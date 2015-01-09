@@ -1,13 +1,11 @@
 <script type='text/javascript' src='/javascript/components/flot/jquery.flot.stack.js'></script>
 <script type='text/javascript'>
 $(function() {
-    var series = [
+	$.plot($("#{GRAPH_ID}"), [
         <!-- BEGIN series -->
         {label: "{SERIES_NAME}", data: [{SERIES_DATA}]}<!-- BEGIN series_separator -->,<!-- END series_separator -->
         <!-- END series -->
-    ];
-
-    var options = {
+    ], {
         series: {
             stack: true,
             bars: {
@@ -25,9 +23,7 @@ $(function() {
         yaxis: {
             tickDecimals: 0
         }
-    }
-
-	$.plot($("#{GRAPH_ID}"), series, options);
+    });
 });
 </script>
 <div class="evaluation-graph-holder clearfix">
