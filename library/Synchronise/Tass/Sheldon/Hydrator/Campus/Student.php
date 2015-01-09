@@ -40,19 +40,19 @@ class Synchronise_Tass_Sheldon_Hydrator_Campus_Student implements Synchronise_Ba
             case 3:
             case 4:
                 // Junior College
-                return 1;
+                return 2;
             case 5:
             case 6:
             case 7:
             case 8:
                 // Middle College
-                return 2;
+                return 3;
             case 9:
             case 10:
             case 11:
             case 12:
                 // Senior College
-                return 3;
+                return 1;
             default:
                 throw new RangeException('Student has no recognized campus');
         }
