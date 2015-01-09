@@ -228,30 +228,34 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
 
         unset($currentPosition);
 
-        /* Find the maximum value and unset anything that isn't the same
+//        /* Find the maximum value and unset anything that isn't the same
+//         */
+//        for ($i = 0; $i < count($scoreboard); $i++) {
+//            $currentPosition = $scoreboard[$i];
+//
+//            $max = false;
+//
+//            foreach ($currentPosition as $key => $value) {
+//                if ($max === false) {
+//                    $max = $value;
+//                }
+//
+//                /* Transfer to a different var
+//                 */
+//                if ($value == $max) {
+//                    $finalScoreboard[$i][$key] = $value;
+//                }
+//                /* For continuity in flot
+//                 */
+//                else {
+//                    $finalScoreboard[$i][$key] = 0;
+//                }
+//            }
+//        }
+
+        /* James prefers to see all the values, not just the maximum
          */
-        for ($i = 0; $i < count($scoreboard); $i++) {
-            $currentPosition = $scoreboard[$i];
-
-            $max = false;
-
-            foreach ($currentPosition as $key => $value) {
-                if ($max === false) {
-                    $max = $value;
-                }
-
-                /* Transfer to a different var
-                 */
-                if ($value == $max) {
-                    $finalScoreboard[$i][$key] = $value;
-                }
-                /* For continuity in flot
-                 */
-                else {
-                    $finalScoreboard[$i][$key] = 0;
-                }
-            }
-        }
+        $finalScoreboard = $scoreboard;
 
         return $finalScoreboard;
     }
