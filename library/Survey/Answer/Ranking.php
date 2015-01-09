@@ -38,14 +38,23 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
 
         $values = unserialize($answer['answer']);
 
-        $allValues = array();
+        $scoreboard = array();
 
         /* Prefill a "scoreboard" of zeroes for each individual response item
          * This represents each individual response item's position in the stack
          * and how many times it is chosen to be in that position in the stack
          */
-        foreach ($values as $currentValue) {
-            $allValues[$currentValue->answerRight] = array_fill(0, count($values), 0);
+        for ($i = 0; $i < count($values); $i++) {
+            $possibilities[] = $values[$i]->answerRight;
+        }
+
+        /* Keep this for zerofilling
+         */
+        $possibilityKeys = $possibilities;
+        $possibilities = array_fill_keys($possibilityKeys, 0);
+
+        for ($i = 0; $i < count($possibilities); $i++) {
+            $scoreboard[$i] = $possibilities;
         }
 
         /* Find all the responses that people made
@@ -58,46 +67,82 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
             $response = unserialize($currentResult['response']);
 
             for ($i = 0; $i < count($response); $i++) {
-                $allValues[$response[$i]][$i]++;
+                $scoreboard[$i][$response[$i]]++;
             }
         }
 
-        /* Sort
+        /* NOTE: Gigantic stupid problem encountered
+         * https://bugs.php.net/bug.php?id=29992
+         *
+         * Be uber careful with these foreaches as they corrupt data.
+         * Stupid php
+         *
+         * This is the reason behind the unset()
          */
-        foreach ($allValues as &$currentValue) {
-            ksort($currentValue);
+        foreach ($scoreboard as &$currentPosition) {
+            arsort($currentPosition);
         }
 
-        /* Find the max value for each individual response, so we can
-         * once again order by key
-         */
-        new \Alaress_Probe($allValues);
-        foreach ($allValues as &$currentValue) {
-            $max = 0;
-            $largestKey = 0;
+        unset($currentPosition);
 
-            for ($i = 0; $i < count($currentValue); $i++) {
-                if ($currentValue[$i] > $max) {
-                    $max = $currentValue[$i];
-                    $largestKey = $i;
+        /* Find the maximum value and unset anything that isn't the same
+         */
+        $finalScoreboard = array();
+
+        for ($i = 0; $i < count($scoreboard); $i++) {
+            $currentPosition = $scoreboard[$i];
+
+            $max = false;
+
+            foreach ($currentPosition as $key => $value) {
+                if ($max === false) {
+                    $max = $value;
+                }
+
+                /* Transfer to a different var
+                 */
+                if ($value == $max) {
+                    $finalScoreboard[$i][$key] = $value;
                 }
             }
-
-            $currentValue = array(
-                'key' => $largestKey,
-                'value' => $max
-            );
         }
 
-        /* Transform and sort them again
-         */
-        $final = array();
+        new \Alaress_ThreeProbe($allResults, $scoreboard, $finalScoreboard);
+        die();
 
-        foreach ($allValues as $key => $struct) {
 
-        }
 
-        ksort($final);
+//
+//        /* Find the max value for each individual response, so we can
+//         * once again order by key
+//         */
+//        new \Alaress_Probe($allValues);
+//        foreach ($allValues as &$currentValue) {
+//            $max = 0;
+//            $largestKey = 0;
+//
+//            for ($i = 0; $i < count($currentValue); $i++) {
+//                if ($currentValue[$i] > $max) {
+//                    $max = $currentValue[$i];
+//                    $largestKey = $i;
+//                }
+//            }
+//
+//            $currentValue = array(
+//                'key' => $largestKey,
+//                'value' => $max
+//            );
+//        }
+//
+//        /* Transform and sort them again
+//         */
+//        $final = array();
+//
+//        foreach ($allValues as $key => $struct) {
+//
+//        }
+//
+//        ksort($final);
 
 
 
