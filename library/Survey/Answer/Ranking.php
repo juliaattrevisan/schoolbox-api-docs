@@ -30,8 +30,9 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
 
         $page->setFile($componentHandle, $this->getGraphTemplateFile());
 
-        $dataset = $this->generateDataSet((int)$currentQuestion['question_id']);
-        $dataset = $this->process($dataset);
+        $dataset = $this->process($this->generateDataSet((int)$currentQuestion['question_id']));
+
+        new \Alaress_Probe($dataset);
 
         $page->setVar(array(
             'SERIES_NAME' => $key,
@@ -49,6 +50,7 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
      */
     private function process($dataset) {
         $newDataset = array();
+        $finalDataset = array();
 
         /* Goddamn you phplib
          */
@@ -64,9 +66,11 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
             }
         }
 
-        new \Alaress_ThreeProbe($dataset, $newDataset, null);
+        foreach($newDataset as $key => $value) {
+            $finalDataset[$key] = implode(',', $value);
+        }
 
-        return $newDataset;
+        return $finalDataset;
     }
 
     /**
