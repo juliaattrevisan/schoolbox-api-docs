@@ -40,7 +40,9 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
      */
     public function visit($currentEvent)
     {
-
+        // Output event times as UTC,
+        // no client should be able to mess that up.
+        $utcTimezone = new DateTimeZone('UTC');
         /* Show visible events only, in export
          */
         if ($this->isVisible($currentEvent)) {
@@ -67,6 +69,8 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
                 $end_time = new DateTime($currentEvent->getEndTime()->getDatabase());
             }
             if (!$currentEvent->getAllday()) {
+                $start_time->setTimezone($utcTimezone);
+                $end_time->setTimezone($utcTimezone);
                 $vevent->add('DTSTART', $start_time);
                 $vevent->add('DTEND', $end_time);
             } else {
