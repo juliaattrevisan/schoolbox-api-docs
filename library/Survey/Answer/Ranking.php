@@ -33,6 +33,11 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
         $dataset = $this->generateDataSet((int)$currentQuestion['question_id']);
         $dataset = $this->process($dataset);
 
+        $page->setVar(array(
+            'SERIES_NAME' => $key,
+            'SERIES_DATA' => $seriesData,
+        ));
+
         $page->parse('graph_block', $componentHandle);
     }
 
@@ -40,11 +45,28 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
      * Manufacture a flot stacked barchart
      *
      * @param $dataset
+     * @return array
      */
     private function process($dataset) {
+        $newDataset = array();
 
         /* Goddamn you phplib
          */
+        for ($i = 0; $i < count($dataset); $i++) {
+            $keys = array_keys($dataset[$i]);
+            $values = array_values($dataset[$i]);
+
+            /* Generate a dataset for flot
+             */
+            for ($j = 0; $j < count($keys); $j++) {
+                $graphIndex = $i+1;
+                $newDataset[$keys[$j]][] = "[{$graphIndex}, {$values[$j]}]";
+            }
+        }
+
+        new \Alaress_ThreeProbe($dataset, $newDataset, null);
+
+        return $newDataset;
     }
 
     /**
@@ -185,6 +207,11 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
                  */
                 if ($value == $max) {
                     $finalScoreboard[$i][$key] = $value;
+                }
+                /* For continuity in flot
+                 */
+                else {
+                    $finalScoreboard[$i][$key] = 0;
                 }
             }
         }
