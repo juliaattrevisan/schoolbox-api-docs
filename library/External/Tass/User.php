@@ -353,8 +353,7 @@ class External_Tass_User implements External_UserInterface
                 s.campus_code AS StudentCampus, *
                 -- s.dol AS StudentLeavingDate
             FROM student AS s
-            WHERE s.campus_code IS NOT NULL
-            AND s.dol IS NULL
+            WHERE s.dol IS NULL
         ";
 
         $result = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
