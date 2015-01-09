@@ -12,59 +12,72 @@
 class External_Edumate_Timetable extends External_Edumate_Connection implements External_TimetableInterface
 {
 
-    protected $offset = 0;
-
-    /**
-     * Ideally, these two arrays would be replaced with a View to retrieve dynamically, rather than hardcoded
-     * @var array
-     */
-    protected $labelMap = array(
-        'BS' => array('Before School', 1),
-        'MG' => array('Morning Activities', 1),
-        '1'  => array('Period 1', 1),
-        '2'  => array('Period 2', 1),
-        'R'  => array('Recess', 2),
-        '3'  => array('Period 3', 1),
-        '4'  => array('Period 4', 1),
-        '5'  => array('Period 5', 1),
-        'L1' => array('Lunch', 2),
-        '6'  => array('Period 6', 1),
-        '7'  => array('Period 7', 1),
-        'AS' => array('After School', 2)
-    );
-
-    protected $timeMap = array(
-        'BS' => array('08:00', '08:40'),
-        'MG' => array('08:40', '09:00'),
-        '1'  => array('09:00', '09:45'),
-        '2'  => array('09:45', '10:30'),
-        'R'  => array('10:30', '10:50'),
-        '3'  => array('10:50', '11:35'),
-        '4'  => array('11:35', '12:20'),
-        '5'  => array('12:20', '13:05'),
-        'L1' => array('13:05', '13:40'),
-        '6'  => array('13:40', '14:25'),
-        '7'  => array('14:25', '15:10'),
-        'AS' => array('15:10', '15:55'),
-    );
-
-    protected $cycleLength = 5;
+    /** @var array */
+    protected $campusCache;
 
 
     /**
+     * @param int $campusId
+     * @param int $day
      * @return array
      */
-    protected function getLabelMap()
+    protected function getLabelMap($campusId, $day)
     {
-        $stmt = $this->getDatabase()->query("
-            SELECT period, period_sequence
+        return $this->getMap(array('period', 'PERIOD SEQUENCE'), $campusId, $day);
+    }
+
+
+    /**
+     *
+     * @param int $campusId
+     * @param int $day
+     * @return array
+     */
+    protected function getTimeMap($campusId, $day)
+    {
+        return $this->getMap(array('start_time', 'end_time'), $campusId, $day);
+    }
+
+
+    /**
+     * @param array $fields
+     * @param int $campusId
+     * @param int $day
+     * @return array
+     */
+    protected function getMap($fields, $campusId, $day)
+    {
+        $campusName = $this->getCampusName($campusId);
+
+        if (!in_array('PERIOD SEQUENCE', $fields)) {
+            $unset = true;
+            $fields[] = 'PERIOD SEQUENCE';
+        }
+
+        $fieldString = implode('", "', $fields);
+
+        $query = sprintf('
+            SELECT "%s"
             FROM db2inst1.schoolbox_timetable_definition
-        ");
+            WHERE "CAMPUS" = :campus
+            AND "DAY SEQUENCE" = :seq
+            ORDER BY "DAY SEQUENCE" ASC, "PERIOD SEQUENCE" ASC
+        ', $fieldString);
+
+        $stmt = $this->getDatabase()->prepare($query);
+
+        $stmt->execute(array(
+            'campus' => $campusName,
+            'seq'    => $day
+        ));
 
         $map = array();
 
         while ($r = $stmt->fetch(DB2::FETCH_ASSOC)) {
-            $map[/* ??? "number" */] = array($r['PERIOD'], $r['PERIOD_SEQUENCE']);
+            if (isset($unset)) {
+                unset($r['PERIOD SEQUENCE']);
+            }
+            $map[(int)$r["PERIOD SEQUENCE"]] = array_values($r);
         }
 
         return $map;
@@ -72,24 +85,17 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
 
     /**
-     * @return array
+     * @param int $campusId
+     * @return string
      */
-    protected function getTimeMap()
+    protected function getCampusName($campusId)
     {
-        $stmt = $this->getDatabase()->query("
-            SELECT start_time, end_time
-            FROM sb2inst1.schoolbox_timetable_definition
-        ");
-
-        $map = array();
-
-        while ($r = $stmt->fetch(DB2::FETCH_ASSOC)) {
-            $map[/* ??? "number" */] = array($r['START_TIME'], $r['END_TIME']);
+        if (empty($this->campusCache[$campusId])) {
+            $this->campusCache[$campusId] = \Schoolbox\CampusMapper::getInstance()->findById($campusId)->getName();
         }
 
-        return $map;
+        return $this->campusCache[$campusId];
     }
-
 
     /**
      * Returns the timetable definition for a particular campus *FOR A PARTICULAR DAY*
@@ -104,9 +110,9 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         $definition = array();
         $periodCount = 0;
 
-        $timeMap = $this->getTimeMap();
+        $timeMap = $this->getTimeMap($campusId, $day);
 
-        foreach($this->getLabelMap() as $shortName => $periodDetails) {
+        foreach($this->getLabelMap($campusId, $day) as $shortName => $periodDetails) {
             $definition['desc'][] = $periodDetails[0];
             $definition['start'][] = $this->parseTime($timeMap[$shortName][0]);
             $definition['end'][] = $this->parseTime($timeMap[$shortName][1]);
@@ -121,12 +127,17 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
         $definition['periodCount'] = $periodCount;
 
-        $definition['dayCount'] = $this->getCycleLength();
+        $definition['dayCount'] = $this->getCycleLength($campusId);
 
         return $definition;
 
     }
 
+
+    /**
+     * @param string $time
+     * @return string
+     */
     protected function parseTime($time)
     {
         $timeObject = new DateTime($time, new DateTimeZone('UTC'));
@@ -135,14 +146,31 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
     /**
      * Helper function to retrieve the length of the timetable cycle in edumate
+     * @param int $campusId
      * @return int
      */
-    private function getCycleLength() 
+    protected function getCycleLength($campusId)
     {
-        return $this->getDatabase()->query("SELECT MAX(day_sequence) FROM db2inst.schoolbox_timetable.definition")->fetchColumn();
+        $stmt = $this->getDatabase()->prepare('
+            SELECT "DAY SEQUENCE"
+            FROM db2inst1.schoolbox_timetable_definition
+            WHERE campus = :campus
+            ORDER BY "DAY SEQUENCE" DESC
+            FETCH FIRST 1 ROW ONLY
+        ');
+
+        $stmt->execute(array('campus' => $this->getCampusName($campusId)));
+
+        return $stmt->fetchColumn();
     }
 
-    public function getDayNumber($campusId, $date = 0)
+
+    /**
+     * @param int $campusId
+     * @param int $date
+     * @return bool|string
+     */
+    public function getDayNumber($campusId, $date = 0) 
     {
 
         if (!$date) {
@@ -385,16 +413,18 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      * @param $dayNumber
      * @return int|bool
      */
-    public function getSubjectPeriod($classCode, $dayNumber)
+    public function getSubjectPeriod($classCode, $dayNumber) 
     {
-        $stmt = $this->getDatabase()->prepare(
-            "
-                        SELECT period
-                        FROM db2inst1.schoolbox_timetable
-                        WHERE class_code = :code
-                        AND day = :day
-                    "
-        );
+        $stmt = $this->getDatabase()->prepare('
+            SELECT "PERIOD SEQUENCE"
+            FROM db2inst1.schoolbox_timetable t
+            LEFT JOIN db2inst1.schoolbox_timetable_definition td
+              ON t.campus = td.campus
+              AND t.day = td."DAY SEQUENCE"
+              AND t.period = td."PERIOD SEQUENCE"
+            WHERE t.class_code = :code
+            AND t.day = :day
+        ');
 
         $stmt->execute(
             array(
@@ -403,23 +433,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             )
         );
 
-        $class = $stmt->fetchColumn();
-
-        if ($class === false) {
-            return false;
-        }
-
-        // return the SEQUENCE of the period (if that is not what is expected, then this should be changed)
-        $i = 0;
-        foreach($this->getLabelMap() as $periodCode => $periodDetails) {
-            ++$i;
-            if ($class == $periodCode) {
-                return $i;
-            }
-        }
-
-        return false;
-
+        return (int)$stmt->fetchColumn() ?: false;
     }
 
     /**
