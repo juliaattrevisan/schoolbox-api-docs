@@ -254,6 +254,9 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
 //        }
 
         /* James prefers to see all the values, not just the maximum
+         * in each position in the stack
+         *
+         * This is going to get ugly for more than ~10-20 items in the stack.
          */
         $finalScoreboard = $scoreboard;
 
