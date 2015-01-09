@@ -88,7 +88,14 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
              */
             for ($j = 0; $j < count($keys); $j++) {
                 $graphIndex = $i+1;
-                $newDataset[$keys[$j]][] = "[{$graphIndex}, {$values[$j]}]";
+                if (!$values[$j]) {
+                    $val = null;
+                }
+                else {
+                    $val = $values[$j];
+                }
+
+                $newDataset[$keys[$j]][] = "[{$graphIndex}, {$val}]";
             }
         }
 
