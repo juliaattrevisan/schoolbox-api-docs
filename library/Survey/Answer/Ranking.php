@@ -30,15 +30,87 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
 
         $page->setFile($componentHandle, $this->getGraphTemplateFile());
 
-        $questionId = (int)$currentQuestion['question_id'];
+        $dataset = $this->generateDataSet((int)$currentQuestion['question_id']);
+
+        $page->parse('graph_block', $componentHandle);
+    }
+
+    /**
+     * Generate a "scoreboard" of items.
+     *
+     * This lists them in order of precedence from the top of the stack
+     * to the bottom.
+     *
+     * Each element in the zero-indexed scoreboard will contain the item
+     * (or items) most frequently chosen for that position.
+     *
+     * e.g.
+     * a:3:{i:0;s:3:"dog";i:1;s:3:"cat";i:2;s:5:"rhino";}
+     * a:3:{i:0;s:3:"dog";i:1;s:5:"rhino";i:2;s:3:"cat";}
+     * a:3:{i:0;s:3:"cat";i:1;s:3:"dog";i:2;s:5:"rhino";}
+     *
+     * Produces the interim scoreboard
+     *
+    Array
+    (
+        [0] => Array
+            (
+                [dog] => 2
+                [cat] => 1
+                [rhino] => 0
+            )
+
+        [1] => Array
+            (
+                [rhino] => 1
+                [dog] => 1
+                [cat] => 1
+            )
+
+        [2] => Array
+            (
+                [rhino] => 2
+                [cat] => 1
+                [dog] => 0
+            )
+    )
+     *
+     * Only the maximum values are used; anything less than the maximum
+     * is discarded, which results in $finalScoreboard
+     *
+    Array
+    (
+        [0] => Array
+            (
+                [dog] => 2
+            )
+
+        [1] => Array
+            (
+                [rhino] => 1
+                [dog] => 1
+                [cat] => 1
+            )
+
+        [2] => Array
+            (
+                [rhino] => 2
+            )
+    )
+     *
+     * @param $questionId
+     * @return array
+     */
+    private function generateDataSet($questionId) {
+        $possibilities = array();
+        $scoreboard = array();
+        $finalScoreboard = array();
 
         /* Find all the possible things to chooze from
          */
         $answer = $this->getByField('question_id', $questionId);
 
         $values = unserialize($answer['answer']);
-
-        $scoreboard = array();
 
         /* Prefill a "scoreboard" of zeroes for each individual response item
          * This represents each individual response item's position in the stack
@@ -87,8 +159,6 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
 
         /* Find the maximum value and unset anything that isn't the same
          */
-        $finalScoreboard = array();
-
         for ($i = 0; $i < count($scoreboard); $i++) {
             $currentPosition = $scoreboard[$i];
 
@@ -107,70 +177,6 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
             }
         }
 
-        new \Alaress_ThreeProbe($allResults, $scoreboard, $finalScoreboard);
-        die();
-
-
-
-//
-//        /* Find the max value for each individual response, so we can
-//         * once again order by key
-//         */
-//        new \Alaress_Probe($allValues);
-//        foreach ($allValues as &$currentValue) {
-//            $max = 0;
-//            $largestKey = 0;
-//
-//            for ($i = 0; $i < count($currentValue); $i++) {
-//                if ($currentValue[$i] > $max) {
-//                    $max = $currentValue[$i];
-//                    $largestKey = $i;
-//                }
-//            }
-//
-//            $currentValue = array(
-//                'key' => $largestKey,
-//                'value' => $max
-//            );
-//        }
-//
-//        /* Transform and sort them again
-//         */
-//        $final = array();
-//
-//        foreach ($allValues as $key => $struct) {
-//
-//        }
-//
-//        ksort($final);
-
-
-
-        /* Set up a list of lists
-         */
-//        for ($j = 0; $j < count($allResults); $j++) {
-//            $currentResult = $allResults[$j];
-//
-//            if ($allValues = unserialize($currentResult['response'])) {
-//                $scoreboard[$j] = $allValues;
-//            }
-//        }
-
-
-//        /* Summate each position
-//         */
-//        $position = array();
-//
-//        $numPositions = count($scoreboard[0]);
-//
-//        foreach ($scoreboard as $list) {
-//            for ($i = 0; $i < $numPositions; $i++) {
-//                $position[$i][$list[$i]]++;
-//            }
-//        }
-//
-//        new \Alaress_ThreeProbe($scoreboard, $position, null);
-
-        $page->parse('graph_block', $componentHandle);
+        return $finalScoreboard;
     }
-} 
+}
