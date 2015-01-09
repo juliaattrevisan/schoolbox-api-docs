@@ -1,30 +1,33 @@
+<script type='text/javascript' src='/javascript/components/flot/jquery.flot.stack.js'></script>
 <script type='text/javascript'>
 $(function() {
-	$.plot($("#{GRAPH_ID}"), [
-		{
-			label: "{SERIES_LABEL}",
-			data: [
-                <!-- BEGIN series -->
-                {label: "{SERIES_NAME}", data: [{SERIES_DATA}]}<!-- BEGIN series_separator -->,<!-- END series_separator -->
-                <!-- END series -->
-            ],
-			bars: {
-				show: true,
-				align: 'center'
-			}
-		}
-	], {
-		legend: {
-			container: $('#legend_{GRAPH_ID}')
-		},
-		xaxis: {
-			show: false,
-			tickLength: 0
-		},
-		yaxis: {
-			tickDecimals: 0
-		}
-	});
+    var series = [
+        <!-- BEGIN series -->
+        {label: "{SERIES_NAME}", data: [{SERIES_DATA}]}<!-- BEGIN series_separator -->,<!-- END series_separator -->
+        <!-- END series -->
+    ];
+
+    var options = {
+        series: {
+            stack: true,
+            bars: {
+                show: true,
+                align: 'center'
+            }
+        },
+
+        legend: {
+            container: $('#legend_{GRAPH_ID}')
+        },
+        xaxis: {
+            ticks: [[1, 'First'], [2, 'Second'], [3, 'Third']]
+        },
+        yaxis: {
+            tickDecimals: 0
+        }
+    }
+
+	$.plot($("#{GRAPH_ID}"), series, options);
 });
 </script>
 <div class="evaluation-graph-holder clearfix">

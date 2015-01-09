@@ -29,17 +29,43 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
         $componentHandle = 'temp' . $currentQuestion['question_id'];
 
         $page->setFile($componentHandle, $this->getGraphTemplateFile());
+        $page->setBlock($componentHandle, 'series', 'series_block');
+        $page->setBlock('series', 'series_separator', 'series_separator_block');
 
         $dataset = $this->process($this->generateDataSet((int)$currentQuestion['question_id']));
 
-        new \Alaress_Probe($dataset);
+        $i = 0;
+
+        foreach ($dataset as $key => $data) {
+            $page->setVar(array(
+                'SERIES_NAME' => $key,
+                'SERIES_DATA' => $data,
+            ));
+
+            if ($i < count($dataset)-1) {
+                $page->parse('series_separator_block', 'series_separator');
+            }
+
+            $i++;
+
+            $page->parse('series_block', 'series', true);
+
+            /* Clear children after parsing out the parent
+             */
+            $page->setVar(array(
+                'series_separator_block' => ''
+            ));
+        }
 
         $page->setVar(array(
-            'SERIES_NAME' => $key,
-            'SERIES_DATA' => $seriesData,
+            'GRAPH_ID' => 'surveyQuestion_'
+                . intval($currentQuestion['question_id'])
+                . '_'
+                . md5($currentQuestion['question']),
         ));
 
         $page->parse('graph_block', $componentHandle);
+
     }
 
     /**
