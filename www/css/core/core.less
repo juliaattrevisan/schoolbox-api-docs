@@ -10199,19 +10199,24 @@ div.colours p {
         width: 17px;
         z-index: 50;
     }
+    .as-prev-arrow,
+    .as-next-arrow{
+    	top: 50%;
+    	margin-top: -12px;
+    }
     .as-prev-arrow{
-        background: url("/images/core/icons/arrows.png") top left no-repeat; left: 10px; top: 50%;
+        background: url("/images/core/icons/arrows.png") top left no-repeat; left: 10px;
         &:hover{ background: url("/images/core/icons/arrows.png") bottom left no-repeat; }
     }
     .as-next-arrow{
-        background: url("/images/core/icons/arrows.png") top right no-repeat; right: 10px; top: 50%;
+        background: url("/images/core/icons/arrows.png") top right no-repeat; right: 10px;
         &:hover{ background: url("/images/core/icons/arrows.png") bottom right no-repeat; }
     }
 }
 .as-nav{
     bottom: -10px;
     left: 50%;
-    margin: 0 0 0 -7px;
+    margin: 0 0 0 -24px;
     position: absolute;
     text-align: left;
     z-index: 1;
