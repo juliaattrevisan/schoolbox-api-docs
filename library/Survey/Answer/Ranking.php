@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Survey_Answer_Ranking
  *
@@ -7,14 +8,15 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-
-class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
+class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
+{
     protected $graphTemplateFile = 'survey/answer/ranking/graph.html';
 
     /**
      * Setup
      */
-    protected function setup() {
+    protected function setup()
+    {
         $this->setResponseHandler(new Survey_Response());
     }
 
@@ -25,7 +27,8 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
      * @param  $currentQuestion
      * @return void
      */
-    public function graphResults($page, $currentQuestion) {
+    public function graphResults($page, $currentQuestion)
+    {
         $componentHandle = 'temp' . $currentQuestion['question_id'];
 
         $page->setFile($componentHandle, $this->getGraphTemplateFile());
@@ -37,12 +40,14 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
         $i = 0;
 
         foreach ($dataset as $key => $data) {
-            $page->setVar(array(
-                'SERIES_NAME' => $key,
-                'SERIES_DATA' => $data,
-            ));
+            $page->setVar(
+                array(
+                    'SERIES_NAME' => $key,
+                    'SERIES_DATA' => $data,
+                )
+            );
 
-            if ($i < count($dataset)-1) {
+            if ($i < count($dataset) - 1) {
                 $page->parse('series_separator_block', 'series_separator');
             }
 
@@ -52,17 +57,21 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
 
             /* Clear children after parsing out the parent
              */
-            $page->setVar(array(
-                'series_separator_block' => ''
-            ));
+            $page->setVar(
+                array(
+                    'series_separator_block' => ''
+                )
+            );
         }
 
-        $page->setVar(array(
-            'GRAPH_ID' => 'surveyQuestion_'
-                . intval($currentQuestion['question_id'])
-                . '_'
-                . md5($currentQuestion['question']),
-        ));
+        $page->setVar(
+            array(
+                'GRAPH_ID' => 'surveyQuestion_'
+                    . intval($currentQuestion['question_id'])
+                    . '_'
+                    . md5($currentQuestion['question']),
+            )
+        );
 
         $page->parse('graph_block', $componentHandle);
 
@@ -74,24 +83,24 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
      * @param $dataset
      * @return array
      */
-    private function process($dataset) {
-        $newDataset = array();
+    private function process($dataset)
+    {
+        $newDataset   = array();
         $finalDataset = array();
 
         /* Goddamn you phplib
          */
         for ($i = 0; $i < count($dataset); $i++) {
-            $keys = array_keys($dataset[$i]);
+            $keys   = array_keys($dataset[$i]);
             $values = array_values($dataset[$i]);
 
             /* Generate a dataset for flot
              */
             for ($j = 0; $j < count($keys); $j++) {
-                $graphIndex = $i+1;
+                $graphIndex = $i + 1;
                 if (!$values[$j]) {
                     $val = null;
-                }
-                else {
+                } else {
                     $val = $values[$j];
                 }
 
@@ -99,7 +108,7 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
             }
         }
 
-        foreach($newDataset as $key => $value) {
+        foreach ($newDataset as $key => $value) {
             $finalDataset[$key] = implode(',', $value);
         }
 
@@ -122,59 +131,60 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
      *
      * Produces the interim scoreboard
      *
-    Array
-    (
-        [0] => Array
-            (
-                [dog] => 2
-                [cat] => 1
-                [rhino] => 0
-            )
-
-        [1] => Array
-            (
-                [rhino] => 1
-                [dog] => 1
-                [cat] => 1
-            )
-
-        [2] => Array
-            (
-                [rhino] => 2
-                [cat] => 1
-                [dog] => 0
-            )
-    )
+     * Array
+     * (
+     * [0] => Array
+     * (
+     * [dog] => 2
+     * [cat] => 1
+     * [rhino] => 0
+     * )
+     *
+     * [1] => Array
+     * (
+     * [rhino] => 1
+     * [dog] => 1
+     * [cat] => 1
+     * )
+     *
+     * [2] => Array
+     * (
+     * [rhino] => 2
+     * [cat] => 1
+     * [dog] => 0
+     * )
+     * )
      *
      * Only the maximum values are used; anything less than the maximum
      * is discarded, which results in $finalScoreboard
      *
-    Array
-    (
-        [0] => Array
-            (
-                [dog] => 2
-            )
-
-        [1] => Array
-            (
-                [rhino] => 1
-                [dog] => 1
-                [cat] => 1
-            )
-
-        [2] => Array
-            (
-                [rhino] => 2
-            )
-    )
+     * Array
+     * (
+     * [0] => Array
+     * (
+     * [dog] => 2
+     * )
+     *
+     * [1] => Array
+     * (
+     * [rhino] => 1
+     * [dog] => 1
+     * [cat] => 1
+     * )
+     *
+     * [2] => Array
+     * (
+     * [rhino] => 2
+     * )
+     * )
      *
      * @param $questionId
      * @return array
      */
-    private function generateDataSet($questionId) {
-        $possibilities = array();
-        $scoreboard = array();
+    private function generateDataSet($questionId)
+    {
+        $possibilities   = array();
+        $scoreboard      = array();
         $finalScoreboard = array();
 
         /* Find all the possible things to chooze from
@@ -194,7 +204,7 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
         /* Keep this for zerofilling
          */
         $possibilityKeys = $possibilities;
-        $possibilities = array_fill_keys($possibilityKeys, 0);
+        $possibilities   = array_fill_keys($possibilityKeys, 0);
 
         for ($i = 0; $i < count($possibilities); $i++) {
             $scoreboard[$i] = $possibilities;
@@ -261,5 +271,53 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
         $finalScoreboard = $scoreboard;
 
         return $finalScoreboard;
+    }
+
+    /**
+     * Show the response someone submitted and also show the correct answer.
+     * Provide an option for the teacher to review the mark and adjust.
+     *
+     * @param  $page
+     * @param  $question_id
+     *
+     * @return void
+     */
+    public function reviewResponse($page, $question_id)
+    {
+        $right = array();
+
+        $existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
+
+        if ($existing['response']) {
+            $right = unserialize($existing['response']);
+        }
+
+        /* Define special blocks to handle this special answerOptions scenario,
+         * because we have three columns to parse per iteration.
+         */
+        $page->setBlock('answerFormFragment', 'answerOptionRight', 'answerOptionRight_block');
+
+        $answerGroup = $this->getByQuestionID($question_id);
+
+        if ($answerGroup) {
+            $page->setVar(
+                array(
+                    'ANSWER_ID'   => $answerGroup['answer_id'],
+                    'RESPONSE_ID' => $existing['response_id'],
+                )
+            );
+
+            $allAnswers = unserialize($answerGroup['answer']);
+
+            for ($i = 0; $i < count($allAnswers); $i++) {
+                $page->setVar(
+                    array(
+                        'ANSWER_RIGHT_VALUE' => $right[$i],
+                    )
+                );
+
+                $page->parse('answerOptionRight_block', 'answerOptionRight', true);
+            }
+        }
     }
 }
