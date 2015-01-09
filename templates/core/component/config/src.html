@@ -17,7 +17,8 @@
           var lbl = $('#text-{COMPONENT_HANDLE}');
 
           src.val(url);
-          lbl.attr('href', url).html(filename);
+          // Don't show folder icons here
+          lbl.attr('href', url).html($(filename).text());
 
           // Update a select box.
           // How that's done depends on exactly what type it is: textbox or tile
@@ -45,7 +46,7 @@
   });
 </script>
 <span>
-  <a id="text-{COMPONENT_HANDLE}" href="{COMPONENT_CONFIG_SRC_ID}" class="src-folder" title="{COMPONENT_CONFIG_SRC_NAME}">
+  <a id="text-{COMPONENT_HANDLE}" href="{COMPONENT_CONFIG_SRC_ID}" title="{COMPONENT_CONFIG_SRC_NAME}">
     {COMPONENT_CONFIG_SRC_NAME}
   </a>
 </span>
