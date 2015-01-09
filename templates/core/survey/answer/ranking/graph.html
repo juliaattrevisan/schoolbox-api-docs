@@ -1,17 +1,18 @@
 <script type='text/javascript'>
 $(function() {
 	$.plot($("#{GRAPH_ID}"), [
-		<!-- BEGIN series -->
 		{
 			label: "{SERIES_LABEL}",
-			data: [[{SERIES_INDEX}, {SERIES_DATA}]],
+			data: [
+                <!-- BEGIN series -->
+                {label: '{SERIES_NAME}', data: [{SERIES_DATA}]}<!-- BEGIN series_separator -->,<!-- END series_separator -->
+                <!-- END series -->
+            ],
 			bars: {
 				show: true,
 				align: 'center'
 			}
-		}<!-- BEGIN series_separator -->,
-		<!-- END series_separator -->
-		<!-- END series -->
+		}
 	], {
 		legend: {
 			container: $('#legend_{GRAPH_ID}')

@@ -31,8 +31,20 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking {
         $page->setFile($componentHandle, $this->getGraphTemplateFile());
 
         $dataset = $this->generateDataSet((int)$currentQuestion['question_id']);
+        $dataset = $this->process($dataset);
 
         $page->parse('graph_block', $componentHandle);
+    }
+
+    /**
+     * Manufacture a flot stacked barchart
+     *
+     * @param $dataset
+     */
+    private function process($dataset) {
+
+        /* Goddamn you phplib
+         */
     }
 
     /**
