@@ -1,89 +1,93 @@
 <?php
+
 /************************************************************
-*                                                           *
-* 		Copyright (c) 2013 Alaress Pty Ltd  				*
-*                                                           *
-*	This file provides access to Denbigh timetable info	*
-*                                                           *
-************************************************************/
+ *                                                           *
+ *        Copyright (c) 2013 Alaress Pty Ltd                *
+ *                                                           *
+ *    This file provides access to Denbigh timetable info    *
+ *                                                           *
+ ************************************************************/
+class External_Schoolbox_Timetable implements External_TimetableInterface
+{
+    private $database;
 
-class External_Schoolbox_Timetable implements External_TimetableInterface {
-	private $database;
+    private $group;
 
-	private $group;
+    public function __construct()
+    {
+        $this->setdatabase(Database::getInstance());
 
-	public function __construct () {
-		$this->setdatabase( Database::getInstance() );
+        $this->setGroup(new Group);
+    }
 
-		$this->setGroup( new Group );
-	}
+    public function getTimetableDefinition($campusId, $day = 0)
+    {
+        $statement = $this->getDatabase()->prepare(
+            "
+                        SELECT tc.start, tc.reset, tc.finish, tc.offset,
+                            ty.title, ty.cycle_length, ty.day_length, ty.regular
+                        FROM timetable_campus tc
+                        LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
+                        WHERE tc.campus_id = :campusId
+                            AND tc.start < NOW()
+                            AND tc.finish > NOW()
+                    "
+        );
 
-	public function getTimetableDefinition ($campusId, $day = 0) {
-		$statement = $this->getDatabase()->prepare("
-			SELECT tc.start, tc.reset, tc.finish, tc.offset,
-				ty.title, ty.cycle_length, ty.day_length, ty.regular
-			FROM timetable_campus tc
-			LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
-			WHERE tc.campus_id = :campusId
-			    AND tc.start < NOW()
-			    AND tc.finish > NOW()
-		");
+        $statement->execute(array(':campusId' => $campusId));
 
-		$statement->execute( array(':campusId' => $campusId) );
-		
-        if ( $definition = $statement->fetch(PDO::FETCH_ASSOC) ) {
+        if ($definition = $statement->fetch(PDO::FETCH_ASSOC)) {
             /* Adapt to spec */
             $definition['dayCount'] = $definition['cycle_length'];
             $definition['periodCount'] = $definition['day_length'];
 
             return $definition;
-        }
-        else {
+        } else {
             return false;
         }
-	}
+    }
 
-	public function getDayNumber ($campusId, $date = 0) {
-        if ( !$definition = $this->getTimetableDefinition($campusId) ) {
+    public function getDayNumber($campusId, $date = 0)
+    {
+        if (!$definition = $this->getTimetableDefinition($campusId)) {
             return false;
         }
 
-		if ( empty($date) ) {
-			$date = time();
-		}
+        if (empty($date)) {
+            $date = time();
+        }
 
-		if ( empty($definition['reset']) || $definition['reset'] == '0000-00-00') {
-			$start = strtotime($definition['start']);
-		}
-		else {
-			$start = strtotime($definition['reset']);
-		}
+        if (empty($definition['reset']) || $definition['reset'] == '0000-00-00') {
+            $start = strtotime($definition['start']);
+        } else {
+            $start = strtotime($definition['reset']);
+        }
 
-		$days = ceil( ($date - $start) / (60 * 60 * 24) ) + 1;
+        $days = ceil(($date - $start) / (60 * 60 * 24)) + 1;
 
-		/* Calculate the business days from the even weeks */
-		$businessDays = 5 * floor($days / 7);
+        /* Calculate the business days from the even weeks */
+        $businessDays = 5 * floor($days / 7);
 
-		/* Handle the excess days */
-		$excessDays = $days % 7;
+        /* Handle the excess days */
+        $excessDays = $days % 7;
 
-		for ( $i = 0; $i < $excessDays; $i++ ) {
-			$currentExcessDay = $date - (60 * 60 * 24 * $i);
+        for ($i = 0; $i < $excessDays; $i++) {
+            $currentExcessDay = $date - (60 * 60 * 24 * $i);
 
-			/* If its not Saturday or Sunday then increment the business days */
-			if ( date('N', $currentExcessDay) < 6 ) {
-				$businessDays++;
-			}
-		}
+            /* If its not Saturday or Sunday then increment the business days */
+            if (date('N', $currentExcessDay) < 6) {
+                $businessDays++;
+            }
+        }
 
-        if ( is_numeric($definition['offset']) ) {
+        if (is_numeric($definition['offset'])) {
             $businessDays += $definition['offset'];
         }
 
-		$currentDay = $businessDays % $definition['cycle_length'];
+        $currentDay = $businessDays % $definition['cycle_length'];
 
-		return $currentDay;
-	}
+        return $currentDay;
+    }
 
     /**
      * Gets a statement for fetching the periods for a given campus. Has
@@ -93,7 +97,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
      *
      * @return PDOStatement
      */
-    protected function getPeriodStatement($single_day = false) {
+    protected function getPeriodStatement($single_day = false)
+    {
         $query = "
             SELECT tp.id, tp.title, tp.day, tp.sequence, tp.start, tp.finish, tp.usable
             FROM timetable_campus tc
@@ -114,7 +119,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
      *
      * @return PDOStatement
      */
-    protected function getClassUserStatement() {
+    protected function getClassUserStatement()
+    {
         // Get classes for which this user is involved, or is a teacher.
         $query = "
             SELECT c.name, c.code, c.description, cp.period_id, cp.room, cp.teacher_id, u.synergy_id
@@ -134,14 +140,15 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
      *
      * @return array
      */
-    public function getPeriodNumber ($campusId) {
+    public function getPeriodNumber($campusId)
+    {
         // Surely this should take a day number????
 
-        if ( !$definition = $this->getTimetableDefinition($campusId) ) {
+        if (!$definition = $this->getTimetableDefinition($campusId)) {
             return false;
         }
 
-        if ( empty($definition['regular']) ) {
+        if (empty($definition['regular'])) {
             return false;
         }
 
@@ -159,116 +166,128 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
         return false;
     }
 
-	public function getFullTimetable ($externalUserId, $userId, $campusId) {
-		/* Get current campus timetable */
-		$periodStatement = $this->getPeriodStatement(false);
-		$periodStatement->execute( array(
-			':campusId' => $campusId,
-		) );
+    public function getFullTimetable($externalUserId, $userId, $campusId)
+    {
+        /* Get current campus timetable */
+        $periodStatement = $this->getPeriodStatement(false);
+        $periodStatement->execute(
+            array(
+                ':campusId' => $campusId,
+            )
+        );
 
-		$periodList = $periodStatement->fetchAll(PDO::FETCH_ASSOC);
+        $periodList = $periodStatement->fetchAll(PDO::FETCH_ASSOC);
 
-		/* Get user's classes */
-		// Is this a teacher? If so only get classes for which I'm a teacher
-		$classStatement = $this->getClassUserStatement();
-		$classStatement->execute( array(
-			':userId' => $userId,
-		) );
+        /* Get user's classes */
+        // Is this a teacher? If so only get classes for which I'm a teacher
+        $classStatement = $this->getClassUserStatement();
+        $classStatement->execute(
+            array(
+                ':userId' => $userId,
+            )
+        );
 
-		$classList = $classStatement->fetchAll(PDO::FETCH_ASSOC);
+        $classList = $classStatement->fetchAll(PDO::FETCH_ASSOC);
 
-		$periodListAdaption = array();
+        $periodListAdaption = array();
 
-		foreach ( $periodList as $period ) {
-			$periodSequence = $period['sequence'];
+        foreach ($periodList as $period) {
+            $periodSequence = $period['sequence'];
 
-			if ( !isset($periodListAdaption[$periodSequence]) ) {
-				$periodListAdaption[$periodSequence] = array(
-					'periodNumber'   => $period['sequence'],
-					'periodName'     => $period['title'],
-					'periodStart'    => $period['start'],
-					'periodEnd'      => $period['finish'],
-					'periodSequence' => 1,
-					'day'            => array()
-				);
-			}
+            if (!isset($periodListAdaption[$periodSequence])) {
+                $periodListAdaption[$periodSequence] = array(
+                    'periodNumber'   => $period['sequence'],
+                    'periodName'     => $period['title'],
+                    'periodStart'    => $period['start'],
+                    'periodEnd'      => $period['finish'],
+                    'periodSequence' => 1,
+                    'day'            => array()
+                );
+            }
 
-			$dayNumber = $period['day'];
+            $dayNumber = $period['day'];
 
-			$periodListAdaption[$periodSequence]['day'][$dayNumber] = array( 'periodOn' => 1 );
+            foreach ($classList as $i => $class) {
+                if ($class['period_id'] == $period['id']) {
+                    $periodListAdaption[$periodSequence]['day'][$dayNumber][0]['description'] = $class['name'];
+                    $periodListAdaption[$periodSequence]['day'][$dayNumber][0]['code'] = $class['code'];
+                    $periodListAdaption[$periodSequence]['day'][$dayNumber][0]['room'] = $class['room'];
+                    $periodListAdaption[$periodSequence]['day'][$dayNumber][0]['staffCode'] = $class['synergy_id'];
+                    unset($classList[$i]);
+                }
+            }
+        }
 
-			foreach ( $classList as $i => $class ) {
-				if ( $class['period_id'] == $period['id'] ) {
-					$periodListAdaption[$periodSequence]['day'][$dayNumber]['description'] = $class['name'];
-					$periodListAdaption[$periodSequence]['day'][$dayNumber]['code'] = $class['code'];
-					$periodListAdaption[$periodSequence]['day'][$dayNumber]['room'] = $class['room'];
-					$periodListAdaption[$periodSequence]['day'][$dayNumber]['staffCode'] = $class['synergy_id'];
-					unset($classList[$i]);
-				}
-			}
-		}
+        return $periodListAdaption;
+    }
 
-		return $periodListAdaption;
-	}
+    public function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber)
+    {
+        /* Get current campus timetable */
+        $periodStatement = $this->getPeriodStatement(true);
+        $periodStatement->execute(
+            array(
+                ':campusId' => $campusId,
+                ':day'      => $dayNumber
+            )
+        );
 
-	public function getDayTimetable ($externalUserId, $userId, $campusId, $dayNumber) {
-		/* Get current campus timetable */
-		$periodStatement = $this->getPeriodStatement(true);
-		$periodStatement->execute( array(
-			':campusId' => $campusId,
-			':day' => $dayNumber
-		) );
+        $periodList = $periodStatement->fetchAll(PDO::FETCH_ASSOC);
 
-		$periodList = $periodStatement->fetchAll(PDO::FETCH_ASSOC);
+        /* Get user's classes */
+        $classStatement = $this->getClassUserStatement();
+        $classStatement->execute(
+            array(
+                ':userId' => $userId,
+            )
+        );
 
-		/* Get user's classes */
-		$classStatement = $this->getClassUserStatement();
-		$classStatement->execute( array(
-			':userId' => $userId,
-		) );
+        $classList = $classStatement->fetchAll(PDO::FETCH_ASSOC);
 
-		$classList = $classStatement->fetchAll(PDO::FETCH_ASSOC);
+        $periodListAdaption = array();
 
-		$periodListAdaption = array();
+        foreach ($periodList as $period) {
+            $periodAdaption = array(
+                'periodNumber'   => $period['sequence'],
+                'periodName'     => $period['title'],
+                'periodStart'    => $period['start'],
+                'periodEnd'      => $period['finish'],
+                'periodSequence' => 1,
+            );
 
-		foreach ( $periodList as $period ) {
-			$periodAdaption = array(
-				'periodNumber'   => $period['sequence'],
-				'periodName'     => $period['title'],
-				'periodStart'    => $period['start'],
-				'periodEnd'      => $period['finish'],
-				'periodSequence' => 1,
-			);
+            foreach ($classList as $i => $class) {
+                if ($class['period_id'] == $period['id']) {
+                    $periodAdaption['class'][0]['description'] = $class['name'];
+                    $periodAdaption['class'][0]['code'] = $class['code'];
+                    $periodAdaption['class'][0]['room'] = '';
+                    $periodAdaption['class'][0]['staffCode'] = $class['synergy_id'];
+                    unset($classList[$i]);
+                }
+            }
 
-			foreach ( $classList as $i => $class ) {
-				if ( $class['period_id'] == $period['id'] ) {
-					$periodAdaption['description'] = $class['name'];
-					$periodAdaption['code'] = $class['code'];
-					$periodAdaption['room'] = '';
-					$periodAdaption['staffCode'] = $class['synergy_id'];
-					unset($classList[$i]);
-				}
-			}
+            $periodListAdaption[] = $periodAdaption;
+        }
 
-			$periodListAdaption[] = $periodAdaption;
-		}
+        return $periodListAdaption;
+    }
 
-		return $periodListAdaption;
-	}
+    public function getDaySubjects($externalUserId, $dayNumber)
+    {
 
-	public function getDaySubjects ($externalUserId, $dayNumber) {
-		
-	}
+    }
 
-	public function getSubjectPeriod($classCode, $dayNumber) {
+    public function getSubjectPeriod($classCode, $dayNumber)
+    {
 
-	}
-	
-	public function getSubjectName($classCode) {
-		
-	}
+    }
 
-    public function getRoomTimetable($roomCode) {
+    public function getSubjectName($classCode)
+    {
+
+    }
+
+    public function getRoomTimetable($roomCode)
+    {
         $query = "
             SELECT
                 class.description AS Description,
@@ -308,32 +327,36 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
     }
 
     /**
-	 * @param Database $database
-	 * @return void
-	 */
-	private function setDatabase (Database $database) {
-		$this->database = $database;
-	}
+     * @param Database $database
+     * @return void
+     */
+    private function setDatabase(Database $database)
+    {
+        $this->database = $database;
+    }
 
-	/**
-	 * @return Database
-	 */
-	private function getDatabase () {
-		return $this->database;
-	}
+    /**
+     * @return Database
+     */
+    private function getDatabase()
+    {
+        return $this->database;
+    }
 
-	/**
-	 * @param Group $group
-	 * @return void
-	 */
-	private function setGroup (Group $group) {
-		$this->group = $group;
-	}
+    /**
+     * @param Group $group
+     * @return void
+     */
+    private function setGroup(Group $group)
+    {
+        $this->group = $group;
+    }
 
-	/**
-	 * @return Group
-	 */
-	private function getGroup () {
-		return $this->group;
-	}
+    /**
+     * @return Group
+     */
+    private function getGroup()
+    {
+        return $this->group;
+    }
 }

@@ -39,7 +39,7 @@
             <tr>
                 {% for day in period.day %}
                 <td style="background:{{day.colour}};" {% if day.today and period.highlight %} class="current"{% endif %}>
-                    {% if day.periodOn == 1 %}
+                    {% if day.code %}
                     <ul>
                         <li>
                         {% if day.catID %}

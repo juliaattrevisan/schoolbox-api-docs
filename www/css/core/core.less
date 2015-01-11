@@ -8557,24 +8557,27 @@ dd {
         vertical-align: top;
         padding: 4px 4px 12px 4px;
         .title { font-weight: bold; display: block; }
-        .class { display: block; }
+        .class {
+          display: block;
+          clear: both;
+          padding: 6px;
+          a &:hover {
+            span.title {
+              text-decoration: underline;
+            }
+          }
+
+        }
+        .attendance {
+          border: 0;
+          background: none;
+          text-shadow: none;
+          margin-bottom: 6px;
+        }
         a { color: @body-text; }
     }
-    .class {
-        display: block;
-        padding: 6px;
-        &:hover {
-            text-decoration: none;
-            a.title {
-                text-decoration: underline;
-            }
-        }
-    }
-    .attendance {
-        border: 0;
-        background: none;
-        text-shadow: none;
-    }
+
+
     tr {
         td,th{&:first-child{
             border-left: 0;

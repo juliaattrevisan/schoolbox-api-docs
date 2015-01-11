@@ -140,8 +140,10 @@ if (is_array($outputList)) {
             foreach ($timetable as $currentDay) {
                 if (is_array($currentDay['day']) && count($currentDay['day'])) {
                     foreach ($currentDay['day'] as $currentPeriod) {
-                        if (isset($currentPeriod['description']) && strlen($currentPeriod['description'])) {
-                            $classCount++;
+                        foreach($currentPeriod as $currentClass) {
+                            if (isset($currentClass['description']) && strlen($currentClass['description'])) {
+                                $classCount++;
+                            }
                         }
                     }
                 }
@@ -170,6 +172,7 @@ if (is_array($outputList)) {
                     $dayCount = 1;
                     //for each day
                     foreach ($row['day'] as $period) {
+
                         // only output header on first run through
                         if ($periodCount == 1) {
                             //output day header
@@ -178,8 +181,8 @@ if (is_array($outputList)) {
                             } else {
                                 $this->setVar('TIMETABLE_CLASS', 'normal');
                             }
-                            $this->setVar("DAY_NUMBER", $dayCount);
-                            $this->parse("day_header_listing", "day_header", true);
+                            $this->setVar('DAY_NUMBER', $dayCount);
+                            $this->parse('day_header_listing', 'day_header', true);
                         }
 
                         $outputPeriod = array(
@@ -189,99 +192,100 @@ if (is_array($outputList)) {
                             'PERIOD_ONCLICK'  => '',
                             'PERIOD_STAFF'    => '',
                             'PERIOD_COLOUR'   => '',
+                            'PERIOD_URL'      => '',
                             'TIMETABLE_CLASS' => '',
                         );
 
-                        if ($period['description']) {
+                        $this->setVar('period_class_link_block', '');
+                        $this->setVar('period_class_block', '');
 
-                            /* Handle colour array */
-                            if ($period['code'] && !array_key_exists($period['code'], $subjectColourMap)) {
-                                // not enough colors: loop around to index 0.
-                                if (!$colourList->offsetExists($colourIndex)) {
-                                    $colourIndex = 0;
+                        if (count($period) > 0 ) {
+                            foreach($period as $class) {
+                                /* Handle colour array */
+                                if ($class['code'] && !array_key_exists($class['code'], $subjectColourMap)) {
+                                    // not enough colors: loop around to index 0.
+                                    if (!$colourList->offsetExists($colourIndex)) {
+                                        $colourIndex = 0;
+                                    }
+                                    $subjectColourMap[$class['code']] = $colourList->offsetGet($colourIndex)->getHexColour();
+                                    $colourIndex++;
                                 }
-                                $subjectColourMap[$period['code']] = $colourList->offsetGet($colourIndex)->getHexColour();
-                                $colourIndex++;
-                            }
 
-                            // format teacher output
+                                // format teacher output
 
-                            // if not staff and external db is enabled
-                            if (!$staffFlag && Cfg::get('external_enable')) {
-                                switch (Cfg::get('external_type')) {
-                                    case 'maze':
-                                    case 'synergetic':
-                                        $period_staff = $userHandler->formatName(
-                                            array(
-                                                'title'    => $period['staffTitle'],
-                                                'lastname' => $period['staffSurname']
-                                            )
-                                        );
-                                        break;
-                                    case 'tass':
-                                    case 'schoolbox':
-                                        $period_staff = $period['staffCode'];
-                                        break;
-                                    case 'denbigh':
-                                    default:
-                                        break;
+                                // if not staff and external db is enabled
+                                if (!$staffFlag && Cfg::get('external_enable')) {
+                                    switch (Cfg::get('external_type')) {
+                                        case 'maze':
+                                        case 'synergetic':
+                                            $period_staff = $userHandler->formatName(
+                                                array(
+                                                    'title'    => $class['staffTitle'],
+                                                    'lastname' => $class['staffSurname']
+                                                )
+                                            );
+                                            break;
+                                        case 'tass':
+                                        case 'schoolbox':
+                                            $period_staff = $class['staffCode'];
+                                            break;
+                                        case 'denbigh':
+                                        default:
+                                            break;
+                                    }
+                                } // staff, or external_db is disabled
+                                else {
+                                    $period_staff = '';
                                 }
-                            } // staff, or external_db is disabled
-                            else {
-                                $period_staff = '';
+
+                                $outputPeriod = array(
+                                    'PERIOD_DESC'   => Scrub::Text($class['description']),
+                                    'PERIOD_CODE'   => '(' . Scrub::Text($class['code']) . ')',
+                                    'PERIOD_ROOM'   => Scrub::Text($class['room']),
+                                    'PERIOD_STAFF'  => Scrub::Text($period_staff),
+                                    'PERIOD_COLOUR' => '#' . Scrub::text($subjectColourMap[$class['code']]),
+                                );
+
+                                /* Lookup subject code and check permissions, if read access provide a link to the user */
+                                if (!isset($catCache[$class['code']])) {
+                                    $cat = $categoryHandler->getByCode($class['code']);
+                                    $catCache[$class['code']] = $cat['id'];
+                                }
+
+                                $this->setVar($outputPeriod);
+
+                                if ($catCache[$class['code']] && $groupHandler->getPermission($catCache[$class['code']]) >= READ_ACCESS) {
+                                    $this->setVar('PERIOD_URL', '/homepage/code/' . $class['code']);
+                                    $this->parse('period_class_link_block', 'period_class_link', true);
+                                } else {
+                                    $this->parse('period_class_block', 'period_class', true);
+                                }
+
                             }
 
-                            $outputPeriod = array(
-                                'PERIOD_DESC'   => Scrub::Text($period['description']),
-                                'PERIOD_CODE'   => '(' . Scrub::Text($period['code']) . ')',
-                                'PERIOD_ROOM'   => Scrub::Text($period['room']),
-                                'PERIOD_STAFF'  => Scrub::Text($period_staff),
-                                'PERIOD_COLOUR' => '#' . Scrub::text($subjectColourMap[$period['code']]),
-                            );
-
-                            /* Lookup subject code and check permissions, if read access provide a link to the user */
-                            if (!isset($catCache[$period['code']])) {
-                                $cat = $categoryHandler->getByCode($period['code']);
-                                $catCache[$period['code']] = $cat['id'];
-                            }
-                        } else {
-                            $outputPeriod = array(
-                                'PERIOD_DESC'   => '',
-                                'PERIOD_CODE'   => '',
-                                'PERIOD_ROOM'   => '',
-                                'PERIOD_STAFF'  => '',
-                                'PERIOD_URL'    => '',
-                                'PERIOD_COLOUR' => '',
-                            );
+                        }
+                        else {
+                            $this->setVar($outputPeriod);
+                            $this->setVar('period_class_link_block', '');
+                            $this->parse('period_class_block', 'period_class');
                         }
 
                         if ($is_current_period) {
                             if ($dayCount == $dayCurrent) {
                                 // current period, also current day: intersection
-                                $outputPeriod['TIMETABLE_CLASS'] = 'dayCurrent current';
+                                $this->setVar('TIMETABLE_CLASS', 'dayCurrent current');
                             } else {
                                 // current period, not current day: display row
-                                $outputPeriod['TIMETABLE_CLASS'] = 'dayCurrent';
+                                $this->setVar('TIMETABLE_CLASS', 'dayCurrent');
                             }
                         } else {
                             if ($dayCount == $dayCurrent) {
                                 // not current period, but is current day: display column
-                                $outputPeriod['TIMETABLE_CLASS'] = 'dayCurrent';
+                                $this->setVar('TIMETABLE_CLASS','dayCurrent');
                             } else {
                                 // neither current period nor current day
-                                $outputPeriod['TIMETABLE_CLASS'] = 'normal';
+                                $this->setVar('TIMETABLE_CLASS', 'normal');
                             }
-                        }
-
-                        $this->setVar($outputPeriod);
-
-                        if ($catCache[$period['code']] && $groupHandler->getPermission($catCache[$period['code']]) >= READ_ACCESS) {
-                            $this->setVar('PERIOD_URL', '/homepage/code/' . $period['code']);
-                            $this->parse('period_class_link_block', 'period_class_link');
-                            $this->setVar('period_class_block', '');
-                        } else {
-                            $this->setVar('period_class_link_block', '');
-                            $this->parse('period_class_block', 'period_class');
                         }
 
                         $this->parse('day_listing', 'day', true);

@@ -389,6 +389,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         //for each period
         $timetable = array();
+        $seq = 0;
+
         for ($x = 0; isset($timetabledef['desc'][$x]); $x++) {
             $timetable[$x]['periodName']     = $timetabledef['desc'][$x];
             $timetable[$x]['periodStart']    = $timetabledef['start'][$x];
@@ -397,20 +399,24 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             $timetable[$x]['periodSequence'] = $timetabledef['sequence'][$x];
 
             if ($timetabledef['sequence'][$x] != 2 && $desc['PeriodNumber'] == $timetable[$x]['periodNumber']) {
-                $timetable[$x]['description'] = $desc['Description'];
-                $timetable[$x]['code']        = $desc['ClassCode'];
-                $timetable[$x]['campus']      = $desc['ClassCampus'];
-                $timetable[$x]['room']        = $desc['Room'];
-                if (isset($desc['StaffID'])) {
-                    $timetable[$x]['staffID'] = $desc['StaffID'];
-                }
-                $desc                         = $this->getDatabase()->getNextArray();
+                $timetable[$x]['class'][$seq]['description'] = $desc['Description'];
+                $timetable[$x]['class'][$seq]['code']        = $desc['ClassCode'];
+                $timetable[$x]['class'][$seq]['campus']      = $desc['ClassCampus'];
+                $timetable[$x]['class'][$seq]['room']        = $desc['Room'];
+                $timetable[$x]['class'][$seq]['staffID']     = $desc['StaffID'];
 
-                //bad data in synergetic.. why..??
-                while ($desc['PeriodNumber'] == $timetable[$x]['periodNumber'] && $desc != 0) {
-                    $desc = $this->getDatabase()->getNextArray();
-                }
+                $desc = $this->getDatabase()->getNextArray();
             }
+
+            /* IF multiple subjects scheduled for the same day */
+            if($desc['PeriodNumber'] == $timetable[$x]['periodNumber']) {
+                $seq++;
+                $x--;
+            }
+            else {
+                $seq = 0;
+            }
+
         }
 
         if (is_array($timetable)) {
@@ -528,28 +534,32 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             $timetable[$x]['periodEnd']      = $timetabledef['end'][$x];
             $timetable[$x]['periodNumber']   = $timetabledef['number'][$x];
             $timetable[$x]['periodSequence'] = $timetabledef['sequence'][$x];
+            $seq = 0;
 
             //for each day
             for ($y = 1; $y <= $dayCount; $y++) {
                 if ($timetabledef['sequence'][$x] != 2 && $desc['PeriodNumber'] == $timetable[$x]['periodNumber'] && $desc['DayNumber'] == $y) {
-                    $timetable[$x]['day'][$y]['periodOn']       = 1;
-                    $timetable[$x]['day'][$y]['description']    = $desc['Description'];
-                    $timetable[$x]['day'][$y]['code']           = $desc['ClassCode'];
-                    $timetable[$x]['day'][$y]['campus']         = $desc['ClassCampus'];
-                    $timetable[$x]['day'][$y]['room']           = $desc['Room'];
-                    $timetable[$x]['day'][$y]['staffID']        = $desc['StaffID'];
-                    $timetable[$x]['day'][$y]['staffFirstname'] = $desc['StaffPreferredName'];
-                    $timetable[$x]['day'][$y]['staffSurname']   = $desc['StaffSurname'];
-                    $timetable[$x]['day'][$y]['staffTitle']     = $desc['StaffTitle'];
+                    $timetable[$x]['day'][$y][$seq]['description']    = $desc['Description'];
+                    $timetable[$x]['day'][$y][$seq]['code']           = $desc['ClassCode'];
+                    $timetable[$x]['day'][$y][$seq]['campus']         = $desc['ClassCampus'];
+                    $timetable[$x]['day'][$y][$seq]['room']           = $desc['Room'];
+                    $timetable[$x]['day'][$y][$seq]['staffID']        = $desc['StaffID'];
+                    $timetable[$x]['day'][$y][$seq]['staffFirstname'] = $desc['StaffPreferredName'];
+                    $timetable[$x]['day'][$y][$seq]['staffSurname']   = $desc['StaffSurname'];
+                    $timetable[$x]['day'][$y][$seq]['staffTitle']     = $desc['StaffTitle'];
                     $desc                                       = $this->getDatabase()->getNextArray();
 
-                    //bad data in synergetic.. why..??
-                    while ($desc['DayNumber'] == $y && $desc['PeriodNumber'] == $timetable[$x]['periodNumber']) {
-                        $desc = $this->getDatabase()->getNextArray();
+                    /* IF multiple subjects scheduled for the same day */
+                    if($desc['DayNumber'] == $y && $desc['PeriodNumber'] == $timetable[$x]['periodNumber']) {
+                        $seq++;
+                        $y--;
+                    }
+                    else {
+                        $seq = 0;
                     }
 
                 } else {
-                    $timetable[$x]['day'][$y]['periodOn'] = 0;
+                    $timetable[$x]['day'][$y] = array();
                 }
 
             }
@@ -562,7 +572,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         if (is_array($timetable)) {
             usort($timetable, array($this, 'sortTimetable'));
         }
-
         return $timetable;
 
     }

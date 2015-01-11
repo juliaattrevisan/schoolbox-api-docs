@@ -6,7 +6,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 class External_Schoolpro_Timetable implements External_TimetableInterface
 {
@@ -56,7 +55,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     {
         $campus = $this->getCampusMapper()->findById($campusId);
         $this->setCycleLength($campus->getTimetableDay());
-        $vars   = array(
+        $vars = array(
             'sbGetTimetableDefinition',
             array(
                 array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
@@ -71,12 +70,12 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
              */
             foreach ($result['result'] as $currentDefinition) {
                 if (!$day || ($day == $currentDefinition['DayNumber'])) {
-                    $allDefinitions['desc'][]      = $currentDefinition['PeriodDescription'];
-                    $allDefinitions['start'][]     = $currentDefinition['TimeFrom'];
-                    $allDefinitions['end'][]       = $currentDefinition['TimeTo'];
-                    $allDefinitions['number'][]    = $currentDefinition['PeriodNumber'];
+                    $allDefinitions['desc'][] = $currentDefinition['PeriodDescription'];
+                    $allDefinitions['start'][] = $currentDefinition['TimeFrom'];
+                    $allDefinitions['end'][] = $currentDefinition['TimeTo'];
+                    $allDefinitions['number'][] = $currentDefinition['PeriodNumber'];
                     $allDefinitions['dayNumber'][] = $currentDefinition['DayNumber'];
-                    $allDefinitions['sequence'][]  = 1;
+                    $allDefinitions['sequence'][] = 1;
                 }
             }
             /* Number of days per cycle
@@ -103,9 +102,9 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
         /* Convert from timestamp to datetime
          */
         if ($date) {
-            $dateObj   = new Alaress_Date_Format($date, 'U');
+            $dateObj = new Alaress_Date_Format($date, 'U');
             $dateToUse = $dateObj->getDatabaseDate();
-            $vars      = array(
+            $vars = array(
                 'sbGetDayNumber',
                 array(
                     array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
@@ -114,7 +113,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
                     array('@pDateToUse', $dateToUse, SQLVARCHAR, false, false, -1),
                 )
             );
-            $result    = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+            $result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
             if ($result['success'] && count($result['result'])) {
                 return $result['result'][0]['DayNumber'];
             }
@@ -132,7 +131,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     public function getPeriodNumber($campusId)
     {
         $campus = $this->getCampusMapper()->findById($campusId);
-        $vars   = array(
+        $vars = array(
             'sbGetPeriodNumber',
             array(
                 array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
@@ -162,7 +161,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     private function getStaffDayTimetable($externalUserId, $campusId, $dayNumber)
     {
         $campus = $this->getCampusMapper()->findById($campusId);
-        $vars   = array(
+        $vars = array(
             'sbGetStaffDayTimetable',
             array(
                 array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
@@ -188,7 +187,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     private function getStudentDayTimetable($externalUserId, $campusId, $dayNumber)
     {
         $campus = $this->getCampusMapper()->findById($campusId);
-        $vars   = array(
+        $vars = array(
             'sbGetStudentDayTimetable',
             array(
                 array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
@@ -224,7 +223,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
         }
         $definition = $this->getTimetableDefinition($campusId, $dayNumber);
         if ($result['success'] && count($result['result'])) {
-            $timetable  = array();
+            $timetable = array();
             $allClasses = $result['result'];
             /* For every period defined in the timetable definition,
              * set up a stub stack which contains all the possible
@@ -232,10 +231,10 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
              * this data structure.
              */
             for ($x = 0; isset($definition['desc'][$x]); $x++) {
-                $timetable[$x]['periodName']     = $definition['desc'][$x];
-                $timetable[$x]['periodStart']    = $definition['start'][$x];
-                $timetable[$x]['periodEnd']      = $definition['end'][$x];
-                $timetable[$x]['periodNumber']   = $definition['number'][$x];
+                $timetable[$x]['periodName'] = $definition['desc'][$x];
+                $timetable[$x]['periodStart'] = $definition['start'][$x];
+                $timetable[$x]['periodEnd'] = $definition['end'][$x];
+                $timetable[$x]['periodNumber'] = $definition['number'][$x];
                 $timetable[$x]['periodSequence'] = $definition['sequence'][$x];
             }
             /* With the result set obtained above, append actual class
@@ -259,11 +258,11 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
                         /* If this class occurs in this period, append its details
                          */
                         if ($timetable[$x]['periodNumber'] == $currentClass['Identifier']) {
-                            $timetable[$x]['description'] = $currentClass['ClassDescription'];
-                            $timetable[$x]['code']        = $currentClass['ClassCode'];
-                            $timetable[$x]['room']        = $currentClass['ClassRoom'];
-                            $timetable[$x]['staffID']     = $externalUserId;
-                            $timetable[$x]['dayNumber']   = $currentClass['DayNumber'];
+                            $timetable[$x]['class'][0]['description'] = $currentClass['ClassDescription'];
+                            $timetable[$x]['class'][0]['code'] = $currentClass['ClassCode'];
+                            $timetable[$x]['class'][0]['room'] = $currentClass['ClassRoom'];
+                            $timetable[$x]['class'][0]['staffID'] = $externalUserId;
+                            $timetable[$x]['class'][0]['dayNumber'] = $currentClass['DayNumber'];
                             array_shift($allClasses);
                             break;
                         }
@@ -302,17 +301,17 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
          */
         for ($period = 0; $period < count($allDayTimetables[0]); $period++) {
             for ($day = 0; $day < $this->getCycleLength(); $day++) {
-                $timetable[$period]['day'][$day] = $allDayTimetables[$day][$period];
+                $timetable[$period]['day'][$day][0] = $allDayTimetables[$day][$period]['class'][0];
                 /* TODO: Have these use convert(varchar(10), theDate, 120) in stored proc
                  */
                 $start = substr($allDayTimetables[0][$period]['periodStart'], 0, 5);
-                $end   = substr($allDayTimetables[0][$period]['periodEnd'], 0, 5);
+                $end = substr($allDayTimetables[0][$period]['periodEnd'], 0, 5);
                 /* Port across some values
                  */
-                $timetable[$period]['periodName']     = $allDayTimetables[0][$period]['periodName'];
-                $timetable[$period]['periodNumber']   = $allDayTimetables[0][$period]['periodNumber'];
-                $timetable[$period]['periodStart']    = $start;
-                $timetable[$period]['periodEnd']      = $end;
+                $timetable[$period]['periodName'] = $allDayTimetables[0][$period]['periodName'];
+                $timetable[$period]['periodNumber'] = $allDayTimetables[0][$period]['periodNumber'];
+                $timetable[$period]['periodStart'] = $start;
+                $timetable[$period]['periodEnd'] = $end;
                 $timetable[$period]['periodSequence'] = 1;
             }
         }
