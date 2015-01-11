@@ -23,7 +23,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      */
     protected function getLabelMap($campusId, $day)
     {
-        return $this->getMap(array('period', 'PERIOD SEQUENCE'), $campusId, $day);
+        return $this->getMap(array('PERIOD', 'PERIOD SEQUENCE'), $campusId, $day);
     }
 
 
@@ -35,7 +35,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      */
     protected function getTimeMap($campusId, $day)
     {
-        return $this->getMap(array('start_time', 'end_time'), $campusId, $day);
+        return $this->getMap(array('START_TIME', 'END_TIME'), $campusId, $day);
     }
 
 
@@ -68,16 +68,17 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
         $stmt->execute(array(
             'campus' => $campusName,
-            'seq'    => $day
+            'seq'    => $day ?: 1 // there is no day zero in this schema
         ));
 
         $map = array();
 
         while ($r = $stmt->fetch(DB2::FETCH_ASSOC)) {
+            $k = (int)$r["PERIOD SEQUENCE"];
             if (isset($unset)) {
                 unset($r['PERIOD SEQUENCE']);
             }
-            $map[(int)$r["PERIOD SEQUENCE"]] = array_values($r);
+            $map[$k] = array_values($r);
         }
 
         return $map;
@@ -113,11 +114,11 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         $timeMap = $this->getTimeMap($campusId, $day);
 
         foreach($this->getLabelMap($campusId, $day) as $shortName => $periodDetails) {
-            $definition['desc'][] = $periodDetails[0];
-            $definition['start'][] = $this->parseTime($timeMap[$shortName][0]);
-            $definition['end'][] = $this->parseTime($timeMap[$shortName][1]);
-            $definition['number'][] = $shortName;
-            $definition['sequence'][] = $periodDetails[1];
+            $definition['desc'][]     = $periodDetails[0];
+            $definition['start'][]    = $this->parseTime($timeMap[$shortName][0]);
+            $definition['end'][]      = $this->parseTime($timeMap[$shortName][1]);
+            $definition['number'][]   = $periodDetails[1];
+            $definition['sequence'][] = is_numeric($periodDetails[1]) ? 1 : 2;
             ++$periodCount;
         }
 
