@@ -1,0 +1,5 @@
+# Overrides for Vagrant running of schoolbox-belld
+env SBHOME=/vagrant/tools/notif/bell
+env SBLOGS=/vagrant/data
+env SBVERBOSITY=' -vvv --pid --mem --truemem'
+start on mounted MOUNTPOINT=/vagrant
