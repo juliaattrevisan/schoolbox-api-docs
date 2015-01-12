@@ -11,6 +11,7 @@ namespace Custom\Meriden\Pastoral;
 
 use MSSQL;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class Query
 {
@@ -446,11 +447,57 @@ class Query
         $result = $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll(strtr($query, $params))
         );
-        foreach ($result as &$row) {
-            $row['code'] = sprintf('%s-%s-%s', $row['yr_study'], $row['sub_code'], $row['class']);
-        }
-        unset($row);
+
+        // Add class code
+        $result = array_map(
+            function($row) {
+                $row['code'] = sprintf('%s-%s-%s', $row['yr_study'], $row['sub_code'], $row['class']);
+                return $row;
+            },
+            $result
+        );
+
+        // Join all teacher codes into a single result.
+        $result = array_reduce(
+            $result,
+            function ($carry, $newRow) {
+                $isDuplicateCode = false;
+                foreach ($carry as &$row) {
+                    if ($row['code'] == $newRow['code']) {
+                        $row['tch_code'][] = $newRow['tch_code'];
+                        $isDuplicateCode = true;
+                        break;
+                    }
+                }
+                unset($row);
+                if (!$isDuplicateCode) {
+                    $newRow['tch_code'] = array($newRow['tch_code']);
+                    $carry[] = $newRow;
+                }
+                return $carry;
+            },
+            array()
+        );
+
         return $result;
+    }
+
+    /**
+     * Augments a list retrieved by getAllSubjectsForYear() with a homepage
+     * link and one or more teachers.
+
+     * @param array $subjects
+     * @return array
+     */
+    public function augmentSubjectsWithTeacher(array $subjects)
+    {
+        $userMapper = new UserMapper();
+        foreach ($subjects as &$subject) {
+            // Get every teacher by their tch_code
+            $subject['teachers'] = $userMapper->findByColumn('synergy_id', $subject['tch_code']);
+        }
+        unset($subject);
+        return $subjects;
     }
 
     /**
