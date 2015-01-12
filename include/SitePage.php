@@ -1,5 +1,6 @@
 <?php
 
+use Schoolbox\Realtime\Message\RerouteOverride;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 
 class SitePage extends Page
@@ -756,7 +757,12 @@ class SitePage extends Page
         $this->setBlock("mgroup", "mgroup_block", "my_groups");
 
         // get overrides for this user
-        $overrides = RerouteOverrideMapper::getInstance()->getMatchingRoutes('service.'.HOMEPAGE_SERVICE, 0, $_SESSION['id'])->map(function($v) {
+        $overrides = RerouteOverrideMapper::getInstance()->getMatchingRoutes(
+            'service.'.HOMEPAGE_SERVICE,
+            0,
+            $_SESSION['id'],
+            true
+        )->map(function($v) {
             if (preg_match('`service.\d+.(\d+)`', $v->getRouteKey(), $matches)) {
                 return (int)$matches[1];
             }

@@ -119,13 +119,17 @@ class RerouteOverrideMapper extends Mapper {
      * @param string $routeKey
      * @param int    $outgoingLevel
      * @param int    $userId        If supplied, the user to check.
-     *
+     * @param bool   $userExclusive If true, only routes that are exclusive to
+     *                              $userId are retrieved.
      * @return Collection|RerouteOverride[]
      */
-    public function getMatchingRoutes($routeKey, $outgoingLevel, $userId = null)
+    public function getMatchingRoutes($routeKey, $outgoingLevel, $userId = null, $userExclusive = false)
     {
         $userIds = array(0);
         if (isset($userId)) {
+            if ($userExclusive) {
+                $userIds = array();
+            }
             $userIds[] = $userId;
         }
         // Check all permutations of route key:
