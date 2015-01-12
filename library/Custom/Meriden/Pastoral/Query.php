@@ -430,16 +430,20 @@ class Query
             AND studsub.cmpy_code = '01'
             AND studsub.yr_study = :year
             ORDER BY
-                studsub.sub_code ASC,
-                studsub.class ASC
+                subtab.sub_desc ASC
         ";
         $params = array(
             ':externalId'   => $this->getDatabase()->smartQuote($externalId),
             ':year'         => $this->getDatabase()->smartQuote($year),
         );
-        return $this->getDatabase()->trimAll(
+        $result = $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll(strtr($query, $params))
         );
+        foreach ($result as &$row) {
+            $row['code'] = sprintf('%s-%s-%s', $row['yr_study'], $row['sub_code'], $row['class']);
+        }
+        unset($row);
+        return $result;
     }
 
     /**

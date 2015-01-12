@@ -2,7 +2,7 @@
     (function($){
         $(function(){
             // Jump menu for changing semester
-            $('#semester').on('change', function() {
+            $('#semester, #enrolled-subjects').on('change', function() {
                 window.location.href = this.value;
             });
         })
@@ -43,10 +43,10 @@
             <span class="elbow">&#9492;</span>
             <select id="enrolled-subjects">
                 <option disabled="disabled" selected="selected">Select a subject</option>
-                {% for subject in report.student.subjectCollection %}
-                <option value="{{ subject.code }}"
-                        label="{{ subject.name }} ({{ subject.code }})"
-                        >{{ subject.name }} ({{ subject.code }})</option>
+                {% for subject in report.year.subjects %}
+                <option value="{{ routeLookup('customMeridenPastoral.subject', {year: report.year.current, id: report.student.id, subjectCode: subject.code}) }}"
+                        label="{{ subject.sub_desc }} ({{ subject.code }})"
+                        >{{ subject.sub_desc }} ({{ subject.code }})</option>
                 {% endfor %}
             </select>
         </form>
