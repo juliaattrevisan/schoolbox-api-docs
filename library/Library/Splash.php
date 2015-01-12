@@ -40,7 +40,7 @@ class Library_Splash {
         $page->setBlock(TEMPLATE_content, 'image', 'image_block');
 
         foreach($this->vars as $token => $textID) {
-            $box = $this->getTextboxMapper()->findById($textID;
+            $box = $this->getTextboxMapper()->findById($textID);
             $page->setVar($token, Scrub::html($box->getBody()));
         }
 
