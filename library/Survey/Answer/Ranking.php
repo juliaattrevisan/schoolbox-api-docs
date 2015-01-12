@@ -10,6 +10,11 @@
  */
 class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
 {
+    /**
+     * Template file containing the graph
+     *
+     * @var string
+     */
     protected $graphTemplateFile = 'survey/answer/ranking/graph.html';
 
     /**
@@ -27,7 +32,6 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
         $this->setResponseHandler(new Survey_Response());
     }
 
-
     /**
      * Graph the results for this answer type
      *
@@ -44,7 +48,7 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
         $page->setBlock('series', 'series_separator', 'series_separator_block');
 
         $dataset = $this->process($this->generateDataSet((int)$currentQuestion['question_id']));
-        $ticks = $this->generateTicks($this->getTicks());
+        $ticks   = $this->generateTicks($this->getTicks());
 
         $i = 0;
 
@@ -75,7 +79,7 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
 
         $page->setVar(
             array(
-                'TICKS' => $ticks,
+                'TICKS'    => $ticks,
                 'GRAPH_ID' => 'surveyQuestion_'
                     . intval($currentQuestion['question_id'])
                     . '_'
@@ -94,17 +98,19 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
      * @param $num
      * @return string
      */
-    private function ordinal($num) {
+    private function ordinal($num)
+    {
 
         // Special case "teenth"
-        if ( ($num / 10) % 10 != 1 )
-        {
+        if (($num / 10) % 10 != 1) {
             // Handle 1st, 2nd, 3rd
-            switch( $num % 10 )
-            {
-                case 1: return $num . 'st';
-                case 2: return $num . 'nd';
-                case 3: return $num . 'rd';
+            switch ($num % 10) {
+                case 1:
+                    return $num . 'st';
+                case 2:
+                    return $num . 'nd';
+                case 3:
+                    return $num . 'rd';
             }
         }
         // Everything else is "nth"
@@ -117,7 +123,8 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
      * @param $numTicks
      * @return string
      */
-    private function generateTicks($numTicks) {
+    private function generateTicks($numTicks)
+    {
         $ticks = array();
 
         for ($i = 1; $i <= $numTicks; $i++) {
@@ -147,9 +154,13 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
             /* Generate a dataset for flot
              */
             for ($j = 0; $j < count($keys); $j++) {
-                $graphIndex = $i + 1;
+                $graphIndex = $i+1;
+
+                /* Note that flot is buggy:
+                 * https://code.google.com/p/flot/issues/detail?id=247
+                 */
                 if (!$values[$j]) {
-                    $val = null;
+                    $val = 0;
                 } else {
                     $val = $values[$j];
                 }
@@ -235,7 +246,6 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
     {
         $possibilities   = array();
         $scoreboard      = array();
-        $finalScoreboard = array();
 
         /* Find all the possible things to chooze from
          */
@@ -283,12 +293,13 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
          *
          * This is the reason behind the unset()
          */
-        foreach ($scoreboard as &$currentPosition) {
-            arsort($currentPosition);
-        }
-
-        unset($currentPosition);
-
+//        foreach ($scoreboard as &$currentPosition) {
+//
+//            arsort($currentPosition);
+//        }
+////
+//        unset($currentPosition);
+//
 //        /* Find the maximum value and unset anything that isn't the same
 //         */
 //        for ($i = 0; $i < count($scoreboard); $i++) {
