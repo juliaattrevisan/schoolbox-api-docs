@@ -9,16 +9,22 @@
 class Library_Splash {
 
     private $templateFile;
-    private $textHandler;
     private $fileHandler;
     private $categoryID;
     private $vars = array();
 
+    /**
+     * A textbox mapper
+     *
+     * @var \Schoolbox\Textbox\Mapper
+     */
+    private $textboxMapper;
+
     public function __construct($templateFile, $categoryID) {
         $this->setTemplateFile($templateFile);
-        $this->setTextHandler(new TextBox());
         $this->setCategoryID($categoryID);
         $this->setFileHandler(new File());
+        $this->setTextboxMapper(new \Schoolbox\Textbox\Mapper());
     }
 
     public function setVar($token, $textboxID) {
@@ -34,8 +40,8 @@ class Library_Splash {
         $page->setBlock(TEMPLATE_content, 'image', 'image_block');
 
         foreach($this->vars as $token => $textID) {
-            $box = $this->getTextHandler()->getByID($textID);
-            $page->setVar($token, Scrub::html( $box['body'] ));
+            $box = $this->getTextboxMapper()->findById($textID;
+            $page->setVar($token, Scrub::html($box->getBody()));
         }
 
         $allFiles = $this->getFileHandler()->getAllInCategory($this->getCategoryID(), array('filter' => array('image')));
@@ -63,17 +69,6 @@ class Library_Splash {
         return $this->templateFile;
     }
 
-    private function setTextHandler($handler) {
-        $this->textHandler = $handler;
-    }
-
-    /**
-     * @return TextBox
-     */
-    public function getTextHandler() {
-        return $this->textHandler;
-    }
-
     public function setCategoryID($id) {
         $this->categoryID = $id;
     }
@@ -91,5 +86,25 @@ class Library_Splash {
      */
     public function getFileHandler() {
         return $this->fileHandler;
+    }
+
+    /**
+     * Set textbox mapper
+     *
+     * @param \Schoolbox\Textbox\Mapper $textboxMapper
+     */
+    private function setTextboxMapper($textboxMapper)
+    {
+        $this->textboxMapper = $textboxMapper;
+    }
+
+    /**
+     * Return textbox mapper
+     *
+     * @return \Schoolbox\Textbox\Mapper
+     */
+    private function getTextboxMapper()
+    {
+        return $this->textboxMapper;
     }
 }
