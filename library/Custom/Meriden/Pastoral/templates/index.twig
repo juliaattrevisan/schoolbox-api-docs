@@ -122,20 +122,49 @@
  # due to the possiblilty of parents getting drunk and sending emails to teachers.
  # Whatever happened to the saying "Give a man enough rope..."?
  #}
-{% for subjectGroup in report.subjects %}
-    <h2>{{ subjectGroup.name }}</h2>
-    <ul>
-        {% for subject in subjectGroup.subjects %}
+<div class="directory">
+    <div class="subjects">
+        <h2>Subjects</h2>
+        {# Split half the subjects in one column, half in the other #}
+        {% set reportHalf = (report.year.subjects|length / 2)|round(0, 'ceil') %}
+        <ul>
+            {% for subject in report.year.subjects|slice(0, reportHalf) %}
+                <li>
+                    <div class="subject">
+                        <a class="to-subject" href="/homepage/code/{{ subject.code }}">
+                            {{ subject.sub_desc }}
+                            <span class="icon"></span>
+                        </a>
+                    </div>
+                    {% for teacher in subject.teachers %}
+                        <div class="profile">
+                            <a href="/search/user/{{ teacher.id }}" class="teacher-profile no-email">
+                                <img src="/portrait.php?userId={{ teacher.externalId }}&amp;size=square32">
+                                <span class="name">{{ teacher.formatName }}</span>
+                                <span class="role">{{ teacher.role.name }}</span>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </li>
+            {% endfor %}
+        </ul>
+        {##
+         # The second half has a ul per subject,
+         # the first only has a single ul for all subjects.
+         # Go figure!
+         #}
+        {% for subject in report.year.subjects|slice(reportHalf) %}
+        <ul>
             <li>
                 <div class="subject">
-                    <a class="to-subject" href="#">
-                        {{ subject.code }}
+                    <a class="to-subject" href="/homepage/code/{{ subject.code }}">
+                        {{ subject.sub_desc }}
                         <span class="icon"></span>
                     </a>
                 </div>
                 {% for teacher in subject.teachers %}
                     <div class="profile">
-                        <a href="/search/user/{{ teacher.id }}" class="teacher-profile">
+                        <a href="/search/user/{{ teacher.id }}" class="teacher-profile no-email">
                             <img src="/portrait.php?userId={{ teacher.externalId }}&amp;size=square32">
                             <span class="name">{{ teacher.formatName }}</span>
                             <span class="role">{{ teacher.role.name }}</span>
@@ -143,6 +172,7 @@
                     </div>
                 {% endfor %}
             </li>
+        </ul>
         {% endfor %}
-    </ul>
-{% endfor %}
+    </div>
+</div>

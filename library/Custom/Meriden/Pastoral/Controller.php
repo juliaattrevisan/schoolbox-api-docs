@@ -36,7 +36,9 @@ class Controller extends Base
         $activities = $this->getDatabase()->getAllActivities($year, $student);
         $tutors     = $this->getDatabase()->getAllTutors($year, $student);
         $yearLevels = $this->getDatabase()->getAllYearLevelGroups($student);
-        $subjects   = $this->getDatabase()->getAllSubjectsForYear($year, $student);
+        $subjects   = $this->getDatabase()->augmentSubjectsWithTeacher(
+            $this->getDatabase()->getAllSubjectsForYear($year, $student)
+        );
 
         // Check previous and next year, disable if no year level group exists
         $previousYear = false;
