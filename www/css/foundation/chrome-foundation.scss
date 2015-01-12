@@ -1,0 +1,32 @@
+//@import "../../javascript/components/foundation/scss/foundation";
+// Utils
+@import "utils/functions";
+@import "utils/mixins";
+@import "utils/variables";
+
+@import "settings";
+
+// Base
+@import "base/reset";
+@import "base/typography";
+
+// Components
+@import "components/buttons";
+@import "components/carousel";
+@import "components/dropdown";
+@import "components/navigation";
+@import "components/alert-boxes";
+
+// Layout
+@import "layout/footer";
+@import "layout/forms";
+@import "layout/grid";
+@import "layout/header";
+@import "layout/sidebar";
+
+#nav,
+#header,
+.cal-bubble,
+#footer{
+	display: none;
+}

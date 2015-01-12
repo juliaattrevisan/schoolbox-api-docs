@@ -120,6 +120,8 @@ module.exports = function(grunt) {
                     'www/javascript/jquery.flyout.js',
                     // Fix touch on side navigation
                     'www/javascript/jquery.touchMenu.js',
+                    // Foundation
+                    'www/javascript/components/foundation/js/foundation.min.js',
                     //Random scripts
                     'www/javascript/scripts.js'
                     //Maths formulas
