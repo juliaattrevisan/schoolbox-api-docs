@@ -420,11 +420,18 @@ class Query
                 studsub.yr_study,
                 studsub.sub_code,
                 subtab.sub_desc,
-                subtab.sub_type
+                subtab.sub_type,
+                tchsub.tch_code
             FROM studsub
             INNER JOIN subtab
                 ON subtab.sub_code = studsub.sub_code
                 AND subtab.cmpy_code = studsub.cmpy_code
+            LEFT JOIN tchsub
+                ON subtab.sub_code = tchsub.sub_code
+                AND subtab.cmpy_code = tchsub.cmpy_code
+                AND studsub.semester = tchsub.semester
+                AND studsub.yr_study = tchsub.year_num
+                AND studsub.class = tchsub.class
             WHERE studsub.stud_code = :externalId
             AND subtab.sub_code NOT IN ('9994','9995','9996','9997','9998','9999')
             AND studsub.cmpy_code = '01'
