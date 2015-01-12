@@ -10,7 +10,6 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $page = new SitePage();
 $groupHandler = new Group();
-$textBoxHandler = new TextBox();
 
 if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
 	if ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS) {
