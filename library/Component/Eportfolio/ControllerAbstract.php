@@ -33,7 +33,7 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
          */
         $this->sitepage->setVar('ID', $context['uid']);
 
-        $this->hook();
+        $this->postConstruct();
     }
 
     /**

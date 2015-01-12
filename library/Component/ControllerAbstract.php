@@ -100,7 +100,7 @@ abstract class Component_ControllerAbstract
      * Hook method for components to perform their own dynamic
      * setup() amendments
      */
-    protected function hook()
+    protected function postConstruct()
     {
     }
 
