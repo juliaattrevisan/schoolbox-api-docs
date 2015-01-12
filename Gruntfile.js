@@ -137,6 +137,10 @@ module.exports = function(grunt) {
             css: ['www/css/*/{chrome,mchrome,print}.css']
         },
         less: buildTasks,
+        sass: {
+            src: ['www/css/foundation/chrome-foundation.scss'],
+            dest: 'www/css/foundation/chrome.css'
+        },
         watch: watchTasks
     });
 
