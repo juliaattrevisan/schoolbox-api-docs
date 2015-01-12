@@ -13,12 +13,20 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
     protected $graphTemplateFile = 'survey/answer/ranking/graph.html';
 
     /**
+     * Number of ticks on the x axis
+     *
+     * @var int
+     */
+    private $ticks = 0;
+
+    /**
      * Setup
      */
     protected function setup()
     {
         $this->setResponseHandler(new Survey_Response());
     }
+
 
     /**
      * Graph the results for this answer type
@@ -36,6 +44,7 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
         $page->setBlock('series', 'series_separator', 'series_separator_block');
 
         $dataset = $this->process($this->generateDataSet((int)$currentQuestion['question_id']));
+        $ticks = $this->generateTicks($this->getTicks());
 
         $i = 0;
 
@@ -66,6 +75,7 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
 
         $page->setVar(
             array(
+                'TICKS' => $ticks,
                 'GRAPH_ID' => 'surveyQuestion_'
                     . intval($currentQuestion['question_id'])
                     . '_'
@@ -74,7 +84,47 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
         );
 
         $page->parse('graph_block', $componentHandle);
+    }
 
+    /**
+     * Ordinal
+     *
+     * From php.net
+     *
+     * @param $num
+     * @return string
+     */
+    private function ordinal($num) {
+
+        // Special case "teenth"
+        if ( ($num / 10) % 10 != 1 )
+        {
+            // Handle 1st, 2nd, 3rd
+            switch( $num % 10 )
+            {
+                case 1: return $num . 'st';
+                case 2: return $num . 'nd';
+                case 3: return $num . 'rd';
+            }
+        }
+        // Everything else is "nth"
+        return $num . 'th';
+    }
+
+    /**
+     * Generate ticks
+     *
+     * @param $numTicks
+     * @return string
+     */
+    private function generateTicks($numTicks) {
+        $ticks = array();
+
+        for ($i = 1; $i <= $numTicks; $i++) {
+            $ticks[] = "[{$i}, '{$this->ordinal($i)}']";
+        }
+
+        return implode(', ', $ticks);
     }
 
     /**
@@ -199,6 +249,7 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
          */
         for ($i = 0; $i < count($values); $i++) {
             $possibilities[] = $values[$i]->answerRight;
+            $this->setTicks(count($possibilities));
         }
 
         /* Keep this for zerofilling
@@ -319,5 +370,24 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
                 $page->parse('answerOptionRight_block', 'answerOptionRight', true);
             }
         }
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * @param int $ticks
+     */
+    private function setTicks($ticks)
+    {
+        $this->ticks = $ticks;
+    }
+
+    /**
+     * @return int
+     */
+    private function getTicks()
+    {
+        return $this->ticks;
     }
 }
