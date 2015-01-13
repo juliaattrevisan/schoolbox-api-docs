@@ -16,7 +16,7 @@ if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
 		error(19);
 	}
 
-	$textbox = new \Schoolbox\Resource\Textbox();
+	$textbox = new \Schoolbox\Textbox\Model();
 
 	$textbox
 		->setCategory(\Schoolbox\Resource\CategoryMapper::getInstance()->createModel()->setId($_POST['categoryID']))
@@ -28,7 +28,7 @@ if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
 		$textbox->setId($_POST['textBoxID']);
 	}
 
-	$affected = \Schoolbox\Resource\TextboxMapper::getInstance()->save($textbox);
+	$affected = \Schoolbox\Textbox\Mapper::getInstance()->save($textbox);
 	$textbox->setId($affected[0]);
 
 	// select this textBox
@@ -49,7 +49,7 @@ if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
 }
 else if (is_numeric($_GET['delete'])) {
 	try {
-		$textbox = \Schoolbox\Resource\TextboxMapper::getInstance()->findById($_GET['delete']);
+		$textbox = \Schoolbox\Textbox\Mapper::getInstance()->findById($_GET['delete']);
 	}
 	catch(\Schoolbox\Mapper\Exception $e) {
 		error(2);
@@ -60,7 +60,7 @@ else if (is_numeric($_GET['delete'])) {
 		error(8);
 	}
 
-	\Schoolbox\Resource\TextboxMapper::getInstance()->delete($textbox);
+	\Schoolbox\Textbox\Mapper::getInstance()->delete($textbox);
 
 	SitePage::localRedir('/homepage/' . $_GET['originID']);
 }
