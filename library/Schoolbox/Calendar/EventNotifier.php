@@ -70,10 +70,12 @@ class EventNotifier extends AbstractModuleNotifier
                 ? $event->getPublishDateTime()->getUnixTimestamp()
                 : self::IMMEDIATELY;
 
-            $bundle->attachEach(array(
-                self::TRIGGER_UPCOMING => $start - (60 * self::UPCOMING_WINDOW),
-                self::TRIGGER_UPDATED  => $pubstamp
-            ));
+            $bundle->attachEach(
+                array(
+                    self::TRIGGER_UPCOMING => $start - (60 * self::UPCOMING_WINDOW),
+                    self::TRIGGER_UPDATED  => $pubstamp
+                )
+            );
         }
     }
 
@@ -84,12 +86,12 @@ class EventNotifier extends AbstractModuleNotifier
     /**
      * @param string $trigger
      * @param string $roleType
-     * @param Event  $event
+     * @param Event $event
      * @return Builder
      */
     protected function newBuilder($trigger, $roleType, $event)
     {
-        $bob   = new Builder();
+        $bob = new Builder();
         $bob->setNamespace(NSMapper::NS_CALENDAR)
             ->setIcon('/images/icon.php?size=32&icon=clock')
             ->setHref('/calendar/full/' . $event->getStartDateTime()->getUsingFormat('d-m-Y'))
@@ -104,8 +106,8 @@ class EventNotifier extends AbstractModuleNotifier
 
     /**
      * @param string $roleType
-     * @param Event  $event
-     * @param User   $author
+     * @param Event $event
+     * @param User $author
      * @return Envelope
      */
     protected function notifyUpcoming($roleType, $event, $author)
@@ -113,10 +115,10 @@ class EventNotifier extends AbstractModuleNotifier
         /** @var Event $event */
         $event = $this->mapper->findById($event->getId());
 
-        $bob   = $this->newBuilder('upcoming', $roleType, $event)
-                      ->setTitle(':name is about to start')
-                      ->setTimestamp($event->getStartDateTime()->getUnixTimestamp() - (60 * self::UPCOMING_WINDOW))
-                      ->setParam('name', new Param($event->getTitle()));
+        $bob = $this->newBuilder('upcoming', $roleType, $event)
+            ->setTitle(':name is about to start')
+            ->setTimestamp($event->getStartDateTime()->getUnixTimestamp() - (60 * self::UPCOMING_WINDOW))
+            ->setParam('name', new Param($event->getTitle()));
 
         return $this->notify($event, array($bob->build()));
     }
@@ -124,9 +126,9 @@ class EventNotifier extends AbstractModuleNotifier
 
     /**
      * @param string $roleType
-     * @param Event  $event
-     * @param User   $effector
-     * @param array  $diff
+     * @param Event $event
+     * @param User $effector
+     * @param array $diff
      * @return Envelope
      */
     protected function notifyUpdated($roleType, $event, $effector, $diff = null)
@@ -139,11 +141,13 @@ class EventNotifier extends AbstractModuleNotifier
         // title changed
         if (isset($diff['title'])) {
             $bob->setTitle(':user renamed the event :old to :new')
-                ->setParams(array(
-                    'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
-                    'old'  => new Param($diff['title'][1]),
-                    'new'  => new Param($event->getTitle())
-                ));
+                ->setParams(
+                    array(
+                        'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
+                        'old'  => new Param($diff['title'][1]),
+                        'new'  => new Param($event->getTitle())
+                    )
+                );
             $instances[] = $bob->build();
             unset($diff['title']);
         }
@@ -151,11 +155,13 @@ class EventNotifier extends AbstractModuleNotifier
         // location changed
         if (isset($diff['location'])) {
             $bob->setTitle(':event has moved from :old to :new')
-                ->setParams(array(
-                    'event' => new Param($event->getTitle()),
-                    'old'   => new Param($diff['location'][1]),
-                    'new'   => new Param($event->getLocation())
-                ));
+                ->setParams(
+                    array(
+                        'event' => new Param($event->getTitle()),
+                        'old'   => new Param($diff['location'][1]),
+                        'new'   => new Param($event->getLocation())
+                    )
+                );
             $instances[] = $bob->build();
             unset($diff['location']);
         }
@@ -163,11 +169,13 @@ class EventNotifier extends AbstractModuleNotifier
         // time changed
         if (isset($diff['startDate']) || isset($diff['startTime'])) {
             $bob->setTitle(':user changed the start time of :name to :time')
-                ->setParams(array(
-                    'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
-                    'name' => new Param($event->getTitle()),
-                    'time' => new Param($event->getStartDateTime()->getShort())
-                ));
+                ->setParams(
+                    array(
+                        'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
+                        'name' => new Param($event->getTitle()),
+                        'time' => new Param($event->getStartDateTime()->getShort())
+                    )
+                );
 
             $instances[] = $bob->build();
             unset($diff['startDate']);
@@ -177,10 +185,12 @@ class EventNotifier extends AbstractModuleNotifier
         // something else changed
         if (count($diff)) {
             $bob->setTitle(':user updated the event :name')
-                ->setParams(array(
-                    'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
-                    'name' => new Param($event->getTitle())
-                ));
+                ->setParams(
+                    array(
+                        'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
+                        'name' => new Param($event->getTitle())
+                    )
+                );
 
             $instances[] = $bob->build();
         }
@@ -190,13 +200,13 @@ class EventNotifier extends AbstractModuleNotifier
 
 
     /**
-     * @param Event      $event
+     * @param Event $event
      * @param Instance[] $instances
      * @return Envelope
      */
     protected function notify(Event $event, $instances)
     {
-        $envelope  = new Envelope();
+        $envelope = new Envelope();
 
         switch ($event->getAccess()) {
             case Calendar::ACCESS_CAMPUS:
@@ -242,7 +252,7 @@ class EventNotifier extends AbstractModuleNotifier
 
     /**
      * @param Event $event
-     * @param User  $author
+     * @param User $author
      * @return Envelope
      */
     public function notifyStudentUpcoming($event, $author)
@@ -253,7 +263,7 @@ class EventNotifier extends AbstractModuleNotifier
 
     /**
      * @param Event $event
-     * @param User  $author
+     * @param User $author
      * @return Envelope
      */
     public function notifyStaffUpcoming($event, $author)
@@ -264,7 +274,7 @@ class EventNotifier extends AbstractModuleNotifier
 
     /**
      * @param Event $event
-     * @param User  $author
+     * @param User $author
      * @return Envelope
      */
     public function notifyParentUpcoming($event, $author)
@@ -275,7 +285,7 @@ class EventNotifier extends AbstractModuleNotifier
 
     /**
      * @param Event $event
-     * @param User  $author
+     * @param User $author
      * @param array $diff
      * @return Envelope
      */
@@ -287,7 +297,7 @@ class EventNotifier extends AbstractModuleNotifier
 
     /**
      * @param Event $event
-     * @param User  $author
+     * @param User $author
      * @param array $diff
      * @return Envelope
      */
@@ -299,7 +309,7 @@ class EventNotifier extends AbstractModuleNotifier
 
     /**
      * @param Event $event
-     * @param User  $author
+     * @param User $author
      * @param array $diff
      * @return Envelope
      */
