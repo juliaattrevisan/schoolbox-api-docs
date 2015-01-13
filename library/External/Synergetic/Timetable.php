@@ -398,6 +398,13 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             $timetable[$x]['periodNumber']   = $timetabledef['number'][$x];
             $timetable[$x]['periodSequence'] = $timetabledef['sequence'][$x];
 
+            // Have I reached the end of timetable classes?
+            // Keep filling out timetable periods, but no longer add classes or
+            // mess with loop variables, thus avoiding possible infinite loop.
+            if (empty($desc)) {
+                continue;
+            }
+
             if ($timetabledef['sequence'][$x] != 2 && $desc['PeriodNumber'] == $timetable[$x]['periodNumber']) {
                 $timetable[$x]['class'][$seq]['description'] = $desc['Description'];
                 $timetable[$x]['class'][$seq]['code']        = $desc['ClassCode'];
@@ -538,6 +545,14 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
             //for each day
             for ($y = 1; $y <= $dayCount; $y++) {
+
+                // Have I reached the end of timetable classes?
+                // Keep filling out timetable periods, but no longer add classes or
+                // mess with loop variables, thus avoiding possible infinite loop.
+                if (empty($desc)) {
+                    continue;
+                }
+
                 if ($timetabledef['sequence'][$x] != 2 && $desc['PeriodNumber'] == $timetable[$x]['periodNumber'] && $desc['DayNumber'] == $y) {
                     $timetable[$x]['day'][$y][$seq]['description']    = $desc['Description'];
                     $timetable[$x]['day'][$y][$seq]['code']           = $desc['ClassCode'];
