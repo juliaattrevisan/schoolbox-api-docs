@@ -19,7 +19,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
     /**
      * Link Mapper
      *
-     * @var Schoolbox\LinkMapper
+     * @var Schoolbox\Resource\LinkMapper
      */
     private $linkMapper = null;
 
@@ -49,7 +49,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
     public function execute()
     {
         $this->groupHandler = new Group();
-        $this->setLinkMapper(new \Schoolbox\LinkMapper());
+        $this->setLinkMapper(new \Schoolbox\Resource\LinkMapper());
         $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
 
         try {
@@ -107,25 +107,15 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         $j = 0;
 
         foreach ($allLinks as $currentLink) {
-            $url = new Url($currentLink->getUrl());
-
-            if ($url->isLocalUrl()) {
-                $linkUrl    = $url->getRelativeURL();
-                $linkTarget = '';
-            } else {
-                $linkUrl    = $url->getBase64EncodedRedirect();
-                $linkTarget = 'external';
-            }
-
             $this->setVar(
                 array(
                     'LINK_ID'           => $currentLink->getId(),
                     'LINK_NAME'         => Scrub::text($currentLink->getDescription()),
-                    'LINK_URL'          => $linkUrl,
-                    'LINK_TARGET'       => $linkTarget,
-                    'LINK_POSTED_BY'    => $currentLink->getOwnerId()->formatName(),
-                    'LINK_POSTED_BY_ID' => $currentLink->getOwnerId()->getId(),
-                    'LINK_POSTED_DATE'  => $currentLink->getSubmittedAt()->getShort(),
+                    'LINK_URL'          => $currentLink->getHref(),
+                    'LINK_TARGET'       => $currentLink->getTarget(),
+                    'LINK_POSTED_BY'    => $currentLink->getOwner()->formatName(),
+                    'LINK_POSTED_BY_ID' => $currentLink->getOwner()->getId(),
+                    'LINK_POSTED_DATE'  => $currentLink->getSubmitted()->getShort(),
                     'LINK_COMMENT'      => nl2br(Scrub::text($currentLink->getComment())),
                     'ON_OFF'            => ++$j % 2 ? '' : 'dark',
                     'HIDDEN'            => $currentLink->getHidden() ? 'hidden' : '',
@@ -161,7 +151,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
     /**
      * Set link mapper
      *
-     * @param \Schoolbox\LinkMapper $linkMapper
+     * @param \Schoolbox\Resource\LinkMapper $linkMapper
      */
     private function setLinkMapper($linkMapper)
     {
@@ -171,7 +161,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
     /**
      * Get link mapper
      *
-     * @return \Schoolbox\LinkMapper
+     * @return \Schoolbox\Resource\LinkMapper
      */
     private function getLinkMapper()
     {

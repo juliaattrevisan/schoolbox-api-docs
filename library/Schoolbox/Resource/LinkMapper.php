@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Resource;
 use Schoolbox\Mapper;
+use Schoolbox\Collection;
 
 class LinkMapper extends Mapper {
 
@@ -83,4 +84,65 @@ class LinkMapper extends Mapper {
 
         $this->hasSoftDeleteDateField('deleted_at');
 	}
+
+    /**
+     * Find all the links in a given category
+     *
+     * @param Category $category
+     * @param $options
+     * @return Collection
+     */
+    public function findAllInCategory(Category $category, $options)
+    {
+        $categoryMapper = $this->getJoinMapper('category');
+        $userMapper     = $this->getJoinMapper('user');
+
+        /* Special case misrepresentations in db
+         */
+        if ($options['sort'] == 'Date') {
+            $sort = 'submitted';
+        } else {
+            $sort = 'description';
+        }
+
+        $sortDir = strtoupper($options['sortdir']) == 'DESC' ? 'DESC' : 'ASC';
+
+        $limit = (int)$options['size'];
+
+        $query = "
+            SELECT
+            	{$this->getColumnString('l')},
+            	{$categoryMapper->getColumnString('c')},
+            	{$userMapper->getColumnString('o')}
+            FROM `{$this->table}` l
+            LEFT JOIN {$this->getJoinSql('category', 'l', 'c')}
+            LEFT JOIN {$this->getJoinSql('user', 'l', 'o')}
+            WHERE l.category = :categoryId
+            AND l.deleted_at IS NULL
+            ORDER BY l.{$sort} {$sortDir}
+		";
+
+        if ($options['size']) {
+            $query .= "LIMIT {$limit}";
+        }
+
+        $statement = $this->database->prepare($query);
+        $statement->bindParam(':categoryId', $category->getId());
+        $statement->execute();
+
+        /* Manually construct hierarchy of blog items and their comments
+         */
+        $collection = new Collection();
+
+        foreach ($statement as $row) {
+            $link = $this->hydrate($row, 'l');
+
+            $link->setFolder($categoryMapper->hydrate($row, 'c'));
+            $link->setOwner($userMapper->hydrate($row, 'o'));
+
+            $collection->add($link);
+        }
+
+        return $collection;
+    }
 }
