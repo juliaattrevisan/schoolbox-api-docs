@@ -279,13 +279,18 @@ class External_Tass_User implements External_UserInterface
     public function getPortrait($externalUserId)
     {
 
-        $portraitPath = realpath( Config::get('portrait_dir') ) .'/'.strtolower($externalUserId).".jpg";
+        /* Try several different combinations it has to be one of these */
+        $portraitPathList = array( realpath( Config::get('portrait_dir') ) .'/'.$externalUserId.".jpg",
+                                   realpath( Config::get('portrait_dir') ) .'/'.strtolower($externalUserId).".jpg",
+                                   realpath( Config::get('portrait_dir') ) .'/'.strtoupper($externalUserId).".jpg",
+        );
 
-        if (is_readable($portraitPath)) {
-            return $portraitPath;
-        } else {
-            return false;
+        foreach($portraitPathList as $portraitPath) {
+            if (is_readable($portraitPath)) {
+                return $portraitPath;
+            }
         }
+        return false;
     }
 
     public function getEmail($id)
