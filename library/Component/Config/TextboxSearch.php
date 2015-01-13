@@ -45,8 +45,8 @@ class Component_Config_TextboxSearch extends Component_Config_Abstract
             array(
                 'COMPONENT_TEXTBOX_ID'   => $configValue,
                 'COMPONENT_TEXTBOX_NAME' => $textbox->getHeading(),
-                'VIEW_URL'               => "/homepage/{$textbox->getCategoryId()->getId()}#component{$componentId}",
-                'EDIT_URL'               => "/homepage/{$textbox->getCategoryId()->getId()}/textBoxModify/{$componentId}#component{$componentId}",
+                'VIEW_URL'               => "/homepage/{$textbox->getCategory()->getId()}#component{$componentId}",
+                'EDIT_URL'               => "/homepage/{$textbox->getCategory()->getId()}/textBoxModify/{$componentId}#component{$componentId}",
             )
         );
     }

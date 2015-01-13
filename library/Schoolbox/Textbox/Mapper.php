@@ -39,7 +39,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasMap(
             array(
                 'column'   => 'categoryID',
-                'property' => 'categoryId',
+                'property' => 'category',
                 'type'     => self::TYPE_MODEL,
                 'join'     => 'category'
             )
@@ -104,7 +104,7 @@ class Mapper extends \Schoolbox\Mapper
 		";
 
         $statement = $this->database->prepare($query);
-        $statement->bindParam(':categoryId', $textbox->getCategoryId()->getId());
+        $statement->bindParam(':categoryId', $textbox->getCategory()->getId());
         $statement->bindParam(':textboxId', $textbox->getId());
         $statement->execute();
 

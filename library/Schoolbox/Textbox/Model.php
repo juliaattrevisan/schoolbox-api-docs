@@ -26,7 +26,7 @@ class Model implements ISoftDeletable
      *
      * @var
      */
-    private $categoryId;
+    private $category;
 
     /**
      * Textbox heading
@@ -94,23 +94,23 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * Set category id
+     * Set category
      *
-     * @param mixed $categoryId
+     * @param mixed $category
      */
-    public function setCategoryId($categoryId)
+    public function setCategory($category)
     {
-        $this->categoryId = $categoryId;
+        $this->category = $category;
     }
 
     /**
-     * Get category id
+     * Get category
      *
      * @return mixed
      */
-    public function getCategoryId()
+    public function getCategory()
     {
-        return $this->categoryId;
+        return $this->category;
     }
 
     /**
