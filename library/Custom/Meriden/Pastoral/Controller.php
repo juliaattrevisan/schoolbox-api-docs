@@ -86,6 +86,13 @@ class Controller extends Base
      */
     public function subject($year, User $student, $subject)
     {
+
+        $this->getResponse()->content->set(
+            array(
+                'template' => '@customMeridenPastoral/subject.twig',
+                'data'     => array(),
+            )
+        );
     }
 
     /**
