@@ -190,6 +190,13 @@ then
 	apt-get -y install schoolbox-epl;
 fi
 
+if [ "`apache2 -v | grep Apache | cut -d'/' -f2 | cut -d'.' -f1-2`" == "2.4" ];
+then
+	echo "$vag Apache is v2.4.x, changing access config to match";
+	sed -i 's/Order\ allow,deny//g' /etc/apache2/sites-available/*.conf;
+	sed -i 's/Allow\ from\ all/Require\ all\ granted/g' /etc/apache2/sites-available/*.conf;
+fi
+
 echo "$vag Ensure all services are running";
 service schoolbox-epl restart > /dev/null 2>&1;
 #service mysql restart > /dev/null 2>&1;
