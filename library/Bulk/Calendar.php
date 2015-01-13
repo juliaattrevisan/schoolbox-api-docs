@@ -16,15 +16,17 @@ class Bulk_Calendar extends Bulk_Abstract {
 	 */
 	public function addCalendar() {
 		if (is_file($this->getFile())) {
-
-			/* Set defaults for id and campus if they are not submitted
-			 */
-			if ($_POST['userid'] == '') {
-				$uid = $_SESSION['id'];
-			}
-			else {
-				$uid = $_POST['userid'];
-			}
+            /* Calendar Owner override
+             */
+            if (isset($_POST['userid']) && is_numeric($_POST['userid'])) {
+                $userMapper = new \Schoolbox\UserMapper();
+                $user = $userMapper->findById($_POST['userid']);
+                $author = $user;
+            }
+            else {
+                $user = $_SESSION['user'];
+                $author = $_SESSION['user'];
+            }
 
 			/* Set up specified campus list
 			 * Set up specified group list
@@ -48,7 +50,7 @@ class Bulk_Calendar extends Bulk_Abstract {
 
 			/* Use factory to spawn a builder
 			 */
-			$factory = new \Calendar\Import\Factory($uid, $_SESSION['id'], $categoryList, $groupList, $campusList, \Schoolbox\Calendar\Event::ACCESS_CAMPUS, $this->getFile());
+			$factory = new \Calendar\Import\Factory($user->getId(), $author->getId(), $categoryList, $groupList, $campusList, \Schoolbox\Calendar\Event::ACCESS_CAMPUS, $this->getFile());
 			$strategy = $factory->build();
 			$strategy->load();
 
