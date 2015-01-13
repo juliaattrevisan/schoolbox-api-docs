@@ -65,7 +65,7 @@ class Mapper extends \Schoolbox\Mapper
             array(
                 'column'   => 'deleted',
                 'property' => 'deletedAt',
-                'type'     => self::TYPE_STRING,
+                'type'     => self::TYPE_DATETIME,
             )
         );
 
@@ -172,7 +172,7 @@ class Mapper extends \Schoolbox\Mapper
             FROM `{$this->table}` t
             LEFT JOIN {$this->getJoinSql('category', 't', 'c')}
             WHERE t.heading LIKE :like
-            AND t.deleted = 'false'
+            AND t.deleted IS NULL
             AND c.deleted_at IS NULL
             ORDER BY {$sortBy} {$sortDir}
             LIMIT {$offset}, {$limit}

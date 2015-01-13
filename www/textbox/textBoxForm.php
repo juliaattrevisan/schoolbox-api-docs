@@ -18,11 +18,12 @@ if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
 
 	$textbox = new \Schoolbox\Textbox\Model();
 
+    $now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 	$textbox
 		->setCategory(\Schoolbox\Resource\CategoryMapper::getInstance()->createModel()->setId($_POST['categoryID']))
 		->setHeading($_POST['textBoxHeading'])
 		->setBody($_POST['textBoxBody'])
-		->setDeletedAt(false);
+		->setDeletedAt($now->getDatabase());
 
 	if (is_numeric($_POST['textBoxID'])) {
 		$textbox->setId($_POST['textBoxID']);
