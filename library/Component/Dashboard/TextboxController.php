@@ -19,7 +19,7 @@ class Component_Dashboard_TextboxController extends Component_Dashboard_Controll
 		$this->hideHeader = $this->getConfig('compactMode');
 
 		if ($textBoxID > 0) {
-			$mapper = new \Schoolbox\Resource\TextboxMapper();
+			$mapper = new \Schoolbox\Textbox\Mapper();
 
 			try {
 				$textbox = $mapper->findById($textBoxID);
