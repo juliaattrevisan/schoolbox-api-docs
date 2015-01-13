@@ -188,7 +188,7 @@ class Mapper extends \Schoolbox\Mapper
             $textbox  = $this->hydrate($row, 't');
             $category = $categoryMapper->hydrate($row, 'c');
 
-            $textbox->setCategoryId($category);
+            $textbox->setCategory($category);
 
             $collection->add($textbox);
         }
