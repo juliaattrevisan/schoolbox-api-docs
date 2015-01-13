@@ -12,18 +12,18 @@ use Schoolbox\Assessment\Component\OnlineAssessment\Attempt;
 use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 use Schoolbox\Assessment\Course\Task;
 
-$assessHandler = new Assess_Main();
-$attemptHandler = new Assess_Attempt();
+$assessHandler   = new Assess_Main();
+$attemptHandler  = new Assess_Attempt();
 $questionHandler = new Assess_Question();
 $responseHandler = new Assess_Response();
-$sectionHandler = new Assess_Section();
-$groupHandler = new Group();
+$sectionHandler  = new Assess_Section();
+$groupHandler    = new Group();
 
 if (!is_numeric($_SESSION['attempt_id'])) {
     SitePage::localRedir('/assess/intro/' . $this->arg[0]);
 }
 
-$assess = $assessHandler->getByID($this->arg[0]);
+$assess  = $assessHandler->getByID($this->arg[0]);
 $attempt = $attemptHandler->getByID($_SESSION['attempt_id']);
 
 if (!$assess) {
@@ -72,11 +72,13 @@ if ($attempt['finish'] == '0000-00-00 00:00:00') {
 
     AttemptMapper::getInstance()->save($attempt);
 
-    $this->setVar(array(
-        'ASSESS_TITLE' => Scrub::text($assess['title']),
-        'ASSESS_CATEGORY_ID' => $assess['category_id'],
-        'ATTEMPT_END' => $attemptFinishDate->getShort(),
-    ));
+    $this->setVar(
+        array(
+            'ASSESS_TITLE'       => Scrub::text($assess['title']),
+            'ASSESS_CATEGORY_ID' => $assess['category_id'],
+            'ATTEMPT_END'        => $attemptFinishDate->getShort(),
+        )
+    );
 
     // Does this item have a task instance associated? if so, set it as
     // completed (pending, instead of completed?)
@@ -92,11 +94,13 @@ if ($attempt['finish'] == '0000-00-00 00:00:00') {
 } else {
     $attemptFinishDate = new Alaress_Date_Format(strtotime($attempt['finish']), 'U');
 
-    $this->setVar(array(
-        'ASSESS_TITLE' => Scrub::text($assess['title']),
-        'ASSESS_CATEGORY_ID' => $assess['category_id'],
-        'ATTEMPT_END' => $attemptFinishDate->getShort(),
-    ));
+    $this->setVar(
+        array(
+            'ASSESS_TITLE'       => Scrub::text($assess['title']),
+            'ASSESS_CATEGORY_ID' => $assess['category_id'],
+            'ATTEMPT_END'        => $attemptFinishDate->getShort(),
+        )
+    );
 
     $this->parse('alreadyEnded_block', 'alreadyEnded');
     $this->setVar('endAssess_block', '');
@@ -137,25 +141,26 @@ $marks = $attemptHandler->getMarksForAttempt($_SESSION['attempt_id']);
 $total = $attemptHandler->getTotalMarks($this->arg[0], $_SESSION['attempt_id']);
 
 if ($total > 0) {
-	$percentage = 100 * number_format($marks / $total, 2);
-}
-else {
-	$percentage = 0;
+    $percentage = 100 * number_format($marks / $total, 2);
+} else {
+    $percentage = 0;
 }
 
-$numMarkedQuestions = $responseHandler->numAutomarked($_SESSION['attempt_id']);
-$numUnmarkedQuestions = $responseHandler->numNotAutomarked($_SESSION['attempt_id']);
+$numMarkedQuestions     = $responseHandler->numAutomarked($_SESSION['attempt_id']);
+$numUnmarkedQuestions   = $responseHandler->numNotAutomarked($_SESSION['attempt_id']);
 $valueUnmarkedQuestions = $responseHandler->valueNotAutomarked($_SESSION['attempt_id']);
 
-$this->setVar(array(
-    'ATTEMPT_MARKS' => $marks,
-    'ATTEMPT_PERCENTAGE' => $percentage,
-    'ATTEMPT_TOTAL' => $total,
-    'ATTEMPT_NUM_MARKED_QUESTIONS' => $numMarkedQuestions,
-    'ATTEMPT_NUM_UNMARKED_QUESTIONS' => $numUnmarkedQuestions,
-    'ATTEMPT_NUM_QUESTIONS' => $numMarkedQuestions + $numUnmarkedQuestions,
-    'ATTEMPT_VALUE_UNMARKED_QUESTIONS' => $valueUnmarkedQuestions,
-));
+$this->setVar(
+    array(
+        'ATTEMPT_MARKS'                    => $marks,
+        'ATTEMPT_PERCENTAGE'               => $percentage,
+        'ATTEMPT_TOTAL'                    => $total,
+        'ATTEMPT_NUM_MARKED_QUESTIONS'     => $numMarkedQuestions,
+        'ATTEMPT_NUM_UNMARKED_QUESTIONS'   => $numUnmarkedQuestions,
+        'ATTEMPT_NUM_QUESTIONS'            => $numMarkedQuestions + $numUnmarkedQuestions,
+        'ATTEMPT_VALUE_UNMARKED_QUESTIONS' => $valueUnmarkedQuestions,
+    )
+);
 
 /* If there are unmarked questions remaining, show the block
  */
@@ -169,11 +174,13 @@ if ($numUnmarkedQuestions) {
  */
 $firstSection = $sectionHandler->getFirst($assess['assess_id']);
 
-$this->setVar(array(
-    'ASSESS_ID' => $assess['assess_id'],
-    'SECTION_ID' => $firstSection['section_id'],
-    'ATTEMPT_ID' => $_SESSION['attempt_id']
-));
+$this->setVar(
+    array(
+        'ASSESS_ID'  => $assess['assess_id'],
+        'SECTION_ID' => $firstSection['section_id'],
+        'ATTEMPT_ID' => $_SESSION['attempt_id']
+    )
+);
 
 /* Visibility
  */
@@ -181,22 +188,25 @@ $visibility = new \Assess\Visibility();
 $visibility->setId($assess['mark_visibility']);
 
 if ($visibility->isStaff() && $groupHandler->isStaff()) {
-	$this->parse('has_marks_block', 'has_marks');
+    $this->parse('has_marks_block', 'has_marks');
     $this->parse('view_attempt_block', 'view_attempt');
-}
-else if ($visibility->isStaffStudent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
-	$this->parse('has_marks_block', 'has_marks');
-    $this->parse('view_attempt_block', 'view_attempt');
-}
-else if ($visibility->isStaffStudentParent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
-	$this->parse('has_marks_block', 'has_marks');
-    $this->parse('view_attempt_block', 'view_attempt');
-}
-else {
-	$this->setVar(array(
-        'view_attempt_block' => '',
-		'has_marks_block' => '',
-	));
+} else {
+    if ($visibility->isStaffStudent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
+        $this->parse('has_marks_block', 'has_marks');
+        $this->parse('view_attempt_block', 'view_attempt');
+    } else {
+        if ($visibility->isStaffStudentParent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
+            $this->parse('has_marks_block', 'has_marks');
+            $this->parse('view_attempt_block', 'view_attempt');
+        } else {
+            $this->setVar(
+                array(
+                    'view_attempt_block' => '',
+                    'has_marks_block'    => '',
+                )
+            );
+        }
+    }
 }
 
 /* Clear attempt
