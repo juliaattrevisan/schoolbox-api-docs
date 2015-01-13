@@ -16,6 +16,7 @@ $assessHandler = new Assess_Main();
 $attemptHandler = new Assess_Attempt();
 $questionHandler = new Assess_Question();
 $responseHandler = new Assess_Response();
+$sectionHandler = new Assess_Section();
 $groupHandler = new Group();
 
 if (!is_numeric($_SESSION['attempt_id'])) {
@@ -182,6 +183,16 @@ else {
 		'has_marks_block' => ''
 	));
 }
+
+/* View Attempt link
+ */
+$firstSection = $sectionHandler->getFirst($assess['assess_id']);
+
+$this->setVar(array(
+    'ASSESS_ID' => $assess['assess_id'],
+    'SECTION_ID' => $firstSection['section_id'],
+    'ATTEMPT_ID' => $_SESSION['attempt_id']
+));
 
 /* Clear attempt
  */
