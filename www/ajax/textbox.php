@@ -1,21 +1,17 @@
 <?php
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
-$textBoxHandler = new TextBox();
-$page = new SitePage;
+$page          = new SitePage;
+$textboxMapper = new \Schoolbox\Textbox\Mapper();
+$return        = array();
 
+$allTextboxes = $textboxMapper->search($_GET['query']);
 
-$searchList = $textBoxHandler->search($_GET['query']);
-
-$return = array();
-if (is_array($searchList)) {
-    foreach ($searchList as $textbox) {
-        $return[] = array(
-            'id'   => $textbox['textBoxID'],
-            'name' => $textbox['cname'] . ': ' . $textbox['heading'],
-        );
-    }
-
+foreach ($allTextboxes as $currentTextbox) {
+    $return[] = array(
+        'id'   => $currentTextbox->getId(),
+        'name' => "{$currentTextbox->getCategory()->getName()}: {$currentTextbox->getHeading()}",
+    );
 }
 
 header('Content-type: application/json');
