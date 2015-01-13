@@ -42,7 +42,13 @@ class HomepageTemplateMapper extends Mapper {
         ));
 	}
 
-    public function delete(HomepageTemplate $object) {
+    /*
+     * Deletes a component instance and its config
+     *
+     * @param HomepageTemplate $object
+     */
+
+    public function delete($object) {
 
         /* Deletes all config instances related to this homepage template */
         $query = "DELETE ci, cci FROM component_instance ci
