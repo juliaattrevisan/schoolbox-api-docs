@@ -77,10 +77,12 @@ class Model implements ISoftDeletable
      * Set body
      *
      * @param string $body
+     * @return $this
      */
     public function setBody($body)
     {
         $this->body = $body;
+        return $this;
     }
 
     /**
@@ -97,10 +99,12 @@ class Model implements ISoftDeletable
      * Set category
      *
      * @param mixed $category
+     * @return $this
      */
     public function setCategory($category)
     {
         $this->category = $category;
+        return $this;
     }
 
     /**
@@ -117,10 +121,12 @@ class Model implements ISoftDeletable
      * Set deleted at
      *
      * @param string $deletedAt
+     * @return $this
      */
     public function setDeletedAt($deletedAt)
     {
         $this->deletedAt = $deletedAt;
+        return $this;
     }
 
     /**
@@ -137,10 +143,12 @@ class Model implements ISoftDeletable
      * Set heading
      *
      * @param string $heading
+     * @return $this
      */
     public function setHeading($heading)
     {
         $this->heading = $heading;
+        return $this;
     }
 
     /**
@@ -157,10 +165,12 @@ class Model implements ISoftDeletable
      * Set id
      *
      * @param int $id
+     * @return $this
      */
     public function setId($id)
     {
         $this->id = $id;
+        return $this;
     }
 
     /**
