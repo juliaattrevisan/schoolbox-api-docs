@@ -1,0 +1,17 @@
+<li>
+    <div class="subject">
+        <a class="to-subject" href="/homepage/code/{{ subject.code }}">
+            {{ subject.sub_desc }}
+            <span class="icon"></span>
+        </a>
+    </div>
+    {% for teacher in subject.teachers %}
+        <div class="profile">
+            <a href="/search/user/{{ teacher.id }}" class="teacher-profile no-email">
+                <img src="/portrait.php?userId={{ teacher.externalId }}&amp;size=square32">
+                <span class="name">{{ teacher.formatName }}</span>
+                <span class="role">{{ teacher.role.name }}</span>
+            </a>
+        </div>
+    {% endfor %}
+</li>

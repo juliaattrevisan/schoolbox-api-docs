@@ -9,6 +9,22 @@
     })(jQuery);
 </script>
 
+<style type="text/css">
+    /* TODO remove inline styles */
+    #meriden-crest {
+        text-align: center;
+    }
+    #house-info dt {
+
+    }
+    #house-info dd {
+
+    }
+    .teacher-profile.no-email {
+         margin-right: 0;
+     }
+</style>
+
 <h1>School Report - {{ report.year.current }}</h1>
 
 <div id="context">
@@ -54,8 +70,11 @@
 </div>
 
 {# Table of contents #}
-<img src="/images/meriden/crest.png" />
-<dl>
+<div id="meriden-crest">
+    <img src="/images/meriden/crest.png" />
+</div>
+
+<dl id="house-info">
     <dt>House</dt>
     <dd>{{ report.student.house.name }}</dd>
 
@@ -66,7 +85,9 @@
     {% for tutor in report.studentExternal.tutors %}
         <dd>{{ tutor.tch_name }} (Semester {{ tutor.semester }})</dd>
     {% endfor %}
+</dl>
 
+<dl id="attendance-info">
     <dt>Days Absent</dt>
     <dd>{{ report.studentExternal.attendance.absent }}</dd>
 
@@ -84,7 +105,7 @@
 
     {##
      # Athletics, Swimming, Camp, Uniform, Pastoral Services:
-     # All these are based off of assessments in the grade page.
+     # All these are attendances, and are based off of assessments in the grade page.
      #}
     {% for assessment in report.studentExternal.assessments %}
         <dt>{{ assessment.name }}</dt>
@@ -92,7 +113,7 @@
     {% endfor %}
 </dl>
 
-<dl>
+<dl id="awards-info">
     <dt>Awards and Prizes</dt>
     {% for award in report.studentExternal.activities.awards %}
         <dd>{{ award.act_desc }}</dd>
@@ -129,23 +150,7 @@
         {% set reportHalf = (report.year.subjects|length / 2)|round(0, 'ceil') %}
         <ul>
             {% for subject in report.year.subjects|slice(0, reportHalf) %}
-                <li>
-                    <div class="subject">
-                        <a class="to-subject" href="/homepage/code/{{ subject.code }}">
-                            {{ subject.sub_desc }}
-                            <span class="icon"></span>
-                        </a>
-                    </div>
-                    {% for teacher in subject.teachers %}
-                        <div class="profile">
-                            <a href="/search/user/{{ teacher.id }}" class="teacher-profile no-email">
-                                <img src="/portrait.php?userId={{ teacher.externalId }}&amp;size=square32">
-                                <span class="name">{{ teacher.formatName }}</span>
-                                <span class="role">{{ teacher.role.name }}</span>
-                            </a>
-                        </div>
-                    {% endfor %}
-                </li>
+                {% include '@customMeridenPastoral/sub/subject.twig' with {subject: subject} %}
             {% endfor %}
         </ul>
         {##
@@ -155,23 +160,7 @@
          #}
         {% for subject in report.year.subjects|slice(reportHalf) %}
         <ul>
-            <li>
-                <div class="subject">
-                    <a class="to-subject" href="/homepage/code/{{ subject.code }}">
-                        {{ subject.sub_desc }}
-                        <span class="icon"></span>
-                    </a>
-                </div>
-                {% for teacher in subject.teachers %}
-                    <div class="profile">
-                        <a href="/search/user/{{ teacher.id }}" class="teacher-profile no-email">
-                            <img src="/portrait.php?userId={{ teacher.externalId }}&amp;size=square32">
-                            <span class="name">{{ teacher.formatName }}</span>
-                            <span class="role">{{ teacher.role.name }}</span>
-                        </a>
-                    </div>
-                {% endfor %}
-            </li>
+            {% include '@customMeridenPastoral/sub/subject.twig' with {subject: subject} %}
         </ul>
         {% endfor %}
     </div>
