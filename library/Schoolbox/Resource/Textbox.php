@@ -7,6 +7,8 @@
  * @version     SVN: $Id$
  */
 
+/* Deprecated
+ */
 namespace Schoolbox\Resource;
 
 
