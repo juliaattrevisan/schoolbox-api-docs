@@ -150,7 +150,7 @@
         {% set reportHalf = (report.year.subjects|length / 2)|round(0, 'ceil') %}
         <ul>
             {% for subject in report.year.subjects|slice(0, reportHalf) %}
-                {% include '@customMeridenPastoral/sub/subject.twig' with {subject: subject} %}
+                {% include '@customMeridenPastoral/sub/subject.twig' with {subject: subject, showEmail: false} %}
             {% endfor %}
         </ul>
         {##
@@ -159,9 +159,9 @@
          # Go figure!
          #}
         {% for subject in report.year.subjects|slice(reportHalf) %}
-        <ul>
-            {% include '@customMeridenPastoral/sub/subject.twig' with {subject: subject} %}
-        </ul>
+            <ul>
+                {% include '@customMeridenPastoral/sub/subject.twig' with {subject: subject, showEmail: false} %}
+            </ul>
         {% endfor %}
     </div>
 </div>
