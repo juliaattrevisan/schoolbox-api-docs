@@ -12,6 +12,17 @@
 class Synchronise_Tass_Toowoomba_Strategy_Staff extends Synchronise_Base_Strategy_Staff
 {
     /**
+     * Overridden to only search external ID because I can't accurately
+     * determine the role of a staff member.
+     *
+     * {@inheritdoc}
+     */
+    protected function userExists($user)
+    {
+        return $this->user_handler->getBySynergy($user['synergy_id']);
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function setup()
