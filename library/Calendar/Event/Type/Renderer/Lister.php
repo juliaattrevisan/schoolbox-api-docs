@@ -56,47 +56,58 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
      */
     public function visit($currentEvent)
     {
-        $page = $this->getPage();
+        $page      = $this->getPage();
+        $separator = '&ndash;';
 
         if ($currentEvent->getPublishDate()->getUnixTimestamp() > $_SERVER['REQUEST_TIME']) {
             $cssClass = 'translucent';
-        }
-        else {
+        } else {
             $cssClass = '';
+        }
+
+        /* Only display the start time if it's the same as the end time
+         */
+        $startTime = $currentEvent->getStartTime()->getTimeOnly();
+        $endTime   = $currentEvent->getEndTime()->getTimeOnly();
+
+        if ($startTime == $endTime) {
+            $endTime   = '';
+            $separator = '';
         }
 
         $page->setVar(
             array(
-                'EVENT_ID' => $currentEvent->getEventId(),
-                'EVENT_START' => $currentEvent->getStartTime()->getTimeOnly(),
-                'EVENT_END' => $currentEvent->getEndTime()->getTimeOnly(),
-                'EVENT_TITLE' => Scrub::text($currentEvent->getTitle()),
-                'EVENT_SELECTORS' => $this->determineSelectors($currentEvent),
-                'EVENT_CLASS' => $cssClass,
-                'EVENT_COLOUR' => $currentEvent->getColour(),
-                'EVENT_DETAIL' => Scrub::html($currentEvent->getDetail()),
-                'EVENT_TYPE' => Scrub::text($currentEvent->getEventType()),
-                'EVENT_AUTHOR' => Scrub::text($currentEvent->getAuthorName()),
-                'EVENT_AUTHOR_ID' => $currentEvent->getAuthorId(),
-                'EVENT_FULL_TIME' => $currentEvent->getFullDate(),
-                'EVENT_LOCATION' => Scrub::text($currentEvent->getLocation()),
-                'EVENT_CATEGORY_ID' => $currentEvent->getCategoryId(),
-                'EVENT_CATEGORY_NAME' => Scrub::text($currentEvent->getCategoryName()),
-                'event_location_block' => '',
-                'event_has_category_block' => '',
-                'event_buttons_block' => '',
-                'event_attendance_status_block' => '',
+                'EVENT_ID'                       => $currentEvent->getEventId(),
+                'EVENT_START'                    => $startTime,
+                'EVENT_SEPARATOR'                => $separator,
+                'EVENT_END'                      => $endTime,
+                'EVENT_TITLE'                    => Scrub::text($currentEvent->getTitle()),
+                'EVENT_SELECTORS'                => $this->determineSelectors($currentEvent),
+                'EVENT_CLASS'                    => $cssClass,
+                'EVENT_COLOUR'                   => $currentEvent->getColour(),
+                'EVENT_DETAIL'                   => Scrub::html($currentEvent->getDetail()),
+                'EVENT_TYPE'                     => Scrub::text($currentEvent->getEventType()),
+                'EVENT_AUTHOR'                   => Scrub::text($currentEvent->getAuthorName()),
+                'EVENT_AUTHOR_ID'                => $currentEvent->getAuthorId(),
+                'EVENT_FULL_TIME'                => $currentEvent->getFullDate(),
+                'EVENT_LOCATION'                 => Scrub::text($currentEvent->getLocation()),
+                'EVENT_CATEGORY_ID'              => $currentEvent->getCategoryId(),
+                'EVENT_CATEGORY_NAME'            => Scrub::text($currentEvent->getCategoryName()),
+                'event_location_block'           => '',
+                'event_has_category_block'       => '',
+                'event_buttons_block'            => '',
+                'event_attendance_status_block'  => '',
                 'event_attendance_request_block' => '',
-                'event_timed_block' => '',
-                'event_allday_block' => '',
-                'event_submission_block' => '',
+                'event_timed_block'              => '',
+                'event_allday_block'             => '',
+                'event_submission_block'         => '',
             )
         );
         if ($currentEvent->getCategoryId() > 0) {
             $page->parse('event_has_category_block', 'event_has_category');
         }
 
-        if($currentEvent->getLocation()) {
+        if ($currentEvent->getLocation()) {
             $page->parse('event_location_block', 'event_location');
         }
 
@@ -118,7 +129,7 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
             // Finagle better notes or details
             $title = $currentEvent->getTitle();
             if (strlen($title) === 0) {
-                $title = 'Booking: '.$currentEvent->getBooking()->getResource()->getName();
+                $title = 'Booking: ' . $currentEvent->getBooking()->getResource()->getName();
             } else {
                 $page->setVar(
                     'EVENT_DETAIL',
@@ -220,7 +231,7 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
         $page->setVar(
             array(
                 'event_allday_block' => '',
-                'event_timed_block' => ''
+                'event_timed_block'  => ''
             )
         );
     }
