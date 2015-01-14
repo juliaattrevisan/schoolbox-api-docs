@@ -12,6 +12,8 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
 {
 
     /**
+     * User
+     *
      * @var \Schoolbox\User
      */
     private $user = null;
@@ -25,11 +27,64 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
      * @param $page
      * @param $user
      */
-    public function __construct($api, $startTimestamp, $endTimestamp, $page, $user)
+    public function __construct($api, $startTimestamp, $endTimestamp, $page, \Schoolbox\User $user)
     {
         parent::__construct($api, $startTimestamp, $endTimestamp, $page);
 
         $this->setUser($user);
+
+        /* Detonate multi-day events into their individual day ingredients
+         * Merje and sort
+         */
+        $detonatedEvents = $this->detonate($this->getAllEvents());
+
+        $this->getAllEvents()->merge($detonatedEvents)->sort();
+    }
+
+    /**
+     * Find out if there are multi-day events which also occur
+     * on this day - if there are, render out an all-day instance
+     * if this isn't its end day. Do this by exploding multi-day
+     * events into its constituent parts, due to edge cases that
+     * occur in the foreach()
+     *
+     * e.g. only one multi-day event
+     *
+     * Turned out to be easier to simply clone and explode, then
+     * re-sort on date
+     */
+    private function detonate() {
+        $collection = new \Calendar_Event_Collection();
+
+        foreach ($this->getAllEvents() as $currentEvent) {
+
+            /* Same-day event, just throw it into the pile
+             */
+            if ($currentEvent->getStartTime()->getDatabaseDate() == $currentEvent->getEndTime()->getDatabaseDate()) {
+                $collection->add($currentEvent);
+            }
+            /* Otherwise, multi-day event - detonate it
+             */
+            else {
+
+                /* Independence Day!
+                 * Free clones from their imperial counterparts
+                 */
+                $clone = clone($currentEvent);
+                $cloneStart = new \Alaress_Date_Format($currentEvent->getStartTime()->getUnixTimestamp(), 'U');
+                $clone->setStartTime($cloneStart);
+
+                while ($clone->getStartTime()->addDays(1)->getDatabaseDate() <= $currentEvent->getEndTime()->getDatabaseDate()) {
+                    $collection->add($clone);
+
+                    /* Self replicate, self independence
+                     */
+                    $clone = clone($clone);
+                    $clone->setStartTime(new \Alaress_Date_Format($clone->getStartTime()->getUnixTimestamp(), 'U'));
+                }
+            }
+        }
+        return $collection;
     }
 
     /**
