@@ -28,7 +28,7 @@ class Synchronise_Tass_Toowoomba_Strategy_Parent extends Synchronise_Base_Strate
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Parent())
             // should be common for all TASS syncs
-            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_Name_Parent())
+            ->addHydrator(new Synchronise_Tass_Hydrator_Name_Parent())
             // should be common for all TASS syncs - this reduces emails down to a single mail
             ->addHydrator(new Synchronise_Tass_Hydrator_Email_Parent())
             // username generation is common to all TASS syncs
