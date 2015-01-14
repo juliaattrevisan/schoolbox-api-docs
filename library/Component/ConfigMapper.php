@@ -55,4 +55,44 @@ class Component_ConfigMapper extends \Schoolbox\Mapper {
         return false;
     }
 
+    /**
+     * Find the value of a particular component instance's config instance
+     *
+     * @param $key
+     * @param $instanceId
+     * @return mixed
+     */
+    public function findValue($key, $instanceId) {
+        $query = "
+            SELECT {$this->getColumnString('cci')}
+            FROM component_config_instance cci
+            LEFT JOIN component_config_definition ON cci.`component_config_definition_id` = component_config_definition.`id`
+            WHERE cci.component_instance_id = :instanceId
+            AND `key` = :key
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->bindParam(':instanceId', $instanceId);
+        $statement->bindParam(':key', $key);
+        $statement->execute();
+
+        $collection = new \Schoolbox\Collection();
+
+        foreach ($statement as $row) {
+            $cci = $this->hydrate($row, 'cci');
+
+            $collection->add($cci);
+        }
+
+        if ($collection->count()) {
+            return $collection->first()->getValue();
+        }
+        /* Otherwise spawn default values
+         */
+        else {
+            $componentConfigDefinition = \Component_ConfigDefinitionMapper::getInstance()->findByColumn('key', $key);
+
+            return $componentConfigDefinition->first()->getDefaultValue();
+        }
+    }
 }
