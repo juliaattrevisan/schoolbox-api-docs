@@ -36,13 +36,18 @@ if (is_numeric($this->arg[0])) {
 
 	$this->setVar($output);
 }
-else if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
+else if ($this->arg[0] == 'new' && is_numeric($this->arg[1]) && is_numeric($this->arg[2])) {
 
 	/* Check permission
+	 *
+	 * First check that Allow Create is active. If it is, continue;
+	 * otherwise proceed to the usual getPermission()
 	 */
-	if ($groupHandler->getPermission($this->arg[1]) < WRITE_ACCESS) {
-		error(19);
-	}
+    $value = \Component_ConfigMapper::getInstance()->findValue('allowCreate', $this->arg[2]);
+
+    if (((int)$value === 0) && ($groupHandler->getPermission($this->arg[1]) < WRITE_ACCESS)) {
+        error(19);
+    }
 
 	$this->setVar(array(
 		'ACTION' => 'Add',
