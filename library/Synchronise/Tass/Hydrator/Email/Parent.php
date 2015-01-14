@@ -1,15 +1,15 @@
 <?php
 /**
- * Hydrator for email for Cathedral parents.
+ * Hydrator for email for TASS parents.
  *
- * Cathedral's email field can have multiple emails, each separated by a ;
+ * TASS email field can have multiple emails, each separated by a ;
  * character. I'm going to assume only the first should be used.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Tass_Cathedral_Hydrator_Email_Parent implements Synchronise_Base_IHydrator
+class Synchronise_Tass_Hydrator_Email_Parent implements Synchronise_Base_IHydrator
 {
     /**
      * {@inheritdoc}
