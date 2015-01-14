@@ -46,6 +46,7 @@ mv -f $fullpath/init/upstart-digestd.conf $fullpath/init/$1-digestd.conf;
 mv -f $fullpath/init/upstart-rerouted.conf $fullpath/init/$1-rerouted.conf;
 # belld only for mggs, please configure manually
 #mv -f $fullpath/init/upstart-belld.conf $fullpath/init/$1-belld.conf;
+mv -f $fullpath/init/upstart-belld.conf $fullpath/$i-belld.conf;
 mv -f $fullpath/init/$1-upstart-socketd.override $fullpath/init/$1-socketd.override;
 rm -vf `$fullpath/init/$cronjob-upstart-socketd.override`;
 rm -f $fullpath/init/upstart*.override;
