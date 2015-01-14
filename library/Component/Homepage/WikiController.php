@@ -87,7 +87,8 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
         // Set up component name
         $this->setVar(
             array(
-                'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Wiki',
+                'COMPONENT_NAME'        => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Wiki',
+                'COMPONENT_INSTANCE_ID' => $this->instance->getId(),
             )
         );
 
