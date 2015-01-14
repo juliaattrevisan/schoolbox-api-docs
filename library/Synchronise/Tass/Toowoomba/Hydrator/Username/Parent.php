@@ -2,7 +2,7 @@
 /**
  * Hydrator for username for Toowoomba parents.
  *
- * Currently, this is the same as the Cathedral username sync.
+ * Currently, usernames are the same as whatever the external ID is set to.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd
@@ -15,11 +15,7 @@ class Synchronise_Tass_Toowoomba_Hydrator_Username_Parent implements Synchronise
      */
     public function hydrate($externalUser, $newUser)
     {
-        $externalId = $externalUser['StudentContactID'];
-        if ($externalUser['add_num'] == 4) {
-            $externalId .= '-4';
-        }
-        $newUser['username'] = $externalId;
+        $newUser['username'] = $newUser['synergy_id'];
         return $newUser;
     }
 }
