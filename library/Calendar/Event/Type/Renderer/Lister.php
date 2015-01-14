@@ -57,6 +57,7 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
     public function visit($currentEvent)
     {
         $page = $this->getPage();
+        $separator = '&ndash;';
 
         if ($currentEvent->getPublishDate()->getUnixTimestamp() > $_SERVER['REQUEST_TIME']) {
             $cssClass = 'translucent';
@@ -65,11 +66,22 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
             $cssClass = '';
         }
 
+        /* Only display the start time if it's the same as the end time
+         */
+        $startTime = $currentEvent->getStartTime()->getTimeOnly();
+        $endTime = $currentEvent->getEndTime()->getTimeOnly();
+
+        if ($startTime == $endTime) {
+            $endTime = '';
+            $separator = '';
+        }
+
         $page->setVar(
             array(
                 'EVENT_ID' => $currentEvent->getEventId(),
-                'EVENT_START' => $currentEvent->getStartTime()->getTimeOnly(),
-                'EVENT_END' => $currentEvent->getEndTime()->getTimeOnly(),
+                'EVENT_START' => $startTime,
+                'EVENT_SEPARATOR' => $separator,
+                'EVENT_END' => $endTime,
                 'EVENT_TITLE' => Scrub::text($currentEvent->getTitle()),
                 'EVENT_SELECTORS' => $this->determineSelectors($currentEvent),
                 'EVENT_CLASS' => $cssClass,
