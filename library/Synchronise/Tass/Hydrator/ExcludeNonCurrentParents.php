@@ -6,7 +6,7 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Tass_Cathedral_Hydrator_ExcludeNonCurrentParents implements Synchronise_Base_IHydrator
+class Synchronise_Tass_Hydrator_ExcludeNonCurrentParents implements Synchronise_Base_IHydrator
 {
 
     /**

@@ -23,7 +23,7 @@ class Synchronise_Tass_Cathedral_Strategy_Parent extends Synchronise_Base_Strate
         $unsetOnUpdate->setClearFields(array('password'));
         $this
             ->addHydrator(new Synchronise_Tass_Hydrator_ExcludeCompanyCodes())
-            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_ExcludeNonCurrentParents())
+            ->addHydrator(new Synchronise_Tass_Hydrator_ExcludeNonCurrentParents())
             ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_ExcludeParentAddresses())
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Parent())
