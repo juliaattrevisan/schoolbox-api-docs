@@ -7,6 +7,11 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+/**
+ * Class DB2Statement
+ * @property string $queryString
+ */
 class DB2Statement implements Iterator {
 
     private $ptr = null;
