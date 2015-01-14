@@ -58,6 +58,17 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
         error(19);
     }
 
+    /* First check that Allow Create is active. If it is, continue;
+	 * otherwise proceed to the usual getPermission()
+     */
+    $value = \Component_ConfigMapper::getInstance()->findValue('allowCreate', $this->arg[2]);
+
+    /* Allow Create is off
+     */
+    if (((int)$value === 0) && ($groupHandler->getPermission($this->arg[1]) < WRITE_ACCESS)) {
+        error(19);
+    }
+
     // check locked-ness
     if ($wiki->getLocked() && $permission < WRITE_ACCESS) {
         error(19);
