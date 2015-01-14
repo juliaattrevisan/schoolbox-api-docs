@@ -189,8 +189,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             LEFT JOIN db2inst1.schoolbox_classes cl ON t.class_code = cl.class_code
             $join
             AND day = :d
-        "
-        );
+        ");
 
         $stmt->execute(
             array(
