@@ -74,7 +74,11 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
                 $cloneStart = new \Alaress_Date_Format($currentEvent->getStartTime()->getUnixTimestamp(), 'U');
                 $clone->setStartTime($cloneStart);
 
-                while ($clone->getStartTime()->addDays(1)->getDatabaseDate() <= $currentEvent->getEndTime()->getDatabaseDate()) {
+                while ($clone->getStartTime()->addDays(1)->getDatabaseDate() < $currentEvent->getEndTime()->getDatabaseDate()) {
+
+                    /* Set all-day flag for the clones
+                     */
+                    $clone->setAllDay(true);
                     $collection->add($clone);
 
                     /* Self replicate, self independence
@@ -82,6 +86,18 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
                     $clone = clone($clone);
                     $clone->setStartTime(new \Alaress_Date_Format($clone->getStartTime()->getUnixTimestamp(), 'U'));
                 }
+
+                /* This is the day on which start matches end
+                 * Display datetime in a special way
+                 */
+                $startDate = $clone->getStartTime()->getDatabaseDate();
+                $startTime = $currentEvent->getStartTime()->getDatabaseTime();
+
+                $clone = clone($clone);
+                $clone->setAllDay(false);
+                $clone->setStartTime(new \Alaress_Date_Format("{$startDate} {$startTime}", 'y-m-d h:i:s'));
+
+                $collection->add($clone);
             }
         }
         return $collection;
