@@ -24,7 +24,7 @@ class Synchronise_Tass_Toowoomba_Strategy_Parent extends Synchronise_Base_Strate
             // should be common for all TASS syncs
             ->addHydrator(new Synchronise_Tass_Hydrator_ExcludeNonCurrentParents())
             // should be common for all TASS syncs
-            ->addHydrator(new Synchronise_Tass_Cathedral_Hydrator_ExcludeParentAddresses())
+            ->addHydrator(new Synchronise_Tass_Hydrator_ExcludeParentAddresses())
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Parent())
             // should be common for all TASS syncs
