@@ -19,8 +19,9 @@ class Synchronise_Tass_Meriden_Strategy_Parent extends Synchronise_Base_Strategy
     protected function setup() {
         $this->verbose_filter = new Synchronise_Tass_Meriden_Verbose();
         $this
-            // Exclude split families, because original query didn't fetch them
-            ->addHydrator(new Synchronise_Tass_Meriden_Hydrator_ExcludeParentAddresses())
+            // Don't add new hydrators, because Meriden sync uses old queries
+//            // Exclude split families, because original query didn't fetch them
+//            ->addHydrator(new Synchronise_Tass_Meriden_Hydrator_ExcludeParentAddresses())
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Parent())
             ->addHydrator(new Synchronise_Tass_Meriden_Hydrator_Name_Parent())
