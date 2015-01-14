@@ -56,6 +56,7 @@ else if ($this->arg[0] == 'new' && is_numeric($this->arg[1]) && is_numeric($this
 		'HEADING' => '',
 		'BODY' => '',
 		'REVISION' => '',
+        'INSTANCE_ID' => $this->arg[2],
 	));
 
 	/* If a slug was provided, create a new wiki page
