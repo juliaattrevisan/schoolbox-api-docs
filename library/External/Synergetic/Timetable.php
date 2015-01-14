@@ -380,50 +380,36 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         }
 
         $result = $this->getDatabase()->query($query);
-        //get first period
-        if ($result !== false && $result !== true) {
-            $desc = $this->getDatabase()->getNextArray($result);
-        } else {
-            $desc = "";
-        }
 
         //for each period
         $timetable = array();
-        $seq = 0;
 
-        for ($x = 0; isset($timetabledef['desc'][$x]); $x++) {
+        // Build the timetable
+        foreach ($timetabledef['desc'] as $x => $name) {
             $timetable[$x]['periodName']     = $timetabledef['desc'][$x];
             $timetable[$x]['periodStart']    = $timetabledef['start'][$x];
             $timetable[$x]['periodEnd']      = $timetabledef['end'][$x];
             $timetable[$x]['periodNumber']   = $timetabledef['number'][$x];
             $timetable[$x]['periodSequence'] = $timetabledef['sequence'][$x];
+            $timetable[$x]['class']          = array();
+        }
 
-            // Have I reached the end of timetable classes?
-            // Keep filling out timetable periods, but no longer add classes or
-            // mess with loop variables, thus avoiding possible infinite loop.
-            if (empty($desc)) {
-                continue;
+        // Add classes into it
+        while ($desc = $this->getDatabase()->getNextArray($result)) {
+            foreach ($timetable as $x => $timetablePeriod) {
+                if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber']
+                    && $timetablePeriod['periodSequence'] != 2
+                ) {
+                    $timetable[$x]['class'][] = array(
+                        'description' => $desc['Description'],
+                        'code'        => $desc['ClassCode'],
+                        'campus'      => $desc['ClassCampus'],
+                        'room'        => $desc['Room'],
+                        'staffID'     => $desc['StaffID'],
+                    );
+                    break;
+                }
             }
-
-            if ($timetabledef['sequence'][$x] != 2 && $desc['PeriodNumber'] == $timetable[$x]['periodNumber']) {
-                $timetable[$x]['class'][$seq]['description'] = $desc['Description'];
-                $timetable[$x]['class'][$seq]['code']        = $desc['ClassCode'];
-                $timetable[$x]['class'][$seq]['campus']      = $desc['ClassCampus'];
-                $timetable[$x]['class'][$seq]['room']        = $desc['Room'];
-                $timetable[$x]['class'][$seq]['staffID']     = $desc['StaffID'];
-
-                $desc = $this->getDatabase()->getNextArray();
-            }
-
-            /* IF multiple subjects scheduled for the same day */
-            if($desc['PeriodNumber'] == $timetable[$x]['periodNumber']) {
-                $seq++;
-                $x--;
-            }
-            else {
-                $seq = 0;
-            }
-
         }
 
         if (is_array($timetable)) {
