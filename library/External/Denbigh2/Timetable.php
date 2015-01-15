@@ -105,11 +105,43 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     {
         if ($this->getGroupHandler()->isStudent($userId)) {
             return $this->getStudentTimetable($externalUserId, $dayNumber);
-        } else {
-            if ($this->getGroupHandler()->isStaff($userId)) {
-                return $this->getStaffTimetable($externalUserId, $dayNumber);
+        }
+        elseif ($this->getGroupHandler()->isStaff($userId)) {
+            return $this->getStaffTimetable($externalUserId, $dayNumber);
+        }
+    }
+
+    public function getStudentTimetable($externalUserId, $dayNumber) {
+        $api = new External_Denbigh2_Api('StudentTimetable', array(
+            'Student ID' => $externalUserId
+        ));
+
+        if (!count($api->getErrors())) {
+            $allPeriods = $api->getResult()->data;
+
+            foreach($allPeriods as $currentPeriod) {
+                if ($currentPeriod->{'Day Number'} == $dayNumber) {
+                    $period = array(
+                        'periodName' => $currentPeriod->{'Period Name'},
+                        'periodStart' =>  '',
+                        'periodEnd' => '',
+                        'periodNumber' => $currentPeriod->{'Period Number'},
+                        'periodSequence' => 1,
+                        'description' => $currentPeriod->{'TT Description'},
+                        'code' => $currentPeriod->{'ClassCode'},
+                        'room' => $currentPeriod->{'Room'},
+                        'staffID' => $currentPeriod->{'TeacherCode'},
+                        'staffTitle' => '',
+                        'staffFirstname' => $currentPeriod->{'Teacher'},
+                        'staffSurname' => '',
+                    );
+
+                    new \Alaress_Probe($period);
+                }
             }
         }
+
+        return;
     }
 
     public function getStaffTimetable($externalUserId, $dayNumber) {

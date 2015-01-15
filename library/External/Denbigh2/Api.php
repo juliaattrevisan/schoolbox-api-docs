@@ -15,7 +15,7 @@ class External_Denbigh2_Api {
      *
      * @var string
      */
-    private $host = 'http://125.255.100.142/RESTfm/Staging/layout';
+    private $host = 'http://10.1.0.9/RESTfm/Staging/layout';
 
     /**
      * RFMkey
