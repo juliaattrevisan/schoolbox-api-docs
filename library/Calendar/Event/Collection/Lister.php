@@ -65,10 +65,10 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
             /* Otherwise, multi-day event - detonate it
              */
             else {
-                /* Alter the end date of the first instance, so it doesn't
-                 * display the end time at the start of the span
-                 */
+
                 /* Special note to Renderer class
+                 * Alter the end date of the first instance, so it doesn't
+                 * display the end time at the start of the span
                  */
                 $currentEvent->setCustom(array(
                     'hideEnd' => true
