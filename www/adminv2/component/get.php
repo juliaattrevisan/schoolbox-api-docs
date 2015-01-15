@@ -51,7 +51,6 @@ foreach($componentCollection as $component) {
     }
 
     $component->setup(array('id' => '-1', 'code' => '', 'name' => ''), array());
-    $component->execute();
 
     $this->setVar(array(
         'COMPONENT_INSTANCE_ID'     => $instance_no,
