@@ -241,7 +241,6 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 				$cclass = $instance->getDefinition()->getClass();
                 /** @var \Component_ControllerAbstract $controller */
 				$controller = new $cclass($instance, new \Schoolbox\User(), $page);
-				$controller->execute();
 				$fields = $controller->getFilterFields();
 				$val = 0;
 				for($i = 0; $i < count($fields); $i++) {
