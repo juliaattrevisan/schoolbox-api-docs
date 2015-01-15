@@ -18,11 +18,19 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     private $groupHandler = null;
 
     /**
+     * An instance of CampusMapper
+     *
+     * @var null
+     */
+    private $campusMapper = null;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->setGroupHandler(new Group());
+        $this->setCampusMapper(new \Schoolbox\CampusMapper());
     }
 
     /**
@@ -276,7 +284,58 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
      */
     public function getFullTimetable($externalUserId, $userId, $campusId)
     {
-        // TODO: Implement getFullTimetable() method.
+        $timetable = array();
+        $allDayTimetables = array();
+
+        /* This person's campus
+         */
+        $campus = $this->getCampusMapper()->findById($campusId);
+
+        /* Get all the days' timetables first
+         */
+        for ($day = 1; $day <= $campus->getTimetableDay(); $day++) {
+            $allDayTimetables[] = $this->getDayTimetable($externalUserId, $userId, $campusId, $day);
+        }
+
+
+
+        /* Assemble into a 2D array
+         * Each row represents a Period across each Day in the cycle
+         *
+         * [Period1 [Day1, Day2, Day3, DayN...]]
+         * [Period2 [Day1, Day2, Day3, DayN...]]
+         * [Period3 [Day1, Day2, Day3, DayN...]]
+         * [PeriodN [Day1, Day2, Day3, DayN...]]
+         * ...
+         */
+        for ($period = 0; $period < count($allDayTimetables[0]); $period++) {
+            $timetable[$period]['periodName'] = $allDayTimetables[0][$period]['periodName'];
+            $timetable[$period]['periodStart'] = $allDayTimetables[0][$period]['periodStart'];
+            $timetable[$period]['periodEnd'] = $allDayTimetables[0][$period]['periodEnd'];
+            $timetable[$period]['periodNumber'] = $allDayTimetables[0][$period]['periodNumber'];
+            $timetable[$period]['periodSequence'] = $allDayTimetables[0][$period]['periodSequence'];
+
+            /* Put in Day classes
+             */
+            for ($day = 0; $day < $campus->getTimetableDay(); $day++) {
+                if (strlen(trim($allDayTimetables[$day][$period]['class'][0]['description']))) {
+                    $timetable[$period]['day'][$day][0] = array(
+                        'description'    => $allDayTimetables[$day][$period]['class'][0]['description'],
+                        'code'           => $allDayTimetables[$day][$period]['class'][0]['code'],
+                        'room'           => $allDayTimetables[$day][$period]['class'][0]['room'],
+                        'staffID'        => $allDayTimetables[$day][$period]['class'][0]['staffID'],
+                        'staffFirstname' => $allDayTimetables[$day][$period]['class'][0]['staffFirstname'],
+                        'staffSurname'   => $allDayTimetables[$day][$period]['class'][0]['staffSurname'],
+                        'staffTitle'     => $allDayTimetables[$day][$period]['class'][0]['staffTitle'],
+                    );
+                }
+                else {
+                    $timetable[$period]['day'][$day] = array();
+                }
+            }
+        }
+
+        return $timetable;
     }
 
     /**
@@ -369,4 +428,25 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     {
         return $this->groupHandler;
     }
+
+    /**
+     * Set campus mapper
+     *
+     * @param null $campusMapper
+     */
+    private function setCampusMapper($campusMapper)
+    {
+        $this->campusMapper = $campusMapper;
+    }
+
+    /**
+     * Get campus mapper
+     *
+     * @return \Schoolbox\CampusMapper
+     */
+    private function getCampusMapper()
+    {
+        return $this->campusMapper;
+    }
+
 }
