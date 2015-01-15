@@ -311,43 +311,54 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
 
         /* Api connect
          */
-        $api = new External_Denbigh2_Api('StudentTimetable', array(
-            'Student ID' => $externalUserId,
-        ));
+        $api = false;
 
-        if (!count($api->getErrors())) {
-            $allPeriods = $api->getResult()->data;
+        if ($this->getGroupHandler()->isStudent($userId)) {
+            $api = new External_Denbigh2_Api('StudentTimetable', array(
+                'Student ID' => $externalUserId,
+            ));
+        }
+        else if ($this->getGroupHandler()->isStaff($userId)) {
+            $api = new External_Denbigh2_Api('StaffTimetable', array(
+                'Staff Code' => $externalUserId,
+            ));
+        }
 
-            /* Assemble into a 2D array
-             * Each row represents a Period across each Day in the cycle
-             *
-             * [Period1 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
-             * [Period2 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
-             * [Period3 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
-             * [PeriodN [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
-             * ...
-             */
-            foreach($allPeriods as $currentPeriod) {
+        if ($api !== false) {
+            if (!count($api->getErrors())) {
+                $allPeriods = $api->getResult()->data;
 
-                /* wtf
-                 * ...or I could preg_match it out of 1/3/0001, wherever that came from
+                /* Assemble into a 2D array
+                 * Each row represents a Period across each Day in the cycle
+                 *
+                 * [Period1 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                 * [Period2 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                 * [Period3 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                 * [PeriodN [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                 * ...
                  */
-                $periodNumber = trim(str_replace('Period', '', $currentPeriod->{'Period Name'}));
-                $periodIndex = $periodNumber-1;
+                foreach($allPeriods as $currentPeriod) {
 
-                $dayNumber = trim($currentPeriod->{'Day Number'});
-                $dayIndex = $dayNumber-1;
+                    /* wtf
+                     * ...or I could preg_match it out of 1/3/0001, wherever that came from
+                     */
+                    $periodNumber = trim(str_replace('Period', '', $currentPeriod->{'Period Name'}));
+                    $periodIndex = $periodNumber-1;
 
-                $timetable[$periodIndex]['day'][$dayIndex][] = array(
-                    'description' => $currentPeriod->{'Period Name'},
-                    'code' => $currentPeriod->{'ClassCode'},
-                    'campus' => $campus->getName(),
-                    'room' => "Room {$currentPeriod->{'Room'}}",
-                    'staffID' => $currentPeriod->{'TeacherCode'},
-                    'staffFirstname' => $currentPeriod->{'Teacher'},
-                    'staffSurname' => '',
-                    'staffTitle' => '',
-                );
+                    $dayNumber = trim($currentPeriod->{'Day Number'});
+                    $dayIndex = $dayNumber-1;
+
+                    $timetable[$periodIndex]['day'][$dayIndex][] = array(
+                        'description' => $currentPeriod->{'Period Name'},
+                        'code' => $currentPeriod->{'ClassCode'},
+                        'campus' => $campus->getName(),
+                        'room' => "Room {$currentPeriod->{'Room'}}",
+                        'staffID' => $currentPeriod->{'TeacherCode'},
+                        'staffFirstname' => $currentPeriod->{'Teacher'},
+                        'staffSurname' => '',
+                        'staffTitle' => '',
+                    );
+                }
             }
         }
 
