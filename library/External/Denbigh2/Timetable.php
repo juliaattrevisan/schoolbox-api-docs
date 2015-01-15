@@ -90,6 +90,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     public function getDayNumber($campusId, $date = 0)
     {
         // TODO: Implement getDayNumber() method.
+        return 1;
     }
 
     /**
@@ -149,25 +150,38 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
         $api = new External_Denbigh2_Api('StudentTimetable', array(
             'Student ID' => $externalUserId
         ));
-echo 'test';
+
         if (!count($api->getErrors())) {
             $allPeriods = $api->getResult()->data;
 
             foreach($allPeriods as $currentPeriod) {
                 if ($currentPeriod->{'Day Number'} == $dayNumber) {
+
+                    /* You dumdums put the teacher's name concatted with the
+                     * subject name >.< So instead of booming it and using the
+                     * first shrapnel I'm just going to strreplace it out, so
+                     * this will work even if they change their format to
+                     * some other ridiculous thing
+                     */
+                    $className = trim(str_replace($currentPeriod->{'Teacher'}, '', $currentPeriod->{'TT Description'}));
+
                     $period = array(
                         'periodName' => $currentPeriod->{'Period Name'},
                         'periodStart' =>  '',
                         'periodEnd' => '',
                         'periodNumber' => $currentPeriod->{'Period Number'},
                         'periodSequence' => 1,
-                        'description' => $currentPeriod->{'TT Description'},
-                        'code' => $currentPeriod->{'ClassCode'},
-                        'room' => $currentPeriod->{'Room'},
-                        'staffID' => $currentPeriod->{'TeacherCode'},
-                        'staffTitle' => '',
-                        'staffFirstname' => $currentPeriod->{'Teacher'},
-                        'staffSurname' => '',
+                        'class' => array(
+                            array(
+                                'description' => $className,
+                                'code' => $currentPeriod->{'ClassCode'},
+                                'room' => $currentPeriod->{'Room'},
+                                'staffID' => $currentPeriod->{'TeacherCode'},
+                                'staffTitle' => '',
+                                'staffFirstname' => $currentPeriod->{'Teacher'},
+                                'staffSurname' => '',
+                            )
+                        )
                     );
 
                     new \Alaress_Probe($period);
