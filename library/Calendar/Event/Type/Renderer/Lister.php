@@ -78,11 +78,11 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
         /* Custom notes to Renderer
          * This helps display multi-day events with a sensible structure:
          *
-         * start time
-         * all day
-         * all day
-         * ...
-         * -end time
+         * startTime-   "My Event"
+         * All Day      "My Event"
+         * All Day      "My Event"
+         * ...          ...
+         * -endTime     "My Event"
          */
         $custom = $currentEvent->getCustom();
 
