@@ -268,10 +268,8 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     {
         $timetable = array();
 
-        $userMapper = new \Schoolbox\UserMapper();
-        $user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
-        $user = $userMapper->findById($user->getId());
-        $campus = $user->getCampusCollection()->first();
+        $campusMapper = new \Schoolbox\CampusMapper();
+        $campus = $campusMapper->findById($campusId);
         $definition = $this->getTimetableDefinition($campus->getId());
 
         if (!$definition) {
