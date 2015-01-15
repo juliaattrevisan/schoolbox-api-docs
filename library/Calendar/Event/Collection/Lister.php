@@ -52,7 +52,8 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
      * Turned out to be easier to simply clone and explode, then
      * re-sort on date. This is a detonate-and-merge.
      */
-    private function detonate() {
+    private function detonate()
+    {
         $collection = new \Calendar_Event_Collection();
 
         foreach ($this->getAllEvents() as $currentEvent) {
@@ -61,8 +62,7 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
              */
             if ($currentEvent->getStartTime()->getDatabaseDate() == $currentEvent->getEndTime()->getDatabaseDate()) {
                 $collection->add($currentEvent);
-            }
-            /* Otherwise, multi-day event - detonate it
+            } /* Otherwise, multi-day event - detonate it
              */
             else {
 
@@ -70,16 +70,18 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
                  * Alter the end date of the first instance, so it doesn't
                  * display the end time at the start of the span
                  */
-                $currentEvent->setCustom(array(
-                    'hideEnd' => true
-                ));
+                $currentEvent->setCustom(
+                    array(
+                        'hideEnd' => true
+                    )
+                );
 
                 $collection->add($currentEvent);
 
                 /* Independence Day!
                  * Free clones from their imperial counterparts
                  */
-                $clone = clone($currentEvent);
+                $clone      = clone($currentEvent);
                 $cloneStart = new \Alaress_Date_Format($currentEvent->getStartTime()->getUnixTimestamp(), 'U');
                 $clone->setStartTime($cloneStart);
 
@@ -116,9 +118,11 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
 
                 /* Special note to Renderer class
                  */
-                $clone->setCustom(array(
-                    'hideStart' => true
-                ));
+                $clone->setCustom(
+                    array(
+                        'hideStart' => true
+                    )
+                );
 
                 $collection->add($clone);
             }
