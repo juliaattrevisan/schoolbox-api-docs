@@ -43,46 +43,39 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
      */
     public function getTimetableDefinition($campusId, $day = 0)
     {
-        $api = new External_Denbigh2_Api('PeriodTimes', array());
+        $campusMapper = new \Schoolbox\CampusMapper();
+        $campus = $campusMapper->findById($campusId);
 
         $timetableDef = array();
         $maxPeriodsPerDay = 6;
-        $maxDays = 5;
+        $maxDays = $campus->getTimetableDay();
 
-        /* There are some missing days, so zero-fill to start with
-         */
-        for ($i = 1; $i <= $maxPeriodsPerDay; $i++) {
-            for ($j = 1; $j <= $maxDays; $j++) {
-                $timetableDef['desc'][$i][$j] = '';
-                $timetableDef['start'][$i][$j] = '';
-                $timetableDef['end'][$i][$j] = '';
-                $timetableDef['number'][$i][$j] = '';
-                $timetableDef['sequence'][$i][$j] = 1;
-            }
-        }
+        $api = new External_Denbigh2_Api('PeriodTimes', array());
 
         if (!count($api->getErrors())) {
             $allPeriods = $api->getResult()->data;
 
-            for ($i = 1; $i <= $maxPeriodsPerDay; $i++) {
-                for ($j = 1; $j <= $maxDays; $j++) {
+            /* Day-specific e.g. for Dashboard
+             */
+            $i = 0;
 
-                    /* Day-specific e.g. for Dashboard
-                     */
-                    if (!$day || $j == $day) {
-                        foreach ($allPeriods as $currentPeriod) {
-                            if (($currentPeriod->{'Period'} == $i) && ($currentPeriod->{'Day of Cycle'} == $j)) {
-                                $timetableDef['desc'][$i][$j] = "Period {$currentPeriod->{'Period'}}";
-                                $timetableDef['start'][$i][$j] = $currentPeriod->{'Period Start Time'};
-                                $timetableDef['end'][$i][$j] = $currentPeriod->{'Period End Time'};
-                                $timetableDef['number'][$i][$j] = $currentPeriod->{'Period'};
-                                $timetableDef['sequence'][$i][$j] = 1;
-                            }
-                        }
+            foreach ($allPeriods as $currentPeriod) {
+                if ($i < $maxPeriodsPerDay) {
+                    if (!$day || $currentPeriod->{'Day of Cycle'} == $day) {
+                        $timetableDef['desc'][$i] = "Period {$currentPeriod->{'Period'}}";
+                        $timetableDef['start'][$i] = $currentPeriod->{'Period Start Time'};
+                        $timetableDef['end'][$i] = $currentPeriod->{'Period End Time'};
+                        $timetableDef['number'][$i] = $currentPeriod->{'Period'};
+                        $timetableDef['sequence'][$i] = '';
+
+                        $i++;
                     }
                 }
             }
         }
+
+        $timetableDef['periodCount'] = $maxPeriodsPerDay;
+        $timetableDef['dayCount'] = $maxDays;
 
         return $timetableDef;
     }
@@ -156,7 +149,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
         $api = new External_Denbigh2_Api('StudentTimetable', array(
             'Student ID' => $externalUserId
         ));
-
+echo 'test';
         if (!count($api->getErrors())) {
             $allPeriods = $api->getResult()->data;
 
