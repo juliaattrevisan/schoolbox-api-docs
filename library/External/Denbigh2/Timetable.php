@@ -146,106 +146,88 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
      */
     public function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber)
     {
-        if ($this->getGroupHandler()->isStudent($userId)) {
-            return $this->getStudentTimetable($externalUserId, $dayNumber);
-        }
-        elseif ($this->getGroupHandler()->isStaff($userId)) {
-            return $this->getStaffTimetable($externalUserId, $dayNumber);
-        }
-    }
-
-    /**
-     * Get a student's timetable for a particular day
-     *
-     * @param $externalUserId
-     * @param $dayNumber
-     * @return array
-     */
-    public function getStudentTimetable($externalUserId, $dayNumber = 0) {
+        $api = false;
         $timetable = array();
-
-        $userMapper = new \Schoolbox\UserMapper();
-        $user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
-        $user = $userMapper->findById($user->getId());
-        $definition = $this->getTimetableDefinition($user->getCampusCollection()->first()->getId());
-
-        if (!$definition) {
-            return false;
-        }
 
         /* Api connect
          */
-        $api = new External_Denbigh2_Api('StudentTimetable', array(
-            'Student ID' => $externalUserId
-        ));
+        if ($this->getGroupHandler()->isStudent($userId)) {
+            $api = new External_Denbigh2_Api('StudentTimetable', array(
+                'Student ID' => $externalUserId
+            ));
+        }
+        elseif ($this->getGroupHandler()->isStaff($userId)) {
+            $api = new External_Denbigh2_Api('StaffTimetable', array(
+                'Staff Code' => $externalUserId
+            ));
+        }
 
-        if (!count($api->getErrors())) {
+        if ($api !== false) {
+            $userMapper = new \Schoolbox\UserMapper();
+            $user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
+            $user = $userMapper->findById($user->getId());
+            $definition = $this->getTimetableDefinition($user->getCampusCollection()->first()->getId());
 
-            // Build the timetable
-            foreach ($definition['desc'] as $x => $name) {
-                $timetable[$x]['periodName']     = $definition['desc'][$x];
-                $timetable[$x]['periodStart']    = $definition['start'][$x];
-                $timetable[$x]['periodEnd']      = $definition['end'][$x];
-                $timetable[$x]['periodNumber']   = $definition['number'][$x];
-                $timetable[$x]['periodSequence'] = $definition['sequence'][$x];
-                $timetable[$x]['class']          = array();
+            if (!$definition) {
+                return false;
             }
 
-            /* Data collectors
-             */
-            $allPeriods = $api->getResult()->data;
+            if (!count($api->getErrors())) {
 
-            foreach($allPeriods as $currentPeriod) {
-                if (!$dayNumber || $currentPeriod->{'Day Number'} == $dayNumber) {
+                // Build the timetable
+                foreach ($definition['desc'] as $x => $name) {
+                    $timetable[$x]['periodName']     = $definition['desc'][$x];
+                    $timetable[$x]['periodStart']    = $definition['start'][$x];
+                    $timetable[$x]['periodEnd']      = $definition['end'][$x];
+                    $timetable[$x]['periodNumber']   = $definition['number'][$x];
+                    $timetable[$x]['periodSequence'] = $definition['sequence'][$x];
+                    $timetable[$x]['class']          = array();
+                }
 
-                    /* You dumdums put the teacher's name concatted with the
-                     * subject name >.< So instead of booming it and using the
-                     * first shrapnel I'm just going to strreplace it out, so
-                     * this will work even if they change their format to
-                     * some other ridiculous thing
-                     */
-                    $className = trim(str_replace($currentPeriod->{'Teacher'}, '', $currentPeriod->{'TT Description'}));
+                /* Data collectors
+                 */
+                $allPeriods = $api->getResult()->data;
 
-                    /* wtf
-                     * ...or I could preg_match it out of 1/3/0001, wherever that came from
-                     */
-                    $periodNumber = str_replace('Period', '', $currentPeriod->{'Period Name'});
+                foreach($allPeriods as $currentPeriod) {
+                    if (!$dayNumber || $currentPeriod->{'Day Number'} == $dayNumber) {
 
-                    $timetable[$periodNumber-1] = array(
-                        'periodName' => $currentPeriod->{'Period Name'},
-                        'periodStart' =>  $definition['start'][$periodNumber-1],
-                        'periodEnd' => $definition['end'][$periodNumber-1],
-                        'periodNumber' => $periodNumber,
-                        'periodSequence' => 1,
-                        'class' => array(
-                            array(
-                                'description' => $className,
-                                'code' => $currentPeriod->{'ClassCode'},
-                                'room' => $currentPeriod->{'Room'},
-                                'staffID' => $currentPeriod->{'TeacherCode'},
-                                'staffTitle' => '',
-                                'staffFirstname' => $currentPeriod->{'Teacher'},
-                                'staffSurname' => '',
+                        /* You dumdums put the teacher's name concatted with the
+                         * subject name >.< So instead of booming it and using the
+                         * first shrapnel I'm just going to strreplace it out, so
+                         * this will work even if they change their format to
+                         * some other ridiculous thing
+                         */
+                        $className = trim(str_replace($currentPeriod->{'Teacher'}, '', $currentPeriod->{'TT Description'}));
+
+                        /* wtf
+                         * ...or I could preg_match it out of 1/3/0001, wherever that came from
+                         */
+                        $periodNumber = str_replace('Period', '', $currentPeriod->{'Period Name'});
+
+                        $timetable[$periodNumber-1] = array(
+                            'periodName' => $currentPeriod->{'Period Name'},
+                            'periodStart' =>  $definition['start'][$periodNumber-1],
+                            'periodEnd' => $definition['end'][$periodNumber-1],
+                            'periodNumber' => $periodNumber,
+                            'periodSequence' => 1,
+                            'class' => array(
+                                array(
+                                    'description' => $className,
+                                    'code' => $currentPeriod->{'ClassCode'},
+                                    'room' => $currentPeriod->{'Room'},
+                                    'staffID' => $currentPeriod->{'TeacherCode'},
+                                    'staffTitle' => '',
+                                    'staffFirstname' => $currentPeriod->{'Teacher'},
+                                    'staffSurname' => '',
+                                )
                             )
-                        )
-                    );
+                        );
+                    }
                 }
             }
         }
 
         return $timetable;
-    }
-
-    public function getStaffTimetable($externalUserId, $dayNumber) {
-        $api = new External_Denbigh2_Api('StaffTimetable', array(
-            'Staff Code' => $externalUserId
-        ));
-
-        if (!count($api->getErrors())) {
-            new \Alaress_Probe($api->getResult());
-        }
-
-        return;
     }
 
     /**
