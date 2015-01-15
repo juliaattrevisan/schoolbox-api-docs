@@ -66,7 +66,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
                         $timetableDef['start'][$i] = $currentPeriod->{'Period Start Time'};
                         $timetableDef['end'][$i] = $currentPeriod->{'Period End Time'};
                         $timetableDef['number'][$i] = $currentPeriod->{'Period'};
-                        $timetableDef['sequence'][$i] = '';
+                        $timetableDef['sequence'][$i] = 1;
 
                         $i++;
                     }
@@ -146,8 +146,15 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
         }
     }
 
+    /**
+     * Get a student's timetable for a particular day
+     *
+     * @param $externalUserId
+     * @param $dayNumber
+     * @return array
+     */
     public function getStudentTimetable($externalUserId, $dayNumber) {
-        $stack = array();
+        $timetable = array();
 
         $api = new External_Denbigh2_Api('StudentTimetable', array(
             'Student ID' => $externalUserId
@@ -159,6 +166,16 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
             $user = $userMapper->findById($user->getId());
 
             $definition = $this->getTimetableDefinition($user->getCampusCollection()->first()->getId());
+
+            // Build the timetable
+            foreach ($definition['desc'] as $x => $name) {
+                $timetable[$x]['periodName']     = $definition['desc'][$x];
+                $timetable[$x]['periodStart']    = $definition['start'][$x];
+                $timetable[$x]['periodEnd']      = $definition['end'][$x];
+                $timetable[$x]['periodNumber']   = $definition['number'][$x];
+                $timetable[$x]['periodSequence'] = $definition['sequence'][$x];
+                $timetable[$x]['class']          = array();
+            }
 
             /* Data collectors
              */
@@ -180,7 +197,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
                      */
                     $periodNumber = str_replace('Period', '', $currentPeriod->{'Period Name'});
 
-                    $period = array(
+                    $timetable[$periodNumber-1] = array(
                         'periodName' => $currentPeriod->{'Period Name'},
                         'periodStart' =>  $definition['start'][$periodNumber-1],
                         'periodEnd' => $definition['end'][$periodNumber-1],
@@ -198,13 +215,11 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
                             )
                         )
                     );
-
-                    $stack[] = $period;
                 }
             }
         }
 
-        return $stack;
+        return $timetable;
     }
 
     public function getStaffTimetable($externalUserId, $dayNumber) {
