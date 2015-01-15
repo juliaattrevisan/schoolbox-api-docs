@@ -68,13 +68,34 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
         /* Only display the start time if it's the same as the end time
          */
         $startTime = $currentEvent->getStartTime()->getTimeOnly();
-        $endTime   = $currentEvent->getEndTime()->getTimeOnly();
+        $endTime = $currentEvent->getEndTime()->getTimeOnly();
 
         if ($startTime == $endTime) {
             $endTime   = '';
             $separator = '';
         }
 
+        /* Custom notes to Renderer
+         * This helps display multi-day events with a sensible structure:
+         *
+         * start time
+         * all day
+         * all day
+         * ...
+         * -end time
+         */
+        $custom = $currentEvent->getCustom();
+
+        if (isset($custom['hideStart'])) {
+            $startTime = '';
+        }
+
+        if (isset($custom['hideEnd'])) {
+            $endTime = '';
+        }
+
+        /* phplib sigh
+         */
         $page->setVar(
             array(
                 'EVENT_ID'                       => $currentEvent->getEventId(),

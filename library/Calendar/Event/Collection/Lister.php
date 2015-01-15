@@ -38,7 +38,9 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
          */
         $detonatedEvents = $this->detonate($this->getAllEvents());
 
-        $this->getAllEvents()->merge($detonatedEvents)->sort();
+        $this->setAllEvents($detonatedEvents);
+
+        $this->getAllEvents()->sort();
     }
 
     /**
@@ -51,7 +53,7 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
      * e.g. only one multi-day event
      *
      * Turned out to be easier to simply clone and explode, then
-     * re-sort on date
+     * re-sort on date. This is a detonate-and-merge.
      */
     private function detonate() {
         $collection = new \Calendar_Event_Collection();
@@ -66,6 +68,16 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
             /* Otherwise, multi-day event - detonate it
              */
             else {
+                /* Alter the end date of the first instance, so it doesn't
+                 * display the end time at the start of the span
+                 */
+                /* Special note to Renderer class
+                 */
+                $currentEvent->setCustom(array(
+                    'hideEnd' => true
+                ));
+
+                $collection->add($currentEvent);
 
                 /* Independence Day!
                  * Free clones from their imperial counterparts
@@ -74,6 +86,8 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
                 $cloneStart = new \Alaress_Date_Format($currentEvent->getStartTime()->getUnixTimestamp(), 'U');
                 $clone->setStartTime($cloneStart);
 
+                /* Add each detonated instance into collection
+                 */
                 while ($clone->getStartTime()->addDays(1)->getDatabaseDate() < $currentEvent->getEndTime()->getDatabaseDate()) {
 
                     /* Set all-day flag for the clones
@@ -87,7 +101,7 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
                     $clone->setStartTime(new \Alaress_Date_Format($clone->getStartTime()->getUnixTimestamp(), 'U'));
                 }
 
-                /* This is the day on which start matches end
+                /* This is the day on which start matches end.
                  * Display datetime in a special way
                  */
                 $startDate = $clone->getStartTime()->getDatabaseDate();
@@ -97,9 +111,16 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
                 $clone->setAllDay(false);
                 $clone->setStartTime(new \Alaress_Date_Format("{$startDate} {$startTime}", 'y-m-d h:i:s'));
 
+                /* Special note to Renderer class
+                 */
+                $clone->setCustom(array(
+                    'hideStart' => true
+                ));
+
                 $collection->add($clone);
             }
         }
+
         return $collection;
     }
 
