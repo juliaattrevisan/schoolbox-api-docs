@@ -36,10 +36,7 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
         /* Detonate multi-day events into their individual day ingredients
          * Merje and sort
          */
-        $detonatedEvents = $this->detonate($this->getAllEvents());
-
-        $this->setAllEvents($detonatedEvents);
-
+        $this->setAllEvents($this->detonate($this->getAllEvents()));
         $this->getAllEvents()->sort();
     }
 
