@@ -161,7 +161,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
      * @param $dayNumber
      * @return array
      */
-    public function getStudentTimetable($externalUserId, $dayNumber) {
+    public function getStudentTimetable($externalUserId, $dayNumber = 0) {
         $timetable = array();
 
         $userMapper = new \Schoolbox\UserMapper();
@@ -196,7 +196,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
             $allPeriods = $api->getResult()->data;
 
             foreach($allPeriods as $currentPeriod) {
-                if ($currentPeriod->{'Day Number'} == $dayNumber) {
+                if (!$dayNumber || $currentPeriod->{'Day Number'} == $dayNumber) {
 
                     /* You dumdums put the teacher's name concatted with the
                      * subject name >.< So instead of booming it and using the
@@ -285,53 +285,69 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     public function getFullTimetable($externalUserId, $userId, $campusId)
     {
         $timetable = array();
-        $allDayTimetables = array();
 
-        /* This person's campus
-         */
-        $campus = $this->getCampusMapper()->findById($campusId);
+        $userMapper = new \Schoolbox\UserMapper();
+        $user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
+        $user = $userMapper->findById($user->getId());
+        $campus = $user->getCampusCollection()->first();
+        $definition = $this->getTimetableDefinition($campus->getId());
 
-        /* Get all the days' timetables first
-         */
-        for ($day = 1; $day <= $campus->getTimetableDay(); $day++) {
-            $allDayTimetables[] = $this->getDayTimetable($externalUserId, $userId, $campusId, $day);
+        if (!$definition) {
+            return false;
         }
 
-
-
-        /* Assemble into a 2D array
-         * Each row represents a Period across each Day in the cycle
-         *
-         * [Period1 [Day1, Day2, Day3, DayN...]]
-         * [Period2 [Day1, Day2, Day3, DayN...]]
-         * [Period3 [Day1, Day2, Day3, DayN...]]
-         * [PeriodN [Day1, Day2, Day3, DayN...]]
-         * ...
+        /* Initialise $timetable
          */
-        for ($period = 0; $period < count($allDayTimetables[0]); $period++) {
-            $timetable[$period]['periodName'] = $allDayTimetables[0][$period]['periodName'];
-            $timetable[$period]['periodStart'] = $allDayTimetables[0][$period]['periodStart'];
-            $timetable[$period]['periodEnd'] = $allDayTimetables[0][$period]['periodEnd'];
-            $timetable[$period]['periodNumber'] = $allDayTimetables[0][$period]['periodNumber'];
-            $timetable[$period]['periodSequence'] = $allDayTimetables[0][$period]['periodSequence'];
+        for ($i = 0; $i < count($definition['desc']); $i++) {
+            $timetable[$i] = array(
+                'periodName' => $definition['desc'][$i],
+                'periodStart' => $definition['start'][$i],
+                'periodEnd' => $definition['end'][$i],
+                'periodNumber' => $definition['number'][$i],
+                'periodSequence' => $definition['sequence'][$i],
+                'day' => array_fill(0, $campus->getTimetableDay(), array()),
+            );
+        }
 
-            /* Put in Day classes
+        /* Api connect
+         */
+        $api = new External_Denbigh2_Api('StudentTimetable', array(
+            'Student ID' => $externalUserId,
+        ));
+
+        if (!count($api->getErrors())) {
+            $allPeriods = $api->getResult()->data;
+
+            /* Assemble into a 2D array
+             * Each row represents a Period across each Day in the cycle
+             *
+             * [Period1 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+             * [Period2 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+             * [Period3 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+             * [PeriodN [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+             * ...
              */
-            for ($day = 0; $day < $campus->getTimetableDay(); $day++) {
-                if (strlen(trim($allDayTimetables[$day][$period]['class'][0]['description']))) {
-                    $timetable[$period]['day'][$day][0] = array(
-                        'description'    => $allDayTimetables[$day][$period]['class'][0]['description'],
-                        'code'           => $allDayTimetables[$day][$period]['class'][0]['code'],
-                        'room'           => $allDayTimetables[$day][$period]['class'][0]['room'],
-                        'staffID'        => $allDayTimetables[$day][$period]['class'][0]['staffID'],
-                        'staffFirstname' => $allDayTimetables[$day][$period]['class'][0]['staffFirstname'],
-                        'staffSurname'   => $allDayTimetables[$day][$period]['class'][0]['staffSurname'],
-                        'staffTitle'     => $allDayTimetables[$day][$period]['class'][0]['staffTitle'],
-                    );
-                }
-                else {
-                    $timetable[$period]['day'][$day] = array();
-                }
+            foreach($allPeriods as $currentPeriod) {
+
+                /* wtf
+                 * ...or I could preg_match it out of 1/3/0001, wherever that came from
+                 */
+                $periodNumber = trim(str_replace('Period', '', $currentPeriod->{'Period Name'}));
+                $periodIndex = $periodNumber-1;
+
+                $dayNumber = trim($currentPeriod->{'Day Number'});
+                $dayIndex = $dayNumber-1;
+
+                $timetable[$periodIndex]['day'][$dayIndex][] = array(
+                    'description' => $currentPeriod->{'Period Name'},
+                    'code' => $currentPeriod->{'ClassCode'},
+                    'campus' => $campus->getName(),
+                    'room' => "Room {$currentPeriod->{'Room'}}",
+                    'staffID' => $currentPeriod->{'TeacherCode'},
+                    'staffFirstname' => $currentPeriod->{'Teacher'},
+                    'staffSurname' => '',
+                    'staffTitle' => '',
+                );
             }
         }
 
