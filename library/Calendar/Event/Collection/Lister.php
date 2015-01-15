@@ -108,7 +108,13 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
                 $startTime = $currentEvent->getStartTime()->getDatabaseTime();
 
                 $clone = clone($clone);
-                $clone->setAllDay(false);
+
+                /* Reset AllDay status conditionally
+                 */
+                if (!$currentEvent->getAllDay()) {
+                    $clone->setAllDay(false);
+                }
+
                 $clone->setStartTime(new \Alaress_Date_Format("{$startDate} {$startTime}", 'y-m-d h:i:s'));
 
                 /* Special note to Renderer class
