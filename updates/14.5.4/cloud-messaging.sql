@@ -1,0 +1,18 @@
+INSERT INTO `config` (`name`,`value`,`title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`)
+VALUES (
+  'push_notifications_enabled', '0', 'Enable Push Notification Module', 'Enables push notification module.',
+  (SELECT cf.id FROM lu_config_field cf WHERE cf.field = 'boolean'), '',
+  (SELECT ct.id FROM lu_config_type ct WHERE ct.type LIKE 'modules'),
+  'false', 'false', 'false'
+), (
+  'push_gcm_api_key', '', 'Google Cloud Messaging API Key', '', 
+  (SELECT cf.id FROM lu_config_field cf WHERE cf.field = 'input'), '',
+  (SELECT ct.id FROM lu_config_type ct WHERE ct.type LIKE 'modules'),
+  'false', 'true', 'false'
+), (
+  'push_apns_api_key', '', 'Apply Push Notification Service API Key', '',
+  (SELECT cf.id FROM lu_config_field cf WHERE cf.field = 'input'), '',
+  (SELECT ct.id FROM lu_config_type ct WHERE ct.type LIKE 'modules'),
+  'false', 'true', 'false'
+)
+ON DUPLICATE KEY UPDATE `configID` = `configID`;
