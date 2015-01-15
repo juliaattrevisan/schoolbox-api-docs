@@ -152,7 +152,16 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
         ));
 
         if (!count($api->getErrors())) {
+            $userMapper = new \Schoolbox\UserMapper();
+            $user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
+            $user = $userMapper->findById($user->getId());
+
+            $definition = $this->getTimetableDefinition($user->getCampusCollection()->first()->getId());
+
+            /* Data collectors
+             */
             $allPeriods = $api->getResult()->data;
+            $stack = array();
 
             foreach($allPeriods as $currentPeriod) {
                 if ($currentPeriod->{'Day Number'} == $dayNumber) {
@@ -165,11 +174,16 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
                      */
                     $className = trim(str_replace($currentPeriod->{'Teacher'}, '', $currentPeriod->{'TT Description'}));
 
+                    /* wtf
+                     * ...or I could preg_match it out of 1/3/0001, wherever that came from
+                     */
+                    $periodNumber = str_replace('Period', '', $currentPeriod->{'Period Name'});
+
                     $period = array(
                         'periodName' => $currentPeriod->{'Period Name'},
-                        'periodStart' =>  '',
-                        'periodEnd' => '',
-                        'periodNumber' => $currentPeriod->{'Period Number'},
+                        'periodStart' =>  $definition['start'][$periodNumber-1],
+                        'periodEnd' => $definition['end'][$periodNumber-1],
+                        'periodNumber' => $periodNumber,
                         'periodSequence' => 1,
                         'class' => array(
                             array(
@@ -184,12 +198,12 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
                         )
                     );
 
-                    new \Alaress_Probe($period);
+                    $stack[] = $period;
                 }
             }
         }
 
-        return;
+        return $stack;
     }
 
     public function getStaffTimetable($externalUserId, $dayNumber) {
