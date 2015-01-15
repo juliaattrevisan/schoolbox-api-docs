@@ -13,50 +13,70 @@ use Schoolbox\User;
 use Schoolbox\ISoftDeletable;
 use Url;
 
-class Link implements ISoftDeletable {
-	/**
-	 * @var int
-	 */
-	protected $id;
-
-	/**
-	 * @var int
-	 */
-	protected $owner;
+class Link implements ISoftDeletable
+{
+    /**
+     * Identifier
+     *
+     * @var int
+     */
+    protected $id;
 
     /**
-     * @var Category
+     * Owner Id
+     *
+     * @var int
+     */
+    protected $owner;
+
+    /**
+     * Category Id
+     *
+     * @var int
      */
     protected $folder;
 
-    /** @var Url */
+    /**
+     * Url
+     *
+     * @var int
+     */
     protected $url;
 
-	/**
-	 * @var string
-	 */
-	protected $description;
-
-	/**
-	 * @var string
-	 */
-	protected $comment;
-
-	/**
-	 * @var boolean
-	 */
-	protected $hidden;
-
+    /**
+     * Description
+     *
+     * @var string
+     */
+    protected $description;
 
     /**
-   	 * @var \Alaress_Date_Format
-   	 */
-   	protected $submitted;
+     * Comment
+     *
+     * @var string
+     */
+    protected $comment;
 
-   	/**
-   	 * @var \Alaress_Date_Format
-   	 */
-   	protected $modified;
+    /**
+     * Hidden
+     *
+     * @var int
+     */
+    protected $hidden;
+
+    /**
+     * Submitted date
+     *
+     * @var \Alaress_Date_Format
+     */
+    protected $submitted;
+
+    /**
+     * Modified date
+     *
+     * @var \Alaress_Date_Format
+     */
+    protected $modified;
 
     /**
      * Deleted at
@@ -70,30 +90,35 @@ class Link implements ISoftDeletable {
      *
      * @return bool
      */
-    public function isDeleted() {
+    public function isDeleted()
+    {
         return ($this->getDeletedAt() instanceof \Alaress_Date_Format);
     }
 
     /* Getters/Setters
      */
 
-	/**
-	 * @param  int $id
-	 * @return $this
-	 */
-	public function setId($id) {
-		$this->id = $id;
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * @param  int $id
+     * @return $this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
 
     /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set category id
+     *
      * @param Category $folder
      */
     public function setFolder($folder)
@@ -102,6 +127,8 @@ class Link implements ISoftDeletable {
     }
 
     /**
+     * Get category
+     *
      * @return Category
      */
     public function getFolder()
@@ -110,6 +137,8 @@ class Link implements ISoftDeletable {
     }
 
     /**
+     * Set url
+     *
      * @param string $url
      */
     public function setUrl($url)
@@ -118,6 +147,8 @@ class Link implements ISoftDeletable {
     }
 
     /**
+     * Get url
+     *
      * @return string
      */
     public function getUrl()
@@ -131,6 +162,8 @@ class Link implements ISoftDeletable {
     }
 
     /**
+     * Is this a valid url
+     *
      * @return bool
      */
     public function isUrl()
@@ -139,6 +172,8 @@ class Link implements ISoftDeletable {
     }
 
     /**
+     * Get local url
+     *
      * @return bool
      */
     public function isLocalUrl()
@@ -147,6 +182,8 @@ class Link implements ISoftDeletable {
     }
 
     /**
+     * Get ftp url
+     *
      * @return bool
      */
     public function isFtpUrl()
@@ -155,6 +192,8 @@ class Link implements ISoftDeletable {
     }
 
     /**
+     * Get relative url
+     *
      * @return mixed
      */
     public function getRelativeUrl()
@@ -163,6 +202,8 @@ class Link implements ISoftDeletable {
     }
 
     /**
+     * Get redirect string
+     *
      * @return string
      */
     public function getBase64EncodedRedirect()
@@ -171,6 +212,8 @@ class Link implements ISoftDeletable {
     }
 
     /**
+     * Get url slug
+     *
      * @return string
      */
     public function getSlug()
@@ -179,6 +222,22 @@ class Link implements ISoftDeletable {
     }
 
     /**
+     * Get url target
+     *
+     * @return string
+     */
+    public function getTarget()
+    {
+        if ($this->isLocalUrl()) {
+            return '';
+        }
+
+        return 'external';
+    }
+
+    /**
+     * Get link url
+     *
      * @return string
      */
     public function getHref()
@@ -192,102 +251,130 @@ class Link implements ISoftDeletable {
         }
     }
 
-	/**
-	 * @param  int $owner
-	 * @return $this
-	 */
-	public function setOwner($owner) {
-		$this->owner = $owner;
-		return $this;
-	}
-
-	/**
-	 * @return User
-	 */
-	public function getOwner() {
-		return $this->owner;
-	}
-
-	/**
-	 * @param string $comment
-	 */
-	public function setComment($comment) {
-		$this->comment = $comment;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getComment() {
-		return $this->comment;
-	}
-
-	/**
-	 * @param string $description
-	 */
-	public function setDescription($description) {
-		$this->description = $description;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getDescription() {
-		return $this->description;
-	}
-
+    /**
+     * @param  int $owner
+     * @return $this
+     */
+    public function setOwner($owner)
+    {
+        $this->owner = $owner;
+        return $this;
+    }
 
     /**
+     * @return User
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+    /**
+     * Set comment
+     *
+     * @param string $comment
+     */
+    public function setComment($comment)
+    {
+        $this->comment = $comment;
+    }
+
+    /**
+     * Get comment
+     *
+     * @return string
+     */
+    public function getComment()
+    {
+        return $this->comment;
+    }
+
+    /**
+     * Set description
+     *
+     * @param string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * Get description
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * Set hidden
+     *
      * @param bool $hidden
      */
-	public function setHidden($hidden) {
-		$this->hidden = $hidden;
-	}
-
+    public function setHidden($hidden)
+    {
+        $this->hidden = $hidden;
+    }
 
     /**
+     * Get hidden
+     *
      * @return bool
      */
-	public function getHidden() {
-		return $this->hidden;
-	}
+    public function getHidden()
+    {
+        return $this->hidden;
+    }
 
     /**
-   	 * @param  \Alaress_Date_Format $submitted
-   	 * @return $this
-   	 */
-   	public function setSubmitted($submitted) {
-   		$this->submitted = $submitted;
-   		return $this;
-   	}
-
-   	/**
-   	 * @return \Alaress_Date_Format
-   	 */
-   	public function getSubmitted() {
-   		return $this->submitted;
-   	}
+     * Set submitted
+     *
+     * @param  \Alaress_Date_Format $submitted
+     * @return $this
+     */
+    public function setSubmitted($submitted)
+    {
+        $this->submitted = $submitted;
+        return $this;
+    }
 
     /**
-   	 * @param  \Alaress_Date_Format $modified
-   	 * @return $this
-   	 */
-   	public function setModified($modified) {
-   		$this->modified = $modified;
-   		return $this;
-   	}
+     * @return \Alaress_Date_Format
+     */
+    public function getSubmitted()
+    {
+        return $this->submitted;
+    }
 
-   	/**
-   	 * @return \Alaress_Date_Format
-   	 */
-   	public function getModified() {
-   		return $this->modified;
-   	}
+    /**
+     * Set modified
+     *
+     * @param  \Alaress_Date_Format|null $modified
+     * @return $this
+     */
+    public function setModified($modified)
+    {
+        $this->modified = $modified;
+        return $this;
+    }
+
+    /**
+     * Get modified
+     *
+     * @return \Alaress_Date_Format
+     */
+    public function getModified()
+    {
+        return $this->modified;
+    }
 
     /**
      * Set deleted at
      *
-     * @param mixed $deletedAt
+     * @param \Alaress_Date_Format|null $deletedAt
      */
     public function setDeletedAt($deletedAt)
     {
@@ -297,7 +384,7 @@ class Link implements ISoftDeletable {
     /**
      * Get deleted at
      *
-     * @return mixed
+     * @return \Alaress_Date_Format|null $deletedAt
      */
     public function getDeletedAt()
     {

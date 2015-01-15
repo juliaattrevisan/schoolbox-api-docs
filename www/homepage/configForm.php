@@ -5,68 +5,60 @@ $page = new SitePage();
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
 if (is_numeric($_REQUEST['cid'])) {
-	if ($groupHandler->getPermission($_REQUEST['cid']) < WRITE_ACCESS) {
-		error(19);
-	}
+    if ($groupHandler->getPermission($_REQUEST['cid']) < WRITE_ACCESS) {
+        error(19);
+    }
 
-	$componentInstanceMapper = Component_InstanceMapper::getInstance();
+    $componentInstanceMapper = Component_InstanceMapper::getInstance();
     $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
 
 
-	// AJAX request for drag and drop of components
-	if ($_POST['cid'] && $_POST['type'] == 'components') {
-		$columns = array(
+    // AJAX request for drag and drop of components
+    if ($_POST['cid'] && $_POST['type'] == 'components') {
+        $columns = array(
             'left'  => $_POST['column1'],
             'right' => $_POST['column2'],
             'top'   => $_POST['column3']
         );
 
-		foreach ($columns as $position => $componentString) {
-			// Explode the columns
-			$components[$position] = explode(',', $componentString);
+        foreach ($columns as $position => $componentString) {
+            // Explode the columns
+            $components[$position] = explode(',', $componentString);
 
             $instanceList = array();
 
-			// Update the db
-			foreach ($components[$position] as $sequence => $componentID) {
-                if($componentID) {
-	                try {
-		                /** @var $inst Component_Instance */
-		                $inst = Component_InstanceMapper::getInstance()->findById($componentID);
-		                $inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database///
-		                $inst->setPosition($position);
-		                $instanceList[] = $inst;
-	                }
-	                catch (Schoolbox\Mapper\Exception $e) {}
+            // Update the db
+            foreach ($components[$position] as $sequence => $componentID) {
+                if ($componentID) {
+                    try {
+                        /** @var $inst Component_Instance */
+                        $inst = Component_InstanceMapper::getInstance()->findById($componentID);
+                        $inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database///
+                        $inst->setPosition($position);
+                        $instanceList[] = $inst;
+                    } catch (Schoolbox\Mapper\Exception $e) {
+                    }
                 }
-			}
+            }
 
             Component_InstanceMapper::getInstance()->save($instanceList);
-		}
-	}
-
-
-	// AJAX request to delete component from homepage
-	else if ($_POST['cid'] && is_numeric($_POST['delete'])) {
-
-        // locate the instance, locate its config instances, then blast them away
-		try {
-			/** @var Component_Instance $instance */
-			$instance = $componentInstanceMapper->findById($_POST['delete']);
-	        $configs = $componentConfigInstanceMapper->findByColumn('component_instance_id', $instance->getId());
-	        foreach ($configs as $c) {
-	            $componentConfigInstanceMapper->delete($c);
-	        }
-	        $componentInstanceMapper->delete($instance);
-		}
-		catch (Schoolbox\Mapper\Exception $e) {}
-	}
-
-
-	// POST new component to page and output render of component
-	else if (is_numeric($_POST['cid']) && (is_numeric($_POST['add']) || is_numeric($_POST['reload']))) {
-
-        if (is_numeric($_POST['add'])) {
+        }
+    }     // AJAX request to delete component from homepage
+    elseif ($_POST['cid'] && is_numeric($_POST['delete'])) {
+// locate the instance, locate its config instances, then blast them away
+        try {
+            /** @var Component_Instance $instance */
+            $instance = $componentInstanceMapper->findById($_POST['delete']);
+            $configs = $componentConfigInstanceMapper->findByColumn('component_instance_id', $instance->getId());
+            foreach ($configs as $c) {
+                $componentConfigInstanceMapper->delete($c);
+            }
+            $componentInstanceMapper->delete($instance);
+        } catch (Schoolbox\Mapper\Exception $e) {
+        }
+    } // POST new component to page and output render of component
+    elseif (is_numeric($_POST['cid']) && (is_numeric($_POST['add']) || is_numeric($_POST['reload']))) {
+if (is_numeric($_POST['add'])) {
             $newComp = new Component_Instance();
             $newComp
                 ->setDefinitionId($_POST['add'])
@@ -84,10 +76,9 @@ if (is_numeric($_REQUEST['cid'])) {
             $instanceID = $ids[0];
 
             $componentInstanceMapper->cascadeSequence($_POST['cid']);
-        }
-        else {
-            $instanceID = $_POST['reload'];
-        }
+} else {
+                $instanceID = $_POST['reload'];
+            }
 
         // get the Instance's Definition's Controller
         $factory = new Component_Homepage_Factory(new \Schoolbox\User(), new SitePage(false));
@@ -98,7 +89,7 @@ if (is_numeric($_REQUEST['cid'])) {
 
         $component = $factory->buildComponent($cList[0]);
 
-        if(!($component instanceof Component_ControllerAbstract)) {
+        if (!($component instanceof Component_ControllerAbstract)) {
             die("<h2>Error adding component</h2><p>Could not find component to instantiate.</p>");
         }
 
@@ -128,28 +119,22 @@ if (is_numeric($_REQUEST['cid'])) {
 
         $component->getPageTemplate()->pparse($templateTarget, $templateHandle);
 
-	}
-
-
-	// AJAX Save homepage colours
-	else if ($_POST['cid'] && is_array($_POST['colors'])) {
+    } // AJAX Save homepage colours
+    elseif ($_POST['cid'] && is_array($_POST['colors'])) {
         $homepage = new Homepage($_POST['cid']);
         $color = array();
         foreach ($_POST['colors'] as $key => $value) {
-			$color[$key] = substr($value, 1);
-		}
-		$homepage->saveDisplayProperties($color);
-	}
-
-
-	// GET config options from homepage
-	else if ($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component']) {
+            $color[$key] = substr($value, 1);
+        }
+        $homepage->saveDisplayProperties($color);
+    } // GET config options from homepage
+    elseif ($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component']) {
         $config = $_GET;
 
         /** @var Component_Instance $instance */
         $instance = reset($componentInstanceMapper->findByInstanceId($config['component']));
 
-        if(is_object($instance)) {
+        if (is_object($instance)) {
             $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
 
             $configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn(
@@ -163,13 +148,14 @@ if (is_numeric($_REQUEST['cid'])) {
             $cclass = $instance->getDefinition()->getClass();
             /** @var Component_ControllerAbstract $controller */
             $controller = new $cclass($instance, new \Schoolbox\User(), $page);
-            $controller->execute();
+            // No need to execute at all just to set configuration,
+            // and doing so can break components that rely on context
+//            $controller->execute();
 
             /** @var Component_ConfigDefinition $confD */
             foreach ($configDefinitionCollection as $confD) {
                 $key = $confD->getKey();
                 if (isset($config[$key])) {
-
                     $configItem = Component_Config_Factory::build($key, $category, $config);
                     $value = $configItem->dehydrate($config[$key], $controller);
 
@@ -183,7 +169,7 @@ if (is_numeric($_REQUEST['cid'])) {
                         $confI = new Component_Config();
                     }
 
-                    if(!($confI->getId())) {
+                    if (!($confI->getId())) {
                         $confI = new Component_Config();
                         $confI->setConfigDefinitionId($confD->getId());
                         $confI->setInstanceId($instance->getId());
@@ -196,17 +182,12 @@ if (is_numeric($_REQUEST['cid'])) {
             }
         }
         SitePage::localRedir("/homepage/" . $_GET['cid']);
-    }
-
-
-    // AJAX new column widths
-	else if ($_POST['cid'] && is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
+    } // AJAX new column widths
+    elseif ($_POST['cid'] && is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
         $homepage = new Homepage($_POST['cid']);
-		$homepage->updateColumnWidths(Scrub::text($_POST['leftColWidth']), Scrub::text($_POST['rightColWidth']));
-	}
-}
-
-// no cid provided
+        $homepage->updateColumnWidths(Scrub::text($_POST['leftColWidth']), Scrub::text($_POST['rightColWidth']));
+    }
+} // no cid provided
 else {
-	error(2);
+    error(2);
 }

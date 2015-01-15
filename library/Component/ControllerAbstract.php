@@ -71,9 +71,9 @@ abstract class Component_ControllerAbstract
     public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage)
     {
         $this->instance = $instance;
-        $this->user = $user;
+        $this->user     = $user;
         $this->sitepage = $sitepage;
-        $this->config = $instance->getConfigArray();
+        $this->config   = $instance->getConfigArray();
     }
 
 
@@ -84,7 +84,7 @@ abstract class Component_ControllerAbstract
     public function setup(array $context, array $config)
     {
         $this->context = $context;
-        $this->config = $config;
+        $this->config  = $config;
     }
 
 
@@ -95,6 +95,14 @@ abstract class Component_ControllerAbstract
      * @return void
      */
     abstract function execute();
+
+    /**
+     * Hook method for components to perform their own dynamic
+     * setup() amendments
+     */
+    protected function postConstruct()
+    {
+    }
 
     /**
      * @param $templateHandle
@@ -111,9 +119,9 @@ abstract class Component_ControllerAbstract
         }
 
         $output = array(
-            'COMPONENT_INSTANCE_ID' => $this->instance->getId(),
+            'COMPONENT_INSTANCE_ID'   => $this->instance->getId(),
             'COMPONENT_DEFINITION_ID' => $this->instance->getDefinitionId(),
-            'COMPONENT_HANDLE' => $templateHandle . '_' . $this->instance->getId()
+            'COMPONENT_HANDLE'        => $templateHandle . '_' . $this->instance->getId()
         );
 
         $this->setVar($output);
@@ -292,12 +300,15 @@ abstract class Component_ControllerAbstract
         // otherwise use the regular one (_wrapper.html)
         if (in_array($this->instance->getModule(), array('dashboard', 'homepage_template', 'eportfolio_template'))) {
             $template = 'component/config/_templatewrapper.html';
-        } elseif (in_array($this->instance->getModule(), array('homepage', 'eportfolio'))) {
-/* eportfolio uses a special version of le wrapier
-			 */
-            $template = 'component/config/' . $this->instance->getModule() . '_wrapper.html';
         } else {
-            $template = 'component/config/_wrapper.html';
+            if (in_array($this->instance->getModule(), array('homepage', 'eportfolio'))) {
+
+                /* eportfolio uses a special version of le wrapier
+                 */
+                $template = 'component/config/' . $this->instance->getModule() . '_wrapper.html';
+            } else {
+                $template = 'component/config/_wrapper.html';
+            }
         }
         $page->setFile('configTpl', $template);
 
@@ -359,14 +370,14 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-    * Split this out so subclasses can determine which config elements get rendered
-    *
-    * @param Component_Config_Abstract $conf
-    * @param string                    $key
-    * @param SitePage                  $page
-    * @param array                     $params
-    * @param array                     $allConfigs All configurations for this component
-    */
+     * Split this out so subclasses can determine which config elements get rendered
+     *
+     * @param Component_Config_Abstract $conf
+     * @param string $key
+     * @param SitePage $page
+     * @param array $params
+     * @param array $allConfigs All configurations for this component
+     */
     protected function parseConfigInstance($conf, $key, $page, $params, $allConfigs = array())
     {
         $templateFile = "component/config/$key.html";
@@ -462,7 +473,7 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * @param  int   $maximumPermission
+     * @param  int $maximumPermission
      * @return $this
      */
     public function setMaximumPermission($maximumPermission)

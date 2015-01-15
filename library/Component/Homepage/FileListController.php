@@ -6,7 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_FileListController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_FileListController extends Component_Homepage_ControllerAbstract
+{
 
 
     /**
@@ -40,11 +41,28 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
     private $source;
 
     /**
+     * Available filters for this component.
+     *
+     * @see Component_Config_Filter for how this data is passed in/out of the database
+     *
+     * @var array
+     */
+    protected $filterFields = array('document', 'audio', 'video', 'image', 'other');
+
+    /**
+     * Available sort fields for this component.
+     *
+     * @var array
+     */
+    protected $sortFields = array('name', 'date');
+
+    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
         $this->groupHandler = new Group();
         $this->catHandler = new Category();
         $this->fileHandler = new File();
@@ -54,17 +72,13 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         // remove any non-numeric values from the source config
         $this->source = $this->catHandler->getByID(
             $this->getConfig('src') ?
-                preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
-                $this->getContext('id')
+            preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
+            $this->getContext('id')
         );
 
-	    if($this->source === false) {
-		    $this->source = $this->catHandler->getByID($this->getContext('id'));
-	    }
-
-        // if you need to edit this array, see Component_Config_Filter for how this data is passed in/out of the database
-        $this->filterFields = array('document', 'audio', 'video', 'image', 'other');
-        $this->sortFields = array('name', 'date');
+        if ($this->source === false) {
+            $this->source = $this->catHandler->getByID($this->getContext('id'));
+        }
     }
 
     /**
@@ -72,17 +86,18 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'fileList')) {
+    public function renderTemplate($templateHandle)
+    {
+        if (!parent::loadTemplate($templateHandle, 'fileList')) {
             return false;
         }
         $this->parseConfig();
 
-	    if($this->permission < READ_ACCESS) {
-		    return false;
-	    }
+        if ($this->permission < READ_ACCESS) {
+            return false;
+        }
 
-	    /* Set up component name
+        /* Set up component name
 	*/
         $this->setVar(array(
             'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Files',
@@ -96,9 +111,9 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
         $configValue = $this->getConfig('filter');
         $filter = array();
-        for($i = 0; $i < count($this->filterFields); $i++) {
+        for ($i = 0; $i < count($this->filterFields); $i++) {
             $j = $configValue % 2;
-            if($j) {
+            if ($j) {
                 $filter[] = $this->filterFields[$i];
             }
             $configValue = (int) $configValue / 2;
@@ -122,9 +137,8 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         if (is_array($fileList)) {
             $j = 0;
             foreach ($fileList as $file) {
-
-                // exclude files associated with due work
-                if($file['type'] || $file['typeName']) {
+// exclude files associated with due work
+                if ($file['type'] || $file['typeName']) {
                     continue;
                 }
 
@@ -146,44 +160,39 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                 $this->setVar($output);
 
                 //set name
-                if($file['realname'] != "") {
-
+                if ($file['realname'] != "") {
                     $this->setVar('FILE_URL', '/send.php?id='.$file['id']);
                     $this->setVar('FILE_TARGET', '_blank');
 
                     $this->setVar('file_no_url_block', '');
                     $this->parse('file_url_block', 'file_url');
-                }
-                else {
+                } else {
                     $this->setVar('file_url_block', '');
                     $this->parse('file_no_url_block', 'file_no_url');
                 }
-
-                if($this->permission >= WRITE_ACCESS)
+                if ($this->permission >= WRITE_ACCESS) {
                     $this->parse('modify_file_block', 'modify_file');
-                else
-                    $this->setVar('modify_file_block','');
+                } else {
+                    $this->setVar('modify_file_block', '');
+                }
 
                 $this->parse('files_block', 'files', true);
 
             }
-        }
-        else {
+        } else {
             $this->setVar('files_block', '');
         }
-
         //setup block for submission button
         $this->setVar('FILE_CAT_ID', $this->source['id']);
         $this->setBlock($templateHandle, "submit_file", "submit_file_block");
-        if ($this->permission < WRITE_ACCESS)
+        if ($this->permission < WRITE_ACCESS) {
             $this->setVar("submit_file_block", "");
-        else
+        } else {
             $this->parse("submit_file_block", "submit_file");
+        }
 
 
         return true;
 
     }
-
-
 }

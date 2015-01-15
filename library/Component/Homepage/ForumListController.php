@@ -6,7 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_ForumListController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_ForumListController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * @var Group
@@ -24,11 +25,19 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
     private $source;
 
     /**
+     * Available sort fields for this component.
+     *
+     * @var array
+     */
+    protected $sortFields = array('Threads', 'Posts');
+
+    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
 
         $this->groupHandler = new Group();
         $this->catHandler = new Category();
@@ -36,15 +45,13 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
         // remove any non-numeric values from the source config
         $this->source = $this->catHandler->getByID(
             $this->getConfig('src') ?
-                preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
-                $this->getContext('id')
+            preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
+            $this->getContext('id')
         );
 
-	    if($this->source === false) {
-		    $this->source = $this->catHandler->getByID($this->getContext('id'));
-	    }
-
-        $this->sortFields = array('Threads', 'Posts');
+        if ($this->source === false) {
+            $this->source = $this->catHandler->getByID($this->getContext('id'));
+        }
     }
 
     /**
@@ -52,8 +59,9 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'forumList')) {
+    public function renderTemplate($templateHandle)
+    {
+        if (!parent::loadTemplate($templateHandle, 'forumList')) {
             return false;
         }
 
@@ -66,7 +74,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
 
         $this->parseConfig();
 
-        if($this->permission < READ_ACCESS) {
+        if ($this->permission < READ_ACCESS) {
             return false;
         }
 
@@ -131,12 +139,10 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
 
                 $this->parse("forum_block", "forum", true);
             }
-        }
-        else {
+        } else {
             $this->setVar("forum_block", '');
         }
 
         return true;
     }
-
 }
