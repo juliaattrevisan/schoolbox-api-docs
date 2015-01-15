@@ -156,16 +156,22 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     public function getStudentTimetable($externalUserId, $dayNumber) {
         $timetable = array();
 
+        $userMapper = new \Schoolbox\UserMapper();
+        $user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
+        $user = $userMapper->findById($user->getId());
+        $definition = $this->getTimetableDefinition($user->getCampusCollection()->first()->getId());
+
+        if (!$definition) {
+            return false;
+        }
+
+        /* Api connect
+         */
         $api = new External_Denbigh2_Api('StudentTimetable', array(
             'Student ID' => $externalUserId
         ));
 
         if (!count($api->getErrors())) {
-            $userMapper = new \Schoolbox\UserMapper();
-            $user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
-            $user = $userMapper->findById($user->getId());
-
-            $definition = $this->getTimetableDefinition($user->getCampusCollection()->first()->getId());
 
             // Build the timetable
             foreach ($definition['desc'] as $x => $name) {
