@@ -68,7 +68,6 @@ function readConfig($vars, SitePage $page) {
         array('id' => '-1', 'code' => '', 'name' => ''),
         $component->getInstance()->getConfigArray()
     );
-    $component->execute();
     $component->parseConfigForTemplate();
 
     $page->setVar(array(
@@ -115,7 +114,6 @@ function writeConfig($vars, SitePage $page) {
     // config values
     $factory    = new Component_Dashboard_Factory(new \Schoolbox\User(), $page);
     $controller = $factory->buildComponent($instance);
-    $controller->execute();
 
     /** @var Component_ConfigDefinition $confD */
     foreach ($cdm as $confD) {
