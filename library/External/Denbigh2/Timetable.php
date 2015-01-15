@@ -147,6 +147,8 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     }
 
     public function getStudentTimetable($externalUserId, $dayNumber) {
+        $stack = array();
+
         $api = new External_Denbigh2_Api('StudentTimetable', array(
             'Student ID' => $externalUserId
         ));
@@ -161,7 +163,6 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
             /* Data collectors
              */
             $allPeriods = $api->getResult()->data;
-            $stack = array();
 
             foreach($allPeriods as $currentPeriod) {
                 if ($currentPeriod->{'Day Number'} == $dayNumber) {
