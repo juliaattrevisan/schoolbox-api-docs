@@ -360,7 +360,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
      */
     public function getDaySubjects($externalUserId, $dayNumber)
     {
-        // TODO: Implement getDaySubjects() method.
+        // TODO: noop - Ignore this method, it's marked for removal
     }
 
     /**
