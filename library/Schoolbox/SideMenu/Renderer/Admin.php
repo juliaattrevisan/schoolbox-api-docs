@@ -18,13 +18,17 @@ class Admin
      * Renders a menu tree as HTML.
      *
      * @param Collection|Model[] $tree
-     * @param int                $level
-     * @param bool               $selectable
+     * @param bool               $selectable Can the item be selected?
+     * @param int                $level      Internal break parameter -
+     *                                       renderer won't go > 50 levels deep
      *
      * @return string
      */
-    public function renderTree(Collection $tree, $level = 0, $selectable = false)
+    public function renderTree(Collection $tree, $selectable = false, $level = 0)
     {
+        if ($level > 50) {
+            return '';
+        }
         // Top level? Render a top level item.
         $text = "<ul>\n";
         foreach ($tree as $menuItem) {
@@ -40,7 +44,7 @@ class Admin
             }
 
             if (count($children)) {
-                $text .= $this->renderTree($children, ($level + 1), $selectable);
+                $text .= $this->renderTree($children, $selectable, ($level + 1));
             }
             $text .= "</li>\n";
         }
