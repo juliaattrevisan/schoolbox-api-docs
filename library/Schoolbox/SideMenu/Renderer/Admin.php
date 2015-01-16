@@ -11,9 +11,22 @@ namespace Schoolbox\SideMenu\Renderer;
 
 use Schoolbox\SideMenu\Model;
 use Schoolbox\Collection;
+use Scrub;
 
 class Admin
 {
+    /**
+     * Text scrubber class
+     *
+     * @var Scrub
+     */
+    protected $scrubber;
+
+    public function __construct(Scrub $scrubber)
+    {
+        $this->scrubber = $scrubber;
+    }
+
     /**
      * Renders a menu tree as HTML.
      *
@@ -33,7 +46,7 @@ class Admin
         $text = "<ul>\n";
         foreach ($tree as $menuItem) {
             $id       = $menuItem->getId();
-            $menuText = \Scrub::text($menuItem->getText());
+            $menuText = $this->scrubber->text($menuItem->getText());
             $children = $menuItem->getChildren();
 
             $text .= '<li id="node_' . $id . '">';
