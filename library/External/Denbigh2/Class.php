@@ -87,7 +87,9 @@ class External_Denbigh2_Class implements External_ClassInterface {
             $allClasses = $api->getResult()->data;
 
             foreach ($allClasses as $currentClass) {
-                $ids[] = $currentClass->{'Teacher Code'};
+                if ($currentClass->{'Class'} == $classCode) {
+                    $ids[] = $currentClass->{'Teacher Code'};
+                }
             }
         }
 
