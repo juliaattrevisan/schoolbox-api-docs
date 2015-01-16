@@ -542,7 +542,29 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStaff($externalUserId)
     {
-        // TODO: Implement getStaff() method.
+        $staff = array();
+        
+        $api = new External_Denbigh2_Api('Staff', array(
+            'Staff Code' => $externalUserId
+        ));
+
+        if (!count($api->getErrors())) {
+            $currentStaff = $api->getResult()->data[0];
+
+            $staff = array(
+                'SchoolStaffCode' => $currentStaff->{'Staff Code'},
+                'StaffBuilding' => '',
+                'StaffRoom' => '',
+                'StaffExtension' => $currentStaff->{'Telephone Extension'},
+                'StaffMobilePhone' => '',
+                'StaffCampusDescription' => $currentStaff->{'Campus'},
+                'StaffCategoryDescription' => '',
+                'StaffDepartment' => '',
+                'StaffVoiceMail' => '',
+            );
+        }
+
+        return $staff;
     }
 
     /**
