@@ -86,7 +86,7 @@ $kernel->run(
 
            if ($conf->get('push_notifications_enabled')) {
                $services = array(
-                   new Cloud\GCM(),
+                   new Cloud\Google\GCM($conf->get('push_gcm_api_key')),
                    new Cloud\APNS()
                );
            } else {
