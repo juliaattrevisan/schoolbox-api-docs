@@ -55,7 +55,7 @@ if (is_numeric($this->arg[0])) {
         'URL' => '',
         'BLANK_SELECTED' => '',
         'ID' => '',
-	    'PARENT_ID' => '0',
+        'PARENT_ID' => '0',
         'ACTION' => 'Create'
     );
     $this->setVar($output);
