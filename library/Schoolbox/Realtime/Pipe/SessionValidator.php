@@ -52,24 +52,29 @@ class SessionValidator {
      * Extracts a user from a Redis remember-me and returns the associated username
      *
      * @param string $rememberMe
-     * @throws SessionException
      * @return int
      */
     public function findUserIdByRememberMe($rememberMe)
     {
-        // redis will unfortunately respond with the username, not the id -_-
-        $username = $this->findUser($rememberMe, 'remember-me token', '');
+        try {
+            // redis will unfortunately respond with the username, not the id -_-
+            $username = $this->findUser($rememberMe, 'remember-me token', '');
 
-        if (empty($this->userIdCache[$username])) {
-            // *sigh*
-            $id = (int)$this->database
-                            ->query("SELECT `id` FROM `user` WHERE `username` = ? LIMIT 0, 1", array($username))
-                            ->fetchColumn();
+            if (empty($this->userIdCache[$username])) {
+                // *sigh*
+                $id = (int)$this->database
+                    ->query("SELECT `id` FROM `user` WHERE `username` = ? LIMIT 0, 1", array($username))
+                    ->fetchColumn();
 
-            $this->userIdCache[$username] = $id;
+                $this->userIdCache[$username] = $id;
+            }
+
+            return $this->userIdCache[$username];
+
+        } catch (SessionException $e) {
+            // this method must be safe to use
+            return 0;
         }
-
-        return $this->userIdCache[$username];
     }
 
     /**
