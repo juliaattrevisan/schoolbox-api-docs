@@ -18,13 +18,6 @@ $mapper = new Schoolbox\SideMenu\Mapper();
 $list   = $mapper->findAll(array('order' => array('sequence' => 'asc')));
 $tree   = $mapper->getCollectionAsTree($list);
 
-// Create a base for the collection
-$base = new Schoolbox\SideMenu\Model();
-$base
-    ->setId(0)
-    ->setText('Top Level')
-    ->setChildren($tree);
-
 // and render the tree
 $renderer = new Schoolbox\SideMenu\Renderer\Admin(new Scrub());
-$this->setVar('MENU_TREE', $renderer->renderTree(new \Schoolbox\Collection(array($base))));
+$this->setVar('MENU_TREE', $renderer->renderTree($mapper->placeInRootNode($tree)));

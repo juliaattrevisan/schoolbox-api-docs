@@ -9,6 +9,7 @@
 
 namespace Schoolbox\SideMenu;
 
+use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 
 class Mapper extends BaseMapper
@@ -65,5 +66,28 @@ class Mapper extends BaseMapper
                 'type'     => self::TYPE_INTEGER
             )
         );
+    }
+
+    /**
+     * Puts the entire tree in a root node.
+     *
+     * @param Collection|Model[] $tree A tree of side menu items, built with
+     *                                 $this->getCollectionAsTree()
+     * @param string             $text
+     *
+     * @return Collection
+     * @throws BaseMapper\Exception
+     */
+    public function placeInRootNode(Collection $tree, $text = 'Top Level')
+    {
+        $base = $this->createModel();
+        $base
+            ->setId(0)
+            ->setText($text)
+            ->setChildren($tree);
+
+        $newCollection = new Collection();
+        $newCollection->add($base);
+        return $newCollection;
     }
 }
