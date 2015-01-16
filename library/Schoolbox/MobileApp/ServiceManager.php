@@ -10,7 +10,7 @@
 namespace Schoolbox\MobileApp;
 
 use Alaress\Async\Notification\Cloud\ServiceInterface;
-use Schoolbox\Collection;
+use OutOfBoundsException;
 
 class ServiceManager
 {
@@ -42,7 +42,8 @@ class ServiceManager
      */
     public function addService(ServiceInterface $service)
     {
-        $this->services[] = $service;
+        // index by provider name
+        $this->services[$service->getProviderName()] = $service;
         return $this;
     }
 
@@ -56,8 +57,28 @@ class ServiceManager
         $registered = $this->registryMapper->findByColumn('user_id', $userId)->groupBy('provider');
 
         foreach ($registered as $provider => $registries) {
-            /** @var Collection|Registry[] $registries */
+            try {
+                $this->getService($provider)->send($registries->getColumnValues('token'), $data);
+
+            } catch (OutOfBoundsException $e) {
+                echo $e; // TODO use logger
+            }
         }
+    }
+
+
+    /**
+     * @param string $providerName
+     * @throws OutOfBoundsException
+     * @return ServiceInterface
+     */
+    protected function getService($providerName)
+    {
+        if (isset($this->services[$providerName])) {
+            return $this->services[$providerName];
+        }
+
+        throw new OutOfBoundsException("Provider '$providerName' not set.");
     }
 
 }
