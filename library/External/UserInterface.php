@@ -315,10 +315,13 @@ interface External_UserInterface {
      * staff by using the Schoolbox $userId
      *
      * returns array(
-     *      'code' => class category code
-     *      'name' => class name
-     *      'classType' => a string e.g. academic, music, maths
-     *      'campusCode' => the campus this class is in
+     *     array(
+     *         'code' => class category code
+     *         'name' => class name
+     *         'classType' => a string e.g. academic, music, maths
+     *         'campusCode' => the campus this class is in
+     *     )
+     *     ...
      * )
      *
      * @param $externalUserId
