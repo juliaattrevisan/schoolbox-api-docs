@@ -720,7 +720,48 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getPortrait($externalUserId)
     {
-        // TODO: Implement getPortrait() method.
+        if (!is_numeric($externalUserId)) {
+            return false;
+        }
+
+        $api = new External_Denbigh2_Api('Photos', array(
+            'Community ID' => $externalUserId
+        ));
+
+        if (!count($api->getErrors())) {
+            if (count($api->getResult()->data) && strlen($api->getResult()->data[0]->{'PhotoBase64Encoded'})) {
+                $photoPath = Config::get('portrait_dir') . '/' . $externalUserId . '.jpg';
+
+                //TODO: delete photos on rollover
+
+                /* If the cached file doesn't exist, or the synergetic image is more recent than our
+                 * last known cached version, regenerate cached version.
+                 *
+                 * Separate the queries out, fetching the photo data only if it's newer than the cached
+                 * version, or if the cache version doesn't already exist.
+                 */
+                $cacheTime    = @filemtime($photoPath);
+
+                /* Denbigh didn't provide a modified date
+                 * $modifiedTime = strtotime($photo['ModifiedDate']);
+                 */
+                $modifiedTime = $_SERVER['REQUEST_TIME'];
+
+                if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
+                    $binary = base64_decode($api->getResult()->data[0]->{'PhotoBase64Encoded'});
+
+                    /* Save the image
+                     */
+                    $photoHandle = fopen($photoPath, "w");
+                    fwrite($photoHandle, $binary);
+                    fclose($photoHandle);
+                }
+
+                return $photoPath;
+            }
+        }
+
+        return false;
     }
 
     /**
