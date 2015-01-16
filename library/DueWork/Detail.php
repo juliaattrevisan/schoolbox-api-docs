@@ -13,7 +13,7 @@ class DueWork_Detail
     const ACCEPT_SINGLE = 1;
     const ACCEPT_MULTI = 2;
 
-    const UNSUBMITTED = 'Unsubmitted';
+    const UNSUBMITTED = 'Not submitted';
     const SUBMITTED = 'Submitted';
     const RESUBMITTED = 'Resubmitted';
     const ON_TIME = ' on time';
