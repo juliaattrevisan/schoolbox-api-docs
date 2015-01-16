@@ -83,7 +83,16 @@ $kernel->run(
            $conf             = $di->get('config');
            $sessionValidator = new SessionValidator($redis, new PhpHandler(), $conf->get('session_length'), Database::getInstance());
 
-           $cloudManager = new Cloud\ServiceManager();
+           if ($conf->get('push_notifications_enabled')) {
+               $services = array(
+                   new Cloud\GCM(),
+                   new Cloud\APNS()
+               );
+           } else {
+               $services = array();
+           }
+
+           $cloudManager = new Cloud\ServiceManager($services);
 
            $stompFactory = new Factory($loop);
 
