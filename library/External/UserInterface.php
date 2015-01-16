@@ -18,7 +18,7 @@ interface External_UserInterface {
      * StudentID,
      * StudentGiven1,
      * StudentSurname,
-     * StudentBirthDate,
+     * StudentBirthDate, (a unix timestamp)
      * StudentHouseDescription,
      * StudentHouse,
      * HeadOfHouseID,

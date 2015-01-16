@@ -17,7 +17,7 @@ class External_Denbigh2_User implements External_UserInterface
      * StudentID,
      * StudentGiven1,
      * StudentSurname,
-     * StudentBirthDate,
+     * StudentBirthDate, (a unix timestamp)
      * StudentHouseDescription,
      * StudentHouse,
      * HeadOfHouseID,
@@ -62,11 +62,13 @@ class External_Denbigh2_User implements External_UserInterface
         if (!count($api->getErrors())) {
             $result = $api->getResult()->data[0];
 
+            $dobby = new \Alaress_Date_Format($result->{'Date of Birth'}, 'm/d/y');
+
             $data = array(
                 'StudentID' => $result->{'Student ID'},
                 'StudentGiven1' => $result->{'Given Names'},
                 'StudentSurname' => $result->{'Surname'},
-                'StudentBirthDate' => $result->{'Date of Birth'},
+                'StudentBirthDate' => $dobby->getUnixTimestamp(),
                 'StudentHouseDescription' => $result->{'House'},
                 'StudentHouse' => $result->{'House'},
                 'HeadOfHouseID' => '',
