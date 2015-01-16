@@ -514,32 +514,10 @@ class SitePage extends Page
 
     function renderSideNav()
     {
-        //this section handles the drop down menu
-        if ($_SESSION['su']) {
-            $query = "SELECT sideMenu.id, parent, txt, url, target FROM sideMenu ORDER BY parent, sequence, txt";
-        } elseif (is_array($_SESSION['campus'])) {
-            $query = "SELECT DISTINCT(sideMenu.id), parent, txt, url, target FROM sideMenu, sideMenuCampus, sideMenuGroup
-                      WHERE (sideMenu.id = sideMenuCampus.id AND sideMenuCampus.campus IN (" . implode(',', $_SESSION['campus']) . ") )
-                      AND (sideMenu.id = sideMenuGroup.id AND sideMenuGroup.gid = '" . $_SESSION['gid'] . "')
-                      ORDER BY parent, sequence, txt";
-        } else {
-            $query = "SELECT DISTINCT(sideMenu.id), parent, txt, url, target FROM sideMenu, sideMenuCampus, sideMenuGroup
-                      WHERE (sideMenu.id = sideMenuCampus.id AND sideMenuCampus.campus = 1)
-                      AND (sideMenu.id = sideMenuGroup.id AND sideMenuGroup.gid = '" . $_SESSION['gid'] . "')
-                      ORDER BY parent, sequence, txt";
-        }
-        $this->db->query($query);
-
-        //initialise root of tree
-        $list[0]['id'] = 0;
-
-        //fetch each record and insert into tree
-        while ($menuitem = $this->db->getNextArray()) {
-            $list = $this->__insertChild($list, $menuitem);
-        }
-
-        //output tree with html
-        $this->setVar("MCSSMENU", $this->__outputMenu($list[0]['children'], 1));
+        $mapper = new \Schoolbox\SideMenu\Mapper();
+        $tree   = $mapper->getCollectionAsTree($mapper->findByUser($_SESSION['user']));
+        $renderer = new \Schoolbox\SideMenu\Renderer(new Scrub());
+        $this->setVar("MCSSMENU", $renderer->renderTree($tree));
     }
 
 
