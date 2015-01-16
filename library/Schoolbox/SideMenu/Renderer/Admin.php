@@ -50,7 +50,7 @@ class Admin
             $children = $menuItem->getChildren();
 
             $text .= '<li id="node_' . $id . '">';
-            if ($selectable) {
+            if ($selectable || $id == 0) {
                 $text .= '<a id="' . $id . '" href="#">' . $menuText . "</a>";
             } else {
                 $text .= '<a href="/adminv2/modify-side-menu/' . $id . '">' . $menuText . '</a>';
