@@ -98,6 +98,19 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     public function getDayNumber($campusId, $date = 0)
     {
         // TODO: Implement getDayNumber() method.
+
+        $all = array(
+            new External_Denbigh2_Api('TimetableLessons', array()),
+            new External_Denbigh2_Api('PeriodTimes', array()),
+        );
+
+        foreach ($all as $api) {
+            new \Alaress_Probe($api->getErrors());
+            new \Alaress_Probe($api->getResult());
+
+            echo "<HR>";
+        }
+
         return 1;
     }
 
