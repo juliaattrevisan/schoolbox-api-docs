@@ -7,7 +7,9 @@
  * @version     SVN: $Id$
  */
 
-namespace Alaress\Async\Notification\Cloud;
+namespace Alaress\Async\Notification\Cloud\Apple;
+
+use Alaress\Async\Notification\Cloud\ServiceInterface;
 
 
 /**
@@ -15,7 +17,7 @@ namespace Alaress\Async\Notification\Cloud;
  *
  * Class APNS
  *
- * @package Alaress\Async\Notification\Cloud
+ * @package Alaress\Async\Notification\Cloud\Apple
  */
 class APNS implements ServiceInterface
 {
