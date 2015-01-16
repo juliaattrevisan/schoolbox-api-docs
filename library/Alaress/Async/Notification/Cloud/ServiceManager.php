@@ -16,7 +16,7 @@ use Schoolbox\MobileApp\RegistryMapper;
 class ServiceManager
 {
     /** @var ServiceInterface */
-    protected $services = [];
+    protected $services = array();
 
     /** @var RegistryMapper */
     protected $registryMapper;
@@ -26,7 +26,7 @@ class ServiceManager
      * @param ServiceInterface[] $services
      * @param RegistryMapper     $registryMapper
      */
-    public function __construct(array $services = [], RegistryMapper $registryMapper = null)
+    public function __construct(array $services = array(), RegistryMapper $registryMapper = null)
     {
         $this->registryMapper = $registryMapper ?: RegistryMapper::getInstance();
 
