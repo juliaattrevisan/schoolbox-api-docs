@@ -13,4 +13,17 @@ namespace Alaress\Async\Notification\Cloud;
 interface ServiceInterface
 {
 
-} 
+    /**
+     * @return string
+     */
+    public function getProviderName();
+
+
+    /**
+     * @param array $tokens
+     * @param array $data
+     * @return bool
+     */
+    public function send(array $tokens, array $data);
+
+}
