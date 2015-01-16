@@ -34,22 +34,26 @@
 @import "../../m/inc/css/variables.less";
 
 // =============================================================================
-// Schoolbox Mobile Skin - Demo
+// Schoolbox Mobile Skin - StRitas
 // =============================================================================
 
 // REQUIRED
-@skin:              'demo';             // skin name
-@banner-color:      #013A63;            // top banner background
+@skin:              'stritas';             // skin name
+@banner-color:      #5b3508;            // top banner background
 @navigation-color:  @banner-color;      // th and h3 foreground
 @link-color: 	    #0066B0;            // item link foreground
-@header-color:      #FAFAFA;            // article header background
-@background:        #EEEEEE;            // body background
-@login-color:       #FFF;      			// login background base-colour
-@input-bg: 			#eee;				// Login input background
-@submit-bg: 		#0066b0; 			// Submit btn background
+@header-color:      #f2f2f2;            // article header background
+@background:        @header-color;            // body background
+@login-color:       @banner-color;      			// login background base-colour
+@input-bg: 			#fff;				// Login input background
+@submit-bg: 		#fcb913; 			// Submit btn background
 
 // OPTIONAL
 // any definitions in variables.less can be overridden by re-specifying here
+
+#login_frm input[type="submit"]{
+	color: #5b3508 !important;
+}
 
 // =============================================================================
 // Includes
