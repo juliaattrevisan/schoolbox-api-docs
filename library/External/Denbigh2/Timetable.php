@@ -135,11 +135,14 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
             $now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
             if ($definition['start'][$i] > $now->getUsingFormat('H:i:s')) {
-                return $definition['number'][$i-1];
+                return array(
+                    'PeriodNumber' => $definition['number'][$i-1],
+                    'PeriodNumberSeq' => $definition['sequence'][$i-1],
+                );
             }
         }
 
-        return 0;
+        return array();
     }
 
     /**
