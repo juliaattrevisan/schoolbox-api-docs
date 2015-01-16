@@ -155,7 +155,7 @@ class External_Denbigh2_User implements External_UserInterface
             if (!count($api->getErrors())) {
                 $family = $api->getResult()->data[0];
 
-                $data = array(
+                $data[] = array(
                     'StudentContactID' => '',
                     'StudentContactTitle' => $family->{'Father Title'},
                     'StudentContactPreferred' => $family->{'Father Preferred Name'},
