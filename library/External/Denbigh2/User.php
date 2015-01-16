@@ -610,6 +610,12 @@ class External_Denbigh2_User implements External_UserInterface
             'Student ID' => $externalUserId
         ));
 
+        /* Calling userMapper->findById() for user 689 causes Avondale
+         * to time out with Error code: ERR_EMPTY_RESPONSE
+         *
+         * This is needed to get the campusCode
+         */
+
         if (!count($api->getErrors())) {
             $allEnrolments = $api->getResult()->data;
 
