@@ -12,9 +12,9 @@ namespace Schoolbox\Realtime\Pipe;
 
 use Alaress\Async\AMQP\AMQPResponseHandlerInterface;
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\Cloud;
 use Alaress\WorkerCrew\QueueingException;
 use Alaress\WorkerCrew\Transaction\Transaction;
-use Monolog\Logger;
 use PhpAmqpLib\Message\AMQPMessage;
 use Predis\CommunicationException;
 use Psr\Log\LoggerInterface;
@@ -55,6 +55,9 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	/** @var SubscriptionManager */
 	protected $subscriptionManager;
 
+    /** @var Cloud\ServiceManager */
+    protected $cloudManager;
+
 	/** @var LoopInterface */
 	protected $reactLoop;
 
@@ -73,12 +76,12 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
     /** @var TimerInterface[] */
     protected $userTimeouts = array();
 
-
     /**
      * @param LoopInterface             $reactLoop
      * @param SessionValidator          $sessionValidator
      * @param Client                    $stompClient
      * @param QueueFactory              $qf
+     * @param Cloud\ServiceManager      $cloudManager
      * @param LoggerInterface           $log
      * @param DispatchStrategyInterface $strat
      */
@@ -87,6 +90,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
         SessionValidator $sessionValidator,
         Client $stompClient,
         QueueFactory $qf,
+        Cloud\ServiceManager $cloudManager,
         LoggerInterface $log,
         DispatchStrategyInterface $strat = null
     ) {
@@ -94,6 +98,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
         $this->reactLoop           = $reactLoop;
         $this->taskDispatcher      = new Dispatcher($reactLoop, $this, $log, $strat);
         $this->log                 = $log;
+        $this->cloudManager        = $cloudManager;
         $this->subscriptionManager = new SubscriptionManager($stompClient, $this, $log, $qf);
 
         $this->log->debug('Instantiated PipeManager');
@@ -470,12 +475,17 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	/**
 	 * Send data to all pipes associated with a specific user.
 	 *
-	 * @param int $userId
+	 * @param int    $userId
 	 * @param string $data
+	 * @param bool   $cloudPush
 	 */
-	public function sendToUser($userId, $data) {
+	public function sendToUser($userId, $data, $cloudPush = true) {
 		foreach($this->pipes->getPipesByUserId($userId) as $pipe) {
 			$this->sendToPipe($pipe, $data);
+		}
+
+		if ($cloudPush) {
+			$this->cloudManager->push($userId, $data);
 		}
 	}
 
