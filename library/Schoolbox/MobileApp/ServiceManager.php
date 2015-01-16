@@ -7,11 +7,10 @@
  * @version     SVN: $Id$
  */
 
-namespace Alaress\Async\Notification\Cloud;
+namespace Schoolbox\MobileApp;
 
-
-
-use Schoolbox\MobileApp\RegistryMapper;
+use Alaress\Async\Notification\Cloud\ServiceInterface;
+use Schoolbox\Collection;
 
 class ServiceManager
 {
@@ -54,7 +53,11 @@ class ServiceManager
      */
     public function push($userId, $data)
     {
+        $registered = $this->registryMapper->findByColumn('user_id', $userId)->groupBy('provider');
 
+        foreach ($registered as $provider => $registries) {
+            /** @var Collection|Registry[] $registries */
+        }
     }
 
 }

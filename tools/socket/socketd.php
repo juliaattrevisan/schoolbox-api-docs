@@ -9,6 +9,7 @@ use Ratchet\Session\Serialize\PhpHandler;
 use React\EventLoop\LoopInterface;
 use React\Socket\ConnectionException;
 use React\Stomp\Factory;
+use Schoolbox\MobileApp;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Queue\QueueFactory;
 use Schoolbox\Realtime\Pipe\PipeManager;
@@ -92,7 +93,7 @@ $kernel->run(
                $services = array();
            }
 
-           $cloudManager = new Cloud\ServiceManager($services);
+           $cloudManager = new MobileApp\ServiceManager($services);
 
            $stompFactory = new Factory($loop);
 
