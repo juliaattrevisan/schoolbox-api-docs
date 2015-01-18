@@ -341,16 +341,38 @@ class Mapper extends BaseMapper {
      * @param  string $keyword
      * @param  int    $offset
      * @param  int    $limit
+     * @param  string $sort_by  Sort field, defaults to 'name' but can be 'modified_at'
+     * @param  string $sort_dir Sort direction, defaults to 'ASC'
      * @return Collection
      */
-    public function search($keyword, $offset = 0, $limit = 20) {
+    public function search($keyword, $offset = 0, $limit = 20, $sort_by = 'name', $sort_dir = 'ASC') {
+        // Ordering
+        switch (strtolower($sort_by)) {
+            case 'modified_at':
+                $order = '`re`.`modified_at`';
+                break;
+            case 'name':
+            default:
+                $order = '`re`.`name`';
+                break;
+        }
+        switch (strtolower($sort_dir)) {
+            case 'desc':
+                $order .= ' DESC ';
+                break;
+            case 'asc':
+            default:
+                $order .= ' ASC ';
+                break;
+        }
+
         $query = "
             SELECT {$this->getColumnString('re')}
             FROM {$this->getTable()} `re`
             WHERE
               (`re`.`name` LIKE :searchLike OR `re`.`description` LIKE :searchLike OR `re`.`room_code` LIKE :search)
               AND {$this->getSoftDeleteFilterSql('re')}
-            ORDER BY `re`.`modified_at` DESC
+            ORDER BY $order
             LIMIT :limit OFFSET :offset
         ";
         $statement = $this->getDatabase()->prepare($query);
