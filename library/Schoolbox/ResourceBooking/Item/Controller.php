@@ -61,7 +61,9 @@ class Controller extends Base {
                 $list = $this->getMapper()->search(
                     $search,
                     $this->paginator->getOffset($page),
-                    $this->paginator->getPageSize()
+                    $this->paginator->getPageSize(),
+                    'name',
+                    'asc'
                 );
             }
         }
@@ -77,7 +79,7 @@ class Controller extends Base {
                 $list = $this->mapper->findByColumnList(
                     $query,
                     array(
-                        'order'  => array('modified_at' => 'desc'),
+                        'order'  => array('name' => 'asc'),
                         'limit'  => $this->paginator->getPageSize(),
                         'offset' => $this->paginator->getOffset($page),
                     )
