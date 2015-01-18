@@ -395,11 +395,12 @@ class Mapper extends BaseMapper {
             SELECT COUNT(*)
             FROM {$this->getTable()} `re`
             WHERE
-              (`re`.`name` LIKE :search OR `re`.`description` LIKE :search)
+              (`re`.`name` LIKE :searchLike OR `re`.`description` LIKE :searchLike OR `re`.`room_code` LIKE :search)
               AND {$this->getSoftDeleteFilterSql('re')}
         ";
         $statement = $this->getDatabase()->prepare($query);
-        $statement->bindValue('search', '%'.$this->getDatabase()->quoteForLike($keyword).'%');
+        $statement->bindValue('search', $keyword);
+        $statement->bindValue('searchLike', '%'.$this->getDatabase()->quoteForLike($keyword).'%');
         $statement->execute();
         return $statement->fetchColumn();
     }
