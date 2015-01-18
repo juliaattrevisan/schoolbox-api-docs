@@ -370,7 +370,7 @@ class Mapper extends BaseMapper {
             SELECT {$this->getColumnString('re')}
             FROM {$this->getTable()} `re`
             WHERE
-              (`re`.`name` LIKE :searchLike OR `re`.`description` LIKE :searchLike OR `re`.`room_code` LIKE :search)
+              (`re`.`name` LIKE :searchLike OR `re`.`description` LIKE :searchLike OR `re`.`room_code` = :search)
               AND {$this->getSoftDeleteFilterSql('re')}
             ORDER BY $order
             LIMIT :limit OFFSET :offset
@@ -395,7 +395,7 @@ class Mapper extends BaseMapper {
             SELECT COUNT(*)
             FROM {$this->getTable()} `re`
             WHERE
-              (`re`.`name` LIKE :searchLike OR `re`.`description` LIKE :searchLike OR `re`.`room_code` LIKE :search)
+              (`re`.`name` LIKE :searchLike OR `re`.`description` LIKE :searchLike OR `re`.`room_code` = :search)
               AND {$this->getSoftDeleteFilterSql('re')}
         ";
         $statement = $this->getDatabase()->prepare($query);
