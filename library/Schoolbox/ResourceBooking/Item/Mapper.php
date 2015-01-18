@@ -9,12 +9,15 @@
  
 
 namespace Schoolbox\ResourceBooking\Item;
+
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Collection;
 
-class Mapper extends BaseMapper {
+class Mapper extends BaseMapper
+{
 
-    public function mapping() {
+    public function mapping()
+    {
         $this->hasTable('resource');
         $this->hasModel('Schoolbox\\ResourceBooking\\Item\\Model');
         $this->hasMap(
@@ -142,11 +145,11 @@ class Mapper extends BaseMapper {
                 'other_key' => 'resource_id',
                 'multiple'  => true,
                 // Better M2M joins:
-//                'mapper'    => '\\Schoolbox\\User',
-//                'this_key'  => 'id',
-//                'other_key' => 'id',
-//                'multiple'  => true,
-//                'through'   => '\\Schoolbox\\ResourceBooking\\Item\\Moderator\\Mapper',
+            //                'mapper'    => '\\Schoolbox\\User',
+            //                'this_key'  => 'id',
+            //                'other_key' => 'id',
+            //                'multiple'  => true,
+            //                'through'   => '\\Schoolbox\\ResourceBooking\\Item\\Moderator\\Mapper',
             )
         );
         $this->hasJoin(
@@ -174,7 +177,8 @@ class Mapper extends BaseMapper {
      * Ensures that moderators and related items are saved after the item is
      * loaded.
      */
-    public function postSave(Model $object) {
+    public function postSave(Model $object)
+    {
         $mapper  = $this->getJoinMapper('moderator');
         $oldList = $mapper->findByColumn('resource_id', $object->getId());
         $newList = new Collection();
@@ -229,7 +233,8 @@ class Mapper extends BaseMapper {
      * @throws BaseMapper\Exception         if item with $id wasn't found
      * @throws BaseMapper\Exception\Deleted if item with $id is soft-deleted
      */
-    public function findById($id) {
+    public function findById($id)
+    {
         $query = "
             SELECT
                 {$this->getColumnString('r')},
@@ -266,7 +271,8 @@ class Mapper extends BaseMapper {
      *
      * @return object
      */
-    public function hydrate($row, $alias = '', $callback = null) {
+    public function hydrate($row, $alias = '', $callback = null)
+    {
         if (isset($callback)) {
             return parent::hydrate($row, $alias, $callback);
         }
@@ -298,8 +304,8 @@ class Mapper extends BaseMapper {
                     $imageMapper = $mapper->getJoinMapper('image');
                     try {
                         $model->setImage($imageMapper->findById($imageId));
+                    } catch (BaseMapper\Exception $ex) {
                     }
-                    catch (BaseMapper\Exception $ex) {}
                 }
 
                 // populate related resources
@@ -345,7 +351,8 @@ class Mapper extends BaseMapper {
      * @param  string $sort_dir Sort direction, defaults to 'ASC'
      * @return Collection
      */
-    public function search($keyword, $offset = 0, $limit = 20, $sort_by = 'name', $sort_dir = 'ASC') {
+    public function search($keyword, $offset = 0, $limit = 20, $sort_by = 'name', $sort_dir = 'ASC')
+    {
         // Ordering
         switch (strtolower($sort_by)) {
             case 'modified_at':
@@ -376,9 +383,9 @@ class Mapper extends BaseMapper {
             LIMIT :limit OFFSET :offset
         ";
         $statement = $this->getDatabase()->prepare($query);
-        $statement->bindValue('search',     $keyword);
+        $statement->bindValue('search', $keyword);
         $statement->bindValue('searchLike', '%'.$this->getDatabase()->quoteForLike($keyword).'%');
-        $statement->bindValue('limit',  intval($limit),  \PDO::PARAM_INT);
+        $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
         $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
         $statement->execute();
         return $this->hydrateList($statement, 're');
@@ -390,7 +397,8 @@ class Mapper extends BaseMapper {
      * @param  string $keyword
      * @return int
      */
-    public function searchCount($keyword) {
+    public function searchCount($keyword)
+    {
         $query = "
             SELECT COUNT(*)
             FROM {$this->getTable()} `re`
@@ -412,7 +420,8 @@ class Mapper extends BaseMapper {
      * @param  int $userId
      * @return bool
      */
-    public function isUserModerator($itemId, $userId) {
+    public function isUserModerator($itemId, $userId)
+    {
         $list = $this->getJoinMapper('moderator')->findByColumnList(
             array('resource_id' => $itemId, 'moderator_id' => $userId),
             array('limit' => 1)
@@ -430,7 +439,8 @@ class Mapper extends BaseMapper {
      * @param  int $moderatorId
      * @return Collection|Model[]
      */
-    public function findForModerator($moderatorId) {
+    public function findForModerator($moderatorId)
+    {
 
         $query = "
             SELECT {$this->getColumnString('r')}
@@ -447,5 +457,4 @@ class Mapper extends BaseMapper {
         /** @var Model $item */
         return $this->hydrateList($statement, 'r');
     }
-
 }
