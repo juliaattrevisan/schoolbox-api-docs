@@ -623,19 +623,19 @@ class External_Denbigh2_User implements External_UserInterface
         $api = new External_Denbigh2_Api('Staff', array());
 
         if (!count($api->getErrors())) {
-            $currentStaff = $api->getResult()->data[0];
-
-            $staff = array(
-                'SchoolStaffCode' => $currentStaff->{'Staff Code'},
-                'StaffBuilding' => '',
-                'StaffRoom' => '',
-                'StaffExtension' => $currentStaff->{'Telephone Extension'},
-                'StaffMobilePhone' => '',
-                'StaffCampusDescription' => $currentStaff->{'Campus'},
-                'StaffCategoryDescription' => '',
-                'StaffDepartment' => '',
-                'StaffVoiceMail' => '',
-            );
+            foreach($api->getResult()->data as $currentStaff) {
+                $staff[] = array(
+                    'SchoolStaffCode' => $currentStaff->{'Staff Code'},
+                    'StaffBuilding' => '',
+                    'StaffRoom' => '',
+                    'StaffExtension' => $currentStaff->{'Telephone Extension'},
+                    'StaffMobilePhone' => '',
+                    'StaffCampusDescription' => $currentStaff->{'Campus'},
+                    'StaffCategoryDescription' => '',
+                    'StaffDepartment' => '',
+                    'StaffVoiceMail' => '',
+                );
+            }
         }
 
         return $staff;
