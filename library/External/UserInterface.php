@@ -224,7 +224,31 @@ interface External_UserInterface {
      * Accept array of Synergy IDs, or just an int
      *
      * @param $externalUserId
-     * @return array
+     * @return array (
+     *     ID,
+     *     Title,
+     *     Preferred,
+     *     Surname,
+     *     Email,
+     *     OccupEmail,
+     *     DefaultEmailCode,
+     *     DirectoryIncludeFlag
+     * )
+     *
+     * or
+     *
+     * @return array(
+     *     array(
+     *         ID,
+     *         Title,
+     *         Preferred,
+     *         Surname,
+     *         Email,
+     *         OccupEmail,
+     *         DefaultEmailCode,
+     *         DirectoryIncludeFlag
+     *     )
+     * )
      */
     public function getParentSync($externalUserId);
 

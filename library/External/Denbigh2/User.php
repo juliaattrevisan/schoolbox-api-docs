@@ -487,11 +487,60 @@ class External_Denbigh2_User implements External_UserInterface
      * Accept array of Synergy IDs, or just an int
      *
      * @param $externalUserId
-     * @return array
+     * @return array (
+     *     ID,
+     *     Title,
+     *     Preferred,
+     *     Surname,
+     *     Email,
+     *     OccupEmail,
+     *     DefaultEmailCode,
+     *     DirectoryIncludeFlag
+     * )
+     *
+     * or
+     *
+     * @return array(
+     *     array(
+     *         ID,
+     *         Title,
+     *         Preferred,
+     *         Surname,
+     *         Email,
+     *         OccupEmail,
+     *         DefaultEmailCode,
+     *         DirectoryIncludeFlag
+     *     )
+     * )
      */
     public function getParentSync($externalUserId)
     {
-        // TODO: No way to uniquely identify parents?
+        $parent = array();
+
+        if (is_array($externalUserId)) {
+        }
+        else {
+            $api = new External_Denbigh2_Api('Family', array(
+                'Family Code' => $externalUserId
+            ));
+
+            if (!count($api->getErrors())) {
+                $family = $api->getResult()->data;
+
+                $parent = array(
+                    ID,
+                    Title,
+                    Preferred,
+                    Surname,
+                    Email,
+                    OccupEmail,
+                    DefaultEmailCode,
+                    DirectoryIncludeFlag
+                );
+            }
+        }
+
+        return $parent;
     }
 
     /**
