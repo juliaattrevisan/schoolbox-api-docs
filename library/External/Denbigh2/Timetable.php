@@ -70,9 +70,15 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
             foreach ($allPeriods as $currentPeriod) {
                 if ($i < $maxPeriodsPerDay) {
                     if (!$day || $currentPeriod->{'Day of Cycle'} == $day) {
+
+                        /* Format some times
+                         */
+                        $start = new \Alaress_Date_Format($currentPeriod->{'Period Start Time'}, 'H:i:s');
+                        $end = new \Alaress_Date_Format($currentPeriod->{'Period End Time'}, 'H:i:s');
+
                         $timetableDef['desc'][$i] = "Period {$currentPeriod->{'Period'}}";
-                        $timetableDef['start'][$i] = $currentPeriod->{'Period Start Time'};
-                        $timetableDef['end'][$i] = $currentPeriod->{'Period End Time'};
+                        $timetableDef['start'][$i] = $start->getUsingFormat('h:ia');
+                        $timetableDef['end'][$i] = $end->getUsingFormat('h:ia');
                         $timetableDef['number'][$i] = $currentPeriod->{'Period'};
                         $timetableDef['sequence'][$i] = 1;
 
