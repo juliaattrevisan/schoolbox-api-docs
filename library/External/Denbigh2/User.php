@@ -12,6 +12,21 @@ class External_Denbigh2_User implements External_UserInterface
 {
 
     /**
+     * An instance of Group
+     *
+     * @var Group
+     */
+    private $groupHandler = null;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->setGroupHandler(new Group());
+    }
+
+    /**
      * Get student info for $externalUserId
      *
      * StudentID,
@@ -821,39 +836,75 @@ class External_Denbigh2_User implements External_UserInterface
     {
         $class = array();
 
-        $api = new External_Denbigh2_Api('Enrolments', array(
-            'Student ID' => $externalUserId
-        ));
+        if ($this->getGroupHandler()->isStudent($userId)) {
+            $api = new External_Denbigh2_Api('Enrolments', array(
+                'Student ID' => $externalUserId
+            ));
 
-        /* Calling userMapper->findById() for user 689 causes Avondale
-         * to time out with Error code: ERR_EMPTY_RESPONSE
-         *
-         * This is needed to get the campusCode
-         */
+            /* Calling userMapper->findById() for user 689 causes Avondale
+             * to time out with Error code: ERR_EMPTY_RESPONSE
+             *
+             * This is needed to get the campusCode
+             */
+            if (!count($api->getErrors())) {
+                $allEnrolments = $api->getResult()->data;
 
-        if (!count($api->getErrors())) {
-            $allEnrolments = $api->getResult()->data;
+                foreach($allEnrolments as $currentEnrolment) {
 
-            foreach($allEnrolments as $currentEnrolment) {
+                    /* Find out more info about the class
+                     */
+                    $api = new External_Denbigh2_Api('Classes', array(
+                        'Class' => $currentEnrolment->{'Class'}
+                    ));
 
-                /* Find out more info about the class
-                 */
-                $api = new External_Denbigh2_Api('Classes', array(
-                    'Class' => $currentEnrolment->{'Class'}
-                ));
+                    if (!count($api->getErrors())) {
+                        $classData = $api->getResult()->data[0];
 
-                if (!count($api->getErrors())) {
-                    $classData = $api->getResult()->data[0];
+                        // TODO: No campus for class?
 
-                    // TODO: No campus for class?
+                        $class[] = array(
+                            'code' => $classData->{'Class'},
+                            'name' => $classData->{'Subject Name'},
+                            'classType' => 'Academic',
+                            'campusCode' => ''
+                        );
+                    }
+                }
+            }
+        }
+        else if ($this->getGroupHandler()->isStaff($userId)) {
+            $api = new External_Denbigh2_Api('TimetableLessons',
+                array(
+                    'Teacher Code' => $externalUserId
+                ),
+                array(
+                    'RFMmax' => 0
+                )
+            );
 
-                    $class[] = array(
-                        'code' => $classData->{'Class'},
-                        'name' => $classData->{'Subject Name'},
+            /* Calling userMapper->findById() for user 689 causes Avondale
+             * to time out with Error code: ERR_EMPTY_RESPONSE
+             *
+             * This is needed to get the campusCode
+             */
+            if (!count($api->getErrors())) {
+                $stack = array();
+
+                $allClasses = $api->getResult()->data;
+
+                foreach ($allClasses as $currentClass) {
+
+                    /* Awesome uniquify
+                     */
+                    $stack[$currentClass->{'Class'}] = array(
+                        'code' => $currentClass->{'Class'},
+                        'name' => $currentClass->{'Subject Name'},
                         'classType' => 'Academic',
                         'campusCode' => ''
                     );
                 }
+
+                $class = array_values($stack);
             }
         }
 
@@ -997,5 +1048,28 @@ class External_Denbigh2_User implements External_UserInterface
     public function getHousemasterByHouseId($houseID)
     {
         // TODO: Implement getHousemasterByHouseId() method.
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Set group handler
+     *
+     * @param \Group $groupHandler
+     */
+    private function setGroupHandler($groupHandler)
+    {
+        $this->groupHandler = $groupHandler;
+    }
+
+    /**
+     * Get group handler
+     *
+     * @return \Group
+     */
+    private function getGroupHandler()
+    {
+        return $this->groupHandler;
     }
 }
