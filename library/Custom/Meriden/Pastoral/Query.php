@@ -509,7 +509,6 @@ class Query
      */
     public function getSubject($subjectCode)
     {
-        list($year, $code, $class) = explode('-', $subjectCode);
         $query = "
             SELECT
                 st.sub_desc,
@@ -520,7 +519,7 @@ class Query
             WHERE so.sub_code = :code
         ";
         $params = array(
-            ':code' => $this->getDatabase()->smartQuote($code),
+            ':code' => $this->getDatabase()->smartQuote($subjectCode),
         );
         return $this->getDatabase()->trimRow(
             $this->getDatabase()->getRow(strtr($query, $params))

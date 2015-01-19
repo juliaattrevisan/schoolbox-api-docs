@@ -80,8 +80,9 @@ class Controller extends Base
             );
         } else {
             // Only required for the subject page
+            list(, $code, $class) = explode('-', $subjectCode);
             $subjectReport = array(
-                'subject' => $this->getDatabase()->getSubject($subjectCode),
+                'subject' => $this->getDatabase()->getSubject($code),
             );
         }
 
