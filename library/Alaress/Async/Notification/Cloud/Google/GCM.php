@@ -10,7 +10,10 @@
 namespace Alaress\Async\Notification\Cloud\Google;
 
 use Alaress\Async\Notification\Cloud\ServiceInterface;
+use Guzzle\Http\Client;
+use OutOfBoundsException;
 use OverflowException;
+use RangeException;
 
 
 /**
@@ -22,6 +25,10 @@ use OverflowException;
  */
 class GCM implements ServiceInterface
 {
+
+    const GCM_API_URI = 'https://android.googleapis.com/gcm/send';
+    const MAX_PAYLOAD = 4096;
+    const MAX_TOKENS  = 1000;
 
     /** @var string */
     protected $apiKey;
@@ -46,98 +53,54 @@ class GCM implements ServiceInterface
 
 
     /**
-     * @param array $tokens
+     * @param array $registrationIds
      * @param array $data
-     * @throws OverflowException
-     * @return bool
+     * @throws OverflowException     if the intended payload would be too large
+     * @throws OutOfBoundsException  if the GCM API key is invalid
+     * @throws RangeException        if GCM needs us to back off
+     * @return void
      */
-    public function send(array $tokens, array $data)
+    public function send(array $registrationIds, array $data)
     {
-        // ensure payload does not exceed 4KB
-        if (strlen(json_encode($data)) > 4096) {
-            throw new OverflowException("Maximum data size is 4KB.");
-        }
-
-        // break into multiple requests if too many for a single pass
-        foreach (array_chunk($tokens, 1000, false) as $chunk) {
-
-            $response = $this->cUrl(array(
-                'registration_ids' => $chunk,
-                'data'             => $data
-            ));
-
-            switch ($response['code'][0]) {
-                case '2': // success
-
-                    $data = json_decode($response['body'], true);
-
-                    if ($data['failure'] + $data['canonical_ids'] == 0) {
-                        // nothing more need be don here. onto the next request
-                        continue;
-                    }
-
-                    foreach ($data['results'] as $i => $detail) {
-                        if (isset($detail['message_id'])) {
-                            if (isset($detail['registration_id'])) {
-                                // you need to update your tokens
-                                $tokens[$i] = $detail['registration_id'];
-                                // TODO get this into the database
-                            }
-                        }
-                    }
-
-                case '4': // our fault
-                case '5': // el goog's fault
-            }
-
-        }
-    }
-
-
-    /**
-     * @return resource
-     */
-    protected function cUrl($data)
-    {
-        $apiUri  = 'https://android.googleapis.com/gcm/send';
+        $apiUri  = self::GCM_API_URI;
         $headers = array(
             "Authorization: key=$this->apiKey",
             'Content-Type: application/json'
         );
 
-        $ch = curl_init($apiUri); // TODO proxify this
-
-        curl_setopt_array($ch, array(
-            CURLOPT_POST           => true,
-            CURLOPT_HTTPHEADER     => $headers,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HEADER         => true,
-            CURLOPT_POSTFIELDS     => json_encode($data),
-        ));
-
-        $response = curl_exec($ch);
-
-        curl_close($ch);
-
-        list($headers, $body) = explode("\n\n", $response, 2);
-
-        $output = array(
-            'status' => '',
-            'headers' => array(),
-            'body' => $body
-        );
-
-        foreach (explode("\n", $headers) as $line) {
-            if (strpos($line, 'HTTP/1.') === 0) {
-                $output['status'] = substr($line, 9, 3);
-                continue;
-            }
-
-            $header = explode(": ", $line);
-            $output['headers'][$header[0]] = $header[1];
+        // ensure payload does not exceed 4KB
+        if (strlen(json_encode($data)) > self::MAX_PAYLOAD) {
+            throw new OverflowException("Maximum payload size is " . self::MAX_PAYLOAD);
         }
 
-        return $output;
+        $client   = new Client();
+//        $response = new Response();
+
+        // break into multiple requests if too many for a single pass
+        foreach (array_chunk($registrationIds, self::MAX_TOKENS, false) as $chunk) {
+            $payload = json_encode(array(
+                'registration_ids' => $chunk,
+                'data'             => $data
+            ));
+
+            $rq = $client->post($apiUri, $headers, $payload);
+
+            try {
+//                $response->append($registrationIds, $rq->send());
+                $rq->send();
+
+            } catch (OutOfBoundsException $e) {
+                if ($e->getCode() == 401) {
+                    // your API key is bad: don't try to do anything else
+                    throw $e;
+                }
+                // TODO log $e as a non-fatal error
+                echo $e;
+            }
+            // range exception not caught here
+        }
+
+//        return $response;
     }
 
 } 
