@@ -32,47 +32,10 @@ class Controller extends Base
      */
     public function index($year, User $student)
     {
-        $attendance = $this->getDatabase()->getAllAttendances($year, $student);
-        $activities = $this->getDatabase()->getAllActivities($year, $student);
-        $tutors     = $this->getDatabase()->getAllTutors($year, $student);
-        $yearLevels = $this->getDatabase()->getAllYearLevelGroups($student);
-        $subjects   = $this->getDatabase()->augmentSubjectsWithTeacher(
-            $this->getDatabase()->getAllSubjectsForYear($year, $student)
-        );
-
-        // Check previous and next year, disable if no year level group exists
-        $previousYear = false;
-        $nextYear     = false;
-        foreach ($yearLevels as $level) {
-            $yearLevel = $level['yr_study'];
-            if ($yearLevel == ($year-1)) {
-                $previousYear = $yearLevel;
-            }
-            if ($yearLevel == ($year+1)) {
-                $nextYear = $yearLevel;
-            }
-        }
-
         $this->getResponse()->content->set(
             array(
                 'template' => '@customMeridenPastoral/index.twig',
-                'data'     => array(
-                    'report' => array(
-                        'year'     => array(
-                            'current'  => $year,
-                            'previous' => $previousYear,
-                            'next'     => $nextYear,
-                            'levels'   => $yearLevels,
-                            'subjects' => $subjects,
-                        ),
-                        'student'  => $student,
-                        'studentExternal' => array(
-                            'attendance' => $attendance,
-                            'activities' => $activities,
-                            'tutors'     => $tutors,
-                        ),
-                    )
-                ),
+                'data'     => $this->buildReportData($year, $student),
             )
         );
     }
@@ -90,7 +53,63 @@ class Controller extends Base
         $this->getResponse()->content->set(
             array(
                 'template' => '@customMeridenPastoral/subject.twig',
-                'data'     => array(),
+                'data'     => $this->buildReportData($year, $student, $subject),
+            )
+        );
+    }
+
+    /**
+     * Builds data for the report for this student for this year, with an
+     * optional subject to drill down into.
+     *
+     * @param int    $year
+     * @param User   $student
+     * @param string $subject
+     *
+     * @return array
+     */
+    protected function buildReportData($year, User $student, $subject = null)
+    {
+        // Only required for the eReport
+        $attendance = $this->getDatabase()->getAllAttendances($year, $student);
+        $activities = $this->getDatabase()->getAllActivities($year, $student);
+        $tutors     = $this->getDatabase()->getAllTutors($year, $student);
+
+        // Only required for the subject page
+
+        // Used in all reports, for the subject/year selector
+        $yearLevels = $this->getDatabase()->getAllYearLevelGroups($student);
+        $subjects   = $this->getDatabase()->augmentSubjectsWithTeacher(
+            $this->getDatabase()->getAllSubjectsForYear($year, $student)
+        );
+
+        // Check previous and next year, disable if no year level group exists
+        $previousYear = false;
+        $nextYear     = false;
+        foreach ($yearLevels as $level) {
+            $yearLevel = $level['yr_study'];
+            if ($yearLevel == ($year-1)) {
+                $previousYear = $yearLevel;
+            }
+            if ($yearLevel == ($year+1)) {
+                $nextYear = $yearLevel;
+            }
+        }
+        return array(
+            'report' => array(
+                'year'     => array(
+                    'current'  => $year,
+                    'previous' => $previousYear,
+                    'next'     => $nextYear,
+                    'levels'   => $yearLevels,
+                    'subjects' => $subjects,
+                ),
+                'student'  => $student,
+                'studentExternal' => array(
+                    'attendance' => $attendance,
+                    'activities' => $activities,
+                    'tutors'     => $tutors,
+                ),
             )
         );
     }
