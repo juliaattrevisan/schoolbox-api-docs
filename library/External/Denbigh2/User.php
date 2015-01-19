@@ -525,17 +525,17 @@ class External_Denbigh2_User implements External_UserInterface
             ));
 
             if (!count($api->getErrors())) {
-                $family = $api->getResult()->data;
+                $family = $api->getResult()->data[0];
 
                 $parent = array(
-                    ID,
-                    Title,
-                    Preferred,
-                    Surname,
-                    Email,
-                    OccupEmail,
-                    DefaultEmailCode,
-                    DirectoryIncludeFlag
+                    'ID' => $family->{'Father Community ID'},
+                    'Title' => $family->{'Father Title'},
+                    'Preferred' => $family->{'Father Preferred Name'},
+                    'Surname' => $family->{'Father Surname'},
+                    'Email' => $family->{'Father email'},
+                    'OccupEmail' => $family->{'Father Email Work'},
+                    'DefaultEmailCode' => '',
+                    'DirectoryIncludeFlag' => '',
                 );
             }
         }
