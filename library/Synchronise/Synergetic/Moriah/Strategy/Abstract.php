@@ -129,11 +129,10 @@ abstract class Synchronise_Synergetic_Moriah_Strategy_Abstract extends Synchroni
             case '03':
             case '04':
             case '05':
-                return self::PS;
             case '06':
+                return self::PS;
             case '07':
             case '08':
-                return self::MS;
             case '09':
             case '10':
             case '11':
