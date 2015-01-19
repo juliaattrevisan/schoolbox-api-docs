@@ -518,6 +518,26 @@ class External_Denbigh2_User implements External_UserInterface
         $parent = array();
 
         if (is_array($externalUserId)) {
+            foreach($externalUserId as $current) {
+                $api = new External_Denbigh2_Api('Family', array(
+                    'Family Code' => $current
+                ));
+
+                if (!count($api->getErrors())) {
+                    foreach ($api->getResult()->data as $family) {
+                        $parent[] = array(
+                            'ID' => $family->{'Father Community ID'},
+                            'Title' => $family->{'Father Title'},
+                            'Preferred' => $family->{'Father Preferred Name'},
+                            'Surname' => $family->{'Father Surname'},
+                            'Email' => $family->{'Father email'},
+                            'OccupEmail' => $family->{'Father Email Work'},
+                            'DefaultEmailCode' => '',
+                            'DirectoryIncludeFlag' => '',
+                        );
+                    }
+                }
+            }
         }
         else {
             $api = new External_Denbigh2_Api('Family', array(
