@@ -174,8 +174,25 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
      */
     public function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber)
     {
-        $api = false;
         $timetable = array();
+
+        $campusMapper = new \Schoolbox\CampusMapper();
+        $campus = $campusMapper->findById($campusId);
+        $definition = $this->getTimetableDefinition($campus->getId());
+
+        if (!$definition) {
+            return false;
+        }
+
+        // Build the timetable
+        foreach ($definition['desc'] as $x => $name) {
+            $timetable[$x]['periodName']     = $definition['desc'][$x];
+            $timetable[$x]['periodStart']    = $definition['start'][$x];
+            $timetable[$x]['periodEnd']      = $definition['end'][$x];
+            $timetable[$x]['periodNumber']   = $definition['number'][$x];
+            $timetable[$x]['periodSequence'] = $definition['sequence'][$x];
+            $timetable[$x]['class']          = array();
+        }
 
         /* Api connect
          */
@@ -183,33 +200,8 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
             $api = new External_Denbigh2_Api('StudentTimetable', array(
                 'Student ID' => $externalUserId
             ));
-        }
-        elseif ($this->getGroupHandler()->isStaff($userId)) {
-            $api = new External_Denbigh2_Api('StaffTimetable', array(
-                'Staff Code' => $externalUserId
-            ));
-        }
-
-        if ($api !== false) {
-            $campusMapper = new \Schoolbox\CampusMapper();
-            $campus = $campusMapper->findById($campusId);
-            $definition = $this->getTimetableDefinition($campus->getId());
-
-            if (!$definition) {
-                return false;
-            }
 
             if (!count($api->getErrors())) {
-
-                // Build the timetable
-                foreach ($definition['desc'] as $x => $name) {
-                    $timetable[$x]['periodName']     = $definition['desc'][$x];
-                    $timetable[$x]['periodStart']    = $definition['start'][$x];
-                    $timetable[$x]['periodEnd']      = $definition['end'][$x];
-                    $timetable[$x]['periodNumber']   = $definition['number'][$x];
-                    $timetable[$x]['periodSequence'] = $definition['sequence'][$x];
-                    $timetable[$x]['class']          = array();
-                }
 
                 /* Data collectors
                  */
@@ -243,6 +235,55 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
                                     'code' => $currentPeriod->{'ClassCode'},
                                     'room' => $currentPeriod->{'Room'},
                                     'staffID' => $currentPeriod->{'TeacherCode'},
+                                    'staffTitle' => '',
+                                    'staffFirstname' => $currentPeriod->{'Teacher'},
+                                    'staffSurname' => '',
+                                )
+                            )
+                        );
+                    }
+                }
+            }
+        }
+        elseif ($this->getGroupHandler()->isStaff($userId)) {
+            $api = new External_Denbigh2_Api('TimetableLessons',
+                array(
+                    'Teacher Code' => $externalUserId
+                ),
+                array(
+                    'RFMmax' => 0
+                )
+            );
+
+            if (!count($api->getErrors())) {
+                $allPeriods = $api->getResult()->data;
+
+                /* Assemble into a 2D array
+                 * Each row represents a Period across each Day in the cycle
+                 *
+                 * [Period1 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                 * [Period2 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                 * [Period3 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                 * [PeriodN [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                 * ...
+                 */
+                foreach($allPeriods as $currentPeriod) {
+                    if (!$dayNumber || $currentPeriod->{'Day'} == $dayNumber) {
+                        $periodName = "Period {$currentPeriod->{'Period'}}";
+                        $periodNumber = $currentPeriod->{'Period'};
+
+                        $timetable[$periodNumber-1] = array(
+                            'periodName' => $periodName,
+                            'periodStart' =>  $definition['start'][$periodNumber-1],
+                            'periodEnd' => $definition['end'][$periodNumber-1],
+                            'periodNumber' => $periodNumber,
+                            'periodSequence' => 1,
+                            'class' => array(
+                                array(
+                                    'description' => $currentPeriod->{'Description for Staff TT'},
+                                    'code' => $currentPeriod->{'Class'},
+                                    'room' => "Room {$currentPeriod->{'Room'}}",
+                                    'staffID' => $currentPeriod->{'Teacher Code'},
                                     'staffTitle' => '',
                                     'staffFirstname' => $currentPeriod->{'Teacher'},
                                     'staffSurname' => '',
