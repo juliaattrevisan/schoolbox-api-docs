@@ -29,37 +29,7 @@
 
 <div id="context">
     {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
-
-    {# Selector - like the grades selector, but displays only years #}
-    <div id="enrolment">
-        <form id="semesters">
-            <a class="sem-back"
-               {% if not report.year.previous %}disabled{% endif %}
-               href="{{ routeLookup('customMeridenPastoral.index', {year: report.year.current-1, id: report.student.id}) }}">&lsaquo;</a>
-            <select id="semester">
-                {% for year in report.year.levels %}
-                <option value="{{ routeLookup('customMeridenPastoral.index', {year: year.yr_study, id: report.student.id}) }}"
-                        label="{{ year.yr_study }} eReport"
-                        {% if year.yr_study == report.year.current %}selected{% endif %}
-                        >{{ year.yr_study }} eReport</option>
-                {% endfor %}
-            </select>
-            <a class="sem-fwd"
-               {% if not report.year.next %}disabled{% endif %}
-               href="{{ routeLookup('customMeridenPastoral.index', {year: report.year.current+1, id: report.student.id}) }}">&rsaquo;</a>
-        </form>
-        <form id="subjects" method="get">
-            <span class="elbow">&#9492;</span>
-            <select id="enrolled-subjects">
-                <option disabled="disabled" selected="selected">Select a subject</option>
-                {% for subject in report.year.subjects %}
-                <option value="{{ routeLookup('customMeridenPastoral.subject', {year: report.year.current, id: report.student.id, subjectCode: subject.code}) }}"
-                        label="{{ subject.sub_desc }} ({{ subject.code }})"
-                        >{{ subject.sub_desc }} ({{ subject.code }})</option>
-                {% endfor %}
-            </select>
-        </form>
-    </div>
+    {% include '@customMeridenPastoral/sub/selector.twig' with {year: report.year, student: report.student} %}
 </div>
 
 {# Table of contents #}
