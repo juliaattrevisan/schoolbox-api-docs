@@ -438,7 +438,39 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getParent($externalUserId)
     {
-        // TODO: No way to uniquely identify parents?
+        $parent = array();
+
+        $api = new External_Denbigh2_Api('Family', array(
+            'Family Code' => $externalUserId
+        ));
+
+        if (!count($api->getErrors())) {
+            $family = $api->getResult()->data[0];
+
+            $parent = array(
+                'Title' => $family->{'Father Title'},
+                'Preferred' => $family->{'Father Preferred Name'},
+                'Surname' => $family->{'Father Surname'},
+                'Email' => $family->{'Father email'},
+                'OccupEmail' => $family->{'Father Email Work'},
+                'DefaultEmailCode' => '',
+                'HomePhone' => $family->{'Father Phone'},
+                'SilentPhoneFlag' => '',
+                'MobilePhone' => $family->{'Father Mobile'},
+                'DirectoryIncludeFlag' => '',
+                'SpouseID' => $family->{'Mother Community ID'},
+                'SpouseTitle' => $family->{'Mother Title'},
+                'SpousePreferred' => $family->{'Mother Preferred Name'},
+                'SpouseSurname' => $family->{'Mother Surname'},
+                'SpouseEmail' => $family->{'Mother Email'},
+                'SpouseOccupEmail' => $family->{'Mother Email Work'},
+                'SpouseDefaultEmailCode' => '',
+                'SpouseMobilePhone' => $family->{'Mother Mobile'},
+                'SpouseDirectoryIncludeFlag' => '',
+            );
+        }
+
+        return $parent;
     }
 
     /**
