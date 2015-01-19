@@ -601,18 +601,22 @@ class External_Denbigh2_User implements External_UserInterface
      * @return array(
      *     array(
      *         StaffID,
-     *         NetworkLogin,
-     *         ActiveFlag,
+     *         SchoolStaffCode,
      *         StaffTitle,
      *         StaffPreferredName,
      *         StaffSurname,
-     *         DefaultEmailCode,
-     *         OccupEmail,
-     *         Email,
-     *         StaffCampus,
-     *         StaffCategoryType,
+     *         StaffOccupPhone,
+     *         StaffOccupEmail,
+     *         StaffExtension,
+     *         StaffCampusDescription,
      *         StaffCategory,
-     *         StaffDepartment
+     *         StaffCategoryType,
+     *         StaffDefaultMobilePhone,
+     *         StaffVoiceMail,
+     *         StaffDepartmentDescription,
+     *         JobPositionDescription,
+     *         StaffJobPositionStartDate,
+     *         StaffJobPositionEndDate
      *     )
      * )
      */
@@ -625,15 +629,23 @@ class External_Denbigh2_User implements External_UserInterface
         if (!count($api->getErrors())) {
             foreach($api->getResult()->data as $currentStaff) {
                 $staff[] = array(
-                    'SchoolStaffCode' => $currentStaff->{'Staff Code'},
-                    'StaffBuilding' => '',
-                    'StaffRoom' => '',
+                    'StaffID' => $currentStaff->{'Staff Code'},
+                    'SchoolStaffCode' => '',
+                    'StaffTitle' => $currentStaff->{'Staff Title'},
+                    'StaffPreferredName' => $currentStaff->{'First Name'},
+                    'StaffSurname' => $currentStaff->{'Surname'},
+                    'StaffOccupPhone' => $currentStaff->{'Telephone'},
+                    'StaffOccupEmail' => $currentStaff->{'Email Address'},
                     'StaffExtension' => $currentStaff->{'Telephone Extension'},
-                    'StaffMobilePhone' => '',
                     'StaffCampusDescription' => $currentStaff->{'Campus'},
-                    'StaffCategoryDescription' => '',
-                    'StaffDepartment' => '',
+                    'StaffCategory' => '',
+                    'StaffCategoryType' => '',
+                    'StaffDefaultMobilePhone' => '',
                     'StaffVoiceMail' => '',
+                    'StaffDepartmentDescription' => '',
+                    'JobPositionDescription' => '',
+                    'StaffJobPositionStartDate' => '',
+                    'StaffJobPositionEndDate' => '',
                 );
             }
         }
