@@ -572,17 +572,7 @@ class External_Denbigh2_User implements External_UserInterface
      *
      * Used in Synchronise
      *
-     * @return array
-     */
-    public function getStaffUserAccountInfo()
-    {
-        // TODO: Implement getStaffUserAccountInfo() method.
-    }
-
-    /**
-     * Get contact list for staff directory
-     *
-     * return array(
+     * @return array(
      *     array(
      *         StaffID,
      *         NetworkLogin,
@@ -599,8 +589,32 @@ class External_Denbigh2_User implements External_UserInterface
      *         StaffDepartment
      *     )
      * )
+     */
+    public function getStaffUserAccountInfo()
+    {
+        // TODO: Implement getStaffUserAccountInfo() method.
+    }
+
+    /**
+     * Get contact list for staff directory
      *
-     * @return array
+     * @return array(
+     *     array(
+     *         StaffID,
+     *         NetworkLogin,
+     *         ActiveFlag,
+     *         StaffTitle,
+     *         StaffPreferredName,
+     *         StaffSurname,
+     *         DefaultEmailCode,
+     *         OccupEmail,
+     *         Email,
+     *         StaffCampus,
+     *         StaffCategoryType,
+     *         StaffCategory,
+     *         StaffDepartment
+     *     )
+     * )
      */
     public function getStaffContactListExtended()
     {

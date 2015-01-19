@@ -280,7 +280,23 @@ interface External_UserInterface {
      *
      * Used in Synchronise
      *
-     * @return array
+     * @return array(
+     *     array(
+     *         StaffID,
+     *         NetworkLogin,
+     *         ActiveFlag,
+     *         StaffTitle,
+     *         StaffPreferredName,
+     *         StaffSurname,
+     *         DefaultEmailCode,
+     *         OccupEmail,
+     *         Email,
+     *         StaffCampus,
+     *         StaffCategoryType,
+     *         StaffCategory,
+     *         StaffDepartment
+     *     )
+     * )
      */
     public function getStaffUserAccountInfo();
 
