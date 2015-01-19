@@ -399,7 +399,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
                      */
                     if ($dayNumber <= $campus->getTimetableDay()) {
                         $timetable[$periodIndex]['day'][$dayIndex][] = array(
-                            'description' => $currentPeriod->{'Period Name'},
+                            'description' => $currentPeriod->{'ClassCode'},
                             'code' => $currentPeriod->{'ClassCode'},
                             'campus' => $campus->getName(),
                             'room' => "Room {$currentPeriod->{'Room'}}",
