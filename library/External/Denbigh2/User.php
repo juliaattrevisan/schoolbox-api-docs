@@ -791,7 +791,9 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getCurrentSemester($externalUserId = null)
     {
-        // TODO: Implement getCurrentSemester() method.
+        /* Apparently denbigh has no concept of semesters
+         */
+        return 1;
     }
 
     /**
