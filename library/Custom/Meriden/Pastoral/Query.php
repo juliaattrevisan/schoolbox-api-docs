@@ -449,9 +449,16 @@ class Query
         );
 
         // Add class code
+        // year level is the student's year level at the time they took class,
+        // not the year in which they took it.
         $result = array_map(
             function($row) {
-                $row['code'] = sprintf('%s-%s-%s', $row['yr_study'], $row['sub_code'], $row['class']);
+                $row['code'] = sprintf(
+                    '%s-%s-%s',
+                    $row['yr_study'],
+                    $row['sub_code'],
+                    $row['class']
+                );
                 return $row;
             },
             $result
