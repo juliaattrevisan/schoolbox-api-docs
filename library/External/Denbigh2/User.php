@@ -582,11 +582,49 @@ class External_Denbigh2_User implements External_UserInterface
     /**
      * Get contact list for staff directory
      *
+     * return array(
+     *     array(
+     *         StaffID,
+     *         NetworkLogin,
+     *         ActiveFlag,
+     *         StaffTitle,
+     *         StaffPreferredName,
+     *         StaffSurname,
+     *         DefaultEmailCode,
+     *         OccupEmail,
+     *         Email,
+     *         StaffCampus,
+     *         StaffCategoryType,
+     *         StaffCategory,
+     *         StaffDepartment
+     *     )
+     * )
+     *
      * @return array
      */
     public function getStaffContactListExtended()
     {
-        // TODO: Implement getStaffContactListExtended() method.
+        $staff = array();
+
+        $api = new External_Denbigh2_Api('Staff', array());
+
+        if (!count($api->getErrors())) {
+            $currentStaff = $api->getResult()->data[0];
+
+            $staff = array(
+                'SchoolStaffCode' => $currentStaff->{'Staff Code'},
+                'StaffBuilding' => '',
+                'StaffRoom' => '',
+                'StaffExtension' => $currentStaff->{'Telephone Extension'},
+                'StaffMobilePhone' => '',
+                'StaffCampusDescription' => $currentStaff->{'Campus'},
+                'StaffCategoryDescription' => '',
+                'StaffDepartment' => '',
+                'StaffVoiceMail' => '',
+            );
+        }
+
+        return $staff;
     }
 
     /**

@@ -290,6 +290,24 @@ interface External_UserInterface {
     /**
      * Get contact list for staff directory
      *
+     * return array(
+     *     array(
+     *         StaffID,
+     *         NetworkLogin,
+     *         ActiveFlag,
+     *         StaffTitle,
+     *         StaffPreferredName,
+     *         StaffSurname,
+     *         DefaultEmailCode,
+     *         OccupEmail,
+     *         Email,
+     *         StaffCampus,
+     *         StaffCategoryType,
+     *         StaffCategory,
+     *         StaffDepartment
+     *     )
+     * )
+     *
      * @return array
      */
     public function getStaffContactListExtended();
