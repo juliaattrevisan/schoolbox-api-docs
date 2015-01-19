@@ -1004,7 +1004,7 @@ class External_Denbigh2_User implements External_UserInterface
                  * Separate the queries out, fetching the photo data only if it's newer than the cached
                  * version, or if the cache version doesn't already exist.
                  */
-                $cacheTime    = @filemtime($photoPath);
+                $cacheTime = @filemtime($photoPath);
 
                 /* Denbigh didn't provide a modified date
                  * $modifiedTime = strtotime($photo['ModifiedDate']);
