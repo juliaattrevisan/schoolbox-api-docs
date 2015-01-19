@@ -1,0 +1,8 @@
+{# Student's portrait - exactly the same as /submission/allWork/{{ student.id }} #}
+<div id="student">
+    <a class="bar large button" href="/search/user/{{ student.id }}">
+        <img src="/portrait.php?userId={{ student.externalId }}&amp;size=square64">
+        <span class="name">{{ student.formatName }}</span>
+        <span class="group">Year {{ student.year }} Student</span>
+    </a>
+</div>

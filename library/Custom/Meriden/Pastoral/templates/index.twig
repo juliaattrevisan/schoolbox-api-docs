@@ -28,14 +28,7 @@
 <h1>School Report - {{ report.year.current }}</h1>
 
 <div id="context">
-    {# Student's portrait - exactly the same as /submission/allWork/{{ report.student.id }} #}
-    <div id="student">
-        <a class="bar large button" href="/search/user/{{ report.student.id }}">
-            <img src="/portrait.php?userId={{ report.student.externalId }}&amp;size=square64">
-            <span class="name">{{ report.student.formatName }}</span>
-            <span class="group">Year {{ report.student.year }} Student</span>
-        </a>
-    </div>
+    {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
 
     {# Selector - like the grades selector, but displays only years #}
     <div id="enrolment">
