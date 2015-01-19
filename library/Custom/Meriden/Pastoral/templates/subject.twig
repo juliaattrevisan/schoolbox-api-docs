@@ -29,7 +29,7 @@
 
 <div id="context">
     {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
-    {% include '@customMeridenPastoral/sub/selector.twig' with {year: report.year, student: report.student} %}
+    {% include '@customMeridenPastoral/sub/selector.twig' with {year: report.year, student: report.student, subject: report.subject} %}
 </div>
 
 {# Table of contents #}

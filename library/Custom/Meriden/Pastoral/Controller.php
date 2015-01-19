@@ -113,6 +113,9 @@ class Controller extends Base
                     'levels'   => $yearLevels,
                     'subjects' => $subjects,
                 ),
+                'subject' => array(
+                    'current' => $subjectCode,
+                ),
                 'student'  => $student,
                 'yearLevelReport' => $yearLevelReport,
                 'subjectReport' => $subjectReport,

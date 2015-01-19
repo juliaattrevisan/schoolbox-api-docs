@@ -20,10 +20,11 @@
         <span class="elbow">&#9492;</span>
         <select id="enrolled-subjects">
             <option disabled="disabled" selected="selected">Select a subject</option>
-            {% for subject in year.subjects %}
-                <option value="{{ routeLookup('customMeridenPastoral.subject', {year: year.current, id: student.id, subjectCode: subject.code}) }}"
-                        label="{{ subject.sub_desc }} ({{ subject.code }})"
-                        >{{ subject.sub_desc }} ({{ subject.code }})</option>
+            {% for currentSubject in year.subjects %}
+                <option value="{{ routeLookup('customMeridenPastoral.subject', {year: year.current, id: student.id, subjectCode: currentSubject.code}) }}"
+                        label="{{ currentSubject.sub_desc }} ({{ currentSubject.code }})"
+                        {% if currentSubject.code == subject.current %}selected{% endif %}
+                        >{{ currentSubject.sub_desc }} ({{ currentSubject.code }})</option>
             {% endfor %}
         </select>
     </form>
