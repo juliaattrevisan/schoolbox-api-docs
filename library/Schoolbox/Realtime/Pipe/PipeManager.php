@@ -26,6 +26,7 @@ use React\EventLoop\Timer\Timer;
 use React\EventLoop\Timer\TimerInterface;
 use React\Socket\ConnectionException;
 use React\Stomp\Client;
+use Schoolbox\MobileApp\ServiceManager;
 use Schoolbox\Notif\Queue\QueueFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\ProcessException;
@@ -55,7 +56,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	/** @var SubscriptionManager */
 	protected $subscriptionManager;
 
-    /** @var Cloud\ServiceManager */
+    /** @var ServiceManager */
     protected $cloudManager;
 
 	/** @var LoopInterface */
@@ -81,7 +82,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
      * @param SessionValidator          $sessionValidator
      * @param Client                    $stompClient
      * @param QueueFactory              $qf
-     * @param Cloud\ServiceManager      $cloudManager
+     * @param ServiceManager            $cloudManager
      * @param LoggerInterface           $log
      * @param DispatchStrategyInterface $strat
      */
@@ -90,7 +91,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
         SessionValidator $sessionValidator,
         Client $stompClient,
         QueueFactory $qf,
-        Cloud\ServiceManager $cloudManager,
+        ServiceManager $cloudManager,
         LoggerInterface $log,
         DispatchStrategyInterface $strat = null
     ) {
