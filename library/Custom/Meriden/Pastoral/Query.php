@@ -501,6 +501,32 @@ class Query
     }
 
     /**
+     * Gets the subject outlines for a given subject code.
+     *
+     * @param string $subjectCode
+     *
+     * @return array
+     */
+    public function getSubject($subjectCode)
+    {
+        $query = "
+            SELECT
+                st.sub_desc,
+                so.outline_text,
+                so.outline_url
+            FROM suboutline so
+            INNER JOIN subtab st ON so.sub_code=st.sub_code AND so.cmpy_code=st.cmpy_code
+            WHERE so.sub_code = :code
+        ";
+        $params = array(
+            ':code' => $this->getDatabase()->smartQuote($subjectCode),
+        );
+        return $this->getDatabase()->trimRow(
+            $this->getDatabase()->getRow(strtr($query, $params))
+        );
+    }
+
+    /**
      * @return MSSQL
      */
     public function getDatabase()

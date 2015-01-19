@@ -45,15 +45,14 @@ class Controller extends Base
      *
      * @param int    $year
      * @param User   $student
-     * @param string $subject
+     * @param string $subjectCode
      */
-    public function subject($year, User $student, $subject)
+    public function subject($year, User $student, $subjectCode)
     {
-
         $this->getResponse()->content->set(
             array(
                 'template' => '@customMeridenPastoral/subject.twig',
-                'data'     => $this->buildReportData($year, $student, $subject),
+                'data'     => $this->buildReportData($year, $student, $subjectCode),
             )
         );
     }
@@ -64,18 +63,27 @@ class Controller extends Base
      *
      * @param int    $year
      * @param User   $student
-     * @param string $subject
+     * @param string $subjectCode
      *
      * @return array
      */
-    protected function buildReportData($year, User $student, $subject = null)
+    protected function buildReportData($year, User $student, $subjectCode = null)
     {
-        // Only required for the eReport
-        $attendance = $this->getDatabase()->getAllAttendances($year, $student);
-        $activities = $this->getDatabase()->getAllActivities($year, $student);
-        $tutors     = $this->getDatabase()->getAllTutors($year, $student);
-
-        // Only required for the subject page
+        $yearLevelReport = array();
+        $subjectReport   = array();
+        if (!isset($subjectCode)) {
+            // Only required for the eReport
+            $yearLevelReport = array(
+                'attendance' => $this->getDatabase()->getAllAttendances($year, $student),
+                'activities' => $this->getDatabase()->getAllActivities($year, $student),
+                'tutors'     => $this->getDatabase()->getAllTutors($year, $student),
+            );
+        } else {
+            // Only required for the subject page
+            $subjectReport = array(
+                'subject' => $this->getDatabase()->getSubject($subjectCode),
+            );
+        }
 
         // Used in all reports, for the subject/year selector
         $yearLevels = $this->getDatabase()->getAllYearLevelGroups($student);
@@ -105,11 +113,8 @@ class Controller extends Base
                     'subjects' => $subjects,
                 ),
                 'student'  => $student,
-                'yearLevelReport' => array(
-                    'attendance' => $attendance,
-                    'activities' => $activities,
-                    'tutors'     => $tutors,
-                ),
+                'yearLevelReport' => $yearLevelReport,
+                'subjectReport' => $subjectReport,
             )
         );
     }
