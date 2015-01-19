@@ -10,11 +10,15 @@
 namespace Schoolbox\MobileApp;
 
 use Alaress\Async\Notification\Cloud\ServiceInterface;
+use InvalidArgumentException;
 use OutOfBoundsException;
+use OverflowException;
+use RangeException;
 
 class ServiceManager
 {
-    /** @var ServiceInterface */
+
+    /** @var ServiceInterface[] */
     protected $services = array();
 
     /** @var RegistryMapper */
@@ -42,9 +46,28 @@ class ServiceManager
      */
     public function addService(ServiceInterface $service)
     {
+        $provider = $service->getProviderName();
+
+        // can't set it more than once
+        if (array_key_exists($provider, $this->services)) {
+            throw new OverflowException("Cannot redeclare service '$provider'.");
+        }
+
         // index by provider name
-        $this->services[$service->getProviderName()] = $service;
+        $this->services[$provider] = $service;
         return $this;
+    }
+
+
+    /**
+     * You should only do this if a service cannot be used, eg. the API key in config is invalid.
+     *
+     * @param string $provider
+     */
+    protected function dropService($provider) {
+        if (array_key_exists($provider, $this->services)) {
+            $this->services[$provider] = null;
+        }
     }
 
 
@@ -58,9 +81,12 @@ class ServiceManager
 
         foreach ($registered as $provider => $registries) {
             try {
-                $this->getService($provider)->send($registries->getColumnValues('token'), $data);
+                $service = $this->getService($provider);
+                $tokens  = $registries->getColumnValues('token');
+                $this->pushToService($service, $tokens, $data);
 
-            } catch (OutOfBoundsException $e) {
+            } catch (InvalidArgumentException $e) {
+                // service not available
                 echo $e; // TODO use logger
             }
         }
@@ -68,8 +94,33 @@ class ServiceManager
 
 
     /**
+     * @param ServiceInterface $service
+     * @param array            $tokens
+     * @param array            $data
+     */
+    protected function pushToService(ServiceInterface $service, $tokens, $data)
+    {
+        $provider = $service->getProviderName();
+
+        try {
+            $service->send($tokens, $data);
+
+        } catch (OutOfBoundsException $e) {
+            // bad API key, which will require a daemon restart, so remove this service from use
+            $this->dropService($provider);
+            echo $e; // TODO use logger
+
+        } catch (RangeException $e) {
+            // TODO implement backoff-and-retry.
+            // TODO $e->getCode() will contain a Retry-After TTL (in seconds), or 0 if exponential backoff is to be implemented
+            echo $e;
+        }
+    }
+
+
+    /**
      * @param string $providerName
-     * @throws OutOfBoundsException
+     * @throws InvalidArgumentException
      * @return ServiceInterface
      */
     protected function getService($providerName)
@@ -78,7 +129,7 @@ class ServiceManager
             return $this->services[$providerName];
         }
 
-        throw new OutOfBoundsException("Provider '$providerName' not set.");
+        throw new InvalidArgumentException("Provider '$providerName' not available.");
     }
 
 }
