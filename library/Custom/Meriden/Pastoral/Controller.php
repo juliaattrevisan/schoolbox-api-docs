@@ -105,7 +105,7 @@ class Controller extends Base
                     'subjects' => $subjects,
                 ),
                 'student'  => $student,
-                'studentExternal' => array(
+                'yearLevelReport' => array(
                     'attendance' => $attendance,
                     'activities' => $activities,
                     'tutors'     => $tutors,

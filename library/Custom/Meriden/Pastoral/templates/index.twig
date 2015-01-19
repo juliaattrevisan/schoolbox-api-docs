@@ -42,35 +42,35 @@
     <dd>{{ report.student.house.name }}</dd>
 
     <dt>Year Coordinator</dt>
-    <dd>{{ report.studentExternal.coordinator.name }}</dd>
+    <dd>{{ report.yearLevelReport.coordinator.name }}</dd>
 
     <dt>Tutor</dt>
-    {% for tutor in report.studentExternal.tutors %}
+    {% for tutor in report.yearLevelReport.tutors %}
         <dd>{{ tutor.tch_name }} (Semester {{ tutor.semester }})</dd>
     {% endfor %}
 </dl>
 
 <dl id="attendance-info">
     <dt>Days Absent</dt>
-    <dd>{{ report.studentExternal.attendance.absent }}</dd>
+    <dd>{{ report.yearLevelReport.attendance.absent }}</dd>
 
     <dt>Days Late</dt>
-    <dd>{{ report.studentExternal.attendance.late }}</dd>
+    <dd>{{ report.yearLevelReport.attendance.late }}</dd>
 
     <dt>Detentions</dt>
-    <dd>{{ report.studentExternal.attendance.detentions }}</dd>
+    <dd>{{ report.yearLevelReport.attendance.detentions }}</dd>
 
     {# Don't show endorsed leave at all if there is none #}
-    {% if report.studentExternal.attendance.endorsedLeave %}
+    {% if report.yearLevelReport.attendance.endorsedLeave %}
         <dt>Endorsed Leave</dt>
-        <dd>{{ report.studentExternal.attendance.endorsedLeave }}</dd>
+        <dd>{{ report.yearLevelReport.attendance.endorsedLeave }}</dd>
     {% endif %}
 
     {##
      # Athletics, Swimming, Camp, Uniform, Pastoral Services:
      # All these are attendances, and are based off of assessments in the grade page.
      #}
-    {% for assessment in report.studentExternal.assessments %}
+    {% for assessment in report.yearLevelReport.assessments %}
         <dt>{{ assessment.name }}</dt>
         <dd>{{ assessment.grade }}</dd>
     {% endfor %}
@@ -78,22 +78,22 @@
 
 <dl id="awards-info">
     <dt>Awards and Prizes</dt>
-    {% for award in report.studentExternal.activities.awards %}
+    {% for award in report.yearLevelReport.activities.awards %}
         <dd>{{ award.act_desc }}</dd>
     {% endfor %}
 
     <dt>Co-curricular Activities</dt>
-    {% for activity in report.studentExternal.activities.cocurricular %}
+    {% for activity in report.yearLevelReport.activities.cocurricular %}
         <dd>{{ activity.act_desc }}</dd>
     {% endfor %}
 
     <dt>Community Service</dt>
-    {% for service in report.studentExternal.activities.service %}
+    {% for service in report.yearLevelReport.activities.service %}
         <dd>{{ service.act_desc }}</dd>
     {% endfor %}
 
     <dt>Positions of Office</dt>
-    {% for position in report.studentExternal.activities.positions %}
+    {% for position in report.yearLevelReport.activities.positions %}
         <dd>{{ position.act_desc }}</dd>
     {% endfor %}
 </dl>
