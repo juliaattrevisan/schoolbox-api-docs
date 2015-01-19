@@ -1,0 +1,43 @@
+<script type="text/javascript">
+    (function($){
+        $(function(){
+            // Jump menu for changing semester
+            $('#semester, #enrolled-subjects').on('change', function() {
+                window.location.href = this.value;
+            });
+        })
+    })(jQuery);
+</script>
+
+<style type="text/css">
+    /* TODO remove inline styles */
+    #meriden-crest {
+        text-align: center;
+    }
+    #house-info dt {
+
+    }
+    #house-info dd {
+
+    }
+    .teacher-profile.no-email {
+        margin-right: 0;
+    }
+</style>
+
+<h1>{{ report.subjectReport.subject.sub_desc }}</h1>
+
+<div id="context">
+    {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
+    {% include '@customMeridenPastoral/sub/selector.twig' with {year: report.year, student: report.student} %}
+</div>
+
+{# Table of contents #}
+<div id="meriden-crest">
+    <img src="/images/meriden/crest.png" />
+</div>
+
+{# course description #}
+<p>
+{{ report.subjectReport.subject.outline_text }}
+</p>
