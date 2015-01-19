@@ -87,7 +87,7 @@ $kernel->run(
            if ($conf->get('push_notifications_enabled')) {
                $services = array(
                    new Cloud\Google\GCM($conf->get('push_gcm_api_key')),
-                   new Cloud\Apple\APNS()
+                   new Cloud\Apple\APNS(ZendService\Apple\Apns\Client\Message::SANDBOX_URI, $conf->get('push_apns_cert_path'), $conf->get('push_apns_cert_key') ?: null)
                );
            } else {
                $services = array();
