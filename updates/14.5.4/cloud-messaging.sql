@@ -10,7 +10,12 @@ VALUES (
   (SELECT ct.id FROM lu_config_type ct WHERE ct.type LIKE 'modules'),
   'false', 'true', 'false'
 ), (
-  'push_apns_api_key', '', 'Apply Push Notification Service API Key', '',
+  'push_apns_cert_path', '', 'Apple Push Notification Service Certificate Path', '',
+  (SELECT cf.id FROM lu_config_field cf WHERE cf.field = 'input'), '',
+  (SELECT ct.id FROM lu_config_type ct WHERE ct.type LIKE 'modules'),
+  'false', 'true', 'false'
+), (
+  'push_apns_cert_key', '', 'Apple Push Notification Service Certificate Key', '',
   (SELECT cf.id FROM lu_config_field cf WHERE cf.field = 'input'), '',
   (SELECT ct.id FROM lu_config_type ct WHERE ct.type LIKE 'modules'),
   'false', 'true', 'false'
