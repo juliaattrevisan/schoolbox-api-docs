@@ -56,7 +56,10 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
         $categoryList     = array();
         $currentTimestamp = $startTimestamp;
         $dayNumberList    = array();
+        $utcTimezone      = new DateTimeZone('UTC');
         while ($currentTimestamp < $endTimestamp) {
+            $currentTime = new DateTime();
+            $currentTime->setTimestamp($currentTimestamp)->setTimezone($utcTimezone);
             // Get the definition for this day only.
             foreach ($roomTimetable as $room) {
                 // What's the day number for the campus that has booked this room?
@@ -91,16 +94,14 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                 }
 
                 // Does this event overlap timespan $startTimestamp to $endTimestamp?
-                $currentDay = date('Y-m-d', $currentTimestamp);
-                $classStart = date('H:i:s', strtotime($room['PeriodStart'], $currentTimestamp));
-                $classEnd   = date('H:i:s', strtotime($room['PeriodEnd'], $currentTimestamp));
-                $classStart = strtotime($currentDay . ' ' . $classStart);
-                $classEnd   = strtotime($currentDay . ' ' . $classEnd);
-
-                if ($classEnd < $startTimestamp) {
+                $classStartTime = clone $currentTime;
+                $classEndTime   = clone $currentTime;
+                $classStartTime->modify($room['PeriodStart']);
+                $classEndTime->modify($room['PeriodEnd']);
+                if ($classEndTime->getTimestamp() < $startTimestamp) {
                     continue;
                 }
-                if ($classStart > $endTimestamp) {
+                if ($classStartTime->getTimestamp() > $endTimestamp) {
                     continue;
                 }
 
@@ -110,8 +111,8 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                 $event->setType(Calendar_Event_Type_Day::CAMPUS_ACCESS);
                 $event->setAllday(false);
                 $event->setLocation($this->roomCode);
-                $event->setStartTime(new Alaress_Date_Format($classStart, 'U'));
-                $event->setEndTime(new Alaress_Date_Format($classEnd, 'U'));
+                $event->setStartTime(new Alaress_Date_Format($classStartTime));
+                $event->setEndTime(new Alaress_Date_Format($classEndTime));
                 // Let's say the event doesn't have a publish date,
                 // this gets around issue SB-5493 (where events that haven't
                 // occured yet only show to superusers)
