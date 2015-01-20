@@ -87,7 +87,7 @@
 $(function() {
 	$('#addNewRow').click(function() {
 		var newRow = $('#newData').find('tr').clone();
-		$('#tableData').find('tbody').append(newRow);
+		$('#tableData').find('tbody').append(newRow).find('input[name="name[]"]').last().focus();
 		return false;
 	});
 });
