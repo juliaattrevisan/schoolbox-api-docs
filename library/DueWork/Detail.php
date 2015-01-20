@@ -220,12 +220,12 @@ class DueWork_Detail
             // Reset the contents of the submission row block, so that each student starts with a fresh row
             // (without the previous student's rows)
             $page->setVar('submission_row_block', '');
+
             if (count($record['submissions'])) {
                 $returnTime = new Alaress_Date_Format($record['return']['returned'], 'Y-m-d H:i:s');
                 
                 foreach ($record['submissions'] as $submission) {
-                    $submitTime = new Alaress_Date_Format($submission['datestamp'], 'Y-m-d H:i');
-
+                    $submitTime = new Alaress_Date_Format($submission['datestamp'], 'Y-m-d H:i:s');
 
                     if ($submitTime->getUnixTimestamp() > $returnTime->getUnixTimestamp() && $returnTime->getUnixTimestamp() > 0) {
                         $afterMark = '<span class="alert"></span>';
@@ -327,6 +327,12 @@ class DueWork_Detail
                     $page->parse('submission_row_block', 'submission_row', true);
                 }
             }
+            else {
+                $page->setVar(array(
+                    'SUBMISSION_AFTER_MARK' => ''
+                ));
+            }
+
             $page->parse('student_row_block', 'student_row', true);
         }
 
