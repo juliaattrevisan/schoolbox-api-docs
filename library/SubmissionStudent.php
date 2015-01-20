@@ -78,7 +78,7 @@ class SubmissionStudent extends DeprecatedModel
 
         $query = "SELECT student_submission.id, user.title, user.firstname, user.lastname, user.id AS uid, username,
                          local_email, alt_email, DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date,
-                         DATE_FORMAT(submitted, '%Y-%m-%d %H:%i') as datestamp, realname, late, marked,
+                         DATE_FORMAT(submitted, '%Y-%m-%d %H:%i:%s') as datestamp, realname, late, marked,
                          (student_submission.body IS NOT NULL) AS is_online_submission,
                          user.synergy_id as synergy_id, pd.score, pd.status plag_status, pd.plagscan_id plag_doc_id,
                          pd.deleted plag_deleted

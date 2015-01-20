@@ -51,7 +51,15 @@
 
 						<div>
 							<a href="/search/user/{OWNER_ID}">{OWNER_NAME}</a>
-							<div class="student-status {OWNER_CLASS}" title="{OWNER_TIME}">{OWNER_STATUS}</div>
+
+							<div class="student-status {OWNER_CLASS}" >
+                                <span title="{OWNER_TIME}">{OWNER_STATUS}</span><br />
+
+                                <!-- BEGIN submission_after_mark -->
+                                <span class="alert" title="Work has been resubmitted after grading"></span>
+                                <!-- END submission_after_mark -->
+                            </div>
+
 							<!-- BEGIN submission_row -->
 							<!-- BEGIN plag_enabled -->
 							<!-- END plag_enabled -->
