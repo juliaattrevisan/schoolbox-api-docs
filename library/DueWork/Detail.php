@@ -150,6 +150,7 @@ class DueWork_Detail
 
         $page->setBlock(TEMPLATE_content, 'student_row', 'student_row_block');
         $page->setBlock('student_row', 'submission_row', 'submission_row_block');
+        $page->setBlock('student_row', 'submission_after_mark', 'submission_after_mark_block');
         $page->setBlock(TEMPLATE_content, 'download_btn', 'download_btn_block');
         $page->setBlock(TEMPLATE_content, 'modify_btn', 'modify_btn_block');
 
@@ -228,10 +229,12 @@ class DueWork_Detail
                     $submitTime = new Alaress_Date_Format($submission['datestamp'], 'Y-m-d H:i:s');
 
                     if ($submitTime->getUnixTimestamp() > $returnTime->getUnixTimestamp() && $returnTime->getUnixTimestamp() > 0) {
-                        $afterMark = '<span class="alert"></span>';
+                        $page->parse('submission_after_mark_block', 'submission_after_mark');
                     }
                     else {
-                        $afterMark = '';
+                        $page->setVar(array(
+                            'submission_after_mark_block' => ''
+                        ));
                     }
 
                     if ($submitTime->getUnixTimestamp() > $this->getDueDate()->getUnixTimestamp()) {
@@ -327,13 +330,14 @@ class DueWork_Detail
                     $page->parse('submission_row_block', 'submission_row', true);
                 }
             }
-            else {
-                $page->setVar(array(
-                    'SUBMISSION_AFTER_MARK' => ''
-                ));
-            }
 
             $page->parse('student_row_block', 'student_row', true);
+
+            /* Clear children after parsing out the parent
+             */
+            $page->setVar(array(
+                'submission_after_mark_block' => ''
+            ));
         }
 
         // final housekeeping
