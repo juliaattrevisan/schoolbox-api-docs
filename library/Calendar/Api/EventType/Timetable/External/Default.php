@@ -60,7 +60,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
             }
             foreach ($timetable as $periodDetail) {
                 foreach ($periodDetail['day'] as $dayNumber => $dayDetail) {
-                    foreach($dayDetail as $classDetail) {
+                    foreach ($dayDetail as $classDetail) {
                         // Build the day timetable detail.
                         $period             = $periodDetail + $classDetail;
                         $period['staff']    = null;
@@ -124,10 +124,9 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                     continue;
                 }
                 // Load events for this campus
-                if(isset($dayTimetable[$dayNumber][$campusId])) {
+                if (isset($dayTimetable[$dayNumber][$campusId])) {
                     foreach ($dayTimetable[$dayNumber][$campusId] as $period) {
-
-                        if (isset($period['description'])) {
+if (isset($period['description'])) {
                             $event = new Calendar_Event_Type_Day();
                             $event->setAllday(false);
                             $event->setLocation($period['room']);
@@ -164,7 +163,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                             $event->setColour($period['color']);
                             $event->setConnectorId($this->getConnectorId());
                             $stack->add($event);
-                        }
+}
                     }
                 }
             }
