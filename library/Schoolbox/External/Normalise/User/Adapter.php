@@ -330,16 +330,21 @@ class Adapter  implements \External_UserInterface {
 
                         /* Add guardian to the registry
                          */
-                        if (!($allGuardians[$currentGuardian->getId()] instanceof Guardian)) {
+                        if (!isset($allGuardians[$currentGuardian->getId()])) {
+                            $allGuardians[$currentGuardian->getId()] = $currentGuardian;
+                        }
+                        elseif (!($allGuardians[$currentGuardian->getId()] instanceof Guardian)) {
                             $allGuardians[$currentGuardian->getId()] = $currentGuardian;
                         }
 
                         /* Add student
+                         * Temporarily disabled for memory conservation reasons
+                         * Re-enable in second stage
                          */
-                        $allGuardians[$currentGuardian->getId()]
-                            ->getStudents()
-                                ->add($student)
-                        ;
+//                        $allGuardians[$currentGuardian->getId()]
+//                            ->getStudents()
+//                                ->add($student)
+//                        ;
                     }
                 }
             }
