@@ -75,7 +75,7 @@ class RedisQueue implements QueueInterface
             // attempt to unserialize the message
             if (is_null($data)) {
                 // the thing we're pointing at doesn't exist? remove the reference
-                // $this->exec('SREM', $this->getRedisSetKey(), $key);
+                 $this->exec('SREM', $this->getRedisSetKey(), $key);
                 continue;
             }
 
