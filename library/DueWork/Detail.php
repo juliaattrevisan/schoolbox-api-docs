@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -9,21 +10,21 @@
 class DueWork_Detail
 {
 
-    const ACCEPT_NONE = 0;
+    const ACCEPT_NONE   = 0;
     const ACCEPT_SINGLE = 1;
-    const ACCEPT_MULTI = 2;
+    const ACCEPT_MULTI  = 2;
 
     const UNSUBMITTED = 'Not submitted';
-    const SUBMITTED = 'Submitted';
+    const SUBMITTED   = 'Submitted';
     const RESUBMITTED = 'Resubmitted';
-    const ON_TIME = ' on time';
-    const LATE = ' late';
+    const ON_TIME     = ' on time';
+    const LATE        = ' late';
 
     const CLASS_UNSUBMITTED = 'submit-regular';
-    const CLASS_ON_TIME = 'submit-ok';
-    const CLASS_LATE = 'submit-critical';
+    const CLASS_ON_TIME     = 'submit-ok';
+    const CLASS_LATE        = 'submit-critical';
 
-    const CLASS_PLAG_0 = 'plag-score ok';
+    const CLASS_PLAG_0  = 'plag-score ok';
     const CLASS_PLAG_20 = 'plag-score warn';
     const CLASS_PLAG_60 = 'plag-score critical';
 
@@ -40,16 +41,16 @@ class DueWork_Detail
 
     public function __construct($id, \Schoolbox\Assessment\Component\SubmissionBox $submissionBox)
     {
-        $this->userHandler = new User();
-        $this->submissionHandler = new Submission();
+        $this->userHandler              = new User();
+        $this->submissionHandler        = new Submission();
         $this->submissionStudentHandler = new SubmissionStudent();
-        $this->submissionReturnHandler = new SubmissionReturn();
-        $this->groupHandler = new Group();
+        $this->submissionReturnHandler  = new SubmissionReturn();
+        $this->groupHandler             = new Group();
 
         // set things we're interested in
-        $this->dueWork = $this->submissionHandler->getByID($id);
+        $this->dueWork                    = $this->submissionHandler->getByID($id);
         $this->dueWork['submissionCount'] = 0;
-        $this->marksheet = Marksheet_Factory::build($this->dueWork['mark_type_slug'], $submissionBox);
+        $this->marksheet                  = Marksheet_Factory::build($this->dueWork['mark_type_slug'], $submissionBox);
     }
 
     /**
@@ -75,19 +76,19 @@ class DueWork_Detail
             // accepts submissions
             if ($this->getSubmissionType() != self::ACCEPT_NONE) {
                 $insertion['user']['instance'] = $user;
-                $submissions = $this->submissionStudentHandler->getByUserID($this->dueWork['id'], $user->getId());
+                $submissions                   = $this->submissionStudentHandler->getByUserID($this->dueWork['id'], $user->getId());
 
                 // an empty array is preferred to false
                 if (!$submissions) {
-                    $insertion['submissions'] = array();
+                    $insertion['submissions']    = array();
                     $insertion['user']['status'] = self::UNSUBMITTED;
-                    $insertion['user']['class'] = self::CLASS_UNSUBMITTED;
-                    $insertion['user']['time'] = new Alaress_Date_Format(0);
-                    $submissions = array();
+                    $insertion['user']['class']  = self::CLASS_UNSUBMITTED;
+                    $insertion['user']['time']   = new Alaress_Date_Format(0);
+                    $submissions                 = array();
                 } // only use the first if this is a single-submit box
                 else {
                     if ($this->getSubmissionType() == self::ACCEPT_SINGLE) {
-                        $insertion['submissions'] = $submissions[0];
+                        $insertion['submissions']    = $submissions[0];
                         $insertion['user']['status'] = self::SUBMITTED;
                     } else {
                         $insertion['submissions'] = array($submissions[0]);
@@ -100,8 +101,8 @@ class DueWork_Detail
                     }
 
                     // determine whether to give the ontime or late class
-                    $submitTime = new Alaress_Date_Format($submissions[0]['datestamp'], 'y-m-d');
-                    $dueTime = new Alaress_Date_Format($this->dueWork['date'], 'y-m-d');
+                    $submitTime                = new Alaress_Date_Format($submissions[0]['datestamp'], 'y-m-d');
+                    $dueTime                   = new Alaress_Date_Format($this->dueWork['date'], 'y-m-d');
                     $insertion['user']['time'] = $submitTime;
 
 
@@ -119,14 +120,14 @@ class DueWork_Detail
             } // does not accept submissions
             else {
                 $insertion['user']['instance'] = $user;
-                $insertion['user']['status'] = '';
-                $insertion['user']['class'] = '';
+                $insertion['user']['status']   = '';
+                $insertion['user']['class']    = '';
             }
 
             // get student's mark, if there is one
             $insertion['mark'] = $this->marksheet->retrieveMark($user->getId());
 
-            $returns = $this->submissionReturnHandler->getByUser($user->getId(), $this->dueWork['id']);
+            $returns             = $this->submissionReturnHandler->getByUser($user->getId(), $this->dueWork['id']);
             $insertion['return'] = is_array($returns) ? $returns[0] : array();
 
             $this->sitepageData[$user->getId()] = $insertion;
@@ -140,13 +141,13 @@ class DueWork_Detail
     public function renderDetails(SitePage $page)
     {
 
-        $allowedHandler = new AllowedFile();
+        $allowedHandler  = new AllowedFile();
         $fileTypeHandler = new FileType('');
 
         // setup blocks, etc
         $page->setTab('submission');
         $page->setFile(TEMPLATE_content, 'submission/viewSubmission.html');
-        $page->setTitle(Scrub::text($this->dueWork['categoryName']).': '.Scrub::text($this->dueWork['name']));
+        $page->setTitle(Scrub::text($this->dueWork['categoryName']) . ': ' . Scrub::text($this->dueWork['name']));
 
         $page->setBlock(TEMPLATE_content, 'student_row', 'student_row_block');
         $page->setBlock('student_row', 'submission_row', 'submission_row_block');
@@ -161,7 +162,7 @@ class DueWork_Detail
 
         $page->setVar('plag_deleted_block', '');
 
-        $closeADF = $this->getDueDate();
+        $closeADF       = $this->getDueDate();
         $formatDateOnly = 'l, jS F Y';
         $formatDateTime = $formatDateOnly . ' g:ia';
 
@@ -173,19 +174,19 @@ class DueWork_Detail
 
         $page->setVar(
             array(
-                'DUEWORK_DESCRIPTION'   => Scrub::text($this->dueWork['name']),
-                'DUEWORK_YEAR'          => date('Y', strtotime($this->dueWork['date'])),
-                'DUEWORK_SEMESTER'      => DueWork_All::getSemester(strtotime($this->dueWork['date'])),
-                'CATEGORY_NAME'         => Scrub::text($this->dueWork['categoryName']),
-                'DUEWORK_TYPE'          => $this->dueWork['typeName'],
-                'DUEWORK_DUEDATE'       => $closeString,
-                'CATEGORY_ID'           => $this->dueWork['cid'],
-                'BOX_ID'                => $this->dueWork['id'],
-                'SITE_ROOT'             => $page->conType() . $_SERVER['HTTP_HOST'],
+                'DUEWORK_DESCRIPTION' => Scrub::text($this->dueWork['name']),
+                'DUEWORK_YEAR'        => date('Y', strtotime($this->dueWork['date'])),
+                'DUEWORK_SEMESTER'    => DueWork_All::getSemester(strtotime($this->dueWork['date'])),
+                'CATEGORY_NAME'       => Scrub::text($this->dueWork['categoryName']),
+                'DUEWORK_TYPE'        => $this->dueWork['typeName'],
+                'DUEWORK_DUEDATE'     => $closeString,
+                'CATEGORY_ID'         => $this->dueWork['cid'],
+                'BOX_ID'              => $this->dueWork['id'],
+                'SITE_ROOT'           => $page->conType() . $_SERVER['HTTP_HOST'],
             )
         );
 
-        $dem = DueWork_ErrorMapper::getInstance();
+        $dem  = DueWork_ErrorMapper::getInstance();
         $errs = $dem->listDisplayValues();
         $page->setVar('COMBO_OPTIONS', json_encode($errs));
 
@@ -205,13 +206,13 @@ class DueWork_Detail
             // output the student row
             $page->setVar(
                 array(
-                    'OWNER_ID' => $record['user']['instance']->getId(),
-                    'OWNER_NAME' => $record['user']['instance']->formatName('{lastname}, {firstname}'),
+                    'OWNER_ID'      => $record['user']['instance']->getId(),
+                    'OWNER_NAME'    => $record['user']['instance']->formatName('{lastname}, {firstname}'),
                     'OWNER_ESCAPED' => addslashes($record['user']['instance']->formatName('{firstname} {lastname}')),
-                    'OWNER_STATUS' => $record['user']['status'],
-                    'OWNER_CLASS' => $record['user']['class'],
-                    'OWNER_TIME'  => $record['user']['time'] instanceof Alaress_Date_Format ? $record['user']['time']->getShort() : '',
-                    'OWNER_IMG' => sprintf('/portrait.php?userId=%s&size=square32', $record['user']['instance']->getexternalId())
+                    'OWNER_STATUS'  => $record['user']['status'],
+                    'OWNER_CLASS'   => $record['user']['class'],
+                    'OWNER_TIME'    => $record['user']['time'] instanceof Alaress_Date_Format ? $record['user']['time']->getShort() : '',
+                    'OWNER_IMG'     => sprintf('/portrait.php?userId=%s&size=square32', $record['user']['instance']->getexternalId())
                 )
             );
 
@@ -224,24 +225,25 @@ class DueWork_Detail
 
             if (count($record['submissions'])) {
                 $returnTime = new Alaress_Date_Format($record['return']['returned'], 'Y-m-d H:i:s');
-                
+
                 foreach ($record['submissions'] as $submission) {
                     $submitTime = new Alaress_Date_Format($submission['datestamp'], 'Y-m-d H:i:s');
 
                     if ($submitTime->getUnixTimestamp() > $returnTime->getUnixTimestamp() && $returnTime->getUnixTimestamp() > 0) {
                         $page->parse('submission_after_mark_block', 'submission_after_mark');
-                    }
-                    else {
-                        $page->setVar(array(
-                            'submission_after_mark_block' => ''
-                        ));
+                    } else {
+                        $page->setVar(
+                            array(
+                                'submission_after_mark_block' => ''
+                            )
+                        );
                     }
 
                     if ($submitTime->getUnixTimestamp() > $this->getDueDate()->getUnixTimestamp()) {
-                        $class = self::CLASS_LATE;
+                        $class                     = self::CLASS_LATE;
                         $submissionTimeDescription = 'Submitted Late';
                     } else {
-                        $class = '';
+                        $class                     = '';
                         $submissionTimeDescription = 'Submitted On Time';
                     }
 
@@ -250,7 +252,7 @@ class DueWork_Detail
                         $mime = 'text/html';
                     } else {
                         $filename = $submission['realname'];
-                        $mime = $allowedHandler->getMime(substr($filename, strripos($filename, '.') + 1));
+                        $mime     = $allowedHandler->getMime(substr($filename, strripos($filename, '.') + 1));
                     }
                     $icon = $fileTypeHandler->getIconFile($mime);
 
@@ -273,20 +275,20 @@ class DueWork_Detail
 
                     $page->setVar(
                         array(
-                            'SUBMISSION_ID' => $submission['id'],
-                            'SUBMISSION_TIME' => $submission['date'],
-                            'SUBMISSION_FILENAME' => $submission['realname'],
-                            'SUBMISSION_CLASS' => $class,
+                            'SUBMISSION_ID'               => $submission['id'],
+                            'SUBMISSION_TIME'             => $submission['date'],
+                            'SUBMISSION_FILENAME'         => $submission['realname'],
+                            'SUBMISSION_CLASS'            => $class,
                             'SUBMISSION_TIME_DESCRIPTION' => $submissionTimeDescription,
-                            'SUBMISSION_AFTER_MARK' => $afterMark,
-                            'SUBMISSION_PLAG_SCORE' => sprintf("%d%%", $submission['score']),
-                            'SUBMISSION_PLAG_CLASS' => $plagClass,
-                            'SUBMISSION_PLAG_HREF' => base64_encode($plagHref),
-                            'SUBMISSION_EXPANDABLE' => $this->getSubmissionType() == self::ACCEPT_MULTI
-                                ? 'hide expandable'
-                                : '',
-                            'SUBMISSION_SELECTED'   => $page->arg[2] == $submission['id']?'highlight':'',
-                            'SUBMISSION_MIMEICON' => $icon
+                            'SUBMISSION_AFTER_MARK'       => $afterMark,
+                            'SUBMISSION_PLAG_SCORE'       => sprintf("%d%%", $submission['score']),
+                            'SUBMISSION_PLAG_CLASS'       => $plagClass,
+                            'SUBMISSION_PLAG_HREF'        => base64_encode($plagHref),
+                            'SUBMISSION_EXPANDABLE'       => $this->getSubmissionType() == self::ACCEPT_MULTI
+                                    ? 'hide expandable'
+                                    : '',
+                            'SUBMISSION_SELECTED'         => $page->arg[2] == $submission['id'] ? 'highlight' : '',
+                            'SUBMISSION_MIMEICON'         => $icon
                         )
                     );
 
@@ -335,9 +337,11 @@ class DueWork_Detail
 
             /* Clear children after parsing out the parent
              */
-            $page->setVar(array(
-                'submission_after_mark_block' => ''
-            ));
+            $page->setVar(
+                array(
+                    'submission_after_mark_block' => ''
+                )
+            );
         }
 
         // final housekeeping
