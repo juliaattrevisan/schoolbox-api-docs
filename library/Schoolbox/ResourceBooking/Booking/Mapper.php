@@ -208,9 +208,16 @@ class Mapper extends BaseMapper {
 
         // Just search on date for now.
         // Events: any event whose start <= endWindow, or end >= startWindow
+        // Timestamps are in GMT, this doesn't make a big difference for
+        // month view, but does for day.
+        $startWindow = new \DateTime();
+        $endWindow   = new \DateTime();
+        $utcTimezone = new \DateTimeZone('UTC');
+        $startWindow->setTimestamp($fromTimestamp)->setTimezone($utcTimezone);
+        $endWindow->setTimestamp($toTimestamp)->setTimezone($utcTimezone);
         $params = array(
-            'startWindow' => date('Y-m-d H:i:s', $fromTimestamp),
-            'endWindow'   => date('Y-m-d H:i:s', $toTimestamp),
+            'startWindow' => $startWindow->format('Y-m-d H:i:s'),
+            'endWindow'   => $endWindow->format('Y-m-d H:i:s'),
         );
         if (!empty($extra['resource_id'])) {
             $params = array_merge($params, $this->getArrayParameters($extra['resource_id'], 'resource'));
