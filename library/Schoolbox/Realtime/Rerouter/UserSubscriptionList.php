@@ -57,7 +57,7 @@ class UserSubscriptionList extends SubscriptionList {
             $name = $this->createQueueName($id);
 
             // with clear, everyone gets reloaded; without, only new users get loaded
-            if ($clear || empty($this->queues[$name])) {
+            if ($clear || empty($this->queues[$name]) || !array_key_exists($name, $this->queues)) {
                 $user = $source->findById($id); // TODO srsly. this has to change.
                 $this->queues[$name] = $user;
             }

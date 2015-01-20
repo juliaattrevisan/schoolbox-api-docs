@@ -19,7 +19,7 @@ abstract class SubscriptionList {
 	 *
 	 * @var array
 	 */
-	protected $queues;
+	protected $queues = array();
 
 
 	/**
