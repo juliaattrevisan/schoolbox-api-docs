@@ -90,7 +90,7 @@ class DueWork_Detail
                         $insertion['submissions'] = $submissions[0];
                         $insertion['user']['status'] = self::SUBMITTED;
                     } else {
-                        $insertion['submissions'] = $submissions;
+                        $insertion['submissions'] = array($submissions[0]);
                         if (count($submissions) > 1) {
                             $insertion['user']['status'] = self::RESUBMITTED;
                         } else {
@@ -115,7 +115,6 @@ class DueWork_Detail
                 }
 
                 $this->dueWork['submissionCount'] += count($submissions);
-                $insertion['submissions'] = $submissions;
 
             } // does not accept submissions
             else {
@@ -210,9 +209,7 @@ class DueWork_Detail
                     'OWNER_ESCAPED' => addslashes($record['user']['instance']->formatName('{firstname} {lastname}')),
                     'OWNER_STATUS' => $record['user']['status'],
                     'OWNER_CLASS' => $record['user']['class'],
-                    'OWNER_TIME'  => $record['user']['time'] instanceof Alaress_Date_Format
-                        ? $record['user']['time']->getShort()
-                        : '',
+                    'OWNER_TIME'  => $record['user']['time'] instanceof Alaress_Date_Format ? $record['user']['time']->getShort() : '',
                     'OWNER_IMG' => sprintf('/portrait.php?userId=%s&size=square32', $record['user']['instance']->getexternalId())
                 )
             );
@@ -224,16 +221,16 @@ class DueWork_Detail
             // (without the previous student's rows)
             $page->setVar('submission_row_block', '');
             if (count($record['submissions'])) {
-                $returnTime = new Alaress_Date_Format($record['return']['returned'], 'y-m-d j:i:s');
-
+                $returnTime = new Alaress_Date_Format($record['return']['returned'], 'Y-m-d H:i:s');
+                
                 foreach ($record['submissions'] as $submission) {
-                    $submitTime = new Alaress_Date_Format($submission['datestamp'], 'y-m-d j:i:s');
+                    $submitTime = new Alaress_Date_Format($submission['datestamp'], 'Y-m-d H:i');
 
-                    if ($submitTime->getUnixTimestamp() > $returnTime->getUnixTimestamp(
-                    ) && $returnTime->getUnixTimestamp() > 0
-                    ) {
+
+                    if ($submitTime->getUnixTimestamp() > $returnTime->getUnixTimestamp() && $returnTime->getUnixTimestamp() > 0) {
                         $afterMark = '<span class="alert"></span>';
-                    } else {
+                    }
+                    else {
                         $afterMark = '';
                     }
 
