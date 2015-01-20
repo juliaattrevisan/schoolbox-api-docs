@@ -207,6 +207,18 @@ class External_User implements External_UserInterface {
         return $this->getDatabase()->getStaffContactListExtended();
     }
 
+    /**
+     * List of campuses a staff member is involved in based on timetable
+     *
+     * @param int $staffID
+     * @return array|bool
+     */
+    public function getCampusFromTimetable($staffID)
+    {
+        return $this->getDatabase()->getCampusFromTimetable($staffID);
+    }
+
+
     public function __call ($methodName, $argumentList) {
 		$database = $this->getDatabase();
 

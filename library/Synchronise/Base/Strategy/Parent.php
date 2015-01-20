@@ -115,26 +115,31 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy
     public function createIfExists()
     {
         $this->verbose_filter->intro();
-     //
-     // Pass 1: get a unique list of users
+
+        // Pass 1: get a unique list of users
         $parents = array();
         foreach ($this->list as $currentUser) {
-   //
-   // Get user and their spouse.
+
+            // Get user and their spouse.
             $users = array(
-            $this->setupUserDetails($currentUser),
-            $this->setupSpouseDetails($currentUser),
+                $this->setupUserDetails($currentUser),
+                $this->setupSpouseDetails($currentUser),
             );
             foreach ($users as $newUser) {
-       //
-       // Add each user to the list of unique users, merging the campus
-       // list into the new one.
+
+                // no user? well, ok...
+                if ($newUser === false) {
+                    continue;
+                }
+
+                // Add each user to the list of unique users, merging the campus
+                // list into the new one.
                 $user_id = $newUser['synergy_id'];
                 if (!isset($parents[$user_id])) {
                     $parents[$user_id] = $newUser;
                 }
-       //
-       // Overwrite default campus
+
+                // Overwrite default campus
                 if (!empty($newUser['campus'])) {
                     // Default campus: whatever the first in the list is
                     $parents[$user_id]['defaultCampus'] = current($newUser['campus']);
@@ -147,8 +152,8 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy
                 }
             }
         }
-     //
-     // Pass 2: insert/update into list of users
+
+        // Pass 2: insert/update into list of users
         foreach ($parents as $parent) {
             if (!empty($parent)) {
                 $this->executeCreateUpdate($parent);

@@ -947,8 +947,16 @@ class External_Synergetic_User implements External_UserInterface
         return $this->getDatabase()->getAll($query);
     }
 
+
+    /**
+     * List of campuses a staff member is involved in based on timetable
+     *
+     * @param int $staffID
+     * @return array|bool
+     */
     public function getCampusFromTimetable($staffID)
     {
+        $staffID = (int)$staffID;
         $query = "SELECT DISTINCT( ClassCampus ) AS campus FROM timetable WHERE StaffID = '$staffID'";
         return $this->getDatabase()->getAll($query);
     }

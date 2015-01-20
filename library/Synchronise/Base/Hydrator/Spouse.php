@@ -18,6 +18,11 @@ class Synchronise_Base_Hydrator_Spouse implements Synchronise_Base_IHydrator {
         $newUser['synergy_id'] = $externalUser['StudentContactSpouseID'];
         $newUser['alt_email']  = $externalUser['StudentContactSpouseDefaultEmail'];
         $newUser['group_id']   = self::DEFAULT_PARENT_GROUP;
+
+        if (empty($newUser['username'])) {
+            throw new Exception("Spouse ContactID not defined");
+        }
+
         return $newUser;
     }
 }

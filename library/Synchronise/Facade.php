@@ -129,75 +129,24 @@ class Synchronise_Facade {
         echo "Synergetic Student Entity Examples\n";
         $esu = new External_Synergetic_User();
         $esu->getCurrentSemester();
-        $students = $esu->getStudentUserAccountInfo();
 
-        foreach (array_keys($students[0]) as $key) {
-            printf("%-24s", $key);
-        }
-        echo "\n";
-
-        $j = $k = 0;
-        for ($i = 0; $i < count($students) && $j < 5; ++$i) {
-            if ($students[$i]['NetworkLogin']) {
-                foreach ($students[$i] as $field) {
-                    printf("%-24s", $field);
-                }
-                echo "\n";
-                ++$j;
-            } else {
-                ++$k;
-            }
-        }
-        if ($k) {
-            echo "$k skipped with no NetworkLogin\n";
-        }
+        $this->renderTable($esu->getStudentUserAccountInfo());
     }
 
     private function lookupSynergeticStaffExample() {
         echo "Synergetic Staff Entity Examples\n";
         $esu = new External_Synergetic_User();
         $esu->getCurrentSemester();
-        $students = $esu->getStaffUserAccountInfo();
 
-        foreach (array_keys($students[0]) as $key) {
-            printf("%-24s", $key);
-        }
-        echo "\n";
-
-        $j = $k = 0;
-        for ($i = 0; $i < count($students) && $j < 5; ++$i) {
-            if ($students[$i]['NetworkLogin']) {
-                foreach ($students[$i] as $field) {
-                    printf("%-24s", $field);
-                }
-                echo "\n";
-                ++$j;
-            } else {
-                ++$k;
-            }
-        }
-        if ($k) {
-            echo "$k skipped with no NetworkLogin\n";
-        }
+        $this->renderTable($esu->getStaffUserAccountInfo());
     }
 
     private function lookupSynergeticParentExample() {
         echo "Synergetic Parent Entity Examples\n";
         $esu = new External_Synergetic_User();
         $esu->getCurrentSemester();
-        $students = $esu->getParentUserAccountInfo();
 
-        foreach (array_keys($students[0]) as $key) {
-            printf("%-24s", substr($key, 7));
-        }
-        echo "\n";
-
-        for ($i = 0; $i < 5; $i++) {
-            foreach ($students[$i] as $field) {
-                printf("%-24s", $field);
-            }
-            echo "\n";
-        }
+        $this->renderTable($esu->getParentUserAccountInfo(), null, 10, 7);
     }
 
     private function lookupSynergeticStaffCategory() {
@@ -235,5 +184,56 @@ class Synchronise_Facade {
         } else {
             echo "Failed to obtain Schoolbox student groups\n";
         }
+    }
+
+
+    /**
+     * @param array  $dataset
+     * @param string $notBlankField
+     * @param int    $maxRows
+     * @param int    $offset
+     */
+    private function renderTable($dataset, $notBlankField = 'NetworkLogin', $maxRows = 10, $offset = 0)
+    {
+        $padding = 3;
+
+        // find field-widths per key
+        $keyWidths = array();
+        foreach ($dataset as $record) {
+            if ($notBlankField && !$record[$notBlankField]) {
+                continue;
+            }
+            foreach ($record as $col => $val) {
+                if (empty($keyWidths[$col])) {
+                    $keyWidths[$col] = strlen(substr($col, $offset));
+                }
+                $keyWidths[$col] = max($keyWidths[$col], strlen($val));
+            }
+        }
+
+        foreach ($keyWidths as $key => $width) {
+            $w = $width + $padding;
+            printf("%-{$w}s", substr($key, $offset));
+        }
+        echo "\n";
+
+        $j = $k = 0;
+        for ($i = 0; $i < count($dataset) && $j < $maxRows; ++$i) {
+            if ($notBlankField && !$dataset[$i][$notBlankField]) {
+                ++$k;
+            } else {
+                foreach ($dataset[$i] as $key => $field) {
+                    $w = $keyWidths[$key] + $padding;
+                    printf("%-{$w}s", $field);
+                }
+                echo "\n";
+                ++$j;
+            }
+        }
+        if ($k) {
+            echo "$k skipped with no $notBlankField\n";
+        }
+
+        echo "\n";
     }
 }
