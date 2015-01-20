@@ -291,7 +291,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
             /* Hide "posted by" if there is no author
              */
-            if (is_numeric($currentEvent->getAuthorId())) {
+            if (is_numeric($currentEvent->getAuthorId()) && ($currentEvent->getAuthorId() > 0)) {
                 $this->parse('has_posted_by_block', 'has_posted_by');
             }
 
