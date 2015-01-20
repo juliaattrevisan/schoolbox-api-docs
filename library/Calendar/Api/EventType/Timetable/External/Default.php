@@ -55,6 +55,9 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                 $this->getUser()->getId(),
                 $campusId
             );
+            if (empty($timetable)) {
+                continue;
+            }
             foreach ($timetable as $periodDetail) {
                 foreach ($periodDetail['day'] as $dayNumber => $dayDetail) {
                     foreach($dayDetail as $classDetail) {
