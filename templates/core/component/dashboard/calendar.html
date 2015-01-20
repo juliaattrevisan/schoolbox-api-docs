@@ -16,7 +16,11 @@
                     <p class="meta">
                         {DETAIL}
 
-                    <div class="created">Posted by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a>
+                    <div class="created">
+                        <!-- BEGIN has_posted_by -->
+                        Posted by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a>
+                        <!-- END has_posted_by -->
+
                         <!-- BEGIN has_category -->
                         in <a href='/homepage/{HAS_CATEGORY_ID}'>{HAS_CATEGORY_NAME}</a>
                         <!-- END has_category -->
