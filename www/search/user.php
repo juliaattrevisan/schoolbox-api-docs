@@ -378,10 +378,6 @@ if (is_numeric($this->arg[0])) {
 					            'GROUP_URL' => is_array($group) && $groupHandler->getPermission( $group['id']  ) >= READ_ACCESS ? "/homepage/{$group['id']}": '#',
 				            );
 
-
-                            $this->setVar($output);
-                            $this->parse('group_item_block', 'group_item', true);
-
 				            $this->setVar($output);
 				            $this->parse('group_item_block', 'group_item', true);
 
