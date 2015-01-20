@@ -60,7 +60,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
 
         $api = new External_Denbigh2_Api('PeriodTimes', array());
 
-        if (!count($api->getErrors())) {
+        if (!$api->hasErrors()) {
             $allPeriods = $api->getResult()->data;
 
             /* Day-specific e.g. for Dashboard
@@ -207,7 +207,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
                 'Student ID' => $externalUserId
             ));
 
-            if (!count($api->getErrors())) {
+            if (!$api->hasErrors()) {
 
                 /* Data collectors
                  */
@@ -261,7 +261,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
                 )
             );
 
-            if (!count($api->getErrors())) {
+            if (!$api->hasErrors()) {
                 $allPeriods = $api->getResult()->data;
 
                 /* Assemble into a 2D array
@@ -371,7 +371,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
                 'Student ID' => $externalUserId,
             ));
 
-            if (!count($api->getErrors())) {
+            if (!$api->hasErrors()) {
                 $allPeriods = $api->getResult()->data;
 
                 /* Assemble into a 2D array
@@ -422,7 +422,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
                 )
             );
 
-            if (!count($api->getErrors())) {
+            if (!$api->hasErrors()) {
                 $allPeriods = $api->getResult()->data;
 
                 /* Assemble into a 2D array
@@ -513,7 +513,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
             'Class' => $classCode
         ));
 
-        if (!count($api->getErrors())) {
+        if (!$api->hasErrors()) {
             return $api->getResult()->data[0]->{'Subject Name'};
         }
 

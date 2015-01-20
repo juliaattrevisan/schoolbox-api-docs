@@ -32,7 +32,7 @@ class External_Denbigh2_Class implements External_ClassInterface {
             'Class' => $classCode
         ));
 
-        if (!count($api->getErrors())) {
+        if (!$api->hasErrors()) {
             $allStudents = $api->getResult()->data;
 
             foreach ($allStudents as $currentStudent) {
@@ -43,7 +43,7 @@ class External_Denbigh2_Class implements External_ClassInterface {
                     'Student ID' => $currentStudent->{'Student ID'}
                 ));
 
-                if (!count($api->getErrors())) {
+                if (!$api->hasErrors()) {
                     $allStudentData = $api->getResult()->data;
 
                     foreach ($allStudentData as $currentStudentData) {
@@ -83,7 +83,7 @@ class External_Denbigh2_Class implements External_ClassInterface {
             'Class' => $classCode
         ));
 
-        if (!count($api->getErrors())) {
+        if (!$api->hasErrors()) {
             $allClasses = $api->getResult()->data;
 
             foreach ($allClasses as $currentClass) {

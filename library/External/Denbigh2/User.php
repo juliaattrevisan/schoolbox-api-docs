@@ -74,7 +74,7 @@ class External_Denbigh2_User implements External_UserInterface
             'Student ID' => $externalUserId,
         ));
 
-        if (!count($api->getErrors())) {
+        if (!$api->hasErrors()) {
             $result = $api->getResult()->data[0];
 
             $dobby = new \Alaress_Date_Format($result->{'Date of Birth'}, 'm/d/y');
@@ -162,14 +162,14 @@ class External_Denbigh2_User implements External_UserInterface
             'Student ID' => $externalUserId,
         ));
 
-        if (!count($api->getErrors())) {
+        if (!$api->hasErrors()) {
             $result = $api->getResult()->data[0];
 
             $api = new External_Denbigh2_Api('Family', array(
                 'Family Code' => $result->{'Family Code'},
             ));
 
-            if (!count($api->getErrors())) {
+            if (!$api->hasErrors()) {
                 $family = $api->getResult()->data[0];
 
                 $data[] = array(
@@ -302,7 +302,7 @@ class External_Denbigh2_User implements External_UserInterface
          */
         $api = new External_Denbigh2_Api('Students', $params);
 
-        if (!count($api->getErrors())) {
+        if (!$api->hasErrors()) {
             $allStudents = $api->getResult()->data;
 
             /* Filter people out by name, if provided
@@ -361,7 +361,7 @@ class External_Denbigh2_User implements External_UserInterface
 
         $api = new External_Denbigh2_Api('Students', array());
 
-        if (!count($api->getErrors())) {
+        if (!$api->hasErrors()) {
             foreach ($api->getResult()->data as $currentStudent) {
                 // TODO: I guess I need the NetworkLogin
                 // TODO: Campus isn't being populated
@@ -407,7 +407,7 @@ class External_Denbigh2_User implements External_UserInterface
                     'Student ID' => $currentExternalId,
                 ));
 
-                if (!count($api->getErrors())) {
+                if (!$api->hasErrors()) {
                     $currentStudent = $api->getResult()->data[0];
 
                     if (strlen(trim($currentStudent->{'email Father'}))) {
@@ -459,7 +459,7 @@ class External_Denbigh2_User implements External_UserInterface
             'Family Code' => $externalUserId
         ));
 
-        if (!count($api->getErrors())) {
+        if (!$api->hasErrors()) {
             $family = $api->getResult()->data[0];
 
             $parent = array(
@@ -538,7 +538,7 @@ class External_Denbigh2_User implements External_UserInterface
                     'Family Code' => $current
                 ));
 
-                if (!count($api->getErrors())) {
+                if (!$api->hasErrors()) {
                     foreach ($api->getResult()->data as $family) {
                         $parent[] = array(
                             'ID' => $family->{'Father Community ID'},
@@ -559,7 +559,7 @@ class External_Denbigh2_User implements External_UserInterface
                 'Family Code' => $externalUserId
             ));
 
-            if (!count($api->getErrors())) {
+            if (!$api->hasErrors()) {
                 $family = $api->getResult()->data[0];
 
                 $parent = array(
@@ -608,7 +608,7 @@ class External_Denbigh2_User implements External_UserInterface
 
         $api = new External_Denbigh2_Api('Students', array());
 
-        if (!count($api->getErrors())) {
+        if (!$api->hasErrors()) {
             $allStudents = $api->getResult()->data;
 
             foreach($allStudents as $currentStudent) {
@@ -664,7 +664,7 @@ class External_Denbigh2_User implements External_UserInterface
             'Staff Code' => $externalUserId
         ));
 
-        if (!count($api->getErrors())) {
+        if (!$api->hasErrors()) {
             $currentStaff = $api->getResult()->data[0];
 
             $staff = array(
@@ -712,7 +712,7 @@ class External_Denbigh2_User implements External_UserInterface
 
         $api = new External_Denbigh2_Api('Staff', array());
 
-        if (!count($api->getErrors())) {
+        if (!$api->hasErrors()) {
             foreach($api->getResult()->data as $currentStaff) {
                 $staff[] = array(
                     'StaffID' => $currentStaff->{'Staff Code'},
@@ -766,7 +766,7 @@ class External_Denbigh2_User implements External_UserInterface
 
         $api = new External_Denbigh2_Api('Staff', array());
 
-        if (!count($api->getErrors())) {
+        if (!$api->hasErrors()) {
             foreach($api->getResult()->data as $currentStaff) {
                 $staff[] = array(
                     'StaffID' => $currentStaff->{'Staff Code'},
@@ -846,7 +846,7 @@ class External_Denbigh2_User implements External_UserInterface
              *
              * This is needed to get the campusCode
              */
-            if (!count($api->getErrors())) {
+            if (!$api->hasErrors()) {
                 $allEnrolments = $api->getResult()->data;
 
                 foreach($allEnrolments as $currentEnrolment) {
@@ -857,7 +857,7 @@ class External_Denbigh2_User implements External_UserInterface
                         'Class' => $currentEnrolment->{'Class'}
                     ));
 
-                    if (!count($api->getErrors())) {
+                    if (!$api->hasErrors()) {
                         $classData = $api->getResult()->data[0];
 
                         // TODO: No campus for class?
@@ -887,7 +887,7 @@ class External_Denbigh2_User implements External_UserInterface
              *
              * This is needed to get the campusCode
              */
-            if (!count($api->getErrors())) {
+            if (!$api->hasErrors()) {
                 $stack = array();
 
                 $allClasses = $api->getResult()->data;
@@ -930,7 +930,7 @@ class External_Denbigh2_User implements External_UserInterface
             'Family Code' => $externalUserId
         ));
 
-        if (!count($api->getErrors())) {
+        if (!$api->hasErrors()) {
             $allStudents = $api->getResult()->data;
 
             foreach($allStudents as $currentStudent) {
@@ -957,7 +957,7 @@ class External_Denbigh2_User implements External_UserInterface
             'Student ID' => $externalUserId
         ));
 
-        if (!count($api->getErrors())) {
+        if (!$api->hasErrors()) {
             $currentStudent = $api->getResult()->data[0];
 
             /* School address normally
@@ -992,7 +992,7 @@ class External_Denbigh2_User implements External_UserInterface
             'Community ID' => $externalUserId
         ));
 
-        if (!count($api->getErrors())) {
+        if (!$api->hasErrors()) {
             if (count($api->getResult()->data) && strlen($api->getResult()->data[0]->{'PhotoBase64Encoded'})) {
                 $photoPath = Config::get('portrait_dir') . '/' . $externalUserId . '.jpg';
 
