@@ -103,6 +103,19 @@ class External_Denbigh2_Api {
     }
 
     /**
+     * Decide if this curl request had errors
+     *
+     * @return bool
+     */
+    public function hasErrors() {
+        if (count($this->getErrors())) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Get curl error object
      *
      * @return mixed
