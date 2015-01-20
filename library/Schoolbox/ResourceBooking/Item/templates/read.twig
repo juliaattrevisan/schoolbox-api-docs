@@ -74,8 +74,8 @@ $(document).ready(function() {
             timeFormat: { month: 'h(:mm)a' },
             events: function(start, end, timezone, callback) {
                 var data = [
-                    {name: 'start', value: start.unix()},
-                    {name: 'end',   value: end.unix()}
+                    {name: 'start', value: Calendar.reOffsetTimestamp(start.unix())},
+                    {name: 'end',   value: Calendar.reOffsetTimestamp(end.unix())}
                 ];
                 $.ajax({
                     data:     data.concat($('#calendar-controls').find('form').serializeArray()),
