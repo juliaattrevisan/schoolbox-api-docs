@@ -134,7 +134,7 @@ abstract class Calendar_Event_Type_Abstract
     /**
      * A generic variable for custom stuff
      *
-     * @var string
+     * @var array
      */
     protected $custom = array();
 

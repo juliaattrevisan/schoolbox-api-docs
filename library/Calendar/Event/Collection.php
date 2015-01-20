@@ -116,15 +116,18 @@ class Calendar_Event_Collection implements Iterator, Countable {
 		$this->stack[] = $element;
 	}
 
-	/**
-	 * Merge another stack into this one
-	 *
-	 * @param \Calendar_Event_Collection $collection
-	 */
+    /**
+     * Merge another stack into this one
+     *
+     * @param \Calendar_Event_Collection $collection
+     * @return $this
+     */
 	public function merge(Calendar_Event_Collection $collection) {
 		$merged = array_merge($this->getStack(), $collection->getStack());
 
 		$this->setStack($merged);
+
+        return $this;
 	}
 
 	/**
