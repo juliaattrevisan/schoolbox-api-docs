@@ -1,0 +1,1 @@
+UPDATE `config` SET `options` = 'synergetic:tass:denbigh:denbigh2:edumate:schoolbox:schoolpro:maze' WHERE `name` = 'external_type';
