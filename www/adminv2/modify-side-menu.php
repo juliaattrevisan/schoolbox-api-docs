@@ -55,7 +55,7 @@ if (is_numeric($this->arg[0])) {
         'URL' => '',
         'BLANK_SELECTED' => '',
         'ID' => '',
-	    'PARENT_ID' => '0',
+        'PARENT_ID' => '0',
         'ACTION' => 'Create'
     );
     $this->setVar($output);
@@ -74,9 +74,11 @@ if (is_numeric($this->arg[0])) {
     ));
 
     // don't hide the parent select block
-
-    $this->setVar('MENU_TREE', $menuHandler->outputTree($menuHandler->getTree(), 0, true));
+    $mapper   = new Schoolbox\SideMenu\Mapper();
+    $tree     = $mapper->getCollectionAsTree(
+        $mapper->findAll(array('order' => array('sequence' => 'asc')))
+    );
+    $renderer = new Schoolbox\SideMenu\Renderer\Admin(new Scrub());
+    $this->setVar('MENU_TREE', $renderer->renderTree($mapper->placeInRootNode($tree), true));
     $this->parse('parent_select_block', 'parent_select', false);
 }
-
-?>

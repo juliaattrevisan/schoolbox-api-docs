@@ -13,9 +13,11 @@ $this->setTitle('Admin - Side Menu');
 $nav = new AdminV2_Nav();
 $nav->parse($this, 'side-menu');
 
-$menuHandler = new SideMenu();
+// get the side menu tree
+$mapper = new Schoolbox\SideMenu\Mapper();
+$list   = $mapper->findAll(array('order' => array('sequence' => 'asc')));
+$tree   = $mapper->getCollectionAsTree($list);
 
-$this->setVar('MENU_TREE', $menuHandler->outputTree($menuHandler->getTree()));
-
-
-?>
+// and render the tree
+$renderer = new Schoolbox\SideMenu\Renderer\Admin(new Scrub());
+$this->setVar('MENU_TREE', $renderer->renderTree($mapper->placeInRootNode($tree)));
