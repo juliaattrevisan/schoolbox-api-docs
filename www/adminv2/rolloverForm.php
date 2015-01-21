@@ -93,8 +93,9 @@ function rollover($categoryId) {
 	foreach($cats as $cat) {
 		$cat = $catMapper->findById($cat['id']);
 		$cat->setName(sprintf('%s [%s]', $cat->getName(), $cat->getCodeString()));
-		$catMapper->save($cat);
 		$codeMapper->delete($cat->getCodes());
+		$cat->setCodes(new Collection());
+		$catMapper->save($cat);
 	}
 
 	exit;
