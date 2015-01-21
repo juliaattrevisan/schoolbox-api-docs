@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../include/Bootstrap.php';
 session_start();
 
-if ((isset($_POST['username'])) && (isset($_POST['password']) && $_POST['password'] && $_POST['username'])) {
+if ((isset($_POST['username'])) && (isset($_POST['password']) && $_POST['password'] && trim($_POST['username']))) {
     $sessionHandler = new Session;
 
     // Authentication
@@ -29,8 +29,8 @@ if ((isset($_POST['username'])) && (isset($_POST['password']) && $_POST['passwor
     else {
         try {
             $authenticated =
-                $sessionHandler->authenticate($_POST['username'], $_POST['password'])
-                && $sessionHandler->create($_POST['username'], $remember);
+                $sessionHandler->authenticate(trim($_POST['username']), $_POST['password'])
+                && $sessionHandler->create(trim($_POST['username']), $remember);
         }
         catch (Exception_Schoolbox_NotFound $e) {
             $message = 'The username or password you typed is incorrect, please try again.';
