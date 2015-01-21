@@ -12,43 +12,21 @@
 class External_Edumate_Timetable extends External_Edumate_Connection implements External_TimetableInterface
 {
 
-    protected $offset = 0;
+    /** @var array */
+    protected $campusCache;
 
     /**
-     * Ideally, these two arrays would be replaced with a View to retrieve dynamically, rather than hardcoded
-     * @var array
+     * @param int $campusId
+     * @return string
      */
-    protected $labelMap = array(
-        'BS' => array('Before School', 1),
-        'MG' => array('Morning Activities', 1),
-        '1'  => array('Period 1', 1),
-        '2'  => array('Period 2', 1),
-        'R'  => array('Recess', 2),
-        '3'  => array('Period 3', 1),
-        '4'  => array('Period 4', 1),
-        '5'  => array('Period 5', 1),
-        'L1' => array('Lunch', 2),
-        '6'  => array('Period 6', 1),
-        '7'  => array('Period 7', 1),
-        'AS' => array('After School', 2)
-    );
+    protected function getCampusCode($campusId)
+    {
+        if (empty($this->campusCache[$campusId])) {
+            $this->campusCache[$campusId] = \Schoolbox\CampusMapper::getInstance()->findById($campusId)->getExtTimetableCode();
+        }
 
-    protected $timeMap = array(
-        'BS' => array('08:00', '08:40'),
-        'MG' => array('08:40', '09:00'),
-        '1'  => array('09:00', '09:45'),
-        '2'  => array('09:45', '10:30'),
-        'R'  => array('10:30', '10:50'),
-        '3'  => array('10:50', '11:35'),
-        '4'  => array('11:35', '12:20'),
-        '5'  => array('12:20', '13:05'),
-        'L1' => array('13:05', '13:40'),
-        '6'  => array('13:40', '14:25'),
-        '7'  => array('14:25', '15:10'),
-        'AS' => array('15:10', '15:55'),
-    );
-
-    protected $cycleLength = 5;
+        return $this->campusCache[$campusId];
+    }
 
     /**
      * Returns the timetable definition for a particular campus *FOR A PARTICULAR DAY*
@@ -63,13 +41,25 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         $definition = array();
         $periodCount = 0;
 
-        $i = 0;
-        foreach ($this->labelMap as $shortName => $periodDetails) {
-            $definition['desc'][] = $periodDetails[0];
-            $definition['start'][] = $this->parseTime($this->timeMap[$shortName][0]);
-            $definition['end'][] = $this->parseTime($this->timeMap[$shortName][1]);
-            $definition['number'][] = $shortName;
-            $definition['sequence'][] = $periodDetails[1];
+        $stmt = $this->getDatabase()->prepare('
+            SELECT period "desc", start_time "start", end_time "end", period_number "number", 1 "sequence"
+            FROM db2inst1.schoolbox_timetable_definition td
+            WHERE td.day_number = :day
+            AND td.campus = :campus
+            ORDER BY td.start_time ASC
+        ');
+
+        $stmt->execute(array(
+            'day'    => $day ?: 1, // there is no day 0 in this definition
+            'campus' => $this->getCampusCode($campusId)
+        ));
+
+        while ($r = $stmt->fetch(DB2::FETCH_ASSOC)) {
+            $definition['desc'][] = $r['desc'];
+            $definition['start'][] = $this->parseTime($r['start']);
+            $definition['end'][] = $this->parseTime($r['end']);
+            $definition['number'][] = $r['number'];
+            $definition['sequence'][] = $r['sequence'];
             ++$periodCount;
         }
 
@@ -79,12 +69,17 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
         $definition['periodCount'] = $periodCount;
 
-        $definition['dayCount'] = $this->getCycleLength();
+        $definition['dayCount'] = $this->getCycleLength($campusId);
 
         return $definition;
 
     }
 
+
+    /**
+     * @param string $time
+     * @return string
+     */
     protected function parseTime($time)
     {
         $timeObject = new DateTime($time, new DateTimeZone('UTC'));
@@ -93,14 +88,31 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
     /**
      * Helper function to retrieve the length of the timetable cycle in edumate
+     * @param int $campusId
      * @return int
      */
-    private function getCycleLength()
+    protected function getCycleLength($campusId)
     {
-        return $this->cycleLength;
+        $stmt = $this->getDatabase()->prepare('
+            SELECT day_number
+            FROM db2inst1.schoolbox_timetable_definition
+            WHERE campus = :campus
+            ORDER BY day_number DESC
+            FETCH FIRST 1 ROW ONLY
+        ');
+
+        $stmt->execute(array('campus' => $this->getCampusCode($campusId)));
+
+        return $stmt->fetchColumn();
     }
 
-    public function getDayNumber($campusId, $date = 0)
+
+    /**
+     * @param int $campusId
+     * @param int $date
+     * @return bool|string
+     */
+    public function getDayNumber($campusId, $date = 0) 
     {
 
         if (!$date) {
@@ -171,15 +183,13 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             return false;
         }
 
-        $stmt = $this->getDatabase()->prepare(
-            "
-            SELECT period AS description, t.class_code AS code, c.{$type}_number AS staffID, room, cl.class
+        $stmt = $this->getDatabase()->prepare("
+            SELECT period_number AS description, t.class_code AS code, c.{$type}_number AS staffID, room, cl.class
             FROM db2inst1.schoolbox_timetable t
             LEFT JOIN db2inst1.schoolbox_classes cl ON t.class_code = cl.class_code
             $join
             AND day = :d
-        "
-        );
+        ");
 
         $stmt->execute(
             array(
@@ -253,9 +263,8 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             return false;
         }
 
-        $stmt = $this->getDatabase()->prepare(
-            "
-            SELECT period AS description, day, t.class_code AS code, t.staff_number AS staffID, room, cl.class
+        $stmt = $this->getDatabase()->prepare("
+            SELECT period_number AS description, t.day_number, t.class_code AS code, t.staff_number AS staffID, room, cl.class
             FROM db2inst1.schoolbox_timetable t
             LEFT JOIN db2inst1.schoolbox_classes cl ON t.class_code = cl.class_code
             $join
@@ -271,8 +280,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         // compile the returned data
         $classes = array();
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-
-            $classes[$row['DESCRIPTION']][$row['DAY']] = $row;
+            $classes[$row['DESCRIPTION']][$row['DAY_NUMBER']] = $row;
         }
 
         $timetable = array();
@@ -343,16 +351,18 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      * @param $dayNumber
      * @return int|bool
      */
-    public function getSubjectPeriod($classCode, $dayNumber)
+    public function getSubjectPeriod($classCode, $dayNumber) 
     {
-        $stmt = $this->getDatabase()->prepare(
-            "
-                        SELECT period
-                        FROM db2inst1.schoolbox_timetable
-                        WHERE class_code = :code
-                        AND day = :day
-                    "
-        );
+        $stmt = $this->getDatabase()->prepare('
+            SELECT period_number
+            FROM db2inst1.schoolbox_timetable t
+            LEFT JOIN db2inst1.schoolbox_timetable_definition td
+              ON t.campus = td.campus
+              AND t.day_number = td.day_number
+              AND t.period_number = td.period_number
+            WHERE t.class_code = :code
+            AND t.day = :day
+        ');
 
         $stmt->execute(
             array(
@@ -361,23 +371,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             )
         );
 
-        $class = $stmt->fetchColumn();
-
-        if ($class === false) {
-            return false;
-        }
-
-        // return the SEQUENCE of the period (if that is not what is expected, then this should be changed)
-        $i = 0;
-        foreach ($this->labelMap as $periodCode => $periodDetails) {
-            ++$i;
-            if ($class == $periodCode) {
-                return $i;
-            }
-        }
-
-        return false;
-
+        return (int)$stmt->fetchColumn() ?: false;
     }
 
     /**
@@ -413,32 +407,30 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      * @param  string $roomCode
      * @return array
      */
-    public function getRoomTimetable($roomCode)
+    public function getRoomTimetable($roomCode) 
     {
-        $statement = $this->getDatabase()->prepare(
-            '
-                        SELECT
-                            cl.CLASS AS "Description",
-                            t.DAY AS "DayNumber",
-                            t.PERIOD AS "PeriodNumber",
-                            NULL AS "TimetableGroup",
-                            NULL AS "TimetableCampus",
-                            t.CLASS_CODE AS "ClassCode",
-                            t.STAFF_NUMBER AS "StaffID",
-                            st.SALUTATION AS "StaffTitle",
-                            st.FIRSTNAME AS "StaffPreferredName",
-                            st.SURNAME AS "StaffSurname"
-                        FROM db2inst1.schoolbox_timetable AS t
-                        INNER JOIN db2inst1.schoolbox_classes AS cl ON
-                            t.CLASS_CODE = cl.CLASS_CODE
-                        INNER JOIN db2inst1.schoolbox_staff AS st ON
-                            t.STAFF_NUMBER = st.STAFF_NUMBER
-                        WHERE t.ROOM = :room
-                        ORDER BY
-                            t.DAY ASC,
-                            t.PERIOD ASC
-                    '
-        );
+        $statement = $this->getDatabase()->prepare('
+            SELECT
+                cl.CLASS AS "Description",
+                t.DAY_NUMBER AS "DayNumber",
+                t.PERIOD_NUMBER AS "PeriodNumber",
+                NULL AS "TimetableGroup",
+                NULL AS "TimetableCampus",
+                t.CLASS_CODE AS "ClassCode",
+                t.STAFF_NUMBER AS "StaffID",
+                st.SALUTATION AS "StaffTitle",
+                st.FIRSTNAME AS "StaffPreferredName",
+                st.SURNAME AS "StaffSurname"
+            FROM db2inst1.schoolbox_timetable AS t
+            INNER JOIN db2inst1.schoolbox_classes AS cl ON
+                t.CLASS_CODE = cl.CLASS_CODE
+            INNER JOIN db2inst1.schoolbox_staff AS st ON
+                t.STAFF_NUMBER = st.STAFF_NUMBER
+            WHERE t.ROOM = :room
+            ORDER BY
+                t.DAY_NUMBER ASC,
+                t.PERIOD_NUMBER ASC
+        ');
         $statement->execute(array('room' => $roomCode));
 
         // Join with Edumate's (currently hardcoded and campusless) timetable.
