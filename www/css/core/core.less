@@ -1363,7 +1363,6 @@ Notifications
         list-style: none;
         margin: 0;
         li {
-            padding: 12px 16px 11px;
             line-height: 16px;
         }
     }
@@ -1711,6 +1710,7 @@ Notifications
 		border-bottom: 1px solid @border-color;
 		clear: both;
         line-height: 16px;
+        padding: 12px 16px 11px;
 		.clearfix;
 
 		.ticks {
@@ -1843,7 +1843,6 @@ Notifications
 td,li,span,.row {
   .actions {
     position: relative;
-    z-index: 1;
     float: right;
     // Put all buttons on the one row
     &.oneline {
@@ -2209,23 +2208,37 @@ li:hover > .actions .btn,
     .resource h3 {
         float: none;
         display: inline-block;
+        padding: 0;
+        vertical-align: top;
     }
     .resource.no-image h3 {
         margin-left: 32px;
+        padding: 0;
     }
     .resource{
     	padding: 0;
+    	border-bottom: 1px solid @border-color;
+    	.resource-item {
+        	padding: 12px;
+    	}
     	.resource-image {
         	display: inline-block;
+        	padding-right: 1em;
     	}
 	}
     .booking-details {
-    	padding: 12px 16px 0 11px;
+    	padding: 12px;
         display: flex;
         justify-content: space-between;
     }
+    .status-buttons{
+    	min-width: 100px;
+    }
+    .status-selector {
+	    display: inline-block;
+	}
     .booking-event {
-        display: inline-flex;
+        width: 80%;
         .portrait {
             float:left;
             padding-right: 1em;
@@ -2236,7 +2249,6 @@ li:hover > .actions .btn,
         }
         .event-data {
             display: block;
-            margin-left: 12px;
         }
         .booking-controls {
             display: inline-flex;
@@ -2249,12 +2261,12 @@ li:hover > .actions .btn,
     display: none;
     position: absolute;
     text-align: right;
-    top: 27px;
+    top: 31px;
     right: 0;
     background-color: #FAFAFA;
     border: 1px solid #DEDEDE;
     z-index:199;
-    min-width: 100px;
+    min-width: 150px;
     .status-header{
         background: @module-background;
         color: @black;
