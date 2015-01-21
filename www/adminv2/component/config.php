@@ -8,7 +8,7 @@
  */
 
 // require SitePage context
-if(!isset($this)) {
+if (!isset($this)) {
     require_once('../../../include/Bootstrap.php');
     httpError(400, 101); // resource not available
 }
@@ -18,22 +18,20 @@ $this->setAjax(true);
 $method = strtoupper($_SERVER['REQUEST_METHOD']);
 
 // check authorised
-if(!isset($_SESSION['id'])) {
+if (!isset($_SESSION['id'])) {
     httpError(401, 1);
 }
 
 
 // retrieve the config for the specified component
-if($method == 'GET') {
+if ($method == 'GET') {
     checkFields($_GET);
     readConfig($_GET, $this);
-}
-// update the config for the specified component
-elseif($method == 'POST') {
+} // update the config for the specified component
+elseif ($method == 'POST') {
     checkFields($_POST);
     writeConfig($_POST, $this);
-}
-else {
+} else {
     // method not recognised
     httpError(405, 'Invalid method: should be GET or POST.');
 }
@@ -43,10 +41,11 @@ else {
  * @param $vars
  * @param SitePage $page
  */
-function readConfig($vars, SitePage $page) {
+function readConfig($vars, SitePage $page)
+{
     $groupHandler = new Group();
     // superuser check precedes group perm, so if categoryID was passed as a templateID, it won't cause httpErrorure
-    if(!$groupHandler->isSuperuser() && !$groupHandler->getPermission($vars['cid'])) {
+    if (!$groupHandler->isSuperuser() && !$groupHandler->getPermission($vars['cid'])) {
         // lack permission to see configuration details
         httpError(403, 6);
     }
@@ -60,7 +59,7 @@ function readConfig($vars, SitePage $page) {
     $component = $chf->buildComponent($instance);
 
     // it's in an array, but there's only going to be one
-    if($component === false) {
+    if ($component === false) {
         httpError(400, "Component doesn't exist.");
     }
 
@@ -68,7 +67,6 @@ function readConfig($vars, SitePage $page) {
         array('id' => '-1', 'code' => '', 'name' => ''),
         $component->getInstance()->getConfigArray()
     );
-    $component->execute();
     $component->parseConfigForTemplate();
 
     $page->setVar(array(
@@ -88,9 +86,10 @@ function readConfig($vars, SitePage $page) {
 /**
  * @param $vars
  */
-function writeConfig($vars, SitePage $page) {
+function writeConfig($vars, SitePage $page)
+{
     $groupHandler = new Group();
-    if(!$groupHandler->getPermission($vars['cid'])) {
+    if (!$groupHandler->getPermission($vars['cid'])) {
         // lack permission to see configuration details
         httpError(403, 6);
     }
@@ -115,7 +114,6 @@ function writeConfig($vars, SitePage $page) {
     // config values
     $factory    = new Component_Dashboard_Factory(new \Schoolbox\User(), $page);
     $controller = $factory->buildComponent($instance);
-    $controller->execute();
 
     /** @var Component_ConfigDefinition $confD */
     foreach ($cdm as $confD) {
@@ -134,7 +132,7 @@ function writeConfig($vars, SitePage $page) {
                 $confI = new Component_Config();
             }
 
-            if(!($confI->getId())) {
+            if (!($confI->getId())) {
                 $confI->setConfigDefinitionId($confD->getId());
                 $confI->setInstanceId($instance->getId());
             }
@@ -148,11 +146,12 @@ function writeConfig($vars, SitePage $page) {
 }
 
 
-function checkFields($array) {
+function checkFields($array)
+{
     // mandatory arguments
     $reqd = array('component', 'cid');
-    foreach($reqd as $field) {
-        if(!isset($array[$field])) {
+    foreach ($reqd as $field) {
+        if (!isset($array[$field])) {
             // necessary information is lacking
             httpError(400, 2);
         }

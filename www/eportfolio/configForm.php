@@ -7,90 +7,83 @@ $groupHandler = new Group(HOMEPAGE_SERVICE);
 /* Update page, or its stuff
  */
 if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
-
-	/* Check permissions
+/* Check permissions
 	 */
-	$eportfolioHandler = new Eportfolio($_SESSION['id'], $_POST['page_id']);
+    $eportfolioHandler = new Eportfolio($_SESSION['id'], $_POST['page_id']);
 
-	$authenticator = new Eportfolio_Authenticator($_SESSION['id'], $eportfolioHandler->getSettingsPageOwner(), $_POST['page_id']);
+    $authenticator = new Eportfolio_Authenticator($_SESSION['id'], $eportfolioHandler->getSettingsPageOwner(), $_POST['page_id']);
 
-	/* If $user can modify page, continue; otherwise die
+    /* If $user can modify page, continue; otherwise die
 	 * Superusers, staff and page owners can modify contents/settings.
 	 */
-	if ($authenticator->canModify()) {
-		$componentInstanceMapper = Component_InstanceMapper::getInstance();
-		$componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
+    if ($authenticator->canModify()) {
+        $componentInstanceMapper = Component_InstanceMapper::getInstance();
+        $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
 
-		/* Ajax save page colours. When instantiating the Eportfolio object, assume page owner
+        /* Ajax save page colours. When instantiating the Eportfolio object, assume page owner
 		 * is currently logged in. The colourpicker is built to only send one primary name/key'
 		 * pair, rather than two, which is what would be nice.
 		 */
-		if (is_array($_POST['colors'])) {
-			$color = array();
+        if (is_array($_POST['colors'])) {
+            $color = array();
 
-			foreach ($_POST['colors'] as $key => $value) {
-				$color[$key] = substr($value, 1);
-			}
+            foreach ($_POST['colors'] as $key => $value) {
+                $color[$key] = substr($value, 1);
+            }
 
-			$eportfolioHandler->saveDisplayProperties($color);
-		}
-		/* Save page title
+            $eportfolioHandler->saveDisplayProperties($color);
+        } /* Save page title
 		 */
-		else if (isset($_POST['user_id']) && is_numeric($_POST['user_id']) && strlen(trim($_POST['pageTitle']))) {
-			$eportfolioHandler->updatePageTitle(trim($_POST['pageTitle']));
-			SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getUid()}/{$eportfolioHandler->getPageId()}");
-		}
-		/* Ajax request for drag and drop of components
+        elseif (isset($_POST['user_id']) && is_numeric($_POST['user_id']) && strlen(trim($_POST['pageTitle']))) {
+            $eportfolioHandler->updatePageTitle(trim($_POST['pageTitle']));
+            SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getUid()}/{$eportfolioHandler->getPageId()}");
+        } /* Ajax request for drag and drop of components
 		 */
-		else if ($_POST['type'] == 'components') {
-			$columns = array(
-				'left' => $_POST['column1'],
-				'right' => $_POST['column2'],
-				'top' => $_POST['column3']
-			);
+        elseif ($_POST['type'] == 'components') {
+            $columns = array(
+                'left' => $_POST['column1'],
+                'right' => $_POST['column2'],
+                'top' => $_POST['column3']
+            );
 
-			foreach ($columns as $position => $componentString) {
-				// Explode the columns
-				$components[$position] = explode(',', $componentString);
+            foreach ($columns as $position => $componentString) {
+                // Explode the columns
+                $components[$position] = explode(',', $componentString);
 
-				$instanceCollection = new Schoolbox\Collection();
+                $instanceCollection = new Schoolbox\Collection();
 
-				// Update the db
-				foreach ($components[$position] as $sequence => $componentID) {
-					if ($componentID) {
-						/** @var Component_Instance $inst */
-						$inst = Component_InstanceMapper::getInstance()->findById($componentID);
-						$inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database
-						$inst->setPosition($position);
-						$instanceCollection->add($inst);
-					}
-				}
+                // Update the db
+                foreach ($components[$position] as $sequence => $componentID) {
+                    if ($componentID) {
+                        /** @var Component_Instance $inst */
+                        $inst = Component_InstanceMapper::getInstance()->findById($componentID);
+                        $inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database
+                        $inst->setPosition($position);
+                        $instanceCollection->add($inst);
+                    }
+                }
 
-				if ($instanceCollection->count()) {
-					Component_InstanceMapper::getInstance()->save($instanceCollection);
-				}
-			}
-		}
-		/* AJAX request to delete component from eportfolio
+                if ($instanceCollection->count()) {
+                    Component_InstanceMapper::getInstance()->save($instanceCollection);
+                }
+            }
+        } /* AJAX request to delete component from eportfolio
 		 */
-		else if (is_numeric($_POST['delete'])) {
+        elseif (is_numeric($_POST['delete'])) {
+// locate the instance, locate its config instances, then blast them away
+            /** @var Component_Instance $instance */
+            $instance = $componentInstanceMapper->findById($_POST['delete']);
+            $configs = $componentConfigInstanceMapper->findByColumn('component_instance_id', $instance->getId());
 
-			// locate the instance, locate its config instances, then blast them away
-			/** @var Component_Instance $instance */
-			$instance = $componentInstanceMapper->findById($_POST['delete']);
-			$configs = $componentConfigInstanceMapper->findByColumn('component_instance_id', $instance->getId());
+            foreach ($configs as $c) {
+                $componentConfigInstanceMapper->delete($c);
+            }
 
-			foreach ($configs as $c) {
-				$componentConfigInstanceMapper->delete($c);
-			}
-
-			$componentInstanceMapper->delete($instance);
-		}
-		/* POST new component to page and output render of component
+            $componentInstanceMapper->delete($instance);
+        } /* POST new component to page and output render of component
 		 */
-		else if (is_numeric($_POST['add']) || is_numeric($_POST['reload'])) {
-			if (is_numeric($_POST['add'])) {
-
+        elseif (is_numeric($_POST['add']) || is_numeric($_POST['reload'])) {
+            if (is_numeric($_POST['add'])) {
                 $newComp = new Component_Instance();
                 $newComp
                     ->setDefinitionId($_POST['add'])
@@ -102,223 +95,208 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                 $ids = $componentInstanceMapper->save($newComp);
 
                 $instanceID = $ids[0];
-            }
-            else {
+            } else {
                 $instanceID = $_POST['reload'];
             }
 
-			$componentInstanceMapper->cascadeSequence($eportfolioHandler->getSettingsPageOwner());
+            $componentInstanceMapper->cascadeSequence($eportfolioHandler->getSettingsPageOwner());
 
-			// get the Instance's Definition's Controller
-			$factory = new Component_Eportfolio_Factory(new \Schoolbox\User(), new SitePage(false));
+            // get the Instance's Definition's Controller
+            $factory = new Component_Eportfolio_Factory(new \Schoolbox\User(), new SitePage(false));
 
-			// $component instanceof Component_ControllerAbstract
-			$componentList = $componentInstanceMapper->findByInstanceId($instanceID);
-			$cList = array_values($componentList);
+            // $component instanceof Component_ControllerAbstract
+            $componentList = $componentInstanceMapper->findByInstanceId($instanceID);
+            $cList = array_values($componentList);
 
-			$component = $factory->buildComponent($cList[0]);
+            $component = $factory->buildComponent($cList[0]);
 
-			if(!($component instanceof Component_ControllerAbstract)) {
-				die("<h2>Error adding component</h2><p>Could not find component to instantiate.</p>");
-			}
+            if (!($component instanceof Component_ControllerAbstract)) {
+                die("<h2>Error adding component</h2><p>Could not find component to instantiate.</p>");
+            }
 
-			$templateTarget = "component_position_{$component->getInstance()->getPosition()}";
-			$templateHandle = "component_{$component->getInstance()->getId()}";
-			$templateHandle = TEMPLATE_content;
+            $templateTarget = "component_position_{$component->getInstance()->getPosition()}";
+            $templateHandle = "component_{$component->getInstance()->getId()}";
+            $templateHandle = TEMPLATE_content;
 
 
             //Setup permissions for component
             $context['uid'] = $eportfolioHandler->getSettingsPageOwner();
             $context['permission'] = \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE;
 
-			$component->setup($context, $component->getInstance()->getConfigArray() );
+            $component->setup($context, $component->getInstance()->getConfigArray() );
 
-			if ($component->execute() !== false) {
-
-				/* Insert with config'd name
+            if ($component->execute() !== false) {
+/* Insert with config'd name
 				 */
-				foreach ($component->getInstance()->getConfig() as $currentConfig) {
-					/** @var Component_ConfigDefinition $currentConfig */
-					if ($currentConfig->getKey() == 'componentname') {
-						$configInstance = Component_ConfigMapper::getInstance()->findByColumnList(array(
-							'component_config_definition_id' => $currentConfig->getId(),
-							'component_instance_id' => $_POST['from'],
-						))->first();
+                foreach ($component->getInstance()->getConfig() as $currentConfig) {
+                    /** @var Component_ConfigDefinition $currentConfig */
+                    if ($currentConfig->getKey() == 'componentname') {
+                        $configInstance = Component_ConfigMapper::getInstance()->findByColumnList(array(
+                            'component_config_definition_id' => $currentConfig->getId(),
+                            'component_instance_id' => $_POST['from'],
+                        ))->first();
 
-						if ($configInstance instanceof Component_Config) {
-							$componentName = $configInstance->getValue();
+                        if ($configInstance instanceof Component_Config) {
+                            $componentName = $configInstance->getValue();
 
-							/* Presave a config for this newly added component
+                            /* Presave a config for this newly added component
 							 * so it always has the name we gave it
 							 */
-							$newConfigInstance = new Component_Config();
-							$newConfigInstance->setId(null);
-							$newConfigInstance->setConfigDefinitionId($currentConfig->getId());
-							$newConfigInstance->setInstanceId($component->getInstance()->getId());
-							$newConfigInstance->setValue($componentName);
+                            $newConfigInstance = new Component_Config();
+                            $newConfigInstance->setId(null);
+                            $newConfigInstance->setConfigDefinitionId($currentConfig->getId());
+                            $newConfigInstance->setInstanceId($component->getInstance()->getId());
+                            $newConfigInstance->setValue($componentName);
 
-							Component_ConfigMapper::getInstance()->save($newConfigInstance);
+                            Component_ConfigMapper::getInstance()->save($newConfigInstance);
 
-							/* Force inherited name
+                            /* Force inherited name
 							 */
-							$component->getInstance()->getConfig()->offsetGet($currentConfig->getId())
-								->setDefaultValue($componentName);
-						}
-						else {
-							$componentName = $currentConfig->getDefaultValue();
-						}
-					}
-				}
+                            $component->getInstance()->getConfig()->offsetGet($currentConfig->getId())
+                                ->setDefaultValue($componentName);
+                        } else {
+                            $componentName = $currentConfig->getDefaultValue();
+                        }
+                    }
+                }
 
-				$component->parseConfig();
+                $component->parseConfig();
 
-				if ($component->renderTemplate($templateHandle) !== false) {
-					$component->setVar(array(
-						'COMPONENT_NAME' => $componentName,
-					));
+                if ($component->renderTemplate($templateHandle) !== false) {
+                    $component->setVar(array(
+                        'COMPONENT_NAME' => $componentName,
+                    ));
 
-					$component->parse($templateTarget, $templateHandle, true);
-				}
-			}
+                    $component->parse($templateTarget, $templateHandle, true);
+                }
+            }
 
-			/* These aren't normally parsed so have to do it explicitly
+            /* These aren't normally parsed so have to do it explicitly
 			 */
-			$component->getPageTemplate()->setVar(array(
-				'USER_ID' => $eportfolioHandler->getUserId(),
-				'PAGE_ID' => $eportfolioHandler->getPageId(),
-			));
+            $component->getPageTemplate()->setVar(array(
+                'USER_ID' => $eportfolioHandler->getUserId(),
+                'PAGE_ID' => $eportfolioHandler->getPageId(),
+            ));
 
-			$component->getPageTemplate()->pparse($templateTarget, $templateHandle);
-		}
-		/* AJAX new column widths
+            $component->getPageTemplate()->pparse($templateTarget, $templateHandle);
+        } /* AJAX new column widths
 		 */
-		else if (is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
-			$eportfolioHandler->updateColumnWidths(Scrub::text($_POST['leftColWidth']), Scrub::text($_POST['rightColWidth']));
-		}
-		/* Update permissions
+        elseif (is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
+            $eportfolioHandler->updateColumnWidths(Scrub::text($_POST['leftColWidth']), Scrub::text($_POST['rightColWidth']));
+        } /* Update permissions
 		 */
-		else if (isset($_POST['update']) && ($_POST['update'] == 'permissions')) {
-			\Eportfolio\PermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'], $_POST['individual_permission']);
+        elseif (isset($_POST['update']) && ($_POST['update'] == 'permissions')) {
+            \Eportfolio\PermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'], $_POST['individual_permission']);
 
-			SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getUid()}/{$eportfolioHandler->getPageId()}");
-		}
-		/* Softdelete this page and redirect back to profile
+            SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getUid()}/{$eportfolioHandler->getPageId()}");
+        } /* Softdelete this page and redirect back to profile
 		 */
-		else if (isset($_POST['deletePage'])) {
-			$eportfolioHandler->softdelete();
+        elseif (isset($_POST['deletePage'])) {
+            $eportfolioHandler->softdelete();
 
-			SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getUid()}/profile");
-		}
-		/* Update config options from homepage
+            SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getUid()}/profile");
+        } /* Update config options from homepage
 		 */
-		else if (($_POST['type'] == 'config') && $_POST['component']) {
-			$config = $_POST;
+        elseif (($_POST['type'] == 'config') && $_POST['component']) {
+            $config = $_POST;
 
-			/** @var Component_Instance $instance */
-			$instance = reset($componentInstanceMapper->findByInstanceId($config['component']));
-			$componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
+            /** @var Component_Instance $instance */
+            $instance = reset($componentInstanceMapper->findByInstanceId($config['component']));
+            $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
 
-			$configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn(
-				'component_definition_id', $instance->getDefinitionId()
-			);
+            $configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn(
+                'component_definition_id', $instance->getDefinitionId()
+            );
 
-			$pageId = $config['page_id'];
+            $pageId = $config['page_id'];
 
-			unset($config['page_id'], $config['type'], $config['component']);
+            unset($config['page_id'], $config['type'], $config['component']);
 
-			// much as I hate exceptional cases, there are exceptional cases...
+            // much as I hate exceptional cases, there are exceptional cases...
 
-			//remove the prepended '/homepage/'
-			if(isset($config['src'])) {
-				preg_match("#[^0-9]*([0-9]*)#i", $config['src'], $matches);
-				if($matches) {
-					$config['src'] = $matches[1];
-				}
-			}
-			// prepare filter value
-			if(isset($config['filter'])) {
-				// retrieve the instance so we know how to insert this data
-				$cclass = $instance->getDefinition()->getClass();
+            //remove the prepended '/homepage/'
+            if (isset($config['src'])) {
+                preg_match("#[^0-9]*([0-9]*)#i", $config['src'], $matches);
+                if ($matches) {
+                    $config['src'] = $matches[1];
+                }
+            }
+            // prepare filter value
+            if (isset($config['filter'])) {
+                // retrieve the instance so we know how to insert this data
+                $cclass = $instance->getDefinition()->getClass();
                 /** @var \Component_ControllerAbstract $controller */
-				$controller = new $cclass($instance, new \Schoolbox\User(), $page);
-				$controller->execute();
-				$fields = $controller->getFilterFields();
-				$val = 0;
-				for($i = 0; $i < count($fields); $i++) {
-					$add = isset($config['filter'][$fields[$i]]) && $config['filter'][$fields[$i]] ? 1 : 0;
-					$val += $add * pow(2, $i);
-				}
-				$config['filter'] = $val;
-			}
+                $controller = new $cclass($instance, new \Schoolbox\User(), $page);
+                $fields = $controller->getFilterFields();
+                $val = 0;
+                for ($i = 0; $i < count($fields); $i++) {
+                    $add = isset($config['filter'][$fields[$i]]) && $config['filter'][$fields[$i]] ? 1 : 0;
+                    $val += $add * pow(2, $i);
+                }
+                $config['filter'] = $val;
+            }
 
             /** @var Component_ConfigDefinition $confD */
-			foreach($configDefinitionCollection as $confD) {
-				if (isset($config[$confD->getKey()])) {
-
-					// this should be 1:1 relation, so return only the first instance of this definition
+            foreach ($configDefinitionCollection as $confD) {
+                if (isset($config[$confD->getKey()])) {
+// this should be 1:1 relation, so return only the first instance of this definition
                     /** @var Component_Config $confI */
-					$confI = $componentConfigInstanceMapper->findByColumnList(array(
-						'component_config_definition_id' => $confD->getId(),
-						'component_instance_id'          => $instance->getId()
-					))->first();
-					if (!($confI instanceof Component_Config)) {
-						$confI = new Component_Config();
-					}
+                    $confI = $componentConfigInstanceMapper->findByColumnList(array(
+                        'component_config_definition_id' => $confD->getId(),
+                        'component_instance_id'          => $instance->getId()
+                    ))->first();
+                    if (!($confI instanceof Component_Config)) {
+                        $confI = new Component_Config();
+                    }
 
-					printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $confD->getKey(), $confI->getValue(), $config[$confD->getKey()]);
+                    printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $confD->getKey(), $confI->getValue(), $config[$confD->getKey()]);
 
-					if(!($confI->getId())) {
-						$confI->setConfigDefinitionId($confD->getId());
-						$confI->setInstanceId($instance->getId());
-					}
-					$confI->setValue($config[$confD->getKey()]);
+                    if (!($confI->getId())) {
+                        $confI->setConfigDefinitionId($confD->getId());
+                        $confI->setInstanceId($instance->getId());
+                    }
+                    $confI->setValue($config[$confD->getKey()]);
 
-					$componentConfigInstanceMapper->save($confI);
+                    $componentConfigInstanceMapper->save($confI);
 
-				}
-			}
+                }
+            }
 
-			SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getUid()}/{$eportfolioHandler->getPageId()}");
-		}
-	}
-	else {
-		error(19);
-	}
-}
-else {
-
-	/* Create page
+            SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getUid()}/{$eportfolioHandler->getPageId()}");
+        }
+    } else {
+        error(19);
+    }
+} else {
+/* Create page
 	 */
-	if (isset($_POST['page_title']) && strlen(trim($_POST['page_title'])) && isset($_POST['page_template']) && is_numeric($_POST['page_template'])) {
-
-		/* Create page for the currently logged-in user
+    if (isset($_POST['page_title']) && strlen(trim($_POST['page_title'])) && isset($_POST['page_template']) && is_numeric($_POST['page_template'])) {
+/* Create page for the currently logged-in user
 		 */
-		$userId = $_POST['userId'];
-		$pageId = null;
-		$pageTitle = $_POST['page_title'];
-		$templateId = $_POST['page_template'];
+        $userId = $_POST['userId'];
+        $pageId = null;
+        $pageTitle = $_POST['page_title'];
+        $templateId = $_POST['page_template'];
 
-		$authenticator = new Eportfolio_Authenticator($_SESSION['id'], $userId, null);
+        $authenticator = new Eportfolio_Authenticator($_SESSION['id'], $userId, null);
 
-		if ($authenticator->canCreate()) {
-			/* Create page and apply components (a page_id is generated)
+        if ($authenticator->canCreate()) {
+            /* Create page and apply components (a page_id is generated)
 			 */
-			$eportfolioHandler = new Eportfolio($userId, $pageId);
-			$eportfolioHandler->createEportfolioFromTemplate($pageTitle, $templateId);
+            $eportfolioHandler = new Eportfolio($userId, $pageId);
+            $eportfolioHandler->createEportfolioFromTemplate($pageTitle, $templateId);
 
-			/* Apply permissions to the newly-created page
+            /* Apply permissions to the newly-created page
 			 */
-			Eportfolio\PermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'], $_POST['individual_permission']);
+            Eportfolio\PermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'], $_POST['individual_permission']);
 
-			/* Redirect to newly created page
+            /* Redirect to newly created page
 			 */
-			SitePage::localRedir("/eportfolio/{$eportfolioHandler->getUserId()}/{$eportfolioHandler->getPageId()}");
-		}
-		else {
-			error(19);
-		}
-	}
-	else {
-		error(2);
-	}
+            SitePage::localRedir("/eportfolio/{$eportfolioHandler->getUserId()}/{$eportfolioHandler->getPageId()}");
+        } else {
+            error(19);
+        }
+    } else {
+        error(2);
+    }
 }

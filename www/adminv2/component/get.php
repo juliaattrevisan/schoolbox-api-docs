@@ -10,7 +10,7 @@
  */
 
 // require SitePage context
-if(!isset($this)) {
+if (!isset($this)) {
     require_once('../../../include/Bootstrap.php');
     httpError(400, 101); // resource not available
 }
@@ -20,7 +20,7 @@ $this->setLite(true);
 $context = $this->arg[0];
 $groupId = $this->arg[1];
 
-if(empty($context) || empty($groupId)) {
+if (empty($context) || empty($groupId)) {
     httpError(400, 2); // info missing
 }
 
@@ -32,7 +32,7 @@ $this->setBlock(TEMPLATE_body, 'position_right', 'position_right_block');
 
 $componentFactory = buildComponentFactory($context, new Schoolbox\User(), $this);
 
-if(!$componentFactory) {
+if (!$componentFactory) {
     httpError(400, 'Invalid context specified.');
 }
 
@@ -40,18 +40,17 @@ $componentCollection = $componentFactory->buildComponentList($groupId);
 
 $occupiedPositionList = array();
 
-foreach($componentCollection as $component) {
+foreach ($componentCollection as $component) {
     /** @var Component_ControllerAbstract $component */
     $instance_no = $component->getInstance()->getId();
     $position_no = $component->getInstance()->getPosition();
     $position    = "position_{$position_no}";
 
-    if ( !$this->template->exists("{$position}_block") ) {
+    if (!$this->template->exists("{$position}_block")) {
         $this->setFile($position, 'adminv2/component/placeholder.html');
     }
 
     $component->setup(array('id' => '-1', 'code' => '', 'name' => ''), array());
-    $component->execute();
 
     $this->setVar(array(
         'COMPONENT_INSTANCE_ID'     => $instance_no,
@@ -66,14 +65,14 @@ foreach($componentCollection as $component) {
 
     $this->parse("{$position}_block", $position, true);
 
-    if ( !in_array($position_no, $occupiedPositionList) ) {
+    if (!in_array($position_no, $occupiedPositionList)) {
         $occupiedPositionList[] = $position_no;
     }
 }
 
 $emptyPositionList = array_diff(array('top', 'left', 'right'), $occupiedPositionList);
 
-foreach ( $emptyPositionList as $emptyPosition ) {
+foreach ($emptyPositionList as $emptyPosition) {
     $this->setVar("position_{$emptyPosition}_block", '');
 }
 
@@ -85,20 +84,20 @@ foreach ( $emptyPositionList as $emptyPosition ) {
  * @param SitePage $sitepage
  * @return Component_FactoryAbstract|null
  */
-function buildComponentFactory($context, Schoolbox\User $user, SitePage $sitepage) {
+function buildComponentFactory($context, Schoolbox\User $user, SitePage $sitepage)
+{
     $contextMap = array(
         'dashboard' => false,
         'homepage' => true,
         'eportfolio' => true
     );
 
-    if(isset($contextMap[$context])) {
+    if (isset($contextMap[$context])) {
         $class = sprintf('Component_%s_Factory', ucfirst(strtolower($context)));
 
-        if($contextMap[$context]) {
+        if ($contextMap[$context]) {
             return new $class($user, $sitepage, true);
-        }
-        else {
+        } else {
             return new $class($user, $sitepage);
         }
     }

@@ -92,7 +92,6 @@ foreach ($componentCollection as $component) {
         array('id' => '-1', 'code' => '', 'name' => ''),
         $component->getInstance()->getConfigArray()
     );
-    $component->execute();
 
     $this->setVar(array(
         'COMPONENT_INSTANCE_ID'     => $instance_id,
