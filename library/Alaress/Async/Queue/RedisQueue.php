@@ -69,7 +69,7 @@ class RedisQueue implements QueueInterface
         $count = count($idList);
 
         for ($i = 0; $i < $count; ++$i) {
-            // $key  = $idList[$i];
+            $key  = $idList[$i];
             $data = $result[$i];
 
             // attempt to unserialize the message
