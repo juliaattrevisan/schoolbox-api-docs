@@ -9,7 +9,7 @@
 class Synchronise_Synergetic_Meggs_Hydrator_Student_Role implements Synchronise_Base_IHydrator
 {
     const ROLE_JUNIOR_STUDENTS = 5;
-    const ROLE_SENIOR_STUDENTS = 6;
+    const ROLE_SENIOR_STUDENTS = 3;
 
     /**
      * Hydrates role based on year level.
