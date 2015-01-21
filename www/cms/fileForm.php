@@ -5,6 +5,8 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use \Schoolbox\Resource\CategoryMapper;
 use \Schoolbox\Resource\FileMapper;
 use \Schoolbox\Resource\File;
+use \Schoolbox\Resource\Link;
+use \Schoolbox\Resource\LinkMapper;
 
 /* Force session usage due to flash uploader
  * http://www.uploadify.com/forums/discussion/43/using-sessions-tricking-basic-authentication/p1
@@ -215,21 +217,18 @@ elseif ( is_numeric($_GET['deleteList']) ) {
         }
     }
 
-    $linkHandler = new Link;
-
     $linkList = explode(',', rtrim($_GET['linkList'], ','));
     if ( is_array($linkList) ) {
         foreach ( $linkList as $linkID ) {
-            if ( is_numeric($linkID) ) {
-                if ( !$link = $linkHandler->getByID($linkID) ) {
-                    error(2);
-                }
-
-                if ( $groupHandler->getPermission($link['category']) < WRITE_ACCESS ) {
+            try {
+                /** @var Link $link */
+                $link = LinkMapper::getInstance()->findById($linkID);
+                if ($groupHandler->getPermission($link->getFolder()->getId()) < WRITE_ACCESS) {
                     error(6);
                 }
-
-                $linkHandler->delete($linkID);
+                LinkMapper::getInstance()->delete($link);
+            } catch (Exception $e) {
+                error(2);
             }
         }
     }
