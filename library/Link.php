@@ -33,16 +33,18 @@ class Link extends DeprecatedModel
 
         if (is_array($categoryID)) {
             $cats = " IN ('" . implode("', '", $categoryID) . "') ";
-        } else
+        } else {
             $cats = " = '$categoryID' ";
+        }
 
         $query = "SELECT l.*, u.firstname, u.lastname, u.title, UNIX_TIMESTAMP(submitted) submitted, 'html_alt1' iconFile
 				  FROM link l
 				  LEFT JOIN user u ON u.id = l.owner
-				  WHERE category $cats";
+				  WHERE deleted_at IS NULL AND category $cats";
 
-        if ($groupHandler->getPermission($categoryID) < WRITE_ACCESS)
+        if ($groupHandler->getPermission($categoryID) < WRITE_ACCESS) {
             $query .= " AND l.hidden = 0";
+        }
 
         $sortFields = array('Name' => 'l.description', 'Date' => 'l.submitted');
         $config['sort'] = isset($sortFields[$config['sort']]) ? $config['sort'] : 'Name';
@@ -50,16 +52,18 @@ class Link extends DeprecatedModel
 
         $query .= " ORDER BY " . $sortFields[$config['sort']] . " " . $config['sortdir'];
 
-        if ($config['size'] > 0)
+        if ($config['size'] > 0) {
             $query .= " LIMIT 0, " . $config['size'];
+        }
 
         return $this->db->getAll($query);
     }
 
     function appendHTTP($url)
     {
-        if (strncasecmp($url, "http://", 7) && strncasecmp($url, "https://", 8) && strncasecmp($url, "ftp://", 6))
+        if (strncasecmp($url, "http://", 7) && strncasecmp($url, "https://", 8) && strncasecmp($url, "ftp://", 6)) {
             $url = "http://" . $url;
+        }
         return $url;
     }
 
@@ -71,16 +75,17 @@ class Link extends DeprecatedModel
             'user' => $_SESSION['id'],
         );
 
-	    $notif = new Notif(Notif::TOPIC_CMS);
-	    $notif->info("CRUD", $logEntry);
+        $notif = new Notif(Notif::TOPIC_CMS);
+        $notif->info("CRUD", $logEntry);
 
     }
 
     function update($data)
     {
 
-        if (isset($data['url']))
+        if (isset($data['url'])) {
             $data['url'] = $this->appendHTTP(trim($data['url']));
+        }
 
         $data['modified'] = 'NOW()';
 
@@ -132,6 +137,7 @@ class Link extends DeprecatedModel
                             AND `userAccess`.uid = {$_SESSION['id']}
                         WHERE (`perms`.cid OR `userAccess`.sid)
                             AND MATCH(`url`,`description`,`comment`) AGAINST ('$keyword')
+                            AND `deleted_at` IS NULL
                             AND `hidden` = FALSE
                         ORDER BY `$sort_by` $sort_dir
                         LIMIT $offset, $limit;
@@ -148,6 +154,7 @@ class Link extends DeprecatedModel
                                 AND `userAccess`.uid = {$_SESSION['id']}
                             WHERE (`perms`.cid OR `userAccess`.sid)
                                 AND MATCH(`url`,`description`,`comment`) AGAINST ('$keyword')
+                                AND `deleted_at` IS NULL
                                 AND `hidden` = FALSE
             ";
 
