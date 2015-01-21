@@ -984,10 +984,10 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getPortrait($externalUserId)
     {
-
         $userMapper = new \Schoolbox\UserMapper();
+
         try {
-        $user = $userMapper->findByColumn('synergy_id', $externalUserId)->first();
+            $user = $userMapper->findByColumn('synergy_id', $externalUserId)->first();
         }
         catch (\Exception $e) {
             return false;
