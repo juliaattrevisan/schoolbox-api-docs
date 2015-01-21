@@ -39,7 +39,7 @@ class Link extends DeprecatedModel
         $query = "SELECT l.*, u.firstname, u.lastname, u.title, UNIX_TIMESTAMP(submitted) submitted, 'html_alt1' iconFile
 				  FROM link l
 				  LEFT JOIN user u ON u.id = l.owner
-				  WHERE category $cats";
+				  WHERE deleted_at IS NULL AND category $cats";
 
         if ($groupHandler->getPermission($categoryID) < WRITE_ACCESS)
             $query .= " AND l.hidden = 0";
@@ -132,6 +132,7 @@ class Link extends DeprecatedModel
                             AND `userAccess`.uid = {$_SESSION['id']}
                         WHERE (`perms`.cid OR `userAccess`.sid)
                             AND MATCH(`url`,`description`,`comment`) AGAINST ('$keyword')
+                            AND `deleted_at` IS NULL
                             AND `hidden` = FALSE
                         ORDER BY `$sort_by` $sort_dir
                         LIMIT $offset, $limit;
@@ -148,6 +149,7 @@ class Link extends DeprecatedModel
                                 AND `userAccess`.uid = {$_SESSION['id']}
                             WHERE (`perms`.cid OR `userAccess`.sid)
                                 AND MATCH(`url`,`description`,`comment`) AGAINST ('$keyword')
+                                AND `deleted_at` IS NULL
                                 AND `hidden` = FALSE
             ";
 
