@@ -32,6 +32,7 @@ class Synchronise_Tass_Toowoomba_Strategy_Parent extends Synchronise_Base_Strate
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator($unsetOnUpdate)
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
+            ->addHydrator(new Synchronise_Base_Hydrator_AllowUpdateOnly())
             // TASS has no separate spouse entries, so just add a clear one.
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Clear())
         ;
