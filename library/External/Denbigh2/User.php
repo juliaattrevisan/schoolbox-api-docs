@@ -873,7 +873,7 @@ class External_Denbigh2_User implements External_UserInterface
             }
         }
         else if ($this->getGroupHandler()->isStaff($userId)) {
-            $api = new External_Denbigh2_Api('TimetableLessons',
+            $api = new External_Denbigh2_Api('Classes',
                 array(
                     'Teacher Code' => $externalUserId
                 ),
