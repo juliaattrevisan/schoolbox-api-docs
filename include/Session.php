@@ -53,9 +53,9 @@ class Session
 
         $ip = Session::getIP();
 
-        /* if user is found and session is started create our user record */
-        if (is_array($user) && session_start()) {
-
+        /* if user is found and enabled and session is started create our user record */
+        if (is_array($user) && $user['enabled'] && session_start()) {
+            
             /* Store remember me cookie so user can return in the future */
             if($remember == true) {
                 $key = sha1(microtime(true).mt_rand(10000,90000));
