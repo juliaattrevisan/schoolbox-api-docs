@@ -11,11 +11,9 @@ namespace Schoolbox\Realtime\Rerouter;
 
 
 use Alaress\Async\Stomp\SubscriptionList;
-use Psr\Log\LoggerInterface;
-use Schoolbox\Collection;
 use Schoolbox\Notif\Queue\QueueFactory;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class UserSubscriptionList extends SubscriptionList {
 
@@ -60,8 +58,12 @@ class UserSubscriptionList extends SubscriptionList {
 
             // with clear, everyone gets reloaded; without, only new users get loaded
             if ($clear || empty($this->queues[$name]) || !array_key_exists($name, $this->queues)) {
-                $user = $source->findById($id); // TODO srsly. this has to change.
-                $this->queues[$name] = $user;
+                try {
+                    $user = $source->findById($id); // TODO srsly. this has to change.
+                    $this->queues[$name] = $user;
+                } catch (MapperException $e) {
+                    // *@(&*(#$*%#$(*^!!!!
+                }
             }
 		}
 	}
