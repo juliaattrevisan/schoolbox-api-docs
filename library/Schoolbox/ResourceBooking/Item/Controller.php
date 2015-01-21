@@ -18,7 +18,8 @@ use Schoolbox\UserMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\StorageMapper;
 
-class Controller extends Base {
+class Controller extends Base
+{
 
     /**
      * @var Mapper
@@ -43,7 +44,8 @@ class Controller extends Base {
     /**
      * Browses the list of items.
      */
-    public function browse() {
+    public function browse()
+    {
 
         // Get the list of items
         $query  = array();
@@ -61,11 +63,12 @@ class Controller extends Base {
                 $list = $this->getMapper()->search(
                     $search,
                     $this->paginator->getOffset($page),
-                    $this->paginator->getPageSize()
+                    $this->paginator->getPageSize(),
+                    'name',
+                    'asc'
                 );
             }
-        }
-        else {
+        } else {
             if ($catId) {
                 $query['resource_category_id'] = $catId;
             }
@@ -77,7 +80,7 @@ class Controller extends Base {
                 $list = $this->mapper->findByColumnList(
                     $query,
                     array(
-                        'order'  => array('modified_at' => 'desc'),
+                        'order'  => array('name' => 'asc'),
                         'limit'  => $this->paginator->getPageSize(),
                         'offset' => $this->paginator->getOffset($page),
                     )
@@ -105,14 +108,15 @@ class Controller extends Base {
      *
      * @todo remove and integrate into browse() once BelgianSuggest is gone
      */
-    public function search() {
+    public function search()
+    {
         $excludedId = $this->getRequest()->query['thisId'];
         $search     = trim($this->getRequest()->query['query']);
         $this->getResponse()->content->set(
             array(
                 'format' => 'json',
                 'data'   => $this->getMapper()->search($search)
-                    ->filter(function($item) use($excludedId) {
+                    ->filter(function($item) use ($excludedId) {
                         return $item->getId() != $excludedId;
                     })
                     ->map(function($item) {
@@ -128,7 +132,8 @@ class Controller extends Base {
     /**
      * Display form for adding another category
      */
-    public function add() {
+    public function add()
+    {
         $this->getResponse()->content->set(
             array(
                 'template' => '@resourceItem/edit.twig',
@@ -149,7 +154,8 @@ class Controller extends Base {
      *
      * @param Model $item
      */
-    public function read(Model $item) {
+    public function read(Model $item)
+    {
         // Show a given view and date
         $calendarDate = DateTime::createFromFormat('d-m-Y', $this->request->query['date']);
         if (!($calendarDate instanceof DateTime)) {
@@ -174,7 +180,8 @@ class Controller extends Base {
      *
      * @param Model $item
      */
-    public function edit(Model $item) {
+    public function edit(Model $item)
+    {
         // Build list of moderators and related items (for BelgianSuggest)
         $moderatorList = array();
         foreach ($item->getModeratorList() as $moderator) {
@@ -209,7 +216,8 @@ class Controller extends Base {
     /**
      * Backend for adding a new category
      */
-    public function create() {
+    public function create()
+    {
         $model = new Model();
         $this->updateItemWithFormValues(
             $model,
@@ -230,7 +238,8 @@ class Controller extends Base {
      *
      * @param Model $item
      */
-    public function update(Model $item) {
+    public function update(Model $item)
+    {
         $this->updateItemWithFormValues(
             $item,
             $this->getRequest()->post,
@@ -250,7 +259,8 @@ class Controller extends Base {
      *
      * @param Model $item
      */
-    public function delete(Model $item) {
+    public function delete(Model $item)
+    {
         $this->getMapper()->delete($item);
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate('resourceItem.browse', array())
@@ -264,7 +274,8 @@ class Controller extends Base {
      * @param array $post  Data from $_POST
      * @param array $files Data from $_FILES
      */
-    protected function updateItemWithFormValues(Model $model, $post, $files) {
+    protected function updateItemWithFormValues(Model $model, $post, $files)
+    {
         $model
             ->setName($post['name'])
             ->setRoomCode($post['room_code'])
@@ -281,8 +292,7 @@ class Controller extends Base {
                 $upload['name'], $upload['tmp_name'], $this->getUser()->getId()
             );
             $model->setImage($image);
-        }
-        else {
+        } else {
             $model->setImage($post['image'] ?: null);
         }
 
@@ -332,7 +342,8 @@ class Controller extends Base {
      * @return \DateInterval
      * @throws \Exception if the date interval object can't be created.
      */
-    protected function getDateIntervalFromForm($formPart) {
+    protected function getDateIntervalFromForm($formPart)
+    {
         return new \DateInterval(
             sprintf('PT%dH%dM', ($formPart['day'] * 24 + $formPart['hour']), $formPart['minute'])
         );
@@ -342,7 +353,8 @@ class Controller extends Base {
      * @param  Mapper $mapper
      * @return $this
      */
-    public function setMapper($mapper) {
+    public function setMapper($mapper)
+    {
         $this->mapper = $mapper;
         return $this;
     }
@@ -350,7 +362,8 @@ class Controller extends Base {
     /**
      * @return Mapper
      */
-    public function getMapper() {
+    public function getMapper()
+    {
         return $this->mapper;
     }
 
@@ -358,7 +371,8 @@ class Controller extends Base {
      * @param  UserMapper $userMapper
      * @return $this
      */
-    public function setUserMapper($userMapper) {
+    public function setUserMapper($userMapper)
+    {
         $this->userMapper = $userMapper;
         return $this;
     }
@@ -366,7 +380,8 @@ class Controller extends Base {
     /**
      * @return UserMapper
      */
-    public function getUserMapper() {
+    public function getUserMapper()
+    {
         return $this->userMapper;
     }
 
@@ -374,7 +389,8 @@ class Controller extends Base {
      * @param  RoleMapper $roleMapper
      * @return $this
      */
-    public function setRoleMapper($roleMapper) {
+    public function setRoleMapper($roleMapper)
+    {
         $this->roleMapper = $roleMapper;
         return $this;
     }
@@ -382,7 +398,8 @@ class Controller extends Base {
     /**
      * @return RoleMapper
      */
-    public function getRoleMapper() {
+    public function getRoleMapper()
+    {
         return $this->roleMapper;
     }
 
@@ -390,7 +407,8 @@ class Controller extends Base {
      * @param  IUrlPaginator $paginator
      * @return $this
      */
-    public function setPaginator($paginator) {
+    public function setPaginator($paginator)
+    {
         $this->paginator = $paginator;
         return $this;
     }
@@ -398,8 +416,8 @@ class Controller extends Base {
     /**
      * @return IUrlPaginator
      */
-    public function getPaginator() {
+    public function getPaginator()
+    {
         return $this->paginator;
     }
-
 }
