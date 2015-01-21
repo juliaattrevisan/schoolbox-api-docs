@@ -50,11 +50,16 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
         // For efficiency - fetch the full timetable, and build its color list
         foreach ($this->getUser()->getCampusCollection() as $campus) {
             $campusId  = $campus->getId();
-            $timetable = $this->getExternalTimetable()->getFullTimetable(
-                $this->getUser()->getExternalId(),
-                $this->getUser()->getId(),
-                $campusId
-            );
+            try {
+                $timetable = $this->getExternalTimetable()->getFullTimetable(
+                    $this->getUser()->getExternalId(),
+                    $this->getUser()->getId(),
+                    $campusId
+                );
+            } catch (Schoolbox\External\Exception $e) {
+                // Can't fetch timetable? assume it's empty
+                $timetable = array();
+            }
             if (empty($timetable)) {
                 continue;
             }
