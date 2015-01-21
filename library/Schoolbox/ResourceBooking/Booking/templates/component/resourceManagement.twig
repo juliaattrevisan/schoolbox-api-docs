@@ -4,12 +4,14 @@
         {% for item in bookingsByResource %}
             <li class="resource {% if item.resource.image.hash is empty %}no-image{% endif %}">
                 {# Show image for item if it's there, otherwise some empty image? #}
-                {% if item.resource.image.hash %}
-                    <img class="resource-image" src="/storage/image.php?size=square32&amp;hash={{ item.resource.image.hash|e('url') }}" />
-                {% endif %}
-                <h3>
-                    <a href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">{{ item.resource.name }}</a>
-                </h3>
+                <div class="resource-item">
+                    {% if item.resource.image.hash %}
+                        <img class="resource-image" src="/storage/image.php?size=square32&amp;hash={{ item.resource.image.hash|e('url') }}" />
+                    {% endif %}
+                    <h3>
+                        <a href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">{{ item.resource.name }}</a>
+                    </h3>
+                </div>
                 <ul>
                     {% for event in item.bookingEvents %}
                         <li class="{% if loop.index0 is even %}dark{% endif %} booking-details">
