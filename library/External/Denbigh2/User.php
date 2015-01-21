@@ -984,14 +984,30 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getPortrait($externalUserId)
     {
-        if (!is_numeric($externalUserId)) {
+
+        $userMapper = new \Schoolbox\UserMapper();
+        try {
+        $user = $userMapper->findByColumn('synergy_id', $externalUserId)->first();
+        }
+        catch (\Exception $e) {
             return false;
         }
 
-        $api = new External_Denbigh2_Api('Photos', array(
-            'Community ID' => $externalUserId
-        ));
+        /* Different columns for different types!
+         */
+        if ($this->getGroupHandler()->isStudent($user->getId())) {
+            $api = new External_Denbigh2_Api('Photos', array(
+                'Community ID' => $externalUserId
+            ));
+        }
+        elseif ($this->getGroupHandler()->isStaff($user->getId())) {
+            $api = new External_Denbigh2_Api('Photos', array(
+                'z_StaffCode' => $externalUserId
+            ));
+        }
 
+        /* Deal with the pic
+         */
         if (!$api->hasErrors()) {
             if (count($api->getResult()->data) && strlen($api->getResult()->data[0]->{'PhotoBase64Encoded'})) {
                 $photoPath = Config::get('portrait_dir') . '/' . $externalUserId . '.jpg';
