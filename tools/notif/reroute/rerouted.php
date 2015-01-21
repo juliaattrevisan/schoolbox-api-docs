@@ -110,7 +110,7 @@ $kernel->run(function($di, $loop, $log, $opts) use (&$rerouter) {
 
             // setup dependencies
             $binder     = new UserQueueBinder($amqp, new BunnyControl(), $qf1, new Generator());
-            $subscriber = new Subscriber($client, new UserSubscriptionList($qf2));
+            $subscriber = new Subscriber($client, new UserSubscriptionList($qf2, $log));
             $strat      = new RerouterDispatchStrategy($opts['flags']);
             $bunnyCtrl  = new BunnyControl();
 

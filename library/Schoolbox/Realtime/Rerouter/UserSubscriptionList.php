@@ -11,6 +11,7 @@ namespace Schoolbox\Realtime\Rerouter;
 
 
 use Alaress\Async\Stomp\SubscriptionList;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Notif\Queue\QueueFactory;
 use Schoolbox\UserMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -20,13 +21,17 @@ class UserSubscriptionList extends SubscriptionList {
     /** @var QueueFactory */
     protected $qf;
 
+    /** @var LoggerInterface */
+    protected $log;
 
     /**
      * @param QueueFactory $qf
+     * @param LoggerInterface $log
      */
-    public function __construct(QueueFactory $qf)
+    public function __construct(QueueFactory $qf, $log)
     {
         $this->qf = $qf;
+        $this->log = $log;
     }
 
 
@@ -39,33 +44,62 @@ class UserSubscriptionList extends SubscriptionList {
         return $this->qf->buildForUser($userId)->getName();
     }
 
-	/**
-	 * @param UserMapper $source
-	 * @param bool       $clear
-	 * @return void
-	 */
-	public function importFromSource($source, $clear = true) {
-		if($clear) {
-			$this->queues = array();
-		}
+
+    /**
+     * @param UserMapper $source
+     * @param bool       $clear
+     * @return void
+     */
+    public function importFromSource($source, $clear = true)
+    {
+        if ($clear) {
+            $this->log->debug("Dropping cache");
+            $this->queues = array();
+        }
+
+        $db = $source->getDatabase();
+
+        $count = $db->query("SELECT COUNT(`id`) FROM `user`")->fetchColumn();
+
+        if ($count == 0) {
+            return;
+        }
 
         // this isn't exactly kosher, but it sure beats dummy-hydrating every user in the db
-		$stmt = $source->getDatabase()->query("SELECT `id` FROM `user`");
+        $stmt = $source->getDatabase()->query("SELECT `id` FROM `user`");
 
-        // loooooose typingz
-		while (!is_null($id = $stmt->fetchColumn())) {
+        // we'll do this the long way because somehow a user might have an id of 0...
+        for ($i = 0; $i < $count; ++$i) {
+            $id = $stmt->fetchColumn();
+
+            // result is explicitly false? we somehow miscounted - we're done here
+            if ($id === false) {
+                $this->log->debug("Was expecting to load $count users, but only got " . ($i + 1));
+                return;
+            }
+
             $name = $this->createQueueName($id);
 
             // with clear, everyone gets reloaded; without, only new users get loaded
-            if ($clear || empty($this->queues[$name]) || !array_key_exists($name, $this->queues)) {
+            if ($clear || $this->noQueue($name)) {
                 try {
                     $user = $source->findById($id); // TODO srsly. this has to change.
                     $this->queues[$name] = $user;
                 } catch (MapperException $e) {
-                    // *@(&*(#$*%#$(*^!!!!
+                    $this->log->notice("Could not retrieve user with ID '$id'");
                 }
             }
-		}
-	}
+        }
+    }
+
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    protected function noQueue($name)
+    {
+        return !array_key_exists($name, $this->queues) || empty($this->queues[$name]);
+    }
 
 }

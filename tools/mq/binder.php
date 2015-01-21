@@ -82,7 +82,7 @@ EOL;
 
     $generator = new Generator();
     $binder    = new UserQueueBinder($conn, $ctrl, $qf, $generator);
-    $subList   = new UserSubscriptionList($qf);
+    $subList   = new UserSubscriptionList($qf, $log);
 
     // import data from database
     $log->debug("Importing user data");
