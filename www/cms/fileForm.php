@@ -11,17 +11,17 @@ use \Schoolbox\Resource\LinkMapper;
 /* Force session usage due to flash uploader
  * http://www.uploadify.com/forums/discussion/43/using-sessions-tricking-basic-authentication/p1
  */
-if ( isset( $_POST[session_name()] ) ) {
+if (isset( $_POST[session_name()] )) {
     session_id($_POST[session_name()]);
 }
 
-if ( isset( $_GET[session_name()] ) ) {
+if (isset( $_GET[session_name()] )) {
     session_id($_GET[session_name()]);
 }
 
 $ajax = isset($_GET['ajax']) && $_GET['ajax'];
 
-if($ajax) {
+if ($ajax) {
     header("Content-Type: application/json");
 }
 
@@ -34,8 +34,7 @@ $groupHandler = new Group();
 
 /* Upload single file */
 if (is_string($_POST['description']) && isset($_POST['category'])) {
-
-    // get a file object or die
+// get a file object or die
     try {
         // if we're editing an existing file, ensure the file exists
         if (is_numeric($_POST['fileID'])) {
@@ -69,7 +68,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
     }
 
     // if file was synchronously uploaded
-    if ( $_FILES['file']['name'] && is_uploaded_file($_FILES['file']['tmp_name'])) {
+    if ($_FILES['file']['name'] && is_uploaded_file($_FILES['file']['tmp_name'])) {
         $file->setTempFileLocation($_FILES['file']['tmp_name']);
         $file->setFilename($_FILES['file']['name']);
         $file->setFilesize(filesize($_FILES['file']['tmp_name']));
@@ -124,7 +123,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
             $code = 11;
             $msg  = "Your file, '{$file->getFilename()}' is not a valid filetype";
 
-        } elseif ($e->getCode() == \Schoolbox\File\Exception::CODE_FILE_TOO_LARGE ) {
+        } elseif ($e->getCode() == \Schoolbox\File\Exception::CODE_FILE_TOO_LARGE) {
             $code = 10;
             $msg  = 'The size of the uploaded file exceeds the file size restrictions of '.Alaress_Byte_Format::bytesToString($file->getMimetype()->getMaxFileSize()).'.';
 
@@ -140,86 +139,71 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
             error($code, $msg);
         }
     }
-}
-
-/* Move file from one category to another */
-elseif ( is_numeric($_POST['move']) && is_numeric($_POST['categoryID']) ) {
-
-    try {
+} /* Move file from one category to another */
+elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
+try {
         $file = FileMapper::getInstance()->findById($_POST['move']);
 
-        if ( $groupHandler->getPermission($file->getFolder()->getId()) < WRITE_ACCESS ) {
+        if ($groupHandler->getPermission($file->getFolder()->getId()) < WRITE_ACCESS) {
             $result = "Insufficient permssions";
-        }
-        else if ( $groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS ) {
+        } elseif ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS) {
             $result = "Insufficient permssions";
-        }
-        else {
+        } else {
             $file->setFolder(CategoryMapper::getInstance()->createModel($_POST['categoryID']));
             $file->setModified(Alaress_Date_Format::now());
 
             FileMapper::getInstance()->save($file);
             $result = "success";
         }
-    }
-    catch (Exception $e) {
+} catch (Exception $e) {
             $result = "File not found";
-    }
+        }
 
     header("Content-type: application/json");
     print json_encode(array( 'result' => $result ));
-}
-
-/* Delete a single file */
-elseif ( is_numeric($_GET['delete']) ) {
-    try{
+} /* Delete a single file */
+elseif (is_numeric($_GET['delete'])) {
+    try {
         $file = FileMapper::getInstance()->findById($_GET['delete']);
 
-        if ( $groupHandler->getPermission($file->getFolder()->getId()) < WRITE_ACCESS ) {
+        if ($groupHandler->getPermission($file->getFolder()->getId()) < WRITE_ACCESS) {
             error(6);
         }
 
         FileMapper::getInstance()->delete($file);
-    }
-    catch (Exception $e) {
+    } catch (Exception $e) {
         error(2);
     }
 
-    if ( $_GET['redirect'] == '' ) {
+    if ($_GET['redirect'] == '') {
         $page->backToTheFuture(1);
-    }
-    else {
+    } else {
         SitePage::localRedir($_GET['redirect']);
     }
-}
-
-/* Delete a list of files */
-elseif ( is_numeric($_GET['deleteList']) ) {
+} /* Delete a list of files */
+elseif (is_numeric($_GET['deleteList'])) {
     $fileList = explode(',', rtrim($_GET['fileList'], ','));
 
-    if ( is_array($fileList) ) {
-        foreach ( $fileList as $fileID ) {
-            if ( is_numeric($fileID) ) {
-
-                try{
+    if (is_array($fileList)) {
+        foreach ($fileList as $fileID) {
+            if (is_numeric($fileID)) {try {
                     $file = FileMapper::getInstance()->findById($fileID);
 
-                    if ( $groupHandler->getPermission($file->getFolder()->getId()) < WRITE_ACCESS ) {
+                    if ($groupHandler->getPermission($file->getFolder()->getId()) < WRITE_ACCESS) {
                         error(6);
                     }
 
                     FileMapper::getInstance()->delete($file);
-                }
-                catch (Exception $e) {
-                    error(2);
-                }
+            } catch (Exception $e) {
+                        error(2);
+            }
             }
         }
     }
 
     $linkList = explode(',', rtrim($_GET['linkList'], ','));
-    if ( is_array($linkList) ) {
-        foreach ( $linkList as $linkID ) {
+    if (is_array($linkList)) {
+        foreach ($linkList as $linkID) {
             try {
                 /** @var Link $link */
                 $link = LinkMapper::getInstance()->findById($linkID);
@@ -234,14 +218,10 @@ elseif ( is_numeric($_GET['deleteList']) ) {
     }
 
     $page->backToTheFuture(1);
-}
-
-/* Exceeded PHP max file size */
-elseif ( $_SERVER['REQUEST_METHOD'] == 'POST' && $_SERVER['CONTENT_LENGTH'] > 0 && empty($_POST) && empty($_FILES) ) {
+} /* Exceeded PHP max file size */
+elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && $_SERVER['CONTENT_LENGTH'] > 0 && empty($_POST) && empty($_FILES)) {
     error(10);
-}
-
-/* Unknown action */
+} /* Unknown action */
 else {
     error(2);
 }
