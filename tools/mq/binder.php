@@ -91,6 +91,12 @@ EOL;
 
     // final preflight details
     $userCount = count($subList->getAllQueueNames());
+
+    if ($userCount == 0) {
+        $log->error("No users found, no work to do. Exiting.");
+        return;
+    }
+
     $countLen  = strlen("$userCount");
     $pattern   = "BIND [%{$countLen}d/%{$countLen}d]  %4s/%4s: %s";
 

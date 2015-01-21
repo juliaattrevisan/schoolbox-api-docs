@@ -11,6 +11,7 @@ namespace Schoolbox\Realtime\Rerouter;
 
 
 use Alaress\Async\Stomp\SubscriptionList;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Collection;
 use Schoolbox\Notif\Queue\QueueFactory;
 use Schoolbox\User;
@@ -51,9 +52,10 @@ class UserSubscriptionList extends SubscriptionList {
 		}
 
         // this isn't exactly kosher, but it sure beats dummy-hydrating every user in the db
-		$stmt = $source->getDatabase()->query("SELECT id from `user`");
+		$stmt = $source->getDatabase()->query("SELECT `id` FROM `user`");
 
-		while ($id = $stmt->fetchColumn()) {
+        // loooooose typingz
+		while (!is_null($id = $stmt->fetchColumn())) {
             $name = $this->createQueueName($id);
 
             // with clear, everyone gets reloaded; without, only new users get loaded
