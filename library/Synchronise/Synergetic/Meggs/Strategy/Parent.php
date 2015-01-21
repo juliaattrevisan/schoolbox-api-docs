@@ -17,9 +17,11 @@ class Synchronise_Synergetic_Meggs_Strategy_Parent extends Synchronise_Base_Stra
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Parent())
+            ->addHydrator(new Synchronise_Synergetic_Meggs_Hydrator_Student_Campus())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Default())
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Spouse())
+            ->addSpouseHydrator(new Synchronise_Synergetic_Meggs_Hydrator_Student_Campus())
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Clear())
         ;
     }
