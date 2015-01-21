@@ -282,9 +282,9 @@
                         dataType: 'json',
                         url:      '/calendar/ajax/full',
                         data: {
-                            start: Math.round(start.unix()),
-                            end:   Math.round(end.unix()),
-							userId: {CALENDAR_USER_ID}
+                            start: Calendar.reOffsetTimestamp(start.unix()),
+                            end:   Calendar.reOffsetTimestamp(end.unix()),
+                            userId: {CALENDAR_USER_ID}
                         },
                         success: function(data) {
                             callback(data);

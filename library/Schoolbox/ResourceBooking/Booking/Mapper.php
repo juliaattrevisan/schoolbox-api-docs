@@ -8,14 +8,17 @@
  */
 
 namespace Schoolbox\ResourceBooking\Booking;
+
 use Schoolbox\Calendar\Event;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Item;
 
-class Mapper extends BaseMapper {
+class Mapper extends BaseMapper
+{
 
-    public function mapping() {
+    public function mapping()
+    {
         $this->hasTable('resource_booking');
         $this->hasModel('Schoolbox\\ResourceBooking\\Booking\\Model');
         $this->hasMap(
@@ -80,15 +83,15 @@ class Mapper extends BaseMapper {
             )
         );
 
-		$this->hasMap(
-			array(
-				'column' => 'name',
-				'property' => 'name',
-				'type' => self::TYPE_STRING,
-			)
-		);
+        $this->hasMap(
+            array(
+                'column' => 'name',
+                'property' => 'name',
+                'type' => self::TYPE_STRING,
+            )
+        );
 
-		// Created/Modified/Deleted
+        // Created/Modified/Deleted
         $this->hasMap(
             array(
                 'column'            => 'created_at',
@@ -122,53 +125,54 @@ class Mapper extends BaseMapper {
                 'this_key'  => 'id',
                 'other_key' => 'resource_booking_id',
                 'multiple'  => true,
-//                // Better M2M joins:
-//                'mapper'    => '\\Schoolbox\\ResourceBooking\\Booking\\Mapper',
-//                'this_key'  => 'id',
-//                'other_key' => 'id',
-//                'multiple'  => true,
-//                'through'   => array(
-//                    'mapper' => '\\Schoolbox\\ResourceBooking\\Booking\\RelatedBooking\\Mapper',
-//                    'table'     => 'resource_booking_relation',
-//                    'this_key'  => 'resource_booking_id',
-//                    'other_key' => 'extra_resource_booking_id',
-//                    'two_way'   => true,
-//                ),
+            //                // Better M2M joins:
+            //                'mapper'    => '\\Schoolbox\\ResourceBooking\\Booking\\Mapper',
+            //                'this_key'  => 'id',
+            //                'other_key' => 'id',
+            //                'multiple'  => true,
+            //                'through'   => array(
+            //                    'mapper' => '\\Schoolbox\\ResourceBooking\\Booking\\RelatedBooking\\Mapper',
+            //                    'table'     => 'resource_booking_relation',
+            //                    'this_key'  => 'resource_booking_id',
+            //                    'other_key' => 'extra_resource_booking_id',
+            //                    'two_way'   => true,
+            //                ),
             )
         );
     }
 
-	/**
-	 * Find a booking matching a partial name
-	 *
-	 * @param $column
-	 * @param $value
-	 * @return Collection
-	 */
-	public function findColumnLike($column, $value) {
-		$searchTerm = '%' . $this->getDatabase()->quoteForLike($value) .'%';
+    /**
+    * Find a booking matching a partial name
+    *
+    * @param $column
+    * @param $value
+    * @return Collection
+    */
+    public function findColumnLike($column, $value)
+    {
+        $searchTerm = '%' . $this->getDatabase()->quoteForLike($value) .'%';
 
-		$query = "
+        $query = "
 			SELECT {$this->getColumnString('b')}
 			FROM {$this->table} b
 			WHERE b.{$column} LIKE :like
 		";
 
-		$statement = $this->getDatabase()->prepare($query);
-		$statement->execute(array(
-			'like' => $searchTerm
-		));
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(array(
+            'like' => $searchTerm
+        ));
 
-		$mapper = new \Schoolbox\ResourceBooking\Booking\Mapper();
+        $mapper = new \Schoolbox\ResourceBooking\Booking\Mapper();
 
-		$collection = new \Schoolbox\Collection();
+        $collection = new \Schoolbox\Collection();
 
-		while ($row = $statement->fetch()) {
-			$collection->add($mapper->hydrate($row, 'b'));
-		}
+        while ($row = $statement->fetch()) {
+            $collection->add($mapper->hydrate($row, 'b'));
+        }
 
-		return $collection;
-	}
+        return $collection;
+    }
 
     /**
      * Retrieves all bookings between a given timespan.
@@ -184,7 +188,8 @@ class Mapper extends BaseMapper {
      *
      * @return Collection|Model[]
      */
-    public function findForTimespan($fromTimestamp, $toTimestamp, $statusIds = array(), $extra = array()) {
+    public function findForTimespan($fromTimestamp, $toTimestamp, $statusIds = array(), $extra = array())
+    {
         // If using Aura:sql_query
 //        $this->queryFactory->newSelect()
 //            ->cols($this->getColumnArray('x'))
@@ -208,9 +213,16 @@ class Mapper extends BaseMapper {
 
         // Just search on date for now.
         // Events: any event whose start <= endWindow, or end >= startWindow
+        // Timestamps are in GMT, this doesn't make a big difference for
+        // month view, but does for day.
+        $startWindow = new \DateTime();
+        $endWindow   = new \DateTime();
+        $utcTimezone = new \DateTimeZone('UTC');
+        $startWindow->setTimestamp($fromTimestamp)->setTimezone($utcTimezone);
+        $endWindow->setTimestamp($toTimestamp)->setTimezone($utcTimezone);
         $params = array(
-            'startWindow' => date('Y-m-d H:i:s', $fromTimestamp),
-            'endWindow'   => date('Y-m-d H:i:s', $toTimestamp),
+            'startWindow' => $startWindow->format('Y-m-d H:i:s'),
+            'endWindow'   => $endWindow->format('Y-m-d H:i:s'),
         );
         if (!empty($extra['resource_id'])) {
             $params = array_merge($params, $this->getArrayParameters($extra['resource_id'], 'resource'));
@@ -295,7 +307,8 @@ class Mapper extends BaseMapper {
      *
      * @return Collection|Model[]
      */
-    public function findForOwner($ownerId, $fromTimestamp, $toTimestamp, $statusIds = array()) {
+    public function findForOwner($ownerId, $fromTimestamp, $toTimestamp, $statusIds = array())
+    {
         return $this->findForTimespan(
             $fromTimestamp,
             $toTimestamp,
@@ -316,7 +329,8 @@ class Mapper extends BaseMapper {
      *
      * @return Collection|Model[]
      */
-    public function findForResource($resourceId, $fromTimestamp, $toTimestamp, $statusIds = array()) {
+    public function findForResource($resourceId, $fromTimestamp, $toTimestamp, $statusIds = array())
+    {
         return $this->findForTimespan(
             $fromTimestamp,
             $toTimestamp,
@@ -332,7 +346,8 @@ class Mapper extends BaseMapper {
      * @param  int $userId
      * @return bool
      */
-    public function isUserModeratorOfBookingItem($bookingId, $userId) {
+    public function isUserModeratorOfBookingItem($bookingId, $userId)
+    {
         $query = "
             SELECT COUNT(*)
             FROM {$this->getTable()} b
@@ -342,7 +357,7 @@ class Mapper extends BaseMapper {
         ";
         $statement = $this->getDatabase()->prepare($query);
         $statement->bindValue('bookingId', $bookingId);
-        $statement->bindValue('userId',    $userId);
+        $statement->bindValue('userId', $userId);
         $statement->execute();
         return $statement->fetchColumn() > 0;
     }
@@ -354,7 +369,8 @@ class Mapper extends BaseMapper {
      * @return Model
      * @throws BaseMapper\Exception if item doesn't exist
      */
-    public function findById($id) {
+    public function findById($id)
+    {
         // TODO request joins in find* methods
         $query = "
             SELECT
@@ -390,7 +406,8 @@ class Mapper extends BaseMapper {
      * @param  int $id
      * @return Collection|Model[]
      */
-    public function findRelatedBookings($id) {
+    public function findRelatedBookings($id)
+    {
         // Related bookings: all items that share the same event ID,
         // but are not the same booking
         $query = "
@@ -427,7 +444,8 @@ class Mapper extends BaseMapper {
      * @param  int $seriesId
      * @return Collection|Model[]
      */
-    public function findSeriesBookings($id, $seriesId) {
+    public function findSeriesBookings($id, $seriesId)
+    {
         $resourceStatement = $this->getDatabase()->prepare(
             "SELECT resource_id FROM {$this->getTable()} WHERE id=?"
         );
@@ -453,8 +471,8 @@ class Mapper extends BaseMapper {
             AND   b.resource_id = :resourceId
         ";
         $statement = $this->getDatabase()->prepare($query);
-        $statement->bindValue('id',         $id);
-        $statement->bindValue('seriesId',   $seriesId);
+        $statement->bindValue('id', $id);
+        $statement->bindValue('seriesId', $seriesId);
         $statement->bindValue('resourceId', $resourceId);
         $statement->execute();
         $list = $this->hydrateList($statement, 'b', function($mapper, $model, $row) {
