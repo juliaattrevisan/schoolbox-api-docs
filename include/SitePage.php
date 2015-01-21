@@ -605,15 +605,6 @@ class SitePage extends Page
                     }
                     break;
 
-                case 'cedars':
-                    if ($this->groupHandler->isStaff()) {
-                        $location = 'https://login.microsoftonline.com';
-                    } elseif ($this->groupHandler->isStudent()) {
-                        $location = 'https://login.microsoftonline.com';
-                    }
-
-                    break;
-
                 case 'oakburn':
                     if ($this->groupHandler->isStaff()) {
                         $location = 'https://mail.soc.tas.edu.au/owa/';
