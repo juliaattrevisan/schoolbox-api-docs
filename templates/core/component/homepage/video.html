@@ -13,10 +13,6 @@
            width="100%">
       <source src="/cms/sendVideo.php?type=sbfs&id={DEFAULT_VIDEO_ID}" type='video/mp4'>
     </video>
-    <script>
-        var videoElement = $("#schoolbox_video{COMPONENT_INSTANCE_ID}").mediaelementplayer();
-        var video        = videoElement.data('mediaelementplayer');
-    </script>
 </div>
 <!-- END default_video -->
   <div class="dz-wrap">
@@ -43,16 +39,20 @@
 </ul>
 </div>
 <script type="text/javascript">
-    $('#component{COMPONENT_INSTANCE_ID} a.video-link').click(function(event) {
-        event.preventDefault();
-        var $target = "/cms/sendVideo.php?type=sbfs&id="+$(this).attr("rel");
-        var $poster = "/cms/videoThumb.php?type=sbfs&id="+$(this).attr("rel")+"&size=poster";
-        // setting video plugin's poster doesn't work as expected,
-        // so set the video's poster directly
-        videoElement.attr('poster', $poster);
-        video.pause();
-        video.setSrc($target);
-        video.setPoster($poster);
+    $(function(){
+        var videoElement = $("#schoolbox_video{COMPONENT_INSTANCE_ID}").mediaelementplayer();
+        var video        = videoElement.data('mediaelementplayer');
+        $('#component{COMPONENT_INSTANCE_ID} a.video-link').click(function(event) {
+            event.preventDefault();
+            var $target = "/cms/sendVideo.php?type=sbfs&id="+$(this).attr("rel");
+            var $poster = "/cms/videoThumb.php?type=sbfs&id="+$(this).attr("rel")+"&size=poster";
+            // setting video plugin's poster doesn't work as expected,
+            // so set the video's poster directly
+            videoElement.attr('poster', $poster);
+            video.pause();
+            video.setSrc($target);
+            video.setPoster($poster);
+        });
     });
 </script>
 <!-- BEGIN submit_video -->
