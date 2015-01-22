@@ -104,6 +104,7 @@ class Mapper extends BaseMapper
                 $campusList[] = $campus->getId();
             }
             if (empty($campusList)) {
+                // Load the user's campuses?
                 return new Collection();
             }
 
@@ -125,7 +126,7 @@ class Mapper extends BaseMapper
 
             $statement = $this->getDatabase()->prepare($query);
             $statement->execute($params);
-            return $this->hydrate($statement);
+            return $this->hydrateList($statement);
         }
     }
 }
