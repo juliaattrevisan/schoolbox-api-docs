@@ -321,6 +321,11 @@ class External_Maze_Timetable implements External_TimetableInterface
         }
 
         /* Proceed "normally"
+         *
+         * SB-6670
+         * Note that when you are between semesters the TCTDKEY filter here
+         * may force the query to return no data (no subjects exist at the
+         * specified date)
          */
         $query = "
 			SELECT *
