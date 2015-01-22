@@ -18,7 +18,19 @@ class External_Maze_Helper
      */
     private $db = null;
 
+    /**
+     * Current semester
+     *
+     * @var string
+     */
     private $currentSemester = '';
+
+    /**
+     * Decide whether you're in between semesters
+     *
+     * @var bool
+     */
+    private $betweenSemesters = false;
 
     /**
      * Constructor
@@ -163,6 +175,7 @@ class External_Maze_Helper
          * start trying to display semester 2 data. At the end of semester 2,
          * start trying to display semester 1 data from the next year.
          */
+        $this->setBetweenSemesters(true);
 
         /* If January and between semesters 2 and 1, assume it's semester 1
          * Otherwise assume between semester 1 and 2, and assume it's semester 2
@@ -245,5 +258,25 @@ class External_Maze_Helper
     public function getCurrentSemester()
     {
         return $this->currentSemester;
+    }
+
+    /**
+     * Set between semesters
+     *
+     * @param boolean $betweenSemesters
+     */
+    private function setBetweenSemesters($betweenSemesters)
+    {
+        $this->betweenSemesters = $betweenSemesters;
+    }
+
+    /**
+     * Get between semesters
+     *
+     * @return boolean
+     */
+    private function getBetweenSemesters()
+    {
+        return $this->betweenSemesters;
     }
 }
