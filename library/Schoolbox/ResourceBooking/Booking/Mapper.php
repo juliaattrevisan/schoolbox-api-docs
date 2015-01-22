@@ -139,20 +139,6 @@ class Mapper extends BaseMapper
             //                ),
             )
         );
-
-        $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'postDelete'));
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'postDelete'));
-    }
-
-    /**
-     * On delete, delete related event.
-     *
-     * @param Model $object
-     */
-    public function postDelete(Model $object)
-    {
-        $eventMapper = $this->getJoinMapper('event');
-        $eventMapper->delete($eventMapper->findByColumn('id', $object->getEvent()->getId()));
     }
 
     /**
