@@ -217,6 +217,15 @@ class External_Maze_Helper
         );
     }
 
+    /**
+     * Alias
+     * 
+     * @return bool
+     */
+    public function isBetweenSemesters() {
+        return $this->getBetweenSemesters();
+    }
+
     /* Getters/Setters
      */
 
