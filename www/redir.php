@@ -13,12 +13,12 @@ if ($_GET['url']) {
         $link       = $linkMapper->findById($_GET['id']);
 
         $url = $link->getUrl();
-
-        if ($link) {
-            $linkMapper->logAction($_SESSION['user'], 'access', $link);
-        }
     } catch (\Exception $e) {
         error(101);
+    }
+
+    if ($link) {
+        $linkMapper->logAction($_SESSION['user'], 'access', $link);
     }
 }
 
