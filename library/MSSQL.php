@@ -323,7 +323,7 @@ class MSSQL {
 	function getOne($sql_q)
 	{
 		$result = $this->query($sql_q);
-		$row = mssql_fetch_assoc($result);
+		$row = array_values(mssql_fetch_assoc($result));
 		$one = $row[0];
 		if ($this->getConvertEncoding()) {
 			$one = $this->convertEncoding($one);
