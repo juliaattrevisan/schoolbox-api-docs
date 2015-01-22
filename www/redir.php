@@ -15,7 +15,7 @@ if ($_GET['url']) {
         $url = $link->getUrl();
 
         if ($link) {
-            $linkHandler->logAction($_SESSION['user'], 'access', $link);
+            $linkMapper->logAction($_SESSION['user'], 'access', $link);
         }
     } catch (\Exception $e) {
         error(101);
