@@ -306,7 +306,6 @@ function getSingleFileMeta($folderId, $fileId)
 function getSingleLinkMeta($folderId, $linkId)
 {
     $groupHandler = new Group();
-    $userHandler = new User();
 
     try {
         $linkMapper = new \Schoolbox\Resource\LinkMapper();
