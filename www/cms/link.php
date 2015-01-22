@@ -6,9 +6,6 @@ use \Schoolbox\Resource\LinkMapper;
 use \Schoolbox\Resource\CategoryMapper;
 
 if (is_numeric($this->arg[0])) {
-
-    $linkHandler = new Link;
-
     try {
         /** @var \Schoolbox\Resource\Link $link */
         $link = LinkMapper::getInstance()->findById($this->arg[0]);
