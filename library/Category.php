@@ -752,8 +752,13 @@ class Category extends DeprecatedModel
 
         /* Delete all links
          */
-        $categoryMapper = new \Schoolbox\Resource\Category();
-        $category = $categoryMapper->findById($categoryID);
+        try {
+            $categoryMapper = new \Schoolbox\Resource\Category();
+            $category = $categoryMapper->findById($categoryID);
+        }
+        catch (\Exception $e) {
+            error(13);
+        }
 
         $linkMapper = new \Schoolbox\Resource\LinkMapper();
         $allLinks = $linkMapper->findAllInCategory($category, array());
