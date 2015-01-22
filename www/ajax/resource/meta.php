@@ -306,20 +306,29 @@ function getSingleFileMeta($folderId, $fileId)
 function getSingleLinkMeta($folderId, $linkId)
 {
     $groupHandler = new Group();
-    $linkHandler = new Link();
     $userHandler = new User();
 
-    $link = $linkHandler->getByID($linkId);
+    try {
+        $linkMapper = new \Schoolbox\Resource\LinkMapper();
+        $link = $linkMapper->findById($linkId);
 
-    if (!$link || $link['deleted'] == 1) {
-        sendError('No link with the specified ID exists');
+        try {
+            $userMapper = new \Schoolbox\UserMapper();
+            $user = $userMapper->findById($link->getOwner()->getId());
+        }
+        catch (\Exception $e) {
+            error(31);
+        }
+    }
+    catch (\Exception $e) {
+        error(101);
     }
 
     $userAccess = $groupHandler->getPermission($folderId);
-    $adf = new Alaress_Date_Format($link['submitted'], 'U');
 
     // actions based on access
     $actions = array();
+
     switch ($userAccess) {
         case FULL_ACCESS:
         case WRITE_ACCESS:
@@ -335,12 +344,12 @@ function getSingleLinkMeta($folderId, $linkId)
 
     $file = array(
         'kind'        => 'link',
-        'id'          => $link['id'],
-        'name'        => $link['description'],
-        'hidden'      => $link['hidden'],
-        'description' => $link['comment'],
-        'posted_by'   => $userHandler->formatName($userHandler->getByID($link['owner'])),
-        'posted_date' => $adf->getDateOnly(),
+        'id'          => $link->getId(),
+        'name'        => $link->getDescription(),
+        'hidden'      => $link->getHidden(),
+        'description' => $link->getComment(),
+        'posted_by'   => $user->formatName(),
+        'posted_date' => $link->getSubmitted()->getDateOnly(),
         'actions'     => $actions
     );
 
