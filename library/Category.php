@@ -750,14 +750,18 @@ class Category extends DeprecatedModel
             }
         }
 
-        /* Delete all links */
-        $linkHandler = new Link;
-        $linkList = $linkHandler->getAllInCategory($categoryID);
-        if (is_array($linkList)) {
-            foreach ($linkList as $link) {
-                $linkHandler->delete($link['id']);
-            }
+        /* Delete all links
+         */
+        $categoryMapper = new \Schoolbox\Resource\Category();
+        $category = $categoryMapper->findById($categoryID);
+
+        $linkMapper = new \Schoolbox\Resource\LinkMapper();
+        $allLinks = $linkMapper->findAllInCategory($category, array());
+
+        foreach ($allLinks as $currentLink) {
+            $currentLink->delete();
         }
+
 
         /* Delete folder */
         if ($deleteSelf) {
