@@ -7,7 +7,6 @@ $allowFilter = array('image', 'video');
 
 if (is_numeric($_POST['categoryID'])) {
 	$fileHandler = new MyFile();
-	$linkHandler = new Link();
 	$allowedFiles = new AllowedFile();
 
     $config['filter'] = in_array($_POST['filter'], $allowFilter) ?  $_POST['filter'] : false;
