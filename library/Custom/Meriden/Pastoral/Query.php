@@ -410,6 +410,47 @@ class Query
     }
 
     /**
+     * Given a year level and a student, gets their year level for that year.
+     *
+     * @param int  $year
+     * @param User $student
+     *
+     * @return int
+     */
+    public function getYearLevelForStudentForYear($year, User $student)
+    {
+        $externalId = $student->getExternalId();
+        if (!$externalId) {
+            return null;
+        }
+        $query = "
+            SELECT
+                subtab.sub_desc
+            FROM studsub
+            INNER JOIN subtab
+                ON subtab.sub_code = studsub.sub_code
+                AND subtab.cmpy_code = studsub.cmpy_code
+            WHERE studsub.stud_code = :externalId
+            AND studsub.yr_study = :year
+            AND subtab.sub_code IN ('9994','9995','9996','9997','9998','9999')
+            AND studsub.cmpy_code = '01'
+            ORDER BY
+                studsub.sub_code ASC,
+                studsub.class ASC
+        ";
+        $params = array(
+            ':externalId' => $this->getDatabase()->smartQuote($externalId),
+            ':year'       => $this->getDatabase()->smartQuote($year),
+        );
+        $result = $this->getDatabase()->trimField(
+            $this->getDatabase()->getOne(strtr($query, $params))
+        );
+        // All year groups are named "Year x Tutor Group"
+        preg_match('/^Year (?P<year_level>\\d+) Tutor Group$/', $result, $subject);
+        return $subject['year_level'];
+    }
+
+    /**
      * Gets all subjects for this student for this year.
      *
      * @param int  $year
@@ -460,11 +501,12 @@ class Query
         // Add class code
         // year level is the student's year level at the time they took class,
         // not the year in which they took it.
+        $yearLevel = $this->getYearLevelForStudentForYear($year, $student);
         $result = array_map(
-            function($row) {
+            function ($row) use ($yearLevel) {
                 $row['code'] = sprintf(
                     '%s-%s-%s',
-                    $row['yr_study'],
+                    $yearLevel,
                     $row['sub_code'],
                     $row['class']
                 );
