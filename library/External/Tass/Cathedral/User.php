@@ -8,7 +8,7 @@
  * @copyright Copyright 2015, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class External_Tass_Meriden_User extends External_Tass_User implements External_UserInterface
+class External_Tass_Cathedral_User extends External_Tass_User implements External_UserInterface
 {
     /**
      * Retrieves student user account info for sync script.
