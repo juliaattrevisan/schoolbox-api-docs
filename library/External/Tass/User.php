@@ -442,11 +442,11 @@ class External_Tass_User implements External_UserInterface
         // Inject student campuses, year levels, etc.
         $newList = array();
         foreach ($list as $listItem) {
-            if (!empty($listItem['StudentYearLevel'])) {
+            if (isset($listItem['StudentYearLevel'])) {
                 // Base related student accounts are fetched in base query.
                 $newList[] = $listItem;
             }
-            if (!empty($listItem['SplitStudentIDList'])) {
+            if (isset($listItem['SplitStudentIDList'])) {
                 // Inject pia_sfaccess children separately, because they may
                 // not belong to the same parent account
                 // (but they are still allowed access)
