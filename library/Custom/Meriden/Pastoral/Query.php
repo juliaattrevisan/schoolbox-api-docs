@@ -393,10 +393,19 @@ class Query
                 studsub.class ASC
         ";
         $params = array(
-            ':externalId'    => $this->getDatabase()->smartQuote($externalId),
+            ':externalId' => $this->getDatabase()->smartQuote($externalId),
         );
-        return $this->getDatabase()->trimAll(
+        $result = $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll(strtr($query, $params))
+        );
+        return array_map(
+            function ($r) {
+                // All year groups are named "Year x Tutor Group"
+                preg_match('/^Year (?P<year_level>\\d+) Tutor Group$/', $r['sub_desc'], $subject);
+                $r['year_level'] = $subject['year_level'];
+                return $r;
+            },
+            $result
         );
     }
 
