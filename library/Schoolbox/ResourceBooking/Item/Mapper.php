@@ -153,6 +153,15 @@ class Mapper extends BaseMapper
             )
         );
         $this->hasJoin(
+            'booking',
+            array(
+                'mapper'    => '\\Schoolbox\\ResourceBooking\\Booking\\Mapper',
+                'this_key'  => 'id',
+                'other_key' => 'resource_id',
+                'multiple'  => true,
+            )
+        );
+        $this->hasJoin(
             'related_resource',
             array(
                 'mapper'    => '\\Schoolbox\\ResourceBooking\\Item\\RelatedResource\\Mapper',
@@ -171,11 +180,15 @@ class Mapper extends BaseMapper
             )
         );
         $this->registerCallback('postSave', array($this, 'postSave'));
+        $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'postDelete'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'postDelete'));
     }
 
     /**
      * Ensures that moderators and related items are saved after the item is
      * loaded.
+     *
+     * @param Model $object
      */
     public function postSave(Model $object)
     {
@@ -222,6 +235,18 @@ class Mapper extends BaseMapper
             $role->setResource($object);
         }
         $this->getJoinMapper('role')->save($roleList);
+    }
+
+    /**
+     * On delete of this item, delete all associated bookings
+     *
+     * @param Model $object
+     */
+    public function postDelete(Model $object)
+    {
+        $bookingMapper = $this->getJoinMapper('booking');
+        $bookings      = $bookingMapper->findByColumn('resource_id', $object->getId());
+        $bookingMapper->delete($bookings);
     }
 
     /**
