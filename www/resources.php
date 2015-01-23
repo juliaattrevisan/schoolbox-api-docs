@@ -47,7 +47,6 @@ $this->setTab('resources');
 
 $categoryHandler = new Category;
 $fileHandler = new File;
-$linkHandler = new Link;
 $groupHandler = new Group;
 $allowedFiles = new AllowedFile;
 
