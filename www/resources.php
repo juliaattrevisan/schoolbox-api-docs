@@ -119,17 +119,11 @@ catch (\Exception $e) {
 }
 
 $contents = new \Schoolbox\Resource\Browser\Tree\Contents($category);
-$allNodes = $contents->build();
 
 /* phplib
  */
-if ($allNodes->count()) {
-
-    /* Sort by name, then process all
-     */
-    $allNodes->sortBy('name', 'asc');
-
-	foreach ($allNodes as $currentNode) {
+if ($contents->getAllNodes()->count()) {
+	foreach ($contents->getAllNodes() as $currentNode) {
         $output = array(
             'FILE_ID' => $currentNode->getNodeId(),
             'TYPE' => $currentNode->getType(),

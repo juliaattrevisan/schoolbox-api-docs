@@ -47,6 +47,20 @@ class Contents {
      *
      * @var \Schoolbox\Collection
      */
+    private $linkNodes = null;
+
+    /**
+     * An instance of \Schoolbox\Collection
+     *
+     * @var \Schoolbox\Collection
+     */
+    private $fileNodes = null;
+
+    /**
+     * An instance of \Schoolbox\Collection
+     *
+     * @var \Schoolbox\Collection
+     */
     private $allNodes = null;
 
     /**
@@ -108,7 +122,16 @@ class Contents {
         $this->setCategory($category);
         $this->setPermission($this->getGroupHandler()->getPermission($category->getId()));
         $this->setFilterOptions($filterOptions);
+
+        /* Collections
+         */
+        $this->setLinkNodes(new Collection());
+        $this->setFileNodes(new Collection());
         $this->setAllNodes(new Collection());
+
+        /* Hadoken
+         */
+        $this->build();
     }
 
     /**
@@ -116,11 +139,18 @@ class Contents {
      *
      * @return Collection
      */
-    public function build() {
+    private function build() {
+
+        /* Individual types
+         */
         $this->buildLinks();
         $this->buildFiles();
 
-        return $this->getAllNodes();
+        /* Combined nodes
+         */
+        $this->getAllNodes()->merge($this->getLinkNodes());
+        $this->getAllNodes()->merge($this->getFileNodes());
+        $this->getAllNodes()->sortBy('name', 'asc');
     }
 
     /**
@@ -135,6 +165,7 @@ class Contents {
         foreach ($allLinkNodes as $currentLinkNode) {
             $node = new Node();
             $node->setNodeId($currentLinkNode->getId());
+            $node->setUser($currentLinkNode->getOwner());
             $node->setType('link');
             $node->setIcon('link');
             $node->setName(\Scrub::text($currentLinkNode->getDescription()));
@@ -142,7 +173,7 @@ class Contents {
             $node->setCss(implode(' ', array('link')));
             $node->setModifiedAt($currentLinkNode->getSubmitted());
 
-            $this->getAllNodes()->add($node);
+            $this->getLinkNodes()->add($node);
         }
     }
 
@@ -207,7 +238,7 @@ class Contents {
             $node->setCss(implode(' ' , $class));
             $node->setModifiedAt(new \Alaress_Date_Relative($currentFileNode['modified']));
 
-            $this->getAllNodes()->add($node);
+            $this->getFileNodes()->add($node);
         }
     }
 
@@ -349,7 +380,7 @@ class Contents {
      *
      * @return \Schoolbox\Collection
      */
-    private function getAllNodes()
+    public function getAllNodes()
     {
         return $this->allNodes;
     }
@@ -392,5 +423,41 @@ class Contents {
     private function getLinkMapper()
     {
         return $this->linkMapper;
+    }
+
+    /**
+     * @param \Schoolbox\Collection $fileNodes
+     */
+    private function setFileNodes($fileNodes)
+    {
+        $this->fileNodes = $fileNodes;
+    }
+
+    /**
+     * Get file nodes
+     *
+     * @return \Schoolbox\Collection
+     */
+    public function getFileNodes()
+    {
+        return $this->fileNodes;
+    }
+
+    /**
+     * @param \Schoolbox\Collection $linkNodes
+     */
+    private function setLinkNodes($linkNodes)
+    {
+        $this->linkNodes = $linkNodes;
+    }
+
+    /**
+     * Get link nodes
+     *
+     * @return \Schoolbox\Collection
+     */
+    public function getLinkNodes()
+    {
+        return $this->linkNodes;
     }
 }
