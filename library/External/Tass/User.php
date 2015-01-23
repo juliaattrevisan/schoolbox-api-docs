@@ -309,7 +309,7 @@ class External_Tass_User implements External_UserInterface
         // * filter out non-teachers
         $query = "
             SELECT
-                t.emp_code AS StaffID,
+                te.tch_code AS StaffID,
                 '' AS NetworkLogin,
                 CASE
                     WHEN (t.term_date) IS NULL THEN 0
