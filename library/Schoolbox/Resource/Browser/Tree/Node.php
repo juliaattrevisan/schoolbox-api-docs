@@ -23,6 +23,13 @@ class Node {
     private $nodeId = 0;
 
     /**
+     * Node owner
+     *
+     * @var null
+     */
+    private $user = null;
+
+    /**
      * Node type
      *
      * @var string
@@ -240,5 +247,25 @@ class Node {
     public function getIcon()
     {
         return $this->icon;
+    }
+
+    /**
+     * Set user
+     *
+     * @param null $user
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
+    }
+
+    /**
+     * Get user
+     *
+     * @return null
+     */
+    public function getUser()
+    {
+        return $this->user;
     }
 }
