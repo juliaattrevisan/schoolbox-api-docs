@@ -20,53 +20,54 @@
 // 2. And then variables can be overridden here
 // =============================================================================
 // Dimensions
-@logo-width: 					255px;
-@logo-height: 					46px;
+@logo-width: 					    285px;
+@logo-height: 					  59px;
 
 // Generic colors
 @body-background: 				#e8f1f8; // Body, but not the content area
 @content-background: 			#F0F7FE; // Used for forms
-@dark: 							#F0F7FE; // Alternate tigerstriping color
-@border-color: 					#EEEEEE; // Bordering @dark
-@alternate-background: 			#EEEEEE; // Sections such as admin
+@dark: 							      #F0F7FE; // Alternate tigerstriping color
+@border-color: 					  #EEEEEE; // Bordering @dark
+@alternate-background: 	  #EEEEEE; // Sections such as admin
 
 // Basic type
-@body-text: 					@black;
-@secondary-text: 				#797979;
-@link: 							#004e83;
-@link-hover: 					#0060a1;
+@body-text: 					    @black;
+@secondary-text: 				  #797979;
+@link: 							      #004e83;
+@link-hover: 					    #0060a1;
 
 // Main banner
 @banner-background: 			#005288;
 @banner-color:      			#ffffff;
 @banner-links:      			@banner-color;
-@banner-height:     			72px;
-@search-color:                  @banner-background;
+@banner-height:     			96px;
+@search-color:            @banner-background;
 
 // Modules
-@module-heading: 				@banner-color;
+@module-heading: 				  @banner-color;
 @module-background: 			@banner-background;
-@admin-nav:                     @tab-background;
+@admin-nav:               @tab-background;
 
 // Refers to the left navigation
 @navigation-width:				200px;
 @navigation-padding:			16px;
-@navigation-background:  		@body-background;
-@navigation-color:  			@tab-background;
-@navigation-links:  			#004e83;
+@navigation-background:  		    @body-background;
+@navigation-color:  			      @tab-background;
+@navigation-links:  			      #004e83;
 @navigation-hover-background: 	@tab-background;
-@navigation-hover-color:  		#FFFFFF;
-@navigation-sub-background:  	@navigation-background;
+@navigation-hover-color:  		  #FFFFFF;
+@navigation-sub-background:  	  @navigation-background;
 
 // Main "Tab" Navigation
-@tab-background:				#cb042d;
-@tab-color:						#FFFFFF;
-@tab-hover-background:			@tab-color;
-@tab-hover-color:				@tab-background;
+@tab-background:				  #cb042d;
+@tab-color:						    #FFFFFF;
+@tab-hover-background:		@tab-color;
+@tab-hover-color:				  @tab-background;
 
 // messages
-@notify-color:					@tab-background;
+@notify-color:					  @tab-background;
 @infopanel-bellsprite:			'/images/stmichaels/bell.png';
+@infopanel-height:        32px;
 @flyout-background:				@banner-color;
 @flyout-header-color:			@banner-background;
 
@@ -87,17 +88,23 @@
 // =============================================================================
 
 #header{
-  background: #005288 url('/images/stmichaels/header-bg.jpg') bottom right no-repeat;
+  background: @banner-background url('/images/stmichaels/header-bg.png') bottom right no-repeat;
 
   .logo {
-    left: 15px;
-    top: 11px;
+    left: 14px;
+    top: 10px;
+  }
+
+  .diversity{
+    position: absolute;
+    top: 24px;
+    left: 400px;
   }
 
   #search{
     #search-field{
       background: @tab-color;
-      color: #005288;
+      color: @banner-background;
       padding: 6px 12px;
       width: 250px;
       height: 32px;
@@ -107,6 +114,12 @@
       left: auto;
       right: 5px;
     }
+  }
+
+  #tabs{
+    position: relative;
+    top: 24px;
+    z-index: 1;
   }
 }
 
