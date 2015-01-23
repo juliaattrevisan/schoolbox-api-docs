@@ -21,19 +21,7 @@ use Schoolbox\User;
 
 class Contents {
 
-    /**
-     * An instance of group handler
-     *
-     * @var \Group
-     */
-    private $groupHandler = null;
 
-    /**
-     * An instance of allowed files handler
-     *
-     * @var \AllowedFile
-     */
-    private $allowedFiles = null;
 
     /**
      * An instance of \Schoolbox\Resource\Category
@@ -57,6 +45,13 @@ class Contents {
     private $filterOptions = array();
 
     /**
+     * An instance of \Schoolbox\Collection
+     *
+     * @var \Schoolbox\Collection
+     */
+    private $allNodes = null;
+
+    /**
      * An instance of \Schoolbox\UserMapper
      *
      * @var \Schoolbox\UserMapper
@@ -64,11 +59,32 @@ class Contents {
     private $userMapper = null;
 
     /**
-     * An instance of \Schoolbox\Collection
+     * An instance of \Schoolbox\Resource\LinkMapper
      *
-     * @var \Schoolbox\Collection
+     * @var \Schoolbox\Resource\LinkMapper
      */
-    private $allNodes = null;
+    private $linkMapper = null;
+
+    /**
+     * An instance of group handler
+     *
+     * @var \Group
+     */
+    private $groupHandler = null;
+
+    /**
+     * An instance of allowed files handler
+     *
+     * @var \AllowedFile
+     */
+    private $allowedFiles = null;
+
+    /**
+     * An instance of file handler
+     *
+     * @var \File
+     */
+    private $fileHandler = null;
 
     /**
      * Constructor
@@ -77,10 +93,20 @@ class Contents {
      * @param array $filterOptions
      */
     public function __construct(Category $category, $filterOptions = null) {
+
+        /* Handlers
+         */
         $this->setGroupHandler(new \Group());
         $this->setAllowedFiles(new \AllowedFile());
-        $this->setUserMapper(new UserMapper());
+        $this->setFileHandler(new \File());
 
+        /* Mappers
+         */
+        $this->setUserMapper(new UserMapper());
+        $this->setLinkMapper(new LinkMapper());
+
+        /* Other
+         */
         $this->setCategory($category);
         $this->setPermission($this->getGroupHandler()->getPermission($category->getId()));
         $this->setFilterOptions($filterOptions);
@@ -104,8 +130,7 @@ class Contents {
      *
      */
     private function buildLinks() {
-        $linkMapper = new LinkMapper();
-        $allLinkNodes = $linkMapper->findAllInCategory($this->getCategory(), array());
+        $allLinkNodes = $this->getLinkMapper()->findAllInCategory($this->getCategory(), array());
 
         /* Process links
          */
@@ -127,11 +152,7 @@ class Contents {
      * A list of files in this category
      */
     private function buildFiles() {
-        $fileHandler = new \File();
-
-        /* Files
-         */
-        $allFileNodes = new Collection($fileHandler->getAllInCategory($this->getCategory()->getId(), $this->getFilterOptions()));
+        $allFileNodes = new Collection($this->getFileHandler()->getAllInCategory($this->getCategory()->getId(), $this->getFilterOptions()));
 
         /* Process files
          */
@@ -333,5 +354,45 @@ class Contents {
     private function getAllNodes()
     {
         return $this->allNodes;
+    }
+
+    /**
+     * Set file handler
+     *
+     * @param \File $fileHandler
+     */
+    private function setFileHandler($fileHandler)
+    {
+        $this->fileHandler = $fileHandler;
+    }
+
+    /**
+     * Get file handler
+     *
+     * @return \File
+     */
+    private function getFileHandler()
+    {
+        return $this->fileHandler;
+    }
+
+    /**
+     * Set link mapper
+     *
+     * @param \Schoolbox\Resource\LinkMapper $linkMapper
+     */
+    private function setLinkMapper($linkMapper)
+    {
+        $this->linkMapper = $linkMapper;
+    }
+
+    /**
+     * Get link mapper
+     *
+     * @return \Schoolbox\Resource\LinkMapper
+     */
+    private function getLinkMapper()
+    {
+        return $this->linkMapper;
     }
 }
