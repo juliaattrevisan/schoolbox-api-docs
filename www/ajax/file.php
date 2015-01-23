@@ -3,27 +3,23 @@ require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
 $page = new SitePage;
 $output = array();
+$homepage = null;
 
 $allowFilter = array('image', 'video');
 
 if (is_numeric($_POST['categoryID'])) {
-	$fileHandler = new File;
-	$linkHandler = new Link;
-	$allowedFiles = new AllowedFile;
+    $filterOptions = null;
 
+    if (in_array($_POST['filter'], $allowFilter)) {
+        $filterOptions = array('filter' => $_POST['filter']);
 
-	$fileList = $fileHandler->getAllInCategory($_POST['categoryID'],  in_array($_POST['filter'], $allowFilter) ? array('filter' => $_POST['filter']) : false);
+        /* Do we really need this?
+         */
 
-	if (!in_array($_POST['filter'], $allowFilter)) {
+        // add homepage "file"
+        if (isset($_POST['homelink'])) {
 
-		$linkList = $linkHandler->getAllInCategory($_POST['categoryID']);
-		$fileList = $fileHandler->mergeLinks( $fileList, $linkList);
-
-
-    	// add homepage "file"
-    	if (isset($_POST['homelink'])) {
-
-    	    $categoryHandler = new Category;
+            $categoryHandler = new Category;
             $category = $categoryHandler->getByID($_POST['categoryID']);
 
             if ($category['template'] > 0) {
@@ -31,29 +27,45 @@ if (is_numeric($_POST['categoryID'])) {
                                   'description' => 'Homepage',
                                   'size'        => 1,
                                   'iconFile'    => 'vcard_fiquet.png',
-                                  );
-
-                array_unshift($fileList, $homepage);
+                );
             }
         }
-	}
+    }
 
-	if (!is_array($fileList)) {
-		$output = array();
-	} else {
-		$userHandler = new User();
+    /* Output a list of nodes (which are comprised of both files and links)
+     * in the second column of Old Resource Browser
+     *
+     * Root folder is zero and no links should be in there
+     * Root folder is the default location to open upon first visit
+     * and when a folder doesn't exist anymore
+     */
+    $category = new \Schoolbox\Resource\Category();
+    $category->setId(0);
 
-		foreach ($fileList as $file) {
-            $fileTime = new Alaress_Date_Relative($file['modified']);
-            $fileTime->setPrefix('');
+    try {
+        $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+        $category = $categoryMapper->findById($_POST['categoryID']);
+    }
+    catch (\Exception $e) {
+        error(13);
+    }
 
-			$file['user'] = $userHandler->formatName($file);
-			$file['relative'] = $fileTime->getRelativeTime();
-			$file['mimeClass'] = !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile";
-			$file['description'] = TextFormatter::cutString($file['description'], 32);
-			$output[] = $file;
-		}
-	}
+    $contents = new \Schoolbox\Resource\Browser\Tree\Contents($category, $filterOptions);
+    $allNodes = $contents->getFileNodes();
+
+    foreach ($allNodes as $currentNode) {
+        $adr = new \Alaress_Date_Relative($currentNode->getModifiedAt()->getUnixTimestamp());
+        $adr->setPrefix('');
+
+        $output[] = array(
+            'id' => $currentNode->getNodeId(),
+            'user' => $currentNode->getUser()->formatName(),
+            'relative' => $adr->getRelativeTime(),
+            'mimeClass' => $currentNode->getIcon()->getCss(),
+            'iconFile' => $currentNode->getIcon()->getFile(),
+            'description' => $currentNode->getName(),
+        );
+    }
 
 	$_SESSION['resourcesID'] = $_POST['categoryID'];
 }
@@ -61,4 +73,3 @@ if (is_numeric($_POST['categoryID'])) {
 header("Content-type: application/json");
 print json_encode($output);
 
-?>

@@ -16,6 +16,7 @@ use Schoolbox\Resource\Category;
 use Schoolbox\Collection;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\Resource\Browser\Tree\Node;
+use Schoolbox\Resource\Browser\Tree\Node\Icon;
 use Schoolbox\UserMapper;
 use Schoolbox\User;
 
@@ -211,16 +212,6 @@ class Contents {
                 // icon
                 $class[] = !empty($currentFileNode['iconFile']) ? $this->getAllowedFiles()->getClass($currentFileNode["iconFile"]) : "binary";
 
-                /* Detect which icon to display
-                 * $allowedFiles->getClass() returns empty string for iconFile 'html_alt1'
-                 */
-                if (!empty($currentFileNode['iconFile'])) {
-                    $fileListType = $this->getAllowedFiles()->getClass($currentFileNode["iconFile"]);
-                }
-                else {
-                    $fileListType = "textfile";
-                }
-
                 try {
                     $user = $this->getUserMapper()->findById($currentFileNode['owner']);
                 }
@@ -229,12 +220,21 @@ class Contents {
                     $user->setId($currentFileNode['owner']);
                 }
 
+                /* Detect which icon to display
+                 * $allowedFiles->getClass() returns empty string for iconFile 'html_alt1'
+                 */
+                $icon = new Icon();
+
+                if (!empty($currentFileNode['iconFile'])) {
+                    $icon->setCss($this->getAllowedFiles()->getClass($currentFileNode["iconFile"]));
+                    $icon->setFile($currentFileNode["iconFile"]);
+                }
+
                 $node = new Node();
                 $node->setNodeId($currentFileNode['id']);
                 $node->setUser($user);
                 $node->setType('file');
-                $node->setIcon($fileListType);
-                $node->setIconFile($currentFileNode['iconFile']);
+                $node->setIcon($icon);
                 $node->setName(\Scrub::text($currentFileNode['description']));
                 $node->setSize($currentFileNode['file_size'] > 0 ? \Alaress_Byte_Format::bytesToString($currentFileNode['file_size']) : "--");
                 $node->setCategory($this->getCategory());
