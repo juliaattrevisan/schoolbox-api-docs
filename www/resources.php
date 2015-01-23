@@ -99,9 +99,7 @@ $this->setVar(
 
 
 
-/* Permissions
- */
-$permission = $groupHandler->getPermission($openCategoryId);
+
 
 /* Output a list of nodes (which are comprised of both files and links)
  * in the second column of Old Resource Browser
@@ -120,82 +118,8 @@ try {
 catch (\Exception $e) {
 }
 
-/* Adapt and overcome
- */
-$allNodes = new \Schoolbox\Collection();
-
-/* Links
- */
-$linkMapper = new \Schoolbox\Resource\LinkMapper();
-$allLinkNodes = $linkMapper->findAllInCategory($category, array());
-
-/* Process links
- */
-foreach ($allLinkNodes as $currentLinkNode) {
-    $node = new \Schoolbox\Resource\Browser\Tree\Node();
-    $node->setNodeId($currentLinkNode->getId());
-    $node->setType('link');
-    $node->setIcon('link');
-    $node->setName(Scrub::text($currentLinkNode->getDescription()));
-    $node->setCategory($category);
-    $node->setCss(implode(' ', array('link')));
-    $node->setModifiedAt($currentLinkNode->getSubmitted());
-
-    $allNodes->add($node);
-}
-
-/* Files
- */
-$allFileNodes = new \Schoolbox\Collection($fileHandler->getAllInCategory($openCategoryId));
-
-/* Process files
- */
-foreach ($allFileNodes as $currentFileNode) {
-
-    // if the file is associated with due work, it shouldn't be visible here
-    if ($currentFileNode['type'] || $currentFileNode['typeName']) {
-        continue;
-    }
-
-    /* css for the node
-     */
-    $class = array();
-
-    // write access
-    if ($permission >= WRITE_ACCESS) {
-        $class[] = "write";
-    }
-
-    // is hidden
-    if ($currentFileNode['hidden'] > 0) {
-        $class[] = "hidden";
-    }
-
-    // icon
-    $class[] = !empty($currentFileNode['iconFile']) ? $allowedFiles->getClass($currentFileNode["iconFile"]) : "binary";
-
-    /* Detect which icon to display
-     * $allowedFiles->getClass() returns empty string for iconFile 'html_alt1'
-     */
-    if (!empty($currentFileNode['iconFile'])) {
-        $fileListType = $allowedFiles->getClass($currentFileNode["iconFile"]);
-    }
-    else {
-        $fileListType = "textfile";
-    }
-
-    $node = new \Schoolbox\Resource\Browser\Tree\Node();
-    $node->setNodeId($currentFileNode['id']);
-    $node->setType('file');
-    $node->setIcon($fileListType);
-    $node->setName(Scrub::text($currentFileNode['description']));
-    $node->setSize($currentFileNode['file_size'] > 0 ? Alaress_Byte_Format::bytesToString($currentFileNode['file_size']) : "--");
-    $node->setCategory($category);
-    $node->setCss(implode(' ' , $class));
-    $node->setModifiedAt(new \Alaress_Date_Relative($currentFileNode['modified']));
-
-    $allNodes->add($node);
-}
+$contents = new \Schoolbox\Resource\Browser\Tree\Contents($category);
+$allNodes = $contents->build();
 
 /* phplib
  */
