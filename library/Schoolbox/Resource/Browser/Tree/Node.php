@@ -37,11 +37,19 @@ class Node {
     private $type = '';
 
     /**
-     * Node icon
+     * Node icon css class
      *
      * @var string
      */
     private $icon = '';
+
+    /**
+     * Node icon actual file
+     * (Used in that file_browser.html resource browser)
+     *
+     * @var string
+     */
+    private $iconFile = '';
 
     /**
      * Node name
@@ -267,5 +275,25 @@ class Node {
     public function getUser()
     {
         return $this->user;
+    }
+
+    /**
+     * Set icon file
+     *
+     * @param string $iconFile
+     */
+    public function setIconFile($iconFile)
+    {
+        $this->iconFile = $iconFile;
+    }
+
+    /**
+     * Get icon file
+     *
+     * @return string
+     */
+    public function getIconFile()
+    {
+        return $this->iconFile;
     }
 }

@@ -168,6 +168,7 @@ class Contents {
             $node->setUser($currentLinkNode->getOwner());
             $node->setType('link');
             $node->setIcon('link');
+            $node->setIconFile('html.png');
             $node->setName(\Scrub::text($currentLinkNode->getDescription()));
             $node->setCategory($this->getCategory());
             $node->setCss(implode(' ', array('link')));
@@ -233,6 +234,7 @@ class Contents {
                 $node->setUser($user);
                 $node->setType('file');
                 $node->setIcon($fileListType);
+                $node->setIconFile($currentFileNode['iconFile']);
                 $node->setName(\Scrub::text($currentFileNode['description']));
                 $node->setSize($currentFileNode['file_size'] > 0 ? \Alaress_Byte_Format::bytesToString($currentFileNode['file_size']) : "--");
                 $node->setCategory($this->getCategory());
