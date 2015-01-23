@@ -181,64 +181,66 @@ class Contents {
      * A list of files in this category
      */
     private function buildFiles() {
-        $allFileNodes = new Collection($this->getFileHandler()->getAllInCategory($this->getCategory()->getId(), $this->getFilterOptions()));
+       $allFileNodes = $this->getFileHandler()->getAllInCategory($this->getCategory()->getId(), $this->getFilterOptions());
 
         /* Process files
          */
-        foreach ($allFileNodes as $currentFileNode) {
+        if (is_array($allFileNodes) && count($allFileNodes)) {
+            foreach ($allFileNodes as $currentFileNode) {
 
-            // if the file is associated with due work, it shouldn't be visible here
-            if ($currentFileNode['type'] || $currentFileNode['typeName']) {
-                continue;
+                // if the file is associated with due work, it shouldn't be visible here
+                if ($currentFileNode['type'] || $currentFileNode['typeName']) {
+                    continue;
+                }
+
+                /* css for the node
+                 */
+                $class = array();
+
+                // write access
+                if ($this->getPermission() >= WRITE_ACCESS) {
+                    $class[] = "write";
+                }
+
+                // is hidden
+                if ($currentFileNode['hidden'] > 0) {
+                    $class[] = "hidden";
+                }
+
+                // icon
+                $class[] = !empty($currentFileNode['iconFile']) ? $this->getAllowedFiles()->getClass($currentFileNode["iconFile"]) : "binary";
+
+                /* Detect which icon to display
+                 * $allowedFiles->getClass() returns empty string for iconFile 'html_alt1'
+                 */
+                if (!empty($currentFileNode['iconFile'])) {
+                    $fileListType = $this->getAllowedFiles()->getClass($currentFileNode["iconFile"]);
+                }
+                else {
+                    $fileListType = "textfile";
+                }
+
+                try {
+                    $user = $this->getUserMapper()->findById($currentFileNode['owner']);
+                }
+                catch (\Exception $e) {
+                    $user = new User();
+                    $user->setId($currentFileNode['owner']);
+                }
+
+                $node = new Node();
+                $node->setNodeId($currentFileNode['id']);
+                $node->setUser($user);
+                $node->setType('file');
+                $node->setIcon($fileListType);
+                $node->setName(\Scrub::text($currentFileNode['description']));
+                $node->setSize($currentFileNode['file_size'] > 0 ? \Alaress_Byte_Format::bytesToString($currentFileNode['file_size']) : "--");
+                $node->setCategory($this->getCategory());
+                $node->setCss(implode(' ' , $class));
+                $node->setModifiedAt(new \Alaress_Date_Relative($currentFileNode['modified']));
+
+                $this->getFileNodes()->add($node);
             }
-
-            /* css for the node
-             */
-            $class = array();
-
-            // write access
-            if ($this->getPermission() >= WRITE_ACCESS) {
-                $class[] = "write";
-            }
-
-            // is hidden
-            if ($currentFileNode['hidden'] > 0) {
-                $class[] = "hidden";
-            }
-
-            // icon
-            $class[] = !empty($currentFileNode['iconFile']) ? $this->getAllowedFiles()->getClass($currentFileNode["iconFile"]) : "binary";
-
-            /* Detect which icon to display
-             * $allowedFiles->getClass() returns empty string for iconFile 'html_alt1'
-             */
-            if (!empty($currentFileNode['iconFile'])) {
-                $fileListType = $this->getAllowedFiles()->getClass($currentFileNode["iconFile"]);
-            }
-            else {
-                $fileListType = "textfile";
-            }
-
-            try {
-                $user = $this->getUserMapper()->findById($currentFileNode['owner']);
-            }
-            catch (\Exception $e) {
-                $user = new User();
-                $user->setId($currentFileNode['owner']);
-            }
-
-            $node = new Node();
-            $node->setNodeId($currentFileNode['id']);
-            $node->setUser($user);
-            $node->setType('file');
-            $node->setIcon($fileListType);
-            $node->setName(\Scrub::text($currentFileNode['description']));
-            $node->setSize($currentFileNode['file_size'] > 0 ? \Alaress_Byte_Format::bytesToString($currentFileNode['file_size']) : "--");
-            $node->setCategory($this->getCategory());
-            $node->setCss(implode(' ' , $class));
-            $node->setModifiedAt(new \Alaress_Date_Relative($currentFileNode['modified']));
-
-            $this->getFileNodes()->add($node);
         }
     }
 
