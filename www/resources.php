@@ -58,28 +58,28 @@ if (is_numeric($this->arg[0])) {
 }
 else
 {
-	$openCategory = (int)$_SESSION['resourcesID'];
+	$openCategoryId = (int)$_SESSION['resourcesID'];
 }
 
 // check permissions on selected category
-if ($groupHandler->getPermission($openCategory) < READ_ACCESS) {
-	$openCategory = 0;
+if ($groupHandler->getPermission($openCategoryId) < READ_ACCESS) {
+	$openCategoryId = 0;
 }
 
 // Check if the category even exists
 $categoryMapper = CategoryMapper::getInstance();
 try {
-    $categoryMapper->findById($openCategory);
+    $categoryMapper->findById($openCategoryId);
 } catch (Schoolbox\Mapper\Exception\Deleted $e) {
     // Deleted: load the parent
-    $openCategory = $e->getDeletedObject()->getParent()->getId();
+    $openCategoryId = $e->getDeletedObject()->getParent()->getId();
 } catch (Schoolbox\Mapper\Exception $e) {
-    $openCategory = 0;
+    $openCategoryId = 0;
 }
 
 // log view
-if ($openCategory > 0) {
-	$categoryHandler->logPageView($openCategory);
+if ($openCategoryId > 0) {
+	$categoryHandler->logPageView($openCategoryId);
 }
 
 // Build a tree up to the last resource we looked at
@@ -92,118 +92,139 @@ $treeBuilder = new Schoolbox\Resource\CategoryTreeBuilder(
 // output folders, column 1 - now done via jsTree and TREEDATA
 $this->setVar(
     array(
-        'TREEDATA'      => json_encode($treeBuilder->buildPartialTree($openCategory)),
-        'OPEN_CATEGORY' => intval($openCategory),
+        'TREEDATA'      => json_encode($treeBuilder->buildPartialTree($openCategoryId)),
+        'OPEN_CATEGORY' => intval($openCategoryId),
     )
 );
 
-// output files, column 2
-$allLinkNodes = new \Schoolbox\Collection();
 
-/* Display links in the opened folder
- * Root folder is zero and no links should be in there
+
+
+/* Permissions
  */
-if ($openCategory) {
-    try {
-        $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
-        $category = $categoryMapper->findById($openCategory);
+$permission = $groupHandler->getPermission($openCategoryId);
 
-        $linkMapper = new \Schoolbox\Resource\LinkMapper();
-        $allLinkNodes = $linkMapper->findAllInCategory($category, array());
-    }
-    catch (\Exception $e) {
-        error(13);
-    }
+/* Output a list of nodes (which are comprised of both files and links)
+ * in the second column of Old Resource Browser
+ */
+$allLinkNodes = new \Schoolbox\Collection();
+$allFileNodes = new \Schoolbox\Collection();
+
+/* Display links in the opened (selected) folder
+ */
+
+/* Root folder is zero and no links should be in there
+ * Root folder is the default location to open upon first visit
+ * and when a folder doesn't exist anymore
+ */
+$category = new \Schoolbox\Resource\Category();
+$category->setId(0);
+
+try {
+    $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+    $category = $categoryMapper->findById($openCategoryId);
+}
+catch (\Exception $e) {
 }
 
-$allFileNodes = new \Schoolbox\Collection($fileHandler->getAllInCategory($openCategory));
-
-/* Pseudo-composite
+/* Adapt and overcome
  */
 $allNodes = new \Schoolbox\Collection();
-$allNodes->merge($allFileNodes);
-$allNodes->merge($allLinkNodes);
 
-/* TODO: Sort by Description
+/* Links
  */
+$linkMapper = new \Schoolbox\Resource\LinkMapper();
+$allLinkNodes = $linkMapper->findAllInCategory($category, array());
 
-$permission = $groupHandler->getPermission($openCategory);
+/* Process links
+ */
+foreach ($allLinkNodes as $currentLinkNode) {
+    $node = new \Schoolbox\Resource\Browser\Tree\Node();
+    $node->setNodeId($currentLinkNode->getId());
+    $node->setType('link');
+    $node->setIcon('link');
+    $node->setName(Scrub::text($currentLinkNode->getDescription()));
+    $node->setCategory($category);
+    $node->setCss(implode(' ', array('link')));
+    $node->setModifiedAt($currentLinkNode->getSubmitted());
 
+    $allNodes->add($node);
+}
+
+/* Files
+ */
+$allFileNodes = new \Schoolbox\Collection($fileHandler->getAllInCategory($openCategoryId));
+
+/* Process files
+ */
+foreach ($allFileNodes as $currentFileNode) {
+
+    // if the file is associated with due work, it shouldn't be visible here
+    if ($currentFileNode['type'] || $currentFileNode['typeName']) {
+        continue;
+    }
+
+    /* css for the node
+     */
+    $class = array();
+
+    // write access
+    $permission >= WRITE_ACCESS ? $class[] = "write" : null;
+
+    // is hidden
+    $currentFileNode['hidden'] > 0 ? $class[] = "hidden" : null;
+
+    // icon
+    $class[] = !empty($currentFileNode['iconFile']) ? $allowedFiles->getClass($currentFileNode["iconFile"]) : "binary";
+
+    /* Detect which icon to display
+     * $allowedFiles->getClass() returns empty string for iconFile 'html_alt1'
+     */
+    if (!empty($currentFileNode['iconFile'])) {
+        $fileListType = $allowedFiles->getClass($currentFileNode["iconFile"]);
+    }
+    else {
+        $fileListType = "textfile";
+    }
+
+    $node = new \Schoolbox\Resource\Browser\Tree\Node();
+    $node->setNodeId($currentFileNode['id']);
+    $node->setType('file');
+    $node->setIcon($fileListType);
+    $node->setName(Scrub::text($currentFileNode['description']));
+    $node->setSize($currentFileNode['file_size'] > 0 ? Alaress_Byte_Format::bytesToString($currentFileNode['file_size']) : "--");
+    $node->setCategory($category);
+    $node->setCss(implode(' ' , $class));
+    $node->setModifiedAt(new \Alaress_Date_Relative($currentFileNode['modified']));
+
+    $allNodes->add($node);
+}
+
+/* phplib
+ */
 if ($allNodes->count()) {
-	$userHandler = new User();
+
+    /* Sort by name, then process all
+     */
+    $allNodes->sortBy('name', 'asc');
 
 	foreach ($allNodes as $currentNode) {
+        $output = array(
+            'FILE_ID' => $currentNode->getNodeId(),
+            'TYPE' => $currentNode->getType(),
+            'FILE_NAME' => $currentNode->getName(),
+            'FILE_SIZE' => $currentNode->getSize(),
+            'CATEGORY_ID' => $currentNode->getCategory()->getId(),
+            'CLASS' => $currentNode->getCss(),
+            'FILE_LIST_TYPE' => $currentNode->getIcon()
+        );
 
-        /* phpliberalism on Link nodes
-         */
-        if ($currentNode instanceof \Schoolbox\Resource\Link) {
-            $class = array('link');
-
-            $output = array(
-                'FILE_ID' => $currentNode->getId(),
-                'TYPE' => 'link',
-                'FILE_NAME' => Scrub::text($currentNode->getDescription()),
-                'FILE_SIZE' => "--",
-                'CATEGORY_ID' => $category->getId(),
-                'CLASS' => implode(" ", $class),
-                'FILE_LIST_TYPE' => 'link'
-            );
-
-            $this->setVar($output);
-            $this->parse('file_list_block', 'file_list', true);
-        }
-        else {
-
-            // if the file is associated with due work, it shouldn't be visible here
-            if($currentNode['type'] || $currentNode['typeName']) {
-                continue;
-            }
-
-            if (empty($currentNode['modified'])) {
-                $currentNode['modified'] = $currentNode['submitted'];
-            }
-
-            $class = array();
-
-            // write access
-            $permission >= WRITE_ACCESS ? $class[] = "write" : null;
-
-            // is hidden
-            $currentNode['hidden'] > 0 ? $class[] = "hidden" : null;
-
-            // icon
-            $class[] = !empty($currentNode['iconFile']) ? $allowedFiles->getClass($currentNode["iconFile"]) : "binary";
-
-            $fileModifiedTime = new Alaress_Date_Relative($currentNode['modified']);
-
-            /* Detect which icon to display
-             * $allowedFiles->getClass() returns empty string for iconFile 'html_alt1'
-             */
-            if (!empty($currentNode['iconFile'])) {
-                $fileListType = $allowedFiles->getClass($currentNode["iconFile"]);
-            }
-            else {
-                $fileListType = "textfile";
-            }
-
-            $output = array(
-                'FILE_ID' => $currentNode['id'],
-                'TYPE' => 'file',
-                'FILE_NAME' => Scrub::text($currentNode['description']),
-                'FILE_SIZE' => $currentNode['file_size'] > 0 ? Alaress_Byte_Format::bytesToString($currentNode['file_size']) : "--",
-                'CATEGORY_ID' => $currentNode['category'],
-                'CLASS' => implode(" ", $class),
-                'FILE_LIST_TYPE' => $fileListType
-            );
-
-            $this->setVar($output);
-            $this->parse('file_list_block', 'file_list', true);
-        }
-	}
+        $this->setVar($output);
+        $this->parse('file_list_block', 'file_list', true);
+    }
 }
-else
-{
-	$this->setVar('file_list_block', '');
+else {
+    $this->setVar('file_list_block', '');
 }
 
 // output mime classes
