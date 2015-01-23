@@ -64,6 +64,13 @@ class Contents {
     private $userMapper = null;
 
     /**
+     * An instance of \Schoolbox\Collection
+     *
+     * @var \Schoolbox\Collection
+     */
+    private $allNodes = null;
+
+    /**
      * Constructor
      *
      * @param Category $category
@@ -77,6 +84,7 @@ class Contents {
         $this->setCategory($category);
         $this->setPermission($this->getGroupHandler()->getPermission($category->getId()));
         $this->setFilterOptions($filterOptions);
+        $this->setAllNodes(new Collection());
     }
 
     /**
@@ -85,14 +93,17 @@ class Contents {
      * @return Collection
      */
     public function build() {
-        $fileHandler = new \File();
+        $this->buildLinks();
+        $this->buildFiles();
 
-        /* Adapt and overcome
-         */
-        $allNodes = new Collection();
+        return $this->getAllNodes();
+    }
 
-        /* Links
-         */
+    /**
+     * A list of links in this category
+     *
+     */
+    private function buildLinks() {
         $linkMapper = new LinkMapper();
         $allLinkNodes = $linkMapper->findAllInCategory($this->getCategory(), array());
 
@@ -108,8 +119,15 @@ class Contents {
             $node->setCss(implode(' ', array('link')));
             $node->setModifiedAt($currentLinkNode->getSubmitted());
 
-            $allNodes->add($node);
+            $this->getAllNodes()->add($node);
         }
+    }
+
+    /**
+     * A list of files in this category
+     */
+    private function buildFiles() {
+        $fileHandler = new \File();
 
         /* Files
          */
@@ -170,11 +188,12 @@ class Contents {
             $node->setCss(implode(' ' , $class));
             $node->setModifiedAt(new \Alaress_Date_Relative($currentFileNode['modified']));
 
-            $allNodes->add($node);
+            $this->getAllNodes()->add($node);
         }
-
-        return $allNodes;
     }
+
+    /* Getters/Setters
+     */
 
     /**
      * Set allowed files
@@ -294,5 +313,25 @@ class Contents {
     private function getUserMapper()
     {
         return $this->userMapper;
+    }
+
+    /**
+     * Set all nodes
+     *
+     * @param \Schoolbox\Collection $allNodes
+     */
+    private function setAllNodes($allNodes)
+    {
+        $this->allNodes = $allNodes;
+    }
+
+    /**
+     * Get all nodes
+     *
+     * @return \Schoolbox\Collection
+     */
+    private function getAllNodes()
+    {
+        return $this->allNodes;
     }
 }
