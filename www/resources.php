@@ -98,68 +98,107 @@ $this->setVar(
 );
 
 // output files, column 2
-$fileList = $fileHandler->mergeLinks($fileHandler->getAllInCategory($openCategory), $linkHandler->getAllInCategory($openCategory));
+$allLinkNodes = new \Schoolbox\Collection();
+
+/* Display links in the opened folder
+ * Root folder is zero and no links should be in there
+ */
+if ($openCategory) {
+    try {
+        $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+        $category = $categoryMapper->findById($openCategory);
+
+        $linkMapper = new \Schoolbox\Resource\LinkMapper();
+        $allLinkNodes = $linkMapper->findAllInCategory($category, array());
+    }
+    catch (\Exception $e) {
+        error(13);
+    }
+}
+
+$allFileNodes = new \Schoolbox\Collection($fileHandler->getAllInCategory($openCategory));
+
+/* Pseudo-composite
+ */
+$allNodes = new \Schoolbox\Collection();
+$allNodes->merge($allFileNodes);
+$allNodes->merge($allLinkNodes);
+
+/* TODO: Sort by Description
+ */
+
 $permission = $groupHandler->getPermission($openCategory);
 
-if (is_array($fileList) && count($fileList) > 0) {
+if ($allNodes->count()) {
 	$userHandler = new User();
 
-	foreach ($fileList as $file) {
+	foreach ($allNodes as $currentNode) {
 
-        // if the file is associated with due work, it shouldn't be visible here
-        if($file['type'] || $file['typeName']) {
-            continue;
+        /* phpliberalism on Link nodes
+         */
+        if ($currentNode instanceof \Schoolbox\Resource\Link) {
+            $class = array('link');
+
+            $output = array(
+                'FILE_ID' => $currentNode->getId(),
+                'TYPE' => 'link',
+                'FILE_NAME' => Scrub::text($currentNode->getDescription()),
+                'FILE_SIZE' => "--",
+                'CATEGORY_ID' => $category->getId(),
+                'CLASS' => implode(" ", $class),
+                'FILE_LIST_TYPE' => 'link'
+            );
+
+            $this->setVar($output);
+            $this->parse('file_list_block', 'file_list', true);
         }
+        else {
 
-		if (empty($file['modified'])) {
-			$file['modified'] = $file['submitted'];
-		}
+            // if the file is associated with due work, it shouldn't be visible here
+            if($currentNode['type'] || $currentNode['typeName']) {
+                continue;
+            }
 
-		$class = array();
+            if (empty($currentNode['modified'])) {
+                $currentNode['modified'] = $currentNode['submitted'];
+            }
 
-		// is link
-		$file['url'] ? $class[] = "link" : null;
+            $class = array();
 
-		// write access
-		$permission >= WRITE_ACCESS ? $class[] = "write" : null;
+            // write access
+            $permission >= WRITE_ACCESS ? $class[] = "write" : null;
 
-		// is hidden
-		$file['hidden'] > 0 ? $class[] = "hidden" : null;
+            // is hidden
+            $currentNode['hidden'] > 0 ? $class[] = "hidden" : null;
 
-		// icon
-		$class[] = !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "binary";
+            // icon
+            $class[] = !empty($currentNode['iconFile']) ? $allowedFiles->getClass($currentNode["iconFile"]) : "binary";
 
-		if (!($i++ % 2)) {
-			$class[] = 'dark';
-		}
+            $fileModifiedTime = new Alaress_Date_Relative($currentNode['modified']);
 
-		$fileModifiedTime = new Alaress_Date_Relative($file['modified']);
+            /* Detect which icon to display
+             * $allowedFiles->getClass() returns empty string for iconFile 'html_alt1'
+             */
+            if (!empty($currentNode['iconFile'])) {
+                $fileListType = $allowedFiles->getClass($currentNode["iconFile"]);
+            }
+            else {
+                $fileListType = "textfile";
+            }
 
-		/* Detect which icon to display
-		 * $allowedFiles->getClass() returns empty string for iconFile 'html_alt1'
-		 */
-		if (isset($file['url'])) {
-			$fileListType = 'link';
-		}
-		else if (!empty($file['iconFile'])) {
-			$fileListType = $allowedFiles->getClass($file["iconFile"]);
-		}
-		else {
-			$fileListType = "textfile";
-		}
+            $output = array(
+                'FILE_ID' => $currentNode['id'],
+                'TYPE' => 'file',
+                'FILE_NAME' => Scrub::text($currentNode['description']),
+                'FILE_SIZE' => $currentNode['file_size'] > 0 ? Alaress_Byte_Format::bytesToString($currentNode['file_size']) : "--",
+                'CATEGORY_ID' => $currentNode['category'],
+                'CLASS' => implode(" ", $class),
+                'FILE_LIST_TYPE' => $fileListType
+            );
 
-		$output = array(
-			'FILE_ID' => $file['id'],
-			'TYPE' => $file['url'] ? 'link' : 'file',
-			'FILE_NAME' => Scrub::text($file['description']),
-			'FILE_SIZE' => $file['file_size'] > 0 ? Alaress_Byte_Format::bytesToString($file['file_size']) : "--",
-			'CATEGORY_ID' => $file['category'],
-			'CLASS' => implode(" ", $class),
-			'FILE_LIST_TYPE' => $fileListType
-		);
-
-		$this->setVar($output);
-		$this->parse('file_list_block', 'file_list', true);
+            $this->setVar($output);
+            $this->parse('file_list_block', 'file_list', true);
+        }
 	}
 }
 else
