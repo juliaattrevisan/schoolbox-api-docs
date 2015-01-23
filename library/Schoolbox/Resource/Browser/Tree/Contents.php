@@ -21,8 +21,6 @@ use Schoolbox\User;
 
 class Contents {
 
-
-
     /**
      * An instance of \Schoolbox\Resource\Category
      *
