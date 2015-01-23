@@ -169,10 +169,14 @@ foreach ($allFileNodes as $currentFileNode) {
     $class = array();
 
     // write access
-    $permission >= WRITE_ACCESS ? $class[] = "write" : null;
+    if ($permission >= WRITE_ACCESS) {
+        $class[] = "write";
+    }
 
     // is hidden
-    $currentFileNode['hidden'] > 0 ? $class[] = "hidden" : null;
+    if ($currentFileNode['hidden'] > 0) {
+        $class[] = "hidden";
+    }
 
     // icon
     $class[] = !empty($currentFileNode['iconFile']) ? $allowedFiles->getClass($currentFileNode["iconFile"]) : "binary";
