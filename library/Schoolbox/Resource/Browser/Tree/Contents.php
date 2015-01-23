@@ -16,6 +16,8 @@ use Schoolbox\Resource\Category;
 use Schoolbox\Collection;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\Resource\Browser\Tree\Node;
+use Schoolbox\UserMapper;
+use Schoolbox\User;
 
 class Contents {
 
@@ -48,16 +50,33 @@ class Contents {
     private $permission = 0;
 
     /**
+     * An array of options to pass to findAllInCategory() calls
+     *
+     * @var array
+     */
+    private $filterOptions = array();
+
+    /**
+     * An instance of \Schoolbox\UserMapper
+     *
+     * @var \Schoolbox\UserMapper
+     */
+    private $userMapper = null;
+
+    /**
      * Constructor
      *
      * @param Category $category
+     * @param array $filterOptions
      */
-    public function __construct(Category $category) {
+    public function __construct(Category $category, $filterOptions = null) {
         $this->setGroupHandler(new \Group());
         $this->setAllowedFiles(new \AllowedFile());
+        $this->setUserMapper(new UserMapper());
 
         $this->setCategory($category);
         $this->setPermission($this->getGroupHandler()->getPermission($category->getId()));
+        $this->setFilterOptions($filterOptions);
     }
 
     /**
@@ -94,7 +113,7 @@ class Contents {
 
         /* Files
          */
-        $allFileNodes = new Collection($fileHandler->getAllInCategory($this->getCategory()->getId()));
+        $allFileNodes = new Collection($fileHandler->getAllInCategory($this->getCategory()->getId(), $this->getFilterOptions()));
 
         /* Process files
          */
@@ -132,8 +151,17 @@ class Contents {
                 $fileListType = "textfile";
             }
 
+            try {
+                $user = $this->getUserMapper()->findById($currentFileNode['owner']);
+            }
+            catch (\Exception $e) {
+                $user = new User();
+                $user->setId($currentFileNode['owner']);
+            }
+
             $node = new Node();
             $node->setNodeId($currentFileNode['id']);
+            $node->setUser($user);
             $node->setType('file');
             $node->setIcon($fileListType);
             $node->setName(\Scrub::text($currentFileNode['description']));
@@ -227,6 +255,44 @@ class Contents {
     {
         return $this->permission;
     }
-    
-    
-} 
+
+    /**
+     * Set filter options
+     *
+     * @param array $filterOptions
+     */
+    private function setFilterOptions($filterOptions)
+    {
+        $this->filterOptions = $filterOptions;
+    }
+
+    /**
+     * Get filter options
+     *
+     * @return array
+     */
+    private function getFilterOptions()
+    {
+        return $this->filterOptions;
+    }
+
+    /**
+     * Set user mapper
+     *
+     * @param \Schoolbox\UserMapper $userMapper
+     */
+    private function setUserMapper($userMapper)
+    {
+        $this->userMapper = $userMapper;
+    }
+
+    /**
+     * Get user mapper
+     *
+     * @return \Schoolbox\UserMapper
+     */
+    private function getUserMapper()
+    {
+        return $this->userMapper;
+    }
+}
