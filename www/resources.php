@@ -106,14 +106,8 @@ $permission = $groupHandler->getPermission($openCategoryId);
 
 /* Output a list of nodes (which are comprised of both files and links)
  * in the second column of Old Resource Browser
- */
-$allLinkNodes = new \Schoolbox\Collection();
-$allFileNodes = new \Schoolbox\Collection();
-
-/* Display links in the opened (selected) folder
- */
-
-/* Root folder is zero and no links should be in there
+ *
+ * Root folder is zero and no links should be in there
  * Root folder is the default location to open upon first visit
  * and when a folder doesn't exist anymore
  */
