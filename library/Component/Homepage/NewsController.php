@@ -120,6 +120,10 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
 
             $j = 0;
             foreach ($newsList as $news) {
+                // Student view: don't show unpublished even if I created it
+                if ($newsPermission < WRITE_ACCESS && $news['published'] > $_SERVER['REQUEST_TIME']) {
+                    continue;
+                }
                 // news_edit_other allows users with write access to edit other's news
                 if ($news['owner'] == $_SESSION['id']
                     || $this->permission >= FULL_ACCESS
