@@ -6,7 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_NewsController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_NewsController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * @var Group
@@ -33,7 +34,8 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
         $this->groupHandler = new Group();
         $this->newsHandler = new CategoryNews();
         $this->catHandler = new Category();
@@ -41,13 +43,13 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
         // remove any non-numeric values from the source config
         $this->source = $this->catHandler->getByID(
             $this->getConfig('src') ?
-                preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
-                $this->getContext('id')
+            preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
+            $this->getContext('id')
         );
 
-	    if($this->source === false) {
-		    $this->source = $this->catHandler->getByID($this->getContext('id'));
-	    }
+        if ($this->source === false) {
+            $this->source = $this->catHandler->getByID($this->getContext('id'));
+        }
     }
 
     /**
@@ -55,18 +57,19 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
         if (!parent::loadTemplate($templateHandle, 'news')) {
             return false;
         }
 
         $this->parseConfig();
 
-	    if($this->permission < READ_ACCESS) {
-		    return false;
-	    }
+        if ($this->permission < READ_ACCESS) {
+            return false;
+        }
 
-	    $this->setBlock($templateHandle, 'news', 'news_block');
+        $this->setBlock($templateHandle, 'news', 'news_block');
         $this->setBlock($templateHandle, "submit_news", "submit_news_block");
         $this->setBlock('news', "has_publish_date", "has_publish_date_block");
 
@@ -168,13 +171,11 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
                         );
 
                         $this->parse('has_publish_date_block', 'has_publish_date');
-                    }
-                    else {
+                    } else {
                         $this->setVar('has_publish_date_block', '');
                     }
 
-                }
-                else {
+                } else {
                     $this->setVar('has_publish_date_block', '');
                 }
 
@@ -185,5 +186,4 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
         return true;
 
     }
-
 }
