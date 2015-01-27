@@ -52,9 +52,9 @@ class Results implements Searchable {
      */
     public function search($user, $keyword, $offset = 0, $limit = null, $sortProperty = '', $sortDirection = 'DESC') {
         foreach($this->getRegistry() as $currentDefinition) {
-            $results = $currentDefinition->getMapper()->search($user, $keyword, $offset, $limit, $sortProperty, $sortDirection);
+            $searcher = $currentDefinition->getMapper()->search($user, $keyword, $offset, $limit, $sortProperty, $sortDirection);
 
-            $currentDefinition->getRenderer()->render($results);
+            $currentDefinition->getRenderer()->render($searcher);
         }
 
         return;
