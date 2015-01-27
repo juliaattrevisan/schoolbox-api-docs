@@ -1,36 +1,11 @@
 <?php
-require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
+require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
-$page = new SitePage;
+$page = new SitePage();
 $output = array();
-$homepage = null;
-
 $allowFilter = array('image', 'video');
 
-if (is_numeric($_POST['categoryID'])) {
-    $filterOptions = null;
-
-    if (in_array($_POST['filter'], $allowFilter)) {
-        $filterOptions = array('filter' => $_POST['filter']);
-
-        /* Do we really need this?
-         */
-
-        // add homepage "file"
-        if (isset($_POST['homelink'])) {
-
-            $categoryHandler = new Category;
-            $category = $categoryHandler->getByID($_POST['categoryID']);
-
-            if ($category['template'] > 0) {
-                $homepage = array('id'          => $category['id'],
-                                  'description' => 'Homepage',
-                                  'size'        => 1,
-                                  'iconFile'    => 'vcard_fiquet.png',
-                );
-            }
-        }
-    }
+if (is_numeric($_POST['categoryID']) && $_POST['categoryID']) {
 
     /* Output a list of nodes (which are comprised of both files and links)
      * in the second column of Old Resource Browser
@@ -50,12 +25,27 @@ if (is_numeric($_POST['categoryID'])) {
         error(13);
     }
 
+    /* Also used in tinyMCE resource browser
+     */
+    $filterOptions = null;
+
+    if (in_array($_POST['filter'], $allowFilter)) {
+        $filterOptions = array(
+            'filter' => $_POST['filter']
+        );
+    }
+
+    /* The usual nodes
+     */
     $contents = new \Schoolbox\Resource\Browser\Tree\Contents($category, $filterOptions);
     $allNodes = $contents->getFileNodes();
 
-    /* Prepend the homepage node, whatever that does
+    /* Prepend the homepage node, a custom manufacture
+     *
+     * This is used in the tinyMCE resource browser popup, when selecting
+     * links to a Homepage from within a folder
      */
-    if ($homepage !== null) {
+    if (isset($_POST['homelink']) && is_numeric($category->getHomepage()->getTemplate()->getId())) {
         $icon = new \Schoolbox\Resource\Browser\Tree\Node\Icon();
         $icon->setCss('');
         $icon->setFile('vcard_fiquet.png');
