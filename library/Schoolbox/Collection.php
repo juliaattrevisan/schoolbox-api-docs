@@ -14,26 +14,8 @@ use ICollection;
 use JsonSerializable;
 
 class Collection implements ICollection, JsonSerializable {
-
 	protected $stack = array();
 	protected $position = 0;
-
-    /**
-     * @param $element
-     * @return $this
-     */
-	public function add($element) {
-		$this->stack[] = $element;
-
-        return $this;
-	}
-
-	/**
-	 * @param $element
-	 */
-	public function prepend($element) {
-		array_unshift($this->stack, $element);
-	}
 
 	/**
 	 * Constructor
@@ -47,7 +29,28 @@ class Collection implements ICollection, JsonSerializable {
 			$this->setStack($stack);
 		}
 	}
-	
+
+    /**
+     * Add an element ot the end of the stack
+     *
+     * @param $element
+     * @return $this
+     */
+    public function add($element) {
+        $this->stack[] = $element;
+
+        return $this;
+    }
+
+    /**
+     * Prepend an element to the start of the stack
+     *
+     * @param $element
+     */
+    public function prepend($element) {
+        array_unshift($this->stack, $element);
+    }
+
 	/**
 	 * Returns whole collection as an array.
 	 *
