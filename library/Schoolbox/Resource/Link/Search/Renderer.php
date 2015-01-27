@@ -13,6 +13,11 @@ namespace Schoolbox\Resource\Link\Search;
 use Schoolbox\Resource\Search\MapperResult\Base as MapperResult;
 use Schoolbox\Resource\Search\Renderer\Base;
 
+/* Link specific
+ */
+use Schoolbox\Resource\Link;
+use Schoolbox\Resource\CategoryMapper;
+
 class Renderer extends Base {
 
     /**
@@ -28,28 +33,42 @@ class Renderer extends Base {
             'LINK_COUNT' => $mapperResult->getCount(),
         ));
 
+        /* phplib
+         */
         foreach ($mapperResult->getResult() as $currentLink) {
-//            foreach ($categoryStd->breadcrumb($link['category']) as $i => $breadcrumb) {
-//                $link['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
-//            }
-//
-//
             $createdTime = new \Alaress_Date_Relative($currentLink->getSubmitted(), 'Y-m-d H:i:s');
 
             $this->getPage()->setVar(array(
                 'LINK_URL' => $currentLink->getHref(),
-                'LINK_ICON' => '',
                 'LINK_TARGET' => $currentLink->getTarget(),
                 'LINK_DESCRIPTION' => \Scrub::text($currentLink->getDescription()),
                 'LINK_COMMENT' => \TextFormatter::cutSentence(\Scrub::text($currentLink->getComment()), 150),
                 'LINK_OWNER' => $currentLink->getOwner()->getId(),
                 'LINK_OWNER_NAME' => $currentLink->getOwner()->formatName(),
                 'LINK_CREATED' => $createdTime->getRelativeTime(),
-//                'LINK_BREADCRUMB' => $link['breadcrumb'],
-//                'LINK_COUNT' => $mapperResult->getCount(),
+                'LINK_BREADCRUMB' => $this->spawnBreadcrumbs($currentLink),
             ));
 
             $this->getPage()->parse('link_block', 'link', true);
         }
+    }
+
+    /**
+     * Breadcrumbs haha
+     *
+     * @param Link $currentLink
+     * @return string
+     */
+    private function spawnBreadcrumbs(Link $currentLink) {
+        $categoryMapper = new CategoryMapper();
+        $allCrumbs = $categoryMapper->breadcrumb($currentLink->getFolder());
+
+        $html = array();
+
+        foreach($allCrumbs as $currentCrumb) {
+            $html[] = "<a href=\"/homepage/{$currentCrumb->getId()}\">{$currentCrumb->getName()}</a>";
+        }
+
+        return implode(' > ', $html);
     }
 }
