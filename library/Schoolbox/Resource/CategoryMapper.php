@@ -655,5 +655,29 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
         return $this->findByParent($nodeId);
     }
 
+    /**
+     * Creates a breadcrumb of a category's hierarchical navigation
+     */
+    public function breadcrumb(Category $category)
+    {
+        $breadcrumb = new Collection();
 
+        $parentId = $category->getParent()->getId();
+
+        /* get the breadcrumb back up to the root directory
+         */
+        while ($parentId != 0) {
+            try {
+                $nextCategory = $this->findById($category->getParent()->getId());
+                $breadcrumb->prepend($nextCategory);
+
+                $category = $nextCategory;
+                $parentId = $nextCategory->getParent()->getId();
+            }
+            catch (\Exception $e) {
+            }
+        }
+
+        return $breadcrumb;
+    }
 }
