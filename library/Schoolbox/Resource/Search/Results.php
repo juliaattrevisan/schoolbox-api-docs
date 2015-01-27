@@ -38,6 +38,13 @@ class Results implements Searchable {
     private $type = '';
 
     /**
+     * Search results
+     *
+     * @var null
+     */
+    private $result = null;
+
+    /**
      * Constructor
      *
      * $type is 'all' or specific to which tab you selected e.g. 'link'
@@ -49,6 +56,7 @@ class Results implements Searchable {
     public function __construct($page, $type) {
         $this->setRegistry(new Collection());
         $this->setType($type);
+        $this->setResult(new Collection());
 
         /* Add searchables
          */
@@ -67,15 +75,44 @@ class Results implements Searchable {
      * @return void
      */
     public function search($user, $keyword, $offset = 0, $limit = null, $sortProperty = '', $sortDirection = 'DESC') {
+        $result = new Collection();
+
         foreach($this->getRegistry() as $currentDefinition) {
             $searcher = $currentDefinition->getMapper()->search($user, $keyword, $offset, $limit, $sortProperty, $sortDirection);
 
-            /* For "outputMore()"
-             */
-            $currentDefinition->getRenderer()->render($searcher, $this->getType());
+            $result->setOffset(get_class($currentDefinition->getMapper()), $searcher);
         }
 
-        return;
+        $this->setResult($result);
+    }
+
+    /**
+     * Render search results
+     */
+    public function render() {
+        foreach($this->getRegistry() as $currentDefinition) {
+            $searcher = $this->getResult()->getOffset(get_class($currentDefinition->getMapper()));
+
+            $currentDefinition->getRenderer()->render($searcher, $this->getType());
+        }
+    }
+
+    /**
+     * Count the total number of results for all participants
+     * listed in the Registry
+     *
+     * @return int
+     */
+    public function countTotalResults() {
+        $sum = 0;
+
+        foreach($this->getRegistry() as $currentDefinition) {
+            $searcher = $this->getResult()->getOffset(get_class($currentDefinition->getMapper()));
+
+            $sum += $searcher->getCount();
+        }
+
+        return $sum;
     }
 
     /* Getters/Setters
@@ -119,5 +156,25 @@ class Results implements Searchable {
     private function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * Set result
+     *
+     * @param null $result
+     */
+    private function setResult($result)
+    {
+        $this->result = $result;
+    }
+
+    /**
+     * Get result
+     *
+     * @return null
+     */
+    private function getResult()
+    {
+        return $this->result;
     }
 }
