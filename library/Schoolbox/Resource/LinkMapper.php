@@ -9,14 +9,22 @@
 
 namespace Schoolbox\Resource;
 
-use Schoolbox\Mapper;
+use PDO;
 use Schoolbox\Collection;
-use Schoolbox\User;
+use Schoolbox\Mapper;
+use Schoolbox\Mapper\Searchable;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\User;
+use Schoolbox\Resource\Search\Sanitiser;
 
-class LinkMapper extends Mapper
+class LinkMapper extends Mapper implements Searchable
 {
-
+    /**
+     * Mapping
+     *
+     * @return void
+     */
     protected function mapping()
     {
         $this->hasTable('link');
@@ -111,6 +119,24 @@ class LinkMapper extends Mapper
             )
         );
 
+        $this->hasJoin(
+            'perms',
+            array(
+                'mapper' => '\\Schoolbox\\Permission\\Access\\RoleAccessMapper',
+                'this_key' => 'category',
+                'other_key' => 'cid'
+            )
+        );
+
+        $this->hasJoin(
+            'userAccess',
+            array(
+                'mapper' => '\\Schoolbox\\Permission\\Access\\UserAccessMapper',
+                'this_key' => 'category',
+                'other_key' => 'sid'
+            )
+        );
+
         $this->hasSoftDeleteDateField('deleted_at');
     }
 
@@ -193,5 +219,67 @@ class LinkMapper extends Mapper
 
         $notif = new Notif(Notif::TOPIC_CMS);
         $notif->info("CRUD", $logEntry);
+    }
+
+    /**
+     * Performs a search with the given parameters, and returns a Collection of the resultant set.
+     *
+     * @param User $user
+     * @param string $keyword
+     * @param int $offset
+     * @param int $limit
+     * @param string $sortProperty
+     * @param string $sortDirection
+     * @return Collection
+     */
+    public function search($user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC')
+    {
+        $sanitiser = new Sanitiser($this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
+
+        $query = "
+			SELECT
+				{$this->getColumnString('l')},
+				{$this->getJoinMapper('user')->getColumnString('u')},
+				{$this->getJoinMapper('category')->getColumnString('c')},
+				MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()}) AS `score`
+			FROM
+				`{$this->getTable()}` `l`
+				LEFT JOIN {$this->getJoinSql('user', 'l', 'u')}
+				LEFT JOIN {$this->getJoinSql('category', 'l', 'c')}
+				LEFT JOIN {$this->getJoinSql('perms', 'l', 'p')}
+					AND p.gid = :role_id
+					AND p.type > :min_access
+				LEFT JOIN {$this->getJoinSql('userAccess', 'l', 'a')}
+					AND a.service = :service
+					AND a.uid = :user_id
+			WHERE
+				(p.cid OR a.sid)
+				AND l.deleted_at IS NULL
+				AND MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()})
+			ORDER BY l.{$sanitiser->getSortBy()} {$sanitiser->getSortDir()}
+			LIMIT {$sanitiser->getOffset()}, {$sanitiser->getLimit()}
+		";
+
+        $stmt = $this->getDatabase()->prepare($query);
+        $stmt->execute(array(
+            'role_id' => $user->getRole()->getId(),
+            'service' => UserAccess::SERVICE_HOMEPAGE,
+            'min_access' => UserAccess::ACCESS_READ,
+            'user_id' => $user->getId()
+        ));
+
+        $collection = $this->createCollection();
+
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $link = $this->hydrate($row, 'l');
+            $owner = $this->hydrateJoin($row, 'user', 'u');
+            $category = $this->hydrateJoin($row, 'category', 'c');
+
+            $link->setOwner($owner)->setFolder($category);
+
+            $collection->add($link);
+        }
+
+        return $collection;
     }
 }

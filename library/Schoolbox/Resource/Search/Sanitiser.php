@@ -2,15 +2,25 @@
 /**
  * Sanitiser
  *
+ * Santises search parameters Keyword, Sort Property, Sort Direction, Offset, Limit
+ *
+ * - Keyword is quoted
+ *
+ * - Sort Property is based on mapper's defined properties.
+ * If it's not in the mapper's defined properties, will sort by identifier column
+ *
+ * - Sort direction will always return DESC or ASC.
+ *
+ * - Also casts (int) on offset and limit.
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Resource\Link\Search;
+namespace Schoolbox\Resource\Search;
 
-use Schoolbox\MappingCollection;
 use Schoolbox\Mapper;
 
 class Sanitiser {
