@@ -5,7 +5,6 @@ use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Resource\Link;
 use Schoolbox\Resource\LinkMapper;
 
-
 $page         = new SitePage();
 $groupHandler = new Group();
 
@@ -50,7 +49,6 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
         if (is_array($_POST['category'])) {
             $linkCollection = LinkMapper::getInstance()->createCollection();
             foreach ($_POST['category'] as $cat) {
-
                 if ($groupHandler->getPermission($cat) < WRITE_ACCESS) {
                     error(6);
                 }
@@ -82,7 +80,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
 
             if ($groupHandler->getPermission($link->getFolder()->getId()) < WRITE_ACCESS) {
                 $result = "Insufficient permssions";
-            } else if ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS) {
+            } elseif ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS) {
                 $result = "Insufficient permssions";
             } else {
                 $link->setFolder(\Schoolbox\Resource\CategoryMapper::getInstance()->createModel($_POST['categoryID']));
@@ -100,7 +98,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
                 'result' => $result
             )
         );
-    } else if ($_GET['delete']) {
+    } elseif ($_GET['delete']) {
         try {
             $link = LinkMapper::getInstance()->findById($_GET['delete']);
 
@@ -122,4 +120,3 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
         error(2);
     }
 }
-
