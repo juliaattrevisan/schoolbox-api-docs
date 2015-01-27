@@ -16,6 +16,8 @@ use Schoolbox\Mapper\Searchable;
 use Schoolbox\Collection;
 
 use Schoolbox\Resource\LinkMapper;
+use Schoolbox\Resource\Link\Search\Renderer as LinkRenderer;
+
 
 class Results implements Searchable {
 
@@ -29,12 +31,12 @@ class Results implements Searchable {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct($page) {
         $this->setRegistry(new Collection());
 
         /* Add searchables
          */
-        $this->getRegistry()->add(new LinkMapper());
+        $this->getRegistry()->add(new Definition(new LinkMapper(), new LinkRenderer($page)));
     }
 
     /**
@@ -46,20 +48,16 @@ class Results implements Searchable {
      * @param null $limit
      * @param string $sortProperty
      * @param string $sortDirection
-     * @return Collection
+     * @return void
      */
     public function search($user, $keyword, $offset = 0, $limit = null, $sortProperty = '', $sortDirection = 'DESC') {
-        $result = new Collection();
+        foreach($this->getRegistry() as $currentDefinition) {
+            $results = $currentDefinition->getMapper()->search($user, $keyword, $offset, $limit, $sortProperty, $sortDirection);
 
-        foreach($this->getRegistry() as $currentMapper) {
-            if ($limit === null) {
-                $limit = $currentMapper::DEFAULT_LIMIT;
-            }
-
-            $result->add($currentMapper->search($user, $keyword, $offset, $limit, $sortProperty, $sortDirection));
+            $currentDefinition->getRenderer()->render($results);
         }
 
-        return $result;
+        return;
     }
 
     /**
