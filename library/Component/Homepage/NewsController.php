@@ -107,7 +107,8 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
 
             case READ_ACCESS:
                 $newsList = $this->newsHandler->getAllForCategory(
-                    $this->source['id'], array('size' => $this->getConfig('size'))
+                    $this->source['id'],
+                    array('size' => $this->getConfig('size'))
                 );
                 break;
 
@@ -134,7 +135,9 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
                 ) {
                     $this->setVar(
                         'MOD_NEWS',
-                        '<a class="btn no-text modify" href="/news/homepage/' . $news['id'] . '" title="Modify News"><span></span></a>'
+                        '<a class="btn no-text modify" href="/news/homepage/'
+                        . $news['id']
+                        . '" title="Modify News"><span></span></a>'
                     );
                 } else {
                     $this->setVar('MOD_NEWS', '');
@@ -147,9 +150,9 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
                         "NEWS_ID" => $news['id'],
                         "NEWS_HEADING" => Scrub::text($news['heading']),
                         "NEWS_BODY" => Scrub::html($news['body']),
-                        "EMAIL_CONTACT" => "<a href=\"/search/user/{$news['uid']}\">" . $userHandler->formatName(
-                            $news
-                        ) . "</a>",
+                        "EMAIL_CONTACT" => "<a href=\"/search/user/{$news['uid']}\">"
+                            . $userHandler->formatName($news)
+                            . "</a>",
                         "AUTHOR" => $userHandler->formatName($news),
                         "AUTHOR_ID" => $news['uid'],
                         "AUTHOR_EXTERNAL_ID" => $news['synid'],
