@@ -160,6 +160,24 @@ class Category extends DeprecatedModel
             $cats = " = '$categoryID' ";
         }
 
+        $permissionSubquery = "
+            SELECT 1 FROM `" . $this->_table . "` k
+            LEFT JOIN perms p
+                ON p.cid = k.id
+                AND p.gid = '" . $_SESSION['gid'] . "'
+                AND p.type > 0
+            LEFT JOIN userAccess ua
+                ON ua.uid = '" . $_SESSION['id'] . "'
+                AND ua.service = 1
+                AND ua.sid = k.id
+                AND ua.type > 0
+            WHERE (
+                p.type IS NOT NULL
+                OR ua.type IS NOT NULL
+                OR 1 = " . (int)$_SESSION['su'] . "
+            )
+        ";
+
         $query = "SELECT
             id,
             name,
@@ -167,22 +185,8 @@ class Category extends DeprecatedModel
             cf.template,
             parent,
             (
-                SELECT 1 FROM `" . $this->_table . "` k
-                LEFT JOIN perms p
-                    ON p.cid = k.id
-                    AND p.gid = '" . $_SESSION['gid'] . "'
-                    AND p.type > 0
-                LEFT JOIN userAccess ua
-                    ON ua.uid = '" . $_SESSION['id'] . "'
-                    AND ua.service = 1
-                    AND ua.sid = k.id
-                    AND ua.type > 0
-                WHERE k.parent = ca.id
-                    AND (
-                        p.type IS NOT NULL
-                        OR ua.type IS NOT NULL
-                        OR 1 = " . (int)$_SESSION['su'] . "
-                    )
+                $permissionSubquery
+                AND k.parent = ca.id
                 LIMIT 1
             ) isParent,
             (
@@ -193,7 +197,13 @@ class Category extends DeprecatedModel
             FROM category ca
             LEFT JOIN categoryCode co ON co.categoryID = ca.id AND co.deleted_at IS NULL
             LEFT JOIN homepage_config cf ON cf.cid = ca.id
-            WHERE ca.deleted_at IS NULL AND parent $cats
+            WHERE ca.deleted_at IS NULL
+            AND (
+                $permissionSubquery
+                AND k.id = ca.id
+                LIMIT 1
+            )
+            AND parent $cats
             GROUP BY ca.id
         ";
 
