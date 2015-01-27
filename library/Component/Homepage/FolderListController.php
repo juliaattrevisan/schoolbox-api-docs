@@ -38,8 +38,8 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
         // remove any non-numeric values from the source config
         $this->source = $this->catHandler->getByID(
             $this->getConfig('src') ?
-                preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
-                $this->getContext('id')
+            preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
+            $this->getContext('id')
         );
 
         if ($this->source === false) {
