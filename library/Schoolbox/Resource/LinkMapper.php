@@ -235,6 +235,10 @@ class LinkMapper extends Mapper implements Searchable
      */
     public function search($user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC')
     {
+        if ($limit == 0) {
+            $limit = self::DEFAULT_LIMIT;
+        }
+
         $searcher = new Result();
         $searcher->search($user, $this, $keyword, $offset, $limit, $sortProperty, $sortDirection);
 
