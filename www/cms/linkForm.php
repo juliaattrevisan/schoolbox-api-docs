@@ -85,7 +85,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
             } else if ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS) {
                 $result = "Insufficient permssions";
             } else {
-                $link->setFolder(\Schoolbox\Calendar\Relation\CategoryMapper::getInstance()->createModel($_POST['categoryID']));
+                $link->setFolder(\Schoolbox\Resource\CategoryMapper::getInstance()->createModel($_POST['categoryID']));
                 $link->setModified(Alaress_Date_Format::now());
                 LinkMapper::getInstance()->save($link);
                 $result = "success";
