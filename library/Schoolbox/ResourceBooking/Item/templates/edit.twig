@@ -142,7 +142,7 @@
     <table class="standardForm table">
         <tr>
             <td class="formLabelWidth"><h4>Name</h4></td>
-            <td><input class="required" name="name" type="text" value="{{ item.name }}" size="30"/></td>
+            <td><label><input class="required" name="name" type="text" value="{{ item.name }}" /></label></td>
         </tr>
         <tr>
             <td class="formLabelWidth">
@@ -153,7 +153,7 @@
                     class timetabled there.
                 </em>
             </td>
-            <td><input name="room_code" type="text" value="{{ item.roomCode }}" size="64"/></td>
+            <td><label><input name="room_code" type="text" value="{{ item.roomCode }}" /></label></td>
         </tr>
         <tr>
             <td class="formLabelWidth"><h4>Category</h4></td>
@@ -251,9 +251,9 @@
             </td>
             <td>
                 {% set isEmpty = item.minLeadTime.secondTotal == 0 %}
-                <input type="text" class="interval-input" value="{{ isEmpty ? '' : item.minLeadTime.dayTotal        }}" name="min_lead_time[day]"    placeholder="days">
-                <input type="text" class="interval-input" value="{{ isEmpty ? '' : item.minLeadTime.hourRemainder   }}" name="min_lead_time[hour]"   placeholder="hours">
-                <input type="text" class="interval-input" value="{{ isEmpty ? '' : item.minLeadTime.minuteRemainder }}" name="min_lead_time[minute]" placeholder="minutes">
+                <label class="interval-input"><input type="text" value="{{ isEmpty ? '' : item.minLeadTime.dayTotal        }}" name="min_lead_time[day]"> days,</label>
+                <label class="interval-input"><input type="text" value="{{ isEmpty ? '' : item.minLeadTime.hourRemainder   }}" name="min_lead_time[hour]"> hours,</label>
+                <label class="interval-input"><input type="text" value="{{ isEmpty ? '' : item.minLeadTime.minuteRemainder }}" name="min_lead_time[minute]"> minutes</label>
             </td>
         </tr>
         <tr>
@@ -263,9 +263,9 @@
             </td>
             <td>
                 {% set isEmpty = item.minReservationTime.secondTotal == 0 %}
-                <input type="text" class="interval-input" value="{{ isEmpty ? '' : item.minReservationTime.dayTotal        }}" name="min_reservation_time[day]"    placeholder="days">
-                <input type="text" class="interval-input" value="{{ isEmpty ? '' : item.minReservationTime.hourRemainder   }}" name="min_reservation_time[hour]"   placeholder="hours">
-                <input type="text" class="interval-input" value="{{ isEmpty ? '' : item.minReservationTime.minuteRemainder }}" name="min_reservation_time[minute]" placeholder="minutes">
+                <label class="interval-input"><input type="text" value="{{ isEmpty ? '' : item.minReservationTime.dayTotal        }}" name="min_reservation_time[day]"> days,</label>
+                <label class="interval-input"><input type="text" value="{{ isEmpty ? '' : item.minReservationTime.hourRemainder   }}" name="min_reservation_time[hour]"> hours,</label>
+                <label class="interval-input"><input type="text" value="{{ isEmpty ? '' : item.minReservationTime.minuteRemainder }}" name="min_reservation_time[minute]"> minutes</label>
             </td>
         </tr>
         <tr>
@@ -275,9 +275,9 @@
             </td>
             <td>
                 {% set isEmpty = item.maxReservationTime.secondTotal == 0 %}
-                <input type="text" class="interval-input" value="{{ isEmpty ? '' : item.maxReservationTime.dayTotal        }}" name="max_reservation_time[day]"    placeholder="days">
-                <input type="text" class="interval-input" value="{{ isEmpty ? '' : item.maxReservationTime.hourRemainder   }}" name="max_reservation_time[hour]"   placeholder="hours">
-                <input type="text" class="interval-input" value="{{ isEmpty ? '' : item.maxReservationTime.minuteRemainder }}" name="max_reservation_time[minute]" placeholder="minutes">
+                <label class="interval-input"><input type="text" value="{{ isEmpty ? '' : item.maxReservationTime.dayTotal        }}" name="max_reservation_time[day]"> days,</label>
+                <label class="interval-input"><input type="text" value="{{ isEmpty ? '' : item.maxReservationTime.hourRemainder   }}" name="max_reservation_time[hour]"> hours,</label>
+                <label class="interval-input"><input type="text" value="{{ isEmpty ? '' : item.maxReservationTime.minuteRemainder }}" name="max_reservation_time[minute]"> minutes</label>
             </td>
         </tr>
     </table>
