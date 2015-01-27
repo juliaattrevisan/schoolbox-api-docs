@@ -137,6 +137,9 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         if (is_array($fileList)) {
             $j = 0;
             foreach ($fileList as $file) {
+                if ($file['hidden'] && $this->permission < WRITE_ACCESS) {
+                    continue;
+                }
 // exclude files associated with due work
                 if ($file['type'] || $file['typeName']) {
                     continue;
