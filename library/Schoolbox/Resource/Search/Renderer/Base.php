@@ -10,7 +10,7 @@
 
 namespace Schoolbox\Resource\Search\Renderer;
 
-use \Schoolbox\Collection;
+use Schoolbox\Resource\Search\MapperResult\Base as MapperResult;
 
 abstract class Base {
 
@@ -33,7 +33,7 @@ abstract class Base {
     /**
      * Render html fragment
      */
-    abstract public function render(Collection $collection);
+    abstract public function render(MapperResult $collection);
 
     /* Getters/Setters
      */
