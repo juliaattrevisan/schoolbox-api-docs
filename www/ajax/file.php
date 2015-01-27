@@ -53,6 +53,28 @@ if (is_numeric($_POST['categoryID'])) {
     $contents = new \Schoolbox\Resource\Browser\Tree\Contents($category, $filterOptions);
     $allNodes = $contents->getFileNodes();
 
+    /* Prepend the homepage node, whatever that does
+     */
+    if ($homepage !== null) {
+        $icon = new \Schoolbox\Resource\Browser\Tree\Node\Icon();
+        $icon->setCss('');
+        $icon->setFile('vcard_fiquet.png');
+
+        $node = new \Schoolbox\Resource\Browser\Tree\Node();
+        $node->setNodeId($category->getId());
+        $node->setUser(new \Schoolbox\User());
+        $node->setType('file');
+        $node->setIcon($icon);
+        $node->setName('Homepage');
+        $node->setCategory($category);
+        $node->setCss(array());
+        $node->setModifiedAt(new \Alaress_Date_Relative($_SERVER['REQUEST_TIME']));
+
+        $allNodes->prepend($node);
+    }
+
+    /* Mash it out
+     */
     foreach ($allNodes as $currentNode) {
         $adr = new \Alaress_Date_Relative($currentNode->getModifiedAt()->getUnixTimestamp());
         $adr->setPrefix('');
