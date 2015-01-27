@@ -76,33 +76,25 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
 
         $this->setVar('folders_block', '');
 
-        if (is_array($folderList)) {
-            $flag = 0;
-            $j    = 0;
+        if (is_array($folderList) && $this->permission > DENY_ACCESS) {
+            $j = 0;
             foreach ($folderList as $folder) {
-                if ($this->permission > DENY_ACCESS) {
-                    //set name
-                    $output = array(
-                        'FOLDER_ID'   => $folder['id'],
-                        'FOLDER_NAME' => Scrub::text($folder['name']),
-                        'FOLDER_ICON' => $folder['template'] ? 'house' : 'folder_blue_full',
-                        'ON_OFF'      => ++$j % 2 ? '' : 'dark',
-                    );
-                    $this->setVar($output);
+                //set name
+                $output = array(
+                    'FOLDER_ID'   => $folder['id'],
+                    'FOLDER_NAME' => Scrub::text($folder['name']),
+                    'FOLDER_ICON' => $folder['template'] ? 'house' : 'folder_blue_full',
+                    'ON_OFF'      => ++$j % 2 ? '' : 'dark',
+                );
+                $this->setVar($output);
 
-                    if ($this->permission >= WRITE_ACCESS) {
-                        $this->parse('modify_folder_block', 'modify_folder');
-                    } else {
-                        $this->setVar('modify_folder_block', '');
-                    }
-
-                    $this->parse('folders_block', 'folders', true);
-                    $flag = 1;
-
+                if ($this->permission >= WRITE_ACCESS) {
+                    $this->parse('modify_folder_block', 'modify_folder');
+                } else {
+                    $this->setVar('modify_folder_block', '');
                 }
-            }
-            if (!$flag) {
-                $this->setVar('folders_block', '');
+
+                $this->parse('folders_block', 'folders', true);
             }
         } else {
             $this->setVar('folders_block', '');
