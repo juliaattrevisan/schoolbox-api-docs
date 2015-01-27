@@ -657,6 +657,9 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
 
     /**
      * Creates a breadcrumb of a category's hierarchical navigation
+     *
+     * @param Category $category
+     * @return Collection
      */
     public function breadcrumb(Category $category)
     {
