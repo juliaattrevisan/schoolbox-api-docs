@@ -31,7 +31,9 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
     private $categoryMapper = null;
 
     /**
-     * @var array
+     * The category to show links in
+     *
+     * @var Schoolbox\Resource\Category
      */
     private $source;
 
@@ -94,8 +96,10 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         $this->setBlock($templateHandle, 'link', 'link_block');
         $this->setBlock('link', 'modify_link', 'modify_link_block');
 
+        /** @var Schoolbox\Resource\Link[] $allLinks */
         $allLinks = $this->getLinkMapper()->findAllInCategory(
-            $this->source, array(
+            $this->source,
+            array(
                 'size'    => $this->getConfig('size'),
                 'sort'    => $this->getConfig('sort'),
                 'sortdir' => $this->getConfig('sortdir'),
@@ -107,6 +111,9 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         $j = 0;
 
         foreach ($allLinks as $currentLink) {
+            if ($currentLink->getHidden() && $this->permission < WRITE_ACCESS) {
+                continue;
+            }
             $this->setVar(
                 array(
                     'LINK_ID'           => $currentLink->getId(),
