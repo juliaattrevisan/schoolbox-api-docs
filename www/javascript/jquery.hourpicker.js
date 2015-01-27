@@ -47,6 +47,7 @@
                 );
                 break;
         }
+        delete thisOptions.hours;
 
         return this.timepicker(thisOptions);
     }
