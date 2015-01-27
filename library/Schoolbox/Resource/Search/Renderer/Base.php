@@ -32,8 +32,12 @@ abstract class Base {
 
     /**
      * Render html fragment
+     *
+     * @param \Schoolbox\Resource\Search\MapperResult\Base $collection
+     * @param $type
+     * @return
      */
-    abstract public function render(MapperResult $collection);
+    abstract public function render(MapperResult $collection, $type);
 
     /* Getters/Setters
      */

@@ -22,11 +22,15 @@ class Renderer extends Base {
 
     /**
      * Render html fragment
+     *
+     * @param MapperResult $mapperResult
+     * @param $type
      */
-    public function render(MapperResult $mapperResult)
+    public function render(MapperResult $mapperResult, $type)
     {
         $this->getPage()->setFile('link_t', 'resource/link/search/results.html');
         $this->getPage()->setBlock('link_t', 'link', 'link_block');
+        $this->getPage()->setBlock('link_t', 'see_more', 'see_more_block');
 
         $this->getPage()->setVar(array(
             'LINK_DISP_COUNT' => $mapperResult->getResult()->count(),
@@ -51,6 +55,18 @@ class Renderer extends Base {
 
             $this->getPage()->parse('link_block', 'link', true);
         }
+
+        /* "outputMore"
+         */
+        if ($type == 'all' && $mapperResult->getCount() > \Cfg::get('search_all_limit')) {
+            $this->getPage()->setVar('MORE_COUNT', $mapperResult->getCount());
+            $this->getPage()->parse('see_more_block', 'see_more');
+        }
+        else {
+            $this->getPage()->setVar('see_more_block', '');
+        }
+
+        $this->getPage()->parse('RESULT', 'link_t', true);
     }
 
     /**

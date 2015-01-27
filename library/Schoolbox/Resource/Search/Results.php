@@ -29,10 +29,26 @@ class Results implements Searchable {
     private $registry = null;
 
     /**
-     * Constructor
+     * Tab that you clicked on
+     *
+     * e.g. 'all', 'link', 'wiki' etc
+     *
+     * @var string
      */
-    public function __construct($page) {
+    private $type = '';
+
+    /**
+     * Constructor
+     *
+     * $type is 'all' or specific to which tab you selected e.g. 'link'
+     * This is used to generate a phplib for "see more" - see outputMore()
+     *
+     * @param $page
+     * @param $type
+     */
+    public function __construct($page, $type) {
         $this->setRegistry(new Collection());
+        $this->setType($type);
 
         /* Add searchables
          */
@@ -54,11 +70,16 @@ class Results implements Searchable {
         foreach($this->getRegistry() as $currentDefinition) {
             $searcher = $currentDefinition->getMapper()->search($user, $keyword, $offset, $limit, $sortProperty, $sortDirection);
 
-            $currentDefinition->getRenderer()->render($searcher);
+            /* For "outputMore()"
+             */
+            $currentDefinition->getRenderer()->render($searcher, $this->getType());
         }
 
         return;
     }
+
+    /* Getters/Setters
+     */
 
     /**
      * Set registry
@@ -78,5 +99,25 @@ class Results implements Searchable {
     private function getRegistry()
     {
         return $this->registry;
+    }
+
+    /**
+     * Set type
+     *
+     * @param string $type
+     */
+    private function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * Get type
+     *
+     * @return string
+     */
+    private function getType()
+    {
+        return $this->type;
     }
 }
