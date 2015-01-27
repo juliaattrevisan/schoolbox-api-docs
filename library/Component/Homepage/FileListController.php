@@ -1,6 +1,6 @@
 <?php
+
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -44,7 +44,6 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
      * Available filters for this component.
      *
      * @see Component_Config_Filter for how this data is passed in/out of the database
-     *
      * @var array
      */
     protected $filterFields = array('document', 'audio', 'video', 'image', 'other');
@@ -63,17 +62,17 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
      */
     public function execute()
     {
-        $this->groupHandler = new Group();
-        $this->catHandler = new Category();
-        $this->fileHandler = new File();
-        $this->userHandler = new User();
+        $this->groupHandler       = new Group();
+        $this->catHandler         = new Category();
+        $this->fileHandler        = new File();
+        $this->userHandler        = new User();
         $this->allowedFileHandler = new AllowedFile();
 
         // remove any non-numeric values from the source config
         $this->source = $this->catHandler->getByID(
             $this->getConfig('src') ?
-            preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
-            $this->getContext('id')
+                preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
+                $this->getContext('id')
         );
 
         if ($this->source === false) {
@@ -83,7 +82,9 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
     /**
      * Renders the data into the SitePage. Presentation logic.
+     *
      * @param String $templateHandle
+     *
      * @return boolean
      */
     public function renderTemplate($templateHandle)
@@ -98,25 +99,29 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         }
 
         /* Set up component name
-	*/
-        $this->setVar(array(
-            'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Files',
-
-            // These are for the Select Alternate Source resourcebrowser
-            'COMPONENT_CONFIG_SRC_ID'   => $this->source['id'],
-            'COMPONENT_CONFIG_SRC_NAME' => $this->source['id'] == $this->getContext('id') ? 'Local' : $this->source['name'],
-
-            'FILES_CATEGORY_ID' => $this->source['id'],
-        ));
+         */
+        $this->setVar(
+            array(
+                'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname')))
+                    ? $this->getConfig('componentname')
+                    : 'Files',
+                // These are for the Select Alternate Source resourcebrowser
+                'COMPONENT_CONFIG_SRC_ID'   => $this->source['id'],
+                'COMPONENT_CONFIG_SRC_NAME' => $this->source['id'] == $this->getContext('id')
+                    ? 'Local'
+                    : $this->source['name'],
+                'FILES_CATEGORY_ID'         => $this->source['id'],
+            )
+        );
 
         $configValue = $this->getConfig('filter');
-        $filter = array();
+        $filter      = array();
         for ($i = 0; $i < count($this->filterFields); $i++) {
             $j = $configValue % 2;
             if ($j) {
                 $filter[] = $this->filterFields[$i];
             }
-            $configValue = (int) $configValue / 2;
+            $configValue = (int)$configValue / 2;
         }
 
         //file output
@@ -125,12 +130,15 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         $this->setBlock('files', 'file_no_url', 'file_no_url_block');
         $this->setBlock('files', 'modify_file', 'modify_file_block');
 
-        $fileList = $this->fileHandler->getAllInCategory($this->source['id'], array(
-            'size' => $this->getConfig('size'),
-            'filter' => $filter,
-            'sort'  => $this->getConfig('sort'),
-            'sortdir' => $this->getConfig('sortdir'),
-        ));
+        $fileList = $this->fileHandler->getAllInCategory(
+            $this->source['id'],
+            array(
+                'size'    => $this->getConfig('size'),
+                'filter'  => $filter,
+                'sort'    => $this->getConfig('sort'),
+                'sortdir' => $this->getConfig('sortdir'),
+            )
+        );
 
         $this->setVar('files_block', '');
 
@@ -140,31 +148,32 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                 if ($file['hidden'] && $this->permission < WRITE_ACCESS) {
                     continue;
                 }
-// exclude files associated with due work
+                // exclude files associated with due work
                 if ($file['type'] || $file['typeName']) {
                     continue;
                 }
 
-                $date = new Alaress_Date_Format($file['submitted'], 'U');
+                $date            = new Alaress_Date_Format($file['submitted'], 'U');
                 $posted_relative = new Alaress_Date_Relative($file['submitted'], 'U');
-                $modified = new Alaress_Date_Relative($file['modified'], 'U');
-                $output = array('FILE_DESCRIPTION'	=> Scrub::text($file['description']),
-                    'FILE_ID'			=> $file['id'],
-                    'FILE_MIME_IMAGE'	=> $this->allowedFileHandler->getClass($file['iconFile']),
-                    'FILE_POSTED_BY'	=> $this->userHandler->formatName($file),
-                    'FILE_POSTED_BY_ID'	=> $file['owner'],
-                    'FILE_POSTED_DATE'	=> $date->getShort(),
-                    'FILE_POSTED_RELATIVE'	=> $posted_relative->getRelativeTime(),
-                    'FILE_MODIFIED_DATE' => $modified->getRelativeTime(),
-                    'FILE_COMMENT'		=> nl2br(Scrub::text($file['comment'])),
-                    'ON_OFF'			=> ++$j % 2 ? '' : 'dark',
-                    'HIDDEN'            => $file['hidden'] ? 'hidden' : '',
+                $modified        = new Alaress_Date_Relative($file['modified'], 'U');
+                $output          = array(
+                    'FILE_DESCRIPTION'     => Scrub::text($file['description']),
+                    'FILE_ID'              => $file['id'],
+                    'FILE_MIME_IMAGE'      => $this->allowedFileHandler->getClass($file['iconFile']),
+                    'FILE_POSTED_BY'       => $this->userHandler->formatName($file),
+                    'FILE_POSTED_BY_ID'    => $file['owner'],
+                    'FILE_POSTED_DATE'     => $date->getShort(),
+                    'FILE_POSTED_RELATIVE' => $posted_relative->getRelativeTime(),
+                    'FILE_MODIFIED_DATE'   => $modified->getRelativeTime(),
+                    'FILE_COMMENT'         => nl2br(Scrub::text($file['comment'])),
+                    'ON_OFF'               => ++$j % 2 ? '' : 'dark',
+                    'HIDDEN'               => $file['hidden'] ? 'hidden' : '',
                 );
                 $this->setVar($output);
 
                 //set name
                 if ($file['realname'] != "") {
-                    $this->setVar('FILE_URL', '/send.php?id='.$file['id']);
+                    $this->setVar('FILE_URL', '/send.php?id=' . $file['id']);
                     $this->setVar('FILE_TARGET', '_blank');
 
                     $this->setVar('file_no_url_block', '');
