@@ -90,7 +90,7 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
         );
 
         /* Render event types to choose from
-		 */
+         */
         $allTypes = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findAll();
 
         if ($allTypes->count()) {
@@ -105,7 +105,7 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
                 $this->getPage()->parse('event_type_block', 'event_type', true);
 
                 /* Event Task id
-				 */
+                 */
                 if ($currentType->getType() == 'Task') {
                     $this->getPage()->setVar(
                         array(
