@@ -161,15 +161,29 @@ class Category extends DeprecatedModel
         }
 
         $query = "SELECT
-            id, name,
+            id,
+            name,
             GROUP_CONCAT(co.code) code,
             cf.template,
             parent,
             (
                 SELECT 1 FROM `" . $this->_table . "` k
-                LEFT JOIN perms p ON p.cid = k.id AND p.gid = '" . $_SESSION['gid'] . "' AND p.type > 0
-                LEFT JOIN userAccess ua ON ua.uid = '" . $_SESSION['id'] . "' AND ua.service = 1 AND ua.sid = k.id AND ua.type > 0
-                WHERE k.parent = ca.id AND (p.type IS NOT NULL OR ua.type IS NOT NULL OR 1 = " . (int)$_SESSION['su'] . ") LIMIT 1
+                LEFT JOIN perms p
+                    ON p.cid = k.id
+                    AND p.gid = '" . $_SESSION['gid'] . "'
+                    AND p.type > 0
+                LEFT JOIN userAccess ua
+                    ON ua.uid = '" . $_SESSION['id'] . "'
+                    AND ua.service = 1
+                    AND ua.sid = k.id
+                    AND ua.type > 0
+                WHERE k.parent = ca.id
+                    AND (
+                        p.type IS NOT NULL
+                        OR ua.type IS NOT NULL
+                        OR 1 = " . (int)$_SESSION['su'] . "
+                    )
+                LIMIT 1
             ) isParent,
             (
                 SELECT COUNT(*) FROM `" . $this->_table . "` l
@@ -180,7 +194,8 @@ class Category extends DeprecatedModel
             LEFT JOIN categoryCode co ON co.categoryID = ca.id AND co.deleted_at IS NULL
             LEFT JOIN homepage_config cf ON cf.cid = ca.id
             WHERE ca.deleted_at IS NULL AND parent $cats
-            GROUP BY ca.id";
+            GROUP BY ca.id
+        ";
 
         $sortFields = array('name' => 'name', 'date' => 'id');
         $config['sort'] = in_array($config['sort'], $sortFields) ? $config['sort'] : 'name';
