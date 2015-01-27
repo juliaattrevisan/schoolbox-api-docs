@@ -376,54 +376,10 @@ if (!empty($result['category'])) {
     $page->parse('RESULT', 'category_t', true);
 }
 
-// render links
-if (!empty($result['link'])) {
-    $page->setFile('link_t', 'search/link.html');
-    $page->setBlock('link_t', 'link', 'link_block');
-    $page->setVar(array(
-        'LINK_DISP_COUNT' => count($result['link']),
-        'LINK_COUNT' => $count['link'],
-    ));
-
-
-    foreach ($result['link'] as $link) {
-        foreach ($categoryStd->breadcrumb($link['category']) as $i => $breadcrumb) {
-            $link['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
-        }
-
-        $url = new Url($link['url']);
-
-        if ($url->isLocalUrl()) {
-            $linkUrl = $url->getRelativeURL();
-            $linkTarget = '';
-        } else {
-            $linkUrl = $url->getBase64EncodedRedirect();
-            $linkTarget = 'external';
-        }
-
-        $userHandler = new User();
-        $createdTime = new Alaress_Date_Relative($link['submitted']);
-
-        $page->setVar(array(
-            'LINK_URL' => $linkUrl,
-            'LINK_ICON' => $link['iconFile'],
-            'LINK_TARGET' => $linkTarget,
-            'LINK_DESCRIPTION' => Scrub::text($link['description']),
-            'LINK_COMMENT' => TextFormatter::cutSentence(Scrub::text($link['comment']), 150),
-            'LINK_OWNER' => $link['uid'],
-            'LINK_OWNER_NAME' => $userHandler->formatName($link),
-            'LINK_CREATED' => $createdTime->getRelativeTime(),
-            'LINK_BREADCRUMB' => $link['breadcrumb'],
-            'LINK_COUNT' => $count['link'],
-        ));
-
-        $page->parse('link_block', 'link', true);
-    }
-
-    outputSeeMore($page, $type, $count, 'link');
-
-    $page->parse('RESULT', 'link_t', true);
-}
+/* Omaha Beach!
+ */
+$mapper = new \Schoolbox\Resource\Search\Results($page, $type);
+$mapper->search( $_SESSION['user'], $keyword, 0, Cfg::get('search_all_limit'));
 
 // render homepage news
 if (!empty($result['homepagenews'])) {
