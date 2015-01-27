@@ -72,6 +72,8 @@ $(document).ready(function() {
             },
             defaultView: calendarView,
             timeFormat: { month: 'h(:mm)a' },
+            eventLimit: {{ config.calendar_collapse_events ? 'true' : 'false' }},
+            firstDay: Number({{ config.calendar_start_day }}),
             events: function(start, end, timezone, callback) {
                 var data = [
                     {name: 'start', value: Calendar.reOffsetTimestamp(start.unix())},
