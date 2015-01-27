@@ -40,7 +40,7 @@ class Synchronise_Tass_Toowoomba_Strategy_Staff extends Synchronise_Base_Strateg
             ->addHydrator(new Synchronise_Tass_Toowoomba_Hydrator_Campus())
             // Email address comes from username
             ->addHydrator(new Synchronise_Base_Hydrator_LocalEmail())
-            ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
+            ->addHydrator(new Synchronise_Tass_Toowoomba_Hydrator_Staff_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
         ;
     }
