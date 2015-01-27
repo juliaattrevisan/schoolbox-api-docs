@@ -1,6 +1,8 @@
 /**
  * Minute picker, based on timepicker
  *
+ * All options get passed directly to timepicker
+ *
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */

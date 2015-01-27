@@ -1,6 +1,11 @@
 /**
  * Hour picker, based on timepicker
  *
+ * Has built-in support for a 12 hour (1-12) and 24 hour (0-23) picker, with the
+ * "hours" option.
+ *
+ * All other options get passed directly to timepicker
+ *
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
