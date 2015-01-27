@@ -240,7 +240,7 @@ class LinkMapper extends Mapper implements Searchable
         }
 
         $searcher = new Result();
-        $searcher->search($user, $this, $keyword, $offset, $limit, $sortProperty, $sortDirection);
+        $searcher->search($user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
 
         return $searcher;
     }
