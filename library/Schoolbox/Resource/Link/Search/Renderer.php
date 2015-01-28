@@ -57,45 +57,47 @@ class Renderer extends Base {
      */
     public function render(MapperResult $mapperResult, $type)
     {
-        $this->getPage()->setFile('link_t', 'resource/link/search/results.html');
-        $this->getPage()->setBlock('link_t', 'link', 'link_block');
-        $this->getPage()->setBlock('link_t', 'see_more', 'see_more_block');
-
-        $this->getPage()->setVar(array(
-            'LINK_DISP_COUNT' => $mapperResult->getResult()->count(),
-            'LINK_COUNT' => $mapperResult->getCount(),
-        ));
-
-        /* phplib
-         */
-        foreach ($mapperResult->getResult() as $currentLink) {
-            $createdTime = new \Alaress_Date_Relative($currentLink->getSubmitted(), 'Y-m-d H:i:s');
+        if ($mapperResult->getCount()) {
+            $this->getPage()->setFile('link_t', 'resource/link/search/results.html');
+            $this->getPage()->setBlock('link_t', 'link', 'link_block');
+            $this->getPage()->setBlock('link_t', 'see_more', 'see_more_block');
 
             $this->getPage()->setVar(array(
-                'LINK_URL' => $currentLink->getHref(),
-                'LINK_TARGET' => $currentLink->getTarget(),
-                'LINK_DESCRIPTION' => \Scrub::text($currentLink->getDescription()),
-                'LINK_COMMENT' => \TextFormatter::cutSentence(\Scrub::text($currentLink->getComment()), 150),
-                'LINK_OWNER' => $currentLink->getOwner()->getId(),
-                'LINK_OWNER_NAME' => $currentLink->getOwner()->formatName(),
-                'LINK_CREATED' => $createdTime->getRelativeTime(),
-                'LINK_BREADCRUMB' => $this->spawnBreadcrumbs($currentLink),
+                'LINK_DISP_COUNT' => $mapperResult->getResult()->count(),
+                'LINK_COUNT' => $mapperResult->getCount(),
             ));
 
-            $this->getPage()->parse('link_block', 'link', true);
-        }
+            /* phplib
+             */
+            foreach ($mapperResult->getResult() as $currentLink) {
+                $createdTime = new \Alaress_Date_Relative($currentLink->getSubmitted(), 'Y-m-d H:i:s');
 
-        /* "outputMore"
-         */
-        if ($type == 'all' && $mapperResult->getCount() > \Cfg::get('search_all_limit')) {
-            $this->getPage()->setVar('MORE_COUNT', $mapperResult->getCount());
-            $this->getPage()->parse('see_more_block', 'see_more');
-        }
-        else {
-            $this->getPage()->setVar('see_more_block', '');
-        }
+                $this->getPage()->setVar(array(
+                    'LINK_URL' => $currentLink->getHref(),
+                    'LINK_TARGET' => $currentLink->getTarget(),
+                    'LINK_DESCRIPTION' => \Scrub::text($currentLink->getDescription()),
+                    'LINK_COMMENT' => \TextFormatter::cutSentence(\Scrub::text($currentLink->getComment()), 150),
+                    'LINK_OWNER' => $currentLink->getOwner()->getId(),
+                    'LINK_OWNER_NAME' => $currentLink->getOwner()->formatName(),
+                    'LINK_CREATED' => $createdTime->getRelativeTime(),
+                    'LINK_BREADCRUMB' => $this->spawnBreadcrumbs($currentLink),
+                ));
 
-        $this->getPage()->parse('RESULT', 'link_t', true);
+                $this->getPage()->parse('link_block', 'link', true);
+            }
+
+            /* "outputMore"
+             */
+            if ($type == 'all' && $mapperResult->getCount() > \Cfg::get('search_all_limit')) {
+                $this->getPage()->setVar('MORE_COUNT', $mapperResult->getCount());
+                $this->getPage()->parse('see_more_block', 'see_more');
+            }
+            else {
+                $this->getPage()->setVar('see_more_block', '');
+            }
+
+            $this->getPage()->parse('RESULT', 'link_t', true);
+        }
     }
 
     /**
