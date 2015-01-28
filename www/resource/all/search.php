@@ -20,6 +20,24 @@ require_once '../searchConfig.php';
 /**
  * Execute searches for all handlers and mappers
  */
+
+/* Omaha Beach!
+ */
+$mapper = new \Schoolbox\Resource\Search\Results($page, $type);
+$mapper->search( $_SESSION['user'], $keyword, 0, Cfg::get('search_all_limit'));
+
+/* Omaha Beach
+ *
+ * These have landed
+ * When you add more, remove them from the searchConfig pseudo-registry
+ * and remove them from the gigantic phplibbery below
+ *
+ * Everything here is self-contained
+ */
+if ($type == 'all') {
+    $mapper->render();
+}
+
 // iterate through the handle types
 foreach ($handle as $type_name => &$type_handle) {
     // include & instantiate
@@ -32,25 +50,6 @@ foreach ($handle as $type_name => &$type_handle) {
 }
 
 $count['all'] = array_sum($count);
-
-/* Omaha Beach!
- */
-$mapper = new \Schoolbox\Resource\Search\Results($page, $type);
-$mapper->search( $_SESSION['user'], $keyword, 0, Cfg::get('search_all_limit'));
-
-/* <RESULTS RENDERING> */
-
-/* Omaha Beach
- *
- * These have landed
- * When you add more, remove them from the searchConfig pseudo-registry
- * and remove them from the gigantic phplibbery below
- *
- * Everything here is self-contained
- */
-if ($type == 'all' || in_array($type, $omaha)) {
-    $mapper->render();
-}
 
 /* These are old handlers
  */
@@ -515,12 +514,14 @@ if (!empty($result['event'])) {
 
 /* Omaha Beach
  *
- * Pagination
- * If we have a search type and have results to display
+ * Pagination Composite
  */
 if (in_array($type, $omaha)) {
     $mapper->renderPagination($current_page);
 }
+/* Pagination
+ * If we have a search type and have results to display
+ */
 else if ($result[$type] || $type == 'all') {
 
     // clear count

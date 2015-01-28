@@ -23,6 +23,10 @@ $mapper = new \Schoolbox\Resource\Search\Results($this, $type);
 $mapper->search( $_SESSION['user'], $keyword, 0, Cfg::get('search_all_limit'));
 
 /* Omaha Beach
+ *
+ * There's a sequential dependency here, which prevents us from moving
+ * up the beach in a nice way. 2RS uses $count as a global var, a terrible
+ * move, and it's even more annoying to use a $temp var to counter it
  */
 $count['all'] += $mapper->countTotalResults();
 
@@ -54,14 +58,16 @@ $this->setVar(array(
  * test the search as to why it failed, and return meaningful
  * response to the user
  */
-if (!is_numeric($keyword) && (strlen($keyword) < 3)) {
+define('MIN_KEYWORD_LENGTH', 3);
+
+if (!is_numeric($keyword) && (strlen($keyword) < MIN_KEYWORD_LENGTH)) {
     if (strlen($keyword) == 0) {
         $this->setVar(array(
             'FOR' => '',
             'NO_RESULTS_BECAUSE' => ' because it\'s empty'
         ));
     }
-    elseif (strlen($keyword) < 3) {
+    elseif (strlen($keyword) < MIN_KEYWORD_LENGTH) {
         $this->setVar(array(
             'NO_RESULTS_BECAUSE' => ' because it needs to be longer, or wrapped in "quotes"'
         ));
@@ -134,6 +140,8 @@ foreach ($type_list as $type_name => $type_desc) {
 $mapper->renderTabs();
 
 /**
+ * End
+ *
  * Render search outputs
  * These are ajaxed in individually
  */
