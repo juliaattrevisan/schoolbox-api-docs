@@ -126,8 +126,7 @@ class External_Maze_Timetable implements External_TimetableInterface
                 /* Day-specific e.g. for Dashboard
                  */
                 if (!$day || "Day {$day}" == $definition[$dayTempKey]) {
-
-                    /* TH_RLABEL01, TH_RLABEL02...TH_RLABEL13
+/* TH_RLABEL01, TH_RLABEL02...TH_RLABEL13
                      */
                     $periodTempKey = $this->getTimetablePeriodLabel($i);
 

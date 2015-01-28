@@ -173,7 +173,6 @@ class External_Denbigh_Timetable implements External_TimetableInterface
 
         if (!empty($lessonList)) {
             foreach ($lessonList as $lesson) {
-
                 $period = $lesson['period'];
                 $day = $lesson['day'];
 
@@ -250,7 +249,6 @@ class External_Denbigh_Timetable implements External_TimetableInterface
 
         if (!empty($lessonList)) {
             foreach ($lessonList as $lesson) {
-
                 $period = $lesson['period'];
 
                 if (isset($periodList[$period])) {
@@ -413,5 +411,3 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         return $this->group;
     }
 }
-
-?>
