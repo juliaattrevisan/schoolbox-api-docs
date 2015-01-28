@@ -40,7 +40,7 @@ $current_page = empty($_GET['page']) ? 1 : $_GET['page'];
 $count = array();
 
 // strip out any injection attempts
-$keyword = trim(preg_replace('/[^\ A-Za-z0-9\"\'\+\-_=\@\?!\.]/', '', $this->arg[0]));
+$keyword = trim(preg_replace('/[^\ A-Za-z0-9\"\'\+\-_=\@\?!\.]/', '', $_GET['keyword']));
 
 /**
  * Execute searches for all handlers and mappers
@@ -86,6 +86,7 @@ $this->setVar(array(
     'result_block' => '',
     'no_result_block' => '',
     'NO_RESULTS_BECAUSE' => '',
+    'FOR' => ' for ',
 ));
 
 /* Special error case
@@ -103,7 +104,6 @@ if (!is_numeric($keyword) && (strlen($keyword) < 3)) {
     }
     elseif (strlen($keyword) < 3) {
         $this->setVar(array(
-            'FOR' => ' for ',
             'NO_RESULTS_BECAUSE' => ' because it needs to be longer, or wrapped in "quotes"'
         ));
 
@@ -115,7 +115,6 @@ if (!is_numeric($keyword) && (strlen($keyword) < 3)) {
  */
 if ($count['all'] == 0) {
     $this->setVar(array(
-        'FOR' => ' for ',
         'NO_RESULTS_BECAUSE' => ' because it needs to be longer, or wrapped in "quotes"'
     ));
 
