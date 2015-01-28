@@ -20,30 +20,30 @@ use Schoolbox\Mapper;
 class Definition {
 
     /**
+     * The type of item for this search definition
+     * e.g. 'link', 'wiki', 'forum' ...
+     */
+    private $type = '';
+
+    /**
      * Mapper instance
      *
      * @var null
      */
-    protected $mapper = null;
+    private $mapper = null;
 
     /**
      * Renderer instance
      *
      * @var null
      */
-    protected $renderer = null;
-
-    /**
-     * A collection of found items
-     *
-     * @var null
-     */
-    protected $results = null;
+    private $renderer = null;
 
     /**
      * Constructor
      */
-    public function __construct(Mapper $mapper, Renderer\Base $renderer) {
+    public function __construct($type, Mapper $mapper, Renderer\Base $renderer) {
+        $this->setType($type);
         $this->setMapper($mapper);
         $this->setRenderer($renderer);
     }
@@ -56,7 +56,7 @@ class Definition {
      *
      * @param null $mapper
      */
-    protected function setMapper($mapper)
+    private function setMapper($mapper)
     {
         $this->mapper = $mapper;
     }
@@ -76,7 +76,7 @@ class Definition {
      *
      * @param null $renderer
      */
-    protected function setRenderer($renderer)
+    private function setRenderer($renderer)
     {
         $this->renderer = $renderer;
     }
@@ -89,5 +89,25 @@ class Definition {
     public function getRenderer()
     {
         return $this->renderer;
+    }
+
+    /**
+     * Set type
+     *
+     * @param mixed $type
+     */
+    private function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * Get type
+     *
+     * @return mixed
+     */
+    public function getType()
+    {
+        return $this->type;
     }
 }
