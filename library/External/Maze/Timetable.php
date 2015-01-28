@@ -206,8 +206,8 @@ class External_Maze_Timetable implements External_TimetableInterface
             $i = 1;
 
             foreach ($allTimes as $currentTime) {
-                if ($currentTime['startTime']->getTimeOnly() <= $now->getTimeOnly()) {
-                    if ($currentTime['endTime']->getTimeOnly() > $now->getTimeOnly()) {
+                if ($currentTime['startTime']->getDatabaseTime() <= $now->getDatabaseTime()) {
+                    if ($currentTime['endTime']->getDatabaseTime() > $now->getDatabaseTime()) {
                         return array(
                             'PeriodNumber'    => $i,
                             'PeriodNumberSeq' => 1,
