@@ -34,13 +34,12 @@ $omaha = array(
 );
 
 /* Request params
+ * strip out any injection attempts
  */
-$type = $_GET['type'];
-$current_page = empty($_GET['page']) ? 1 : $_GET['page'];
-$count = array();
-
-// strip out any injection attempts
 $keyword = trim(preg_replace('/[^\ A-Za-z0-9\"\'\+\-_=\@\?!\.]/', '', $_GET['keyword']));
+$type = trim(preg_replace('/[^\ A-Za-z0-9\"\'\+\-_=\@\?!\.]/', '', $_GET['type']));
+$current_page = empty($_GET['page']) ? 1 : (int)$_GET['page'];
+$count = array();
 
 /**
  * Execute searches for all handlers and mappers
