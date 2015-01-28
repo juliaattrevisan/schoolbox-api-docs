@@ -20,7 +20,6 @@ use Monolog\Handler\SwiftMailerHandler;
 use Monolog\Logger;
 use PDOException;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
-use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
@@ -39,7 +38,7 @@ use Swift_Message;
  * Class Notif
  * @package Schoolbox\Notif
  */
-class Notif implements LoggerInterface {
+class Notif implements NotifInterface {
 
 	/** Note - If you create any extra topics, ensure they are added to the following for auto create:
 	 * tools/create-data-dirs.sh
