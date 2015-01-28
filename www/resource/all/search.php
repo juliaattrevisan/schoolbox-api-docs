@@ -10,7 +10,14 @@
  * @version     SVN: $Id$
  */
 require_once('../../../include/Bootstrap.php');
+
+/* Old handler junk
+ */
 require_once('../searchConfig.php');
+
+/* Clean params
+ */
+require_once('../searchClean.php');
 
 /**
  * Execute searches for all handlers and mappers
