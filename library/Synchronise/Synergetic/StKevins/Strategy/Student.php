@@ -120,8 +120,14 @@ class Synchronise_Synergetic_StKevins_Strategy_Student extends Synchronise_Base_
 		elseif ($year == 9) {
 			$group = 10;
 		}
-		elseif (in_array($year, array(10, 11, 12,))) {
+		elseif ($year == 10) {
 			$group = 11;
+		}
+		elseif ($year == 11) {
+			$group = 19;
+		}
+		elseif ($year == 12) {
+			$group = 20;
 		}
 		return $group;
 	}
