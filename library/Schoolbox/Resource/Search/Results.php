@@ -109,6 +109,17 @@ class Results implements Searchable {
     }
 
     /**
+     * Render pagination
+     */
+    public function renderPagination($currentPage) {
+        foreach($this->getRegistry() as $currentDefinition) {
+            $searcher = $this->getResult()->getOffset(get_class($currentDefinition->getMapper()));
+
+            $currentDefinition->getRenderer()->renderPagination($searcher, $this->getType(), $currentPage);
+        }
+    }
+
+    /**
      * Count the total number of results for all participants
      * listed in the Registry
      *

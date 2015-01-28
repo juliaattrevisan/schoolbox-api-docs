@@ -174,7 +174,6 @@ if (empty($type) || $type == 'all') {
     /* Omaha Beach
      */
     $mapper->renderTabs();
-
 }
 
 /* Omaha Beach - these have landed
@@ -652,7 +651,7 @@ if (!empty($result['event'])) {
 // if search type isn't specified
 if (empty($type)) {
     // clear pagination
-//    $page->setBlock('RESULT', 'pagination', 'pagination_block');
+    $page->setBlock('RESULT', 'pagination', 'pagination_block');
     $page->setVar('pagination_block');
 
     // execution time
@@ -663,10 +662,11 @@ if (empty($type)) {
 
 // if we have a search type
 }
-/* If we have a search type and have results to display
- * Omaha Beach
+/* Omaha Beach
+ * If we have a search type and have results to display
  */
 elseif (in_array($type, $omaha)) {
+    $mapper->renderPagination($current_page);
 }
 else if ($result[$type] || $type == 'all') {
 
