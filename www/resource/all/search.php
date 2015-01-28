@@ -203,7 +203,7 @@ if (!empty($result['user'])) {
 
 // render files
 if (!empty($result['file'])) {
-    $page->setFile('file_t', 'search/file.html');
+    $page->setFile('file_t', 'resource/file/search/results.html');
     $page->setBlock('file_t', 'file', 'file_block');
     $page->setBlock('file', 'modify', 'modify_block');
     $page->setVar(array(
