@@ -666,7 +666,9 @@ if (empty($type)) {
 /* If we have a search type and have results to display
  * Omaha Beach
  */
-else if ($result[$type] || $type == 'all' || in_array($type, $omaha)) {
+elseif (in_array($type, $omaha)) {
+}
+else if ($result[$type] || $type == 'all') {
 
     // clear count
     $page->setBlock('RESULT', 'count', 'count_block');
@@ -724,14 +726,14 @@ else if ($result[$type] || $type == 'all' || in_array($type, $omaha)) {
         $page->setVar('pagination_block');
     }
 
-    // execution time
-    $time = microtime(true) - $time_start;
 
     // render final output
     $page->parse(TEMPLATE_body, 'RESULT', true);
     $page->outputPage(true);
 }
 
+// execution time
+$time = microtime(true) - $time_start;
 
 /**
  * @param SitePage $page
