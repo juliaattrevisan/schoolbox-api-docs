@@ -42,7 +42,7 @@ search = {
 
         /* This url is constructed dynamically
          */
-        this.setUrl('/resource/' + this.getSection() + '/search.php')
+        this.setUrl('/resource/' + this.getSection() + '/search')
 	},
 
 	/**

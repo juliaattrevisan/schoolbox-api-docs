@@ -9,15 +9,15 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-require_once('../../../include/Bootstrap.php');
+require_once('../include/Bootstrap.php');
 
 /* Old handler junk
  */
-require_once('../searchConfig.php');
+require_once('./resource/searchConfig.php');
 
 /* Clean params
  */
-require_once('../searchClean.php');
+require_once('./resource/searchClean.php');
 
 /**
  * Execute searches for all handlers and mappers
@@ -590,11 +590,12 @@ else if ($result[$type] || $type == 'all') {
         $page->setVar('pagination_block');
     }
 
-
     // render final output
     $page->parse(TEMPLATE_body, 'RESULT', true);
     $page->outputPage(true);
 }
+
+exit();
 
 /**
  * @param SitePage $page
