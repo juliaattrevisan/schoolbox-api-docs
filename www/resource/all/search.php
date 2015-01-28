@@ -80,7 +80,7 @@ if (!empty($handle[$type])) {
 
 // render users
 if (!empty($result['user'])) {
-    $page->setFile('user_t', 'search/user.html');
+    $page->setFile('user_t', 'user/search/results.html');
     $page->setBlock('user_t', 'user', 'user_block');
     $page->setBlock('user', 'due_work', 'due_work_block');
     $page->setBlock('user', 'grades_button', 'grades_button_block');
