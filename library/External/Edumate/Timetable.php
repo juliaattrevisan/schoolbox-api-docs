@@ -162,7 +162,9 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      */
     public function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber)
     {
-
+        if (empty($externalUserId)) {
+            return array();
+        }
         if (!($definition = $this->getTimetableDefinition($campusId, $dayNumber))) {
             return false;
         }

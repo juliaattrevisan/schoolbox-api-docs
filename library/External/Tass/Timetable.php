@@ -173,6 +173,9 @@ class External_Tass_Timetable implements External_TimetableInterface
 
     function getDayTimetable($synergy_id, $userID, $campus, $daynumber)
     {
+        if (empty($synergy_id)) {
+            return array();
+        }
         $timetabledef = $this->getTimetableDefinition($campus, $daynumber);
 
         if ($this->groupHandler->isStudent($userID)) {

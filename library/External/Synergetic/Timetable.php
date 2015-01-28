@@ -323,6 +323,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
     public function getDayTimetable($synergy_id, $userID, $campus, $daynumber)
     {
+        if (empty($synergy_id)) {
+            return array();
+        }
         $timetabledef = $this->getTimetableDefinition($campus, $daynumber);
 
         if (!is_array($timetabledef)) {

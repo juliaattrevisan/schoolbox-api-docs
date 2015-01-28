@@ -236,6 +236,9 @@ class External_Maze_Timetable implements External_TimetableInterface
      */
     public function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber)
     {
+        if (empty($externalUserId)) {
+            return array();
+        }
         if ($this->getGroupHandler()->isStudent($userId)) {
             return $this->getStudentTimetable($externalUserId, $dayNumber);
         } else {

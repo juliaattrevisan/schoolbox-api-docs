@@ -213,6 +213,9 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
      */
     public function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber)
     {
+        if (empty($externalUserId)) {
+            return array();
+        }
         $groupHandler = new Group();
         if ($groupHandler->isStudent($userId)) {
             $result = $this->getStudentDayTimetable($externalUserId, $campusId, $dayNumber);
