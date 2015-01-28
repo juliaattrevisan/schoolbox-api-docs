@@ -9,13 +9,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-
-/* Execution time
- */
-$time_start = microtime(true);
-
-require_once '../../../include/Bootstrap.php';
-require_once '../searchConfig.php';
+require_once('../../../include/Bootstrap.php');
+require_once('../searchConfig.php');
 
 /**
  * Execute searches for all handlers and mappers
@@ -593,9 +588,6 @@ else if ($result[$type] || $type == 'all') {
     $page->parse(TEMPLATE_body, 'RESULT', true);
     $page->outputPage(true);
 }
-
-// execution time
-$time = microtime(true) - $time_start;
 
 /**
  * @param SitePage $page
