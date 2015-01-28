@@ -45,6 +45,8 @@ $mapper->search( $_SESSION['user'], $keyword, 0, Cfg::get('search_all_limit'));
  * These have landed
  * When you add more, remove them from the searchConfig pseudo-registry
  * and remove them from the gigantic phplibbery below
+ *
+ * Everything here is self-contained
  */
 if ($type == 'all' || in_array($type, $omaha)) {
     $mapper->render();
