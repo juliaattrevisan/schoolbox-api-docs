@@ -130,7 +130,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         $this->setVar('video_pending_list_block', '');
         $this->setVar('default_video_block', '');
 
-        if (count($this->outputList)) {
+        if ($this->getConfig('size') > 1 && count($this->outputList)) {
             $j = 0;
             foreach ($this->outputList as $video) {
                 $this->setVar(
