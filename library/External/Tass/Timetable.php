@@ -302,6 +302,9 @@ class External_Tass_Timetable implements External_TimetableInterface
 
     function getDaySubjects($synergy_id, $daynum)
     {
+        if (empty($synergy_id)) {
+            return array();
+        }
         $query = "SELECT Timetable.Room, SubjectClasses.Description,
                          Timetable.PeriodNumber, Timetable.ClassCode, SubjectClasses.ClassCampus
                          FROM SynergyOne.dbo.SubjectClasses SubjectClasses, SynergyOne.dbo.Timetable Timetable

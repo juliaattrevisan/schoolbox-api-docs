@@ -328,6 +328,9 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      */
     public function getDaySubjects($externalUserId, $dayNumber)
     {
+        if (empty($externalUserId)) {
+            return array();
+        }
         // Timetable.Room, SubjectClasses.Description, Timetable.PeriodNumber, Timetable.ClassCode, SubjectClasses.ClassCampus
 
         $user = $this->getUserHandler()->getBySynergy($externalUserId);
