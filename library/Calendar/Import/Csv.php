@@ -18,6 +18,7 @@ use \Schoolbox\Calendar\Relation\Role;
 use \Schoolbox\Calendar\Relation\RoleMapper;
 use \Schoolbox\CampusMapper;
 use \Alaress_Date_Format;
+use Schoolbox\Notif\SilentNotif;
 
 class Csv extends Base {
 
@@ -31,6 +32,14 @@ class Csv extends Base {
 		$eventMapper = new EventMapper();
 		$categoryRelationMapper = new CategoryMapper();
 		$roleRelationMapper = new RoleMapper();
+
+        // silence notifications
+        $silence = new SilentNotif();
+
+        $campusMapper->setNotifier($silence);
+        $eventMapper->setNotifier($silence);
+        $categoryRelationMapper->setNotifier($silence);
+        $roleRelationMapper->setNotifier($silence);
 
 		/* All the campuses selected in the ui
 		 */
