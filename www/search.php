@@ -1,5 +1,6 @@
 <?php
 require_once('./resource/searchConfig.php');
+require_once('./resource/searchClean.php');
 
 /**
  * Execute searches for all handlers and mappers
