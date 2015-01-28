@@ -256,43 +256,36 @@ class External_Tass_Timetable implements External_TimetableInterface
                          ORDER BY prd_code, day_code";
         }
 
-        $periodCount = $timetabledef['periodCount'];
-        $dayCount    = $timetabledef['dayCount'];
-        $result      = $this->getDatabase()->query($query);
+        $dayCount  = $timetabledef['dayCount'];
+        $result    = $this->getDatabase()->query($query);
+        $timetable = array();
 
-        //get first period
-        if ($result != 1) {
-            $desc = $this->getDatabase()->getNextArray();
-        } else {
-            $desc = "";
-        }
-
-        //for each period
-        for ($x = 0; isset($timetabledef['desc'][$x]); $x++) {
+        // Build the timetable
+        // TODO do this somewhere generic as it's the same for all connectors
+        foreach ($timetabledef['desc'] as $x => $name) {
             $timetable[$x]['periodName']     = $timetabledef['desc'][$x];
             $timetable[$x]['periodStart']    = $timetabledef['start'][$x];
             $timetable[$x]['periodEnd']      = $timetabledef['end'][$x];
             $timetable[$x]['periodNumber']   = $timetabledef['number'][$x];
             $timetable[$x]['periodSequence'] = 1;
+            $timetable[$x]['day']            = array_fill(1, $dayCount, array());
+        }
 
-            //for each day
-            for ($y = 1; $y <= $dayCount; $y++) {
-                if ($timetabledef['sequence'][$x] != 2
-                    && $desc['prd_code'] == $timetable[$x]['periodNumber']
-                    && $desc['day_code'] == $y
+        // Build the class list
+        while ($desc = $this->getDatabase()->getNextArray($result)) {
+            foreach ($timetable as $x => $timetablePeriod) {
+                if ($desc['prd_code'] == $timetablePeriod['periodNumber']
+                    && $timetablePeriod['periodSequence'] != 2
                 ) {
-                    $timetable[$x]['day'][$y][0]['description'] = $desc['sub_desc'];
-                    $timetable[$x]['day'][$y][0]['code']        =
-                        trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
-                    $timetable[$x]['day'][$y][0]['room']        = $desc['room_code'];
-                    $timetable[$x]['day'][$y][0]['staffCode']   = $desc['tch_code'];
-
-                    $desc = $this->getDatabase()->getNextArray();
-
-                } else {
-                    $timetable[$x]['day'][$y] = array();
+                    $timetable[$x]['day'][$desc['day_code']][] = array(
+                        'description'    => $desc['sub_desc'],
+                        'code'           => trim($desc['year_grp'])
+                            . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']),
+                        'room'           => $desc['room_code'],
+                        'staffCode'      => $desc['tch_code'],
+                    );
+                    break;
                 }
-
             }
         }
         return $timetable;
