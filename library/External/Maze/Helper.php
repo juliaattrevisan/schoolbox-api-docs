@@ -18,7 +18,19 @@ class External_Maze_Helper
      */
     private $db = null;
 
+    /**
+     * Current semester
+     *
+     * @var string
+     */
     private $currentSemester = '';
+
+    /**
+     * Decide whether you're in between semesters
+     *
+     * @var bool
+     */
+    private $betweenSemesters = false;
 
     /**
      * Constructor
@@ -44,9 +56,7 @@ class External_Maze_Helper
 
         /* Only get subjects that are relevant now
          */
-        $ttPeriod = "{$_SESSION['FileYear']}S{$_SESSION['FileSemester']}";
-
-        return $ttPeriod;
+        return $this->getCurrentSemester();
     }
 
     /**
@@ -56,7 +66,6 @@ class External_Maze_Helper
      */
     public function currentDate()
     {
-
         /* Samuel wanted it like this.
          * My life, where did it go?
          */
@@ -162,8 +171,21 @@ class External_Maze_Helper
         }
 
         /* In between semesters
+         * Make a guess as to what data to display. At the end of semester 1,
+         * start trying to display semester 2 data. At the end of semester 2,
+         * start trying to display semester 1 data from the next year.
          */
-        return '';
+        $this->setBetweenSemesters(true);
+
+        /* If January and between semesters 2 and 1, assume it's semester 1
+         * Otherwise assume between semester 1 and 2, and assume it's semester 2
+         */
+        if (date('n') == 1) {
+            return date('Y') . 'S1';
+        }
+        else {
+            return date('Y') . 'S2';
+        }
     }
 
     /**
@@ -193,6 +215,15 @@ class External_Maze_Helper
             'ClassCode'   => $classCode,
             'ClassNumber' => $classNumber,
         );
+    }
+
+    /**
+     * Alias
+     * 
+     * @return bool
+     */
+    public function isBetweenSemesters() {
+        return $this->getBetweenSemesters();
     }
 
     /* Getters/Setters
@@ -236,5 +267,25 @@ class External_Maze_Helper
     public function getCurrentSemester()
     {
         return $this->currentSemester;
+    }
+
+    /**
+     * Set between semesters
+     *
+     * @param boolean $betweenSemesters
+     */
+    private function setBetweenSemesters($betweenSemesters)
+    {
+        $this->betweenSemesters = $betweenSemesters;
+    }
+
+    /**
+     * Get between semesters
+     *
+     * @return boolean
+     */
+    private function getBetweenSemesters()
+    {
+        return $this->betweenSemesters;
     }
 }
