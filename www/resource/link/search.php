@@ -22,11 +22,8 @@ $allowedFile = new AllowedFile();
 $mapper = new \Schoolbox\Resource\Search\Results($page, $type);
 $mapper->search( $_SESSION['user'], $keyword, 0, Cfg::get('search_all_limit'));
 
-$count = array();
-
 // default case is to search for everthing
 if (empty($type) || $type == 'all') {
-
 
     // are there any results?
 
@@ -36,10 +33,6 @@ if (empty($type) || $type == 'all') {
         $page->outputPage();
         return true;
     }
-
-    /* Omaha Beach
-     */
-    $mapper->renderTabs();
 }
 
 /* Omaha Beach - these have landed
