@@ -6,7 +6,7 @@ search = {
 
 	/* The url that puts out search results
 	 */
-	url: '/search.php',
+	url: '/search',
 
 	/* The search section (type) that was selected e.g. all, people, etc.
 	 */
