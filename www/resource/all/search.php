@@ -40,7 +40,11 @@ $mapper->search( $_SESSION['user'], $keyword, 0, Cfg::get('search_all_limit'));
 
 /* <RESULTS RENDERING> */
 
-/* Omaha Beach - these have landed
+/* Omaha Beach
+ *
+ * These have landed
+ * When you add more, remove them from the searchConfig pseudo-registry
+ * and remove them from the gigantic phplibbery below
  */
 if ($type == 'all' || in_array($type, $omaha)) {
     $mapper->render();
@@ -594,10 +598,10 @@ if (!empty($handle[$type])) {
 //
 //
 //    // render final output
-    $page->parse(TEMPLATE_body, 'RESULT', true);
-    $page->outputPage(true);
+//    $page->parse(TEMPLATE_body, 'RESULT', true);
+//    $page->outputPage(true);
 //}
-//
+
 // execution time
 $time = microtime(true) - $time_start;
 
