@@ -79,6 +79,26 @@ $this->setBlock(TEMPLATE_content, 'type', 'type_block');
 $this->setBlock(TEMPLATE_content, 'result', 'result_block');
 $this->setBlock(TEMPLATE_content, 'no_result', 'no_result_block');
 
+/* Initialise blocks
+ */
+$this->setVar(array(
+    'type_block' => '',
+    'result_block' => '',
+    'no_result_block' => ''
+));
+
+// setup default values
+// escape any quotes in the keyword string, or the javascript will explode.
+$output = array(
+    'KEYWORD' => str_replace('"', '\"', $keyword),
+    'ENCODED_KEYWORD' => htmlentities($keyword),
+    'UNESCAPED_KEYWORD' => $keyword,
+    'FOR' => ' for ', // LOL!
+    'NO_RESULTS_BECAUSE' => '',
+);
+
+$this->setVar($output);
+
 if (is_numeric($keyword) || ($keyword && strlen($keyword) > 2)) {
     $this->setVar(array(
         'UNESCAPED_KEYWORD' => $keyword,
@@ -101,20 +121,16 @@ else {
     }
 }
 
-// setup default values
-// escape any quotes in the keyword string, or the javascript will explode.
-$output = array(
-    'KEYWORD' => str_replace('"', '\"', $keyword),
-    'ENCODED_KEYWORD' => htmlentities($keyword),
-    'UNESCAPED_KEYWORD' => $keyword,
-    'FOR' => ' for ',
-    'NO_RESULTS_BECAUSE' => '',
-    'type_block' => '',
-    'result_block' => '',
-    'no_result_block' => ''
-);
+/* Also parse the no_result block if no results were found
+ */
+if ($count['all'] == 0) {
+    $this->setVar(array(
+        'NO_RESULTS_BECAUSE' => ' because it needs to be longer, or wrapped in "quotes"'
+    ));
 
-$this->setVar($output);
+    $this->parse('no_result_block', 'no_result');
+}
+
 
 /**
  * phpliberalise the menu tabs
