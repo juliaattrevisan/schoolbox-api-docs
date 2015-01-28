@@ -17,43 +17,7 @@ $group = new Group();
 $categoryStd = new Category();
 $allowedFile = new AllowedFile();
 
-/* Omaha Beach!
- */
-$mapper = new \Schoolbox\Resource\Search\Results($page, $type);
-$mapper->search( $_SESSION['user'], $keyword, 0, Cfg::get('search_all_limit'));
 
-// default case is to search for everthing
-if (empty($type) || $type == 'all') {
-
-    // are there any results?
-
-    if ($count['all'] == 0) {
-        $page->parse('no_result_block', 'no_result', false);
-        // done. exit.
-        $page->outputPage();
-        return true;
-    }
-}
-
-/* Omaha Beach - these have landed
- */
-else if (in_array($type, $omaha)) {
-    $mapper->render();
-}
-elseif (!empty($handle[$type])) {
-    // include & instantiate
-    $type_class = ucfirst($handle[$type]);
-    $handle[$type] = new $type_class;
-
-    /* Particular ordering and sorting for Categories
-     */
-    if (in_array($type_class, array('Category'))) {
-        $result[$type] = $handle[$type]->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type], 'id', 'desc');
-    } else {
-        // perform search for individual category (without formatting for ajax call)
-        $result[$type] = $handle[$type]->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type]);
-    }
-}
 
 /* <RESULTS RENDERING> */
 

@@ -50,7 +50,7 @@ search = {
 	 */
 	load: function() {
 		if (!$(this).hasClass('loaded')) {
-			$(this.getTargetDiv()).load(this.getUrl(), "keyword=" + this.getKeyword() + "&type=" + this.getSection() + "&page=" + search.getPageNumber(), function() {
+			$(this.getTargetDiv()).load(this.getUrl(), "keyword=" + this.getKeyword() + "&type=" + this.getSection() + "&p=" + search.getPageNumber(), function() {
 
 				/* Flag it as having loaded
 				 */

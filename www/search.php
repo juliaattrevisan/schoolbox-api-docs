@@ -169,6 +169,33 @@ foreach ($type_list as $type_name => $type_desc) {
 
 /* Omaha Beach
  * The individual renderers should only render tabs when there are
- * positve result counts for their respective items
+ * positive result counts for their respective items
  */
 $mapper->renderTabs();
+
+/**
+ * Render search outputs
+ */
+
+/* Omaha Beach - these have landed
+ */
+if (in_array($type, $omaha)) {
+    $mapper->render();
+}
+/* These are old handlers
+ */
+elseif (!empty($handle[$type])) {
+    // include & instantiate
+    $type_class = ucfirst($handle[$type]);
+    $handle[$type] = new $type_class;
+
+    /* Particular ordering and sorting for Categories
+     */
+    if (in_array($type_class, array('Category'))) {
+        $result[$type] = $handle[$type]->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type], 'id', 'desc');
+    } else {
+        // perform search for individual category (without formatting for ajax call)
+        $result[$type] = $handle[$type]->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type]);
+    }
+}
+
