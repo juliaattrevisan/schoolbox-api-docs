@@ -74,7 +74,7 @@ search = {
 
 			/* Set the page number
 			 */
-            search.setPageNumber( $(this).attr('rel') );
+            search.setPageNumber($(this).attr('rel'));
 
 			/* Update hash configuration
 			 */
@@ -86,7 +86,7 @@ search = {
 
 			/* Load search results in, update pagination and styles
 			 */
-			$(search.getTargetDiv()).load(search.getUrl(), "keyword=" + search.getKeyword() + "&type=" + search.getSection() + "&page=" + search.getPageNumber(), function() {
+			$(search.getTargetDiv()).load(search.getUrl(), "keyword=" + search.getKeyword() + "&type=" + search.getSection() + "&p=" + search.getPageNumber(), function() {
 				search.paginate();
 				search.updateStyles();
 			});
