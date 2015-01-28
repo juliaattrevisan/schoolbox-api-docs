@@ -425,6 +425,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
     public function getFullTimetable($synergy_id, $userID, $campus)
     {
+        if (empty($synergy_id)) {
+            return array();
+        }
         /* Temporarily switch the filesemester to the requested user */
         $originalFileSemester = $_SESSION['FileSemester'];
         $originalFileYear     = $_SESSION['FileYear'];

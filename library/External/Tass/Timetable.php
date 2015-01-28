@@ -238,7 +238,9 @@ class External_Tass_Timetable implements External_TimetableInterface
 
     function getFullTimetable($synergy_id, $userID, $campus)
     {
-
+        if (empty($synergy_id)) {
+            return array();
+        }
         $timetabledef = $this->getTimetableDefinition($campus);
 
         if ($this->groupHandler->isStudent($userID)) {

@@ -118,6 +118,9 @@ class External_Denbigh_Timetable implements External_TimetableInterface
 
     public function getFullTimetable($externalUserId, $userId, $campusId)
     {
+        if (empty($externalUserId)) {
+            return array();
+        }
         /* Setup skeleton timetable */
         if (!$definition = $this->getTimetableDefinition($campusId)) {
             return false;

@@ -288,6 +288,9 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
      */
     public function getFullTimetable($externalUserId, $userId, $campusId)
     {
+        if (empty($externalUserId)) {
+            return array();
+        }
         $campus = $this->getCampusMapper()->findById($campusId);
         $this->setCycleLength($campus->getTimetableDay());
         $allDayTimetables = array();

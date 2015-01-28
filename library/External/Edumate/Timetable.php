@@ -245,6 +245,9 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      */
     public function getFullTimetable($externalUserId, $userId, $campusId)
     {
+        if (empty($externalUserId)) {
+            return array();
+        }
         $definition = $this->getTimetableDefinition($campusId);
         $dayCount = is_numeric($definition['dayCount']) ? $definition['dayCount'] : 0;
 

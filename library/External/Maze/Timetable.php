@@ -532,6 +532,9 @@ class External_Maze_Timetable implements External_TimetableInterface
      */
     public function getFullTimetable($externalUserId, $userId, $campusId)
     {
+        if (empty($externalUserId)) {
+            return array();
+        }
         $timetable = array();
         $allDayTimetables = array();
 
