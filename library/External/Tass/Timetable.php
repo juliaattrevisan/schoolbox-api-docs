@@ -197,35 +197,38 @@ class External_Tass_Timetable implements External_TimetableInterface
                          ORDER BY prd_code";
         }
 
-        $periodCount = $timetabledef['periodCount'];
-        $dayCount    = $timetabledef['dayCount'];
-
         $result = $this->getDatabase()->query($query);
-        //get first period
-        if ($result !== false && $result !== true) {
-            $desc = $this->getDatabase()->getNextArray($result);
-        } else {
-            $desc = "";
-        }
 
-        //for each period
-        for ($x = 0; isset($timetabledef['desc'][$x]); $x++) {
+        $timetable = array();
+
+        // Build the timetable
+        foreach ($timetabledef['desc'] as $x => $name) {
             $timetable[$x]['periodName']     = $timetabledef['desc'][$x];
             $timetable[$x]['periodStart']    = $timetabledef['start'][$x];
             $timetable[$x]['periodEnd']      = $timetabledef['end'][$x];
             $timetable[$x]['periodNumber']   = $timetabledef['number'][$x];
             $timetable[$x]['periodSequence'] = 1;
-
-            if ($timetabledef['sequence'][$x] != 2 && $desc['prd_code'] == $timetable[$x]['periodNumber']) {
-                $timetable[$x]['class'][0]['description'] = $desc['sub_desc'];
-                $timetable[$x]['class'][0]['code']        =
-                    trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
-                $timetable[$x]['class'][0]['room']        = $desc['room_code'];
-                $desc = $this->getDatabase()->getNextArray();
-            }
+            $timetable[$x]['class']          = array();
         }
 
-
+        // Add classes into it
+        while ($desc = $this->getDatabase()->getNextArray($result)) {
+            foreach ($timetable as $x => $timetablePeriod) {
+                if ($desc['prd_code'] == $timetablePeriod['periodNumber']
+                    && $timetablePeriod['periodSequence'] != 2
+                ) {
+                    $timetable[$x]['class'][] = array(
+                        'description' => $desc['sub_desc'],
+                        'code'        => trim($desc['year_grp'])
+                            . '-' . trim($desc['sub_code'])
+                            . '-' . trim($desc['class']),
+                        'room'        => $desc['room_code'],
+                        'staffCode'   => $desc['tch_code'],
+                    );
+                    break;
+                }
+            }
+        }
         return $timetable;
 
     }
