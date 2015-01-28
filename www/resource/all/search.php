@@ -596,23 +596,3 @@ else if ($result[$type] || $type == 'all') {
 }
 
 exit();
-
-/**
- * @param SitePage $page
- * @param string $type
- * @param array $count
- * @param string $handle
- *
- * @return void
- */
-function outputSeeMore($page, $type, $count, $handle)
-{
-    $page->setBlock($handle . '_t', 'see_more', 'see_more_block');
-
-    if($type == 'all' && $count[$handle] > Cfg::get('search_all_limit')) {
-        $page->setVar('MORE_COUNT', $count[$handle]);
-        $page->parse('see_more_block', 'see_more');
-    } else {
-        $page->setVar('see_more_block', '');
-    }
-}
