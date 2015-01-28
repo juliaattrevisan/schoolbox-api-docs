@@ -92,8 +92,20 @@ class Mapper extends BaseMapper
         return $newCollection;
     }
 
-    public function findByUser(User $user)
+    /**
+     * Finds all side menus for a particular user.
+     *
+     * @param User $user
+     *
+     * @return Collection|Model[] Will be empty if $user isn't a User object
+     * @throws BaseMapper\Exception if there's a multi-join somewhere in the
+     *                              mapping? I don't think there ever is here.
+     */
+    public function findByUser($user)
     {
+        if (!($user instanceof User)) {
+            return new Collection();
+        }
         if ($user->isSuperuser()) {
             return $this->findAll(array('order' => array('sequence' => 'asc')));
         } else {
