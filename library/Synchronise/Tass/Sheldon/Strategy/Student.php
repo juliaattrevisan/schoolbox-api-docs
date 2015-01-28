@@ -1,0 +1,33 @@
+<?php
+/**
+ * Synchronise_Tass_Sheldon_Strategy_Student
+ *
+ * Update Schoolbox with Tass data if there is something different
+ * contained in Tass database.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2014, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+class Synchronise_Tass_Sheldon_Strategy_Student extends Synchronise_Base_Strategy_Student
+{
+    /**
+     * {@inheritdoc}
+     */
+    protected function setup()
+    {
+        $this->verbose_filter = new Synchronise_Tass_Sheldon_Verbose();
+        $this
+            ->addHydrator(new Synchronise_Tass_Hydrator_ExcludeCompanyCodes())
+            ->addHydrator(new Synchronise_Base_Hydrator_Default())
+            ->addHydrator(new Synchronise_Base_Hydrator_Student())
+            ->addHydrator(new Synchronise_Base_Hydrator_LocalEmail())
+            ->addHydrator(new Synchronise_Base_Hydrator_BasicMapping('StudentID', 'username', 's%s'))
+            ->addHydrator(new Synchronise_Tass_Sheldon_Hydrator_Group_Student())
+            ->addHydrator(new Synchronise_Tass_Sheldon_Hydrator_Campus_Student())
+            ->addHydrator(new Synchronise_Tass_Sheldon_Hydrator_House_Student())
+            ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
+            ->addHydrator(new Synchronise_Base_Hydrator_Clear())
+        ;
+    }
+}

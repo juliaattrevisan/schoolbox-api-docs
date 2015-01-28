@@ -297,20 +297,28 @@ class External_Tass_User implements External_UserInterface
     {
     }
 
+    /**
+     * Retrieves staff user account info for sync script.
+     *
+     * @return array
+     */
     public function getStaffUserAccountInfo()
     {
-
-        // Include Synergetic fields, and attempt to perform data normalisation
-        // using extra fields.
+        // For Meriden:
+        // * filter on t.curr_flg = Y
+        // * filter out non-teachers
         $query = "
             SELECT
-                t.tch_code AS StaffID,
+                te.tch_code AS StaffID,
                 '' AS NetworkLogin,
-                t.curr_flg AS ActiveFlag,
-                '' AS StaffTitle,
-                '' AS StaffPreferredName,
-                t.surname AS StaffSurname,
-                t.tch_name AS StaffFullName,
+                CASE
+                    WHEN (t.term_date) IS NULL THEN 0
+                    ELSE 1
+                END AS ActiveFlag,
+                t.salutation_flag AS StaffTitle,
+                t.prefer_name_text AS StaffPreferredName,
+                t.surname_text AS StaffSurname,
+                '' AS StaffFullName,
                 '' AS DefaultEmailCode,
                 '' AS OccupEmail,
                 t.e_mail AS Email,
@@ -319,11 +327,10 @@ class External_Tass_User implements External_UserInterface
                 '' AS StaffCategory,
                 td.tch_dept AS StaffDepartment,
                 *
-            FROM teacher AS t
-            JOIN tchdept AS td ON t.tch_code = td.tch_code
-            WHERE t.curr_flg = 'Y'
+            FROM tel_vw_telemf AS t
+            LEFT JOIN teacher AS te ON t.emp_code = te.emp_code
+            LEFT JOIN tchdept AS td ON te.tch_code = td.tch_code
         ";
-
         $staffList = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
         return $staffList;
     }
@@ -343,11 +350,12 @@ class External_Tass_User implements External_UserInterface
                 '' AS StudentOccupEmail,
                 s.year_grp AS StudentYearLevel,
                 s.house AS StudentHouse,
-                s.campus_code AS StudentCampus, *
-                -- s.dol AS StudentLeavingDate
+                s.campus_code AS StudentCampus,
+                sb.resid_code AS StudentBoardingHouse,
+                s.*
             FROM student AS s
-            WHERE s.campus_code IS NOT NULL
-            AND s.dol IS NULL
+            LEFT JOIN studboard AS sb ON s.stud_code = sb.stud_code AND s.cmpy_code = sb.cmpy_code
+            WHERE s.dol IS NULL
         ";
 
         $result = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
@@ -373,22 +381,32 @@ class External_Tass_User implements External_UserInterface
         return array();
     }
 
-
+    /**
+     * Retrieves parent user account info for sync script.
+     *
+     * @return array
+     */
     public function getParentUserAccountInfo()
     {
-        // status of TASS support for single, gay, transgendered or polygamous
-        // parents - unknown
-        // par_code: most likely login
-        // According to getEnrolledStudents(): parent codes are prefixed with 'P'
-        // There seems to be no separate accounts for separate parents, maybe
-        // I'll have to create one.
+        // For Meriden: ignore split families,
+        // because they weren't retrieved with their original query.
+
+        // pia_sfaccess:
+        // * both add_nums and stud_codes are comma-separated lists, unfortunately
+        // joining students to parents:
+        // * if pia_sfaccess: join if student.stud_code is in pia_sfaccess.stud_codes
+        // * otherwise: always join
+
+        // pia_sfaccess: only join the relevant paraddress
+        // no pia_sfaccess: get all paraddress
+        $database = $this->getDatabase();
         $query = "
             SELECT
                 p.par_code AS StudentContactID,
                 '' AS StudentContactTitle,
                 p.f_name AS StudentContactPreferred,
                 p.surname AS StudentContactSurname,
-                '' AS StudentContactDefaultEmail,
+                pa.e_mail AS StudentContactDefaultEmail,
 
                 '' AS StudentContactSpouseID,
                 '' AS StudentContactSpouseTitle,
@@ -400,16 +418,60 @@ class External_Tass_User implements External_UserInterface
                 s.campus_code AS StudentCampus,
                 s.sex AS StudentGender,
 
-                p.*
+                sf.sfa_num,
+                sf.stud_codes AS SplitStudentIDList,
+
+                p.*,
+                pa.*
             FROM parent AS p
-            -- INNER JOIN pia_sfaccess AS sf
-            --    ON p.par_code = sf.par_code AND p.cmpy_code = sf.cmpy_code
-            INNER JOIN student as s
-                ON p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code
+            INNER JOIN paraddress as pa
+                ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code
+            LEFT JOIN pia_sfaccess AS sf
+                ON p.par_code = sf.par_code
+                AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
+                AND p.cmpy_code = sf.cmpy_code
+            LEFT JOIN student as s
+                ON p.par_code = s.par_code
+                AND p.cmpy_code = s.cmpy_code
             ORDER BY p.par_code ASC
         ";
-        $list = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
-        return $list;
+        $list = $database->trimAll($database->getAll($query));
+
+        // Inject pia_sfaccess address numbers separately?
+
+        // Inject student campuses, year levels, etc.
+        $newList = array();
+        foreach ($list as $listItem) {
+            if (isset($listItem['StudentYearLevel'])) {
+                // Base related student accounts are fetched in base query.
+                $newList[] = $listItem;
+            }
+            if (isset($listItem['SplitStudentIDList'])) {
+                // Inject pia_sfaccess children separately, because they may
+                // not belong to the same parent account
+                // (but they are still allowed access)
+                $codes = array_map(
+                    function ($code) use ($database) {
+                        return "'".$database->quote($code)."'";
+                    },
+                    explode(',', $listItem['SplitStudentIDList'])
+                );
+                $splitStudentQuery = sprintf(
+                    "SELECT
+                        s.year_grp AS StudentYearLevel,
+                        s.campus_code AS StudentCampus,
+                        s.sex AS StudentGender
+                    FROM student as s
+                    WHERE s.stud_code IN (%s)",
+                    implode(',', $codes)
+                );
+                foreach ($database->trimAll($database->getAll($splitStudentQuery)) as $child) {
+                    $newList[] = array_merge($listItem, $child);
+                }
+            }
+        }
+
+        return $newList;
     }
 
     /**

@@ -6,7 +6,7 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Tass_Cathedral_Hydrator_ExcludeNonCurrentParents implements Synchronise_Base_IHydrator
+class Synchronise_Tass_Meriden_Hydrator_ExcludeNonCurrentStaff implements Synchronise_Base_IHydrator
 {
 
     /**
@@ -14,8 +14,9 @@ class Synchronise_Tass_Cathedral_Hydrator_ExcludeNonCurrentParents implements Sy
      */
     public function hydrate($externalUser, $newUser)
     {
-        if (strtoupper($externalUser['status_flg']) == 'N') {
-            throw new Exception('Parents who are not current are not synced');
+        if ($externalUser['tch_code'] != 'Y') {
+            throw new Exception('Employees who are no longer at school are not synced');
         }
+        return $newUser;
     }
 }

@@ -1,12 +1,15 @@
 <?php
 /**
- * Hydrator for name for Cathedral parents.
+ * Hydrator for name for TASS parents.
+ *
+ * Because TASS doesn't have separate accounts for a mother and father,
+ * their names must be jammed into one name.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_Tass_Cathedral_Hydrator_Name_Parent implements Synchronise_Base_IHydrator
+class Synchronise_Tass_Hydrator_Name_Parent implements Synchronise_Base_IHydrator
 {
 
     protected $field = 'StudentContactPreferred';

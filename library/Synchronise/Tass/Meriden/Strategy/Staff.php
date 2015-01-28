@@ -17,6 +17,9 @@ class Synchronise_Tass_Meriden_Strategy_Staff extends Synchronise_Base_Strategy_
     protected function setup() {
         $this->verbose_filter = new Synchronise_Tass_Meriden_Verbose();
         $this
+            // Don't add new hydrators, because Meriden sync uses old queries
+//            ->addHydrator(new Synchronise_Tass_Meriden_Hydrator_ExcludeNonCurrentStaff())
+//            ->addHydrator(new Synchronise_Tass_Meriden_Hydrator_ExcludeNonTeachers())
             ->addHydrator(new Synchronise_Base_Hydrator_Staff())
             ->addHydrator(new Synchronise_Tass_Meriden_Hydrator_Name_Staff())
             ->addHydrator(new Synchronise_Tass_Meriden_Hydrator_Username_Staff())
