@@ -4,6 +4,16 @@
  *
  * A composite class consisting of Searchable-interfaced Mappers
  *
+ * The composite also commands each of its minions to render tabs,
+ * pagination and search results independently of the other minions
+ *
+ * search() needs to run before any of the render* methods
+ *
+ * In the future I'd like to have render(), renderTabs() and
+ * renderPagination() running adjacently in twig, but for phplib reasons
+ * I have to keep them separate as they are called at different times
+ * and I don't want to rock the boat so close to the beach
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -17,7 +27,6 @@ use Schoolbox\Collection;
 
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\Resource\Link\Search\Renderer as LinkRenderer;
-
 
 class Results implements Searchable {
 

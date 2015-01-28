@@ -20,6 +20,12 @@ use Schoolbox\Resource\CategoryMapper;
 
 class Renderer extends Base {
 
+    /**
+     * Render clickable tab menu
+     *
+     * @param MapperResult $mapperResult
+     * @param $type
+     */
     public function renderTab(MapperResult $mapperResult, $type) {
         $this->getPage()->setVar(array(
             'TYPE_COUNT' => $mapperResult->getCount(),
