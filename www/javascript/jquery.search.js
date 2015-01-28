@@ -4,10 +4,6 @@
  */
 search = {
 
-	/* The url that puts out search results
-	 */
-	url: '/search',
-
 	/* The search section (type) that was selected e.g. all, people, etc.
 	 */
 	section: '',
@@ -43,6 +39,10 @@ search = {
 		this.setSectionElement(config.sectionElement);
 		this.setPageNumber(config.pageNumber);
 		this.setTargetDiv(config.section);
+
+        /* This url is constructed dynamically
+         */
+        this.setUrl('/resource/' + this.getSection() + '/search.php')
 	},
 
 	/**
@@ -248,6 +248,15 @@ search = {
 		return this.url;
 	},
 
+    /**
+     * Set url
+     *
+     * @param url
+     */
+    setUrl: function(url) {
+        this.url = url;
+    },
+
 	/**
 	 * Set the div where search results get loaded in
 	 */
@@ -279,5 +288,4 @@ search = {
 	getSection: function() {
 		return this.section;
 	}
-
 }
