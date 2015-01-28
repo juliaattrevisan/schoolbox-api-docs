@@ -69,7 +69,7 @@ class Results implements Searchable {
 
         /* Add searchables
          */
-        $this->getRegistry()->add(new Definition(new LinkMapper(), new LinkRenderer($page)));
+        $this->getRegistry()->add(new Definition($type, new LinkMapper(), new LinkRenderer($page)));
     }
 
     /**
@@ -86,10 +86,15 @@ class Results implements Searchable {
     public function search($user, $keyword, $offset = 0, $limit = null, $sortProperty = '', $sortDirection = 'DESC') {
         $result = new Collection();
 
+        /* Run search() on each minion in the registry if 'all' is selected
+         * or if this particular minion was chosen specifically (e.g. 'link')
+         */
         foreach($this->getRegistry() as $currentDefinition) {
-            $searcher = $currentDefinition->getMapper()->search($user, $keyword, $offset, $limit, $sortProperty, $sortDirection);
+            if (in_array($currentDefinition->getType(), array('all', $this->getType()))) {
+                $searcher = $currentDefinition->getMapper()->search($user, $keyword, $offset, $limit, $sortProperty, $sortDirection);
 
-            $result->setOffset(get_class($currentDefinition->getMapper()), $searcher);
+                $result->setOffset($currentDefinition->getType(), $searcher);
+            }
         }
 
         $this->setResult($result);
@@ -100,9 +105,11 @@ class Results implements Searchable {
      */
     public function render() {
         foreach($this->getRegistry() as $currentDefinition) {
-            $searcher = $this->getResult()->getOffset(get_class($currentDefinition->getMapper()));
+            if (in_array($currentDefinition->getType(), array('all', $this->getType()))) {
+                $searcher = $this->getResult()->getOffset($currentDefinition->getType());
 
-            $currentDefinition->getRenderer()->render($searcher, $this->getType());
+                $currentDefinition->getRenderer()->render($searcher, $this->getType());
+            }
         }
     }
 
@@ -111,7 +118,7 @@ class Results implements Searchable {
      */
     public function renderTabs() {
         foreach($this->getRegistry() as $currentDefinition) {
-            $searcher = $this->getResult()->getOffset(get_class($currentDefinition->getMapper()));
+            $searcher = $this->getResult()->getOffset($currentDefinition->getType());
 
             $currentDefinition->getRenderer()->renderTab($searcher, $this->getType());
         }
@@ -121,10 +128,16 @@ class Results implements Searchable {
      * Render pagination
      */
     public function renderPagination($currentPage) {
+
+        /* Render pagination from the first $searcher, as they all do it the same
+         * and only need to do it once
+         */
         foreach($this->getRegistry() as $currentDefinition) {
-            $searcher = $this->getResult()->getOffset(get_class($currentDefinition->getMapper()));
+            $searcher = $this->getResult()->getOffset($currentDefinition->getType());
 
             $currentDefinition->getRenderer()->renderPagination($searcher, $this->getType(), $currentPage);
+
+            break;
         }
     }
 
@@ -138,7 +151,7 @@ class Results implements Searchable {
         $sum = 0;
 
         foreach($this->getRegistry() as $currentDefinition) {
-            $searcher = $this->getResult()->getOffset(get_class($currentDefinition->getMapper()));
+            $searcher = $this->getResult()->getOffset($currentDefinition->getType());
 
             $sum += $searcher->getCount();
         }
