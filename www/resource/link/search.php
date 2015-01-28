@@ -27,9 +27,6 @@ $count = array();
 // default case is to search for everthing
 if (empty($type) || $type == 'all') {
 
-    /* Omaha Beach
-     */
-    $count['all'] = array_sum($count) + $mapper->countTotalResults();
 
     // are there any results?
 

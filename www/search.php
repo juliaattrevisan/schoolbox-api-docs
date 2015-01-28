@@ -51,13 +51,21 @@ foreach ($handle as $type_name => &$type_handle) {
     $type_class = ucfirst($type_handle);
     $type_handle = new $type_class;
 
+    /* search() calls access a global counter array, $count
+     */
     $result[$type_name] = $type_handle->search($keyword, 0, Cfg::get('search_all_limit'), $count[$type_name]);
 }
+
+$count['all'] = array_sum($count);
 
 /* Omaha Beach!
  */
 $mapper = new \Schoolbox\Resource\Search\Results($this, $type);
 $mapper->search( $_SESSION['user'], $keyword, 0, Cfg::get('search_all_limit'));
+
+/* Omaha Beach
+ */
+$count['all'] += $mapper->countTotalResults();
 
 /**
  * phpliberalise the basic template output
