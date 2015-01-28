@@ -175,27 +175,6 @@ $mapper->renderTabs();
 
 /**
  * Render search outputs
+ * These are ajaxed in individually
  */
-
-/* Omaha Beach - these have landed
- */
-if (in_array($type, $omaha)) {
-    $mapper->render();
-}
-/* These are old handlers
- */
-elseif (!empty($handle[$type])) {
-    // include & instantiate
-    $type_class = ucfirst($handle[$type]);
-    $handle[$type] = new $type_class;
-
-    /* Particular ordering and sorting for Categories
-     */
-    if (in_array($type_class, array('Category'))) {
-        $result[$type] = $handle[$type]->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type], 'id', 'desc');
-    } else {
-        // perform search for individual category (without formatting for ajax call)
-        $result[$type] = $handle[$type]->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type]);
-    }
-}
 
