@@ -9,7 +9,6 @@
 
 namespace Schoolbox;
 
-use Alaress\Async\Notification\LoggerInterface;
 use Database;
 use PDO;
 use Schoolbox\Column\Factory as ColumnFactory;
@@ -18,6 +17,7 @@ use Schoolbox\Column\IFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\NotifInterface;
 use Schoolbox\Realtime\Schedule\Event;
 use Serializable;
 
@@ -153,7 +153,7 @@ class Mapper implements Serializable
     /**
      * Notifier
      *
-     * @var Notif
+     * @var NotifInterface
      */
     protected $notif;
 
@@ -283,7 +283,7 @@ class Mapper implements Serializable
     }
 
     /**
-     * @param LoggerInterface $notif
+     * @param NotifInterface $notif
      */
     public function setNotifier($notif)
     {
@@ -291,12 +291,12 @@ class Mapper implements Serializable
     }
 
     /**
-     * @return LoggerInterface
+     * @return NotifInterface
      */
     public function getNotifier()
     {
         // load on demand, so that we don't get infinite loops
-        if (!$this->notif instanceof LoggerInterface) {
+        if (!$this->notif instanceof NotifInterface) {
             $this->setNotifier(new Notif(Notif::TOPIC_APPLICATION, $this->getConfigLoader()));
         }
         return $this->notif;
