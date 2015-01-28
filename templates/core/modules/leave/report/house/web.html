@@ -99,9 +99,8 @@
 
     <h2>Leave Report</h2>
 
-    <span class="header_option in-h2">
-        <a id="reportExportButton" href="/modules/leave/report/house/{HOUSE_ID}" class="btn modify"><span></span>Export
-            History</a>
+    <div class="report-options">
+        <a id="reportExportButton" href="/modules/leave/report/house/{HOUSE_ID}" class="btn export"><span></span>Export History</a>
         <form id="reportFilter">
             <a id="reportFilterSubmit" href="javascript:void(0);" class="btn search"><span></span>Search</a>
             <select id="reportHouse">
@@ -112,7 +111,7 @@
             </select>
             <input id="reportDate" type="text" value="{REPORT_DATE}">
         </form>
-    </span>
+    </div>
 
     <p class='leaveReportGeneratedAt'>Generated on {GENERATED_AT}</p>
 
