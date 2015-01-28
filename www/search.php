@@ -9,6 +9,14 @@ $time_start = microtime(true);
 
 require_once '../include/Bootstrap.php';
 
+/* Omaha Beach
+ * These handlers have been mapperised and shouldn't appear in the
+ * old search.php contexts
+ */
+$omaha = array(
+    'link'
+);
+
 $page = new SitePage();
 $group = new Group();
 $categoryStd = new Category();
@@ -62,7 +70,7 @@ $handle = array(
     'user' => 'user',
     'file' => 'file',
     'category' => 'category',
-    'link' => 'link',
+//    'link' => 'link',
 	'sitenews' => 'news',
 	'homepagenews' => 'categoryNews',
     'blog' => 'blog',
@@ -76,7 +84,7 @@ $type_list = array(
     'user' => 'People',
     'file' => 'Files',
     'category' => 'Folders',
-    'link' => 'Links',
+//    'link' => 'Links',
     'sitenews' => 'School News',
     'homepagenews' => 'Homepage News',
     'blog' => 'Blogs',
@@ -84,6 +92,12 @@ $type_list = array(
     'forum' => 'Forums',
     'event' => 'Calendar',
 );
+
+
+/* Omaha Beach!
+ */
+$mapper = new \Schoolbox\Resource\Search\Results($page, $type);
+$mapper->search( $_SESSION['user'], $keyword, 0, Cfg::get('search_all_limit'));
 
 $count = array();
 
@@ -120,7 +134,9 @@ if (empty($type) || $type == 'all') {
         $result[$type_name] = $type_handle->search($keyword, 0, Cfg::get('search_all_limit'), $count[$type_name]);
     }
 
-    $count['all'] = array_sum($count);
+    /* Omaha Beach
+     */
+    $count['all'] = array_sum($count) + $mapper->countTotalResults();
 
     // are there any results?
 
@@ -154,14 +170,25 @@ if (empty($type) || $type == 'all') {
         $page->parse('type_block', 'type', true);
         $page->parse('result_block', 'result', true);
     }
-} //
+
+    /* Omaha Beach
+     */
+    $mapper->renderTabs();
+
+}
+
+/* Omaha Beach - these have landed
+ */
+else if (in_array($type, $omaha)) {
+    $mapper->render();
+}
 elseif (!empty($handle[$type])) {
     // include & instantiate
     $type_class = ucfirst($handle[$type]);
     $handle[$type] = new $type_class;
 
     /* Particular ordering and sorting for Categories
-      */
+     */
     if (in_array($type_class, array('Category'))) {
         $result[$type] = $handle[$type]->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type], 'id', 'desc');
     } else {
@@ -375,11 +402,6 @@ if (!empty($result['category'])) {
 
     $page->parse('RESULT', 'category_t', true);
 }
-
-/* Omaha Beach!
- */
-$mapper = new \Schoolbox\Resource\Search\Results($page, $type);
-$mapper->search( $_SESSION['user'], $keyword, 0, Cfg::get('search_all_limit'));
 
 // render homepage news
 if (!empty($result['homepagenews'])) {
@@ -630,7 +652,7 @@ if (!empty($result['event'])) {
 // if search type isn't specified
 if (empty($type)) {
     // clear pagination
-    $page->setBlock('RESULT', 'pagination', 'pagination_block');
+//    $page->setBlock('RESULT', 'pagination', 'pagination_block');
     $page->setVar('pagination_block');
 
     // execution time
@@ -640,9 +662,11 @@ if (empty($type)) {
     $page->outputPage();
 
 // if we have a search type
-} /* If we have a search type and have results to display
+}
+/* If we have a search type and have results to display
+ * Omaha Beach
  */
-else if ($result[$type] || $type == 'all') {
+else if ($result[$type] || $type == 'all' || in_array($type, $omaha)) {
 
     // clear count
     $page->setBlock('RESULT', 'count', 'count_block');

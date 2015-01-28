@@ -20,6 +20,27 @@ use Schoolbox\Resource\CategoryMapper;
 
 class Renderer extends Base {
 
+    public function renderTab(MapperResult $mapperResult, $type) {
+        $this->getPage()->setVar(array(
+            'TYPE_COUNT' => $mapperResult->getCount(),
+            'TYPE_TITLE' => 'link',
+            'TYPE_CLASS' => '',
+            'TYPE_NAME' => 'Links'
+        ));
+
+        $this->getPage()->setVar(array(
+            'RESULT_TITLE' => 'link',
+            'RESULT_CLASS' => $type == 'all' ? 'hide loaded' : 'hide',
+        ));
+
+        $this->getPage()->setVar(array(
+            'RESULT' => ''
+        ));
+
+        $this->getPage()->parse('type_block', 'type', true);
+        $this->getPage()->parse('result_block', 'result', true);
+    }
+
     /**
      * Render html fragment
      *

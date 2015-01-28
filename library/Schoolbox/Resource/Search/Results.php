@@ -98,6 +98,17 @@ class Results implements Searchable {
     }
 
     /**
+     * Render search results
+     */
+    public function renderTabs() {
+        foreach($this->getRegistry() as $currentDefinition) {
+            $searcher = $this->getResult()->getOffset(get_class($currentDefinition->getMapper()));
+
+            $currentDefinition->getRenderer()->renderTab($searcher, $this->getType());
+        }
+    }
+
+    /**
      * Count the total number of results for all participants
      * listed in the Registry
      *
