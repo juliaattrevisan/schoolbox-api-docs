@@ -71,11 +71,11 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 
         $this->source_category_id = $source;
 
-        if ($this->getConfig('size') > 1) {
+        if ($this->getConfig('size') >= 1) {
             $this->outputList = $videoResourceMapper->findByCategory(
                 $source,
                 $sortConfig,
-                $this->getConfig('size') - 1
+                $this->getConfig('size')
             );
         } elseif ($this->getConfig('size') == 0) {
             $this->outputList = $videoResourceMapper->findByCategory($source, $sortConfig);
@@ -130,7 +130,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         $this->setVar('video_pending_list_block', '');
         $this->setVar('default_video_block', '');
 
-        if (count($this->outputList)) {
+        if ($this->getConfig('size') > 1 && count($this->outputList)) {
             $j = 0;
             foreach ($this->outputList as $video) {
                 $this->setVar(
