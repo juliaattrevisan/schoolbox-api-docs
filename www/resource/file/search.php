@@ -22,16 +22,16 @@ require_once('./resource/searchClean.php');
 /**
  * Execute searches for all handlers and mappers
  */
-$userHandler = new User();
+$fileHandler = new File();
 $type = 'file';
 
 /* search() calls access a global counter array, $count
  */
-$result[$type] = $userHandler->search($keyword, 0, Cfg::get('search_all_limit'), $count[$type]);
+$result[$type] = $fileHandler->search($keyword, 0, Cfg::get('search_all_limit'), $count[$type]);
 
 $count['all'] = array_sum($count);
 
-$result[$type] = $userHandler->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type]);
+$result[$type] = $fileHandler->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type]);
 
 // render files
 if (!empty($result['file'])) {
