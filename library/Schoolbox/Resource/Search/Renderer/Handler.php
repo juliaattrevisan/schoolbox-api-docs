@@ -51,6 +51,14 @@ abstract class Handler {
     protected $currentPage = 0;
 
     /**
+     * Make a See More button
+     * Used only in 'All' context
+     *
+     * @var bool
+     */
+    protected $useSeymourLinks = false;
+
+    /**
      * Constructor
      *
      * @param $page a site page
@@ -160,6 +168,26 @@ abstract class Handler {
         }
     }
 
+    /**
+     * Provide a Seymour link
+     *
+     * @param $page
+     * @param $type
+     * @param $count
+     * @param $handle
+     */
+    protected function outputSeeMore($page, $type, $count, $handle)
+    {
+        $page->setBlock($handle . '_t', 'see_more', 'see_more_block');
+
+        if ($count[$type] > \Cfg::get('search_all_limit')) {
+            $page->setVar('MORE_COUNT', $count[$type]);
+            $page->parse('see_more_block', 'see_more');
+        } else {
+            $page->setVar('see_more_block', '');
+        }
+    }
+
     /* Getters/Setters
      */
 
@@ -241,5 +269,25 @@ abstract class Handler {
     protected function getCurrentPage()
     {
         return $this->currentPage;
+    }
+
+    /**
+     * Set use seymour links
+     *
+     * @param boolean $useSeymourLinks
+     */
+    public function setUseSeymourLinks($useSeymourLinks)
+    {
+        $this->useSeymourLinks = $useSeymourLinks;
+    }
+
+    /**
+     * Get use seymour links
+     *
+     * @return boolean
+     */
+    public function getUseSeymourLinks()
+    {
+        return $this->useSeymourLinks;
     }
 }

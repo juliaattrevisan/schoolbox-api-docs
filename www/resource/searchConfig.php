@@ -42,23 +42,3 @@ $type_list = array(
 $omaha = array(
     'link'
 );
-
-/**
- * @param SitePage $page
- * @param string $type
- * @param array $count
- * @param string $handle
- *
- * @return void
- */
-function outputSeeMore($page, $type, $count, $handle)
-{
-    $page->setBlock($handle . '_t', 'see_more', 'see_more_block');
-
-    if ($count[$type] > Cfg::get('search_all_limit')) {
-        $page->setVar('MORE_COUNT', $count[$type]);
-        $page->parse('see_more_block', 'see_more');
-    } else {
-        $page->setVar('see_more_block', '');
-    }
-}

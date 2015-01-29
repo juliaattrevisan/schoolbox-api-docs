@@ -62,7 +62,7 @@ class Renderer extends Handler {
                 $this->getPage()->parse('forum_block', 'forum', true);
             }
 
-            outputSeeMore($this->getPage(), $this->getType(), $this->getCount(), 'forum');
+            $this->outputSeeMore($this->getPage(), $this->getType(), $this->getCount(), 'forum');
 
             $this->getPage()->parse('RESULT', 'forum_t', true);
         }
