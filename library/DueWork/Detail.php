@@ -85,9 +85,9 @@ class DueWork_Detail
                     $insertion['user']['class']  = self::CLASS_UNSUBMITTED;
                     $insertion['user']['time']   = new Alaress_Date_Format(0);
                     $submissions                 = array();
-                } // only use the first if this is a single-submit box
+                }
                 else {
-                    $insertion['submissions'] = array($submissions[0]);
+                    $insertion['submissions'] = $submissions;
                     if (count($submissions) > 1) {
                         $insertion['user']['status'] = self::RESUBMITTED;
                     } else {
