@@ -373,47 +373,11 @@ if (!empty($result['sitenews'])) {
 }
 
 
-$blogRenderer = new \Schoolbox\Blog\Search\Renderer($page, $result, $count, 0);
-$blogRenderer->render();
+$renderer = new \Schoolbox\Blog\Search\Renderer($page, $result, $count, 0);
+$renderer->render();
 
-// render wiki
-if (!empty($result['wiki'])) {
-    $page->setFile('wiki_t', 'resource/wiki/search/results.html');
-    $page->setBlock('wiki_t', 'wiki', 'wiki_block');
-    $page->setVar(array(
-            'WIKI_DISP_COUNT' => count($result['wiki']),
-            'WIKI_COUNT' => $count['wiki'],
-        ));
-
-    $userHandler = new User();
-
-    foreach ($result['wiki'] as $wiki) {
-        foreach ($categoryStd->breadcrumb($wiki['categoryID']) as $i => $breadcrumb) {
-            $wiki['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
-        }
-
-        $createdTime = new Alaress_Date_Relative($wiki['created']);
-
-        $page->setVar(array(
-                'WIKI_ID' => $wiki['wikiID'],
-                'WIKI_CID' => $wiki['categoryID'],
-                'WIKI_HEADING' => Scrub::text($wiki['heading']),
-                'WIKI_BODY' => TextFormatter::cutSentence(Scrub::html2text($wiki['body']), 150),
-                'WIKI_OWNER' => $wiki['userID'],
-                'WIKI_OWNER_NAME' => $userHandler->formatName($wiki),
-                'WIKI_CREATED' => $createdTime->getRelativeTime(),
-                'WIKI_BREADCRUMB' => $wiki['breadcrumb'],
-                'WIKI_COUNT' => $count['wiki'],
-                'WIKI_SLUG' => $wiki['slug'],
-            ));
-
-        $page->parse('wiki_block', 'wiki', true);
-    }
-
-    outputSeeMore($page, $type, $count, 'wiki');
-
-    $page->parse('RESULT', 'wiki_t', true);
-}
+$renderer = new \Schoolbox\Wiki\Search\Renderer($page, $result, $count, 0);
+$renderer->render();
 
 // render forum
 if (!empty($result['forum'])) {
