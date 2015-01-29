@@ -87,6 +87,8 @@ class Module extends BaseModule
     {
         // Inject the custom Meriden pastoral database connection too
         // a MSSQL connection should be a service?
+        $injector->params['Custom\\Meriden\\Pastoral\\Controller']['categoryMapper']
+            = $injector->lazyNew('Schoolbox\\Resource\\CategoryMapper');
         $injector->params['Custom\\Meriden\\Pastoral\\Controller']['database']
             = $injector->lazyNew('Custom\\Meriden\\Pastoral\\Query');
         $injector->params['Custom\\Meriden\\Pastoral\\Query']['database']
