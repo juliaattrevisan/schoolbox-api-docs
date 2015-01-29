@@ -248,7 +248,7 @@ if (!empty($result['file'])) {
 
 // render categories
 if (!empty($result['category'])) {
-    $page->setFile('category_t', 'search/category.html');
+    $page->setFile('category_t', 'resource/folder/search/results.html');
     $page->setBlock('category_t', 'category', 'category_block');
     $page->setBlock('category', 'modify', 'modify_block');
     $page->setVar(array(
