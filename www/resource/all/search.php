@@ -90,32 +90,24 @@ if (!empty($handle[$type])) {
     }
 }
 
-$renderer = new \Schoolbox\User\Search\Renderer($page, $result, $count, 0);
-$renderer->render();
+/* Dump them
+ */
+$oldHandlerRenderers = new \Schoolbox\Collection();
+$oldHandlerRenderers->setOffset('user', new \Schoolbox\User\Search\Renderer($page, $result, $count, 0));
+$oldHandlerRenderers->setOffset('file', new \Schoolbox\File\Search\Renderer($page, $result, $count, 0));
+$oldHandlerRenderers->setOffset('folder', new \Schoolbox\Folder\Search\Renderer($page, $result, $count, 0));
+$oldHandlerRenderers->setOffset('categorynews', new \Schoolbox\Folder\News\Search\Renderer($page, $result, $count, 0));
+$oldHandlerRenderers->setOffset('homepagenews', new \Schoolbox\News\Search\Renderer($page, $result, $count, 0));
+$oldHandlerRenderers->setOffset('blog', new \Schoolbox\Blog\Search\Renderer($page, $result, $count, 0));
+$oldHandlerRenderers->setOffset('wiki', new \Schoolbox\Wiki\Search\Renderer($page, $result, $count, 0));
+$oldHandlerRenderers->setOffset('forum', new \Schoolbox\Forum\Search\Renderer($page, $result, $count, 0));
+$oldHandlerRenderers->setOffset('event', new \Schoolbox\Calendar\Event\Search\Renderer($page, $result, $count, 0));
 
-$renderer = new \Schoolbox\File\Search\Renderer($page, $result, $count, 0);
-$renderer->render();
-
-$renderer = new \Schoolbox\Folder\Search\Renderer($page, $result, $count, 0);
-$renderer->render();
-
-$renderer = new \Schoolbox\Folder\News\Search\Renderer($page, $result, $count, 0);
-$renderer->render();
-
-$renderer = new \Schoolbox\News\Search\Renderer($page, $result, $count, 0);
-$renderer->render();
-
-$renderer = new \Schoolbox\Blog\Search\Renderer($page, $result, $count, 0);
-$renderer->render();
-
-$renderer = new \Schoolbox\Wiki\Search\Renderer($page, $result, $count, 0);
-$renderer->render();
-
-$renderer = new \Schoolbox\Forum\Search\Renderer($page, $result, $count, 0);
-$renderer->render();
-
-$renderer = new \Schoolbox\Calendar\Event\Search\Renderer($page, $result, $count, 0);
-$renderer->render();
+/* Draw them
+ */
+foreach($oldHandlerRenderers as $currentRenderer) {
+    $currentRenderer->render();
+}
 
 /* Omaha Beach
  *
@@ -124,11 +116,16 @@ $renderer->render();
 if (in_array($type, $omaha)) {
     $mapper->renderPagination($current_page);
 }
+
 /* Pagination
  *
  * If we have a search type and have results to display
  */
-else if ($result[$type] || $type == 'all') {
+else if ($oldHandlerRenderers->getOffset($type) instanceof Schoolbox\Resource\Search\Renderer\Handler) {
+    $renderer = $oldHandlerRenderers->getOffset($type);
+    $renderer->renderPagination();
+}
+else if ($type == 'all') {
 
     // clear count
     $page->setBlock('RESULT', 'count', 'count_block');
