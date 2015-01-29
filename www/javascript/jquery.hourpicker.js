@@ -11,12 +11,12 @@
  */
 (function($){
     $.fn.hourpicker = function(options) {
-
+        var leadingZero = options.leadingZero || false;
         // Default set of options
         var thisOptions = $.extend(
             {},
             {
-                timeFormat: "H",
+                timeFormat: leadingZero ? "H" : "G",
                 minTime: '00:00',
                 maxTime: '23:59',
                 step: 60
@@ -30,7 +30,7 @@
                 $.extend(
                     thisOptions,
                     {
-                        timeFormat: "h",
+                        timeFormat: leadingZero ? "h" : "g",
                         minTime: '01:00am',
                         maxTime: '12:59pm',
                     }
@@ -40,7 +40,7 @@
                 $.extend(
                     thisOptions,
                     {
-                        timeFormat: "H",
+                        timeFormat: leadingZero ? "H" : "G",
                         minTime: '00:00',
                         maxTime: '23:59',
                     }
@@ -48,6 +48,7 @@
                 break;
         }
         delete thisOptions.hours;
+        delete thisOptions.leadingZero;
 
         return this.timepicker(thisOptions);
     }
