@@ -554,4 +554,41 @@ class OnlineAssessmentMapper extends Mapper implements FeedableMapperInterface {
 		return $c;
 	}
 
+
+    /**
+     * @param int $identifierValue
+     * @throws Mapper\Exception
+     * @return OnlineAssessment
+     */
+    public function findById($identifierValue)
+    {
+        $stmt = $this->getDatabase()->prepare("
+            SELECT
+                {$this->getColumnString('a')},
+                {$this->getJoinColumnString('category', 'c')},
+                {$this->getJoinColumnString('work_type', 't')},
+                {$this->getJoinColumnString('user', 'u')}
+            FROM
+                `{$this->getTable()}` `a`
+                LEFT JOIN {$this->getJoinSql('category', 'a', 'c')}
+                LEFT JOIN {$this->getJoinSql('work_type', 'a', 't')}
+                LEFT JOIN {$this->getJoinSql('user', 'a', 'u')}
+            WHERE
+                `a`.assess_id = :id
+        ");
+
+        $stmt->execute(array('id' => $identifierValue));
+
+        if (!($record = $stmt->fetch(PDO::FETCH_ASSOC))) {
+            throw new Mapper\Exception("Instance of object not found");
+        }
+
+        $quiz = $this->hydrate($record, 'a');
+        $quiz->setCategory($this->hydrateJoin($record, 'category', 'c'));
+        $quiz->setWorkType($this->hydrateJoin($record, 'work_type', 't'));
+        $quiz->setUser($this->hydrateJoin($record, 'user', 'u'));
+
+        return $quiz;
+    }
+
 }
