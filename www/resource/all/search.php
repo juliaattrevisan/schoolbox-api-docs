@@ -412,7 +412,7 @@ if (!empty($result['blog'])) {
 
 // render wiki
 if (!empty($result['wiki'])) {
-    $page->setFile('wiki_t', 'search/wiki.html');
+    $page->setFile('wiki_t', 'resource/wiki/search/results.html');
     $page->setBlock('wiki_t', 'wiki', 'wiki_block');
     $page->setVar(array(
             'WIKI_DISP_COUNT' => count($result['wiki']),
