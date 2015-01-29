@@ -43,8 +43,11 @@ if (!empty($result['sitenews'])) {
         ));
 
     foreach ($result['sitenews'] as $news) {
+        $now = new Datetime();
+        $expiryDate = new DateTime($news['item_datetime_expires']);
+
         $tName = strtolower($news['topicName']);
-        $archived = (new DateTime() > new DateTime($news['item_datetime_expires']));
+        $archived = ($now->getTimestamp() > $expiryDate->getTimestamp());
         $news['breadcrumb'] = ($archived ? ' Archived' : 'Posted') . " in <a href=\"/news/" .
             ($archived ? 'archive/' : '') .
             "$tName\">".Scrub::text($news['topicName'])."</a>";
