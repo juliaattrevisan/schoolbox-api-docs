@@ -34,9 +34,9 @@ $count['all'] = array_sum($count);
 $result[$type] = $blogHandler->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type]);
 
 // render blog
-$blogRenderer = new \Schoolbox\Blog\Search\Renderer($page, $result, $count, $current_page);
-$blogRenderer->render();
-$blogRenderer->renderPagination();
+$renderer = new \Schoolbox\Blog\Search\Renderer($page, $result, $count, $current_page);
+$renderer->render();
+$renderer->renderPagination();
 
 // render final output
 $page->parse(TEMPLATE_body, 'RESULT', true);
