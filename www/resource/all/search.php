@@ -81,50 +81,9 @@ if (!empty($handle[$type])) {
 $renderer = new \Schoolbox\User\Search\Renderer($page, $result, $count, 0);
 $renderer->render();
 
-// render files
-if (!empty($result['file'])) {
-    $page->setFile('file_t', 'resource/file/search/results.html');
-    $page->setBlock('file_t', 'file', 'file_block');
-    $page->setBlock('file', 'modify', 'modify_block');
-    $page->setVar(array(
-            'FILE_DISP_COUNT' => count($result['file']),
-            'FILE_COUNT' => $count['file'],
-        ));
+$renderer = new \Schoolbox\File\Search\Renderer($page, $result, $count, 0);
+$renderer->render();
 
-    $userHandler = new User();
-
-    foreach ($result['file'] as $file) {
-        foreach ($categoryStd->breadcrumb($file['category']) as $i => $breadcrumb) {
-            $file['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
-        }
-
-        $createdTime = new Alaress_Date_Relative($file['submitted']);
-
-        $page->setVar(array(
-                'FILE_ID' => $file['id'],
-                'FILE_ICON' => $file['iconFile'],
-                'FILE_SIZE' => Alaress_Byte_Format::bytesToString($file['file_size']),
-                'FILE_DESCRIPTION' => Scrub::text($file['description']),
-                'FILE_COMMENT' => TextFormatter::cutSentence(Scrub::text($file['comment']), 150),
-                'FILE_OWNER' => $file['uid'],
-                'FILE_OWNER_NAME' => $userHandler->formatName($file),
-                'FILE_CREATED' => $createdTime->getRelativeTime(),
-                'FILE_BREADCRUMB' => $file['breadcrumb'],
-                'FILE_COUNT' => $count['file'],
-            ));
-
-        if ($file['perms_type'] < 2 && $file['userAccess_type'] < 2)
-            $page->setVar('modify_block');
-        else
-            $page->parse('modify_block', 'modify');
-
-        $page->parse('file_block', 'file', true);
-    }
-
-    outputSeeMore($page, $type, $count, 'file');
-
-    $page->parse('RESULT', 'file_t', true);
-}
 
 // render categories
 if (!empty($result['folder'])) {
