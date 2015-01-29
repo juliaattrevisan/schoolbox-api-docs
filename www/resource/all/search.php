@@ -105,7 +105,7 @@ $oldHandlerRenderers->setOffset('event', new \Schoolbox\Calendar\Event\Search\Re
 
 /* Draw them
  */
-foreach($oldHandlerRenderers as $currentRenderer) {
+foreach($oldHandlerRenderers as $type => $currentRenderer) {
     $currentRenderer->setUseSeymourLinks(true);
     $currentRenderer->render();
 }
