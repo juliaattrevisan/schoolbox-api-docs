@@ -1,15 +1,14 @@
 <?php
-
-/* An include
+/**
+ * An include
  *
  * Shared configs for Search
  */
-
-$page = new SitePage();
-
 define('MIN_KEYWORD_LENGTH', 2);
 define('AJAX_ENABLED', 1);
 define('AJAX_DISABLED', 0);
+
+$page = new SitePage();
 
 $handle = array(
     'user' => 'user',
