@@ -87,50 +87,8 @@ $renderer->render();
 $renderer = new \Schoolbox\Folder\Search\Renderer($page, $result, $count, 0);
 $renderer->render();
 
-// render homepage news
-if (!empty($result['homepagenews'])) {
-    $page->setFile('homepagenews_t', 'resource/homepagenews/search/results.html');
-    $page->setBlock('homepagenews_t', 'homepagenews', 'homepagenews_block');
-    $page->setVar(array(
-            'HOMEPAGE_NEWS_DISP_COUNT' => count($result['homepagenews']),
-            'HOMEPAGE_NEWS_COUNT' => $count['homepagenews'],
-        ));
-
-    foreach ($result['homepagenews'] as $news) {
-        foreach ($categoryStd->breadcrumb($news['code']) as $i => $breadcrumb) {
-            $news['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
-        }
-
-        if (new DateTime() > new DateTime($news['datetime_expires'])) {
-            $news['link'] = "/homepage/newsArchive/{$news['code']}#{$news['id']}";
-        } else {
-            $news['link'] = "/homepage/{$news['code']}#news-{$news['id']}";
-        }
-
-        $userHandler = new User();
-        $createdTime = new Alaress_Date_Relative($news['datetime_posted']);
-
-        $page->setVar(array(
-                'HOMEPAGENEWS_ID' => $news['id'],
-                'HOMEPAGENEWS_CODE' => $news['code'],
-                'HOMEPAGENEWS_LINK' => $news['link'],
-                'HOMEPAGENEWS_HEADING' => Scrub::text($news['heading']),
-                'HOMEPAGENEWS_BODY' => TextFormatter::cutSentence(Scrub::html2text($news['body']), 150),
-                'HOMEPAGENEWS_OWNER' => $news['uid'],
-                'HOMEPAGENEWS_OWNER_NAME' => $userHandler->formatName($news),
-                'HOMEPAGENEWS_CREATED' => $createdTime->getRelativeTime(),
-                'HOMEPAGENEWS_BREADCRUMB' => $news['breadcrumb'],
-                'HOMEPAGENEWS_COUNT' => $count['homepagenews'],
-            ));
-
-        $page->parse('homepagenews_block', 'homepagenews', true);
-    }
-
-    outputSeeMore($page, $type, $count, 'homepagenews');
-
-    $page->parse('RESULT', 'homepagenews_t', true);
-}
-
+$renderer = new \Schoolbox\Folder\News\Search\Renderer($page, $result, $count, 0);
+$renderer->render();
 
 $renderer = new \Schoolbox\News\Search\Renderer($page, $result, $count, 0);
 $renderer->render();
