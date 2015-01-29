@@ -132,51 +132,8 @@ if (!empty($result['homepagenews'])) {
 }
 
 
-// render school news
-if (!empty($result['sitenews'])) {
-    $page->setFile('sitenews_t', 'resource/sitenews/search/results.html');
-    $page->setBlock('sitenews_t', 'sitenews', 'sitenews_block');
-    $page->setVar(array(
-            'SITENEWS_DISP_COUNT' => count($result['news']),
-            'SITENEWS_COUNT' => $count['news'],
-        ));
-
-    foreach ($result['sitenews'] as $news) {
-        $now = new Datetime();
-        $expiryDate = new DateTime($news['item_datetime_expires']);
-
-        $tName = strtolower($news['topicName']);
-        $archived = ($now->getTimestamp() > $expiryDate->getTimestamp());
-        $news['breadcrumb'] = ($archived ? ' Archived' : 'Posted') . " in <a href=\"/news/" .
-            ($archived ? 'archive/' : '') .
-            "$tName\">".Scrub::text($news['topicName'])."</a>";
-
-        $news['link'] = "/news/item/{$news['item_id']}";
-
-        $userHandler = new User();
-        $createdTime = new Alaress_Date_Relative($news['item_datetime_posted']);
-
-        $page->setVar(array(
-                'SITENEWS_ID' => $news['item_id'],
-                'SITENEWS_CODE' => $news['code'],
-                'SITENEWS_LINK' => $news['link'],
-                'SITENEWS_HEADING' => Scrub::text($news['item_heading']),
-                'SITENEWS_BODY' => TextFormatter::cutSentence(Scrub::html2text($news['item_body']), 150),
-                'SITENEWS_OWNER' => $news['item_owner'],
-                'SITENEWS_OWNER_NAME' => $userHandler->formatName($news),
-                'SITENEWS_CREATED' => $createdTime->getRelativeTime(),
-                'SITENEWS_BREADCRUMB' => $news['breadcrumb'],
-                'SITENEWS_COUNT' => $count['news'],
-            ));
-
-        $page->parse('sitenews_block', 'sitenews', true);
-    }
-
-    outputSeeMore($page, $type, $count, 'sitenews');
-
-    $page->parse('RESULT', 'sitenews_t', true);
-}
-
+$renderer = new \Schoolbox\News\Search\Renderer($page, $result, $count, 0);
+$renderer->render();
 
 $renderer = new \Schoolbox\Blog\Search\Renderer($page, $result, $count, 0);
 $renderer->render();
