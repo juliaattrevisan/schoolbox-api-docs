@@ -67,8 +67,13 @@ if ($type == 'all') {
 }
 
 /* These are old handlers
+ *
  * Once you convert them to Mappers, remove their renderer, and remove them
  * from the searchConfig lists.
+ *
+ * Note that once you convert all to Mappers, you'll have more freedom in
+ * choozing where their respective html files shall live. At the moment they
+ * are tied in to the keys in the array, which really isn't nice.
  */
 if (!empty($handle[$type])) {
     // include & instantiate
