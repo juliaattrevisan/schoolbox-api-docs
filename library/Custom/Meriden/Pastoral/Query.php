@@ -594,6 +594,31 @@ class Query
     }
 
     /**
+     * Gets the (current or archived) folder for this subject code,
+     * or an empty one if not found.
+     *
+     * @param $subjectCode
+     *
+     * @return Category
+     */
+    public function getFolder($subjectCode)
+    {
+        try {
+            return $this->getCategoryMapper()->findByCode($subjectCode);
+        } catch (MapperException $e) {
+            // This folder might have been rolled over.
+            // Multiple rolled-over categories with this code could exist,
+            // get the one that has the requested student in it.
+            // To do this, every matching category has to be checked.
+            try {
+                return $this->getCategoryMapper()->findByArchivedCode($subjectCode);
+            } catch (MapperException $e) {
+                return new Category();
+            }
+        }
+    }
+
+    /**
      * @return MSSQL
      */
     public function getDatabase()
