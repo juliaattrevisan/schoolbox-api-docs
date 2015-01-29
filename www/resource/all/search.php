@@ -329,7 +329,7 @@ if (!empty($result['homepagenews'])) {
 
 // render school news
 if (!empty($result['sitenews'])) {
-    $page->setFile('sitenews_t', 'search/sitenews.html');
+    $page->setFile('sitenews_t', 'resource/sitenews/search/results.html');
     $page->setBlock('sitenews_t', 'sitenews', 'sitenews_block');
     $page->setVar(array(
             'SITENEWS_DISP_COUNT' => count($result['news']),
