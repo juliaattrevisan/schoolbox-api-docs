@@ -173,6 +173,9 @@ class External_Tass_Timetable implements External_TimetableInterface
 
     function getDayTimetable($synergy_id, $userID, $campus, $daynumber)
     {
+        if (empty($synergy_id)) {
+            return array();
+        }
         $timetabledef = $this->getTimetableDefinition($campus, $daynumber);
 
         if ($this->groupHandler->isStudent($userID)) {
@@ -235,7 +238,9 @@ class External_Tass_Timetable implements External_TimetableInterface
 
     function getFullTimetable($synergy_id, $userID, $campus)
     {
-
+        if (empty($synergy_id)) {
+            return array();
+        }
         $timetabledef = $this->getTimetableDefinition($campus);
 
         if ($this->groupHandler->isStudent($userID)) {
@@ -297,6 +302,9 @@ class External_Tass_Timetable implements External_TimetableInterface
 
     function getDaySubjects($synergy_id, $daynum)
     {
+        if (empty($synergy_id)) {
+            return array();
+        }
         $query = "SELECT Timetable.Room, SubjectClasses.Description,
                          Timetable.PeriodNumber, Timetable.ClassCode, SubjectClasses.ClassCampus
                          FROM SynergyOne.dbo.SubjectClasses SubjectClasses, SynergyOne.dbo.Timetable Timetable

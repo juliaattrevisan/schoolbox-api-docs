@@ -168,6 +168,9 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
     public function getFullTimetable($externalUserId, $userId, $campusId)
     {
+        if (empty($externalUserId)) {
+            return array();
+        }
         /* Get current campus timetable */
         $periodStatement = $this->getPeriodStatement(false);
         $periodStatement->execute(
@@ -226,6 +229,9 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
     public function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber)
     {
+        if (empty($externalUserId)) {
+            return array();
+        }
         /* Get current campus timetable */
         $periodStatement = $this->getPeriodStatement(true);
         $periodStatement->execute(

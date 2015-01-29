@@ -126,8 +126,7 @@ class External_Maze_Timetable implements External_TimetableInterface
                 /* Day-specific e.g. for Dashboard
                  */
                 if (!$day || "Day {$day}" == $definition[$dayTempKey]) {
-
-                    /* TH_RLABEL01, TH_RLABEL02...TH_RLABEL13
+/* TH_RLABEL01, TH_RLABEL02...TH_RLABEL13
                      */
                     $periodTempKey = $this->getTimetablePeriodLabel($i);
 
@@ -236,6 +235,9 @@ class External_Maze_Timetable implements External_TimetableInterface
      */
     public function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber)
     {
+        if (empty($externalUserId)) {
+            return array();
+        }
         if ($this->getGroupHandler()->isStudent($userId)) {
             return $this->getStudentTimetable($externalUserId, $dayNumber);
         } else {
@@ -529,6 +531,9 @@ class External_Maze_Timetable implements External_TimetableInterface
      */
     public function getFullTimetable($externalUserId, $userId, $campusId)
     {
+        if (empty($externalUserId)) {
+            return array();
+        }
         $timetable = array();
         $allDayTimetables = array();
 
