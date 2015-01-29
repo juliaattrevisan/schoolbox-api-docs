@@ -1,0 +1,245 @@
+<?php
+/**
+ * Renderer
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Schoolbox\Resource\Search\Renderer;
+
+
+abstract class Handler {
+
+    /**
+     * A sitepage
+     *
+     * @var null
+     */
+    protected $page = null;
+
+    /**
+     * The 2RS nightmare array
+     *
+     * @var array
+     */
+    protected $result = array();
+
+    /**
+     * The even-more-nightmarish global count array
+     *
+     * @param $page
+     * @param $result
+     * @param $count
+     */
+    protected $count = array();
+
+    /**
+     * Type (e.g. 'link', 'blog', etc)
+     *
+     * @var string
+     */
+    protected $type = '';
+
+    /**
+     * Current page number
+     *
+     * @var int
+     */
+    protected $currentPage = 0;
+
+    /**
+     * Constructor
+     *
+     * @param $page a site page
+     * @param array $result Equivalent of $result['blog'] etc.
+     * @param array $count Equivalent of $count['blog'] etc.
+     * @param $currentPage
+     */
+    public function __construct($page, $result, $count, $currentPage) {
+        $this->setPage($page);
+        $this->setResult($result);
+        $this->setCount($count);
+    }
+
+    /**
+     * Get count
+     *
+     * Augmented getter
+     *
+     * @param null $type
+     * @return mixed
+     */
+    public function getCount($type = null)
+    {
+        if ($type !== null) {
+            return $this->count[$type];
+        }
+
+        return $this->count;
+    }
+
+    /**
+     * Get result
+     *
+     * Augmented getter
+     *
+     * @param null $type
+     * @return array
+     */
+    protected function getResult($type = null)
+    {
+        if ($type !== null) {
+            return $this->result[$type];
+        }
+        return $this->result;
+    }
+
+    /**
+     * Render pagination
+     *
+     * Shared among all the handlers
+     */
+    public function renderPagination() {
+        // clear count
+        $this->getPage()->setBlock('RESULT', 'count', 'count_block');
+        $this->getPage()->setVar('count_block');
+
+        // render pagination
+        $this->getPage()->setBlock('RESULT', 'pagination', 'pagination_block');
+
+        $number_pages = ceil($this->getCount($this->getType()) / \Cfg::get('search_type_limit'));
+
+        if ($number_pages > 1) {
+            if (($this->getCurrentPage() - 5) <= 1) {
+                $start_window = 1;
+                $end_window = $number_pages > 10 ? 10 : $number_pages;
+            } elseif (($this->getCurrentPage() + 5) >= $number_pages) {
+                $start_window = $number_pages - 10;
+                $end_window = $number_pages;
+            } else {
+                $start_window = $this->getCurrentPage() - 5;
+                $end_window = $this->getCurrentPage() + 5;
+            }
+            //
+            // Limit start and end (start can't be < 1, end can't be > num pages)
+            $start_window = max($start_window, 1);
+            $end_window   = min($end_window, $number_pages);
+
+            $this->getPage()->setVar(array(
+                    'PAGE_NAME' => '<',
+                    'PAGE_NUMBER' => '1',
+                    'PAGE_CLASS' => '',
+                ));
+
+            $this->getPage()->parse('pagination_block', 'pagination', true);
+
+            for ($i = $start_window; $i <= $end_window; $i++) {
+                $this->getPage()->setVar(array(
+                        'PAGE_NAME' => $i,
+                        'PAGE_NUMBER' => $i,
+                        'PAGE_CLASS' => $i == $this->getCurrentPage() ? 'current' : '',
+                    ));
+
+                $this->getPage()->parse('pagination_block', 'pagination', true);
+            }
+
+            $this->getPage()->setVar(array(
+                    'PAGE_NAME' => '>',
+                    'PAGE_NUMBER' => $number_pages,
+                    'PAGE_CLASS' => '',
+                ));
+
+            $this->getPage()->parse('pagination_block', 'pagination', true);
+
+            // only 1 page to display
+        } else {
+            $this->getPage()->setVar('pagination_block');
+        }
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Set type
+     *
+     * @param string $type
+     */
+    protected function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * Get type
+     *
+     * @return string
+     */
+    protected function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Set count
+     *
+     * @param mixed $count
+     */
+    protected function setCount($count)
+    {
+        $this->count = $count;
+    }
+
+    /**
+     * Set page
+     *
+     * @param null $page
+     */
+    protected function setPage($page)
+    {
+        $this->page = $page;
+    }
+
+    /**
+     * Get page
+     *
+     * @return null
+     */
+    protected function getPage()
+    {
+        return $this->page;
+    }
+
+    /**
+     * Set result
+     *
+     * @param array $result
+     */
+    protected function setResult($result)
+    {
+        $this->result = $result;
+    }
+
+    /**
+     * Set current page
+     *
+     * @param int $currentPage
+     */
+    protected function setCurrentPage($currentPage)
+    {
+        $this->currentPage = $currentPage;
+    }
+
+    /**
+     * Get current page
+     *
+     * @return int
+     */
+    protected function getCurrentPage()
+    {
+        return $this->currentPage;
+    }
+}

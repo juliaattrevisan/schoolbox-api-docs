@@ -373,42 +373,8 @@ if (!empty($result['sitenews'])) {
 }
 
 
-// render blog
-if (!empty($result['blog'])) {
-    $page->setFile('blog_t', 'resource/blog/search/results.html');
-    $page->setBlock('blog_t', 'blog', 'blog_block');
-    $page->setVar(array(
-            'BLOG_DISP_COUNT' => count($result['blog']),
-            'BLOG_COUNT' => $count['blog'],
-        ));
-
-    $userHandler = new User();
-
-    foreach ($result['blog'] as $blog) {
-        foreach ($categoryStd->breadcrumb($blog['cid']) as $i => $breadcrumb) {
-            $blog['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
-        }
-
-        $createdTime = new Alaress_Date_Relative($blog['created']);
-
-        $page->setVar(array(
-                'BLOG_CID' => $blog['cid'],
-                'BLOG_HEADING' => Scrub::text($blog['heading']),
-                'BLOG_BODY' => TextFormatter::cutSentence(Scrub::html2text($blog['body']), 150),
-                'BLOG_OWNER' => $blog['uid'],
-                'BLOG_OWNER_NAME' => $userHandler->formatName($blog),
-                'BLOG_CREATED' => $createdTime->getRelativeTime(),
-                'BLOG_BREADCRUMB' => $blog['breadcrumb'],
-                'BLOG_COUNT' => $count['blog'],
-            ));
-
-        $page->parse('blog_block', 'blog', true);
-    }
-
-    outputSeeMore($page, $type, $count, 'blog');
-
-    $page->parse('RESULT', 'blog_t', true);
-}
+$blogRenderer = new \Schoolbox\Blog\Search\Renderer($page, $result, $count, 0);
+$blogRenderer->render();
 
 // render wiki
 if (!empty($result['wiki'])) {
