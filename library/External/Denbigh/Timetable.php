@@ -132,7 +132,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
                 'periodStart'    => '',
                 'periodEnd'      => '',
                 'periodSequence' => '1',
-                'day'            => array()
+                'day'            => array_fill(1, $definition['dayCount'], array()),
             );
         }
 
