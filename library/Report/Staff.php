@@ -63,69 +63,58 @@ class Report_Staff extends Report_Abstract
     }
 
     /**
+     * Merge staff records method, used as an array_reduce() callback to merge
+     * job position descriptions.
+     *
+     * @param $mergedRecords
+     * @param $record
+     *
+     * @return array
+     */
+    protected function mergeStaffRecords($mergedRecords, $record)
+    {
+        $staffId = $record['StaffID'];
+        if (!array_key_exists($staffId, $mergedRecords)) {
+            $mergedRecords[$staffId] = $record;
+            $mergedRecords[$staffId]['JobPositionDescription'] = array();
+        }
+        $mergedRecords[$staffId]['JobPositionDescription'][] = $record['JobPositionDescription'];
+        return $mergedRecords;
+    }
+
+    /**
      * Render data
      */
     public function render()
     {
-        $allStaff = $this->getAllRecords();
+        // Agglutinate multiple JobPositionDescription
+        $allStaff = array_reduce(
+            $this->getAllRecords(),
+            array($this, 'mergeStaffRecords'),
+            array()
+        );
 
         if (is_array($allStaff) && count($allStaff)) {
-            $jobPositionDescription = array();
-            $previousStaff = null;
-
-            /* Agglutinate multiple JobPositionDescription
-             */
             foreach ($allStaff as $currentStaff) {
-                $jobPositionDescription[] = $previousStaff['JobPositionDescription'];
-
-                if ($previousStaff['StaffID'] != $currentStaff['StaffID']) {
-                    if ($previousStaff != null) {
-                        $this->getPage()->setVar(
-                            array(
-                                'STAFF_STAFFID'    => $previousStaff['StaffID'],
-                                'STAFF_STAFFCODE'  => $previousStaff['SchoolStaffCode'],
-                                'STAFF_TITLE'      => $previousStaff['StaffTitle'],
-                                'STAFF_FIRSTNAME'  => $previousStaff['StaffPreferredName'],
-                                'STAFF_SURNAME'    => $previousStaff['StaffSurname'],
-                                'STAFF_ROLE'       => implode(', ', $jobPositionDescription),
-                                'STAFF_DEPARTMENT' => $previousStaff['StaffDepartmentDescription'],
-                                'STAFF_CAMPUS'     => $previousStaff['StaffCampusDescription'],
-                                'STAFF_EXTENSION'  => $previousStaff['StaffExtension'],
-                                'STAFF_MOBILE'     => $previousStaff['StaffDefaultMobilePhone'],
-                                'STAFF_VOICEMAIL'  => $previousStaff['StaffVoiceMail'],
-                                'STAFF_PHONE'      => $previousStaff['StaffOccupPhone'],
-                                'STAFF_EMAIL'      => $previousStaff['StaffOccupEmail'],
-                            )
-                        );
-
-                        $this->getPage()->parse('staff_block', 'staff', true);
-                    }
-
-                    $jobPositionDescription = array();
-                }
-
-                $previousStaff = $currentStaff;
+                $this->getPage()->setVar(
+                    array(
+                        'STAFF_STAFFID'    => $currentStaff['StaffID'],
+                        'STAFF_STAFFCODE'  => $currentStaff['SchoolStaffCode'],
+                        'STAFF_TITLE'      => $currentStaff['StaffTitle'],
+                        'STAFF_FIRSTNAME'  => $currentStaff['StaffPreferredName'],
+                        'STAFF_SURNAME'    => $currentStaff['StaffSurname'],
+                        'STAFF_ROLE'       => implode(', ', $currentStaff['JobPositionDescription']),
+                        'STAFF_DEPARTMENT' => $currentStaff['StaffDepartmentDescription'],
+                        'STAFF_CAMPUS'     => $currentStaff['StaffCampusDescription'],
+                        'STAFF_EXTENSION'  => $currentStaff['StaffExtension'],
+                        'STAFF_MOBILE'     => $currentStaff['StaffDefaultMobilePhone'],
+                        'STAFF_VOICEMAIL'  => $currentStaff['StaffVoiceMail'],
+                        'STAFF_PHONE'      => $currentStaff['StaffOccupPhone'],
+                        'STAFF_EMAIL'      => $currentStaff['StaffOccupEmail'],
+                    )
+                );
+                $this->getPage()->parse('staff_block', 'staff', true);
             }
-//
-            /* Last person
-             */
-            $this->getPage()->setVar(
-                array(
-                    'STAFF_STAFFID'    => $currentStaff['StaffID'],
-                    'STAFF_STAFFCODE'  => $currentStaff['SchoolStaffCode'],
-                    'STAFF_TITLE'      => $currentStaff['StaffTitle'],
-                    'STAFF_FIRSTNAME'  => $currentStaff['StaffPreferredName'],
-                    'STAFF_SURNAME'    => $currentStaff['StaffSurname'],
-                    'STAFF_ROLE'       => implode(',', $jobPositionDescription),
-                    'STAFF_DEPARTMENT' => $currentStaff['StaffDepartment'],
-                    'STAFF_CAMPUS'     => $currentStaff['StaffCampusDescription'],
-                    'STAFF_EXTENSION'  => $currentStaff['StaffExtension'],
-                    'STAFF_PHONE'      => $currentStaff['StaffOccupPhone'],
-                    'STAFF_EMAIL'      => $currentStaff['StaffOccupEmail'],
-                )
-            );
-
-            $this->getPage()->parse('staff_block', 'staff', true);
         }
     }
 
