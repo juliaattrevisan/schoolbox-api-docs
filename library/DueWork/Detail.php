@@ -88,7 +88,7 @@ class DueWork_Detail
                 } // only use the first if this is a single-submit box
                 else {
                     if ($this->getSubmissionType() == self::ACCEPT_SINGLE) {
-                        $insertion['submissions']    = $submissions[0];
+                        $insertion['submissions']    = array($submissions[0]);
                         $insertion['user']['status'] = self::SUBMITTED;
                     } else {
                         $insertion['submissions'] = array($submissions[0]);
