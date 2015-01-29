@@ -451,7 +451,7 @@ if (!empty($result['wiki'])) {
 
 // render forum
 if (!empty($result['forum'])) {
-    $page->setFile('forum_t', 'search/forum.html');
+    $page->setFile('forum_t', 'resource/forum/search/results.html');
     $page->setBlock('forum_t', 'forum', 'forum_block');
     $page->setVar(array(
             'FORUM_DISP_COUNT' => count($result['forum']),
