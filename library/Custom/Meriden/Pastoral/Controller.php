@@ -10,7 +10,6 @@
 namespace Custom\Meriden\Pastoral;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\User;
 
 class Controller extends Base
@@ -21,19 +20,13 @@ class Controller extends Base
     protected $database;
 
     /**
-     * @var CategoryMapper
-     */
-    protected $categoryMapper;
-
-    /**
      * Constructor
      *
      * @param Query $database
-     * @param CategoryMapper $categoryMapper
      */
-    public function __construct(Query $database, CategoryMapper $categoryMapper)
+    public function __construct(Query $database)
     {
-        $this->setDatabase($database)->setCategoryMapper($categoryMapper);
+        $this->setDatabase($database);
     }
 
     /**
@@ -151,25 +144,6 @@ class Controller extends Base
     public function setDatabase($database)
     {
         $this->database = $database;
-        return $this;
-    }
-
-    /**
-     * @return CategoryMapper
-     */
-    public function getCategoryMapper()
-    {
-        return $this->categoryMapper;
-    }
-
-    /**
-     * @param  CategoryMapper $categoryMapper
-     *
-     * @return $this
-     */
-    public function setCategoryMapper($categoryMapper)
-    {
-        $this->categoryMapper = $categoryMapper;
         return $this;
     }
 }
