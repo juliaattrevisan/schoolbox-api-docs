@@ -379,42 +379,8 @@ $renderer->render();
 $renderer = new \Schoolbox\Wiki\Search\Renderer($page, $result, $count, 0);
 $renderer->render();
 
-// render forum
-if (!empty($result['forum'])) {
-    $page->setFile('forum_t', 'resource/forum/search/results.html');
-    $page->setBlock('forum_t', 'forum', 'forum_block');
-    $page->setVar(array(
-            'FORUM_DISP_COUNT' => count($result['forum']),
-            'FORUM_COUNT' => $count['forum'],
-        ));
-
-    $userHandler = new User();
-
-    foreach ($result['forum'] as $forum) {
-        foreach ($categoryStd->breadcrumb($forum['categoryID']) as $i => $breadcrumb) {
-            $forum['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
-        }
-
-        $createdTime = new Alaress_Date_Relative($forum['date']);
-
-        $page->setVar(array(
-                'FORUM_CID' => $forum['categoryID'],
-                'FORUM_THREADID' => $forum['threadID'],
-                'FORUM_TITLE' => Scrub::text($forum['threadTitle']),
-                'FORUM_BODY' => TextFormatter::cutSentence(Scrub::html2text($forum['body']), 150),
-                'FORUM_OWNER' => $forum['uid'],
-                'FORUM_OWNER_NAME' => $userHandler->formatName($forum),
-                'FORUM_CREATED' => $createdTime->getRelativeTime(),
-                'FORUM_BREADCRUMB' => $forum['breadcrumb'],
-            ));
-
-        $page->parse('forum_block', 'forum', true);
-    }
-
-    outputSeeMore($page, $type, $count, 'forum');
-
-    $page->parse('RESULT', 'forum_t', true);
-}
+$renderer = new \Schoolbox\Forum\Search\Renderer($page, $result, $count, 0);
+$renderer->render();
 
 // render event
 if (!empty($result['event'])) {
