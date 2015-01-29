@@ -24,23 +24,23 @@ $.fn.greenerize = function(options) {
     this.each(function() {
         var self = $(this);
         if (settings.applyClasses) {
-            self.find(':checkbox').each(function () {
-                if ($(this).is(':checked')) {
-                    $(this).parent().addClass('active-checkbox');
-                }
-            });
-
-            this.find(':checkbox').click(function () {
-                if ($(this).parent().hasClass('active-checkbox')) {
-                    $(this).parent().removeClass('active-checkbox')
-                    if ($(this).closest('.checkboxes').find('.select_all').is(':checked')) {
-                        $(this).closest('.checkboxes').find('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
+            self.find(':checkbox')
+                .each(function () {
+                    if ($(this).is(':checked')) {
+                        $(this).parent().addClass('active-checkbox');
                     }
-                }
-                else {
-                    $(this).parent().addClass('active-checkbox');
-                }
-            });
+                })
+                .click(function () {
+                    if ($(this).parent().hasClass('active-checkbox')) {
+                        $(this).parent().removeClass('active-checkbox')
+                        if ($(this).closest('.checkboxes').find('.select_all').is(':checked')) {
+                            $(this).closest('.checkboxes').find('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
+                        }
+                    }
+                    else {
+                        $(this).parent().addClass('active-checkbox');
+                    }
+                });
         }
 
         self.find('.select_all').change(function(){
