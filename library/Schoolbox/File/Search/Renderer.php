@@ -71,7 +71,7 @@ class Renderer extends Handler {
                 $this->getPage()->parse('file_block', 'file', true);
             }
 
-            $this->outputSeeMore($this->getPage(), $this->getType(), $this->getCount(), 'file');
+            $this->outputSeeMore('file');
 
             $this->getPage()->parse('RESULT', 'file_t', true);
         }

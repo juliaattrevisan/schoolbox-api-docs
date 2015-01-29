@@ -171,20 +171,23 @@ abstract class Handler {
     /**
      * Provide a Seymour link
      *
-     * @param $page
-     * @param $type
-     * @param $count
+     * This is optionally disabled. Renderer instantiation is mutable.
+     *
      * @param $handle
      */
-    protected function outputSeeMore($page, $type, $count, $handle)
+    protected function outputSeeMore($handle)
     {
-        $page->setBlock($handle . '_t', 'see_more', 'see_more_block');
+        $this->getPage()->setBlock($handle . '_t', 'see_more', 'see_more_block');
 
-        if ($count[$type] > \Cfg::get('search_all_limit')) {
-            $page->setVar('MORE_COUNT', $count[$type]);
-            $page->parse('see_more_block', 'see_more');
-        } else {
-            $page->setVar('see_more_block', '');
+        if ($this->getUseSeymourLinks() && ($this->getCount($this->getType()) > \Cfg::get('search_all_limit'))) {
+            $this->getPage()->setVar(array(
+                'MORE_COUNT' => $this->getCount($this->getType())
+            ));
+
+            $this->getPage()->parse('see_more_block', 'see_more');
+        }
+        else {
+            $this->getPage()->setVar('see_more_block', '');
         }
     }
 

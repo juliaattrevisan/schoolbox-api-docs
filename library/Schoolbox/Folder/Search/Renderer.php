@@ -61,7 +61,7 @@ class Renderer extends Handler {
                 $this->getPage()->parse('category_block', 'category', true);
             }
 
-            $this->outputSeeMore($this->getPage(), $this->getType(), $this->getCount(), 'category');
+            $this->outputSeeMore('category');
 
             $this->getPage()->parse('RESULT', 'category_t', true);
         }

@@ -74,7 +74,7 @@ class Renderer extends Handler {
                 $this->getPage()->parse('homepagenews_block', 'homepagenews', true);
             }
 
-            $this->outputSeeMore($this->getPage(), $this->getType(), $this->getCount(), 'homepagenews');
+            $this->outputSeeMore('homepagenews');
 
             $this->getPage()->parse('RESULT', 'homepagenews_t', true);
         }
