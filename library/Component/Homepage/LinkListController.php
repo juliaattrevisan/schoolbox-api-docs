@@ -1,7 +1,6 @@
 <?php
 
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -31,7 +30,9 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
     private $categoryMapper = null;
 
     /**
-     * @var array
+     * The category to show links in
+     *
+     * @var Schoolbox\Resource\Category
      */
     private $source;
 
@@ -44,6 +45,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
 
     /**
      * Prepares data for the render function. Business logic.
+     *
      * @return void
      */
     public function execute()
@@ -55,7 +57,9 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         try {
             // remove any non-numeric values from the source config
             $this->source = $this->getCategoryMapper()->findById(
-                $this->getConfig('src') ? preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) : $this->getContext('id')
+                $this->getConfig('src')
+                    ? preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src'))
+                    : $this->getContext('id')
             );
         } catch (\Exception $e) {
             $this->source = $this->getCategoryMapper()->findById($this->getContext('id'));
@@ -64,7 +68,9 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
 
     /**
      * Renders the data into the SitePage. Presentation logic.
+     *
      * @param String $templateHandle
+     *
      * @return boolean
      */
     public function renderTemplate($templateHandle)
@@ -84,9 +90,13 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             array(
                 // These are for the Select Alternate Source resourcebrowser
                 'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
-                'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext('id') ? 'Local' : $this->source->getName(),
+                'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext('id')
+                    ? 'Local'
+                    : $this->source->getName(),
                 'LINK_CATEGORY_ID'          => $this->source->getId(),
-                'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'News',
+                'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname')))
+                    ? $this->getConfig('componentname')
+                    : 'News',
             )
         );
 
@@ -94,8 +104,10 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         $this->setBlock($templateHandle, 'link', 'link_block');
         $this->setBlock('link', 'modify_link', 'modify_link_block');
 
+        /** @var Schoolbox\Resource\Link[] $allLinks */
         $allLinks = $this->getLinkMapper()->findAllInCategory(
-            $this->source, array(
+            $this->source,
+            array(
                 'size'    => $this->getConfig('size'),
                 'sort'    => $this->getConfig('sort'),
                 'sortdir' => $this->getConfig('sortdir'),
@@ -107,6 +119,9 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         $j = 0;
 
         foreach ($allLinks as $currentLink) {
+            if ($currentLink->getHidden() && $this->permission < WRITE_ACCESS) {
+                continue;
+            }
             $this->setVar(
                 array(
                     'LINK_ID'           => $currentLink->getId(),

@@ -6,7 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_NewsController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_NewsController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * @var Group
@@ -33,7 +34,8 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
         $this->groupHandler = new Group();
         $this->newsHandler = new CategoryNews();
         $this->catHandler = new Category();
@@ -41,13 +43,13 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
         // remove any non-numeric values from the source config
         $this->source = $this->catHandler->getByID(
             $this->getConfig('src') ?
-                preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
-                $this->getContext('id')
+            preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
+            $this->getContext('id')
         );
 
-	    if($this->source === false) {
-		    $this->source = $this->catHandler->getByID($this->getContext('id'));
-	    }
+        if ($this->source === false) {
+            $this->source = $this->catHandler->getByID($this->getContext('id'));
+        }
     }
 
     /**
@@ -55,18 +57,19 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
         if (!parent::loadTemplate($templateHandle, 'news')) {
             return false;
         }
 
         $this->parseConfig();
 
-	    if($this->permission < READ_ACCESS) {
-		    return false;
-	    }
+        if ($this->permission < READ_ACCESS) {
+            return false;
+        }
 
-	    $this->setBlock($templateHandle, 'news', 'news_block');
+        $this->setBlock($templateHandle, 'news', 'news_block');
         $this->setBlock($templateHandle, "submit_news", "submit_news_block");
         $this->setBlock('news', "has_publish_date", "has_publish_date_block");
 
@@ -104,7 +107,8 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
 
             case READ_ACCESS:
                 $newsList = $this->newsHandler->getAllForCategory(
-                    $this->source['id'], array('size' => $this->getConfig('size'))
+                    $this->source['id'],
+                    array('size' => $this->getConfig('size'))
                 );
                 break;
 
@@ -120,6 +124,10 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
 
             $j = 0;
             foreach ($newsList as $news) {
+                // Student view: don't show unpublished even if I created it
+                if ($newsPermission < WRITE_ACCESS && $news['published'] > $_SERVER['REQUEST_TIME']) {
+                    continue;
+                }
                 // news_edit_other allows users with write access to edit other's news
                 if ($news['owner'] == $_SESSION['id']
                     || $this->permission >= FULL_ACCESS
@@ -127,7 +135,9 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
                 ) {
                     $this->setVar(
                         'MOD_NEWS',
-                        '<a class="btn no-text modify" href="/news/homepage/' . $news['id'] . '" title="Modify News"><span></span></a>'
+                        '<a class="btn no-text modify" href="/news/homepage/'
+                        . $news['id']
+                        . '" title="Modify News"><span></span></a>'
                     );
                 } else {
                     $this->setVar('MOD_NEWS', '');
@@ -140,9 +150,9 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
                         "NEWS_ID" => $news['id'],
                         "NEWS_HEADING" => Scrub::text($news['heading']),
                         "NEWS_BODY" => Scrub::html($news['body']),
-                        "EMAIL_CONTACT" => "<a href=\"/search/user/{$news['uid']}\">" . $userHandler->formatName(
-                            $news
-                        ) . "</a>",
+                        "EMAIL_CONTACT" => "<a href=\"/search/user/{$news['uid']}\">"
+                            . $userHandler->formatName($news)
+                            . "</a>",
                         "AUTHOR" => $userHandler->formatName($news),
                         "AUTHOR_ID" => $news['uid'],
                         "AUTHOR_EXTERNAL_ID" => $news['synid'],
@@ -164,13 +174,11 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
                         );
 
                         $this->parse('has_publish_date_block', 'has_publish_date');
-                    }
-                    else {
+                    } else {
                         $this->setVar('has_publish_date_block', '');
                     }
 
-                }
-                else {
+                } else {
                     $this->setVar('has_publish_date_block', '');
                 }
 
@@ -181,5 +189,4 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
         return true;
 
     }
-
 }
