@@ -410,7 +410,15 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
     public function findByCode($code)
     {
         $query = $this->getFindQuery();
-        $query .= 'WHERE c.deleted_at IS NULL AND cc.code=:code OR cc.code LIKE :codeLike';
+        // Retrieve all codes for category, not just $code
+        $query .= "
+            WHERE c.deleted_at IS NULL
+            AND c.id IN (
+                SELECT cj.categoryID FROM {$this->getJoinMapper('codes')->getTable()} cj
+                WHERE cj.deleted_at IS NULL
+                AND (cj.code=:code OR cj.code LIKE :codeLike)
+            )
+        ";
         $statement = $this->database->prepare($query);
         $statement->execute(
             array(
