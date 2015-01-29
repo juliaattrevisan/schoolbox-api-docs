@@ -189,6 +189,9 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
         $classList = $classStatement->fetchAll(PDO::FETCH_ASSOC);
 
+        $timetableDefinition = $this->getTimetableDefinition($campusId);
+        $dayCount            = $timetableDefinition['dayCount'];
+
         $periodListAdaption = array();
 
         foreach ($periodList as $period) {
@@ -201,7 +204,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                     'periodStart'    => $period['start'],
                     'periodEnd'      => $period['finish'],
                     'periodSequence' => 1,
-                    'day'            => array()
+                    'day'            => array_fill(1, $dayCount, array()),
                 );
             }
 
