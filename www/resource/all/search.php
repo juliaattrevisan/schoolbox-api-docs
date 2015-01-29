@@ -84,42 +84,8 @@ $renderer->render();
 $renderer = new \Schoolbox\File\Search\Renderer($page, $result, $count, 0);
 $renderer->render();
 
-
-// render categories
-if (!empty($result['folder'])) {
-    $page->setFile('category_t', 'resource/folder/search/results.html');
-    $page->setBlock('category_t', 'category', 'category_block');
-    $page->setBlock('category', 'modify', 'modify_block');
-    $page->setVar(array(
-            'CATEGORY_DISP_COUNT' => count($result['category']),
-            'CATEGORY_COUNT' => $count['category'],
-        ));
-
-    foreach ($result['category'] as $category) {
-        foreach ($categoryStd->breadcrumb($category['id']) as $i => $breadcrumb)
-            $category['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
-
-        $page->setVar(array(
-                'CATEGORY_ID' => $category['id'],
-                'CATEGORY_NAME' => $category['code'] ? Scrub::text($category['name']) . '(' . $category['code'] . ')' : Scrub::text($category['name']),
-                'CATEGORY_CODE' => $category['code'],
-                'CATEGORY_BREADCRUMB' => $category['breadcrumb'],
-                'CATEGORY_COUNT' => $count['category'],
-                'CATEGORY_TYPE' => ($category['template'] ? 'home' : 'folder'),
-            ));
-
-        if ($category['perms_type'] < 2 && $category['userAccess_type'] < 2)
-            $page->setVar('modify_block');
-        else
-            $page->parse('modify_block', 'modify');
-
-        $page->parse('category_block', 'category', true);
-    }
-
-    outputSeeMore($page, $type, $count, 'category');
-
-    $page->parse('RESULT', 'category_t', true);
-}
+$renderer = new \Schoolbox\Folder\Search\Renderer($page, $result, $count, 0);
+$renderer->render();
 
 // render homepage news
 if (!empty($result['homepagenews'])) {
