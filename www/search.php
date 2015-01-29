@@ -88,7 +88,7 @@ if ($count['all'] == 0) {
     $enabled = AJAX_DISABLED;
 
     $this->setVar(array(
-        'NO_RESULTS_BECAUSE' => ' because it needs to be longer, or wrapped in "quotes"',
+        'NO_RESULTS_BECAUSE' => '',
         'ENABLED' => AJAX_DISABLED,
     ));
 
