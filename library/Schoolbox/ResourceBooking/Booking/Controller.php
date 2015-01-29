@@ -1388,10 +1388,13 @@ class Controller extends Base
                     }
                 } elseif ($relatedBooking instanceof Model) {
                     // delete or don't add. Maybe mark as deleted?
+                    // If it wasn't, then do nothing with it at all
                     $relatedBooking->setDeletedAt(new Alaress_Date_Format(new DateTime()));
                 }
-                $relatedBooking->setEvent($event);
-                $bookingList->add($relatedBooking);
+                if ($relatedBooking instanceof Model) {
+                    $relatedBooking->setEvent($event);
+                    $bookingList->add($relatedBooking);
+                }
             }
         }
 
