@@ -5,44 +5,49 @@
 
 $(function() {
 
-	/* Set initial conditions
-	 */
-	var keyword = "{KEYWORD}";
-	var section = 'all';
-	var pageNumber = 1;
+    /* Disable under certain conditions
+     */
+    var enabled = '{ENABLED}';
 
-	if (window.location.hash.length > 1) {
-		var params = search.fetchHash();
+    if (enabled === '1') {
 
-		if (params.length) {
-			section = params[0];
-		}
+        /* Set initial conditions
+         */
+        var keyword = "{KEYWORD}";
+        var section = 'all';
+        var pageNumber = 1;
 
-		if (params.length > 1) {
-			pageNumber = params[1];
-		}
-	}
+        if (window.location.hash.length > 1) {
+            var params = search.fetchHash();
 
-    $(document).ready(function() {
-        $('#content div.results').on('click', 'a.more', function() {
-            var type = $(this).attr('rel');
-            var selector = '#type a[rel='+type+']';
-            $(selector).trigger('click');
-            event.preventDefault();
+            if (params.length) {
+                section = params[0];
+            }
+
+            if (params.length > 1) {
+                pageNumber = params[1];
+            }
+        }
+
+        $(document).ready(function() {
+            $('#content div.results').on('click', 'a.more', function() {
+                var type = $(this).attr('rel');
+                var selector = '#type a[rel='+type+']';
+                $(selector).trigger('click');
+                event.preventDefault();
+            });
         });
-    });
 
-	search.runOnce(keyword, section, $('#type a[rel=' + section + ']'), pageNumber);
+        search.runOnce(keyword, section, $('#type a[rel=' + section + ']'), pageNumber);
 
-	/* Runs when you change sections
-	 */
-	$('#type a[class!=disabled]').click(function(event) {
-		event.preventDefault();
+        /* Runs when you change sections
+         */
+        $('#type a[class!=disabled]').click(function(event) {
+            event.preventDefault();
 
-		search.runOnce(keyword, $(this).attr('rel'), $(this), 1);
-	});
-
-
+            search.runOnce(keyword, $(this).attr('rel'), $(this), 1);
+        });
+    }
 });
 </script>
 <!-- END custom_head -->

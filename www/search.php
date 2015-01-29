@@ -51,6 +51,7 @@ $this->setVar(array(
     'no_result_block' => '',
     'NO_RESULTS_BECAUSE' => '',
     'FOR' => ' for ',
+    'ENABLED' => 1,
 ));
 
 /* Special error case
@@ -59,29 +60,40 @@ $this->setVar(array(
  * test the search as to why it failed, and return meaningful
  * response to the user
  */
-define('MIN_KEYWORD_LENGTH', 3);
+define('MIN_KEYWORD_LENGTH', 2);
+define('AJAX_ENABLED', 1);
+define('AJAX_DISABLED', 0);
 
-if (!is_numeric($keyword) && (strlen($keyword) < MIN_KEYWORD_LENGTH)) {
-    if (strlen($keyword) == 0) {
-        $this->setVar(array(
-            'FOR' => '',
-            'NO_RESULTS_BECAUSE' => ' because it\'s empty'
-        ));
-    }
-    elseif (strlen($keyword) < MIN_KEYWORD_LENGTH) {
-        $this->setVar(array(
-            'NO_RESULTS_BECAUSE' => ' because it needs to be longer, or wrapped in "quotes"'
-        ));
+$enabled = AJAX_ENABLED;
 
-        $this->parse('no_result_block', 'no_result');
-    }
+if (!is_numeric($keyword) && (strlen($keyword) == 0)) {
+    $enabled = AJAX_DISABLED;
+
+    $this->setVar(array(
+        'FOR' => '',
+        'NO_RESULTS_BECAUSE' => ' because it\'s empty',
+        'ENABLED' => AJAX_DISABLED,
+    ));
+}
+elseif (!is_numeric($keyword) && (strlen($keyword) < MIN_KEYWORD_LENGTH)) {
+    $enabled = AJAX_DISABLED;
+
+    $this->setVar(array(
+        'NO_RESULTS_BECAUSE' => ' because it needs to be longer, or wrapped in "quotes"',
+        'ENABLED' => AJAX_DISABLED,
+    ));
+
+    $this->parse('no_result_block', 'no_result');
 }
 
 /* Also parse the no_result block if no results were found
  */
 if ($count['all'] == 0) {
+    $enabled = AJAX_DISABLED;
+
     $this->setVar(array(
-        'NO_RESULTS_BECAUSE' => ' because it needs to be longer, or wrapped in "quotes"'
+        'NO_RESULTS_BECAUSE' => ' because it needs to be longer, or wrapped in "quotes"',
+        'ENABLED' => AJAX_DISABLED,
     ));
 
     $this->parse('no_result_block', 'no_result');
@@ -99,46 +111,48 @@ $this->setVar(array(
  * phpliberalise the menu tabs
  * render tabs "All" and any with a search result count
  */
-foreach ($type_list as $type_name => $type_desc) {
+if ($enabled) {
+    foreach ($type_list as $type_name => $type_desc) {
 
-    /* Always render "All" tab
-     */
-    if ($type_name != 'all') {
-
-        /* Skip any tabs that have no results
+        /* Always render "All" tab
          */
-        if (!$count[$type_name]) {
-            continue;
+        if ($type_name != 'all') {
+
+            /* Skip any tabs that have no results
+             */
+            if (!$count[$type_name]) {
+                continue;
+            }
         }
+
+        /* Unholy mess
+         */
+        $this->setVar(array(
+            'TYPE_COUNT' => $count[$type_name],
+            'TYPE_TITLE' => $type_name,
+            'TYPE_CLASS' => $count[$type_name] == 0 ? 'disabled' : '',
+            'TYPE_NAME' => $type_desc
+        ));
+
+        $this->setVar(array(
+            'RESULT_TITLE' => $type_name,
+            'RESULT_CLASS' => $type_name == 'all' ? 'hide loaded' : 'hide',
+        ));
+
+        if ($type_name != 'all') {
+            $this->setVar('RESULT');
+        }
+
+        $this->parse('type_block', 'type', true);
+        $this->parse('result_block', 'result', true);
     }
 
-    /* Unholy mess
+    /* Omaha Beach
+     * The individual renderers should only render tabs when there are
+     * positive result counts for their respective items
      */
-    $this->setVar(array(
-        'TYPE_COUNT' => $count[$type_name],
-        'TYPE_TITLE' => $type_name,
-        'TYPE_CLASS' => $count[$type_name] == 0 ? 'disabled' : '',
-        'TYPE_NAME' => $type_desc
-    ));
-
-    $this->setVar(array(
-        'RESULT_TITLE' => $type_name,
-        'RESULT_CLASS' => $type_name == 'all' ? 'hide loaded' : 'hide',
-    ));
-
-    if ($type_name != 'all') {
-        $this->setVar('RESULT');
-    }
-
-    $this->parse('type_block', 'type', true);
-    $this->parse('result_block', 'result', true);
+    $mapper->renderTabs();
 }
-
-/* Omaha Beach
- * The individual renderers should only render tabs when there are
- * positive result counts for their respective items
- */
-$mapper->renderTabs();
 
 /**
  * End
