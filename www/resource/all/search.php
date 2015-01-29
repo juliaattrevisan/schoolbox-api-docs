@@ -187,44 +187,8 @@ $renderer->render();
 $renderer = new \Schoolbox\Forum\Search\Renderer($page, $result, $count, 0);
 $renderer->render();
 
-// render event
-if (!empty($result['event'])) {
-    $page->setFile('event_t', 'resource/event/search/results.html');
-    $page->setBlock('event_t', 'event', 'event_block');
-    $page->setVar(array(
-            'EVENT_DISP_COUNT' => count($result['event']),
-            'EVENT_COUNT' => $count['event'],
-        ));
-
-    foreach ($result['event'] as $event) {
-        $date = new Alaress_Date_Format($event['startDate'], 'Y-m-d');
-        $event_time = '';
-
-        if (!empty($event['startTime']) && $event['startTime'] != '12:00AM') {
-            $event_time .= $event['startTime'];
-
-            if (!empty($event['endTime']) && $event['startTime'] != '12:00AM') {
-                $event_time .= ' to ' . $event['endTime'];
-            }
-        }
-
-        $page->setVar(array(
-                'EVENT_TITLE' => Scrub::text($event['title']),
-                'EVENT_TYPE' => Scrub::text($event['eventType']),
-                'EVENT_DETAIL' => TextFormatter::cutSentence(Scrub::html2text($event['detail']),150),
-                'EVENT_DATE' => $date->getDateOnly(),
-                'EVENT_DATE_RAW' => $date->getUsingFormat('d-m-Y'),
-                'EVENT_LOCATION' => $event['location'],
-                'EVENT_TIME' => $event_time
-            ));
-
-        $page->parse('event_block', 'event', true);
-    }
-
-    outputSeeMore($page, $type, $count, 'event');
-
-    $page->parse('RESULT', 'event_t', true);
-}
+$renderer = new \Schoolbox\Calendar\Event\Search\Renderer($page, $result, $count, 0);
+$renderer->render();
 
 /* Omaha Beach
  *
