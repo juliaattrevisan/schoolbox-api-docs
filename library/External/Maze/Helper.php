@@ -101,8 +101,7 @@ class External_Maze_Helper
         $currentYear = date('Y');
 
         $query = "
-			SELECT
-			 	THKEY,
+			SELECT THKEY,
 			 	CALENDAR_START01,
 			 	CALENDAR_START02,
 			 	CALENDAR_START03,
@@ -162,7 +161,7 @@ class External_Maze_Helper
             /* You are currently in the most recently added semester definition
              */
             if ($afterSemesterStart && $beforeSemesterEnd) {
-                return str_replace("{$currentYear}S", '', $currentRow['THKEY']);
+                return $currentRow['THKEY'];
             }
 
             /* Not in this semester yet? Maybe try an older one from the same year
@@ -180,7 +179,7 @@ class External_Maze_Helper
         /* If January and between semesters 2 and 1, assume it's semester 1
          * Otherwise assume between semester 1 and 2, and assume it's semester 2
          */
-        if (date('n') == 1) {
+        if (date('n') < 6) {
             return date('Y') . 'S1';
         }
         else {
