@@ -117,6 +117,8 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
 
         $this->registerCallback(self::CALLBACK_PRESAVE, array($this, self::CALLBACK_PRESAVE));
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, self::CALLBACK_POSTSAVE));
+        $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'hardDeleteCategoryCodes'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteCategoryCodes'));
 
         $this->hasSoftDeleteDateField('deleted_at');
     }
@@ -225,6 +227,32 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
         CategoryCodeMapper::getInstance()->save($model->getCodes());
 
         return true;
+    }
+
+    /**
+     * Hard deletes all category codes that belong to this object.
+     *
+     * Called as a post delete callback.
+     *
+     * @param Category $object
+     */
+    public function hardDeleteCategoryCodes(Category $object)
+    {
+        $codeMapper = $this->getJoinMapper('codes');
+        $codeMapper->hardDelete($codeMapper->findByColumn('categoryID', $object->getId()));
+    }
+
+    /**
+     * Soft deletes all category codes that belong to this object.
+     *
+     * Called as a post soft-delete callback.
+     *
+     * @param Category $object
+     */
+    public function softDeleteCategoryCodes(Category $object)
+    {
+        $codeMapper = $this->getJoinMapper('codes');
+        $codeMapper->softDelete($codeMapper->findByColumn('categoryID', $object->getId()));
     }
 
     /**

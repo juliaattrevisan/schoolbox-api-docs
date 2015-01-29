@@ -78,6 +78,8 @@ class Mapper implements Serializable
     const CALLBACK_POSTSAVE   = 'postSave';
     const CALLBACK_PREDELETE  = 'preDelete';
     const CALLBACK_POSTDELETE = 'postDelete';
+    const CALLBACK_PRESOFTDELETE  = 'preSoftDelete';
+    const CALLBACK_POSTSOFTDELETE = 'postSoftDelete';
 
     /**
      * @var Database
