@@ -375,7 +375,7 @@ if (!empty($result['sitenews'])) {
 
 // render blog
 if (!empty($result['blog'])) {
-    $page->setFile('blog_t', 'search/blog.html');
+    $page->setFile('blog_t', 'resource/blog/search/results.html');
     $page->setBlock('blog_t', 'blog', 'blog_block');
     $page->setVar(array(
             'BLOG_DISP_COUNT' => count($result['blog']),
