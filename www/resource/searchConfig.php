@@ -6,9 +6,10 @@
  */
 
 $page = new SitePage();
-$group = new Group();
-$categoryStd = new Category();
-$allowedFile = new AllowedFile();
+
+define('MIN_KEYWORD_LENGTH', 2);
+define('AJAX_ENABLED', 1);
+define('AJAX_DISABLED', 0);
 
 $handle = array(
     'user' => 'user',

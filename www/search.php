@@ -60,10 +60,6 @@ $this->setVar(array(
  * test the search as to why it failed, and return meaningful
  * response to the user
  */
-define('MIN_KEYWORD_LENGTH', 2);
-define('AJAX_ENABLED', 1);
-define('AJAX_DISABLED', 0);
-
 $enabled = AJAX_ENABLED;
 
 if (!is_numeric($keyword) && (strlen($keyword) == 0)) {
