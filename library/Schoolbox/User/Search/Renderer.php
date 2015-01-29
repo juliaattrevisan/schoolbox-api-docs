@@ -148,7 +148,7 @@ class Renderer extends Handler {
                 $this->getPage()->parse('user_block', 'user', true);
             }
 
-            $this->outputSeeMore($this->getPage(), $this->getType(), $this->getCount(), 'user');
+            $this->outputSeeMore('user');
 
             $this->getPage()->parse('RESULT', 'user_t', true);
         }
