@@ -284,7 +284,7 @@ if (!empty($result['folder'])) {
 
 // render homepage news
 if (!empty($result['homepagenews'])) {
-    $page->setFile('homepagenews_t', 'search/homepagenews.html');
+    $page->setFile('homepagenews_t', 'resource/homepagenews/search/results.html');
     $page->setBlock('homepagenews_t', 'homepagenews', 'homepagenews_block');
     $page->setVar(array(
             'HOMEPAGE_NEWS_DISP_COUNT' => count($result['homepagenews']),
