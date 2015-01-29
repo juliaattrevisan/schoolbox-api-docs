@@ -10,6 +10,9 @@
 namespace Custom\Meriden\Pastoral;
 
 use MSSQL;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Category;
+use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -21,11 +24,17 @@ class Query
     protected $database;
 
     /**
+     * @var CategoryMapper
+     */
+    protected $categoryMapper;
+
+    /**
      * Constructor
      *
-     * @param MSSQL $database
+     * @param MSSQL          $database
+     * @param CategoryMapper $categoryMapper
      */
-    public function __construct(MSSQL $database)
+    public function __construct(MSSQL $database, CategoryMapper $categoryMapper)
     {
         $this->setDatabase($database);
     }
@@ -600,6 +609,25 @@ class Query
     public function setDatabase($database)
     {
         $this->database = $database;
+        return $this;
+    }
+
+    /**
+     * @return CategoryMapper
+     */
+    public function getCategoryMapper()
+    {
+        return $this->categoryMapper;
+    }
+
+    /**
+     * @param  CategoryMapper $categoryMapper
+     *
+     * @return $this
+     */
+    public function setCategoryMapper($categoryMapper)
+    {
+        $this->categoryMapper = $categoryMapper;
         return $this;
     }
 }
