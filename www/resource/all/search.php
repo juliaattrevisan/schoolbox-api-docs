@@ -23,7 +23,12 @@ require_once('./resource/searchClean.php');
  * Execute searches for all handlers and mappers
  */
 
-// iterate through the handle types
+/* Iterate through the handle types
+ *
+ * These are used to generate counts for the menu tabs, for handler-based items.
+ * Mapper-based ones do it all internally within the \Search\Results composite,
+ * avoiding the global $count var (silly old bugalugs, silly old bucket)
+ */
 foreach ($handle as $type_name => &$type_handle) {
     // include & instantiate
     $type_class = ucfirst($type_handle);
@@ -62,6 +67,8 @@ if ($type == 'all') {
 }
 
 /* These are old handlers
+ * Once you convert them to Mappers, remove their renderer, and remove them
+ * from the searchConfig lists.
  */
 if (!empty($handle[$type])) {
     // include & instantiate
@@ -113,6 +120,7 @@ if (in_array($type, $omaha)) {
     $mapper->renderPagination($current_page);
 }
 /* Pagination
+ *
  * If we have a search type and have results to display
  */
 else if ($result[$type] || $type == 'all') {
