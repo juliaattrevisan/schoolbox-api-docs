@@ -488,7 +488,7 @@ if (!empty($result['forum'])) {
 
 // render event
 if (!empty($result['event'])) {
-    $page->setFile('event_t', 'search/event.html');
+    $page->setFile('event_t', 'resource/event/search/results.html');
     $page->setBlock('event_t', 'event', 'event_block');
     $page->setVar(array(
             'EVENT_DISP_COUNT' => count($result['event']),
