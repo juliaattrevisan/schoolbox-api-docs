@@ -87,17 +87,11 @@ class DueWork_Detail
                     $submissions                 = array();
                 } // only use the first if this is a single-submit box
                 else {
-                    if ($this->getSubmissionType() == self::ACCEPT_SINGLE) {
-                        $insertion['submissions']    = array($submissions[0]);
-                        $insertion['user']['status'] = self::SUBMITTED;
+                    $insertion['submissions'] = array($submissions[0]);
+                    if (count($submissions) > 1) {
+                        $insertion['user']['status'] = self::RESUBMITTED;
                     } else {
-                        $insertion['submissions'] = array($submissions[0]);
-                        if (count($submissions) > 1) {
-                            $insertion['user']['status'] = self::RESUBMITTED;
-                        } else {
-                            $insertion['user']['status'] = self::SUBMITTED;
-                        }
-
+                        $insertion['user']['status'] = self::SUBMITTED;
                     }
 
                     // determine whether to give the ontime or late class
