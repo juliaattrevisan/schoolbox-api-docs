@@ -90,6 +90,9 @@
                 },
                 defaultView: anchor || '{CALENDAR_VIEW}',
                 timeFormat: { month: 'h(:mm)a' },
+                // Event limit: could be configured from session but leave global for now
+                eventLimit: Boolean('{CALENDAR_COLLAPSE_EVENTS}'),
+                firstDay: Number('{CALENDAR_START_DAY}'),
 
                 /**
                  * When an event is drawn on the calendar
