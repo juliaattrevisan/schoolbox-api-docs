@@ -11,6 +11,9 @@
 namespace Schoolbox\Blog\Search;
 
 use Schoolbox\Resource\Search\Renderer\Handler;
+use Scrub;
+use TextFormatter;
+use Alaress_Date_Relative;
 
 class Renderer extends Handler {
 
@@ -43,12 +46,12 @@ class Renderer extends Handler {
                     $blog['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
                 }
 
-                $createdTime = new \Alaress_Date_Relative($blog['created']);
+                $createdTime = new Alaress_Date_Relative($blog['created']);
 
                 $this->getPage()->setVar(array(
                     'BLOG_CID' => $blog['cid'],
-                    'BLOG_HEADING' => \Scrub::text($blog['heading']),
-                    'BLOG_BODY' => \TextFormatter::cutSentence(\Scrub::html2text($blog['body']), 150),
+                    'BLOG_HEADING' => Scrub::text($blog['heading']),
+                    'BLOG_BODY' => TextFormatter::cutSentence(Scrub::html2text($blog['body']), 150),
                     'BLOG_OWNER' => $blog['uid'],
                     'BLOG_OWNER_NAME' => $userHandler->formatName($blog),
                     'BLOG_CREATED' => $createdTime->getRelativeTime(),
