@@ -62,7 +62,7 @@ class Renderer extends Handler {
                 $this->getPage()->parse('blog_block', 'blog', true);
             }
 
-            $this->outputSeeMore('blog');
+            $this->outputSeeMore();
 
             $this->getPage()->parse('RESULT', 'blog_t', true);
         }

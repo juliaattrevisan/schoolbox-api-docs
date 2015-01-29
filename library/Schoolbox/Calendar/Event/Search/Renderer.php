@@ -63,7 +63,7 @@ class Renderer extends Handler {
                 $this->getPage()->parse('event_block', 'event', true);
             }
 
-            $this->outputSeeMore('event');
+            $this->outputSeeMore();
 
             $this->getPage()->parse('RESULT', 'event_t', true);
         }

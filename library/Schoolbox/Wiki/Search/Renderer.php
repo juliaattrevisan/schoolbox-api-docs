@@ -64,7 +64,7 @@ class Renderer extends Handler {
                 $this->getPage()->parse('wiki_block', 'wiki', true);
             }
 
-            $this->outputSeeMore('wiki');
+            $this->outputSeeMore();
 
             $this->getPage()->parse('RESULT', 'wiki_t', true);
         }

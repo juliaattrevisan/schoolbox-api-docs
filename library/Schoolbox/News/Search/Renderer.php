@@ -71,7 +71,7 @@ class Renderer extends Handler {
                 $this->getPage()->parse('sitenews_block', 'sitenews', true);
             }
 
-            $this->outputSeeMore('sitenews');
+            $this->outputSeeMore();
 
             $this->getPage()->parse('RESULT', 'sitenews_t', true);
         }

@@ -172,12 +172,10 @@ abstract class Handler {
      * Provide a Seymour link
      *
      * This is optionally disabled. Renderer instantiation is mutable.
-     *
-     * @param $handle
      */
-    protected function outputSeeMore($handle)
+    protected function outputSeeMore()
     {
-        $this->getPage()->setBlock($handle . '_t', 'see_more', 'see_more_block');
+        $this->getPage()->setBlock($this->getType() . '_t', 'see_more', 'see_more_block');
 
         if ($this->getUseSeymourLinks() && ($this->getCount($this->getType()) > \Cfg::get('search_all_limit'))) {
             $this->getPage()->setVar(array(
