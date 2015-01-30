@@ -28,15 +28,13 @@ require_once('./resource/searchClean.php');
  * These are used to generate counts for the menu tabs, for handler-based items.
  * Mapper-based ones do it all internally within the \Search\Results composite,
  * avoiding the global $count var (silly old bugalugs, silly old bucket)
+ *
+ * search() calls access a global counter array, $count
  */
-foreach ($handle as $type_name => &$type_handle) {
-    // include & instantiate
-    $type_class = ucfirst($type_handle);
-    $type_handle = new $type_class;
+foreach ($handle as $type_name => $type_handle) {
+    $handler = new $type_handle();
 
-    /* search() calls access a global counter array, $count
-     */
-    $result[$type_name] = $type_handle->search($keyword, 0, Cfg::get('search_all_limit'), $count[$type_name]);
+    $result[$type_name] = $handler->search($keyword, 0, Cfg::get('search_all_limit'), $count[$type_name]);
 }
 
 $count['all'] = array_sum($count);
@@ -76,13 +74,10 @@ if ($type == 'all') {
  * are tied in to the keys in the array, which really isn't nice.
  */
 if (!empty($handle[$type])) {
-    // include & instantiate
-    $type_class = ucfirst($handle[$type]);
-    $handle[$type] = new $type_class;
 
     /* Particular ordering and sorting for Categories
      */
-    if (in_array($type_class, array('Category'))) {
+    if (in_array($handle[$type], array('Category'))) {
         $result[$type] = $handle[$type]->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type], 'id', 'desc');
     } else {
         // perform search for individual category (without formatting for ajax call)

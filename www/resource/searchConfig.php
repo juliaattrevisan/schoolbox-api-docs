@@ -11,15 +11,15 @@ define('AJAX_DISABLED', 0);
 $page = new SitePage();
 
 $handle = array(
-    'user' => 'user',
-    'file' => 'file',
-    'category' => 'category',
-    'sitenews' => 'news',
-    'homepagenews' => 'categoryNews',
-    'blog' => 'blog',
-    'wiki' => 'wiki',
-    'forum' => 'forum',
-    'event' => 'calendar',
+    'user' => 'User',
+    'file' => 'File',
+    'category' => 'Category',
+    'sitenews' => 'News',
+    'homepagenews' => 'CategoryNews',
+    'blog' => 'Blog',
+    'wiki' => 'Wiki',
+    'forum' => 'Forum',
+    'event' => 'Calendar',
 );
 
 $type_list = array(
@@ -42,3 +42,4 @@ $type_list = array(
 $omaha = array(
     'link'
 );
+

@@ -5,15 +5,13 @@ require_once('./resource/searchClean.php');
 /**
  * Execute searches for all handlers and mappers
  */
-// iterate through the handle types
-foreach ($handle as $type_name => &$type_handle) {
-    // include & instantiate
-    $type_class = ucfirst($type_handle);
-    $type_handle = new $type_class;
+/* iterate through the handle types
+ * search() calls access a global counter array, $count
+ */
+foreach ($handle as $type_name => $type_handle) {
+    $handler = new $type_handle();
 
-    /* search() calls access a global counter array, $count
-     */
-    $result[$type_name] = $type_handle->search($keyword, 0, Cfg::get('search_all_limit'), $count[$type_name]);
+    $result[$type_name] = $handler->search($keyword, 0, Cfg::get('search_all_limit'), $count[$type_name]);
 }
 
 $count['all'] = array_sum($count);
