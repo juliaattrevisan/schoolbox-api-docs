@@ -88,16 +88,16 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
         /* Set up blocks and stuff
          */
         $this->setBlock($templateHandle, 'blog', 'blog_block');
-        $this->setBlock($templateHandle, 'create_text', 'create_text_block');
-        $this->setBlock('blog', 'modify_text', 'modify_text_block');
+        $this->setBlock($templateHandle, 'create_blog', 'create_blog_block');
+        $this->setBlock('blog', 'modify_blog', 'modify_blog_block');
         $this->setBlock('blog', 'has_comments', 'has_comments_block');
         $this->setBlock('has_comments', 'comment', 'comment_block');
         $this->setBlock('comment', 'has_comment_delete', 'has_comment_delete_block');
 
         $this->setVar(
             array(
-                'modify_text_block' => '',
-                'create_text_block' => '',
+                'modify_blog_block' => '',
+                'create_blog_block' => '',
                 'has_comments_block' => '',
                 'comment_block' => '',
                 'has_comment_delete_block' => '',
@@ -218,11 +218,11 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                 /* Control for modifying a blog
                  */
                 if ($currentItem->getOwner()->getId() == $_SESSION['id'] || $this->permission >= WRITE_ACCESS) {
-                    $this->parse('modify_text_block', 'modify_text');
+                    $this->parse('modify_blog_block', 'modify_blog');
                 } else {
                     $this->setVar(
                         array(
-                            'modify_text_block' => ''
+                            'modify_blog_block' => ''
                         )
                     );
                 }
@@ -233,7 +233,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                  */
                 $this->setVar(
                     array(
-                        'modify_text_block' => '',
+                        'modify_blog_block' => '',
                         'has_comments_block' => '',
                         'comment_block' => ''
                     )
@@ -244,7 +244,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
         /* Controls such as Post Blog
          */
         if ($this->permission >= WRITE_ACCESS) {
-            $this->parse('create_text_block', 'create_text');
+            $this->parse('create_blog_block', 'create_blog');
         }
 
         return true;
