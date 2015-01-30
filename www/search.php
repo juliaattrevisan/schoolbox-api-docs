@@ -115,6 +115,7 @@ if ($enabled) {
         'homepagenews' => new \Schoolbox\Folder\News\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
         'sitenews' => new \Schoolbox\News\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
         'wiki' => new \Schoolbox\Wiki\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
+        'forum' => new \Schoolbox\Forum\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
     );
 
 
