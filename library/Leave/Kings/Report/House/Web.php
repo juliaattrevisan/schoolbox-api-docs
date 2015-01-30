@@ -362,7 +362,7 @@ class Leave_Kings_Report_House_Web
 
                     foreach($currentPerson['request_host_type'] as $currentHostType) {
                         if (!empty($currentHostType)) {
-                            $hostTypes[] = $currentHostType->getName();
+                            $hostTypes[] = $currentHostType;
                         }
                     }
 
