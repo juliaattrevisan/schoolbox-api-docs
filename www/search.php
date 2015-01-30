@@ -107,17 +107,16 @@ $this->setVar(array(
  * phpliberalise the menu tabs
  */
 if ($enabled) {
-
     $allRenderers = array(
-        'blog' => new \Schoolbox\Blog\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
-        'file' => new \Schoolbox\File\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
-        'category' => new \Schoolbox\Folder\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
-        'event' => new \Schoolbox\Calendar\Event\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
-        'homepagenews' => new \Schoolbox\Folder\News\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
-        'sitenews' => new \Schoolbox\News\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
-        'wiki' => new \Schoolbox\Wiki\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
-        'forum' => new \Schoolbox\Forum\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
-        'user' => new \Schoolbox\User\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
+        'blog' => new \Schoolbox\Blog\Search\Renderer($this, '', '', 0),
+        'file' => new \Schoolbox\File\Search\Renderer($this, '', '', 0),
+        'category' => new \Schoolbox\Folder\Search\Renderer($this, '', '', 0),
+        'event' => new \Schoolbox\Calendar\Event\Search\Renderer($this, '', '', 0),
+        'homepagenews' => new \Schoolbox\Folder\News\Search\Renderer($this, '', '', 0),
+        'sitenews' => new \Schoolbox\News\Search\Renderer($this, '', '', 0),
+        'wiki' => new \Schoolbox\Wiki\Search\Renderer($this, '', '', 0),
+        'forum' => new \Schoolbox\Forum\Search\Renderer($this, '', '', 0),
+        'user' => new \Schoolbox\User\Search\Renderer($this, '', '', 0),
     );
 
     /* Render "All" tab option always
