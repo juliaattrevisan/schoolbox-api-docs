@@ -31,10 +31,10 @@ require_once('./resource/searchClean.php');
  *
  * search() calls access a global counter array, $count
  */
-foreach ($handle as $type_name => $type_handle) {
-    $handler = new $type_handle();
-
-    $result[$type_name] = $handler->search($keyword, 0, Cfg::get('search_all_limit'), $count[$type_name]);
+foreach ($handle as $typeName => $config) {
+    if ($typeName != 'all') {
+        $result[$typeName] = $config['handler']->search($keyword, 0, Cfg::get('search_all_limit'), $count[$typeName]);
+    }
 }
 
 $count['all'] = array_sum($count);
@@ -77,11 +77,13 @@ if (!empty($handle[$type])) {
 
     /* Particular ordering and sorting for Categories
      */
-    if (in_array($handle[$type], array('Category'))) {
-        $result[$type] = $handle[$type]->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type], 'id', 'desc');
-    } else {
-        // perform search for individual category (without formatting for ajax call)
-        $result[$type] = $handle[$type]->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type]);
+    if ($type != 'all') {
+        if ($type == 'category') {
+            $result[$type] = $handle[$type]['handler']->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type], 'id', 'desc');
+        } else {
+            // perform search for individual category (without formatting for ajax call)
+            $result[$type] = $handle[$type]['handler']->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type]);
+        }
     }
 }
 

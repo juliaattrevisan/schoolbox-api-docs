@@ -8,10 +8,10 @@ require_once('./resource/searchClean.php');
 /* iterate through the handle types
  * search() calls access a global counter array, $count
  */
-foreach ($handle as $type_name => $type_handle) {
-    $handler = new $type_handle();
-
-    $result[$type_name] = $handler->search($keyword, 0, Cfg::get('search_all_limit'), $count[$type_name]);
+foreach ($handle as $typeName => $config) {
+    if ($typeName != 'all') {
+        $result[$typeName] = $config['handler']->search($keyword, 0, Cfg::get('search_all_limit'), $count[$typeName]);
+    }
 }
 
 $count['all'] = array_sum($count);
@@ -105,39 +105,32 @@ $this->setVar(array(
  * phpliberalise the menu tabs
  */
 if ($enabled) {
-    $allRenderers = array(
-        'blog' => new \Schoolbox\Blog\Search\Renderer($this, '', '', 0),
-        'file' => new \Schoolbox\File\Search\Renderer($this, '', '', 0),
-        'category' => new \Schoolbox\Folder\Search\Renderer($this, '', '', 0),
-        'event' => new \Schoolbox\Calendar\Event\Search\Renderer($this, '', '', 0),
-        'homepagenews' => new \Schoolbox\Folder\News\Search\Renderer($this, '', '', 0),
-        'sitenews' => new \Schoolbox\News\Search\Renderer($this, '', '', 0),
-        'wiki' => new \Schoolbox\Wiki\Search\Renderer($this, '', '', 0),
-        'forum' => new \Schoolbox\Forum\Search\Renderer($this, '', '', 0),
-        'user' => new \Schoolbox\User\Search\Renderer($this, '', '', 0),
-    );
-
-    /* Render "All" tab option always
-     * Unholy mess
-     */
-    $this->setVar(array(
-        'TYPE_TYPE' => 'all',
-        'TYPE_NAME' => 'All'
-    ));
-
-    $this->setVar(array(
-        'RESULT_TYPE' => 'all',
-    ));
-
-    $this->parse('type_block', 'type', true);
-    $this->parse('result_block', 'result', true);
 
     /* Always render all tabs, hidden by default
      * Upon ajax completion, populate the tabs with counts and
      * phplib the result html fragment
      */
-    foreach($allRenderers as $type => $currentRenderer) {
-        $currentRenderer->renderTab();
+    foreach($handle as $typeName => $config) {
+
+        /* Render "All" tab option always
+         * Unholy mess
+         */
+        if ($typeName == 'all') {
+            $this->setVar(array(
+                'TYPE_TYPE' => 'all',
+                'TYPE_NAME' => 'All'
+            ));
+
+            $this->setVar(array(
+                'RESULT_TYPE' => 'all',
+            ));
+
+            $this->parse('type_block', 'type', true);
+            $this->parse('result_block', 'result', true);
+        }
+        else {
+            $config['renderer']->renderTab();
+        }
     }
 
     /* Omaha Beach
