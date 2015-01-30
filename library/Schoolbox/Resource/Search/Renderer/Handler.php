@@ -302,7 +302,7 @@ abstract class Handler {
      *
      * @param boolean $useSeymourLinks
      */
-    protected function setUseSeymourLinks($useSeymourLinks)
+    public function setUseSeymourLinks($useSeymourLinks)
     {
         $this->useSeymourLinks = $useSeymourLinks;
     }
@@ -312,7 +312,7 @@ abstract class Handler {
      *
      * @return boolean
      */
-    protected function getUseSeymourLinks()
+    public function getUseSeymourLinks()
     {
         return $this->useSeymourLinks;
     }
