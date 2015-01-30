@@ -275,7 +275,8 @@
 		 * Show or hide the View More link contextually
 		 */
 		function updateViewMoreLink() {
-			if (config.start < config.numPosts) {
+			// Never show view more if viewing all (offset = 0)
+			if (config.offset > 0 && config.start < config.numPosts) {
 				$j(config.viewMoreLink).show();
 			}
 			else {
@@ -287,7 +288,8 @@
 		 * Show or hide the View More link contextually
 		 */
 		function updateViewMoreLinkSlow() {
-			if (config.end < config.numPosts) {
+			// Never show view more if viewing all (offset = 0)
+			if (config.offset > 0 && config.end < config.numPosts) {
 				$j(config.viewMoreLink).show();
 			}
 			else {
