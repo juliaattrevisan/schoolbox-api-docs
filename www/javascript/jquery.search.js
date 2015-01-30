@@ -52,15 +52,15 @@ search = {
 		if (!$(this).hasClass('loaded')) {
 			$(this.getTargetDiv()).load(this.getUrl(), "keyword=" + this.getKeyword() + "&type=" + this.getSection() + "&p=" + search.getPageNumber(), function() {
 
-//				/* Flag it as having loaded
-//				 */
-//				search.getTargetDiv().addClass('loaded');
-//
-//				/* Add pagination again
-//				 */
-//				search.paginate();
-//
-//				search.updateStyles();
+				/* Flag it as having loaded
+				 */
+				search.getTargetDiv().addClass('loaded');
+
+				/* Add pagination again
+				 */
+				search.paginate();
+
+				search.updateStyles();
 			});
 		}
 	},
