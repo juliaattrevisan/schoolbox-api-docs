@@ -25,6 +25,13 @@ class Renderer extends Handler {
     protected $type = 'wiki';
 
     /**
+     * Tab Name (e.g. 'Link', 'Blogs', etc);
+     *
+     * @var string
+     */
+    protected $tabName = 'Wikis';
+
+    /**
      * Render
      */
     public function render() {

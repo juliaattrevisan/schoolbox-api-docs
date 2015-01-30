@@ -114,6 +114,7 @@ if ($enabled) {
         'event' => new \Schoolbox\Calendar\Event\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
         'homepagenews' => new \Schoolbox\Folder\News\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
         'sitenews' => new \Schoolbox\News\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
+        'wiki' => new \Schoolbox\Wiki\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
     );
 
 
