@@ -90,21 +90,35 @@ if (!empty($handle[$type])) {
 /* Dump them
  */
 $oldHandlerRenderers = new \Schoolbox\Collection();
-$oldHandlerRenderers->setOffset('user', new \Schoolbox\User\Search\Renderer($page, $result, $count, 0, $keyword));
-$oldHandlerRenderers->setOffset('file', new \Schoolbox\File\Search\Renderer($page, $result, $count, 0, $keyword));
-$oldHandlerRenderers->setOffset('folder', new \Schoolbox\Folder\Search\Renderer($page, $result, $count, 0, $keyword));
-$oldHandlerRenderers->setOffset('categorynews', new \Schoolbox\Folder\News\Search\Renderer($page, $result, $count, 0, $keyword));
-$oldHandlerRenderers->setOffset('homepagenews', new \Schoolbox\News\Search\Renderer($page, $result, $count, 0, $keyword));
-$oldHandlerRenderers->setOffset('blog', new \Schoolbox\Blog\Search\Renderer($page, $result, $count, 0, $keyword));
-$oldHandlerRenderers->setOffset('wiki', new \Schoolbox\Wiki\Search\Renderer($page, $result, $count, 0, $keyword));
-$oldHandlerRenderers->setOffset('forum', new \Schoolbox\Forum\Search\Renderer($page, $result, $count, 0, $keyword));
-$oldHandlerRenderers->setOffset('event', new \Schoolbox\Calendar\Event\Search\Renderer($page, $result, $count, 0, $keyword));
+$oldHandlerRenderers->setOffset('user', new \Schoolbox\User\Search\Renderer($page, $result, $count, 0));
+$oldHandlerRenderers->setOffset('file', new \Schoolbox\File\Search\Renderer($page, $result, $count, 0));
+$oldHandlerRenderers->setOffset('folder', new \Schoolbox\Folder\Search\Renderer($page, $result, $count, 0));
+$oldHandlerRenderers->setOffset('categorynews', new \Schoolbox\Folder\News\Search\Renderer($page, $result, $count, 0));
+$oldHandlerRenderers->setOffset('homepagenews', new \Schoolbox\News\Search\Renderer($page, $result, $count, 0));
+$oldHandlerRenderers->setOffset('blog', new \Schoolbox\Blog\Search\Renderer($page, $result, $count, 0));
+$oldHandlerRenderers->setOffset('wiki', new \Schoolbox\Wiki\Search\Renderer($page, $result, $count, 0));
+$oldHandlerRenderers->setOffset('forum', new \Schoolbox\Forum\Search\Renderer($page, $result, $count, 0));
+$oldHandlerRenderers->setOffset('event', new \Schoolbox\Calendar\Event\Search\Renderer($page, $result, $count, 0));
 
 /* Draw them
  */
 foreach($oldHandlerRenderers as $type => $currentRenderer) {
     $currentRenderer->setUseSeymourLinks(true);
     $currentRenderer->render();
+}
+
+/* If no result, render error screen
+ */
+if ($noResults) {
+    $this->getPage()->setFile('no_results', 'resource/search/noResults.html');
+
+    $this->getPage()->setVar(array(
+        'ENCODED_KEYWORD' => $this->getKeyword(),
+        'UNESCAPED_KEYWORD' => $this->getKeyword(),
+        'ENABLED' => AJAX_DISABLED,
+    ));
+
+    $this->getPage()->parse('RESULT', 'no_results', true);
 }
 
 $page->parse(TEMPLATE_body, 'RESULT', true);

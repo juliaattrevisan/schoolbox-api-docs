@@ -73,8 +73,5 @@ class Renderer extends Handler {
 
             $this->getPage()->parse('RESULT', 'forum_t', true);
         }
-        else {
-            $this->renderNoResults();
-        }
     }
 }

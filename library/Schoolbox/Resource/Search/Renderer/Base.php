@@ -22,6 +22,13 @@ abstract class Base {
     protected $page = null;
 
     /**
+     * The thing you looked for
+     *
+     * @var string
+     */
+    private $keyword = '';
+
+    /**
      * Constructor
      *
      * @param $page
@@ -118,25 +125,12 @@ abstract class Base {
         $this->getPage()->outputPage(true);
     }
 
-    /**
-     * Render error screen for no results found
-     */
-    protected function renderNoResults() {
-        $this->getPage()->setFile('no_results', 'resource/search/noResults.html');
-
-        $this->getPage()->setVar(array(
-                'ENCODED_KEYWORD' => $this->getKeyword(),
-                'UNESCAPED_KEYWORD' => $this->getKeyword(),
-                'ENABLED' => AJAX_DISABLED,
-            ));
-
-        $this->getPage()->parse('RESULT', 'no_results', true);
-    }
-    
     /* Getters/Setters
      */
 
     /**
+     * Set page
+     *
      * @param null $page
      */
     protected function setPage($page)
@@ -145,10 +139,12 @@ abstract class Base {
     }
 
     /**
+     * Get page
+     *
      * @return null
      */
     protected function getPage()
     {
         return $this->page;
     }
-} 
+}

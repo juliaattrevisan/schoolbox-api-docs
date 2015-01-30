@@ -66,27 +66,18 @@ abstract class Handler {
     protected $useSeymourLinks = false;
 
     /**
-     * The thing you looked for
-     *
-     * @var string
-     */
-    protected $keyword = '';
-
-    /**
      * Constructor
      *
      * @param $page a site page
      * @param array $result Equivalent of $result['blog'] etc.
      * @param array $count Equivalent of $count['blog'] etc.
      * @param $currentPage
-     * @param $keyword
      */
-    public function __construct($page, $result, $count, $currentPage, $keyword) {
+    public function __construct($page, $result, $count, $currentPage) {
         $this->setPage($page);
         $this->setResult($result);
         $this->setCount($count);
         $this->setCurrentPage($currentPage);
-        $this->setKeyword($keyword);
     }
 
     /**
@@ -94,15 +85,15 @@ abstract class Handler {
      */
     public function renderTab() {
         $this->getPage()->setVar(array(
-                'TYPE_TYPE' => $this->getType(),
-                'TYPE_NAME' => $this->getTabName(),
-            ));
+            'TYPE_TYPE' => $this->getType(),
+            'TYPE_NAME' => $this->getTabName(),
+        ));
 
         $this->getPage()->parse('type_block', 'type', true);
 
         $this->getPage()->setVar(array(
-                'RESULT_TYPE' => $this->getType(),
-            ));
+            'RESULT_TYPE' => $this->getType(),
+        ));
 
         $this->getPage()->parse('result_block', 'result', true);
     }
@@ -201,21 +192,6 @@ abstract class Handler {
         } else {
             $this->getPage()->setVar('pagination_block');
         }
-    }
-
-    /**
-     * Render error screen for no results found
-     */
-    protected function renderNoResults() {
-        $this->getPage()->setFile('no_results', 'resource/search/noResults.html');
-
-        $this->getPage()->setVar(array(
-            'ENCODED_KEYWORD' => $this->getKeyword(),
-            'UNESCAPED_KEYWORD' => $this->getKeyword(),
-            'ENABLED' => AJAX_DISABLED,
-        ));
-
-        $this->getPage()->parse('RESULT', 'no_results', true);
     }
 
     /**
@@ -360,25 +336,5 @@ abstract class Handler {
     protected function getTabName()
     {
         return $this->tabName;
-    }
-
-    /**
-     * Set keyword
-     *
-     * @param string $keyword
-     */
-    protected function setKeyword($keyword)
-    {
-        $this->keyword = $keyword;
-    }
-
-    /**
-     * Get keyword
-     *
-     * @return string
-     */
-    protected function getKeyword()
-    {
-        return $this->keyword;
     }
 }

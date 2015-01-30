@@ -73,8 +73,5 @@ class Renderer extends Handler {
 
             $this->getPage()->parse('RESULT', 'blog_t', true);
         }
-        else {
-            $this->renderNoResults();
-        }
     }
 }

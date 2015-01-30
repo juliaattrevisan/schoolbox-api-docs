@@ -67,13 +67,11 @@ class Results implements Searchable {
      *
      * @param $page
      * @param $type
-     * @param $keyword
      */
-    public function __construct($page, $type, $keyword) {
+    public function __construct($page, $type) {
         $this->setRegistry(new Collection());
         $this->setType($type);
         $this->setResult(new Collection());
-        $this->setKeyword($keyword);
 
         /* Add searchables
          */
