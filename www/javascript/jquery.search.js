@@ -52,15 +52,15 @@ search = {
 		if (!$(this).hasClass('loaded')) {
 			$(this.getTargetDiv()).load(this.getUrl(), "keyword=" + this.getKeyword() + "&type=" + this.getSection() + "&p=" + search.getPageNumber(), function() {
 
-				/* Flag it as having loaded
-				 */
-				$(search.getTargetDiv()).addClass('loaded');
-
-				/* Add pagination again
-				 */
-				search.paginate();
-
-				search.updateStyles();
+//				/* Flag it as having loaded
+//				 */
+//				search.getTargetDiv().addClass('loaded');
+//
+//				/* Add pagination again
+//				 */
+//				search.paginate();
+//
+//				search.updateStyles();
 			});
 		}
 	},
@@ -112,7 +112,7 @@ search = {
 	 * Hide irrelevant tabs
 	 */
 	hideTabs: function() {
-		$('div.results > div').hide();
+		$('div.results').find('div').hide();
 		$(this.getTargetDiv()).show();
 	},
 
@@ -261,7 +261,7 @@ search = {
 	 * Set the div where search results get loaded in
 	 */
 	setTargetDiv: function(rel) {
-		this.targetDiv = 'div.results > div[rel=' + rel + ']';
+        this.targetDiv = $('div.results').find('[data-type='+rel+']');
 	},
 
 	/**

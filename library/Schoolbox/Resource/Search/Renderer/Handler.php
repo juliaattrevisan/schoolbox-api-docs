@@ -44,6 +44,13 @@ abstract class Handler {
     protected $type = '';
 
     /**
+     * Tab Name (e.g. 'Link', 'Blogs', etc);
+     *
+     * @var string
+     */
+    protected $tabName = '';
+
+    /**
      * Current page number
      *
      * @var int
@@ -70,6 +77,24 @@ abstract class Handler {
         $this->setPage($page);
         $this->setResult($result);
         $this->setCount($count);
+    }
+
+    /**
+     * Render clickable tab menu
+     */
+    public function renderTab() {
+        $this->getPage()->setVar(array(
+                'TYPE_TYPE' => $this->getType(),
+                'TYPE_NAME' => $this->getTabName(),
+            ));
+
+        $this->getPage()->parse('type_block', 'type', true);
+
+        $this->getPage()->setVar(array(
+                'RESULT_TYPE' => $this->getType(),
+            ));
+
+        $this->getPage()->parse('result_block', 'result', true);
     }
 
     /**
@@ -277,7 +302,7 @@ abstract class Handler {
      *
      * @param boolean $useSeymourLinks
      */
-    public function setUseSeymourLinks($useSeymourLinks)
+    protected function setUseSeymourLinks($useSeymourLinks)
     {
         $this->useSeymourLinks = $useSeymourLinks;
     }
@@ -287,8 +312,28 @@ abstract class Handler {
      *
      * @return boolean
      */
-    public function getUseSeymourLinks()
+    protected function getUseSeymourLinks()
     {
         return $this->useSeymourLinks;
+    }
+
+    /**
+     * Set tab name
+     *
+     * @param string $tabName
+     */
+    protected function setTabName($tabName)
+    {
+        $this->tabName = $tabName;
+    }
+
+    /**
+     * Get tab name
+     *
+     * @return string
+     */
+    protected function getTabName()
+    {
+        return $this->tabName;
     }
 }

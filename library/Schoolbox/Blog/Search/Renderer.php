@@ -25,6 +25,13 @@ class Renderer extends Handler {
     protected $type = 'blog';
 
     /**
+     * Tab Name (e.g. 'Link', 'Blogs', etc);
+     *
+     * @var string
+     */
+    protected $tabName = 'Blogs';
+
+    /**
      * Render
      */
     public function render() {

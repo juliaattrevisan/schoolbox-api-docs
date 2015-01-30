@@ -104,42 +104,42 @@ $this->setVar(array(
 
 /**
  * phpliberalise the menu tabs
- * render tabs "All" and any with a search result count
  */
 if ($enabled) {
+
+    /* Always render all tabs, hidden by default
+     * Upon ajax completion, populate the tabs with counts and
+     * phplib the result html fragment
+     */
     foreach ($type_list as $type_name => $type_desc) {
-
-        /* Always render "All" tab
-         */
-        if ($type_name != 'all') {
-
-            /* Skip any tabs that have no results
-             */
-            if (!$count[$type_name]) {
-                continue;
-            }
+        if ($type_name == 'blog') {
+            $renderer = new \Schoolbox\Blog\Search\Renderer($this, $result['blog'], $count['blog'], $current_page);
+            $renderer->renderTab();
         }
-
         /* Unholy mess
          */
-        $this->setVar(array(
-            'TYPE_COUNT' => $count[$type_name],
-            'TYPE_TITLE' => $type_name,
-            'TYPE_CLASS' => $count[$type_name] == 0 ? 'disabled' : '',
-            'TYPE_NAME' => $type_desc
-        ));
+        else {
+            $this->setVar(array(
+                'TYPE_TYPE' => $type_name,
+                'TYPE_COUNT' => $count[$type_name],
+                'TYPE_TITLE' => $type_name,
+                'TYPE_CLASS' => $count[$type_name] == 0 ? 'disabled' : '',
+                'TYPE_NAME' => $type_desc
+            ));
 
-        $this->setVar(array(
-            'RESULT_TITLE' => $type_name,
-            'RESULT_CLASS' => $type_name == 'all' ? 'hide loaded' : 'hide',
-        ));
+            $this->setVar(array(
+                'RESULT_TYPE' => $type_name,
+                'RESULT_TITLE' => $type_name,
+                'RESULT_CLASS' => $type_name == 'all' ? 'hide loaded' : 'hide',
+            ));
 
-        if ($type_name != 'all') {
-            $this->setVar('RESULT');
+            if ($type_name != 'all') {
+                $this->setVar('RESULT');
+            }
+
+            $this->parse('type_block', 'type', true);
+            $this->parse('result_block', 'result', true);
         }
-
-        $this->parse('type_block', 'type', true);
-        $this->parse('result_block', 'result', true);
     }
 
     /* Omaha Beach
