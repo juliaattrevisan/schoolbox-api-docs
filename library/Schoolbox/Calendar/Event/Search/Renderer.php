@@ -41,9 +41,9 @@ class Renderer extends Handler {
             $this->getPage()->setFile('event_t', 'resource/event/search/results.html');
             $this->getPage()->setBlock('event_t', 'event', 'event_block');
             $this->getPage()->setVar(array(
-                    'EVENT_DISP_COUNT' => count($this->getResult($this->getType())),
-                    'EVENT_COUNT' => $this->getCount($this->getType()),
-                ));
+                'EVENT_DISP_COUNT' => count($this->getResult($this->getType())),
+                'EVENT_COUNT' => $this->getCount($this->getType()),
+            ));
 
             foreach ($result as $event) {
                 $date = new Alaress_Date_Format($event['startDate'], 'Y-m-d');
@@ -58,14 +58,14 @@ class Renderer extends Handler {
                 }
 
                 $this->getPage()->setVar(array(
-                        'EVENT_TITLE' => Scrub::text($event['title']),
-                        'EVENT_TYPE' => Scrub::text($event['eventType']),
-                        'EVENT_DETAIL' => TextFormatter::cutSentence(Scrub::html2text($event['detail']),150),
-                        'EVENT_DATE' => $date->getDateOnly(),
-                        'EVENT_DATE_RAW' => $date->getUsingFormat('d-m-Y'),
-                        'EVENT_LOCATION' => $event['location'],
-                        'EVENT_TIME' => $event_time
-                    ));
+                    'EVENT_TITLE' => Scrub::text($event['title']),
+                    'EVENT_TYPE' => Scrub::text($event['eventType']),
+                    'EVENT_DETAIL' => TextFormatter::cutSentence(Scrub::html2text($event['detail']),150),
+                    'EVENT_DATE' => $date->getDateOnly(),
+                    'EVENT_DATE_RAW' => $date->getUsingFormat('d-m-Y'),
+                    'EVENT_LOCATION' => $event['location'],
+                    'EVENT_TIME' => $event_time
+                ));
 
                 $this->getPage()->parse('event_block', 'event', true);
             }
