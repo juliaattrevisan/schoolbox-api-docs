@@ -52,6 +52,7 @@ $this->setVar(array(
     'NO_RESULTS_BECAUSE' => '',
     'FOR' => ' for ',
     'ENABLED' => 1,
+    'RESULT' => '',
 ));
 
 /* Special error case
@@ -107,7 +108,7 @@ $this->setVar(array(
  */
 if ($enabled) {
 
-    $rendererArray = array(
+    $allRenderers = array(
         'blog' => new \Schoolbox\Blog\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
         'file' => new \Schoolbox\File\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
         'category' => new \Schoolbox\Folder\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
@@ -119,38 +120,27 @@ if ($enabled) {
         'user' => new \Schoolbox\User\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
     );
 
+    /* Render "All" tab option always
+     * Unholy mess
+     */
+    $this->setVar(array(
+        'TYPE_TYPE' => 'all',
+        'TYPE_NAME' => 'All'
+    ));
+
+    $this->setVar(array(
+        'RESULT_TYPE' => 'all',
+    ));
+
+    $this->parse('type_block', 'type', true);
+    $this->parse('result_block', 'result', true);
+
     /* Always render all tabs, hidden by default
      * Upon ajax completion, populate the tabs with counts and
      * phplib the result html fragment
      */
-    foreach ($type_list as $type_name => $type_desc) {
-        if (in_array($type_name, array_keys($rendererArray))) {
-            $rendererArray[$type_name]->renderTab();
-        }
-        /* Unholy mess
-         */
-        else {
-            $this->setVar(array(
-                'TYPE_TYPE' => $type_name,
-                'TYPE_COUNT' => $count[$type_name],
-                'TYPE_TITLE' => $type_name,
-                'TYPE_CLASS' => $count[$type_name] == 0 ? 'disabled' : '',
-                'TYPE_NAME' => $type_desc
-            ));
-
-            $this->setVar(array(
-                'RESULT_TYPE' => $type_name,
-                'RESULT_TITLE' => $type_name,
-                'RESULT_CLASS' => $type_name == 'all' ? 'hide loaded' : 'hide',
-            ));
-
-            if ($type_name != 'all') {
-                $this->setVar('RESULT');
-            }
-
-            $this->parse('type_block', 'type', true);
-            $this->parse('result_block', 'result', true);
-        }
+    foreach($allRenderers as $type => $currentRenderer) {
+        $currentRenderer->renderTab();
     }
 
     /* Omaha Beach
