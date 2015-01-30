@@ -107,14 +107,18 @@ $this->setVar(array(
  */
 if ($enabled) {
 
+    $rendererArray = array(
+        'blog' => new \Schoolbox\Blog\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
+        'file' => new \Schoolbox\File\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
+    );
+
     /* Always render all tabs, hidden by default
      * Upon ajax completion, populate the tabs with counts and
      * phplib the result html fragment
      */
     foreach ($type_list as $type_name => $type_desc) {
-        if ($type_name == 'blog') {
-            $renderer = new \Schoolbox\Blog\Search\Renderer($this, $result['blog'], $count['blog'], $current_page);
-            $renderer->renderTab();
+        if (in_array($type_name, array_keys($rendererArray))) {
+            $rendererArray[$type_name]->renderTab();
         }
         /* Unholy mess
          */

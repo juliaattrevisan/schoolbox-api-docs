@@ -25,6 +25,13 @@ class Renderer extends Handler {
     protected $type = 'event';
 
     /**
+     * Tab Name (e.g. 'Link', 'Blogs', etc);
+     *
+     * @var string
+     */
+    protected $tabName = 'Calendar';
+
+    /**
      * Render
      */
     public function render() {

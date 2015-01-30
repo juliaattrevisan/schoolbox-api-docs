@@ -26,6 +26,13 @@ class Renderer extends Handler {
     protected $type = 'file';
 
     /**
+     * Tab Name (e.g. 'Link', 'Blogs', etc);
+     *
+     * @var string
+     */
+    protected $tabName = 'Files';
+
+    /**
      * Render
      */
     public function render() {
@@ -39,9 +46,9 @@ class Renderer extends Handler {
             $this->getPage()->setBlock('file_t', 'file', 'file_block');
             $this->getPage()->setBlock('file', 'modify', 'modify_block');
             $this->getPage()->setVar(array(
-                    'FILE_DISP_COUNT' => count($this->getResult($this->getType())),
-                    'FILE_COUNT' => $this->getCount($this->getType()),
-                ));
+                'FILE_DISP_COUNT' => count($this->getResult($this->getType())),
+                'FILE_COUNT' => $this->getCount($this->getType()),
+            ));
 
             foreach ($result as $file) {
                 foreach ($categoryStd->breadcrumb($file['category']) as $i => $breadcrumb) {
@@ -51,17 +58,17 @@ class Renderer extends Handler {
                 $createdTime = new Alaress_Date_Relative($file['submitted']);
 
                 $this->getPage()->setVar(array(
-                        'FILE_ID' => $file['id'],
-                        'FILE_ICON' => $file['iconFile'],
-                        'FILE_SIZE' => Alaress_Byte_Format::bytesToString($file['file_size']),
-                        'FILE_DESCRIPTION' => Scrub::text($file['description']),
-                        'FILE_COMMENT' => TextFormatter::cutSentence(Scrub::text($file['comment']), 150),
-                        'FILE_OWNER' => $file['uid'],
-                        'FILE_OWNER_NAME' => $userHandler->formatName($file),
-                        'FILE_CREATED' => $createdTime->getRelativeTime(),
-                        'FILE_BREADCRUMB' => $file['breadcrumb'],
-                        'FILE_COUNT' => $this->getCount($this->getType()),
-                    ));
+                    'FILE_ID' => $file['id'],
+                    'FILE_ICON' => $file['iconFile'],
+                    'FILE_SIZE' => Alaress_Byte_Format::bytesToString($file['file_size']),
+                    'FILE_DESCRIPTION' => Scrub::text($file['description']),
+                    'FILE_COMMENT' => TextFormatter::cutSentence(Scrub::text($file['comment']), 150),
+                    'FILE_OWNER' => $file['uid'],
+                    'FILE_OWNER_NAME' => $userHandler->formatName($file),
+                    'FILE_CREATED' => $createdTime->getRelativeTime(),
+                    'FILE_BREADCRUMB' => $file['breadcrumb'],
+                    'FILE_COUNT' => $this->getCount($this->getType()),
+                ));
 
                 if ($file['perms_type'] < 2 && $file['userAccess_type'] < 2)
                     $this->getPage()->setVar('modify_block');
