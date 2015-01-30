@@ -73,6 +73,17 @@ class Results implements Searchable {
     }
 
     /**
+     * Render search tabs to chooze from
+     */
+    public function renderTabs() {
+        foreach($this->getRegistry() as $currentDefinition) {
+            $searcher = $this->getResult()->getOffset($currentDefinition->getType());
+
+            $currentDefinition->getRenderer()->renderTab($searcher, $this->getType());
+        }
+    }
+
+    /**
      * Search using each mapper's custom implementation of Search()
      *
      * @param \Schoolbox\User $user
@@ -110,17 +121,6 @@ class Results implements Searchable {
 
                 $currentDefinition->getRenderer()->render($searcher, $this->getType());
             }
-        }
-    }
-
-    /**
-     * Render search results
-     */
-    public function renderTabs() {
-        foreach($this->getRegistry() as $currentDefinition) {
-            $searcher = $this->getResult()->getOffset($currentDefinition->getType());
-
-            $currentDefinition->getRenderer()->renderTab($searcher, $this->getType());
         }
     }
 
