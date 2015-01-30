@@ -110,8 +110,11 @@ if ($enabled) {
     $rendererArray = array(
         'blog' => new \Schoolbox\Blog\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
         'file' => new \Schoolbox\File\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
+        'category' => new \Schoolbox\Folder\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
         'event' => new \Schoolbox\Calendar\Event\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
+        'homepagenews' => new \Schoolbox\Folder\News\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
     );
+
 
     /* Always render all tabs, hidden by default
      * Upon ajax completion, populate the tabs with counts and

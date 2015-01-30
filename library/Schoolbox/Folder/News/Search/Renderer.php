@@ -26,6 +26,13 @@ class Renderer extends Handler {
     protected $type = 'homepagenews';
 
     /**
+     * Tab Name (e.g. 'Link', 'Blogs', etc);
+     *
+     * @var string
+     */
+    protected $tabName = 'Homepage News';
+
+    /**
      * Render
      */
     public function render() {
@@ -38,9 +45,9 @@ class Renderer extends Handler {
             $this->getPage()->setFile('homepagenews_t', 'resource/homepagenews/search/results.html');
             $this->getPage()->setBlock('homepagenews_t', 'homepagenews', 'homepagenews_block');
             $this->getPage()->setVar(array(
-                    'HOMEPAGE_NEWS_DISP_COUNT' => count($this->getResult($this->getType())),
-                    'HOMEPAGE_NEWS_COUNT' => $this->getCount($this->getType()),
-                ));
+                'HOMEPAGE_NEWS_DISP_COUNT' => count($this->getResult($this->getType())),
+                'HOMEPAGE_NEWS_COUNT' => $this->getCount($this->getType()),
+            ));
 
             foreach ($result as $news) {
                 foreach ($categoryStd->breadcrumb($news['code']) as $i => $breadcrumb) {
@@ -59,17 +66,17 @@ class Renderer extends Handler {
                 $createdTime = new Alaress_Date_Relative($news['datetime_posted']);
 
                 $this->getPage()->setVar(array(
-                        'HOMEPAGENEWS_ID' => $news['id'],
-                        'HOMEPAGENEWS_CODE' => $news['code'],
-                        'HOMEPAGENEWS_LINK' => $news['link'],
-                        'HOMEPAGENEWS_HEADING' => Scrub::text($news['heading']),
-                        'HOMEPAGENEWS_BODY' => TextFormatter::cutSentence(Scrub::html2text($news['body']), 150),
-                        'HOMEPAGENEWS_OWNER' => $news['uid'],
-                        'HOMEPAGENEWS_OWNER_NAME' => $userHandler->formatName($news),
-                        'HOMEPAGENEWS_CREATED' => $createdTime->getRelativeTime(),
-                        'HOMEPAGENEWS_BREADCRUMB' => $news['breadcrumb'],
-                        'HOMEPAGENEWS_COUNT' => $this->getCount($this->getType()),
-                    ));
+                    'HOMEPAGENEWS_ID' => $news['id'],
+                    'HOMEPAGENEWS_CODE' => $news['code'],
+                    'HOMEPAGENEWS_LINK' => $news['link'],
+                    'HOMEPAGENEWS_HEADING' => Scrub::text($news['heading']),
+                    'HOMEPAGENEWS_BODY' => TextFormatter::cutSentence(Scrub::html2text($news['body']), 150),
+                    'HOMEPAGENEWS_OWNER' => $news['uid'],
+                    'HOMEPAGENEWS_OWNER_NAME' => $userHandler->formatName($news),
+                    'HOMEPAGENEWS_CREATED' => $createdTime->getRelativeTime(),
+                    'HOMEPAGENEWS_BREADCRUMB' => $news['breadcrumb'],
+                    'HOMEPAGENEWS_COUNT' => $this->getCount($this->getType()),
+                ));
 
                 $this->getPage()->parse('homepagenews_block', 'homepagenews', true);
             }
