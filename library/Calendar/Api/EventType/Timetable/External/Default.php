@@ -51,11 +51,14 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
         foreach ($this->getUser()->getCampusCollection() as $campus) {
             $campusId  = $campus->getId();
             try {
-                $timetable = $this->getExternalTimetable()->getFullTimetable(
-                    $this->getUser()->getExternalId(),
-                    $this->getUser()->getId(),
-                    $campusId
-                );
+                foreach (range(1, $campus->getTimetableDay()) as $day) {
+                    $timetable[$day] = $this->getExternalTimetable()->getDayTimetable(
+                        $this->getUser()->getExternalId(),
+                        $this->getUser()->getId(),
+                        $campusId,
+                        $day
+                    );
+                }
             } catch (Schoolbox\External\Exception $e) {
                 // Can't fetch timetable? assume it's empty
                 $timetable = array();
@@ -63,13 +66,14 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
             if (empty($timetable)) {
                 continue;
             }
-            foreach ($timetable as $periodDetail) {
-                foreach ($periodDetail['day'] as $dayNumber => $dayDetail) {
-                    foreach ($dayDetail as $classDetail) {
+            foreach ($timetable as $dayNumber => $periods) {
+                foreach ($periods as $periodDetail) {
+                    foreach ($periodDetail['class'] as $classDetail) {
                         // Build the day timetable detail.
                         $period             = $periodDetail + $classDetail;
                         $period['staff']    = null;
                         $period['category'] = null;
+                        unset($period['class']);
                         try {
                             if (!empty($period['staffID'])) {
                                 $period['staff'] = \Schoolbox\UserMapper::getInstance()->findOneByColumn(
@@ -91,18 +95,16 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                         }
 
                         // And set the color map as well.
-                        if (count($dayDetail) > 0) {
-                            // Set this into the color map
-                            if ($period['code'] && !array_key_exists($period['code'], $colorMap)) {
-                                // not enough colors: loop around to index 0.
-                                if (!$colorList->offsetExists($colorIndex)) {
-                                    $colorIndex = 0;
-                                }
-                                $colorMap[$period['code']] = $colorList->offsetGet($colorIndex)->getHexColour();
-                                $colorIndex++;
+                        // Set this into the color map
+                        if ($period['code'] && !array_key_exists($period['code'], $colorMap)) {
+                            // not enough colors: loop around to index 0.
+                            if (!$colorList->offsetExists($colorIndex)) {
+                                $colorIndex = 0;
                             }
-                            $period['color'] = $colorMap[$period['code']];
+                            $colorMap[$period['code']] = $colorList->offsetGet($colorIndex)->getHexColour();
+                            $colorIndex++;
                         }
+                        $period['color'] = $colorMap[$period['code']];
                         $dayTimetable[$dayNumber][$campusId][] = $period;
                     }
                 }
