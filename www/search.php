@@ -113,6 +113,7 @@ if ($enabled) {
         'category' => new \Schoolbox\Folder\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
         'event' => new \Schoolbox\Calendar\Event\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
         'homepagenews' => new \Schoolbox\Folder\News\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
+        'sitenews' => new \Schoolbox\News\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
     );
 
 
