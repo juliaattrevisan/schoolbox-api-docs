@@ -45,7 +45,11 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         // already been added.
         $checked_campus_list = array();
         foreach ($_SESSION['campus'] as $campus_id) {
-            $campus = Schoolbox\CampusMapper::getInstance()->findById($campus_id);
+            try {
+                $campus = Schoolbox\CampusMapper::getInstance()->findById($campus_id);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                continue;
+            }
             if ($campus instanceof Schoolbox\Campus) {
                 $campus_code = $campus->getExtTimetableCode();
                 if (!isset($checked_campus_list[$campus_code])) {
