@@ -116,8 +116,8 @@ if ($enabled) {
         'sitenews' => new \Schoolbox\News\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
         'wiki' => new \Schoolbox\Wiki\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
         'forum' => new \Schoolbox\Forum\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
+        'user' => new \Schoolbox\User\Search\Renderer($this, $result[$type_name], $count[$type_name], $current_page),
     );
-
 
     /* Always render all tabs, hidden by default
      * Upon ajax completion, populate the tabs with counts and

@@ -27,6 +27,13 @@ class Renderer extends Handler {
     protected $type = 'user';
 
     /**
+     * Tab Name (e.g. 'Link', 'Blogs', etc);
+     *
+     * @var string
+     */
+    protected $tabName = 'People';
+
+    /**
      * Render
      */
     public function render() {
@@ -47,22 +54,22 @@ class Renderer extends Handler {
             $this->getPage()->setBlock('user', 'user_calendar', 'user_calendar_block');
 
             $this->getPage()->setVar(array(
-                    'USER_DISP_COUNT' => count($this->getResult($this->getType())),
-                    'USER_COUNT' => $this->getCount($this->getType()),
-                ));
+                'USER_DISP_COUNT' => count($this->getResult($this->getType())),
+                'USER_COUNT' => $this->getCount($this->getType()),
+            ));
 
             foreach ($result as $user) {
                 $this->getPage()->setVar(array(
-                        'USER_SEARCH_ID' => $user['id'],
-                        'USER_SEARCH_SYNERGY_ID' => $user['synergy_id'],
-                        'USER_SEARCH_NAME' => Scrub::text($userHandler->formatName($user)),
-                        'USER_SEARCH_COUNT' => $this->getCount($this->getType()),
-                        'USER_SEARCH_YEAR' => empty($user['year']) ? '' : "Year {$user['year']}",
-                        'USER_SEARCH_CAMPUS' => Scrub::text(
-                                stristr($user['group_name'], $user['campus_name']) ? '' : $user['campus_name']
-                            ),
-                        'USER_SEARCH_GROUP' => Scrub::text($user['group_name']),
-                    ));
+                    'USER_SEARCH_ID' => $user['id'],
+                    'USER_SEARCH_SYNERGY_ID' => $user['synergy_id'],
+                    'USER_SEARCH_NAME' => Scrub::text($userHandler->formatName($user)),
+                    'USER_SEARCH_COUNT' => $this->getCount($this->getType()),
+                    'USER_SEARCH_YEAR' => empty($user['year']) ? '' : "Year {$user['year']}",
+                    'USER_SEARCH_CAMPUS' => Scrub::text(
+                            stristr($user['group_name'], $user['campus_name']) ? '' : $user['campus_name']
+                        ),
+                    'USER_SEARCH_GROUP' => Scrub::text($user['group_name']),
+                ));
 
                 $this->getPage()->setVar('timetable_block');
                 $this->getPage()->setVar('eportfolio_block');
@@ -85,8 +92,6 @@ class Renderer extends Handler {
                 } else {
                     $this->getPage()->parse('grades_button_block', 'grades_button');
                 }
-
-
 
                 //Show student timetables to staff and parents of child
                 if ($groupHandler->isStudent($user['id'])) {
