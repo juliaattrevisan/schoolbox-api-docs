@@ -23,7 +23,7 @@ $type = 'link';
 
 /* Omaha Beach!
  */
-$mapper = new \Schoolbox\Resource\Search\Results($page, $type);
+$mapper = new \Schoolbox\Resource\Search\Results($page, $type, $keyword);
 $mapper->search( $_SESSION['user'], $keyword, 0, Cfg::get('search_all_limit'));
 
 /* Omaha Beach

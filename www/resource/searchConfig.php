@@ -7,14 +7,7 @@
 define('MIN_KEYWORD_LENGTH', 2);
 define('AJAX_ENABLED', 1);
 define('AJAX_DISABLED', 0);
-//'blog' =>
-//        'file' =>
-//        'category' =>
-//        'event' =>
-//        'homepagenews' =>
-//        'sitenews' =>
-//        'wiki' =>
-//        'forum' =>
+
 $page = new SitePage();
 
 $handle = array(
@@ -24,39 +17,39 @@ $handle = array(
     ),
     'user' => array(
         'handler' => new User(),
-        'renderer' => new \Schoolbox\User\Search\Renderer($this, '', '', 0),
+        'renderer' => new \Schoolbox\User\Search\Renderer($this, '', '', 0, $keyword),
     ),
     'file' => array(
         'handler' => new File(),
-        'renderer' => new \Schoolbox\File\Search\Renderer($this, '', '', 0),
+        'renderer' => new \Schoolbox\File\Search\Renderer($this, '', '', 0, $keyword),
     ),
     'category' => array(
         'handler' => new Category(),
-        'renderer' => new \Schoolbox\Folder\Search\Renderer($this, '', '', 0),
+        'renderer' => new \Schoolbox\Folder\Search\Renderer($this, '', '', 0, $keyword),
     ),
     'sitenews' => array(
         'handler' => new News(),
-        'renderer' => new \Schoolbox\News\Search\Renderer($this, '', '', 0),
+        'renderer' => new \Schoolbox\News\Search\Renderer($this, '', '', 0, $keyword),
     ),
     'homepagenews' => array(
         'handler' => new CategoryNews(),
-        'renderer' => new \Schoolbox\Folder\News\Search\Renderer($this, '', '', 0),
+        'renderer' => new \Schoolbox\Folder\News\Search\Renderer($this, '', '', 0, $keyword),
     ),
     'blog' => array(
         'handler' => new Blog(),
-        'renderer' => new \Schoolbox\Blog\Search\Renderer($this, '', '', 0),
+        'renderer' => new \Schoolbox\Blog\Search\Renderer($this, '', '', 0, $keyword),
     ),
     'wiki' => array(
         'handler' => new Wiki(),
-        'renderer' => new \Schoolbox\Wiki\Search\Renderer($this, '', '', 0),
+        'renderer' => new \Schoolbox\Wiki\Search\Renderer($this, '', '', 0, $keyword),
     ),
     'forum' => array(
         'handler' => new Forum(),
-        'renderer' => new \Schoolbox\Forum\Search\Renderer($this, '', '', 0),
+        'renderer' => new \Schoolbox\Forum\Search\Renderer($this, '', '', 0, $keyword),
     ),
     'event' => array(
         'handler' => new Calendar(),
-        'renderer' => new \Schoolbox\Calendar\Event\Search\Renderer($this, '', '', 0),
+        'renderer' => new \Schoolbox\Calendar\Event\Search\Renderer($this, '', '', 0, $keyword),
     ),
 );
 

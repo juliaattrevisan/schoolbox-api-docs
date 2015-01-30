@@ -54,6 +54,12 @@ class Results implements Searchable {
     private $result = null;
 
     /**
+     * The thing you searched for
+     * @var string
+     */
+    private $keyword = '';
+
+    /**
      * Constructor
      *
      * $type is 'all' or specific to which tab you selected e.g. 'link'
@@ -61,11 +67,13 @@ class Results implements Searchable {
      *
      * @param $page
      * @param $type
+     * @param $keyword
      */
-    public function __construct($page, $type) {
+    public function __construct($page, $type, $keyword) {
         $this->setRegistry(new Collection());
         $this->setType($type);
         $this->setResult(new Collection());
+        $this->setKeyword($keyword);
 
         /* Add searchables
          */
@@ -220,5 +228,25 @@ class Results implements Searchable {
     private function getResult()
     {
         return $this->result;
+    }
+
+    /**
+     * Set keyword
+     *
+     * @param string $keyword
+     */
+    private function setKeyword($keyword)
+    {
+        $this->keyword = $keyword;
+    }
+
+    /**
+     * Get keyword
+     *
+     * @return string
+     */
+    private function getKeyword()
+    {
+        return $this->keyword;
     }
 }

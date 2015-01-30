@@ -33,7 +33,7 @@ $count['all'] = array_sum($count);
 
 $result[$type] = $categoryHandler->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type]);
 
-$renderer = new \Schoolbox\Folder\Search\Renderer($page, $result, $count, 0);
+$renderer = new \Schoolbox\Folder\Search\Renderer($page, $result, $count, 0, $keyword);
 $renderer->render();
 $renderer->renderPagination();
 

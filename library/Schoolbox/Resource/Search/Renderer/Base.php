@@ -118,6 +118,21 @@ abstract class Base {
         $this->getPage()->outputPage(true);
     }
 
+    /**
+     * Render error screen for no results found
+     */
+    protected function renderNoResults() {
+        $this->getPage()->setFile('no_results', 'resource/search/noResults.html');
+
+        $this->getPage()->setVar(array(
+                'ENCODED_KEYWORD' => $this->getKeyword(),
+                'UNESCAPED_KEYWORD' => $this->getKeyword(),
+                'ENABLED' => AJAX_DISABLED,
+            ));
+
+        $this->getPage()->parse('RESULT', 'no_results', true);
+    }
+    
     /* Getters/Setters
      */
 
