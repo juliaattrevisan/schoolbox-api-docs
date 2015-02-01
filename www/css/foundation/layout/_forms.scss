@@ -35,23 +35,23 @@ $input-box-shadow: none;
 // We use these to style the fieldset border and spacing.
 // $fieldset-border-style: solid;
 // $fieldset-border-width: 1px;
-// $fieldset-border-color: #ddd;
+// $fieldset-border-color: $gainsboro;
 // $fieldset-padding: rem-calc(20);
 $fieldset-margin: rem-calc(16 0);
 
 // We use these to style the legends when you use them
-// $legend-bg: #fff;
+// $legend-bg: $white;
 // $legend-font-weight: $font-weight-bold;
 // $legend-padding: rem-calc(0 3);
 
 // We use these to style the prefix and postfix input elements
-// $input-prefix-bg: scale-color(#fff, $lightness: -5%);
-// $input-prefix-border-color: scale-color(#fff, $lightness: -20%);
+// $input-prefix-bg: scale-color($white, $lightness: -5%);
+// $input-prefix-border-color: scale-color($white, $lightness: -20%);
 // $input-prefix-border-size: 1px;
 // $input-prefix-border-type: solid;
 // $input-prefix-overflow: hidden;
-// $input-prefix-font-color: #333;
-// $input-prefix-font-color-alt: #fff;
+// $input-prefix-font-color: $oil;
+// $input-prefix-font-color-alt: $white;
 
 // We use this setting to turn on/off HTML5 number spinners (the up/down arrows)
 // $input-number-spinners: true;
@@ -62,7 +62,7 @@ $input-error-message-top: -1px;
 $input-error-message-font-size: rem-calc(12);
 $input-error-message-font-weight: $font-weight-normal;
 // $input-error-message-font-style: italic;
-// $input-error-message-font-color: #fff;
+// $input-error-message-font-color: $white;
 $input-error-message-font-color-alt: $alert-color;
 
 // We use this to style the glowing effect of inputs when focused

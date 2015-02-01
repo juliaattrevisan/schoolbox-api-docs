@@ -12,7 +12,7 @@ $joyride-tip-border: 0;
 // $joyride-tip-radius: 4px;
 // $joyride-tip-position-offset: 22px;
 
-// Here, we're setting the tip dont styles
+// Here, we're setting the tip font styles
 $joyride-tip-font-color: $white;
 $joyride-tip-font-size: rem-calc(16);
 $joyride-tip-header-weight: $font-weight-bold;
@@ -23,7 +23,7 @@ $joyride-tip-header-weight: $font-weight-bold;
 // This adjusts the styles for the timer when its enabled
 // $joyride-tip-timer-width: 50px;
 // $joyride-tip-timer-height: 3px;
-// $joyride-tip-timer-color: #666;
+// $joyride-tip-timer-color: $steel;
 
 // This changes up the styles for the close button
 $joyride-tip-close-color: $white;

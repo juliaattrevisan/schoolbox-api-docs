@@ -18,7 +18,7 @@ $button-med: rem-calc(14, 40);
 // We use these to control button text styles.
 // $button-font-family: $body-font-family;
 $button-font-color: $white;
-$button-font-color-alt: $white;
+$button-font-color-alt: $black;
 // $button-font-tny: rem-calc(11);
 // $button-font-sml: rem-calc(13);
 // $button-font-med: rem-calc(16);
@@ -84,13 +84,13 @@ $crumb-border-size: 0;
 // We use these to set various text styles for breadcrumbs.
 // $crumb-font-size: rem-calc(11);
 // $crumb-font-color: $primary-color;
-// $crumb-font-color-current: #333;
-// $crumb-font-color-unavailable: #999;
+// $crumb-font-color-current: $oil;
+// $crumb-font-color-unavailable: $aluminum;
 // $crumb-font-transform: uppercase;
 // $crumb-link-decor: underline;
 
 // We use these to control the slash between breadcrumbs
-// $crumb-slash-color: #aaa;
+// $crumb-slash-color: $base;
 $crumb-slash: "";
 
 //
@@ -152,25 +152,25 @@ $dropdown-button-pip-color-alt: $white;
 // $dropdown-button-padding-tny: $button-pip-tny * 7;
 // $dropdown-button-pip-size-tny: $button-pip-tny;
 // $dropdown-button-pip-opposite-tny: $button-pip-tny * 3;
-// $dropdown-button-pip-top-tny: -$button-pip-tny / 2 + rem-calc(1);
+// $dropdown-button-pip-top-tny: (-$button-pip-tny / 2) + rem-calc(1);
 
 // We use these to style small dropdown buttons
 // $dropdown-button-padding-sml: $button-pip-sml * 7;
 // $dropdown-button-pip-size-sml: $button-pip-sml;
 // $dropdown-button-pip-opposite-sml: $button-pip-sml * 3;
-// $dropdown-button-pip-top-sml: -$button-pip-sml / 2 + rem-calc(1);
+// $dropdown-button-pip-top-sml: (-$button-pip-sml / 2) + rem-calc(1);
 
 // We use these to style medium dropdown buttons
 // $dropdown-button-padding-med: $button-pip-med * 6 + rem-calc(3);
 // $dropdown-button-pip-size-med: $button-pip-med - rem-calc(3);
 // $dropdown-button-pip-opposite-med: $button-pip-med * 2.5;
-// $dropdown-button-pip-top-med: -$button-pip-med / 2 + rem-calc(2);
+// $dropdown-button-pip-top-med: (-$button-pip-med / 2) + rem-calc(2);
 
 // We use these to style large dropdown buttons
 // $dropdown-button-padding-lrg: $button-pip-lrg * 5 + rem-calc(3);
 // $dropdown-button-pip-size-lrg: $button-pip-lrg - rem-calc(6);
 // $dropdown-button-pip-opposite-lrg: $button-pip-lrg * 2.5;
-// $dropdown-button-pip-top-lrg: -$button-pip-lrg / 2 + rem-calc(3);
+// $dropdown-button-pip-top-lrg: (-$button-pip-lrg / 2) + rem-calc(3);
 
 //
 // DROPDOWN
@@ -206,7 +206,7 @@ $f-dropdown-border-color: transparent;
 
 // We use these to style the triangle pip.
 $f-dropdown-triangle-size: 0px;
-// $f-dropdown-triangle-color: #fff;
+// $f-dropdown-triangle-color: $white;
 // $f-dropdown-triangle-side-offset: 10px;
 
 // We use these to control styles for the list elements.
@@ -220,6 +220,9 @@ $f-dropdown-list-hover-bg: tint($primary-color, 32%);
 
 // We use this to control the styles for when the dropdown has custom content.
 $f-dropdown-content-padding: rem-calc(16);
+
+// Default radius for dropdown.
+// $f-dropdown-radius: $global-radius;
 
 //
 // PAGINATION
@@ -245,7 +248,7 @@ $pagination-link-active-bg: tint($tertiary, 87%);
 
 // We use these for disabled anchor links
 // $pagination-link-unavailable-cursor: default;
-// $pagination-link-unavailable-font-color: #999;
+// $pagination-link-unavailable-font-color: $aluminum;
 $pagination-link-unavailable-bg-active: scale-color(#fff, $lightness: -5%);
 
 // We use these for currently selected anchor links
