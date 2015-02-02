@@ -57,12 +57,6 @@ $(function() {
 <!-- END custom_head -->
 
 <h1>Search Results{FOR}<em>{UNESCAPED_KEYWORD}</em></h1>
-<style type="text/css">
-.admin-nav li .hide {
-    display: none;
-    padding: none;
-}
-</style>
 <ul id="type" class="admin-nav">
     <!-- BEGIN type -->
     <li class='{TYPE_CLASS}'>
@@ -73,7 +67,7 @@ $(function() {
 
 <div class="results">
     <!-- BEGIN result -->
-    <div data-type="{RESULT_TYPE}" data-container="resultType">
+    <div data-type="{RESULT_TYPE}" data-container="resultType" class="search-resultType">
 		{RESULT}
 	</div>
     <!-- END result -->
