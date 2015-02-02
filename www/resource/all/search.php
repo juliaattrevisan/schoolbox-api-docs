@@ -52,73 +52,74 @@ $mapper->search( $_SESSION['user'], $keyword, 0, Cfg::get('search_all_limit'));
  */
 $count['all'] += $mapper->countTotalResults();
 
-/* Omaha Beach
- *
- * These have landed
- * When you add more, remove them from the searchConfig pseudo-registry
- * and remove them from the gigantic phplibbery below
- *
- * Everything here is self-contained
- */
-if ($type == 'all') {
-    $mapper->render();
-}
-
-/* These are old handlers
- *
- * Once you convert them to Mappers, remove their renderer, and remove them
- * from the searchConfig lists.
- *
- * Note that once you convert all to Mappers, you'll have more freedom in
- * choozing where their respective html files shall live. At the moment they
- * are tied in to the keys in the array, which really isn't nice.
- */
-if (!empty($handle[$type])) {
-
-    /* Particular ordering and sorting for Categories
-     */
-    if ($type != 'all') {
-        if ($type == 'category') {
-            $result[$type] = $handle[$type]['handler']->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type], 'id', 'desc');
-        } else {
-            // perform search for individual category (without formatting for ajax call)
-            $result[$type] = $handle[$type]['handler']->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type]);
-        }
-    }
-}
-
-/* Dump them
- */
-$oldHandlerRenderers = new \Schoolbox\Collection();
-$oldHandlerRenderers->setOffset('user', new \Schoolbox\User\Search\Renderer($page, $result, $count, 0));
-$oldHandlerRenderers->setOffset('file', new \Schoolbox\File\Search\Renderer($page, $result, $count, 0));
-$oldHandlerRenderers->setOffset('folder', new \Schoolbox\Folder\Search\Renderer($page, $result, $count, 0));
-$oldHandlerRenderers->setOffset('categorynews', new \Schoolbox\Folder\News\Search\Renderer($page, $result, $count, 0));
-$oldHandlerRenderers->setOffset('homepagenews', new \Schoolbox\News\Search\Renderer($page, $result, $count, 0));
-$oldHandlerRenderers->setOffset('blog', new \Schoolbox\Blog\Search\Renderer($page, $result, $count, 0));
-$oldHandlerRenderers->setOffset('wiki', new \Schoolbox\Wiki\Search\Renderer($page, $result, $count, 0));
-$oldHandlerRenderers->setOffset('forum', new \Schoolbox\Forum\Search\Renderer($page, $result, $count, 0));
-$oldHandlerRenderers->setOffset('event', new \Schoolbox\Calendar\Event\Search\Renderer($page, $result, $count, 0));
-
-/* Draw them
- */
-foreach($oldHandlerRenderers as $type => $currentRenderer) {
-    $currentRenderer->setUseSeymourLinks(true);
-    $currentRenderer->render();
-}
-
 /* If no result, render error screen
  */
-if ($noResults) {
+if (!$count['all']) {
     $this->getPage()->setFile('no_results', 'resource/search/noResults.html');
 
     $this->getPage()->setVar(array(
-        'ENCODED_KEYWORD' => $this->getKeyword(),
-        'UNESCAPED_KEYWORD' => $this->getKeyword(),
-        'ENABLED' => AJAX_DISABLED,
-    ));
+            'ENCODED_KEYWORD' => $this->getKeyword(),
+            'UNESCAPED_KEYWORD' => $this->getKeyword(),
+            'ENABLED' => AJAX_DISABLED,
+        ));
 
     $this->getPage()->parse('RESULT', 'no_results', true);
+}
+else {
+    /* Omaha Beach
+     *
+     * These have landed
+     * When you add more, remove them from the searchConfig pseudo-registry
+     * and remove them from the gigantic phplibbery below
+     *
+     * Everything here is self-contained
+     */
+    if ($type == 'all') {
+        $mapper->render();
+    }
+
+    /* These are old handlers
+     *
+     * Once you convert them to Mappers, remove their renderer, and remove them
+     * from the searchConfig lists.
+     *
+     * Note that once you convert all to Mappers, you'll have more freedom in
+     * choozing where their respective html files shall live. At the moment they
+     * are tied in to the keys in the array, which really isn't nice.
+     */
+    if (!empty($handle[$type])) {
+
+        /* Particular ordering and sorting for Categories
+         */
+        if ($type != 'all') {
+            if ($type == 'category') {
+                $result[$type] = $handle[$type]['handler']->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type], 'id', 'desc');
+            } else {
+                // perform search for individual category (without formatting for ajax call)
+                $result[$type] = $handle[$type]['handler']->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type]);
+            }
+        }
+    }
+
+    /* Dump them
+     */
+    $oldHandlerRenderers = new \Schoolbox\Collection();
+    $oldHandlerRenderers->setOffset('user', new \Schoolbox\User\Search\Renderer($page, $result, $count, 0));
+    $oldHandlerRenderers->setOffset('file', new \Schoolbox\File\Search\Renderer($page, $result, $count, 0));
+    $oldHandlerRenderers->setOffset('folder', new \Schoolbox\Folder\Search\Renderer($page, $result, $count, 0));
+    $oldHandlerRenderers->setOffset('categorynews', new \Schoolbox\Folder\News\Search\Renderer($page, $result, $count, 0));
+    $oldHandlerRenderers->setOffset('homepagenews', new \Schoolbox\News\Search\Renderer($page, $result, $count, 0));
+    $oldHandlerRenderers->setOffset('blog', new \Schoolbox\Blog\Search\Renderer($page, $result, $count, 0));
+    $oldHandlerRenderers->setOffset('wiki', new \Schoolbox\Wiki\Search\Renderer($page, $result, $count, 0));
+    $oldHandlerRenderers->setOffset('forum', new \Schoolbox\Forum\Search\Renderer($page, $result, $count, 0));
+    $oldHandlerRenderers->setOffset('event', new \Schoolbox\Calendar\Event\Search\Renderer($page, $result, $count, 0));
+
+    /* Draw them
+     */
+    foreach($oldHandlerRenderers as $type => $currentRenderer) {
+        $currentRenderer->setUseSeymourLinks(true);
+        $currentRenderer->render();
+    }
 }
 
 $page->parse(TEMPLATE_body, 'RESULT', true);
