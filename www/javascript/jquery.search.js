@@ -114,8 +114,14 @@ search = {
 		});
 
         /* Show the pagination div again
+         * but only for non-all portions
          */
-        $('.admin-nav.foot').show();
+        if (search.getSection() == 'all') {
+            $('.admin-nav.foot').hide();
+        }
+        else {
+            $('.admin-nav.foot').show();
+        }
 	},
 
 	/**
