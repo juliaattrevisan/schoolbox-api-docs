@@ -33,4 +33,5 @@ $mapper->search($_SESSION['user'], $keyword, ($current_page - 1) * Cfg::get('sea
 $mapper->render();
 $mapper->renderPagination($current_page);
 
+$page->outputPage(true);
 exit();

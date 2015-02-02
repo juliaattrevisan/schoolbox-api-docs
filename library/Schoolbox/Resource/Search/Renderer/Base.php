@@ -129,7 +129,6 @@ abstract class Base {
 
         // render final output
         $this->getPage()->parse(TEMPLATE_body, 'RESULT', true);
-        $this->getPage()->outputPage(true);
     }
 
     /* Getters/Setters
