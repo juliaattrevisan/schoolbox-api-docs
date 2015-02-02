@@ -10,6 +10,8 @@
 namespace Custom\Meriden\Pastoral;
 
 use MSSQL;
+use Schoolbox\Assessment\Grades;
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
@@ -659,21 +661,65 @@ class Query
      */
     public function getFolder($subjectCode, User $student)
     {
+        // Once I have a list:
+        // for each category, ensure that this student is actually involved
+        // Involvement:
+        // is this user currently a member?
+        // If not, are they in any assessments?
         try {
             // Only return folder that this student is involved in,
             // or was involved in.
-            return $this->getCategoryMapper()->findByCode($subjectCode);
+            $folder = $this->getCategoryMapper()->findByCode($subjectCode);
+            // I still need to know if this user is involved in this category.
+            if ($this->isStudentInvolved($folder, $student)) {
+                return $folder;
+            }
         } catch (MapperException $e) {
-            // This folder might have been rolled over.
-            // Multiple rolled-over categories with this code could exist,
-            // get the one that has the requested student in it.
-            // To do this, every matching category has to be checked.
-            try {
-                return $this->getCategoryMapper()->findByArchivedCode($subjectCode);
-            } catch (MapperException $e) {
-                return $this->getCategoryMapper()->createModel();
+            // no folder with this cat code exists.
+            // Try to find by archived code instead.
+        }
+
+        // Take 2: find by archived code, as this folder might have been rolled over.
+        // Multiple rolled-over categories with this code could exist,
+        // get the one that has the requested student in it.
+        // To do this, every matching category has to be checked.
+        $archivedFolders = $this->getCategoryMapper()->findAllByArchivedCode($subjectCode);
+        foreach ($archivedFolders as $archivedFolder) {
+            if ($this->isStudentInvolved($archivedFolder, $student)) {
+                return $archivedFolder;
             }
         }
+
+        // everything failed? return an empty model
+        return $this->getCategoryMapper()->createModel();
+    }
+
+    /**
+     * @param Category $folder
+     * @param User     $student
+     *
+     * @return bool
+     */
+    public function isStudentInvolved(Category $folder, User $student)
+    {
+        // Is $student a member of $folder (by class code?)
+        foreach ($student->getSubjectCollection() as $subject) {
+            foreach ($folder->getCodes() as $code) {
+                if ($code->getCode() == $subject['code']) {
+                    return true;
+                }
+            }
+        }
+
+        // If not, has $student got a grade in this folder?
+        $grades = Grades::getInstance()->getStudentGradesForSubject(
+            new Collection(array($student)),
+            $folder
+        );
+        if (!empty($grades[$student->getId()])) {
+            return true;
+        }
+        return false;
     }
 
     /**

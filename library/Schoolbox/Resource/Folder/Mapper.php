@@ -519,16 +519,17 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
     }
 
     /**
-     * Finds a single category based on a category code that has been archived.
+     * Finds a list of category codes based on an archived category code.
      *
      * Expects the name of the category contains $code between [] at the end.
      *
      * @param  string $code
      * @throws \Schoolbox\Mapper\Exception if statement returned no category
-     * @return Model
+     * @return Collection|Model[]
      */
-    public function findByArchivedCode($code)
+    public function findAllByArchivedCode($code)
     {
+        // Don't need no category codes here
         $query = $this->getFindQuery();
         $query .= 'WHERE c.name LIKE :code';
         $statement = $this->database->prepare($query);
@@ -537,7 +538,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
                 'code' => '%[%' . $this->database->quoteForLike($code) . '%]',
             )
         );
-        return $this->hydrateFromFindQuery($statement);
+        return $this->hydrateList($statement, 'c');
     }
 
     /**
