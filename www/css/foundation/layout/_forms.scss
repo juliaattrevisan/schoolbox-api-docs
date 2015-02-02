@@ -87,7 +87,7 @@ $switch-bg: tint($secondary-color, 26%);
 $switch-border-color: transparent;
 // $switch-border-style: solid;
 $switch-border-width: 0px;
-// $switch-bg: #fff;
+// $switch-bg: $white;
 
 // We use these to control the switch heights for our default classes
 // $switch-height-tny: rem-calc(22);
@@ -105,7 +105,7 @@ $switch-font-size-med: 16px;
 
 // We use these to style the switch-paddle
 $switch-active-color: $success-color;
-// $switch-paddle-bg: #fff;
+// $switch-paddle-bg: $white;
 $switch-paddle-fade-to-color: tint($secondary-color, 74%);
 $switch-paddle-border-color: transparent;
 $switch-paddle-border-width: 0px;
@@ -116,7 +116,7 @@ $switch-positive-color: tint($success-color, 50%);
 $switch-negative-color: tint($secondary-color, 74%);
 
 // Outline Style for tabbing through switches
-// $switch-label-outline: 1px dotted #888;
+// $switch-label-outline: 1px dotted $jumbo;
 
 @import "../../../javascript/components/foundation/scss/foundation/components/forms";
 @import "../../../javascript/components/foundation/scss/foundation/components/switches";

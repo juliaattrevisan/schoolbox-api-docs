@@ -268,13 +268,13 @@ $pagination-link-current-active-bg: $pagination-link-active-bg;
 $tabs-navigation-bg-color: tint($tertiary, 74%);
 $tabs-navigation-active-bg-color: $white;
 $tabs-navigation-hover-bg-color: tint($tertiary, 87%);
-// $tabs-navigation-font-color: #222;
+// $tabs-navigation-font-color: $jet;
 // $tabs-navigation-active-font-color: $tabs-navigation-font-color;
 // $tabs-navigation-font-size: rem-calc(16);
 // $tabs-navigation-font-family: $body-font-family;
 
 // $tabs-content-margin-bottom: rem-calc(24);
-$tabs-content-padding: $column-gutter/5;
+$tabs-content-padding: ($column-gutter/5);
 
 // $tabs-vertical-navigation-margin-bottom: 1.25rem;
 
