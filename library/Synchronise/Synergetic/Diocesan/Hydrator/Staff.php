@@ -52,10 +52,13 @@ class Staff extends Synchronise_Base_Hydrator_Staff
             return $newUser;
         }
 
-        $synCampi = $this->euHandler->getCampusFromTimetable($externalUser['StaffID']);
+        // loosey goosey
+        $synCampi = $this->euHandler->getCampusFromTimetable($externalUser['StaffID']) ?: array();
 
         // append their 'default' campus
-        $synCampi[] = $externalUser['StaffCampus'];
+        if ($externalUser['StaffCampus']) {
+            array_unshift($synCampi, array('campus' => $externalUser['StaffCampus']));
+        }
 
         $map = array(
             'S' => array(self::CAMPUS_SENIOR, self::CAMPUS_JUNHIGH),
@@ -68,8 +71,8 @@ class Staff extends Synchronise_Base_Hydrator_Staff
         // cast to schoolbox
         foreach ($synCampi as $cs)
         {
-            if (isset($map[$cs])) {
-                foreach ($map[$cs] as $c) {
+            if (array_key_exists($cs['campus'], $map)) {
+                foreach ($map[$cs['campus']] as $c) {
                     $boxCampi[$c] = true;
                 }
             }
@@ -78,8 +81,10 @@ class Staff extends Synchronise_Base_Hydrator_Staff
         // extract
         $boxCampi = array_keys($boxCampi);
 
-        $newUser['campus'] = $boxCampi;
-        $newUser['defaultCampus'] = $map[$externalUser['StaffCampus']][0];
+        if (count($boxCampi)) {
+            $newUser['campus'] = $boxCampi;
+            $newUser['defaultCampus'] = $boxCampi[0];
+        }
 
         return $newUser;
 
