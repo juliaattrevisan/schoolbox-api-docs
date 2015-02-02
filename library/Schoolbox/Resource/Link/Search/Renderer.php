@@ -84,6 +84,8 @@ class Renderer extends Base {
      */
     public function render(MapperResult $mapperResult, $type)
     {
+        $this->getPage()->setVar('see_more_block', '');
+
         if ($mapperResult->getCount()) {
             $this->getPage()->setFile('link_t', 'resource/link/search/results.html');
             $this->getPage()->setBlock('link_t', 'link', 'link_block');
@@ -118,9 +120,6 @@ class Renderer extends Base {
             if ($type == 'all' && $mapperResult->getCount() > \Cfg::get('search_all_limit')) {
                 $this->getPage()->setVar('MORE_COUNT', $mapperResult->getCount());
                 $this->getPage()->parse('see_more_block', 'see_more');
-            }
-            else {
-                $this->getPage()->setVar('see_more_block', '');
             }
 
             $this->getPage()->parse('RESULT', 'link_t', true);
