@@ -82,5 +82,8 @@ class Renderer extends Handler {
 
             $this->getPage()->parse('RESULT', 'file_t', true);
         }
+        else {
+            exit();
+        }
     }
 }

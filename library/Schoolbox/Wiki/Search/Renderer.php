@@ -75,5 +75,8 @@ class Renderer extends Handler {
 
             $this->getPage()->parse('RESULT', 'wiki_t', true);
         }
+        else {
+            exit();
+        }
     }
 }

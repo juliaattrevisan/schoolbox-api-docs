@@ -74,5 +74,8 @@ class Renderer extends Handler {
 
             $this->getPage()->parse('RESULT', 'event_t', true);
         }
+        else {
+            exit();
+        }
     }
 } 
