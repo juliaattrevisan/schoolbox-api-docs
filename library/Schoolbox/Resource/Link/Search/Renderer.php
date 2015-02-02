@@ -107,7 +107,7 @@ class Renderer extends Base {
             $this->getPage()->parse('RESULT', 'link_t', true);
         }
         else {
-            exit();
+            return;
         }
     }
 
