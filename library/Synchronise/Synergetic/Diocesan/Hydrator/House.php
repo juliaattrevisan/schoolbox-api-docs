@@ -67,7 +67,7 @@ class House implements Synchronise_Base_IHydrator
         }
 
         // boarder?
-        if ($externalUser['StudentBoarder']) {
+        if ($externalUser['StudentBoardingHouse']) {
             $newUser['residential_house_id'] = self::BOARD_INNES;
         }
 
