@@ -118,7 +118,8 @@ if ($enabled) {
         if ($typeName == 'all') {
             $this->setVar(array(
                 'TYPE_TYPE' => 'all',
-                'TYPE_NAME' => 'All'
+                'TYPE_NAME' => 'All',
+                'TYPE_STYLE' => '',
             ));
 
             $this->setVar(array(
@@ -129,7 +130,7 @@ if ($enabled) {
             $this->parse('result_block', 'result', true);
         }
         else {
-            $config['renderer']->renderTab();
+            $config['renderer']->renderTab($count);
         }
     }
 
