@@ -46,9 +46,21 @@ class Synchronise_Facade {
         $facade = sprintf($this->facadeBase, $this->db);
 
         foreach($this->strats as $currentStrategy) {
+
+            $classname = sprintf($this->stratBase, $this->db, $this->school, $currentStrategy);
+
+            if (!class_exists($classname)) {
+                $classname = str_replace('_', '\\', $classname);
+
+                if (!class_exists($classname)) {
+                    printf("Unable to find strat: %s.%s", $this->school, $currentStrategy);
+                    continue;
+                }
+            }
+
             // double-nested polymorphism anyone? This may need refactoring.
             // this will also call setup() in some cases, which is reserved for destructive changes
-            $strats[$currentStrategy] = new $facade(sprintf($this->stratBase, $this->db, $this->school, $currentStrategy));
+            $strats[$currentStrategy] = new $facade($classname);
         }
 
         foreach ($this->strats as $currentStrategy) {
