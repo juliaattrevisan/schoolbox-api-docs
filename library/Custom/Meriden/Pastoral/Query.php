@@ -10,6 +10,7 @@
 namespace Custom\Meriden\Pastoral;
 
 use MSSQL;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Grades;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -735,25 +736,25 @@ class Query
                 if ($code->getCode() == $subject['code']) {
                     // Student is involved, even if they have no grades.
                     // Try to get them anyway.
-                    $grades = $this->getGradesService()->getStudentGradesForSubject(
-                        new Collection(array($student)),
-                        $folder
+                    $grades = ReturnedWorkMapper::getInstance()->getStudentMarks(
+                        $folder->getId(),
+                        $studentId
                     );
                     return array(
-                        'grades' => $grades[$studentId] ?: array(),
+                        'grades' => $grades ?: array(),
                     );
                 }
             }
         }
 
         // If not, has $student got a grade in this folder?
-        $grades = $this->getGradesService()->getStudentGradesForSubject(
-            new Collection(array($student)),
-            $folder
+        $grades = ReturnedWorkMapper::getInstance()->getStudentMarks(
+            $folder->getId(),
+            $studentId
         );
-        if (!empty($grades[$studentId])) {
+        if (!empty($grades)) {
             return array(
-                'grades' => $grades[$studentId],
+                'grades' => $grades,
             );
         }
         return array();
