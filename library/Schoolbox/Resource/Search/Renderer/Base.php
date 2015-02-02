@@ -22,11 +22,18 @@ abstract class Base {
     protected $page = null;
 
     /**
-     * The thing you looked for
+     * Type (e.g. 'link', 'blog', etc)
      *
      * @var string
      */
-    private $keyword = '';
+    protected $type = '';
+
+    /**
+     * Tab Name (e.g. 'Link', 'Blogs', etc);
+     *
+     * @var string
+     */
+    protected $tabName = '';
 
     /**
      * Constructor
@@ -146,5 +153,45 @@ abstract class Base {
     protected function getPage()
     {
         return $this->page;
+    }
+
+    /**
+     * Set type
+     *
+     * @param string $type
+     */
+    protected function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * Get type
+     *
+     * @return string
+     */
+    protected function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Set tab name
+     *
+     * @param string $tabName
+     */
+    protected function setTabName($tabName)
+    {
+        $this->tabName = $tabName;
+    }
+
+    /**
+     * Get tab name
+     *
+     * @return string
+     */
+    protected function getTabName()
+    {
+        return $this->tabName;
     }
 }

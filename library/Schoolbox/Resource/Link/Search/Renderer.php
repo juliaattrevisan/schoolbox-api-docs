@@ -21,6 +21,20 @@ use Schoolbox\Resource\CategoryMapper;
 class Renderer extends Base {
 
     /**
+     * Type (e.g. 'link', 'blog', etc)
+     *
+     * @var string
+     */
+    protected $type = 'link';
+
+    /**
+     * Tab Name (e.g. 'Link', 'Blogs', etc);
+     *
+     * @var string
+     */
+    protected $tabName = 'Links';
+
+    /**
      * Render clickable tab menu
      *
      * @param MapperResult $mapperResult
@@ -29,15 +43,16 @@ class Renderer extends Base {
     public function renderTab(MapperResult $mapperResult, $type) {
         if ($mapperResult->getCount()) {
             $this->getPage()->setVar(array(
-                'TYPE_TYPE' => 'link',
-                'TYPE_NAME' => 'Links'
-            ));
-
-            $this->getPage()->setVar(array(
-                'RESULT_TYPE' => 'link',
+                'TYPE_TYPE' => $this->getType(),
+                'TYPE_NAME' => $this->getTabName(),
             ));
 
             $this->getPage()->parse('type_block', 'type', true);
+
+            $this->getPage()->setVar(array(
+                'RESULT_TYPE' => $this->getType(),
+            ));
+
             $this->getPage()->parse('result_block', 'result', true);
         }
     }
