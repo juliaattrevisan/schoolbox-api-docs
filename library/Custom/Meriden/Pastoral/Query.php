@@ -361,12 +361,27 @@ class Query
                 teacher.tch_name ASC
         ";
         $params = array(
-            ':externalId'   => $this->getDatabase()->smartQuote($externalId),
-            ':year'         => $this->getDatabase()->smartQuote($year),
+            ':externalId' => $this->getDatabase()->smartQuote($externalId),
+            ':year'       => $this->getDatabase()->smartQuote($year),
         );
         return $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll(strtr($query, $params))
         );
+    }
+
+    /**
+     * Adds year level (7-12) into the year level group record.
+     *
+     * @param array $group
+     *
+     * @return array
+     */
+    protected function augmentYearLevelGroupWithYearLevel($group)
+    {
+        // All year groups are named "Year x Tutor Group"
+        preg_match('/^Year (?P<year_level>\\d+) Tutor Group$/', $group['sub_desc'], $subject);
+        $group['year_level'] = $subject['year_level'];
+        return $group;
     }
 
     /**
@@ -407,34 +422,37 @@ class Query
         $result = $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll(strtr($query, $params))
         );
+        $result = array_map(
+            array($this, 'augmentYearLevelGroupWithYearLevel'),
+            $result
+        );
         return array_map(
-            function ($r) {
-                // All year groups are named "Year x Tutor Group"
-                preg_match('/^Year (?P<year_level>\\d+) Tutor Group$/', $r['sub_desc'], $subject);
-                $r['year_level'] = $subject['year_level'];
-                return $r;
-            },
+            array($this, 'augmentSubjectWithCode'),
             $result
         );
     }
 
     /**
-     * Given a year level and a student, gets their year level for that year.
+     * Given a year level and a student, gets their year level group for that year.
      *
      * @param int  $year
      * @param User $student
      *
      * @return int
      */
-    public function getYearLevelForStudentForYear($year, User $student)
+    public function getYearLevelGroup($year, User $student)
     {
         $externalId = $student->getExternalId();
         if (!$externalId) {
-            return null;
+            return array();
         }
         $query = "
             SELECT
-                subtab.sub_desc
+                studsub.class,
+                studsub.yr_study,
+                studsub.sub_code,
+                subtab.sub_desc,
+                subtab.sub_type
             FROM studsub
             INNER JOIN subtab
                 ON subtab.sub_code = studsub.sub_code
@@ -451,12 +469,44 @@ class Query
             ':externalId' => $this->getDatabase()->smartQuote($externalId),
             ':year'       => $this->getDatabase()->smartQuote($year),
         );
-        $result = $this->getDatabase()->trimField(
-            $this->getDatabase()->getOne(strtr($query, $params))
+        $result = $this->getDatabase()->trimRow(
+            $this->getDatabase()->getRow(strtr($query, $params))
         );
-        // All year groups are named "Year x Tutor Group"
-        preg_match('/^Year (?P<year_level>\\d+) Tutor Group$/', $result, $subject);
+
+        return $this->augmentYearLevelGroupWithYearLevel(
+            $this->augmentSubjectWithCode($result)
+        );
+    }
+
+    /**
+     * Given a year level and a student, gets their year level for that year.
+     *
+     * @param int  $year
+     * @param User $student
+     *
+     * @return int
+     */
+    public function getYearLevelForStudentForYear($year, User $student)
+    {
+        $subject = $this->getYearLevelGroup($year, $student);
         return $subject['year_level'];
+    }
+
+    /**
+     * Adds Schoolbox compatible subject code into the subject record.
+     *
+     * @param array $subject
+     *
+     * @return array
+     */
+    protected function augmentSubjectWithCode($subject)
+    {
+        $subject['code'] = sprintf(
+            '-%s-%s',
+            $subject['sub_code'],
+            $subject['class']
+        );
+        return $subject;
     }
 
     /**
@@ -510,16 +560,8 @@ class Query
         // Add class code
         // year level is the student's year level at the time they took class,
         // not the year in which they took it.
-        $yearLevel = $this->getYearLevelForStudentForYear($year, $student);
         $result = array_map(
-            function ($row) use ($yearLevel) {
-                $row['code'] = sprintf(
-                    '-%s-%s',
-                    $row['sub_code'],
-                    $row['class']
-                );
-                return $row;
-            },
+            array($this, 'augmentSubjectWithCode'),
             $result
         );
 

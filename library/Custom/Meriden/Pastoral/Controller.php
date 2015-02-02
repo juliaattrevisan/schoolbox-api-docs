@@ -78,10 +78,12 @@ class Controller extends Base
         $subjectReport   = array();
         if (!isset($subjectCode)) {
             // Only required for the eReport
+            // Get more information about the tutor group too.
             $yearLevelReport = array(
                 'attendance' => $this->getDatabase()->getAllAttendances($year, $student),
                 'activities' => $this->getDatabase()->getAllActivities($year, $student),
                 'tutors'     => $this->getDatabase()->getAllTutors($year, $student),
+                'tutorGroup' => $this->getDatabase()->getYearLevelGroup($year, $student),
             );
         } else {
             // Only required for the subject page
