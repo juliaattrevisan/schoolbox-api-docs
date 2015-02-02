@@ -107,13 +107,21 @@ class UserProfile extends SubjectListAbstract {
                             'subject_teacher_block' => ''
                         ));
 
+                        if ($currentSubject['category']['code']) {
+                            $code = $currentSubject['category']['code'];
+                        }
+                        else {
+                            $code = $currentSubject['subject']['campusCode'].'/'.$currentSubject['subject']['code'];
+                        }
+
+
                         $this->getPage()->setVar(array(
                             'SUBJECT_NAME' => \Scrub::text($currentSubject['categoryName']),
                             'SUBJECT_URL' => is_array($currentSubject['category']) && $this->getGroupHandler()->getPermission($currentSubject['category']['id']  ) >= READ_ACCESS ? "/homepage/code/{$currentSubject['category']['code']}": '#',
                         ));
 
                         /* Fetch teacher names */
-                        $teacherList = $this->getExternalClassHandler()->getTeacherName($currentSubject['category']['code']);
+                        $teacherList = $this->getExternalClassHandler()->getTeacherName($code);
 
                         if (is_array($teacherList) && count($teacherList)) {
                             foreach ($teacherList as $teacherSynID) {
