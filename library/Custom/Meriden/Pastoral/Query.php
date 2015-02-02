@@ -36,7 +36,7 @@ class Query
      */
     public function __construct(MSSQL $database, CategoryMapper $categoryMapper)
     {
-        $this->setDatabase($database);
+        $this->setDatabase($database)->setCategoryMapper($categoryMapper);
     }
 
     /**
