@@ -209,7 +209,9 @@ abstract class Handler {
 
             // only 1 page to display
         } else {
-            $this->getPage()->setVar('pagination_block');
+            $this->getPage()->setVar(array(
+                'pagination_block' => ''
+            ));
         }
     }
 
