@@ -29,8 +29,7 @@ class Parents extends Synchronise_Base_Strategy_Parent
         $this
             ->addHydrator(new \Synchronise_Base_Hydrator_Default())
 
-            ->addHydrator(new Diocesan\Hydrator\Parents())
-
+            ->addHydrator(new Diocesan\Hydrator\Parents(new \External_User()))
 
             ->addHydrator(new \Synchronise_Base_Hydrator_MailHandler())
             ->addHydrator(new \Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
