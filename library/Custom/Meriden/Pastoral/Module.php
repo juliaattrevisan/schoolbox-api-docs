@@ -93,6 +93,8 @@ class Module extends BaseModule
             = $injector->lazyNew('MSSQL');
         $injector->params['Custom\\Meriden\\Pastoral\\Query']['categoryMapper']
             = $injector->lazyNew('Schoolbox\\Resource\\CategoryMapper');
+        $injector->params['Custom\\Meriden\\Pastoral\\Query']['userMapper']
+            = $injector->lazyNew('Schoolbox\\UserMapper');
         $injector->set(
             'controller:customMeridenPastoral',
             $injector->lazyNew('Custom\\Meriden\\Pastoral\\Controller')

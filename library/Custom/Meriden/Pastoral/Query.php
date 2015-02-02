@@ -24,6 +24,11 @@ class Query
     protected $database;
 
     /**
+     * @var UserMapper
+     */
+    protected $userMapper;
+
+    /**
      * @var CategoryMapper
      */
     protected $categoryMapper;
@@ -32,11 +37,15 @@ class Query
      * Constructor
      *
      * @param MSSQL          $database
+     * @param UserMapper     $userMapper
      * @param CategoryMapper $categoryMapper
      */
-    public function __construct(MSSQL $database, CategoryMapper $categoryMapper)
+    public function __construct(MSSQL $database, UserMapper $userMapper, CategoryMapper $categoryMapper)
     {
-        $this->setDatabase($database)->setCategoryMapper($categoryMapper);
+        $this
+            ->setDatabase($database)
+            ->setUserMapper($userMapper)
+            ->setCategoryMapper($categoryMapper);
     }
 
     /**
@@ -670,6 +679,8 @@ class Query
     public function getFolder($subjectCode)
     {
         try {
+            // Only return folder that this student is involved in,
+            // or was involved in.
             return $this->getCategoryMapper()->findByCode($subjectCode);
         } catch (MapperException $e) {
             // This folder might have been rolled over.
@@ -679,7 +690,7 @@ class Query
             try {
                 return $this->getCategoryMapper()->findByArchivedCode($subjectCode);
             } catch (MapperException $e) {
-                return new Category();
+                return $this->getCategoryMapper()->createModel();
             }
         }
     }
@@ -700,6 +711,25 @@ class Query
     public function setDatabase($database)
     {
         $this->database = $database;
+        return $this;
+    }
+
+    /**
+     * @return UserMapper
+     */
+    public function getUserMapper()
+    {
+        return $this->userMapper;
+    }
+
+    /**
+     * @param  UserMapper $userMapper
+     *
+     * @return $this
+     */
+    public function setUserMapper($userMapper)
+    {
+        $this->userMapper = $userMapper;
         return $this;
     }
 
