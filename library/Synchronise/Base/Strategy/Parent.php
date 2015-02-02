@@ -132,6 +132,11 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy
                     continue;
                 }
 
+                // no VALID user? well, ok...
+                if (empty($newUser['synergy_id'])) {
+                    continue;
+                }
+
                 // Add each user to the list of unique users, merging the campus
                 // list into the new one.
                 $user_id = $newUser['synergy_id'];
