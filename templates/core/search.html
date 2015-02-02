@@ -29,14 +29,19 @@ $(function() {
             }
         }
 
+        /* Seymour
+         */
         $('#content div.results').on('click', 'a.more', function() {
             event.preventDefault();
 
-            var type = $(this).attr('[data-type]');
-            var selector = '#type a[rel='+type+']';
-            $(selector).trigger('click');
+            var type = $(this).attr('rel');
+
+            window.location.href = '/search?keyword=' + keyword + '#' + type + ',1';
+            window.location.reload(true);
         });
 
+        /* Run Once by default
+         */
         search.runOnce(keyword, section, $('#type a[rel=' + section + ']'), pageNumber);
 
         /* Runs when you change sections
