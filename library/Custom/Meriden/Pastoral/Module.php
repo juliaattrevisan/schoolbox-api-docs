@@ -60,7 +60,7 @@ class Module extends BaseModule
         $matcher->add(
             '/^customMeridenPastoral\\.(?:index|subject)/',
             function($params) {
-                $student = UserMapper::getInstance()->findById($params['id']);
+                $student = UserMapper::getInstance()->findWithSubjects($params['id']);
                 $student->setSubjectCollection(SubjectMapper::getInstance()->findAllForStudent($student));
                 return array(
                     'student' => $student,
