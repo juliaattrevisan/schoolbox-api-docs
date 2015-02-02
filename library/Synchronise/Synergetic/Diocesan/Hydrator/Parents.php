@@ -30,10 +30,12 @@ class Parents extends Synchronise_Base_Hydrator_Parent
 
     /**
      * @param External_UserInterface $eu
+     * @param Mapper $userMapper
      */
-    function __construct(External_UserInterface $eu)
+    function __construct(External_UserInterface $eu, Mapper $userMapper)
     {
         $this->euHandler = $eu;
+        $this->userMapper = $userMapper;
     }
 
 
@@ -51,7 +53,7 @@ class Parents extends Synchronise_Base_Hydrator_Parent
 
         // provide access to all campuses of children
         // make eldest-child campus the default
-        $childExtIds = $this->euHandler->getEnrolledStudents($externalUser['ContactID']);
+        $childExtIds = $this->euHandler->getEnrolledStudents($externalUser['StudentContactID']);
 
         /** @var Collection|User[] $children */
         $children = $this->userMapper->findByColumn('synergy_id', $childExtIds, array(

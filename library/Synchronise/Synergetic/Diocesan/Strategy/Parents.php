@@ -10,6 +10,7 @@
 namespace Synchronise\Synergetic\Diocesan\Strategy;
 
 
+use Schoolbox\UserMapper;
 use Synchronise_Base_Strategy_Parent;
 
 use Synchronise\Synergetic\Diocesan;
@@ -29,7 +30,7 @@ class Parents extends Synchronise_Base_Strategy_Parent
         $this
             ->addHydrator(new \Synchronise_Base_Hydrator_Default())
 
-            ->addHydrator(new Diocesan\Hydrator\Parents(new \External_User()))
+            ->addHydrator(new Diocesan\Hydrator\Parents(new \External_User(), UserMapper::getInstance()))
 
             ->addHydrator(new \Synchronise_Base_Hydrator_MailHandler())
             ->addHydrator(new \Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
