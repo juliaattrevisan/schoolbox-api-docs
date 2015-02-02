@@ -15,5 +15,15 @@ use Synchronise\Synergetic\Diocesan;
 
 class Guest extends Synchronise_Base_Strategy_Student
 {
+    /**
+     * Setup verbose output and hydration classes
+     */
+    protected function setup()
+    {
+        $this->setVerboseFilter(new Diocesan\Verbose());
+
+        $this->addHydrator(new \Synchronise_Base_Hydrator_MailHandler())
+             ->addHydrator(new \Synchronise_Base_Hydrator_Clear());
+    }
 
 }
