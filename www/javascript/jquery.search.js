@@ -112,6 +112,10 @@ search = {
 				search.updateStyles();
 			});
 		});
+
+        /* Show the pagination div again
+         */
+        $('.admin-nav.foot').show();
 	},
 
 	/**
@@ -194,7 +198,7 @@ search = {
 		 * through this particular section
 		 */
 		if (this.getSection() == 'all') {
-			$('.admin-nav.foot').remove();
+			$('.admin-nav.foot').hide();
 		}
 	},
 
