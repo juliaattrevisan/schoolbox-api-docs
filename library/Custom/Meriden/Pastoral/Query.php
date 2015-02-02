@@ -382,21 +382,6 @@ class Query
     }
 
     /**
-     * Adds year level (7-12) into the year level group record.
-     *
-     * @param array $group
-     *
-     * @return array
-     */
-    protected function augmentYearLevelGroupWithYearLevel($group)
-    {
-        // All year groups are named "Year x Tutor Group"
-        preg_match('/^Year (?P<year_level>\\d+) Tutor Group$/', $group['sub_desc'], $subject);
-        $group['year_level'] = $subject['year_level'];
-        return $group;
-    }
-
-    /**
      * Retrieves all year level groups for this student.
      *
      * @param User $student
