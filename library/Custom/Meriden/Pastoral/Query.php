@@ -333,7 +333,7 @@ class Query
         }
         // In Schoolbox-Tass nomeclature, Schoolbox classes will have the
         // following code:
-        // {tchsub.year_num}-{tchsub.sub_code}-{tchsub.class}
+        // {tchsub.year_num(optional)}-{tchsub.sub_code}-{tchsub.class}
         $query = "
             SELECT DISTINCT
                 teacher.tch_code,
@@ -514,8 +514,7 @@ class Query
         $result = array_map(
             function ($row) use ($yearLevel) {
                 $row['code'] = sprintf(
-                    '%s-%s-%s',
-                    $yearLevel,
+                    '-%s-%s',
                     $row['sub_code'],
                     $row['class']
                 );
