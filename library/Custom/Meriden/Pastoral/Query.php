@@ -435,10 +435,6 @@ class Query
             $this->getDatabase()->getAll(strtr($query, $params))
         );
         $result = $result ?: array();
-        $result = array_map(
-            array($this, 'augmentYearLevelGroupWithYearLevel'),
-            $result
-        );
         return array_map(
             array($this, 'augmentSubjectWithCode'),
             $result
@@ -488,9 +484,7 @@ class Query
         $result = $result ?: array();
 
         return $this->augmentSubjectWithFolder(
-            $this->augmentYearLevelGroupWithYearLevel(
-                $this->augmentSubjectWithCode($result)
-            )
+            $this->augmentSubjectWithCode($result)
         );
     }
 
