@@ -22,18 +22,14 @@ require_once('./resource/searchClean.php');
 $type = 'link';
 
 /* Omaha Beach!
- */
-$mapper = new \Schoolbox\Resource\Search\Results($page, $type, $keyword);
-$mapper->search($_SESSION['user'], $keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'));
-
-/* Omaha Beach
  *
  * These have landed
  * When you add more, remove them from the searchConfig pseudo-registry
- * and remove them from the gigantic phplibbery below
  *
  * Everything here is self-contained
  */
+$mapper = new \Schoolbox\Resource\Search\Results($page, $type, $keyword);
+$mapper->search($_SESSION['user'], $keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'));
 $mapper->render();
 $mapper->renderPagination($current_page);
 
