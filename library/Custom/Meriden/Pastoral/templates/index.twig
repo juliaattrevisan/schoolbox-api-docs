@@ -45,7 +45,15 @@
     <dd>{{ report.yearLevelReport.coordinator.name }}</dd>
 
     <dt>Tutor Group</dt>
-    <dd>{{ report.yearLevelReport.tutorGroup.code }}</dd>
+    <dd>
+        {% if report.yearLevelReport.tutorGroup.folder.id %}
+            <a href="/homepage/{{ report.yearLevelReport.tutorGroup.folder.id }}">
+                {{ report.yearLevelReport.tutorGroup.code }}
+            </a>
+        {% else %}
+            {{ report.yearLevelReport.tutorGroup.code }}
+        {% endif %}
+    </dd>
 
     <dt>Tutor</dt>
     {% for tutor in report.yearLevelReport.tutors %}
