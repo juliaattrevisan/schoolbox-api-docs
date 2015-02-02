@@ -75,6 +75,8 @@ class Renderer extends Handler {
             $this->getPage()->parse('RESULT', 'event_t', true);
         }
         else {
+            $this->getPage()->setVar('see_more_block', '');
+
             return;
         }
     }

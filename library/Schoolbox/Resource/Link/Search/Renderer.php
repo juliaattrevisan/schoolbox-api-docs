@@ -84,12 +84,14 @@ class Renderer extends Base {
      */
     public function render(MapperResult $mapperResult, $type)
     {
-        $this->getPage()->setVar('see_more_block', '');
-
         if ($mapperResult->getCount()) {
             $this->getPage()->setFile('link_t', 'resource/link/search/results.html');
             $this->getPage()->setBlock('link_t', 'link', 'link_block');
             $this->getPage()->setBlock('link_t', 'see_more', 'see_more_block');
+
+            $this->getPage()->setVar(array(
+                'see_more_block' => ''
+            ));
 
             $this->getPage()->setVar(array(
                 'LINK_DISP_COUNT' => $mapperResult->getResult()->count(),

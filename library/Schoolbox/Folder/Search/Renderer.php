@@ -73,6 +73,8 @@ class Renderer extends Handler {
             $this->getPage()->parse('RESULT', 'category_t', true);
         }
         else {
+            $this->getPage()->setVar('see_more_block', '');
+
             return;
         }
     }
