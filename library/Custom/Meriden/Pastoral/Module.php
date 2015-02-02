@@ -16,6 +16,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Assessment\Grades;
 use Schoolbox\External\SubjectMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
@@ -95,6 +96,8 @@ class Module extends BaseModule
             = $injector->lazyNew('Schoolbox\\Resource\\CategoryMapper');
         $injector->params['Custom\\Meriden\\Pastoral\\Query']['userMapper']
             = $injector->lazyNew('Schoolbox\\UserMapper');
+        $injector->params['Custom\\Meriden\\Pastoral\\Query']['gradesService']
+            = Grades::getInstance();
         $injector->set(
             'controller:customMeridenPastoral',
             $injector->lazyNew('Custom\\Meriden\\Pastoral\\Controller')

@@ -36,18 +36,29 @@ class Query
     protected $categoryMapper;
 
     /**
+     * @var Grades
+     */
+    protected $gradesService;
+
+    /**
      * Constructor
      *
      * @param MSSQL          $database
      * @param UserMapper     $userMapper
      * @param CategoryMapper $categoryMapper
+     * @param Grades         $gradesService
      */
-    public function __construct(MSSQL $database, UserMapper $userMapper, CategoryMapper $categoryMapper)
-    {
+    public function __construct(
+        MSSQL $database,
+        UserMapper $userMapper,
+        CategoryMapper $categoryMapper,
+        Grades $gradesService
+    ) {
         $this
             ->setDatabase($database)
             ->setUserMapper($userMapper)
-            ->setCategoryMapper($categoryMapper);
+            ->setCategoryMapper($categoryMapper)
+            ->setGradesService($gradesService);
     }
 
     /**
@@ -712,7 +723,7 @@ class Query
         }
 
         // If not, has $student got a grade in this folder?
-        $grades = Grades::getInstance()->getStudentGradesForSubject(
+        $grades = $this->getGradesService()->getStudentGradesForSubject(
             new Collection(array($student)),
             $folder
         );
@@ -776,6 +787,25 @@ class Query
     public function setCategoryMapper($categoryMapper)
     {
         $this->categoryMapper = $categoryMapper;
+        return $this;
+    }
+
+    /**
+     * @return Grades
+     */
+    public function getGradesService()
+    {
+        return $this->gradesService;
+    }
+
+    /**
+     * @param  Grades $gradesService
+     *
+     * @return $this
+     */
+    public function setGradesService($gradesService)
+    {
+        $this->gradesService = $gradesService;
         return $this;
     }
 }
