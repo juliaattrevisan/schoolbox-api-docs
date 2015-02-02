@@ -90,7 +90,8 @@ class Controller extends Base
             list(, $code, $class) = explode('-', $subjectCode);
             $subjectReport = array(
                 'subject' => $this->getDatabase()->getSubject($code),
-                'folder'  => $this->getDatabase()->getFolder($subjectCode, $student),
+//                'subject' => $this->getDatabase()->getSubject($subjectCode, $student),
+//                'folder'  => $this->getDatabase()->getFolder($subjectCode, $student),
             );
         }
 

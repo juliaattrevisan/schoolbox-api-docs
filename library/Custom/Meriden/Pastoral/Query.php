@@ -657,7 +657,9 @@ class Query
      */
     protected function augmentSubjectWithFolder($subject, User $student)
     {
-        $subject['folder'] = $this->getFolder($subject['code'], $student);
+        $folderWithGrades  = $this->getFolderWithGrades($subject['code'], $student);
+        $subject['folder'] = $folderWithGrades['folder'];
+        $subject['grades'] = $folderWithGrades['grades'];
         return $subject;
     }
 
@@ -668,15 +670,21 @@ class Query
      * @param string $subjectCode
      * @param User   $student
      *
-     * @return Category
+     * @return array {
+     *  folder: Category
+     *  grades: array
+     * }
      */
-    public function getFolder($subjectCode, User $student)
+    public function getFolderWithGrades($subjectCode, User $student)
     {
         try {
             // Find by category code, and figure out if they're involved.
             $folder = $this->getCategoryMapper()->findByCode($subjectCode);
-            if ($this->isStudentInvolved($folder, $student)) {
-                return $folder;
+            if ($involvement = $this->getStudentInvolvement($folder, $student)) {
+                return array(
+                    'folder' => $folder,
+                    'grades' => $involvement['grades'],
+                );
             }
         } catch (MapperException $e) {
             // no folder with this cat code exists.
@@ -689,13 +697,19 @@ class Query
         // To do this, every matching category has to be checked.
         $archivedFolders = $this->getCategoryMapper()->findAllByArchivedCode($subjectCode);
         foreach ($archivedFolders as $archivedFolder) {
-            if ($this->isStudentInvolved($archivedFolder, $student)) {
-                return $archivedFolder;
+            if ($involvement = $this->getStudentInvolvement($archivedFolder, $student)) {
+                return array(
+                    'folder' => $archivedFolder,
+                    'grades' => $involvement['grades'],
+                );
             }
         }
 
         // everything failed? return an empty model
-        return $this->getCategoryMapper()->createModel();
+        return array(
+            'folder' => $this->getCategoryMapper()->createModel(),
+            'grades' => array(),
+        );
     }
 
     /**
@@ -708,15 +722,26 @@ class Query
      * @param Category $folder
      * @param User     $student
      *
-     * @return bool
+     * @return array {
+     *  grades: array (if the student is involved)
+     * }
      */
-    public function isStudentInvolved(Category $folder, User $student)
+    public function getStudentInvolvement(Category $folder, User $student)
     {
         // Is $student a member of $folder (by class code?)
+        $studentId = $student->getId();
         foreach ($student->getSubjectCollection() as $subject) {
             foreach ($folder->getCodes() as $code) {
                 if ($code->getCode() == $subject['code']) {
-                    return true;
+                    // Student is involved, even if they have no grades.
+                    // Try to get them anyway.
+                    $grades = $this->getGradesService()->getStudentGradesForSubject(
+                        new Collection(array($student)),
+                        $folder
+                    );
+                    return array(
+                        'grades' => $grades[$studentId] ?: array(),
+                    );
                 }
             }
         }
@@ -726,10 +751,12 @@ class Query
             new Collection(array($student)),
             $folder
         );
-        if (!empty($grades[$student->getId()])) {
-            return true;
+        if (!empty($grades[$studentId])) {
+            return array(
+                'grades' => $grades[$studentId],
+            );
         }
-        return false;
+        return array();
     }
 
     /**
