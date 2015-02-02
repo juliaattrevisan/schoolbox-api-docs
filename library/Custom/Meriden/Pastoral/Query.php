@@ -662,7 +662,7 @@ class Query
     }
 
     /**
-     * Gets the (current or archived) folder for this subject code,
+     * Gets the (current or archived) folder for this subject code and student,
      * or an empty one if not found.
      *
      * @param string $subjectCode
@@ -672,16 +672,9 @@ class Query
      */
     public function getFolder($subjectCode, User $student)
     {
-        // Once I have a list:
-        // for each category, ensure that this student is actually involved
-        // Involvement:
-        // is this user currently a member?
-        // If not, are they in any assessments?
         try {
-            // Only return folder that this student is involved in,
-            // or was involved in.
+            // Find by category code, and figure out if they're involved.
             $folder = $this->getCategoryMapper()->findByCode($subjectCode);
-            // I still need to know if this user is involved in this category.
             if ($this->isStudentInvolved($folder, $student)) {
                 return $folder;
             }
@@ -690,7 +683,7 @@ class Query
             // Try to find by archived code instead.
         }
 
-        // Take 2: find by archived code, as this folder might have been rolled over.
+        // Find by archived code, as this folder might have been rolled over.
         // Multiple rolled-over categories with this code could exist,
         // get the one that has the requested student in it.
         // To do this, every matching category has to be checked.
@@ -706,6 +699,12 @@ class Query
     }
 
     /**
+     * Is $student involved in $folder?
+     *
+     * This performs the following checks:
+     * * Is this student currently a member of the class?
+     * * Does this student have a grade in this folder?
+     *
      * @param Category $folder
      * @param User     $student
      *
