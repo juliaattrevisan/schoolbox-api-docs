@@ -90,9 +90,10 @@ class Query
                 )
             );
         }
-        return $this->getDatabase()->trimAll(
+        $result = $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll(strtr($query, $params))
         );
+        return $result ?: array();
     }
 
     /**
@@ -130,9 +131,10 @@ class Query
             ':year'         => $this->getDatabase()->smartQuote($year),
             ':activityType' => $this->getDatabase()->smartQuote($activityType),
         );
-        return $this->getDatabase()->trimAll(
+        $result = $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll(strtr($query, $params))
         );
+        return $result ?: array();
     }
 
     /**
@@ -364,9 +366,10 @@ class Query
             ':externalId' => $this->getDatabase()->smartQuote($externalId),
             ':year'       => $this->getDatabase()->smartQuote($year),
         );
-        return $this->getDatabase()->trimAll(
+        $result = $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll(strtr($query, $params))
         );
+        return $result ?: array();
     }
 
     /**
@@ -422,6 +425,7 @@ class Query
         $result = $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll(strtr($query, $params))
         );
+        $result = $result ?: array();
         $result = array_map(
             array($this, 'augmentYearLevelGroupWithYearLevel'),
             $result
@@ -556,6 +560,7 @@ class Query
         $result = $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll(strtr($query, $params))
         );
+        $result = $result ?: array();
 
         // Add class code
         // year level is the student's year level at the time they took class,

@@ -44,6 +44,9 @@
     <dt>Year Coordinator</dt>
     <dd>{{ report.yearLevelReport.coordinator.name }}</dd>
 
+    <dt>Tutor Group</dt>
+    <dd>{{ report.yearLevelReport.tutorGroup.code }}</dd>
+
     <dt>Tutor</dt>
     {% for tutor in report.yearLevelReport.tutors %}
         <dd>{{ tutor.tch_name }} (Semester {{ tutor.semester }})</dd>
