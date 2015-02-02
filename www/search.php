@@ -81,6 +81,7 @@ elseif (!is_numeric($keyword) && (strlen($keyword) < MIN_KEYWORD_LENGTH)) {
     $this->parse('no_result_block', 'no_result');
 }
 /* Also parse the no_result block if no results were found
+ * when using the default 'all' selection
  */
 elseif ($count['all'] == 0) {
     $enabled = AJAX_DISABLED;
