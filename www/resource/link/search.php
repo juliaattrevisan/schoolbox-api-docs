@@ -34,6 +34,8 @@ $mapper->search( $_SESSION['user'], $keyword, 0, Cfg::get('search_all_limit'));
  */
 $count['all'] += $mapper->countTotalResults();
 
+$mapper->search($_SESSION['user'], $keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'));
+
 /* Omaha Beach
  *
  * These have landed
