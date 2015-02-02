@@ -603,26 +603,26 @@ class Query
             },
             array()
         );
-
+        $result = array_map(
+            array($this, 'augmentSubjectWithTeacher'),
+            $result
+        );
         return $result;
     }
 
     /**
-     * Augments a list retrieved by getAllSubjectsForYear() with a homepage
-     * link and one or more teachers.
-
-     * @param array $subjects
+     * Augments a subject retrieved by getAllSubjectsForYear() with one or
+     * more teachers.
+     *
+     * @param array $subject
+     *
      * @return array
      */
-    public function augmentSubjectsWithTeacher(array $subjects)
+    protected function augmentSubjectWithTeacher(array $subject)
     {
-        $userMapper = new UserMapper();
-        foreach ($subjects as &$subject) {
-            // Get every teacher by their tch_code
-            $subject['teachers'] = $userMapper->findByColumn('synergy_id', $subject['tch_code']);
-        }
-        unset($subject);
-        return $subjects;
+        // Get every teacher by their tch_code
+        $subject['teachers'] = $this->getUserMapper()->findByColumn('synergy_id', $subject['tch_code']);
+        return $subject;
     }
 
     /**

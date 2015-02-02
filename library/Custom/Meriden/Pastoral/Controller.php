@@ -96,9 +96,7 @@ class Controller extends Base
 
         // Used in all reports, for the subject/year selector
         $yearLevels = $this->getDatabase()->getAllYearLevelGroups($student);
-        $subjects   = $this->getDatabase()->augmentSubjectsWithTeacher(
-            $this->getDatabase()->getAllSubjectsForYear($year, $student)
-        );
+        $subjects   = $this->getDatabase()->getAllSubjectsForYear($year, $student);
 
         // Check previous and next year, disable if no year level group exists
         $previousYear = false;
