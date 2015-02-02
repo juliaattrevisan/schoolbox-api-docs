@@ -29,19 +29,12 @@ class Renderer extends Base {
     public function renderTab(MapperResult $mapperResult, $type) {
         if ($mapperResult->getCount()) {
             $this->getPage()->setVar(array(
-                'TYPE_COUNT' => $mapperResult->getCount(),
-                'TYPE_TITLE' => 'link',
-                'TYPE_CLASS' => '',
+                'TYPE_TYPE' => 'link',
                 'TYPE_NAME' => 'Links'
             ));
 
             $this->getPage()->setVar(array(
-                'RESULT_TITLE' => 'link',
-                'RESULT_CLASS' => $type == 'all' ? 'hide loaded' : 'hide',
-            ));
-
-            $this->getPage()->setVar(array(
-                'RESULT' => ''
+                'RESULT_TYPE' => 'link',
             ));
 
             $this->getPage()->parse('type_block', 'type', true);
