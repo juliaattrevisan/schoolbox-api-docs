@@ -49,7 +49,7 @@ $this->setVar(array(
     'no_result_block' => '',
     'NO_RESULTS_BECAUSE' => '',
     'FOR' => ' for ',
-    'ENABLED' => 1,
+    'ENABLED' => AJAX_ENABLED,
     'RESULT' => '',
 ));
 
