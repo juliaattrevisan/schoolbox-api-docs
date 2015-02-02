@@ -22,8 +22,10 @@ class Guest extends Synchronise_Base_Strategy_Student
     {
         $this->setVerboseFilter(new Diocesan\Verbose());
 
-        $this->addHydrator(new \Synchronise_Base_Hydrator_MailHandler())
-             ->addHydrator(new \Synchronise_Base_Hydrator_Clear());
+        $this
+            ->addHydrator(new Diocesan\Hydrator\Guest())
+            ->addHydrator(new \Synchronise_Base_Hydrator_MailHandler())
+        ;
     }
 
 }
