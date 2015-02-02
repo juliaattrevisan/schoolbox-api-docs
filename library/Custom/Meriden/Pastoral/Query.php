@@ -469,7 +469,8 @@ class Query
         $result = $result ?: array();
 
         return $this->augmentSubjectWithFolder(
-            $this->augmentSubjectWithCode($result)
+            $this->augmentSubjectWithCode($result),
+            $student
         );
     }
 
@@ -630,7 +631,6 @@ class Query
         );
         $result = $result ?: array();
         $result = $this->augmentSubjectWithCode($result);
-        $result = $this->augmentSubjectWithFolder($result);
         return $result;
     }
 
@@ -638,12 +638,13 @@ class Query
      * Adds the folder object into the subject.
      *
      * @param array $subject
+     * @param User  $student
      *
      * @return array
      */
-    protected function augmentSubjectWithFolder($subject)
+    protected function augmentSubjectWithFolder($subject, User $student)
     {
-        $subject['folder'] = $this->getFolder($subject['code']);
+        $subject['folder'] = $this->getFolder($subject['code'], $student);
         return $subject;
     }
 
@@ -651,11 +652,12 @@ class Query
      * Gets the (current or archived) folder for this subject code,
      * or an empty one if not found.
      *
-     * @param $subjectCode
+     * @param string $subjectCode
+     * @param User   $student
      *
      * @return Category
      */
-    public function getFolder($subjectCode)
+    public function getFolder($subjectCode, User $student)
     {
         try {
             // Only return folder that this student is involved in,
