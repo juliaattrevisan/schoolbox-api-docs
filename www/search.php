@@ -119,7 +119,7 @@ if ($enabled) {
             $this->setVar(array(
                 'TYPE_TYPE' => 'all',
                 'TYPE_NAME' => 'All',
-                'TYPE_STYLE' => '',
+                'TYPE_CLASS' => '',
             ));
 
             $this->setVar(array(
