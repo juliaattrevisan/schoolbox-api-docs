@@ -10,7 +10,14 @@
 namespace Synchronise\Synergetic\Diocesan\Strategy;
 
 
+use External_User;
 use Schoolbox\UserMapper;
+use Synchronise_Base_Hydrator_Clear;
+use Synchronise_Base_Hydrator_Default;
+use Synchronise_Base_Hydrator_MailHandler;
+use Synchronise_Base_Hydrator_Parent;
+use Synchronise_Base_Hydrator_Spouse;
+use Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate;
 use Synchronise_Base_Strategy_Parent;
 
 use Synchronise\Synergetic\Diocesan;
@@ -28,13 +35,14 @@ class Parents extends Synchronise_Base_Strategy_Parent
         $this->setVerboseFilter(new Diocesan\Verbose());
 
         $this
-            ->addHydrator(new \Synchronise_Base_Hydrator_Default())
+            ->addHydrator(new Synchronise_Base_Hydrator_Default())
 
-            ->addHydrator(new Diocesan\Hydrator\Parents(new \External_User(), UserMapper::getInstance()))
+            ->addHydrator(new Diocesan\Hydrator\Parents(new Synchronise_Base_Hydrator_Parent(), new External_User(), UserMapper::getInstance()))
+            ->addHydrator(new Diocesan\Hydrator\Parents(new Synchronise_Base_Hydrator_Spouse(), new External_User(), UserMapper::getInstance()))
 
-            ->addHydrator(new \Synchronise_Base_Hydrator_MailHandler())
-            ->addHydrator(new \Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
-            ->addHydrator(new \Synchronise_Base_Hydrator_Clear());
+            ->addHydrator(new Synchronise_Base_Hydrator_MailHandler())
+            ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
+            ->addHydrator(new Synchronise_Base_Hydrator_Clear());
     }
 
 }
