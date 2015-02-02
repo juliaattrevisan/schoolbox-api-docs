@@ -24,16 +24,6 @@ $type = 'link';
 /* Omaha Beach!
  */
 $mapper = new \Schoolbox\Resource\Search\Results($page, $type, $keyword);
-$mapper->search( $_SESSION['user'], $keyword, 0, Cfg::get('search_all_limit'));
-
-/* Omaha Beach
- *
- * There's a sequential dependency here, which prevents us from moving
- * up the beach in a nice way. 2RS uses $count as a global var, a terrible
- * move, and it's even more annoying to use a $temp var to counter it
- */
-$count['all'] += $mapper->countTotalResults();
-
 $mapper->search($_SESSION['user'], $keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'));
 
 /* Omaha Beach
