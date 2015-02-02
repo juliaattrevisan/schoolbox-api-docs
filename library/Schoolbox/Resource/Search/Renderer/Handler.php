@@ -68,12 +68,12 @@ abstract class Handler {
     /**
      * Constructor
      *
-     * @param $page a site page
+     * @param \SitePage $page 
      * @param array $result Equivalent of $result['blog'] etc.
      * @param array $count Equivalent of $count['blog'] etc.
      * @param $currentPage
      */
-    public function __construct($page, $result, $count, $currentPage) {
+    public function __construct(\SitePage $page, $result, $count, $currentPage) {
         $this->setPage($page);
         $this->setResult($result);
         $this->setCount($count);
