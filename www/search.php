@@ -69,6 +69,8 @@ if (!is_numeric($keyword) && (strlen($keyword) == 0)) {
         'NO_RESULTS_BECAUSE' => ' because it\'s empty',
         'ENABLED' => AJAX_DISABLED,
     ));
+
+    $this->parse('no_result_block', 'no_result');
 }
 elseif (!is_numeric($keyword) && (strlen($keyword) < MIN_KEYWORD_LENGTH)) {
     $enabled = AJAX_DISABLED;
