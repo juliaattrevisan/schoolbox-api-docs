@@ -83,7 +83,7 @@ class Renderer extends Handler {
             $this->getPage()->parse('RESULT', 'sitenews_t', true);
         }
         else {
-            exit();
+            return;
         }
     }
 } 
