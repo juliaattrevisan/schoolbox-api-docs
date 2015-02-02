@@ -476,9 +476,12 @@ class Query
         $result = $this->getDatabase()->trimRow(
             $this->getDatabase()->getRow(strtr($query, $params))
         );
+        $result = $result ?: array();
 
-        return $this->augmentYearLevelGroupWithYearLevel(
-            $this->augmentSubjectWithCode($result)
+        return $this->augmentSubjectWithFolder(
+            $this->augmentYearLevelGroupWithYearLevel(
+                $this->augmentSubjectWithCode($result)
+            )
         );
     }
 
@@ -634,9 +637,26 @@ class Query
         $params = array(
             ':code' => $this->getDatabase()->smartQuote($subjectCode),
         );
-        return $this->getDatabase()->trimRow(
+        $result = $this->getDatabase()->trimRow(
             $this->getDatabase()->getRow(strtr($query, $params))
         );
+        $result = $result ?: array();
+        $result = $this->augmentSubjectWithCode($result);
+        $result = $this->augmentSubjectWithFolder($result);
+        return $result;
+    }
+
+    /**
+     * Adds the folder object into the subject.
+     *
+     * @param array $subject
+     *
+     * @return array
+     */
+    protected function augmentSubjectWithFolder($subject)
+    {
+        $subject['folder'] = $this->getFolder($subject['code']);
+        return $subject;
     }
 
     /**
