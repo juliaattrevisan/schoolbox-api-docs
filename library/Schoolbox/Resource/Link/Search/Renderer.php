@@ -45,7 +45,7 @@ class Renderer extends Base {
             $this->getPage()->setVar(array(
                 'TYPE_TYPE' => $this->getType(),
                 'TYPE_NAME' => $this->getTabName(),
-
+                'TYPE_COUNT' => $mapperResult->getCount(),
             ));
 
             /* Rage these styles in, because of css specificity

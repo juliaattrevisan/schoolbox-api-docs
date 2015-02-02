@@ -87,6 +87,7 @@ abstract class Handler {
         $this->getPage()->setVar(array(
             'TYPE_TYPE' => $this->getType(),
             'TYPE_NAME' => $this->getTabName(),
+            'TYPE_COUNT' => $count[$this->getType()],
         ));
 
         /* Rage these styles in, because of css specificity

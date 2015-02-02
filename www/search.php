@@ -120,6 +120,7 @@ if ($enabled) {
                 'TYPE_TYPE' => 'all',
                 'TYPE_NAME' => 'All',
                 'TYPE_CLASS' => '',
+                'TYPE_COUNT' => $count[$typeName],
             ));
 
             $this->setVar(array(
