@@ -91,7 +91,7 @@ class Controller extends Base
 //            new \Alaress_Probe(
 //                $this->getTutorGroupFactory()->build($year, $student)
 //            );
-            $tutorGroup = $this->getTutorGroupFactory()->build($year, $student);
+            $tutorGroup = $this->getTutorGroupFactory()->buildTutorGroup($year, $student);
         } else {
             // Only required for the subject page
             list(, $code, $class) = explode('-', $subjectCode);

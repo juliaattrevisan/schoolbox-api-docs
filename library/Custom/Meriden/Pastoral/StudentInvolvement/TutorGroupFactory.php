@@ -70,7 +70,7 @@ class TutorGroupFactory
      *
      * @return TutorGroup
      */
-    public function build($year, User $student)
+    public function buildTutorGroup($year, User $student)
     {
         $tutorGroup = new TutorGroup();
         $tutorGroup
