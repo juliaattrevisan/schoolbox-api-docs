@@ -13,7 +13,6 @@ use Custom\Meriden\Pastoral\StudentInvolvement\Gateway;
 use MSSQL;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Grades;
-use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
@@ -62,11 +61,10 @@ class Query
         Grades $gradesService
     ) {
         $this
-            ->setDatabase($database)
+            ->setGateway(new Gateway($database))
             ->setUserMapper($userMapper)
             ->setCategoryMapper($categoryMapper)
             ->setGradesService($gradesService);
-        $this->gateway = new Gateway($database);
     }
 
     /**
@@ -83,7 +81,7 @@ class Query
      */
     public function getAbsenceCount($year, User $student)
     {
-        return $this->gateway->getAbsenceCount($year, $student);
+        return $this->getGateway()->getAbsenceCount($year, $student);
     }
 
     /**
@@ -96,7 +94,7 @@ class Query
      */
     public function getLateCount($year, User $student)
     {
-        return $this->gateway->getLateCount($year, $student);
+        return $this->getGateway()->getLateCount($year, $student);
     }
 
     /**
@@ -109,7 +107,7 @@ class Query
      */
     public function getDetentionCount($year, User $student)
     {
-        return $this->gateway->getDetentionCount($year, $student);
+        return $this->getGateway()->getDetentionCount($year, $student);
     }
 
     /**
@@ -122,7 +120,7 @@ class Query
      */
     public function getLeaveCount($year, User $student)
     {
-        return $this->gateway->getLeaveCount($year, $student);
+        return $this->getGateway()->getLeaveCount($year, $student);
     }
 
     /**
@@ -153,7 +151,7 @@ class Query
      */
     public function getAwards($year, User $student)
     {
-        return $this->gateway->getAwards($year, $student);
+        return $this->getGateway()->getAwards($year, $student);
     }
 
     /**
@@ -166,7 +164,7 @@ class Query
      */
     public function getCocurricular($year, User $student)
     {
-        return $this->gateway->getCocurricular($year, $student);
+        return $this->getGateway()->getCocurricular($year, $student);
     }
 
     /**
@@ -179,7 +177,7 @@ class Query
      */
     public function getService($year, User $student)
     {
-        return $this->gateway->getService($year, $student);
+        return $this->getGateway()->getService($year, $student);
     }
 
     /**
@@ -192,7 +190,7 @@ class Query
      */
     public function getPositions($year, User $student)
     {
-        return $this->gateway->getPositions($year, $student);
+        return $this->getGateway()->getPositions($year, $student);
     }
 
     /**
@@ -224,7 +222,7 @@ class Query
      */
     public function getAllTutors($year, User $student)
     {
-        return $this->gateway->getAllTutors($year, $student);
+        return $this->getGateway()->getAllTutors($year, $student);
     }
 
     /**
@@ -236,7 +234,7 @@ class Query
      */
     public function getAllYearLevelGroups(User $student)
     {
-        $result = $this->gateway->getAllYearLevelGroups($student);
+        $result = $this->getGateway()->getAllYearLevelGroups($student);
         return array_map(
             array($this, 'augmentSubjectWithCode'),
             $result
@@ -253,7 +251,7 @@ class Query
      */
     public function getYearLevelGroup($year, User $student)
     {
-        $result = $this->gateway->getYearLevelGroup($year, $student);
+        $result = $this->getGateway()->getYearLevelGroup($year, $student);
         return $this->augmentSubjectWithFolder(
             $this->augmentSubjectWithCode($result),
             $student
@@ -301,7 +299,7 @@ class Query
      */
     public function getAllSubjectsForYear($year, User $student)
     {
-        $result = $this->gateway->getAllSubjectsForYear($year, $student);
+        $result = $this->getGateway()->getAllSubjectsForYear($year, $student);
 
         // Add class code
         // year level is the student's year level at the time they took class,
@@ -363,7 +361,7 @@ class Query
      */
     public function getSubject($subjectCode)
     {
-        $result = $this->gateway->getSubject($subjectCode);
+        $result = $this->getGateway()->getSubject($subjectCode);
         $result = $this->augmentSubjectWithCode($result);
         return $result;
     }
@@ -553,6 +551,25 @@ class Query
     public function setGradesService($gradesService)
     {
         $this->gradesService = $gradesService;
+        return $this;
+    }
+
+    /**
+     * @return Gateway
+     */
+    public function getGateway()
+    {
+        return $this->gateway;
+    }
+
+    /**
+     * @param  Gateway $gateway
+     *
+     * @return $this
+     */
+    public function setGateway($gateway)
+    {
+        $this->gateway = $gateway;
         return $this;
     }
 }
