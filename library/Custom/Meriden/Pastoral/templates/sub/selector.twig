@@ -8,7 +8,7 @@
             {% for level in tutorGroupList.levels %}
                 <option value="{{ routeLookup('customMeridenPastoral.index', {year: level.yr_study, id: student.id}) }}"
                         label="{{ level.yr_study }} eReport"
-                        {% if level.yr_study == tutorGroupReport.year %}selected{% endif %}
+                        {% if level.yr_study == (tutorGroupReport.year ?: subjectReport.year) %}selected{% endif %}
                         >{{ level.yr_study }} eReport</option>
             {% endfor %}
         </select>
