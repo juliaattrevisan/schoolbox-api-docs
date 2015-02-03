@@ -21,9 +21,9 @@
         <select id="enrolled-subjects">
             <option disabled="disabled" selected="selected">Select a subject</option>
             {% for currentSubject in subjectList %}
-                <option value="{{ routeLookup('customMeridenPastoral.subject', {year: currentSubject.year, id: student.id, subjectCode: currentSubject.code}) }}"
+                <option value="{{ routeLookup('customMeridenPastoral.subject', {year: currentSubject.yr_study, id: student.id, subjectCode: currentSubject.code}) }}"
                         label="{{ currentSubject.sub_desc }} ({{ currentSubject.code }})"
-                        {% if currentSubject.code == subjectReport.code %}selected{% endif %}
+                        {% if currentSubject.code == subjectReport.subjectCode %}selected{% endif %}
                         >{{ currentSubject.sub_desc }} ({{ currentSubject.code }})</option>
             {% endfor %}
         </select>
