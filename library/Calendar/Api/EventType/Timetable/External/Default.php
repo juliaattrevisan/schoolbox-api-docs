@@ -66,6 +66,8 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
             if (empty($timetable)) {
                 continue;
             }
+            $timetableStaff      = array();
+            $timetableCategories = array();
             foreach ($timetable as $dayNumber => $periods) {
                 foreach ($periods as $periodDetail) {
                     foreach ($periodDetail['class'] as $classDetail) {
@@ -74,25 +76,44 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                         $period['staff']    = null;
                         $period['category'] = null;
                         unset($period['class']);
+
+                        // Load staff into period defintion
+                        $staffId = $period['staffID'];
                         try {
-                            if (!empty($period['staffID'])) {
-                                $period['staff'] = \Schoolbox\UserMapper::getInstance()->findOneByColumn(
-                                    'synergy_id',
-                                    $period['staffID']
-                                );
+                            if (!empty($staffId)) {
+                                // Don't load more than once
+                                if (!array_key_exists($staffId, $timetableStaff)) {
+                                    $timetableStaff[$staffId] = \Schoolbox\UserMapper::getInstance()->findOneByColumn(
+                                        'synergy_id',
+                                        $period['staffID']
+                                    );
+                                }
+                            } else {
+                                $timetableStaff[$staffId] = null;
                             }
                         } catch (Exception $e) {
-                            // noop
+                            $timetableStaff[$staffId] = null;
                         }
+                        $period['staff'] = $timetableStaff[$staffId];
+
+                        // Load category into period defintion
+                        $categoryId = $period['code'];
                         try {
-                            if (!empty($period['code'])) {
-                                $period['category'] = \Schoolbox\Resource\CategoryMapper::getInstance()->findByCode(
-                                    $period['code']
-                                );
+                            if (!empty($categoryId)) {
+                                // Don't load more than once
+                                if (!array_key_exists($categoryId, $timetableCategories)) {
+                                    $timetableCategories[$categoryId] =
+                                        \Schoolbox\Resource\CategoryMapper::getInstance()->findByCode(
+                                            $categoryId
+                                        );
+                                }
+                            } else {
+                                $timetableCategories[$categoryId] = null;
                             }
                         } catch (Exception $e) {
-                            // noop
+                            $timetableCategories[$categoryId] = null;
                         }
+                        $period['category'] = $timetableCategories[$categoryId];
 
                         // And set the color map as well.
                         // Set this into the color map
