@@ -16,11 +16,6 @@ use Schoolbox\User;
 class Controller extends Base
 {
     /**
-     * @var Query
-     */
-    protected $database;
-
-    /**
      * @var Factory
      */
     protected $studentInvolvementFactory;
@@ -28,14 +23,11 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param Query   $database
      * @param Factory $studentInvolvementFactory
      */
-    public function __construct(
-        Query $database,
-        Factory $studentInvolvementFactory
-    ) {
-        $this->setDatabase($database)->setStudentInvolvementFactory($studentInvolvementFactory);
+    public function __construct(Factory $studentInvolvementFactory)
+    {
+        $this->setStudentInvolvementFactory($studentInvolvementFactory);
     }
 
     /**
@@ -99,25 +91,6 @@ class Controller extends Base
                 'subjectList'      => $this->getStudentInvolvementFactory()->buildSubjectList($year, $student),
             )
         );
-    }
-
-    /**
-     * @return Query
-     */
-    public function getDatabase()
-    {
-        return $this->database;
-    }
-
-    /**
-     * @param  Query $database
-     *
-     * @return $this
-     */
-    public function setDatabase($database)
-    {
-        $this->database = $database;
-        return $this;
     }
 
     /**

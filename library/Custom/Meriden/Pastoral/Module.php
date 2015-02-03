@@ -103,15 +103,6 @@ class Module extends BaseModule
         $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Gateway']['database']
             = $injector->lazyNew('MSSQL');
 
-        $injector->params['Custom\\Meriden\\Pastoral\\Query']['database']
-            = $injector->lazyNew('MSSQL');
-        $injector->params['Custom\\Meriden\\Pastoral\\Query']['categoryMapper']
-            = $injector->lazyNew('Schoolbox\\Resource\\CategoryMapper');
-        $injector->params['Custom\\Meriden\\Pastoral\\Query']['userMapper']
-            = $injector->lazyNew('Schoolbox\\UserMapper');
-        $injector->params['Custom\\Meriden\\Pastoral\\Query']['gradesService']
-            = Grades::getInstance();
-
         $injector->set(
             'controller:customMeridenPastoral',
             $injector->lazyNew('Custom\\Meriden\\Pastoral\\Controller')
