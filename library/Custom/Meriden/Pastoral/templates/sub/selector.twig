@@ -19,7 +19,13 @@
     <form id="subjects" method="get">
         <span class="elbow">&#9492;</span>
         <select id="enrolled-subjects">
-            <option disabled="disabled" selected="selected">Select a subject</option>
+            {# Subject report? show a "Back to eReport" option #}
+            {% if tutorGroupReport.subjectCode %}
+                <option disabled="disabled" selected="selected">Select a subject</option>
+            {% elseif subjectReport.subjectCode %}
+                <option value="{{ routeLookup('customMeridenPastoral.subject', {year: .yr_study, id: student.id, subjectCode: currentSubject.code}) }}"
+                        label="{{ currentSubject.sub_desc }} ({{ currentSubject.code }})">Back to </option>
+            {% endif %}
             {% for currentSubject in subjectList %}
                 <option value="{{ routeLookup('customMeridenPastoral.subject', {year: currentSubject.yr_study, id: student.id, subjectCode: currentSubject.code}) }}"
                         label="{{ currentSubject.sub_desc }} ({{ currentSubject.code }})"
