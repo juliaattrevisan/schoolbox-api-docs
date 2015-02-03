@@ -9,6 +9,7 @@
 
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Grades;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Category;
@@ -87,8 +88,116 @@ class TutorGroupFactory
                 )
             )
         ;
+
+        $tutorGroupCode   = $tutorGroup->getTutorGroup();
+        $folderWithGrades = $this->getFolderWithGrades($tutorGroupCode['code'], $student);
+        $tutorGroup
+            ->setFolder($folderWithGrades['folder'])
+            ->setGrades($folderWithGrades['grades'])
+        ;
+//        $folder = $this->getCategoryMapper()->findAllByArchivedCode();
+//        $tutorGroup
+//            ->setFolder()
+//            ->setGrades()
+//        ;
         // also get the folder, grades and subject list?
         return $tutorGroup;
+    }
+
+    /**
+     * Gets the (current or archived) folder for this subject code and student,
+     * or an empty one if not found.
+     *
+     * @param string $subjectCode
+     * @param User   $student
+     *
+     * @return array {
+     *  folder: Category
+     *  grades: array
+     * }
+     */
+    public function getFolderWithGrades($subjectCode, User $student)
+    {
+        try {
+            // Find by category code, and figure out if they're involved.
+            $folder = $this->getCategoryMapper()->findByCode($subjectCode);
+            if ($involvement = $this->getStudentInvolvement($folder, $student)) {
+                return array(
+                    'folder' => $folder,
+                    'grades' => $involvement['grades'],
+                );
+            }
+        } catch (MapperException $e) {
+            // no folder with this cat code exists.
+            // Try to find by archived code instead.
+        }
+
+        // Find by archived code, as this folder might have been rolled over.
+        // Multiple rolled-over categories with this code could exist,
+        // get the one that has the requested student in it.
+        // To do this, every matching category has to be checked.
+        $archivedFolders = $this->getCategoryMapper()->findAllByArchivedCode($subjectCode);
+        foreach ($archivedFolders as $archivedFolder) {
+            if ($involvement = $this->getStudentInvolvement($archivedFolder, $student)) {
+                return array(
+                    'folder' => $archivedFolder,
+                    'grades' => $involvement['grades'],
+                );
+            }
+        }
+
+        // everything failed? return an empty model
+        return array(
+            'folder' => $this->getCategoryMapper()->createModel(),
+            'grades' => array(),
+        );
+    }
+
+    /**
+     * Is $student involved in $folder?
+     *
+     * This performs the following checks:
+     * * Is this student currently a member of the class?
+     * * Does this student have a grade in this folder?
+     *
+     * @param Category $folder
+     * @param User     $student
+     *
+     * @return array {
+     *  grades: array (if the student is involved)
+     * }
+     */
+    public function getStudentInvolvement(Category $folder, User $student)
+    {
+        // Is $student a member of $folder (by class code?)
+        $studentId = $student->getId();
+        foreach ($student->getSubjectCollection() as $subject) {
+            foreach ($folder->getCodes() as $code) {
+                if ($code->getCode() == $subject['code']) {
+                    // Student is involved, even if they have no grades.
+                    // Try to get them anyway.
+                    $grades = ReturnedWorkMapper::getInstance()->getStudentMarks(
+                        $folder->getId(),
+                        $studentId
+                    );
+                    return array(
+                        'grades' => $grades ?: array(),
+                    );
+                }
+            }
+        }
+
+        // If not, has $student got a grade in this folder?
+        $grades = ReturnedWorkMapper::getInstance()->getStudentMarks(
+            $folder->getId(),
+            $studentId
+        );
+        if (!empty($grades)) {
+            return array(
+                'grades' => $grades,
+            );
+        }
+        return array();
     }
 
     /**

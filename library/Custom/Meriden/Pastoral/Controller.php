@@ -83,17 +83,15 @@ class Controller extends Base
      */
     protected function buildReportData($year, User $student, $subjectCode = null)
     {
-        $yearLevelReport = array();
-        $subjectReport   = array();
+        $subjectReport = array();
+        $tutorGroup    = null;
         if (!isset($subjectCode)) {
             // Only required for the eReport
             // Get more information about the tutor group too.
-            $yearLevelReport = array(
-                'attendance' => $this->getDatabase()->getAllAttendances($year, $student),
-                'activities' => $this->getDatabase()->getAllActivities($year, $student),
-                'tutors'     => $this->getDatabase()->getAllTutors($year, $student),
-                'tutorGroup' => $this->getDatabase()->getYearLevelGroup($year, $student),
-            );
+//            new \Alaress_Probe(
+//                $this->getTutorGroupFactory()->build($year, $student)
+//            );
+            $tutorGroup = $this->getTutorGroupFactory()->build($year, $student);
         } else {
             // Only required for the subject page
             list(, $code, $class) = explode('-', $subjectCode);
@@ -133,7 +131,7 @@ class Controller extends Base
                     'current' => $subjectCode,
                 ),
                 'student'  => $student,
-                'yearLevelReport' => $yearLevelReport,
+                'tutorGroup' => $tutorGroup,
                 'subjectReport' => $subjectReport,
             )
         );
