@@ -30,9 +30,10 @@
 <div id="context">
     {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
     {% include '@customMeridenPastoral/sub/selector.twig' with {
-        year:    report.year,
-        student: report.student,
-        subject: report.subjectReport.subjectCode
+        tutorGroupList: report.tutorGroupList,
+        subjectList:    report.subjectList,
+        student:        report.student,
+        subjectReport:  report.subjectReport
     } %}
 </div>
 

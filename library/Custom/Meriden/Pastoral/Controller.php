@@ -90,30 +90,13 @@ class Controller extends Base
         } else {
             $subject = $this->getStudentInvolvementFactory()->buildSubject($year, $student, $subjectCode);
         }
-
-        // Used in all reports, for the subject/year selector
-        $yearLevels = $this->getStudentInvolvementFactory()->buildTutorGroupList($year, $student);
-        $subjects   = $this->getStudentInvolvementFactory()->buildSubjectList($year, $student);
-
-//        // Check previous and next year, disable if no year level group exists
-//        $previousYear = false;
-//        $nextYear     = false;
-//        foreach ($yearLevels as $level) {
-//            $yearLevel = $level['yr_study'];
-//            if ($yearLevel == ($year-1)) {
-//                $previousYear = $yearLevel;
-//            }
-//            if ($yearLevel == ($year+1)) {
-//                $nextYear = $yearLevel;
-//            }
-//        }
         return array(
             'report' => array(
                 'student'          => $student,
                 'tutorGroupReport' => $tutorGroup,
                 'subjectReport'    => $subject,
-                'year'             => $yearLevels,
-                'subjectList'      => $subjects,
+                'tutorGroupList'   => $this->getStudentInvolvementFactory()->buildTutorGroupList($year, $student),
+                'subjectList'      => $this->getStudentInvolvementFactory()->buildSubjectList($year, $student),
             )
         );
     }
