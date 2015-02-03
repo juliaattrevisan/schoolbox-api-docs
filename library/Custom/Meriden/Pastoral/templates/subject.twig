@@ -25,11 +25,11 @@
     }
 </style>
 
-<h1>{{ report.subjectReport.subject.sub_desc }}</h1>
+<h1>{{ report.subjectReport.externalData.sub_desc }}</h1>
 
 <div id="context">
     {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
-    {% include '@customMeridenPastoral/sub/selector.twig' with {year: report.year, student: report.student, subject: report.subject} %}
+    {% include '@customMeridenPastoral/sub/selector.twig' with {year: report.year, student: report.student, subject: report.subject.subjectCode} %}
 </div>
 
 {# Table of contents #}
@@ -40,5 +40,5 @@
 {# course description #}
 <h2>Course Description</h2>
 <p>
-{{ report.subjectReport.subject.outline_text }}
+{{ report.subject.externalData.outline_text }}
 </p>

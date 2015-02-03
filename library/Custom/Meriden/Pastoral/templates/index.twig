@@ -48,10 +48,10 @@
     <dd>
         {% if report.tutorGroup.folder.id %}
             <a href="/homepage/{{ report.tutorGroup.folder.id }}">
-                {{ report.tutorGroup.tutorGroup.code }}
+                {{ report.tutorGroup.subjectCode }}
             </a>
         {% else %}
-            {{ report.tutorGroup.tutorGroup.code }}
+            {{ report.tutorGroup.subjectCode }}
         {% endif %}
     </dd>
 

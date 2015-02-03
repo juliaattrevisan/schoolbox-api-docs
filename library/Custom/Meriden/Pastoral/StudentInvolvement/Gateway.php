@@ -536,8 +536,9 @@ class Gateway
             INNER JOIN subtab st ON so.sub_code=st.sub_code AND so.cmpy_code=st.cmpy_code
             WHERE so.sub_code = :code
         ";
+        list(, $code, ) = explode('-', $subjectCode);
         $params = array(
-            ':code' => $this->getDatabase()->smartQuote($subjectCode),
+            ':code' => $this->getDatabase()->smartQuote($code),
         );
         $result = $this->getDatabase()->trimRow(
             $this->getDatabase()->getRow(strtr($query, $params))

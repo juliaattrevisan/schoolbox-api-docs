@@ -96,12 +96,11 @@ class Controller extends Base
         } else {
             $subject = $this->getStudentInvolvementFactory()->buildSubject($year, $student, $subjectCode);
             // Only required for the subject page
-            list(, $code, $class) = explode('-', $subjectCode);
-            $subjectReport = array(
-                'subject' => $this->getDatabase()->getSubject($code),
-//                'subject' => $this->getDatabase()->getSubject($subjectCode, $student),
-//                'folder'  => $this->getDatabase()->getFolder($subjectCode, $student),
-            );
+//            $subjectReport = array(
+//                'subject' => $this->getDatabase()->getSubject($subjectCode),
+////                'subject' => $this->getDatabase()->getSubject($subjectCode, $student),
+////                'folder'  => $this->getDatabase()->getFolder($subjectCode, $student),
+//            );
         }
 
         // Used in all reports, for the subject/year selector
@@ -129,13 +128,13 @@ class Controller extends Base
                     'levels'   => $yearLevels,
                     'subjects' => $subjects,
                 ),
-                'subject' => array(
-                    'current' => $subjectCode,
-                ),
+//                'subject' => array(
+//                    'current' => $subjectCode,
+//                ),
                 'student'  => $student,
                 'tutorGroup' => $tutorGroup,
                 'subjectReport' => $subjectReport,
-                'subjectObject' => $subject,
+                'subject' => $subject,
             )
         );
     }
