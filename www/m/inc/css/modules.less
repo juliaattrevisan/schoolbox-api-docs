@@ -43,7 +43,7 @@
             &.current       { background: lighten(@highlight-color, 2%); .hi-contrast(@highlight-color, @banner-color); }
         }
     }
-    tbody td                { height: 80px; }
+    tbody td                { height: 84px; }
     tr                      { height: 65px; overflow: hidden; }
     td                      { border-top: solid 1px #ddd; overflow: hidden; text-overflow: ellipsis; word-break: break-all;
                               white-space: nowrap;
@@ -51,8 +51,14 @@
     td, th                  { border: 1px solid #ddd; border-width: 0 1px 1px 0; min-width: @dp * 2;
                               padding: 0; vertical-align: top;
     }
-    ul, li                  { height: 100%; }
-    ul li a                 { padding: @dp6 @dp6 @dp6 (@dp6 - 1) }
+    ul                      { height: 100%; }
+    li                      { box-sizing: border-box; height: 28px; width: 140px;
+        &.of1               { height: 100%; width: auto; }
+        &.of2               { height: 42px;
+            .class-details  { margin-top: -5px; }
+        }
+    }
+    ul li a                 { padding: @dp6 @dp6 @dp3 (@dp6 - 1) }
     a                       { display: block; height: 100%; vertical-align: top; }
     time, span              { text-style: italic; display: block; color: lighten(@body-color,20%); }
     time                    { margin-top: @dp2; }
@@ -60,16 +66,20 @@
     .class-title            { font-weight: bold; }
     .class-code             { display: none; }
     .class-details          { margin-top: @dp12;
-        span                { height: 1.1em !important;
-
-        }
+        span                { height: 1.1em !important; }
     }
     .current                { background: lighten(@highlight-color,7%); font-weight: bold; border-color: @highlight-color; }
 }
 #table-wrapper              {
     td                      { min-width: 140px;
-        span                { height: 2.2em; line-height: 1.1em; }
-        .class-title        { white-space: normal; word-break: normal; }
+        span                { line-height: 1.1em; }
+        .class-teacher      { display: none; }
+        .of1                {
+            span            { height: 2.2em; }
+            .class-title    { white-space: normal; word-break: normal; }
+            .class-teacher  { display: block; }
+        }
+        .of2                {  }
     }
 }
 
