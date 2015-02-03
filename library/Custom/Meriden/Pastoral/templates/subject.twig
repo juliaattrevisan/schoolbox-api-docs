@@ -25,11 +25,15 @@
     }
 </style>
 
-<h1>{{ report.subject.externalData.sub_desc }}</h1>
+<h1>{{ report.subjectReport.externalData.sub_desc }}</h1>
 
 <div id="context">
     {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
-    {% include '@customMeridenPastoral/sub/selector.twig' with {year: report.year, student: report.student, subject: report.subject.subjectCode} %}
+    {% include '@customMeridenPastoral/sub/selector.twig' with {
+        year:    report.year,
+        student: report.student,
+        subject: report.subjectReport.subjectCode
+    } %}
 </div>
 
 {# Table of contents #}
@@ -40,5 +44,15 @@
 {# course description #}
 <h2>Course Description</h2>
 <p>
-{{ report.subject.externalData.outline_text }}
+{{ report.subjectReport.externalData.outline_text }}
 </p>
+
+{# course grade - derived from grade for this class #}
+
+{# grade distribution - also derived from grade #}
+
+{# Endeavor Grades - a rubric #}
+
+{# Approaches to learning - another rubric #}
+
+{# Assessments #}

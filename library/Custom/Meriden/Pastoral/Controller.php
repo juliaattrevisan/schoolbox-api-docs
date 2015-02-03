@@ -83,58 +83,37 @@ class Controller extends Base
      */
     protected function buildReportData($year, User $student, $subjectCode = null)
     {
-        $subjectReport = array();
         $tutorGroup    = null;
         $subject       = null;
         if (!isset($subjectCode)) {
-            // Only required for the eReport
-            // Get more information about the tutor group too.
-//            new \Alaress_Probe(
-//                $this->getFactory()->build($year, $student)
-//            );
             $tutorGroup = $this->getStudentInvolvementFactory()->buildTutorGroup($year, $student);
         } else {
             $subject = $this->getStudentInvolvementFactory()->buildSubject($year, $student, $subjectCode);
-            // Only required for the subject page
-//            $subjectReport = array(
-//                'subject' => $this->getDatabase()->getSubject($subjectCode),
-////                'subject' => $this->getDatabase()->getSubject($subjectCode, $student),
-////                'folder'  => $this->getDatabase()->getFolder($subjectCode, $student),
-//            );
         }
 
         // Used in all reports, for the subject/year selector
-        $yearLevels = $this->getDatabase()->getAllYearLevelGroups($student);
-        $subjects   = $this->getDatabase()->getAllSubjectsForYear($year, $student);
+        $yearLevels = $this->getStudentInvolvementFactory()->buildTutorGroupList($year, $student);
+        $subjects   = $this->getStudentInvolvementFactory()->buildSubjectList($year, $student);
 
-        // Check previous and next year, disable if no year level group exists
-        $previousYear = false;
-        $nextYear     = false;
-        foreach ($yearLevels as $level) {
-            $yearLevel = $level['yr_study'];
-            if ($yearLevel == ($year-1)) {
-                $previousYear = $yearLevel;
-            }
-            if ($yearLevel == ($year+1)) {
-                $nextYear = $yearLevel;
-            }
-        }
+//        // Check previous and next year, disable if no year level group exists
+//        $previousYear = false;
+//        $nextYear     = false;
+//        foreach ($yearLevels as $level) {
+//            $yearLevel = $level['yr_study'];
+//            if ($yearLevel == ($year-1)) {
+//                $previousYear = $yearLevel;
+//            }
+//            if ($yearLevel == ($year+1)) {
+//                $nextYear = $yearLevel;
+//            }
+//        }
         return array(
             'report' => array(
-                'year'     => array(
-                    'current'  => $year,
-                    'previous' => $previousYear,
-                    'next'     => $nextYear,
-                    'levels'   => $yearLevels,
-                    'subjects' => $subjects,
-                ),
-//                'subject' => array(
-//                    'current' => $subjectCode,
-//                ),
-                'student'  => $student,
-                'tutorGroup' => $tutorGroup,
-                'subjectReport' => $subjectReport,
-                'subject' => $subject,
+                'student'          => $student,
+                'tutorGroupReport' => $tutorGroup,
+                'subjectReport'    => $subject,
+                'year'             => $yearLevels,
+                'subjectList'      => $subjects,
             )
         );
     }

@@ -82,7 +82,7 @@ class Factory
             ->setAttendances($this->getGateway()->getAllAttendances($year, $student))
             ->setTutors($this->getGateway()->getAllTutors($year, $student))
             ->setTutorGroup($this->getGateway()->getYearLevelGroup($year, $student))
-            // Add teachers into subjects
+            // Add teachers into subjects - debatable if this is part of tutor group?
             ->setSubjects(
                 array_map(
                     array($this, 'augmentSubjectWithTeacher'),
@@ -126,6 +126,52 @@ class Factory
             ->setGrades($this->augmentGradesWithAssessment($folderWithGrades['grades']))
         ;
         return $subject;
+    }
+
+    /**
+     * Builds a list of all of the tutor groups that this student has been in.
+     *
+     * @param int  $year
+     * @param User $student
+     *
+     * @return array
+     */
+    public function buildTutorGroupList($year, User $student)
+    {
+        $tutorGroups  = $this->getGateway()->getAllYearLevelGroups($student);
+        $previousYear = false;
+        $nextYear     = false;
+        foreach ($tutorGroups as $level) {
+            $yearLevel = $level['yr_study'];
+            if ($yearLevel == ($year-1)) {
+                $previousYear = $yearLevel;
+            }
+            if ($yearLevel == ($year+1)) {
+                $nextYear = $yearLevel;
+            }
+        }
+        return array(
+            'current'  => $year,
+            'previous' => $previousYear,
+            'next'     => $nextYear,
+            'levels'   => $tutorGroups,
+        );
+    }
+
+    /**
+     * Builds a list of all of the student's subjects for this year.
+     *
+     * @param int  $year
+     * @param User $student
+     *
+     * @return array
+     */
+    public function buildSubjectList($year, User $student)
+    {
+        return array_map(
+            array($this, 'augmentSubjectWithTeacher'),
+            $this->getGateway()->getAllSubjectsForYear($year, $student)
+        );
     }
 
     /**

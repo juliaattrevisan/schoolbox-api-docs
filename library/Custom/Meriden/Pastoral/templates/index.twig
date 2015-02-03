@@ -42,46 +42,46 @@
     <dd>{{ report.student.house.name }}</dd>
 
     <dt>Year Coordinator</dt>
-    <dd>{{ report.tutorGroup.coordinator.name }}</dd>
+    <dd>{{ report.tutorGroupReport.coordinator.name }}</dd>
 
     <dt>Tutor Group</dt>
     <dd>
-        {% if report.tutorGroup.folder.id %}
-            <a href="/homepage/{{ report.tutorGroup.folder.id }}">
-                {{ report.tutorGroup.subjectCode }}
+        {% if report.tutorGroupReport.folder.id %}
+            <a href="/homepage/{{ report.tutorGroupReport.folder.id }}">
+                {{ report.tutorGroupReport.subjectCode }}
             </a>
         {% else %}
-            {{ report.tutorGroup.subjectCode }}
+            {{ report.tutorGroupReport.subjectCode }}
         {% endif %}
     </dd>
 
     <dt>Tutor</dt>
-    {% for tutor in report.tutorGroup.tutors %}
+    {% for tutor in report.tutorGroupReport.tutors %}
         <dd>{{ tutor.tch_name }} (Semester {{ tutor.semester }})</dd>
     {% endfor %}
 </dl>
 
 <dl id="attendance-info">
     <dt>Days Absent</dt>
-    <dd>{{ report.tutorGroup.attendances.absent }}</dd>
+    <dd>{{ report.tutorGroupReport.attendances.absent }}</dd>
 
     <dt>Days Late</dt>
-    <dd>{{ report.tutorGroup.attendances.late }}</dd>
+    <dd>{{ report.tutorGroupReport.attendances.late }}</dd>
 
     <dt>Detentions</dt>
-    <dd>{{ report.tutorGroup.attendances.detentions }}</dd>
+    <dd>{{ report.tutorGroupReport.attendances.detentions }}</dd>
 
     {# Don't show endorsed leave at all if there is none #}
-    {% if report.tutorGroup.attendances.endorsedLeave %}
+    {% if report.tutorGroupReport.attendances.endorsedLeave %}
         <dt>Endorsed Leave</dt>
-        <dd>{{ report.tutorGroup.attendances.endorsedLeave }}</dd>
+        <dd>{{ report.tutorGroupReport.attendances.endorsedLeave }}</dd>
     {% endif %}
 
     {##
      # Athletics, Swimming, Camp, Uniform, Pastoral Services:
      # All these are attendances, and are based off of assessments in the grade page.
      #}
-    {% for grade in report.tutorGroup.grades %}
+    {% for grade in report.tutorGroupReport.grades %}
         <dt>{{ grade.assessment.name }}</dt>
         <dd>{{ grade.pretty_mark }}</dd>
     {% endfor %}
@@ -89,22 +89,22 @@
 
 <dl id="awards-info">
     <dt>Awards and Prizes</dt>
-    {% for award in report.tutorGroup.activities.awards %}
+    {% for award in report.tutorGroupReport.activities.awards %}
         <dd>{{ award.act_desc }}</dd>
     {% endfor %}
 
     <dt>Co-curricular Activities</dt>
-    {% for activity in report.tutorGroup.activities.cocurricular %}
+    {% for activity in report.tutorGroupReport.activities.cocurricular %}
         <dd>{{ activity.act_desc }}</dd>
     {% endfor %}
 
     <dt>Community Service</dt>
-    {% for service in report.tutorGroup.activities.service %}
+    {% for service in report.tutorGroupReport.activities.service %}
         <dd>{{ service.act_desc }}</dd>
     {% endfor %}
 
     <dt>Positions of Office</dt>
-    {% for position in report.tutorGroup.activities.positions %}
+    {% for position in report.tutorGroupReport.activities.positions %}
         <dd>{{ position.act_desc }}</dd>
     {% endfor %}
 </dl>

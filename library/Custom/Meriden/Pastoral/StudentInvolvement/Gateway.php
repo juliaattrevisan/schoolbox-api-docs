@@ -379,7 +379,8 @@ class Gateway
                 studsub.yr_study,
                 studsub.sub_code,
                 subtab.sub_desc,
-                subtab.sub_type
+                subtab.sub_type,
+                ('-' + RTRIM(studsub.sub_code) + '-' + RTRIM(studsub.class)) AS code
             FROM studsub
             INNER JOIN subtab
                 ON subtab.sub_code = studsub.sub_code

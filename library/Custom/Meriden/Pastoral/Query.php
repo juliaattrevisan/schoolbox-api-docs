@@ -229,11 +229,7 @@ class Query
      */
     public function getAllYearLevelGroups(User $student)
     {
-        $result = $this->getGateway()->getAllYearLevelGroups($student);
-        return array_map(
-            array($this, 'augmentSubjectWithCode'),
-            $result
-        );
+        return $this->getGateway()->getAllYearLevelGroups($student);
     }
 
     /**
