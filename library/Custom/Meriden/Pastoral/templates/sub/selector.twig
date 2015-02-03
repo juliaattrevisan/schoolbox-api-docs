@@ -23,7 +23,7 @@
             {% for currentSubject in year.subjects %}
                 <option value="{{ routeLookup('customMeridenPastoral.subject', {year: year.current, id: student.id, subjectCode: currentSubject.code}) }}"
                         label="{{ currentSubject.sub_desc }} ({{ currentSubject.code }})"
-                        {% if currentSubject.code == subject.current %}selected{% endif %}
+                        {% if currentSubject.code == subject %}selected{% endif %}
                         >{{ currentSubject.sub_desc }} ({{ currentSubject.code }})</option>
             {% endfor %}
         </select>
