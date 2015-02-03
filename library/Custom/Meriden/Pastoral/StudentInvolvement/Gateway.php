@@ -466,7 +466,8 @@ class Gateway
                 studsub.sub_code,
                 subtab.sub_desc,
                 subtab.sub_type,
-                tchsub.tch_code
+                tchsub.tch_code,
+                ('-' + RTRIM(studsub.sub_code) + '-' + RTRIM(studsub.class)) AS code
             FROM studsub
             INNER JOIN subtab
                 ON subtab.sub_code = studsub.sub_code
@@ -491,7 +492,30 @@ class Gateway
         $result = $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll(strtr($query, $params))
         );
-        return $result ?: array();
+        $result = $result ?: array();
+
+        // Join all teacher codes into a single result.
+        $result = array_reduce(
+            $result,
+            function ($carry, $newRow) {
+                $isDuplicateCode = false;
+                foreach ($carry as &$row) {
+                    if ($row['code'] == $newRow['code']) {
+                        $row['tch_code'][] = $newRow['tch_code'];
+                        $isDuplicateCode = true;
+                        break;
+                    }
+                }
+                unset($row);
+                if (!$isDuplicateCode) {
+                    $newRow['tch_code'] = array($newRow['tch_code']);
+                    $carry[] = $newRow;
+                }
+                return $carry;
+            },
+            array()
+        );
+        return $result;
     }
 
     /**

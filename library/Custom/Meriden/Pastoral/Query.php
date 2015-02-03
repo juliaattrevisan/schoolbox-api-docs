@@ -294,42 +294,10 @@ class Query
      */
     public function getAllSubjectsForYear($year, User $student)
     {
-        $result = $this->getGateway()->getAllSubjectsForYear($year, $student);
-
-        // Add class code
-        // year level is the student's year level at the time they took class,
-        // not the year in which they took it.
-        $result = array_map(
-            array($this, 'augmentSubjectWithCode'),
-            $result
-        );
-
-        // Join all teacher codes into a single result.
-        $result = array_reduce(
-            $result,
-            function ($carry, $newRow) {
-                $isDuplicateCode = false;
-                foreach ($carry as &$row) {
-                    if ($row['code'] == $newRow['code']) {
-                        $row['tch_code'][] = $newRow['tch_code'];
-                        $isDuplicateCode = true;
-                        break;
-                    }
-                }
-                unset($row);
-                if (!$isDuplicateCode) {
-                    $newRow['tch_code'] = array($newRow['tch_code']);
-                    $carry[] = $newRow;
-                }
-                return $carry;
-            },
-            array()
-        );
-        $result = array_map(
+        return array_map(
             array($this, 'augmentSubjectWithTeacher'),
-            $result
+            $this->getGateway()->getAllSubjectsForYear($year, $student)
         );
-        return $result;
     }
 
     /**

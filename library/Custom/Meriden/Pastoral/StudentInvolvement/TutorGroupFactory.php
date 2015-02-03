@@ -79,6 +79,8 @@ class TutorGroupFactory
             ->setAttendances($this->getGateway()->getAllAttendances($year, $student))
             ->setTutors($this->getGateway()->getAllTutors($year, $student))
             ->setTutorGroup($this->getGateway()->getYearLevelGroup($year, $student))
+            // Add teachers into subjects?
+            ->setSubjects($this->getGateway()->getAllSubjectsForYear($year, $student))
         ;
 
 //        $this->getGateway()->
