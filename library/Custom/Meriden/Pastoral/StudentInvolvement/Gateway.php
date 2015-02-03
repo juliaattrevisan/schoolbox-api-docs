@@ -342,6 +342,90 @@ class Gateway
     }
 
     /**
+     * Retrieves all year level groups for this student.
+     *
+     * @param User $student
+     *
+     * @return array
+     */
+    public function getAllYearLevelGroups(User $student)
+    {
+        $externalId = $student->getExternalId();
+        if (!$externalId) {
+            return array();
+        }
+        // Adapted External_Tass_User->getSubjectList()
+        $query  = "
+            SELECT DISTINCT
+                studsub.class,
+                studsub.yr_study,
+                studsub.sub_code,
+                subtab.sub_desc,
+                subtab.sub_type
+            FROM studsub
+            INNER JOIN subtab
+                ON subtab.sub_code = studsub.sub_code
+                AND subtab.cmpy_code = studsub.cmpy_code
+            WHERE studsub.stud_code = :externalId
+            AND subtab.sub_code IN ('9994','9995','9996','9997','9998','9999')
+            AND studsub.cmpy_code = '01'
+            ORDER BY
+                studsub.sub_code ASC,
+                studsub.class ASC
+        ";
+        $params = array(
+            ':externalId' => $this->getDatabase()->smartQuote($externalId),
+        );
+        $result = $this->getDatabase()->trimAll(
+            $this->getDatabase()->getAll(strtr($query, $params))
+        );
+        return $result ?: array();
+    }
+
+    /**
+     * Given a year level and a student, gets their year level group for that year.
+     *
+     * @param int  $year
+     * @param User $student
+     *
+     * @return array
+     */
+    public function getYearLevelGroup($year, User $student)
+    {
+        $externalId = $student->getExternalId();
+        if (!$externalId) {
+            return array();
+        }
+        $query  = "
+            SELECT
+                studsub.class,
+                studsub.yr_study,
+                studsub.sub_code,
+                subtab.sub_desc,
+                subtab.sub_type
+            FROM studsub
+            INNER JOIN subtab
+                ON subtab.sub_code = studsub.sub_code
+                AND subtab.cmpy_code = studsub.cmpy_code
+            WHERE studsub.stud_code = :externalId
+            AND studsub.yr_study = :year
+            AND subtab.sub_code IN ('9994','9995','9996','9997','9998','9999')
+            AND studsub.cmpy_code = '01'
+            ORDER BY
+                studsub.sub_code ASC,
+                studsub.class ASC
+        ";
+        $params = array(
+            ':externalId' => $this->getDatabase()->smartQuote($externalId),
+            ':year'       => $this->getDatabase()->smartQuote($year),
+        );
+        $result = $this->getDatabase()->trimRow(
+            $this->getDatabase()->getRow(strtr($query, $params))
+        );
+        return $result ?: array();
+    }
+
+    /**
      * @return MSSQL
      */
     protected function getDatabase()
