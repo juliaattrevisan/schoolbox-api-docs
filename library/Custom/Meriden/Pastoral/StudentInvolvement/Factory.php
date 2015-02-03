@@ -92,15 +92,36 @@ class Factory
         $tutorGroupCode   = $tutorGroup->getTutorGroup();
         $folderWithGrades = $this->getFolderWithGrades($tutorGroupCode['code'], $student);
         $tutorGroup
+            ->setSubjectCode($tutorGroupCode['code'])
             ->setFolder($folderWithGrades['folder'])
             ->setGrades($folderWithGrades['grades'])
         ;
-//        $folder = $this->getCategoryMapper()->findAllByArchivedCode();
-//        $tutorGroup
-//            ->setFolder()
-//            ->setGrades()
-//        ;
-        // also get the folder, grades and subject list?
+        return $tutorGroup;
+    }
+
+    /**
+     * Builds a Subject object
+     *
+     * @param int    $year
+     * @param User   $student
+     * @param string $subjectCode
+     *
+     * @return Subject
+     */
+    public function buildSubject($year, User $student, $subjectCode)
+    {
+        $tutorGroup = new Subject();
+        $tutorGroup
+            ->setStudent($student)
+            ->setYear($year)
+            ->setSubjectCode($subjectCode)
+        ;
+
+        $folderWithGrades = $this->getFolderWithGrades($subjectCode, $student);
+        $tutorGroup
+            ->setFolder($folderWithGrades['folder'])
+            ->setGrades($folderWithGrades['grades'])
+        ;
         return $tutorGroup;
     }
 

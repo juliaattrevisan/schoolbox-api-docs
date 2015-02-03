@@ -85,6 +85,7 @@ class Controller extends Base
     {
         $subjectReport = array();
         $tutorGroup    = null;
+        $subject       = null;
         if (!isset($subjectCode)) {
             // Only required for the eReport
             // Get more information about the tutor group too.
@@ -93,6 +94,7 @@ class Controller extends Base
 //            );
             $tutorGroup = $this->getStudentInvolvementFactory()->buildTutorGroup($year, $student);
         } else {
+            $subject = $this->getStudentInvolvementFactory()->buildSubject($year, $student, $subjectCode);
             // Only required for the subject page
             list(, $code, $class) = explode('-', $subjectCode);
             $subjectReport = array(
@@ -133,6 +135,7 @@ class Controller extends Base
                 'student'  => $student,
                 'tutorGroup' => $tutorGroup,
                 'subjectReport' => $subjectReport,
+                'subjectObject' => $subject,
             )
         );
     }
