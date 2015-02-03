@@ -158,32 +158,25 @@ function checkAmqp($args, $regexMode)
  */
 function checkData($args, $regexMode, $msg)
 {
+    $success = false;
 
     if (isset($args['body'])) {
-        if (checkStr($regexMode, $args['body'], $msg['title']['text'])) {
-            return true;
-        }
+        $success = $success || checkStr($regexMode, $args['body'], $msg['title']['text']);
     }
 
     if (isset($args['href'])) {
-        if (checkStr($regexMode, $args['href'], $msg['href'])) {
-            return true;
-        }
+        $success = $success || checkStr($regexMode, $args['href'], $msg['href']);
     }
 
     if (isset($args['start'])) {
-        if (checkTime(true, $args['start'], $msg['time'])) {
-            return true;
-        }
+        $success = $success && checkTime(true, $args['start'], $msg['time']);
     }
 
     if (isset($args['end'])) {
-        if (checkTime(false, $args['start'], $msg['time'])) {
-            return true;
-        }
+        $success = $success && checkTime(false, $args['start'], $msg['time']);
     }
 
-    return false;
+    return $success;
 }
 
 
