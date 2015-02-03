@@ -17,6 +17,7 @@ class Synchronise_Synergetic_Arden_Strategy_Staff extends Synchronise_Base_Strat
             ->addHydrator(new Synchronise_Base_Hydrator_Staff())
             ->addHydrator(new Synchronise_Base_Hydrator_AllCampus())
             ->addHydrator(new Synchronise_Synergetic_Arden_Hydrator_Group_Staff())
+            ->addHydrator(new Synchronise_Synergetic_Arden_Hydrator_Campus_Staff())
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
         ;
