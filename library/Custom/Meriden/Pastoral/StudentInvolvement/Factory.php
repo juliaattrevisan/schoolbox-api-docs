@@ -10,6 +10,8 @@
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Grades;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Category;
@@ -94,7 +96,7 @@ class Factory
         $tutorGroup
             ->setSubjectCode($tutorGroupCode['code'])
             ->setFolder($folderWithGrades['folder'])
-            ->setGrades($folderWithGrades['grades'])
+            ->setGrades($this->augmentGradesWithAssessment($folderWithGrades['grades']))
         ;
         return $tutorGroup;
     }
@@ -121,10 +123,8 @@ class Factory
         $folderWithGrades = $this->getFolderWithGrades($subjectCode, $student);
         $subject
             ->setFolder($folderWithGrades['folder'])
-            ->setGrades($folderWithGrades['grades'])
+            ->setGrades($this->augmentGradesWithAssessment($folderWithGrades['grades']))
         ;
-
-        // Get a whole heap of grades for this student for this class
         return $subject;
     }
 
@@ -222,6 +222,23 @@ class Factory
             );
         }
         return array();
+    }
+
+    /**
+     * Adds assessment into grades fetched by getStudentInvolvement().
+     *
+     * @param array $grades
+     *
+     * @return array
+     */
+    protected function augmentGradesWithAssessment($grades)
+    {
+        // TODO inject this
+        foreach (SubmissionBoxMapper::getInstance()->findByColumn('id', array_keys($grades)) as $assess) {
+            /** @var SubmissionBox $assess */
+            $grades[$assess->getId()]['assessment'] = $assess;
+        }
+        return $grades;
     }
 
     /**
