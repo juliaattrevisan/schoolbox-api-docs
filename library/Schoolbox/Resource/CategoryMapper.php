@@ -346,15 +346,7 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
                 {$this->getColumnString('c')},
                 {$code_mapper->getColumnString('cc')},
                 {$homepageConfig_mapper->getColumnString('hp')},
-                {$group_mapper->getColumnString('ug')},
-                (
-                    SELECT COUNT(*) FROM `task` `t`
-                    WHERE `t`.`category_id` IN (
-                        SELECT `subc`.`id`
-                        FROM {$this->getTable()} `subc`
-                        WHERE `subc`.`parent` = `c`.`id`
-                    )
-                ) AS `c.taskCount`
+                {$group_mapper->getColumnString('ug')}
             FROM {$this->getTable()} c
             LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
             LEFT JOIN {$this->getJoinSql('homepages', 'c', 'hp')}
