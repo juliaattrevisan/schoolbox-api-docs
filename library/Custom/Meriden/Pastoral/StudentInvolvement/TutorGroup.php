@@ -79,4 +79,175 @@ class TutorGroup
      * @var array|Subject[]
      */
     protected $subjects;
+
+    /**
+     * @return int
+     */
+    public function getYear()
+    {
+        return $this->year;
+    }
+
+    /**
+     * @param  int $year
+     *
+     * @return $this
+     */
+    public function setYear($year)
+    {
+        $this->year = $year;
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getStudent()
+    {
+        return $this->student;
+    }
+
+    /**
+     * @param  User $student
+     *
+     * @return $this
+     */
+    public function setStudent($student)
+    {
+        $this->student = $student;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSubjectCode()
+    {
+        return $this->subjectCode;
+    }
+
+    /**
+     * @param  string $subjectCode
+     *
+     * @return $this
+     */
+    public function setSubjectCode($subjectCode)
+    {
+        $this->subjectCode = $subjectCode;
+        return $this;
+    }
+
+    /**
+     * @return Category
+     */
+    public function getFolder()
+    {
+        return $this->folder;
+    }
+
+    /**
+     * @param  Category $folder
+     *
+     * @return $this
+     */
+    public function setFolder($folder)
+    {
+        $this->folder = $folder;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTutors()
+    {
+        return $this->tutors;
+    }
+
+    /**
+     * @param  array $tutors
+     *
+     * @return $this
+     */
+    public function setTutors($tutors)
+    {
+        $this->tutors = $tutors;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getActivities()
+    {
+        return $this->activities;
+    }
+
+    /**
+     * @param  array $activities
+     *
+     * @return $this
+     */
+    public function setActivities($activities)
+    {
+        $this->activities = $activities;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAttendances()
+    {
+        return $this->attendances;
+    }
+
+    /**
+     * @param  array $attendances
+     *
+     * @return $this
+     */
+    public function setAttendances($attendances)
+    {
+        $this->attendances = $attendances;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getGrades()
+    {
+        return $this->grades;
+    }
+
+    /**
+     * @param  array $grades
+     *
+     * @return $this
+     */
+    public function setGrades($grades)
+    {
+        $this->grades = $grades;
+        return $this;
+    }
+
+    /**
+     * @return array|Subject[]
+     */
+    public function getSubjects()
+    {
+        return $this->subjects;
+    }
+
+    /**
+     * @param  array|Subject[] $subjects
+     *
+     * @return $this
+     */
+    public function setSubjects($subjects)
+    {
+        $this->subjects = $subjects;
+        return $this;
+    }
 }
