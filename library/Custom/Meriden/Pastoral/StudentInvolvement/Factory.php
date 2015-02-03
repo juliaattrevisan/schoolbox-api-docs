@@ -110,8 +110,8 @@ class Factory
      */
     public function buildSubject($year, User $student, $subjectCode)
     {
-        $tutorGroup = new Subject();
-        $tutorGroup
+        $subject = new Subject();
+        $subject
             ->setStudent($student)
             ->setYear($year)
             ->setSubjectCode($subjectCode)
@@ -119,11 +119,13 @@ class Factory
         ;
 
         $folderWithGrades = $this->getFolderWithGrades($subjectCode, $student);
-        $tutorGroup
+        $subject
             ->setFolder($folderWithGrades['folder'])
             ->setGrades($folderWithGrades['grades'])
         ;
-        return $tutorGroup;
+
+        // Get a whole heap of grades for this student for this class
+        return $subject;
     }
 
     /**
