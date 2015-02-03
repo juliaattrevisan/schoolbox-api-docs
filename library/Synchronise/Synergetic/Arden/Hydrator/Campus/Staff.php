@@ -36,15 +36,8 @@ class Synchronise_Synergetic_Arden_Hydrator_Campus_Staff implements Synchronise_
             /* Empty campus denotes involvement in all campuses
              * Set default campus to Year 6
              */
-            case '':
-                $campus = array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14);
-                $defaultCampus = 8;
-                break;
-
-            /* Set default campus to Year 6
-             */
             default:
-                $campus = array(8);
+                $campus = array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14);
                 $defaultCampus = 8;
                 break;
         }
