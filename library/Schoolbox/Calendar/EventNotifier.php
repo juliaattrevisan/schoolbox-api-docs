@@ -94,7 +94,8 @@ class EventNotifier extends AbstractModuleNotifier
         $bob = new Builder();
         $bob->setNamespace(NSMapper::NS_CALENDAR)
             ->setIcon('/images/icon.php?size=32&icon=clock')
-            ->setHref('/calendar/full/' . $event->getStartDateTime()->getUsingFormat('d-m-Y'))
+            // we need to stack based on series if that's possible
+            ->setHref('/calendar/full/' . ($event->getSeriesId() ? '?s='.$event->getSeriesId() : $event->getStartDateTime()->getUsingFormat('d-m-Y')))
             ->setBody($event->getDetail())
             ->addTopic("calendar.{$event->getType()->getId()}.{$event->getId()}.$trigger")
             ->addFilter('roletype', array($roleType))
