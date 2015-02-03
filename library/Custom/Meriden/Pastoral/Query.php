@@ -22,11 +22,6 @@ use Schoolbox\UserMapper;
 class Query
 {
     /**
-     * @var MSSQL
-     */
-    protected $database;
-
-    /**
      * @var UserMapper
      */
     protected $userMapper;
@@ -476,25 +471,6 @@ class Query
             );
         }
         return array();
-    }
-
-    /**
-     * @return MSSQL
-     */
-    public function getDatabase()
-    {
-        return $this->database;
-    }
-
-    /**
-     * @param  MSSQL $database
-     *
-     * @return $this
-     */
-    public function setDatabase($database)
-    {
-        $this->database = $database;
-        return $this;
     }
 
     /**
