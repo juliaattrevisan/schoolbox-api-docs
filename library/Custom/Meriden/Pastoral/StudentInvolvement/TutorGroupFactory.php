@@ -79,13 +79,31 @@ class TutorGroupFactory
             ->setAttendances($this->getGateway()->getAllAttendances($year, $student))
             ->setTutors($this->getGateway()->getAllTutors($year, $student))
             ->setTutorGroup($this->getGateway()->getYearLevelGroup($year, $student))
-            // Add teachers into subjects?
-            ->setSubjects($this->getGateway()->getAllSubjectsForYear($year, $student))
+            // Add teachers into subjects
+            ->setSubjects(
+                array_map(
+                    array($this, 'augmentSubjectWithTeacher'),
+                    $this->getGateway()->getAllSubjectsForYear($year, $student)
+                )
+            )
         ;
-
-//        $this->getGateway()->
         // also get the folder, grades and subject list?
         return $tutorGroup;
+    }
+
+    /**
+     * Augments a subject retrieved by getAllSubjectsForYear() with one or
+     * more teachers.
+     *
+     * @param array $subject
+     *
+     * @return array
+     */
+    protected function augmentSubjectWithTeacher(array $subject)
+    {
+        // Get every teacher by their tch_code
+        $subject['teachers'] = $this->getUserMapper()->findByColumn('synergy_id', $subject['tch_code']);
+        return $subject;
     }
 
     /**

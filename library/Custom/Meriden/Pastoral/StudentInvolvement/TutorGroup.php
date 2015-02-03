@@ -83,7 +83,7 @@ class TutorGroup
      * The subject list will not be fully hydrated - only the year and subject
      * code will be.
      *
-     * @var array|Subject[]
+     * @var array
      */
     protected $subjects;
 
