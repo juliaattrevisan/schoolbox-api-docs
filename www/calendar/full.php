@@ -7,7 +7,27 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
+use Schoolbox\Calendar\EventMapper;
+
 $user_mapper = new \Schoolbox\UserMapper();
+$eventMapper = EventMapper::getInstance();
+
+/** @var SitePage $this */
+
+// if ?s=:num, then treat that as a series Id
+if (isset($_GET['s']) && is_numeric($_GET['s'])) {
+    try {
+        $event = $eventMapper->findNextInSeries($_GET['s']);
+        $selectedDate = $event->getStartDateTime()->getUsingFormat('d-m-Y');
+
+    } catch (Schoolbox\Mapper\Exception $e) {
+        // invalid series ID
+        $selectedDate = '';
+    }
+
+    $this->localRedir("/calendar/full/$selectedDate");
+    exit;
+}
 
 /* If both args were provided, assume date and userId respectively
  * Otherwise just assume currently logged in user
@@ -19,10 +39,10 @@ if (count($this->arg) == 2) {
         $user = $user_mapper->findById($this->arg[1]);
     }
     catch (Exception $e) {
-        error($e->getCode());
+        $this->error($e->getCode());
+        exit;
     }
-}
-else {
+} else {
     $selectedDate = $this->arg[0];
     $user = $_SESSION['user'];
 }
