@@ -88,18 +88,16 @@ class Module extends BaseModule
     {
         // Inject the custom Meriden pastoral database connection too
         // a MSSQL connection should be a service?
-//        $injector->params['Custom\\Meriden\\Pastoral\\Controller']['database']
-//            = $injector->lazyNew('Custom\\Meriden\\Pastoral\\Query');
-        $injector->params['Custom\\Meriden\\Pastoral\\Controller']['tutorGroupFactory']
-            = $injector->lazyNew('Custom\\Meriden\\Pastoral\\StudentInvolvement\\TutorGroupFactory');
+        $injector->params['Custom\\Meriden\\Pastoral\\Controller']['studentInvolvementFactory']
+            = $injector->lazyNew('Custom\\Meriden\\Pastoral\\StudentInvolvement\\Factory');
 
-        $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\TutorGroupFactory']['gateway']
+        $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Factory']['gateway']
             = $injector->lazyNew('Custom\\Meriden\\Pastoral\\StudentInvolvement\\Gateway');
-        $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\TutorGroupFactory']['categoryMapper']
+        $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Factory']['categoryMapper']
             = $injector->lazyNew('Schoolbox\\Resource\\CategoryMapper');
-        $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\TutorGroupFactory']['userMapper']
+        $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Factory']['userMapper']
             = $injector->lazyNew('Schoolbox\\UserMapper');
-        $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\TutorGroupFactory']['gradesService']
+        $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Factory']['gradesService']
             = Grades::getInstance();
 
         $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Gateway']['database']

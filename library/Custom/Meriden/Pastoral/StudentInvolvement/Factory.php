@@ -17,7 +17,7 @@ use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-class TutorGroupFactory
+class Factory
 {
     /**
      * @var Gateway

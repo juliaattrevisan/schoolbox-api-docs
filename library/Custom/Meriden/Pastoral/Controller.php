@@ -10,7 +10,7 @@
 namespace Custom\Meriden\Pastoral;
 
 use Alaress\Web\Controller\Base;
-use Custom\Meriden\Pastoral\StudentInvolvement\TutorGroupFactory;
+use Custom\Meriden\Pastoral\StudentInvolvement\Factory;
 use Schoolbox\User;
 
 class Controller extends Base
@@ -21,21 +21,21 @@ class Controller extends Base
     protected $database;
 
     /**
-     * @var TutorGroupFactory
+     * @var Factory
      */
-    protected $tutorGroupFactory;
+    protected $studentInvolvementFactory;
 
     /**
      * Constructor
      *
-     * @param Query             $database
-     * @param TutorGroupFactory $tutorGroupFactory
+     * @param Query   $database
+     * @param Factory $studentInvolvementFactory
      */
     public function __construct(
         Query $database,
-        TutorGroupFactory $tutorGroupFactory
+        Factory $studentInvolvementFactory
     ) {
-        $this->setDatabase($database)->setTutorGroupFactory($tutorGroupFactory);
+        $this->setDatabase($database)->setStudentInvolvementFactory($studentInvolvementFactory);
     }
 
     /**
@@ -89,9 +89,9 @@ class Controller extends Base
             // Only required for the eReport
             // Get more information about the tutor group too.
 //            new \Alaress_Probe(
-//                $this->getTutorGroupFactory()->build($year, $student)
+//                $this->getFactory()->build($year, $student)
 //            );
-            $tutorGroup = $this->getTutorGroupFactory()->buildTutorGroup($year, $student);
+            $tutorGroup = $this->getStudentInvolvementFactory()->buildTutorGroup($year, $student);
         } else {
             // Only required for the subject page
             list(, $code, $class) = explode('-', $subjectCode);
@@ -157,21 +157,21 @@ class Controller extends Base
     }
 
     /**
-     * @return TutorGroupFactory
+     * @return Factory
      */
-    public function getTutorGroupFactory()
+    public function getStudentInvolvementFactory()
     {
-        return $this->tutorGroupFactory;
+        return $this->studentInvolvementFactory;
     }
 
     /**
-     * @param  TutorGroupFactory $tutorGroupFactory
+     * @param  Factory $studentInvolvementFactory
      *
      * @return $this
      */
-    public function setTutorGroupFactory($tutorGroupFactory)
+    public function setStudentInvolvementFactory($studentInvolvementFactory)
     {
-        $this->tutorGroupFactory = $tutorGroupFactory;
+        $this->studentInvolvementFactory = $studentInvolvementFactory;
         return $this;
     }
 }
