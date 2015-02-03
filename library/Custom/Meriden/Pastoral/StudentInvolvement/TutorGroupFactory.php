@@ -78,8 +78,11 @@ class TutorGroupFactory
             ->setActivities($this->getGateway()->getAllActivities($year, $student))
             ->setAttendances($this->getGateway()->getAllAttendances($year, $student))
             ->setTutors($this->getGateway()->getAllTutors($year, $student))
+            ->setTutorGroup($this->getGateway()->getYearLevelGroup($year, $student))
         ;
-        // also get the folder, grades and subjects
+
+//        $this->getGateway()->
+        // also get the folder, grades and subject list?
         return $tutorGroup;
     }
 

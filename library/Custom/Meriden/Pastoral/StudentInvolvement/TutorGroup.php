@@ -50,6 +50,13 @@ class TutorGroup
     protected $tutors;
 
     /**
+     * The external tutor group entry
+     *
+     * @var array
+     */
+    protected $tutorGroup;
+
+    /**
      * The activities this student has partaken in within this group
      *
      * @var array
@@ -248,6 +255,25 @@ class TutorGroup
     public function setSubjects($subjects)
     {
         $this->subjects = $subjects;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTutorGroup()
+    {
+        return $this->tutorGroup;
+    }
+
+    /**
+     * @param  array $tutorGroup
+     *
+     * @return $this
+     */
+    public function setTutorGroup($tutorGroup)
+    {
+        $this->tutorGroup = $tutorGroup;
         return $this;
     }
 }
