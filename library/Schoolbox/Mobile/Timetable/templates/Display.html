@@ -38,12 +38,12 @@
             {% for period in content %}
             <tr>
                 {% for day in period.day %}
-                <td style="background:{{day.colour}};" {% if day.today and period.highlight %} class="current"{% endif %}>
+                <td {% if day.today and period.highlight %} class="current"{% endif %}>
                     {% if day | length %}
                     <ul>
                     {% for subj in day %}
                         {% if subj.code %}
-                        <li class="of{{ day | length }}">
+                        <li class="of{{ day | length }}" style="background-color:{{subj.colour}};">
                         {% if subj.catID %}
                         <a href="/m/facade/homepage/display/{{ subj.catID }}">
                         {% else %}
