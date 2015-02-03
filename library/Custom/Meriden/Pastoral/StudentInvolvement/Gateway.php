@@ -289,6 +289,59 @@ class Gateway
     }
 
     /**
+     * Gets all tutors this student may have had through the year.
+     *
+     * @param int  $year
+     * @param User $student
+     *
+     * @return array
+     */
+    public function getAllTutors($year, User $student)
+    {
+        $externalId = $student->getExternalId();
+        if (!$externalId) {
+            return array();
+        }
+        // In Schoolbox-Tass nomeclature, Schoolbox classes will have the
+        // following code:
+        // {tchsub.year_num(optional)}-{tchsub.sub_code}-{tchsub.class}
+        $query = "
+            SELECT DISTINCT
+                teacher.tch_code,
+                teacher.tch_name,
+                tchsub.semester
+            FROM teacher
+            INNER JOIN tchsub
+                ON tchsub.tch_code = teacher.tch_code
+                AND tchsub.cmpy_code = teacher.cmpy_code
+            INNER JOIN studsub
+                ON studsub.sub_code = tchsub.sub_code
+                AND studsub.class = tchsub.class
+                AND studsub.yr_study = tchsub.year_num
+                AND studsub.semester = tchsub.semester
+                AND studsub.cmpy_code = tchsub.cmpy_code
+            INNER JOIN subtab
+                ON subtab.sub_code = studsub.sub_code
+                AND subtab.cmpy_code = studsub.cmpy_code
+            WHERE studsub.stud_code = :externalId
+            AND studsub.cmpy_code = '01'
+            AND subtab.sub_code IN ('9994','9995','9996','9997','9998','9999')
+            AND tchsub.year_num = :year
+            ORDER BY
+                tchsub.semester ASC,
+                teacher.tch_name ASC
+        ";
+        $params = array(
+            ':externalId' => $this->getDatabase()->smartQuote($externalId),
+            ':year'       => $this->getDatabase()->smartQuote($year),
+        );
+        $result = $this->getDatabase()->trimAll(
+            $this->getDatabase()->getAll(strtr($query, $params))
+        );
+        return $result ?: array();
+    }
+
+    /**
      * @return MSSQL
      */
     protected function getDatabase()
