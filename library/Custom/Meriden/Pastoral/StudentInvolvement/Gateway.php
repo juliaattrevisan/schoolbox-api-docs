@@ -426,6 +426,83 @@ class Gateway
     }
 
     /**
+     * Gets all subjects for this student for this year.
+     *
+     * @param int  $year
+     * @param User $student
+     *
+     * @return array
+     */
+    public function getAllSubjectsForYear($year, User $student)
+    {
+        $externalId = $student->getExternalId();
+        if (!$externalId) {
+            return array();
+        }
+        // Adapted External_Tass_User->getSubjectList()
+        $query  = "
+            SELECT DISTINCT
+                studsub.class,
+                studsub.yr_study,
+                studsub.sub_code,
+                subtab.sub_desc,
+                subtab.sub_type,
+                tchsub.tch_code
+            FROM studsub
+            INNER JOIN subtab
+                ON subtab.sub_code = studsub.sub_code
+                AND subtab.cmpy_code = studsub.cmpy_code
+            LEFT JOIN tchsub
+                ON subtab.sub_code = tchsub.sub_code
+                AND subtab.cmpy_code = tchsub.cmpy_code
+                AND studsub.semester = tchsub.semester
+                AND studsub.yr_study = tchsub.year_num
+                AND studsub.class = tchsub.class
+            WHERE studsub.stud_code = :externalId
+            AND subtab.sub_code NOT IN ('9994','9995','9996','9997','9998','9999')
+            AND studsub.cmpy_code = '01'
+            AND studsub.yr_study = :year
+            ORDER BY
+                subtab.sub_desc ASC
+        ";
+        $params = array(
+            ':externalId' => $this->getDatabase()->smartQuote($externalId),
+            ':year'       => $this->getDatabase()->smartQuote($year),
+        );
+        $result = $this->getDatabase()->trimAll(
+            $this->getDatabase()->getAll(strtr($query, $params))
+        );
+        return $result ?: array();
+    }
+
+    /**
+     * Gets the subject outlines for a given subject code.
+     *
+     * @param string $subjectCode
+     *
+     * @return array
+     */
+    public function getSubject($subjectCode)
+    {
+        $query = "
+            SELECT
+                st.sub_desc,
+                so.outline_text,
+                so.outline_url
+            FROM suboutline so
+            INNER JOIN subtab st ON so.sub_code=st.sub_code AND so.cmpy_code=st.cmpy_code
+            WHERE so.sub_code = :code
+        ";
+        $params = array(
+            ':code' => $this->getDatabase()->smartQuote($subjectCode),
+        );
+        $result = $this->getDatabase()->trimRow(
+            $this->getDatabase()->getRow(strtr($query, $params))
+        );
+        return $result ?: array();
+    }
+
+    /**
      * @return MSSQL
      */
     protected function getDatabase()
