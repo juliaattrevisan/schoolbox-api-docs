@@ -9,6 +9,7 @@
  
 namespace Custom\Meriden\Pastoral;
 
+use Custom\Meriden\Pastoral\StudentInvolvement\Gateway;
 use MSSQL;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Grades;
@@ -42,6 +43,11 @@ class Query
     protected $gradesService;
 
     /**
+     * @var StudentInvolvement\Gateway
+     */
+    protected $gateway;
+
+    /**
      * Constructor
      *
      * @param MSSQL          $database
@@ -60,104 +66,7 @@ class Query
             ->setUserMapper($userMapper)
             ->setCategoryMapper($categoryMapper)
             ->setGradesService($gradesService);
-    }
-
-    /**
-     * Base query for querying a student's absences.
-     *
-     * @param int   $year
-     * @param User  $student
-     * @param array $absenceTypes
-     * @param array $reasonCodes
-     *
-     * @return array
-     */
-    protected function queryDays($year, User $student, array $absenceTypes, array $reasonCodes = array())
-    {
-        $externalId = $student->getExternalId();
-        if (!$externalId) {
-            return array();
-        }
-        $query = "
-            SELECT
-                studabsent.stud_code,
-                studabsent.absent_date,
-                studabsent.absent_type,
-                studabsent.reas_code
-            FROM studabsent
-            WHERE stud_code = :externalId
-            AND absent_date BETWEEN :yearStart AND :yearEnd
-        ";
-        $params = array(
-            ':externalId' => $this->getDatabase()->smartQuote($externalId),
-            ':yearStart'  => $this->getDatabase()->smartQuote($year . '-01-01'),
-            ':yearEnd'    => $this->getDatabase()->smartQuote($year . '-12-31'),
-        );
-        if (!empty($absenceTypes)) {
-            $query .= ' AND absent_type IN (:absenceTypes) ';
-            $params[':absenceTypes'] = implode(
-                ',',
-                array_map(
-                    array($this->getDatabase(), 'smartQuote'),
-                    $absenceTypes
-                )
-            );
-        }
-        if (!empty($reasonCodes)) {
-            $query .= ' AND reas_code IN (:reasonCodes) ';
-            $params[':reasonCodes'] = implode(
-                ',',
-                array_map(
-                    array($this->getDatabase(), 'smartQuote'),
-                    $reasonCodes
-                )
-            );
-        }
-        $result = $this->getDatabase()->trimAll(
-            $this->getDatabase()->getAll(strtr($query, $params))
-        );
-        return $result ?: array();
-    }
-
-    /**
-     * Base query for querying a student's activities.
-     *
-     * @param int    $year
-     * @param User   $student
-     * @param string $activityType
-     *
-     * @return array
-     */
-    protected function queryActivities($year, User $student, $activityType)
-    {
-        $externalId = $student->getExternalId();
-        if (!$externalId) {
-            return array();
-        }
-        $query = "
-            SELECT DISTINCT
-                studecact.stud_code,
-                studecact.act_code,
-                ecactivity.act_desc,
-                ecactivity.act_type
-            FROM ecactivity
-            INNER JOIN studecact
-                ON studecact.act_code = ecactivity.act_code
-                AND studecact.cmpy_code = ecactivity.cmpy_code
-            WHERE studecact.stud_code = :externalId
-            AND studecact.act_year = :year
-            AND ecactivity.act_type = :activityType
-            AND ecactivity.cmpy_code = '01'
-        ";
-        $params = array(
-            ':externalId'   => $this->getDatabase()->smartQuote($externalId),
-            ':year'         => $this->getDatabase()->smartQuote($year),
-            ':activityType' => $this->getDatabase()->smartQuote($activityType),
-        );
-        $result = $this->getDatabase()->trimAll(
-            $this->getDatabase()->getAll(strtr($query, $params))
-        );
-        return $result ?: array();
+        $this->gateway = new Gateway($database);
     }
 
     /**
@@ -174,27 +83,7 @@ class Query
      */
     public function getAbsenceCount($year, User $student)
     {
-        $resultSet = $this->queryDays(
-            $year,
-            $student,
-            array('AFS', 'APD', 'AAM', 'APM', 'EDP'),
-            array('A', 'L', 'S')
-        );
-        $count = 0;
-        foreach ($resultSet as $row) {
-            switch ($row['absent_type']) {
-                case 'AFS':
-                    $count += 1;
-                    break;
-                case 'APD':
-                case 'AAM':
-                case 'APM':
-                case 'EDP':
-                    $count += 0.5;
-                    break;
-            }
-        }
-        return $count;
+        return $this->gateway->getAbsenceCount($year, $student);
     }
 
     /**
@@ -207,13 +96,7 @@ class Query
      */
     public function getLateCount($year, User $student)
     {
-        $resultSet = $this->queryDays(
-            $year,
-            $student,
-            array('LFS'),
-            array('A', 'L', 'S')
-        );
-        return count($resultSet);
+        return $this->gateway->getLateCount($year, $student);
     }
 
     /**
@@ -226,12 +109,7 @@ class Query
      */
     public function getDetentionCount($year, User $student)
     {
-        $resultSet = $this->queryDays(
-            $year,
-            $student,
-            array('DET')
-        );
-        return count($resultSet);
+        return $this->gateway->getDetentionCount($year, $student);
     }
 
     /**
@@ -244,13 +122,7 @@ class Query
      */
     public function getLeaveCount($year, User $student)
     {
-        $resultSet = $this->queryDays(
-            $year,
-            $student,
-            array('AFS'),
-            array('M')
-        );
-        return count($resultSet);
+        return $this->gateway->getLeaveCount($year, $student);
     }
 
     /**
@@ -281,7 +153,7 @@ class Query
      */
     public function getAwards($year, User $student)
     {
-        return $this->queryActivities($year, $student, 'C');
+        return $this->gateway->getAwards($year, $student);
     }
 
     /**
@@ -294,7 +166,7 @@ class Query
      */
     public function getCocurricular($year, User $student)
     {
-        return $this->queryActivities($year, $student, 'B');
+        return $this->gateway->getCocurricular($year, $student);
     }
 
     /**
@@ -307,7 +179,7 @@ class Query
      */
     public function getService($year, User $student)
     {
-        return $this->queryActivities($year, $student, 'O');
+        return $this->gateway->getService($year, $student);
     }
 
     /**
@@ -320,7 +192,7 @@ class Query
      */
     public function getPositions($year, User $student)
     {
-        return $this->queryActivities($year, $student, 'A');
+        return $this->gateway->getPositions($year, $student);
     }
 
     /**
