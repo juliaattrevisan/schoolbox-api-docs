@@ -218,6 +218,24 @@ class Gateway
     }
 
     /**
+     * Gets all attendance related counts.
+     *
+     * @param int  $year
+     * @param User $student
+     *
+     * @return array
+     */
+    public function getAllAttendances($year, User $student)
+    {
+        return array(
+            'absent'        => $this->getAbsenceCount($year, $student),
+            'late'          => $this->getLateCount($year, $student),
+            'detentions'    => $this->getDetentionCount($year, $student),
+            'endorsedLeave' => $this->getLeaveCount($year, $student),
+        );
+    }
+
+    /**
      * Gets awards for the given student.
      *
      * @param      $year
