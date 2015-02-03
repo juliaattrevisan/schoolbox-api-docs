@@ -81,9 +81,9 @@
      # Athletics, Swimming, Camp, Uniform, Pastoral Services:
      # All these are attendances, and are based off of assessments in the grade page.
      #}
-    {% for assessment in report.tutorGroup.assessments %}
-        <dt>{{ assessment.name }}</dt>
-        <dd>{{ assessment.grade }}</dd>
+    {% for grade in report.tutorGroup.grades %}
+        <dt>{{ grade.assessment.name }}</dt>
+        <dd>{{ grade.pretty_mark }}</dd>
     {% endfor %}
 </dl>
 
