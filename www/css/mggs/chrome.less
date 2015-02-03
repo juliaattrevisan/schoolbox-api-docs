@@ -180,17 +180,18 @@ h2{ .border-radius(5px); }
 #infoPanel {
 	margin: 9px 14px;
 	position: relative;
-	> li{ line-height: 30px; height: auto; }
+	> li{ line-height: 30px; height: auto; margin: 0 10px 0 0; }
 	.bell {
-		top: 4px;
+		top: 0px;
+		height: 30px !important;
 		background-image: url('/images/mggs/bell.png');
-		background-position: 4px -24px;
-		> a{ width: 15px !important; }
+		background-position: 4px -21px;
+		> a{ width: 15px !important; line-height: 32px !important; }
 		&[data-unread="0"] {
 			background-position: 4px 0;
 		}
 		&.open {
-			background-position: 4px -48px;
+			background-position: 4px -45px;
 		}
 	}
 	li.more {
@@ -214,7 +215,7 @@ h2{ .border-radius(5px); }
 		&.open:after {
 			width: 0;
 			height: 0;
-			bottom: -10px;
+			bottom: -4px;
 			right: 21px;
 			position: absolute;
 			border-left: 6px solid transparent;
