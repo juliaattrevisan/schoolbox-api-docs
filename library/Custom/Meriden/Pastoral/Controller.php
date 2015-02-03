@@ -10,6 +10,7 @@
 namespace Custom\Meriden\Pastoral;
 
 use Alaress\Web\Controller\Base;
+use Custom\Meriden\Pastoral\StudentInvolvement\TutorGroupFactory;
 use Schoolbox\User;
 
 class Controller extends Base
@@ -20,13 +21,21 @@ class Controller extends Base
     protected $database;
 
     /**
+     * @var TutorGroupFactory
+     */
+    protected $tutorGroupFactory;
+
+    /**
      * Constructor
      *
-     * @param Query $database
+     * @param Query             $database
+     * @param TutorGroupFactory $tutorGroupFactory
      */
-    public function __construct(Query $database)
-    {
-        $this->setDatabase($database);
+    public function __construct(
+        Query $database,
+        TutorGroupFactory $tutorGroupFactory
+    ) {
+        $this->setDatabase($database)->setTutorGroupFactory($tutorGroupFactory);
     }
 
     /**
@@ -146,6 +155,25 @@ class Controller extends Base
     public function setDatabase($database)
     {
         $this->database = $database;
+        return $this;
+    }
+
+    /**
+     * @return TutorGroupFactory
+     */
+    public function getTutorGroupFactory()
+    {
+        return $this->tutorGroupFactory;
+    }
+
+    /**
+     * @param  TutorGroupFactory $tutorGroupFactory
+     *
+     * @return $this
+     */
+    public function setTutorGroupFactory($tutorGroupFactory)
+    {
+        $this->tutorGroupFactory = $tutorGroupFactory;
         return $this;
     }
 }

@@ -88,8 +88,23 @@ class Module extends BaseModule
     {
         // Inject the custom Meriden pastoral database connection too
         // a MSSQL connection should be a service?
-        $injector->params['Custom\\Meriden\\Pastoral\\Controller']['database']
-            = $injector->lazyNew('Custom\\Meriden\\Pastoral\\Query');
+//        $injector->params['Custom\\Meriden\\Pastoral\\Controller']['database']
+//            = $injector->lazyNew('Custom\\Meriden\\Pastoral\\Query');
+        $injector->params['Custom\\Meriden\\Pastoral\\Controller']['tutorGroupFactory']
+            = $injector->lazyNew('Custom\\Meriden\\Pastoral\\StudentInvolvement\\TutorGroupFactory');
+
+        $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\TutorGroupFactory']['gateway']
+            = $injector->lazyNew('Custom\\Meriden\\Pastoral\\StudentInvolvement\\Gateway');
+        $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\TutorGroupFactory']['categoryMapper']
+            = $injector->lazyNew('Schoolbox\\Resource\\CategoryMapper');
+        $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\TutorGroupFactory']['userMapper']
+            = $injector->lazyNew('Schoolbox\\UserMapper');
+        $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\TutorGroupFactory']['gradesService']
+            = Grades::getInstance();
+
+        $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Gateway']['database']
+            = $injector->lazyNew('MSSQL');
+
         $injector->params['Custom\\Meriden\\Pastoral\\Query']['database']
             = $injector->lazyNew('MSSQL');
         $injector->params['Custom\\Meriden\\Pastoral\\Query']['categoryMapper']
@@ -98,6 +113,7 @@ class Module extends BaseModule
             = $injector->lazyNew('Schoolbox\\UserMapper');
         $injector->params['Custom\\Meriden\\Pastoral\\Query']['gradesService']
             = Grades::getInstance();
+
         $injector->set(
             'controller:customMeridenPastoral',
             $injector->lazyNew('Custom\\Meriden\\Pastoral\\Controller')
