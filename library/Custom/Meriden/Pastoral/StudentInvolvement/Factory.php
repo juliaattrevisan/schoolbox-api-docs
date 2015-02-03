@@ -140,7 +140,7 @@ class Factory
      *  grades: array
      * }
      */
-    public function getFolderWithGrades($subjectCode, User $student)
+    protected function getFolderWithGrades($subjectCode, User $student)
     {
         try {
             // Find by category code, and figure out if they're involved.
@@ -191,7 +191,7 @@ class Factory
      *  grades: array (if the student is involved)
      * }
      */
-    public function getStudentInvolvement(Category $folder, User $student)
+    protected function getStudentInvolvement(Category $folder, User $student)
     {
         // Is $student a member of $folder (by class code?)
         $studentId = $student->getId();
