@@ -46,6 +46,8 @@ class Synchronise_Base_Verbose {
 
     /**
      * Column widths for the rest of the row which contains user data
+     * These are the default lengths which get overridden if the data
+     * exceeds their current values
      *
      * @var array
      */
@@ -120,7 +122,6 @@ class Synchronise_Base_Verbose {
             else {
                 $this->allSkipped[] = "Skipping create/update {$reason}";
             }
-
         }
 	}
 
@@ -252,7 +253,7 @@ class Synchronise_Base_Verbose {
                 $datalength = strlen($currentRow[$title]);
 
                 if ($datalength > $padding) {
-                    $padding = $datalength;
+                    $padding = $datalength+2;
                 }
             }
         }
