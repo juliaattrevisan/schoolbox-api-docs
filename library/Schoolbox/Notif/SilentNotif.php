@@ -147,6 +147,7 @@ class SilentNotif implements NotifInterface
      */
     public function setTopic($topic)
     {
+        return $this;
     }
 
 } 
