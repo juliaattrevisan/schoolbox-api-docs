@@ -19,7 +19,23 @@ class Synchronise_Base_Verbose {
 	protected $numUpdated = 0;
 	protected $numSkipped = 0;
 
-	/**
+    protected $rowSpecification = array(
+        'Username' => 10,
+        'Title' => 7,
+        'Firstname' => 20,
+        'Lastname' => 20,
+        'SynergyID' => 12,
+        'AltEmail' => 40,
+        'Campus' => 10,
+        'GroupID' => 9,
+        'Year' => 5,
+        'ePort.' => 8,
+        'Webm.' => 7,
+        'LocalEmail' => 12,
+        'MailHandler' => 13
+    );
+
+    /**
 	 * Create an intro
 	 *
 	 * @return void
@@ -45,6 +61,18 @@ class Synchronise_Base_Verbose {
 		echo "o  Skipping create/update: The script intends to ignore this record altogether, regardless of mode.\n\n";
 		echo "-------------------------------------------------------------\n";
 		echo "\n\n";
+
+        $heading = array();
+        $heading[''] = str_pad('', 2);
+        $heading['Mode'] = str_pad('Mode', 10);
+        $heading['Action'] = str_pad('Action', 15);
+
+        foreach($this->rowSpecification as $title => $padding) {
+            $heading[$title] = str_pad($title, $padding);
+        }
+
+        echo implode('', $heading);
+        echo "\n";
 	}
 
 	/* These methods create verbosity strings which indicate what happened. You should override methods
@@ -59,7 +87,14 @@ class Synchronise_Base_Verbose {
 	 */
 	public function skip() {
 		if ($this->getVerbose() === true) {
-			echo "o  Skipping create/update of " . $this->verboseUserSummary($this->getNewUser()) . " because they have no username.\n";
+            $result = array(
+                str_pad('o', 2),
+                str_pad('Skipping', 10),
+                str_pad('create/update', 15),
+                $this->verboseUserSummary($this->getNewUser()) . " because they have no username.\n"
+            );
+
+			echo implode('', $result);
 		}
 	}
 
@@ -70,7 +105,14 @@ class Synchronise_Base_Verbose {
 	 */
 	public function planCreation() {
 		if ($this->getVerbose() === true) {
-			echo "+  Planning create of " . $this->verboseUserSummary($this->getNewUser()) . "\n";
+            $result = array(
+                str_pad('+', 2),
+                str_pad('Planning', 10),
+                str_pad('create', 15),
+                $this->verboseUserSummary($this->getNewUser()) . "\n"
+            );
+
+            echo implode('', $result);
 		}
 	}
 
@@ -81,7 +123,14 @@ class Synchronise_Base_Verbose {
 	 */
 	public function performCreation() {
 		if ($this->getVerbose() === true) {
-			echo "+  Performing create of " . $this->verboseUserSummary($this->getNewUser()) . "\n";
+            $result = array(
+                str_pad('+', 2),
+                str_pad('Performing', 10),
+                str_pad('create', 15),
+                $this->verboseUserSummary($this->getNewUser()) . "\n"
+            );
+
+            echo implode('', $result);
 		}
 	}
 
@@ -92,7 +141,14 @@ class Synchronise_Base_Verbose {
 	 */
 	public function planUpdate() {
 		if ($this->getVerbose() === true) {
-			echo "^  Planning update of " . $this->verboseUserSummary($this->getNewUser()) . "\n";
+            $result = array(
+                str_pad('^', 2),
+                str_pad('Planning', 10),
+                str_pad('update', 15),
+                $this->verboseUserSummary($this->getNewUser()) . "\n"
+            );
+
+            echo implode('', $result);
 		}
 	}
 
@@ -103,7 +159,14 @@ class Synchronise_Base_Verbose {
 	 */
 	public function performUpdate() {
 		if ($this->getVerbose() === true) {
-			echo "^  Performing update of " . $this->verboseUserSummary($this->getNewUser()) . "\n";
+            $result = array(
+                str_pad('^', 2),
+                str_pad('Performing', 10),
+                str_pad('update', 15),
+                $this->verboseUserSummary($this->getNewUser()) . "\n"
+            );
+
+            echo implode('', $result);
 		}
 	}
 
@@ -113,9 +176,16 @@ class Synchronise_Base_Verbose {
      * @param $message
      */
     public function outputSkipMessage($message) {
-        if ($this->getVerbose() === true) {
-            echo 'o  Skipping create/update of '.$message."\n";
-        }
+//        if ($this->getVerbose() === true) {
+//            $result = array(
+//                str_pad('o', 2),
+//                str_pad('Skipping', 10),
+//                str_pad('create/update', 15),
+//                "of {$message}\n",
+//            );
+//
+//            echo implode('', $result);
+//        }
     }
 
     /**
@@ -125,7 +195,14 @@ class Synchronise_Base_Verbose {
      */
     public function outputPlanCreateMessage($message) {
         if ($this->getVerbose() === true) {
-            echo '+  Planning create of '.$message."\n";
+            $result = array(
+                str_pad('+', 2),
+                str_pad('Planning', 10),
+                str_pad('create', 15),
+                "of {$message}\n",
+            );
+
+            echo implode('', $result);
         }
     }
 
@@ -136,7 +213,14 @@ class Synchronise_Base_Verbose {
      */
     public function outputPerformCreateMessage($message) {
         if ($this->getVerbose() === true) {
-            echo '+  Performing create of '.$message."\n";
+            $result = array(
+                str_pad('+', 2),
+                str_pad('Performing', 10),
+                str_pad('create', 15),
+                "of {$message}\n",
+            );
+
+            echo implode('', $result);
         }
     }
 
@@ -147,7 +231,14 @@ class Synchronise_Base_Verbose {
      */
     public function outputPlanUpdateMessage($message) {
         if ($this->getVerbose() === true) {
-            echo '^  Planning update of '.$message."\n";
+            $result = array(
+                str_pad('^', 2),
+                str_pad('Planning', 10),
+                str_pad('update', 15),
+                "of {$message}\n",
+            );
+
+            echo implode('', $result);
         }
     }
 
@@ -158,7 +249,14 @@ class Synchronise_Base_Verbose {
      */
     public function outputPerformUpdateMessage($message) {
         if ($this->getVerbose() === true) {
-            echo '^  Performing update of '.$message."\n";
+            $result = array(
+                str_pad('^', 2),
+                str_pad('Performing', 10),
+                str_pad('update', 15),
+                "of {$message}\n",
+            );
+
+            echo implode('', $result);
         }
     }
 
@@ -169,7 +267,14 @@ class Synchronise_Base_Verbose {
      */
     public function outputPlanLinkMessage($message) {
         if ($this->getVerbose() === true) {
-            echo '   Planning link of '.$message."\n";
+            $result = array(
+                str_pad('&', 2),
+                str_pad('Planning', 10),
+                str_pad('link', 15),
+                "of {$message}\n",
+            );
+
+            echo implode('', $result);
         }
     }
 
@@ -180,7 +285,14 @@ class Synchronise_Base_Verbose {
      */
     public function outputPerformLinkMessage($message) {
         if ($this->getVerbose() === true) {
-            echo '   Performing link of '.$message."\n";
+            $result = array(
+                str_pad('&', 2),
+                str_pad('Performing', 10),
+                str_pad('link', 15),
+                "of {$message}\n",
+            );
+
+            echo implode('', $result);
         }
     }
 
@@ -204,33 +316,44 @@ class Synchronise_Base_Verbose {
 	 * @return string
 	 */
 	protected function verboseUserSummary($newUser) {
-		if(is_array($newUser)){
+		if (is_array($newUser)) {
 			$data = array();
-			$data[] = "username: {$newUser['username']}";
-			$data[] = "synergy_id: " .$newUser['synergy_id'];
-			$data[] = "title: {$newUser['title']}";
-			$data[] = "firstname: {$newUser['firstname']}";
-			$data[] = "lastname: {$newUser['lastname']}";
-			$data[] = "alt_email: {$newUser['alt_email']}";
-			$data[] = "campus: " . '[' . implode(',', $newUser['campus']) . ']';
-			$data[] = "groupIDs: " . $newUser['group_id'];
+
+            /* Username, title, firstname, lastname
+             */
+            $data['Username'] = $newUser['username'];
+            $data['Title'] = $newUser['title'];
+            $data['Firstname'] = $newUser['firstname'];
+            $data['Lastname'] = $newUser['lastname'];
+
+            /* Other fields
+             */
+			$data['SynergyID'] = $newUser['synergy_id'];
+			$data['AltEmail'] = $newUser['alt_email'];
+			$data['Campus'] = '[' . implode(',', $newUser['campus']) . ']';
+			$data['GroupID'] = $newUser['group_id'];
+            $data['Year'] = '';
 
 			if (array_key_exists('year', $newUser)) {
-				$data[] = 'year: ' . $newUser['year'];
+				$data['Year'] = $newUser['year'];
 			}
 
             /* Default settings
              */
-            $data[] = "eportfolio: {$newUser['eportfolio_enabled']}";
-            $data[] = "webmail: {$newUser['webmail']}";
-            $data[] = "email from username: {$newUser['local_email']}";
-            $data[] = "ext mail client: {$newUser['mail_handler']}";
+            $data['ePort.'] = $newUser['eportfolio_enabled'];
+            $data['Webm.'] = $newUser['webmail'];
+            $data['LocalEmail'] = $newUser['local_email'];
+            $data['MailHandler'] = $newUser['mail_handler'];
 
-			return '(' . implode(', ', $data) . ')';
+            foreach ($this->rowSpecification as $title => $padding) {
+                $data[$title] = str_pad($data[$title], $padding);
+            }
+
+			return implode('', $data);
 		}
 	}
 
-	/**
+    /**
 	 * A summary count of changes
 	 *
 	 * @return void
