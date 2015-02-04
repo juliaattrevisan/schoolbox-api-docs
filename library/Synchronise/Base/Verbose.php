@@ -28,7 +28,7 @@ class Synchronise_Base_Verbose {
 
     /**
      * A list of all the skip actions
-     * 
+     *
      * @var array
      */
     protected $allSkipped = array();
@@ -117,15 +117,17 @@ class Synchronise_Base_Verbose {
 	 * in subclasses to make your own verbose strings.
 	 */
 
-	/**
-	 * Echo message about skipping all actions
-	 *
-	 * @return void
-	 */
-	public function skip() {
+    /**
+     * Echo message about skipping all actions
+     * Optionally pass in your own reason
+     *
+     * @param string $reason
+     * @return void
+     */
+	public function skip($reason = 'because they have no username.') {
 		if ($this->getVerbose() === true) {
-            $this->allSkipped[] = 'Skipping create/update of ' . $this->verboseUserSummary($this->getNewUser()) . " because they have no username.\n";
-		}
+            $this->allSkipped[] = 'Skipping create/update of ' . $this->verboseUserSummary($this->getNewUser()) . ' ' . $reason;
+        }
 	}
 
 	/**
