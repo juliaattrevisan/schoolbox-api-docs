@@ -265,7 +265,7 @@ class EventMapper extends Schoolbox\External\Mapper {
 
 		/* If an event was found matching this id
 		 */
-		if ($eventItem) {
+		if (isset($eventItem)) {
 			$personalCollection->reindex();
 			$eventItem->setUserCollection($personalCollection);
 
