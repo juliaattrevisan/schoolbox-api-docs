@@ -133,7 +133,7 @@ then
 	then
 		mkdir -p $backup_dir >> $logfile 2>&1;
 	fi
-	mount -t cifs $backup_share $backup_dir -o username=$backup_username,password=$backup_password$backup_extra_options >> $logfile 2>&1;
+	mount -t cifs "$backup_share" $backup_dir -o username=$backup_username,password=$backup_password$backup_extra_options >> $logfile 2>&1;
 fi
 
 # If share mounted, check available disk space [>90% WARN, >97% FAIL]
