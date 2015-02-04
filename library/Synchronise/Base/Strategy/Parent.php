@@ -79,7 +79,9 @@ class Synchronise_Base_Strategy_Parent extends Synchronise_Base_Strategy
                 } catch (Exception $e) {
                     // Skip user as something is not good.
                     // Raise a skip message, though.
-                    $this->verbose_filter->skip('spouse because: ' .$e->getMessage() ?: 'exception thrown');
+                    $person = "{$external_user['StudentContactID']} {$external_user['StudentContactPreferred']} {$external_user['StudentContactSurname']}";
+
+                    $this->verbose_filter->skip($person . ' spouse because: ' .$e->getMessage() ?: 'exception thrown');
                     $this->verbose_filter->incrementSkipped();
                     return false;
                 }

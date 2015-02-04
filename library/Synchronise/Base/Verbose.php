@@ -124,9 +124,22 @@ class Synchronise_Base_Verbose {
      * @param string $reason
      * @return void
      */
-	public function skip($reason = 'because they have no username.') {
+	public function skip($reason = null) {
 		if ($this->getVerbose() === true) {
-            $this->allSkipped[] = 'Skipping create/update of ' . $this->verboseUserSummary($this->getNewUser()) . ' ' . $reason;
+
+            /* Default reason
+             */
+            if ($reason === null) {
+                $newUser = $this->getNewUser();
+
+                $this->allSkipped[] = "Skipping create/update of {$newUser['Firstname']} {$newUser['Lastname']} {$newUser['SynergyID']} because they have no username.";
+            }
+            /* Custom reason
+             */
+            else {
+                $this->allSkipped[] = "Skipping create/update {$reason}";
+            }
+
         }
 	}
 
@@ -202,6 +215,28 @@ class Synchronise_Base_Verbose {
 		}
 	}
 
+    /**
+     * Format output row in verbose mode
+     *
+     * @param $row
+     * @internal param $prefix
+     * @internal param $data
+     * @return mixed
+     */
+    private function formatRow($row) {
+        $formattedRow = $row;
+
+        foreach ($this->prefixSpecification as $title => $padding) {
+            $formattedRow[$title] = str_pad($row[$title], $padding);
+        }
+
+        foreach ($this->rowSpecification as $title => $padding) {
+            $formattedRow[$title] = str_pad($row[$title], $padding);
+        }
+
+        return implode('', $formattedRow);
+    }
+
 	/**
 	 * Create a verbose summary string containing data about the
 	 * current user being examined
@@ -239,10 +274,6 @@ class Synchronise_Base_Verbose {
             $data['LocalEmail'] = $newUser['local_email'];
             $data['MailHandler'] = $newUser['mail_handler'];
 
-            foreach ($this->rowSpecification as $title => $padding) {
-                $data[$title] = str_pad($data[$title], $padding);
-            }
-
 			return $data;
 		}
 	}
@@ -253,7 +284,23 @@ class Synchronise_Base_Verbose {
 	 * @return void
 	 */
 	public function summary() {
-		echo "\n";
+
+        /* Create and Update results
+         */
+        foreach ($this->allResults as $currentRow) {
+            echo $this->formatRow($currentRow);
+            echo "\n";
+        }
+
+        echo "\n";
+
+        /* Skipped results
+         */
+        foreach ($this->allSkipped as $currentRow) {
+            echo $currentRow . "\n";
+        }
+
+        echo "\n";
 		echo "Created: {$this->getNumCreated()}, ";
 		echo "Updated: {$this->getNumUpdated()}, ";
 		echo "Skipped: {$this->getNumSkipped()}";
