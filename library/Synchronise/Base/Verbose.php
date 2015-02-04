@@ -40,7 +40,7 @@ class Synchronise_Base_Verbose {
      */
     protected $prefixSpecification = array(
         'I' => 2,
-        'Mode' => 10,
+        'Mode' => 12,
         'Action' => 15
     );
 
