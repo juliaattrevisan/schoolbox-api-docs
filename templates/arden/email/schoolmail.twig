@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+{% macro spacer(fqdn, height, width, colspan) %}
+<td colspan="{{ colspan|default('1') }}"
+    valign="top"
+    height="{{ height|default('1') }}"
+    width="{{ width|default('1') }}"
+    style="line-height:{{ height|default('1') }}px;">
+    <img src="http://{{ fqdn }}/images/emails/spacer.gif"
+         height="{{ height|default('1') }}"
+         width="0"
+         border="0" />
+</td>
+{% endmacro %}
+{% import _self as fn %}
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>{{ config.subject }}</title>
+    <style type="text/css">
+        {% include 'screen.css.twig' %}
+    </style>
+</head>
+<body>
+
+{# "full-width" wrapper #}
+<table class="wrap"><tr><td>
+    <table class="inner-wrap">
+        <tr{# header #}>
+            <td class="header">
+                <table align="center" width="640">
+                    {% include 'schoolmail/header.twig' %}
+                </table>
+            </td>
+        </tr>
+        <tr{# content #}>
+            <td class="content">
+                <table align="center" width="640">
+                    {#<tr>{{ fn.spacer(config.fqdn, 16, 0, 3) }}</tr>#}
+                    <tr>
+                        {{ fn.spacer(config.fqdn, 0, 8) }}
+                        <td>
+                        {% block content %}
+                            <!-- NO CONTENT -->
+                        {% endblock %}
+                        </td>
+                        {{ fn.spacer(config.fqdn, 0, 8) }}
+                    </tr>
+                    <tr class="content">{{ fn.spacer(config.fqdn, 8, 0, 3) }}</tr>
+                </table>
+            </td>
+        </tr>
+        <tr{# footer #}>
+            <td class="footer" width="640">
+                <table align="center" width="640">
+                    {% include 'schoolmail/footer.twig' %}
+                </table>
+            </td>
+        </tr>
+    </table>
+</td></tr></table>
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+{% extends 'schoolmail.twig' %}
+{# parent DOM: you are directly inside a <td/> right now #}
+{% block content %}
+    <table>
+    {% for ns, group in groups %}
+        <tr>{{ fn.spacer(config.fqdn, 16, 0, 3) }}</tr>
+        <tr class="heading">
+            {{ fn.spacer(config.fqdn, 0, 8) }}
+            <td class="heading" valign="middle" height="32">{{ group.heading }}</td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <table width="624">
+                    <tr>
+                        <td>
+                            <table width="624">
+                            {% for row in group.rows %}
+                                {% include "digestmail/grouping/#{ns}.twig" %}
+                            {% endfor %}
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>{{ fn.spacer(config.fqdn, 4, 0) }}</tr>
+                </table>
+            </td>
+        </tr>
+    {% endfor %}
+        <tr>{{ fn.spacer(config.fqdn, 8, 0, 2) }}</tr>
+    </table>
+{% endblock %}
+
