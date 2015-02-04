@@ -1,6 +1,6 @@
 <?php
-/**
- *
+ /**
+ * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -96,6 +96,17 @@ class Event implements EventInterface, Serializable
     public function getObject()
     {
         return $this->object;
+    }
+
+
+    /**
+     * @param object $object
+     * @return self
+     */
+    public function setObject($object)
+    {
+        $this->object = $object;
+        return $this;
     }
 
 
