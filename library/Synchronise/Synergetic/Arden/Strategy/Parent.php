@@ -27,6 +27,8 @@ class Synchronise_Synergetic_Arden_Strategy_Parent extends Synchronise_Base_Stra
              */
             ->addHydrator(new Synchronise_Synergetic_Arden_Hydrator_Campus_Parent())
             ->addSpouseHydrator(new Synchronise_Synergetic_Arden_Hydrator_Campus_Parent())
+            ->addHydrator(new Synchronise_Synergetic_Arden_Hydrator_Group_Parent())
+            ->addSpouseHydrator(new Synchronise_Synergetic_Arden_Hydrator_Group_Parent())
 
             /**
              * These have to occur at the end
