@@ -117,11 +117,28 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
         $stack = array();
 
         for ($i = 0; $i < count($timetable); $i++) {
-            $period = $timetable[$i];
 
             /* Make a gigantic assumption
-             * $period = $timetable[$i]['class'][0];
+             * formerly: $period = $timetable[$i];
              */
+            if ($timetable[$i]['periodSequence'] == 2) {
+                if ($this->getIncludeNonclasses()) {
+                    $period = $timetable[$i];
+                }
+
+                /* Skip nonclasses
+                 */
+                else {
+                    continue;
+                }
+            }
+            else {
+                $period = $timetable[$i]['class'][0];
+                $period['periodStart'] = $timetable[$i]['periodStart'];
+                $period['periodEnd'] = $timetable[$i]['periodEnd'];
+                $period['periodNumber'] = $timetable[$i]['periodNumber'];
+                $period['periodSequence'] = $timetable[$i]['periodSequence'];
+            }
 
             /* Initial condition
              */
@@ -167,15 +184,53 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
             $lastCode = $period['code'];
         }
 
+        /* Reconstruct bucket structure
+         */
+        $processed = array();
+
+        $i = 1;
+
         /* Clear out the period name, beacuse they will now be combined
          * and individual headings no longer mean anything
          */
-        foreach ($allCondensedClasses as &$currentClass) {
-            $currentClass['periodName'] = '';
+        foreach ($allCondensedClasses as $currentClass) {
+            $temp = $currentClass;
+
+            /* Force rendering of nonclasses (periodSequence 2)
+             * This should only run when includeNonClasses is set to true
+             * as that accumulates nonclasses; setting it to false will
+             * exclude them before getting here
+             */
+            if ($currentClass['periodSequence'] == 2) {
+                $temp['description'] = $currentClass['periodName'];
+                $temp['code'] = $currentClass['periodName'];
+            }
+
+            unset($temp['class']);
+            unset($temp['periodName']);
+            unset($temp['periodStart']);
+            unset($temp['periodEnd']);
+            unset($temp['periodNumber']);
+            unset($temp['periodSequence']);
+
+            $record = array(
+                'periodName' => '',
+                'periodStart' => $currentClass['periodStart'],
+                'periodEnd' => $currentClass['periodEnd'],
+                'periodNumber' => $i,
+                'periodSequence' => 1,
+                'class' => array(
+                    $temp
+                )
+            );
+
+            array_push($processed, $record);
+
+            $i++;
         }
 
         return array(
-            'condensed' => $allCondensedClasses,
+            'condensed' => $processed,
             'stack' => $stack
         );
     }
