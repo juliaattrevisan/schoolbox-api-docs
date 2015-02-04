@@ -14,6 +14,7 @@ use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
+use Alaress_Date_Format;
 use Calendar;
 use Monolog\Logger;
 use Schoolbox\Calendar\Relation\Campus;
@@ -66,17 +67,51 @@ class EventNotifier extends AbstractModuleNotifier
             $bundle->attach(self::TRIGGER_UPCOMING, $start - (60 * self::UPCOMING_WINDOW));
         } elseif ($bundle->getMethod() == Mapper::METHOD_UPDATE) {
             // advise 10 minutes before start, and only advise updated once published
-            $pubstamp = $event->getPublishDateTime() instanceof \Alaress_Date_Format
+            $pubstamp = $event->getPublishDateTime() instanceof Alaress_Date_Format
                 ? $event->getPublishDateTime()->getUnixTimestamp()
                 : self::IMMEDIATELY;
 
+            if ($event->inSeries()) {
+                // attach a custom trigger for handling the event recurrence
+                $upcoming = array($this, 'getNextSeriesTime');
+
+            } else {
+                $upcoming = $start - (60 * self::UPCOMING_WINDOW);
+
+            }
+
             $bundle->attachEach(
                 array(
-                    self::TRIGGER_UPCOMING => $start - (60 * self::UPCOMING_WINDOW),
+                    self::TRIGGER_UPCOMING => $upcoming,
                     self::TRIGGER_UPDATED  => $pubstamp
                 )
             );
         }
+    }
+
+
+    /**
+     * @param \Schoolbox\Realtime\Schedule\Event $event
+     * @return int
+     * @throws Mapper\Exception
+     */
+    public function getNextSeriesTime($event)
+    {
+        /** @var Event $object */
+        $object   = $event->getObject();
+        $next     = EventMapper::getInstance()->findNextInSeries($object->getSeriesId(), $object->getStartDateTime()->addMinutes(1));
+        $nextTime = $next->getStartDateTime()->getUnixTimestamp();
+        $now      = Alaress_Date_Format::now()->getUnixTimestamp();
+
+        // returns an with the next timestamp, or negative to cancel (ie. none left)
+
+        if ($nextTime > $now) {
+            // update the event to reference the next object in the series, and return its time
+            $event->setObject($next);
+            return $nextTime;
+        }
+
+        return -1;
     }
 
 
