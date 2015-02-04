@@ -446,7 +446,7 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
     public function findForUser(User $user, $get_subjects = true, $access_level = UserAccess::ACCESS_READ)
     {
         $query = "
-			SELECT DISTINCT
+			SELECT
 				{$this->getColumnString('c')},
 				{$this->getJoinColumnString('homepages', 'h')}
 			FROM {$this->getTable()} c
@@ -495,19 +495,30 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
 
         $statement = $this->database->prepare($query);
         $statement->execute($params);
-        return $this->hydrateList(
-            $statement,
-            'c',
-            function ($mapper, $model, $row) {
-                /**
-                 * @var CategoryMapper $mapper
-                 * @var Category $model
-                 * @var array $row
-                 */
-                $model->setHomepage($mapper->getJoinMapper('homepages')->hydrate($row, 'h'));
-                return $model;
+
+        $collection = new Collection();
+        $addedIds   = array();
+        foreach ($statement as $row) {
+            if (!array_key_exists($row['c.id'], $addedIds)) {
+                $addedIds[$row['c.id']] = true;
+                $collection->add(
+                    $this->hydrate(
+                        $row,
+                        'c',
+                        function ($mapper, $model, $row) {
+                            /**
+                             * @var CategoryMapper $mapper
+                             * @var Category $model
+                             * @var array $row
+                             */
+                            $model->setHomepage($mapper->getJoinMapper('homepages')->hydrate($row, 'h'));
+                            return $model;
+                        }
+                    )
+                );
             }
-        );
+        }
+        return $collection;
     }
 
     /**
