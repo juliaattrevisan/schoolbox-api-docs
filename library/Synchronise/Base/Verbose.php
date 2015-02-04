@@ -115,12 +115,12 @@ class Synchronise_Base_Verbose {
             if ($reason === null) {
                 $newUser = $this->getNewUser();
 
-                $this->allSkipped[] = "Skipping create/update of {$newUser['Firstname']} {$newUser['Lastname']} {$newUser['SynergyID']} because they have no username.";
+                $this->allSkipped[] = "o Skipping create/update of {$newUser['Firstname']} {$newUser['Lastname']} {$newUser['SynergyID']} because they have no username.";
             }
             /* Custom reason
              */
             else {
-                $this->allSkipped[] = "Skipping create/update {$reason}";
+                $this->allSkipped[] = "o Skipping create/update {$reason}";
             }
         }
 	}
