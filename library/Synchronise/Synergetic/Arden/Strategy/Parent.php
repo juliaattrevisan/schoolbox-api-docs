@@ -25,8 +25,34 @@ class Synchronise_Synergetic_Arden_Strategy_Parent extends Synchronise_Base_Stra
             /**
              * Custom hydrators
              */
+
+            /* Eportfolio Enabled
+             */
+            ->addHydrator(new Synchronise_Base_Hydrator_NoEportfolio())
+            ->addSpouseHydrator(new Synchronise_Base_Hydrator_NoEportfolio())
+
+            /* Webmail
+             */
+            ->addHydrator(new Synchronise_Base_Hydrator_NoWebmail())
+            ->addSpouseHydrator(new Synchronise_Base_Hydrator_NoWebmail())
+
+            /* External Mail Client
+             */
+            ->addHydrator(new Synchronise_Base_Hydrator_MailHandler())
+            ->addSpouseHydrator(new Synchronise_Base_Hydrator_MailHandler())
+
+            /* Email Address From Username
+             */
+            ->addHydrator(new Synchronise_Base_Hydrator_NoLocalEmail())
+            ->addSpouseHydrator(new Synchronise_Base_Hydrator_NoLocalEmail())
+
+            /* Campus
+             */
             ->addHydrator(new Synchronise_Synergetic_Arden_Hydrator_Campus_Parent())
             ->addSpouseHydrator(new Synchronise_Synergetic_Arden_Hydrator_Campus_Parent())
+
+            /* Group
+             */
             ->addHydrator(new Synchronise_Synergetic_Arden_Hydrator_Group_Parent())
             ->addSpouseHydrator(new Synchronise_Synergetic_Arden_Hydrator_Group_Parent())
 
