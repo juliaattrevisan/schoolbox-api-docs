@@ -159,6 +159,10 @@ EOL;
 				$this->onWarning($errNum, $errStr, $errFile, $errLine);
 				return true;
 
+            case E_STRICT:
+                $this->logger()->warning("Warning: $errStr");
+                return true;
+
 			default:
 				// we don't know how to deal with this, so let the stock error handler deal with it
                 $this->logger()->error("Don't know how to handle $errStr");
