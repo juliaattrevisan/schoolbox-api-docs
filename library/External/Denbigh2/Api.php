@@ -47,11 +47,10 @@ class External_Denbigh2_Api {
      * @param $options
      */
     public function __construct($type, $keyvalues, $options = array()) {
-        $curl = new \Alaress_Curl_Url($this->generateGetRequest($type, $keyvalues, $options));
-
         $this->setHost(\Cfg::get('external_db_host'));
         $this->setKey(\Cfg::get('external_db_passwd'));
 
+        $curl = new \Alaress_Curl_Url($this->generateGetRequest($type, $keyvalues, $options));
         $this->setCurl($curl)->getCurl()->exec();
     }
 
