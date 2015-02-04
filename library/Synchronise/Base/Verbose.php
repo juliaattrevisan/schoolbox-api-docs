@@ -91,25 +91,6 @@ class Synchronise_Base_Verbose {
 		echo "o  Skipping create/update: The script intends to ignore this record altogether, regardless of mode.\n\n";
 		echo "-------------------------------------------------------------\n";
 		echo "\n\n";
-
-        /* Formatted output
-         */
-        $heading = array();
-
-        /* Prefix column widths
-         */
-        foreach($this->prefixSpecification as $title => $padding) {
-            $heading[$title] = str_pad($title, $padding);
-        }
-
-        /* Data column widths
-         */
-        foreach($this->rowSpecification as $title => $padding) {
-            $heading[$title] = str_pad($title, $padding);
-        }
-
-        echo implode('', $heading);
-        echo "\n";
 	}
 
 	/* These methods create verbosity strings which indicate what happened. You should override methods
@@ -215,28 +196,6 @@ class Synchronise_Base_Verbose {
 		}
 	}
 
-    /**
-     * Format output row in verbose mode
-     *
-     * @param $row
-     * @internal param $prefix
-     * @internal param $data
-     * @return mixed
-     */
-    private function formatRow($row) {
-        $formattedRow = $row;
-
-        foreach ($this->prefixSpecification as $title => $padding) {
-            $formattedRow[$title] = str_pad($row[$title], $padding);
-        }
-
-        foreach ($this->rowSpecification as $title => $padding) {
-            $formattedRow[$title] = str_pad($row[$title], $padding);
-        }
-
-        return implode('', $formattedRow);
-    }
-
 	/**
 	 * Create a verbose summary string containing data about the
 	 * current user being examined
@@ -279,28 +238,106 @@ class Synchronise_Base_Verbose {
 	}
 
     /**
+     * Find maximum lengths of columns, and adjust specification
+     * to accommodate longest data
+     *
+     * sometimes numerous emails exist in alt email field
+     * sometimes names are really long
+     * arden campus value
+     * etc
+     */
+    protected function adjustColumnWidths() {
+        foreach ($this->rowSpecification as $title => &$padding) {
+            foreach($this->getAllResults() as $currentRow) {
+                $datalength = strlen($currentRow[$title]);
+
+                if ($datalength > $padding) {
+                    $padding = $datalength;
+                }
+            }
+        }
+    }
+
+    /**
+     * Format output row in verbose mode
+     *
+     * @param $row
+     * @internal param $prefix
+     * @internal param $data
+     * @return mixed
+     */
+    private function formatRow($row) {
+        $formattedRow = $row;
+
+        foreach ($this->getPrefixSpecification() as $title => $padding) {
+            $formattedRow[$title] = str_pad($row[$title], $padding);
+        }
+
+        foreach ($this->getRowSpecification() as $title => $padding) {
+            $formattedRow[$title] = str_pad($row[$title], $padding);
+        }
+
+        return implode('', $formattedRow);
+    }
+
+    /**
+     * Echo headings
+     */
+    protected function dumpHeadings() {
+        /* Formatted output
+         */
+        $heading = array();
+
+        /* Prefix column widths
+         */
+        foreach($this->getPrefixSpecification() as $title => $padding) {
+            $heading[$title] = str_pad($title, $padding);
+        }
+
+        /* Data column widths
+         */
+        foreach($this->getRowSpecification() as $title => $padding) {
+            $heading[$title] = str_pad($title, $padding);
+        }
+
+        echo implode('', $heading);
+        echo "\n\n";
+    }
+
+    /**
+     * Echo create/update results
+     */
+    protected function dumpResults() {
+        foreach ($this->getAllResults() as $currentRow) {
+            echo $this->formatRow($currentRow);
+            echo "\n";
+        }
+
+        echo "\n\n";
+    }
+
+    /**
+     * Echo skipped results
+     */
+    protected function dumpSkipped() {
+        foreach ($this->getAllSkipped() as $currentRow) {
+            echo $currentRow . "\n";
+        }
+
+        echo "\n\n";
+    }
+
+    /**
 	 * A summary count of changes
 	 *
 	 * @return void
 	 */
 	public function summary() {
+        $this->adjustColumnWidths();
+        $this->dumpHeadings();
+        $this->dumpResults();
+        $this->dumpSkipped();
 
-        /* Create and Update results
-         */
-        foreach ($this->allResults as $currentRow) {
-            echo $this->formatRow($currentRow);
-            echo "\n";
-        }
-
-        echo "\n";
-
-        /* Skipped results
-         */
-        foreach ($this->allSkipped as $currentRow) {
-            echo $currentRow . "\n";
-        }
-
-        echo "\n";
 		echo "Created: {$this->getNumCreated()}, ";
 		echo "Updated: {$this->getNumUpdated()}, ";
 		echo "Skipped: {$this->getNumSkipped()}";
@@ -401,4 +438,84 @@ class Synchronise_Base_Verbose {
 	protected function getNewUser() {
 		return $this->newUser;
 	}
+
+    /**
+     * Set all results
+     *
+     * @param array $allResults
+     */
+    protected function setAllResults($allResults)
+    {
+        $this->allResults = $allResults;
+    }
+
+    /**
+     * Get all results
+     *
+     * @return array
+     */
+    protected function getAllResults()
+    {
+        return $this->allResults;
+    }
+
+    /**
+     * Set all skipped
+     *
+     * @param array $allSkipped
+     */
+    protected function setAllSkipped($allSkipped)
+    {
+        $this->allSkipped = $allSkipped;
+    }
+
+    /**
+     * Get all skipped
+     *
+     * @return array
+     */
+    protected function getAllSkipped()
+    {
+        return $this->allSkipped;
+    }
+
+    /**
+     * Set prefix specification
+     *
+     * @param array $prefixSpecification
+     */
+    protected function setPrefixSpecification($prefixSpecification)
+    {
+        $this->prefixSpecification = $prefixSpecification;
+    }
+
+    /**
+     * Get prefix specification
+     *
+     * @return array
+     */
+    protected function getPrefixSpecification()
+    {
+        return $this->prefixSpecification;
+    }
+
+    /**
+     * Set row specification
+     *
+     * @param array $rowSpecification
+     */
+    protected function setRowSpecification($rowSpecification)
+    {
+        $this->rowSpecification = $rowSpecification;
+    }
+
+    /**
+     * Get row specification
+     *
+     * @return array
+     */
+    protected function getRowSpecification()
+    {
+        return $this->rowSpecification;
+    }
 }
