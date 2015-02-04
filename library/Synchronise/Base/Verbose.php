@@ -219,6 +219,13 @@ class Synchronise_Base_Verbose {
 				$data[] = 'year: ' . $newUser['year'];
 			}
 
+            /* Default settings
+             */
+            $data[] = "eportfolio: {$newUser['eportfolio_enabled']}";
+            $data[] = "webmail: {$newUser['webmail']}";
+            $data[] = "email from username: {$newUser['local_email']}";
+            $data[] = "ext mail client: {$newUser['mail_handler']}";
+
 			return '(' . implode(', ', $data) . ')';
 		}
 	}
