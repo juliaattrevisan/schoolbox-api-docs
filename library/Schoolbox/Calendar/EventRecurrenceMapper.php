@@ -155,6 +155,8 @@ class EventRecurrenceMapper
          */
         if (is_numeric($event->getId())) {
 
+            $previous = $this->getEventMapper()->findById($event->getId());
+
             /* Update details of an already-existing set of recurring event incidents
              * (Change details of each instance of a recurring event, for example)
              */
@@ -179,9 +181,6 @@ class EventRecurrenceMapper
                     $endDate->getDateTimeObject()
                 )->getAsDateInterval();
 
-                // calm the Storm
-                $seriesEvent = $series->first();
-
                 foreach ($series as $seriesEvent) {
                     $this->setSeriesEventData($seriesEvent, $event);
                     // Adjust each event's start and end individually
@@ -196,9 +195,8 @@ class EventRecurrenceMapper
 
                 // seriesEvent will currently be the last event from the iteration, which will be compared to the last event as retrieved from the DB
                 // yes. this is cheating.
-                $this->raiseNotification($seriesEvent, Schoolbox\Mapper::METHOD_UPDATE, $series->last());
-            } /* Modify an existing event and add recurring incidents
-			 */
+                $this->raiseNotification($event, Schoolbox\Mapper::METHOD_UPDATE, $previous);
+            } // Modify an existing event and add recurring incidents
             elseif ($efficacy == 'self') {
                 // If there's any recurrence: update first only, and create the
                 // rest from scratch.
@@ -219,7 +217,7 @@ class EventRecurrenceMapper
                  */
                 $eventRecurrence->getDateCollection()->next();
 
-                $this->persist($event, $eventRecurrence->getDateCollection(), $eventRecurrence->getSeriesId(), $eventRelations, $access);
+                $this->persist($event, $eventRecurrence->getDateCollection(), $eventRecurrence->getSeriesId(), $eventRelations, $access, $previous);
             }
         } /* Create N recurring events which are wholly new
 		 *
@@ -288,8 +286,9 @@ class EventRecurrenceMapper
      * @param EventRelations $eventRelations
      * @param int            $sid
      * @param int            $access
+     * @param Event          $previous
      */
-    protected function persist(Event $event, Traversable $dates, $sid, EventRelations $eventRelations, $access)
+    protected function persist(Event $event, Traversable $dates, $sid, EventRelations $eventRelations, $access, $previous = null)
     {
         $method = $event->getId() ? Schoolbox\Mapper::METHOD_UPDATE : Schoolbox\Mapper::METHOD_CREATE;
 
@@ -307,7 +306,7 @@ class EventRecurrenceMapper
             $eventRelations->resetRelations($event);
         }
 
-        $this->raiseNotification($event, $method);
+        $this->raiseNotification($event, $method, $previous);
     }
 
     /* Getters/Setters
