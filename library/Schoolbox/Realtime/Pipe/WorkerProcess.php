@@ -21,10 +21,10 @@ use Predis\PredisException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
+use Schoolbox\Mapper;
 use Schoolbox\Notif\UserQueue\UserQueueFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\Notification\Envelope;
-use Schoolbox\Role;
 use Schoolbox\User;
 
 class WorkerProcess extends AbstractProcess
@@ -59,30 +59,34 @@ class WorkerProcess extends AbstractProcess
     {
         $this->log->debug("Received $command command");
 
-        switch ($command) {
+        try {
+            switch ($command) {
 
-            // retrieve messages
-            case DefaultDispatchStrategy::TASK_FETCH:
-                list($userId, $count) = $args;
-                return $this->fetch($userId, $count);
+                // retrieve messages
+                case DefaultDispatchStrategy::TASK_FETCH:
+                    list($userId, $count) = $args;
+                    return $this->fetch($userId, $count);
 
-            // publish messages
-            case DefaultDispatchStrategy::TASK_PUBLISH:
-                $data = unserialize($args[0]);
-                if (!(is_array($data) && count($data) == 4)) {
-                    throw new RuntimeException("Data should be array(4); is " . gettype($data) . "(" . count($data) . ")");
-                }
-                list($callback, $model, $user, $diff) = $data;
-                return $this->publish($callback, $model, $user, $diff);
+                // publish messages
+                case DefaultDispatchStrategy::TASK_PUBLISH:
+                    $data = unserialize($args[0]);
+                    if (!(is_array($data) && count($data) == 4)) {
+                        throw new RuntimeException("Data should be array(4); is " . gettype($data) . "(" . count($data) . ")");
+                    }
+                    list($callback, $model, $user, $diff) = $data;
+                    return $this->publish($callback, $model, $user, $diff);
 
-            // digest or alert messages
-            case DefaultDispatchStrategy::TASK_DIGEST:
-            case DefaultDispatchStrategy::TASK_TIMETABLE:
-                $data = unserialize($args[0]);
-                if (!(is_array($data) && count($data) >= 2)) {
-                    throw new RuntimeException("Data should be array(2+); is " . gettype($data) . "(" . count($data) . ")");
-                }
-                return $this->sendTo($data[0], $data[1]);
+                // digest or alert messages
+                case DefaultDispatchStrategy::TASK_DIGEST:
+                case DefaultDispatchStrategy::TASK_TIMETABLE:
+                    $data = unserialize($args[0]);
+                    if (!(is_array($data) && count($data) >= 2)) {
+                        throw new RuntimeException("Data should be array(2+); is " . gettype($data) . "(" . count($data) . ")");
+                    }
+                    return $this->sendTo($data[0], $data[1]);
+            }
+        } catch (Mapper\Exception $e) {
+            throw new RuntimeException(sprintf("Could not complete '%s': %s in %s:%s", $command, $e->getMessage(), $e->getFile(), $e->getLine()), 0, $e);
         }
 
         throw new InvalidArgumentException("Can't process '$command'.");
