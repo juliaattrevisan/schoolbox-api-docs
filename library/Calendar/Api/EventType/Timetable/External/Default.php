@@ -47,91 +47,6 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
         $colorMap   = array();
         $colorIndex = 0;
 
-        // For efficiency - fetch the full timetable, and build its color list
-        foreach ($this->getUser()->getCampusCollection() as $campus) {
-            $campusId  = $campus->getId();
-            try {
-                foreach (range(1, $campus->getTimetableDay()) as $day) {
-                    $timetable[$day] = $this->getExternalTimetable()->getDayTimetable(
-                        $this->getUser()->getExternalId(),
-                        $this->getUser()->getId(),
-                        $campusId,
-                        $day
-                    );
-                }
-            } catch (Schoolbox\External\Exception $e) {
-                // Can't fetch timetable? assume it's empty
-                $timetable = array();
-            }
-            if (empty($timetable)) {
-                continue;
-            }
-            $timetableStaff      = array();
-            $timetableCategories = array();
-            foreach ($timetable as $dayNumber => $periods) {
-                foreach ($periods as $periodDetail) {
-                    foreach ($periodDetail['class'] as $classDetail) {
-                        // Build the day timetable detail.
-                        $period             = $periodDetail + $classDetail;
-                        $period['staff']    = null;
-                        $period['category'] = null;
-                        unset($period['class']);
-
-                        // Load staff into period defintion
-                        $staffId = $period['staffID'];
-                        try {
-                            if (!empty($staffId)) {
-                                // Don't load more than once
-                                if (!array_key_exists($staffId, $timetableStaff)) {
-                                    $timetableStaff[$staffId] = \Schoolbox\UserMapper::getInstance()->findOneByColumn(
-                                        'synergy_id',
-                                        $period['staffID']
-                                    );
-                                }
-                            } else {
-                                $timetableStaff[$staffId] = null;
-                            }
-                        } catch (Exception $e) {
-                            $timetableStaff[$staffId] = null;
-                        }
-                        $period['staff'] = $timetableStaff[$staffId];
-
-                        // Load category into period defintion
-                        $categoryId = $period['code'];
-                        try {
-                            if (!empty($categoryId)) {
-                                // Don't load more than once
-                                if (!array_key_exists($categoryId, $timetableCategories)) {
-                                    $timetableCategories[$categoryId] =
-                                        \Schoolbox\Resource\CategoryMapper::getInstance()->findByCode(
-                                            $categoryId
-                                        );
-                                }
-                            } else {
-                                $timetableCategories[$categoryId] = null;
-                            }
-                        } catch (Exception $e) {
-                            $timetableCategories[$categoryId] = null;
-                        }
-                        $period['category'] = $timetableCategories[$categoryId];
-
-                        // And set the color map as well.
-                        // Set this into the color map
-                        if ($period['code'] && !array_key_exists($period['code'], $colorMap)) {
-                            // not enough colors: loop around to index 0.
-                            if (!$colorList->offsetExists($colorIndex)) {
-                                $colorIndex = 0;
-                            }
-                            $colorMap[$period['code']] = $colorList->offsetGet($colorIndex)->getHexColour();
-                            $colorIndex++;
-                        }
-                        $period['color'] = $colorMap[$period['code']];
-                        $dayTimetable[$dayNumber][$campusId][] = $period;
-                    }
-                }
-            }
-        }
-
         // Figure out event type
         try {
             /** @var Calendar_Api_Config_Record $config */
@@ -150,6 +65,11 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                 $dayNumber = $this->getExternalTimetable()->getDayNumber($campusId, $currentTimestamp);
                 if ($dayNumber <= 0) {
                     continue;
+                }
+                // Building the timetable is an expensive process,
+                // so only do when necessary, and only once for each day/campus
+                if (!isset($dayTimetable[$dayNumber][$campusId])) {
+                    $dayTimetable[$dayNumber][$campusId] = $this->buildTimetable($campusId, $dayNumber);
                 }
                 // Load events for this campus
                 if (isset($dayTimetable[$dayNumber][$campusId])) {
@@ -188,7 +108,18 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                                 $event->setAccess(Calendar_Event_Type_Day::CAMPUS_ACCESS);
                             }
                             $event->setType($eventType);
-                            $event->setColour($period['color']);
+
+                            // Load the color for this timetabled class
+                            if ($period['code'] && !array_key_exists($period['code'], $colorMap)) {
+                                // not enough colors: loop around to index 0.
+                                if (!$colorList->offsetExists($colorIndex)) {
+                                    $colorIndex = 0;
+                                }
+                                $colorMap[$period['code']] = $colorList->offsetGet($colorIndex)->getHexColour();
+                                $colorIndex++;
+                            }
+                            $event->setColour($colorMap[$period['code']]);
+
                             $event->setConnectorId($this->getConnectorId());
                             $stack->add($event);
                         }
@@ -198,6 +129,96 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
             $currentTimestamp = strtotime('+1 day', $currentTimestamp);
         }
         return $stack;
+    }
+
+    /**
+     * Builds the timetable for a given campus for a given day.
+     *
+     * @param int $campusId
+     * @param int $day
+     *
+     * @return array
+     */
+    protected function buildTimetable($campusId, $day)
+    {
+        try {
+            $timetable = $this->getExternalTimetable()->getDayTimetable(
+                $this->getUser()->getExternalId(),
+                $this->getUser()->getId(),
+                $campusId,
+                $day
+            );
+        } catch (Schoolbox\External\Exception $e) {
+            // Can't fetch timetable? assume it's empty
+            $timetable = array();
+        }
+
+        $dayTimetable        = array();
+        $timetableStaff      = array();
+        $timetableCategories = array();
+        foreach ($timetable as $periodDetail) {
+            foreach ($periodDetail['class'] as $classDetail) {
+                // Build the day timetable detail.
+                $period             = $periodDetail + $classDetail;
+                $period['staff']    = null;
+                $period['category'] = null;
+                unset($period['class']);
+
+                // Load staff into period defintion
+                $staffId = $period['staffID'];
+                try {
+                    if (!empty($staffId)) {
+                        // Don't load more than once
+                        if (!array_key_exists($staffId, $timetableStaff)) {
+                            $timetableStaff[$staffId] = \Schoolbox\UserMapper::getInstance()->findOneByColumn(
+                                'synergy_id',
+                                $period['staffID']
+                            );
+                        }
+                    } else {
+                        $timetableStaff[$staffId] = null;
+                    }
+                } catch (Exception $e) {
+                    $timetableStaff[$staffId] = null;
+                }
+                $period['staff'] = $timetableStaff[$staffId];
+
+                // Load category into period defintion
+                $categoryId = $period['code'];
+                try {
+                    if (!empty($categoryId)) {
+                        // Don't load more than once
+                        if (!array_key_exists($categoryId, $timetableCategories)) {
+                            $timetableCategories[$categoryId] =
+                                \Schoolbox\Resource\CategoryMapper::getInstance()->findByCode(
+                                    $categoryId
+                                );
+                        }
+                    } else {
+                        $timetableCategories[$categoryId] = null;
+                    }
+                } catch (Exception $e) {
+                    $timetableCategories[$categoryId] = null;
+                }
+                $period['category'] = $timetableCategories[$categoryId];
+
+                $dayTimetable[] = $period;
+
+//                // And set the color map as well.
+//                // Set this into the color map
+//                if ($period['code'] && !array_key_exists($period['code'], $colorMap)) {
+//                    // not enough colors: loop around to index 0.
+//                    if (!$colorList->offsetExists($colorIndex)) {
+//                        $colorIndex = 0;
+//                    }
+//                    $colorMap[$period['code']] = $colorList->offsetGet($colorIndex)->getHexColour();
+//                    $colorIndex++;
+//                }
+//                $period['color'] = $colorMap[$period['code']];
+//                $dayTimetable[$dayNumber][$campusId][] = $period;
+            }
+        }
+        return $dayTimetable;
     }
 
     /**
