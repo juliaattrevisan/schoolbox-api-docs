@@ -20,6 +20,7 @@ use HttpUserAgent;
 use ReflectionMethod;
 use RuntimeException;
 use SitePage;
+use Zend\Uri\Uri;
 
 class Kernel extends \Alaress\Application\Kernel
 {
@@ -145,8 +146,17 @@ class Kernel extends \Alaress\Application\Kernel
                 $response = $controller->getResponse();
             } catch (Unauthenticated $e) {
                 // Really basic unauthenticated response - redirect to a login page.
+                // Preserve GET params that aren't "page" (or "samlAuth"?)
+                $uri   = new Uri($path);
+                $query = array();
+                foreach ($controller->getRequest()->query as $key => $value) {
+                    if (!in_array($key, array('page', 'samlAuth'))) {
+                        $query[$key] = $value;
+                    }
+                }
+                $uri->setQuery($query);
                 $response = $this->di->get('webFactory')->newResponse();
-                $response->redirect->to('/login/?page='.urlencode($path));
+                $response->redirect->to('/login/?page='.urlencode($uri));
             }
             catch (Forbidden $e) {
                 // TODO replace the call to Sitepage::error() method
