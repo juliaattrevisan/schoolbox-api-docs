@@ -24,6 +24,7 @@ class Synchronise_Synergetic_ARden_Strategy_Student extends Synchronise_Base_Str
              * Custom hydrators
              */
             ->addHydrator(new Synchronise_Synergetic_Arden_Hydrator_Campus_Student())
+            ->addHydrator(new Synchronise_Synergetic_Arden_Hydrator_Group_Student())
 
             /**
              * These have to occur at the end
