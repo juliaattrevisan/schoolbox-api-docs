@@ -109,7 +109,6 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 			$d->enqueue($timer, RerouterDispatchStrategy::TASK_REROUTE, $timer->getData());
 		}, self::TRANSACTION_CACHE_TIMEOUT, self::TRANSACTION_COUNT_LIMIT);
 
-        $this->subscriber->connect(array($this, 'onConnect'), array($this, 'onException'));
 	}
 
 
