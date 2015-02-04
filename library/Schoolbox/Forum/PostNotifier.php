@@ -120,7 +120,15 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         $posts = $this->mapper->findForFeed($context, $limit, $offset);
 
         foreach ($posts as $post) {
-            $c->merge(new Collection($this->notifyFollowed($roletype, $post, $post->getOwner())->getAll($post->getDate()->getUnixTimestamp())));
+            $c->merge(
+                new Collection(
+                    $this->notifyFollowed(
+                        $roletype,
+                        $post,
+                        $post->getOwner()
+                    )->getAll($post->getDate()->getUnixTimestamp())
+                )
+            );
         }
 
         return $c;
@@ -191,11 +199,14 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
                          ->addFilter('roletype', array($roletype));
 
         /** @var Post $parent */
+        $quotedId = 0;
         if (($parentId = $post->getParent()->getId()) !== null) {
-            $parent   = $this->mapper->findById($parentId);
-            $quotedId = $parent->getOwner()->getId();
-        } else {
-            $quotedId = 0;
+            try {
+                $parent   = $this->mapper->findById($parentId);
+                $quotedId = $parent->getOwner()->getId();
+            } catch (Mapper\Exception $e) {
+                // leave quoted ID at zero
+            }
         }
 
         foreach ($this->threadMapper->findInvolvedUsers($post->getThread()) as $user) {
@@ -223,9 +234,12 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
                          ->addFilter('roletype', array($roletype));
 
         if ($parentId = $post->getParent()->getId()) {
-            $parent = PostMapper::getInstance()->findById($parentId);
-
-            $envelope->targetToUser($parent->getOwner(), $bob->build());
+            try {
+                $parent = $this->mapper->findById($parentId);
+                $envelope->targetToUser($parent->getOwner(), $bob->build());
+            } catch (Mapper\Exception $e) {
+                // I can't target a non-existent post
+            }
         }
 
         return $envelope;
