@@ -11,7 +11,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 {
     private $externalTimetable;
 
-    private $dayNumber = array();
+    protected $dayNumber = array();
 
     private $currentPeriod = array();
 
@@ -21,6 +21,13 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      * @var Schoolbox\Collection
      */
     protected $colourList;
+
+    /**
+     * The html file to load
+     *
+     * @var string
+     */
+    protected $templateFile = 'timetable';
 
     public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage, Group $group, Category $category, External_Timetable $externalTimetable)
     {
@@ -75,7 +82,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
     public function renderTemplate($templateHandle)
     {
-        if (!$this->loadTemplate($templateHandle, 'timetable')) {
+        if (!$this->loadTemplate($templateHandle, $this->getTemplateFile())) {
             return false;
         }
 
@@ -252,4 +259,22 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         return true;
     }
 
+    /* Getters/Setters
+     */
+
+    /**
+     * @param string $templateFile
+     */
+    protected function setTemplateFile($templateFile)
+    {
+        $this->templateFile = $templateFile;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getTemplateFile()
+    {
+        return $this->templateFile;
+    }
 }

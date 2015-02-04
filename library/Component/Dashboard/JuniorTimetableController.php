@@ -24,6 +24,13 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
     private $includeNonclasses = true;
 
     /**
+     * The html file to load
+     *
+     * @var string
+     */
+    protected $templateFile = 'juniorTimetable';
+
+    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
@@ -68,6 +75,7 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
                         $processed = $this->condense($timetable);
 
                         $this->timetable[$campus_id] = $processed['condensed'];
+                        $this->dayNumber[$campus_id] = $day_number;
                     }
                 }
             }
