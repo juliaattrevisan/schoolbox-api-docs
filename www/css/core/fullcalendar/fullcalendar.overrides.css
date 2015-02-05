@@ -2,6 +2,10 @@
  * FullCalendar CSS customisations
  */
 
+.fc-event {
+    min-height: 1em;
+}
+
 .fc-event,
 .fc-event:hover {
     color: #000;
