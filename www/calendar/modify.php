@@ -232,16 +232,69 @@ $page->dropDown(
     )
 );
 
+/**
+ * Group (Folder) selection
+ */
+
 /* Only provide Group option if groups have been defined
  */
 $groupHandler = new \Group();
-$groupList    = $groupHandler->involvedInCategoryList($selectedUser->getId(), true, WRITE_ACCESS);
+
+/* Possible options, based on current user's involvement
+ */
+$possibleFolderList = $groupHandler->involvedInCategoryList($selectedUser->getId(), true, WRITE_ACCESS);
+
+/* Ones that it's already in, from previous selections
+ */
+$alreadyInGroupList = $event->getRoleCollection();
+
+/* Get data about the Folders
+ */
+$tempFolderIds = array();
+
+foreach ($alreadyInGroupList as $current) {
+    $tempFolderIds[] = $current->getRoleId();
+}
+
+$folderMapper = new \Schoolbox\Resource\CategoryMapper();
+$allFolders = $folderMapper->findByColumnList(array('id' => $tempFolderIds));
+
+/**
+ * Dedupe and make synonymous
+ */
+
+/* All the checkbox options, deduped, are here
+ */
+$allFolderList = array();
+
+/* A simple stack of ids for checkboxes which should already be ticked
+ */
+$previousInvolvement = array();
+
+foreach ($possibleFolderList as $current) {
+    $allFolderList[$current['id']] = $current;
+}
+
+foreach ($allFolders as $currentFolder) {
+    if (!isset($allFolderList[$currentFolder->getId()])) {
+        $allFolderList[$currentFolder->getId()] = array(
+            'name' => $currentFolder->getName(),
+            'id' => $currentFolder->getId()
+        );
+    }
+
+    $previousInvolvement[] = $currentFolder->getId();
+}
+
+/* Just get the values
+ */
+$allFolderList = array_values($allFolderList);
 
 /* Group checkbox array when using Group Event Level
  */
-foreach ($groupList as $currentUserGroup) {
-    $alreadyInCategory = $event->getCategoryCollection()->getBy('categoryId', $currentUserGroup['id']);
-    $fromHomepage      = (($_GET['level'] == 2) && ($_GET['homepageId'] == $currentUserGroup['id']));
+foreach ($allFolderList as $currentFolder) {
+    $alreadyInCategory = $event->getCategoryCollection()->getBy('categoryId', $currentFolder['id']) || in_array($currentFolder['id'], $previousInvolvement);
+    $fromHomepage      = (($_GET['level'] == 2) && ($_GET['homepageId'] == $currentFolder['id']));
 
     /* If you have already chosen these categories, or if it's specified
      * from a homepage via Group Calendar > Add Event
@@ -254,8 +307,8 @@ foreach ($groupList as $currentUserGroup) {
 
     $page->setVar(
         array(
-            'EVENT_GROUP_ID'          => $currentUserGroup['id'],
-            'EVENT_GROUP_NAME'        => $currentUserGroup['name'],
+            'EVENT_GROUP_ID'          => $currentFolder['id'],
+            'EVENT_GROUP_NAME'        => $currentFolder['name'],
             'EVENT_GROUP_ID_SELECTED' => $selected
         )
     );
@@ -274,11 +327,11 @@ $campusMapper = new \Schoolbox\CampusMapper();
 $campusList   = $campusMapper->getAvailableCampusesForUser($selectedUser);
 
 /* Event Access Levels
- * Requires both $groupList and $campusList for optional values
+ * Requires both $possibleFolderList and $campusList for optional values
  */
 $page->dropDown(
     'event_level_drop',
-    new \Schoolbox\Calendar\EventLevelCollection($groupList, $campusList),
+    new \Schoolbox\Calendar\EventLevelCollection($possibleFolderList, $campusList),
     $defaultAccessLevel,
     TEMPLATE_content,
     array(
