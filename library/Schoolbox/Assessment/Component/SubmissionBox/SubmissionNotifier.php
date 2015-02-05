@@ -247,7 +247,7 @@ class SubmissionNotifier extends AbstractModuleNotifier {
 		);
 
 		$params = array(
-			'owner'   => array($user->formatName(), "/user/search/$ownerId"),
+			'owner'   => array($user->formatName(), "/search/user/$ownerId"),
 			'boxname' => array($box->getName(),     "/submission/submissionHistory/$boxId/$studentId"),
 			'catname' => array($cat->getName(),     "/homepage/$catId"),
 		);
