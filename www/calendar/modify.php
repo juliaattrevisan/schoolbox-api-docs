@@ -90,29 +90,29 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_START_HOUR'     => $event->getStartDateTime()->getUsingFormat('g'),
             'EVENT_START_MIN'      => $event->getStartDateTime()->getUsingFormat('i'),
             'EVENT_START_AM'       => $event->getStartDateTime()->getUsingFormat('A') == 'AM'
-                ? 'selected="selected"'
-                : '',
+                    ? 'selected="selected"'
+                    : '',
             'EVENT_START_PM'       => $event->getStartDateTime()->getUsingFormat('A') == 'PM'
-                ? 'selected="selected"'
-                : '',
+                    ? 'selected="selected"'
+                    : '',
             'EVENT_END_DATE'       => $event->getEndDateTime()->getUsingFormat('d/m/Y'),
             'EVENT_END_HOUR'       => $event->getEndDateTime()->getUsingFormat('g'),
             'EVENT_END_MIN'        => $event->getEndDateTime()->getUsingFormat('i'),
             'EVENT_END_AM'         => $event->getEndDateTime()->getUsingFormat('A') == 'AM'
-                ? 'selected="selected"'
-                : '',
+                    ? 'selected="selected"'
+                    : '',
             'EVENT_END_PM'         => $event->getEndDateTime()->getUsingFormat('A') == 'PM'
-                ? 'selected="selected"'
-                : '',
+                    ? 'selected="selected"'
+                    : '',
             'EVENT_PUBLISH_DATE'   => $publishDate,
             'EVENT_LOCATION'       => $event->getLocation(),
             'EVENT_DETAIL'         => $event->getDetail(),
             'EVENT_REDIRECT'       => $event->setupRedirect(
-                $_GET['returnTo'],
-                $event->getStartDateTime()->getUsingFormat('d-m-Y'),
-                $_GET['homepageId'],
-                $_GET['userId']
-            ),
+                    $_GET['returnTo'],
+                    $event->getStartDateTime()->getUsingFormat('d-m-Y'),
+                    $_GET['homepageId'],
+                    $_GET['userId']
+                ),
         )
     );
 
@@ -178,29 +178,29 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_START_HOUR'     => $event->getStartDateTime()->getUsingFormat('g'),
             'EVENT_START_MIN'      => $event->getStartDateTime()->getUsingFormat('i'),
             'EVENT_START_AM'       => $event->getStartDateTime()->getUsingFormat('A') == 'AM'
-                ? 'selected="selected"'
-                : '',
+                    ? 'selected="selected"'
+                    : '',
             'EVENT_START_PM'       => $event->getStartDateTime()->getUsingFormat('A') == 'PM'
-                ? 'selected="selected"'
-                : '',
+                    ? 'selected="selected"'
+                    : '',
             'EVENT_END_DATE'       => $event->getEndDateTime()->getUsingFormat('d/m/Y'),
             'EVENT_END_HOUR'       => $event->getEndDateTime()->getUsingFormat('g'),
             'EVENT_END_MIN'        => $event->getEndDateTime()->getUsingFormat('i'),
             'EVENT_END_AM'         => $event->getEndDateTime()->getUsingFormat('A') == 'AM'
-                ? 'selected="selected"'
-                : '',
+                    ? 'selected="selected"'
+                    : '',
             'EVENT_END_PM'         => $event->getEndDateTime()->getUsingFormat('A') == 'PM'
-                ? 'selected="selected"'
-                : '',
+                    ? 'selected="selected"'
+                    : '',
             'EVENT_PUBLISH_DATE'   => '',
             'EVENT_LOCATION'       => '',
             'EVENT_DETAIL'         => '',
             'EVENT_REDIRECT'       => $event->setupRedirect(
-                $_GET['returnTo'],
-                $event->getStartDateTime()->getUsingFormat('d-m-Y'),
-                $_GET['homepageId'],
-                $_GET['userId']
-            ),
+                    $_GET['returnTo'],
+                    $event->getStartDateTime()->getUsingFormat('d-m-Y'),
+                    $_GET['homepageId'],
+                    $_GET['userId']
+                ),
         )
     );
 
@@ -232,16 +232,73 @@ $page->dropDown(
     )
 );
 
+/**
+ * Group (Folder) selection
+ */
+
 /* Only provide Group option if groups have been defined
  */
 $groupHandler = new \Group();
-$groupList    = $groupHandler->involvedInCategoryList($selectedUser->getId(), true, WRITE_ACCESS);
+
+/* Possible options, based on current user's involvement
+ */
+$possibleFolderList = $groupHandler->involvedInCategoryList($selectedUser->getId(), true, WRITE_ACCESS);
+
+/* Ones that it's already in, from previous selections
+ */
+$alreadyInFolderList = $event->getCategoryCollection();
+
+/* Get data about the Folders
+ */
+$tempFolderIds = array();
+
+foreach ($alreadyInFolderList as $current) {
+    $tempFolderIds[] = $current->getCategoryId();
+}
+
+$folderMapper = new \Schoolbox\Resource\CategoryMapper();
+$allFolders   = $folderMapper->findByColumnList(array('id' => $tempFolderIds));
+
+/**
+ * Dedupe and make synonymous
+ */
+
+/* All the checkbox options, deduped, are here
+ */
+$allFolderList = array();
+
+/* A simple stack of ids for checkboxes which should already be ticked
+ */
+$previousInvolvement = array();
+
+/* Ones that you could possibly tick
+ */
+foreach ($possibleFolderList as $current) {
+    $allFolderList[$current['id']] = $current;
+}
+
+/* Ones that have been ticked in the past
+ */
+foreach ($allFolders as $currentFolder) {
+    if (!isset($allFolderList[$currentFolder->getId()])) {
+        $allFolderList[$currentFolder->getId()] = array(
+            'name' => $currentFolder->getName(),
+            'id'   => $currentFolder->getId()
+        );
+    }
+
+    $previousInvolvement[] = $currentFolder->getId();
+}
+
+/* Just get the values
+ */
+$allFolderList = array_values($allFolderList);
 
 /* Group checkbox array when using Group Event Level
  */
-foreach ($groupList as $currentUserGroup) {
-    $alreadyInCategory = $event->getCategoryCollection()->getBy('categoryId', $currentUserGroup['id']);
-    $fromHomepage      = (($_GET['level'] == 2) && ($_GET['homepageId'] == $currentUserGroup['id']));
+foreach ($allFolderList as $currentFolder) {
+    $alreadyInCategory = $event->getCategoryCollection()->getBy('categoryId', $currentFolder['id']) || in_array($currentFolder['id'], $previousInvolvement);
+    $fromHomepage      = (($_GET['level'] == 2) && ($_GET['homepageId'] == $currentFolder['id']));
 
     /* If you have already chosen these categories, or if it's specified
      * from a homepage via Group Calendar > Add Event
@@ -254,8 +311,8 @@ foreach ($groupList as $currentUserGroup) {
 
     $page->setVar(
         array(
-            'EVENT_GROUP_ID'          => $currentUserGroup['id'],
-            'EVENT_GROUP_NAME'        => $currentUserGroup['name'],
+            'EVENT_GROUP_ID'          => $currentFolder['id'],
+            'EVENT_GROUP_NAME'        => $currentFolder['name'],
             'EVENT_GROUP_ID_SELECTED' => $selected
         )
     );
@@ -274,11 +331,11 @@ $campusMapper = new \Schoolbox\CampusMapper();
 $campusList   = $campusMapper->getAvailableCampusesForUser($selectedUser);
 
 /* Event Access Levels
- * Requires both $groupList and $campusList for optional values
+ * Requires both $possibleFolderList and $campusList for optional values
  */
 $page->dropDown(
     'event_level_drop',
-    new \Schoolbox\Calendar\EventLevelCollection($groupList, $campusList),
+    new \Schoolbox\Calendar\EventLevelCollection($possibleFolderList, $campusList),
     $defaultAccessLevel,
     TEMPLATE_content,
     array(
