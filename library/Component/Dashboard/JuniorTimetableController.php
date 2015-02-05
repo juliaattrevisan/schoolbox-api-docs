@@ -141,11 +141,22 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
                 }
             }
             else {
-                $period = $timetable[$i]['class'][0];
-                $period['periodStart'] = $timetable[$i]['periodStart'];
-                $period['periodEnd'] = $timetable[$i]['periodEnd'];
-                $period['periodNumber'] = $timetable[$i]['periodNumber'];
-                $period['periodSequence'] = $timetable[$i]['periodSequence'];
+
+                /* Start restructuring
+                 */
+                if (count($timetable[$i]['class'])) {
+                    $period = $timetable[$i]['class'][0];
+                    $period['periodStart'] = $timetable[$i]['periodStart'];
+                    $period['periodEnd'] = $timetable[$i]['periodEnd'];
+                    $period['periodNumber'] = $timetable[$i]['periodNumber'];
+                    $period['periodSequence'] = $timetable[$i]['periodSequence'];
+                }
+                /* Hide periodSequence 1 periods which have no classes
+                 * (Hide spares)
+                 */
+                else {
+                    continue;
+                }
             }
 
             /* Initial condition
@@ -163,6 +174,17 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
                     $stack[] = "Updating periodEnd to {$period['periodEnd']}<br>";
 
                     $condensedClass['periodEnd'] = $period['periodEnd'];
+
+                    /* Last period in the day is the same as the second-last
+                     * period in the day
+                     */
+                    if ($i == (count($timetable)-1)) {
+                        if ($this->getIncludeNonclasses() || isset($condensedClass['code'])) {
+                            $stack[] = "Adding {$this->getCode($condensedClass)}<br>";
+
+                            $allCondensedClasses[] = $condensedClass;
+                        }
+                    }
                 }
                 else {
                     if ($this->getIncludeNonclasses() || isset($condensedClass['code'])) {
@@ -175,9 +197,8 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
 
                     $stack[] = "Current condensed class is {$period['code']}<br>";
 
-                    /* If this is the last period in the timetable, add it. This can
-                     * occur if the last element in $timetable is a nonclass that
-                     * didn't match the one just added
+                    /* Last period in the day is different to the second-last
+                     * period in the day
                      */
                     if ($i == (count($timetable)-1)) {
                         if ($this->getIncludeNonclasses() || isset($condensedClass['code'])) {
