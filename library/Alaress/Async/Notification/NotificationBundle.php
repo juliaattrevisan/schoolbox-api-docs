@@ -118,4 +118,9 @@ class NotificationBundle {
 		});
 	}
 
+    protected function limit($limit, $offset = 0)
+    {
+        $this->notifications = array_slice($this->notifications, $offset, $limit, false);
+    }
+
 } 
