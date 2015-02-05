@@ -36,6 +36,13 @@ class Involvement
     protected $subjectCode;
 
     /**
+     * The name for this involvement
+     *
+     * @var string
+     */
+    protected $name;
+
+    /**
      * The student's grades in this group
      *
      * @var array
@@ -141,6 +148,25 @@ class Involvement
     public function setFolder($folder)
     {
         $this->folder = $folder;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param  mixed $name
+     *
+     * @return $this
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
         return $this;
     }
 }

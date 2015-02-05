@@ -76,6 +76,7 @@ class Factory
     {
         $tutorGroup = new TutorGroup();
         $tutorGroup
+            ->setName($year . ' eReport')
             ->setStudent($student)
             ->setYear($year)
             ->setActivities($this->getGateway()->getAllActivities($year, $student))
@@ -113,11 +114,13 @@ class Factory
     public function buildSubject($year, User $student, $subjectCode)
     {
         $subject = new Subject();
+        $externalData = $this->getGateway()->getSubject($subjectCode);
         $subject
+            ->setName($externalData['sub_desc'])
             ->setStudent($student)
             ->setYear($year)
             ->setSubjectCode($subjectCode)
-            ->setExternalData($this->getGateway()->getSubject($subjectCode))
+            ->setExternalData($externalData)
         ;
 
         $folderWithGrades = $this->getFolderWithGrades($subjectCode, $student);
@@ -143,6 +146,7 @@ class Factory
         foreach ($this->getGateway()->getAllYearLevelGroups($student) as $level) {
             $tutorGroup = new TutorGroup();
             $tutorGroup
+                ->setName($level['yr_study'] . ' eReport')
                 ->setStudent($student)
                 ->setYear($level['yr_study'])
                 ->setSubjectCode($level['code']);
@@ -169,6 +173,7 @@ class Factory
         foreach ($result as $row) {
             $subject = new Subject();
             $subject
+                ->setName($row['sub_desc'])
                 ->setStudent($student)
                 ->setYear($row['yr_study'])
                 ->setSubjectCode($row['code'])

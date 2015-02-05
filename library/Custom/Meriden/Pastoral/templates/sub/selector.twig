@@ -14,9 +14,9 @@
                             'customMeridenPastoral.index',
                             {year: level.year, id: student.id})
                         }}"
-                        label="{{ level.year }} eReport"
+                        label="{{ level.name }}"
                         {% if level.year == currentYear %}selected{% endif %}
-                        >{{ level.year }} eReport</option>
+                        >{{ level.name }}</option>
             {% endfor %}
         </select>
         <a class="sem-fwd"
@@ -45,9 +45,9 @@
                             'customMeridenPastoral.subject',
                             {year: currentSubject.year, id: student.id, subjectCode: currentSubject.subjectCode})
                         }}"
-                        label="{{ currentSubject.description }} ({{ currentSubject.subjectCode }})"
+                        label="{{ currentSubject.name }} ({{ currentSubject.subjectCode }})"
                         {% if currentSubject.subjectCode == subjectReport.subjectCode %}selected{% endif %}
-                        >{{ currentSubject.description }} ({{ currentSubject.subjectCode }})</option>
+                        >{{ currentSubject.name }} ({{ currentSubject.subjectCode }})</option>
             {% endfor %}
         </select>
     </form>
