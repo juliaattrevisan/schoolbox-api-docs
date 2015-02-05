@@ -120,6 +120,11 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
         $condensedClass = false;
         $allCondensedClasses = array();
 
+        /* A stack of classcodes that were condensed, in order
+         * This is used to manage some edge cases at the end
+         */
+        $lastProcessed = array();
+
         /* Event stack, for debugging/diagnosis
          */
         $stack = array();
@@ -162,7 +167,6 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
             /* Initial condition
              */
             if ($condensedClass === false) {
-                $lastCode = $period['code'];
                 $condensedClass = $period;
 
                 $stack[] = "Initial condensed class is {$this->getCode($period)}<br>";
@@ -170,25 +174,21 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
             /* Condense
              */
             else {
-                if ($lastCode == $period['code']) {
+                if ($condensedClass['code'] == $period['code']) {
                     $stack[] = "Updating periodEnd to {$period['periodEnd']}<br>";
 
                     $condensedClass['periodEnd'] = $period['periodEnd'];
-
-                    /* Last period in the day is the same as the second-last
-                     * period in the day
-                     */
-                    if ($i == (count($timetable)-1)) {
-                        if ($this->getIncludeNonclasses() || isset($condensedClass['code'])) {
-                            $stack[] = "Adding {$this->getCode($condensedClass)}<br>";
-
-                            $allCondensedClasses[] = $condensedClass;
-                        }
-                    }
                 }
                 else {
-                    if ($this->getIncludeNonclasses() || isset($condensedClass['code'])) {
+                    if ($this->getIncludeNonclasses()) {
                         $stack[] = "Adding {$this->getCode($condensedClass)}<br>";
+                        $lastProcessed[] = $condensedClass['code'];
+
+                        $allCondensedClasses[] = $condensedClass;
+                    }
+                    elseif (isset($condensedClass['code'])) {
+                        $stack[] = "Adding {$this->getCode($condensedClass)}<br>";
+                        $lastProcessed[] = $condensedClass['code'];
 
                         $allCondensedClasses[] = $condensedClass;
                     }
@@ -196,21 +196,39 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
                     $condensedClass = $period;
 
                     $stack[] = "Current condensed class is {$period['code']}<br>";
-
-                    /* Last period in the day is different to the second-last
-                     * period in the day
-                     */
-                    if ($i == (count($timetable)-1)) {
-                        if ($this->getIncludeNonclasses() || isset($condensedClass['code'])) {
-                            $stack[] = "Adding {$this->getCode($condensedClass)}<br>";
-
-                            $allCondensedClasses[] = $condensedClass;
-                        }
-                    }
                 }
             }
+        }
 
-            $lastCode = $period['code'];
+        /* There are a number of edge cases relating to the processing of the
+         * final class of the day. Each of these edge cases causes the
+         * $condensedClass to be set up but never added, and they are
+         * consequently excluded from $allCondensedClasses stack
+         *
+         * + Last period in the day is the same as the second-last period
+         *   in the day. This falls under "$lastCode == $period[code]" clause         *
+         *   and may be accidentally excluded as a result.
+         *
+         * + Last period in the day is different to the second-last period
+         *   in the day. This falls under the else{} near "$lastCode == $period[code]"
+         *   and may be accidentally excluded as a result.
+         *
+         * + Last period in the day is one or more empty periodSequence 1 classes
+         *   (spares). This falls under the "else { continue; }" part and may
+         *   be accidentally excluded as a result.
+         *
+         * + Last period in the day is one or more empty periodSequence 2 classes
+         *   (unknown). This falls under the "else { continue; }" part and may
+         *   be accidentally excluded as a result. I haven't actually seen this
+         *   yet and still needs to be verified with production data.
+         */
+        if ($condensedClass['code'] != end($lastProcessed)) {
+            if ($this->getIncludeNonclasses() || isset($condensedClass['code'])) {
+                $stack[] = "Adding {$this->getCode($condensedClass)}<br>";
+                $lastProcessed[] = $condensedClass['code'];
+
+                $allCondensedClasses[] = $condensedClass;
+            }
         }
 
         /* Reconstruct bucket structure
