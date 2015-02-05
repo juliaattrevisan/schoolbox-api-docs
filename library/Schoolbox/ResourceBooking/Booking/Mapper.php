@@ -243,14 +243,14 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('resource.category', 'ic')},
                 {$this->getJoinColumnString('resource.image',    'im')}
             FROM {$this->getTable()} `b`
-            LEFT JOIN {$this->getJoinSql('event',             'b', 'e')}
-            LEFT JOIN {$this->getJoinSql('event.owner',       'e', 'eo')}
-            LEFT JOIN {$this->getJoinSql('event.author',      'e', 'ea')}
-            LEFT JOIN {$this->getJoinSql('status',            'b', 's')}
-            LEFT JOIN {$this->getJoinSql('reviewer',          'b', 'r')}
-            LEFT JOIN {$this->getJoinSql('resource',          'b', 'i')}
-            LEFT JOIN {$this->getJoinSql('resource.category', 'i', 'ic')}
-            LEFT JOIN {$this->getJoinSql('resource.image',    'i', 'im')}
+            INNER JOIN {$this->getJoinSql('event',             'b', 'e')}
+            LEFT  JOIN {$this->getJoinSql('event.owner',       'e', 'eo')}
+            LEFT  JOIN {$this->getJoinSql('event.author',      'e', 'ea')}
+            INNER JOIN {$this->getJoinSql('status',            'b', 's')}
+            LEFT  JOIN {$this->getJoinSql('reviewer',          'b', 'r')}
+            INNER JOIN {$this->getJoinSql('resource',          'b', 'i')}
+            INNER JOIN {$this->getJoinSql('resource.category', 'i', 'ic')}
+            LEFT  JOIN {$this->getJoinSql('resource.image',    'i', 'im')}
             WHERE b.deleted_at IS NULL
             AND   s.id IN {$this->getArrayPlaceholders($statusIds, 'status')}
             AND NOT (
