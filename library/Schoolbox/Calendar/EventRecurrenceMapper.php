@@ -271,6 +271,7 @@ class EventRecurrenceMapper {
 		$seriesEvent->setCampusCollection($coreEvent->getCampusCollection());
 		$seriesEvent->setRoleCollection($coreEvent->getRoleCollection());
         $seriesEvent->setAccess($coreEvent->getAccess());
+        $seriesEvent->setType($coreEvent->getType());
 	}
 
 	/**
