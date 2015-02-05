@@ -37,7 +37,7 @@ if(isset($_GET['year']) || isset($_GET['semester'])) {
 	$this->localRedir("/submission/allWork/$userId/{$_GET['year']}/{$_GET['semester']}");
 }
 
-$year = isset($this->arg[1]) ? $this->arg[1] : date('Y');
+$year = (int)(isset($this->arg[1]) ? $this->arg[1] : date('Y'));
 if(isset($this->arg[2])) {
 	$semester = $this->arg[2];
 	if($semester > 2) {
