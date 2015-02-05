@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -35,226 +35,236 @@ use Schoolbox\UserMapper;
  * Class SubmissionNotifier
  * @package Schoolbox\Assessment\Component\SubmissionBox
  */
-class SubmissionNotifier extends AbstractModuleNotifier {
+class SubmissionNotifier extends AbstractModuleNotifier
+{
 
-	const TRIGGER_SUBMITTED   = 'submitted';
-	const TRIGGER_RESUBMITTED = 'resubmitted';
-	const TRIGGER_DELETED     = 'deleted';
+    const TRIGGER_SUBMITTED   = 'submitted';
+    const TRIGGER_RESUBMITTED = 'resubmitted';
+    const TRIGGER_DELETED     = 'deleted';
 
-	/** @var SubmissionBoxMapper */
-	protected $submissionBoxMapper;
+    /** @var SubmissionBoxMapper */
+    protected $submissionBoxMapper;
 
-	/** @var UserMapper */
-	protected $userMapper;
+    /** @var UserMapper */
+    protected $userMapper;
 
-	/** @var CategoryMapper */
-	protected $categoryMapper;
-
-
-	/**
-	 * @return string
-	 */
-	protected function getSlug() {
-		return NSMapper::NS_DUEWORK;
-	}
+    /** @var CategoryMapper */
+    protected $categoryMapper;
 
 
-	/**
-	 * Instantiate all your dependencies within yourself.
-	 *
-	 * @param mixed $dependencies
-	 * @return void
-	 */
-	public function loadDependencies($dependencies = null) {
-		$this->submissionBoxMapper = SubmissionBoxMapper::getInstance();
-		$this->userMapper = UserMapper::getInstance();
-		$this->categoryMapper = CategoryMapper::getInstance();
-		parent::loadDependencies($dependencies);
-	}
-
-	/**
-	 * This notifier does not actually use future scheduling - all events fire immediately, if at all.
-	 *
-	 * @param TriggerBundle $bundle
-	 * @throws ScheduleException
-	 * @return void
-	 */
-	public function bundleTriggers($bundle) {
-		$method = $bundle->getMethod();
-		$submission = $bundle->getEvent()->getObject();
-		$diff = $bundle->getEvent()->getDiff();
-
-		if(!$submission instanceof Submission) {
-			return;
-		}
-
-		$studentId = $submission->getOwner()->getId();
-		$boxId = $submission->getSubmissionBox()->getId();
-
-		/** @var SubmissionMapper $mapper */
-		$mapper = $this->mapper;
-
-		switch($method) {
-			case Mapper::METHOD_CREATE: // new submission created
-
-				// is this in draft mode? if so, do nothing
-				if($submission->getDraft()) {
-					break;
-				}
-
-				// is this the first? or a resubmit?
-				$counts = $mapper->findCountsForSubmissionBoxes(array($boxId), $studentId);
-				// because '1' would be the first submission
-				if(array_key_exists($boxId, $counts) && $counts[$boxId] > 1) {
-					$bundle->attach(self::TRIGGER_RESUBMITTED, self::IMMEDIATELY);
-					break;
-				}
-				$bundle->attach(self::TRIGGER_SUBMITTED, self::IMMEDIATELY);
-				break;
-
-			case Mapper::METHOD_DELETE: // submission deleted - if single-submit, student can submit again
-				/** @var SubmissionBox $owningBox */
-				$owningBox = $this->submissionBoxMapper->findById($submission->getSubmissionBox()->getId());
-				// if multi-submit, don't notify
-				if($owningBox->getAcceptMultiple()) {
-					break;
-				}
-				$bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
-				break;
-
-			case Mapper::METHOD_READ:
-				break;
-
-			case Mapper::METHOD_UPDATE:
-				// if no diff, ignore
-				if(!is_array($diff)) {
-					break;
-				}
-				// if we've gone from draft to not, notify submission
-				if(array_key_exists('draft', $diff) && $diff['draft'] == true) {
-					// is this the first? or a resubmit?
-					$counts = $mapper->findCountsForSubmissionBoxes(array($boxId), $studentId);
-					if(array_key_exists($boxId, $counts) && $counts[$boxId] > 1) {
-						$bundle->attach(self::TRIGGER_RESUBMITTED, self::IMMEDIATELY);
-						break;
-					}
-					$bundle->attach(self::TRIGGER_SUBMITTED, self::IMMEDIATELY);
-				}
-				break;
-
-			default:
-				throw new ScheduleException("Unrecognised CRUD operation: '{$bundle->getMethod()}'.");
-		}
-	}
+    /**
+     * @return string
+     */
+    protected function getSlug()
+    {
+        return NSMapper::NS_DUEWORK;
+    }
 
 
-	/**
-	 * @param string $type
-	 * @param Submission $submission
-	 * @param User $user
-	 * @param array|null $diff
-	 * @return Messenger
-	 */
-	protected function submissionNotification($type, $submission, $user, $diff = null) {
-		$envelope = new Envelope();
+    /**
+     * Instantiate all your dependencies within yourself.
+     *
+     * @param mixed $dependencies
+     * @return void
+     */
+    public function loadDependencies($dependencies = null)
+    {
+        $this->submissionBoxMapper = SubmissionBoxMapper::getInstance();
+        $this->userMapper          = UserMapper::getInstance();
+        $this->categoryMapper      = CategoryMapper::getInstance();
+        parent::loadDependencies($dependencies);
+    }
 
-		$studentExtId = $user->getExternalId();
+    /**
+     * This notifier does not actually use future scheduling - all events fire immediately, if at all.
+     *
+     * @param TriggerBundle $bundle
+     * @throws ScheduleException
+     * @return void
+     */
+    public function bundleTriggers($bundle)
+    {
+        $method     = $bundle->getMethod();
+        $submission = $bundle->getEvent()->getObject();
+        $diff       = $bundle->getEvent()->getDiff();
 
-		$box = $this->submissionBoxMapper->findById($submission->getSubmissionBox()->getId());
-		$cat = $this->categoryMapper->findById($box->getCategory()->getId());
+        if (!$submission instanceof Submission) {
+            return;
+        }
 
-		$boxId = $box->getId();
+        $studentId = $submission->getOwner()->getId();
+        $boxId     = $submission->getSubmissionBox()->getId();
 
-		$bob = new Builder();
+        /** @var SubmissionMapper $mapper */
+        $mapper = $this->mapper;
 
-		$bob->setTitle(":student $type work to :boxname in :catname")
-			->setParams(array(
-				'student' => new UserParam($user),
-				'boxname' => new Param($box->getName(), "/submission/viewSubmission/$boxId"),
-				'catname' => new CategoryParam($cat)
-			))
-			->setIcon("/portrait?userId=$studentExtId&size=square32")
-			->setHref("/submission/viewSubmission/$boxId")
-			->setNamespace($this->getSlug())
-			->setSeverity(Logger::NOTICE)
-			->addTopic("duework.$boxId.$type");
+        switch ($method) {
+            case Mapper::METHOD_CREATE: // new submission created
 
-		// send this message to the owner of the submission box
-		$envelope->targetToUser($box->getOwner(), $bob->build());
+                // is this in draft mode? if so, do nothing
+                if ($submission->getDraft()) {
+                    break;
+                }
 
-		return $envelope;
-	}
+                // is this the first? or a resubmit?
+                $counts = $mapper->findCountsForSubmissionBoxes(array($boxId), $studentId);
+                // because '1' would be the first submission
+                if (array_key_exists($boxId, $counts) && $counts[$boxId] > 1) {
+                    $bundle->attach(self::TRIGGER_RESUBMITTED, self::IMMEDIATELY);
+                    break;
+                }
+                $bundle->attach(self::TRIGGER_SUBMITTED, self::IMMEDIATELY);
+                break;
+
+            case Mapper::METHOD_DELETE: // submission deleted - if single-submit, student can submit again
+                /** @var SubmissionBox $owningBox */
+                $owningBox = $this->submissionBoxMapper->findById($submission->getSubmissionBox()->getId());
+                // if multi-submit, don't notify
+                if ($owningBox->getAcceptMultiple()) {
+                    break;
+                }
+                $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
+                break;
+
+            case Mapper::METHOD_READ:
+                break;
+
+            case Mapper::METHOD_UPDATE:
+                // if no diff, ignore
+                if (!is_array($diff)) {
+                    break;
+                }
+                // if we've gone from draft to not, notify submission
+                if (array_key_exists('draft', $diff) && $diff['draft'] == true) {
+                    // is this the first? or a resubmit?
+                    $counts = $mapper->findCountsForSubmissionBoxes(array($boxId), $studentId);
+                    if (array_key_exists($boxId, $counts) && $counts[$boxId] > 1) {
+                        $bundle->attach(self::TRIGGER_RESUBMITTED, self::IMMEDIATELY);
+                        break;
+                    }
+                    $bundle->attach(self::TRIGGER_SUBMITTED, self::IMMEDIATELY);
+                }
+                break;
+
+            default:
+                throw new ScheduleException("Unrecognised CRUD operation: '{$bundle->getMethod()}'.");
+        }
+    }
 
 
-	/* ----------------------------------------------------------------------------------------------------------
-	 *  ASYNC WORKER METHODS
-	 * ---------------------------------------------------------------------------------------------------------- */
+    /**
+     * @param string $type
+     * @param Submission $submission
+     * @param User $user
+     * @param array|null $diff
+     * @return Messenger
+     */
+    protected function submissionNotification($type, $submission, $user, $diff = null)
+    {
+        $envelope = new Envelope();
 
-	/**
-	 * Notify a teacher that students have submitted to their submission box
-	 *
-	 * @param Submission $submission
-	 * @param User $user
-	 * @param array|null $diff
-	 * @return Messenger
-	 */
-	public function notifyStaffSubmitted($submission, $user, $diff = null) {
-		return $this->submissionNotification(self::TRIGGER_SUBMITTED, $submission, $user, $diff);
-	}
+        $studentExtId = $user->getExternalId();
+
+        $box = $this->submissionBoxMapper->findById($submission->getSubmissionBox()->getId());
+        $cat = $this->categoryMapper->findById($box->getCategory()->getId());
+
+        $boxId = $box->getId();
+
+        $bob = new Builder();
+
+        $bob->setTitle(":student $type work to :boxname in :catname")
+            ->setParams(
+                array(
+                    'student' => new UserParam($user),
+                    'boxname' => new Param($box->getName(), "/submission/viewSubmission/$boxId"),
+                    'catname' => new CategoryParam($cat)
+                )
+            )
+            ->setIcon("/portrait?userId=$studentExtId&size=square32")
+            ->setHref("/submission/viewSubmission/$boxId")
+            ->setNamespace($this->getSlug())
+            ->setSeverity(Logger::NOTICE)
+            ->addTopic("duework.$boxId.$type");
+
+        // send this message to the owner of the submission box
+        $envelope->targetToUser($box->getOwner(), $bob->build());
+
+        return $envelope;
+    }
 
 
-	/**
-	 * Notify a teacher that a student has submitted to their submission box...again
-	 *
-	 * @param Submission $submission
-	 * @param User $user
-	 * @param array|null $diff
-	 * @return Messenger
-	 */
-	public function notifyStaffResubmitted($submission, $user, $diff = null) {
-		return $this->submissionNotification(self::TRIGGER_RESUBMITTED, $submission, $user, $diff);
-	}
+    /* ----------------------------------------------------------------------------------------------------------
+     *  ASYNC WORKER METHODS
+     * ---------------------------------------------------------------------------------------------------------- */
+
+    /**
+     * Notify a teacher that students have submitted to their submission box
+     *
+     * @param Submission $submission
+     * @param User $user
+     * @param array|null $diff
+     * @return Messenger
+     */
+    public function notifyStaffSubmitted($submission, $user, $diff = null)
+    {
+        return $this->submissionNotification(self::TRIGGER_SUBMITTED, $submission, $user, $diff);
+    }
 
 
-	/**
-	 * Notify a student that their (only) submission has been deleted, so they can resubmit.
-	 *
-	 * @param Submission $submission
-	 * @param User $user
-	 * @param array|null $diff
-	 * @return Messenger
-	 */
-	public function notifyStudentDeleted($submission, $user, $diff = null) {
-		$msgr = new Messenger();
+    /**
+     * Notify a teacher that a student has submitted to their submission box...again
+     *
+     * @param Submission $submission
+     * @param User $user
+     * @param array|null $diff
+     * @return Messenger
+     */
+    public function notifyStaffResubmitted($submission, $user, $diff = null)
+    {
+        return $this->submissionNotification(self::TRIGGER_RESUBMITTED, $submission, $user, $diff);
+    }
 
-		$student = $submission->getOwner();
-		$studentId = $student->getId();
 
-		$box = $this->submissionBoxMapper->findById($submission->getSubmissionBox()->getId());
-		$boxId = $box->getId();
+    /**
+     * Notify a student that their (only) submission has been deleted, so they can resubmit.
+     *
+     * @param Submission $submission
+     * @param User $user
+     * @param array|null $diff
+     * @return Messenger
+     */
+    public function notifyStudentDeleted($submission, $user, $diff = null)
+    {
+        $msgr = new Messenger();
 
-		$cat = $this->categoryMapper->findById($box->getCategory()->getId());
-		$catId = $cat->getId();
+        $student   = $submission->getOwner();
+        $studentId = $student->getId();
 
-		$ownerId = $user->getId();
-		$ownerExtId = $user->getExternalId();
+        $box   = $this->submissionBoxMapper->findById($submission->getSubmissionBox()->getId());
+        $boxId = $box->getId();
 
-		$icon = "/portrait?userId=$ownerExtId&size=square32";
-		$href = "/submission/submissionHistory/$boxId/$studentId";
+        $cat   = $this->categoryMapper->findById($box->getCategory()->getId());
+        $catId = $cat->getId();
 
-		$msg = new Message(":owner removed your previous submission to :boxname in :catname, you can now resubmit",
-			$icon, $href
-		);
+        $ownerId    = $user->getId();
+        $ownerExtId = $user->getExternalId();
 
-		$params = array(
-			'owner'   => array($user->formatName(), "/user/search/$ownerId"),
-			'boxname' => array($box->getName(),     "/submission/submissionHistory/$boxId/$studentId"),
-			'catname' => array($cat->getName(),     "/homepage/$catId"),
-		);
+        $icon = "/portrait?userId=$ownerExtId&size=square32";
+        $href = "/submission/submissionHistory/$boxId/$studentId";
 
-		$msgr->targetToUser($studentId, $msg, "duework.$boxId.unsubmitted", Logger::NOTICE, $params);
+        $msg = new Message(":owner removed your previous submission to :boxname in :catname, you can now resubmit",
+            $icon, $href
+        );
 
-		return $msgr;
-	}
+        $params = array(
+            'owner'   => array($user->formatName(), "/search/user/$ownerId"),
+            'boxname' => array($box->getName(), "/submission/submissionHistory/$boxId/$studentId"),
+            'catname' => array($cat->getName(), "/homepage/$catId"),
+        );
+
+        $msgr->targetToUser($studentId, $msg, "duework.$boxId.unsubmitted", Logger::NOTICE, $params);
+
+        return $msgr;
+    }
 
 }
