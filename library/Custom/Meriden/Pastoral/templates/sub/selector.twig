@@ -43,11 +43,11 @@
             {% for currentSubject in subjectList %}
                 <option value="{{ routeLookup(
                             'customMeridenPastoral.subject',
-                            {year: currentSubject.yr_study, id: student.id, subjectCode: currentSubject.code})
+                            {year: currentSubject.year, id: student.id, subjectCode: currentSubject.subjectCode})
                         }}"
-                        label="{{ currentSubject.sub_desc }} ({{ currentSubject.code }})"
-                        {% if currentSubject.code == subjectReport.subjectCode %}selected{% endif %}
-                        >{{ currentSubject.sub_desc }} ({{ currentSubject.code }})</option>
+                        label="{{ currentSubject.description }} ({{ currentSubject.subjectCode }})"
+                        {% if currentSubject.subjectCode == subjectReport.subjectCode %}selected{% endif %}
+                        >{{ currentSubject.description }} ({{ currentSubject.subjectCode }})</option>
             {% endfor %}
         </select>
     </form>

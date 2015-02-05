@@ -157,14 +157,25 @@ class Factory
      * @param int  $year
      * @param User $student
      *
-     * @return array
+     * @return array|Subject[]
      */
     public function buildSubjectList($year, User $student)
     {
-        return array_map(
+        $subjects = array();
+        $result   = array_map(
             array($this, 'augmentSubjectWithTeacher'),
             $this->getGateway()->getAllSubjectsForYear($year, $student)
         );
+        foreach ($result as $row) {
+            $subject = new Subject();
+            $subject
+                ->setStudent($student)
+                ->setYear($row['yr_study'])
+                ->setSubjectCode($row['code'])
+                ->setTeachers($row['teachers']);
+            $subjects[$row['code']] = $subject;
+        }
+        return $subjects;
     }
 
     /**

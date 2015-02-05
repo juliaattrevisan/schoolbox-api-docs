@@ -9,6 +9,8 @@
 
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
+use Schoolbox\User;
+
 class Subject extends Involvement
 {
     /**
@@ -17,6 +19,13 @@ class Subject extends Involvement
      * @var array
      */
     protected $externalData;
+
+    /**
+     * The teachers for this subject
+     *
+     * @var array|User[]
+     */
+    protected $teachers;
 
     /**
      * @return array
@@ -34,6 +43,25 @@ class Subject extends Involvement
     public function setExternalData($externalData)
     {
         $this->externalData = $externalData;
+        return $this;
+    }
+
+    /**
+     * @return array|\Schoolbox\User[]
+     */
+    public function getTeachers()
+    {
+        return $this->teachers;
+    }
+
+    /**
+     * @param  array|\Schoolbox\User[] $teachers
+     *
+     * @return $this
+     */
+    public function setTeachers($teachers)
+    {
+        $this->teachers = $teachers;
         return $this;
     }
 }
