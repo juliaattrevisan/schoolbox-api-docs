@@ -246,14 +246,14 @@ $possibleFolderList = $groupHandler->involvedInCategoryList($selectedUser->getId
 
 /* Ones that it's already in, from previous selections
  */
-$alreadyInGroupList = $event->getRoleCollection();
+$alreadyInFolderList = $event->getCategoryCollection();
 
 /* Get data about the Folders
  */
 $tempFolderIds = array();
 
-foreach ($alreadyInGroupList as $current) {
-    $tempFolderIds[] = $current->getRoleId();
+foreach ($alreadyInFolderList as $current) {
+    $tempFolderIds[] = $current->getCategoryId();
 }
 
 $folderMapper = new \Schoolbox\Resource\CategoryMapper();
@@ -263,18 +263,22 @@ $allFolders = $folderMapper->findByColumnList(array('id' => $tempFolderIds));
  * Dedupe and make synonymous
  */
 
-/* All the checkbox options, deduped, are here
- */
-$allFolderList = array();
-
 /* A simple stack of ids for checkboxes which should already be ticked
  */
 $previousInvolvement = array();
 
+/* All the checkbox options, deduped, are here
+ */
+$allFolderList = array();
+
+/* Ones that you could possibly tick
+ */
 foreach ($possibleFolderList as $current) {
     $allFolderList[$current['id']] = $current;
 }
 
+/* Ones that have been ticked in the past
+ */
 foreach ($allFolders as $currentFolder) {
     if (!isset($allFolderList[$currentFolder->getId()])) {
         $allFolderList[$currentFolder->getId()] = array(
