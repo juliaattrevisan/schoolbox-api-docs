@@ -41,6 +41,8 @@ class Feed extends Decorator {
 		}
 
 		$this->sort();
+
+        $this->limit($limit, $offset);
 	}
 
 
