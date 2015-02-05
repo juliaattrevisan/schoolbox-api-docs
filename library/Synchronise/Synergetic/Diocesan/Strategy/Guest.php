@@ -15,6 +15,9 @@ use Synchronise\Synergetic\Diocesan;
 
 class Guest extends Synchronise_Base_Strategy_Student
 {
+    /** @var string */
+    protected $title = "Update Schoolbox Guest Details Synchronisation";
+
     /**
      * Setup verbose output and hydration classes
      */
