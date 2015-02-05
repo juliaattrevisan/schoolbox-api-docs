@@ -32,8 +32,7 @@ class Student extends Synchronise_Base_Strategy_Student
 
             ->addHydrator(new \Synchronise_Base_Hydrator_LocalEmail())
             ->addHydrator(new \Synchronise_Base_Hydrator_Webmail())
-
-            ->addHydrator(new \Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
+            ->addHydrator(new Diocesan\Hydrator\UnsetOnUpdate())
             ->addHydrator(new \Synchronise_Base_Hydrator_Clear());
     }
 

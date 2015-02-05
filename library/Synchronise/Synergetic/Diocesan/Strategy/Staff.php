@@ -26,13 +26,14 @@ class Staff extends Synchronise_Base_Strategy_Staff
 
         $this
             ->addHydrator(new \Synchronise_Base_Hydrator_Default())
+            ->addHydrator(new \Synchronise_Base_Hydrator_NoEportfolio())
 
             ->addHydrator(new Diocesan\Hydrator\Staff(new \External_User()))
 
             ->addHydrator(new \Synchronise_Base_Hydrator_LocalEmail())
             ->addHydrator(new \Synchronise_Base_Hydrator_Webmail())
 
-            ->addHydrator(new \Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
+            ->addHydrator(new Diocesan\Hydrator\UnsetOnUpdate())
             ->addHydrator(new \Synchronise_Base_Hydrator_Clear());
     }
 

@@ -36,11 +36,12 @@ class Parents extends Synchronise_Base_Strategy_Parent
 
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
+            ->addHydrator(new \Synchronise_Base_Hydrator_NoEportfolio())
 
             ->addHydrator(new Diocesan\Hydrator\Parents(new Synchronise_Base_Hydrator_Parent(), new External_User(), UserMapper::getInstance()))
             ->addSpouseHydrator(new Diocesan\Hydrator\Parents(new Synchronise_Base_Hydrator_Spouse(), new External_User(), UserMapper::getInstance()))
             ->addHydrator(new Synchronise_Base_Hydrator_MailHandler())
-            ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
+            ->addHydrator(new Diocesan\Hydrator\UnsetOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear());
     }
 
