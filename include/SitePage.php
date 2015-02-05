@@ -404,7 +404,7 @@ class SitePage extends Page
                 $redis = \Alaress\Redis::getClientInstance();
                 $username = $redis->executeCommand($redis->createCommand('get', array($_COOKIE['remember'])));
 
-                if (!$sessionHandler->create($username)) {
+                if (strlen($username) > 0 && !$sessionHandler->create($username)) {
                     $this->goLoginPage();
                 }
             } //Catch already logged in users via kerberos or other means
