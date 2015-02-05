@@ -474,6 +474,27 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             }
 
         }
+        else if ($site_location=='meriden') {
+            $settings = array(
+                'baseUri' => 'http://webdav.meriden.nsw.edu.au/',
+                'userName' => "meriden/" . $_SESSION['username'],
+                'password' => $_SESSION['password'],
+            );
+
+            if ($groupHandler->isStaff()) {
+                $paths = array(
+                    $settings['baseUri'].'staff/' . $_SESSION['username'] .'/',
+                    $settings['baseUri'].'staffgroup/',
+                );
+            } else if ($groupHandler->isStudent()) {
+                $paths = array(
+                    $settings['baseUri'].(12 - $_SESSION['year'] + date('Y')) . '/' . $_SESSION['username'] . '/',
+                );
+            } else {
+                return false;
+            }
+
+        }
         else if (in_array($site_location, array('core', 'demo'))) {
             $settings = array(
                 'baseUri' => 'http://webdave.alaress-dev.com.au/',
