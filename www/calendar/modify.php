@@ -90,29 +90,29 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_START_HOUR'     => $event->getStartDateTime()->getUsingFormat('g'),
             'EVENT_START_MIN'      => $event->getStartDateTime()->getUsingFormat('i'),
             'EVENT_START_AM'       => $event->getStartDateTime()->getUsingFormat('A') == 'AM'
-                ? 'selected="selected"'
-                : '',
+                    ? 'selected="selected"'
+                    : '',
             'EVENT_START_PM'       => $event->getStartDateTime()->getUsingFormat('A') == 'PM'
-                ? 'selected="selected"'
-                : '',
+                    ? 'selected="selected"'
+                    : '',
             'EVENT_END_DATE'       => $event->getEndDateTime()->getUsingFormat('d/m/Y'),
             'EVENT_END_HOUR'       => $event->getEndDateTime()->getUsingFormat('g'),
             'EVENT_END_MIN'        => $event->getEndDateTime()->getUsingFormat('i'),
             'EVENT_END_AM'         => $event->getEndDateTime()->getUsingFormat('A') == 'AM'
-                ? 'selected="selected"'
-                : '',
+                    ? 'selected="selected"'
+                    : '',
             'EVENT_END_PM'         => $event->getEndDateTime()->getUsingFormat('A') == 'PM'
-                ? 'selected="selected"'
-                : '',
+                    ? 'selected="selected"'
+                    : '',
             'EVENT_PUBLISH_DATE'   => $publishDate,
             'EVENT_LOCATION'       => $event->getLocation(),
             'EVENT_DETAIL'         => $event->getDetail(),
             'EVENT_REDIRECT'       => $event->setupRedirect(
-                $_GET['returnTo'],
-                $event->getStartDateTime()->getUsingFormat('d-m-Y'),
-                $_GET['homepageId'],
-                $_GET['userId']
-            ),
+                    $_GET['returnTo'],
+                    $event->getStartDateTime()->getUsingFormat('d-m-Y'),
+                    $_GET['homepageId'],
+                    $_GET['userId']
+                ),
         )
     );
 
@@ -178,29 +178,29 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_START_HOUR'     => $event->getStartDateTime()->getUsingFormat('g'),
             'EVENT_START_MIN'      => $event->getStartDateTime()->getUsingFormat('i'),
             'EVENT_START_AM'       => $event->getStartDateTime()->getUsingFormat('A') == 'AM'
-                ? 'selected="selected"'
-                : '',
+                    ? 'selected="selected"'
+                    : '',
             'EVENT_START_PM'       => $event->getStartDateTime()->getUsingFormat('A') == 'PM'
-                ? 'selected="selected"'
-                : '',
+                    ? 'selected="selected"'
+                    : '',
             'EVENT_END_DATE'       => $event->getEndDateTime()->getUsingFormat('d/m/Y'),
             'EVENT_END_HOUR'       => $event->getEndDateTime()->getUsingFormat('g'),
             'EVENT_END_MIN'        => $event->getEndDateTime()->getUsingFormat('i'),
             'EVENT_END_AM'         => $event->getEndDateTime()->getUsingFormat('A') == 'AM'
-                ? 'selected="selected"'
-                : '',
+                    ? 'selected="selected"'
+                    : '',
             'EVENT_END_PM'         => $event->getEndDateTime()->getUsingFormat('A') == 'PM'
-                ? 'selected="selected"'
-                : '',
+                    ? 'selected="selected"'
+                    : '',
             'EVENT_PUBLISH_DATE'   => '',
             'EVENT_LOCATION'       => '',
             'EVENT_DETAIL'         => '',
             'EVENT_REDIRECT'       => $event->setupRedirect(
-                $_GET['returnTo'],
-                $event->getStartDateTime()->getUsingFormat('d-m-Y'),
-                $_GET['homepageId'],
-                $_GET['userId']
-            ),
+                    $_GET['returnTo'],
+                    $event->getStartDateTime()->getUsingFormat('d-m-Y'),
+                    $_GET['homepageId'],
+                    $_GET['userId']
+                ),
         )
     );
 
@@ -257,19 +257,19 @@ foreach ($alreadyInFolderList as $current) {
 }
 
 $folderMapper = new \Schoolbox\Resource\CategoryMapper();
-$allFolders = $folderMapper->findByColumnList(array('id' => $tempFolderIds));
+$allFolders   = $folderMapper->findByColumnList(array('id' => $tempFolderIds));
 
 /**
  * Dedupe and make synonymous
  */
 
-/* A simple stack of ids for checkboxes which should already be ticked
- */
-$previousInvolvement = array();
-
 /* All the checkbox options, deduped, are here
  */
 $allFolderList = array();
+
+/* A simple stack of ids for checkboxes which should already be ticked
+ */
+$previousInvolvement = array();
 
 /* Ones that you could possibly tick
  */
@@ -283,7 +283,7 @@ foreach ($allFolders as $currentFolder) {
     if (!isset($allFolderList[$currentFolder->getId()])) {
         $allFolderList[$currentFolder->getId()] = array(
             'name' => $currentFolder->getName(),
-            'id' => $currentFolder->getId()
+            'id'   => $currentFolder->getId()
         );
     }
 
