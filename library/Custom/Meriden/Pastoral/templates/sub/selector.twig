@@ -23,8 +23,8 @@
             {% if tutorGroupReport.subjectCode %}
                 <option disabled="disabled" selected="selected">Select a subject</option>
             {% elseif subjectReport.subjectCode %}
-                <option value="{{ routeLookup('customMeridenPastoral.subject', {year: .yr_study, id: student.id, subjectCode: currentSubject.code}) }}"
-                        label="{{ currentSubject.sub_desc }} ({{ currentSubject.code }})">Back to </option>
+                <option value="{{ routeLookup('customMeridenPastoral.index', {year: subjectReport.year, id: student.id}) }}"
+                        label="« {{ subjectReport.year }} eReport">« {{ subjectReport.year }} eReport</option>
             {% endif %}
             {% for currentSubject in subjectList %}
                 <option value="{{ routeLookup('customMeridenPastoral.subject', {year: currentSubject.yr_study, id: student.id, subjectCode: currentSubject.code}) }}"
