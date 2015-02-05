@@ -265,8 +265,8 @@ class StudentReportCard
             }
         }
         // Disable back and forward buttons if I can't go back or forward
-        $disabledBack = $this->targetSemester == 1 && $this->targetYear = min($years);
-        $disabledFwd  = $this->targetSemester == 2 && $this->targetYear = max($years);
+        $disabledBack = $this->targetSemester == 1 && $this->targetYear == min($years);
+        $disabledFwd  = $this->targetSemester == 2 && $this->targetYear == max($years);
         $page->setVar(
             array(
                 'WORK_YEAR'              => $this->targetYear,
