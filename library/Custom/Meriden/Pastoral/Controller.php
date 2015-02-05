@@ -87,7 +87,7 @@ class Controller extends Base
                 'student'          => $student,
                 'tutorGroupReport' => $tutorGroup,
                 'subjectReport'    => $subject,
-                'tutorGroupList'   => $this->getStudentInvolvementFactory()->buildTutorGroupList($year, $student),
+                'tutorGroupList'   => $this->getStudentInvolvementFactory()->buildTutorGroupList($student),
                 'subjectList'      => $this->getStudentInvolvementFactory()->buildSubjectList($year, $student),
             )
         );

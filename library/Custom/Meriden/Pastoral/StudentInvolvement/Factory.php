@@ -131,31 +131,24 @@ class Factory
     /**
      * Builds a list of all of the tutor groups that this student has been in.
      *
-     * @param int  $year
+     * They will be populated with only a year of study and student.
+     *
      * @param User $student
      *
-     * @return array
+     * @return array|TutorGroup[]
      */
-    public function buildTutorGroupList($year, User $student)
+    public function buildTutorGroupList(User $student)
     {
-        $tutorGroups  = $this->getGateway()->getAllYearLevelGroups($student);
-        $previousYear = false;
-        $nextYear     = false;
-        foreach ($tutorGroups as $level) {
-            $yearLevel = $level['yr_study'];
-            if ($yearLevel == ($year-1)) {
-                $previousYear = $yearLevel;
-            }
-            if ($yearLevel == ($year+1)) {
-                $nextYear = $yearLevel;
-            }
+        $tutorGroups = array();
+        foreach ($this->getGateway()->getAllYearLevelGroups($student) as $level) {
+            $tutorGroup = new TutorGroup();
+            $tutorGroup
+                ->setStudent($student)
+                ->setYear($level['yr_study'])
+                ->setSubjectCode($level['code']);
+            $tutorGroups[$level['yr_study']] = $tutorGroup;
         }
-        return array(
-            'current'  => $year,
-            'previous' => $previousYear,
-            'next'     => $nextYear,
-            'levels'   => $tutorGroups,
-        );
+        return $tutorGroups;
     }
 
     /**

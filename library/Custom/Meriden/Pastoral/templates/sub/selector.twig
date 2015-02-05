@@ -1,28 +1,29 @@
 {# Selector - like the grades selector, but displays only years #}
+{% set currentYear = (tutorGroupReport.year ?: subjectReport.year) %}
 <div id="enrolment">
     <form id="semesters">
         <a class="sem-back"
-           {% if not tutorGroupList.previous %}disabled{% endif %}
+           {% if not tutorGroupList[currentYear-1] %}disabled{% endif %}
            href="{{ routeLookup(
             'customMeridenPastoral.index',
-            {year: tutorGroupList.current-1, id: student.id})
+            {year: currentYear-1, id: student.id})
            }}">&lsaquo;</a>
         <select id="semester">
-            {% for level in tutorGroupList.levels %}
+            {% for level in tutorGroupList %}
                 <option value="{{ routeLookup(
                             'customMeridenPastoral.index',
-                            {year: level.yr_study, id: student.id})
+                            {year: level.year, id: student.id})
                         }}"
-                        label="{{ level.yr_study }} eReport"
-                        {% if level.yr_study == (tutorGroupReport.year ?: subjectReport.year) %}selected{% endif %}
-                        >{{ level.yr_study }} eReport</option>
+                        label="{{ level.year }} eReport"
+                        {% if level.year == currentYear %}selected{% endif %}
+                        >{{ level.year }} eReport</option>
             {% endfor %}
         </select>
         <a class="sem-fwd"
-           {% if not tutorGroupList.next %}disabled{% endif %}
+           {% if not tutorGroupList[currentYear+1] %}disabled{% endif %}
            href="{{ routeLookup(
             'customMeridenPastoral.index',
-           {year: tutorGroupList.current+1, id: student.id})
+            {year: currentYear+1, id: student.id})
            }}">&rsaquo;</a>
     </form>
     <form id="subjects" method="get">
