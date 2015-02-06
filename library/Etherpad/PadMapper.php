@@ -85,4 +85,18 @@ class PadMapper extends \Schoolbox\Mapper {
 
 		$this->hasSoftDeleteDateField('deleted_at');
 	}
+
+
+    /**
+     * @param object $object
+     * @param string $verb
+     * @param null   $previous
+     * @return bool
+     */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        // vicious lies
+        return true;
+    }
+
 }

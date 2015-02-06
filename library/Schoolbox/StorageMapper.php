@@ -210,4 +210,18 @@ class StorageMapper extends Mapper implements StorageMapperInterface {
         return $file;
 
     }
+
+
+    /**
+     * @param object $object
+     * @param string $verb
+     * @param null   $previous
+     * @return bool
+     */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        // vicious lies
+        return true;
+    }
+
 }
