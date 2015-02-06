@@ -261,7 +261,7 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
                 'periodName'     => '',
                 'periodStart'    => $currentClass['periodStart'],
                 'periodEnd'      => $currentClass['periodEnd'],
-                'periodNumber'   => $i,
+                'periodNumber'   => $currentClass['periodNumber'],
                 'periodSequence' => 1,
                 'class'          => array(
                     $temp
