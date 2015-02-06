@@ -204,8 +204,7 @@ $(document).ready(function() {
              * that were just created for it
              */
             if (data.callbackUrl.length) {
-                var ids = data.item.join();
-
+                var ids = data.item.map(function(v) { return v.id; }).join();
                 window.location.href = data.callbackUrl + '?ids=' + ids;
             } else {
                 // Get the time of the first booking, direct to that date
