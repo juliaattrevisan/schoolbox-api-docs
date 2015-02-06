@@ -88,7 +88,7 @@ try {
     $exporter = new Calendar_Event_Collection_Exporter(
         $api,
         $_SERVER['REQUEST_TIME'],
-        strtotime('+1 year', $_SERVER['REQUEST_TIME']),
+        strtotime('+6 months', $_SERVER['REQUEST_TIME']),
         new SitePage(false)
     );
     // for IE8
