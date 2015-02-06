@@ -3350,6 +3350,12 @@ input.timeField {
             }
         }
     }
+	&.users span {
+      .btn-icon(106);
+    }
+    &.users:hover span {
+      .btn-icon(107);
+    }
     &.submit {
         .submit-btn-plain();
         padding: 0 16px 0 30px;
@@ -9630,23 +9636,26 @@ div.visibility-drop {
   margin-bottom: -4px;
 }
 
+.submissions span.visibility-btn {
+  margin: 0 0 0 20px;
+}
+
 span.visibility-btn {
   display: block;
   float:left;
-  top: 4px;
-  left: 8px;
+  margin: 0 0 0 4px;
   height: 14px;
-  width: 20px;
-  background: url(/images/core/assess/visibility.png) no-repeat;
+  width: 14px;
+  background: url(/images/core/icons/btn-icons.png) no-repeat;
 }
-&span.visibility_0 { /*Staff*/
-  .btn-icon(0);
+&span.visibility_0{ /*Staff*/
+  .btn-icon(104);
 }
-&span.visibility_1  { /*Students*/
-  .btn-icon(1);
+&span.visibility_1{ /*Students*/
+  .btn-icon(44);
 }
-&span.visibility_2  { /*Parents*/
-  .btn-icon(2);
+&span.visibility_2{ /*Parents*/
+  .btn-icon(106);
 }
 
 .down-arrow {
@@ -11678,6 +11687,7 @@ form.comment-form label {
 	li a{
 		padding: 5px 10px 5px 5px !important;
 		span{
+			background: url(/images/core/icons/btn-icons.png) no-repeat;
 			display: block;
 			float: left;
 			height: 14px;
@@ -11686,13 +11696,13 @@ form.comment-form label {
 		}
 	}
 	li:first-child a span{
-		background: url('/images/core/assess/visibility.png') 0px -42px no-repeat; 
+		.btn-icon(104); 
 	}
 	li:nth-child(2) a span{
-		background: url('/images/core/assess/visibility.png') 0px -14px no-repeat; 
+		.btn-icon(44); 
 	}
 	li:nth-child(3) a span{
-		background: url('/images/core/assess/visibility.png') 0px -28px no-repeat; 
+		.btn-icon(106);
 	}
 }
 
