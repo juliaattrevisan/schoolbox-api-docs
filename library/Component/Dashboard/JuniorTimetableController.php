@@ -22,7 +22,7 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
      *
      * @var bool
      */
-    private $includeNonclasses = true;
+    private $includeNonclasses = false;
 
     /**
      * The html file to load
@@ -113,12 +113,6 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
      */
     private function condense($timetable)
     {
-
-        /* Condense each class code. Due to Third Dimension I can't assume that
-         * classes appear in each array index in the same place.
-         */
-        $lastCode = false;
-
         /* Condensation
          */
         $condensedClass      = false;
@@ -141,7 +135,8 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
             if ($timetable[$i]['periodSequence'] == 2) {
                 if ($this->getIncludeNonclasses()) {
                     $period = $timetable[$i];
-                } /* Skip nonclasses
+                }
+                /* Skip nonclasses
                  */
                 else {
                     continue;
@@ -156,7 +151,8 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
                     $period['periodEnd']      = $timetable[$i]['periodEnd'];
                     $period['periodNumber']   = $timetable[$i]['periodNumber'];
                     $period['periodSequence'] = $timetable[$i]['periodSequence'];
-                } /* Hide periodSequence 1 periods which have no classes
+                }
+                /* Hide periodSequence 1 periods which have no classes
                  * (Hide spares)
                  */
                 else {
@@ -170,7 +166,8 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
                 $condensedClass = $period;
 
                 $stack[] = "Initial condensed class is {$this->getCode($period)}<br>";
-            } /* Condense
+            }
+            /* Condense
              */
             else {
                 if ($condensedClass['code'] == $period['code']) {
@@ -203,7 +200,7 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
          * consequently excluded from $allCondensedClasses stack
          *
          * + Last period in the day is the same as the second-last period
-         *   in the day. This falls under "$lastCode == $period[code]" clause         *
+         *   in the day. This falls under "$lastCode == $period[code]" clause
          *   and may be accidentally excluded as a result.
          *
          * + Last period in the day is different to the second-last period
