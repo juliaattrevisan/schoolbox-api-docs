@@ -23,7 +23,7 @@ define('EBL_LIBRARY_ID', 'shore');
 define('EBL_SHARED_SECRET', 'bG45902501c3');
 
 $userID = $_SESSION['username'];
-$time = mktime();
+$time = time();
 
 $secret = sha1($userID.$time.EBL_SHARED_SECRET);
 

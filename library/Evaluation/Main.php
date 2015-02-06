@@ -425,7 +425,7 @@ abstract class Evaluation_Main extends DeprecatedModel
      */
     public function isOpen($assess)
     {
-        if (strtotime($assess['start']) <= mktime()) {
+        if (strtotime($assess['start']) <= time()) {
             return true;
         } else {
             return false;

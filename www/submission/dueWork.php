@@ -69,7 +69,7 @@ switch (count($this->arg)) {
         // set both the date and uid
         $userID = $this->arg[1];
         if ($this->arg[0] == 0) {
-            $targetDate = new Alaress_Date_Format(mktime(), 'U'); // if no date use today
+            $targetDate = new Alaress_Date_Format(time(), 'U'); // if no date use today
         } else {
             $targetDate = new Alaress_Date_Format(preg_replace('[^0-9\-]', '', $this->arg[0]), 'y-m-d');
         }

@@ -15,7 +15,7 @@ if (TRACKIP && $_SESSION['ip'] != Session::getIP()) {
 }
 
 //if session remember is disabled and check session has not expired
-if (!$_SESSION['remember'] && (($_SESSION['lasttime'] + SESSIONLENGTH) < mktime())) {
+if (!$_SESSION['remember'] && (($_SESSION['lasttime'] + SESSIONLENGTH) < time())) {
 	$gotoLoginPage = true;
 }
 
@@ -27,4 +27,4 @@ if ($gotoLoginPage === true) {
 }
 
 //reset session timer
-$_SESSION['lasttime'] = mktime();
+$_SESSION['lasttime'] = time();

@@ -156,7 +156,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                     } else {
 
                         // show to everyone unless expired
-                        if (strtotime($currentSurvey['finish']) < mktime()) {
+                        if (strtotime($currentSurvey['finish']) < time()) {
                             $this->parse('surveyNoLink_block', 'surveyNoLink');
                             $this->setVar('surveyLink_block', '');
                             $this->setVar('resumeLink_block', '');
