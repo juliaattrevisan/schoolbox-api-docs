@@ -94,7 +94,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $days = $campusModel->getTimetableDay();
 
         if (!$date) {
-            $date = mktime();
+            $date = time();
         }
 
         $result = $this->getDatabase()->executeProcedure(

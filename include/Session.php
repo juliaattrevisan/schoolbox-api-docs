@@ -80,7 +80,7 @@ class Session
             $_SESSION['webmail'] = $user['webmail'];
             $_SESSION['email_pass'] = $user['email_pass'];
             $_SESSION['key'] = $user['key'];
-            $_SESSION['lasttime'] = mktime();
+            $_SESSION['lasttime'] = time();
             $_SESSION['username'] = $user['username'];
             $_SESSION['password'] = $_POST['password'];
             $_SESSION['eportfolio_enabled'] = $user['eportfolio_enabled'];

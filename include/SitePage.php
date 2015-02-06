@@ -395,7 +395,7 @@ class SitePage extends Page
         session_start();
 
         if (!isset($_SESSION['id']) || //If session does not exist
-            ( ($_SESSION['lasttime'] + \Config::get('session_length')) < mktime() ) || //If session has expired
+            ( ($_SESSION['lasttime'] + \Config::get('session_length')) < time() ) || //If session has expired
             ( \Config::get('track_ip') && $_SESSION['ip'] != Session::getIP())  // If IP is not the same
         ) {
             $sessionHandler = new Session;
@@ -430,7 +430,7 @@ class SitePage extends Page
         }
 
         //reset session timer
-        $_SESSION['lasttime'] = mktime();
+        $_SESSION['lasttime'] = time();
     }
 
     function saveHistory($override = '')

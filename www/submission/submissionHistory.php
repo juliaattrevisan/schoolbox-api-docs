@@ -584,8 +584,8 @@ if (isset($recent_submission)) {
     // and if the current time is between open and late
     if (
         $userID == $currentUserId &&
-        (mktime() > $submission->getOpenDate()->getUnixTimestamp()) &&
-        (mktime() < $submission->getLateDate()->getUnixTimestamp()) &&
+        (time() > $submission->getOpenDate()->getUnixTimestamp()) &&
+        (time() < $submission->getLateDate()->getUnixTimestamp()) &&
         $submission->getAcceptOnline() &&
         $submission->getAcceptMultiple()
     ) {
@@ -622,8 +622,8 @@ if (isset($recent_submission)) {
      * Hide the Resubmit form
      */
     if ($userID == $currentUserId
-        && mktime() > $submission->getOpenDate()->getUnixTimestamp()
-        && mktime() < $submission->getLateDate()->getUnixTimestamp()
+        && time() > $submission->getOpenDate()->getUnixTimestamp()
+        && time() < $submission->getLateDate()->getUnixTimestamp()
         && $submission->getAcceptOnline()
     ) {
         // Which edit button gets shown (is there already a draft?)

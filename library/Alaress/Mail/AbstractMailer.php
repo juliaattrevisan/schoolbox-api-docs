@@ -66,7 +66,7 @@ abstract class AbstractMailer implements IMailer {
 		$this->setFrom(self::getConfig()->get('mail_from_address'), self::getConfig()->get('mail_from_name'));
 
 		//setup header
-		$this->headers['MessageID'] = '<' . md5(mktime()) . '@alaressmailer>';
+		$this->headers['MessageID'] = '<' . md5(time()) . '@alaressmailer>';
 
 		$this->setTo($to);
 		$this->setSubject($subject);

@@ -96,7 +96,7 @@ class External_Tass_Timetable implements External_TimetableInterface
     {
 
         if (!$date) {
-            $date = mktime();
+            $date = time();
         }
 
         if (date('w', $date) == 0 || date('w', $date) == 6) {
