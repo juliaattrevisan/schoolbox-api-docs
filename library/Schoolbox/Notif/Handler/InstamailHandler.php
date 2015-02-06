@@ -94,9 +94,9 @@ class InstamailHandler extends MailHandler {
 			$decorator->appendInstance(Instance::jsonUnserialize($records[0]['message']));
 
 			// there should only be one notification
-			$n = reset($decorator->getNotifications());
+            $ns = $decorator->getNotifications();
 
-			$this->email->setSubject($decorator->renderTitleAsPlaintext($n));
+			$this->email->setSubject($decorator->renderTitleAsPlaintext($ns[0]));
 
 			$context = $decorator->renderAsTwigContext($this->email->getCoreContext());
 			$context['recipient'] = $user->getFirstname();
