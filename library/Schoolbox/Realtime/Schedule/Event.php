@@ -106,12 +106,14 @@ class Event implements EventInterface, Serializable {
 	 * @return string the string representation of the object or null
 	 */
 	public function serialize() {
+        $get = array($this->getObject(), $this->getMapper()->getGetIdentifierMethodName());
+
 		return serialize(array(
-			'u' => UserMapper::getInstance()->dehydrate($this->effector),
+			'u' => $this->effector->getId(),
 			'a' => $this->getAction(),
 			'o' => array(
 				'c' => get_class($this->getMapper()),
-				'i' => $this->getMapper()->dehydrate($this->getObject())
+				'i' => call_user_func($get) // extract ID
 			),
 			'd' => $this->getDiff(),
 		));
@@ -127,10 +129,10 @@ class Event implements EventInterface, Serializable {
 	public function unserialize($serialized) {
 		$array = unserialize($serialized);
 
-		$this->effector = UserMapper::getInstance()->hydrate($array['u']);
+		$this->effector = is_array($array['u']) ? UserMapper::getInstance()->hydrate($array['u']) : UserMapper::getInstance()->findById($array['u']);
 		$this->action   = $array['a'];
 		$this->mapper   = $array['o']['c']::getInstance();
-		$this->object   = $this->getMapper()->hydrate($array['o']['i']);
+		$this->object   = is_array($array['o']['i']) ? $this->getMapper()->hydrate($array['o']['i']) : $this->getMapper()->findById($array['o']['i']);
 		$this->diff     = $array['d'];
 	}
 }
