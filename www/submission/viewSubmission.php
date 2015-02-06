@@ -12,16 +12,21 @@ if (!is_numeric($submissionBoxId)) {
     error(2);
 }
 
+// compile the list of students over which we will iterate
+try {
+    $submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
+    $submissionBox = $submissionBoxMapper->findById($submissionBoxId);
+}
+catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+    error(17);
+}
+
 $studentRetHandler = new SubmissionReturn();
 $studentRetHandler->securityCheck($submissionBoxId);
 
 // we log the viewing of this page, I know not why
 $submissionHandler = new Submission();
 $submissionHandler->logPageView(3, $submissionBoxId);
-
-// compile the list of students over which we will iterate
-$submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
-$submissionBox = $submissionBoxMapper->findById($submissionBoxId);
 
 /* Add category codes
  */
