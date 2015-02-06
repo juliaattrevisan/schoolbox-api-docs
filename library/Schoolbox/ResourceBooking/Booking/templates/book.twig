@@ -207,10 +207,16 @@ $(document).ready(function() {
                 var ids = data.item.join();
 
                 window.location.href = data.callbackUrl + '?ids=' + ids;
-            }
-            // Go back to bookings list for this item
-            else {
-                window.location.href = $('#resource-booking-back').attr('href');
+            } else {
+                // Get the time of the first booking, direct to that date
+                var dateQuery = '';
+                try {
+                    var date = moment(data.item[0].event.start);
+                    dateQuery += '?date='+date.format('DD-MM-YYYY');
+                } catch (e) {
+                    // noop
+                }
+                window.location.href = $('#resource-booking-back').attr('href')+dateQuery;
             }
         }
         var ajaxFail = function(jqXHR) {

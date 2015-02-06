@@ -281,7 +281,13 @@ class Model implements ISoftDeletable, JsonSerializable {
 	 * which is a value of any type other than a resource.
 	 */
 	public function jsonSerialize() {
-		// TODO: Implement jsonSerialize() method.
-		return $this->getId();
+		return array(
+            'id'       => $this->getId(),
+            'resource' => $this->getResource(),
+            'event'    => array(
+                'start' => $this->getEvent()->getStartDateTime()->getUsingFormat('c'),
+                'end'   => $this->getEvent()->getEndDateTime()->getUsingFormat('c'),
+            ),
+        );
 	}
 }
