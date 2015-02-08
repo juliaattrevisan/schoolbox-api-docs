@@ -31,7 +31,7 @@ override_dh_install:
 	rm -fR tools/apache-vhost-*-sso
 	## End SSO
 	## DR
-	mkdir -pv $(CURDIR)/dr
+	#mkdir -pv $(CURDIR)/dr
 	## End DR
 	## Leave Module
 	mkdir -pv $(CURDIR)/leave
