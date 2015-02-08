@@ -38,25 +38,29 @@
             {% for period in content %}
             <tr>
                 {% for day in period.day %}
-                <td style="background:{{day.colour}};" {% if day.today and period.highlight %} class="current"{% endif %}>
-                    {% if day.code %}
+                <td {% if day.today and period.highlight %} class="current"{% endif %}>
+                    {% if day | length %}
                     <ul>
-                        <li>
-                        {% if day.catID %}
-                        <a href="/m/facade/homepage/display/{{ day.catID }}">
+                    {% for subj in day %}
+                        {% if subj.code %}
+                        <li class="of{{ day | length }}" style="background-color:{{subj.colour}};">
+                        {% if subj.catID %}
+                        <a href="/m/facade/homepage/display/{{ subj.catID }}">
                         {% else %}
                         <a href="#">
                         {% endif %}
-                            <span class="class-title">{{ day.description }}</span>
-                            <span class="class-code">{{ day.code }}</span>
+                            <span class="class-title">{{ subj.description }}</span>
+                            <span class="class-code">{{ subj.code }}</span>
                             <span class="class-details">
-                                {% if day.teacherName %}
-                                <span class="class-teacher">{{ day.teacherName }}</span>
+                                {% if subj.teacherName %}
+                                <span class="class-teacher">{{ subj.teacherName }}</span>
                                 {% endif %}
-                                <span class="class-room">{{ day.room }}</span>
+                                <span class="class-room">{{ subj.room }}</span>
                             </span>
                         </a>
+                          {% endif %}
                         </li>
+                    {% endfor %}
                     </ul>
                     {% endif %}
                 </td>

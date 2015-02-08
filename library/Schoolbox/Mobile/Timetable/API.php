@@ -136,53 +136,56 @@ class API {
 	        $colourIndex = 0;
 
 	        foreach($table as &$period) {
-                if(($period['periodNumber'] * $tableDefinition['periodCount'] + $period['periodSequence']) == $highlightedRow) {
+                if (($period['periodNumber'] * $tableDefinition['periodCount'] + $period['periodSequence']) == $highlightedRow) {
                     $period['highlight'] = '1';
                 }
-                foreach($period['day'] as $day => &$class) {
-                    if ($day == $today) {
-                        $class['today'] = '1';
-                    }
 
-                    if (count($class) == 0) {
-                        continue;
-                    }
+                foreach ($period['day'] as $day => &$classes) {
 
-                    if ($class['code'] && !array_key_exists($class['code'], $subjectColourMap)) {
-                        if (!$colourList->offsetExists($colourIndex)) {
-                            $colourIndex = 0;
+                    foreach ($classes as &$class) {
+                        if ($day == $today) {
+                            $class['today'] = '1';
                         }
-                        $subjectColourMap[$class['code']] = $colourList->offsetGet($colourIndex)->getHexColour();
-                        $colourIndex++;
-                    }
-                    $class['colour'] = '#' . $subjectColourMap[$class['code']];
-                    $class['room'] = trim($class['room']);
 
-                    if (isset($class['staffID'])) {
-	                    try {
-                            $user = $this->readData($uMap, $class['staffID']);
-                            $class['teacherName'] = $user->formatName();
+                        if (count($class) == 0) {
+                            continue;
                         }
-                        catch (Exception_Schoolbox $e) {
-                            $class['err'][] = "Failed to read staff with `synergy_id` = '{$class['staffID']}': {$e->getErrorMessage()}";
-                        }
-                        catch (\Exception $e) {
-	                        $class['err'][] = "Failed to read staff with `synergy_id` = '{$class['staffID']}'";
-                        }
-                    }
 
-                    try {
-                        $class['catID'] = $this->readData($cMap, $class['code'])->getId();
+                        if ($class['code'] && !array_key_exists($class['code'], $subjectColourMap)) {
+                            if (!$colourList->offsetExists($colourIndex)) {
+                                $colourIndex = 0;
+                            }
+                            $subjectColourMap[$class['code']] = $colourList->offsetGet($colourIndex)
+                                                                           ->getHexColour();
+                            $colourIndex++;
+                        }
+                        $class['colour'] = '#' . $subjectColourMap[$class['code']];
+                        $class['room']   = trim($class['room']);
+
+                        if (isset($class['staffID'])) {
+                            try {
+                                $user                 = $this->readData($uMap, $class['staffID']);
+                                $class['teacherName'] = $user->formatName();
+                            } catch (Exception_Schoolbox $e) {
+                                $class['err'][] = "Failed to read staff with `synergy_id` = '{$class['staffID']}': {$e->getErrorMessage()}";
+                            } catch (\Exception $e) {
+                                $class['err'][] = "Failed to read staff with `synergy_id` = '{$class['staffID']}'";
+                            }
+                        }
+
+                        try {
+                            $class['catID'] = $this->readData($cMap, $class['code'])
+                                                   ->getId();
+                        } catch (Exception_Schoolbox $e) {
+                            $class['err'][] = "Failed to read category with `categoryCode`.`code` = '{$class['code']}': {$e->getErrorMessage()}";
+                        } catch (\Exception $e) {
+                            $class['err'][] = "Failed to read category with `categoryCode`.`code` = '{$class['code']}'";
+                        }
+                        $response->setResponse('debug', array($class));
                     }
-                    catch (Exception_Schoolbox $e) {
-                        $class['err'][] = "Failed to read category with `categoryCode`.`code` = '{$class['code']}': {$e->getErrorMessage()}";
-                    }
-                    catch (\Exception $e) {
-                        $class['err'][] = "Failed to read category with `categoryCode`.`code` = '{$class['code']}'";
-                    }
-                    $response->setResponse('debug', array($class));
+                    unset($class);
                 }
-				unset($class);
+                unset($classes);
             }
 			unset($period);
 
