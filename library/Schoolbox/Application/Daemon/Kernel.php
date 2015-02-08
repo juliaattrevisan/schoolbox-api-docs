@@ -201,6 +201,10 @@ EOL;
             $this->logger()->error("$errStr in $errFile:$errLine");
 			return;
 		}
+        if(strpos($errStr, 'Undefined variable') === 0) {
+            $this->logger()->error("$errStr in $errFile:$errLine");
+            return;
+        }
         if(strpos($errStr, 'fwrite') === 0) {
             throw new IOException($errStr, $errNum);
         }
