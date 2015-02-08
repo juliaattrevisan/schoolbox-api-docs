@@ -32,6 +32,25 @@ Description: Schoolbox LMS by Alaress Pty. Ltd.
  increasing staff efficiency, leaving greater time for the core purpose of
  schools - learning.
 
+Package: schoolbox-dr
+Architecture: all
+Depends: apache2-mpm-prefork, libapache2-mod-php5,
+ php5-cli, php5-imap, php5-gd, php5-curl, php5-mysql, php5-sybase, php5-ldap,
+ php-pear, php-apc,
+ mysql-client, mysql-server,
+ freetds-common,
+ wget,
+ cifs-utils,
+ libav-tools, libavcodec-extra-53, libimage-exiftool-perl,
+ redis-server, php5-redis,
+ libpspell-dev, php5-pspell, aspell-en,
+ schoolbox-epl,
+ ${misc:Depends}
+Conflicts: javascript-common
+Description: Schoolbox Disaster Recovery dependencies and scripts
+ Ensures all core dependencies for Schoolbox are installed as well as any
+ scripts required for disaster recovery.
+
 Package: schoolbox-sso
 Architecture: all
 Depends: schoolbox,
