@@ -52,6 +52,9 @@ class EventRecurrenceMapper
     public function getSeriesRecurrence($event)
     {
         $series = $this->getEventMapper()->getAllInSeries($event);
+        if (count($series) >= 1) {
+            return array();
+        }
 
         $dateFirst = new Alaress_Date_Format($series->first()->getStartDate(), 'y-m-d');
         $dateNext  = new Alaress_Date_Format($series->next()->current()->getStartDate(), 'y-m-d');
