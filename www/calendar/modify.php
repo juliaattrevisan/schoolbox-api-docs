@@ -108,11 +108,11 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_LOCATION'       => $event->getLocation(),
             'EVENT_DETAIL'         => $event->getDetail(),
             'EVENT_REDIRECT'       => $event->setupRedirect(
-                    $_GET['returnTo'],
-                    $event->getStartDateTime()->getUsingFormat('d-m-Y'),
-                    $_GET['homepageId'],
-                    $_GET['userId']
-                ),
+                $_GET['returnTo'],
+                $event->getStartDateTime()->getUsingFormat('d-m-Y'),
+                $_GET['homepageId'],
+                $_GET['userId']
+            ),
         )
     );
 
@@ -198,11 +198,11 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_LOCATION'       => '',
             'EVENT_DETAIL'         => '',
             'EVENT_REDIRECT'       => $event->setupRedirect(
-                    $_GET['returnTo'],
-                    $event->getStartDateTime()->getUsingFormat('d-m-Y'),
-                    $_GET['homepageId'],
-                    $_GET['userId']
-                ),
+                $_GET['returnTo'],
+                $event->getStartDateTime()->getUsingFormat('d-m-Y'),
+                $_GET['homepageId'],
+                $_GET['userId']
+            ),
         )
     );
 
