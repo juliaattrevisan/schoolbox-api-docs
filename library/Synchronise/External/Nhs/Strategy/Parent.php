@@ -87,6 +87,18 @@ class Synchronise_External_Nhs_Strategy_Parent extends Synchronise_Base_Strategy
     }
 
     /**
+     * Set parent's role to 3. Why didn't we pick up on this before?
+     *
+     * @param array $currentUser
+     *
+     * @return int
+     */
+    public function getGroupIDFromUser($currentUser)
+    {
+        return 3;
+    }
+
+    /**
      * For a user which contains both contact and spouse: return nothing for
      * first name, and "$surname Family" for surname.
      *
