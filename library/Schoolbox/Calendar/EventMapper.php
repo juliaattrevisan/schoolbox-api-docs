@@ -335,8 +335,12 @@ class EventMapper extends Schoolbox\External\Mapper {
 	 * @return Collection|Event[]
 	 */
 	public function getAllInSeries($event) {
+		$seriesId = $event->getSeriesId();
+		if (!isset($seriesId)) {
+			return new Collection();
+		}
 		return $this->findByColumnList(array(
-			'series_id' => $event->getSeriesId(),
+			'series_id' => $seriesId,
 		),
 		array(
 			'order' => array(
