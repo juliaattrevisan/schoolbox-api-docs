@@ -119,18 +119,20 @@ if (is_numeric($_GET['eventID'])) {
     /* Recurrence
      */
     // Is there a recurrence? If so don't show the repeat selector.
-    if ($event->getSeriesId() == null) {
-        $page->setVar('recurring_reminder_block', '');
-        $page->parse('recurring_dates_block', 'recurring_dates');
-    } else {
+    $recurrence = array();
+    if ($event->getSeriesId()) {
         $eventRecurrenceMapper = new \Schoolbox\Calendar\EventRecurrenceMapper($mapper);
         $recurrence            = $eventRecurrenceMapper->getSeriesRecurrence($event);
-
+    }
+    if (!empty($recurrence)) {
         $page->setVar('EVENT_REC_FREQ', ucfirst($recurrence['freq']));
         $page->setVar('EVENT_REC_START', $recurrence['start']->getLongDateOnly());
         $page->setVar('EVENT_REC_END', $recurrence['end']->getLongDateOnly());
         $page->parse('recurring_reminder_block', 'recurring_reminder');
         $page->setVar('recurring_dates_block', '');
+    } else {
+        $page->setVar('recurring_reminder_block', '');
+        $page->parse('recurring_dates_block', 'recurring_dates');
     }
 } else {
     /* Create new event
