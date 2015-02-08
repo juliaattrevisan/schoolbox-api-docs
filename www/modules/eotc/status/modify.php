@@ -54,22 +54,22 @@ $this->setVar(array(
 /* Recurrence
  */
 // Is there a recurrence? If so don't show the repeat selector.
-if ($event->getSeriesId() == null) {
-	$this->setVar(array(
-		'recurring_reminder_block' => ''
-	));
-}
-else {
+$recurrence = array();
+if ($event->getSeriesId()) {
 	$eventRecurrenceMapper = new \Schoolbox\Calendar\EventRecurrenceMapper($mapper);
 	$recurrence = $eventRecurrenceMapper->getSeriesRecurrence($event);
-
+}
+if (!empty($recurrence)) {
 	$this->setVar(array(
 		'EVENT_REC_FREQ' => ucfirst($recurrence['freq']),
 		'EVENT_REC_START' => $recurrence['start']->getLongDateOnly(),
 		'EVENT_REC_END' => $recurrence['end']->getLongDateOnly(),
 	));
-
 	$this->parse('recurring_reminder_block', 'recurring_reminder');
+} else {
+	$this->setVar(array(
+		'recurring_reminder_block' => ''
+	));
 }
 
 /* RAMS file requirement
