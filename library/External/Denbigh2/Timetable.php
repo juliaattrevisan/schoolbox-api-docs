@@ -25,6 +25,13 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     private $campusMapper = null;
 
     /**
+     * Redis cache duration
+     *
+     * @var int
+     */
+    private $cacheTime = 7200;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -54,44 +61,58 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
         $campusMapper = new \Schoolbox\CampusMapper();
         $campus = $campusMapper->findById($campusId);
 
-        $timetableDef = array();
         $maxPeriodsPerDay = 6;
         $maxDays = $campus->getTimetableDay();
 
-        $api = new External_Denbigh2_Api('PeriodTimes', array());
+        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
+            "denbigh2.getTimetableDefinition",
 
-        if (!$api->hasErrors()) {
-            $allPeriods = $api->getResult()->data;
+            function ($params) {
+                list($maxPeriodsPerDay, $maxDays, $day) = $params;
+                $timetableDef = array();
 
-            /* Day-specific e.g. for Dashboard
-             */
-            $i = 0;
+                $api = new External_Denbigh2_Api('PeriodTimes', array());
 
-            foreach ($allPeriods as $currentPeriod) {
-                if ($i < $maxPeriodsPerDay) {
-                    if (!$day || $currentPeriod->{'Day of Cycle'} == $day) {
+                if (!$api->hasErrors()) {
+                    $allPeriods = $api->getResult()->data;
 
-                        /* Format some times
-                         */
-                        $start = new \Alaress_Date_Format($currentPeriod->{'Period Start Time'}, 'H:i:s');
-                        $end = new \Alaress_Date_Format($currentPeriod->{'Period End Time'}, 'H:i:s');
+                    /* Day-specific e.g. for Dashboard
+                     */
+                    $i = 0;
 
-                        $timetableDef['desc'][$i] = "Period {$currentPeriod->{'Period'}}";
-                        $timetableDef['start'][$i] = $start->getUsingFormat('h:ia');
-                        $timetableDef['end'][$i] = $end->getUsingFormat('h:ia');
-                        $timetableDef['number'][$i] = $currentPeriod->{'Period'};
-                        $timetableDef['sequence'][$i] = 1;
+                    if (count($allPeriods)) {
+                        foreach ($allPeriods as $currentPeriod) {
+                            if ($i < $maxPeriodsPerDay) {
+                                if (!$day || $currentPeriod->{'Day of Cycle'} == $day) {
 
-                        $i++;
+                                    /* Format some times
+                                     */
+                                    $start = new \Alaress_Date_Format($currentPeriod->{'Period Start Time'}, 'H:i:s');
+                                    $end = new \Alaress_Date_Format($currentPeriod->{'Period End Time'}, 'H:i:s');
+
+                                    $timetableDef['desc'][$i] = "Period {$currentPeriod->{'Period'}}";
+                                    $timetableDef['start'][$i] = $start->getUsingFormat('h:ia');
+                                    $timetableDef['end'][$i] = $end->getUsingFormat('h:ia');
+                                    $timetableDef['number'][$i] = $currentPeriod->{'Period'};
+                                    $timetableDef['sequence'][$i] = 1;
+
+                                    $i++;
+                                }
+                            }
+                        }
                     }
                 }
-            }
-        }
 
-        $timetableDef['periodCount'] = $maxPeriodsPerDay;
-        $timetableDef['dayCount'] = $maxDays;
+                $timetableDef['periodCount'] = $maxPeriodsPerDay;
+                $timetableDef['dayCount'] = $maxDays;
 
-        return $timetableDef;
+                return json_encode($timetableDef);
+            },
+            array($maxPeriodsPerDay, $maxDays, $day),
+            $this->getCacheTime()
+        );
+
+        return json_decode($encoded);
     }
 
     /**
@@ -582,4 +603,23 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
         return $this->campusMapper;
     }
 
+    /**
+     * Set cache time
+     *
+     * @param int $cacheTime
+     */
+    private function setCacheTime($cacheTime)
+    {
+        $this->cacheTime = $cacheTime;
+    }
+
+    /**
+     * Get cache time
+     *
+     * @return int
+     */
+    private function getCacheTime()
+    {
+        return $this->cacheTime;
+    }
 }
