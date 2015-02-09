@@ -521,39 +521,49 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getParent($externalUserId)
     {
-        $parent = array();
+        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
+            "denbigh2.getParent",
 
-        $api = new External_Denbigh2_Api('Family', array(
-            'Family Code' => $externalUserId
-        ));
+            function ($params) {
+                $parent = array();
 
-        if (!$api->hasErrors()) {
-            $family = $api->getResult()->data[0];
+                $api = new External_Denbigh2_Api('Family', array(
+                    'Family Code' => $params
+                ));
 
-            $parent = array(
-                'Title' => $family->{'Father Title'},
-                'Preferred' => $family->{'Father Preferred Name'},
-                'Surname' => $family->{'Father Surname'},
-                'Email' => $family->{'Father email'},
-                'OccupEmail' => $family->{'Father Email Work'},
-                'DefaultEmailCode' => '',
-                'HomePhone' => $family->{'Father Phone'},
-                'SilentPhoneFlag' => '',
-                'MobilePhone' => $family->{'Father Mobile'},
-                'DirectoryIncludeFlag' => '',
-                'SpouseID' => $family->{'Mother Community ID'},
-                'SpouseTitle' => $family->{'Mother Title'},
-                'SpousePreferred' => $family->{'Mother Preferred Name'},
-                'SpouseSurname' => $family->{'Mother Surname'},
-                'SpouseEmail' => $family->{'Mother Email'},
-                'SpouseOccupEmail' => $family->{'Mother Email Work'},
-                'SpouseDefaultEmailCode' => '',
-                'SpouseMobilePhone' => $family->{'Mother Mobile'},
-                'SpouseDirectoryIncludeFlag' => '',
-            );
-        }
+                if (!$api->hasErrors()) {
+                    $family = $api->getResult()->data[0];
 
-        return $parent;
+                    $parent = array(
+                        'Title' => $family->{'Father Title'},
+                        'Preferred' => $family->{'Father Preferred Name'},
+                        'Surname' => $family->{'Father Surname'},
+                        'Email' => $family->{'Father email'},
+                        'OccupEmail' => $family->{'Father Email Work'},
+                        'DefaultEmailCode' => '',
+                        'HomePhone' => $family->{'Father Phone'},
+                        'SilentPhoneFlag' => '',
+                        'MobilePhone' => $family->{'Father Mobile'},
+                        'DirectoryIncludeFlag' => '',
+                        'SpouseID' => $family->{'Mother Community ID'},
+                        'SpouseTitle' => $family->{'Mother Title'},
+                        'SpousePreferred' => $family->{'Mother Preferred Name'},
+                        'SpouseSurname' => $family->{'Mother Surname'},
+                        'SpouseEmail' => $family->{'Mother Email'},
+                        'SpouseOccupEmail' => $family->{'Mother Email Work'},
+                        'SpouseDefaultEmailCode' => '',
+                        'SpouseMobilePhone' => $family->{'Mother Mobile'},
+                        'SpouseDirectoryIncludeFlag' => '',
+                    );
+                }
+
+                return json_encode($parent);
+            },
+            $externalUserId,
+            $this->getCacheTime()
+        );
+
+        return json_decode($encoded);
     }
 
     /**
