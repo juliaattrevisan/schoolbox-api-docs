@@ -243,15 +243,11 @@ class StudentReportCard
         $page->setBlock(TEMPLATE_content, 'year_option', 'year_option_block');
         // Years is tricksy, because we first need to find out all the years in which the student in question has submitted work
         // also, merging in this current year is a tad unfortunate
-        $years = array_unique(
-            array_merge(
-                array($this->currentYear),
-                $this->submissionMapper->getAllYearsByUser($this->targetUserId)
-            )
-        );
+        $years = range($this->currentYear, min($this->submissionMapper->getAllYearsByUser($this->targetUserId)));
+
         foreach ($years as $y) {
             // Semesters can be hardcoded, no need to look anything up (may change if a school wants Term breakdowns rather than Semester)
-            $semesters = array(1, 2);
+            $semesters = array(2, 1);
             foreach ($semesters as $sem) {
                 $selected = $y == $this->targetYear && $sem == $this->targetSemester;
                 $page->setVar(
@@ -265,8 +261,8 @@ class StudentReportCard
             }
         }
         // Disable back and forward buttons if I can't go back or forward
-        $disabledBack = $this->targetSemester == 1 && $this->targetYear = min($years);
-        $disabledFwd  = $this->targetSemester == 2 && $this->targetYear = max($years);
+        $disabledBack = $this->targetSemester == 1 && $this->targetYear == min($years);
+        $disabledFwd  = $this->targetSemester == 2 && $this->targetYear == max($years);
         $page->setVar(
             array(
                 'WORK_YEAR'              => $this->targetYear,
