@@ -9,24 +9,27 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-class Assess_Answer_Multi extends Evaluation_Answer_Multi {
+class Assess_Answer_Multi extends Evaluation_Answer_Multi
+{
 
-	/**
-	 * Setup
-	 */
-	protected function setup() {
-		$this->setResponseHandler(new Assess_Response());
-		$this->setQuestionHandler(new Assess_Question());
-	}
+    /**
+    * Setup
+    */
+    protected function setup()
+    {
+        $this->setResponseHandler(new Assess_Response());
+        $this->setQuestionHandler(new Assess_Question());
+    }
 
-	/**
+    /**
      * Automatically marks a response. Customised to be applicable to the way in
      * which the response is actually stored.
      *
      * @param  $currentResponse
      * @return void
      */
-    public function mark($currentResponse) {
+    public function mark($currentResponse)
+    {
         $response = unserialize($currentResponse['response']);
         $answer = unserialize($currentResponse['answer']);
 
@@ -41,8 +44,7 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi {
         if (is_array($answer)) {
             foreach ($answer as $currentAnswer) {
                 if ($currentAnswer->correct) {
-
-                    /* If the user responded with a correct answer, accumulate
+/* If the user responded with a correct answer, accumulate
                           */
                     if (is_array($response) && in_array($currentAnswer->value, $response)) {
                         $numCorrect++;
@@ -83,7 +85,8 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi {
      * @param  array $answerGroup an answer group from $this->getByQuestionId()
      * @return array
      */
-    protected function getAnswersFromAnswerGroup($answerGroup) {
+    protected function getAnswersFromAnswerGroup($answerGroup)
+    {
         $allAnswers = parent::getAnswersFromAnswerGroup($answerGroup);
         $question   = $this->questionHandler->getByID($answerGroup['question_id']);
         $config     = json_decode($question['config']);
@@ -101,11 +104,16 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi {
      * @param  $question_id
      * @return void
      */
-    public function reviewResponse($page, $question_id) {
+    public function reviewResponse($page, $question_id)
+    {
         $existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         if ($existing) {
             $existingAnswer = unserialize($existing['response']);
+            // Treat single answers as a single multiple response
+            if (!is_array($existingAnswer)) {
+                $existingAnswer = array($existingAnswer);
+            }
         }
 
         $answerGroup = $this->getByQuestionID($question_id);
@@ -125,8 +133,7 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi {
                     $page->setVar(array(
                         'ACTUAL_CORRECT_VALUE' => 'correct-answer'
                     ));
-                }
-				else {
+                } else {
                     $page->setVar(array(
                         'ACTUAL_CORRECT_VALUE' => ''
                     ));
@@ -154,26 +161,22 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi {
                             $page->setVar(array(
                                 'CORRECT' => $this->getCorrectClass(),
                             ));
-                        }
-						else if (in_array($currentAnswer->value, $existingAnswer)) {
+                        } elseif (in_array($currentAnswer->value, $existingAnswer)) {
                             $page->setVar(array(
                                 'CORRECT' => $this->getIncorrectClass(),
                             ));
-                        }
-						else {
+                        } else {
                             $page->setVar(array(
                                 'CORRECT' => ''
                             ));
                         }
-                    }
-					else {
+                    } else {
                         $page->setVar(array(
                             'ANSWER_CHECKED' => '',
                             'CORRECT' => ''
                         ));
                     }
-                }
-				else {
+                } else {
                     $page->setVar(array(
                         'CORRECT' => ''
                     ));
@@ -181,61 +184,60 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi {
 
                 $page->parse('answerOption_block', 'answerOption', true);
             }
-        }
-		else {
+        } else {
             $page->setVar('answerOption_block', '');
         }
     }
 
-	/**
-	 * Configure question/configure answer
-	 *
-	 * @param $page
-	 * @param $config
-	 */
-	public function configure($page, $config) {
-		$options = json_decode($config);
+    /**
+    * Configure question/configure answer
+    *
+    * @param $page
+    * @param $config
+    */
+    public function configure($page, $config)
+    {
+        $options = json_decode($config);
 
-		if ($options->randomiseOptionOrder) {
-			$page->setVar(array(
-				'CONFIGURATION_RANDOMISEOPTIONORDER_CHECKED' => 'checked="checked"'
-			));
-		}
-		else {
-			$page->setVar(array(
-				'CONFIGURATION_RANDOMISEOPTIONORDER_CHECKED' => ''
-			));
-		}
-	}
+        if ($options->randomiseOptionOrder) {
+            $page->setVar(array(
+                'CONFIGURATION_RANDOMISEOPTIONORDER_CHECKED' => 'checked="checked"'
+            ));
+        } else {
+            $page->setVar(array(
+                'CONFIGURATION_RANDOMISEOPTIONORDER_CHECKED' => ''
+            ));
+        }
+    }
 
-	/**
-	 * Configure question/configure answer
-	 *
-	 * @param $page
-	 * @param $config
-	 */
-	public function configureXml($page, $config) {
-		$options = json_decode($config);
+    /**
+    * Configure question/configure answer
+    *
+    * @param $page
+    * @param $config
+    */
+    public function configureXml($page, $config)
+    {
+        $options = json_decode($config);
 
-		/* std objects cast as arrays -_- since json.stringify
+        /* std objects cast as arrays -_- since json.stringify
 		 * compiles them into anonymous objects
 		 */
-		$keys = array_keys((array)$options);
+        $keys = array_keys((array)$options);
 
-		if (is_array($keys) && count($keys)) {
-			foreach($keys as $currentConfigOption) {
-				$page->setVar(array(
-					'ANSWER_CONFIGURATION_NAME' => $currentConfigOption,
-					'ANSWER_CONFIGURATION_VALUE' => $options->$currentConfigOption
-				));
+        if (is_array($keys) && count($keys)) {
+            foreach ($keys as $currentConfigOption) {
+                $page->setVar(array(
+                    'ANSWER_CONFIGURATION_NAME' => $currentConfigOption,
+                    'ANSWER_CONFIGURATION_VALUE' => $options->$currentConfigOption
+                ));
 
-				$page->parse('answer_configuration_block', 'answer_configuration', true);
-			}
-		}
-		else {
-			$page->setVar(array(
-				'answer_configuration_block' => ''
-			));
-		}
-	}
+                $page->parse('answer_configuration_block', 'answer_configuration', true);
+            }
+        } else {
+            $page->setVar(array(
+                'answer_configuration_block' => ''
+            ));
+        }
+    }
 }
