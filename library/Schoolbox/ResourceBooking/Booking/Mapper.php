@@ -213,13 +213,13 @@ class Mapper extends BaseMapper
 
         // Just search on date for now.
         // Events: any event whose start <= endWindow, or end >= startWindow
-        // Timestamps are in GMT, this doesn't make a big difference for
-        // month view, but does for day.
+        // Timestamp is passed as the start and end of a given day in the
+        // client's timezone, so parse the timezone in the current timezone
+        // (which is generally the same as the client's)
         $startWindow = new \DateTime();
         $endWindow   = new \DateTime();
-        $utcTimezone = new \DateTimeZone('UTC');
-        $startWindow->setTimestamp($fromTimestamp)->setTimezone($utcTimezone);
-        $endWindow->setTimestamp($toTimestamp)->setTimezone($utcTimezone);
+        $startWindow->setTimestamp($fromTimestamp);
+        $endWindow->setTimestamp($toTimestamp);
         $params = array(
             'startWindow' => $startWindow->format('Y-m-d H:i:s'),
             'endWindow'   => $endWindow->format('Y-m-d H:i:s'),
