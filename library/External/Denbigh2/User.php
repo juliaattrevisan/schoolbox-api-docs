@@ -19,6 +19,13 @@ class External_Denbigh2_User implements External_UserInterface
     private $groupHandler = null;
 
     /**
+     * Redis cache duration
+     *
+     * @var int
+     */
+    private $cacheTime = 7200;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -123,7 +130,7 @@ class External_Denbigh2_User implements External_UserInterface
                 return json_encode($data);
             },
             $externalUserId,
-            60*60*2
+            $this->getCacheTime()
         );
 
         return json_decode($encoded);
@@ -164,55 +171,65 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStudentContactList($externalUserId)
     {
-        $data = array();
+        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
+            "denbigh2.getStudentContactList",
 
-        /* Gotta get the famiry code out of the Student result set
-         */
-        $api = new External_Denbigh2_Api('Students', array(
-            'Student ID' => $externalUserId,
-        ));
+            function ($params) {
+                $data = array();
 
-        if (!$api->hasErrors()) {
-            $result = $api->getResult()->data[0];
+                /* Gotta get the famiry code out of the Student result set
+                 */
+                $api = new External_Denbigh2_Api('Students', array(
+                    'Student ID' => $params,
+                ));
 
-            $api = new External_Denbigh2_Api('Family', array(
-                'Family Code' => $result->{'Family Code'},
-            ));
+                if (!$api->hasErrors()) {
+                    $result = $api->getResult()->data[0];
 
-            if (!$api->hasErrors()) {
-                $family = $api->getResult()->data[0];
+                    $api = new External_Denbigh2_Api('Family', array(
+                        'Family Code' => $result->{'Family Code'},
+                    ));
 
-                $data[] = array(
-                    'StudentContactID' => '',
-                    'StudentContactTitle' => $family->{'Father Title'},
-                    'StudentContactPreferred' => $family->{'Father Preferred Name'},
-                    'StudentContactSurname' => $family->{'Father Surname'},
-                    'StudentContactDefaultEmail' => $family->{'Father email'},
-                    'ValidAddressFlag' => '',
-                    'StudentContactAddress1' => $family->{'Residential Address Street'},
-                    'StudentContactAddress2' => '',
-                    'StudentContactAddress3' => '',
-                    'StudentContactSuburb' => $family->{'Residential Address Suburb'},
-                    'StudentContactPostCode' => $family->{'Residential Address PostCode'},
-                    'StudentContactState' => $family->{'Residential Address State'},
-                    'StudentContactPhoneActual' => '',
-                    'StudentContactMobilePhone' => $family->{'Father Mobile'},
-                    'StudentContactOccupPhone' => $family->{'Father Phone'},
-                    'StudentContactRelation' => '',
-                    'StudentContactSpouseID' => '',
-                    'StudentContactSpouseTitle' => $family->{'Mother Title'},
-                    'StudentContactSpousePreferred' => $family->{'Mother Preferred Name'},
-                    'StudentContactSpouseSurname' => $family->{'Mother Surname'},
-                    'StudentContactSpouseMobilePhone' => $family->{'Mother Mobile'},
-                    'StudentContactSpouseOccupPhone' => $family->{'Mother Phone'},
-                    'StudentContactSpouseDefaultEmail' => $family->{'Mother Email'},
-                    'StudentContactType' => '',
-                    'StudentContactSpouseRelation' => '',
-                );
-            }
-        }
+                    if (!$api->hasErrors()) {
+                        $family = $api->getResult()->data[0];
 
-        return $data;
+                        $data[] = array(
+                            'StudentContactID' => '',
+                            'StudentContactTitle' => $family->{'Father Title'},
+                            'StudentContactPreferred' => $family->{'Father Preferred Name'},
+                            'StudentContactSurname' => $family->{'Father Surname'},
+                            'StudentContactDefaultEmail' => $family->{'Father email'},
+                            'ValidAddressFlag' => '',
+                            'StudentContactAddress1' => $family->{'Residential Address Street'},
+                            'StudentContactAddress2' => '',
+                            'StudentContactAddress3' => '',
+                            'StudentContactSuburb' => $family->{'Residential Address Suburb'},
+                            'StudentContactPostCode' => $family->{'Residential Address PostCode'},
+                            'StudentContactState' => $family->{'Residential Address State'},
+                            'StudentContactPhoneActual' => '',
+                            'StudentContactMobilePhone' => $family->{'Father Mobile'},
+                            'StudentContactOccupPhone' => $family->{'Father Phone'},
+                            'StudentContactRelation' => '',
+                            'StudentContactSpouseID' => '',
+                            'StudentContactSpouseTitle' => $family->{'Mother Title'},
+                            'StudentContactSpousePreferred' => $family->{'Mother Preferred Name'},
+                            'StudentContactSpouseSurname' => $family->{'Mother Surname'},
+                            'StudentContactSpouseMobilePhone' => $family->{'Mother Mobile'},
+                            'StudentContactSpouseOccupPhone' => $family->{'Mother Phone'},
+                            'StudentContactSpouseDefaultEmail' => $family->{'Mother Email'},
+                            'StudentContactType' => '',
+                            'StudentContactSpouseRelation' => '',
+                        );
+                    }
+                }
+
+                return json_encode($data);
+            },
+            $externalUserId,
+            $this->getCacheTime()
+        );
+
+        return json_decode($encoded);
     }
 
     /**
@@ -275,15 +292,14 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
     {
-        $params = array();
+        $args = array();
         $allNameSources = array();
         $pattern = null;
-        $collection = array();
 
         /* Filter by year level
          */
         if (strlen($yearlevel) && is_numeric($yearlevel)) {
-            $params['Academic Year'] = (int)$yearlevel;
+            $args['Academic Year'] = (int)$yearlevel;
         }
 
         /* Filter by name
@@ -307,43 +323,57 @@ class External_Denbigh2_User implements External_UserInterface
 
         /* TODO: Boarding house and Form information not available?
          */
+        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
+            "denbigh2.getStudentContactListExtended",
 
-        /* Proceed
-         */
-        $api = new External_Denbigh2_Api('Students', $params);
+            function ($params) {
+                $collection = array();
+                list($pregName, $pattern, $allNameSources) = $params;
 
-        if (!$api->hasErrors()) {
-            $allStudents = $api->getResult()->data;
-
-            /* Filter people out by name, if provided
-             * Otherwise just restack them
-             */
-            foreach ($allStudents as $currentStudent) {
-
-                /* Filter by name
+                /* Proceed
                  */
-                if ($pregName) {
-                    foreach($allNameSources as $currentSource) {
+                $api = new External_Denbigh2_Api('Students', $params);
 
-                        /* Check names
-                         */
-                        if (preg_match($pattern, $currentStudent->{$currentSource})) {
-                            $collection[] = $currentStudent;
-                            break;
+                if (!$api->hasErrors()) {
+                    $allStudents = $api->getResult()->data;
+
+                    /* Filter people out by name, if provided
+                     * Otherwise just restack them
+                     */
+                    if (count($allStudents)) {
+                        foreach ($allStudents as $currentStudent) {
+
+                            /* Filter by name
+                             */
+                            if ($pregName) {
+                                foreach($allNameSources as $currentSource) {
+
+                                    /* Check names
+                                     */
+                                    if (preg_match($pattern, $currentStudent->{$currentSource})) {
+                                        $collection[] = $currentStudent;
+                                        break;
+                                    }
+                                }
+                            }
+                            /* TODO: Check anything else in a similar manner
+                             */
+                            /* Otherwise just stack up everyone
+                             */
+                            else {
+                                $collection[] = $currentStudent;
+                            }
                         }
                     }
                 }
-                /* TODO: Check anything else in a similar manner
-                 */
-                /* Otherwise just stack up everyone
-                 */
-                else {
-                    $collection[] = $currentStudent;
-                }
-            }
-        }
 
-        return $collection;
+                return serialize($collection);
+            },
+            array($pregName, $pattern, $allNameSources),
+            $this->getCacheTime()
+        );
+
+        return unserialize($encoded);
     }
 
     /**
@@ -1097,5 +1127,25 @@ class External_Denbigh2_User implements External_UserInterface
     private function getGroupHandler()
     {
         return $this->groupHandler;
+    }
+
+    /**
+     * Set cache time
+     *
+     * @param int $cacheTime
+     */
+    private function setCacheTime($cacheTime)
+    {
+        $this->cacheTime = $cacheTime;
+    }
+
+    /**
+     * Get cache time
+     *
+     * @return int
+     */
+    private function getCacheTime()
+    {
+        return $this->cacheTime;
     }
 }
