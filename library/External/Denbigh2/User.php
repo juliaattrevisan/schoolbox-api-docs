@@ -720,29 +720,31 @@ class External_Denbigh2_User implements External_UserInterface
                 if (!$api->hasErrors()) {
                     $allStudents = $api->getResult()->data;
 
-                    foreach($allStudents as $currentStudent) {
-                        // TODO: Parents have no networkLogin equivalent?
-                        // TODO: Parents have no unique id?
+                    if (count($allStudents)) {
+                        foreach($allStudents as $currentStudent) {
+                            // TODO: Parents have no networkLogin equivalent?
+                            // TODO: Parents have no unique id?
 
-                        $parent = array(
-                            'StudentContactNetworkLogin' => '',
-                            'StudentContactID' => '',
-                            'StudentContactTitle' => $currentStudent->{'Father Title'},
-                            'StudentContactPreferred' => $currentStudent->{'Father'},
-                            'StudentContactSurname' => $currentStudent->{'Father Surname'},
-                            'StudentContactDefaultEmail' => $currentStudent->{'email Father'},
-                            'StudentContactSpouseNetworkLogin' => '',
-                            'StudentContactSpouseID' => '',
-                            'StudentContactSpouseTitle' => $currentStudent->{'Mother Title'},
-                            'StudentContactSpousePreferred' => $currentStudent->{'Mother'},
-                            'StudentContactSpouseSurname' => $currentStudent->{'Mother Surname'},
-                            'StudentContactSpouseDefaultEmail' => $currentStudent->{'email Mother'},
-                            'StudentYearLevel' => $currentStudent->{'Academic Year'},
-                            'StudentCampus' => $currentStudent->{'Campus'},
-                            'StudentGender' => $currentStudent->{'Gender'},
-                        );
+                            $parent = array(
+                                'StudentContactNetworkLogin' => '',
+                                'StudentContactID' => '',
+                                'StudentContactTitle' => $currentStudent->{'Father Title'},
+                                'StudentContactPreferred' => $currentStudent->{'Father'},
+                                'StudentContactSurname' => $currentStudent->{'Father Surname'},
+                                'StudentContactDefaultEmail' => $currentStudent->{'email Father'},
+                                'StudentContactSpouseNetworkLogin' => '',
+                                'StudentContactSpouseID' => '',
+                                'StudentContactSpouseTitle' => $currentStudent->{'Mother Title'},
+                                'StudentContactSpousePreferred' => $currentStudent->{'Mother'},
+                                'StudentContactSpouseSurname' => $currentStudent->{'Mother Surname'},
+                                'StudentContactSpouseDefaultEmail' => $currentStudent->{'email Mother'},
+                                'StudentYearLevel' => $currentStudent->{'Academic Year'},
+                                'StudentCampus' => $currentStudent->{'Campus'},
+                                'StudentGender' => $currentStudent->{'Gender'},
+                            );
 
-                        $allParents[] = $parent;
+                            $allParents[] = $parent;
+                        }
                     }
                 }
 
@@ -773,29 +775,39 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStaff($externalUserId)
     {
-        $staff = array();
-        
-        $api = new External_Denbigh2_Api('Staff', array(
-            'Staff Code' => $externalUserId
-        ));
+        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
+            "denbigh2.getStaff",
 
-        if (!$api->hasErrors()) {
-            $currentStaff = $api->getResult()->data[0];
+            function ($params) {
+                $staff = array();
 
-            $staff = array(
-                'SchoolStaffCode' => $currentStaff->{'Staff Code'},
-                'StaffBuilding' => '',
-                'StaffRoom' => '',
-                'StaffExtension' => $currentStaff->{'Telephone Extension'},
-                'StaffMobilePhone' => '',
-                'StaffCampusDescription' => $currentStaff->{'Campus'},
-                'StaffCategoryDescription' => '',
-                'StaffDepartment' => '',
-                'StaffVoiceMail' => '',
-            );
-        }
+                $api = new External_Denbigh2_Api('Staff', array(
+                    'Staff Code' => $params
+                ));
 
-        return $staff;
+                if (!$api->hasErrors()) {
+                    $currentStaff = $api->getResult()->data[0];
+
+                    $staff = array(
+                        'SchoolStaffCode' => $currentStaff->{'Staff Code'},
+                        'StaffBuilding' => '',
+                        'StaffRoom' => '',
+                        'StaffExtension' => $currentStaff->{'Telephone Extension'},
+                        'StaffMobilePhone' => '',
+                        'StaffCampusDescription' => $currentStaff->{'Campus'},
+                        'StaffCategoryDescription' => '',
+                        'StaffDepartment' => '',
+                        'StaffVoiceMail' => '',
+                    );
+                }
+
+                return json_encode($staff);
+            },
+            $externalUserId,
+            $this->getCacheTime()
+        );
+
+        return json_decode($encoded);
     }
 
     /**
