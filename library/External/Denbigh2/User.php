@@ -985,81 +985,109 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getSubjectList($externalUserId, $userId)
     {
-        $class = array();
-
         if ($this->getGroupHandler()->isStudent($userId)) {
-            $api = new External_Denbigh2_Api('Enrolments', array(
-                'Student ID' => $externalUserId
-            ));
+            $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
+                "denbigh2.getSubjectList",
 
-            /* Calling userMapper->findById() for user 689 causes Avondale
-             * to time out with Error code: ERR_EMPTY_RESPONSE
-             *
-             * This is needed to get the campusCode
-             */
-            if (!$api->hasErrors()) {
-                $allEnrolments = $api->getResult()->data;
+                function ($params) {
+                    $class = array();
 
-                foreach($allEnrolments as $currentEnrolment) {
-
-                    /* Find out more info about the class
-                     */
-                    $api = new External_Denbigh2_Api('Classes', array(
-                        'Class' => $currentEnrolment->{'Class'}
+                    $api = new External_Denbigh2_Api('Enrolments', array(
+                        'Student ID' => $params
                     ));
 
+                    /* Calling userMapper->findById() for user 689 causes Avondale
+                     * to time out with Error code: ERR_EMPTY_RESPONSE
+                     *
+                     * This is needed to get the campusCode
+                     */
                     if (!$api->hasErrors()) {
-                        $classData = $api->getResult()->data[0];
+                        $allEnrolments = $api->getResult()->data;
 
-                        // TODO: No campus for class?
+                        if (count($allEnrolments)) {
+                            foreach($allEnrolments as $currentEnrolment) {
 
-                        $class[] = array(
-                            'code' => $classData->{'Class'},
-                            'name' => $classData->{'Subject Name'},
-                            'classType' => 'Academic',
-                            'campusCode' => ''
-                        );
+                                /* Find out more info about the class
+                                 */
+                                $api = new External_Denbigh2_Api('Classes', array(
+                                    'Class' => $currentEnrolment->{'Class'}
+                                ));
+
+                                if (!$api->hasErrors()) {
+                                    $classData = $api->getResult()->data[0];
+
+                                    // TODO: No campus for class?
+
+                                    $class[] = array(
+                                        'code' => $classData->{'Class'},
+                                        'name' => $classData->{'Subject Name'},
+                                        'classType' => 'Academic',
+                                        'campusCode' => ''
+                                    );
+                                }
+                            }
+                        }
                     }
-                }
-            }
-        }
-        else if ($this->getGroupHandler()->isStaff($userId)) {
-            $api = new External_Denbigh2_Api('Classes',
-                array(
-                    'Teacher Code' => $externalUserId
-                ),
-                array(
-                    'RFMmax' => 0
-                )
+
+                    return json_encode($class);
+                },
+                $externalUserId,
+                $this->getCacheTime()
             );
 
-            /* Calling userMapper->findById() for user 689 causes Avondale
-             * to time out with Error code: ERR_EMPTY_RESPONSE
-             *
-             * This is needed to get the campusCode
-             */
-            if (!$api->hasErrors()) {
-                $stack = array();
-
-                $allClasses = $api->getResult()->data;
-
-                foreach ($allClasses as $currentClass) {
-
-                    /* Awesome uniquify
-                     */
-                    $stack[$currentClass->{'Class'}] = array(
-                        'code' => $currentClass->{'Class'},
-                        'name' => $currentClass->{'Subject Name'},
-                        'classType' => 'Academic',
-                        'campusCode' => ''
-                    );
-                }
-
-                $class = array_values($stack);
-            }
+            return json_decode($encoded);
         }
+        else if ($this->getGroupHandler()->isStaff($userId)) {
+            $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
+                "denbigh2.getSubjectList",
 
-        return $class;
+                function ($params) {
+                    $class = array();
+
+                    $api = new External_Denbigh2_Api('Classes',
+                        array(
+                            'Teacher Code' => $params
+                        ),
+                        array(
+                            'RFMmax' => 0
+                        )
+                    );
+
+                    /* Calling userMapper->findById() for user 689 causes Avondale
+                     * to time out with Error code: ERR_EMPTY_RESPONSE
+                     *
+                     * This is needed to get the campusCode
+                     */
+                    if (!$api->hasErrors()) {
+                        $stack = array();
+
+                        $allClasses = $api->getResult()->data;
+
+                        if (count($allClasses)) {
+                            foreach ($allClasses as $currentClass) {
+
+                                /* Awesome uniquify
+                                 */
+                                $stack[$currentClass->{'Class'}] = array(
+                                    'code' => $currentClass->{'Class'},
+                                    'name' => $currentClass->{'Subject Name'},
+                                    'classType' => 'Academic',
+                                    'campusCode' => ''
+                                );
+                            }
+                        }
+
+                        $class = array_values($stack);
+                    }
+
+                    return json_encode($class);
+                },
+                $externalUserId,
+                $this->getCacheTime()
+            );
+
+            return json_decode($encoded);
+        }
     }
 
     /**
