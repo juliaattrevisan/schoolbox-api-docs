@@ -17,20 +17,21 @@ use Alaress_Date_Format;
 use Schoolbox\User;
 use JsonSerializable;
 
-class Model implements ISoftDeletable, JsonSerializable {
+class Model implements ISoftDeletable, JsonSerializable
+{
 
     /**
      * @var int
      */
     protected $id;
 
-	/**
-	 * Name of the booking, which can be used to identify this booking
-	 * when using beavis suggests etc.
-	 *
-	 * @var
-	 */
-	protected $name;
+    /**
+    * Name of the booking, which can be used to identify this booking
+    * when using beavis suggests etc.
+    *
+    * @var
+    */
+    protected $name;
 
     /**
      * @var Item\Model
@@ -72,7 +73,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      */
     protected $relatedBookingList;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->setRelatedBookingList(new Collection());
     }
 
@@ -80,7 +82,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  Alaress_Date_Format $modifiedAt
      * @return $this
      */
-    public function setModifiedAt($modifiedAt) {
+    public function setModifiedAt($modifiedAt)
+    {
         $this->modifiedAt = $modifiedAt;
         return $this;
     }
@@ -88,7 +91,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return Alaress_Date_Format
      */
-    public function getModifiedAt() {
+    public function getModifiedAt()
+    {
         return $this->modifiedAt;
     }
 
@@ -97,7 +101,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      *
      * @return $this
      */
-    public function setCreatedAt($createdAt) {
+    public function setCreatedAt($createdAt)
+    {
         $this->createdAt = $createdAt;
         return $this;
     }
@@ -105,7 +110,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return Alaress_Date_Format
      */
-    public function getCreatedAt() {
+    public function getCreatedAt()
+    {
         return $this->createdAt;
     }
 
@@ -113,7 +119,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  Alaress_Date_Format $deletedAt
      * @return $this
      */
-    public function setDeletedAt($deletedAt) {
+    public function setDeletedAt($deletedAt)
+    {
         $this->deletedAt = $deletedAt;
         return $this;
     }
@@ -121,7 +128,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return Alaress_Date_Format
      */
-    public function getDeletedAt() {
+    public function getDeletedAt()
+    {
         return $this->deletedAt;
     }
 
@@ -129,7 +137,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  int   $id
      * @return $this
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -137,7 +146,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -145,7 +155,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  Item\Model $resource
      * @return $this
      */
-    public function setResource($resource) {
+    public function setResource($resource)
+    {
         $this->resource = $resource;
         return $this;
     }
@@ -153,7 +164,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return Item\Model
      */
-    public function getResource() {
+    public function getResource()
+    {
         return $this->resource;
     }
 
@@ -161,7 +173,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  Calendar\Event $event
      * @return $this
      */
-    public function setEvent($event) {
+    public function setEvent($event)
+    {
         $this->event = $event;
         return $this;
     }
@@ -169,7 +182,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return Calendar\Event
      */
-    public function getEvent() {
+    public function getEvent()
+    {
         return $this->event;
     }
 
@@ -177,7 +191,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  User  $reviewer
      * @return $this
      */
-    public function setReviewer($reviewer) {
+    public function setReviewer($reviewer)
+    {
         $this->reviewer = $reviewer;
         return $this;
     }
@@ -185,7 +200,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return User
      */
-    public function getReviewer() {
+    public function getReviewer()
+    {
         return $this->reviewer;
     }
 
@@ -193,7 +209,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  Status\Model $status
      * @return $this
      */
-    public function setStatus($status) {
+    public function setStatus($status)
+    {
         $this->status = $status;
         return $this;
     }
@@ -201,7 +218,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return Status\Model
      */
-    public function getStatus() {
+    public function getStatus()
+    {
         return $this->status;
     }
 
@@ -209,7 +227,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  Collection|self[] $relatedBookingList
      * @return $this
      */
-    public function setRelatedBookingList($relatedBookingList) {
+    public function setRelatedBookingList($relatedBookingList)
+    {
         $this->relatedBookingList = $relatedBookingList;
         return $this;
     }
@@ -217,7 +236,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return Collection|self[]
      */
-    public function getRelatedBookingList() {
+    public function getRelatedBookingList()
+    {
         return $this->relatedBookingList;
     }
 
@@ -225,7 +245,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  self  $booking
      * @return $this
      */
-    public function addRelatedBooking($booking) {
+    public function addRelatedBooking($booking)
+    {
         $this->getRelatedBookingList()->add($booking);
         return $this;
     }
@@ -236,7 +257,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  int $resourceId
      * @return bool
      */
-    public function hasRelatedBookingForResource($resourceId) {
+    public function hasRelatedBookingForResource($resourceId)
+    {
         foreach ($this->getRelatedBookingList() as $booking) {
             if ($booking->getResource()->getId() == $resourceId) {
                 return true;
@@ -250,38 +272,48 @@ class Model implements ISoftDeletable, JsonSerializable {
      *
      * @return bool
      */
-    public function isDeleted() {
+    public function isDeleted()
+    {
         return ($this->getDeletedAt() instanceof Alaress_Date_Format);
     }
 
-	/**
-	 * Set name
-	 *
-	 * @param mixed $name
-	 * @return $this
-	 */
-	public function setName($name) {
-		$this->name = $name;
-		return $this;
-	}
+    /**
+    * Set name
+    *
+    * @param mixed $name
+    * @return $this
+    */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
 
-	/**
-	 * Get name
-	 *
-	 * @return mixed
-	 */
-	public function getName() {
-		return $this->name;
-	}
+    /**
+    * Get name
+    *
+    * @return mixed
+    */
+    public function getName()
+    {
+        return $this->name;
+    }
 
-	/**
-	 * Specify data which should be serialized to JSON
-	 * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
-	 * @return mixed data which can be serialized by <b>json_encode</b>,
-	 * which is a value of any type other than a resource.
-	 */
-	public function jsonSerialize() {
-		// TODO: Implement jsonSerialize() method.
-		return $this->getId();
-	}
+    /**
+    * Specify data which should be serialized to JSON
+    * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+    * @return mixed data which can be serialized by <b>json_encode</b>,
+    * which is a value of any type other than a resource.
+    */
+    public function jsonSerialize()
+    {
+        return array(
+            'id'       => $this->getId(),
+            'resource' => $this->getResource(),
+            'event'    => array(
+                'start' => $this->getEvent()->getStartDateTime()->getUsingFormat('c'),
+                'end'   => $this->getEvent()->getEndDateTime()->getUsingFormat('c'),
+            ),
+        );
+    }
 }
