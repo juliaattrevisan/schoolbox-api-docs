@@ -608,17 +608,60 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getParentSync($externalUserId)
     {
-        $parent = array();
-
         if (is_array($externalUserId)) {
-            foreach($externalUserId as $current) {
-                $api = new External_Denbigh2_Api('Family', array(
-                    'Family Code' => $current
-                ));
+            $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
+                "denbigh2.getParentSync",
 
-                if (!$api->hasErrors()) {
-                    foreach ($api->getResult()->data as $family) {
-                        $parent[] = array(
+                function ($params) {
+                    $parent = array();
+
+                    foreach($params as $current) {
+                        $api = new External_Denbigh2_Api('Family', array(
+                            'Family Code' => $current
+                        ));
+
+                        if (!$api->hasErrors()) {
+                            if (count($api->getResult()->data)) {
+                                foreach ($api->getResult()->data as $family) {
+                                    $parent[] = array(
+                                        'ID' => $family->{'Father Community ID'},
+                                        'Title' => $family->{'Father Title'},
+                                        'Preferred' => $family->{'Father Preferred Name'},
+                                        'Surname' => $family->{'Father Surname'},
+                                        'Email' => $family->{'Father email'},
+                                        'OccupEmail' => $family->{'Father Email Work'},
+                                        'DefaultEmailCode' => '',
+                                        'DirectoryIncludeFlag' => '',
+                                    );
+                                }
+                            }
+                        }
+                    }
+
+                    return json_encode($params);
+                },
+                $externalUserId,
+                $this->getCacheTime()
+            );
+
+            return json_decode($encoded);
+
+        }
+        else {
+            $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
+                "denbigh2.getParentSync",
+
+                function ($params) {
+                    $parent = array();
+
+                    $api = new External_Denbigh2_Api('Family', array(
+                        'Family Code' => $params
+                    ));
+
+                    if (!$api->hasErrors()) {
+                        $family = $api->getResult()->data[0];
+
+                        $parent = array(
                             'ID' => $family->{'Father Community ID'},
                             'Title' => $family->{'Father Title'},
                             'Preferred' => $family->{'Father Preferred Name'},
@@ -629,31 +672,15 @@ class External_Denbigh2_User implements External_UserInterface
                             'DirectoryIncludeFlag' => '',
                         );
                     }
-                }
-            }
+
+                    return json_encode($parent);
+                },
+                $externalUserId,
+                $this->getCacheTime()
+            );
+
+            return json_decode($encoded);
         }
-        else {
-            $api = new External_Denbigh2_Api('Family', array(
-                'Family Code' => $externalUserId
-            ));
-
-            if (!$api->hasErrors()) {
-                $family = $api->getResult()->data[0];
-
-                $parent = array(
-                    'ID' => $family->{'Father Community ID'},
-                    'Title' => $family->{'Father Title'},
-                    'Preferred' => $family->{'Father Preferred Name'},
-                    'Surname' => $family->{'Father Surname'},
-                    'Email' => $family->{'Father email'},
-                    'OccupEmail' => $family->{'Father Email Work'},
-                    'DefaultEmailCode' => '',
-                    'DirectoryIncludeFlag' => '',
-                );
-            }
-        }
-
-        return $parent;
     }
 
     /**
