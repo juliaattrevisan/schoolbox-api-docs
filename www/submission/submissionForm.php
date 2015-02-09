@@ -153,7 +153,7 @@ elseif ($markTypeID == SubmissionBox\MarkType::TYPE_RUBRIC) {
 $submission->setAcceptOnline(!empty($_POST['accept_submission']) ? true : false);
 $submission->setAcceptMultiple(!empty($_POST['multi_submission']) ? true : false);
 if (!$is_task) {
-    $submission->setPublishDate($openDate);
+    $submission->setPublishDate($publishDate);
     $submission->setOpenDate($openDate);
     $submission->setDueDate($dueDate);
     $submission->setLateDate($lateDate);
