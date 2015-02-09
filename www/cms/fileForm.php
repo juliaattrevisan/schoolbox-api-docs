@@ -81,6 +81,9 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
     $file->setHidden($_POST['hidden'] ? true : false);
     $file->setModified(Alaress_Date_Format::now());
 
+    // set copy source
+    $file->setTempFileLocation($file->getFileLocation());
+
     // this is the collection we'll be saving
     $collection = new \Schoolbox\Collection();
 
