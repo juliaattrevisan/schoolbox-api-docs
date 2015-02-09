@@ -106,6 +106,10 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi {
 
         if ($existing) {
             $existingAnswer = unserialize($existing['response']);
+            // Treat single answers as a single multiple response
+            if (!is_array($existingAnswer)) {
+                $existingAnswer = array($existingAnswer);
+            }
         }
 
         $answerGroup = $this->getByQuestionID($question_id);
