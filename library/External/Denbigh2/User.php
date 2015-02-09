@@ -1140,30 +1140,40 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getEmail($externalUserId)
     {
-        $emailAddress = '';
+        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
+            "denbigh2.getEmail",
 
-        // TODO: Currently no way of knowing which parent to return email address for
+            function ($params) {
+                $emailAddress = '';
 
-        $api = new External_Denbigh2_Api('Students', array(
-            'Student ID' => $externalUserId
-        ));
+                // TODO: Currently no way of knowing which parent to return email address for
 
-        if (!$api->hasErrors()) {
-            $currentStudent = $api->getResult()->data[0];
+                $api = new External_Denbigh2_Api('Students', array(
+                    'Student ID' => $params
+                ));
 
-            /* School address normally
-             */
-            if (strlen(trim($currentStudent->{'Email Address'}))) {
-                $emailAddress = $currentStudent->{'Email Address'};
-            }
-            /* Try emailing home lol
-             */
-            else if (strlen(trim($currentStudent->{'email Home'}))) {
-                $emailAddress = $currentStudent->{'email Home'};
-            }
-        }
+                if (!$api->hasErrors()) {
+                    $currentStudent = $api->getResult()->data[0];
 
-        return $emailAddress;
+                    /* School address normally
+                     */
+                    if (strlen(trim($currentStudent->{'Email Address'}))) {
+                        $emailAddress = $currentStudent->{'Email Address'};
+                    }
+                    /* Try emailing home lol
+                     */
+                    else if (strlen(trim($currentStudent->{'email Home'}))) {
+                        $emailAddress = $currentStudent->{'email Home'};
+                    }
+                }
+
+                return $emailAddress;
+            },
+            $externalUserId,
+            $this->getCacheTime()
+        );
+
+        return json_decode($encoded);
     }
 
     /**
