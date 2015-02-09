@@ -1188,61 +1188,76 @@ class External_Denbigh2_User implements External_UserInterface
         $userMapper = new \Schoolbox\UserMapper();
 
         try {
-            $user = $userMapper->findByColumn('synergy_id', $externalUserId)->first();
+            $user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
         }
         catch (\Exception $e) {
             return false;
         }
 
-        /* Different columns for different types!
-         */
-        if ($this->getGroupHandler()->isStudent($user->getId())) {
-            $api = new External_Denbigh2_Api('Photos', array(
-                'Community ID' => $externalUserId
-            ));
-        }
-        elseif ($this->getGroupHandler()->isStaff($user->getId())) {
-            $api = new External_Denbigh2_Api('Photos', array(
-                'z_StaffCode' => $externalUserId
-            ));
-        }
+        $isStudent = $this->getGroupHandler()->isStudent($user->getId());
+        $isStaff = $this->getGroupHandler()->isStaff($user->getId());
 
-        /* Deal with the pic
-         */
-        if (!$api->hasErrors()) {
-            if (count($api->getResult()->data) && strlen($api->getResult()->data[0]->{'PhotoBase64Encoded'})) {
-                $photoPath = Config::get('portrait_dir') . '/' . $externalUserId . '.jpg';
+        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
+            "denbigh2.getPortrait",
 
-                //TODO: delete photos on rollover
+            function ($params) {
+                list($externalUserId, $isStudent, $isStaff) = $params;
 
-                /* If the cached file doesn't exist, or the synergetic image is more recent than our
-                 * last known cached version, regenerate cached version.
-                 *
-                 * Separate the queries out, fetching the photo data only if it's newer than the cached
-                 * version, or if the cache version doesn't already exist.
+                /* Different columns for different types!
                  */
-                $cacheTime = @filemtime($photoPath);
-
-                /* Denbigh didn't provide a modified date
-                 * $modifiedTime = strtotime($photo['ModifiedDate']);
-                 */
-                $modifiedTime = $_SERVER['REQUEST_TIME'];
-
-                if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
-                    $binary = base64_decode($api->getResult()->data[0]->{'PhotoBase64Encoded'});
-
-                    /* Save the image
-                     */
-                    $photoHandle = fopen($photoPath, "w");
-                    fwrite($photoHandle, $binary);
-                    fclose($photoHandle);
+                if ($isStudent) {
+                    $api = new External_Denbigh2_Api('Photos', array(
+                        'Community ID' => $externalUserId
+                    ));
+                }
+                elseif ($isStaff) {
+                    $api = new External_Denbigh2_Api('Photos', array(
+                        'z_StaffCode' => $externalUserId
+                    ));
                 }
 
-                return $photoPath;
-            }
-        }
+                /* Deal with the pic
+                 */
+                if (!$api->hasErrors()) {
+                    if (count($api->getResult()->data) && strlen($api->getResult()->data[0]->{'PhotoBase64Encoded'})) {
+                        $photoPath = Config::get('portrait_dir') . '/' . $externalUserId . '.jpg';
 
-        return false;
+                        //TODO: delete photos on rollover
+
+                        /* If the cached file doesn't exist, or the synergetic image is more recent than our
+                         * last known cached version, regenerate cached version.
+                         *
+                         * Separate the queries out, fetching the photo data only if it's newer than the cached
+                         * version, or if the cache version doesn't already exist.
+                         */
+                        $cacheTime = @filemtime($photoPath);
+
+                        /* Denbigh didn't provide a modified date
+                         * $modifiedTime = strtotime($photo['ModifiedDate']);
+                         */
+                        $modifiedTime = $_SERVER['REQUEST_TIME'];
+
+                        if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
+                            $binary = base64_decode($api->getResult()->data[0]->{'PhotoBase64Encoded'});
+
+                            /* Save the image
+                             */
+                            $photoHandle = fopen($photoPath, "w");
+                            fwrite($photoHandle, $binary);
+                            fclose($photoHandle);
+                        }
+
+                        return $photoPath;
+                    }
+                }
+
+                return false;
+            },
+            array($externalUserId, $isStudent, $isStaff),
+            $this->getCacheTime()
+        );
+
+        return $encoded;
     }
 
     /**
