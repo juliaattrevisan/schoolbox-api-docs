@@ -835,31 +835,43 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStaffUserAccountInfo()
     {
-        $staff = array();
+        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
+            "denbigh2.getStaffUserAccountInfo",
 
-        $api = new External_Denbigh2_Api('Staff', array());
+            function ($params) {
+                $staff = array();
 
-        if (!$api->hasErrors()) {
-            foreach($api->getResult()->data as $currentStaff) {
-                $staff[] = array(
-                    'StaffID' => $currentStaff->{'Staff Code'},
-                    'NetworkLogin' => '',
-                    'ActiveFlag' => '',
-                    'StaffTitle' => $currentStaff->{'Title'},
-                    'StaffPreferredName' => $currentStaff->{'First Name'},
-                    'StaffSurname' => $currentStaff->{'Surname'},
-                    'DefaultEmailCode' => '',
-                    'OccupEmail' => '',
-                    'Email' => $currentStaff->{'Email Address'},
-                    'StaffCampus' => $currentStaff->{'Campus'},
-                    'StaffCategoryType' => '',
-                    'StaffCategory' => '',
-                    'StaffDepartment' => '',
-                );
-            }
-        }
+                $api = new External_Denbigh2_Api('Staff', array());
 
-        return $staff;
+                if (!$api->hasErrors()) {
+                    if (count($api->getResult()->data)) {
+                        foreach($api->getResult()->data as $currentStaff) {
+                            $staff[] = array(
+                                'StaffID' => $currentStaff->{'Staff Code'},
+                                'NetworkLogin' => '',
+                                'ActiveFlag' => '',
+                                'StaffTitle' => $currentStaff->{'Title'},
+                                'StaffPreferredName' => $currentStaff->{'First Name'},
+                                'StaffSurname' => $currentStaff->{'Surname'},
+                                'DefaultEmailCode' => '',
+                                'OccupEmail' => '',
+                                'Email' => $currentStaff->{'Email Address'},
+                                'StaffCampus' => $currentStaff->{'Campus'},
+                                'StaffCategoryType' => '',
+                                'StaffCategory' => '',
+                                'StaffDepartment' => '',
+                            );
+                        }
+                    }
+                }
+
+                return json_encode($staff);
+            },
+            null,
+            $this->getCacheTime()
+        );
+
+        return json_decode($encoded);
     }
 
     /**
@@ -889,35 +901,47 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStaffContactListExtended()
     {
-        $staff = array();
+        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
+            "denbigh2.getStaffContactListExtended",
 
-        $api = new External_Denbigh2_Api('Staff', array());
+            function ($params) {
+                $staff = array();
 
-        if (!$api->hasErrors()) {
-            foreach($api->getResult()->data as $currentStaff) {
-                $staff[] = array(
-                    'StaffID' => $currentStaff->{'Staff Code'},
-                    'SchoolStaffCode' => '',
-                    'StaffTitle' => $currentStaff->{'Staff Title'},
-                    'StaffPreferredName' => $currentStaff->{'First Name'},
-                    'StaffSurname' => $currentStaff->{'Surname'},
-                    'StaffOccupPhone' => $currentStaff->{'Telephone'},
-                    'StaffOccupEmail' => $currentStaff->{'Email Address'},
-                    'StaffExtension' => $currentStaff->{'Telephone Extension'},
-                    'StaffCampusDescription' => $currentStaff->{'Campus'},
-                    'StaffCategory' => '',
-                    'StaffCategoryType' => '',
-                    'StaffDefaultMobilePhone' => '',
-                    'StaffVoiceMail' => '',
-                    'StaffDepartmentDescription' => '',
-                    'JobPositionDescription' => '',
-                    'StaffJobPositionStartDate' => '',
-                    'StaffJobPositionEndDate' => '',
-                );
-            }
-        }
+                $api = new External_Denbigh2_Api('Staff', array());
 
-        return $staff;
+                if (!$api->hasErrors()) {
+                    if (count($api->getResult()->data)) {
+                        foreach($api->getResult()->data as $currentStaff) {
+                            $staff[] = array(
+                                'StaffID' => $currentStaff->{'Staff Code'},
+                                'SchoolStaffCode' => '',
+                                'StaffTitle' => $currentStaff->{'Staff Title'},
+                                'StaffPreferredName' => $currentStaff->{'First Name'},
+                                'StaffSurname' => $currentStaff->{'Surname'},
+                                'StaffOccupPhone' => $currentStaff->{'Telephone'},
+                                'StaffOccupEmail' => $currentStaff->{'Email Address'},
+                                'StaffExtension' => $currentStaff->{'Telephone Extension'},
+                                'StaffCampusDescription' => $currentStaff->{'Campus'},
+                                'StaffCategory' => '',
+                                'StaffCategoryType' => '',
+                                'StaffDefaultMobilePhone' => '',
+                                'StaffVoiceMail' => '',
+                                'StaffDepartmentDescription' => '',
+                                'JobPositionDescription' => '',
+                                'StaffJobPositionStartDate' => '',
+                                'StaffJobPositionEndDate' => '',
+                            );
+                        }
+                    }
+                }
+
+                return json_encode($staff);
+            },
+            null,
+            $this->getCacheTime()
+        );
+
+        return json_decode($encoded);
     }
 
     /**
