@@ -81,6 +81,9 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
     $file->setHidden($_POST['hidden'] ? true : false);
     $file->setModified(Alaress_Date_Format::now());
 
+    // set copy source
+    $file->setTempFileLocation($file->getFileLocation());
+
     // this is the collection we'll be saving
     $collection = new \Schoolbox\Collection();
 
@@ -99,7 +102,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
     }
 
     try {
-        $affectedIds = FileMapper::getInstance()->save($collection);
+        $affectedIds = FileMapper::getInstance()->create($collection);
 
         /* For some reason this is necessary for upload indication to reach completed status */
         if ($_POST['uploadifydie'] == true) {

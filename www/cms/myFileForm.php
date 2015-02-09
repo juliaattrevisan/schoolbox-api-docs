@@ -75,7 +75,7 @@ if (isset($_POST['description'])) {
     $file->setParent(\Schoolbox\MyFolderMapper::getInstance()->createModel()->setId($_POST['parent']));
 
     try {
-        $affectedIds = MyFileMapper::getInstance()->save($file);
+        $affectedIds = MyFileMapper::getInstance()->create($file);
 
         /* If any checkboxes were selected, publish to eportfolio My Files components on various pages
          */
