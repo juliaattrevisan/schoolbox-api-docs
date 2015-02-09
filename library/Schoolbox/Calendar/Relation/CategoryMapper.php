@@ -103,9 +103,13 @@ class CategoryMapper extends Schoolbox\External\Mapper
     /**
      * This mapper doesn't raise notifications - the event mapper handles that.
      *
+     * @param object $object
+     * @param string $verb
+     * @param null   $previous
+     *
      * @return true
      */
-    protected function raiseNotification()
+    protected function raiseNotification($object, $verb, $previous = null)
     {
         return true;
     }
