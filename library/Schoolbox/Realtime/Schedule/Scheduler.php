@@ -276,14 +276,14 @@ class Scheduler extends StompScheduler
      *
      * @param TriggerInterface $trigger - the identifier passed as the first argument to Dispatcher::enqueue()
      * @param string           $command - the command that was executed by the Worker
-     * @param array            $data    - the data with which the Worker responded
+     * @param array            $data    - the data with which the Worker responded - array wrapping around (InstanceBundle or NULL, serialized)
      * @throws ScheduleException
      * @throws RuntimeException
      * @return void                       - this method does not return any value
      */
     public function handleResponse($trigger, $command, $data)
     {
-        $this->log->notice("Received worker response to handle: '$command' -> " . substr(json_encode($data), 0, 64) . "...");
+        $this->log->notice("Received worker response to handle: '$command'");
 
         // detach the trigger, which will ACK the message if that was the last trigger (even if it errors out)
         $this->detachTrigger($trigger);
@@ -294,6 +294,11 @@ class Scheduler extends StompScheduler
         // method not implemented or nothing to send, this is fine
         if (is_null($bundle)) {
             $this->log->debug("No messages to broadcast");
+            return;
+        }
+        // worker died midflight and nothing valid was returned
+        if ($bundle === false) {
+            $this->log->error("No messages to broadcast: worker did not complete execution");
             return;
         }
         // check that a bundle was returned
