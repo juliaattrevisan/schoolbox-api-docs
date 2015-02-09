@@ -68,55 +68,65 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStudent($externalUserId)
     {
-        $data = array();
+        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
+            "denbigh2.getStudent",
 
-        $api = new External_Denbigh2_Api('Students', array(
-            'Student ID' => $externalUserId,
-        ));
+            function ($params) {
+                $data = array();
 
-        if (!$api->hasErrors()) {
-            $result = $api->getResult()->data[0];
+                $api = new External_Denbigh2_Api('Students', array(
+                    'Student ID' => $params,
+                ));
 
-            $dobby = new \Alaress_Date_Format($result->{'Date of Birth'}, 'm/d/y');
+                if (!$api->hasErrors()) {
+                    $result = $api->getResult()->data[0];
 
-            $data = array(
-                'StudentID' => $result->{'Student ID'},
-                'StudentGiven1' => $result->{'Given Names'},
-                'StudentSurname' => $result->{'Surname'},
-                'StudentBirthDate' => $dobby->getUnixTimestamp(),
-                'StudentHouseDescription' => $result->{'House'},
-                'StudentHouse' => $result->{'House'},
-                'HeadOfHouseID' => '',
-                'StudentHeadOfHouse' => '',
-                'StudentBoarder' => '',
-                'StudentForm' => '',
-                'FormDescription' => '',
-                'StudentFormStaffName' => '',
-                'StudentTutor' => '',
-                'StudentTutorName' => '',
-                'StudentTutorDescription' => '',
-                'TeacherFormID' => '',
-                'TeacherTutorID' => '',
-                'StudentYearLevel' => $result->{'Academic Year'},
-                'YearLevelCoordID' => '',
-                'StudentYearLevelCoordinator' => '',
-                'StudentLockerBook' => '',
-                'StudentEmergencyName' => $result->{'Father'} . ' ' . $result->{'Father Surname'},
-                'StudentEmergencyPhone' => $result->{'Father Phone'},
-                'StudentEmergencyPhoneAlt' => '',
-                'StudentEmergency2Name' => $result->{'Mother'} . ' ' . $result->{'Mother Surname'},
-                'StudentEmergency2Phone' => $result->{'Mother Phone'},
-                'StudentEmergency2PhoneAlt' => '',
-                'StudentEmergency3Name' => '',
-                'StudentEmergency3Phone' => '',
-                'StudentEmergency3PhoneAlt' => '',
-                'StudentMedicalAlert' => $result->{'Medical Alert Label'},
-                'StudentSpecialNeedsFlag' => $result->{'Special Needs'},
-                'AlertMessage' => '',
-            );
-        }
+                    $dobby = new \Alaress_Date_Format($result->{'Date of Birth'}, 'm/d/y');
 
-        return $data;
+                    $data = array(
+                        'StudentID' => $result->{'Student ID'},
+                        'StudentGiven1' => $result->{'Given Names'},
+                        'StudentSurname' => $result->{'Surname'},
+                        'StudentBirthDate' => $dobby->getUnixTimestamp(),
+                        'StudentHouseDescription' => $result->{'House'},
+                        'StudentHouse' => $result->{'House'},
+                        'HeadOfHouseID' => '',
+                        'StudentHeadOfHouse' => '',
+                        'StudentBoarder' => '',
+                        'StudentForm' => '',
+                        'FormDescription' => '',
+                        'StudentFormStaffName' => '',
+                        'StudentTutor' => '',
+                        'StudentTutorName' => '',
+                        'StudentTutorDescription' => '',
+                        'TeacherFormID' => '',
+                        'TeacherTutorID' => '',
+                        'StudentYearLevel' => $result->{'Academic Year'},
+                        'YearLevelCoordID' => '',
+                        'StudentYearLevelCoordinator' => '',
+                        'StudentLockerBook' => '',
+                        'StudentEmergencyName' => $result->{'Father'} . ' ' . $result->{'Father Surname'},
+                        'StudentEmergencyPhone' => $result->{'Father Phone'},
+                        'StudentEmergencyPhoneAlt' => '',
+                        'StudentEmergency2Name' => $result->{'Mother'} . ' ' . $result->{'Mother Surname'},
+                        'StudentEmergency2Phone' => $result->{'Mother Phone'},
+                        'StudentEmergency2PhoneAlt' => '',
+                        'StudentEmergency3Name' => '',
+                        'StudentEmergency3Phone' => '',
+                        'StudentEmergency3PhoneAlt' => '',
+                        'StudentMedicalAlert' => $result->{'Medical Alert Label'},
+                        'StudentSpecialNeedsFlag' => $result->{'Special Needs'},
+                        'AlertMessage' => '',
+                    );
+                }
+
+                return json_encode($data);
+            },
+            $externalUserId,
+            60*60*2
+        );
+
+        return json_decode($encoded);
     }
 
     /**
