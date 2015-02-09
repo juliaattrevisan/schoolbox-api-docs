@@ -9,6 +9,14 @@
  */
 
 class External_Denbigh2_Class implements External_ClassInterface {
+
+    /**
+     * Redis cache duration
+     *
+     * @var int
+     */
+    private $cacheTime = 7200;
+
     /**
      * Get a list of students in a particular $classCode
      *
@@ -26,46 +34,60 @@ class External_Denbigh2_Class implements External_ClassInterface {
      */
     public function getStudents($classCode)
     {
-        $students = array();
+        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
+            "denbigh2.getStudents",
 
-        $api = new External_Denbigh2_Api('Enrolments', array(
-            'Class' => $classCode
-        ));
+            function ($params) {
+                $students = array();
 
-        if (!$api->hasErrors()) {
-            $allStudents = $api->getResult()->data;
-
-            foreach ($allStudents as $currentStudent) {
-
-                /* Find out more about each student
-                 */
-                $api = new External_Denbigh2_Api('Students', array(
-                    'Student ID' => $currentStudent->{'Student ID'}
+                $api = new External_Denbigh2_Api('Enrolments', array(
+                    'Class' => $params
                 ));
 
                 if (!$api->hasErrors()) {
-                    $allStudentData = $api->getResult()->data;
+                    $allStudents = $api->getResult()->data;
 
-                    foreach ($allStudentData as $currentStudentData) {
+                    if (count($allStudents)) {
+                        foreach ($allStudents as $currentStudent) {
 
-                        // TODO: No campus for classes?
+                            /* Find out more about each student
+                             */
+                            $api = new External_Denbigh2_Api('Students', array(
+                                'Student ID' => $currentStudent->{'Student ID'}
+                            ));
 
-                        $students[] = array(
-                            'lastname' => $currentStudentData->{'Surname'},
-                            'firstname' => $currentStudentData->{'Preferred Name'},
-                            'yearlevel' => $currentStudentData->{'Academic Year'},
-                            'house' => $currentStudentData->{'House'},
-                            'StudentMedicalAlert' => $currentStudentData->{'Medical Alert Label'},
-                            'StudentSpecialNeedsFlag' => $currentStudentData->{'Special Needs'},
-                            'synergy_id' => $currentStudentData->{'Student ID'},
-                            'ClassCampus' => ''
-                        );
+                            if (!$api->hasErrors()) {
+                                $allStudentData = $api->getResult()->data;
+
+                                if (count($allStudentData)) {
+                                    foreach ($allStudentData as $currentStudentData) {
+
+                                        // TODO: No campus for classes?
+
+                                        $students[] = array(
+                                            'lastname' => $currentStudentData->{'Surname'},
+                                            'firstname' => $currentStudentData->{'Preferred Name'},
+                                            'yearlevel' => $currentStudentData->{'Academic Year'},
+                                            'house' => $currentStudentData->{'House'},
+                                            'StudentMedicalAlert' => $currentStudentData->{'Medical Alert Label'},
+                                            'StudentSpecialNeedsFlag' => $currentStudentData->{'Special Needs'},
+                                            'synergy_id' => $currentStudentData->{'Student ID'},
+                                            'ClassCampus' => ''
+                                        );
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
-            }
-        }
 
-        return $students;
+                return json_encode($students);
+            },
+            $classCode,
+            $this->getCacheTime()
+        );
+
+        return json_decode($encoded);
     }
 
     /**
@@ -94,5 +116,28 @@ class External_Denbigh2_Class implements External_ClassInterface {
         }
 
         return $ids;
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Set cache time
+     *
+     * @param int $cacheTime
+     */
+    private function setCacheTime($cacheTime)
+    {
+        $this->cacheTime = $cacheTime;
+    }
+
+    /**
+     * Get cache time
+     *
+     * @return int
+     */
+    private function getCacheTime()
+    {
+        return $this->cacheTime;
     }
 }
