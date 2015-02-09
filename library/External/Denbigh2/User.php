@@ -433,13 +433,13 @@ class External_Denbigh2_User implements External_UserInterface
                     }
                 }
 
-                return json_encode($allStudents);
+                return serialize($allStudents);
             },
             null,
             $this->getCacheTime()
         );
 
-        return json_decode($encoded);
+        return unserialize($encoded);
     }
 
     /**
@@ -480,13 +480,13 @@ class External_Denbigh2_User implements External_UserInterface
                         }
                     }
 
-                    return json_encode($allEmails);
+                    return serialize($allEmails);
                 },
                 $synergyIds,
                 $this->getCacheTime()
             );
 
-            return json_decode($encoded);
+            return unserialize($encoded);
         }
 
         return $allEmails;
@@ -557,13 +557,13 @@ class External_Denbigh2_User implements External_UserInterface
                     );
                 }
 
-                return json_encode($parent);
+                return serialize($parent);
             },
             $externalUserId,
             $this->getCacheTime()
         );
 
-        return json_decode($encoded);
+        return unserialize($encoded);
     }
 
     /**
@@ -638,13 +638,13 @@ class External_Denbigh2_User implements External_UserInterface
                         }
                     }
 
-                    return json_encode($params);
+                    return serialize($params);
                 },
                 $externalUserId,
                 $this->getCacheTime()
             );
 
-            return json_decode($encoded);
+            return unserialize($encoded);
 
         }
         else {
@@ -673,13 +673,13 @@ class External_Denbigh2_User implements External_UserInterface
                         );
                     }
 
-                    return json_encode($parent);
+                    return serialize($parent);
                 },
                 $externalUserId,
                 $this->getCacheTime()
             );
 
-            return json_decode($encoded);
+            return unserialize($encoded);
         }
     }
 
@@ -748,13 +748,13 @@ class External_Denbigh2_User implements External_UserInterface
                     }
                 }
 
-                return json_encode($allParents);
+                return serialize($allParents);
             },
             null,
             $this->getCacheTime()
         );
 
-        return json_decode($encoded);
+        return unserialize($encoded);
     }
 
     /**
@@ -801,13 +801,13 @@ class External_Denbigh2_User implements External_UserInterface
                     );
                 }
 
-                return json_encode($staff);
+                return serialize($staff);
             },
             $externalUserId,
             $this->getCacheTime()
         );
 
-        return json_decode($encoded);
+        return unserialize($encoded);
     }
 
     /**
@@ -865,13 +865,13 @@ class External_Denbigh2_User implements External_UserInterface
                     }
                 }
 
-                return json_encode($staff);
+                return serialize($staff);
             },
             null,
             $this->getCacheTime()
         );
 
-        return json_decode($encoded);
+        return unserialize($encoded);
     }
 
     /**
@@ -935,13 +935,13 @@ class External_Denbigh2_User implements External_UserInterface
                     }
                 }
 
-                return json_encode($staff);
+                return serialize($staff);
             },
             null,
             $this->getCacheTime()
         );
 
-        return json_decode($encoded);
+        return unserialize($encoded);
     }
 
     /**
@@ -1029,13 +1029,13 @@ class External_Denbigh2_User implements External_UserInterface
                         }
                     }
 
-                    return json_encode($class);
+                    return serialize($class);
                 },
                 $externalUserId,
                 $this->getCacheTime()
             );
 
-            return json_decode($encoded);
+            return unserialize($encoded);
         }
         else if ($this->getGroupHandler()->isStaff($userId)) {
             $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
@@ -1080,13 +1080,13 @@ class External_Denbigh2_User implements External_UserInterface
                         $class = array_values($stack);
                     }
 
-                    return json_encode($class);
+                    return serialize($class);
                 },
                 $externalUserId,
                 $this->getCacheTime()
             );
 
-            return json_decode($encoded);
+            return unserialize($encoded);
         }
     }
 
@@ -1123,13 +1123,13 @@ class External_Denbigh2_User implements External_UserInterface
                     }
                 }
 
-                return json_encode($ids);
+                return serialize($ids);
             },
             $externalUserId,
             $this->getCacheTime()
         );
 
-        return json_decode($encoded);
+        return unserialize($encoded);
     }
 
     /**
@@ -1173,7 +1173,7 @@ class External_Denbigh2_User implements External_UserInterface
             $this->getCacheTime()
         );
 
-        return json_decode($encoded);
+        return $encoded;
     }
 
     /**

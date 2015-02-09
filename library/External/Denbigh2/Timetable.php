@@ -280,13 +280,13 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
                         }
                     }
 
-                    return json_encode($timetable);
+                    return serialize($timetable);
                 },
                 array($externalUserId, $dayNumber, $timetable, $definition),
                 $this->getCacheTime()
             );
 
-            return json_decode($encoded);
+            return unserialize($encoded);
         }
         elseif ($this->getGroupHandler()->isStaff($userId)) {
             $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
@@ -345,13 +345,13 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
                         }
                     }
 
-                    return json_encode($timetable);
+                    return serialize($timetable);
                 },
                 array($externalUserId, $dayNumber, $timetable, $definition),
                 $this->getCacheTime()
             );
 
-            return json_decode($encoded);
+            return unserialize($encoded);
         }
 
         return '';

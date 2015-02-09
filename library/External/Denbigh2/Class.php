@@ -81,13 +81,13 @@ class External_Denbigh2_Class implements External_ClassInterface {
                     }
                 }
 
-                return json_encode($students);
+                return serialize($students);
             },
             $classCode,
             $this->getCacheTime()
         );
 
-        return json_decode($encoded);
+        return unserialize($encoded);
     }
 
     /**
@@ -121,13 +121,13 @@ class External_Denbigh2_Class implements External_ClassInterface {
                     }
                 }
 
-                return json_encode($ids);
+                return serialize($ids);
             },
             $classCode,
             $this->getCacheTime()
         );
 
-        return json_decode($encoded);
+        return unserialize($encoded);
     }
 
     /* Getters/Setters
