@@ -474,6 +474,24 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             }
 
         }
+        else if ($site_location=='loyola') {
+            $settings = array(
+                'baseUri' => 'http://lcapache.loyola.local:8080/',
+                'userName' => "loyola/" . $_SESSION['username'],
+                'password' => $_SESSION['password'],
+            );
+            if ($groupHandler->isStaff()) {
+                $paths = array(
+                    $settings['baseUri'].'Staff Home/' . $_SESSION['username'] . '/',
+                );
+            } else if ($groupHandler->isStudent()) {
+                $paths = array(
+                    $settings['baseUri'].'Student Home/' . $_SESSION['username'] . '/',
+                );
+            } else {
+                return false;
+            }
+        }
         else if ($site_location=='meriden') {
             $settings = array(
                 'baseUri' => 'http://webdav.meriden.nsw.edu.au/',
