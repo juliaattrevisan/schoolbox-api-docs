@@ -109,21 +109,31 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
     /**
      * @param int $campusId
-     * @param int $date
+     * @param int $time
      * @return bool|string
      */
-    public function getDayNumber($campusId, $date = 0)
+    public function getDayNumber($campusId, $time = 0)
     {
+        $stmt = $this->getDatabase()->prepare('
+            SELECT "DAY"
+            FROM db2inst1.schoolbox_timetable_days
+            WHERE "DATE" = :date
+            AND "CAMPUS" = :campus
+            FETCH FIRST 1 ROW ONLY
+        ');
 
-        if (!$date) {
-            $date = time();
+        $params = array(
+            'date'   => date('Y-m-d', $time ?: time()),
+            'campus' => $this->getCampusCode($campusId),
+        );
+
+        $stmt->execute($params);
+
+        if ($row = $stmt->fetch(DB2::FETCH_ASSOC)) {
+            return $row['DAY'];
         }
 
-        // if it's the weekend
-        if (in_array($day_number = date('w', $date), array(0, 6))) {
-            return false;
-        }
-        return $day_number;
+        return false;
     }
 
     /**
