@@ -48,7 +48,7 @@ mv -f $fullpath/init/upstart-rerouted.conf $fullpath/init/$1-rerouted.conf;
 #mv -f $fullpath/init/upstart-belld.conf $fullpath/init/$1-belld.conf;
 mv -f $fullpath/init/upstart-belld.conf $fullpath/$1-belld.conf;
 mv -f $fullpath/init/$1-upstart-socketd.override $fullpath/init/$1-socketd.override;
-rm -vf `$fullpath/init/$cronjob-upstart-socketd.override`;
+rm -vf `readlink -f $fullpath/init/$cronjob-upstart-socketd.override`;
 rm -f $fullpath/init/upstart*.override;
 
 rm -vf `readlink -f $fullpath/cron/$cronjob`;
