@@ -9,7 +9,6 @@
 
 namespace Schoolbox;
 
-use Alaress\Async\Notification\LoggerInterface;
 use Database;
 use PDO;
 use Schoolbox\Column\Factory as ColumnFactory;
@@ -18,6 +17,7 @@ use Schoolbox\Column\IFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\NotifInterface;
 use Schoolbox\Realtime\Schedule\Event;
 use Serializable;
 
@@ -153,7 +153,7 @@ class Mapper implements Serializable
     /**
      * Notifier
      *
-     * @var Notif
+     * @var NotifInterface
      */
     protected $notif;
 
@@ -283,7 +283,7 @@ class Mapper implements Serializable
     }
 
     /**
-     * @param LoggerInterface $notif
+     * @param NotifInterface $notif
      */
     public function setNotifier($notif)
     {
@@ -291,12 +291,12 @@ class Mapper implements Serializable
     }
 
     /**
-     * @return LoggerInterface
+     * @return NotifInterface
      */
     public function getNotifier()
     {
         // load on demand, so that we don't get infinite loops
-        if (!$this->notif instanceof LoggerInterface) {
+        if (!$this->notif instanceof NotifInterface) {
             $this->setNotifier(new Notif(Notif::TOPIC_APPLICATION, $this->getConfigLoader()));
         }
         return $this->notif;
@@ -2095,23 +2095,32 @@ class Mapper implements Serializable
      * Compares two objects mapped by this mapper and returns an array of the differences between.
      * Does not traverse hydrations - it explicitly dehydrates and compares ID values only.
      *
+     * If $objectB is not supplied, diff will attempt to compare to the version of the object
+     * currently stored in the database
+     *
      * @param object $objectA
      * @param object $objectB
      *
      * @throws Mapper\Exception
      * @return array
      */
-    public function diff($objectA, $objectB)
+    public function diff($objectA, $objectB = null)
     {
         $a = trim(get_class($objectA), '\\');
-        $b = trim(get_class($objectB), '\\');
         $c = trim($this->getModel(), '\\');
-        if ($a != $b) {
-            throw new Exception("Cannot diff objects of different classes: '$a' != '$b'.");
-        }
         if ($a != $c) {
             throw new Exception("Cannot diff objects from another mapper: require '$c', got '$a'.");
         }
+        if ($objectB) {
+            $b = trim(get_class($objectB), '\\');
+            if ($a != $b) {
+                throw new Exception("Cannot diff objects of different classes: '$a' != '$b'.");
+            }
+        } else {
+            // retrieve current DB version
+            $objectB = $this->findById($this->getModelProperty($objectA, $this->identifier['property']));
+        }
+
         $diff = array();
         foreach ($this->getMap() as $mapping) {
             $property = $mapping['property'];

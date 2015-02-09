@@ -9,7 +9,8 @@
  */
 
 namespace Schoolbox\Calendar;
-
+use Alaress_Date_Format;
+use PDO;
 use Schoolbox;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
@@ -576,6 +577,47 @@ class EventMapper extends Schoolbox\External\Mapper
             $allEvents->add($event);
         }
 
-        return $allEvents;
+		return $allEvents;
+	}
+
+
+    /**
+     * @param int $seriesId
+     * @param Alaress_Date_Format $now
+     * @throws \Schoolbox\Mapper\Exception
+     * @return Event
+     */
+    public function findNextInSeries($seriesId, Alaress_Date_Format $now = null)
+    {
+        $now = $now ?: Alaress_Date_Format::now();
+
+        $stmt = $this->getDatabase()->prepare("
+            SELECT {$this->getColumnString('e')}
+            FROM `{$this->getTable()}` e
+            WHERE startDate >= :now
+            AND series_id = :sid
+            ORDER BY startDate ASC
+            LIMIT 0, 1
+        ");
+
+        $stmt->execute(array(
+            'sid' => $seriesId,
+            'now' => $now->getDatabaseDate()
+        ));
+
+        if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            return $this->hydrate($row, 'e');
+        }
+
+        // no future events for this series ID? go to the last one
+        $series = $this->findByColumn('series_id', $seriesId, array(
+            'order' => array('startDate' => 'DESC')
+        ));
+
+        if (!$series->count()) {
+            throw new \Schoolbox\Mapper\Exception("No events in given series");
+        }
+
+        return $series->first();
     }
 }

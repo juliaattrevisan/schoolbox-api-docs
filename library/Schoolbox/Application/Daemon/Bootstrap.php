@@ -133,6 +133,9 @@ class Bootstrap implements BootstrapInterface {
 		// Configuration
 		$di->set('config', $di->lazyNew('Schoolbox\\Config\\ConfigMapper'));
 
+        // Set correct timezone
+        date_default_timezone_set($di->get('config')->get('date_timezone'));
+
 		require_once 'conf/modules/ModuleConfigInterface.php';
 
 		// Initialise module configuration
@@ -148,9 +151,6 @@ class Bootstrap implements BootstrapInterface {
 				$obj->configure($this->kernel);
 			}
 		}
-
-		// Set correct timezone
-		date_default_timezone_set($di->get('config')->get('date_timezone'));
 
 	}
 

@@ -646,6 +646,11 @@ class Event
         return $this->seriesId;
     }
 
+    public function inSeries()
+    {
+        return !!$this->seriesId;
+    }
+
     /**
      * Set start datetime
      *

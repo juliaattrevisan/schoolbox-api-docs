@@ -97,8 +97,8 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
      */
     public function scheduleNotification($trigger)
     {
-        if ($trigger instanceof CancelTrigger) {
-            $this->log->info("Unscheduling CancelTrigger");
+        if ($trigger instanceof CancelTrigger || $trigger->getTimestamp() < 0) {
+            $this->log->info($trigger instanceof CancelTrigger ? "Unscheduling CancelTrigger" : "Unscheduling negative Trigger");
             $this->unschedule($trigger);
             return;
         }

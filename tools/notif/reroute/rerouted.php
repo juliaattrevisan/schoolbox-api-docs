@@ -119,6 +119,8 @@ $kernel->run(function($di, $loop, $log, $opts) use (&$rerouter) {
 
             if ($opts['bind']) {
                 $rerouter->onHangup();
+            } else {
+                $rerouter->onResume();
             }
         });
 

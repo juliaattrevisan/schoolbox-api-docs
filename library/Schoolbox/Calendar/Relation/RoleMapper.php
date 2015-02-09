@@ -60,4 +60,19 @@ class RoleMapper extends Schoolbox\External\Mapper
         $statement->bindValue(':identifierValue', $event->getId());
         $statement->execute();
     }
+
+
+    /**
+     * No notifications for this model
+     *
+     * @param object $object
+     * @param string $verb
+     * @param null   $previous
+     * @return bool
+     */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        return true;
+    }
+
 }
