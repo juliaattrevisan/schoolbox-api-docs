@@ -709,40 +709,50 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getParentUserAccountInfo()
     {
-        $allParents = array();
+        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
+            "denbigh2.getParentUserAccountInfo",
 
-        $api = new External_Denbigh2_Api('Students', array());
+            function ($params) {
+                $allParents = array();
 
-        if (!$api->hasErrors()) {
-            $allStudents = $api->getResult()->data;
+                $api = new External_Denbigh2_Api('Students', array());
 
-            foreach($allStudents as $currentStudent) {
-                // TODO: Parents have no networkLogin equivalent?
-                // TODO: Parents have no unique id?
+                if (!$api->hasErrors()) {
+                    $allStudents = $api->getResult()->data;
 
-                $parent = array(
-                    'StudentContactNetworkLogin' => '',
-                    'StudentContactID' => '',
-                    'StudentContactTitle' => $currentStudent->{'Father Title'},
-                    'StudentContactPreferred' => $currentStudent->{'Father'},
-                    'StudentContactSurname' => $currentStudent->{'Father Surname'},
-                    'StudentContactDefaultEmail' => $currentStudent->{'email Father'},
-                    'StudentContactSpouseNetworkLogin' => '',
-                    'StudentContactSpouseID' => '',
-                    'StudentContactSpouseTitle' => $currentStudent->{'Mother Title'},
-                    'StudentContactSpousePreferred' => $currentStudent->{'Mother'},
-                    'StudentContactSpouseSurname' => $currentStudent->{'Mother Surname'},
-                    'StudentContactSpouseDefaultEmail' => $currentStudent->{'email Mother'},
-                    'StudentYearLevel' => $currentStudent->{'Academic Year'},
-                    'StudentCampus' => $currentStudent->{'Campus'},
-                    'StudentGender' => $currentStudent->{'Gender'},
-                );
+                    foreach($allStudents as $currentStudent) {
+                        // TODO: Parents have no networkLogin equivalent?
+                        // TODO: Parents have no unique id?
 
-                $allParents[] = $parent;
-            }
-        }
+                        $parent = array(
+                            'StudentContactNetworkLogin' => '',
+                            'StudentContactID' => '',
+                            'StudentContactTitle' => $currentStudent->{'Father Title'},
+                            'StudentContactPreferred' => $currentStudent->{'Father'},
+                            'StudentContactSurname' => $currentStudent->{'Father Surname'},
+                            'StudentContactDefaultEmail' => $currentStudent->{'email Father'},
+                            'StudentContactSpouseNetworkLogin' => '',
+                            'StudentContactSpouseID' => '',
+                            'StudentContactSpouseTitle' => $currentStudent->{'Mother Title'},
+                            'StudentContactSpousePreferred' => $currentStudent->{'Mother'},
+                            'StudentContactSpouseSurname' => $currentStudent->{'Mother Surname'},
+                            'StudentContactSpouseDefaultEmail' => $currentStudent->{'email Mother'},
+                            'StudentYearLevel' => $currentStudent->{'Academic Year'},
+                            'StudentCampus' => $currentStudent->{'Campus'},
+                            'StudentGender' => $currentStudent->{'Gender'},
+                        );
 
-        return $allParents;
+                        $allParents[] = $parent;
+                    }
+                }
+
+                return json_encode($allParents);
+            },
+            null,
+            $this->getCacheTime()
+        );
+
+        return json_decode($encoded);
     }
 
     /**
