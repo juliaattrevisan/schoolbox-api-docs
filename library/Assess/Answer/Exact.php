@@ -9,37 +9,56 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-class Assess_Answer_Exact extends Evaluation_Answer_Exact {
+class Assess_Answer_Exact extends Evaluation_Answer_Exact
+{
 
-	/**
-	 * Setup
-	 */
-	protected function setup() {
-		$this->setResponseHandler(new Assess_Response());
-	}
+    /**
+    * Setup
+    */
+    protected function setup()
+    {
+        $this->setResponseHandler(new Assess_Response());
+    }
 
-	/**
-	 * Automatically marks a response. Customised to be applicable to the way in
-	 * which the response is actually stored.
-	 *
-	 * @param  $currentResponse
-	 * @return void
-	 */
-	public function mark($currentResponse) {
-		if ($currentResponse['response'] == $currentResponse['answer']) {
-			$totalMarks = $currentResponse['marks'];
-		}
-		else {
-			$totalMarks = 0;
-		}
+    /**
+    * Normalizes response and answer for comparison - replaces all spaces,
+    * and converts to lower case.
+    *
+    * @param string $response
+    *
+    * @return string
+    */
+    protected function normalizeForComparison($response)
+    {
+        return mb_strtolower(trim(preg_replace('/\\s+/', ' ', $response)), 'UTF-8');
+    }
 
-		/* Total marks for this question
-		 */
-		$marks = array(
-			'response_id' => $currentResponse['response_id'],
-			'mark' => $totalMarks,
-		);
+    /**
+    * Automatically marks a response. Customised to be applicable to the way in
+    * which the response is actually stored.
+    *
+    * @param  $currentResponse
+    * @return void
+    */
+    public function mark($currentResponse)
+    {
+        // Normalize both response and answer for comparison
+        if (
+            $this->normalizeForComparison($currentResponse['response'])
+            === $this->normalizeForComparison($currentResponse['answer'])
+        ) {
+            $totalMarks = $currentResponse['marks'];
+        } else {
+            $totalMarks = 0;
+        }
 
-		$this->getResponseHandler()->update($marks);
-	}
+        /* Total marks for this question
+         */
+        $marks = array(
+            'response_id' => $currentResponse['response_id'],
+            'mark' => $totalMarks,
+        );
+
+        $this->getResponseHandler()->update($marks);
+    }
 }
