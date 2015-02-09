@@ -108,29 +108,31 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_LOCATION'       => $event->getLocation(),
             'EVENT_DETAIL'         => $event->getDetail(),
             'EVENT_REDIRECT'       => $event->setupRedirect(
-                    $_GET['returnTo'],
-                    $event->getStartDateTime()->getUsingFormat('d-m-Y'),
-                    $_GET['homepageId'],
-                    $_GET['userId']
-                ),
+                $_GET['returnTo'],
+                $event->getStartDateTime()->getUsingFormat('d-m-Y'),
+                $_GET['homepageId'],
+                $_GET['userId']
+            ),
         )
     );
 
     /* Recurrence
      */
     // Is there a recurrence? If so don't show the repeat selector.
-    if ($event->getSeriesId() == null) {
-        $page->setVar('recurring_reminder_block', '');
-        $page->parse('recurring_dates_block', 'recurring_dates');
-    } else {
+    $recurrence = array();
+    if ($event->getSeriesId()) {
         $eventRecurrenceMapper = new \Schoolbox\Calendar\EventRecurrenceMapper($mapper);
         $recurrence            = $eventRecurrenceMapper->getSeriesRecurrence($event);
-
+    }
+    if (!empty($recurrence)) {
         $page->setVar('EVENT_REC_FREQ', ucfirst($recurrence['freq']));
         $page->setVar('EVENT_REC_START', $recurrence['start']->getLongDateOnly());
         $page->setVar('EVENT_REC_END', $recurrence['end']->getLongDateOnly());
         $page->parse('recurring_reminder_block', 'recurring_reminder');
         $page->setVar('recurring_dates_block', '');
+    } else {
+        $page->setVar('recurring_reminder_block', '');
+        $page->parse('recurring_dates_block', 'recurring_dates');
     }
 } else {
     /* Create new event
@@ -196,11 +198,11 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_LOCATION'       => '',
             'EVENT_DETAIL'         => '',
             'EVENT_REDIRECT'       => $event->setupRedirect(
-                    $_GET['returnTo'],
-                    $event->getStartDateTime()->getUsingFormat('d-m-Y'),
-                    $_GET['homepageId'],
-                    $_GET['userId']
-                ),
+                $_GET['returnTo'],
+                $event->getStartDateTime()->getUsingFormat('d-m-Y'),
+                $_GET['homepageId'],
+                $_GET['userId']
+            ),
         )
     );
 

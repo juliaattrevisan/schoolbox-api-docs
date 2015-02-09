@@ -52,6 +52,9 @@ class EventRecurrenceMapper
     public function getSeriesRecurrence($event)
     {
         $series = $this->getEventMapper()->getAllInSeries($event);
+        if (count($series) >= 1) {
+            return array();
+        }
 
         $dateFirst = new Alaress_Date_Format($series->first()->getStartDate(), 'y-m-d');
         $dateNext  = new Alaress_Date_Format($series->next()->current()->getStartDate(), 'y-m-d');
@@ -108,8 +111,7 @@ class EventRecurrenceMapper
         /* Modify an existing event
          */
         if (is_numeric($event->getId())) {
-
-            /* Update details of an already-existing set of recurring event incidents
+/* Update details of an already-existing set of recurring event incidents
              * (Change details of each instance of a recurring event, for example)
              */
             if ($efficacy == 'series') {
@@ -142,8 +144,7 @@ class EventRecurrenceMapper
 			 */
             else {
                 if ($efficacy == 'self') {
-
-                    // If there's any recurrence: update first only, and create the
+// If there's any recurrence: update first only, and create the
                     // rest from scratch.
                     $first_date_set = $eventRecurrence->getDateCollection()->first();
 
