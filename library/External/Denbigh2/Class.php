@@ -99,23 +99,35 @@ class External_Denbigh2_Class implements External_ClassInterface {
      */
     public function getTeacherName($classCode)
     {
-        $ids = array();
+        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
+            "denbigh2.getTeacherName",
 
-        $api = new External_Denbigh2_Api('Classes', array(
-            'Class' => $classCode
-        ));
+            function ($params) {
+                $ids = array();
 
-        if (!$api->hasErrors()) {
-            $allClasses = $api->getResult()->data;
+                $api = new External_Denbigh2_Api('Classes', array(
+                    'Class' => $params
+                ));
 
-            foreach ($allClasses as $currentClass) {
-                if ($currentClass->{'Class'} == $classCode) {
-                    $ids[] = $currentClass->{'Teacher Code'};
+                if (!$api->hasErrors()) {
+                    $allClasses = $api->getResult()->data;
+
+                    if (count($allClasses)) {
+                        foreach ($allClasses as $currentClass) {
+                            if ($currentClass->{'Class'} == $params) {
+                                $ids[] = $currentClass->{'Teacher Code'};
+                            }
+                        }
+                    }
                 }
-            }
-        }
 
-        return $ids;
+                return json_encode($ids);
+            },
+            $classCode,
+            $this->getCacheTime()
+        );
+
+        return json_decode($encoded);
     }
 
     /* Getters/Setters
