@@ -19,6 +19,7 @@ namespace Schoolbox\ResourceBooking\Booking;
 use Aura\Router\Router;
 use Monolog\Logger;
 use Schoolbox\Calendar\Event;
+use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Permission\Access\UserAccess;
@@ -125,9 +126,24 @@ class Notifier extends AbstractModuleNotifier
         $messenger = new Messenger();
 
         // Hydrate event owner
+        /** @var EventMapper $eventMapper */
         /** @var Event $calendarEvent */
         $eventMapper    = $this->mapper->getJoinMapper('event');
         $calendarEvent  = $eventMapper->findById($object->getEvent()->getId());
+        $seriesId       = $calendarEvent->getSeriesId();
+        if ($seriesId) {
+            // Only create a notice for the next in series
+            try {
+                $next = $eventMapper->findNextInSeries($seriesId);
+                if ($next->getId() != $calendarEvent->getId()) {
+                    // Not the next in series: raise no notification
+                    return $messenger;
+                }
+            } catch (\Exception $e) {
+                return $messenger;
+            }
+        }
+
         $owner          = $eventMapper->getJoinMapper('owner')->findById($calendarEvent->getOwner()->getId());
         $key            = $this->slug . '.' . $object->getId() . '.' . $event;
         $level          = Logger::NOTICE;
