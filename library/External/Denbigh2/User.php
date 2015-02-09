@@ -454,23 +454,39 @@ class External_Denbigh2_User implements External_UserInterface
         $allEmails = array();
 
         if (count($synergyIds)) {
-            foreach($synergyIds as $currentExternalId) {
-                $api = new External_Denbigh2_Api('Students', array(
-                    'Student ID' => $currentExternalId,
-                ));
+            $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
+                "denbigh2.getParentEmails",
 
-                if (!$api->hasErrors()) {
-                    $currentStudent = $api->getResult()->data[0];
+                function ($params) {
+                    $allEmails = array();
 
-                    if (strlen(trim($currentStudent->{'email Father'}))) {
-                        $allEmails[] = $currentStudent->{'email Father'};
+                    if (is_array($params) && count($params)) {
+                        foreach($params as $currentExternalId) {
+                            $api = new External_Denbigh2_Api('Students', array(
+                                'Student ID' => $currentExternalId,
+                            ));
+
+                            if (!$api->hasErrors()) {
+                                $currentStudent = $api->getResult()->data[0];
+
+                                if (strlen(trim($currentStudent->{'email Father'}))) {
+                                    $allEmails[] = $currentStudent->{'email Father'};
+                                }
+
+                                if (strlen(trim($currentStudent->{'email Mother'}))) {
+                                    $allEmails[] = $currentStudent->{'email Mother'};
+                                }
+                            }
+                        }
                     }
 
-                    if (strlen(trim($currentStudent->{'email Mother'}))) {
-                        $allEmails[] = $currentStudent->{'email Mother'};
-                    }
-                }
-            }
+                    return json_encode($allEmails);
+                },
+                $synergyIds,
+                $this->getCacheTime()
+            );
+
+            return json_decode($encoded);
         }
 
         return $allEmails;
