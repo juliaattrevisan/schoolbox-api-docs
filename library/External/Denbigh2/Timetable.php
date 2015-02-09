@@ -106,13 +106,13 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
                 $timetableDef['periodCount'] = $maxPeriodsPerDay;
                 $timetableDef['dayCount'] = $maxDays;
 
-                return json_encode($timetableDef);
+                return serialize($timetableDef);
             },
             array($maxPeriodsPerDay, $maxDays, $day),
             $this->getCacheTime()
         );
 
-        return json_decode($encoded);
+        return unserialize($encoded);
     }
 
     /**
@@ -224,105 +224,137 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
         /* Api connect
          */
         if ($this->getGroupHandler()->isStudent($userId)) {
-            $api = new External_Denbigh2_Api('StudentTimetable', array(
-                'Student ID' => $externalUserId
-            ));
+            $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
+                "denbigh2.getDayTimetable",
 
-            if (!$api->hasErrors()) {
+                function ($params) {
+                    list($externalUserId, $dayNumber, $timetable, $definition) = $params;
 
-                /* Data collectors
-                 */
-                $allPeriods = $api->getResult()->data;
+                    $api = new External_Denbigh2_Api('StudentTimetable', array(
+                        'Student ID' => $externalUserId
+                    ));
 
-                foreach($allPeriods as $currentPeriod) {
-                    if (!$dayNumber || $currentPeriod->{'Day Number'} == $dayNumber) {
+                    if (!$api->hasErrors()) {
 
-                        /* You dumdums put the teacher's name concatted with the
-                         * subject name >.< So instead of booming it and using the
-                         * first shrapnel I'm just going to strreplace it out, so
-                         * this will work even if they change their format to
-                         * some other ridiculous thing
+                        /* Data collectors
                          */
-                        $className = trim(str_replace($currentPeriod->{'Teacher'}, '', $currentPeriod->{'TT Description'}));
+                        $allPeriods = $api->getResult()->data;
 
-                        /* wtf
-                         * ...or I could preg_match it out of 1/3/0001, wherever that came from
-                         */
-                        $periodNumber = str_replace('Period', '', $currentPeriod->{'Period Name'});
+                        if (count($allPeriods)) {
+                            foreach($allPeriods as $currentPeriod) {
+                                if (!$dayNumber || $currentPeriod->{'Day Number'} == $dayNumber) {
 
-                        $timetable[$periodNumber-1] = array(
-                            'periodName' => $currentPeriod->{'Period Name'},
-                            'periodStart' =>  $definition['start'][$periodNumber-1],
-                            'periodEnd' => $definition['end'][$periodNumber-1],
-                            'periodNumber' => $periodNumber,
-                            'periodSequence' => 1,
-                            'class' => array(
-                                array(
-                                    'description' => $className,
-                                    'code' => $currentPeriod->{'ClassCode'},
-                                    'room' => $currentPeriod->{'Room'},
-                                    'staffID' => $currentPeriod->{'TeacherCode'},
-                                    'staffTitle' => '',
-                                    'staffFirstname' => $currentPeriod->{'Teacher'},
-                                    'staffSurname' => '',
-                                )
-                            )
-                        );
+                                    /* You dumdums put the teacher's name concatted with the
+                                     * subject name >.< So instead of booming it and using the
+                                     * first shrapnel I'm just going to strreplace it out, so
+                                     * this will work even if they change their format to
+                                     * some other ridiculous thing
+                                     */
+                                    $className = trim(str_replace($currentPeriod->{'Teacher'}, '', $currentPeriod->{'TT Description'}));
+
+                                    /* wtf
+                                     * ...or I could preg_match it out of 1/3/0001, wherever that came from
+                                     */
+                                    $periodNumber = str_replace('Period', '', $currentPeriod->{'Period Name'});
+
+                                    $timetable[$periodNumber-1] = array(
+                                        'periodName' => $currentPeriod->{'Period Name'},
+                                        'periodStart' =>  $definition['start'][$periodNumber-1],
+                                        'periodEnd' => $definition['end'][$periodNumber-1],
+                                        'periodNumber' => $periodNumber,
+                                        'periodSequence' => 1,
+                                        'class' => array(
+                                            array(
+                                                'description' => $className,
+                                                'code' => $currentPeriod->{'ClassCode'},
+                                                'room' => $currentPeriod->{'Room'},
+                                                'staffID' => $currentPeriod->{'TeacherCode'},
+                                                'staffTitle' => '',
+                                                'staffFirstname' => $currentPeriod->{'Teacher'},
+                                                'staffSurname' => '',
+                                            )
+                                        )
+                                    );
+                                }
+                            }
+                        }
                     }
-                }
-            }
-        }
-        elseif ($this->getGroupHandler()->isStaff($userId)) {
-            $api = new External_Denbigh2_Api('TimetableLessons',
-                array(
-                    'Teacher Code' => $externalUserId
-                ),
-                array(
-                    'RFMmax' => 0
-                )
+
+                    return json_encode($timetable);
+                },
+                array($externalUserId, $dayNumber, $timetable, $definition),
+                $this->getCacheTime()
             );
 
-            if (!$api->hasErrors()) {
-                $allPeriods = $api->getResult()->data;
+            return json_decode($encoded);
+        }
+        elseif ($this->getGroupHandler()->isStaff($userId)) {
+            $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
+                "denbigh2.getDayTimetable",
 
-                /* Assemble into a 2D array
-                 * Each row represents a Period across each Day in the cycle
-                 *
-                 * [Period1 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
-                 * [Period2 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
-                 * [Period3 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
-                 * [PeriodN [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
-                 * ...
-                 */
-                foreach($allPeriods as $currentPeriod) {
-                    if (!$dayNumber || $currentPeriod->{'Day'} == $dayNumber) {
-                        $periodName = "Period {$currentPeriod->{'Period'}}";
-                        $periodNumber = $currentPeriod->{'Period'};
+                function ($params) {
+                    list($externalUserId, $dayNumber, $timetable, $definition) = $params;
 
-                        $timetable[$periodNumber-1] = array(
-                            'periodName' => $periodName,
-                            'periodStart' =>  $definition['start'][$periodNumber-1],
-                            'periodEnd' => $definition['end'][$periodNumber-1],
-                            'periodNumber' => $periodNumber,
-                            'periodSequence' => 1,
-                            'class' => array(
-                                array(
-                                    'description' => $currentPeriod->{'Description for Staff TT'},
-                                    'code' => $currentPeriod->{'Class'},
-                                    'room' => "Room {$currentPeriod->{'Room'}}",
-                                    'staffID' => $currentPeriod->{'Teacher Code'},
-                                    'staffTitle' => '',
-                                    'staffFirstname' => $currentPeriod->{'Teacher'},
-                                    'staffSurname' => '',
-                                )
-                            )
-                        );
+                    $api = new External_Denbigh2_Api('TimetableLessons',
+                        array(
+                            'Teacher Code' => $externalUserId
+                        ),
+                        array(
+                            'RFMmax' => 0
+                        )
+                    );
+
+                    if (!$api->hasErrors()) {
+                        $allPeriods = $api->getResult()->data;
+
+                        /* Assemble into a 2D array
+                         * Each row represents a Period across each Day in the cycle
+                         *
+                         * [Period1 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                         * [Period2 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                         * [Period3 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                         * [PeriodN [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                         * ...
+                         */
+                        if (count($allPeriods)) {
+                            foreach($allPeriods as $currentPeriod) {
+                                if (!$dayNumber || $currentPeriod->{'Day'} == $dayNumber) {
+                                    $periodName = "Period {$currentPeriod->{'Period'}}";
+                                    $periodNumber = $currentPeriod->{'Period'};
+
+                                    $timetable[$periodNumber-1] = array(
+                                        'periodName' => $periodName,
+                                        'periodStart' =>  $definition['start'][$periodNumber-1],
+                                        'periodEnd' => $definition['end'][$periodNumber-1],
+                                        'periodNumber' => $periodNumber,
+                                        'periodSequence' => 1,
+                                        'class' => array(
+                                            array(
+                                                'description' => $currentPeriod->{'Description for Staff TT'},
+                                                'code' => $currentPeriod->{'Class'},
+                                                'room' => "Room {$currentPeriod->{'Room'}}",
+                                                'staffID' => $currentPeriod->{'Teacher Code'},
+                                                'staffTitle' => '',
+                                                'staffFirstname' => $currentPeriod->{'Teacher'},
+                                                'staffSurname' => '',
+                                            )
+                                        )
+                                    );
+                                }
+                            }
+                        }
                     }
-                }
-            }
+
+                    return json_encode($timetable);
+                },
+                array($externalUserId, $dayNumber, $timetable, $definition),
+                $this->getCacheTime()
+            );
+
+            return json_decode($encoded);
         }
 
-        return $timetable;
+        return '';
     }
 
     /**
@@ -552,7 +584,6 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     /**
      * Gets the timetable for the given room.
      *
-     * @param  string $roomCode
      * @return array
      */
     public function getRoomTimetable($roomCode)
