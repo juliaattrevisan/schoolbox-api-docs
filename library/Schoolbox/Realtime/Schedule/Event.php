@@ -71,17 +71,20 @@ class Event implements EventInterface, Serializable
      */
     public function serialize()
     {
+        // Get the ID if I can, otherwise dehydrate as before.
         $get = array(
             $this->getObject(),
             $this->getMapper()->getGetIdentifierMethodName()
         );
-
+        $dehydrated = is_callable($get)
+            ? call_user_func($get)
+            : $this->getMapper()->dehydrate($this->getObject());
         return serialize(array(
             'u' => $this->effector->getId(),
             'a' => $this->getAction(),
             'o' => array(
                 'c' => get_class($this->getMapper()),
-                'i' => call_user_func($get) // extract ID
+                'i' => $dehydrated
             ),
             'd' => $this->getDiff(),
         ));
