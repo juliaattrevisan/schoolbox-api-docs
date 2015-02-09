@@ -397,37 +397,49 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStudentUserAccountInfo()
     {
-        $allStudents = array();
+        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
+            "denbigh2.getStudentUserAccountInfo",
 
-        $api = new External_Denbigh2_Api('Students', array());
+            function ($params) {
+                $allStudents = array();
 
-        if (!$api->hasErrors()) {
-            foreach ($api->getResult()->data as $currentStudent) {
-                // TODO: I guess I need the NetworkLogin
-                // TODO: Campus isn't being populated
-                // TODO: Boarders - dunno
+                $api = new External_Denbigh2_Api('Students', array());
 
-                $student = array(
-                    'StudentID' => $currentStudent->{'Student ID'},
-                    'NetworkLogin' => '',
-                    'StudentTitle' => '',
-                    'StudentPreferred' => $currentStudent->{'Preferred Name'},
-                    'StudentSurname' => $currentStudent->{'Surname'},
-                    'StudentGender' => $currentStudent->{'Gender'},
-                    'StudentEmail' => $currentStudent->{'Email Address'},
-                    'StudentOccupEmail' => '',
-                    'StudentYearLevel' => $currentStudent->{'Academic Year'},
-                    'StudentHouse' => $currentStudent->{'House'},
-                    'StudentBoarder' => '',
-                    'StudentBoardingHouse' => '',
-                    'StudentCampus' => $currentStudent->{'Campus'},
-                );
+                if (!$api->hasErrors()) {
+                    if (count($api->getResult()->data)) {
+                        foreach ($api->getResult()->data as $currentStudent) {
+                            // TODO: I guess I need the NetworkLogin
+                            // TODO: Campus isn't being populated
+                            // TODO: Boarders - dunno
 
-                $allStudents[] = $student;
-            }
-        }
+                            $student = array(
+                                'StudentID' => $currentStudent->{'Student ID'},
+                                'NetworkLogin' => '',
+                                'StudentTitle' => '',
+                                'StudentPreferred' => $currentStudent->{'Preferred Name'},
+                                'StudentSurname' => $currentStudent->{'Surname'},
+                                'StudentGender' => $currentStudent->{'Gender'},
+                                'StudentEmail' => $currentStudent->{'Email Address'},
+                                'StudentOccupEmail' => '',
+                                'StudentYearLevel' => $currentStudent->{'Academic Year'},
+                                'StudentHouse' => $currentStudent->{'House'},
+                                'StudentBoarder' => '',
+                                'StudentBoardingHouse' => '',
+                                'StudentCampus' => $currentStudent->{'Campus'},
+                            );
 
-        return $allStudents;
+                            $allStudents[] = $student;
+                        }
+                    }
+                }
+
+                return json_encode($allStudents);
+            },
+            null,
+            $this->getCacheTime()
+        );
+
+        return json_decode($encoded);
     }
 
     /**
