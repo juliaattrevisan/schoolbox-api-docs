@@ -1232,7 +1232,7 @@ class External_Denbigh2_User implements External_UserInterface
                          */
                         $cacheTime = @filemtime($photoPath);
 
-                        /* Denbigh didn't provide a modified date
+                        /* TODO: Denbigh didn't provide a modified date
                          * $modifiedTime = strtotime($photo['ModifiedDate']);
                          */
                         $modifiedTime = $_SERVER['REQUEST_TIME'];
