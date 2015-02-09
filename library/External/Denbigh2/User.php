@@ -1101,23 +1101,35 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getEnrolledStudents($externalUserId)
     {
-        $ids = array();
+        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
+            "denbigh2.getEnrolledStudents",
 
-        // TODO: Made an assumption that the Family Code can get us there
+            function ($params) {
+                $ids = array();
 
-        $api = new External_Denbigh2_Api('Students', array(
-            'Family Code' => $externalUserId
-        ));
+                // TODO: Made an assumption that the Family Code can get us there
 
-        if (!$api->hasErrors()) {
-            $allStudents = $api->getResult()->data;
+                $api = new External_Denbigh2_Api('Students', array(
+                    'Family Code' => $params
+                ));
 
-            foreach($allStudents as $currentStudent) {
-                $ids[] = $currentStudent->{'Student ID'};
-            }
-        }
+                if (!$api->hasErrors()) {
+                    $allStudents = $api->getResult()->data;
 
-        return $ids;
+                    if (count($allStudents)) {
+                        foreach($allStudents as $currentStudent) {
+                            $ids[] = $currentStudent->{'Student ID'};
+                        }
+                    }
+                }
+
+                return json_encode($ids);
+            },
+            $externalUserId,
+            $this->getCacheTime()
+        );
+
+        return json_decode($encoded);
     }
 
     /**
