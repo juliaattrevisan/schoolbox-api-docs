@@ -99,4 +99,14 @@ class CampusMapper extends Schoolbox\External\Mapper
 
         return $allUsers;
     }
+
+    /**
+     * This mapper doesn't raise notifications - the event mapper handles that.
+     *
+     * @return true
+     */
+    protected function raiseNotification()
+    {
+        return true;
+    }
 }

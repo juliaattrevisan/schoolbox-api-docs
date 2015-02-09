@@ -99,4 +99,14 @@ class CategoryMapper extends Schoolbox\External\Mapper
 
         return $allCategories;
     }
+
+    /**
+     * This mapper doesn't raise notifications - the event mapper handles that.
+     *
+     * @return true
+     */
+    protected function raiseNotification()
+    {
+        return true;
+    }
 }
