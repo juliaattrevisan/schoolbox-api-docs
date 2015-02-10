@@ -82,8 +82,10 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
 
         $limit = is_numeric($this->getConfig('size')) ? $this->getConfig('size') * $this->getImagesPerRow() : 0;
 
+        /* Template rendering
+         */
 	    $this->setBlock($templateHandle, 'image_gallery', 'image_gallery_block');
-        $this->setBlock($templateHandle, "submit_image", "submit_image_block");
+        $this->setBlock($templateHandle, 'submit_image', 'submit_image_block');
 
         /* Prevent multiple galleries from other categories stacking up in the wrong place
          * and initialise empty gallery by default
@@ -112,20 +114,18 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
         ));
 
         // Load images for the requested homepage
-        $imageList = $this->getCategoryMapper()->findImages($this->getSource(), $limit, true);
+        $allImages = $this->getCategoryMapper()->findImages($this->getSource(), $limit, true);
 
         // Iterate
-        if (is_array($imageList)) {
-            foreach($imageList as $thumbnail) {
-                $this->setVar(array(
-                    'THUMBNAIL_ID' => $thumbnail['id'],
-                    'THUMBNAIL_DESCRIPTION' => $thumbnail['description'],
-                    'THUMBNAIL_SIZE' =>	Cfg::get('thumbnail_size'),
-                    'IMAGE_HEIGHT' => Cfg::get('thumbnail_size'),
-                ));
+        foreach($allImages as $currentImage) {
+            $this->setVar(array(
+                'THUMBNAIL_ID' => $currentImage->getId(),
+                'THUMBNAIL_DESCRIPTION' => $currentImage->getDescription(),
+                'THUMBNAIL_SIZE' =>	Cfg::get('thumbnail_size'),
+                'IMAGE_HEIGHT' => Cfg::get('thumbnail_size'),
+            ));
 
-                $this->parse('image_gallery_block', 'image_gallery', true);
-            }
+            $this->parse('image_gallery_block', 'image_gallery', true);
         }
 
         // everything went according to plan
