@@ -127,13 +127,13 @@ class External_Denbigh2_User implements External_UserInterface
                     );
                 }
 
-                return json_encode($data);
+                return serialize($data);
             },
             $externalUserId,
             $this->getCacheTime()
         );
 
-        return json_decode($encoded);
+        return unserialize($encoded);
     }
 
     /**
@@ -223,13 +223,13 @@ class External_Denbigh2_User implements External_UserInterface
                     }
                 }
 
-                return json_encode($data);
+                return serialize($data);
             },
             $externalUserId,
             $this->getCacheTime()
         );
 
-        return json_decode($encoded);
+        return unserialize($encoded);
     }
 
     /**
