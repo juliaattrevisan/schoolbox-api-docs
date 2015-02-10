@@ -95,7 +95,7 @@
         "easyrdf/easyrdf": "~0.8.0",
         "caxy/php-htmldiff": "dev-master",
         "intervention/image": "~2.0.14",
-        "imagine/imagine": "dev-0.6.2+resize-animated-gif as 0.6.2"
+        "imagine/imagine": "dev-0.6.2+resize-animated-gif+image-convolution as 0.6.2"
     },
     "require-dev": {
         "sebastian/phpcpd": "2.*",
