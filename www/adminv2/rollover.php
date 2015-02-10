@@ -22,7 +22,6 @@ $this->setFile(TEMPLATE_content, 'adminv2/rollover.html');
 $nav = new AdminV2_Nav();
 $nav->parse($this, 'rollover');
 
-$categoryHandler = new Category();
 $groupHandler = new Group();
 
 $openCategory = 0;
