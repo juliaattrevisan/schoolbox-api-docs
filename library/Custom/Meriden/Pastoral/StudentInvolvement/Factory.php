@@ -117,10 +117,10 @@ class Factory
         $externalData = $this->getGateway()->getSubject($subjectCode);
         $subject
             ->setName($externalData['sub_desc'])
+            ->setDescription($externalData['outline_text'])
             ->setStudent($student)
             ->setYear($year)
             ->setSubjectCode($subjectCode)
-            ->setExternalData($externalData)
         ;
 
         $folderWithGrades = $this->getFolderWithGrades($subjectCode, $student);

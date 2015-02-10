@@ -43,6 +43,13 @@ class Involvement
     protected $name;
 
     /**
+     * A more detailed description of this involvement
+     *
+     * @var string
+     */
+    protected $description;
+
+    /**
      * The student's grades in this group
      *
      * @var array
@@ -167,6 +174,25 @@ class Involvement
     public function setName($name)
     {
         $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param  string $description
+     *
+     * @return $this
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
         return $this;
     }
 }
