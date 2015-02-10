@@ -20,6 +20,8 @@ use \Schoolbox\Collection;
 use \Crocodoc\Renderer\Factory;
 use \Rubric\Renderer\Vertical;
 
+/** @var SitePage $this */
+
 /* /submission/inline/view/<box_id>/<user_id>
  */
 $submissionBoxId = $this->arg[0];
@@ -53,9 +55,29 @@ $studentList = $submissionHandler->getAllStudentsForSubmission($submissionBox);
 $processed = array();
 $stack = array();
 
-foreach ($studentList as $currentStudent) {
+$this->setFile(TEMPLATE_content, 'submission/inlineGrading/view.html');
+
+$this->setFile('studentNavTpl', 'submission/inlineGrading/injectables/controls/navigation-option.html');
+$this->setBlock('custom_head', 'studentnav', 'studentnav_block');
+
+foreach ($studentList as $i => $currentStudent) {
 	if (!in_array($currentStudent->getId(), $processed)) {
 		$processed[] = $currentStudent->getId();
+
+        $this->setVar(array(
+            'BOX_ID'                => $submissionBox->getId(),
+            'USER_ID'               => $currentStudent->getId(),
+            'USER_EXT_ID'           => $currentStudent->getExternalId(),
+            'USER_FULLNAME'         => $currentStudent->formatName('{lastname}, {firstname}'),
+            'USER_SUBMISSION_CLASS' => '',
+            'USER_SUBMISSION_TEXT'  => '',
+            'USER_MARKSTATUS_CLASS' => '',
+        ));
+
+        $this->parse('USER_HTML', 'studentNavTpl');
+
+
+        $this->parse('studentnav_block', 'studentnav', true);
 
 		/* Augment navigation data
 		 */
@@ -166,8 +188,6 @@ $navigationElements = array(
 );
 
 $navigationDirect = json_encode($navigationElements);
-
-$this->setFile(TEMPLATE_content, 'submission/inlineGrading/view.html');
 
 $zone = new Zone('inline-return');
 

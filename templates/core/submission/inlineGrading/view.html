@@ -1,5 +1,69 @@
 <!-- BEGIN custom_head -->
+<style type="text/css">
+  .selectize-input {
+    height: 48px;
+  }
+  .selectize-input .navigation-option img {
+    top: 1px;
+  }
+  .selectize-input .navigation-option {
+    width: calc(100% - 24px);
+  }
+  .selectize-input .navigation-option .markstatus {
+    display: none !important;
+  }
+  .navigation-option {
+    position: relative;
+  }
+  .navigation-option img {
+    position: absolute;
+    top: 6px;
+  }
+  .navigation-option span {
+    margin-left: 38px;
+    display: block;
+    line-height: 16px;
+  }
+  .navigation-option .submitted {
+    text-transform: lowercase;
+    font-variant: small-caps;
+    background-color: #eff;
+    display: inline-block;
+    padding: 0 5px;
+    font-weight: bold;
+  }
+  .navigation-option .submitted.on-time {
+    background-color: #F7FDF1;
+    color: #28A326;
+  }
+  .navigation-option .submitted.late {
+    background-color: #F9E6E6;
+    color: #f00;
+  }
+  .navigation-option .un.submitted {
+    background-color: #EEEEEE;
+    color: #848484;
+  }
+  .navigation-option .markstatus {
+    position: absolute;
+    right: 24px;
+    width: 24px;
+    height: 24px;
+    top: 10px;
+    border-radius: 12px;
+    line-height: 24px;
+    text-align: center;
+    font-size: 18px;
+    display: none;
+  }
+  .navigation-option .markstatus.marked {
+    background-color: #28A326;
+    color: #fff;
+    display: block;
+  }
+</style>
 <script src="/javascript/components/qtip2/jquery.qtip.js" type="text/javascript"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script src="/javascript/jquery.combobox.js" type="text/javascript"></script>
 <script src="/submission/inlineGrading/js/inlineGrading.js" type="text/javascript"></script>
 <script src="/javascript/jquery.marksheet.js" type="text/javascript"></script>
@@ -24,6 +88,31 @@
 			/* Callback methods
 			 */
 			selectItemCallback: function() {
+
+        $('select[name=foo]').selectize({
+          preload: true,
+          closeAfterSelect: false,
+          options: [
+              <!-- BEGIN studentnav -->
+            {
+              text: "{USER_FULLNAME}",
+              value: "/submission/inlineGrading/view/{BOX_ID}/{USER_ID}",
+              html: '{USER_HTML}'
+            },
+            <!-- END studentnav -->
+            {}
+          ],
+          render: {
+            option: function (item, escape) {
+              return $('<div/>').html(item.html).html();
+            },
+            item: function (item, escape) {
+              return $('<div/>').html(item.html).html();
+            }
+          }
+        });
+
+
 				$('.context-select').change(function() {
 					window.location.href = $(this).val();
 				});
@@ -97,7 +186,9 @@
         <li class="last"><a href="/search/user/{INLINE_GRADING_STUDENT_ID}">{INLINE_GRADING_STUDENT_FULL_NAME}</a></li>
     </ul>
 </div>
-<div class="dropdown-navigator float-left"></div>
+<div class="dropdown-navigator">
+  <select name="foo"></select>
+</div>
 <div class='float-left'>
     <form action="/submission/inlineGrading/configForm.php" method="post">
         <input type="hidden" name='boxId' value="{BOX_ID}" />
