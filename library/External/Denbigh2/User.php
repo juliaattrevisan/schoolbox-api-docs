@@ -1282,6 +1282,15 @@ class External_Denbigh2_User implements External_UserInterface
         // TODO: Implement getHousemasterByHouseId() method.
     }
 
+    /**
+     * List of campuses a staff member is involved in based on timetable
+     *
+     * @param int $staffID
+     * @return array|bool
+     */
+    public function getCampusFromTimetable($staffID) {
+    }
+
     /* Getters/Setters
      */
 
