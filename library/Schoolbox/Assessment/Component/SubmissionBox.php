@@ -181,7 +181,7 @@ class SubmissionBox implements ISoftDeletable
      */
     public function isRubric()
     {
-        if ($this->getMarkType()->getSlug() == 'rubric') {
+        if ($this->getMarkType()->getId() == MarkType::TYPE_RUBRIC) {
             return true;
         }
 
