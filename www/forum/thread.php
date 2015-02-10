@@ -1,7 +1,6 @@
 <?php
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
-$categoryHandler = new Category();
 $forumHandler = new Forum();
 $groupHandler = new Group();
 
@@ -10,13 +9,8 @@ $this->setBlock(TEMPLATE_content, 'post', 'post_block');
 $this->setBlock('post', 'reply_post', 'reply_post_block');
 $this->setBlock('post', 'modify', 'modify_block');
 $this->setBlock('post', 'modified', 'modified_block');
-
-
 $this->setBlock(TEMPLATE_content, 'reply', 'reply_block');
 $this->setBlock(TEMPLATE_content, 'modify_thread', 'modify_thread_block');
-
-
-
 $this->setBlock(TEMPLATE_content, 'previous_button', 'previous_button_block');
 $this->setBlock(TEMPLATE_content, 'next_button', 'next_button_block');
 $this->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');
@@ -31,17 +25,18 @@ if (!isset($thread['threadID'])) {
 	error(2);
 }
 
-$category = $categoryHandler->getByID($thread['categoryID']);
+$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+$category = $categoryMapper->findById($thread['categoryID']);
 
 /* forum exists
  */
-if (!$forumHandler->hasForum($category['id'])) {
-	SitePage::localRedir('/homepage/' . $category['id']);
+if (!$forumHandler->hasForum($category->getId())) {
+	SitePage::localRedir('/homepage/' . $category->getId());
 }
 
 /* check permissions
  */
-if ($groupHandler->getPermission($category['id']) < READ_ACCESS) {
+if ($groupHandler->getPermission($category->getId()) < READ_ACCESS) {
 	error(19);
 }
 
@@ -52,8 +47,8 @@ $threadLocked = $thread['locked'] == 'true' ? true : false;
 /* output breadcrumbs
  */
 $output = array(
-	'CATEGORY' => Scrub::text($category['name']),
-	'CATEGORY_ID' => $category['id'],
+	'CATEGORY' => Scrub::text($category->getName()),
+	'CATEGORY_ID' => $category->getId(),
 	'THREAD_ID' => $thread['threadID'],
 	'THREAD_TITLE' => Scrub::text($thread['title']),
 	'LOCK_UNLOCK' => $threadLocked ? 'Unlock' : 'Lock',
@@ -65,7 +60,7 @@ $this->setVar($output);
 $this->setVar('modify_thread_block', '');
 
 
-if ($groupHandler->getPermission($category['id']) >= WRITE_ACCESS) {
+if ($groupHandler->getPermission($category->getId()) >= WRITE_ACCESS) {
 	$this->parse('modify_thread_block', 'modify_thread');
 }
 
@@ -73,11 +68,11 @@ if ($groupHandler->getPermission($category['id']) >= WRITE_ACCESS) {
  */
 $this->setVar('reply_block', '');
 
-$is_post_allowed = !$groupHandler->hasChildAccessOnly($category['id']);
+$is_post_allowed = !$groupHandler->hasChildAccessOnly($category->getId());
 if (!$is_post_allowed && Cfg::get('restrict_parent_forum_access')) {
 	error(19);
 }
-if (!$threadLocked || $groupHandler->getPermission($category['id']) >= WRITE_ACCESS) {
+if (!$threadLocked || $groupHandler->getPermission($category->getId()) >= WRITE_ACCESS) {
 	if ($is_post_allowed) {
 		$this->parse('reply_block', 'reply');
 	}
@@ -172,7 +167,8 @@ if (is_array($postList)) {
 		$this->setVar('modify_block', '');
 		$this->setVar('modify_heading_block', '');
 
-		if ((!$threadLocked && $post['userID'] == $_SESSION['id']) || $groupHandler->getPermission($category['id']) >= WRITE_ACCESS) {
+		if ((!$threadLocked && $post['userID'] == $_SESSION['id']) || $groupHandler->getPermission($category->getId()
+            ) >= WRITE_ACCESS) {
 			$this->parse('modify_block', 'modify');
 
 		}
@@ -185,7 +181,7 @@ if (is_array($postList)) {
 
 		// reply to this post
 		$this->setVar('reply_post_block', '');
-		if (!$threadLocked || $groupHandler->getPermission($category['id']) >= WRITE_ACCESS) {
+		if (!$threadLocked || $groupHandler->getPermission($category->getId()) >= WRITE_ACCESS) {
 			if ($is_post_allowed) {
 				$this->parse('reply_post_block', 'reply_post');
 			}
@@ -199,6 +195,3 @@ else
 {
 	$this->setVar('post_block', '<p>There are no posts to display. Create a new post.</p>');
 }
-
-
-?>
