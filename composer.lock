@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "921cc8fa03612a6bfa453e64a73a7dae",
+    "hash": "bcb5edd16c6c3fec7b65d2f8b6bc18d6",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -391,12 +391,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/caxy/php-htmldiff.git",
-                "reference": "a2da731bceb50af036e30294d58e3546513f1d47"
+                "reference": "144c621e13a2930bc882d9fdde08163d8809abe2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/caxy/php-htmldiff/zipball/a2da731bceb50af036e30294d58e3546513f1d47",
-                "reference": "a2da731bceb50af036e30294d58e3546513f1d47",
+                "url": "https://api.github.com/repos/caxy/php-htmldiff/zipball/144c621e13a2930bc882d9fdde08163d8809abe2",
+                "reference": "144c621e13a2930bc882d9fdde08163d8809abe2",
                 "shasum": ""
             },
             "require": {
@@ -425,7 +425,7 @@
                 "diff",
                 "html"
             ],
-            "time": "2014-09-25 21:46:36"
+            "time": "2015-01-09 00:47:04"
         },
         {
             "name": "cboden/ratchet",
@@ -788,16 +788,16 @@
         },
         {
             "name": "imagine/imagine",
-            "version": "0.6.2",
+            "version": "dev-0.6.2+resize-animated-gif",
             "source": {
                 "type": "git",
-                "url": "https://github.com/avalanche123/Imagine.git",
-                "reference": "83ca8babede0e54f935ec09d55a726bf4b0a3f7c"
+                "url": "https://github.com/armatronic/Imagine.git",
+                "reference": "9ad2e37bb1a372759a2c397140ddcae80c90d2f5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/avalanche123/Imagine/zipball/83ca8babede0e54f935ec09d55a726bf4b0a3f7c",
-                "reference": "83ca8babede0e54f935ec09d55a726bf4b0a3f7c",
+                "url": "https://api.github.com/repos/armatronic/Imagine/zipball/9ad2e37bb1a372759a2c397140ddcae80c90d2f5",
+                "reference": "9ad2e37bb1a372759a2c397140ddcae80c90d2f5",
                 "shasum": ""
             },
             "require": {
@@ -822,7 +822,6 @@
                     "Imagine": "lib/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -841,7 +840,10 @@
                 "image manipulation",
                 "image processing"
             ],
-            "time": "2014-11-11 11:36:02"
+            "support": {
+                "source": "https://github.com/armatronic/Imagine/tree/0.6.2+resize-animated-gif"
+            },
+            "time": "2015-01-28 22:25:21"
         },
         {
             "name": "intervention/image",
@@ -4144,6 +4146,12 @@
             "alias_normalized": "9999999-dev",
             "version": "dev-schoolbox-14.0-dep",
             "package": "0x46616c6b/etherpad-lite-client"
+        },
+        {
+            "alias": "0.6.2",
+            "alias_normalized": "0.6.2.0",
+            "version": "dev-0.6.2+resize-animated-gif",
+            "package": "imagine/imagine"
         }
     ],
     "minimum-stability": "stable",
@@ -4155,6 +4163,7 @@
         "aura/session": 10,
         "0x46616c6b/etherpad-lite-client": 20,
         "caxy/php-htmldiff": 20,
+        "imagine/imagine": 20,
         "squizlabs/php_codesniffer": 20,
         "fabpot/php-cs-fixer": 0
     },
