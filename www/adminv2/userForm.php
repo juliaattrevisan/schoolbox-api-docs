@@ -4,7 +4,6 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 $page = new SitePage();
 $userHandler = new User();
 $groupHandler = new Group();
-$categoryHandler = new Category();
 
 /* Superusers only
  */
@@ -124,8 +123,10 @@ else if ($_POST['updateGroups'] == true) {
 	/* If assigning a new admin, demote any existing owners
 	 */
 	if (Scrub::text($_POST['type']) == FULL_ACCESS) {
-		$category = $categoryHandler->getByID(Scrub::text($_POST['sid']));
-		$groupHandler->setUserPermission(Scrub::text($_POST['sid']), $category['owner'], WRITE_ACCESS);
+        $userAccessMapper = new \Schoolbox\Permission\Access\UserAccessMapper();
+        $userAccess = $userAccessMapper->findOneByColumn('sid', $_POST['sid']);
+
+		$groupHandler->setUserPermission($_POST['sid'], $userAccess->getUser()->getId(), WRITE_ACCESS);
 	}
 
 	/* Update user access as normal
