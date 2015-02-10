@@ -135,7 +135,6 @@ $attemptHandler = new Assess_Attempt();
 $sectionHandler = new Assess_Section();
 $userHandler = new User();
 $groupHandler = new Group();
-$categoryHandler = new Category();
 
 $assess = $assessHandler->getByID($this->arg[0]);
 
