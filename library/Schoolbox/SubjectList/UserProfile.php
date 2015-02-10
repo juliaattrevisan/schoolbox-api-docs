@@ -10,6 +10,7 @@
 
 namespace Schoolbox\SubjectList;
 
+use \Schoolbox\Resource\CategoryCode;
 
 class UserProfile extends SubjectListAbstract {
 
@@ -63,15 +64,12 @@ class UserProfile extends SubjectListAbstract {
 	 * Expel each subject grouped by its type
 	 */
 	public function render() {
-
         $emailObj = new \Email();
-        $categoryHandler = new \Category;
+
 		/* Expel each subject grouped by its type
 		 */
-
         foreach($this->getAllSubjectLists() as $key => $currentSubjectList) {
 			$emailAll = array();
-
 
 			$this->getPage()->setVar(array(
 				'SUBJECT_CLASSTYPE' => $key
@@ -79,19 +77,22 @@ class UserProfile extends SubjectListAbstract {
 
 			/* For all the classes in the current subject
 			 */
-
             if (is_array($currentSubjectList) && count($currentSubjectList)) {
                 $finalSubjectList = array();
-                /* preprocess list and remove items that should not exist if we cannot link to them */
+
+                /* Preprocess list and remove items that should not exist if we cannot link to them
+                 */
                 foreach($currentSubjectList as $currentSubject) {
-                    $category = $categoryHandler->getByCode($currentSubject['subject']['code']);
-                    if(is_array($category)) {
-                        $currentSubject['category']['id'] = $category['id'];
-                        $currentSubject['category']['code'] = array_shift(explode(',',$category['code']));
+                    try {
+                        $category = $this->getCategoryMapper()->findByCode($currentSubject['subject']['code']);
+                        $currentSubject['category']['id'] = $category->getId();
+                        $currentSubject['category']['code'] = $category->getCodes()->first();
                         $finalSubjectList[] = $currentSubject;
                     }
-                    else if(\Config::get('show_all_subjects') == 1) {
-                        $finalSubjectList[] = $currentSubject; //output subject because show all subjects is enabled
+                    catch (\Exception $e) {
+                        if(\Config::get('show_all_subjects') == 1) {
+                            $finalSubjectList[] = $currentSubject; //output subject because show all subjects is enabled
+                        }
                     }
                 }
 
@@ -101,23 +102,21 @@ class UserProfile extends SubjectListAbstract {
                 $i = 1;
 
                 if (is_array($currentSubjectList) && count($currentSubjectList)) {
-
                     foreach($currentSubjectList as $currentSubject) {
                         $this->getPage()->setVar(array(
                             'subject_teacher_block' => ''
                         ));
 
-                        if ($currentSubject['category']['code']) {
-                            $code = $currentSubject['category']['code'];
+                        if ($currentSubject['category']['code'] instanceof CategoryCode) {
+                            $code = $currentSubject['category']['code']->getCode();
                         }
                         else {
                             $code = $currentSubject['subject']['campusCode'].'/'.$currentSubject['subject']['code'];
                         }
 
-
                         $this->getPage()->setVar(array(
                             'SUBJECT_NAME' => \Scrub::text($currentSubject['categoryName']),
-                            'SUBJECT_URL' => is_array($currentSubject['category']) && $this->getGroupHandler()->getPermission($currentSubject['category']['id']  ) >= READ_ACCESS ? "/homepage/code/{$currentSubject['category']['code']}": '#',
+                            'SUBJECT_URL' => is_array($currentSubject['category']) && $this->getGroupHandler()->getPermission($currentSubject['category']['id']  ) >= READ_ACCESS ? "/homepage/code/{$currentSubject['category']['code']->getCode()}": '#',
                         ));
 
                         /* Fetch teacher names */

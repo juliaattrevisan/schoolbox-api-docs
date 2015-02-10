@@ -10,6 +10,7 @@
 
 namespace Schoolbox\SubjectList;
 
+use Schoolbox\Resource\CategoryMapper;
 
 abstract class SubjectListAbstract {
 
@@ -34,12 +35,12 @@ abstract class SubjectListAbstract {
 	 */
 	protected $allSubjectLists = array();
 
-	/**
-	 * An instance of categoryHandler
-	 *
-	 * @var null
-	 */
-	protected $categoryHandler = null;
+    /**
+     * An instance of categoryHandler
+     *
+     * @var \Schoolbox\Resource\CategoryMapper
+     */
+    protected $categoryMapper = null;
 
 	/**
 	 * Constructor
@@ -50,7 +51,7 @@ abstract class SubjectListAbstract {
 	public function __construct($page, $allSubjects) {
 		$this->setPage($page);
 		$this->setAllSubjects($allSubjects);
-		$this->setCategoryHandler(new \Category());
+		$this->setCategoryMapper(new CategoryMapper());
 
 		$this->setup();
 		$this->split();
@@ -144,23 +145,25 @@ abstract class SubjectListAbstract {
 		return $this->allSubjects;
 	}
 
-	/**
-	 * Set category handler
-	 * s
-	 * @param null $categoryHandler
-	 */
-	protected function setCategoryHandler($categoryHandler) {
-		$this->categoryHandler = $categoryHandler;
-	}
+    /**
+     * Set category mapper
+     *
+     * @param \Schoolbox\Resource\CategoryMapper $categoryMapper
+     */
+    protected function setCategoryMapper($categoryMapper)
+    {
+        $this->categoryMapper = $categoryMapper;
+    }
 
-	/**
-	 * Get category handler
-	 *
-	 * @return null
-	 */
-	protected function getCategoryHandler() {
-		return $this->categoryHandler;
-	}
+    /**
+     * Get category mapper
+     *
+     * @return \Schoolbox\Resource\CategoryMapper
+     */
+    protected function getCategoryMapper()
+    {
+        return $this->categoryMapper;
+    }
 
 	/**
 	 * Set all subject lists
