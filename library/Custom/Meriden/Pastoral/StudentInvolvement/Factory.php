@@ -97,7 +97,7 @@ class Factory
         $tutorGroup
             ->setSubjectCode($tutorGroupCode['code'])
             ->setFolder($folderWithGrades['folder'])
-            ->setGrades($this->augmentGradesWithAssessment($folderWithGrades['grades']))
+            ->setGrades($this->augmentGradesWithAssessment($folderWithGrades['grades'], $student))
         ;
         return $tutorGroup;
     }
@@ -126,7 +126,7 @@ class Factory
         $folderWithGrades = $this->getFolderWithGrades($subjectCode, $student);
         $subject
             ->setFolder($folderWithGrades['folder'])
-            ->setGrades($this->augmentGradesWithAssessment($folderWithGrades['grades']))
+            ->setGrades($this->augmentGradesWithAssessment($folderWithGrades['grades'], $student))
         ;
         return $subject;
     }
@@ -283,15 +283,26 @@ class Factory
      * Adds assessment into grades fetched by getStudentInvolvement().
      *
      * @param array $grades
+     * @param User  $student
      *
      * @return array
      */
-    protected function augmentGradesWithAssessment($grades)
+    protected function augmentGradesWithAssessment($grades, User $student)
     {
-        // TODO inject this
+        // TODO inject dependencies
+        // TODO get rid of the handlers too
+        $rubricHandler = new \DueWork_Rubric_Handler();
         foreach (SubmissionBoxMapper::getInstance()->findByColumn('id', array_keys($grades)) as $assess) {
             /** @var SubmissionBox $assess */
-            $grades[$assess->getId()]['assessment'] = $assess;
+            $assessId = $assess->getId();
+            $grades[$assessId]['assessment'] = $assess;
+            // Is there a rubric involved? If so get student's marks for it
+            if ($assess->isRubric()) {
+                $rubric     = $rubricHandler->getRubric($assessId);
+                $rubricMark = new \DueWork_Rubric_Mark($rubric);
+                $rubricMark->populateMarks($student->getId());
+                $grades[$assessId]['rubric'] = $rubricMark;
+            }
         }
         return $grades;
     }
