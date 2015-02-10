@@ -456,13 +456,18 @@ class External_Denbigh_User implements External_UserInterface {
      * @return string
      */
     public function determineBoarderType($boarderValue) {
-        $boarders = array('Boarder', 'Weekly Boarder');
+        $boarders = array('Boarder'=>'Boarder',
+                          'Weekly Boarder' => 'Weekly Boarder',
+                          'W' => 'Weekly Boarder',
+                          'D' => 'Day Boarder',
+                          'B' => 'Full Boarder');
 
-        if (in_array($boarderValue, $boarders)) {
-            return 'Boarder';
+        if(isset($boarders[$boarderValue])) {
+            return $boarders[$boarderValue];
         }
-
-        return 'Day';
+        else {
+            return false;
+        }
     }
 
     /**
