@@ -83,13 +83,13 @@ abstract class Evaluation_Answer extends DeprecatedModel
     }
 
 	/**
-	 * Configure question/configure answers
+	 * Output configuration settings in modify
 	 */
 	public function configure() {
 	}
 
     /**
-     * Configure question/configure answer during creation/modification
+     * Output configuration tags in xml
      *
      * @param $page
      * @param $config
