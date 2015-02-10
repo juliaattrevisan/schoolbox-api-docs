@@ -2,7 +2,6 @@
 
 require_once SITE_root . '/include/Bootstrap.php';
 
-$categoryHandler = new Category();
 $forumHandler = new Forum();
 $groupHandler = new Group();
 
@@ -21,47 +20,59 @@ $this->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');
 
 // category exists
 if (is_numeric($this->arg[0])) {
-	$category = $categoryHandler->getByID($this->arg[0]);
-}
+    $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
 
-if (!isset($category['id'])) {
-	error(2);
+    try {
+	    $category = $categoryMapper->findById($this->arg[0]);
+    }
+    catch (\Exception $e) {
+        error(2);
+    }
+}
+else {
+    error(2);
 }
 
 // forum exists
-if (!$forumHandler->hasForum($category['id'])) {
-	SitePage::localRedir('/homepage/' . $category['id']);
+if (!$forumHandler->hasForum($category->getId())) {
+	SitePage::localRedir('/homepage/' . $category->getId());
 }
 
 // check permissions
-if (($perm = $groupHandler->getPermission($category['id'])) < READ_ACCESS) {
+if (($perm = $groupHandler->getPermission($category->getId())) < READ_ACCESS) {
 	error(19);
 }
 //
 // Parent's permissions:
 // If they aren't directly involved in the forum's category, they can read but
 // not write.
-$is_post_allowed = !$groupHandler->hasChildAccessOnly($category['id']);
+$is_post_allowed = !$groupHandler->hasChildAccessOnly($category->getId());
+
 if (!$is_post_allowed && Cfg::get('restrict_parent_forum_access')) {
 	error(19);
 }
-$this->setVar('forum_post_block', '');
+
+$this->setVar(array(
+    'forum_post_block' => ''
+));
+
 if ($is_post_allowed) {
 	$this->parse('forum_post_block', 'forum_post');
 }
 
-$this->setTitle(Scrub::text($category['name']) . ' Forum');
+$this->setTitle(Scrub::text($category->getName()) . ' Forum');
 
 /* output breadcrumbs */
-$output = array(
-	'CATEGORY' => Scrub::text($category['name']),
-	'CATEGORY_ID' => $category['id'],
-);
-$this->setVar($output);
+$this->setVar(array(
+	'CATEGORY' => Scrub::text($category->getName()),
+	'CATEGORY_ID' => $category->getId(),
+));
 
 /*Output delete button */
-$this->setVar('delete_button_block', '');
-$this->setVar('modify_heading_block', '');
+$this->setVar(array(
+    'delete_button_block' => '',
+    'modify_heading_block' => '',
+));
 
 if ($perm >= WRITE_ACCESS) {
 	$this->parse('delete_button_block', 'delete_button');
@@ -70,7 +81,7 @@ if ($perm >= WRITE_ACCESS) {
 
 /* output pagination */
 
-$threadList = $forumHandler->getThreadList($category['id']);
+$threadList = $forumHandler->getThreadList($category->getId());
 $pageNum = $this->arg[1];
 
 if (!$pageNum) {
@@ -81,8 +92,10 @@ $threadPerPage = FORUM_THREADS_PER_PAGE;
 $totalPages = ceil(count($threadList) / $threadPerPage);
 $threadIndex = $threadPerPage * ($pageNum - 1);
 
-$this->setVar('previous_button_block', '');
-$this->setVar('next_button_block', '');
+$this->setVar(array(
+    'previous_button_block' => '',
+    'next_button_block' => '',
+));
 
 if ($pageNum >= 2) {
 	$this->parse('previous_button_block', 'previous_button');
@@ -119,7 +132,7 @@ $outputPagination = array(
 $this->setVar($outputPagination);
 
 /* output threads */
-$threadList = $forumHandler->getThreadList($category['id'], $threadIndex, $threadPerPage);
+$threadList = $forumHandler->getThreadList($category->getId(), $threadIndex, $threadPerPage);
 
 if (is_array($threadList)) {
 	$userHandler = new User();
@@ -141,7 +154,7 @@ if (is_array($threadList)) {
 		$threadTime = new Alaress_Date_Relative($thread['date']);
 		$threadLastPostTime = new Alaress_Date_Relative($thread['last_post_date']);
 
-		$output = array(
+        $this->setVar(array(
 			'THREAD_ID' => $thread['threadID'],
 			'THREAD_TITLE' => Scrub::text($thread['title']),
 			'THREAD_AUTHOR' => Scrub::text($userHandler->formatName($user)),
@@ -158,19 +171,19 @@ if (is_array($threadList)) {
 			'THREAD_LAST_PAGE' => ceil((($thread['replies'] + 1) / FORUM_POSTS_PER_PAGE)),
 			'THREAD_LOCKED' => $thread['locked'] == 'true' ? '(Locked)' : '',
             'ON_OFF'          => ++$j % 2 ? 'dark' : ''
-		);
+		));
 
-		$this->setVar($output);
+        if ($perm >= WRITE_ACCESS) {
+            $this->parse('modify_thread_block', 'modify_thread', true);
+        }
 
-		/* Delete checkbox */
-		$this->setVar('modify_thread_block', '');
-
-		if ($perm >= WRITE_ACCESS) {
-			$this->parse('modify_thread_block', 'modify_thread', true);
-		}
-
-		/* last post block */
-		$this->setVar('last_post_block', '');
+		/* Delete checkbox
+         * last post block
+         */
+		$this->setVar(array(
+            'modify_thread_block' => '',
+            'last_post_block' => ''
+        ));
 
 		if ($thread['replies'] > 0) {
 			$this->parse('last_post_block', 'last_post', true);
