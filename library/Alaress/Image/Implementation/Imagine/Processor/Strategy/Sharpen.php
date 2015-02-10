@@ -12,6 +12,7 @@
 
 namespace Alaress\Image\Implementation\Imagine\Processor\Strategy;
 
+use Imagine\Image\Effects\ConvolutionMatrix;
 use Imagine\Image\ImageInterface;
 
 class Sharpen extends BaseStrategy
@@ -23,7 +24,19 @@ class Sharpen extends BaseStrategy
      */
     public function manipulate($image)
     {
-        $image->effects()->sharpen();
+        $image->effects()->convolve(
+            new ConvolutionMatrix(
+                -0.2,
+                -1,
+                -0.2,
+                -1,
+                15,
+                -1,
+                -0.2,
+                -1,
+                -0.2
+            )
+        );
         return $image;
     }
 }
