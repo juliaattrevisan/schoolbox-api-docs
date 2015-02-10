@@ -109,7 +109,7 @@
 
 		/* Empty out the div
 		 */
-		config.element.html('');
+		//config.element.html('');
 
 		/* Render controls
 		 */
