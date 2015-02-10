@@ -126,12 +126,12 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
     /**
      * Find all images for a category
      *
-     * @param $categoryId
+     * @param \Schoolbox\Resource\Category $category
      * @param int $limit
      * @param bool $excludeWork
      * @return mixed
      */
-    public function findImages($categoryId, $limit = 0, $excludeWork = false)
+    public function findImages(Category $category, $limit = 0, $excludeWork = false)
     {
         $fileMapper = $this->getJoinMapper('files');
 
@@ -151,13 +151,13 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
         }
 
         $params = array(
-            'categoryId' => $categoryId,
+            'categoryId' => $category->getId(),
         );
 
         $statement = $this->database->prepare($query);
         $statement->execute($params);
 
-        $collection = new \Schoolbox\Collection();
+        $collection = new Collection();
 
         foreach ($statement as $row) {
             $collection->add($fileMapper->hydrate($row, 'f'));
