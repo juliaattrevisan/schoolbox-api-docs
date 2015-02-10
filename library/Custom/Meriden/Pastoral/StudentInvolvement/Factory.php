@@ -296,12 +296,13 @@ class Factory
             /** @var SubmissionBox $assess */
             $assessId = $assess->getId();
             $grades[$assessId]['assessment'] = $assess;
+            $grades[$assessId]['rubric']     = array();
             // Is there a rubric involved? If so get student's marks for it
             if ($assess->isRubric()) {
                 $rubric     = $rubricHandler->getRubric($assessId);
                 $rubricMark = new \DueWork_Rubric_Mark($rubric);
                 $rubricMark->populateMarks($student->getId());
-                $grades[$assessId]['rubric'] = $rubricMark;
+                $grades[$assessId]['rubric'] = $rubricMark->toArray();
             }
         }
         return $grades;
