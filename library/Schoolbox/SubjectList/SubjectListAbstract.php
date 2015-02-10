@@ -36,7 +36,7 @@ abstract class SubjectListAbstract {
 	protected $allSubjectLists = array();
 
     /**
-     * An instance of categoryHandler
+     * An instance of category mapper
      *
      * @var \Schoolbox\Resource\CategoryMapper
      */
