@@ -1355,10 +1355,12 @@ class Submission extends DeprecatedModel
             LEFT JOIN lu_submission_type ft ON ft.id = sb.type
             LEFT JOIN category c ON c.`id` = sb.`category`
             LEFT JOIN student_submission ss ON sb.id = ss.box_id AND ss.owner = '$studentID' AND ss.draft IS FALSE
+            LEFT JOIN submission_return sr ON sb.id = sr.box_id AND sr.owner = '$studentID'
             WHERE c.id $conditional AND sb.deleted IS FALSE
             AND YEAR(sb.date) = $this_year
             AND sb.deleted IS FALSE
             AND sb.task_id IS NULL
+            AND sr.id IS NULL
             GROUP BY sb.id
             ORDER BY sb.date ASC
             ";
