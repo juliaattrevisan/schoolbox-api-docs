@@ -13,8 +13,8 @@
             </tr>
         </table>
     </td>
-    {{ fn.spacer(config.fqdn, 0, 8) }}
-    <td valign="middle">
+    {{ fn.spacer(config.fqdn, 0, 12) }}
+    <td valign="top">
         <table width="100%">
             <tr>
                 <td>
@@ -31,5 +31,5 @@
     </td>
     {{ fn.spacer(config.fqdn, 0, 8) }}
 </tr>
-<tr class="{{ loop.index is even ? 'dark' : '' }}">{{ fn.spacer(config.fqdn, 12, 0, 4) }}</tr>
+<tr style="border-bottom:1px solid #dbe9ec" class="{{ loop.index is even ? 'dark' : '' }}">{{ fn.spacer(config.fqdn, 12, 0, 4) }}</tr>
 
