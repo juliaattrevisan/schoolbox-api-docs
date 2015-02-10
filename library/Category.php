@@ -283,6 +283,12 @@ class Category extends DeprecatedModel
         return $this->db->getRow($query);
     }
 
+    /**
+     * Deprecated
+     *
+     * @deprecated
+     * @param $categoryID
+     */
     function logPageView($categoryID)
     {
         // new mechanism for storing pageviews
