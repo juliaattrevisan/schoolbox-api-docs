@@ -19,7 +19,7 @@ if (!Cfg::get('external_enable')) {
 $groupHandler = new Group;
 $userHandler = new User;
 $timetableHandler = new External_Timetable;
-$categoryHandler = new Category;
+$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
 
 $this->setFile(TEMPLATE_content, 'class/timetable.html');
 $this->setTitle('Timetable');
@@ -248,8 +248,8 @@ if (is_array($outputList)) {
 
                                 /* Lookup subject code and check permissions, if read access provide a link to the user */
                                 if (!isset($catCache[$class['code']])) {
-                                    $cat = $categoryHandler->getByCode($class['code']);
-                                    $catCache[$class['code']] = $cat['id'];
+                                    $cat = $categoryMapper->findByCode($class['code']);
+                                    $catCache[$class['code']] = $cat->getId();
                                 }
 
                                 $this->setVar($outputPeriod);
