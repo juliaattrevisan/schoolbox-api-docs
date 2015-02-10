@@ -15,6 +15,9 @@ $this->setBlock('folder_detail', 'folder_detail_perms', 'folder_detail_perms_blo
 $this->setBlock(TEMPLATE_content, 'file_detail', 'file_detail_block');
 $this->setBlock(TEMPLATE_content, 'multi_file_detail', 'multi_file_detail_block');
 
+$this->setTitle('Resources');
+$this->setTab('resources');
+
 // presently, the 3rd-panel blocks are being AJAX'd, so just blank their vars and render them as-is
 // that way you know what's meant to be in the template, rather than just gues
 $this->setVar(array(
@@ -36,27 +39,23 @@ $this->setVar(array(
 	'MULTIFILE_COUNT' => '',
 
 ));
+
 $this->parse('folder_detail_block', 'folder_detail', false);
 $this->parse('folder_detail_perms_block', 'folder_detail_perms', false);
 $this->parse('file_detail_block', 'file_detail', false);
 $this->parse('multi_file_detail_block', 'multi_file_detail', false);
 
-
-$this->setTitle('Resources');
-$this->setTab('resources');
-
-$categoryHandler = new Category;
 $fileHandler = new File;
 $groupHandler = new Group;
 $allowedFiles = new AllowedFile;
 
+$categoryMapper = CategoryMapper::getInstance();
 
 if (is_numeric($this->arg[0])) {
 	$_SESSION['resourcesID'] = $this->arg[0];
 	SitePage::localRedir('/resources/');
 }
-else
-{
+else {
 	$openCategoryId = (int)$_SESSION['resourcesID'];
 }
 
@@ -66,19 +65,19 @@ if ($groupHandler->getPermission($openCategoryId) < READ_ACCESS) {
 }
 
 // Check if the category even exists
-$categoryMapper = CategoryMapper::getInstance();
 try {
-    $categoryMapper->findById($openCategoryId);
-} catch (Schoolbox\Mapper\Exception\Deleted $e) {
-    // Deleted: load the parent
-    $openCategoryId = $e->getDeletedObject()->getParent()->getId();
-} catch (Schoolbox\Mapper\Exception $e) {
-    $openCategoryId = 0;
-}
+    $openCategory = $categoryMapper->findById($openCategoryId);
 
-// log view
-if ($openCategoryId > 0) {
-	$categoryHandler->logPageView($openCategoryId);
+    // log view
+    $categoryMapper->logPageView($openCategory);
+}
+catch (Schoolbox\Mapper\Exception\Deleted $e) {
+    // Deleted: load the parent
+    $openCategory = $e->getDeletedObject()->getParent();
+}
+catch (Schoolbox\Mapper\Exception $e) {
+    $openCategory = new \Schoolbox\Resource\Category();
+    $openCategory->setId(0);
 }
 
 // Build a tree up to the last resource we looked at
@@ -91,15 +90,10 @@ $treeBuilder = new Schoolbox\Resource\CategoryTreeBuilder(
 // output folders, column 1 - now done via jsTree and TREEDATA
 $this->setVar(
     array(
-        'TREEDATA'      => json_encode($treeBuilder->buildPartialTree($openCategoryId)),
-        'OPEN_CATEGORY' => intval($openCategoryId),
+        'TREEDATA'      => json_encode($treeBuilder->buildPartialTree($openCategory->getId())),
+        'OPEN_CATEGORY' => intval($openCategory->getId()),
     )
 );
-
-
-
-
-
 
 /* Output a list of nodes (which are comprised of both files and links)
  * in the second column of Old Resource Browser
@@ -108,17 +102,7 @@ $this->setVar(
  * Root folder is the default location to open upon first visit
  * and when a folder doesn't exist anymore
  */
-$category = new \Schoolbox\Resource\Category();
-$category->setId(0);
-
-try {
-    $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
-    $category = $categoryMapper->findById($openCategoryId);
-}
-catch (\Exception $e) {
-}
-
-$contents = new \Schoolbox\Resource\Browser\Tree\Contents($category);
+$contents = new \Schoolbox\Resource\Browser\Tree\Contents($openCategory);
 
 /* phplib
  */

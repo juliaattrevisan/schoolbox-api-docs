@@ -124,6 +124,32 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
     }
 
     /**
+     * Log a page view
+     *
+     * @param Category $category
+     */
+    public function logPageView(Category $category) {
+
+        // new mechanism for storing pageviews
+        // the use of NOW() generates a truncation warning (non-fatal and non-critical) since a datetime is being
+        // shoved into a date field, but it can be safely ignored: the data inserts correctly
+        $query = "
+            INSERT INTO homepage_visits (`date`, `user_group_id`, `category_id`)
+            VALUES (NOW(), :gid, :cid)
+            ON DUPLICATE KEY
+            UPDATE `hitcount` = `hitcount` + 1
+        ";
+
+        $params = array(
+            'cid' => $category->getId(),
+            'gid' => $_SESSION['gid']
+        );
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($params);
+    }
+
+    /**
      * Find all images for a category
      *
      * @param \Schoolbox\Resource\Category $category
