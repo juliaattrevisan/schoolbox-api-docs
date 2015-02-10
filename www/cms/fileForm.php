@@ -72,6 +72,11 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
         $file->setTempFileLocation($_FILES['file']['tmp_name']);
         $file->setFilename($_FILES['file']['name']);
         $file->setFilesize(filesize($_FILES['file']['tmp_name']));
+    } else {
+        $originalLocation = $file->getFileLocation();
+        if ($originalLocation) {
+            $file->setTempFileLocation($originalLocation);
+        }
     }
 
     // set attributes
@@ -82,7 +87,6 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
     $file->setModified(Alaress_Date_Format::now());
 
     // set copy source
-    $file->setTempFileLocation($file->getFileLocation());
 
     // this is the collection we'll be saving
     $collection = new \Schoolbox\Collection();
