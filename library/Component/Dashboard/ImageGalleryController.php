@@ -109,7 +109,7 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
         $this->setVar('image_gallery_block', '');
 
         // Load images for the current homepage
-        $allImages = $this->getCategoryMapper()->findImages($this->getSource()->getId(), $this->getConfig('size'), true);
+        $allImages = $this->getCategoryMapper()->findImages($this->getSource(), $this->getConfig('size'), true);
 
         // Iterate
         foreach ($allImages as $currentImage) {
