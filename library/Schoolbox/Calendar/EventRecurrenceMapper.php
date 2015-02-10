@@ -209,6 +209,10 @@ class EventRecurrenceMapper
 
                 $this->getEventMapper()->save($event);
 
+                if (!$event->getSeriesId()) {
+                    return;
+                }
+
                 /* Assign relations
                  */
                 $eventRelations->resetRelations($event);
