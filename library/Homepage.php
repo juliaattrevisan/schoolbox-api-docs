@@ -186,9 +186,9 @@ class Homepage {
         }
 
         // reset the homepage
-        $categoryHandler = new Category();
-        $category = $categoryHandler->getByID($this->cid);
-        $this->resetHomepageToTemplate($category['template']);
+        $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+        $category = $categoryMapper->findById($this->cid);
+        $this->resetHomepageToTemplate($category->getHomepage()->getTemplate());
 
     }
 
