@@ -82,6 +82,39 @@ class Healthcheck
         $this->MssqlConnection();
     }
 
+    private function TassCheckTables()
+    {
+        echo "\nTass Permission Check - Tables\n";
+        $list[] = 'studsub';
+        $list[] = 'student';
+        $list[] = 'tchsub';
+        $list[] = 'subtab';
+        $list[] = 'ttperiod';
+        $list[] = 'ttdays';
+        $list[] = 'ttcalendar';
+        $list[] = 'ttmast';
+        $list[] = 'paraddress';
+        $list[] = 'house';
+        $list[] = 'teacher';
+        $list[] = 'parent';
+        $list[] = 'pia_sfaccess';
+        $list[] = 'tchdept';
+        sort($list);
+
+        foreach ($list as $table) {
+            echo "  $table : ";
+            $db = new MSSQL();
+            $db->debug = true;
+            $result = $db->query("SELECT TOP 1 * FROM $table");
+            if ($result) {
+                echo "OK\n";
+            } else {
+                echo "\n    Failed - ".mssql_get_last_message()."\n";
+            }
+            unset($db,$result);
+        }
+    }
+
     private function SynergeticCheckTables()
     {
         echo "\nSynergetic Permission Check - Tables\n";
