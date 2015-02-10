@@ -187,11 +187,14 @@ class Homepage {
 
         // reset the homepage
         $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
-        $category = $categoryMapper->findById($this->cid);
-        $this->resetHomepageToTemplate($category->getHomepage()->getTemplate());
 
+        try {
+            $category = $categoryMapper->findById($this->cid);
+            $this->resetHomepageToTemplate($category->getHomepage()->getTemplate());
+        }
+        catch (\Exception $e) {
+        }
     }
-
 
     /**
      * Resets a homepage to a template, or destroys the homepage if it is to be removed.
