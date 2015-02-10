@@ -1421,7 +1421,7 @@ class Submission extends DeprecatedModel
      *
      * @param \Schoolbox\Assessment\Component\SubmissionBox $box
      *
-     * @return array
+     * @return \Schoolbox\Collection|\Schoolbox\User[]
      */
     public function getAllStudentsForSubmission(\Schoolbox\Assessment\Component\SubmissionBox $box)
     {
