@@ -8,7 +8,6 @@
  *
  */
 $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
-$catHandler = new Category();
 
 $groupID = $_SESSION['gid'];
 $prefix = 'code';
@@ -94,7 +93,7 @@ if(!$homepageHandler->getTemplate()) {
 // moving forward! log the pageview
 $mapper = new Schoolbox\Resource\CategoryLogMapper();
 $mapper->incrementHitcount($_SESSION['user'], $category->getId());
-$catHandler->logPageView($category->getId());
+$categoryMapper->logPageView($category);
 
 /* BUILD PAGE */
 $this->setFile(TEMPLATE_content, 'homepage/index.html');
