@@ -94,7 +94,7 @@ class EventRecurrenceMapper
     {
         $series = $this->getEventMapper()
                        ->getAllInSeries($event);
-        if (count($series) >= 1) {
+        if (count($series) <= 1) {
             return array();
         }
 
