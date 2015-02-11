@@ -1,36 +1,42 @@
 <?php
 
-$categoryHandler = new Category;
 $groupHandler = new Group;
 $newsHandler = new CategoryNews;
 $userHandler = new User();
 
+$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+
 $this->setFile(TEMPLATE_content, "homepage/newsArchive.html");
 $this->setBlock(TEMPLATE_content, "submit_news", "submit_news_block");
 $this->setBlock(TEMPLATE_content, "news", "news_block");
-if (!($category = $categoryHandler->getByID($this->arg[0])))
-	$this->error(2);
 
-$output = array('CATEGORY_NAME'	=> Scrub::text($category['name']),
+try {
+    $category = $categoryMapper->findById($this->arg[0]);
+}
+catch (\Exception $e) {
+    $this->error(2);
+}
+
+$output = array('CATEGORY_NAME'	=> Scrub::text($category->getName()),
 				'TITLE'			=> 'News Archive',
-				'ID'			=> $category['id'],
+				'ID'			=> $category->getId(),
 				);
 $this->setVar($output);
 
 //hide add button
-if($groupHandler->getPermission($category['id']) >= WRITE_ACCESS)
+if($groupHandler->getPermission($category->getId()) >= WRITE_ACCESS)
 	$this->parse("submit_news_block", "submit_news");
 else
 	$this->setVar("submit_news_block", "");
 
 
-$newsList = $newsHandler->getAllForCategory($category['id'], false, true);
+$newsList = $newsHandler->getAllForCategory($category->getId(), false, true);
 
 if(is_array($newsList)) {
 
     $j = 0;
 	foreach($newsList as $news) {
-		if($article['owner'] == $_SESSION['id'] || $groupHandler->getPermission($category['id']) >= WRITE_ACCESS)
+		if($article['owner'] == $_SESSION['id'] || $groupHandler->getPermission($category->getId()) >= WRITE_ACCESS)
 			$this->setVar("MOD_NEWS", "<a class=\"btn modify\" href=\"/news/homepage/".$news['id']."\"><span></span>Modify</a>");
 		else
 			$this->setVar("MOD_NEWS", "");
@@ -59,7 +65,3 @@ if(is_array($newsList)) {
 	}
 } else
 	$this->setVar("news_block", "");
-
-
-
-?>
