@@ -12,7 +12,7 @@ if (!is_numeric($_GET['categoryID']))
 	die('Invalid category id');
 
 $groupHandler = new Group;
-$categoryHandler = new Category;
+$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
 $fileHandler = new File;
 
 $output = array('FILE_CATEGORY_ID'	=> $_GET['categoryID'],
@@ -27,7 +27,7 @@ $treeBuilder = new Schoolbox\Resource\CategoryTreeBuilder(
 );
 $page->setVar('TREEDATA', json_encode($treeBuilder->buildPartialTree($_GET['categoryID'])));
 
-$category = $categoryHandler->getByID($_GET['categoryID']);
+$category = $categoryMapper->findById($_GET['categoryID']);
 
 /* output files */
 if (in_array($_GET['filter'], array('image', 'video'))) {
@@ -46,8 +46,8 @@ $page->setVar($output);
 if (is_array($fileList)) {
 
     // add homepage "file"
-    if ($category['template'] > 0 && !is_array($filter)) {
-        $homepage = array('id'          => $category['id'],
+    if ($category->getHomepage()->getTemplate()->getId() > 0 && !is_array($filter)) {
+        $homepage = array('id'          => $category->getId(),
                           'description' => 'Homepage',
                           'size'        => 1,
                           'iconFile'    => 'vcard_fiquet.png',
@@ -82,4 +82,3 @@ if (is_array($fileList)) {
 
 $page->outputPage(true);
 
-?>
