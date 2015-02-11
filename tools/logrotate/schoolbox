@@ -28,7 +28,7 @@
 }
 
 /var/log/schoolbox/digestd*.log /var/log/schoolbox/scheduled*.log /var/log/schoolbox/socketd*.log /var/log/schoolbox/rerouted*.log /var/log/schoolbox/belld*.log {
-	daily
+	size 100M
 	copytruncate
 	missingok
 	rotate 14
