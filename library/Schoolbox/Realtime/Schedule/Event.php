@@ -82,6 +82,17 @@ class Event implements EventInterface, Serializable {
 
 
 	/**
+     * @param object $object
+     * @return self
+     */
+    public function setObject($object)
+    {
+        $this->object = $object;
+        return $this;
+    }
+
+
+    /**
 	 * @return Mapper
 	 */
 	public function getMapper() {
