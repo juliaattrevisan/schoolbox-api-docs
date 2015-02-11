@@ -1,0 +1,195 @@
+<?php
+/**
+ * Alaress_Image_Processor_Strategy_Abstract
+ *
+ * Canvas abstract. Used when you need to specify new dimensions for an image.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Alaress\Image\Implementation\Imagine\Processor\Strategy;
+
+use Alaress\Image\Processor\Strategy\StrategyInterface;
+use Imagine\Image\BoxInterface;
+use Imagine\Image\ImagineInterface;
+use Imagine\Image\Point;
+use Imagine\Image\PointInterface;
+
+abstract class BaseStrategy implements StrategyInterface
+{
+    /**
+     * Used for strategies that need to create a new image canvas.
+     *
+     * @var ImagineInterface
+     */
+    protected $imageManager;
+    protected $canvasWidth = 0;
+    protected $canvasHeight = 0;
+
+    /**
+     * Constructor
+     *
+     * @param array            $args
+     * @param ImagineInterface $imageManager
+     */
+    public function __construct($args, ImagineInterface $imageManager)
+    {
+        $this->setImageManager($imageManager);
+        $this->setup($args);
+    }
+
+    /**
+     * Post-constructor setup
+     * $this->imageManager is guaranteed to be set up
+     *
+     * @param array $args
+     */
+    protected function setup($args)
+    {
+    }
+
+    /**
+     * Translates color array to a hex string, otherwise returns white
+     *
+     * @param  array  $bgColorArray
+     * @return string
+     */
+    protected function translateColorArray($bgColorArray)
+    {
+        if (is_array($bgColorArray)) {
+            return sprintf(
+                '#%02x%02x%02x',
+                min(255, max(0, $bgColorArray['red'])),
+                min(255, max(0, $bgColorArray['green'])),
+                min(255, max(0, $bgColorArray['blue']))
+            );
+        }
+        return '#ffffff';
+    }
+
+    /**
+     * Gets the top left point of $imageBox when it is aligned at
+     * $alignment within $canvasBox.
+     *
+     * @param BoxInterface $canvasBox
+     * @param BoxInterface $imageBox
+     * @param string       $alignment
+     *
+     * @return PointInterface
+     */
+    protected function getImageBoxPoint(
+        BoxInterface $canvasBox,
+        BoxInterface $imageBox,
+        $alignment = 'center'
+    ) {
+        $xLeft   = 0;
+        $xRight  = $canvasBox->getWidth() - $imageBox->getWidth();
+        $xCenter = intval($xRight / 2);
+        $yTop    = 0;
+        $yBottom = $canvasBox->getHeight() - $imageBox->getHeight();
+        $yCenter = intval($yBottom / 2);
+        switch (strtolower($alignment)) {
+            case 'top':
+                $xPoint = $xCenter;
+                $yPoint = $yTop;
+                break;
+            case 'top-right':
+                $xPoint = $xRight;
+                $yPoint = $yTop;
+                break;
+            case 'right':
+                $xPoint = $xRight;
+                $yPoint = $yCenter;
+                break;
+            case 'bottom-right':
+                $xPoint = $xRight;
+                $yPoint = $yBottom;
+                break;
+            case 'bottom':
+                $xPoint = $xCenter;
+                $yPoint = $yBottom;
+                break;
+            case 'bottom-left':
+                $xPoint = $xLeft;
+                $yPoint = $yBottom;
+                break;
+            case 'left':
+                $xPoint = $xLeft;
+                $yPoint = $yCenter;
+                break;
+            case 'top-left':
+                $xPoint = $xLeft;
+                $yPoint = $yTop;
+                break;
+            case 'center':
+            case 'middle':
+            default:
+                $xPoint = $xCenter;
+                $yPoint = $yCenter;
+                break;
+        }
+        return new Point(intval($xPoint), intval($yPoint));
+    }
+
+    /**
+    * Set canvas height
+    *
+    * @param $canvasHeight
+    */
+    protected function setCanvasHeight($canvasHeight)
+    {
+        $this->canvasHeight = $canvasHeight;
+    }
+
+    /**
+    * Get canvas height
+    *
+    * @return int
+    */
+    protected function getCanvasHeight()
+    {
+        return $this->canvasHeight;
+    }
+
+    /**
+    * Set canvas width
+    *
+    * @param $canvasWidth
+    */
+    protected function setCanvasWidth($canvasWidth)
+    {
+        $this->canvasWidth = $canvasWidth;
+    }
+
+    /**
+    * Get canvas width
+    *
+    * @return int
+    */
+    protected function getCanvasWidth()
+    {
+        return $this->canvasWidth;
+    }
+
+    /**
+     * @return ImagineInterface
+     */
+    public function getImageManager()
+    {
+        return $this->imageManager;
+    }
+
+    /**
+     * @param  ImagineInterface $imageManager
+     *
+     * @return $this
+     */
+    public function setImageManager($imageManager)
+    {
+        $this->imageManager = $imageManager;
+        return $this;
+    }
+}

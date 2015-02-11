@@ -55,6 +55,10 @@
         {
             "type": "vcs",
             "url":  "https://github.com/alaress/etherpad-lite-client"
+        },
+        {
+            "type": "vcs",
+            "url":  "https://github.com/armatronic/Imagine"
         }
     ],
     "require": {
@@ -89,7 +93,9 @@
         "aura/sqlquery": "~2.0.0",
         "0x46616c6b/etherpad-lite-client": "dev-schoolbox-14.0-dep as dev-master",
         "easyrdf/easyrdf": "~0.8.0",
-        "caxy/php-htmldiff": "dev-master"
+        "caxy/php-htmldiff": "dev-master",
+        "intervention/image": "~2.0.14",
+        "imagine/imagine": "dev-0.6.2+resize-animated-gif+image-convolution as 0.6.2"
     },
     "require-dev": {
         "sebastian/phpcpd": "2.*",

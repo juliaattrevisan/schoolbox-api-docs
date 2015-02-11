@@ -7,6 +7,10 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
+use Alaress\Image\Cache\MyImage;
+use Alaress\Image\Processor\Freeform;
+use Alaress\Image\Processor\Standard;
+
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 /* Preserve old checks
@@ -14,9 +18,9 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 session_start();
 
 if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
-	if (empty($_SESSION['id'])) {
-		Sitepage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 403);
-	}
+    if (empty($_SESSION['id'])) {
+        Sitepage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 403);
+    }
 
 //	$db = DeprecatedDatabase::getInstance();
 //
@@ -25,7 +29,7 @@ if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
 //
 //	$imageInfo = $db->getRow($query);
 
-	/* TODO: Add permissions later to prevent people from manufacturing
+    /* TODO: Add permissions later to prevent people from manufacturing
 	 * links to other people's images
 	 */
 //	/* See if you can view this image
@@ -36,44 +40,51 @@ if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
 //		error(5);
 //	}
 
-	/* Choose a caching method to use
+    /* Choose a caching method to use
 	 */
-	$key = $_GET['width'] . 'x' . $_GET['height'];
+    $key = $_GET['width'] . 'x' . $_GET['height'];
 
-	$cache = new Alaress_Image_Cache_MyImage($_GET['id'], $key);
+    $cache = new MyImage($_GET['id'], $key);
 
-	/* Process and stream image
+    /* Process and stream image
 	 */
-	$imageProcessor = new Alaress_Image_Processor_Freeform($cache, new Alaress_Image_Transformation_MyImage($_GET['width'], $_GET['height']));
-	try {
-		$imageProcessor->load()->stream();
-	}
-	catch (Exception_Schoolbox_NotFound $e) {
-		SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
-	}
-	catch (Exception $e) {
-		SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 500);
-	}
-}
-else {
-	if (empty($_SESSION['id'])) {
-		SitePage::redirectToBrokenImageWithTransform('storage', $_GET['key'], 403);
-	}
+    $imageProcessor = new Freeform(
+        $cache,
+        new \Alaress\Image\Transformation\MyImage($_GET['width'], $_GET['height']),
+        new \Alaress\Image\Implementation\Imagine\Filetype\Factory(),
+        new \Alaress\Image\Implementation\Imagine\Processor\Strategy\Factory()
+    );
+    try {
+        $imageProcessor->load()->stream();
+    } catch (Exception_Schoolbox_NotFound $e) {
+        SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
+    }
+    catch (Exception $e) {
+        SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 500);
+    }
+} else {
+    if (empty($_SESSION['id'])) {
+        SitePage::redirectToBrokenImageWithTransform('storage', $_GET['key'], 403);
+    }
 
-	$cache = new Alaress_Image_Cache_MyImage($_GET['id'], $_GET['key']);
+    $cache = new MyImage($_GET['id'], $_GET['key']);
 
-	/* Process and stream image
+    /* Process and stream image
 	 */
-	$imageProcessor = new Alaress_Image_Processor_Standard($cache, new Alaress_Image_Transformation_Storage());
-	try {
-		$imageProcessor->load()->stream();
-	}
-	catch (Exception_Schoolbox_NotFound $e) {
-		//
-		// Pass transform to broken image selector
-		SitePage::redirectToBrokenImageWithTransform('storage', $_GET['key'], 404);
-	}
-	catch (Exception $e) {
-		SitePage::redirectToBrokenImageWithTransform('storage', $_GET['key'], 500);
-	}
+    $imageProcessor = new Standard(
+        $cache,
+        new \Alaress\Image\Transformation\Storage(),
+        new \Alaress\Image\Implementation\Imagine\Filetype\Factory(),
+        new \Alaress\Image\Implementation\Imagine\Processor\Strategy\Factory()
+    );
+    try {
+        $imageProcessor->load()->stream();
+    } catch (Exception_Schoolbox_NotFound $e) {
+        //
+        // Pass transform to broken image selector
+        SitePage::redirectToBrokenImageWithTransform('storage', $_GET['key'], 404);
+    }
+    catch (Exception $e) {
+        SitePage::redirectToBrokenImageWithTransform('storage', $_GET['key'], 500);
+    }
 }
