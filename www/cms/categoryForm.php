@@ -142,7 +142,7 @@ if ($_POST['name']) {
     if ($groupHandler->getPermission($_POST['move']) < WRITE_ACCESS
         || $groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS
     ) {
-        echo "Insufficient permssions";
+        echo "Insufficient permissions";
         exit;
     }
 
