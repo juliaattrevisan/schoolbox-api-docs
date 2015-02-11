@@ -43,8 +43,7 @@ class Marksheet
     protected $userHandler;
     /** @var \Group */
     protected $groupHandler;
-    /** @var \Category */
-    protected $categoryHandler;
+
     /** @var \External_Class */
     protected $synergyHandler;
 
