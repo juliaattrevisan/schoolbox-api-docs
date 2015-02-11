@@ -458,7 +458,10 @@ $tooltip-font-color: $white;
 //
 // CUSTOM OVERRIDES
 //
-.label 						{ text-transform: uppercase; }
+.label { text-transform: uppercase; }
+
+.panel { overflow: auto; }
+
 .submitted {
 	@include label(
 		$bg: tint($success-color, 74%)

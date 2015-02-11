@@ -1,5 +1,5 @@
-@charset "UTF-8";
 //@import "../../javascript/components/foundation/scss/foundation";
+
 // Utils
 @import "utils/functions";
 @import "utils/mixins";
@@ -18,6 +18,8 @@
 @import "components/content";
 @import "components/joyride";
 @import "components/navigation";
+
+@import "utils/fonts";
 
 // Layout
 @import "layout/footer";
