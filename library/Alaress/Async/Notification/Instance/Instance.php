@@ -192,7 +192,11 @@ class Instance implements JsonSerializable {
 	 * @return string
 	 */
 	public function __toString() {
-		return json_encode(Json::applyJsonSerializable($this));
+        try {
+            return json_encode(Json::applyJsonSerializable($this));
+        } catch (\Exception $e) {
+            return "";
+        }
 	}
 
 

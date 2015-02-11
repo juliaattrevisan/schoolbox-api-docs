@@ -43,7 +43,15 @@ class Postman {
 	public function deliver($bundle, $appendContext = array()) {
 		$i = 0;
 		foreach($bundle->getAll() as $destination => $instance) {
-			$this->notif->setTopic($destination)->log($instance->getSeverity(), "$instance", $instance->getContext() + $appendContext);
+            $json = "$instance";
+
+            if (strlen($json) == 0) {
+                // message could not be serialized, therefore cannot be delivered
+                $this->log->notice("Broken message, was unable to json_encode", array('char' => '?'));
+                continue;
+            }
+
+			$this->notif->setTopic($destination)->log($instance->getSeverity(), $json, $instance->getContext() + $appendContext);
 			$this->log->info("Broadcast a message to '$destination' at level {$instance->getSeverity()}", array('char' => '<'));
 			++$i;
 		}
