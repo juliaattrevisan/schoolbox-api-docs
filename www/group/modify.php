@@ -25,14 +25,19 @@ $this->setTitle('Modify User Group');
 $this->setTab('resources');
 
 $groupHandler = new Group(HOMEPAGE_SERVICE);
-$categoryHandler = new Category;
+$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
 
 if (is_numeric($this->arg[0])) {
-    $messagingEnabled = ConfigMapper::getInstance()->get('messaging_enabled');
+
 
 	$userHandler = new User();
 
-	$category = $categoryHandler->getByID($this->arg[0]);
+    try {
+    	$category = $categoryMapper->findByID($this->arg[0]);
+    }
+    catch (\Exception $e) {
+        error(19);
+    }
 
 	// check access
 	if($groupHandler->getPermission($this->arg[0]) < FULL_ACCESS)
@@ -47,12 +52,12 @@ if (is_numeric($this->arg[0])) {
 		)
 	);
 
-	$output = array('CATEGORY_NAME'		=> Scrub::text($category['name']),
-					'CATEGORY_ID'		=> $category['id'],
+	$output = array('CATEGORY_NAME'		=> Scrub::text($category->getName()),
+					'CATEGORY_ID'		=> $category->getId(),
 					'GROUP_TYPE_1'		=> '',
 					'GROUP_TYPE_2'		=> '',
 					'GROUP_TYPE_3'		=> '',
-					'GROUP_TYPE_'.$category['type']	=> 'checked="checked"',
+					'GROUP_TYPE_'.$category->getGroup()->getType()	=> 'checked="checked"',
 					);
 
 	$this->setVar($output);
@@ -61,12 +66,14 @@ if (is_numeric($this->arg[0])) {
 
     $search = array(
         'user_id'        => 0,
-        'msg_route_key'  => "service.1.{$category['id']}",
+        'msg_route_key'  => "service.1.{$category->getId()}",
         'outgoing_level' => 0
     );
 
+    /* Group Messaging
+     */
     $groupMessagesEnabled = !RerouteOverrideMapper::getInstance()->isRouteMuted(
-        "service.1.{$category['id']}"
+        "service.1.{$category->getId()}"
     );
 
     $output = array(
@@ -77,19 +84,32 @@ if (is_numeric($this->arg[0])) {
     if ($groupMessagesEnabled) {
         $output['MSG_ENABLED_CHECKED'] = 'checked="checked"';
 
-        if ($category['force_follow']) {
+        /* Discover force_follow value
+         */
+        $groupMapper = new \Schoolbox\Resource\GroupMapper();
+        $groupSettings = $groupMapper->findOneByColumn('cid', $category->getId());
+
+        if ($groupSettings->getForceFollow()) {
             $output['MSG_FORCE_FOLLOW_CHECKED'] = 'checked="checked"';
         }
     }
 
     $this->setVar($output);
 
+    /* Find folder owner (full access users)
+     */
+    $userAccessMapper = new \Schoolbox\Permission\Access\UserAccessMapper();
+    $folderOwner = $userAccessMapper->findByColumnList(array(
+        'sid' => $category->getId(),
+        'service' => HOMEPAGE_SERVICE,
+        'type' => \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL
+    ))->first();
 
-	if ($category['owner']) {
+	if ($folderOwner instanceof \Schoolbox\Permission\Access\UserAccess) {
 		$this->setVar(
 			array(
-				'GROUP_OWNER' => $userHandler->formatName($category),
-				'OWNER_ID'    => $category['owner'],
+				'GROUP_OWNER' => $folderOwner->getUser()->formatName(),
+				'OWNER_ID'    => $folderOwner->getUser()->getId(),
 			)
 		);
 		$this->parse('groupOwner_block', 'groupOwner');
@@ -98,12 +118,16 @@ if (is_numeric($this->arg[0])) {
 		$this->parse('groupUnmanaged_block', 'groupUnmanaged');
 	}
 
+    /* Messaging Enabled
+     */
+    $messagingEnabled = ConfigMapper::getInstance()->get('messaging_enabled');
+
     if ($messagingEnabled) {
         $this->parse('msg_enabled_block', 'msg_enabled');
         $this->parse('msg_enabled_followth_block', 'msg_enabled_followth');
     }
 
-	$memberList   = $groupHandler->getMemberList($category['id']);
+	$memberList   = $groupHandler->getMemberList($category->getId());
 	//
 	// Keep list of everyone to email
 	$all_emails   = array();
@@ -118,12 +142,12 @@ if (is_numeric($this->arg[0])) {
 
             $search = array(
                 'user_id'        => array(0, $member['uid']),
-                'msg_route_key'  => "service.1.{$category['id']}",
+                'msg_route_key'  => "service.1.{$category->getId()}",
                 'outgoing_level' => 0
             );
 
             $following = !RerouteOverrideMapper::getInstance()->isRouteMuted(
-                "service.1.{$category['id']}",
+                "service.1.{$category->getId()}",
                 $member['uid']
             );
 
@@ -170,7 +194,7 @@ if (is_numeric($this->arg[0])) {
 		$this->setVar('mail_all_block', '');
 	}
 
-	$waitingList = $groupHandler->getWaitingList($category['id']);
+	$waitingList = $groupHandler->getWaitingList($category->getId());
 	if (is_array($waitingList)) {
 		foreach ($waitingList as $waiting) {
 			$output = array('WAITING_NAME' => $userHandler->formatName($waiting),
@@ -191,11 +215,8 @@ if (is_numeric($this->arg[0])) {
 	 */
 	$this->setVar(array(
 		'MAKEADMIN_CURRENT_USER_ID' => $_SESSION['user']->getId(),
-		'MAKEADMIN_CURRENT_ADMIN_ID' => $category['owner'],
+		'MAKEADMIN_CURRENT_ADMIN_ID' => $folderOwner->getUser()->getId(),
 		'MAKEADMIN_SUPER' => isset($_SESSION['su']) ? $_SESSION['su'] : 0
 	));
-
 } else
 	error(2);
-
-?>
