@@ -9,6 +9,7 @@
 
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\User;
 use Schoolbox\Resource\Category;
 
@@ -62,6 +63,38 @@ class Involvement
      * @var Category
      */
     protected $folder;
+
+    /**
+     * A grade that is specially named.
+     *
+     * This is used for the special assessments that are meant to exist for all
+     * classes, and are therefore not shown with a class's actual assessments.
+     *
+     * @var array
+     */
+    protected $namedGrades;
+
+    /**
+     * Moves a grade from $this->grades and puts it in $this->namedGrades.
+     *
+     * @param string $key
+     * @param string $assessmentName
+     *
+     * @return $this
+     */
+    public function moveToNamedGrade($key, $assessmentName)
+    {
+        foreach ($this->grades as $gradeId => $grade) {
+            if ($grade['assessment'] instanceof SubmissionBox) {
+                $name = $grade['assessment']->getName();
+                if (strcasecmp($name, $assessmentName) === 0) {
+                    $this->namedGrades[$key] = $grade;
+                    unset($this->grades[$gradeId]);
+                }
+            }
+        }
+        return $this;
+    }
 
     /**
      * @return int
@@ -194,5 +227,13 @@ class Involvement
     {
         $this->description = $description;
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getNamedGrades()
+    {
+        return $this->namedGrades;
     }
 }
