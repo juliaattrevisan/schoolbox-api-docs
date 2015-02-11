@@ -107,6 +107,9 @@ class ZipFileUpload extends DeprecatedModel {
 			return;
 		}
 
+        $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+        $roleAccessMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
+
 		/* Begin traversal
 		 */
 		while (false !== ($obj = readdir($dh))) {
@@ -117,16 +120,31 @@ class ZipFileUpload extends DeprecatedModel {
 				 * permissions
 				 */
 				if (is_dir($currentPath)) {
-					$categoryHandler = new Category();
+                    $parent = new \Schoolbox\Resource\Category();
+                    $parent->setId($parentID);
 
-					$id = $categoryHandler->create(array(
-						'name' => $obj,
-						'parent' => $parentID,
-						'group'	=> $_POST['group'],
-					));
+                    $category = new \Schoolbox\Resource\Category();
+                    $category->setName($obj);
+                    $category->setParent($parent);
+                    $categoryMapper->save($category);
+
+                    foreach ($_POST['group'] as $id => $perm) {
+                        try {
+                            $roleMapper = new \Schoolbox\RoleMapper();
+                            $role = $roleMapper->findById($id);
+
+                            $roleAccess = new \Schoolbox\Permission\Access\RoleAccess();
+                            $roleAccess->setCategory($category);
+                            $roleAccess->setRole($role);
+                            $roleAccess->setType($perm);
+                            $roleAccessMapper->save($roleAccess);
+                        }
+                        catch (\Exception $e) {
+                        }
+                    }
 
 					if ($this->verbose) {
-						echo "Creating $currentPath with $id, corresponding to $obj, with parent {$this->dirMap[$dir]}<br>";
+						echo "Creating $currentPath with {$category->getId()}, corresponding to $obj, with parent {$this->dirMap[$dir]}<br>";
 					}
 				}
 
@@ -137,7 +155,7 @@ class ZipFileUpload extends DeprecatedModel {
 				 * Otherwise, it's a file, and we add it to the parent Category
 				 */
 				if (is_dir($currentPath)) {
-					$this->traverse($currentPath, $id);
+					$this->traverse($currentPath, $category->getId());
 				}
 				else {
 					// Ignore filenames starting with a . (these are usually
