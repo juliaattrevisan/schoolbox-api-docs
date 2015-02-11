@@ -10,20 +10,11 @@ use Schoolbox\Resource\HomepageTemplateMapper;
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $page = new SitePage();
-$categoryHandler = new Category();
 $categoryMapper = CategoryMapper::getInstance();
 $categoryMapper->setSessionData($_SESSION);
 $groupHandler = new Group();
 
 if ($_POST['name']) {
-    $category = array(
-        'name' => $_POST['name'],
-        'parent' => $_POST['parent'],
-        'template' => $_POST['template'],
-        'code' => $_POST['code'],
-        'group' => $_POST['group'],
-        'recursive' => $_POST['recursive'] ? '1' : '0',
-    );
 
     /** @var \Schoolbox\Resource\Category $model */
     $model = $categoryMapper->createModel()
@@ -52,7 +43,6 @@ if ($_POST['name']) {
             error(6);
         }
         $model->setId($_POST['categoryID']);
-        $category['id'] = $_POST['categoryID'];
         $model->setId($_POST['categoryID']);
     } elseif ($groupHandler->getPermission($_POST['parent']) < WRITE_ACCESS) {
         error(6);
@@ -124,7 +114,7 @@ if ($_POST['name']) {
         } else {
             /* If a category code exists, just go back to where you came from
              */
-            if (strlen(trim($category['code']))) {
+            if (strlen(trim($_POST['code']))) {
                 $page->backToTheFuture(2);
             }
 
@@ -136,7 +126,15 @@ if ($_POST['name']) {
     }
 } elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
     /* Move link from one category to another, after checking permission on both from and to categories */
-    if ($_POST['move'] == $_POST['categoryID'] || !$category = $categoryHandler->getByID($_POST['move'])) {
+    try {
+        $category = $categoryMapper->findById($_POST['move']);
+    }
+    catch (\Exception $e) {
+        echo "Failed";
+        exit;
+    }
+
+    if ($_POST['move'] == $_POST['categoryID']) {
         echo "Failed";
         exit;
     }
@@ -153,11 +151,14 @@ if ($_POST['name']) {
             ->setParent($categoryMapper->createModel()->setId($_POST['categoryID']))
     );
 } elseif (is_numeric($_GET['delete'])) {
-    if (!$category = $categoryHandler->getByID($_GET['delete'])) {
+    try {
+        $category = $categoryMapper->findById($_GET['delete']);
+    }
+    catch (\Exception $e) {
         error(2);
     }
 
-    if ($groupHandler->getPermission($category['id']) < WRITE_ACCESS) {
+    if ($groupHandler->getPermission($category->getId()) < WRITE_ACCESS) {
         error(8);
     }
 
@@ -170,7 +171,7 @@ if ($_POST['name']) {
     }
     $categoryMapper->delete($categoryMapper->findById($_GET['delete']));
 
-    $_SESSION['resourcesID'] = $category['parent'];
+    $_SESSION['resourcesID'] = $category->getParent()->getId();
 } elseif (is_numeric($_GET['deleteAll'])) {
 
     // only superusers can do this no matter what
