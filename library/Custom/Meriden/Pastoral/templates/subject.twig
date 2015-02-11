@@ -48,26 +48,6 @@
 {{ report.subjectReport.description }}
 </p>
 
-<dl>
-{% for grade in report.subjectReport.grades %}
-    <dt>{{ grade.assessment.name }}</dt>
-    <dd>
-        {% if grade.rubric.criteria %}
-            <table>
-                {% for criterion in grade.rubric.criteria %}
-                    <tr>
-                        <th>{{ criterion.label }}</th>
-                        <td>{{ criterion.results[criterion.value] }}</td>
-                    </tr>
-                {% endfor %}
-            </table>
-        {% else %}
-            {{ grade.pretty_mark }}
-        {% endif %}
-    </dd>
-{% endfor %}
-</dl>
-
 {# course grade - derived from grade for this class #}
 
 {# grade distribution - also derived from grade #}
@@ -77,3 +57,9 @@
 {# Approaches to learning - another rubric #}
 
 {# Assessments #}
+<dl>
+    {% for grade in report.subjectReport.grades %}
+        <dt>{{ grade.assessment.name }}</dt>
+        <dd>{% include '@customMeridenPastoral/sub/assessmentResult.twig' with {grade: grade} %}</dd>
+    {% endfor %}
+</dl>
