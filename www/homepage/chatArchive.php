@@ -24,7 +24,7 @@ $this->setVar('category_header_block', '');
 
 
 $groupHandler = new Group();
-$categoryHandler = new Category();
+$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
 $chatHandler = new Chat();
 
 // setup filters
@@ -36,17 +36,20 @@ $filter = array(
 );
 
 // if the category doesn't exist, throw an error
-if (!($category = $categoryHandler->getByID($filter['category']))) {
+try {
+    $category = $categoryMapper->findById($filter['category']);
+}
+catch (\Exception $e) {
     error(19);
 }
 
-$this->setTitle("Chat Archive: {$category['name']}");
-$this->setVar('CATEGORY_TITLE', $category['name']);
-$this->setVar('CATEGORY_ID', $category['id']);
+$this->setTitle("Chat Archive: {$category->getName()}");
+$this->setVar('CATEGORY_TITLE', $category->getName());
+$this->setVar('CATEGORY_ID', $category->getId());
 
 // collate the full list of chat the current user is allowed to see in the current context
 // this is used to populate the category headers
-$visibleList = $chatHandler->get_logs($category['id']);
+$visibleList = $chatHandler->get_logs($category->getId());
 
 
 // sanitise filter inputs
@@ -166,6 +169,7 @@ if (is_array($items)) {
     $total = count($items);
     $userHandler = new User();
     $userList = array();
+    $categoryList = array();
 
     if ($items) {
         foreach ($items as $chat) {
@@ -221,12 +225,12 @@ if (is_array($items)) {
             } else {
                 if ($total == $i) {
                     /* Last rotation
-                         */
+                     */
                     $this->parse("chat_block", "chat", true);
                     $this->parse('chat_date_block', 'chat_date', true);
                 } else {
                     /* normal rotation
-                         */
+                     */
                     $this->parse("chat_block", "chat", true);
                 }
             }
@@ -237,30 +241,8 @@ if (is_array($items)) {
         $this->setVar('chat_date_block', '');
         $this->setVar('year_block', 'No chat items found.');
     }
-
-    /*
-        // output tabs
-        if (is_array($allCategories)) {
-            foreach ($allCategories as $category => $i) {
-                $url = new Url($category);
-
-                $output = array(
-                    'CATEGORY_CLASS' => strtolower($category) == $filter['category'] ? 'class="selected"' : '',
-                    'CHAT_CATEGORY' => Scrub::text(ucwords($category)),
-                    'CATEGORY_CLEAN' => strtolower($url->getSlug())
-                );
-
-                $this->setVar($output);
-                $this->parse('category_header_block', 'category_header', true);
-            }
-        }
-        else {
-            $this->setVar('category_block', '');
-        }
-    */
 } else {
     $this->setVar('chat_date_block', '');
     $this->setVar('year_block', 'No chat items found.');
 }
 
-?>
