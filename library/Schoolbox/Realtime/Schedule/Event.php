@@ -1,6 +1,6 @@
 <?php
  /**
- *
+ * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -10,14 +10,14 @@
 
 namespace Schoolbox\Realtime\Schedule;
 
+
 use Alaress\Scheduler\Event\EventInterface;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Serializable;
 
-class Event implements EventInterface, Serializable
-{
+class Event implements EventInterface, Serializable {
 
     /** @var User */
     protected $effector;
@@ -28,26 +28,25 @@ class Event implements EventInterface, Serializable
     /** @var object */
     protected $object;
 
-    /** @var Mapper */
-    protected $mapper;
+	/** @var Mapper */
+	protected $mapper;
 
     /** @var array|null */
     protected $diff;
 
 
     /**
-     * @param User   $subject
+     * @param User $subject
      * @param string $verb
      * @param object $object
      * @param Mapper $mapper
-     * @param array  $diff
+     * @param array $diff
      */
-    function __construct($subject, $verb, $object, $mapper, $diff = null)
-    {
+    function __construct($subject, $verb, $object, $mapper, $diff = null) {
         $this->effector = $subject;
         $this->action   = $verb;
         $this->object   = $object;
-        $this->mapper   = $mapper;
+	    $this->mapper   = $mapper;
         $this->diff     = $diff;
     }
 
@@ -57,67 +56,8 @@ class Event implements EventInterface, Serializable
      *
      * @return User
      */
-    public function getEffector()
-    {
+    public function getEffector() {
         return $this->effector;
-    }
-
-
-    /**
-     * String representation of object
-     *
-     * @return string the string representation of the object or null
-     */
-    public function serialize()
-    {
-        // Get the ID if I can, otherwise dehydrate as before.
-        $get = array(
-            $this->getObject(),
-            $this->getMapper()->getGetIdentifierMethodName()
-        );
-        $dehydrated = is_callable($get)
-            ? call_user_func($get)
-            : $this->getMapper()->dehydrate($this->getObject());
-        return serialize(array(
-            'u' => $this->effector->getId(),
-            'a' => $this->getAction(),
-            'o' => array(
-                'c' => get_class($this->getMapper()),
-                'i' => $dehydrated
-            ),
-            'd' => $this->getDiff(),
-        ));
-    }
-
-
-    /**
-     * Returns the object that is being acted upon
-     *
-     * @return object
-     */
-    public function getObject()
-    {
-        return $this->object;
-    }
-
-
-    /**
-     * @param object $object
-     * @return self
-     */
-    public function setObject($object)
-    {
-        $this->object = $object;
-        return $this;
-    }
-
-
-    /**
-     * @return Mapper
-     */
-    public function getMapper()
-    {
-        return $this->mapper;
     }
 
 
@@ -126,10 +66,27 @@ class Event implements EventInterface, Serializable
      *
      * @return string
      */
-    public function getAction()
-    {
+    public function getAction() {
         return $this->action;
     }
+
+
+    /**
+     * Returns the object that is being acted upon
+     *
+     * @return object
+     */
+    public function getObject() {
+        return $this->object;
+    }
+
+
+	/**
+	 * @return Mapper
+	 */
+	public function getMapper() {
+		return $this->mapper;
+	}
 
 
     /**
@@ -138,33 +95,42 @@ class Event implements EventInterface, Serializable
      *
      * @return array|null
      */
-    public function getDiff()
-    {
+    public function getDiff() {
         return $this->diff;
     }
 
 
-    /**
-     * Constructs the object
-     *
-     * @param string $serialized The string representation of the object.
-     * @return void
-     */
-    public function unserialize($serialized)
-    {
-        $array = unserialize($serialized);
+	/**
+	 * String representation of object
+	 *
+	 * @return string the string representation of the object or null
+	 */
+	public function serialize() {
+		return serialize(array(
+			'u' => UserMapper::getInstance()->dehydrate($this->effector),
+			'a' => $this->getAction(),
+			'o' => array(
+				'c' => get_class($this->getMapper()),
+				'i' => $this->getMapper()->dehydrate($this->getObject())
+			),
+			'd' => $this->getDiff(),
+		));
+	}
 
-        $this->effector = is_array($array['u'])
-            ? UserMapper::getInstance()->hydrate($array['u'])
-            : UserMapper::getInstance()->findById($array['u']);
 
-        $this->action = $array['a'];
-        $this->mapper = $array['o']['c']::getInstance();
+	/**
+	 * Constructs the object
+	 *
+	 * @param string $serialized The string representation of the object.
+	 * @return void
+	 */
+	public function unserialize($serialized) {
+		$array = unserialize($serialized);
 
-        $this->object = is_array($array['o']['i'])
-            ? $this->getMapper()->hydrate($array['o']['i'])
-            : $this->getMapper()->findById($array['o']['i']);
-
-        $this->diff = $array['d'];
-    }
+		$this->effector = UserMapper::getInstance()->hydrate($array['u']);
+		$this->action   = $array['a'];
+		$this->mapper   = $array['o']['c']::getInstance();
+		$this->object   = $this->getMapper()->hydrate($array['o']['i']);
+		$this->diff     = $array['d'];
+	}
 }
