@@ -11,6 +11,7 @@ namespace Schoolbox\Resource;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\Resource\Category;
+use Schoolbox\Collection;
 
 class CategoryLogMapper extends Mapper {
 
@@ -74,7 +75,6 @@ class CategoryLogMapper extends Mapper {
 		$this->save($item);
 	}
 
-
 	/**
 	 * Override default behaviour: this mapper does not raise any notifications.
 	 *
@@ -87,4 +87,47 @@ class CategoryLogMapper extends Mapper {
 		return false;
 	}
 
+    /**
+     * Get the last time a person visited this place
+     *
+     * @param Category $category
+     * @param User $user
+     * @return Collection
+     */
+    public function lastVisit(Category $category, User $user) {
+        $query = "
+            SELECT
+            	{$this->getColumnString('hl')}
+            FROM `{$this->table}` hl
+            LEFT JOIN {$this->getJoinSql('category', 'hl', 'c')}
+            LEFT JOIN {$this->getJoinSql('user', 'hl', 'o')}
+            WHERE hl.cid = :categoryId
+            AND hl.user = :userId
+            AND c.deleted_at IS NULL
+		";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute(array(
+            'categoryId' => $category->getId(),
+            'userId' => $user->getId()
+        ));
+
+        /* Manually construct hierarchy of items
+         */
+        $collection = new Collection();
+
+        $categoryMapper = $this->getJoinMapper('category');
+        $userMapper     = $this->getJoinMapper('user');
+
+        foreach ($statement as $row) {
+            $log = $this->hydrate($row, 'hl');
+
+            $log->setCategory($categoryMapper->hydrate($row, 'c'));
+            $log->setUser($userMapper->hydrate($row, 'o'));
+
+            $collection->add($log);
+        }
+
+        return $collection;
+    }
 }
