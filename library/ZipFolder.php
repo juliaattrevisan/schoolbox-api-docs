@@ -21,9 +21,9 @@ class ZipFolder {
 
         $this->folderDetails = $this->getFolderDetails($folder);
 
-        if (is_numeric($this->folderDetails['id'])) {
+        if (is_numeric($this->folderDetails->getId())) {
 
-            if ($this->getPermission($this->folderDetails['id']) < READ_ACCESS) {
+            if ($this->getPermission($this->folderDetails->getId()) < READ_ACCESS) {
                 error(5);
             }
         } else {
@@ -60,7 +60,7 @@ class ZipFolder {
     function sendZip() {
         if ($this->createZip()) {
 
-            $filename = $this->cleanName($this->folderDetails['name']);
+            $filename = $this->cleanName($this->folderDetails->getName());
 
             $filesize = filesize($this->tmpZip);
             header("Pragma: ");
@@ -174,8 +174,14 @@ class ZipFolder {
      * @return array|bool
      */
     protected function getFolderDetails($folder_id) {
-        $categoryHandler = new Category;
-        return $categoryHandler->getByID($folder_id);
+        try {
+            $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+            $category = $categoryMapper->findById($folder_id);
+
+            return $category;
+        }
+        catch (\Exception $e) {
+        }
     }
 
     /**
