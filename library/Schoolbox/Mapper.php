@@ -1679,7 +1679,7 @@ class Mapper implements Serializable
      * @throws Exception
      * @return object
      */
-    public function hydrate($row, $alias = '', $callback = null)
+    public function hydrate(array $row, $alias = '', $callback = null)
     {
         $model = $this->createModel();
         foreach ($this->map as $map) {
