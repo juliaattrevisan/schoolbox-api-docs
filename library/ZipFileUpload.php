@@ -13,17 +13,41 @@
  */
 
 class ZipFileUpload extends DeprecatedModel {
-	private $extractTo = '/tmp';
-	private $prefix = 'portal_zip_upload_';
-	private $path = '';
 
-	/* Show what is being read and processed
-	 */
-	private $verbose = false;
+    /**
+     * Temporary location
+     *
+     * @var string
+     */
+    private $extractTo = '/tmp';
 
-	/* A list of files which didn't get added due to errors
-	 * 	 */
-	private $errorFiles = array();
+    /**
+     * Zip file prefix
+     *
+     * @var string
+     */
+    private $prefix = 'portal_zip_upload_';
+
+    /**
+     * Path to extract into
+     *
+     * @var string
+     */
+    private $path = '';
+
+    /**
+     * Show what is being read and processed
+     *
+     * @var bool
+     */
+    private $verbose = false;
+
+    /**
+     * A list of files which didn't get added due to errors
+     *
+     * @var array
+     */
+    private $errorFiles = array();
 
 	/**
 	 * Constructor
@@ -33,8 +57,7 @@ class ZipFileUpload extends DeprecatedModel {
 		parent::DeprecatedModel();
 
 		$this->path = $this->extractTo . '/' . $this->prefix . uniqid();
-                $this->allowedFileHandler = new AllowedFile();
-
+        $this->allowedFileHandler = new AllowedFile();
 
 		/* Prepare folder: if folder already exists, unlink all the stuff in it
 		 * and start it again
@@ -42,12 +65,12 @@ class ZipFileUpload extends DeprecatedModel {
 		$this->cleanup();
 	}
 
-	/**
-	 * Gets the path that stuff will be extracted into
-	 *
-	 * @return <type>
-	 */
-	public function getPath() {
+    /**
+     * Gets the path that stuff will be extracted into
+     *
+     * @return string
+     */
+    public function getPath() {
 		return $this->path;
 	}
 
@@ -249,4 +272,3 @@ class ZipFileUpload extends DeprecatedModel {
 		return $errorMessages;
 	}
 }
-?>
