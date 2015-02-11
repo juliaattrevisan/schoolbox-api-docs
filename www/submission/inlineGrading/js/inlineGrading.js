@@ -238,43 +238,43 @@
 		 * Render select box
 		 */
 		function renderSelect() {
-			var allOptions = '';
-
-			for (var i = 0; i < config.items.length; i++) {
-				var label = config.items[i].navigation.label;
-				var value = config.items[i].navigation.value;
-
-				/* Preselected dropdown element
-				 */
-				var selected = '';
-
-				if (config.currentId == config.items[i].navigation.id) {
-					var selected = 'selected="selected"';
-				}
-
-				/* Disable dropdown elements for those who haven't
-				 * submitted (optional)
-				 */
-				var disabled = '';
-
-				/* Only disable items when this flag is enabled
-				 */
-				if (config.useDisabled == true) {
-					if (jQuery.inArray(config.items[i].navigation.id, config.disabled) > -1) {
-						disabled = 'disabled';
-					}
-				}
-
-				var option = '<option ' + disabled + ' value="'+ value +'"'+ selected +'>'+ label +'</option>';
-
-				/* Stack up
-				 */
-				allOptions += option;
-			}
-
-			var select = '<select class="context-select">' + allOptions + '</select>';
-
-			config.element.append(select);
+			//var allOptions = '';
+            //
+			//for (var i = 0; i < config.items.length; i++) {
+			//	var label = config.items[i].navigation.label;
+			//	var value = config.items[i].navigation.value;
+            //
+			//	/* Preselected dropdown element
+			//	 */
+			//	var selected = '';
+            //
+			//	if (config.currentId == config.items[i].navigation.id) {
+			//		var selected = 'selected="selected"';
+			//	}
+            //
+			//	/* Disable dropdown elements for those who haven't
+			//	 * submitted (optional)
+			//	 */
+			//	var disabled = '';
+            //
+			//	/* Only disable items when this flag is enabled
+			//	 */
+			//	if (config.useDisabled == true) {
+			//		if (jQuery.inArray(config.items[i].navigation.id, config.disabled) > -1) {
+			//			disabled = 'disabled';
+			//		}
+			//	}
+            //
+			//	var option = '<option ' + disabled + ' value="'+ value +'"'+ selected +'>'+ label +'</option>';
+            //
+			//	/* Stack up
+			//	 */
+			//	allOptions += option;
+			//}
+            //
+			//var select = '<select class="context-select">' + allOptions + '</select>';
+            //
+			//config.element.append(select);
 			config.selectItemCallback();
 		}
 
