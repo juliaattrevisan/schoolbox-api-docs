@@ -162,6 +162,8 @@ class Scheduler extends StompScheduler
         } catch(CompressionException $e) {
             // this message is unparseable, so we'll eventually ACK it to make it go away
             $this->log->critical('Compression Exception: ' . $e->getMessage(), array($e));
+        } catch(\ErrorException $e) {
+            $this->log->critical('Error Exception: '. $e->getMessage(), array($e));
         }
 
         $resolver->ack();
