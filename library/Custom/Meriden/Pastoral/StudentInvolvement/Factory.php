@@ -127,6 +127,9 @@ class Factory
         $subject
             ->setFolder($folderWithGrades['folder'])
             ->setGrades($this->augmentGradesWithAssessment($folderWithGrades['grades'], $student))
+            ->moveToNamedGrade('courseGrade', 'Course Grade')
+            ->moveToNamedGrade('endeavourGrades', 'Endeavour Grades')
+            ->moveToNamedGrade('learningApproaches', 'Approaches to Learning')
         ;
         return $subject;
     }
