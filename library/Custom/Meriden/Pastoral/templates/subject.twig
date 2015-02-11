@@ -48,18 +48,50 @@
 {{ report.subjectReport.description }}
 </p>
 
-{# course grade - derived from grade for this class #}
-
-{# grade distribution - also derived from grade #}
-
-{# Endeavor Grades - a rubric #}
-
-{# Approaches to learning - another rubric #}
-
-{# Assessments #}
 <dl>
+    {# course grade - derived from grade for this class #}
+    {% if report.subjectReport.namedGrades.courseGrade %}
+        <dt>Course Grade</dt>
+        <dd>
+            {%
+                include '@customMeridenPastoral/sub/assessmentResult.twig'
+                with {grade: report.subjectReport.namedGrades.courseGrade}
+            %}
+        </dd>
+    {% endif %}
+
+    {# grade distribution - other student's values for course grade #}
+
+    {# Endeavor Grades - a rubric #}
+    {% if report.subjectReport.namedGrades.endeavourGrades %}
+        <dt>Endeavour Grades</dt>
+        <dd>
+            {%
+                include '@customMeridenPastoral/sub/assessmentResult.twig'
+                with {grade: report.subjectReport.namedGrades.endeavourGrades}
+            %}
+        </dd>
+    {% endif %}
+
+    {# Approaches to learning - another rubric #}
+    {% if report.subjectReport.namedGrades.learningApproaches %}
+        <dt>Approaches to Learning</dt>
+        <dd>
+            {%
+                include '@customMeridenPastoral/sub/assessmentResult.twig'
+                with {grade: report.subjectReport.namedGrades.learningApproaches}
+            %}
+        </dd>
+    {% endif %}
+
+    {# Other assessments #}
     {% for grade in report.subjectReport.grades %}
         <dt>{{ grade.assessment.name }}</dt>
-        <dd>{% include '@customMeridenPastoral/sub/assessmentResult.twig' with {grade: grade} %}</dd>
+        <dd>
+            {%
+                include '@customMeridenPastoral/sub/assessmentResult.twig'
+                with {grade: grade}
+            %}
+        </dd>
     {% endfor %}
 </dl>
