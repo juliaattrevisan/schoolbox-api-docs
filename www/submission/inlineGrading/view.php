@@ -64,18 +64,29 @@ foreach ($studentList as $i => $currentStudent) {
 	if (!in_array($currentStudent->getId(), $processed)) {
 		$processed[] = $currentStudent->getId();
 
+        $submit = rand(0,1);
+        $ontime = $submit ? rand(0,2) : false;
+        $marked = rand(0,1);
+
         $this->setVar(array(
             'BOX_ID'                => $submissionBox->getId(),
             'USER_ID'               => $currentStudent->getId(),
             'USER_EXT_ID'           => $currentStudent->getExternalId(),
             'USER_FULLNAME'         => $currentStudent->formatName('{lastname}, {firstname}'),
-            'USER_SUBMISSION_CLASS' => '',
-            'USER_SUBMISSION_TEXT'  => '',
-            'USER_MARKSTATUS_CLASS' => '',
+            'USER_UNSUBMITTED'      => $submit ? 'false' : 'true',
+
+            'USER_MARKSTATUS_CLASS'    => $marked ? 'marked' : '',
+            'USER_MARKSTATUS_DATETIME' => $marked ? Alaress_Date_Format::now()->addHours(-1 * rand(1,4))->getLocal() : '',
+
+            'USER_SUBMISSION_CLASS'    => $submit ? ($ontime ? 'on-time' : 'late') : 'un',
+            'USER_SUBMISSION_TEXT'     => $submit ? ($ontime ? 'Submitted on Time' : 'Submitted Late') : 'Unsubmitted',
+            'USER_SUBMISSION_DATETIME' => '',
+
         ));
 
         $this->parse('USER_HTML', 'studentNavTpl');
-
+        // force the subtemplate onto a single line so the JS doesn't snap
+        $this->setVar('USER_HTML', preg_replace('`\s+`', ' ', $this->getVar('USER_HTML')));
 
         $this->parse('studentnav_block', 'studentnav', true);
 
