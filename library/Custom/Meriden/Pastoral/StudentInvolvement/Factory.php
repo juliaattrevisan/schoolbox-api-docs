@@ -131,6 +131,11 @@ class Factory
             ->moveToNamedGrade('endeavourGrades', 'Endeavour Grades')
             ->moveToNamedGrade('learningApproaches', 'Approaches to Learning')
         ;
+
+        // What are the other grade distributions?
+        $courseGrade = $subject->getNamedGrade('courseGrade');
+        $this->buildDistribution($courseGrade);
+
         return $subject;
     }
 
@@ -324,6 +329,64 @@ class Factory
         // Get every teacher by their tch_code
         $subject['teachers'] = $this->getUserMapper()->findByColumn('synergy_id', $subject['tch_code']);
         return $subject;
+    }
+
+    /**
+     * Builds a distribution of grades for this grade.
+     *
+     * @param array $grade
+     *
+     * @return array
+     */
+    protected function buildDistribution($grade)
+    {
+        if (!($grade['assessment'] instanceof SubmissionBox)) {
+            return array();
+        }
+
+        // Get everyone who has submitted to this assessment
+        $assessment         = $grade['assessment'];
+        $returnedWorkMapper = ReturnedWorkMapper::getInstance();
+        $returnStudents     = array();
+        foreach ($returnedWorkMapper->findByColumn('box_id', $assessment->getId()) as $return) {
+            $returnStudentId = $return->getOwner()->getId();
+            $returnStudents[$returnStudentId] = $returnStudentId;
+        }
+
+        // Felch out all student marks for this folder, and put back the one we
+        // actually want if it's there.
+        $distribution = array();
+        foreach ($returnStudents as $studentId) {
+            $marks = ReturnedWorkMapper::getInstance()->getStudentMarks(
+                $assessment->getCategory()->getId(),
+                $studentId
+            );
+            if (array_key_exists($assessment->getId(), $marks)) {
+                $distribution[$studentId] = $marks[$assessment->getId()];
+            }
+        }
+
+        // What are the possible pretty marks for this assessment?
+        $levels = SubmissionBox\GradeLevel\Mapper::getInstance()
+            ->findByColumn(
+                'submission_grade_group_id',
+                $assessment->getGradeGroup()->getId(),
+                array(
+                    'order' => array('raw_grade' => 'desc')
+                )
+            );
+
+        $groupedDistribution = array();
+        foreach ($levels as $level) {
+            $caption = $level->getCaption();
+            if (!empty($caption)) {
+                $groupedDistribution[$level->getCaption()] = array();
+            }
+        }
+        foreach ($distribution as $item) {
+            $groupedDistribution[$item['pretty_mark']][] = $item;
+        }
+        return $groupedDistribution;
     }
 
     /**
