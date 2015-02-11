@@ -236,4 +236,18 @@ class Involvement
     {
         return $this->namedGrades;
     }
+
+    /**
+     * Gets a single named grade by its key.
+     *
+     * @param string $key
+     *
+     * @return array
+     */
+    public function getNamedGrade($key)
+    {
+        return array_key_exists($key, $this->namedGrades)
+            ? $this->namedGrades[$key]
+            : array();
+    }
 }
