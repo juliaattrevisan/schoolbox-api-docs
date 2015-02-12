@@ -64,7 +64,12 @@ class Result extends Base {
             /* Reassign var
              */
             $folder = $hashtable[$folder->getId()];
-            $folder->getCodes()->add($code_mapper->hydrate($row, 'cc'));
+
+            $code = $code_mapper->hydrate($row, 'cc');
+
+            if (strlen($code->getCode())) {
+                $folder->getCodes()->add();
+            }
 
             /* Accumulate homepage configs
              */
