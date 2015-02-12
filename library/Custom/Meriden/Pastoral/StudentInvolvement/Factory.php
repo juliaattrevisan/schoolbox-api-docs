@@ -9,6 +9,8 @@
 
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
+use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
+use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -263,34 +265,54 @@ class Factory
     protected function getStudentInvolvement(Category $folder, User $student)
     {
         // Is $student a member of $folder (by class code?)
-        $studentId = $student->getId();
         foreach ($student->getSubjectCollection() as $subject) {
             foreach ($folder->getCodes() as $code) {
                 if ($code->getCode() == $subject['code']) {
                     // Student is involved, even if they have no grades.
                     // Try to get them anyway.
-                    $grades = ReturnedWorkMapper::getInstance()->getStudentMarks(
-                        $folder->getId(),
-                        $studentId
-                    );
                     return array(
-                        'grades' => $grades ?: array(),
+                        'grades' => $this->getGrades($folder, $student),
                     );
                 }
             }
         }
 
         // If not, has $student got a grade in this folder?
-        $grades = ReturnedWorkMapper::getInstance()->getStudentMarks(
-            $folder->getId(),
-            $studentId
-        );
+        $grades = $this->getGrades($folder, $student);
         if (!empty($grades)) {
             return array(
                 'grades' => $grades,
             );
         }
         return array();
+    }
+
+    /**
+     * Gets all assessment and quiz grades.
+     *
+     * @param Category $folder
+     * @param User     $student
+     *
+     * @return array
+     */
+    protected function getGrades(Category $folder, User $student)
+    {
+        $allGrades = array();
+        $assessGrades = ReturnedWorkMapper::getInstance()->getStudentMarks(
+            $folder->getId(),
+            $student->getId()
+        ) ?: array();
+        $quizGrades = AttemptMapper::getInstance()->getStudentMarks(
+            $folder->getId(),
+            $student->getId()
+        ) ?: array();
+        foreach ($assessGrades as $id => $grade) {
+            $allGrades['a'.$id] = $grade;
+        }
+        foreach ($quizGrades as $id => $grade) {
+            $allGrades['q'.$id] = $grade;
+        }
+        return $allGrades;
     }
 
     /**
@@ -306,17 +328,32 @@ class Factory
         // TODO inject dependencies
         // TODO get rid of the handlers too
         $rubricHandler = new \DueWork_Rubric_Handler();
-        foreach (SubmissionBoxMapper::getInstance()->findByColumn('id', array_keys($grades)) as $assess) {
+
+        // Get the 'a' off the start of the assessment grades to get a list of
+        // actual assess IDs
+        $gradeKeys = array_map(
+            function ($v) {
+                return substr($v, 1);
+            },
+            array_filter(
+                array_keys($grades),
+                function ($v) {
+                    return substr($v, 0, 1) === 'a';
+                }
+            )
+        );
+        foreach (SubmissionBoxMapper::getInstance()->findByColumn('id', $gradeKeys) as $assess) {
             /** @var SubmissionBox $assess */
             $assessId = $assess->getId();
-            $grades[$assessId]['assessment'] = $assess;
-            $grades[$assessId]['rubric']     = array();
+            $gradeKey = 'a'.$assessId;
+            $grades[$gradeKey]['assessment'] = $assess;
+            $grades[$gradeKey]['rubric']     = array();
             // Is there a rubric involved? If so get student's marks for it
             if ($assess->isRubric()) {
                 $rubric     = $rubricHandler->getRubric($assessId);
                 $rubricMark = new \DueWork_Rubric_Mark($rubric);
                 $rubricMark->populateMarks($student->getId());
-                $grades[$assessId]['rubric'] = $rubricMark->toArray();
+                $grades[$gradeKey]['rubric'] = $rubricMark->toArray();
             }
         }
         return $grades;
