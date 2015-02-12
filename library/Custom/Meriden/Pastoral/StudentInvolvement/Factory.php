@@ -139,7 +139,8 @@ class Factory
 
         // What are the other grade distributions?
         $courseGrade = $subject->getNamedGrade('courseGrade');
-        $this->buildDistribution($courseGrade);
+        $courseGrade['distribution'] = $this->buildDistribution($courseGrade);
+        $subject->setNamedGrade('courseGrade', $courseGrade);
 
         return $subject;
     }

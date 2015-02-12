@@ -88,7 +88,7 @@ class Involvement
             if ($grade['assessment'] instanceof SubmissionBox) {
                 $name = $grade['assessment']->getName();
                 if (strcasecmp($name, $assessmentName) === 0) {
-                    $this->namedGrades[$key] = $grade;
+                    $this->setNamedGrade($key, $grade);
                     unset($this->grades[$gradeId]);
                 }
             }
@@ -249,5 +249,19 @@ class Involvement
         return array_key_exists($key, $this->namedGrades)
             ? $this->namedGrades[$key]
             : array();
+    }
+
+    /**
+     * Updates a single named grade.
+     *
+     * @param string $key
+     * @param array  $value
+     *
+     * @return $this
+     */
+    public function setNamedGrade($key, $value)
+    {
+        $this->namedGrades[$key] = $value;
+        return $this;
     }
 }
