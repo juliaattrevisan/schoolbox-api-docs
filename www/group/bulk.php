@@ -17,29 +17,19 @@ if (is_numeric($this->arg[0])) {
     }
 
     $userAccessMapper = new \Schoolbox\Permission\Access\UserAccessMapper();
-    $userAccess = $userAccessMapper->findByColumnList(array(
-        'sid' => $folder->getId(),
-        'service' => HOMEPAGE_SERVICE
-    ))->first();
 
-    $isFolderOwner = false;
-
-    if ($userAccess instanceof \Schoolbox\Permission\Access\UserAccess) {
-        if ($userAccess->getUser()->getId() == $_SESSION['user']->getId()) {
-            $isFolderOwner = true;
-        }
-    }
+    $isFolderOwner = $userAccessMapper->isFolderOwner($_SESSION['user'], $folder);
 
 	// check access
 	if (!$_SESSION['su'] && !$isFolderOwner) {
 		error(19);
     }
 
-	$output = array('CATEGORY_NAME'	=> Scrub::text($folder->getName()),
-					'CATEGORY_ID'	=> $folder->getId(),
-					);
-	$this->setVar($output);
-
-} else {
+	$this->setVar(array(
+        'CATEGORY_NAME' => Scrub::text($folder->getName()),
+        'CATEGORY_ID'   => $folder->getId(),
+    ));
+}
+else {
 	error(2);
 }
