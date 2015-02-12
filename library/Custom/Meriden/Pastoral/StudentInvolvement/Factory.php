@@ -9,6 +9,7 @@
 
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
+use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
@@ -342,7 +343,19 @@ class Factory
                 }
             )
         );
-        foreach (SubmissionBoxMapper::getInstance()->findByColumn('id', $gradeKeys) as $assess) {
+        $assessKeys = array();
+        $quizKeys   = array();
+        foreach (array_keys($grades) as $key) {
+            $type = substr($key, 0, 1);
+            $id   = substr($key, 1);
+            if ($type === 'a') {
+                $assessKeys[] = $id;
+            } elseif ($type === 'q') {
+                $quizKeys[] = $id;
+            }
+
+        }
+        foreach (SubmissionBoxMapper::getInstance()->findByColumn('id', $assessKeys) as $assess) {
             /** @var SubmissionBox $assess */
             $assessId = $assess->getId();
             $gradeKey = 'a'.$assessId;
@@ -355,6 +368,10 @@ class Factory
                 $rubricMark->populateMarks($student->getId());
                 $grades[$gradeKey]['rubric'] = $rubricMark->toArray();
             }
+        }
+        foreach (OnlineAssessmentMapper::getInstance()->findByColumn('assess_id', $quizKeys) as $quiz) {
+            /** @var OnlineAssessment $quiz */
+            $grades['q'.$quiz->getId()]['quiz'] = $quiz;
         }
         return $grades;
     }

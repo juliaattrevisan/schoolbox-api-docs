@@ -117,7 +117,7 @@
 
     {# Other assessments #}
     {% for grade in report.subjectReport.grades %}
-        <dt>{{ grade.assessment.name }}</dt>
+        <dt>{{ grade.assessment.name ?: grade.quiz.title }}</dt>
         <dd>
             {%
                 include '@customMeridenPastoral/sub/assessmentResult.twig'
