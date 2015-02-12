@@ -313,6 +313,13 @@ class Factory
         foreach ($quizGrades as $id => $grade) {
             $allGrades['q'.$id] = $grade;
         }
+        // Sort grades too
+        uksort(
+            $allGrades,
+            function ($a, $b) {
+                return $a['date'] < $b['date'] ? -1 : 1;
+            }
+        );
         return $allGrades;
     }
 
