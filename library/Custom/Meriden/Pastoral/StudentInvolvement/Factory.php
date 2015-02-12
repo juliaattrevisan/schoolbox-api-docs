@@ -332,17 +332,6 @@ class Factory
 
         // Get the 'a' off the start of the assessment grades to get a list of
         // actual assess IDs
-        $gradeKeys = array_map(
-            function ($v) {
-                return substr($v, 1);
-            },
-            array_filter(
-                array_keys($grades),
-                function ($v) {
-                    return substr($v, 0, 1) === 'a';
-                }
-            )
-        );
         $assessKeys = array();
         $quizKeys   = array();
         foreach (array_keys($grades) as $key) {
