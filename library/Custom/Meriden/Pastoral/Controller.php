@@ -106,14 +106,40 @@ class Controller extends Base
      * @param string $subjectCode
      *
      * @return array
+     *
+     * @throws \RangeException if student isn't in year or subject
      */
     protected function buildReportData($year, User $student, $subjectCode = null)
     {
-        $tutorGroup    = null;
-        $subject       = null;
+        $tutorGroup     = null;
+        $tutorGroupList = $this->getStudentInvolvementFactory()->buildTutorGroupList($student);
+        $subject        = null;
+        $subjectList    = $this->getStudentInvolvementFactory()->buildSubjectList($year, $student);
         if (!isset($subjectCode)) {
+            // Does this student exist for this year and subject?
+            $exists = false;
+            foreach ($tutorGroupList as $tutorGroup) {
+                if ($tutorGroup->getYear() == $year) {
+                    $exists = true;
+                    break;
+                }
+            }
+            if (!$exists) {
+                throw new \RangeException("Student has no tutor group in $year");
+            }
             $tutorGroup = $this->getStudentInvolvementFactory()->buildTutorGroup($year, $student);
         } else {
+            // Does this subject exist for this student?
+            $exists = false;
+            foreach ($subjectList as $subject) {
+                if ($subject->getSubjectCode() == $subjectCode) {
+                    $exists = true;
+                    break;
+                }
+            }
+            if (!$exists) {
+                throw new \RangeException("Student was not in subject $subjectCode in $year");
+            }
             $subject = $this->getStudentInvolvementFactory()->buildSubject($year, $student, $subjectCode);
         }
         return array(
@@ -121,8 +147,8 @@ class Controller extends Base
                 'student'          => $student,
                 'tutorGroupReport' => $tutorGroup,
                 'subjectReport'    => $subject,
-                'tutorGroupList'   => $this->getStudentInvolvementFactory()->buildTutorGroupList($student),
-                'subjectList'      => $this->getStudentInvolvementFactory()->buildSubjectList($year, $student),
+                'tutorGroupList'   => $tutorGroupList,
+                'subjectList'      => $subjectList,
             )
         );
     }
