@@ -5,6 +5,10 @@ require_once('./resource/searchClean.php');
 /**
  * Execute searches for all handlers and mappers
  */
+if ($type == '') {
+    $type = 'all';
+}
+
 /* iterate through the handle types
  * search() calls access a global counter array, $count
  */
