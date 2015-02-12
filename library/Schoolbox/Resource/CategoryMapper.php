@@ -748,10 +748,11 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
          */
         while ($parentId != 0) {
             try {
-                $nextCategory = $this->findById($category->getParent()->getId());
+                $nextCategory = $this->findCheaplyById($category->getParent()->getId());
                 $breadcrumb->prepend($nextCategory);
 
                 $category = $nextCategory;
+
                 $parentId = $nextCategory->getParent()->getId();
             }
             catch (\Exception $e) {
@@ -759,5 +760,38 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
         }
 
         return $breadcrumb;
+    }
+
+    /**
+     * A budget version of findById
+     *
+     * This only gives you the id and name of the folder
+     * This was used to cheaply manufacture breadcrumb trails
+     *
+     * @param $folderId
+     * @return \Schoolbox\Collection
+     */
+    public function findCheaplyById($folderId) {
+        $query = "
+            SELECT id, name, parent
+            FROM `{$this->getTable()}` c
+            WHERE id = :folderId
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute(array(
+            'folderId' => $folderId
+        ));
+
+        $row = $statement->fetch(\PDO::FETCH_ASSOC);
+
+        $folder = $this->hydrate($row);
+
+        $parent = new Category();
+        $parent->setId($folder->getParent()->getId());
+
+        $folder->setParent($parent);
+
+        return $folder;
     }
 }

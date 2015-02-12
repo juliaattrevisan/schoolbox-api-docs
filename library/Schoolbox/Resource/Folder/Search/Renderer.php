@@ -134,8 +134,7 @@ class Renderer extends Base {
                 $this->getPage()->setVar(array(
                     'FOLDER_ID' => $currentFolder->getId(),
                     'FOLDER_NAME' => Scrub::text($folderName),
-//                    'FOLDER_BREADCRUMB' => $this->spawnBreadcrumbs($currentFolder),
-                    'FOLDER_BREADCRUMB' => '', // TODO: temporarily disabled
+                    'FOLDER_BREADCRUMB' => $this->spawnBreadcrumbs($currentFolder),
                     'FOLDER_TYPE' => $folderType,
                 ));
 
