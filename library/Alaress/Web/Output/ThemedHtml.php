@@ -28,18 +28,26 @@ class ThemedHtml extends Html {
      * keys.
      */
     protected function outputResponseBody() {
-        $page = $this->getSitepage();
-        $page->setFile(TEMPLATE_content, 'output.html');
+        $page     = $this->getSitepage();
         $response = $this->getResponse()->content->get();
-        $page->setVar(
-            'OUTPUT',
-            $this->getTemplateEngine()->render(
-                $response['template'], ($response['data'] ?: array())
-            )
-        );
-        $page->setTitle($response['title']);
-        $page->buildPage();
-        $page->outputPage(true);
+        $data     = $response['data'] ?: array();
+        $template = $response['template'];
+        if (empty($template)) {
+            // No template? I can't generate a standard response,
+            // so return an error response.
+            $code = $this->getResponse()->status->getCode();
+            if ($code == 404) {
+                $page->pageNotFound();
+            } else {
+                $page->error(null, 'Template not found', $code ?: 500);
+            }
+        } else {
+            $page->setFile(TEMPLATE_content, 'output.html');
+            $page->setVar('OUTPUT', $this->getTemplateEngine()->render($template, $data));
+            $page->setTitle($response['title']);
+            $page->buildPage();
+            $page->outputPage(true);
+        }
     }
 
     /**
