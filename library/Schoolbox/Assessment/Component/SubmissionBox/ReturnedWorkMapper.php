@@ -279,6 +279,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\StorageMa
 			SELECT
 				sb.id AS box_id,
 				sr.mark,
+				sr.comment,
 				sr.norm_mark,
 				sr.returned,
 				sb.weight,
@@ -302,6 +303,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\StorageMa
             if (!array_key_exists($box_id, $marks)) {
                 $marks[$box_id] = array(
                     'mark'                      => $mark,
+                    'comment'                   => $row['comment'],
                     'pretty_mark'               => $pretty_mark,
                     'date'                      => $row['returned'],
                     'weight'                    => $row['weight'],
