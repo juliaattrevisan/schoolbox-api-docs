@@ -100,7 +100,6 @@ else {
     $oldHandlerRenderers = new \Schoolbox\Collection();
     $oldHandlerRenderers->add(new \Schoolbox\User\Search\Renderer($page, $result, $count, 0));
     $oldHandlerRenderers->add(new \Schoolbox\File\Search\Renderer($page, $result, $count, 0));
-    $oldHandlerRenderers->add(new \Schoolbox\Folder\Search\Renderer($page, $result, $count, 0));
     $oldHandlerRenderers->add(new \Schoolbox\News\Search\Renderer($page, $result, $count, 0));
     $oldHandlerRenderers->add(new \Schoolbox\Blog\Search\Renderer($page, $result, $count, 0));
     $oldHandlerRenderers->add(new \Schoolbox\Wiki\Search\Renderer($page, $result, $count, 0));
