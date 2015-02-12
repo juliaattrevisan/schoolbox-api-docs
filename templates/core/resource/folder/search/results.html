@@ -1,20 +1,20 @@
 <div class="box">
-<h2>Folders <!-- BEGIN count -->({CATEGORY_DISP_COUNT} / {CATEGORY_COUNT})<!-- END count --></h2>
+<h2>Folders <!-- BEGIN count -->({FOLDER_DISP_COUNT} / {FOLDER_COUNT})<!-- END count --></h2>
 <ul class="information-list">
-<!-- BEGIN category -->
+<!-- BEGIN folder -->
 	<li>
 		<span class="actions">
-			<!-- BEGIN modify --><a href="/cms/category/{CATEGORY_ID}" class="btn no-text modify" title="Modify Folder"><span></span></a><!-- END modify -->
+			<!-- BEGIN modify --><a href="/cms/category/{FOLDER_ID}" class="btn no-text modify" title="Modify Folder"><span></span></a><!-- END modify -->
 		</span>
-		<a href="/homepage/{CATEGORY_ID}">
-			<img class="thumbnail" height="60" width="60" src="/images/icons/60x60/{CATEGORY_TYPE}.png" />
-			<h4>{CATEGORY_NAME}</h4>
+		<a href="/homepage/{FOLDER_ID}">
+			<img class="thumbnail" height="60" width="60" src="/images/icons/60x60/{FOLDER_TYPE}.png" />
+			<h4>{FOLDER_NAME}</h4>
 		</a>
-		<p class="meta">{CATEGORY_BREADCRUMB}</p>
-		<a class="btn folder" href="/resources/{CATEGORY_ID}"><span></span>Resources</a>
-		<a class="btn resources" href="/cms/imageGallery/{CATEGORY_ID}"><span></span>Image Gallery</a>
+		<p class="meta">{FOLDER_BREADCRUMB}</p>
+		<a class="btn folder" href="/resources/{FOLDER_ID}"><span></span>Resources</a>
+		<a class="btn resources" href="/cms/imageGallery/{FOLDER_ID}"><span></span>Image Gallery</a>
 	</li>
-<!-- END category -->
+<!-- END folder -->
 </ul>
 <!-- BEGIN see_more -->
 <p>
