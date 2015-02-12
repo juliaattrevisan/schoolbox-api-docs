@@ -25,7 +25,12 @@
     }
 </style>
 
-<h1>{{ report.subjectReport.externalData.sub_desc }}</h1>
+<h1>
+    School Report - {{ report.subjectReport.year }} » {{ report.subjectReport.name }}
+    {% if report.subjectReport.folder.id %}
+        [<a href="/homepage/{{ report.subjectReport.folder.id }}">Subject Page</a>]
+    {% endif %}
+</h1>
 
 <div id="context">
     {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}

@@ -25,7 +25,12 @@
      }
 </style>
 
-<h1>School Report - {{ report.tutorGroupReport.year }}</h1>
+<h1>
+    School Report - {{ report.tutorGroupReport.year }}
+    {% if report.tutorGroupReport.folder.id %}
+        [<a href="/homepage/{{ report.tutorGroupReport.folder.id }}">Tutor Group Page</a>]
+    {% endif %}
+</h1>
 
 <div id="context">
     {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
