@@ -238,19 +238,18 @@ else {
 	else {
 		if ($this->arg[0] == 'reset' && is_numeric($this->arg[1])) {
             try {
-                $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
-                $category = $categoryMapper->findById($this->arg[1]);
+                $folder = $folderMapper->findById($this->arg[1]);
             }
             catch (\Exception $e) {
                 error(13);
             }
 
-			if ($groupHandler->getPermission($category->getId()) < WRITE_ACCESS) {
+			if ($groupHandler->getPermission($folder->getId()) < WRITE_ACCESS) {
 				error(6);
 			}
 
 			// remove component content
-			$homepage = new Homepage($category->getId());
+			$homepage = new Homepage($folder->getId());
 			$homepage->emptyHomepage();
 
 			/**
@@ -261,7 +260,7 @@ else {
 
 			/* Delete all files */
 			$fileHandler = new File;
-			$fileList = $fileHandler->getAllInCategory($category->getId());
+			$fileList = $fileHandler->getAllInCategory($folder->getId());
 			if (is_array($fileList)) {
 				foreach ($fileList as $file) {
 					$fileHandler->delete($file['id']);
@@ -271,13 +270,13 @@ else {
 			/* Delete all links
 			 */
             $linkMapper = new \Schoolbox\Resource\LinkMapper();
-            $allLinks = $linkMapper->findAllInCategory($category, array());
+            $allLinks = $linkMapper->findAllInCategory($folder, array());
 
             foreach ($allLinks as $currentLink) {
                 $currentLink->delete();
             }
 
-			SitePage::localRedir("/homepage/{$category->getId()}");
+			SitePage::localRedir("/homepage/{$folder->getId()}");
 		}
 	}
 }
