@@ -111,7 +111,7 @@ class Results implements Searchable {
          * or if this particular minion was chosen specifically (e.g. 'link')
          */
         foreach($this->getRegistry() as $currentDefinition) {
-            if (in_array($currentDefinition->getType(), array('all', $this->getType()))) {
+            if (in_array($this->getType(), array('all', $currentDefinition->getType()))) {
                 $searcher = $currentDefinition->getMapper()->search($user, $keyword, $offset, $limit, $sortProperty, $sortDirection);
 
                 $result->setOffset($currentDefinition->getType(), $searcher);
@@ -126,7 +126,7 @@ class Results implements Searchable {
      */
     public function render() {
         foreach($this->getRegistry() as $currentDefinition) {
-            if (in_array($currentDefinition->getType(), array('all', $this->getType()))) {
+            if (in_array($this->getType(), array('all', $currentDefinition->getType()))) {
                 $searcher = $this->getResult()->getOffset($currentDefinition->getType());
 
                 $currentDefinition->getRenderer()->render($searcher, $this->getType());
