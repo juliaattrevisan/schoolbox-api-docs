@@ -122,7 +122,7 @@ class Renderer extends Base {
 
                 /* Is this a homepage or just a folder
                  */
-                if (is_numeric($currentFolder->getHomepage()->getTemplate()->getId())) {
+                if (is_numeric($currentFolder->getHomepage()->getTemplate())) {
                     $folderType = 'home';
                 }
                 else {
@@ -134,7 +134,8 @@ class Renderer extends Base {
                 $this->getPage()->setVar(array(
                     'FOLDER_ID' => $currentFolder->getId(),
                     'FOLDER_NAME' => Scrub::text($folderName),
-                    'FOLDER_BREADCRUMB' => $this->spawnBreadcrumbs($currentFolder),
+//                    'FOLDER_BREADCRUMB' => $this->spawnBreadcrumbs($currentFolder),
+                    'FOLDER_BREADCRUMB' => '', // TODO: temporarily disabled
                     'FOLDER_TYPE' => $folderType,
                 ));
 
