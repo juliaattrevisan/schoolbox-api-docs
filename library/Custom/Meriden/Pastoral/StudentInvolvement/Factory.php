@@ -74,9 +74,15 @@ class Factory
      * @param User $student
      *
      * @return TutorGroup
+     *
+     * @throws \RangeException if $student has no group for $year
      */
     public function buildTutorGroup($year, User $student)
     {
+        $yearLevelData = $this->getGateway()->getYearLevelGroup($year, $student);
+        if (empty($yearLevelData)) {
+            throw new \RangeException("Student has no group for year $year");
+        }
         $tutorGroup = new TutorGroup();
         $tutorGroup
             ->setName($year . ' eReport')
@@ -85,7 +91,7 @@ class Factory
             ->setActivities($this->getGateway()->getAllActivities($year, $student))
             ->setAttendances($this->getGateway()->getAllAttendances($year, $student))
             ->setTutors($this->getGateway()->getAllTutors($year, $student))
-            ->setTutorGroup($this->getGateway()->getYearLevelGroup($year, $student))
+            ->setTutorGroup($yearLevelData)
             // Add teachers into subjects - debatable if this is part of tutor group?
             ->setSubjects(
                 array_map(
