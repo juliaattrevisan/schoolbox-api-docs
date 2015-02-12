@@ -2,31 +2,40 @@
 
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
-$groupHandler = new Group();
-$categoryHandler = new Category();
+$folderMapper = new \Schoolbox\Resource\CategoryMapper();
 
-$isSuperuser = $groupHandler->isSuperuser();
-$isAllowedTeacher = ($groupHandler->isStaff() && \Cfg::get('enable_teacher_zip_upload'));
+$isSuperuser = $_SESSION['user']->isSuperuser();
+$isAllowedTeacher = ($_SESSION['user']->getRole()->isStaff() && \Cfg::get('enable_teacher_zip_upload'));
 
 if (($isSuperuser || $isAllowedTeacher) && is_numeric($this->arg[0])) {
 	$this->setFile(TEMPLATE_content, 'cms/zipFile.html');
 	$this->setBlock(TEMPLATE_content, 'perm_table', 'perm_table_block');
 
-        $cat = $categoryHandler->getByID($this->arg[0]);
+    try {
+        $folder = $folderMapper->findById($this->arg[0]);
+    }
+    catch (\Exception $e) {
+    }
 
-
-        $this->setVar('CATEGORY_NAME', Scrub::text($cat['name']));
-        $this->setVar('CID', $cat['id']);
+    $this->setVar(array(
+        'CATEGORY_NAME' => Scrub::text($folder->getName()),
+        'CID' => $folder->getId()
+    ));
 
 	/* Set up permissions options
 	 */
-	$groupPermList = $categoryHandler->getGroupPerms(0);
+    $roleMapper = new \Schoolbox\RoleMapper();
 
-	if (is_array($groupPermList)) {
-		foreach ($groupPermList as $group) {
+    $folderParent = new \Schoolbox\Resource\Category();
+    $folderParent->setId(0);
+
+    $allRoles = $roleMapper->findAll();
+
+	if ($allRoles->count()) {
+		foreach ($allRoles as $currentRole) {
 			$this->setVar(array(
-				'GROUP_NAME'		=> Scrub::text($group['name']),
-				'GROUP_ID'			=> $group['id'],
+				'GROUP_NAME'		=> Scrub::text($currentRole->getName()),
+				'GROUP_ID'			=> $currentRole->getId(),
 				'PERM_0_SELECTED'	=> 'checked="checked"',
 				'PERM_1_SELECTED'	=> '',
 				'PERM_2_SELECTED'	=> '',
