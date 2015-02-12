@@ -23,10 +23,6 @@ $handle = array(
         'handler' => new File(),
         'renderer' => new \Schoolbox\File\Search\Renderer($this, '', '', 0, $keyword),
     ),
-    'category' => array(
-        'handler' => new Category(),
-        'renderer' => new \Schoolbox\Folder\Search\Renderer($this, '', '', 0, $keyword),
-    ),
     'sitenews' => array(
         'handler' => new News(),
         'renderer' => new \Schoolbox\News\Search\Renderer($this, '', '', 0, $keyword),
@@ -57,7 +53,6 @@ $type_list = array(
     'all' => 'All',
     'user' => 'People',
     'file' => 'Files',
-    'category' => 'Folders',
     'sitenews' => 'School News',
     'homepagenews' => 'Homepage News',
     'blog' => 'Blogs',
@@ -71,6 +66,6 @@ $type_list = array(
  * old search.php contexts
  */
 $omaha = array(
-    'link'
+    'link', 'folder'
 );
 
