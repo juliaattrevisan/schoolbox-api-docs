@@ -76,10 +76,10 @@ class Results implements Searchable {
         $this->setType($type);
         $this->setResult(new Collection());
 
-        /* Add searchables
+        /* Add searchables (synonymous with values from omaha)
          */
-        $this->getRegistry()->add(new Definition($type, new LinkMapper(), new LinkRenderer($page)));
-        $this->getRegistry()->add(new Definition($type, new FolderMapper(), new FolderRenderer($page)));
+        $this->getRegistry()->add(new Definition('link', new LinkMapper(), new LinkRenderer($page)));
+        $this->getRegistry()->add(new Definition('folder', new FolderMapper(), new FolderRenderer($page)));
     }
 
     /**
