@@ -25,9 +25,9 @@
                 {% endif %}
             </td>
             <td class="grade">
-                <span class="gradient-{{ workItem.gradient }}">{{ workItem.pretty_mark }}</span>
+                <span class="gradient-{{ workItem.mark // 10 }}">{{ workItem.pretty_mark }}</span>
             </td>
-            <td>{{ workItem.dueDate }}</td>
+            <td>{{ workItem.date|date(locale.date.dateOnlyFormat) }}</td>
             <td>{{ workItem.comment }}</td>
         </tr>
         {% endfor %}

@@ -49,7 +49,7 @@
 </div>
 
 {# course description #}
-<h2>Course Description</h2>
+<h2 class="clear">Course Description</h2>
 <p>
 {{ report.subjectReport.description }}
 </p>
@@ -116,7 +116,7 @@
     </dd>
 </dl>
 
-<h2>Assessments</h2>
+<h2 class="clear">Assessments</h2>
 {%
     include '@customMeridenPastoral/sub/assessments.twig'
     with {work: report.subjectReport.grades, student: report.student}
