@@ -69,7 +69,7 @@ class Result extends Base {
             $code = $code_mapper->hydrate($row, 'cc');
 
             if (strlen($code->getCode())) {
-                $folder->getCodes()->add();
+                $folder->getCodes()->add($code);
             }
 
             /* Accumulate homepage configs
