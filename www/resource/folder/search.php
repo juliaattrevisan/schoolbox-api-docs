@@ -19,7 +19,7 @@ require_once('./resource/searchConfig.php');
  */
 require_once('./resource/searchClean.php');
 
-$type = 'link';
+$type = 'folder';
 
 /* Omaha Beach!
  *
@@ -29,7 +29,7 @@ $type = 'link';
  * Everything here is self-contained
  */
 $mapper = new \Schoolbox\Resource\Search\Results($page, $type, $keyword);
-$mapper->search($_SESSION['user'], $keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'));
+$mapper->search($_SESSION['user'], $keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), 'id', 'desc');
 $mapper->render();
 $mapper->renderPagination($current_page);
 
