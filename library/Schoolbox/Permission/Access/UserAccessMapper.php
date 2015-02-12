@@ -65,6 +65,51 @@ class UserAccessMapper extends Mapper {
 
 	}
 
+    /**
+     * Determine whether $folder has a $user of type 3
+     *
+     * @param Category $folder
+     * @return bool
+     */
+    public function hasFolderOwner(Category $folder) {
+        $userAccess = $this->findByColumnList(array(
+            'sid' => $folder->getId(),
+            'service' => HOMEPAGE_SERVICE,
+            'type' => UserAccess::ACCESS_FULL
+        ));
+
+        if ($userAccess->count()) {
+            return true;
+        }
+
+        return false;
+    }
+    /**
+     * Determine whether $user owns $folder
+     *
+     * @param User $user
+     * @param Category $folder
+     * @return bool
+     */
+    public function isFolderOwner(User $user, Category $folder) {
+        if ($user->isSuperuser()) {
+            return true;
+        }
+        else {
+            $userAccess = $this->findByColumnList(array(
+                'sid' => $folder->getId(),
+                'service' => HOMEPAGE_SERVICE,
+                'type' => UserAccess::ACCESS_FULL,
+                'uid' => $user->getId()
+            ));
+
+            if ($userAccess->count()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /**
      * Returns all the UserAccess associated with the given user
