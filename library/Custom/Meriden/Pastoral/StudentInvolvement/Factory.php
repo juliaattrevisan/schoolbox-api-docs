@@ -390,7 +390,10 @@ class Factory
             }
         }
         foreach ($distribution as $item) {
-            $groupedDistribution[$item['pretty_mark']][] = $item;
+            $key = $item['pretty_mark'];
+            if (array_key_exists($key, $groupedDistribution)) {
+                $groupedDistribution[$key][] = $item;
+            }
         }
         return $groupedDistribution;
     }
