@@ -381,6 +381,57 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
     }
 
     /**
+     * Search by name
+     *
+     * @param $keyword
+     * @param bool $userGroupsOnly
+     * @return Category
+     */
+    public function searchByName($keyword, $userGroupsOnly = false) {
+        $code_mapper = $this->getJoinMapper('codes');
+        $homepageConfig_mapper = $this->getJoinMapper('homepages');
+        $group_mapper = $this->getJoinMapper('groups');
+
+        $query = $this->getFindQuery();
+
+        $query .= "
+			WHERE (
+			    c.name LIKE :nameLike
+			    OR cc.code LIKE :codeLike
+            )
+        ";
+
+        /* Filter result set further by only returning records that are also
+		 * in the userGroups table
+		 */
+        if ($userGroupsOnly) {
+            $query .= "
+                AND ug.cid IS NOT NULL
+            ";
+        }
+
+        $params = array(
+            'nameLike' => "%{$this->database->quoteForLike($keyword)}%",
+            'codeLike' => "%/{$this->database->quoteForLike($keyword)}",
+        );
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($params);
+
+        $hashtable = array();
+
+        /* Only need to return category records
+         */
+        foreach ($statement as $row) {
+            $category = $this->hydrate($row, 'c');
+
+            $hashtable[$category->getId()] = $category;
+        }
+
+        return new Collection(array_values($hashtable));
+    }
+
+    /**
      * Helper method for hydrating a result from a query created by getFindQuery().
      *
      * @param  \PDOStatement $statement
