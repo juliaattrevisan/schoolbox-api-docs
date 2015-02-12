@@ -8,12 +8,11 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Resource\Link\Search;
+namespace Schoolbox\Resource\Folder\Search;
 
 use PDO;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Search\Sanitiser;
 use Schoolbox\User;
 use Schoolbox\Resource\Search\MapperResult\Base;
@@ -29,48 +28,45 @@ class Result extends Base {
      * @return Collection
      */
     protected function executeSearch(User $user, Mapper $mapper, Sanitiser $sanitiser) {
-        $query = "
-			SELECT
-				{$mapper->getColumnString('l')},
-				{$mapper->getJoinMapper('user')->getColumnString('u')},
-				{$mapper->getJoinMapper('category')->getColumnString('c')},
-				MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()}) AS `score`
-			FROM
-				`{$mapper->getTable()}` `l`
-				LEFT JOIN {$mapper->getJoinSql('user', 'l', 'u')}
-				LEFT JOIN {$mapper->getJoinSql('category', 'l', 'c')}
-				LEFT JOIN {$mapper->getJoinSql('perms', 'l', 'p')}
-					AND p.gid = :role_id
-					AND p.type > :min_access
-				LEFT JOIN {$mapper->getJoinSql('userAccess', 'l', 'a')}
-					AND a.service = :service
-					AND a.uid = :user_id
-			WHERE
-				(p.cid OR a.sid)
-				AND l.deleted_at IS NULL
-				AND MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()})
-			ORDER BY l.{$sanitiser->getSortBy()} {$sanitiser->getSortDir()}
-			LIMIT {$sanitiser->getOffset()}, {$sanitiser->getLimit()}
-		";
+        $code_mapper = $mapper->getJoinMapper('codes');
+        $homepageConfig_mapper = $mapper->getJoinMapper('homepages');
 
-        $stmt = $mapper->getDatabase()->prepare($query);
-        $stmt->execute(array(
-            'role_id' => $user->getRole()->getId(),
-            'service' => UserAccess::SERVICE_HOMEPAGE,
-            'min_access' => UserAccess::ACCESS_READ,
-            'user_id' => $user->getId()
-        ));
+        $query = "
+            SELECT
+                {$mapper->getColumnString('c')},
+                {$code_mapper->getColumnString('cc')},
+                {$homepageConfig_mapper->getColumnString('hp')}
+            FROM {$mapper->getTable()} c
+            LEFT JOIN {$mapper->getJoinSql('codes', 'c', 'cc')}
+            LEFT JOIN {$mapper->getJoinSql('homepages', 'c', 'hp')}
+            WHERE (
+                MATCH(`c`.`name`) AGAINST (\"*{$sanitiser->getKeyword()}*\" IN BOOLEAN MODE) OR
+                MATCH(`cc`.`code`) AGAINST (\"*{$sanitiser->getKeyword()}*\" IN BOOLEAN MODE)
+            )
+			ORDER BY c.{$sanitiser->getSortBy()} {$sanitiser->getSortDir()}
+			LIMIT {$sanitiser->getOffset()}, {$sanitiser->getLimit()}
+        ";
+
+        $statement = $mapper->getDatabase()->prepare($query);
+        $statement->execute();
 
         $collection = $mapper->createCollection();
 
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $link = $mapper->hydrate($row, 'l');
-            $owner = $mapper->hydrateJoin($row, 'user', 'u');
-            $category = $mapper->hydrateJoin($row, 'category', 'c');
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $folder = $mapper->hydrate($row, 'c');
 
-            $link->setOwner($owner)->setFolder($category);
+            /* Accumulate folder codes here
+             */
+            if (isset($hashtable[$folder->getId()])) {
+                $folder = $hashtable[$folder->getId()];
+            }
 
-            $collection->add($link);
+            $folder->getCodes()->add($code_mapper->hydrate($row, 'cc'));
+
+            /* Accumulate homepage configs
+             */
+            $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
+            $folder->setHomepage($homepageConfig);
         }
 
         return $collection;
@@ -87,30 +83,18 @@ class Result extends Base {
     protected function executeSearchCount(User $user, Mapper $mapper, Sanitiser $sanitiser) {
         $query = "
 			SELECT
-			    COUNT(*) AS num
-			FROM
-				`{$mapper->getTable()}` `l`
-				LEFT JOIN {$mapper->getJoinSql('user', 'l', 'u')}
-				LEFT JOIN {$mapper->getJoinSql('category', 'l', 'c')}
-				LEFT JOIN {$mapper->getJoinSql('perms', 'l', 'p')}
-					AND p.gid = :role_id
-					AND p.type > :min_access
-				LEFT JOIN {$mapper->getJoinSql('userAccess', 'l', 'a')}
-					AND a.service = :service
-					AND a.uid = :user_id
-			WHERE
-				(p.cid OR a.sid)
-				AND l.deleted_at IS NULL
-				AND MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()})
+                COUNT(*) AS num
+            FROM {$mapper->getTable()} c
+            LEFT JOIN {$mapper->getJoinSql('codes', 'c', 'cc')}
+            LEFT JOIN {$mapper->getJoinSql('homepages', 'c', 'hp')}
+            WHERE (
+                MATCH(`c`.`name`) AGAINST (\"*{$sanitiser->getKeyword()}*\" IN BOOLEAN MODE) OR
+                MATCH(`cc`.`code`) AGAINST (\"*{$sanitiser->getKeyword()}*\" IN BOOLEAN MODE)
+            )
 		";
 
         $stmt = $mapper->getDatabase()->prepare($query);
-        $stmt->execute(array(
-            'role_id' => $user->getRole()->getId(),
-            'min_access' => UserAccess::ACCESS_READ,
-            'service' => UserAccess::SERVICE_HOMEPAGE,
-            'user_id' => $user->getId()
-        ));
+        $stmt->execute();
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
