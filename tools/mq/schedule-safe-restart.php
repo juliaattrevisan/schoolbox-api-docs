@@ -48,6 +48,14 @@ else {
 	$d->notice("Doing diagnostic only, no data will be harmed (despite what messages say)");
 }
 
+set_error_handler(
+    function ($num, $string, $file, $line) {
+        // cast catchable fatal error to runtime exception so it gets ditched
+        throw new RuntimeException("$string in $file:$line");
+    },
+    E_RECOVERABLE_ERROR
+);
+
 $loop = \React\EventLoop\Factory::create();
 
 $stompFactory = new \React\Stomp\Factory($loop);
@@ -198,6 +206,7 @@ function interrogate($event, $log) {
 	}
 
 	// YOU ARE IN CHILD CONTEXT HERE. DO NOT ATTEMPT TO RETURN. YOU MUST EXIT INSTEAD.
+    restore_error_handler();
 	register_shutdown_function(function($d) {
         /** @var \Psr\Log\LoggerInterface $d */
 		$last = error_get_last();
