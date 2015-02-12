@@ -22,7 +22,11 @@ use \Rubric\Renderer\Vertical;
 
 /** @var SitePage $this */
 
-/* /submission/inline/view/<box_id>/<user_id>
+if (count($this->arg) < 2) {
+    $this->error(2); // not enough info
+}
+
+/* /submission/inlineGrading/view/<box_id>/<user_id>
  */
 $submissionBoxId = $this->arg[0];
 $currentUid = $this->arg[1];
