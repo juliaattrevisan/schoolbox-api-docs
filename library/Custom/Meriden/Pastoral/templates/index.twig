@@ -87,6 +87,66 @@
         <dd>{{ report.tutorGroupReport.attendances.endorsedLeave }}</dd>
     {% endif %}
 
+    <dt>Athletics</dt>
+    <dd>
+        {% if report.tutorGroupReport.namedGrades.athletics %}
+            {%
+            include '@customMeridenPastoral/sub/assessmentResult.twig'
+            with {grade: report.tutorGroupReport.namedGrades.athletics}
+            %}
+        {% else %}
+            Unknown
+        {% endif %}
+    </dd>
+
+    <dt>Swimming</dt>
+    <dd>
+        {% if report.tutorGroupReport.namedGrades.swimming %}
+            {%
+            include '@customMeridenPastoral/sub/assessmentResult.twig'
+            with {grade: report.tutorGroupReport.namedGrades.swimming}
+            %}
+        {% else %}
+            Unknown
+        {% endif %}
+    </dd>
+
+    <dt>School Camp</dt>
+    <dd>
+        {% if report.tutorGroupReport.namedGrades.camp %}
+            {%
+            include '@customMeridenPastoral/sub/assessmentResult.twig'
+            with {grade: report.tutorGroupReport.namedGrades.camp}
+            %}
+        {% else %}
+            Unknown
+        {% endif %}
+    </dd>
+
+    <dt>Uniform</dt>
+    <dd>
+        {% if report.tutorGroupReport.namedGrades.uniform %}
+            {%
+            include '@customMeridenPastoral/sub/assessmentResult.twig'
+            with {grade: report.tutorGroupReport.namedGrades.uniform}
+            %}
+        {% else %}
+            Unknown
+        {% endif %}
+    </dd>
+
+    <dt>Pastoral activities involvement</dt>
+    <dd>
+        {% if report.tutorGroupReport.namedGrades.pastoral %}
+            {%
+            include '@customMeridenPastoral/sub/assessmentResult.twig'
+            with {grade: report.tutorGroupReport.namedGrades.pastoral}
+            %}
+        {% else %}
+            Unknown
+        {% endif %}
+    </dd>
+
     {##
      # Athletics, Swimming, Camp, Uniform, Pastoral Services:
      # All these are attendances, and are based off of assessments in the grade page.

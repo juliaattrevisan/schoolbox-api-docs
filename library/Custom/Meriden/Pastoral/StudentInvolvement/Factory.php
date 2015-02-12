@@ -98,6 +98,11 @@ class Factory
             ->setSubjectCode($tutorGroupCode['code'])
             ->setFolder($folderWithGrades['folder'])
             ->setGrades($this->augmentGradesWithAssessment($folderWithGrades['grades'], $student))
+            ->moveToNamedGrade('athletics', 'Swimming Carnival')
+            ->moveToNamedGrade('swimming', 'Athletics Carnival')
+            ->moveToNamedGrade('camp', 'School Camp')
+            ->moveToNamedGrade('uniform', 'Uniform')
+            ->moveToNamedGrade('pastoral', 'Pastoral activities involvement')
         ;
         return $tutorGroup;
     }
