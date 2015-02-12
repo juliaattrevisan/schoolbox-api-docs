@@ -69,6 +69,25 @@
     </dd>
 
     {# grade distribution - other student's values for course grade #}
+    <dt>Grade Distribution</dt>
+    <dd>
+        <table>
+            <thead>
+            <tr>
+                {% for gradeLevel,_ in report.subjectReport.namedGrades.courseGrade.distribution %}
+                    <th>{{ gradeLevel }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                {% for _,results in report.subjectReport.namedGrades.courseGrade.distribution %}
+                    <td>{{ results|length }}</td>
+                {% endfor %}
+            </tr>
+            </tbody>
+        </table>
+    </dd>
 
     {# Endeavor Grades - a rubric #}
     <dt>Endeavour Grades</dt>
