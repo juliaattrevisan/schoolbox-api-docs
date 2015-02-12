@@ -74,7 +74,7 @@ class UserSubscriptionList extends SubscriptionList {
         $n = max(10, (int)($count / 50));
 
         // notify every 10%
-        $dec = $count / 10;
+        $dec = (int)($count / 10);
 
         // we'll do this the long way because somehow a user might have an id of 0...
         for ($i = 0, $a = microtime(true); $i < $count; ++$i) {
