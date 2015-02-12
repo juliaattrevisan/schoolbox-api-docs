@@ -79,6 +79,7 @@ foreach ($sqlq as $qi) {
 
             if ($perform) {
                 // split this message off onto a special queue
+		        Database::reinitialise();
                 Database::getInstance()->exec("DELETE FROM scheduleq WHERE id_hash = ".$qi['id_hash']);
             }
         }
@@ -104,6 +105,7 @@ foreach ($sqlq as $qi) {
     }
 
     if ($perform) {
+        Database::reinitialise();
         Database::getInstance()->exec("DELETE FROM scheduleq WHERE id_hash = ".$qi['id_hash']);
     }
 
