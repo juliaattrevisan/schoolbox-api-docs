@@ -88,6 +88,7 @@ class Renderer extends Base {
         if ($mapperResult->getCount()) {
             $this->getPage()->setFile('folder_t', 'resource/folder/search/results.html');
             $this->getPage()->setBlock('folder_t', 'folder', 'folder_block');
+            $this->getPage()->setBlock('folder_t', 'see_more', 'see_more_block');
             $this->getPage()->setBlock('folder', 'modify', 'modify_block');
 
             $this->getPage()->setVar(array(
