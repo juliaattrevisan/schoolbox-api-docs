@@ -52,6 +52,8 @@ class Result extends Base {
 
         $collection = $mapper->createCollection();
 
+        $hashtable = array();
+        
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $folder = $mapper->hydrate($row, 'c');
 
