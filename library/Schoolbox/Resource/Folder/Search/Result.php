@@ -50,8 +50,6 @@ class Result extends Base {
         $statement = $mapper->getDatabase()->prepare($query);
         $statement->execute();
 
-        $collection = $mapper->createCollection();
-
         $hashtable = array();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
@@ -59,10 +57,13 @@ class Result extends Base {
 
             /* Accumulate folder codes here
              */
-            if (isset($hashtable[$folder->getId()])) {
-                $folder = $hashtable[$folder->getId()];
+            if (!isset($hashtable[$folder->getId()])) {
+                $hashtable[$folder->getId()] = $folder;
             }
 
+            /* Reassign var
+             */
+            $folder = $hashtable[$folder->getId()];
             $folder->getCodes()->add($code_mapper->hydrate($row, 'cc'));
 
             /* Accumulate homepage configs
@@ -71,7 +72,10 @@ class Result extends Base {
             $folder->setHomepage($homepageConfig);
         }
 
-        return new Collection(array_values($hashtable));
+        $results = new Collection(array_values($hashtable));
+
+        return $results;
+
     }
 
     /**
