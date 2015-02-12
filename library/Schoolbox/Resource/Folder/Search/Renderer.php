@@ -86,17 +86,17 @@ class Renderer extends Base {
     public function render(MapperResult $mapperResult, $type)
     {
         if ($mapperResult->getCount()) {
-            $this->getPage()->setFile('category_t', 'resource/folder/search/results.html');
-            $this->getPage()->setBlock('category_t', 'category', 'category_block');
-            $this->getPage()->setBlock('category', 'modify', 'modify_block');
+            $this->getPage()->setFile('folder_t', 'resource/folder/search/results.html');
+            $this->getPage()->setBlock('folder_t', 'folder', 'folder_block');
+            $this->getPage()->setBlock('folder', 'modify', 'modify_block');
 
             $this->getPage()->setVar(array(
-                'see_more_block' => ''
+                'see_more_block' => '',
             ));
 
             $this->getPage()->setVar(array(
-                'CATEGORY_DISP_COUNT' => $mapperResult->getResult()->count(),
-                'CATEGORY_COUNT' => $mapperResult->getCount(),
+                'FOLDER_DISP_COUNT' => $mapperResult->getResult()->count(),
+                'FOLDER_COUNT' => $mapperResult->getCount(),
             ));
 
             /* phplib
@@ -131,15 +131,15 @@ class Renderer extends Base {
                 /* phplib
                  */
                 $this->getPage()->setVar(array(
-                    'CATEGORY_ID' => $currentFolder->getId(),
-                    'CATEGORY_NAME' => Scrub::text($folderName),
-                    'CATEGORY_CODE' => $currentFolder->getCodes()->first()->getCode(),
-                    'CATEGORY_BREADCRUMB' => $this->spawnBreadcrumbs($currentFolder),
-                    'CATEGORY_COUNT' => $this->getCount($this->getType()),
-                    'CATEGORY_TYPE' => $folderType,
+                    'FOLDER_ID' => $currentFolder->getId(),
+                    'FOLDER_NAME' => Scrub::text($folderName),
+                    'FOLDER_CODE' => $currentFolder->getCodes()->first()->getCode(),
+                    'FOLDER_BREADCRUMB' => $this->spawnBreadcrumbs($currentFolder),
+                    'FOLDER_COUNT' => $this->getCount($this->getType()),
+                    'FOLDER_TYPE' => $folderType,
                 ));
 
-                $this->getPage()->parse('category_block', 'category', true);
+                $this->getPage()->parse('folder_block', 'folder', true);
             }
 
             /* "outputMore"
@@ -149,7 +149,7 @@ class Renderer extends Base {
                 $this->getPage()->parse('see_more_block', 'see_more');
             }
 
-            $this->getPage()->parse('RESULT', 'category_t', true);
+            $this->getPage()->parse('RESULT', 'folder_t', true);
         }
         else {
             return;
