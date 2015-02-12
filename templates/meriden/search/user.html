@@ -1,0 +1,55 @@
+<div class="box">
+<h2>People <!-- BEGIN count -->({USER_DISP_COUNT} / {USER_COUNT})<!-- END count --></h2>
+<ul class="information-list">
+<!-- BEGIN user -->
+	<li>
+		<span class="actions">
+			<!-- BEGIN modify -->
+			<a href="/adminv2/modify-user/{USER_SEARCH_ID}" class="btn modify no-text" title="Modify User"><span></span></a>
+			<!-- END modify -->
+		</span>
+		<a href="/search/user/{USER_SEARCH_ID}">
+		<img class="thumbnail" height="64" width="64" src="/portrait.php?userId={USER_SEARCH_SYNERGY_ID}&size=square64" alt="{USER_SEARCH_NAME}"/>
+		<h4>{USER_SEARCH_NAME}</h4>
+		</a>
+		<p class="meta">{USER_SEARCH_YEAR} {USER_SEARCH_CAMPUS} {USER_SEARCH_GROUP}</p>
+		<span class="buttons">
+			<!-- BEGIN boarder_leave -->
+			<a href="/modules/leave/student/{USER_SEARCH_ID}" class="btn bed"><span></span>Boarding Leave</a>
+			<!-- END boarder_leave -->
+
+			<!-- BEGIN timetable -->
+			<a href="/timetable/{USER_SEARCH_ID}" class="btn time-table"><span></span>Timetable</a>
+			<!-- END timetable -->
+
+			<!-- BEGIN user_calendar -->
+			<a href='/calendar/full/{USER_CALENDAR_CURRENTDATE}/{USER_SEARCH_ID}' class="btn calendar"><span></span>Calendar</a>
+			<!-- END user_calendar -->
+
+			<!-- BEGIN eportfolio -->
+			<a href="/eportfolio/{USER_SEARCH_ID}/profile" class="btn eportfolio"><span></span>ePortfolio</a>
+			<!-- END eportfolio -->
+
+	        <!-- BEGIN grades_button -->
+	        <a href="/submission/allWork/{USER_SEARCH_ID}" class="btn tick"><span></span>Grades</a>
+	        <a href="/modules/custom/meriden/pastoral/{USER_SEARCH_ID}" class="btn report"><span></span>Pastoral Report</a>
+	        <!-- END grades_button -->
+
+			<!-- BEGIN due_work -->
+			<a href="/submission/dueWork/0/{USER_SEARCH_ID}" class="btn due-work"><span></span>Due Work</a>
+			<!-- END due_work -->
+		</span>
+	</li>
+<!-- END user -->
+</ul>
+<!-- BEGIN see_more -->
+<p>
+	<a id="user-more" class="float-left btn more" rel="user" href="#"><span></span>See all {MORE_COUNT} results for People</a>
+</p>
+<!-- END see_more -->
+<ul class="admin-nav foot">
+	<!-- BEGIN pagination -->
+	<li><a href="javascript:void(0);" rel="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a></li>
+	<!-- END pagination -->
+</ul>
+</div>
