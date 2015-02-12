@@ -192,6 +192,12 @@ class MSSQL {
      */
     function query($sql_q)
 	{
+		// SB-6907: Cathedral's SQL server won't accept long query strings, so
+		// strip any leading space from each line of the query.
+		// (I can't guarantee that this won't change the meaning of any query,
+		//  but 1. we never insert into any MSSQL DB, and 2. we never query on
+		//  any value with a line break, so this should be fine.
+		$sql_q = preg_replace('/^\\s+/m', '', $sql_q);
 		if($this->dbf) {
 			if ($this->collector instanceof MssqlDatabaseCollector) {
 				$this->result = $this->collector->query($sql_q);
