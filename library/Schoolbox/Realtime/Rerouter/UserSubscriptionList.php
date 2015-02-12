@@ -65,11 +65,32 @@ class UserSubscriptionList extends SubscriptionList {
             return;
         }
 
+        $this->log->notice("Loading $count users");
+
         // this isn't exactly kosher, but it sure beats dummy-hydrating every user in the db
         $stmt = $source->getDatabase()->query("SELECT `id` FROM `user`");
 
+        // temporal sample: 10, or 2%, whichever is larger
+        $n = max(10, (int)($count / 50));
+
+        // notify every 10%
+        $dec = $count / 10;
+
         // we'll do this the long way because somehow a user might have an id of 0...
-        for ($i = 0; $i < $count; ++$i) {
+        for ($i = 0, $a = microtime(true); $i < $count; ++$i) {
+
+            // sample first $n iterations to gauge how long this is going to take
+            if ($i == $n) {
+                $b   = microtime(true);
+                $ttl = ($b - $a) * ($count - $n) / $n;
+                $adr = new \Alaress_Date_Relative(time() + $ttl);
+                $this->log->info(sprintf("Loading estimated to be complete ".$adr->getRelativeTime()), array('char' => '?'));
+            }
+
+            if ($i > 0 && $i % $dec == 0) {
+                $this->log->debug(($i * 10 / $dec)."% loaded");
+            }
+
             $id = $stmt->fetchColumn();
 
             // result is explicitly false? we somehow miscounted - we're done here
@@ -90,6 +111,8 @@ class UserSubscriptionList extends SubscriptionList {
                 }
             }
         }
+
+        $this->log->debug("Finished loading");
     }
 
 
