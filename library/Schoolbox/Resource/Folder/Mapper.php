@@ -10,7 +10,7 @@
 
 namespace Schoolbox\Resource\Folder;
 
-use Schoolbox\Resource\Link\Search\Result;
+use Schoolbox\Resource\Folder\Search\Result;
 use Schoolbox\Resource\CategoryMapper;
 
 class Mapper extends CategoryMapper {
