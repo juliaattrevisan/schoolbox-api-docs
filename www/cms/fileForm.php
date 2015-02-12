@@ -189,7 +189,7 @@ elseif (is_numeric($_GET['delete'])) {
     }
 } /* Delete a list of files */
 elseif (is_numeric($_GET['deleteList'])) {
-    $fileList = explode(',', rtrim($_GET['fileList'], ','));
+    $fileList = array_filter(explode(',', rtrim($_GET['fileList'], ',')));
 
     if (is_array($fileList)) {
         foreach ($fileList as $fileID) {
@@ -208,7 +208,7 @@ elseif (is_numeric($_GET['deleteList'])) {
         }
     }
 
-    $linkList = explode(',', rtrim($_GET['linkList'], ','));
+    $linkList = array_filter(explode(',', rtrim($_GET['linkList'], ',')));
     if (is_array($linkList)) {
         foreach ($linkList as $linkID) {
             try {
