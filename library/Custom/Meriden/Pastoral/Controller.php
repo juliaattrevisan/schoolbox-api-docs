@@ -72,12 +72,16 @@ class Controller extends Base
      */
     public function index($year, User $student)
     {
-        $this->getResponse()->content->set(
-            array(
-                'template' => '@customMeridenPastoral/index.twig',
-                'data'     => $this->buildReportData($year, $student),
-            )
-        );
+        try {
+            $this->getResponse()->content->set(
+                array(
+                    'template' => '@customMeridenPastoral/index.twig',
+                    'data'     => $this->buildReportData($year, $student),
+                )
+            );
+        } catch (\RangeException $e) {
+            $this->getResponse()->status->setCode(404);
+        }
     }
 
     /**
@@ -89,12 +93,16 @@ class Controller extends Base
      */
     public function subject($year, User $student, $subjectCode)
     {
-        $this->getResponse()->content->set(
-            array(
-                'template' => '@customMeridenPastoral/subject.twig',
-                'data'     => $this->buildReportData($year, $student, $subjectCode),
-            )
-        );
+        try {
+            $this->getResponse()->content->set(
+                array(
+                    'template' => '@customMeridenPastoral/subject.twig',
+                    'data'     => $this->buildReportData($year, $student, $subjectCode),
+                )
+            );
+        } catch (\RangeException $e) {
+            $this->getResponse()->status->setCode(404);
+        }
     }
 
     /**
