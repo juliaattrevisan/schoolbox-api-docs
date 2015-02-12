@@ -113,7 +113,7 @@ class Renderer extends Base {
                     }
 
                     $suffix = implode(', ', $allCodes);
-                    $folderName = "{$currentFolder->getName} ({$suffix})";
+                    $folderName = "{$currentFolder->getName()} ({$suffix})";
                 }
                 else {
                     $folderName = "{$currentFolder->getName()}";
