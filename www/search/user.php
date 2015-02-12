@@ -333,7 +333,6 @@ if (is_numeric($this->arg[0])) {
 
                     $this->setVar($output);
                     $synClass   = new External_Class;
-                    $catHandler = new Category;
                     $i          = 1;
 
                     /*Output subject list */
