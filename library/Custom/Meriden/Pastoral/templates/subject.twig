@@ -114,15 +114,19 @@
             Unknown
         {% endif %}
     </dd>
-
-    {# Other assessments #}
-    {% for grade in report.subjectReport.grades %}
-        <dt>{{ grade.assessment.name ?: grade.quiz.title }}</dt>
-        <dd>
-            {%
-                include '@customMeridenPastoral/sub/assessmentResult.twig'
-                with {grade: grade}
-            %}
-        </dd>
-    {% endfor %}
 </dl>
+
+<h2>Assessments</h2>
+{%
+    include '@customMeridenPastoral/sub/assessments.twig'
+    with {work: report.subjectReport.grades, student: report.student}
+%}
+{#{% for grade in report.subjectReport.grades %}#}
+    {#<dt>{{ grade.assessment.name ?: grade.quiz.title }}</dt>#}
+    {#<dd>#}
+        {#{%#}
+        {#include '@customMeridenPastoral/sub/assessmentResult.twig'#}
+        {#with {grade: grade}#}
+        {#%}#}
+    {#</dd>#}
+{#{% endfor %}#}

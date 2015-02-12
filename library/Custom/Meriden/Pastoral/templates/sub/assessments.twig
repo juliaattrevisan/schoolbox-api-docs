@@ -1,0 +1,36 @@
+<div class="listing">
+    <table class="upcoming-work table ruler">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Grade</th>
+                <th>Date</th>
+                <th>Comments</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for workItem in work %}
+        <tr>
+            <td>
+                {% if workItem.assessment %}
+                    <a class="title" href="/submission/submissionHistory/{{ workItem.assessment.id }}/{{ student.id }}">
+                        {{ workItem.assessment.name }}
+                    </a>
+                {% elseif workItem.quiz %}
+                    <a class="title" href="/assess/attempts/{{ workItem.quiz.id }}/{{ student.id }}">
+                        {{ workItem.quiz.title }}
+                    </a>
+                {% else %}
+                    Unknown
+                {% endif %}
+            </td>
+            <td class="grade">
+                <span class="gradient-{{ workItem.gradient }}">{{ workItem.pretty_mark }}</span>
+            </td>
+            <td>{{ workItem.dueDate }}</td>
+            <td>{{ workItem.comment }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
