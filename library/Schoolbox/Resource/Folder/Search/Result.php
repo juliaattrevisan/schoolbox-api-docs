@@ -53,7 +53,7 @@ class Result extends Base {
         $collection = $mapper->createCollection();
 
         $hashtable = array();
-        
+
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $folder = $mapper->hydrate($row, 'c');
 
@@ -71,7 +71,7 @@ class Result extends Base {
             $folder->setHomepage($homepageConfig);
         }
 
-        return $collection;
+        return new Collection(array_values($hashtable));
     }
 
     /**
