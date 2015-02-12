@@ -135,9 +135,38 @@ class Renderer extends Base {
                     'FOLDER_NAME' => Scrub::text($folderName),
                     'FOLDER_CODE' => $currentFolder->getCodes()->first()->getCode(),
                     'FOLDER_BREADCRUMB' => $this->spawnBreadcrumbs($currentFolder),
-                    'FOLDER_COUNT' => $this->getCount($this->getType()),
                     'FOLDER_TYPE' => $folderType,
                 ));
+
+                $userAccessMapper = new \Schoolbox\Permission\Access\UserAccessMapper();
+                $userAccess = $userAccessMapper->findByColumnList(array(
+                    'uid' => $_SESSION['user']->getId(),
+                    'service' => HOMEPAGE_SERVICE,
+                    'sid' => $currentFolder->getId()
+                ));
+
+                $roleAccessMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
+                $roleAccess = $roleAccessMapper->findByColumnList(array(
+                    'cid' => $currentFolder->getId(),
+                    'gid' => $_SESSION['user']->getRole()->getId(),
+                ));
+
+                /* Only show modify block for those with access >= 2
+                 */
+                if ($userAccess->count() && $roleAccess->count()) {
+                    $hasRoleAccess = ($roleAccess->first()->getType() >= 2);
+                    $hasUserAccess = ($userAccess->first()->getAccessLevel() >= 2);
+
+                    if ($hasRoleAccess && $hasUserAccess) {
+                        $this->getPage()->parse('modify_block', 'modify');
+                    }
+                    else {
+                        $this->getPage()->parse('modify_block', 'modify');
+                    }
+                }
+                else {
+                    $this->getPage()->parse('modify_block', 'modify');
+                }
 
                 $this->getPage()->parse('folder_block', 'folder', true);
             }
