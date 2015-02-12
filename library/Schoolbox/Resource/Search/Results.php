@@ -28,6 +28,9 @@ use Schoolbox\Collection;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\Resource\Link\Search\Renderer as LinkRenderer;
 
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Search\Renderer as FolderRenderer;
+
 class Results implements Searchable {
 
     /**
@@ -76,6 +79,7 @@ class Results implements Searchable {
         /* Add searchables
          */
         $this->getRegistry()->add(new Definition($type, new LinkMapper(), new LinkRenderer($page)));
+        $this->getRegistry()->add(new Definition($type, new FolderMapper(), new FolderRenderer($page)));
     }
 
     /**
