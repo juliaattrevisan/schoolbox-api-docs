@@ -16,6 +16,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Resource\Search\Sanitiser;
 use Schoolbox\User;
 use Schoolbox\Resource\Search\MapperResult\Base;
+use Schoolbox\Resource\Category;
 
 class Result extends Base {
 
@@ -50,20 +51,20 @@ class Result extends Base {
         $statement = $mapper->getDatabase()->prepare($query);
         $statement->execute();
 
-        $hashtable = array();
+        $results = new Collection();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $folder = $mapper->hydrate($row, 'c');
 
             /* Accumulate folder codes here
              */
-            if (!isset($hashtable[$folder->getId()])) {
-                $hashtable[$folder->getId()] = $folder;
+            if (!($results->getOffset($folder->getId()) instanceof Category)) {
+                $results->setOFfset($folder->getId(), $folder);
             }
 
             /* Reassign var
              */
-            $folder = $hashtable[$folder->getId()];
+            $folder = $results->getOffset($folder->getId());
 
             $code = $code_mapper->hydrate($row, 'cc');
 
@@ -77,10 +78,11 @@ class Result extends Base {
             $folder->setHomepage($homepageConfig);
         }
 
-        $results = new Collection(array_values($hashtable));
+        /* What, it times out doing new Collection(array_values($results))
+         */
+        $results->reindex();
 
         return $results;
-
     }
 
     /**
