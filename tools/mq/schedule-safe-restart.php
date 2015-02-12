@@ -86,9 +86,6 @@ foreach ($sqlq as $qi) {
             $d->notice("Message retained", array('char' => '+'));
         }
 
-        // hold onto our NACK's
-        return;
-
     } catch (RuntimeException $e) {
         // this message is can't be parsed, so we ACK it to make it go away
         $d->error("RuntimeException: ".$e->getMessage());
