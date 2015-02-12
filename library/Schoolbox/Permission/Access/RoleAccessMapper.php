@@ -61,6 +61,39 @@ class RoleAccessMapper extends Mapper {
 
 	}
 
+    public function getGroupPermissions(Category $category) {
+        $query = "
+            SELECT
+                {$this->getColumnString('ra')},
+                {$this->getJoinColumnString('category', 'c')},
+                {$this->getJoinColumnString('role', 'r')}
+            FROM `{$this->getTable()}` `ra`
+            LEFT JOIN {$this->getJoinSql('role', 'ra', 'r')}
+            LEFT JOIN {$this->getJoinSql('category', 'ra', 'c')}
+            WHERE c.id = :categoryId
+            ORDER BY c.id
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute(array(
+            'categoryId' => $category->getId()
+        ));
+
+        $collection = new Collection();
+
+        while($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $roleAccess = $this->hydrate($row, 'ra');
+            $folder = $this->getJoinMapper('category')->hydrate($row, 'c');
+            $role = $this->getJoinMapper('role')->hydrate($row, 'r');
+
+            $roleAccess->setCategory($folder);
+            $roleAccess->setRole($role);
+
+            $collection->add($roleAccess);
+        }
+
+        return $collection;
+    }
 
 	/**
 	 * Save category permissions, optionally recursively

@@ -1,23 +1,31 @@
 <?php
 
-$categoryHandler = new Category();
+$folderMapper = new \Schoolbox\Resource\CategoryMapper();
 $groupHandler = new Group();
 
 if (is_numeric($this->arg[0])) {
-	if (!($category = $categoryHandler->getByID($this->arg[0]))) {
+    try {
+        $folder = $folderMapper->findById($this->arg[0]);
+    }
+    catch (\Exception $e) {
 		error(2);
 	}
 
-	if ($category['parent'] == 0) {
-		$categoryParent = array('id' => 0, 'name' => 'Top');
+	if ($folder->getParent()->getId() == 0) {
+        $folderParent = new \Schoolbox\Resource\Category();
+        $folderParent->setId(0);
+        $folderParent->setName('Top');
 	}
 	else {
-		if (!($categoryParent = $categoryHandler->getByID($category['parent']))) {
+        try {
+            $folderParent = $folderMapper->findById($folder->getParent()->getId());
+        }
+        catch (\Exception $e) {
 			error(2);
 		}
 	}
 
-	if ($groupHandler->getPermission($category['id']) < WRITE_ACCESS) {
+	if ($groupHandler->getPermission($folder->getId()) < WRITE_ACCESS) {
 		error(6);
 	}
 
@@ -29,7 +37,7 @@ if (is_numeric($this->arg[0])) {
 	$this->setBlock(TEMPLATE_content, 'synergy_input', 'synergy_input_block');
 	$this->setBlock(TEMPLATE_content, 'recursive', 'recursive_block');
 
-    if($groupHandler->isSuperuser()) {
+    if ($groupHandler->isSuperuser()) {
         $this->parse('recursive_block', 'recursive');
     } else {
         $this->setVar('recursive_block', '');
@@ -40,11 +48,11 @@ if (is_numeric($this->arg[0])) {
 
 	$output = array(
 		'ACTION' => 'Modify',
-		'CATEGORY_ID' => $category['id'],
-		'NAME' => Scrub::text($category['name']),
-		'CODE' => Scrub::text($category['code']),
-		'PARENT_ID' => $category['parent'],
-		'PARENT_NAME' => Scrub::text($categoryParent['name']),
+		'CATEGORY_ID' => $folder->getId(),
+		'NAME' => Scrub::text($folder->getName()),
+		'CODE' => Scrub::text($folder->getCodes()->first()->getCode()),
+		'PARENT_ID' => $folder->getParent()->getId(),
+		'PARENT_NAME' => Scrub::text($folderParent->getName()),
 		'USER_GROUP' => $_SESSION['gid'],
 		'DATABASE_TYPE' => ucfirst(Cfg::get('external_type')),
 		'REQUIRED_PERMS' => $_SESSION['gid'],
@@ -69,20 +77,23 @@ if (is_numeric($this->arg[0])) {
 
 	$this->dropDown('template_list', $homepageTemplateList, '', TEMPLATE_content, array('name'=>'TEMPLATE_NAME','id'=>'TEMPLATE_ID' ));
 
-	$groupPermList = $categoryHandler->getGroupPerms($category['id']);
+    $roleMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
+    $allRoles = $roleMapper->findByColumnList(array(
+        'cid' => $folder->getId(),
+        'type' => \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL
+    ));
 
-	if (is_array($groupPermList)) {
-		foreach ($groupPermList as $group) {
-			$output = array(
-				'GROUP_NAME' => Scrub::text($group['name']),
-				'GROUP_ID' => $group['id'],
+	if ($allRoles->count()) {
+		foreach ($allRoles as $role) {
+            $this->setVar(array(
+				'GROUP_NAME' => Scrub::text($role->getName()),
+				'GROUP_ID' => $role->getId(),
 				'PERM_0_SELECTED' => '',
 				'PERM_1_SELECTED' => '',
 				'PERM_2_SELECTED' => '',
-				'PERM_' . (int)$group['type'] . '_SELECTED' => 'checked="checked"',
-			);
+				'PERM_' . $role->getType() . '_SELECTED' => 'checked="checked"',
+			));
 
-			$this->setVar($output);
 			$this->parse('perm_table_block', 'perm_table', true);
 		}
 	}
@@ -90,12 +101,14 @@ if (is_numeric($this->arg[0])) {
 		$this->setVar('perm_table_block', '');
 	}
 
-	if ($category['owner'] == $_SESSION['id'] || ($category['owner'] && $_SESSION['su'])) {
+    $userAccessMapper = new \Schoolbox\Permission\Access\UserAccessMapper();
+
+	if ($userAccessMapper->isFolderOwner($_SESSION['user'], $folder)) {
 		$this->setVar('indiv_perms_block', '');
 		$this->parse('indiv_modify_block', 'indiv_modify');
 	}
 	else {
-		if ($category['owner']) {
+		if ($userAccessMapper->hasFolderOwner($folder)) {
 			$this->setVar('indiv_perms_block', '');
 			$this->setVar('indiv_modify_block', '');
 		}
@@ -117,15 +130,20 @@ if (is_numeric($this->arg[0])) {
 else {
 	if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 		if ($this->arg[1] == 0) {
-			$categoryParent = array('id' => 0, 'name' => 'Top');
+            $folderParent = new \Schoolbox\Resource\Category();
+            $folderParent->setId(0);
+            $folderParent->setName('Top');
 		}
 		else {
-			if (!($categoryParent = $categoryHandler->getByID($this->arg[1]))) {
-				error(2);
-			}
+            try {
+                $folderParent = $folderMapper->findById($this->arg[1]);
+            }
+            catch (\Exception $e) {
+                error(2);
+            }
 		}
 
-		if ($groupHandler->getPermission($categoryParent['id']) < WRITE_ACCESS) {
+		if ($groupHandler->getPermission($folderParent->getId()) < WRITE_ACCESS) {
 			error(6);
 		}
 
@@ -143,19 +161,17 @@ else {
 		$this->setTitle('Add Category');
 		$this->setTab('resources');
 
-		$output = array(
+        $this->setVar(array(
 			'ACTION' => 'Add',
 			'CATEGORY_ID' => '',
 			'NAME' => '',
 			'CODE' => '',
-			'PARENT_ID' => $categoryParent['id'],
-			'PARENT_NAME' => Scrub::text($categoryParent['name']),
+			'PARENT_ID' => $folderParent->getId(),
+			'PARENT_NAME' => Scrub::text($folderParent->getName()),
 			'REQUIRED_PERMS' => $_SESSION['gid'],
 			'GROUP_NAME' => '',
 			'DATABASE_TYPE' => ucfirst(Cfg::get('database_type')),
-		);
-
-		$this->setVar($output);
+		));
 
         $homepageTemplateMapper = new \Schoolbox\Resource\HomepageTemplateMapper();
         $homepageTemplateList = $homepageTemplateMapper->findAll();
@@ -168,16 +184,17 @@ else {
 
         $this->dropDown('template_list', $homepageTemplateList, '', TEMPLATE_content, array('name'=>'TEMPLATE_NAME','id'=>'TEMPLATE_ID' ));
 
-
 		/* Suggest Group Permissions based on parent folder's Group Permissions
 		 */
-		$allParentPermissions = $categoryHandler->getGroupPerms($categoryParent['id']);
+        $roleAccessMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
 
-		if (is_array($allParentPermissions) && count($allParentPermissions)) {
+        $allParentPermissions = $roleAccessMapper->getGroupPermissions($folderParent);
+
+        if ($allParentPermissions->count()) {
 			foreach($allParentPermissions as $parentPermission) {
 				$this->setVar(array(
-					'GROUP_ID' => $parentPermission['id'],
-					'GROUP_NAME' => Scrub::text($parentPermission['name']),
+					'GROUP_ID' => $parentPermission->getRole()->getId(),
+					'GROUP_NAME' => Scrub::text($parentPermission->getRole()->getName()),
 					'PERM_0_SELECTED' => '',
 					'PERM_1_SELECTED' => '',
 					'PERM_2_SELECTED' => '',
@@ -185,8 +202,8 @@ else {
 
 				/* Preselect permission radio
 				 */
-				if (is_numeric($parentPermission['type']) && in_array($parentPermission['type'], array(0,1,2))) {
-					$key = "PERM_{$parentPermission['type']}_SELECTED";
+				if (is_numeric($parentPermission->getType()) && in_array($parentPermission->getType(), array(0,1,2))) {
+					$key = "PERM_{$parentPermission->getType()}_SELECTED";
 
 					$this->setVar(array(
 						$key => 'checked="checked"',
