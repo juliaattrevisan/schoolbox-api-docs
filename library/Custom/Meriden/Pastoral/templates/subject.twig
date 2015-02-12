@@ -55,39 +55,45 @@
 
 <dl>
     {# course grade - derived from grade for this class #}
-    {% if report.subjectReport.namedGrades.courseGrade %}
-        <dt>Course Grade</dt>
-        <dd>
+    <dt>Course Grade</dt>
+    <dd>
+        {% if report.subjectReport.namedGrades.courseGrade %}
             {%
                 include '@customMeridenPastoral/sub/assessmentResult.twig'
                 with {grade: report.subjectReport.namedGrades.courseGrade}
             %}
-        </dd>
-    {% endif %}
+        {% else %}
+            Unknown
+        {% endif %}
+    </dd>
 
     {# grade distribution - other student's values for course grade #}
 
     {# Endeavor Grades - a rubric #}
-    {% if report.subjectReport.namedGrades.endeavourGrades %}
-        <dt>Endeavour Grades</dt>
-        <dd>
+    <dt>Endeavour Grades</dt>
+    <dd>
+        {% if report.subjectReport.namedGrades.courseGrade %}
             {%
                 include '@customMeridenPastoral/sub/assessmentResult.twig'
                 with {grade: report.subjectReport.namedGrades.endeavourGrades}
             %}
-        </dd>
-    {% endif %}
+        {% else %}
+            Unknown
+        {% endif %}
+    </dd>
 
     {# Approaches to learning - another rubric #}
-    {% if report.subjectReport.namedGrades.learningApproaches %}
-        <dt>Approaches to Learning</dt>
-        <dd>
+    <dt>Approaches to Learning</dt>
+    <dd>
+        {% if report.subjectReport.namedGrades.courseGrade %}
             {%
                 include '@customMeridenPastoral/sub/assessmentResult.twig'
                 with {grade: report.subjectReport.namedGrades.learningApproaches}
             %}
-        </dd>
-    {% endif %}
+        {% else %}
+            Unknown
+        {% endif %}
+    </dd>
 
     {# Other assessments #}
     {% for grade in report.subjectReport.grades %}
