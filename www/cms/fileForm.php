@@ -1,21 +1,21 @@
 <?php
-require_once( dirname(__FILE__) . '/../../include/Bootstrap.php' );
+require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use \Schoolbox\Resource\CategoryMapper;
-use \Schoolbox\Resource\FileMapper;
-use \Schoolbox\Resource\File;
-use \Schoolbox\Resource\Link;
-use \Schoolbox\Resource\LinkMapper;
+use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\File;
+use Schoolbox\Resource\FileMapper;
+use Schoolbox\Resource\Link;
+use Schoolbox\Resource\LinkMapper;
 
 /* Force session usage due to flash uploader
  * http://www.uploadify.com/forums/discussion/43/using-sessions-tricking-basic-authentication/p1
  */
-if (isset( $_POST[session_name()] )) {
+if (isset($_POST[session_name()])) {
     session_id($_POST[session_name()]);
 }
 
-if (isset( $_GET[session_name()] )) {
+if (isset($_GET[session_name()])) {
     session_id($_GET[session_name()]);
 }
 
@@ -28,7 +28,7 @@ if ($ajax) {
 $page = new SitePage();
 $page->setAjax($ajax);
 
-$fileHandler = new File();
+$fileHandler  = new File();
 $groupHandler = new Group();
 
 
@@ -49,7 +49,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
         if (isset($_POST['attachment'])) {
             $factory = new CollectorFactory(FileMapper::getInstance());
             /** @var File $result */
-            $result  = $factory->build($_POST['attachment'])->getFirst();
+            $result = $factory->build($_POST['attachment'])->getFirst();
 
             if ($file->getId()) {
                 $result->setId($file->getId());
@@ -132,7 +132,8 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
 
         } elseif ($e->getCode() == \Schoolbox\File\Exception::CODE_FILE_TOO_LARGE) {
             $code = 10;
-            $msg  = 'The size of the uploaded file exceeds the file size restrictions of '.Alaress_Byte_Format::bytesToString($file->getMimetype()->getMaxFileSize()).'.';
+            $msg  = 'The size of the uploaded file exceeds the file size restrictions of '
+                . Alaress_Byte_Format::bytesToString($file->getMimetype()->getMaxFileSize()) . '.';
 
         } else {
             $code = 9;
@@ -148,7 +149,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
     }
 } /* Move file from one category to another */
 elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
-try {
+    try {
         $file = FileMapper::getInstance()->findById($_POST['move']);
 
         if ($groupHandler->getPermission($file->getFolder()->getId()) < WRITE_ACCESS) {
@@ -162,12 +163,12 @@ try {
             FileMapper::getInstance()->save($file);
             $result = "success";
         }
-} catch (Exception $e) {
-            $result = "File not found";
-        }
+    } catch (Exception $e) {
+        $result = "File not found";
+    }
 
     header("Content-type: application/json");
-    print json_encode(array( 'result' => $result ));
+    print json_encode(array('result' => $result));
 } /* Delete a single file */
 elseif (is_numeric($_GET['delete'])) {
     try {
@@ -193,7 +194,8 @@ elseif (is_numeric($_GET['deleteList'])) {
 
     if (is_array($fileList)) {
         foreach ($fileList as $fileID) {
-            if (is_numeric($fileID)) {try {
+            if (is_numeric($fileID)) {
+                try {
                     $file = FileMapper::getInstance()->findById($fileID);
 
                     if ($groupHandler->getPermission($file->getFolder()->getId()) < WRITE_ACCESS) {
@@ -201,9 +203,9 @@ elseif (is_numeric($_GET['deleteList'])) {
                     }
 
                     FileMapper::getInstance()->delete($file);
-            } catch (Exception $e) {
-                        error(2);
-            }
+                } catch (Exception $e) {
+                    error(2);
+                }
             }
         }
     }
