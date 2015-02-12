@@ -31,6 +31,40 @@ class Controller extends Base
     }
 
     /**
+     * Redirect to most recent report for this student.
+     *
+     * @param User $student
+     */
+    public function currentReport(User $student)
+    {
+        $currentYear = date('Y');
+        $reportYears = array_map(
+            function ($v) {
+                return $v->getYear();
+            },
+            $this->getStudentInvolvementFactory()->buildTutorGroupList($student)
+        );
+
+        if (empty($reportYears)) {
+            // 404
+            $this->getResponse()->status->setCode(404);
+        } else {
+            // Redirect to current year, or last year in report
+            $lastReportYear = max($reportYears);
+            $this->getResponse()->redirect->found(
+                $this->getRouter()->generate(
+                    'customMeridenPastoral.index',
+                    array(
+                        'id'   => $student->getId(),
+                        'year' => min($lastReportYear, $currentYear)
+                    )
+                )
+
+            );
+        }
+    }
+
+    /**
      * Index for Meriden's pastoral page
      *
      * @param int  $year

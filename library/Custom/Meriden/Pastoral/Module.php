@@ -30,6 +30,7 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
+        $router->addGet('customMeridenPastoral.currentReport', $basePath.'/{id}');
         $router->addGet('customMeridenPastoral.index', $basePath.'/{id}/{year}');
         $router->addGet('customMeridenPastoral.subject', $basePath.'/{id}/{year}/{subjectCode}');
     }
@@ -59,7 +60,7 @@ class Module extends BaseModule
         // Search for the user
         // TODO move the mappers out of here, inject their dependency
         $matcher->add(
-            '/^customMeridenPastoral\\.(?:index|subject)/',
+            '/^customMeridenPastoral\\.(?:index|subject|currentReport)/',
             function($params) {
                 $student = UserMapper::getInstance()->findWithSubjects($params['id']);
                 $student->setSubjectCollection(SubjectMapper::getInstance()->findAllForStudent($student));
