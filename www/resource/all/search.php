@@ -90,12 +90,8 @@ else {
         /* Particular ordering and sorting for Categories
          */
         if ($type != 'all') {
-            if ($type == 'category') {
-                $result[$type] = $handle[$type]['handler']->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type], 'id', 'desc');
-            } else {
-                // perform search for individual category (without formatting for ajax call)
-                $result[$type] = $handle[$type]['handler']->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type]);
-            }
+            // perform search for individual category (without formatting for ajax call)
+            $result[$type] = $handle[$type]['handler']->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type]);
         }
     }
 
@@ -105,7 +101,6 @@ else {
     $oldHandlerRenderers->add(new \Schoolbox\User\Search\Renderer($page, $result, $count, 0));
     $oldHandlerRenderers->add(new \Schoolbox\File\Search\Renderer($page, $result, $count, 0));
     $oldHandlerRenderers->add(new \Schoolbox\Folder\Search\Renderer($page, $result, $count, 0));
-    $oldHandlerRenderers->add(new \Schoolbox\Folder\News\Search\Renderer($page, $result, $count, 0));
     $oldHandlerRenderers->add(new \Schoolbox\News\Search\Renderer($page, $result, $count, 0));
     $oldHandlerRenderers->add(new \Schoolbox\Blog\Search\Renderer($page, $result, $count, 0));
     $oldHandlerRenderers->add(new \Schoolbox\Wiki\Search\Renderer($page, $result, $count, 0));

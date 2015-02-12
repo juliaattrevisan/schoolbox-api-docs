@@ -128,7 +128,7 @@ class Results implements Searchable {
      */
     public function render() {
         foreach($this->getRegistry() as $currentDefinition) {
-            if (in_array($currentDefinition->getType(), array_unique(array('all', $this->getType())))) {
+            if (($this->getType() == 'all') || ($currentDefinition->getType() == $this->getType())) {
                 $searcher = $this->getResult()->getOffset($currentDefinition->getType());
 
                 $currentDefinition->getRenderer()->render($searcher, $this->getType());
