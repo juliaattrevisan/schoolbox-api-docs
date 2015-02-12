@@ -201,7 +201,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             FROM db2inst1.schoolbox_timetable t
             LEFT JOIN db2inst1.schoolbox_classes cl ON t.class_code = cl.class_code
             $join
-            AND day = :d
+            AND day_number = :d
         "
         );
 
@@ -221,7 +221,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         // arrange data as $timetable[$sequence] = array('period[Name|Start|End|Number|Sequence]');
         $timetable = array();
         for ($i = 0; isset($definition['sequence'][$i]); ++$i) {
-// the 'shortName' of the period
+            // the 'shortName' of the period
             $code = $definition['number'][$i];
 
             $timetable[$i] = array(
