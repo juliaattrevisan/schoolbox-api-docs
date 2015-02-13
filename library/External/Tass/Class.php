@@ -38,7 +38,7 @@ class External_Tass_Class implements External_ClassInterface {
 
 
 
-		$query = "SELECT studsub.stud_code as synergy_id, preferred_name as firstname, surname as lastname, year_grp as yearlevel, house
+		$query = "SELECT DISTINCT studsub.stud_code as synergy_id, preferred_name as firstname, surname as lastname, year_grp as yearlevel, house
 		FROM studsub
 		JOIN student ON student.stud_code = studsub.stud_code AND student.cmpy_code = studsub.cmpy_code
 		WHERE semester = '{$_SESSION['FileSemester']}'
