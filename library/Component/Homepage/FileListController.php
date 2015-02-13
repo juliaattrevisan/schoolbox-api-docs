@@ -16,11 +16,6 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
     private $groupHandler;
 
     /**
-     * @var Category
-     */
-    private $catHandler;
-
-    /**
      * @var File
      */
     private $fileHandler;
@@ -63,20 +58,25 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
     public function execute()
     {
         $this->groupHandler       = new Group();
-        $this->catHandler         = new Category();
         $this->fileHandler        = new File();
         $this->userHandler        = new User();
         $this->allowedFileHandler = new AllowedFile();
 
         // remove any non-numeric values from the source config
-        $this->source = $this->catHandler->getByID(
-            $this->getConfig('src') ?
-                preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
-                $this->getContext()->getId()
-        );
+        if ($this->getConfig('src')) {
+            $id = preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src'));
 
-        if ($this->source === false) {
-            $this->source = $this->catHandler->getByID($this->getContext()->getId());
+            try {
+                $folderMapper = new \Schoolbox\Resource\CategoryMapper();
+                $folder = $folderMapper->findById($id);
+
+                $this->source = $folder;
+            }
+            catch (\Exception $e) {
+            }
+        }
+        else {
+            $this->source = $this->getContext();
         }
     }
 
@@ -106,11 +106,11 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                     ? $this->getConfig('componentname')
                     : 'Files',
                 // These are for the Select Alternate Source resourcebrowser
-                'COMPONENT_CONFIG_SRC_ID'   => $this->source['id'],
-                'COMPONENT_CONFIG_SRC_NAME' => $this->source['id'] == $this->getContext()->getId()
+                'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
+                'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext()->getId()
                     ? 'Local'
-                    : $this->source['name'],
-                'FILES_CATEGORY_ID'         => $this->source['id'],
+                    : $this->source->getName(),
+                'FILES_CATEGORY_ID'         => $this->source->getId(),
             )
         );
 
@@ -131,7 +131,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         $this->setBlock('files', 'modify_file', 'modify_file_block');
 
         $fileList = $this->fileHandler->getAllInCategory(
-            $this->source['id'],
+            $this->source->getId(),
             array(
                 'size'    => $this->getConfig('size'),
                 'filter'  => $filter,
@@ -195,7 +195,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
             $this->setVar('files_block', '');
         }
         //setup block for submission button
-        $this->setVar('FILE_CAT_ID', $this->source['id']);
+        $this->setVar('FILE_CAT_ID', $this->source->getId());
         $this->setBlock($templateHandle, "submit_file", "submit_file_block");
         if ($this->permission < WRITE_ACCESS) {
             $this->setVar("submit_file_block", "");
