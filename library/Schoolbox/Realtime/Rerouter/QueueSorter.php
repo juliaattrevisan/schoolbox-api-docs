@@ -182,6 +182,7 @@ class QueueSorter implements FilterInterface {
 
 		if(!count($levels)) {
 			// if we got nothing back, this user isn't meant to see this message
+            $this->log->debug("Got no levels back, msg source is disabled for this user's role");
 			return 0;
 		}
 
