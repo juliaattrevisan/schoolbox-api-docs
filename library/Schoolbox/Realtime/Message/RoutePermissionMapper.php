@@ -97,7 +97,7 @@ class RoutePermissionMapper extends Mapper {
 			LEFT JOIN msg_route_perm perm ON src.id = perm.msg_source_id AND perm.role_id = :role_id
 			LEFT JOIN msg_reroute reroute ON src.id = reroute.msg_source_id AND reroute.user_id = :user_id
 			WHERE role_id IS NOT NULL
-			AND :topic REGEXP CONCAT(ns.slug, '\\.[^\\.]+\\.', src.key, '$')
+			AND :topic REGEXP CONCAT(ns.slug, '(\\.[0-9]+)+\\.', src.key, '$')
 		");
 
 		$stmt->execute(array(
