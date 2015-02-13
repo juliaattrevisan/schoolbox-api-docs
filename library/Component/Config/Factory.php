@@ -12,13 +12,13 @@ abstract class Component_Config_Factory {
 
     /**
      * @static
-     * @param string $key
-     * @param int $category
-     * @return Component_Config_Abstract|bool
+     * @param $key
+     * @param $folder
+     * @param $fields
+     * @return bool
      */
-    public static function build($key, $category, $fields) {
-
-        if(in_array(strtolower($key), self::$invalid)) {
+    public static function build($key, $folder, $fields) {
+        if (in_array(strtolower($key), self::$invalid)) {
             return false;
         }
 
@@ -28,12 +28,11 @@ abstract class Component_Config_Factory {
 
         if(class_exists($classname)) {
             // echo "Found $classname - will need template $key.html<br/>\n";
-            return new $classname($category, $fields);
+            return new $classname($folder, $fields);
         }
         else {
             // echo "Problem: couldn't find $classname ($key.html won't be rendered)<br/>\n";
             return false;
         }
     }
-
 }

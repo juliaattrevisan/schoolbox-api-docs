@@ -12,11 +12,21 @@ abstract class Component_Homepage_Statistics_ControllerAbstract extends Componen
     protected $groupType;
     private $validGroups = array('student','parent','staff','guest');
 
-    public function setup(array $context, array $config) {
+    public function setup($context, array $config) {
         parent::setup($context, $config);
         $g = new Group();
-        $this->permission = $g->getPermission($context['id']);
 
+        /* ffs arrays
+         * TODO: This should just be an object, never an array
+         */
+        if (is_object($context)) {
+            $contextId = $g->getPermission($context->getId());
+            $this->permission = $contextId;
+        }
+        else if (is_array($context)) {
+            $contextId = $g->getPermission($context['id']);
+            $this->permission = $contextId;
+        }
 
         $args = $this->sitepage->arg;
 
@@ -53,7 +63,7 @@ abstract class Component_Homepage_Statistics_ControllerAbstract extends Componen
         }
 
         $this->sitepage->setVar(array(
-            'ID'    => $context['id'],
+            'ID'    => $contextId,
             'GROUP' => $this->groupType
         ));
     }

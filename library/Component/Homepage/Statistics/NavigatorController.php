@@ -94,7 +94,7 @@ class Component_Homepage_Statistics_NavigatorController extends Component_Homepa
      * AS WELL AS PER-CAPITA (GROUP SIZE) WEIGHTINGS (but for now, it doesn't)
      */
     private function calculateStarRating() {
-        $categoryID = $this->getContext('id');
+        $categoryID = $this->getContext()->getId();
 
         $inner = "
             SELECT cid, LOG(2, SUM(hitcount)) AS hits, SUM(hitcount) AS raw_hits

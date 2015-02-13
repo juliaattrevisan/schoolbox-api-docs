@@ -28,7 +28,9 @@ abstract class Component_ControllerAbstract
     protected $sitepage;
 
     /**
-     * @var array
+     * -_-
+     *
+     * @var array|object
      */
     protected $context;
 
@@ -79,9 +81,9 @@ abstract class Component_ControllerAbstract
 
     /**
      * Method to provide global config details to the component
-     * @param array $config
+     * @param array|object $config
      */
-    public function setup(array $context, array $config)
+    public function setup($context, array $config)
     {
         $this->context = $context;
         $this->config  = $config;
@@ -396,7 +398,12 @@ abstract class Component_ControllerAbstract
     protected function getContext($key = '')
     {
         if ($key) {
-            return isset($this->context[$key]) ? $this->context[$key] : false;
+            if (is_object($this->context)) {
+                return isset($this->context->$key) ? $this->context->$key : false;
+            }
+            else {
+                return isset($this->context[$key]) ? $this->context[$key] : false;
+            }
         }
         return $this->context;
     }
