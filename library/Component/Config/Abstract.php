@@ -63,7 +63,7 @@ abstract class Component_Config_Abstract
             
             return false;
         }
-        return $this->cat;
+        return $this->folder;
     }
 
     /**
