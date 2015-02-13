@@ -31,7 +31,9 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
     private $userHandler;
 
     /**
-     * @var array
+     * An instance of Category
+     * 
+     * @var \Schoolbox\Resource\Category
      */
     private $source;
 
