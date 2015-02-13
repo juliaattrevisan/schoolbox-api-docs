@@ -32,7 +32,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
     /**
      * An instance of Category
-     * 
+     *
      * @var \Schoolbox\Resource\Category
      */
     private $source;
@@ -64,6 +64,8 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         $this->userHandler        = new User();
         $this->allowedFileHandler = new AllowedFile();
 
+        $this->source = $this->getContext();
+
         // remove any non-numeric values from the source config
         if ($this->getConfig('src')) {
             $id = preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src'));
@@ -76,9 +78,6 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
             }
             catch (\Exception $e) {
             }
-        }
-        else {
-            $this->source = $this->getContext();
         }
     }
 
