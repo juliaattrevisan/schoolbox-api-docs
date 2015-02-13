@@ -21,7 +21,6 @@ class Digest_News
 {
     protected $host;
 
-    protected $catHandler;
     protected $newsHandler;
     protected $catnewsHandler;
     protected $emailHandler;
@@ -63,7 +62,6 @@ class Digest_News
 
         $this->cli('Link URI base is ' . $this->host);
 
-        $this->catHandler = new Category();
         $this->newsHandler = new News();
         $this->catnewsHandler = new CategoryNews();
         $this->emailHandler = new Email();
@@ -109,7 +107,6 @@ class Digest_News
     public function __destruct()
     {
         unset($this->userList);
-        unset($this->catHandler);
         unset($this->newsHandler);
         unset($this->catnewsHandler);
         unset($this->textFormatter);
