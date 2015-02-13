@@ -20,12 +20,12 @@ abstract class Component_Homepage_Statistics_ControllerAbstract extends Componen
          * TODO: This should just be an object, never an array
          */
         if (is_object($context)) {
-            $contextId = $g->getPermission($context->getId());
-            $this->permission = $contextId;
+            $contextId = $context->getId();
+            $this->permission = $g->getPermission($context->getId());
         }
         else if (is_array($context)) {
-            $contextId = $g->getPermission($context['id']);
-            $this->permission = $contextId;
+            $contextId = $context['id'];
+            $this->permission = $g->getPermission($context['id']);
         }
 
         $args = $this->sitepage->arg;
@@ -61,7 +61,7 @@ abstract class Component_Homepage_Statistics_ControllerAbstract extends Componen
         else {
             $this->groupType = 'all';
         }
-
+new \Alaress_Probe($context);
         $this->sitepage->setVar(array(
             'ID'    => $contextId,
             'GROUP' => $this->groupType
