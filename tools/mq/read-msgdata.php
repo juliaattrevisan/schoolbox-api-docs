@@ -8,16 +8,19 @@ if (count($argv) < 2) {
 require_once __DIR__ . '/../../www/conf/conf.php';
 
 for ($i = 1; $i < $argc; ++$i) {
-    if (!preg_match('`^[0-9a-f]{40}:[0-9a-f]{40}$`', $argv[$i], $matches)) {
+    if (!preg_match('`^([0-9a-f]{40}):([0-9a-f]{40})$`', $argv[$i], $matches)) {
         echo "Invalid hash: $argv[$i]\n";
         continue;
     }
 
     $key = sprintf('msg:%s:m:%s', INSTANCE_ID, $matches[0]);
 
-    $data = gzuncompress(`redis-cli get $key`);
-
-    echo " *** $argv[$i] *** \n";
-    print_r(json_decode($data, true));
-
+    $output[$matches[1]][$matches[2]] = json_decode(gzuncompress(`redis-cli get $key`), true);
 }
+
+if (empty($output)) {
+    die("No data\n");
+}
+
+print_r($output);
+exit;
