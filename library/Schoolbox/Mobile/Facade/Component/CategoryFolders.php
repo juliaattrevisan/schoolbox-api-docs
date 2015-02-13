@@ -18,23 +18,28 @@ use ClientDevice;
 use Scrub;
 use Schoolbox\User;
 
+use Schoolbox\Resource\CategoryTreeBuilder;
+use Schoolbox\Assessment\Course\TaskMapper;
+
 class CategoryFolders extends Generic {
 
     /**
      * This should return an array of [title, aside, content]
      * @param User $user
+     * @param int $catID
      * @return array
      */
     public function render(User $user, $catID = 0) {
 
         // generate data
-        $catHandler = new Category();
         $groupHandler = new Group();
-        $children = $catHandler->getCategoryList($catID);
 
-        for($i = 0; $i < count($children); ++$i) {
-            if($groupHandler->getPermission($catID) < READ_ACCESS) {
-                unset($children[$i]);
+        $treeBuilder = new CategoryTreeBuilder(new CategoryMapper(), new TaskMapper(), $groupHandler);
+        $allFolders = $treeBuilder->buildChildNodes($catID);
+
+        for($i = 0; $i < count($allFolders); ++$i) {
+            if ($groupHandler->getPermission($catID) < READ_ACCESS) {
+                unset($allFolders[$i]);
             }
         }
 
@@ -43,8 +48,7 @@ class CategoryFolders extends Generic {
             'aside'   => '',
             'class'   => 'category-folders',
             'icon'    => 'work',
-            'content' => $children,
+            'content' => $allFolders,
         );
     }
-
 }
