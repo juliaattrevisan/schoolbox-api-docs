@@ -25,24 +25,32 @@ class Component_Config_Src extends Component_Config_Abstract
         return $value;
     }
 
-//    protected $is_shown_on_template = false;
-
+    /**
+     * Parse
+     *
+     * @param SitePage $page
+     * @param string $key
+     * @param string $keyblock
+     * @param mixed $configValue
+     * @param Component_ControllerAbstract $component
+     */
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
-        $catHandler = new Category();
-        $cat = $catHandler->getByID($configValue);
+        try {
+            $folderMapper = new \Schoolbox\Resource\CategoryMapper();
+            $folder = $folderMapper->findById($configValue);
 
-        if (empty($cat['name'])) {
+            $page->setVar(array(
+                'COMPONENT_CONFIG_SRC_ID'   => '/homepage/' . $folder->getId(),
+                'COMPONENT_CONFIG_SRC_NAME' => $folder->getName(),
+                'COMPONENT_CONFIG_SRC_CID'  => $folder->getId()
+            ));
+        }
+        catch (\Exception $e) {
             $page->setVar(array(
                 'COMPONENT_CONFIG_SRC_ID'   => '#',
                 'COMPONENT_CONFIG_SRC_NAME' => 'Local',
                 'COMPONENT_CONFIG_SRC_CID'  => '0'
-            ));
-        } else {
-            $page->setVar(array(
-                'COMPONENT_CONFIG_SRC_ID'   => '/homepage/' . $cat['id'],
-                'COMPONENT_CONFIG_SRC_NAME' => $cat['name'],
-                'COMPONENT_CONFIG_SRC_CID'  => $cat['id']
             ));
         }
     }
