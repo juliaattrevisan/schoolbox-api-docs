@@ -44,25 +44,12 @@ abstract class Component_Config_Abstract
     }
 
     /**
-     * @param string $attr
-     * @return mixed|bool
+     * Get folder
+     * 
+     * @return mixed
      */
-    protected function getCategory($attr = '')
+    protected function getCategory()
     {
-        if ($attr) {
-            if (is_object($this->folder)) {
-                if (isset($this->folder->$attr)) {
-                    return $this->folder->$attr;
-                }
-            }
-            else if (is_array($this->folder)) {
-                if (isset($this->folder[$attr])) {
-                    return $this->folder[$attr];
-                }
-            }
-            
-            return false;
-        }
         return $this->folder;
     }
 
