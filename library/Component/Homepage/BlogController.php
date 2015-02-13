@@ -69,16 +69,17 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
         $this->parseConfig();
 
         // remove any non-numeric values from the source config
-        $sourceId = $this->getConfig('src') ? preg_replace(
-            '#[/a-zA-Z]#',
-            '',
-            $this->getConfig('src')
-        ) : $this->getContext('id');
+        if ($this->getConfig('src')) {
+            $sourceId = preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src'));
+        }
+        else {
+            $sourceId = $this->getContext()->getId();
+        }
 
         try {
             $this->source = $this->getCategoryMapper()->findById($sourceId);
-        } catch (\Exception $e) {
-            $this->source = $this->getCategoryMapper()->findById($this->getContext('id'));
+        }
+        catch (\Exception $e) {
         }
 
         if ($this->permission < READ_ACCESS) {

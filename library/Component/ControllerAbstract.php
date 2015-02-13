@@ -85,10 +85,25 @@ abstract class Component_ControllerAbstract
      */
     public function setup($context, array $config)
     {
-        $this->context = $context;
+        /* Enforce instance insetad of permitting dual types
+         */
+        if (is_array($context)) {
+
+            try {
+                $folderMapper = new \Schoolbox\Resource\CategoryMapper();
+                $folder = $folderMapper->findById($context['id']);
+
+                $this->context = $folder;
+            }
+            catch (\Exception $e) {
+            }
+        }
+        else {
+            $this->context = $context;
+        }
+
         $this->config  = $config;
     }
-
 
     /**
      * Prepares data for the render function. Business logic.
@@ -405,6 +420,7 @@ abstract class Component_ControllerAbstract
                 return isset($this->context[$key]) ? $this->context[$key] : false;
             }
         }
+
         return $this->context;
     }
 

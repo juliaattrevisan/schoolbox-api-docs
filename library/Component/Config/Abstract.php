@@ -22,9 +22,18 @@ abstract class Component_Config_Abstract
      */
     protected $is_shown_on_template = true;
 
-    public function __construct($category = array(), $fields = null)
+    /**
+     * Constructor
+     *
+     * Folder should be an instance of \Schoolbox\Resource\Category
+     * but must be either handler array or instance, for now
+     *
+     * @param $folder
+     * @param null $fields
+     */
+    public function __construct($folder, $fields = null)
     {
-        $this->cat = $category;
+        $this->folder = $folder;
 
         if (isset($fields['sort'])) {
             $this->sortFields = $fields['sort'];
@@ -41,9 +50,17 @@ abstract class Component_Config_Abstract
     protected function getCategory($attr = '')
     {
         if ($attr) {
-            if (isset($this->cat[$attr])) {
-                return $this->cat[$attr];
+            if (is_object($this->folder)) {
+                if (isset($this->folder->$attr)) {
+                    return $this->folder->$attr;
+                }
             }
+            else if (is_array($this->folder)) {
+                if (isset($this->folder[$attr])) {
+                    return $this->folder[$attr];
+                }
+            }
+            
             return false;
         }
         return $this->cat;
