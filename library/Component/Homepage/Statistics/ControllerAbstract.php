@@ -61,7 +61,7 @@ abstract class Component_Homepage_Statistics_ControllerAbstract extends Componen
         else {
             $this->groupType = 'all';
         }
-new \Alaress_Probe($context);
+
         $this->sitepage->setVar(array(
             'ID'    => $contextId,
             'GROUP' => $this->groupType
