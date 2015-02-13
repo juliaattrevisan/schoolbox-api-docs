@@ -56,7 +56,8 @@ class TextboxMapper extends Mapper {
 			'other_key' => 'id'
 		));
 
-		$this->hasSoftDeleteBooleanField('deleted');
+        /* Took one on the chin for samuel
+         */
+		$this->hasSoftDeleteField('deleted', 'true', 'false');
 	}
-
-} 
+}
