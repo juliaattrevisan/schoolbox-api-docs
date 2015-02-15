@@ -10,6 +10,7 @@
  * @link      http://www.alaress.com.au/
  */
 
+use Html2Text\Html2Text;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Property\ICalendar;
 use Schoolbox\Calendar\EventTypeMapper;
@@ -25,12 +26,18 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
     protected function setup()
     {
         $this->setEventTypeMapper(EventTypeMapper::getInstance());
+        $this->setTextConverter(new \Html2Text\Html2Text());
     }
 
     /**
      * @var VCalendar
      */
     protected $vcalendar;
+
+    /**
+     * @var Html2Text
+     */
+    protected $textConverter;
 
     /**
      * Render this event
@@ -58,7 +65,9 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
                 // noop
             }
             $vevent->add('LOCATION', $currentEvent->getLocation());
-            $vevent->add('DESCRIPTION', \Scrub::html2text($currentEvent->getDetail()));
+
+            $this->getTextConverter()->set_html($currentEvent->getDetail());
+            $vevent->add('DESCRIPTION', $this->getTextConverter()->get_text());
 
             $start_time = $currentEvent->getStartTime()->getDateTimeObject();
             if (!($start_time instanceof DateTime)) {
@@ -118,6 +127,25 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
     public function setEventTypeMapper($eventTypeMapper)
     {
         $this->eventTypeMapper = $eventTypeMapper;
+        return $this;
+    }
+
+    /**
+     * @return Html2Text
+     */
+    public function getTextConverter()
+    {
+        return $this->textConverter;
+    }
+
+    /**
+     * @param  Html2Text $textConverter
+     *
+     * @return $this
+     */
+    public function setTextConverter($textConverter)
+    {
+        $this->textConverter = $textConverter;
         return $this;
     }
 }
