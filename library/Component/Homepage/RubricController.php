@@ -53,11 +53,6 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
             return false;
         }
 
-        // Permission denied if user doesn't have write access to category
-        if ($this->permission < WRITE_ACCESS) {
-            return false;
-        }
-
         $this->parseConfig();
 
         // Dump out block stuff
