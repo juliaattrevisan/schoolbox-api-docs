@@ -10,9 +10,8 @@
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 
-
-
-class Component_Homepage_RubricController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_RubricController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * @var Group
@@ -32,23 +31,25 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
     /**
      * {@inheritdoc}
      */
-    public function execute() {
+    public function execute()
+    {
         $this->group_handler  = new Group();
 
         // get rubric details
         $this->criteria = CriterionMapper::getInstance()->findByColumnList(
-                                              array(
-                                                  'parent_id'   => $this->getContext('id'),
-                                                  'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-                                              ),
-                                              array('order' => array('grouping'=>'ASC', 'name'=>'ASC'))
+            array(
+                'parent_id'   => $this->getContext('id'),
+                'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+            ),
+            array('order' => array('grouping'=>'ASC', 'name'=>'ASC'))
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
         if (!parent::loadTemplate($templateHandle, 'rubric')) {
             return false;
         }
@@ -63,7 +64,7 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
 
         /* Create group structure */
         $criteriaList = array();
-        foreach($this->criteria as $crit) {
+        foreach ($this->criteria as $crit) {
             $criteriaList[$crit->getGrouping()][] = $crit;
         }
 
@@ -81,5 +82,4 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
 
         return true;
     }
-
 }
