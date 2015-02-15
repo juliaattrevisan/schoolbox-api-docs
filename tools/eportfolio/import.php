@@ -241,6 +241,30 @@ foreach ($destUserList as $destUser) {
                     }
                 }
             }
+
+            // Copy only the allow parents permission.
+            $parentPermission = 0;
+            foreach (\Eportfolio\PermissionMapper::getInstance()->findParentSetting($page->getPageId()) as $perm) {
+                $parentPermission = $perm->getValue();
+            }
+            \Eportfolio\PermissionMapper::getInstance()->updatePermissions(
+                $newPage->getPageId(),
+                $parentPermission,
+                array(),
+                array()
+            );
+
+            // Below code will copy all permissions, including perms for users
+            // and groups the destination user can't access.
+//            $newPermissions = new \Schoolbox\Collection();
+//            foreach ($page->getPermissions() as $permission) {
+//                /** @var Eportfolio\Permission $newPermission */
+//                $newPermission = clone $permission;
+//                $newPermission->setPageId($newPage->getPageId());
+//                $newPermissions->add($newPermission);
+//            }
+//            \Eportfolio\PermissionMapper::getInstance()->create($newPermissions);
+//            \Eportfolio\PermissionMapper::getInstance()->updatePermissions($newPermissions);
         }
     }
 }
