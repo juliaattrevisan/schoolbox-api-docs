@@ -20,6 +20,7 @@ LEFT JOIN link l ON l.category = c.id AND l.submitted > DATE_SUB(NOW(), INTERVAL
 LEFT JOIN subject_news sn ON sn.code = c.id AND sn.datetime_posted > DATE_SUB(NOW(), INTERVAL $month MONTH)
 LEFT JOIN wiki w ON w.categoryID = c.id AND w.created > DATE_SUB(NOW(), INTERVAL $month MONTH)
 LEFT JOIN poll p ON p.categoryID = c.id AND p.created > DATE_SUB(NOW(), INTERVAL $month MONTH)
+LEFT JOIN homepage_config hc ON c.id = hc.cid
 WHERE template > 0 AND  t.threadID IS NULL AND f.id IS NULL AND l.id IS NULL AND sn.id IS NULL AND w.wikiID IS NULL
 AND p.pollID IS NULL";
 
@@ -35,5 +36,3 @@ while($row = $this->db->getNextArray($result)) {
     $this->parse('stale_block','stale',true);
 
 }
-
-?>
