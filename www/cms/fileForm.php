@@ -90,6 +90,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
     try {
         // sooo, this case is much simpler
         if ($modifyExisting) {
+            $file->setFolder(CategoryMapper::getInstance()->createModel()->setId($_POST['category']));
             FileMapper::getInstance()->save($file);
 
         } else {
