@@ -645,33 +645,59 @@ class Group extends DeprecatedModel
     public function involvedInSubjects($userID)
     {
         //Fetch subject list
-        $catList = array();
-        if ($userID == $_SESSION['id']) {
-            $catList = $_SESSION['subjects'];
-        } else {
-            $userHandler = new User;
-            $catHandler = new Category;
-            $user = $userHandler->getByID($userID);
+        $allFolders = array();
 
-            if ($user['synergy_id']) {
+        if ($userID == $_SESSION['id']) {
+            $allFolders = $_SESSION['subjects'];
+        } else {
+            $userMapper = new \Schoolbox\UserMapper();
+            $user = $userMapper->findById($userID);
+
+            $folderMapper = new \Schoolbox\Resource\CategoryMapper();
+
+            if ($user->getExternalId()) {
                 $externalUser = new External_User;
-                $externalSubjectList = $externalUser->getSubjectList($user['synergy_id'], $user['uid']);
+                $externalSubjectList = $externalUser->getSubjectList($user->getExternalId(), $user->getId());
 
                 if (is_array($externalSubjectList)) {
-                    foreach ($externalSubjectList as $subject) {
-                        $cat = $catHandler->getByCode($subject['code']);
-                        if (is_array($cat)) {
-                            $catList[] = $cat;
+                    foreach ($externalSubjectList as $currentSubject) {
+                        try {
+                            $folder = $folderMapper->findByCode($currentSubject['code']);
+
+                            /* Find folder owner
+                             */
+                            $userAccessMapper = new \Schoolbox\Permission\Access\UserAccessMapper();
+                            $allFolderOwners = $userAccessMapper->findUsersInCategory($folder, \Schoolbox\Role::STAFF, \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL);
+
+                            if (!$allFolderOwners->count()) {
+                                $folderOwner = new \Schoolbox\User();
+                            }
+                            else {
+                                $folderOwner = $allFolderOwners->first();
+                            }
+
+                            $allFolders[] = array(
+                                'id' => $folder->getId(),
+                                'name' => $folder->getName(),
+                                'parent' => $folder->getParent()->getId(),
+                                'deleted_at' => $folder->getDeletedAt(),
+                                'code' => $folder->getCodeString(),
+                                'owner' => $folderOwner->getId(),
+                                'title' => $folderOwner->getTitle(),
+                                'firstname' => $folderOwner->getFirstname(),
+                                'lastname' => $folderOwner->getLastname(),
+                                'type' => $folder->getGroup()->getType(),
+                                'template' => $folder->getHomepage()->getTemplate()->getId(),
+                            );
+                        }
+                        catch (\Exception $e) {
                         }
                     }
                 }
             }
         }
 
-        if (!is_array($catList)) {
-            $catList = array();
-        }
-        return $catList;
+        return $allFolders;
     }
 
     /*
