@@ -38,8 +38,9 @@ class Synchronise_Synergetic_Mgs_Strategy_Parent extends Synchronise_Synergetic_
         $newUser['lastname'] = $currentUser['StudentContactSurname'];
         $newUser['alt_email'] = $currentUser['StudentContactDefaultEmail'];
         // get campuses of attached children
-        $newUser['campus'] = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
-        $newUser['defaultCampus'] = $newUser['campus'][0];
+        $campus = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
+        $newUser['campus'] = $campus;
+        $newUser['defaultCampus'] = $this->defaultCampus($campus);
         $newUser['group_id'] = self::PARENT_GROUP_ID;
 
         // parents are not superusers
@@ -66,8 +67,9 @@ class Synchronise_Synergetic_Mgs_Strategy_Parent extends Synchronise_Synergetic_
         $spouse['lastname'] = $currentUser['StudentContactSpouseSurname'];
         $spouse['alt_email'] = $currentUser['StudentContactSpouseDefaultEmail'];
         // get campuses of kids
-        $spouse['campus'] = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
-        $spouse['defaultCampus'] = $spouse['campus'][0];
+        $campus = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
+        $spouse['campus'] = $campus;
+        $spouse['defaultCampus'] = $this->defaultCampus($campus);
         $spouse['group_id'] = self::PARENT_GROUP_ID;
         // parents are not superusers
         //$spouse['su'] = false;
@@ -112,9 +114,12 @@ class Synchronise_Synergetic_Mgs_Strategy_Parent extends Synchronise_Synergetic_
                      */
                 $previousUser['campus'] = array_unique($previousUser['campus']);
                 $previousSpouse['campus'] = array_unique($previousSpouse['campus']);
+                $previousUser['defaultCampus'] = $this->defaultCampus($previousUser['campus']);
+                $previousSpouse['defaultCampus'] = $this->defaultCampus($previousSpouse['campus']);
 
                 /* Update previous user
                      */
+
                 $this->executeCreateUpdate($previousUser);
                 $this->executeCreateUpdate($previousSpouse);
 
@@ -133,5 +138,14 @@ class Synchronise_Synergetic_Mgs_Strategy_Parent extends Synchronise_Synergetic_
         }
 
         $this->getVerboseFilter()->summary();
+    }
+
+    /**
+     * Determine default campus, based on highest campus available
+     */
+    private function defaultCampus($campusList) {
+        $sorted = sort($campusList, SORT_NUMERIC);
+        return $sorted[0];
+
     }
 }
