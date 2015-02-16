@@ -204,7 +204,7 @@ class MSSQL {
 						trigger_error(sprintf('MSSQL Query: "%s" triggered error: "%s"', $sql_q, mssql_get_last_message()), E_USER_WARNING);
 					}
 					else {
-						error(21, 'Error in Synegetic query<br /><br /><p>'.mssql_get_last_message().'</p>' );
+						error(21, 'Error in Microsoft SQL query<br /><br /><p>'.mssql_get_last_message().'</p>' );
 					}
 				}
 			}
