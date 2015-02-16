@@ -19,7 +19,7 @@ $componentCollection = $componentFactory->buildComponentList($groupID);
 $occupiedPositionList = array();
 
 foreach ($componentCollection as $component) {
-    /** @var Component_Homepage_ControllerAbstract $component */
+    /** @var Component_Dashboard_ControllerAbstract $component */
     $instance = $component->getInstance();
     $templateTarget = "component_position_{$instance->getPosition()}";
     $templateHandle = "component_{$instance->getDefinitionId()}";
