@@ -43,7 +43,6 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
     public function execute()
     {
         $this->groupHandler = new Group();
-        $this->catHandler = new Category();
         $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
 
         $this->source = $this->getContext();
