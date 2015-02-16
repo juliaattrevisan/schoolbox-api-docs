@@ -383,7 +383,7 @@ class Session
     function setSynergyInfo($userHandler) {
         $synUser = new External_User;
         $groupHandler = new Group;
-        $catHandler = new Category;
+        $folderMapper = new \Schoolbox\Resource\CategoryMapper();
 
         //setup a users enrolement for the session
 
@@ -418,23 +418,31 @@ class Session
                                 foreach ($subjectList as $subject) {
                                     //check subject exists.. we cant link to subjects that dont exist its ugly
                                     $cat = false;
-                                    if($subject['campusCode']) {
+
+                                    if ($subject['campusCode']) {
+
                                         //Check for subject with campus code
-                                        $cat = $catHandler->getByCode($subject['campusCode'].'/'.$subject['code']);
+                                        try {
+                                            $cat = $folderMapper->findByCode($subject['campusCode'].'/'.$subject['code']);
+                                        }
+                                        catch (\Exception $e) {
+
+                                            //Try to fetch witout campus code
+                                            try {
+                                                $cat = $folderMapper->findByCode($subject['code']);
+                                            }
+                                            catch (\Exception $e) {
+                                            }
+                                        }
                                     }
 
-                                    if(!is_array($cat)) {
-                                        //Try to fetch witout campus code
-                                        $cat = $catHandler->getByCode($subject['code']);
-                                    }
-
-                                    if (is_array($cat) && is_numeric($cat['id'])) {
-                                        if ($groupHandler->getPermission($cat['id']) >= READ_ACCESS) {
-                                            if(!in_array($cat['id'], $subjectIDList)) {
-                                                $subject['id'] = $cat['id'];
-                                                $subject['name'] = $cat['name'];
+                                    if ($cat instanceof \Schoolbox\Resource\Category) {
+                                        if ($groupHandler->getPermission($cat->getId()) >= READ_ACCESS) {
+                                            if(!in_array($cat->getId(), $subjectIDList)) {
+                                                $subject['id'] = $cat->getId();
+                                                $subject['name'] = $cat->getName();
                                                 $subjects[] = $subject;
-                                                $subjectIDList[] = $cat['id']; //dont dupe ids in this list
+                                                $subjectIDList[] = $cat->getId(); //dont dupe ids in this list
                                             }
                                         }
                                     }
@@ -459,24 +467,32 @@ class Session
                     foreach ($subjectList as $subject) {
                         //check subject exists.. we cant link to subjects that dont exist its ugly
                         $result = false;
-                        if($subject['campusCode']) {
+
+                        if ($subject['campusCode']) {
+
                             //Check for subject with campus code
-                            $result = $catHandler->getByCode($subject['campusCode'].'/'.$subject['code']);
+                            try {
+                                $result = $folderMapper->findByCode($subject['campusCode'].'/'.$subject['code']);
+                            }
+                            catch (\Exception $e) {
+
+                                //Try to fetch witout campus code
+                                try {
+                                    $result = $folderMapper->findByCode($subject['code']);
+                                }
+                                catch (\Exception $e) {
+                                }
+                            }
                         }
 
-                        if(!is_array($result)) {
-                            //Try to fetch witout campus code
-                            $result = $catHandler->getByCode($subject['code']);
-                        }
-
-                        if (is_array($result) && is_numeric($result['id'])) {
-                            if (!in_array($result['id'], $catList)) {
-                                $subject['id'] = $result['id'];
-                                $subject['name'] = $result['name'];
-								$subject['code'] = $result['code'];
+                        if ($result instanceof \Schoolbox\Resource\Category) {
+                            if (!in_array($result->getId(), $catList)) {
+                                $subject['id'] = $result->getId();
+                                $subject['name'] = $result->getName();
+								$subject['code'] = $result->getCodeString();
                                 $_SESSION['subjects'][] = $subject;
 
-                                $catList[] = $result['id']; //check for dupes
+                                $catList[] = $result->getId(); //check for dupes
                             }
                         }
                     }
