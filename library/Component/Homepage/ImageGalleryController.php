@@ -16,7 +16,14 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
     private $groupHandler;
 
     /**
-     * A category mapper
+     * An instance of Category
+     *
+     * @var \Schoolbox\Resource\Category
+     */
+    private $source;
+
+    /**
+     * Category Mapper
      *
      * @var \Schoolbox\Resource\CategoryMapper
      */
@@ -28,13 +35,6 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
      * @var int
      */
     private $imagesPerRow = 4;
-
-    /**
-     * Source category
-     *
-     * @var \Schoolbox\Resource\Category
-     */
-    protected $source = null;
 
     /**
      * Template file to load
@@ -52,11 +52,15 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
         $this->groupHandler = new Group();
         $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
 
-        try {
-            $this->setSource($this->getCategoryMapper()->findById($this->getConfig('src')));
-        }
-        catch (\Exception $e) {
-            $this->setSource($this->getCategoryMapper()->findById($this->getContext()->getId()));
+        $this->source = $this->getContext();
+
+        if (is_numeric($this->getConfig('src'))) {
+            try {
+                // remove any non-numeric values from the source config
+                $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
+            }
+            catch (\Exception $e) {
+            }
         }
     }
 
