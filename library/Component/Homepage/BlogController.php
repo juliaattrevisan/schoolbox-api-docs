@@ -37,7 +37,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
     /**
      * Category Mapper
      *
-     * @var null
+     * @var \Schoolbox\Resource\CategoryMapper
      */
     private $categoryMapper = null;
 
