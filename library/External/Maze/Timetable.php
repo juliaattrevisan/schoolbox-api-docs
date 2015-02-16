@@ -192,12 +192,18 @@ class External_Maze_Timetable implements External_TimetableInterface
      *
      * The returned data structure is required for Dashboard Timetable Controller
      *
-     * @param $campusId
+     * @param int $campusId
+     * @param int $now
      * @return int
      */
-    public function getPeriodNumber($campusId)
+    public function getPeriodNumber($campusId, $now = 0)
     {
-        $now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+        if ($now) {
+            $now = new \Alaress_Date_Format($now, 'U');
+        } else {
+            $now = Alaress_Date_Format::now();
+        }
+
 
         $allTimes = $this->getPeriodTimes();
 

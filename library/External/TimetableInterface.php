@@ -12,7 +12,7 @@ interface External_TimetableInterface {
 
 	public function getDayNumber ($campusId, $date = 0);
 
-	public function getPeriodNumber ($campusId);
+	public function getPeriodNumber ($campusId, $now = 0);
 
 	public function getDayTimetable ($externalUserId, $userId, $campusId, $dayNumber);
 

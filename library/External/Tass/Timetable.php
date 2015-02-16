@@ -166,7 +166,7 @@ class External_Tass_Timetable implements External_TimetableInterface
     }
 
     //returns the period number for the current time
-    function getPeriodNumber($campus)
+    function getPeriodNumber($campus, $now = 0)
     {
         return 0;
     }

@@ -282,13 +282,13 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      *       calls use the key in the external DB, instead of the Schoolbox key.
      *
      * @param int $campus A campus ID (internal, not Synergetic)
+     * @param int $now    Optional override of time
      *
      * @return array
      */
-    public function getPeriodNumber($campus)
+    public function getPeriodNumber($campus, $now = 0)
     {
-        // TODO put this in the signature
-        $now = time();
+        $now = $now ?: time();
 
         $secondsAfterMidnight = $now % 86400;
 

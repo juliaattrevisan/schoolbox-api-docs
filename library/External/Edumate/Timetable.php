@@ -139,13 +139,13 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     /**
      * Calculates the current period based on the current time
      *
-     * @param $campusId
+     * @param int $campusId
+     * @param int $now
      * @return int
      */
-    public function getPeriodNumber($campusId)
+    public function getPeriodNumber($campusId, $now = 0)
     {
-        $now = new DateTime('now', new DateTimeZone('UTC'));
-        $now = $this->parseTime($now->format('Hi'));
+        $now = date('g:ia', $now ?: time());
 
         $defn = $this->getTimetableDefinition($campusId);
         $sequence = 0;
