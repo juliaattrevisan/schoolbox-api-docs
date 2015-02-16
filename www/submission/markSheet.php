@@ -55,7 +55,6 @@ $m = new Marksheet($categoryID, $_SESSION['id'], array(
 	// inject handler dependencies
 	'user' => new User(),
 	'group' => $groupHandler,
-	'category' => new Category(),
 	'synergy' => new External_Class(),
 
 	'submission' => new Submission(),
