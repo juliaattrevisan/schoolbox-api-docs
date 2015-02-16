@@ -769,7 +769,7 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
      * This was used to cheaply manufacture breadcrumb trails
      *
      * @param $folderId
-     * @return \Schoolbox\Collection
+     * @return \Schoolbox\Resource\Category
      */
     public function findCheaplyById($folderId) {
         $query = "
