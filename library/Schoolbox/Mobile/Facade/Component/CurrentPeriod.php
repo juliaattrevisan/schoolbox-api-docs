@@ -9,13 +9,9 @@
 
 namespace Schoolbox\Mobile\Facade\Component;
 
+use Alaress_Date_Format;
 use Schoolbox\Resource\CategoryMapper;
-use Schoolbox\Resource\CategoryLogMapper;
-use Config;
-use ClientDevice;
-use Scrub;
 use External_Timetable;
-use External_User;
 use Exception_Schoolbox;
 use ErrorException;
 use Schoolbox\User;
@@ -23,6 +19,10 @@ use Schoolbox\UserMapper;
 
 class CurrentPeriod extends Generic {
 
+    /**
+     * @param User $user
+     * @return array
+     */
     public function render(User $user) {
 
         if($_SESSION['timetable'] == 0) {
@@ -84,15 +84,14 @@ class CurrentPeriod extends Generic {
                 );
             }
 
-
-
+            $current = $timetableHandler->getPeriodNumber($campus);
 
             $ttable = array();
 
             $currentFlag = false;
             for($i = 0; $i < count($def['end']); $i++) {
                 $ttable[$i] = $todayDef[$i];
-                if(!$currentFlag && strtotime($def['end'][$i]) > $now) {
+                if (!$currentFlag && $ttable[$i]['periodNumber'] == $current['PeriodNumber'] && $ttable[$i]['periodSequence'] == $current['PeriodNumberSeq']) {
                     $ttable[$i]['current'] = 1;
                     $currentFlag = true;
                 }
