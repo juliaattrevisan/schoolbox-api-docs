@@ -440,25 +440,27 @@ class Factory
         if (!($grade['assessment'] instanceof SubmissionBox)) {
             return array();
         }
+        $boxMapper          = SubmissionBoxMapper::getInstance();
+        $returnedWorkMapper = ReturnedWorkMapper::getInstance();
 
+        // Get the matching assessments in the cohort classes
         $cohortFolderIds = array();
         foreach ($cohortFolders as $cohortFolder) {
             $cohortFolderIds[] = $cohortFolder->getId();
         }
         $assessmentName = $grade['assessment']->getName();
-        $assessments    = SubmissionBoxMapper::getInstance()->findByColumnList(
+        $assessments    = $boxMapper->findByColumnList(
             array(
                 'name'     => $assessmentName,
                 'category' => $cohortFolderIds,
             )
         );
         $assessments->add($grade['assessment']);
-        $returnedWorkMapper = ReturnedWorkMapper::getInstance();
-        $returnStudents     = array();
 
         $groupedDistribution = array();
         foreach ($assessments as $assessment) {
             // Get everyone who has submitted to this assessment
+            $returnStudents = array();
             foreach ($returnedWorkMapper->findByColumn('box_id', $assessment->getId()) as $return) {
                 $returnStudentId = $return->getOwner()->getId();
                 $returnStudents[$returnStudentId] = $returnStudentId;
@@ -468,7 +470,7 @@ class Factory
             // actually want if it's there.
             $distribution = array();
             foreach ($returnStudents as $studentId) {
-                $marks = ReturnedWorkMapper::getInstance()->getStudentMarks(
+                $marks = $returnedWorkMapper->getStudentMarks(
                     $assessment->getCategory()->getId(),
                     $studentId
                 );
@@ -487,10 +489,12 @@ class Factory
                     )
                 );
 
+            // For now, assume that distributions are only calculated for
+            // letter grade assessments.
             foreach ($levels as $level) {
                 $caption = $level->getCaption();
-                if (!empty($caption)) {
-                    $groupedDistribution[$level->getCaption()] = array();
+                if (!empty($caption) && empty($groupedDistribution[$caption])) {
+                    $groupedDistribution[$caption] = array();
                 }
             }
             foreach ($distribution as $item) {
