@@ -17,7 +17,6 @@ use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Alaress_Date_Format;
 use Calendar;
 use Monolog\Logger;
-use Schoolbox\Calendar\Relation\Campus;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -140,6 +139,10 @@ class EventNotifier extends AbstractModuleNotifier
             ->addFilter('roletype', array($roleType))
             ->setSeverity(Logger::INFO);
 
+        if ($event->getAccess() == Event::ACCESS_CAMPUS) {
+            $bob->addFilter('campus', $event->getCampusCollection()->getColumnValues('campusId'));
+        }
+
         return $bob;
     }
 
@@ -250,12 +253,12 @@ class EventNotifier extends AbstractModuleNotifier
 
         switch ($event->getAccess()) {
             case Calendar::ACCESS_CAMPUS:
-                $collection = $event->getCampusCollection();
+                $collection = $event->getRoleCollection();
                 if ($collection instanceof \Traversable || is_array($collection)) {
-                    foreach ($collection as $campus) {
-                        $campus = $campus instanceof Campus ? $campus->getCampusId() : $campus;
+                    foreach ($collection as $role) {
+                        $role = $role instanceof Relation\Role ? $role->getRoleId() : $role;
                         foreach ($instances as $instance) {
-                            $envelope->broadcastToCampus($campus, $instance);
+                            $envelope->broadcastToRole($role, $instance);
                         }
                     }
                 }
