@@ -77,11 +77,11 @@
 			/* Only ajax submit on change if this setting is on
 			 */
 			if (config.submitOnChange === true) {
-				$('.mark-input').change(function(){
-					$(this).closest('.inlineform').submit();
-				});
-
-				$('.comment').change(function(){
+				var allInlineForms = config.element.find('.inlineform');
+				$('.mark-input, .comment').change(function(){
+					var thisInlineForm = $(this).closest('.inlineform');
+					allInlineForms.not(thisInlineForm).removeClass('inline-submit');
+					thisInlineForm.addClass('inline-submit');
 					$(this).closest('.inlineform').submit();
 				});
 			}
@@ -170,16 +170,6 @@
 				});
 			});
 
-			// Focus/blur events on all return work form inputs: focus sets this
-			// row as the inline submit form, blur unsets it.
-			var inputs = config.element.find(':input');
-
-			inputs.focus(function() {
-				$(this).closest('.inlineform').addClass('inline-submit');
-			})
-			inputs.blur(function() {
-				$(this).closest('.inlineform').removeClass('inline-submit');
-			})
 		}
 
 		function selectGrouping() {
