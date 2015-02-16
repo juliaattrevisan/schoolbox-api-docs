@@ -38,6 +38,13 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
     private $source;
 
     /**
+     * Category Mapper
+     *
+     * @var \Schoolbox\Resource\CategoryMapper
+     */
+    private $categoryMapper = null;
+
+    /**
      * Available filters for this component.
      *
      * @see Component_Config_Filter for how this data is passed in/out of the database
@@ -63,18 +70,14 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         $this->fileHandler        = new File();
         $this->userHandler        = new User();
         $this->allowedFileHandler = new AllowedFile();
+        $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
 
         $this->source = $this->getContext();
 
-        // remove any non-numeric values from the source config
-        if ($this->getConfig('src')) {
-            $id = preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src'));
-
+        if (is_numeric($this->getConfig('src'))) {
             try {
-                $folderMapper = new \Schoolbox\Resource\CategoryMapper();
-                $folder = $folderMapper->findById($id);
-
-                $this->source = $folder;
+                // remove any non-numeric values from the source config
+                $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
             }
             catch (\Exception $e) {
             }
@@ -204,8 +207,29 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
             $this->parse("submit_file_block", "submit_file");
         }
 
-
         return true;
+    }
 
+    /* Getters/Setters
+     */
+
+    /**
+     * Set category mapper
+     *
+     * @param null $categoryMapper
+     */
+    private function setCategoryMapper($categoryMapper)
+    {
+        $this->categoryMapper = $categoryMapper;
+    }
+
+    /**
+     * Get category mapper
+     *
+     * @return null
+     */
+    private function getCategoryMapper()
+    {
+        return $this->categoryMapper;
     }
 }
