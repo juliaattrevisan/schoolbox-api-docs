@@ -105,6 +105,52 @@ class External_Denbigh2_Api {
     }
 
     /**
+     * Include filemaker errors
+     * These are stored in a json encoded object
+     *
+     * stdClass Object
+        (
+            [X-RESTfm-FM-Status] => 102
+            [X-RESTfm-FM-Reason] => Field is missing
+            [X-RESTfm-Version] => 3.2.0/r498
+            [X-RESTfm-Protocol] => 5
+            [X-RESTfm-Status] => 500
+            [X-RESTfm-Reason] => FileMaker Error
+            [X-RESTfm-Method] => GET
+            [X-RESTfm-Trace] => exception 'FileMakerResponseException' in /Library/FileMaker Server/HTTPServer/htdocs/RESTfm/lib/RESTfm/BackendFileMaker/FileMakerOpsLayout.php:96
+        Stack trace:
+        #0 /Library/FileMaker Server/HTTPServer/htdocs/RESTfm/lib/uriLayout.php(119): FileMakerOpsLayout->read()
+        #1 [internal function]: uriLayout->get(Object(RESTfmRequest), 'Staging', 'Students')
+        #2 /Library/FileMaker Server/HTTPServer/htdocs/RESTfm/lib/tonic/lib/tonic.php(697): call_user_func_array(Array, Array)
+        #3 /Library/FileMaker Server/HTTPServer/htdocs/RESTfm/lib/RESTfm/RESTfmResource.php(49): Resource->exec(Object(RESTfmRequest))
+        #4 /Library/FileMaker Server/HTTPServer/htdocs/RESTfm/RESTfm.php(91): RESTfmResource->exec(Object(RESTfmRequest))
+        #5 {main}
+        )
+     */
+    private function hasFilemakerError() {
+        $filemakerError = json_decode($this->getCurl()->getResult());
+
+        if ($filemakerError) {
+            if (isset($filemakerError->info->{'X-RESTfm-Reason'}) && ($filemakerError->info->{'X-RESTfm-Reason'} == 'FileMaker Error')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get the whole object
+     *
+     * @return array
+     */
+    private function getFilemakerError() {
+        $filemakerError = json_decode($this->getCurl()->getResult());
+
+        return array($filemakerError->info);
+    }
+
+    /**
      * Decide if this curl request had errors
      *
      * @return bool
@@ -114,16 +160,31 @@ class External_Denbigh2_Api {
             return true;
         }
 
+        if ($this->hasFilemakerError()) {
+            return true;
+        }
+
         return false;
     }
 
     /**
      * Get curl error object
      *
+     * Augment with filemaker fails
+     *
      * @return mixed
      */
     public function getErrors() {
-        return $this->getCurl()->getErrors();
+        $allErrors = array();
+
+        if ($this->hasFilemakerError()) {
+            $allErrors = array_merge(
+                $this->getCurl()->getErrors(),
+                $this->getFilemakerError()
+            );
+        }
+
+        return $allErrors;
     }
 
     /**
