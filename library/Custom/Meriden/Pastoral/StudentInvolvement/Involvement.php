@@ -65,6 +65,13 @@ class Involvement
     protected $folder;
 
     /**
+     * The Schoolbox folders for the other classes for this subject
+     *
+     * @var Category[]
+     */
+    protected $cohortFolders;
+
+    /**
      * A grade that is specially named.
      *
      * This is used for the special assessments that are meant to exist for all
@@ -262,6 +269,25 @@ class Involvement
     public function setNamedGrade($key, $value)
     {
         $this->namedGrades[$key] = $value;
+        return $this;
+    }
+
+    /**
+     * @return \Schoolbox\Resource\Category[]
+     */
+    public function getCohortFolders()
+    {
+        return $this->cohortFolders;
+    }
+
+    /**
+     * @param  \Schoolbox\Resource\Category[] $cohortFolders
+     *
+     * @return $this
+     */
+    public function setCohortFolders($cohortFolders)
+    {
+        $this->cohortFolders = $cohortFolders;
         return $this;
     }
 }

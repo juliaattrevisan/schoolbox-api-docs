@@ -134,6 +134,7 @@ class Factory
         $folderWithGrades = $this->getFolderWithGrades($subjectCode, $student);
         $subject
             ->setFolder($folderWithGrades['folder'])
+            ->setCohortFolders($this->getCohortFolders($folderWithGrades['folder'], $subjectCode))
             ->setGrades($this->augmentGradesWithAssessment($folderWithGrades['grades'], $student))
             ->moveToNamedGrade('courseGrade', 'Course Grade')
             ->moveToNamedGrade('endeavourGrades', 'Endeavour Grades')
@@ -321,6 +322,42 @@ class Factory
             }
         );
         return $allGrades;
+    }
+
+    /**
+     * Gets the cohort folders for this folder.
+     *
+     * @param Category $category
+     * @param string $subjectCode The original subject code (pre-rollover)
+     *                            for $category.
+     *
+     * @return Category[]
+     */
+    protected function getCohortFolders(Category $category, $subjectCode)
+    {
+        // Find the equivalent assessments for each cohort class
+        // (class with the same second part of the class code)
+        $cohortList = array();
+        $parent     = $category->getParent();
+        $parentId   = $parent instanceof Category ? $parent->getId() : null;
+        foreach ($this->getGateway()->getOtherSubjectClasses($subjectCode) as $otherCode) {
+            // All archived or live codes with the same parent as $category
+            // are cohorts.
+            try {
+                $liveCategory = $this->getCategoryMapper()->findByCode($otherCode);
+                if ($liveCategory->getParent()->getId() == $parentId) {
+                    $cohortList[] = $liveCategory;
+                }
+            } catch (\Exception $e) {
+                // noop
+            }
+            foreach ($this->getCategoryMapper()->findAllByArchivedCode($otherCode) as $archivedCategory) {
+                if ($archivedCategory->getParent()->getId() == $parentId) {
+                    $cohortList[] = $archivedCategory;
+                }
+            }
+        }
+        return $cohortList;
     }
 
     /**
