@@ -549,6 +549,40 @@ class Gateway
     }
 
     /**
+     * Gets all of the possible class codes for related classes.
+     *
+     * @param string $subjectCode
+     *
+     * @return array|string[]
+     */
+    public function getAllSubjectClasses($subjectCode)
+    {
+        $query = "
+            SELECT DISTINCT
+                ('-' + RTRIM(st.sub_code) + '-' + RTRIM(ss.class)) AS code
+            FROM subtab st
+            INNER JOIN studsub ss
+                ON st.sub_code = ss.sub_code
+                AND st.cmpy_code = ss.cmpy_code
+            WHERE st.sub_code = :code
+            AND st.cmpy_code = '01';
+        ";
+        list(, $code,) = explode('-', $subjectCode);
+        $params = array(
+            ':code' => $this->getDatabase()->smartQuote($code),
+        );
+        $result = $this->getDatabase()->trimAll(
+            $this->getDatabase()->getAll(strtr($query, $params))
+        );
+        return array_map(
+            function ($v) {
+                return $v['code'];
+            },
+            $result ?: array()
+        );
+    }
+
+    /**
      * @return MSSQL
      */
     protected function getDatabase()
