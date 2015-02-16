@@ -26,13 +26,23 @@ AND p.pollID IS NULL";
 
 $result = $this->db->query($query);
 
+$folderMapper = new \Schoolbox\Resource\CategoryMapper();
+
 while($row = $this->db->getNextArray($result)) {
-    $breadcrumbHTML = '';
-    foreach ($categoryStd->breadcrumb($row['id']) as $i => $breadcrumb)
-            $breadcrumbHTML .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
+    $loaf = array();
+    $breadcrumbs = $folderMapper->breadcrumb($folderMapper->findCheaplyById($row['id']));
+
+    foreach($breadcrumbs as $breadcrumb) {
+        $loaf[] .= "<a href='/homepage/{$breadcrumb->getId()}'>{$breadcrumb->getName()}</a>";
+    }
+
+    $breadcrumbHTML = implode(' > ', $loaf);
             
-    $this->setVar(array('FOLDER_ID'=>$row['id'], 'FOLDER_NAME'=>$row['name'], 'BREADCRUMB'=>$breadcrumbHTML));
+    $this->setVar(array(
+        'FOLDER_ID' => $row['id'],
+        'FOLDER_NAME' => $row['name'],
+        'BREADCRUMB' => $breadcrumbHTML
+    ));
 
     $this->parse('stale_block','stale',true);
-
 }
