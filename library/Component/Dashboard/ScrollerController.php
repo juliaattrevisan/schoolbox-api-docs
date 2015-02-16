@@ -48,19 +48,16 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
         $this->fileHandler  = new File();
         $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
 
-        if ((!$this->source instanceof \Schoolbox\Resource\Category)) {
-            if (is_numeric($this->getConfig('src'))) {
-                try {
-                    // remove any non-numeric values from the source config
-                    $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
-                }
-                catch (\Exception $e) {
-                    $this->source = new \Schoolbox\Resource\Category();
-                }
+        $this->source = new \Schoolbox\Resource\Category();
+
+        if (is_numeric($this->getConfig('src'))) {
+            try {
+                // remove any non-numeric values from the source config
+                $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
             }
-        }
-        else {
-            $this->source = new \Schoolbox\Resource\Category();
+            catch (\Exception $e) {
+                $this->source = new \Schoolbox\Resource\Category();
+            }
         }
     }
 
