@@ -15,19 +15,23 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
     private $groupHandler;
 
     /**
-     * @var Category
-     */
-    private $catHandler;
-
-    /**
      * @var CategoryNews
      */
     private $newsHandler;
 
     /**
-     * @var array
+     * An instance of Category
+     *
+     * @var \Schoolbox\Resource\Category
      */
     private $source;
+
+    /**
+     * Category Mapper
+     *
+     * @var \Schoolbox\Resource\CategoryMapper
+     */
+    private $categoryMapper = null;
 
     /**
      * Prepares data for the render function. Business logic.
@@ -38,17 +42,17 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
     {
         $this->groupHandler = new Group();
         $this->newsHandler = new CategoryNews();
-        $this->catHandler = new Category();
+        $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
 
-        // remove any non-numeric values from the source config
-        $this->source = $this->catHandler->getByID(
-            $this->getConfig('src') ?
-            preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
-            $this->getContext()->getId()
-        );
+        $this->source = $this->getContext();
 
-        if ($this->source === false) {
-            $this->source = $this->catHandler->getByID($this->getContext()->getId());
+        if (is_numeric($this->getConfig('src'))) {
+            try {
+                // remove any non-numeric values from the source config
+                $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
+            }
+            catch (\Exception $e) {
+            }
         }
     }
 
@@ -82,9 +86,9 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
                     'componentname'
                 ) : 'News',
                 // These are for the Select Alternate Source resourcebrowser
-                'COMPONENT_CONFIG_SRC_ID' => $this->source['id'],
-                'COMPONENT_CONFIG_SRC_NAME' => $this->source['id'] == $this->getContext()->getId() ? 'Local' : $this->source['name'],
-                'NEWS_CATEGORY_ID' => $this->source['id'],
+                'COMPONENT_CONFIG_SRC_ID' => $this->source->getId(),
+                'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext()->getId() ? 'Local' : $this->source->getName(),
+                'NEWS_CATEGORY_ID' => $this->source->getId(),
             )
         );
 
@@ -105,7 +109,7 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
 
             case READ_ACCESS:
                 $newsList = $this->newsHandler->getAllForCategory(
-                    $this->source['id'],
+                    $this->source->getId(),
                     array('size' => $this->getConfig('size'))
                 );
                 break;
@@ -186,5 +190,28 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
 
         return true;
 
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Set category mapper
+     *
+     * @param null $categoryMapper
+     */
+    private function setCategoryMapper($categoryMapper)
+    {
+        $this->categoryMapper = $categoryMapper;
+    }
+
+    /**
+     * Get category mapper
+     *
+     * @return null
+     */
+    private function getCategoryMapper()
+    {
+        return $this->categoryMapper;
     }
 }
