@@ -5,7 +5,7 @@
 // $include-html-grid-classes: $include-html-classes;
 // $include-xl-html-grid-classes: false;
 
-$row-width: rem-calc(1300);
+$row-width: rem-calc(1000);
 // $total-columns: 12;
 // $column-gutter: rem-calc(30);
 
@@ -28,3 +28,13 @@ $row-width: rem-calc(1300);
 
 @import "../../../javascript/components/foundation/scss/foundation/components/grid";
 @import "../../../javascript/components/foundation/scss/foundation/components/block-grid";
+
+//
+// CUSTOM OVERRIDES
+//
+
+// .island-panel{
+// 	.columns:not(:first-child){
+// 		padding: 0 0 0 1.5rem;
+// 	}
+// }

@@ -46,7 +46,7 @@
 // $paragraph-font-weight: $font-weight-normal;
 // $paragraph-font-size: 1rem;
 // $paragraph-line-height: 1.6;
-// $paragraph-margin-bottom: rem-calc(20);
+$paragraph-margin-bottom: rem-calc(16);
 // $paragraph-aside-font-size: rem-calc(14);
 // $paragraph-aside-line-height: 1.35;
 // $paragraph-aside-font-style: italic;
@@ -123,3 +123,10 @@
 // $microformat-abbr-font-decoration: none;
 
 @import "../../../javascript/components/foundation/scss/foundation/components/type";
+
+.meta{
+	color: $steel !important;
+	margin: 0;
+	font-size: 0.875rem;
+}
+

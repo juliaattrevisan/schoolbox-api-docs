@@ -59,17 +59,17 @@ $sub-nav-list-margin: 0;
 // We use this to control the definition
 // $sub-nav-font-family: $body-font-family;
 $sub-nav-font-size: rem-calc(16);
-$sub-nav-font-color: $black;
+$sub-nav-font-color: $primary-color;
 // $sub-nav-font-weight: $font-weight-normal;
 // $sub-nav-text-decoration: none;
-$sub-nav-padding: rem-calc(16 32);
+$sub-nav-padding: rem-calc(14 28);
 $sub-nav-border-radius: 0px;
 $sub-nav-font-color-hover: $sub-nav-font-color;
 
 
 // We use these to control the active item styles
 $sub-nav-active-font-weight: $font-weight-normal;
-$sub-nav-active-bg: $white;
+$sub-nav-active-bg: $secondary-color;
 $sub-nav-active-bg-hover: tint($tertiary, 74%);
 $sub-nav-active-color: $sub-nav-font-color;
 $sub-nav-active-padding: $sub-nav-padding;
@@ -77,6 +77,9 @@ $sub-nav-active-cursor: default;
 
 // $sub-nav-item-divider: "";
 // $sub-nav-item-divider-margin: rem-calc(12);
+
+$sub-nav-bg-color: $secondary-color;
+$sub-nav-bg-active-color: $tertiary;
 
 //
 // TOP BAR
@@ -125,7 +128,7 @@ $topbar-link-bg-hover: tint($primary-color, 32%);
 // $topbar-link-dropdown-padding: rem-calc(20px);
 
 $topbar-button-font-size: 0.75rem;
-// $topbar-button-top: rem-calc(7px);
+$topbar-button-top: rem-calc(0px);
 
 $topbar-dropdown-label-color: $white;
 $topbar-dropdown-label-text-transform: none;
@@ -239,13 +242,33 @@ $menu-slide: "transform 500ms ease";
 .side-nav					{
 	li a 					{ background: $side-nav-link-bg; }
 }
-.sub-nav dt,
-.sub-nav dd,
-.sub-nav li 				{ margin: 0; } //Why?
+
+// Spawning my own sub-nav
+.sub-nav{
+	background-color: $sub-nav-bg-color;
+	padding: 10px 10px 10px 0;
+	dt{
+		margin: 0 1rem;
+	}
+	dd, li{
+		margin-left: 0;
+	}
+	a{
+		font-weight: $font-weight-bold;
+		@include single-transition(all, 0.15s, linear);
+		&:hover{
+			background-color: tint($tertiary, 87%);
+			color: $white;
+		}
+	}
+	.active{
+		background-color: $white;
+		&:hover{
+			@extend .active;
+		}
+	}
+}
 
 .top-bar-section 			{ 
 	.dropdown label 		{ font-style: $topbar-dropdown-label-font-style; }
 }
-
-.top-bar .button,
-.top-bar button  			{ padding-top: 0.90rem; padding-bottom: 0.90rem; }

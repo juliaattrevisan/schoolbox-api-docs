@@ -33,13 +33,13 @@ $button-font-weight: $font-weight-bold;
 // $button-border-width: 0px;
 // $button-border-style: solid;
 $button-bg-color: $primary-color;
-$button-bg-hover: tint($button-bg-color, 11%);
+$button-bg-hover: tint($button-bg-color, 16%);
 $button-border-color: transparent;
-$secondary-button-bg-hover: tint($secondary-color, 11%);
+$secondary-button-bg-hover: tint($secondary-color, 16%);
 $secondary-button-border-color: transparent;
-$success-button-bg-hover: tint($success-color, 11%);
+$success-button-bg-hover: tint($success-color, 16%);
 $success-button-border-color: transparent;
-$alert-button-bg-hover: tint($alert-color, 11%);
+$alert-button-bg-hover: tint($alert-color, 16%);
 $alert-button-border-color: transparent;
 
 // We use this to set the default radius used throughout the core.
@@ -298,7 +298,27 @@ $tabs-content-padding: ($column-gutter/5);
 		&:hover 				{ background-color: tint($warning-color, 11%); }
 	}
 }
-$button-group-border-width: 0;
+
+// Button Group
+.button-group > li {
+	margin: 0;
+}
+
+// Actions
+.actions{
+	height: 100%;
+	a{
+		padding: 0 1.125em;
+		height: 100%;
+		display: inline-block;
+		float: right;
+		// &:hover{
+		// 	background: darken($ocean-sunset, 5%);
+		// }
+	}
+}
+
+
 
 // Custom SB breadcrumbs
 .breadcrumb 					{ margin: 0; list-style: none; overflow: hidden;

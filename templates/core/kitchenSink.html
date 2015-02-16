@@ -675,19 +675,49 @@
             </thead>
             <tbody>
             <tr>
-                <td>Content Goes Here</td>
+                <td>Mank</td>
                 <td>This is longer content Donec id elit non mi porta gravida at eget metus.</td>
                 <td>Content Goes Here</td>
                 <td>Content Goes Here</td>
             </tr>
             <tr>
-                <td>Content Goes Here</td>
+                <td>Twonk</td>
                 <td>This is longer Content Goes Here Donec id elit non mi porta gravida at eget metus.</td>
                 <td>Content Goes Here</td>
                 <td>Content Goes Here</td>
             </tr>
             <tr>
+                <td>Faffing</td>
+                <td>This is longer Content Goes Here Donec id elit non mi porta gravida at eget metus.</td>
                 <td>Content Goes Here</td>
+                <td>Content Goes Here</td>
+            </tr>
+            </tbody>
+        </table>
+        <table id="sortable">
+            <thead>
+            <tr>
+                <th width="200">Table Header</th>
+                <th>Table Header</th>
+                <th width="150">Table Header</th>
+                <th width="150">Table Header</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Mank</td>
+                <td>This is longer content Donec id elit non mi porta gravida at eget metus.</td>
+                <td>Content Goes Here</td>
+                <td>Content Goes Here</td>
+            </tr>
+            <tr>
+                <td>Twonk</td>
+                <td>This is longer Content Goes Here Donec id elit non mi porta gravida at eget metus.</td>
+                <td>Content Goes Here</td>
+                <td>Content Goes Here</td>
+            </tr>
+            <tr>
+                <td>Faffing</td>
                 <td>This is longer Content Goes Here Donec id elit non mi porta gravida at eget metus.</td>
                 <td>Content Goes Here</td>
                 <td>Content Goes Here</td>
@@ -865,7 +895,25 @@
 
     </div>
 </div>
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.5/css/jquery.dataTables.css">
+
+<!-- jQuery -->
+<script type="text/javascript" charset="utf8" src="/DataTables-1.10.5/media/js/jquery.js"></script>
+  
+<!-- DataTables -->
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.js"></script>
+
+<script>
+    $(document).ready( function () {
+        $('#sortable').DataTable({
+            paging: false,
+            searching: false
+        });
+    });
+</script>
+
 <script>
     $("#joyride-go").foundation('joyride', 'start');
-
 </script>

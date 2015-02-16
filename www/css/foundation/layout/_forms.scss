@@ -125,36 +125,36 @@ $switch-negative-color: tint($secondary-color, 74%);
 // Custom overrides
 //
 
-form 							{ @include placeholder-color($body-grey); @include placeholder-hover-color($black);
-	input,
-	textarea,
-	select 						{ @include single-transition(all, 0.15s, linear); font-weight: $font-weight-normal;
-		&:hover 				{ background-color: $input-hover-bg-color; color: $input-hover-color; }
-		&:focus 				{ color: $input-focus-color; outline-color: none; }
-	}
-	select option				{
-		&:hover 				{ background: $input-hover-bg-color; }
-	}
-	input[type=radio],
-	input[type=checkbox] 		{ float: left; width: 0; height: 0; opacity: 0; }
-	label.radio-label,
-	label.checkbox-label		{ background-image: url('/images/foundation/form-elements.png'); }
-	input[type=radio] +
-	label.radio-label,
-	input[type=checkbox] +
-	label.checkbox-label		{ padding-left: 29px; height: 24px; display: inline-block; line-height: 24px;
-								background-repeat: no-repeat; background-position: 0 0; font-weight: $font-weight-normal;
-								vertical-align: middle; cursor: pointer; margin: 16px 1.375rem 16px 0;
-	}
-	input[type=checkbox] +
-	label.checkbox-label		{ background-position: 0 -72px; }
-	//	input[type=radio]:hover +
-//	label.checkbox-label:hover	{ background-position: 0 -24px; }
-	input[type=radio]:checked +
-	label.radio-label			{ background-position: 0 -48px; }
-	input[type=checkbox]:checked +
-	label.checkbox-label		{ background-position: 0 -120px; }
+form 						{ @include placeholder-color($body-grey); @include placeholder-hover-color($black); }
+
+input,
+textarea,
+select 						{ @include single-transition(all, 0.15s, linear); font-weight: $font-weight-normal;
+	&:hover 				{ background-color: $input-hover-bg-color; color: $input-hover-color; }
+	&:focus 				{ color: $input-focus-color; outline-color: none; }
 }
+select option				{
+	&:hover 				{ background: $input-hover-bg-color; }
+}
+input[type=radio],
+input[type=checkbox] 		{ float: left; width: 0; height: 0; opacity: 0; }
+label.radio-label,
+label.checkbox-label		{ background-image: url('/images/foundation/form-elements.png'); }
+input[type=radio] +
+label.radio-label,
+input[type=checkbox] +
+label.checkbox-label		{ padding-left: 29px; height: 24px; display: inline-block; line-height: 24px;
+							background-repeat: no-repeat; background-position: 0 0; font-weight: $font-weight-normal;
+							vertical-align: middle; cursor: pointer; margin: 16px 1.375rem 16px 0;
+}
+input[type=checkbox] +
+label.checkbox-label		{ background-position: 0 -72px; }
+//	input[type=radio]:hover +
+//	label.checkbox-label:hover	{ background-position: 0 -24px; }
+input[type=radio]:checked +
+label.radio-label			{ background-position: 0 -48px; }
+input[type=checkbox]:checked +
+label.checkbox-label		{ background-position: 0 -120px; }
 
 
 //	DROPZONE

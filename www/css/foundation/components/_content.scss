@@ -460,8 +460,21 @@ $tooltip-font-color: $white;
 //
 .label { text-transform: uppercase; }
 
-.panel { overflow: auto; }
 
+// Panels
+.panel,
+ .island-panel{
+	overflow: auto;
+}
+
+.island-panel {
+  @include panel(
+    // Sets the panel background color. Default: $panel-pg
+    $bg: $white
+  );
+}
+
+// Labels
 .submitted {
 	@include label(
 		$bg: tint($success-color, 74%)
@@ -496,3 +509,40 @@ $tooltip-font-color: $white;
 
 .accordion a 				{ @include single-transition(all, 0.15s, linear); }
 
+
+// Information lists
+.information-list{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	.content{
+		float: left;
+	}
+	.actions{
+		opacity: 0.5;
+		float: right;
+		@include single-transition(all, 0.15s, linear);
+	}
+	> li{
+		border-bottom: 1px solid $gainsboro;
+		position: relative;
+		padding: 1.125em 0;
+		overflow: auto;
+		//@include single-transition(all, 0.15s, linear);
+
+		img{
+			float: left;
+			margin: 0 1.125em 1.125em 0;
+		}
+
+		&:hover{
+			//background: $ocean-sunset;
+			.actions{
+				opacity: 1;
+			}
+		}
+	}
+	> li:last-child{
+		border: 0;
+	}
+}

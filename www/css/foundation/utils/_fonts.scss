@@ -24,6 +24,11 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
+.no-text:before{
+	padding-right: 0 !important;
+	float: right;
+}
+
 .icon-add:before {
 	content: "\e600";
 }
