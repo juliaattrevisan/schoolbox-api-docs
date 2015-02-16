@@ -28,9 +28,9 @@ abstract class Component_ControllerAbstract
     protected $sitepage;
 
     /**
-     * -_-
+     * The category the component is on, if any.
      *
-     * @var array|object
+     * @var \Schoolbox\Resource\Category
      */
     protected $context;
 
@@ -76,6 +76,7 @@ abstract class Component_ControllerAbstract
         $this->user     = $user;
         $this->sitepage = $sitepage;
         $this->config   = $instance->getConfigArray();
+        $this->context  = new \Schoolbox\Resource\Category();
     }
 
 
