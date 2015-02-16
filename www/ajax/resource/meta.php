@@ -86,10 +86,9 @@ function getFolderMeta($folderId)
 {
 
     // handler setup
-    $catHandler = new Category();
     $groupHandler = new Group();
 
-    $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+    $folderMapper = new \Schoolbox\Resource\CategoryMapper();
 
     try {
 
@@ -98,7 +97,7 @@ function getFolderMeta($folderId)
          * folder to the root node
          */
         if ($folderId) {
-            $cat = $categoryMapper->findById($folderId);
+            $folder = $folderMapper->findById($folderId);
         }
     } catch (Schoolbox\Mapper\Exception $e) {
         sendError('No folder with specified ID exists');
@@ -126,11 +125,11 @@ function getFolderMeta($folderId)
 
 
     // determine the group type (open, restricted, moderated)
-    if ($cat->getGroup()->isPrivate()) {
+    if ($folder->getGroup()->isPrivate()) {
         $type = 'Restricted';
-    } elseif ($cat->getGroup()->isModerated()) {
+    } elseif ($folder->getGroup()->isModerated()) {
         $type = 'Moderated';
-    } elseif ($cat->getGroup()->isFree()) {
+    } elseif ($folder->getGroup()->isFree()) {
         $type = 'Open';
     } else {
         $type = '';
@@ -152,7 +151,7 @@ function getFolderMeta($folderId)
             $joinable = 3; //member of group
         }
 
-        $members = UserAccessMapper::getInstance()->findAdminsInCategory($cat);
+        $members = UserAccessMapper::getInstance()->findAdminsInCategory($folder);
         if(count($members) > 0) {
             $admin = $members->first(); //only every 1 admin
         }
@@ -166,19 +165,19 @@ function getFolderMeta($folderId)
     $userAccess = $groupHandler->getPermission($folderId);
     if ($userAccess >= WRITE_ACCESS) {
         $permissions = array();
-        $permsList = $catHandler->getGroupPerms($folderId);
-        if (is_array($permsList)) {
-            $j = 0;
 
-            foreach ($permsList as $group) {
-                $groupAccess = (int)$group['type'];
-                if ($groupAccess > 0) {
-                    $permissions[] = array(
-                        'group'  => $group['name'],
-                        'access' => $groupAccess,
-                        'on_off' => ++$j % 2 ? '' : 'dark',
-                    );
-                }
+        $roleAccessMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
+        $allGroupPerms = $roleAccessMapper->getGroupPermissions($folder);
+
+        $j = 0;
+
+        foreach ($allGroupPerms as $currentGroupPerm) {
+            if ($currentGroupPerm->getType() > 0) {
+                $permissions[] = array(
+                    'group'  => $currentGroupPerm->getRole()->getName(),
+                    'access' => $currentGroupPerm->getType(),
+                    'on_off' => ++$j % 2 ? '' : 'dark',
+                );
             }
         }
     } else {
@@ -213,14 +212,14 @@ function getFolderMeta($folderId)
     }
 
 
-    if ($cat->hasHomepage()) {
+    if ($folder->hasHomepage()) {
         $actions[] = 'homepage';
     }
 
     $folder = array(
-        'name'        => $cat->getName(),
-        'id'          => $cat->getId(),
-        'template'    => $cat->hasHomepage(),
+        'name'        => $folder->getName(),
+        'id'          => $folder->getId(),
+        'template'    => $folder->hasHomepage(),
         'type'        => $type,
         'joinable'    => $joinable,
         'permissions' => $permissions,
