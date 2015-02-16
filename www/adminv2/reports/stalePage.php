@@ -4,8 +4,6 @@
 $this->setFile(TEMPLATE_content, 'admin/reports/stalePage.html');
 $this->setBlock(TEMPLATE_content, 'stale', 'stale_block');
 
-$categoryStd = new Category;
-
 if(is_numeric($_POST['age']))
     $month = $_POST['age'];
 else
