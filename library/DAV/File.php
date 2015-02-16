@@ -12,12 +12,18 @@ class DAV_File extends Sabre\DAV\File {
     private $folderID;
     private $fileName;
     private $fileHandler;
-    private $folderHandler;
     private $file;
+
+    /**
+     * A category mapper
+     *
+     * @var \Schoolbox\Resource\CategoryMapper
+     */
+    private $folderMapper = null;
 
     function __construct($path) {
         $this->setFileHandler();
-        $this->setFolderHandler();
+        $this->setFolderMapper(new \Schoolbox\Resource\CategoryMapper());
         $this->setPath($path);
         $this->setFile();
     }
@@ -89,14 +95,16 @@ class DAV_File extends Sabre\DAV\File {
         $this->fileName = array_pop($folderList);
 
         $parent = 0;
+
         foreach ($folderList as $folderName) {
-            $folder = $this->getFolderHandler()->getByArray(
-                array(
-                    'name'   => $folderName,
-                    'parent' => $parent,
-                )
-            );
-            $parent = $folder[0]['id'];
+            $allFolders = $this->getFolderMapper()->findByColumnList(array(
+                'name' => $folderName,
+                'parent' => $parent
+            ));
+
+            if ($allFolders->count()) {
+                $parent = $allFolders->first()->getId();
+            }
         }
 
         $this->folderID = $parent;
@@ -122,17 +130,6 @@ class DAV_File extends Sabre\DAV\File {
         return $this->fileHandler;
     }
 
-    /**
-     * @return Category
-     */
-    private function getFolderHandler() {
-        return $this->folderHandler;
-    }
-
-    private function setFolderHandler() {
-        $this->folderHandler = new Category();
-    }
-
     function setFile() {
         $result = $this->getFileHandler()->getByArray(
             array(
@@ -151,4 +148,26 @@ class DAV_File extends Sabre\DAV\File {
         return  Cfg::get('file_dir') .'/'. $this->getFileID() . '.dat';
     }
 
+    /* Getters/Setters
+     */
+
+    /**
+     * Set folder mapper
+     *
+     * @param \Schoolbox\Resource\CategoryMapper $folderMapper
+     */
+    private function setFolderMapper($folderMapper)
+    {
+        $this->folderMapper = $folderMapper;
+    }
+
+    /**
+     * Get folder mapper
+     *
+     * @return \Schoolbox\Resource\CategoryMapper
+     */
+    private function getFolderMapper()
+    {
+        return $this->folderMapper;
+    }
 }
