@@ -1096,7 +1096,7 @@ class SitePage extends Page
     }
 
 
-    function checkList($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = '')
+    function checkList($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = array())
     {
         $this->setBlock($template, $handle, $handle . '_block');
         $selected = is_array($selected) ? $selected : array();
