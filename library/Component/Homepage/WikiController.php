@@ -10,19 +10,23 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
 {
 
     /**
-     * @var array
-     */
-    private $source;
-
-    /**
      * @var Group
      */
     private $groupHandler;
 
     /**
-     * @var Category
+     * An instance of Category
+     *
+     * @var \Schoolbox\Resource\Category
      */
-    private $catHandler;
+    private $source;
+
+    /**
+     * Category Mapper
+     *
+     * @var \Schoolbox\Resource\CategoryMapper
+     */
+    private $categoryMapper = null;
 
     /**
      * Available sort fields for this component.
@@ -38,19 +42,19 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
      */
     public function execute()
     {
-
         $this->groupHandler = new Group();
         $this->catHandler = new Category();
+        $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
 
-        // remove any non-numeric values from the source config
-        $this->source = $this->catHandler->getByID(
-            $this->getConfig('src') ?
-            preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
-            $this->getContext()->getId()
-        );
+        $this->source = $this->getContext();
 
-        if ($this->source === false) {
-            $this->source = $this->catHandler->getByID($this->getContext()->getId());
+        if (is_numeric($this->getConfig('src'))) {
+            try {
+                // remove any non-numeric values from the source config
+                $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
+            }
+            catch (\Exception $e) {
+            }
         }
     }
 
@@ -91,10 +95,10 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
         */
         $this->setVar('wiki_row_block', '');
 
-        $wikiList = $wikiHandler->getByCategory($this->source['id'], strtolower($this->getConfig('sort')), $this->getConfig('sortdir'), $this->getConfig('size'));
+        $wikiList = $wikiHandler->getByCategory($this->source->getId(), strtolower($this->getConfig('sort')), $this->getConfig('sortdir'), $this->getConfig('size'));
 
         $this->setVar(array(
-            'WIKI_CATEGORY_ID' => $this->source['id']
+            'WIKI_CATEGORY_ID' => $this->source->getId()
         ));
 
         // Controls such as Post News
@@ -140,6 +144,28 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
         }
 
         return true; // everything went according to plan
+    }
 
+    /* Getters/Setters
+     */
+
+    /**
+     * Set category mapper
+     *
+     * @param null $categoryMapper
+     */
+    private function setCategoryMapper($categoryMapper)
+    {
+        $this->categoryMapper = $categoryMapper;
+    }
+
+    /**
+     * Get category mapper
+     *
+     * @return null
+     */
+    private function getCategoryMapper()
+    {
+        return $this->categoryMapper;
     }
 }
