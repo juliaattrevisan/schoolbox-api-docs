@@ -23,18 +23,18 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
     private $linkMapper = null;
 
     /**
-     * Category Mapper
+     * An instance of Category
      *
-     * @var Schoolbox\Resource\CategoryMapper
-     */
-    private $categoryMapper = null;
-
-    /**
-     * The category to show links in
-     *
-     * @var Schoolbox\Resource\Category
+     * @var \Schoolbox\Resource\Category
      */
     private $source;
+
+    /**
+     * Category Mapper
+     *
+     * @var \Schoolbox\Resource\CategoryMapper
+     */
+    private $categoryMapper = null;
 
     /**
      * Available sort fields for this component.
@@ -54,15 +54,15 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         $this->setLinkMapper(new \Schoolbox\Resource\LinkMapper());
         $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
 
-        try {
-            // remove any non-numeric values from the source config
-            $this->source = $this->getCategoryMapper()->findById(
-                $this->getConfig('src')
-                    ? preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src'))
-                    : $this->getContext()->getId()
-            );
-        } catch (\Exception $e) {
-            $this->source = $this->getCategoryMapper()->findById($this->getContext()->getId());
+        $this->source = $this->getContext();
+
+        if (is_numeric($this->getConfig('src'))) {
+            try {
+                // remove any non-numeric values from the source config
+                $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
+            }
+            catch (\Exception $e) {
+            }
         }
     }
 
