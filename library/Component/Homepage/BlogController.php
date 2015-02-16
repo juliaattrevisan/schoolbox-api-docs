@@ -53,6 +53,17 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
         $this->setBlogMapper(new \Schoolbox\Blog\BlogMapper());
         $this->setCommentMapper(new \Schoolbox\Blog\CommentMapper());
         $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
+
+        $this->source = $this->getContext();
+
+        if (is_numeric($this->getConfig('src'))) {
+            try {
+                // remove any non-numeric values from the source config
+                $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
+            }
+            catch (\Exception $e) {
+            }
+        }
     }
 
     /**
@@ -67,20 +78,6 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
         }
 
         $this->parseConfig();
-
-        // remove any non-numeric values from the source config
-        if ($this->getConfig('src')) {
-            $sourceId = preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src'));
-        }
-        else {
-            $sourceId = $this->getContext()->getId();
-        }
-
-        try {
-            $this->source = $this->getCategoryMapper()->findById($sourceId);
-        }
-        catch (\Exception $e) {
-        }
 
         if ($this->permission < READ_ACCESS) {
             return false;
