@@ -20,12 +20,16 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
     private $fileHandler;
 
     /**
-     * @var Category
+     * Category Mapper
+     *
+     * @var \Schoolbox\Resource\CategoryMapper
      */
-    private $catHandler;
+    private $categoryMapper = null;
 
     /**
-     * @var array
+     * A category
+     *
+     * @var \Schoolbox\Resource\Category
      */
     private $source;
 
@@ -45,16 +49,21 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
     {
         $this->groupHandler = new Group();
         $this->fileHandler  = new File();
+        $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
 
-        $this->catHandler = new Category();
-
-        // remove any non-numeric values from the source config
-        $this->source = $this->catHandler->getByID(
-            $this->getConfig('src') ? preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) : ''
-        );
-
-        if ($this->source === false) {
-            $this->source = array();
+        if ((!$this->source instanceof \Schoolbox\Resource\Category)) {
+            if (is_numeric($this->getConfig('src'))) {
+                try {
+                    // remove any non-numeric values from the source config
+                    $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
+                }
+                catch (\Exception $e) {
+                    $this->source = new \Schoolbox\Resource\Category();
+                }
+            }
+        }
+        else {
+            $this->source = new \Schoolbox\Resource\Category();
         }
     }
 
@@ -70,7 +79,7 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
         }
         $this->parseConfig();
 
-        if ($this->groupHandler->getPermission($this->source['id']) < READ_ACCESS) {
+        if ($this->groupHandler->getPermission($this->source->getId()) < READ_ACCESS) {
             return false;
         }
 
@@ -115,7 +124,7 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
 
         // Load images for the current homepage
         $allFiles = $this->fileHandler->getAllInCategory(
-            $this->source['id'], array(
+            $this->source->getId(), array(
                 'filter'  => array('image'),
                 'sort'    => $this->getConfig('sort'),
                 'sortdir' => $this->getConfig('sortdir'),
@@ -123,7 +132,7 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
         );
 
         // Have update form to back to this homepage, not the gallery's homepage
-        $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->source['id']);
+        $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->source->getId());
 
         // Iterate
         if (is_array($allFiles)) {
@@ -153,5 +162,28 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
         }
 
         return true; // everything went according to plan
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Set category mapper
+     *
+     * @param null $categoryMapper
+     */
+    private function setCategoryMapper($categoryMapper)
+    {
+        $this->categoryMapper = $categoryMapper;
+    }
+
+    /**
+     * Get category mapper
+     *
+     * @return null
+     */
+    private function getCategoryMapper()
+    {
+        return $this->categoryMapper;
     }
 }
