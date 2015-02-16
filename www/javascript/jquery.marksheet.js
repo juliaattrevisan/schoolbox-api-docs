@@ -77,7 +77,7 @@
 			/* Only ajax submit on change if this setting is on
 			 */
 			if (config.submitOnChange === true) {
-				$('.mark-input').blur(function(){
+				$('.mark-input').change(function(){
 					$(this).closest('.inlineform').submit();
 				});
 
