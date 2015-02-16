@@ -22,7 +22,6 @@ new SitePage();
 header('Content-Type: application/json');
 
 $group = new Group();
-$category = new Category();
 
 if ( !$group->isSuperuser() ) {
 	respond("You are not authorised to perform that function.", 403);
@@ -54,23 +53,27 @@ if(isset($_POST['rollover'])) {
  * @return array
  */
 function traverse($categoryId, $catsWithCodes = array()) {
+    $folderMapper = new \Schoolbox\Resource\CategoryMapper();
+    $allFolders = $folderMapper->findByParent($categoryId);
 
-	$category = new Category();
+    /* For JSON ajax
+     */
+    foreach($allFolders as $currentFolder) {
+        if (strlen($currentFolder->getCodeString())) {
+            $catsWithCodes[$currentFolder->getId()] = array(
+                'id' => $currentFolder->getId(),
+                'name' => $currentFolder->getName(),
+                'parent' => $currentFolder->getParent()->getId(),
+                'template' => $currentFolder->getHomepage()->getTemplate()->getId(),
+                'code' => $currentFolder->getCodeString()
+            );
+        }
 
-	$children = $category->getSimpleCategoryList($categoryId);
-
-	if(is_array($children)) {
-		foreach($children as $child) {
-			if($child['code']) {
-				$catsWithCodes[$child['id']] = $child;
-			}
-			$catsWithCodes = traverse($child['id'], $catsWithCodes);
-		}
-	}
+        $catsWithCodes = traverse($currentFolder->getId(), $catsWithCodes);
+    }
 
 	return $catsWithCodes;
 }
-
 
 /**
  * Perform a rollover. This is an idempotent function, so if the request is repeated it's ok
