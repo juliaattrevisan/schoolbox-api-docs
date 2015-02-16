@@ -63,7 +63,23 @@ class Module extends BaseModule
             '/^customMeridenPastoral\\.(?:index|subject|currentReport)/',
             function($params) {
                 $student = UserMapper::getInstance()->findWithSubjects($params['id']);
-                $student->setSubjectCollection(SubjectMapper::getInstance()->findAllForStudent($student));
+                $student->setSubjectCollection(
+                    SubjectMapper::getInstance()->findAllForStudent($student)
+                );
+                try {
+                    // School house is actually an integer.
+                    // It should be a model, and will be for this purpose.
+                    // Also make sure it's hydrated.
+                    $schoolHouse = $student->getSchoolHouse();
+                    if ($schoolHouse instanceof \House) {
+                        $houseId = $schoolHouse->getId();
+                    } else {
+                        $houseId = $schoolHouse;
+                    }
+                    $student->setSchoolHouse(\HouseMapper::getInstance()->findById($houseId));
+                } catch (\Exception $e) {
+                    // noop
+                }
                 return array(
                     'student' => $student,
                 );
