@@ -8,24 +8,40 @@
  */
 
 use Schoolbox\UserMapper;
+use Schoolbox\Resource\CategoryMapper;
 
 class DAV_Folder extends Sabre\DAV\Collection {
 
+    /**
+     * @var \Schoolbox\Resource\Category
+     */
     private $folder;
-    private $folderHandler;
+
+
     private $fileHandler;
     private $groupHandler;
+
+    /**
+     * A category instance
+     *
+     * @var \Schoolbox\Resource\CategoryMapper
+     */
+    private $folderMapper = null;
 
     /**
      * @var DAV_SubjectServer_SubjectList
      */
     protected $subject_list;
 
+    /**
+     * Constructor
+     *
+     * @param $path
+     */
     public function __construct($path) {
-
+        $this->setFolderMapper(new CategoryMapper());
         $this->myPath = $path;
 
-        $this->setFolderHandler();
         $this->setFileHandler();
         $this->setGroupHandler();
 
@@ -38,15 +54,14 @@ class DAV_Folder extends Sabre\DAV\Collection {
 
     public function getChildren() {
 
-        $categoryList = $this->getFolderHandler()->getSimpleCategoryList($this->getFolderID());
+        $allFolders = $this->getFolderMapper()->findByParent($this->getFolder()->getId());
 
         // Loop through the directory, and create objects for each node that the user has permission to access
         $folders = array();
-        if(is_array($categoryList)){
-            foreach($categoryList as $folder) {
-                if($this->getGroupHandler()->getPermission($folder['id']) >= READ_ACCESS) {
-                    $folders[] = new DAV_Folder($this->myPath.'/'.$folder['name']);
-                }
+
+        foreach($allFolders as $currentFolder) {
+            if($this->getGroupHandler()->getPermission($currentFolder->getId()) >= READ_ACCESS) {
+                $folders[] = new DAV_Folder($this->myPath.'/'.$currentFolder->getName());
             }
         }
 
@@ -152,8 +167,11 @@ class DAV_Folder extends Sabre\DAV\Collection {
 
     }
 
+    /**
+     * Delete a folder
+     */
     public function delete() {
-        $this->getFolderHandler()->delete($this->getFolderID());
+        $this->getFolderMapper()->delete($this->getFolder());
     }
 
 
@@ -190,28 +208,49 @@ class DAV_Folder extends Sabre\DAV\Collection {
         return $this->getFolderName();
     }
 
+    /**
+     * Rename folder
+     *
+     * @param string $newName
+     */
     public function setName($newName) {
-        $folder = array('id' => $this->getFolderID(),
-                        'name' => $newName
-                        );
-        $this->getFolderHandler()->update($folder);
+        $this->getFolder()->setName($newName);
+
+        $this->getFolderMapper()->save($this->getFolder());
     }
 
+    /**
+     * Determine if $name is a folder
+     *
+     * @param $name
+     * @param bool $parent
+     * @return bool
+     */
     private function isFolder($name, $parent = false) {
-        return is_array($this->getFolderHandler()->getByArray(array('name' => $name, 'parent' => $parent,)));
+        $allFolders = $this->getFolderMapper()->findByColumnList(array(
+            'name' => $name,
+            'parent' => $parent
+        ));
+
+        if ($allFolders->count()) {
+            return true;
+        }
+
+        return false;
     }
 
     private function getFolderID(){
-        return $this->folder['id'];
+        return $this->folder->getId();
     }
 
     private function getFolderName() {
-        return $this->folder['name'];
+        return $this->folder->getName();
     }
 
     private function setFolderID($path) {
         if($path == '') {
-            $this->folder['id'] = 0;
+            $this->folder = new \Schoolbox\Resource\Category();
+            $this->folder->setId(0);
         }
         else {
             //
@@ -219,33 +258,25 @@ class DAV_Folder extends Sabre\DAV\Collection {
             $folderList = array_filter(explode('/',$path), 'strlen');
             $parent = 0;
             foreach ($folderList as $folderName) {
-                $folder = $this->getFolderHandler()->getByArray(
-                    array(
-                        'name'   => $folderName,
-                        'parent' => $parent,
-                    )
-                );
-                $parent = $folder[0]['id'];
+                $allFolders = $this->getFolderMapper()->findByColumnList(array(
+                    'name' => $folderName,
+                    'parent' => $parent
+                ));
+
+                if ($allFolders->count()) {
+                    $folder = $allFolders->first();
+                }
+                else {
+                    return false;
+                }
+
+                $parent = $folder->getId();
             }
 
-            $this->folderName = $folderName;
-            $this->folder = $folder[0];
-
-            if(!is_numeric($this->folderID))
-                $this->folderID = 0;
+            $this->folder = $folder;
       }
     }
 
-    /**
-     * @return Category
-     */
-    private function getFolderHandler() {
-        return $this->folderHandler;
-    }
-
-    private function setFolderHandler() {
-        $this->folderHandler = new Category();
-    }
 
     /**
      * @return File
@@ -265,4 +296,45 @@ class DAV_Folder extends Sabre\DAV\Collection {
     private function getGroupHandler() {
         return $this->groupHandler;
     }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Set folder mapper
+     *
+     * @param \Schoolbox\Resource\CategoryMapper $folderMapper
+     */
+    private function setFolderMapper($folderMapper)
+    {
+        $this->folderMapper = $folderMapper;
+    }
+
+    /**
+     * Get folder mapper
+     *
+     * @return \Schoolbox\Resource\CategoryMapper
+     */
+    private function getFolderMapper()
+    {
+        return $this->folderMapper;
+    }
+
+    /**
+     * @param \Schoolbox\Resource\Category $folder
+     */
+    public function setFolder($folder)
+    {
+        $this->folder = $folder;
+    }
+
+    /**
+     * @return \Schoolbox\Resource\Category
+     */
+    public function getFolder()
+    {
+        return $this->folder;
+    }
+
+
 }
