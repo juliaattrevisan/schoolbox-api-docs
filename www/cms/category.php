@@ -50,7 +50,7 @@ if (is_numeric($this->arg[0])) {
 		'ACTION' => 'Modify',
 		'CATEGORY_ID' => $folder->getId(),
 		'NAME' => Scrub::text($folder->getName()),
-		'CODE' => Scrub::text($folder->getCodes()->first()->getCode()),
+		'CODE' => Scrub::text($folder->getCodeString()),
 		'PARENT_ID' => $folder->getParent()->getId(),
 		'PARENT_NAME' => Scrub::text($folderParent->getName()),
 		'USER_GROUP' => $_SESSION['gid'],
