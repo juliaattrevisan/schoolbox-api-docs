@@ -5,7 +5,6 @@
                 <th>Title</th>
                 <th>Grade</th>
                 <th>Date</th>
-                <th>Comments</th>
             </tr>
         </thead>
         <tbody>
@@ -28,7 +27,6 @@
                 <span class="gradient-{{ workItem.mark // 10 }}">{{ workItem.pretty_mark }}</span>
             </td>
             <td>{{ workItem.date|date(locale.date.dateOnlyFormat) }}</td>
-            <td>{{ workItem.comment }}</td>
         </tr>
         {% endfor %}
         </tbody>
