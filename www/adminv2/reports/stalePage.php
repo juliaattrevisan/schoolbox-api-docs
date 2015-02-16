@@ -28,11 +28,16 @@ $folderMapper = new \Schoolbox\Resource\CategoryMapper();
 
 while($row = $this->db->getNextArray($result)) {
     $loaf = array();
-    $breadcrumbs = $folderMapper->breadcrumb($folderMapper->findCheaplyById($row['id']));
+
+    $thisFolder = $folderMapper->findCheaplyById($row['id']);
+
+    $breadcrumbs = $folderMapper->breadcrumb($thisFolder);
 
     foreach($breadcrumbs as $breadcrumb) {
-        $loaf[] .= "<a href='/homepage/{$breadcrumb->getId()}'>{$breadcrumb->getName()}</a>";
+        $loaf[] = "<a href='/homepage/{$breadcrumb->getId()}'>{$breadcrumb->getName()}</a>";
     }
+
+    $loaf[] = "<a href='/homepage/{$thisFolder->getId()}'>{$thisFolder->getName()}</a>";
 
     $breadcrumbHTML = implode(' > ', $loaf);
             
