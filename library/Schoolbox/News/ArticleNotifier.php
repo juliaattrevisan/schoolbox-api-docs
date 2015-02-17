@@ -103,7 +103,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
 		}
 		else {
 			$icon = "/portrait.php?userId={$user->getExternalId()}&size=square32";
-            $thumb = '';
+            $thumb = '/images/emails/spacer.gif';
 		}
 
 		$href = '/news/item/' . $article->getId();

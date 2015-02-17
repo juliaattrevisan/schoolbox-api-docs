@@ -139,7 +139,7 @@ switch ($this->arg[0]) {
                 $thumb = '/storage/image.php?size=square200&hash=' . $article->getImage()->getHash();
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $image = '/images/icon.php?size=64&icon=pin';
-                $thumb = '';
+                $thumb = '/images/emails/spacer.gif';
             }
 
             $decorator->appendInstance($bob

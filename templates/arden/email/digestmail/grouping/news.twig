@@ -7,7 +7,7 @@
 
 {% block pretty %}
     {% set msg = row.messages | first %}
-    <a class="news-title" href="#">{{ msg.meta.title }}</a>
+    <a class="news-title" href="{{ msg.href }}">{{ msg.meta.title }}</a>
 {% endblock %}
 
 {% block meta %}
