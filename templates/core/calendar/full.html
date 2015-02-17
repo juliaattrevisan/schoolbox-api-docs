@@ -290,7 +290,9 @@
                             userId: {CALENDAR_USER_ID}
                         },
                         success: function(data) {
-                            callback(data);
+                            callback(data.filter(function(v) {
+                                return 'start' in v;
+                            }));
                         },
                         cache: false
                     });
