@@ -447,8 +447,15 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 		if ($defaultCampus instanceof \Schoolbox\Campus) {
 			return $defaultCampus->getName();
 		}
+
 		// What if there is no default? Return the first campus I guess.
-		return $this->user->getCampusCollection()->first()->getName();
+        if ($this->user->getCampusCollection()->count()) {
+    		return $this->user->getCampusCollection()->first()->getName();
+        }
+
+        /* No campuses at all (for some reason)
+         */
+        return '';
 	}
 
 	/**
