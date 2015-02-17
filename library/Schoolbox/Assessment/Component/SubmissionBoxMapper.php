@@ -684,9 +684,9 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
      *
      * * Upcoming submission boxes, which the user hasn't submitted work for
      *
-     * @param int|null  $user_id    The user for whom activities are fetched.
-     * @param int       $limit      The max number of activities to be fetched.
-     * @param array|int $categories The categories to fetch activities for.
+     * @param int|null  $user_id    The user for whom activities are fetched, or null if any.
+     * @param int       $limit      The max number of activities to be fetched, or 0 if all.
+     * @param array|int $categories The category/ies to fetch activities for.
      *
      * @return ActivityCollection|Activity[]
      */
@@ -698,6 +698,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         //
         // All submission boxes that are due in the future.
         $submission_mapper = $this->getJoinMapper('submission');
+
+        $lim = $limit ? 'LIMIT :limit' : '';
 
         if (is_null($user_id)) {
             $selectCount = '';
@@ -727,7 +729,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 			AND sb.task_id IS NULL
 			$having
 			ORDER BY sb.date ASC
-			LIMIT :limit
+			$lim
 		";
         $statement = $this->database->prepare($query);
 
@@ -735,7 +737,10 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
             $statement->bindValue('user_id', $user_id, PDO::PARAM_INT);
         }
 
-        $statement->bindValue('limit', $limit, PDO::PARAM_INT);
+        if ($limit) {
+            $statement->bindValue('limit', $limit, PDO::PARAM_INT);
+        }
+
         foreach ($this->getArrayParameters($categories, 'category') as $param => $value) {
             $statement->bindValue($param, $value, PDO::PARAM_INT);
         }
