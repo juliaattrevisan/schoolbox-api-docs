@@ -84,7 +84,6 @@ foreach ($studentList as $i => $currentStudent) {
 
             'USER_SUBMISSION_CLASS'    => $submit ? ($ontime ? 'on-time' : 'late') : 'un',
             'USER_SUBMISSION_TEXT'     => $submit ? ($ontime ? 'Submitted on Time' : 'Submitted Late') : 'Unsubmitted',
-            'USER_SUBMISSION_DATETIME' => '',
 
         ));
 
@@ -226,7 +225,7 @@ $renderer->render();
 $oneStudent = new Collection();
 $oneStudent->add($currentAugmented['currentStudent']);
 
-$dueWorkDetail = new DueWork_Detail($submissionBoxId, $submissionBox);
+$dueWorkDetail = new DueWork_Detail($submissionBox);
 $dueWorkDetail->processStudents($oneStudent);
 $dueWorkDetail->renderDetails($this);
 
