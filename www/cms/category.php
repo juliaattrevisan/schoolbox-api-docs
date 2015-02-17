@@ -78,20 +78,17 @@ if (is_numeric($this->arg[0])) {
 	$this->dropDown('template_list', $homepageTemplateList, '', TEMPLATE_content, array('name'=>'TEMPLATE_NAME','id'=>'TEMPLATE_ID' ));
 
     $roleMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
-    $allRoles = $roleMapper->findByColumnList(array(
-        'cid' => $folder->getId(),
-        'type' => \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL
-    ));
+    $allRoleAccess = $roleMapper->getGroupPermissions($folder);
 
-	if ($allRoles->count()) {
-		foreach ($allRoles as $role) {
+	if ($allRoleAccess->count()) {
+		foreach ($allRoleAccess as $currentRoleAccess) {
             $this->setVar(array(
-				'GROUP_NAME' => Scrub::text($role->getName()),
-				'GROUP_ID' => $role->getId(),
+				'GROUP_NAME' => Scrub::text($currentRoleAccess->getRole()->getName()),
+				'GROUP_ID' => $currentRoleAccess->getRole()->getId(),
 				'PERM_0_SELECTED' => '',
 				'PERM_1_SELECTED' => '',
 				'PERM_2_SELECTED' => '',
-				'PERM_' . $role->getType() . '_SELECTED' => 'checked="checked"',
+				'PERM_' . $currentRoleAccess->getType() . '_SELECTED' => 'checked="checked"',
 			));
 
 			$this->parse('perm_table_block', 'perm_table', true);
