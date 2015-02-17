@@ -73,6 +73,8 @@ class DueWork_Detail
             return;
         }
 
+        $this->sitepageData = array();
+
         foreach ($students as $user) {
             $insertion = array();
 
