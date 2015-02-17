@@ -59,7 +59,9 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
         // Dump out block stuff
         $this->setBlock($templateHandle, 'rubric_criterion', 'rubric_criterion_block');
         $this->setBlock('rubric_criterion', 'rubric_descriptor', 'rubric_descriptor_block');
+        $this->setBlock($templateHandle, 'modify_rubric', 'modify_rubric_block');
         $this->setVar('rubric_criterion_block', '');
+        $this->setVar('modify_rubric_block', '');
         $i = 0;
 
         /* Create group structure */
@@ -78,6 +80,12 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
                 $this->parse('rubric_descriptor_block', 'rubric_descriptor', true);
             }
             $this->parse('rubric_criterion_block', 'rubric_criterion', true);
+        }
+
+        if ($this->permission >= WRITE_ACCESS) {
+            $this->parse('modify_rubric_block', 'modify_rubric');
+        } else {
+            $this->setVar('modify_rubric_block', '');
         }
 
         return true;
