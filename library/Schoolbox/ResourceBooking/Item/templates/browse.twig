@@ -36,9 +36,7 @@
                 <a href="{{ routeLookup('resourceCategory.read', {id: item.category.id}) }}" >{{ item.category.name }}</a>
                 {% if item.moderatorList is not empty %}
                     {% include '@resourceItem/sub/moderated.twig' with {item: item} %}
-                    {% for moderator in item.moderatorList %}
-                        <span>{% include 'sub/userLink.twig' with {user: moderator} %} </span>
-                    {% endfor %}
+                    {% include '@resourceItem/sub/moderatorList.twig' with {moderatorList: item.moderatorList} %}
                 {% endif %}
             </p>
             {{ item.description|e("purify")|raw }}
