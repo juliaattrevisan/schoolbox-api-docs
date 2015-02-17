@@ -98,7 +98,7 @@ $catHandler->logPageView($category->getId());
 
 /* BUILD PAGE */
 $this->setFile(TEMPLATE_content, 'homepage/index.html');
-$this->setTitle(Scrub::text($category->getName()));
+$this->setTitle($category->getName());
 $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
 $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
 $this->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
