@@ -684,14 +684,17 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
      *
      * * Upcoming submission boxes, which the user hasn't submitted work for
      *
-     * @param int|null $user_id    The user for whom activities are fetched.
-     * @param int      $limit      The max number of activities to be fetched.
-     * @param array    $categories The categories to fetch activities for.
+     * @param int|null  $user_id    The user for whom activities are fetched.
+     * @param int       $limit      The max number of activities to be fetched.
+     * @param array|int $categories The categories to fetch activities for.
      *
      * @return ActivityCollection|Activity[]
      */
     public function getUpcomingActivities($user_id, $limit, $categories)
     {
+        if (!is_array($categories)) {
+            $categories = array($categories);
+        }
         //
         // All submission boxes that are due in the future.
         $submission_mapper = $this->getJoinMapper('submission');
