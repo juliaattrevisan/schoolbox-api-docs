@@ -175,7 +175,7 @@
 		skipUnsubmitted.change(function (event) {
 
       var ize  = tgt[0].selectize,
-          skip = $(this).is(':checked'),
+          skip = $(this).is(':checked') ? 1 : 0,
           form = $(this).closest('form');
 
       // clear the selectize render cache
