@@ -77,12 +77,22 @@
   }
   .dropdown-navigator {
     width: 59%;
+    position: relative;
   }
   .dropdown-navigator .nav {
     opacity: 0.2;
+    display: inline-block;
+    height: 40px;
+    line-height: 40px;
+    position: relative;
+    top: -20px;
   }
   .dropdown-navigator .nav[href] {
     opacity: 1;
+  }
+  label[for=skipUnsubmitted] {
+    height: 48px;
+    line-height: 48px;
   }
 </style>
 <script src="/javascript/components/qtip2/jquery.qtip.js" type="text/javascript"></script>
@@ -98,7 +108,7 @@
     var navNext = $('.next-item');
     var navPrev = $('.previous-item');
 
-    var tgt = $('select[name=foo]'), ize,
+    var tgt = $('select[name=student-select]'), ize,
         skipUnsubmitted = $('#skipUnsubmitted'),
         students = [
           <!-- BEGIN studentnav -->
@@ -143,25 +153,7 @@
 			errorElement: '#inline-grading-error-container'
 		});
 
-        $('#returnWorkForm').marksheet();
-//
-//		$('.dropdown-navigator').inlineGradingNavigator({
-//			currentId: '{INLINE_GRADING_SUBMISSION_NAVIGATION_CURRENT_ID}',
-//			direct: {INLINE_GRADING_SUBMISSION_NAVIGATION_DIRECT},
-//			items: {INLINE_GRADING_SUBMISSION_NAVIGATION_ITEMS},
-//			disabled: '{INLINE_GRADING_SUBMISSION_NAVIGATION_DISABLED}',
-//
-//			/* Callback methods
-//			 */
-//			selectItemCallback: function() {
-//
-//
-//			},
-//			previousItemCallback: function() {
-//			},
-//			nextItemCallback: function() {
-//			}
-//		});
+    $('#returnWorkForm').marksheet();
 
 		$('.combobox').combobox({COMBO_OPTIONS});
 
@@ -199,43 +191,7 @@
       refreshNav(navNext, ize.getAdjacentOption(val, 1));
       refreshNav(navPrev, ize.getAdjacentOption(val, -1));
 
-      return;
-
-			var url = form.attr('action');
-			var data = form.serialize();
-
-			/* Hook in Skip Unsubmitted box
-			 */
-			var useDisabled = $(this).is(':checked');
-
-			$.post(url, data, function(responseText) {
-				$('.dropdown-navigator').inlineGradingNavigator({
-					currentId: '{INLINE_GRADING_SUBMISSION_NAVIGATION_CURRENT_ID}',
-					direct: {INLINE_GRADING_SUBMISSION_NAVIGATION_DIRECT},
-					items: {INLINE_GRADING_SUBMISSION_NAVIGATION_ITEMS},
-					disabled: {INLINE_GRADING_SUBMISSION_NAVIGATION_DISABLED},
-					useDisabled: useDisabled,
-
-					/* Callback methods
-					 */
-					selectItemCallback: function() {
-						$('.context-select').change(function() {
-							window.location.href = $(this).val();
-						});
-					},
-					previousItemCallback: function() {
-					},
-					nextItemCallback: function() {
-					}
-				});
-
-				// Why don't I have a class for this?
-				$('.dropdown-navigator').addClass('ajax-updated');
-				setTimeout(function() {
-					$('.dropdown-navigator').removeClass('ajax-updated');
-				}, 1000)
-			});
-		});
+		}).trigger('change');
 	});
 </script>
 <!-- END custom_head -->
@@ -255,19 +211,19 @@
 </div>
 <div class="dropdown-navigator">
   <a class="nav previous-item" href="" title="">&lsaquo;</a>
-  <select name="foo"></select>
+  <select name="student-select"></select>
   <a class="nav next-item" href="" title="">&rsaquo;</a>
-</div>
-<div class='float-left'>
+  <div class="float-right">
     <form action="/submission/inlineGrading/configForm.php" method="post">
-        <input type="hidden" name='boxId' value="{BOX_ID}" />
-        <input type="hidden" name="userId" value="{INLINE_GRADING_STUDENT_ID}" />
-		<input type="hidden" name="skipUnsubmitted" value="0" />
-		<label for="skipUnsubmitted">
-			<input type="checkbox" name="skipUnsubmitted" id="skipUnsubmitted" {SKIP_UNSUBMITTED_CHECKED} value='1' />
-			<strong>Skip Unsubmitted</strong>
-		</label>
+      <input type="hidden" name='boxId' value="{BOX_ID}" />
+      <input type="hidden" name="userId" value="{INLINE_GRADING_STUDENT_ID}" />
+      <input type="hidden" name="skipUnsubmitted" value="0" />
+      <label for="skipUnsubmitted">
+        <input type="checkbox" name="skipUnsubmitted" id="skipUnsubmitted" {SKIP_UNSUBMITTED_CHECKED} value='1' />
+        <strong>Skip Unsubmitted</strong>
+      </label>
     </form>
+  </div>
 </div>
 
 <div class="clearfix"></div>
@@ -277,7 +233,7 @@
 </div>
 
 <div class='left inline-grading-column-left'>
-	{INJECTED_INTERFACE_TEMPLATE}
+	<!--{INJECTED_INTERFACE_TEMPLATE}-->
 </div>
 <div class='right inline-grading-column-right'>
 
