@@ -8,6 +8,7 @@
             {{ fn.spacer(config.fqdn, 0, 8) }}
             <td class="heading" valign="middle" height="32">{{ group.heading }}</td>
         </tr>
+        {% if ns == 'news' %}
         <tr>
             {{ fn.spacer(config.fqdn, 0, 8) }}
             <td valign="middle" height="32">
@@ -22,6 +23,7 @@
             </ul>
             </td>
         </tr>
+        {% endif %}
         <tr>
             <td colspan="2">
                 <table width="624">
