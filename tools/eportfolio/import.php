@@ -50,8 +50,7 @@ HELP;
 
 if ($dryRun) {
     print("ePortfolio Import Script - Dry Run (no updates made):\n\n");
-}
-else {
+} else {
     print("ePortfolio Import Script:\n\n");
 }
 
@@ -59,8 +58,7 @@ else {
 try {
     /** @var User $user */
     $user = UserMapper::getInstance()->findById($userId);
-}
-catch (MapperException $e) {
+} catch (MapperException $e) {
     fprintf(STDERR, "Error: user #%s not found\n", $userId);
     exit(1);
 }
@@ -73,14 +71,12 @@ if (isset($toUserId)) {
         printf("user #%d does not exist - aborting.\n", $toUserId);
         exit;
     }
-}
-elseif (isset($roleId)) {
+} elseif (isset($roleId)) {
     // Load role
     try {
         /** @var Role $role */
         $role = RoleMapper::getInstance()->findById($roleId);
-    }
-    catch (MapperException $e) {
+    } catch (MapperException $e) {
         fprintf(STDERR, "Error: role #%s not found\n", $roleId);
         exit(1);
     }
@@ -95,8 +91,7 @@ elseif (isset($roleId)) {
         );
         exit;
     }
-}
-else {
+} else {
     fprintf(STDERR, "Error: either -r or -U options must be provided\n");
     exit(1);
 }
@@ -138,8 +133,7 @@ if ($roleId) {
         $roleId,
         $role->getName()
     );
-}
-else {
+} else {
     printf(
         "importing %d eportfolio pages from user #%d (%s) into user #%d.\n",
         count($eportfolioList),
@@ -152,22 +146,19 @@ foreach ($destUserList as $destUser) {
     $destUserId = $destUser->getId();
     if ($destUserId == $userId) {
         print("  skipping import from user into same user...\n");
-    }
-    else {
+    } else {
         printf("  importing into user #%d (%s)...\n", $destUser->getId(), $destUser->formatName());
         // Does this user have eportfolio disabled? If so then enable it
         if (!($destUser->getEportfolioEnable())) {
             if ($enableEportfolio) {
                 if ($dryRun) {
                     print("    ePortfolio is disabled - would enable...\n");
-                }
-                else {
+                } else {
                     print("    ePortfolio is disabled - enabling...\n");
                     $destUser->setEportfolioEnable(true);
                     UserMapper::getInstance()->save($destUser);
                 }
-            }
-            else {
+            } else {
                 print("    skipping because ePortfolio is disabled and --enable-eportfolio is not on.\n");
                 continue;
             }
@@ -230,17 +221,41 @@ foreach ($destUserList as $destUser) {
                     try {
                         /** @var Component\Eportfolio\Textbox $textbox */
                         $textbox = Component\Eportfolio\TextboxMapper::getInstance()->findOneByColumn(
-                            'component_instance_id', $component->getInstance()->getId()
+                            'component_instance_id',
+                            $component->getInstance()->getId()
                         );
                         $newTextbox = clone $textbox;
                         $newTextbox->setComponentInstanceId($newInstance->getId());
                         Component\Eportfolio\TextboxMapper::getInstance()->create($newTextbox);
-                    }
-                    catch (MapperException $e) {
+                    } catch (MapperException $e) {
                         // This component has no textbox yet, that's okay.
                     }
                 }
             }
+
+            // Copy only the allow parents permission.
+            $parentPermission = 0;
+            foreach (\Eportfolio\PermissionMapper::getInstance()->findParentSetting($page->getPageId()) as $perm) {
+                $parentPermission = $perm->getValue();
+            }
+            \Eportfolio\PermissionMapper::getInstance()->updatePermissions(
+                $newPage->getPageId(),
+                $parentPermission,
+                array(),
+                array()
+            );
+
+            // Below code will copy all permissions, including perms for users
+            // and groups the destination user can't access.
+//            $newPermissions = new \Schoolbox\Collection();
+//            foreach ($page->getPermissions() as $permission) {
+//                /** @var Eportfolio\Permission $newPermission */
+//                $newPermission = clone $permission;
+//                $newPermission->setPageId($newPage->getPageId());
+//                $newPermissions->add($newPermission);
+//            }
+//            \Eportfolio\PermissionMapper::getInstance()->create($newPermissions);
+//            \Eportfolio\PermissionMapper::getInstance()->updatePermissions($newPermissions);
         }
     }
 }
