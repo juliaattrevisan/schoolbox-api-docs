@@ -78,7 +78,7 @@ class Submission extends DeprecatedModel
     }
 
     /**
-     * @param string       $field
+     * @param string $field
      * @param string|array $value
      *
      * @return array|bool
@@ -623,8 +623,8 @@ class Submission extends DeprecatedModel
         }
         if ($semester) {
             $dateConditionA .= " AND DATE_FORMAT(submission_box.date, '%m') " . DueWork_All::getSemesterLogic(
-                $semester
-            );
+                    $semester
+                );
             $dateConditionB .= " AND DATE_FORMAT(assess.start, '%m') " . DueWork_All::getSemesterLogic($semester);
         }
 
@@ -1134,12 +1134,12 @@ class Submission extends DeprecatedModel
                         'firstname'  => $member['firstname'],
                         'lastname'   => $member['lastname'],
                         'alt_email'  => $emailObj->formatEmailFromArray(
-                            array(
-                                'username'    => $member['u_username'],
-                                'alt_email'   => $member['u_alt_email'],
-                                'local_email' => $member['u_local_email']
-                            )
-                        ),
+                                array(
+                                    'username'    => $member['u_username'],
+                                    'alt_email'   => $member['u_alt_email'],
+                                    'local_email' => $member['u_local_email']
+                                )
+                            ),
                         'categories' => array()
                     );
                 }
@@ -1429,6 +1429,7 @@ class Submission extends DeprecatedModel
             $synHandler = new External_Class();
 
             $studentListClassCode = $synHandler->getStudents($box->getCategory()->getCodeString());
+
             if (is_array($studentListClassCode)) {
                 $studentList = array_merge($studentList, $studentListClassCode);
             }
