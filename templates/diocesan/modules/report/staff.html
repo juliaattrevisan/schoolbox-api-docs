@@ -56,6 +56,7 @@
             <th>Role</th>
             <th>Campus</th>
             <th>Phone</th>
+            <th>Extension</th>
             <th>Mobile</th>
             <th>Email</th>
 
@@ -74,8 +75,9 @@
             <td>{STAFF_DEPARTMENT}</td>
             <td>{STAFF_ROLE}</td>
             <td>{STAFF_CAMPUS}</td>
-            <td class="number" width="20%">{STAFF_PHONE}</td>
-            <td class="number" width="20%">{STAFF_MOBILE}</td>
+            <td class="number" width="20%"><a href="tel:{STAFF_PHONE}">{STAFF_PHONE}</a></td>
+            <td class="number" width="20%">{STAFF_EXTENSION}</td>
+            <td class="number" width="20%"><a href="tel:{STAFF_MOBILE}">{STAFF_MOBILE}</a></td>
             <td><a href="mailto:{STAFF_EMAIL}">{STAFF_EMAIL}</a></td>
         </tr>
         <!-- END staff -->
