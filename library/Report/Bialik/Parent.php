@@ -252,6 +252,9 @@ class Report_Bialik_Parent extends \Report_Parent
 
             if($row['SpouseUserFlag2'] == 1)
                 $row['StudentContactSpouseMobilePhone'] = '';
+
+            $row['StudentContactHomeCountryDesc'] = '';
+            $row['StudentContactCountryDesc']     = '';
         }
 
         return $contactList;
