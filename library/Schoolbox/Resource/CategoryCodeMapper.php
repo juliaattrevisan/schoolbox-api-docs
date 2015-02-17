@@ -89,6 +89,7 @@ class CategoryCodeMapper extends Mapper
             SELECT {$this->getColumnString()}
             FROM {$this->table}
             WHERE categoryID IN {$this->getArrayPlaceholders($category_ids, 'id')}
+            AND deleted_at IS NULL
             ORDER BY code ASC, categoryID ASC
         "
         );
