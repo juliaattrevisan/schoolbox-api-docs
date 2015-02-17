@@ -781,8 +781,8 @@ class Controller extends Base
             );
             $roomSource->setRoomCode($roomCode);
             $roomEvents = $roomSource->getEvents(
-                $startDate->getTimestamp(),
-                $endDate->getTimestamp()
+                $startDate->getTimestamp() + 1,
+                $endDate->getTimestamp() - 1
             );
             if (count($roomEvents)) {
                 $errors['start_datetime'][] = 'timetabled_class';
