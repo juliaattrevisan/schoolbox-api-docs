@@ -2,16 +2,16 @@
 // FORMS
 //
 
-$include-html-form-classes: $include-html-classes;
+//$include-html-form-classes: $include-html-classes;
 
 // We use this to set the base for lots of form spacing and positioning styles
-$form-spacing: rem-calc(16);
+$form-spacing: rem-calc(22);
 
 // We use these to style the labels in different ways
 // $form-label-pointer: pointer;
 $form-label-font-size: rem-calc(16);
-$form-label-font-weight: $font-weight-bold;
-$form-label-line-height: 1.5;
+$form-label-font-weight: $font-weight-normal;
+$form-label-line-height: 1.5rem;
 $form-label-font-color: $black;
 // $form-label-small-transform: capitalize;
 $form-label-bottom-margin: 0;
@@ -127,6 +127,7 @@ $switch-negative-color: tint($secondary-color, 74%);
 
 form 						{ @include placeholder-color($body-grey); @include placeholder-hover-color($black); }
 
+input 						{ height: 3rem; }
 input,
 textarea,
 select 						{ @include single-transition(all, 0.15s, linear); font-weight: $font-weight-normal;

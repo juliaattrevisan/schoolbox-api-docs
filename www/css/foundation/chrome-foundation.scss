@@ -1,11 +1,17 @@
-//@import "../../javascript/components/foundation/scss/foundation";
-
 // Utils
+@import "utils/fonts";
 @import "utils/functions";
 @import "utils/mixins";
 @import "utils/variables";
 
 @import "settings";
+
+// Layout
+@import "layout/footer";
+@import "layout/forms";
+@import "layout/grid";
+@import "layout/header";
+@import "layout/sidebar";
 
 // Base
 @import "base/reset";
@@ -19,14 +25,7 @@
 @import "components/joyride";
 @import "components/navigation";
 
-@import "utils/fonts";
-
-// Layout
-@import "layout/footer";
-@import "layout/forms";
-@import "layout/grid";
-@import "layout/header";
-@import "layout/sidebar";
+@import "../../javascript/components/foundation/scss/foundation";
 
 #nav,
 #header,
