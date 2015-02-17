@@ -76,7 +76,7 @@ class External_Denbigh2_User implements External_UserInterface
     public function getStudent($externalUserId)
     {
         $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "denbigh2.getStudent",
+            "extdb:" . INSTANCE_ID . ":denbigh2.getStudent",
 
             function ($params) {
                 $data = array();
@@ -172,7 +172,7 @@ class External_Denbigh2_User implements External_UserInterface
     public function getStudentContactList($externalUserId)
     {
         $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "denbigh2.getStudentContactList",
+            "extdb:" . INSTANCE_ID . ":denbigh2.getStudentContactList",
 
             function ($params) {
                 $data = array();
@@ -324,7 +324,7 @@ class External_Denbigh2_User implements External_UserInterface
         /* TODO: Boarding house and Form information not available?
          */
         $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "denbigh2.getStudentContactListExtended",
+            "extdb:" . INSTANCE_ID . ":denbigh2.getStudentContactListExtended",
 
             function ($params) {
                 $collection = array();
@@ -398,7 +398,7 @@ class External_Denbigh2_User implements External_UserInterface
     public function getStudentUserAccountInfo()
     {
         $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "denbigh2.getStudentUserAccountInfo",
+            "extdb:" . INSTANCE_ID . ":denbigh2.getStudentUserAccountInfo",
 
             function ($params) {
                 $allStudents = array();
@@ -455,7 +455,7 @@ class External_Denbigh2_User implements External_UserInterface
 
         if (count($synergyIds)) {
             $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-                "denbigh2.getParentEmails",
+                "extdb:" . INSTANCE_ID . ":denbigh2.getParentEmails",
 
                 function ($params) {
                     $allEmails = array();
@@ -522,7 +522,7 @@ class External_Denbigh2_User implements External_UserInterface
     public function getParent($externalUserId)
     {
         $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "denbigh2.getParent",
+            "extdb:" . INSTANCE_ID . ":denbigh2.getParent",
 
             function ($params) {
                 $parent = array();
@@ -610,7 +610,7 @@ class External_Denbigh2_User implements External_UserInterface
     {
         if (is_array($externalUserId)) {
             $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-                "denbigh2.getParentSync",
+                "extdb:" . INSTANCE_ID . ":denbigh2.getParentSync",
 
                 function ($params) {
                     $parent = array();
@@ -649,7 +649,7 @@ class External_Denbigh2_User implements External_UserInterface
         }
         else {
             $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-                "denbigh2.getParentSync",
+                "extdb:" . INSTANCE_ID . ":denbigh2.getParentSync",
 
                 function ($params) {
                     $parent = array();
@@ -710,7 +710,7 @@ class External_Denbigh2_User implements External_UserInterface
     public function getParentUserAccountInfo()
     {
         $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "denbigh2.getParentUserAccountInfo",
+            "extdb:" . INSTANCE_ID . ":denbigh2.getParentUserAccountInfo",
 
             function ($params) {
                 $allParents = array();
@@ -776,7 +776,7 @@ class External_Denbigh2_User implements External_UserInterface
     public function getStaff($externalUserId)
     {
         $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "denbigh2.getStaff",
+            "extdb:" . INSTANCE_ID . ":denbigh2.getStaff",
 
             function ($params) {
                 $staff = array();
@@ -836,7 +836,7 @@ class External_Denbigh2_User implements External_UserInterface
     public function getStaffUserAccountInfo()
     {
         $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "denbigh2.getStaffUserAccountInfo",
+            "extdb:" . INSTANCE_ID . ":denbigh2.getStaffUserAccountInfo",
 
             function ($params) {
                 $staff = array();
@@ -902,7 +902,7 @@ class External_Denbigh2_User implements External_UserInterface
     public function getStaffContactListExtended()
     {
         $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "denbigh2.getStaffContactListExtended",
+            "extdb:" . INSTANCE_ID . ":denbigh2.getStaffContactListExtended",
 
             function ($params) {
                 $staff = array();
@@ -987,7 +987,7 @@ class External_Denbigh2_User implements External_UserInterface
     {
         if ($this->getGroupHandler()->isStudent($userId)) {
             $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-                "denbigh2.getSubjectList",
+                "extdb:" . INSTANCE_ID . ":denbigh2.getSubjectList",
 
                 function ($params) {
                     $class = array();
@@ -1039,7 +1039,7 @@ class External_Denbigh2_User implements External_UserInterface
         }
         else if ($this->getGroupHandler()->isStaff($userId)) {
             $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-                "denbigh2.getSubjectList",
+                "extdb:" . INSTANCE_ID . ":denbigh2.getSubjectList",
 
                 function ($params) {
                     $class = array();
@@ -1102,7 +1102,7 @@ class External_Denbigh2_User implements External_UserInterface
     public function getEnrolledStudents($externalUserId)
     {
         $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "denbigh2.getEnrolledStudents",
+            "extdb:" . INSTANCE_ID . ":denbigh2.getEnrolledStudents",
 
             function ($params) {
                 $ids = array();
@@ -1141,7 +1141,7 @@ class External_Denbigh2_User implements External_UserInterface
     public function getEmail($externalUserId)
     {
         $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "denbigh2.getEmail",
+            "extdb:" . INSTANCE_ID . ":denbigh2.getEmail",
 
             function ($params) {
                 $emailAddress = '';
@@ -1198,7 +1198,7 @@ class External_Denbigh2_User implements External_UserInterface
         $isStaff = $this->getGroupHandler()->isStaff($user->getId());
 
         $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "denbigh2.getPortrait",
+            "extdb:" . INSTANCE_ID . ":denbigh2.getPortrait",
 
             function ($params) {
                 list($externalUserId, $isStudent, $isStaff) = $params;

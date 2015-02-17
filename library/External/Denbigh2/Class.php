@@ -35,7 +35,7 @@ class External_Denbigh2_Class implements External_ClassInterface {
     public function getStudents($classCode)
     {
         $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "denbigh2.getStudents",
+            "extdb:" . INSTANCE_ID . ":denbigh2.getStudents",
 
             function ($params) {
                 $students = array();
@@ -100,7 +100,7 @@ class External_Denbigh2_Class implements External_ClassInterface {
     public function getTeacherName($classCode)
     {
         $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "denbigh2.getTeacherName",
+            "extdb:" . INSTANCE_ID . ":denbigh2.getTeacherName",
 
             function ($params) {
                 $ids = array();

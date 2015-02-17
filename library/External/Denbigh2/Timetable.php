@@ -65,7 +65,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
         $maxDays = $campus->getTimetableDay();
 
         $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "denbigh2.getTimetableDefinition",
+            "extdb:" . INSTANCE_ID . ":denbigh2.getTimetableDefinition",
 
             function ($params) {
                 list($maxPeriodsPerDay, $maxDays, $day) = $params;
@@ -225,7 +225,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
          */
         if ($this->getGroupHandler()->isStudent($userId)) {
             $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-                "denbigh2.getDayTimetable",
+                "extdb:" . INSTANCE_ID . ":denbigh2.getDayTimetable",
 
                 function ($params) {
                     list($externalUserId, $dayNumber, $timetable, $definition) = $params;
@@ -290,7 +290,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
         }
         elseif ($this->getGroupHandler()->isStaff($userId)) {
             $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-                "denbigh2.getDayTimetable",
+                "extdb:" . INSTANCE_ID . ":denbigh2.getDayTimetable",
 
                 function ($params) {
                     list($externalUserId, $dayNumber, $timetable, $definition) = $params;
@@ -429,7 +429,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
          */
         if ($this->getGroupHandler()->isStudent($userId)) {
             $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-                "denbigh2.getFullTimetable",
+                "extdb:" . INSTANCE_ID . ":denbigh2.getFullTimetable",
 
                 function ($params) {
                     list($externalUserId, $timetable, $timetableDay, $campusName) = $params;
@@ -491,7 +491,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
         }
         else if ($this->getGroupHandler()->isStaff($userId)) {
             $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-                "denbigh2.getFullTimetable",
+                "extdb:" . INSTANCE_ID . ":denbigh2.getFullTimetable",
 
                 function ($params) {
                     list($externalUserId, $timetable, $timetableDay, $campusName) = $params;
