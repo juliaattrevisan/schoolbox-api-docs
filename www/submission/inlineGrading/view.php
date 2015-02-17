@@ -64,13 +64,30 @@ $this->setFile(TEMPLATE_content, 'submission/inlineGrading/view.html');
 $this->setFile('studentNavTpl', 'submission/inlineGrading/injectables/controls/navigation-option.html');
 $this->setBlock('custom_head', 'studentnav', 'studentnav_block');
 
-foreach ($studentList as $i => $currentStudent) {
-	if (!in_array($currentStudent->getId(), $processed)) {
-		$processed[] = $currentStudent->getId();
+$dueWorkDetail = new DueWork_Detail($submissionBox);
+$dueWorkDetail->processStudents($studentList);
 
-        $submit = rand(0,1);
-        $ontime = $submit ? rand(0,2) : false;
-        $marked = rand(0,1);
+foreach ($dueWorkDetail->getSitepageData() as $studentId => $studentData) {
+	if (!in_array($studentId, $processed)) {
+		$processed[] = $studentId;
+
+        /** @var Schoolbox\User $currentStudent */
+        $currentStudent = $studentData['user']['instance'];
+
+        /** @var Alaress_Date_Format $submitTime */
+        $submitTime  = $studentData['user']['time'];
+        $submitText  = $studentData['user']['status'];
+        $submitClass = $studentData['user']['class'];
+
+        unset($studentData['user']);
+
+        $submit = !!count($studentData['submissions']);
+        $ontime = $submit ? $submitClass == 'submit-ok' : false;
+        $marked = isset($studentData['return']['id']) && $studentData['return']['id'] > 0;
+
+        if ($marked) {
+            $markTime = new Alaress_Date_Format($studentData['return']['returned'], 'Y-m-d H:i:s');
+        }
 
         $this->setVar(array(
             'BOX_ID'                => $submissionBox->getId(),
@@ -80,7 +97,7 @@ foreach ($studentList as $i => $currentStudent) {
             'USER_UNSUBMITTED'      => $submit ? 'false' : 'true',
 
             'USER_MARKSTATUS_CLASS'    => $marked ? 'marked' : '',
-            'USER_MARKSTATUS_DATETIME' => $marked ? Alaress_Date_Format::now()->addHours(-1 * rand(1,4))->getLocal() : '',
+            'USER_MARKSTATUS_DATETIME' => $marked ? $markTime->getLocal() : '',
 
             'USER_SUBMISSION_CLASS'    => $submit ? ($ontime ? 'on-time' : 'late') : 'un',
             'USER_SUBMISSION_TEXT'     => $submit ? ($ontime ? 'Submitted on Time' : 'Submitted Late') : 'Unsubmitted',
@@ -225,7 +242,6 @@ $renderer->render();
 $oneStudent = new Collection();
 $oneStudent->add($currentAugmented['currentStudent']);
 
-$dueWorkDetail = new DueWork_Detail($submissionBox);
 $dueWorkDetail->processStudents($oneStudent);
 $dueWorkDetail->renderDetails($this);
 
