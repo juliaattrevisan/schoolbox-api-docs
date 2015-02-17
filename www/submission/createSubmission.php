@@ -490,11 +490,11 @@ function outputCriteria(
 
         $hasCritGroup = false;
         if ($criterionCollection->count()) {
+            $hasCritGroup = true;
             $currentGrouping = $criterionCollection->first()->getGrouping();
 
             foreach ($criterionCollection as $criterion) {
                 if ($criterion->getGrouping() != $currentGrouping) {
-                    $hasCritGroup = true;
                     $page->parse('crit_group_block', 'crit_group', true);
                     $page->setVar('criterion_block', '');
                 }
@@ -533,6 +533,7 @@ function outputCriteria(
                 $currentGrouping = $criterion->getGrouping();
             }
             $page->parse('crit_group_block', 'crit_group', true);
+            $page->setVar('no_crit_group_block', '');
         }
 
         if (!$hasCritGroup) {
