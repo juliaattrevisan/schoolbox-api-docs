@@ -363,8 +363,8 @@ class External_Tass_Timetable implements External_TimetableInterface
                 '' AS StaffTitle,
                 '' AS StaffPreferredName,
                 teacher.tch_name AS StaffSurname,
-                ttperiod.prd_start AS PeriodStart,
-                ttperiod.prd_end AS PeriodEnd,
+                CONVERT(VARCHAR(8), ttperiod.prd_start, 108) AS PeriodStart,
+                CONVERT(VARCHAR(8), ttperiod.prd_end, 108) AS PeriodEnd,
                 ttperiod.prd_desc AS PeriodName
             FROM ttmast
             LEFT JOIN subtab ON
