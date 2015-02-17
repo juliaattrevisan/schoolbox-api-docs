@@ -269,7 +269,7 @@ class FileMapper extends Mapper implements FileLocatorInterface, Schoolbox\Stora
      */
     protected function postSave(File $file, $previous = null) {
         // copy file into location
-        if( is_readable($file->getTempFileLocation())) {
+        if( is_readable($file->getTempFileLocation()) && $file->getTempFileLocation() != $file->getFileLocation()) {
 
             $filename = $this->getSaveLocation() . $file->getId() . '.dat';
             @unlink($filename);

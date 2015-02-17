@@ -31,13 +31,14 @@ $page->setAjax($ajax);
 $fileHandler = new File();
 $groupHandler = new Group();
 
+$modifyExisting = is_numeric($_POST['fileID']);
 
 /* Upload single file */
 if (is_string($_POST['description']) && isset($_POST['category'])) {
 // get a file object or die
     try {
         // if we're editing an existing file, ensure the file exists
-        if (is_numeric($_POST['fileID'])) {
+        if ($modifyExisting) {
             $file = FileMapper::getInstance()->findById($_POST['fileID']);
 
         } else {
@@ -51,12 +52,24 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
             /** @var File $result */
             $result  = $factory->build($_POST['attachment'])->getFirst();
 
-            if ($file->getId()) {
-                $result->setId($file->getId());
-            }
+            // if the attachment is an already-existing file
+            if ($result->getId()) {
+                if ($result->getId() == $file->getId()) {
+                    // mirror, mirror (the file on disk was not changed)
+                    $file = $result;
 
-            // Yes, we may have just overridden the result of findById(), but that was also for additional safety checks
-            $file = $result;
+                } else {
+                    // target attachment is from SBFS, but a different file - set our temp location to its actual location
+                    $file->setTempFileLocation($result->getFileLocation());
+                    $file->setFilename($result->getFilename());
+
+                }
+            } else {
+                // target attachment is not from SBFS
+                $file->setTempFileLocation($result->getTempFileLocation());
+                $file->setFilename($result->getFilename());
+
+            }
         }
 
     } catch (\Schoolbox\Mapper\Exception $e) {
@@ -72,7 +85,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
         $file->setTempFileLocation($_FILES['file']['tmp_name']);
         $file->setFilename($_FILES['file']['name']);
         $file->setFilesize(filesize($_FILES['file']['tmp_name']));
-    } else {
+    } elseif (!$modifyExisting) {
         $originalLocation = $file->getFileLocation();
         if ($originalLocation) {
             $file->setTempFileLocation($originalLocation);
@@ -86,27 +99,34 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
     $file->setHidden($_POST['hidden'] ? true : false);
     $file->setModified(Alaress_Date_Format::now());
 
-    // set copy source
+    try {
+        // sooo, this case is much simpler
+        if ($modifyExisting) {
+            $file->setFolder(CategoryMapper::getInstance()->createModel()->setId($_POST['category']));
+            $affectedIds = FileMapper::getInstance()->save($file);
 
-    // this is the collection we'll be saving
-    $collection = new \Schoolbox\Collection();
+        } else {
 
-    // we can iterate, even if we're only iterating one
-    $destinations = is_array($_POST['category']) ? $_POST['category'] : array($_POST['category']);
+            // this is the collection we'll be saving
+            $collection = new \Schoolbox\Collection();
 
-    foreach ($destinations as $cat) {
-        if ($groupHandler->getPermission($cat) < WRITE_ACCESS) {
-            error(6);
+            // we can iterate, even if we're only iterating one
+            $destinations = is_array($_POST['category']) ? $_POST['category'] : array($_POST['category']);
+
+            foreach ($destinations as $cat) {
+                if ($groupHandler->getPermission($cat) < WRITE_ACCESS) {
+                    error(6);
+                }
+
+                $clone = clone $file;
+                $clone->setFolder(CategoryMapper::getInstance()->createModel()->setId($cat));
+
+                $collection->add($clone);
+            }
+
+            $affectedIds = FileMapper::getInstance()->create($collection);
         }
 
-        $clone = clone $file;
-        $clone->setFolder(CategoryMapper::getInstance()->createModel()->setId($cat));
-
-        $collection->add($clone);
-    }
-
-    try {
-        $affectedIds = FileMapper::getInstance()->create($collection);
 
         /* For some reason this is necessary for upload indication to reach completed status */
         if ($_POST['uploadifydie'] == true) {
