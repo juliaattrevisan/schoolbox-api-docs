@@ -78,7 +78,19 @@ if (!$_SESSION['id']) {
 }
 
 header(':', true, $result['error']);
-header('Content-Type: application/json');
+
+// F U IE9 - I really don't want to do this
+// TODO create a browscap service, and inject it around places
+$browscap = new \phpbrowscap\Browscap(SITE_root.'/tools/browscap');
+$browscap->doAutoUpdate = false;
+$browscap->updateMethod = 'local';
+$browscap->updateInterval = '31536000';
+if ($browscap->getBrowser()->Browser == 'IE') {
+    header('Content-Type: text/plain');
+} else {
+    header('Content-Type: application/json');
+}
+
 die(json_encode($result));
 
 
