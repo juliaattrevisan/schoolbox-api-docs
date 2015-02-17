@@ -19,6 +19,7 @@ use \Schoolbox\Calendar\Relation\RoleMapper;
 use \Schoolbox\CampusMapper;
 use \Alaress_Date_Format;
 use Schoolbox\Notif\SilentNotif;
+use \Schoolbox\Calendar\EventTypeMapper;
 
 class Csv extends Base {
 
@@ -100,7 +101,7 @@ class Csv extends Base {
 			 * If one not found, report error and move on
 			 */
 			try {
-				$eventTypeMapper = new \Schoolbox\Calendar\EventTypeMapper();
+				$eventTypeMapper = new EventTypeMapper();
 				$eventType = $eventTypeMapper->findById($event_type);
 			}
 			catch (\Exception $e) {
@@ -112,6 +113,34 @@ class Csv extends Base {
 
 				continue;
 			}
+
+            /* Check validity of event settings e.g. datetimes
+             */
+            if (!preg_match('/\d\d:\d\d:\d\d/', $start_time)) {
+                $startDatetime = new \Alaress_Date_Format($start_date . ' ' . $start_time, 'd/m/y H:i:s');
+            }
+            else {
+                $startDatetime = new \Alaress_Date_Format($start_date . ' ' . $start_time . ':00', 'd/m/y H:i:s');
+            }
+
+            if (!preg_match('/\d\d:\d\d:\d\d/', $finish_time)) {
+                $finishDatetime = new \Alaress_Date_Format($finish_date . ' ' . $finish_time, 'd/m/y H:i:s');
+            }
+            else {
+                $finishDatetime = new \Alaress_Date_Format($finish_date . ' ' . $finish_time . ':00', 'd/m/y H:i:s');
+            }
+
+            /* Start datetime occurs after finish datetime
+             */
+            if ($startDatetime->getUnixTimestamp() > $finishDatetime->getUnixTimestamp()) {
+                $output[] = array(
+                    'name' => \Scrub::text($name),
+                    'status' => 'Not Added',
+                    'error' => 'Invalid date and/or times',
+                );
+
+                continue;
+            }
 
 			/* Save
 			 */
