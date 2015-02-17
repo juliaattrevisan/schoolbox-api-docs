@@ -738,7 +738,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         }
 
         if ($limit) {
-            $statement->bindValue('limit', $limit, PDO::PARAM_INT);
+            $statement->bindValue('limit', intval($limit), PDO::PARAM_INT);
         }
 
         foreach ($this->getArrayParameters($categories, 'category') as $param => $value) {
