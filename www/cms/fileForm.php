@@ -52,12 +52,24 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
             /** @var File $result */
             $result  = $factory->build($_POST['attachment'])->getFirst();
 
-            if ($file->getId()) {
-                $result->setId($file->getId());
-            }
+            // if the attachment is an already-existing file
+            if ($result->getId()) {
+                if ($result->getId() == $file->getId()) {
+                    // mirror, mirror (the file on disk was not changed)
+                    $file = $result;
 
-            // Yes, we may have just overridden the result of findById(), but that was also for additional safety checks
-            $file = $result;
+                } else {
+                    // target attachment is from SBFS, but a different file - set our temp location to its actual location
+                    $file->setTempFileLocation($result->getFileLocation());
+                    $file->setFilename($result->getFilename());
+
+                }
+            } else {
+                // target attachment is not from SBFS
+                $file->setTempFileLocation($result->getTempFileLocation());
+                $file->setFilename($result->getFilename());
+
+            }
         }
 
     } catch (\Schoolbox\Mapper\Exception $e) {
@@ -91,7 +103,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
         // sooo, this case is much simpler
         if ($modifyExisting) {
             $file->setFolder(CategoryMapper::getInstance()->createModel()->setId($_POST['category']));
-            FileMapper::getInstance()->save($file);
+            $affectedIds = FileMapper::getInstance()->save($file);
 
         } else {
 
