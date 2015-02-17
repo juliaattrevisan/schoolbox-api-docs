@@ -19,7 +19,7 @@ $page = new SitePage();
  * Check user exists
  */
 $boxId = $_POST['boxId'];
-$skip  = isset($_POST['skipUnsubmitted']) && $_POST['skipUnsubmitted'] ? 1 : 0; // because it's hydrated as an int, not a boolean -_-
+$skip  = isset($_POST['skipUnsubmitted']) && $_POST['skipUnsubmitted'] && $_POST['skipUnsubmitted'] != 'false' ? 1 : 0; // because it's hydrated as an int, not a boolean -_- // oh, and it might come through as the string "false", because Newspeak, that's why
 
 try {
 	$submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
