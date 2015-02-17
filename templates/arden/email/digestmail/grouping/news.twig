@@ -2,25 +2,26 @@
 
 {% block image %}
     {% set msg = row.messages | first %}
-    <img src="{{ msg.icon }}" width="200" height="200" />
+    <img src="{{ msg.meta.thumb }}" width="200" height="200" />
 {% endblock %}
 
 {% block pretty %}
     {% set msg = row.messages | first %}
-    {{ msg.title | raw }}
+    <a class="news-title" href="#">{{ msg.meta.title }}</a>
 {% endblock %}
 
 {% block meta %}
     {% set msg = row.messages | first %}
     {% if msg.meta %}
-    {{ parent() }}
     <tr>
         <td>
             <p>
                 <em>
-                    {{ msg.meta.byline }}
+                    Posted by <a>{{ msg.meta.author }}</a>
+                    <br/>{{ msg.meta.date }}
                 </em>
             </p>
+            <br/>
         </td>
     </tr>
     <tr>
