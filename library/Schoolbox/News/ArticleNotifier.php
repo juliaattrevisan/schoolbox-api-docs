@@ -99,9 +99,11 @@ class ArticleNotifier extends AbstractModuleNotifier {
 
 		if($article->getImage()->getId()) {
 			$icon = "/storage/image.php?hash={$article->getImage()->getHash()}&size=square64";
+            $thumb = '/storage/image.php?size=square200&hash=' . $article->getImage()->getHash();
 		}
 		else {
 			$icon = "/portrait.php?userId={$user->getExternalId()}&size=square32";
+            $thumb = '';
 		}
 
 		$href = '/news/item/' . $article->getId();
@@ -142,6 +144,12 @@ class ArticleNotifier extends AbstractModuleNotifier {
 				->addTopic("news.$articleId.posted")
 
 				// body and byline are optional, but recommended since they render out in emails
+                ->setMeta(array(
+                    'title'  => $heading,
+                    'author' => $authorName,
+                    'date'   => $article->getPostDate()->getLong(),
+                    'thumb'  => $thumb
+                ))
 				->setBody($article->getBody())
 				->setByline("$shortDate by $authorName in $topicName")
 
