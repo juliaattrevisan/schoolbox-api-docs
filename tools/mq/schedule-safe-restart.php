@@ -48,6 +48,70 @@ else {
 	$d->notice("Doing diagnostic only, no data will be harmed (despite what messages say)");
 }
 
+set_error_handler(
+    function ($num, $string, $file, $line) {
+        // cast catchable fatal error to runtime exception so it gets ditched
+        throw new RuntimeException("$string in $file:$line");
+    },
+    E_RECOVERABLE_ERROR
+);
+
+// we have to fetch all because the DB conn is about to be reset :/
+$sqlq = Database::getInstance()->query("SELECT * FROM scheduleq")->fetchAll(PDO::FETCH_ASSOC);
+
+// init this
+DeprecatedDatabase::getInstance();
+
+foreach ($sqlq as $qi) {
+
+    // do this for every message that comes in
+    $d->info("Processing message from SQL", array('char' => '>'));
+
+    Database::reinitialise();
+    DeprecatedDatabase::reinitialise();
+
+    try {
+        $event = unserialize($qi['identifier']);
+
+        // if the interrogation says to dismiss the message, we do
+        if (interrogate($event, $d)) {
+            $d->error("Message broken");
+
+            if ($perform) {
+                // split this message off onto a special queue
+		        Database::reinitialise();
+                Database::getInstance()->exec("DELETE FROM scheduleq WHERE id_hash = '".$qi['id_hash']."'");
+            }
+        }
+        else {
+            $d->notice("Message retained", array('char' => '+'));
+        }
+
+    } catch (RuntimeException $e) {
+        // this message is can't be parsed, so we ACK it to make it go away
+        $d->error("RuntimeException: ".$e->getMessage());
+        $d->notice("Message unparseable", array('char' => '-'));
+
+    } catch (\Schoolbox\Realtime\Schedule\ScheduleException $e) {
+        // we're happy to ignore this, it just means no scheduling strategy exists for this Model
+        $d->warning('Schedule Exception: ' . $e->getMessage());
+        $d->notice("Message ignorable", array('char' => '-'));
+
+    } catch (\Schoolbox\Notif\Formatter\CompressionException $e) {
+        // this message is unparseable, so we'll eventually ACK it to make it go away
+        $d->error('Compression Exception: ' . $e->getMessage());
+        $d->notice("Message unparseable", array('char' => '-'));
+
+    }
+
+    if ($perform) {
+        Database::reinitialise();
+        Database::getInstance()->exec("DELETE FROM scheduleq WHERE id_hash = '".$qi['id_hash']."'");
+    }
+
+}
+
+// now move onto stuff in rabbit
 $loop = \React\EventLoop\Factory::create();
 
 $stompFactory = new \React\Stomp\Factory($loop);
@@ -60,8 +124,6 @@ $stomp = $stompFactory->createClient(array(
 	'passcode'  => Cfg::get('amqp_pass'),
 ));
 
-$seen = new stdClass();
-
 $amqpConn = \Schoolbox\Notif\MQ\Connector::getInstance();
 $amqpConn->declareQueue(INSTANCE_ID.'.sb.reviewsched');
 $amqpConn->bindQueue(INSTANCE_ID.'.sb.reviewsched', 'deadmessage');
@@ -71,15 +133,18 @@ unset($amqpConn);
 /**
  * @var $stomp \React\Stomp\Client $stomp
  */
-$stomp->connect()->then(function($stomp) use ($d, $seen, $loop, $perform) {
+$stomp->connect()->then(function($stomp) use ($d, $loop, $perform) {
 
 	$timer = $loop->addTimer(4, function() { exit(0); });
 
-	/**
-	 * @param \React\Stomp\Protocol\Frame $frame
-	 * @param \React\Stomp\AckResolver $resolver
-	 */
-	$stomp->subscribeWithAck(INSTANCE_ID.'.sb.sched', 'client-individual', function($frame, $resolver) use ($d, $seen, $loop, &$timer, $perform) {
+    /**
+     * @var $stomp \React\Stomp\Client $stomp
+     */
+    $stomp->subscribeWithAck(INSTANCE_ID.'.sb.sched', 'client-individual', function($frame, $resolver) use ($d, $loop, &$timer, $perform) {
+            /**
+             * @var \React\Stomp\Protocol\Frame $frame
+             * @var \React\Stomp\AckResolver $resolver
+             */
 			$loop->cancelTimer($timer);
 			$timer = $loop->addTimer(4, function() { exit(0); });
 
@@ -198,6 +263,7 @@ function interrogate($event, $log) {
 	}
 
 	// YOU ARE IN CHILD CONTEXT HERE. DO NOT ATTEMPT TO RETURN. YOU MUST EXIT INSTEAD.
+    restore_error_handler();
 	register_shutdown_function(function($d) {
         /** @var \Psr\Log\LoggerInterface $d */
 		$last = error_get_last();
