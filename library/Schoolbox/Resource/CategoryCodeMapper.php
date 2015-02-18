@@ -43,7 +43,7 @@ class CategoryCodeMapper extends Mapper
             array(
                 'column'   => 'deleted_at',
                 'property' => 'deletedAt',
-                'type'     => self::TYPE_STRING,
+                'type'     => self::TYPE_DATETIME,
             )
         );
         $this->hasJoin(
@@ -83,12 +83,13 @@ class CategoryCodeMapper extends Mapper
         if (empty($category_ids)) {
             return $this->hydrateList(array());
         }
-        $params = $this->getArrayParameters($category_ids, 'id');
+        $params    = $this->getArrayParameters($category_ids, 'id');
         $statement = $this->database->prepare(
             "
             SELECT {$this->getColumnString()}
             FROM {$this->table}
             WHERE categoryID IN {$this->getArrayPlaceholders($category_ids, 'id')}
+            AND deleted_at IS NULL
             ORDER BY code ASC, categoryID ASC
         "
         );
@@ -134,7 +135,7 @@ class CategoryCodeMapper extends Mapper
         // Add codes to each category
         foreach ($collection as $item) {
             $category = $retrieve_function($item);
-            $cat_id = $category->getId();
+            $cat_id   = $category->getId();
             if (!empty($grouped_codes[$cat_id])) {
                 foreach ($grouped_codes[$cat_id] as $code) {
                     $category->addCode($code);
@@ -149,7 +150,7 @@ class CategoryCodeMapper extends Mapper
      *
      * @param object $object
      * @param string $verb
-     * @param null   $previous
+     * @param null $previous
      * @return bool
      */
     protected function raiseNotification($object, $verb, $previous = null)

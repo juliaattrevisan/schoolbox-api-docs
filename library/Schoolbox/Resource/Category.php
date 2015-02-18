@@ -102,14 +102,19 @@ class Category implements ISoftDeletable, FolderInterface
     }
 
     /**
-     * Gets your category codes in a , seperated string
+     * Gets your category codes in a , separated string
+     *
      * @return string
      */
     public function getCodeString()
     {
+        $codeSet = array();
+
         if (count($this->codes)) {
             foreach ($this->codes as $code) {
-                $codeSet[] = $code->getCode();
+                if (!$code->isDeleted()) {
+                    $codeSet[] = $code->getCode();
+                }
             }
 
             return implode(',', $codeSet);
