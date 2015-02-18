@@ -515,11 +515,11 @@ class Collection implements ICollection, JsonSerializable {
 	/**
 	 * Slice this collection to a specified size, optionally with an offset
 	 *
-	 * @param int $count
 	 * @param int $offset
+	 * @param int $count
 	 * @return self
 	 */
-	public function slice($count, $offset = 0) {
+	public function slice($offset, $count = null) {
 		$this->stack = array_slice($this->stack, $offset, $count, false);
 		return $this;
 	}

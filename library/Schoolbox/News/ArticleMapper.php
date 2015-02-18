@@ -422,7 +422,7 @@ class ArticleMapper extends Mapper implements Searchable
             }
         );
 
-        $collection->slice($limit, $offset)->sortBy('publishDate', 'DESC');
+        $collection->slice($offset, $limit)->sortBy('publishDate', 'DESC');
 
         return $collection;
     }
@@ -471,7 +471,7 @@ class ArticleMapper extends Mapper implements Searchable
         )->sortBy('publishDate', 'ASC');
 
         if ($limit) {
-            $c = $c->slice($limit, $offset);
+            $c = $c->slice($offset, $limit);
         }
 
         if ($groupByTopic) {
