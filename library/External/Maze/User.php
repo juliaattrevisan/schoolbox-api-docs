@@ -605,6 +605,8 @@ class External_Maze_User implements External_UserInterface {
 	 * @return array|bool
 	 */
 	public function getSubjectList($externalUserId, $userId) {
+        $allSubjects = array();
+
 		if ($this->getGroup()->isStudent($userId)) {
 
 			/* Get roll groups
