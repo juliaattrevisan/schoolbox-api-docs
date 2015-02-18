@@ -841,7 +841,7 @@ class Event
     /**
      * Set campus collection
      *
-     * @param Collection $campusCollection
+     * @param Collection|Relation\Campus[] $campusCollection
      * @return self
      */
     public function setCampusCollection($campusCollection)
@@ -853,7 +853,7 @@ class Event
     /**
      * Get campus collection
      *
-     * @return Collection|Campus[]
+     * @return Collection|Relation\Campus[]
      */
     public function getCampusCollection()
     {
@@ -863,7 +863,7 @@ class Event
     /**
      * Set role collection
      *
-     * @param Collection|Role[] $roleCollection
+     * @param Collection|Relation\Role[] $roleCollection
      * @return self
      */
     public function setRoleCollection($roleCollection)
@@ -875,7 +875,7 @@ class Event
     /**
      * Get role collection
      *
-     * @return Collection|Role[]
+     * @return Collection|Relation\Role[]
      */
     public function getRoleCollection()
     {
@@ -907,7 +907,7 @@ class Event
     /**
      * Set category collection
      *
-     * @param Collection|\Schoolbox\Calendar\Relation\Category[] $categoryCollection
+     * @param Collection|Relation\Category[] $categoryCollection
      */
     public function setCategoryCollection($categoryCollection)
     {
@@ -917,7 +917,7 @@ class Event
     /**
      * Get category collection
      *
-     * @return Collection|\Schoolbox\Calendar\Relation\Category[]
+     * @return Collection|Relation\Category[]
      */
     public function getCategoryCollection()
     {
@@ -927,7 +927,7 @@ class Event
     /**
      * Set user collection
      *
-     * @param Collection|User[] $userCollection
+     * @param Collection|Relation\Personal[] $userCollection
      */
     public function setUserCollection($userCollection)
     {
@@ -937,7 +937,7 @@ class Event
     /**
      * Get user collection
      *
-     * @return Collection|User[]
+     * @return Collection|Relation\Personal[]
      */
     public function getUserCollection()
     {

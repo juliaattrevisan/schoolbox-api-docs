@@ -13,7 +13,6 @@ namespace Schoolbox\Realtime\Message;
 use PDO;
 use PDOStatement;
 use Schoolbox\Mapper;
-use Schoolbox\Mapper\Exception;
 
 class RoutePermissionMapper extends Mapper {
 
@@ -66,15 +65,29 @@ class RoutePermissionMapper extends Mapper {
 		));
 	}
 
-	public function findById($msgSourceId, $roleId) {
+
+    /**
+     * @param int $msgSourceId
+     * @param int $roleId      is optional to keep method compatible with parent class
+     * @return RoutePermission
+     * @throws Mapper\Exception
+     */
+	public function findById($msgSourceId, $roleId = 0) {
 		return parent::findOneByColumnList(array(
 			'msg_source_id' => $msgSourceId,
 			'role_id'       => $roleId
 		));
 	}
 
+
+    /**
+     * @param string $topic
+     * @param int    $roleId
+     * @param int    $userId
+     * @return array
+     */
 	public function findRouteLevels($topic, $roleId, $userId = 0) {
-		// find the routing levels that match this role and user
+		// find the routing levels that match this role, user and topic regex
 		$stmt = $this->prepare("
 			SELECT
 				ns.slug, src.key,
@@ -84,35 +97,29 @@ class RoutePermissionMapper extends Mapper {
 			LEFT JOIN msg_route_perm perm ON src.id = perm.msg_source_id AND perm.role_id = :role_id
 			LEFT JOIN msg_reroute reroute ON src.id = reroute.msg_source_id AND reroute.user_id = :user_id
 			WHERE role_id IS NOT NULL
+			AND :topic REGEXP CONCAT(ns.slug, '(\\.[0-9]+)+\\.', src.key, '$')
 		");
 
 		$stmt->execute(array(
 			'role_id' => $roleId,
-			'user_id' => $userId
+			'user_id' => $userId,
+            'topic'   => $topic
 		));
 
-		$result = array();
-		$topicParts = explode('.', $topic);
+        // we take the first, whether there are multiple or not (keys should ensure there cannot be)
+        $r = $stmt->fetch(PDO::FETCH_ASSOC);
 
-		// iterate across, looking for one that matches the topic that we've been provided
-		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-			$test = array($r['slug'], $r['key']);
+        // if no record matches, this message is not appropriate to this user/role, so dismiss
+        if (!$r) {
+            return array();
+        }
 
-			if(!count(array_diff($test, $topicParts))) {
-				$result = array(
-					'min' => $r['min_level'],
-					'def' => $r['default_level'],
-					'out' => $r['outgoing_level'],
-					'max' => $r['max_level'],
-				);
-				break;
-			}
-		}
-
-		// this message does not apply to this user/role
-		if(!count($result)) {
-			return $result;
-		}
+        $result = array(
+            'min' => $r['min_level'],
+            'def' => $r['default_level'],
+            'out' => $r['outgoing_level'],
+            'max' => $r['max_level'],
+        );
 
 		// find overrides where
 		$stmt = $this->prepare("
@@ -128,7 +135,7 @@ class RoutePermissionMapper extends Mapper {
 		$precedence = array();
 
 		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-			// no multiword (hash) support
+			// no multiword (ie '.#.') support
 			$regex = '`' . str_replace('*','([^\.]+)', $r['msg_route_key']) . '`';
 
 			if(preg_match($regex, $topic, $matches, PREG_OFFSET_CAPTURE)) {
@@ -142,6 +149,7 @@ class RoutePermissionMapper extends Mapper {
 
 		}
 
+        // no overrides, just return the result we got from the global config query
 		if(!count($precedence)) {
 			return $result;
 		}
