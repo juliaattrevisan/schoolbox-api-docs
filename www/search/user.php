@@ -531,10 +531,11 @@ if (is_numeric($this->arg[0])) {
                         $this->parse('emergency_block', 'emergency');
                     }
 
-
-                    if ($groupHandler->isStaff() || (Cfg::get('site_location') != 'mgs' && $groupHandler->isParentOfChild($user['uid']))) {
-                        if (trim($synInfo['StudentMedicalAlert'])) {
-                            $this->parse('medical_block', 'medical');
+                    if (!Cfg::get('protect_medicalspecial_profile')) {
+                        if ($groupHandler->isStaff() || (Cfg::get('site_location') != 'mgs' && $groupHandler->isParentOfChild($user['uid']))) {
+                            if (trim($synInfo['StudentMedicalAlert'])) {
+                                $this->parse('medical_block', 'medical');
+                            }
                         }
                     }
 
