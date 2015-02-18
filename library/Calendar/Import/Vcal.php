@@ -92,6 +92,18 @@ class Vcal extends Base {
 					$eventStartTimestamp = strtotime((string)$currentEvent->DTSTART);
 					$eventEndTimestamp = strtotime((string)$currentEvent->DTEND);
 
+                    /* Start datetime occurs after finish datetime
+                     */
+                    if ($eventStartTimestamp > $eventEndTimestamp) {
+                        $output[] = array(
+                            'name' => \Scrub::text((string)$currentEvent->SUMMARY),
+                            'status' => 'Not Added',
+                            'error' => 'Invalid date and/or times',
+                        );
+
+                        continue;
+                    }
+
 					// According to VCAL standard: end of all day event is 12am next day
 					$allDay = !$currentEvent->DTSTART->hasTime();
 
