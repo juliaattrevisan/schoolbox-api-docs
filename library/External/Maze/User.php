@@ -137,7 +137,7 @@ class External_Maze_User implements External_UserInterface {
 			$newFamily['Title'] = $family['SpouseTitle'];
 			$newFamily['Preferred'] = $family['SpousePreferred'];
 			$newFamily['Surname'] = $family['SpouseSurname'];
-			$newFamily['Email'] = $family['SpouseEmail'];
+			$newFamily['Email'] = $family['SpouseDefaultEmail'];
 			$newFamily['HomePhone'] = $family['SpouseHomePhone'];
 			$newFamily['MobilePhone'] = $family['SpouseMobilePhone'];
 		}
@@ -225,10 +225,13 @@ class External_Maze_User implements External_UserInterface {
 			$query = "
 				SELECT
 					DFKEY AS RelatedID,
-					M_EMAIL AS Email1,
-					F_EMAIL AS Email2
+					DF1.M_EMAIL AS FamilyEmail1,
+					DF1.F_EMAIL AS FamilyEmail2,
+					DF2.M_EMAIL AS AltFamilyEmail1,
+					DF2.F_EMAIL AS AltFamilyEmail2
 				FROM ST
-				LEFT JOIN DF ON ST.FAMILY = DF.DFKEY
+				LEFT JOIN DF DF1 ON ST.FAMILY = DF1.DFKEY
+				LEFT JOIN DF DF2 ON ST.FAMB = DF2.DFKEY
 				WHERE ST.STKEY IN $allIds
 			";
 
@@ -240,12 +243,17 @@ class External_Maze_User implements External_UserInterface {
 				foreach($allEmails as $currentEmail) {
 
 					/* Choose one of two possibilities
+					 *
+					 * How to choose for split parents?
+					 *
+					 * I have assumed that the record in FAMILY is the primary
+					 * record to use, so decide which of the FAMILY emails to use
 					 */
-					if (strlen($currentEmail['Email1'])) {
-						$processed['RelatedID'] = $currentEmail['Email1'];
+					if (strlen($currentEmail['FamilyEmail1'])) {
+						$processed['RelatedID'] = $currentEmail['FamilyEmail1'];
 					}
-					else if (strlen($currentEmail['Email2'])) {
-						$processed['RelatedID'] = $currentEmail['Email2'];
+					else if (strlen($currentEmail['FamilyEmail2'])) {
+						$processed['RelatedID'] = $currentEmail['FamilyEmail2'];
 					}
 				}
 			}
@@ -421,11 +429,11 @@ class External_Maze_User implements External_UserInterface {
 				'' AS StudentContactSpouseRelation
 			FROM DF
 			LEFT JOIN UM ON DF.HOMEKEY = UM.UMKEY
-			LEFT JOIN ST ON DF.DFKEY = ST.FAMILY
+			LEFT JOIN ST ON (DF.DFKEY = ST.FAMILY OR DF.DFKEY = ST.FAMB)
 			WHERE ST.STKEY = '{$externalUserId}'
 		";
 
-		return $this->getDb()->getAll($query);
+        return $this->getDb()->getAll($query);
 	}
 
 	/**
@@ -436,6 +444,9 @@ class External_Maze_User implements External_UserInterface {
 	 *
 	 * Note that there is no StudentContactHomeCountryDesc in the Synergetic views
 	 * so I changed it to use CountryCode instead.
+     *
+     * Note that if a student has split parents, they will appear more than once.
+     * They will appear once for each split parent.
 	 *
 	 * @param $yearlevel
 	 * @param $name
@@ -499,7 +510,7 @@ class External_Maze_User implements External_UserInterface {
 				'' AS SpouseDirectoryIncludeFlag,
 				'' AS StudentParentsSeparatedFlag
 			FROM ST
-			LEFT JOIN DF ON ST.FAMILY = DF.DFKEY
+			LEFT JOIN DF ON (ST.FAMILY = DF.DFKEY OR ST.FAMB = DF.DFKEY)
 			LEFT JOIN UM ON DF.HOMEKEY = UM.UMKEY
 			LEFT JOIN KGC ON ST.ROLL_GROUP = KGC.ROLL_GROUP
 			WHERE 1 = 1
@@ -749,6 +760,7 @@ class External_Maze_User implements External_UserInterface {
 			SELECT ST.STKEY AS RelatedID
 			FROM ST
 			WHERE FAMILY = '{$synergyID}'
+			OR FAMB = '{$synergyID}'
 		";
 
 		return $this->getDb()->getAll($query);
@@ -897,7 +909,7 @@ class External_Maze_User implements External_UserInterface {
 				DF.M_EMAIL AS SpouseDefaultEmail,
 				ST.SCHOOL_YEAR
 			FROM ST
-			LEFT JOIN DF ON ST.FAMILY = DF.DFKEY
+			LEFT JOIN DF ON (ST.FAMILY = DF.DFKEY OR ST.FAMB = DF.DFKEY)
 		";
 
 		$allFamilies = $this->getDb()->getAll($query);
