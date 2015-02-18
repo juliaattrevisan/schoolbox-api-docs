@@ -95,7 +95,6 @@ class Report_Bialik_Parent extends \Report_Parent
                 StudentContactPostCode,
                 StudentContactState,
                 StudentCountry.Description AS StudentContactCountryCode,
-                StudentContactAddressComma
                 StudentContactHomeAddress1,
                 StudentContactHomeAddress2,
                 StudentContactHomeAddress3,
@@ -254,7 +253,10 @@ class Report_Bialik_Parent extends \Report_Parent
             if($row['SpouseUserFlag2'] == 1)
                 $row['StudentContactSpouseMobilePhone'] = '';
 
+            $row['StudentContactHomeCountryDesc'] = '';
+            $row['StudentContactCountryDesc']     = '';
         }
+
         return $contactList;
     }
 } 
