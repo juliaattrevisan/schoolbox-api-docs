@@ -37,7 +37,6 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
-        $stack            = new Calendar_Event_Collection();
         $dayTimetable     = array();
         $currentTimestamp = $startTimestamp;
 
@@ -59,6 +58,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
 
         // Scan through each day from $startTimestamp to $endTimestamp, figuring
         // out that day's timetable day number for each of the user's campuses.
+        /** @var Calendar_Event_Type_Day[] $addedEvents */
         $addedEvents = array();
         while ($currentTimestamp < $endTimestamp) {
             foreach ($this->getUser()->getCampusCollection() as $campus) {
@@ -76,13 +76,18 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                 if (isset($dayTimetable[$dayNumber][$campusId])) {
                     foreach ($dayTimetable[$dayNumber][$campusId] as $period) {
                         // Has this exact class code for this time been added?
-                        // Don't add it again.
-                        $startTime = strtotime($period['periodStart'], $currentTimestamp);
-                        $endTime   = strtotime($period['periodEnd'], $currentTimestamp);
-                        $code      = $period['code'];
-                        $key       = sprintf('%d-%d-%s', $startTime, $endTime, $code);
-                        if (isset($period['description']) && !array_key_exists($key, $addedEvents)) {
-                            $addedEvents[$key] = true;
+                        // Don't add it again, but do add that it belongs to this campus.
+                        if (isset($period['description'])) {
+                            $startTime = strtotime($period['periodStart'], $currentTimestamp);
+                            $endTime   = strtotime($period['periodEnd'], $currentTimestamp);
+                            $code      = $period['code'];
+                            $key       = sprintf('%d-%d-%s', $startTime, $endTime, $code);
+                            if (array_key_exists($key, $addedEvents)) {
+                                $addedEvents[$key]->setCampusList(
+                                    $addedEvents[$key]->getCampusList().','.$campusId
+                                );
+                                continue;
+                            }
                             $event = new Calendar_Event_Type_Day();
                             $event->setAllday(false);
                             $event->setLocation($period['room']);
@@ -125,13 +130,15 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                             $event->setColour($colorMap[$period['code']]);
 
                             $event->setConnectorId($this->getConnectorId());
-                            $stack->add($event);
+                            $addedEvents[$key] = $event;
                         }
                     }
                 }
             }
             $currentTimestamp = strtotime('+1 day', $currentTimestamp);
         }
+        $stack = new Calendar_Event_Collection();
+        $stack->setStack(array_values($addedEvents));
         return $stack;
     }
 
