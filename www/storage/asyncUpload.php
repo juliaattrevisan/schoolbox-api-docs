@@ -85,7 +85,7 @@ $browscap = new \phpbrowscap\Browscap(SITE_root.'/tools/browscap');
 $browscap->doAutoUpdate = false;
 $browscap->updateMethod = 'local';
 $browscap->updateInterval = '31536000';
-if ($browscap->getBrowser()->Browser == 'IE') {
+if ($browscap->getBrowser()->Browser == 'IE' && $browscap->getBrowser()->MajorVer <= 9) {
     header('Content-Type: text/plain');
 } else {
     header('Content-Type: application/json');
