@@ -676,20 +676,6 @@ class External_Maze_User implements External_UserInterface {
 
 			$query = "
 				SELECT
-					TTTG.SUBJ AS ClassCode,
-					TTTG.CLASS AS ClassNumber,
-					SU.FULLNAME AS name,
-					'' AS classType,
-					'' AS ClassCampus
-				FROM TTTG
-				INNER JOIN TT ON TTTG.GKEY = TT.TTKEY
-				INNER JOIN SU ON TTTG.SUBJ = SU.SUKEY
-				WHERE (T1TEACH = '{$externalUserId}' OR T2TEACH = '{$externalUserId}')
-				AND TTPERIOD = '{$this->getHelper()->getCurrentTTPeriod()}'
-			";
-
-			$query = "
-				SELECT
 					THTQ.SUBJ AS ClassCode,
 					THTQ.CLASS AS ClassNumber,
 					SU.FULLNAME AS name,
