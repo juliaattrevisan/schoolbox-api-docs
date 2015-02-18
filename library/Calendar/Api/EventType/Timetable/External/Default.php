@@ -59,6 +59,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
 
         // Scan through each day from $startTimestamp to $endTimestamp, figuring
         // out that day's timetable day number for each of the user's campuses.
+        $addedEvents = array();
         while ($currentTimestamp < $endTimestamp) {
             foreach ($this->getUser()->getCampusCollection() as $campus) {
                 $campusId  = $campus->getId();
@@ -74,18 +75,21 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                 // Load events for this campus
                 if (isset($dayTimetable[$dayNumber][$campusId])) {
                     foreach ($dayTimetable[$dayNumber][$campusId] as $period) {
-                        if (isset($period['description'])) {
+                        // Has this exact class code for this time been added?
+                        // Don't add it again.
+                        $startTime = strtotime($period['periodStart'], $currentTimestamp);
+                        $endTime   = strtotime($period['periodEnd'], $currentTimestamp);
+                        $code      = $period['code'];
+                        $key       = sprintf('%d-%d-%s', $startTime, $endTime, $code);
+                        if (isset($period['description']) && !array_key_exists($key, $addedEvents)) {
+                            $addedEvents[$key] = true;
                             $event = new Calendar_Event_Type_Day();
                             $event->setAllday(false);
                             $event->setLocation($period['room']);
-                            $event->setStartTime(
-                                new Alaress_Date_Format(strtotime($period['periodStart'], $currentTimestamp), 'U')
-                            );
-                            $event->setEndTime(
-                                new Alaress_Date_Format(strtotime($period['periodEnd'], $currentTimestamp), 'U')
-                            );
+                            $event->setStartTime(new Alaress_Date_Format($startTime, 'U'));
+                            $event->setEndTime(new Alaress_Date_Format($endTime, 'U'));
                             $event->setPublishDate(null);
-                            $event->setTitle(sprintf('%s (%s)', $period['description'], $period['code']));
+                            $event->setTitle(sprintf('%s (%s)', $period['description'], $code));
                             $event->setCampusList($campusId);
                             if ($period['staff'] instanceof Schoolbox\User) {
                                 $event->setAuthorId($period['staff']->getId());
