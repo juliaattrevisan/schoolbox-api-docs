@@ -656,7 +656,7 @@ Calendar.prototype.cdelete = function(data, callback) {
  * @returns Number
  */
 Calendar.reOffsetTimestamp = function(timestamp) {
-    var timezoneOffset = new Date().getTimezoneOffset() * 60;
+    var timezoneOffset = new Date(timestamp*1000).getTimezoneOffset() * 60;
     return timestamp + timezoneOffset;
 }
 
