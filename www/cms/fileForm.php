@@ -62,12 +62,14 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
                     // target attachment is from SBFS, but a different file - set our temp location to its actual location
                     $file->setTempFileLocation($result->getFileLocation());
                     $file->setFilename($result->getFilename());
+                    $file->setFilesize($result->getFilesize());
 
                 }
             } else {
                 // target attachment is not from SBFS
                 $file->setTempFileLocation($result->getTempFileLocation());
                 $file->setFilename($result->getFilename());
+                $file->setFilesize($result->getFilesize());
 
             }
         }
