@@ -40,12 +40,12 @@
       <!-- BEGIN digest_online -->
       <p>You can modify which roles receive digest messages at which frequencies:</p>
       <form method="post" action="/adminv2/messages/digestForm.php">
-        <table id="digest-settings">
+        <table class="digest-settings">
           <!-- BEGIN role_digest -->
           <tr>
             <th>{ROLE_NAME}</th>
               <!-- BEGIN day_check -->
-            <td>
+            <td class="perm">
               <input id="t{ROLE_ID}{DAY_CHAR}{DAY_VALUE}" type="checkbox" name="role[{ROLE_ID}][day][]" value="{DAY_VALUE}" {DAY_CHECKED} />
               <label for="t{ROLE_ID}{DAY_CHAR}{DAY_VALUE}">
                 <span>{DAY_CHAR}</span>

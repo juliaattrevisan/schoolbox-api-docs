@@ -4212,14 +4212,14 @@ fieldset.calendarOptions fieldset {
 /*--------------------------------------------------------------
 ADMINV2/MESSAGES
 --------------------------------------------------------------*/
-#digest-settings {
+.digest-settings {
 	border-collapse: collapse;
-	&:hover {
+	&:hover tr:not(.thead) {
 		td, th {
 			opacity: 0.3;
 		}
 	}
-	tr {
+	tr:not(.thead) {
 		&:hover {
 			td, th {
 				opacity: 1;
@@ -4246,7 +4246,7 @@ ADMINV2/MESSAGES
 		padding: 4px 32px 4px 8px;
 		white-space: nowrap;
 	}
-	td {
+	td.perm {
 		padding: 4px 0;
 		width: 2em;
 		&:last-child {
@@ -4266,12 +4266,15 @@ ADMINV2/MESSAGES
 		text-align: center;
 		transition: background-color 0.1s linear;
 	}
-	input[type=checkbox] {
-		position: absolute;
-		top: 2px;
-		left: 2px;
-		z-index: -1;
-		opacity: 0;
+	.perm input {
+        &[type=checkbox],
+        &[type=radio] {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            z-index: -1;
+            opacity: 0;
+        }
 	}
 	.timeselect {
 		margin-left: 16px;
