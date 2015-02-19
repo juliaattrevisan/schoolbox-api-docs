@@ -260,7 +260,7 @@ $(document).ready(function() {
             {% endif %}
         </p>
         <p class="category">
-            Category: <a href="{{ routeLookup('resourceCategory.read', {id: item.category.id}) }}" >{{ item.category.name }}</a>
+            Category: <a href="{{ routeLookup('resourceItem.browse') }}?category={{ item.category.id|e('url') }}" >{{ item.category.name }}</a>
         </p>
 
         {{ item.description|e("purify")|raw }}
