@@ -34,7 +34,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             $this->textbox = new \Schoolbox\Resource\Textbox();
             $this->textbox
                 ->setHeading('Text Box')
-                ->setCategory(\Schoolbox\Resource\CategoryMapper::getInstance()->createModel()->setId($this->getContext('id')));
+                ->setCategory(\Schoolbox\Resource\CategoryMapper::getInstance()->createModel()->setId($this->getContext()->getId()));
         }
 
         if (!$this->getTextbox()->getHeading()) {
@@ -62,7 +62,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         if ($this->textbox instanceof \Schoolbox\Resource\Textbox) {
             $sourceCategory = $this->textbox->getCategory()->getId();
         } else {
-            $sourceCategory = $this->getContext('id');
+            $sourceCategory = $this->getContext()->getId();
         }
 
         /* If user does not have access to the source, do not output anything */

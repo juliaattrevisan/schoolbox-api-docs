@@ -38,13 +38,13 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
         // remove any non-numeric values from the source config
         $this->source = $this->catHandler->getByID(
             $this->getConfig('src') ?
-            preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
-            $this->getContext('id')
+                preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
+                $this->getContext()->getId()
         );
 
-        if ($this->source === false) {
-            $this->source = $this->catHandler->getByID($this->getContext('id'));
-        }
+	    if($this->source === false) {
+		    $this->source = $this->catHandler->getByID($this->getContext()->getId());
+	    }
 
     }
 
@@ -52,7 +52,6 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
      * Renders the data into the SitePage. Presentation logic.
      *
      * @param String $templateHandle
-     *
      * @return boolean
      */
     public function renderTemplate($templateHandle)

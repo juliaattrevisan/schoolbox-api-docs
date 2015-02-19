@@ -52,7 +52,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
     {
         // Get the list of students for this class (in which method?)
         $group_handler = new Group();
-        $code          = $this->getContext('code');
+        $code          = $this->getContext()->getCodeString();
 
         // Get the list of units for this course, as well as who has actually
         // completed each unit.
@@ -78,7 +78,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                         ->getColumnValues('id');
                 }
             }
-            $groupStudentList = $group_handler->getMemberList($this->getContext('id'));
+            $groupStudentList = $group_handler->getMemberList($this->getContext()->getId());
             if (is_array($groupStudentList)) {
                 $groupStudentIdList = array_unique(
                     array_map(

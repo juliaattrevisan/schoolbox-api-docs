@@ -60,7 +60,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
         ));
 
         $userHandler = new User;
-        $userList = $userHandler->getAllInCategory($this->getContext('id'));
+        $userList = $userHandler->getAllInCategory($this->getContext()->getId());
         $emailObj = new Email();
 
         $emailall = array();

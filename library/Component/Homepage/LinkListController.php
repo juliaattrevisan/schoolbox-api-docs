@@ -59,10 +59,10 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             $this->source = $this->getCategoryMapper()->findById(
                 $this->getConfig('src')
                     ? preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src'))
-                    : $this->getContext('id')
+                    : $this->getContext()->getId()
             );
         } catch (\Exception $e) {
-            $this->source = $this->getCategoryMapper()->findById($this->getContext('id'));
+            $this->source = $this->getCategoryMapper()->findById($this->getContext()->getId());
         }
     }
 
@@ -90,7 +90,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             array(
                 // These are for the Select Alternate Source resourcebrowser
                 'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
-                'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext('id')
+                'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext()->getId()
                     ? 'Local'
                     : $this->source->getName(),
                 'LINK_CATEGORY_ID'          => $this->source->getId(),

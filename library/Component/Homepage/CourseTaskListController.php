@@ -51,7 +51,7 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
      */
     public function execute() {
         $this->group_handler = new Group();
-        $categoryId = $this->getContext('id');
+        $categoryId = $this->getContext()->getId();
         if ($categoryId > 0) {
             $this->category = CategoryMapper::getInstance()->findById($categoryId);
         }

@@ -58,7 +58,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         $this->parseConfig();
         $source = $this->getConfig('src');
         if (empty($source)) {
-            $source = $this->getContext('id');
+            $source = $this->getContext()->getId();
         }
 
         /* Sort order

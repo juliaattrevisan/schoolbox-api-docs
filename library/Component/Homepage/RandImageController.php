@@ -40,7 +40,7 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
         //get image id
         $query = "SELECT id, comment
                   FROM file
-                  WHERE category = {$this->getContext('id')}
+                  WHERE category = {$this->getContext()->getId()}
                   AND deleted = '0'
                   AND hidden = '0'
                   AND INSTR(mime_type, 'image/')

@@ -72,11 +72,11 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         $this->source = $this->catHandler->getByID(
             $this->getConfig('src') ?
                 preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
-                $this->getContext('id')
+                $this->getContext()->getId()
         );
 
         if ($this->source === false) {
-            $this->source = $this->catHandler->getByID($this->getContext('id'));
+            $this->source = $this->catHandler->getByID($this->getContext()->getId());
         }
     }
 
@@ -107,7 +107,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                     : 'Files',
                 // These are for the Select Alternate Source resourcebrowser
                 'COMPONENT_CONFIG_SRC_ID'   => $this->source['id'],
-                'COMPONENT_CONFIG_SRC_NAME' => $this->source['id'] == $this->getContext('id')
+                'COMPONENT_CONFIG_SRC_NAME' => $this->source['id'] == $this->getContext()->getId()
                     ? 'Local'
                     : $this->source['name'],
                 'FILES_CATEGORY_ID'         => $this->source['id'],

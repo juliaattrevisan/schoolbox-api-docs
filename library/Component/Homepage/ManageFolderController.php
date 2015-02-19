@@ -44,7 +44,7 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
         $this->setBlock($templateHandle, "addmylinks", "addmylinks_block");
 
         // My links button
-        $url = 'http://'.Cfg::get('site_hostname') . '.' . Cfg::get('site_domain').'/homepage/'.$this->getContext('id');
+        $url = 'http://'.Cfg::get('site_hostname') . '.' . Cfg::get('site_domain').'/homepage/'.$this->getContext()->getId();
 
         if($this->myLinkHandler->linkExists($_SESSION['id'], $url)) {
             $this->setVar('addmylinks_block','');
@@ -75,14 +75,14 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
         $this->setVar('unsubscribed_block', '');
 
         // If you are subscribed but are awaiting authorisation
-        $type = $this->groupHandler->involvedInGroup($_SESSION['id'], $this->getContext('id'));
+        $type = $this->groupHandler->involvedInGroup($_SESSION['id'], $this->getContext()->getId());
 
         if ($type == DENY_ACCESS && $type !== NULL) {
             $this->parse('subscribedModerated_block', 'subscribedModerated');
         }
 
         // If you are subscribed with something greater than DENY_ACCESS and you can subscribe, display the unsubscribe button
-        else if ($this->groupHandler->canSubscribe($this->getContext('id')) && ($type == READ_ACCESS || $type == WRITE_ACCESS)) {
+        else if ($this->groupHandler->canSubscribe($this->getContext()->getId()) && ($type == READ_ACCESS || $type == WRITE_ACCESS)) {
             $this->parse('subscribed_block', 'subscribed');
         }
         else if($type == FULL_ACCESS) {
@@ -93,7 +93,7 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
         * If you can subscribe to the group, present option.
         * Otherwise do nothing
         */
-        else if ($this->groupHandler->canSubscribe($this->getContext('id'))) {
+        else if ($this->groupHandler->canSubscribe($this->getContext()->getId())) {
             $this->parse('unsubscribed_block', 'unsubscribed');
         }
 

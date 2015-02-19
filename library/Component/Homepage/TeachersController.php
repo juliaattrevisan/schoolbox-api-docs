@@ -55,13 +55,13 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
             'LIST_STYLE' => $displayOptions[$display]['css'],
         ));
 
-        if (($this->getContext('code') != '') && Cfg::get('external_enable')) {
+        if (($this->getContext()->getCodeString() != '') && Cfg::get('external_enable')) {
 
             $externalClassHandler = new External_Class();
             $userHandler = new User();
             $groupHandler = new Group();
 
-            $listSyns = $externalClassHandler->getTeacherName($this->getContext('code'));
+            $listSyns = $externalClassHandler->getTeacherName($this->getContext()->getCodeString());
             $staffGroups = $groupHandler->getStaffGroupTypeIds();
 
             if (is_array($listSyns)) {

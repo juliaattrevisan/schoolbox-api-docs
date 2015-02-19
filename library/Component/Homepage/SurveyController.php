@@ -57,7 +57,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
         $sectionHandler = new Survey_Section();
         $userHandler = new User();
 
-        $allSurveys = $surveyHandler->getList($this->getContext('id'));
+        $allSurveys = $surveyHandler->getList($this->getContext()->getId());
 
         if ($this->permission >= WRITE_ACCESS) {
             $this->parse('createSurvey_block', 'createSurvey');

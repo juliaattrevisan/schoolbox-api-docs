@@ -44,11 +44,11 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
         $this->source = $this->catHandler->getByID(
             $this->getConfig('src') ?
             preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
-            $this->getContext('id')
+            $this->getContext()->getId()
         );
 
         if ($this->source === false) {
-            $this->source = $this->catHandler->getByID($this->getContext('id'));
+            $this->source = $this->catHandler->getByID($this->getContext()->getId());
         }
     }
 
@@ -83,9 +83,7 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
                 ) : 'News',
                 // These are for the Select Alternate Source resourcebrowser
                 'COMPONENT_CONFIG_SRC_ID' => $this->source['id'],
-                'COMPONENT_CONFIG_SRC_NAME' => $this->source['id'] == $this->getContext(
-                    'id'
-                ) ? 'Local' : $this->source['name'],
+                'COMPONENT_CONFIG_SRC_NAME' => $this->source['id'] == $this->getContext()->getId() ? 'Local' : $this->source['name'],
                 'NEWS_CATEGORY_ID' => $this->source['id'],
             )
         );

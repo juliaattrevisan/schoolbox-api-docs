@@ -115,9 +115,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                     ) : 'Blog',
                 // These are for the Select Alternate Source resourcebrowser
                 'COMPONENT_CONFIG_SRC_ID' => $this->source->getId(),
-                'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext(
-                        'id'
-                    ) ? 'Local' : $this->source->getName(),
+                'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext()->getId() ? 'Local' : $this->source->getName(),
                 /* Have update form to back to this homepage, not the wiki's homepage
                  */
                 'BLOG_CATEGORY_ID' => $this->source->getId(),

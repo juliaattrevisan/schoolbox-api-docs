@@ -43,11 +43,11 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         $this->source = $this->catHandler->getByID(
             $this->getConfig('src') ?
                 preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
-                $this->getContext('id')
+                $this->getContext()->getId()
         );
 
 	    if($this->source === false) {
-		    $this->source = $this->catHandler->getByID($this->getContext('id'));
+		    $this->source = $this->catHandler->getByID($this->getContext()->getId());
 	    }
     }
 

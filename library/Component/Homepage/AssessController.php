@@ -60,7 +60,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
             $this->setVar('createAssessment_block', '');
         }
 
-        $allAssess = $assessHandler->getList($this->getContext('id'));
+        $allAssess = $assessHandler->getList($this->getContext()->getId());
 
         if (is_array($allAssess)) {
             $i = 0;

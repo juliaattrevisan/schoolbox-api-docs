@@ -46,11 +46,11 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
         $this->source = $this->catHandler->getByID(
             $this->getConfig('src') ?
             preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
-            $this->getContext('id')
+            $this->getContext()->getId()
         );
 
         if ($this->source === false) {
-            $this->source = $this->catHandler->getByID($this->getContext('id'));
+            $this->source = $this->catHandler->getByID($this->getContext()->getId());
         }
     }
 

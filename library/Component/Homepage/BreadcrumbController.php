@@ -25,7 +25,7 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
      */
     public function execute()
     {
-        $categoryId = is_numeric($this->getConfig('src')) && $this->getConfig('src') > 0 ? $this->getConfig('src') : $this->getContext('id');
+        $categoryId = is_numeric($this->getConfig('src')) && $this->getConfig('src') > 0 ? $this->getConfig('src') : $this->getContext()->getId();
 
         if ($categoryId > 0) {
             try {
@@ -33,7 +33,7 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
             } catch (Exception $e) {
                 // if alternate source cannot be found revert to yourself
                 try {
-                    $this->category = CategoryMapper::getInstance()->findById($this->getContext('id'));
+                    $this->category = CategoryMapper::getInstance()->findById($this->getContext()->getId());
                 } catch (Exception $e) {
                     return false;
                 }

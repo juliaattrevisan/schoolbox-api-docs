@@ -255,10 +255,10 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
         // (Staff have no context for actually following the view result button)
         if ($this->permission == READ_ACCESS) {
             // is the current user a member of this category?
-            $catAccess = $this->groupHandler->involvedInGroup($_SESSION['id'], $this->getContext('id'));
+            $catAccess = $this->groupHandler->involvedInGroup($_SESSION['id'], $this->getContext()->getId());
             $subAccess = false;
-            if ($this->getContext('code')) {
-                $subAccess = $this->groupHandler->involvedInSubject($this->getContext('code'));
+            if ($this->getContext()->getCodeString()) {
+                $subAccess = $this->groupHandler->involvedInSubject($this->getContext()->getCodeString());
             }
 
             if ($catAccess || $subAccess) {

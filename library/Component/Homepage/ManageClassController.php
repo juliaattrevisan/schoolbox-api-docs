@@ -34,7 +34,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             return false;
         }
 
-        if( $this->getContext('code') == '') {
+        if( $this->getContext()->getCodeString() == '') {
             return false;
         }
 
@@ -56,8 +56,8 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 
         /* Output student grades link to students of this class */
         if($this->permission == READ_ACCESS && (
-            $this->groupHandler->involvedInGroup($_SESSION['id'], $this->getContext('id')) ||
-            $this->groupHandler->involvedInSubject($this->getContext('code')))) {
+            $this->groupHandler->involvedInGroup($_SESSION['id'], $this->getContext()->getId()) ||
+            $this->groupHandler->involvedInSubject($this->getContext()->getCodeString()))) {
             $this->parse('student_grades_block', 'student_grades');
         }
         else {
@@ -65,7 +65,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         }
 
 
-        if(Cfg::get('external_enable') == false || $this->permission < WRITE_ACCESS || $this->getContext('code') == '') {
+        if(Cfg::get('external_enable') == false || $this->permission < WRITE_ACCESS || $this->getContext()->getCodeString() == '') {
             $this->setVar('class_list_block', '');
         }
         else {

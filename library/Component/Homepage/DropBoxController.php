@@ -63,7 +63,7 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
 
             $this->setVar('drop_student_block', '');
             $dropbox = new Dropbox;
-            $fileList = $dropbox->getFileList($this->getContext('id'));
+            $fileList = $dropbox->getFileList($this->getContext()->getId());
             $userHandler = new User();
 
             if(is_array($fileList)) {

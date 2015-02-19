@@ -66,7 +66,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
         ));
 
         $userHandler = new User;
-        $managerList = $userHandler->getManagers($this->getContext('id'));
+        $managerList = $userHandler->getManagers($this->getContext()->getId());
 
         $emailObj = new Email();
 

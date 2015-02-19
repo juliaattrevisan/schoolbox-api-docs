@@ -65,7 +65,7 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
 
         $source = $this->getConfig('src');
         if (empty($source)) {
-            $source = $this->getContext('id');
+            $source = $this->getContext()->getId();
         }
 
         /* Sort order

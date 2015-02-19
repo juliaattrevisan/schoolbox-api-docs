@@ -56,7 +56,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
             $this->setSource($this->getCategoryMapper()->findById($this->getConfig('src')));
         }
         catch (\Exception $e) {
-            $this->setSource($this->getCategoryMapper()->findById($this->getContext('id')));
+            $this->setSource($this->getCategoryMapper()->findById($this->getContext()->getId()));
         }
     }
 
