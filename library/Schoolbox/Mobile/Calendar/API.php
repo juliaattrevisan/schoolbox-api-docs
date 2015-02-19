@@ -482,8 +482,8 @@ class API extends Generic\API
                     'detail'       => Scrub::html($event->getDetail()),
                     'publish_date' => $event->getPublishDate(),
                     'allDay'       => $event->getAllday(),
-                    'startTime'    => $event->getStartTime()->getUsingFormat('H:iA'),
-                    'endTime'      => $event->getEndTime()->getUsingFormat('H:iA'),
+                    'startTime'    => $event->getStartTime()->getUsingFormat('h:iA'),
+                    'endTime'      => $event->getEndTime()->getUsingFormat('h:iA'),
                     /* The author's title - mr, mrs, etc. */
                     //'title' => '',
                     'firstname'    => $event->getAuthorName(),

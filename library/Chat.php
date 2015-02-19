@@ -36,7 +36,7 @@ class Chat extends DeprecatedModel {
 
                 $log['time_js'] = $log_time->format('D M j Y H:i:s \G\M\TO (T)'); // Thu Apr 14 2011 15:54:52 GMT+1000 (EST)
                 $log['stamp'] = $log_time->format('Y-m-d H:i:s');
-                $log['time'] = $log_time->format('H:i:s a');
+                $log['time'] = $log_time->format('h:i:s a');
                 $log['name'] = $userHandler->formatName($log);
                 $log['user_perm'] = $this->group->getPermission($category_id, $log['user_id']);
                 $log['type'] = Scrub::text($log['type']);
