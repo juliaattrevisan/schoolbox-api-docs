@@ -33,11 +33,17 @@ class Alaress_Date_Strategy_DateTime extends Alaress_Date_Strategy_Abstract
     {
         $this->isValid = true;
         if ($dateTime instanceof DateTime) {
-            $this->setDateTimeObject(DateTime::createFromFormat('U', $dateTime->getTimestamp()));
+            $newDateTime = DateTime::createFromFormat('U', $dateTime->getTimestamp());
+            $newDateTime->setTimezone($dateTime->getTimezone());
+            $this->setDateTimeObject($newDateTime);
         } elseif ($dateTime instanceof DateTimeInterface) {
-            $this->setDateTimeObject(DateTime::createFromFormat('U', $dateTime->getTimestamp()));
+            $newDateTime = DateTime::createFromFormat('U', $dateTime->getTimestamp());
+            $newDateTime->setTimezone($dateTime->getTimezone());
+            $this->setDateTimeObject($newDateTime);
         } elseif ($dateTime instanceof Alaress_Date_Format_Interface) {
-            $this->setDateTimeObject(DateTime::createFromFormat('U', $dateTime->getUnixTimestamp()));
+            $newDateTime = DateTime::createFromFormat('U', $dateTime->getDateTimeObject()->getTimestamp());
+            $newDateTime->setTimezone($dateTime->getDateTimeObject()->getTimezone());
+            $this->setDateTimeObject($newDateTime);
         } else {
             if (!isset($inputDateFormat)) {
                 throw new InvalidArgumentException(
