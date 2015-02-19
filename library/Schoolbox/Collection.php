@@ -603,4 +603,30 @@ class Collection implements ICollection, JsonSerializable
     {
         return $this->getStack();
     }
+
+
+    /**
+     * Indexes the collection by the given column.
+     * Be careful! The property indicated by $column should contain unique values. If not, earlier values will be overwritten.
+     *
+     * @param string $column
+     * @return self
+     */
+    public function indexBy($column)
+    {
+        $this->reindex();
+
+        $keys = $this->getColumnValues($column);
+        $len  = count($keys);
+        $new  = array();
+
+        for ($i = 0; $i < $len; ++$i) {
+            $new[$keys[$i]] = $this->stack[$i];
+        }
+
+        $this->setStack($new);
+
+        return $this;
+    }
+
 }
