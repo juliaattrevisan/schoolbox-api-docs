@@ -79,15 +79,19 @@ class Alaress_Date_Strategy_DateTime extends Alaress_Date_Strategy_Abstract
             // * Exception? Null date? current date?
             $errors = DateTime::getLastErrors();
             if ($errors['error_count']) {
-                // I didn't get a datetime at all.
-                $this->isValid = false;
-                throw new RuntimeException(
-                    sprintf(
-                        'DateTime creation failed with %d errors: (%s)',
-                        $errors['error_count'],
-                        implode(', ', $errors['errors'])
-                    )
-                );
+                // Try again with trailing data allowed.
+                $newDateTime = DateTime::createFromFormat($inputDateFormat.'+', $dateTime);
+                if (!($newDateTime instanceof DateTime)) {
+                    // I didn't get a datetime at all.
+                    $this->isValid = false;
+                    throw new RuntimeException(
+                        sprintf(
+                            'DateTime creation failed with %d errors: (%s)',
+                            $errors['error_count'],
+                            implode(', ', $errors['errors'])
+                        )
+                    );
+                }
             }
             if ($errors['warning_count']) {
                 // I have a datetime, but it's not what I expected. Warn the user.
