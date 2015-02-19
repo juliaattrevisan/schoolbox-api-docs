@@ -20,6 +20,21 @@ class Alaress_Date_Strategy_DateTime extends Alaress_Date_Strategy_Abstract
     protected $isValid = false;
 
     /**
+     * @var DateTimeZone
+     */
+    protected $timezone;
+
+    /**
+     * Constructor
+     *
+     * @param DateTimeZone $defaultTimezone The default timezone for this strategy
+     */
+    public function __construct(DateTimeZone $defaultTimezone)
+    {
+        $this->timezone = $defaultTimezone;
+    }
+
+    /**
      * @param DateTimeInterface|Alaress_Date_Format_Interface|string $dateTime
      * @param string                                                 $inputDateFormat
      *
