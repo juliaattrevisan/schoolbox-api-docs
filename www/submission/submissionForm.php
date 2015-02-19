@@ -294,7 +294,7 @@ function generateDate($field, $placeholder)
                 $_POST[$field . '_date'],
                 $placeholder
             ),
-            'd/m/Y'
+            'd/m/Y H:i:s'
         );
     } else {
         $adf = new Alaress_Date_Format(
@@ -305,7 +305,7 @@ function generateDate($field, $placeholder)
                 $_POST[$field . '_minute'],
                 $_POST[$field . '_period']
             ),
-            'd/m/Y a'
+            'd/m/Y h:i a'
         );
     }
     return $adf;
