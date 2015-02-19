@@ -11,6 +11,7 @@ namespace Custom\Meriden\Pastoral;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule\HasRole;
+use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Authorizer\Rule\IsSuperuser;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
@@ -42,14 +43,10 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $authorizer->add(
-            '/^customMeridenPastoral\\.(?:index|subject)/',
-            new IsSuperuser()
-        );
-        $authorizer->add(
-            '/^customMeridenPastoral\\.(?:index|subject)/',
-            new HasRole(Role::STAFF)
-        );
+        $ruleRegexp = '/^customMeridenPastoral\\.(?:index|subject)/';
+        $authorizer->addRule($ruleRegexp, new IsLoggedIn());
+        $authorizer->addRule($ruleRegexp, new IsSuperuser());
+        $authorizer->addRule($ruleRegexp, new HasRole(Role::STAFF));
     }
 
     /**
