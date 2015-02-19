@@ -1,100 +1,4 @@
 <!-- BEGIN custom_head -->
-<style type="text/css">
-  .selectize-control {
-    min-width: 300px;
-    display: inline-block;
-  }
-  .selectize-input {
-    height: 48px;
-  }
-  .selectize-input .navigation-option img {
-    top: 1px;
-  }
-  .selectize-input .navigation-option {
-    width: calc(100% - 24px);
-  }
-  .selectize-input .navigation-option .markstatus {
-    display: none !important;
-  }
-  .navigation-option {
-    position: relative;
-  }
-  .selectize-dropdown-content .navigation-option {
-    padding: 5px 8px;
-  }
-  .navigation-option img {
-    position: absolute;
-    top: 6px;
-  }
-  .navigation-option span {
-    margin-left: 38px;
-    display: block;
-    line-height: 16px;
-  }
-  .navigation-option span.highlight {
-    display: inline;
-    margin-left: 0;
-  }
-  .navigation-option .submitted {
-    text-transform: lowercase;
-    font-variant: small-caps;
-    background-color: #eff;
-    display: inline-block;
-    padding: 0 5px;
-    font-weight: bold;
-  }
-  .navigation-option .submitted.on-time {
-    background-color: #F7FDF1;
-    color: #28A326;
-  }
-  .navigation-option .submitted.late {
-    background-color: #F9E6E6;
-    color: #f00;
-  }
-  .navigation-option .un.submitted {
-    background-color: #EEEEEE;
-    color: #848484;
-  }
-  .navigation-option .markstatus {
-    position: absolute;
-    right: 24px;
-    width: 26px;
-    height: 24px;
-    top: 10px;
-    border-radius: 12px;
-    line-height: 24px;
-    text-align: center;
-    font-size: 18px;
-    display: none;
-    background: transparent url("/images/core/icons/ticks.png") 0 24px no-repeat;
-  }
-  .navigation-option .markstatus.marked {
-    background-position: 0 -72px;
-    display: block;
-  }
-  .navigation-option[data-disabled] {
-    opacity: 0.3;
-  }
-  .dropdown-navigator {
-    width: 59%;
-    position: relative;
-  }
-  .dropdown-navigator .nav {
-    opacity: 0.2;
-    display: inline-block;
-    height: 40px;
-    line-height: 40px;
-    position: relative;
-    top: -20px;
-  }
-  .dropdown-navigator .nav[href] {
-    opacity: 1;
-  }
-  label[for=skipUnsubmitted] {
-    height: 48px;
-    line-height: 48px;
-  }
-</style>
 <script src="/javascript/components/qtip2/jquery.qtip.js" type="text/javascript"></script>
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.js"></script>
 <script src="/javascript/jquery.combobox.js" type="text/javascript"></script>
@@ -213,8 +117,7 @@
   <a class="nav previous-item" href="" title="">&lsaquo;</a>
   <select name="student-select"></select>
   <a class="nav next-item" href="" title="">&rsaquo;</a>
-  <div class="float-right">
-    <form action="/submission/inlineGrading/configForm.php" method="post">
+  <form action="/submission/inlineGrading/configForm.php" method="post">
       <input type="hidden" name='boxId' value="{BOX_ID}" />
       <input type="hidden" name="userId" value="{INLINE_GRADING_STUDENT_ID}" />
       <input type="hidden" name="skipUnsubmitted" value="0" />
@@ -222,8 +125,7 @@
         <input type="checkbox" name="skipUnsubmitted" id="skipUnsubmitted" {SKIP_UNSUBMITTED_CHECKED} value='1' />
         <strong>Skip Unsubmitted</strong>
       </label>
-    </form>
-  </div>
+  </form>
 </div>
 
 <div class="clearfix"></div>
