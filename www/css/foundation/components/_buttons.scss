@@ -33,13 +33,13 @@ $button-font-weight: $font-weight-bold;
 // $button-border-width: 0px;
 // $button-border-style: solid;
 $button-bg-color: $primary-color;
-$button-bg-hover: tint($button-bg-color, 16%);
+$button-bg-hover: tint($button-bg-color, 12%);
 $button-border-color: transparent;
-$secondary-button-bg-hover: tint($secondary-color, 16%);
+$secondary-button-bg-hover: tint($secondary-color, 12%);
 $secondary-button-border-color: transparent;
-$success-button-bg-hover: tint($success-color, 16%);
+$success-button-bg-hover: tint($success-color, 12%);
 $success-button-border-color: transparent;
-$alert-button-bg-hover: tint($alert-color, 16%);
+$alert-button-bg-hover: tint($alert-color, 12%);
 $alert-button-border-color: transparent;
 
 // We use this to set the default radius used throughout the core.
@@ -290,7 +290,8 @@ $tabs-content-padding: ($column-gutter/5);
 //
 // CUSTOM OVERRIDES
 //
-.button 						{ padding: 0.825rem 2.5rem;
+.button,
+input[type=submit]				{ padding: 0.825rem 2.5rem; border: none;
 	&.secondary 				{ color: $primary-color;
 		&:hover 				{ color: $primary-color; }
 	}
@@ -298,6 +299,8 @@ $tabs-content-padding: ($column-gutter/5);
 		&:hover 				{ background-color: tint($warning-color, 11%); }
 	}
 }
+
+input[type=submit] 				{ @include button-style; }
 
 // Button Group
 .button-group > li {
@@ -337,7 +340,42 @@ $tabs-content-padding: ($column-gutter/5);
 	li:first-child a 			{ padding-left: 22px; }
 }
 
-.f-dropdown.content 			{ background-color: $f-dropdown-content-bg; }
+.f-dropdown.open						{ 
+	.content 					{ background-color: $f-dropdown-content-bg; }
+}
 
 ul.pagination li a,
 ul.pagination li button 		{ background-color: tint($tertiary, 74%); border-radius: 0px; font-weight: $font-weight-bold; }
+
+@-webkit-keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -100%, 0);
+            transform: translate3d(0, -100%, 0);
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: none;
+            transform: none;
+  }
+}
+
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -100%, 0);
+            transform: translate3d(0, -100%, 0);
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: none;
+            transform: none;
+  }
+}
+
+.fadeInDown {
+  -webkit-animation-name: fadeInDown;
+          animation-name: fadeInDown;
+}

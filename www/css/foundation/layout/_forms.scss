@@ -10,11 +10,11 @@ $form-spacing: rem-calc(22);
 // We use these to style the labels in different ways
 // $form-label-pointer: pointer;
 $form-label-font-size: rem-calc(16);
-$form-label-font-weight: $font-weight-normal;
-$form-label-line-height: 1.5rem;
+$form-label-font-weight: $font-weight-bold;
+$form-label-line-height: 1.4rem;
 $form-label-font-color: $black;
 // $form-label-small-transform: capitalize;
-$form-label-bottom-margin: 0;
+$form-label-bottom-margin: rem-calc(16);
 // $input-font-family: inherit;
 $input-font-color: $body-grey;
 $input-font-size: rem-calc(16);
@@ -125,7 +125,7 @@ $switch-negative-color: tint($secondary-color, 74%);
 // Custom overrides
 //
 
-form 						{ @include placeholder-color($body-grey); @include placeholder-hover-color($black); }
+form 						{ @include placeholder-color($body-grey, $font-weight-normal); @include placeholder-hover-color($black); }
 
 input 						{ height: 3rem; }
 input,
@@ -156,6 +156,49 @@ input[type=radio]:checked +
 label.radio-label			{ background-position: 0 -48px; }
 input[type=checkbox]:checked +
 label.checkbox-label		{ background-position: 0 -120px; }
+
+
+//  DATEPICKER
+.ui-datepicker{
+	@include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));
+}
+
+.ui-datepicker-calendar{
+	margin: 0;
+
+	thead,
+	tr.even,
+	tr.alt,
+	tr{
+		background-color: $secondary-color !important;
+	}
+	.ui-datepicker-today{
+		background-color: $white;
+	}
+	td:hover{
+		background-color: tint($tertiary, 87%);
+	}
+}
+
+.ui-datepicker-header{
+	background-color: $secondary-color;
+	color: $primary-color;
+	font-weight: $font-weight-bold;
+	padding: 1rem;
+}
+
+.ui-datepicker-title{
+	text-align: center;
+}
+
+.ui-datepicker-prev{
+	float: left;
+}
+
+.ui-datepicker-next{
+	float: right;
+}
+
 
 
 //	DROPZONE

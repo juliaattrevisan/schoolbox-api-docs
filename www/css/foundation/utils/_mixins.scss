@@ -105,11 +105,11 @@
 	transition-timing-function: $transition-timing-function;
 }
 
-@mixin placeholder-color($color) {
-	::-webkit-input-placeholder { color: $color; }
-	:-ms-input-placeholder { color: $color; }
-	:-moz-placeholder { color: $color; }
-	::-moz-placeholder { color: $color; }
+@mixin placeholder-color($color, $font-weight) {
+	::-webkit-input-placeholder { color: $color; font-weight: $font-weight; }
+	:-ms-input-placeholder { color: $color; font-weight: $font-weight; }
+	:-moz-placeholder { color: $color; font-weight: $font-weight; }
+	::-moz-placeholder { color: $color; font-weight: $font-weight; }
 }
 
 @mixin placeholder-hover-color($color) {

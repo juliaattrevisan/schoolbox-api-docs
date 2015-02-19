@@ -200,12 +200,12 @@
 		        	    	<p class="meta"><a href="#">Student Services</a> > <a href="#">School Councellors Office</a></p>
 		        	    	<p class="meta">228.53 KB | Uploaded by <a href="#">Alaress Admin</a> on 12th Apr 2013</p>
 	        	    	</div>
-	        	    	<span class="actions small-12 medium-3 large-3">
+	        	    	<span class="actions small-12 medium-3 large-3 fadeInDown">
 	        	    		<a href="#" data-dropdown="tinyDrop"><span class="icon-menu no-text"></span></a>
 	        	    	</span>
 					</div>
         	    </li>
-    	    	<ul class="f-dropdown" data-dropdown-content="Mank" id="tinyDrop">
+    	    	<ul class="f-dropdown fadeInDown" data-dropdown-content="Mank" id="tinyDrop">
 		            <li><a href="#" class="icon-duework">Due Work</a></li>
 	            	<li><a href="#" class="icon-approve">Grades</a></li>
 	            	<li><a href="#" class="icon-eportfolio">ePortfolio</a></li>
@@ -353,6 +353,88 @@
 	            </tr>
 	            </tbody>
 	        </table>
+		</div>
+
+		<div class="island-panel component large-12">
+			<h2>Post Due Work</h2>
+			<form data-abide>
+                <div class="large-12">
+                    <label>Title
+                        <input type="text" placeholder="Bald Mank World" />
+                    </label>
+	            </div>
+                <div class="large-12">
+                    <label>Description
+                        <textarea placeholder="Bald Mank World" rows="4"></textarea>
+                    </label>
+                </div>
+                <div class="large-12">
+                    <label>Due Work Type
+                    	<p class="desc"><i>What kind of assessment is this?</i></p>
+                        <select>
+                            <option value="husker">Assessment Task</option>
+                            <option value="starbuck">Starbuck</option>
+                            <option value="hotdog">Hot Dog</option>
+                            <option value="apollo">Apollo</option>
+                        </select>
+                    </label>
+                </div>
+				<div class="large-12">
+                    <label>Mark Type
+                    	<p class="desc"><i>How this assessment will be graded.</i></p>
+                        <select>
+                            <option value="husker">Percentage (%)</option>
+                            <option value="starbuck">Starbuck</option>
+                            <option value="hotdog">Hot Dog</option>
+                            <option value="apollo">Apollo</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="large-12">
+                    <label>Mark Visibility
+                    	<p class="desc"><i>Who will be able to view marks for this assessment?</i></p>
+                        <select>
+                            <option value="husker">Staff, Students & their Parents</option>
+                            <option value="starbuck">Starbuck</option>
+                            <option value="hotdog">Hot Dog</option>
+                            <option value="apollo">Apollo</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="large-12">
+                    <label>Mark Weight
+                    	<p class="desc"><i>What is the weighting of this due work towards the student's overall grade average? (Default is 0)</i></p>
+                        <input type="text" placeholder="Bald Mank World" />
+                    </label>
+                </div>
+                <div class="large-6">
+                    <label>Accept Submissions
+						<p class="desc"><i>Will this work be submitted electronically?</i></p>
+                    </label>
+                    <input id="checkbox1" type="checkbox"><label for="checkbox1" class="checkbox-label">Bald Mank World</label>
+                </div>
+				<div class="large-12">
+                    <label>Publish Date
+                    	<p class="desc"><i>This due work will not show on your student's calendar until this date. To publish at the start of the day, leave the time fields blank.</i></p>
+                        <input type="text" placeholder="Bald Mank World" />
+                    </label>
+                </div>
+                <div class="large-12 columns">
+                	<div class="large-12 columns">
+	                    <label>Due Date
+	                    	<p class="desc"><i>Actual date the work is due. This is the date that will be published. To allow submissions until the end of the day, leave the time fields blank.</i></p>
+	                        <input type="text" placeholder="Bald Mank World"id="datepicker" />
+	                    </label>
+                    </div>
+                <div class="large-12 columns">
+	                <div class="large-2 columns">
+	                    <input type="text" placeholder="2" maxlength="2" /> 
+	                    <input type="text" placeholder="00" maxlength="2" />
+	                    <div class="large-4"></div>
+                    </div>
+				</div>
+            	<input type="submit" name='submit' value="Send" />
+	        </form>
 		</div>
 
 	</div>
