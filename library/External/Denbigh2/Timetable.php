@@ -124,15 +124,27 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
      */
     public function getDayNumber($campusId, $date = 0)
     {
-        $api = new External_Denbigh2_Api('CurrentDay', array());
+        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
+            "extdb:" . INSTANCE_ID . ":denbigh2.getTimetableDefinition",
 
-        if (!$api->hasErrors()) {
-            return $api->getResult()->data[0]->{'Current Day of Cycle'};
-        }
+            function ($params) {
+                $dayNumber = 1;
 
-        /* Just highlight day 1 by default, I guess
-         */
-        return 1;
+                $api = new External_Denbigh2_Api('CurrentDay', array());
+
+                if (!$api->hasErrors()) {
+                    $dayNumber = $api->getResult()->data[0]->{'Current Day of Cycle'};
+                }
+
+                /* Just highlight day 1 by default, I guess
+                 */
+                return serialize($dayNumber);
+            },
+            null,
+            $this->getCacheTime()
+        );
+
+        return unserialize($encoded);
     }
 
     /**
