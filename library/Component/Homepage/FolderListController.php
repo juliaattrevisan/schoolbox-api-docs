@@ -8,17 +8,25 @@
  */
 class Component_Homepage_FolderListController extends Component_Homepage_ControllerAbstract
 {
-
-    /**
-     * @var array
-     */
-    private $source;
-
     /**
      * @var Group
      */
     private $groupHandler;
-
+    
+    /**
+     * An instance of Category
+     *
+     * @var \Schoolbox\Resource\Category
+     */
+    private $source;
+    
+    /**
+     * Category Mapper
+     *
+     * @var \Schoolbox\Resource\CategoryMapper
+     */
+    private $categoryMapper = null;
+    
     /**
      * Prepares data for the render function. Business logic.
      *
@@ -27,6 +35,9 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
     public function execute()
     {
         $this->groupHandler = new Group();
+
+        $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
+
         $this->source = $this->getContext();
 
         // remove any non-numeric values from the source config
@@ -122,5 +133,28 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
         }
 
         return true;
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Set category mapper
+     *
+     * @param null $categoryMapper
+     */
+    private function setCategoryMapper($categoryMapper)
+    {
+        $this->categoryMapper = $categoryMapper;
+    }
+
+    /**
+     * Get category mapper
+     *
+     * @return null
+     */
+    private function getCategoryMapper()
+    {
+        return $this->categoryMapper;
     }
 }
