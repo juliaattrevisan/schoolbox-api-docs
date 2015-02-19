@@ -32,6 +32,15 @@ class External_Denbigh2_Api {
     private $curl = null;
 
     /**
+     * Because sometimes columns get renamed randomly, databases
+     * copied incompletely etc. store the generated url request
+     * for debugging in $api->getErrors()
+     *
+     * @var string
+     */
+    private $generatedRequestUrl = '';
+
+    /**
      * $url is the data file ie. Students.json, Staff.json etc
      * $keyvalues is a key-value array
      *
@@ -50,7 +59,9 @@ class External_Denbigh2_Api {
         $this->setHost(\Cfg::get('external_db_host'));
         $this->setKey(\Cfg::get('external_db_passwd'));
 
-        $curl = new \Alaress_Curl_Url($this->generateGetRequest($type, $keyvalues, $options));
+        $this->generateGetRequest($type, $keyvalues, $options);
+
+        $curl = new \Alaress_Curl_Url($this->getGeneratedRequestUrl());
         $this->setCurl($curl)->getCurl()->exec();
     }
 
@@ -60,7 +71,6 @@ class External_Denbigh2_Api {
      * @param $type
      * @param $keyvalues
      * @param $options
-     * @return string
      */
     private function generateGetRequest($type, $keyvalues, $options) {
 
@@ -101,7 +111,7 @@ class External_Denbigh2_Api {
          */
         $querystring = http_build_query($dataset);
 
-        return "{$url}?{$querystring}";
+        $this->setGeneratedRequestUrl("{$url}?{$querystring}");
     }
 
     /**
@@ -147,7 +157,10 @@ class External_Denbigh2_Api {
     private function getFilemakerError() {
         $filemakerError = json_decode($this->getCurl()->getResult());
 
-        return array($filemakerError->info);
+        return array(
+            'request' => $this->getGeneratedRequestUrl(),
+            'response' => $filemakerError->info,
+        );
     }
 
     /**
@@ -260,5 +273,25 @@ class External_Denbigh2_Api {
     private function getKey()
     {
         return $this->key;
+    }
+
+    /**
+     * Set generated request url
+     *
+     * @param string $generatedRequestUrl
+     */
+    private function setGeneratedRequestUrl($generatedRequestUrl)
+    {
+        $this->generatedRequestUrl = $generatedRequestUrl;
+    }
+
+    /**
+     * Get generated request url
+     *
+     * @return string
+     */
+    private function getGeneratedRequestUrl()
+    {
+        return $this->generatedRequestUrl;
     }
 }
