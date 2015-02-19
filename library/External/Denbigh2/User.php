@@ -1216,6 +1216,7 @@ class External_Denbigh2_User implements External_UserInterface
                     ));
                 }
 
+
                 /* Deal with the pic
                  */
                 if (!$api->hasErrors()) {
@@ -1232,10 +1233,9 @@ class External_Denbigh2_User implements External_UserInterface
                          */
                         $cacheTime = @filemtime($photoPath);
 
-                        /* TODO: Denbigh didn't provide a modified date
-                         * $modifiedTime = strtotime($photo['ModifiedDate']);
+                        /* Denbigh only provided a modified date, without time
                          */
-                        $modifiedTime = $_SERVER['REQUEST_TIME'];
+                        $modifiedTime = strtotime($api->getResult()->data[0]->{'z_ModificationDate'});
 
                         if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
                             $binary = base64_decode($api->getResult()->data[0]->{'PhotoBase64Encoded'});
