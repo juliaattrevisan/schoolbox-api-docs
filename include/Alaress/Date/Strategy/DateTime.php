@@ -32,10 +32,12 @@ class Alaress_Date_Strategy_DateTime extends Alaress_Date_Strategy_Abstract
     public function setFromFormat($dateTime, $inputDateFormat)
     {
         $this->isValid = true;
-        if ($dateTime instanceof DateTimeInterface) {
-            $this->setDateTimeObject($dateTime);
+        if ($dateTime instanceof DateTime) {
+            $this->setDateTimeObject(DateTime::createFromFormat('U', $dateTime->getTimestamp()));
+        } elseif ($dateTime instanceof DateTimeInterface) {
+            $this->setDateTimeObject(DateTime::createFromFormat('U', $dateTime->getTimestamp()));
         } elseif ($dateTime instanceof Alaress_Date_Format_Interface) {
-            $this->setDateTimeObject(clone $dateTime->getDateTimeObject());
+            $this->setDateTimeObject(DateTime::createFromFormat('U', $dateTime->getUnixTimestamp()));
         } else {
             if (!isset($inputDateFormat)) {
                 throw new InvalidArgumentException(
