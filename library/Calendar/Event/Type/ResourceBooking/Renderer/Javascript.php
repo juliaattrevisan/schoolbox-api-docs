@@ -142,21 +142,17 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
             }
         }
 
-        // Title: defaults to "Booking: $event.name",
-        // but could have been set in the booking itself.
-        // If it was, put a note in the detail that this is for a booking.
-        $title  = $currentEvent->getTitle();
-        $detail = $currentEvent->getDetail();
-        if (strlen($title) === 0) {
-            $title = 'Booking: '.$currentEvent->getBooking()->getResource()->getName();
-        } else {
-            $detail = sprintf(
-                "(Booking for: %s)<br />%s",
-                $currentEvent->getBooking()->getResource()->getName(),
-                $detail
-            );
+        // Set title from resource name, and code and booking name
+        // if either are there.
+        $title = $currentEvent->getBooking()->getResource()->getName();
+        if ($currentEvent->getBooking()->getResource()->getRoomCode()) {
+            $title .= ' ['.$currentEvent->getBooking()->getResource()->getRoomCode().']';
         }
-        $event = array(
+        if ($currentEvent->getBooking()->getName()) {
+            $title .= ': '.$currentEvent->getBooking()->getName();
+        }
+        $detail = $currentEvent->getDetail();
+        $event  = array(
             'title' => $title,
             'start' => "$start",
             'end' => "$end",
