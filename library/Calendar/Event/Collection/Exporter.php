@@ -47,13 +47,12 @@ class Calendar_Event_Collection_Exporter extends Calendar_Event_Collection_Rende
 		$renderer   = new Calendar_Event_Type_Exporter_VObject(null);
 		$renderer->setVCalendar($v);
 
+		// Output base calendar, and output its start and end separately
+		echo trim(str_replace('END:VCALENDAR', '', $v->serialize()))."\r\n";
 		foreach ($collection as $currentEvent) {
 			$currentEvent->accept($renderer);
-//			$component = $currentEvent->accept($renderer);
-//			if ($component instanceof calendarComponent) {
-//				$v->addComponent($component);
-//			}
 		}
+		echo "END:VCALENDAR";
 
 		//
 		// Add timezone AFTER adding all events. Hooray, IcalCreator is smart
@@ -61,6 +60,6 @@ class Calendar_Event_Collection_Exporter extends Calendar_Event_Collection_Rende
 //		iCalUtilityFunctions::createTimezone($v, Cfg::get('date_timezone'));
 //		$str = $v->output();
 //		echo $str;
-		echo $v->serialize();
+//		echo $v->serialize();
 	}
 }
