@@ -47,12 +47,15 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 	 *
 	 * @param string|object $dateTime
 	 * @param string        $dateFormat
+	 * @param DateTimeZone  $timezone   The timezone of the date, or null to use default
 	 */
-	public function __construct($dateTime = null, $dateFormat = null) {
-		try {
-			$timezone = new DateTimeZone(Config::get('date_timezone'));
-		} catch (Exception $e) {
-			$timezone = new DateTimeZone(date_default_timezone_get());
+	public function __construct($dateTime = null, $dateFormat = null, DateTimeZone $timezone = null) {
+		if (!($timezone instanceof DateTimeZone)) {
+			try {
+				$timezone = new DateTimeZone(Config::get('date_timezone'));
+			} catch (Exception $e) {
+				$timezone = new DateTimeZone(date_default_timezone_get());
+			}
 		}
 		$strategy = new Alaress_Date_Strategy_DateTime($timezone);
 		$strategy->setFromFormat($dateTime, $dateFormat);
