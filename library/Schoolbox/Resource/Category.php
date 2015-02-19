@@ -20,26 +20,36 @@ use Schoolbox\ISoftDeletable;
 class Category implements ISoftDeletable, FolderInterface
 {
     /**
+     * Identifier
+     *
      * @var int
      */
     protected $id;
 
     /**
+     * Category name
+     *
      * @var string
      */
     protected $name;
 
     /**
+     * A category instance
+     *
      * @var Category
      */
     protected $parent;
 
     /**
+     * A homepage instance
+     *
      * @var \Schoolbox\Resource\HomepageConfig
      */
     protected $homepage;
 
     /**
+     * A collection of CategoryCode() instances
+     *
      * @var Collection
      */
     protected $codes;
@@ -60,14 +70,23 @@ class Category implements ISoftDeletable, FolderInterface
     protected $taskCount;
 
     /**
+     * A group instance
      *
      * @var \Schoolbox\Resource\Group
      */
     protected $group;
 
-    /** @var Collection */
+    /**
+     * A collection of user instances
+     *
+     * @var Collection
+     */
     protected $teacher_collection;
 
+    /**
+     * Constructor
+     *
+     */
     public function __construct()
     {
         $this->setCodes(new Collection(array()));
@@ -84,26 +103,9 @@ class Category implements ISoftDeletable, FolderInterface
     }
 
     /**
-     * @param  Collection $codes
-     * @return $this
-     */
-    public function setCodes($codes)
-    {
-        $this->codes = $codes;
-        return $this;
-    }
-
-    /**
-     * @return Collection|CategoryCode[]
-     */
-    public function getCodes()
-    {
-        return $this->codes;
-    }
-
-    /**
-     * Gets your category codes in a , separated string
+     * Get code string
      *
+     * Gets your category codes in a , seperated string
      * @return string
      */
     public function getCodeString()
@@ -124,6 +126,8 @@ class Category implements ISoftDeletable, FolderInterface
     }
 
     /**
+     * Add code
+     *
      * @param  CategoryCode $code
      * @return $this
      */
@@ -132,108 +136,7 @@ class Category implements ISoftDeletable, FolderInterface
         $this->getCodes()->add($code);
         return $this;
     }
-
-    /**
-     * @param  int $id
-     * @return $this
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param  string $name
-     * @return $this
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * @param  Category $parent
-     * @return $this
-     */
-    public function setParent($parent)
-    {
-        $this->parent = $parent;
-        return $this;
-    }
-
-    /**
-     * @return Category
-     */
-    public function getParent()
-    {
-        return $this->parent;
-    }
-
-    /**
-     * @param \Schoolbox\Resource\HomepageConfig $homepage
-     * @return $this
-     */
-    public function setHomepage($homepage)
-    {
-        $this->homepage = $homepage;
-        return $this;
-    }
-
-    /**
-     * @return \Schoolbox\Resource\HomepageConfig
-     */
-    public function getHomepage()
-    {
-        return $this->homepage;
-    }
-
-    /**
-     * @param \Schoolbox\Resource\Group $group
-     * @return $this
-     */
-    public function setGroup($group)
-    {
-        $this->group = $group;
-        return $this;
-    }
-
-    /**
-     * @return \Schoolbox\Resource\Group
-     */
-    public function getGroup()
-    {
-        return $this->group;
-    }
-
-    /**
-     * Returns the teacher collection
-     *
-     * @return Collection|User[]
-     */
-    public function getTeachers()
-    {
-        return $this->teacher_collection;
-    }
-
-
+    
     /**
      * Populates the teacher collection
      *
@@ -261,42 +164,6 @@ class Category implements ISoftDeletable, FolderInterface
         }
 
         // do we include staff included in this category internally as well? for now, no.
-
-    }
-
-    /**
-     * @param \Alaress_Date_Format $deletedAt
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-    }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
-    }
-
-    /**
-     * @return int
-     */
-    public function getTaskCount()
-    {
-        return $this->taskCount;
-    }
-
-    /**
-     * @param  int $taskCount
-     *
-     * @return $this
-     */
-    public function setTaskCount($taskCount)
-    {
-        $this->taskCount = $taskCount;
-        return $this;
     }
 
     /**
@@ -313,15 +180,197 @@ class Category implements ISoftDeletable, FolderInterface
         return $this->hasHomepage() ? 'home' : 'folder';
     }
 
-    //
-    // TODO implement group type, user access joins
-//	protected $user_access;
-
     /**
+     * Is deleted
+     * 
      * @return bool
      */
     public function isDeleted()
     {
         return ($this->getDeletedAt() instanceof \Alaress_Date_Format);
+    }
+    
+    /* Getters/Setters
+     */
+
+    /**
+     * @param  Collection $codes
+     * @return $this
+     */
+    public function setCodes($codes)
+    {
+        $this->codes = $codes;
+        return $this;
+    }
+
+    /**
+     * @return Collection|CategoryCode[]
+     */
+    public function getCodes()
+    {
+        return $this->codes;
+    }
+    
+    /**
+     * Set id
+     * 
+     * @param  int $id
+     * @return $this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * Get id
+     *
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set name
+     *
+     * @param  string $name
+     * @return $this
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Set parent
+     *
+     * @param  Category $parent
+     * @return $this
+     */
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
+        return $this;
+    }
+
+    /**
+     * Get parent
+     *
+     * @return Category
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * Set homepage
+     *
+     * @param \Schoolbox\Resource\HomepageConfig $homepage
+     * @return $this
+     */
+    public function setHomepage($homepage)
+    {
+        $this->homepage = $homepage;
+        return $this;
+    }
+
+    /**
+     * Get homepage
+     *
+     * @return \Schoolbox\Resource\HomepageConfig
+     */
+    public function getHomepage()
+    {
+        return $this->homepage;
+    }
+
+    /**
+     * Set group
+     *
+     * @param \Schoolbox\Resource\Group $group
+     * @return $this
+     */
+    public function setGroup($group)
+    {
+        $this->group = $group;
+        return $this;
+    }
+
+    /**
+     * Get group
+     *
+     * @return \Schoolbox\Resource\Group
+     */
+    public function getGroup()
+    {
+        return $this->group;
+    }
+
+    /**
+     * Returns the teacher collection
+     *
+     * @return Collection|User[]
+     */
+    public function getTeachers()
+    {
+        return $this->teacher_collection;
+    }
+    
+    /**
+     * Set deleted at
+     * 
+     * @param \Alaress_Date_Format $deletedAt
+     */
+    public function setDeletedAt($deletedAt)
+    {
+        $this->deletedAt = $deletedAt;
+    }
+
+    /**
+     * Get deleted at
+     *
+     * @return \Alaress_Date_Format
+     */
+    public function getDeletedAt()
+    {
+        return $this->deletedAt;
+    }
+
+    /**
+     * Get task count
+     *
+     * @return int
+     */
+    public function getTaskCount()
+    {
+        return $this->taskCount;
+    }
+
+    /**
+     * Set task count
+     *
+     * @param  int $taskCount
+     *
+     * @return $this
+     */
+    public function setTaskCount($taskCount)
+    {
+        $this->taskCount = $taskCount;
+        return $this;
     }
 }
