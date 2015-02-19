@@ -47,7 +47,12 @@ class Alaress_Date_Strategy_DateTime extends Alaress_Date_Strategy_Abstract
     public function setFromFormat($dateTime, $inputDateFormat)
     {
         $this->isValid = true;
-        if ($dateTime instanceof DateTime) {
+        if (!isset($dateTime)) {
+            // Nothing set? set it to now
+            $newDateTime = new DateTime();
+            $newDateTime->setTimezone($this->timezone);
+            $this->setDateTimeObject($newDateTime);
+        } elseif ($dateTime instanceof DateTime) {
             $newDateTime = DateTime::createFromFormat('U', $dateTime->getTimestamp());
             $newDateTime->setTimezone($dateTime->getTimezone());
             $this->setDateTimeObject($newDateTime);
