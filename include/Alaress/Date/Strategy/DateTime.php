@@ -68,11 +68,6 @@ class Alaress_Date_Strategy_DateTime extends Alaress_Date_Strategy_Abstract
             // Discard setDateComponents and setTimeComponents
             $dateTime = DateTime::createFromFormat($inputDateFormat, $dateTime);
 
-            // Did I specify a timezone? If not, set it to the default
-            if (!preg_match('/[eOPT]/', $inputDateFormat)) {
-                $dateTime->setTimezone($this->timezone);
-            }
-
             // Check for errors or warnings
             // Question: how tolerant of bad data do we want to be?
             // On bad data:
@@ -101,6 +96,11 @@ class Alaress_Date_Strategy_DateTime extends Alaress_Date_Strategy_Abstract
                     ),
                     E_USER_WARNING
                 );
+            }
+
+            // Did I specify a timezone? If not, set it to the default
+            if (!preg_match('/[eOPT]/', $inputDateFormat)) {
+                $dateTime->setTimezone($this->timezone);
             }
             $this->setDateTimeObject($dateTime);
         }
