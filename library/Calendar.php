@@ -554,7 +554,7 @@ class Calendar extends DeprecatedModel
                 $event->setSubmissionBoxName($submission['name']);
                 $event->setSubmissionBoxDetail($submission['description']);
                 $event->setColour($this->displayColour(4));
-                $event->setStartTime(new Alaress_Date_Format($submission['date'], 'y-m-d h:i:s'));
+                $event->setStartTime(new Alaress_Date_Format($submission['date'], 'y-m-d H:i:s'));
                 $event->setAllDay(stristr($submission['date'], '23:59:59'));
 
                 $stack->add($event);
@@ -848,13 +848,13 @@ class Calendar extends DeprecatedModel
                 $event->setStartTime(
                     new Alaress_Date_Format(
                         $currentEvent['startDate'] . ' ' . $currentEvent['startTime'],
-                        'y-m-d h:i:s'
+                        'y-m-d H:i:s'
                     )
                 );
                 $event->setEndTime(
                     new Alaress_Date_Format(
                         $currentEvent['endDate'] . ' ' . $currentEvent['endTime'],
-                        'y-m-d h:i:s'
+                        'y-m-d H:i:s'
                     )
                 );
                 $event->setType($currentEvent['type']);

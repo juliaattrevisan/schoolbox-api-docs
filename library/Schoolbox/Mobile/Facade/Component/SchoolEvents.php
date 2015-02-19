@@ -30,7 +30,7 @@ class SchoolEvents extends Generic {
         $calendarHandler = $calFactory->produce();
 
         $now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
-        $start = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'y-m-d h:i:s');
+        $start = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'y-m-d H:i:s');
         $end = new Alaress_Date_Format($start);
         $end->addDays(1);
 

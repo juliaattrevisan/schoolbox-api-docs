@@ -134,7 +134,7 @@ class Leave_Request {
      * @return Alaress_Date_Format
      */
     public function getFinish() {
-        return new Alaress_Date_Format($this->finish, 'y-m-d h:i:s');
+        return new Alaress_Date_Format($this->finish, 'y-m-d H:i:s');
     }
 
     /**
@@ -225,7 +225,7 @@ class Leave_Request {
      * @return Alaress_Date_Format
      */
     public function getStart() {
-        return new Alaress_Date_Format($this->start, 'y-m-d h:i:s');
+        return new Alaress_Date_Format($this->start, 'y-m-d H:i:s');
     }
 
     /**

@@ -428,8 +428,8 @@ class Leave_Controller extends Controller
         /* Limit leave creation to a threshold
 		 */
         if ($this->isOutsideCreationThreshold($data['request']['start']['date'])) {
-            $start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/y h:i:s');
-            $finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/y h:i:s');
+            $start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/y H:i:s');
+            $finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/y H:i:s');
             $created = new Alaress_Date_Format(time(), 'U');
             $request = new Leave_Request();
 
@@ -673,8 +673,8 @@ class Leave_Controller extends Controller
             throw new Exception_Schoolbox_NotFound('Request not found');
         }
 
-        $start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/y h:i:s');
-        $finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/y h:i:s');
+        $start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/y H:i:s');
+        $finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/y H:i:s');
 
         $request->setStart($start->getDatabase());
         $request->setFinish($finish->getDatabase());

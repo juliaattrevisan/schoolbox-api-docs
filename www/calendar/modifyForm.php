@@ -83,8 +83,8 @@ switch ($_POST['action']) {
             . ' ' . $_POST['endHour']
             . ':' . $_POST['endMinute']
             . ' ' . $_POST['endPeriod'];
-        $startDate = new Alaress_Date_Format($start, 'd/m/y h:i z');
-        $endDate   = new Alaress_Date_Format($end, 'd/m/y h:i z');
+        $startDate = new Alaress_Date_Format($start, 'd/m/y H:i z');
+        $endDate   = new Alaress_Date_Format($end, 'd/m/y H:i z');
         // Don't allow start to be after end
         if ($startDate->getUnixTimestamp() > $endDate->getUnixTimestamp()) {
             error(145);

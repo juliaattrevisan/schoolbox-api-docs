@@ -16,7 +16,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk_PayloadTest {
 	private $listName = 'Master Calendar';
 	private $rowLimit = 100;
 
-	/* Should be in database date format yyyy-mm-dd hh:ii:ss
+	/* Should be in database date format yyyy-mm-dd hH:ii:ss
 	 */
 	private $startDate = '';
 	private $endDate = '';

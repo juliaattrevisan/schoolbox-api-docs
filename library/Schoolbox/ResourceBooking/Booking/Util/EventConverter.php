@@ -39,10 +39,10 @@ class EventConverter {
     public function convertEventToCalendarEvent(Event $eventItem, Booking\Model $booking) {
         /* Convert dates ;(
          */
-        $startDateTime = new \Alaress_Date_Format($eventItem->getStartDate() . ' ' . $eventItem->getStartTime(), 'y-m-d h:i:s');
+        $startDateTime = new \Alaress_Date_Format($eventItem->getStartDate() . ' ' . $eventItem->getStartTime(), 'y-m-d H:i:s');
         $eventItem->setStartDateTime($startDateTime);
 
-        $endDateTime = new \Alaress_Date_Format($eventItem->getEndDate() . ' ' . $eventItem->getEndTime(), 'y-m-d h:i:s');
+        $endDateTime = new \Alaress_Date_Format($eventItem->getEndDate() . ' ' . $eventItem->getEndTime(), 'y-m-d H:i:s');
         $eventItem->setEndDateTime($endDateTime);
 
         /* Translate a \Schoolbox\Event type into a

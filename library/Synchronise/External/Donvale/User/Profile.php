@@ -37,7 +37,7 @@ class Synchronise_External_Donvale_User_Profile {
 	 * @return PDOStatement
 	 */
 	public function createUpdate() {
-		$date = new Alaress_Date_Format($this->getDob(), 'd/m/y h:i:s');
+		$date = new Alaress_Date_Format($this->getDob(), 'd/m/y H:i:s');
 
 		$profileData = array(
 			'userId' => $this->getUserId(),

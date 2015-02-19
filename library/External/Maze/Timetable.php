@@ -519,8 +519,8 @@ class External_Maze_Timetable implements External_TimetableInterface
         if (is_array($result) && count($result)) {
             foreach ($result as $currentResult) {
                 $processed[] = array(
-                    'startTime' => new \Alaress_Date_Format($currentResult['startTime'], 'y-m-d h:i:s'),
-                    'endTime'   => new \Alaress_Date_Format($currentResult['endTime'], 'y-m-d h:i:s'),
+                    'startTime' => new \Alaress_Date_Format($currentResult['startTime'], 'y-m-d H:i:s'),
+                    'endTime'   => new \Alaress_Date_Format($currentResult['endTime'], 'y-m-d H:i:s'),
                 );
             }
         }

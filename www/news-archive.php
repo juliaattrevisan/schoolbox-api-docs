@@ -269,7 +269,7 @@ if (is_array($items)) {
             /* Show publish date to administrators if it's in the future
              */
             if ($hasAdminAccess) {
-                $publishDate = new Alaress_Date_Format($article['item_datetime_published'], 'y-m-d h:i:s');
+                $publishDate = new Alaress_Date_Format($article['item_datetime_published'], 'y-m-d H:i:s');
 
                 if ($publishDate->getUnixTimestamp() > time()) {
                     $this->setVar(

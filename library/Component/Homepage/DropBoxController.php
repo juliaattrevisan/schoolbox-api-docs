@@ -69,7 +69,7 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
             if (is_array($fileList)) {
                 $j = 0;
                 foreach ($fileList as $file) {
-                    $date = new Alaress_Date_Format($file['subdate'], 'y-m-d h:i:s');
+                    $date = new Alaress_Date_Format($file['subdate'], 'y-m-d H:i:s');
 
                     $output = array('DROPBOX_MIME_IMAGE'	=> $this->allowedFileHandler->getClass($file["iconFile"]),
                         'DROPBOX_DESCRIPTION' => Scrub::text($file['description']),

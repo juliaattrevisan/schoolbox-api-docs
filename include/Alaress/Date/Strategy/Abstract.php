@@ -148,10 +148,10 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Date_Format_Int
 	 *
 	 * Permitted formats:
 	 *
-	 * y-m-d h:i:s
-	 * d/m/y h:i:s z
-	 * m/d/y h:i
-	 * d-m-y h:i:s
+	 * y-m-d H:i:s
+	 * d/m/y H:i:s z
+	 * m/d/y H:i
+	 * d-m-y H:i:s
 	 *
 	 * @param  $dateComponent
 	 */

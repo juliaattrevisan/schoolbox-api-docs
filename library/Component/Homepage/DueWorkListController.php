@@ -182,7 +182,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                 $displayActions = true;
             }
 
-            $relative = new \Alaress_Date_Relative($submission->getDueDate(), 'y-m-d h:i:s');
+            $relative = new \Alaress_Date_Relative($submission->getDueDate(), 'y-m-d H:i:s');
 
             $output = array(
                 'DUE_ID'            => $box_id,
