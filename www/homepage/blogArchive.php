@@ -64,7 +64,7 @@ if ($dateList = $blogHandler->getOccupiedDateList($category->getId())) {
             )
         );
 
-        $month = new Alaress_Date_Format($date['created'], 'y-m-d');
+        $month = new Alaress_Date_Format($date['created'], 'Y-m-d');
 
         /* Highlight only for the selected month and selected year
          */

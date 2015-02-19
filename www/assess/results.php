@@ -37,7 +37,7 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
       * they never even attempted the test.
       */
     if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
-        $attemptFinishDate = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d');
+        $attemptFinishDate = new Alaress_Date_Format($currentAttempt['finish'], 'Y-m-d');
 
         $finish = $attemptFinishDate->getShort();
         $timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);

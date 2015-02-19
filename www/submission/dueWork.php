@@ -57,8 +57,8 @@ if (is_array($_SESSION['children'])) {
 }
 
 /* possible uri formats
- - /y-m-d/uid - date and user
- - /y-m-d/    - date only
+ - /Y-m-d/uid - date and user
+ - /Y-m-d/    - date only
  - /uid       - user only
  - /          - default
 */
@@ -71,7 +71,7 @@ switch (count($this->arg)) {
         if ($this->arg[0] == 0) {
             $targetDate = new Alaress_Date_Format(time(), 'U'); // if no date use today
         } else {
-            $targetDate = new Alaress_Date_Format(preg_replace('[^0-9\-]', '', $this->arg[0]), 'y-m-d');
+            $targetDate = new Alaress_Date_Format(preg_replace('[^0-9\-]', '', $this->arg[0]), 'Y-m-d');
         }
 
         break;
@@ -80,7 +80,7 @@ switch (count($this->arg)) {
         if (is_numeric($this->arg[0])) {
             $userID = $this->arg[0];
         } else {
-            $targetDate = new Alaress_Date_Format(preg_replace('[^0-9\-]', '', $this->arg[0]), 'y-m-d');
+            $targetDate = new Alaress_Date_Format(preg_replace('[^0-9\-]', '', $this->arg[0]), 'Y-m-d');
         }
         break;
     case 0:

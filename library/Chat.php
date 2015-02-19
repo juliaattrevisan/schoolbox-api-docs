@@ -158,7 +158,7 @@ class Chat extends DeprecatedModel {
         $occupiedDates = array();
         if($chats) {
             foreach($chats as $chat) {
-                $df = new Alaress_Date_Format($chat['stamp'], 'y-m-d H:i:s');
+                $df = new Alaress_Date_Format($chat['stamp'], 'Y-m-d H:i:s');
                 $occupation = array(
                     'year'  => $df->getUsingFormat('Y'),
                     'month' => $df->getUsingFormat('m')

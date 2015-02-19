@@ -30,7 +30,7 @@ if (!is_numeric(preg_replace('/[^0-9]+/', '', $_POST['attendancePeriod']))) {
  * Check that you are allowed to edit something in a particular date range
  * (You cannot edit anything older than the previous week)
  */
-$attendanceDate = new Alaress_Date_Format($_POST['attendanceDate'], 'y-m-d');
+$attendanceDate = new Alaress_Date_Format($_POST['attendanceDate'], 'Y-m-d');
 $now = new Alaress_Date_Format(time(), 'U');
 
 if ($attendanceDate->getUsingFormat('W')  < ($now->getUsingFormat('W')-1)) {

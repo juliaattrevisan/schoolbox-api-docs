@@ -43,7 +43,7 @@ class Alaress_Date_Relative extends Alaress_Date_Format {
 		 *
 		 * Input format needs to all be in lower case for James' ninja code
 		 */
-		parent::__construct($dateTime, 'y-m-d H:i:s');
+		parent::__construct($dateTime, 'Y-m-d H:i:s');
 	}
 
 	/**

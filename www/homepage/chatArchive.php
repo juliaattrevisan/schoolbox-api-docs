@@ -89,7 +89,7 @@ if ($occupiedDateList) {
             $monthClass = '';
         }
 
-        $format = new Alaress_Date_Format('70-' . $date['month'] . '-01', 'y-m-d');
+        $format = new Alaress_Date_Format('70-' . $date['month'] . '-01', 'Y-m-d');
 
         $this->setVar(
             array(
@@ -175,9 +175,9 @@ if (is_array($items)) {
 
             // get the datestamp for the post
             if (isset($previous)) {
-                $df = new Alaress_Date_Format($previous['time'], 'y-m-d');
+                $df = new Alaress_Date_Format($previous['time'], 'Y-m-d');
             } else {
-                $df = new Alaress_Date_Format($chat['time'], 'y-m-d');
+                $df = new Alaress_Date_Format($chat['time'], 'Y-m-d');
             }
 
             $postDay = $df->getLongDateOnly();
@@ -214,7 +214,7 @@ if (is_array($items)) {
                 $this->parse("chat_block", "chat", true);
 
                 if ($total == $i) {
-                    $lastDate = new Alaress_Date_Format($chat['time'], 'y-m-d');
+                    $lastDate = new Alaress_Date_Format($chat['time'], 'Y-m-d');
                     $this->setVar('CHAT_DATE', $lastDate->getLongDateOnly());
                     $this->parse('chat_date_block', 'chat_date', true);
 

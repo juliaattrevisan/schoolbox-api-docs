@@ -98,9 +98,9 @@ class EventRecurrenceMapper
             return array();
         }
 
-        $dateFirst = new Alaress_Date_Format($series->first()->getStartDate(), 'y-m-d');
-        $dateNext  = new Alaress_Date_Format($series->next()->current()->getStartDate(), 'y-m-d');
-        $dateLast  = new Alaress_Date_Format($series->last()->getStartDate(), 'y-m-d');
+        $dateFirst = new Alaress_Date_Format($series->first()->getStartDate(), 'Y-m-d');
+        $dateNext  = new Alaress_Date_Format($series->next()->current()->getStartDate(), 'Y-m-d');
+        $dateLast  = new Alaress_Date_Format($series->last()->getStartDate(), 'Y-m-d');
 
         $diff = (int)(($dateNext->getUnixTimestamp() - $dateFirst->getUnixTimestamp()) / 86400);
 

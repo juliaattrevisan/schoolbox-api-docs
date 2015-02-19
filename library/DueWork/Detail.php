@@ -100,8 +100,8 @@ class DueWork_Detail
                     }
 
                     // determine whether to give the ontime or late class
-                    $submitTime                = new Alaress_Date_Format($submissions[0]['datestamp'], 'y-m-d');
-                    $dueTime                   = new Alaress_Date_Format($this->dueWork['date'], 'y-m-d');
+                    $submitTime                = new Alaress_Date_Format($submissions[0]['datestamp'], 'Y-m-d');
+                    $dueTime                   = new Alaress_Date_Format($this->dueWork['date'], 'Y-m-d');
                     $insertion['user']['time'] = $submitTime;
 
 
@@ -432,6 +432,6 @@ class DueWork_Detail
      */
     public function getDueDate()
     {
-        return new Alaress_Date_Format($this->dueWork['date'], 'y-m-d');
+        return new Alaress_Date_Format($this->dueWork['date'], 'Y-m-d');
     }
 }

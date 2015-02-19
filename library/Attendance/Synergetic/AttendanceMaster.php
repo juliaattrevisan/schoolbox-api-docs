@@ -28,7 +28,7 @@ class Attendance_Synergetic_AttendanceMaster
     protected $classCode = '';
 
     /**
-     * The date in y-m-d of the class
+     * The date in Y-m-d of the class
      *
      * @var string
      */

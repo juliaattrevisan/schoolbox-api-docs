@@ -29,7 +29,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
     private $classCode = '';
 
     /**
-     * The date in y-m-d of the class
+     * The date in Y-m-d of the class
      *
      * @var string
      */

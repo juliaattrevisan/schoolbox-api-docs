@@ -327,7 +327,7 @@ class Sidebar {
                 continue;
             }
 
-            $adr = new Alaress_Date_Relative($item['date'], 'y-m-d');
+            $adr = new Alaress_Date_Relative($item['date'], 'Y-m-d');
 
             // how many days left, 0 <= x <= 10
             $item['urgency'] = max(0, min(10, (int)(($adr->getUnixTimestamp() - $now) / 86400)));

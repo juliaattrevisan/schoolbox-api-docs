@@ -181,8 +181,8 @@ class Csv extends Base {
 				$event->setOwner($this->getUser());
 				$event->setAuthor($this->getAuthor());
 				$event->setAccess($this->getAccess());
-				$event->setStartDateTime(new Alaress_Date_Format($start->getDatabaseDate() . ' ' . $start_time, 'y-m-d H:i:s'));
-				$event->setEndDateTime(new Alaress_Date_Format($finish->getDatabaseDate() . ' ' . $finish_time, 'y-m-d H:i:s'));
+				$event->setStartDateTime(new Alaress_Date_Format($start->getDatabaseDate() . ' ' . $start_time, 'Y-m-d H:i:s'));
+				$event->setEndDateTime(new Alaress_Date_Format($finish->getDatabaseDate() . ' ' . $finish_time, 'Y-m-d H:i:s'));
 				$event->setTitle($name);
 				$event->setDetail(nl2br(\Scrub::text($detail)));
 				$event->setLocation($location);

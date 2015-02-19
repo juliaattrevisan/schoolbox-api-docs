@@ -154,7 +154,7 @@ function getSingleFileMeta($folderId, $fileId) {
 
 	$mtypeMap = new MimetypeMapper();
 
-	$postDate = new Alaress_Date_Format($file['submitted'], 'y-m-d H:i:s');
+	$postDate = new Alaress_Date_Format($file['submitted'], 'Y-m-d H:i:s');
 
 	try {
 		$mimetype = $mtypeMap->getByFilename($file['realname']);

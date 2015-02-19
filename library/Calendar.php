@@ -446,9 +446,9 @@ class Calendar extends DeprecatedModel
         $next   = 1;
         $last   = count($series) - 1;
 
-        $dateFirst = new Alaress_Date_Format($series[$first]['startDate'], 'y-m-d');
-        $dateNext  = new Alaress_Date_Format($series[$next]['startDate'], 'y-m-d');
-        $dateLast  = new Alaress_Date_Format($series[$last]['startDate'], 'y-m-d');
+        $dateFirst = new Alaress_Date_Format($series[$first]['startDate'], 'Y-m-d');
+        $dateNext  = new Alaress_Date_Format($series[$next]['startDate'], 'Y-m-d');
+        $dateLast  = new Alaress_Date_Format($series[$last]['startDate'], 'Y-m-d');
 
         $diff = (int)(($dateNext->getUnixTimestamp() - $dateFirst->getUnixTimestamp()) / 86400);
 
@@ -554,7 +554,7 @@ class Calendar extends DeprecatedModel
                 $event->setSubmissionBoxName($submission['name']);
                 $event->setSubmissionBoxDetail($submission['description']);
                 $event->setColour($this->displayColour(4));
-                $event->setStartTime(new Alaress_Date_Format($submission['date'], 'y-m-d H:i:s'));
+                $event->setStartTime(new Alaress_Date_Format($submission['date'], 'Y-m-d H:i:s'));
                 $event->setAllDay(stristr($submission['date'], '23:59:59'));
 
                 $stack->add($event);
@@ -848,13 +848,13 @@ class Calendar extends DeprecatedModel
                 $event->setStartTime(
                     new Alaress_Date_Format(
                         $currentEvent['startDate'] . ' ' . $currentEvent['startTime'],
-                        'y-m-d H:i:s'
+                        'Y-m-d H:i:s'
                     )
                 );
                 $event->setEndTime(
                     new Alaress_Date_Format(
                         $currentEvent['endDate'] . ' ' . $currentEvent['endTime'],
-                        'y-m-d H:i:s'
+                        'Y-m-d H:i:s'
                     )
                 );
                 $event->setType($currentEvent['type']);

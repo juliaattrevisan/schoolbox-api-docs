@@ -10,7 +10,7 @@ class InvalidAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testEmptyString() {
 		$input = '';
-		$date = new Alaress_Date_Format($input, 'y-m-d H:i:s');
+		$date = new Alaress_Date_Format($input, 'Y-m-d H:i:s');
 		$this->assertFalse($date->isValid());
 	}
 
@@ -22,7 +22,7 @@ class InvalidAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testString() {
 		$input = 'gronk de la guber';
-		$date = new Alaress_Date_Format($input, 'y-m-d H:i:s');
+		$date = new Alaress_Date_Format($input, 'Y-m-d H:i:s');
 		$this->assertFalse($date->isValid());
 	}
 

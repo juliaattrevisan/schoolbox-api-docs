@@ -118,8 +118,8 @@ class Leave_Core_Report_House_Web
 
             /* Start and end of leave
 			 */
-            $requestDateStart = new Alaress_Date_Format($request->getStart(), 'y-m-d H:i:s');
-            $requestDateFinish = new Alaress_Date_Format($request->getFinish(), 'y-m-d H:i:s');
+            $requestDateStart = new Alaress_Date_Format($request->getStart(), 'Y-m-d H:i:s');
+            $requestDateFinish = new Alaress_Date_Format($request->getFinish(), 'Y-m-d H:i:s');
 
             /* For each day that the person is on leave within the prescribed period of time, show an
 			 * icon. If they are starting or ending their leave on this day, show the time as well
@@ -217,7 +217,7 @@ class Leave_Core_Report_House_Web
 
                     /* Check whether the next morning is occupied
 					 */
-                    $nextMorning = new Alaress_Date_Format($dayStart->getDatabase(), 'y-m-d H:i:s');
+                    $nextMorning = new Alaress_Date_Format($dayStart->getDatabase(), 'Y-m-d H:i:s');
                     $nextMorning->addDays(1);
 
                     if ($showStartTime) {

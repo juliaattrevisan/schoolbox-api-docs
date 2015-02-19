@@ -333,7 +333,7 @@ class External_Maze_User implements External_UserInterface {
 
 		/* Assign birthday
 		 */
-		$birthday = new \Alaress_Date_Format($student['StudentBirthDate'], 'y-m-d');
+		$birthday = new \Alaress_Date_Format($student['StudentBirthDate'], 'Y-m-d');
 		$student['StudentBirthDate'] = $birthday->getUnixTimestamp();
 
 		/* Find one or more homeroom teachers and condense them

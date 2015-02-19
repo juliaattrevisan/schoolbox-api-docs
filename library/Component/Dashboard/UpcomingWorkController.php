@@ -167,7 +167,7 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
                 continue;
             }
 
-            $adr = new Alaress_Date_Relative($item['date'], 'y-m-d');
+            $adr = new Alaress_Date_Relative($item['date'], 'Y-m-d');
 
             if ($item['kind'] == 0) {
                 $mapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();

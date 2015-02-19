@@ -47,8 +47,8 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
     public function execute()
     {
         $now         = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
-        $this->start = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'y-m-d H:i:s');
-        $this->end   = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'y-m-d H:i:s');
+        $this->start = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'Y-m-d H:i:s');
+        $this->end   = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'Y-m-d H:i:s');
         $days        = $this->getConfig('days');
 
         /* Get 30 days of events by default

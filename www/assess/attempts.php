@@ -73,7 +73,7 @@ if (is_array($allAttempts) && count($allAttempts)) {
             'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
         ));
 
-        $startDate = new Alaress_Date_Format($currentAttempt['start'], 'y-m-d H:i:s');
+        $startDate = new Alaress_Date_Format($currentAttempt['start'], 'Y-m-d H:i:s');
 
         /* For attempts that are still in progress
          */
@@ -85,7 +85,7 @@ if (is_array($allAttempts) && count($allAttempts)) {
 			 */
 			$timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
 
-			$finishDate = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d H:i:s');
+			$finishDate = new Alaress_Date_Format($currentAttempt['finish'], 'Y-m-d H:i:s');
             $finishDateValue = $finishDate->getShort();
 
 			/* Parse review link
@@ -117,7 +117,7 @@ if (is_array($allAttempts) && count($allAttempts)) {
         $available = $attemptHandler->getTotalMarks($assess['assess_id'], $currentAttempt['attempt_id']);
 
         if ($currentAttempt['reviewed_at'] != null) {
-            $reviewedAt = new \Alaress_Date_Format($currentAttempt['reviewed_at'], 'y-m-d H:i:s');
+            $reviewedAt = new \Alaress_Date_Format($currentAttempt['reviewed_at'], 'Y-m-d H:i:s');
             $reviewed = $reviewedAt->getShort();
 
             if ($available && $canReview) {
