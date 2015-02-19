@@ -44,7 +44,7 @@ else {
 
     /* Take them on a date
      */
-    $start  = new \Alaress_Date_Format($this->arg[0], 'd-m-y');
+    $start  = new \Alaress_Date_Format($this->arg[0], 'd-m-Y');
     $finish = new \Alaress_Date_Format(strtotime('+1 month', $start->getUnixTimestamp()), 'U');
 }
 

@@ -23,7 +23,7 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Date_Format_Int
 	private $second = '00';
 	private $meridiem = '';
 	private $dateSeparator = '-';
-	private $inputDateFormat = 'd/m/y';
+	private $inputDateFormat = 'd/m/Y';
 
 	/**
 	 * @var DateTime
@@ -149,7 +149,7 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Date_Format_Int
 	 * Permitted formats:
 	 *
 	 * Y-m-d H:i:s
-	 * d/m/y H:i:s z
+	 * d/m/Y H:i:s z
 	 * m/d/y H:i
 	 * d-m-y H:i:s
 	 *

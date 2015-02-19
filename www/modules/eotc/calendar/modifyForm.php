@@ -60,14 +60,14 @@ switch($_POST['action']) {
 		 * TODO: Fix validator in Alaress Date Format
 		 */
 		if (strlen($_POST['publishDate'])) {
-			$pubDateObject = new Alaress_Date_Format($_POST['publishDate'], 'd/m/y');
+			$pubDateObject = new Alaress_Date_Format($_POST['publishDate'], 'd/m/Y');
 			$publishDate = $pubDateObject->getDatabaseDate();
 		}
 
 		/* Events recur until this time
 		 */
 		if (strlen($_POST['repeat_until'])) {
-			$until = new Alaress_Date_Format($_POST['repeat_until'], 'd/m/y');
+			$until = new Alaress_Date_Format($_POST['repeat_until'], 'd/m/Y');
 		}
 
 		/* Start and end dates
@@ -75,8 +75,8 @@ switch($_POST['action']) {
 		$start = $_POST['startDate'] . ' ' . $_POST['startHour'] . ':' . $_POST['startMinute'] . ' ' . $_POST['startPeriod'];
 		$end = $_POST['endDate'] . ' ' . $_POST['endHour'] . ':' . $_POST['endMinute'] . ' ' . $_POST['endPeriod'];
 
-		$startDate = new Alaress_Date_Format($start, 'd/m/y H:i z');
-		$endDate = new Alaress_Date_Format($end, 'd/m/y H:i z');
+		$startDate = new Alaress_Date_Format($start, 'd/m/Y H:i z');
+		$endDate = new Alaress_Date_Format($end, 'd/m/Y H:i z');
 
 		/* NO RETREAT
 		 * NO SURRENDER

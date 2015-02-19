@@ -24,7 +24,7 @@ if (is_numeric($_POST['pollID']) && is_numeric($_POST['categoryID']) && isset($_
         error(19);
     }
 
-    $date = new Alaress_Date_Format($_POST['close'], 'd/m/y');
+    $date = new Alaress_Date_Format($_POST['close'], 'd/m/Y');
 
     $poll = array(
         'categoryID' => $_POST['categoryID'],

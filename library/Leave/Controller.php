@@ -387,7 +387,7 @@ class Leave_Controller extends Controller
             return true;
         }
 
-        $thresholdDateTime = new \Alaress_Date_Format($startDate, 'd/m/y');
+        $thresholdDateTime = new \Alaress_Date_Format($startDate, 'd/m/Y');
         $weekdayIndex = $thresholdDateTime->getUsingFormat('N');
 
         /* Get back to nearest Friday, which comes after furthest Thursday
@@ -428,8 +428,8 @@ class Leave_Controller extends Controller
         /* Limit leave creation to a threshold
 		 */
         if ($this->isOutsideCreationThreshold($data['request']['start']['date'])) {
-            $start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/y H:i:s');
-            $finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/y H:i:s');
+            $start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/Y H:i:s');
+            $finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/Y H:i:s');
             $created = new Alaress_Date_Format(time(), 'U');
             $request = new Leave_Request();
 
@@ -673,8 +673,8 @@ class Leave_Controller extends Controller
             throw new Exception_Schoolbox_NotFound('Request not found');
         }
 
-        $start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/y H:i:s');
-        $finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/y H:i:s');
+        $start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/Y H:i:s');
+        $finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/Y H:i:s');
 
         $request->setStart($start->getDatabase());
         $request->setFinish($finish->getDatabase());
@@ -1203,10 +1203,10 @@ class Leave_Controller extends Controller
         /* Mess with these two magic numbers to change the range, in conjunction
            * with the class constant RANGE
            */
-        $reportStart = new Alaress_Date_Format($date, 'd/m/y');
+        $reportStart = new Alaress_Date_Format($date, 'd/m/Y');
         $reportStart->addDays(self::FRIDAY - $reportStart->getWeekDayNumber());
 
-        $reportFinish = new Alaress_Date_Format($date, 'd/m/y');
+        $reportFinish = new Alaress_Date_Format($date, 'd/m/Y');
         $reportFinish->addDays(self::SUNDAY - $reportFinish->getWeekDayNumber());
         $reportFinish->addHours(24);
 
@@ -1284,7 +1284,7 @@ class Leave_Controller extends Controller
         /* Skip Friday
            */
         for ($i = self::SATURDAY; $i <= self::SUNDAY; $i++) {
-            $currentDate = new Alaress_Date_Format($date, 'd/m/y');
+            $currentDate = new Alaress_Date_Format($date, 'd/m/Y');
             $currentDate->addDays($i - $currentDate->getWeekDayNumber());
 
             $data['dateList'][] = $currentDate;

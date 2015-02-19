@@ -131,7 +131,7 @@ class Synchronise_External_Nhs_Strategy_Student extends Synchronise_Base_Strateg
         $profile
             ->setHouse($externalUser['StudentHouse'])
             ->setLevel($externalUser['StudentYearLevel'])
-            ->setDob(new Alaress_Date_Format($externalUser['StudentBirthDate'], 'd/m/y'))
+            ->setDob(new Alaress_Date_Format($externalUser['StudentBirthDate'], 'd/m/Y'))
             ->setBirthDate($externalUser['StudentBirthDate'])
             ->setHomegroup($externalUser['StudentClassGroup'])
             ->setGivenName($externalUser['StudentPreferred'])
