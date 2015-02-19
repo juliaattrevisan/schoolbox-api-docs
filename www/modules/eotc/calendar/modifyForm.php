@@ -75,8 +75,8 @@ switch($_POST['action']) {
 		$start = $_POST['startDate'] . ' ' . $_POST['startHour'] . ':' . $_POST['startMinute'] . ' ' . $_POST['startPeriod'];
 		$end = $_POST['endDate'] . ' ' . $_POST['endHour'] . ':' . $_POST['endMinute'] . ' ' . $_POST['endPeriod'];
 
-		$startDate = new Alaress_Date_Format($start, 'd/m/Y H:i z');
-		$endDate = new Alaress_Date_Format($end, 'd/m/Y H:i z');
+		$startDate = new Alaress_Date_Format($start, 'd/m/Y h:i a');
+		$endDate = new Alaress_Date_Format($end, 'd/m/Y h:i a');
 
 		/* NO RETREAT
 		 * NO SURRENDER
