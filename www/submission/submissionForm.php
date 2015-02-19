@@ -288,7 +288,14 @@ $page->localRedir($is_task ? "/homepage/$categoryID" : '/submission/listSubmissi
 function generateDate($field, $placeholder)
 {
     if (empty($_POST[$field . '_hour'])) {
-        $adf = new Alaress_Date_Format(sprintf("%s %s", $_POST[$field . '_date'], $placeholder), 'd/m/Y');
+        $adf = new Alaress_Date_Format(
+            sprintf(
+                "%s %s",
+                $_POST[$field . '_date'],
+                $placeholder
+            ),
+            'd/m/Y'
+        );
     } else {
         $adf = new Alaress_Date_Format(
             sprintf(
@@ -298,7 +305,7 @@ function generateDate($field, $placeholder)
                 $_POST[$field . '_minute'],
                 $_POST[$field . '_period']
             ),
-            'd/m/Y'
+            'd/m/Y a'
         );
     }
     return $adf;
