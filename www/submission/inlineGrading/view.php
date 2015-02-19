@@ -100,7 +100,7 @@ foreach ($dueWorkDetail->getSitepageData() as $studentId => $studentData) {
             'USER_MARKSTATUS_DATETIME' => $marked ? $markTime->getLocal() : '',
 
             'USER_SUBMISSION_CLASS'    => $submit ? ($ontime ? 'on-time' : 'late') : 'un',
-            'USER_SUBMISSION_TEXT'     => $submit ? ($ontime ? 'Submitted on Time' : 'Submitted Late') : 'Unsubmitted',
+            'USER_SUBMISSION_TEXT'     => $submit ? ($ontime ? 'Submitted on Time' : 'Submitted Late') : 'Not Submitted',
 
         ));
 
