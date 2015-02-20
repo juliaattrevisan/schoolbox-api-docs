@@ -59,6 +59,8 @@ class Renderer extends Base {
              */
             foreach ($mapperResult->getResult() as $currentTextbox) {
                 $this->getPage()->setVar(array(
+                    'TEXTBOX_ID' => $currentTextbox->getId(),
+                    'TEXTBOX_FOLDER_ID' => $currentTextbox->getCategory()->getId(),
                     'TEXTBOX_HEADING' => \Scrub::text($currentTextbox->getHeading()),
                     'TEXTBOX_BODY' => \TextFormatter::cutSentence(\Scrub::html($currentTextbox->getBody()), 150),
                     'TEXTBOX_BREADCRUMB' => $this->spawnBreadcrumbs($currentTextbox->getCategory()),
