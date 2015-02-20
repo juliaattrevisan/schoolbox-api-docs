@@ -9,6 +9,7 @@
  * @version     SVN: $Id$
  */
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\Realtime\Schedule\Event;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -214,12 +215,12 @@ $loop->run();
 
 
 /**
- * @param \Schoolbox\Realtime\Schedule\Event $event
- * @param \Psr\Log\LoggerInterface $log
+ * @param Event $event
+ * @param LoggerInterface $log
  * @throws \Schoolbox\Realtime\Schedule\ScheduleException
  * @return bool whether or not to acknowledge the message
  */
-function interrogate($event, $log) {
+function interrogate(Event $event, LoggerInterface $log) {
 	// setup for ifs
 	$modelClass = get_class($event->getObject());
 	$pregClass = preg_replace('/([_\\\\])[^_\\\\]+$/', '$1Notifier', $modelClass);
