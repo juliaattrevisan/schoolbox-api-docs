@@ -10,7 +10,6 @@
 namespace Schoolbox\Assessment\Course;
 
 use Alaress_Date_Format;
-use Alaress_Date_Format;
 use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
