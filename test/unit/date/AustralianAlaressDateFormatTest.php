@@ -44,7 +44,7 @@ class AustralianAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 		$input = '23/08/2011';
 		$expected = '2011-08-23 00:00:00';
 
-		$date = new Alaress_Date_Format($input, 'd/m/Y');
+		$date = new Alaress_Date_Format($input, 'd/m/Y|');
 		$result = $date->getDatabase();
 
 		$this->assertEquals($expected, $result);
