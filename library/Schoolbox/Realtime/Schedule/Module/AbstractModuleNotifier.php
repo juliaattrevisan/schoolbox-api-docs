@@ -12,6 +12,7 @@ namespace Schoolbox\Realtime\Schedule\Module;
 
 use ReflectionClass;
 use ReflectionMethod;
+use RuntimeException;
 use Schoolbox\Collection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
@@ -235,7 +236,11 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
      */
     public function unserialize($serialized)
     {
-        $data            = unserialize($serialized);
+        $data = unserialize($serialized);
+
+        if (!is_array($data)) {
+            throw new RuntimeException("Could not unserialize notifier instance");
+        }
         $conf            = $data[0];
         $this->namespace = $data[1];
         // the only thing we serialize is the name of the config class
