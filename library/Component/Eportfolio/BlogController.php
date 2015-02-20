@@ -113,7 +113,7 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 				 */
 				if ($currentItem->getComments()->count()) {
 					foreach($currentItem->getComments() as $currentComment) {
-						$createdAt = new Alaress_Date_Relative($currentComment->getCreatedAt());
+						$createdAt = new Alaress_Date_Relative($currentComment->getCreatedAt(), 'Y-m-d H:i:s');
 
 						$this->setVar(array(
 							'COMMENT_ID' => $currentComment->getId(),

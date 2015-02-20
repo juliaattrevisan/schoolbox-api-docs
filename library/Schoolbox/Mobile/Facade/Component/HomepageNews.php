@@ -46,7 +46,7 @@ class HomepageNews extends Generic {
                 if(count($newsList) >= $limit) {
                     break;
                 }
-                $adr = new Alaress_Date_Relative($item['posted']);
+                $adr = new Alaress_Date_Relative($item['posted'], 'U');
                 $item['post_datetime_relative'] = $adr->getRelativeTime();
                 $item['poster'] = $userHandler->formatName($item);
                 $item['item_body_clean'] = TextFormatter::cutSentence(Scrub::html2text($item['body']), 300);

@@ -69,7 +69,7 @@ class Component_Homepage_Statistics_TopFilesController extends Component_Homepag
                     $icon = '/images/mime/60x60/source.png';
                 }
 
-                $rel = new Alaress_Date_Relative($this->files[$i]['submitted']);
+                $rel = new Alaress_Date_Relative($this->files[$i]['submitted'], 'Y-m-d H:i:s');
                 $this->setVar(
                     array(
                         'FILE_ID' => $this->files[$i]['id'],

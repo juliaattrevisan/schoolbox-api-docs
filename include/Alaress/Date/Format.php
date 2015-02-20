@@ -20,6 +20,37 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 	 */
 	protected $strategy;
 
+	/**
+	 * Ported properties from Alaress_Date_Relative
+	 */
+
+	/**
+	 * @var string
+	 */
+	private $prefix = 'on';
+
+	/**
+	 * @var string
+	 */
+	private $suffix = 'ago';
+
+	/**
+	 * @var int
+	 */
+	private $now = 0;
+
+	/**
+	 * @var array
+	 */
+	private $intervals = array(
+		array(60, 'second'),
+		array(60, 'minute'),
+		array(24, 'hour'),
+		array(7,  'day'),
+		array(4.38,  'week'),
+		array(12, 'month'),
+	);
+
 
     /**
      * Returns an instance of self at the current time.

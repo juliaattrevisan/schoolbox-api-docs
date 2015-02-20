@@ -73,7 +73,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
             foreach ($allSurveys as $currentSurvey) {
 // Do not show the survey if you are a participant and the survey is not yet open
                 if (($this->permission >= WRITE_ACCESS) || $surveyHandler->isOpen($currentSurvey)) {
-                    $createdTime = new Alaress_Date_Relative($currentSurvey['created_at']);
+                    $createdTime = new Alaress_Date_Relative($currentSurvey['created_at'], 'Y-m-d H:i:s');
 
                     $author = $userHandler->getByID($currentSurvey['user_id']);
 

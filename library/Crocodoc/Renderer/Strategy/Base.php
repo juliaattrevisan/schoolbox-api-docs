@@ -103,7 +103,7 @@ abstract class Base {
 		$this->getPage()->setBlock('injectableUpload', 'returned_work', 'returned_work_block');
 
 		if ($this->getReturnedWork() !== null) {
-			$returnDate = new \Alaress_Date_Relative($this->getReturnedWork()->getReturned(), 'U');
+			$returnDate = new \Alaress_Date_Relative($this->getReturnedWork()->getReturned());
 
             if ($this->getReturnedWork()->getFilename() != null) {
                 $this->getPage()->setVar(array(

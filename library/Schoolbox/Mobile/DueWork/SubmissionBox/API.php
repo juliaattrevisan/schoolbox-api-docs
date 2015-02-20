@@ -90,7 +90,7 @@ class API extends Generic\API {
             )) ? 'false' : 'true';
         }
 
-        $due = new Alaress_Date_Relative($box['date'], 'Y-m-d');
+        $due = new Alaress_Date_Relative($box['date'], 'Y-m-d H:i:s');
 
         $d = $due->getUsingFormat('jS M');
         $rel = $due->getRelativeTime();

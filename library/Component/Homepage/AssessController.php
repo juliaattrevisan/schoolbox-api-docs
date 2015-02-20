@@ -69,7 +69,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
 /* Hide it from students if the start date hasn't passed yet
              	 */
                 if (($this->permission >= WRITE_ACCESS) || $assessHandler->isOpen($currentAssess)) {
-                    $createdTime = new Alaress_Date_Relative($currentAssess['created_at']);
+                    $createdTime = new Alaress_Date_Relative($currentAssess['created_at'], 'Y-m-d H:i:s');
 
                     $author = $userHandler->getByID($currentAssess['user_id']);
 

@@ -94,7 +94,7 @@ class SubjectDueWork extends Generic {
 						continue;
 					}
 
-					$adr = new Alaress_Date_Relative($item['date'], 'Y-m-d');
+					$adr = new Alaress_Date_Relative($item['date'], 'U');
 
 					// how many days left, 0 <= x <= 10
 					$item['urgency'] = max(0, min(10, (int)(($adr->getUnixTimestamp() - $now) / 86400)));

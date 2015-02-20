@@ -110,7 +110,7 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
         if (is_array($wikiList)) {
             $j = 0;
             foreach ($wikiList as $wiki) {
-                $modifiedTime = new Alaress_Date_Relative($wiki['modified']);
+                $modifiedTime = new Alaress_Date_Relative($wiki['modified'], 'U');
 
                 $this->setVar(array(
                     'WIKI_ID' => $wiki['wikiID'],

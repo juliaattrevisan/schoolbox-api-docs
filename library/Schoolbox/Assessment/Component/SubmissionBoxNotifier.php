@@ -455,7 +455,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $oldDate    = strtotime($diff['dueDate'][1]);
         $newDate    = strtotime($diff['dueDate'][0]);
         $verb       = $newDate > $oldDate ? 'extended' : 'changed the due date of';
-        $relative   = new Alaress_Date_Relative($newDate);
+        $relative   = new Alaress_Date_Relative($newDate, 'U');
         $dateformat = ((int)$relative->getUsingFormat('Hi') == '1159' ? 'g:ia \o\n ' : '') . 'D, jS M';
         $bob->setTitle(":author $verb :boxname to :date in :catname")
             ->setTopics(array("duework.{$box->getId()}.datechanged"))

@@ -23,7 +23,7 @@ if (is_numeric($this->arg[0])) {
         $this->setVar('MODIFY_BLOG', '');
     }
 
-    $adr = new Alaress_Date_Relative($blog['created']);
+    $adr = new Alaress_Date_Relative($blog['created'], 'Y-m-d H:i:s');
     $userHandler = new User();
 
     $this->setVar(
@@ -50,7 +50,7 @@ if (is_numeric($this->arg[0])) {
         $j = 0;
 
         foreach ($comments as $comment) {
-            $actionDate = new Alaress_Date_Relative($comment['created']);
+            $actionDate = new Alaress_Date_Relative($comment['created'], 'Y-m-d H:i:s');
 
             $this->setVar(
                 array(
