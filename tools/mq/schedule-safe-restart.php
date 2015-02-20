@@ -9,6 +9,9 @@
  * @version     SVN: $Id$
  */
 
+use Psr\Log\LoggerInterface;
+use Schoolbox\Realtime\Schedule\Event;
+
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
 new \Schoolbox\Application\Daemon\Kernel('Schedule Safe Restart');
@@ -160,6 +163,10 @@ $stomp->connect()->then(function($stomp) use ($d, $loop, $perform) {
 				$formatted = \Schoolbox\Notif\Formatter\CompressedFormatter::uncompress($frame->body);
 				$event = unserialize($formatted['message']);
 
+                if (!$event instanceof Event) {
+                    throw new RuntimeException("Could not unserialize message data");
+                }
+
 				// if the interrogation says to dismiss the message, we do
 				if(interrogate($event, $d)) {
 					$d->error("Message broken");
@@ -208,12 +215,12 @@ $loop->run();
 
 
 /**
- * @param \Schoolbox\Realtime\Schedule\Event $event
- * @param \Psr\Log\LoggerInterface $log
+ * @param Event $event
+ * @param LoggerInterface $log
  * @throws \Schoolbox\Realtime\Schedule\ScheduleException
  * @return bool whether or not to acknowledge the message
  */
-function interrogate($event, $log) {
+function interrogate(Event $event, LoggerInterface $log) {
 	// setup for ifs
 	$modelClass = get_class($event->getObject());
 	$pregClass = preg_replace('/([_\\\\])[^_\\\\]+$/', '$1Notifier', $modelClass);
