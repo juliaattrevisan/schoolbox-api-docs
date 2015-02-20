@@ -53,17 +53,24 @@ class Alaress_Date_Strategy_LaravelDate extends Alaress_Date_Strategy_DateTime
                 );
             }
 
-            try {
-                // LaravelDate throws exceptions on error, but not warning.
-                $newDateTime = LaravelDate::createFromFormat($inputDateFormat, $dateTime);
-            } catch (InvalidArgumentException $e) {
+            $newDateTime = DateTime::createFromFormat($inputDateFormat, $dateTime);
+            $errors      = DateTime::getLastErrors();
+            if ($errors['error_count']) {
                 // Try again with trailing data allowed.
-                // Let exception fall through if it still isn't valid.
-                $newDateTime = LaravelDate::createFromFormat($inputDateFormat.'+', $dateTime);
+                $newDateTime = DateTime::createFromFormat($inputDateFormat.'+', $dateTime);
+                if (!($newDateTime instanceof DateTime)) {
+                    // I didn't get a datetime at all.
+                    $this->isValid = false;
+                    $errors       = DateTime::getLastErrors();
+                    throw new InvalidArgumentException(
+                        sprintf(
+                            'LaravelDate creation failed with %d errors: (%s)',
+                            $errors['error_count'],
+                            implode(', ', $errors['errors'])
+                        )
+                    );
+                }
             }
-
-            // Check for warnings, but ignore trailing data warning?
-            $errors = LaravelDate::getLastErrors();
             if ($errors['warning_count']) {
                 // I have a datetime, but it's not what I expected. Warn the user.
                 // This date will also fail isValid()
@@ -77,12 +84,13 @@ class Alaress_Date_Strategy_LaravelDate extends Alaress_Date_Strategy_DateTime
                     E_USER_WARNING
                 );
             }
+            $laravelDate = LaravelDate::instance($newDateTime);
 
             // Did I specify a timezone? If not, set it to the default
             if (!preg_match('/[eOPT]/', $inputDateFormat)) {
-                $newDateTime->setTimezone($this->timezone);
+                $laravelDate->setTimezone($this->timezone);
             }
-            $this->setDateTimeObject($newDateTime);
+            $this->setDateTimeObject($laravelDate);
         }
     }
 
