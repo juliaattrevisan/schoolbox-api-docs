@@ -82,11 +82,7 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 	 */
 	public function __construct($dateTime = null, $dateFormat = null, DateTimeZone $timezone = null) {
 		if (!($timezone instanceof DateTimeZone)) {
-			try {
-				$timezone = new DateTimeZone(Config::get('date_timezone'));
-			} catch (Exception $e) {
-				$timezone = new DateTimeZone(date_default_timezone_get());
-			}
+			$timezone = new DateTimeZone(date_default_timezone_get());
 		}
 		$strategy = new Alaress_Date_Strategy_LaravelDate($timezone);
 		$strategy->setFromFormat($dateTime, $dateFormat);
