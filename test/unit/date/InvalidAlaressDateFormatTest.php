@@ -58,6 +58,10 @@ class InvalidAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 	 * Random but illegal digits in a date format
 	 * Returns empty string
 	 *
+	 * This isn't a valid date format at all.
+	 *
+	 * @expectedException InvalidArgumentException
+	 *
 	 * @return void
 	 */
 	public function testInvalidDate3() {
