@@ -10,7 +10,7 @@
 namespace Schoolbox\Assessment\Course;
 
 use Alaress_Date_Format;
-use Alaress_Date_Relative;
+use Alaress_Date_Format;
 use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
@@ -274,12 +274,12 @@ class UnitInstance implements ISoftDeletable {
      *
      * It opens on 12am of the open date.
      *
-     * @return Alaress_Date_Relative
+     * @return Alaress_Date_Format
      */
     public function getRelativeOpenDate() {
         $date = clone $this->getOpenDate()->getDateTimeObject();
         $date->modify('00:00:00');
-        return new Alaress_Date_Relative($date);
+        return new Alaress_Date_Format($date);
     }
 
     /**
@@ -287,11 +287,11 @@ class UnitInstance implements ISoftDeletable {
      *
      * It closes on the last second of the due date.
      *
-     * @return Alaress_Date_Relative
+     * @return Alaress_Date_Format
      */
     public function getRelativeDueDate() {
         $date = clone $this->getDueDate()->getDateTimeObject();
         $date->modify('23:59:59');
-        return new Alaress_Date_Relative($date);
+        return new Alaress_Date_Format($date);
     }
 }

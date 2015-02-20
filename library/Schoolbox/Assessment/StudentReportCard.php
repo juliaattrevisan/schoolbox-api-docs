@@ -656,7 +656,7 @@ class StudentReportCard
     {
         $workTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper();
         $workType       = $workTypeMapper->findById($box->getWorkType()->getId());
-        $due            = new \Alaress_Date_Relative($box->getDueDate());
+        $due            = new \Alaress_Date_Format($box->getDueDate());
         $urgency        = $box->getGradientIndex();
         $output         = array(
             'WORK_TITLE'   => $box->getName(),
@@ -702,7 +702,7 @@ class StudentReportCard
         $workType       = $workTypeMapper->findById($oa->getWorkType()->getId());
         // marks are contained inside a single-element array, pull it out of itself
         $marks                     = $marks[0];
-        $due                       = new \Alaress_Date_Relative($oa->getFinish());
+        $due                       = new \Alaress_Date_Format($oa->getFinish());
         $urgency                   = $oa->getGradientIndex();
         $output                    = array(
             'WORK_TITLE'   => $oa->getTitle(),
@@ -821,7 +821,7 @@ class StudentReportCard
         if ($comments->count()) {
             foreach ($comments as $comment) {
                 /** @var Comment $comment */
-                $adr  = new \Alaress_Date_Relative($comment->getCreated());
+                $adr  = new \Alaress_Date_Format($comment->getCreated());
                 $date = $adr->getRelativeTime();
                 if ($comment->getModified()) {
                     $date .= " &ndash; edited";

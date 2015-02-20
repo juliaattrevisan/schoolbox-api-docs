@@ -116,7 +116,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
                     'lastname' => $thread['userLastname'],
                 );
 
-                $threadTime = new Alaress_Date_Relative($thread['date'], 'Y-m-d H:i:s');
+                $threadTime = new Alaress_Date_Format($thread['date'], 'Y-m-d H:i:s');
 
                 $this->setVar(array(
                     'THREAD_ID' => $thread['threadID'],

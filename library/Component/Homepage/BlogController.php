@@ -126,7 +126,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
             $i = 0;
 
             foreach ($allItems as $currentItem) {
-                $createdTime = new Alaress_Date_Relative($currentItem->getCreated());
+                $createdTime = new Alaress_Date_Format($currentItem->getCreated());
 
                 $this->setVar(
                     array(
@@ -150,7 +150,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                     $j = 0;
 
                     foreach ($allComments as $currentComment) {
-                        $createdTime = new Alaress_Date_Relative($currentComment->getCreated());
+                        $createdTime = new Alaress_Date_Format($currentComment->getCreated());
 
                         $this->setVar(
                             array(

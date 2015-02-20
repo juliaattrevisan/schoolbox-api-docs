@@ -53,7 +53,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
                 if($count >= $limit)
                     break;
 
-                $date = new Alaress_Date_Relative($submit['datestamp'], 'Y-m-d H:i');
+                $date = new Alaress_Date_Format($submit['datestamp'], 'Y-m-d H:i');
 
                 $output = array(
                     'WORK_DATE'        => $date->getRelativeTime(),

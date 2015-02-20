@@ -35,7 +35,7 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
             // map the feed for the ActivityList
             if (count($feedList)) {
                 foreach ($feedList as $f) {
-                    $feedTime = new Alaress_Date_Relative($f['date'], 'U');
+                    $feedTime = new Alaress_Date_Format($f['date'], 'U');
                     $feedTime->setPrefix('');
 
                     $this->feedList[] = array(

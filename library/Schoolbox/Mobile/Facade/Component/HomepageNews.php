@@ -11,7 +11,7 @@ namespace Schoolbox\Mobile\Facade\Component;
 
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Resource\CategoryLogMapper;
-use Alaress_Date_Relative;
+use Alaress_Date_Format;
 use TextFormatter;
 use Config;
 use ClientDevice;
@@ -46,7 +46,7 @@ class HomepageNews extends Generic {
                 if(count($newsList) >= $limit) {
                     break;
                 }
-                $adr = new Alaress_Date_Relative($item['posted'], 'U');
+                $adr = new Alaress_Date_Format($item['posted'], 'U');
                 $item['post_datetime_relative'] = $adr->getRelativeTime();
                 $item['poster'] = $userHandler->formatName($item);
                 $item['item_body_clean'] = TextFormatter::cutSentence(Scrub::html2text($item['body']), 300);

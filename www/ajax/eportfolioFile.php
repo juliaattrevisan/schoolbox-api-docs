@@ -21,7 +21,7 @@ if (is_numeric($_POST['categoryID'])) {
         $userHandler = new User();
 
         foreach ($fileList as $file) {
-            $fileTime = new Alaress_Date_Relative($file['modified'], 'Y-m-d H:i:s');
+            $fileTime = new Alaress_Date_Format($file['modified'], 'Y-m-d H:i:s');
             $fileTime->setPrefix('');
 
             $file['user'] = $userHandler->formatName($file);

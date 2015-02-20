@@ -69,14 +69,14 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
 /* Hide it from students if the start date hasn't passed yet
              	 */
                 if (($this->permission >= WRITE_ACCESS) || $assessHandler->isOpen($currentAssess)) {
-                    $createdTime = new Alaress_Date_Relative($currentAssess['created_at'], 'Y-m-d H:i:s');
+                    $createdTime = new Alaress_Date_Format($currentAssess['created_at'], 'Y-m-d H:i:s');
 
                     $author = $userHandler->getByID($currentAssess['user_id']);
 
                     /* Note that Assess Descriptions can now contain html, so we decode them
 					 * and remove the html from the short description in homepage components
 					 */
-                    $finishRelative = new \Alaress_Date_Relative(strtotime($currentAssess['finish']), 'U');
+                    $finishRelative = new \Alaress_Date_Format(strtotime($currentAssess['finish']), 'U');
 
                     /* Use an additional date if finish date not yet reached
                      */

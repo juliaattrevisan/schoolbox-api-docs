@@ -14,7 +14,7 @@ use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
-use Alaress_Date_Relative;
+use Alaress_Date_Format;
 use Monolog\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
@@ -455,7 +455,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $oldDate    = strtotime($diff['dueDate'][1]);
         $newDate    = strtotime($diff['dueDate'][0]);
         $verb       = $newDate > $oldDate ? 'extended' : 'changed the due date of';
-        $relative   = new Alaress_Date_Relative($newDate, 'U');
+        $relative   = new Alaress_Date_Format($newDate, 'U');
         $dateformat = ((int)$relative->getUsingFormat('Hi') == '1159' ? 'g:ia \o\n ' : '') . 'D, jS M';
         $bob->setTitle(":author $verb :boxname to :date in :catname")
             ->setTopics(array("duework.{$box->getId()}.datechanged"))

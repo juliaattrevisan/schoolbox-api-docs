@@ -570,7 +570,7 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
             break;
     }
 
-    $activityTime = new Alaress_Date_Relative($activity->getDate());
+    $activityTime = new Alaress_Date_Format($activity->getDate());
     $activityTime->setPrefix('');
 
     $mark = $returnHandler->shortenGrade($numericMark);

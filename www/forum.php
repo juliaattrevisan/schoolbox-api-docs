@@ -145,8 +145,8 @@ if (is_array($threadList)) {
             'lastname' => $thread['last_post_surname'],
         );
 
-        $threadTime = new Alaress_Date_Relative($thread['date'], 'Y-m-d H:i:s');
-        $threadLastPostTime = new Alaress_Date_Relative($thread['last_post_date'], 'Y-m-d H:i:s');
+        $threadTime = new Alaress_Date_Format($thread['date'], 'Y-m-d H:i:s');
+        $threadLastPostTime = new Alaress_Date_Format($thread['last_post_date'], 'Y-m-d H:i:s');
 
         $this->setVar(array(
             'THREAD_ID' => $thread['threadID'],

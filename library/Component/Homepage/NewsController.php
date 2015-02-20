@@ -144,7 +144,7 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
                     $this->setVar('MOD_NEWS', '');
                 }
 
-                $postedTime = new Alaress_Date_Relative($news['posted'], 'U');
+                $postedTime = new Alaress_Date_Format($news['posted'], 'U');
 
                 $this->setVar(
                     array(

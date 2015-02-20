@@ -139,10 +139,10 @@ if (is_array($postList)) {
                       'lastname' => $post['userLastname'],
         );
 
-        $postTime = new Alaress_Date_Relative($post['date'], 'Y-m-d H:i:s');
+        $postTime = new Alaress_Date_Format($post['date'], 'Y-m-d H:i:s');
         $postTime->setPrefix('');
 
-        $modifiedTime = new Alaress_Date_Relative($post['date'], 'Y-m-d H:i:s');
+        $modifiedTime = new Alaress_Date_Format($post['date'], 'Y-m-d H:i:s');
         $modifiedTime->setNow(strtotime($post['modified']))->setPrefix('')->setSuffix('later');
 
         $output = array('POST_ID' => $post['postID'],

@@ -36,7 +36,7 @@ class Download extends Base {
 		$this->getPage()->setFile('injectable', $this->getTemplateFile());
 		$this->getPage()->setBlock('injectable', 'plag_score', 'plag_score_block');
 
-		$recentSubmissionDate = new \Alaress_Date_Relative($this->getSubmission()->getSubmitted());
+		$recentSubmissionDate = new \Alaress_Date_Format($this->getSubmission()->getSubmitted());
 		$this->plag();
 
 		try {

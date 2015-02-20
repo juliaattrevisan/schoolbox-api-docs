@@ -16,7 +16,7 @@ use Scrub;
 use Response_HTTP;
 use User;
 use News;
-use Alaress_Date_Relative;
+use Alaress_Date_Format;
 use TextFormatter;
 
 class API extends Generic\API
@@ -45,7 +45,7 @@ class API extends Generic\API
                     );
                 }
                 // insert headling into the topic
-                $adr = new Alaress_Date_Relative($headline['post_datetime'], 'U');
+                $adr = new Alaress_Date_Format($headline['post_datetime'], 'U');
                 $headline['post_datetime_relative'] = $adr->getRelativeTime();
                 $headline['item_body_clean'] = TextFormatter::cutSentence(Scrub::html2text($headline['item_body']), 300);
                 $headline['poster'] = $userHandler->formatName($headline);

@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Mobile\Facade\Component;
 
-use Alaress_Date_Relative;
+use Alaress_Date_Format;
 use Scrub;
 use TextFormatter;
 use Schoolbox\User;
@@ -43,7 +43,7 @@ class SchoolNews extends Generic
                         count($newsList[$topicList[$headline['newsTopicID']]]) >= $limit ) {
                         continue;
                     }
-                    $adr = new Alaress_Date_Relative($headline['post_datetime'], 'U');
+                    $adr = new Alaress_Date_Format($headline['post_datetime'], 'U');
                     $headline['post_datetime_relative'] = $adr->getRelativeTime();
                     $headline['poster'] = $userHandler->formatName($headline);
                     $headline['item_body_clean'] = TextFormatter::cutSentence(Scrub::html2text($headline['item_body']), 300);

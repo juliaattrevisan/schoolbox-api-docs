@@ -146,7 +146,7 @@ if ($blogList = $blogHandler->getByYearAndMonth($category->getId(), $yearNumber,
             $userHandler = new User();
 
             foreach ($comments as $comment) {
-                $createdTime = new Alaress_Date_Relative($comment['created'], 'Y-m-d H:i:s');
+                $createdTime = new Alaress_Date_Format($comment['created'], 'Y-m-d H:i:s');
 
                 $comment['name'] = $userHandler->formatName($comment);
 

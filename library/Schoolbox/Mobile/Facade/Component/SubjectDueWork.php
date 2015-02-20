@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Mobile\Facade\Component;
 
-use Alaress_Date_Relative;
+use Alaress_Date_Format;
 use Scrub;
 use Submission;
 use Schoolbox\User;
@@ -94,7 +94,7 @@ class SubjectDueWork extends Generic {
 						continue;
 					}
 
-					$adr = new Alaress_Date_Relative($item['date'], 'U');
+					$adr = new Alaress_Date_Format($item['date'], 'U');
 
 					// how many days left, 0 <= x <= 10
 					$item['urgency'] = max(0, min(10, (int)(($adr->getUnixTimestamp() - $now) / 86400)));
