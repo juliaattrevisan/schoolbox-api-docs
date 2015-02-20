@@ -9,6 +9,8 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Realtime\Schedule\Event;
+
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
 new \Schoolbox\Application\Daemon\Kernel('Schedule Safe Restart');
@@ -159,6 +161,10 @@ $stomp->connect()->then(function($stomp) use ($d, $loop, $perform) {
 			try {
 				$formatted = \Schoolbox\Notif\Formatter\CompressedFormatter::uncompress($frame->body);
 				$event = unserialize($formatted['message']);
+
+                if (!$event instanceof Event) {
+                    throw new RuntimeException("Could not unserialize message data");
+                }
 
 				// if the interrogation says to dismiss the message, we do
 				if(interrogate($event, $d)) {
