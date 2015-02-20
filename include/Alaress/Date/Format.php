@@ -57,7 +57,7 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 				$timezone = new DateTimeZone(date_default_timezone_get());
 			}
 		}
-		$strategy = new Alaress_Date_Strategy_DateTime($timezone);
+		$strategy = new Alaress_Date_Strategy_LaravelDate($timezone);
 		$strategy->setFromFormat($dateTime, $dateFormat);
 		$strategy->setLocale(new Alaress_Date_Locale_Australian());
 
