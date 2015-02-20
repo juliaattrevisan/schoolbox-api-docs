@@ -16,8 +16,8 @@ use Scrub;
 
 /* Folder specific
  */
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 
 class Renderer extends Base {
 
@@ -96,14 +96,14 @@ class Renderer extends Base {
                     'FOLDER_TYPE' => $folderType,
                 ));
 
-                $userAccessMapper = new \Schoolbox\Permission\Access\UserAccessMapper();
+                $userAccessMapper = new UserAccessMapper();
                 $userAccess = $userAccessMapper->findByColumnList(array(
                     'uid' => $_SESSION['user']->getId(),
                     'service' => HOMEPAGE_SERVICE,
                     'sid' => $currentFolder->getId()
                 ));
 
-                $roleAccessMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
+                $roleAccessMapper = new RoleAccessMapper();
                 $roleAccess = $roleAccessMapper->findByColumnList(array(
                     'cid' => $currentFolder->getId(),
                     'gid' => $_SESSION['user']->getRole()->getId(),
