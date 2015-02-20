@@ -6,6 +6,8 @@ class InvalidAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 	 * Empty string input
 	 * Returns empty string
 	 *
+	 * @expectedException InvalidArgumentException
+	 *
 	 * @return void
 	 */
 	public function testEmptyString() {
@@ -17,6 +19,8 @@ class InvalidAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * Random text string input
 	 * Returns empty string
+	 *
+	 * @expectedException InvalidArgumentException
 	 *
 	 * @return void
 	 */
@@ -34,7 +38,7 @@ class InvalidAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testInvalidDate1() {
 		$input = '43/67/2011';
-		$date = new Alaress_Date_Format($input, 'd/m/Y');
+		$date = @new Alaress_Date_Format($input, 'd/m/Y');
 		$this->assertFalse($date->isValid());
 	}
 
@@ -46,7 +50,7 @@ class InvalidAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testInvalidDate2() {
 		$input = '97/27/1011';
-		$date = new Alaress_Date_Format($input, 'd/m/Y');
+		$date = @new Alaress_Date_Format($input, 'd/m/Y');
 		$this->assertFalse($date->isValid());
 	}
 
@@ -66,6 +70,8 @@ class InvalidAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 	 * Random but illegal digits in a date format
 	 * Returns empty string
 	 *
+	 * @expectedException InvalidArgumentException
+	 *
 	 * @return void
 	 */
 	public function testInvalidDate4() {
@@ -77,6 +83,8 @@ class InvalidAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * Random but illegal digits in a partial date format
 	 * Returns empty string
+	 *
+	 * @expectedException InvalidArgumentException
 	 *
 	 * @return void
 	 */
@@ -90,6 +98,8 @@ class InvalidAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 	 * Random but illegal digits in a partial date format
 	 * Returns empty string
 	 *
+	 * @expectedException InvalidArgumentException
+	 *
 	 * @return void
 	 */
 	public function testPartialDate2() {
@@ -101,6 +111,8 @@ class InvalidAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * Random but illegal digits in a partial date format
 	 * Returns empty string
+	 *
+	 * @expectedException InvalidArgumentException
 	 *
 	 * @return void
 	 */
