@@ -12,7 +12,7 @@ class AustralianAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 		$input = '02/08/2011 8:15 am';
 		$expected = '2011-08-02 08:15:00';
 
-		$date = new Alaress_Date_Format($input, 'd/m/Y h:i a');
+		$date = new Alaress_Date_Format($input, 'd/m/Y h:i a', new DateTimeZone(date_default_timezone_get()));
 		$result = $date->getDatabase();
 
 		$this->assertEquals($expected, $result);
@@ -28,7 +28,7 @@ class AustralianAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 		$input = '23/08/2011 8:15 pm';
 		$expected = '2011-08-23 20:15:00';
 
-		$date = new Alaress_Date_Format($input, 'd/m/Y h:i a');
+		$date = new Alaress_Date_Format($input, 'd/m/Y h:i a', new DateTimeZone(date_default_timezone_get()));
 		$result = $date->getDatabase();
 
 		$this->assertEquals($expected, $result);
@@ -44,7 +44,7 @@ class AustralianAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 		$input = '23/08/2011';
 		$expected = '2011-08-23 00:00:00';
 
-		$date = new Alaress_Date_Format($input, 'd/m/Y|');
+		$date = new Alaress_Date_Format($input, 'd/m/Y|', new DateTimeZone(date_default_timezone_get()));
 		$result = $date->getDatabase();
 
 		$this->assertEquals($expected, $result);
@@ -60,7 +60,7 @@ class AustralianAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 		$input = '23/08/2011 12:00 pm';
 		$expected = '2011-08-23 12:00:00';
 
-		$date = new Alaress_Date_Format($input, 'd/m/Y h:i a');
+		$date = new Alaress_Date_Format($input, 'd/m/Y h:i a', new DateTimeZone(date_default_timezone_get()));
 		$result = $date->getDatabase();
 
 		$this->assertEquals($expected, $result);
@@ -76,7 +76,7 @@ class AustralianAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 		$input = '23/08/2011 12:00 Am';
 		$expected = '2011-08-23 00:00:00';
 
-		$date = new Alaress_Date_Format($input, 'd/m/Y H:i a');
+		$date = new Alaress_Date_Format($input, 'd/m/Y H:i a', new DateTimeZone(date_default_timezone_get()));
 		$result = $date->getDatabase();
 
 		$this->assertEquals($expected, $result);
@@ -92,7 +92,7 @@ class AustralianAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 		$input = '23-08-2011 12:00 Am';
 		$expected = '2011-08-23 00:00:00';
 
-		$date = new Alaress_Date_Format($input, 'd-m-Y h:i a');
+		$date = new Alaress_Date_Format($input, 'd-m-Y h:i a', new DateTimeZone(date_default_timezone_get()));
 		$result = $date->getDatabase();
 
 		$this->assertEquals($expected, $result);
@@ -102,7 +102,7 @@ class AustralianAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 		$input = date('U', strtotime('2011-08-31 19:21:00'));
 		$expected = '2011-08-31 19:21:00';
 
-		$date = new Alaress_Date_Format($input, 'U');
+		$date = new Alaress_Date_Format($input, 'U', new DateTimeZone(date_default_timezone_get()));
 		$result = $date->getDatabase();
 
 		$this->assertEquals($expected, $result);
@@ -112,7 +112,7 @@ class AustralianAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 		$input = date('U', strtotime('2011-08-31 19:21:00'));
 		$expected = '7:21pm';
 
-		$date = new Alaress_Date_Format($input, 'U');
+		$date = new Alaress_Date_Format($input, 'U', new DateTimeZone(date_default_timezone_get()));
 		$result = $date->getTimeOnly();
 
 		$this->assertEquals($expected, $result);
@@ -122,7 +122,7 @@ class AustralianAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 		$input = date('U', strtotime('2011-08-31 19:21:00'));
 		$expected = '19:21:00';
 
-		$date = new Alaress_Date_Format($input, 'U');
+		$date = new Alaress_Date_Format($input, 'U', new DateTimeZone(date_default_timezone_get()));
 		$result = $date->getDatabaseTime();
 
 		$this->assertEquals($expected, $result);
@@ -132,7 +132,7 @@ class AustralianAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 		$input = '1/9/2011 12:14 pm';
 		$expected = '2011-09-01 12:14:00';
 
-		$date = new Alaress_Date_Format($input, 'd/m/Y h:i a');
+		$date = new Alaress_Date_Format($input, 'd/m/Y h:i a', new DateTimeZone(date_default_timezone_get()));
 		$result = $date->getDatabase();
 
 		$this->assertEquals($expected, $result);
@@ -142,7 +142,7 @@ class AustralianAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 		$input = '2011-07-01 20:51:00';
 		$expected = '2011-07-01 20:51:00';
 
-		$date = new Alaress_Date_Format($input, 'Y-m-d H:i:s');
+		$date = new Alaress_Date_Format($input, 'Y-m-d H:i:s', new DateTimeZone(date_default_timezone_get()));
 		$result = $date->getDatabase();
 
 		$this->assertEquals($expected, $result);
