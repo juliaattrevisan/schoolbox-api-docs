@@ -142,23 +142,4 @@ class Renderer extends Base {
             return;
         }
     }
-
-    /**
-     * Breadcrumbs haha
-     *
-     * @param Category $currentFolder
-     * @return string
-     */
-    private function spawnBreadcrumbs(Category $currentFolder) {
-        $folderMapper = new CategoryMapper();
-        $allCrumbs = $folderMapper->breadcrumb($currentFolder);
-
-        $html = array();
-
-        foreach($allCrumbs as $currentCrumb) {
-            $html[] = "<a href=\"/homepage/{$currentCrumb->getId()}\">{$currentCrumb->getName()}</a>";
-        }
-
-        return implode(' > ', $html);
-    }
 }

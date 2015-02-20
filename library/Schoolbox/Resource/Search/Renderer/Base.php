@@ -11,6 +11,8 @@
 namespace Schoolbox\Resource\Search\Renderer;
 
 use Schoolbox\Resource\Search\MapperResult\Base as MapperResult;
+use Schoolbox\Resource\Category;
+use Schoolbox\Resource\CategoryMapper;
 
 abstract class Base {
 
@@ -163,6 +165,27 @@ abstract class Base {
 
         // render final output
         $this->getPage()->parse(TEMPLATE_body, 'RESULT', true);
+    }
+
+    /**
+     * Breadcrumbs haha
+     *
+     * @param Category $folder
+     * @return string
+     */
+    protected function spawnBreadcrumbs(Category $folder) {
+        $categoryMapper = new CategoryMapper();
+        $allCrumbs = $categoryMapper->breadcrumb($folder);
+
+        $html = array();
+
+        foreach($allCrumbs as $currentCrumb) {
+            $html[] = "<a href=\"/homepage/{$currentCrumb->getId()}\">{$currentCrumb->getName()}</a>";
+        }
+
+        $html[] = "<a href=\"/homepage/{$folder->getId()}\">{$folder->getName()}</a>";
+
+        return implode(' > ', $html);
     }
 
     /* Getters/Setters

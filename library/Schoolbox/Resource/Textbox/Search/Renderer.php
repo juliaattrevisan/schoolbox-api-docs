@@ -16,7 +16,6 @@ use Schoolbox\Resource\Search\Renderer\Base;
 /* Textbox specific
  */
 use Schoolbox\Resource\Textbox;
-use Schoolbox\Resource\CategoryMapper;
 
 class Renderer extends Base {
 
@@ -62,7 +61,7 @@ class Renderer extends Base {
                 $this->getPage()->setVar(array(
                     'TEXTBOX_HEADING' => \Scrub::text($currentTextbox->getHeading()),
                     'TEXTBOX_BODY' => \TextFormatter::cutSentence(\Scrub::html($currentTextbox->getBody()), 150),
-                    'TEXTBOX_BREADCRUMB' => $this->spawnBreadcrumbs($currentTextbox),
+                    'TEXTBOX_BREADCRUMB' => $this->spawnBreadcrumbs($currentTextbox->getCategory()),
                 ));
 
                 $this->getPage()->parse('textbox_block', 'textbox', true);
@@ -80,26 +79,5 @@ class Renderer extends Base {
         else {
             return;
         }
-    }
-
-    /**
-     * Breadcrumbs haha
-     *
-     * @param Textbox $currentTextbox
-     * @return string
-     */
-    private function spawnBreadcrumbs(Textbox $currentTextbox) {
-        $categoryMapper = new CategoryMapper();
-        $allCrumbs = $categoryMapper->breadcrumb($currentTextbox->getCategory());
-
-        $html = array();
-
-        foreach($allCrumbs as $currentCrumb) {
-            $html[] = "<a href=\"/homepage/{$currentCrumb->getId()}\">{$currentCrumb->getName()}</a>";
-        }
-
-        $html[] = "<a href=\"/homepage/{$currentTextbox->getCategory()->getId()}\">{$currentTextbox->getCategory()->getName()}</a>";
-
-        return implode(' > ', $html);
     }
 }

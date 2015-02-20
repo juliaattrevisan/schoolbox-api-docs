@@ -69,7 +69,7 @@ class Renderer extends Base {
                     'LINK_OWNER' => $currentLink->getOwner()->getId(),
                     'LINK_OWNER_NAME' => $currentLink->getOwner()->formatName(),
                     'LINK_CREATED' => $createdTime->getRelativeTime(),
-                    'LINK_BREADCRUMB' => $this->spawnBreadcrumbs($currentLink),
+                    'LINK_BREADCRUMB' => $this->spawnBreadcrumbs($currentLink->getFolder()),
                 ));
 
                 $this->getPage()->parse('link_block', 'link', true);
@@ -87,24 +87,5 @@ class Renderer extends Base {
         else {
             return;
         }
-    }
-
-    /**
-     * Breadcrumbs haha
-     *
-     * @param Link $currentLink
-     * @return string
-     */
-    private function spawnBreadcrumbs(Link $currentLink) {
-        $categoryMapper = new CategoryMapper();
-        $allCrumbs = $categoryMapper->breadcrumb($currentLink->getFolder());
-
-        $html = array();
-
-        foreach($allCrumbs as $currentCrumb) {
-            $html[] = "<a href=\"/homepage/{$currentCrumb->getId()}\">{$currentCrumb->getName()}</a>";
-        }
-
-        return implode(' > ', $html);
     }
 }
