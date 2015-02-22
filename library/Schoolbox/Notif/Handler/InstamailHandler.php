@@ -21,6 +21,7 @@ use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Swift_RfcComplianceException;
+use UnderflowException;
 
 
 /**
@@ -110,6 +111,9 @@ class InstamailHandler extends MailHandler {
 		}
 		catch(MapperException $e) {
 			echo "Could not find user $matches[1]\n";
+		}
+		catch(UnderflowException $e) {
+			echo "Could not compile message: {$e->getMessage()}\n";
 		}
 
 	}
