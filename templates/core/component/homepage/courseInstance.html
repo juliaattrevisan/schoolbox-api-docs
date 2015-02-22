@@ -47,6 +47,10 @@
 
                     });
 
+                    // Did I remove an attachment? Remove the URL too
+                    component.on('click', 'a[data-dz-remove]', function() {
+                        $(this).closest('form').find('input[name=url]').val('').prop('readonly', false);
+                    });
 
                 });
             })(jQuery);
