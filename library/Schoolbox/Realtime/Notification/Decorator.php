@@ -263,7 +263,6 @@ class Decorator extends NotificationBundle
 
             if (!count($params)) {
                 // if this occurs, it's a bug in the notifier that created this notification.
-                debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
                 throw new UnderflowException("Message '$text' contains no params for token '$token'");
             }
 
