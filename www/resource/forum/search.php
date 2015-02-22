@@ -31,6 +31,10 @@ $result[$type] = $forumHandler->search($keyword, 0, Cfg::get('search_all_limit')
 
 $count['all'] = array_sum($count);
 
+/* You can save a db request by using the first $result[$type] and
+ * traversing to $currentPage-1 manually in php, manually constructing
+ * the page's contents
+ */
 $result[$type] = $forumHandler->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type]);
 
 $renderer = new \Schoolbox\Forum\Search\Renderer($page, $result, $count, 0, $keyword);

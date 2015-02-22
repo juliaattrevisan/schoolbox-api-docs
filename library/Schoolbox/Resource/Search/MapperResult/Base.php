@@ -60,6 +60,11 @@ abstract class Base {
          */
         $this->setResult($this->executeSearch($user, $mapper, $sanitiser));
 
+        /* You can save a db request by using the $setResult() outcome and
+         * traversing to $currentPage-1 manually in php, manually constructing
+         * the page's contents
+         */
+
         /* Collect search results count without limit/offset params
          */
         $this->setCount($this->executeSearchCount($user, $mapper, $sanitiser));
