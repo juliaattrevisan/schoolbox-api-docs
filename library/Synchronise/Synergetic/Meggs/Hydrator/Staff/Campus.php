@@ -57,6 +57,7 @@ class Synchronise_Synergetic_Meggs_Hydrator_Staff_Campus implements Synchronise_
                     case 'ELC':
                         $schoolboxCampuses[Campus::CAMPUS_ELC] = Campus::CAMPUS_ELC;
                         break;
+                    case 's':
                     case 'S':
                         $schoolboxCampuses[Campus::CAMPUS_YR7]  = Campus::CAMPUS_YR7;
                         $schoolboxCampuses[Campus::CAMPUS_YR8]  = Campus::CAMPUS_YR8;
