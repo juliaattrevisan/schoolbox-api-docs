@@ -228,16 +228,16 @@ class Notifier extends AbstractModuleNotifier
             );
         }
 
-        // Broadcast to all resource booking moderators
-        $messenger->broadcastToService(
-            UserAccess::SERVICE_RESOURCE_BOOKING,
-            0,
-            UserAccess::ACCESS_FULL,
-            $moderatorMessage,
-            $key,
-            $level,
-            $messageParams
-        );
+        // Broadcast to all resource booking moderators was removed in SB-6802
+//        $messenger->broadcastToService(
+//            UserAccess::SERVICE_RESOURCE_BOOKING,
+//            0,
+//            UserAccess::ACCESS_FULL,
+//            $moderatorMessage,
+//            $key,
+//            $level,
+//            $messageParams
+//        );
 
         return $messenger;
     }
