@@ -436,7 +436,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             $externalUser->getCurrentSemester($synergy_id);
         }
 
-        $timetabledef = $this->getTimetableDefinition($campus);
+        $timetabledef = $this->getTimetableDefinition($campus, $this->getDayNumber($campus));
 
         if (!is_array($timetabledef['desc'])) {
             $_SESSION['FileSemester'] = $originalFileSemester;
