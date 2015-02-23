@@ -86,8 +86,8 @@ class Csv extends Base {
 
 			//
 			// Start or finish time empty? Default to start and end of day.
-			$start_time  = strlen(trim($start_time))  ? $start_time  : '00:00:00';
-			$finish_time = strlen(trim($finish_time)) ? $finish_time : '23:59:59';
+			$start_time  = strlen(trim($start_time))  ? $start_time  : '00:00';
+			$finish_time = strlen(trim($finish_time)) ? $finish_time : '23:59';
 
 			//
 			// All day? if "all day" flag is set.
@@ -116,19 +116,60 @@ class Csv extends Base {
 
             /* Check validity of event settings e.g. datetimes
              */
-            if (!preg_match('/\d\d:\d\d:\d\d/', $start_time)) {
-                $startDatetime = new \Alaress_Date_Format($start_date . ' ' . $start_time, 'd/m/y H:i:s');
-            }
-            else {
-                $startDatetime = new \Alaress_Date_Format($start_date . ' ' . $start_time . ':00', 'd/m/y H:i:s');
-            }
+            $start_time = array(
+                '00:59',
+                '12:58',
+                '23:59',
+                '00:00',
+                '57:00',
+                '99',
+                '99:13',
+                '76:68',
+                '00:00:0',
+                '00:00:00',
+                '23:59:58',
+                '23:59:59',
+                '',
+                '238:011',
+                ':',
+                '-1:-10'
+            );
 
-            if (!preg_match('/\d\d:\d\d:\d\d/', $finish_time)) {
-                $finishDatetime = new \Alaress_Date_Format($finish_date . ' ' . $finish_time, 'd/m/y H:i:s');
+            /* 24 hour time enforcement
+             */
+            foreach ($start_time as $current) {
+
+                /* Default value for all-day events
+                 */
+                if (preg_match('#(00:00:00)|(23:59:59)#', $current)) {
+                    new \Alaress_Probe("$current -- yep, default");
+                }
+                /* Prescribed 24-hour format
+                 */
+                elseif (preg_match('#(0[0-2]|1\d|2[0-3]):([0-5]\d)#', $current)) {
+                    new \Alaress_Probe("$current -- yep, input");
+                }
+                else {
+                    new \Alaress_Probe("$current -- nope");
+                }
             }
-            else {
-                $finishDatetime = new \Alaress_Date_Format($finish_date . ' ' . $finish_time . ':00', 'd/m/y H:i:s');
-            }
+die();
+            $startDatetime = new \Alaress_Date_Format($start_date . ' ' . $start_time, 'd/m/y H:i:s');
+            $finishDatetime = new \Alaress_Date_Format($finish_date . ' ' . $finish_time, 'd/m/y H:i:s');
+
+//            if (preg_match('/\d\d:\d\d:\d\d/', $start_time)) {
+//                $startDatetime = new \Alaress_Date_Format($start_date . ' ' . $start_time, 'd/m/y H:i:s');
+//            }
+//            else {
+//                $startDatetime = new \Alaress_Date_Format($start_date . ' ' . $start_time . ':00', 'd/m/y H:i:s');
+//            }
+//
+//            if (preg_match('/\d\d:\d\d:\d\d/', $finish_time)) {
+//                $finishDatetime = new \Alaress_Date_Format($finish_date . ' ' . $finish_time, 'd/m/y H:i:s');
+//            }
+//            else {
+//                $finishDatetime = new \Alaress_Date_Format($finish_date . ' ' . $finish_time . ':00', 'd/m/y H:i:s');
+//            }
 
             /* Start datetime occurs after finish datetime
              */
@@ -215,6 +256,7 @@ class Csv extends Base {
 			unset($publish_date, $start, $finish);
 		}
 
+        new \Alaress_Probe($output);die();
 		$this->setOutput($output);
 	}
 }
