@@ -216,7 +216,7 @@ class LinkMapper extends Mapper implements Searchable
         );
 
         $notif = new Notif(Notif::TOPIC_CMS);
-        $notif->info("CRUD", $logEntry);
+        $notif->notice("CRUD", $logEntry);
     }
 
     /**
