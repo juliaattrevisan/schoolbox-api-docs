@@ -87,10 +87,13 @@ if (is_numeric($this->arg[0])) {
         /* Discover force_follow value
          */
         $groupMapper = new \Schoolbox\Resource\GroupMapper();
-        $groupSettings = $groupMapper->findOneByColumn('cid', $category->getId());
-
-        if ($groupSettings->getForceFollow()) {
-            $output['MSG_FORCE_FOLLOW_CHECKED'] = 'checked="checked"';
+        try {
+            $groupSettings = $groupMapper->findOneByColumn('cid', $category->getId());
+            if ($groupSettings->getForceFollow()) {
+                $output['MSG_FORCE_FOLLOW_CHECKED'] = 'checked="checked"';
+            }
+        } catch (\Exception $e) {
+            // noop
         }
     }
 
