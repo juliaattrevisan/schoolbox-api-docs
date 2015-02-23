@@ -6,34 +6,44 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-abstract class Component_Homepage_Statistics_ControllerAbstract extends Component_ControllerAbstract {
+abstract class Component_Homepage_Statistics_ControllerAbstract extends Component_ControllerAbstract
+{
 
     protected $dateRange = array();
     protected $groupType;
     private $validGroups = array('student','parent','staff','guest');
 
-    public function setup(array $context, array $config) {
+    public function setup($context, array $config)
+    {
         parent::setup($context, $config);
         $g = new Group();
-        $this->permission = $g->getPermission($context['id']);
 
+        /* ffs arrays
+         * TODO: This should just be an object, never an array
+         */
+        if (is_object($context)) {
+            $contextId = $context->getId();
+            $this->permission = $g->getPermission($context->getId());
+        } elseif (is_array($context)) {
+            $contextId = $context['id'];
+            $this->permission = $g->getPermission($context['id']);
+        }
 
         $args = $this->sitepage->arg;
 
-        if(isset($args[1])) {
+        if (isset($args[1])) {
             $start = explode('-', $args[1]);
 
             // from 1 to 2
-            if(isset($args[2])) {
+            if (isset($args[2])) {
                 $end = explode('-', $args[2]);
-            }
-            // just 1
+            } // just 1
             else {
                 $end = explode('-', $args[1]);
             }
 
             ++$end[1];
-            if($end[1] > 12) {
+            if ($end[1] > 12) {
                 ++$end[0];
                 $end[1] -= 12;
             }
@@ -46,14 +56,13 @@ abstract class Component_Homepage_Statistics_ControllerAbstract extends Componen
             $args[3] = strtolower($args[3]);
             $this->groupType = isset($args[3]) && in_array($args[3], $this->validGroups) ? $args[3] : 'all';
 
-        }
-        // show default (all time?)
+        } // show default (all time?)
         else {
             $this->groupType = 'all';
         }
 
         $this->sitepage->setVar(array(
-            'ID'    => $context['id'],
+            'ID'    => $contextId,
             'GROUP' => $this->groupType
         ));
     }
@@ -63,14 +72,13 @@ abstract class Component_Homepage_Statistics_ControllerAbstract extends Componen
      * @param string $templatePath
      * @return string
      */
-    protected function getTemplate ($templateName = '', $templatePath = '') {
+    protected function getTemplate ($templateName = '', $templatePath = '')
+    {
 
-        if ( empty($templatePath) ) {
+        if (empty($templatePath)) {
             $templatePath = "component/homepage/statistics";
         }
 
         return parent::getTemplate($templateName, $templatePath);
     }
-
-
 }

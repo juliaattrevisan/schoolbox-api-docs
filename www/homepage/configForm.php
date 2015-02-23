@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
-$page = new SitePage();
+$page         = new SitePage();
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
 if (is_numeric($_REQUEST['cid'])) {
@@ -9,7 +9,7 @@ if (is_numeric($_REQUEST['cid'])) {
         error(19);
     }
 
-    $componentInstanceMapper = Component_InstanceMapper::getInstance();
+    $componentInstanceMapper       = Component_InstanceMapper::getInstance();
     $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
 
 
@@ -43,13 +43,13 @@ if (is_numeric($_REQUEST['cid'])) {
 
             Component_InstanceMapper::getInstance()->save($instanceList);
         }
-    }     // AJAX request to delete component from homepage
+    } // AJAX request to delete component from homepage
     elseif ($_POST['cid'] && is_numeric($_POST['delete'])) {
 // locate the instance, locate its config instances, then blast them away
         try {
             /** @var Component_Instance $instance */
             $instance = $componentInstanceMapper->findById($_POST['delete']);
-            $configs = $componentConfigInstanceMapper->findByColumn('component_instance_id', $instance->getId());
+            $configs  = $componentConfigInstanceMapper->findByColumn('component_instance_id', $instance->getId());
             foreach ($configs as $c) {
                 $componentConfigInstanceMapper->delete($c);
             }
@@ -58,7 +58,7 @@ if (is_numeric($_REQUEST['cid'])) {
         }
     } // POST new component to page and output render of component
     elseif (is_numeric($_POST['cid']) && (is_numeric($_POST['add']) || is_numeric($_POST['reload']))) {
-if (is_numeric($_POST['add'])) {
+        if (is_numeric($_POST['add'])) {
             $newComp = new Component_Instance();
             $newComp
                 ->setDefinitionId($_POST['add'])
@@ -72,20 +72,20 @@ if (is_numeric($_POST['add'])) {
                 exit;
             }
 
-            $ids = $componentInstanceMapper->save($newComp);
+            $ids        = $componentInstanceMapper->save($newComp);
             $instanceID = $ids[0];
 
             $componentInstanceMapper->cascadeSequence($_POST['cid']);
-} else {
-                $instanceID = $_POST['reload'];
-            }
+        } else {
+            $instanceID = $_POST['reload'];
+        }
 
         // get the Instance's Definition's Controller
         $factory = new Component_Homepage_Factory(new \Schoolbox\User(), new SitePage(false));
 
         // $component instanceof Component_ControllerAbstract
         $componentList = $componentInstanceMapper->findByInstanceId($instanceID);
-        $cList = array_values($componentList);
+        $cList         = array_values($componentList);
 
         $component = $factory->buildComponent($cList[0]);
 
@@ -93,14 +93,14 @@ if (is_numeric($_POST['add'])) {
             die("<h2>Error adding component</h2><p>Could not find component to instantiate.</p>");
         }
 
-        $catHandler = new Category;
-        $category = $catHandler->getByID($_POST['cid']);
+        $folderMapper = new \Schoolbox\Resource\CategoryMapper();
+        $folder = $folderMapper->findById($_POST['cid']);
 
         $templateTarget = "component_position_{$component->getInstance()->getPosition()}";
         $templateHandle = "component_{$component->getInstance()->getId()}";
         $templateHandle = TEMPLATE_content;
 
-        $component->setup($category, $component->getInstance()->getConfigArray() );
+        $component->setup($folder, $component->getInstance()->getConfigArray());
 
         if ($component->execute() !== false) {
             $component->parseConfig();
@@ -109,20 +109,25 @@ if (is_numeric($_POST['add'])) {
             }
         }
 
-        //
-        // Forgive me for I have sinned and copy-pasted this (double encoding
-        // and all) from www/homepage/index.php
-        $categoryCodes = $catHandler->getCodeForCategory($_POST['cid']);
-        $component->getPageTemplate()->setVar('CODE', urlencode(urlencode($categoryCodes['codes'])));
-        $component->getPageTemplate()->setVar('HEADING', Scrub::text($category['name']));
-        $component->getPageTemplate()->setVar('SITE_LOCATION', Cfg::get('site_location'));
+        /* Accumulate folder codes
+         */
+        $temp = array();
 
+        foreach ($folder->getCodes() as $currentCode) {
+            $temp[] = $currentCode->getCode();
+        }
+
+        $folderCodes = implode(', ', $temp);
+
+        $component->getPageTemplate()->setVar('CODE', urlencode(urlencode($folderCodes)));
+        $component->getPageTemplate()->setVar('HEADING', Scrub::text($folder->getName()));
+        $component->getPageTemplate()->setVar('SITE_LOCATION', Cfg::get('site_location'));
         $component->getPageTemplate()->pparse($templateTarget, $templateHandle);
 
     } // AJAX Save homepage colours
     elseif ($_POST['cid'] && is_array($_POST['colors'])) {
         $homepage = new Homepage($_POST['cid']);
-        $color = array();
+        $color    = array();
         foreach ($_POST['colors'] as $key => $value) {
             $color[$key] = substr($value, 1);
         }
@@ -157,14 +162,16 @@ if (is_numeric($_POST['add'])) {
                 $key = $confD->getKey();
                 if (isset($config[$key])) {
                     $configItem = Component_Config_Factory::build($key, $category, $config);
-                    $value = $configItem->dehydrate($config[$key], $controller);
+                    $value      = $configItem->dehydrate($config[$key], $controller);
 
                     // this should be 1:1 relation, so return only the first instance of this definition
                     /** @var Component_Config $confI */
-                    $confI = $componentConfigInstanceMapper->findByColumnList(array(
-                        'component_config_definition_id' => $confD->getId(),
-                        'component_instance_id'          => $instance->getId()
-                    ))->first();
+                    $confI = $componentConfigInstanceMapper->findByColumnList(
+                        array(
+                            'component_config_definition_id' => $confD->getId(),
+                            'component_instance_id'          => $instance->getId()
+                        )
+                    )->first();
                     if (!($confI instanceof Component_Config)) {
                         $confI = new Component_Config();
                     }

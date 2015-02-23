@@ -86,19 +86,17 @@ function getFolderMeta($folderId)
 {
 
     // handler setup
-    $catHandler = new Category();
     $groupHandler = new Group();
 
-    $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+    $folderMapper = new \Schoolbox\Resource\CategoryMapper();
 
     try {
-
-        /* Only throw error exception if a folderId is specified
+/* Only throw error exception if a folderId is specified
          * and it can't be found; $folderId 0 is used to add a
          * folder to the root node
          */
         if ($folderId) {
-            $cat = $categoryMapper->findById($folderId);
+            $folder = $folderMapper->findById($folderId);
         }
     } catch (Schoolbox\Mapper\Exception $e) {
         sendError('No folder with specified ID exists');
@@ -126,17 +124,17 @@ function getFolderMeta($folderId)
 
 
     // determine the group type (open, restricted, moderated)
-    if ($cat->getGroup()->isPrivate()) {
+    if ($folder->getGroup()->isPrivate()) {
         $type = 'Restricted';
-    } elseif ($cat->getGroup()->isModerated()) {
+    } elseif ($folder->getGroup()->isModerated()) {
         $type = 'Moderated';
-    } elseif ($cat->getGroup()->isFree()) {
+    } elseif ($folder->getGroup()->isFree()) {
         $type = 'Open';
     } else {
         $type = '';
     }
 
-    if($type) {
+    if ($type) {
         // joinable: is the logged in user not already a member?
         $accessType = $groupHandler->involvedInGroup($_SESSION['id'], $folderId);
 
@@ -147,16 +145,14 @@ function getFolderMeta($folderId)
             } elseif ($groupHandler->canSubscribe($folderId)) {
                 $joinable = 1; // can join
             }
-        }
-        else if($accessType >= READ_ACCESS) {
+        } elseif ($accessType >= READ_ACCESS) {
             $joinable = 3; //member of group
         }
 
-        $members = UserAccessMapper::getInstance()->findAdminsInCategory($cat);
-        if(count($members) > 0) {
+        $members = UserAccessMapper::getInstance()->findAdminsInCategory($folder);
+        if (count($members) > 0) {
             $admin = $members->first(); //only every 1 admin
-        }
-        else {
+        } else {
             $admin = UserMapper::getInstance()->getUnknownUser();
         }
     }
@@ -166,19 +162,19 @@ function getFolderMeta($folderId)
     $userAccess = $groupHandler->getPermission($folderId);
     if ($userAccess >= WRITE_ACCESS) {
         $permissions = array();
-        $permsList = $catHandler->getGroupPerms($folderId);
-        if (is_array($permsList)) {
-            $j = 0;
 
-            foreach ($permsList as $group) {
-                $groupAccess = (int)$group['type'];
-                if ($groupAccess > 0) {
-                    $permissions[] = array(
-                        'group'  => $group['name'],
-                        'access' => $groupAccess,
-                        'on_off' => ++$j % 2 ? '' : 'dark',
-                    );
-                }
+        $roleAccessMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
+        $allGroupPerms = $roleAccessMapper->getGroupPermissions($folder);
+
+        $j = 0;
+
+        foreach ($allGroupPerms as $currentGroupPerm) {
+            if ($currentGroupPerm->getType() > 0) {
+                $permissions[] = array(
+                    'group'  => $currentGroupPerm->getRole()->getName(),
+                    'access' => $currentGroupPerm->getType(),
+                    'on_off' => ++$j % 2 ? '' : 'dark',
+                );
             }
         }
     } else {
@@ -213,21 +209,21 @@ function getFolderMeta($folderId)
     }
 
 
-    if ($cat->hasHomepage()) {
+    if ($folder->hasHomepage()) {
         $actions[] = 'homepage';
     }
 
     $folder = array(
-        'name'        => $cat->getName(),
-        'id'          => $cat->getId(),
-        'template'    => $cat->hasHomepage(),
+        'name'        => $folder->getName(),
+        'id'          => $folder->getId(),
+        'template'    => $folder->hasHomepage(),
         'type'        => $type,
         'joinable'    => $joinable,
         'permissions' => $permissions,
         'actions'     => $actions
     );
 
-    if($type) {
+    if ($type) {
         $folder['admins'] = array('externalID'=>$admin->getExternalId(), 'name'=>$admin->getFullName());
         $folder['manage'] = $_SESSION['id'] == $admin->getId() || $_SESSION['user']->isSuperuser() ? true : false;
     }
@@ -306,20 +302,26 @@ function getSingleFileMeta($folderId, $fileId)
 function getSingleLinkMeta($folderId, $linkId)
 {
     $groupHandler = new Group();
-    $linkHandler = new Link();
-    $userHandler = new User();
 
-    $link = $linkHandler->getByID($linkId);
+    try {
+        $linkMapper = new \Schoolbox\Resource\LinkMapper();
+        $link = $linkMapper->findById($linkId);
 
-    if (!$link || $link['deleted'] == 1) {
-        sendError('No link with the specified ID exists');
+        try {
+            $userMapper = new \Schoolbox\UserMapper();
+            $user = $userMapper->findById($link->getOwner()->getId());
+        } catch (\Exception $e) {
+            error(31);
+        }
+    } catch (\Exception $e) {
+        error(101);
     }
 
     $userAccess = $groupHandler->getPermission($folderId);
-    $adf = new Alaress_Date_Format($link['submitted'], 'U');
 
     // actions based on access
     $actions = array();
+
     switch ($userAccess) {
         case FULL_ACCESS:
         case WRITE_ACCESS:
@@ -335,12 +337,12 @@ function getSingleLinkMeta($folderId, $linkId)
 
     $file = array(
         'kind'        => 'link',
-        'id'          => $link['id'],
-        'name'        => $link['description'],
-        'hidden'      => $link['hidden'],
-        'description' => $link['comment'],
-        'posted_by'   => $userHandler->formatName($userHandler->getByID($link['owner'])),
-        'posted_date' => $adf->getDateOnly(),
+        'id'          => $link->getId(),
+        'name'        => $link->getDescription(),
+        'hidden'      => $link->getHidden(),
+        'description' => $link->getComment(),
+        'posted_by'   => $user->formatName(),
+        'posted_date' => $link->getSubmitted()->getDateOnly(),
         'actions'     => $actions
     );
 

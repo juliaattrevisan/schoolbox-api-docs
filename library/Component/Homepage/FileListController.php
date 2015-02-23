@@ -16,11 +16,6 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
     private $groupHandler;
 
     /**
-     * @var Category
-     */
-    private $catHandler;
-
-    /**
      * @var File
      */
     private $fileHandler;
@@ -36,9 +31,18 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
     private $userHandler;
 
     /**
-     * @var array
+     * An instance of Category
+     *
+     * @var \Schoolbox\Resource\Category
      */
     private $source;
+
+    /**
+     * Category Mapper
+     *
+     * @var \Schoolbox\Resource\CategoryMapper
+     */
+    private $categoryMapper = null;
 
     /**
      * Available filters for this component.
@@ -63,20 +67,19 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
     public function execute()
     {
         $this->groupHandler       = new Group();
-        $this->catHandler         = new Category();
         $this->fileHandler        = new File();
         $this->userHandler        = new User();
         $this->allowedFileHandler = new AllowedFile();
+        $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
 
-        // remove any non-numeric values from the source config
-        $this->source = $this->catHandler->getByID(
-            $this->getConfig('src') ?
-                preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
-                $this->getContext('id')
-        );
+        $this->source = $this->getContext();
 
-        if ($this->source === false) {
-            $this->source = $this->catHandler->getByID($this->getContext('id'));
+        if (is_numeric($this->getConfig('src'))) {
+            try {
+                // remove any non-numeric values from the source config
+                $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
+            } catch (\Exception $e) {
+            }
         }
     }
 
@@ -106,11 +109,11 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                     ? $this->getConfig('componentname')
                     : 'Files',
                 // These are for the Select Alternate Source resourcebrowser
-                'COMPONENT_CONFIG_SRC_ID'   => $this->source['id'],
-                'COMPONENT_CONFIG_SRC_NAME' => $this->source['id'] == $this->getContext('id')
+                'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
+                'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext()->getId()
                     ? 'Local'
-                    : $this->source['name'],
-                'FILES_CATEGORY_ID'         => $this->source['id'],
+                    : $this->source->getName(),
+                'FILES_CATEGORY_ID'         => $this->source->getId(),
             )
         );
 
@@ -131,7 +134,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         $this->setBlock('files', 'modify_file', 'modify_file_block');
 
         $fileList = $this->fileHandler->getAllInCategory(
-            $this->source['id'],
+            $this->source->getId(),
             array(
                 'size'    => $this->getConfig('size'),
                 'filter'  => $filter,
@@ -195,7 +198,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
             $this->setVar('files_block', '');
         }
         //setup block for submission button
-        $this->setVar('FILE_CAT_ID', $this->source['id']);
+        $this->setVar('FILE_CAT_ID', $this->source->getId());
         $this->setBlock($templateHandle, "submit_file", "submit_file_block");
         if ($this->permission < WRITE_ACCESS) {
             $this->setVar("submit_file_block", "");
@@ -203,8 +206,29 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
             $this->parse("submit_file_block", "submit_file");
         }
 
-
         return true;
+    }
 
+    /* Getters/Setters
+     */
+
+    /**
+     * Set category mapper
+     *
+     * @param null $categoryMapper
+     */
+    private function setCategoryMapper($categoryMapper)
+    {
+        $this->categoryMapper = $categoryMapper;
+    }
+
+    /**
+     * Get category mapper
+     *
+     * @return null
+     */
+    private function getCategoryMapper()
+    {
+        return $this->categoryMapper;
     }
 }

@@ -36,7 +36,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
         // From updated calendar
         $groupHandler = new Group();
         $calendarApi  = new Calendar_Api_EventType_Event_Schoolbox_Group($_SESSION['user'], array());
-        $calendarApi->setGroupId($this->getContext('id'));
+        $calendarApi->setGroupId($this->getContext()->getId());
 
         // Filter to a given number of days.
         $eventLimit = intval($this->getConfig('size'));
@@ -85,7 +85,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
                     'CAL_DETAIL' => Scrub::html($eventObject->getDetail()),
                     'CAL_COLOUR' => Scrub::text($eventObject->getColour()),
                     'CAL_MODIFY' => $calendarHandler->getPerm($eventId) > READ_ACCESS
-                            ? "<a class=\"btn modify float-left\" href=\"/calendar/modify.php?eventID={$eventId}&homepageId={$this->getContext('id')}&returnTo=homepage\" title=\"Modify\"><span></span>Modify</a>"
+                            ? "<a class=\"btn modify float-left\" href=\"/calendar/modify.php?eventID={$eventId}&homepageId={$this->getContext()->getId()}&returnTo=homepage\" title=\"Modify\"><span></span>Modify</a>"
                             : '',
                     'CAL_TYPE' => Scrub::text($eventObject->getEventType()),
                     'CAL_AUTHOR' => $eventObject->getAuthorName(),
@@ -117,8 +117,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 
                     if ($groupHandler->isStudent($_SESSION['id'])) {
                         if ($attendance = $calendarHandler->getAttendanceByEventAndUser($eventId, $_SESSION['id'])) {
-
-                            /* Attendance Status
+/* Attendance Status
                             */
                             if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
                                 $this->setVar('ATTENDANCE_STATUS', 'Pending');

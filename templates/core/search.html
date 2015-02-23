@@ -5,61 +5,69 @@
 
 $(function() {
 
-	/* Set initial conditions
-	 */
-	var keyword = "{KEYWORD}";
-	var section = 'all';
-	var pageNumber = 1;
+    /* Disable under certain conditions
+     */
+    var enabled = '{ENABLED}';
 
-	if (window.location.hash.length > 1) {
-		var params = search.fetchHash();
+    if (enabled === '1') {
 
-		if (params.length) {
-			section = params[0];
-		}
+        /* Set initial conditions
+         */
+        var keyword = "{KEYWORD}";
+        var section = 'all';
+        var pageNumber = 1;
 
-		if (params.length > 1) {
-			pageNumber = params[1];
-		}
-	}
+        if (window.location.hash.length > 1) {
+            var params = search.fetchHash();
 
-    $(document).ready(function() {
+            if (params.length) {
+                section = params[0];
+            }
+
+            if (params.length > 1) {
+                pageNumber = params[1];
+            }
+        }
+
+        /* Seymour
+         */
         $('#content div.results').on('click', 'a.more', function() {
-            var type = $(this).attr('rel');
-            var selector = '#type a[rel='+type+']';
-            $(selector).trigger('click');
             event.preventDefault();
+
+            var type = $(this).attr('rel');
+
+            window.location.href = '/search?keyword=' + keyword + '#' + type + ',1';
+            window.location.reload(true);
         });
-    });
 
-	search.runOnce(keyword, section, $('#type a[rel=' + section + ']'), pageNumber);
+        /* Run Once by default
+         */
+        search.runOnce(keyword, section, $('#type a[rel=' + section + ']'), pageNumber);
 
-	/* Runs when you change sections
-	 */
-	$('#type a[class!=disabled]').click(function(event) {
-		event.preventDefault();
+        /* Runs when you change sections
+         */
+        $('#type a[class!=disabled]').click(function(event) {
+            event.preventDefault();
 
-		search.runOnce(keyword, $(this).attr('rel'), $(this), 1);
-	});
-
-
+            search.runOnce(keyword, $(this).attr('rel'), $(this), 1);
+        });
+    }
 });
 </script>
 <!-- END custom_head -->
 
 <h1>Search Results{FOR}<em>{UNESCAPED_KEYWORD}</em></h1>
-
 <ul id="type" class="admin-nav">
     <!-- BEGIN type -->
-    <li>
-		<a href='#' rel="{TYPE_TITLE}" class="{TYPE_CLASS}">{TYPE_NAME} ({TYPE_COUNT})</a>
+    <li class='{TYPE_CLASS}'>
+		<a href='#' rel="{TYPE_TYPE}" data-count="0">{TYPE_NAME} ({TYPE_COUNT})</a>
 	</li>
     <!-- END type -->
 </ul>
 
 <div class="results">
     <!-- BEGIN result -->
-    <div rel="{RESULT_TITLE}" class="{RESULT_CLASS}">
+    <div data-type="{RESULT_TYPE}" data-container="resultType" class="search-resultType">
 		{RESULT}
 	</div>
     <!-- END result -->
@@ -72,7 +80,7 @@ $(function() {
         <li>Ensure your search is 3 or more letters long. If you need to search for something less than 3 letters long, "quote" it.</li>
         <li>You can also use "quotes" to search for an exact string, for example "dog and cat".</li>
     </ul>
-    <form method="get" action="/search.php" _lpchecked="1" id="inline_search">
+    <form method="get" action="/search" _lpchecked="1" id="inline_search">
         <label for="inline_search_field">
             Search again:
         </label>

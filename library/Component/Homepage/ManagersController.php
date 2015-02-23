@@ -30,7 +30,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
      */
     public function renderTemplate($templateHandle)
     {
-        if(!parent::loadTemplate($templateHandle, 'managers')) {
+        if (!parent::loadTemplate($templateHandle, 'managers')) {
             return false;
         }
         $this->parseConfig();
@@ -66,14 +66,13 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
         ));
 
         $userHandler = new User;
-        $managerList = $userHandler->getManagers($this->getContext('id'));
+        $managerList = $userHandler->getManagers($this->getContext()->getId());
 
         $emailObj = new Email();
 
         if (is_array($managerList)) {
             $j = 0;
             foreach ($managerList as $manager) {
-
                 $name = $userHandler->formatName($manager);
                 $email = $emailObj->formatEmailFromArray($manager);
                 $meta = $userHandler->getByID($manager['uid']);
@@ -116,7 +115,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
         	 */
             if ($this->groupHandler->isStaff() && isset($emailall) && \Cfg::get('mail_enable')) {
                 $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
-                $this->setVar("EMAILALL", implode(',',$emailall));
+                $this->setVar("EMAILALL", implode(',', $emailall));
                 $this->parse("member_email_block", "member_email");
             } else {
                 $this->setVar('member_email_block', '');
@@ -128,5 +127,4 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
 
         return true; // everything went according to plan
     }
-
 }

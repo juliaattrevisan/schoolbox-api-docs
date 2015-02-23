@@ -14,26 +14,30 @@
 
 if (is_numeric($this->arg[0])) {
     $groupHandler    = new Group;
-    $categoryHandler = new Category;
+    $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
 
-    if (!$category = $categoryHandler->getByID($this->arg[0])) {
+    try {
+        $category = $categoryMapper->findById($this->arg[0]);
+    } catch (\Exception $e) {
         error(2);
     }
+
     if ($groupHandler->getPermission($this->arg[0]) < READ_ACCESS) {
         error(6);
     }
 
     $this->setFile(TEMPLATE_content, 'cms/image-gallery.html');
-    $this->setTitle('Image Gallery for ' . $category['name']);
+    $this->setTitle('Image Gallery for ' . $category->getName());
     $this->setTab('resources');
 
     $this->setBlock(TEMPLATE_content, 'image_gallery', 'image_gallery_block');
 
-    $this->setVar('FOLDER_NAME', $category['name']);
-    $this->setVar('CATEGORY_ID', $category['id']);
+    $this->setVar('FOLDER_NAME', $category->getName());
+    $this->setVar('CATEGORY_ID', $category->getId());
 
     // which homepage do I return to?
-    $returnId = $category['id'];
+    $returnId = $category->getId();
+
     if (isset($this->arg[1])
         && preg_match('/^returnTo:(?P<returnId>\\d+)$/', $this->arg[1], $matches)
     ) {
@@ -41,14 +45,14 @@ if (is_numeric($this->arg[0])) {
     }
     $this->setVar('RETURN_CATEGORY_ID', $returnId);
 
-    $imageList = $categoryHandler->getImages($category['id']);
+    $allImages = $categoryMapper->findImages($category);
 
-    if (is_array($imageList)) {
-        foreach ($imageList as $thumbnail) {
+    if ($allImages->count()) {
+        foreach ($allImages as $currentImage) {
             $this->setVar(
                 array(
-                    'THUMBNAIL_ID'          => $thumbnail['id'],
-                    'THUMBNAIL_DESCRIPTION' => $thumbnail['description'],
+                    'THUMBNAIL_ID'          => $currentImage->getId(),
+                    'THUMBNAIL_DESCRIPTION' => $currentImage->getDescription(),
                     'THUMBNAIL_SIZE'        => Cfg::get('thumbnail_size'),
                 )
             );

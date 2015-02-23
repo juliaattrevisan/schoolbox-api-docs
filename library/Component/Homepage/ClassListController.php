@@ -74,7 +74,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
         /* Get all the students belonging to this category code
          */
         $externalClassHandler = new External_Class();
-        $allStudents = $externalClassHandler->getStudents($this->getContext('code'));
+        $allStudents = $externalClassHandler->getStudents($this->getContext()->getCodeString());
 
         $userHandler = new User();
         $emailHandler = new Email();
@@ -181,5 +181,4 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
         return true;
     }
-
 }

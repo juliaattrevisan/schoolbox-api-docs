@@ -24,7 +24,7 @@ class Component_Config_Video extends Component_Config_Abstract
         }
 
         $videoMapper = new \Schoolbox\Video\ResourceVideoMapper();
-        $vidList = $videoMapper->findByCategory($altSource ?: $this->getCategory('id'), $sortConfig);
+        $vidList = $videoMapper->findByCategory($altSource ?: $this->getCategory()->getId(), $sortConfig);
 
         $page->setBlock($keyblock, 'video_select', 'video_select_block');
         $page->setVar('video_select_block', '');

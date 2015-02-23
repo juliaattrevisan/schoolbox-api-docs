@@ -1,64 +1,84 @@
 <?php
-require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
+require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
-$page = new SitePage;
+$page = new SitePage();
 $output = array();
-
 $allowFilter = array('image', 'video');
 
-if (is_numeric($_POST['categoryID'])) {
-	$fileHandler = new File;
-	$linkHandler = new Link;
-	$allowedFiles = new AllowedFile;
+if (is_numeric($_POST['categoryID']) && $_POST['categoryID']) {
+/* Output a list of nodes (which are comprised of both files and links)
+     * in the second column of Old Resource Browser
+     *
+     * Root folder is zero and no links should be in there
+     * Root folder is the default location to open upon first visit
+     * and when a folder doesn't exist anymore
+     */
+    $category = new \Schoolbox\Resource\Category();
+    $category->setId(0);
 
+    try {
+        $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+        $category = $categoryMapper->findById($_POST['categoryID']);
+    } catch (\Exception $e) {
+        error(13);
+    }
 
-	$fileList = $fileHandler->getAllInCategory($_POST['categoryID'],  in_array($_POST['filter'], $allowFilter) ? array('filter' => $_POST['filter']) : false);
+    /* Also used in tinyMCE resource browser
+     */
+    $filterOptions = null;
 
-	if (!in_array($_POST['filter'], $allowFilter)) {
+    if (in_array($_POST['filter'], $allowFilter)) {
+        $filterOptions = array(
+            'filter' => $_POST['filter']
+        );
+    }
 
-		$linkList = $linkHandler->getAllInCategory($_POST['categoryID']);
-		$fileList = $fileHandler->mergeLinks( $fileList, $linkList);
+    /* The usual nodes
+     */
+    $contents = new \Schoolbox\Resource\Browser\Tree\Contents($category, $filterOptions);
+    $allNodes = $contents->getAllNodes();
 
+    /* Prepend the homepage node, a custom manufacture
+     *
+     * This is used in the tinyMCE resource browser popup, when selecting
+     * links to a Homepage from within a folder
+     */
+    if (isset($_POST['homelink']) && is_numeric($category->getHomepage()->getTemplate()->getId())) {
+        $icon = new \Schoolbox\Resource\Browser\Tree\Node\Icon();
+        $icon->setCss('');
+        $icon->setFile('vcard_fiquet.png');
 
-    	// add homepage "file"
-    	if (isset($_POST['homelink'])) {
+        $node = new \Schoolbox\Resource\Browser\Tree\Node();
+        $node->setNodeId($category->getId());
+        $node->setUser(new \Schoolbox\User());
+        $node->setType('file');
+        $node->setIcon($icon);
+        $node->setName('Homepage');
+        $node->setCategory($category);
+        $node->setCss(array());
+        $node->setModifiedAt(new \Alaress_Date_Relative($_SERVER['REQUEST_TIME']));
 
-    	    $categoryHandler = new Category;
-            $category = $categoryHandler->getByID($_POST['categoryID']);
+        $allNodes->prepend($node);
+    }
 
-            if ($category['template'] > 0) {
-                $homepage = array('id'          => $category['id'],
-                                  'description' => 'Homepage',
-                                  'size'        => 1,
-                                  'iconFile'    => 'vcard_fiquet.png',
-                                  );
+    /* Mash it out
+     */
+    foreach ($allNodes as $currentNode) {
+        $adr = new \Alaress_Date_Relative($currentNode->getModifiedAt()->getUnixTimestamp());
+        $adr->setPrefix('');
 
-                array_unshift($fileList, $homepage);
-            }
-        }
-	}
+        $output[] = array(
+            'id' => $currentNode->getNodeId(),
+            'user' => $currentNode->getUser()->formatName(),
+            'relative' => $adr->getRelativeTime(),
+            'mimeClass' => $currentNode->getIcon()->getCss(),
+            'iconFile' => $currentNode->getIcon()->getFile(),
+            'description' => $currentNode->getName(),
+        );
+    }
 
-	if (!is_array($fileList)) {
-		$output = array();
-	} else {
-		$userHandler = new User();
-
-		foreach ($fileList as $file) {
-            $fileTime = new Alaress_Date_Relative($file['modified']);
-            $fileTime->setPrefix('');
-
-			$file['user'] = $userHandler->formatName($file);
-			$file['relative'] = $fileTime->getRelativeTime();
-			$file['mimeClass'] = !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile";
-			$file['description'] = TextFormatter::cutString($file['description'], 32);
-			$output[] = $file;
-		}
-	}
-
-	$_SESSION['resourcesID'] = $_POST['categoryID'];
+    $_SESSION['resourcesID'] = $_POST['categoryID'];
 }
 
 header("Content-type: application/json");
 print json_encode($output);
-
-?>

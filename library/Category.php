@@ -283,6 +283,12 @@ class Category extends DeprecatedModel
         return $this->db->getRow($query);
     }
 
+    /**
+     * Deprecated
+     *
+     * @deprecated
+     * @param $categoryID
+     */
     function logPageView($categoryID)
     {
         // new mechanism for storing pageviews
@@ -750,14 +756,22 @@ class Category extends DeprecatedModel
             }
         }
 
-        /* Delete all links */
-        $linkHandler = new Link;
-        $linkList = $linkHandler->getAllInCategory($categoryID);
-        if (is_array($linkList)) {
-            foreach ($linkList as $link) {
-                $linkHandler->delete($link['id']);
-            }
+        /* Delete all links
+         */
+        try {
+            $categoryMapper = new \Schoolbox\Resource\Category();
+            $category = $categoryMapper->findById($categoryID);
+        } catch (\Exception $e) {
+            error(13);
         }
+
+        $linkMapper = new \Schoolbox\Resource\LinkMapper();
+        $allLinks = $linkMapper->findAllInCategory($category, array());
+
+        foreach ($allLinks as $currentLink) {
+            $currentLink->delete();
+        }
+
 
         /* Delete folder */
         if ($deleteSelf) {

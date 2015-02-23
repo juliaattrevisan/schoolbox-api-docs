@@ -11,12 +11,17 @@ use Schoolbox\Resource\CategoryMapper;
 class Component_Homepage_BreadcrumbController extends Component_Homepage_ControllerAbstract
 {
 
+    /**
+     * Category Mapper
+     *
+     * @var \Schoolbox\Resource\CategoryMapper
+     */
+    private $categoryMapper = null;
 
     /**
-     * Holds source category object
-     * @var Category
+     * @var array
      */
-    private $category;
+    private $source;
 
     /**
      * Prepares data for the render function. Business logic.
@@ -25,18 +30,15 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
      */
     public function execute()
     {
-        $categoryId = is_numeric($this->getConfig('src')) && $this->getConfig('src') > 0 ? $this->getConfig('src') : $this->getContext('id');
+        $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
 
-        if ($categoryId > 0) {
+        $this->source = $this->getContext();
+
+        if (is_numeric($this->getConfig('src'))) {
             try {
-                $this->category = CategoryMapper::getInstance()->findById($categoryId);
-            } catch (Exception $e) {
-                // if alternate source cannot be found revert to yourself
-                try {
-                    $this->category = CategoryMapper::getInstance()->findById($this->getContext('id'));
-                } catch (Exception $e) {
-                    return false;
-                }
+                // remove any non-numeric values from the source config
+                $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
+            } catch (\Exception $e) {
             }
         }
     }
@@ -51,29 +53,48 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
         if (!parent::loadTemplate($templateHandle, 'breadcrumb')) {
             return false;
         }
+        
         $this->parseConfig();
 
         $this->setBlock($templateHandle, 'category_breadcrumb', 'category_breadcrumb_block');
-
         $this->setVar('category_breadcrumb_block', '');
-        if ($this->category instanceof Category) {
 
-            foreach (CategoryMapper::getInstance()->findParents($this->category) as $parent) {
-                /** @var Category $parent */
-                $this->setVar('BREADCRUMB_CATEGORY_ID', $parent->getId());
-                $this->setVar('BREADCRUMB_CATEGORY_NAME', $parent->getName());
-                $this->setVar('BREADCRUMB_CATEGORY_CLASS', '');
-                $this->parse('category_breadcrumb_block', 'category_breadcrumb', true);
-            }
-
-            $this->setVar('BREADCRUMB_CATEGORY_ID', $this->category->getId());
-            $this->setVar('BREADCRUMB_CATEGORY_NAME', $this->category->getName());
-            $this->setVar('BREADCRUMB_CATEGORY_CLASS', 'last');
+        foreach ($this->getCategoryMapper()->findParents($this->source) as $parent) {
+            /** @var Category $parent */
+            $this->setVar('BREADCRUMB_CATEGORY_ID', $parent->getId());
+            $this->setVar('BREADCRUMB_CATEGORY_NAME', $parent->getName());
+            $this->setVar('BREADCRUMB_CATEGORY_CLASS', '');
             $this->parse('category_breadcrumb_block', 'category_breadcrumb', true);
         }
 
-        return true; // everything went according to plan
+        $this->setVar('BREADCRUMB_CATEGORY_ID', $this->source->getId());
+        $this->setVar('BREADCRUMB_CATEGORY_NAME', $this->source->getName());
+        $this->setVar('BREADCRUMB_CATEGORY_CLASS', 'last');
+        $this->parse('category_breadcrumb_block', 'category_breadcrumb', true);
 
+        return true; // everything went according to plan
     }
 
+    /* Getters/Setters
+     */
+
+    /**
+     * Set category mapper
+     *
+     * @param null $categoryMapper
+     */
+    private function setCategoryMapper($categoryMapper)
+    {
+        $this->categoryMapper = $categoryMapper;
+    }
+
+    /**
+     * Get category mapper
+     *
+     * @return null
+     */
+    private function getCategoryMapper()
+    {
+        return $this->categoryMapper;
+    }
 }

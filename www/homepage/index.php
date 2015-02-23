@@ -8,7 +8,6 @@
  *
  */
 $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
-$catHandler = new Category();
 
 $groupID = $_SESSION['gid'];
 $prefix = 'code';
@@ -19,8 +18,7 @@ $prefix = 'code';
 if (preg_match('/^[1-9]+[0-9]*$/', $this->arg[0])) {
     try {
         $category = $categoryMapper->findById($this->arg[0]);
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
         $this->pageNotFound();
     }
 
@@ -31,15 +29,13 @@ if (preg_match('/^[1-9]+[0-9]*$/', $this->arg[0])) {
         if (!$category) {
             $category = $categoryMapper->findByCode($this->arg[0]);
         }
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
         $this->pageNotFound();
     }
-}
-/* If a prefixed argument is given, load category code directly
+} /* If a prefixed argument is given, load category code directly
  * e.g. /homepage/$prefix/EN344
  */
-else if (($this->arg[0] == $prefix) && (count($this->arg) > 1)) {
+elseif (($this->arg[0] == $prefix) && (count($this->arg) > 1)) {
     $items = $this->arg;
     array_shift($items);
 
@@ -47,15 +43,13 @@ else if (($this->arg[0] == $prefix) && (count($this->arg) > 1)) {
 
     try {
         $category = $categoryMapper->findByCode(urldecode(urldecode($code)));
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
         $this->pageNotFound();
     }
-}
-/* When just an alphabetical category code provided
+} /* When just an alphabetical category code provided
  * e.g. /homepage/EN344
  */
-else if (!is_numeric($this->arg[0])) {
+elseif (!is_numeric($this->arg[0])) {
     $items = $this->arg;
     $code = implode('/', $items);
 
@@ -87,14 +81,14 @@ if ($actualPermission > READ_ACCESS && $_GET['readonly']) {
 $homepageHandler = new Homepage($category->getId());
 
 // this category doesn't have a template, therefore doesn't have a homepage: redirect to resource browser.
-if(!$homepageHandler->getTemplate()) {
+if (!$homepageHandler->getTemplate()) {
     $this->localRedir('/resources/'.$category->getId());
 }
 
 // moving forward! log the pageview
 $mapper = new Schoolbox\Resource\CategoryLogMapper();
 $mapper->incrementHitcount($_SESSION['user'], $category->getId());
-$catHandler->logPageView($category->getId());
+$categoryMapper->logPageView($category);
 
 /* BUILD PAGE */
 $this->setFile(TEMPLATE_content, 'homepage/index.html');
@@ -176,7 +170,7 @@ if ($virtualPermission >= WRITE_ACCESS) {
                 'HOMEPAGE_COMPONENT_NAME' => Scrub::text($component->getName()),
                 'HOMEPAGE_COMPONENT_COUNT' => $component->getInstanceCount(),
                 'HOMEPAGE_COMPONENT_DESCRIPTION' => Scrub::text($component->getDescription()),
-                'HOMEPAGE_COMPONENT_CLASS' => str_replace('\\','_',$component->getClass()),
+                'HOMEPAGE_COMPONENT_CLASS' => str_replace('\\', '_', $component->getClass()),
                 'HOMEPAGE_COMPONENT_MULTIPLE_STATE' => $class,
                 'HOMEPAGE_COMPONENT_CATEGORY_ID' => $previous->getComponentCategory(),
             );
@@ -222,7 +216,6 @@ if ($virtualPermission >= WRITE_ACCESS) {
 
     if (isset($tabList) && count($tabList)) {
         foreach ($tabList as $id => $tab) {
-
             $output = array(
                 'COMPONENT_CATEGORY_ID' => $id,
                 'COMPONENT_CATEGORY_NAME' => Scrub::text($tab['name']),
@@ -307,24 +300,23 @@ $manageClassController = new Component_Homepage_ManageClassController(
 $manageClassController->setMaximumPermission($virtualPermission);
 $manageClassController->setup($categoryContext, array());
 $manageClassController->execute();
-if($manageClassController->renderTemplate('manage_class')){
+if ($manageClassController->renderTemplate('manage_class')) {
     $this->parse('manage_class_block', 'manage_class');
-}
-else {
-    $this->setVar('manage_class_block','');
+} else {
+    $this->setVar('manage_class_block', '');
 }
 
-$this->parse('page_controls_block','page_controls');
+$this->parse('page_controls_block', 'page_controls');
 
 $codeString = '';
-if($_SESSION['user']->getRole()->isStaff()) {
-    if($category->getCodes()->count() > 4) {
+if ($_SESSION['user']->getRole()->isStaff()) {
+    if ($category->getCodes()->count() > 4) {
         //Get first 4 codes
         $subCodes = $category->getCodes()->slice(0, 4);
-        foreach($subCodes as $subCode) {
+        foreach ($subCodes as $subCode) {
             $subCodeString[] = $subCode->getCode();
         }
-        $codeString = Scrub::text(implode(',',$subCodeString).'....');
+        $codeString = Scrub::text(implode(',', $subCodeString).'....');
     } else {
         $codeString = Scrub::text($category->getCodeString());
     }
@@ -392,8 +384,7 @@ $allowedFiles = new AllowedFile;
 $allowedList = $allowedFiles->getAll();
 
 if (is_array($allowedList)) {
-
-    // append link icon to results
+// append link icon to results
     $allowedList[]['iconFile'] = "link.png";
     $last = '';
 

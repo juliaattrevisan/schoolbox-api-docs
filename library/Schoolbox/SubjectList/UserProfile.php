@@ -10,88 +10,91 @@
 
 namespace Schoolbox\SubjectList;
 
+use \Schoolbox\Resource\CategoryCode;
 
-class UserProfile extends SubjectListAbstract {
+class UserProfile extends SubjectListAbstract
+{
 
-	/**
-	 * An instance of groupHandler
-	 *
-	 * @var null
-	 */
-	private $groupHandler = null;
+    /**
+    * An instance of groupHandler
+    *
+    * @var null
+    */
+    private $groupHandler = null;
 
-	/**
-	 * An instance of External_Class
-	 *
-	 * @var null
-	 */
-	private $externalClassHandler = null;
+    /**
+    * An instance of External_Class
+    *
+    * @var null
+    */
+    private $externalClassHandler = null;
 
-	/**
-	 * An instance of userHandler
-	 *
-	 * @var null
-	 */
-	private $userHandler = null;
+    /**
+    * An instance of userHandler
+    *
+    * @var null
+    */
+    private $userHandler = null;
 
-	/**
-	 * Hook method
-	 *
-	 * Set up blocks and stuff
-	 */
-	protected function setup() {
-		$this->setGroupHandler(new \Group());
-		$this->setExternalClassHandler(new \External_Class());
-		$this->setUserHandler(new \User());
+    /**
+    * Hook method
+    *
+    * Set up blocks and stuff
+    */
+    protected function setup()
+    {
+        $this->setGroupHandler(new \Group());
+        $this->setExternalClassHandler(new \External_Class());
+        $this->setUserHandler(new \User());
 
-		$this->getPage()->setBlock(TEMPLATE_content, 'subject', 'subject_block');
-		$this->getPage()->setBlock('subject', 'subject_row', 'subject_row_block');
-		$this->getPage()->setBlock('subject', 'subject_mail', 'subject_mail_block');
-		$this->getPage()->setBlock('subject_row', 'subject_item', 'subject_item_block');
-		$this->getPage()->setBlock('subject_item', 'subject_teacher', 'subject_teacher_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'subject', 'subject_block');
+        $this->getPage()->setBlock('subject', 'subject_row', 'subject_row_block');
+        $this->getPage()->setBlock('subject', 'subject_mail', 'subject_mail_block');
+        $this->getPage()->setBlock('subject_row', 'subject_item', 'subject_item_block');
+        $this->getPage()->setBlock('subject_item', 'subject_teacher', 'subject_teacher_block');
 
-		$this->getPage()->setVar(array(
-			'subject_block' => '',
-			'subject_row_block' => '',
-			'subject_mail_block' => '',
-			'subject_item_block' => '',
-			'subject_teacher_block' => '',
-		));
-	}
+        $this->getPage()->setVar(array(
+            'subject_block' => '',
+            'subject_row_block' => '',
+            'subject_mail_block' => '',
+            'subject_item_block' => '',
+            'subject_teacher_block' => '',
+        ));
+    }
 
-	/**
-	 * Expel each subject grouped by its type
-	 */
-	public function render() {
-
+    /**
+    * Expel each subject grouped by its type
+    */
+    public function render()
+    {
         $emailObj = new \Email();
-        $categoryHandler = new \Category;
-		/* Expel each subject grouped by its type
+
+        /* Expel each subject grouped by its type
 		 */
+        foreach ($this->getAllSubjectLists() as $key => $currentSubjectList) {
+            $emailAll = array();
 
-        foreach($this->getAllSubjectLists() as $key => $currentSubjectList) {
-			$emailAll = array();
+            $this->getPage()->setVar(array(
+                'SUBJECT_CLASSTYPE' => $key
+            ));
 
-
-			$this->getPage()->setVar(array(
-				'SUBJECT_CLASSTYPE' => $key
-			));
-
-			/* For all the classes in the current subject
+            /* For all the classes in the current subject
 			 */
-
             if (is_array($currentSubjectList) && count($currentSubjectList)) {
                 $finalSubjectList = array();
-                /* preprocess list and remove items that should not exist if we cannot link to them */
-                foreach($currentSubjectList as $currentSubject) {
-                    $category = $categoryHandler->getByCode($currentSubject['subject']['code']);
-                    if(is_array($category)) {
-                        $currentSubject['category']['id'] = $category['id'];
-                        $currentSubject['category']['code'] = array_shift(explode(',',$category['code']));
+
+                /* Preprocess list and remove items that should not exist if we cannot link to them
+                 */
+                foreach ($currentSubjectList as $currentSubject) {
+                    try {
+                        $category = $this->getCategoryMapper()->findByCode($currentSubject['subject']['code']);
+                        $currentSubject['category']['id'] = $category->getId();
+                        $currentSubject['category']['code'] = $category->getCodes()->first();
                         $finalSubjectList[] = $currentSubject;
-                    }
-                    else if(\Config::get('show_all_subjects') == 1) {
-                        $finalSubjectList[] = $currentSubject; //output subject because show all subjects is enabled
+                    } catch (\Exception $e) {
+                        if (\Config::get('show_all_subjects') == 1) {
+                            $finalSubjectList[] = $currentSubject; //output subject because show all subjects is enabled
+                        }
                     }
                 }
 
@@ -101,23 +104,20 @@ class UserProfile extends SubjectListAbstract {
                 $i = 1;
 
                 if (is_array($currentSubjectList) && count($currentSubjectList)) {
-
-                    foreach($currentSubjectList as $currentSubject) {
+                    foreach ($currentSubjectList as $currentSubject) {
                         $this->getPage()->setVar(array(
                             'subject_teacher_block' => ''
                         ));
 
-                        if ($currentSubject['category']['code']) {
-                            $code = $currentSubject['category']['code'];
-                        }
-                        else {
+                        if ($currentSubject['category']['code'] instanceof CategoryCode) {
+                            $code = $currentSubject['category']['code']->getCode();
+                        } else {
                             $code = $currentSubject['subject']['campusCode'].'/'.$currentSubject['subject']['code'];
                         }
 
-
                         $this->getPage()->setVar(array(
                             'SUBJECT_NAME' => \Scrub::text($currentSubject['categoryName']),
-                            'SUBJECT_URL' => is_array($currentSubject['category']) && $this->getGroupHandler()->getPermission($currentSubject['category']['id']  ) >= READ_ACCESS ? "/homepage/code/{$currentSubject['category']['code']}": '#',
+                            'SUBJECT_URL' => is_array($currentSubject['category']) && $this->getGroupHandler()->getPermission($currentSubject['category']['id']  ) >= READ_ACCESS ? "/homepage/code/{$currentSubject['category']['code']->getCode()}": '#',
                         ));
 
                         /* Fetch teacher names */
@@ -165,8 +165,7 @@ class UserProfile extends SubjectListAbstract {
                             ));
 
                             $i = 0;
-                        }
-                        else {
+                        } else {
                             $i++;
                         }
                     }
@@ -176,8 +175,7 @@ class UserProfile extends SubjectListAbstract {
                         $this->getPage()->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
                         $this->getPage()->setVar("EMAILALL", implode(',', $emailAll));
                         $this->getPage()->parse("subject_mail_block", "subject_mail");
-                    }
-                    else {
+                    } else {
                         $this->getPage()->setVar('subject_mail_block', '');
                     }
 
@@ -192,63 +190,69 @@ class UserProfile extends SubjectListAbstract {
                     ));
                 }
             }
-		}
-	}
+        }
+    }
 
-	/* Getters/Setters
+    /* Getters/Setters
 	 */
 
-	/**
-	 * Set group handler
-	 *
-	 * @param null $groupHandler
-	 */
-	private function setGroupHandler($groupHandler) {
-		$this->groupHandler = $groupHandler;
-	}
+    /**
+    * Set group handler
+    *
+    * @param null $groupHandler
+    */
+    private function setGroupHandler($groupHandler)
+    {
+        $this->groupHandler = $groupHandler;
+    }
 
-	/**
-	 * Get group handler
-	 *
-	 * @return null
-	 */
-	private function getGroupHandler() {
-		return $this->groupHandler;
-	}
+    /**
+    * Get group handler
+    *
+    * @return null
+    */
+    private function getGroupHandler()
+    {
+        return $this->groupHandler;
+    }
 
-	/**
-	 * Set external class handler
-	 *
-	 * @param null $externalClassHandler
-	 */
-	private function setExternalClassHandler($externalClassHandler) {
-		$this->externalClassHandler = $externalClassHandler;
-	}
+    /**
+    * Set external class handler
+    *
+    * @param null $externalClassHandler
+    */
+    private function setExternalClassHandler($externalClassHandler)
+    {
+        $this->externalClassHandler = $externalClassHandler;
+    }
 
-	/**
-	 * Get external class handler
-	 *
-	 * @return null
-	 */
-	private function getExternalClassHandler() {
-		return $this->externalClassHandler;
-	}
+    /**
+    * Get external class handler
+    *
+    * @return null
+    */
+    private function getExternalClassHandler()
+    {
+        return $this->externalClassHandler;
+    }
 
-	/**
-	 * Set user handler
-	 *
-	 * @param null $userHandler
-	 */
-	private function setUserHandler($userHandler) {
-		$this->userHandler = $userHandler;
-	}
+    /**
+    * Set user handler
+    *
+    * @param null $userHandler
+    */
+    private function setUserHandler($userHandler)
+    {
+        $this->userHandler = $userHandler;
+    }
 
-	/**
-	 * Get user handler
-	 *
-	 * @return null
-	 */
-	private function getUserHandler() {
-		return $this->userHandler;
-	}
+    /**
+    * Get user handler
+    *
+    * @return null
+    */
+    private function getUserHandler()
+    {
+        return $this->userHandler;
+    }
 }

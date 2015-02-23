@@ -1,0 +1,206 @@
+<?php
+/**
+ * Sanitiser
+ *
+ * Santises search parameters Keyword, Sort Property, Sort Direction, Offset, Limit
+ *
+ * - Keyword is quoted
+ *
+ * - Sort Property is based on mapper's defined properties.
+ * If it's not in the mapper's defined properties, will sort by identifier column
+ *
+ * - Sort direction will always return DESC or ASC.
+ *
+ * - Also casts (int) on offset and limit.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Schoolbox\Resource\Search;
+
+use Schoolbox\Mapper;
+
+class Sanitiser
+{
+
+    /**
+     * Sort by this column name
+     *
+     * @var string
+     */
+    private $sortBy = '';
+
+    /**
+     * Sort direction
+     *
+     * @var string
+     */
+    private $sortDir = 'DESC';
+
+    /**
+     * Offset
+     *
+     * @var int
+     */
+    private $offset = 0;
+
+    /**
+     * Limit
+     *
+     * @var int
+     */
+    private $limit = 0;
+
+    /**
+     * Keyword
+     *
+     * @var string
+     */
+    private $keyword = '';
+
+    /**
+     * Sanitise search params
+     *
+     * Immutable
+     *
+     * @param \Schoolbox\Mapper $mapper
+     * @param $keyword
+     * @param $sortProperty
+     * @param $sortDirection
+     * @param $offset
+     * @param $limit
+     */
+    public function __construct(Mapper $mapper, $keyword, $sortProperty, $sortDirection, $offset, $limit)
+    {
+
+        /* Check whether the field you're sorting on exists
+         * in mapping definition before trying to sort on it
+         */
+        if (strlen($sortProperty) && $mapper->getMap()->offsetExists($sortProperty)) {
+            $mappingDefinition = $mapper->getMap()->getOffset($sortProperty);
+        } else {
+            $mappingDefinition = $mapper->getIdentifier();
+        }
+
+        $this->setSortBy($mappingDefinition['column']);
+
+        /* Sort direction
+         */
+        $this->setSortDir(strtoupper($sortDirection) == 'DESC' ? 'DESC' : 'ASC');
+
+        /* Limits and offsets
+         */
+        $this->setOffset((int)$offset);
+        $this->setLimit((int)$limit);
+
+        /* PDO
+         */
+        $this->setKeyword($mapper->getDatabase()->quote($keyword));
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Set limit
+     *
+     * @param int $limit
+     */
+    private function setLimit($limit)
+    {
+        $this->limit = $limit;
+    }
+
+    /**
+     * Get limit
+     *
+     * @return int
+     */
+    public function getLimit()
+    {
+        return $this->limit;
+    }
+
+    /**
+     * Set offset
+     *
+     * @param int $offset
+     */
+    private function setOffset($offset)
+    {
+        $this->offset = $offset;
+    }
+
+    /**
+     * Get offset
+     *
+     * @return int
+     */
+    public function getOffset()
+    {
+        return $this->offset;
+    }
+
+    /**
+     * Set sort by
+     *
+     * @param string $sortBy
+     */
+    private function setSortBy($sortBy)
+    {
+        $this->sortBy = $sortBy;
+    }
+
+    /**
+     * Get sort by
+     *
+     * @return string
+     */
+    public function getSortBy()
+    {
+        return $this->sortBy;
+    }
+
+    /**
+     * Set sort dir
+     *
+     * @param string $sortDir
+     */
+    private function setSortDir($sortDir)
+    {
+        $this->sortDir = $sortDir;
+    }
+
+    /**
+     * Get sort dir
+     *
+     * @return string
+     */
+    public function getSortDir()
+    {
+        return $this->sortDir;
+    }
+
+    /**
+     * Set keyword
+     *
+     * @param string $keyword
+     */
+    private function setKeyword($keyword)
+    {
+        $this->keyword = $keyword;
+    }
+
+    /**
+     * Get keyword
+     *
+     * @return string
+     */
+    public function getKeyword()
+    {
+        return $this->keyword;
+    }
+}

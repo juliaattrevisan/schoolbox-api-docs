@@ -57,7 +57,8 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
         $source = $this->getConfig('src');
 
         if (empty($source)) {
-            $source = array();
+            // Nothing to see here move along
+            return false;
         }
 
         $this->source_category_id = $source;

@@ -15,9 +15,11 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
     private $groupHandler;
 
     /**
-     * @var Category
+     * Category Mapper
+     *
+     * @var \Schoolbox\Resource\CategoryMapper
      */
-    private $catHandler;
+    private $categoryMapper = null;
 
     /**
      * @var array
@@ -38,19 +40,17 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
      */
     public function execute()
     {
-
         $this->groupHandler = new Group();
-        $this->catHandler = new Category();
+        $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
 
-        // remove any non-numeric values from the source config
-        $this->source = $this->catHandler->getByID(
-            $this->getConfig('src') ?
-            preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
-            $this->getContext('id')
-        );
+        $this->source = $this->getContext();
 
-        if ($this->source === false) {
-            $this->source = $this->catHandler->getByID($this->getContext('id'));
+        if (is_numeric($this->getConfig('src'))) {
+            try {
+                // remove any non-numeric values from the source config
+                $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
+            } catch (\Exception $e) {
+            }
         }
     }
 
@@ -67,7 +67,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
 
         // don't show forums to parents if they not a direct member of group
         // (Allow parents to read, but not post, if a child is in group)
-        $is_post_allowed = !$this->groupHandler->hasChildAccessOnly($this->getContext('id'));
+        $is_post_allowed = !$this->groupHandler->hasChildAccessOnly($this->getContext()->getId());
         if (!$is_post_allowed && Cfg::get('restrict_parent_forum_access')) {
             return false;
         }
@@ -84,13 +84,14 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
 
         // Set up component name
         $this->setVar(array(
-            'COMPONENT_CONFIG_SRC_ID'   => $this->source['id'],
-            'COMPONENT_CONFIG_SRC_NAME' => $this->source['name'],
+            'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
+            'COMPONENT_CONFIG_SRC_NAME' => $this->source->getName(),
             'COMPONENT_HANDLE'          => strtolower($templateHandle),
             'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Forum',
         ));
 
         $this->setVar('forum_post_block', '');
+
         if ($is_post_allowed) {
             $this->parse('forum_post_block', 'forum_post');
         }
@@ -100,12 +101,8 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
          */
         $this->setVar("forum_block", '');
 
-        // Override default sorting fields with Forum-specific ones
-        $sortOptions = array('Threads', 'Posts');
-
         $forumHandler = new Forum();
-
-        $threadList = $forumHandler->getRecentThreadList($this->source['id'], $this->getConfig());
+        $threadList = $forumHandler->getRecentThreadList($this->source->getId(), $this->getConfig());
 
         // Iterate
         if (is_array($threadList)) {
@@ -144,5 +141,28 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
         }
 
         return true;
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Set category mapper
+     *
+     * @param null $categoryMapper
+     */
+    private function setCategoryMapper($categoryMapper)
+    {
+        $this->categoryMapper = $categoryMapper;
+    }
+
+    /**
+     * Get category mapper
+     *
+     * @return null
+     */
+    private function getCategoryMapper()
+    {
+        return $this->categoryMapper;
     }
 }

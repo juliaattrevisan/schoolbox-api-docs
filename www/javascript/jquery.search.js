@@ -4,32 +4,39 @@
  */
 search = {
 
-	/* The url that puts out search results
-	 */
-	url: '/search.php',
-
-	/* The search section (type) that was selected e.g. all, people, etc.
-	 */
+    /**
+     * The search section (type) that was selected e.g. all, people, etc.
+     */
 	section: '',
 
-	/* The actual section's HTML element that was selected
-	 */
+    /**
+     * The actual section's HTML element that was selected
+     */
 	sectionElement: '',
 
-	/* The div into which search results get loaded
-	 */
+    /**
+     * The div into which search results get loaded
+     */
 	targetDiv: '',
 
-	/* The keyword to search for
-	 */
+    /**
+     * The keyword to search for
+     */
 	keyword: '',
 
-	/* A comma-separated string/int tuple, e.g. all,1 / user,1 / user,2
-	 *
-	 * This is used to parameterise the search method. This interface is now
-	 * expected each time a search is run.
-	 */
+    /**
+     * A comma-separated string/int tuple, e.g. all,1 / user,1 / user,2
+     *
+     * This is used to parameterise the search method. This interface is now
+     * expected each time a search is run.
+     */
 	hash: '',
+
+    /**
+     * A set of results tabs. These are denoted by data-container=resultType,
+     * caching the selection here allows you to switch tabs faster
+     */
+    resultsTabs: [],
 
 	/**
 	 * Set up destination divs and stuff, storing them in the global search
@@ -43,18 +50,25 @@ search = {
 		this.setSectionElement(config.sectionElement);
 		this.setPageNumber(config.pageNumber);
 		this.setTargetDiv(config.section);
+        this.setResultsTabs($('div.results').find('[data-container=resultType]'));
+
+        /* This url is constructed dynamically
+         */
+        this.setUrl('/resource/' + this.getSection() + '/search')
 	},
 
 	/**
 	 * Load data in
 	 */
 	load: function() {
-		if (!$(this).hasClass('loaded')) {
-			$(this.getTargetDiv()).load(this.getUrl(), "keyword=" + this.getKeyword() + "&type=" + this.getSection() + "&page=" + search.getPageNumber(), function() {
+        var self = this;
+
+		if (!$(this.getTargetDiv()).hasClass('loaded')) {
+			$(this.getTargetDiv()).load(this.getUrl(), "keyword=" + this.getKeyword() + "&type=" + this.getSection() + "&p=" + search.getPageNumber(), function() {
 
 				/* Flag it as having loaded
 				 */
-				$(search.getTargetDiv()).addClass('loaded');
+                $(self.getTargetDiv()).addClass('loaded');
 
 				/* Add pagination again
 				 */
@@ -63,6 +77,13 @@ search = {
 				search.updateStyles();
 			});
 		}
+        else {
+            /* Add pagination again
+             */
+            search.paginate();
+
+            search.updateStyles();
+        }
 	},
 
 	/**
@@ -74,7 +95,7 @@ search = {
 
 			/* Set the page number
 			 */
-            search.setPageNumber( $(this).attr('rel') );
+            search.setPageNumber($(this).attr('rel'));
 
 			/* Update hash configuration
 			 */
@@ -86,11 +107,21 @@ search = {
 
 			/* Load search results in, update pagination and styles
 			 */
-			$(search.getTargetDiv()).load(search.getUrl(), "keyword=" + search.getKeyword() + "&type=" + search.getSection() + "&page=" + search.getPageNumber(), function() {
+			$(search.getTargetDiv()).load(search.getUrl(), "keyword=" + search.getKeyword() + "&type=" + search.getSection() + "&p=" + search.getPageNumber(), function() {
 				search.paginate();
 				search.updateStyles();
 			});
 		});
+
+        /* Show the pagination div again
+         * but only for non-all portions
+         */
+        if (search.getSection() == 'all') {
+            $('.admin-nav.foot').hide();
+        }
+        else {
+            $('.admin-nav.foot').show();
+        }
 	},
 
 	/**
@@ -112,7 +143,7 @@ search = {
 	 * Hide irrelevant tabs
 	 */
 	hideTabs: function() {
-		$('div.results > div').hide();
+		$(this.getResultsTabs()).hide();
 		$(this.getTargetDiv()).show();
 	},
 
@@ -173,7 +204,7 @@ search = {
 		 * through this particular section
 		 */
 		if (this.getSection() == 'all') {
-			$('.admin-nav.foot').remove();
+			$('.admin-nav.foot').hide();
 		}
 	},
 
@@ -248,11 +279,20 @@ search = {
 		return this.url;
 	},
 
+    /**
+     * Set url
+     *
+     * @param url
+     */
+    setUrl: function(url) {
+        this.url = url;
+    },
+
 	/**
 	 * Set the div where search results get loaded in
 	 */
 	setTargetDiv: function(rel) {
-		this.targetDiv = 'div.results > div[rel=' + rel + ']';
+        this.targetDiv = $('div.results').find('[data-type='+rel+']');
 	},
 
 	/**
@@ -278,6 +318,21 @@ search = {
 	 */
 	getSection: function() {
 		return this.section;
-	}
+	},
 
+    /**
+     * Get resultsTabs
+     */
+    getResultsTabs: function() {
+        return this.resultsTabs;
+    },
+
+    /**
+     * Set resultsTabs
+     * 
+     * @param resultsTabs
+     */
+    setResultsTabs: function(resultsTabs) {
+        this.resultsTabs = resultsTabs;
+    }
 }

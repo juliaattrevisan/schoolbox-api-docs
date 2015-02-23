@@ -28,7 +28,9 @@ abstract class Component_ControllerAbstract
     protected $sitepage;
 
     /**
-     * @var array
+     * The category the component is on, if any.
+     *
+     * @var \Schoolbox\Resource\Category
      */
     protected $context;
 
@@ -74,19 +76,32 @@ abstract class Component_ControllerAbstract
         $this->user     = $user;
         $this->sitepage = $sitepage;
         $this->config   = $instance->getConfigArray();
+        $this->context  = new \Schoolbox\Resource\Category();
     }
 
 
     /**
      * Method to provide global config details to the component
-     * @param array $config
+     * @param array|object $config
      */
-    public function setup(array $context, array $config)
+    public function setup($context, array $config)
     {
-        $this->context = $context;
+        /* Enforce instance insetad of permitting dual types
+         */
+        if (is_array($context)) {
+            try {
+                $folderMapper = new \Schoolbox\Resource\CategoryMapper();
+                $folder = $folderMapper->findById($context['id']);
+
+                $this->context = $folder;
+            } catch (\Exception $e) {
+            }
+        } else {
+            $this->context = $context;
+        }
+
         $this->config  = $config;
     }
-
 
     /**
      * Prepares data for the render function. Business logic.
@@ -302,8 +317,7 @@ abstract class Component_ControllerAbstract
             $template = 'component/config/_templatewrapper.html';
         } else {
             if (in_array($this->instance->getModule(), array('homepage', 'eportfolio'))) {
-
-                /* eportfolio uses a special version of le wrapier
+/* eportfolio uses a special version of le wrapier
                  */
                 $template = 'component/config/' . $this->instance->getModule() . '_wrapper.html';
             } else {
@@ -396,8 +410,13 @@ abstract class Component_ControllerAbstract
     protected function getContext($key = '')
     {
         if ($key) {
-            return isset($this->context[$key]) ? $this->context[$key] : false;
+            if (is_object($this->context)) {
+                return isset($this->context->$key) ? $this->context->$key : false;
+            } else {
+                return isset($this->context[$key]) ? $this->context[$key] : false;
+            }
         }
+
         return $this->context;
     }
 

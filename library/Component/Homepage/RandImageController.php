@@ -6,7 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_RandImageController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_RandImageController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * @var DeprecatedDatabase
@@ -18,7 +19,8 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
         $this->db = DeprecatedDatabase::getInstance();
     }
 
@@ -27,7 +29,8 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
         if (!parent::loadTemplate($templateHandle, 'randImage')) {
             return false;
         }
@@ -40,7 +43,7 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
         //get image id
         $query = "SELECT id, comment
                   FROM file
-                  WHERE category = {$this->getContext('id')}
+                  WHERE category = {$this->getContext()->getId()}
                   AND deleted = '0'
                   AND hidden = '0'
                   AND INSTR(mime_type, 'image/')
@@ -68,5 +71,4 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
         return true; // everything went according to plan
 
     }
-
 }

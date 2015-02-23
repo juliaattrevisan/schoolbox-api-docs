@@ -4,10 +4,12 @@
 /**
  * Puts all resources from a folder into a zip
  */
-class ZipFolder {
+class ZipFolder
+{
 
-    function ZipFolder($folder) {
-	    $this->db = DeprecatedDatabase::getInstance();
+    function ZipFolder($folder)
+    {
+        $this->db = DeprecatedDatabase::getInstance();
         $this->folder = $folder;
         $this->tmpName = tempnam(Cfg::get('zip_dir'), 'zip');
         $this->tmpFolder = $this->tmpName . 'dir';
@@ -21,9 +23,8 @@ class ZipFolder {
 
         $this->folderDetails = $this->getFolderDetails($folder);
 
-        if (is_numeric($this->folderDetails['id'])) {
-
-            if ($this->getPermission($this->folderDetails['id']) < READ_ACCESS) {
+        if (is_numeric($this->folderDetails->getId())) {
+            if ($this->getPermission($this->folderDetails->getId()) < READ_ACCESS) {
                 error(5);
             }
         } else {
@@ -32,22 +33,26 @@ class ZipFolder {
     }
 
 
-    function getResources($folder) {
+    function getResources($folder)
+    {
         $query = "SELECT id, realname, file_size FROM file WHERE category = {$folder} AND deleted = 0";
         return $this->db->getAll($query);
     }
 
-    function getFolders($folder) {
+    function getFolders($folder)
+    {
         $query = "SELECT id, name FROM category WHERE parent = {$folder}";
         return $this->db->getAll($query);
     }
 
-    function cleanName($name) {
+    function cleanName($name)
+    {
         $filename = preg_replace("/{$this->allowedChars}/", "_", $name);
         return $filename;
     }
 
-    function uniqueFileName($fileName, $depth = 1) {
+    function uniqueFileName($fileName, $depth = 1)
+    {
         if (is_file($fileName)) {
             $pathParts = pathinfo($fileName);
             $newName = $pathParts['dirname'] . '/' . $pathParts['filename'] . '_' . $depth . '.' . $pathParts['extension'];
@@ -57,10 +62,10 @@ class ZipFolder {
         }
     }
 
-    function sendZip() {
+    function sendZip()
+    {
         if ($this->createZip()) {
-
-            $filename = $this->cleanName($this->folderDetails['name']);
+            $filename = $this->cleanName($this->folderDetails->getName());
 
             $filesize = filesize($this->tmpZip);
             header("Pragma: ");
@@ -76,7 +81,8 @@ class ZipFolder {
         }
     }
 
-    function createDirectory($currentDir, $folderID, $depth = 0) {
+    function createDirectory($currentDir, $folderID, $depth = 0)
+    {
         //populate dir with files
         $fileList = $this->getResources($folderID);
 
@@ -93,8 +99,7 @@ class ZipFolder {
 
         //dont recurse deeper than max depth or max size
         if ($this->maxDepth > $depth && $this->maxSize > $this->size) {
-
-            //get subfolders and recurse through them
+//get subfolders and recurse through them
             $folderList = $this->getFolders($folderID);
             if (is_array($folderList)) {
                 foreach ($folderList as $folder) {
@@ -109,7 +114,8 @@ class ZipFolder {
         }
     }
 
-    function createZip() {
+    function createZip()
+    {
         $archive = new ZipArchive();
         $archive->open($this->tmpZip, ZipArchive::CREATE);
         mkdir($this->tmpFolder);
@@ -131,8 +137,7 @@ class ZipFolder {
             $zipPath  = substr($filePath, strlen($this->tmpFolder)+1);
             if ($file->isDir()) {
                 $archive->addEmptyDir($zipPath);
-            }
-            elseif ($file->isFile()) {
+            } elseif ($file->isFile()) {
                 $archive->addFile($filePath, $zipPath);
             }
         }
@@ -141,28 +146,30 @@ class ZipFolder {
 
     }
 
-    function cleanUp() {
+    function cleanUp()
+    {
         unlink($this->tmpName);
         unlink($this->tmpZip);
         $this->removeDir($this->tmpFolder);
     }
 
-    function removeDir($path) {
+    function removeDir($path)
+    {
         // Add trailing slash to $path if one is not there
         if (substr($path, -1, 1) != "/") {
             $path .= "/";
         }
         foreach (glob($path . "*") as $file) {
-            if (is_file($file) === TRUE) {
+            if (is_file($file) === true) {
                 // Remove each file in this Directory
                 unlink($file);
-            } else if (is_dir($file) === TRUE) {
+            } elseif (is_dir($file) === true) {
                 // If this Directory contains a Subdirectory, run this Function on it
                 $this->removeDir($file);
             }
         }
         // Remove Directory once Files have been removed (If Exists)
-        if (is_dir($path) === TRUE) {
+        if (is_dir($path) === true) {
             rmdir($path);
         }
     }
@@ -173,9 +180,15 @@ class ZipFolder {
      * @param $folder_id
      * @return array|bool
      */
-    protected function getFolderDetails($folder_id) {
-        $categoryHandler = new Category;
-        return $categoryHandler->getByID($folder_id);
+    protected function getFolderDetails($folder_id)
+    {
+        try {
+            $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+            $category = $categoryMapper->findById($folder_id);
+
+            return $category;
+        } catch (\Exception $e) {
+        }
     }
 
     /**
@@ -184,7 +197,8 @@ class ZipFolder {
      * @param $folder_id
      * @return DENY_ACCESS|READ_ACCESS|WRITE_ACCESS|FULL_ACCESS
      */
-    protected function getPermission($folder_id) {
+    protected function getPermission($folder_id)
+    {
         return $this->groupHandler->getPermission($folder_id);
     }
 
@@ -194,7 +208,8 @@ class ZipFolder {
      * @param $file_id Id of the file in the database
      * @return string
      */
-    protected function getFilePath($file_id) {
+    protected function getFilePath($file_id)
+    {
         return Cfg::get('file_dir') . '/' . $file_id . '.dat';
     }
 
@@ -205,7 +220,8 @@ class ZipFolder {
      * @param array $file File row from the database
      * @return string
      */
-    protected function getTargetPath($currentDir, $file) {
+    protected function getTargetPath($currentDir, $file)
+    {
         $fileName = $currentDir . '/' . $file['realname'];
         return $this->uniqueFileName($fileName); //ensure filename is unique else puts numbers in filename
     }

@@ -37,7 +37,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
     /**
      * Category Mapper
      *
-     * @var null
+     * @var \Schoolbox\Resource\CategoryMapper
      */
     private $categoryMapper = null;
 
@@ -53,6 +53,16 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
         $this->setBlogMapper(new \Schoolbox\Blog\BlogMapper());
         $this->setCommentMapper(new \Schoolbox\Blog\CommentMapper());
         $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
+
+        $this->source = $this->getContext();
+
+        if (is_numeric($this->getConfig('src'))) {
+            try {
+                // remove any non-numeric values from the source config
+                $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
+            } catch (\Exception $e) {
+            }
+        }
     }
 
     /**
@@ -67,19 +77,6 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
         }
 
         $this->parseConfig();
-
-        // remove any non-numeric values from the source config
-        $sourceId = $this->getConfig('src') ? preg_replace(
-            '#[/a-zA-Z]#',
-            '',
-            $this->getConfig('src')
-        ) : $this->getContext('id');
-
-        try {
-            $this->source = $this->getCategoryMapper()->findById($sourceId);
-        } catch (\Exception $e) {
-            $this->source = $this->getCategoryMapper()->findById($this->getContext('id'));
-        }
 
         if ($this->permission < READ_ACCESS) {
             return false;
@@ -110,13 +107,11 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
         $this->setVar(
             array(
                 'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig(
-                        'componentname'
-                    ) : 'Blog',
+                    'componentname'
+                ) : 'Blog',
                 // These are for the Select Alternate Source resourcebrowser
                 'COMPONENT_CONFIG_SRC_ID' => $this->source->getId(),
-                'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext(
-                        'id'
-                    ) ? 'Local' : $this->source->getName(),
+                'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext()->getId() ? 'Local' : $this->source->getName(),
                 /* Have update form to back to this homepage, not the wiki's homepage
                  */
                 'BLOG_CATEGORY_ID' => $this->source->getId(),

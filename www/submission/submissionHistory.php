@@ -148,13 +148,24 @@ $this->setVar(
 $externalClassHandler = new External_Class();
 $userHandler          = new User();
 $groupHandler         = new Group();
-$catHandler           = new Category();
 
-$codes = $catHandler->getCodeForCategory($submission->getCategory()->getId());
+$folderMapper = new \Schoolbox\Resource\CategoryMapper();
+$folder = $folderMapper->findById($submission->getCategory()->getId());
 
-if ($codes && count($codes)) {
-    $classCode = $codes['codes'];
+if ($folder->getCodes()->count()) {
+/* Get all the folder codes, implode them into a csv
+     * as per the handler
+     */
+    $temp = array();
 
+    foreach ($folder->getCodes() as $currentCode) {
+        $temp[] = $currentCode->getCode();
+    }
+
+    $classCode = implode(', ', $temp);
+
+    /* Iterate
+     */
     $listSyns    = $externalClassHandler->getTeacherName($classCode);
     $staffGroups = $groupHandler->getStaffGroupTypeIds();
 

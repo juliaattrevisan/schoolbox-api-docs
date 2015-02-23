@@ -1,0 +1,29 @@
+<div class="box">
+<h2>Folders <!-- BEGIN count -->({FOLDER_DISP_COUNT} / {FOLDER_COUNT})<!-- END count --></h2>
+<ul class="information-list">
+<!-- BEGIN folder -->
+	<li>
+		<span class="actions">
+			<!-- BEGIN modify --><a href="/cms/category/{FOLDER_ID}" class="btn no-text modify" title="Modify Folder"><span></span></a><!-- END modify -->
+		</span>
+		<a href="/homepage/{FOLDER_ID}">
+			<img class="thumbnail" height="60" width="60" src="/images/icons/60x60/{FOLDER_TYPE}.png" />
+			<h4>{FOLDER_NAME}</h4>
+		</a>
+		<p class="meta">{FOLDER_BREADCRUMB}</p>
+		<a class="btn folder" href="/resources/{FOLDER_ID}"><span></span>Resources</a>
+		<a class="btn resources" href="/cms/imageGallery/{FOLDER_ID}"><span></span>Image Gallery</a>
+	</li>
+<!-- END folder -->
+</ul>
+<!-- BEGIN see_more -->
+<p>
+	<a id="category-more" class="float-left btn more" rel="folder" href="#"><span></span>See all {MORE_COUNT} results for Folders</a>
+</p>
+<!-- END see_more -->
+<ul class="admin-nav foot">
+	<!-- BEGIN pagination -->
+	<li><a href="javascript:void(0);" rel="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a></li>
+	<!-- END pagination -->
+</ul>
+</div>

@@ -6,22 +6,28 @@ $this->setFile(TEMPLATE_content, 'group/bulk.html');
 $this->setTitle('Add Bulk Members');
 $this->setTab('resources');
 
-$categoryHandler = new Category;
+$folderMapper = new \Schoolbox\Resource\CategoryMapper();
 
 if (is_numeric($this->arg[0])) {
+    try {
+        $folder = $folderMapper->findById($this->arg[0]);
+    } catch (\Exception $e) {
+        error(19);
+    }
 
-	$category = $categoryHandler->getByID($this->arg[0]);
+    $userAccessMapper = new \Schoolbox\Permission\Access\UserAccessMapper();
 
-	// check access
-	if(!$_SESSION['su'] && $category['owner'] != $_SESSION['id'])
-		error(19);
+    $isFolderOwner = $userAccessMapper->isFolderOwner($_SESSION['user'], $folder);
 
-	$output = array('CATEGORY_NAME'	=> Scrub::text($category['name']),
-					'CATEGORY_ID'	=> $category['id'],
-					);
-	$this->setVar($output);
+    // check access
+    if (!$_SESSION['su'] && !$isFolderOwner) {
+        error(19);
+    }
 
-} else
-	error(2);
-
-?>
+    $this->setVar(array(
+        'CATEGORY_NAME' => Scrub::text($folder->getName()),
+        'CATEGORY_ID'   => $folder->getId(),
+    ));
+} else {
+    error(2);
+}

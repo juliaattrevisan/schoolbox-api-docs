@@ -24,7 +24,7 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
      */
     public function renderTemplate($templateHandle)
     {
-        if(!parent::loadTemplate($templateHandle, 'teachers')) {
+        if (!parent::loadTemplate($templateHandle, 'teachers')) {
             return false;
         }
         $this->parseConfig();
@@ -55,18 +55,17 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
             'LIST_STYLE' => $displayOptions[$display]['css'],
         ));
 
-        if (($this->getContext('code') != '') && Cfg::get('external_enable')) {
-
+        if (($this->getContext()->getCodeString() != '') && Cfg::get('external_enable')) {
             $externalClassHandler = new External_Class();
             $userHandler = new User();
             $groupHandler = new Group();
 
-            $listSyns = $externalClassHandler->getTeacherName($this->getContext('code'));
+            $listSyns = $externalClassHandler->getTeacherName($this->getContext()->getCodeString());
             $staffGroups = $groupHandler->getStaffGroupTypeIds();
 
             if (is_array($listSyns)) {
                 $j = 0;
-                foreach($listSyns as $synid) {
+                foreach ($listSyns as $synid) {
                     $teacher = $userHandler->getBySynergyAndGroup($synid, $staffGroups);
                     $meta = $userHandler->getByID($teacher['uid']);
 
@@ -104,5 +103,4 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
         return true; // everything went according to plan
 
     }
-
 }

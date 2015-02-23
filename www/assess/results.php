@@ -28,7 +28,8 @@
  *
  * @return void
  */
-function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $page, $currentStudent, $previousAttempt, $readonly) {
+function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $page, $currentStudent, $previousAttempt, $readonly)
+{
     $firstSection = $sectionHandler->getFirst($page->arg[0]);
 
     /* Finish time. Show the datetime when the person clicked Finish.
@@ -135,7 +136,6 @@ $attemptHandler = new Assess_Attempt();
 $sectionHandler = new Assess_Section();
 $userHandler = new User();
 $groupHandler = new Group();
-$categoryHandler = new Category();
 
 $assess = $assessHandler->getByID($this->arg[0]);
 
@@ -207,16 +207,14 @@ $allAttempts = $attemptHandler->getList($this->arg[0]);
  */
 if (is_array($allAttempts) && count($allAttempts)) {
     $this->parse('has_attempt_block', 'has_attempt');
-}
-else {
+} else {
     $this->setVar('has_attempt_block', '');
 }
 
 /* Process everyone
  */
 if (is_array($allStudents) && count($allStudents)) {
-
-    /* Process each student
+/* Process each student
       */
     foreach ($allStudents as $currentStudent) {
         $previousAttempt = null;

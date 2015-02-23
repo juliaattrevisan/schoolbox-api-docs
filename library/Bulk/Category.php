@@ -7,124 +7,182 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Bulk_Category extends Bulk_Abstract {
-	private $templateID = 0;
+class Bulk_Category extends Bulk_Abstract
+{
 
-	/**
-	 * Constructor
-	 *
-	 * @param $file
-	 * @param $templateID
-	 */
-	public function __construct($file, $templateID) {
-		$this->setFile($file);
-		$this->setTemplateID($templateID);
-	}
+    /**
+     * Default id for HomepageTemplate instance
+     *
+     * @var int
+     */
+    private $templateID = 0;
 
-	/**
-	 * Adds categories via csv
-	 * CSV Fields:
-		 0.	parent
-		 1.	title
-		 2-n. codes
-	 *
-	 * @return array
-	 */
-	public function addCategories() {
-		$categoryHandler = new Category();
+    /**
+    * Constructor
+    *
+    * @param $file
+    * @param $templateID
+    */
+    public function __construct($file, $templateID)
+    {
+        $this->setFile($file);
+        $this->setTemplateID($templateID);
+    }
 
-		/* List of outcomes
+    /**
+    * Adds categories via csv
+    * CSV Fields:
+    0.	parent
+    1.	title
+    2-n. codes
+    *
+    * @return array
+    */
+    public function addCategories()
+    {
+        $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+
+        /* List of outcomes
 		 */
-		$output = array();
+        $output = array();
 
-		if (is_file($this->getFile())) {
-			$groups = array_map(array(Scrub, 'text'), $_POST['groupPerm']);
+        if (is_file($this->getFile())) {
+            $groups = array_map(array(Scrub, 'text'), $_POST['groupPerm']);
 
-			/* Process rows
+            /* Process rows
 			 */
-			$handle = fopen($this->getFile(), 'r');
-			$headerRow = fgetcsv($handle, 1000, ",");
+            $handle = fopen($this->getFile(), 'r');
+            $headerRow = fgetcsv($handle, 1000, ",");
 
-			while (($category = fgetcsv($handle, 1000, ",")) !== FALSE) {
-				if (($category[0] != '') && ($category[1] != '')) {
-
-					/* Check parent exists
+            while (($row = fgetcsv($handle, 1000, ",")) !== false) {
+                if (($row[0] != '') && ($row[1] != '')) {
+/* Check parent exists
 					 */
-					if ($categoryHandler->getByID($category[0]) == FALSE) {
-						$output[] = array(
-							'category' => $category[1],
-							'status' => 'Not Added',
-							'error' => "Could not find parent folder {$category[0]}",
-						);
+                    try {
+                        $category = $categoryMapper->findById($row[0]);
+                    } catch (\Exception $e) {
+                        $output[] = array(
+                            'category' => $row[1],
+                            'status' => 'Not Added',
+                            'error' => "Could not find parent folder {$row[0]}",
+                        );
 
-						continue;
-					}
+                        continue;
+                    }
 
-					/* Check if subject code already exists
+                    /* Check if subject code already exists
 					 */
-					$codeExists = false;
-					$code = array();
+                    $codeExists = false;
+                    $code = array();
 
-					for ($i=2; $category[$i]; $i++) {
-						if ($categoryHandler->getByCode($category[$i])) {
-							$output[] = array(
-								'category' => $category[$i],
-								'status' => 'Skipped',
-								'error' => "Subject code already exists ({$category[$i]})",
-							);
+                    for ($i=2; $row[$i]; $i++) {
+                        try {
+                            $category = $categoryMapper->findByCode($row[$i]);
 
-							$codeExists = true;
-						}
+                            $output[] = array(
+                                'category' => $row[$i],
+                                'status' => 'Skipped',
+                                'error' => "Subject code already exists ({$row[$i]})",
+                            );
 
-						$code[] = $category[$i];
-					}
+                            $codeExists = true;
+                        } catch (\Exception $e) {
+                        }
 
-					if ($codeExists) {
-						continue;
-					}
+                        $code[] = $row[$i];
+                    }
 
-					$newCat = array(
-						'name' => $category[1],
-						'parent' => $category[0],
-						'template' => $this->getTemplateID(),
-						'group' => $groups,
-						'code' => implode(',', $code),
-					);
+                    if ($codeExists) {
+                        continue;
+                    }
 
-					/* Successfully created
+                    /* Parent folder
+                     */
+                    $parent = new \Schoolbox\Resource\Category();
+                    $parent->setId($row[0]);
+
+                    /* Homepage config template
+                     */
+                    $homepageTemplate = new \Schoolbox\Resource\HomepageTemplate();
+                    $homepageTemplate->setId($this->getTemplateID());
+
+                    /* Homepage config
+                     */
+                    $homepageConfig = new \Schoolbox\Resource\HomepageConfig();
+                    $homepageConfig->setTemplate($homepageTemplate);
+
+                    /* Set up new folder
+                     */
+                    $newFolder = new \Schoolbox\Resource\Category();
+                    $newFolder->setName($row[1]);
+                    $newFolder->setParent($parent);
+                    $newFolder->setHomepage($homepageConfig);
+
+                    /* Accumulate all folder codes
+                     */
+                    foreach ($code as $currentCode) {
+                        $folderCode = new \Schoolbox\Resource\CategoryCode();
+                        $folderCode->setCode($currentCode);
+
+                        $newFolder->getCodes()->add($folderCode);
+                    }
+
+                    $categoryMapper->save($newFolder);
+
+                    /* Save roles
+                     */
+                    $roleAccessMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
+
+                    foreach ($groups as $id => $perm) {
+                        try {
+                            $roleMapper = new \Schoolbox\RoleMapper();
+                            $role = $roleMapper->findById($id);
+
+                            $roleAccess = new \Schoolbox\Permission\Access\RoleAccess();
+                            $roleAccess->setCategory($category);
+                            $roleAccess->setRole($role);
+                            $roleAccess->setType($perm);
+                            $roleAccessMapper->save($roleAccess);
+                        } catch (\Exception $e) {
+                        }
+                    }
+
+                    /* Successfully created
 					 */
-					if ($categoryHandler->create($newCat)) {
-						$output[] = array(
-							'category' => $category[1],
-							'status' => 'Added',
-							'error' => 'OK',
-						);
-					}
-				}
-			}
-		}
+                    if (is_numeric($category->getId())) {
+                        $output[] = array(
+                            'category' => $row[1],
+                            'status' => 'Added',
+                            'error' => 'OK',
+                        );
+                    }
+                }
+            }
+        }
 
-		return $output;
-	}
+        return $output;
+    }
 
-	/* Getters/Setters
+    /* Getters/Setters
 	 */
 
-	/**
-	 * Set template id
-	 *
-	 * @param $templateID
-	 */
-	private function setTemplateID($templateID) {
-		$this->templateID = $templateID;
-	}
+    /**
+    * Set template id
+    *
+    * @param $templateID
+    */
+    private function setTemplateID($templateID)
+    {
+        $this->templateID = $templateID;
+    }
 
-	/**
-	 * Get template id
-	 *
-	 * @return int
-	 */
-	private function getTemplateID() {
-		return $this->templateID;
-	}
+    /**
+    * Get template id
+    *
+    * @return int
+    */
+    private function getTemplateID()
+    {
+        return $this->templateID;
+    }
 }

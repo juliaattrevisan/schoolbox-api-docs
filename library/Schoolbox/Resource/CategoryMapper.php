@@ -124,14 +124,40 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
     }
 
     /**
+     * Log a page view
+     *
+     * @param Category $category
+     */
+    public function logPageView(Category $category) {
+
+        // new mechanism for storing pageviews
+        // the use of NOW() generates a truncation warning (non-fatal and non-critical) since a datetime is being
+        // shoved into a date field, but it can be safely ignored: the data inserts correctly
+        $query = "
+            INSERT INTO homepage_visits (`date`, `user_group_id`, `category_id`)
+            VALUES (NOW(), :gid, :cid)
+            ON DUPLICATE KEY
+            UPDATE `hitcount` = `hitcount` + 1
+        ";
+
+        $params = array(
+            'cid' => $category->getId(),
+            'gid' => $_SESSION['gid']
+        );
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($params);
+    }
+
+    /**
      * Find all images for a category
      *
-     * @param $categoryId
+     * @param \Schoolbox\Resource\Category $category
      * @param int $limit
      * @param bool $excludeWork
      * @return mixed
      */
-    public function findImages($categoryId, $limit = 0, $excludeWork = false)
+    public function findImages(Category $category, $limit = 0, $excludeWork = false)
     {
         $fileMapper = $this->getJoinMapper('files');
 
@@ -151,13 +177,13 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
         }
 
         $params = array(
-            'categoryId' => $categoryId,
+            'categoryId' => $category->getId(),
         );
 
         $statement = $this->database->prepare($query);
         $statement->execute($params);
 
-        $collection = new \Schoolbox\Collection();
+        $collection = new Collection();
 
         foreach ($statement as $row) {
             $collection->add($fileMapper->hydrate($row, 'f'));
@@ -352,6 +378,57 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
             LEFT JOIN {$this->getJoinSql('homepages', 'c', 'hp')}
             LEFT JOIN {$this->getJoinSql('groups', 'c', 'ug')}
         ";
+    }
+
+    /**
+     * Search by name
+     *
+     * @param $keyword
+     * @param bool $userGroupsOnly
+     * @return Category
+     */
+    public function searchByName($keyword, $userGroupsOnly = false) {
+        $code_mapper = $this->getJoinMapper('codes');
+        $homepageConfig_mapper = $this->getJoinMapper('homepages');
+        $group_mapper = $this->getJoinMapper('groups');
+
+        $query = $this->getFindQuery();
+
+        $query .= "
+			WHERE (
+			    c.name LIKE :nameLike
+			    OR cc.code LIKE :codeLike
+            )
+        ";
+
+        /* Filter result set further by only returning records that are also
+		 * in the userGroups table
+		 */
+        if ($userGroupsOnly) {
+            $query .= "
+                AND ug.cid IS NOT NULL
+            ";
+        }
+
+        $params = array(
+            'nameLike' => "%{$this->database->quoteForLike($keyword)}%",
+            'codeLike' => "%/{$this->database->quoteForLike($keyword)}",
+        );
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($params);
+
+        $hashtable = array();
+
+        /* Only need to return category records
+         */
+        foreach ($statement as $row) {
+            $category = $this->hydrate($row, 'c');
+
+            $hashtable[$category->getId()] = $category;
+        }
+
+        return new Collection(array_values($hashtable));
     }
 
     /**
@@ -655,5 +732,66 @@ class CategoryMapper extends Mapper implements FolderLocatorInterface
         return $this->findByParent($nodeId);
     }
 
+    /**
+     * Creates a breadcrumb of a category's hierarchical navigation
+     *
+     * @param Category $category
+     * @return Collection
+     */
+    public function breadcrumb(Category $category)
+    {
+        $breadcrumb = new Collection();
 
+        $parentId = $category->getParent()->getId();
+
+        /* get the breadcrumb back up to the root directory
+         */
+        while ($parentId != 0) {
+            try {
+                $nextCategory = $this->findCheaplyById($category->getParent()->getId());
+                $breadcrumb->prepend($nextCategory);
+
+                $category = $nextCategory;
+
+                $parentId = $nextCategory->getParent()->getId();
+            }
+            catch (\Exception $e) {
+            }
+        }
+
+        return $breadcrumb;
+    }
+
+    /**
+     * A budget version of findById
+     *
+     * This only gives you the id and name of the folder
+     * This was used to cheaply manufacture breadcrumb trails
+     *
+     * @param $folderId
+     * @return \Schoolbox\Resource\Category
+     */
+    public function findCheaplyById($folderId) {
+        $query = "
+            SELECT id, name, parent
+            FROM `{$this->getTable()}` c
+            WHERE id = :folderId
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute(array(
+            'folderId' => $folderId
+        ));
+
+        $row = $statement->fetch(\PDO::FETCH_ASSOC);
+
+        $folder = $this->hydrate($row);
+
+        $parent = new Category();
+        $parent->setId($folder->getParent()->getId());
+
+        $folder->setParent($parent);
+
+        return $folder;
+    }
 }

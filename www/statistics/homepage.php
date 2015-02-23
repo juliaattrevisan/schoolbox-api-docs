@@ -7,57 +7,65 @@
  * @version     SVN: $Id$
  */
 
-if(isset($_GET['date_start']) && isset($_GET['date_end']) && isset($_GET['drop'])) {
+if (isset($_GET['date_start']) && isset($_GET['date_end']) && isset($_GET['drop'])) {
     $this->localRedir('/'. implode('/', $_GET));
 }
 
 $groupID = $_SESSION['gid'];
-$catHandler = new Category();
 
+$folderMapper = new \Schoolbox\Resource\CategoryMapper();
+
+$folder = new \Schoolbox\Resource\Category();
+
+/* Try to find by folder id first
+ */
 if (preg_match('/^[1-9]+[0-9]*$/', $this->arg[0])) {
-    $category = $catHandler->getByID($this->arg[0]);
-}
-else {
-    $category = null;
+    try {
+        $folder = $folderMapper->findById($this->arg[0]);
+    } catch (\Exception $e) {
+    }
 }
 
-if (!is_array($category)) {
+/* If you couldn't find it by id, try by category code
+ */
+if (!is_numeric($folder->getId())) {
     $code = implode('/', $this->arg);
-    $category = $catHandler->getByCode(urldecode(urldecode($code)));
-}
 
-if (!isset($category['id'])) {
-    error(18);
+    try {
+        $folder = $folderMapper->findByCode(urldecode(urldecode($code)));
+    } catch (\Exception $e) {
+/* STILL couldn't find it? die
+         */
+        error(18);
+    }
 }
-
-$categoryID = $category['id'];
 
 // hack away at the args provided
-if(!(isset($this->arg[1]) && preg_match('#[0-9]+-[0-9]+#', $this->arg[1]))) {
+if (!(isset($this->arg[1]) && preg_match('#[0-9]+-[0-9]+#', $this->arg[1]))) {
     $this->arg[1] = date('Y-m');
 }
 
-$homepageHandler = new Homepage($categoryID);
+$homepageHandler = new Homepage($folder->getId());
 
 $g = new Group();
-$permission = $g->getPermission($categoryID);
+$permission = $g->getPermission($folder->getId());
 
 /* Only write-access people can view statistics
  */
 if ($permission < WRITE_ACCESS) {
-	error(19);
+    error(19);
 }
 
 $this->setTab('resources');
-$this->setTitle($category['name'] . ' Statistics');
+$this->setTitle($folder->getName() . ' Statistics');
 $this->setFile(TEMPLATE_content, 'statistics/homepage.html');
 
-$this->setVar('CATEGORY_NAME', $category['name']);
-$this->setVar('ID', $categoryID);
+$this->setVar('CATEGORY_NAME', $folder->getName());
+$this->setVar('ID', $folder->getId());
 
 /* PARSE COMPONENTRY */
 $componentFactory = new Component_Homepage_Statistics_Factory(new \Schoolbox\User(), $this);
-$componentCollection = $componentFactory->buildComponentList($categoryID);
+$componentCollection = $componentFactory->buildComponentList($folder->getId());
 $occupiedPositionList = array();
 $j = 0;
 /** @var Component_Homepage_Statistics_ControllerAbstract[] $componentCollection */
@@ -65,7 +73,9 @@ foreach ($componentCollection as $component) {
     $templateTarget = "component_position_{$component->getInstance()->getPosition()}";
     $templateHandle = 'component_'.$j++;
 
-    $component->setup($category, $component->getInstance()->getConfigArray());
+    /* omfg you have got to be kidding
+     */
+    $component->setup($folder, $component->getInstance()->getConfigArray());
 
     if ($component->execute() !== false) {
         if ($component->renderTemplate($templateHandle) !== false) {

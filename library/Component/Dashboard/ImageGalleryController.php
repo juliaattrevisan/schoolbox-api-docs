@@ -11,14 +11,16 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
 {
 
     /**
+     * A group handler
+     *
      * @var Group
      */
     private $groupHandler = null;
 
     /**
-     * Category mapper
+     * A category mapper
      *
-     * @var null
+     * @var \Schoolbox\Resource\CategoryMapper
      */
     private $categoryMapper = null;
 
@@ -30,18 +32,25 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
     private $fileMapper = null;
 
     /**
-     * Source folder
-     *
-     * @var null
-     */
-    private $source = null;
-
-    /**
-     * Images per row
+     * Number of images per row
      *
      * @var int
      */
     private $imagesPerRow = 4;
+
+    /**
+     * Source category
+     *
+     * @var \Schoolbox\Resource\Category
+     */
+    protected $source = null;
+
+    /**
+     * Template file to load
+     *
+     * @var string
+     */
+    protected $templateHandle = 'imageGallery';
 
     /**
      * Prepares data for the render function. Business logic.
@@ -61,17 +70,14 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
      */
     private function determineSourceFolder()
     {
-
         // remove any non-numeric values from the source config
         $categoryId = $this->getConfig('src') ? preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) : $this->getContext('id');
 
         try {
-            $category = $this->getCategoryMapper()->findById($categoryId);
+            $this->setSource($this->getCategoryMapper()->findById($categoryId));
         } catch (\Exception $e) {
-            $category = new \Schoolbox\Resource\Category();
+            $this->setSource(new \Schoolbox\Resource\Category());
         }
-
-        $this->setSource($category);
     }
 
     /**
@@ -81,7 +87,9 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
      */
     public function renderTemplate($templateHandle)
     {
-        if (!parent::loadTemplate($templateHandle, 'imageGallery')) {
+        /* TODO: This should be inherited
+         */
+        if (!parent::loadTemplate($templateHandle, $this->getTemplateHandle())) {
             return false;
         }
 
@@ -95,7 +103,15 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
          */
         $this->setBlock($templateHandle, 'image_gallery', 'image_gallery_block');
 
-        // Set up component name
+        /* Prevent multiple galleries from other categories stacking up in the wrong place
+         * and initialise empty gallery by default
+         */
+        $this->setVar(array(
+            'image_gallery_block' => ''
+        ));
+
+        /* Set up component name
+         */
         $this->setVar(
             array(
                 'COMPONENT_NAME'           => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Image Gallery',
@@ -103,13 +119,8 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
             )
         );
 
-        /* Prevent multiple galleries from other categories stacking up in the wrong place
-        * and initialise empty gallery by default
-        */
-        $this->setVar('image_gallery_block', '');
-
         // Load images for the current homepage
-        $allImages = $this->getCategoryMapper()->findImages($this->getSource()->getId(), $this->getConfig('size'), true);
+        $allImages = $this->getCategoryMapper()->findImages($this->getSource(), $this->getConfig('size'), true);
 
         // Iterate
         foreach ($allImages as $currentImage) {
@@ -125,11 +136,12 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
             $this->parse('image_gallery_block', 'image_gallery', true);
         }
 
-        return true; // everything went according to plan
+        // everything went according to plan
+        return true;
     }
 
     /* Getters/Setters
-      */
+     */
 
     /**
      * Set category mapper
@@ -192,26 +204,6 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
     }
 
     /**
-     * Set source
-     *
-     * @param null $source
-     */
-    private function setSource($source)
-    {
-        $this->source = $source;
-    }
-
-    /**
-     * Get source
-     *
-     * @return null
-     */
-    private function getSource()
-    {
-        return $this->source;
-    }
-
-    /**
      * Set group handler
      *
      * @param \Group $groupHandler
@@ -230,6 +222,44 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
     {
         return $this->groupHandler;
     }
+
+    /**
+     * Set source
+     *
+     * @param null $source
+     */
+    protected function setSource($source)
+    {
+        $this->source = $source;
+    }
+
+    /**
+     * Get source
+     *
+     * @return null
+     */
+    protected function getSource()
+    {
+        return $this->source;
+    }
+
+    /**
+     * Set template handle
+     *
+     * @param string $templateHandle
+     */
+    protected function setTemplateHandle($templateHandle)
+    {
+        $this->templateHandle = $templateHandle;
+    }
+
+    /**
+     * Get template handle
+     *
+     * @return string
+     */
+    protected function getTemplateHandle()
+    {
+        return $this->templateHandle;
+    }
 }
-
-

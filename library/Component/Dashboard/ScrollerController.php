@@ -3,6 +3,8 @@
 /**
  * Plag'd from Doctore's component
  *
+ * This is the Image Slideshow component
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -22,12 +24,16 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
     private $fileHandler;
 
     /**
-     * @var Category
+     * Category Mapper
+     *
+     * @var \Schoolbox\Resource\CategoryMapper
      */
-    private $catHandler;
+    private $categoryMapper = null;
 
     /**
-     * @var array
+     * A category
+     *
+     * @var \Schoolbox\Resource\Category
      */
     private $source;
 
@@ -40,16 +46,17 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
     {
         $this->groupHandler = new Group();
         $this->fileHandler  = new File();
+        $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
 
-        $this->catHandler = new Category();
+        $this->source = new \Schoolbox\Resource\Category();
 
-        // remove any non-numeric values from the source config
-        $this->source = $this->catHandler->getByID(
-            $this->getConfig('src') ? preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) : ''
-        );
-
-        if ($this->source === false) {
-            $this->source = array();
+        if (is_numeric($this->getConfig('src'))) {
+            try {
+                // remove any non-numeric values from the source config
+                $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
+            } catch (\Exception $e) {
+                $this->source = new \Schoolbox\Resource\Category();
+            }
         }
     }
 
@@ -65,7 +72,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
         }
         $this->parseConfig();
 
-        if ($this->groupHandler->getPermission($this->source['id']) < READ_ACCESS) {
+        if ($this->groupHandler->getPermission($this->source->getId()) < READ_ACCESS) {
             return false;
         }
 
@@ -93,8 +100,8 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
                 'COMPONENT_ALIGN'                  => $this->getConfig('align'),
                 'COMPONENT_PIXEL'                  => $pixel,
                 'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getConfig('timing') ? $this->getConfig(
-                            'timing'
-                        ) * 1000 : '2000',
+                    'timing'
+                ) * 1000 : '2000',
             )
         );
 
@@ -110,19 +117,18 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
         $this->setVar('image_scroller_block', '');
 
         // Load images for the current homepage
-        $allFiles = $this->catHandler->getImages($this->source['id'], 0, true);
+        $allFiles = $this->getCategoryMapper()->findImages($this->source, 0, true);
 
         // Have update form to back to this homepage, not the gallery's homepage
-        $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->source['id']);
-
+        $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->source->getId());
 
         // Iterate
-        if (is_array($allFiles)) {
+        if ($allFiles->count()) {
             foreach ($allFiles as $currentFile) {
                 $this->setVar(
                     array(
-                        'IMAGE_ID'        => $currentFile['id'],
-                        'IMAGE_NAME'      => $currentFile['description'],
+                        'IMAGE_ID'        => $currentFile->getId(),
+                        'IMAGE_NAME'      => $currentFile->getDescription(),
                         'IMAGE_DIMENSION' => $pixel
                     )
                 );
@@ -139,5 +145,28 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
         }
 
         return true; // everything went according to plan
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Set category mapper
+     *
+     * @param null $categoryMapper
+     */
+    private function setCategoryMapper($categoryMapper)
+    {
+        $this->categoryMapper = $categoryMapper;
+    }
+
+    /**
+     * Get category mapper
+     *
+     * @return null
+     */
+    private function getCategoryMapper()
+    {
+        return $this->categoryMapper;
     }
 }

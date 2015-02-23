@@ -19,7 +19,7 @@ if (!Cfg::get('external_enable')) {
 $groupHandler = new Group;
 $userHandler = new User;
 $timetableHandler = new External_Timetable;
-$categoryHandler = new Category;
+$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
 
 $this->setFile(TEMPLATE_content, 'class/timetable.html');
 $this->setTitle('Timetable');
@@ -109,8 +109,7 @@ if ($groupHandler->isParent()) {
 
 if (is_array($outputList)) {
     foreach ($outputList as $user) {
-
-        /* Setup colour map */
+/* Setup colour map */
         $subjectColourMap = array();
         $colourIndex = 0;
 
@@ -140,7 +139,7 @@ if (is_array($outputList)) {
             foreach ($timetable as $currentDay) {
                 if (is_array($currentDay['day']) && count($currentDay['day'])) {
                     foreach ($currentDay['day'] as $currentPeriod) {
-                        foreach($currentPeriod as $currentClass) {
+                        foreach ($currentPeriod as $currentClass) {
                             if (isset($currentClass['description']) && strlen($currentClass['description'])) {
                                 $classCount++;
                             }
@@ -172,8 +171,7 @@ if (is_array($outputList)) {
                     $dayCount = 1;
                     //for each day
                     foreach ($row['day'] as $period) {
-
-                        // only output header on first run through
+// only output header on first run through
                         if ($periodCount == 1) {
                             //output day header
                             if ($dayCount == $dayCurrent) {
@@ -199,8 +197,8 @@ if (is_array($outputList)) {
                         $this->setVar('period_class_link_block', '');
                         $this->setVar('period_class_block', '');
 
-                        if (count($period) > 0 ) {
-                            foreach($period as $class) {
+                        if (count($period) > 0) {
+                            foreach ($period as $class) {
                                 /* Handle colour array */
                                 if ($class['code'] && !array_key_exists($class['code'], $subjectColourMap)) {
                                     // not enough colors: loop around to index 0.
@@ -248,8 +246,8 @@ if (is_array($outputList)) {
 
                                 /* Lookup subject code and check permissions, if read access provide a link to the user */
                                 if (!isset($catCache[$class['code']])) {
-                                    $cat = $categoryHandler->getByCode($class['code']);
-                                    $catCache[$class['code']] = $cat['id'];
+                                    $cat = $categoryMapper->findByCode($class['code']);
+                                    $catCache[$class['code']] = $cat->getId();
                                 }
 
                                 $this->setVar($outputPeriod);
@@ -263,8 +261,7 @@ if (is_array($outputList)) {
 
                             }
 
-                        }
-                        else {
+                        } else {
                             $this->setVar($outputPeriod);
                             $this->setVar('period_class_link_block', '');
                             $this->parse('period_class_block', 'period_class');
@@ -281,7 +278,7 @@ if (is_array($outputList)) {
                         } else {
                             if ($dayCount == $dayCurrent) {
                                 // not current period, but is current day: display column
-                                $this->setVar('TIMETABLE_CLASS','dayCurrent');
+                                $this->setVar('TIMETABLE_CLASS', 'dayCurrent');
                             } else {
                                 // neither current period nor current day
                                 $this->setVar('TIMETABLE_CLASS', 'normal');
@@ -302,7 +299,7 @@ if (is_array($outputList)) {
             //reset blocks in case we coming back...
             $this->setVar('period_listing', '');
             $this->setVar('day_header_listing', '');
-        } else if ($days == 0) {
+        } elseif ($days == 0) {
             //In case no timetable has been output for what ever reason
             $this->setVar('timetable_listing', '');
         }

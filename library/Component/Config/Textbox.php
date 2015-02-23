@@ -11,8 +11,7 @@ class Component_Config_Textbox extends Component_Config_Abstract
 
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
-
-        $handler = new TextBox();
+        $textboxMapper = new \Schoolbox\Resource\TextboxMapper();
 
         // has an internal block for the select element
 
@@ -22,20 +21,20 @@ class Component_Config_Textbox extends Component_Config_Abstract
             ? $component->getConfig('src')
             : null;
         if (is_numeric($altSource) && $altSource) {
-            $boxList = $handler->getAllByCategory($altSource);
+            $allTextboxes = $textboxMapper->findByColumn('categoryID', $altSource);
         } else {
-            $boxList = $handler->getAllByCategory($this->getCategory('id'));
+            $allTextboxes = $textboxMapper->findByColumn('categoryID', $this->getCategory()->getId());
         }
 
         $page->setBlock($keyblock, 'textbox_select', 'textbox_select_block');
         $page->setVar('textbox_select_block', '');
 
-        if (is_array($boxList)) {
-            foreach ($boxList as $box) {
+        if ($allTextboxes->count()) {
+            foreach ($allTextboxes as $currentTextbox) {
                 $page->setVar(array(
-                    'COMPONENT_CONFIG_BOXSELECT_NAME'       => Scrub::text($box['heading']),
-                    'COMPONENT_CONFIG_BOXSELECT_VALUE' 	    => $box['textBoxID'],
-                    'COMPONENT_CONFIG_BOXSELECT_SELECTED'   => $box['textBoxID'] == $configValue ? 'selected="selected"' : '',
+                    'COMPONENT_CONFIG_BOXSELECT_NAME'       => Scrub::text($currentTextbox->getHeading()),
+                    'COMPONENT_CONFIG_BOXSELECT_VALUE' 	    => $currentTextbox->getId(),
+                    'COMPONENT_CONFIG_BOXSELECT_SELECTED'   => $currentTextbox->getId() == $configValue ? 'selected="selected"' : '',
                 ));
 
                 $page->parse("textbox_select_block", "textbox_select", true);

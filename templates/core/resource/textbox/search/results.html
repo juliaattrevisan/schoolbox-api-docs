@@ -1,0 +1,25 @@
+<div class="box">
+<h2>Textboxes <!-- BEGIN count -->({TEXTBOX_DISP_COUNT} / {TEXTBOX_COUNT})<!-- END count --></h2>
+<ul class="information-list">
+<!-- BEGIN textbox -->
+	<li>
+		<a href="/homepage/{TEXTBOX_FOLDER_ID}#textbox{TEXTBOX_ID}">
+			<img class="thumbnail" height="60" width="60" src="images/mime/60x60/document.png" />
+			<h4>{TEXTBOX_HEADING}</h4>
+		</a>
+		<p class="meta">{TEXTBOX_BREADCRUMB}</p>
+		<p>{TEXTBOX_BODY}</p>
+	</li>
+<!-- END textbox -->
+</ul>
+<!-- BEGIN see_more -->
+<p>
+	<a id="textbox-more" class="float-left btn more" rel="textbox" href="#"><span></span>See all {MORE_COUNT} results for Textboxes</a>
+</p>
+<!-- END see_more -->
+<ul class="admin-nav foot">
+	<!-- BEGIN pagination -->
+	<li><a href="javascript:void(0);" rel="{PAGE_NUMBER}" class="{PAGE_CLASS}">{PAGE_NAME}</a></li>
+	<!-- END pagination -->
+</ul>
+</div>

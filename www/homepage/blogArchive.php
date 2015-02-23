@@ -3,7 +3,7 @@
 $groupHandler = new Group;
 $blogHandler = new Blog;
 $commentHandle = new Comment();
-$categoryHandler = new Category;
+$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
 
 $this->setFile(TEMPLATE_content, "homepage/blogArchive.html");
 $this->setBlock(TEMPLATE_content, "submit_blog", "submit_blog_block");
@@ -14,8 +14,11 @@ $this->setBlock('blog', 'comment', 'comment_block');
 $this->setBlock(TEMPLATE_content, "year", "year_block");
 $this->setBlock('year', 'month', 'month_block');
 
-/* Check for valid arguments */
-if (!($category = $categoryHandler->getById($this->arg[0]))) {
+/* Check for valid arguments
+ */
+try {
+    $category = $categoryMapper->findById($this->arg[0]);
+} catch (\Exception $e) {
     $this->error(2);
 }
 
@@ -37,22 +40,22 @@ if (empty($monthNumber)) {
 
 $this->setVar(
     array(
-        'CATEGORY_NAME' => Scrub::text($category['name']),
+        'CATEGORY_NAME' => Scrub::text($category->getName()),
         'TITLE' => 'Blog Archive',
-        'ID' => $category['id'],
+        'ID' => $category->getId(),
         'blog_block' => '',
     )
 );
 
 /* Hide 'Add' button if not authorised */
-if ($groupHandler->getPermission($category['id']) >= WRITE_ACCESS) {
+if ($groupHandler->getPermission($category->getId()) >= WRITE_ACCESS) {
     $this->parse('submit_blog_block', 'submit_blog');
 } else {
     $this->setVar('submit_blog_block', '');
 }
 
 /* Year and Month List */
-if ($dateList = $blogHandler->getOccupiedDateList($category['id'])) {
+if ($dateList = $blogHandler->getOccupiedDateList($category->getId())) {
     foreach ($dateList as $i => $date) {
         $this->setVar(
             array(
@@ -91,8 +94,7 @@ if ($dateList = $blogHandler->getOccupiedDateList($category['id'])) {
 }
 
 /* Blog Posts */
-if ($blogList = $blogHandler->getByYearAndMonth($category['id'], $yearNumber, $monthNumber)) {
-
+if ($blogList = $blogHandler->getByYearAndMonth($category->getId(), $yearNumber, $monthNumber)) {
     $i = 0;
     foreach ($blogList as $blog) {
         $currentDate = date_parse($blog['created']);
@@ -178,5 +180,3 @@ if ($blogList = $blogHandler->getByYearAndMonth($category['id'], $yearNumber, $m
         $this->parse('blog_block', 'blog', true);
     }
 }
-
-?>

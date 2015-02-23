@@ -6,7 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_ManageFolderController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_ManageFolderController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * @var Group
@@ -23,7 +24,8 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
         $this->myLinkHandler = new MyLinks();
         $this->groupHandler = new Group();
     }
@@ -33,8 +35,9 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'manageFolder')) {
+    public function renderTemplate($templateHandle)
+    {
+        if (!parent::loadTemplate($templateHandle, 'manageFolder')) {
             return false;
         }
         $this->parseConfig();
@@ -44,25 +47,27 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
         $this->setBlock($templateHandle, "addmylinks", "addmylinks_block");
 
         // My links button
-        $url = 'http://'.Cfg::get('site_hostname') . '.' . Cfg::get('site_domain').'/homepage/'.$this->getContext('id');
+        $url = 'http://'.Cfg::get('site_hostname') . '.' . Cfg::get('site_domain').'/homepage/'.$this->getContext()->getId();
 
-        if($this->myLinkHandler->linkExists($_SESSION['id'], $url)) {
-            $this->setVar('addmylinks_block','');
-        }
-        else {
+        if ($this->myLinkHandler->linkExists($_SESSION['id'], $url)) {
+            $this->setVar('addmylinks_block', '');
+        } else {
             $this->setVar('HOMEPAGE_URL', $url);
-            $this->parse('addmylinks_block','addmylinks');
+            $this->parse('addmylinks_block', 'addmylinks');
+        }
+        if ($this->permission >= FULL_ACCESS) {
+//is owner of area
+            $this->parse("manage_page_block", "manage_page");
+        } else {
+            $this->setVar("manage_page_block", "");
         }
 
-        if($this->permission >= FULL_ACCESS) //is owner of area
-            $this->parse("manage_page_block", "manage_page");
-        else
-            $this->setVar("manage_page_block", "");
-
-        if($this->permission >= WRITE_ACCESS) //has write access
+        if ($this->permission >= WRITE_ACCESS) {
+//has write access
             $this->parse("stats_data_block", "stats_data");
-        else
+        } else {
             $this->setVar("stats_data_block", "");
+        }
 
         // User subscription to groups.
         $this->setBlock($templateHandle, 'subscribed', 'subscribed_block');
@@ -75,34 +80,27 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
         $this->setVar('unsubscribed_block', '');
 
         // If you are subscribed but are awaiting authorisation
-        $type = $this->groupHandler->involvedInGroup($_SESSION['id'], $this->getContext('id'));
+        $type = $this->groupHandler->involvedInGroup($_SESSION['id'], $this->getContext()->getId());
 
-        if ($type == DENY_ACCESS && $type !== NULL) {
+        if ($type == DENY_ACCESS && $type !== null) {
             $this->parse('subscribedModerated_block', 'subscribedModerated');
-        }
-
-        // If you are subscribed with something greater than DENY_ACCESS and you can subscribe, display the unsubscribe button
-        else if ($this->groupHandler->canSubscribe($this->getContext('id')) && ($type == READ_ACCESS || $type == WRITE_ACCESS)) {
+        } // If you are subscribed with something greater than DENY_ACCESS and you can subscribe, display the unsubscribe button
+        elseif ($this->groupHandler->canSubscribe($this->getContext()->getId()) && ($type == READ_ACCESS || $type == WRITE_ACCESS)) {
             $this->parse('subscribed_block', 'subscribed');
-        }
-        else if($type == FULL_ACCESS) {
-
-        }
-
-        /* You aren't subscribed to the group yet.
+        } elseif ($type == FULL_ACCESS) {
+        } /* You aren't subscribed to the group yet.
         * If you can subscribe to the group, present option.
         * Otherwise do nothing
         */
-        else if ($this->groupHandler->canSubscribe($this->getContext('id'))) {
+        elseif ($this->groupHandler->canSubscribe($this->getContext()->getId())) {
             $this->parse('unsubscribed_block', 'unsubscribed');
         }
 
-		/* Only write-access people can view statistics
+        /* Only write-access people can view statistics
 		 */
-        if($this->permission >= WRITE_ACCESS) {
-            $this->parse('view_stats_block','view_stats');
-        }
-        else {
+        if ($this->permission >= WRITE_ACCESS) {
+            $this->parse('view_stats_block', 'view_stats');
+        } else {
             $this->setVar('view_stats_block', '');
         }
 

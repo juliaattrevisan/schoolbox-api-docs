@@ -6,14 +6,16 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_DutiesController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_DutiesController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
 
         // TODO: Implement execute() method.
 
@@ -24,8 +26,9 @@ class Component_Homepage_DutiesController extends Component_Homepage_ControllerA
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'duties')) {
+    public function renderTemplate($templateHandle)
+    {
+        if (!parent::loadTemplate($templateHandle, 'duties')) {
             return false;
         }
         $this->parseConfig();
@@ -34,7 +37,7 @@ class Component_Homepage_DutiesController extends Component_Homepage_ControllerA
 
         $dutyHandler = new Duty;
 
-        $dutyList = $dutyHandler->getAllInCategory($this->getContext('id'));
+        $dutyList = $dutyHandler->getAllInCategory($this->getContext()->getId());
         $this->setVar("DATE", 'Duties for '.date('l, jS \of F Y'));
 
         $block = false;
@@ -52,15 +55,14 @@ class Component_Homepage_DutiesController extends Component_Homepage_ControllerA
             $this->setVar("ASSIGNEDUSER", '');
             $this->parse("d_block", "duties", true);
         }
-
         $this->setBlock($templateHandle, "edit_duties", "edit_duties_block");
 
-        if ($this->permission < WRITE_ACCESS)
+        if ($this->permission < WRITE_ACCESS) {
             $this->setVar("edit_duties_block", "");
-        else
+        } else {
             $this->parse("edit_duties_block", "edit_duties");
+        }
 
         return true;
     }
-
 }

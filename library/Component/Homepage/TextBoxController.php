@@ -34,7 +34,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             $this->textbox = new \Schoolbox\Resource\Textbox();
             $this->textbox
                 ->setHeading('Text Box')
-                ->setCategory(\Schoolbox\Resource\CategoryMapper::getInstance()->createModel()->setId($this->getContext('id')));
+                ->setCategory(\Schoolbox\Resource\CategoryMapper::getInstance()->createModel()->setId($this->getContext()->getId()));
         }
 
         if (!$this->getTextbox()->getHeading()) {
@@ -62,7 +62,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         if ($this->textbox instanceof \Schoolbox\Resource\Textbox) {
             $sourceCategory = $this->textbox->getCategory()->getId();
         } else {
-            $sourceCategory = $this->getContext('id');
+            $sourceCategory = $this->getContext()->getId();
         }
 
         /* If user does not have access to the source, do not output anything */
@@ -92,22 +92,21 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
          * To just edit one homepage's textbox, you need write access to that homepage.
          */
         if ($this->permission >= WRITE_ACCESS && $this->sitepage->arg[2] == $this->instance->getId()) {
-
             if ($this->sitepage->arg[1] == 'textBoxModify') {
                 $this->setVar(
                     array(
                         'TEXTBOX_BODY' => Scrub::text($this->getTextbox()->getBody()),
                     )
                 );
-            } else if ($this->sitepage->arg[1] == 'textBoxCreate') {
-                $this->setVar(
-                    array(
+            } elseif ($this->sitepage->arg[1] == 'textBoxCreate') {
+                    $this->setVar(
+                        array(
                         'TEXTBOX_HEADING'     => '',
                         'TEXTBOX_BODY'        => '',
                         'TEXTBOX_ID'          => '',
                         'TEXTBOX_CATEGORY_ID' => $sourceCategory,
-                    )
-                );
+                        )
+                    );
             }
             $this->parse('text_editable_block', 'text_editable');
         } else {
@@ -134,5 +133,4 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
     {
         return $this->textbox;
     }
-
 }

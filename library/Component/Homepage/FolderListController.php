@@ -8,22 +8,25 @@
  */
 class Component_Homepage_FolderListController extends Component_Homepage_ControllerAbstract
 {
-
-    /**
-     * @var array
-     */
-    private $source;
-
     /**
      * @var Group
      */
     private $groupHandler;
-
+    
     /**
-     * @var Category
+     * An instance of Category
+     *
+     * @var \Schoolbox\Resource\Category
      */
-    private $catHandler;
-
+    private $source;
+    
+    /**
+     * Category Mapper
+     *
+     * @var \Schoolbox\Resource\CategoryMapper
+     */
+    private $categoryMapper = null;
+    
     /**
      * Prepares data for the render function. Business logic.
      *
@@ -31,28 +34,30 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
      */
     public function execute()
     {
-
         $this->groupHandler = new Group();
-        $this->catHandler   = new Category();
+
+        $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
+
+        $this->source = $this->getContext();
 
         // remove any non-numeric values from the source config
-        $this->source = $this->catHandler->getByID(
-            $this->getConfig('src') ?
-            preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
-            $this->getContext('id')
-        );
+        if ($this->getConfig('src')) {
+            $id = preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src'));
 
-        if ($this->source === false) {
-            $this->source = $this->catHandler->getByID($this->getContext('id'));
+            try {
+                $folderMapper = new \Schoolbox\Resource\CategoryMapper();
+                $folder = $folderMapper->findById($id);
+
+                $this->source = $folder;
+            } catch (\Exception $e) {
+            }
         }
-
     }
 
     /**
      * Renders the data into the SitePage. Presentation logic.
      *
      * @param String $templateHandle
-     *
      * @return boolean
      */
     public function renderTemplate($templateHandle)
@@ -72,20 +77,25 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
         $this->setBlock('folders', 'modify_folder', 'modify_folder_block');
 
 
-        $folderList = $this->catHandler->getCategoryList($this->source['id'], $this->getConfig());
+        $treeBuilder = new \Schoolbox\Resource\CategoryTreeBuilder(new \Schoolbox\Resource\CategoryMapper(), new \Schoolbox\Assessment\Course\TaskMapper(), new \Group());
+        $allFolders = $treeBuilder->buildChildNodes($this->source->getId());
 
         $this->setVar('folders_block', '');
 
-        if (is_array($folderList) && $this->permission > DENY_ACCESS) {
+        if (count($allFolders) && $this->permission > DENY_ACCESS) {
             $j = 0;
-            foreach ($folderList as $folder) {
+
+            $this->setVar('folders_block', '');
+            
+            foreach ($allFolders as $currentFolder) {
                 //set name
                 $output = array(
-                    'FOLDER_ID'   => $folder['id'],
-                    'FOLDER_NAME' => Scrub::text($folder['name']),
-                    'FOLDER_ICON' => $folder['template'] ? 'house' : 'folder_blue_full',
-                    'ON_OFF'      => ++$j % 2 ? '' : 'dark',
+                    'FOLDER_ID'		=> $currentFolder['id'],
+                    'FOLDER_NAME'	=> Scrub::text($currentFolder['text']),
+                    'FOLDER_ICON'	=> $currentFolder['type'] == 'homepage' ? 'house' : 'folder_blue_full',
+                    'ON_OFF'		=> ++$j % 2 ? '' : 'dark',
                 );
+
                 $this->setVar($output);
 
                 if ($this->permission >= WRITE_ACCESS) {
@@ -100,27 +110,47 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
             $this->setVar('folders_block', '');
         }
 
-        $this->setvar(
-            array(
-                'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname')))
-                    ? $this->getConfig('componentname')
-                    : 'Folders',
-                'COMPONENT_CONFIG_SRC_ID'   => $this->source['id'],
-                'COMPONENT_CONFIG_SRC_NAME' => $this->source['name'],
-                'COMPONENT_HANDLE'          => strtolower($templateHandle)
-            )
-        );
+        $this->setvar(array(
+            'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Folders',
+            'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
+            'COMPONENT_CONFIG_SRC_NAME' => $this->source->getName(),
+            'COMPONENT_HANDLE'          => strtolower($templateHandle)
+        ));
 
         //setup block for submission button
-        $this->setVar('FOLDER_CAT_ID', $this->source['id']);
+        $this->setVar('FOLDER_CAT_ID', $this->source->getId());
+
         $this->setBlock($templateHandle, "submit_folder", "submit_folder_block");
+
         if ($this->permission < WRITE_ACCESS) {
             $this->setVar("submit_folder_block", "");
         } else {
             $this->parse("submit_folder_block", "submit_folder");
         }
 
-
         return true;
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Set category mapper
+     *
+     * @param null $categoryMapper
+     */
+    private function setCategoryMapper($categoryMapper)
+    {
+        $this->categoryMapper = $categoryMapper;
+    }
+
+    /**
+     * Get category mapper
+     *
+     * @return null
+     */
+    private function getCategoryMapper()
+    {
+        return $this->categoryMapper;
     }
 }

@@ -10,7 +10,7 @@
 abstract class Component_Homepage_ControllerAbstract extends Component_ControllerAbstract
 {
 
-    public function setup(array $context, array $config)
+    public function setup($context, array $config)
     {
         parent::setup($context, $config);
         $g = new Group();
@@ -19,10 +19,11 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
         if (!empty($config['src']['value'])) {
             $sourceId = $config['src']['value'];
         } else {
-            $sourceId = $context['id'];
+            $sourceId = $this->getContext()->getId();
         }
+
         $this->permission = min($g->getPermission($sourceId), $this->getMaximumPermission());
-        $this->sitepage->setVar('ID', $context['id']);
+        $this->sitepage->setVar('ID', $this->getContext()->getId());
 
         $this->postConstruct();
     }
@@ -41,6 +42,4 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
 
         return parent::getTemplate($templateName, $templatePath);
     }
-
-
 }

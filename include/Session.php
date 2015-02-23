@@ -15,7 +15,7 @@ class Session
     /**
      * Constructor
      */
-    public function  __construct()
+    public function __construct()
     {
         $this->db = DeprecatedDatabase::getInstance();
     }
@@ -30,9 +30,9 @@ class Session
     {
         if ($_SERVER['HTTP_CLIENT_IP']) {
             $ip = $_SERVER['HTTP_CLIENT_IP'];
-        } else if ($_SERVER['HTTP_X_FORWARDED_FOR']) {
+        } elseif ($_SERVER['HTTP_X_FORWARDED_FOR']) {
             $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        } else if ($_SERVER['REMOTE_ADDR']) {
+        } elseif ($_SERVER['REMOTE_ADDR']) {
             $ip = $_SERVER['REMOTE_ADDR'];
         } else {
             $ip = "UNKNOWN";
@@ -41,7 +41,7 @@ class Session
         return $ip;
     }
 
-    public function create($username, $remember=false)
+    public function create($username, $remember = false)
     {
         $userHandler = new User;
         $groupHandler = new Group;
@@ -55,17 +55,15 @@ class Session
 
         /* if user is found and enabled and session is started create our user record */
         if (is_array($user) && $user['enabled'] && session_start()) {
-            
-            /* Store remember me cookie so user can return in the future */
-            if($remember == true) {
-                $key = sha1(microtime(true).mt_rand(10000,90000));
+/* Store remember me cookie so user can return in the future */
+            if ($remember == true) {
+                $key = sha1(microtime(true).mt_rand(10000, 90000));
                 $expire = strtotime('+2 month');
-                setcookie('remember',$key, $expire, '/', $_SERVER['HTTP_HOST'], false, true);
+                setcookie('remember', $key, $expire, '/', $_SERVER['HTTP_HOST'], false, true);
                 $redis = \Alaress\Redis::getClientInstance();
-                $redis->executeCommand($redis->createCommand('set',array($key, $username) ));
+                $redis->executeCommand($redis->createCommand('set', array($key, $username) ));
                 $redis->executeCommand($redis->createCommand('expire', array($key,  ($expire - $_SERVER['REQUEST_TIME']))));
             }
-
             //register users id
             $_SESSION['title'] = $user['title'];
             $_SESSION['firstname'] = $user['firstname'];
@@ -89,20 +87,22 @@ class Session
             $_SESSION['calendar_view'] = $user['calendar_view'];
 
             //if no mail enabled or user has elected to use external client set mailhandle to mailto:
-	        //TODO: remove this parent special config, but schools currently rely on it, need to update all parents to mail_handler = 1
-            if (Cfg::get('mail_enable') == 0 || $user['mail_handler'] || ($groupHandler->isParent() && !$user['local_email']))
+            //TODO: remove this parent special config, but schools currently rely on it, need to update all parents to mail_handler = 1
+            if (Cfg::get('mail_enable') == 0 || $user['mail_handler'] || ($groupHandler->isParent() && !$user['local_email'])) {
                 $_SESSION['mailhandle'] = "mailto:";
-            else
+            } else {
                 $_SESSION['mailhandle'] = "/mail/createMail.php?replyto=";
+            }
 
             //superuser value, used to bypass most security checks
-            if ($user['su'] == 1)
+            if ($user['su'] == 1) {
                 $_SESSION['su'] = 1;
+            }
 
 
             if (Cfg::get('external_enable')) {
                 $this->setSynergyInfo($userHandler);
-			}
+            }
 
             if ($this->getUseLoginLog()) {
                 $notif = new Notif(Notif::TOPIC_AUTH);
@@ -113,7 +113,7 @@ class Session
                 ));
             }
 
-	        // add mobile session data
+            // add mobile session data
             $sbmAuth = new Authenticator();
             return $sbmAuth->appendSession($username);
 
@@ -151,11 +151,10 @@ class Session
         $user = null;
         try {
             $user = $uMap->findOneByColumn('username', $username);
-        }
-        catch (Schoolbox\Mapper\Exception $e) {
+        } catch (Schoolbox\Mapper\Exception $e) {
             throw new Exception_Schoolbox_NotFound();
         }
-        if(!($user instanceof \Schoolbox\User && $user->getEnabled())) {
+        if (!($user instanceof \Schoolbox\User && $user->getEnabled())) {
             throw new Exception_Schoolbox_AccountDisabled();
         }
 
@@ -183,13 +182,13 @@ class Session
 
         if (!$result) {
             /* Log failure */
-	        $notif = new Notif(Notif::TOPIC_AUTH);
-	        $notif->notice("Login failure for ".$user->getUsername(), array(
-		        'username' => $user->getUsername(),
-		        'ip'       => $ip,
-		        'login'    => 0,
-	        ));
-	        throw new Exception_Schoolbox_AccessDenied();
+            $notif = new Notif(Notif::TOPIC_AUTH);
+            $notif->notice("Login failure for ".$user->getUsername(), array(
+                'username' => $user->getUsername(),
+                'ip'       => $ip,
+                'login'    => 0,
+            ));
+            throw new Exception_Schoolbox_AccessDenied();
         } else {
             // Store password as hash for DAV authentication later
             $this->db->update('user', 'username', array('username' => $username, 'hash' => md5($username . ':' . Cfg::get('site_location') . ':' . $password)));
@@ -288,20 +287,21 @@ class Session
         $ds = ldap_connect(Cfg::get('ldap_host'));
 
         // test authentication in primary server
-        if ($this->_authLDAP($username, $password, $ds, Cfg::get('ldap_user'), Cfg::get('ldap_base')))
+        if ($this->_authLDAP($username, $password, $ds, Cfg::get('ldap_user'), Cfg::get('ldap_base'))) {
             return true;
+        }
 
         // test authentication in secondary server
         if (Cfg::get('ldap_host_alt')) {
             $ds = ldap_connect(Cfg::get('ldap_host_alt'));
-            if ($this->_authLDAP($username, $password, $ds, Cfg::get('ldap_user_alt'), Cfg::get('ldap_base_alt')))
+            if ($this->_authLDAP($username, $password, $ds, Cfg::get('ldap_user_alt'), Cfg::get('ldap_base_alt'))) {
                 return true;
+            }
         }
 
         // failed authentication
         return false;
     }
-
     private function authenticateSQL($username, $password)
     {
         // Function to check username exists and password is correct
@@ -311,10 +311,11 @@ class Session
         $this->db->query($query);
         $result = $this->db->countRows();
         //$user = $db->getNextArray();
-        if ($result == 1)
+        if ($result == 1) {
             return true;
-        else
+        } else {
             return false;
+        }
     }
 
 
@@ -341,7 +342,6 @@ class Session
         return ($code < 400 && preg_match('/^[0-9]+$/', $result));
     }
 
-
     public function ldap_escape($str, $for_dn = false)
     {
 
@@ -350,17 +350,19 @@ class Session
         // http://msdn.microsoft.com/en-us/library/ms675768(VS.85).aspx
         // http://www-03.ibm.com/systems/i/software/ldap/underdn.html
 
-        if ($for_dn)
+        if ($for_dn) {
             $metaChars = array(',', '=', '+', '<', '>', ';', '\\', '"', '#');
-        else
+        } else {
             $metaChars = array('*', '(', ')', '\\', chr(0));
+        }
 
         $quotedMetaChars = array();
-        foreach ($metaChars as $key => $value) $quotedMetaChars[$key] = '\\' . str_pad(dechex(ord($value)), 2, '0');
+        foreach ($metaChars as $key => $value) {
+            $quotedMetaChars[$key] = '\\' . str_pad(dechex(ord($value)), 2, '0');
+        }
         $str = str_replace($metaChars, $quotedMetaChars, $str); //replace them
         return ($str);
     }
-
     public function checkBruteForce()
     {
         // Function to check that host isnt brute forceing the login
@@ -371,19 +373,21 @@ class Session
         $query = "SELECT id FROM login_log WHERE ip = '$ip' AND login = '0' AND date > FROM_UNIXTIME($graceperiod)";
         $this->db->query($query);
 
-        if ($this->db->countRows() < Cfg::get('login_allowed'))
+        if ($this->db->countRows() < Cfg::get('login_allowed')) {
             return false;
-        else
+        } else {
             return true;
+        }
     }
 
     /**
      * @param User $userHandler
      */
-    function setSynergyInfo($userHandler) {
+    function setSynergyInfo($userHandler)
+    {
         $synUser = new External_User;
         $groupHandler = new Group;
-        $catHandler = new Category;
+        $folderMapper = new \Schoolbox\Resource\CategoryMapper();
 
         //setup a users enrolement for the session
 
@@ -398,10 +402,8 @@ class Session
         unset($_SESSION['children'], $_SESSION['subjects']);
 
         if ($synergy_id) {
-
-            //if user is parent get information regarding enrolled students
+//if user is parent get information regarding enrolled students
             if ($groupHandler->isParent()) {
-
                 $children = $synUser->getEnrolledStudents($synergy_id);
 
                 /* Get subject list for each student */
@@ -418,23 +420,27 @@ class Session
                                 foreach ($subjectList as $subject) {
                                     //check subject exists.. we cant link to subjects that dont exist its ugly
                                     $cat = false;
-                                    if($subject['campusCode']) {
-                                        //Check for subject with campus code
-                                        $cat = $catHandler->getByCode($subject['campusCode'].'/'.$subject['code']);
+
+                                    if ($subject['campusCode']) {
+//Check for subject with campus code
+                                        try {
+                                            $cat = $folderMapper->findByCode($subject['campusCode'].'/'.$subject['code']);
+                                        } catch (\Exception $e) {
+//Try to fetch witout campus code
+                                            try {
+                                                $cat = $folderMapper->findByCode($subject['code']);
+                                            } catch (\Exception $e) {
+                                            }
+                                        }
                                     }
 
-                                    if(!is_array($cat)) {
-                                        //Try to fetch witout campus code
-                                        $cat = $catHandler->getByCode($subject['code']);
-                                    }
-
-                                    if (is_array($cat) && is_numeric($cat['id'])) {
-                                        if ($groupHandler->getPermission($cat['id']) >= READ_ACCESS) {
-                                            if(!in_array($cat['id'], $subjectIDList)) {
-                                                $subject['id'] = $cat['id'];
-                                                $subject['name'] = $cat['name'];
+                                    if ($cat instanceof \Schoolbox\Resource\Category) {
+                                        if ($groupHandler->getPermission($cat->getId()) >= READ_ACCESS) {
+                                            if (!in_array($cat->getId(), $subjectIDList)) {
+                                                $subject['id'] = $cat->getId();
+                                                $subject['name'] = $cat->getName();
                                                 $subjects[] = $subject;
-                                                $subjectIDList[] = $cat['id']; //dont dupe ids in this list
+                                                $subjectIDList[] = $cat->getId(); //dont dupe ids in this list
                                             }
                                         }
                                     }
@@ -452,31 +458,36 @@ class Session
                         }
                     }
                 }
-            } else { //user is not parent so get timetable information
+            } else {
+//user is not parent so get timetable information
                 $subjectList = $synUser->getSubjectList($synergy_id, $_SESSION['id']);
                 $catList = array();
                 if (is_array($subjectList)) {
                     foreach ($subjectList as $subject) {
                         //check subject exists.. we cant link to subjects that dont exist its ugly
                         $result = false;
-                        if($subject['campusCode']) {
-                            //Check for subject with campus code
-                            $result = $catHandler->getByCode($subject['campusCode'].'/'.$subject['code']);
+
+                        if ($subject['campusCode']) {
+//Check for subject with campus code
+                            try {
+                                $result = $folderMapper->findByCode($subject['campusCode'].'/'.$subject['code']);
+                            } catch (\Exception $e) {
+//Try to fetch witout campus code
+                                try {
+                                    $result = $folderMapper->findByCode($subject['code']);
+                                } catch (\Exception $e) {
+                                }
+                            }
                         }
 
-                        if(!is_array($result)) {
-                            //Try to fetch witout campus code
-                            $result = $catHandler->getByCode($subject['code']);
-                        }
-
-                        if (is_array($result) && is_numeric($result['id'])) {
-                            if (!in_array($result['id'], $catList)) {
-                                $subject['id'] = $result['id'];
-                                $subject['name'] = $result['name'];
-								$subject['code'] = $result['code'];
+                        if ($result instanceof \Schoolbox\Resource\Category) {
+                            if (!in_array($result->getId(), $catList)) {
+                                $subject['id'] = $result->getId();
+                                $subject['name'] = $result->getName();
+                                $subject['code'] = $result->getCodeString();
                                 $_SESSION['subjects'][] = $subject;
 
-                                $catList[] = $result['id']; //check for dupes
+                                $catList[] = $result->getId(); //check for dupes
                             }
                         }
                     }
@@ -493,14 +504,16 @@ class Session
     /**
      * Enable login log logging
      */
-    public function enableLoginLog() {
+    public function enableLoginLog()
+    {
         $this->setUseLoginLog(true);
     }
 
     /**
      * Disable login log logging
      */
-    public function disableLoginLog() {
+    public function disableLoginLog()
+    {
         $this->setUseLoginLog(false);
     }
 
@@ -526,5 +539,4 @@ class Session
     {
         return $this->useLoginLog;
     }
-
 }

@@ -43,8 +43,7 @@ class Marksheet
     protected $userHandler;
     /** @var \Group */
     protected $groupHandler;
-    /** @var \Category */
-    protected $categoryHandler;
+
     /** @var \External_Class */
     protected $synergyHandler;
 
@@ -469,8 +468,13 @@ class Marksheet
         $contextSelector->setCategoryFirst(true);
 
         $catIdList = array();
-        foreach ($this->groupHandler->involvedInSubjects($this->sessionUser->getId()) as $catAsArray) {
-            $catIdList[] = $catAsArray['id'];
+
+        $allSubjects = $this->groupHandler->involvedInSubjects($this->sessionUser->getId());
+
+        if (is_array($allSubjects) && count($allSubjects)) {
+            foreach ($allSubjects as $catAsArray) {
+                $catIdList[] = $catAsArray['id'];
+            }
         }
 
         $contextSelector->setCategories($this->categoryMapper->findByColumn('id', $catIdList));

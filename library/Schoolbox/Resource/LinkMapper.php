@@ -8,82 +8,135 @@
  */
 
 namespace Schoolbox\Resource;
-use Schoolbox\Mapper;
+
 use Schoolbox\Collection;
+use Schoolbox\Mapper;
+use Schoolbox\Mapper\Searchable;
+use Schoolbox\Notif\Notif;
+use Schoolbox\User;
+use Schoolbox\Resource\Link\Search\Result;
 
-class LinkMapper extends Mapper {
+class LinkMapper extends Mapper implements Searchable
+{
+    /**
+     * Mapping
+     *
+     * @return void
+     */
+    protected function mapping()
+    {
+        $this->hasTable('link');
+        $this->hasModel('\\Schoolbox\\Resource\\Link');
+        $this->hasMap(
+            array(
+                'column'     => 'id',
+                'property'   => 'id',
+                'type'       => self::TYPE_INTEGER,
+                'identifier' => true,
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'   => 'category',
+                'property' => 'folder',
+                'type'     => self::TYPE_MODEL,
+                'join'     => 'category'
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'   => 'owner',
+                'property' => 'owner',
+                'type'     => self::TYPE_MODEL,
+                'join'     => 'user',
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'   => 'url',
+                'property' => 'url',
+                'type'     => self::TYPE_STRING,
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'   => 'comment',
+                'property' => 'comment',
+                'type'     => self::TYPE_STRING,
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'   => 'description',
+                'property' => 'description',
+                'type'     => self::TYPE_STRING,
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'   => 'hidden',
+                'property' => 'hidden',
+                'type'     => self::TYPE_STRING,
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'            => 'submitted',
+                'property'          => 'submitted',
+                'type'              => self::TYPE_DATETIME,
+                'created_timestamp' => true,
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'            => 'modified',
+                'property'          => 'modified',
+                'type'              => self::TYPE_DATETIME,
+                'updated_timestamp' => true,
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'   => 'deleted_at',
+                'property' => 'deletedAt',
+                'type'     => self::TYPE_DATETIME,
+            )
+        );
+        $this->hasJoin(
+            'user', array(
+                'mapper'    => '\\Schoolbox\\UserMapper',
+                'this_key'  => 'owner',
+                'other_key' => 'id',
+            )
+        );
+        $this->hasJoin(
+            'category', array(
+                'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
+                'this_key'  => 'category',
+                'other_key' => 'id'
+            )
+        );
 
-	protected function mapping() {
-		$this->hasTable('link');
-		$this->hasModel('\\Schoolbox\\Resource\\Link');
-		$this->hasMap(array(
-			'column'     => 'id',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true,
-		));
-        $this->hasMap(array(
-            'column'     => 'category',
-            'property'   => 'folder',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'category'
-        ));
-        $this->hasMap(array(
-            'column'     => 'owner',
-            'property'   => 'owner',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'user',
-        ));
-        $this->hasMap(array(
-            'column'     => 'url',
-            'property'   => 'url',
-            'type'       => self::TYPE_STRING,
-        ));
-		$this->hasMap(array(
-			'column'     => 'comment',
-			'property'   => 'comment',
-			'type'       => self::TYPE_STRING,
-		));
-		$this->hasMap(array(
-			'column'     => 'description',
-			'property'   => 'description',
-			'type'       => self::TYPE_STRING,
-		));
-		$this->hasMap(array(
-			'column'     => 'hidden',
-			'property'   => 'hidden',
-			'type'       => self::TYPE_STRING,
-		));
-		$this->hasMap(array(
-			'column'            => 'submitted',
-			'property'          => 'submitted',
-			'type'              => self::TYPE_DATETIME,
-			'created_timestamp' => true,
-		));
-		$this->hasMap(array(
-			'column'            => 'modified',
-			'property'          => 'modified',
-			'type'              => self::TYPE_DATETIME,
-			'updated_timestamp' => true,
-		));
-        $this->hasMap(array(
-            'column'     => 'deleted_at',
-            'property'   => 'deletedAt',
-            'type'       => self::TYPE_DATETIME,
-        ));
-		$this->hasJoin('user', array(
-             'mapper'    => '\\Schoolbox\\UserMapper',
-             'this_key'  => 'owner',
-             'other_key' => 'id',
-		));
-        $this->hasJoin('category', array(
-            'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
-            'this_key'  => 'category',
-            'other_key' => 'id'
-        ));
+        $this->hasJoin(
+            'perms',
+            array(
+                'mapper' => '\\Schoolbox\\Permission\\Access\\RoleAccessMapper',
+                'this_key' => 'category',
+                'other_key' => 'cid'
+            )
+        );
+
+        $this->hasJoin(
+            'userAccess',
+            array(
+                'mapper' => '\\Schoolbox\\Permission\\Access\\UserAccessMapper',
+                'this_key' => 'category',
+                'other_key' => 'sid'
+            )
+        );
 
         $this->hasSoftDeleteDateField('deleted_at');
-	}
+    }
 
     /**
      * Find all the links in a given category
@@ -144,5 +197,51 @@ class LinkMapper extends Mapper {
         }
 
         return $collection;
+    }
+
+    /**
+     * Log action
+     *
+     * @param User $user
+     * @param $action
+     * @param Link $link
+     */
+    public function logAction(User $user, $action, Link $link)
+    {
+        $logEntry = array(
+            'object'   => 'link',
+            'objectId' => $link->getId(),
+            'action'   => $action,
+            'user'     => $user->getId(),
+        );
+
+        $notif = new Notif(Notif::TOPIC_CMS);
+        $notif->info("CRUD", $logEntry);
+    }
+
+    /**
+     * Performs a search with the given parameters, and returns a Collection of the resultant set.
+     *
+     * This also returns a count of all the items found in the search, not limited
+     * by params
+     *
+     * @param User $user
+     * @param string $keyword
+     * @param int $offset
+     * @param int $limit
+     * @param string $sortProperty
+     * @param string $sortDirection
+     * @return Collection
+     */
+    public function search($user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC')
+    {
+        if ($limit == 0) {
+            $limit = self::DEFAULT_LIMIT;
+        }
+
+        $searcher = new Result();
+        $searcher->search($user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
+
+        return $searcher;
     }
 }

@@ -8,16 +8,17 @@ $page->setBlock(TEMPLATE_body, 'file', 'file_block');
 $page->setBlock('file', 'thumbnail_image', 'thumbnail_image_block');
 $page->setBlock('file', 'thumbnail_flash', 'thumbnail_flash_block');
 
-if (!is_numeric($_GET['categoryID']))
-	die('Invalid category id');
+if (!is_numeric($_GET['categoryID'])) {
+    die('Invalid category id');
+}
 
 $groupHandler = new Group;
-$categoryHandler = new Category;
+$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
 $fileHandler = new File;
 
 $output = array('FILE_CATEGORY_ID'	=> $_GET['categoryID'],
-				'REQUEST_URI'		=> $_SERVER['REQUEST_URI'],
-				);
+                'REQUEST_URI'		=> $_SERVER['REQUEST_URI'],
+                );
 $page->setVar($output);
 
 $treeBuilder = new Schoolbox\Resource\CategoryTreeBuilder(
@@ -27,7 +28,7 @@ $treeBuilder = new Schoolbox\Resource\CategoryTreeBuilder(
 );
 $page->setVar('TREEDATA', json_encode($treeBuilder->buildPartialTree($_GET['categoryID'])));
 
-$category = $categoryHandler->getByID($_GET['categoryID']);
+$category = $categoryMapper->findById($_GET['categoryID']);
 
 /* output files */
 if (in_array($_GET['filter'], array('image', 'video'))) {
@@ -44,10 +45,9 @@ $fileList = $fileHandler->getAllInCategory($_GET['categoryID'], $filter);
 $page->setVar($output);
 
 if (is_array($fileList)) {
-
-    // add homepage "file"
-    if ($category['template'] > 0 && !is_array($filter)) {
-        $homepage = array('id'          => $category['id'],
+// add homepage "file"
+    if ($category->getHomepage()->getTemplate()->getId() > 0 && !is_array($filter)) {
+        $homepage = array('id'          => $category->getId(),
                           'description' => 'Homepage',
                           'size'        => 1,
                           'iconFile'    => 'vcard_fiquet.png',
@@ -57,29 +57,28 @@ if (is_array($fileList)) {
 
     }
 
-	foreach ($fileList as $file) {
+    foreach ($fileList as $file) {
+        $output = array ( 'FILE_ID' 	=> $file['id'],
+                          'DESCRIPTION'	=> $file['description'],
+                          'TITLE_SHORT' => TextFormatter::cutString($file['description'], 10),
+                          'SIZE'  		=> round($file['file_size']/1024),
+                          'FILE_ICON'	=> $file['iconFile'],
+                          );
+        $page->setVar($output);
 
-		$output = array ( 'FILE_ID' 	=> $file['id'],
-						  'DESCRIPTION'	=> $file['description'],
-						  'TITLE_SHORT' => TextFormatter::cutString($file['description'], 10),
-						  'SIZE'  		=> round($file['file_size']/1024),
-						  'FILE_ICON'	=> $file['iconFile'],
-						  );
-		$page->setVar($output);
+        $page->setVar('thumbnail_image_block', '');
+        $page->setVar('thumbnail_flash_block', '');
+        if ($filter['filter'] == 'image') {
+            $page->parse('thumbnail_image_block', 'thumbnail_image');
+        } else {
+            $page->parse('thumbnail_flash_block', 'thumbnail_flash');
+        }
 
-		$page->setVar('thumbnail_image_block', '');
-		$page->setVar('thumbnail_flash_block', '');
-		if ($filter['filter'] == 'image')
-			$page->parse('thumbnail_image_block', 'thumbnail_image');
-		else
-			$page->parse('thumbnail_flash_block', 'thumbnail_flash');
+        $page->parse('file_block', 'file', true);
 
-		$page->parse('file_block', 'file', true);
-
-	}
-} else
-	$page->setVar('file_block', '');
+    }
+} else {
+    $page->setVar('file_block', '');
+}
 
 $page->outputPage(true);
-
-?>

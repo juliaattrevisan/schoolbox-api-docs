@@ -11,21 +11,20 @@ class Component_Config_Image extends Component_Config_Abstract
 
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
-
         // has an internal block for the select element
         $page->setBlock($keyblock, 'config_images', 'config_images_block');
         $page->setVar('config_images_block', '');
 
-        $catHandler = new Category();
-        $imageList = $catHandler->getImages($this->getCategory('id'), 0, true);
+        $folderMapper = new \Schoolbox\Resource\CategoryMapper();
+        $allImages = $folderMapper->findImages($this->getCategory(), 0, true);
 
-        if (is_array($imageList)) {
-            foreach ($imageList as $image) {
-                $page->setVar('COMPONENT_CONFIG_IMAGE', $image['description']);
-                $page->setVar(
-                    'COMPONENT_CONFIG_IMAGE_SELECTED',
-                    $image['description'] == $configValue ? ' selected="selected"' : ''
-                );
+        if ($allImages->count()) {
+            foreach ($allImages as $currentImage) {
+                $page->setVar(array(
+                    'COMPONENT_CONFIG_IMAGE' => $currentImage->getDescription(),
+                    'COMPONENT_CONFIG_IMAGE_SELECTED', $currentImage->getDescription() == $configValue ? ' selected="selected"' : ''
+                ));
+
                 $page->parse('config_images_block', 'config_images', true);
             }
         } else {
@@ -33,6 +32,5 @@ class Component_Config_Image extends Component_Config_Abstract
             $page->setVar('COMPONENT_CONFIG_IMAGE_SELECTED', '');
             $page->parse('config_images_block', 'config_images', false);
         }
-
     }
 }
