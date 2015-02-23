@@ -168,8 +168,10 @@ class Contents {
             $node->setNodeId($currentLinkNode->getId());
             $node->setUser($currentLinkNode->getOwner());
             $node->setType('link');
-            $node->setIcon('link');
-            $node->setIconFile('html.png');
+            $icon = new Icon();
+            $icon->setFile('html.png');
+            $icon->setCss('link');
+            $node->setIcon($icon);
             $node->setName(\Scrub::text($currentLinkNode->getDescription()));
             $node->setCategory($this->getCategory());
             $node->setCss(implode(' ', array('link')));
