@@ -1,25 +1,33 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 $page = new SitePage;
+$url  = '';
 
-$url = '';
+$link       = false;
+$linkMapper = new \Schoolbox\Resource\LinkMapper();
 
 if ($_GET['url']) {
-    $url = base64_decode($_GET['url']);
-} elseif (is_numeric($_GET['id'])) {
-    // lookup link if id given
     try {
-        $linkMapper = new \Schoolbox\Resource\LinkMapper();
-        $link       = $linkMapper->findById($_GET['id']);
+        $url = base64_decode($_GET['url']);
+
+        $link = $linkMapper->findOneByColumn('url', $url);
+    } catch (\Exception $e) {
+        error(101);
+    }
+} elseif (is_numeric($_GET['id'])) {
+    try {
+        $link = $linkMapper->findById($_GET['id']);
 
         $url = $link->getUrl();
     } catch (\Exception $e) {
         error(101);
     }
+}
 
-    if ($link) {
-        $linkMapper->logAction($_SESSION['user'], 'access', $link);
-    }
+/* Log it
+ */
+if ($link instanceof \Schoolbox\Resource\Link) {
+    $linkMapper->logAction($_SESSION['user'], 'access', $link);
 }
 
 if (!empty($url)) {
