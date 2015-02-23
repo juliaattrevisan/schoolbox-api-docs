@@ -12,41 +12,47 @@ $userMapper = new \Schoolbox\UserMapper();
 /* Calendar controls execute post
  */
 if (!empty($_POST)) {
-    try {
-        $user = $userMapper->findById($_POST['userKey']);
-        Calendar_Layout_Full_Javascript::permissionCheck($_POST['userKey'], $_SESSION['user'], new Group());
-    } catch (Exception $e) {
-        error($e->getCode());
-    }
-
-    $start  = new \Alaress_Date_Format($_POST['start_date'], 'd/m/y');
-    $finish = new \Alaress_Date_Format($_POST['finish_date'], 'd/m/y');
+    $this->localRedir("/calendar/list/{$_POST['userKey']}/{$_POST['start_date']}/{$_POST['finish_date']}");
 }
 /* If both args were provided, assume date and userId respectively
  * Otherwise just assume currently logged in user
  */
 else {
-    if (count($this->arg) == 2) {
-        $selectedDate = $this->arg[0];
 
+    /* Viewing someone else's calendar:
+     * Url format: /calendar/list/{userId}/{startDate}/{finishDate}
+     */
+    if (count($this->arg) >= 2) {
+        /* Check that the user exists
+         */
         try {
-            $user = $userMapper->findById($this->arg[1]);
-            Calendar_Layout_Full_Javascript::permissionCheck($this->arg[1], $_SESSION['user'], new Group());
-
+            $user = $userMapper->findById($this->arg[0]);
+            Calendar_Layout_Full_Javascript::permissionCheck($this->arg[0], $_SESSION['user'], new Group());
         } catch (Exception $e) {
             error($e->getCode());
         }
-    } else {
-        $selectedDate = $this->arg[0];
-        $user         = $_SESSION['user'];
+
+        /* Take them on a date
+         */
+        $start = new \Alaress_Date_Format($this->arg[1], 'd-m-Y');
+
+        if (isset($this->arg[2])) {
+            $finish = new \Alaress_Date_Format($this->arg[2], 'd-m-Y');
+        } else {
+            $finish = new \Alaress_Date_Format(strtotime('+1 month', $start->getUnixTimestamp()), 'U');
+        }
     }
-
-    /* Take them on a date
+    /* Viewing your own calendar:
+     * Url format: /calendar/list/{startDate}
      */
-    $date = new \Alaress_Date_Format($selectedDate, 'd-m-y');
+    else {
+        $user = $_SESSION['user'];
 
-    $start  = new \Alaress_Date_Format($date->getUnixTimestamp(), 'U');
-    $finish = new \Alaress_Date_Format(strtotime('+1 month', $date->getUnixTimestamp()), 'U');
+        /* Take them on a date
+         */
+        $start  = new \Alaress_Date_Format($this->arg[0], 'd-m-y');
+        $finish = new \Alaress_Date_Format(strtotime('+1 month', $start->getUnixTimestamp()), 'U');
+    }
 }
 
 $factory = new Calendar_Api_Factory($user);
@@ -54,11 +60,13 @@ $api     = $factory->produce();
 
 $this->setVar(
     array(
-        'USER_ID'         => $user->getId(),
-        'USER_TOKEN'      => $user->getKey(),
-        'CALENDAR_PARAMS' => implode('/', $this->arg),
-        'SELECTED_START'  => $start->getUsingFormat('d/m/Y'),
-        'SELECTED_FINISH' => $finish->getUsingFormat('d/m/Y'),
+        'USER_ID'                   => $user->getId(),
+        'USER_TOKEN'                => $user->getKey(),
+        'CALENDAR_PARAMS'           => implode('/', $this->arg),
+        'SELECTED_START'            => $start->getUsingFormat('d/m/Y'),
+        'SELECTED_FINISH'           => $finish->getUsingFormat('d/m/Y'),
+        'SELECTED_FORMATTED_START'  => $start->getUsingFormat('d-m-Y'),
+        'SELECTED_FORMATTED_FINISH' => $finish->getUsingFormat('d-m-Y'),
     )
 );
 

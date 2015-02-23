@@ -457,7 +457,7 @@ Calendar.prototype.init = function() {
      */
     $('#fc-button-list').removeAttr('unselectable').removeClass('list filters').click(function(event) {
         event.preventDefault();
-        window.location.href = '/calendar/list/' + c.dom.fullCalendar('getDate').format('DD-MM-YYYY') + '/' + c.options.userId;
+        window.location.href = '/calendar/list/' + c.options.userId + '/' + c.dom.fullCalendar('getDate').format('DD-MM-YYYY');
     });
 
     // mash in the datepicker

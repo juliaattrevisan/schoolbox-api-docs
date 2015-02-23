@@ -14,12 +14,14 @@
 		})
 
 		/* date picker */
-		$('#start_date, #finish_date').datepicker({
+		$('#start_date').datepicker({
 			dateFormat: 'dd/mm/yy',
 			showOn: 'both',
 			buttonImage: '/images/core/calendar/calendar-click.png',
 			buttonImageOnly: true,
 			constrainInput: false,
+            altField: '#start_date_alt',
+            altFormat: 'dd-mm-yy',
 			onClose: function (string) {
 				var input = $(this);
 				$.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
@@ -27,7 +29,24 @@
 				})
 			}
 		});
-
+        
+        /* date picker */
+        $('#finish_date').datepicker({
+            dateFormat: 'dd/mm/yy',
+            showOn: 'both',
+            buttonImage: '/images/core/calendar/calendar-click.png',
+            buttonImageOnly: true,
+            constrainInput: false,
+            altField: '#finish_date_alt',
+            altFormat: 'dd-mm-yy',
+            onClose: function (string) {
+                var input = $(this);
+                $.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                    input.val(data.time);
+                })
+            }
+        });
+        
 		$('#start_date').syncDates({
 			endDate: $('#finish_date')
 		});
@@ -214,10 +233,12 @@
         </div>
         <form action="/calendar/list" method="post">
 			<input type="hidden" name='userKey' value='{USER_ID}' />
+            <input id="start_date_alt" name='start_date' type="hidden" value="{SELECTED_FORMATTED_START}" />
+            <input id="finish_date_alt" name='finish_date' type="hidden" value="{SELECTED_FORMATTED_FINISH}" />
 
             <div class="float-left dateSelector">
-                <input id='start_date' name="start_date" type="text" size="10" maxlength="10" value="{SELECTED_START}" />
-                to <input id='finish_date' name="finish_date" type="text" size="10" maxlength="10" value="{SELECTED_FINISH}" />
+                <input id='start_date' type="text" size="10" maxlength="10" value="{SELECTED_START}" />
+                to <input id='finish_date' type="text" size="10" maxlength="10" value="{SELECTED_FINISH}" />
             </div>
 
             <input type="submit" class="btn submit-btn-plain" value="Update" />
