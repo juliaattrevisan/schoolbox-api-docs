@@ -20,6 +20,7 @@ use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use Alaress\WorkerCrew\Transaction\Transaction;
 use Exception;
+use PDO;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
@@ -306,7 +307,16 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
             $this->rebindUser($user, $queue);
         }
 
-        $this->log->debug("Full rebind complete");
+        $this->log->debug("Full rebind complete; cleaning up stale queues");
+
+        // get all current user IDs
+        $userIds = $this->userMapper->getDatabase()
+                        ->query('SELECT id FROM `user`')
+                        ->fetchAll(PDO::FETCH_COLUMN);
+
+        $this->binder->destroyStaleBindings($userIds);
+
+        $this->log->debug("Stale queue cleanup complete");
     }
 
 
