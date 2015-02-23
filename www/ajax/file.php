@@ -38,7 +38,7 @@ if (is_numeric($_POST['categoryID']) && $_POST['categoryID']) {
     /* The usual nodes
      */
     $contents = new \Schoolbox\Resource\Browser\Tree\Contents($category, $filterOptions);
-    $allNodes = $contents->getFileNodes();
+    $allNodes = $contents->getAllNodes();
 
     /* Prepend the homepage node, a custom manufacture
      *
