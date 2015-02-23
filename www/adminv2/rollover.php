@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2013, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -9,8 +9,8 @@
 
 $group = new Group();
 
-if ( !$group->isSuperuser() ) {
-	error(19);
+if (!$group->isSuperuser()) {
+    error(19);
 }
 
 /**

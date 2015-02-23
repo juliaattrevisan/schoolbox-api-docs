@@ -75,8 +75,7 @@ if (!is_numeric($keyword) && (strlen($keyword) == 0)) {
     ));
 
     $this->parse('no_result_block', 'no_result');
-}
-elseif (!is_numeric($keyword) && (strlen($keyword) < MIN_KEYWORD_LENGTH)) {
+} elseif (!is_numeric($keyword) && (strlen($keyword) < MIN_KEYWORD_LENGTH)) {
     $enabled = AJAX_DISABLED;
 
     $this->setVar(array(
@@ -85,8 +84,7 @@ elseif (!is_numeric($keyword) && (strlen($keyword) < MIN_KEYWORD_LENGTH)) {
     ));
 
     $this->parse('no_result_block', 'no_result');
-}
-/* Also parse the no_result block if no results were found
+} /* Also parse the no_result block if no results were found
  * when using the default 'all' selection
  */
 elseif ($count['all'] == 0) {
@@ -112,14 +110,12 @@ $this->setVar(array(
  * phpliberalise the menu tabs
  */
 if ($enabled) {
-
-    /* Always render all tabs, hidden by default
+/* Always render all tabs, hidden by default
      * Upon ajax completion, populate the tabs with counts and
      * phplib the result html fragment
      */
-    foreach($handle as $typeName => $config) {
-
-        /* Render "All" tab option always
+    foreach ($handle as $typeName => $config) {
+/* Render "All" tab option always
          * Unholy mess
          */
         if ($typeName == 'all') {
@@ -136,8 +132,7 @@ if ($enabled) {
 
             $this->parse('type_block', 'type', true);
             $this->parse('result_block', 'result', true);
-        }
-        else {
+        } else {
             $config['renderer']->renderTab($count);
         }
     }
@@ -155,4 +150,3 @@ if ($enabled) {
  * Render search outputs
  * These are ajaxed in individually
  */
-

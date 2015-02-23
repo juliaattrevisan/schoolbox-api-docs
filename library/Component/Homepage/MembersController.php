@@ -24,7 +24,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
      */
     public function renderTemplate($templateHandle)
     {
-        if(!parent::loadTemplate($templateHandle, 'members')) {
+        if (!parent::loadTemplate($templateHandle, 'members')) {
             return false;
         }
         $this->parseConfig();
@@ -118,10 +118,9 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                 ));
             }
         } else {
-            $this->setVar('member_email_block','');
+            $this->setVar('member_email_block', '');
         }
 
         return true; // everything went according to plan
     }
-
 }

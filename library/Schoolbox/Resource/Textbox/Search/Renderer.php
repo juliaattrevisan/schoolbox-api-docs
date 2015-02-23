@@ -17,7 +17,8 @@ use Schoolbox\Resource\Search\Renderer\Base;
  */
 use Schoolbox\Resource\Textbox;
 
-class Renderer extends Base {
+class Renderer extends Base
+{
 
     /**
      * Type (e.g. 'link', 'blog', etc)
@@ -77,8 +78,7 @@ class Renderer extends Base {
             }
 
             $this->getPage()->parse('RESULT', 'textbox_t', true);
-        }
-        else {
+        } else {
             return;
         }
     }

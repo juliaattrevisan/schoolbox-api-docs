@@ -10,8 +10,8 @@
 
 namespace Schoolbox\Resource\Browser\Tree\Node;
 
-
-class Icon {
+class Icon
+{
 
     /**
      * css class associated with this icon
@@ -32,7 +32,8 @@ class Icon {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
     }
 
     /* Getters/Setters

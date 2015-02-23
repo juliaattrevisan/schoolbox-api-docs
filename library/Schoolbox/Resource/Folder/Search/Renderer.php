@@ -19,7 +19,8 @@ use Scrub;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 
-class Renderer extends Base {
+class Renderer extends Base
+{
 
     /**
      * Type (e.g. 'link', 'blog', etc)
@@ -61,20 +62,18 @@ class Renderer extends Base {
             /* phplib
              */
             foreach ($mapperResult->getResult() as $currentFolder) {
-
-                /* Manufacture a formatted name with codes, if any
+/* Manufacture a formatted name with codes, if any
                  */
                 if ($currentFolder->getCodes()->count()) {
                     $allCodes = array();
 
-                    foreach($currentFolder->getCodes() as $currentCode) {
+                    foreach ($currentFolder->getCodes() as $currentCode) {
                         $allCodes[] = $currentCode->getCode();
                     }
 
                     $suffix = implode(', ', $allCodes);
                     $folderName = "{$currentFolder->getName()} ({$suffix})";
-                }
-                else {
+                } else {
                     $folderName = "{$currentFolder->getName()}";
                 }
 
@@ -82,8 +81,7 @@ class Renderer extends Base {
                  */
                 if (is_numeric($currentFolder->getHomepage()->getTemplate())) {
                     $folderType = 'home';
-                }
-                else {
+                } else {
                     $folderType = 'folder';
                 }
 
@@ -117,12 +115,10 @@ class Renderer extends Base {
 
                     if ($hasRoleAccess && $hasUserAccess) {
                         $this->getPage()->parse('modify_block', 'modify');
-                    }
-                    else {
+                    } else {
                         $this->getPage()->parse('modify_block', 'modify');
                     }
-                }
-                else {
+                } else {
                     $this->getPage()->parse('modify_block', 'modify');
                 }
 
@@ -137,8 +133,7 @@ class Renderer extends Base {
             }
 
             $this->getPage()->parse('RESULT', 'folder_t', true);
-        }
-        else {
+        } else {
             return;
         }
     }

@@ -6,7 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-abstract class Component_Config_Factory {
+abstract class Component_Config_Factory
+{
 
     private static $invalid = array('factory', 'abstract', 'interface');
 
@@ -17,7 +18,8 @@ abstract class Component_Config_Factory {
      * @param $fields
      * @return bool
      */
-    public static function build($key, $folder, $fields) {
+    public static function build($key, $folder, $fields)
+    {
         if (in_array(strtolower($key), self::$invalid)) {
             return false;
         }
@@ -26,11 +28,10 @@ abstract class Component_Config_Factory {
             return ucfirst($matches[0][1]); // because strings are accessible via array notation ^_^
         }, $key));
 
-        if(class_exists($classname)) {
+        if (class_exists($classname)) {
             // echo "Found $classname - will need template $key.html<br/>\n";
             return new $classname($folder, $fields);
-        }
-        else {
+        } else {
             // echo "Problem: couldn't find $classname ($key.html won't be rendered)<br/>\n";
             return false;
         }

@@ -54,8 +54,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
             try {
                 // remove any non-numeric values from the source config
                 $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 $this->source = new \Schoolbox\Resource\Category();
             }
         }
@@ -101,8 +100,8 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
                 'COMPONENT_ALIGN'                  => $this->getConfig('align'),
                 'COMPONENT_PIXEL'                  => $pixel,
                 'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getConfig('timing') ? $this->getConfig(
-                            'timing'
-                        ) * 1000 : '2000',
+                    'timing'
+                ) * 1000 : '2000',
             )
         );
 

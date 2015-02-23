@@ -57,8 +57,7 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
             try {
                 // remove any non-numeric values from the source config
                 $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
             }
         }
     }
@@ -102,8 +101,8 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
                 'COMPONENT_ALIGN'                  => $this->getConfig('align'),
                 'COMPONENT_PIXEL'                  => $pixel,
                 'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getConfig('timing') ? $this->getConfig(
-                            'timing'
-                        ) * 1000 : '2000',
+                    'timing'
+                ) * 1000 : '2000',
             )
         );
 
@@ -133,7 +132,6 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
         // Iterate
         if (is_array($allFiles)) {
             foreach ($allFiles as $currentFile) {
-
                 $url = '#';
 
                 // sanitise url

@@ -38,8 +38,7 @@ $filter = array(
 // if the category doesn't exist, throw an error
 try {
     $category = $categoryMapper->findById($filter['category']);
-}
-catch (\Exception $e) {
+} catch (\Exception $e) {
     error(19);
 }
 
@@ -75,7 +74,6 @@ $visibleListSubset = $chatHandler->getChatListing($filter['category'], $filter['
 /* Year and Month List */
 if ($occupiedDateList) {
     foreach ($occupiedDateList as $i => $date) {
-
         $this->setVar(
             array(
                 'YEAR' => $date['year'],
@@ -211,7 +209,6 @@ if (is_array($items)) {
             $categoryList[$chat['time']] = 1;
 
             if ($chat['date'] != $previous['date'] && $i > 1) {
-
                 $this->parse('chat_date_block', 'chat_date', true);
                 $this->setVar("chat_block", "");
                 $this->parse("chat_block", "chat", true);
@@ -245,4 +242,3 @@ if (is_array($items)) {
     $this->setVar('chat_date_block', '');
     $this->setVar('year_block', 'No chat items found.');
 }
-

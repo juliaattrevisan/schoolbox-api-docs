@@ -16,7 +16,6 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\ISoftDeletable;
 
-
 class Category implements ISoftDeletable, FolderInterface
 {
     /**
@@ -182,7 +181,7 @@ class Category implements ISoftDeletable, FolderInterface
 
     /**
      * Is deleted
-     * 
+     *
      * @return bool
      */
     public function isDeleted()
@@ -213,7 +212,7 @@ class Category implements ISoftDeletable, FolderInterface
     
     /**
      * Set id
-     * 
+     *
      * @param  int $id
      * @return $this
      */
@@ -333,7 +332,7 @@ class Category implements ISoftDeletable, FolderInterface
     
     /**
      * Set deleted at
-     * 
+     *
      * @param \Alaress_Date_Format $deletedAt
      */
     public function setDeletedAt($deletedAt)

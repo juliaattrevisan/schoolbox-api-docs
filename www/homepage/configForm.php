@@ -59,7 +59,6 @@ if (is_numeric($_REQUEST['cid'])) {
     } // POST new component to page and output render of component
     elseif (is_numeric($_POST['cid']) && (is_numeric($_POST['add']) || is_numeric($_POST['reload']))) {
         if (is_numeric($_POST['add'])) {
-
             $newComp = new Component_Instance();
             $newComp
                 ->setDefinitionId($_POST['add'])
@@ -104,7 +103,6 @@ if (is_numeric($_REQUEST['cid'])) {
         $component->setup($folder, $component->getInstance()->getConfigArray());
 
         if ($component->execute() !== false) {
-
             $component->parseConfig();
             if ($component->renderTemplate($templateHandle) !== false) {
                 $component->parse($templateTarget, $templateHandle, true);

@@ -7,7 +7,8 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Bulk_Category extends Bulk_Abstract {
+class Bulk_Category extends Bulk_Abstract
+{
 
     /**
      * Default id for HomepageTemplate instance
@@ -16,65 +17,65 @@ class Bulk_Category extends Bulk_Abstract {
      */
     private $templateID = 0;
 
-	/**
-	 * Constructor
-	 *
-	 * @param $file
-	 * @param $templateID
-	 */
-	public function __construct($file, $templateID) {
-		$this->setFile($file);
-		$this->setTemplateID($templateID);
-	}
+    /**
+    * Constructor
+    *
+    * @param $file
+    * @param $templateID
+    */
+    public function __construct($file, $templateID)
+    {
+        $this->setFile($file);
+        $this->setTemplateID($templateID);
+    }
 
-	/**
-	 * Adds categories via csv
-	 * CSV Fields:
-		 0.	parent
-		 1.	title
-		 2-n. codes
-	 *
-	 * @return array
-	 */
-	public function addCategories() {
+    /**
+    * Adds categories via csv
+    * CSV Fields:
+    0.	parent
+    1.	title
+    2-n. codes
+    *
+    * @return array
+    */
+    public function addCategories()
+    {
         $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
 
-		/* List of outcomes
+        /* List of outcomes
 		 */
-		$output = array();
+        $output = array();
 
-		if (is_file($this->getFile())) {
-			$groups = array_map(array(Scrub, 'text'), $_POST['groupPerm']);
+        if (is_file($this->getFile())) {
+            $groups = array_map(array(Scrub, 'text'), $_POST['groupPerm']);
 
-			/* Process rows
+            /* Process rows
 			 */
-			$handle = fopen($this->getFile(), 'r');
-			$headerRow = fgetcsv($handle, 1000, ",");
+            $handle = fopen($this->getFile(), 'r');
+            $headerRow = fgetcsv($handle, 1000, ",");
 
-			while (($row = fgetcsv($handle, 1000, ",")) !== FALSE) {
-				if (($row[0] != '') && ($row[1] != '')) {
-
-					/* Check parent exists
+            while (($row = fgetcsv($handle, 1000, ",")) !== false) {
+                if (($row[0] != '') && ($row[1] != '')) {
+/* Check parent exists
 					 */
                     try {
                         $category = $categoryMapper->findById($row[0]);
-                    }
-                    catch (\Exception $e) {
+                    } catch (\Exception $e) {
                         $output[] = array(
                             'category' => $row[1],
                             'status' => 'Not Added',
                             'error' => "Could not find parent folder {$row[0]}",
                         );
 
-						continue;
-					}
+                        continue;
+                    }
 
-					/* Check if subject code already exists
+                    /* Check if subject code already exists
 					 */
-					$codeExists = false;
-					$code = array();
+                    $codeExists = false;
+                    $code = array();
 
-					for ($i=2; $row[$i]; $i++) {
+                    for ($i=2; $row[$i]; $i++) {
                         try {
                             $category = $categoryMapper->findByCode($row[$i]);
 
@@ -85,16 +86,15 @@ class Bulk_Category extends Bulk_Abstract {
                             );
 
                             $codeExists = true;
-                        }
-                        catch (\Exception $e) {
+                        } catch (\Exception $e) {
                         }
 
-						$code[] = $row[$i];
-					}
+                        $code[] = $row[$i];
+                    }
 
-					if ($codeExists) {
-						continue;
-					}
+                    if ($codeExists) {
+                        continue;
+                    }
 
                     /* Parent folder
                      */
@@ -120,7 +120,7 @@ class Bulk_Category extends Bulk_Abstract {
 
                     /* Accumulate all folder codes
                      */
-                    foreach($code as $currentCode) {
+                    foreach ($code as $currentCode) {
                         $folderCode = new \Schoolbox\Resource\CategoryCode();
                         $folderCode->setCode($currentCode);
 
@@ -143,45 +143,46 @@ class Bulk_Category extends Bulk_Abstract {
                             $roleAccess->setRole($role);
                             $roleAccess->setType($perm);
                             $roleAccessMapper->save($roleAccess);
-                        }
-                        catch (\Exception $e) {
+                        } catch (\Exception $e) {
                         }
                     }
 
-					/* Successfully created
+                    /* Successfully created
 					 */
                     if (is_numeric($category->getId())) {
-						$output[] = array(
-							'category' => $row[1],
-							'status' => 'Added',
-							'error' => 'OK',
-						);
-					}
-				}
-			}
-		}
+                        $output[] = array(
+                            'category' => $row[1],
+                            'status' => 'Added',
+                            'error' => 'OK',
+                        );
+                    }
+                }
+            }
+        }
 
-		return $output;
-	}
+        return $output;
+    }
 
-	/* Getters/Setters
+    /* Getters/Setters
 	 */
 
-	/**
-	 * Set template id
-	 *
-	 * @param $templateID
-	 */
-	private function setTemplateID($templateID) {
-		$this->templateID = $templateID;
-	}
+    /**
+    * Set template id
+    *
+    * @param $templateID
+    */
+    private function setTemplateID($templateID)
+    {
+        $this->templateID = $templateID;
+    }
 
-	/**
-	 * Get template id
-	 *
-	 * @return int
-	 */
-	private function getTemplateID() {
-		return $this->templateID;
-	}
+    /**
+    * Get template id
+    *
+    * @return int
+    */
+    private function getTemplateID()
+    {
+        return $this->templateID;
+    }
 }

@@ -41,15 +41,13 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
         $codeArray = explode(',', $code);
 
         $val = $codeArray[0];
-    }
-    else {
+    } else {
         $val = $code;
     }
 
     try {
         $category = $categoryMapper->findByCode($val);
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
         $this->error(18);
     }
 
@@ -83,8 +81,7 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
         foreach ($classList as $student) {
             try {
                 $user = $userMapper->findOneByColumn('synergy_id', $student['synergy_id']);
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 $user = new \Schoolbox\User();
             }
 
@@ -92,8 +89,7 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
 
             if (strlen($emailaddr)) {
                 $emailLink = "<a href=\"" . $_SESSION['mailhandle'] . $user->getEmail() . "\">Email</a>";
-            }
-            else {
+            } else {
                 $emailLink = '';
             }
 
@@ -109,7 +105,7 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
                 'SYNERGYID' => $student['synergy_id'],
                 'EMAIL' => $emailLink,
                 'EMAIL_ADDRESS' => $user->getEmail(),
-                'EMAIL_BTN' => $user->getEmail() ? sprintf('<a href="%s%s" title="Send email" class="btn email float-left"><span></span>Email</a>',$_SESSION['mailhandle'], $emailaddr) : '',
+                'EMAIL_BTN' => $user->getEmail() ? sprintf('<a href="%s%s" title="Send email" class="btn email float-left"><span></span>Email</a>', $_SESSION['mailhandle'], $emailaddr) : '',
                 'MEDICAL_ALERT' => $student['StudentMedicalAlert'],
                 'ON_OFF' => ++$j % 2 ? '' : 'dark',
                 'SELECT' => $user->getEmail() ? sprintf('<input id="c%s" name="c%s" type="checkbox" value="%s"/>', $j, $j, $emailaddr) : '',
@@ -165,8 +161,7 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
                 ));
 
                 $this->parse('actions_block', 'actions');
-            }
-            else {
+            } else {
                 $this->parse('name_without_link_block', 'name_without_link');
 
                 $this->setVar(array(

@@ -20,7 +20,8 @@ use Schoolbox\Resource\Browser\Tree\Node\Icon;
 use Schoolbox\UserMapper;
 use Schoolbox\User;
 
-class Contents {
+class Contents
+{
 
     /**
      * An instance of \Schoolbox\Resource\Category
@@ -31,7 +32,7 @@ class Contents {
 
     /**
      * Permission value
-     * 
+     *
      * @var int
      */
     private $permission = 0;
@@ -105,7 +106,8 @@ class Contents {
      * @param Category $category
      * @param array $filterOptions
      */
-    public function __construct(Category $category, $filterOptions = null) {
+    public function __construct(Category $category, $filterOptions = null)
+    {
 
         /* Handlers
          */
@@ -140,7 +142,8 @@ class Contents {
      *
      * @return Collection
      */
-    private function build() {
+    private function build()
+    {
 
         /* Individual types
          */
@@ -158,7 +161,8 @@ class Contents {
      * A list of links in this category
      *
      */
-    private function buildLinks() {
+    private function buildLinks()
+    {
         $allLinkNodes = $this->getLinkMapper()->findAllInCategory($this->getCategory(), array());
 
         /* Process links
@@ -184,15 +188,15 @@ class Contents {
     /**
      * A list of files in this category
      */
-    private function buildFiles() {
-       $allFileNodes = $this->getFileHandler()->getAllInCategory($this->getCategory()->getId(), $this->getFilterOptions());
+    private function buildFiles()
+    {
+        $allFileNodes = $this->getFileHandler()->getAllInCategory($this->getCategory()->getId(), $this->getFilterOptions());
 
         /* Process files
          */
         if (is_array($allFileNodes) && count($allFileNodes)) {
             foreach ($allFileNodes as $currentFileNode) {
-
-                // if the file is associated with due work, it shouldn't be visible here
+// if the file is associated with due work, it shouldn't be visible here
                 if ($currentFileNode['type'] || $currentFileNode['typeName']) {
                     continue;
                 }
@@ -216,8 +220,7 @@ class Contents {
 
                 try {
                     $user = $this->getUserMapper()->findById($currentFileNode['owner']);
-                }
-                catch (\Exception $e) {
+                } catch (\Exception $e) {
                     $user = new User();
                     $user->setId($currentFileNode['owner']);
                 }
@@ -240,7 +243,7 @@ class Contents {
                 $node->setName(\Scrub::text($currentFileNode['description']));
                 $node->setSize($currentFileNode['file_size'] > 0 ? \Alaress_Byte_Format::bytesToString($currentFileNode['file_size']) : "--");
                 $node->setCategory($this->getCategory());
-                $node->setCss(implode(' ' , $class));
+                $node->setCss(implode(' ', $class));
                 $node->setModifiedAt(new \Alaress_Date_Relative($currentFileNode['modified']));
 
                 $this->getFileNodes()->add($node);

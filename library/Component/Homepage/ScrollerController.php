@@ -6,7 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_ScrollerController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_ScrollerController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * @var Group
@@ -37,7 +38,8 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
         $this->groupHandler = new Group();
         $this->fileHandler = new File();
         $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
@@ -48,8 +50,7 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
             try {
                 // remove any non-numeric values from the source config
                 $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
             }
         }
     }
@@ -59,17 +60,18 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
         if (!parent::loadTemplate($templateHandle, 'scroller')) {
             return false;
         }
         $this->parseConfig();
 
-	    if($this->permission < READ_ACCESS) {
-		    return false;
-	    }
+        if ($this->permission < READ_ACCESS) {
+            return false;
+        }
 
-	    $this->setBlock($templateHandle, 'image_scroller', 'image_scroller_block');
+        $this->setBlock($templateHandle, 'image_scroller', 'image_scroller_block');
         $this->setBlock('image_scroller', 'show_caption', 'show_caption_block');
         $this->setBlock($templateHandle, 'submit_image', 'submit_image_block');
 
@@ -77,13 +79,13 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         $pixel = $this->getConfig('pixel') ? $this->getConfig('pixel') : 200;
 
         $this->setVar(array(
-			'COMPONENT_ALIGN' => $this->getConfig('align'),
-			'COMPONENT_PIXEL' => $pixel,
-			'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getConfig('timing') ? $this->getConfig(
-				'timing'
-			) * 1000 : '2000',
-			'COMPONENT_CONFIG_RANDOM_STARTING_SLIDE' => $this->getConfig('randomStartingSlide')
-		));
+            'COMPONENT_ALIGN' => $this->getConfig('align'),
+            'COMPONENT_PIXEL' => $pixel,
+            'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getConfig('timing') ? $this->getConfig(
+                'timing'
+            ) * 1000 : '2000',
+            'COMPONENT_CONFIG_RANDOM_STARTING_SLIDE' => $this->getConfig('randomStartingSlide')
+        ));
 
         // Set up component name
         $this->setVar(

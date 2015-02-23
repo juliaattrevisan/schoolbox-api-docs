@@ -761,8 +761,7 @@ class Category extends DeprecatedModel
         try {
             $categoryMapper = new \Schoolbox\Resource\Category();
             $category = $categoryMapper->findById($categoryID);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             error(13);
         }
 

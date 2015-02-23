@@ -45,8 +45,7 @@ class Component_Config_Src extends Component_Config_Abstract
                 'COMPONENT_CONFIG_SRC_NAME' => $folder->getName(),
                 'COMPONENT_CONFIG_SRC_CID'  => $folder->getId()
             ));
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $page->setVar(array(
                 'COMPONENT_CONFIG_SRC_ID'   => '#',
                 'COMPONENT_CONFIG_SRC_NAME' => 'Local',

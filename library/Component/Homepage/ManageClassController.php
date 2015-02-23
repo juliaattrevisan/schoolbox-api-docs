@@ -6,7 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_ManageClassController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_ManageClassController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * @var Group
@@ -18,7 +19,8 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
 
         $this->groupHandler = new Group();
 
@@ -29,12 +31,13 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'manageClass')) {
+    public function renderTemplate($templateHandle)
+    {
+        if (!parent::loadTemplate($templateHandle, 'manageClass')) {
             return false;
         }
 
-        if( $this->getContext()->getCodeString() == '') {
+        if ($this->getContext()->getCodeString() == '') {
             return false;
         }
 
@@ -55,27 +58,24 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         );
 
         /* Output student grades link to students of this class */
-        if($this->permission == READ_ACCESS && (
+        if ($this->permission == READ_ACCESS && (
             $this->groupHandler->involvedInGroup($_SESSION['id'], $this->getContext()->getId()) ||
             $this->groupHandler->involvedInSubject($this->getContext()->getCodeString()))) {
             $this->parse('student_grades_block', 'student_grades');
-        }
-        else {
+        } else {
             $this->setVar('student_grades_block', '');
         }
 
 
-        if(Cfg::get('external_enable') == false || $this->permission < WRITE_ACCESS || $this->getContext()->getCodeString() == '') {
+        if (Cfg::get('external_enable') == false || $this->permission < WRITE_ACCESS || $this->getContext()->getCodeString() == '') {
             $this->setVar('class_list_block', '');
-        }
-        else {
+        } else {
             $this->parse('class_list_block', 'class_list');
         }
 
         if ($this->permission >= WRITE_ACCESS && $this->groupHandler->isStaff()) {
             $this->parse('class_mark_block', 'class_mark');
-        }
-        else {
+        } else {
             $this->setVar('class_mark_block', '');
         }
 
@@ -83,5 +83,4 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 
         return true; // everything went according to plan
     }
-
 }

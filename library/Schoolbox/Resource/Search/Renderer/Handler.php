@@ -10,8 +10,8 @@
 
 namespace Schoolbox\Resource\Search\Renderer;
 
-
-abstract class Handler {
+abstract class Handler
+{
 
     /**
      * A sitepage
@@ -68,12 +68,13 @@ abstract class Handler {
     /**
      * Constructor
      *
-     * @param \SitePage $page 
+     * @param \SitePage $page
      * @param array $result Equivalent of $result['blog'] etc.
      * @param array $count Equivalent of $count['blog'] etc.
      * @param $currentPage
      */
-    public function __construct(\SitePage $page, $result, $count, $currentPage) {
+    public function __construct(\SitePage $page, $result, $count, $currentPage)
+    {
         $this->setPage($page);
         $this->setResult($result);
         $this->setCount($count);
@@ -83,7 +84,8 @@ abstract class Handler {
     /**
      * Render clickable tab menu
      */
-    public function renderTab($count) {
+    public function renderTab($count)
+    {
         $this->getPage()->setVar(array(
             'TYPE_TYPE' => $this->getType(),
             'TYPE_NAME' => $this->getTabName(),
@@ -96,13 +98,11 @@ abstract class Handler {
             $this->getPage()->setVar(array(
                 'TYPE_CLASS' => ''
             ));
-        }
-        elseif (!$count[$this->getType()]) {
+        } elseif (!$count[$this->getType()]) {
             $this->getPage()->setVar(array(
                 'TYPE_CLASS' => 'hide'
             ));
-        }
-        else {
+        } else {
             $this->getPage()->setVar(array(
                 'TYPE_CLASS' => ''
             ));
@@ -155,7 +155,8 @@ abstract class Handler {
      *
      * Shared among all the handlers
      */
-    public function renderPagination() {
+    public function renderPagination()
+    {
         // clear count
         $this->getPage()->setBlock('RESULT', 'count', 'count_block');
         $this->getPage()->setVar('count_block');
@@ -230,8 +231,7 @@ abstract class Handler {
             ));
 
             $this->getPage()->parse('see_more_block', 'see_more');
-        }
-        else {
+        } else {
             $this->getPage()->setVar('see_more_block', '');
         }
     }

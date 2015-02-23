@@ -39,7 +39,7 @@ if (is_numeric($this->arg[0])) {
     $this->setVar($output);
 
 
-} else if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
+} elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     try {
         $folder = CategoryMapper::getInstance()->findById($this->arg[1]);
 
@@ -71,7 +71,7 @@ if (is_numeric($this->arg[0])) {
     );
     $this->setVar($output);
 
-} else if ($this->arg[0] == 'multicat') {
+} elseif ($this->arg[0] == 'multicat') {
     /* Upload a link to multiple categories */
 
     $this->setFile(TEMPLATE_content, 'cms/add-link-multi-cat.html');

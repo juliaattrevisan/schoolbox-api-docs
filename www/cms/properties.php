@@ -12,7 +12,6 @@ $page->setBlock(TEMPLATE_body, 'link', 'link_block');
 $page->setBlock(TEMPLATE_body, 'file', 'file_block');
 
 if (is_numeric($_GET['fileID'])) {
-
     $file = $fileHandler->getByID($_GET['fileID']);
 
     if ($groupHandler->getPermission($file['category']) < READ_ACCESS) {
@@ -47,12 +46,11 @@ if (is_numeric($_GET['fileID'])) {
     $page->outputPage(true);
 
 } elseif (is_numeric($_GET['linkID'])) {
-
     try {
         $linkMapper = new \Schoolbox\Resource\LinkMapper();
         $link       = $linkMapper->findById($_GET['linkID']);
     } catch (\Exception $e) {
-        error(101);
+            error(101);
     }
 
     if ($groupHandler->getPermission($link->getFolder()->getId()) < READ_ACCESS) {
@@ -104,4 +102,3 @@ if (is_numeric($_GET['fileID'])) {
 } else {
     error(2);
 }
-

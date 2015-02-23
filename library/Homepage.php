@@ -2,24 +2,26 @@
 
 /* This script controls homepage layout functions.  It is used for setting up templates and customising homepage */
 
-class Homepage {
+class Homepage
+{
 
-	/* Used to remove homepage components and reset template
+    /* Used to remove homepage components and reset template
 	 */
-	const REMOVE_HOMEPAGE_TEMPLATE_ID = -1;
+    const REMOVE_HOMEPAGE_TEMPLATE_ID = -1;
     const KEEP_EXISTING_HOMEPAGE = 0;
 
-	function Homepage($cid) {
-		$this->db = DeprecatedDatabase::getInstance();
-		$this->cid = $cid;
-	}
+    function Homepage($cid)
+    {
+        $this->db = DeprecatedDatabase::getInstance();
+        $this->cid = $cid;
+    }
 
-	function getTemplate()
-	{
-			//returns the current template
-			$query = "SELECT template FROM homepage_config WHERE cid = '".$this->cid."'";
-			return $this->db->getOne($query);
-	}
+    function getTemplate()
+    {
+            //returns the current template
+            $query = "SELECT template FROM homepage_config WHERE cid = '".$this->cid."'";
+            return $this->db->getOne($query);
+    }
 
     /**
      * @deprecated
@@ -28,12 +30,12 @@ class Homepage {
      * @return array|bool
      */
     function getComponentList($type = null, $categoryId = null)
-	{
-        if ( !is_numeric($categoryId) ) {
+    {
+        if (!is_numeric($categoryId)) {
             $categoryId = $this->cid;
         }
 
-		$query = "SELECT t.homepageComponentCategoryID AS categoryID, t.name as categoryName, id, c.name, component, description, allowMultiple,
+        $query = "SELECT t.homepageComponentCategoryID AS categoryID, t.name as categoryName, id, c.name, component, description, allowMultiple,
                     (SELECT COUNT(*) FROM homepage_comp_location hcl WHERE hcl.component = c.id AND hcl.cid = {$categoryId}) as componentCount
                     FROM homepage_comp c
                     JOIN homepageComponentCategory t ON t.homepageComponentCategoryID = homepageCategoryID
@@ -48,16 +50,17 @@ class Homepage {
 
         $query .= " GROUP BY id ORDER BY homepageCategoryID, c.name";
 
-		return $this->db->getAll($query);
-	}
+        return $this->db->getAll($query);
+    }
 
     /**
      * @deprecated
      * @param null $categoryId
      * @return array|bool
      */
-    public function getSimpleComponentList ($categoryId = null) {
-        if ( !is_numeric($categoryId) ) {
+    public function getSimpleComponentList ($categoryId = null)
+    {
+        if (!is_numeric($categoryId)) {
             $categoryId = $this->cid;
         }
 
@@ -77,100 +80,107 @@ class Homepage {
      * @param $componentList
      * @param null $categoryId
      */
-    public function setComponentList ($componentList, $categoryId = null) {
-        if ( !is_numeric($categoryId) ) {
+    public function setComponentList ($componentList, $categoryId = null)
+    {
+        if (!is_numeric($categoryId)) {
             $categoryId = $this->cid;
         }
 
         $this->deleteComponentPositions($categoryId);
 
-        if ( is_array($componentList) ) {
-            foreach ( $componentList as $component ) {
+        if (is_array($componentList)) {
+            foreach ($componentList as $component) {
                 $this->db->insert('homepage_comp_location', $component);
             }
         }
     }
 
-	/**
-	 * Gets the column widths for a particular homepage
-	 *
-	 * @return array|bool
-	 */
-	public function getColumnWidths() {
-		$query = "SELECT left_column_width, right_column_width
+    /**
+    * Gets the column widths for a particular homepage
+    *
+    * @return array|bool
+    */
+    public function getColumnWidths()
+    {
+        $query = "SELECT left_column_width, right_column_width
 				  FROM homepage_config
 				  WHERE cid = '{$this->cid}'";
 
-		return $this->db->getRow($query);
-	}
+        return $this->db->getRow($query);
+    }
 
-	/**
-	 * Update column widths
-	 *
-	 * @param  $left
-	 * @param  $right
-	 * @return void
-	 */
-	public function updateColumnWidths($left, $right) {
+    /**
+    * Update column widths
+    *
+    * @param  $left
+    * @param  $right
+    * @return void
+    */
+    public function updateColumnWidths($left, $right)
+    {
 
         $columnWidths = array('cid' => $this->cid,
                               'left_column_width' => $left,
                               'right_column_width' => $right,);
 
         $this->db->update('homepage_config', 'cid', $columnWidths);
-	}
+    }
 
 
-	function getColorList()
-	{
-		$query = "SELECT left_head_font, left_head_bg, left_font, left_bg_primary, left_bg_secondary, left_link, left_hover,
+    function getColorList()
+    {
+        $query = "SELECT left_head_font, left_head_bg, left_font, left_bg_primary, left_bg_secondary, left_link, left_hover,
 						right_head_font, right_head_bg, right_font, right_bg_primary, right_bg_secondary, right_link, right_hover,
 						top_head_font, top_head_bg, top_font, top_bg_primary, top_bg_secondary, top_link, top_hover
 						FROM homepage_config WHERE cid = '{$this->cid}'";
-		$colourList = $this->db->getRow($query);
+        $colourList = $this->db->getRow($query);
 
-		// use defaults for missing colours
-		$defaultColours = unserialize(HOMEPAGE_colors);
-		if (is_array($colourList)) {
-			foreach ($colourList as $key => $value) {
-				if (empty($value)) $colourList[$key] = $defaultColours[$key];
-			}
-		}
-		return $colourList;
-	}
+        // use defaults for missing colours
+        $defaultColours = unserialize(HOMEPAGE_colors);
+        if (is_array($colourList)) {
+            foreach ($colourList as $key => $value) {
+                if (empty($value)) {
+                    $colourList[$key] = $defaultColours[$key];
+                }
+            }
+        }
+        return $colourList;
+    }
 
 
-	function savePageTemplate($template) {
+    function savePageTemplate($template)
+    {
         $query = "SELECT cid FROM homepage_config WHERE cid = '".$this->cid."'";
         $this->db->query($query);
-        if($row = $this->db->getNextArray()) {
+        if ($row = $this->db->getNextArray()) {
             $query = "UPDATE homepage_config SET template = '$template' WHERE cid = '".$this->cid."'";
-        }
-        else {
+        } else {
             $query = "INSERT INTO homepage_config (cid, template) VALUES ('$this->cid', '$template')";
         }
         $this->db->query($query);
-	}
+    }
 
 
-	function deleteHomepage() {
-		$groupHandler = new Group;
-		$groupHandler->disbandGroup($this->cid);
+    function deleteHomepage()
+    {
+        $groupHandler = new Group;
+        $groupHandler->disbandGroup($this->cid);
 
-		$this->emptyHomepage();
+        $this->emptyHomepage();
 
         $this->db->delete('homepage_config', 'cid', $this->cid);
         $this->deleteComponentPositions();
-	}
+    }
 
 
-	/**
-	 * Removes componentry from homepage and resets to the template that was used to create it.
+    /**
+    * Removes componentry from homepage and resets to the template that was used to create it.
      * Also soft-deletes homepage content where applicable
-	 *
-	 * @return void
-	 */
-	public function emptyHomepage() {
+    *
+    * @return void
+    */
+    public function emptyHomepage()
+    {
         // TODO for 13.0.0: refactor this to call iterate across Component_Homepage_*Controllers instead, and call deleteData() if available
         // soft delete the data using handlers
         $allComponents = array(
@@ -191,8 +201,7 @@ class Homepage {
         try {
             $category = $categoryMapper->findById($this->cid);
             $this->resetHomepageToTemplate($category->getHomepage()->getTemplate());
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
         }
     }
 
@@ -204,12 +213,12 @@ class Homepage {
      * @param $templateID
      * @return int
      */
-    public function resetHomepageToTemplate($templateID) {
+    public function resetHomepageToTemplate($templateID)
+    {
         $categoryID = $this->cid;
 
         if ($templateID != Homepage::KEEP_EXISTING_HOMEPAGE) {
-
-            // if 'remove homepage', delete config and components, then set the templateID to zero
+// if 'remove homepage', delete config and components, then set the templateID to zero
             if ($templateID == Homepage::REMOVE_HOMEPAGE_TEMPLATE_ID) {
                 $templateID = $this->removeAllComponentsFromHomepage($categoryID);
             }
@@ -217,8 +226,7 @@ class Homepage {
             // now continue as normal
             if ($templateID > 0) {
                 $this->createHomepageFromTemplate($templateID);
-            }
-            else {
+            } else {
                 // we don't want an invalid template ID going into the database
                 $templateID = 0;
             }
@@ -237,7 +245,8 @@ class Homepage {
      * @param $categoryID
      * @param $templateID
      */
-    public function createHomepageFromTemplate($templateID) {
+    public function createHomepageFromTemplate($templateID)
+    {
         $categoryID = $this->cid;
 
         // locate all the component instances associated with this homepage (if they exist), and clear them out
@@ -267,7 +276,7 @@ class Homepage {
             'right_column_width' => $tpl['right_column_width'],
         );
 
-        foreach(array('top','left','right') as $position) {
+        foreach (array('top','left','right') as $position) {
             $homepageConfig = array_merge($homepageConfig, array(
                 $position . '_head_font' => Cfg::get('homepage_colour_head_font'),
                 $position . '_head_bg' => Cfg::get('homepage_colour_head_bg'),
@@ -288,8 +297,8 @@ class Homepage {
         $ccm = Component_ConfigMapper::getInstance();
         $instances = $cim->findByContext('homepage_template', $templateID);
 
-        if(count($instances)) {
-            foreach($instances as $inst) {
+        if (count($instances)) {
+            foreach ($instances as $inst) {
                 /* @var $inst Component_Instance */
                 // preserve the config
                 $configs = $inst->getConfig();
@@ -303,10 +312,10 @@ class Homepage {
                 $ids = $cim->save($inst);
                 $id = $ids[0];
 
-                if(count($configs)) {
-                    foreach($configs as $c) {
+                if (count($configs)) {
+                    foreach ($configs as $c) {
                         /* @var $c Component_Config */
-                        if($c->getId()) {
+                        if ($c->getId()) {
                             $conf = new Component_Config();
                             $conf
                                 ->setInstanceId($id)
@@ -331,7 +340,8 @@ class Homepage {
      * @param string $indexField
      * @return array
      */
-    private function duplicateRowsOnTable($table, array $map, $sqlCondition = '', $indexField = 'id') {
+    private function duplicateRowsOnTable($table, array $map, $sqlCondition = '', $indexField = 'id')
+    {
         $queries = array();
         $sql = "SELECT * FROM $table $sqlCondition";
         $queries[] = $sql;
@@ -364,7 +374,8 @@ class Homepage {
      *
      * @return int
      */
-    function removeAllComponentsFromHomepage() {
+    function removeAllComponentsFromHomepage()
+    {
         $categoryID = $this->db->quote($this->cid);
 
         // locate all the component instances associated with this homepage, and clear them out
@@ -380,9 +391,10 @@ class Homepage {
      * @param $component
      * @return int
      */
-    function addComponent($component) {
+    function addComponent($component)
+    {
         $query = "SELECT config FROM homepage_comp WHERE id = '$component'";
-	    $componentSetup = $this->db->getRow($query);
+        $componentSetup = $this->db->getRow($query);
 
          /* We are inserting component at the top of the left column so we move all the existing components down */
         $query = "UPDATE homepage_comp_location SET position = position+1 WHERE cid = ".$this->cid." AND `column` = 1";
@@ -397,23 +409,23 @@ class Homepage {
      * @param null $categoryId
      */
     function deleteComponentPositions($categoryId = null)
-	{
-        if ( !is_numeric($categoryId) ) {
+    {
+        if (!is_numeric($categoryId)) {
             $categoryId = $this->cid;
         }
 
-		$this->db->delete('homepage_comp_location', 'cid', $categoryId);
-	}
+        $this->db->delete('homepage_comp_location', 'cid', $categoryId);
+    }
 
     /**
      * @deprecated
      * @param $component
      */
     function deleteComponent($component)
-	{
+    {
         $query = "DELETE FROM homepage_comp_location WHERE cid = '$this->cid' AND homepageComponentLocationID = '$component'";
         $this->db->query($query);
-	}
+    }
 
 
     /**
@@ -423,15 +435,15 @@ class Homepage {
      * @param $position
      */
     function updateComponentPosition($component, $column, $position)
-	{
-		$query = array(
-			"homepageComponentLocationID" => $component,
-			"column" => $column,
-			"position" => $position
-		);
+    {
+        $query = array(
+            "homepageComponentLocationID" => $component,
+            "column" => $column,
+            "position" => $position
+        );
 
-		$result = $this->db->update('homepage_comp_location', 'homepageComponentLocationID', $query);
-	}
+        $result = $this->db->update('homepage_comp_location', 'homepageComponentLocationID', $query);
+    }
 
     /**
      * @deprecated
@@ -439,13 +451,13 @@ class Homepage {
      * @param $config
      */
     function updateComponentConfig($component, $config)
-	{
-		$query = array(
-			"homepageComponentLocationID" => $component,
-			"config" => $config
-		);
-		$this->db->update('homepage_comp_location', 'homepageComponentLocationID', $query);
-	}
+    {
+        $query = array(
+            "homepageComponentLocationID" => $component,
+            "config" => $config
+        );
+        $this->db->update('homepage_comp_location', 'homepageComponentLocationID', $query);
+    }
 
     /**
      * For updating available components
@@ -454,67 +466,65 @@ class Homepage {
      * @param $submitListComp
      * @param null $categoryId
      */
-    function updateComponents($submitListComp, $categoryId = null){
-        if ( !is_numeric($categoryId) ) {
+    function updateComponents($submitListComp, $categoryId = null)
+    {
+        if (!is_numeric($categoryId)) {
             $categoryId = $this->cid;
         }
 
-		// Get components
-		$query = "SELECT `cid`, `position`, `column`, `component`, `config`
+        // Get components
+        $query = "SELECT `cid`, `position`, `column`, `component`, `config`
 			FROM homepage_comp_location
 			WHERE cid = '{$categoryId}'
 			ORDER BY `position`";
-		$currentListComp = $this->db->getAll($query);
-		$submitListComp = is_array($submitListComp) ? $submitListComp : array();
-		if (is_array($currentListComp)) {
-			// Remove deleted ones
-			foreach($currentListComp as $key => $comp)
-			{
-				if(!in_array($comp['component'], $submitListComp))
-				{
-					unset($currentListComp[$key]);
-				}
-				else
-					unset($submitListComp[array_search($comp['component'], $submitListComp)]);
-			}
-		}
+        $currentListComp = $this->db->getAll($query);
+        $submitListComp = is_array($submitListComp) ? $submitListComp : array();
+        if (is_array($currentListComp)) {
+            // Remove deleted ones
+            foreach ($currentListComp as $key => $comp) {
+                if (!in_array($comp['component'], $submitListComp)) {
+                    unset($currentListComp[$key]);
+                } else {
+                    unset($submitListComp[array_search($comp['component'], $submitListComp)]);
+                }
+            }
+        }
 
-		// Add new ones to end finding their
-		$newListComp = $currentListComp;
-		if (is_array($submitListComp)) {
-			foreach($submitListComp as $key => $comp)
-			{
-				$query = "SELECT size, config FROM homepage_comp WHERE id = $comp";
-				$result = $this->db->getRow($query);
-				$newComp = array(
-					"cid" => $categoryId,
-					"position" => "",
-					"column" => $result['size'],
-					"component" => $comp,
-					"config" => $result['config']
-				);
-				$newListComp[] = $newComp;
-			}
-		}
-		// Reposition both columns and reorder array
-		$count = array(1, 1);
-		if (is_array($newListComp)) {
-			foreach($newListComp as $key => $newComp)
-			{
-				$newListComp[$key]['position'] = $count[$newComp['column'] - 1];
-				$count[$newComp['column'] - 1]++;
-			}
-		}
-		$newListComp = is_array($newListComp) ? $newListComp : array();
-		$newListComp = array_values($newListComp);
+        // Add new ones to end finding their
+        $newListComp = $currentListComp;
+        if (is_array($submitListComp)) {
+            foreach ($submitListComp as $key => $comp) {
+                $query = "SELECT size, config FROM homepage_comp WHERE id = $comp";
+                $result = $this->db->getRow($query);
+                $newComp = array(
+                    "cid" => $categoryId,
+                    "position" => "",
+                    "column" => $result['size'],
+                    "component" => $comp,
+                    "config" => $result['config']
+                );
+                $newListComp[] = $newComp;
+            }
+        }
+        // Reposition both columns and reorder array
+        $count = array(1, 1);
+        if (is_array($newListComp)) {
+            foreach ($newListComp as $key => $newComp) {
+                $newListComp[$key]['position'] = $count[$newComp['column'] - 1];
+                $count[$newComp['column'] - 1]++;
+            }
+        }
+        $newListComp = is_array($newListComp) ? $newListComp : array();
+        $newListComp = array_values($newListComp);
 
-		// Update
-		$this->deleteComponentPositions();
-		if (is_array($newListComp)) {
-			foreach($newListComp as $newComp)
-				$this->saveComponentPosition($newComp['component'], $newComp['column'], $newComp['position'], $newComp['config']);
-		}
-	}
+        // Update
+        $this->deleteComponentPositions();
+        if (is_array($newListComp)) {
+            foreach ($newListComp as $newComp) {
+                $this->saveComponentPosition($newComp['component'], $newComp['column'], $newComp['position'], $newComp['config']);
+            }
+        }
+    }
 
 
     /**
@@ -526,19 +536,19 @@ class Homepage {
      * @return int
      */
     function saveComponentPosition($component, $column, $position, $config)
-	{
-		$query = array(
-			"cid" => $this->cid,
-			"component" => $component,
-			"column" => $column,
-			"position" => $position,
-			"config" => $config
-		);
-		$this->db->insert('homepage_comp_location', $query);
+    {
+        $query = array(
+            "cid" => $this->cid,
+            "component" => $component,
+            "column" => $column,
+            "position" => $position,
+            "config" => $config
+        );
+        $this->db->insert('homepage_comp_location', $query);
 
         return $this->db->insertID();
 
-	}
+    }
 
     /**
      * @deprecated
@@ -546,7 +556,8 @@ class Homepage {
      * @param $config
      * @return bool
      */
-    function setComponentConfig($homepageComponentLocationID, $config) {
+    function setComponentConfig($homepageComponentLocationID, $config)
+    {
         $result =  $this->db->update('homepage_comp_location', 'homepageComponentLocationID', array(
             'homepageComponentLocationID' => $homepageComponentLocationID,
             'config' => serialize($config)
@@ -560,7 +571,8 @@ class Homepage {
      * @param $homepageComponentLocationID
      * @return mixed
      */
-    function getComponentConfig($homepageComponentLocationID) {
+    function getComponentConfig($homepageComponentLocationID)
+    {
         $query = "SELECT config FROM homepage_comp_location WHERE homepageComponentLocationID = $homepageComponentLocationID";
 
         $config = unserialize($this->db->getOne($query));
@@ -568,21 +580,21 @@ class Homepage {
         return $config;
     }
 
-	function saveDisplayProperties($listColor)
-	{
-		$query = "UPDATE homepage_config SET ";
-		foreach($listColor as $key => $color)
-		{
-			$query .= "`".$this->db->quote($key)."` = '".$this->db->quote($color)."', ";
-		}
-		$query = substr($query, 0, -2);
-		$query .= " WHERE cid = '".$this->cid."'";
-		return $this->db->query($query);
+    function saveDisplayProperties($listColor)
+    {
+        $query = "UPDATE homepage_config SET ";
+        foreach ($listColor as $key => $color) {
+            $query .= "`".$this->db->quote($key)."` = '".$this->db->quote($color)."', ";
+        }
+        $query = substr($query, 0, -2);
+        $query .= " WHERE cid = '".$this->cid."'";
+        return $this->db->query($query);
 
-	}
+    }
 
-    public function getConfig ($categoryId = null) {
-        if ( !is_numeric($categoryId) ) {
+    public function getConfig ($categoryId = null)
+    {
+        if (!is_numeric($categoryId)) {
             $categoryId = $this->cid;
         }
 
@@ -600,21 +612,22 @@ class Homepage {
         return $config;
     }
 
-    public function setConfig ($config, $categoryId = null) {
-        if ( !is_numeric($categoryId) ) {
+    public function setConfig ($config, $categoryId = null)
+    {
+        if (!is_numeric($categoryId)) {
             $categoryId = $this->cid;
         }
 
-        if ( $cleanConfig = $this->getConfig($categoryId) ) {
+        if ($cleanConfig = $this->getConfig($categoryId)) {
             $this->db->update('homepage_config', 'cid', $config);
-        }
-        else {
+        } else {
             $this->db->insert('homepage_config', $config);
         }
     }
 
-    public function deleteConfig ($categoryId = null) {
-        if ( !is_numeric($categoryId) ) {
+    public function deleteConfig ($categoryId = null)
+    {
+        if (!is_numeric($categoryId)) {
             $categoryId = $this->cid;
         }
 

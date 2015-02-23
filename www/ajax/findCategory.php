@@ -11,7 +11,7 @@ $allResults = $categoryMapper->searchByName($_GET['query']);
 
 $return = array();
 
-foreach($allResults as $currentResult) {
+foreach ($allResults as $currentResult) {
     $return[] = array(
         'id'   => '/homepage/' . $currentResult->getId(),
         'name' => $currentResult->getName() . ' - /homepage/' . $currentResult->getId(),

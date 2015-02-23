@@ -68,4 +68,3 @@ $type_list = array(
 $omaha = array(
     'link', 'folder'
 );
-

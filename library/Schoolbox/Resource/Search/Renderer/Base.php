@@ -14,7 +14,8 @@ use Schoolbox\Resource\Search\MapperResult\Base as MapperResult;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 
-abstract class Base {
+abstract class Base
+{
 
     /**
      * A sitepage
@@ -42,7 +43,8 @@ abstract class Base {
      *
      * @param $page
      */
-    public function __construct($page) {
+    public function __construct($page)
+    {
         $this->setPage($page);
     }
 
@@ -52,7 +54,8 @@ abstract class Base {
      * @param MapperResult $mapperResult
      * @param $type
      */
-    public function renderTab(MapperResult $mapperResult, $type) {
+    public function renderTab(MapperResult $mapperResult, $type)
+    {
         if ($mapperResult->getCount()) {
             $this->getPage()->setVar(array(
                     'TYPE_TYPE' => $this->getType(),
@@ -66,13 +69,11 @@ abstract class Base {
                 $this->getPage()->setVar(array(
                         'TYPE_CLASS' => ''
                     ));
-            }
-            elseif (!$mapperResult->getCount()) {
+            } elseif (!$mapperResult->getCount()) {
                 $this->getPage()->setVar(array(
                         'TYPE_CLASS' => 'hide'
                     ));
-            }
-            else {
+            } else {
                 $this->getPage()->setVar(array(
                         'TYPE_CLASS' => ''
                     ));
@@ -106,7 +107,8 @@ abstract class Base {
      * @param MapperResult $mapperResult
      * @param int $currentPage
      */
-    public function renderPagination(MapperResult $mapperResult, $currentPage) {
+    public function renderPagination(MapperResult $mapperResult, $currentPage)
+    {
         // clear count
         $this->getPage()->setBlock('RESULT', 'count', 'count_block');
         $this->getPage()->setVar('count_block');
@@ -157,8 +159,7 @@ abstract class Base {
             ));
 
             $this->getPage()->parse('pagination_block', 'pagination', true);
-        }
-        // only 1 page to display
+        } // only 1 page to display
         else {
             $this->getPage()->setVar('pagination_block');
         }
@@ -173,13 +174,14 @@ abstract class Base {
      * @param Category $folder
      * @return string
      */
-    protected function spawnBreadcrumbs(Category $folder) {
+    protected function spawnBreadcrumbs(Category $folder)
+    {
         $categoryMapper = new CategoryMapper();
         $allCrumbs = $categoryMapper->breadcrumb($folder);
 
         $html = array();
 
-        foreach($allCrumbs as $currentCrumb) {
+        foreach ($allCrumbs as $currentCrumb) {
             $html[] = "<a href=\"/homepage/{$currentCrumb->getId()}\">{$currentCrumb->getName()}</a>";
         }
 

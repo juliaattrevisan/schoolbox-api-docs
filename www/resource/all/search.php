@@ -64,8 +64,7 @@ if (!$count['all']) {
     ));
 
     $this->getPage()->parse('RESULT', 'no_results', true);
-}
-else {
+} else {
     /* Omaha Beach
      *
      * These have landed
@@ -86,8 +85,7 @@ else {
      * are tied in to the keys in the array, which really isn't nice.
      */
     if (!empty($handle[$type])) {
-
-        /* Particular ordering and sorting for Categories
+/* Particular ordering and sorting for Categories
          */
         if ($type != 'all') {
             // perform search for individual category (without formatting for ajax call)
@@ -108,7 +106,7 @@ else {
 
     /* Draw them
      */
-    foreach($oldHandlerRenderers as $currentRenderer) {
+    foreach ($oldHandlerRenderers as $currentRenderer) {
         $currentRenderer->setUseSeymourLinks(true);
         $currentRenderer->render();
     }

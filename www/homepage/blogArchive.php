@@ -18,8 +18,7 @@ $this->setBlock('year', 'month', 'month_block');
  */
 try {
     $category = $categoryMapper->findById($this->arg[0]);
-}
-catch (\Exception $e) {
+} catch (\Exception $e) {
     $this->error(2);
 }
 
@@ -96,7 +95,6 @@ if ($dateList = $blogHandler->getOccupiedDateList($category->getId())) {
 
 /* Blog Posts */
 if ($blogList = $blogHandler->getByYearAndMonth($category->getId(), $yearNumber, $monthNumber)) {
-
     $i = 0;
     foreach ($blogList as $blog) {
         $currentDate = date_parse($blog['created']);

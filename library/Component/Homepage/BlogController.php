@@ -60,8 +60,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
             try {
                 // remove any non-numeric values from the source config
                 $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
             }
         }
     }
@@ -108,8 +107,8 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
         $this->setVar(
             array(
                 'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig(
-                        'componentname'
-                    ) : 'Blog',
+                    'componentname'
+                ) : 'Blog',
                 // These are for the Select Alternate Source resourcebrowser
                 'COMPONENT_CONFIG_SRC_ID' => $this->source->getId(),
                 'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext()->getId() ? 'Local' : $this->source->getName(),

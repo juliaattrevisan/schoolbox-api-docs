@@ -18,8 +18,7 @@ if (is_numeric($this->arg[0])) {
 
     try {
         $category = $categoryMapper->findById($this->arg[0]);
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
         error(2);
     }
 

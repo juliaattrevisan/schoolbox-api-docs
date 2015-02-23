@@ -175,7 +175,7 @@ class Digest_News
             'missing'  => 0,
             'failures' => 0,
         );
-        for($i = 0; $i < $count; $i++) {
+        for ($i = 0; $i < $count; $i++) {
             $this->cli(sprintf("Memory usage at %03d: %s (%s)", $i, $this->convert(memory_get_usage(true)), memory_get_usage(true)));
             $user   = $this->compileNews($this->userList[$keys[$i]]);
             $result = $this->sendEmail($user);
@@ -207,7 +207,7 @@ class Digest_News
      */
     protected function getPosterFromArticle($article)
     {
-        $poster = sprintf('%s %s', $article['firstname'],  $article['lastname']);
+        $poster = sprintf('%s %s', $article['firstname'], $article['lastname']);
         if ($article['title']) {
             $poster = $article['title'].' '.$poster;
         }
@@ -243,8 +243,8 @@ class Digest_News
         $newsList = $this->newsHandler->getFilteredNews($u['id'], $u['campus'], $u['gid']);
 
         $u['articles'] = array('c' => array(), 'h' => array());
-        if(is_array($newsList)) {
-            foreach($newsList as $article) {
+        if (is_array($newsList)) {
+            foreach ($newsList as $article) {
                 $u['articles']['c'][$article['item_id']] = array(
                     'id'        => $article['item_id'],
                     'title'     => $article['item_heading'],
@@ -267,8 +267,8 @@ class Digest_News
         foreach ($u['category_list'] as $category) {
             $cat_id = $category->getId();
             $hNews = $this->catnewsHandler->getAllForCategory($cat_id, false, false, $u['id']);
-            if($hNews) {
-                foreach($hNews as $art) {
+            if ($hNews) {
+                foreach ($hNews as $art) {
                     $u['articles']['h'][$art['id']] = array(
                         'id'        => $art['id'],
                         'title'     => $art['heading'],
@@ -315,7 +315,7 @@ class Digest_News
     protected function sendEmail($u)
     {
         // do nothing if there's no email address
-        if(!trim($u['email'])) {
+        if (!trim($u['email'])) {
             return array(
                 'sendable' => false,
                 'sent'     => false,
@@ -349,14 +349,14 @@ class Digest_News
         $mailer->setBlock('activity', 'activity_nolink', 'activity_nolink_block');
 
         $mailer->setVar('NAME', $u['firstname']);
-        $mailer->setVar('SITE_NAME',  Cfg::get('school_name'));
-        $mailer->setVar('TEMPLATE_YEAR',  date('Y'));
+        $mailer->setVar('SITE_NAME', Cfg::get('school_name'));
+        $mailer->setVar('TEMPLATE_YEAR', date('Y'));
 
         $newsFlag = false;
 
         $mailer->setVar('newslist_block', '');
         if (is_array($u['articles'])) {
-            foreach($u['articles'] as $newsType => $newsList) {
+            foreach ($u['articles'] as $newsType => $newsList) {
                 $i = 0;
                 $mailer->setVar('article_block', '');
                 switch($newsType) {
@@ -578,7 +578,7 @@ class Digest_News
 
     protected function cli($output, $err = false)
     {
-        if($this->debugging() || $err) {
+        if ($this->debugging() || $err) {
             printf("[%s] %s\n", $err ? '!' : ' ', $output);
         }
     }
@@ -599,5 +599,4 @@ class Digest_News
     {
         return $this->textFormatter->cutSentence(Scrub::html2text($html), 300);
     }
-
 }

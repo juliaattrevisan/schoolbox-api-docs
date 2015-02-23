@@ -6,7 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_DropBoxController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_DropBoxController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * @var AllowedFile
@@ -18,7 +19,8 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
         $this->allowedFileHandler = new AllowedFile();
     }
 
@@ -27,8 +29,9 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'dropBox')) {
+    public function renderTemplate($templateHandle)
+    {
+        if (!parent::loadTemplate($templateHandle, 'dropBox')) {
             return false;
         }
         $this->parseConfig();
@@ -41,7 +44,6 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
         $this->setBlock('drop_staff', 'drop_file', 'drop_file_block');
 
         if ($this->permission < WRITE_ACCESS) {
-
             $this->setVar('drop_success_block', '');
             if ($_SESSION['dropSuccess']) {
                 $this->parse('drop_success_block', 'drop_success', true);
@@ -58,17 +60,15 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
 
             $this->parse('drop_student_block', 'drop_student');
             $this->setVar('drop_staff_block', '');
-        }
-        else {
-
+        } else {
             $this->setVar('drop_student_block', '');
             $dropbox = new Dropbox;
             $fileList = $dropbox->getFileList($this->getContext()->getId());
             $userHandler = new User();
 
-            if(is_array($fileList)) {
+            if (is_array($fileList)) {
                 $j = 0;
-                foreach($fileList as $file) {
+                foreach ($fileList as $file) {
                     $date = new Alaress_Date_Format($file['subdate'], 'y-m-d h:i:s');
 
                     $output = array('DROPBOX_MIME_IMAGE'	=> $this->allowedFileHandler->getClass($file["iconFile"]),
@@ -81,9 +81,9 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
                     $this->setVar($output);
                     $this->parse("drop_file_block", "drop_file", true);
                 }
-            }
-            else
+            } else {
                 $this->setVar("drop_file_block", "");
+            }
 
             $this->parse("drop_staff_block", "drop_staff");
 
@@ -91,5 +91,4 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
 
         return true;
     }
-
 }

@@ -89,17 +89,14 @@ abstract class Component_ControllerAbstract
         /* Enforce instance insetad of permitting dual types
          */
         if (is_array($context)) {
-
             try {
                 $folderMapper = new \Schoolbox\Resource\CategoryMapper();
                 $folder = $folderMapper->findById($context['id']);
 
                 $this->context = $folder;
+            } catch (\Exception $e) {
             }
-            catch (\Exception $e) {
-            }
-        }
-        else {
+        } else {
             $this->context = $context;
         }
 
@@ -320,8 +317,7 @@ abstract class Component_ControllerAbstract
             $template = 'component/config/_templatewrapper.html';
         } else {
             if (in_array($this->instance->getModule(), array('homepage', 'eportfolio'))) {
-
-                /* eportfolio uses a special version of le wrapier
+/* eportfolio uses a special version of le wrapier
                  */
                 $template = 'component/config/' . $this->instance->getModule() . '_wrapper.html';
             } else {
@@ -416,8 +412,7 @@ abstract class Component_ControllerAbstract
         if ($key) {
             if (is_object($this->context)) {
                 return isset($this->context->$key) ? $this->context->$key : false;
-            }
-            else {
+            } else {
                 return isset($this->context[$key]) ? $this->context[$key] : false;
             }
         }

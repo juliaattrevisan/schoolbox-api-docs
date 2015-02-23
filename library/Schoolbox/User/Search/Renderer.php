@@ -17,7 +17,8 @@ use Config;
 use Cfg;
 use Eportfolio_Authenticator;
 
-class Renderer extends Handler {
+class Renderer extends Handler
+{
 
     /**
      * Type (e.g. 'link', 'blog', etc)
@@ -36,7 +37,8 @@ class Renderer extends Handler {
     /**
      * Render
      */
-    public function render() {
+    public function render()
+    {
         $userHandler = new \User();
         $groupHandler = new \Group();
 
@@ -66,8 +68,8 @@ class Renderer extends Handler {
                     'USER_SEARCH_COUNT' => $this->getCount($this->getType()),
                     'USER_SEARCH_YEAR' => empty($user['year']) ? '' : "Year {$user['year']}",
                     'USER_SEARCH_CAMPUS' => Scrub::text(
-                            stristr($user['group_name'], $user['campus_name']) ? '' : $user['campus_name']
-                        ),
+                        stristr($user['group_name'], $user['campus_name']) ? '' : $user['campus_name']
+                    ),
                     'USER_SEARCH_GROUP' => Scrub::text($user['group_name']),
                 ));
 
@@ -85,7 +87,7 @@ class Renderer extends Handler {
                     $this->getPage()->parse('due_work_block', 'due_work');
                 }
 
-                if($groupHandler->isParent() && Config::get('restrict_parent_grades') ) {
+                if ($groupHandler->isParent() && Config::get('restrict_parent_grades')) {
                     $this->getPage()->setVar('grades_button_block', '');
                 } elseif (!$groupHandler->isStudent($user['id']) || (!$groupHandler->isStaff() && !$groupHandler->isParentOfChild($user['id']))) {
                     $this->getPage()->setVar('grades_button_block', '');
@@ -96,8 +98,7 @@ class Renderer extends Handler {
                 //Show student timetables to staff and parents of child
                 if ($groupHandler->isStudent($user['id'])) {
                     if ($groupHandler->isStaff() || $groupHandler->isParentOfChild($user['id'])) {
-
-                        /* Timetable shouldn't appear if synergy is disabled in the conf
+/* Timetable shouldn't appear if synergy is disabled in the conf
                          */
                         if (Cfg::get('external_enable') && $user['synergy_id']) {
                             $this->getPage()->parse('timetable_block', 'timetable');
@@ -113,14 +114,15 @@ class Renderer extends Handler {
                     }
                 } else {
                     //Show staff timetables to other staff
-                    if ($groupHandler->isStaff() && $groupHandler->isStaff($user['id']))
+                    if ($groupHandler->isStaff() && $groupHandler->isStaff($user['id'])) {
                         $this->getPage()->parse('timetable_block', 'timetable');
+                    }
                 }
-
-                if (!$_SESSION['su'])
+                if (!$_SESSION['su']) {
                     $this->getPage()->setVar('modify_block');
-                else
+                } else {
                     $this->getPage()->parse('modify_block', 'modify');
+                }
 
                 /* ePortfolio link
                  */
@@ -156,12 +158,10 @@ class Renderer extends Handler {
             $this->outputSeeMore();
 
             $this->getPage()->parse('RESULT', 'user_t', true);
-        }
-        else {
+        } else {
             $this->getPage()->setVar('see_more_block', '');
 
             return;
         }
     }
 }
-

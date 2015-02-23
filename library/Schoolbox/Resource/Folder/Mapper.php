@@ -3,7 +3,7 @@
  * Mapper
  *
  * Eventually migrate CategoryMapper into here
- * 
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -15,7 +15,8 @@ namespace Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Search\Result;
 use Schoolbox\Resource\CategoryMapper;
 
-class Mapper extends CategoryMapper {
+class Mapper extends CategoryMapper
+{
 
     /**
      * Performs a search with the given parameters, and returns a Collection of the resultant set.
@@ -42,4 +43,4 @@ class Mapper extends CategoryMapper {
 
         return $searcher;
     }
-} 
+}

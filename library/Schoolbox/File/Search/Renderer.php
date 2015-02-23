@@ -16,7 +16,8 @@ use TextFormatter;
 use Alaress_Date_Relative;
 use Alaress_Byte_Format;
 
-class Renderer extends Handler {
+class Renderer extends Handler
+{
 
     /**
      * Type (e.g. 'link', 'blog', etc)
@@ -35,7 +36,8 @@ class Renderer extends Handler {
     /**
      * Render
      */
-    public function render() {
+    public function render()
+    {
         $categoryStd = new \Category();
         $userHandler = new \User();
 
@@ -54,7 +56,6 @@ class Renderer extends Handler {
                 foreach ($categoryStd->breadcrumb($file['category']) as $i => $breadcrumb) {
                     $file['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
                 }
-
                 $createdTime = new Alaress_Date_Relative($file['submitted']);
 
                 $this->getPage()->setVar(array(
@@ -70,10 +71,11 @@ class Renderer extends Handler {
                     'FILE_COUNT' => $this->getCount($this->getType()),
                 ));
 
-                if ($file['perms_type'] < 2 && $file['userAccess_type'] < 2)
+                if ($file['perms_type'] < 2 && $file['userAccess_type'] < 2) {
                     $this->getPage()->setVar('modify_block');
-                else
+                } else {
                     $this->getPage()->parse('modify_block', 'modify');
+                }
 
                 $this->getPage()->parse('file_block', 'file', true);
             }
@@ -81,8 +83,7 @@ class Renderer extends Handler {
             $this->outputSeeMore();
 
             $this->getPage()->parse('RESULT', 'file_t', true);
-        }
-        else {
+        } else {
             $this->getPage()->setVar('see_more_block', '');
 
             return;

@@ -91,8 +91,7 @@ function getFolderMeta($folderId)
     $folderMapper = new \Schoolbox\Resource\CategoryMapper();
 
     try {
-
-        /* Only throw error exception if a folderId is specified
+/* Only throw error exception if a folderId is specified
          * and it can't be found; $folderId 0 is used to add a
          * folder to the root node
          */
@@ -135,7 +134,7 @@ function getFolderMeta($folderId)
         $type = '';
     }
 
-    if($type) {
+    if ($type) {
         // joinable: is the logged in user not already a member?
         $accessType = $groupHandler->involvedInGroup($_SESSION['id'], $folderId);
 
@@ -146,16 +145,14 @@ function getFolderMeta($folderId)
             } elseif ($groupHandler->canSubscribe($folderId)) {
                 $joinable = 1; // can join
             }
-        }
-        else if($accessType >= READ_ACCESS) {
+        } elseif ($accessType >= READ_ACCESS) {
             $joinable = 3; //member of group
         }
 
         $members = UserAccessMapper::getInstance()->findAdminsInCategory($folder);
-        if(count($members) > 0) {
+        if (count($members) > 0) {
             $admin = $members->first(); //only every 1 admin
-        }
-        else {
+        } else {
             $admin = UserMapper::getInstance()->getUnknownUser();
         }
     }
@@ -226,7 +223,7 @@ function getFolderMeta($folderId)
         'actions'     => $actions
     );
 
-    if($type) {
+    if ($type) {
         $folder['admins'] = array('externalID'=>$admin->getExternalId(), 'name'=>$admin->getFullName());
         $folder['manage'] = $_SESSION['id'] == $admin->getId() || $_SESSION['user']->isSuperuser() ? true : false;
     }
@@ -313,12 +310,10 @@ function getSingleLinkMeta($folderId, $linkId)
         try {
             $userMapper = new \Schoolbox\UserMapper();
             $user = $userMapper->findById($link->getOwner()->getId());
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             error(31);
         }
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
         error(101);
     }
 

@@ -15,7 +15,6 @@ $categoryMapper->setSessionData($_SESSION);
 $groupHandler = new Group();
 
 if ($_POST['name']) {
-
     /** @var \Schoolbox\Resource\Category $model */
     $model = $categoryMapper->createModel()
         ->setName($_POST['name'])
@@ -128,8 +127,7 @@ if ($_POST['name']) {
     /* Move link from one category to another, after checking permission on both from and to categories */
     try {
         $category = $categoryMapper->findById($_POST['move']);
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
         echo "Failed";
         exit;
     }
@@ -153,8 +151,7 @@ if ($_POST['name']) {
 } elseif (is_numeric($_GET['delete'])) {
     try {
         $category = $categoryMapper->findById($_GET['delete']);
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
         error(2);
     }
 
@@ -173,8 +170,7 @@ if ($_POST['name']) {
 
     $_SESSION['resourcesID'] = $category->getParent()->getId();
 } elseif (is_numeric($_GET['deleteAll'])) {
-
-    // only superusers can do this no matter what
+// only superusers can do this no matter what
     if (!$groupHandler->isSuperuser()) {
         error(12);
     }
@@ -183,8 +179,7 @@ if ($_POST['name']) {
         $category = $categoryMapper->findById($_GET['deleteAll']);
         $categoryMapper->recursiveDelete($category);
         $_SESSION['resourcesID'] = $category->getParent()->getId();
-    }
-    catch (Exception $e) {
+    } catch (Exception $e) {
         error(2);
     }
 } else {

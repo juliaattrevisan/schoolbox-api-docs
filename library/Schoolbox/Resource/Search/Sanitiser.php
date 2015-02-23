@@ -23,7 +23,8 @@ namespace Schoolbox\Resource\Search;
 
 use Schoolbox\Mapper;
 
-class Sanitiser {
+class Sanitiser
+{
 
     /**
      * Sort by this column name
@@ -72,15 +73,15 @@ class Sanitiser {
      * @param $offset
      * @param $limit
      */
-    public function __construct(Mapper $mapper, $keyword, $sortProperty, $sortDirection, $offset, $limit) {
+    public function __construct(Mapper $mapper, $keyword, $sortProperty, $sortDirection, $offset, $limit)
+    {
 
         /* Check whether the field you're sorting on exists
          * in mapping definition before trying to sort on it
          */
         if (strlen($sortProperty) && $mapper->getMap()->offsetExists($sortProperty)) {
             $mappingDefinition = $mapper->getMap()->getOffset($sortProperty);
-        }
-        else {
+        } else {
             $mappingDefinition = $mapper->getIdentifier();
         }
 

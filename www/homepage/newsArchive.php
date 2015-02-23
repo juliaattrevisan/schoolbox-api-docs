@@ -12,42 +12,42 @@ $this->setBlock(TEMPLATE_content, "news", "news_block");
 
 try {
     $category = $categoryMapper->findById($this->arg[0]);
-}
-catch (\Exception $e) {
+} catch (\Exception $e) {
     $this->error(2);
 }
 
 $output = array('CATEGORY_NAME'	=> Scrub::text($category->getName()),
-				'TITLE'			=> 'News Archive',
-				'ID'			=> $category->getId(),
-				);
+                'TITLE'			=> 'News Archive',
+                'ID'			=> $category->getId(),
+                );
 $this->setVar($output);
 
 //hide add button
-if($groupHandler->getPermission($category->getId()) >= WRITE_ACCESS)
-	$this->parse("submit_news_block", "submit_news");
-else
-	$this->setVar("submit_news_block", "");
+if ($groupHandler->getPermission($category->getId()) >= WRITE_ACCESS) {
+    $this->parse("submit_news_block", "submit_news");
+} else {
+    $this->setVar("submit_news_block", "");
+}
 
 
 $newsList = $newsHandler->getAllForCategory($category->getId(), false, true);
 
-if(is_array($newsList)) {
-
+if (is_array($newsList)) {
     $j = 0;
-	foreach($newsList as $news) {
-		if($article['owner'] == $_SESSION['id'] || $groupHandler->getPermission($category->getId()) >= WRITE_ACCESS)
-			$this->setVar("MOD_NEWS", "<a class=\"btn modify\" href=\"/news/homepage/".$news['id']."\"><span></span>Modify</a>");
-		else
-			$this->setVar("MOD_NEWS", "");
+    foreach ($newsList as $news) {
+        if ($article['owner'] == $_SESSION['id'] || $groupHandler->getPermission($category->getId()) >= WRITE_ACCESS) {
+            $this->setVar("MOD_NEWS", "<a class=\"btn modify\" href=\"/news/homepage/".$news['id']."\"><span></span>Modify</a>");
+        } else {
+            $this->setVar("MOD_NEWS", "");
+        }
 
-		$userHandler = new User();
+        $userHandler = new User();
 
-		$poster = $userHandler->formatName($news);
+        $poster = $userHandler->formatName($news);
 
-		$postedDate = new Alaress_Date_Format($news['posted'], 'U');
+        $postedDate = new Alaress_Date_Format($news['posted'], 'U');
 
-		$output = array(
+        $output = array(
                     "NEWS_ID"           => $news['id'],
                     "NEWS_HEADING"	=> Scrub::text($news['heading']),
                     "NEWS_BODY"		=> Scrub::html($news['body']),
@@ -59,9 +59,10 @@ if(is_array($newsList)) {
                     "AUTHOR_EXTERNAL_ID" => $news['synid'],
                     'ON_OFF' => ++$j % 2 ? '' : 'dark'
                 );
-		$this->setVar($output);
+        $this->setVar($output);
 
-		$this->parse("news_block", "news", true);
-	}
-} else
-	$this->setVar("news_block", "");
+        $this->parse("news_block", "news", true);
+    }
+} else {
+    $this->setVar("news_block", "");
+}

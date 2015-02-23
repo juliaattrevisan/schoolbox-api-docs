@@ -32,9 +32,11 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
     {
         $this->groupHandler = new Group();
 
-        $this->submissionList = new Collection(SubmissionBoxMapper::getInstance()
+        $this->submissionList = new Collection(
+            SubmissionBoxMapper::getInstance()
             ->getUpcomingActivities(null, $this->getConfig('size'), $this->getContext('id'))
-            ->getColumnValues('submissionBox'));
+            ->getColumnValues('submissionBox')
+        );
     }
 
     /**

@@ -1,13 +1,13 @@
 <?php
-
-
+ 
 $this->setFile(TEMPLATE_content, 'admin/reports/stalePage.html');
 $this->setBlock(TEMPLATE_content, 'stale', 'stale_block');
 
-if(is_numeric($_POST['age']))
+if (is_numeric($_POST['age'])) {
     $month = $_POST['age'];
-else
+} else {
     $month = 6;
+}
 
 $this->setVar($month.'_SELECTED', 'selected="selected"');
 
@@ -26,14 +26,14 @@ $result = $this->db->query($query);
 
 $folderMapper = new \Schoolbox\Resource\CategoryMapper();
 
-while($row = $this->db->getNextArray($result)) {
+while ($row = $this->db->getNextArray($result)) {
     $loaf = array();
 
     $thisFolder = $folderMapper->findCheaplyById($row['id']);
 
     $breadcrumbs = $folderMapper->breadcrumb($thisFolder);
 
-    foreach($breadcrumbs as $breadcrumb) {
+    foreach ($breadcrumbs as $breadcrumb) {
         $loaf[] = "<a href='/homepage/{$breadcrumb->getId()}'>{$breadcrumb->getName()}</a>";
     }
 
@@ -47,5 +47,5 @@ while($row = $this->db->getNextArray($result)) {
         'BREADCRUMB' => $breadcrumbHTML
     ));
 
-    $this->parse('stale_block','stale',true);
+    $this->parse('stale_block', 'stale', true);
 }

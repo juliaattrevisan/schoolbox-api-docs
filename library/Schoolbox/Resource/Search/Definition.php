@@ -17,7 +17,8 @@ namespace Schoolbox\Resource\Search;
 
 use Schoolbox\Mapper;
 
-class Definition {
+class Definition
+{
 
     /**
      * The type of item for this search definition
@@ -42,7 +43,8 @@ class Definition {
     /**
      * Constructor
      */
-    public function __construct($type, Mapper $mapper, Renderer\Base $renderer) {
+    public function __construct($type, Mapper $mapper, Renderer\Base $renderer)
+    {
         $this->setType($type);
         $this->setMapper($mapper);
         $this->setRenderer($renderer);

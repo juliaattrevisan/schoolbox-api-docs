@@ -15,7 +15,8 @@ use Schoolbox\Mapper;
 use Schoolbox\Resource\Search\Sanitiser;
 use Schoolbox\User;
 
-abstract class Base {
+abstract class Base
+{
 
     /**
      * Search results
@@ -34,7 +35,8 @@ abstract class Base {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->setResult(new Collection());
     }
 
@@ -50,7 +52,8 @@ abstract class Base {
      * @param $offset
      * @param $limit
      */
-    public function search(User $user, Mapper $mapper, $keyword, $sortProperty, $sortDirection, $offset, $limit) {
+    public function search(User $user, Mapper $mapper, $keyword, $sortProperty, $sortDirection, $offset, $limit)
+    {
 
         /* Sanitise inputs
          */
@@ -132,4 +135,4 @@ abstract class Base {
     {
         return $this->result;
     }
-} 
+}

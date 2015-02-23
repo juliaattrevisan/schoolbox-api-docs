@@ -49,8 +49,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
                 $folder = $folderMapper->findById($id);
 
                 $this->source = $folder;
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
             }
         }
     }
@@ -101,15 +100,13 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
 
                 if ($this->permission >= WRITE_ACCESS) {
                     $this->parse('modify_folder_block', 'modify_folder');
-                }
-                else {
-                    $this->setVar('modify_folder_block','');
+                } else {
+                    $this->setVar('modify_folder_block', '');
                 }
 
                 $this->parse('folders_block', 'folders', true);
             }
-        }
-        else {
+        } else {
             $this->setVar('folders_block', '');
         }
 
@@ -127,8 +124,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
 
         if ($this->permission < WRITE_ACCESS) {
             $this->setVar("submit_folder_block", "");
-        }
-        else {
+        } else {
             $this->parse("submit_folder_block", "submit_folder");
         }
 

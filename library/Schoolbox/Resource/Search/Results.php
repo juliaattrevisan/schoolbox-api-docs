@@ -34,7 +34,8 @@ use Schoolbox\Resource\Folder\Search\Renderer as FolderRenderer;
 use Schoolbox\Resource\TextboxMapper;
 use Schoolbox\Resource\Textbox\Search\Renderer as TextboxRenderer;
 
-class Results implements Searchable {
+class Results implements Searchable
+{
 
     /**
      * Registry of mappers
@@ -74,7 +75,8 @@ class Results implements Searchable {
      * @param $page
      * @param $type
      */
-    public function __construct($page, $type) {
+    public function __construct($page, $type)
+    {
         $this->setRegistry(new Collection());
         $this->setType($type);
         $this->setResult(new Collection());
@@ -97,13 +99,14 @@ class Results implements Searchable {
      * @param string $sortDirection
      * @return void
      */
-    public function search($user, $keyword, $offset = 0, $limit = null, $sortProperty = '', $sortDirection = 'DESC') {
+    public function search($user, $keyword, $offset = 0, $limit = null, $sortProperty = '', $sortDirection = 'DESC')
+    {
         $result = new Collection();
 
         /* Run search() on each minion in the registry if 'all' is selected
          * or if this particular minion was chosen specifically (e.g. 'link')
          */
-        foreach($this->getRegistry() as $currentDefinition) {
+        foreach ($this->getRegistry() as $currentDefinition) {
             if (($this->getType() == 'all') || ($currentDefinition->getType() == $this->getType())) {
                 $searcher = $currentDefinition->getMapper()->search($user, $keyword, $offset, $limit, $sortProperty, $sortDirection);
 
@@ -117,8 +120,9 @@ class Results implements Searchable {
     /**
      * Render search tabs to chooze from
      */
-    public function renderTabs() {
-        foreach($this->getRegistry() as $currentDefinition) {
+    public function renderTabs()
+    {
+        foreach ($this->getRegistry() as $currentDefinition) {
             if (($this->getType() == 'all') || ($currentDefinition->getType() == $this->getType())) {
                 $searcher = $this->getResult()->getOffset($currentDefinition->getType());
 
@@ -130,8 +134,9 @@ class Results implements Searchable {
     /**
      * Render search results
      */
-    public function render() {
-        foreach($this->getRegistry() as $currentDefinition) {
+    public function render()
+    {
+        foreach ($this->getRegistry() as $currentDefinition) {
             if (($this->getType() == 'all') || ($currentDefinition->getType() == $this->getType())) {
                 $searcher = $this->getResult()->getOffset($currentDefinition->getType());
 
@@ -143,12 +148,13 @@ class Results implements Searchable {
     /**
      * Render pagination
      */
-    public function renderPagination($currentPage) {
+    public function renderPagination($currentPage)
+    {
 
         /* Render pagination from the first $searcher, as they all do it the same
          * and only need to do it once
          */
-        foreach($this->getRegistry() as $currentDefinition) {
+        foreach ($this->getRegistry() as $currentDefinition) {
             if (($this->getType() == 'all') || ($currentDefinition->getType() == $this->getType())) {
                 $searcher = $this->getResult()->getOffset($currentDefinition->getType());
 
@@ -165,10 +171,11 @@ class Results implements Searchable {
      *
      * @return int
      */
-    public function countTotalResults() {
+    public function countTotalResults()
+    {
         $sum = 0;
 
-        foreach($this->getRegistry() as $currentDefinition) {
+        foreach ($this->getRegistry() as $currentDefinition) {
             $searcher = $this->getResult()->getOffset($currentDefinition->getType());
 
             $sum += $searcher->getCount();

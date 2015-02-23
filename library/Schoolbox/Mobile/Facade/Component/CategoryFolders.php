@@ -21,7 +21,8 @@ use Schoolbox\User;
 use Schoolbox\Resource\CategoryTreeBuilder;
 use Schoolbox\Assessment\Course\TaskMapper;
 
-class CategoryFolders extends Generic {
+class CategoryFolders extends Generic
+{
 
     /**
      * This should return an array of [title, aside, content]
@@ -29,7 +30,8 @@ class CategoryFolders extends Generic {
      * @param int $catID
      * @return array
      */
-    public function render(User $user, $catID = 0) {
+    public function render(User $user, $catID = 0)
+    {
 
         // generate data
         $groupHandler = new Group();
@@ -37,7 +39,7 @@ class CategoryFolders extends Generic {
         $treeBuilder = new CategoryTreeBuilder(new CategoryMapper(), new TaskMapper(), $groupHandler);
         $allFolders = $treeBuilder->buildChildNodes($catID);
 
-        for($i = 0; $i < count($allFolders); ++$i) {
+        for ($i = 0; $i < count($allFolders); ++$i) {
             if ($groupHandler->getPermission($catID) < READ_ACCESS) {
                 unset($allFolders[$i]);
             }

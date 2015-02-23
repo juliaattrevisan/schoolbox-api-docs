@@ -6,8 +6,7 @@ $output = array();
 $allowFilter = array('image', 'video');
 
 if (is_numeric($_POST['categoryID']) && $_POST['categoryID']) {
-
-    /* Output a list of nodes (which are comprised of both files and links)
+/* Output a list of nodes (which are comprised of both files and links)
      * in the second column of Old Resource Browser
      *
      * Root folder is zero and no links should be in there
@@ -20,8 +19,7 @@ if (is_numeric($_POST['categoryID']) && $_POST['categoryID']) {
     try {
         $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
         $category = $categoryMapper->findById($_POST['categoryID']);
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
         error(13);
     }
 
@@ -79,9 +77,8 @@ if (is_numeric($_POST['categoryID']) && $_POST['categoryID']) {
         );
     }
 
-	$_SESSION['resourcesID'] = $_POST['categoryID'];
+    $_SESSION['resourcesID'] = $_POST['categoryID'];
 }
 
 header("Content-type: application/json");
 print json_encode($output);
-

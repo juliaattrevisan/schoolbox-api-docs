@@ -671,8 +671,7 @@ class Group extends DeprecatedModel
 
                             if (!$allFolderOwners->count()) {
                                 $folderOwner = new \Schoolbox\User();
-                            }
-                            else {
+                            } else {
                                 $folderOwner = $allFolderOwners->first();
                             }
 
@@ -689,8 +688,7 @@ class Group extends DeprecatedModel
                                 'type' => $folder->getGroup()->getType(),
                                 'template' => $folder->getHomepage()->getTemplate()->getId(),
                             );
-                        }
-                        catch (\Exception $e) {
+                        } catch (\Exception $e) {
                         }
                     }
                 }

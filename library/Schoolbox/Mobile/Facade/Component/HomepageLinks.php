@@ -20,7 +20,8 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\LinkMapper;
 
-class HomepageLinks extends Generic {
+class HomepageLinks extends Generic
+{
 
     /**
      * This should return an array of [title, aside, content]
@@ -29,7 +30,8 @@ class HomepageLinks extends Generic {
      * @param int $catID
      * @return array
      */
-    public function render(User $user, $catID = 0) {
+    public function render(User $user, $catID = 0)
+    {
 
         // generate data
         try {
@@ -38,8 +40,7 @@ class HomepageLinks extends Generic {
 
             $linkMapper = new LinkMapper();
             $allLinks = $linkMapper->findAllInCategory($category, array());
-        }
-        catch(ErrorException $e) {
+        } catch (ErrorException $e) {
             die($e);
         }
 

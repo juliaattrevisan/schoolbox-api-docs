@@ -66,8 +66,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
             $i = 0;
 
             foreach ($allAssess as $currentAssess) {
-
-                /* Hide it from students if the start date hasn't passed yet
+/* Hide it from students if the start date hasn't passed yet
              	 */
                 if (($this->permission >= WRITE_ACCESS) || $assessHandler->isOpen($currentAssess)) {
                     $createdTime = new Alaress_Date_Relative($currentAssess['created_at']);

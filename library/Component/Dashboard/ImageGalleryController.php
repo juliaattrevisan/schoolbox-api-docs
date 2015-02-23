@@ -263,5 +263,3 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
         return $this->templateHandle;
     }
 }
-
-

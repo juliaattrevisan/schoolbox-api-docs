@@ -153,8 +153,7 @@ $folderMapper = new \Schoolbox\Resource\CategoryMapper();
 $folder = $folderMapper->findById($submission->getCategory()->getId());
 
 if ($folder->getCodes()->count()) {
-
-    /* Get all the folder codes, implode them into a csv
+/* Get all the folder codes, implode them into a csv
      * as per the handler
      */
     $temp = array();

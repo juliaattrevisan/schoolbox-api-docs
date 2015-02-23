@@ -15,7 +15,8 @@ use Scrub;
 use TextFormatter;
 use Alaress_Date_Format;
 
-class Renderer extends Handler {
+class Renderer extends Handler
+{
 
     /**
      * Type (e.g. 'link', 'blog', etc)
@@ -34,7 +35,8 @@ class Renderer extends Handler {
     /**
      * Render
      */
-    public function render() {
+    public function render()
+    {
         $result = $this->getResult($this->getType());
 
         if (!empty($result)) {
@@ -60,7 +62,7 @@ class Renderer extends Handler {
                 $this->getPage()->setVar(array(
                     'EVENT_TITLE' => Scrub::text($event['title']),
                     'EVENT_TYPE' => Scrub::text($event['eventType']),
-                    'EVENT_DETAIL' => TextFormatter::cutSentence(Scrub::html2text($event['detail']),150),
+                    'EVENT_DETAIL' => TextFormatter::cutSentence(Scrub::html2text($event['detail']), 150),
                     'EVENT_DATE' => $date->getDateOnly(),
                     'EVENT_DATE_RAW' => $date->getUsingFormat('d-m-Y'),
                     'EVENT_LOCATION' => $event['location'],
@@ -73,11 +75,10 @@ class Renderer extends Handler {
             $this->outputSeeMore();
 
             $this->getPage()->parse('RESULT', 'event_t', true);
-        }
-        else {
+        } else {
             $this->getPage()->setVar('see_more_block', '');
 
             return;
         }
     }
-} 
+}

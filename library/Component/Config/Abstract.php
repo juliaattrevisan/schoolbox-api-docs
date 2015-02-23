@@ -45,7 +45,7 @@ abstract class Component_Config_Abstract
 
     /**
      * Get folder
-     * 
+     *
      * @return mixed
      */
     protected function getCategory()

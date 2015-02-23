@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-if(isset($_GET['date_start']) && isset($_GET['date_end']) && isset($_GET['drop'])) {
+if (isset($_GET['date_start']) && isset($_GET['date_end']) && isset($_GET['drop'])) {
     $this->localRedir('/'. implode('/', $_GET));
 }
 
@@ -22,8 +22,7 @@ $folder = new \Schoolbox\Resource\Category();
 if (preg_match('/^[1-9]+[0-9]*$/', $this->arg[0])) {
     try {
         $folder = $folderMapper->findById($this->arg[0]);
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
     }
 }
 
@@ -34,17 +33,15 @@ if (!is_numeric($folder->getId())) {
 
     try {
         $folder = $folderMapper->findByCode(urldecode(urldecode($code)));
-    }
-    catch (\Exception $e) {
-
-        /* STILL couldn't find it? die
+    } catch (\Exception $e) {
+/* STILL couldn't find it? die
          */
         error(18);
     }
 }
 
 // hack away at the args provided
-if(!(isset($this->arg[1]) && preg_match('#[0-9]+-[0-9]+#', $this->arg[1]))) {
+if (!(isset($this->arg[1]) && preg_match('#[0-9]+-[0-9]+#', $this->arg[1]))) {
     $this->arg[1] = date('Y-m');
 }
 
@@ -56,7 +53,7 @@ $permission = $g->getPermission($folder->getId());
 /* Only write-access people can view statistics
  */
 if ($permission < WRITE_ACCESS) {
-	error(19);
+    error(19);
 }
 
 $this->setTab('resources');

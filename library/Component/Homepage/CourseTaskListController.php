@@ -15,7 +15,8 @@ use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Collection;
 
-class Component_Homepage_CourseTaskListController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_CourseTaskListController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * @var Group
@@ -49,7 +50,8 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
     /**
      * {@inheritdoc}
      */
-    public function execute() {
+    public function execute()
+    {
         $this->group_handler = new Group();
         $categoryId = $this->getContext()->getId();
         if ($categoryId > 0) {
@@ -71,7 +73,8 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
     /**
      * {@inheritdoc}
      */
-    public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
         if (!parent::loadTemplate($templateHandle, 'courseTaskList')) {
             return false;
         }
@@ -109,7 +112,7 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
         if ($this->category instanceof Category) {
             foreach (CategoryMapper::getInstance()->findParents($this->category) as $parent) {
                 /** @var Category $parent */
-                $this->setVar('PARENT_CATEGORY_ID',   $parent->getId());
+                $this->setVar('PARENT_CATEGORY_ID', $parent->getId());
                 $this->setVar('PARENT_CATEGORY_NAME', $parent->getName());
                 $this->parse('category_breadcrumb_block', 'category_breadcrumb', true);
             }
@@ -132,12 +135,11 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
                 )
             );
             $this->parse('task_no_link_block', 'task_no_link');
-            $this->parse('edit_task_block',    'edit_task');
+            $this->parse('edit_task_block', 'edit_task');
 
             $task_type = $task->getType();
             $this->setVar('edit_task_form_block', '');
             if ($task_type === Task::TYPE_TASK) {
-
                 $zone = $this->newZone('az-task-'.$task->getId());
 
                 if (strpos($task->getLink(), '/storage/fetch.php') === 0) {
@@ -160,13 +162,11 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
                 $this->setVar('TASK_TYPE', 'task');
                 if (strlen($task->getLink()) > 0) {
                     $this->setVar('task_no_link_block', '');
-                    $this->parse('task_link_block',  'task_link');
+                    $this->parse('task_link_block', 'task_link');
                 }
-            }
-            elseif ($task_type === Task::TYPE_DUE_WORK) {
+            } elseif ($task_type === Task::TYPE_DUE_WORK) {
                 $this->setVar('TASK_TYPE', 'due_work');
-            }
-            elseif ($task_type === Task::TYPE_ONLINE_ASSESS) {
+            } elseif ($task_type === Task::TYPE_ONLINE_ASSESS) {
                 $this->setVar('TASK_TYPE', 'assessment');
             }
             $this->parse('task_block', 'task', true);
@@ -200,5 +200,4 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
 
         return $zone;
     }
-
 }

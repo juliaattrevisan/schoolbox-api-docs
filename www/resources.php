@@ -21,22 +21,22 @@ $this->setTab('resources');
 // presently, the 3rd-panel blocks are being AJAX'd, so just blank their vars and render them as-is
 // that way you know what's meant to be in the template, rather than just gues
 $this->setVar(array(
-	'FOLDER_MIME_IMG' => '',
-	'FOLDER_NAME' => '',
-	'FOLDER_TEMPLATE' => '',
-	'FOLDER_TYPE' => '',
-	'FOLDER_PERM_GROUP' => '',
-	'FOLDER_PERM_ACCESS' => '',
+    'FOLDER_MIME_IMG' => '',
+    'FOLDER_NAME' => '',
+    'FOLDER_TEMPLATE' => '',
+    'FOLDER_TYPE' => '',
+    'FOLDER_PERM_GROUP' => '',
+    'FOLDER_PERM_ACCESS' => '',
 
-	'FILE_MIME_IMG' => '',
-	'FILE_NAME' => '',
-	'FILE_DESCRIPTION' => '',
-	'FILE_POSTED_BY' => '',
-	'FILE_POSTED_DATE' => '',
-	'FILE_MODIFIED_DATE' => '',
+    'FILE_MIME_IMG' => '',
+    'FILE_NAME' => '',
+    'FILE_DESCRIPTION' => '',
+    'FILE_POSTED_BY' => '',
+    'FILE_POSTED_DATE' => '',
+    'FILE_MODIFIED_DATE' => '',
 
-	'MULTIFILE_MIME_IMG' => '',
-	'MULTIFILE_COUNT' => '',
+    'MULTIFILE_MIME_IMG' => '',
+    'MULTIFILE_COUNT' => '',
 
 ));
 
@@ -52,16 +52,15 @@ $allowedFiles = new AllowedFile;
 $categoryMapper = CategoryMapper::getInstance();
 
 if (is_numeric($this->arg[0])) {
-	$_SESSION['resourcesID'] = $this->arg[0];
-	SitePage::localRedir('/resources/');
-}
-else {
-	$openCategoryId = (int)$_SESSION['resourcesID'];
+    $_SESSION['resourcesID'] = $this->arg[0];
+    SitePage::localRedir('/resources/');
+} else {
+    $openCategoryId = (int)$_SESSION['resourcesID'];
 }
 
 // check permissions on selected category
 if ($groupHandler->getPermission($openCategoryId) < READ_ACCESS) {
-	$openCategoryId = 0;
+    $openCategoryId = 0;
 }
 
 // Check if the category even exists
@@ -70,8 +69,7 @@ try {
 
     // log view
     $categoryMapper->logPageView($openCategory);
-}
-catch (Schoolbox\Mapper\Exception\Deleted $e) {
+} catch (Schoolbox\Mapper\Exception\Deleted $e) {
     // Deleted: load the parent
     $openCategory = $e->getDeletedObject()->getParent();
 }
@@ -83,8 +81,8 @@ catch (Schoolbox\Mapper\Exception $e) {
 // Build a tree up to the last resource we looked at
 $treeBuilder = new Schoolbox\Resource\CategoryTreeBuilder(
     $categoryMapper,
-	TaskMapper::getInstance(),
-	$groupHandler
+    TaskMapper::getInstance(),
+    $groupHandler
 );
 
 // output folders, column 1 - now done via jsTree and TREEDATA
@@ -107,7 +105,7 @@ $contents = new \Schoolbox\Resource\Browser\Tree\Contents($openCategory);
 /* phplib
  */
 if ($contents->getAllNodes()->count()) {
-	foreach ($contents->getAllNodes() as $currentNode) {
+    foreach ($contents->getAllNodes() as $currentNode) {
         $output = array(
             'FILE_ID' => $currentNode->getNodeId(),
             'TYPE' => $currentNode->getType(),
@@ -121,34 +119,29 @@ if ($contents->getAllNodes()->count()) {
         $this->setVar($output);
         $this->parse('file_list_block', 'file_list', true);
     }
-}
-else {
+} else {
     $this->setVar('file_list_block', '');
 }
 
 // output mime classes
 $allowedList = $allowedFiles->getAll();
 if (is_array($allowedList)) {
+// append link icon to resutls
+    $allowedList[]['iconFile'] = "link.png";
+    $last = '';
+    foreach ($allowedList as $allowed) {
+        if ($last != $allowed["iconFile"]) {
+            $output = array(
+                "NAME" => $allowedFiles->getClass($allowed["iconFile"]),
+                "ICON" => $allowed["iconFile"],
+            );
 
-	// append link icon to resutls
-	$allowedList[]['iconFile'] = "link.png";
-	$last = '';
-	foreach ($allowedList as $allowed) {
-		if ($last != $allowed["iconFile"]) {
-			$output = array(
-				"NAME" => $allowedFiles->getClass($allowed["iconFile"]),
-				"ICON" => $allowed["iconFile"],
-			);
+            $this->setVar($output);
+            $this->parse("allowed_files_block", "allowed_files", true);
 
-			$this->setVar($output);
-			$this->parse("allowed_files_block", "allowed_files", true);
-
-			$last = $allowed["iconFile"];
-		}
-	}
+            $last = $allowed["iconFile"];
+        }
+    }
+} else {
+    $this->setVar('allowed_files_block', '');
 }
-else
-{
-	$this->setVar('allowed_files_block', '');
-}
-

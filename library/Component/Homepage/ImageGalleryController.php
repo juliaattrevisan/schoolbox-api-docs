@@ -6,7 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_ImageGalleryController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_ImageGalleryController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * A group handler
@@ -48,7 +49,8 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
         $this->groupHandler = new Group();
         $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
 
@@ -58,8 +60,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
             try {
                 // remove any non-numeric values from the source config
                 $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
             }
         }
     }
@@ -70,7 +71,8 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
 
         /* TODO: This should be inherited
          */
@@ -80,15 +82,15 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
 
         $this->parseConfig();
 
-	    if ($this->permission < READ_ACCESS) {
-		    return false;
-	    }
+        if ($this->permission < READ_ACCESS) {
+            return false;
+        }
 
         $limit = is_numeric($this->getConfig('size')) ? $this->getConfig('size') * $this->getImagesPerRow() : 0;
 
         /* Template rendering
          */
-	    $this->setBlock($templateHandle, 'image_gallery', 'image_gallery_block');
+        $this->setBlock($templateHandle, 'image_gallery', 'image_gallery_block');
         $this->setBlock($templateHandle, 'submit_image', 'submit_image_block');
 
         /* Prevent multiple galleries from other categories stacking up in the wrong place
@@ -103,8 +105,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
             $this->setVar(array(
                 'submit_image_block' => ''
             ));
-        }
-        else {
+        } else {
             $this->parse('submit_image_block', 'submit_image');
         }
 
@@ -121,7 +122,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
         $allImages = $this->getCategoryMapper()->findImages($this->getSource(), $limit, true);
 
         // Iterate
-        foreach($allImages as $currentImage) {
+        foreach ($allImages as $currentImage) {
             $this->setVar(array(
                 'THUMBNAIL_ID' => $currentImage->getId(),
                 'THUMBNAIL_DESCRIPTION' => $currentImage->getDescription(),

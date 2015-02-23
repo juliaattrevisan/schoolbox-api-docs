@@ -16,7 +16,8 @@ use TextFormatter;
 use Alaress_Date_Relative;
 use DateTime;
 
-class Renderer extends Handler {
+class Renderer extends Handler
+{
 
     /**
      * Type (e.g. 'link', 'blog', etc)
@@ -35,7 +36,8 @@ class Renderer extends Handler {
     /**
      * Render
      */
-    public function render() {
+    public function render()
+    {
         $userHandler = new \User();
 
         $result = $this->getResult($this->getType());
@@ -81,11 +83,10 @@ class Renderer extends Handler {
             $this->outputSeeMore();
 
             $this->getPage()->parse('RESULT', 'sitenews_t', true);
-        }
-        else {
+        } else {
             $this->getPage()->setVar('see_more_block', '');
 
             return;
         }
     }
-} 
+}

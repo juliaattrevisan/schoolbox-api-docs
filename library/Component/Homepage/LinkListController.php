@@ -60,8 +60,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             try {
                 // remove any non-numeric values from the source config
                 $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
             }
         }
     }

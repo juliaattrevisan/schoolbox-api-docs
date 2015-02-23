@@ -10,29 +10,27 @@ $data = array();
 $return = array();
 
 if ($_GET['type'] == 'system') {
-
-    /* Add from this group...
+/* Add from this group...
      */
     $groupID   = $_GET['systemGroupID'];
     $allGroups = $groupHandler->searchByName($_GET['query']);
 
 
     if (is_array($allGroups) && count($allGroups)) {
-        foreach($allGroups as $currentGroup) {
+        foreach ($allGroups as $currentGroup) {
             $return[] = array(
                 'name' => $currentGroup['name'],
                 'id'   => intval($currentGroup['id']),
             );
         }
     }
-}
-else {
+} else {
     /* Add from this group...
      */
     $groupID   = $_GET['individualGroupID'];
     $allGroups = $categoryMapper->searchByName($_GET['query'], true);
 
-    foreach($allGroups as $currentGroup) {
+    foreach ($allGroups as $currentGroup) {
         $return[] = array(
             'name' => $currentGroup->getName(),
             'id'   => intval($currentGroup->getId()),

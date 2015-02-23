@@ -13,7 +13,8 @@
 
 namespace Schoolbox\Resource\Browser\Tree;
 
-class Node {
+class Node
+{
 
     /**
      * Node id
@@ -91,7 +92,8 @@ class Node {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
     }
 
     /* Getters/Setters

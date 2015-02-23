@@ -18,7 +18,8 @@ use Schoolbox\Resource\Search\Sanitiser;
 use Schoolbox\User;
 use Schoolbox\Resource\Search\MapperResult\Base;
 
-class Result extends Base {
+class Result extends Base
+{
 
     /**
      * Get all the search results
@@ -28,7 +29,8 @@ class Result extends Base {
      * @param Sanitiser $sanitiser
      * @return Collection
      */
-    protected function executeSearch(User $user, Mapper $mapper, Sanitiser $sanitiser) {
+    protected function executeSearch(User $user, Mapper $mapper, Sanitiser $sanitiser)
+    {
         $query = "
 			SELECT
 				{$mapper->getColumnString('l')},
@@ -84,7 +86,8 @@ class Result extends Base {
      * @param Sanitiser $sanitiser
      * @return int
      */
-    protected function executeSearchCount(User $user, Mapper $mapper, Sanitiser $sanitiser) {
+    protected function executeSearchCount(User $user, Mapper $mapper, Sanitiser $sanitiser)
+    {
         $query = "
 			SELECT
 			    COUNT(*) AS num
