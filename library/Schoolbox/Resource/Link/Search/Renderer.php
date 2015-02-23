@@ -60,7 +60,7 @@ class Renderer extends Base
             /* phplib
              */
             foreach ($mapperResult->getResult() as $currentLink) {
-                $createdTime = new \Alaress_Date_Relative($currentLink->getSubmitted(), 'Y-m-d H:i:s');
+                $createdTime = new \Alaress_Date_Format($currentLink->getSubmitted(), 'Y-m-d H:i:s');
 
                 $this->getPage()->setVar(array(
                     'LINK_URL' => $currentLink->getHref(),

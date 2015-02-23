@@ -13,7 +13,7 @@ namespace Schoolbox\Blog\Search;
 use Schoolbox\Resource\Search\Renderer\Handler;
 use Scrub;
 use TextFormatter;
-use Alaress_Date_Relative;
+use Alaress_Date_Format;
 
 class Renderer extends Handler
 {
@@ -55,7 +55,7 @@ class Renderer extends Handler
                     $blog['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
                 }
 
-                $createdTime = new Alaress_Date_Relative($blog['created']);
+                $createdTime = new Alaress_Date_Format($blog['created'], 'Y-m-d H:i:s');
 
                 $this->getPage()->setVar(array(
                     'BLOG_CID' => $blog['cid'],

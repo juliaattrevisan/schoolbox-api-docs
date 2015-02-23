@@ -13,7 +13,7 @@ namespace Schoolbox\Wiki\Search;
 use Schoolbox\Resource\Search\Renderer\Handler;
 use Scrub;
 use TextFormatter;
-use Alaress_Date_Relative;
+use Alaress_Date_Format;
 
 class Renderer extends Handler
 {
@@ -55,7 +55,7 @@ class Renderer extends Handler
                     $wiki['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
                 }
 
-                $createdTime = new Alaress_Date_Relative($wiki['created']);
+                $createdTime = new Alaress_Date_Format($wiki['created'], 'Y-m-d H:i:s');
 
                 $this->getPage()->setVar(array(
                     'WIKI_ID' => $wiki['wikiID'],
