@@ -114,63 +114,54 @@ class Csv extends Base {
 				continue;
 			}
 
-            /* Check validity of event settings e.g. datetimes
-             */
-            $start_time = array(
-                '00:59',
-                '12:58',
-                '23:59',
-                '00:00',
-                '57:00',
-                '99',
-                '99:13',
-                '76:68',
-                '00:00:0',
-                '00:00:00',
-                '23:59:58',
-                '23:59:59',
-                '',
-                '238:011',
-                ':',
-                '-1:-10'
-            );
-
             /* 24 hour time enforcement
+             * Check validity of event settings e.g. datetimes
+             *
+             * These should be put into Alaress_Date_Format, I think,
+             * rather than floating around in here. But Boomerang's got
+             * some stuff coming in fifteen so
              */
-            foreach ($start_time as $current) {
 
-                /* Default value for all-day events
-                 */
-                if (preg_match('#(00:00:00)|(23:59:59)#', $current)) {
-                    new \Alaress_Probe("$current -- yep, default");
-                }
-                /* Prescribed 24-hour format
-                 */
-                elseif (preg_match('#(0[0-2]|1\d|2[0-3]):([0-5]\d)#', $current)) {
-                    new \Alaress_Probe("$current -- yep, input");
-                }
-                else {
-                    new \Alaress_Probe("$current -- nope");
-                }
+            /* Default value for all-day events
+             */
+            if (preg_match('#(00:00:00)|(23:59:59)#', $start_time)) {
+                $startDatetime = new \Alaress_Date_Format("{$start_date} {$start_time}", 'd/m/Y H:i:s');
             }
-die();
-            $startDatetime = new \Alaress_Date_Format($start_date . ' ' . $start_time, 'd/m/y H:i:s');
-            $finishDatetime = new \Alaress_Date_Format($finish_date . ' ' . $finish_time, 'd/m/y H:i:s');
+            /* Prescribed 24-hour format from csv, append :00 seconds
+             */
+            elseif (preg_match('#(0[0-2]|1\d|2[0-3]):([0-5]\d)#', $start_time)) {
+                $startDatetime = new \Alaress_Date_Format("{$start_date} {$start_time}:00", 'd/m/Y H:i:s');
+            }
+            else {
+                $output[] = array(
+                    'name' => \Scrub::text($name),
+                    'status' => 'Not Added',
+                    'error' => 'Invalid start date and/or times (use 24-hour format)',
+                );
 
-//            if (preg_match('/\d\d:\d\d:\d\d/', $start_time)) {
-//                $startDatetime = new \Alaress_Date_Format($start_date . ' ' . $start_time, 'd/m/y H:i:s');
-//            }
-//            else {
-//                $startDatetime = new \Alaress_Date_Format($start_date . ' ' . $start_time . ':00', 'd/m/y H:i:s');
-//            }
-//
-//            if (preg_match('/\d\d:\d\d:\d\d/', $finish_time)) {
-//                $finishDatetime = new \Alaress_Date_Format($finish_date . ' ' . $finish_time, 'd/m/y H:i:s');
-//            }
-//            else {
-//                $finishDatetime = new \Alaress_Date_Format($finish_date . ' ' . $finish_time . ':00', 'd/m/y H:i:s');
-//            }
+                continue;
+            }
 
+            /* Default value for all-day events
+             */
+            if (preg_match('#(00:00:00)|(23:59:59)#', $finish_time)) {
+                $finishDatetime = new \Alaress_Date_Format("{$finish_date} {$finish_time}", 'd/m/Y H:i:s');
+            }
+            /* Prescribed 24-hour format from csv, append :00 seconds
+             */
+            elseif (preg_match('#(0[0-2]|1\d|2[0-3]):([0-5]\d)#', $finish_time)) {
+                $finishDatetime = new \Alaress_Date_Format("{$finish_date} {$finish_time}:00", 'd/m/Y H:i:s');
+            }
+            else {
+                $output[] = array(
+                    'name' => \Scrub::text($name),
+                    'status' => 'Not Added',
+                    'error' => 'Invalid finish date and/or times (use 24-hour format)',
+                );
+
+                continue;
+            }
+            
             /* Start datetime occurs after finish datetime
              */
             if ($startDatetime->getUnixTimestamp() > $finishDatetime->getUnixTimestamp()) {
@@ -256,7 +247,6 @@ die();
 			unset($publish_date, $start, $finish);
 		}
 
-        new \Alaress_Probe($output);die();
 		$this->setOutput($output);
 	}
 }
