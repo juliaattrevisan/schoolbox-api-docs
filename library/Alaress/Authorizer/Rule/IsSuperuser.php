@@ -13,8 +13,18 @@ namespace Alaress\Authorizer\Rule;
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Unauthorized;
 
-class IsSuperuser implements IAuthorizationRule
+class IsSuperuser extends All
 {
+    /**
+     * Constructor (obviously)
+     */
+    public function __construct()
+    {
+        $this
+            ->addRule(new IsLoggedIn())
+            ->addRule(new Callback(array($this, 'authorizeMethod')))
+        ;
+    }
 
     public function authorize(array $params = array(), User $user = null)
     {

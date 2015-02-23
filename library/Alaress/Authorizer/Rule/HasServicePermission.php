@@ -13,7 +13,7 @@ namespace Alaress\Authorizer\Rule;
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Forbidden;
 
-class HasServicePermission implements IAuthorizationRule
+class HasServicePermission extends All
 {
 
     /**
@@ -62,12 +62,16 @@ class HasServicePermission implements IAuthorizationRule
         $this->service           = $service;
         $this->accessLevel       = $accessLevel;
         $this->serviceIdentifier = $serviceIdentifier;
+        $this
+            ->addRule(new IsLoggedIn())
+            ->addRule(new Callback(array($this, 'authorizeMethod')))
+        ;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function authorize(array $params = array(), User $user = null)
+    public function authorizeMethod(array $params = array(), User $user = null)
     {
         if ($user instanceof User) {
             // Check this user's permissions against this item's service and

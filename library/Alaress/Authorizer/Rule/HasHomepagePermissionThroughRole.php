@@ -17,7 +17,7 @@ use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Unauthorized;
 
-class HasHomepagePermissionThroughRole implements IAuthorizationRule
+class HasHomepagePermissionThroughRole extends All
 {
     /**
      * A value of Schoolbox\Permission\Access\UserAccess::ACCESS_*
@@ -66,12 +66,16 @@ class HasHomepagePermissionThroughRole implements IAuthorizationRule
         $this->accessLevel        = $accessLevel;
         $this->homepageIdentifier = $categoryIdentifier;
         $this->roleAccessMapper   = $roleAccessMapper;
+        $this
+            ->addRule(new IsLoggedIn())
+            ->addRule(new Callback(array($this, 'authorizeMethod')))
+        ;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function authorize(array $params = array(), User $user = null)
+    public function authorizeMethod(array $params = array(), User $user = null)
     {
         if ($user instanceof User) {
             // What's the scalar identifier value?

@@ -25,6 +25,7 @@ class IsTeacherOfClass extends All
     public function __construct(External_UserInterface $externalDb, $classCodeSource)
     {
         parent::__construct(
+            new IsLoggedIn(),
             new HasRole(Role::STAFF),
             new IsInvolvedInClass($externalDb, $classCodeSource)
         );
