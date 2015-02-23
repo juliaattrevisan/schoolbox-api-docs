@@ -18,6 +18,13 @@ class Alaress_Date_Strategy_LaravelDate extends Alaress_Date_Strategy_DateTime
      */
 
     /**
+     * Any warnings that might have been raised in creation of this object.
+     *
+     * @var array
+     */
+    protected $warnings = array();
+
+    /**
      * @param DateTimeInterface|Alaress_Date_Format_Interface|string $dateTime
      * @param string                                                 $inputDateFormat
      *
@@ -29,7 +36,6 @@ class Alaress_Date_Strategy_LaravelDate extends Alaress_Date_Strategy_DateTime
      */
     public function setFromFormat($dateTime, $inputDateFormat)
     {
-        $this->isValid = true;
         if (!isset($dateTime)) {
             // Nothing set? set it to now
             $newDateTime = LaravelDate::now($this->timezone);
@@ -56,12 +62,11 @@ class Alaress_Date_Strategy_LaravelDate extends Alaress_Date_Strategy_DateTime
             $newDateTime = DateTime::createFromFormat($inputDateFormat, $dateTime);
             $errors      = DateTime::getLastErrors();
             if ($errors['error_count']) {
-                // Try again with trailing data allowed.
+                // I don't have a datetime, try again with trailing data allowed
                 $newDateTime = DateTime::createFromFormat($inputDateFormat.'+', $dateTime);
                 if (!($newDateTime instanceof DateTime)) {
-                    // I didn't get a datetime at all.
-                    $this->isValid = false;
-                    $errors       = DateTime::getLastErrors();
+                    // I still don't have a datetime, exception out
+                    $errors = DateTime::getLastErrors();
                     throw new InvalidArgumentException(
                         sprintf(
                             'LaravelDate creation failed with %d errors: (%s)',
@@ -74,7 +79,7 @@ class Alaress_Date_Strategy_LaravelDate extends Alaress_Date_Strategy_DateTime
             if ($errors['warning_count']) {
                 // I have a datetime, but it's not what I expected. Warn the user.
                 // This date will also fail isValid()
-                $this->isValid = false;
+                $this->warnings = $errors['warnings'];
                 trigger_error(
                     sprintf(
                         'LaravelDate creation raised %d warnings: (%s)',
@@ -101,6 +106,14 @@ class Alaress_Date_Strategy_LaravelDate extends Alaress_Date_Strategy_DateTime
      */
     public function isValid()
     {
-        return $this->isValid;
+        return empty($this->warnings);
+    }
+
+    /**
+     * @return array
+     */
+    public function getWarnings()
+    {
+        return $this->warnings;
     }
 }
