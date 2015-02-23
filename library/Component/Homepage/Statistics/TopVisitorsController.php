@@ -41,7 +41,7 @@ class Component_Homepage_Statistics_TopVisitorsController extends Component_Home
             GROUP BY `user`
             ORDER BY hits DESC"
         );
-        $stmt->execute(array('cat' => $this->getContext('id')));
+        $stmt->execute(array('cat' => $this->getContext()->getId()));
 
         $i = 0;
         while ($visitor = $stmt->fetch(PDO::FETCH_ASSOC)) {

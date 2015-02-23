@@ -54,7 +54,7 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
                     $stmt->execute(
                         array(
                             'sid' => $student['synergy_id'],
-                            'cid' => $this->getContext('id')
+                            'cid' => $this->getContext()->getId()
                         )
                     );
                     $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -72,7 +72,7 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
 
         // else is this a group?
         $stmt = Database::getInstance()->prepare("SELECT cid FROM userGroups WHERE cid = :id");
-        $stmt->execute(array('id' => $this->getContext('id')));
+        $stmt->execute(array('id' => $this->getContext()->getId()));
         if ($stmt->rowCount() == 1) {
             $stmt = Database::getInstance()->prepare(
                 "SELECT
@@ -93,7 +93,7 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
              )"
             );
 
-            $stmt->execute(array('cid' => $this->getContext('id')));
+            $stmt->execute(array('cid' => $this->getContext()->getId()));
 
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $this->unvisitors[] = $row;
