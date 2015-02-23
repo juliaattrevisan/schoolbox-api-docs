@@ -13,6 +13,20 @@
 			exportContainer: exportForm
 		})
 
+        /* Calendar controls
+         */
+        $('[data-type=calendar-controls]').submit(function(event) {
+            event.preventDefault();
+
+            var id = $('[data-type=calendar-controls]').find('input[name=userKey]').val();
+            var start_date = $('[data-type=calendar-controls]').find('input[name=start_date]').val();
+            var finish_date = $('[data-type=calendar-controls]').find('input[name=finish_date]').val();
+
+            var url = '/calendar/list/' + id + '/' + start_date + '/' + finish_date;
+
+            window.location.href = url;
+        });
+
 		/* date picker */
 		$('#start_date').datepicker({
 			dateFormat: 'dd/mm/yy',
@@ -231,7 +245,7 @@
         <a href="/calendar/full/{CALENDAR_PARAMS}#agendaDay" class='btn small no-icon'><span></span>Day</a>
         <a href="#" class='btn export'><span></span>Export</a>
         </div>
-        <form action="/calendar/list" method="post">
+        <form data-type='calendar-controls' action="/calendar/list" method="post">
 			<input type="hidden" name='userKey' value='{USER_ID}' />
             <input id="start_date_alt" name='start_date' type="hidden" value="{SELECTED_FORMATTED_START}" />
             <input id="finish_date_alt" name='finish_date' type="hidden" value="{SELECTED_FORMATTED_FINISH}" />
