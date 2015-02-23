@@ -102,11 +102,19 @@ if (is_numeric($this->arg[0])) {
     /* Find folder owner (full access users)
      */
     $userAccessMapper = new \Schoolbox\Permission\Access\UserAccessMapper();
-    $folderOwner = $userAccessMapper->findByColumnList(array(
-        'sid' => $category->getId(),
-        'service' => HOMEPAGE_SERVICE,
-        'type' => \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL
-    ))->first();
+	try {
+		$folderOwner = $userAccessMapper->findOneByColumnList(
+			array(
+				'sid' => $category->getId(),
+				'service' => HOMEPAGE_SERVICE,
+				'type' => \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL
+			)
+		);
+		// hydrate user -_-
+		$folderOwner->setUser(\Schoolbox\UserMapper::getInstance()->findById($folderOwner->getUser()->getId()));
+	} catch (\Exception $e) {
+		$folderOwner = null;
+	}
 
 	if ($folderOwner instanceof \Schoolbox\Permission\Access\UserAccess) {
 		$this->setVar(
@@ -218,7 +226,9 @@ if (is_numeric($this->arg[0])) {
 	 */
 	$this->setVar(array(
 		'MAKEADMIN_CURRENT_USER_ID' => $_SESSION['user']->getId(),
-		'MAKEADMIN_CURRENT_ADMIN_ID' => $folderOwner->getUser()->getId(),
+		'MAKEADMIN_CURRENT_ADMIN_ID' => $folderOwner instanceof \Schoolbox\Permission\Access\UserAccess
+			? $folderOwner->getUser()->getId()
+			: '',
 		'MAKEADMIN_SUPER' => isset($_SESSION['su']) ? $_SESSION['su'] : 0
 	));
 } else
