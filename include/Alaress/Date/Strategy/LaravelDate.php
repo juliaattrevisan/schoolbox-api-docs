@@ -34,11 +34,11 @@ class Alaress_Date_Strategy_LaravelDate extends Alaress_Date_Strategy_DateTime
             // Nothing set? set it to now
             $newDateTime = LaravelDate::now($this->timezone);
             $this->setDateTimeObject($newDateTime);
-        } elseif ($dateTime instanceof DateTime) {
-            $newDateTime = LaravelDate::createFromTimestamp($dateTime->getTimestamp(), $this->timezone);
-            $this->setDateTimeObject($newDateTime);
-        } elseif ($dateTime instanceof DateTimeInterface) {
-            $newDateTime = LaravelDate::createFromTimestamp($dateTime->getTimestamp(), $this->timezone);
+        } elseif ($dateTime instanceof DateTime || $dateTime instanceof DateTimeInterface) {
+            $newDateTime = LaravelDate::createFromTimestamp(
+                $dateTime->getTimestamp(),
+                $this->timezone
+            );
             $this->setDateTimeObject($newDateTime);
         } elseif ($dateTime instanceof Alaress_Date_Format_Interface) {
             $newDateTime = LaravelDate::createFromTimestamp(
