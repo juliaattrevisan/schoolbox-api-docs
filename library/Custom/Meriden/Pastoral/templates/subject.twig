@@ -25,6 +25,10 @@
     }
 </style>
 
+<div id="meriden-crest">
+    <img src="/images/meriden/crest.png" />
+</div>
+
 {% if report.subjectReport.folder.id %}
     <a class="btn go-to float-right"
        href="/homepage/{{ report.subjectReport.folder.id }}"
@@ -41,11 +45,6 @@
         student:        report.student,
         subjectReport:  report.subjectReport
     } %}
-</div>
-
-{# Table of contents #}
-<div id="meriden-crest">
-    <img src="/images/meriden/crest.png" />
 </div>
 
 {# course description #}
