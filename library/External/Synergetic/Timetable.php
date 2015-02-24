@@ -282,43 +282,59 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      *       calls use the key in the external DB, instead of the Schoolbox key.
      *
      * @param int $campus A campus ID (internal, not Synergetic)
+     * @param int $now    Optional override of time
      *
      * @return array
      */
-    public function getPeriodNumber($campus)
+    public function getPeriodNumber($campus, $now = 0)
     {
+        $now = $now ?: time();
+
+        $secondsAfterMidnight = $now - strtotime('00:00:00', $now);
+
         $campusModel = $this->campusMapper->findById($campus);
         if (!($campusModel instanceof \Schoolbox\Campus)) {
             return false;
         }
         $campusString = $campusModel->getExtTimetableCode();
 
-        # Since the year information in the TimeFrom and TimeTo fields is not reliable, this rips out just the time
-        # and sets all dates to be the same, then compares.
-        # First it gets the hours and minutes with datepart, casts them to varchar so that they can be concatenated to
-        # look like '10:34', then casts this to datetime, which can be compared. Kludgy.
+        // firstly, what day number is it?
+        $targetDay = $this->getDayNumber($campus);
 
+        // get the day numbers used for this campus
         $query = "
-			SELECT	t.TimeFrom,
-				t.TimeTo,
-				t.PeriodNumber,
-				t.PeriodNumberSeq
-			FROM	TimetableDefinition t
-			WHERE	(cast( cast( datepart( hh, t.TimeFrom) as varchar) + ':' + cast( datepart( mi, t.TimeFrom) as varchar) as datetime)
-				<=
-				cast( cast( datepart( hh, getdate()) as varchar) + ':' + cast( datepart( mi, getdate()) as varchar) as datetime))
-				and
-				(cast( cast( datepart( hh, getdate()) as varchar) + ':' + cast( datepart( mi, getdate()) as varchar) as datetime)
-				<=
-				cast( cast( datepart( hh, t.TimeTo) as varchar) + ':' + cast( datepart( mi, t.TimeTo) as varchar) as datetime))
-				and
-				t.FileSemester = '" . $_SESSION['FileSemester'] . "'
-				and
-				t.FileYear = '" . $_SESSION['FileYear'] . "'
-				and
-				TimetableGroup = '" . $campusString . "'";
+            SELECT DISTINCT DayNumber
+            FROM TimetableDefinition t
+            WHERE t.FileSemester = '%s'
+            AND t.FileYear = '%s'
+            AND t.TimetableGroup = '%s'
+        ";
 
-        return $this->getDatabase()->getRow($query);
+        // get available day numbers
+        $dayNumbers = array_map(
+            function ($r) {
+                return $r['DayNumber'];
+            },
+            $this->getDatabase()->getAll(sprintf($query, $_SESSION['FileSemester'], $_SESSION['FileYear'], $campusString))
+        );
+
+        $day = in_array($targetDay, $dayNumbers) ? $targetDay : 0;
+
+        // cannot believe the something like 'LEFT(CONVERT(VARCHAR...' is needed
+        $query = "
+            SELECT t.TimeFrom, t.TimeTo, t.PeriodNumber, t.PeriodNumberSeq
+            FROM TimetableDefinition t
+            WHERE t.FileSemester = '%d'
+            AND t.FileYear = '%d'
+            AND t.TimetableGroup = '%s'
+            AND t.DayNumber = '%d'
+            AND DATEDIFF(S, LEFT(CONVERT(VARCHAR(20), t.TimeFrom, 126), 10), t.TimeFrom) < '%d'
+            AND DATEDIFF(S, LEFT(CONVERT(VARCHAR(20), t.TimeTo, 126), 10), t.TimeTo) > '%d'
+        ";
+
+        return $this->getDatabase()->getRow(sprintf($query,
+            $_SESSION['FileSemester'], $_SESSION['FileYear'], $campusString, $day, $secondsAfterMidnight, $secondsAfterMidnight
+        ));
     }
 
     public function getDayTimetable($synergy_id, $userID, $campus, $daynumber)

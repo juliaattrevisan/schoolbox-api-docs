@@ -124,11 +124,11 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     /**
      * Get period number for a particular campus
      *
-     * @param $campusId
-     *
+     * @param int $campusId
+     * @param int $now
      * @return array
      */
-    public function getPeriodNumber($campusId)
+    public function getPeriodNumber($campusId, $now = 0)
     {
         $campus = $this->getCampusMapper()->findById($campusId);
         $vars = array(

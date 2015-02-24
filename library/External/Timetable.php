@@ -51,11 +51,12 @@ class External_Timetable implements External_TimetableInterface
      * Determines the period number
      *
      * @param Integer $campusId
+     * @param Integer $now
      * @return Integer
      */
-    function getPeriodNumber($campusId)
+    function getPeriodNumber($campusId, $now = 0)
     {
-        return $this->getDatabase()->getPeriodNumber($campusId);
+        return $this->getDatabase()->getPeriodNumber($campusId, $now);
     }
 
     /**

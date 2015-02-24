@@ -137,10 +137,10 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
      * Hilariously this method doesn't return a number at all!
      *
      * @param int $campusId
-     *
+     * @param int $now
      * @return array
      */
-    public function getPeriodNumber($campusId)
+    public function getPeriodNumber($campusId, $now = 0)
     {
         // Surely this should take a day number????
 
@@ -154,7 +154,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
         $periodStatement = $this->getPeriodStatement(false);
         $periodStatement->execute(array(':campusId' => $campusId,));
-        $current_time = date('H:i:s');
+        $current_time = date('H:i:s', $now ?: time());
         foreach ($periodStatement as $item) {
             if ($item['start'] <= $current_time && $item['finish'] >= $current_time) {
                 return array(

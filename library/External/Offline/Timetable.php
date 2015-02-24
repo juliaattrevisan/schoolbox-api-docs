@@ -21,7 +21,7 @@ class External_Offline_Timetable implements External_TimetableInterface
         // Noop
     }
 
-    public function getPeriodNumber($campusId)
+    public function getPeriodNumber($campusId, $now = 0)
     {
         // Noop
     }

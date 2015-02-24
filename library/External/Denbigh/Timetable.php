@@ -111,7 +111,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         return $currentDay;
     }
 
-    public function getPeriodNumber($campusId)
+    public function getPeriodNumber($campusId, $now = 0)
     {
         return 0;
     }
