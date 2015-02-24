@@ -290,7 +290,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     {
         $now = $now ?: time();
 
-        $secondsAfterMidnight = $now % 86400;
+        $secondsAfterMidnight = $now - strtotime('00:00:00', $now);
 
         $campusModel = $this->campusMapper->findById($campus);
         if (!($campusModel instanceof \Schoolbox\Campus)) {
