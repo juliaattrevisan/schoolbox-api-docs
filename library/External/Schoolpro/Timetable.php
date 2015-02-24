@@ -310,7 +310,10 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
          */
         for ($period = 0; $period < count($allDayTimetables[0]); $period++) {
             for ($day = 0; $day < $this->getCycleLength(); $day++) {
-                $timetable[$period]['day'][$day][0] = $allDayTimetables[$day][$period]['class'][0];
+                $timetable[$period]['day'][$day] = array();
+                if (!empty($allDayTimetables[$day][$period]['class'][0])) {
+                    $timetable[$period]['day'][$day][] = $allDayTimetables[$day][$period]['class'][0];
+                }
                 /* TODO: Have these use convert(varchar(10), theDate, 120) in stored proc
                  */
                 $start = substr($allDayTimetables[0][$period]['periodStart'], 0, 5);
