@@ -55,7 +55,7 @@ $this->setVar(
     array(
         'USER_ID'                   => $user->getId(),
         'USER_TOKEN'                => $user->getKey(),
-        'CALENDAR_PARAMS'           => implode('/', $this->arg),
+        'CALENDAR_PARAMS'           => "{$start->getUsingFormat('d-m-Y')}/{$user->getId()}",
         'SELECTED_START'            => $start->getUsingFormat('d/m/Y'),
         'SELECTED_FINISH'           => $finish->getUsingFormat('d/m/Y'),
         'SELECTED_FORMATTED_START'  => $start->getUsingFormat('d-m-Y'),
