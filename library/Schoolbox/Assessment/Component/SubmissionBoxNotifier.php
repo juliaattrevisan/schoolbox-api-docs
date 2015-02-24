@@ -489,7 +489,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         $bob->setTitle($m)
             ->setParams(array(
-                'boxname' => new Param($box->getName(), "/submission/submissionHistory/", $box->getId()),
+                'boxname' => new Param($box->getName(), "/submission/submissionHistory/{$box->getId()}"),
                 'catname' => new CategoryParam($box->getCategory())
             ))
             ->setTopics(array("duework.{$box->getId()}.updated"));

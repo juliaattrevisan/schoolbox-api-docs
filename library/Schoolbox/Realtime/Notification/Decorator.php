@@ -17,6 +17,7 @@ use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Html2Text\Html2Text;
 use Schoolbox\Realtime\Message\NSMapper;
 use TextFormatter;
+use UnderflowException;
 
 class Decorator extends NotificationBundle
 {
@@ -81,14 +82,18 @@ class Decorator extends NotificationBundle
 
         foreach ($this->getNotifications($limit, $sortDirection) as $n) {
             // compile the title
-            $array[$n->getId()]['title'] = $this->renderTitleAsHtml($n, $fqdn);
-            $array[$n->getId()]['icon']  = $this->getUnprotectedIcon($n);
+            try {
+                $array[$n->getId()]['title'] = $this->renderTitleAsHtml($n, $fqdn);
+                $array[$n->getId()]['icon']  = $this->getUnprotectedIcon($n);
 
-            foreach (array('icon', 'href') as $field) {
-                $value = $array[$n->getId()][$field];
-                if (strlen($value) && $value[0] == '/') {
-                    $array[$n->getId()][$field] = $fqdn . $value;
+                foreach (array('icon', 'href') as $field) {
+                    $value = $array[$n->getId()][$field];
+                    if (strlen($value) && $value[0] == '/') {
+                        $array[$n->getId()][$field] = $fqdn . $value;
+                    }
                 }
+            } catch (UnderflowException $e) {
+                unset($array[$n->getId()]);
             }
         }
 
@@ -162,12 +167,17 @@ class Decorator extends NotificationBundle
 
         foreach ($this->getNotifications($limit, $dir) as $n) {
             // compile the title
-            $context[$n->getId()]['title'] = $this->renderTitleAsHtml($n);
+            try {
+                $context[$n->getId()]['title'] = $this->renderTitleAsHtml($n);
 
-            // convert the time into human readable
-            $date = new \Alaress_Date_Format($n->getTimestamp(), 'U');
-            $context[$n->getId()]['longtime'] = $date->getLong();
-            $context[$n->getId()]['timeonly'] = $date->getUsingFormat('g:ia');
+                // convert the time into human readable
+                $date                             = new \Alaress_Date_Format($n->getTimestamp(), 'U');
+                $context[$n->getId()]['longtime'] = $date->getLong();
+                $context[$n->getId()]['timeonly'] = $date->getUsingFormat('g:ia');
+            } catch (UnderflowException $e) {
+                // TODO log this somewhere
+                unset($context[$n->getId()]);
+            }
         }
 
         return $context;
@@ -241,6 +251,7 @@ class Decorator extends NotificationBundle
      *
      * @param Notification $notification
      * @param string       $fqdn
+     * @throws UnderflowException
      * @return string
      */
     public function renderTitleAsHtml($notification, $fqdn = '')
@@ -249,6 +260,11 @@ class Decorator extends NotificationBundle
 
         foreach ($notification->getParameters() as $token => $params) {
             /** @var ParameterInterface[] $params */
+
+            if (!count($params)) {
+                // if this occurs, it's a bug in the notifier that created this notification.
+                throw new UnderflowException("Message '$text' contains no params for token '$token'");
+            }
 
             // sort params by reverse timestamp to give precedence to most recent
             krsort($params);
