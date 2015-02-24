@@ -93,6 +93,13 @@ class Mapper extends BaseMapper
         );
         $this->hasMap(
             array(
+                'column'   => 'background_image_contained',
+                'property' => 'backgroundImageContained',
+                'type'     => self::TYPE_BOOLEAN,
+            )
+        );
+        $this->hasMap(
+            array(
                 'column'   => 'background_color',
                 'property' => 'backgroundColor',
                 'type'     => self::TYPE_COLOR,
