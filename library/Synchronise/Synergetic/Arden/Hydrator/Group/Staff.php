@@ -17,19 +17,28 @@ class Synchronise_Synergetic_Arden_Hydrator_Group_Staff implements Synchronise_B
     {
         $newUser['group_id'] = $this->getGroupIDFromUser($externalUser);
 
+        new \Alaress_Probe($externalUser);
+        new \Alaress_Probe($newUser);
         return $newUser;
     }
 
     /**
-     * Groups for Scs are based on year level
+     * Roles are based on campus
      *
      * @param  array $externalUser
      * @return int
      */
     public function getGroupIDFromUser($externalUser)
     {
-        /* All staff are in Group 1
-         */
-        return 1;
+        switch ($externalUser['StaffCampus']) {
+            case 'E':
+                return 1;
+
+            case 'B':
+                return 6;
+
+            default:
+                return 6;
+        }
     }
 }
