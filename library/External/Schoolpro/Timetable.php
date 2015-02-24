@@ -269,7 +269,6 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
                                 'staffID'     => $externalUserId,
                                 'dayNumber'   => $currentClass['DayNumber'],
                             );
-                            array_shift($allClasses);
                             break;
                         }
                     }
