@@ -13,13 +13,29 @@
 			exportContainer: exportForm
 		})
 
+        /* Calendar controls
+         */
+        $('[data-type=calendar-controls]').submit(function(event) {
+            event.preventDefault();
+
+            var id = $('[data-type=calendar-controls]').find('input[name=userKey]').val();
+            var start_date = $('[data-type=calendar-controls]').find('input[name=start_date]').val();
+            var finish_date = $('[data-type=calendar-controls]').find('input[name=finish_date]').val();
+
+            var url = '/calendar/list/' + id + '/' + start_date + '/' + finish_date;
+
+            window.location.href = url;
+        });
+
 		/* date picker */
-		$('#start_date, #finish_date').datepicker({
+		$('#start_date').datepicker({
 			dateFormat: 'dd/mm/yy',
 			showOn: 'both',
 			buttonImage: '/images/core/calendar/calendar-click.png',
 			buttonImageOnly: true,
 			constrainInput: false,
+            altField: '#start_date_alt',
+            altFormat: 'dd-mm-yy',
 			onClose: function (string) {
 				var input = $(this);
 				$.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
@@ -27,7 +43,24 @@
 				})
 			}
 		});
-
+        
+        /* date picker */
+        $('#finish_date').datepicker({
+            dateFormat: 'dd/mm/yy',
+            showOn: 'both',
+            buttonImage: '/images/core/calendar/calendar-click.png',
+            buttonImageOnly: true,
+            constrainInput: false,
+            altField: '#finish_date_alt',
+            altFormat: 'dd-mm-yy',
+            onClose: function (string) {
+                var input = $(this);
+                $.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                    input.val(data.time);
+                })
+            }
+        });
+        
 		$('#start_date').syncDates({
 			endDate: $('#finish_date')
 		});
@@ -212,12 +245,14 @@
         <a href="/calendar/full/{CALENDAR_PARAMS}#agendaDay" class='btn small no-icon'><span></span>Day</a>
         <a href="#" class='btn export'><span></span>Export</a>
         </div>
-        <form action="/calendar/list" method="post">
+        <form data-type='calendar-controls' action="/calendar/list" method="post">
 			<input type="hidden" name='userKey' value='{USER_ID}' />
+            <input id="start_date_alt" name='start_date' type="hidden" value="{SELECTED_FORMATTED_START}" />
+            <input id="finish_date_alt" name='finish_date' type="hidden" value="{SELECTED_FORMATTED_FINISH}" />
 
             <div class="float-left dateSelector">
-                <input id='start_date' name="start_date" type="text" size="10" maxlength="10" value="{SELECTED_START}" />
-                to <input id='finish_date' name="finish_date" type="text" size="10" maxlength="10" value="{SELECTED_FINISH}" />
+                <input id='start_date' type="text" size="10" maxlength="10" value="{SELECTED_START}" />
+                to <input id='finish_date' type="text" size="10" maxlength="10" value="{SELECTED_FINISH}" />
             </div>
 
             <input type="submit" class="btn submit-btn-plain" value="Update" />
