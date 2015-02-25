@@ -75,7 +75,7 @@ class Pool extends EventEmitter implements PoolInterface
         $this->ioListeners = array(
             self::DATA_OUT  => new DataIOListener($log, $this, $strat, $msgHandler),
             self::DEBUG_OUT => new LogIOListener($log),
-            self::DEBUG_ERR => new ErrorIOListener($log, $this),
+            self::DEBUG_ERR => new ErrorIOListener($log, $this, $msgHandler),
         );
     }
 
