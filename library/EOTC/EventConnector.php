@@ -24,14 +24,6 @@ class EventConnector extends EventMapper
     protected $user;
 
     /**
-     * @param User $user
-     */
-    public function __construct(User $user)
-    {
-        $this->user = $user;
-    }
-
-    /**
      * Get details of a single event (used in Mobile)
      *
      * @param $eventId
@@ -392,5 +384,16 @@ class EventConnector extends EventMapper
     public function getUser()
     {
         return $this->user;
+    }
+
+    /**
+     * @param  User $user
+     *
+     * @return $this
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
+        return $this;
     }
 }
