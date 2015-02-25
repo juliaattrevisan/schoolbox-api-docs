@@ -216,15 +216,15 @@ class External_Tass_Timetable implements External_TimetableInterface
 
         // Add classes into it
         while ($desc = $this->getDatabase()->getNextArray($result)) {
+            $code = trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($desc['prd_code'] == $timetablePeriod['periodNumber']
                     && $timetablePeriod['periodSequence'] != 2
+                    && !isset($timetable[$x]['class'][$code])
                 ) {
-                    $timetable[$x]['class'][] = array(
+                    $timetable[$x]['class'][$code] = array(
                         'description' => $desc['sub_desc'],
-                        'code'        => trim($desc['year_grp'])
-                            . '-' . trim($desc['sub_code'])
-                            . '-' . trim($desc['class']),
+                        'code'        => $code,
                         'room'        => $desc['room_code'],
                         'staffCode'   => $desc['tch_code'],
                     );
@@ -281,14 +281,15 @@ class External_Tass_Timetable implements External_TimetableInterface
 
         // Build the class list
         while ($desc = $this->getDatabase()->getNextArray($result)) {
+            $code = trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($desc['prd_code'] == $timetablePeriod['periodNumber']
                     && $timetablePeriod['periodSequence'] != 2
+                    && !isset($timetable[$x]['day'][$desc['day_code']][$code])
                 ) {
-                    $timetable[$x]['day'][$desc['day_code']][] = array(
+                    $timetable[$x]['day'][$desc['day_code']][$code] = array(
                         'description'    => $desc['sub_desc'],
-                        'code'           => trim($desc['year_grp'])
-                            . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']),
+                        'code'           => $code,
                         'room'           => $desc['room_code'],
                         'staffCode'      => $desc['tch_code'],
                     );
