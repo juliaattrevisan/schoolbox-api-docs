@@ -300,7 +300,10 @@ class External_Synergetic_User implements External_UserInterface
                     AlertMessage,
                     vStudents.StudentBoarder
                 FROM SynergyOne.dbo.vStudents vStudents
-                    LEFT JOIN CommunityAlerts ON CommunityAlerts.ID = StudentID
+                    LEFT JOIN CommunityAlerts
+                        ON CommunityAlerts.ID = StudentID
+                        AND (CommunityAlerts.AlertDateFrom IS NULL OR CommunityAlerts.AlertDateFrom <= CAST(GETDATE() AS date))
+                        AND (CommunityAlerts.AlertDateTo IS NULL OR CommunityAlerts.AlertDateTo >= CAST(GETDATE() AS date))
                     LEFT JOIN luForm ON vStudents.StudentForm = luForm.Code
                     LEFT JOIN luTutor ON vStudents.StudentTutor = luTutor.Code
                     LEFT JOIN luYearLevel ON vStudents.StudentCampus = luYearLevel.Campus
@@ -321,9 +324,9 @@ class External_Synergetic_User implements External_UserInterface
                 && preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches)
             ) {
                 $student['StudentBirthDate'] = strtotime($matches[2] . ' ' . $matches[1] . ' ' . $matches[3]);
-            } else {
-                $student['StudentBirthDate'] = false;
-            }
+                } else {
+                    $student['StudentBirthDate'] = false;
+                }
 				$student['AlertMessage'] = array($student['AlertMessage']);
 			} else {
 				// join subsequent alerts
