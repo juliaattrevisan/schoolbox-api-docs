@@ -957,7 +957,7 @@ class External_Synergetic_User implements External_UserInterface
     public function getCampusFromTimetable($staffID)
     {
         $staffID = (int)$staffID;
-        $query = "SELECT DISTINCT( ClassCampus ) AS campus FROM timetable WHERE StaffID = '$staffID'";
+        $query = "SELECT DISTINCT( ClassCampus ) AS campus FROM timetable WHERE StaffID = '$staffID' AND FileYear = ".date('Y');
         return $this->getDatabase()->getAll($query);
     }
 
