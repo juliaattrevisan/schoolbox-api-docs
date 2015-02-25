@@ -12,7 +12,7 @@ class Calendar_Api_EventType_Custom_EOTC_Default extends Calendar_Api_EventType_
 	/**
 	 * A schoobox event handler instance
 	 *
-	 * @var Calendar
+	 * @var \EOTC\EventConnector
 	 */
 	private $calendarHandler;
 
@@ -66,7 +66,7 @@ class Calendar_Api_EventType_Custom_EOTC_Default extends Calendar_Api_EventType_
 	/**
 	 * Set calendar handler
 	 *
-	 * @param Calendar $calendarHandler
+	 * @param \EOTC\EventConnector $calendarHandler
 	 */
 	public function setCalendarHandler($calendarHandler) {
 		$this->calendarHandler = $calendarHandler;
@@ -75,7 +75,7 @@ class Calendar_Api_EventType_Custom_EOTC_Default extends Calendar_Api_EventType_
 	/**
 	 * Get calendar handler
 	 *
-	 * @return Calendar
+	 * @return \EOTC\EventConnector
 	 */
 	public function getCalendarHandler() {
 		return $this->calendarHandler;
