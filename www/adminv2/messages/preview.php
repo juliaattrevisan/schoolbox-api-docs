@@ -136,8 +136,10 @@ switch ($this->arg[0]) {
             try {
                 $image = \Schoolbox\StorageMapper::getInstance()->findById($article->getImage()->getId());
                 $image = '/storage/image.php?size=square64&hash=' . $article->getImage()->getHash();
+                $thumb = '/storage/image.php?size=square200&hash=' . $article->getImage()->getHash();
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $image = '/images/icon.php?size=64&icon=pin';
+                $thumb = '/images/emails/spacer.gif';
             }
 
             $decorator->appendInstance($bob
@@ -149,8 +151,14 @@ switch ($this->arg[0]) {
                 ))
                 ->setHref('/news/item/' . $article->getId())
                 ->setIcon($image)
+                ->setMeta(array(
+                    'title'  => $article->getHeading(),
+                    'author' => $article->getOwner()->formatName(),
+                    'date'   => $article->getPostDate()->getLong(),
+                    'thumb'  => $thumb
+                ))
                 ->setBody(TextFormatter::cutSentence(Scrub::html2text($article->getBody()), 300))
-                ->setByline("By {$article->getOwner()->formatName()} in {$article->getTopic()->getName()}")
+                ->setByline("{$article->getPostDate()->getDateOnly()} by {$article->getOwner()->formatName()} in {$article->getTopic()->getName()}")
                 ->setTimestamp($article->getPostDate()->getUnixTimestamp())
                 ->setNamespace(NSMapper::NS_NEWS)
                 ->build()

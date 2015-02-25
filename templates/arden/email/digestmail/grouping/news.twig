@@ -1,0 +1,31 @@
+{% extends "schoolmail/row.twig" %}
+
+{% block image %}
+    {% set msg = row.messages | first %}
+    <img src="{{ msg.meta.thumb }}" width="200" height="200" />
+{% endblock %}
+
+{% block pretty %}
+    {% set msg = row.messages | first %}
+    <a class="news-title" href="{{ msg.href }}">{{ msg.meta.title }}</a>
+{% endblock %}
+
+{% block meta %}
+    {% set msg = row.messages | first %}
+    {% if msg.meta %}
+    <tr>
+        <td>
+            <p>
+                <em>
+                    Posted by <a>{{ msg.meta.author }}</a>
+                    <br/>{{ msg.meta.date }}
+                </em>
+            </p>
+            <br/>
+        </td>
+    </tr>
+    <tr>
+        <td><p>{{ msg.meta.body | html2text }}</p></td>
+    </tr>
+    {% endif %}
+{% endblock %}

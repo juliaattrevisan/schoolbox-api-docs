@@ -38,6 +38,17 @@ class Storage extends BaseTransformation
                 'method' => 'Sharpen'
             ),
         ),
+        'square200' => array(
+            array(
+                'method' => 'Square',
+                'args' => array(
+                    'width' => 200,
+                )
+            ),
+            array(
+                'method' => 'Sharpen'
+            ),
+        ),
         'constrain200' => array(
             array(
                 'method' => 'Constrain',
