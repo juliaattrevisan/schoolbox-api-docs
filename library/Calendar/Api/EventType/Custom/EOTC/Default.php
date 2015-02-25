@@ -43,8 +43,8 @@ class Calendar_Api_EventType_Custom_EOTC_Default extends Calendar_Api_EventType_
         $collection = $this->getCalendarHandler()->getDayEvents($startTimestamp, $endTimestamp);
 
         /* Give the calendar_connector id so this event knows where it came from
-		 * This allows you to create an event detail screen in Mobile
-		 */
+         * This allows you to create an event detail screen in Mobile
+         */
         foreach ($collection as $current) {
             $current->setConnectorId($this->getConnectorId());
         }
@@ -67,7 +67,7 @@ class Calendar_Api_EventType_Custom_EOTC_Default extends Calendar_Api_EventType_
     }
 
     /* Getters/Setters
-	 */
+     */
 
     /**
      * Set calendar handler

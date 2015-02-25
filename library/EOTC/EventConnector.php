@@ -44,14 +44,14 @@ class EventConnector extends EventMapper
         $eventTypeMapper = $this->getJoinMapper('eventType');
 
         $query = "
-			SELECT
-				{$this->getColumnString('e')},
-				{$authorMapper->getColumnString('a')},
-				{$eventTypeMapper->getColumnString('t')}
-			FROM `{$this->table}` e
-			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
-			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
-		";
+            SELECT
+                {$this->getColumnString('e')},
+                {$authorMapper->getColumnString('a')},
+                {$eventTypeMapper->getColumnString('t')}
+            FROM `{$this->table}` e
+            LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
+            LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
+        ";
 
         $statement = $this->database->prepare($query);
         $statement->bindParam(":eventId", $eventId);
@@ -74,11 +74,11 @@ class EventConnector extends EventMapper
             $eventItem->setType($eventTypeItem);
 
             /* Accumulate campuses for this event
-			 */
+             */
             $eventItem->setCampusCollection($this->findCampuses($eventItem->getId()));
 
             /* For filters
-			 */
+             */
             $campusIds = array();
 
             foreach ($eventItem->getCampusCollection() as $currentCampus) {
@@ -86,8 +86,8 @@ class EventConnector extends EventMapper
             }
 
             /* Translate an \EOTC\Event type into a
-			 * Calendar_Event_Type_Abstract type
-			 */
+             * Calendar_Event_Type_Abstract type
+             */
             $event = new \Calendar_Event_Type_EOTC();
             $event->setAuthorName($eventItem->getAuthor()->getFullname());
             $event->setAuthorId($eventItem->getAuthor()->getId());
@@ -97,8 +97,8 @@ class EventConnector extends EventMapper
             $event->setCampusList(implode(',', $campusIds));
 
             /* EOTC Events are always of the type "EOTC" for usage
-			 * in calendar filters
-			 */
+             * in calendar filters
+             */
             $event->setType($eventItem->getType()->getId());
             $event->setTitle($eventItem->getTitle());
             $event->setAccess($eventItem->getAccess());
@@ -109,8 +109,8 @@ class EventConnector extends EventMapper
             $event->setAllDay(0);
 
             /* If you have write access to the event. Only superusers
-			 * and authors can modify an event
-			 */
+             * and authors can modify an event
+             */
             if ($this->getUser()->isSuperuser() || $this->getUser()->getId() == $event->getAuthorId()) {
                 $event->setIsEditable(true);
             } else {
@@ -165,21 +165,21 @@ class EventConnector extends EventMapper
         $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
 
         $query = "
-			SELECT
-				{$this->getColumnString('e')},
-				{$authorMapper->getColumnString('a')},
-				{$teacherInChargeMapper->getColumnString('c')},
-				{$eventTypeMapper->getColumnString('t')}
-			FROM `{$this->table}` e
-			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
-			LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
-			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
-			WHERE
-				DATE(e.endDate) >= DATE(FROM_UNIXTIME(:startTimestamp))
-				AND
-				DATE(e.startDate) <= DATE(FROM_UNIXTIME(:endTimestamp))
-			ORDER BY e.startTime, e.endTime
-		";
+            SELECT
+                {$this->getColumnString('e')},
+                {$authorMapper->getColumnString('a')},
+                {$teacherInChargeMapper->getColumnString('c')},
+                {$eventTypeMapper->getColumnString('t')}
+            FROM `{$this->table}` e
+            LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
+            LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
+            LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
+            WHERE
+                DATE(e.endDate) >= DATE(FROM_UNIXTIME(:startTimestamp))
+                AND
+                DATE(e.startDate) <= DATE(FROM_UNIXTIME(:endTimestamp))
+            ORDER BY e.startTime, e.endTime
+        ";
 
         $statement = $this->database->prepare($query);
         $statement->bindParam(":startTimestamp", $startTimestamp);
@@ -189,11 +189,11 @@ class EventConnector extends EventMapper
         $collection = new \Calendar_Event_Collection();
 
         /* Anyone in the EOTC permissions sytem can also see it
-		 * We don't need to iterate with this, since $user doesn't
-		 * actually change between iterations
-		 *
-		 * EOTC managers and superusers always see events
-		 */
+         * We don't need to iterate with this, since $user doesn't
+         * actually change between iterations
+         *
+         * EOTC managers and superusers always see events
+         */
         $isEOTCManager = false;
 
         $user = $this->getUser();
@@ -225,40 +225,40 @@ class EventConnector extends EventMapper
             $eventItem->setType($eventTypeItem);
 
             /* Accumulate campuses for this event
-			 */
+             */
             $eventItem->setCampusCollection($this->findCampuses($eventItem->getId()));
 
             /* Accumulate the metadata for this event
-			 * Only use the first record
-			 */
+             * Only use the first record
+             */
             $eventItem->setMetadata($this->findMetadata($eventItem->getId())->first());
 
             /* Determine current status
-			 */
+             */
             if ($eventItem->getMetadata()) {
                 $metadataMapper = new EventMetadataMapper();
                 $metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
 
                 /* Skip over rejected events so they don't display in the calendar grid,
-				 * obscuring your vision, occupying your real estate
-				 */
+                 * obscuring your vision, occupying your real estate
+                 */
                 if ($eventItem->getMetadata()->getStatus()->isRejected()) {
                     continue;
                 }
 
                 /* Accumulate staff attendees for this event
-				 */
+                 */
                 $allStaffAttendees = $metadataMapper->findStaffAttendees($eventItem->getMetadata()->getId());
                 $eventItem->getMetadata()->setStaffAttendees($allStaffAttendees);
 
                 /* Accumulate student attendees for this event
-				 */
+                 */
                 $allStudentAttendees = $metadataMapper->findStudentAttendees($eventItem->getMetadata()->getId());
                 $eventItem->getMetadata()->setStudentAttendees($allStudentAttendees);
             }
 
             /* For filters
-			 */
+             */
             $campusIds = array();
 
             foreach ($eventItem->getCampusCollection() as $currentCampus) {
@@ -266,17 +266,17 @@ class EventConnector extends EventMapper
             }
 
             /* Only present this event for a particular user if they are
-			 * superuser or attendee (teacher in charge, staff, student)
-			 * or are in the EOTC permissions system
-			 *
-			 * Save some hassle if you're already an EOTC manager, skip all
-			 * this other mapper stuff
-			 */
+             * superuser or attendee (teacher in charge, staff, student)
+             * or are in the EOTC permissions system
+             *
+             * Save some hassle if you're already an EOTC manager, skip all
+             * this other mapper stuff
+             */
             if (!$isEOTCManager) {
                 $isAttendee = false;
 
                 /* Superusers can always see it
-				 */
+                 */
                 if (!$isAttendee) {
                     if ($user->isSuperuser()) {
                         $isAttendee = true;
@@ -284,7 +284,7 @@ class EventConnector extends EventMapper
                 }
 
                 /* Creators can always see it
-				 */
+                 */
                 if (!$isAttendee) {
                     if ($eventItem->getAuthor()->getId() == $user->getId()) {
                         $isAttendee = true;
@@ -292,13 +292,13 @@ class EventConnector extends EventMapper
                 }
 
                 /* Teachers in Charge should see it in translucent form
-				 */
+                 */
                 if (!$isAttendee) {
                     $isAttendee = $user->getId() == $eventItem->getTeacherInCharge()->getId();
                 }
 
                 /* Staff members should see it in translucent form
-				 */
+                 */
                 if (!$isAttendee) {
                     foreach ($eventItem->getMetadata()->getStaffAttendees() as $currentStaff) {
                         if ($currentStaff->getId() == $user->getId()) {
@@ -309,8 +309,8 @@ class EventConnector extends EventMapper
                 }
 
                 /* Students should only see this event if it's Approved and
-				 * if they are assigned to it as an attendee
-				 */
+                 * if they are assigned to it as an attendee
+                 */
                 if (!$isAttendee) {
                     if ($eventItem->getMetadata()->getStatus()->isApproved()) {
                         foreach ($eventItem->getMetadata()->getStudentAttendees() as $currentStudent) {
@@ -337,8 +337,8 @@ class EventConnector extends EventMapper
                 $event->setCampusList(implode(',', $campusIds));
 
                 /* EOTC Events are always of the type "EOTC" for usage
-				 * in calendar filters
-				 */
+                 * in calendar filters
+                 */
                 $event->setType($eventItem->getType()->getId());
                 $event->setTitle($eventItem->getTitle());
                 $event->setAccess($eventItem->getAccess());
@@ -348,8 +348,8 @@ class EventConnector extends EventMapper
                 $event->setLocation($eventItem->getLocation());
 
                 /* If you have write access to the event. Only superusers
-				 * and authors can modify an event
-				 */
+                 * and authors can modify an event
+                 */
                 if ($user->isSuperuser() || $user->getId() == $event->getAuthorId()) {
                     $event->setIsEditable(true);
                 } else {
@@ -360,7 +360,7 @@ class EventConnector extends EventMapper
                 $event->setCompleted(0);
 
                 /* Custom data
-				 */
+                 */
                 $event->setCustom(
                     array(
                         'approved' => $eventItem->getMetadata()->getStatus()->isApproved()
