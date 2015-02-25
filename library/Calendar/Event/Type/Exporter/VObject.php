@@ -90,8 +90,9 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
 
             $vevent->add('SUMMARY', $currentEvent->getTitle());
 
-            return $this->getVCalendar()->add($vevent);
+            echo $vevent->serialize();
         }
+        return $this->getVCalendar();
     }
 
     /**
