@@ -8,6 +8,7 @@ var WebSocketClient = require('websocket').client;
 var settings = {
     host: '127.0.0.1',
     port: '8080',
+    path: 'websocket',
     debug: false,
     prefetch: 50,
     sessionFile: 'sessions.list',
@@ -229,7 +230,7 @@ rl.on('line', function(line) {
             if(settings.debug) { console.error("Connection with session "+line); }
             var client = new WebSocketClient();
             attach(client, line, new Date());
-            client.connect('ws://'+settings.host+':'+settings.port, null, null, {
+            client.connect('ws://'+settings.host+':'+settings.port+'/'+settings.path, null, null, {
                 'Cookie' : 'PHPSESSID='+line
             });
         }, t);
