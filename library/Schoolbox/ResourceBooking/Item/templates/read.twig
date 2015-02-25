@@ -92,8 +92,8 @@ $(document).ready(function() {
             loading: function(isLoading) {
                 if (isLoading === true) {
                     $('#calendar-loading').css({
-                        top: ($j('#calendar').height() - $j('#calendar-loading').height())/2,
-                        left: ($j('#calendar').width() - $j('#calendar-loading').width())/2
+                        top: ($('#calendar').height() - $('#calendar-loading').height())/2,
+                        left: ($('#calendar').width() - $('#calendar-loading').width())/2
                     }).show();
                 }
                 else {
