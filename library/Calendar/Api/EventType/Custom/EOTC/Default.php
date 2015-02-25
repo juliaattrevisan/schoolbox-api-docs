@@ -7,77 +7,83 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Calendar_Api_EventType_Custom_EOTC_Default extends Calendar_Api_EventType_Abstract {
+class Calendar_Api_EventType_Custom_EOTC_Default extends Calendar_Api_EventType_Abstract
+{
 
-	/**
-	 * A schoobox event handler instance
-	 *
-	 * @var \EOTC\EventConnector
-	 */
-	private $calendarHandler;
+    /**
+    * A schoobox event handler instance
+    *
+    * @var \EOTC\EventConnector
+    */
+    private $calendarHandler;
 
-	/**
-	 * Constructor
-	 *
-	 * @param $user
-	 * @param $config
-	 */
-	public function __construct($user, $config) {
-		$this->setUser($user);
-		$this->setCalendarHandler(new \EOTC\EventConnector($user));
-	}
+    /**
+    * Constructor
+    *
+    * @param $user
+    * @param $config
+    */
+    public function __construct($user, $config)
+    {
+        $this->setUser($user);
+        $this->setCalendarHandler(new \EOTC\EventConnector($user));
+    }
 
-	/**
-	 * Get day events from this data source
-	 *
-	 * @param int $startTimestamp
-	 * @param int $endTimestamp
-	 *
-	 * @return Calendar_Event_Collection
-	 */
-	public function getEvents($startTimestamp, $endTimestamp) {
-		$collection = $this->getCalendarHandler()->getDayEvents($startTimestamp, $endTimestamp);
+    /**
+    * Get day events from this data source
+    *
+    * @param int $startTimestamp
+    * @param int $endTimestamp
+    *
+    * @return Calendar_Event_Collection
+    */
+    public function getEvents($startTimestamp, $endTimestamp)
+    {
+        $collection = $this->getCalendarHandler()->getDayEvents($startTimestamp, $endTimestamp);
 
-		/* Give the calendar_connector id so this event knows where it came from
+        /* Give the calendar_connector id so this event knows where it came from
 		 * This allows you to create an event detail screen in Mobile
 		 */
-		foreach ($collection as $current) {
-			$current->setConnectorId($this->getConnectorId());
-		}
+        foreach ($collection as $current) {
+            $current->setConnectorId($this->getConnectorId());
+        }
 
-		return $collection;
-	}
+        return $collection;
+    }
 
-	/**
-	 * Find a particular event from this source
-	 *
-	 * @param $eventId
-	 * @return Calendar_Event_Collection
+    /**
+    * Find a particular event from this source
+    *
+    * @param $eventId
+    * @return Calendar_Event_Collection
+    */
+    public function getEvent($eventId)
+    {
+        $collection = $this->getCalendarHandler()->getEvent($eventId);
+
+        return $collection;
+    }
+
+    /* Getters/Setters
 	 */
-	public function getEvent($eventId) {
-		$collection = $this->getCalendarHandler()->getEvent($eventId);
 
-		return $collection;
-	}
+    /**
+    * Set calendar handler
+    *
+    * @param \EOTC\EventConnector $calendarHandler
+    */
+    public function setCalendarHandler($calendarHandler)
+    {
+        $this->calendarHandler = $calendarHandler;
+    }
 
-	/* Getters/Setters
-	 */
-
-	/**
-	 * Set calendar handler
-	 *
-	 * @param \EOTC\EventConnector $calendarHandler
-	 */
-	public function setCalendarHandler($calendarHandler) {
-		$this->calendarHandler = $calendarHandler;
-	}
-
-	/**
-	 * Get calendar handler
-	 *
-	 * @return \EOTC\EventConnector
-	 */
-	public function getCalendarHandler() {
-		return $this->calendarHandler;
-	}
+    /**
+    * Get calendar handler
+    *
+    * @return \EOTC\EventConnector
+    */
+    public function getCalendarHandler()
+    {
+        return $this->calendarHandler;
+    }
 }
