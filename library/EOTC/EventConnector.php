@@ -109,7 +109,7 @@ class EventConnector extends EventMapper {
 			/* If you have write access to the event. Only superusers
 			 * and authors can modify an event
 			 */
-			if ($_SESSION['user']->isSuperuser() || $_SESSION['user']->getId() == $event->getAuthorId()) {
+			if ($this->getUser()->isSuperuser() || $this->getUser()->getId() == $event->getAuthorId()) {
 				$event->setIsEditable(true);
 			}
 			else {
@@ -350,7 +350,7 @@ class EventConnector extends EventMapper {
 				/* If you have write access to the event. Only superusers
 				 * and authors can modify an event
 				 */
-				if ($_SESSION['user']->isSuperuser() || $_SESSION['user']->getId() == $event->getAuthorId()) {
+				if ($this->getUser()->isSuperuser() || $this->getUser()->getId() == $event->getAuthorId()) {
 					$event->setIsEditable(true);
 				}
 				else {
