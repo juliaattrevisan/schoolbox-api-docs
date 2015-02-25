@@ -22,7 +22,7 @@ if (!empty($_POST)) {
         error(112);
     }
 
-    if (!$surveyHandler->isOwner($survey['assess_id']) && !($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
+    if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
         error(130);
     }
 

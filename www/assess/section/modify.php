@@ -18,7 +18,7 @@ if (!empty($_POST)) {
         error(112);
     }
 
-    if (!$assessHandler->isOwner($assess['assess_id']) && !($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
         error(130);
     }
 
