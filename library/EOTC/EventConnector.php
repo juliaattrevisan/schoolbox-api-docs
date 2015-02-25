@@ -17,8 +17,23 @@ use Schoolbox\User;
 class EventConnector extends EventMapper {
 
 	/**
+	 * The user we're getting EOTC events for
+	 *
+	 * @var User
+	 */
+	protected $user;
+
+	/**
+	 * @param User $user
+	 */
+	public function __construct(User $user)
+	{
+		$this->user = $user;
+	}
+
+	/**
 	 * Get details of a single event (used in Mobile)
-	 * 
+	 *
 	 * @param $eventId
 	 * @return \Calendar_Event_Collection
 	 */
@@ -369,5 +384,13 @@ class EventConnector extends EventMapper {
 		}
 
 		return $collection;
+	}
+
+	/**
+	 * @return User
+	 */
+	public function getUser()
+	{
+		return $this->user;
 	}
 } 
