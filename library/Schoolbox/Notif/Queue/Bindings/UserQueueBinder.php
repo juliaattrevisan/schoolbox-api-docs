@@ -145,7 +145,7 @@ class UserQueueBinder
 
     /**
      * Destroy all routing bindings for the given user.
-     * Returns the number of bindings deleted, or -1 on error.
+     * Returns the number of bindings deleted, or 0 on error.
      *
      * @return int
      */
@@ -203,9 +203,9 @@ class UserQueueBinder
                 continue;
             }
 
-            $username = substr($binding['destination_name'], strlen($prefix));
+            $userId = substr($binding['destination_name'], strlen($prefix));
 
-            $this->existingBindings[$username][] = $binding['routing_key'];
+            $this->existingBindings[$userId][] = $binding['routing_key'];
 
             ++$count;
         }
@@ -263,5 +263,44 @@ class UserQueueBinder
         }
     }
 
+
+    /**
+     * @param array $currentUserIds - any user NOT in this list will have their bindings destroyed
+     */
+    public function destroyStaleBindings(array $currentUserIds)
+    {
+        $this->cacheExistingBindings();
+
+        $queueCache = array();
+
+        // collect a cache of current AMQP queues
+        foreach ($this->rabbitCtrl->listQueues(array('name')) as $queue) {
+            if (preg_match('`\\.u\\.(\\d+)\\.`', $queue['name'], $matches)) {
+                $queueCache[$matches[1]][] = $queue['name'];
+            }
+        }
+
+        // remove current users from the list
+        foreach ($currentUserIds as $currentUserId) {
+            unset($this->existingBindings[$currentUserId]);
+        }
+
+        foreach (array_keys($this->existingBindings) as $expiredUserId) {
+            // cheat our way around self::validate()
+            $this->userId = $expiredUserId;
+            $this->bindings = array('fake');
+
+            // remove this user's bindings
+            $this->destroyUserBindings();
+
+            // aaaaaand delete their queues for good measure
+            if (isset($queueCache[$expiredUserId])) {
+                foreach ($queueCache[$expiredUserId] as $queue) {
+                    $this->amqp->deleteQueue($queue);
+                }
+            }
+
+        }
+    }
 
 }
