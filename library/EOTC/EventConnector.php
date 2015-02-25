@@ -153,12 +153,11 @@ class EventConnector extends EventMapper {
 	/**
 	 * Get events within a particular time span
 	 *
-	 * @param User $user
 	 * @param $startTimestamp
 	 * @param $endTimestamp
 	 * @return \Calendar_Event_Collection
 	 */
-	public function getDayEvents($user, $startTimestamp, $endTimestamp) {
+	public function getDayEvents($startTimestamp, $endTimestamp) {
 		$authorMapper = $this->getJoinMapper('author');
 		$eventTypeMapper = $this->getJoinMapper('eventType');
 		$teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
