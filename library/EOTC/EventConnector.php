@@ -195,6 +195,7 @@ class EventConnector extends EventMapper {
 		 */
 		$isEOTCManager = false;
 
+		$user = $this->getUser();
 		if ($user->isSuperuser()) {
 			$isEOTCManager = true;
 		}
@@ -350,7 +351,7 @@ class EventConnector extends EventMapper {
 				/* If you have write access to the event. Only superusers
 				 * and authors can modify an event
 				 */
-				if ($this->getUser()->isSuperuser() || $this->getUser()->getId() == $event->getAuthorId()) {
+				if ($user->isSuperuser() || $user->getId() == $event->getAuthorId()) {
 					$event->setIsEditable(true);
 				}
 				else {
