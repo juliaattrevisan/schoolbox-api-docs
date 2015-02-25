@@ -239,6 +239,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
                 $timetable[$x]['periodEnd'] = $definition['end'][$x];
                 $timetable[$x]['periodNumber'] = $definition['number'][$x];
                 $timetable[$x]['periodSequence'] = $definition['sequence'][$x];
+                $timetable[$x]['class'] = array();
             }
             /* With the result set obtained above, append actual class
              * details to the period definition established in the previous loop
@@ -261,12 +262,13 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
                         /* If this class occurs in this period, append its details
                          */
                         if ($timetable[$x]['periodNumber'] == $currentClass['Identifier']) {
-                            $timetable[$x]['class'][0]['description'] = $currentClass['ClassDescription'];
-                            $timetable[$x]['class'][0]['code'] = $currentClass['ClassCode'];
-                            $timetable[$x]['class'][0]['room'] = $currentClass['ClassRoom'];
-                            $timetable[$x]['class'][0]['staffID'] = $externalUserId;
-                            $timetable[$x]['class'][0]['dayNumber'] = $currentClass['DayNumber'];
-                            array_shift($allClasses);
+                            $timetable[$x]['class'][] = array(
+                                'description' => $currentClass['ClassDescription'],
+                                'code'        => $currentClass['ClassCode'],
+                                'room'        => $currentClass['ClassRoom'],
+                                'staffID'     => $externalUserId,
+                                'dayNumber'   => $currentClass['DayNumber'],
+                            );
                             break;
                         }
                     }
@@ -307,7 +309,10 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
          */
         for ($period = 0; $period < count($allDayTimetables[0]); $period++) {
             for ($day = 0; $day < $this->getCycleLength(); $day++) {
-                $timetable[$period]['day'][$day][0] = $allDayTimetables[$day][$period]['class'][0];
+                $timetable[$period]['day'][$day] = array();
+                if (!empty($allDayTimetables[$day][$period]['class'][0])) {
+                    $timetable[$period]['day'][$day][] = $allDayTimetables[$day][$period]['class'][0];
+                }
                 /* TODO: Have these use convert(varchar(10), theDate, 120) in stored proc
                  */
                 $start = substr($allDayTimetables[0][$period]['periodStart'], 0, 5);
