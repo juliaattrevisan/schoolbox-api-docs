@@ -1,9 +1,22 @@
 {% if paginator.pageCount > 1 %}
     <ul class="{{ class }}">
-        <li><a href="{{ paginator.urlForPage(1) }}">&lt;</a></li>
+        {# back/forward page links #}
+        <li><a href="{{ paginator.urlForPage(1) }}"
+               title="First Page"
+               {% if page == 1 %}disabled{% endif %} >«</a></li>
+        <li><a href="{{ paginator.urlForPage(max(page-1, 1)) }}"
+               title="Next Page"
+               {% if page == 1 %}disabled{% endif %}>‹</a></li>
         {% for currentPage, url in paginator.pageUrls %}
-            <li><a href="{{ url }}" {% if currentPage == page %}class="current"{% endif %}>{{ currentPage }}</a></li>
+            <li><a href="{{ url }}"
+                   title="Page {{ currentPage }}"
+                   {% if currentPage == page %}class="current"{% endif %}>{{ currentPage }}</a></li>
         {% endfor %}
-        <li><a href="{{ paginator.urlForPage(paginator.pageCount) }}">&gt;</a></li>
+        <li><a href="{{ paginator.urlForPage(min(page+1, paginator.pageCount)) }}"
+               title="Previous Page"
+               {% if page == paginator.pageCount %}disabled{% endif %}>›</a></li>
+        <li><a href="{{ paginator.urlForPage(paginator.pageCount) }}"
+               title="Last Page"
+               {% if page == paginator.pageCount %}disabled{% endif %}>»</a></li>
     </ul>
 {% endif %}
