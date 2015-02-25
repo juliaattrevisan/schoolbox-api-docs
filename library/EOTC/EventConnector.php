@@ -17,29 +17,30 @@ class EventConnector extends EventMapper
 {
 
     /**
-    * The user we're getting EOTC events for
-    *
-    * @var User
-    */
+     * The user we're getting EOTC events for
+     *
+     * @var User
+     */
     protected $user;
 
     /**
-    * @param User $user
-    */
+     * @param User $user
+     */
     public function __construct(User $user)
     {
         $this->user = $user;
     }
 
     /**
-    * Get details of a single event (used in Mobile)
-    *
-    * @param $eventId
-    * @return \Calendar_Event_Collection
-    */
+     * Get details of a single event (used in Mobile)
+     *
+     * @param $eventId
+     *
+     * @return \Calendar_Event_Collection
+     */
     public function getEvent($eventId)
     {
-        $authorMapper = $this->getJoinMapper('author');
+        $authorMapper    = $this->getJoinMapper('author');
         $eventTypeMapper = $this->getJoinMapper('eventType');
 
         $query = "
@@ -135,7 +136,7 @@ class EventConnector extends EventMapper
             if ($eventItem->getMetadata()->getStatus()->isApproved()) {
                 $publishDate = new \Alaress_Date_Format(0, 'U');
             } else {
-                $publishDate = new \Alaress_Date_Format($_SERVER['REQUEST_TIME']+1, 'U');
+                $publishDate = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'] + 1, 'U');
             }
 
             $event->setPublishDate($publishDate);
@@ -150,16 +151,17 @@ class EventConnector extends EventMapper
     }
 
     /**
-    * Get events within a particular time span
-    *
-    * @param $startTimestamp
-    * @param $endTimestamp
-    * @return \Calendar_Event_Collection
-    */
+     * Get events within a particular time span
+     *
+     * @param $startTimestamp
+     * @param $endTimestamp
+     *
+     * @return \Calendar_Event_Collection
+     */
     public function getDayEvents($startTimestamp, $endTimestamp)
     {
-        $authorMapper = $this->getJoinMapper('author');
-        $eventTypeMapper = $this->getJoinMapper('eventType');
+        $authorMapper          = $this->getJoinMapper('author');
+        $eventTypeMapper       = $this->getJoinMapper('eventType');
         $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
 
         $query = "
@@ -199,7 +201,7 @@ class EventConnector extends EventMapper
             $isEOTCManager = true;
         } else {
             $permissionMapper = new EventPermissionMapper();
-            $allPermissions = $permissionMapper->findByUser($user);
+            $allPermissions   = $permissionMapper->findByUser($user);
 
             if ($allPermissions->count()) {
                 $isEOTCManager = true;
@@ -322,9 +324,9 @@ class EventConnector extends EventMapper
             }
 
             if ($isEOTCManager || $isAttendee) {
-/* Translate an \EOTC\Event type into a
-				 * Calendar_Event_Type_Abstract type
-				 */
+                /* Translate an \EOTC\Event type into a
+                                 * Calendar_Event_Type_Abstract type
+                                 */
                 $event = new \Calendar_Event_Type_EOTC();
                 $event->setAuthorName($eventItem->getAuthor()->getFullname());
                 $event->setAuthorId($eventItem->getAuthor()->getId());
@@ -359,9 +361,11 @@ class EventConnector extends EventMapper
 
                 /* Custom data
 				 */
-                $event->setCustom(array(
-                    'approved' => $eventItem->getMetadata()->getStatus()->isApproved()
-                ));
+                $event->setCustom(
+                    array(
+                        'approved' => $eventItem->getMetadata()->getStatus()->isApproved()
+                    )
+                );
 
                 /* Derive publishDate settings for front-end classes
                  * If it's approved, set the publishDate in the past
@@ -370,7 +374,7 @@ class EventConnector extends EventMapper
                 if ($eventItem->getMetadata()->getStatus()->isApproved()) {
                     $publishDate = new \Alaress_Date_Format(0, 'U');
                 } else {
-                    $publishDate = new \Alaress_Date_Format($_SERVER['REQUEST_TIME']+1, 'U');
+                    $publishDate = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'] + 1, 'U');
                 }
 
                 $event->setPublishDate($publishDate);
@@ -383,8 +387,8 @@ class EventConnector extends EventMapper
     }
 
     /**
-    * @return User
-    */
+     * @return User
+     */
     public function getUser()
     {
         return $this->user;
