@@ -136,7 +136,7 @@ class Csv extends Base {
                 $output[] = array(
                     'name' => \Scrub::text($name),
                     'status' => 'Not Added',
-                    'error' => 'Invalid start date and/or times (use 24-hour format)',
+                    'error' => 'Invalid start date and/or times (use 24-hour h:m format)',
                 );
 
                 continue;
@@ -156,7 +156,7 @@ class Csv extends Base {
                 $output[] = array(
                     'name' => \Scrub::text($name),
                     'status' => 'Not Added',
-                    'error' => 'Invalid finish date and/or times (use 24-hour format)',
+                    'error' => 'Invalid finish date and/or times (use 24-hour h:m format)',
                 );
 
                 continue;
