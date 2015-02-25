@@ -302,8 +302,8 @@ class External_Synergetic_User implements External_UserInterface
                 FROM SynergyOne.dbo.vStudents vStudents
                     LEFT JOIN CommunityAlerts
                         ON CommunityAlerts.ID = StudentID
-                        AND (CommunityAlerts.AlertDateFrom IS NULL OR CommunityAlerts.AlertDateFrom <= GETDATE())
-                        AND (CommunityAlerts.AlertDateTo IS NULL OR CommunityAlerts.AlertDateTo >= GETDATE())
+                        AND (CommunityAlerts.AlertDateFrom IS NULL OR CommunityAlerts.AlertDateFrom <= CAST(GETDATE() AS date))
+                        AND (CommunityAlerts.AlertDateTo IS NULL OR CommunityAlerts.AlertDateTo >= CAST(GETDATE() AS date))
                     LEFT JOIN luForm ON vStudents.StudentForm = luForm.Code
                     LEFT JOIN luTutor ON vStudents.StudentTutor = luTutor.Code
                     LEFT JOIN luYearLevel ON vStudents.StudentCampus = luYearLevel.Campus
