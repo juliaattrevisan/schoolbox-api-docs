@@ -47,10 +47,10 @@ class Component_Homepage_Statistics_PageVisitsController extends Component_Homep
             ORDER BY `date` ASC, group_type ASC;"
         );
 
-        $stmt->execute(array('cid' => $this->getContext('id')));
+        $stmt->execute(array('cid' => $this->getContext()->getId()));
 
         while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $adf = new Alaress_Date_Format($row['date'], 'y-m-d');
+            $adf = new Alaress_Date_Format($row['date'], 'Y-m-d');
             $time = (int)($adf->getUnixTimestamp() / 86400);
             $data[$row['group_type']][$time] = $row['hcount'];
 

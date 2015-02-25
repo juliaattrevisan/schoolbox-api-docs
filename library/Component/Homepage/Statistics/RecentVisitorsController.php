@@ -37,7 +37,7 @@ class Component_Homepage_Statistics_RecentVisitorsController extends Component_H
             $groupFilter
             ORDER BY `datetime` DESC"
         );
-        $stmt->execute(array('catID' => $this->getContext('id')));
+        $stmt->execute(array('catID' => $this->getContext()->getId()));
 
         $visitors = array();
         while ($user = $stmt->fetch(PDO::FETCH_ASSOC)) {

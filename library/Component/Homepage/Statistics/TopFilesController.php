@@ -35,7 +35,7 @@ class Component_Homepage_Statistics_TopFilesController extends Component_Homepag
             ORDER BY `count` DESC"
         );
 
-        $stmt->execute(array('cid' => $this->getContext('id')));
+        $stmt->execute(array('cid' => $this->getContext()->getId()));
 
         $i = 0;
         while ($file = $stmt->fetch(PDO::FETCH_ASSOC)) {
