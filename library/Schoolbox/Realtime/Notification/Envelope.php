@@ -12,7 +12,7 @@ namespace Schoolbox\Realtime\Notification;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Instance\InstanceBundle;
 use Schoolbox\Campus;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Category;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\UserAccess;

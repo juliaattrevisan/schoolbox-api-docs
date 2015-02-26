@@ -759,7 +759,7 @@ class Category extends DeprecatedModel
         /* Delete all links
          */
         try {
-            $categoryMapper = new \Schoolbox\Resource\Category();
+            $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
             $category = $categoryMapper->findById($categoryID);
         } catch (\Exception $e) {
             error(13);

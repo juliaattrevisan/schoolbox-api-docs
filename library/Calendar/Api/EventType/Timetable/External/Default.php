@@ -1,4 +1,5 @@
 <?php
+use Schoolbox\Resource\Folder\Model as Category;
 
 /**
  * Event type that represents events from the external timetable handler.
@@ -100,7 +101,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                                 $event->setAuthorId($period['staff']->getId());
                                 $event->setAuthorName($period['staff']->formatName());
                             }
-                            if ($period['category'] instanceof Schoolbox\Resource\Category) {
+                            if ($period['category'] instanceof Category) {
                                 // Put this into a category
                                 $event->setCategoryId($period['category']->getId());
                                 $event->setCategoryName($period['category']->getName());

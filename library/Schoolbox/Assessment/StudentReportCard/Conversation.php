@@ -11,7 +11,7 @@ namespace Schoolbox\Assessment\StudentReportCard;
 
 
 use Schoolbox\Collection;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Category;
 use Schoolbox\Role;
 use Schoolbox\User;
 

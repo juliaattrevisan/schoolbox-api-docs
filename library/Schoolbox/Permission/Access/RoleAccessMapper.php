@@ -11,10 +11,8 @@ namespace Schoolbox\Permission\Access;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Notif;
-use Schoolbox\Realtime\Schedule\Event;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Category;
+use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 use Schoolbox\RoleMapper;
 
 class RoleAccessMapper extends Mapper

@@ -9,7 +9,7 @@
 namespace Schoolbox\Mobile\Timetable;
 
 use Schoolbox\Mobile\Generic;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 use Response_HTTP;
 use Config;
 use Exception_Schoolbox;

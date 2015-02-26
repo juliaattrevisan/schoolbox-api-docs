@@ -1,4 +1,7 @@
 <?php
+use Schoolbox\Resource\Folder\Model as Category;
+use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
+
 /**
  * Event type that represents events for a room.
  *
@@ -139,14 +142,14 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                 $categoryCode = $room['ClassCode'];
                 if (!(array_key_exists($categoryCode, $categoryList))) {
                     try {
-                        $categoryList[$categoryCode] = \Schoolbox\Resource\CategoryMapper::getInstance()->findByCode(
+                        $categoryList[$categoryCode] = CategoryMapper::getInstance()->findByCode(
                             $categoryCode
                         );
                     } catch (Schoolbox\Mapper\Exception $e) {
                         $categoryList[$categoryCode] = null;
                     }
                 }
-                if ($categoryList[$categoryCode] instanceof \Schoolbox\Resource\Category) {
+                if ($categoryList[$categoryCode] instanceof Category) {
                     $event->setCategoryId($categoryList[$categoryCode]->getId());
                     $event->setCategoryName($categoryList[$categoryCode]->getName());
                 }

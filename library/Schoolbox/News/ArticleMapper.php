@@ -16,9 +16,9 @@ use Schoolbox\Column\Model;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Searchable;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Category;
 use Schoolbox\Resource\Category\NewsMapper;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 use Schoolbox\User;
 
 class ArticleMapper extends Mapper implements Searchable

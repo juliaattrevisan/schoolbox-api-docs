@@ -15,6 +15,7 @@ use Schoolbox\Mapper\Searchable;
 use Schoolbox\Notif\Notif;
 use Schoolbox\User;
 use Schoolbox\Resource\Link\Search\Result;
+use Schoolbox\Resource\Folder\Model as Category;
 
 class LinkMapper extends Mapper implements Searchable
 {

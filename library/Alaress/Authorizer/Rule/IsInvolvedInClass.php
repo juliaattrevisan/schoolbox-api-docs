@@ -12,7 +12,7 @@ namespace Alaress\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use External_UserInterface;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Category;
 use Schoolbox\User;
 
 class IsInvolvedInClass implements IAuthorizationRule

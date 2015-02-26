@@ -11,7 +11,7 @@ namespace Schoolbox\Resource;
 
 use Schoolbox\Mapper;
 use Schoolbox\User;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Category;
 use Schoolbox\Collection;
 
 class CategoryLogMapper extends Mapper

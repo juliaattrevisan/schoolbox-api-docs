@@ -11,8 +11,8 @@
 namespace Schoolbox\Resource\Search\Renderer;
 
 use Schoolbox\Resource\Search\MapperResult\Base as MapperResult;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Category;
+use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 
 abstract class Base
 {

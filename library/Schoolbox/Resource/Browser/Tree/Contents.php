@@ -12,7 +12,7 @@
 
 namespace Schoolbox\Resource\Browser\Tree;
 
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Category;
 use Schoolbox\Collection;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\Resource\Browser\Tree\Node;

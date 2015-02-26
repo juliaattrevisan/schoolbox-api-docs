@@ -13,6 +13,7 @@ namespace Schoolbox\Realtime\Digest;
 use Alaress\Scheduler\CronScheduler;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
+use Alaress\WorkerCrew\Worker\Worker;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
