@@ -10,7 +10,7 @@
 
 namespace Schoolbox\SubjectList;
 
-use \Schoolbox\Resource\CategoryCode;
+use \Schoolbox\Resource\Folder\Code\Model as CategoryCode;
 
 class UserProfile extends SubjectListAbstract
 {

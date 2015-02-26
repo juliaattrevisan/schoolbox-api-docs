@@ -16,8 +16,6 @@ use External_UserInterface;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\CategoryCode;
-use Schoolbox\Resource\CategoryCodeMapper;
 use Schoolbox\Resource\FileMapper;
 use Schoolbox\Resource\Folder\Search\Result;
 use Schoolbox\Resource\LinkMapper;
@@ -66,7 +64,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         $this->hasJoin(
             'codes', array(
                 'multiple'  => true,
-                'mapper'    => '\\Schoolbox\\Resource\\CategoryCodeMapper',
+                'mapper'    => '\\Schoolbox\\Resource\\Folder\\Code\\Mapper',
                 'this_key'  => 'id',
                 'other_key' => 'categoryID',
             )
@@ -156,7 +154,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
     /**
      * Find all images for a category
      *
-     * @param \Schoolbox\Resource\Category $category
+     * @param Model $category
      * @param int $limit
      * @param bool $excludeWork
      * @return mixed
@@ -207,13 +205,13 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         $codeList = $model->getCodes()->getColumnValues('code');
 
 
-        $collisions = CategoryCodeMapper::getInstance()->findByColumn('code', $codeList);
+        $collisions = Code\Mapper::getInstance()->findByColumn('code', $codeList);
 
         // retain any codes that do NOT match the given model
         $id = $model->getId();
         $collisions = $collisions->filterByCallback(
             function ($code) use ($id) {
-                /** @var CategoryCode $code */
+                /** @var Code\Model $code */
                 return $code->getCategory()->getId() != $id;
             }
         );
@@ -241,8 +239,8 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
         // first drop the previous code(s) connected to this category
         try {
-            CategoryCodeMapper::getInstance()->delete(
-                CategoryCodeMapper::getInstance()->findByColumn('categoryID', $model->getId())
+            Code\Mapper::getInstance()->delete(
+                Code\Mapper::getInstance()->findByColumn('categoryID', $model->getId())
             );
         } catch (\Exception $e) {
         }
@@ -254,7 +252,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
         // persist the Code objects
 
-        CategoryCodeMapper::getInstance()->save($model->getCodes());
+        Code\Mapper::getInstance()->save($model->getCodes());
 
         return true;
     }
@@ -707,7 +705,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
         /* Soft delete all category codes
          */
-        $codeMapper = new CategoryCodeMapper();
+        $codeMapper = new Code\Mapper();
         $allCodes = $codeMapper->findForCategory($category->getId());
 
         foreach ($allCodes as $currentCode) {
