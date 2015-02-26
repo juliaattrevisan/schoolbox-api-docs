@@ -16,6 +16,37 @@
 class Alaress_Date_Strategy_V52 extends Alaress_Date_Strategy_Abstract {
 
 	/**
+	 * Ported properties from Alaress_Date_Relative
+	 */
+
+	/**
+	 * @var string
+	 */
+	private $prefix = 'on';
+
+	/**
+	 * @var string
+	 */
+	private $suffix = 'ago';
+
+	/**
+	 * @var int
+	 */
+	private $now = 0;
+
+	/**
+	 * @var array
+	 */
+	private $intervals = array(
+		array(60, 'second'),
+		array(60, 'minute'),
+		array(24, 'hour'),
+		array(7,  'day'),
+		array(4.38,  'week'),
+		array(12, 'month'),
+	);
+
+	/**
 	 * Transform the datetime into the format specified in the config table
 	 * Do some error checking
 	 *
@@ -42,7 +73,119 @@ class Alaress_Date_Strategy_V52 extends Alaress_Date_Strategy_Abstract {
 	 */
 	public function getRelativeTime($now = null, $stripModifiers = false)
 	{
-		// TODO: Implement getRelativeTime() method.
+		$currentTime = null;
+		if ($now instanceof DateTime || $now instanceof DateTimeInterface) {
+			// now should be something understandable as a datetime
+			$currentTime = $now->getTimestamp();
+		} elseif ($now instanceof Alaress_Date_Format) {
+			$currentTime = $now->getUnixTimestamp();
+		}
+		if (!isset($time)) {
+			// error out
+			$currentTime = time();
+		}
+
+//		$currentTime = $this->getNow();
+//		/* If Now is zero, assume you want to get the period between the event
+//		 * happening and the current moment in time
+//		 */
+//		if (!$currentTime) {
+//			$currentTime = time();
+//		}
+
+		/* Provide return string
+		 */
+		$diff = $currentTime - $this->getUnixTimestamp();
+
+		if($diff > 0) {
+			return $this->getRelativePast($diff, $stripModifiers);
+		}
+		elseif($diff < 0) {
+			return $this->getRelativeFuture($diff, $stripModifiers);
+		}
+		else {
+			return 'just then';
+		}
+	}
+
+	/**
+	 * Output a relative string from the past
+	 * @param $diff
+	 * @return string
+	 */
+	private function getRelativePast($diff, $stripModifiers = false) {
+		$suffix = $stripModifiers ? '' : $this->suffix;
+		for($i = 0; $i < count($this->intervals); ++$i) {
+			if ($diff < $this->intervals[$i][0]) {
+				return sprintf('%s %s%s %s', $diff, $this->intervals[$i][1], $this->plural($diff), $suffix);
+			}
+			$diff = round($diff / $this->intervals[$i][0]);
+
+			// exceptional cases
+			if($i == 2) {
+				if ($diff < 2) {
+					return 'Yesterday';
+				}
+			}
+			elseif($i == 3) {
+				if ($diff < 2) {
+					return 'Last week';
+				}
+			}
+		}
+
+		// fall back to full format
+		return ($stripModifiers ? '' : $this->prefix) . ' ' . $this->getDateOnly();
+	}
+
+	/**
+	 * Output a relative time in the future
+	 * @param $diff
+	 * @return string
+	 */
+	private function getRelativeFuture($diff, $stripModifiers = false) {
+		// ensure positivity
+		if($diff < 0) {
+			$diff = 0 - $diff;
+		}
+
+		for($i = 0; $i < count($this->intervals); ++$i) {
+			if ($diff < $this->intervals[$i][0]) {
+				return sprintf('in %s %s%s', $diff, $this->intervals[$i][1], $this->plural($diff));
+			}
+			$diff = round($diff / $this->intervals[$i][0]);
+
+			// exceptional cases
+			if($i == 2) {
+				if ($diff < 2) {
+					return 'Tomorrow';
+				}
+				elseif($diff < 7) {
+					$dow = $this->getUsingFormat('l');
+					return 'on ' . $dow;
+				}
+				elseif($diff < 14) {
+					$dow = $this->getUsingFormat('l');
+					return 'next ' . $dow;
+				}
+			}
+		}
+
+		// fall back to full format
+		return ($stripModifiers ? '' : $this->prefix) . ' ' . $this->getDateOnly();
+	}
+
+	/**
+	 * Pluralise something. Used in getRelativeTime()
+	 *
+	 * @param  $num
+	 * @return string
+	 */
+	private function plural($num) {
+		if ($num != 1) {
+			return 's';
+		}
+
 		return '';
 	}
 }

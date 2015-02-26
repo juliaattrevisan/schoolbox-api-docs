@@ -123,7 +123,12 @@ class Alaress_Date_Strategy_LaravelDate extends Alaress_Date_Strategy_DateTime
      */
     public function getRelativeTime($now = null, $stripModifiers = false)
     {
-        return LaravelDate::now()->diffForHumans($now, $stripModifiers);
+        // Convert now to a carbon object
+        try {
+            return $this->getDateTimeObject()->diffForHumans($this->buildLaravelDate($now), $stripModifiers);
+        } catch (InvalidArgumentException $e) {
+            return $this->getDateTimeObject()->diffForHumans(null, $stripModifiers);
+        }
     }
 
     /**
