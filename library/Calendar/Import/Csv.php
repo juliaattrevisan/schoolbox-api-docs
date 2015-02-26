@@ -86,8 +86,8 @@ class Csv extends Base {
 
 			//
 			// Start or finish time empty? Default to start and end of day.
-			$start_time  = strlen(trim($start_time))  ? $start_time  : '00:00:00';
-			$finish_time = strlen(trim($finish_time)) ? $finish_time : '23:59:59';
+			$start_time  = strlen(trim($start_time))  ? $start_time  : '00:00';
+			$finish_time = strlen(trim($finish_time)) ? $finish_time : '23:59';
 
 			//
 			// All day? if "all day" flag is set.
@@ -114,22 +114,54 @@ class Csv extends Base {
 				continue;
 			}
 
-            /* Check validity of event settings e.g. datetimes
+            /* 24 hour time enforcement
+             * Check validity of event settings e.g. datetimes
+             *
+             * These should be put into Alaress_Date_Format, I think,
+             * rather than floating around in here. But Boomerang's got
+             * some stuff coming in fifteen so
              */
-            if (!preg_match('/\d\d:\d\d:\d\d/', $start_time)) {
-                $startDatetime = new \Alaress_Date_Format($start_date . ' ' . $start_time, 'd/m/y H:i:s');
+
+            /* Default value for all-day events
+             */
+            if (preg_match('#(00:00:00)|(23:59:59)#', $start_time)) {
+                $startDatetime = new \Alaress_Date_Format("{$start_date} {$start_time}", 'd/m/Y H:i:s');
+            }
+            /* Prescribed 24-hour format from csv, append :00 seconds
+             */
+            elseif (preg_match('#^((0\d)|(1\d)|(2[0-3])):([0-5]\d)$#', $start_time)) {
+                $startDatetime = new \Alaress_Date_Format("{$start_date} {$start_time}:00", 'd/m/Y H:i:s');
             }
             else {
-                $startDatetime = new \Alaress_Date_Format($start_date . ' ' . $start_time . ':00', 'd/m/y H:i:s');
+                $output[] = array(
+                    'name' => \Scrub::text($name),
+                    'status' => 'Not Added',
+                    'error' => 'Invalid start date and/or times (use 24-hour h:m format)',
+                );
+
+                continue;
             }
 
-            if (!preg_match('/\d\d:\d\d:\d\d/', $finish_time)) {
-                $finishDatetime = new \Alaress_Date_Format($finish_date . ' ' . $finish_time, 'd/m/y H:i:s');
+            /* Default value for all-day events
+             */
+            if (preg_match('#(00:00:00)|(23:59:59)#', $finish_time)) {
+                $finishDatetime = new \Alaress_Date_Format("{$finish_date} {$finish_time}", 'd/m/Y H:i:s');
+            }
+            /* Prescribed 24-hour format from csv, append :00 seconds
+             */
+            elseif (preg_match('#^((0\d)|(1\d)|(2[0-3])):([0-5]\d)$#', $finish_time)) {
+                $finishDatetime = new \Alaress_Date_Format("{$finish_date} {$finish_time}:00", 'd/m/Y H:i:s');
             }
             else {
-                $finishDatetime = new \Alaress_Date_Format($finish_date . ' ' . $finish_time . ':00', 'd/m/y H:i:s');
-            }
+                $output[] = array(
+                    'name' => \Scrub::text($name),
+                    'status' => 'Not Added',
+                    'error' => 'Invalid finish date and/or times (use 24-hour h:m format)',
+                );
 
+                continue;
+            }
+            
             /* Start datetime occurs after finish datetime
              */
             if ($startDatetime->getUnixTimestamp() > $finishDatetime->getUnixTimestamp()) {
