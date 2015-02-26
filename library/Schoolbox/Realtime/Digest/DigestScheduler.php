@@ -11,6 +11,7 @@ namespace Schoolbox\Realtime\Digest;
 
 
 use Alaress\Scheduler\CronScheduler;
+use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use InvalidArgumentException;
@@ -117,7 +118,20 @@ class DigestScheduler extends CronScheduler {
 	}
 
 
-	/**
+    /**
+     * @param TriggerInterface $trigger
+     * @param string           $command
+     * @param array            $data
+     */
+    public function handleError($trigger, $command, $data)
+    {
+        // we are assured that the worked that caused this error has already died
+        $this->log->warning("Worker failed to complete, resetting digest triggers");
+        $this->reload();
+    }
+
+
+    /**
 	 * Report in an appropriate way, based on the data returned by the worker
 	 *
 	 * @param $data
