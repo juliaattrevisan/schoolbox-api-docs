@@ -395,41 +395,63 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 
 	/**
 	 * Ported methods from Alaress_Date_Relative
+	 *
+	 * TODO: move to strategy methods
 	 */
 
 
 	/**
-	 * Ported from stdfuncs
-	 *
-	 * @param  $date
-	 * @param int $now
-	 * @param string $prefix
-	 * @param string $suffix
-	 * @return string
+	 * {@inheritdoc}
 	 */
-	public function getRelativeTime() {
-		$currentTime = $this->getNow();
+	public function getRelativeTime($now = null, $stripModifiers = false) {
 
-		/* If Now is zero, assume you want to get the period between the event
-		 * happening and the current moment in time
-		 */
-		if (!$currentTime) {
-			$currentTime = time();
-		}
+		// Pass this through to the strategies instead
+		return $this->getStrategy()->getRelativeTime($now, $stripModifiers);
 
-		/* Provide return string
-		 */
-		$diff = $currentTime - $this->getUnixTimestamp();
-
-		if($diff > 0) {
-			return $this->getRelativePast($diff);
-		}
-		elseif($diff < 0) {
-			return $this->getRelativeFuture($diff);
-		}
-		else {
-			return 'just then';
-		}
+//		$time = null;
+////		if (!isset($now)) {
+////			$now = $this->getStrategy()->getUsingFormat(new DateTime());
+////		} else
+//		if ($now instanceof DateTime || $now instanceof DateTimeInterface) {
+//			// now should be something understandable as a datetime
+//			$time = $now->getTimestamp();
+////			$now = $this->getStrategy()->getUsingFormat($now);
+//		} elseif ($now instanceof Alaress_Date_Format) {
+//			$time = $now->getUnixTimestamp();
+//		}
+//
+//		if (!isset($time)) {
+//			// error out
+//			$time = time();
+//		}
+//
+//		// Use diffForHumans
+//		$datetimeObject = $this->getDateTimeObject();
+//		if ($datetimeObject instanceof \Carbon\Carbon) {
+//		}
+//
+//		$currentTime = $this->getNow();
+//
+//		/* If Now is zero, assume you want to get the period between the event
+//		 * happening and the current moment in time
+//		 */
+//		if (!$currentTime) {
+//			$currentTime = time();
+//		}
+//
+//		/* Provide return string
+//		 */
+//		$diff = $currentTime - $this->getUnixTimestamp();
+//
+//		if($diff > 0) {
+//			return $this->getRelativePast($diff);
+//		}
+//		elseif($diff < 0) {
+//			return $this->getRelativeFuture($diff);
+//		}
+//		else {
+//			return 'just then';
+//		}
 
 	}
 
