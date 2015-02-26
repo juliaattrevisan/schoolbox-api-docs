@@ -17,7 +17,7 @@ use Schoolbox\ConfigLoader;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Category;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\Course\Task;
