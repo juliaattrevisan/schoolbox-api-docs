@@ -1,28 +1,30 @@
+@charset "UTF-8";
 // Utils
-@import "utils/fonts";
-@import "utils/mixins";
-@import "utils/functions";
-@import "utils/variables";
+@import "utils/font-faces";
+#container.foundation {
+  @import "utils/fonts";
+  @import "utils/mixins";
+  @import "utils/functions";
+  @import "utils/variables";
 
-// Base
-@import "base/reset";
-@import "base/typography";
+  // Base
+  @import "base/reset";
+  @import "base/typography";
 
-@import "settings";
+  @import "settings";
 
-// Components
-@import "components/alert-boxes";
-@import "components/buttons";
-@import "components/carousel";
-@import "components/content";
-@import "components/forms";
-@import "components/joyride";
-@import "components/navigation";
+  // Components
+  @import "components/alert-boxes";
+  @import "components/buttons";
+  @import "components/carousel";
+  @import "components/content";
+  @import "components/forms";
+  @import "components/joyride";
+  @import "components/navigation";
 
-// Layout
-@import "layout/footer";
-@import "layout/grid";
-@import "layout/header";
-@import "layout/sidebar";
-
-@import "../../javascript/components/foundation/scss/foundation";
+  // Layout
+  @import "layout/footer";
+  @import "layout/grid";
+  @import "layout/header";
+  @import "layout/sidebar";
+}
