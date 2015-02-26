@@ -129,6 +129,7 @@ class InputStreamListener extends AbstractIOStreamListener
             $this->writer->write($this->proto->cancel());
         } catch(PDOException $e) {
             $this->log->emergency("PDOException: " . $e->getMessage(), array($e));
+            $this->writer->write($this->proto->reject(), true);
             $this->loop->stop();
         } catch(Exception $e) {
             // all exceptions must be caught, otherwise the react loop explodes and this worker dies

@@ -60,7 +60,7 @@ class MailNotifier extends WorkNotifier {
         /** @var Collection|User[] $users */
 		$users = UserMapper::getInstance()->findByColumn('group_id', $role->getId());
 
-		$this->log()->info("Preparing to digest {$role->getName()}: {$users->count()} users");
+		$this->log()->notice("Preparing to digest {$role->getName()}: {$users->count()} users");
 
         $result = 0;
 		$dir    = $this->conf->get('digest_oldest_first') ? SORT_DESC : SORT_ASC;
@@ -75,13 +75,13 @@ class MailNotifier extends WorkNotifier {
 
             $email->setCoreContext($core->getContext());
 
-            $this->log()->info("Digesting {$user->getUsername()}");
+            $this->log()->debug("Digesting {$user->getUsername()}");
 
             $uq->fetchNotificationsIntoBundle($decorator, true);
 
 			if(!$decorator->count()) {
 				// this user has nothing to digest
-				$this->log()->notice("{$user->getUsername()} has nothing to digest");
+				$this->log()->debug("{$user->getUsername()} has nothing to digest");
                 unset($uq, $decorator, $email, $user);
 				continue;
 			}
@@ -97,7 +97,7 @@ class MailNotifier extends WorkNotifier {
 
                 // if email sent successfully, ACK, otherwise NACK
                 if($sent) {
-                    $this->log()->notice("Mail sent successfully, dropping messages from queue");
+                    $this->log()->notice("Mail sent successfully to user {$user->getUsername()}, dropping messages from queue");
                     $uq->drain();
                     ++$result;
                 }

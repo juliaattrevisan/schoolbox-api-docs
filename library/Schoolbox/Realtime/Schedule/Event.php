@@ -12,6 +12,7 @@ namespace Schoolbox\Realtime\Schedule;
 
 
 use Alaress\Scheduler\Event\EventInterface;
+use RuntimeException;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -137,6 +138,11 @@ class Event implements EventInterface, Serializable {
 	 */
 	public function unserialize($serialized) {
 		$array = unserialize($serialized);
+
+        // urgh. more safety checks
+        if (!class_exists($array['o']['c'])) {
+            throw new RuntimeException("Could not unserialize non-existent mapper");
+        }
 
 		$this->effector = UserMapper::getInstance()->hydrate($array['u']);
 		$this->action   = $array['a'];
