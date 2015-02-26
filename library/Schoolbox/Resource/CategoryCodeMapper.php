@@ -23,6 +23,16 @@ class CategoryCodeMapper extends Folder\Code\Mapper
 
     /**
      * @deprecated
+     * @return static
+     */
+    public static function getInstance()
+    {
+        return parent::getInstance();
+    }
+
+
+    /**
+     * @deprecated
      */
     public function __construct()
     {
