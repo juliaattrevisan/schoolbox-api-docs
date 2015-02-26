@@ -9,6 +9,7 @@ core.css
 mchrome.css
 jquery-ui.css
 chrome.css
+chrome.css.map
 legacy.css
 variables.css
 mixins.css
