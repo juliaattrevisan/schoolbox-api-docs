@@ -331,6 +331,7 @@ input[type=submit] 				{ @include button-style; }
 	li 							{
 		a 						{ color: $black; text-decoration: none; padding: 13px 0 13px 50px; background-color: tint($tertiary, 74%);
 								position: relative;display: block;float: left; @include single-transition(all, 0.15s, linear);
+								margin-right: 0; white-space: nowrap; border: none;
 			&:before, &:after 	{ content: " "; display: block; width: 0; height: 0; border-top: 50px solid transparent; @include single-transition(all, 0.15s, linear);
 								border-bottom: 50px solid transparent; position: absolute; top: 50%; margin-top: -50px; left: 100%; z-index: 2;
 			}
