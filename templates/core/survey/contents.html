@@ -13,7 +13,7 @@ $(function() {
 		placeholder: "sortable-placeholder",
 		forcePlaceholderSize: true,
 		stop: function(event, ui) {
-			var allQuestions = $(this).find('li');
+			var allQuestions = $(this).children('li');
 			var section = $(this).attr('id');
 			var data = new Array();
 
@@ -26,8 +26,10 @@ $(function() {
 			$.post('/survey/reorderQuestions/{ASSESS_ASSESS_ID}', {ids: data}, function(data) {
 				var sequence = 1;
 
-				$.each($('#' + section).find('li'), function(index, element) {
-					$(element).find('strong').html('Q' + sequence);
+				$.each($('#' + section).children('li'), function (index, element) {
+					var strong = $(element).find('strong');
+
+					strong.html(strong.text().replace(/^Q\d+/, 'Q' + sequence));
 					sequence++;
 				});
 			});
