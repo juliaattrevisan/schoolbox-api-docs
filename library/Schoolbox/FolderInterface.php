@@ -10,29 +10,15 @@
 namespace Schoolbox;
 
 
-interface FolderInterface {
+use Schoolbox\Resource\Folder\IFolder;
 
-    /**
-     * @return int
-     */
-    public function getId();
-
-
-    /**
-     * @return string
-     */
-    public function getName();
-
-
-    /**
-     * @return FolderInterface
-     */
-    public function getParent();
-
-    /**
-     * A folder type. This will probably map to a class name.
-     *
-     * @return string
-     */
-    public function getFolderType();
+/**
+ * Interface FolderInterface
+ *
+ * @deprecated
+ * @package Schoolbox
+ */
+interface FolderInterface extends IFolder
+{
+    // BC.
 }

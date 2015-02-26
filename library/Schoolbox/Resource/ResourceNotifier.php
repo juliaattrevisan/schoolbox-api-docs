@@ -190,7 +190,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param string             $action
      * @param ParameterInterface $param
      * @param User               $effector
-     * @param Category           $category
+     * @param Folder\Model       $category
      * @param string             $roletype
      * @return Envelope
      */
