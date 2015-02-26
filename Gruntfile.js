@@ -138,8 +138,11 @@ module.exports = function(grunt) {
         },
         less: buildTasks,
         sass: {
-            src: ['www/css/foundation/chrome-foundation.scss'],
-            dest: 'www/css/foundation/chrome.css'
+            dist: {
+                files: {
+                    'www/css/foundation/chrome.css': 'www/css/foundation/chrome-foundation.scss'
+                }
+            }
         },
         watch: watchTasks
     });
