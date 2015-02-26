@@ -25,6 +25,7 @@ class Synchronise_Synergetic_Meggs_Hydrator_Student_Role implements Synchronise_
             case 20:
             case 30:
             case 40:
+            case 0:
             case 1:
             case 2:
             case 3:
