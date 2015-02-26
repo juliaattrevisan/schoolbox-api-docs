@@ -295,6 +295,9 @@ input[type=submit]				{ padding: 0.825rem 2.5rem; border: none;
 	&.secondary 				{ color: $primary-color;
 		&:hover 				{ color: $primary-color; }
 	}
+	&.alert 					{ 
+		&:hover 				{ color: $white; }
+	}
 	&.warning 					{ background-color: $warning-color;
 		&:hover 				{ background-color: tint($warning-color, 11%); }
 	}
@@ -340,42 +343,9 @@ input[type=submit] 				{ @include button-style; }
 	li:first-child a 			{ padding-left: 22px; }
 }
 
-.f-dropdown.open						{ 
+.f-dropdown.open				{ 
 	.content 					{ background-color: $f-dropdown-content-bg; }
 }
 
 ul.pagination li a,
 ul.pagination li button 		{ background-color: tint($tertiary, 74%); border-radius: 0px; font-weight: $font-weight-bold; }
-
-@-webkit-keyframes fadeInDown {
-  0% {
-    opacity: 0;
-    -webkit-transform: translate3d(0, -100%, 0);
-            transform: translate3d(0, -100%, 0);
-  }
-
-  100% {
-    opacity: 1;
-    -webkit-transform: none;
-            transform: none;
-  }
-}
-
-@keyframes fadeInDown {
-  0% {
-    opacity: 0;
-    -webkit-transform: translate3d(0, -100%, 0);
-            transform: translate3d(0, -100%, 0);
-  }
-
-  100% {
-    opacity: 1;
-    -webkit-transform: none;
-            transform: none;
-  }
-}
-
-.fadeInDown {
-  -webkit-animation-name: fadeInDown;
-          animation-name: fadeInDown;
-}
