@@ -1,17 +1,19 @@
 @charset "UTF-8";
+
 // Utils
 @import "utils/font-faces";
-#container.foundation {
-  @import "utils/fonts";
-  @import "utils/mixins";
-  @import "utils/functions";
-  @import "utils/variables";
+@import "utils/fonts";
+@import "utils/mixins";
+@import "utils/functions";
+@import "utils/variables";
 
+// Settings
+@import "settings";
+
+#container.foundation {
   // Base
   @import "base/reset";
   @import "base/typography";
-
-  @import "settings";
 
   // Components
   @import "components/alert-boxes";
