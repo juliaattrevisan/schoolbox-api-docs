@@ -25,6 +25,38 @@ class Alaress_Date_Strategy_LaravelDate extends Alaress_Date_Strategy_DateTime
     protected $warnings = array();
 
     /**
+     * Attempts to create a Laravel date out of $dateTime.
+     *
+     * * empty: creates as now
+     * * DateTimeInterface or Alaress_Date_Format_Interface: clones from that
+     *
+     * @param mixed $dateTime
+     *
+     * @return LaravelDate
+     * @throws InvalidArgumentException if date couldn't be built
+     */
+    protected function buildLaravelDate($dateTime = null)
+    {
+        if (!isset($dateTime)) {
+            // Nothing set? set it to now
+            return LaravelDate::now($this->timezone);
+        } elseif ($dateTime instanceof DateTime || $dateTime instanceof DateTimeInterface) {
+            // Build out of timestamp and timezone
+            return LaravelDate::createFromTimestamp(
+                $dateTime->getTimestamp(),
+                $dateTime->getTimezone()
+            );
+        } elseif ($dateTime instanceof Alaress_Date_Format_Interface) {
+            // Build out of date object's timestamp/timezone
+            return LaravelDate::createFromTimestamp(
+                $dateTime->getDateTimeObject()->getTimestamp(),
+                $dateTime->getDateTimeObject()->getTimezone()
+            );
+        }
+        throw new InvalidArgumentException('Could not create LaravelDate from $dateTime');
+    }
+
+    /**
      * @param DateTimeInterface|Alaress_Date_Format_Interface|string $dateTime
      * @param string                                                 $inputDateFormat
      *
@@ -36,23 +68,10 @@ class Alaress_Date_Strategy_LaravelDate extends Alaress_Date_Strategy_DateTime
      */
     public function setFromFormat($dateTime, $inputDateFormat)
     {
-        if (!isset($dateTime)) {
-            // Nothing set? set it to now
-            $newDateTime = LaravelDate::now($this->timezone);
+        try {
+            $newDateTime = $this->buildLaravelDate($dateTime);
             $this->setDateTimeObject($newDateTime);
-        } elseif ($dateTime instanceof DateTime || $dateTime instanceof DateTimeInterface) {
-            $newDateTime = LaravelDate::createFromTimestamp(
-                $dateTime->getTimestamp(),
-                $this->timezone
-            );
-            $this->setDateTimeObject($newDateTime);
-        } elseif ($dateTime instanceof Alaress_Date_Format_Interface) {
-            $newDateTime = LaravelDate::createFromTimestamp(
-                $dateTime->getDateTimeObject()->getTimestamp(),
-                $dateTime->getDateTimeObject()->getTimezone()
-            );
-            $this->setDateTimeObject($newDateTime);
-        } else {
+        } catch (InvalidArgumentException $e) {
             if (!isset($inputDateFormat)) {
                 throw new InvalidArgumentException(
                     '$inputDateFormat must be supplied if $dateTime is not a date object'
