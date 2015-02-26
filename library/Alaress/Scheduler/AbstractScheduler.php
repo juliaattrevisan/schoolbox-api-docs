@@ -187,7 +187,9 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
         $timer->setData($trigger);
         $this->putTimer($model, $label, $timer);
 
-        $this->log->info("Scheduling trigger '{$trigger->getIdString()}'", array('char' => '+'));
+        $this->log->info(sprintf("Scheduling trigger '%s' for %s", $trigger->getIdString(), date('Y-m-d H:i:s', $trigger->getTimestamp())),
+            array('char' => '+')
+        );
 
         return true;
     }
