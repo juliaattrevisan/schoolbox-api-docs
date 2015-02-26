@@ -374,4 +374,37 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 	public function getRelativeTime($now = null, $stripModifiers = false) {
 		return $this->getStrategy()->getRelativeTime($now, $stripModifiers);
 	}
+
+	/**
+	 * Set prefix
+	 * Support chainable settings
+	 *
+	 * @param  $val
+	 * @return $this
+	 */
+	public function setPrefix($val) {
+		return $this;
+	}
+
+	/**
+	 * Set suffix
+	 * Support chainable settings
+	 *
+	 * @param  $val
+	 * @return $this
+	 */
+	public function setSuffix($val) {
+		return $this;
+	}
+
+	/**
+	 * Set Now
+	 * Support chainable settings
+	 *
+	 * @param  $val
+	 * @return $this
+	 */
+	public function setNow($val) {
+		return $this;
+	}
 }
