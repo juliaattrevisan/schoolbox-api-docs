@@ -12,6 +12,7 @@ namespace Schoolbox\Realtime\Digest;
 
 use Alaress\Scheduler\CronScheduler;
 use Alaress\Scheduler\Trigger\TriggerInterface;
+use Alaress\WorkerCrew\Pool;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use InvalidArgumentException;
@@ -82,6 +83,9 @@ class DigestScheduler extends CronScheduler {
 			$this->unschedule($t);
 			unset($this->triggers[$k]);
 		}
+
+        // gently release workers in case they're digesting
+        $this->getDispatcher()->releaseWorkerPool(Pool::RELEASE_SOFT);
 
 		// read each role entry, and schedule a cron based on it
 		foreach(RoleMapper::getInstance()->findAll() as $role) {
