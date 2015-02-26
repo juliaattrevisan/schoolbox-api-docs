@@ -34,7 +34,8 @@
     "fullcalendar": "2.1.1",
     "jquery.tablesorter": "2.14.5",
     "momentjs": "2.5.1",
-    "jstree": "3.0.4"
+    "jstree": "3.0.4",
+    "foundation": "5.5.0"
   },
   "ignore": [
     "**/.*",

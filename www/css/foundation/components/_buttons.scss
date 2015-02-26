@@ -1,0 +1,351 @@
+//
+// BUTTONS
+//
+
+$include-html-button-classes: $include-html-classes;
+
+// We use these to build padding for buttons.
+// $button-tny: rem-calc(10);
+// $button-sml: rem-calc(14);
+// $button-med: rem-calc(12);
+$button-med: rem-calc(14, 40);
+// $button-lrg: rem-calc(18);
+
+// We use this to control the display property.
+// $button-display: inline-block;
+// $button-margin-bottom: rem-calc(20);
+
+// We use these to control button text styles.
+// $button-font-family: $body-font-family;
+$button-font-color: $white;
+$button-font-color-alt: $black;
+// $button-font-tny: rem-calc(11);
+// $button-font-sml: rem-calc(13);
+// $button-font-med: rem-calc(16);
+// $button-font-lrg: rem-calc(20);
+$button-font-weight: $font-weight-bold;
+// $button-font-align: center;
+
+// We use these to control various hover effects.
+ $button-function-factor: 11%;
+
+// We use these to control button border and hover styles.
+// $button-border-width: 0px;
+// $button-border-style: solid;
+$button-bg-color: $primary-color;
+$button-bg-hover: tint($button-bg-color, 12%);
+$button-border-color: transparent;
+$secondary-button-bg-hover: tint($secondary-color, 12%);
+$secondary-button-border-color: transparent;
+$success-button-bg-hover: tint($success-color, 12%);
+$success-button-border-color: transparent;
+$alert-button-bg-hover: tint($alert-color, 12%);
+$alert-button-border-color: transparent;
+
+// We use this to set the default radius used throughout the core.
+// $button-radius: $global-radius;
+// $button-round: $global-rounded;
+
+// We use this to set default opacity and cursor for disabled buttons.
+// $button-disabled-opacity: 0.7;
+// $button-disabled-cursor: $cursor-default-value;
+
+//
+// BUTTON GROUPS
+//
+
+// $include-html-button-classes: $include-html-classes;
+
+// Sets the margin for the right side by default, and the left margin if right-to-left direction is used
+// $button-bar-margin-opposite: rem-calc(10);
+// $button-group-border-width: 1px;
+
+
+//
+// BREADCRUMBS
+//
+
+// $include-html-nav-classes: $include-html-classes;
+
+// We use this to set the background color for the breadcrumb container.
+//$crumb-bg: scale-color($secondary-color, $lightness: 100%);
+
+// We use these to set the padding around the breadcrumbs.
+// $crumb-padding: rem-calc(9 14 9);
+// $crumb-side-padding: rem-calc(12);
+
+// We use these to control border styles.
+// $crumb-function-factor: -10%;
+$crumb-border-size: 0;
+// $crumb-border-style: solid;
+// $crumb-border-color: scale-color($crumb-bg, $lightness: $crumb-function-factor);
+// $crumb-radius: $global-radius;
+
+// We use these to set various text styles for breadcrumbs.
+// $crumb-font-size: rem-calc(11);
+// $crumb-font-color: $primary-color;
+// $crumb-font-color-current: $oil;
+// $crumb-font-color-unavailable: $aluminum;
+// $crumb-font-transform: uppercase;
+// $crumb-link-decor: underline;
+
+// We use these to control the slash between breadcrumbs
+// $crumb-slash-color: $base;
+$crumb-slash: "";
+
+//
+// SPLIT BUTTONS
+//
+
+// $include-html-button-classes: $include-html-classes;
+
+// We use these to control different shared styles for Split Buttons
+// $split-button-function-factor: 10%;
+$split-button-pip-color: $white;
+$split-button-pip-color-alt: $white;
+// $split-button-active-bg-tint: rgba(0,0,0,0.1);
+
+// We use these to control tiny split buttons
+// $split-button-padding-tny: $button-pip-tny * 10;
+// $split-button-span-width-tny: $button-pip-tny * 6;
+// $split-button-pip-size-tny: $button-pip-tny;
+// $split-button-pip-top-tny: $button-pip-tny * 2;
+// $split-button-pip-default-float-tny: rem-calc(-6);
+
+// We use these to control small split buttons
+// $split-button-padding-sml: $button-pip-sml * 10;
+// $split-button-span-width-sml: $button-pip-sml * 6;
+// $split-button-pip-size-sml: $button-pip-sml;
+// $split-button-pip-top-sml: $button-pip-sml * 1.5;
+// $split-button-pip-default-float-sml: rem-calc(-6);
+
+// We use these to control medium split buttons
+// $split-button-padding-med: $button-pip-med * 9;
+// $split-button-span-width-med: $button-pip-med * 5.5;
+// $split-button-pip-size-med: $button-pip-med - rem-calc(3);
+// $split-button-pip-top-med: $button-pip-med * 1.5;
+// $split-button-pip-default-float-med: rem-calc(-6);
+
+// We use these to control large split buttons
+// $split-button-padding-lrg: $button-pip-lrg * 8;
+// $split-button-span-width-lrg: $button-pip-lrg * 5;
+// $split-button-pip-size-lrg: $button-pip-lrg - rem-calc(6);
+// $split-button-pip-top-lrg: $button-pip-lrg + rem-calc(5);
+// $split-button-pip-default-float-lrg: rem-calc(-6);
+
+//
+// DROPDOWN BUTTONS
+//
+
+// $include-html-button-classes: $include-html-classes;
+
+// We use these to set the color of the pip in dropdown buttons
+$dropdown-button-pip-color: $white;
+$dropdown-button-pip-color-alt: $white;
+
+// $button-pip-tny: rem-calc(6);
+// $button-pip-sml: rem-calc(7);
+// $button-pip-med: rem-calc(9);
+// $button-pip-lrg: rem-calc(11);
+
+// We use these to style tiny dropdown buttons
+// $dropdown-button-padding-tny: $button-pip-tny * 7;
+// $dropdown-button-pip-size-tny: $button-pip-tny;
+// $dropdown-button-pip-opposite-tny: $button-pip-tny * 3;
+// $dropdown-button-pip-top-tny: (-$button-pip-tny / 2) + rem-calc(1);
+
+// We use these to style small dropdown buttons
+// $dropdown-button-padding-sml: $button-pip-sml * 7;
+// $dropdown-button-pip-size-sml: $button-pip-sml;
+// $dropdown-button-pip-opposite-sml: $button-pip-sml * 3;
+// $dropdown-button-pip-top-sml: (-$button-pip-sml / 2) + rem-calc(1);
+
+// We use these to style medium dropdown buttons
+// $dropdown-button-padding-med: $button-pip-med * 6 + rem-calc(3);
+// $dropdown-button-pip-size-med: $button-pip-med - rem-calc(3);
+// $dropdown-button-pip-opposite-med: $button-pip-med * 2.5;
+// $dropdown-button-pip-top-med: (-$button-pip-med / 2) + rem-calc(2);
+
+// We use these to style large dropdown buttons
+// $dropdown-button-padding-lrg: $button-pip-lrg * 5 + rem-calc(3);
+// $dropdown-button-pip-size-lrg: $button-pip-lrg - rem-calc(6);
+// $dropdown-button-pip-opposite-lrg: $button-pip-lrg * 2.5;
+// $dropdown-button-pip-top-lrg: (-$button-pip-lrg / 2) + rem-calc(3);
+
+//
+// DROPDOWN
+//
+
+// $include-html-dropdown-classes: $include-html-classes;
+
+// We use these to controls height and width styles.
+$f-dropdown-max-width: 242px;
+// $f-dropdown-height: auto;
+// $f-dropdown-max-height: none;
+
+// Used for bottom position
+$f-dropdown-margin-top: 0px;
+
+// Used for right position
+// $f-dropdown-margin-left: $f-dropdown-margin-top;
+
+// Used for left position
+// $f-dropdown-margin-right: $f-dropdown-margin-top;
+
+// Used for top position
+// $f-dropdown-margin-bottom: $f-dropdown-margin-top;
+
+// We use this to control the background color
+$f-dropdown-bg: tint($primary-color, 11%);
+$f-dropdown-content-bg: tint($secondary-color, 80%);
+
+// We use this to set the border styles for dropdowns.
+// $f-dropdown-border-style: solid;
+$f-dropdown-border-width: 0px;
+$f-dropdown-border-color: transparent;
+
+// We use these to style the triangle pip.
+$f-dropdown-triangle-size: 0px;
+// $f-dropdown-triangle-color: $white;
+// $f-dropdown-triangle-side-offset: 10px;
+
+// We use these to control styles for the list elements.
+// $f-dropdown-list-style: none;
+$f-dropdown-font-color: $white;
+$f-dropdown-font-size: rem-calc(16);
+$f-dropdown-list-padding: rem-calc(16);
+// $f-dropdown-line-height: rem-calc(18);
+$f-dropdown-list-hover-bg: tint($primary-color, 32%);
+// $dropdown-mobile-default-float: 0;
+
+// We use this to control the styles for when the dropdown has custom content.
+$f-dropdown-content-padding: rem-calc(16);
+
+// Default radius for dropdown.
+// $f-dropdown-radius: $global-radius;
+
+//
+// PAGINATION
+//
+
+// $include-pagination-classes: $include-html-classes;
+
+// We use these to control the pagination container
+$pagination-height: rem-calc(48);
+$pagination-margin: rem-calc(0);
+
+// We use these to set the list-item properties
+// $pagination-li-float: $default-float;
+$pagination-li-height: rem-calc(48);
+$pagination-li-font-color: $primary-color;
+$pagination-li-font-size: rem-calc(16);
+$pagination-li-margin: rem-calc(0);
+
+// We use these for the pagination anchor links
+$pagination-link-pad: rem-calc(8 16 8);
+$pagination-link-font-color: $primary-color;
+$pagination-link-active-bg: tint($tertiary, 87%);
+
+// We use these for disabled anchor links
+// $pagination-link-unavailable-cursor: default;
+// $pagination-link-unavailable-font-color: $aluminum;
+$pagination-link-unavailable-bg-active: scale-color(#fff, $lightness: -5%);
+
+// We use these for currently selected anchor links
+$pagination-link-current-background: $white;
+$pagination-link-current-font-color: $primary-color;
+// $pagination-link-current-font-weight: $font-weight-bold;
+// $pagination-link-current-cursor: default;
+$pagination-link-current-active-bg: $pagination-link-active-bg;
+
+//
+// TABS
+//
+
+// $include-html-tabs-classes: $include-html-classes;
+
+// $tabs-navigation-padding: rem-calc(16);
+$tabs-navigation-bg-color: tint($tertiary, 74%);
+$tabs-navigation-active-bg-color: $white;
+$tabs-navigation-hover-bg-color: tint($tertiary, 87%);
+// $tabs-navigation-font-color: $jet;
+// $tabs-navigation-active-font-color: $tabs-navigation-font-color;
+// $tabs-navigation-font-size: rem-calc(16);
+// $tabs-navigation-font-family: $body-font-family;
+
+// $tabs-content-margin-bottom: rem-calc(24);
+$tabs-content-padding: ($column-gutter/5);
+
+// $tabs-vertical-navigation-margin-bottom: 1.25rem;
+
+@import "../../../javascript/components/foundation/scss/foundation/components/buttons";
+@import "../../../javascript/components/foundation/scss/foundation/components/button-groups";
+@import "../../../javascript/components/foundation/scss/foundation/components/breadcrumbs";
+@import "../../../javascript/components/foundation/scss/foundation/components/dropdown-buttons";
+@import "../../../javascript/components/foundation/scss/foundation/components/dropdown";
+@import "../../../javascript/components/foundation/scss/foundation/components/split-buttons";
+@import "../../../javascript/components/foundation/scss/foundation/components/pagination";
+@import "../../../javascript/components/foundation/scss/foundation/components/tabs";
+
+//
+// CUSTOM OVERRIDES
+//
+.button,
+input[type=submit]				{ padding: 0.825rem 2.5rem; border: none;
+	&.secondary 				{ color: $primary-color;
+		&:hover 				{ color: $primary-color; }
+	}
+	&.alert 					{ 
+		&:hover 				{ color: $white; }
+	}
+	&.warning 					{ background-color: $warning-color;
+		&:hover 				{ background-color: tint($warning-color, 11%); }
+	}
+}
+
+input[type=submit] 				{ @include button-style; }
+
+// Button Group
+.button-group > li {
+	margin: 0;
+}
+
+// Actions
+.actions{
+	height: 100%;
+	a{
+		padding: 0 1.125em;
+		height: 100%;
+		display: inline-block;
+		float: right;
+		// &:hover{
+		// 	background: darken($ocean-sunset, 5%);
+		// }
+	}
+}
+
+
+
+// Custom SB breadcrumbs
+.breadcrumb 					{ margin: 0; list-style: none; overflow: hidden;
+	li 							{
+		a 						{ color: $black; text-decoration: none; padding: 13px 0 13px 50px; background-color: tint($tertiary, 74%);
+								position: relative;display: block;float: left; @include single-transition(all, 0.15s, linear);
+			&:before, &:after 	{ content: " "; display: block; width: 0; height: 0; border-top: 50px solid transparent; @include single-transition(all, 0.15s, linear);
+								border-bottom: 50px solid transparent; position: absolute; top: 50%; margin-top: -50px; left: 100%; z-index: 2;
+			}
+			&:before			{ margin-left: 1px; border-left: 30px solid $white; }
+			&:after 			{ border-left: 30px solid tint($tertiary, 74%); }
+			&:hover 			{ background-color: tint($tertiary, 87%); }
+			&:hover:after 		{ border-left-color: tint($tertiary, 87%) !important; }
+		}
+	}
+	li:first-child a 			{ padding-left: 22px; }
+}
+
+.f-dropdown.open				{ 
+	.content 					{ background-color: $f-dropdown-content-bg; }
+}
+
+ul.pagination li a,
+ul.pagination li button 		{ background-color: tint($tertiary, 74%); border-radius: 0px; font-weight: $font-weight-bold; }

@@ -1,0 +1,63 @@
+//
+// ALERT BOXES
+//
+
+// $include-html-alert-classes: $include-html-classes;
+
+// We use this to control alert padding.
+$alert-padding-top: rem-calc(14);
+$alert-padding-default-float: $alert-padding-top;
+$alert-padding-opposite-direction: $alert-padding-top + rem-calc(10);
+$alert-padding-bottom: $alert-padding-top;
+
+// We use these to control text style.
+$alert-font-weight: $font-weight-normal;
+$alert-font-size: rem-calc(16);
+$alert-font-color: $white;
+$alert-font-color-alt: scale-color($secondary-color, $lightness: -66%);
+
+// We use this for close hover effect.
+$alert-function-factor: 89%;
+
+// We use these to control border styles.
+$alert-border-style: solid;
+$alert-border-width: 0px;
+$alert-border-color: scale-color($primary-color, $lightness: $alert-function-factor);
+$alert-bottom-margin: rem-calc(20);
+
+// We use these to style the close buttons
+$alert-close-color: $primary-color;
+$alert-close-top: 50%;
+$alert-close-position: rem-calc(4);
+$alert-close-font-size: rem-calc(30);
+$alert-close-opacity: 1.0;
+$alert-close-opacity-hover: 1.0;
+$alert-close-padding: 14px 11px 4px;
+
+// We use this to control border radius
+$alert-radius: $global-radius;
+
+// We use this to control transition effects
+$alert-transition-speed: 300ms;
+$alert-transition-ease: ease-out;
+
+.alert-box { background-color: scale-color($primary-color, $lightness: $alert-function-factor); }
+
+@import "../../../javascript/components/foundation/scss/foundation/components/alert-boxes";
+
+//
+// Custom overrides
+//
+
+.alert-box 						{ background-color: tint($primary-color, 74%); color: $primary-color;
+	&.secondary 				{ background-color: tint($secondary-color, 74%); }
+	&.success 					{ background-color: tint($success-color, 74%); color: $success-color;
+		.close 					{ color: $success-color; }
+	}
+	&.warning 					{ background-color: tint($warning-color, 74%); color: $warning-color;
+		.close 					{ color: $warning-color; }
+	}
+	&.alert 					{ background-color: tint($alert-color, 74%); color: $alert-color;
+		.close 					{ color: $alert-color; }
+	}
+}

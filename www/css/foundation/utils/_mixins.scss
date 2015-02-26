@@ -1,0 +1,139 @@
+// Link hovers
+@mixin link-bg-transition{
+	-webkit-transition: background-color 0.3s;
+	-moz-transition: background-color 0.3s;
+	-ms-transition: background-color 0.3s;
+	-o-transition: background-color 0.3s;
+	transition: background-color 0.3s;
+}
+
+@mixin link-transition{
+	-webkit-transition: color 0.3s;
+	-moz-transition: color 0.3s;
+	-ms-transition: color 0.3s;
+	-o-transition: color 0.3s;
+	transition: color 0.3s;
+}
+
+@mixin all-transition{
+	-webkit-transition: all 0.5s;
+	-moz-transition: all 0.5s;
+	-ms-transition: all 0.5s;
+	-o-transition: all 0.5s;
+	transition: all 0.5s;
+}
+
+// Background images - cover
+@mixin cover-image {
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+}
+
+%vertical-align {
+	position: relative;
+	top: 50%;
+	-webkit-transform: translateY(-50%);
+	-ms-transform: translateY(-50%);
+	transform: translateY(-50%);
+}
+
+// Prefixed properties, in alphabetical order
+
+@mixin absolute ($top: auto, $left: auto, $bottom: auto, $right: auto) {
+	position: absolute; top: $top; right: $right; bottom: $bottom; left: $left;
+}
+
+@mixin animation ($animation) {
+	-webkit-animation: $animation;
+	animation: $animation;
+}
+
+@mixin border-radius($radius) {
+	border-radius: $radius;
+	-moz-border-radius: $radius;
+	-webkit-border-radius: $radius;
+}
+
+@mixin box-shadow($x-offset, $y-offset, $blur, $color) {
+	-moz-box-shadow: $x-offset $y-offset $blur $color;
+	-webkit-box-shadow: $x-offset $y-offset $blur $color;
+	box-shadow: $x-offset $y-offset $blur $color;
+}
+
+@mixin box-sizing ($box-sizing) {
+	-moz-box-sizing: $box-sizing;
+	box-sizing: $box-sizing;
+}
+
+@mixin columns ($columns: 2 1em) {
+	-webkit-columns: $columns;
+	-moz-columns: $columns;
+	columns: $columns;
+}
+
+@mixin transform ($transform) {
+	-webkit-transform: $transform;
+	-ms-transform: $transform;
+	transform: $transform;
+}
+
+@mixin transform-origin ($transform-origin) {
+	-webkit-transform-origin: $transform-origin;
+	-o-transform-origin: $transform-origin;
+	transform-origin: $transform-origin;
+}
+
+@mixin transition ($transition) {
+	-webkit-transition: $transition;
+	transition: $transition;
+}
+
+@mixin transition-property($transition-property: all) {
+	-webkit-transition-property: $transition-property;
+	transition-property: $transition-property;
+}
+
+@mixin transition-duration($transition-duration: 0s) {
+	-webkit-transition-duration: $transition-duration;
+	transition-duration: $transition-duration;
+}
+
+@mixin transition-timing-function($transition-timing-function: ease) {
+	-webkit-transition-timing-function: $transition-timing-function;
+	transition-timing-function: $transition-timing-function;
+}
+
+@mixin placeholder-color($color, $font-weight) {
+	::-webkit-input-placeholder { color: $color; font-weight: $font-weight; }
+	:-ms-input-placeholder { color: $color; font-weight: $font-weight; }
+	:-moz-placeholder { color: $color; font-weight: $font-weight; }
+	::-moz-placeholder { color: $color; font-weight: $font-weight; }
+}
+
+@mixin placeholder-hover-color($color) {
+	input:focus::-webkit-input-placeholder,
+	textarea:focus::-webkit-input-placeholder	{ color: $color; }
+
+	input:focus:-moz-placeholder,				{ color: $color; }
+	textarea:focus:-moz-placeholder,			{ color: $color; }
+
+	input:focus::-moz-placeholder,				{ color: $color; }
+	textarea:focus::-moz-placeholder			{ color: $color; }
+
+	input:focus:-ms-input-placeholder,			{ color: $color; }
+	textarea:focus:-ms-input-placeholder		{ color: $color; }
+
+	input:hover::-webkit-input-placeholder,		{ color: $color; }
+	textarea:hover::-webkit-input-placeholder	{ color: $color; }
+
+	input:hover:-moz-placeholder,				{ color: $color; }
+	textarea:hover:-moz-placeholder				{ color: $color; }
+
+	input:hover::-moz-placeholder,				{ color: $color; }
+	textarea:hover::-moz-placeholder			{ color: $color; }
+
+	input:hover:-ms-input-placeholder,			{ color: $color; }
+	textarea:hover:-ms-input-placeholder		{ color: $color; }
+}

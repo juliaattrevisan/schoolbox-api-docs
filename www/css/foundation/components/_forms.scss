@@ -1,0 +1,527 @@
+//
+// FORMS
+//
+
+//$include-html-form-classes: $include-html-classes;
+
+// We use this to set the base for lots of form spacing and positioning styles
+$form-spacing: rem-calc(22);
+
+// We use these to style the labels in different ways
+// $form-label-pointer: pointer;
+$form-label-font-size: rem-calc(16);
+$form-label-font-weight: $font-weight-bold;
+$form-label-line-height: 1.4rem;
+$form-label-font-color: $black;
+// $form-label-small-transform: capitalize;
+$form-label-bottom-margin: rem-calc(16);
+// $input-font-family: inherit;
+$input-font-color: $body-grey;
+$input-font-size: rem-calc(16);
+$input-bg-color: $white;
+$input-focus-bg-color: $ocean-sunset;
+$input-focus-color: $black;
+$input-border-color: tint($tertiary, 66%);
+$input-focus-border-color: tint($tertiary, 66%);
+$input-hover-bg-color: tint($tertiary, 87%);
+$input-hover-color: $black;
+$input-border-style: solid;
+$input-border-width: 2px;
+// $input-border-radius: $global-radius;
+$input-disabled-bg: rgba($primary-color, 0.04);
+// $input-disabled-cursor: $cursor-default-value;
+$input-box-shadow: none;
+
+// We use these to style the fieldset border and spacing.
+// $fieldset-border-style: solid;
+// $fieldset-border-width: 1px;
+// $fieldset-border-color: $gainsboro;
+// $fieldset-padding: rem-calc(20);
+$fieldset-margin: rem-calc(16 0);
+
+// We use these to style the legends when you use them
+// $legend-bg: $white;
+// $legend-font-weight: $font-weight-bold;
+// $legend-padding: rem-calc(0 3);
+
+// We use these to style the prefix and postfix input elements
+// $input-prefix-bg: scale-color($white, $lightness: -5%);
+// $input-prefix-border-color: scale-color($white, $lightness: -20%);
+// $input-prefix-border-size: 1px;
+// $input-prefix-border-type: solid;
+// $input-prefix-overflow: hidden;
+// $input-prefix-font-color: $oil;
+// $input-prefix-font-color-alt: $white;
+
+// We use this setting to turn on/off HTML5 number spinners (the up/down arrows)
+// $input-number-spinners: true;
+
+// We use these to style the error states for inputs and labels
+$input-error-message-padding: rem-calc(8);
+$input-error-message-top: -1px;
+$input-error-message-font-size: rem-calc(12);
+$input-error-message-font-weight: $font-weight-normal;
+// $input-error-message-font-style: italic;
+// $input-error-message-font-color: $white;
+$input-error-message-font-color-alt: $alert-color;
+
+// We use this to style the glowing effect of inputs when focused
+$input-include-glowing-effect: false;
+// $glowing-effect-fade-time: 0.45s;
+// $glowing-effect-color: $input-focus-border-color;
+
+// Select variables
+$select-bg-color: $input-bg-color;
+$select-hover-bg-color: tint($warning-color, 50%);
+
+//  
+// SWITCH
+//
+
+// $include-html-form-classes: $include-html-classes;
+
+// Controlling background color for the switch container
+$switch-bg: tint($secondary-color, 26%);
+
+// Controlling border styles and background colors for the switch container
+$switch-border-color: transparent;
+// $switch-border-style: solid;
+$switch-border-width: 0px;
+// $switch-bg: $white;
+
+// We use these to control the switch heights for our default classes
+// $switch-height-tny: rem-calc(22);
+// $switch-height-sml: rem-calc(28);
+$switch-height-med: rem-calc(32);
+// $switch-height-lrg: rem-calc(44);
+// $switch-bottom-margin: rem-calc(20);
+
+// We use these to control default font sizes for our classes.
+// $switch-font-size-tny: 11px;
+// $switch-font-size-sml: 12px;
+$switch-font-size-med: 16px;
+// $switch-font-size-lrg: 17px;
+// $switch-label-side-padding: 6px;
+
+// We use these to style the switch-paddle
+$switch-active-color: $success-color;
+// $switch-paddle-bg: $white;
+$switch-paddle-fade-to-color: tint($secondary-color, 74%);
+$switch-paddle-border-color: transparent;
+$switch-paddle-border-width: 0px;
+// $switch-paddle-border-style: solid;
+// $switch-paddle-transition-speed: .1s;
+// $switch-paddle-transition-ease: ease-out;
+$switch-positive-color: tint($success-color, 50%);
+$switch-negative-color: tint($secondary-color, 74%);
+
+// Outline Style for tabbing through switches
+// $switch-label-outline: 1px dotted $jumbo;
+
+@import "../../../javascript/components/foundation/scss/foundation/components/forms";
+@import "../../../javascript/components/foundation/scss/foundation/components/switches";
+
+//
+// Custom overrides
+//
+
+form 						{ @include placeholder-color($body-grey, $font-weight-normal); @include placeholder-hover-color($black); }
+
+input 						{ height: 3rem; }
+input,
+textarea,
+select 						{ @include single-transition(all, 0.15s, linear); font-weight: $font-weight-normal;
+	&:hover 				{ background-color: $input-hover-bg-color; color: $input-hover-color; }
+	&:focus 				{ color: $input-focus-color; outline-color: none; }
+}
+select option				{
+	&:hover 				{ background: $input-hover-bg-color; }
+}
+input[type=radio],
+input[type=checkbox] 		{ float: left; width: 0; height: 0; opacity: 0; }
+label.radio-label,
+label.checkbox-label		{ background-image: url('/images/foundation/form-elements.png'); }
+input[type=radio] +
+label.radio-label,
+input[type=checkbox] +
+label.checkbox-label		{ padding-left: 29px; height: 24px; display: inline-block; line-height: 24px;
+							background-repeat: no-repeat; background-position: 0 0; font-weight: $font-weight-normal;
+							vertical-align: middle; cursor: pointer; margin: 16px 1.375rem 16px 0;
+}
+input[type=checkbox] +
+label.checkbox-label		{ background-position: 0 -72px; }
+//	input[type=radio]:hover +
+//	label.checkbox-label:hover	{ background-position: 0 -24px; }
+input[type=radio]:checked +
+label.radio-label			{ background-position: 0 -48px; }
+input[type=checkbox]:checked +
+label.checkbox-label		{ background-position: 0 -120px; }
+
+
+//  DATEPICKER
+.ui-datepicker{
+	@include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));
+}
+
+.ui-datepicker-calendar{
+	margin: 0;
+
+	thead,
+	tr.even,
+	tr.alt,
+	tr{
+		background-color: $secondary-color !important;
+	}
+	.ui-datepicker-today{
+		background-color: $white;
+	}
+	td:hover{
+		background-color: tint($tertiary, 87%);
+	}
+}
+
+.ui-datepicker-header{
+	background-color: $secondary-color;
+	color: $primary-color;
+	font-weight: $font-weight-bold;
+	padding: 1rem;
+}
+
+.ui-datepicker-title{
+	text-align: center;
+}
+
+.ui-datepicker-prev{
+	float: left;
+}
+
+.ui-datepicker-next{
+	float: right;
+}
+
+
+
+//	DROPZONE
+.dropzone{
+	background-color: rgba($success-color, 0.3);
+	border: 4px dashed $success-color;
+	padding: 2rem;
+	text-align: center;
+	position: relative;
+	min-height: 145px;
+
+	&.dz-drag-hover {
+		border-color: rgba($black, 0.15);
+		background: rgba($black, 0.4);
+	}
+
+	.dz-default.dz-message {
+		background-image: url('/images/foundation/dropzone.png');
+		background-repeat: no-repeat;
+		background-position: 50% 0;
+		@include single-transition(opacity, 0.3s, ease-in-out);
+		opacity: 1;
+		-ms-filter: none;
+		filter: none;
+		height: 48px;
+		position: absolute;
+		width: 205px;
+		left: 50%;
+		margin-left: -95px;
+		top: 25px;
+	}
+
+	.dz-preview,
+	.dropzone-previews .dz-preview {
+		background: $white;
+		position: relative;
+		display: inline-block;
+		margin: 16px 8px;
+		vertical-align: top;
+		border: 2px solid tint($tertiary, 66%);
+		padding: 0.4rem;
+	}
+	
+	.dz-preview.dz-error .dz-error-mark,
+	.dropzone-previews .dz-preview.dz-error .dz-error-mark,
+	.dz-preview.dz-success .dz-success-mark,
+	.dropzone-previews .dz-preview.dz-success .dz-success-mark,
+	.dz-preview:hover.dz-error .dz-error-message,
+	.dropzone-previews .dz-preview:hover.dz-error .dz-error-message {
+		display: block;
+	}
+
+	.dz-preview .dz-error-mark span,
+	.dropzone-previews .dz-preview .dz-error-mark span,
+	.dz-preview .dz-success-mark span,
+	.dropzone-previews .dz-preview .dz-success-mark span,
+	.dz-preview.dz-file-preview [data-dz-thumbnail],
+	.dropzone-previews .dz-preview.dz-file-preview [data-dz-thumbnail],
+	.dz-preview:hover .dz-details img,
+	.dropzone-previews .dz-preview:hover .dz-details img {
+		display: none;
+	}
+
+	.dz-preview .dz-error-mark,
+	.dropzone-previews .dz-preview .dz-error-mark {
+		background-position: 0 -72px;
+	}
+
+	.dz-preview .dz-success-mark,
+	.dropzone-previews .dz-preview .dz-success-mark {
+		background-position: 0 -48px;
+	}
+
+	.dz-preview .dz-error-mark,
+	.dropzone-previews .dz-preview .dz-error-mark,
+	.dz-preview .dz-success-mark,
+	.dropzone-previews .dz-preview .dz-success-mark {
+		background-image: url('/images/foundation/dropzone.png');
+		background-repeat: no-repeat;
+		display: block;
+		opacity: 0;
+		-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+		filter: alpha(opacity=0);
+		@include single-transition(opacity, 0.4s, ease-in-out);
+	}
+
+	.dz-preview .dz-success-mark,
+	.dropzone-previews .dz-preview .dz-success-mark,
+	.dz-preview .dz-error-mark,
+	.dropzone-previews .dz-preview .dz-error-mark {
+		display: none;
+		position: absolute;
+		width: 24px;
+		height: 24px;
+		font-size: 1rem;
+		text-align: center;
+		right: -10px;
+		top: -10px;
+	}
+
+	.dropzone a.dz-remove,
+	.dropzone-previews a.dz-remove {
+		text-decoration: none;
+		display: block;
+		padding: 4px 5px;
+		text-align: center;
+		color: $primary-color;
+	}
+}
+
+.dz-preview .dz-details,
+.dropzone-previews .dz-preview .dz-details {
+	width: 100px;
+	height: 100px;
+	position: relative;
+	background: #ebebeb;
+	padding: 5px;
+	margin-bottom: 22px;
+}
+.dz-preview .dz-details .dz-filename,
+.dropzone-previews .dz-preview .dz-details .dz-filename {
+	overflow: hidden;
+	height: 100%;
+}
+.dz-preview .dz-details img,
+.dropzone-previews .dz-preview .dz-details img {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100px;
+	height: 100px;
+}
+.dz-preview .dz-details .dz-size,
+.dropzone-previews .dz-preview .dz-details .dz-size {
+	position: absolute;
+	bottom: -28px;
+	left: 3px;
+	height: 28px;
+	line-height: 28px;
+}
+
+.dz-preview .dz-success-mark,
+.dropzone-previews .dz-preview .dz-success-mark,
+.dz-preview .dz-error-mark,
+.dropzone-previews .dz-preview .dz-error-mark {
+	display: none;
+	position: absolute;
+	width: 24px;
+	height: 24px;
+	font-size: 30px;
+	text-align: center;
+	right: -10px;
+	top: -10px;
+}
+.dz-preview .dz-success-mark,
+.dropzone-previews .dz-preview .dz-success-mark {
+	color: $success-color;
+}
+.dz-preview .dz-error-mark,
+.dropzone-previews .dz-preview .dz-error-mark {
+	color: $alert-color;
+}
+.dz-preview .dz-progress,
+.dropzone-previews .dz-preview .dz-progress {
+	position: absolute;
+	top: 100px;
+	left: 6px;
+	right: 6px;
+	height: 6px;
+	background: $body-grey;
+	display: none;
+}
+.dz-preview .dz-progress .dz-upload,
+.dropzone-previews .dz-preview .dz-progress .dz-upload {
+	display: block;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: 0%;
+	background-color: $success-color;
+}
+.dz-preview.dz-processing .dz-progress,
+.dropzone-previews .dz-preview.dz-processing .dz-progress {
+	display: block;
+}
+.dz-preview .dz-error-message,
+.dropzone-previews .dz-preview .dz-error-message {
+	display: none;
+	position: absolute;
+	top: -5px;
+	left: -20px;
+	background: rgba($white, 0.8);
+	padding: 8px 10px;
+	color: $alert-color;
+	min-width: 140px;
+	max-width: 500px;
+	z-index: 500;
+}
+
+.dz-default.dz-message span {
+	color: $success-color;
+	line-height: 10rem;
+	font-weight: 800;
+}
+.dropzone.dz-square .dz-default.dz-message {
+	background-position: 0 -123px;
+	width: 268px;
+	margin-left: -134px;
+	height: 174px;
+	margin-top: -87px;
+}
+.dropzone.dz-drag-hover .dz-message {
+	opacity: 0.15;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=15)";
+	filter: alpha(opacity=15);
+}
+.dropzone.dz-started .dz-message {
+	display: block;
+	opacity: 0;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+	filter: alpha(opacity=0);
+}
+.dz-preview.dz-image-preview:hover .dz-details img,
+.dropzone-previews .dz-preview.dz-image-preview:hover .dz-details img {
+	display: block;
+	opacity: 0.1;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=10)";
+	filter: alpha(opacity=10);
+}
+.dz-preview.dz-success .dz-success-mark,
+.dropzone-previews .dz-preview.dz-success .dz-success-mark {
+	opacity: 1;
+	-ms-filter: none;
+	filter: none;
+}
+.dz-preview.dz-error .dz-error-mark,
+.dropzone-previews .dz-preview.dz-error .dz-error-mark {
+	opacity: 1;
+	-ms-filter: none;
+	filter: none;
+}
+.dz-preview.dz-error .dz-progress .dz-upload,
+.dropzone-previews .dz-preview.dz-error .dz-progress .dz-upload {
+	background: $alert-color;
+}
+
+.dz-preview.dz-success .dz-progress,
+.dropzone-previews .dz-preview.dz-success .dz-progress {
+	display: block;
+	opacity: 0;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+	filter: alpha(opacity=0);
+	@include single-transition(opacity, 0.4s, ease-in-out);
+}
+
+.dz-preview .dz-error-message,
+.dropzone-previews .dz-preview .dz-error-message {
+	display: block;
+	opacity: 0;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+	filter: alpha(opacity=0);
+	@include single-transition(opacity, 0.3s, ease-in-out);
+}
+
+.dz-preview:hover.dz-error .dz-error-message,
+.dropzone-previews .dz-preview:hover.dz-error .dz-error-message {
+	opacity: 1;
+	-ms-filter: none;
+	filter: none;
+}
+
+.dz-preview .dz-progress .dz-upload,
+.dropzone-previews .dz-preview .dz-progress .dz-upload {
+	@include animation(loading 0.4s linear infinite);
+	@include single-transition(width, 0.3s, ease-in-out);
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 0%;
+	height: 100%;
+	background-image: url('/images/foundation/dropzone.png');
+	background-repeat: repeat-x;
+	background-position: 0px -400px;
+}
+
+a.dz-remove:hover,
+.dropzone-previews a.dz-remove:hover {
+	color: #666;
+}
+@-moz-keyframes loading {
+	from {
+		background-position: 0 -400px;
+	}
+	to {
+		background-position: -7px -400px;
+	}
+}
+@-webkit-keyframes loading {
+	from {
+		background-position: 0 -400px;
+	}
+	to {
+		background-position: -7px -400px;
+	}
+}
+@-o-keyframes loading {
+	from {
+		background-position: 0 -400px;
+	}
+	to {
+		background-position: -7px -400px;
+	}
+}
+@keyframes loading {
+	from {
+		background-position: 0 -400px;
+	}
+	to {
+		background-position: -7px -400px;
+	}
+}
+
+
