@@ -154,7 +154,7 @@ li ul, li ol {
 }
 
 ul, ol {
-    margin: 0 16px;
+    margin: 0;
     padding: 0;
 }
 
@@ -7869,14 +7869,18 @@ p.forgotten {
       font-weight: bold;
     }
 
-    ul{
-    	margin: 0 16px;
-    	list-style: disc;
+    ul, ol {
+        list-style: disc;
+    }
+
+    ol {
+        list-style: decimal;
     }
 
     li {
         padding: 0 !important;
         border: 0 !important;
+        margin: 0 16px !important;
     }
 
     code {
