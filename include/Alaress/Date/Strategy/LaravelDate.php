@@ -100,6 +100,14 @@ class Alaress_Date_Strategy_LaravelDate extends Alaress_Date_Strategy_DateTime
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getRelativeTime($now = null, $stripModifiers = false)
+    {
+        return LaravelDate::now()->diffForHumans($now, $stripModifiers);
+    }
+
+    /**
      * Validates whether this date is actually valid.
      *
      * @return bool

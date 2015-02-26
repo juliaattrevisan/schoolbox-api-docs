@@ -116,6 +116,15 @@ class Alaress_Date_Strategy_DateTime extends Alaress_Date_Strategy_Abstract
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getRelativeTime($now = null, $stripModifiers = false)
+    {
+        // Not implemented, I will probably remove this whole connector
+        return '';
+    }
+
+    /**
      * Validates whether this date is actually valid.
      *
      * @return bool

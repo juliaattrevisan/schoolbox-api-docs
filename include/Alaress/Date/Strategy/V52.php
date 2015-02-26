@@ -36,4 +36,13 @@ class Alaress_Date_Strategy_V52 extends Alaress_Date_Strategy_Abstract {
 
 		return $result;
 	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getRelativeTime($now = null, $stripModifiers = false)
+	{
+		// TODO: Implement getRelativeTime() method.
+		return '';
+	}
 }

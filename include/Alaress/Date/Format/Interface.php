@@ -45,4 +45,16 @@ interface Alaress_Date_Format_Interface extends IComparable {
 	 * @return DateTime
 	 */
 	public function getDateTimeObject();
+
+	/**
+	 * Retrieves this time, formatted as a relative time.
+	 *
+	 * @param Alaress_Date_Format|DateTime|DateTimeInterface $now
+	 *          The time to compare to, or null to default to the current time.
+	 * @param bool                                           $stripModifiers
+	 *          If true, remove the prefix and suffix from the output, defaults to false.
+	 *
+	 * @return string
+	 */
+	public function getRelativeTime($now = null, $stripModifiers = false);
 }
