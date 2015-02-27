@@ -83,7 +83,6 @@ class BlogMapper extends Schoolbox\Mapper {
 			'other_key' => 'blog_id',
 		));
 
-		parent::mapping();
 	}
 
 	/**

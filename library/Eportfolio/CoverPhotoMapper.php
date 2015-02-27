@@ -60,7 +60,6 @@ class CoverPhotoMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_DATETIME,
 		));
 
-		parent::mapping();
 	}
 
 	/**

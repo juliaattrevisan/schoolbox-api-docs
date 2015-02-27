@@ -70,6 +70,5 @@ class BlogCommentMapper extends Schoolbox\Mapper {
 			'other_key' => 'id',
 		));
 
-		parent::mapping();
 	}
 }

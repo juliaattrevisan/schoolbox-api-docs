@@ -46,6 +46,5 @@ class TextboxMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_INTEGER,
 		));
 
-		parent::mapping();
 	}
 }
