@@ -1,1 +1,138 @@
-poop
+<script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
+<script type="text/javascript" src="/javascript/components/highcharts/highcharts-more.js"></script>
+<script type="text/javascript">
+    $(function () {
+
+        var values = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+        /**
+         * http://www.purplemath.com/modules/boxwhisk.htm
+         */
+        function findMedian(values) {
+
+            /* This sorts as strings by default so use an
+             * anonymous function to do it properly
+             *
+             * http://www.w3schools.com/jsref/jsref_sort.asp
+             */
+            values.sort(function(a, b) {
+                return a-b
+            });
+
+            /* Figure out medians in different ways depending
+             * on even or odd number of elements
+             */
+            var halfway = Math.floor(values.length/2);
+
+            var even = !(values.length % 2);
+
+            if (even) {
+                return (values[halfway-1] + values[halfway])/2.0;
+            }
+            /* Careful of these offsets
+             */
+            else {
+                return values[halfway];
+            }
+        }
+
+        /* Even number of items: split down the middle
+         * Odd number of items: ignore the median value
+         */
+        var even = !(values.length % 2);
+
+        if (even) {
+            var firstQuartile = values.slice(0, Math.floor(values.length/2));
+            var thirdQuartile = values.slice(Math.floor(values.length/2), values.length);
+        }
+        else {
+            console.log(values.slice(0, Math.floor(values.length/2)));
+            console.log(values.slice(Math.ceil(values.length/2), values.length));
+        }
+
+        var data = {
+            minimum: 0,
+            quartile1: 0,
+            median: findMedian(values),
+            quartile2: 0,
+            maximum: 0
+        }
+
+
+
+
+
+        $('#container').highcharts({
+
+            chart: {
+                type: 'boxplot'
+            },
+
+            title: {
+                text: 'Highcharts Box Plot Example'
+            },
+
+            legend: {
+                enabled: false
+            },
+
+            xAxis: {
+                categories: ['Gronzy'],
+                title: {
+                    text: 'Experiment No.'
+                }
+            },
+
+            yAxis: {
+                title: {
+                    text: 'Observations'
+                },
+                plotLines: [{
+                    value: 67,
+                    color: 'red',
+                    width: 2,
+                    label: {
+                        text: 'Theoretical mean: 932',
+                        align: 'center',
+                        style: {
+                            color: 'gray'
+                        }
+                    }
+                }]
+            },
+
+            series: [{
+                name: 'Observations',
+                data: [
+                    /* Sample Minimum, Lower Quartile, Media, Upper Quartile, Sample Maximum
+                     */
+                    [1, 25, 60, 75, 100]
+                ],
+                tooltip: {
+                    headerFormat: '<em>Experiment No {point.key}</em><br/>'
+                }
+            },
+            {
+                name: 'Outlier',
+                color: Highcharts.getOptions().colors[0],
+                type: 'scatter',
+                data: [ // x, y positions where 0 is the first category
+                ],
+                marker: {
+                    fillColor: 'white',
+                    lineWidth: 1,
+                    lineColor: Highcharts.getOptions().colors[0]
+                },
+                tooltip: {
+                    pointFormat: 'Observation: {point.y}'
+                }
+            }]
+        });
+    });
+</script>
+
+test
+<div id="container" style="width:100%;height:100%">
+    stuff happens here I suppose
+
+</div>
