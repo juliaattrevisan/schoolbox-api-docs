@@ -11,6 +11,7 @@ namespace Schoolbox;
 
 use Database;
 use PDO;
+use PDOStatement;
 use Schoolbox\Column\Factory as ColumnFactory;
 use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
@@ -1156,9 +1157,7 @@ abstract class Mapper implements Serializable
         );
         $options      = array_merge($defaults, $options);
         $quoted_table = $this->database->quoteIdentifier($this->table);
-        $query        = "SELECT {$this->getColumnString()} FROM $quoted_table";
-        // Build WHERE part
-        $where_parts = array();
+        $query        = $this->getSelectString();
         $params      = array();
         if (!empty($columnList)) {
             // Build WHERE part
@@ -1220,9 +1219,33 @@ abstract class Mapper implements Serializable
             $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
         }
         $statement->execute();
+
+        return $this->hydrateSelect($statement);
+    }
+
+
+    /**
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        // in the core mapper this is quite trivial, but implementing classes can override
+        $quoted_table = $this->database->quoteIdentifier($this->table);
+        return "SELECT {$this->getColumnString()} FROM $quoted_table";
+    }
+
+
+    /**
+     * @param PDOStatement $statement
+     * @return Collection
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        // in the core mapper this is quite trivial, but implementing classes can override
         $rowset = $statement->fetchAll();
         return $this->hydrateList($rowset);
     }
+
 
     /**
      * @see $this->findAll()
@@ -1844,7 +1867,7 @@ abstract class Mapper implements Serializable
      *
      * @return object
      */
-    public function hydrateJoin($row, $join, $alias, $callback = null)
+    public function hydrateJoin($row, $join, $alias = '', $callback = null)
     {
         $mapper = $this->getJoinMapper($join);
         if ($mapper instanceof Mapper) {
