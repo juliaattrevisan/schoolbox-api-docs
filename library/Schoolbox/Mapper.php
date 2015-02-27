@@ -81,6 +81,11 @@ abstract class Mapper implements Serializable
     const CALLBACK_PRESOFTDELETE  = 'preSoftDelete';
     const CALLBACK_POSTSOFTDELETE = 'postSoftDelete';
 
+    const COLUMN_IDENTIFIER        = 1;
+    const COLUMN_CREATED_TIMESTAMP = 2;
+    const COLUMN_UPDATED_TIMESTAMP = 4;
+    const COLUMN_JOIN_MULTI        = 8;
+    const COLUMN_SOFTDELETE        = 16;
     /**
      * @var Database
      */
@@ -477,6 +482,131 @@ abstract class Mapper implements Serializable
         $model->$set_method($value);
         return $this;
     }
+
+
+    /**
+     * @param string             $column
+     * @param string|IColumnType $type
+     * @param int                $options
+     * @param string             $property
+     * @return array
+     */
+    private function buildColumnMap($column, $type, $options, $property)
+    {
+        $map = [
+            'column' => $column,
+        ];
+        if ($property) {
+            $map['property'] = $property;
+        }
+        if ($type instanceof IColumnType) {
+            $map['hydrator'] = $type;
+        } else {
+            $map['type'] = $type;
+        }
+        // boolean options
+        if ($options & self::COLUMN_IDENTIFIER) {
+            $map['identifier'] = true;
+        }
+        if ($options & self::COLUMN_CREATED_TIMESTAMP) {
+            $map['created_timestamp'] = true;
+        }
+        if ($options & self::COLUMN_UPDATED_TIMESTAMP) {
+            $map['updated_timestamp'] = true;
+        }
+        if ($options & self::COLUMN_SOFTDELETE) {
+            if (in_array($type, [self::TYPE_TIMESTAMP, self::TYPE_DATETIME, self::TYPE_DATE])) {
+                $map['softdelete_timestamp'] = true;
+            } else {
+                $map['softdelete_boolean'] = true;
+            }
+        }
+        return $map;
+    }
+
+
+    /**
+     * The concise, typesafe version of hasMap()
+     *
+     * @param string $column
+     * @param string|IColumnType $type
+     * @param int    $options
+     * @param string $property
+     * @return bool
+     */
+    protected function uses($column, $type, $options = null, $property = null)
+    {
+        return $this->hasMap($this->buildColumnMap($column, $type, $options, $property));
+    }
+
+
+    /**
+     * The concise, typesafe version of hasMap() + hasJoin()
+     *
+     * @param string      $column
+     * @param string      $foreignMapper
+     * @param string      $foreignKey
+     * @param IColumnType $hydrator
+     * @param int         $options
+     * @param string      $property
+     * @return bool
+     */
+    protected function joins($column, $foreignMapper, $foreignKey, $hydrator = null, $options = null, $property = null)
+    {
+        if ($hydrator) {
+            $type = $hydrator;
+        } elseif ($options & self::COLUMN_JOIN_MULTI) {
+            $type = self::TYPE_COLLECTION;
+        } else {
+            $type = self::TYPE_MODEL;
+        }
+        $map = $this->buildColumnMap($column, $type, $options, $property);
+        $map['join'] = $column;
+        $map['join_def'] = [
+            'mapper'    => $foreignMapper,
+            'other_key' => $foreignKey
+        ];
+        return $this->hasMap($map);
+    }
+
+
+    /**
+     * The concise, typesave version of hasMap() + hasJoin(['multi'])
+     *
+     * @param string      $viaTable       the manymany jointable
+     * @param string      $foreignMapper  the target Mapper on the other side (not a jointable Mapper)
+     * @param string      $foreignKey     the ID field of the foreign Model
+     * @param string      $viaForeign     the fieldname on the foreign side of the jointable
+     * @param string      $viaLocal       the fieldname of the local side of the jointable
+     * @param string      $localKey       optionally, the ID field of this Model, defaults to $this->identifier otherwise
+     * @param IColumnType $hydrator       optionally, a custom hydrator
+     * @param int         $options        optionally, any custom options required
+     * @param string      $property       opyionally, override the property name from default
+     * @throws Exception
+     */
+    protected function joinsVia($viaTable, $foreignMapper, $foreignKey, $viaForeign, $viaLocal, $localKey = null, $hydrator = null, $options = null, $property = null)
+    {
+        if (!$localKey && !$this->identifier) {
+            throw new Exception("No identifier specified, either provide one or declare a primary key first");
+        }
+        $type = $hydrator ?: self::TYPE_COLLECTION;
+        $map  = $this->buildColumnMap('', $type, $options, $property);
+        // there is no local column in this instance
+        unset($map['column']);
+        $map['join'] = $viaTable;
+        $map['join_def'] = [
+            'mapper'    => $foreignMapper,
+            'this_key'  => $localKey ?: $this->identifier['column'],
+            'other_key' => $foreignKey,
+            'multi'     => [
+                'via_table'  => $viaTable,
+                'this_key'   => $viaLocal,
+                'other_key'  => $viaForeign
+            ]
+        ];
+        $this->hasMap($map);
+    }
+
 
     /**
      * Adds a mapping from a database column to a model property.
