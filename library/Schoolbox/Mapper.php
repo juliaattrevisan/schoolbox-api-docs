@@ -21,7 +21,7 @@ use Schoolbox\Notif\NotifInterface;
 use Schoolbox\Realtime\Schedule\Event;
 use Serializable;
 
-class Mapper implements Serializable
+abstract class Mapper implements Serializable
 {
     /**
      * Represents a boolean data type.
@@ -1443,44 +1443,13 @@ class Mapper implements Serializable
         return $affectedIDs;
     }
 
+
     /**
-     * @brief      Attempts to complete a partially defined map
-     *
-     * @deprecated Define all mappings yourself instead of relying on magic
-     *
-     * @return Bool
+     * Setup method. Implementing classes to define their SQL map here.
+     * @return void
      */
-    protected function mapping()
-    {
-        if (empty($this->model)) {
-            $modelName = substr(get_class($this), 0, -6);
-            if (class_exists($modelName, true)) {
-                $this->model = $modelName;
-            } else {
-                return false;
-            }
-        }
-        if (empty($this->table)) {
-            $this->table = $this->toUnderscore($this->model);
-        }
-        if ($this->map->count() === 0) {
-            $propertyList = array_keys(get_class_vars($this->model));
-            if (!empty($propertyList)) {
-                foreach ($propertyList as $propertyName) {
-                    $this->hasMap(
-                        array(
-                            'column'     => $this->toUnderscore($propertyName),
-                            'property'   => $propertyName,
-                            'identifier' => $propertyName == 'id' ? true : false
-                        )
-                    );
-                }
-            } else {
-                return false;
-            }
-        }
-        return true;
-    }
+    protected abstract function mapping();
+
 
     protected function hasTable($table)
     {
