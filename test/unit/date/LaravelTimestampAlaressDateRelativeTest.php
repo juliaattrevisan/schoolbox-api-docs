@@ -122,7 +122,7 @@ class LaravelTimestampAlaressDateRelativeTest extends PHPUnit_Framework_TestCase
     public function testRelativeTimeAncientHistory()
     {
         $input    = date('U', strtotime('2001-01-03 02:02:12'));
-        $expected = 'on 3rd Jan 2001';
+        $expected = '10 years before';
 
         $relativeDate = new Alaress_Date_Format($input, 'U');
         $result       = $relativeDate->getRelativeTime(new DateTime('2011-08-31 17:40:11'));
