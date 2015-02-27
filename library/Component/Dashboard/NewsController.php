@@ -73,8 +73,6 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                 $url = new Url($previous['topicName']);
 
                 $newsTime = new Alaress_Date_Format($item['item_datetime_posted'], 'Y-m-d H:i:s');
-                $newsTime->setPrefix('');
-
                 $output = array(
                     'NEWS_TITLE' => $item['item_heading'],
                     'NEWS_URL' => '/news/item/' . $item['item_id'],

@@ -36,8 +36,6 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
             if (count($feedList)) {
                 foreach ($feedList as $f) {
                     $feedTime = new Alaress_Date_Format($f['date'], 'U');
-                    $feedTime->setPrefix('');
-
                     $this->feedList[] = array(
                         'icon' => $f['type'],
                         'content' => $f['messageHTML'] . (empty($f['cat_name']) ? '' : ' in <a href="/homepage/' . $f['cat_id'] . '">' . $f['cat_name'] . '</a>'),
