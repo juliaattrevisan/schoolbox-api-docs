@@ -51,15 +51,16 @@ class Controller extends Base {
      */
     public function register($provider)
     {
-        $data     = (array)$this->getRequest()->post;
-        $response = $this->getResponse()->content;
+        $data      = (array)$this->getRequest()->post;
+        $response  = $this->getResponse()->content;
+        $providers = array(Registry::PROVIDER_APPLE, Registry::PROVIDER_GOOGLE);
 
         // check the provider is valid
-        if (!in_array($provider, array(Registry::PROVIDER_APPLE, Registry::PROVIDER_GOOGLE))) {
+        if (!in_array($provider, $providers)) {
             $this->getResponse()->status->setCode(400);
             $response->set(array(
                 'format' => 'json',
-                'data'   => "Invalid provider: '$provider'. Accepted providers are: ".implode(', ', array(Registry::PROVIDER_APPLE, Registry::PROVIDER_GOOGLE))
+                'data'   => "Invalid provider: '$provider'. Accepted providers are: " . implode(', ', $providers)
             ));
             return;
         }
