@@ -12,7 +12,7 @@ if ($_GET['url']) {
 
         $link = $linkMapper->findOneByColumn('url', $url);
     } catch (\Exception $e) {
-        error(101);
+        // let it through
     }
 } elseif (is_numeric($_GET['id'])) {
     try {
