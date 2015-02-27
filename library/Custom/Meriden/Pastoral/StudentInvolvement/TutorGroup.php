@@ -9,8 +9,17 @@
 
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
+use Schoolbox\User;
+
 class TutorGroup extends Involvement
 {
+    /**
+     * The year level coordinator(s) for this group
+     *
+     * @var User[]
+     */
+    protected $coordinators = array();
+
     /**
      * The tutors for this group
      *
@@ -141,6 +150,25 @@ class TutorGroup extends Involvement
     public function setSubjects($subjects)
     {
         $this->subjects = $subjects;
+        return $this;
+    }
+
+    /**
+     * @return \Schoolbox\User[]
+     */
+    public function getCoordinators()
+    {
+        return $this->coordinators;
+    }
+
+    /**
+     * @param  \Schoolbox\User[] $coordinators
+     *
+     * @return $this
+     */
+    public function setCoordinators($coordinators)
+    {
+        $this->coordinators = $coordinators;
         return $this;
     }
 }

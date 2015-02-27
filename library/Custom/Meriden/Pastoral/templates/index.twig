@@ -42,7 +42,9 @@
     <dd>{{ report.student.schoolHouse.house }}</dd>
 
     <dt>Year Coordinator</dt>
-    <dd>{{ report.tutorGroupReport.coordinator.name }}</dd>
+    {% for coordinator in report.tutorGroupReport.coordinators %}
+        <dd><a href="/search/user/{{ coordinator.id }}">{{ coordinator.formatName }}</a></dd>
+    {% endfor %}
 
     <dt>Tutor Group</dt>
     <dd>

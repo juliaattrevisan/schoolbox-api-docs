@@ -17,8 +17,11 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Grades;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -107,6 +110,19 @@ class Factory
             ->moveToNamedGrade('uniform', 'Uniform')
             ->moveToNamedGrade('pastoral', 'Pastoral activities involvement')
         ;
+
+        // Add write level staff as coordinators
+        $folder = $tutorGroup->getFolder();
+        if ($folder instanceof Category) {
+            $tutorGroup->setCoordinators(
+                UserAccessMapper::getInstance()->findUsersInCategory(
+                    $folder,
+                    Role::STAFF,
+                    UserAccess::ACCESS_WRITE,
+                    false
+                )
+            );
+        }
         return $tutorGroup;
     }
 
