@@ -25,7 +25,7 @@
                     var sequence = 1;
 
                     allQuestions.each(function (index, element) {
-                        var strong = $(element).find('strong');
+                        var strong = $(element).children('strong[data-seq]');
 
                         strong.html(strong.text().trim().replace(/^Q\d+/, 'Q' + sequence));
                         sequence++;
@@ -57,7 +57,7 @@
 		<ul class="question-list" id='section{SECTION_SECTION_ID}'>
 			<!-- BEGIN question -->
 			<li id='question_{QUESTION_QUESTION_ID}'>
-				<strong>
+				<strong data-seq>
           Q{QUESTION_SEQUENCE})
           <!-- BEGIN has_mark -->
           ({QUESTION_MARKS} marks)
