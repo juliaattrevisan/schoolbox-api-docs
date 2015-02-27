@@ -145,7 +145,7 @@ class LaravelDatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase
     public function testRelativeTimePastAncientHistory()
     {
         $input    = '2001-01-03 02:02:12';
-        $expected = 'on 3rd Jan 2001';
+        $expected = '10 years before';
 
         $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $result       = $relativeDate->getRelativeTime(new DateTime('2011-08-31 17:40:11'));
@@ -201,7 +201,7 @@ class LaravelDatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase
     public function testRelativeTimeFutureMinutes2()
     {
         $input    = '2011-06-08 05:55:00';
-        $expected = '54 minutes after';
+        $expected = '53 minutes after';
 
         $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $result       = $relativeDate->getRelativeTime(new DateTime('2011-06-08 05:01:01'));
