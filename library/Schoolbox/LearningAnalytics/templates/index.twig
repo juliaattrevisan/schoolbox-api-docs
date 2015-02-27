@@ -9,7 +9,11 @@
              */
             var config = init(options);
 
-            return generateBoxPlotValues();
+            if (config.type == 'structured') {
+                return generateStructuredBoxPlotValues();
+            }
+
+            return generateArrayBoxPlotValues();
 
             /**
              * Init
@@ -50,7 +54,7 @@
              * Generate an object containing all the box plot values
              * required to manufacture a graph
              */
-            function generateBoxPlotValues() {
+            function generateStructuredBoxPlotValues() {
                 return {
                     minimum: findMinimum(config.values),
                     quartile1: findMedian(setupFirstQuartile(config.values)),
@@ -58,6 +62,22 @@
                     quartile3: findMedian(setupThirdQuartile(config.values)),
                     maximum: findMaximum(config.values)
                 }
+            }
+
+            /**
+             * Generate an object containing all the box plot values
+             * required to manufacture a graph
+             */
+            function generateArrayBoxPlotValues() {
+                var array = [];
+
+                array.push(findMinimum(config.values));
+                array.push(findMedian(setupFirstQuartile(config.values)));
+                array.push(findMedian(config.values));
+                array.push(findMedian(setupThirdQuartile(config.values)));
+                array.push(findMaximum(config.values));
+
+                return array;
             }
 
             /**
