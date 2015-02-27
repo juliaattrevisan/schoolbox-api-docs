@@ -3,7 +3,11 @@
 <script type="text/javascript">
     $(function () {
 
-        var values = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        var values = [4.3,  5.1,  3.9,  4.5,  4.4,  4.9,  5.0,  4.7,  4.1,  4.6,  4.4,  4.3,  4.8,  4.4,  4.2,  4.5,  4.4];
+
+        values.sort(function(a, b) {
+            return a-b
+        });
 
         /**
          * http://www.purplemath.com/modules/boxwhisk.htm
@@ -58,12 +62,42 @@
             return values.slice(Math.ceil(values.length/2), values.length);
         }
 
+        /**
+         * Find minimum value in an array
+         */
+        function findMinimum(values) {
+            var min = values[0];
+
+            for (var i = 0; i < values.length; i++) {
+                if (values[i] < min) {
+                    min = values[i];
+                }
+            }
+
+            return min;
+        }
+
+        /**
+         * Find maximum value in an array
+         */
+        function findMaximum(values) {
+            var max = values[0];
+
+            for (var i = 0; i < values.length; i++) {
+                if (values[i] > max) {
+                    max = values[i];
+                }
+            }
+
+            return max;
+        }
+
         var data = {
-            minimum: 0,
+            minimum: findMinimum(values),
             quartile1: findMedian(setupFirstQuartile(values)),
             median: findMedian(values),
             quartile3: findMedian(setupThirdQuartile(values)),
-            maximum: 0
+            maximum: findMaximum(values)
         }
 
         console.log(data);
