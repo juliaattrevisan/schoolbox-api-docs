@@ -65,8 +65,6 @@ if (is_numeric($_POST['categoryID']) && $_POST['categoryID']) {
      */
     foreach ($allNodes as $currentNode) {
         $adr = new \Alaress_Date_Format($currentNode->getModifiedAt()->getUnixTimestamp(), 'U');
-        $adr->setPrefix('');
-
         $output[] = array(
             'id' => $currentNode->getNodeId(),
             'user' => $currentNode->getUser()->formatName(),

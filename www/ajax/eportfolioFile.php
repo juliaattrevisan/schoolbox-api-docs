@@ -22,8 +22,6 @@ if (is_numeric($_POST['categoryID'])) {
 
         foreach ($fileList as $file) {
             $fileTime = new Alaress_Date_Format($file['modified'], 'Y-m-d H:i:s');
-            $fileTime->setPrefix('');
-
             $file['user'] = $userHandler->formatName($file);
             $file['relative'] = $fileTime->getRelativeTime();
             $file['mimeClass'] = !$file['iconFile'] ? $allowedFiles->getClass($file["iconFile"]) : "textfile";

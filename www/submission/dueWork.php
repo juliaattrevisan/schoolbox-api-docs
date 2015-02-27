@@ -571,8 +571,6 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
     }
 
     $activityTime = new Alaress_Date_Format($activity->getDate());
-    $activityTime->setPrefix('');
-
     $mark = $returnHandler->shortenGrade($numericMark);
 
     $feedItems[] = array(
