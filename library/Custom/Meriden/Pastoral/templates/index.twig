@@ -73,91 +73,122 @@
     </li>
 </ul>
 
-<dl id="attendance-info">
-    <dt>Days Absent</dt>
-    <dd>{{ report.tutorGroupReport.attendances.absent }}</dd>
-
-    <dt>Days Late</dt>
-    <dd>{{ report.tutorGroupReport.attendances.late }}</dd>
-
-    <dt>Detentions</dt>
-    <dd>{{ report.tutorGroupReport.attendances.detentions }}</dd>
-
-    {# Don't show endorsed leave at all if there is none #}
+<ul id="attendance-info">
+    <li>
+        <dl>
+            <dt>Days Absent</dt>
+            <dd>{{ report.tutorGroupReport.attendances.absent }}</dd>
+        </dl>
+    </li>
+    <li>
+        <dl>
+            <dt>Days Late</dt>
+            <dd>{{ report.tutorGroupReport.attendances.late }}</dd>
+        </dl>
+    </li>
+    <li>
+        <dl>
+            <dt>Detentions</dt>
+            <dd>{{ report.tutorGroupReport.attendances.detentions }}</dd>
+        </dl>
+    </li>
     {% if report.tutorGroupReport.attendances.endorsedLeave %}
-        <dt>Endorsed Leave</dt>
-        <dd>{{ report.tutorGroupReport.attendances.endorsedLeave }}</dd>
+    <li>
+        <dl>
+            {# Don't show endorsed leave at all if there is none #}
+            <dt>Endorsed Leave</dt>
+            <dd>{{ report.tutorGroupReport.attendances.endorsedLeave }}</dd>
+        </dl>
+    </li>
     {% endif %}
-
-    <dt>Athletics</dt>
-    <dd>
-        {% if report.tutorGroupReport.namedGrades.athletics %}
-            {%
-            include '@customMeridenPastoral/sub/assessmentResult.twig'
-            with {grade: report.tutorGroupReport.namedGrades.athletics}
-            %}
-        {% else %}
-            Unknown
-        {% endif %}
-    </dd>
-
-    <dt>Swimming</dt>
-    <dd>
-        {% if report.tutorGroupReport.namedGrades.swimming %}
-            {%
-            include '@customMeridenPastoral/sub/assessmentResult.twig'
-            with {grade: report.tutorGroupReport.namedGrades.swimming}
-            %}
-        {% else %}
-            Unknown
-        {% endif %}
-    </dd>
-
-    <dt>School Camp</dt>
-    <dd>
-        {% if report.tutorGroupReport.namedGrades.camp %}
-            {%
-            include '@customMeridenPastoral/sub/assessmentResult.twig'
-            with {grade: report.tutorGroupReport.namedGrades.camp}
-            %}
-        {% else %}
-            Unknown
-        {% endif %}
-    </dd>
-
-    <dt>Uniform</dt>
-    <dd>
-        {% if report.tutorGroupReport.namedGrades.uniform %}
-            {%
-            include '@customMeridenPastoral/sub/assessmentResult.twig'
-            with {grade: report.tutorGroupReport.namedGrades.uniform}
-            %}
-        {% else %}
-            Unknown
-        {% endif %}
-    </dd>
-
-    <dt>Pastoral activities involvement</dt>
-    <dd>
-        {% if report.tutorGroupReport.namedGrades.pastoral %}
-            {%
-            include '@customMeridenPastoral/sub/assessmentResult.twig'
-            with {grade: report.tutorGroupReport.namedGrades.pastoral}
-            %}
-        {% else %}
-            Unknown
-        {% endif %}
-    </dd>
-
-    {##
-     # Athletics, Swimming, Camp, Uniform, Pastoral Services:
-     # All these are attendances, and are based off of assessments in the grade page.
-     #}
-    {% for grade in report.tutorGroupReport.grades %}
-        <dt>{{ grade.assessment.name }}</dt>
-        <dd>{{ grade.pretty_mark }}</dd>
-    {% endfor %}
-</dl>
+    <li>
+        <dl>
+            <dt>Athletics</dt>
+            <dd>
+                {% if report.tutorGroupReport.namedGrades.athletics %}
+                    {%
+                    include '@customMeridenPastoral/sub/assessmentResult.twig'
+                    with {grade: report.tutorGroupReport.namedGrades.athletics}
+                    %}
+                {% else %}
+                    Unknown
+                {% endif %}
+            </dd>
+        </dl>
+    </li>
+    <li>
+        <dl>
+            <dt>Swimming</dt>
+            <dd>
+                {% if report.tutorGroupReport.namedGrades.swimming %}
+                    {%
+                    include '@customMeridenPastoral/sub/assessmentResult.twig'
+                    with {grade: report.tutorGroupReport.namedGrades.swimming}
+                    %}
+                {% else %}
+                    Unknown
+                {% endif %}
+            </dd>
+        </dl>
+    </li>
+    <li>
+        <dl>
+            <dt>School Camp</dt>
+            <dd>
+                {% if report.tutorGroupReport.namedGrades.camp %}
+                    {%
+                    include '@customMeridenPastoral/sub/assessmentResult.twig'
+                    with {grade: report.tutorGroupReport.namedGrades.camp}
+                    %}
+                {% else %}
+                    Unknown
+                {% endif %}
+            </dd>
+        </dl>
+    </li>
+    <li>
+        <dl>
+            <dt>Uniform</dt>
+            <dd>
+                {% if report.tutorGroupReport.namedGrades.uniform %}
+                    {%
+                    include '@customMeridenPastoral/sub/assessmentResult.twig'
+                    with {grade: report.tutorGroupReport.namedGrades.uniform}
+                    %}
+                {% else %}
+                    Unknown
+                {% endif %}
+            </dd>
+        </dl>
+    </li>
+    <li>
+        <dl>
+            <dt>Pastoral activities involvement</dt>
+            <dd>
+                {% if report.tutorGroupReport.namedGrades.pastoral %}
+                    {%
+                    include '@customMeridenPastoral/sub/assessmentResult.twig'
+                    with {grade: report.tutorGroupReport.namedGrades.pastoral}
+                    %}
+                {% else %}
+                    Unknown
+                {% endif %}
+            </dd>
+        </dl>
+    </li>
+    <li>
+        <dl>
+            {##
+             # Athletics, Swimming, Camp, Uniform, Pastoral Services:
+             # All these are attendances, and are based off of assessments in the grade page.
+             #}
+            {% for grade in report.tutorGroupReport.grades %}
+                <dt>{{ grade.assessment.name }}</dt>
+                <dd>{{ grade.pretty_mark }}</dd>
+            {% endfor %}
+        </dl>
+    </li>
+</ul>
 
 <dl id="awards-info">
     <dt>Awards and Prizes</dt>

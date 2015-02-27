@@ -9,17 +9,22 @@
     margin-right: 0;
 }
 
-ul#house-info li {
+#house-info li,
+#attendance-info li {
     width: 33%;
     display: inline-block;
     vertical-align: top;
 }
 
-#house-info dt {
+#house-info dt,
+#attendance-info dt {
+    width: auto;
     float: none;
     clear: none;
 }
-#house-info dd {
+#house-info dd,
+#attendance-info dd {
+    width: auto;
     float: none;
     clear: none;
 }
