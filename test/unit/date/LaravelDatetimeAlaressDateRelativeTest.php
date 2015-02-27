@@ -168,7 +168,7 @@ class LaravelDatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase
     public function testRelativeTimeFutureSeconds1()
     {
         $input    = '2011-06-08 05:01:03';
-        $expected = 'in 2 seconds';
+        $expected = '2 seconds after';
 
         $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $result       = $relativeDate->getRelativeTime(new DateTime('2011-06-08 05:01:01'));
@@ -179,7 +179,7 @@ class LaravelDatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase
     public function testRelativeTimeFutureSeconds2()
     {
         $input    = '2011-06-08 05:02:00';
-        $expected = 'in 59 seconds';
+        $expected = '59 seconds after';
 
         $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $result       = $relativeDate->getRelativeTime(new DateTime('2011-06-08 05:01:01'));
@@ -190,7 +190,7 @@ class LaravelDatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase
     public function testRelativeTimeFutureMinutes1()
     {
         $input    = '2011-06-08 05:02:05';
-        $expected = 'in 1 minute';
+        $expected = '1 minute after';
 
         $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $result       = $relativeDate->getRelativeTime(new DateTime('2011-06-08 05:01:01'));
@@ -201,7 +201,7 @@ class LaravelDatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase
     public function testRelativeTimeFutureMinutes2()
     {
         $input    = '2011-06-08 05:55:00';
-        $expected = 'in 54 minutes';
+        $expected = '54 minutes after';
 
         $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $result       = $relativeDate->getRelativeTime(new DateTime('2011-06-08 05:01:01'));
@@ -212,7 +212,7 @@ class LaravelDatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase
     public function testRelativeTimeFutureHours1()
     {
         $input    = '2011-06-08 06:10:00';
-        $expected = 'in 1 hour';
+        $expected = '1 hour after';
 
         $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $result       = $relativeDate->getRelativeTime(new DateTime('2011-06-08 05:01:01'));
@@ -223,7 +223,7 @@ class LaravelDatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase
     public function testRelativeTimeFutureHours2()
     {
         $input    = '2011-06-09 04:30:00';
-        $expected = 'in 23 hours';
+        $expected = '23 hours after';
 
         $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $result       = $relativeDate->getRelativeTime(new DateTime('2011-06-08 05:01:01'));
@@ -272,7 +272,7 @@ class LaravelDatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase
     public function testRelativeTimeFutureWeeks1()
     {
         $input    = '2011-06-22 05:01:01';
-        $expected = 'in 2 weeks';
+        $expected = '2 weeks after';
 
         $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $result       = $relativeDate->getRelativeTime(new DateTime('2011-06-08 05:01:01'));
@@ -283,7 +283,7 @@ class LaravelDatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase
     public function testRelativeTimeFutureWeeks2()
     {
         $input    = '2011-07-09 05:01:02';
-        $expected = 'in 4 weeks';
+        $expected = '1 month after';
 
         $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $result       = $relativeDate->getRelativeTime(new DateTime('2011-06-08 05:01:01'));
@@ -297,7 +297,7 @@ class LaravelDatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase
     public function testRelativeTimeFutureMonths1()
     {
         $input    = '2011-03-05 05:01:01';
-        $expected = 'in 1 month';
+        $expected = '1 month after';
 
         $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $result       = $relativeDate->getRelativeTime(new DateTime('2011-02-01 05:01:01'));
@@ -311,7 +311,7 @@ class LaravelDatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase
     public function testRelativeTimeFutureMonths2()
     {
         $input    = '2012-01-10 05:01:01';
-        $expected = 'in 11 months';
+        $expected = '11 months after';
 
         $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $result       = $relativeDate->getRelativeTime(new DateTime('2011-02-01 05:01:01'));
