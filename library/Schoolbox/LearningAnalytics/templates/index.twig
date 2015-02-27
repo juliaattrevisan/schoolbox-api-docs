@@ -26,37 +26,47 @@
 
             var even = !(values.length % 2);
 
+            /* Careful of these offsets
+             */
             if (even) {
                 return (values[halfway-1] + values[halfway])/2.0;
             }
-            /* Careful of these offsets
-             */
-            else {
-                return values[halfway];
-            }
+
+            return values[halfway];
         }
 
-        /* Even number of items: split down the middle
+        /**
+         * Find the values used to calculate first quartile
+         */
+        function setupFirstQuartile(values) {
+            return values.slice(0, Math.floor(values.length/2));
+        }
+
+        /**
+         * Find the values used to calculate third quartile
+         *
+         * Even number of items: split down the middle
          * Odd number of items: ignore the median value
          */
-        var even = !(values.length % 2);
+        function setupThirdQuartile(values) {
+            var even = !(values.length % 2);
 
-        if (even) {
-            var firstQuartile = values.slice(0, Math.floor(values.length/2));
-            var thirdQuartile = values.slice(Math.floor(values.length/2), values.length);
-        }
-        else {
-            console.log(values.slice(0, Math.floor(values.length/2)));
-            console.log(values.slice(Math.ceil(values.length/2), values.length));
+            if (even) {
+                return values.slice(Math.floor(values.length/2), values.length);
+            }
+
+            return values.slice(Math.ceil(values.length/2), values.length);
         }
 
         var data = {
             minimum: 0,
-            quartile1: 0,
+            quartile1: findMedian(setupFirstQuartile(values)),
             median: findMedian(values),
-            quartile2: 0,
+            quartile3: findMedian(setupThirdQuartile(values)),
             maximum: 0
         }
+
+        console.log(data);
 
 
 
