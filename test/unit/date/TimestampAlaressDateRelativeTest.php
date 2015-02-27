@@ -2,6 +2,17 @@
 
 class TimestampAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
 
+	/**
+	 * Skip these tests for Alaress_Date_Strategy_LaravelDate
+	 */
+	protected function setUp()
+	{
+		$date = new Alaress_Date_Format();
+		if ($date->getDateTimeObject() instanceof \Carbon\Carbon) {
+			$this->markTestSkipped('This test only applies to Alaress_Date_Strategy_V52');
+		}
+	}
+
 	public function testRelativeTimeSeconds1() {
 		$input = date('U', strtotime('2011-08-31 12:12:00'));
 		$expected = '10 seconds ago';
