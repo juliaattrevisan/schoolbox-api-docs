@@ -1,106 +1,147 @@
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts-more.js"></script>
 <script type="text/javascript">
+    (function() {
+        $.fn.calculateBoxPlotValues = function(options) {
+
+            /* Store the config in this instance so private methods
+             * can access it
+             */
+            var config = init(options);
+
+            return generateBoxPlotValues();
+
+            /**
+             * Init
+             */
+            function init(options) {
+
+                /* Default values
+                 */
+                var defaults = {
+                    values: [],
+
+                    /* 'structured' gives you an object
+                     * 'array' gives you highcharts-compatible array
+                     */
+                    type: 'structured'
+                }
+
+                /* Derived values
+                 */
+                var derived = {
+                }
+
+                /* This sorts as strings by default so use an
+                 * anonymous function to do it properly
+                 *
+                 * http://www.w3schools.com/jsref/jsref_sort.asp
+                 */
+                options.values.sort(function(a, b) {
+                    return a-b
+                });
+
+                var merged = $.extend(defaults, derived, options);
+
+                return merged;
+            }
+
+            /**
+             * Generate an object containing all the box plot values
+             * required to manufacture a graph
+             */
+            function generateBoxPlotValues() {
+                return {
+                    minimum: findMinimum(config.values),
+                    quartile1: findMedian(setupFirstQuartile(config.values)),
+                    quartile2: findMedian(config.values),
+                    quartile3: findMedian(setupThirdQuartile(config.values)),
+                    maximum: findMaximum(config.values)
+                }
+            }
+
+            /**
+             * http://www.purplemath.com/modules/boxwhisk.htm
+             */
+            function findMedian(values) {
+
+                /* Figure out medians in different ways depending
+                 * on even or odd number of elements
+                 */
+                var halfway = Math.floor(values.length/2);
+
+                var even = !(values.length % 2);
+
+                /* Careful of these offsets
+                 */
+                if (even) {
+                    return (values[halfway-1] + values[halfway])/2.0;
+                }
+
+                return values[halfway];
+            }
+
+            /**
+             * Find the values used to calculate first quartile
+             */
+            function setupFirstQuartile(values) {
+                return values.slice(0, Math.floor(values.length/2));
+            }
+
+            /**
+             * Find the values used to calculate third quartile
+             *
+             * Even number of items: split down the middle
+             * Odd number of items: ignore the median value
+             */
+            function setupThirdQuartile(values) {
+                var even = !(values.length % 2);
+
+                if (even) {
+                    return values.slice(Math.floor(values.length/2), values.length);
+                }
+
+                return values.slice(Math.ceil(values.length/2), values.length);
+            }
+
+            /**
+             * Find minimum value in an array
+             */
+            function findMinimum(values) {
+                var min = values[0];
+
+                for (var i = 0; i < values.length; i++) {
+                    if (values[i] < min) {
+                        min = values[i];
+                    }
+                }
+
+                return min;
+            }
+
+            /**
+             * Find maximum value in an array
+             */
+            function findMaximum(values) {
+                var max = values[0];
+
+                for (var i = 0; i < values.length; i++) {
+                    if (values[i] > max) {
+                        max = values[i];
+                    }
+                }
+
+                return max;
+            }
+        }
+    }(jQuery));
+
     $(function () {
 
-        var values = [4.3,  5.1,  3.9,  4.5,  4.4,  4.9,  5.0,  4.7,  4.1,  4.6,  4.4,  4.3,  4.8,  4.4,  4.2,  4.5,  4.4];
-
-        values.sort(function(a, b) {
-            return a-b
-        });
-
-        /**
-         * http://www.purplemath.com/modules/boxwhisk.htm
-         */
-        function findMedian(values) {
-
-            /* This sorts as strings by default so use an
-             * anonymous function to do it properly
-             *
-             * http://www.w3schools.com/jsref/jsref_sort.asp
-             */
-            values.sort(function(a, b) {
-                return a-b
-            });
-
-            /* Figure out medians in different ways depending
-             * on even or odd number of elements
-             */
-            var halfway = Math.floor(values.length/2);
-
-            var even = !(values.length % 2);
-
-            /* Careful of these offsets
-             */
-            if (even) {
-                return (values[halfway-1] + values[halfway])/2.0;
-            }
-
-            return values[halfway];
-        }
-
-        /**
-         * Find the values used to calculate first quartile
-         */
-        function setupFirstQuartile(values) {
-            return values.slice(0, Math.floor(values.length/2));
-        }
-
-        /**
-         * Find the values used to calculate third quartile
-         *
-         * Even number of items: split down the middle
-         * Odd number of items: ignore the median value
-         */
-        function setupThirdQuartile(values) {
-            var even = !(values.length % 2);
-
-            if (even) {
-                return values.slice(Math.floor(values.length/2), values.length);
-            }
-
-            return values.slice(Math.ceil(values.length/2), values.length);
-        }
-
-        /**
-         * Find minimum value in an array
-         */
-        function findMinimum(values) {
-            var min = values[0];
-
-            for (var i = 0; i < values.length; i++) {
-                if (values[i] < min) {
-                    min = values[i];
-                }
-            }
-
-            return min;
-        }
-
-        /**
-         * Find maximum value in an array
-         */
-        function findMaximum(values) {
-            var max = values[0];
-
-            for (var i = 0; i < values.length; i++) {
-                if (values[i] > max) {
-                    max = values[i];
-                }
-            }
-
-            return max;
-        }
-
-        var data = {
-            minimum: findMinimum(values),
-            quartile1: findMedian(setupFirstQuartile(values)),
-            median: findMedian(values),
-            quartile3: findMedian(setupThirdQuartile(values)),
-            maximum: findMaximum(values)
-        }
-
-        console.log(data);
+        console.log($.fn.calculateBoxPlotValues({
+            values: [4.3,  5.1,  3.9,  4.5,  4.4,  4.9,  5.0,  4.7,  4.1,  4.6,  4.4,  4.3,  4.8,  4.4,  4.2,  4.5,  4.4],
+            type: 'structured'
+        }));
 
 
 
