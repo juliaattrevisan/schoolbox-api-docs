@@ -8,3 +8,18 @@
 .teacher-profile.no-email {
     margin-right: 0;
 }
+
+ul#house-info li {
+    width: 33%;
+    display: inline-block;
+    vertical-align: top;
+}
+
+#house-info dt {
+    float: none;
+    clear: none;
+}
+#house-info dd {
+    float: none;
+    clear: none;
+}

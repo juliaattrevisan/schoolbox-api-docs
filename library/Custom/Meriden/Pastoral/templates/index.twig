@@ -31,31 +31,47 @@
     } %}
 </div>
 
-<dl id="house-info">
-    <dt>House</dt>
-    <dd>{{ report.student.schoolHouse.house }}</dd>
-
-    <dt>Year Coordinator</dt>
-    {% for coordinator in report.tutorGroupReport.coordinators %}
-        <dd><a href="/search/user/{{ coordinator.id }}">{{ coordinator.formatName }}</a></dd>
-    {% endfor %}
-
-    <dt>Tutor Group</dt>
-    <dd>
-        {% if report.tutorGroupReport.folder.id %}
-            <a href="/homepage/{{ report.tutorGroupReport.folder.id }}">
-                {{ report.tutorGroupReport.subjectCode }}
-            </a>
-        {% else %}
-            {{ report.tutorGroupReport.subjectCode }}
-        {% endif %}
-    </dd>
-
-    <dt>Tutor</dt>
-    {% for tutor in report.tutorGroupReport.tutors %}
-        <dd>{{ tutor.tch_name }} (Semester {{ tutor.semester }})</dd>
-    {% endfor %}
-</dl>
+<ul id="house-info">
+    <li>
+        <dl>
+            <dt>House</dt>
+            <dd>{{ report.student.schoolHouse.house }}</dd>
+        </dl>
+    </li>
+    <li>
+        <dl>
+            <dt>Year Coordinator</dt>
+            {% for coordinator in report.tutorGroupReport.coordinators %}
+                <dd><a href="/search/user/{{ coordinator.id }}">{{ coordinator.formatName }}</a></dd>
+            {% endfor %}
+        </dl>
+    </li>
+    <li>
+        <dl>
+            <dt>Tutor Group</dt>
+            <dd>
+                {% if report.tutorGroupReport.folder.id %}
+                    <a href="/homepage/{{ report.tutorGroupReport.folder.id }}">
+                        {{ report.tutorGroupReport.folder.name }}
+                        {% if report.tutorGroupReport.folder.codes|length %}
+                        ({{ report.tutorGroupReport.subjectCode }})
+                        {% endif %}
+                    </a>
+                {% else %}
+                    {{ report.tutorGroupReport.subjectCode }}
+                {% endif %}
+            </dd>
+        </dl>
+    </li>
+    <li>
+        <dl>
+            <dt>Tutor</dt>
+            {% for tutor in report.tutorGroupReport.tutors %}
+                <dd>{{ tutor.tch_name }} (Semester {{ tutor.semester }})</dd>
+            {% endfor %}
+        </dl>
+    </li>
+</ul>
 
 <dl id="attendance-info">
     <dt>Days Absent</dt>
