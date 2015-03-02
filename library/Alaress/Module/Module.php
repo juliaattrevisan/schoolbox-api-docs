@@ -18,12 +18,21 @@ use Twig_Loader_Chain;
 class Module {
 
     /**
-     * The dependency injection container. All router
+     * The dependency injection container.
      *
      * @var ContainerInterface
      */
     protected $injector;
 
+    /**
+     * Constructor
+     *
+     * TODO don't set $injector here, pass as a param to init() instead.
+     * (This would mean that custom constructors could be used, and $injector
+     *  shouldn't be used outside of init() anyway)
+     *
+     * @param ContainerInterface $injector
+     */
     public function __construct(ContainerInterface $injector) {
         $this->setInjector($injector);
     }
