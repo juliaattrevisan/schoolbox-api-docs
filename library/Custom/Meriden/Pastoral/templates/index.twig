@@ -43,23 +43,6 @@
     </li>
     <li>
         <dl>
-            <dt>Tutor Group</dt>
-            <dd>
-                {% if report.tutorGroupReport.folder.id %}
-                    <a href="/homepage/{{ report.tutorGroupReport.folder.id }}">
-                        {{ report.tutorGroupReport.folder.name }}
-                        {% if report.tutorGroupReport.folder.codes|length %}
-                        ({{ report.tutorGroupReport.subjectCode }})
-                        {% endif %}
-                    </a>
-                {% else %}
-                    {{ report.tutorGroupReport.subjectCode }}
-                {% endif %}
-            </dd>
-        </dl>
-    </li>
-    <li>
-        <dl>
             <dt>Tutor</dt>
             {% for tutor in report.tutorGroupReport.tutors %}
                 <dd>{{ tutor.tch_name }} (Semester {{ tutor.semester }})</dd>
