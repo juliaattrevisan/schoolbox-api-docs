@@ -17,9 +17,11 @@ use Alaress\Authorizer\Rule\IsSuperuser;
 use Alaress\Authorizer\Rule\IsUser;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
-use External_UserInterface;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use External_UserInterface;
+use House;
+use HouseMapper;
 use Schoolbox\Assessment\Grades;
 use Schoolbox\External\SubjectMapper;
 use Schoolbox\Role;
@@ -77,11 +79,7 @@ class Module extends BaseModule
             ->addRule($ruleRegexp, new IsUser('id'))
             ->addRule(
                 $ruleRegexp,
-                new IsParentOfUser(
-                    $this->getExternalDb(),
-                    $this->getUserMapper(),
-                    'id'
-                )
+                new IsParentOfUser($this->externalDb, $this->userMapper, 'id')
             )
         ;
     }
@@ -93,7 +91,7 @@ class Module extends BaseModule
     {
         // Search for the user
         // TODO move the mappers out of here, inject their dependency
-        $userMapper = $this->getUserMapper();
+        $userMapper = $this->userMapper;
         $matcher->add(
             '/^customMeridenPastoral\\.(?:index|subject|currentReport)/',
             function ($params) use ($userMapper) {
@@ -106,12 +104,12 @@ class Module extends BaseModule
                     // It should be a model, and will be for this purpose.
                     // Also make sure it's hydrated.
                     $schoolHouse = $student->getSchoolHouse();
-                    if ($schoolHouse instanceof \House) {
+                    if ($schoolHouse instanceof House) {
                         $houseId = $schoolHouse->getId();
                     } else {
                         $houseId = $schoolHouse;
                     }
-                    $student->setSchoolHouse(\HouseMapper::getInstance()->findById($houseId));
+                    $student->setSchoolHouse(HouseMapper::getInstance()->findById($houseId));
                 } catch (\Exception $e) {
                     // noop - the controller will die at this point anyway
                 }
@@ -162,14 +160,6 @@ class Module extends BaseModule
     }
 
     /**
-     * @return External_UserInterface
-     */
-    protected function getExternalDb()
-    {
-        return $this->externalDb;
-    }
-
-    /**
      * @param  External_UserInterface $externalDb
      *
      * @return $this
@@ -178,14 +168,6 @@ class Module extends BaseModule
     {
         $this->externalDb = $externalDb;
         return $this;
-    }
-
-    /**
-     * @return UserMapper
-     */
-    protected function getUserMapper()
-    {
-        return $this->userMapper;
     }
 
     /**
