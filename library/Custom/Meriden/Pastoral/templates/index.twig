@@ -172,29 +172,21 @@
     <dt>Awards and Prizes</dt>
     {% for award in report.tutorGroupReport.activities.awards %}
         <dd>{{ award.act_desc }}</dd>
-    {% else %}
-        <dd>(none)</dd>
     {% endfor %}
 
     <dt>Co-curricular Activities</dt>
     {% for activity in report.tutorGroupReport.activities.cocurricular %}
         <dd>{{ activity.act_desc }}</dd>
-    {% else %}
-        <dd>(none)</dd>
     {% endfor %}
 
     <dt>Community Service</dt>
     {% for service in report.tutorGroupReport.activities.service %}
         <dd>{{ service.act_desc }}</dd>
-    {% else %}
-        <dd>(none)</dd>
     {% endfor %}
 
     <dt>Positions of Office</dt>
     {% for position in report.tutorGroupReport.activities.positions %}
         <dd>{{ position.act_desc }}</dd>
-    {% else %}
-        <dd>(none)</dd>
     {% endfor %}
 </dl>
 
