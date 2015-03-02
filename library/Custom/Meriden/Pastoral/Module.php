@@ -12,10 +12,12 @@ namespace Custom\Meriden\Pastoral;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule\HasRole;
 use Alaress\Authorizer\Rule\IsLoggedIn;
+use Alaress\Authorizer\Rule\IsParentOfUser;
 use Alaress\Authorizer\Rule\IsSuperuser;
 use Alaress\Authorizer\Rule\IsUser;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
+use External_UserInterface;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Assessment\Grades;
@@ -27,6 +29,24 @@ use Twig_Loader_Filesystem;
 
 class Module extends BaseModule
 {
+    /**
+     * Dependency on external user database.
+     *
+     * Required for checking that the requesting user is the student's parent.
+     *
+     * @var External_UserInterface
+     */
+    protected $externalDb;
+
+    /**
+     * Dependency on user mapper.
+     *
+     * Required for checking that the requesting user is the student's parent.
+     *
+     * @var UserMapper
+     */
+    protected $userMapper;
+
     /**
      * {@inheritdoc}
      */
@@ -55,6 +75,14 @@ class Module extends BaseModule
             ->addRule($ruleRegexp, new IsSuperuser())
             ->addRule($ruleRegexp, new HasRole(Role::STAFF))
             ->addRule($ruleRegexp, new IsUser('id'))
+            ->addRule(
+                $ruleRegexp,
+                new IsParentOfUser(
+                    $this->getExternalDb(),
+                    $this->getUserMapper(),
+                    'id'
+                )
+            )
         ;
     }
 
@@ -65,10 +93,11 @@ class Module extends BaseModule
     {
         // Search for the user
         // TODO move the mappers out of here, inject their dependency
+        $userMapper = $this->getUserMapper();
         $matcher->add(
             '/^customMeridenPastoral\\.(?:index|subject|currentReport)/',
-            function($params) {
-                $student = UserMapper::getInstance()->findWithSubjects($params['id']);
+            function ($params) use ($userMapper) {
+                $student = $userMapper->findWithSubjects($params['id']);
                 $student->setSubjectCollection(
                     SubjectMapper::getInstance()->findAllForStudent($student)
                 );
@@ -84,7 +113,7 @@ class Module extends BaseModule
                     }
                     $student->setSchoolHouse(\HouseMapper::getInstance()->findById($houseId));
                 } catch (\Exception $e) {
-                    // noop
+                    // noop - the controller will die at this point anyway
                 }
                 return array(
                     'student' => $student,
@@ -130,5 +159,43 @@ class Module extends BaseModule
             'controller:customMeridenPastoral',
             $injector->lazyNew('Custom\\Meriden\\Pastoral\\Controller')
         );
+    }
+
+    /**
+     * @return External_UserInterface
+     */
+    protected function getExternalDb()
+    {
+        return $this->externalDb;
+    }
+
+    /**
+     * @param  External_UserInterface $externalDb
+     *
+     * @return $this
+     */
+    public function setExternalDb($externalDb)
+    {
+        $this->externalDb = $externalDb;
+        return $this;
+    }
+
+    /**
+     * @return UserMapper
+     */
+    protected function getUserMapper()
+    {
+        return $this->userMapper;
+    }
+
+    /**
+     * @param  UserMapper $userMapper
+     *
+     * @return $this
+     */
+    public function setUserMapper($userMapper)
+    {
+        $this->userMapper = $userMapper;
+        return $this;
     }
 }

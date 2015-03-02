@@ -12,6 +12,7 @@ namespace Config\Modules\Custom\Meriden;
 use Alaress\Application\Kernel;
 use Custom\Meriden\Pastoral\Module;
 use Config\Modules\ModuleConfigInterface;
+use Schoolbox\UserMapper;
 
 class Pastoral implements ModuleConfigInterface
 {
@@ -27,6 +28,10 @@ class Pastoral implements ModuleConfigInterface
         $di = $kernel->getDependencyInjector();
         if ($di->get('config')->get('site_location') == 'meriden') {
             $pastoralModule = new Module($di);
+            $pastoralModule
+                ->setExternalDb(new \External_User())
+                ->setUserMapper(new UserMapper())
+            ;
             $pastoralModule->init('/modules/custom/meriden/pastoral');
         }
     }
