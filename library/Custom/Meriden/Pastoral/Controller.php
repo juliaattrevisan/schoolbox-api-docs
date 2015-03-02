@@ -77,6 +77,7 @@ class Controller extends Base
                 array(
                     'template' => '@customMeridenPastoral/index.twig',
                     'data'     => $this->buildReportData($year, $student),
+                    'title'    => 'School Report - ' . $year . ' - ' . $student->formatName()
                 )
             );
         } catch (\RangeException $e) {
@@ -94,10 +95,14 @@ class Controller extends Base
     public function subject($year, User $student, $subjectCode)
     {
         try {
+            $reportData    = $this->buildReportData($year, $student, $subjectCode);
+            /** @var StudentInvolvement\Subject $subjectReport */
+            $subjectReport = $reportData['report']['subjectReport'];
             $this->getResponse()->content->set(
                 array(
                     'template' => '@customMeridenPastoral/subject.twig',
-                    'data'     => $this->buildReportData($year, $student, $subjectCode),
+                    'data'     => $reportData,
+                    'title'    => $subjectReport->getName() . ' - ' . $year . ' - ' . $student->formatName()
                 )
             );
         } catch (\RangeException $e) {
