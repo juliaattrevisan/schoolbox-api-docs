@@ -29,8 +29,8 @@ class Pastoral implements ModuleConfigInterface
         if ($di->get('config')->get('site_location') == 'meriden') {
             $pastoralModule = new Module($di);
             $pastoralModule
-                ->setExternalDb(new \External_User())
-                ->setUserMapper(new UserMapper())
+                ->setExternalDb($di->newInstance('\\External_User'))
+                ->setUserMapper($di->newInstance('\\Schoolbox\\UserMapper'))
             ;
             $pastoralModule->init('/modules/custom/meriden/pastoral');
         }
