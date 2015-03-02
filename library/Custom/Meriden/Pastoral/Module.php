@@ -10,11 +10,7 @@
 namespace Custom\Meriden\Pastoral;
 
 use Alaress\Authorizer\Authorizer;
-use Alaress\Authorizer\Rule\HasRole;
-use Alaress\Authorizer\Rule\IsLoggedIn;
-use Alaress\Authorizer\Rule\IsParentOfUser;
-use Alaress\Authorizer\Rule\IsSuperuser;
-use Alaress\Authorizer\Rule\IsUser;
+use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
@@ -73,13 +69,13 @@ class Module extends BaseModule
     {
         $ruleRegexp = '/^customMeridenPastoral\\.(?:index|subject)/';
         $authorizer
-            ->addRule($ruleRegexp, new IsLoggedIn())
-            ->addRule($ruleRegexp, new IsSuperuser())
-            ->addRule($ruleRegexp, new HasRole(Role::STAFF))
-            ->addRule($ruleRegexp, new IsUser('id'))
+            ->addRule($ruleRegexp, new Rule\IsLoggedIn())
+            ->addRule($ruleRegexp, new Rule\IsSuperuser())
+            ->addRule($ruleRegexp, new Rule\HasRole(Role::STAFF))
+            ->addRule($ruleRegexp, new Rule\IsUser('id'))
             ->addRule(
                 $ruleRegexp,
-                new IsParentOfUser($this->externalDb, $this->userMapper, 'id')
+                new Rule\IsParentOfUser($this->externalDb, $this->userMapper, 'id')
             )
         ;
     }
