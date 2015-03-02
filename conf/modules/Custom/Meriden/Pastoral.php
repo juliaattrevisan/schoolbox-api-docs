@@ -12,7 +12,6 @@ namespace Config\Modules\Custom\Meriden;
 use Alaress\Application\Kernel;
 use Custom\Meriden\Pastoral\Module;
 use Config\Modules\ModuleConfigInterface;
-use Schoolbox\UserMapper;
 
 class Pastoral implements ModuleConfigInterface
 {
