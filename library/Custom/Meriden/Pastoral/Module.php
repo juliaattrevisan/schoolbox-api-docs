@@ -70,12 +70,14 @@ class Module extends BaseModule
         $ruleRegexp = '/^customMeridenPastoral\\.(?:index|subject)/';
         $authorizer
             ->addRule($ruleRegexp, new Rule\IsLoggedIn())
-            ->addRule($ruleRegexp, new Rule\IsSuperuser())
-            ->addRule($ruleRegexp, new Rule\HasRole(Role::STAFF))
-            ->addRule($ruleRegexp, new Rule\IsUser('id'))
             ->addRule(
                 $ruleRegexp,
-                new Rule\IsParentOfUser($this->externalDb, $this->userMapper, 'id')
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF),
+                    new Rule\IsUser('id'),
+                    new Rule\IsParentOfUser($this->externalDb, $this->userMapper, 'id')
+                )
             )
         ;
     }
