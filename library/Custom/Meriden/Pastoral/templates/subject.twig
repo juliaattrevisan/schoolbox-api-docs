@@ -14,13 +14,7 @@
     <img src="/images/meriden/crest.png" />
 </div>
 
-{% if report.subjectReport.folder.id %}
-    <a class="btn go-to float-right"
-       href="/homepage/{{ report.subjectReport.folder.id }}"
-    ><span></span>Go to subject page</a>
-{% endif %}
-
-<h1>School Report - {{ report.subjectReport.year }} » {{ report.subjectReport.name }}</h1>
+<h1>{{ report.subjectReport.name }}</h1>
 
 <div id="context">
     {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
