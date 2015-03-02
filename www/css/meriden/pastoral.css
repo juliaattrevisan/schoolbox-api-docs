@@ -22,6 +22,10 @@
     width: auto;
     float: none;
     clear: none;
+}
+#house-info dt,
+#attendance-info dt,
+#awards-info dt:first-child {
     margin-top: 12px;
 }
 #house-info dd,
@@ -44,4 +48,11 @@
 }
 #awards-info dd {
     margin-left: 33%
+}
+
+#subject-info .subjects {
+    width: 100%;
+}
+#subject-info .subjects ul {
+    margin: 0;
 }
