@@ -13,6 +13,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule\HasRole;
 use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Authorizer\Rule\IsSuperuser;
+use Alaress\Authorizer\Rule\IsUser;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
@@ -37,16 +38,24 @@ class Module extends BaseModule
     }
 
     /**
-     * Only superusers may access this page for now.
+     * These pages may be accessed by:
+     *
+     * * superusers
+     * * staff
+     * * the child themselves
+     * * the child's parents
      *
      * {@inheritdoc}
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
         $ruleRegexp = '/^customMeridenPastoral\\.(?:index|subject)/';
-        $authorizer->addRule($ruleRegexp, new IsLoggedIn());
-        $authorizer->addRule($ruleRegexp, new IsSuperuser());
-        $authorizer->addRule($ruleRegexp, new HasRole(Role::STAFF));
+        $authorizer
+            ->addRule($ruleRegexp, new IsLoggedIn())
+            ->addRule($ruleRegexp, new IsSuperuser())
+            ->addRule($ruleRegexp, new HasRole(Role::STAFF))
+            ->addRule($ruleRegexp, new IsUser('id'))
+        ;
     }
 
     /**
