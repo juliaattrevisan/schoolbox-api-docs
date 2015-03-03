@@ -73,20 +73,38 @@
                          * @returns {string}
                          */
                         pointFormatter: function() {
-                            var tooltipContent = '';
+
+                            /* Basic template for each outlier
+                             */
+                            var template =
+                                '<tr>' +
+                                    '<td>' +
+                                        '<span style="display:block;width:32px;height:32px;background-image:url(/portrait.php?userId={UID}&size=square32);"></span>' +
+                                    '</td>' +
+                                    '<td>' +
+                                        '<em>{NAME}</em><br />{VALUE}' +
+                                    '</td>' +
+                                '</tr>';
+
+                            /* Concatenate everything
+                             */
+                            var allTooltipContent = '';
 
                             for (var i = 0; i < options.allData.input[this.x].length; i++) {
                                 if (options.allData.input[this.x][i].value == this.y) {
-                                    tooltipContent += '<span style="display:block;width:32px;height:32px;background-image:url(/portrait.php?userId='+options.allData.input[this.x][i].uid+'&size=square32);"></span>';
-                                    tooltipContent += '<em>' + options.allData.input[this.x][i].info + ':</em> ' + this.y;
-                                    tooltipContent += '<br />';
+                                    var tooltipContent = template;
+
+                                    tooltipContent = tooltipContent.replace(/{UID}/, options.allData.input[this.x][i].uid);
+                                    tooltipContent = tooltipContent.replace(/{NAME}/, options.allData.input[this.x][i].info);
+                                    tooltipContent = tooltipContent.replace(/{VALUE}/, this.y);
+
+                                    allTooltipContent += tooltipContent;
                                 }
                             }
 
-                            return tooltipContent;
+                            return '<table><tbody>' + allTooltipContent + '</tbody></table>';
                         }
                     }
-
                 }
             ]
         });
