@@ -190,7 +190,10 @@ class Controller extends Base
 
             // Build the booking
             $booking = $this->getBookingFromEvent($item, $event);
-            $booking->setName($this->request->post['name']);
+            $booking
+                ->setName($this->request->post['name'])
+                ->setNotes($this->request->post['notes'])
+            ;
             $bookingList = new Collection();
             $bookingList->add($booking);
 
@@ -298,7 +301,10 @@ class Controller extends Base
                 $this->eventMapper->save($event);
 
                 // Adjust $booking
-                $booking->setName($this->request->post['name']);
+                $booking
+                    ->setName($this->request->post['name'])
+                    ->setNotes($this->request->post['notes'])
+                ;
 
                 // getUpdatedSeries() sets deleted field if the item isn't in
                 // the sequence.
@@ -367,7 +373,10 @@ class Controller extends Base
                         $relatedResource,
                         $booking->getEvent()
                     );
-                    $relatedBooking->setName($booking->getName());
+                    $relatedBooking
+                        ->setName($booking->getName())
+                        ->setNotes($booking->getNotes())
+                    ;
                     // Add related booking relation in both directions
                     $booking->addRelatedBooking($relatedBooking);
                     $relatedBooking->addRelatedBooking($booking);
@@ -867,7 +876,9 @@ class Controller extends Base
             ->setEvent($event)
             ->setResource($resource)
             ->setStatus(Status\Model::STATUS_PENDING)
-            ->setName($this->getRequest()->post['name']);
+            ->setName($this->getRequest()->post['name'])
+            ->setNotes($this->getRequest()->post['notes'])
+        ;
         // What about the resource? If it's an open resource, confirm the
         // booking immediately.
         if ($resource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
