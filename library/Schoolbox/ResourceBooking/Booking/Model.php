@@ -34,6 +34,13 @@ class Model implements ISoftDeletable, JsonSerializable
     protected $name;
 
     /**
+     * Notes for this resource booking, formerly stored in calendar event
+     *
+     * @var string
+     */
+    protected $notes;
+
+    /**
      * @var Item\Model
      */
     protected $resource;
@@ -297,6 +304,25 @@ class Model implements ISoftDeletable, JsonSerializable
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNotes()
+    {
+        return $this->notes;
+    }
+
+    /**
+     * @param  string $notes
+     *
+     * @return $this
+     */
+    public function setNotes($notes)
+    {
+        $this->notes = $notes;
+        return $this;
     }
 
     /**

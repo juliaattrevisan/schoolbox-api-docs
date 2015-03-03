@@ -83,11 +83,19 @@ class Mapper extends BaseMapper
             )
         );
 
+        // Name (title) and notes (description)
         $this->hasMap(
             array(
                 'column' => 'name',
                 'property' => 'name',
                 'type' => self::TYPE_STRING,
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'   => 'notes',
+                'property' => 'notes',
+                'type'     => self::TYPE_STRING,
             )
         );
 
