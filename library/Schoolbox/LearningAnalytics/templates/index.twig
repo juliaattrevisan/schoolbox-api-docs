@@ -4,12 +4,23 @@
 <script type="text/javascript">
     $(function () {
         var options = {
+
+            /* Title of the graph
+             */
             title: 'Schoolbox Learning Analytics for Test Class',
+
+            /* A list of all the assessment names that are being graphed
+             * These correspond to a series of data and their respective
+             * five-point summaries
+             */
             allAssessments: [
                 'Assessment 1',
                 'Assessment 2',
                 'Assessment 3'
             ],
+
+            /* All the raw data
+             */
             allData: $.fn.calculateAllSeriesData([
                 [
                     {
@@ -141,6 +152,8 @@
             ])
         }
 
+        /* Mr Squiggle
+         */
         $.fn.renderGraph(options);
     });
 </script>
