@@ -3,11 +3,7 @@
 <script type="text/javascript" src="/learninganalytics/js/graph.js"></script>
 <script type="text/javascript">
     $(function () {
-
-        /* This var is referenced from a callback
-          * when rendering outliers' data
-         */
-        var input = [
+        var allData = $.fn.calculateAllSeriesData([
             [
                 {
                     info: 'Alice',
@@ -135,9 +131,7 @@
                     value: 87
                 }
             ]
-        ];
-
-        var allData = $.fn.calculateAllSeriesData(input);
+        ]);
 
         /* The plot unfolds
          */
@@ -209,9 +203,9 @@
                     pointFormatter: function() {
                         var tooltipContent = '';
 
-                        for (var i = 0; i < input[this.x].length; i++) {
-                            if (input[this.x][i].value == this.y) {
-                                tooltipContent += '<strong>' + input[this.x][i].info + ':</strong> ' + this.y;
+                        for (var i = 0; i < allData.input[this.x].length; i++) {
+                            if (allData.input[this.x][i].value == this.y) {
+                                tooltipContent += '<strong>' + allData.input[this.x][i].info + ':</strong> ' + this.y;
                                 tooltipContent += '<br />';
                             }
                         }

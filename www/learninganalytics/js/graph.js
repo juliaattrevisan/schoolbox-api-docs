@@ -8,6 +8,7 @@
      */
     $.fn.calculateAllSeriesData = function(input) {
         var output = {
+            input: input,
             allGraphData: [],
             allOutliers: []
         }
