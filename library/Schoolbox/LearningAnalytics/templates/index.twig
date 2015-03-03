@@ -98,73 +98,6 @@
 
                 return merged;
             }
-
-            /**
-             * Generate IQR value
-             */
-            function generateIQR() {
-                return output.fivePointSummary.structured.quartile3 - output.fivePointSummary.structured.quartile1;
-            }
-
-            /**
-             * Generate a list of outliers
-             *
-             * Decide where the whiskers will be
-             * Use a Tukey box plot
-             */
-            function generateOutliers() {
-                var allOutliers = [];
-                var i;
-
-                /* Lower whisker
-                 * Use the first value that is above the lowerThreshold
-                 */
-                var lowerThreshold = output.fivePointSummary.structured.quartile1 - (1.5 * output.iqr);
-
-                for (i = (config.values.length-1); i >= 0; i--) {
-                    if (config.values[i] > lowerThreshold) {
-                        output.fivePointSummary.structured.minimum = config.values[i];
-                    }
-                }
-
-                /* Upper whisker
-                 * Use the first value that is below the upperThreshold
-                 */
-                var upperThreshold = output.fivePointSummary.structured.quartile3 + (1.5 * output.iqr);
-
-                for (i = 0; i < config.values.length; i++) {
-                    if (config.values[i] < upperThreshold) {
-                        output.fivePointSummary.structured.maximum = config.values[i];
-                    }
-                }
-
-                /* Outlier stack
-                 * Stack with information about the outlier,
-                 * not just its value
-                 */
-                for (i = 0; i < config.values.length; i++) {
-                    if ((config.values[i] < lowerThreshold) || (config.values[i] > upperThreshold)) {
-                        allOutliers.push(config.input[i]);
-                    }
-                }
-
-                return allOutliers;
-            }
-
-            /**
-             * Generate an object containing all the box plot values
-             * required to manufacture a graph
-             */
-            function generateValues() {
-                return {
-                    minimum: findMinimum(config.values),
-                    quartile1: findMedian(setupFirstQuartile(config.values)),
-                    quartile2: findMedian(config.values),
-                    quartile3: findMedian(setupThirdQuartile(config.values)),
-                    maximum: findMaximum(config.values)
-                }
-            }
-
             /**
              * http://www.purplemath.com/modules/boxwhisk.htm
              */
@@ -238,6 +171,72 @@
 
                 return max;
             }
+
+            /**
+             * Generate an object containing all the box plot values
+             * required to manufacture a graph
+             */
+            function generateValues() {
+                return {
+                    minimum: findMinimum(config.values),
+                    quartile1: findMedian(setupFirstQuartile(config.values)),
+                    quartile2: findMedian(config.values),
+                    quartile3: findMedian(setupThirdQuartile(config.values)),
+                    maximum: findMaximum(config.values)
+                }
+            }
+
+            /**
+             * Generate IQR value
+             */
+            function generateIQR() {
+                return output.fivePointSummary.structured.quartile3 - output.fivePointSummary.structured.quartile1;
+            }
+
+            /**
+             * Generate a list of outliers
+             *
+             * Decide where the whiskers will be
+             * Use a Tukey box plot
+             */
+            function generateOutliers() {
+                var allOutliers = [];
+                var i;
+
+                /* Lower whisker
+                 * Use the first value that is above the lowerThreshold
+                 */
+                var lowerThreshold = output.fivePointSummary.structured.quartile1 - (1.5 * output.iqr);
+
+                for (i = (config.values.length-1); i >= 0; i--) {
+                    if (config.values[i] > lowerThreshold) {
+                        output.fivePointSummary.structured.minimum = config.values[i];
+                    }
+                }
+
+                /* Upper whisker
+                 * Use the first value that is below the upperThreshold
+                 */
+                var upperThreshold = output.fivePointSummary.structured.quartile3 + (1.5 * output.iqr);
+
+                for (i = 0; i < config.values.length; i++) {
+                    if (config.values[i] < upperThreshold) {
+                        output.fivePointSummary.structured.maximum = config.values[i];
+                    }
+                }
+
+                /* Outlier stack
+                 * Stack with information about the outlier,
+                 * not just its value
+                 */
+                for (i = 0; i < config.values.length; i++) {
+                    if ((config.values[i] < lowerThreshold) || (config.values[i] > upperThreshold)) {
+                        allOutliers.push(config.input[i]);
+                    }
+                }
+
+                return allOutliers;
+            }
         }
     }(jQuery));
 
@@ -287,32 +286,33 @@
                     $.fn.calculateQuartiles({
                         input: [
                             {
-                                info: 'First',
-                                value: 21
+                                info: 'Sixth',
+                                value: 33
                             },
+
                             {
                                 info: 'Second',
                                 value: 23
                             },
                             {
-                                info: 'Third',
-                                value: 24
-                            },
-                            {
-                                info: 'Fourth',
-                                value: 25
+                                info: 'First',
+                                value: 21
                             },
                             {
                                 info: 'Fifth',
                                 value: 29
                             },
                             {
-                                info: 'Sixth',
-                                value: 33
+                                info: 'Third',
+                                value: 24
                             },
                             {
                                 info: 'Seventh',
                                 value: 49
+                            },
+                            {
+                                info: 'Fourth',
+                                value: 25
                             }
                         ]
                     })
