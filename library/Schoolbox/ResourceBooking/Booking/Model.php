@@ -261,6 +261,23 @@ class Model implements ISoftDeletable, JsonSerializable
     /**
      * Does this resource booking have a related booking for the given resource?
      *
+     * @param  int   $resourceId
+     * @return Model
+     * @throws \OutOfBoundsException if no related booking exists for $resourceId
+     */
+    public function getRelatedBookingForResource($resourceId)
+    {
+        foreach ($this->getRelatedBookingList() as $booking) {
+            if ($booking->getResource()->getId() == $resourceId) {
+                return $booking;
+            }
+        }
+        throw new \OutOfBoundsException('No related booking exists for resource '.$resourceId);
+    }
+
+    /**
+     * Does this resource booking have a related booking for the given resource?
+     *
      * @param  int $resourceId
      * @return bool
      */
