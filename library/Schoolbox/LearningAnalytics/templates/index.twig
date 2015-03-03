@@ -3,13 +3,12 @@
 <script type="text/javascript" src="/learninganalytics/js/graph.js"></script>
 <script type="text/javascript">
     $(function () {
-        var input = [
+        var allData = $.fn.calculateAllSeriesData([
             [
                 {
                     info: 'Alice',
                     value: 10.2
                 },
-
                 {
                     info: 'Douglas',
                     value: 14.1
@@ -97,10 +96,10 @@
                     value: 25
                 }
             ]
-        ];
+        ]);
 
-        var allData = $.fn.calculateAllSeriesData(input);
-
+        /* The plot unfolds
+         */
         $('#learning-analytics-container').highcharts({
             chart: {
                 type: 'boxplot'
@@ -115,7 +114,7 @@
             },
 
             xAxis: {
-                categories: ['Gronzy'],
+                categories: ['Gronzy', 'McNonzy'],
                 title: {
                     text: 'Experiment No.'
                 }
