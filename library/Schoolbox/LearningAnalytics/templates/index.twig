@@ -13,11 +13,14 @@
              */
             var output = {
 
-                /* An object literal or an array, containing values
-                 * corresponding to the five-point summary (the
-                 * min, q1, q2, q3 and max values)
+                /* An object literal containing another object literal and
+                 * an array, both of which correspond to the five-point
+                 * summary (min, q1, q2, q3 and max values)
                  */
-                fivePointSummary: null,
+                fivePointSummary: {
+                    structured: null,
+                    array: []
+                },
 
                 /* A float, the interquartile range
                  */
@@ -31,7 +34,7 @@
 
             /* Calculate five point summary
              */
-            output.fivePointSummary = generateStructuredBoxPlotValues();
+            output.fivePointSummary.structured = generateValues();
 
             /* Calculate interquartile range
              */
@@ -41,19 +44,17 @@
              */
             output.outliers = generateOutliers();
 
-            console.log(output);
-
-            /* Decide output format
-             * 'structured' gives you an object
-             * 'array' gives you highcharts-compatible array
+            /* Convert into an array format
              */
-            switch (config.type) {
-                case 'structured':
-                    break;
+            output.fivePointSummary.array = [
+                output.fivePointSummary.structured.minimum,
+                output.fivePointSummary.structured.quartile1,
+                output.fivePointSummary.structured.quartile2,
+                output.fivePointSummary.structured.quartile3,
+                output.fivePointSummary.structured.maximum,
+            ];
 
-                default:
-                    break;
-            }
+            console.log(output);
 
             return output;
 
@@ -65,8 +66,7 @@
                 /* Default values
                  */
                 var defaults = {
-                    values: [],
-                    type: 'structured'
+                    values: []
                 }
 
                 /* Derived values
@@ -92,47 +92,44 @@
              * Generate IQR value
              */
             function generateIQR() {
-                return output.fivePointSummary.quartile3 - output.fivePointSummary.quartile1;
+                return output.fivePointSummary.structured.quartile3 - output.fivePointSummary.structured.quartile1;
             }
 
             /**
              * Generate a list of outliers
              *
+             * Decide where the whiskers will be
              * Use a Tukey box plot
              */
             function generateOutliers() {
                 var allOutliers = [];
-
-                /* Decide where the whiskers will be
-                 */
+                var i = 0;
 
                 /* Lower whisker
+                 * Use the first value that is above the lowerThreshold
                  */
-                var lowerThreshold = output.fivePointSummary.quartile1 - (1.5 * output.iqr);
+                var lowerThreshold = output.fivePointSummary.structured.quartile1 - (1.5 * output.iqr);
 
-                /* Use the first value that is above the lowerThreshold
-                 */
-                for (var i = (config.values.length-1); i >= 0; i--) {
+                for (i = (config.values.length-1); i >= 0; i--) {
                     if (config.values[i] > lowerThreshold) {
-                        output.fivePointSummary.minimum = config.values[i];
+                        output.fivePointSummary.structured.minimum = config.values[i];
                     }
                 }
 
                 /* Upper whisker
+                 * Use the first value that is below the upperThreshold
                  */
-                var upperThreshold = output.fivePointSummary.quartile3 + (1.5 * output.iqr);
+                var upperThreshold = output.fivePointSummary.structured.quartile3 + (1.5 * output.iqr);
 
-                /* Use the first value that is below the upperThreshold
-                 */
-                for (var i = 0; i < config.values.length; i++) {
+                for (i = 0; i < config.values.length; i++) {
                     if (config.values[i] < upperThreshold) {
-                        output.fivePointSummary.maximum = config.values[i];
+                        output.fivePointSummary.structured.maximum = config.values[i];
                     }
                 }
 
                 /* Outlier stack
                  */
-                for (var i = 0; i < config.values.length; i++) {
+                for (i = 0; i < config.values.length; i++) {
                     if ((config.values[i] < lowerThreshold) || (config.values[i] > upperThreshold)) {
                         allOutliers.push(config.values[i]);
                     }
@@ -145,7 +142,7 @@
              * Generate an object containing all the box plot values
              * required to manufacture a graph
              */
-            function generateStructuredBoxPlotValues() {
+            function generateValues() {
                 return {
                     minimum: findMinimum(config.values),
                     quartile1: findMedian(setupFirstQuartile(config.values)),
@@ -153,22 +150,6 @@
                     quartile3: findMedian(setupThirdQuartile(config.values)),
                     maximum: findMaximum(config.values)
                 }
-            }
-
-            /**
-             * Generate an object containing all the box plot values
-             * required to manufacture a graph
-             */
-            function generateArrayBoxPlotValues() {
-                var array = [];
-
-                array.push(findMinimum(config.values));
-                array.push(findMedian(setupFirstQuartile(config.values)));
-                array.push(findMedian(config.values));
-                array.push(findMedian(setupThirdQuartile(config.values)));
-                array.push(findMaximum(config.values));
-
-                return array;
             }
 
             /**
