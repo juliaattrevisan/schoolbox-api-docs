@@ -239,41 +239,77 @@
     }(jQuery));
 
     $(function () {
+        var tooltipIndex = 0;
+
+        var input = [
+            {
+                info: 'Alice',
+                value: 10.2
+            },
+
+            {
+                info: 'Douglas',
+                value: 14.1
+            },
+            {
+                info: 'John',
+                value: 14.4
+            },
+            {
+                info: 'James',
+                value: 14.4
+            },
+            {
+                info: 'Linda',
+                value: 14.4
+            },
+            {
+                info: 'Kelly',
+                value: 14.5
+            },
+            {
+                info: 'Jerome',
+                value: 14.5
+            },
+            {
+                info: 'Frederic',
+                value: 14.6
+            },
+            {
+                info: 'Samuel',
+                value: 14.7
+            },
+            {
+                info: 'Grace',
+                value: 14.7
+            },
+            {
+                info: 'Naomi',
+                value: 14.7
+            },
+            {
+                info: 'Randall',
+                value: 14.9
+            },
+            {
+                info: 'Isaac',
+                value: 15.1
+            },
+            {
+                info: 'Kurt',
+                value: 15.9
+            },
+            {
+                info: 'Solomon',
+                value: 16.4
+            }
+        ];
 
         var graphData = $.fn.calculateQuartiles({
-            input: [
-                {
-                    info: 'Sixth',
-                    value: 33
-                },
-
-                {
-                    info: 'Second',
-                    value: 23
-                },
-                {
-                    info: 'First',
-                    value: 21
-                },
-                {
-                    info: 'Fifth',
-                    value: 29
-                },
-                {
-                    info: 'Third',
-                    value: 24
-                },
-                {
-                    info: 'Seventh',
-                    value: 49
-                },
-                {
-                    info: 'Fourth',
-                    value: 25
-                }
-            ]
+            input: input
         });
 
+        console.log(graphData);
         $('#container').highcharts({
             chart: {
                 type: 'boxplot'
@@ -335,8 +371,7 @@
                 },
                 tooltip: {
                     pointFormatter: function() {
-                        console.log(this);
-                        return this.x + ' ' + this.y + ' ' + this.series.name;
+                        return graphData.outliers[tooltipIndex].info + ': ' + this.y + ' ' + this.series.name;
                     }
 
                 }
