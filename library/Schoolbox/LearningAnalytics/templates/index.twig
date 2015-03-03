@@ -17,7 +17,7 @@
                  * corresponding to the five-point summary (the
                  * min, q1, q2, q3 and max values)
                  */
-                summary: null,
+                fivePointSummary: null,
 
                 /* A float, the interquartile range
                  */
@@ -29,19 +29,29 @@
                 outliers: []
             }
 
+            /* Calculate five point summary
+             */
+            output.fivePointSummary = generateStructuredBoxPlotValues();
+
+            /* Calculate interquartile range
+             */
+            output.iqr = generateIQR();
+
+            /* Decide outliers
+             */
+            output.outliers = generateOutliers();
+
+            console.log(output);
+
             /* Decide output format
              * 'structured' gives you an object
              * 'array' gives you highcharts-compatible array
              */
             switch (config.type) {
                 case 'structured':
-                    output.values = generateStructuredBoxPlotValues();
-                    output.iqr = generateIQR();
                     break;
 
                 default:
-                    output.values = generateStructuredBoxPlotValues();
-                    output.iqr = generateIQR();
                     break;
             }
 
@@ -78,7 +88,57 @@
                 return merged;
             }
 
+            /**
+             * Generate IQR value
+             */
             function generateIQR() {
+                return output.fivePointSummary.quartile3 - output.fivePointSummary.quartile1;
+            }
+
+            /**
+             * Generate a list of outliers
+             *
+             * Use a Tukey box plot
+             */
+            function generateOutliers() {
+                var allOutliers = [];
+
+                /* Decide where the whiskers will be
+                 */
+
+                /* Lower whisker
+                 */
+                var lowerThreshold = output.fivePointSummary.quartile1 - (1.5 * output.iqr);
+
+                /* Use the first value that is above the lowerThreshold
+                 */
+                for (var i = (config.values.length-1); i >= 0; i--) {
+                    if (config.values[i] > lowerThreshold) {
+                        output.fivePointSummary.minimum = config.values[i];
+                    }
+                }
+
+                /* Upper whisker
+                 */
+                var upperThreshold = output.fivePointSummary.quartile3 + (1.5 * output.iqr);
+
+                /* Use the first value that is below the upperThreshold
+                 */
+                for (var i = 0; i < config.values.length; i++) {
+                    if (config.values[i] < upperThreshold) {
+                        output.fivePointSummary.maximum = config.values[i];
+                    }
+                }
+
+                /* Outlier stack
+                 */
+                for (var i = 0; i < config.values.length; i++) {
+                    if ((config.values[i] < lowerThreshold) || (config.values[i] > upperThreshold)) {
+                        allOutliers.push(config.values[i]);
+                    }
+                }
+
+                return allOutliers;
             }
 
             /**
@@ -233,7 +293,7 @@
                     /* Sample Minimum, Lower Quartile, Media, Upper Quartile, Sample Maximum
                      */
                     $.fn.calculateQuartiles({
-                        values: [77,  79,  80,  86,  87,  87,  94,  99],
+                        values: [21,  23,  24,  25,   29,  33,  49],
                         type: 'array'
                     })
                 ],
