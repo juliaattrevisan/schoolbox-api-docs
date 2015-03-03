@@ -39,10 +39,10 @@
 
             series: [
                 {
-                    name: 'Observations',
+                    name: 'Analysis',
                     data: options.allData.allGraphData,
                     tooltip: {
-                        headerFormat: '<strong>{point.key}</strong><br/>'
+                        headerFormat: ''
                     }
                 },
                 {
