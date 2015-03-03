@@ -3,218 +3,145 @@
 <script type="text/javascript" src="/learninganalytics/js/graph.js"></script>
 <script type="text/javascript">
     $(function () {
-        var allData = $.fn.calculateAllSeriesData([
-            [
-                {
-                    info: 'Alice',
-                    value: 10.2
-                },
-                {
-                    info: 'Douglas',
-                    value: 14.1
-                },
-                {
-                    info: 'John',
-                    value: 14.4
-                },
-                {
-                    info: 'James',
-                    value: 14.4
-                },
-                {
-                    info: 'Linda',
-                    value: 14.4
-                },
-                {
-                    info: 'Kelly',
-                    value: 14.5
-                },
-                {
-                    info: 'Jerome',
-                    value: 14.5
-                },
-                {
-                    info: 'Frederic',
-                    value: 14.6
-                },
-                {
-                    info: 'Samuel',
-                    value: 14.7
-                },
-                {
-                    info: 'Grace',
-                    value: 14.7
-                },
-                {
-                    info: 'Naomi',
-                    value: 14.7
-                },
-                {
-                    info: 'Randall',
-                    value: 14.9
-                },
-                {
-                    info: 'Isaac',
-                    value: 15.1
-                },
-                {
-                    info: 'Kurt',
-                    value: 15.9
-                },
-                {
-                    info: 'Solomon',
-                    value: 16.4
-                }
+        var options = {
+            title: 'Schoolbox Learning Analytics for Test Class',
+            allAssessments: [
+                'Assessment 1',
+                'Assessment 2',
+                'Assessment 3'
             ],
-            [
-                {
-                    info: 'Kelly',
-                    value: 21
-                },
-                {
-                    info: 'Jerome',
-                    value: 49
-                },
-                {
-                    info: 'Frederic',
-                    value: 23
-                },
-                {
-                    info: 'Samuel',
-                    value: 33
-                },
-                {
-                    info: 'Grace',
-                    value: 24
-                },
-                {
-                    info: 'Naomi',
-                    value: 29
-                },
-                {
-                    info: 'Solomon',
-                    value: 25
-                }
-            ],
-            [
-                {
-                    info: 'John',
-                    value: 77
-                },
-                {
-                    info: 'James',
-                    value: 79
-                },
-                {
-                    info: 'Linda',
-                    value: 86
-                },
-                {
-                    info: 'Kelly',
-                    value: 80
-                },
-                {
-                    info: 'Jerome',
-                    value: 99
-                },
-
-                {
-                    info: 'Samuel',
-                    value: 87
-                },
-                {
-                    info: 'Grace',
-                    value: 94
-                },
-                {
-                    info: 'Naomi',
-                    value: 87
-                }
-            ]
-        ]);
-
-        /* The plot unfolds
-         */
-        $('#learning-analytics-container').highcharts({
-            chart: {
-                type: 'boxplot'
-            },
-
-            title: {
-                text: 'Highcharts Box Plot Example'
-            },
-
-            legend: {
-                enabled: false
-            },
-
-            xAxis: {
-                categories: ['Gronzy', 'McNonzy'],
-                title: {
-                    text: 'Experiment No.'
-                }
-            },
-
-            yAxis: {
-                title: {
-                    text: 'Observations'
-                },
-                plotLines: [{
-                    value: 67,
-                    color: 'red',
-                    width: 2,
-                    label: {
-                        text: 'Theoretical mean: 932',
-                        align: 'center',
-                        style: {
-                            color: 'gray'
-                        }
+            allData: $.fn.calculateAllSeriesData([
+                [
+                    {
+                        info: 'Alice',
+                        value: 10.2
+                    },
+                    {
+                        info: 'Douglas',
+                        value: 14.1
+                    },
+                    {
+                        info: 'John',
+                        value: 14.4
+                    },
+                    {
+                        info: 'James',
+                        value: 14.4
+                    },
+                    {
+                        info: 'Linda',
+                        value: 14.4
+                    },
+                    {
+                        info: 'Kelly',
+                        value: 14.5
+                    },
+                    {
+                        info: 'Jerome',
+                        value: 14.5
+                    },
+                    {
+                        info: 'Frederic',
+                        value: 14.6
+                    },
+                    {
+                        info: 'Samuel',
+                        value: 14.7
+                    },
+                    {
+                        info: 'Grace',
+                        value: 14.7
+                    },
+                    {
+                        info: 'Naomi',
+                        value: 14.7
+                    },
+                    {
+                        info: 'Randall',
+                        value: 14.9
+                    },
+                    {
+                        info: 'Isaac',
+                        value: 15.1
+                    },
+                    {
+                        info: 'Kurt',
+                        value: 15.9
+                    },
+                    {
+                        info: 'Solomon',
+                        value: 16.4
                     }
-                }]
-            },
-
-            series: [{
-                name: 'Observations',
-                data: allData.allGraphData,
-                tooltip: {
-                    headerFormat: '<em>Experiment No {point.key}</em><br/>'
-                }
-            },
-            {
-                name: 'Outlier',
-                color: Highcharts.getOptions().colors[0],
-                type: 'scatter',
-                data: allData.allOutliers,
-                marker: {
-                    fillColor: 'white',
-                    lineWidth: 1,
-                    lineColor: Highcharts.getOptions().colors[0]
-                },
-                tooltip: {
-
-                    /**
-                     * Sigh, find all the values in the series which match the
-                     * outlier value and concat it all into one giant tooltip
-                     *
-                     * so goofy
-                     *
-                     * @returns {string}
-                     */
-                    pointFormatter: function() {
-                        var tooltipContent = '';
-
-                        for (var i = 0; i < allData.input[this.x].length; i++) {
-                            if (allData.input[this.x][i].value == this.y) {
-                                tooltipContent += '<strong>' + allData.input[this.x][i].info + ':</strong> ' + this.y;
-                                tooltipContent += '<br />';
-                            }
-                        }
-
-                        return tooltipContent;
+                ],
+                [
+                    {
+                        info: 'Kelly',
+                        value: 21
+                    },
+                    {
+                        info: 'Jerome',
+                        value: 49
+                    },
+                    {
+                        info: 'Frederic',
+                        value: 23
+                    },
+                    {
+                        info: 'Samuel',
+                        value: 33
+                    },
+                    {
+                        info: 'Grace',
+                        value: 24
+                    },
+                    {
+                        info: 'Naomi',
+                        value: 29
+                    },
+                    {
+                        info: 'Solomon',
+                        value: 25
                     }
-                }
-            }]
-        });
+                ],
+                [
+                    {
+                        info: 'John',
+                        value: 77
+                    },
+                    {
+                        info: 'James',
+                        value: 79
+                    },
+                    {
+                        info: 'Linda',
+                        value: 86
+                    },
+                    {
+                        info: 'Kelly',
+                        value: 80
+                    },
+                    {
+                        info: 'Jerome',
+                        value: 99
+                    },
+
+                    {
+                        info: 'Samuel',
+                        value: 87
+                    },
+                    {
+                        info: 'Grace',
+                        value: 94
+                    },
+                    {
+                        info: 'Naomi',
+                        value: 87
+                    }
+                ]
+            ])
+        }
+
+        $.fn.renderGraph(options);
     });
 </script>
 

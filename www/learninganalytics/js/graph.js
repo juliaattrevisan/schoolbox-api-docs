@@ -1,6 +1,85 @@
 (function() {
 
     /**
+     * Render boxplot graphs
+     *
+     * @param options
+     */
+    $.fn.renderGraph = function(options) {
+        var options = options || {};
+
+        /* The plot unfolds
+         */
+        $('#learning-analytics-container').highcharts({
+            chart: {
+                type: 'boxplot'
+            },
+
+            title: {
+                text: options.title
+            },
+
+            legend: {
+                enabled: false
+            },
+
+            xAxis: {
+                categories: options.allAssessments
+            },
+
+            yAxis: {
+                title: {
+                    text: 'Mark'
+                }
+            },
+
+            series: [
+                {
+                    name: 'Observations',
+                    data: options.allData.allGraphData,
+                    tooltip: {
+                        headerFormat: '<strong>{point.key}</strong><br/>'
+                    }
+                },
+                {
+                    name: 'Outlier',
+                    color: Highcharts.getOptions().colors[0],
+                    type: 'scatter',
+                    data: options.allData.allOutliers,
+                    marker: {
+                        fillColor: 'white',
+                        lineWidth: 1,
+                        lineColor: Highcharts.getOptions().colors[0]
+                    },
+                    tooltip: {
+
+                        /**
+                         * Sigh, find all the values in the series which match the
+                         * outlier value and concat it all into one giant tooltip
+                         *
+                         * so goofy
+                         *
+                         * @returns {string}
+                         */
+                        pointFormatter: function() {
+                            var tooltipContent = '';
+
+                            for (var i = 0; i < options.allData.input[this.x].length; i++) {
+                                if (options.allData.input[this.x][i].value == this.y) {
+                                    tooltipContent += '<em>' + options.allData.input[this.x][i].info + ':</em> ' + this.y;
+                                    tooltipContent += '<br />';
+                                }
+                            }
+
+                            return tooltipContent;
+                        }
+                    }
+                }
+            ]
+        });
+    }
+
+    /**
      * Calculate five-point summary and outliers for all series
      * of data, in both structured and array foramts
      *
