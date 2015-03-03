@@ -1,4 +1,44 @@
 (function() {
+
+    /**
+     * Calculate five-point summary and outliers for all series
+     * of data, in both structured and array foramts
+     *
+     * @returns {{allGraphData: Array, allOutliers: Array}}
+     */
+    $.fn.calculateAllSeriesData = function(input) {
+        var output = {
+            allGraphData: [],
+            allOutliers: []
+        }
+
+        console.log(input);
+
+        for (var i = 0; i < input.length; i++) {
+            var currentSeriesData = $.fn.calculateSeriesData({
+                input: input[i]
+            });
+
+
+            /* Outliers and boxplots rendered separately
+             */
+            output.allGraphData.push(currentSeriesData.fivePointSummary.array);
+
+            for (var j = 0; j < currentSeriesData.outliers.length; j++) {
+                output.allOutliers.push([i, currentSeriesData.outliers[j].value]);
+            }
+        }
+
+        return output;
+    }
+
+    /**
+     * Calculate five-point summary and outliers for one series
+     * of data, in both structured and array formats
+     *
+     * @param options
+     * @returns {{fivePointSummary: {structured: null, array: Array}, iqr: null, outliers: Array}}
+     */
     $.fn.calculateSeriesData = function(options) {
 
         /* Store the config in this instance so private methods

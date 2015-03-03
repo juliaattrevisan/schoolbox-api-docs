@@ -99,22 +99,7 @@
             ]
         ];
 
-        var allGraphData = [];
-        var allOutliers = [];
-
-        for (var i = 0; i < input.length; i++) {
-            var currentSeriesData = $.fn.calculateSeriesData({
-                input: input[i]
-            });
-
-            /* Outliers and boxplots rendered separately
-             */
-            allGraphData.push(currentSeriesData.fivePointSummary.array);
-
-            for (var j = 0; j < currentSeriesData.outliers.length; j++) {
-                allOutliers.push([i, currentSeriesData.outliers[j].value]);
-            }
-        }
+        var allData = $.fn.calculateAllSeriesData(input);
 
         $('#learning-analytics-container').highcharts({
             chart: {
@@ -156,7 +141,7 @@
 
             series: [{
                 name: 'Observations',
-                data: allGraphData,
+                data: allData.allGraphData,
                 tooltip: {
                     headerFormat: '<em>Experiment No {point.key}</em><br/>'
                 }
@@ -165,7 +150,7 @@
                 name: 'Outlier',
                 color: Highcharts.getOptions().colors[0],
                 type: 'scatter',
-                data: allOutliers,
+                data: allData.allOutliers,
                 marker: {
                     fillColor: 'white',
                     lineWidth: 1,
