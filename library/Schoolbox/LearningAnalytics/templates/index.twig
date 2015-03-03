@@ -18,7 +18,7 @@
                     return generateStructuredBoxPlotValues();
 
                 default:
-                    return generateArrayBoxPlotValues;
+                    return generateArrayBoxPlotValues();
             }
 
             /**
@@ -162,7 +162,7 @@
 
         console.log($.fn.calculateQuartiles({
             values: [4.3,  5.1,  3.9,  4.5,  4.4,  4.9,  5.0,  4.7,  4.1,  4.6,  4.4,  4.3,  4.8,  4.4,  4.2,  4.5,  4.4],
-            type: 'structured'
+            type: 'array'
         }));
 
 
