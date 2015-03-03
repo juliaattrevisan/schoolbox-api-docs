@@ -15,6 +15,9 @@
         /* The plot unfolds
          */
         $('#learning-analytics-container').highcharts({
+
+            /* can use inverted:true to make it horizontal'
+             */
             chart: {
                 type: 'boxplot'
             },
@@ -95,8 +98,6 @@
             allGraphData: [],
             allOutliers: []
         }
-
-        console.log(input);
 
         for (var i = 0; i < input.length; i++) {
             var currentSeriesData = $.fn.calculateSeriesData({
