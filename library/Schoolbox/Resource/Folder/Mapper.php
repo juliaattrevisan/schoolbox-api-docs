@@ -225,9 +225,9 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
     }
 
     /**
-     * Pre-save callback: ensures that
+     * Pre-save callback: ensures that folders can't be their own parents
      *
-     * @param $model
+     * @param Model $model
      *
      * @return bool
      */
