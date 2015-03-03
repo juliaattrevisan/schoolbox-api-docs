@@ -6,7 +6,11 @@
      * @param options
      */
     $.fn.renderGraph = function(options) {
-        var options = options || {};
+        var options = options || {
+            title: '',
+            allAssessments: [],
+            allData: []
+        };
 
         /* The plot unfolds
          */
