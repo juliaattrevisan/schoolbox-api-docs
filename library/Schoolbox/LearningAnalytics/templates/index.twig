@@ -66,12 +66,19 @@
                 /* Default values
                  */
                 var defaults = {
-                    values: []
+
+                    /* An array of object literals
+                     */
+                    input: []
                 }
 
                 /* Derived values
                  */
                 var derived = {
+
+                    /* An array of values derived from input
+                     */
+                    values: []
                 }
 
                 /* This sorts as strings by default so use an
@@ -79,9 +86,13 @@
                  *
                  * http://www.w3schools.com/jsref/jsref_sort.asp
                  */
-                options.values.sort(function(a, b) {
-                    return a-b
+                options.input.sort(function(a, b) {
+                    return a.value - b.value
                 });
+
+                for (var i = 0; i < options.input.length; i++) {
+                    derived.values.push(options.input[i].value);
+                }
 
                 var merged = $.extend(defaults, derived, options);
 
@@ -103,7 +114,7 @@
              */
             function generateOutliers() {
                 var allOutliers = [];
-                var i = 0;
+                var i;
 
                 /* Lower whisker
                  * Use the first value that is above the lowerThreshold
@@ -128,10 +139,12 @@
                 }
 
                 /* Outlier stack
+                 * Stack with information about the outlier,
+                 * not just its value
                  */
                 for (i = 0; i < config.values.length; i++) {
                     if ((config.values[i] < lowerThreshold) || (config.values[i] > upperThreshold)) {
-                        allOutliers.push(config.values[i]);
+                        allOutliers.push(config.input[i]);
                     }
                 }
 
@@ -271,11 +284,37 @@
             series: [{
                 name: 'Observations',
                 data: [
-                    /* Sample Minimum, Lower Quartile, Media, Upper Quartile, Sample Maximum
-                     */
                     $.fn.calculateQuartiles({
-                        values: [21,  23,  24,  25,   29,  33,  49],
-                        type: 'array'
+                        input: [
+                            {
+                                info: 'First',
+                                value: 21
+                            },
+                            {
+                                info: 'Second',
+                                value: 23
+                            },
+                            {
+                                info: 'Third',
+                                value: 24
+                            },
+                            {
+                                info: 'Fourth',
+                                value: 25
+                            },
+                            {
+                                info: 'Fifth',
+                                value: 29
+                            },
+                            {
+                                info: 'Sixth',
+                                value: 33
+                            },
+                            {
+                                info: 'Seventh',
+                                value: 49
+                            }
+                        ]
                     })
                 ],
                 tooltip: {
