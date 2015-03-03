@@ -54,8 +54,6 @@
                 output.fivePointSummary.structured.maximum
             ];
 
-            console.log(output);
-
             return output;
 
             /**
@@ -242,6 +240,40 @@
 
     $(function () {
 
+        var graphData = $.fn.calculateQuartiles({
+            input: [
+                {
+                    info: 'Sixth',
+                    value: 33
+                },
+
+                {
+                    info: 'Second',
+                    value: 23
+                },
+                {
+                    info: 'First',
+                    value: 21
+                },
+                {
+                    info: 'Fifth',
+                    value: 29
+                },
+                {
+                    info: 'Third',
+                    value: 24
+                },
+                {
+                    info: 'Seventh',
+                    value: 49
+                },
+                {
+                    info: 'Fourth',
+                    value: 25
+                }
+            ]
+        });
+
         $('#container').highcharts({
             chart: {
                 type: 'boxplot'
@@ -283,39 +315,7 @@
             series: [{
                 name: 'Observations',
                 data: [
-                    $.fn.calculateQuartiles({
-                        input: [
-                            {
-                                info: 'Sixth',
-                                value: 33
-                            },
-
-                            {
-                                info: 'Second',
-                                value: 23
-                            },
-                            {
-                                info: 'First',
-                                value: 21
-                            },
-                            {
-                                info: 'Fifth',
-                                value: 29
-                            },
-                            {
-                                info: 'Third',
-                                value: 24
-                            },
-                            {
-                                info: 'Seventh',
-                                value: 49
-                            },
-                            {
-                                info: 'Fourth',
-                                value: 25
-                            }
-                        ]
-                    })
+                    graphData.fivePointSummary.array
                 ],
                 tooltip: {
                     headerFormat: '<em>Experiment No {point.key}</em><br/>'
@@ -325,7 +325,8 @@
                 name: 'Outlier',
                 color: Highcharts.getOptions().colors[0],
                 type: 'scatter',
-                data: [ // x, y positions where 0 is the first category
+                data: [
+                    [0, graphData.outliers[0].value]
                 ],
                 marker: {
                     fillColor: 'white',
@@ -333,7 +334,11 @@
                     lineColor: Highcharts.getOptions().colors[0]
                 },
                 tooltip: {
-                    pointFormat: 'Observation: {point.y}'
+                    pointFormatter: function() {
+                        console.log(this);
+                        return this.x + ' ' + this.y + ' ' + this.series.name;
+                    }
+
                 }
             }]
         });
