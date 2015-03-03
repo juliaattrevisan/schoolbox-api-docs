@@ -240,74 +240,119 @@
 
     $(function () {
         var input = [
-            {
-                info: 'Alice',
-                value: 10.2
-            },
+            [
+                {
+                    info: 'Alice',
+                    value: 10.2
+                },
 
-            {
-                info: 'Douglas',
-                value: 14.1
-            },
-            {
-                info: 'John',
-                value: 14.4
-            },
-            {
-                info: 'James',
-                value: 14.4
-            },
-            {
-                info: 'Linda',
-                value: 14.4
-            },
-            {
-                info: 'Kelly',
-                value: 14.5
-            },
-            {
-                info: 'Jerome',
-                value: 14.5
-            },
-            {
-                info: 'Frederic',
-                value: 14.6
-            },
-            {
-                info: 'Samuel',
-                value: 14.7
-            },
-            {
-                info: 'Grace',
-                value: 14.7
-            },
-            {
-                info: 'Naomi',
-                value: 14.7
-            },
-            {
-                info: 'Randall',
-                value: 14.9
-            },
-            {
-                info: 'Isaac',
-                value: 15.1
-            },
-            {
-                info: 'Kurt',
-                value: 15.9
-            },
-            {
-                info: 'Solomon',
-                value: 16.4
-            }
+                {
+                    info: 'Douglas',
+                    value: 14.1
+                },
+                {
+                    info: 'John',
+                    value: 14.4
+                },
+                {
+                    info: 'James',
+                    value: 14.4
+                },
+                {
+                    info: 'Linda',
+                    value: 14.4
+                },
+                {
+                    info: 'Kelly',
+                    value: 14.5
+                },
+                {
+                    info: 'Jerome',
+                    value: 14.5
+                },
+                {
+                    info: 'Frederic',
+                    value: 14.6
+                },
+                {
+                    info: 'Samuel',
+                    value: 14.7
+                },
+                {
+                    info: 'Grace',
+                    value: 14.7
+                },
+                {
+                    info: 'Naomi',
+                    value: 14.7
+                },
+                {
+                    info: 'Randall',
+                    value: 14.9
+                },
+                {
+                    info: 'Isaac',
+                    value: 15.1
+                },
+                {
+                    info: 'Kurt',
+                    value: 15.9
+                },
+                {
+                    info: 'Solomon',
+                    value: 16.4
+                }
+            ],
+            [
+                {
+                    info: 'Kelly',
+                    value: 21
+                },
+                {
+                    info: 'Jerome',
+                    value: 49
+                },
+                {
+                    info: 'Frederic',
+                    value: 23
+                },
+                {
+                    info: 'Samuel',
+                    value: 33
+                },
+                {
+                    info: 'Grace',
+                    value: 24
+                },
+                {
+                    info: 'Naomi',
+                    value: 29
+                },
+                {
+                    info: 'Solomon',
+                    value: 25
+                }
+            ]
         ];
 
-        var graphData = $.fn.calculateQuartiles({
-            input: input
-        });
+        var allGraphData = [];
+        var allOutliers = [];
 
-        console.log(graphData);
+        for (var i = 0; i < input.length; i++) {
+            var currentGraphData = $.fn.calculateQuartiles({
+                input: input[i]
+            });
+
+            /* Outliers and boxplots rendered separately
+             */
+            allGraphData.push(currentGraphData.fivePointSummary.array);
+
+            for (var j = 0; j < currentGraphData.outliers.length; j++) {
+                allOutliers.push([i, currentGraphData.outliers[j].value]);
+            }
+        }
+
+        console.log(allGraphData);
         $('#learning-analytics-container').highcharts({
             chart: {
                 type: 'boxplot'
@@ -348,9 +393,7 @@
 
             series: [{
                 name: 'Observations',
-                data: [
-                    graphData.fivePointSummary.array
-                ],
+                data: allGraphData,
                 tooltip: {
                     headerFormat: '<em>Experiment No {point.key}</em><br/>'
                 }
@@ -359,11 +402,7 @@
                 name: 'Outlier',
                 color: Highcharts.getOptions().colors[0],
                 type: 'scatter',
-                data: [
-                    [0, graphData.outliers[0].value],
-                    [0, graphData.outliers[1].value],
-                    [0, graphData.outliers[2].value]
-                ],
+                data: allOutliers,
                 marker: {
                     fillColor: 'white',
                     lineWidth: 1,
@@ -382,9 +421,11 @@
                     pointFormatter: function() {
                         var tooltipContent = '';
 
-                        for (var i = 0; i < graphData.outliers.length; i++) {
-                            if (graphData.outliers[i].value == this.y) {
-                                tooltipContent += '<strong>' + graphData.outliers[i].info + ':</strong> ' + this.y;
+                        /* For a particular box plot
+                         */
+                        for (var i = 0; i < allOutliers[this.x].length; i++) {
+                            if (allOutliers[this.x].value == this.y) {
+                                tooltipContent += '<strong>' + allOutliers[this.x].info + ':</strong> ' + this.y;
                             }
                         }
 
