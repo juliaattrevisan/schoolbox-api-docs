@@ -388,9 +388,14 @@ $(document).ready(function() {
                 .find('[data-relation="related-resource-notes"]')
             ;
             if (this.checked) {
-                notes.slideDown('fast');
+                // Dunno if this disables tinyboxes
+                notes.slideDown('fast', function() {
+                    notes.find(':input').prop('disabled', false);
+                });
             } else {
-                notes.slideUp('fast');
+                notes.slideUp('fast', function() {
+                    notes.find(':input').prop('disabled', true);
+                });
             }
         }
     )
