@@ -3,7 +3,11 @@
 <script type="text/javascript" src="/learninganalytics/js/graph.js"></script>
 <script type="text/javascript">
     $(function () {
-        var allData = $.fn.calculateAllSeriesData([
+
+        /* This var is referenced from a callback
+          * when rendering outliers' data
+         */
+        var input = [
             [
                 {
                     info: 'Alice',
@@ -95,8 +99,45 @@
                     info: 'Solomon',
                     value: 25
                 }
+            ],
+            [
+                {
+                    info: 'John',
+                    value: 77
+                },
+                {
+                    info: 'James',
+                    value: 79
+                },
+                {
+                    info: 'Linda',
+                    value: 86
+                },
+                {
+                    info: 'Kelly',
+                    value: 80
+                },
+                {
+                    info: 'Jerome',
+                    value: 99
+                },
+
+                {
+                    info: 'Samuel',
+                    value: 87
+                },
+                {
+                    info: 'Grace',
+                    value: 94
+                },
+                {
+                    info: 'Naomi',
+                    value: 87
+                }
             ]
-        ]);
+        ];
+
+        var allData = $.fn.calculateAllSeriesData(input);
 
         /* The plot unfolds
          */
