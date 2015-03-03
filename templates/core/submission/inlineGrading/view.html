@@ -1,5 +1,6 @@
 <!-- BEGIN custom_head -->
 <script src="/javascript/components/qtip2/jquery.qtip.js" type="text/javascript"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.js"></script>
 <script src="/javascript/jquery.combobox.js" type="text/javascript"></script>
 <script src="/submission/inlineGrading/js/inlineGrading.js" type="text/javascript"></script>
 <script src="/javascript/jquery.marksheet.js" type="text/javascript"></script>
@@ -7,79 +8,94 @@
 
 <script type='text/javascript'>
 	$(function() {
-		$('#inline-grading').inlineGrading({
+
+    var navNext = $('.next-item');
+    var navPrev = $('.previous-item');
+
+    var tgt = $('select[name=student-select]'), ize,
+        skipUnsubmitted = $('#skipUnsubmitted'),
+        students = [
+          <!-- BEGIN studentnav -->
+          {
+            text: "{USER_FULLNAME}",
+            value: "/submission/inlineGrading/view/{BOX_ID}/{USER_ID}",
+            html: '{USER_HTML}',
+            unsubmitted: {USER_UNSUBMITTED}
+          },
+          <!-- END studentnav -->
+          {}
+        ],
+        selectizeOptions = {
+          preload: true,
+          closeAfterSelect: false,
+          options: students,
+          render: {
+            option: function (item) {
+              item.disabled = skipUnsubmitted.is(':checked') && item.unsubmitted;
+              return $('<div/>').html(item.html).html();
+            },
+            item: function (item) {
+              return $('<div/>').html(item.html).html();
+            }
+          }
+        };
+
+
+    ize = tgt.selectize(selectizeOptions);
+
+    // manually set the value, because selectize
+    ize[0].selectize.setValue("/submission/inlineGrading/view/{INLINE_GRADING_SUBMISSION_BOX_ID}/{INLINE_GRADING_STUDENT_ID}", true);
+
+    // add the listener AFTER we've set the value
+    ize.on('change', function (e) {
+      window.location.href = e.target.value;
+    });
+
+    $('#inline-grading').inlineGrading({
 			boxId: '{INLINE_GRADING_SUBMISSION_BOX_ID}',
 			submissionId: '{INLINE_GRADING_SUBMISSION_ID}',
 			errorElement: '#inline-grading-error-container'
 		});
 
-        $('#returnWorkForm').marksheet();
-
-		$('.dropdown-navigator').inlineGradingNavigator({
-			currentId: '{INLINE_GRADING_SUBMISSION_NAVIGATION_CURRENT_ID}',
-			direct: {INLINE_GRADING_SUBMISSION_NAVIGATION_DIRECT},
-			items: {INLINE_GRADING_SUBMISSION_NAVIGATION_ITEMS},
-			disabled: '{INLINE_GRADING_SUBMISSION_NAVIGATION_DISABLED}',
-
-			/* Callback methods
-			 */
-			selectItemCallback: function() {
-				$('.context-select').change(function() {
-					window.location.href = $(this).val();
-				});
-			},
-			previousItemCallback: function() {
-			},
-			nextItemCallback: function() {
-			}
-		});
+    $('#returnWorkForm').marksheet();
 
 		$('.combobox').combobox({COMBO_OPTIONS});
+
+    function refreshNav(nav, source) {
+      if (source.length) {
+        nav.attr('href', source.data('value'))
+            .attr('title', source.children('img').attr('alt'))
+            .removeAttr('disabled');
+      } else {
+        nav.removeAttr('href')
+           .removeAttr('title')
+           .attr('disabled', 'disabled');
+      }
+    }
 
 		/* Asynchronous update
 		 * Rerun plugin
 		 */
-		$('#skipUnsubmitted').change(function(event) {
-			var form = $(this).closest('form');
-			var url = form.attr('action');
-			var data = form.serialize();
+		skipUnsubmitted.change(function (event) {
 
-			/* Hook in Skip Unsubmitted box
-			 */
-			var useDisabled = false;
+      var ize  = tgt[0].selectize,
+          skip = $(this).is(':checked') ? 1 : 0,
+          form = $(this).closest('form');
 
-			if ($(this).is(':checked')) {
-				useDisabled = true;
-			}
+      // clear the selectize render cache
+      ize.renderCache.option = {};
 
-			$.post(url, data, function(responseText) {
-				$('.dropdown-navigator').inlineGradingNavigator({
-					currentId: '{INLINE_GRADING_SUBMISSION_NAVIGATION_CURRENT_ID}',
-					direct: {INLINE_GRADING_SUBMISSION_NAVIGATION_DIRECT},
-					items: {INLINE_GRADING_SUBMISSION_NAVIGATION_ITEMS},
-					disabled: {INLINE_GRADING_SUBMISSION_NAVIGATION_DISABLED},
-					useDisabled: useDisabled,
+      ize.refreshOptions(false);
 
-					/* Callback methods
-					 */
-					selectItemCallback: function() {
-						$('.context-select').change(function() {
-							window.location.href = $(this).val();
-						});
-					},
-					previousItemCallback: function() {
-					},
-					nextItemCallback: function() {
-					}
-				});
+      // fire an ajax to persist the "skip_unsubmitted" state for this box...because reasons...
+      $.post(form.attr('action'), { boxId: form.children('input[name=boxId]').val(), skipUnsubmitted: skip });
 
-				// Why don't I have a class for this?
-				$('.dropdown-navigator').addClass('ajax-updated');
-				setTimeout(function() {
-					$('.dropdown-navigator').removeClass('ajax-updated');
-				}, 1000)
-			});
-		});
+      var val = ize.getOption(ize.getValue());
+
+      refreshNav(navNext, ize.getAdjacentOption(val, 1));
+      refreshNav(navPrev, ize.getAdjacentOption(val, -1));
+
+		}).trigger('change');
 	});
 </script>
 <!-- END custom_head -->
@@ -97,17 +113,19 @@
         <li class="last"><a href="/search/user/{INLINE_GRADING_STUDENT_ID}">{INLINE_GRADING_STUDENT_FULL_NAME}</a></li>
     </ul>
 </div>
-<div class="dropdown-navigator float-left"></div>
-<div class='float-left'>
-    <form action="/submission/inlineGrading/configForm.php" method="post">
-        <input type="hidden" name='boxId' value="{BOX_ID}" />
-        <input type="hidden" name="userId" value="{INLINE_GRADING_STUDENT_ID}" />
-		<input type="hidden" name="skipUnsubmitted" value="0" />
-		<label for="skipUnsubmitted">
-			<input type="checkbox" name="skipUnsubmitted" id="skipUnsubmitted" {SKIP_UNSUBMITTED_CHECKED} value='1' />
-			<strong>Skip Unsubmitted</strong>
-		</label>
-    </form>
+<div class="dropdown-navigator">
+  <a class="nav previous-item" href="" title="">&lsaquo;</a>
+  <select name="student-select"></select>
+  <a class="nav next-item" href="" title="">&rsaquo;</a>
+  <form action="/submission/inlineGrading/configForm.php" method="post">
+      <input type="hidden" name='boxId' value="{BOX_ID}" />
+      <input type="hidden" name="userId" value="{INLINE_GRADING_STUDENT_ID}" />
+      <input type="hidden" name="skipUnsubmitted" value="0" />
+      <label for="skipUnsubmitted">
+        <input type="checkbox" name="skipUnsubmitted" id="skipUnsubmitted" {SKIP_UNSUBMITTED_CHECKED} value='1' />
+        <strong>Skip Unsubmitted</strong>
+      </label>
+  </form>
 </div>
 
 <div class="clearfix"></div>

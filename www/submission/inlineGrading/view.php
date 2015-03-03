@@ -20,7 +20,13 @@ use \Schoolbox\Collection;
 use \Crocodoc\Renderer\Factory;
 use \Rubric\Renderer\Vertical;
 
-/* /submission/inline/view/<box_id>/<user_id>
+/** @var SitePage $this */
+
+if (count($this->arg) < 2) {
+    $this->error(2); // not enough info
+}
+
+/* /submission/inlineGrading/view/<box_id>/<user_id>
  */
 $submissionBoxId = $this->arg[0];
 $currentUid = $this->arg[1];
@@ -53,9 +59,56 @@ $studentList = $submissionHandler->getAllStudentsForSubmission($submissionBox);
 $processed = array();
 $stack = array();
 
-foreach ($studentList as $currentStudent) {
-	if (!in_array($currentStudent->getId(), $processed)) {
-		$processed[] = $currentStudent->getId();
+$this->setFile(TEMPLATE_content, 'submission/inlineGrading/view.html');
+
+$this->setFile('studentNavTpl', 'submission/inlineGrading/injectables/controls/navigation-option.html');
+$this->setBlock('custom_head', 'studentnav', 'studentnav_block');
+
+$dueWorkDetail = new DueWork_Detail($submissionBox);
+$dueWorkDetail->processStudents($studentList);
+
+foreach ($dueWorkDetail->getSitepageData() as $studentId => $studentData) {
+	if (!in_array($studentId, $processed)) {
+		$processed[] = $studentId;
+
+        /** @var Schoolbox\User $currentStudent */
+        $currentStudent = $studentData['user']['instance'];
+
+        /** @var Alaress_Date_Format $submitTime */
+        $submitTime  = $studentData['user']['time'];
+        $submitText  = $studentData['user']['status'];
+        $submitClass = $studentData['user']['class'];
+
+        unset($studentData['user']);
+
+        $submit = !!count($studentData['submissions']);
+        $ontime = $submit ? $submitClass == 'submit-ok' : false;
+        $marked = isset($studentData['return']['id']) && $studentData['return']['id'] > 0;
+
+        if ($marked) {
+            $markTime = new Alaress_Date_Format($studentData['return']['returned'], 'Y-m-d H:i:s');
+        }
+
+        $this->setVar(array(
+            'BOX_ID'                => $submissionBox->getId(),
+            'USER_ID'               => $currentStudent->getId(),
+            'USER_EXT_ID'           => $currentStudent->getExternalId(),
+            'USER_FULLNAME'         => $currentStudent->formatName('{lastname}, {firstname}'),
+            'USER_UNSUBMITTED'      => $submit ? 'false' : 'true',
+
+            'USER_MARKSTATUS_CLASS'    => $marked ? 'marked' : '',
+            'USER_MARKSTATUS_DATETIME' => $marked ? $markTime->getLocal() : '',
+
+            'USER_SUBMISSION_CLASS'    => $submit ? ($ontime ? 'on-time' : 'late') : 'un',
+            'USER_SUBMISSION_TEXT'     => $submit ? ($ontime ? 'Submitted on Time' : 'Submitted Late') : 'Not Submitted',
+
+        ));
+
+        $this->parse('USER_HTML', 'studentNavTpl');
+        // force the subtemplate onto a single line so the JS doesn't snap
+        $this->setVar('USER_HTML', preg_replace('`\s+`', ' ', $this->getVar('USER_HTML')));
+
+        $this->parse('studentnav_block', 'studentnav', true);
 
 		/* Augment navigation data
 		 */
@@ -167,8 +220,6 @@ $navigationElements = array(
 
 $navigationDirect = json_encode($navigationElements);
 
-$this->setFile(TEMPLATE_content, 'submission/inlineGrading/view.html');
-
 $zone = new Zone('inline-return');
 
 $zone->setMulti(false)
@@ -191,7 +242,6 @@ $renderer->render();
 $oneStudent = new Collection();
 $oneStudent->add($currentAugmented['currentStudent']);
 
-$dueWorkDetail = new DueWork_Detail($submissionBoxId, $submissionBox);
 $dueWorkDetail->processStudents($oneStudent);
 $dueWorkDetail->renderDetails($this);
 

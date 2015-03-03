@@ -19,7 +19,7 @@ $page = new SitePage();
  * Check user exists
  */
 $boxId = $_POST['boxId'];
-$userId = $_POST['userId'];
+$skip  = isset($_POST['skipUnsubmitted']) && $_POST['skipUnsubmitted'] && $_POST['skipUnsubmitted'] != 'false' ? 1 : 0; // because it's hydrated as an int, not a boolean -_- // oh, and it might come through as the string "false", because Newspeak, that's why
 
 try {
 	$submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
@@ -27,14 +27,7 @@ try {
 }
 catch (\Exception $e) {
 	error(17);
-}
-
-try {
-	$userMapper = new Schoolbox\UserMapper();
-	$user = $userMapper->findById($userId);
-}
-catch (\Exception $e) {
-	error(31);
+    exit;
 }
 
 /* Check permissions
@@ -48,7 +41,7 @@ if ($groupHandler->getPermission($submissionBox->getCategory()->getId()) < WRITE
 
 /* Otherwise continue updating config
  */
-$submissionBox->setSkipUnsubmitted($_POST['skipUnsubmitted']);
+$submissionBox->setSkipUnsubmitted($skip);
 $submissionBoxMapper->save($submissionBox);
 
 /* TODO: echo json_encoded object for ui feedback

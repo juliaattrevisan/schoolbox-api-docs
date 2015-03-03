@@ -39,7 +39,10 @@ class DueWork_Detail
     protected $sitepageData;
 
 
-    public function __construct($id, \Schoolbox\Assessment\Component\SubmissionBox $submissionBox)
+    /**
+     * @param Schoolbox\Assessment\Component\SubmissionBox $submissionBox
+     */
+    public function __construct(Schoolbox\Assessment\Component\SubmissionBox $submissionBox)
     {
         $this->userHandler              = new User();
         $this->submissionHandler        = new Submission();
@@ -48,7 +51,7 @@ class DueWork_Detail
         $this->groupHandler             = new Group();
 
         // set things we're interested in
-        $this->dueWork                    = $this->submissionHandler->getByID($id);
+        $this->dueWork                    = $this->submissionHandler->getByID($submissionBox->getId()); // -_-'
         $this->dueWork['submissionCount'] = 0;
         $this->marksheet                  = Marksheet_Factory::build($this->dueWork['mark_type_slug'], $submissionBox);
     }
@@ -69,6 +72,8 @@ class DueWork_Detail
         if (!count($students)) {
             return;
         }
+
+        $this->sitepageData = array();
 
         foreach ($students as $user) {
             $insertion = array();
