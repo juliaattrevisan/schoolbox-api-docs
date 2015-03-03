@@ -370,14 +370,16 @@
                     lineColor: Highcharts.getOptions().colors[0]
                 },
                 tooltip: {
-                    pointFormatter: function() {
 
-                        /* Sigh, find all the values in the series
-                         * which match the outlier value and concat
-                         * it all into one giant tooltip
-                         *
-                         * so goofy
-                         */
+                    /**
+                     * Sigh, find all the values in the series
+                     * which match the outlier value and concat
+                     * it all into one giant tooltip
+                     *
+                     * so goofy
+                     * @returns {string}
+                     */
+                    pointFormatter: function() {
                         var tooltipContent = '';
 
                         for (var i = 0; i < graphData.outliers.length; i++) {
