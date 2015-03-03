@@ -40,6 +40,10 @@
                 }
             },
 
+            tooltip: {
+                useHTML: true
+            },
+
             series: [
                 {
                     name: 'Analysis',
@@ -73,6 +77,7 @@
 
                             for (var i = 0; i < options.allData.input[this.x].length; i++) {
                                 if (options.allData.input[this.x][i].value == this.y) {
+                                    tooltipContent += '<span style="display:block;width:32px;height:32px;background-image:url(/portrait.php?userId='+options.allData.input[this.x][i].uid+'&size=square32);"></span>';
                                     tooltipContent += '<em>' + options.allData.input[this.x][i].info + ':</em> ' + this.y;
                                     tooltipContent += '<br />';
                                 }
@@ -81,6 +86,7 @@
                             return tooltipContent;
                         }
                     }
+
                 }
             ]
         });
