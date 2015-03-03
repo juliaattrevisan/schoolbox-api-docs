@@ -411,21 +411,20 @@
                 tooltip: {
 
                     /**
-                     * Sigh, find all the values in the series
-                     * which match the outlier value and concat
-                     * it all into one giant tooltip
+                     * Sigh, find all the values in the series which match the
+                     * outlier value and concat it all into one giant tooltip
                      *
                      * so goofy
+                     *
                      * @returns {string}
                      */
                     pointFormatter: function() {
                         var tooltipContent = '';
 
-                        /* For a particular box plot
-                         */
-                        for (var i = 0; i < allOutliers[this.x].length; i++) {
-                            if (allOutliers[this.x].value == this.y) {
-                                tooltipContent += '<strong>' + allOutliers[this.x].info + ':</strong> ' + this.y;
+                        for (var i = 0; i < input[this.x].length; i++) {
+                            if (input[this.x][i].value == this.y) {
+                                tooltipContent += '<strong>' + input[this.x][i].info + ':</strong> ' + this.y;
+                                tooltipContent += '<br />';
                             }
                         }
 
