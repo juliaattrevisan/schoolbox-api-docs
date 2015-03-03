@@ -1,5 +1,5 @@
 (function() {
-    $.fn.calculateQuartiles = function(options) {
+    $.fn.calculateSeriesData = function(options) {
 
         /* Store the config in this instance so private methods
          * can access it
