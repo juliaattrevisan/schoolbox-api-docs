@@ -8,6 +8,7 @@
     $.fn.renderGraph = function(options) {
         var options = options || {
             title: '',
+            orientation: 'vertical',
             allAssessments: [],
             allData: []
         };
@@ -19,7 +20,8 @@
             /* can use inverted:true to make it horizontal'
              */
             chart: {
-                type: 'boxplot'
+                type: 'boxplot',
+                inverted: options.orientation == 'vertical' ? false : true
             },
 
             title: {
