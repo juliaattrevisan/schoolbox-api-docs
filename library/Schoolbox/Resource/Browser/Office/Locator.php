@@ -37,6 +37,10 @@ class Locator implements FileLocatorInterface, FolderLocatorInterface
      */
     public function __construct($tenant, $oAuthToken, $sitePath = null, $version = 'v1.0')
     {
+        if (!$tenant) {
+            throw new InvalidArgumentException('A tenant must be provided');
+        }
+
         if ($sitePath) {
             $this->baseUri = sprintf("https://%s.sharepoint.com/%s/_api/%s", $tenant, $sitePath, $version);
         } else {
