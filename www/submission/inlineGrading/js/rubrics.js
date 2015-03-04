@@ -113,7 +113,13 @@ $('#rubric-tbody').inlineGradingRubrics({
 		function setupGraph() {
 			if (isGraph()) {
 				config.rubricData = setupRubricChart(config.graph.data, config.graph.legs, config.graph.max);
-				config.plot = $.plot($(config.graph.container), config.rubricData.spidata.points, config.rubricData.options);
+                var container = $(config.graph.container);
+                var newDimensions = container.innerWidth();
+                container.innerHeight(newDimensions);
+				config.plot = $.plot(container, config.rubricData.spidata.points, config.rubricData.options);
+                container.find('.flot-base, .flot-overlay')
+                    .attr('width', newDimensions)
+                    .attr('height', newDimensions)
 
 				renderGraph();
 			}
