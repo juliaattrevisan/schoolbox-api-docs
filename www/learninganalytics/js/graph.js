@@ -180,9 +180,7 @@
 
         /* Populate with data
          */
-        populateOutput();
-
-        return output;
+        return populateOutput(output);
 
         /**
          * Init
@@ -314,9 +312,12 @@
 
         /**
          * Generate IQR value
+         *
+         * fivePointSummary is a structured object, the output
+         * from generateValues()
          */
-        function generateIQR() {
-            return output.fivePointSummary.structured.quartile3 - output.fivePointSummary.structured.quartile1;
+        function generateIQR(fivePointSummary) {
+            return fivePointSummary.quartile3 - fivePointSummary.quartile1;
         }
 
         /**
@@ -325,29 +326,31 @@
          * Decide where the whiskers will be
          * Use a Tukey box plot
          */
-        function generateOutliers() {
+        function generateOutliers(fivePointSummary, iqr) {
             var allOutliers = [];
+            var minimum = fivePointSummary.minimum;
+            var maximum = fivePointSummary.maximum;
             var i;
 
             /* Lower whisker
              * Use the first value that is above the lowerThreshold
              */
-            var lowerThreshold = output.fivePointSummary.structured.quartile1 - (1.5 * output.iqr);
+            var lowerThreshold = fivePointSummary.quartile1 - (1.5 * iqr);
 
             for (i = (config.values.length-1); i >= 0; i--) {
                 if (config.values[i] > lowerThreshold) {
-                    output.fivePointSummary.structured.minimum = config.values[i];
+                    minimum = config.values[i];
                 }
             }
 
             /* Upper whisker
              * Use the first value that is below the upperThreshold
              */
-            var upperThreshold = output.fivePointSummary.structured.quartile3 + (1.5 * output.iqr);
+            var upperThreshold = fivePointSummary.quartile3 + (1.5 * iqr);
 
             for (i = 0; i < config.values.length; i++) {
                 if (config.values[i] < upperThreshold) {
-                    output.fivePointSummary.structured.maximum = config.values[i];
+                    maximum = config.values[i];
                 }
             }
 
@@ -361,26 +364,39 @@
                 }
             }
 
-            return allOutliers;
+            return {
+                outliers: allOutliers,
+                minimum: minimum,
+                maximum: maximum
+            }
         }
 
         /**
          * Populate output data structure with computed values
          * and any outlier stacks
          */
-        function populateOutput() {
+        function populateOutput(output) {
 
             /* Calculate five point summary
              */
-            output.fivePointSummary.structured = generateValues();
+            var fivePointSummary = generateValues();
 
             /* Calculate interquartile range
              */
-            output.iqr = generateIQR();
+            var iqr = generateIQR(fivePointSummary);
+
+            /* Assign values
+             */
+            output.fivePointSummary.structured = fivePointSummary;
+            output.iqr = iqr;
 
             /* Decide outliers
+             * Amend min/max values where required due to outlier derivation
              */
-            output.outliers = generateOutliers();
+            var outliers = generateOutliers(fivePointSummary, iqr);
+            output.outliers = outliers.outliers;
+            output.fivePointSummary.structured.minimum = outliers.minimum;
+            output.fivePointSummary.structured.maximum = outliers.maximum;
 
             /* Convert into an array format
              */
@@ -391,6 +407,8 @@
                 output.fivePointSummary.structured.quartile3,
                 output.fivePointSummary.structured.maximum
             ];
+
+            return output;
         }
     }
 }(jQuery));
