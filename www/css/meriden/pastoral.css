@@ -125,8 +125,12 @@ dd.fullwidth {
  * Course info finagling
  */
 #course-description,
-#course-info {
-    margin: 0 16px 16px 16px;
+#course-info,
+#house-info,
+#attendance-info,
+#awards-info {
+    /*margin: 0 16px 16px 16px;*/
+    margin: 0;
 }
 #course-info table {
     border: 1px solid black;
