@@ -29,14 +29,14 @@
 
     {# course description #}
     <h2 class="clear">Course Description</h2>
-    <p>
+    <p id="course-description">
     {{ report.subjectReport.description }}
     </p>
 
     <dl id="course-info">
         {# course grade - derived from grade for this class #}
         <dt>Course Grade</dt>
-        <dd id="course-grade-info">
+        <dd class="course-grade">
             {% if report.subjectReport.namedGrades.courseGrade %}
                 {%
                     include '@customMeridenPastoral/sub/assessmentResult.twig'
@@ -49,7 +49,7 @@
 
         {# grade distribution - other student's values for course grade #}
         <dt>Grade Distribution</dt>
-        <dd id="grade-distribution-info">
+        <dd>
             <table>
                 <thead>
                 <tr>
@@ -69,8 +69,8 @@
         </dd>
 
         {# Endeavor Grades - a rubric #}
-        <dt>Endeavour Grades</dt>
-        <dd id="endeavour-grades-info">
+        <dt class="fullwidth">Endeavour Grades</dt>
+        <dd class="fullwidth">
             {% if report.subjectReport.namedGrades.courseGrade %}
                 {%
                     include '@customMeridenPastoral/sub/assessmentResult.twig'
@@ -82,8 +82,8 @@
         </dd>
 
         {# Approaches to learning - another rubric #}
-        <dt>Approaches to Learning</dt>
-        <dd id="learning-approach-info">
+        <dt class="fullwidth">Approaches to Learning</dt>
+        <dd class="fullwidth">
             {% if report.subjectReport.namedGrades.learningApproaches %}
                 <ul>
                 {% for criterion in report.subjectReport.namedGrades.learningApproaches.rubric.criteria %}

@@ -16,6 +16,14 @@
     #container h2 {
         font-size: 14px;
     }
+    #container p {
+        font-size: inherit;
+        margin: inherit;
+    }
+    #container p#course-description,
+    #container dl#course-info {
+        margin: 0 16px 16px 16px;
+    }
 }
 
 #pastoral-report,
@@ -45,7 +53,10 @@ h2 {
     font-size: 14px;
     line-height: 24px;
     padding: 0;
-    margin: 0 0 18px 0;
+    margin: 0;
+}
+.directory h2 {
+    margin: 0;
 }
 
 #house-info li,
@@ -70,8 +81,8 @@ h2 {
 #house-info dd,
 #attendance-info dd,
 #awards-info dd,
-#course-info dd#endeavour-grades-info,
-#course-info dd#learning-approach-info {
+dt.fullwidth,
+dd.fullwidth {
     width: auto;
     float: none;
     clear: both;
@@ -98,6 +109,13 @@ h2 {
     margin: 0;
 }
 
+/**
+ * Course info finagling
+ */
+#course-description,
+#course-info {
+    margin: 0 16px 16px 16px;
+}
 #course-info table {
     border: 1px solid black;
     border-collapse: collapse;
@@ -109,4 +127,13 @@ h2 {
 }
 #course-info ul {
     margin: 0;
+}
+#course-info dt {
+    margin-bottom: 6px;
+}
+#course-info dd {
+    margin-bottom: 24px;
+}
+#course-info .course-grade {
+    font-weight: bold;
 }
