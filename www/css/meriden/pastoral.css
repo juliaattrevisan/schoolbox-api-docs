@@ -90,6 +90,10 @@ h2 {
 #awards-info dt:first-child {
     margin-top: 12px;
 }
+/* Add a little space between award types with no awards */
+#awards-info dt+dt {
+    margin-top: 6px;
+}
 #house-info dd,
 #attendance-info dd,
 #awards-info dd,
