@@ -3,6 +3,12 @@
  */
 
 @media print {
+    #pastoral-report,
+    #student-report,
+    #subject-report {
+        font-family: "Arial", sans-serif;
+        font-size: 12px !important;
+    }
     #container {
         width: auto !important;
     }
@@ -16,9 +22,13 @@
     #container h2 {
         font-size: 14px;
     }
-    #container p {
-        font-size: inherit;
-        margin: inherit;
+    #container p,
+    #container dt,
+    #container dd,
+    #container li,
+    #container table {
+        font-size: 12px;
+        margin: 0;
     }
     #container p#course-description,
     #container dl#course-info {
@@ -27,8 +37,10 @@
 }
 
 #pastoral-report,
-#student-report {
+#student-report,
+#subject-report {
     font-family: "Arial", sans-serif;
+    font-size: 12px !important;
 }
 
 #meriden-crest {
