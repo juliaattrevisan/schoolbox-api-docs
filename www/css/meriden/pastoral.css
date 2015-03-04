@@ -9,6 +9,19 @@
     margin-right: 0;
 }
 
+/**
+ * Undo default SB heading styles
+ */
+h2 {
+    background: inherit;
+    color: inherit;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 28px;
+    padding: 0;
+    margin: 0 0 20px 0;
+}
+
 #house-info li,
 #attendance-info li {
     width: 33%;
