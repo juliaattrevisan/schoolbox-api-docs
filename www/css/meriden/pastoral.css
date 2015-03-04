@@ -146,6 +146,10 @@ dd.fullwidth {
 #course-info dd {
     margin-bottom: 24px;
 }
+#course-info .description-link {
+    font-size: 10px;
+    font-weight: normal;
+}
 #course-info .course-grade {
     font-weight: bold;
 }

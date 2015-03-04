@@ -35,7 +35,10 @@
 
     <dl id="course-info">
         {# course grade - derived from grade for this class #}
-        <dt>Course Grade</dt>
+        <dt>
+            Course Grade
+            <span class="description-link">[<a href="/homepage/3403">Grade Description</a>]</span>
+        </dt>
         <dd class="course-grade">
             {% if report.subjectReport.namedGrades.courseGrade %}
                 {%
