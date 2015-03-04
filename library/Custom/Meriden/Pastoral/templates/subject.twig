@@ -33,7 +33,7 @@
     {{ report.subjectReport.description }}
     </p>
 
-    <dl>
+    <dl id="course-info">
         {# course grade - derived from grade for this class #}
         <dt>Course Grade</dt>
         <dd>
@@ -97,8 +97,10 @@
     </dl>
 
     <h2 class="clear">Assessments</h2>
-    {%
-        include '@customMeridenPastoral/sub/assessments.twig'
-        with {work: report.subjectReport.grades, student: report.student}
-    %}
+    <div id="assessment-info">
+        {%
+            include '@customMeridenPastoral/sub/assessments.twig'
+            with {work: report.subjectReport.grades, student: report.student}
+        %}
+    </div>
 </div>
