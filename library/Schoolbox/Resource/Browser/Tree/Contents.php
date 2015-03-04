@@ -12,7 +12,7 @@
 
 namespace Schoolbox\Resource\Browser\Tree;
 
-use Schoolbox\Resource\Folder\Model as Category;
+use Schoolbox\Resource\Folder\Model as CategoryModel;
 use Schoolbox\Collection;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\Resource\Browser\Tree\Node;
@@ -24,9 +24,9 @@ class Contents
 {
 
     /**
-     * An instance of \Schoolbox\Resource\Category
+     * An instance of CategoryModel
      *
-     * @var \Schoolbox\Resource\Category
+     * @var CategoryModel
      */
     private $category = null;
 
@@ -103,10 +103,10 @@ class Contents
     /**
      * Constructor
      *
-     * @param Category $category
+     * @param CategoryModel $category
      * @param array $filterOptions
      */
-    public function __construct(Category $category, $filterOptions = null)
+    public function __construct(CategoryModel $category, $filterOptions = null)
     {
 
         /* Handlers
@@ -277,7 +277,7 @@ class Contents
     /**
      * Set category
      *
-     * @param \Schoolbox\Resource\Category $category
+     * @param CategoryModel $category
      */
     private function setCategory($category)
     {
@@ -287,7 +287,7 @@ class Contents
     /**
      * Get category
      *
-     * @return \Schoolbox\Resource\Category
+     * @return CategoryModel
      */
     private function getCategory()
     {

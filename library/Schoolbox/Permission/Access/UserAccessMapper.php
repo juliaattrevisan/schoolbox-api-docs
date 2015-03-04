@@ -12,7 +12,7 @@ namespace Schoolbox\Permission\Access;
 use PDO;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
-use Schoolbox\Resource\Folder\Model as Category;
+use Schoolbox\Resource\Folder\Model as CategoryModel;
 use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
@@ -69,10 +69,10 @@ class UserAccessMapper extends Mapper
     /**
      * Determine whether $folder has a $user of type 3
      *
-     * @param Category $folder
+     * @param CategoryModel $folder
      * @return bool
      */
-    public function hasFolderOwner(Category $folder)
+    public function hasFolderOwner(CategoryModel $folder)
     {
         $userAccess = $this->findByColumnList(array(
             'sid' => $folder->getId(),
@@ -90,10 +90,10 @@ class UserAccessMapper extends Mapper
      * Determine whether $user owns $folder
      *
      * @param User $user
-     * @param Category $folder
+     * @param CategoryModel $folder
      * @return bool
      */
-    public function isFolderOwner(User $user, Category $folder)
+    public function isFolderOwner(User $user, CategoryModel $folder)
     {
         if ($user->isSuperuser()) {
             return true;
@@ -177,7 +177,7 @@ class UserAccessMapper extends Mapper
 
 
     /**
-    * @param Category $category
+    * @param CategoryModel $category
     * @param bool $includeSynergy
     * @return Collection|User[]
     */
@@ -188,7 +188,7 @@ class UserAccessMapper extends Mapper
 
 
     /**
-    * @param Category $category
+    * @param CategoryModel $category
     * @param bool $includeSynergy
     * @return Collection|User[]
     */
@@ -200,7 +200,7 @@ class UserAccessMapper extends Mapper
     /**
      * Returns a list of users who are members of a group
      *
-     * @param Category $category
+     * @param CategoryModel $category
      * @return Collection|User[]
      */
     public function findAdminsInCategory($category)
@@ -211,7 +211,7 @@ class UserAccessMapper extends Mapper
 
 
     /**
-    * @param Category $category
+    * @param CategoryModel $category
     * @param string $roleType
      * @param int $accessType
     * @param bool $includeSynergy

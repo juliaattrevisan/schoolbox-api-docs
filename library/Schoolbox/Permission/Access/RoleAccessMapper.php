@@ -11,7 +11,7 @@ namespace Schoolbox\Permission\Access;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
-use Schoolbox\Resource\Folder\Model as Category;
+use Schoolbox\Resource\Folder\Model as CategoryModel;
 use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 use Schoolbox\RoleMapper;
 
@@ -60,7 +60,7 @@ class RoleAccessMapper extends Mapper
 
     }
 
-    public function getGroupPermissions(Category $category)
+    public function getGroupPermissions(CategoryModel $category)
     {
         $query = "
             SELECT
@@ -98,7 +98,7 @@ class RoleAccessMapper extends Mapper
     /**
     * Save category permissions, optionally recursively
     *
-    * @param Category $category
+    * @param CategoryModel $category
     * @param array $perms - assoc array of role IDs and permission levels
     * @param bool $recursive
     * @return bool
@@ -119,7 +119,7 @@ class RoleAccessMapper extends Mapper
     /**
     * Recursive helper function for generating a collection of permissions
     *
-    * @param Category $category
+    * @param CategoryModel $category
     * @param $perms
     * @param bool $recursive
     * @return Collection|RoleAccess[]

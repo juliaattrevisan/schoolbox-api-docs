@@ -1,5 +1,5 @@
 <?php
-use Schoolbox\Resource\Folder\Model as Category;
+use Schoolbox\Resource\Folder\Model as CategoryModel;
 use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 
 /**
@@ -149,7 +149,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                         $categoryList[$categoryCode] = null;
                     }
                 }
-                if ($categoryList[$categoryCode] instanceof Category) {
+                if ($categoryList[$categoryCode] instanceof CategoryModel) {
                     $event->setCategoryId($categoryList[$categoryCode]->getId());
                     $event->setCategoryName($categoryList[$categoryCode]->getName());
                 }

@@ -9,7 +9,7 @@
 
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
-use Schoolbox\Resource\Folder\Model as Category;
+use Schoolbox\Resource\Folder\Model as CategoryModel;
 use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
@@ -24,7 +24,7 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
     protected $group_handler;
 
     /**
-     * @var Category
+     * @var CategoryModel
      */
     protected $category;
 
@@ -43,7 +43,7 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
     /**
      * The list of categories this unit is on. Derived from $this->unitList.
      *
-     * @var Category[]|Collection
+     * @var CategoryModel[]|Collection
      */
     protected $categoryWithUnitList;
 
@@ -109,9 +109,9 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
 
         // Start spamming out tasks into the template
         $this->setVar('category_breadcrumb_block', '');
-        if ($this->category instanceof Category) {
+        if ($this->category instanceof CategoryModel) {
             foreach (CategoryMapper::getInstance()->findParents($this->category) as $parent) {
-                /** @var Category $parent */
+                /** @var CategoryModel $parent */
                 $this->setVar('PARENT_CATEGORY_ID', $parent->getId());
                 $this->setVar('PARENT_CATEGORY_NAME', $parent->getName());
                 $this->parse('category_breadcrumb_block', 'category_breadcrumb', true);

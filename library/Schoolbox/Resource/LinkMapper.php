@@ -15,7 +15,7 @@ use Schoolbox\Mapper\Searchable;
 use Schoolbox\Notif\Notif;
 use Schoolbox\User;
 use Schoolbox\Resource\Link\Search\Result;
-use Schoolbox\Resource\Folder\Model as Category;
+use Schoolbox\Resource\Folder\Model as CategoryModel;
 
 class LinkMapper extends Mapper implements Searchable
 {
@@ -142,11 +142,11 @@ class LinkMapper extends Mapper implements Searchable
     /**
      * Find all the links in a given category
      *
-     * @param Category $category
+     * @param CategoryModel $category
      * @param $options
      * @return Collection
      */
-    public function findAllInCategory(Category $category, $options)
+    public function findAllInCategory(CategoryModel $category, $options)
     {
         $categoryMapper = $this->getJoinMapper('category');
         $userMapper     = $this->getJoinMapper('user');

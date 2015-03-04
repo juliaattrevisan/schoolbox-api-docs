@@ -12,7 +12,7 @@ namespace Schoolbox\Realtime\Notification;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Instance\InstanceBundle;
 use Schoolbox\Campus;
-use Schoolbox\Resource\Folder\Model as Category;
+use Schoolbox\Resource\Folder\Model as CategoryModel;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\UserAccess;
@@ -40,12 +40,12 @@ class Envelope extends InstanceBundle {
 	}
 
 	/**
-	 * @param Category|int $catId
+	 * @param CategoryModel|int $catId
 	 * @param int          $accessLevel
 	 * @param Instance     $instance
 	 */
 	public function broadcastToCategory($catId, $accessLevel, $instance) {
-		if($catId instanceof Category) {
+		if($catId instanceof CategoryModel) {
 			$catId = $catId->getId();
 		}
 		$this->broadcastToService(UserAccess::SERVICE_HOMEPAGE, $catId, $accessLevel, $instance);

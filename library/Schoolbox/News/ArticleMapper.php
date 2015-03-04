@@ -16,7 +16,7 @@ use Schoolbox\Column\Model;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Searchable;
-use Schoolbox\Resource\Folder\Model as Category;
+use Schoolbox\Resource\Folder\Model as CategoryModel;
 use Schoolbox\Resource\Category\NewsMapper;
 use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 use Schoolbox\User;
@@ -502,7 +502,7 @@ class ArticleMapper extends Mapper implements Searchable
 
         /* Find all the news relevant to a specific category
          */
-        if ($category instanceof Category) {
+        if ($category instanceof CategoryModel) {
             $allArticles = $subjectNewsMapper->findForFeed($category->getId(), 9999);
         } /* A combination of news related to you, specifically;
          * and roles within campuses; and your associated categories
