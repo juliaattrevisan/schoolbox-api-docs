@@ -14,8 +14,10 @@
 namespace Schoolbox\Resource\Browser\Resources;
 
 
+use Schoolbox\FolderInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Browser\AbstractNode;
+use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Resource\Exception;
 use Schoolbox\Resource\FileMapper;
@@ -85,6 +87,27 @@ class Node extends AbstractNode
     protected function hasPermission($nodeId, $minimumLevel)
     {
         return $this->getGroupHandler()->getPermission($nodeId) >= $minimumLevel;
+    }
+
+
+    /**
+     * @param FolderInterface|Category $folder
+     * @return array
+     */
+    protected function folderToArray(FolderInterface $folder)
+    {
+        $name = $folder->getName();
+
+        if ($codes = $folder->getCodeString()) {
+            $name .= " ($codes)";
+        }
+
+        return array(
+            'type'       => 'category',
+            'categoryId' => $folder->getId(),
+            'name'       => $name,
+            'folderType' => $folder->getFolderType(),
+        );
     }
 
 }

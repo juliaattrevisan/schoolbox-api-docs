@@ -16,6 +16,7 @@ namespace Schoolbox\Resource\Browser;
 
 use InvalidArgumentException;
 use Schoolbox\File\MimetypeMapper;
+use Schoolbox\FolderInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\FileLocatorInterface;
 use Schoolbox\Resource\FolderLocatorInterface;
@@ -178,18 +179,26 @@ abstract class AbstractNode implements NodeInterface
 
         foreach ($allFolders as $currentFolder) {
             if ($this->hasPermission($currentFolder->getId(), READ_ACCESS)) {
-                $record = array(
-                    'type'       => 'category',
-                    'categoryId' => $currentFolder->getId(),
-                    'name'       => $currentFolder->getName(),
-                    'folderType' => $currentFolder->getFolderType(),
-                );
-
-                $output[] = $record;
+                $output[] = $this->folderToArray($currentFolder);
             }
         }
 
         return $output;
+    }
+
+
+    /**
+     * @param FolderInterface $folder
+     * @return array
+     */
+    protected function folderToArray(FolderInterface $folder)
+    {
+        return array(
+            'type'       => 'category',
+            'categoryId' => $folder->getId(),
+            'name'       => $folder->getName(),
+            'folderType' => $folder->getFolderType(),
+        );
     }
 
 
