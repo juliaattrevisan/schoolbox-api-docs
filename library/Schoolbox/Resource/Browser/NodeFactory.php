@@ -20,6 +20,7 @@ class NodeFactory
     const SBFS   = 'browse';
     const MYFILE = 'myfile';
     const WEBDAV = 'webdav';
+    const OFFICE = 'office365';
 
     /** @var callable[] */
     protected $loaders;
@@ -42,6 +43,10 @@ class NodeFactory
             return new Browser\WebDav\Node($nodeId, $mimeFilter);
         });
 
+        $this->add(self::OFFICE, function ($nodeId, $mimeFilter = null, $oAuthToken = null) {
+            return new Browser\Office\Node($nodeId, $mimeFilter, $oAuthToken);
+        });
+
     }
 
 
@@ -59,13 +64,14 @@ class NodeFactory
      * @param string $label
      * @param int    $nodeId
      * @param string $mimeFilter
+     * @param string $oAuthToken
      * @return NodeInterface
      * @throws OutOfBoundsException
      */
-    public function build($label, $nodeId, $mimeFilter = null)
+    public function build($label, $nodeId, $mimeFilter = null, $oAuthToken = null)
     {
         if (isset($this->loaders[$label]) && is_callable($this->loaders[$label])) {
-            $node = call_user_func($this->loaders[$label], $nodeId, $mimeFilter);
+            $node = call_user_func($this->loaders[$label], $nodeId, $mimeFilter, $oAuthToken);
             if ($node instanceof NodeInterface) {
                 return $node;
             }
