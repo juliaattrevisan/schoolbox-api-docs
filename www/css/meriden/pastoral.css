@@ -124,12 +124,13 @@ dd.fullwidth {
 /**
  * Course info finagling
  */
-#course-description,
+#course-description {
+    margin-bottom: 16px;
+}
 #course-info,
 #house-info,
 #attendance-info,
 #awards-info {
-    /*margin: 0 16px 16px 16px;*/
     margin: 0;
 }
 #course-info table {
@@ -156,4 +157,5 @@ dd.fullwidth {
 }
 #course-info .course-grade {
     font-weight: bold;
+    font-size: 24px;
 }
