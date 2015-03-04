@@ -210,9 +210,9 @@ class Queue extends ResourceVideo
         /* Generate thumbnail of video 64x64 pixels, 1/3rd of the video in, center of frame */
         $thumbScale = '';
         if ($width && $height) {
-            list($thumbWidth, $thumbHeight) = $this->contain(
+            list($thumbWidth, $thumbHeight) = $this->cover(
                 array($width, $height),
-                array(-1, 64)
+                array(64, 64)
             );
             $thumbScale = sprintf(
                 'scale=%d:%d,',
@@ -360,5 +360,23 @@ class Queue extends ResourceVideo
             $height = $maxHeight;
         }
         return array($width, $height);
+    }
+
+    /**
+     * Resizes $dimensions so that they are as small as possible while still
+     * fully covering $minDimensions.
+     *
+     * @param array $dimensions      [width, height]
+     * @param array $coverDimensions [coverWidth, coverHeight]
+     *
+     * @return array [coveredWidth, coveredHeight]
+     */
+    protected function cover($dimensions, $coverDimensions)
+    {
+        // Expand $dimensions, then contain it to $coverDimensions
+        list($width, $height)           = $dimensions;
+        list($coverWidth, $coverHeight) = $coverDimensions;
+        $newRatio = max($coverWidth / $width, $coverHeight / $height);
+        return array($width * $newRatio, $height * $newRatio);
     }
 }
