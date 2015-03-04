@@ -1,6 +1,23 @@
 /**
  * Styles for Meriden's pastoral page
  */
+
+@media print {
+    #container {
+        width: auto !important;
+    }
+    #container h1,
+    #container h2 {
+        font-weight: bold;
+    }
+    #container h1 {
+        font-size: 16px;
+    }
+    #container h2 {
+        font-size: 14px;
+    }
+}
+
 #pastoral-report,
 #student-report {
     font-family: "Arial", sans-serif;
