@@ -1,6 +1,10 @@
 /**
  * Styles for Meriden's pastoral page
  */
+#pastoral-report,
+#student-report {
+    font-family: "Arial", sans-serif;
+}
 
 #meriden-crest {
     text-align: center;

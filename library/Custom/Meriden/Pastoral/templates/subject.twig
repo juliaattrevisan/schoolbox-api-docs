@@ -84,11 +84,12 @@
         {# Approaches to learning - another rubric #}
         <dt>Approaches to Learning</dt>
         <dd>
-            {% if report.subjectReport.namedGrades.courseGrade %}
-                {%
-                    include '@customMeridenPastoral/sub/assessmentResult.twig'
-                    with {grade: report.subjectReport.namedGrades.learningApproaches}
-                %}
+            {% if report.subjectReport.namedGrades.learningApproaches %}
+                <ul>
+                {% for criterion in report.subjectReport.namedGrades.learningApproaches.rubric.criteria %}
+                    <li>{{ criterion.label }}: <strong>{{ criterion.results[criterion.value] }}</strong>
+                {% endfor %}
+                </ul>
             {% else %}
                 Unknown
             {% endif %}
