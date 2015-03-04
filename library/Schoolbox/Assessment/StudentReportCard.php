@@ -243,7 +243,11 @@ class StudentReportCard
         $page->setBlock(TEMPLATE_content, 'year_option', 'year_option_block');
         // Years is tricksy, because we first need to find out all the years in which the student in question has submitted work
         // also, merging in this current year is a tad unfortunate
-        $years = range($this->currentYear, min($this->submissionMapper->getAllYearsByUser($this->targetUserId)));
+        $submitYears  = $this->submissionMapper->getAllYearsByUser($this->targetUserId);
+        $earliestYear = empty($submitYears)
+            ? $this->currentYear
+            : min($submitYears);
+        $years = range($this->currentYear, $earliestYear);
 
         foreach ($years as $y) {
             // Semesters can be hardcoded, no need to look anything up (may change if a school wants Term breakdowns rather than Semester)
