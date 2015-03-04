@@ -10,101 +10,94 @@
     })(jQuery);
 </script>
 
-<div id="meriden-crest">
-    <img src="/images/meriden/crest.png" />
+<div id="subject-report">
+    <div id="meriden-crest">
+        <img src="/images/meriden/crest.png" />
+    </div>
+
+    <h1>{{ report.subjectReport.name }}</h1>
+
+    <div id="context">
+        {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
+        {% include '@customMeridenPastoral/sub/selector.twig' with {
+            tutorGroupList: report.tutorGroupList,
+            subjectList:    report.subjectList,
+            student:        report.student,
+            subjectReport:  report.subjectReport
+        } %}
+    </div>
+
+    {# course description #}
+    <h2 class="clear">Course Description</h2>
+    <p>
+    {{ report.subjectReport.description }}
+    </p>
+
+    <dl>
+        {# course grade - derived from grade for this class #}
+        <dt>Course Grade</dt>
+        <dd>
+            {% if report.subjectReport.namedGrades.courseGrade %}
+                {%
+                    include '@customMeridenPastoral/sub/assessmentResult.twig'
+                    with {grade: report.subjectReport.namedGrades.courseGrade}
+                %}
+            {% else %}
+                Unknown
+            {% endif %}
+        </dd>
+
+        {# grade distribution - other student's values for course grade #}
+        <dt>Grade Distribution</dt>
+        <dd>
+            <table>
+                <thead>
+                <tr>
+                    {% for gradeLevel,_ in report.subjectReport.namedGrades.courseGrade.distribution %}
+                        <th>{{ gradeLevel }}</th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    {% for _,results in report.subjectReport.namedGrades.courseGrade.distribution %}
+                        <td>{{ results|length }}</td>
+                    {% endfor %}
+                </tr>
+                </tbody>
+            </table>
+        </dd>
+
+        {# Endeavor Grades - a rubric #}
+        <dt>Endeavour Grades</dt>
+        <dd>
+            {% if report.subjectReport.namedGrades.courseGrade %}
+                {%
+                    include '@customMeridenPastoral/sub/assessmentResult.twig'
+                    with {grade: report.subjectReport.namedGrades.endeavourGrades}
+                %}
+            {% else %}
+                Unknown
+            {% endif %}
+        </dd>
+
+        {# Approaches to learning - another rubric #}
+        <dt>Approaches to Learning</dt>
+        <dd>
+            {% if report.subjectReport.namedGrades.courseGrade %}
+                {%
+                    include '@customMeridenPastoral/sub/assessmentResult.twig'
+                    with {grade: report.subjectReport.namedGrades.learningApproaches}
+                %}
+            {% else %}
+                Unknown
+            {% endif %}
+        </dd>
+    </dl>
+
+    <h2 class="clear">Assessments</h2>
+    {%
+        include '@customMeridenPastoral/sub/assessments.twig'
+        with {work: report.subjectReport.grades, student: report.student}
+    %}
 </div>
-
-<h1>{{ report.subjectReport.name }}</h1>
-
-<div id="context">
-    {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
-    {% include '@customMeridenPastoral/sub/selector.twig' with {
-        tutorGroupList: report.tutorGroupList,
-        subjectList:    report.subjectList,
-        student:        report.student,
-        subjectReport:  report.subjectReport
-    } %}
-</div>
-
-{# course description #}
-<h2 class="clear">Course Description</h2>
-<p>
-{{ report.subjectReport.description }}
-</p>
-
-<dl>
-    {# course grade - derived from grade for this class #}
-    <dt>Course Grade</dt>
-    <dd>
-        {% if report.subjectReport.namedGrades.courseGrade %}
-            {%
-                include '@customMeridenPastoral/sub/assessmentResult.twig'
-                with {grade: report.subjectReport.namedGrades.courseGrade}
-            %}
-        {% else %}
-            Unknown
-        {% endif %}
-    </dd>
-
-    {# grade distribution - other student's values for course grade #}
-    <dt>Grade Distribution</dt>
-    <dd>
-        <table>
-            <thead>
-            <tr>
-                {% for gradeLevel,_ in report.subjectReport.namedGrades.courseGrade.distribution %}
-                    <th>{{ gradeLevel }}</th>
-                {% endfor %}
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                {% for _,results in report.subjectReport.namedGrades.courseGrade.distribution %}
-                    <td>{{ results|length }}</td>
-                {% endfor %}
-            </tr>
-            </tbody>
-        </table>
-    </dd>
-
-    {# Endeavor Grades - a rubric #}
-    <dt>Endeavour Grades</dt>
-    <dd>
-        {% if report.subjectReport.namedGrades.courseGrade %}
-            {%
-                include '@customMeridenPastoral/sub/assessmentResult.twig'
-                with {grade: report.subjectReport.namedGrades.endeavourGrades}
-            %}
-        {% else %}
-            Unknown
-        {% endif %}
-    </dd>
-
-    {# Approaches to learning - another rubric #}
-    <dt>Approaches to Learning</dt>
-    <dd>
-        {% if report.subjectReport.namedGrades.courseGrade %}
-            {%
-                include '@customMeridenPastoral/sub/assessmentResult.twig'
-                with {grade: report.subjectReport.namedGrades.learningApproaches}
-            %}
-        {% else %}
-            Unknown
-        {% endif %}
-    </dd>
-</dl>
-
-<h2 class="clear">Assessments</h2>
-{%
-    include '@customMeridenPastoral/sub/assessments.twig'
-    with {work: report.subjectReport.grades, student: report.student}
-%}
-{#{% for grade in report.subjectReport.grades %}#}
-    {#<dt>{{ grade.assessment.name ?: grade.quiz.title }}</dt>#}
-    {#<dd>#}
-        {#{%#}
-        {#include '@customMeridenPastoral/sub/assessmentResult.twig'#}
-        {#with {grade: grade}#}
-        {#%}#}
-    {#</dd>#}
-{#{% endfor %}#}
