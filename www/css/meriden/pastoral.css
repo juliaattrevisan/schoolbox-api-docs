@@ -95,3 +95,16 @@ h2 {
 #subject-info .subjects ul {
     margin: 0;
 }
+
+#course-info table {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+#course-info th,
+#course-info td {
+    border: 1px solid black;
+    padding: 0.8em;
+}
+#course-info ul {
+    margin: 0;
+}
