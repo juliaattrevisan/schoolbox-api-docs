@@ -1488,7 +1488,7 @@ abstract class Mapper implements Serializable
      */
     protected function hasPrototype($prototype)
     {
-        if (is_object($prototype)) {
+        if (!is_object($prototype)) {
             return false;
         }
         $this->prototype = $prototype;
