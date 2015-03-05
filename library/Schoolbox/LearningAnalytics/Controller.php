@@ -49,6 +49,22 @@ class Controller extends Base {
             }
         }
 
+        /* This, coincidentally, helps you determine the racehorses
+         * of the class which are represented by the orange bar
+         *
+         * That bar tells you how many tasks a student has completed
+         * as a percentage of all the available tasks (horizontal
+         * ticks on the progressReport screen)
+         *
+         * Expressed as a percentage
+         */
+        $mostAdvancedStudent = 0;
+
+        if ($topStudents->count() && $unit->getTasks()->count()) {
+            $topStudent = $topStudents->first();
+            $mostAdvancedStudent = count($topStudent['tasks'])/$unit->getTasks()->count();
+        }
+
         /* A list of the bottom N students
          *
          * These are people who have completed the most tasks,
@@ -66,12 +82,20 @@ class Controller extends Base {
             }
         }
 
+        /* Find out the overall progress throughout all tasks
+         * This is the number of tasks that all students have
+         * marked as completed, represented as a percentage
+         * of all the tasks that are available
+         */
+
+
         $this->getResponse()->content->set(
             array(
                 'template' => '@learningAnalytics/index.twig',
                 'data' => array(
                     'topStudents' => $topStudents,
                     'bottomStudents' => $bottomStudents,
+                    'mostAdvancedStudent' => $mostAdvancedStudent
                 )
             )
         );
