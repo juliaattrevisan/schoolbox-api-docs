@@ -14,11 +14,35 @@ use Alaress\Web\Controller\Base;
 
 class Controller extends Base {
 
-    public function index() {
+    public function index($folderId, $unitId) {
+
+        var_dump($folderId);
+        var_dump($unitId);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         $this->getResponse()->content->set(
             array(
                 'template' => '@learningAnalytics/index.twig',
             )
         );
     }
+
+
 } 

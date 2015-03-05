@@ -23,16 +23,38 @@ use Schoolbox\Permission\Access\UserAccess;
 class Module extends BaseModule {
 
     /**
+     * Basic routes for this module
+     *
      * {@inheritdoc}
      */
     public function initRoutes(Router $router, $basePath)
     {
         // All of these URLs relate to the resource ID, not a booking ID.
         // Therefore, they should probably be moved to the item module.
-        $router->addGet('learningAnalytics.index', $basePath);
+        $router->addGet('learningAnalytics.index', "{$basePath}/{classId}/{unitId}");
     }
 
     /**
+     * Inject params into controller
+     *
+     * {@inheritdoc}
+     */
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        $matcher->add(
+            '/^learningAnalytics\.index/',
+            function($params) {
+                return array(
+                    'folderId' => $params['classId'],
+                    'unitId' => $params['unitId'],
+                );
+            }
+        );
+    }
+
+    /**
+     * Template locations for this module
+     *
      * {@inheritdoc}
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
@@ -43,6 +65,8 @@ class Module extends BaseModule {
     }
 
     /**
+     * Set up controllers
+     *
      * {@inheritdoc}
      */
     public function initControllers(ContainerInterface $injector)
