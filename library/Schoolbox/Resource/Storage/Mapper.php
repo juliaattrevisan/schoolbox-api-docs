@@ -48,7 +48,7 @@ class Mapper extends Schoolbox\Mapper
     protected function mapping()
     {
         $this->hasTable('storage');
-        $this->hasModel(Model::class);
+        $this->hasPrototype(new Model());
 
         $this->uses('int', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('hash', self::TYPE_STRING);
