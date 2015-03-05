@@ -277,6 +277,18 @@ class FileMapper extends Mapper implements FileLocatorInterface, Schoolbox\Stora
             if (!copy($file->getTempFileLocation(), $filename)) {
                 throw new Schoolbox\File\Exception('Cannot save file', Schoolbox\File\Exception::CODE_CANNOT_WRITE);
             }
+
+            // delete the thumbnail if it's an image
+            if ($file->getMimetype()->isImage()) {
+                $pattern = sprintf('%s/%d-*.dat', $this->config_loader->get('thumbnail_dir'), $file->getId());
+                $thumbs  = glob($pattern);
+
+                foreach ($thumbs as $thumb) {
+                    // dele-ete
+                    @unlink($thumb);
+                }
+            }
+
             // If video add to video processing queue */
             if ($file->getMimeType()->isVideo() || $file->getMimetype()->isAudio()) {
                 $mapper = new Schoolbox\Video\QueueMapper();
