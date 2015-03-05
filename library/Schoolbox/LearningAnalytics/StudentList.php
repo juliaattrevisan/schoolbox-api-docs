@@ -52,6 +52,15 @@ class StudentList {
     private $studentList = null;
 
     /**
+     * A list of Schoolbox user ids who were previously
+     * associated with $folder and $unit but are no longer
+     * in it
+     *
+     * @var array
+     */
+    private $removedStudentIdList = array();
+
+    /**
      * Constructor
      *
      * @param Folder $folder
@@ -149,13 +158,15 @@ class StudentList {
             }
         }
 
+        $this->setRemovedStudentIdList($removedStudentIdList);
+
         /* Finally get a list of all the schoolbox user accounts who
          * are currently, or have been previously, associated with
          * this folder and unit
          */
         $userCollection = $this->getUserMapper()->findByColumn(
             'id',
-            array_merge($classStudentIdList, $groupStudentIdList, $removedStudentIdList),
+            array_merge($classStudentIdList, $groupStudentIdList, $this->getRemovedStudentIdList()),
             array('order' => array('lastname' => 'asc', 'firstname' => 'asc'))
         );
 
@@ -243,5 +254,25 @@ class StudentList {
     public function getStudentList()
     {
         return $this->studentList;
+    }
+
+    /**
+     * Set removed student id list
+     *
+     * @param array $removedStudentIdList
+     */
+    private function setRemovedStudentIdList($removedStudentIdList)
+    {
+        $this->removedStudentIdList = $removedStudentIdList;
+    }
+
+    /**
+     * Get removed student id list
+     *
+     * @return array
+     */
+    private function getRemovedStudentIdList()
+    {
+        return $this->removedStudentIdList;
     }
 }
