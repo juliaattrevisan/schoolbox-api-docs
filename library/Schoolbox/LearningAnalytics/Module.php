@@ -20,6 +20,11 @@ use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 use Schoolbox\Permission\Access\UserAccess;
 
+use Schoolbox\Resource\CategoryMapper as FolderMapper;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Assessment\Course\UnitInstance;
+use Schoolbox\Assessment\Course\UnitInstanceMapper;
+
 class Module extends BaseModule {
 
     /**
@@ -31,7 +36,7 @@ class Module extends BaseModule {
     {
         // All of these URLs relate to the resource ID, not a booking ID.
         // Therefore, they should probably be moved to the item module.
-        $router->addGet('learningAnalytics.index', "{$basePath}/{classId}/{unitId}");
+        $router->addGet('learningAnalytics.index', "{$basePath}/{folderId}/{unitId}");
     }
 
     /**
@@ -41,12 +46,49 @@ class Module extends BaseModule {
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
+        /* Inject ingredients into learningAnalytics/index controller method
+         */
         $matcher->add(
             '/^learningAnalytics\.index/',
             function($params) {
+
+                /* Load folder
+                 */
+                $folderMapper = new FolderMapper();
+
+                try {
+                    $folder = $folderMapper->findById($params['folderId']);
+                    $folderMapper->loadJoinedModel('codes', $folder, array('set_method' => 'setCodes'));
+                }
+                catch (Exception $e) {
+                    error(159);
+                }
+
+                /* Load unit
+                 */
+                $unitInstanceMapper = new UnitInstanceMapper();
+
+                $unit = false;
+                $allUnits = $unitInstanceMapper->findForCategoryId($folder->getId());
+
+                foreach($allUnits as $currentUnit) {
+                    if ($currentUnit->getId() == $params['unitId']) {
+                        $unit = $currentUnit;
+
+                        break;
+                    }
+                }
+
+                if (!($unit instanceof UnitInstance)) {
+                    error(6);
+                }
+
+                /* Inject
+                 */
                 return array(
-                    'folderId' => $params['classId'],
-                    'unitId' => $params['unitId'],
+                    'folder' => $folder,
+                    'unit' => $unit,
+                    'allUnits' => $allUnits
                 );
             }
         );

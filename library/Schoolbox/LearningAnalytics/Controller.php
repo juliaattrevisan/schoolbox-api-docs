@@ -12,30 +12,13 @@ namespace Schoolbox\LearningAnalytics;
 
 use Alaress\Web\Controller\Base;
 
+use Schoolbox\Resource\Category as Folder;
+use Schoolbox\Assessment\Course\UnitInstance;
+use Schoolbox\Collection;
+
 class Controller extends Base {
 
-    public function index($folderId, $unitId) {
-
-        var_dump($folderId);
-        var_dump($unitId);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    public function index(Folder $folder, UnitInstance $unit, Collection $allUnits) {
 
         $this->getResponse()->content->set(
             array(
