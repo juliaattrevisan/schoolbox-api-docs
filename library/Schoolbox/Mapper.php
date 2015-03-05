@@ -654,16 +654,31 @@ abstract class Mapper implements Serializable
      */
     protected function hasMap($map)
     {
-        if (is_array($map) && !isset($map['hydrator'])) {
-            $map['hydrator'] = $this->column_factory->build($map['type']);
-        }
         if (!is_array($map)) {
             return false;
         }
-        if (!empty($map['identifier'])) {
+
+        if (empty($map['hydrator'])) {
+            $map['hydrator'] = $this->column_factory->build($map['type']);
+        }
+
+        // if property is empty, derive it from the column, converting snake_case to camelCase
+        if (empty($map['property'])) {
+            // if type is model, truncate '_id' suffix if it exists
+            if ($map['type'] == self::TYPE_MODEL && substr($map['column'], -3) == '_id') {
+                $property = substr($map['column'], 0, -3);
+            } else {
+                $property = $map['column'];
+            }
+            $map['property'] = score2camel($property);
+        }
+
+        if (isset($map['identifier'])) {
             $this->identifier = $map;
         }
+
         $this->map->setOffset($map['property'], $map);
+
         // Has a join definition been defined? If so create the join.
         if (isset($map['join']) && isset($map['join_def'])) {
             if (!isset($map['join_def']['this_key'])) {
@@ -671,6 +686,15 @@ abstract class Mapper implements Serializable
             }
             $this->hasJoin($map['join'], $map['join_def']);
         }
+
+        // has a softdelete definition been defined? if so create the softdelete
+
+        if (isset($map['softdelete_timestamp'])) {
+            $this->hasSoftDeleteDateField($map['column']);
+        } elseif (isset($map['softdelete_boolean'])) {
+            $this->hasSoftDeleteBooleanField($map['column']);
+        }
+
         return true;
     }
 
