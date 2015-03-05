@@ -16,6 +16,7 @@
         });
 
         $.fn.boxPlotRender({
+            element: '[data-graph=boxplots]',
 
             /* Title of the graph
              */
@@ -213,6 +214,11 @@
         height: 150px;
     }
 
+    .learning-analytics.boxplots {
+        width: 100%;
+        height: 700px;
+    }
+
     /* Top/Bottom students
      */
     .learning-analytics.hall {
@@ -247,8 +253,6 @@
     </ul>
 </div>
 
-<div id="learning-analytics-container" style="width:100%;height:800px">
-    stuff happens here I suppose
-</div>
+<div data-graph="boxplots" class='learning-analytics boxplots'></div>
 
 

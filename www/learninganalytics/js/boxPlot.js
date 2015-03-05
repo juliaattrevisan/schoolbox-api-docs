@@ -7,6 +7,7 @@
      */
     $.fn.boxPlotRender = function(options) {
         var options = options || {
+            element: '',
             title: '',
             orientation: 'vertical',
             allAssessments: [],
@@ -15,7 +16,7 @@
 
         /* The plot unfolds
          */
-        $('#learning-analytics-container').highcharts({
+        $(options.element).highcharts({
 
             /* can use inverted:true to make it horizontal'
              */
