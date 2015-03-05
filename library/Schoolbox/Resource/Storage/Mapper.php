@@ -115,6 +115,7 @@ class Mapper extends Schoolbox\Mapper
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
             $storage = $this->hydrate($r);
+            $storage->setPath($this->mgr->calcPath($storage));
             $storage->setMimetype($this->hydrateJoin($r, 'mime'));
 
             $c->add($storage);
