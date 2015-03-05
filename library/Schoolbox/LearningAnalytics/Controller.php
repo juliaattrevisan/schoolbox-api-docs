@@ -16,7 +16,6 @@ use Schoolbox\Resource\Category as Folder;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Collection;
 use Schoolbox\LearningAnalytics\OverallProgress\OverallProgress;
-use Schoolbox\LearningAnalytics\StudentList;
 
 class Controller extends Base {
 
