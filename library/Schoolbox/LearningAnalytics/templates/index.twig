@@ -1,11 +1,20 @@
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts-more.js"></script>
 <script type="text/javascript" src="/learninganalytics/js/boxPlot.js"></script>
+<script type="text/javascript" src="/learninganalytics/js/overallProgress.js"></script>
 <script type="text/javascript">
     $(function () {
 
         /* Mr Squiggle
          */
+
+        $.fn.overallProgressRender({
+            element: '[data-graph=overall]',
+            title: 'Overall Progress',
+            mostAdvancedStudent: {{ mostAdvancedStudent }},
+            classCompletions: {{ classCompletions }}
+        });
+
         $.fn.boxPlotRender({
 
             /* Title of the graph
@@ -211,77 +220,6 @@
         float: left;
     }
 </style>
-
-<script type="text/javascript">
-    $(function() {
-        $('[data-graph=overall]').highcharts({
-
-            /* lol use an inverted column chart instead of bar
-             * chart to simulate an overlaid bar chart.
-             */
-            chart: {
-                type: 'column',
-                inverted: true
-            },
-            title: {
-                text: 'Overall Progress'
-            },
-            xAxis: {
-                labels: {
-                    enabled: false
-                },
-                categories: ['Individual Completion', 'Entire Class'],
-
-                /* Hide useless ticketty-boo lines (you need all
-                 * of these values, seemingly)
-                 */
-                lineWidth: 0,
-                minorGridLineWidth: 0,
-                lineColor: 'transparent',
-                minorTickLength: 0,
-                tickLength: 0
-            },
-            yAxis: {
-                min: 0,
-                max: 100,
-                title: {
-                    text: 'Percentage Complete %'
-                }
-            },
-
-            /* This is used to ensure that Entire Class bar always
-             * appears over Most Advanced Student bar when the
-             * Most Advanced Student has an equal value to the
-             * Entire Class value
-             */
-            legend: {
-                reversed: true
-            },
-            plotOptions: {
-                column: {
-                    grouping: false
-                }
-            },
-            series: [
-                {
-                    name: 'Most Advanced Student',
-                    data: [{{ mostAdvancedStudent }}],
-                    color: '#ffcc00'
-                },
-                {
-                    name: 'Entire Class',
-                    data: [{{ classCompletions }}],
-                    color: '#00ccff'
-                }
-            ],
-            tooltip: {
-                formatter: function() {
-                    return this.series.name + ': ' + this.y + '%';
-                }
-            }
-        });
-    });
-</script>
 
 <div data-graph='overall' class='learning-analytics overall'></div>
 
