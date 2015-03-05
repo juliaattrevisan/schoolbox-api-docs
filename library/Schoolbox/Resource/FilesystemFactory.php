@@ -31,8 +31,8 @@ class FilesystemFactory
     public function build($storageDir)
     {
         return new MountManager([
-            Manager::FS_TEMP    => new Filesystem(new Local($storageDir)),
-            Manager::FS_STORAGE => new Filesystem(new Local(sys_get_temp_dir()))
+            Manager::FS_TEMP    => new Filesystem(new Local(sys_get_temp_dir())),
+            Manager::FS_STORAGE => new Filesystem(new Local($storageDir))
         ]);
     }
 
