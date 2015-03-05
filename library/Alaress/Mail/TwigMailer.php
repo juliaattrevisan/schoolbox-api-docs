@@ -68,6 +68,13 @@ class TwigMailer extends AbstractMailer {
             )
         );
 
+        // Cut sentence filter
+        $this->twig->addFilter(
+            new Twig_SimpleFilter(
+                'cutSentence',
+                array('TextFormatter', 'cutSentence')
+            )
+        );
 	}
 
 	/**
