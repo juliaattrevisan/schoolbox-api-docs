@@ -198,39 +198,11 @@
 
 <style type="text/css">
 
-    /* Overall Progress Barchart
+    /* Overall Progress
      */
     .learning-analytics.overall {
-        width: 60%;
-        padding-right: 32px;
-        float: left;
-    }
-
-    /* Note that .bar and .bar-container also exist in the
-     * admin home screen. These styles are overrides for
-     * those admin default styles
-     */
-    .learning-analytics.overall .bar span {
-        height: 16px;
-        display: block;
-    }
-
-    .learning-analytics.overall .bar-container .amount {
-        width: 50px;
-    }
-
-    .learning-analytics.overall .bar-container .bar {
-        width: 85%;
-    }
-
-    /* Custom colours
-     */
-    .learning-analytics.overall .individual-completion {
-        background-color: #ffcc33;
-    }
-
-    .learning-analytics.overall .class-completion {
-        background-color: #33ccff;
+        width: 100%;
+        height: 150px;
     }
 
     /* Top/Bottom students
@@ -241,20 +213,78 @@
     }
 </style>
 
-<div class="learning-analytics overall">
-    <div class="bar-container">
-        <div class="bar">
-            <span class='individual-completion' style="width:{{ mostAdvancedStudent }}%"></span>
-        </div>
-        <span class="amount">{{ mostAdvancedStudent }}%</span>
-    </div>
-    <div class="bar-container">
-        <div class="bar">
-            <span class='class-completion' style="width:{{ classCompletions }}%"></span>
-        </div>
-        <span class="amount">{{ classCompletions }}%</span>
-    </div>
-</div>
+<script type="text/javascript">
+    $(function() {
+        $('[data-graph=overall]').highcharts({
+
+            /* lol use an inverted column chart instead of bar
+             * chart to simulate an overlaid bar chart.
+             */
+            chart: {
+                type: 'column',
+                inverted: true
+            },
+            title: {
+                text: 'Overall Progress'
+            },
+            xAxis: {
+                labels: {
+                    enabled: false
+                },
+                categories: ['Individual Completion', 'Entire Class'],
+
+                /* Hide useless ticketty-boo lines (you need all
+                 * of these values, seemingly)
+                 */
+                lineWidth: 0,
+                minorGridLineWidth: 0,
+                lineColor: 'transparent',
+                minorTickLength: 0,
+                tickLength: 0
+            },
+            yAxis: {
+                min: 0,
+                max: 100,
+                title: {
+                    text: 'Percentage Complete %'
+                }
+            },
+
+            /* This is used to ensure that Entire Class bar always
+             * appears over Most Advanced Student bar when the
+             * Most Advanced Student has an equal value to the
+             * Entire Class value
+             */
+            legend: {
+                reversed: true
+            },
+            plotOptions: {
+                column: {
+                    grouping: false
+                }
+            },
+            series: [
+                {
+                    name: 'Most Advanced Student',
+                    data: [{{ mostAdvancedStudent }}],
+                    color: '#ffcc00'
+                },
+                {
+                    name: 'Entire Class',
+                    data: [{{ classCompletions }}],
+                    color: '#00ccff'
+                }
+            ],
+            tooltip: {
+                formatter: function() {
+                    return this.series.name + ': ' + this.y + '%';
+                }
+            }
+        });
+    });
+</script>
+
+<div data-graph='overall' class='learning-analytics overall'></div>
 
 <div class="learning-analytics hall">
     <h3>Top Students</h3>
@@ -264,7 +294,7 @@
                 <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
                 ({{ currentStudent.tasks|length }})
             </li>
-        {%  endfor %}
+        {% endfor %}
     </ul>
 </div>
 
