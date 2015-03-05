@@ -48,7 +48,6 @@ class TemplateMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_DECIMAL,
 		));
 
-		parent::mapping();
 	}
 
 	/**

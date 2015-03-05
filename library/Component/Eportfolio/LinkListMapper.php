@@ -52,6 +52,5 @@ class LinkListMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_INTEGER,
 		));
 
-		parent::mapping();
 	}
 }

@@ -46,7 +46,6 @@ class SubjectMapper extends Schoolbox\External\Mapper
             'property'   => 'name',
             'type'       => self::TYPE_STRING,
         ));
-        parent::mapping();
     }
 
 
