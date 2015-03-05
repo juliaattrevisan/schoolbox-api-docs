@@ -48,10 +48,9 @@ class Mapper extends Schoolbox\Mapper
     protected function mapping()
     {
         $this->hasTable('storage');
-        $this->hasPrototype(new Model());
+        $this->hasPrototype(new Model($this->mgr->getFilesystem(Manager::FS_STORAGE)));
 
-        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('hash', self::TYPE_STRING);
+        $this->uses('hash', self::TYPE_STRING, self::COLUMN_IDENTIFIER);
         $this->uses('filesize', self::TYPE_INTEGER, null, 'size');
 
         $this->joins('mime', MimetypeMapper::class, 'mime', null, null, 'mimetype');
