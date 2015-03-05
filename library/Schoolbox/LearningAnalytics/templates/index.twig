@@ -192,6 +192,52 @@
     });
 </script>
 
+<h1>Stuff</h1>
+
+<h2>Overall Progress</h2>
+
+<style type="text/css">
+    .learning-analytics.overall {
+        width: 70%;
+        float: left;
+    }
+
+    .learning-analytics.hall {
+        width: 15%;
+        float: left;
+    }
+</style>
+
+<div class="learning-analytics overall">
+    graph
+</div>
+
+<div class="learning-analytics hall">
+    <h3>Top Students</h3>
+    <ul>
+        {% for currentStudent in topStudents %}
+            <li>
+                <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
+                ({{ currentStudent.tasks|length }})
+            </li>
+        {%  endfor %}
+    </ul>
+</div>
+
+<div class="learning-analytics hall">
+    <h3>Bottom Students</h3>
+    <ul>
+        {% for currentStudent in bottomStudents %}
+            <li>
+                <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
+                ({{ currentStudent.tasks|length }})
+            </li>
+        {%  endfor %}
+    </ul>
+</div>
+
 <div id="learning-analytics-container" style="width:100%;height:800px">
     stuff happens here I suppose
 </div>
+
+
