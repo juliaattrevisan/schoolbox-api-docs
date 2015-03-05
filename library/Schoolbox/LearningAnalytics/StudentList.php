@@ -12,7 +12,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\LearningAnalytics\OverallProgress;
+namespace Schoolbox\LearningAnalytics;
 
 use Schoolbox\Resource\Category as Folder;
 use Config;
