@@ -198,8 +198,34 @@
 
 <style type="text/css">
     .learning-analytics.overall {
-        width: 70%;
+        width: 60%;
+        padding-right: 32px;
         float: left;
+    }
+
+    /* Note that .bar and .bar-container also exist in the
+     * admin home screen. These styles are overrides for
+     * those admin default styles
+     */
+    .learning-analytics.overall .bar span {
+        height: 16px;
+        display: block;
+    }
+
+    .learning-analytics.overall .bar-container .amount {
+        width: 50px;
+    }
+
+    .learning-analytics.overall .bar-container .bar {
+        width: 85%;
+    }
+
+    .learning-analytics.overall .individual-completion {
+        background-color: #ffcc33;
+    }
+
+    .learning-analytics.overall .class-completion {
+        background-color: #33ccff;
     }
 
     .learning-analytics.hall {
@@ -209,7 +235,18 @@
 </style>
 
 <div class="learning-analytics overall">
-    graph
+    <div class="bar-container">
+        <div class="bar">
+            <span class='individual-completion' style="width:{{ mostAdvancedStudent }}%"></span>
+        </div>
+        <span class="amount">{{ mostAdvancedStudent }}%</span>
+    </div>
+    <div class="bar-container">
+        <div class="bar">
+            <span class='class-completion' style="width:{{ classCompletions }}%"></span>
+        </div>
+        <span class="amount">{{ classCompletions }}%</span>
+    </div>
 </div>
 
 <div class="learning-analytics hall">

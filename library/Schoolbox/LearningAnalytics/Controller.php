@@ -62,7 +62,7 @@ class Controller extends Base {
 
         if ($topStudents->count() && $unit->getTasks()->count()) {
             $topStudent = $topStudents->first();
-            $mostAdvancedStudent = count($topStudent['tasks'])/$unit->getTasks()->count();
+            $mostAdvancedStudent = 100 * count($topStudent['tasks'])/$unit->getTasks()->count();
         }
 
         /* A list of the bottom N students
@@ -87,7 +87,28 @@ class Controller extends Base {
          * marked as completed, represented as a percentage
          * of all the tasks that are available
          */
+        $completionCounts = array();
 
+        foreach ($allTaskCompletions as $currentTaskCompletion) {
+            foreach ($currentTaskCompletion['tasks'] as $currentTask) {
+                $completionCounts[$currentTask]++;
+            }
+        }
+
+        $classCompletions = 0;
+
+        foreach ($completionCounts as $key => $value) {
+            if ($value == $allStudents->count()) {
+                $classCompletions++;
+            }
+        }
+
+        if ($unit->getTasks()->count()) {
+            $classCompletions = 100 * $classCompletions / $unit->getTasks()->count();
+        }
+        else {
+            $classCompletions = 0;
+        }
 
         $this->getResponse()->content->set(
             array(
@@ -95,7 +116,8 @@ class Controller extends Base {
                 'data' => array(
                     'topStudents' => $topStudents,
                     'bottomStudents' => $bottomStudents,
-                    'mostAdvancedStudent' => $mostAdvancedStudent
+                    'mostAdvancedStudent' => $mostAdvancedStudent,
+                    'classCompletions' => $classCompletions,
                 )
             )
         );
