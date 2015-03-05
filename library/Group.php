@@ -710,7 +710,12 @@ class Group extends DeprecatedModel
         $catList = array();
 
         if ($includeSubjectList == true && Cfg::get('external_enable')) {
-            $catList = $this->involvedInSubjects($userID);
+            foreach ($this->involvedInSubjects($userID) as $subject) {
+                // Subjects must still respect $accessType
+                if ($this->getPermission($subject['id'], $userID) >= $accessType) {
+                    $catList[] = $subject;
+                }
+            }
         }
 
         //get list of groups involved in (not already in $catList)
@@ -720,10 +725,9 @@ class Group extends DeprecatedModel
                 $excluded_id_list[] = intval($cat['id']);
             }
         }
-        $exclude_part = !empty($excluded_id_list) ? ('AND category.id NOT IN (' . implode(
-            ',',
-            $excluded_id_list
-        ) . ')') : '';
+        $exclude_part = !empty($excluded_id_list)
+            ? ('AND category.id NOT IN (' . implode(',', $excluded_id_list) . ')')
+            : '';
         $query = "
 			SELECT
 			category.name, category.id, type,
