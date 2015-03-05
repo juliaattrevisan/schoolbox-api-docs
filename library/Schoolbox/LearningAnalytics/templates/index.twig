@@ -233,10 +233,10 @@
     <h3>Top Students</h3>
     <ul>
         {% for currentStudent in topStudents %}
-            <li>
-                <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
-                ({{ currentStudent.tasks|length }}/{{ totalTasks }})
-            </li>
+        <li>
+            <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
+            ({{ currentStudent.tasks|length }}/{{ totalTasks }})
+        </li>
         {% endfor %}
     </ul>
 </div>
@@ -245,13 +245,17 @@
     <h3>Bottom Students</h3>
     <ul>
         {% for currentStudent in bottomStudents %}
-            <li>
-                <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
-                ({{ currentStudent.tasks|length }}/{{ totalTasks }})
-            </li>
+        <li>
+            <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
+            ({{ currentStudent.tasks|length }}/{{ totalTasks }})
+        </li>
         {%  endfor %}
     </ul>
 </div>
+
+<div class="clearfix"></div>
+
+<h2>That boxplot place</h2>
 
 <div data-graph="boxplots" class='learning-analytics boxplots'></div>
 
