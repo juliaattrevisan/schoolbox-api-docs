@@ -11,7 +11,7 @@
 namespace Schoolbox\External;
 use Schoolbox;
 
-class Mapper extends Schoolbox\Mapper {
+abstract class Mapper extends Schoolbox\Mapper {
 
 	/**
 	 * Interface for connecting to external database.
