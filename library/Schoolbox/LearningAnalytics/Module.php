@@ -24,6 +24,7 @@ use Schoolbox\Resource\CategoryMapper as FolderMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Group;
 
 class Module extends BaseModule {
 
@@ -80,6 +81,14 @@ class Module extends BaseModule {
                 }
 
                 if (!($unit instanceof UnitInstance)) {
+                    error(6);
+                }
+
+                /* Check permissions
+                 */
+                $group = new Group();
+
+                if ($group->getPermission($folder->getId()) < WRITE_ACCESS) {
                     error(6);
                 }
 
