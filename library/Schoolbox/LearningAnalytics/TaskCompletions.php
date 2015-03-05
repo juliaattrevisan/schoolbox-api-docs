@@ -58,7 +58,7 @@ class TaskCompletions {
 
         foreach ($this->getAllStudents() as $currentStudent) {
             $completions[$currentStudent->getId()] = array(
-                'user' => $currentStudent->getFullName(),
+                'user' => $currentStudent,
                 'tasks' => array()
             );
 
@@ -73,7 +73,7 @@ class TaskCompletions {
             $completions[$currentStudent->getId()]['tasks'] = array_unique($completions[$currentStudent->getId()]['tasks']);
         }
 
-        $this->setCompletions($completions);
+        $this->setCompletions(array_values($completions));
     }
 
     /**
@@ -96,7 +96,7 @@ class TaskCompletions {
             return count($a['tasks']) - count($b['tasks']);
         });
 
-        return $temp;
+        return array_values($temp);
     }
 
     /**
@@ -110,7 +110,7 @@ class TaskCompletions {
             return count($b['tasks']) - count($a['tasks']);
         });
 
-        return $temp;
+        return array_values($temp);
     }
 
     /* Getters/Setters
