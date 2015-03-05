@@ -50,7 +50,7 @@ class Mapper extends Schoolbox\Mapper
         $this->hasTable('storage');
         $this->hasPrototype(new Model());
 
-        $this->uses('int', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('hash', self::TYPE_STRING);
         $this->uses('filesize', self::TYPE_INTEGER, null, 'size');
 
