@@ -17,7 +17,7 @@ use Schoolbox\ConfigLoader;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as CategoryModel;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\Course\Task;
@@ -764,11 +764,11 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
     * given category.
     *
     * @param User     $user     The user to filter submissions for
-    * @param Category $category If set, restrict results to this category.
+    * @param CategoryModel $category If set, restrict results to this category.
     *
     * @return Collection
     */
-    public function getSubmittable(User $user, Category $category = null)
+    public function getSubmittable(User $user, CategoryModel $category = null)
     {
         $cat_mapper = $this->getJoinMapper('category');
 

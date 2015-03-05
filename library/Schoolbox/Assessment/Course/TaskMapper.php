@@ -11,8 +11,7 @@ namespace Schoolbox\Assessment\Course;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 class TaskMapper extends Mapper {
 
@@ -169,7 +168,7 @@ class TaskMapper extends Mapper {
     /**
      * Gets the tasks in the given category.
      *
-     * @param int|Category $category Either a Category object or a category ID
+     * @param int|Folder   $category Either a Category object or a category ID
      * @param bool         $deleted  True to get deleted tasks too
      *
      * @return Collection
@@ -182,7 +181,7 @@ class TaskMapper extends Mapper {
         $query .= ' ORDER BY t.order ASC, t.title ASC';
 
         $statement = $this->database->prepare($query);
-        $cat_id    = ($category instanceof Category) ? $category->getId() : $category;
+        $cat_id    = ($category instanceof Folder) ? $category->getId() : $category;
         $statement->execute(array($cat_id));
         return $this->hydrateList($statement, 't', array($this, 'baseHydrateCallback'));
     }
@@ -226,7 +225,7 @@ class TaskMapper extends Mapper {
             // scalar category instead of an object.
             // TODO consider standardising object values before callbacks are called
             $category = $object->getCategory();
-            $cat_id   = ($category instanceof Category) ? $category->getId() : $category;
+            $cat_id   = ($category instanceof Folder) ? $category->getId() : $category;
             $statement->bindValue('cat_id', $cat_id, \PDO::PARAM_INT);
             $statement->execute();
             $object->setOrder(intval($statement->fetchColumn())+1);

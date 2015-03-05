@@ -16,7 +16,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Resource\Search\Sanitiser;
 use Schoolbox\User;
 use Schoolbox\Resource\Search\MapperResult\Base;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 class Result extends Base
 {
@@ -60,7 +60,7 @@ class Result extends Base
 
             /* Accumulate folder codes here
              */
-            if (!($results->getOffset($folder->getId()) instanceof Category)) {
+            if (!($results->getOffset($folder->getId()) instanceof Folder)) {
                 $results->setOFfset($folder->getId(), $folder);
             }
 

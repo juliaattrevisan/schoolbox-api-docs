@@ -6,6 +6,8 @@
  ************************************************************/
 //ClassList object..displays class list with most recent visit
 
+use Schoolbox\Resource\Folder\Log\Model as Log;
+
 $groupHandler = new Group;
 
 $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
@@ -100,7 +102,7 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
                 'FIRSTNAME' => $student['firstname'],
                 'YEARLEVEL' => $student['yearlevel'],
                 'HOUSE' => Scrub::text($student['house']),
-                'LASTVISIT' => $lastVisit instanceof \Schoolbox\Resource\CategoryLog ? $lastVisit->getLastAccessTime()->getShort() : 'Never',
+                'LASTVISIT' => $lastVisit instanceof Log ? $lastVisit->getLastAccessTime()->getShort() : 'Never',
                 'ID' => $user->getId(),
                 'SYNERGYID' => $student['synergy_id'],
                 'EMAIL' => $emailLink,

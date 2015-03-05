@@ -60,7 +60,7 @@ elseif (!is_numeric($this->arg[0])) {
  *
  * Check that it's not softdeleted
  */
-if (!($category instanceof \Schoolbox\Resource\Category) || $category->isDeleted()) {
+if (!($category instanceof \Schoolbox\Resource\Folder\Model) || $category->isDeleted()) {
     error(18);
 }
 

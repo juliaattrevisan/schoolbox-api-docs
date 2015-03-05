@@ -92,7 +92,7 @@ class Log {
 			$this->objectId = $object->getId();
 			$this->objectKind = LogMapper::KIND_LINK;
 		}
-		elseif($object instanceof Category) {
+		elseif($object instanceof Folder\Model) {
 			$this->objectId = $object->getId();
 			$this->objectKind = LogMapper::KIND_FOLDER;
 		}

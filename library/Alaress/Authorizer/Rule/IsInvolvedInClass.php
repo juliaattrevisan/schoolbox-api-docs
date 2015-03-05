@@ -12,7 +12,7 @@ namespace Alaress\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use External_UserInterface;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as CategoryModel;
 use Schoolbox\User;
 
 class IsInvolvedInClass implements IAuthorizationRule
@@ -30,10 +30,10 @@ class IsInvolvedInClass implements IAuthorizationRule
      *
      * May be one of the following:
      * * A array or other Traversable of class codes
-     * * A Category object (which contains class codes)
+     * * A CategoryModel object (which contains class codes)
      * * A callable that returns one of the above
      *
-     * @var array|callable|Category
+     * @var array|callable|CategoryModel
      */
     protected $classCodeSource;
 
@@ -41,7 +41,7 @@ class IsInvolvedInClass implements IAuthorizationRule
      * Constructor (obviously)
      *
      * @param External_UserInterface  $externalDb
-     * @param array|callable|Category $classCodeSource
+     * @param array|callable|CategoryModel $classCodeSource
      */
     public function __construct(External_UserInterface $externalDb, $classCodeSource)
     {
@@ -62,7 +62,7 @@ class IsInvolvedInClass implements IAuthorizationRule
 
             // And translate to codes (with a little magic if necessary)
             $classCodes = array();
-            if ($classCodeSource instanceof Category) {
+            if ($classCodeSource instanceof CategoryModel) {
                 foreach ($classCodeSource->getCodes() as $code) {
                     $classCodes[] = $code->getCode();
                 }

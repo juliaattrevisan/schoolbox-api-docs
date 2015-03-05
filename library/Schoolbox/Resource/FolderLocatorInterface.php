@@ -10,24 +10,13 @@
 namespace Schoolbox\Resource;
 
 
-use Schoolbox\FolderInterface;
+/**
+ * Interface FolderLocatorInterface
+ *
+ * @deprecated
+ * @package Schoolbox\Resource
+ */
+interface FolderLocatorInterface extends Folder\ILocator
+{
 
-interface FolderLocatorInterface {
-
-    /**
-     * Return the folder with the given ID
-     *
-     * @param int $nodeId
-     * @return FolderInterface
-     */
-    public function findById($nodeId);
-
-
-    /**
-     * Return the folders contained within the folder with the given ID
-     *
-     * @param int $nodeId
-     * @return FolderInterface[]
-     */
-    public function findByParentId($nodeId);
 } 

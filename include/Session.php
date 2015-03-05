@@ -434,7 +434,7 @@ class Session
                                         }
                                     }
 
-                                    if ($cat instanceof \Schoolbox\Resource\Category) {
+                                    if ($cat instanceof \Schoolbox\Resource\Folder\Model) {
                                         if ($groupHandler->getPermission($cat->getId()) >= READ_ACCESS) {
                                             if (!in_array($cat->getId(), $subjectIDList)) {
                                                 $subject['id'] = $cat->getId();
@@ -480,7 +480,7 @@ class Session
                             }
                         }
 
-                        if ($result instanceof \Schoolbox\Resource\Category) {
+                        if ($result instanceof \Schoolbox\Resource\Folder\Model) {
                             if (!in_array($result->getId(), $catList)) {
                                 $subject['id'] = $result->getId();
                                 $subject['name'] = $result->getName();

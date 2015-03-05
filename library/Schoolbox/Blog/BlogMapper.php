@@ -17,7 +17,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as CategoryModel;
 
 class BlogMapper extends Mapper implements Searchable, FeedableMapperInterface
 {
@@ -279,11 +279,11 @@ class BlogMapper extends Mapper implements Searchable, FeedableMapperInterface
     /**
      * Find all the blog entries for a homepage
      *
-     * @param \Schoolbox\Resource\Category $category
+     * @param CategoryModel $category
      * @param $limit
      * @return Collection
      */
-    public function findForCategory(Category $category, $limit = 0)
+    public function findForCategory(CategoryModel $category, $limit = 0)
     {
         $query =
             "

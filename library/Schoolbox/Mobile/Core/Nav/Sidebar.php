@@ -9,8 +9,8 @@
 
 namespace Schoolbox\Mobile\Core\Nav;
 
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Category;
+use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 use Schoolbox\User;
 use Cfg;
 use ErrorException;

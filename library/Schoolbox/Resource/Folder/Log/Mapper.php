@@ -1,0 +1,138 @@
+<?php
+/**
+ * 
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2015, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Schoolbox\Resource\Folder\Log;
+
+use Schoolbox;
+use Schoolbox\Resource\Folder;
+use Schoolbox\User;
+
+class Mapper extends Schoolbox\Mapper
+{
+    protected function mapping()
+    {
+        $this->hasModel('\\Schoolbox\\Resource\\Folder\\Log\\Model');
+        $this->hasTable('homepage_log');
+        $this->hasMap(array(
+            'column'   => 'cid',
+            'property' => 'category',
+            'type'     => self::TYPE_MODEL,
+            'join'     => 'category',
+        ));
+        $this->hasMap(array(
+            'column'   => 'user',
+            'property' => 'user',
+            'type'     => self::TYPE_MODEL,
+            'join'     => 'user',
+        ));
+        $this->hasMap(array(
+            'column'            => 'datetime',
+            'property'          => 'lastAccessTime',
+            'type'              => self::TYPE_DATETIME,
+            'updated_timestamp' => true,
+        ));
+        $this->hasMap(array(
+            'column'   => 'hitcount',
+            'property' => 'hitcount',
+            'type'     => self::TYPE_INTEGER,
+        ));
+        $this->hasJoin('category', array(
+            'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
+            'this_key'  => 'cid',
+            'other_key' => 'id',
+        ));
+        $this->hasJoin('user', array(
+            'mapper'    => '\\Schoolbox\\UserMapper',
+            'this_key'  => 'user',
+            'other_key' => 'id',
+        ));
+    }
+
+    /**
+     * Override of getUpdateString() to only ever increment the hit count, and
+     * to update the last visit time to the current time.
+     *
+     * @return String
+     */
+    public function getUpdateString()
+    {
+        return '`hitcount` = `hitcount` + 1, `datetime` = NOW()';
+    }
+
+    /**
+     * Increments hit count for this user and category.
+     *
+     * @param int|User         $user     A User object or user ID
+     * @param int|Folder\Model $category A Category object or ID
+     */
+    public function incrementHitcount($user, $category)
+    {
+        $item = $this->createModel();
+        $item->setUser($user)->setCategory($category)->setHitcount(1);
+        $this->save($item);
+    }
+
+    /**
+     * Override default behaviour: this mapper does not raise any notifications.
+     *
+     * @param object $object
+     * @param string $verb
+     * @param null   $previous
+     * @return bool
+     */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        return false;
+    }
+
+    /**
+     * Get the last time a person visited this place
+     *
+     * @param Folder\Model $category
+     * @param User $user
+     * @return Schoolbox\Collection|Model[]
+     */
+    public function lastVisit(Folder\Model $category, User $user)
+    {
+        $query = "
+            SELECT
+            	{$this->getColumnString('hl')}
+            FROM `{$this->table}` hl
+            LEFT JOIN {$this->getJoinSql('category', 'hl', 'c')}
+            LEFT JOIN {$this->getJoinSql('user', 'hl', 'o')}
+            WHERE hl.cid = :categoryId
+            AND hl.user = :userId
+            AND c.deleted_at IS NULL
+		";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute(array(
+            'categoryId' => $category->getId(),
+            'userId' => $user->getId()
+        ));
+
+        /* Manually construct hierarchy of items
+         */
+        $collection = new Schoolbox\Collection();
+
+        $categoryMapper = $this->getJoinMapper('category');
+        $userMapper     = $this->getJoinMapper('user');
+
+        foreach ($statement as $row) {
+            $log = $this->hydrate($row, 'hl');
+
+            $log->setCategory($categoryMapper->hydrate($row, 'c'));
+            $log->setUser($userMapper->hydrate($row, 'o'));
+
+            $collection->add($log);
+        }
+
+        return $collection;
+    }
+} 
