@@ -235,7 +235,7 @@
         {% for currentStudent in topStudents %}
             <li>
                 <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
-                ({{ currentStudent.tasks|length }})
+                ({{ currentStudent.tasks|length }}/{{ totalTasks }})
             </li>
         {% endfor %}
     </ul>
@@ -247,7 +247,7 @@
         {% for currentStudent in bottomStudents %}
             <li>
                 <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
-                ({{ currentStudent.tasks|length }})
+                ({{ currentStudent.tasks|length }}/{{ totalTasks }})
             </li>
         {%  endfor %}
     </ul>

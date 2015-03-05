@@ -37,6 +37,7 @@ class Controller extends Base {
                     'bottomStudents' => $overallProgress->getBottomStudents(),
                     'mostAdvancedStudent' => $overallProgress->getMostAdvancedStudent(),
                     'classCompletions' => $overallProgress->getClassCompletions(),
+                    'totalTasks' => $unit->getTasks()->count(),
                 )
             )
         );
