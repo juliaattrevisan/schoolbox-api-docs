@@ -525,4 +525,35 @@ class Healthcheck
             }
         }
     }
+
+    private function EdumateCheckViews()
+    {
+        echo "\nEdumate Permission Check - Views\n";
+        $list[] = 'classes';
+        $list[] = 'parents';
+        $list[] = 'report_periods';
+        $list[] = 'studentclass';
+        $list[] = 'students';
+        $list[] = 'teacherclass';
+        $list[] = 'parent_student';
+        $list[] = 'staff';
+        $list[] = 'timetable';
+        $list[] = 'timetable_definition';
+        sort($list);
+
+        $eec = new External_Edumate_Connection();
+        $db = $eec->getDatabase();
+
+        foreach ($list as $view) {
+            $viewname = "db2inst1.schoolbox_$view";
+            echo "  $viewname : ";
+            $result = $db->query("SELECT * FROM $viewname FETCH FIRST 1 ROWS ONLY");
+            if ($result) {
+                echo "OK\n";
+            } else {
+                echo "\n    Failed - ".db2_stmt_errormsg()."\n";
+            }
+        }
+
+    }
 }
