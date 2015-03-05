@@ -16,6 +16,7 @@ use Schoolbox\Resource\Category as Folder;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Collection;
 use Schoolbox\LearningAnalytics\OverallProgress\OverallProgress;
+use Schoolbox\LearningAnalytics\OverallProgress\StudentList;
 
 class Controller extends Base {
 
@@ -27,7 +28,10 @@ class Controller extends Base {
      * @param Collection $allUnits
      */
     public function index(Folder $folder, UnitInstance $unit, Collection $allUnits) {
-        $overallProgress = new OverallProgress($folder, $unit);
+        $studentListProcessor = new StudentList($folder, $unit);
+        $allStudents = $studentListProcessor->getStudentList();
+
+        $overallProgress = new OverallProgress($allStudents, $unit);
 
         $this->getResponse()->content->set(
             array(

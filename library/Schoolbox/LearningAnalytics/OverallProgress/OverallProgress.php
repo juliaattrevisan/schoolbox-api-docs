@@ -10,17 +10,10 @@
 
 namespace Schoolbox\LearningAnalytics\OverallProgress;
 
-use Schoolbox\Resource\Category as Folder;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Collection;
 
 class OverallProgress {
-    /**
-     * Folder instance
-     *
-     * @var Folder
-     */
-    private $folder = null;
 
     /**
      * Unit instance
@@ -66,13 +59,20 @@ class OverallProgress {
     private $bottomStudents = null;
 
     /**
+     * A collection of User instances
+     *
+     * @var Collection
+     */
+    private $allStudents = null;
+
+    /**
      * Constructor
      *
-     * @param Folder $folder
+     * @param Collection $allStudents
      * @param UnitInstance $unit
      */
-    public function __construct(Folder $folder, UnitInstance $unit) {
-        $this->setFolder($folder);
+    public function __construct(Collection $allStudents, UnitInstance $unit) {
+        $this->setAllStudents($allStudents);
         $this->setUnit($unit);
 
         $this->process();
@@ -82,10 +82,7 @@ class OverallProgress {
      * Populate with data
      */
     private function process() {
-        $studentListProcessor = new StudentList($this->getFolder(), $this->getUnit());
-        $allStudents = $studentListProcessor->getStudentList();
-
-        $taskCompletions = new TaskCompletions($allStudents, $this->getUnit());
+        $taskCompletions = new TaskCompletions($this->getAllStudents(), $this->getUnit());
 
         /* A list of the top N students
          *
@@ -164,7 +161,7 @@ class OverallProgress {
         $classCompletions = 0;
 
         foreach ($completionCounts as $key => $value) {
-            if ($value == $allStudents->count()) {
+            if ($value == $this->getAllStudents()->count()) {
                 $classCompletions++;
             }
         }
@@ -181,26 +178,6 @@ class OverallProgress {
 
     /* Getters/Setters
      */
-
-    /**
-     * Set folder
-     *
-     * @param Folder $folder
-     */
-    private function setFolder($folder)
-    {
-        $this->folder = $folder;
-    }
-
-    /**
-     * Get folder
-     *
-     * @return Folder
-     */
-    private function getFolder()
-    {
-        return $this->folder;
-    }
 
     /**
      * Set unit
@@ -300,5 +277,25 @@ class OverallProgress {
     public function getTopStudents()
     {
         return $this->topStudents;
+    }
+
+    /**
+     * Set all students
+     *
+     * @param \Schoolbox\Collection $allStudents
+     */
+    private function setAllStudents($allStudents)
+    {
+        $this->allStudents = $allStudents;
+    }
+
+    /**
+     * Get all students
+     *
+     * @return \Schoolbox\Collection
+     */
+    private function getAllStudents()
+    {
+        return $this->allStudents;
     }
 }
