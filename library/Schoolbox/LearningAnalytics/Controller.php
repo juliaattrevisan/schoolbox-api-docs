@@ -36,11 +36,13 @@ class Controller extends Base {
             array(
                 'template' => '@learningAnalytics/index.twig',
                 'data' => array(
-                    'topStudents' => $overallProgress->getTopStudents(),
-                    'bottomStudents' => $overallProgress->getBottomStudents(),
-                    'mostAdvancedStudent' => $overallProgress->getMostAdvancedStudent(),
-                    'classCompletions' => $overallProgress->getClassCompletions(),
-                    'totalTasks' => $unit->getTasks()->count(),
+                    'overallProgress' => array(
+                        'topStudents' => $overallProgress->getTopStudents(),
+                        'bottomStudents' => $overallProgress->getBottomStudents(),
+                        'mostAdvancedStudent' => $overallProgress->getMostAdvancedStudent(),
+                        'classCompletions' => $overallProgress->getClassCompletions(),
+                        'totalTasks' => $unit->getTasks()->count(),
+                    ),
                 )
             )
         );
