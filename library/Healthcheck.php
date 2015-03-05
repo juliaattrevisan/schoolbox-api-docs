@@ -58,27 +58,43 @@ class Healthcheck
         unset($db,$result);
     }
 
+    private function Db2Connection()
+    {
+        echo "  DB2 : ";
+        $eec = new External_Edumate_Connection();
+        $db = $eec->getDatabase();
+        $result = $db->query("SELECT * FROM TABLE(SYSPROC.ENV_GET_INST_INFO());");
+
+        echo $result ? "OK\n" : "\n    Failed - ".db2_conn_errormsg()."\n";
+    }
+
+    private function EdumateCheckConnection()
+    {
+        echo "\nEdumate Connection Check\n";
+        $this->Db2Connection();
+    }
+
     private function TassCheckConnection()
     {
-        echo "\nTass Connnection Check\n";
+        echo "\nTass Connection Check\n";
         $this->MssqlConnection();
     }
 
     private function SynergeticCheckConnection()
     {
-        echo "\nSynergetic Connnection Check\n";
+        echo "\nSynergetic Connection Check\n";
         $this->MssqlConnection();
     }
 
     private function SchoolproCheckConnection()
     {
-        echo "\nSchoolpro Connnection Check\n";
+        echo "\nSchoolpro Connection Check\n";
         $this->MssqlConnection();
     }
 
     private function MazeCheckConnection()
     {
-        echo "\nMaze Connnection Check\n";
+        echo "\nMaze Connection Check\n";
         $this->MssqlConnection();
     }
 
