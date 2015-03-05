@@ -46,16 +46,18 @@
 
             /* Orientation of the box plots
              */
-            orientation: 'horizontal',
+            orientation: 'vertical',
 
             /* A list of all the assessment names that are being graphed
              * These correspond to a series of data and their respective
              * five-point summaries
              */
             allAssessments: [
-                'Assessment 1',
-                'Assessment 2',
-                'Assessment 3'
+{% for currentTask in results.allTasks %}
+"{{ currentTask.getTitle() }}"{% if not loop.last %},
+{% endif %}
+{% endfor %}
+
             ],
 
             /* All the raw data
@@ -216,6 +218,13 @@
                         info: 'Naomi',
                         uid: 165,
                         value: 87
+                    }
+                ],
+                [
+                    {
+                        info: 'John',
+                        uid: 135,
+                        value: 117
                     }
                 ]
             ])

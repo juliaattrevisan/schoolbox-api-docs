@@ -30,7 +30,13 @@ class Controller extends Base {
         $studentListProcessor = new StudentList($folder, $unit);
         $allStudents = $studentListProcessor->getStudentList();
 
+        /* Overall Progress
+         */
         $overallProgress = new OverallProgress($allStudents, $unit);
+
+        /* Results
+         */
+
 
         $this->getResponse()->content->set(
             array(
@@ -42,6 +48,9 @@ class Controller extends Base {
                         'mostAdvancedStudent' => $overallProgress->getMostAdvancedStudent(),
                         'classCompletions' => $overallProgress->getClassCompletions(),
                         'totalTasks' => $unit->getTasks()->count(),
+                    ),
+                    'results' => array(
+                        'allTasks' => $unit->getTasks()
                     ),
                 )
             )
