@@ -123,4 +123,16 @@ class Manager
         return $storage->delete();
     }
 
+
+    /**
+     * Passthrough method
+     *
+     * @param string $prefix
+     * @return \League\Flysystem\FilesystemInterface
+     */
+    public function getFilesystem($prefix)
+    {
+        return $this->mgr->getFilesystem($prefix);
+    }
+
 }
