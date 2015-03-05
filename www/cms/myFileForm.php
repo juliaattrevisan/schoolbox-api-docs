@@ -7,7 +7,7 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 $ajax = isset($_GET['ajax']) && $_GET['ajax'];
 
-if($ajax) {
+if ($ajax) {
     header("Content-Type: application/json");
 }
 
@@ -18,8 +18,8 @@ $userId = isset($_POST['user']) ? $_POST['user'] : $_SESSION['id'];
 
 // PERMISSION: have to be session user or staff
 $groupHandler = new Group();
-if(!($groupHandler->isStaff() || $_SESSION['id'] == $userId)) {
-	if ($ajax) {
+if (!($groupHandler->isStaff() || $_SESSION['id'] == $userId)) {
+    if ($ajax) {
         header(':', true, 400);
         die(json_encode('You do not have write permission to this ePortfolio.'));
     } else {
@@ -29,7 +29,6 @@ if(!($groupHandler->isStaff() || $_SESSION['id'] == $userId)) {
 
 // Upload a new file
 if (isset($_POST['description'])) {
-
     /** @var MyFile $file */
     $file = null;
 
@@ -61,7 +60,7 @@ if (isset($_POST['description'])) {
     }
 
     // if file was synchronously uploaded
-    if ( $_FILES['file']['name'] && is_uploaded_file($_FILES['file']['tmp_name'])) {
+    if ($_FILES['file']['name'] && is_uploaded_file($_FILES['file']['tmp_name'])) {
         $file->setTempFileLocation($_FILES['file']['tmp_name']);
         $file->setFilename($_FILES['file']['name']);
         $file->setFilesize(filesize($_FILES['file']['tmp_name']));
@@ -82,9 +81,9 @@ if (isset($_POST['description'])) {
         if (isset($_POST['published']) && is_array($_POST['published']) && count($_POST['published'])) {
             $now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
-            foreach($_POST['published'] as $ownerId => $pageIds) {
+            foreach ($_POST['published'] as $ownerId => $pageIds) {
                 if (is_array($pageIds) && count($pageIds)) {
-                    foreach($pageIds as $currentPageId => $unused) {
+                    foreach ($pageIds as $currentPageId => $unused) {
                         $authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $currentPageId);
                         if ($authenticator->canModify()) {
                             $publishedFile = new \Component\Eportfolio\FileList();
@@ -132,7 +131,7 @@ if (isset($_POST['description'])) {
         if (isset($_POST['return'])) {
             SitePage::localRedir($_POST['return'] . '&fileID=' . $fileID);
 
-        } elseif($ajax) {
+        } elseif ($ajax) {
             header(':', true, 201);
             die(json_encode(array('id' => $affectedIds[0])));
 
@@ -140,13 +139,12 @@ if (isset($_POST['description'])) {
             $page->backToTheFuture(2);
         }
     } catch (\Schoolbox\File\Exception $e) {
-
-        // Output errors
+// Output errors
         if ($e->getCode() == \Schoolbox\File\Exception::CODE_MIMETYPE_NOT_FOUND) {
             $code = 11;
             $msg  = "Your file, '{$file->getFilename()}' is not a valid filetype";
 
-        } elseif ($e->getCode() == \Schoolbox\File\Exception::CODE_FILE_TOO_LARGE ) {
+        } elseif ($e->getCode() == \Schoolbox\File\Exception::CODE_FILE_TOO_LARGE) {
             $code = 10;
             $msg  = 'The size of the uploaded file exceeds the file size restrictions of '.Alaress_Byte_Format::bytesToString($currentFile->getMimetype()->getMaxFileSize()).'.';
 
@@ -166,8 +164,7 @@ if (isset($_POST['description'])) {
         header('Content-Type: text/html');
         die($e);
     }
-}
-// delete a single file
+} // delete a single file
 elseif (is_numeric($_GET['delete'])) {
     try {
         $parent = deleteMyFile($_GET['delete']);
@@ -175,32 +172,29 @@ elseif (is_numeric($_GET['delete'])) {
         error($e->getCode());
     }
     SitePage::localRedir("/cms/portfolio/$parent");
-}
-// delete multiple files
+} // delete multiple files
 elseif (isset($_GET['fileList']) && is_numeric($_GET['deleteList'])) {
-	$fileList = array_values(array_filter(explode(',', $_GET['fileList'])));
-	$errorList = array();
-	$parent = 0;
-	if(is_array($fileList) && count($fileList)) {
-		foreach($fileList as $file) {
+    $fileList = array_values(array_filter(explode(',', $_GET['fileList'])));
+    $errorList = array();
+    $parent = 0;
+    if (is_array($fileList) && count($fileList)) {
+        foreach ($fileList as $file) {
             try {
                 // it's fine for this to be overwritten each iteration
                 $parent = deleteMyFile($file);
             } catch (Schoolbox\Resource\Exception $e) {
                 $errorList[] = $e->getCode();
-			}
-		}
-		if(count($errorList)) {
-			error($errorList[0]);
-		}
+            }
+        }
+        if (count($errorList)) {
+            error($errorList[0]);
+        }
         SitePage::localRedir("/cms/portfolio/$parent");
-	}
-	else {
-		error(2);
-	}
-}
-// relocate a file
-else if (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
+    } else {
+        error(2);
+    }
+} // relocate a file
+elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
     /* Move file from one category to another, after checking permission on both from and to categories
       */
     try {
@@ -223,7 +217,8 @@ else if (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
  * @throws Schoolbox\Resource\Exception
  * @return int
  */
-function deleteMyFile($fileId) {
+function deleteMyFile($fileId)
+{
     try {
         /** @var MyFile $file */
         $file      = MyFileMapper::getInstance()->findById($fileId);
@@ -238,7 +233,7 @@ function deleteMyFile($fileId) {
             throw new Schoolbox\Resource\Exception("Error", 2); // fail to delete
         }
         throw new Schoolbox\Resource\Exception("Error", 48); // permissions insufficient
-    } catch(Schoolbox\Mapper\Exception $e) {
+    } catch (Schoolbox\Mapper\Exception $e) {
         throw new Schoolbox\Resource\Exception("Error", 41); // no any device exists
     }
 }
