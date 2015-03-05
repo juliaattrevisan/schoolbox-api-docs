@@ -28,12 +28,12 @@ class Controller extends Base {
             new \Alaress_Probe($currentStudent->getFullName());
         }
 
+        new \Alaress_Probe($studentListProcessor->getRemovedStudentIdList());
+
         $this->getResponse()->content->set(
             array(
                 'template' => '@learningAnalytics/index.twig',
             )
         );
     }
-
-
-} 
+}

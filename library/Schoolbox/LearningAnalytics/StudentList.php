@@ -271,7 +271,7 @@ class StudentList {
      *
      * @return array
      */
-    private function getRemovedStudentIdList()
+    public function getRemovedStudentIdList()
     {
         return $this->removedStudentIdList;
     }
