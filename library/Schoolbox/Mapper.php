@@ -194,8 +194,8 @@ abstract class Mapper implements Serializable
     {
         $this->database = \Database::getInstance();
         $this->map      = new MappingCollection();
-        $this->setup();
         $this->setConfigLoader(new ConfigMapper());
+        $this->setup();
         $this->setColumnFactory(new ColumnFactory());
         $this->setSessionData(isset($_SESSION) ? $_SESSION : array());
         $this->mapping();
