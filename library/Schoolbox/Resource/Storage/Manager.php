@@ -93,10 +93,14 @@ class Manager
         $storage->setFilesystem($this->mgr->getFilesystem(self::FS_STORAGE))
                 ->setPath($this->calcPath($storage));
 
+        // this should already be taken care of in the mapper, but better to be safe
+        if ($storage->getPath() == $tempPath) {
+            return true;
+        }
+
         // attempt to copy the file
         if (!$this->copy($tempPath, $storage)) {
-            // whoooa, undo that save!
-            $this->delete($storage, true);
+            // copy failed, let's get out of here
             throw new File\Exception("Failed to copy uploaded file to storage");
         }
         return true;
