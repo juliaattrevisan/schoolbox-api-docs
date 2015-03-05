@@ -45,7 +45,12 @@ class Controller extends Base {
             if (isset($allTaskCompletions[$i])) {
                 $currentTaskCompletion = $allTaskCompletions[$i];
 
-                $topStudents->add($currentTaskCompletion);
+                /* Top students should have at least one completed
+                 * item in order to be listed here
+                 */
+                if (count($currentTaskCompletion['tasks'])) {
+                    $topStudents->add($currentTaskCompletion);
+                }
             }
         }
 
