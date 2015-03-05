@@ -13,6 +13,7 @@ use Alaress_Byte_Format;
 use PDO;
 use PDOStatement;
 use Schoolbox;
+use Schoolbox\File;
 use Schoolbox\Collection;
 use Schoolbox\File\MimetypeMapper;
 
@@ -139,7 +140,12 @@ class Mapper extends Schoolbox\Mapper
             throw new Schoolbox\Mapper\Exception("Attempt to delete Storage file denied");
         }
 
-        return parent::delete($object);
+        try {
+            // postDelete will throw a file exception if the file can't be deleted
+            return parent::delete($object);
+        } catch (File\Exception $e) {
+            throw new Schoolbox\Mapper\Exception("Could not delete Storage file", 0, $e);
+        }
     }
 
 }
