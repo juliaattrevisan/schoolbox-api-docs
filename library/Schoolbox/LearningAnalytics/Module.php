@@ -92,8 +92,6 @@ class Module extends BaseModule {
                     error(6);
                 }
 
-
-
                 /* Inject
                  */
                 return array(
