@@ -43,7 +43,7 @@
                     </td>
                 </tr>
                     <td>
-                        <p>{{ msg.meta.body }}</p>
+                        <p>{{ msg.meta.body | cutSentence(300) }}</p>
                     </td>
                 {% endif %}
             </table>
