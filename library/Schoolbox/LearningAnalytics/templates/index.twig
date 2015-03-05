@@ -1,9 +1,12 @@
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts-more.js"></script>
-<script type="text/javascript" src="/learninganalytics/js/graph.js"></script>
+<script type="text/javascript" src="/learninganalytics/js/boxPlot.js"></script>
 <script type="text/javascript">
     $(function () {
-        var options = {
+
+        /* Mr Squiggle
+         */
+        $.fn.boxPlotRender({
 
             /* Title of the graph
              */
@@ -25,7 +28,7 @@
 
             /* All the raw data
              */
-            allData: $.fn.calculateAllSeriesData([
+            allData: $.fn.boxPlotCalculateAllSeriesData([
                 [
                     {
                         info: 'Alice',
@@ -184,11 +187,7 @@
                     }
                 ]
             ])
-        }
-
-        /* Mr Squiggle
-         */
-        $.fn.renderGraph(options);
+        });
     });
 </script>
 

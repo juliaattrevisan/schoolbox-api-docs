@@ -5,7 +5,7 @@
      *
      * @param options
      */
-    $.fn.renderGraph = function(options) {
+    $.fn.boxPlotRender = function(options) {
         var options = options || {
             title: '',
             orientation: 'vertical',
@@ -118,7 +118,7 @@
      *
      * @returns {{allGraphData: Array, allOutliers: Array}}
      */
-    $.fn.calculateAllSeriesData = function(input) {
+    $.fn.boxPlotCalculateAllSeriesData = function(input) {
         var output = {
             input: input,
             allGraphData: [],
@@ -126,7 +126,7 @@
         }
 
         for (var i = 0; i < input.length; i++) {
-            var currentSeriesData = $.fn.calculateSeriesData({
+            var currentSeriesData = $.fn.boxPlotCalculateSeriesData({
                 input: input[i]
             });
 
@@ -150,7 +150,7 @@
      * @param options
      * @returns {{fivePointSummary: {structured: null, array: Array}, iqr: null, outliers: Array}}
      */
-    $.fn.calculateSeriesData = function(options) {
+    $.fn.boxPlotCalculateSeriesData = function(options) {
 
         /* Store the config in this instance so private methods
          * can access it
