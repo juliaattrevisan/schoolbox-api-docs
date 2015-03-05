@@ -53,6 +53,14 @@ class Module extends BaseModule {
             '/^learningAnalytics\.index/',
             function($params) {
 
+                /* Check permissions
+                 */
+                $group = new Group();
+
+                if ($group->getPermission($params['folderId']) < WRITE_ACCESS) {
+                    error(6);
+                }
+
                 /* Load folder
                  */
                 $folderMapper = new FolderMapper();
@@ -84,13 +92,7 @@ class Module extends BaseModule {
                     error(6);
                 }
 
-                /* Check permissions
-                 */
-                $group = new Group();
 
-                if ($group->getPermission($folder->getId()) < WRITE_ACCESS) {
-                    error(6);
-                }
 
                 /* Inject
                  */
