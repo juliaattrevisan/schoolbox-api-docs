@@ -20,8 +20,8 @@ class Survey_Notification
     /** @var array */
     private $survey = array();
 
-    /** @var User */
-    private $userHandler = null;
+    /** @var UserMapper */
+    private $userMapper = null;
 
     /**
      * Constructor
@@ -31,7 +31,7 @@ class Survey_Notification
     public function __construct($survey)
     {
         $this->setSurvey($survey);
-        $this->setUserHandler(new User());
+        $this->setUserMapper(UserMapper::getInstance());
 
         $this->setup();
     }
@@ -43,10 +43,10 @@ class Survey_Notification
     {
         $survey = $this->getSurvey();
 
-        $author = $this->getUserHandler()->getByID($this->getAuthor());
+        $author = $this->getUserMapper()->findById($this->getAuthor());
         $subject = "A response for {$this->getSurveyName()} was submitted";
 
-        $email = new Mailer($this->getEmailTemplateFile(), $subject, $author['alt_email']);
+        $email = new Mailer($this->getEmailTemplateFile(), $subject, $author->getEmail());
 
         $email->setVar(array(
             'SURVEY_SURVEY_ID' => $survey['assess_id'],
@@ -140,20 +140,20 @@ class Survey_Notification
     /**
      * Set user handler
      *
-     * @param User $userHandler
+     * @param UserMapper $userMapper
      */
-    private function setUserHandler($userHandler)
+    private function setUserMapper($userMapper)
     {
-        $this->userHandler = $userHandler;
+        $this->userMapper = $userMapper;
     }
 
     /**
      * Get user handler
      *
-     * @return User
+     * @return UserMapper
      */
-    private function getUserHandler()
+    private function getUserMapper()
     {
-        return $this->userHandler;
+        return $this->userMapper;
     }
 }
