@@ -1,4 +1,6 @@
 <?php
+use Schoolbox\UserMapper;
+
 /**
  * Survey_Notification
  *
@@ -15,9 +17,6 @@ class Survey_Notification
     /** @var Mailer */
     protected $email = null;
 
-    /** @var Survey_Main */
-    private $surveyHandler = null;
-
     /** @var array */
     private $survey = array();
 
@@ -31,7 +30,6 @@ class Survey_Notification
      */
     public function __construct($survey)
     {
-        $this->setSurveyHandler(new Survey_Main());
         $this->setSurvey($survey);
         $this->setUserHandler(new User());
 
@@ -137,26 +135,6 @@ class Survey_Notification
     private function getSurvey()
     {
         return $this->survey;
-    }
-
-    /**
-     * Set survey handler
-     *
-     * @param Survey_Main $surveyHandler
-     */
-    private function setSurveyHandler($surveyHandler)
-    {
-        $this->surveyHandler = $surveyHandler;
-    }
-
-    /**
-     * Get survey handler
-     *
-     * @return Survey_Main
-     */
-    private function getSurveyHandler()
-    {
-        return $this->surveyHandler;
     }
 
     /**
