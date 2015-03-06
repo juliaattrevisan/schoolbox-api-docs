@@ -48,13 +48,13 @@ class Mapper extends Schoolbox\Mapper
      */
     protected function mapping()
     {
-        $this->hasTable('storage');
+        $this->hasTable('filestore');
         $this->hasPrototype(new Model($this->mgr->getFilesystem(Manager::FS_STORAGE)));
 
         $this->uses('hash', self::TYPE_STRING, self::COLUMN_IDENTIFIER);
-        $this->uses('filesize', self::TYPE_INTEGER, null, 'size');
+        $this->uses('size', self::TYPE_INTEGER);
 
-        $this->joins('mime', MimetypeMapper::class, 'mime', null, null, 'mimetype');
+        $this->joinsVia('allowedFileExtension', MimetypeMapper::class, 'fileTypeID', 'fileTypeID', 'extension', 'ext', null, null, 'mimetype');
 
         $this->registerCallback(self::CALLBACK_PRESAVE,    [ $this->mgr, 'safetyCheck' ]);
         $this->registerCallback(self::CALLBACK_POSTSAVE,   [ $this, self::CALLBACK_POSTSAVE ]);
@@ -99,9 +99,9 @@ class Mapper extends Schoolbox\Mapper
 
         return "
           SELECT {$this->getColumnString()},
-                 {$this->getJoinColumnString('mime')}
+                 {$this->getJoinColumnString('allowedFileExtension')}
           FROM $table
-          LEFT JOIN {$this->getJoinSql('mime')}
+          LEFT JOIN {$this->getJoinSql('allowedFileExtension')}
         ";
     }
 
@@ -117,7 +117,7 @@ class Mapper extends Schoolbox\Mapper
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
             $storage = $this->hydrate($r);
             $storage->setPath($this->mgr->calcPath($storage));
-            $storage->setMimetype($this->hydrateJoin($r, 'mime'));
+            $storage->setMimetype($this->hydrateJoin($r, 'allowedFileExtension'));
 
             $c->add($storage);
         }
