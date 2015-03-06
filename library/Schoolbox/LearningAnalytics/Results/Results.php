@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Collection;
+use Schoolbox\UserMapper;
 
 class Results {
 
@@ -40,6 +41,13 @@ class Results {
     private $allValues = null;
 
     /**
+     * A user mapper
+     *
+     * @var UserMapper
+     */
+    private $userMapper = null;
+
+    /**
      * Constructor
      *
      * @param Collection $allStudents
@@ -48,6 +56,7 @@ class Results {
     public function __construct(Collection $allStudents, UnitInstance $unit) {
         $this->setAllStudents($allStudents);
         $this->setUnit($unit);
+        $this->setUserMapper(new UserMapper());
 
         $this->process();
     }
@@ -115,14 +124,22 @@ class Results {
                 $allUsers = array_values($studentSubmissionList[$currentTask->getSubmissionBox()->getId()]);
 
                 foreach ($allUsers as $currentUser) {
-                    $allValues[$currentTask->getId()]->add($currentUser['return']['norm_mark']);
+                    $allValues[$currentTask->getId()]->add(array(
+                        'user' => $currentUser['user']['instance'],
+                        'value' => $currentUser['return']['norm_mark']
+                    ));
                 }
             }
             else if (($currentTask->getAssessment() instanceof OnlineAssessment) && is_numeric($currentTask->getAssessment()->getId())) {
                 $allUsers = array_values($studentQuizList[$currentTask->getAssessment()->getId()]);
 
+                /* lol handlers
+                 */
                 foreach ($allUsers as $currentUser) {
-                    $allValues[$currentTask->getId()]->add($currentUser['totalMarks']);
+                    $allValues[$currentTask->getId()]->add(array(
+                        'user' => $this->getUserMapper()->findById($currentUser['user_id']),
+                        'value' => $currentUser['totalMarks']
+                    ));
                 }
             }
         }
@@ -191,5 +208,25 @@ class Results {
     private function getAllStudents()
     {
         return $this->allStudents;
+    }
+
+    /**
+     * Set user mapper
+     *
+     * @param \Schoolbox\UserMapper $userMapper
+     */
+    private function setUserMapper($userMapper)
+    {
+        $this->userMapper = $userMapper;
+    }
+
+    /**
+     * Get user mapper
+     *
+     * @return \Schoolbox\UserMapper
+     */
+    private function getUserMapper()
+    {
+        return $this->userMapper;
     }
 }
