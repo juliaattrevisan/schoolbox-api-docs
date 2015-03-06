@@ -9,11 +9,19 @@
  */
 class Survey_Notification
 {
+    /** @var string */
     protected $emailTemplateFile = '../survey/email/authorNotification.html';
+
+    /** @var Mailer */
     protected $email = null;
 
+    /** @var Survey_Main */
     private $surveyHandler = null;
+
+    /** @var array */
     private $survey = array();
+
+    /** @var User */
     private $userHandler = null;
 
     /**
@@ -94,7 +102,7 @@ class Survey_Notification
     /**
      * Set email
      *
-     * @param $email
+     * @param Mailer $email
      */
     protected function setEmail($email)
     {
@@ -104,7 +112,7 @@ class Survey_Notification
     /**
      * Get email
      *
-     * @return null
+     * @return Mailer
      */
     protected function getEmail()
     {
@@ -114,7 +122,7 @@ class Survey_Notification
     /**
      * Set survey
      *
-     * @param $survey
+     * @param array $survey
      */
     private function setSurvey($survey)
     {
@@ -134,7 +142,7 @@ class Survey_Notification
     /**
      * Set survey handler
      *
-     * @param $surveyHandler
+     * @param Survey_Main $surveyHandler
      */
     private function setSurveyHandler($surveyHandler)
     {
@@ -144,7 +152,7 @@ class Survey_Notification
     /**
      * Get survey handler
      *
-     * @return null
+     * @return Survey_Main
      */
     private function getSurveyHandler()
     {
@@ -154,7 +162,7 @@ class Survey_Notification
     /**
      * Set user handler
      *
-     * @param $userHandler
+     * @param User $userHandler
      */
     private function setUserHandler($userHandler)
     {
@@ -164,7 +172,7 @@ class Survey_Notification
     /**
      * Get user handler
      *
-     * @return null
+     * @return User
      */
     private function getUserHandler()
     {
