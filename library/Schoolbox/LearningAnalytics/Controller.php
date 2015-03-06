@@ -86,11 +86,10 @@ class Controller extends Base {
          *
          * This could probably be done in the above loops though
          */
+        $allValues = array();
+        
         foreach ($unit->getTasks() as $currentTask) {
-            $structure[$currentTask->getId()] = array(
-                'task' => $currentTask,
-                'values' => new Collection(),
-            );
+            $allValues[$currentTask->getId()] = new Collection();
 
             /* Get all the stuff out of $studentSubmissionList[$submissionBoxId]
              */
@@ -98,20 +97,17 @@ class Controller extends Base {
                 $allUsers = array_values($studentSubmissionList[$currentTask->getSubmissionBox()->getId()]);
 
                 foreach ($allUsers as $currentUser) {
-                    $structure[$currentTask->getId()]['values']->add($currentUser['return']['norm_mark']);
+                    $allValues[$currentTask->getId()]->add($currentUser['return']['norm_mark']);
                 }
             }
             else if (($currentTask->getAssessment() instanceof OnlineAssessment) && is_numeric($currentTask->getAssessment()->getId())) {
                 $allUsers = array_values($studentQuizList[$currentTask->getAssessment()->getId()]);
 
                 foreach ($allUsers as $currentUser) {
-                    $structure[$currentTask->getId()]['values']->add($currentUser['totalMarks']);
+                    $allValues[$currentTask->getId()]->add($currentUser['totalMarks']);
                 }
             }
         }
-
-        new \Alaress_Probe(array_values($structure));
-
 
         $this->getResponse()->content->set(
             array(
@@ -125,7 +121,8 @@ class Controller extends Base {
                         'totalTasks' => $unit->getTasks()->count(),
                     ),
                     'results' => array(
-                        'allTasks' => $unit->getTasks()
+                        'allTasks' => $unit->getTasks(),
+                        'allValues' => $allValues,
                     ),
                 )
             )
