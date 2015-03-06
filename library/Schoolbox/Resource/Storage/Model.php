@@ -13,6 +13,14 @@ namespace Schoolbox\Resource\Storage;
 use League\Flysystem\File;
 use Schoolbox\File\Mimetype;
 
+/**
+ * Class Model
+ *
+ * Not explicitly a "Schoolbox file entity".
+ * This object ONLY represents the file on disk, and needs to be wrapped in other classes for actual Schoolbox functionality.
+ *
+ * @package Schoolbox\Resource\Storage
+ */
 class Model extends File
 {
 
