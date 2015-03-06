@@ -71,6 +71,14 @@ if ($attempt['finish'] == '0000-00-00 00:00:00') {
 
     $this->setVar('alreadyEnded_block', '');
     $this->parse('endAssess_block', 'endAssess');
+
+    /* Notify the survey author when someone completes this
+     */
+    if ($survey['notify_author']) {
+        $notification = new Survey_Notification($survey);
+        $notification->send();
+    }
+
 } else {
     $attemptEndDate = new Alaress_Date_Format(strtotime($attempt['finish']), 'U');
 
@@ -82,13 +90,6 @@ if ($attempt['finish'] == '0000-00-00 00:00:00') {
 
     $this->parse('alreadyEnded_block', 'alreadyEnded');
     $this->setVar('endAssess_block', '');
-}
-
-/* Notify the survey author when someone completes this
- */
-if ($survey['notify_author']) {
-    $notification = new Survey_Notification($survey);
-    $notification->send();
 }
 
 /* Clear attempt
