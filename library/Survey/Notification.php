@@ -43,8 +43,8 @@ class Survey_Notification
     {
         $survey = $this->getSurvey();
 
-        $author = $this->getUserMapper()->findById($this->getAuthor());
-        $subject = "A response for {$this->getSurveyName()} was submitted";
+        $author = $this->getUserMapper()->findById($this->getAuthorId());
+        $subject = "A response for {$this->getSurveyTitle()} was submitted";
 
         $email = new Mailer($this->getEmailTemplateFile(), $subject, $author->getEmail());
 
@@ -72,7 +72,7 @@ class Survey_Notification
      *
      * @return mixed
      */
-    private function getAuthor()
+    private function getAuthorId()
     {
         return $this->survey['user_id'];
     }
@@ -82,7 +82,7 @@ class Survey_Notification
      *
      * @return mixed
      */
-    private function getSurveyName()
+    private function getSurveyTitle()
     {
         return $this->survey['title'];
     }
