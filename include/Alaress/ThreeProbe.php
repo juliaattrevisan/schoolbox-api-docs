@@ -10,37 +10,31 @@
 
 use Alaress\DebugBar\Instance as DebugBar;
 
-class Alaress_ThreeProbe {
+class Alaress_MultiProbe {
 
 	/**
 	 * Constructor
+     *
+     * Accepts multiple input vars
 	 *
-	 * @param $dataStructure1
-	 * @param $dataStructure2
-	 * @param $dataStructure3
 	 * @internal param $dataStructure
 	 */
-	public function __construct($dataStructure1, $dataStructure2, $dataStructure3) {
+	public function __construct() {
 		if (DebugBar::isEnabled()) {
 		}
 		else {
-			echo "<div style='width:33%;float:left;display:block;overflow:hidden;'>";
-			echo "<pre>";
-			print_r($dataStructure1);
-			echo "</pre>";
-			echo "</div>";
+            $numArgs = func_num_args();
 
-			echo "<div style='width:33%;float:left;display:block;overflow:hidden;'>";
-			echo "<pre>";
-			print_r($dataStructure2);
-			echo "</pre>";
-			echo "</div>";
+            $width = floor(100/$numArgs);
 
-			echo "<div style='width:33%;float:left;display:block;overflow:hidden;'>";
-			echo "<pre>";
-			print_r($dataStructure3);
-			echo "</pre>";
-			echo "</div>";
+            for ($i = 0; $i < $numArgs; $i++) {
+                echo "<div style='width:{$width}%;float:left;display:block;overflow:scroll;'>";
+                echo "<pre>";
+                print_r(func_get_arg($i));
+                echo "</pre>";
+                echo "</div>";
+                echo "<div class='clearfix'></div>";
+            }
 		}
 	}
 } 
