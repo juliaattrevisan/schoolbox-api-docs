@@ -27,6 +27,8 @@ class Alaress_MultiProbe {
 
             $width = floor(100/$numArgs);
 
+            echo "<div class='clearfix'></div>";
+            
             for ($i = 0; $i < $numArgs; $i++) {
                 echo "<div style='width:{$width}%;float:left;display:block;overflow:scroll;'>";
                 echo "<pre>";
@@ -34,7 +36,7 @@ class Alaress_MultiProbe {
                 echo "</pre>";
                 echo "</div>";
             }
-            
+
             echo "<div class='clearfix'></div>";
 		}
 	}
