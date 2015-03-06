@@ -68,9 +68,9 @@
     {# Highcharts won't render without at least one data point #}
     {% if results.allValues[currentTask.getId()]|length == 0 %}
     {
-        info: '',
+        info: null,
         uid: null,
-        value: 0
+        value: -100
     }
     {% endif %}
     {% for currentValue in results.allValues[currentTask.getId()] %}
@@ -88,9 +88,6 @@
         });
     });
 </script>
-
-
-
 
 <h1>Stuff</h1>
 
@@ -127,5 +124,3 @@
 <h2>That boxplot place</h2>
 
 <div data-graph="boxplots" class='learning-analytics boxplots'></div>
-
-
