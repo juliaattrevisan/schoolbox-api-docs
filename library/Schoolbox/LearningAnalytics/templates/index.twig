@@ -241,10 +241,10 @@
 <div class="learning-analytics hall">
     <h3>Top Students</h3>
     <ul>
-        {% for currentStudent in topStudents %}
+        {% for currentStudent in overallProgress.topStudents %}
         <li>
             <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
-            ({{ currentStudent.tasks|length }}/{{ totalTasks }})
+            ({{ currentStudent.tasks|length }}/{{ overallProgress.totalTasks }})
         </li>
         {% endfor %}
     </ul>
@@ -253,10 +253,10 @@
 <div class="learning-analytics hall">
     <h3>Bottom Students</h3>
     <ul>
-        {% for currentStudent in bottomStudents %}
+        {% for currentStudent in overallProgress.bottomStudents %}
         <li>
             <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
-            ({{ currentStudent.tasks|length }}/{{ totalTasks }})
+            ({{ currentStudent.tasks|length }}/{{ overallProgress.totalTasks }})
         </li>
         {%  endfor %}
     </ul>
