@@ -68,7 +68,7 @@ class Controller extends Base {
 
         try {
             // require these to be present in POSTDATA
-            $this->assertArrayKeys($data, array('token', 'username', 'password'));
+            $this->assertArrayKeys($data, array('username', 'password'));
 
         } catch (\UnderflowException $e) {
             $this->getResponse()->status->setCode(400);
@@ -93,24 +93,27 @@ class Controller extends Base {
             return;
         }
 
-        $now = \Alaress_Date_Format::now();
+        // token may be absent or blank, in which case we don't store anything in the registry
+        if (empty($data['token'])) {
+            $now = \Alaress_Date_Format::now();
 
-        try {
-            $registry = $this->registryMapper->findById($_SESSION['id'], $data['token'], $provider);
-            $registry->setTouchedAt($now);
+            try {
+                $registry = $this->registryMapper->findById($_SESSION['id'], $data['token'], $provider);
+                $registry->setTouchedAt($now);
 
-        } catch (MapperException $e) {
-            /** @var Registry $registry */
-            $registry = $this->registryMapper->createModel();
-            $registry
-                ->setUser($_SESSION['user'])
-                ->setToken($data['token'])
-                ->setProvider($provider)
-                ->setCreatedAt($now)
-                ->setTouchedAt($now);
+            } catch (MapperException $e) {
+                /** @var Registry $registry */
+                $registry = $this->registryMapper->createModel();
+                $registry
+                    ->setUser($_SESSION['user'])
+                    ->setToken($data['token'])
+                    ->setProvider($provider)
+                    ->setCreatedAt($now)
+                    ->setTouchedAt($now);
+            }
+
+            $this->registryMapper->save($registry);
         }
-
-        $this->registryMapper->save($registry);
 
         $response->set(array(
             'format' => 'json',
