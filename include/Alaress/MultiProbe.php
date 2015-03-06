@@ -33,8 +33,9 @@ class Alaress_MultiProbe {
                 print_r(func_get_arg($i));
                 echo "</pre>";
                 echo "</div>";
-                echo "<div class='clearfix'></div>";
             }
+            
+            echo "<div class='clearfix'></div>";
 		}
 	}
 } 
