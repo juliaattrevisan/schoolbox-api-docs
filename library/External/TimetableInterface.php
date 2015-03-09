@@ -97,16 +97,30 @@ interface External_TimetableInterface
      * $timetable[$period]['periodSequence']
      * $timetable[$period]['day'][$day][] = array()
      *
-     * For each period, each day has the definition:
+     * Similarly with $dayIndex
      *
-     * periodOn
-     * description
-     * code
-     * room
-     * staffID
-     * staffFirstname
-     * staffSurname
-     * staffTitle
+     * [Period1 [Day1 [Class1, Class2...], Day2, Day3, DayN...]]
+     * [Period2 [Day1 [Class1, Class2...], Day2, Day3, DayN...]]
+     * [Period3 [Day1 [Class1, Class2...], Day2, Day3, DayN...]]
+     * [PeriodN [Day1 [Class1, Class2...], Day2, Day3, DayN...]]
+     * ...
+     * $timetable[$periodIndex]['periodName']
+     * $timetable[$periodIndex]['periodStart']
+     * $timetable[$periodIndex]['periodEnd']
+     * $timetable[$periodIndex]['periodNumber']
+     * $timetable[$periodIndex]['periodSequence']
+     *
+     * An array of classes for this period on this day
+     * $timetable[$periodIndex]['day'][$dayIndex][] = array(
+     *     description
+     *     code
+     *     campus
+     *     room
+     *     staffID
+     *     staffFirstname
+     *     staffSurname
+     *     staffTitle
+     * )
      *
      * @param $externalUserId
      * @param $userId

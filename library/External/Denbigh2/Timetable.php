@@ -310,28 +310,36 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
      * Assemble into a 2D array
      * Each row represents a Period across each Day in the cycle
      *
-     * [Period1 [Day1, Day2, Day3, DayN...]]
-     * [Period2 [Day1, Day2, Day3, DayN...]]
-     * [Period3 [Day1, Day2, Day3, DayN...]]
-     * [PeriodN [Day1, Day2, Day3, DayN...]]
+     * $periodIndex is a zero-based index integer which represents a $periodNumber
+     * i.e. Period 1 is $periodIndex 0
+     * Period 2 is $periodIndex 1
+     * Period 3 is $periodIndex 2
      * ...
-     * $timetable[$period]['periodName']
-     * $timetable[$period]['periodStart']
-     * $timetable[$period]['periodEnd']
-     * $timetable[$period]['periodNumber']
-     * $timetable[$period]['periodSequence']
-     * $timetable[$period]['day'][$day][] = array()
      *
-     * For each period, each day has the definition:
+     * Similarly with $dayIndex
      *
-     * periodOn
-     * description
-     * code
-     * room
-     * staffID
-     * staffFirstname
-     * staffSurname
-     * staffTitle
+     * [Period1 [Day1 [Class1, Class2...], Day2, Day3, DayN...]]
+     * [Period2 [Day1 [Class1, Class2...], Day2, Day3, DayN...]]
+     * [Period3 [Day1 [Class1, Class2...], Day2, Day3, DayN...]]
+     * [PeriodN [Day1 [Class1, Class2...], Day2, Day3, DayN...]]
+     * ...
+     * $timetable[$periodIndex]['periodName']
+     * $timetable[$periodIndex]['periodStart']
+     * $timetable[$periodIndex]['periodEnd']
+     * $timetable[$periodIndex]['periodNumber']
+     * $timetable[$periodIndex]['periodSequence']
+     *
+     * An array of classes for this period on this day
+     * $timetable[$periodIndex]['day'][$dayIndex][] = array(
+     *     description
+     *     code
+     *     campus
+     *     room
+     *     staffID
+     *     staffFirstname
+     *     staffSurname
+     *     staffTitle
+     * )
      *
      * @param $externalUserId
      * @param $userId
