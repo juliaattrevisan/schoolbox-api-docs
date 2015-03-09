@@ -10,12 +10,8 @@
 namespace Schoolbox\Realtime\Digest;
 
 
-use Alaress\Lumberjack\Logger;
 use Alaress\Redis;
-use Psr\Log\LoggerInterface;
 use Schoolbox\Collection;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Mail\CoreContext;
 use Schoolbox\Mail\TwigEmail;
 use Schoolbox\Notif\UserQueue\UserQueueFactory;
@@ -24,7 +20,6 @@ use Schoolbox\Realtime\WorkNotifier;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Serializable;
 
 class MailNotifier extends WorkNotifier {
 
@@ -75,8 +70,6 @@ class MailNotifier extends WorkNotifier {
 
             $email->setCoreContext($core->getContext());
 
-            $this->log()->debug("Digesting {$user->getUsername()}");
-
             $uq->fetchNotificationsIntoBundle($decorator, true);
 
 			if(!$decorator->count()) {
@@ -85,6 +78,8 @@ class MailNotifier extends WorkNotifier {
                 unset($uq, $decorator, $email, $user);
 				continue;
 			}
+
+            $this->log()->debug(sprintf("Digesting %d item%s for user %s", $decorator->count(), $decorator->count() == 1 ? '' : 's'), $user->getUsername());
 
 			$context = $decorator->renderAsTwigContext($core->getContext(), 0, $dir);
 
