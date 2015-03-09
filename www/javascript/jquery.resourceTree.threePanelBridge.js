@@ -16,9 +16,15 @@
      *   moveFile:
      *     a callback that accept the following params:
      *       self:            This object
-     *       fileNode:        The file to move
+     *       fileNode:        The file to move (jQuery object)
      *       destinationNode: The folder to move it to
      *     and returns an object to use as the parameter to jQuery.ajax
+     *   openFile:
+     *     a callback that accept the following params:
+     *       self:            This object
+     *       fileNode:        The file to open (jQuery object)
+     *       destinationNode: The folder to move it to
+     *     and returns nothing - currently, it opens a window for the new file.
      * @constructor
      */
     var ResourceTreeThreePanelBridge = function(element, options) {
@@ -49,6 +55,13 @@
                         categoryID: destinationNode.attr('id')
                     },
                     dataType: 'json'
+                }
+            },
+            openFile: function(self, fileNode) {
+                if (file.hasClass("link")) {
+                    window.open("/redir.php?id="+fileNode.attr("id").substring(5),"_blank");
+                } else {
+                    window.open("/send.php?id="+fileNode.attr("id").substring(5),"_blank");
                 }
             },
             loadFolderFiles: function(self, folderId) {
@@ -391,12 +404,7 @@
         newChildren
             .off('dblclick.resourceTree.threePanelBridge')
             .on('dblclick.resourceTree.threePanelBridge', function() {
-                if ($(this).hasClass("link")) {
-                    window.open("/redir.php?id="+$(this).attr("id").substring(5),"_blank");
-                }
-                else {
-                    window.open("/send.php?id="+$(this).attr("id").substring(5),"_blank");
-                }
+                self.options.openFile(self, $(this));
             });
 
         /* select files */
