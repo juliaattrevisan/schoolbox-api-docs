@@ -44,6 +44,9 @@ $(function() {
                     dataType: 'json'
                 }
             },
+            openFile: function(self, fileNode) {
+                window.open("/cms/sendNetworkFile.php?id="+fileNode.attr("id").substring(5),"_blank");
+            },
             loadFolderFiles: function(self, folderId) {
                 return {
                     type: 'post',
