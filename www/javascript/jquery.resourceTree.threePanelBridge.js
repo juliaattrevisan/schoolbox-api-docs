@@ -58,7 +58,7 @@
                 }
             },
             openFile: function(self, fileNode) {
-                if (file.hasClass("link")) {
+                if (fileNode.hasClass("link")) {
                     window.open("/redir.php?id="+fileNode.attr("id").substring(5),"_blank");
                 } else {
                     window.open("/send.php?id="+fileNode.attr("id").substring(5),"_blank");
