@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by JetBrains PhpStorm.
  * User: aetworowsky
@@ -6,22 +7,148 @@
  * Time: 4:45 PM
  * To change this template use File | Settings | File Templates.
  */
+interface External_TimetableInterface
+{
+    /**
+     * The headings of the timetable, going horizontally
+     * from left to right containing all the times and day numbers
+     *
+     * Has the structure for each period
+     *
+     * $timetableDef['desc'][]
+     * $timetableDef['start'][]
+     * $timetableDef['end'][]
+     * $timetableDef['number'][]
+     * $timetableDef['sequence'][]
+     *
+     * @param $campusId
+     * @param int $day
+     * @return array
+     */
+    public function getTimetableDefinition($campusId, $day = 0);
 
-interface External_TimetableInterface {
-	public function getTimetableDefinition ($campusId, $day=0);
+    /**
+     * Get the current day number for a given campus
+     *
+     * @param $campusId
+     * @param int $date
+     * @return int
+     */
+    public function getDayNumber($campusId, $date = 0);
 
-	public function getDayNumber ($campusId, $date = 0);
-
+    /**
+     * Calculates the current period based on the current time
+     *
+     * The returned data structure is required for Dashboard Timetable Controller
+     *
+     * PeriodNumber
+     * PeriodNumberSeq
+     *
+     * @param $campusId
+     * @param $now
+     * @return array
+     */
 	public function getPeriodNumber ($campusId, $now = 0);
 
+    /**
+     * Return a user's timetable for a specific day
+     *
+     * Depending on the role for $userId (staff or student) this summons the respective
+     * method to spawn associated timetable
+     *
+     * Has the structure for each period
+     *
+     * periodName
+     * periodStart
+     * periodEnd
+     * periodNumber
+     * periodSequence
+     * description
+     * code
+     * room
+     * staffID
+     * staffTitle
+     * staffFirstname
+     * staffSurname
+     *
+     * @param $externalUserId
+     * @param $userId
+     * @param $campusId
+     * @param $dayNumber
+     * @return mixed
+     */
 	public function getDayTimetable ($externalUserId, $userId, $campusId, $dayNumber);
-
+    
+    /**
+     * Return the ENTIRE timetable for a user and campus
+     *
+     * Assemble into a 2D array
+     * Each row represents a Period across each Day in the cycle
+     *
+     * [Period1 [Day1, Day2, Day3, DayN...]]
+     * [Period2 [Day1, Day2, Day3, DayN...]]
+     * [Period3 [Day1, Day2, Day3, DayN...]]
+     * [PeriodN [Day1, Day2, Day3, DayN...]]
+     * ...
+     * $timetable[$period]['periodName']
+     * $timetable[$period]['periodStart']
+     * $timetable[$period]['periodEnd']
+     * $timetable[$period]['periodNumber']
+     * $timetable[$period]['periodSequence']
+     * $timetable[$period]['day'][$day][] = array()
+     *
+     * For each period, each day has the definition:
+     *
+     * periodOn
+     * description
+     * code
+     * room
+     * staffID
+     * staffFirstname
+     * staffSurname
+     * staffTitle
+     *
+     * @param $externalUserId
+     * @param $userId
+     * @param $campusId
+     * @return mixed
+     */
 	public function getFullTimetable ($externalUserId, $userId, $campusId);
 
+    /**
+     * Retrieve the list of subjects for a user on a particular day
+     *
+     * Room
+     * Description
+     * PeriodNumber
+     * ClassCode
+     * ClassCampus
+     *
+     * @param $externalUserId
+     * @param $dayNumber
+     * @return array
+     */
 	public function getDaySubjects ($externalUserId, $dayNumber);
 
+    /**
+     * Get the period for a class, given its $classCode and $dayNumber
+     *
+     * PeriodNumber
+     *
+     * @param $classCode
+     * @param $dayNumber
+     * @return array
+     */
 	public function getSubjectPeriod ($classCode, $dayNumber);
 
+    /**
+     * Get the verbose name for the $classCode
+     *
+     * Description
+     *
+     * @param $classCode
+     * @return string
+     */
 	public function getSubjectName ($classCode);
 
 	/**
