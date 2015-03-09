@@ -48,11 +48,14 @@ class Mapper extends Schoolbox\Mapper
      */
     protected function mapping()
     {
-        $this->hasTable('filestore');
+        $this->hasTable('storage');
         $this->hasPrototype(new Model($this->mgr->getFilesystem(Manager::FS_STORAGE)));
 
         $this->uses('hash', self::TYPE_STRING, self::COLUMN_IDENTIFIER);
-        $this->uses('size', self::TYPE_INTEGER);
+        $this->uses('filesize', self::TYPE_INTEGER, null, 'size');
+        $this->uses('uploaded_on', self::TYPE_DATETIME, null, 'createdAt');
+        $this->uses('last_accessed', self::TYPE_DATETIME);
+        $this->uses('public', self::TYPE_BOOLEAN);
 
         $this->joinsVia('allowedFileExtension', MimetypeMapper::class, 'fileTypeID', 'fileTypeID', 'extension', 'ext', null, null, 'mimetype');
 

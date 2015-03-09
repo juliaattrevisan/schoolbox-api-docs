@@ -10,6 +10,7 @@
 namespace Schoolbox\Resource\Storage;
 
 
+use Alaress_Date_Format;
 use League\Flysystem\File;
 use Schoolbox\File\Mimetype;
 
@@ -32,6 +33,15 @@ class Model extends File
 
     /** @var int */
     protected $size;
+
+    /** @var Alaress_Date_Format */
+    protected $createdAt;
+
+    /** @var Alaress_Date_Format */
+    protected $lastAccessed;
+
+    /** @var bool */
+    protected $public;
 
 
     /**
@@ -103,5 +113,75 @@ class Model extends File
         $this->size = $size;
         return $this;
     }
+
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+
+    /**
+     * @param Alaress_Date_Format $createdAt
+     * @return self
+     */
+    public function setCreatedAt($createdAt)
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getLastAccessed()
+    {
+        return $this->lastAccessed;
+    }
+
+
+    /**
+     * @param Alaress_Date_Format $lastAccessed
+     * @return self
+     */
+    public function setLastAccessed($lastAccessed)
+    {
+        $this->lastAccessed = $lastAccessed;
+        return $this;
+    }
+
+
+    /**
+     * @return boolean
+     */
+    public function isPublic()
+    {
+        return $this->public;
+    }
+
+
+    /**
+     * @deprecated mapper compat
+     * @return bool
+     */
+    public function getPublic()
+    {
+        return $this->isPublic();
+    }
+
+    /**
+     * @param boolean $public
+     * @return self
+     */
+    public function setPublic($public)
+    {
+        $this->public = $public;
+        return $this;
+    }
+
 
 }
