@@ -17,8 +17,6 @@ class Synchronise_Synergetic_Arden_Hydrator_Group_Staff implements Synchronise_B
     {
         $newUser['group_id'] = $this->getGroupIDFromUser($externalUser);
 
-        new \Alaress_Probe($externalUser);
-        new \Alaress_Probe($newUser);
         return $newUser;
     }
 
