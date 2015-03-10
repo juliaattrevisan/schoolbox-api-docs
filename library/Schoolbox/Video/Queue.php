@@ -139,16 +139,18 @@ class Queue extends ResourceVideo
         }
 
         // Get a scale factor for this video
-        if ($height > 720) {
-            // some idevices cannot play back 1080p so we are limiting to 720p as a max
-            $scale = '-vf scale=-1:720';
-        } else {
-            if (($width && $height)) {
-                //avconv does not like uneven heights and widths so this makes them all even
-                $scale = sprintf('-vf scale=%d:%d', intval($width / 2) * 2, intval($height / 2) * 2);
-            }
+        if ($width && $height) {
+            // Max size: 1280x720
+            list($containedWidth, $containedHeight) = $this->contain(
+                array($width, $height),
+                array(1280, 720)
+            );
+            $scale = sprintf(
+                '-vf scale=%d:%d',
+                intval($containedWidth / 2) * 2,
+                intval($containedHeight / 2) * 2
+            );
         }
-
 
         // Get rotation information, for ipad and iphones that record upside down and use metadata to rotate
         $rotation = 0;
@@ -205,11 +207,23 @@ class Queue extends ResourceVideo
             $this->setDuration($duration);
         }
 
-        /* Generate thumbnail of video 64x64 pixels, 1/3rd of the video in */
+        /* Generate thumbnail of video 64x64 pixels, 1/3rd of the video in, center of frame */
+        $thumbScale = '';
+        if ($width && $height) {
+            list($thumbWidth, $thumbHeight) = $this->cover(
+                array($width, $height),
+                array(64, 64)
+            );
+            $thumbScale = sprintf(
+                'scale=%d:%d,',
+                intval($thumbWidth / 2) * 2,
+                intval($thumbHeight / 2) * 2
+            );
+        }
         $thumbnailSeconds = $this->getDuration() > 0 ? round(($this->getDuration() / 3), 2) : 10;
         $thumbnailString  = "nice $executable -y -i " . escapeshellarg($sourceFile) .
             ' -f image2 -ss ' . $thumbnailSeconds .
-            ' -vf scale=-1:64,crop=64:64' . (($rotate) ? ',' . $rotate : '') .
+            ' -vf '.$thumbScale.'crop=64:64' . (($rotate) ? ',' . $rotate : '') .
             ' -frames:v 1 ' .
             escapeshellarg($this->getThumbnailLocation()) . ' 2>&1';
         $posterString     = "nice $executable -y -i " . escapeshellarg($sourceFile) .
@@ -323,5 +337,46 @@ class Queue extends ResourceVideo
     public function getModified()
     {
         return $this->modified;
+    }
+
+    /**
+     * Ensures $dimensions are contained within $maxDimensions
+     *
+     * @param array $dimensions    [width, height]
+     * @param array $maxDimensions [maxWidth, maxHeight]
+     *
+     * @return array [containedWidth, containedHeight]
+     */
+    protected function contain($dimensions, $maxDimensions)
+    {
+        list($width, $height)       = $dimensions;
+        list($maxWidth, $maxHeight) = $maxDimensions;
+        if ($maxWidth > 0 && $width > $maxWidth) {
+            $height = $height * ($maxWidth / $width);
+            $width  = $maxWidth;
+        }
+        if ($maxHeight > 0 && $height > $maxHeight) {
+            $width  = $width * ($maxHeight / $height);
+            $height = $maxHeight;
+        }
+        return array($width, $height);
+    }
+
+    /**
+     * Resizes $dimensions so that they are as small as possible while still
+     * fully covering $minDimensions.
+     *
+     * @param array $dimensions      [width, height]
+     * @param array $coverDimensions [coverWidth, coverHeight]
+     *
+     * @return array [coveredWidth, coveredHeight]
+     */
+    protected function cover($dimensions, $coverDimensions)
+    {
+        // Expand $dimensions, then contain it to $coverDimensions
+        list($width, $height)           = $dimensions;
+        list($coverWidth, $coverHeight) = $coverDimensions;
+        $newRatio = max($coverWidth / $width, $coverHeight / $height);
+        return array($width * $newRatio, $height * $newRatio);
     }
 }
