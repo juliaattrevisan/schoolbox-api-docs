@@ -701,7 +701,7 @@ class ArticleMapper extends Mapper implements Searchable
             }
         }
 
-        $allArticles->sortBy('publishDate', 'DESC');
+        $allArticles->sortBy('postDate', 'DESC');
 
         return $allArticles;
     }
