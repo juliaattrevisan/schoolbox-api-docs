@@ -31,32 +31,45 @@ echo strftime("[%F %T] Plagscan scan started\n");
 $gateway      = new Plagscan_Gateway($username, $key);
 $updated_docs = 0;
 foreach ($docs as $doc) {
+
 	/** @var Plagscan_Document $doc */
 	$doc_id = $doc->getPlagscanId();
-	$stats  = $gateway->retrieve($doc_id, Plagscan_Gateway::MODE_RETRIEVE_STATISTICS_ONLY);
-	if (!$stats) {
-		echo strftime("[%F %T] Plagscan scan failed - check API key and username?\n");
-		exit(2);
-	}
 
-	//
-	// Is this document scannable? If not, mark as such and don't scan again.
-	if ((string)$stats->MSG === 'ERR') {
-		$doc->setStatus(Plagscan_Document::STATUS_UNSCANNABLE);
-		Plagscan_DocumentMapper::getInstance()->save($doc);
-		continue;
-	}
+    /* Sometimes plagscan gives you back -1 as the plagscan_id
+     * In this case, just skip it, so the daemon doesn't get
+     * stuck trying to process the unprocessable
+     *
+     * I am also going to assume that $doc_id has to be greater
+     * than zero. I can't think of why zero would be valid.
+     */
+    if ($doc_id > 0) {
+        echo "Scanning $doc_id\n";
+        
+        $stats  = $gateway->retrieve($doc_id, Plagscan_Gateway::MODE_RETRIEVE_STATISTICS_ONLY);
+        if (!$stats) {
+            echo strftime("[%F %T] Plagscan scan failed - check API key and username?\n");
+            exit(2);
+        }
 
-	//
-	// Has a level been retrieved yet? How can I tell?
-	$level = (string)$stats->LEVEL;
-	if (strlen($level) > 0) {
-		$doc->setScore($level / 10)
-			->setStatus(Plagscan_Document::STATUS_COMPLETE)
-			->setHtml($gateway->retrieve($doc_id, Plagscan_Gateway::MODE_RETRIEVE_HTML_INTERACTIVE));
-		Plagscan_DocumentMapper::getInstance()->save($doc);
-		$updated_docs++;
-	}
+        //
+        // Is this document scannable? If not, mark as such and don't scan again.
+        if ((string)$stats->MSG === 'ERR') {
+            $doc->setStatus(Plagscan_Document::STATUS_UNSCANNABLE);
+            Plagscan_DocumentMapper::getInstance()->save($doc);
+            continue;
+        }
+
+        //
+        // Has a level been retrieved yet? How can I tell?
+        $level = (string)$stats->LEVEL;
+        if (strlen($level) > 0) {
+            $doc->setScore($level / 10)
+                ->setStatus(Plagscan_Document::STATUS_COMPLETE)
+                ->setHtml($gateway->retrieve($doc_id, Plagscan_Gateway::MODE_RETRIEVE_HTML_INTERACTIVE));
+            Plagscan_DocumentMapper::getInstance()->save($doc);
+            $updated_docs++;
+        }
+    }
 }
 
 echo strftime("[%F %T] Plagscan scan completed: ");
