@@ -153,4 +153,41 @@ class Mapper extends Schoolbox\Mapper
         }
     }
 
+
+    /**
+     * Accept a new file upload
+     *
+     * @param string $filename
+     * @param string $tempLocation
+     * @param bool   $public
+     * @return Model
+     */
+    public function accept($filename, $tempLocation, $public = true)
+    {
+        /** @var MimetypeMapper $mtm */
+        $mtm = $this->getJoinMapper('allowedFileExtension');
+
+        // clear hash so it will be recalculated
+        $storage = $this->createModel()->setHash(null);
+
+        // explicitly use temporary upload filesystem
+        $storage->setFilesystem($this->mgr->getFilesystem(Manager::FS_TEMP));
+
+        // TODO find a way to remove the need for this truncation
+        $tempLocation = str_replace(sys_get_temp_dir(), '', $tempLocation);
+        $storage->setPath($tempLocation);
+
+        // set filetype metadata
+        $storage->setExtension(pathinfo($filename, PATHINFO_EXTENSION));
+        $storage->setMimetype($mtm->getByFilename($filename));
+
+        // by default, files uploaded this way are public
+        $storage->setPublic($public);
+
+        // aaaaaand save. file won't be re-saved if it already exists in storage
+        $this->save($storage);
+
+        return $storage;
+    }
+
 }
