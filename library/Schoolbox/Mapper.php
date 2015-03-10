@@ -2171,12 +2171,12 @@ abstract class Mapper implements Serializable
     /**
      * Inverse of hydrate(). Converts a model to an array with indices matching the db fields.
      *
-     * @param object $model The model to get values from
-     *
+     * @param object $model              The model to get values from
+     * @param bool   $includeTimestamps  Whether or not to include timestamps in the dehydrated output
      * @throws Mapper\Exception if the map is not valid
      * @return array
      */
-    public function dehydrate($model)
+    public function dehydrate($model, $includeTimestamps = false)
     {
         $result = array();
         foreach ($this->map as $map) {
@@ -2193,7 +2193,7 @@ abstract class Mapper implements Serializable
             $columnName   = $map['column'];
             //
             // Timestamp fields will never be bound.
-            if (!(isset($map['updated_timestamp']) || isset($map['created_timestamp']))) {
+            if ($includeTimestamps || !(isset($map['updated_timestamp']) || isset($map['created_timestamp']))) {
                 $result[$columnName] = $this->getModelProperty($model, $propertyName);
             }
         }
