@@ -57,6 +57,9 @@ function cloneRole(Role $src, Role $dest)
     $dest->setDigestSchedule($src->getDigestSchedule());
     $dest->setCanChangePassword($src->getCanChangePassword());
 
+    // persist that
+    RoleMapper::getInstance()->save($dest);
+
     // and now onto copying the relevant data
     cloneSideNav($src, $dest);
     cloneDashboard($src, $dest);
@@ -71,7 +74,17 @@ function cloneRole(Role $src, Role $dest)
  */
 function cloneSideNav(Role $src, Role $dest)
 {
-
+    clonePerms("
+        DELETE FROM sideMenuGroup WHERE gid = ?
+    ", "
+        INSERT INTO sideMenuGroup
+        SELECT id, :dest
+        FROM sideMenuGroup
+        WHERE gid = :src
+    ", [
+        'src' => $src->getId(),
+        'dest' => $dest->getId()
+    ]);
 }
 
 /**
@@ -89,7 +102,17 @@ function cloneDashboard(Role $src, Role $dest)
  */
 function cloneCategoryPermissions(Role $src, Role $dest)
 {
-
+    clonePerms("
+        DELETE FROM perms WHERE gid = ?
+    ", "
+        INSERT INTO perms
+        SELECT cid, :dest, `type`
+        FROM perms
+        WHERE gid = :src
+    ", [
+        'src' => $src->getId(),
+        'dest' => $dest->getId()
+    ]);
 }
 
 /**
@@ -98,7 +121,17 @@ function cloneCategoryPermissions(Role $src, Role $dest)
  */
 function cloneSchoolNewsPermissions(Role $src, Role $dest)
 {
-
+    clonePerms("
+        DELETE FROM newsGroup WHERE gid = ?
+    ", "
+        INSERT INTO newsGroup
+        SELECT id, :dest
+        FROM newsGroup
+        WHERE gid = :src
+    ", [
+        'src' => $src->getId(),
+        'dest' => $dest->getId()
+    ]);
 }
 
 /**
@@ -107,5 +140,25 @@ function cloneSchoolNewsPermissions(Role $src, Role $dest)
  */
 function cloneSchoolCalendarPermissions(Role $src, Role $dest)
 {
+    clonePerms("
+        DELETE FROM event_group WHERE group_id = ?
+    ", "
+        INSERT INTO event_group
+        SELECT event_id, :dest
+        FROM event_group
+        WHERE group_id = :src
+    ", [
+        'src' => $src->getId(),
+        'dest' => $dest->getId()
+    ]);
+}
 
+
+function clonePerms($deleteQuery, $insertQuery, $args)
+{
+    // clear old perms
+    Database::getInstance()->query($deleteQuery, [ $args['dest'] ]);
+
+    // insert new perms
+    Database::getInstance()->query($insertQuery, $args);
 }
