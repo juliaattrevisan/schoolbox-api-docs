@@ -1,29 +1,37 @@
 $charset "utf-8";
-//
+// =============================================================================
 // DEFAULT SCHOOLBOX SKIN
-//
+// =============================================================================
 
 //
 // LOAD DEPENDENCIES
 // 
+@import "../core/mixins.scss";
+@import "../core/variables.scss";
 
 //
-// VARIABLES CAN BE OVERRIDDEN HERE
+// VARIABLE OVERRIDES
 //
 
 // Dimensions
 $search-width: 					256px;
 $logo-width: 					172px;
 $logo-height: 					35px;
-$infopanel-bellsprite:			'/images/demo/bell.png';
+$banner-height:     			72px;
+$navigation-width:				200px;
+$navigation-padding:			16px;
+$infopanel-height:				$banner-height - 40;
+$infopanel-bellsprite:			'/images/core/icons/bell.png';
 
 // Generic colors
-$dark-blue:                     $primary-color; // Dark Schoolbox Blue
-$body-background: 				$smoke; // Body, but not the content area
-$content-background: 			transparent; // Used for forms
-$dark: 							$ghost; // Tigerstriping color
-$border-color: 					$smoke; // Bordering $dark
-$alternate-background: 			$white; // Sections such as admin
+$primary-color:					$primary-color;
+$secondary-color:				$secondary-color;
+$tertiary:						$tertiary;
+$body-background: 				$smoke; 		// Body, but not the content area
+$content-background: 			transparent; 	// Used for forms
+$dark: 							$ghost; 		// Tigerstriping color
+$border-color: 					$smoke; 		// Bordering $dark
+$alternate-background: 			$white; 		// Sections such as admin
 
 // Basic type
 $body-text: 					$black;
@@ -38,28 +46,32 @@ $tertiary-bg-color:				$tertiary;
 $submit-btn:                    $banner-background;
 $admin-nav:                     $link;
 
-
 // Main banner & Search
 $banner-background: 			$link;
-$banner-color:      			#FFFFFF;
+$banner-color:      			$white;
 $banner-links:      			$banner-color;
 $search-color:                  $banner-color;
 $banner-height:     			72px;
 
+// Top Navigation
+$tab-background:				transparent;
+$tab-color:						$black;
+$tab-hover-background:		    $tab-color;
+$tab-hover-color:				$link;
+
 // Components
-$component-heading: 			#000000;
+$component-heading: 			$black;
 $component-background: 			#E5EFF7;
 
 // Sidebar
 $sidebar-width:					200px;
 $sidebar-padding:				16px;
 $sidebar-background:  			transparent;
-$sidebar-color:  				#000000;
+$sidebar-color:  				$black;
 $sidebar-links:  				$sidebar-color;
 $sidebar-hover-background: 		$link;
-$sidebar-hover-color:  			#FFFFFF;
+$sidebar-hover-color:  			$white;
 $sidebar-sub-background:  		$body-background;
-
 
 // Flyout Menus and Messages
 $notify-color:					$negative-color;
@@ -73,14 +85,8 @@ $flyout-hover-background:		$navigation-hover-background;
 $flyout-pad-height:				2px;
 $flyout-highlight:				$dark;
 
-// Main "Tab" Navigation
-$tab-background:				transparent;
-$tab-color:						#FFFFFF;
-$tab-hover-background:		    $tab-color;
-$tab-hover-color:				$link;
-
 // Footer text
-$footer-color:					#797979;
+$footer-color:					$monsoon;
 $footer-links:					$footer-color;
 
 //
