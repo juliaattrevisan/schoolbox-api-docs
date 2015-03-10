@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-abstract class External_Edumate_Connection {
+class External_Edumate_Connection {
 
     /**
      * @var Group
@@ -85,10 +85,11 @@ abstract class External_Edumate_Connection {
     }
 
     /**
-     * Retrieve the database connector
+     * Retrieve the database connector. Dirty and hacky.
+     *
      * @return DB2
      */
-    protected function getDatabase() {
+    public function getDatabase() {
         return $this->database;
     }
 
