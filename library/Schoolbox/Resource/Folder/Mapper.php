@@ -225,6 +225,24 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
     }
 
     /**
+     * Pre-save callback: ensures that folders can't be their own parents
+     *
+     * @param Model $model
+     *
+     * @return bool
+     */
+    public function checkParentage($model)
+    {
+        // Ensure $model isn't its own parent
+        try {
+            $this->findParents($model);
+        } catch (\OverflowException $e) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * @param Model $model
      * @param Model $previous
      * @return bool
@@ -645,6 +663,12 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
             $stop_id = $stop_category->getId();
         }
 
+        // Keep a record of ancestry
+        $ancestry = array();
+        if ($category->getId()) {
+            $ancestry[$category->getId()] = true;
+        }
+
         // Get the parent of the first item in the stack, and add it to the top
         // of the stack.
         while ($count++ < 50) {
@@ -656,6 +680,14 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
             if (!$parent_id || (!empty($stop_id) && $stop_id == $parent_id)) {
                 break;
             }
+
+            // This category is its own parent somehow. That shouldn't happen.
+            if (array_key_exists($parent_id, $ancestry)) {
+                throw new \OverflowException(
+                    'Folder "'.$category->getId().'" is its own parent somehow'
+                );
+            }
+            $ancestry[$parent_id] = true;
             array_unshift($stack, $this->findById($parent_id));
         }
 
