@@ -156,17 +156,23 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
      * PeriodNumberSeq
      *
      * @param $campusId
+     * @param $now
      * @return array
      */
-    public function getPeriodNumber($campusId)
+    public function getPeriodNumber($campusId, $now = 0)
     {
         $campusMapper = new \Schoolbox\CampusMapper();
         $campus = $campusMapper->findById($campusId);
         $definition = $this->getTimetableDefinition($campus->getId());
 
+        if (!$now) {
+            $now = $_SERVER['REQUEST_TIME'];
+        }
+        else {
+            $now = new \Alaress_Date_Format($now, 'U');
+        }
+        
         for ($i = 0; $i < count($definition['start']); $i++) {
-            $now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
-
             if ($definition['start'][$i] > $now->getUsingFormat('H:i:s')) {
                 return array(
                     'PeriodNumber' => $definition['number'][$i-1],
