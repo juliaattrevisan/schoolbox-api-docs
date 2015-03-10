@@ -612,7 +612,7 @@ class ArticleMapper extends Mapper implements Searchable
         /* Find all the news relevant to a specific topic
          */
         if ($topic instanceof Topic) {
-            $allArticles = $this->findForTopic($topic->getId(), 9999);
+            $allArticles = $this->findForTopic($topic, 9999);
         } /* A combination of news related to you, specifically;
          * and roles within campuses; and your associated categories
          */
@@ -631,7 +631,7 @@ class ArticleMapper extends Mapper implements Searchable
             $allTopics   = $topicMapper->findAll();
 
             foreach ($allTopics as $currentTopic) {
-                $allArticles = $allArticles->merge($this->findForTopic($currentTopic->getId(), 9999));
+                $allArticles = $allArticles->merge($this->findForTopic($currentTopic, 9999));
             }
 
             /* Find all the news relevant to roles and campuses
@@ -707,14 +707,16 @@ class ArticleMapper extends Mapper implements Searchable
     }
 
     /**
-     * @param     $topicId
+     * Find all the news items relevant to $topic
+     *
+     * @param     Topic $topic
      * @param     $limit
      * @param int $offset
      * @param int $time
      *
      * @return Collection|News[]
      */
-    public function findForTopic($topicId, $limit, $offset = 0, $time = 0)
+    public function findForTopic(Topic $topic, $limit, $offset = 0, $time = 0)
     {
         $time = date('Y-m-d H:i:s', $time ? : time());
         $now  = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
@@ -745,7 +747,7 @@ class ArticleMapper extends Mapper implements Searchable
         $stmt->execute(
             array(
                 'time'    => $time,
-                'topicId' => $topicId,
+                'topicId' => $topic->getId(),
                 'now'     => $now->getDatabaseDate(),
             )
         );
