@@ -8,7 +8,30 @@
  */
 
 interface External_ClassInterface {
-	public function getStudents ($classCode);
 
-	public function getTeacherName ($classCode);
+    /**
+     * Get a list of students in a particular $classCode
+     *
+     * lastname,
+     * firstname,
+     * yearlevel,
+     * StudentHouseDescription as house,
+     * StudentMedicalAlert,
+     * StudentSpecialNeedsFlag,
+     * synergy_id,
+     * ClassCampus
+     *
+     * @param $classCode
+     * @return array
+     */
+    public function getStudents($classCode);
+
+    /**
+     * Returns a list of *THE IDs OF* teachers that are associated
+     * with a class (method is misnamed)
+     *
+     * @param $classCode
+     * @return array
+     */
+    public function getTeacherName($classCode);
 }

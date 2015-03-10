@@ -82,6 +82,34 @@ class Healthcheck
         $this->MssqlConnection();
     }
 
+    /**
+     * Check the Denbigh2 API method access and see if anything snaps
+     */
+    private function Denbigh2CheckConnection()
+    {
+        echo "\nDenbigh2 Connnection Check\n";
+
+        $list[] = 'Enrolments';
+        $list[] = 'Students';
+        $list[] = 'Classes';
+        $list[] = 'PeriodTimes';
+        $list[] = 'StudentTimetable';
+        $list[] = 'TimetableLessons';
+
+        foreach($list as $currentApi) {
+            $api = new External_Denbigh2_Api($currentApi, array());
+
+            if (!$api->hasErrors()) {
+                echo "OK\n";
+            } else {
+                $error = $api->getErrors();
+                $firstError = $error[0];
+
+                echo "\n    Failed - {$firstError}\n";
+            }
+        }
+    }
+
     private function TassCheckTables()
     {
         echo "\nTass Permission Check - Tables\n";
