@@ -166,12 +166,11 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
         $definition = $this->getTimetableDefinition($campus->getId());
 
         if (!$now) {
-            $now = $_SERVER['REQUEST_TIME'];
-        }
-        else {
+            $now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+        } else {
             $now = new \Alaress_Date_Format($now, 'U');
         }
-        
+
         for ($i = 0; $i < count($definition['start']); $i++) {
             if ($definition['start'][$i] > $now->getUsingFormat('H:i:s')) {
                 return array(
