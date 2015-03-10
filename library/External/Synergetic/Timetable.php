@@ -418,8 +418,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber']
                     && $timetablePeriod['periodSequence'] != 2
+                    && !isset($timetable[$x]['class'][$desc['ClassCode']])
                 ) {
-                    $timetable[$x]['class'][] = array(
+                    $timetable[$x]['class'][$desc['ClassCode']] = array(
                         'description' => $desc['Description'],
                         'code'        => $desc['ClassCode'],
                         'campus'      => $desc['ClassCampus'],
@@ -546,8 +547,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber']
                     && $timetablePeriod['periodSequence'] != 2
+                    && !isset($timetable[$x]['day'][$desc['DayNumber']][$desc['ClassCode']])
                 ) {
-                    $timetable[$x]['day'][$desc['DayNumber']][] = array(
+                    $timetable[$x]['day'][$desc['DayNumber']][$desc['ClassCode']] = array(
                         'description'    => $desc['Description'],
                         'code'           => $desc['ClassCode'],
                         'campus'         => $desc['ClassCampus'],

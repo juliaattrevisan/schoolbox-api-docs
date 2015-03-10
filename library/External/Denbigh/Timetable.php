@@ -176,8 +176,9 @@ class External_Denbigh_Timetable implements External_TimetableInterface
                 $period = $lesson['period'];
                 $day = $lesson['day'];
 
-                if (isset($periodList[$period]['day'][$day])) {
-                    $periodList[$period]['day'][$day][] = array(
+                if (isset($periodList[$period]['day'][$day])
+                    && !isset($periodList[$period]['day'][$day][$lesson['ClassCode']])) {
+                    $periodList[$period]['day'][$day][$lesson['ClassCode']] = array(
                         'description' => $lesson['subjectName'],
                         'code'        => $lesson['classCode'],
                         'room'        => $lesson['room']
@@ -251,9 +252,12 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             foreach ($lessonList as $lesson) {
                 $period = $lesson['period'];
 
-                if (isset($periodList[$period])) {
-                    $periodList[$period]['class'][] = array_merge(
-                        $periodList[$period], array(
+                if (isset($periodList[$period])
+                    && !isset($periodList[$period]['class'][$lesson['ClassCode']])
+                ) {
+                    $periodList[$period]['class'][$lesson['ClassCode']] = array_merge(
+                        $periodList[$period],
+                        array(
                             'description' => $lesson['subjectName'],
                             'code'        => $lesson['classCode'],
                             'room'        => $lesson['room']
