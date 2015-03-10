@@ -51,15 +51,16 @@ class Controller extends Base {
      */
     public function register($provider)
     {
-        $data     = (array)$this->getRequest()->post;
-        $response = $this->getResponse()->content;
+        $data      = (array)$this->getRequest()->post;
+        $response  = $this->getResponse()->content;
+        $providers = array(Registry::PROVIDER_APPLE, Registry::PROVIDER_GOOGLE);
 
         // check the provider is valid
-        if (!in_array($provider, array(Registry::PROVIDER_APPLE, Registry::PROVIDER_GOOGLE))) {
+        if (!in_array($provider, $providers)) {
             $this->getResponse()->status->setCode(400);
             $response->set(array(
                 'format' => 'json',
-                'data'   => "Invalid provider: '$provider'. Accepted providers are: ".implode(', ', array(Registry::PROVIDER_APPLE, Registry::PROVIDER_GOOGLE))
+                'data'   => "Invalid provider: '$provider'. Accepted providers are: " . implode(', ', $providers)
             ));
             return;
         }
@@ -67,7 +68,7 @@ class Controller extends Base {
 
         try {
             // require these to be present in POSTDATA
-            $this->assertArrayKeys($data, array('token', 'username', 'password'));
+            $this->assertArrayKeys($data, array('username', 'password'));
 
         } catch (\UnderflowException $e) {
             $this->getResponse()->status->setCode(400);
@@ -92,24 +93,27 @@ class Controller extends Base {
             return;
         }
 
-        $now = \Alaress_Date_Format::now();
+        // token may be absent or blank, in which case we don't store anything in the registry
+        if (!empty($data['token'])) {
+            $now = \Alaress_Date_Format::now();
 
-        try {
-            $registry = $this->registryMapper->findById($_SESSION['id'], $data['token'], $provider);
-            $registry->setTouchedAt($now);
+            try {
+                $registry = $this->registryMapper->findById($_SESSION['id'], $data['token'], $provider);
+                $registry->setTouchedAt($now);
 
-        } catch (MapperException $e) {
-            /** @var Registry $registry */
-            $registry = $this->registryMapper->createModel();
-            $registry
-                ->setUser($_SESSION['user'])
-                ->setToken($data['token'])
-                ->setProvider($provider)
-                ->setCreatedAt($now)
-                ->setTouchedAt($now);
+            } catch (MapperException $e) {
+                /** @var Registry $registry */
+                $registry = $this->registryMapper->createModel();
+                $registry
+                    ->setUser($_SESSION['user'])
+                    ->setToken($data['token'])
+                    ->setProvider($provider)
+                    ->setCreatedAt($now)
+                    ->setTouchedAt($now);
+            }
+
+            $this->registryMapper->save($registry);
         }
-
-        $this->registryMapper->save($registry);
 
         $response->set(array(
             'format' => 'json',
