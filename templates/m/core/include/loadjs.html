@@ -379,9 +379,12 @@ $("#page").on(clickEvent, '#wipeCache', function(){
 });
 
 // register the logout listener
-$("#page,#menu").on(clickEvent, '#logout', function(){
+$("#page,#menu").on(clickEvent, '#logout', function(e){
+    e.preventDefault();
+    e.stopImmediatePropagation();
     lStorage.clear();
     sStorage.clear();
+    window.location.href = this.href;
 });
 
 // register the 'send report' listener
