@@ -89,13 +89,13 @@ switch ($_POST['action']) {
         if ($startDate->getUnixTimestamp() > $endDate->getUnixTimestamp()) {
             error(145);
         }
-        /* Ensure at least one group is selected
+        /* We do this checking later
          */
-        if ($_POST['level'] == 2) {
-            if (!(is_array($_POST['group']) && count($_POST['group']))) {
-                error(2);
-            }
-        }
+//        if ($_POST['level'] == 2) {
+//            if (!(is_array($_POST['group']) && count($_POST['group']))) {
+//                error(2);
+//            }
+//        }
         /* NO RETREAT
          * NO SURRENDER
          */
@@ -134,6 +134,20 @@ switch ($_POST['action']) {
         if ($event->isCampusLevel()) {
             if (!is_array($_POST['campus']) || !count($_POST['campus'])) {
                 error(158);
+            }
+        }
+
+        // Error out if user don't have write access to requested groups
+        if ($event->isGroupLevel()) {
+            if (!is_array($_POST['group']) || !count($_POST['group'])) {
+                error(2);
+                exit;
+            }
+            foreach ($_POST['group'] as $group) {
+                if ($groupHandler->getPermission($group, $owner->getId()) < WRITE_ACCESS) {
+                    error(34);
+                    exit;
+                }
             }
         }
 
