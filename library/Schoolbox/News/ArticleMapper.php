@@ -738,7 +738,7 @@ class ArticleMapper extends Mapper implements Searchable
 				AND `n`.`item_datetime_published` < :time
 				AND `n`.`item_topic_id` = :topicId
 				AND `n`.`item_datetime_expires` > :now
-			ORDER BY `n`.`item_datetime_published` DESC
+			ORDER BY `n`.`item_datetime_posted` DESC
 			LIMIT $offset, $limit
 		";
 
