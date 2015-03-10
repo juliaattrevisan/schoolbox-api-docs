@@ -49,6 +49,10 @@ class Synchronise_Synergetic_Arden_Strategy_Staff extends Synchronise_Base_Strat
             ->addHydrator(new Synchronise_Synergetic_Arden_Hydrator_Group_Staff())
             ->addHydrator(new Synchronise_Synergetic_Arden_Hydrator_Campus_Staff())
 
+            /* Beecroft staff should have no alt_email
+             */
+            ->addHydrator(new Synchronise_Synergetic_Arden_Hydrator_NoBeecroftEmail())
+
             /* These always have to appear at the end
              */
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
