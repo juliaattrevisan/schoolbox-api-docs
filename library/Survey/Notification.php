@@ -1,4 +1,6 @@
 <?php
+use Schoolbox\UserMapper;
+
 /**
  * Survey_Notification
  *
@@ -9,12 +11,17 @@
  */
 class Survey_Notification
 {
+    /** @var string */
     protected $emailTemplateFile = '../survey/email/authorNotification.html';
+
+    /** @var Mailer */
     protected $email = null;
 
-    private $surveyHandler = null;
+    /** @var array */
     private $survey = array();
-    private $userHandler = null;
+
+    /** @var UserMapper */
+    private $userMapper = null;
 
     /**
      * Constructor
@@ -23,9 +30,8 @@ class Survey_Notification
      */
     public function __construct($survey)
     {
-        $this->setSurveyHandler(new Survey_Main());
         $this->setSurvey($survey);
-        $this->setUserHandler(new User());
+        $this->setUserMapper(UserMapper::getInstance());
 
         $this->setup();
     }
@@ -37,10 +43,10 @@ class Survey_Notification
     {
         $survey = $this->getSurvey();
 
-        $author = $this->getUserHandler()->getByID($this->getAuthor());
-        $subject = "A response for {$this->getSurveyName()} was submitted";
+        $author = $this->getUserMapper()->findById($this->getAuthorId());
+        $subject = "A response for {$this->getSurveyTitle()} was submitted";
 
-        $email = new Mailer($this->getEmailTemplateFile(), $subject, $author['alt_email']);
+        $email = new Mailer($this->getEmailTemplateFile(), $subject, $author->getEmail());
 
         $email->setVar(array(
             'SURVEY_SURVEY_ID' => $survey['assess_id'],
@@ -66,7 +72,7 @@ class Survey_Notification
      *
      * @return mixed
      */
-    private function getAuthor()
+    private function getAuthorId()
     {
         return $this->survey['user_id'];
     }
@@ -76,7 +82,7 @@ class Survey_Notification
      *
      * @return mixed
      */
-    private function getSurveyName()
+    private function getSurveyTitle()
     {
         return $this->survey['title'];
     }
@@ -94,7 +100,7 @@ class Survey_Notification
     /**
      * Set email
      *
-     * @param $email
+     * @param Mailer $email
      */
     protected function setEmail($email)
     {
@@ -104,7 +110,7 @@ class Survey_Notification
     /**
      * Get email
      *
-     * @return null
+     * @return Mailer
      */
     protected function getEmail()
     {
@@ -114,7 +120,7 @@ class Survey_Notification
     /**
      * Set survey
      *
-     * @param $survey
+     * @param array $survey
      */
     private function setSurvey($survey)
     {
@@ -132,42 +138,22 @@ class Survey_Notification
     }
 
     /**
-     * Set survey handler
-     *
-     * @param $surveyHandler
-     */
-    private function setSurveyHandler($surveyHandler)
-    {
-        $this->surveyHandler = $surveyHandler;
-    }
-
-    /**
-     * Get survey handler
-     *
-     * @return null
-     */
-    private function getSurveyHandler()
-    {
-        return $this->surveyHandler;
-    }
-
-    /**
      * Set user handler
      *
-     * @param $userHandler
+     * @param UserMapper $userMapper
      */
-    private function setUserHandler($userHandler)
+    private function setUserMapper($userMapper)
     {
-        $this->userHandler = $userHandler;
+        $this->userMapper = $userMapper;
     }
 
     /**
      * Get user handler
      *
-     * @return null
+     * @return UserMapper
      */
-    private function getUserHandler()
+    private function getUserMapper()
     {
-        return $this->userHandler;
+        return $this->userMapper;
     }
 }
