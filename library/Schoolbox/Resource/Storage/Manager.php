@@ -11,6 +11,8 @@ namespace Schoolbox\Resource\Storage;
 
 
 use Alaress_Byte_Format;
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
 use Schoolbox\File;
 
@@ -103,9 +105,41 @@ class Manager
             // copy failed, let's get out of here
             throw new File\Exception("Failed to copy uploaded file to storage");
         }
+
+        $this->reverseSymlink($storage);
+
         return true;
     }
 
+
+    /**
+     * Create symlink for backward-compatibility.
+     * TODO once nothing points to the old system, remove this method completely
+     *
+     * @deprecated
+     * @param Model $storage
+     * @throws File\Exception
+     */
+    private function reverseSymlink(Model $storage)
+    {
+        $stmt = \Database::getInstance()->prepare("SELECT storage_id FROM `storage` WHERE `hash` = ?");
+        $stmt->execute([ $storage->getHash() ]);
+
+        $internalId = $stmt->fetchColumn();
+
+        /** @var Filesystem $fsys */
+        $fsys = $this->mgr->getFilesystem(self::FS_STORAGE);
+
+        /** @var Local $adpt */
+        $adpt = $fsys->getAdapter();
+
+        $path = $adpt->getPathPrefix() . $storage->getPath();
+        $link = $adpt->getPathPrefix() . $internalId . ".dat";
+
+        if (!symlink($path, $link)) {
+            throw new File\Exception("Could not symlink");
+        }
+    }
 
     /**
      * @param string $tmpFilePath
