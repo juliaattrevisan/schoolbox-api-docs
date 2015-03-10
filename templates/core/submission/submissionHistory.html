@@ -58,12 +58,14 @@
 		<span class="owner"> - {BOX_OWNER}</span>
 		<!-- END show_owner -->
 	</h1>
-    <p class="sub-heading"><span class="gradient-{BOX_DUEDATE_GRADIENT}"><b>Due {BOX_DUEDATE}</b></span> on <b>{BOX_DUETIME}</b></p>
 	<div class="two-thirds clearfix">
 
         <div>
-            <h2>Description</h2>
-            <div class="wysiwyg">{BOX_DESCRIPTION}</div>
+            <h2>Overview</h2>
+            <div class="wysiwyg">
+                <p><span class="gradient-{BOX_DUEDATE_GRADIENT}"><b>Due {BOX_DUEDATE}</b></span> on <b>{BOX_DUETIME}</b></p>
+                {BOX_DESCRIPTION}
+            </div>
             <ul class="file-list">
 				<!-- BEGIN legacy_download -->
 				<li>
@@ -71,7 +73,7 @@
 						<img width="32" height="32" src="/images/mime/60x60/{FILE_THUMB}"/>
 						<span class="name">{FILE_NAME}</span> ({FILE_SIZE})
 						<span class="time">{FILE_DATE}</span>
-						<span class="icon"></span>
+						<span class="icon"></span
 					</a>
 				</li>
 				<!-- END legacy_download -->
