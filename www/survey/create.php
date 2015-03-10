@@ -79,7 +79,9 @@ else {
 
     $this->setVar(array(
         'ACTION' => 'create',
-        'ASSESS_ACTION' => 'Create Survey',
+        'ASSESS_ACTION' => 'Create',
+        'ASSESS_KIND_LC'   => 'survey',
+        'ASSESS_KIND'      => 'Survey',
         'ASSESS_ASSESS_ID' => '',
         'ASSESS_CATEGORY_ID' => $this->arg[0],
         'ASSESS_TITLE' => '',

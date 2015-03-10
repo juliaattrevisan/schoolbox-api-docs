@@ -153,23 +153,19 @@ else {
 
     /* Show this Survey' contents
       */
-    $this->setFile('assessContentsFragment', 'survey/contents.html');
-    $this->setBlock('assessContentsFragment', 'section', 'section_block');
-    $this->setBlock('section', 'question', 'question_block');
-
-    $this->parse('allQuestions_block', 'assessContentsFragment', true);
+    $this->setFile('assessContentsFragment', 'assess/contents.html');
 
     /* Options for importing into the Question Bank
       */
     $this->setBlock(TEMPLATE_content, 'question_category', 'question_category_block');
 
     $assessHandler = new Survey_Main();
-    $assessHandler->renderAssessContents($section['assess_id'], $this);
-
     $assess = $assessHandler->getByID($section['assess_id']);
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $section['assess_id'],
+        'ASSESS_KIND_LC'   => 'survey',
+        'ASSESS_KIND'      => 'Survey',
         'ASSESS_CATEGORY_ID' => $assess['category_id'],
         'SECTION_ID' => $question['section_id'],
         'SEQUENCE' => $question['sequence'],
@@ -178,6 +174,9 @@ else {
         'MARKS' => $question['marks'],
         'DISABLED_SELECTED' => '',
     ));
+
+    $assessHandler->renderAssessContents($section['assess_id'], $this);
+    $this->parse('allQuestions_block', 'assessContentsFragment', true);
 
     /* Derive and render a category list
       */

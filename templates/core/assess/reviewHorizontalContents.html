@@ -2,7 +2,13 @@
 <div class="box">
 	<h2>{SECTION_TITLE}</h2>
     <!-- BEGIN question -->
-        <h3><a href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{QUESTION_QUESTION_ID}">Q{QUESTION_SEQUENCE}) {QUESTION_MARKS} marks</a>
+        <h3>
+          <a href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{QUESTION_QUESTION_ID}">
+            Q{QUESTION_SEQUENCE})
+            <!-- BEGIN has_mark -->
+            {QUESTION_MARKS} marks
+            <!-- END has_mark -->
+          </a>
             <span class="actions">
             <a class="btn go-to" href="/assess/reviewHorizontal/{ASSESS_ASSESS_ID}/{QUESTION_QUESTION_ID}"><span></span>Review question</a>
         </span>

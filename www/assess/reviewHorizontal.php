@@ -54,8 +54,6 @@ if (!isset($this->arg[1])) {
 	/* Show this Assess' contents
  	 */
 	$this->setFile('assessContentsFragment', 'assess/reviewHorizontalContents.html');
-	$this->setBlock('assessContentsFragment', 'section', 'section_block');
-	$this->setBlock('section', 'question', 'question_block');
 
 	$assessHandler = new Assess_Main();
 	$assessHandler->renderAssessContents($assess['assess_id'], $this);

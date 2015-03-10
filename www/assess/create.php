@@ -173,7 +173,9 @@ else {
 
     $this->setVar(array(
         'ACTION'             => 'create',
-        'ASSESS_ACTION'      => 'Create Quiz',
+        'ASSESS_ACTION'      => 'Create',
+        'ASSESS_KIND_LC'     => 'assess',
+        'ASSESS_KIND'        => 'Quiz',
         'ASSESS_IS_TASK'     => $is_task ? 1 : 0,
         'ASSESS_ASSESS_ID'   => '',
         'ASSESS_CATEGORY_ID' => $category_id,

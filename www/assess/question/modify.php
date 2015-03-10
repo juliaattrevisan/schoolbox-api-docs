@@ -154,22 +154,18 @@ if (!empty($_POST)) {
     /* Show this Assess' contents
     */
     $this->setFile('assessContentsFragment', 'assess/contents.html');
-    $this->setBlock('assessContentsFragment', 'section', 'section_block');
-    $this->setBlock('section', 'question', 'question_block');
 
     $this->setVar(array(
         'ASSESS_CATEGORY_ID' => $assess['category_id'],
     ));
 
-    $this->parse('allQuestions_block', 'assessContentsFragment', true);
-
     $assessHandler = new Assess_Main();
-    $assessHandler->renderAssessContents($section['assess_id'], $this);
-
     $assess = $assessHandler->getByID($section['assess_id']);
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $section['assess_id'],
+        'ASSESS_KIND_LC'   => 'assess',
+        'ASSESS_KIND'      => 'Quiz',
         'ASSESS_CATEGORY_ID' => $assess['category_id'],
         'SECTION_ID' => $question['section_id'],
         'SEQUENCE' => $question['sequence'],
@@ -178,6 +174,9 @@ if (!empty($_POST)) {
         'MARKS' => $question['marks'],
         'DISABLED_SELECTED' => '',
     ));
+
+    $assessHandler->renderAssessContents($section['assess_id'], $this);
+    $this->parse('allQuestions_block', 'assessContentsFragment', true);
 
     /* Derive and render a category list
       */

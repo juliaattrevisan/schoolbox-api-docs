@@ -121,6 +121,8 @@ if (!empty($_POST)) {
     $this->setVar(
         array(
             'ASSESS_ASSESS_ID' => $section['assess_id'],
+            'ASSESS_KIND_LC'   => 'survey',
+            'ASSESS_KIND'      => 'Survey',
             'ASSESS_CATEGORY_ID' => $assess['category_id'],
             'SECTION_ID' => $this->arg[0],
             'CURRENT_SECTION_TITLE' => Scrub::text($section['title']),
@@ -239,12 +241,10 @@ if (!empty($_POST)) {
 
     /* Show this Survey' contents
      */
-    $this->setFile('surveyContentsFragment', 'survey/contents.html');
-    $this->setBlock('surveyContentsFragment', 'section', 'section_block');
-    $this->setBlock('section', 'question', 'question_block');
+    $this->setFile('assessContentsFragment', 'assess/contents.html');
 
     $survey = new Survey_Main();
     $survey->renderAssessContents($section['assess_id'], $this);
 
-    $this->parse('allQuestions_block', 'surveyContentsFragment', true);
+    $this->parse('allQuestions_block', 'assessContentsFragment', true);
 }
