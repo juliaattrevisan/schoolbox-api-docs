@@ -716,12 +716,13 @@ class ArticleMapper extends Mapper implements Searchable
      */
     public function findForTopic($topicId, $limit, $offset = 0, $time = 0)
     {
-        $time   = date('Y-m-d H:i:s', $time ?: time());
+        $time = date('Y-m-d H:i:s', $time ? : time());
+        $now  = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+
         $limit  = (int)$limit;
         $offset = (int)$offset;
 
-        $stmt = $this->database->prepare(
-            "
+        $query = "
 			SELECT
 				{$this->getColumnString('n')},
 				{$this->getJoinColumnString('owner', 'u')},
@@ -734,15 +735,18 @@ class ArticleMapper extends Mapper implements Searchable
 				`n`.`item_deleted` = FALSE
 				AND `n`.`item_datetime_published` < :time
 				AND `n`.`item_topic_id` = :topicId
+				AND `n`.`item_datetime_expires` > :now
 			ORDER BY `n`.`item_datetime_published` DESC
 			LIMIT $offset, $limit
-		"
-        );
+		";
+
+        $stmt = $this->database->prepare($query);
 
         $stmt->execute(
             array(
                 'time'    => $time,
-                'topicId' => $topicId
+                'topicId' => $topicId,
+                'now'     => $now->getDatabaseDate(),
             )
         );
 
