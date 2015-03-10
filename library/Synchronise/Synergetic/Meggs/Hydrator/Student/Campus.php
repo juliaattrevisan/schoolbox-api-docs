@@ -34,6 +34,7 @@ class Synchronise_Synergetic_Meggs_Hydrator_Student_Campus implements Synchronis
                 $campus = self::CAMPUS_ELC;
                 break;
             case 'PREP':
+            case 0:
             case 1:
             case 2:
             case 3:
