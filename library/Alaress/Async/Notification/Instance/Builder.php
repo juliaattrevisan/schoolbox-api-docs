@@ -117,7 +117,8 @@ class Builder {
 	 * @return self
 	 */
 	public function setBody($body) {
-        $plain = new Html2Text($body);
+        // totally strip links
+        $plain = new Html2Text($body, false, array('do_links' => 'none'));
         return $this->putMeta('body', $plain->get_text());
 	}
 

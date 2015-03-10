@@ -314,6 +314,14 @@ class Bootstrap implements BootstrapInterface {
 						)
 					);
 
+					// Cut sentence filter
+					$twig->addFilter(
+						new Twig_SimpleFilter(
+							'cutSentence',
+							array('TextFormatter', 'cutSentence')
+						)
+					);
+
 					// Bytes to string filter
 					$twig->addFilter(
 						new Twig_SimpleFilter(

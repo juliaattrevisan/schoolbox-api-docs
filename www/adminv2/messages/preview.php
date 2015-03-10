@@ -157,7 +157,7 @@ switch ($this->arg[0]) {
                     'date'   => $article->getPostDate()->getLong(),
                     'thumb'  => $thumb
                 ))
-                ->setBody(TextFormatter::cutSentence(Scrub::html2text($article->getBody()), 300))
+                ->setBody($article->getBody())
                 ->setByline("{$article->getPostDate()->getDateOnly()} by {$article->getOwner()->formatName()} in {$article->getTopic()->getName()}")
                 ->setTimestamp($article->getPostDate()->getUnixTimestamp())
                 ->setNamespace(NSMapper::NS_NEWS)
