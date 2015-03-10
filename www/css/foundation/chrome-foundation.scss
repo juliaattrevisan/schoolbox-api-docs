@@ -8,11 +8,12 @@
 @import "utils/variables";
 
 // Settings
-@import "settings";
+
 
 #container.foundation {
   // Base
   @import "base/reset";
+  @import "settings";
   @import "base/typography";
   @import "base/compatibility";
 
