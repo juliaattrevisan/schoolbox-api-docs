@@ -1,6 +1,6 @@
 <?php
 use Schoolbox\Resource\Browser\NodeFactory;
-use Schoolbox\StorageMapper;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 /**
  * Asynchronous upload of a brownhole file.
@@ -121,7 +121,7 @@ function attemptStorage($fileData, $returnMeta)
         throw new Schoolbox\File\Exception("Filedata not readable");
     }
 
-    $storage = StorageMapper::getInstance()->upload($fileData['name'], $fileData['tmp_name'], $_SESSION['id']);
+    $storage = StorageMapper::getInstance()->accept($fileData['name'], $fileData['tmp_name']);
 
     $result = array(
         'success' => true,
@@ -132,9 +132,8 @@ function attemptStorage($fileData, $returnMeta)
 
     if ($returnMeta) {
         $result['meta'] = array(
-            'name' => $storage->getFilename(),
-            'type' => $storage->getMime(),
-            'size' => $storage->getFilesize()
+            'type' => $storage->getMimetype()->getMime(),
+            'size' => $storage->getSize()
         );
     }
 
