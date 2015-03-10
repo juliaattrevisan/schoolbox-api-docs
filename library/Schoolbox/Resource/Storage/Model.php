@@ -43,6 +43,9 @@ class Model extends File
     /** @var bool */
     protected $public;
 
+    /** @var string */
+    protected $extension;
+
 
     /**
      * @return string
@@ -183,5 +186,24 @@ class Model extends File
         return $this;
     }
 
+
+    /**
+     * @return string
+     */
+    public function getExtension()
+    {
+        return $this->extension;
+    }
+
+
+    /**
+     * @param string $extension
+     * @return self
+     */
+    public function setExtension($extension)
+    {
+        $this->extension = $extension;
+        return $this;
+    }
 
 }
