@@ -396,7 +396,15 @@ if (is_numeric($this->arg[0])) {
                     if (is_array($studentContactList)) {
                         $prevContact['StudentContactID'] = 1;
                         foreach ($studentContactList as $studentContact) {
-                            if ($prevContact['StudentContactID'] != $studentContact['StudentContactSpouseID'] && ($studentContact['StudentContactID'] == $_SESSION['sid'] || $studentContact['StudentContactSpouseID'] == $_SESSION['sid'] || $groupHandler->isStaff() || $_SESSION['su'])) {
+                            if ($prevContact['StudentContactID'] != $studentContact['StudentContactSpouseID']
+                                && (
+                                    $studentContact['StudentContactID'] == $_SESSION['sid']
+                                    || $_SESSION['user']->getId() == $user['uid']
+                                    || $studentContact['StudentContactSpouseID'] == $_SESSION['sid']
+                                    || $groupHandler->isStaff()
+                                    || $_SESSION['su']
+                                )
+                            ) {
                                 $j++;
 
                                 if ($studentContact['StudentContactDefaultEmail']) {
