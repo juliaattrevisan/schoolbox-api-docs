@@ -15,6 +15,7 @@ class Synchronise_Synergetic_Genazzano_Strategy_Student extends Synchronise_Base
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Student())
+            ->addHydrator(new Synchronise_Synergetic_Genazzano_Hydrator_Student_Email())
             ->addHydrator(new Synchronise_Synergetic_Genazzano_Hydrator_Campus())
             ->addHydrator(new Synchronise_Synergetic_Genazzano_Hydrator_House())
             ->addHydrator(new Synchronise_Synergetic_Genazzano_Hydrator_EnableEportfolio())
