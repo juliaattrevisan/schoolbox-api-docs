@@ -97,7 +97,7 @@ class Model extends File
     public function getSize()
     {
         // calculate size if not known
-        if ($this->size) {
+        if (!$this->size) {
             $this->setSize(parent::getSize());
         }
         return $this->size;
