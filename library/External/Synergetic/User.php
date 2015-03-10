@@ -316,7 +316,7 @@ class External_Synergetic_User implements External_UserInterface
         ";
 
 		$student = false;
-		foreach ($this->getDatabase()->getAll($query) as $row) {
+		foreach ($this->getDatabase()->getAll($query) ?: array() as $row) {
 			if (empty($student)) {
 				// fill in student record
 				$student = $row;
@@ -497,7 +497,7 @@ class External_Synergetic_User implements External_UserInterface
         $query .= "
             ORDER BY StudentSurname, StudentID, StudentContactType
         ";
-        $contactList = $this->getDatabase()->getAll($query);
+        $contactList = $this->getDatabase()->getAll($query) ?: array();
         foreach ($contactList as &$row) {
             if ($row['ValidAddressFlag'] == 0) {
                 $row['StudentContactAddress1']        = '';
@@ -619,7 +619,7 @@ class External_Synergetic_User implements External_UserInterface
                 AND (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContactType = 'SC3')
                 AND FileSemester = " . $_SESSION['FileSemester'] . "
                 AND FileYear = " . $_SESSION['FileYear'];
-        $contactList = $this->getDatabase()->getAll($query);
+        $contactList = $this->getDatabase()->getAll($query) ?: array();
         foreach ($contactList as &$row) {
             if ($row['ValidAddressFlag'] == 0) {
                 $row['StudentContactAddress1'] = '';
