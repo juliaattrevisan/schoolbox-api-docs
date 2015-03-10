@@ -724,15 +724,19 @@ class ArticleMapper extends Mapper implements Searchable
         $limit  = (int)$limit;
         $offset = (int)$offset;
 
+        $imageMapper  = $this->getJoinMapper('image');
+
         $query = "
 			SELECT
 				{$this->getColumnString('n')},
 				{$this->getJoinColumnString('owner', 'u')},
-				{$this->getJoinColumnString('topic', 't')}
+				{$this->getJoinColumnString('topic', 't')},
+				{$imageMapper->getColumnString('i')}
 			FROM
 				`{$this->getTable()}` `n`
 				LEFT JOIN {$this->getJoinSql('owner', 'n', 'u')}
 				LEFT JOIN {$this->getJoinSql('topic', 'n', 't')}
+				LEFT JOIN {$this->getJoinSql('image', 'n', 'i')}
 			WHERE
 				`n`.`item_deleted` = FALSE
 				AND `n`.`item_datetime_published` < :time
@@ -759,6 +763,13 @@ class ArticleMapper extends Mapper implements Searchable
             $news = $this->hydrate($r, 'n');
             $news->setOwner($this->hydrateJoin($r, 'owner', 'u'));
             $news->setTopic($this->hydrateJoin($r, 'topic', 't'));
+
+            $image   = $imageMapper->hydrate($r, 'i');
+
+            if (is_numeric($image->getId())) {
+                $news->setImage($image);
+            }
+
             $c->add($news);
         }
         return $c;

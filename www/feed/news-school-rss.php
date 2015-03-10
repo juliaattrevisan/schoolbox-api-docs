@@ -75,7 +75,7 @@ if (strlen($userKey)) {
                  */
                 $imageStr = '';
 
-                if (($currentNews instanceof Schoolbox\News\Article) && is_numeric($currentNews->getImage()->getId())) {
+                if ($currentNews->getImage()->getHash()) {
                     $imageStr = "<img src=\"" . $page->conType(
                         ) . $_SERVER['HTTP_HOST'] . "/storage/image.php?hash={$currentNews->getImage()->getHash(
                         )}&size=constrain200\">";
