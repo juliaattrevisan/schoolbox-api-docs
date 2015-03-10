@@ -668,7 +668,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         // Jam the timetable definition in.
         $campusTimetableList = array();
         $result              = array();
-        foreach ($this->database->getAll($query) as $row) {
+        foreach ($this->database->getAll($query) ?: array() as $row) {
             $timetableCode = $row['TimetableGroup'];
             if (!array_key_exists($timetableCode, $campusTimetableList)) {
                 try {
