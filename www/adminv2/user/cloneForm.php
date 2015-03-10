@@ -83,6 +83,65 @@ function cloneSideNav(Role $src, Role $dest)
  */
 function cloneDashboard(Role $src, Role $dest)
 {
+    // most of the select query stays the same
+    $queryString = "
+        FROM component_instance ci
+        LEFT JOIN component_config_instance cci ON cci.component_instance_id = ci.id
+        WHERE module = 'dashboard'
+        AND identifier = ?
+    ";
+
+    // delete old dashboard
+    Database::getInstance()->query("DELETE ci, cci $queryString", [ $dest->getId() ]);
+
+    // replicate target dashboard
+
+    // statement for duplicating a given instance
+    $insertInstStmt = Database::getInstance()->prepare("
+        INSERT INTO component_instance
+        SELECT null, component_definition_id, module, :dest, position, sequence
+        FROM component_instance
+        WHERE id = :inst_id
+    ");
+
+    // statement for inserting new config for the given instance
+    $insertConfStmt = Database::getInstance()->prepare("
+        INSERT INTO component_config_instance
+          (component_config_definition_id, component_instance_id, value)
+        VALUES
+          (:ccd, :ci, :val)
+    ");
+
+    // collect all the instances we're going to copy
+    $stmt = Database::getInstance()->query("
+        SELECT ci.id inst_id, cci.`component_config_definition_id` defn_id, `value`
+        $queryString
+        ORDER BY component_instance_id ASC
+    ", [ $src->getId() ]);
+
+    while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $instId = $r['inst_id'];
+        $defnId = $r['defn_id'];
+        $value  = $r['value'];
+
+        // insert the new instance
+        $insertInstStmt->execute([
+            'dest'    => $dest->getId(),
+            'inst_id' => $instId
+        ]);
+
+        // retrieve the new instanceId we just created
+        $newInstId = Database::getInstance()->lastInsertId();
+
+        // if there was a config for the instance, copy that across
+        if ($value) {
+            $insertConfStmt->execute([
+                'ccd' => $defnId,
+                'ci'  => $newInstId,
+                'val' => $value
+            ]);
+        }
+    }
 
 }
 
