@@ -76,6 +76,15 @@ class Model implements ISoftDeletable, \JsonSerializable
     protected $backgroundImage;
 
     /**
+     * Is the entire image contained within the tile (background-size: contain)?
+     *
+     * If not, the image will expand to fit the tile (background-size: cover).
+     *
+     * @var bool
+     */
+    protected $backgroundImageContained;
+
+    /**
      * @var int
      */
     protected $order;
@@ -174,6 +183,25 @@ class Model implements ISoftDeletable, \JsonSerializable
     public function getBackgroundImage()
     {
         return $this->backgroundImage;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getBackgroundImageContained()
+    {
+        return $this->backgroundImageContained;
+    }
+
+    /**
+     * @param  boolean $backgroundImageContained
+     *
+     * @return $this
+     */
+    public function setBackgroundImageContained($backgroundImageContained)
+    {
+        $this->backgroundImageContained = $backgroundImageContained;
+        return $this;
     }
 
     /**

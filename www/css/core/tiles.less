@@ -25,6 +25,9 @@ ul.tileList {
     background-size: cover;
     background-position: center;
     transition: background-color 0.1s;
+    &.contained {
+      background-size: contain;
+    }
     &.marked-for-delete {
       // Fade out tiles marked for delete
       filter: grayscale(1);

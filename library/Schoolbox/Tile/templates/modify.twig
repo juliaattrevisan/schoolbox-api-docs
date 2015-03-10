@@ -160,6 +160,21 @@
                     <dd class="background-upload">
                         {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
                     </dd>
+                    <dt>Image Size</dt>
+                    <dd class="title-position">
+                        <input type="radio"
+                               id="background_image_contained_0"
+                               name="background_image_contained"
+                               value="0"
+                               {% if not item.backgroundImageContained %}checked{% endif %} />
+                        <label for="background_image_contained_0">Stretch to cover entire tile</label>
+                        <input type="radio"
+                               id="background_image_contained_1"
+                               name="background_image_contained"
+                               value="1"
+                               {% if item.backgroundImageContained %}checked{% endif %} />
+                        <label for="background_image_contained_1">Shrink to fit within tile</label>
+                    </dd>
                 </dl>
             </td>
         </tr>
