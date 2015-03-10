@@ -25,7 +25,9 @@ if (isset($_GET['s']) && is_numeric($_GET['s'])) {
         $selectedDate = '';
     }
 
-    $this->localRedir("/calendar/full/$selectedDate");
+    // If a series ID was passed, assume this is a notification,
+    // and to therefore redirect to day view
+    $this->localRedir("/calendar/full/$selectedDate#day");
     exit;
 }
 
