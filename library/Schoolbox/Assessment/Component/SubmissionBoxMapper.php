@@ -724,7 +724,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 			FROM {$this->getTable()} sb
 			LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
 			WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
-			AND sb.date > NOW()
+			AND sb.late_date > NOW()
 			AND sb.deleted IS FALSE
 			AND sb.task_id IS NULL
 			$having
