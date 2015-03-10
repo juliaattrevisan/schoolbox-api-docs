@@ -1594,7 +1594,7 @@ abstract class Mapper implements Serializable
 					"
                     );
                     // should dehydrate to an array
-                    $propertyValue = $this->getModelProperty($model, $map['property']);
+                    $propertyValue = (array)$this->getModelProperty($model, $map['property']);
                     // iterate the values given and insert into join table
                     foreach ($propertyValue as $otherKey) {
                         $success = $insertRelationStatement->execute(
