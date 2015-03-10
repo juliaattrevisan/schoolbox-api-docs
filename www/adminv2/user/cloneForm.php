@@ -74,17 +74,7 @@ function cloneRole(Role $src, Role $dest)
  */
 function cloneSideNav(Role $src, Role $dest)
 {
-    clonePerms("
-        DELETE FROM sideMenuGroup WHERE gid = ?
-    ", "
-        INSERT INTO sideMenuGroup
-        SELECT id, :dest
-        FROM sideMenuGroup
-        WHERE gid = :src
-    ", [
-        'src' => $src->getId(),
-        'dest' => $dest->getId()
-    ]);
+    permClone($src, $dest, 'sideMenuGroup', [ 'id', ':dest' ]);
 }
 
 /**
@@ -102,17 +92,7 @@ function cloneDashboard(Role $src, Role $dest)
  */
 function cloneCategoryPermissions(Role $src, Role $dest)
 {
-    clonePerms("
-        DELETE FROM perms WHERE gid = ?
-    ", "
-        INSERT INTO perms
-        SELECT cid, :dest, `type`
-        FROM perms
-        WHERE gid = :src
-    ", [
-        'src' => $src->getId(),
-        'dest' => $dest->getId()
-    ]);
+    permClone($src, $dest, 'perms', [ 'cid', ':dest', '`type`' ]);
 }
 
 /**
@@ -121,17 +101,7 @@ function cloneCategoryPermissions(Role $src, Role $dest)
  */
 function cloneSchoolNewsPermissions(Role $src, Role $dest)
 {
-    clonePerms("
-        DELETE FROM newsGroup WHERE gid = ?
-    ", "
-        INSERT INTO newsGroup
-        SELECT id, :dest
-        FROM newsGroup
-        WHERE gid = :src
-    ", [
-        'src' => $src->getId(),
-        'dest' => $dest->getId()
-    ]);
+    permClone($src, $dest, 'newsGroup', [ 'id', ':dest' ]);
 }
 
 /**
@@ -140,20 +110,38 @@ function cloneSchoolNewsPermissions(Role $src, Role $dest)
  */
 function cloneSchoolCalendarPermissions(Role $src, Role $dest)
 {
+    permClone($src, $dest, 'event_group', [ 'event_id', ':dest' ], 'group_id');
+}
+
+/**
+ * @param Role   $src
+ * @param Role   $dest
+ * @param string $table
+ * @param array  $select
+ * @param string $field
+ */
+function permClone(Role $src, Role $dest, $table, array $select, $field = 'gid')
+{
+    $selects = implode(', ', $select);
+
     clonePerms("
-        DELETE FROM event_group WHERE group_id = ?
+        DELETE FROM `$table` WHERE `$field` = ?
     ", "
-        INSERT INTO event_group
-        SELECT event_id, :dest
-        FROM event_group
-        WHERE group_id = :src
+        INSERT INTO `$table`
+        SELECT $selects
+        FROM `$table`
+        WHERE `$field` = :src
     ", [
-        'src' => $src->getId(),
+        'src'  => $src->getId(),
         'dest' => $dest->getId()
     ]);
 }
 
-
+/**
+ * @param string $deleteQuery
+ * @param string $insertQuery
+ * @param array $args
+ */
 function clonePerms($deleteQuery, $insertQuery, $args)
 {
     // clear old perms
