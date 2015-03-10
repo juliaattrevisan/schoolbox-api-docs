@@ -94,7 +94,7 @@ class Controller extends Base {
         }
 
         // token may be absent or blank, in which case we don't store anything in the registry
-        if (empty($data['token'])) {
+        if (!empty($data['token'])) {
             $now = \Alaress_Date_Format::now();
 
             try {
