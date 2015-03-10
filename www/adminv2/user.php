@@ -1,5 +1,11 @@
 <?php
 
+use Schoolbox\Collection;
+use Schoolbox\Role;
+use Schoolbox\RoleMapper;
+
+/** @var SitePage $this */
+
 $groupHandler = new Group();
 
 if (!$groupHandler->isSuperuser()) {
@@ -33,4 +39,37 @@ if(is_array($superuserList)) {
         $this->parse('superusers_block','superusers', true);
     }
 }
-?>
+
+// cloner code
+$this->setBlock(TEMPLATE_content, 'select_clone', 'select_clone_block');
+$this->setBlock('select_clone', 'select_clone_opt', 'select_clone_opt_block');
+$this->setBlock('select_clone', 'select_new', 'select_new_block');
+$this->setBlock('select_clone', 'new_role', 'new_role_block');
+
+/** @var Collection|Role[] $roles */
+$roles = RoleMapper::getInstance()->findAll();
+
+$iterate = array('src' => 'Source', 'dest' => 'Destination');
+
+foreach ($iterate as $key => $label) {
+    $this->setVar(array(
+        'select_clone_opt_block' => '',
+        'CLONE_LABEL'            => $label,
+        'CLONE_KEY'              => $key
+    ));
+
+    if ($key == 'src') {
+        $this->setVar('select_new_block', '');
+        $this->setVar('new_role_block', '');
+    } else {
+        $this->parse('select_new_block', 'select_new');
+        $this->parse('new_role_block', 'new_role');
+    }
+
+    $this->dropDown('select_clone_opt', $roles, array(), TEMPLATE_content, array(
+        'id'   => 'CLONE_OPT_VALUE',
+        'name' => 'CLONE_OPT_NAME'
+    ));
+
+    $this->parse('select_clone_block', 'select_clone', true);
+}
