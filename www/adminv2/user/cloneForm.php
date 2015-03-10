@@ -116,13 +116,20 @@ function cloneDashboard(Role $src, Role $dest)
     $stmt = Database::getInstance()->query("
         SELECT ci.id inst_id, cci.`component_config_definition_id` defn_id, `value`
         $queryString
-        ORDER BY component_instance_id ASC
+        ORDER BY inst_id ASC
     ", [ $src->getId() ]);
 
+    // index by inst_id
+    $instances = [];
     while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $instId = $r['inst_id'];
-        $defnId = $r['defn_id'];
-        $value  = $r['value'];
+        $instances[$r['inst_id']]['id'] = $r['inst_id'];
+        if ($r['value']) {
+            $instances[$r['inst_id']]['conf'][$r['defn_id']] = $r['value'];
+        }
+    }
+
+    foreach ($instances as $inst) {
+        $instId = $inst['id'];
 
         // insert the new instance
         $insertInstStmt->execute([
@@ -133,8 +140,8 @@ function cloneDashboard(Role $src, Role $dest)
         // retrieve the new instanceId we just created
         $newInstId = Database::getInstance()->lastInsertId();
 
-        // if there was a config for the instance, copy that across
-        if ($value) {
+        foreach ($inst['conf'] as $defnId => $value) {
+            // if there was a config for the instance, copy that across
             $insertConfStmt->execute([
                 'ccd' => $defnId,
                 'ci'  => $newInstId,
