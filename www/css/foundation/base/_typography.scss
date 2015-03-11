@@ -15,12 +15,12 @@
 // $header-text-rendering: optimizeLegibility;
 
 // We use these to control header font sizes
-// $h1-font-size: rem-calc(44);
-// $h2-font-size: rem-calc(37);
-// $h3-font-size: rem-calc(27);
-// $h4-font-size: rem-calc(23);
-// $h5-font-size: rem-calc(18);
-// $h6-font-size: 1rem;
+$h1-font-size: rem-calc(22);
+$h2-font-size: rem-calc(20);
+$h3-font-size: rem-calc(18);
+$h4-font-size: rem-calc(16);
+$h5-font-size: rem-calc(14);
+$h6-font-size: 1rem;
 
 // We use these to control header size reduction on small screens
 // $h1-font-reduction: rem-calc(10) !default;
@@ -44,9 +44,9 @@
 // We use these to style paragraphs
 // $paragraph-font-family: inherit;
 // $paragraph-font-weight: $font-weight-normal;
-// $paragraph-font-size: 1rem;
+$paragraph-font-size: 1rem;
 // $paragraph-line-height: 1.6;
-$paragraph-margin-bottom: rem-calc(16);
+$paragraph-margin-bottom: rem-calc(14);
 // $paragraph-aside-font-size: rem-calc(14);
 // $paragraph-aside-line-height: 1.35;
 // $paragraph-aside-font-style: italic;
