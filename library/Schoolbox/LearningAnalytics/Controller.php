@@ -52,10 +52,13 @@ class Controller extends Base {
             $unitProgress = new Unit($allStudents, $currentUnit);
 
             $allUnitProgress[] = array(
+                'unit' => $currentUnit,
                 'mostAdvancedStudent' => $unitProgress->getMostAdvancedStudent(),
                 'classCompletions' => $unitProgress->getClassCompletions()
             );
         }
+
+//        new \Alaress_Probe($allUnitProgress);
 
         $this->getResponse()->content->set(
             array(
@@ -73,7 +76,7 @@ class Controller extends Base {
                         'bottomStudents' => $averages->findAscending(),
                     ),
                     'progress' => array(
-                        'unit' => $allUnitProgress,
+                        'allUnits' => $allUnitProgress,
                     ),
                 )
             )

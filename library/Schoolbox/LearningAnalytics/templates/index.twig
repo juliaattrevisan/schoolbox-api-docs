@@ -9,7 +9,6 @@
 
     .learning-analytics.boxplots {
         width: 100%;
-        height: 700px;
     }
 
     /* Top/Bottom students
@@ -18,25 +17,35 @@
         width: 49%;
         float: left;
     }
+
+    /* Unit Progress
+     */
+    .learning-analytics.unit-progress {
+        width: 100%;
+    }
 </style>
 
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts-more.js"></script>
-<script type="text/javascript" src="/learninganalytics/js/boxPlot.js"></script>
 <script type="text/javascript" src="/learninganalytics/js/overallProgress.js"></script>
+<script type="text/javascript" src="/learninganalytics/js/boxPlot.js"></script>
+<script type="text/javascript" src="/learninganalytics/js/unitProgress.js"></script>
 <script type="text/javascript">
     $(function () {
 
         /* Mr Squiggle
          */
 
-        $.fn.overallProgressRender({
-            element: '[data-graph=overall]',
-            title: 'Overall Progress',
-            mostAdvancedStudent: {{ overallProgress.mostAdvancedStudent }},
-            classCompletions: {{ overallProgress.classCompletions }}
-        });
+        {#$.fn.overallProgressRender({#}
+            {#element: '[data-graph=overall]',#}
+            {#title: 'Overall Progress',#}
+            {#mostAdvancedStudent: {{ overallProgress.mostAdvancedStudent }},#}
+            {#classCompletions: {{ overallProgress.classCompletions }}#}
+        {#});#}
 
+        /**
+         *  Boxplots for each Task in the Unit
+         */
         $.fn.boxPlotRender({
             element: '[data-graph=boxplots]',
 
@@ -86,6 +95,26 @@
 {% endfor %}
             ])
         });
+
+        /**
+         *  Progress for each Unit in the Course
+         */
+        $.fn.unitProgressRender({
+            element: '[data-graph=unit-progress]',
+            title: 'Unit Progress',
+            units: [
+                {% for currentUnit in progress.allUnits %}"{{ currentUnit.unit.getTitle() }}"{% if not loop.last %},{% endif %}{% endfor %}
+
+            ],
+            mostAdvancedStudents: [
+                {% for currentUnit in progress.allUnits %}{{ currentUnit.mostAdvancedStudent }}{% if not loop.last %},{% endif %}{% endfor %}
+
+            ],
+            classCompletions: [
+                {% for currentUnit in progress.allUnits %}{{ currentUnit.classCompletions }}{% if not loop.last %},{% endif %}{% endfor %}
+
+            ]
+        });
     });
 </script>
 
@@ -122,3 +151,5 @@
 
 <div class="clearfix"></div>
 
+<h2>Unit Progress</h2>
+<div data-graph='unit-progress' class='learning-analytics unit-progress'></div>
