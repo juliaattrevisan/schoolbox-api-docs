@@ -35,10 +35,107 @@ class Controller extends Base {
      * it with only one unit instead of all the units.
      *
      * @param Folder $folder
+     * @param Collection $allUnits
+     */
+    public function allUnits(Folder $folder, Collection $allUnits) {
+
+        /* Overall Progress
+         */
+        $overallProgress = new Overall($folder, $allUnits);
+
+        /* Results
+         */
+        $allAverages = array();
+        $allResults = array();
+
+        foreach ($allUnits as $currentUnit) {
+            $studentListProcessor = new StudentList($folder, $currentUnit);
+            $allStudents = $studentListProcessor->getStudentList();
+
+            /* Merge results for each unit
+             */
+            $results = new Results($allStudents, $currentUnit);
+            $allResults = array_merge($allResults, $results->getAllValues());
+
+            /* Merge averages for each unit
+             */
+            $averages = new Averages($allStudents, $currentUnit);
+            $allAverages = array_merge($averages->findDescending());
+        }
+
+        /* Sort averages by value
+         */
+        $topAverages = $allAverages;
+
+        uasort($topAverages, function($a, $b) {
+            return $b['average'] - $a['average'];
+        });
+
+        $bottomAverages = $allAverages;
+
+        uasort($bottomAverages, function($a, $b) {
+            return $a['average'] - $b['average'];
+        });
+
+        /* Individual Unit Progress
+         */
+        $allUnitProgress = array();
+
+        foreach ($allUnits as $currentUnit) {
+            $studentListProcessor = new StudentList($folder, $currentUnit);
+            $allStudents = $studentListProcessor->getStudentList();
+
+            $unitProgress = new Unit($allStudents, $currentUnit);
+
+            $allUnitProgress[] = array(
+                'unit' => $currentUnit,
+                'mostAdvancedStudent' => $unitProgress->getMostAdvancedStudent(),
+                'classCompletions' => $unitProgress->getClassCompletions()
+            );
+        }
+
+        /* Twig data
+         */
+        $this->getResponse()->content->set(
+            array(
+                'template' => '@learningAnalytics/index.twig',
+                'data' => array(
+                    'overallProgress' => array(
+                        'mostAdvancedStudent' => $overallProgress->getMostAdvancedStudent(),
+                        'classCompletions' => $overallProgress->getClassCompletions(),
+                    ),
+                    'results' => array(
+                        'title' => $folder->getName(),
+//                        'allTasks' => $unit->getTasks(),
+                        'allValues' => $allResults,
+                        'topStudents' => $topAverages,
+                        'bottomStudents' => $bottomAverages,
+                    ),
+                    'progress' => array(
+                        'allUnits' => $allUnitProgress,
+                    ),
+                )
+            )
+        );
+    }
+
+    /**
+     * Do everything
+     *
+     * $folder is the Folder for which the Units/Courses are relevant
+     *
+     * $unit is the currently selected unit for $folder. That is used for
+     * all the boxplots, rankings etc.
+     *
+     * $allUnits is all the units in the course. That is used to calculate
+     * overall progress etc. To make it relevant to only one unit, fill
+     * it with only one unit instead of all the units.
+     *
+     * @param Folder $folder
      * @param UnitInstance $unit
      * @param Collection $allUnits
      */
-    public function index(Folder $folder, UnitInstance $unit, Collection $allUnits) {
+    public function specificUnit(Folder $folder, UnitInstance $unit, Collection $allUnits) {
 
         /* Overall Progress
          */
@@ -75,12 +172,12 @@ class Controller extends Base {
             array(
                 'template' => '@learningAnalytics/index.twig',
                 'data' => array(
-                    'currentUnit' => $unit,
                     'overallProgress' => array(
                         'mostAdvancedStudent' => $overallProgress->getMostAdvancedStudent(),
                         'classCompletions' => $overallProgress->getClassCompletions(),
                     ),
                     'results' => array(
+                        'title' => $unit->getTitle(),
                         'allTasks' => $unit->getTasks(),
                         'allValues' => $results->getAllValues(),
                         'topStudents' => $averages->findDescending(),

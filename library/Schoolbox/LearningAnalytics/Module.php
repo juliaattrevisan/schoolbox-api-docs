@@ -25,6 +25,7 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Group;
+use Schoolbox\Collection;
 
 class Module extends BaseModule {
 
@@ -37,7 +38,8 @@ class Module extends BaseModule {
     {
         // All of these URLs relate to the resource ID, not a booking ID.
         // Therefore, they should probably be moved to the item module.
-        $router->addGet('learningAnalytics.index', "{$basePath}/{folderId}/{unitId}");
+        $router->addGet('learningAnalytics.allUnits', "{$basePath}/{folderId}");
+        $router->addGet('learningAnalytics.specificUnit', "{$basePath}/{folderId}/{unitId}");
     }
 
     /**
@@ -50,7 +52,47 @@ class Module extends BaseModule {
         /* Inject ingredients into learningAnalytics/index controller method
          */
         $matcher->add(
-            '/^learningAnalytics\.index/',
+            '/^learningAnalytics\.allUnits/',
+            function($params) {
+
+                /* Check permissions
+                 */
+                $group = new Group();
+
+                if ($group->getPermission($params['folderId']) < WRITE_ACCESS) {
+                    error(6);
+                }
+
+                /* Load folder
+                 */
+                $folderMapper = new FolderMapper();
+
+                try {
+                    $folder = $folderMapper->findById($params['folderId']);
+                    $folderMapper->loadJoinedModel('codes', $folder, array('set_method' => 'setCodes'));
+                }
+                catch (Exception $e) {
+                    error(159);
+                }
+
+                /* Load unit
+                 */
+                $unitInstanceMapper = new UnitInstanceMapper();
+                $allUnits = $unitInstanceMapper->findForCategoryId($folder->getId());
+
+                /* Inject
+                 */
+                return array(
+                    'folder' => $folder,
+                    'allUnits' => $allUnits
+                );
+            }
+        );
+
+        /* Inject ingredients into learningAnalytics/index controller method
+         */
+        $matcher->add(
+            '/^learningAnalytics\.specificUnit/',
             function($params) {
 
                 /* Check permissions
@@ -84,6 +126,8 @@ class Module extends BaseModule {
                     if ($currentUnit->getId() == $params['unitId']) {
                         $unit = $currentUnit;
 
+                        $allUnits->add($unit);
+
                         break;
                     }
                 }
@@ -91,6 +135,11 @@ class Module extends BaseModule {
                 if (!($unit instanceof UnitInstance)) {
                     error(6);
                 }
+
+                /* Reset allUnits
+                 */
+                $allUnits = new Collection();
+                $allUnits->add($unit);
 
                 /* Inject
                  */
