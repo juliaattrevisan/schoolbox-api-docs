@@ -361,7 +361,12 @@ class PageMapper extends Schoolbox\Mapper {
 			INNER JOIN component_definition cd ON ci.component_definition_id = cd.id
 			WHERE p.uid = :userId
 			AND   p.deleted_at IS NULL
-			AND   cd.class IN ('Component_Eportfolio_FileListController', 'Component_Eportfolio_ImageListController', 'Component_Eportfolio_VideoController')
+			AND   cd.class IN (
+				'Component_Eportfolio_FileListController',
+				'Component_Eportfolio_ImageController',
+				'Component_Eportfolio_ImageListController',
+				'Component_Eportfolio_VideoController'
+			)
 		";
 		$statement = $this->getDatabase()->prepare($query);
 		$statement->bindValue('userId', $user_id);
