@@ -88,7 +88,7 @@ if (is_numeric($this->arg[0])) {
     $this->dropDown('template_list', $homepageTemplateList, '', TEMPLATE_content, array('name'=>'TEMPLATE_NAME','id'=>'TEMPLATE_ID' ));
 
     $roleMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
-    $allRoleAccess = $roleMapper->getGroupPermissions($folder);
+    $allRoleAccess = $roleMapper->findAllForFolder($folder);
 
     if ($allRoleAccess->count()) {
         foreach ($allRoleAccess as $currentRoleAccess) {
@@ -218,7 +218,7 @@ else {
 		 */
         $roleAccessMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
 
-        $allParentPermissions = $roleAccessMapper->getGroupPermissions($folderParent);
+        $allParentPermissions = $roleAccessMapper->findAllForFolder($folderParent);
 
         if ($allParentPermissions->count()) {
             foreach ($allParentPermissions as $parentPermission) {

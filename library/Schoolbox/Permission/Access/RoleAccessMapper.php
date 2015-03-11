@@ -68,7 +68,17 @@ class RoleAccessMapper extends Mapper
      * @return Collection|RoleAccess[]
      * @throws Mapper\Exception
      */
-    public function getGroupPermissions(CategoryModel $category)
+    public function getGroupPermissions(CategoryModel $category) 
+    {
+        return $this->findAllForFolder($category);
+    }
+
+    /**
+     * @param CategoryModel $category
+     * @return Collection|RoleAccess[]
+     * @throws Mapper\Exception
+     */
+    public function findAllForFolder(CategoryModel $category)
     {
         // Get permissions for all roles, regardless of whether there's one in
         // the database for this category.

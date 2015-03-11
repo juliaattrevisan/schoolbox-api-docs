@@ -164,7 +164,7 @@ function getFolderMeta($folderId)
         $permissions = array();
 
         $roleAccessMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
-        $allGroupPerms = $roleAccessMapper->getGroupPermissions($folder);
+        $allGroupPerms = $roleAccessMapper->findAllForFolder($folder);
 
         $j = 0;
 
