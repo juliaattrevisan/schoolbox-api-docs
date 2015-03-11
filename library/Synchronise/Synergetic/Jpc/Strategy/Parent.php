@@ -13,6 +13,13 @@
 class Synchronise_Synergetic_Jpc_Strategy_Parent extends Synchronise_Synergetic_Jpc_Strategy_Abstract {
 	protected $strategyTitle = "Update Schoolbox Parent Details Synchronisation";
 
+    /**
+     * A list of synced parent IDs
+     *
+     * @var array|string[]
+     */
+    protected $syncedExternalIds = array();
+
 	/**
 	 * Setup
 	 */
@@ -44,6 +51,13 @@ class Synchronise_Synergetic_Jpc_Strategy_Parent extends Synchronise_Synergetic_
 			 */
 			$this->executeCreateUpdate($this->setupUserDetails($currentUser));
 		}
+
+        if ($this->getPerformUpdate() === true) {
+            // set all parents into previous parents role.
+            // UPDATE user SET role=16
+            // WHERE external_id NOT IN (list of parents)
+            // AND role IN (parent roles)
+        }
 
 		$this->getVerboseFilter()->summary();
 	}
@@ -107,6 +121,9 @@ class Synchronise_Synergetic_Jpc_Strategy_Parent extends Synchronise_Synergetic_
 				else {
 					$updatedUser['alt_email'] = '';
 				}
+
+                // Store that this user was updated
+                $this->syncedExternalIds[] = $updatedUser['synergy_id'];
 
 				/* Actually perform db update
 				 */
