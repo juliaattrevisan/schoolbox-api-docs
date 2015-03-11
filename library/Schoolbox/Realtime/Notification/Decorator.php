@@ -86,12 +86,21 @@ class Decorator extends NotificationBundle
                 $array[$n->getId()]['title'] = $this->renderTitleAsHtml($n, $fqdn);
                 $array[$n->getId()]['icon']  = $this->getUnprotectedIcon($n);
 
+                // force links to be fully qualified
                 foreach (array('icon', 'href') as $field) {
                     $value = $array[$n->getId()][$field];
                     if (strlen($value) && $value[0] == '/') {
                         $array[$n->getId()][$field] = $fqdn . $value;
                     }
                 }
+
+                // check metadata for links as well
+                foreach ($array[$n->getId()]['meta'] as $k => $value) {
+                    if (strlen($value) && $value[0] == '/') {
+                        $array[$n->getId()]['meta'][$k] = $fqdn . $value;
+                    }
+                }
+
             } catch (UnderflowException $e) {
                 unset($array[$n->getId()]);
             }
