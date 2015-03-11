@@ -134,7 +134,7 @@ class Results {
                 foreach ($allUsers as $currentUser) {
                     if ($currentUser['totalMarks'] !== null) {
                         if ($currentUser['maxMark'] > 0) {
-                            $normalised = 100* $currentUser['totalMarks']/$currentUser['maxMark'];
+                            $normalised = 100 * $currentUser['totalMarks']/$currentUser['maxMark'];
 
                             $allValues[$currentTask->getId()]->add(array(
                                 'user' => $this->getUserMapper()->findById($currentUser['user_id']),
