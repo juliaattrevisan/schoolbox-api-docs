@@ -60,6 +60,8 @@ class Controller extends Base {
             );
         }
 
+        /* Twig data
+         */
         $this->getResponse()->content->set(
             array(
                 'template' => '@learningAnalytics/index.twig',
