@@ -44,7 +44,7 @@ $h6-font-size: 1rem;
 // We use these to style paragraphs
 // $paragraph-font-family: inherit;
 // $paragraph-font-weight: $font-weight-normal;
-$paragraph-font-size: 1rem;
+$paragraph-font-size: rem-calc(14);
 // $paragraph-line-height: 1.6;
 $paragraph-margin-bottom: rem-calc(14);
 // $paragraph-aside-font-size: rem-calc(14);

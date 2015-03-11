@@ -535,6 +535,10 @@ $tooltip-font-color: $white;
 			margin: 0 1.125em 1.125em 0;
 		}
 
+		p{
+			margin: 0;
+		}
+
 		&:hover{
 			//background: $ocean-sunset;
 			.actions{

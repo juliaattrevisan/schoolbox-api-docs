@@ -8,7 +8,7 @@ $include-html-button-classes: $include-html-classes;
 // $button-tny: rem-calc(10);
 // $button-sml: rem-calc(14);
 // $button-med: rem-calc(12);
-$button-med: rem-calc(14, 40);
+$button-med: rem-calc(($base-font-size - 6));
 // $button-lrg: rem-calc(18);
 
 // We use this to control the display property.
@@ -18,12 +18,16 @@ $button-med: rem-calc(14, 40);
 // We use these to control button text styles.
 // $button-font-family: $body-font-family;
 $button-font-color: $white;
-$button-font-color-alt: $black;
+$button-font-color-alt: $primary-color;
 // $button-font-tny: rem-calc(11);
 // $button-font-sml: rem-calc(13);
-// $button-font-med: rem-calc(16);
+$button-font-med: rem-calc(($base-font-size - 2));
+//$button-font-tny: rem-calc(11);
+//$button-font-sml: rem-calc(13);
+//$button-font-lrg: rem-calc(20);
+
 // $button-font-lrg: rem-calc(20);
-$button-font-weight: $font-weight-bold;
+$button-font-weight: $font-weight-normal;
 // $button-font-align: center;
 
 // We use these to control various hover effects.
@@ -212,14 +216,14 @@ $f-dropdown-triangle-size: 0px;
 // We use these to control styles for the list elements.
 // $f-dropdown-list-style: none;
 $f-dropdown-font-color: $white;
-$f-dropdown-font-size: rem-calc(16);
-$f-dropdown-list-padding: rem-calc(16);
+$f-dropdown-font-size: rem-calc(14);
+$f-dropdown-list-padding: rem-calc(14);
 // $f-dropdown-line-height: rem-calc(18);
 $f-dropdown-list-hover-bg: tint($primary-color, 32%);
 // $dropdown-mobile-default-float: 0;
 
 // We use this to control the styles for when the dropdown has custom content.
-$f-dropdown-content-padding: rem-calc(16);
+$f-dropdown-content-padding: rem-calc(14);
 
 // Default radius for dropdown.
 // $f-dropdown-radius: $global-radius;
@@ -238,11 +242,11 @@ $pagination-margin: rem-calc(0);
 // $pagination-li-float: $default-float;
 $pagination-li-height: rem-calc(48);
 $pagination-li-font-color: $primary-color;
-$pagination-li-font-size: rem-calc(16);
+$pagination-li-font-size: rem-calc(14);
 $pagination-li-margin: rem-calc(0);
 
 // We use these for the pagination anchor links
-$pagination-link-pad: rem-calc(8 16 8);
+$pagination-link-pad: rem-calc(8 14 8);
 $pagination-link-font-color: $primary-color;
 $pagination-link-active-bg: tint($tertiary, 87%);
 
@@ -264,13 +268,13 @@ $pagination-link-current-active-bg: $pagination-link-active-bg;
 
 // $include-html-tabs-classes: $include-html-classes;
 
-// $tabs-navigation-padding: rem-calc(16);
+$tabs-navigation-padding: rem-calc(14);
 $tabs-navigation-bg-color: tint($tertiary, 74%);
 $tabs-navigation-active-bg-color: $white;
 $tabs-navigation-hover-bg-color: tint($tertiary, 87%);
 // $tabs-navigation-font-color: $jet;
 // $tabs-navigation-active-font-color: $tabs-navigation-font-color;
-// $tabs-navigation-font-size: rem-calc(16);
+$tabs-navigation-font-size: rem-calc(14);
 // $tabs-navigation-font-family: $body-font-family;
 
 // $tabs-content-margin-bottom: rem-calc(24);
@@ -291,12 +295,12 @@ $tabs-content-padding: ($column-gutter/5);
 // CUSTOM OVERRIDES
 //
 .button,
-input[type=submit]				{ padding: 0.825rem 2.5rem; border: none;
+input[type=submit]				{ border: none;
 	&.secondary 				{ color: $primary-color;
 		&:hover 				{ color: $primary-color; }
 	}
 	&.alert 					{ 
-		&:hover 				{ color: $white; }
+		&:hover 				{ color: $white !important; }
 	}
 	&.warning 					{ background-color: $warning-color;
 		&:hover 				{ background-color: tint($warning-color, 11%); }

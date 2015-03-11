@@ -1,5 +1,12 @@
 <!-- BEGIN custom_head -->
 <link rel="alternate" type="application/rss+xml" title="School News" href="http://{SCHOOL_NEWS_RSS_FEED_URL}" />
+
+<link rel="stylesheet" type="text/css" media="screen" href="/css/foundation/chrome.css?v={SITE_VERSION}" />
+ <script type="text/javascript">
+    $(function() {
+        $('#container').addClass('foundation').foundation();
+    });
+ </script>
 <!-- END custom_head -->
 <h1>News</h1>
 <span class="header_option">
@@ -10,7 +17,7 @@
 <div class="news left clearfix">
     <ul class="information-list">
         <!-- BEGIN news -->
-        <li class="{ON_OFF} clearfix">
+        <li>
             <!-- BEGIN news_image -->
             <a class="thumbnail" href="/news/item/{NEWS_ID}" title="{NEWS_TITLE}"><img width="64" height="64" src="/storage/image.php?hash={NEWS_IMAGE}&size=square64"/></a>
             <!-- END news_image -->
