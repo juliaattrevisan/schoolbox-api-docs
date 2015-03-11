@@ -65,6 +65,16 @@ class Overall {
     }
 
     /**
+     * Populate with data
+     */
+    private function process() {
+        $allStudentRegistry = $this->findStudentRegistry();
+
+        $this->setMostAdvancedStudent($this->findMostAdvancedStudent($allStudentRegistry));
+        $this->setClassCompletions($this->findClassCompletions($allStudentRegistry));
+    }
+
+    /**
      * A list of all the students who are associated with each unit
      *
      * This basically serves as a preload for the external db, because
@@ -107,7 +117,6 @@ class Overall {
             $allStudents = $allStudentRegistry[$currentUnit->getId()];
 
             $taskCompletions = new TaskCompletions($allStudents, $currentUnit);
-
             $allTaskCompletions = $taskCompletions->findAlphabetical();
 
             /* Top students should have at least one completed
@@ -159,44 +168,53 @@ class Overall {
     }
 
     /**
-     * Populate with data
+     * Find out the overall progress throughout all tasks
+     * in all units
+     *
+     * This is the number of tasks that all students have
+     * marked as completed, represented as a percentage
+     * of all the tasks that are available
+     *
+     * If nobody has completed a task, it won't appear in
+     * the $completionCounts array
      */
-    private function process() {
-        $allStudentRegistry = $this->findStudentRegistry();
+    private function findClassCompletions($allStudentRegistry) {
+        $completionCounts = array();
+        $numTasks = 0;
 
-        $this->setMostAdvancedStudent($this->findMostAdvancedStudent($allStudentRegistry));
+        foreach ($this->getAllUnits() as $currentUnit) {
+            $numTasks += $currentUnit->getTasks()->count();
 
-//
-//            /* Find out the overall progress throughout all tasks
-//             * This is the number of tasks that all students have
-//             * marked as completed, represented as a percentage
-//             * of all the tasks that are available
-//             */
-//            $completionCounts = array();
-//
-//            foreach ($allTaskCompletions as $currentTaskCompletion) {
-//                foreach ($currentTaskCompletion['tasks'] as $currentTask) {
-//                    $completionCounts[$currentTask]++;
-//                }
-//            }
-//
-//            $classCompletions = 0;
-//
-//            foreach ($completionCounts as $key => $value) {
-//                if ($value == $this->getAllStudents()->count()) {
-//                    $classCompletions++;
-//                }
-//            }
-//
-//            if ($this->getUnit()->getTasks()->count()) {
-//                $classCompletions = 100 * $classCompletions/$this->getUnit()->getTasks()->count();
-//            }
-//            else {
-//                $classCompletions = 0;
-//            }
-//
-//            $this->setClassCompletions($classCompletions);
+            $allStudents = $allStudentRegistry[$currentUnit->getId()];
 
+            $taskCompletions = new TaskCompletions($allStudents, $currentUnit);
+            $allTaskCompletions = $taskCompletions->findAlphabetical();
+
+            foreach ($allTaskCompletions as $currentTaskCompletion) {
+                if (count($currentTaskCompletion['tasks'])) {
+                    foreach ($currentTaskCompletion['tasks'] as $currentTask) {
+                        $completionCounts[$currentTask]['unitId'] = $currentUnit->getId();
+                        $completionCounts[$currentTask]['count']++;
+                    }
+                }
+            }
+        }
+
+        /* Find out which tasks have been completed by all students
+         */
+        $classCompletions = 0;
+
+        foreach ($completionCounts as $tuple) {
+            if ($tuple['count'] == $allStudentRegistry[$tuple['unitId']]->count()) {
+                $classCompletions++;
+            }
+        }
+
+        if ($numTasks) {
+            return 100 * $classCompletions / $numTasks;
+        }
+
+        return 0;
     }
 
     /* Getters/Setters
