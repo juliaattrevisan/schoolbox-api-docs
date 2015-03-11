@@ -94,6 +94,10 @@ h2 {
 #awards-info dt+dt {
     margin-top: 6px;
 }
+#awards-info dt:last-child {
+    margin-bottom: 6px;
+}
+
 #house-info dd,
 #attendance-info dd,
 #awards-info dd,
@@ -120,6 +124,9 @@ dd.fullwidth {
 
 .directory .subjects {
     width: 100%;
+}
+#subject-info h2 {
+    font-size: 13px;
 }
 #subject-info ul {
     margin: 0;
