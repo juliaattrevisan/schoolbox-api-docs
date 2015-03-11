@@ -1,0 +1,32 @@
+
+<section>
+    {% if file.mimetype.isImage %}
+        <img class="icon" src="/cms/image.php?width=128&height=128&id={{ file.id }}" alt="{{ file.description }}"/>
+    {% else %}
+        <img class="icon" src="/images/mime/128x128/{{ file.mimetype.iconFile }}" alt="{{ file.description }}"/>
+    {% endif %}
+    <h3>{{ file.description }}</h3>
+    <p>({{ file.filesize | bytes }})</p>
+    <ul>
+        <li>Posted by {{ file.owner.formatName }} on {{ file.submitted.dateOnly }}</li>
+        {% if file.submitted.unixTimestamp != file.modified.unixTimestamp %}
+        <li>Last modified {{ file.modified.dateOnly }}</li>
+        {% endif %}
+    </ul>
+</section>
+<section>
+    <h4>Actions</h4>
+    <a class="button secondary icon-document" data-action="open"     href="/send.php?id={{ file.id }}" target="_blank">Open</a>
+    <a class="button secondary icon-download" data-action="download" href="/send.php?id={{ file.id }}&save=1">Download</a>
+    <a class="button secondary icon-modify"   data-action="modify"   href="/cms/file/{{ file.id }}">Modify</a>
+    <a class="button secondary icon-delete"   data-action="delete"   href="#">Delete</a>
+</section>
+<section>
+    <table width="100%">
+        <tr><th>Filename</th><td>{{ file.filename }}</td></tr>
+        <tr><th>Mimetype</th><td>{{ file.mime }}</td></tr>
+        <tr><th>Hidden</th><td>{{ file.hidden ? 'Yes' : 'No' }}</td></tr>
+        <tr><th>Description</th><td>{{ file.comment }}</td></tr>
+        <tr><th>Direct Link</th><td><a href="/send.php?id={{ file.id }}">{{ 'schoolbox:/' }}/send.php?id={{ file.id }}</a></td></tr>
+    </table>
+</section>
