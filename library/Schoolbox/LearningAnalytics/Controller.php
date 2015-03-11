@@ -15,6 +15,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Resource\Category as Folder;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Collection;
+use Schoolbox\LearningAnalytics\Progress\Overall;
 use Schoolbox\LearningAnalytics\Progress\Unit;
 use Schoolbox\LearningAnalytics\Results\Results;
 use Schoolbox\LearningAnalytics\Results\Averages;
@@ -29,15 +30,16 @@ class Controller extends Base {
      * @param Collection $allUnits
      */
     public function index(Folder $folder, UnitInstance $unit, Collection $allUnits) {
-        $studentListProcessor = new StudentList($folder, $unit);
-        $allStudents = $studentListProcessor->getStudentList();
 
         /* Overall Progress
          */
-//        $overallProgress = new OverallProgress($allStudents, $unit);
+        $overallProgress = new Overall($folder, $allUnits);
 
         /* Results
          */
+        $studentListProcessor = new StudentList($folder, $unit);
+        $allStudents = $studentListProcessor->getStudentList();
+
         $results = new Results($allStudents, $unit);
         $averages = new Averages($allStudents, $unit);
 
