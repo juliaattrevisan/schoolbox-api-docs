@@ -74,26 +74,33 @@
         {# Endeavor Grades - a rubric #}
         <dt class="fullwidth">Endeavour Grades</dt>
         <dd class="fullwidth">
-            {% if report.subjectReport.namedGrades.endeavourGrades %}
-                <table>
-                    <thead>
-                    <tr>
-                        {% for criterion in report.subjectReport.namedGrades.endeavourGrades.rubric.criteria %}
-                            <th>{{ criterion.label }}</th>
-                        {% endfor %}
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        {% for criterion in report.subjectReport.namedGrades.endeavourGrades.rubric.criteria %}
-                            <td>{{ criterion.results[criterion.value] }}</td>
-                        {% endfor %}
-                    </tr>
-                    </tbody>
-                </table>
-            {% else %}
-                Unknown
-            {% endif %}
+            <table>
+                <thead>
+                <tr>
+                    {% for criterion in report.subjectReport.namedGrades.endeavourGrades.rubric.criteria %}
+                        <th>{{ criterion.label }}</th>
+                    {% else %}
+                        {# fill all with N/A #}
+                        <th>Term 1</th>
+                        <th>Term 2</th>
+                        <th>Term 3</th>
+                        <th>Term 4</th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    {% for criterion in report.subjectReport.namedGrades.endeavourGrades.rubric.criteria %}
+                        <td>{{ criterion.results[criterion.value]|default('N/A') }}</td>
+                    {% else %}
+                        <td>N/A</td>
+                        <td>N/A</td>
+                        <td>N/A</td>
+                        <td>N/A</td>
+                    {% endfor %}
+                </tr>
+                </tbody>
+            </table>
         </dd>
 
         {# Approaches to learning - another rubric #}
