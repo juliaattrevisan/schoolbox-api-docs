@@ -426,7 +426,7 @@ $(document).ready(function() {
         </tr>
         <tr>
             <td class="formLabelWidth">
-                <h4>Name</h4>
+                <h4>Title</h4>
             </td>
             <td>
                 <input name="name" type="text" value="{{ item.name }}" />
@@ -536,7 +536,7 @@ $(document).ready(function() {
 
                             <div data-relation="related-resource-notes" class="{% if relatedBooking is empty %}hide{% endif %}">
                                 <dl>
-                                    <dt>Name</dt>
+                                    <dt>Title</dt>
                                     <dd><input name="related_item[{{ relatedItem.id }}][name]" type="text" value="{{ relatedBooking.name }}" /></dd>
                                     <dt>Notes</dt>
                                     <dd><textarea name="related_item[{{ relatedItem.id }}][notes]" style="width:100%;">{{ relatedBooking.notes }}</textarea></dd>
