@@ -65,16 +65,44 @@ class Overall {
     }
 
     /**
-     * Populate with data
+     * A list of all the students who are associated with each unit
+     *
+     * This basically serves as a preload for the external db, because
+     * we reuse this list of students and we don't want to hit the
+     * external db more than we have to
+     *
+     * @return array
      */
-    private function process() {
+    private function findStudentRegistry() {
+        $allStudentRegistry = array();
+
+        /* Extract all the students first because we're going to
+         * reuse this list again
+         */
+        foreach ($this->getAllUnits() as $currentUnit) {
+            $studentListProcessor = new StudentList($this->getFolder(), $currentUnit);
+            $allStudentRegistry[$currentUnit->getId()] = $studentListProcessor->getStudentList();
+        }
+
+        return $allStudentRegistry;
+    }
+
+    /**
+     * Find the student who has completed the most tasks
+     * Remember how many they completed
+     *
+     * @param $allStudentRegistry
+     */
+    private function findMostAdvancedStudent($allStudentRegistry) {
         $allCompletions = array();
+        $numTasks = 0;
 
         /* Tally completed tasks across all units in a course
          */
         foreach ($this->getAllUnits() as $currentUnit) {
-            $studentListProcessor = new StudentList($this->getFolder(), $currentUnit);
-            $allStudents = $studentListProcessor->getStudentList();
+            $numTasks += $currentUnit->getTasks()->count();
+
+            $allStudents = $allStudentRegistry[$currentUnit->getId()];
 
             $taskCompletions = new TaskCompletions($allStudents, $currentUnit);
 
@@ -118,8 +146,26 @@ class Overall {
                 return $b - $a;
             });
 
-            $this->setMostAdvancedStudent(array_shift($uniqueCompletionCounts));
+            /* The highest number of tasks completed by a student
+             */
+            if ($numTasks) {
+                $val = 100 * array_shift($uniqueCompletionCounts) / $numTasks;
+            }
+            else {
+                $val = 0;
+            }
         }
+
+        return $val;
+    }
+
+    /**
+     * Populate with data
+     */
+    private function process() {
+        $allStudentRegistry = $this->findStudentRegistry();
+
+        $this->setMostAdvancedStudent($this->findMostAdvancedStudent($allStudentRegistry));
 
 //
 //            /* Find out the overall progress throughout all tasks
