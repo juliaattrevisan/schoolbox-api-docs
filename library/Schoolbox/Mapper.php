@@ -11,6 +11,7 @@ namespace Schoolbox;
 
 use Database;
 use PDO;
+use PDOStatement;
 use Schoolbox\Column\Factory as ColumnFactory;
 use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
@@ -81,6 +82,11 @@ abstract class Mapper implements Serializable
     const CALLBACK_PRESOFTDELETE  = 'preSoftDelete';
     const CALLBACK_POSTSOFTDELETE = 'postSoftDelete';
 
+    const COLUMN_IDENTIFIER        = 1;
+    const COLUMN_CREATED_TIMESTAMP = 2;
+    const COLUMN_UPDATED_TIMESTAMP = 4;
+    const COLUMN_JOIN_MULTI        = 8;
+    const COLUMN_SOFTDELETE        = 16;
     /**
      * @var Database
      */
@@ -188,8 +194,8 @@ abstract class Mapper implements Serializable
     {
         $this->database = \Database::getInstance();
         $this->map      = new MappingCollection();
-        $this->setup();
         $this->setConfigLoader(new ConfigMapper());
+        $this->setup();
         $this->setColumnFactory(new ColumnFactory());
         $this->setSessionData(isset($_SESSION) ? $_SESSION : array());
         $this->mapping();
@@ -478,6 +484,131 @@ abstract class Mapper implements Serializable
         return $this;
     }
 
+
+    /**
+     * @param string             $column
+     * @param string|IColumnType $type
+     * @param int                $options
+     * @param string             $property
+     * @return array
+     */
+    private function buildColumnMap($column, $type, $options, $property)
+    {
+        $map = [
+            'column' => $column,
+        ];
+        if ($property) {
+            $map['property'] = $property;
+        }
+        if ($type instanceof IColumnType) {
+            $map['hydrator'] = $type;
+        } else {
+            $map['type'] = $type;
+        }
+        // boolean options
+        if ($options & self::COLUMN_IDENTIFIER) {
+            $map['identifier'] = true;
+        }
+        if ($options & self::COLUMN_CREATED_TIMESTAMP) {
+            $map['created_timestamp'] = true;
+        }
+        if ($options & self::COLUMN_UPDATED_TIMESTAMP) {
+            $map['updated_timestamp'] = true;
+        }
+        if ($options & self::COLUMN_SOFTDELETE) {
+            if (in_array($type, [self::TYPE_TIMESTAMP, self::TYPE_DATETIME, self::TYPE_DATE])) {
+                $map['softdelete_timestamp'] = true;
+            } else {
+                $map['softdelete_boolean'] = true;
+            }
+        }
+        return $map;
+    }
+
+
+    /**
+     * The concise, typesafe version of hasMap()
+     *
+     * @param string $column
+     * @param string|IColumnType $type
+     * @param int    $options
+     * @param string $property
+     * @return bool
+     */
+    protected function uses($column, $type, $options = null, $property = null)
+    {
+        return $this->hasMap($this->buildColumnMap($column, $type, $options, $property));
+    }
+
+
+    /**
+     * The concise, typesafe version of hasMap() + hasJoin()
+     *
+     * @param string      $column
+     * @param string      $foreignMapper
+     * @param string      $foreignKey
+     * @param IColumnType $hydrator
+     * @param int         $options
+     * @param string      $property
+     * @return bool
+     */
+    protected function joins($column, $foreignMapper, $foreignKey, $hydrator = null, $options = null, $property = null)
+    {
+        if ($hydrator) {
+            $type = $hydrator;
+        } elseif ($options & self::COLUMN_JOIN_MULTI) {
+            $type = self::TYPE_COLLECTION;
+        } else {
+            $type = self::TYPE_MODEL;
+        }
+        $map = $this->buildColumnMap($column, $type, $options, $property);
+        $map['join'] = $column;
+        $map['join_def'] = [
+            'mapper'    => $foreignMapper,
+            'other_key' => $foreignKey
+        ];
+        return $this->hasMap($map);
+    }
+
+
+    /**
+     * The concise, typesave version of hasMap() + hasJoin(['multi'])
+     *
+     * @param string      $viaTable       the manymany jointable
+     * @param string      $foreignMapper  the target Mapper on the other side (not a jointable Mapper)
+     * @param string      $foreignKey     the ID field of the foreign Model
+     * @param string      $viaForeign     the fieldname on the foreign side of the jointable
+     * @param string      $viaLocal       the fieldname of the local side of the jointable
+     * @param string      $localKey       optionally, the ID field of this Model, defaults to $this->identifier otherwise
+     * @param IColumnType $hydrator       optionally, a custom hydrator
+     * @param int         $options        optionally, any custom options required
+     * @param string      $property       opyionally, override the property name from default
+     * @throws Exception
+     */
+    protected function joinsVia($viaTable, $foreignMapper, $foreignKey, $viaForeign, $viaLocal, $localKey = null, $hydrator = null, $options = null, $property = null)
+    {
+        if (!$localKey && !$this->identifier) {
+            throw new Exception("No identifier specified, either provide one or declare a primary key first");
+        }
+        $type = $hydrator ?: self::TYPE_COLLECTION;
+        $map  = $this->buildColumnMap('', $type, $options, $property);
+        // there is no local column in this instance
+        unset($map['column']);
+        $map['join'] = $viaTable;
+        $map['join_def'] = [
+            'mapper'    => $foreignMapper,
+            'this_key'  => $localKey ?: $this->identifier['column'],
+            'other_key' => $foreignKey,
+            'multi'     => [
+                'via_table'  => $viaTable,
+                'this_key'   => $viaLocal,
+                'other_key'  => $viaForeign
+            ]
+        ];
+        $this->hasMap($map);
+    }
+
+
     /**
      * Adds a mapping from a database column to a model property.
      *
@@ -523,16 +654,31 @@ abstract class Mapper implements Serializable
      */
     protected function hasMap($map)
     {
-        if (is_array($map) && !isset($map['hydrator'])) {
-            $map['hydrator'] = $this->column_factory->build($map['type']);
-        }
         if (!is_array($map)) {
             return false;
         }
-        if (!empty($map['identifier'])) {
+
+        if (empty($map['hydrator'])) {
+            $map['hydrator'] = $this->column_factory->build($map['type']);
+        }
+
+        // if property is empty, derive it from the column, converting snake_case to camelCase
+        if (empty($map['property'])) {
+            // if type is model, truncate '_id' suffix if it exists
+            if ($map['type'] == self::TYPE_MODEL && substr($map['column'], -3) == '_id') {
+                $property = substr($map['column'], 0, -3);
+            } else {
+                $property = $map['column'];
+            }
+            $map['property'] = score2camel($property);
+        }
+
+        if (isset($map['identifier'])) {
             $this->identifier = $map;
         }
+
         $this->map->setOffset($map['property'], $map);
+
         // Has a join definition been defined? If so create the join.
         if (isset($map['join']) && isset($map['join_def'])) {
             if (!isset($map['join_def']['this_key'])) {
@@ -540,6 +686,15 @@ abstract class Mapper implements Serializable
             }
             $this->hasJoin($map['join'], $map['join_def']);
         }
+
+        // has a softdelete definition been defined? if so create the softdelete
+
+        if (isset($map['softdelete_timestamp'])) {
+            $this->hasSoftDeleteDateField($map['column']);
+        } elseif (isset($map['softdelete_boolean'])) {
+            $this->hasSoftDeleteBooleanField($map['column']);
+        }
+
         return true;
     }
 
@@ -1026,9 +1181,7 @@ abstract class Mapper implements Serializable
         );
         $options      = array_merge($defaults, $options);
         $quoted_table = $this->database->quoteIdentifier($this->table);
-        $query        = "SELECT {$this->getColumnString()} FROM $quoted_table";
-        // Build WHERE part
-        $where_parts = array();
+        $query        = $this->getSelectString();
         $params      = array();
         if (!empty($columnList)) {
             // Build WHERE part
@@ -1090,9 +1243,33 @@ abstract class Mapper implements Serializable
             $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
         }
         $statement->execute();
+
+        return $this->hydrateSelect($statement);
+    }
+
+
+    /**
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        // in the core mapper this is quite trivial, but implementing classes can override
+        $quoted_table = $this->database->quoteIdentifier($this->table);
+        return "SELECT {$this->getColumnString()} FROM $quoted_table";
+    }
+
+
+    /**
+     * @param PDOStatement $statement
+     * @return Collection
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        // in the core mapper this is quite trivial, but implementing classes can override
         $rowset = $statement->fetchAll();
         return $this->hydrateList($rowset);
     }
+
 
     /**
      * @see $this->findAll()
@@ -1417,7 +1594,7 @@ abstract class Mapper implements Serializable
 					"
                     );
                     // should dehydrate to an array
-                    $propertyValue = $this->getModelProperty($model, $map['property']);
+                    $propertyValue = (array)$this->getModelProperty($model, $map['property']);
                     // iterate the values given and insert into join table
                     foreach ($propertyValue as $otherKey) {
                         $success = $insertRelationStatement->execute(
@@ -1714,7 +1891,7 @@ abstract class Mapper implements Serializable
      *
      * @return object
      */
-    public function hydrateJoin($row, $join, $alias, $callback = null)
+    public function hydrateJoin($row, $join, $alias = '', $callback = null)
     {
         $mapper = $this->getJoinMapper($join);
         if ($mapper instanceof Mapper) {
@@ -1994,12 +2171,12 @@ abstract class Mapper implements Serializable
     /**
      * Inverse of hydrate(). Converts a model to an array with indices matching the db fields.
      *
-     * @param object $model The model to get values from
-     *
+     * @param object $model              The model to get values from
+     * @param bool   $includeTimestamps  Whether or not to include timestamps in the dehydrated output
      * @throws Mapper\Exception if the map is not valid
      * @return array
      */
-    public function dehydrate($model)
+    public function dehydrate($model, $includeTimestamps = false)
     {
         $result = array();
         foreach ($this->map as $map) {
@@ -2016,7 +2193,7 @@ abstract class Mapper implements Serializable
             $columnName   = $map['column'];
             //
             // Timestamp fields will never be bound.
-            if (!(isset($map['updated_timestamp']) || isset($map['created_timestamp']))) {
+            if ($includeTimestamps || !(isset($map['updated_timestamp']) || isset($map['created_timestamp']))) {
                 $result[$columnName] = $this->getModelProperty($model, $propertyName);
             }
         }

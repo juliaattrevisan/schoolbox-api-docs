@@ -1,0 +1,193 @@
+<?php
+/**
+ * 
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2015, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Schoolbox\Resource\Storage;
+
+use Alaress_Byte_Format;
+use PDO;
+use PDOStatement;
+use Schoolbox;
+use Schoolbox\File;
+use Schoolbox\Collection;
+use Schoolbox\File\MimetypeMapper;
+
+/**
+ * Class Mapper
+ *
+ * @package Schoolbox\Resource\Storage
+ *
+ * @method Model hydrate()
+ * @method Model createModel()
+ */
+class Mapper extends Schoolbox\Mapper
+{
+
+    /** @var Manager */
+    protected $mgr;
+
+
+    /**
+     * @return void
+     */
+    public function setup()
+    {
+        // TODO this does not belong here, but where does it go
+        $factory = new Schoolbox\Resource\FilesystemFactory();
+        $this->mgr = new Manager($factory->build($this->config_loader->get('storage_dir')), new Alaress_Byte_Format());
+    }
+
+
+    /**
+     * @return void
+     */
+    protected function mapping()
+    {
+        $this->hasTable('storage');
+        $this->hasPrototype(new Model($this->mgr->getFilesystem(Manager::FS_STORAGE)));
+
+        $this->uses('hash', self::TYPE_STRING, self::COLUMN_IDENTIFIER);
+        $this->uses('filesize', self::TYPE_INTEGER, null, 'size');
+        $this->uses('uploaded_on', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'createdAt');
+        $this->uses('last_accessed', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('public', self::TYPE_BOOLEAN);
+        $this->uses('ext', self::TYPE_STRING, null, 'extension');
+
+        // derived field; mimetype automatically joined via the extension
+        $this->joinsVia('allowedFileExtension', MimetypeMapper::class, 'fileTypeID', 'fileTypeID', 'extension', 'ext', self::TYPE_MODEL, null, 'mimetype');
+
+        $this->registerCallback(self::CALLBACK_PRESAVE,    [ $this->mgr, 'safetyCheck' ]);
+        $this->registerCallback(self::CALLBACK_POSTSAVE,   [ $this, self::CALLBACK_POSTSAVE ]);
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [ $this->mgr, 'delete' ]);
+    }
+
+
+    /**
+     * @param Model $storage
+     * @param Model $previous
+     * @return bool
+     */
+    protected function postSave(Model $storage, Model $previous = null)
+    {
+        if ($previous) {
+            // not the first time we've seen this file? no copying to take place
+            return true;
+        }
+
+        return $this->mgr->save($storage);
+    }
+
+
+    /**
+     * @param $hash
+     * @return object
+     */
+    public function findByHash($hash)
+    {
+        return $this->findOneByColumn('hash', $hash);
+    }
+
+
+    /**
+     * Always join onto Mime
+     *
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        $table = $this->database->quoteIdentifier($this->table);
+
+        return "
+          SELECT {$this->getColumnString()},
+                 {$this->getJoinColumnString('allowedFileExtension')}
+          FROM $table
+          LEFT JOIN {$this->getJoinSql('allowedFileExtension')}
+        ";
+    }
+
+
+    /**
+     * @param PDOStatement $statement
+     * @return Collection
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $c = $this->createCollection();
+
+        while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $storage = $this->hydrate($r);
+            $storage->setPath($this->mgr->calcPath($storage));
+            $storage->setMimetype($this->hydrateJoin($r, 'allowedFileExtension'));
+
+            $c->add($storage);
+        }
+
+        return $c;
+    }
+
+
+    /**
+     * @param Model $object
+     * @return bool
+     * @throws Schoolbox\Mapper\Exception
+     */
+    public function delete($object)
+    {
+        // protect storage objects from accidental deletion by forcing a second, undocument parameter that must be TRUE
+        $args = func_get_args();
+
+        if (count($args) < 2 || $args[1] !== true) {
+            throw new Schoolbox\Mapper\Exception("Attempt to delete Storage file denied");
+        }
+
+        try {
+            // postDelete will throw a file exception if the file can't be deleted
+            return parent::delete($object);
+        } catch (File\Exception $e) {
+            throw new Schoolbox\Mapper\Exception("Could not delete Storage file", 0, $e);
+        }
+    }
+
+
+    /**
+     * Accept a new file upload
+     *
+     * @param string $filename
+     * @param string $tempLocation
+     * @param bool   $public
+     * @return Model
+     */
+    public function accept($filename, $tempLocation, $public = true)
+    {
+        /** @var MimetypeMapper $mtm */
+        $mtm = $this->getJoinMapper('allowedFileExtension');
+
+        // clear hash so it will be recalculated
+        $storage = $this->createModel()->setHash(null);
+
+        // explicitly use temporary upload filesystem
+        $storage->setFilesystem($this->mgr->getFilesystem(Manager::FS_TEMP));
+
+        // TODO find a way to remove the need for this truncation
+        $tempLocation = str_replace(sys_get_temp_dir(), '', $tempLocation);
+        $storage->setPath($tempLocation);
+
+        // set filetype metadata
+        $storage->setExtension(pathinfo($filename, PATHINFO_EXTENSION));
+        $storage->setMimetype($mtm->getByFilename($filename));
+
+        // by default, files uploaded this way are public
+        $storage->setPublic($public);
+
+        // aaaaaand save. file won't be re-saved if it already exists in storage
+        $this->save($storage);
+
+        return $storage;
+    }
+
+}

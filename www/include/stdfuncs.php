@@ -138,3 +138,38 @@ function httpError($code, $message) {
     }
     die($msg);
 }
+
+
+/**
+ * @param $camel
+ * @param string $delim
+ * @return string
+ */
+function camel2score($camel, $delim = '_') {
+    $xpl = preg_split('/([[:upper:]][[:lower:]]+)/', $camel, null, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+    return strtolower(implode($delim, $xpl));
+}
+
+
+/**
+ * @param $score
+ * @param string $delim
+ * @return string
+ */
+function score2camel($score, $delim = '_') {
+    return lcfirst(score2pascal($score, $delim));
+}
+
+
+/**
+ * @param $score
+ * @param string $delim
+ * @return string
+ */
+function score2pascal($score, $delim = '_') {
+    $xpl = explode($delim, $score);
+    foreach($xpl as &$v) {
+        $v = ucfirst($v);
+    }
+    return implode('', $xpl);
+}
