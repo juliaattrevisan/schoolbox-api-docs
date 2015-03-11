@@ -107,11 +107,14 @@
         <dt class="fullwidth">Approaches to Learning</dt>
         <dd class="fullwidth">
             {% if report.subjectReport.namedGrades.learningApproaches %}
-                <ul>
+                <table class="learning-approaches">
                 {% for criterion in report.subjectReport.namedGrades.learningApproaches.rubric.criteria %}
-                    <li>{{ criterion.label }}: <strong>{{ criterion.results[criterion.value] }}</strong>
+                    <tr>
+                        <td>{{ criterion.label }}:</td>
+                        <td><strong>{{ criterion.results[criterion.value] }}</strong></td>
+                    </tr>
                 {% endfor %}
-                </ul>
+                </table>
             {% else %}
                 Unknown
             {% endif %}

@@ -162,3 +162,11 @@ dd.fullwidth {
 #course-info .course-grade {
     font-weight: bold;
 }
+
+#course-info .learning-approaches,
+#course-info .learning-approaches tr,
+#course-info .learning-approaches th,
+#course-info .learning-approaches td {
+    border-width: 0;
+    padding: 0 5px 0 0;
+}
