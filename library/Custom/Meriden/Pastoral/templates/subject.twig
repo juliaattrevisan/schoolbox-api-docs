@@ -74,11 +74,23 @@
         {# Endeavor Grades - a rubric #}
         <dt class="fullwidth">Endeavour Grades</dt>
         <dd class="fullwidth">
-            {% if report.subjectReport.namedGrades.courseGrade %}
-                {%
-                    include '@customMeridenPastoral/sub/assessmentResult.twig'
-                    with {grade: report.subjectReport.namedGrades.endeavourGrades}
-                %}
+            {% if report.subjectReport.namedGrades.endeavourGrades %}
+                <table>
+                    <thead>
+                    <tr>
+                        {% for criterion in report.subjectReport.namedGrades.endeavourGrades.rubric.criteria %}
+                            <th>{{ criterion.label }}</th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        {% for criterion in report.subjectReport.namedGrades.endeavourGrades.rubric.criteria %}
+                            <td>{{ criterion.results[criterion.value] }}</td>
+                        {% endfor %}
+                    </tr>
+                    </tbody>
+                </table>
             {% else %}
                 Unknown
             {% endif %}
