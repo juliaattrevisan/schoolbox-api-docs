@@ -1,3 +1,9 @@
+{% if showEmail is null %}
+    {% set showEmail = true %}
+{% endif %}
+{% if showPortrait is null %}
+    {% set showPortrait = true %}
+{% endif %}
 <li>
     <div class="subject">
         <a class="to-subject" href="/homepage/code/{{ subject.subjectCode }}">
@@ -7,8 +13,11 @@
     </div>
     {% for teacher in subject.teachers %}
         <div class="profile">
-            <a href="/search/user/{{ teacher.id }}" class="teacher-profile{% if not showEmail %} no-email"{% endif %}>
+            <a href="/search/user/{{ teacher.id }}"
+               class="teacher-profile{% if not showEmail %} no-email{% endif %}{% if not showPortrait %} no-portrait{% endif %}">
+                {% if showPortrait %}
                 <img src="/portrait.php?userId={{ teacher.externalId }}&amp;size=square32">
+                {% endif %}
                 <span class="name">{{ teacher.formatName }}</span>
                 <span class="role">{{ teacher.role.name }}</span>
             </a>
