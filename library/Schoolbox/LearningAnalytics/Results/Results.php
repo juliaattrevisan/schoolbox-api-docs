@@ -131,6 +131,9 @@ class Results {
             else if (($currentTask->getAssessment() instanceof OnlineAssessment) && is_numeric($currentTask->getAssessment()->getId())) {
                 $allUsers = array_values($studentQuizList[$currentTask->getAssessment()->getId()]);
 
+                /* Only accumulate if an attempt was made and the maximum available
+                 * marks for the quiz is greater than zero
+                 */
                 foreach ($allUsers as $currentUser) {
                     if ($currentUser['totalMarks'] !== null) {
                         if ($currentUser['maxMark'] > 0) {
