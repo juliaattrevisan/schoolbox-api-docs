@@ -153,9 +153,6 @@ class Overall {
             if ($numTasks) {
                 $val = 100 * array_shift($uniqueCompletionCounts) / $numTasks;
             }
-            else {
-                $val = 0;
-            }
         }
 
         return $val;
