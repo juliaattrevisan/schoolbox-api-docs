@@ -25,6 +25,15 @@ class Controller extends Base {
     /**
      * Do everything
      *
+     * $folder is the Folder for which the Units/Courses are relevant
+     *
+     * $unit is the currently selected unit for $folder. That is used for
+     * all the boxplots, rankings etc.
+     *
+     * $allUnits is all the units in the course. That is used to calculate
+     * overall progress etc. To make it relevant to only one unit, fill
+     * it with only one unit instead of all the units.
+     *
      * @param Folder $folder
      * @param UnitInstance $unit
      * @param Collection $allUnits
