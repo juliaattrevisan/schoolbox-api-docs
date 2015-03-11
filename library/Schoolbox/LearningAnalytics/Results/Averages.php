@@ -66,7 +66,8 @@ class Averages {
          */
         foreach ($allTasks as $currentTask) {
             foreach ($currentTask as $currentResult) {
-                $allUsers[$currentResult['user']->getId()][] = $currentResult['value'];
+                $allUsers[$currentResult['user']->getId()]['user'] = $currentResult['user'];
+                $allUsers[$currentResult['user']->getId()]['values'][] = $currentResult['value'];
             }
         }
 
@@ -74,13 +75,14 @@ class Averages {
          */
         $allAverages = array();
 
-        foreach ($allUsers as $userId => $currentUser) {
-            $num = count($currentUser);
+        foreach ($allUsers as $currentUser) {
+            $num = count($currentUser['values']);
 
             if ($num) {
-                $average = array_sum($currentUser) / $num;
+                $average = array_sum($currentUser['values']) / $num;
 
-                $allAverages[$userId] = $average;
+                $allAverages[$currentUser['user']->getId()]['user'] = $currentUser['user'];
+                $allAverages[$currentUser['user']->getId()]['average'] = $average;
             }
         }
 
@@ -96,7 +98,7 @@ class Averages {
         $temp = $this->getAllAverages();
 
         uasort($temp, function($a, $b) {
-            return $a - $b;
+            return $a['average'] - $b['average'];
         });
 
         return $temp;
@@ -111,7 +113,7 @@ class Averages {
         $temp = $this->getAllAverages();
 
         uasort($temp, function($a, $b) {
-            return $b - $a;
+            return $b['average'] - $a['average'];
         });
 
         return $temp;
