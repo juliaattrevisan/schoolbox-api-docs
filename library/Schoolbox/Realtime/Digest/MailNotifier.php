@@ -79,7 +79,7 @@ class MailNotifier extends WorkNotifier {
 				continue;
 			}
 
-            $this->log()->debug(sprintf("Digesting %d item%s for user %s", $decorator->count(), $decorator->count() == 1 ? '' : 's'), $user->getUsername());
+            $this->log()->debug(sprintf("Digesting %d item%s for user %s", $decorator->count(), $decorator->count() == 1 ? '' : 's', $user->getUsername()));
 
 			$context = $decorator->renderAsTwigContext($core->getContext(), 0, $dir);
 
