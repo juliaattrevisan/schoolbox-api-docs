@@ -66,6 +66,7 @@ class Controller extends Base {
             array(
                 'template' => '@learningAnalytics/index.twig',
                 'data' => array(
+                    'currentUnit' => $unit,
                     'overallProgress' => array(
                         'mostAdvancedStudent' => $overallProgress->getMostAdvancedStudent(),
                         'classCompletions' => $overallProgress->getClassCompletions(),
