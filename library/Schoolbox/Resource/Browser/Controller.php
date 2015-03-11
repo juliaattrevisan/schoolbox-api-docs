@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Browser;
 
 use Alaress\Web\Controller\Base as BaseController;
 
+use Schoolbox\Config;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -47,6 +48,7 @@ class Controller extends BaseController
         $this->userAccessMapper = UserAccessMapper::getInstance();
         $this->roleAccessMapper = RoleAccessMapper::getInstance();
         $this->userMapper       = UserMapper::getInstance();
+        $this->conf             = new Config\Loader();
     }
 
 
@@ -93,7 +95,9 @@ class Controller extends BaseController
             'folder' => $folder,
             'admin'  => $admin,
             'roles'  => $roles,
-            'access' => $access
+            'access' => $access,
+            'user'   => $this->sessionUser,
+            'conf'   => $this->conf
         ];
 
     }

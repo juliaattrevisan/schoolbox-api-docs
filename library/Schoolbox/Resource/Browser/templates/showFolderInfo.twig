@@ -6,7 +6,7 @@
 
 <section>
     <h4>Actions</h4>
-    {% if folder.homepage.template.id %}
+    {% if folder.hasHomepage %}
     <a class="button secondary icon-homepage" data-action="homepage" href="/homepage/{{ folder.id }}">Homepage</a>
     {% endif %}
     {% if access >= 2 %}
@@ -19,6 +19,8 @@
     {% endif %}
     {% if access >= 3 %}
     <a class="button secondary icon-upload"   data-action="multi"    href="/cms/file/multi/{{ folder.id }}">Upload Multiple Files</a>
+    {% endif %}
+    {% if user.isSuperuser or (access >= 2 and conf.enable_teacher_zip_upload) %}
     <a class="button secondary icon-upload"   data-action="zip"      href="/cms/zipFile/{{ folder.id }}">Upload ZIP</a>
     {% endif %}
 </section>
@@ -39,15 +41,21 @@
             <p>
                 {% if folder.group.type == 1 %}Private{% endif %}
                 {% if folder.group.type == 2 %}Moderated{% endif %}
-                {% if folder.group.type == 3 %}Free{% endif %}
+                {% if folder.group.type == 3 %}Open{% endif %}
             </p>
         </li>
     </ul>
     {% if access >= 3 %}
     <a class="button secondary icon-group-managers" data-action="manage">Manage Group</a>
     {% endif %}
-    <a class="button secondary icon-group" data-action="join">Join Group</a>
+
+    {% if access > 0 and access < 3 %}
     <a class="button secondary icon-logout" data-action="leave">Leave Group</a>
+    {% elseif access == 0 %}
+    <a class="button secondary icon-group"  data-action="join">Join Group</a>
+    {% endif %}
+    {# notably, if you are the admin, you can't leave the group #}
+
 </section>
 
 <section>
