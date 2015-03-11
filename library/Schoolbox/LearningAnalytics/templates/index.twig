@@ -15,7 +15,7 @@
     /* Top/Bottom students
      */
     .learning-analytics.hall {
-        width: 15%;
+        width: 49%;
         float: left;
     }
 </style>
@@ -92,11 +92,13 @@
 <h1>Stuff</h1>
 
 <h2>Overall Progress</h2>
-
 <div data-graph='overall' class='learning-analytics overall'></div>
 
+<h2>That boxplot place</h2>
+<div data-graph="boxplots" class='learning-analytics boxplots'></div>
+
 <div class="learning-analytics hall">
-    <h3>Top Students</h3>
+    <h2>Top Students</h2>
     <ul>
         {% for currentStudent in overallProgress.topStudents %}
         <li>
@@ -106,21 +108,17 @@
         {% endfor %}
     </ul>
 </div>
-
 <div class="learning-analytics hall">
-    <h3>Bottom Students</h3>
+    <h2>Bottom Students</h2>
     <ul>
         {% for currentStudent in overallProgress.bottomStudents %}
         <li>
             <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
             ({{ currentStudent.tasks|length }}/{{ overallProgress.totalTasks }})
         </li>
-        {%  endfor %}
+        {% endfor %}
     </ul>
 </div>
 
 <div class="clearfix"></div>
 
-<h2>That boxplot place</h2>
-
-<div data-graph="boxplots" class='learning-analytics boxplots'></div>

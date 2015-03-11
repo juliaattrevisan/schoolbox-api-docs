@@ -23,14 +23,6 @@ class OverallProgress {
     private $unit = null;
 
     /**
-     * Number of students that can appear in the
-     * Top Students and Bottom Students lists
-     *
-     * @var int
-     */
-    private $maxStudentThreshold = 3;
-
-    /**
      * This student has completed the most tasks
      *
      * @var float
@@ -43,20 +35,6 @@ class OverallProgress {
      * @var int
      */
     private $classCompletions = 0;
-
-    /**
-     * This collection has completed the most tasks
-     *
-     * @var Collection
-     */
-    private $topStudents = null;
-
-    /**
-     * This collection has completed the least tasks
-     *
-     * @var Collection
-     */
-    private $bottomStudents = null;
 
     /**
      * A collection of User instances
@@ -93,20 +71,14 @@ class OverallProgress {
 
         $allTaskCompletions = $taskCompletions->findDescending();
 
-        for ($i = 0; $i < $this->maxStudentThreshold; $i++) {
-            if (isset($allTaskCompletions[$i])) {
-                $currentTaskCompletion = $allTaskCompletions[$i];
-
-                /* Top students should have at least one completed
-                 * item in order to be listed here
-                 */
-                if (count($currentTaskCompletion['tasks'])) {
-                    $topStudents->add($currentTaskCompletion);
-                }
+        /* Top students should have at least one completed
+         * item in order to be listed
+         */
+        foreach ($allTaskCompletions as $currentTaskCompletion) {
+            if (count($currentTaskCompletion['tasks'])) {
+                $topStudents->add($currentTaskCompletion);
             }
         }
-
-        $this->setTopStudents($topStudents);
 
         /* This, coincidentally, helps you determine the racehorses
          * of the class which are represented by the orange bar
@@ -125,25 +97,6 @@ class OverallProgress {
         }
 
         $this->setMostAdvancedStudent($mostAdvancedStudent);
-
-        /* A list of the bottom N students
-         *
-         * These are people who have completed the most tasks,
-         * sorted by count in ascending order
-         */
-        $bottomStudents = new Collection();
-
-        $allTaskCompletions = $taskCompletions->findAscending();
-
-        for ($i = 0; $i < $this->maxStudentThreshold; $i++) {
-            if (isset($allTaskCompletions[$i])) {
-                $currentTaskCompletion = $allTaskCompletions[$i];
-
-                $bottomStudents->add($currentTaskCompletion);
-            }
-        }
-
-        $this->setBottomStudents($bottomStudents);
 
         /* Find out the overall progress throughout all tasks
          * This is the number of tasks that all students have
@@ -237,46 +190,6 @@ class OverallProgress {
     public function getMostAdvancedStudent()
     {
         return $this->mostAdvancedStudent;
-    }
-
-    /**
-     * Set bottom students
-     *
-     * @param \Schoolbox\Collection $bottomStudents
-     */
-    private function setBottomStudents($bottomStudents)
-    {
-        $this->bottomStudents = $bottomStudents;
-    }
-
-    /**
-     * Get bottom students
-     *
-     * @return \Schoolbox\Collection
-     */
-    public function getBottomStudents()
-    {
-        return $this->bottomStudents;
-    }
-
-    /**
-     * Set top students
-     *
-     * @param \Schoolbox\Collection $topStudents
-     */
-    private function setTopStudents($topStudents)
-    {
-        $this->topStudents = $topStudents;
-    }
-
-    /**
-     * Get top students
-     *
-     * @return \Schoolbox\Collection
-     */
-    public function getTopStudents()
-    {
-        return $this->topStudents;
     }
 
     /**

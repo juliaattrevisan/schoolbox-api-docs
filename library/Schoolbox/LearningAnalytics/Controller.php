@@ -44,8 +44,6 @@ class Controller extends Base {
                 'template' => '@learningAnalytics/index.twig',
                 'data' => array(
                     'overallProgress' => array(
-                        'topStudents' => $overallProgress->getTopStudents(),
-                        'bottomStudents' => $overallProgress->getBottomStudents(),
                         'mostAdvancedStudent' => $overallProgress->getMostAdvancedStudent(),
                         'classCompletions' => $overallProgress->getClassCompletions(),
                         'totalTasks' => $unit->getTasks()->count(),
@@ -53,6 +51,8 @@ class Controller extends Base {
                     'results' => array(
                         'allTasks' => $unit->getTasks(),
                         'allValues' => $results->getAllValues(),
+//                        'topStudents' => $results->getTopStudents(),
+//                        'bottomStudents' => $results->getBottomStudents(),
                     ),
                 )
             )
