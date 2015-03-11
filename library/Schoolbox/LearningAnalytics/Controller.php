@@ -53,8 +53,8 @@ class Controller extends Base {
                     'results' => array(
                         'allTasks' => $unit->getTasks(),
                         'allValues' => $results->getAllValues(),
-                        'topStudents' => $averages->findAscending(),
-                        'bottomStudents' => $averages->findDescending(),
+                        'topStudents' => $averages->findDescending(),
+                        'bottomStudents' => $averages->findAscending(),
                     ),
                 )
             )
