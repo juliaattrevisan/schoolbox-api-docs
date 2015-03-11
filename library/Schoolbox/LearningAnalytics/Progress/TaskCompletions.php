@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\LearningAnalytics\OverallProgress;
+namespace Schoolbox\LearningAnalytics\Progress;
 
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Collection;
