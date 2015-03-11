@@ -42,6 +42,21 @@ class Synchronise_Synergetic_StPauls_Strategy_Staff extends Synchronise_Synerget
 	public function setupUserDetails($currentUser) {
 		$newUser = array();
 
+		/*
+		 * Ignore all users of StaffCategory = VOL
+		 */
+		if ($currentUser['StaffCategory'] == 'VOL') {
+			$newUser['username'] = '';
+			$newUser['synergy_id'] = '';
+			$newUser['title'] = '';
+			$newUser['firstname'] = '';
+			$newUser['lastname'] = '';
+			$newUser['alt_email'] = '';
+			$newUser['group_id'] = '';
+			$newUser['campus'] = array();
+			return $newUser;
+		}
+
 		/* Login details
 		 * We don't know how the password is given to us
 		 */
