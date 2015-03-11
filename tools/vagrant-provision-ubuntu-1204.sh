@@ -191,7 +191,8 @@ then
 fi
 
 echo "$vag Installing all required packages";
-apt-get -y install imagemagick php5-imagick ruby-sass;
+apt-get -y install imagemagick php5-imagick ruby-bundler;
+bundle install;
 
 if [ "`apache2 -v | grep Apache | cut -d'/' -f2 | cut -d'.' -f1-2`" == "2.4" ];
 then
