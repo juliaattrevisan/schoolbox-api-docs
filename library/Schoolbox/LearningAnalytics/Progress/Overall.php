@@ -92,10 +92,12 @@ class Overall {
      * Remember how many they completed
      *
      * @param $allStudentRegistry
+     * @return float
      */
     private function findMostAdvancedStudent($allStudentRegistry) {
         $allCompletions = array();
         $numTasks = 0;
+        $val = 0.00;
 
         /* Tally completed tasks across all units in a course
          */
