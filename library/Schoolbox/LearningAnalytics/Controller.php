@@ -47,6 +47,7 @@ class Controller extends Base {
          */
         $allAverages = array();
         $allResults = array();
+        $allTasks = new Collection();
 
         foreach ($allUnits as $currentUnit) {
             $studentListProcessor = new StudentList($folder, $currentUnit);
@@ -61,6 +62,10 @@ class Controller extends Base {
              */
             $averages = new Averages($allStudents, $currentUnit);
             $allAverages = array_merge($averages->findDescending());
+
+            /* All the tasks in all the units
+             */
+            $allTasks->merge($currentUnit->getTasks());
         }
 
         /* Sort averages by value
@@ -106,7 +111,7 @@ class Controller extends Base {
                     ),
                     'results' => array(
                         'title' => $folder->getName(),
-//                        'allTasks' => $unit->getTasks(),
+                        'allTasks' => $allTasks,
                         'allValues' => $allResults,
                         'topStudents' => $topAverages,
                         'bottomStudents' => $bottomAverages,
