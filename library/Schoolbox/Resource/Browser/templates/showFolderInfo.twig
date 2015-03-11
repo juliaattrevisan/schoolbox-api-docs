@@ -1,3 +1,4 @@
+{% if access > 0 %}
 <section>
     <img class="icon" src="/images/icons/128x128/{{ folder.folderType }}.png" alt="{{ folder.name }}"/>
     <h3>{{ folder.name }}</h3>
@@ -5,15 +6,21 @@
 
 <section>
     <h4>Actions</h4>
+    {% if folder.homepage.template.id %}
     <a class="button secondary icon-homepage" data-action="homepage" href="/homepage/{{ folder.id }}">Homepage</a>
+    {% endif %}
+    {% if access >= 2 %}
     <a class="button secondary icon-modify"   data-action="modify"   href="/cms/category/{{ folder.id }}">Modify</a>
     <a class="button secondary icon-delete"   data-action="delete"   href="#">Delete</a>
     <a class="button secondary icon-download" data-action="download" href="#">Download</a>
     <a class="button secondary icon-folder"   data-action="folder"   href="/cms/category/new/{{ folder.id }}">Add Folder</a>
     <a class="button secondary icon-drop-box" data-action="file"     href="/cms/file/new/{{ folder.id }}">Post File</a>
     <a class="button secondary icon-link"     data-action="link"     href="/cms/link/new/{{ folder.id }}">Add Link</a>
+    {% endif %}
+    {% if access >= 3 %}
     <a class="button secondary icon-upload"   data-action="multi"    href="/cms/file/multi/{{ folder.id }}">Upload Multiple Files</a>
     <a class="button secondary icon-upload"   data-action="zip"      href="/cms/zipFile/{{ folder.id }}">Upload ZIP</a>
+    {% endif %}
 </section>
 
 <section>
@@ -36,9 +43,11 @@
             </p>
         </li>
     </ul>
-    <a class="button secondary icon-group-managers" data-action="zip">Manage Group</a>
-    <a class="button secondary icon-group" data-action="zip">Join Group</a>
-    <a class="button secondary icon-logout" data-action="zip">Leave Group</a>
+    {% if access >= 3 %}
+    <a class="button secondary icon-group-managers" data-action="manage">Manage Group</a>
+    {% endif %}
+    <a class="button secondary icon-group" data-action="join">Join Group</a>
+    <a class="button secondary icon-logout" data-action="leave">Leave Group</a>
 </section>
 
 <section>
@@ -56,5 +65,10 @@
     {% endfor %}
     </table>
 </section>
-
+{% else %}
+<section>
+    <img class="icon" src="/images/core/icons/error-icon.png" alt="No access"/>
+    <h3>No access</h3>
+</section>
+{% endif %}
 {#{{ dump(admin) | raw }}#}

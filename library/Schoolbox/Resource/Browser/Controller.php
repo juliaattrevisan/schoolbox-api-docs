@@ -12,6 +12,7 @@ namespace Schoolbox\Resource\Browser;
 use Alaress\Web\Controller\Base as BaseController;
 
 use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource;
 use Schoolbox\User;
@@ -24,6 +25,18 @@ class Controller extends BaseController
 
     /** @var Resource\FileMapper */
     protected $fileMapper;
+
+    /** @var UserAccessMapper */
+    protected $userAccessMapper;
+
+    /** @var RoleAccessMapper */
+    protected $roleAccessMapper;
+
+    /** @var UserMapper */
+    protected $userMapper;
+
+    /** @var User */
+    protected $sessionUser;
 
 
     function __construct()
@@ -43,9 +56,26 @@ class Controller extends BaseController
      */
     protected function getFolderData($folderId)
     {
+        // TODO inject deps
+        $this->sessionUser = $_SESSION['user'];
+
         $folder = $this->folderMapper->findById($folderId);
         $admins = $this->userAccessMapper->findAdminsInCategory($folder);
         $roles  = $this->roleAccessMapper->findAllForFolder($folder);
+
+        try {
+            $access = $this->userAccessMapper->findOneByColumnList([
+                'uid'     => $this->sessionUser->getId(),
+                'service' => UserAccess::SERVICE_HOMEPAGE,
+                'sid'     => $folderId
+            ])->getAccessLevel();
+
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // no accesseses found...you get nothin'
+            return [
+                'access' => 0
+            ];
+        }
 
         if ($admins->count()) {
             $admin = $this->userMapper->findById($admins->first()->getId());
@@ -57,7 +87,8 @@ class Controller extends BaseController
         return [
             'folder' => $folder,
             'admin'  => $admin,
-            'roles'  => $roles
+            'roles'  => $roles,
+            'access' => $access
         ];
 
     }
@@ -125,7 +156,31 @@ class Controller extends BaseController
      */
     public function showFileInfo($fileId)
     {
-        $data = [ 'file' => $this->fileMapper->findById($fileId) ];
+        // TODO inject deps
+        $this->sessionUser = $_SESSION['user'];
+
+
+        /** @var Resource\File $file */
+        $file = $this->fileMapper->findById($fileId);
+
+        try {
+            $access = $this->userAccessMapper->findOneByColumnList([
+                'uid'     => $this->sessionUser->getId(),
+                'service' => UserAccess::SERVICE_HOMEPAGE,
+                'sid'     => $file->getFolder()->getId()
+            ])->getAccessLevel();
+
+            $data = [
+                'file'   => $file,
+                'access' => $access
+            ];
+
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // no accesseses found...you get nothin'
+            $data = [
+                'access' => 0
+            ];
+        }
 
         $this->getResponse()->content->set([
             'template' => '@resourceBrowser/showFileInfo.twig',

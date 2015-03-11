@@ -1,4 +1,4 @@
-
+{% if access > 0 %}
 <section>
     {% if file.mimetype.isImage %}
         <img class="icon" src="/cms/image.php?width=128&height=128&id={{ file.id }}" alt="{{ file.description }}"/>
@@ -30,3 +30,9 @@
         <tr><th>Direct Link</th><td><a href="/send.php?id={{ file.id }}">{{ 'schoolbox:/' }}/send.php?id={{ file.id }}</a></td></tr>
     </table>
 </section>
+{% else %}
+<section>
+    <img class="icon" src="/images/core/icons/error-icon.png" alt="No access"/>
+    <h3>No access</h3>
+</section>
+{% endif %}
