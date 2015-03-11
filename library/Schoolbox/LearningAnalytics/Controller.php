@@ -17,6 +17,7 @@ use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Collection;
 use Schoolbox\LearningAnalytics\OverallProgress\OverallProgress;
 use Schoolbox\LearningAnalytics\Results\Results;
+use Schoolbox\LearningAnalytics\Results\Averages;
 
 class Controller extends Base {
 
@@ -38,6 +39,7 @@ class Controller extends Base {
         /* Results
          */
         $results = new Results($allStudents, $unit);
+        $averages = new Averages($allStudents, $unit);
 
         $this->getResponse()->content->set(
             array(
@@ -51,8 +53,8 @@ class Controller extends Base {
                     'results' => array(
                         'allTasks' => $unit->getTasks(),
                         'allValues' => $results->getAllValues(),
-//                        'topStudents' => $results->getTopStudents(),
-//                        'bottomStudents' => $results->getBottomStudents(),
+                        'topStudents' => $averages->findAscending(),
+                        'bottomStudents' => $averages->findDescending(),
                     ),
                 )
             )
