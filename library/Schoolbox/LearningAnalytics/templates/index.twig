@@ -36,12 +36,16 @@
         /* Mr Squiggle
          */
 
-        {#$.fn.overallProgressRender({#}
-            {#element: '[data-graph=overall]',#}
-            {#title: 'Overall Progress',#}
-            {#mostAdvancedStudent: {{ overallProgress.mostAdvancedStudent }},#}
-            {#classCompletions: {{ overallProgress.classCompletions }}#}
-        {#});#}
+        /**
+         * How much of the course has been completed by all students
+         * compared to the person who has completed the most
+         */
+        $.fn.overallProgressRender({
+            element: '[data-graph=overall]',
+            title: 'Overall Progress',
+            mostAdvancedStudent: {{ overallProgress.mostAdvancedStudent }},
+            classCompletions: {{ overallProgress.classCompletions }}
+        });
 
         /**
          *  Boxplots for each Task in the Unit

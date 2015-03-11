@@ -60,16 +60,13 @@ class Controller extends Base {
             );
         }
 
-//        new \Alaress_Probe($allUnitProgress);
-
         $this->getResponse()->content->set(
             array(
                 'template' => '@learningAnalytics/index.twig',
                 'data' => array(
                     'overallProgress' => array(
-//                        'mostAdvancedStudent' => $overallProgress->getMostAdvancedStudent(),
-//                        'classCompletions' => $overallProgress->getClassCompletions(),
-//                        'totalTasks' => $unit->getTasks()->count(),
+                        'mostAdvancedStudent' => $overallProgress->getMostAdvancedStudent(),
+                        'classCompletions' => $overallProgress->getClassCompletions(),
                     ),
                     'results' => array(
                         'allTasks' => $unit->getTasks(),
