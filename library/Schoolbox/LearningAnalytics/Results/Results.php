@@ -92,18 +92,16 @@ class Results {
 
                 if (!empty($allAttempts)) {
                     foreach ($allAttempts as $currentAttempt) {
-                        $studentQuizList[$currentTask->getAssessment()->getId()][$currentAttempt['user_id']] = $currentAttempt;
-                    }
 
-                    // Load max mark, because getList doesn't get it.
-                    foreach ($studentQuizList[$currentTask->getAssessment()->getId()] as &$currentAttempt) {
-                        $currentAttempt['maxMark']      = $attemptHandler->getTotalMarks($currentTask->getAssessment()->getId(), $currentAttempt['attempt_id']);
-                        $currentAttempt['firstSection'] = $sectionHandler->getFirst($currentTask->getAssessment()->getId());
-                    }
+                        /* Manipulate a bit more
+                         * Load max mark, because getList doesn't get it.
+                         */
+                        $temp = $currentAttempt;
+                        $temp['maxMark'] = $attemptHandler->getTotalMarks($currentTask->getAssessment()->getId(), $temp['attempt_id']);
+                        $temp['firstSection'] = $sectionHandler->getFirst($currentTask->getAssessment()->getId());
 
-                    /* That stupid bug again
-                     */
-                    unset($currentAttempt);
+                        $studentQuizList[$currentTask->getAssessment()->getId()][$temp['user_id']] = $temp;
+                    }
                 }
             }
         }
@@ -133,13 +131,17 @@ class Results {
             else if (($currentTask->getAssessment() instanceof OnlineAssessment) && is_numeric($currentTask->getAssessment()->getId())) {
                 $allUsers = array_values($studentQuizList[$currentTask->getAssessment()->getId()]);
 
-                /* lol handlers
-                 */
                 foreach ($allUsers as $currentUser) {
-                    $allValues[$currentTask->getId()]->add(array(
-                        'user' => $this->getUserMapper()->findById($currentUser['user_id']),
-                        'value' => $currentUser['totalMarks']
-                    ));
+                    if ($currentUser['totalMarks'] !== null) {
+                        if ($currentUser['maxMark'] > 0) {
+                            $normalised = 100* $currentUser['totalMarks']/$currentUser['maxMark'];
+
+                            $allValues[$currentTask->getId()]->add(array(
+                                'user' => $this->getUserMapper()->findById($currentUser['user_id']),
+                                'value' => $normalised
+                            ));
+                        }
+                    }
                 }
             }
         }
