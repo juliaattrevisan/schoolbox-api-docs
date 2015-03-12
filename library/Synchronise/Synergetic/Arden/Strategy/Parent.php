@@ -19,8 +19,10 @@ class Synchronise_Synergetic_Arden_Strategy_Parent extends Synchronise_Base_Stra
              */
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Parent())
+            ->addHydrator(new Synchronise_Base_Hydrator_AllowUpdateOnly())
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Default())
             ->addSpouseHydrator(new Synchronise_Base_Hydrator_Spouse())
+            ->addSpouseHydrator(new Synchronise_Base_Hydrator_AllowUpdateOnly())
 
             /**
              * Custom hydrators
