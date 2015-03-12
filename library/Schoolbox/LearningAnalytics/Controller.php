@@ -102,7 +102,7 @@ class Controller extends Base {
          */
         $this->getResponse()->content->set(
             array(
-                'template' => '@learningAnalytics/index.twig',
+                'template' => '@learningAnalytics/allUnits.twig',
                 'data' => array(
                     'overallProgress' => array(
                         'mostAdvancedStudent' => $overallProgress->getMostAdvancedStudent(),
@@ -174,7 +174,7 @@ class Controller extends Base {
          */
         $this->getResponse()->content->set(
             array(
-                'template' => '@learningAnalytics/index.twig',
+                'template' => '@learningAnalytics/specificUnit.twig',
                 'data' => array(
                     'overallProgress' => array(
                         'mostAdvancedStudent' => $overallProgress->getMostAdvancedStudent(),
