@@ -111,8 +111,8 @@ class Controller extends Base {
                         'title' => 'All folders in a course',
                         'allTasks' => $allTasks,
                         'allValues' => $allResults,
-                        'topStudents' => $sorter->findAscending('average'),
-                        'bottomStudents' => $sorter->findDescending('average'),
+                        'topStudents' => $sorter->findDescending('average'),
+                        'bottomStudents' => $sorter->findAscending('average'),
                     ),
                     'progress' => array(
                         'allUnits' => $allUnitProgress,
