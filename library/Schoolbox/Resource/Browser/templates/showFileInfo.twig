@@ -1,5 +1,6 @@
+<ul class="information-list">
 {% if access > 0 %}
-<section>
+<li>
     <span class="p128">
     {% if file.mimetype.isImage %}
         <img class="icon" src="/cms/image.php?width=128&height=128&id={{ file.id }}" alt="{{ file.description }}"/>
@@ -7,9 +8,9 @@
         <img class="icon" src="/images/mime/128x128/{{ file.mimetype.iconFile }}" alt="{{ file.description }}"/>
     {% endif %}
     </span>
-    <h3>{{ file.description }}</h3>
-</section>
-<section>
+    <h3 class="meta-title">{{ file.description }}</h3>
+</li>
+<li>
     <h4>Actions</h4>
     <a class="button secondary icon-document" data-action="open"     href="/send.php?id={{ file.id }}" target="_blank">Open</a>
     <a class="button secondary icon-download" data-action="download" href="/send.php?id={{ file.id }}&save=1">Download</a>
@@ -17,17 +18,17 @@
     <a class="button secondary icon-modify"   data-action="modify"   href="/cms/file/{{ file.id }}">Modify</a>
     <a class="button secondary icon-delete"   data-action="delete"   href="#">Delete</a>
     {% endif %}
-</section>
-<section>
+</li>
+<li>
     <h4>Details</h4>
-    <ul class="information-list">
+    <ul>
         <li>
             <h5 class="subheader">Uploaded by</h5>
-            <img src="/portrait.php?size=square32&userId={{ file.owner.externalId }}" alt="{{ file.owner.formatName }}" />
+            <img src="/portrait.php?size=square48&userId={{ file.owner.externalId }}" alt="{{ file.owner.formatName }}" />
             <h3 class="subheader">
                 <a href="/search/user/{{ file.owner.id }}">{{ file.owner.formatName }}</a>
             </h3>
-            <p class="meta">{{ file.owner.role.name }}</p>
+            <p class="meta">{{ file.owner.role.name ?: 'Unknown' }}</p>
         </li>
         <li>
             <h5 class="subheader">Filesize</h5>
@@ -55,8 +56,8 @@
         </li>
         <li>
             <h5 class="subheader">Hidden</h5>
-            <p title="Visible to users with {{ file.hidden ? 'write' : 'read' }} access to the folder">
-                {{ file.hidden ? 'Yes' : 'No' }}
+            <p>
+                <span data-tooltip aria-haspopup="true" class="has-tip" title="Visible to users with {{ file.hidden ? 'write' : 'read' }} access to the folder">{{ file.hidden ? 'Yes' : 'No' }}</span>
             </p>
         </li>
         <li>
@@ -64,10 +65,11 @@
             <p><a href="/send.php?id={{ file.id }}">{{ 'schoolbox:/' }}/send.php?id={{ file.id }}</a></p>
         </li>
     </ul>
-</section>
+</li>
 {% else %}
-<section>
+<li>
     <img class="icon" src="/images/core/icons/error-icon.png" alt="No access"/>
     <h3>No access</h3>
-</section>
+</li>
 {% endif %}
+</ul>
