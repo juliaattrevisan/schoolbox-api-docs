@@ -1,5 +1,5 @@
 <ul class="information-list">
-{% if access > 0 %}
+{% if access > 0 or user.isSuperuser %}
 <li>
     <img class="icon" src="/images/icons/128x128/{{ folder.folderType }}.png" alt="{{ folder.name }}"/>
     <h3 class="meta-title">{{ folder.name }}</h3>
@@ -10,7 +10,7 @@
     {% if folder.hasHomepage %}
     <a class="button secondary icon-homepage" data-action="homepage" href="/homepage/{{ folder.id }}">View Homepage</a>
     {% endif %}
-    {% if access >= 2 %}
+    {% if access >= 2 or user.isSuperuser %}
     <a class="button secondary icon-modify"   data-action="modify"   href="/cms/category/{{ folder.id }}">Modify</a>
     <a class="button secondary icon-delete"   data-action="delete"   href="#">Delete</a>
     <a class="button secondary icon-download" data-action="download" href="#">Download</a>
@@ -18,7 +18,7 @@
     <a class="button secondary icon-drop-box" data-action="file"     href="/cms/file/new/{{ folder.id }}">Post File</a>
     <a class="button secondary icon-link"     data-action="link"     href="/cms/link/new/{{ folder.id }}">Add Link</a>
     {% endif %}
-    {% if access >= 3 %}
+    {% if access >= 3 or user.isSuperuser %}
     <a class="button secondary icon-upload"   data-action="multi"    href="/cms/file/multi/{{ folder.id }}">Upload Multiple Files</a>
     {% endif %}
     {% if user.isSuperuser or (access >= 2 and conf.enable_teacher_zip_upload) %}
@@ -45,16 +45,16 @@
                 {% if folder.group.moderated %}<span data-tooltip aria-haspopup="true" class="has-tip" title="Users can join, but only once access is approved by an admin">Moderated</span>{% endif %}
                 {% if folder.group.free      %}<span data-tooltip aria-haspopup="true" class="has-tip" title="Can be joined or left by anyone at any time">Open</span>{% endif %}
             </p>
-        </li>
-        <li>
-        {% if access >= 3 %}
-            <a class="button secondary icon-group-managers" data-action="manage">Manage Group</a>
+        {% if access >= 3 or user.isSuperuser %}
+            <a class="button secondary icon-group-managers" data-action="manage" href="/group/modify/{{ folder.id }}">Manage Group</a>
         {% endif %}
 
         {% if access > 0 and access < 3 %}
-            <a class="button secondary icon-logout" data-action="leave">Leave Group</a>
-        {% elseif access == 0 %}
-            <a class="button secondary icon-group"  data-action="join">Join Group</a>
+            <a class="button secondary icon-logout" data-action="leave" href="/group/joinForm.php?leave={{ folder.id }}">Leave Group</a>
+        {% elseif access === null %}
+            <a class="button secondary icon-group"  data-action="join" href="/group/joinForm.php?join={{ folder.id }}">Join Group</a>
+        {% elseif access == 0 and folder.group.moderated %}
+            <span>Membership request pending</span>
         {% endif %}
         {# notably, if you are the admin, you can't leave the group #}
         </li>
@@ -73,9 +73,9 @@
             {% if access.type == 1 %}Read{% endif %}
             {% if access.type == 2 %}Write{% endif %}
         </p>
-    </tr>
+    </li>
     {% endfor %}
-    </table>
+    </ul>
 </li>
 {% else %}
 <li>
