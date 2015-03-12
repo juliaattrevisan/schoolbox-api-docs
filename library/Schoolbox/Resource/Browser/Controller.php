@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Browser;
 
 use Alaress\Web\Controller\Base as BaseController;
 
+use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Config;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -39,6 +40,12 @@ class Controller extends BaseController
     /** @var User */
     protected $sessionUser;
 
+    /** @var Config\Loader */
+    protected $conf;
+
+    /** @var TaskMapper */
+    protected $taskMapper;
+
 
     function __construct()
     {
@@ -49,6 +56,7 @@ class Controller extends BaseController
         $this->roleAccessMapper = RoleAccessMapper::getInstance();
         $this->userMapper       = UserMapper::getInstance();
         $this->conf             = new Config\Loader();
+        $this->taskMapper       = TaskMapper::getInstance();
     }
 
 
@@ -113,10 +121,22 @@ class Controller extends BaseController
      */
     public function browse($folderId = 0)
     {
+        // TODO inject deps
+        $this->sessionUser = $_SESSION['user'];
+
+        $tree = new Resource\Folder\TreeBuilder(
+            $this->folderMapper,
+            $this->taskMapper,
+            $this->userAccessMapper,
+            $this->roleAccessMapper,
+            $this->sessionUser
+        );
+
         $data = $this->getFolderData($folderId);
 
         // add files to that
-        $data['files'] = $this->fileMapper->findByFolderId($folderId)->getAll();
+        $data['files']    = $this->fileMapper->findByFolderId($folderId)->getAll();
+        $data['treedata'] = json_encode($tree->buildPartialTree($folderId ?: '#'));
 
         $this->getResponse()->content->set([
             'template' => '@resourceBrowser/browse.twig',

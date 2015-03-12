@@ -41,7 +41,11 @@
 
         var tree = $('#tree');
 
-        tree.resourceTree();
+        tree.resourceTree({
+            data: {
+                cache: {{ treedata | raw }}
+            }
+        });
 
 
     });
