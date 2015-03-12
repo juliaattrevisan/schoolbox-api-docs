@@ -237,6 +237,7 @@
          * http://www.purplemath.com/modules/boxwhisk.htm
          */
         function findMedian(values) {
+            var median = null;
 
             /* Figure out medians in different ways depending
              * on even or odd number of elements
@@ -248,10 +249,17 @@
             /* Careful of these offsets
              */
             if (even) {
-                return (values[halfway-1] + values[halfway])/2.0;
+                median = (values[halfway-1] + values[halfway])/2.0;
+            }
+            else {
+                median = values[halfway];
             }
 
-            return values[halfway];
+            if (median != null) {
+                median = parseFloat(median.toFixed(1));
+            }
+
+            return median;
         }
 
         /**
@@ -281,38 +289,38 @@
          * Find minimum value in an array
          */
         function findMinimum(values) {
-            var min = null;
+            var minimum = null;
 
             if (values.length) {
-                min = values[0];
+                minimum = values[0];
 
                 for (var i = 0; i < values.length; i++) {
-                    if (values[i] < min) {
-                        min = values[i];
+                    if (values[i] < minimum) {
+                        minimum = values[i];
                     }
                 }
             }
 
-            return min;
+            return minimum;
         }
 
         /**
          * Find maximum value in an array
          */
         function findMaximum(values) {
-            var max = null;
+            var maximum = null;
 
             if (values.length) {
-                max = values[0];
+                maximum = values[0];
 
                 for (var i = 0; i < values.length; i++) {
-                    if (values[i] > max) {
-                        max = values[i];
+                    if (values[i] > maximum) {
+                        maximum = values[i];
                     }
                 }
             }
 
-            return max;
+            return maximum;
         }
 
         /**
@@ -327,12 +335,6 @@
                 quartile3: findMedian(setupThirdQuartile(config.values)),
                 maximum: findMaximum(config.values)
             };
-
-            if ((data.maximum > 80.55) && (data.maximum < 81)) {
-//                console.log(config.values);
-                console.log(findMinimum(config.values));
-                console.log(findMaximum(config.values));
-            }
 
             return data;
         }
@@ -370,6 +372,10 @@
                 }
             }
 
+            if (minimum != null) {
+                minimum = parseFloat(minimum.toFixed(1));
+            }
+
             /* Upper whisker
              * Use the first value that is below the upperThreshold
              */
@@ -379,6 +385,10 @@
                 if (config.values[i] < upperThreshold) {
                     maximum = config.values[i];
                 }
+            }
+
+            if (maximum != null) {
+                maximum = parseFloat(maximum.toFixed(1));
             }
 
             /* Outlier stack
@@ -391,11 +401,13 @@
                 }
             }
 
-            return {
+            var data = {
                 outliers: allOutliers,
                 minimum: minimum,
                 maximum: maximum
             }
+
+            return data;
         }
 
         /**
