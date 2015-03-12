@@ -89,8 +89,8 @@
     {% for currentValue in results.allValues[currentTask.getId()] %}
     {
         info: "{{ currentValue.user.getFullName() }}",
-        uid: {{ currentValue.user.getId() }},
-        value: {{ currentValue.value }}
+        uid: '{{ currentValue.user.getId() }}',
+        value: '{{ currentValue.value }}'
     }{% if not loop.last %},
     {% endif %}
     {% endfor %}
