@@ -8,29 +8,62 @@
     {% endif %}
     </span>
     <h3>{{ file.description }}</h3>
-    <p>({{ file.filesize | bytes }})</p>
-    <ul>
-        <li>Posted by {{ file.owner.formatName }} on {{ file.submitted.dateOnly }}</li>
-        {% if file.submitted.unixTimestamp != file.modified.unixTimestamp %}
-        <li>Last modified {{ file.modified.dateOnly }}</li>
-        {% endif %}
-    </ul>
 </section>
 <section>
     <h4>Actions</h4>
     <a class="button secondary icon-document" data-action="open"     href="/send.php?id={{ file.id }}" target="_blank">Open</a>
     <a class="button secondary icon-download" data-action="download" href="/send.php?id={{ file.id }}&save=1">Download</a>
+    {% if access >= 2 %}
     <a class="button secondary icon-modify"   data-action="modify"   href="/cms/file/{{ file.id }}">Modify</a>
     <a class="button secondary icon-delete"   data-action="delete"   href="#">Delete</a>
+    {% endif %}
 </section>
 <section>
-    <table width="100%">
-        <tr><th>Filename</th><td>{{ file.filename }}</td></tr>
-        <tr><th>Mimetype</th><td>{{ file.mime }}</td></tr>
-        <tr><th>Hidden</th><td>{{ file.hidden ? 'Yes' : 'No' }}</td></tr>
-        <tr><th>Description</th><td>{{ file.comment }}</td></tr>
-        <tr><th>Direct Link</th><td><a href="/send.php?id={{ file.id }}">{{ 'schoolbox:/' }}/send.php?id={{ file.id }}</a></td></tr>
-    </table>
+    <h4>Details</h4>
+    <ul class="information-list">
+        <li>
+            <h5 class="subheader">Uploaded by</h5>
+            <img src="/portrait.php?size=square32&userId={{ file.owner.externalId }}" alt="{{ file.owner.formatName }}" />
+            <h3 class="subheader">
+                <a href="/search/user/{{ file.owner.id }}">{{ file.owner.formatName }}</a>
+            </h3>
+            <p class="meta">{{ file.owner.role.name }}</p>
+        </li>
+        <li>
+            <h5 class="subheader">Filesize</h5>
+            <p>{{ file.filesize | bytes }}</p>
+        </li>
+        <li>
+            <h5 class="subheader">Created</h5>
+            <p>{{ file.submitted.dateOnly }}</p>
+        </li>
+        {% if file.submitted.unixTimestamp != file.modified.unixTimestamp %}
+        <li>
+            <h5 class="subheader">Last modified</h5>
+            <p>{{ file.modified.dateOnly }}</p>
+        </li>
+        {% endif %}
+        {% if file.comment %}
+        <li>
+            <h5 class="subheader">Description</h5>
+            <p>{{ file.comment }}</p>
+        </li>
+        {% endif %}
+        <li>
+            <h5 class="subheader">Original File</h5>
+            <p>{{ file.filename }} ({{ file.mime }})</p>
+        </li>
+        <li>
+            <h5 class="subheader">Hidden</h5>
+            <p title="Visible to users with {{ file.hidden ? 'write' : 'read' }} access to the folder">
+                {{ file.hidden ? 'Yes' : 'No' }}
+            </p>
+        </li>
+        <li>
+            <h5 class="subheader">Direct Link</h5>
+            <p><a href="/send.php?id={{ file.id }}">{{ 'schoolbox:/' }}/send.php?id={{ file.id }}</a></p>
+        </li>
+    </ul>
 </section>
 {% else %}
 <section>
