@@ -316,14 +316,14 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         } else {
             // Otherwise, show a standard open/due message.
             if ($unit->isBeforeOpenDate()) {
-                $completion_status = 'Opens';
+                $completion_status = 'This unit will open';
                 $rel_time          = $unit->getRelativeOpenDate();
                 $urgency           = null;
             } elseif ($unit->isOpen()) {
-                $completion_status = 'Due';
+                $completion_status = 'This unit will close';
                 $rel_time          = $unit->getRelativeDueDate();
             } else {
-                $completion_status = 'Closed';
+                $completion_status = 'This unit closed';
                 $rel_time          = $unit->getRelativeDueDate();
                 $urgency           = 0;
             }
