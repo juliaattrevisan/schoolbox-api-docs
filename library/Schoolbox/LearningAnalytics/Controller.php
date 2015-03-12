@@ -74,19 +74,7 @@ class Controller extends Base {
             $allTasks->merge($currentUnit->getTasks());
         }
 
-        /* Sort averages by value
-         */
-        $topAverages = $allAverages;
-
-        uasort($topAverages, function($a, $b) {
-            return $b['average'] - $a['average'];
-        });
-
-        $bottomAverages = $allAverages;
-
-        uasort($bottomAverages, function($a, $b) {
-            return $a['average'] - $b['average'];
-        });
+        $sorter = new Sorter($allAverages);
 
         /* Individual Unit Progress
          */
@@ -118,8 +106,8 @@ class Controller extends Base {
                         'title' => 'All folders in a course',
                         'allTasks' => $allTasks,
                         'allValues' => $allResults,
-                        'topStudents' => $topAverages,
-                        'bottomStudents' => $bottomAverages,
+                        'topStudents' => $sorter->findAscending('average'),
+                        'bottomStudents' => $sorter->findDescending('average'),
                     ),
                     'progress' => array(
                         'allUnits' => $allUnitProgress,
