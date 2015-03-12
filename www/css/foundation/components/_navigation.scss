@@ -103,6 +103,7 @@ $topbar-title-font-size: $base-font-size - 2;
 $topbar-dropdown-bg: $topbar-bg-color;
 $topbar-dropdown-link-color: $white;
 $topbar-dropdown-link-bg: tint($primary-color, 11%);
+$topbar-dropdown-link-bg-hover: tint($primary-color, 32%);
 $topbar-dropdown-link-weight: $font-weight-normal;
 $topbar-dropdown-toggle-size: 6px;
 $topbar-dropdown-toggle-color: $white;
