@@ -16,9 +16,19 @@ class Synchronise_Synergetic_Jpc_Strategy_Parent extends Synchronise_Synergetic_
     /**
      * A list of synced parent IDs
      *
-     * @var array|string[]
+     * @var array
      */
     protected $syncedExternalIds = array();
+
+    /**
+     * Role ID for parents
+     */
+    const PARENT_ROLE_ID = 4;
+
+    /**
+     * Role ID for past parents
+     */
+    const PAST_PARENT_ROLE_ID = 16;
 
 	/**
 	 * Setup
@@ -53,10 +63,13 @@ class Synchronise_Synergetic_Jpc_Strategy_Parent extends Synchronise_Synergetic_
 		}
 
         if ($this->getPerformUpdate() === true) {
-            // set all parents into previous parents role.
-            // UPDATE user SET role=16
-            // WHERE external_id NOT IN (list of parents)
-            // AND role IN (parent roles)
+            // set parents not touched by this sync into previous parents role.
+            foreach ($this->getUserHandler()->getByGroup(self::PARENT_ROLE_ID) as $parent) {
+                if (!$this->isExternalIdSynced($parent['synergy_id'])) {
+                    $parent['group_id'] = self::PAST_PARENT_ROLE_ID;
+                    $this->getUserHandler()->update($parent);
+                }
+            }
         }
 
 		$this->getVerboseFilter()->summary();
@@ -123,7 +136,7 @@ class Synchronise_Synergetic_Jpc_Strategy_Parent extends Synchronise_Synergetic_
 				}
 
                 // Store that this user was updated
-                $this->syncedExternalIds[] = $updatedUser['synergy_id'];
+                $this->setExternalIdAsSynced($updatedUser['synergy_id']);
 
 				/* Actually perform db update
 				 */
@@ -157,4 +170,28 @@ class Synchronise_Synergetic_Jpc_Strategy_Parent extends Synchronise_Synergetic_
 
 		return true;
 	}
+
+    /**
+     * Sets this external ID as having been synced.
+     *
+     * @todo implement something like this for the base sync
+     *
+     * @param string $externalId
+     */
+    protected function setExternalIdAsSynced($externalId)
+    {
+        $this->syncedExternalIds[$externalId] = true;
+    }
+
+    /**
+     * Is this external ID synced?
+     *
+     * @param string $externalId
+     *
+     * @return bool
+     */
+    protected function isExternalIdSynced($externalId)
+    {
+        return array_key_exists($externalId, $this->syncedExternalIds);
+    }
 }
