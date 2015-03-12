@@ -4,13 +4,17 @@ require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 // Open session after bootstrap, otherwise $_SESSION[user] won't be a user.
 $page = new SitePage;
 
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Assessment\Course\TaskMapper;
 
-$treeBuilder = new Schoolbox\Resource\CategoryTreeBuilder(
-    CategoryMapper::getInstance(),
+$treeBuilder = new Folder\TreeBuilder(
+    Folder\Mapper::getInstance(),
     TaskMapper::getInstance(),
-    new Group()
+    UserAccessMapper::getInstance(),
+    RoleAccessMapper::getInstance(),
+    $_SESSION['user']
 );
 
 header('Content-Type: application/json');

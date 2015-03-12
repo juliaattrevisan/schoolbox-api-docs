@@ -7,6 +7,11 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder;
+
 $group = new Group();
 
 if (!$group->isSuperuser()) {
@@ -22,14 +27,14 @@ $this->setFile(TEMPLATE_content, 'adminv2/rollover.html');
 $nav = new AdminV2_Nav();
 $nav->parse($this, 'rollover');
 
-$groupHandler = new Group();
-
 $openCategory = 0;
 
 // shamelessly copied from resources.php
-$treeBuilder = new Schoolbox\Resource\CategoryTreeBuilder(
-    Schoolbox\Resource\CategoryMapper::getInstance(),
-    Schoolbox\Assessment\Course\TaskMapper::getInstance(),
-    $groupHandler
+$treeBuilder = new Folder\TreeBuilder(
+    Folder\Mapper::getInstance(),
+    TaskMapper::getInstance(),
+    UserAccessMapper::getInstance(),
+    RoleAccessMapper::getInstance(),
+    $_SESSION['user']
 );
 $this->setVar('TREEDATA', json_encode($treeBuilder->buildPartialTree($openCategory)));

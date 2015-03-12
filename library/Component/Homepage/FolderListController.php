@@ -1,4 +1,8 @@
 <?php
+use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder;
 
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -78,8 +82,14 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
         $this->setBlock('folders', 'modify_folder', 'modify_folder_block');
 
 
-        $treeBuilder = new \Schoolbox\Resource\CategoryTreeBuilder(new \Schoolbox\Resource\CategoryMapper(), new \Schoolbox\Assessment\Course\TaskMapper(), new \Group());
-        $allFolders  = $treeBuilder->buildChildNodes($this->source->getId());
+        $treeBuilder = new Folder\TreeBuilder(
+            Folder\Mapper::getInstance(),
+            TaskMapper::getInstance(),
+            UserAccessMapper::getInstance(),
+            RoleAccessMapper::getInstance(),
+            $_SESSION['user']
+        );
+        $allFolders = $treeBuilder->buildChildNodes($this->source->getId());
 
         $this->setVar('folders_block', '');
 
