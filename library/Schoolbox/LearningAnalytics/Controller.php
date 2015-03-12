@@ -44,55 +44,53 @@ class Controller extends Base {
          * so just hit the external db once
          */
         $registry = new Registry($allFolders);
+        $everyone = $registry->getAllStudentRegistry();
 
         /* Overall Progress
          */
         $overallProgress = new Overall($registry);
 
-//        /* Results
-//         */
-//        $allAverages = array();
-//        $allResults = array();
-//        $allTasks = new Collection();
-//
-//        foreach ($allUnits as $currentUnit) {
-//            $studentListProcessor = new StudentList($folder, $currentUnit);
-//            $allStudents = $studentListProcessor->getStudentList();
-//
-//            /* Merge results for each unit
-//             */
-//            $results = new Results($allStudents, $currentUnit);
-//            $allResults = $allResults + $results->getAllValues();
-//
-//            /* Merge averages for each unit, preserving keys
-//             */
-//            $averages = new Averages($allStudents, $currentUnit);
-//            $allAverages = $allAverages + $averages->findDescending();
-//
-//            /* All the tasks in all the units
-//             */
-//            $allTasks->merge($currentUnit->getTasks());
-//        }
-//
-//        /* Sort averages by value
-//         */
-//        $topAverages = $allAverages;
-//
-//        uasort($topAverages, function($a, $b) {
-//            return $b['average'] - $a['average'];
-//        });
-//
-//        $bottomAverages = $allAverages;
-//
-//        uasort($bottomAverages, function($a, $b) {
-//            return $a['average'] - $b['average'];
-//        });
-//
+        /* Results
+         */
+        $allAverages = array();
+        $allResults = array();
+        $allTasks = new Collection();
+
+        foreach ($registry->getAllUnitRegistry() as $currentUnit) {
+            $allStudents = $everyone[$currentUnit->getId()];
+
+            /* Merge results for each unit
+             */
+            $results = new Results($allStudents, $currentUnit);
+            $allResults = $allResults + $results->getAllValues();
+
+            /* Merge averages for each unit, preserving keys
+             */
+            $averages = new Averages($allStudents, $currentUnit);
+            $allAverages = $allAverages + $averages->findDescending();
+
+            /* All the tasks in all the units
+             */
+            $allTasks->merge($currentUnit->getTasks());
+        }
+
+        /* Sort averages by value
+         */
+        $topAverages = $allAverages;
+
+        uasort($topAverages, function($a, $b) {
+            return $b['average'] - $a['average'];
+        });
+
+        $bottomAverages = $allAverages;
+
+        uasort($bottomAverages, function($a, $b) {
+            return $a['average'] - $b['average'];
+        });
+
         /* Individual Unit Progress
          */
         $allUnitProgress = array();
-
-        $everyone = $registry->getAllStudentRegistry();
 
         foreach ($registry->getAllUnitRegistry() as $currentUnit) {
             $allStudents = $everyone[$currentUnit->getId()];
@@ -116,13 +114,13 @@ class Controller extends Base {
                         'mostAdvancedStudent' => $overallProgress->getMostAdvancedStudent(),
                         'classCompletions' => $overallProgress->getClassCompletions(),
                     ),
-//                    'results' => array(
-//                        'title' => $folder->getName(),
-//                        'allTasks' => $allTasks,
-//                        'allValues' => $allResults,
-//                        'topStudents' => $topAverages,
-//                        'bottomStudents' => $bottomAverages,
-//                    ),
+                    'results' => array(
+                        'title' => 'All folders in a course',
+                        'allTasks' => $allTasks,
+                        'allValues' => $allResults,
+                        'topStudents' => $topAverages,
+                        'bottomStudents' => $bottomAverages,
+                    ),
                     'progress' => array(
                         'allUnits' => $allUnitProgress,
                     ),
