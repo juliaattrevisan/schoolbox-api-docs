@@ -9,9 +9,11 @@
 
 namespace Schoolbox\Resource;
 
-use Group as CategoryHandler;
 use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper;
+use Schoolbox\User;
 
 /**
  * Class CategoryTreeBuilder
@@ -24,13 +26,15 @@ class CategoryTreeBuilder extends Folder\TreeBuilder
 
     /**
      * @deprecated
-     * @param Mapper     $mapper
-     * @param TaskMapper $taskMapper
-     * @param \Group     $handler
+     * @param Mapper           $mapper
+     * @param TaskMapper       $taskMapper
+     * @param UserAccessMapper $userAccessMapper
+     * @param RoleAccessMapper $roleAccessMapper
+     * @param User             $user
      */
-    public function __construct(Mapper $mapper, TaskMapper $taskMapper, CategoryHandler $handler)
+    public function __construct(Mapper $mapper, TaskMapper $taskMapper, $userAccessMapper, $roleAccessMapper, $user)
     {
-        parent::__construct($mapper, $taskMapper, $handler);
+        parent::__construct($mapper, $taskMapper, $userAccessMapper, $roleAccessMapper, $user);
     }
 
 }

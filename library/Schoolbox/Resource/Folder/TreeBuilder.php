@@ -9,39 +9,45 @@
 
 namespace Schoolbox\Resource\Folder;
 
-use Group as CategoryHandler;
 use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\User;
 
 
 class TreeBuilder 
 {
 
-    /**
-     * @var Mapper
-     */
+    /** @var Mapper */
     protected $mapper;
 
-    /**
-     * @var CategoryHandler
-     */
-    protected $handler;
-
-    /**
-     * @var TaskMapper
-     */
+    /** @var TaskMapper */
     protected $taskMapper;
 
+    /** @var UserAccessMapper */
+    protected $userAccessMapper;
+
+    /** @var RoleAccessMapper */
+    protected $roleAccessMapper;
+
+    /** @var User */
+    protected $user;
+
     /**
-     * @param Mapper          $mapper
-     * @param TaskMapper      $taskMapper
-     * @param CategoryHandler $handler
+     * @param Mapper           $mapper
+     * @param TaskMapper       $taskMapper
+     * @param UserAccessMapper $userAccessMapper
+     * @param RoleAccessMapper $roleAccessMapper
+     * @param User             $user
      */
-    public function __construct(Mapper $mapper, TaskMapper $taskMapper, CategoryHandler $handler)
+    public function __construct(Mapper $mapper, TaskMapper $taskMapper, $userAccessMapper, $roleAccessMapper, $user)
     {
-        $this->mapper     = $mapper;
-        $this->handler    = $handler;
-        $this->taskMapper = $taskMapper;
+        $this->mapper           = $mapper;
+        $this->taskMapper       = $taskMapper;
+        $this->userAccessMapper = $userAccessMapper;
+        $this->roleAccessMapper = $roleAccessMapper;
+        $this->user             = $user;
     }
 
     /**
@@ -65,7 +71,7 @@ class TreeBuilder
                 'children' => count($this->mapper->findByParent(0)) > 0,
                 'type'     => 'root',
                 'li_attr'  => array(
-                    'data-permission' => $this->getPermissionString($this->handler->getPermission(0)),
+                    'data-permission' => $this->getFolderPermission($categoryId),
                 ),
             );
         } else {
@@ -73,7 +79,7 @@ class TreeBuilder
             foreach ($this->mapper->findByParent($categoryId) as $category) {
                 // Get the permission this user has on this folder.
                 // No permission: don't show it at all!
-                $permission = $this->getPermissionString($this->handler->getPermission($category->getId()));
+                $permission = $this->getFolderPermission($category->getId());
                 if (empty($permission)) {
                     continue;
                 }
@@ -160,6 +166,33 @@ class TreeBuilder
         unset($leaf);
 
         return $partialTree;
+    }
+
+
+    /**
+     * @param int $folderId
+     * @return string
+     */
+    protected function getFolderPermission($folderId)
+    {
+        // check user access first, then role access if that fails
+        try {
+            $access = $this->userAccessMapper
+                ->getAccess($this->user, $folderId)
+                ->getAccessLevel();
+
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            try {
+                $access = $this->roleAccessMapper
+                    ->getAccess($this->user, $folderId)
+                    ->getType();
+
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $access = 0;
+            }
+        }
+
+        return $this->getPermissionString($access);
     }
 
     /**
