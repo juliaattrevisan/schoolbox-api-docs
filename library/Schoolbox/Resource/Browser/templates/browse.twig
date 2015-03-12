@@ -30,6 +30,30 @@
     #tree > ul > li > a {
         margin-left: -7px;
     }
+    [data-ajax] {
+        position: relative;
+    }
+    [data-ajax]:before {
+        display: none;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255,255,255,0.8);
+        text-align: center;
+        box-sizing: border-box;
+        padding-top: 45%;
+    }
+    [data-ajax].loading:before {
+        display: block;
+        position: absolute;
+        content: "Loading...";
+        z-index: 1;
+    }
+    .p128 {
+        display: block;
+        min-height: 128px;
+    }
 </style>
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript" src="/javascript/jquery.resourceTree.js"></script>
@@ -47,6 +71,28 @@
             }
         });
 
+        tree.on('select_node.jstree', function(event, jstree) {
+            $('#file-list')
+                .addClass('loading')
+                .load('/resourceses/'+jstree.node.id+'/children', function () {
+                    $(this).removeClass('loading');
+                });
+
+            $('#meta')
+                .addClass('loading')
+                .load('/resourceses/'+jstree.node.id+'/info', function () {
+                    $(this).removeClass('loading');
+                });
+        });
+
+        $('#file-list').on('click', 'a', function (e) {
+            e.preventDefault();
+            $('#meta')
+                .addClass('loading')
+                .load('/resourceses/file/'+$(this).data('id')+'/info', function () {
+                    $(this).removeClass('loading');
+                });
+        });
 
     });
 </script>
@@ -62,14 +108,16 @@
     <div class="large-4 columns">
         <h2>Files</h2>
         <div class="scroller">
-            <ul id="file-list">
+            <ul data-ajax id="file-list">
                 {% include '@resourceBrowser/listResources.twig' with { files: files } %}
             </ul>
         </div>
     </div>
     <div class="large-4 columns">
         <h2>Details</h2>
-        {% include '@resourceBrowser/showFolderInfo.twig' %}
+        <div data-ajax id="meta">
+            {% include '@resourceBrowser/showFolderInfo.twig' %}
+        </div>
     </div>
 </div>
 

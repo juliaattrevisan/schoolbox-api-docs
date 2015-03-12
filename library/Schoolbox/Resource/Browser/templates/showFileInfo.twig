@@ -1,10 +1,12 @@
 {% if access > 0 %}
 <section>
+    <span class="p128">
     {% if file.mimetype.isImage %}
         <img class="icon" src="/cms/image.php?width=128&height=128&id={{ file.id }}" alt="{{ file.description }}"/>
     {% else %}
         <img class="icon" src="/images/mime/128x128/{{ file.mimetype.iconFile }}" alt="{{ file.description }}"/>
     {% endif %}
+    </span>
     <h3>{{ file.description }}</h3>
     <p>({{ file.filesize | bytes }})</p>
     <ul>
