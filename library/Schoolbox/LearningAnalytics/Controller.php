@@ -53,14 +53,12 @@ class Controller extends Base {
             $studentListProcessor = new StudentList($folder, $currentUnit);
             $allStudents = $studentListProcessor->getStudentList();
 
-            /* Merge results for each unit, preserving keys
-             * http://stackoverflow.com/questions/17462354/how-to-merge-array-and-preserve-keys
+            /* Merge results for each unit
              */
             $results = new Results($allStudents, $currentUnit);
             $allResults = $allResults + $results->getAllValues();
 
             /* Merge averages for each unit, preserving keys
-             * http://stackoverflow.com/questions/17462354/how-to-merge-array-and-preserve-keys
              */
             $averages = new Averages($allStudents, $currentUnit);
             $allAverages = $allAverages + $averages->findDescending();
