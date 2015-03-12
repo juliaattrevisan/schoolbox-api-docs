@@ -126,7 +126,7 @@ class UnitInstanceMapper extends Mapper {
         );
 
         // Hydrate the list of tasks within each unit, sorting by order.
-        $task_list = Task\InstanceMapper::getInstance()->findByColumn(
+        $task_list = $this->getJoinMapper('task')->findByColumn(
             'course_unit_instance_id',
             $unit_list->getColumnValues('id'),
             array(
@@ -138,14 +138,26 @@ class UnitInstanceMapper extends Mapper {
 
         // Add only the relevant tasks to each unit.
         foreach ($unit_list as $unit) {
+            /** @var \CallbackFilterIterator|Task\Instance[] $task_iterator */
             $task_iterator = new \CallbackFilterIterator(
                 $task_list->getIterator(),
-                function($item) use($unit) {
+                function ($item) use ($unit) {
                     /** @var Task\Instance $item */
                     return $item->getUnitInstance()->getId() == $unit->getId();
                 }
             );
             foreach ($task_iterator as $task) {
+                // Load the list of related due work and quiz items too.
+                if (($boxId = $task->getSubmissionBox()->getId())) {
+                    $task->setSubmissionBox(
+                        $this->getJoinMapper('task.submission_box')->findById($boxId)
+                    );
+                }
+                if (($quizId = $task->getAssessment()->getId())) {
+                    $task->setAssessment(
+                        $this->getJoinMapper('task.assessment')->findById($quizId)
+                    );
+                }
                 $unit->getTasks()->add($task);
             }
         }
