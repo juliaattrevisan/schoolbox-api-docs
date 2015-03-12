@@ -90,7 +90,7 @@
     {
         info: "{{ currentValue.user.getFullName() }}",
         uid: '{{ currentValue.user.getId() }}',
-        value: parseFloat({{ currentValue.value }})
+        value: {% if currentValue.value %}{{ currentValue.value }}{% else %}null{% endif %}
     }{% if not loop.last %},
     {% endif %}
     {% endfor %}
