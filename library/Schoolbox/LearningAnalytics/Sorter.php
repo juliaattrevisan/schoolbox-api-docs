@@ -36,12 +36,17 @@ class Sorter {
      * @param $key
      * @return array
      */
-    public function findAscending($key) {
-        $this->setKey($key);
-
+    public function findAscending($key = null) {
         $temp = $this->getData();
 
-        uasort($temp, array($this, 'cmpAscending'));
+        if ($key != null) {
+            $this->setKey($key);
+
+            uasort($temp, array($this, 'cmpAscendingKey'));
+        }
+        else {
+            uasort($temp, array($this, 'cmpAscending'));
+        }
 
         return $temp;
     }
@@ -52,12 +57,17 @@ class Sorter {
      * @param $key
      * @return array
      */
-    public function findDescending($key) {
-        $this->setKey($key);
-
+    public function findDescending($key = null) {
         $temp = $this->getData();
 
-        uasort($temp, array($this, 'cmpDescending'));
+        if ($key != null) {
+            $this->setKey($key);
+
+            uasort($temp, array($this, 'cmpDescendingKey'));
+        }
+        else {
+            uasort($temp, array($this, 'cmpDescending'));
+        }
 
         return $temp;
     }
@@ -69,7 +79,7 @@ class Sorter {
      * @param $b
      * @return mixed
      */
-    private function cmpAscending($a, $b) {
+    private function cmpAscendingKey($a, $b) {
         return $b[$this->getKey()] - $a[$this->getKey()];
     }
 
@@ -80,8 +90,30 @@ class Sorter {
      * @param $b
      * @return mixed
      */
-    private function cmpDescending($a, $b) {
+    private function cmpDescendingKey($a, $b) {
         return $a[$this->getKey()] - $b[$this->getKey()];
+    }
+
+    /**
+     * Custom compare function
+     *
+     * @param $a
+     * @param $b
+     * @return mixed
+     */
+    private function cmpAscending($a, $b) {
+        return $a - $b;
+    }
+
+    /**
+     * Custom compare function
+     *
+     * @param $a
+     * @param $b
+     * @return mixed
+     */
+    private function cmpDescending($a, $b) {
+        return $b - $a;
     }
 
     /**

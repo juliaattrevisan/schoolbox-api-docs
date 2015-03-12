@@ -13,6 +13,7 @@ namespace Schoolbox\LearningAnalytics\Progress;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Category as Folder;
 use Schoolbox\LearningAnalytics\Registry;
+use Schoolbox\LearningAnalytics\Sorter;
 
 class Overall {
 
@@ -112,17 +113,12 @@ class Overall {
         }
 
         /* Sort in descending order
+         * The highest number of tasks completed by a student
          */
-        if (count($uniqueCompletionCounts)) {
-            uasort($uniqueCompletionCounts, function($a, $b) {
-                return $b - $a;
-            });
+        if (count($uniqueCompletionCounts) && $numTasks) {
+            $sorter = new Sorter($uniqueCompletionCounts);
 
-            /* The highest number of tasks completed by a student
-             */
-            if ($numTasks) {
-                $val = 100 * array_shift($uniqueCompletionCounts) / $numTasks;
-            }
+            $val = 100 * array_shift($sorter->findDescending()) / $numTasks;
         }
 
         return $val;
