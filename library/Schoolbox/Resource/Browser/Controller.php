@@ -73,23 +73,14 @@ class Controller extends BaseController
         $admins = $this->userAccessMapper->findAdminsInCategory($folder);
         $roles  = $this->roleAccessMapper->findAllForFolder($folder);
 
-        if ($this->sessionUser->isSuperuser()) {
-            $access = UserAccess::ACCESS_FULL;
+        try {
+            $access = $this->userAccessMapper
+                ->getAccess($this->sessionUser, $folderId)
+                ->getAccessLevel();
 
-        } else {
-            try {
-                $access = $this->userAccessMapper->findOneByColumnList([
-                    'uid'     => $this->sessionUser->getId(),
-                    'service' => UserAccess::SERVICE_HOMEPAGE,
-                    'sid'     => $folderId
-                ])->getAccessLevel();
-
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                // no accesseses found...you get nothin'
-                return [
-                    'access' => UserAccess::ACCESS_DENY
-                ];
-            }
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // no accesseses found...you get nothin'
+            $access = null;
         }
 
         if ($admins->count()) {
@@ -196,24 +187,16 @@ class Controller extends BaseController
 
         $data = [ 'file' => $file ];
 
-        if ($this->sessionUser->isSuperuser()) {
-            $data['access'] = UserAccess::ACCESS_FULL;
+        try {
+            $data['access'] = $this->userAccessMapper
+                                   ->getAccess($this->sessionUser, $file->getFolder()->getId())
+                                   ->getAccessLevel();
 
-        } else {
-            try {
-                $data['access'] = $this->userAccessMapper->findOneByColumnList([
-                    'uid'     => $this->sessionUser->getId(),
-                    'service' => UserAccess::SERVICE_HOMEPAGE,
-                    'sid'     => $file->getFolder()->getId()
-                ])->getAccessLevel();
-
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                // no accesseses found...you get nothin'
-                $data = [
-                    'access' => UserAccess::ACCESS_DENY
-                ];
-            }
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // no accesseses found...you get nothin'
+            $data['access'] = UserAccess::ACCESS_DENY;
         }
+
         $this->getResponse()->content->set([
             'template' => '@resourceBrowser/showFileInfo.twig',
             'format'   => 'nochrome',
