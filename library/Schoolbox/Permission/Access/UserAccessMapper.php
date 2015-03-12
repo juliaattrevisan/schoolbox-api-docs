@@ -285,4 +285,87 @@ class UserAccessMapper extends Mapper
         $extUserCollection->mergeUnique($userCollection, 'id');
         return $extUserCollection;
     }
+
+
+    /**
+     * @param int   $userId
+     * @param array $serviceIds
+     * @param int   $minimumLevel
+     * @param int   $service
+     * @return bool
+     */
+    public function userHasMinimumAccessToAll($userId, $serviceIds, $minimumLevel, $service = UserAccess::SERVICE_HOMEPAGE)
+    {
+        return $this->userHasMinAccess(true, $userId, $serviceIds, $minimumLevel, $service);
+    }
+
+
+    /**
+     * @param int   $userId
+     * @param array $serviceIds
+     * @param int   $minimumLevel
+     * @param int   $service
+     * @return bool
+     */
+    public function userHasMinimumAccessToAny($userId, $serviceIds, $minimumLevel, $service = UserAccess::SERVICE_HOMEPAGE)
+    {
+        return $this->userHasMinAccess(false, $userId, $serviceIds, $minimumLevel, $service);
+    }
+
+
+    /**
+     * @param bool  $all
+     * @param int   $userId
+     * @param array $serviceIds
+     * @param int   $minimumLevel
+     * @param int   $service
+     * @return bool
+     */
+    protected function userHasMinAccess($all, $userId, $serviceIds, $minimumLevel, $service)
+    {
+        // Could be written as... :P
+        // return !!(count(array_filter($this->findByColumnList(['uid'=>$userId,'service'=>$service,'sid'=>$serviceIds])->getColumnValues('accessLevel'),function($v)use($minimumLevel){return$v>=$minimumLevel;}))==count($serviceIds));
+
+        $filter = function ($v) use ($minimumLevel) {
+            return $v >= $minimumLevel;
+        };
+
+        $search = [
+            'uid'     => $userId,
+            'service' => $service,
+            'sid'     => (array)$serviceIds
+        ];
+
+        $levels = $this->findByColumnList($search)->getColumnValues('accessLevel');
+
+        $preCount  = count($serviceIds);
+        $postCount = count(array_filter($levels, $filter));
+
+        if ($all) {
+            // check permission is in all
+            return $preCount == $postCount;
+        }
+
+        // check permission is in any
+        return $postCount > 0;
+    }
+
+
+    /**
+     * @param User $user
+     * @param int  $serviceIdentifier
+     * @param int  $service
+     * @return UserAccess
+     */
+    public function getAccess(User $user, $serviceIdentifier, $service = UserAccess::SERVICE_HOMEPAGE)
+    {
+        return $this->findOneByColumnList(
+            array(
+                'service' => $service,
+                'sid'     => $serviceIdentifier,
+                'uid'     => $user->getId(),
+            )
+        );
+    }
+
 }
