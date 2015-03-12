@@ -51,7 +51,7 @@
 
         {% if access > 0 and access < 3 %}
             <a class="button secondary icon-logout" data-action="leave" href="/group/joinForm.php?leave={{ folder.id }}">Leave Group</a>
-        {% elseif access === null %}
+        {% elseif access is null %}
             <a class="button secondary icon-group"  data-action="join" href="/group/joinForm.php?join={{ folder.id }}">Join Group</a>
         {% elseif access == 0 and folder.group.moderated %}
             <span>Membership request pending</span>
