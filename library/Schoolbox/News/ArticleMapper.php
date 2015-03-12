@@ -610,8 +610,6 @@ class ArticleMapper extends Mapper implements Searchable
 
         /* Find all the news relevant to roles and campuses
          */
-        $allRecords = array();
-
         $userMapper   = $this->getJoinMapper('users');
         $imageMapper  = $this->getJoinMapper('image');
         $campusMapper = $this->getJoinMapper('campuses');
@@ -620,7 +618,21 @@ class ArticleMapper extends Mapper implements Searchable
         /* Find all the news relevant to you specifically by id,
          * or by role type in your campus
          */
-        $topicQuery = $topic->getId() ? 't.id = :topic' : '';
+        $campusList = $user->getCampusCollection()->getColumnValues('id');
+        if (empty($campusList)) {
+            // empty collection
+            return $allArticles;
+        }
+        $campusPlaceholders = $this->getArrayPlaceholders($campusList, 'campus');
+        $params             = $this->getArrayParameters($campusList, 'campus');
+        $params['userId']   = $user->getId();
+        $params['roleId']   = $user->getRole()->getId();
+
+        $topicQuery = '';
+        if ($topic->getId()) {
+            $topicQuery = 'AND t.newsTopicId = :topicId';
+            $params['topicId'] = $topic->getId();
+        }
 
         $query = "
             SELECT
@@ -634,10 +646,14 @@ class ArticleMapper extends Mapper implements Searchable
             LEFT JOIN {$this->getJoinSql('image', 'a', 'i')}
             LEFT JOIN {$this->getJoinSql('users', 'a', 'u')}
             LEFT JOIN {$this->getJoinSql('topic', 'a', 't')}
-            LEFT JOIN `newsCampus`   AS `v_c`   ON `a`.`item_id`   = `v_c`.`id` AND v_c.id IN(:campusId)
-			LEFT JOIN `luCampus` AS `c` ON `c`.`id` = `v_c`.`campus`
-            LEFT JOIN `newsGroup`   AS `v_r`   ON `a`.`item_id`   = `v_r`.`id` AND v_r.id = :roleId
-			LEFT JOIN `groups` AS `r` ON `r`.`id` = `v_r`.`gid`
+            LEFT JOIN `newsCampus` AS `v_c`
+                ON `a`.`item_id` = `v_c`.`id` -- AND v_c.id IN $campusPlaceholders
+			LEFT JOIN `luCampus` AS `c`
+			    ON `c`.`id` = `v_c`.`campus`
+            LEFT JOIN `newsGroup` AS `v_r`
+                ON `a`.`item_id` = `v_r`.`id` -- AND v_r.id = :roleId
+			LEFT JOIN `groups` AS `r`
+			    ON `r`.`id` = `v_r`.`gid`
             WHERE a.item_deleted = 0
                 $topicQuery
                 AND a.item_datetime_published <= NOW()
@@ -645,20 +661,14 @@ class ArticleMapper extends Mapper implements Searchable
                 AND (
                     u.id = :userId
                     OR a.item_owner = :userId
+                    OR (v_c.campus IN $campusPlaceholders AND v_r.gid = :roleId)
                 )
             ORDER BY a.item_datetime_posted DESC
         ";
 
         $statement = $this->getDatabase()->prepare($query);
 
-        $statement->execute(
-            array(
-                'userId'      => $user->getId(),
-                'roleId'      => $user->getRole()->getId(),
-                'campusId'    => $user->getCampusCollection()->getColumnValues('id'),
-                'topicId'     => $topic->getId(),
-            )
-        );
+        $statement->execute($params);
 
         $allRecords = $statement->fetchAll(PDO::FETCH_ASSOC);
 
