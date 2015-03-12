@@ -527,7 +527,6 @@ class ArticleMapper extends Mapper implements Searchable
 
             /* Find all the news relevant to roles and campuses
              */
-            $now        = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
             $allRecords = array();
 
             $userMapper   = $this->getJoinMapper('users');
@@ -551,8 +550,8 @@ class ArticleMapper extends Mapper implements Searchable
                 LEFT JOIN {$this->getJoinSql('campuses', 'a', 'c')}
                 LEFT JOIN {$this->getJoinSql('roles', 'a', 'r')}
                 WHERE a.item_deleted = 0
-                    AND a.item_datetime_published <= :publishDate
-                    AND a.item_datetime_expires > :now
+                    AND a.item_datetime_published <= NOW()
+                    AND a.item_datetime_expires > NOW()
                     AND (
                         u.id = :userId
                         OR a.item_owner = :userId
@@ -570,8 +569,6 @@ class ArticleMapper extends Mapper implements Searchable
                         'userId'      => $user->getId(),
                         'roleId'      => $user->getRole()->getId(),
                         'campusId'    => $campus->getId(),
-                        'publishDate' => $now->getDatabaseDate(),
-                        'now'         => $now->getDatabaseDate(),
                     )
                 );
 
@@ -607,98 +604,75 @@ class ArticleMapper extends Mapper implements Searchable
      *
      * @return \Schoolbox\Collection
      */
-    public function findAllForUserAndTopic(User $user, $topic)
+    public function findAllForUserAndTopic(User $user, Topic $topic)
     {
-        /* Find all the news relevant to a specific topic
+        $allArticles = new Collection();
+
+        /* Find all the news relevant to roles and campuses
          */
-        if ($topic instanceof Topic) {
-            $allArticles = $this->findForTopic($topic, 9999);
-        } /* A combination of news related to you, specifically;
-         * and roles within campuses; and your associated categories
+        $allRecords = array();
+
+        $userMapper   = $this->getJoinMapper('users');
+        $imageMapper  = $this->getJoinMapper('image');
+        $campusMapper = $this->getJoinMapper('campuses');
+        $roleMapper   = $this->getJoinMapper('roles');
+
+        /* Find all the news relevant to you specifically by id,
+         * or by role type in your campus
          */
-        else {
-            $allArticles = new Collection();
+        $topicQuery = $topic->getId() ? 't.id = :topic' : '';
 
-            /* User campuses
-             */
-            $campusMapper = new CampusMapper();
-            $userCampuses = $campusMapper->getAvailableCampusesForUser($user);
-            $user->setCampusCollection($userCampuses);
+        $query = "
+            SELECT
+                {$this->getColumnString('a')},
+                {$imageMapper->getColumnString('i')},
+                {$userMapper->getColumnString('u')},
+                {$campusMapper->getColumnString('c')},
+                {$roleMapper->getColumnString('r')},
+                {$this->getJoinColumnString('topic', 't')}
+            FROM `{$this->getTable()}` a
+            LEFT JOIN {$this->getJoinSql('image', 'a', 'i')}
+            LEFT JOIN {$this->getJoinSql('users', 'a', 'u')}
+            LEFT JOIN {$this->getJoinSql('topic', 'a', 't')}
+            LEFT JOIN `newsCampus`   AS `v_c`   ON `a`.`item_id`   = `v_c`.`id` AND v_c.id IN(:campusId)
+			LEFT JOIN `luCampus` AS `c` ON `c`.`id` = `v_c`.`campus`
+            LEFT JOIN `newsGroup`   AS `v_r`   ON `a`.`item_id`   = `v_r`.`id` AND v_r.id = :roleId
+			LEFT JOIN `groups` AS `r` ON `r`.`id` = `v_r`.`gid`
+            WHERE a.item_deleted = 0
+                $topicQuery
+                AND a.item_datetime_published <= NOW()
+                AND a.item_datetime_expires > NOW()
+                AND (
+                    u.id = :userId
+                    OR a.item_owner = :userId
+                )
+            ORDER BY a.item_datetime_posted DESC
+        ";
 
-            /* Find all the news relevant to all topics
-             */
-            $topicMapper = new TopicMapper();
-            $allTopics   = $topicMapper->findAll();
+        $statement = $this->getDatabase()->prepare($query);
 
-            foreach ($allTopics as $currentTopic) {
-                $allArticles = $allArticles->merge($this->findForTopic($currentTopic, 9999));
+        $statement->execute(
+            array(
+                'userId'      => $user->getId(),
+                'roleId'      => $user->getRole()->getId(),
+                'campusId'    => $user->getCampusCollection()->getColumnValues('id'),
+                'topicId'     => $topic->getId(),
+            )
+        );
+
+        $allRecords = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        /* Hydrate
+         */
+        foreach ($allRecords as $currentRecord) {
+            $article = $this->hydrate($currentRecord, 'a');
+            $image   = $imageMapper->hydrate($currentRecord, 'i');
+
+            if (is_numeric($image->getId())) {
+                $article->setImage($image);
             }
 
-            /* Find all the news relevant to roles and campuses
-             */
-            $now        = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
-            $allRecords = array();
-
-            $userMapper   = $this->getJoinMapper('users');
-            $imageMapper  = $this->getJoinMapper('image');
-            $campusMapper = $this->getJoinMapper('campuses');
-            $roleMapper   = $this->getJoinMapper('roles');
-
-            /* Find all the news relevant to you specifically by id,
-             * or by role type in your campus
-             */
-            $query = "
-                SELECT
-                    {$this->getColumnString('a')},
-                    {$imageMapper->getColumnString('i')},
-                    {$userMapper->getColumnString('u')},
-                    {$campusMapper->getColumnString('c')},
-                    {$roleMapper->getColumnString('r')}
-                FROM `{$this->getTable()}` a
-                LEFT JOIN {$this->getJoinSql('image', 'a', 'i')}
-                LEFT JOIN {$this->getJoinSql('users', 'a', 'u')}
-                LEFT JOIN {$this->getJoinSql('campuses', 'a', 'c')}
-                LEFT JOIN {$this->getJoinSql('roles', 'a', 'r')}
-                WHERE a.item_deleted = 0
-                    AND a.item_datetime_published <= :publishDate
-                    AND a.item_datetime_expires > :now
-                    AND (
-                        u.id = :userId
-                        OR a.item_owner = :userId
-                        OR (c.id = :campusId AND r.id = :roleId)
-                    )
-                ORDER BY a.item_datetime_posted DESC
-            ";
-
-            $statement = $this->getDatabase()->prepare($query);
-
-            // iterate by campus
-            foreach ($user->getCampusCollection() as $campus) {
-                $statement->execute(
-                    array(
-                        'userId'      => $user->getId(),
-                        'roleId'      => $user->getRole()->getId(),
-                        'campusId'    => $campus->getId(),
-                        'publishDate' => $now->getDatabaseDate(),
-                        'now'         => $now->getDatabaseDate(),
-                    )
-                );
-
-                $allRecords = array_merge($statement->fetchAll(PDO::FETCH_ASSOC));
-            }
-
-            /* Hydrate
-             */
-            foreach ($allRecords as $currentRecord) {
-                $article = $this->hydrate($currentRecord, 'a');
-                $image   = $imageMapper->hydrate($currentRecord, 'i');
-
-                if (is_numeric($image->getId())) {
-                    $article->setImage($image);
-                }
-
-                $allArticles->add($article);
-            }
+            $allArticles->add($article);
         }
 
         $allArticles->sortBy('postDate', 'DESC');
@@ -739,9 +713,9 @@ class ArticleMapper extends Mapper implements Searchable
 				LEFT JOIN {$this->getJoinSql('image', 'n', 'i')}
 			WHERE
 				`n`.`item_deleted` = FALSE
-				AND `n`.`item_datetime_published` < :time
+				AND `n`.`item_datetime_published` <= NOW()
 				AND `n`.`item_topic_id` = :topicId
-				AND `n`.`item_datetime_expires` > :now
+				AND `n`.`item_datetime_expires` > NOW()
 			ORDER BY `n`.`item_datetime_posted` DESC
 			LIMIT $offset, $limit
 		";
