@@ -84,7 +84,9 @@ $(document).ready(function() {
                     dataType: 'json',
                     url:      {{ routeLookup('resourceBooking.bookingCalendar', {id: item.id})|json_encode|raw }},
                     success: function(data) {
-                        callback(data);
+                        callback(data.filter(function(v) {
+                            return 'start' in v;
+                        }));
                     },
                     cache: false
                 });
