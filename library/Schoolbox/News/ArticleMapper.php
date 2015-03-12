@@ -635,25 +635,15 @@ class ArticleMapper extends Mapper implements Searchable
         }
 
         $query = "
-            SELECT
+            SELECT DISTINCT
                 {$this->getColumnString('a')},
-                {$imageMapper->getColumnString('i')},
-                {$userMapper->getColumnString('u')},
-                {$campusMapper->getColumnString('c')},
-                {$roleMapper->getColumnString('r')},
-                {$this->getJoinColumnString('topic', 't')}
+                {$imageMapper->getColumnString('i')}
             FROM `{$this->getTable()}` a
             LEFT JOIN {$this->getJoinSql('image', 'a', 'i')}
             LEFT JOIN {$this->getJoinSql('users', 'a', 'u')}
             LEFT JOIN {$this->getJoinSql('topic', 'a', 't')}
-            LEFT JOIN `newsCampus` AS `v_c`
-                ON `a`.`item_id` = `v_c`.`id` -- AND v_c.id IN $campusPlaceholders
-			LEFT JOIN `luCampus` AS `c`
-			    ON `c`.`id` = `v_c`.`campus`
-            LEFT JOIN `newsGroup` AS `v_r`
-                ON `a`.`item_id` = `v_r`.`id` -- AND v_r.id = :roleId
-			LEFT JOIN `groups` AS `r`
-			    ON `r`.`id` = `v_r`.`gid`
+            LEFT JOIN `newsCampus` AS `v_c` ON `a`.`item_id` = `v_c`.`id`
+            LEFT JOIN `newsGroup` AS `v_r` ON `a`.`item_id` = `v_r`.`id`
             WHERE a.item_deleted = 0
                 $topicQuery
                 AND a.item_datetime_published <= NOW()
