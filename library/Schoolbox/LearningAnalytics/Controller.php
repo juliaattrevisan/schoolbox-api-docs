@@ -39,9 +39,15 @@ class Controller extends Base {
      */
     public function allFolders(Collection $allFolders) {
 
+        /* Get a list of all the students involved in each unit
+         * and a list of units involved. This gets reused everywhere
+         * so just hit the external db once
+         */
+        $registry = new Registry($allFolders);
+
         /* Overall Progress
          */
-        $overallProgress = new Overall($allFolders);
+        $overallProgress = new Overall($registry);
 
 //        /* Results
 //         */

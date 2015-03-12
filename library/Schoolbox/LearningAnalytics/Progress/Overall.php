@@ -12,25 +12,9 @@ namespace Schoolbox\LearningAnalytics\Progress;
 
 use Schoolbox\Collection;
 use Schoolbox\Resource\Category as Folder;
-use Schoolbox\LearningAnalytics\StudentList;
-use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\LearningAnalytics\Registry;
 
 class Overall {
-
-    /**
-     * A Collection of Folder instances
-     *
-     * @var Collection
-     */
-    private $allFolders = null;
-
-
-    /**
-     * A collection of UnitInstances
-     *
-     * @var Collection
-     */
-    private $allUnits = null;
 
     /**
      * This student has completed the most tasks
@@ -47,35 +31,19 @@ class Overall {
     private $classCompletions = 0;
 
     /**
-     * A collection of User instances
+     * An instance of LearningAnalytics\Registry
      *
-     * @var Collection
+     * @var Registry
      */
-    private $allStudents = null;
-
-    /**
-     * An array of unitId-user data
-     *
-     * @var Collection
-     */
-    private $allStudentRegistry = null;
-
-    /**
-     * A Collection of UnitInstance instances
-     *
-     * @var Collection
-     */
-    private $allUnitRegistry = null;
+    private $registry = null;
 
     /**
      * Constructor
      *
-     * @param Collection $allFolders
+     * @param Registry $registry
      */
-    public function __construct(Collection $allFolders) {
-        $this->setAllFolders($allFolders);
-
-        $this->findRegistries();
+    public function __construct(Registry $registry) {
+        $this->setRegistry($registry);
 
         $this->process();
     }
@@ -84,63 +52,27 @@ class Overall {
      * Populate with data
      */
     private function process() {
-        $this->setMostAdvancedStudent($this->findMostAdvancedStudent($this->getAllStudentRegistry()));
-        $this->setClassCompletions($this->findClassCompletions($this->getAllStudentRegistry()));
-    }
-
-    /**
-     * A list of all the students who are associated with each unit
-     *
-     * This basically serves as a preload for the external db, because
-     * we reuse this list of students and we don't want to hit the
-     * external db more than we have to
-     *
-     * @return array
-     */
-    private function findRegistries() {
-        $unitInstanceMapper = new UnitInstanceMapper();
-
-        /* A registry of unitId-studentList relations
-         */
-        $allStudentRegistry = array();
-
-        /* Also maintain a growing collection of units
-         */
-        $allUnitRegistry = new Collection();
-
-        /* Extract all the students first because we're going to
-         * reuse this list again
-         */
-        foreach ($this->getAllFolders() as $currentFolder) {
-            $allUnits = $unitInstanceMapper->findForCategoryId($currentFolder->getId());
-
-            $allUnitRegistry->merge($allUnits);
-
-            foreach ($allUnits as $currentUnit) {
-                $studentListProcessor = new StudentList($currentFolder, $currentUnit);
-                $allStudentRegistry[$currentUnit->getId()] = $studentListProcessor->getStudentList();
-            }
-        }
-
-        $this->setAllStudentRegistry($allStudentRegistry);
-        $this->setAllUnitRegistry($allUnitRegistry);
+        $this->setMostAdvancedStudent($this->findMostAdvancedStudent());
+        $this->setClassCompletions($this->findClassCompletions());
     }
 
     /**
      * Find the student who has completed the most tasks
      * Remember how many they completed
      *
-     * @param $allStudentRegistry
      * @return float
      */
-    private function findMostAdvancedStudent($allStudentRegistry) {
+    private function findMostAdvancedStudent() {
         $allCompletions = array();
         $numTasks = 0;
         $val = 0.00;
 
+        $allStudentRegistry = $this->getRegistry()->getAllStudentRegistry();
+        $allUnitRegistry = $this->getRegistry()->getAllUnitRegistry();
+
         /* Tally completed tasks across all units in a course
          */
-        foreach ($this->getAllUnitRegistry() as $currentUnit) {
+        foreach ($allUnitRegistry as $currentUnit) {
             $numTasks += $currentUnit->getTasks()->count();
 
             $allStudents = $allStudentRegistry[$currentUnit->getId()];
@@ -207,11 +139,13 @@ class Overall {
      * If nobody has completed a task, it won't appear in
      * the $completionCounts array
      */
-    private function findClassCompletions($allStudentRegistry) {
+    private function findClassCompletions() {
         $completionCounts = array();
         $numTasks = 0;
 
-        foreach ($this->getAllUnitRegistry() as $currentUnit) {
+        $allStudentRegistry = $this->getRegistry()->getAllStudentRegistry();
+
+        foreach ($this->getRegistry()->getAllUnitRegistry() as $currentUnit) {
             $numTasks += $currentUnit->getTasks()->count();
 
             $allStudents = $allStudentRegistry[$currentUnit->getId()];
@@ -290,122 +224,22 @@ class Overall {
     }
 
     /**
-     * Set all students
+     * Set registry
      *
-     * @param \Schoolbox\Collection $allStudents
+     * @param \Schoolbox\LearningAnalytics\Registry $registry
      */
-    private function setAllStudents($allStudents)
+    private function setRegistry($registry)
     {
-        $this->allStudents = $allStudents;
+        $this->registry = $registry;
     }
 
     /**
-     * Get all students
+     * Get registry
      *
-     * @return \Schoolbox\Collection
+     * @return \Schoolbox\LearningAnalytics\Registry
      */
-    private function getAllStudents()
+    private function getRegistry()
     {
-        return $this->allStudents;
-    }
-
-    /**
-     * Set folder
-     *
-     * @param \Schoolbox\Resource\Category $folder
-     */
-    private function setFolder($folder)
-    {
-        $this->folder = $folder;
-    }
-
-    /**
-     * Get folder
-     *
-     * @return \Schoolbox\Resource\Category
-     */
-    private function getFolder()
-    {
-        return $this->folder;
-    }
-
-    /**
-     * Set all units
-     *
-     * @param \Schoolbox\Collection $allUnits
-     */
-    private function setAllUnits($allUnits)
-    {
-        $this->allUnits = $allUnits;
-    }
-
-    /**
-     * Get all units
-     *
-     * @return \Schoolbox\Collection
-     */
-    private function getAllUnits()
-    {
-        return $this->allUnits;
-    }
-
-    /**
-     * Set all folders
-     *
-     * @param \Schoolbox\Collection $allFolders
-     */
-    private function setAllFolders($allFolders)
-    {
-        $this->allFolders = $allFolders;
-    }
-
-    /**
-     * Get all folders
-     *
-     * @return \Schoolbox\Collection
-     */
-    private function getAllFolders()
-    {
-        return $this->allFolders;
-    }
-
-    /**
-     * Set all student registry
-     *
-     * @param array $allStudentRegistry
-     */
-    private function setAllStudentRegistry($allStudentRegistry)
-    {
-        $this->allStudentRegistry = $allStudentRegistry;
-    }
-
-    /**
-     * Get all student registry
-     *
-     * @return array
-     */
-    private function getAllStudentRegistry()
-    {
-        return $this->allStudentRegistry;
-    }
-
-    /**
-     * Set all unit registry
-     *
-     * @param \Schoolbox\Collection $allUnitRegistry
-     */
-    private function setAllUnitRegistry($allUnitRegistry)
-    {
-        $this->allUnitRegistry = $allUnitRegistry;
-    }
-
-    /**
-     * Get all unit registry
-     *
-     * @return \Schoolbox\Collection
-     */
-    private function getAllUnitRegistry()
-    {
-        return $this->allUnitRegistry;
+        return $this->registry;
     }
 }
