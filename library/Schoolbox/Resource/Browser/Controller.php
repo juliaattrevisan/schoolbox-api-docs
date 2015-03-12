@@ -191,6 +191,8 @@ class Controller extends BaseController
 
         /** @var Resource\File $file */
         $file = $this->fileMapper->findById($fileId);
+        // urgh...
+        $file->setOwner($this->userMapper->findById($file->getOwner()->getId()));
 
         $data = [ 'file' => $file ];
 
