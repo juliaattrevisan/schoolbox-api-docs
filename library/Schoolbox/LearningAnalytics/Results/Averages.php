@@ -14,6 +14,7 @@ namespace Schoolbox\LearningAnalytics\Results;
 
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Collection;
+use Schoolbox\LearningAnalytics\Sorter;
 
 class Averages {
 
@@ -95,13 +96,9 @@ class Averages {
      * @return array
      */
     public function findAscending() {
-        $temp = $this->getAllAverages();
+        $sorter = new Sorter($this->getAllAverages());
 
-        uasort($temp, function($a, $b) {
-            return $a['average'] - $b['average'];
-        });
-
-        return $temp;
+        return $sorter->findAscending('average');
     }
 
     /**
@@ -110,13 +107,9 @@ class Averages {
      * @return array
      */
     public function findDescending() {
-        $temp = $this->getAllAverages();
+        $sorter = new Sorter($this->getAllAverages());
 
-        uasort($temp, function($a, $b) {
-            return $b['average'] - $a['average'];
-        });
-
-        return $temp;
+        return $sorter->findDescending('average');
     }
 
     /* Getters/Setters

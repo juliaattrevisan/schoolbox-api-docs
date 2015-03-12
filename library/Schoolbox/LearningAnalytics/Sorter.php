@@ -80,7 +80,7 @@ class Sorter {
      * @return mixed
      */
     private function cmpAscendingKey($a, $b) {
-        return $b[$this->getKey()] - $a[$this->getKey()];
+        return $a[$this->getKey()] - $b[$this->getKey()];
     }
 
     /**
@@ -91,7 +91,7 @@ class Sorter {
      * @return mixed
      */
     private function cmpDescendingKey($a, $b) {
-        return $a[$this->getKey()] - $b[$this->getKey()];
+        return $b[$this->getKey()] - $a[$this->getKey()];
     }
 
     /**
