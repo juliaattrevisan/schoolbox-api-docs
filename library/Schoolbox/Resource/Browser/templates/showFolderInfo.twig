@@ -7,7 +7,7 @@
 <section>
     <h4>Actions</h4>
     {% if folder.hasHomepage %}
-    <a class="button secondary icon-homepage" data-action="homepage" href="/homepage/{{ folder.id }}">Homepage</a>
+    <a class="button secondary icon-homepage" data-action="homepage" href="/homepage/{{ folder.id }}">View Homepage</a>
     {% endif %}
     {% if access >= 2 %}
     <a class="button secondary icon-modify"   data-action="modify"   href="/cms/category/{{ folder.id }}">Modify</a>
@@ -25,6 +25,7 @@
     {% endif %}
 </section>
 
+{% if folder.group.category %}
 <section>
     <h4>Group</h4>
     <ul class="information-list">
@@ -39,9 +40,9 @@
         <li>
             <h5 class="subheader">Access Type</h5>
             <p>
-                {% if folder.group.type == 1 %}Private{% endif %}
-                {% if folder.group.type == 2 %}Moderated{% endif %}
-                {% if folder.group.type == 3 %}Open{% endif %}
+                {% if folder.group.private   %}Private{% endif %}
+                {% if folder.group.moderated %}Moderated{% endif %}
+                {% if folder.group.free      %}Open{% endif %}
             </p>
         </li>
     </ul>
@@ -57,6 +58,7 @@
     {# notably, if you are the admin, you can't leave the group #}
 
 </section>
+{% endif %}
 
 <section>
     <h4>Permissions</h4>
