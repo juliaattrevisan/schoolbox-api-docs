@@ -30,74 +30,75 @@ class Controller extends Base {
      * $unit is the currently selected unit for $folder. That is used for
      * all the boxplots, rankings etc.
      *
-     * $allUnits is all the units in the course. That is used to calculate
-     * overall progress etc. To make it relevant to only one unit, fill
-     * it with only one unit instead of all the units.
+     * $allFolderts is all the folders in the course. That is used to
+     * calculate overall progress etc. To make it relevant to only one
+     * folder, fill it with only one folder instead of all the folders.
+     * This is done in Module.
      *
-     * @param Folder $folder
-     * @param Collection $allUnits
+     * @param Collection $allFolders
      */
-    public function allUnits(Folder $folder, Collection $allUnits) {
+    public function allFolders(Collection $allFolders) {
 
         /* Overall Progress
          */
-        $overallProgress = new Overall($folder, $allUnits);
+        $overallProgress = new Overall($allFolders);
 
-        /* Results
-         */
-        $allAverages = array();
-        $allResults = array();
-        $allTasks = new Collection();
+//        /* Results
+//         */
+//        $allAverages = array();
+//        $allResults = array();
+//        $allTasks = new Collection();
+//
+//        foreach ($allUnits as $currentUnit) {
+//            $studentListProcessor = new StudentList($folder, $currentUnit);
+//            $allStudents = $studentListProcessor->getStudentList();
+//
+//            /* Merge results for each unit
+//             */
+//            $results = new Results($allStudents, $currentUnit);
+//            $allResults = $allResults + $results->getAllValues();
+//
+//            /* Merge averages for each unit, preserving keys
+//             */
+//            $averages = new Averages($allStudents, $currentUnit);
+//            $allAverages = $allAverages + $averages->findDescending();
+//
+//            /* All the tasks in all the units
+//             */
+//            $allTasks->merge($currentUnit->getTasks());
+//        }
+//
+//        /* Sort averages by value
+//         */
+//        $topAverages = $allAverages;
+//
+//        uasort($topAverages, function($a, $b) {
+//            return $b['average'] - $a['average'];
+//        });
+//
+//        $bottomAverages = $allAverages;
+//
+//        uasort($bottomAverages, function($a, $b) {
+//            return $a['average'] - $b['average'];
+//        });
+//
+//        /* Individual Unit Progress
+//         */
+//        $allUnitProgress = array();
+//
+//        foreach ($allUnits as $currentUnit) {
+//            $studentListProcessor = new StudentList($folder, $currentUnit);
+//            $allStudents = $studentListProcessor->getStudentList();
+//
+//            $unitProgress = new Unit($allStudents, $currentUnit);
+//
+//            $allUnitProgress[] = array(
+//                'unit' => $currentUnit,
+//                'mostAdvancedStudent' => $unitProgress->getMostAdvancedStudent(),
+//                'classCompletions' => $unitProgress->getClassCompletions()
+//            );
+//        }
 
-        foreach ($allUnits as $currentUnit) {
-            $studentListProcessor = new StudentList($folder, $currentUnit);
-            $allStudents = $studentListProcessor->getStudentList();
-
-            /* Merge results for each unit
-             */
-            $results = new Results($allStudents, $currentUnit);
-            $allResults = $allResults + $results->getAllValues();
-
-            /* Merge averages for each unit, preserving keys
-             */
-            $averages = new Averages($allStudents, $currentUnit);
-            $allAverages = $allAverages + $averages->findDescending();
-
-            /* All the tasks in all the units
-             */
-            $allTasks->merge($currentUnit->getTasks());
-        }
-
-        /* Sort averages by value
-         */
-        $topAverages = $allAverages;
-
-        uasort($topAverages, function($a, $b) {
-            return $b['average'] - $a['average'];
-        });
-
-        $bottomAverages = $allAverages;
-
-        uasort($bottomAverages, function($a, $b) {
-            return $a['average'] - $b['average'];
-        });
-
-        /* Individual Unit Progress
-         */
-        $allUnitProgress = array();
-
-        foreach ($allUnits as $currentUnit) {
-            $studentListProcessor = new StudentList($folder, $currentUnit);
-            $allStudents = $studentListProcessor->getStudentList();
-
-            $unitProgress = new Unit($allStudents, $currentUnit);
-
-            $allUnitProgress[] = array(
-                'unit' => $currentUnit,
-                'mostAdvancedStudent' => $unitProgress->getMostAdvancedStudent(),
-                'classCompletions' => $unitProgress->getClassCompletions()
-            );
-        }
         /* Twig data
          */
         $this->getResponse()->content->set(
@@ -108,16 +109,16 @@ class Controller extends Base {
                         'mostAdvancedStudent' => $overallProgress->getMostAdvancedStudent(),
                         'classCompletions' => $overallProgress->getClassCompletions(),
                     ),
-                    'results' => array(
-                        'title' => $folder->getName(),
-                        'allTasks' => $allTasks,
-                        'allValues' => $allResults,
-                        'topStudents' => $topAverages,
-                        'bottomStudents' => $bottomAverages,
-                    ),
-                    'progress' => array(
-                        'allUnits' => $allUnitProgress,
-                    ),
+//                    'results' => array(
+//                        'title' => $folder->getName(),
+//                        'allTasks' => $allTasks,
+//                        'allValues' => $allResults,
+//                        'topStudents' => $topAverages,
+//                        'bottomStudents' => $bottomAverages,
+//                    ),
+//                    'progress' => array(
+//                        'allUnits' => $allUnitProgress,
+//                    ),
                 )
             )
         );

@@ -38,7 +38,7 @@ class Module extends BaseModule {
     {
         // All of these URLs relate to the resource ID, not a booking ID.
         // Therefore, they should probably be moved to the item module.
-        $router->addGet('learningAnalytics.allUnits', "{$basePath}/{folderId}");
+        $router->addGet('learningAnalytics.allFolders', "{$basePath}/{folderId}");
         $router->addGet('learningAnalytics.specificUnit', "{$basePath}/{folderId}/{unitId}");
     }
 
@@ -52,7 +52,7 @@ class Module extends BaseModule {
         /* Inject ingredients into learningAnalytics/index controller method
          */
         $matcher->add(
-            '/^learningAnalytics\.allUnits/',
+            '/^learningAnalytics\.allFolders/',
             function($params) {
 
                 /* Check permissions
@@ -63,28 +63,28 @@ class Module extends BaseModule {
                     error(6);
                 }
 
-                /* Load folder
+                /* Load folders
                  */
                 $folderMapper = new FolderMapper();
 
+                $allFolders = new Collection();
+
                 try {
+                    /* TODO: Find all folders associated with a particular course
+                     */
                     $folder = $folderMapper->findById($params['folderId']);
                     $folderMapper->loadJoinedModel('codes', $folder, array('set_method' => 'setCodes'));
+
+                    $allFolders->add($folder);
                 }
                 catch (Exception $e) {
                     error(159);
                 }
 
-                /* Load unit
-                 */
-                $unitInstanceMapper = new UnitInstanceMapper();
-                $allUnits = $unitInstanceMapper->findForCategoryId($folder->getId());
-
                 /* Inject
                  */
                 return array(
-                    'folder' => $folder,
-                    'allUnits' => $allUnits
+                    'allFolders' => $allFolders,
                 );
             }
         );
