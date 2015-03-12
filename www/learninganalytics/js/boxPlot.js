@@ -219,10 +219,16 @@
                 return a.value - b.value
             });
 
+            /* Remove null values before computing
+             */
             for (var i = 0; i < options.input.length; i++) {
-                derived.values.push(options.input[i].value);
+                if (options.input[i].value != undefined) {
+                    derived.values.push(options.input[i].value);
+                }
             }
 
+            /* Merge everything
+             */
             var merged = $.extend(defaults, derived, options);
 
             return merged;
@@ -275,11 +281,15 @@
          * Find minimum value in an array
          */
         function findMinimum(values) {
-            var min = values[0];
+            var min = null;
 
-            for (var i = 0; i < values.length; i++) {
-                if (values[i] < min) {
-                    min = values[i];
+            if (values.length) {
+                min = values[0];
+
+                for (var i = 0; i < values.length; i++) {
+                    if (values[i] < min) {
+                        min = values[i];
+                    }
                 }
             }
 
@@ -290,11 +300,15 @@
          * Find maximum value in an array
          */
         function findMaximum(values) {
-            var max = values[0];
+            var max = null;
 
-            for (var i = 0; i < values.length; i++) {
-                if (values[i] > max) {
-                    max = values[i];
+            if (values.length) {
+                max = values[0];
+
+                for (var i = 0; i < values.length; i++) {
+                    if (values[i] > max) {
+                        max = values[i];
+                    }
                 }
             }
 
@@ -306,13 +320,21 @@
          * required to manufacture a graph
          */
         function generateValues() {
-            return {
+            var data = {
                 minimum: findMinimum(config.values),
                 quartile1: findMedian(setupFirstQuartile(config.values)),
                 quartile2: findMedian(config.values),
                 quartile3: findMedian(setupThirdQuartile(config.values)),
                 maximum: findMaximum(config.values)
+            };
+
+            if ((data.maximum > 80.55) && (data.maximum < 81)) {
+//                console.log(config.values);
+                console.log(findMinimum(config.values));
+                console.log(findMaximum(config.values));
             }
+
+            return data;
         }
 
         /**
