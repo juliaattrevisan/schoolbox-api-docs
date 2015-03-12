@@ -172,6 +172,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $this->setBlock('unit_task', 'unit_task_no_link', 'unit_task_no_link_block');
         $this->setBlock('unit_task', 'unit_task_count', 'unit_task_count_block');
         $this->setBlock('unit_task', 'unit_task_completion', 'unit_task_completion_block');
+        $this->setBlock('unit_task', 'unit_task_due_date', 'unit_task_due_date_block');
         $this->setBlock('unit_task', 'unit_task_start', 'unit_task_start_block');
         $this->setBlock('unit_task', 'unit_task_modify', 'unit_task_modify_block');
         $this->setBlock('unit_task', 'unit_task_delete', 'unit_task_delete_block');
@@ -415,6 +416,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 'UNIT_TASK_COMPLETE_CLASS'        => $unit_task_class,
                 'unit_task_count_block'           => '',
                 'unit_task_completion_block'      => '',
+                'unit_task_due_date_block'        => '',
                 'unit_task_start_block'           => '',
                 'unit_task_delete_block'          => '',
                 'unit_task_modify_block'          => '',
@@ -481,6 +483,24 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 $this->setVar('UNIT_QUIZ_ID', Scrub::text($task->getAssessment()->getId()));
                 $this->parse('unit_task_quiz_results_block', 'unit_task_quiz_results');
             }
+        }
+
+        // Set due dates for tasks
+        $dueDate = null;
+        if ($task->getType() == Task::TYPE_DUE_WORK) {
+            $dueDate = $task->getSubmissionBox()->getDueDate();
+        } elseif ($task->getType() == Task::TYPE_ONLINE_ASSESS) {
+            $dueDate = $task->getAssessment()->getFinish();
+        }
+        if ($dueDate instanceof Alaress_Date_Format) {
+            $relativeDate = new Alaress_Date_Relative($dueDate);
+            $this->setVar(
+                array(
+                    'UNIT_TASK_DUE_DATE'          => Scrub::text($dueDate->getDateOnly()),
+                    'UNIT_TASK_RELATIVE_DUE_DATE' => Scrub::text($relativeDate->getRelativeTime())
+                )
+            );
+            $this->parse('unit_task_due_date_block', 'unit_task_due_date');
         }
         $this->parse('unit_task_block', 'unit_task', true);
     }
