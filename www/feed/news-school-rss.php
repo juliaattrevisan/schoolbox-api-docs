@@ -33,6 +33,7 @@ if (strlen($userKey)) {
     try {
         $userMapper = new \Schoolbox\UserMapper();
         $user = $userMapper->findOneByColumn('key', $userKey);
+        $user = $userMapper->findById($user->getId());
     } catch (\Exception $e) {
         error(31);
     }
