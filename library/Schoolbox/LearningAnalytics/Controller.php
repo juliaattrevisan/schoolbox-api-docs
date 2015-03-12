@@ -88,22 +88,23 @@ class Controller extends Base {
 //            return $a['average'] - $b['average'];
 //        });
 //
-//        /* Individual Unit Progress
-//         */
-//        $allUnitProgress = array();
-//
-//        foreach ($allUnits as $currentUnit) {
-//            $studentListProcessor = new StudentList($folder, $currentUnit);
-//            $allStudents = $studentListProcessor->getStudentList();
-//
-//            $unitProgress = new Unit($allStudents, $currentUnit);
-//
-//            $allUnitProgress[] = array(
-//                'unit' => $currentUnit,
-//                'mostAdvancedStudent' => $unitProgress->getMostAdvancedStudent(),
-//                'classCompletions' => $unitProgress->getClassCompletions()
-//            );
-//        }
+        /* Individual Unit Progress
+         */
+        $allUnitProgress = array();
+
+        $everyone = $registry->getAllStudentRegistry();
+
+        foreach ($registry->getAllUnitRegistry() as $currentUnit) {
+            $allStudents = $everyone[$currentUnit->getId()];
+
+            $unitProgress = new Unit($allStudents, $currentUnit);
+
+            $allUnitProgress[] = array(
+                'unit' => $currentUnit,
+                'mostAdvancedStudent' => $unitProgress->getMostAdvancedStudent(),
+                'classCompletions' => $unitProgress->getClassCompletions()
+            );
+        }
 
         /* Twig data
          */
@@ -122,9 +123,9 @@ class Controller extends Base {
 //                        'topStudents' => $topAverages,
 //                        'bottomStudents' => $bottomAverages,
 //                    ),
-//                    'progress' => array(
-//                        'allUnits' => $allUnitProgress,
-//                    ),
+                    'progress' => array(
+                        'allUnits' => $allUnitProgress,
+                    ),
                 )
             )
         );
