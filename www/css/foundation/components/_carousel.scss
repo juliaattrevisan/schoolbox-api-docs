@@ -8,9 +8,9 @@
 // $orbit-container-bg: none;
 $orbit-caption-bg: rgba($primary-color, .7);
 $orbit-caption-font-color: $white;
-$orbit-caption-font-size: rem-calc(16);
+$orbit-caption-font-size: rem-calc(($base-font-size - 2));
 // $orbit-caption-position: "bottom"; // Supported values: "bottom", "under"
-$orbit-caption-padding: rem-calc(16 24);
+$orbit-caption-padding: rem-calc(($base-font-size - 2));
 // $orbit-caption-height: auto;
 
 // We use these to control the left/right nav styles
@@ -64,7 +64,7 @@ $clearing-close-size: 30px;
 
 // We use these to style captions
 $clearing-caption-font-color: $white;
-$clearing-caption-font-size: rem-calc(16);
+$clearing-caption-font-size: rem-calc(($base-font-size - 2));
 // $clearing-caption-padding: 10px 30px 20px;
 
 // We use these to make the image and carousel height and style

@@ -55,11 +55,11 @@
 // $include-html-label-classes: $include-html-classes;
 
 // We use these to style the labels
-$label-padding: rem-calc(8 24 8);
+$label-padding: rem-calc(($base-font-size - 8));
 // $label-radius: $global-radius;
 
 // We use these to style the label text
-$label-font-sizing: rem-calc(10);
+$label-font-sizing: rem-calc(($base-font-size - 6));
 $label-font-weight: $font-weight-bold;
 // $label-font-color: $oil;
 // $label-font-color-alt: $white;
@@ -126,7 +126,7 @@ $label-font-weight: $font-weight-bold;
 // $include-html-media-classes: $include-html-classes;
 
 // We use this to set the progress bar height
-$progress-bar-height: rem-calc(16);
+$progress-bar-height: rem-calc(($base-font-size - 2));
 $progress-bar-color: tint($tertiary, 87%);
 
 // We use these to control the border styles
@@ -160,7 +160,7 @@ $progress-bar-pad: rem-calc(0);
 // $reveal-position-top: rem-calc(100);
 // $reveal-default-width: 80%;
 // $reveal-max-width: $row-width;
-$reveal-modal-padding: rem-calc(16);
+$reveal-modal-padding: rem-calc(($base-font-size - 2));
 // $reveal-box-shadow: 0 0 10px rgba($black,.4);
 
 // We use these to style the reveal close button
@@ -188,12 +188,12 @@ $reveal-border-width: 9;
 
 // $include-html-accordion-classes: $include-html-classes;
 
-// $accordion-navigation-padding: rem-calc(16);
+$accordion-navigation-padding: rem-calc(($base-font-size - 2));
 $accordion-navigation-bg-color: tint($tertiary, 74%);
 $accordion-navigation-hover-bg-color: tint($tertiary, 87%);
 // $accordion-navigation-active-bg-color: scale-color($accordion-navigation-bg-color, $lightness: -3%);
 // $accordion-navigation-font-color: $jet;
-// $accordion-navigation-font-size: rem-calc(16);
+$accordion-navigation-font-size: rem-calc(($base-font-size));
 // $accordion-navigation-font-family: $body-font-family;
 
 // $accordion-content-padding: $column-gutter/2;
@@ -216,21 +216,21 @@ $table-border-size: 0;
 
 // These control the table head styles
 $table-head-bg: tint($tertiary, 87%);
-$table-head-font-size: rem-calc(16);
+$table-head-font-size: rem-calc(($base-font-size));
 $table-head-font-color: $black;
 $table-head-font-weight: $font-weight-bold;
-$table-head-padding: rem-calc(16 16);
+$table-head-padding: rem-calc(($base-font-size - 2));
 
 // These control the row padding and font styles
-$table-row-padding: rem-calc(16 16);
-$table-row-font-size: rem-calc(16);
+$table-row-padding: rem-calc(($base-font-size - 2));
+$table-row-font-size: rem-calc(($base-font-size - 2));
 $table-row-font-color: $black;
 // $table-line-height: rem-calc(18);
 
 // These are for controlling the layout, display and margin of tables
 // $table-layout: auto;
 // $table-display: table-cell;
-// $table-margin-bottom: rem-calc(20);
+$table-margin-bottom: rem-calc(($base-font-size - 2));
 
 //
 // THUMBNAILS
@@ -262,9 +262,9 @@ $has-tip-border-bottom-hover: dotted 1px $has-tip-font-color;
 // $has-tip-font-color-hover: $primary-color;
 // $has-tip-cursor-type: help;
 
-$tooltip-padding: rem-calc(16);
+$tooltip-padding: rem-calc(($base-font-size - 2));
 $tooltip-bg: $primary-color;
-$tooltip-font-size: rem-calc(16);
+$tooltip-font-size: rem-calc(($base-font-size - 2));
 // $tooltip-font-weight: $font-weight-normal;
 $tooltip-font-color: $white;
 // $tooltip-line-height: 1.3;
