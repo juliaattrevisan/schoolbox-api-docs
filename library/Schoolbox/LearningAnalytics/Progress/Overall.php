@@ -46,25 +46,24 @@ class Overall {
     public function __construct(Registry $registry) {
         $this->setRegistry($registry);
 
-        $this->process();
+        $this->process($this->preloadUnits());
     }
 
     /**
      * Populate with data
      */
-    private function process() {
-        $this->setMostAdvancedStudent($this->findMostAdvancedStudent());
-        $this->setClassCompletions($this->findClassCompletions());
+    private function process($preloadedUnits) {
+        $this->setMostAdvancedStudent($this->findMostAdvancedStudent($preloadedUnits));
+        $this->setClassCompletions($this->findClassCompletions($preloadedUnits));
     }
 
     /**
-     * Find the student who has completed the most tasks
-     * Remember how much they completed as a percentage
+     * Preload shared data between methods
      *
-     * @return float
+     * @return array
      */
-    private function findMostAdvancedStudent() {
-        $mostAdvancedStudent = 0;
+    private function preloadUnits() {
+        $preload = array();
 
         $everyone = $this->getRegistry()->getAllStudentRegistry();
 
@@ -73,11 +72,28 @@ class Overall {
 
             $unitProgress = new Unit($allStudents, $currentUnit);
 
-            /* Remember the most that was completed
-             */
-            if ($unitProgress->getMostAdvancedStudent() > $mostAdvancedStudent) {
-                $mostAdvancedStudent = $unitProgress->getMostAdvancedStudent();
-            }
+            $preload[$currentUnit->getId()] = $unitProgress;
+        }
+
+        return $preload;
+    }
+
+    /**
+     * Find the student who has completed the most tasks
+     * Remember how much they completed as a percentage
+     *
+     * @param $preloadedUnits
+     * @return float
+     */
+    private function findMostAdvancedStudent($preloadedUnits) {
+        $mostAdvancedStudent = 0;
+
+        /* Remember the most that was completed
+         */
+        foreach ($this->getRegistry()->getAllUnitRegistry() as $currentUnit) {
+            $val = $preloadedUnits[$currentUnit->getId()]->getMostAdvancedStudent();
+
+            $mostAdvancedStudent = max($mostAdvancedStudent, $val);
         }
 
         return $mostAdvancedStudent;
@@ -93,20 +109,19 @@ class Overall {
      *
      * If nobody has completed a task, it won't appear in
      * the $completionCounts array
+     *
+     * @param $preloadedUnits
+     * @return float|int
      */
-    private function findClassCompletions() {
+    private function findClassCompletions($preloadedUnits) {
         $classCompletions = 0;
 
-        $everyone = $this->getRegistry()->getAllStudentRegistry();
-
+        /* Average the two values
+         */
         foreach ($this->getRegistry()->getAllUnitRegistry() as $currentUnit) {
-            $allStudents = $everyone[$currentUnit->getId()];
+            $val = $preloadedUnits[$currentUnit->getId()]->getClassCompletions();
 
-            $unitProgress = new Unit($allStudents, $currentUnit);
-
-            /* Average the two values
-             */
-            $classCompletions = 0.5 * ($classCompletions + $unitProgress->getClassCompletions());
+            $classCompletions = 0.5 * ($classCompletions + $val);
         }
 
         return $classCompletions;
