@@ -46,6 +46,9 @@
 #meriden-crest {
     text-align: center;
 }
+#meriden-crest svg {
+    width: 92px;
+}
 .teacher-profile.no-email {
     margin-right: 0;
 }
