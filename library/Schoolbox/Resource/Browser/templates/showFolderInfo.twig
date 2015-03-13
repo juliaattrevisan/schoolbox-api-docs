@@ -2,7 +2,12 @@
 {% if access > 0 or user.isSuperuser %}
 <li class="center">
     <img class="icon" src="/images/icons/128x128/{{ folder.folderType }}.png" alt="{{ folder.name }}"/>
-    <h3 class="meta-title">{{ folder.name }}</h3>
+    <h3 class="meta-title">
+        {{ folder.name }}
+        {% if folder.codeString %}
+            ({{ folder.codeString }})
+        {% endif %}
+    </h3>
 </li>
 
 <li>
@@ -58,6 +63,23 @@
         {% endif %}
         {# notably, if you are the admin, you can't leave the group #}
         </li>
+    </ul>
+</li>
+{% endif %}
+{% if folder.codeString and folder.teachers|length > 0 %}
+<li>
+    <h4>Class</h4>
+    <h5 class="subheader">{{ folder.teachers|length == 1 ? 'Teacher' : 'Teachers' }}</h5>
+    <ul>
+        {% for teacher in folder.teachers %}
+        <li>
+            <img src="/portrait.php?size=square48&userId={{ teacher.externalId }}" alt="{{ teacher.formatName }}" />
+            <h3 class="subheader">
+                <a href="/search/user/{{ teacher.id }}">{{ teacher.formatName }}</a>
+            </h3>
+            <p class="meta">{{ teacher.role.name }}</p>
+        </li>
+        {% endfor %}
     </ul>
 </li>
 {% endif %}

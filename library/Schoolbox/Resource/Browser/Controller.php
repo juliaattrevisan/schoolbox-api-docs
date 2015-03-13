@@ -73,6 +73,9 @@ class Controller extends BaseController
         $admins = $this->userAccessMapper->findAdminsInCategory($folder);
         $roles  = $this->roleAccessMapper->findAllForFolder($folder);
 
+        // TODO hydrate roles for these users
+        $folder->loadTeachers();
+
         try {
             $access = $this->userAccessMapper
                 ->getAccess($this->sessionUser, $folderId)
@@ -172,6 +175,8 @@ class Controller extends BaseController
 
     /**
      * @api GET /resources/file/:fileId/info
+     * @level 150
+     *
      * @param int $fileId
      */
     public function showFileInfo($fileId)
