@@ -178,6 +178,11 @@ dd.fullwidth {
     padding: 0 5px 0 0;
 }
 
+#assessment-info .feedback {
+    padding-left:3em;
+    font-weight: normal;
+    font-size: 12px;
+}
 #assessment-info .upcoming-work td {
     color: inherit;
 }
