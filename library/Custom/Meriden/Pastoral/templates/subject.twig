@@ -37,7 +37,7 @@
         {# course grade - derived from grade for this class #}
         <dt>
             Course Grade
-            <span class="description-link">[<a href="/homepage/3403">Grade Description</a>]</span>
+            <div class="description-link">[<a href="/homepage/3403">Grade Description</a>]</div>
         </dt>
         <dd class="course-grade">
             {% if report.subjectReport.namedGrades.courseGrade %}
@@ -72,7 +72,10 @@
         </dd>
 
         {# Endeavor Grades - a rubric #}
-        <dt class="fullwidth">Endeavour Grades</dt>
+        <dt class="fullwidth">
+            Endeavour Grades
+            <div class="description-link">[<a href="/homepage/3461">Grade Description</a>]</div>
+        </dt>
         <dd class="fullwidth">
             <table>
                 <thead>
@@ -104,7 +107,10 @@
         </dd>
 
         {# Approaches to learning - another rubric #}
-        <dt class="fullwidth">Approaches to Learning</dt>
+        <dt class="fullwidth">
+            Approaches to Learning
+            <div class="description-link">[<a href="/homepage/3462">Grade Description</a>]</div>
+        </dt>
         <dd class="fullwidth">
             {% if report.subjectReport.namedGrades.learningApproaches %}
                 <table class="learning-approaches">

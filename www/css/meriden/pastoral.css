@@ -177,3 +177,7 @@ dd.fullwidth {
     border-width: 0;
     padding: 0 5px 0 0;
 }
+
+#assessment-info .upcoming-work td {
+    color: inherit;
+}
