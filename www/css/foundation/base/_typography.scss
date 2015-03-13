@@ -124,9 +124,13 @@ $paragraph-aside-font-size: rem-calc(($base-font-size - 4));
 
 @import "../../../javascript/components/foundation/scss/foundation/components/type";
 
+a{
+	@include single-transition(all, 0.15s, linear);
+}
+
 .meta{
 	color: $steel !important;
-	margin: 0;
+	margin: 0 0 rem-calc(($base-font-size - 10)) 0;
 	font-size: rem-calc(($base-font-size - 3));
 }
 
@@ -135,4 +139,6 @@ $paragraph-aside-font-size: rem-calc(($base-font-size - 4));
 	font-size: rem-calc(($base-font-size - 3));
 	margin-bottom: rem-calc(($base-font-size - 3));
 }
+
+
 

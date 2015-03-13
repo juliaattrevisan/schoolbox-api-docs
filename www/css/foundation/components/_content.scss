@@ -458,8 +458,8 @@ $tooltip-font-color: $white;
 //
 // CUSTOM OVERRIDES
 //
-.label { text-transform: uppercase; }
 
+.label { text-transform: uppercase; }
 
 // Panels
 .panel,
@@ -473,6 +473,17 @@ $tooltip-font-color: $white;
     $bg: $white
   );
 }
+
+// Used inside .columns to create space between islands
+.island{
+	@extend .island-panel;
+	border: 0;
+	padding: rem-calc(($base-font-size));
+}
+
+// .columns.island:not(:first-child){
+// 	margin: 0 0 0 1.5rem;
+// }
 
 // Labels
 .submitted {
@@ -524,19 +535,16 @@ $tooltip-font-color: $white;
 		@include single-transition(all, 0.15s, linear);
 	}
 	> li{
-		border-bottom: 1px solid $gainsboro;
+		border-bottom: 1px solid $silver;
 		position: relative;
 		padding: 1.125em 0;
 		overflow: auto;
 		//@include single-transition(all, 0.15s, linear);
 
-		img{
+		.thumbnail{
 			float: left;
-			margin: 0 1.125em 1.125em 0;
-		}
-
-		p{
-			margin: 0;
+			margin: 0 rem-calc(($base-font-size - 2)) rem-calc(($base-font-size - 2)) 0;
+			max-width: 100%;
 		}
 
 		&:hover{
