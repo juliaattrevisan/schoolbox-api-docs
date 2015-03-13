@@ -31,7 +31,7 @@ class Alaress_Probe {
             echo "<div class='clearfix'></div>";
 
             for ($i = 0; $i < $numArgs; $i++) {
-                echo "<div style='width:{$width}%;float:left;display:block;overflow:scroll;'>";
+                echo "<div style='width:{$width}%;float:left;display:block;overflow:auto;'>";
                 echo "<pre>";
                 print_r(func_get_arg($i));
                 echo "</pre>";
