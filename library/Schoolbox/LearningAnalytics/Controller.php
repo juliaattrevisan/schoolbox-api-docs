@@ -37,7 +37,7 @@ class Controller extends Base {
      *
      * @param Collection $allFolders
      */
-    public function allFolders(Collection $allFolders) {
+    public function course(Collection $allFolders) {
 
         /* Get a list of all the students involved in each unit
          * and a list of units involved. This gets reused everywhere

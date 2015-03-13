@@ -38,7 +38,7 @@ class Module extends BaseModule {
     {
         // All of these URLs relate to the resource ID, not a booking ID.
         // Therefore, they should probably be moved to the item module.
-        $router->addGet('learningAnalytics.allFolders', "{$basePath}/{folderId}");
+        $router->addGet('learningAnalytics.course', "{$basePath}/{folderId}/course");
         $router->addGet('learningAnalytics.specificUnit', "{$basePath}/{folderId}/{unitId}");
     }
 
@@ -52,7 +52,7 @@ class Module extends BaseModule {
         /* Inject ingredients into learningAnalytics/index controller method
          */
         $matcher->add(
-            '/^learningAnalytics\.allFolders/',
+            '/^learningAnalytics\.course/',
             function($params) {
 
                 /* Check permissions
