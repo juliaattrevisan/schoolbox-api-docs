@@ -1,6 +1,6 @@
 <ul class="information-list">
 {% if access > 0 %}
-<li>
+<li class="center">
     <span class="p128">
     {% if file.mimetype.isImage %}
         <img class="icon" src="/cms/image.php?width=128&height=128&id={{ file.id }}" alt="{{ file.description }}"/>
