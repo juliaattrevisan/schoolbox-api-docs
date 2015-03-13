@@ -79,6 +79,13 @@
         float: none;
         margin: 0 0 1.125em 0;
     }
+    #three-panel form.dropzone {
+        position: absolute !important;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
 </style>
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript" src="/javascript/jquery.resourceTree.js"></script>
@@ -97,28 +104,13 @@
         });
 
         tree.on('select_node.jstree', function(event, jstree) {
-            $('#file-list')
-                .addClass('loading')
-                .load('/resourceses/'+jstree.node.id+'/children', function () {
-                    $(this).removeClass('loading');
-                });
-
-            $('#meta')
-                .addClass('loading')
-                .load('/resourceses/'+jstree.node.id+'/info', function () {
-                    $(this).removeClass('loading');
-                        $('#container').foundation('tooltip', 'reflow');
-                });
+            loadPanel($('#file-list'), '/children', jstree.node.id);
+            loadPanel($('#meta'), '/info', jstree.node.id);
         });
 
         $('#file-list').on('click', 'a', function (e) {
             e.preventDefault();
-            $('#meta')
-                .addClass('loading')
-                .load('/resourceses/file/'+$(this).data('id')+'/info', function () {
-                    $(this).removeClass('loading');
-                    $('#container').foundation('tooltip', 'reflow');
-                });
+            loadPanel($('#meta'), '/info', $(this).data('id'));
         });
 
         function rs()
@@ -128,9 +120,49 @@
             );
         }
 
+        function loadPanel(panel, path, nodeId)
+        {
+            panel
+                .addClass('loading')
+                .load('/resourceses/' + nodeId + path, function () {
+                    $(this).removeClass('loading');
+                    $('#container').foundation('tooltip', 'reflow');
+                });
+
+        }
+
         rs();
 
         $(window).on('resize', rs);
+
+
+        $('#drop-center').fileDrop({
+            previewsContainer: '#file-list',
+            tplWrap: '<li class="dz-preview" />',
+
+            addedfile: function(file) {
+                var nodeId = $('#tree').jstree('get_selected')[0];
+                $(file.previewElement).data('node', nodeId);
+            },
+
+            // callbacks
+            sending: function (file, xhr, formData) {
+                var el = $(file.previewElement);
+
+                formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                formData.append('category', el.data('node'));
+                formData.append('comment', '');
+                formData.append('hidden', 0);
+            },
+
+            complete: function (file, response) {
+                $(file.previewElement).find('img').attr('src', '');
+                if (this.getUploadingFiles().length === 0 && this.getQueuedFiles().length === 0) {
+                    loadPanel($('#file-list'), '/children', $('#tree').jstree('get_selected')[0]);
+                }
+            }
+
+        });
     });
 </script>
 {# /HEAD #}
@@ -144,6 +176,11 @@
     </div>
     <div class="large-4 columns">
         <h2>Files</h2>
+        <form class="dropzone" action="/cms/fileForm.php?ajax=1" id="drop-center" method="post" >
+            <div class="dz-default dz-message">
+                <span>Drop files here to upload</span>
+            </div>
+        </form>
         <div class="scroller">
             <ul data-ajax id="file-list">
                 {% include '@resourceBrowser/listResources.twig' with { files: files } %}
