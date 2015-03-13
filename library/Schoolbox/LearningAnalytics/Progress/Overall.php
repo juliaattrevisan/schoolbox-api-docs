@@ -59,69 +59,28 @@ class Overall {
 
     /**
      * Find the student who has completed the most tasks
-     * Remember how many they completed
+     * Remember how much they completed as a percentage
      *
      * @return float
      */
     private function findMostAdvancedStudent() {
-        $allCompletions = array();
-        $numTasks = 0;
-        $val = 0.00;
+        $mostAdvancedStudent = 0;
 
-        $allStudentRegistry = $this->getRegistry()->getAllStudentRegistry();
-        $allUnitRegistry = $this->getRegistry()->getAllUnitRegistry();
+        $everyone = $this->getRegistry()->getAllStudentRegistry();
 
-        /* Tally completed tasks across all units in a course
-         */
-        foreach ($allUnitRegistry as $currentUnit) {
-            $numTasks += $currentUnit->getTasks()->count();
+        foreach ($this->getRegistry()->getAllUnitRegistry() as $currentUnit) {
+            $allStudents = $everyone[$currentUnit->getId()];
 
-            $allStudents = $allStudentRegistry[$currentUnit->getId()];
+            $unitProgress = new Unit($allStudents, $currentUnit);
 
-            $taskCompletions = new TaskCompletions($allStudents, $currentUnit);
-            $allTaskCompletions = $taskCompletions->findAlphabetical();
-
-            /* Top students should have at least one completed
-             * item in order to be listed
+            /* Remember the most that was completed
              */
-            foreach ($allTaskCompletions as $currentTaskCompletion) {
-                if (count($currentTaskCompletion['tasks'])) {
-
-                    /* UserId-TaskId relation
-                     * Declare a stack if it isn't one already
-                     */
-                    if (!is_array($allCompletions[$currentTaskCompletion['user']->getId()])) {
-                        $allCompletions[$currentTaskCompletion['user']->getId()] = array();
-                    }
-
-                    /* Combine completed tasks, deduping
-                     */
-                    $allCompletions[$currentTaskCompletion['user']->getId()] = array_filter(array_unique(array_merge(
-                        $allCompletions[$currentTaskCompletion['user']->getId()],
-                        $currentTaskCompletion['tasks']
-                    )));
-                }
+            if ($unitProgress->getMostAdvancedStudent() > $mostAdvancedStudent) {
+                $mostAdvancedStudent = $unitProgress->getMostAdvancedStudent();
             }
         }
 
-        /* Do a tally of unique completions
-         */
-        $uniqueCompletionCounts = array();
-
-        foreach ($allCompletions as $userId => $taskIds) {
-            $uniqueCompletionCounts[$userId] = count($taskIds);
-        }
-
-        /* Sort in descending order
-         * The highest number of tasks completed by a student
-         */
-        if (count($uniqueCompletionCounts) && $numTasks) {
-            $sorter = new Sorter($uniqueCompletionCounts);
-
-            $val = 100 * array_shift($sorter->findDescending()) / $numTasks;
-        }
-
-        return $val;
+        return $mostAdvancedStudent;
     }
 
     /**
@@ -136,44 +95,21 @@ class Overall {
      * the $completionCounts array
      */
     private function findClassCompletions() {
-        $completionCounts = array();
-        $numTasks = 0;
-
-        $allStudentRegistry = $this->getRegistry()->getAllStudentRegistry();
-
-        foreach ($this->getRegistry()->getAllUnitRegistry() as $currentUnit) {
-            $numTasks += $currentUnit->getTasks()->count();
-
-            $allStudents = $allStudentRegistry[$currentUnit->getId()];
-
-            $taskCompletions = new TaskCompletions($allStudents, $currentUnit);
-            $allTaskCompletions = $taskCompletions->findAlphabetical();
-
-            foreach ($allTaskCompletions as $currentTaskCompletion) {
-                if (count($currentTaskCompletion['tasks'])) {
-                    foreach ($currentTaskCompletion['tasks'] as $currentTask) {
-                        $completionCounts[$currentTask]['unitId'] = $currentUnit->getId();
-                        $completionCounts[$currentTask]['count']++;
-                    }
-                }
-            }
-        }
-
-        /* Find out which tasks have been completed by all students
-         */
         $classCompletions = 0;
 
-        foreach ($completionCounts as $tuple) {
-            if ($tuple['count'] == $allStudentRegistry[$tuple['unitId']]->count()) {
-                $classCompletions++;
-            }
+        $everyone = $this->getRegistry()->getAllStudentRegistry();
+
+        foreach ($this->getRegistry()->getAllUnitRegistry() as $currentUnit) {
+            $allStudents = $everyone[$currentUnit->getId()];
+
+            $unitProgress = new Unit($allStudents, $currentUnit);
+
+            /* Average the two values
+             */
+            $classCompletions = 0.5 * ($classCompletions + $unitProgress->getClassCompletions());
         }
 
-        if ($numTasks) {
-            return 100 * $classCompletions / $numTasks;
-        }
-
-        return 0;
+        return $classCompletions;
     }
 
     /* Getters/Setters
