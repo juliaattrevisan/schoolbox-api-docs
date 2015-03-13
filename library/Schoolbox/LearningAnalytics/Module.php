@@ -66,41 +66,10 @@ class Module extends BaseModule {
                 /* Load folders
                  */
                 $unitInstanceMapper = new UnitInstanceMapper();
-                $folderMapper = new FolderMapper();
-                $allFolders = new Collection();
+                $allUnitInstances = new Collection();
 
                 try {
-                    /* First find all the unitInstances which are in the
-                     * specified folder
-                     */
-                    $allUnits = $unitInstanceMapper->findByColumn('category_id', $params['folderId']);
-
-                    /* Find all the usages fo these units
-                     */
-                    $allUnitCategoryIds = array();
-
-                    foreach ($allUnits as $currentUnit) {
-                        $allUnitCategoryIds[] = $currentUnit->getUnitCategory()->getId();
-                    }
-
-                    $allUnitUsages = $unitInstanceMapper->findByColumn('unit_category_id', $allUnitCategoryIds);
-
-                    /* Find all the folders that those units were used in
-                     * Get a unique list of them, skipping hydration if a
-                     * folder was already processed and added
-                     */
-                    $processedIds = array();
-
-                    foreach ($allUnitUsages as $currentUnitUsage) {
-                        if (!in_array($currentUnitUsage->getCategory()->getId(), $processedIds)) {
-                            $folder = $currentUnitUsage->getCategory();
-                            $folderMapper->loadJoinedModel('codes', $folder, array('set_method' => 'setCodes'));
-
-                            $allFolders->add($folder);
-
-                            $processedIds[] = $folder->getId();
-                        }
-                    }
+                    $allUnitInstances = $unitInstanceMapper->findByColumn('category_id', $params['folderId']);
                 }
                 catch (Exception $e) {
                     error(159);
@@ -109,7 +78,7 @@ class Module extends BaseModule {
                 /* Inject
                  */
                 return array(
-                    'allFolders' => $allFolders,
+                    'allUnitInstances' => $allUnitInstances
                 );
             }
         );

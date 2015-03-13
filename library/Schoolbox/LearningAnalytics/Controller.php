@@ -35,15 +35,15 @@ class Controller extends Base {
      * folder, fill it with only one folder instead of all the folders.
      * This is done in Module.
      *
-     * @param Collection $allFolders
+     * @param Collection $allUnitInstances
      */
-    public function course(Collection $allFolders) {
+    public function course(Collection $allUnitInstances) {
 
         /* Get a list of all the students involved in each unit
          * and a list of units involved. This gets reused everywhere
          * so just hit the external db once
          */
-        $registry = new Registry($allFolders);
+        $registry = new Registry($allUnitInstances);
         $everyone = $registry->getAllStudentRegistry();
 
         /**

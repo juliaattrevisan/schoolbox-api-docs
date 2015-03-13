@@ -12,6 +12,7 @@ namespace Schoolbox\LearningAnalytics;
 
 use Schoolbox\Collection;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Resource\CategoryMapper as FolderMapper;
 
 class Registry {
 
@@ -32,10 +33,10 @@ class Registry {
     /**
      * Constructor
      *
-     * @param Collection $allFolders
+     * @param Collection $allUnitInstances
      */
-    public function __construct(Collection $allFolders) {
-        $this->findRegistries($allFolders);
+    public function __construct(Collection $allUnitInstances) {
+        $this->findRegistries($allUnitInstances);
     }
 
     /**
@@ -45,32 +46,41 @@ class Registry {
      * we reuse this list of students and we don't want to hit the
      * external db more than we have to
      *
-     * @param Collection $allFolders
+     * @param Collection $allUnitInstances
      */
-    private function findRegistries(Collection $allFolders) {
+    private function findRegistries(Collection $allUnitInstances) {
         $unitInstanceMapper = new UnitInstanceMapper();
+        $folderMapper = new FolderMapper();
 
         /* A registry of unitId-studentList relations
          */
         $allStudentRegistry = array();
 
         /* Also maintain a growing collection of units
+         * These contain task completion details, which $allUnitInstances do not
          */
-        $allUnitRegistry = new Collection();
+        $allUnitRegistryTemp = array();
 
         /* Extract all the students first because we're going to
          * reuse this list again
          */
-        foreach ($allFolders as $currentFolder) {
-            $allUnits = $unitInstanceMapper->findForCategoryId($currentFolder->getId());
+        foreach ($allUnitInstances as $currentUnitInstance) {
+            $folder = $currentUnitInstance->getCategory();
+            $folderMapper->loadJoinedModel('codes', $folder, array('set_method' => 'setCodes'));
 
-            $allUnitRegistry->merge($allUnits);
+            $allUnits = $unitInstanceMapper->findForCategoryId($folder->getId());
 
             foreach ($allUnits as $currentUnit) {
-                $studentListProcessor = new StudentList($currentFolder, $currentUnit);
+                $allUnitRegistryTemp[$currentUnit->getId()] = $currentUnit;
+
+                $studentListProcessor = new StudentList($folder, $currentUnit);
                 $allStudentRegistry[$currentUnit->getId()] = $studentListProcessor->getStudentList();
             }
         }
+
+        /* Inject $allRegistryTemp as stack
+         */
+        $allUnitRegistry = new Collection($allUnitRegistryTemp);
 
         $this->setAllStudentRegistry($allStudentRegistry);
         $this->setAllUnitRegistry($allUnitRegistry);
