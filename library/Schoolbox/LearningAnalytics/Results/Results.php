@@ -129,20 +129,24 @@ class Results {
                 }
             }
             else if (($currentTask->getAssessment() instanceof OnlineAssessment) && is_numeric($currentTask->getAssessment()->getId())) {
-                $allUsers = array_values($studentQuizList[$currentTask->getAssessment()->getId()]);
+                $users = $studentQuizList[$currentTask->getAssessment()->getId()];
 
-                /* Only accumulate if an attempt was made and the maximum available
-                 * marks for the quiz is greater than zero
-                 */
-                foreach ($allUsers as $currentUser) {
-                    if ($currentUser['totalMarks'] !== null) {
-                        if ($currentUser['maxMark'] > 0) {
-                            $normalised = 100 * $currentUser['totalMarks']/$currentUser['maxMark'];
+                if (is_array($users) && count($users)) {
+                    $allUsers = array_values($users);
 
-                            $allValues[$currentTask->getId()]->add(array(
-                                'user' => $this->getUserMapper()->findById($currentUser['user_id']),
-                                'value' => $normalised
-                            ));
+                    /* Only accumulate if an attempt was made and the maximum available
+                     * marks for the quiz is greater than zero
+                     */
+                    foreach ($allUsers as $currentUser) {
+                        if ($currentUser['totalMarks'] !== null) {
+                            if ($currentUser['maxMark'] > 0) {
+                                $normalised = 100 * $currentUser['totalMarks']/$currentUser['maxMark'];
+
+                                $allValues[$currentTask->getId()]->add(array(
+                                    'user' => $this->getUserMapper()->findById($currentUser['user_id']),
+                                    'value' => $normalised
+                                ));
+                            }
                         }
                     }
                 }

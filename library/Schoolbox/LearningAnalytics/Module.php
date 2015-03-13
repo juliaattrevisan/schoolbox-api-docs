@@ -65,17 +65,42 @@ class Module extends BaseModule {
 
                 /* Load folders
                  */
+                $unitInstanceMapper = new UnitInstanceMapper();
                 $folderMapper = new FolderMapper();
-
                 $allFolders = new Collection();
 
                 try {
-                    /* TODO: Find all folders associated with a particular course
+                    /* First find all the unitInstances which are in the
+                     * specified folder
                      */
-                    $folder = $folderMapper->findById($params['folderId']);
-                    $folderMapper->loadJoinedModel('codes', $folder, array('set_method' => 'setCodes'));
+                    $allUnits = $unitInstanceMapper->findByColumn('category_id', $params['folderId']);
 
-                    $allFolders->add($folder);
+                    /* Find all the usages fo these units
+                     */
+                    $allUnitCategoryIds = array();
+
+                    foreach ($allUnits as $currentUnit) {
+                        $allUnitCategoryIds[] = $currentUnit->getUnitCategory()->getId();
+                    }
+
+                    $allUnitUsages = $unitInstanceMapper->findByColumn('unit_category_id', $allUnitCategoryIds);
+
+                    /* Find all the folders that those units were used in
+                     * Get a unique list of them, skipping hydration if a
+                     * folder was already processed and added
+                     */
+                    $processedIds = array();
+
+                    foreach ($allUnitUsages as $currentUnitUsage) {
+                        if (!in_array($currentUnitUsage->getCategory()->getId(), $processedIds)) {
+                            $folder = $currentUnitUsage->getCategory();
+                            $folderMapper->loadJoinedModel('codes', $folder, array('set_method' => 'setCodes'));
+
+                            $allFolders->add($folder);
+
+                            $processedIds[] = $folder->getId();
+                        }
+                    }
                 }
                 catch (Exception $e) {
                     error(159);
