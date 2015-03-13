@@ -59,23 +59,23 @@ class Controller extends Base {
         $allResults = array();
         $allTasks = new Collection();
 
-        foreach ($registry->getAllUnitRegistry() as $currentUnit) {
-            $allStudents = $everyone[$currentUnit->getId()];
-
-            /* Merge results for each unit
-             */
-            $results = new Results($allStudents, $currentUnit);
-            $allResults = $allResults + $results->getAllValues();
-
-            /* Merge averages for each unit, preserving keys
-             */
-            $averages = new Averages($allStudents, $currentUnit);
-            $allAverages = $allAverages + $averages->findDescending();
-
-            /* All the tasks in all the units
-             */
-            $allTasks->merge($currentUnit->getTasks());
-        }
+//        foreach ($registry->getAllUnitRegistry() as $currentUnit) {
+//            $allStudents = $everyone[$currentUnit->getId()];
+//
+//            /* Merge results for each unit
+//             */
+//            $results = new Results($allStudents, $currentUnit);
+//            $allResults = $allResults + $results->getAllValues();
+//
+//            /* Merge averages for each unit, preserving keys
+//             */
+//            $averages = new Averages($allStudents, $currentUnit);
+//            $allAverages = $allAverages + $averages->findDescending();
+//
+//            /* All the tasks in all the units
+//             */
+//            $allTasks->merge($currentUnit->getTasks());
+//        }
 
         $sorter = new Sorter($allAverages);
 
@@ -97,6 +97,40 @@ class Controller extends Base {
             );
         }
 
+        /* Combine them, averaging stacked results
+         * Alternatively to display all the units in their original separated
+         * states, just use $allUnitProgress instead of $stackedUnitProgress
+         */
+        $stackedUnitProgress = array();
+
+        foreach ($allUnitProgress as $currentUnitProgress) {
+            $key = $currentUnitProgress['unit']->getUnitCategory()->getId();
+
+            /* Insert new values
+             */
+            if (!isset($stackedUnitProgress[$key])) {
+                $stackedUnitProgress[$key] = $currentUnitProgress;
+            }
+            /* Average between this set of values and the existing ones for
+             * class completion; use greatest value for most advanced student
+             */
+            else {
+                /* Max most advanced student
+                 */
+                $existingMostAdvancedStudent = $stackedUnitProgress[$key]['mostAdvancedStudent'];
+                $otherMostadvancedStudent = $currentUnitProgress['mostAdvancedStudent'];
+
+                $stackedUnitProgress[$key]['mostAdvancedStudent'] = max($existingMostAdvancedStudent, $otherMostadvancedStudent);
+
+                /* Class Completion average
+                 */
+                $existingClassCompletions = $stackedUnitProgress[$key]['classCompletions'];
+                $otherClassCompletions = $currentUnitProgress['classCompletions'];
+
+                $stackedUnitProgress[$key]['classCompletions'] = 0.5 * ($existingClassCompletions + $otherClassCompletions);
+            }
+        }
+
         /* Twig data
          */
         $this->getResponse()->content->set(
@@ -115,7 +149,7 @@ class Controller extends Base {
                         'bottomStudents' => $sorter->findAscending('average'),
                     ),
                     'progress' => array(
-                        'allUnits' => $allUnitProgress,
+                        'allUnits' => $stackedUnitProgress,
                     ),
                 )
             )
