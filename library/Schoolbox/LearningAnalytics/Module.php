@@ -38,8 +38,16 @@ class Module extends BaseModule {
     {
         // All of these URLs relate to the resource ID, not a booking ID.
         // Therefore, they should probably be moved to the item module.
+
+        /* folderId is associated with a course, a set of units. This finds all
+         * the units associated with all the folders that use the course.
+         */
         $router->addGet('learningAnalytics.course', "{$basePath}/{folderId}/course");
-        $router->addGet('learningAnalytics.specificUnit', "{$basePath}/{folderId}/{unitId}");
+
+        /* folderId is associated with a course, a set of units. This finds all
+         * the units associated with a particular folder that uses the course.
+         */
+        $router->addGet('learningAnalytics.subject', "{$basePath}/{folderId}");
     }
 
     /**
@@ -49,7 +57,7 @@ class Module extends BaseModule {
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
-        /* Inject ingredients into learningAnalytics/index controller method
+        /* Inject ingredients into learningAnalytics/course controller method
          */
         $matcher->add(
             '/^learningAnalytics\.course/',
@@ -68,8 +76,28 @@ class Module extends BaseModule {
                 $unitInstanceMapper = new UnitInstanceMapper();
                 $allUnitInstances = new Collection();
 
+                /* Acrobatics
+                 */
                 try {
+
+                    /* All the unit instances associated with $params['folderId']
+                     */
                     $allUnitInstances = $unitInstanceMapper->findByColumn('category_id', $params['folderId']);
+
+                    $allUnitCategoryIds = array();
+
+                    foreach ($allUnitInstances as $currentUnitInstance) {
+                        $allUnitCategoryIds[$currentUnitInstance->getUnitCategory()->getId()] = '';
+                    }
+
+                    /* All the folders that used the same units
+                     */
+                    $allUnitCategoryIds = array_keys($allUnitCategoryIds);
+
+                    /* All the units associated with folders which used the same
+                     * course as $params['folderId']
+                     */
+                    $allUnitInstances = $unitInstanceMapper->findByColumn('unit_category_id', $allUnitCategoryIds);
                 }
                 catch (Exception $e) {
                     error(159);
@@ -83,10 +111,10 @@ class Module extends BaseModule {
             }
         );
 
-        /* Inject ingredients into learningAnalytics/index controller method
+        /* Inject ingredients into learningAnalytics/subject controller method
          */
         $matcher->add(
-            '/^learningAnalytics\.specificUnit/',
+            '/^learningAnalytics\.subject/',
             function($params) {
 
                 /* Check permissions
@@ -97,50 +125,24 @@ class Module extends BaseModule {
                     error(6);
                 }
 
-                /* Load folder
+                /* Load folders
                  */
-                $folderMapper = new FolderMapper();
+                $unitInstanceMapper = new UnitInstanceMapper();
+                $allUnitInstances = new Collection();
 
+                /* No acrobatics required
+                 */
                 try {
-                    $folder = $folderMapper->findById($params['folderId']);
-                    $folderMapper->loadJoinedModel('codes', $folder, array('set_method' => 'setCodes'));
+                    $allUnitInstances = $unitInstanceMapper->findByColumn('category_id', $params['folderId']);
                 }
                 catch (Exception $e) {
                     error(159);
                 }
 
-                /* Load unit
-                 */
-                $unitInstanceMapper = new UnitInstanceMapper();
-
-                $unit = false;
-                $allUnits = $unitInstanceMapper->findForCategoryId($folder->getId());
-
-                foreach($allUnits as $currentUnit) {
-                    if ($currentUnit->getId() == $params['unitId']) {
-                        $unit = $currentUnit;
-
-                        $allUnits->add($unit);
-
-                        break;
-                    }
-                }
-
-                if (!($unit instanceof UnitInstance)) {
-                    error(6);
-                }
-
-                /* Reset allUnits
-                 */
-                $allUnits = new Collection();
-                $allUnits->add($unit);
-
                 /* Inject
                  */
                 return array(
-                    'folder' => $folder,
-                    'unit' => $unit,
-                    'allUnits' => $allUnits
+                    'allUnitInstances' => $allUnitInstances
                 );
             }
         );
