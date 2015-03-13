@@ -104,13 +104,13 @@
         });
 
         tree.on('select_node.jstree', function(event, jstree) {
-            loadPanel($('#file-list'), '/children', jstree.node.id);
-            loadPanel($('#meta'), '/info', jstree.node.id);
+            loadPanel($('#file-list'), '/:id/children', jstree.node.id);
+            loadPanel($('#meta'), '/:id/info', jstree.node.id);
         });
 
         $('#file-list').on('click', 'a', function (e) {
             e.preventDefault();
-            loadPanel($('#meta'), '/info', $(this).data('id'));
+            loadPanel($('#meta'), '/file/:id/info', $(this).data('id'));
         });
 
         function rs()
@@ -122,9 +122,11 @@
 
         function loadPanel(panel, path, nodeId)
         {
+            var uri = '/resourceses'+path.replace(':id', nodeId);
+
             panel
                 .addClass('loading')
-                .load('/resourceses/' + nodeId + path, function () {
+                .load(uri, function () {
                     $(this).removeClass('loading');
                     $('#container').foundation('tooltip', 'reflow');
                 });
@@ -158,7 +160,7 @@
             complete: function (file, response) {
                 $(file.previewElement).find('img').attr('src', '');
                 if (this.getUploadingFiles().length === 0 && this.getQueuedFiles().length === 0) {
-                    loadPanel($('#file-list'), '/children', $('#tree').jstree('get_selected')[0]);
+                    loadPanel($('#file-list'), '/:id/children', $('#tree').jstree('get_selected')[0]);
                 }
             }
 
