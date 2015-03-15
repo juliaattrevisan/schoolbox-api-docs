@@ -59,9 +59,7 @@ class DueWork_ErrorMapper extends Schoolbox\Mapper {
         return $this->findOneByColumn(
             'is_default_for_new_submissions',
             true,
-            array(
-                'order' => array('id' => 'asc'),
-            )
+            array('id' => 'asc')
         );
     }
 
