@@ -344,6 +344,7 @@ class SubmissionMapper extends Schoolbox\Mapper implements Schoolbox\StorageMapp
                     // No real marker
                     ->setMarker($object->getSubmissionBox()->getOwner())
                     ->setMark($defaultState->getDisplayAs())
+                    ->setReturned($object->getSubmitted())
                     ->setNormalizedMark($defaultState->getNormaliseAs())
                 ;
                 $returnMapper->save($defaultReturn);
