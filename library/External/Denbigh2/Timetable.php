@@ -572,20 +572,6 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     }
 
     /**
-     * Get the period for a class, given its $classCode and $dayNumber
-     *
-     * PeriodNumber
-     *
-     * @param $classCode
-     * @param $dayNumber
-     * @return array
-     */
-    public function getSubjectPeriod($classCode, $dayNumber)
-    {
-        // TODO: noop - Ignore this method, it's marked for removal
-    }
-
-    /**
      * Get the verbose name for the $classCode
      *
      * Description

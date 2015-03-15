@@ -330,36 +330,6 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         return $timetable;
     }
 
-    /**
-     * give a subject code and day this function returns the period that it occurs in
-     * Assumption made that this should be the sequence rather than period name
-     *
-     * @param $classCode
-     * @param $dayNumber
-     * @return int|bool
-     */
-    public function getSubjectPeriod($classCode, $dayNumber)
-    {
-        $stmt = $this->getDatabase()->prepare('
-            SELECT period_number
-            FROM db2inst1.schoolbox_timetable t
-            LEFT JOIN db2inst1.schoolbox_timetable_definition td
-              ON t.campus = td.campus
-              AND t.day_number = td.day_number
-              AND t.period_number = td.period_number
-            WHERE t.class_code = :code
-            AND t.day = :day
-        ');
-
-        $stmt->execute(
-            array(
-                'code' => $classCode,
-                'day'  => $dayNumber
-            )
-        );
-
-        return (int)$stmt->fetchColumn() ?: false;
-    }
 
     /**
      * Retrieves the name of a subject based on its class code

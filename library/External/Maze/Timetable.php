@@ -593,18 +593,6 @@ class External_Maze_Timetable implements External_TimetableInterface
     }
 
     /**
-     * give a subject code and day this function returns the period that it occurs in
-     * Assumption made that this should be the sequence rather than period name
-     *
-     * @param $classCode
-     * @param $dayNumber
-     * @return int|bool
-     */
-    public function getSubjectPeriod($classCode, $dayNumber)
-    {
-    }
-
-    /**
      * Get the subject name given a string
      *
      * @param $classCode

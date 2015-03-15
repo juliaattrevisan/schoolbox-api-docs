@@ -187,18 +187,6 @@ class External_Timetable implements External_TimetableInterface
     /**
      * No usages found
      *
-     * @param String $classCode
-     * @param Integer $dayNumber
-     * @return Array
-     */
-    function getSubjectPeriod($classCode, $dayNumber)
-    {
-        return $this->getDatabase()->getSubjectPeriod($classCode, $dayNumber);
-    }
-
-    /**
-     * No usages found
-     *
      * @param $classCode
      * @return String
      */

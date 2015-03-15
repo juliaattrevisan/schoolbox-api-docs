@@ -37,11 +37,6 @@ class External_Offline_Timetable implements External_TimetableInterface
         throw new Schoolbox\External\Exception("Timetable is unavailable.");
     }
 
-    public function getSubjectPeriod($classCode, $dayNumber)
-    {
-        // Noop
-    }
-
     public function getSubjectName($classCode)
     {
         // Noop

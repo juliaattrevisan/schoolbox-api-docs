@@ -130,17 +130,6 @@ interface External_TimetableInterface
 	public function getFullTimetable ($externalUserId, $userId, $campusId);
 
     /**
-     * Get the period for a class, given its $classCode and $dayNumber
-     *
-     * PeriodNumber
-     *
-     * @param $classCode
-     * @param $dayNumber
-     * @return array
-     */
-	public function getSubjectPeriod ($classCode, $dayNumber);
-
-    /**
      * Get the verbose name for the $classCode
      *
      * Description

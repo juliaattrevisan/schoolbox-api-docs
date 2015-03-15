@@ -586,20 +586,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         return ($aTime > $bTime) ? +1 : -1;
     }
 
-    public function getSubjectPeriod($code, $day)
-    {
-        //give a subject code and day this function returns the period that it occurs in
-
-        $query = "SELECT Timetable.PeriodNumber
-			FROM SynergyOne.dbo.Timetable Timetable
-			WHERE Timetable.FileSemester='" . $_SESSION['FileSemester'] . "' AND Timetable.FileYear='" . $_SESSION['FileYear'] . "'
-			AND Timetable.DayNumber = '$day' AND Timetable.ClassCode = '$code'
-		";
-
-        return $this->getDatabase()->getOne($query);
-
-    }
-
     /**
      * Gets the timetable for the given room.
      *
