@@ -361,11 +361,19 @@ interface External_UserInterface {
      * $_SESSION['FileYear']
      *
      * @param string $externalUserId
-     * @return array
-     *   year     int The current year
-     *   semester int The current semester
+     * @return string The current semester
      */
     public function getCurrentSemester($externalUserId = null);
+
+    /**
+     * Gets the current year for the user.
+     * Needs a method because a user could be set on file as being on a
+     * previous year.
+     *
+     * @param string $externalUserId
+     * @return string The current file year for the user
+     */
+    public function getCurrentYear($externalUserId = null);
 
     /**
      * Get a list of subjects for $externalUserId

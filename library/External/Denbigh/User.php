@@ -335,10 +335,12 @@ class External_Denbigh_User implements External_UserInterface {
     }
 
     function getCurrentSemester($externalUserId = null) {
-        return array(
-            'year'     => date('Y'),
-            'semester' => date('m') < 6 ? 1 : 2,
-        );
+        return date('m') < 6 ? 1 : 2;
+    }
+
+    public function getCurrentYear($externalUserId = null)
+    {
+        return date('Y');
     }
 
     function getSubjectList($externalUserId, $userId) {

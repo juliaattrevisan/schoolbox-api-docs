@@ -953,16 +953,18 @@ class External_Denbigh2_User implements External_UserInterface
      * $_SESSION['FileYear']
      *
      * @param null $externalUserId
-     * @return null
+     * @return string
      */
     public function getCurrentSemester($externalUserId = null)
     {
         /* Apparently denbigh has no concept of semesters
          */
-        return array(
-            'year'     => date('Y'),
-            'semester' => date('m') < 6 ? 1 : 2,
-        );
+        return date('m') < 6 ? 1 : 2;
+    }
+
+    public function getCurrentYear($externalUserId = null)
+    {
+        return date('Y');
     }
 
     /**

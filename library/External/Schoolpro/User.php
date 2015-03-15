@@ -240,11 +240,13 @@ class External_Schoolpro_User implements External_UserInterface {
 	 * @param null $externalUserId
 	 */
 	public function getCurrentSemester($externalUserId = null) {
-        return array(
-            'year'     => date('Y'),
-            'semester' => date('m') < 6 ? 1 : 2,
-        );
+        return date('m') < 6 ? 1 : 2;
 	}
+
+    public function getCurrentYear($externalUserId = null)
+    {
+        return date('Y');
+    }
 
 	/**
 	 * Get a list of subjects for a particular user

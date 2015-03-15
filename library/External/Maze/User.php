@@ -605,11 +605,13 @@ class External_Maze_User implements External_UserInterface {
 	 * @param null $externalUserId
 	 */
 	public function getCurrentSemester($externalUserId = null) {
-        return array(
-            'year'     => $this->getHelper()->getCurrentYear(),
-            'semester' => $this->getHelper()->getCurrentSemester(),
-        );
+        return $this->getHelper()->getCurrentSemester();
 	}
+
+    public function getCurrentYear($externalUserId = null)
+    {
+        return $this->getHelper()->getCurrentYear();
+    }
 
 	/**
 	 * Get a list of subjects for a particular user
