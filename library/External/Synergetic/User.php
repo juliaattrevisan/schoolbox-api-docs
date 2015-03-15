@@ -674,6 +674,7 @@ class External_Synergetic_User implements External_UserInterface
     {
         $fileYearSemester = $this->findFileYearAndSemester($externalUserId);
         if (!empty($fileYearSemester)) {
+            // TODO remove setting of these vars once sports module is rewritten
             $_SESSION['FileSemester'] = $fileYearSemester['semester'];
             $_SESSION['FileYear']     = $fileYearSemester['year'];
             return $fileYearSemester['semester'];

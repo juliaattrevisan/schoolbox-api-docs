@@ -54,14 +54,6 @@ class External_Maze_Helper
      */
     public function getCurrentTTPeriod()
     {
-        /* Ensure a filesemester is set */
-        if (!(isset($_SESSION['FileSemester']) && isset($_SESSION['FileYear']))) {
-            $_SESSION['FileYear']     = $this->getCurrentYear();
-            $_SESSION['FileSemester'] = $this->getCurrentSemester();
-        }
-
-        /* Only get subjects that are relevant now
-         */
         return $this->getCurrentSemester();
     }
 

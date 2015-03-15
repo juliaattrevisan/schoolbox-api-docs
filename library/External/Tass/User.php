@@ -147,8 +147,6 @@ class External_Tass_User implements External_UserInterface
     {
         $query = "SELECT curr_year, curr_sem FROM ttparms WHERE cmpy_code = 01";
         $current = $this->getDatabase()->getRow($query);
-        $_SESSION['FileSemester'] = $current['curr_sem'];
-        $_SESSION['FileYear'] = $current['curr_year'];
         return $current['curr_sem'];
     }
 

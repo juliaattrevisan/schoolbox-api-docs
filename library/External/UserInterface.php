@@ -353,12 +353,7 @@ interface External_UserInterface {
     public function getStaffContactListExtended();
 
     /**
-     * Find out the current semester and current year
-     *
-     * This MUST set the two session variables:
-     *
-     * $_SESSION['FileSemester']
-     * $_SESSION['FileYear']
+     * Gets the current semester for the user.
      *
      * @param string $externalUserId
      * @return string The current semester

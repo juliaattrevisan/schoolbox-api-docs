@@ -253,8 +253,6 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         $semester = $stmt->fetchColumn();
 
         if ($semester) {
-            $_SESSION['FileSemester'] = $semester;
-            $_SESSION['FileYear'] = date('Y');
             return $semester;
         }
 
