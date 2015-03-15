@@ -59,7 +59,7 @@ class ReturnedWork implements ISoftDeletable
      *
      * @var bool
      */
-    protected $isConfirmationOfSubmission;
+    protected $isConfirmationOfSubmission = false;
 
     /**
      * @var \Alaress_Date_Format
