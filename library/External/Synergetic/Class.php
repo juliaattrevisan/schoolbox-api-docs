@@ -12,11 +12,20 @@ use Alaress\DebugBar\Instance as DebugBar;
 class External_Synergetic_Class implements External_ClassInterface
 {
 
+    /**
+     * @var MSSQL $database
+     */
     private $database;
+
+    /**
+     * @var External_UserInterface
+     */
+    private $externalUser;
 
     function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
+        $this->externalUser = new External_User('synergetic');
         if (DebugBar::isEnabled()) {
             $this->getDatabase()->installCollector();
             /** @var \DebugBar\DataCollector\DataCollectorInterface $collector */
@@ -37,7 +46,8 @@ class External_Synergetic_Class implements External_ClassInterface
      */
     public function getClass($classCode)
     {
-
+        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
+        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
         if (strpos($classCode, '/') !== false) {
             $codeArray = explode('/', $classCode);
             $classQuery .= "( ClassCode = '{$codeArray[1]}' AND ClassCampus = '{$codeArray[0]}' ) ";
@@ -49,8 +59,8 @@ class External_Synergetic_Class implements External_ClassInterface
             SELECT *
             FROM SynergyOne.dbo.SubjectClasses
             WHERE $classQuery
-            AND FileYear='" . $_SESSION['FileYear'] . "'
-            AND FileSemester='" . $_SESSION['FileSemester'] . "'
+            AND FileYear='" . $fileYear . "'
+            AND FileSemester='" . $fileSemester . "'
         ";
 
         return $this->getDatabase()->getRow($query);
@@ -77,6 +87,8 @@ class External_Synergetic_Class implements External_ClassInterface
 
         $classQuery = substr($classQuery, 0, -3) . ')';
 
+        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
+        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
         $query = "
         SELECT DISTINCT StudentClasses.StudentSurname as lastname, StudentClasses.StudentPreferred as firstname,
                         StudentClasses.StudentYearLevelDescription as yearlevel,
@@ -89,8 +101,8 @@ class External_Synergetic_Class implements External_ClassInterface
             vStudents.FileSemester = StudentClasses.FileSemester AND
             vStudents.ID = StudentClasses.StudentID)
         WHERE $classQuery
-            AND (StudentClasses.FileYear='" . $_SESSION['FileYear'] . "')
-            AND (StudentClasses.FileSemester='" . $_SESSION['FileSemester'] . "')
+            AND (StudentClasses.FileYear='" . $fileYear . "')
+            AND (StudentClasses.FileSemester='" . $fileSemester . "')
             AND (StudentClasses.StartDate <= getdate() OR StudentClasses.StartDate IS NULL)
             AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
         ORDER BY StudentClasses.StudentSurname, StudentClasses.StudentPreferred";
@@ -115,8 +127,10 @@ class External_Synergetic_Class implements External_ClassInterface
 
         $classQuery = substr($classQuery, 0, -3) . ')';
 
+        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
+        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
         $msQuery = "SELECT DISTINCT StaffID, StaffSeq FROM vSubjectClassesStaff
-                    WHERE $classQuery AND FileYear={$_SESSION['FileYear']} AND FileSemester={$_SESSION['FileSemester']}
+                    WHERE $classQuery AND FileYear={$fileYear} AND FileSemester={$fileSemester}
                     ORDER BY StaffSeq";
 
         $this->getDatabase()->query($msQuery);
@@ -169,10 +183,11 @@ class External_Synergetic_Class implements External_ClassInterface
     public function findSubjectsWithFiletype($filetype, $timetableCode)
     {
         $database = $this->getDatabase();
+        $fileYear     = $database->quote($this->externalUser->getCurrentYear());
         $params   = array(
             ':type'     => "'" . $database->quote($filetype) . "'",
-            ':year'     => "'" . $database->quote($_SESSION['FileYear']) . "'",
-            ':semester' => "'" . $database->quote($_SESSION['FileSemester']) . "'",
+            ':year'     => "'" . $database->quote($this->externalUser->getCurrentYear()) . "'",
+            ':semester' => "'" . $database->quote($this->externalUser->getCurrentSemester()) . "'",
         );
         if (empty($timetableCode)) {
             $query = "
