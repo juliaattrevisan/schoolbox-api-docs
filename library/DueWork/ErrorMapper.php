@@ -36,7 +36,7 @@ class DueWork_ErrorMapper extends Schoolbox\Mapper {
             'type'       => self::TYPE_DECIMAL,
         ));
 
-        $this->uses('is_default_for_new_submissions', self::TYPE_DECIMAL);
+        $this->uses('is_default_for_new_submissions', self::TYPE_BOOLEAN);
 	}
 
 	/**
