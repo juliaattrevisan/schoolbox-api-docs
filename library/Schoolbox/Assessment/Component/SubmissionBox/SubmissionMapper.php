@@ -339,6 +339,7 @@ class SubmissionMapper extends Schoolbox\Mapper implements Schoolbox\StorageMapp
                 /** @var ReturnedWork $defaultReturn */
                 $defaultReturn = $returnMapper->createModel();
                 $defaultReturn
+                    ->setIsConfirmationOfSubmission(true)
                     ->setSubmissionBox($object->getSubmissionBox())
                     ->setOwner($object->getOwner())
                     // No real marker
