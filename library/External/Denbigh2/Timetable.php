@@ -572,24 +572,6 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     }
 
     /**
-     * Retrieve the list of subjects for a user on a particular day
-     *
-     * Room
-     * Description
-     * PeriodNumber
-     * ClassCode
-     * ClassCampus
-     *
-     * @param $externalUserId
-     * @param $dayNumber
-     * @return array
-     */
-    public function getDaySubjects($externalUserId, $dayNumber)
-    {
-        // TODO: noop - Ignore this method, it's marked for removal
-    }
-
-    /**
      * Get the period for a class, given its $classCode and $dayNumber
      *
      * PeriodNumber

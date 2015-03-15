@@ -130,21 +130,6 @@ interface External_TimetableInterface
 	public function getFullTimetable ($externalUserId, $userId, $campusId);
 
     /**
-     * Retrieve the list of subjects for a user on a particular day
-     *
-     * Room
-     * Description
-     * PeriodNumber
-     * ClassCode
-     * ClassCampus
-     *
-     * @param $externalUserId
-     * @param $dayNumber
-     * @return array
-     */
-	public function getDaySubjects ($externalUserId, $dayNumber);
-
-    /**
      * Get the period for a class, given its $classCode and $dayNumber
      *
      * PeriodNumber

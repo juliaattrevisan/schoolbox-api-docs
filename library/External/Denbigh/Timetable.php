@@ -271,11 +271,6 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         return $periodList;
     }
 
-    public function getDaySubjects($externalUserId, $dayNumber)
-    {
-
-    }
-
     public function getSubjectPeriod($classCode, $dayNumber)
     {
 

@@ -593,17 +593,6 @@ class External_Maze_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Retrieve the list of subjects for a user on a particular day
-     *
-     * @param $externalUserId
-     * @param $dayNumber
-     * @return bool
-     */
-    public function getDaySubjects($externalUserId, $dayNumber)
-    {
-    }
-
-    /**
      * give a subject code and day this function returns the period that it occurs in
      * Assumption made that this should be the sequence rather than period name
      *

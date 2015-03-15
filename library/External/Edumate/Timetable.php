@@ -331,38 +331,6 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     }
 
     /**
-     * Retrieve the list of subjects for a user on a particular day
-     *
-     * @param $externalUserId
-     * @param $dayNumber
-     * @return bool
-     */
-    public function getDaySubjects($externalUserId, $dayNumber)
-    {
-        if (empty($externalUserId)) {
-            return array();
-        }
-        // Timetable.Room, SubjectClasses.Description, Timetable.PeriodNumber, Timetable.ClassCode, SubjectClasses.ClassCampus
-
-        $user = $this->getUserHandler()->getBySynergy($externalUserId);
-
-        $dayTimetable = $this->getDayTimetable($externalUserId, $user['uid'], 0, $dayNumber);
-
-        if ($dayTimetable === false) {
-            return false;
-        }
-
-        foreach ($dayTimetable as $k => $period) {
-            if (!isset($period['code'])) {
-                unset($dayTimetable[$k]);
-            }
-        }
-
-        return array_values($dayTimetable);
-
-    }
-
-    /**
      * give a subject code and day this function returns the period that it occurs in
      * Assumption made that this should be the sequence rather than period name
      *
