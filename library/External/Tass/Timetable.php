@@ -20,12 +20,17 @@ class External_Tass_Timetable implements External_TimetableInterface
      */
     private $tassDay;
 
+    /**
+     * @var External_UserInterface
+     */
+    private $externalUser;
     function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
 
         $this->groupHandler = new Group;
         $this->campusMapper = new \Schoolbox\CampusMapper();
+        $this->externalUser = new External_User('tass');
     }
 
 
@@ -178,6 +183,8 @@ class External_Tass_Timetable implements External_TimetableInterface
         }
         $timetabledef = $this->getTimetableDefinition($campus, $daynumber);
 
+        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($synergy_id));
+        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($synergy_id));
         if ($this->groupHandler->isStudent($userID)) {
             $query = "SELECT room_code, tch_code, ttmast.sub_code, ttmast.year_grp, ttmast.class, prd_code, sub_desc
                         FROM studsub
@@ -185,7 +192,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                         JOIN ttmast ON studsub.sub_code=ttmast.sub_code AND studsub.cmpy_code=ttmast.cmpy_code AND studsub.semester=ttmast.semester 
                                 AND studsub.class=ttmast.class AND (student.year_grp=ttmast.year_grp OR ttmast.year_grp IS null) AND studsub.yr_study=ttmast.year_num
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
-                        WHERE yr_study = '{$_SESSION['FileYear']}' AND studsub.semester = '{$_SESSION['FileSemester']}' 
+                        WHERE yr_study = '$fileYear' AND studsub.semester = '$fileSemester'
                                 AND studsub.stud_code = '$synergy_id'
                                 AND day_code = '$daynumber' 
                         ORDER BY prd_code";
@@ -193,7 +200,7 @@ class External_Tass_Timetable implements External_TimetableInterface
             $query = "SELECT room_code, tch_code, ttmast.sub_code, year_grp, class, prd_code, sub_desc
                         FROM ttmast
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
-                        WHERE year_num = '{$_SESSION['FileYear']}' AND semester = '{$_SESSION['FileSemester']}'
+                        WHERE year_num = '$fileYear' AND semester = '$fileSemester'
                             AND ttmast.cmpy_code = '{$this->getCampusCode($campus)}'
                             AND tch_code = '$synergy_id'
                             AND day_code = '$daynumber'
@@ -243,6 +250,8 @@ class External_Tass_Timetable implements External_TimetableInterface
         }
         $timetabledef = $this->getTimetableDefinition($campus);
 
+        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($synergy_id));
+        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($synergy_id));
         if ($this->groupHandler->isStudent($userID)) {
             $query = "SELECT room_code, tch_code, ttmast.sub_code, ttmast.year_grp, ttmast.class, prd_code, sub_desc, day_code
                             FROM studsub
@@ -250,7 +259,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                             JOIN ttmast ON studsub.sub_code=ttmast.sub_code AND studsub.cmpy_code=ttmast.cmpy_code AND studsub.semester=ttmast.semester
                                     AND studsub.class=ttmast.class AND (student.year_grp=ttmast.year_grp OR ttmast.year_grp IS NULL) AND studsub.yr_study=ttmast.year_num
                             JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
-                            WHERE yr_study = '{$_SESSION['FileYear']}' AND studsub.semester = '{$_SESSION['FileSemester']}'
+                            WHERE yr_study = '$fileYear' AND studsub.semester = '$fileSemester'
                                     AND studsub.stud_code = '$synergy_id'
                             ORDER BY prd_code, day_code";
 
@@ -258,7 +267,7 @@ class External_Tass_Timetable implements External_TimetableInterface
             $query = "SELECT room_code, tch_code, day_code, ttmast.sub_code, year_grp, class, prd_code, sub_desc
                         FROM ttmast
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
-                        WHERE year_num = '{$_SESSION['FileYear']}' AND semester = '{$_SESSION['FileSemester']}'
+                        WHERE year_num = '$fileYear' AND semester = '$fileSemester'
                             AND ttmast.cmpy_code = '{$this->getCampusCode($campus)}'
                             AND tch_code = '$synergy_id'
                          ORDER BY prd_code, day_code";
@@ -302,6 +311,8 @@ class External_Tass_Timetable implements External_TimetableInterface
 
     public function getRoomTimetable($roomCode)
     {
+        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
+        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
         $query = "
             SELECT
                 subtab.sub_desc AS Description,
@@ -345,8 +356,8 @@ class External_Tass_Timetable implements External_TimetableInterface
         $query = strtr(
             $query,
             array(
-                ':semester' => "'" . $this->database->quote($_SESSION['FileSemester']) . "'",
-                ':year'     => "'" . $this->database->quote($_SESSION['FileYear']) . "'",
+                ':semester' => "'" . $this->database->quote($fileSemester) . "'",
+                ':year'     => "'" . $this->database->quote($fileYear) . "'",
                 ':room'     => "'" . $this->database->quote($roomCode) . "'",
             )
         );
