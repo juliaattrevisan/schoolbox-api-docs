@@ -593,29 +593,6 @@ class External_Maze_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Get the subject name given a string
-     *
-     * @param $classCode
-     * @return bool
-     */
-    public function getSubjectName($classCode)
-    {
-        $query = "
-		 	SELECT TOP 1 FULLNAME
-		 	FROM SU
-		 	WHERE SUKEY = '{$classCode}'
-		 ";
-
-        $subject = $this->getDb()->getRow($query);
-
-        if ($subject) {
-            return $subject['FULLNAME'];
-        }
-
-        return false;
-    }
-
-    /**
      * @todo Implement for MAZE connector
      *
      * @param  string $roomCode

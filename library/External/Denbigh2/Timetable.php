@@ -572,27 +572,6 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     }
 
     /**
-     * Get the verbose name for the $classCode
-     *
-     * Description
-     *
-     * @param $classCode
-     * @return string
-     */
-    public function getSubjectName($classCode)
-    {
-        $api = new External_Denbigh2_Api('Classes', array(
-            'Class' => $classCode
-        ));
-
-        if (!$api->hasErrors()) {
-            return $api->getResult()->data[0]->{'Subject Name'};
-        }
-
-        return '';
-    }
-
-    /**
      * Gets the timetable for the given room.
      *
      * @return array

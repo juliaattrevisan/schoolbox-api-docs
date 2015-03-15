@@ -129,16 +129,6 @@ interface External_TimetableInterface
      */
 	public function getFullTimetable ($externalUserId, $userId, $campusId);
 
-    /**
-     * Get the verbose name for the $classCode
-     *
-     * Description
-     *
-     * @param $classCode
-     * @return string
-     */
-	public function getSubjectName ($classCode);
-
 	/**
 	 * Gets the timetable for the given room.
 	 *

@@ -330,28 +330,6 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         return $timetable;
     }
 
-
-    /**
-     * Retrieves the name of a subject based on its class code
-     *
-     * @param $classCode
-     * @return string
-     */
-    public function getSubjectName($classCode)
-    {
-        $stmt = $this->getDatabase()->prepare(
-            "
-                        SELECT class
-                        FROM db2inst1.schoolbox_classes
-                        WHERE class_code = :code
-                    "
-        );
-
-        $stmt->execute(array('code' => $classCode));
-
-        return $stmt->fetchColumn(0);
-    }
-
     /**
      * Gets the timetable for this room code.
      *

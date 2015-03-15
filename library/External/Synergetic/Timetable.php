@@ -672,14 +672,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         return $result;
     }
 
-    public function getSubjectName($code)
-    {
-        $query = "SELECT SubjectClasses.Description
-                       	FROM SynergyOne.dbo.SubjectClasses SubjectClasses
-                       	WHERE SubjectClasses.ClassCode = '$code'";
-        return $this->getDatabase()->getOne($query);
-    }
-
     /**
      * @var MSSQL $database
      */

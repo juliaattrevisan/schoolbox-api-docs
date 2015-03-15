@@ -300,15 +300,6 @@ class External_Tass_Timetable implements External_TimetableInterface
         return $timetable;
     }
 
-    function getSubjectName($code)
-    {
-
-        $query = "SELECT SubjectClasses.Description
-                        FROM SynergyOne.dbo.SubjectClasses SubjectClasses
-                        WHERE SubjectClasses.ClassCode = '$code'";
-        return $this->getDatabase()->getOne($query);
-    }
-
     public function getRoomTimetable($roomCode)
     {
         $query = "

@@ -185,17 +185,6 @@ class External_Timetable implements External_TimetableInterface
     }
 
     /**
-     * No usages found
-     *
-     * @param $classCode
-     * @return String
-     */
-    function getSubjectName($classCode)
-    {
-        return $this->getDatabase()->getSubjectName($classCode);
-    }
-
-    /**
      * Gets the timetable for the given room.
      *
      * @param  string $roomCode
