@@ -106,6 +106,8 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
             )
         );
 
+        $this->uses('is_confirmation_of_submission', self::TYPE_BOOLEAN);
+
         $this->hasSoftDeleteBooleanField('deleted');
 
         $this->hasJoin(

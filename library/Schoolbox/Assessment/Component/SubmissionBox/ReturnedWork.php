@@ -53,6 +53,15 @@ class ReturnedWork implements ISoftDeletable
     protected $normalized_mark;
 
     /**
+     * Is this a confirmation of an existing submission?
+     * If it is, it probably doesn't show in returns and is only for setting a
+     * default mark on a submission.
+     *
+     * @var bool
+     */
+    protected $isConfirmationOfSubmission;
+
+    /**
      * @var \Alaress_Date_Format
      */
     protected $submitted;
@@ -359,6 +368,25 @@ class ReturnedWork implements ISoftDeletable
     public function getUuid()
     {
         return $this->uuid;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getIsConfirmationOfSubmission()
+    {
+        return $this->isConfirmationOfSubmission;
+    }
+
+    /**
+     * @param  boolean $isConfirmationOfSubmission
+     *
+     * @return $this
+     */
+    public function setIsConfirmationOfSubmission($isConfirmationOfSubmission)
+    {
+        $this->isConfirmationOfSubmission = $isConfirmationOfSubmission;
+        return $this;
     }
 
     /**
