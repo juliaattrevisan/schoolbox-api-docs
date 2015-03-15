@@ -224,6 +224,9 @@ class Factory
         $returnedWork = null;
 
         /* If you can't find an existing record, spawn a new one
+         * Don't return the confirmation of submission return, because
+         * that is a special entry used to directly assign a default mark
+         * to a new submission.
          */
         try {
             /** @var ReturnedWork $returnedWork */
@@ -231,6 +234,7 @@ class Factory
                 array(
                     'owner' => $this->getUser()->getId(),
                     'box_id' => $this->getSubmissionBox()->getId(),
+                    'is_confirmation_of_submission' => false,
                 ),
                 array(
                     'returned' => 'desc'
