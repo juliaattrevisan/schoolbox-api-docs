@@ -633,7 +633,7 @@ class External_Synergetic_User implements External_UserInterface
         return $contactList;
     }
 
-    public function getCurrentSemester($externalUserId = null)
+    protected function findFileYearAndSemester($externalUserId = null)
     {
         if ($externalUserId) {
             $result = $this->getDatabase()->executeProcedure(
@@ -648,8 +648,8 @@ class External_Synergetic_User implements External_UserInterface
                 && isset($result['result'][0]['UserFileYear'])
                 && $result['result'][0]['UserFileSemester']
             ) {
-                $_SESSION['FileSemester'] = $result['result'][0]['UserFileSemester'];
-                $_SESSION['FileYear']     = $result['result'][0]['UserFileYear'];
+//                $_SESSION['FileSemester'] = $result['result'][0]['UserFileSemester'];
+//                $_SESSION['FileYear']     = $result['result'][0]['UserFileYear'];
                 return array(
                     'year'     => $result['result'][0]['UserFileYear'],
                     'semester' => $result['result'][0]['UserFileSemester'],
@@ -659,8 +659,8 @@ class External_Synergetic_User implements External_UserInterface
         // Get current FileSemester and FileYear
         $query = "SELECT FileSemester, FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1";
         if ($semester = $this->getDatabase()->getRow($query)) {
-            $_SESSION['FileSemester'] = $semester['FileSemester'];
-            $_SESSION['FileYear']     = $semester['FileYear'];
+//            $_SESSION['FileSemester'] = $semester['FileSemester'];
+//            $_SESSION['FileYear']     = $semester['FileYear'];
             return array(
                 'year'     => $semester['FileYear'],
                 'semester' => $semester['FileSemester'],
@@ -668,6 +668,26 @@ class External_Synergetic_User implements External_UserInterface
         } else {
             return array();
         }
+    }
+
+    public function getCurrentSemester($externalUserId = null)
+    {
+        $fileYearSemester = $this->findFileYearAndSemester($externalUserId);
+        if (!empty($fileYearSemester)) {
+            $_SESSION['FileSemester'] = $fileYearSemester['semester'];
+            $_SESSION['FileYear']     = $fileYearSemester['year'];
+            return $fileYearSemester['semester'];
+        }
+        return null;
+    }
+
+    public function getCurrentYear($externalUserId = null)
+    {
+        $fileYearSemester = $this->findFileYearAndSemester($externalUserId);
+        if (!empty($fileYearSemester)) {
+            return $fileYearSemester['year'];
+        }
+        return null;
     }
 
     /**
