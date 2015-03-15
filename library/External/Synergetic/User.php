@@ -650,7 +650,10 @@ class External_Synergetic_User implements External_UserInterface
             ) {
                 $_SESSION['FileSemester'] = $result['result'][0]['UserFileSemester'];
                 $_SESSION['FileYear']     = $result['result'][0]['UserFileYear'];
-                return true;
+                return array(
+                    'year'     => $result['result'][0]['UserFileYear'],
+                    'semester' => $result['result'][0]['UserFileSemester'],
+                );
             }
         }
         // Get current FileSemester and FileYear
@@ -658,9 +661,12 @@ class External_Synergetic_User implements External_UserInterface
         if ($semester = $this->getDatabase()->getRow($query)) {
             $_SESSION['FileSemester'] = $semester['FileSemester'];
             $_SESSION['FileYear']     = $semester['FileYear'];
-            return true;
+            return array(
+                'year'     => $semester['FileYear'],
+                'semester' => $semester['FileSemester'],
+            );
         } else {
-            return false;
+            return array();
         }
     }
 

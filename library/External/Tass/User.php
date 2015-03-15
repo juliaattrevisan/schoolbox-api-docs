@@ -149,6 +149,10 @@ class External_Tass_User implements External_UserInterface
         $current = $this->getDatabase()->getRow($query);
         $_SESSION['FileSemester'] = $current['curr_sem'];
         $_SESSION['FileYear'] = $current['curr_year'];
+        return array(
+            'year'     => $current['curr_year'],
+            'semester' => $current['curr_sem'],
+        );
     }
 
     function getSubjectList($tassCode, $userID)

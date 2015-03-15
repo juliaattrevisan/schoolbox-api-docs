@@ -49,7 +49,7 @@ class External_Offline_User implements External_UserInterface
 
     public function getCurrentSemester($externalUserId = null)
     {
-        // Return nothing
+        return array();
     }
 
     public function getSubjectList($externalUserId, $userId)

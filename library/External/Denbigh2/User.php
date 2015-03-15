@@ -959,7 +959,10 @@ class External_Denbigh2_User implements External_UserInterface
     {
         /* Apparently denbigh has no concept of semesters
          */
-        return 1;
+        return array(
+            'year'     => date('Y'),
+            'semester' => date('m') < 6 ? 1 : 2,
+        );
     }
 
     /**

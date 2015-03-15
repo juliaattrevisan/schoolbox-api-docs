@@ -360,8 +360,10 @@ interface External_UserInterface {
      * $_SESSION['FileSemester']
      * $_SESSION['FileYear']
      *
-     * @param null $externalUserId
-     * @return null
+     * @param string $externalUserId
+     * @return array
+     *   year     int The current year
+     *   semester int The current semester
      */
     public function getCurrentSemester($externalUserId = null);
 
