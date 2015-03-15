@@ -7,7 +7,11 @@
  * @link      http://www.alaress.com.au/
  */
 
+use Alaress\Redis;
+
 class External_UserDetention implements External_UserDetentionInterface {
+
+    use External_CacheTrait;
 
     /**
      * @var External_UserDetentionInterface
@@ -23,6 +27,7 @@ class External_UserDetention implements External_UserDetentionInterface {
     public function __construct($databaseName = '') {
         $factory = new External_DatabaseFactory();
         $this->database = $factory->buildUserDetentionConnector($databaseName);
+        $this->setCache(Redis::getInstance());
     }
 
     /**
@@ -39,7 +44,7 @@ class External_UserDetention implements External_UserDetentionInterface {
         $year,
         $semester
     ) {
-        return $this->database->getAwards($externalId, $year, $semester);
+        return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
 
     /**
@@ -58,7 +63,7 @@ class External_UserDetention implements External_UserDetentionInterface {
         DateTime $fromDate = null,
         DateTime $toDate = null
     ) {
-        return $this->database->getDetentions($externalId, $fromDate, $toDate);
+        return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
 
     /**
@@ -77,7 +82,7 @@ class External_UserDetention implements External_UserDetentionInterface {
         DateTime $fromDate = null,
         DateTime $toDate = null
     ) {
-        return $this->database->getAbsences($externalId, $fromDate, $toDate);
+        return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
 
 }
