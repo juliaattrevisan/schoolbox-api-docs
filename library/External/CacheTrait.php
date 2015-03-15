@@ -37,12 +37,13 @@ trait External_CacheTrait
      * return $this->getCachedResult(__FUNCTION__, func_get_args());
      * </code>
      *
-     * @param string $method A method defined in the external connector
-     * @param array  $params Parameters passed to the array
+     * @param string $method  A method defined in the external connector
+     * @param array  $params  Parameters passed to the array
+     * @param int    $timeout Timeout of cache result, or null if no timeout
      *
      * @return mixed
      */
-    protected function getCachedResult($method, $params)
+    protected function getCachedResult($method, $params, $timeout = null)
     {
         return $this->getCache()->cacheFunctionCall(
             __CLASS__.'.'.$method,
@@ -52,7 +53,8 @@ trait External_CacheTrait
                     $params
                 );
             },
-            $params
+            $params,
+            $timeout
         );
     }
 }
