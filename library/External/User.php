@@ -116,6 +116,14 @@ class External_User implements External_UserInterface {
 		return $this->getDatabase()->getCurrentSemester($externalUserId);
 	}
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getCurrentYear($externalUserId = null)
+    {
+        return $this->getDatabase()->getCurrentYear($externalUserId);
+    }
+
 	/**
 	 * Retrieves a teacher or student's subject list
 	 *
