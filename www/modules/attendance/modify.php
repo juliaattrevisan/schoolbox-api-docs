@@ -101,7 +101,15 @@ if ($class) {
 
     /* Get the attendance record for this class
      */
-    $attendanceHandler = new External_Synergetic_Attendance($class, $attendanceDate, $attendancePeriod, $_SESSION['FileYear'], $_SESSION['FileSemester'], MSSQL::getInstance());
+    $externalUserHandler = new External_User();
+    $attendanceHandler   = new External_Synergetic_Attendance(
+        $class,
+        $attendanceDate,
+        $attendancePeriod,
+        $externalUserHandler->getCurrentYear(),
+        $externalUserHandler->getCurrentSemester(),
+        MSSQL::getInstance()
+    );
     $allStudents = $attendanceHandler->findAttendanceRecords();
     /* Dish out each row
      */
