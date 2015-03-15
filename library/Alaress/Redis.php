@@ -111,9 +111,17 @@ class Redis
                 $is_result_called = true;
                 $result           = call_user_func($callback, $params);
                 if ($timeout > 0) {
-                    $redis->setex($key, $timeout, $result);
+                    $redis->setex($key, $timeout, serialize($result));
                 } else {
-                    $redis->set($key, $result);
+                    $redis->set($key, serialize($result));
+                }
+            } else {
+                // Results should now always be serialized before storage.
+                // Older results might not be, though.
+                $unserializedResult = unserialize($result);
+                if ($unserializedResult !== false || $result === 'b:0;') {
+                    // if serialized result is legitimately boolean false
+                    $result = $unserializedResult;
                 }
             }
         } catch (Predis\PredisException $e) {
