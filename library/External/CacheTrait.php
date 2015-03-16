@@ -18,14 +18,48 @@ trait External_CacheTrait
      */
     protected $cache;
 
+    /**
+     * The timeout for the external connector cache.
+     *
+     * @var int
+     */
+    protected $timeout;
+
+    /**
+     * @return Redis
+     */
     protected function getCache()
     {
         return $this->cache;
     }
 
+    /**
+     * @param Redis $cache
+     *
+     * @return $this
+     */
     protected function setCache($cache)
     {
         $this->cache = $cache;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    protected function getTimeout()
+    {
+        return $this->timeout;
+    }
+
+    /**
+     * @param  int $timeout
+     *
+     * @return $this
+     */
+    protected function setTimeout($timeout)
+    {
+        $this->timeout = $timeout;
         return $this;
     }
 
@@ -34,7 +68,7 @@ trait External_CacheTrait
      *
      * Should be called in the following manner:
      * <code>
-     * return $this->getCachedResult(__FUNCTION__, func_get_args());
+     * return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
      * </code>
      *
      * @param string $method  A method defined in the external connector
