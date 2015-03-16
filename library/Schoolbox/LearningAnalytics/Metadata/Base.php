@@ -8,34 +8,34 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\LearningAnalytics;
+namespace Schoolbox\LearningAnalytics\Metadata;
 
 use Schoolbox\Collection;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Resource\Category as Folder;
 
-class Metadata {
+abstract class Base {
 
     /**
      * A Collection of UnitInstances
      *
      * @var Collection
      */
-    private $allUnitInstances = null;
+    protected $allUnitInstances = null;
 
     /**
-     * Title of the page
+     * Default title of the page
      *
      * @var string
      */
-    private $pageTitle = 'Course Statistics';
+    protected $pageTitle = 'Statistics';
 
     /**
      * A Collection of Folder instances which are using the same Course
      *
      * @var null
      */
-    private $allFolders = null;
+    protected $allFolders = null;
 
     /**
      * The originating Course folder, used to spawn the Units used in the
@@ -43,7 +43,7 @@ class Metadata {
      *
      * @var Folder
      */
-    private $courseFolder = null;
+    protected $courseFolder = null;
 
     /**
      * Constructor
@@ -59,7 +59,7 @@ class Metadata {
     /**
      * Process
      */
-    private function process() {
+    protected function process() {
 
         /* Find title of the course by deriving the parent folder
          * of a unit_category_id
@@ -93,7 +93,7 @@ class Metadata {
      *
      * @param null $allFolders
      */
-    private function setAllFolders($allFolders)
+    protected function setAllFolders($allFolders)
     {
         $this->allFolders = $allFolders;
     }
@@ -103,7 +103,7 @@ class Metadata {
      *
      * @return null
      */
-    private function getAllFolders()
+    protected function getAllFolders()
     {
         return $this->allFolders;
     }
@@ -113,7 +113,7 @@ class Metadata {
      *
      * @param \Schoolbox\Collection $allUnitInstances
      */
-    private function setAllUnitInstances($allUnitInstances)
+    protected function setAllUnitInstances($allUnitInstances)
     {
         $this->allUnitInstances = $allUnitInstances;
     }
@@ -123,7 +123,7 @@ class Metadata {
      *
      * @return \Schoolbox\Collection
      */
-    private function getAllUnitInstances()
+    protected function getAllUnitInstances()
     {
         return $this->allUnitInstances;
     }
@@ -133,7 +133,7 @@ class Metadata {
      *
      * @param \Schoolbox\LearningAnalytics\Folder $courseFolder
      */
-    private function setCourseFolder($courseFolder)
+    protected function setCourseFolder($courseFolder)
     {
         $this->courseFolder = $courseFolder;
     }
@@ -143,7 +143,7 @@ class Metadata {
      *
      * @return \Schoolbox\LearningAnalytics\Folder
      */
-    private function getCourseFolder()
+    protected function getCourseFolder()
     {
         return $this->courseFolder;
     }
@@ -153,7 +153,7 @@ class Metadata {
      *
      * @param string $pageTitle
      */
-    private function setPageTitle($pageTitle)
+    protected function setPageTitle($pageTitle)
     {
         $this->pageTitle = $pageTitle;
     }

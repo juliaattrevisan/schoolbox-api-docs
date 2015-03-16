@@ -19,6 +19,9 @@ use Schoolbox\LearningAnalytics\Progress\AllUnits as AllUnitProgress;
 use Schoolbox\LearningAnalytics\Results\Averages;
 use Schoolbox\LearningAnalytics\Results\TaskList;
 use Schoolbox\LearningAnalytics\Results\TaskResults;
+use Schoolbox\LearningAnalytics\Metadata\Base as Metadata;
+use Schoolbox\LearningAnalytics\Metadata\Course as MetadataCourse;
+use Schoolbox\LearningAnalytics\Metadata\Folder as MetadataFolder;
 
 class Controller extends Base {
 
@@ -28,11 +31,7 @@ class Controller extends Base {
      * @param Collection $allUnitInstances
      */
     public function course(Collection $allUnitInstances) {
-        $title = 'Course data';
-
-        $metadata = new Metadata($allUnitInstances);
-
-        $this->process($allUnitInstances, $metadata);
+        $this->process($allUnitInstances, new MetadataCourse($allUnitInstances));
     }
 
     /**
@@ -41,9 +40,7 @@ class Controller extends Base {
      * @param Collection $allUnitInstances
      */
     public function subject(Collection $allUnitInstances) {
-        $title = 'Subject data';
-
-        $this->process($allUnitInstances, null);
+        $this->process($allUnitInstances, new MetadataFolder($allUnitInstances));
     }
 
     /**
