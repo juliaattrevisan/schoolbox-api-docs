@@ -125,6 +125,11 @@
             }
         });
 
+        {# TODO this will only work if put inside a promise at the end of jstree loading #}
+        {% if folder.id == 0 %}
+        tree.data('jstree').open_node(0);
+        {% endif %}
+
         tree.on('select_node.jstree', function(event, jstree) {
             loadPanel(fileList, childrenUri, jstree.node.id);
             loadPanel(metaData, folderInfoUri, jstree.node.id);
