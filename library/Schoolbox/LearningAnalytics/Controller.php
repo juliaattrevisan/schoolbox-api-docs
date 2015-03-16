@@ -19,7 +19,6 @@ use Schoolbox\LearningAnalytics\Progress\AllUnits as AllUnitProgress;
 use Schoolbox\LearningAnalytics\Results\Averages;
 use Schoolbox\LearningAnalytics\Results\TaskList;
 use Schoolbox\LearningAnalytics\Results\TaskResults;
-use Schoolbox\Assessment\Course\UnitInstanceMapper;
 
 class Controller extends Base {
 
@@ -31,22 +30,9 @@ class Controller extends Base {
     public function course(Collection $allUnitInstances) {
         $title = 'Course data';
 
-        /* Find title of the course by deriving the parent folder
-         * of a unit_category_id
-         */
-        if ($allUnitInstances->count()) {
-            try {
-                $unitInstanceMapper = new UnitInstanceMapper();
-                $courseFolder = $unitInstanceMapper->findCourseForUnit($allUnitInstances->first());
-                $allFolders = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder);
+        $metadata = new Metadata($allUnitInstances);
 
-                $title = $courseFolder->getName();
-            }
-            catch (\Exception $e) {
-            }
-        }
-
-        $this->process($allUnitInstances, $title);
+        $this->process($allUnitInstances, $metadata);
     }
 
     /**
@@ -57,7 +43,7 @@ class Controller extends Base {
     public function subject(Collection $allUnitInstances) {
         $title = 'Subject data';
 
-        $this->process($allUnitInstances, $title);
+        $this->process($allUnitInstances, null);
     }
 
     /**
@@ -75,9 +61,9 @@ class Controller extends Base {
      * instances' originating task id, not the individual instance id
      *
      * @param Collection $allUnitInstances
-     * @param $title
+     * @param Metadata $metadata
      */
-    private function process(Collection $allUnitInstances, $title) {
+    private function process(Collection $allUnitInstances, Metadata $metadata) {
 
         /* Get a list of all the students involved in each unit
          * and a list of units involved. This gets reused everywhere
@@ -114,7 +100,7 @@ class Controller extends Base {
             array(
                 'template' => '@learningAnalytics/course.twig',
                 'data' => array(
-                    'title' => $title,
+                    'pageTitle' => $metadata->getPageTitle(),
                     'overallProgress' => array(
                         'mostAdvancedStudent' => $overallProgress->getMostAdvancedStudent(),
                         'classCompletions' => $overallProgress->getClassCompletions(),
