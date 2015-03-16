@@ -47,7 +47,7 @@ class Module extends BaseModule {
         /* folderId is associated with a course, a set of units. This finds all
          * the units associated with a particular folder that uses the course.
          */
-        $router->addGet('learningAnalytics.subject', "{$basePath}/{folderId}");
+        $router->addGet('learningAnalytics.folder', "{$basePath}/{folderId}");
     }
 
     /**
@@ -114,7 +114,7 @@ class Module extends BaseModule {
         /* Inject ingredients into learningAnalytics/subject controller method
          */
         $matcher->add(
-            '/^learningAnalytics\.subject/',
+            '/^learningAnalytics\.folder/',
             function($params) {
 
                 /* Check permissions

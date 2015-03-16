@@ -39,7 +39,7 @@ class Controller extends Base {
      *
      * @param Collection $allUnitInstances
      */
-    public function subject(Collection $allUnitInstances) {
+    public function folder(Collection $allUnitInstances) {
         $this->process($allUnitInstances, new MetadataFolder($allUnitInstances));
     }
 
