@@ -27,6 +27,7 @@ class External_Timetable implements External_TimetableInterface
         $factory = new External_DatabaseFactory();
         $this->setDatabase($factory->buildTimetableConnector($databaseName));
         $this->setCache(Redis::getInstance());
+        $this->setTimeout(Config::get('external_cache_timeout'));
     }
 
     /**
@@ -39,7 +40,7 @@ class External_Timetable implements External_TimetableInterface
      */
     function getTimetableDefinition($externalUserId, $campusId, $day = 0)
     {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
     /**
@@ -51,7 +52,7 @@ class External_Timetable implements External_TimetableInterface
      */
     function getDayNumber($campusId, $date = 0)
     {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
     /**
@@ -63,7 +64,7 @@ class External_Timetable implements External_TimetableInterface
      */
     function getPeriodNumber($campusId, $now = 0)
     {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
     /**
@@ -159,7 +160,7 @@ class External_Timetable implements External_TimetableInterface
      */
     function getFullTimetable($externalUserId, $userId, $campusId)
     {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
     /**
@@ -188,7 +189,7 @@ class External_Timetable implements External_TimetableInterface
      */
     function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber)
     {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
     /**
@@ -199,7 +200,7 @@ class External_Timetable implements External_TimetableInterface
      */
     public function getRoomTimetable($roomCode)
     {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
     public function __call($methodName, $argumentList)

@@ -24,14 +24,15 @@ class External_Class implements External_ClassInterface{
 		$factory = new External_DatabaseFactory();
 		$this->setDatabase($factory->buildClassConnector($databaseName));
         $this->setCache(Redis::getInstance());
+        $this->setTimeout(Config::get('external_cache_timeout'));
 	}
 
 	public function getStudents ($classCode) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
 	}
 
 	public function getTeacherName ($classCode) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
 	}
 
 

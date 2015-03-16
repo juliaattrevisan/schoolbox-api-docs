@@ -25,6 +25,7 @@ class External_User implements External_UserInterface {
 		$factory = new External_DatabaseFactory();
 		$this->setDatabase($factory->buildUserConnector($databaseName));
         $this->setCache(Redis::getInstance());
+        $this->setTimeout(Config::get('external_cache_timeout'));
 	}
 
     /**
@@ -34,7 +35,7 @@ class External_User implements External_UserInterface {
      * @return String
      */
     public function getPortrait ($externalUserId) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
 	/**
@@ -44,7 +45,7 @@ class External_User implements External_UserInterface {
 	 * @return Array
 	 */
 	public function getParent ($externalUserId) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
 	}
 
 	/**
@@ -54,7 +55,7 @@ class External_User implements External_UserInterface {
 	 * @return Array
 	 */
 	public function getParentSync ($externalUserId) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
 	}
 
     /**
@@ -64,7 +65,7 @@ class External_User implements External_UserInterface {
      * @return array
      */
     public function getParentEmails($synergyIds) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
 
@@ -75,7 +76,7 @@ class External_User implements External_UserInterface {
 	 * @return Array
 	 */
 	public function getStudent ($externalUserId) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
 	}
 
 	/**
@@ -85,7 +86,7 @@ class External_User implements External_UserInterface {
 	 * @return Array
 	 */
 	function getStaff ($externalUserId) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
 	}
 
 	/**
@@ -100,7 +101,7 @@ class External_User implements External_UserInterface {
 	 * @return Array
 	 */
 	public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
 	}
 
 	/**
@@ -110,7 +111,7 @@ class External_User implements External_UserInterface {
 	 * @return Array
 	 */
 	function getStudentContactList ($externalUserId) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
 	}
 
 	/**
@@ -119,7 +120,7 @@ class External_User implements External_UserInterface {
 	 * @return Integer
 	 */
 	function getCurrentSemester ($externalUserId = null) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
 	}
 
     /**
@@ -127,7 +128,7 @@ class External_User implements External_UserInterface {
      */
     public function getCurrentYear($externalUserId = null)
     {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
 	/**
@@ -138,7 +139,7 @@ class External_User implements External_UserInterface {
 	 * @return Array
 	 */
 	function getSubjectList ($externalUserId, $userID) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
 	}
 
 	/**
@@ -148,7 +149,7 @@ class External_User implements External_UserInterface {
 	 * @return Array
 	 */
 	function getEnrolledStudents ($externalUserId) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
 	}
 
 	/**
@@ -158,7 +159,7 @@ class External_User implements External_UserInterface {
 	 * @return String
 	 */
 	function getEmail ($externalUserId) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
 	}
 
 	/**
@@ -198,7 +199,7 @@ class External_User implements External_UserInterface {
      * @return mixed
      */
     public function determineBoarderType ($boarderValue) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
     /**
@@ -208,7 +209,7 @@ class External_User implements External_UserInterface {
      * @return mixed
      */
     public function getHousemasterByHouseId ($houseID) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
     /**
@@ -217,7 +218,7 @@ class External_User implements External_UserInterface {
      * @return array
      */
     public function getStaffContactListExtended() {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
     /**
@@ -228,7 +229,7 @@ class External_User implements External_UserInterface {
      */
     public function getCampusFromTimetable($staffID)
     {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
 
