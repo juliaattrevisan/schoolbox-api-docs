@@ -21,6 +21,13 @@ use Schoolbox\Resource\Folder\Search\Result;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\User;
 
+/**
+ * Class Mapper
+ *
+ * @package Schoolbox\Resource\Folder
+ * @method Model createModel()
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ */
 class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 {
 

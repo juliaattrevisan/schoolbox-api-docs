@@ -21,6 +21,7 @@ use Schoolbox\UserMapper;
  * @package Schoolbox\Resource\File
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model findById($id)
+ * @method Model createModel()
  */
 class Mapper extends \Schoolbox\Mapper
 {
