@@ -141,9 +141,6 @@ class UserAccessMapper extends Mapper
         // TODO get rid of this
         $_DEPRECATED_EXTERNAL_USER_HANDLER = new \External_User();
 
-        // but first, MAGIC!
-        $_DEPRECATED_EXTERNAL_USER_HANDLER->getCurrentSemester();
-
         $extSubjs = $_DEPRECATED_EXTERNAL_USER_HANDLER->getSubjectList($user->getExternalId(), $user->getId());
 
         $external = new Collection();

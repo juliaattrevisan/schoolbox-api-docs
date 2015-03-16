@@ -141,10 +141,6 @@ class CommentNotifier extends AbstractModuleNotifier
             $student = $this->userMapper->findById($comment->getStudent()->getId());
         }
 
-        // perform magic
-        $DEPRECATED_EXTERNAL_USER = new \External_User();
-        $DEPRECATED_EXTERNAL_USER->getCurrentSemester();
-
         $category->loadTeachers();
 
         $href = sprintf("/submission/allWork/%s/%s/%s/%s",

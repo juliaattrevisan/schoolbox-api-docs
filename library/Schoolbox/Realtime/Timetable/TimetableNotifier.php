@@ -39,8 +39,6 @@ class TimetableNotifier extends WorkNotifier {
     public function __construct($configLoader = null, $log = null, $clock = null)
     {
         parent::__construct($configLoader, $log);
-        $eu = new External_User();
-        $eu->getCurrentSemester(); // becaaaaaause, magic! *%*(&#$%!!!
     }
 
 

@@ -96,7 +96,6 @@ class SynchroniseAbstract {
     private function lookupSynergeticStudentExample() {
         echo "Synergetic Student Entity Examples\n";
         $esu = new External_Synergetic_User();
-        $esu->getCurrentSemester();
         $students = $esu->getStudentUserAccountInfo();
 
         foreach (array_keys($students[0]) as $key) {
@@ -124,7 +123,6 @@ class SynchroniseAbstract {
     private function lookupSynergeticStaffExample() {
         echo "Synergetic Staff Entity Examples\n";
         $esu = new External_Synergetic_User();
-        $esu->getCurrentSemester();
         $students = $esu->getStaffUserAccountInfo();
 
         foreach (array_keys($students[0]) as $key) {
@@ -152,7 +150,6 @@ class SynchroniseAbstract {
     private function lookupSynergeticParentExample() {
         echo "Synergetic Parent Entity Examples\n";
         $esu = new External_Synergetic_User();
-        $esu->getCurrentSemester();
         $students = $esu->getParentUserAccountInfo();
 
         foreach (array_keys($students[0]) as $key) {

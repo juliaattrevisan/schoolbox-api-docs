@@ -140,7 +140,6 @@ class Synchronise_Facade {
     private function lookupSynergeticStudentExample() {
         echo "Synergetic Student Entity Examples\n";
         $esu = new External_Synergetic_User();
-        $esu->getCurrentSemester();
 
         $this->renderTable($esu->getStudentUserAccountInfo());
     }
@@ -148,7 +147,6 @@ class Synchronise_Facade {
     private function lookupSynergeticStaffExample() {
         echo "Synergetic Staff Entity Examples\n";
         $esu = new External_Synergetic_User();
-        $esu->getCurrentSemester();
 
         $this->renderTable($esu->getStaffUserAccountInfo());
     }
@@ -156,7 +154,6 @@ class Synchronise_Facade {
     private function lookupSynergeticParentExample() {
         echo "Synergetic Parent Entity Examples\n";
         $esu = new External_Synergetic_User();
-        $esu->getCurrentSemester();
 
         $this->renderTable($esu->getParentUserAccountInfo(), null, 10, 7);
     }
@@ -164,7 +161,6 @@ class Synchronise_Facade {
     private function lookupSynergeticStaffCategory() {
         echo "Synergetic Staff Category List\n";
         $esu = new External_Synergetic_User();
-        $esu->getCurrentSemester();
         $staff = $esu->getStaffUserAccountInfo();
         $cats = array();
 
