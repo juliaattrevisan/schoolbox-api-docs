@@ -12,20 +12,25 @@
         <tr>
             <td>
                 {% if workItem.assessment %}
+                    {% set showMark = workItem.assessment.isMarkShownToUser(user) %}
                     <a class="title" href="/submission/submissionHistory/{{ workItem.assessment.id }}/{{ student.id }}">
                         {{ workItem.assessment.name }}
                     </a>
                 {% elseif workItem.quiz %}
+                    {% set showMark = workItem.quiz.isMarkShownToUser(user) %}
                     <a class="title" href="/assess/attempts/{{ workItem.quiz.id }}/{{ student.id }}">
                         {{ workItem.quiz.title }}
                     </a>
                 {% else %}
+                    {% set showMark = false %}
                     Unknown
                 {% endif %}
             </td>
             <td class="grade">
-                {#<span class="gradient-{{ workItem.mark // 10 }}">{{ workItem.pretty_mark }}</span>#}
-                {{ workItem.pretty_mark }}
+                {# Does the current user have the right to view this assessment's mark? #}
+                {% if showMark %}
+                    {{ workItem.pretty_mark }}
+                {% endif %}
             </td>
             <td>{{ workItem.date|date('jS F') }}</td>
         </tr>
