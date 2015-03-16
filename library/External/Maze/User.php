@@ -27,7 +27,7 @@ class External_Maze_User implements External_UserInterface {
 	/**
 	 * Helper
 	 *
-	 * @var null
+	 * @var External_Maze_Helper
 	 */
 	private $helper = null;
 
@@ -605,8 +605,13 @@ class External_Maze_User implements External_UserInterface {
 	 * @param null $externalUserId
 	 */
 	public function getCurrentSemester($externalUserId = null) {
-		return $this->getHelper()->getCurrentSemester($externalUserId);
+        return $this->getHelper()->getCurrentSemester();
 	}
+
+    public function getCurrentYear($externalUserId = null)
+    {
+        return $this->getHelper()->getCurrentYear();
+    }
 
 	/**
 	 * Get a list of subjects for a particular user
@@ -1058,7 +1063,7 @@ class External_Maze_User implements External_UserInterface {
 	/**
 	 * Set helper
 	 *
-	 * @param null $helper
+	 * @param External_Maze_Helper $helper
 	 */
 	private function setHelper($helper) {
 		$this->helper = $helper;
@@ -1067,7 +1072,7 @@ class External_Maze_User implements External_UserInterface {
 	/**
 	 * Get helper
 	 *
-	 * @return null
+	 * @return External_Maze_Helper
 	 */
 	private function getHelper() {
 		return $this->helper;

@@ -124,13 +124,14 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
 //        );
 
         // Live data
+        $userDb              = new External_User();
         $this->externalDb    = new External_UserDetention();
         $this->detentionList = $this->externalDb->getDetentions($userId, new DateTime('now'));
         $this->absenceList   = $this->externalDb->getAbsences($userId);
         $this->awardList     = $this->externalDb->getAwards(
             $userId,
-            $_SESSION['FileYear'],
-            $_SESSION['FileSemester']
+            $userDb->getCurrentYear($this->user->getExternalId()),
+            $userDb->getCurrentSemester($this->user->getExternalId())
         );
 
         // Filter award list into absences and lateness

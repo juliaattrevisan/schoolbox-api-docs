@@ -136,7 +136,7 @@ abstract class TimetableTrigger extends AbstractTrigger
 
             $campusId          = $this->campus->getId();
             $dayNumber         = $this->handler->getDayNumber($campusId, $timestamp);
-            $this->cache[$key] = $this->handler->getTimetableDefinition($campusId, $dayNumber);
+            $this->cache[$key] = $this->handler->getTimetableDefinition(null, $campusId, $dayNumber);
         }
 
         return $this->cache[$key];

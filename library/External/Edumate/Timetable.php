@@ -31,11 +31,12 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     /**
      * Returns the timetable definition for a particular campus *FOR A PARTICULAR DAY*
      *
+     * @param string $externalUserId
      * @param $campusId
      * @param int $day
      * @return array
      */
-    public function getTimetableDefinition($campusId, $day = 0)
+    public function getTimetableDefinition($externalUserId, $campusId, $day = 0)
     {
 
         $definition = array();
@@ -147,7 +148,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     {
         $now = date('g:ia', $now ?: time());
 
-        $defn = $this->getTimetableDefinition($campusId);
+        $defn = $this->getTimetableDefinition(null, $campusId);
         $sequence = 0;
 
         for ($i = 0; $i < count($defn['sequence']); ++$i) {
@@ -175,7 +176,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         if (empty($externalUserId)) {
             return array();
         }
-        if (!($definition = $this->getTimetableDefinition($campusId, $dayNumber))) {
+        if (!($definition = $this->getTimetableDefinition($externalUserId, $campusId, $dayNumber))) {
             return false;
         }
 
@@ -259,7 +260,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         if (empty($externalUserId)) {
             return array();
         }
-        $definition = $this->getTimetableDefinition($campusId);
+        $definition = $this->getTimetableDefinition($externalUserId, $campusId);
         $dayCount = is_numeric($definition['dayCount']) ? $definition['dayCount'] : 0;
 
         if (!$dayCount) {
@@ -369,7 +370,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         $statement->execute(array('room' => $roomCode));
 
         // Join with Edumate's (currently hardcoded and campusless) timetable.
-        $campusTimetable = $this->getTimetableDefinition(1);
+        $campusTimetable = $this->getTimetableDefinition(null, 1);
         $result = array();
         foreach ($statement->fetchAll(DB2::FETCH_ASSOC) as $row) {
 // Match day and period against a start and end.

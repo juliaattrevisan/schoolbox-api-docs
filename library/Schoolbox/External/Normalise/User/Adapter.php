@@ -1338,6 +1338,16 @@ class Adapter  implements \External_UserInterface {
     }
 
     /**
+     * Gets the current file year for this user
+     *
+     * @param null $externalUserId
+     * @return int
+     */
+    public function getCurrentYear($externalUserId = null) {
+        return $this->getHandler()->getCurrentYear($externalUserId);
+    }
+
+    /**
      * Get a list of subjects and their types
      *
      * @param $externalUserId

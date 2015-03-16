@@ -265,6 +265,8 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getStudent($synID)
     {
+        $studentYear     = $this->getCurrentYear($synID);
+        $studentSemester = $this->getCurrentSemester($synID);
         $query   = "SELECT
                     vStudents.StudentID,
                     vStudents.StudentGiven1,
@@ -311,8 +313,8 @@ class External_Synergetic_User implements External_UserInterface
                     LEFT JOIN luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
                 WHERE
                     vStudents.StudentID = '$synID'
-                    AND vStudents.FileSemester=" . $_SESSION['FileSemester'] . "
-                    AND vStudents.FileYear=" . $_SESSION['FileYear'] . "
+                    AND vStudents.FileSemester='" . $this->database->quote($studentSemester) . "'
+                    AND vStudents.FileYear='" . $this->database->quote($studentYear) . "'
         ";
 
 		$student = false;
@@ -439,8 +441,9 @@ class External_Synergetic_User implements External_UserInterface
             LEFT JOIN SynergyOne.dbo.luCountry StudentHomeCountry
                 ON StudentContactHomeCountryCode = StudentHomeCountry.Code
             WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContactType = 'SC3')
-            AND FileSemester = " . $_SESSION['FileSemester'] . "
-            AND FileYear = " . $_SESSION['FileYear'];
+            AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
+            AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'"
+        ;
         /* Search for a particular year level
          */
         if (strlen($yearlevel)) {
@@ -571,8 +574,8 @@ class External_Synergetic_User implements External_UserInterface
             LEFT JOIN SynergyOne.dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
             LEFT JOIN SynergyOne.dbo.luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
             WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContactType = 'SC3')
-            AND FileSemester = " . $_SESSION['FileSemester'] . "
-            AND FileYear = " . $_SESSION['FileYear'] . "
+            AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
+            AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
             AND StudentBoarder = 'B'
             ORDER BY StudentSurname, StudentID, StudentContactType";
         return $this->getDatabase()->getAll($query);
@@ -617,8 +620,9 @@ class External_Synergetic_User implements External_UserInterface
             WHERE
                 StudentID = '$externalUserId'
                 AND (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContactType = 'SC3')
-                AND FileSemester = " . $_SESSION['FileSemester'] . "
-                AND FileYear = " . $_SESSION['FileYear'];
+                AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
+                AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'"
+        ;
         $contactList = $this->getDatabase()->getAll($query) ?: array();
         foreach ($contactList as &$row) {
             if ($row['ValidAddressFlag'] == 0) {
@@ -633,7 +637,7 @@ class External_Synergetic_User implements External_UserInterface
         return $contactList;
     }
 
-    public function getCurrentSemester($externalUserId = null)
+    protected function findFileYearAndSemester($externalUserId = null)
     {
         if ($externalUserId) {
             $result = $this->getDatabase()->executeProcedure(
@@ -648,20 +652,40 @@ class External_Synergetic_User implements External_UserInterface
                 && isset($result['result'][0]['UserFileYear'])
                 && $result['result'][0]['UserFileSemester']
             ) {
-                $_SESSION['FileSemester'] = $result['result'][0]['UserFileSemester'];
-                $_SESSION['FileYear']     = $result['result'][0]['UserFileYear'];
-                return true;
+                return array(
+                    'year'     => $result['result'][0]['UserFileYear'],
+                    'semester' => $result['result'][0]['UserFileSemester'],
+                );
             }
         }
         // Get current FileSemester and FileYear
         $query = "SELECT FileSemester, FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1";
         if ($semester = $this->getDatabase()->getRow($query)) {
-            $_SESSION['FileSemester'] = $semester['FileSemester'];
-            $_SESSION['FileYear']     = $semester['FileYear'];
-            return true;
+            return array(
+                'year'     => $semester['FileYear'],
+                'semester' => $semester['FileSemester'],
+            );
         } else {
-            return false;
+            return array();
         }
+    }
+
+    public function getCurrentSemester($externalUserId = null)
+    {
+        $fileYearSemester = $this->findFileYearAndSemester($externalUserId);
+        if (!empty($fileYearSemester)) {
+            return $fileYearSemester['semester'];
+        }
+        return null;
+    }
+
+    public function getCurrentYear($externalUserId = null)
+    {
+        $fileYearSemester = $this->findFileYearAndSemester($externalUserId);
+        if (!empty($fileYearSemester)) {
+            return $fileYearSemester['year'];
+        }
+        return null;
     }
 
     /**
@@ -675,27 +699,6 @@ class External_Synergetic_User implements External_UserInterface
     public function getSubjectList($synergyID, $userID)
     {
         if (empty($synergyID)) {
-            return false;
-        }
-
-        /* Temporarily switch the filesemester to the requested user */
-        if(isset($_SESSION['FileSemester']) && isset($_SESSION['FileYear'])) {
-            $originalFileSemester = $_SESSION['FileSemester'];
-            $originalFileYear     = $_SESSION['FileYear'];
-            /* If no synergy set in session or requested ID is not current user setup the current semester */
-            if(!isset($_SESSION['sid']) || $synergyID != $_SESSION['sid']) {
-                $this->getCurrentSemester($synergyID);
-            }
-        } else {
-            $originalFileSemester = null;
-            $originalFileYear     = null;
-            $this->getCurrentSemester($synergyID);
-        }
-
-        if (!isset($_SESSION['FileSemester']) || !isset($_SESSION['FileYear'])) {
-            /* Return filesemester to original state */
-            $_SESSION['FileSemester'] = $originalFileSemester;
-            $_SESSION['FileYear']     = $originalFileYear;
             return false;
         }
 
@@ -713,8 +716,8 @@ class External_Synergetic_User implements External_UserInterface
                     StudentClasses.FileSemester = SubjectClasses.FileSemester AND
                     StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
                     StudentClasses.ClassCode = SubjectClasses.ClassCode AND
-                    StudentClasses.FileSemester=" . $_SESSION['FileSemester'] . " AND
-                    StudentClasses.FileYear=" . $_SESSION['FileYear'] . " AND
+                    StudentClasses.FileSemester = '" . $this->database->quote($this->getCurrentSemester($synergyID)) . "' AND
+                    StudentClasses.FileYear = '" . $this->database->quote($this->getCurrentYear($synergyID)) . "' AND
                     StudentClasses.ID=$synergyID
                 LEFT JOIN luFileType ON StudentClasses.FileType = luFileType.Code
                 WHERE
@@ -736,8 +739,8 @@ class External_Synergetic_User implements External_UserInterface
                     c1.FileSemester = c2.FileSemester AND
                     c1.ClassCampus = c2.ClassCampus AND
                     c1.ClassCode = c2.ClassCode AND
-                    c1.FileSemester = " . $_SESSION['FileSemester'] . " AND
-                    c1.FileYear = " . $_SESSION['FileYear'] . " AND
+                    c1.FileSemester = '" . $this->database->quote($this->getCurrentSemester($synergyID)) . "' AND
+                    c1.FileYear = '" . $this->database->quote($this->getCurrentYear($synergyID)) . "' AND
                     c1.StaffID = $synergyID
                 LEFT JOIN luFileType ON c2.FileType = luFileType.Code
             ";
@@ -752,9 +755,6 @@ class External_Synergetic_User implements External_UserInterface
                 'campusCode' => $subject['ClassCampus']
             );
         }
-        /* Return filesemester to original state */
-        $_SESSION['FileSemester'] = $originalFileSemester;
-        $_SESSION['FileYear']     = $originalFileYear;
         if (is_array($subjectList)) {
             return $subjectList;
         } else {
@@ -821,8 +821,8 @@ class External_Synergetic_User implements External_UserInterface
                 StudentCampus
             FROM SynergyOne.dbo.vStudents vStudents
             LEFT JOIN Community ON Community.ID = StudentID
-            WHERE vStudents.FileSemester = '{$_SESSION['FileSemester']}'
-            AND vStudents.FileYear = '{$_SESSION['FileYear']}'
+            AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
+            AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
         ";
         return $this->getDatabase()->getAll($query);
     }
@@ -856,8 +856,8 @@ class External_Synergetic_User implements External_UserInterface
 			LEFT JOIN SynergyOne.dbo.Community cp ON s.StudentContactID = cp.ID
 			LEFT JOIN SynergyOne.dbo.Community cs ON s.StudentContactSpouseID = cs.ID
             WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
-            AND FileSemester = '{$_SESSION['FileSemester']}'
-            AND FileYear = '{$_SESSION['FileYear']}'
+            AND FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
+            AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
             ORDER BY StudentContactID
         ";
         return $this->getDatabase()->getAll($query);

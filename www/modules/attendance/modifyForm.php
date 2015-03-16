@@ -58,7 +58,15 @@ $attendancePeriod = $_POST['attendancePeriod'];
 
 /* Deal with it all
  */
-$attendanceHandler = new External_Synergetic_Attendance($class, $attendanceDate, $attendancePeriod, $_SESSION['FileYear'], $_SESSION['FileSemester'], MSSQL::getInstance());
+$externalUserHandler = new External_User();
+$attendanceHandler   = new External_Synergetic_Attendance(
+    $class,
+    $attendanceDate,
+    $attendancePeriod,
+    $externalUserHandler->getCurrentYear(),
+    $externalUserHandler->getCurrentSemester(),
+    MSSQL::getInstance()
+);
 
 /* Create everyone's attendance initially
  */

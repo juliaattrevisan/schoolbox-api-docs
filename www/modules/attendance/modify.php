@@ -75,7 +75,11 @@ $attendancePeriod = $this->arg[3];
 /* Get Period Definition */
 $externalTimetable = new External_Synergetic_Timetable();
 
-$definition = $externalTimetable->getTimetableDefinition($_SESSION['campus'], $externalTimetable->getDayNumber($_SESSION['campus'], $attendanceDate->getUnixTimestamp()));
+$definition = $externalTimetable->getTimetableDefinition(
+    null,
+    $_SESSION['campus'],
+    $externalTimetable->getDayNumber($_SESSION['campus'], $attendanceDate->getUnixTimestamp())
+);
 $periods = array_keys($definition['number'], $attendancePeriod);
 $startTime = $definition['start'][$periods[0]];
 $endTime = $definition['end'][$periods[0]];
@@ -101,7 +105,15 @@ if ($class) {
 
     /* Get the attendance record for this class
      */
-    $attendanceHandler = new External_Synergetic_Attendance($class, $attendanceDate, $attendancePeriod, $_SESSION['FileYear'], $_SESSION['FileSemester'], MSSQL::getInstance());
+    $externalUserHandler = new External_User();
+    $attendanceHandler   = new External_Synergetic_Attendance(
+        $class,
+        $attendanceDate,
+        $attendancePeriod,
+        $externalUserHandler->getCurrentYear(),
+        $externalUserHandler->getCurrentSemester(),
+        MSSQL::getInstance()
+    );
     $allStudents = $attendanceHandler->findAttendanceRecords();
     /* Dish out each row
      */

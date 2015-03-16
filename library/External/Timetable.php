@@ -7,8 +7,13 @@
  * @copyright   Copyright 2015, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+
+use Alaress\Redis;
+
 class External_Timetable implements External_TimetableInterface
 {
+    use External_CacheTrait;
+
     private $database;
 
     /**
@@ -21,18 +26,21 @@ class External_Timetable implements External_TimetableInterface
     {
         $factory = new External_DatabaseFactory();
         $this->setDatabase($factory->buildTimetableConnector($databaseName));
+        $this->setCache(Redis::getInstance());
+        $this->setTimeout(Config::get('external_cache_timeout'));
     }
 
     /**
      * Returns the period definition for the schools timetable, can be optionally provided a day to fetch a specific
      * days definition.
+     * @param string $externalUserId
      * @param Integer $campusId
      * @param Integer $day
      * @return Array
      */
-    function getTimetableDefinition($campusId, $day = 0)
+    function getTimetableDefinition($externalUserId, $campusId, $day = 0)
     {
-        return $this->getDatabase()->getTimetableDefinition($campusId, $day);
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
     /**
@@ -44,7 +52,7 @@ class External_Timetable implements External_TimetableInterface
      */
     function getDayNumber($campusId, $date = 0)
     {
-        return $this->getDatabase()->getDayNumber($campusId, $date);
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
     /**
@@ -56,7 +64,7 @@ class External_Timetable implements External_TimetableInterface
      */
     function getPeriodNumber($campusId, $now = 0)
     {
-        return $this->getDatabase()->getPeriodNumber($campusId, $now);
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
     /**
@@ -152,7 +160,7 @@ class External_Timetable implements External_TimetableInterface
      */
     function getFullTimetable($externalUserId, $userId, $campusId)
     {
-        return $this->getDatabase()->getFullTimetable($externalUserId, $userId, $campusId);
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
     /**
@@ -181,7 +189,7 @@ class External_Timetable implements External_TimetableInterface
      */
     function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber)
     {
-        return $this->getDatabase()->getDayTimetable($externalUserId, $userId, $campusId, $dayNumber);
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
     /**
@@ -192,7 +200,7 @@ class External_Timetable implements External_TimetableInterface
      */
     public function getRoomTimetable($roomCode)
     {
-        return $this->getDatabase()->getRoomTimetable($roomCode);
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
     public function __call($methodName, $argumentList)

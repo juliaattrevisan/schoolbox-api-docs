@@ -46,12 +46,13 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     /**
      * Get a timetable definition
      *
+     * @param string $externalUserId
      * @param     $campusId
      * @param int $day
      *
      * @return array|bool
      */
-    public function getTimetableDefinition($campusId, $day = 0)
+    public function getTimetableDefinition($externalUserId, $campusId, $day = 0)
     {
         $campus = $this->getCampusMapper()->findById($campusId);
         $this->setCycleLength($campus->getTimetableDay());
@@ -224,7 +225,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
              */
             $result = $this->getStaffDayTimetable($externalUserId, $campusId, $dayNumber);
         }
-        $definition = $this->getTimetableDefinition($campusId, $dayNumber);
+        $definition = $this->getTimetableDefinition($externalUserId, $campusId, $dayNumber);
         if ($result['success'] && count($result['result'])) {
             $timetable = array();
             $allClasses = $result['result'];

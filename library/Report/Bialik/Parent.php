@@ -52,7 +52,9 @@ class Report_Bialik_Parent extends \Report_Parent
                         $this->getYearLevel(),
                         $this->getSearchName(),
                         $this->getSearchBoardingStatus(),
-                        $this->getSearchForm()
+                        $this->getSearchForm(),
+                        $this->getExternalUserHandler()->getCurrentYear(),
+                        $this->getExternalUserHandler()->getCurrentSemester()
                     )
                 );
             }
@@ -68,7 +70,7 @@ class Report_Bialik_Parent extends \Report_Parent
     /**
      * Custom query function for fetching student contact results from Synergetic for Bialik
      */
-    protected function getStudentContactList($yearlevel, $name, $boardingStatus, $form) {
+    protected function getStudentContactList($yearlevel, $name, $boardingStatus, $form, $fileYear, $fileSemester) {
 
         $db = new MSSQL();
 
@@ -146,8 +148,8 @@ class Report_Bialik_Parent extends \Report_Parent
             LEFT JOIN SynergyOne.dbo.luCountry StudentHomeCountry
                 ON StudentContactHomeCountryCode = StudentHomeCountry.Code
             WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContactType = 'SC3')
-            AND FileSemester = '" . $_SESSION['FileSemester'] . "'
-            AND FileYear = '" . $_SESSION['FileYear']."'";
+            AND FileSemester = '" . $db->quote($fileSemester) . "'
+            AND FileYear = '" . $db->quote($fileYear) ."'";
         /* Search for a particular year level
          */
         if (strlen($yearlevel)) {

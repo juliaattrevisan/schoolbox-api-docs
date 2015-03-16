@@ -914,53 +914,6 @@ class Calendar extends DeprecatedModel
         return $this->db->getAll($query);
     }
 
-    function getStudentBirthdays($currentDay)
-    {
-
-        $db = MSSQL::getInstance();
-
-//		$query = "SELECT  vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname,
-//						vStudents.StudentBirthDate, vStudents.StudentCampus, datediff(year,studentbirthdate,getdate()) as age,
-//						vStudents.StudentFormDescription, convert(varchar,studentbirthdate,106)  as 'la'
-//						FROM SynergyOne.dbo.vStudents vStudents
-//						WHERE
-//						vStudents.FileSemester=".$_SESSION['FileSemester']."
-//						AND vStudents.FileYear=".$_SESSION[ 'FileYear']."
-//						AND day(studentbirthdate) = ". date("j", $currentDay) ."
-//						AND month(studentbirthdate) =". date("n", $currentDay) ."
-//						AND StudentCampus = 'G'";
-
-        $query = "SELECT  vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname,
-						vStudents.StudentBirthDate, vStudents.StudentCampus, datediff(year,studentbirthdate,getdate()) as age,
-						vStudents.StudentFormDescription, convert(varchar,studentbirthdate,106)  as 'la'
-						FROM SynergyOne.dbo.vStudents vStudents
-						WHERE
-						vStudents.FileSemester=" . $_SESSION['FileSemester'] . "
-						AND vStudents.FileYear=" . $_SESSION['FileYear'] . "
-						AND day(studentbirthdate) = " . date("j", $currentDay) . "
-						AND month(studentbirthdate) =" . date("n", $currentDay);
-
-        $birthdayList = $db->getAll($query);
-
-        /* Standardised output
-         */
-        $stack = new Calendar_Event_Collection();
-
-        if (is_array($birthdayList) && count($birthdayList)) {
-            foreach ($birthdayList as $birthday) {
-                $event = new Calendar_Event_Type_StudentBirthday();
-                $event->setName($birthday['StudentGiven1'] . ' ' . $birthday['StudentSurname']);
-                $event->setForm($birthday['StudentFormDescription']);
-                $event->setAge($birthday['age']);
-                $event->setDate($birthday['la']);
-                $event->setStartTime(new Alaress_Date_Format(strtotime($birthday['StudentBirthdate']), 'U'));
-                $event->setBirthdayNote();
-                $stack->add($event);
-            }
-        }
-
-        return $stack;
-    }
 
     /**
      * Gets all event groups for the given event ID.

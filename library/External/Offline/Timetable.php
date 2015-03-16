@@ -11,7 +11,7 @@ use Alaress\DebugBar\Instance as DebugBar;
 
 class External_Offline_Timetable implements External_TimetableInterface
 {
-    public function getTimetableDefinition($campusId, $day = 0)
+    public function getTimetableDefinition($externalUserId, $campusId, $day = 0)
     {
         // Noop
     }

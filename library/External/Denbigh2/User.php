@@ -945,21 +945,21 @@ class External_Denbigh2_User implements External_UserInterface
     }
 
     /**
-     * Find out the current semester and current year
+     * Gets the current semester for the user.
      *
-     * This MUST set the two session variables:
-     *
-     * $_SESSION['FileSemester']
-     * $_SESSION['FileYear']
-     *
-     * @param null $externalUserId
-     * @return null
+     * @param string $externalUserId
+     * @return string
      */
     public function getCurrentSemester($externalUserId = null)
     {
         /* Apparently denbigh has no concept of semesters
          */
-        return 1;
+        return date('m') < 6 ? 1 : 2;
+    }
+
+    public function getCurrentYear($externalUserId = null)
+    {
+        return date('Y');
     }
 
     /**

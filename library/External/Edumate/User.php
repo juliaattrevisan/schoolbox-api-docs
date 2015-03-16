@@ -252,15 +252,17 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
 
         $semester = $stmt->fetchColumn();
 
-        if($semester) {
-            $_SESSION['FileSemester'] = $semester;
-            $_SESSION['FileYear'] = date('Y');
-            return true;
+        if ($semester) {
+            return $semester;
         }
 
-        return false;
+        return null;
     }
 
+    public function getCurrentYear($externalUserId = null)
+    {
+        return date('Y');
+    }
 
     /**
      * Returns list of subjects the user is enrolled in

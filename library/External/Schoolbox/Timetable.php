@@ -20,7 +20,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         $this->setGroup(new Group);
     }
 
-    public function getTimetableDefinition($campusId, $day = 0)
+    public function getTimetableDefinition($externalUserId, $campusId, $day = 0)
     {
         $statement = $this->getDatabase()->prepare(
             "
@@ -49,7 +49,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
     public function getDayNumber($campusId, $date = 0)
     {
-        if (!$definition = $this->getTimetableDefinition($campusId)) {
+        if (!$definition = $this->getTimetableDefinition(null, $campusId)) {
             return false;
         }
 
@@ -144,7 +144,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     {
         // Surely this should take a day number????
 
-        if (!$definition = $this->getTimetableDefinition($campusId)) {
+        if (!$definition = $this->getTimetableDefinition(null, $campusId)) {
             return false;
         }
 
@@ -192,7 +192,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
         $classList = $classStatement->fetchAll(PDO::FETCH_ASSOC);
 
-        $timetableDefinition = $this->getTimetableDefinition($campusId);
+        $timetableDefinition = $this->getTimetableDefinition($externalUserId, $campusId);
         $dayCount            = $timetableDefinition['dayCount'];
 
         $periodListAdaption = array();

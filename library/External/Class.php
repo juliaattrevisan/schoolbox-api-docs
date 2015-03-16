@@ -6,8 +6,12 @@
  * Time: 4:40 PM
  * To change this template use File | Settings | File Templates.
  */
- 
+
+use Alaress\Redis;
+
 class External_Class implements External_ClassInterface{
+    use External_CacheTrait;
+
 	private $database;
 
 	/**
@@ -19,14 +23,16 @@ class External_Class implements External_ClassInterface{
 	public function __construct($databaseName = '') {
 		$factory = new External_DatabaseFactory();
 		$this->setDatabase($factory->buildClassConnector($databaseName));
+        $this->setCache(Redis::getInstance());
+        $this->setTimeout(Config::get('external_cache_timeout'));
 	}
 
 	public function getStudents ($classCode) {
-		return $this->getDatabase()->getStudents($classCode);
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
 	}
 
 	public function getTeacherName ($classCode) {
-		return $this->getDatabase()->getTeacherName($classCode);
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
 	}
 
 

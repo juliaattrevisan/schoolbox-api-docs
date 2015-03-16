@@ -35,7 +35,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         $this->setGroup(new Group);
     }
 
-    public function getTimetableDefinition($campusId, $day = 0)
+    public function getTimetableDefinition($externalUserId, $campusId, $day = 0)
     {
         $statement = $this->getInternalDatabase()->prepare(
             "
@@ -67,7 +67,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
 
     public function getDayNumber($campusId, $date = 0)
     {
-        if (!$definition = $this->getTimetableDefinition($campusId)) {
+        if (!$definition = $this->getTimetableDefinition(null, $campusId)) {
             return false;
         }
 
@@ -122,7 +122,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             return array();
         }
         /* Setup skeleton timetable */
-        if (!$definition = $this->getTimetableDefinition($campusId)) {
+        if (!$definition = $this->getTimetableDefinition($externalUserId, $campusId)) {
             return false;
         }
 
@@ -197,7 +197,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             return array();
         }
         /* Setup skeleton timetable */
-        if (!$definition = $this->getTimetableDefinition($campusId)) {
+        if (!$definition = $this->getTimetableDefinition($externalUserId, $campusId)) {
             return false;
         }
 

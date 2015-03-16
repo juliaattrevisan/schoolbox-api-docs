@@ -184,10 +184,12 @@ class initTeamLists
 		else if ($_SESSION['campus'][0] == 3)
 			$studentyear = "IN ('5', '6')";
 
+		$externalDb = new External_User();
+		$baseYear   = $externalDb->getCurrentYear();
 		if ($future)
-			$fileyr = $_SESSION['FileYear'] + 1;
+			$fileyr = $baseYear + 1;
 		else
-			$fileyr = $_SESSION['FileYear'];
+			$fileyr = $baseYear;
 		$this->t_body->set_var("FILEYR", $fileyr);
 
 		//setup teams list
@@ -292,7 +294,7 @@ class initTeamLists
 			$years ="<option value=\"\">&nbsp;</option><option value=\"7\">7</option><option value=\"8\">8</option>";
 		else
 			$years ="<option value=\"\">&nbsp;</option><option value=\"Prep\">Prep</option><option value=\"1\">1</option><option value=\"2\">2</option><option value=\"3\">3</option><option value=\"4\">4</option><option value=\"5\">5</option><option value=\"6\">6</option>";
-		$nextyr = $_SESSION['FileYear'] + 1;
+		$nextyr = $baseYear + 1;
 		$this->t_body->set_var("YEAR", $years);
 		$this->t_body->set_var("SNAME", $name);
 		$this->t_body->parse("search_sect", "search", true);

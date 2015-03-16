@@ -13,8 +13,14 @@ class External_Tass_Class implements External_ClassInterface {
 	 */
 	private $database;
 
+    /**
+     * @var External_UserInterface
+     */
+    private $externalUser;
+
 	function __construct () {
 		$this->setDatabase(MSSQL::getInstance());
+        $this->externalUser = new External_User('tass');
 	}
 	
 	function getStudents($subCode) {
@@ -37,12 +43,13 @@ class External_Tass_Class implements External_ClassInterface {
 		}
 
 
-
+        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
+        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
 		$query = "SELECT DISTINCT studsub.stud_code as synergy_id, preferred_name as firstname, surname as lastname, year_grp as yearlevel, house
 		FROM studsub
 		JOIN student ON student.stud_code = studsub.stud_code AND student.cmpy_code = studsub.cmpy_code
-		WHERE semester = '{$_SESSION['FileSemester']}'
-			AND yr_study = '{$_SESSION['FileYear']}'
+		WHERE semester = '{$fileSemester}'
+			AND yr_study = '{$fileYear}'
 			AND next_yr_ind != 'F'
 			AND ( $classQuery )
 		ORDER BY lastname, firstname";
@@ -72,7 +79,9 @@ class External_Tass_Class implements External_ClassInterface {
 
 
 		list($year, $code, $class) = explode('-',$subCode);
-		$query = "SELECT DISTINCT tch_code FROM tchsub WHERE semester = '{$_SESSION['FileSemester']}' AND year_num = '{$_SESSION['FileYear']}'
+        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
+        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
+		$query = "SELECT DISTINCT tch_code FROM tchsub WHERE semester = '{$fileSemester}' AND year_num = '{$fileYear}'
 					   AND ( $classQuery )";
 
 		$this->getDatabase()->query($query);

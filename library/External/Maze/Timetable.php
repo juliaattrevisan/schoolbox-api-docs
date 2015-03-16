@@ -100,11 +100,12 @@ class External_Maze_Timetable implements External_TimetableInterface
      * The headings of the timetable, going horizontally
      * from left to right containing all the times and day numbers
      *
+     * @param string $externalUserId
      * @param $campusId
      * @param int $day
      * @return array
      */
-    public function getTimetableDefinition($campusId, $day = 0)
+    public function getTimetableDefinition($externalUserId, $campusId, $day = 0)
     {
         $query = "
 			SELECT TOP 50 *
@@ -306,7 +307,7 @@ class External_Maze_Timetable implements External_TimetableInterface
         $user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
         $user = $userMapper->findById($user->getId());
 
-        $definition = $this->getTimetableDefinition($user->getCampusCollection()->first()->getId());
+        $definition = $this->getTimetableDefinition($externalUserId, $user->getCampusCollection()->first()->getId());
 
         $finalTimetable = array();
 
@@ -404,7 +405,7 @@ class External_Maze_Timetable implements External_TimetableInterface
         $user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
         $user = $userMapper->findById($user->getId());
 
-        $definition = $this->getTimetableDefinition($user->getCampusCollection()->first()->getId());
+        $definition = $this->getTimetableDefinition($externalUserId, $user->getCampusCollection()->first()->getId());
 
         $finalTimetable = array();
 

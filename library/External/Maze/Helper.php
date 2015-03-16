@@ -26,6 +26,13 @@ class External_Maze_Helper
     private $currentSemester = '';
 
     /**
+     * Current file year. (Always this year but included for consistency.)
+     *
+     * @var string
+     */
+    private $currentYear = '';
+
+    /**
      * Decide whether you're in between semesters
      *
      * @var bool
@@ -38,6 +45,7 @@ class External_Maze_Helper
     public function __construct()
     {
         $this->setDb(MSSQL::getInstance());
+        $this->setCurrentYear($this->determineCurrentYear());
         $this->setCurrentSemester($this->determineCurrentSemester());
     }
 
@@ -46,16 +54,6 @@ class External_Maze_Helper
      */
     public function getCurrentTTPeriod()
     {
-        $now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
-
-        /* Ensure a filesemester is set */
-        if (!(isset($_SESSION['FileSemester']) && isset($_SESSION['FileYear']))) {
-            $_SESSION['FileYear'] = $now->getUsingFormat('Y');
-            $_SESSION['FileSemester'] = $this->getCurrentSemester();
-        }
-
-        /* Only get subjects that are relevant now
-         */
         return $this->getCurrentSemester();
     }
 
@@ -85,6 +83,17 @@ class External_Maze_Helper
     public function mazeTime($date)
     {
         return ltrim(strtolower(substr($date, 12, 5) . substr($date, -2)), 0);
+    }
+
+    /**
+     * Get the current year
+     *
+     * @param null $externalUserId
+     * @return string
+     */
+    public function determineCurrentYear($externalUserId = null)
+    {
+        return date('Y');
     }
 
     /**
@@ -266,6 +275,22 @@ class External_Maze_Helper
     public function getCurrentSemester()
     {
         return $this->currentSemester;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrentYear()
+    {
+        return $this->currentYear;
+    }
+
+    /**
+     * @param string $currentYear
+     */
+    private function setCurrentYear($currentYear)
+    {
+        $this->currentYear = $currentYear;
     }
 
     /**
