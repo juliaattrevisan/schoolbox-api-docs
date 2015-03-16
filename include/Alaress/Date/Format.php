@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Alaress_Date_Format
  *
@@ -13,12 +14,15 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Validator_ValidatableInterface {
+use Jenssegers\Date\Date as LaravelDate;
 
-	/**
-	 * @var Alaress_Date_Format_Interface
-	 */
-	protected $strategy;
+class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Validator_ValidatableInterface
+{
+
+    /**
+     * @var Alaress_Date_Format_Interface
+     */
+    protected $strategy;
 
     /**
      * Returns an instance of self at the current time.
@@ -37,42 +41,47 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
         return new static($time, 'U');
     }
 
-	/**
-	 * Set up datetime data for processing. Choose your strategy here!
-	 * Choose your locale as well; this would probably come from the Config
-	 * table rather than have a concrete instantiation
-	 *
-	 * @see Alaress_Date_Strategy_Abstract->setFromFormat() for param description
-	 *
-	 * @param string|object $dateTime
-	 * @param string        $dateFormat
-	 * @param DateTimeZone  $timezone   The timezone of the date, or null to use default
-	 */
-	public function __construct($dateTime = null, $dateFormat = null, DateTimeZone $timezone = null) {
-		if (!($timezone instanceof DateTimeZone)) {
-			$timezone = new DateTimeZone(date_default_timezone_get());
-		}
-		$strategy = new Alaress_Date_Strategy_LaravelDate($timezone);
-		$strategy->setFromFormat($dateTime, $dateFormat);
-		$strategy->setLocale(new Alaress_Date_Locale_Australian());
+    /**
+     * Set up datetime data for processing. Choose your strategy here!
+     * Choose your locale as well; this would probably come from the Config
+     * table rather than have a concrete instantiation
+     *
+     * @see Alaress_Date_Strategy_Abstract->setFromFormat() for param description
+     *
+     * @param string|object $dateTime
+     * @param string $dateFormat
+     * @param DateTimeZone $timezone The timezone of the date, or null to use default
+     */
+    public function __construct($dateTime = null, $dateFormat = null, DateTimeZone $timezone = null)
+    {
+        if (!($timezone instanceof DateTimeZone)) {
+            $timezone = new DateTimeZone(date_default_timezone_get());
+        }
+        $strategy = new Alaress_Date_Strategy_LaravelDate($timezone);
+        $strategy->setFromFormat($dateTime, $dateFormat);
+        $strategy->setLocale(new Alaress_Date_Locale_Australian());
 
-		$this->setStrategy($strategy);
-	}
+        $this->setStrategy($strategy);
+    }
 
     /**
      * @param $datetime
      * @param $format
+     * @return $this
      */
-    public function setFromFormat($datetime, $format) {
-		$this->getStrategy()->setFromFormat($datetime, $format);
-	}
+    public function setFromFormat($datetime, $format)
+    {
+        $this->getStrategy()->setFromFormat($datetime, $format);
+        return $this;
+    }
 
 
     /**
      * @param $year
      * @return $this
      */
-    public function setYear($year) {
+    public function setYear($year)
+    {
         $this->getDateTimeObject()->setYear($year);
         return $this;
     }
@@ -81,7 +90,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      * @param $month
      * @return $this
      */
-    public function setMonth($month) {
+    public function setMonth($month)
+    {
         $this->getDateTimeObject()->setYear($month);
         return $this;
     }
@@ -90,7 +100,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      * @param $day
      * @return $this
      */
-    public function setDay($day) {
+    public function setDay($day)
+    {
         $this->getDateTimeObject()->setYear($day);
         return $this;
     }
@@ -99,7 +110,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      * @param $hour
      * @return $this
      */
-    public function setHour($hour) {
+    public function setHour($hour)
+    {
         $this->getDateTimeObject()->setYear($hour);
         return $this;
     }
@@ -108,7 +120,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      * @param $minute
      * @return $this
      */
-    public function setMinute($minute) {
+    public function setMinute($minute)
+    {
         $this->getDateTimeObject()->setYear($minute);
         return $this;
     }
@@ -117,7 +130,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      * @param $second
      * @return $this
      */
-    public function setSecond($second) {
+    public function setSecond($second)
+    {
         $this->getDateTimeObject()->setYear($second);
         return $this;
     }
@@ -127,7 +141,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      * @param $val
      * @return $this
      */
-    public function addSeconds($val) {
+    public function addSeconds($val)
+    {
         $this->getDateTimeObject()->addWeeks($val);
         return $this;
     }
@@ -136,7 +151,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      * @param $timezone
      * @return $this
      */
-    public function setTimezone($timezone) {
+    public function setTimezone($timezone)
+    {
         $this->getDateTimeObject()->setTimezone($timezone);
         return $this;
     }
@@ -150,7 +166,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      * @param $sec
      * @return $this
      */
-    public function setDateTime($year, $month, $day, $hour, $min, $sec) {
+    public function setDateTime($year, $month, $day, $hour, $min, $sec)
+    {
         $this->getDateTimeObject()->setDateTime($year, $month, $day, $hour, $min, $sec);
         return $this;
     }
@@ -161,7 +178,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      * @param $day
      * @return $this
      */
-    public function setDate($year, $month, $day) {
+    public function setDate($year, $month, $day)
+    {
         $this->getDateTimeObject()->setDateTime($year, $month, $day);
         return $this;
     }
@@ -172,7 +190,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      * @param $sec
      * @return $this
      */
-    public function setTime($hour, $min, $sec) {
+    public function setTime($hour, $min, $sec)
+    {
         $this->getDateTimeObject()->setDateTime($hour, $min, $sec);
         return $this;
     }
@@ -181,50 +200,55 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      * @param $timestamp
      * @return $this
      */
-    public function setTimestamp($timestamp) {
+    public function setTimestamp($timestamp)
+    {
         $this->getDateTimeObject()->setTimestamp($timestamp);
         return $this;
     }
 
 
-	/**
-	 * Add/subtract minutes and reinitialise
-	 *
-	 * @param $val
-	 * @return \Alaress_Date_Format
-	 */
-	public function addMinutes($val) {
+    /**
+     * Add/subtract minutes and reinitialise
+     *
+     * @param $val
+     * @return \Alaress_Date_Format
+     */
+    public function addMinutes($val)
+    {
         $this->getDateTimeObject()->addMinutes($val);
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Add/subtract hours and reinitialise
-	 *
-	 * @param $val
-	 * @return \Alaress_Date_Format
-	 */
-	public function addHours($val) {
+    /**
+     * Add/subtract hours and reinitialise
+     *
+     * @param $val
+     * @return \Alaress_Date_Format
+     */
+    public function addHours($val)
+    {
         $this->getDateTimeObject()->addHours($val);
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Add/subtract days and reinitialise
-	 *
-	 * @param  $val
-	 * @return \Alaress_Date_Format
-	 */
-	public function addDays($val) {
+    /**
+     * Add/subtract days and reinitialise
+     *
+     * @param  $val
+     * @return \Alaress_Date_Format
+     */
+    public function addDays($val)
+    {
         $this->getDateTimeObject()->addDays($val);
-		return $this;
-	}
+        return $this;
+    }
 
     /**
      * @param $val
      * @return $this
      */
-    public function addMonths($val) {
+    public function addMonths($val)
+    {
         $this->getDateTimeObject()->addMonths($val);
         return $this;
     }
@@ -233,21 +257,21 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      * @param $val
      * @return $this
      */
-    public function addWeeks($val) {
+    public function addWeeks($val)
+    {
         $this->getDateTimeObject()->addWeeks($val);
         return $this;
     }
 
-
-
-
-
     /** FORMATS **/
+
+
     /**
      * 1975-12-25T14:15:16-05:00
      * @return string
      */
-    public function toAtomString() {
+    public function toAtomString()
+    {
         return $this->getDateTimeObject()->toAtomString();
 
     }
@@ -257,7 +281,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      *
      * @return string
      */
-    public function toCookieString() {
+    public function toCookieString()
+    {
         return $this->getDateTimeObject()->toCookieString();
 
     }
@@ -267,7 +292,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      *
      * @return string
      */
-    public function toIso8601String() {
+    public function toIso8601String()
+    {
         return $this->getDateTimeObject()->toIso8601String();
 
     }
@@ -277,7 +303,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      *
      * @return string
      */
-    public function toRfc822String() {
+    public function toRfc822String()
+    {
         return $this->getDateTimeObject()->toRfc822String();
 
     }
@@ -287,7 +314,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      *
      * @return string
      */
-    public function toRfc850String() {
+    public function toRfc850String()
+    {
         return $this->getDateTimeObject()->toRfc850String();
 
     }
@@ -297,7 +325,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      *
      * @return string
      */
-    public function toRfc1036String() {
+    public function toRfc1036String()
+    {
         return $this->getDateTimeObject()->toRfc1036String();
 
     }
@@ -307,7 +336,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      *
      * @return string
      */
-    public function toRfc1123String() {
+    public function toRfc1123String()
+    {
         return $this->getDateTimeObject()->toRfc1123String();
 
     }
@@ -317,14 +347,16 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      *
      * @return string
      */
-    public function toRfc2822String() {
+    public function toRfc2822String()
+    {
         return $this->getDateTimeObject()->toRfc2822String();
     }
 
     /**
      * @return string
      */
-    public function toRfc3339String() {
+    public function toRfc3339String()
+    {
         // 1975-12-25T14:15:16-05:00
         return $this->getDateTimeObject()->toRfc3339String();
 
@@ -335,7 +367,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      *
      * @return string
      */
-    public function toRssString() {
+    public function toRssString()
+    {
         return $this->getDateTimeObject()->toRssString();
 
     }
@@ -345,7 +378,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      *
      * @return string
      */
-    public function toW3cString() {
+    public function toW3cString()
+    {
         return $this->getDateTimeObject()->toW3cString();
 
     }
@@ -358,8 +392,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      *
      * @return $this
      */
-    public function startOfDay() {
-        // 2012-01-31 00:00:00
+    public function startOfDay()
+    {
         $this->getDateTimeObject()->startOfDay();
         return $this;
     }
@@ -369,8 +403,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      *
      * @return $this
      */
-    public function endOfDay() {
-        // 2012-01-31 23:59:59
+    public function endOfDay()
+    {
         $this->getDateTimeObject()->endOfDay();
         return $this;
     }
@@ -380,8 +414,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      *
      * @return $this
      */
-    public function startOfMonth() {
-        // 2012-01-01 00:00:00
+    public function startOfMonth()
+    {
         $this->getDateTimeObject()->startOfMonth();
         return $this;
 
@@ -392,8 +426,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      *
      * @return $this
      */
-    public function endOfMonth() {
-        // 2012-01-31 23:59:59
+    public function endOfMonth()
+    {
         $this->getDateTimeObject()->endOfMonth();
         return $this;
 
@@ -404,8 +438,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      *
      * @return $this
      */
-    public function startOfYear() {
-        // 2012-01-01 00:00:00
+    public function startOfYear()
+    {
         $this->getDateTimeObject()->startOfYear();
         return $this;
 
@@ -416,8 +450,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      *
      * @return $this
      */
-    public function endOfYear() {
-        // 2012-12-31 23:59:59
+    public function endOfYear()
+    {
         $this->getDateTimeObject()->endOfYear();
         return $this;
 
@@ -428,8 +462,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      *
      * @return $this
      */
-    public function startOfWeek() {
-        // 2012-01-30 00:00:00
+    public function startOfWeek()
+    {
         $this->getDateTimeObject()->startOfWeek();
         return $this;
 
@@ -440,8 +474,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      *
      * @return $this;
      */
-    public function endOfWeek() {
-        // 2012-02-05 23:59:59
+    public function endOfWeek()
+    {
         $this->getDateTimeObject()->endOfWeek();
         return $this;
 
@@ -456,8 +490,8 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      * @param int $dayOfWeek
      * @return $this
      */
-    public function next($dayOfWeek) {
-        // 2012-01-08 00:00:00
+    public function next($dayOfWeek)
+    {
         $this->getDateTimeObject()->next($dayOfWeek);
         return $this;
 
@@ -472,117 +506,130 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      * @param int $dayOfWeek
      * @return $this
      */
-    public function previous($dayOfWeek) {
+    public function previous($dayOfWeek)
+    {
         $this->getDateTimeObject()->previous($dayOfWeek);
         return $this;
     }
 
 
     /**
-	 * Get an local format
-	 *
-	 * @return string
-	 */
-	public function getLocal() {
-		return $this->getStrategy()->getLocal();
-	}
+     * Get an local format
+     *
+     * @return string
+     */
+    public function getLocal()
+    {
+        return $this->getStrategy()->getLocal();
+    }
 
-	/**
-	 * Get a date-only local format
-	 *
-	 * @return string
-	 */
-	public function getLocalShort() {
-		return $this->getStrategy()->getLocalShort();
-	}
+    /**
+     * Get a date-only local format
+     *
+     * @return string
+     */
+    public function getLocalShort()
+    {
+        return $this->getStrategy()->getLocalShort();
+    }
 
-	/**
-	 * Get an Australian format
-	 *
-	 * @return string
-	 */
-	public function getAustralian() {
-		return $this->getStrategy()->getAustralian();
-	}
+    /**
+     * Get an Australian format
+     *
+     * @return string
+     */
+    public function getAustralian()
+    {
+        return $this->getStrategy()->getAustralian();
+    }
 
-	/**
-	 * Delegation method to get a long format
-	 *
-	 * @return mixed
-	 */
-	public function getLong() {
-		return $this->getStrategy()->getLong();
-	}
+    /**
+     * Delegation method to get a long format
+     *
+     * @return mixed
+     */
+    public function getLong()
+    {
+        return $this->getStrategy()->getLong();
+    }
 
-	/**
-	 * Delegation method to get a long format
-	 *
-	 * @return mixed
-	 */
-	public function getLongDateOnly() {
-		return $this->getStrategy()->getLongDateOnly();
-	}
+    /**
+     * Delegation method to get a long format
+     *
+     * @return mixed
+     */
+    public function getLongDateOnly()
+    {
+        return $this->getStrategy()->getLongDateOnly();
+    }
 
-	/**
-	 * Delegation method to get a short format
-	 *
-	 * @return mixed
-	 */
-	public function getShort() {
-		return $this->getStrategy()->getShort();
-	}
+    /**
+     * Delegation method to get a short format
+     *
+     * @return mixed
+     */
+    public function getShort()
+    {
+        return $this->getStrategy()->getShort();
+    }
 
-	/**
-	 * Get a date only
-	 *
-	 * @return string
-	 */
-	public function getDateOnly() {
-		return $this->getStrategy()->getDateOnly();
-	}
+    /**
+     * Get a date only
+     *
+     * @return string
+     */
+    public function getDateOnly()
+    {
+        return $this->getStrategy()->getDateOnly();
+    }
 
-	/**
-	 * Get a time only
-	 *
-	 * @return string
-	 */
-	public function getTimeOnly() {
-		return $this->getStrategy()->getTimeOnly();
-	}
+    /**
+     * Get a time only
+     *
+     * @return string
+     */
+    public function getTimeOnly()
+    {
+        return $this->getStrategy()->getTimeOnly();
+    }
 
-	/**
-	 * Delegation method to get a database format
-	 *
-	 * @return mixed
-	 */
-	public function getDatabase() {
-		return $this->getStrategy()->getDatabase();
-	}
+    /**
+     * Delegation method to get a database format
+     *
+     * @return mixed
+     */
+    public function getDatabase()
+    {
+        return $this->getStrategy()->getDatabase();
+    }
 
-	/**
-	 * Delegation method to get a database dateformat
-	 *
-	 * @return
-	 */
-	public function getDatabaseDate() {
-		return $this->getStrategy()->getDatabaseDate();
-	}
+    /**
+     * Delegation method to get a database dateformat
+     *
+     * @return
+     */
+    public function getDatabaseDate()
+    {
+        return $this->getStrategy()->getDatabaseDate();
+    }
 
-	/**
-	 * Delegation method to get a database timeformat
-	 *
-	 * @return
-	 */
-	public function getDatabaseTime() {
-		return $this->getStrategy()->getDatabaseTime();
-	}
+    /**
+     * Delegation method to get a database timeformat
+     *
+     * @return
+     */
+    public function getDatabaseTime()
+    {
+        return $this->getStrategy()->getDatabaseTime();
+    }
 
     /**
      * Get a unix timestamp
      *
      * @return string
      */
-    public function getUnixTimestamp() {
+    public function getUnixTimestamp()
+    {
         return $this->getStrategy()->getUnixTimestamp();
     }
 
@@ -591,123 +638,134 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      *
      * @return string
      */
-    public function getWeekDayNumber () {
+    public function getWeekDayNumber()
+    {
         return $this->getStrategy()->getWeekDayNumber();
     }
 
-	/**
-	 * Delegation method to get the datetime in an arbitrary format
-	 *
-	 * @param  $format
-	 * @return string
-	 */
-	public function getUsingFormat($format) {
-		return $this->getStrategy()->getUsingFormat($format);
-	}
+    /**
+     * Delegation method to get the datetime in an arbitrary format
+     *
+     * @param  $format
+     * @return string
+     */
+    public function getUsingFormat($format)
+    {
+        return $this->getStrategy()->getUsingFormat($format);
+    }
 
-	/**
-	 * Gets datetime object out of this wrapper
-	 *
-	 * @return DateTime
-	 */
-	public function getDateTimeObject() {
-		return $this->getStrategy()->getDateTimeObject();
-	}
+    /**
+     * Gets datetime object out of this wrapper
+     *
+     * @return LaravelDate
+     */
+    public function getDateTimeObject()
+    {
+        return $this->getStrategy()->getDateTimeObject();
+    }
 
-	/**
-	 * Get calendar date format
-	 *
-	 * @return mixed
-	 */
-	public function getCalendarDate() {
-		return $this->getStrategy()->getCalendarDate();
-	}
+    /**
+     * Get calendar date format
+     *
+     * @return mixed
+     */
+    public function getCalendarDate()
+    {
+        return $this->getStrategy()->getCalendarDate();
+    }
 
-	/**
-	 * Get calendar datetime format
-	 *
-	 * @return mixed
-	 */
-	public function getCalendarDateTime() {
-		return $this->getStrategy()->getCalendarDateTime();
-	}
+    /**
+     * Get calendar datetime format
+     *
+     * @return mixed
+     */
+    public function getCalendarDateTime()
+    {
+        return $this->getStrategy()->getCalendarDateTime();
+    }
 
-	/**
-	 * Set strategy object
-	 *
-	 * @param  $val
-	 * @return void
-	 */
-	private function setStrategy($val) {
-		$this->strategy = $val;
-	}
+    /**
+     * Set strategy object
+     *
+     * @param  $val
+     * @return void
+     */
+    private function setStrategy($val)
+    {
+        $this->strategy = $val;
+    }
 
-	/**
-	 * Get strategy object
-	 *
-	 * @return Alaress_Date_Format_Interface
-	 */
-	private function getStrategy() {
-		return $this->strategy;
-	}
+    /**
+     * Get strategy object
+     *
+     * @return Alaress_Date_Format_Interface
+     */
+    private function getStrategy()
+    {
+        return $this->strategy;
+    }
 
     /**
      * Returns whether this date is valid, according to the strategy that this date was set up with.
      *
      * @return bool
      */
-    public function isValid() {
+    public function isValid()
+    {
         $strategy = $this->getStrategy();
-		
+
         if ($strategy instanceof Alaress_Validator_ValidatableInterface) {
             return $strategy->isValid();
         }
-		
+
         return true;
     }
 
-	/**
-	 * Compare function for comparing with another date object.
-	 *
-	 * @param Alaress_Date_Format $other
-	 *
-	 * @return int
-	 */
-	public function compare($other) {
-		if (!($other instanceof Alaress_Date_Format)) {
-			return 0;
-		}
-		
-		return $this->getStrategy()->compare($other->getStrategy());
-	}
+    /**
+     * Compare function for comparing with another date object.
+     *
+     * @param Alaress_Date_Format $other
+     *
+     * @return int
+     */
+    public function compare($other)
+    {
+        if (!($other instanceof Alaress_Date_Format)) {
+            return 0;
+        }
 
-	/**
-	 * Compares dates of two Alaress_Date_Format objects, ignoring the time
-	 * component completely.
-	 *
-	 * @param Alaress_Date_Format $other
-	 *
-	 * @return int
-	 */
-	public function compareDateOnly($other) {
-		if (!($other instanceof Alaress_Date_Format)) {
-			return 0;
-		}
-		return strcmp($this->getDatabaseDate(), $other->getDatabaseDate());
-	}
+        return $this->getStrategy()->compare($other->getStrategy());
+    }
 
-	/**
-	 * Outputs this string as a recognisable string representation of a date,
-	 * including timezone data.
-	 *
-	 * This is mainly for Twig - this makes its date filter work intuitively
-	 * with Alaress_Date_Format objects.
-	 *
-	 * @return string
-	 */
-	public function __toString() {
-		return $this->getUsingFormat('c');
-	}
+    /**
+     * Compares dates of two Alaress_Date_Format objects, ignoring the time
+     * component completely.
+     *
+     * @param Alaress_Date_Format $other
+     *
+     * @return int
+     */
+    public function compareDateOnly($other)
+    {
+        if (!($other instanceof Alaress_Date_Format)) {
+            return 0;
+        }
+        return strcmp($this->getDatabaseDate(), $other->getDatabaseDate());
+    }
+
+    /**
+     * Outputs this string as a recognisable string representation of a date,
+     * including timezone data.
+     *
+     * This is mainly for Twig - this makes its date filter work intuitively
+     * with Alaress_Date_Format objects.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getUsingFormat('c');
+    }
 
     /**
      * Is this date object at the start of the day?
@@ -733,10 +791,11 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
         return $this->getUsingFormat('Hi') == '2359';
     }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function getRelativeTime($now = null, $stripModifiers = false) {
-		return $this->getStrategy()->getRelativeTime($now, $stripModifiers);
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function getRelativeTime($now = null, $stripModifiers = false)
+    {
+        return $this->getStrategy()->getRelativeTime($now, $stripModifiers);
+    }
 }
