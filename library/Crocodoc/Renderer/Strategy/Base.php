@@ -103,15 +103,13 @@ abstract class Base {
 		$this->getPage()->setBlock('injectableUpload', 'returned_work', 'returned_work_block');
 
 		if ($this->getReturnedWork() !== null) {
-			$returnDate = new \Alaress_Date_Format($this->getReturnedWork()->getReturned());
-
             if ($this->getReturnedWork()->getFilename() != null) {
                 $this->getPage()->setVar(array(
                     'MOST_RECENT_RETURN_FILE_ID' => $this->getReturnedWork()->getId(),
                     'MOST_RECENT_RETURN_FILE_NAME' => $this->getReturnedWork()->getFilename(),
                     'MOST_RECENT_RETURN_FILE_SIZE' => \Alaress_Byte_Format::bytesToString($this->getReturnedWork()->getFilesize()),
                     'MOST_RECENT_RETURN_FILE_THUMB' => $this->getReturnedWork()->getMimeType()->getIconFile(),
-                    'MOST_RECENT_RETURN_FILE_DATE'  => $returnDate->getRelativeTime(),
+                    'MOST_RECENT_RETURN_FILE_DATE'  => $this->getReturnedWork()->getReturned()->getRelativeTime(),
                 ));
 
                 $this->getPage()->parse('returned_work_block', 'returned_work');
