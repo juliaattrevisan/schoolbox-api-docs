@@ -130,7 +130,9 @@ class External_Synergetic_Class implements External_ClassInterface
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
         $msQuery = "SELECT DISTINCT StaffID, StaffSeq FROM vSubjectClassesStaff
-                    WHERE $classQuery AND FileYear={$fileYear} AND FileSemester={$fileSemester}
+                    WHERE $classQuery
+                    AND FileYear='{$fileYear}'
+                    AND FileSemester='{$fileSemester}'
                     ORDER BY StaffSeq";
 
         $this->getDatabase()->query($msQuery);
@@ -183,7 +185,6 @@ class External_Synergetic_Class implements External_ClassInterface
     public function findSubjectsWithFiletype($filetype, $timetableCode)
     {
         $database = $this->getDatabase();
-        $fileYear     = $database->quote($this->externalUser->getCurrentYear());
         $params   = array(
             ':type'     => "'" . $database->quote($filetype) . "'",
             ':year'     => "'" . $database->quote($this->externalUser->getCurrentYear()) . "'",

@@ -311,8 +311,6 @@ class External_Tass_Timetable implements External_TimetableInterface
 
     public function getRoomTimetable($roomCode)
     {
-        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
-        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
         $query = "
             SELECT
                 subtab.sub_desc AS Description,
@@ -356,8 +354,8 @@ class External_Tass_Timetable implements External_TimetableInterface
         $query = strtr(
             $query,
             array(
-                ':semester' => "'" . $this->database->quote($fileSemester) . "'",
-                ':year'     => "'" . $this->database->quote($fileYear) . "'",
+                ':semester' => "'" . $this->database->quote($this->externalUser->getCurrentSemester()) . "'",
+                ':year'     => "'" . $this->database->quote($this->externalUser->getCurrentYear()) . "'",
                 ':room'     => "'" . $this->database->quote($roomCode) . "'",
             )
         );

@@ -341,8 +341,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $query = "
             SELECT t.TimeFrom, t.TimeTo, t.PeriodNumber, t.PeriodNumberSeq
             FROM TimetableDefinition t
-            WHERE t.FileSemester = '%d'
-            AND t.FileYear = '%d'
+            WHERE t.FileSemester = '%s'
+            AND t.FileYear = '%s'
             AND t.TimetableGroup = '%s'
             AND t.DayNumber = '%d'
             AND DATEDIFF(S, LEFT(CONVERT(VARCHAR(20), t.TimeFrom, 126), 10), t.TimeFrom) < '%d'
