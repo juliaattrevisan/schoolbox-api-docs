@@ -88,7 +88,7 @@ class DueWork_Detail
                     $insertion['submissions']    = array();
                     $insertion['user']['status'] = self::UNSUBMITTED;
                     $insertion['user']['class']  = self::CLASS_UNSUBMITTED;
-                    $insertion['user']['time']   = new Alaress_Date_Format(0);
+                    $insertion['user']['time']   = new Alaress_Date_Format(0, 'U');
                     $submissions                 = array();
                 }
                 else {
