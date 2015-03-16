@@ -45,11 +45,12 @@ trait External_CacheTrait
      */
     protected function getCachedResult($method, $params, $timeout = null)
     {
+        $database = $this->getDatabase();
         return $this->getCache()->cacheFunctionCall(
-            __CLASS__.'.'.$method,
-            function ($params) use ($method) {
+            get_class($database).'.'.$method,
+            function ($params) use ($database, $method) {
                 return call_user_func_array(
-                    array($this->getDatabase(), $method),
+                    array($database, $method),
                     $params
                 );
             },
