@@ -42,7 +42,7 @@
          */
         $.fn.overallProgressRender({
             element: '[data-graph=overall]',
-            title: 'Overall Progress',
+            title: '',
             mostAdvancedStudent: {{ overallProgress.mostAdvancedStudent }},
             classCompletions: {{ overallProgress.classCompletions }}
         });
@@ -55,7 +55,7 @@
 
             /* Title of the graph
              */
-            title: '{{ results.title }}',
+            title: '',
 
             /* Orientation of the box plots
              */
@@ -105,7 +105,7 @@
          */
         $.fn.unitProgressRender({
             element: '[data-graph=unit-progress]',
-            title: 'Unit Progress',
+            title: '',
             units: [
                 {% for currentUnit in progress.allUnits %}"{{ currentUnit.unit.getTitle() }}"{% if not loop.last %},{% endif %}{% endfor %}
 
@@ -122,12 +122,12 @@
     });
 </script>
 
-<h1>Stuff</h1>
+<h1>{{ title }}</h1>
 
 <h2>Overall Progress</h2>
 <div data-graph='overall' class='learning-analytics overall'></div>
 
-<h2>That boxplot place</h2>
+<h2>Results</h2>
 <div data-graph="boxplots" class='learning-analytics boxplots'></div>
 
 <div class="learning-analytics hall">

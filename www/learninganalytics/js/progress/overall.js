@@ -66,12 +66,12 @@
                 {
                     name: 'Most Advanced Student',
                     data: [options.mostAdvancedStudent],
-                    color: '#ffcc00'
+                    color: '#ffcc66'
                 },
                 {
                     name: 'Entire Class',
                     data: [options.classCompletions],
-                    color: '#00ccff'
+                    color: '#66ccff'
                 }
             ],
             tooltip: {

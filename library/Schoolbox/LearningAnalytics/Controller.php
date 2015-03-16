@@ -19,6 +19,7 @@ use Schoolbox\LearningAnalytics\Progress\AllUnits as AllUnitProgress;
 use Schoolbox\LearningAnalytics\Results\Averages;
 use Schoolbox\LearningAnalytics\Results\TaskList;
 use Schoolbox\LearningAnalytics\Results\TaskResults;
+use Schoolbox\Resource\CategoryMapper as FolderMapper;
 
 class Controller extends Base {
 
@@ -28,7 +29,35 @@ class Controller extends Base {
      * @param Collection $allUnitInstances
      */
     public function course(Collection $allUnitInstances) {
-        $this->process($allUnitInstances);
+        $title = 'Course data';
+
+        /* Find title of the course by deriving the parent folder
+         * of a unit_category_id
+         */
+        if ($allUnitInstances->count()) {
+            $first = $allUnitInstances->first();
+
+            $folderMapper = new FolderMapper();
+
+            try {
+                /* The "unit folder" from which $first originated
+                 */
+                $folder = $folderMapper->findById($first->getUnitCategory()->getId());
+
+                /* Original course folder which spawned the Unit
+                 * contained in $folder
+                 */
+                $parent = $folderMapper->findById($folder->getParent()->getId());
+
+                /* Title of the course
+                 */
+                $title = $parent->getName();
+            }
+            catch (\Exception $e) {
+            }
+        }
+
+        $this->process($allUnitInstances, $title);
     }
 
     /**
@@ -37,7 +66,9 @@ class Controller extends Base {
      * @param Collection $allUnitInstances
      */
     public function subject(Collection $allUnitInstances) {
-        $this->process($allUnitInstances);
+        $title = 'Subject data';
+
+        $this->process($allUnitInstances, $title);
     }
 
     /**
@@ -55,8 +86,9 @@ class Controller extends Base {
      * instances' originating task id, not the individual instance id
      *
      * @param Collection $allUnitInstances
+     * @param $title
      */
-    private function process(Collection $allUnitInstances) {
+    private function process(Collection $allUnitInstances, $title) {
 
         /* Get a list of all the students involved in each unit
          * and a list of units involved. This gets reused everywhere
@@ -93,12 +125,12 @@ class Controller extends Base {
             array(
                 'template' => '@learningAnalytics/course.twig',
                 'data' => array(
+                    'title' => $title,
                     'overallProgress' => array(
                         'mostAdvancedStudent' => $overallProgress->getMostAdvancedStudent(),
                         'classCompletions' => $overallProgress->getClassCompletions(),
                     ),
                     'results' => array(
-                        'title' => 'All folders in a course',
                         'allTasks' => $taskList->getAllTasks(),
                         'allResults' => $taskResults->getAllResults(),
                         'topStudents' => $allAverages->findDescending('average'),
