@@ -32,11 +32,12 @@ class External_Timetable implements External_TimetableInterface
     /**
      * Returns the period definition for the schools timetable, can be optionally provided a day to fetch a specific
      * days definition.
+     * @param string $externalUserId
      * @param Integer $campusId
      * @param Integer $day
      * @return Array
      */
-    function getTimetableDefinition($campusId, $day = 0)
+    function getTimetableDefinition($externalUserId, $campusId, $day = 0)
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }

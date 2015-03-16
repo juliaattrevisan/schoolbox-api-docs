@@ -31,11 +31,12 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     /**
      * Returns the timetable definition for a particular campus *FOR A PARTICULAR DAY*
      *
+     * @param string $externalUserId
      * @param $campusId
      * @param int $day
      * @return array
      */
-    public function getTimetableDefinition($campusId, $day = 0)
+    public function getTimetableDefinition($externalUserId, $campusId, $day = 0)
     {
 
         $definition = array();

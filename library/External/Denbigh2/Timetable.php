@@ -52,11 +52,12 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
      * $timetableDef['number'][]
      * $timetableDef['sequence'][]
      *
+     * @param string $externalUserId
      * @param $campusId
      * @param int $day
      * @return array
      */
-    public function getTimetableDefinition($campusId, $day = 0)
+    public function getTimetableDefinition($externalUserId, $campusId, $day = 0)
     {
         $campusMapper = new \Schoolbox\CampusMapper();
         $campus = $campusMapper->findById($campusId);

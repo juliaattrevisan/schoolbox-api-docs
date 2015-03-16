@@ -21,11 +21,12 @@ interface External_TimetableInterface
      * $timetableDef['number'][]
      * $timetableDef['sequence'][]
      *
+     * @param string $externalUserId If set, the external user ID to get definition for.
      * @param $campusId
      * @param int $day
      * @return array
      */
-    public function getTimetableDefinition($campusId, $day = 0);
+    public function getTimetableDefinition($externalUserId, $campusId, $day = 0);
 
     /**
      * Get the current day number for a given campus

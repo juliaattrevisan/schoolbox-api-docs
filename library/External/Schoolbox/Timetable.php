@@ -20,7 +20,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         $this->setGroup(new Group);
     }
 
-    public function getTimetableDefinition($campusId, $day = 0)
+    public function getTimetableDefinition($externalUserId, $campusId, $day = 0)
     {
         $statement = $this->getDatabase()->prepare(
             "

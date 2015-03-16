@@ -40,7 +40,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $this->campusMapper = new \Schoolbox\CampusMapper();
     }
 
-    public function getTimetableDefinition($campus, $day = 0)
+    public function getTimetableDefinition($externalUserId, $campus, $day = 0)
     {
 
         $campusModel = $this->campusMapper->findById($campus); //TODO campus object should be passed

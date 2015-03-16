@@ -58,7 +58,7 @@ class External_Tass_Timetable implements External_TimetableInterface
         return $campus->getTimetableDay();
     }
 
-    function getTimetableDefinition($campus, $day = 0)
+    function getTimetableDefinition($externalUserId, $campus, $day = 0)
     {
 
         $campusCode    = $this->getCampusCode($campus);

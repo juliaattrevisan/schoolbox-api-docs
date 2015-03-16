@@ -100,11 +100,12 @@ class External_Maze_Timetable implements External_TimetableInterface
      * The headings of the timetable, going horizontally
      * from left to right containing all the times and day numbers
      *
+     * @param string $externalUserId
      * @param $campusId
      * @param int $day
      * @return array
      */
-    public function getTimetableDefinition($campusId, $day = 0)
+    public function getTimetableDefinition($externalUserId, $campusId, $day = 0)
     {
         $query = "
 			SELECT TOP 50 *
