@@ -39,6 +39,12 @@ class Controller extends Base {
      */
     public function course(Collection $allUnitInstances) {
 
+        /* Diagnostic
+         */
+//        foreach ($allUnitInstances as $cu) {
+//            new \Alaress_Probe($cu->getId() . ' ' . $cu->getCategory()->getId() . ' ' . $cu->getComponent()->getId() . '<BR>');
+//        }
+
         /* Get a list of all the students involved in each unit
          * and a list of units involved. This gets reused everywhere
          * so just hit the external db once
@@ -205,6 +211,11 @@ class Controller extends Base {
         );
     }
 
+    /**
+     * Same calculations as course(), just for a different set of units
+     *
+     * @param Collection $allUnitInstances
+     */
     public function subject(Collection $allUnitInstances) {
         $this->course($allUnitInstances);
     }
