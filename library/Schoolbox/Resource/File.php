@@ -14,6 +14,12 @@ use Schoolbox\FileInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\File\Mimetype;
 
+/**
+ * Class File
+ *
+ * @deprecated
+ * @package Schoolbox\Resource
+ */
 class File extends File\Model implements FileInterface {
 
     /**
