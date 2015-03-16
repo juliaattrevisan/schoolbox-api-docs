@@ -9,25 +9,13 @@
 
 namespace Schoolbox\Resource;
 
-
-use Schoolbox\FileInterface;
-
-interface FileLocatorInterface {
-
-    /**
-     * Return the folder by the given ID
-     *
-     * @param int $nodeId
-     * @return FileInterface
-     */
-    public function findById($nodeId);
-
-    /**
-     * Return the files contained within the folder with the given ID
-     *
-     * @param int $nodeId
-     * @return FileInterface[]
-     */
-    public function findByFolderId($nodeId);
+/**
+ * Interface FileLocatorInterface
+ *
+ * @deprecated
+ * @package Schoolbox\Resource
+ */
+interface FileLocatorInterface extends File\ILocator
+{
 
 } 
