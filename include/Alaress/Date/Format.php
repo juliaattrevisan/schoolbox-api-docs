@@ -16,13 +16,24 @@
  */
 use Jenssegers\Date\Date as LaravelDate;
 
-class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Validator_ValidatableInterface
+class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
 {
+    /**
+     * @var LavarelDate
+     */
+    protected $datetime;
 
     /**
-     * @var Alaress_Date_Format_Interface
+     * @var DateTimeZone
      */
-    protected $strategy;
+    protected $timezone;
+
+    /**
+     * Any warnings that might have been raised in creation of this object.
+     *
+     * @var array
+     */
+    protected $warnings = array();
 
     /**
      * Returns an instance of self at the current time.
@@ -57,24 +68,115 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
         if (!($timezone instanceof DateTimeZone)) {
             $timezone = new DateTimeZone(date_default_timezone_get());
         }
-        $strategy = new Alaress_Date_Strategy_LaravelDate($timezone);
-        $strategy->setFromFormat($dateTime, $dateFormat);
-        $strategy->setLocale(new Alaress_Date_Locale_Australian());
-
-        $this->setStrategy($strategy);
+        $this->setTimezone($timezone);
+        $this->setFromFormat($dateTime, $dateFormat);
+        $this->setLocale(new Alaress_Date_Locale_Australian());
     }
 
     /**
-     * @param $datetime
-     * @param $format
-     * @return $this
+     * Attempts to create a Laravel date out of $dateTime.
+     *
+     * * empty: creates as now
+     * * DateTimeInterface or Alaress_Date_Format_Interface: clones from that
+     *
+     * @param mixed $dateTime
+     *
+     * @return LaravelDate
+     * @throws InvalidArgumentException if date couldn't be built
      */
-    public function setFromFormat($datetime, $format)
+    protected function buildLaravelDate($dateTime = null)
     {
-        $this->getStrategy()->setFromFormat($datetime, $format);
-        return $this;
+        if (!isset($dateTime)) {
+            // Nothing set? set it to now
+            return LaravelDate::now($this->timezone);
+        } elseif ($dateTime instanceof DateTime || $dateTime instanceof DateTimeInterface) {
+            // Build out of timestamp and timezone
+            return LaravelDate::createFromTimestamp(
+                $dateTime->getTimestamp(),
+                $dateTime->getTimezone()
+            );
+        } elseif ($dateTime instanceof Alaress_Date_Format_Interface) {
+            // Build out of date object's timestamp/timezone
+            return LaravelDate::createFromTimestamp(
+                $dateTime->getDateTimeObject()->getTimestamp(),
+                $dateTime->getDateTimeObject()->getTimezone()
+            );
+        }
+        throw new InvalidArgumentException('Could not create LaravelDate from $dateTime');
     }
 
+    /**
+     * @param DateTimeInterface|Alaress_Date_Format_Interface|string $dateTime
+     * @param string $inputDateFormat
+     *
+     * @return void
+     * @throws InvalidArgumentException if no $inputDateFormat was set and $dateTime
+     *                                  is a string
+     * @throws RuntimeException         if $dateTime is a string and it can't be
+     *                                  parsed in $inputDateFormat
+     */
+    public function setFromFormat($dateTime, $inputDateFormat)
+    {
+        try {
+            $newDateTime = $this->buildLaravelDate($dateTime);
+            $this->setDateTimeObject($newDateTime);
+        } catch (InvalidArgumentException $e) {
+            if (!isset($inputDateFormat)) {
+                throw new InvalidArgumentException(
+                    '$inputDateFormat must be supplied if $dateTime is not a date object'
+                );
+            }
+
+            $newDateTime = DateTime::createFromFormat($inputDateFormat, $dateTime);
+            $errors = DateTime::getLastErrors();
+            if ($errors['error_count']) {
+                // I don't have a datetime, try again with trailing data allowed
+                $newDateTime = DateTime::createFromFormat($inputDateFormat . '+', $dateTime);
+                if (!($newDateTime instanceof DateTime)) {
+                    // I still don't have a datetime, exception out
+                    $errors = DateTime::getLastErrors();
+                    throw new InvalidArgumentException(
+                        sprintf(
+                            'LaravelDate creation failed with %d errors: (%s)',
+                            $errors['error_count'],
+                            implode(', ', $errors['errors'])
+                        )
+                    );
+                }
+            }
+            if ($errors['warning_count']) {
+                // I have a datetime, but it's not what I expected. Warn the user.
+                // This date will also fail isValid()
+                $this->warnings = $errors['warnings'];
+                trigger_error(
+                    sprintf(
+                        'LaravelDate creation raised %d warnings: (%s)',
+                        $errors['warning_count'],
+                        implode(', ', $errors['warnings'])
+                    ),
+                    E_USER_WARNING
+                );
+            }
+            $laravelDate = LaravelDate::instance($newDateTime);
+
+            // Did I specify a timezone? If not, set it to the default
+            if (!preg_match('/[eOPT]/', $inputDateFormat)) {
+                $laravelDate->setTimezone($this->timezone);
+            }
+            $this->setDateTimeObject($laravelDate);
+        }
+    }
+
+    /**
+     * Set Locale configuration object
+     *
+     * @param  Alaress_Date_Locale_Interface $val
+     * @return void
+     */
+    public function setLocale($val)
+    {
+        $this->locale = $val;
+    }
 
     /**
      * @param $year
@@ -138,16 +240,6 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 
 
     /**
-     * @param $val
-     * @return $this
-     */
-    public function addSeconds($val)
-    {
-        $this->getDateTimeObject()->addWeeks($val);
-        return $this;
-    }
-
-    /**
      * @param $timezone
      * @return $this
      */
@@ -206,6 +298,17 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
         return $this;
     }
 
+    /**
+     * Add/subtract seconds and reinitialise
+     *
+     * @param $val
+     * @return $this
+     */
+    public function addSeconds($val)
+    {
+        $this->getDateTimeObject()->addSeconds($val);
+        return $this;
+    }
 
     /**
      * Add/subtract minutes and reinitialise
@@ -514,133 +617,154 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 
 
     /**
-     * Get an local format
+     * Transform the datetime into a localised version
      *
      * @return string
      */
     public function getLocal()
     {
-        return $this->getStrategy()->getLocal();
+        return $this->getUsingFormat($this->getLocale()->localFormat());
     }
 
     /**
-     * Get a date-only local format
+     * Transform the datetime into a localised short version
      *
      * @return string
      */
     public function getLocalShort()
     {
-        return $this->getStrategy()->getLocalShort();
+        return $this->getUsingFormat($this->getLocale()->localShortFormat());
     }
 
     /**
-     * Get an Australian format
+     * Transform the datetime into an Australianised version
      *
      * @return string
      */
     public function getAustralian()
     {
-        return $this->getStrategy()->getAustralian();
+        return $this->getLocal();
     }
 
     /**
-     * Delegation method to get a long format
+     * Use long format
      *
-     * @return mixed
+     * @return string
      */
     public function getLong()
     {
-        return $this->getStrategy()->getLong();
+        return $this->getUsingFormat($this->getLocale()->longFormat());
     }
 
     /**
-     * Delegation method to get a long format
+     * Use long format
      *
-     * @return mixed
+     * @return string
      */
     public function getLongDateOnly()
     {
-        return $this->getStrategy()->getLongDateOnly();
+        return $this->getUsingFormat($this->getLocale()->longDateOnlyFormat());
     }
 
     /**
-     * Delegation method to get a short format
+     * Use short format
      *
-     * @return mixed
+     * @return string
      */
     public function getShort()
     {
-        return $this->getStrategy()->getShort();
+        return $this->getUsingFormat($this->getLocale()->shortFormat());
     }
 
     /**
-     * Get a date only
+     * Get the date only
      *
      * @return string
      */
     public function getDateOnly()
     {
-        return $this->getStrategy()->getDateOnly();
+        return $this->getUsingFormat($this->getLocale()->dateOnlyFormat());
     }
 
     /**
-     * Get a time only
+     * Get the date only
      *
      * @return string
      */
     public function getTimeOnly()
     {
-        return $this->getStrategy()->getTimeOnly();
+        return $this->getUsingFormat($this->getLocale()->timeOnlyFormat());
     }
 
     /**
-     * Delegation method to get a database format
+     * Transform the datetime into the format specified in the config table
+     * Do some error checking
      *
-     * @return mixed
+     * @return string
      */
     public function getDatabase()
     {
-        return $this->getStrategy()->getDatabase();
+        return $this->getUsingFormat($this->getLocale()->databaseFormat());
     }
 
     /**
-     * Delegation method to get a database dateformat
+     * Transform the datetime into a database date
      *
-     * @return
+     * @return string
      */
     public function getDatabaseDate()
     {
-        return $this->getStrategy()->getDatabaseDate();
+        return $this->getUsingFormat($this->getLocale()->databaseDateFormat());
     }
 
     /**
-     * Delegation method to get a database timeformat
+     * Transform the datetime into a database time
      *
-     * @return
+     * @return string
      */
     public function getDatabaseTime()
     {
-        return $this->getStrategy()->getDatabaseTime();
+        return $this->getUsingFormat($this->getLocale()->databaseTimeFormat());
     }
 
     /**
-     * Get a unix timestamp
+     * Transform the datetime into a unix timestamp
      *
      * @return string
      */
-    public function getUnixTimestamp()
+    public function getUnixTimeStamp()
     {
-        return $this->getStrategy()->getUnixTimestamp();
+        return $this->getUsingFormat($this->getLocale()->timestampFormat());
     }
 
     /**
-     * Get numerical representation of the day of the week
+     * Extract the numeric representation of the day of the week
      *
-     * @return string
+     * @return Integer
      */
     public function getWeekDayNumber()
     {
-        return $this->getStrategy()->getWeekDayNumber();
+        return $this->getUsingFormat('N');
+    }
+
+    /**
+     * Transform the datetime into a calendar date format
+     *
+     * @return string
+     */
+    public function getCalendarDate()
+    {
+        return $this->getUsingFormat($this->getLocale()->calendarDate());
+    }
+
+    /**
+     * Transform the datetime into a calendar date format
+     *
+     * @return string
+     */
+    public function getCalendarDateTime()
+    {
+        return $this->getUsingFormat($this->getLocale()->calendarDateTime());
     }
 
     /**
@@ -651,7 +775,7 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      */
     public function getUsingFormat($format)
     {
-        return $this->getStrategy()->getUsingFormat($format);
+        return $this->getDateTimeObject()->format($format);
     }
 
     /**
@@ -661,80 +785,183 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      */
     public function getDateTimeObject()
     {
-        return $this->getStrategy()->getDateTimeObject();
+        return $this->datetime;
     }
 
     /**
-     * Get calendar date format
-     *
-     * @return mixed
-     */
-    public function getCalendarDate()
-    {
-        return $this->getStrategy()->getCalendarDate();
-    }
-
-    /**
-     * Get calendar datetime format
-     *
-     * @return mixed
-     */
-    public function getCalendarDateTime()
-    {
-        return $this->getStrategy()->getCalendarDateTime();
-    }
-
-    /**
-     * Set strategy object
-     *
-     * @param  $val
-     * @return void
-     */
-    private function setStrategy($val)
-    {
-        $this->strategy = $val;
-    }
-
-    /**
-     * Get strategy object
-     *
-     * @return Alaress_Date_Format_Interface
-     */
-    private function getStrategy()
-    {
-        return $this->strategy;
-    }
-
-    /**
-     * Returns whether this date is valid, according to the strategy that this date was set up with.
+     * Returns whether this date is valid
      *
      * @return bool
      */
     public function isValid()
     {
-        $strategy = $this->getStrategy();
-
-        if ($strategy instanceof Alaress_Validator_ValidatableInterface) {
-            return $strategy->isValid();
-        }
-
-        return true;
+        return empty($this->warnings);
     }
+
+    /** COMPARIONS */
+
+    /**
+     * @param Alaress_Date_Format $second
+     * @return mixed
+     */
+    public function eq($second)
+    {
+        return $this->getDateTimeObject()->eq($second->getDateTimeObject());
+    }
+
+    /**
+     * @param Alaress_Date_Format $second
+     * @return mixed
+     */
+    public function ne($second)
+    {
+        return $this->getDateTimeObject()->ne($second->getDateTimeObject());
+
+    }
+
+    /**
+     * @param Alaress_Date_Format $second
+     * @return mixed
+     */
+    public function gt($second)
+    {
+        return $this->getDateTimeObject()->gt($second->getDateTimeObject());
+
+    }
+
+    /**
+     * @param Alaress_Date_Format $second
+     * @return mixed
+     */
+    public function gte($second)
+    {
+        return $this->getDateTimeObject()->gte($second->getDateTimeObject());
+
+    }
+
+    /**
+     * @param $second
+     * @return bool
+     */
+    public function lt($second)
+    {
+        return $this->getDateTimeObject()->lt($second->getDateTimeObject());
+
+    }
+
+    /**
+     * @param Alaress_Date_Format $second
+     * @return bool
+     */
+    public function lte($second)
+    {
+        return $this->getDateTimeObject()->lte($second->getDateTimeObject());
+
+    }
+
+    /**
+     * @param Alaress_Date_Format $first
+     * @param Alaress_Date_Format $second
+     * @param bool $equal
+     * @return bool
+     */
+    public function between($first, $second, $equal = true)
+    {
+        return $this->getDateTimeObject()->between($first->getDateTimeObject(), $second->getDateTimeObject(), $equal);
+
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isWeekday()
+    {
+        return $this->getDateTimeObject()->isWeekday();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isWeekend()
+    {
+        return $this->getDateTimeObject()->isWeekend();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isYesterday()
+    {
+        return $this->getDateTimeObject()->isYesterday();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isToday()
+    {
+        return $this->getDateTimeObject()->isToday();
+
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTomorrow()
+    {
+        return $this->getDateTimeObject()->isTomorrow();
+
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFuture()
+    {
+        return $this->getDateTimeObject()->isFuture();
+
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPast()
+    {
+        return $this->getDateTimeObject()->isPast();
+
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLeapYear()
+    {
+        return $this->getDateTimeObject()->isLeapYear();
+
+    }
+
+    /**
+     * @param Alaress_Date_Format $date
+     * @return bool
+     */
+    public function isSameDay($date)
+    {
+        return $this->getDateTimeObject()->isSameDay($date->getDateTimeObject());
+
+    }
+
 
     /**
      * Compare function for comparing with another date object.
      *
      * @param Alaress_Date_Format $other
      *
-     * @return int
+     * @return bool
      */
     public function compare($other)
     {
-        if (!($other instanceof Alaress_Date_Format)) {
-            return 0;
-        }
-
-        return $this->getStrategy()->compare($other->getStrategy());
+        return $this->eq($other);
     }
 
     /**
@@ -743,29 +970,13 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      *
      * @param Alaress_Date_Format $other
      *
-     * @return int
+     * @return bool
      */
     public function compareDateOnly($other)
     {
-        if (!($other instanceof Alaress_Date_Format)) {
-            return 0;
-        }
-        return strcmp($this->getDatabaseDate(), $other->getDatabaseDate());
+        return $this->isSameDay($other);
     }
 
-    /**
-     * Outputs this string as a recognisable string representation of a date,
-     * including timezone data.
-     *
-     * This is mainly for Twig - this makes its date filter work intuitively
-     * with Alaress_Date_Format objects.
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->getUsingFormat('c');
-    }
 
     /**
      * Is this date object at the start of the day?
@@ -796,6 +1007,28 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      */
     public function getRelativeTime($now = null, $stripModifiers = false)
     {
-        return $this->getStrategy()->getRelativeTime($now, $stripModifiers);
+        if (!isset($now)) {
+            return $this->getDateTimeObject()->diffForHumans(null, $stripModifiers);
+        }
+        // Convert now to a carbon object, if I can, otherwise assume now
+        try {
+            return $this->getDateTimeObject()->diffForHumans($this->buildLaravelDate($now), $stripModifiers);
+        } catch (InvalidArgumentException $e) {
+            return $this->getDateTimeObject()->diffForHumans(null, $stripModifiers);
+        }
+    }
+
+    /**
+     * Outputs this string as a recognisable string representation of a date,
+     * including timezone data.
+     *
+     * This is mainly for Twig - this makes its date filter work intuitively
+     * with Alaress_Date_Format objects.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getUsingFormat('c');
     }
 }
