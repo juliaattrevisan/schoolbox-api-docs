@@ -30,8 +30,19 @@ class FilesystemFactory
      */
     public function build($storageDir)
     {
+        return $this->buildSpecific($storageDir, sys_get_temp_dir());
+    }
+
+
+    /**
+     * @param string $storageDir
+     * @param string $tempDir
+     * @return MountManager
+     */
+    public function buildSpecific($storageDir, $tempDir)
+    {
         return new MountManager([
-            Manager::FS_TEMP    => new Filesystem(new Local(sys_get_temp_dir())),
+            Manager::FS_TEMP    => new Filesystem(new Local($tempDir)),
             Manager::FS_STORAGE => new Filesystem(new Local($storageDir))
         ]);
     }
