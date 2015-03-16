@@ -105,7 +105,10 @@ class Module extends BaseModule {
 
                 /* Inject
                  */
+                $params['route'] = 'course';
+
                 return array(
+                    'params' => $params,
                     'allUnitInstances' => $allUnitInstances
                 );
             }
@@ -141,7 +144,10 @@ class Module extends BaseModule {
 
                 /* Inject
                  */
+                $params['route'] = 'folder';
+
                 return array(
+                    'params' => $params,
                     'allUnitInstances' => $allUnitInstances
                 );
             }

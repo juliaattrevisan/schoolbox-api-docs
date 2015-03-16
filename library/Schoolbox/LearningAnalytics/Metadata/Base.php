@@ -17,6 +17,13 @@ use Schoolbox\Resource\Category as Folder;
 abstract class Base {
 
     /**
+     * An array of params from aura
+     * 
+     * @var array
+     */
+    protected $params = array();
+
+    /**
      * A Collection of UnitInstances
      *
      * @var Collection
@@ -48,9 +55,11 @@ abstract class Base {
     /**
      * Constructor
      *
+     * @param array $params
      * @param Collection $allUnitInstances
      */
-    public function __construct(Collection $allUnitInstances) {
+    public function __construct($params, Collection $allUnitInstances) {
+        $this->setParams($params);
         $this->setAllUnitInstances($allUnitInstances);
 
         $this->process();
@@ -166,5 +175,25 @@ abstract class Base {
     public function getPageTitle()
     {
         return $this->pageTitle;
+    }
+
+    /**
+     * Set params
+     *
+     * @param array $params
+     */
+    protected function setParams($params)
+    {
+        $this->params = $params;
+    }
+
+    /**
+     * Get params
+     *
+     * @return array
+     */
+    protected function getParams()
+    {
+        return $this->params;
     }
 }

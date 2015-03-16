@@ -28,19 +28,23 @@ class Controller extends Base {
     /**
      * Same calculations as process(), just for a different set of units
      *
+     * @param array $params
      * @param Collection $allUnitInstances
      */
-    public function course(Collection $allUnitInstances) {
-        $this->process($allUnitInstances, new MetadataCourse($allUnitInstances));
+    public function course($params, Collection $allUnitInstances) {
+        new \Alaress_Probe($params);
+        $this->process($allUnitInstances, new MetadataCourse($params, $allUnitInstances));
     }
 
     /**
      * Same calculations as process(), just for a different set of units
      *
+     * @param array $params
      * @param Collection $allUnitInstances
      */
-    public function folder(Collection $allUnitInstances) {
-        $this->process($allUnitInstances, new MetadataFolder($allUnitInstances));
+    public function folder($params, Collection $allUnitInstances) {
+        new \Alaress_Probe($params);
+        $this->process($allUnitInstances, new MetadataFolder($params, $allUnitInstances));
     }
 
     /**
