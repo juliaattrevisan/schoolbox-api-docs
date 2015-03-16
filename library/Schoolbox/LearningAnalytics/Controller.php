@@ -16,8 +16,8 @@ use Schoolbox\Resource\Category as Folder;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Collection;
 use Schoolbox\LearningAnalytics\Progress\Overall;
-use Schoolbox\LearningAnalytics\Progress\Unit;
-use Schoolbox\LearningAnalytics\Results\Results;
+use Schoolbox\LearningAnalytics\Progress\Unit as UnitProgress;
+use Schoolbox\LearningAnalytics\Results\Unit as UnitResults;
 use Schoolbox\LearningAnalytics\Results\Averages;
 
 class Controller extends Base {
@@ -84,7 +84,7 @@ class Controller extends Base {
 
             /* Merge and stack results for each unit
              */
-            $results = new Results($allStudents, $currentUnit);
+            $results = new UnitResults($allStudents, $currentUnit);
 
             foreach ($results->getAllValues() as $unitId => $currentResultValue) {
                 if ($allResults[$unitId] instanceof Collection) {
@@ -110,7 +110,7 @@ class Controller extends Base {
         foreach ($registry->getAllUnitRegistry() as $currentUnit) {
             $allStudents = $everyone[$currentUnit->getId()];
 
-            $unitProgress = new Unit($allStudents, $currentUnit);
+            $unitProgress = new UnitProgress($allStudents, $currentUnit);
 
             $allUnitProgress[] = array(
                 'unit' => $currentUnit,

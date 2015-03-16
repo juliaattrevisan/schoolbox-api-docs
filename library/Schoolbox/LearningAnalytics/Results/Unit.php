@@ -16,7 +16,7 @@ use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Collection;
 use Schoolbox\UserMapper;
 
-class Results {
+class Unit {
 
     /**
      * Unit instance
