@@ -38,6 +38,7 @@ class Controller extends Base {
             try {
                 $unitInstanceMapper = new UnitInstanceMapper();
                 $courseFolder = $unitInstanceMapper->findCourseForUnit($allUnitInstances->first());
+                $allFolders = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder);
 
                 $title = $courseFolder->getName();
             }

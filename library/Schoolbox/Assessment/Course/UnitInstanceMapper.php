@@ -17,6 +17,7 @@ use Schoolbox\Assessment\Course\Task\Cloner;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\User;
+use Schoolbox\Resource\Category as Folder;
 
 class UnitInstanceMapper extends Mapper {
 
@@ -146,6 +147,41 @@ class UnitInstanceMapper extends Mapper {
         }
 
         throw new \Schoolbox\Mapper\Exception('Instance of object not found');
+    }
+
+    /**
+     * Find all the folders which use a Unit that was spawned from
+     * the original Course folder, $folder
+     *
+     * @param Folder $folder
+     * @return Collection
+     */
+    public function findAllFoldersUsingCourse(Folder $folder) {
+        $folderMapper = $this->getJoinMapper('unit_category');
+
+        $query = "
+            SELECT {$folderMapper->getColumnString('c')}
+            FROM {$this->getTable()} `ui`
+            LEFT JOIN {$this->getJoinSql('unit_category', 'ui', 'uc')}
+            LEFT JOIN {$this->getJoinSql('course_folder', 'uc', 'cf')}
+            LEFT JOIN {$this->getJoinSql('category', 'ui', 'c')}
+            WHERE `cf`.`id` = :folderId
+            GROUP BY `c`.`id`
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute(array(
+            'folderId' => $folder->getId()
+        ));
+
+        $collection = new Collection();
+
+        while ($row = $statement->fetch()) {
+            $folder = $folderMapper->hydrate($row, 'c');
+            $collection->add($folder);
+        }
+
+        return $collection;
     }
 
     /**
