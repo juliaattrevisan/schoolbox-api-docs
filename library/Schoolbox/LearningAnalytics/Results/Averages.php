@@ -41,6 +41,8 @@ class Averages {
      * @param array $allResults
      */
     public function __construct($allResults) {
+        $this->setAllResults($allResults);
+        
         $this->process();
     }
 
