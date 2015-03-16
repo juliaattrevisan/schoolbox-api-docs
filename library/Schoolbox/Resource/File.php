@@ -8,88 +8,29 @@
  */
 
 namespace Schoolbox\Resource;
+use Alaress_Date_Format;
 use Schoolbox\ConfigLoader;
 use Schoolbox\FileInterface;
 use Schoolbox\IConfigLoader;
-use Schoolbox\ISoftDeletable;
-use Schoolbox\User;
 use Schoolbox\File\Mimetype;
 
-class File implements ISoftDeletable, FileInterface {
-	/**
-	 * @var int
-	 */
-	protected $id;
-
-	/**
-	 * @var string
-	 */
-	protected $filename;
+class File extends File\Model implements FileInterface {
 
     /**
      * Location of file prior to creation
      * @var string
      */
-    protected $tempFileLocation;
-
-    /**
-	 * @var string
-	 */
-	protected $mimeType;
-
-	/**
-	 * @var User
-	 */
-	protected $owner;
-
-	/**
-	 * @var \Alaress_Date_Format
-	 */
-	protected $submitted;
-
-	/**
-	 * @var \Alaress_Date_Format
-	 */
-	protected $modified;
-
-	/**
-	 * @var string
-	 */
-	protected $description;
-
-	/**
-	 * @var string
-	 */
-	protected $comment;
-
-	/**
-	 * @var bool
-	 */
-	protected $hidden;
-
-	/**
-	 * @var Category
-	 */
-	protected $folder;
-
-	/**
-	 * @var int
-	 */
-	protected $filesize;
+    private $tempFileLocation;
 
 	/**
 	 * @var IConfigLoader
 	 */
-	protected $config_loader;
-
-	/**
-	 * @var bool
-	 */
-	protected $deleted;
+    private $config_loader;
 
 
 	/**
 	 * Creates object and sets up sub-objects.
+     * @deprecated
 	 */
 	public function __construct() {
 		$this->config_loader = new ConfigLoader();
@@ -98,6 +39,7 @@ class File implements ISoftDeletable, FileInterface {
 	/**
 	 * Gets the location at which this file would be stored.
 	 *
+     * @deprecated
 	 * @return string
 	 */
 	public function getFileLocation() {
@@ -109,113 +51,64 @@ class File implements ISoftDeletable, FileInterface {
 	}
 
 	/**
-	 * @param  int $id
-	 * @return $this
-	 */
-	public function setId($id) {
-		$this->id = $id;
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
-
-	/**
-	 * @param  string $filename
-	 * @return $this
-	 */
-	public function setFilename($filename) {
-		$this->filename = $filename;
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getFilename() {
-		return $this->filename;
-	}
-
-	/**
+     * @deprecated
 	 * @param \Schoolbox\File\Mimetype $mimeType
+     * @return self
 	 */
 	public function setMimeType($mimeType) {
-		$this->mimeType = $mimeType;
+		$this->getStorage()->setMimetype($mimeType);
+        return $this;
 	}
 
     /**
      * Return a mime type object, if none is found a blank object is returned
+     *
+     * @deprecated
      * @return \Schoolbox\File\Mimetype
      */
     public function getMimetype() {
-        if($this->mimeType instanceof Mimetype)
-            return $this->mimeType;
+        if($this->getStorage()->getMimetype() instanceof Mimetype)
+            return $this->getStorage()->getMimetype();
         else
             return new Mimetype();
     }
 
-
-    /**
-     * @return string
-     */
-    public function getMime() {
-        return $this->getMimeType()->getMime();
-    }
-
-
 	/**
-	 * @param  \Alaress_Date_Format $modified
+     * @deprecated
+	 * @param  Alaress_Date_Format $modified
 	 * @return $this
 	 */
 	public function setModified($modified) {
-		$this->modified = $modified;
-		return $this;
+        return $this->setModifiedAt($modified);
 	}
 
 	/**
-	 * @return \Alaress_Date_Format
+     * @deprecated
+	 * @return Alaress_Date_Format
 	 */
 	public function getModified() {
-		return $this->modified;
+		return $this->getModifiedAt();
 	}
 
 	/**
-	 * @param User $owner
-	 * @return $this
-	 */
-	public function setOwner($owner) {
-		$this->owner = $owner;
-		return $this;
-	}
-
-	/**
-	 * @return User
-	 */
-	public function getOwner() {
-		return $this->owner;
-	}
-
-	/**
-	 * @param  \Alaress_Date_Format $submitted
+     * @deprecated
+	 * @param  Alaress_Date_Format $submitted
 	 * @return $this
 	 */
 	public function setSubmitted($submitted) {
-		$this->submitted = $submitted;
-		return $this;
+		return $this->setCreatedAt($submitted);
 	}
 
 	/**
-	 * @return \Alaress_Date_Format
+     * @deprecated
+	 * @return Alaress_Date_Format
 	 */
 	public function getSubmitted() {
-		return $this->submitted;
+		return $this->getCreatedAt();
 	}
 
 	/**
+     * @deprecated
 	 * @param  \Schoolbox\IConfigLoader $config_loader
 	 * @return $this
 	 */
@@ -225,6 +118,7 @@ class File implements ISoftDeletable, FileInterface {
 	}
 
 	/**
+     * @deprecated
 	 * @return \Schoolbox\IConfigLoader
 	 */
 	public function getConfigLoader() {
@@ -232,108 +126,79 @@ class File implements ISoftDeletable, FileInterface {
 	}
 
 	/**
+     * @deprecated
 	 * @param string $comment
+     * @return self
 	 */
 	public function setComment($comment) {
-		$this->comment = $comment;
+		$this->description = $comment;
 	}
 
 	/**
+     * @deprecated
 	 * @return string
 	 */
 	public function getComment() {
-		return $this->comment;
-	}
-
-	/**
-	 * @param string $description
-	 */
-	public function setDescription($description) {
-		$this->description = $description;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getDescription() {
 		return $this->description;
 	}
 
-
     /**
-     * @param bool $hidden
+     * @deprecated
+     * @param string $description
+     * @return self
      */
-    public function setHidden($hidden) {
-		$this->hidden = $hidden;
-	}
-
+    public function setDescription($description) {
+        return $this->setTitle($description);
+    }
 
     /**
-     * @return bool
+     * @deprecated
+     * @return string
      */
-    public function getHidden() {
-		return $this->hidden;
-	}
-
-
-    /**
-     * @param Category $folder
-     */
-    public function setFolder($folder) {
-		$this->folder = $folder;
-	}
-
+    public function getDescription()
+    {
+        return $this->getTitle();
+    }
 
     /**
-     * @return Category
-     */
-    public function getFolder() {
-		return $this->folder;
-	}
-
-
-    /**
+     * @deprecated
      * @param int $filesize
+     * @return self
      */
     public function setFilesize($filesize) {
-		$this->filesize = $filesize;
-	}
-
+        $this->getStorage()->setSize($filesize);
+        return $this;
+    }
 
     /**
+     * @deprecated
      * @return int
      */
     public function getFilesize() {
-		return $this->filesize;
-	}
+        return $this->getSize();
+    }
 
 	/**
+     * @deprecated
 	 * @param bool $deleted
-	 *
 	 * @return $this
 	 */
 	public function setDeleted($deleted) {
-		$this->deleted = $deleted;
-		return $this;
+		return $this->setDeletedAt($deleted ? Alaress_Date_Format::now() : null);
 	}
 
 	/**
+     * @deprecated
 	 * @return bool
 	 */
 	public function getDeleted() {
-		return $this->deleted;
-	}
-
-
-    /**
-     * @return bool
-     */
-    public function isDeleted() {
-		return $this->getDeleted();
+		return $this->getDeletedAt() instanceof Alaress_Date_Format;
 	}
 
     /**
      * Use this function to set the location of the file when creating a new file record
+     *
+     * @deprecated
      * @param mixed $tempFileLocation
      */
     public function setTempFileLocation($tempFileLocation)
@@ -343,6 +208,8 @@ class File implements ISoftDeletable, FileInterface {
 
     /**
      * This function only exists to move the uploaded file into the correct location on save
+     *
+     * @deprecated
      * @return string
      */
     public function getTempFileLocation()
