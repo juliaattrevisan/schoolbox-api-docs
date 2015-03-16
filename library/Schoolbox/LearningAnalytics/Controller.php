@@ -32,7 +32,6 @@ class Controller extends Base {
      * @param Collection $allUnitInstances
      */
     public function course($params, Collection $allUnitInstances) {
-        new \Alaress_Probe($params);
         $this->process($allUnitInstances, new MetadataCourse($params, $allUnitInstances));
     }
 
@@ -43,7 +42,6 @@ class Controller extends Base {
      * @param Collection $allUnitInstances
      */
     public function folder($params, Collection $allUnitInstances) {
-        new \Alaress_Probe($params);
         $this->process($allUnitInstances, new MetadataFolder($params, $allUnitInstances));
     }
 
@@ -101,7 +99,12 @@ class Controller extends Base {
             array(
                 'template' => '@learningAnalytics/course.twig',
                 'data' => array(
-                    'pageTitle' => $metadata->getPageTitle(),
+                    'metadata' => array(
+                        'pageTitle' => $metadata->getPageTitle(),
+                        'allFolders' => $metadata->getAllFolders(),
+                        'selectedFolder' => $metadata->getSelectedFolder(),
+                        'route' => $metadata->getRoute(),
+                    ),
                     'overallProgress' => array(
                         'mostAdvancedStudent' => $overallProgress->getMostAdvancedStudent(),
                         'classCompletions' => $overallProgress->getClassCompletions(),

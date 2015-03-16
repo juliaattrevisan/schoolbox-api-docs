@@ -60,6 +60,7 @@ abstract class Base {
      */
     public function __construct($params, Collection $allUnitInstances) {
         $this->setParams($params);
+
         $this->setAllUnitInstances($allUnitInstances);
 
         $this->process();
@@ -94,6 +95,25 @@ abstract class Base {
         }
     }
 
+    /**
+     * Get selected folder
+     *
+     * @return int
+     */
+    public function getSelectedFolder()
+    {
+        return $this->params['folderId'];
+    }
+
+    /**
+     * Get route
+     *
+     * @return string
+     */
+    public function getRoute() {
+        return $this->params['route'];
+    }
+
     /* Getters/Setters
      */
 
@@ -112,7 +132,7 @@ abstract class Base {
      *
      * @return null
      */
-    protected function getAllFolders()
+    public function getAllFolders()
     {
         return $this->allFolders;
     }
