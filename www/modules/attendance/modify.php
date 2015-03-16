@@ -75,7 +75,11 @@ $attendancePeriod = $this->arg[3];
 /* Get Period Definition */
 $externalTimetable = new External_Synergetic_Timetable();
 
-$definition = $externalTimetable->getTimetableDefinition($_SESSION['campus'], $externalTimetable->getDayNumber($_SESSION['campus'], $attendanceDate->getUnixTimestamp()));
+$definition = $externalTimetable->getTimetableDefinition(
+    null,
+    $_SESSION['campus'],
+    $externalTimetable->getDayNumber($_SESSION['campus'], $attendanceDate->getUnixTimestamp())
+);
 $periods = array_keys($definition['number'], $attendancePeriod);
 $startTime = $definition['start'][$periods[0]];
 $endTime = $definition['end'][$periods[0]];

@@ -45,7 +45,7 @@ class CurrentPeriod extends Generic {
             $dayNum = $timetableHandler->getDayNumber($campus);
             $now = time();
 
-            $def = $timetableHandler->getTimetableDefinition($campus, $dayNum);
+            $def = $timetableHandler->getTimetableDefinition($user->getExternalId(), $campus, $dayNum);
 
             if(!count($def) || !is_array($def)) {
                 // return an array without title set, which will prevent the article rendering

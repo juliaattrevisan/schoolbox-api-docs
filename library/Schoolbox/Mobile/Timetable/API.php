@@ -76,7 +76,7 @@ class API {
 
             $today = $timetableHandler->getDayNumber($campus);
 
-            $tableDefinition = $timetableHandler->getTimetableDefinition($campus, $today);
+            $tableDefinition = $timetableHandler->getTimetableDefinition($targetUser->getExternalId(), $campus, $today);
 
             if(!is_array($tableDefinition) || !count($tableDefinition)) {
                 $r = array(
