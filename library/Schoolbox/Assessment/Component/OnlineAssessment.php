@@ -15,6 +15,7 @@ use \Alaress_Date_Format;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Category;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 
@@ -149,19 +150,19 @@ class OnlineAssessment implements ISoftDeletable
     }
 
     /**
-     * Is this mark shown to the given user?
+     * Is this mark shown to the given user role?
      *
-     * @param User $user
+     * @param Role $role
      *
      * @return bool
      */
-    public function isMarkShownToUser(User $user)
+    public function isMarkShownToRole(Role $role)
     {
-        if ($user->getRole()->isStaff()) {
+        if ($role->isStaff()) {
             return true;
-        } elseif ($user->getRole()->isStudent() && $this->isMarkShownToStudents()) {
+        } elseif ($role->isStudent() && $this->isMarkShownToStudents()) {
             return true;
-        } elseif ($user->getRole()->isParent() && $this->isMarkShownToParents()) {
+        } elseif ($role->isParent() && $this->isMarkShownToParents()) {
             return true;
         }
         return false;

@@ -19,6 +19,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Role;
 use Schoolbox\User;
 
 class SubmissionBox implements ISoftDeletable
@@ -220,19 +221,19 @@ class SubmissionBox implements ISoftDeletable
     }
 
     /**
-     * Is this mark shown to the given user?
+     * Is this mark shown to the given user role?
      *
-     * @param User $user
+     * @param Role $role
      *
      * @return bool
      */
-    public function isMarkShownToUser(User $user)
+    public function isMarkShownToRole(Role $role)
     {
-        if ($user->getRole()->isStaff()) {
+        if ($role->isStaff()) {
             return true;
-        } elseif ($user->getRole()->isStudent() && $this->isMarkShownToStudents()) {
+        } elseif ($role->isStudent() && $this->isMarkShownToStudents()) {
             return true;
-        } elseif ($user->getRole()->isParent() && $this->isMarkShownToParents()) {
+        } elseif ($role->isParent() && $this->isMarkShownToParents()) {
             return true;
         }
         return false;
