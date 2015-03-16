@@ -367,7 +367,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         if (empty($synergy_id)) {
             return array();
         }
-        $timetabledef = $this->getTimetableDefinition($campus, $daynumber);
+        $timetabledef = $this->getTimetableDefinition($synergy_id, $campus, $daynumber);
 
         if (!is_array($timetabledef)) {
             return false;
@@ -473,7 +473,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             return array();
         }
 
-        $timetabledef = $this->getTimetableDefinition($campus, $this->getDayNumber($campus));
+        $timetabledef = $this->getTimetableDefinition($synergy_id, $campus, $this->getDayNumber($campus));
 
         if (!is_array($timetabledef['desc'])) {
             return false;
@@ -656,7 +656,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                         'ext_timetable_code',
                         $timetableCode
                     );
-                    $campusTimetableList[$timetableCode] = $this->getTimetableDefinition($campus->getId());
+                    $campusTimetableList[$timetableCode] = $this->getTimetableDefinition(null, $campus->getId());
                 } catch (\Schoolbox\Mapper\Exception $e) {
                     // No campus found: error out
                     // TODO: make getTimetableDefinition() accept campus code instead of SB ID

@@ -164,7 +164,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     {
         $campusMapper = new \Schoolbox\CampusMapper();
         $campus = $campusMapper->findById($campusId);
-        $definition = $this->getTimetableDefinition($campus->getId());
+        $definition = $this->getTimetableDefinition(null, $campus->getId());
 
         if (!$now) {
             $now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
@@ -217,7 +217,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
 
         $campusMapper = new \Schoolbox\CampusMapper();
         $campus = $campusMapper->findById($campusId);
-        $definition = $this->getTimetableDefinition($campus->getId());
+        $definition = $this->getTimetableDefinition($externalUserId, $campus->getId());
 
         if (!$definition) {
             return false;
@@ -417,7 +417,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
 
         $campusMapper = new \Schoolbox\CampusMapper();
         $campus = $campusMapper->findById($campusId);
-        $definition = $this->getTimetableDefinition($campus->getId());
+        $definition = $this->getTimetableDefinition($externalUserId, $campus->getId());
 
         if (!$definition) {
             return false;

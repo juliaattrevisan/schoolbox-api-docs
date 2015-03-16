@@ -225,7 +225,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
              */
             $result = $this->getStaffDayTimetable($externalUserId, $campusId, $dayNumber);
         }
-        $definition = $this->getTimetableDefinition($campusId, $dayNumber);
+        $definition = $this->getTimetableDefinition($externalUserId, $campusId, $dayNumber);
         if ($result['success'] && count($result['result'])) {
             $timetable = array();
             $allClasses = $result['result'];

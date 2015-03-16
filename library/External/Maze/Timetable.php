@@ -307,7 +307,7 @@ class External_Maze_Timetable implements External_TimetableInterface
         $user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
         $user = $userMapper->findById($user->getId());
 
-        $definition = $this->getTimetableDefinition($user->getCampusCollection()->first()->getId());
+        $definition = $this->getTimetableDefinition($externalUserId, $user->getCampusCollection()->first()->getId());
 
         $finalTimetable = array();
 
@@ -405,7 +405,7 @@ class External_Maze_Timetable implements External_TimetableInterface
         $user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
         $user = $userMapper->findById($user->getId());
 
-        $definition = $this->getTimetableDefinition($user->getCampusCollection()->first()->getId());
+        $definition = $this->getTimetableDefinition($externalUserId, $user->getCampusCollection()->first()->getId());
 
         $finalTimetable = array();
 
