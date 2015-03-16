@@ -124,15 +124,15 @@
 
 <h1>{{ metadata.pageTitle }}</h1>
 
-<ul class="breadcrumb">
+<ul class="admin-nav">
     <li>
-        <a href='/learningAnalytics/{{ metadata.selectedFolder }}/course' class="{% if metadata.route == 'course' %}selected{% endif %}">
+        <a href='/learningAnalytics/{{ metadata.selectedFolder }}/course' class="{% if metadata.route == 'course' %}current{% endif %}">
             {{ metadata.pageTitle }}
         </a>
     </li>
     {% for folder in metadata.allFolders %}
     <li>
-        <a href='/learningAnalytics/{{ folder.getId() }}' class="{% if (folder.getId() == metadata.selectedFolder) and (metadata.route == 'folder') %}selected{% endif %}">
+        <a href='/learningAnalytics/{{ folder.getId() }}' class="{% if (folder.getId() == metadata.selectedFolder) and (metadata.route == 'folder') %}current{% endif %}">
             {{ folder.getName() }}
         </a>
     </li>
