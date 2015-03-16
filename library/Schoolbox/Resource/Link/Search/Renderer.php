@@ -60,8 +60,6 @@ class Renderer extends Base
             /* phplib
              */
             foreach ($mapperResult->getResult() as $currentLink) {
-                $createdTime = new \Alaress_Date_Format($currentLink->getSubmitted(), 'Y-m-d H:i:s');
-
                 $this->getPage()->setVar(array(
                     'LINK_URL' => $currentLink->getHref(),
                     'LINK_TARGET' => $currentLink->getTarget(),
@@ -69,7 +67,7 @@ class Renderer extends Base
                     'LINK_COMMENT' => \TextFormatter::cutSentence(\Scrub::text($currentLink->getComment()), 150),
                     'LINK_OWNER' => $currentLink->getOwner()->getId(),
                     'LINK_OWNER_NAME' => $currentLink->getOwner()->formatName(),
-                    'LINK_CREATED' => $createdTime->getRelativeTime(),
+                    'LINK_CREATED' => $currentLink->getSubmitted()->getRelativeTime(),
                     'LINK_BREADCRUMB' => $this->spawnBreadcrumbs($currentLink->getFolder()),
                 ));
 
