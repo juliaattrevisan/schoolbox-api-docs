@@ -88,6 +88,11 @@ class UnitInstanceMapper extends Mapper {
             'this_key'  => 'unit_category_id',
             'other_key' => 'id',
         ));
+        $this->hasJoin('course_folder', array(
+            'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
+            'this_key'  => 'parent',
+            'other_key' => 'id',
+        ));
         $this->hasJoin('component', array(
             'mapper'    => 'Component_InstanceMapper',
             'this_key'  => 'component_id',
@@ -104,6 +109,43 @@ class UnitInstanceMapper extends Mapper {
         $this->registerCallback('postSave',       array($this, 'postSave'));
         $this->registerCallback('postDelete',     array($this, 'postDelete'));
         $this->registerCallback('postSoftDelete', array($this, 'postDelete'));
+    }
+
+    /**
+     * Find the course, whose units from which a Unit
+     * $unitInstance was spawned
+     *
+     * @param UnitInstance $unitInstance
+     * @return object
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function findCourseForUnit(UnitInstance $unitInstance) {
+        $folderMapper = $this->getJoinMapper('course_folder');
+
+        $query = "
+            SELECT {$folderMapper->getColumnString('cf')}
+            FROM {$this->getTable()} `ui`
+            LEFT JOIN {$this->getJoinSql('unit_category', 'ui', 'uc')}
+            LEFT JOIN {$this->getJoinSql('course_folder', 'uc', 'cf')}
+            WHERE `ui`.`unit_category_id` = :unitId
+            GROUP BY `cf`.`id`
+            LIMIT 1
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute(array(
+            'unitId' => $unitInstance->getUnitCategory()->getId()
+        ));
+
+        $row = $statement->fetch();
+
+        if ($row != false) {
+            $folder = $folderMapper->hydrate($row, 'cf');
+
+            return $folder;
+        }
+
+        throw new \Schoolbox\Mapper\Exception('Instance of object not found');
     }
 
     /**

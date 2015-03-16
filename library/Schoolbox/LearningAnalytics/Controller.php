@@ -19,7 +19,7 @@ use Schoolbox\LearningAnalytics\Progress\AllUnits as AllUnitProgress;
 use Schoolbox\LearningAnalytics\Results\Averages;
 use Schoolbox\LearningAnalytics\Results\TaskList;
 use Schoolbox\LearningAnalytics\Results\TaskResults;
-use Schoolbox\Resource\CategoryMapper as FolderMapper;
+use Schoolbox\Assessment\Course\UnitInstanceMapper;
 
 class Controller extends Base {
 
@@ -35,23 +35,11 @@ class Controller extends Base {
          * of a unit_category_id
          */
         if ($allUnitInstances->count()) {
-            $first = $allUnitInstances->first();
-
-            $folderMapper = new FolderMapper();
-
             try {
-                /* The "unit folder" from which $first originated
-                 */
-                $folder = $folderMapper->findById($first->getUnitCategory()->getId());
+                $unitInstanceMapper = new UnitInstanceMapper();
+                $courseFolder = $unitInstanceMapper->findCourseForUnit($allUnitInstances->first());
 
-                /* Original course folder which spawned the Unit
-                 * contained in $folder
-                 */
-                $parent = $folderMapper->findById($folder->getParent()->getId());
-
-                /* Title of the course
-                 */
-                $title = $parent->getName();
+                $title = $courseFolder->getName();
             }
             catch (\Exception $e) {
             }
