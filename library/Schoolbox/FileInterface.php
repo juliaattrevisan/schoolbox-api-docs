@@ -9,7 +9,16 @@
 namespace Schoolbox;
 
 
-interface FileInterface {
+use Schoolbox\Resource\File\IFile;
+
+/**
+ * Interface FileInterface
+ *
+ * @deprecated
+ * @package Schoolbox
+ */
+interface FileInterface extends IFile
+{
 
     /**
      * Returns the path to the file on the filesystem
@@ -18,38 +27,9 @@ interface FileInterface {
     public function getFileLocation();
 
     /**
-     * Returns the full mime string for the file
-     * @return string
-     */
-    public function getMime();
-
-    /**
-     * Returns the ID of the file
-     * @return int
-     */
-    public function getId();
-
-    /**
      * Returns the size on disk of the file
      * @return int
      */
     public function getFilesize();
-
-    /**
-     * Returns the real filename of the file
-     * @return string
-     */
-    public function getFilename();
-
-    /**
-     * Returns the title (not filename) of the file
-     * @return string
-     */
-//    public function getDescription();
-
-    /**
-     * @return User
-     */
-    public function getOwner();
 
 }
