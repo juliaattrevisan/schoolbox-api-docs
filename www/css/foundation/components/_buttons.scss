@@ -321,17 +321,15 @@ input[type=submit] 				{ @include button-style; padding: rem-calc(($base-font-si
 		height: 100%;
 		display: inline-block;
 		float: right;
-		// &:hover{
-		// 	background: darken($ocean-sunset, 5%);
-		// }
 	}
 }
 
-// Header Actions
+// Header Actions - for when you need buttons inline with the heading
 .header-actions {
-    position: absolute;
-	top: 1px;
-	right: 0px;
+  	float: right;
+	a{
+		//margin: 0;
+	}
 }
 
 // Dropdown

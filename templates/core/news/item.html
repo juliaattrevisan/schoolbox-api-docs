@@ -8,7 +8,24 @@
 <!-- END custom_head -->
 <div class="row full-width">
     <div class="large-12 columns no-pad">
-        <h1>{NEWS_TITLE}</h1>
+        <h1>
+            {NEWS_TITLE}
+            <span class="header-actions">
+                <a class="button icon-menu" href="#" data-dropdown="tinydDrop">Options</a>
+            </span>
+
+            <ul class="f-dropdown" data-dropdown-content="" id="tinydDrop">
+                <!-- BEGIN modify_news -->
+                <li><a class="icon-modify" href="/news/modify/{NEWS_ID}">Modify Article</a></li>
+                <!-- END modify_news -->
+                <!-- BEGIN previous_article -->
+                <li><a class="icon-previous" href="/news/item/{PREVIOUS_ARTICLE_ID}">{PREVIOUS_ARTICLE_TITLE}</a></li>
+                <!-- END previous_article -->
+                <!-- BEGIN next_article -->
+                <li><a class="icon-next" href="/news/item/{NEXT_ARTICLE_ID}">{NEXT_ARTICLE_TITLE}</a></li>
+                <!-- END next_article -->
+            </ul>
+        </h1>
         <!-- BEGIN add_news -->
         <!-- END add_news -->
         <!-- <dl class="tabs" data-tab> -->
@@ -24,18 +41,7 @@
         <!-- BEGIN allnews_button -->
         <!-- END allnews_button -->
 
-        <span class="header-actions">
-            <!-- BEGIN modify_news -->
-            <a class="button icon-modify" href="/news/modify/{NEWS_ID}">Modify Article</a>
-            <!-- END modify_news -->
 
-            <!-- BEGIN previous_article -->
-            <a class="button" href="/news/item/{PREVIOUS_ARTICLE_ID}">&larr; {PREVIOUS_ARTICLE_TITLE}</a>
-            <!-- END previous_article -->
-            <!-- BEGIN next_article -->
-            <a class="button" href="/news/item/{NEXT_ARTICLE_ID}">{NEXT_ARTICLE_TITLE} &rarr;</a>
-            <!-- END next_article -->
-        </span>
     </div>
 </div>
 <div class="row full-width">
@@ -46,16 +52,16 @@
             <!-- END featured_image -->
         </div>
         <div class="large-11 columns">
+        	<div class="wysiwyg">
+        		{NEWS_BODY}
+        	</div>
             <p class="meta">
                 <a href="/search/user/{POSTER_ID}" class="author">
-                    <img width="64" height="64" src="/portrait.php?userId={POSTER_EXTERNAL_ID}&size=square64"/>
+                    <img width="32" height="32" src="/portrait.php?userId={POSTER_EXTERNAL_ID}&size=square32"/>
                     <span class="name">{POSTER}</span>
                 </a>
                 <span class="subtitle">{DATETIME}</span>
             </p>
-        	<div class="wysiwyg">
-        		{NEWS_BODY}
-        	</div>
         </div>
     </div>
 

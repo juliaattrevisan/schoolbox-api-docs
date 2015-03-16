@@ -526,35 +526,38 @@ $tooltip-font-color: $white;
 	list-style: none;
 	margin: 0;
 	padding: 0;
-	.content{
-		float: left;
-	}
-	.actions{
-		opacity: 0.5;
-		float: right;
-		@include single-transition(all, 0.15s, linear);
-	}
 	> li{
 		border-bottom: 1px solid $silver;
 		position: relative;
 		padding: 1.125em 0;
 		overflow: auto;
-		//@include single-transition(all, 0.15s, linear);
 
 		.thumbnail{
-			float: left;
-			margin: 0 rem-calc(($base-font-size - 2)) rem-calc(($base-font-size - 2)) 0;
-			max-width: 100%;
-		}
+			@media #{$small-up} { @include grid-column(1); }
+			@extend .no-pad;
 
-		&:hover{
-			//background: $ocean-sunset;
-			.actions{
-				opacity: 1;
+			img{
+				max-width: 100%;
 			}
+		}
+		.content{
+			@media #{$small-up} { @include grid-column(11); }
 		}
 	}
 	> li:last-child{
 		border: 0;
+	}
+}
+
+.action-list{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	> li{
+		&:hover{
+			.actions{
+				opacity: 1;
+			}
+		}
 	}
 }
