@@ -39,7 +39,7 @@ class Mapper extends Schoolbox\Mapper
     {
         // TODO this does not belong here, but where does it go
         $factory = new Schoolbox\Resource\FilesystemFactory();
-        $this->mgr = new Manager($factory->build($this->config_loader->get('storage_dir')), new Alaress_Byte_Format());
+        $this->setManager(new Manager($factory->build($this->config_loader->get('storage_dir')), new Alaress_Byte_Format()));
     }
 
 
@@ -189,5 +189,26 @@ class Mapper extends Schoolbox\Mapper
 
         return $storage;
     }
+
+
+    /**
+     * @return Manager
+     */
+    public function getManager()
+    {
+        return $this->mgr;
+    }
+
+
+    /**
+     * @param Manager $mgr
+     * @return self
+     */
+    public function setManager($mgr)
+    {
+        $this->mgr = $mgr;
+        return $this;
+    }
+
 
 }
