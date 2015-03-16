@@ -69,7 +69,18 @@ class Controller extends BaseController
         // TODO inject deps
         $this->sessionUser = $_SESSION['user'];
 
-        $folder = $this->folderMapper->findById($folderId);
+        try {
+            $folder = $this->folderMapper->findById($folderId);
+
+        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+            // Deleted: load the parent
+            $folder = $e->getDeletedObject()->getParent();
+        }
+        catch (\Schoolbox\Mapper\Exception $e) {
+            $folder = $this->folderMapper->createModel();
+            $folder->setId(0);
+        }
+
         $admins = $this->userAccessMapper->findAdminsInCategory($folder);
         $roles  = $this->roleAccessMapper->findAllForFolder($folder);
 
@@ -130,7 +141,7 @@ class Controller extends BaseController
 
         // add files to that
         $data['files']    = $this->fileMapper->findByFolderId($folderId)->getAll();
-        $data['treedata'] = json_encode($tree->buildPartialTree($folderId ?: '#'));
+        $data['treedata'] = json_encode($tree->buildPartialTree($folderId));
 
         $this->getResponse()->content->set([
             'template' => '@resourceBrowser/browse.twig',
@@ -208,4 +219,4 @@ class Controller extends BaseController
             'data'     => $data,
         ]);
     }
-} 
+}
