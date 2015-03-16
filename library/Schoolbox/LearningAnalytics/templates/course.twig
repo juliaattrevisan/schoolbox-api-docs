@@ -4,7 +4,7 @@
      */
     .learning-analytics.overall {
         width: 100%;
-        height: 150px;
+        height: 125px;
     }
 
     .learning-analytics.boxplots {
@@ -173,4 +173,4 @@
 <div class="clearfix"></div>
 
 <h2>Unit Progress</h2>
-<div data-graph='unit-progress' class='learning-analytics unit-progress'></div>
+<div data-graph='unit-progress' class='learning-analytics unit-progress' style="height:{{ (progress.allUnits|length)*50 }}px"></div>
