@@ -64,6 +64,9 @@ class Controller extends Base {
 
             /* Task List Union
              * All the tasks in all the units
+             *
+             * Group by the originating task id, not the task instance id
+             * This is so you can stack results from multiple classes
              */
             foreach ($currentUnit->getTasks() as $currentTask) {
                 $allTasks[$currentTask->getTask()->getId()] = $currentTask;
@@ -96,21 +99,33 @@ class Controller extends Base {
         /**
          * Grade Averages for student rankings
          */
-
-
-//            /* Merge grade averages for each unit, preserving keys
-//             */
-//            $averages = new Averages($allStudents, $currentUnit);
-//            new \Alaress_Probe($averages->findDescending());
-//            $allAverages = $allAverages + $averages->findDescending();
-//            $sorter = new Sorter($allAverages);
-//        }
-
-
-
-
         $allAverages = array();
 
+        foreach ($allResults as $taskId => $currentTaskResult) {
+            foreach ($currentTaskResult as $userResult) {
+                $key = $userResult['user']->getId();
+
+                /* Average the two values (running average)
+                 */
+                if (is_numeric($userResult['value'])) {
+                    if (isset($allAverages[$key])) {
+                        new \Alaress_Probe("Averaging {$allAverages[$key]['average']} + {$userResult['value']} for {$userResult['user']->getFullname()}<BR>");
+
+                        $allAverages[$key]['average'] = 0.5 * ($allAverages[$key]['average'] + $userResult['value']);
+                    }
+                    /* Store user/value tuple
+                     */
+                    else {
+                        new \Alaress_Probe("Setting {$userResult['value']} for {$userResult['user']->getFullname()}<BR>");
+
+                        $allAverages[$key]['user'] = $userResult['user'];
+                        $allAverages[$key]['average'] = $userResult['value'];
+                    }
+                }
+            }
+        }
+
+        $rankedStudents = new Sorter($allAverages);
 
 
         /**
@@ -179,8 +194,8 @@ class Controller extends Base {
                         'title' => 'All folders in a course',
                         'allTasks' => $allTasks,
                         'allValues' => $allResults,
-//                        'topStudents' => $sorter->findDescending('average'),
-//                        'bottomStudents' => $sorter->findAscending('average'),
+                        'topStudents' => $rankedStudents->findDescending('average'),
+                        'bottomStudents' => $rankedStudents->findAscending('average'),
                     ),
                     'progress' => array(
                         'allUnits' => $stackedUnitProgress,
