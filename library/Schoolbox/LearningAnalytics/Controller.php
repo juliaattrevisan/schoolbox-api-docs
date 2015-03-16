@@ -100,7 +100,7 @@ class Controller extends Base {
                     'results' => array(
                         'title' => 'All folders in a course',
                         'allTasks' => $taskList->getAllTasks(),
-                        'allValues' => $taskResults->getAllResults(),
+                        'allResults' => $taskResults->getAllResults(),
                         'topStudents' => $allAverages->findDescending('average'),
                         'bottomStudents' => $allAverages->findAscending('average'),
                     ),
