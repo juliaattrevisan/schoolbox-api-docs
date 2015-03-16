@@ -550,8 +550,8 @@ class ArticleMapper extends Mapper implements Searchable
                 LEFT JOIN {$this->getJoinSql('campuses', 'a', 'c')}
                 LEFT JOIN {$this->getJoinSql('roles', 'a', 'r')}
                 WHERE a.item_deleted = 0
-                    AND a.item_datetime_published <= CURDATE()()
-                    AND a.item_datetime_expires > CURDATE()()
+                    AND a.item_datetime_published <= CURDATE()
+                    AND a.item_datetime_expires > CURDATE()
                     AND (
                         u.id = :userId
                         OR a.item_owner = :userId
