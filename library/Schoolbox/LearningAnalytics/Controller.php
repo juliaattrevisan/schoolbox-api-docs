@@ -13,11 +13,9 @@ namespace Schoolbox\LearningAnalytics;
 use Alaress\Web\Controller\Base;
 
 use Schoolbox\Resource\Category as Folder;
-use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Collection;
 use Schoolbox\LearningAnalytics\Progress\Overall;
 use Schoolbox\LearningAnalytics\Progress\AllUnits as AllUnitProgress;
-use Schoolbox\LearningAnalytics\Results\Unit as UnitResults;
 use Schoolbox\LearningAnalytics\Results\Averages;
 use Schoolbox\LearningAnalytics\Results\TaskList;
 use Schoolbox\LearningAnalytics\Results\TaskResults;
@@ -25,21 +23,40 @@ use Schoolbox\LearningAnalytics\Results\TaskResults;
 class Controller extends Base {
 
     /**
-     * Do everything
-     *
-     * $folder is the Folder for which the Units/Courses are relevant
-     *
-     * $unit is the currently selected unit for $folder. That is used for
-     * all the boxplots, rankings etc.
-     *
-     * $allFolderts is all the folders in the course. That is used to
-     * calculate overall progress etc. To make it relevant to only one
-     * folder, fill it with only one folder instead of all the folders.
-     * This is done in Module.
+     * Same calculations as process(), just for a different set of units
      *
      * @param Collection $allUnitInstances
      */
     public function course(Collection $allUnitInstances) {
+        $this->process($allUnitInstances);
+    }
+
+    /**
+     * Same calculations as process(), just for a different set of units
+     *
+     * @param Collection $allUnitInstances
+     */
+    public function subject(Collection $allUnitInstances) {
+        $this->process($allUnitInstances);
+    }
+
+    /**
+     * Calculate all data about $allUnitInstances
+     *
+     * $allUnitInstances will be:
+     *
+     * + either all the units relevant to the course belonging to the
+     * "learningAnalytics/$param['folderId']/course" route
+     *
+     * + or all the units relevant to a particular folder in the
+     * "learningAnalytics/$param['folderId']" route
+     *
+     * Both are processed identically as data is grouped based on task
+     * instances' originating task id, not the individual instance id
+     *
+     * @param Collection $allUnitInstances
+     */
+    private function process(Collection $allUnitInstances) {
 
         /* Get a list of all the students involved in each unit
          * and a list of units involved. This gets reused everywhere
@@ -93,14 +110,5 @@ class Controller extends Base {
                 )
             )
         );
-    }
-
-    /**
-     * Same calculations as course(), just for a different set of units
-     *
-     * @param Collection $allUnitInstances
-     */
-    public function subject(Collection $allUnitInstances) {
-        $this->course($allUnitInstances);
     }
 }
