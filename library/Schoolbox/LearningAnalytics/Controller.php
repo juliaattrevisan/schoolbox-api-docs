@@ -39,12 +39,6 @@ class Controller extends Base {
      */
     public function course(Collection $allUnitInstances) {
 
-        /* Diagnostic
-         */
-//        foreach ($allUnitInstances as $cu) {
-//            new \Alaress_Probe($cu->getId() . ' ' . $cu->getCategory()->getId() . ' ' . $cu->getComponent()->getId() . '<BR>');
-//        }
-
         /* Get a list of all the students involved in each unit
          * and a list of units involved. This gets reused everywhere
          * so just hit the external db once
@@ -105,34 +99,7 @@ class Controller extends Base {
         /**
          * Grade Averages for student rankings
          */
-        $allAverages = array();
-
-        foreach ($allResults as $taskId => $currentTaskResult) {
-            foreach ($currentTaskResult as $userResult) {
-                $key = $userResult['user']->getId();
-
-                /* Average the two values (running average)
-                 */
-                if (is_numeric($userResult['value'])) {
-                    if (isset($allAverages[$key])) {
-                        new \Alaress_Probe("Averaging {$allAverages[$key]['average']} + {$userResult['value']} for {$userResult['user']->getFullname()}<BR>");
-
-                        $allAverages[$key]['average'] = 0.5 * ($allAverages[$key]['average'] + $userResult['value']);
-                    }
-                    /* Store user/value tuple
-                     */
-                    else {
-                        new \Alaress_Probe("Setting {$userResult['value']} for {$userResult['user']->getFullname()}<BR>");
-
-                        $allAverages[$key]['user'] = $userResult['user'];
-                        $allAverages[$key]['average'] = $userResult['value'];
-                    }
-                }
-            }
-        }
-
-        $rankedStudents = new Sorter($allAverages);
-
+        $allAverages = new Averages($allResults);
 
         /**
          * Individual Unit Progress for all the units in each $folder
@@ -200,8 +167,8 @@ class Controller extends Base {
                         'title' => 'All folders in a course',
                         'allTasks' => $allTasks,
                         'allValues' => $allResults,
-                        'topStudents' => $rankedStudents->findDescending('average'),
-                        'bottomStudents' => $rankedStudents->findAscending('average'),
+                        'topStudents' => $allAverages->findDescending('average'),
+                        'bottomStudents' => $allAverages->findAscending('average'),
                     ),
                     'progress' => array(
                         'allUnits' => $stackedUnitProgress,
