@@ -47,38 +47,21 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
      * @return Calendar_Event_Collection
      */
     protected function loadPermissions() {
-
-        // Permissions for bookings that this user moderates.
-        // If the user passes this permission, then they can moderate any item.
-        $baseManageRule = new Rule\Any(
-            new Rule\IsSuperuser(),
-            new Rule\HasServicePermission(
-                UserAccess::SERVICE_RESOURCE_BOOKING,
-                UserAccess::ACCESS_FULL
-            )
+        // We no longer show moderators bookings for all items [SB-6802]
+        // Maybe they are a moderator for some items?
+        $items = $this->getBookingMapper()->getJoinMapper('resource')->findForModerator(
+            $this->user->getId()
         );
-        $restrictedIds = array();
-        try {
-            $baseManageRule->authorize(array(), $this->getUser());
-            $this->setUserCanModerate(true)->setUserRestrictedToIds(array());
+        foreach ($items as $item) {
+            $restrictedIds[] = $item->getId();
         }
-        catch (Failure\Base $e) {
-            // This user isn't a moderator.
-            // Maybe they are a moderator for some items?
-            $items = $this->getBookingMapper()->getJoinMapper('resource')->findForModerator(
-                $this->user->getId()
-            );
-            foreach ($items as $item) {
-                $restrictedIds[] = $item->getId();
-            }
-            // If I still don't moderate any items - return empty collection.
-            // There should be notice that this user doesn't moderate any items.
-            if (empty($restrictedIds)) {
-                $this->setUserCanModerate(false);
-            }
-            else {
-                $this->setUserCanModerate(true)->setUserRestrictedToIds($restrictedIds);
-            }
+        // If I still don't moderate any items - return empty collection.
+        // There should be notice that this user doesn't moderate any items.
+        if (empty($restrictedIds)) {
+            $this->setUserCanModerate(false);
+        }
+        else {
+            $this->setUserCanModerate(true)->setUserRestrictedToIds($restrictedIds);
         }
     }
 
