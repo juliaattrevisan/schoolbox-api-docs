@@ -280,21 +280,6 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         return $periodListAdaption;
     }
 
-    public function getDaySubjects($externalUserId, $dayNumber)
-    {
-
-    }
-
-    public function getSubjectPeriod($classCode, $dayNumber)
-    {
-
-    }
-
-    public function getSubjectName($classCode)
-    {
-
-    }
-
     public function getRoomTimetable($roomCode)
     {
         $query = "

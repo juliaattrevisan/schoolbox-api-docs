@@ -184,42 +184,6 @@ class External_Timetable implements External_TimetableInterface
         return $this->getDatabase()->getDayTimetable($externalUserId, $userId, $campusId, $dayNumber);
     }
 
-
-    /**
-     * No usages found
-     *
-     * @param Integer $externalUserId
-     * @param Integer $dayNumber
-     * @return Array
-     */
-    function getDaySubjects($externalUserId, $dayNumber)
-    {
-        return $this->getDatabase()->getDaySubjects($externalUserId, $dayNumber);
-    }
-
-    /**
-     * No usages found
-     *
-     * @param String $classCode
-     * @param Integer $dayNumber
-     * @return Array
-     */
-    function getSubjectPeriod($classCode, $dayNumber)
-    {
-        return $this->getDatabase()->getSubjectPeriod($classCode, $dayNumber);
-    }
-
-    /**
-     * No usages found
-     *
-     * @param $classCode
-     * @return String
-     */
-    function getSubjectName($classCode)
-    {
-        return $this->getDatabase()->getSubjectName($classCode);
-    }
-
     /**
      * Gets the timetable for the given room.
      *

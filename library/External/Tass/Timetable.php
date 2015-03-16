@@ -300,50 +300,6 @@ class External_Tass_Timetable implements External_TimetableInterface
         return $timetable;
     }
 
-
-    function getDaySubjects($synergy_id, $daynum)
-    {
-        if (empty($synergy_id)) {
-            return array();
-        }
-        $query = "SELECT Timetable.Room, SubjectClasses.Description,
-                         Timetable.PeriodNumber, Timetable.ClassCode, SubjectClasses.ClassCampus
-                         FROM SynergyOne.dbo.SubjectClasses SubjectClasses, SynergyOne.dbo.Timetable Timetable
-                         WHERE Timetable.ClassCampus = SubjectClasses.ClassCampus AND
-                         Timetable.ClassCode = SubjectClasses.ClassCode AND Timetable.FileSemester =
-                         SubjectClasses.FileSemester AND Timetable.FileType = SubjectClasses.FileType
-                         AND Timetable.FileYear = SubjectClasses.FileYear AND
-                         ((SubjectClasses.FileSemester=" . $_SESSION['FileSemester'] . ") AND (SubjectClasses.FileYear='" . $_SESSION['FileYear'] . "')
-                         AND (Timetable.StaffID='$synergy_id')) AND Timetable.DayNumber = '$daynum'
-                ORDER BY Timetable.PeriodNumber";
-
-        return $this->getDatabase()->getAll($query);
-
-    }
-
-    function getSubjectPeriod($code, $day)
-    {
-        //give a subject code and day this function returns the period that it occurs in
-
-        $query = "SELECT Timetable.PeriodNumber
-            FROM SynergyOne.dbo.Timetable Timetable
-            WHERE Timetable.FileSemester='" . $_SESSION['FileSemester'] . "' AND Timetable.FileYear='" . $_SESSION['FileYear'] . "'
-            AND Timetable.DayNumber = '$day' AND Timetable.ClassCode = '$code'
-        ";
-
-        return $this->getDatabase()->getOne($query);
-
-    }
-
-    function getSubjectName($code)
-    {
-
-        $query = "SELECT SubjectClasses.Description
-                        FROM SynergyOne.dbo.SubjectClasses SubjectClasses
-                        WHERE SubjectClasses.ClassCode = '$code'";
-        return $this->getDatabase()->getOne($query);
-    }
-
     public function getRoomTimetable($roomCode)
     {
         $query = "

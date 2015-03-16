@@ -332,35 +332,6 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     /**
      * TODO: No stored proc
      *
-     * @param $externalUserId
-     * @param $dayNumber
-     */
-    public function getDaySubjects($externalUserId, $dayNumber)
-    {
-    }
-
-    /**
-     * TODO: No stored proc
-     *
-     * @param $classCode
-     * @param $dayNumber
-     */
-    public function getSubjectPeriod($classCode, $dayNumber)
-    {
-    }
-
-    /**
-     * TODO: No stored proc
-     *
-     * @param $classCode
-     */
-    public function getSubjectName($classCode)
-    {
-    }
-
-    /**
-     * TODO: No stored proc
-     *
      * @param  string $roomCode
      *
      * @return array

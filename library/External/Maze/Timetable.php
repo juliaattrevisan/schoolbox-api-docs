@@ -593,52 +593,6 @@ class External_Maze_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Retrieve the list of subjects for a user on a particular day
-     *
-     * @param $externalUserId
-     * @param $dayNumber
-     * @return bool
-     */
-    public function getDaySubjects($externalUserId, $dayNumber)
-    {
-    }
-
-    /**
-     * give a subject code and day this function returns the period that it occurs in
-     * Assumption made that this should be the sequence rather than period name
-     *
-     * @param $classCode
-     * @param $dayNumber
-     * @return int|bool
-     */
-    public function getSubjectPeriod($classCode, $dayNumber)
-    {
-    }
-
-    /**
-     * Get the subject name given a string
-     *
-     * @param $classCode
-     * @return bool
-     */
-    public function getSubjectName($classCode)
-    {
-        $query = "
-		 	SELECT TOP 1 FULLNAME
-		 	FROM SU
-		 	WHERE SUKEY = '{$classCode}'
-		 ";
-
-        $subject = $this->getDb()->getRow($query);
-
-        if ($subject) {
-            return $subject['FULLNAME'];
-        }
-
-        return false;
-    }
-
-    /**
      * @todo Implement for MAZE connector
      *
      * @param  string $roomCode
