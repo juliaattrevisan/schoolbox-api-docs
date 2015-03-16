@@ -248,7 +248,7 @@ class External_Tass_Timetable implements External_TimetableInterface
         if (empty($synergy_id)) {
             return array();
         }
-        $timetabledef = $this->getTimetableDefinition($campus);
+        $timetabledef = $this->getTimetableDefinition($synergy_id, $campus);
 
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($synergy_id));
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($synergy_id));

@@ -48,8 +48,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             return array();
         }
 
-        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
-        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
+        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
+        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
         $query = "SELECT TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq, TimetableDefinition.TimeFrom,
 					TimetableDefinition.TimeTo, TimetableDefinition.Description, TimetableDefinition.DayNumber
 					FROM SynergyOne.dbo.TimetableDefinition TimetableDefinition
@@ -83,7 +83,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         //Fall back to day 0 if nothing found
         if ($periodCount == 0 && $day != 0) {
-            return $this->getTimetableDefinition(($campus));
+            return $this->getTimetableDefinition($externalUserId, $campus);
         }
 
         $timetableDef['periodCount'] = $periodCount;
