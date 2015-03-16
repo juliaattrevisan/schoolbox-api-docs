@@ -36,7 +36,7 @@
                 inverted: true
             },
             title: {
-                text: 'Unit Progress'
+                text: options.title
             },
             xAxis: {
                 categories: options.units
