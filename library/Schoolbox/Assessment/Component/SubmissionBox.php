@@ -220,6 +220,25 @@ class SubmissionBox implements ISoftDeletable
     }
 
     /**
+     * Is this mark shown to the given user?
+     *
+     * @param User $user
+     *
+     * @return bool
+     */
+    public function isMarkShownToUser(User $user)
+    {
+        if ($user->getRole()->isStaff()) {
+            return true;
+        } elseif ($user->getRole()->isStudent() && $this->isMarkShownToStudents()) {
+            return true;
+        } elseif ($user->getRole()->isParent() && $this->isMarkShownToParents()) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Get index of gradient
      *
      * @return int
