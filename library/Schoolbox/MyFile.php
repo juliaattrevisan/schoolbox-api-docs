@@ -307,4 +307,16 @@ class MyFile implements FileInterface {
     {
         return $this->config_loader->get('myfile_dir') . '/' . $this->getId() . '.dat';
     }
+
+
+    /**
+     * Returns the size on disk of the file
+     *
+     * @return int
+     */
+    public function getSize()
+    {
+        return $this->getFilesize();
+    }
+
 }

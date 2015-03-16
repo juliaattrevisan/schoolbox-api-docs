@@ -358,4 +358,15 @@ class Storage implements FileInterface {
         return $this->getUploadedBy();
     }
 
+
+    /**
+     * Returns the size on disk of the file
+     *
+     * @return int
+     */
+    public function getSize()
+    {
+        return $this->getFilesize();
+    }
+
 }

@@ -535,4 +535,15 @@ class ReturnedWork implements ISoftDeletable, FileInterface
         return $this->getMimetype()->getMime();
     }
 
+
+    /**
+     * Returns the size on disk of the file
+     *
+     * @return int
+     */
+    public function getSize()
+    {
+        return $this->getFilesize();
+    }
+
 }
