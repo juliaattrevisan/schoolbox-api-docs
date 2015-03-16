@@ -6,8 +6,6 @@
  * Facade class. This facilitates a layer of abstraction so you can switch in
  * and out of date processing classes via the $strategy class variable.
  *
- * Uses the Alaress_Date_Format_Interface to enforce method definition across
- * all strategy implementations.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -77,8 +75,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      * Attempts to create a Laravel date out of $dateTime.
      *
      * * empty: creates as now
-     * * DateTimeInterface or Alaress_Date_Format_Interface: clones from that
-     *
+     * *
      * @param mixed $dateTime
      *
      * @return LaravelDate
@@ -95,7 +92,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
                 $dateTime->getTimestamp(),
                 $dateTime->getTimezone()
             );
-        } elseif ($dateTime instanceof Alaress_Date_Format_Interface) {
+        } elseif ($dateTime instanceof Alaress_Date_Format) {
             // Build out of date object's timestamp/timezone
             return LaravelDate::createFromTimestamp(
                 $dateTime->getDateTimeObject()->getTimestamp(),
@@ -106,7 +103,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
-     * @param DateTimeInterface|Alaress_Date_Format_Interface|string $dateTime
+     * @param DateTimeInterface|Alaress_Date_Format|string $dateTime
      * @param string $inputDateFormat
      *
      * @return void
