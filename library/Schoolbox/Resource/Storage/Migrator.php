@@ -60,8 +60,9 @@ class Migrator
         $manager = new Storage\Manager($this->factory->buildSpecific($this->storageDir, $fileDir), $this->abf);
         $this->storageMapper->setManager($manager);
 
+        $stmt = $pattern->getFetchStatement();
 
-        while ($row = $pattern->getFetchStatement()->fetch(PDO::FETCH_ASSOC)) {
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
             $fileId   = $pattern->readId($row);
             $filename = $pattern->readFilename($row);
