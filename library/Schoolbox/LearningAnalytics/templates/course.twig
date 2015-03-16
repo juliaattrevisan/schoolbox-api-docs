@@ -122,7 +122,23 @@
     });
 </script>
 
-<h1>{{ pageTitle }}</h1>
+<h1>{{ metadata.pageTitle }}</h1>
+
+<dl>
+    <dt>{{ metadata.pageTitle }}</dt>
+    <dd>{% if metadata.route == 'course' %}SELECTED{% endif %}</dd>
+
+    {% for folder in metadata.allFolders %}
+    <dt>{{ folder.getName() }}</dt>
+    <dd>
+        {% if (folder.getId() == metadata.selectedFolder) and (metadata.route == 'folder') %}
+            SELECTED
+        {% endif %}
+    </dd>
+    {% endfor %}
+</dl>
+
+<div class="clearfix"></div>
 
 <h2>Overall Progress</h2>
 <div data-graph='overall' class='learning-analytics overall'></div>
