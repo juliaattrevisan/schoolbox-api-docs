@@ -184,7 +184,7 @@ class Controller extends Base {
          */
         $this->getResponse()->content->set(
             array(
-                'template' => '@learningAnalytics/allUnits.twig',
+                'template' => '@learningAnalytics/course.twig',
                 'data' => array(
                     'overallProgress' => array(
                         'mostAdvancedStudent' => $overallProgress->getMostAdvancedStudent(),
