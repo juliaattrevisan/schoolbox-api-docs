@@ -1,0 +1,93 @@
+<?php
+/**
+ * 
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2015, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Schoolbox\Resource\File;
+
+
+use Database;
+use PDOStatement;
+use Schoolbox\Config\Loader;
+use Schoolbox\Resource\Storage\MigrationPattern;
+
+class Migration implements MigrationPattern
+{
+    /** @var Database */
+    protected $db;
+
+
+    public function __construct()
+    {
+        $this->db = Database::getInstance();
+        $this->conf = new Loader();
+    }
+
+    /**
+     * @return string
+     */
+    public function getFileDir()
+    {
+        return $this->conf->get('file_dir');
+    }
+
+
+    /**
+     * @return PDOStatement
+     */
+    public function getFetchStatement()
+    {
+        return $this->db->query("
+          SELECT id, realname FROM file WHERE deleted = 0 AND hash = ''
+        ");
+    }
+
+
+    /**
+     * @param int    $fileId
+     * @param string $hash
+     * @return void
+     */
+    public function injectHash($fileId, $hash)
+    {
+        $this->db->prepare("UPDATE file SET hash = :hash WHERE id = :id", [
+            'id'   => $fileId,
+            'hash' => $hash
+        ]);
+    }
+
+
+    /**
+     * @param int $id
+     * @return void
+     */
+    public function flagAsDeleted($id)
+    {
+        $this->db->prepare("UPDATE file SET deleted = 1 AND deleted_at = '1999-12-31 23:59:59' WHERE id = ?", [ $id ]);
+    }
+
+
+    /**
+     * @param array $row
+     * @return int
+     */
+    public function readId(array $row)
+    {
+        return $row['id'];
+    }
+
+
+    /**
+     * @param array $row
+     * @return string
+     */
+    public function readFilename(array $row)
+    {
+        return $row['realname'];
+    }
+
+} 
