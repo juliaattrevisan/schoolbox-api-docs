@@ -59,9 +59,133 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 		$this->setStrategy($strategy);
 	}
 
-	public function setFromFormat($datetime, $format) {
+    /**
+     * @param $datetime
+     * @param $format
+     */
+    public function setFromFormat($datetime, $format) {
 		$this->getStrategy()->setFromFormat($datetime, $format);
 	}
+
+
+    /**
+     * @param $year
+     * @return $this
+     */
+    public function setYear($year) {
+        $this->getDateTimeObject()->setYear($year);
+        return $this;
+    }
+
+    /**
+     * @param $month
+     * @return $this
+     */
+    public function setMonth($month) {
+        $this->getDateTimeObject()->setYear($month);
+        return $this;
+    }
+
+    /**
+     * @param $day
+     * @return $this
+     */
+    public function setDay($day) {
+        $this->getDateTimeObject()->setYear($day);
+        return $this;
+    }
+
+    /**
+     * @param $hour
+     * @return $this
+     */
+    public function setHour($hour) {
+        $this->getDateTimeObject()->setYear($hour);
+        return $this;
+    }
+
+    /**
+     * @param $minute
+     * @return $this
+     */
+    public function setMinute($minute) {
+        $this->getDateTimeObject()->setYear($minute);
+        return $this;
+    }
+
+    /**
+     * @param $second
+     * @return $this
+     */
+    public function setSecond($second) {
+        $this->getDateTimeObject()->setYear($second);
+        return $this;
+    }
+
+
+    /**
+     * @param $val
+     * @return $this
+     */
+    public function addSeconds($val) {
+        $this->getDateTimeObject()->addWeeks($val);
+        return $this;
+    }
+
+    /**
+     * @param $timezone
+     * @return $this
+     */
+    public function setTimezone($timezone) {
+        $this->getDateTimeObject()->setTimezone($timezone);
+        return $this;
+    }
+
+    /**
+     * @param $year
+     * @param $month
+     * @param $day
+     * @param $hour
+     * @param $min
+     * @param $sec
+     * @return $this
+     */
+    public function setDateTime($year, $month, $day, $hour, $min, $sec) {
+        $this->getDateTimeObject()->setDateTime($year, $month, $day, $hour, $min, $sec);
+        return $this;
+    }
+
+    /**
+     * @param $year
+     * @param $month
+     * @param $day
+     * @return $this
+     */
+    public function setDate($year, $month, $day) {
+        $this->getDateTimeObject()->setDateTime($year, $month, $day);
+        return $this;
+    }
+
+    /**
+     * @param $hour
+     * @param $min
+     * @param $sec
+     * @return $this
+     */
+    public function setTime($hour, $min, $sec) {
+        $this->getDateTimeObject()->setDateTime($hour, $min, $sec);
+        return $this;
+    }
+
+    /**
+     * @param $timestamp
+     * @return $this
+     */
+    public function setTimestamp($timestamp) {
+        $this->getDateTimeObject()->setTimestamp($timestamp);
+        return $this;
+    }
+
 
 	/**
 	 * Add/subtract minutes and reinitialise
@@ -70,10 +194,7 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 	 * @return \Alaress_Date_Format
 	 */
 	public function addMinutes($val) {
-		$time = $this->getStrategy()->getUnixTimestamp() + (60*$val);
-
-		$this->getStrategy()->setFromFormat($time, 'U');
-		
+        $this->getDateTimeObject()->addMinutes($val);
 		return $this;
 	}
 
@@ -84,10 +205,7 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 	 * @return \Alaress_Date_Format
 	 */
 	public function addHours($val) {
-		$time = $this->getStrategy()->getUnixTimestamp() + (60*60*$val);
-
-		$this->getStrategy()->setFromFormat($time, 'U');
-		
+        $this->getDateTimeObject()->addHours($val);
 		return $this;
 	}
 
@@ -98,14 +216,269 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 	 * @return \Alaress_Date_Format
 	 */
 	public function addDays($val) {
-		$time = $this->getStrategy()->getUnixTimestamp() + (60*60*24*$val);
-
-		$this->getStrategy()->setFromFormat($time, 'U');
-		
+        $this->getDateTimeObject()->addDays($val);
 		return $this;
 	}
 
-	/**
+    /**
+     * @param $val
+     * @return $this
+     */
+    public function addMonths($val) {
+        $this->getDateTimeObject()->addMonths($val);
+        return $this;
+    }
+
+    /**
+     * @param $val
+     * @return $this
+     */
+    public function addWeeks($val) {
+        $this->getDateTimeObject()->addWeeks($val);
+        return $this;
+    }
+
+
+
+
+
+    /** FORMATS **/
+    /**
+     * 1975-12-25T14:15:16-05:00
+     * @return string
+     */
+    public function toAtomString() {
+        return $this->getDateTimeObject()->toAtomString();
+
+    }
+
+    /**
+     * Thursday, 25-Dec-1975 14:15:16 EST
+     *
+     * @return string
+     */
+    public function toCookieString() {
+        return $this->getDateTimeObject()->toCookieString();
+
+    }
+
+    /**
+     * 1975-12-25T14:15:16-0500
+     *
+     * @return string
+     */
+    public function toIso8601String() {
+        return $this->getDateTimeObject()->toIso8601String();
+
+    }
+
+    /**
+     * Thu, 25 Dec 75 14:15:16 -0500
+     *
+     * @return string
+     */
+    public function toRfc822String() {
+        return $this->getDateTimeObject()->toRfc822String();
+
+    }
+
+    /**
+     * Thu, 25 Dec 75 14:15:16 -0500
+     *
+     * @return string
+     */
+    public function toRfc850String() {
+        return $this->getDateTimeObject()->toRfc850String();
+
+    }
+
+    /**
+     * Thu, 25 Dec 75 14:15:16 -0500
+     *
+     * @return string
+     */
+    public function toRfc1036String() {
+        return $this->getDateTimeObject()->toRfc1036String();
+
+    }
+
+    /**
+     * Thu, 25 Dec 1975 14:15:16 -0500
+     *
+     * @return string
+     */
+    public function toRfc1123String() {
+        return $this->getDateTimeObject()->toRfc1123String();
+
+    }
+
+    /**
+     * Thu, 25 Dec 1975 14:15:16 -0500
+     *
+     * @return string
+     */
+    public function toRfc2822String() {
+        return $this->getDateTimeObject()->toRfc2822String();
+    }
+
+    /**
+     * @return string
+     */
+    public function toRfc3339String() {
+        // 1975-12-25T14:15:16-05:00
+        return $this->getDateTimeObject()->toRfc3339String();
+
+    }
+
+    /**
+     * Thu, 25 Dec 1975 14:15:16 -0500
+     *
+     * @return string
+     */
+    public function toRssString() {
+        return $this->getDateTimeObject()->toRssString();
+
+    }
+
+    /**
+     * 1975-12-25T14:15:16-05:00
+     *
+     * @return string
+     */
+    public function toW3cString() {
+        return $this->getDateTimeObject()->toW3cString();
+
+    }
+
+
+    /** MODIFIERS **/
+
+    /**
+     * Resets the time to 00:00:00
+     *
+     * @return $this
+     */
+    public function startOfDay() {
+        // 2012-01-31 00:00:00
+        $this->getDateTimeObject()->startOfDay();
+        return $this;
+    }
+
+    /**
+     * Resets the time to 23:59:59
+     *
+     * @return $this
+     */
+    public function endOfDay() {
+        // 2012-01-31 23:59:59
+        $this->getDateTimeObject()->endOfDay();
+        return $this;
+    }
+
+    /**
+     * Resets the date to the first day of the month and the time to 00:00:00
+     *
+     * @return $this
+     */
+    public function startOfMonth() {
+        // 2012-01-01 00:00:00
+        $this->getDateTimeObject()->startOfMonth();
+        return $this;
+
+    }
+
+    /**
+     * Resets the date to end of the month and time to 23:59:59
+     *
+     * @return $this
+     */
+    public function endOfMonth() {
+        // 2012-01-31 23:59:59
+        $this->getDateTimeObject()->endOfMonth();
+        return $this;
+
+    }
+
+    /**
+     * Resets the date to the first day of the year and the time to 00:00:00
+     *
+     * @return $this
+     */
+    public function startOfYear() {
+        // 2012-01-01 00:00:00
+        $this->getDateTimeObject()->startOfYear();
+        return $this;
+
+    }
+
+    /**
+     * Resets the date to end of the century and time to 23:59:59
+     *
+     * @return $this
+     */
+    public function endOfYear() {
+        // 2012-12-31 23:59:59
+        $this->getDateTimeObject()->endOfYear();
+        return $this;
+
+    }
+
+    /**
+     * Resets the date to the first day of the ISO-8601 week (Monday) and the time to 00:00:00
+     *
+     * @return $this
+     */
+    public function startOfWeek() {
+        // 2012-01-30 00:00:00
+        $this->getDateTimeObject()->startOfWeek();
+        return $this;
+
+    }
+
+    /**
+     * Resets the date to end of the ISO-8601 week (Sunday) and time to 23:59:59
+     *
+     * @return $this;
+     */
+    public function endOfWeek() {
+        // 2012-02-05 23:59:59
+        $this->getDateTimeObject()->endOfWeek();
+        return $this;
+
+    }
+
+    /**
+     * Modify to the next occurance of a given day of the week.
+     * If no dayOfWeek is provided, modify to the next occurance
+     * of the current day of the week.  Use the supplied consts
+     * to indicate the desired dayOfWeek, ex. static::MONDAY.
+     *
+     * @param int $dayOfWeek
+     * @return $this
+     */
+    public function next($dayOfWeek) {
+        // 2012-01-08 00:00:00
+        $this->getDateTimeObject()->next($dayOfWeek);
+        return $this;
+
+    }
+
+    /**
+     * Modify to the previous occurance of a given day of the week.
+     * If no dayOfWeek is provided, modify to the previous occurance
+     * of the current day of the week.  Use the supplied consts
+     * to indicate the desired dayOfWeek, ex. static::MONDAY.
+     *
+     * @param int $dayOfWeek
+     * @return $this
+     */
+    public function previous($dayOfWeek) {
+        $this->getDateTimeObject()->previous($dayOfWeek);
+        return $this;
+    }
+
+
+    /**
 	 * Get an local format
 	 *
 	 * @return string
