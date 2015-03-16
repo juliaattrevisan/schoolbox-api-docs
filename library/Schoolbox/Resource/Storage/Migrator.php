@@ -47,6 +47,21 @@ class Migrator
 
 
     /**
+     * @param MigrationPattern[] $patterns
+     */
+    public function migrateEach(array $patterns)
+    {
+        foreach ($patterns as $pattern) {
+            try {
+                $this->migrate($pattern);
+            } catch (\Exception $e) {
+                $this->log->critical("$e");
+            }
+        }
+    }
+
+
+    /**
      * @param MigrationPattern $pattern
      * @throws File\Exception
      * @throws Flysystem\Exception

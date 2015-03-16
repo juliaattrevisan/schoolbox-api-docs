@@ -28,9 +28,12 @@ $kernel->run(function ($di, $loop, $log, $opts) {
      */
 
     $migrator    = new Storage\Migrator($log);
-    $filePattern = new File\Migration();
 
-    $migrator->migrate($filePattern);
+    $patterns = [
+        new File\Migration()
+    ];
+
+    $migrator->migrateEach($patterns);
 
 });
 
