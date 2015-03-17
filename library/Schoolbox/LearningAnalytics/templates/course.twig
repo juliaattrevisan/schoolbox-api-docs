@@ -128,6 +128,7 @@
             ]
         });
 
+{% if rubrics.allRubrics|length > 0 %}
         /**
          *  Boxplots for Rubrics
          */
@@ -189,6 +190,7 @@
 {% endfor %}
             ])
         });
+{% endif %}
     });
 </script>
 
@@ -261,5 +263,7 @@
 <h2>Unit Progress</h2>
 <div data-graph='unit-progress' class='learning-analytics unit-progress' style="height:{{ ((progress.allUnits|length)*50)+50 }}px"></div>
 
+{% if rubrics.allRubrics|length > 0 %}
 <h2>Rubrics</h2>
 <div data-graph="rubrics" class='learning-analytics boxplots'></div>
+{% endif %}
