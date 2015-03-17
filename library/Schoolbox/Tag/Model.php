@@ -52,4 +52,80 @@ class Model implements ISoftDeletable
      * @var int
      */
     protected $tagId;
+
+    /**
+     * @return string
+     */
+    public function getContentType()
+    {
+        return $this->contentType;
+    }
+
+    /**
+     * @param  string $contentType
+     *
+     * @return $this
+     */
+    public function setContentType($contentType)
+    {
+        $this->contentType = $contentType;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getContentId()
+    {
+        return $this->contentId;
+    }
+
+    /**
+     * @param  int $contentId
+     *
+     * @return $this
+     */
+    public function setContentId($contentId)
+    {
+        $this->contentId = $contentId;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTagType()
+    {
+        return $this->tagType;
+    }
+
+    /**
+     * @param  string $tagType
+     *
+     * @return $this
+     */
+    public function setTagType($tagType)
+    {
+        $this->tagType = $tagType;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTagId()
+    {
+        return $this->tagId;
+    }
+
+    /**
+     * @param  int $tagId
+     *
+     * @return $this
+     */
+    public function setTagId($tagId)
+    {
+        $this->tagId = $tagId;
+        return $this;
+    }
 }
