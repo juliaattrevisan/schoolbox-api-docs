@@ -96,7 +96,7 @@ class Decorator extends NotificationBundle
 
                 // check metadata for links as well
                 foreach ($array[$n->getId()]['meta'] as $k => $value) {
-                    if (strlen($value) && $value[0] == '/') {
+                    if (is_string($value) && strlen($value) && $value[0] == '/') {
                         $array[$n->getId()]['meta'][$k] = $fqdn . $value;
                     }
                 }
