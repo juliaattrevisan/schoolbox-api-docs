@@ -136,7 +136,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
             $this->setVar('LIST_DATE', $currentDay->getDateOnly());
 
             $eventOutput = array(
-                'DATE'                            => $currentDay->getUsingFormat('l jS F'),
+                'DATE'                            => $currentDay->getLongDateOnly(),
                 'CALENDAR_DATE'                   => $currentDay->getUsingFormat('d-m-Y'),
                 'TIME'                            => $currentEvent->getEventSpan(),
                 'FULL_TIME'                       => $currentEvent->getFullDate(),

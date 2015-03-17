@@ -721,7 +721,7 @@ class Event
      */
     public function getEndDate()
     {
-        return $this->getFormattedDate($this->endDateTime, 'Y-m-d');
+        return $this->endDateTime->getDatabaseDate();
     }
 
     /**
@@ -733,6 +733,8 @@ class Event
     public function setEndTime($endTime)
     {
         // preserve date if already set
+
+
         $date = $this->getFormattedDate($this->endDateTime, 'Y-m-d');
         $this->endDateTime = new Alaress_Date_Format("$date $endTime", 'Y-m-d H:i:s');
 
@@ -771,6 +773,7 @@ class Event
      */
     public function getStartDate()
     {
+
         return $this->getFormattedDate($this->startDateTime, 'Y-m-d');
     }
 
@@ -783,10 +786,8 @@ class Event
      */
     public function setStartTime($startTime)
     {
-        // preserve date if set
-        $date = $this->getFormattedDate($this->startDateTime, 'Y-m-d');
-        $this->startDateTime = new Alaress_Date_Format("$date $startTime", 'Y-m-d H:i:s');
-
+        list($hour, $min, $sec) = explode(':',$startTime);
+        $this->startDateTime->setTime($hour,$min,$sec);
         return $this;
     }
 

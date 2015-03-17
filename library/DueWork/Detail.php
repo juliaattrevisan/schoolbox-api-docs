@@ -162,13 +162,11 @@ class DueWork_Detail
         $page->setVar('plag_deleted_block', '');
 
         $closeADF       = $this->getDueDate();
-        $formatDateOnly = 'l, jS F Y';
-        $formatDateTime = $formatDateOnly . ' g:ia';
 
         if ($closeADF->isAtEndOfDay()) {
-            $closeString = $closeADF->getUsingFormat($formatDateOnly);
+            $closeString = $closeADF->getLongDateOnly();
         } else {
-            $closeString = $closeADF->getUsingFormat($formatDateTime);
+            $closeString = $closeADF->getLong();
         }
 
         $page->setVar(
@@ -398,7 +396,7 @@ class DueWork_Detail
      */
     public function isArchived()
     {
-        return $this->getDueDate()->getUsingFormat('Y') < date('Y');
+        return $this->getDueDate()->getYear() < date('Y');
     }
 
 

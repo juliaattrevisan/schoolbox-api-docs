@@ -581,8 +581,8 @@ class News extends DeprecatedModel
             foreach ($visibleNews as $article) {
                 $df = new Alaress_Date_Format($article['item_datetime_published'], 'Y-m-d H:i:s');
                 $occupation = array(
-                    'year' => $df->getUsingFormat('Y'),
-                    'month' => $df->getUsingFormat('m')
+                    'year' => $df->getYear(),
+                    'month' => $df->getMonth()
                 );
                 if (!in_array($occupation, $occupiedDates)) {
                     $occupiedDates[] = $occupation;

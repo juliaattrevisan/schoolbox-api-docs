@@ -538,7 +538,12 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
 			$verb = $newDate > $oldDate ? 'extended' : 'changed the closing date of';
 			$relative = new Alaress_Date_Format($newDate. 'U');
-			$dateformat = ((int)$relative->getUsingFormat('Hi') == '1159' ? 'g:ia \o\n ' : '') . 'D, jS M';
+
+
+            $dateformat = $relative->getLongDateOnly();
+            if(!$relative->isAtEndOfDay()) {
+                $dateformat = $relative->getTimeOnly() .' on '.$dateformat;
+            }
 
 			$msg = new Message(":author $verb :boxname to :date in :catname", $icon, $href);
 

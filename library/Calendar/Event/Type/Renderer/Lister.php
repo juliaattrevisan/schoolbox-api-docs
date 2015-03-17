@@ -136,15 +136,15 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
          */
         if ($currentEvent instanceof Calendar_Event_Type_Submission) {
             if ($currentEvent->getAllday()) {
-                $page->setVar('EVENT_TIMESTAMP', $currentEvent->getEndTime()->getUsingFormat('Y-m-d'));
+                $page->setVar('EVENT_TIMESTAMP', $currentEvent->getEndTime()->getDatabaseDate());
                 $page->parse('event_allday_block', 'event_allday');
             } else {
-                $page->setVar('EVENT_TIMESTAMP', $currentEvent->getEndTime()->getUsingFormat('Y-m-d H:i:s'));
+                $page->setVar('EVENT_TIMESTAMP', $currentEvent->getEndTime()->getDatabase());
                 $page->parse('event_submission_block', 'event_submission');
             }
         } elseif ($currentEvent instanceof Calendar_Event_Type_ResourceBooking) {
             $page->setVar('EVENT_TYPE', 'Booking');
-            $page->setVar('EVENT_TIMESTAMP', $currentEvent->getStartTime()->getUsingFormat('Y-m-d H:i:s'));
+            $page->setVar('EVENT_TIMESTAMP', $currentEvent->getStartTime()->getDatabase());
             $page->setVar('EVENT_ID', '');
 
             // Finagle better notes or details
@@ -169,10 +169,10 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
             $page->setVar('EVENT_TITLE', Scrub::text($title));
             $page->parse('event_timed_block', 'event_timed');
         } elseif ($currentEvent->getAllday()) {
-            $page->setVar('EVENT_TIMESTAMP', $currentEvent->getStartTime()->getUsingFormat('Y-m-d'));
+            $page->setVar('EVENT_TIMESTAMP', $currentEvent->getStartTime()->getDatabaseDate());
             $page->parse('event_allday_block', 'event_allday');
         } else {
-            $page->setVar('EVENT_TIMESTAMP', $currentEvent->getStartTime()->getUsingFormat('Y-m-d H:i:s'));
+            $page->setVar('EVENT_TIMESTAMP', $currentEvent->getStartTime()->getDatabase());
             $page->parse('event_timed_block', 'event_timed');
         }
 

@@ -22,7 +22,7 @@ class Leave_Kings_Report_House_Print extends Leave_Kings_Report_House_Web {
 		$weekEnding->addDays(Leave_Controller::SUNDAY - $weekEnding->getWeekDayNumber());
 
 		$this->getPage()->setVar(array(
-			'WEEK_ENDING' => $weekEnding->getUsingFormat('l F j, Y'),
+			'WEEK_ENDING' => $weekEnding->getLongDateOnly(),
 		));
 	}
 }

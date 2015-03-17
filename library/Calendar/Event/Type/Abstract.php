@@ -252,7 +252,7 @@ abstract class Calendar_Event_Type_Abstract
      */
     public function getFullDate()
     {
-        $startDate = $this->getStartTime()->getUsingFormat('l, jS F');
+        $startDate = $this->getStartTime()->getLongDateOnly();
         if (!$this->getAllDay()) {
             $formattedTime = $startDate . ', ' . $this->getTime();
         } else {
@@ -271,7 +271,7 @@ abstract class Calendar_Event_Type_Abstract
         if ($this->getAllDay()) {
             return false;
         } else {
-            return $this->getStartTime()->getUsingFormat('g:iA');
+            return $this->getStartTime()->getTimeOnly();
         }
     }
 

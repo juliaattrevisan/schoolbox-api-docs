@@ -359,10 +359,11 @@ class EventRecurrenceMapper
         } else {
             // dateSource could be a datePeriod
             // How many days are there between $start and $end?
-            $startDate = new DateTime($event->getStartDate() . ' 00:00:00');
-            $endDate   = new DateTime($event->getEndDate() . ' 00:00:00');
-            $diff      = $startDate->diff($endDate);
-            $dayDiff   = $diff->days;
+            $startDate = $event->getStartDateTime();
+            $endDate   = $event->getStartDateTime();
+            $startDate->startOfDay();
+            $endDate->startOfDay();
+            $dayDiff      = $startDate->diffInDays($endDate);
             $seriesId  = $this->getEventMapper()->getUpperSeriesIndex();
             foreach ($dateSource as $currentDate) {
                 $newEvent = clone $event;

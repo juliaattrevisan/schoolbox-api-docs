@@ -37,13 +37,6 @@ class EventConverter {
      * @return Calendar_Event_Type_ResourceBooking
      */
     public function convertEventToCalendarEvent(Event $eventItem, Booking\Model $booking) {
-        /* Convert dates ;(
-         */
-        $startDateTime = new \Alaress_Date_Format($eventItem->getStartDate() . ' ' . $eventItem->getStartTime(), 'Y-m-d H:i:s');
-        $eventItem->setStartDateTime($startDateTime);
-
-        $endDateTime = new \Alaress_Date_Format($eventItem->getEndDate() . ' ' . $eventItem->getEndTime(), 'Y-m-d H:i:s');
-        $eventItem->setEndDateTime($endDateTime);
 
         /* Translate a \Schoolbox\Event type into a
          * Calendar_Event_Type_Abstract type
