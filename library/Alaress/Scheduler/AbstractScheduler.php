@@ -110,18 +110,23 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
             return;
         }
 
-        $self = $this;
+        $this->schedule($trigger, $this->timerCallback());
+    }
 
-        $this->schedule(
-             $trigger,
-             function ($timer) use ($self) {
-                 /** @var TimerInterface $timer */
-                 if (!$timer->getData() instanceof TriggerInterface) {
-                     throw new InvalidArgumentException("Trigger must be provided to publish data");
-                 }
-                 $self->dispatchTrigger($timer->getData());
-             }
-        );
+
+    /**
+     * @return callable
+     */
+    protected function timerCallback()
+    {
+        $self = $this;
+        return function ($timer) use ($self) {
+            /** @var TimerInterface $timer */
+            if (!$timer->getData() instanceof TriggerInterface) {
+                throw new InvalidArgumentException("Trigger must be provided to publish data");
+            }
+            $self->dispatchTrigger($timer->getData());
+        };
     }
 
 
@@ -166,9 +171,10 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
      *
      * @param TriggerInterface $trigger
      * @param callable         $callable
+     * @param bool             $cancelPrevious
      * @return bool
      */
-    protected function schedule($trigger, $callable)
+    protected function schedule($trigger, $callable, $cancelPrevious = true)
     {
         // can't schedule a cancel trigger
         if ($trigger instanceof CancelTrigger) {
@@ -177,7 +183,9 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
         }
 
         // firstly, remove any existing timer for this trigger
-        $this->unschedule($trigger);
+        if ($cancelPrevious) {
+            $this->unschedule($trigger);
+        }
 
         $model = $trigger->getEvent()->getObject();
         $label = $trigger->getLabel();
