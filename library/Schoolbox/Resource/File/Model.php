@@ -11,11 +11,22 @@ namespace Schoolbox\Resource\File;
 
 
 use Alaress_Date_Format;
+use Schoolbox\File\Mimetype;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Storage\Model as Storage;
 
+/**
+ * Class Model
+ *
+ * @package Schoolbox\Resource\File
+ * @method string   getHash()
+ * @method Model    setHash($hash)
+ * @method Mimetype getMimetype()
+ * @method Model    setMimetype(Mimetype $mimetype)
+ * @method Model    setSize($size)
+ */
 class Model implements IFile, ISoftDeletable
 {
     /** @var int */
@@ -312,4 +323,28 @@ class Model implements IFile, ISoftDeletable
     {
         return $this->getStorage()->getSize();
     }
+
+
+    /**
+     * Act as a proxy for the internal storage object
+     *
+     * @param string $name
+     * @param array  $arguments
+     * @return mixed
+     */
+    function __call($name, $arguments)
+    {
+        if (method_exists($this->storage, $name)) {
+            $value = call_user_func_array([ $this->storage, $name ], $arguments);
+            if ($value instanceof Storage) {
+                return $this;
+            }
+            return $value;
+        }
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+        $pattern = "Call to undefined method <b>%s::%s()</b> in <b>%s</b> on line <b>%d</b>, triggered";
+        trigger_error(sprintf($pattern, get_called_class(), $name, $trace[1]['file'], $trace[1]['line']), E_USER_ERROR);
+        return null;
+    }
+
 }
