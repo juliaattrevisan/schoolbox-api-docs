@@ -9,7 +9,7 @@
 namespace Schoolbox;
 
 
-use Schoolbox\Resource\File\IFile;
+// use Schoolbox\Resource\File\IFile;
 
 /**
  * Interface FileInterface
@@ -17,8 +17,37 @@ use Schoolbox\Resource\File\IFile;
  * @deprecated
  * @package Schoolbox
  */
-interface FileInterface extends IFile
+interface FileInterface /* extends IFile */
 {
+
+    /**
+     * Returns the full mime string for the file
+     * @return string
+     */
+    public function getMime();
+
+    /**
+     * Returns the ID of the file
+     * @return int
+     */
+    public function getId();
+
+    /**
+     * Returns the size on disk of the file
+     * @return int
+     */
+    public function getSize();
+
+    /**
+     * Returns the real filename of the file
+     * @return string
+     */
+    public function getFilename();
+
+    /**
+     * @return User
+     */
+    public function getOwner();
 
     /**
      * Returns the path to the file on the filesystem
