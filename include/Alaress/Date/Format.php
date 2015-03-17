@@ -1032,6 +1032,100 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
         return $this->getUsingFormat('Hi') == '2359';
     }
 
+    /** DIFF */
+
+
+    /**
+     * @param Alaress_Date_Format $diff
+     * @return int
+     */
+    public function diffInYears(Alaress_Date_Format $diff)
+    {
+        return $this->getDateTimeObject()->diffInYears($diff->getDateTimeObject());
+    }
+
+
+    /**
+     * @param Alaress_Date_Format $diff
+     * @return int
+     */
+    public function diffInMonths(Alaress_Date_Format $diff)
+    {
+        return $this->getDateTimeObject()->diffInMonths($diff->getDateTimeObject());
+    }
+
+
+    /**
+     * @param Alaress_Date_Format $diff
+     * @return int
+     */
+    public function diffInWeeks(Alaress_Date_Format $diff)
+    {
+        return $this->getDateTimeObject()->diffInWeeks($diff->getDateTimeObject());
+    }
+
+
+    /**
+     * @param Alaress_Date_Format $diff
+     * @return int
+     */
+    public function diffInDays(Alaress_Date_Format $diff)
+    {
+        return $this->getDateTimeObject()->diffInDays($diff->getDateTimeObject());
+    }
+
+
+    /**
+     * @param Alaress_Date_Format $diff
+     * @return int
+     */
+    public function diffInWeekdays(Alaress_Date_Format $diff)
+    {
+        return $this->getDateTimeObject()->diffInWeekdays($diff->getDateTimeObject());
+    }
+
+
+    /**
+     * @param Alaress_Date_Format $diff
+     * @return int
+     */
+    public function diffInWeekendDays(Alaress_Date_Format $diff)
+    {
+        return $this->getDateTimeObject()->diffInWeekendDays($diff->getDateTimeObject());
+    }
+
+
+    /**
+     * @param Alaress_Date_Format $diff
+     * @return int
+     */
+    public function diffInHours(Alaress_Date_Format $diff)
+    {
+        return $this->getDateTimeObject()->diffInHours($diff->getDateTimeObject());
+    }
+
+
+    /**
+     * @param Alaress_Date_Format $diff
+     * @return int
+     */
+    public function diffInMinutes(Alaress_Date_Format $diff)
+    {
+        return $this->getDateTimeObject()->diffInMinutes($diff->getDateTimeObject());
+    }
+
+
+    /**
+     * @param Alaress_Date_Format $diff
+     * @return int
+     */
+    public function diffInSeconds(Alaress_Date_Format $diff)
+    {
+        return $this->getDateTimeObject()->diffInSeconds($diff->getDateTimeObject());
+
+    }
+
+
     /**
      * {@inheritdoc}
      */
