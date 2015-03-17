@@ -12,16 +12,6 @@ use Alaress\Json;
 use PHPUnit_Framework_TestCase;
 
 class JsonTest extends PHPUnit_Framework_TestCase {
-
-    /**
-     * These tests aren't applicable to PHP 5.4+.
-     */
-    public function setUp() {
-        if (version_compare(PHP_VERSION, '5.4', '>=')) {
-            $this->markTestSkipped('JsonSerializable is handled natively in PHP 5.4+');
-        }
-    }
-
     /**
      * @return array
      */
@@ -50,20 +40,22 @@ class JsonTest extends PHPUnit_Framework_TestCase {
         // Test recursion
         $object = new Serializable(new Serializable(new Serializable(new Serializable('something'))));
         $this->assertSame(
-            array(
-                'label' => 'object',
-                'value' => array(
+            json_encode(
+                array(
                     'label' => 'object',
                     'value' => array(
                         'label' => 'object',
                         'value' => array(
                             'label' => 'object',
-                            'value' => 'something',
+                            'value' => array(
+                                'label' => 'object',
+                                'value' => 'something',
+                            ),
                         ),
                     ),
-                ),
+                )
             ),
-            Json::applyJsonSerializable($object)
+            json_encode(Json::applyJsonSerializable($object))
         );
     }
 
@@ -99,56 +91,58 @@ class JsonTest extends PHPUnit_Framework_TestCase {
             )
         );
         $this->assertSame(
-            array(
-                'label' => 'collection',
-                'value' => array(
-                    array(
-                        'label' => 'object',
-                        'value' => 'cow',
-                    ),
-                    array(
-                        'label' => 'object',
-                        'value' => 'goat',
-                    ),
-                    array(
+            json_encode(
+                array(
+                    'label' => 'collection',
+                    'value' => array(
                         array(
                             'label' => 'object',
-                            'value' => 'rabbit',
+                            'value' => 'cow',
                         ),
                         array(
                             'label' => 'object',
-                            'value' => 'fox',
+                            'value' => 'goat',
                         ),
-                    ),
-                    array(
-                        'label' => 'collection',
-                        'value' => array('dog', 'cat',)
-                    ),
-                    array(
-                        'label' => 'object',
-                        'value' => array(
+                        array(
+                            array(
+                                'label' => 'object',
+                                'value' => 'rabbit',
+                            ),
+                            array(
+                                'label' => 'object',
+                                'value' => 'fox',
+                            ),
+                        ),
+                        array(
                             'label' => 'collection',
+                            'value' => array('dog', 'cat',)
+                        ),
+                        array(
+                            'label' => 'object',
                             'value' => array(
-                                array(
+                                'label' => 'collection',
+                                'value' => array(
                                     array(
-                                        'label' => 'object',
-                                        'value' => 'bird',
+                                        array(
+                                            'label' => 'object',
+                                            'value' => 'bird',
+                                        ),
+                                        array(
+                                            'label' => 'object',
+                                            'value' => 'duck',
+                                        ),
                                     ),
                                     array(
                                         'label' => 'object',
-                                        'value' => 'duck',
+                                        'value' => 'chicken',
                                     ),
-                                ),
-                                array(
-                                    'label' => 'object',
-                                    'value' => 'chicken',
-                                ),
-                            )
+                                )
+                            ),
                         ),
                     ),
-                ),
+                )
             ),
-            Json::applyJsonSerializable($object)
+            json_encode(Json::applyJsonSerializable($object))
         );
     }
 }
