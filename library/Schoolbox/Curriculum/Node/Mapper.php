@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Curriculum\Node;
 
+use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 
 class Mapper extends BaseMapper
@@ -161,5 +162,35 @@ class Mapper extends BaseMapper
                 )
             )
         );
+    }
+
+    /**
+     * Searches for a node that matches a search term.
+     *
+     * @param  string $keyword
+     * @param  int    $offset
+     * @param  int    $limit
+     * @param  string $sort_by  Sort field, defaults to 'name' but can be 'modified_at'
+     * @param  string $sort_dir Sort direction, defaults to 'ASC'
+     *
+     * @return Collection|Model[]
+     */
+    public function search($keyword, $offset = 0, $limit = 20, $sort_by = 'name', $sort_dir = 'ASC')
+    {
+        $query = "
+            SELECT {$this->getColumnString('n')}
+            FROM {$this->getTable()} n
+            WHERE n.code LIKE :codeLike
+            OR (n.code != '' AND n.name LIKE :nameLike)
+        ";
+        $statement  = $this->getDatabase()->prepare($query);
+        $quotedLike = $this->getDatabase()->quoteForLike($keyword);
+        $statement->execute(
+            array(
+                'codeLike' => $quotedLike . '%',
+                'nameLike' => '%' . $quotedLike . '%',
+            )
+        );
+        return $this->hydrateList($statement, 'n');
     }
 }
