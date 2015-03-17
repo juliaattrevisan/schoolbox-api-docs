@@ -18,6 +18,14 @@
         float: left;
     }
 
+    .learning-analytics.hall.top-students {
+        float: left;
+    }
+
+    .learning-analytics.hall.bottom-students {
+        float: right;
+    }
+
     /* Unit Progress
      */
     .learning-analytics.unit-progress {
@@ -147,8 +155,9 @@
 <h2>Results</h2>
 <div data-graph="boxplots" class='learning-analytics boxplots'></div>
 
-<div class="learning-analytics hall">
+<div class="learning-analytics hall top-students">
     <h2>Top Students</h2>
+    {% if results.topStudents|length > 0 %}
     <ul>
         {% for currentStudent in results.topStudents|slice(0,3) %}
         <li>
@@ -157,9 +166,15 @@
         </li>
         {% endfor %}
     </ul>
+    {% else %}
+    <p>
+        Nobody has attempted these tasks yet.
+    </p>
+    {% endif %}
 </div>
-<div class="learning-analytics hall">
+<div class="learning-analytics hall bottom-students">
     <h2>Bottom Students</h2>
+    {% if results.topStudents|length > 0 %}
     <ul>
         {% for currentStudent in results.bottomStudents|slice(0,3) %}
         <li>
@@ -168,6 +183,11 @@
         </li>
         {% endfor %}
     </ul>
+    {% else %}
+    <p>
+        Nobody has attempted these tasks yet.
+    </p>
+    {% endif %}
 </div>
 
 <div class="clearfix"></div>
