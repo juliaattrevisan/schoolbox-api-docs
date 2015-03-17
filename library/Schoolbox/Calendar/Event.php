@@ -708,8 +708,8 @@ class Event
     public function setEndDate($endDate)
     {
         // preserve time if already set
-        $time = $this->getFormattedDate($this->endDateTime, "H:i:s");
-        $this->endDateTime = new Alaress_Date_Format("$endDate $time", 'Y-m-d H:i:s');
+        list($year, $month, $day) = explode('-',$endDate);
+        $this->endDateTime->setDate($year,$month,$day);
 
         return $this;
     }
@@ -733,23 +733,12 @@ class Event
     public function setEndTime($endTime)
     {
         // preserve date if already set
-
-
-        $date = $this->getFormattedDate($this->endDateTime, 'Y-m-d');
-        $this->endDateTime = new Alaress_Date_Format("$date $endTime", 'Y-m-d H:i:s');
+        list($hour, $min, $sec) = explode(':',$endTime);
+        $this->endDateTime->setTime($hour,$min,$sec);
 
         return $this;
     }
 
-    /**
-     * Get end time
-     *
-     * @return string
-     */
-    public function getEndTime()
-    {
-        return $this->getFormattedDate($this->endDateTime, 'H:i:s');
-    }
 
     /**
      * Set start date
@@ -760,21 +749,9 @@ class Event
     public function setStartDate($startDate)
     {
         // preserve time if set
-        $time = $this->getFormattedDate($this->startDateTime, 'H:i:s');
-        $this->startDateTime = new Alaress_Date_Format("$startDate $time", 'Y-m-d H:i:s');
-
+        list($year, $month, $day) = explode('-',$startDate);
+        $this->startDateTime->setDate($year,$month,$day);
         return $this;
-    }
-
-    /**
-     * Get start date
-     *
-     * @return string
-     */
-    public function getStartDate()
-    {
-
-        return $this->getFormattedDate($this->startDateTime, 'Y-m-d');
     }
 
     /**
@@ -791,31 +768,6 @@ class Event
         return $this;
     }
 
-    /**
-     * Get start time
-     *
-     * @return string
-     */
-    public function getStartTime()
-    {
-        return $this->getFormattedDate($this->startDateTime, 'H:i:s');
-    }
-
-
-    /**
-     * Format a date, with type-safety
-     *
-     * @param \Alaress_Date_Format $object
-     * @param string $format
-     * @return string
-     */
-    protected function getFormattedDate($object, $format)
-    {
-        if ($object instanceof Alaress_Date_Format) {
-            return $object->getUsingFormat($format);
-        }
-        return date($format, 0);
-    }
 
     /**
      * Set publish datetime
