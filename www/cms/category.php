@@ -48,6 +48,7 @@ if (is_numeric($this->arg[0])) {
         'CATEGORY_ID' => $folder->getId(),
         'NAME' => Scrub::text($folder->getName()),
         'CODE' => Scrub::text($folder->getCodeString()),
+        'CURRICULUM_CODE_LIST' => '',
         'PARENT_ID' => $folder->getParent()->getId(),
         'PARENT_NAME' => Scrub::text($folderParent->getName()),
         'USER_GROUP' => $_SESSION['gid'],

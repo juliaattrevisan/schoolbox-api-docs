@@ -115,7 +115,12 @@ $(function() {
         <tr>
             <td><h4>Curriculum Codes</h4>
                 <em>If you want to associate curriculum codes with this folder, enter them here.</em></td>
-            <td><input type="text" name="code" size="40" value="{CURRICULUM_CODE_LIST}" /></td>
+            <td>
+                <textarea name="code">{CURRICULUM_CODE_LIST}</textarea>
+                <a href="#"
+                   class="btn inline-block"
+                ><span></span>Search for codes</a>
+            </td>
         </tr>
 	</table>
 	<input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
