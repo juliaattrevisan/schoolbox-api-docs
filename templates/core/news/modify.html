@@ -1,4 +1,95 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+<script type="text/javascript">
+    function confirmDelete(newsID) {
+        if (confirm('Delete this news item?')) {
+            window.open('/news/modifyForm.php?delete=' + newsID, '_self', '');
+        }
+    }
+    $(function () {
+        $.fn.alaressTiny({
+            mode: 'textareas'
+        });
+        $('#item_datetime_published, #item_datetime_expires').datepicker({
+            dateFormat:'dd/mm/yy',
+            showOn:'both',
+            buttonImage:'/images/core/calendar/calendar-click.png',
+            buttonImageOnly:true,
+            constrainInput:false,
+            onClose:function (string) {
+                var input = $(this);
+                $.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
+                    input.val(data.time);
+                })
+            }
+        });
+        $('#addUser')
+            .selectizeSelector({
+                multiple: true,
+                value: {USER_LIST},
+                ajax: {
+                    url:      '/ajax/user.php',
+                    type:     'GET',
+                    data:     {groupID: 0},
+                    dataType: 'json'
+                }
+            })
+        $('#type_form input').each(function () {
+            $(this).click(function () {
+                $.get('/group/modifyForm.php', {categoryID:'{CATEGORY_ID}', type:$(this).val()});
+            });
+        });
+        $(document).on('click', '.delete-from-list', function (event) {
+            event.preventDefault();
+            $(this).parent().remove();
+            $('#addUser').val("").focus();
+        });
+        $('.customise').click(function (event) {
+            event.preventDefault();
+            $(this).children('span').toggle();
+            $('.form-advanced').toggleClass('show');
+            if ($('.form-advanced').is(':visible')) {
+                $('.form-advanced').children('td').delay(1000).animate({opacity:'1'});
+            } else {
+                $('.form-advanced').queue('fx', []);
+            }
+        });
+        jQuery.validator.addMethod("groupCheck", function (value, element) {
+            console.log($(element).prop("checked"));
+            if (($('.visible-users').children('li').length < 1) && ($('.groups input:checked').length < 1 )) {
+                return false;
+            } else {
+                return true;
+            }
+        }, "Please tick at least one group");
+        $('#newsForm').validate({
+            rules:{
+                'group[]':{
+                    groupCheck:true
+                },
+                'campus[]':{
+                    required:true,
+                    minlength:1
+                }
+            },
+            messages:{
+                'group[]':"Please tick at least one group",
+                'campus[]':"Please tick at least one campus"
+            },
+            errorPlacement:function (error, element) {
+                if (element.parent().parent().hasClass('checkboxes')) {
+                    error.insertAfter(element.parent().parent().parent().children(':last-child'));
+                } else {
+                    error.insertAfter(element);
+                }
+            }
+        });
+    });
+</script>
 
 <link rel="stylesheet" type="text/css" media="screen" href="/css/foundation/chrome.css?v={SITE_VERSION}" />
 <script type="text/javascript">
@@ -11,10 +102,12 @@
     <div class="large-12 columns no-pad">
         <h1>
             {ACTION} News
-            <a class="customise" href="#">
-                <span{ADV_OFF}>Show Advanced Options</span>
-                <span{ADV_ON}>Close Advanced Options</span>
-            </a>
+            <span class="header-actions">
+                <a class="customise button" href="#">
+                    <span{ADV_OFF}>Show Advanced Options</span>
+                    <span{ADV_ON}>Close Advanced Options</span>
+                </a>            
+            </span>
         </h1>
     </div>
 </div>
@@ -27,78 +120,93 @@
             <label>
                 <input type="text" class="required" name="heading" size="35" maxlength="100" value="{HEADING}"/>
             </label>
-
+            
+            <hr>
             <h2>
-                Article          
-                <span data-tooltip="right" class="has-tip tip-right secondary label" data-width="200" title="This is the main portion of your news.">?</span>
+                Article     
+                <span class="header-actions">
+                    <span data-tooltip="article" class="has-tip tip-left secondary label icon-help no-text" data-width="240" title="This is the main portion of your news."></span>
+                </span>  
             </h2>
             <textarea id="body" name="body" style="width:100%;height:350px">{BODY}</textarea>
-
+            
+            <hr>
             <h2>
                 Feature Image
-                <span data-tooltip="right" class="has-tip tip-right secondary label" data-width="200" title="The feature image to be attached to your news post">?</span>
+                <span class="header-actions">
+                    <span data-tooltip="feat-img" class="has-tip tip-left secondary label icon-help no-text icon-help no-text" data-width="250" title="The feature image to be attached to your news post"></span>
+                </span>
             </h2>
             {ATTACH_ZONE}
-
+            
+            <hr>
             <h2>Topic</h2>
             <select name="item_topic_id">
             <!-- BEGIN topic_list -->
             <option value="{TOPIC_ID}" {TOPIC_ID_SELECTED}>{TOPIC_NAME}</option>
             <!-- END topic_list -->
             </select>
-
+                
+            <hr>
             <h2>
                 Roles
-                <span data-tooltip="right" class="has-tip tip-right secondary label" data-width="200" title="This news item will only be visible to the roles you select.">?</span>
+                <span class="header-actions">
+                    <span data-tooltip="roles" class="has-tip tip-left secondary label icon-help no-text" data-width="250" title="This news item will only be visible to the roles you select."></span>
+                </span>
             </h2>
             <div>
                 <!-- BEGIN group_selection -->              
-                <input id="checkbox1" type="checkbox" value="{GROUP_ID}" name="group[]" {GROUP_ID_SELECTED}><label for="checkbox1" class="checkbox-label">{GROUP_NAME}</label>
+                <input id="role_checkbox{GROUP_ID}" type="checkbox" value="{GROUP_ID}" name="group[]" {GROUP_ID_SELECTED}><label for="role_checkbox{GROUP_ID}" class="checkbox-label">{GROUP_NAME}</label>
                 <!-- END group_selection -->
-                <input id="checkbox2" type="checkbox" value="{GROUP_ID}" name="" class="select_all" /><label for="checkbox2" class="checkbox-label">Select all</label>     
+                <input id="role_checkbox_all" type="checkbox" value="" name="" class="select_all" /><label for="role_checkbox_all" class="checkbox-label">Select all</label>     
             </div>
-
+            
+            <hr>
             <!-- BEGIN campus_row -->
             <h2>
                 Campus
-                <span data-tooltip="right" class="has-tip tip-right secondary label" data-width="200" title="This news item will only be visible to users that are within this campus.">?</span>
+                <span class="header-actions">
+                    <span data-tooltip="campus" class="has-tip tip-left secondary label icon-help no-text" data-width="250" title="This news item will only be visible to users that are within this campus."></span>
+                </span>
             </h2>
 			<!-- BEGIN campus_selection -->
-            <label>
-                <input type="checkbox" value="{CAMPUS_ID}" name="campus[]" {CAMPUS_ID_SELECTED} />{CAMPUS_NAME}
-			</label>
+            <input type="checkbox" value="{CAMPUS_ID}" name="campus[]" id="campus_{CAMPUS_ID}" {CAMPUS_ID_SELECTED} /><label for="campus_{CAMPUS_ID}" class="checkbox-label">{CAMPUS_NAME}</label>
             <!-- END campus_selection -->
-            <label>
-                <input type="checkbox" value="{GROUP_ID}" name="" class="select_all" /> Select all
-            </label>
+            <input type="checkbox" value="" name="" id="select_all" /><label for="select_all" class="checkbox-label">Select all</label>
             <!-- END campus_row -->
-            <div class="advanced" {SHOW_ADVANCED}>
+            <div class="form-advanced" {SHOW_ADVANCED}>
                 <div {OPAC_ADVANCED}>
                     <h2>
                         Add users
-                        <span data-tooltip="right" class="has-tip tip-right secondary label" data-width="200" title="You may add users individually by typing their name and selecting from the list.">?</span>
+                        <span class="header-actions">
+                            <span data-tooltip="add-users" class="has-tip tip-left secondary label icon-help no-text" data-width="250" title="You may add users individually by typing their name and selecting from the list."></span>
+                        </span>
                     </h2>
                 </div>
                 <div {OPAC_ADVANCED}>
                     <select id="addUser" name="userList[]" multiple placeholder="Search Users"></select>
                 </div>
             </div>
-            <div class="advanced" {SHOW_ADVANCED}>
+            <div class="form-advanced" {SHOW_ADVANCED}>
                 <div {OPAC_ADVANCED}>
                     <h2>
                         Publish Date
-                        <span data-tooltip="right" class="has-tip tip-right secondary label" data-width="200" title="Select a date for when this news item will become available.">?</span>
+                        <span class="header-actions">
+                            <span data-tooltip="publish-date" class="has-tip tip-left secondary label icon-help no-text" data-width="250" title="Select a date for when this news item will become available."></span>
+                        </span>
                     </h2>
                 </div>
                 <div {OPAC_ADVANCED}>
-                <input type="text" class="required" name="item_datetime_published" id="item_datetime_published" size="12"
-                       maxlength="50" value="{ITEM_DATETIME_PUBLISHED}"/>
+                <input type="text" class="required" name="item_datetime_published" id="item_datetime_published" size="12" maxlength="50" value="{ITEM_DATETIME_PUBLISHED}"/>
                 </div>
             </div>
-
+            
+            <hr>
             <h2>
                 Expiry Date
-                <span data-tooltip="right" class="has-tip tip-right secondary label" data-width="200" title="Select a date for when this item will expire.">?</span>
+                <span class="header-actions">
+                    <span data-tooltip="exp-date" class="has-tip tip-left secondary label icon-help no-text" data-width="250" title="Select a date for when this item will expire."></span>
+                </span>
             </h2>
             <input type="text" class="required" name="item_datetime_expires" id="item_datetime_expires" size="12"
                    maxlength="50" value="{ITEM_DATETIME_EXPIRES}"/>

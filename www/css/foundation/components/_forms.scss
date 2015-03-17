@@ -157,6 +157,14 @@ input[type=checkbox]:checked +
 label.checkbox-label		{ background-position: 0 -120px; }
 
 
+//  Show/Hide Advanced form fields
+.form-advanced{
+	display: none;
+	&.show{
+		display: block;
+	}
+}
+
 //  DATEPICKER
 .ui-datepicker{
 	@include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));
