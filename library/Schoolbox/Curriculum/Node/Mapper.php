@@ -169,8 +169,8 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
      * @param string          $keyword
      * @param int             $offset
      * @param int             $limit
-     * @param string          $sortProperty
-     * @param string          $sortDirection
+     * @param string          $sortProperty  Ignored for this search for now
+     * @param string          $sortDirection Ignored for this search for now
      *
      * @return Collection|Model[]
      */
@@ -197,14 +197,29 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
             WHERE n.code LIKE :codeLike
             OR (n.code != '' AND n.name LIKE :nameLike)
         ";
-        $statement  = $this->getDatabase()->prepare($query);
         $quotedLike = $this->getDatabase()->quoteForLike($keyword);
-        $statement->execute(
-            array(
-                'codeLike' => $quotedLike . '%',
-                'nameLike' => '%' . $quotedLike . '%',
-            )
-        );
+        $params     = [
+            'codeLike' => $quotedLike . '%',
+            'nameLike' => '%' . $quotedLike . '%',
+        ];
+        if ($limit) {
+            $query .= ' LIMIT :limit';
+        }
+        if ($offset) {
+            $query .= ' OFFSET :offset';
+        }
+        $statement = $this->getDatabase()->prepare($query);
+        foreach ($params as $param => $value) {
+            $statement->bindValue($param, $value);
+        }
+        if ($limit) {
+            $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
+        }
+        if ($offset) {
+            $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
+        }
+
+        $statement->execute();
         return $this->hydrateList(
             $statement,
             'n',
