@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Folder;
 
 
 use Schoolbox\Collection;
+use Schoolbox\Curriculum\Node;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\CategoryCode;
@@ -41,6 +42,13 @@ class Model extends AbstractFolder implements ISoftDeletable
      * @var Collection|CategoryCode[]
      */
     protected $codes;
+
+    /**
+     * A collection of CurriculumNode instances
+     *
+     * @var Collection|Node\Model[]
+     */
+    protected $curriculumNodes;
 
     /**
      * Deleted at
@@ -78,6 +86,7 @@ class Model extends AbstractFolder implements ISoftDeletable
     public function __construct()
     {
         $this->setCodes(new Collection(array()));
+        $this->setCurriculumNodes(new Collection());
     }
 
     /**
@@ -124,6 +133,19 @@ class Model extends AbstractFolder implements ISoftDeletable
         $this->getCodes()->add($code);
         return $this;
     }
+
+    /**
+     * Add curriculum node
+     *
+     * @param  Node\Model $node
+     * @return $this
+     */
+    public function addCurriculumNode(Node\Model $node)
+    {
+        $this->getCurriculumNodes()->add($node);
+        return $this;
+    }
+
 
     /**
      * Populates the teacher collection
@@ -197,6 +219,25 @@ class Model extends AbstractFolder implements ISoftDeletable
     public function getCodes()
     {
         return $this->codes;
+    }
+
+    /**
+     * @return Collection|Node\Model[]
+     */
+    public function getCurriculumNodes()
+    {
+        return $this->curriculumNodes;
+    }
+
+    /**
+     * @param  Collection|Node\Model[] $curriculumNodes
+     *
+     * @return $this
+     */
+    public function setCurriculumNodes($curriculumNodes)
+    {
+        $this->curriculumNodes = $curriculumNodes;
+        return $this;
     }
 
     /**
