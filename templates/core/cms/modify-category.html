@@ -13,38 +13,37 @@ $(function() {
 	});
 
 
-  jQuery.validator.addMethod("groupCheck", function(value, element, params) {
-    var hasDefaultPerms = $("input[name='group[{REQUIRED_PERMS}]']:checked").val();
-    var individualPerms = $('input[name=groupcheck]').is(':checked');
+    jQuery.validator.addMethod("groupCheck", function(value, element, params) {
+        var hasDefaultPerms = $("input[name='group[{REQUIRED_PERMS}]']:checked").val();
+        var individualPerms = $('input[name=groupcheck]').is(':checked');
 
-    if ((hasDefaultPerms < 2) && !individualPerms) {
-      return confirm("You do not currently have write access to this folder. Do you wish to continue?");
-    }
-    else {
-      return true;
-    }
-  }, "Please select write access for this group.");
+        if ((hasDefaultPerms < 2) && !individualPerms) {
+          return confirm("You do not currently have write access to this folder. Do you wish to continue?");
+        }
+        else {
+          return true;
+        }
+    }, "Please select write access for this group.");
 
-
-    var options = {
+    $('#curriculum-codes').selectizeSelector({
         ajax: {
-            url:      '/curriculum/node/search.json',
+            url:      '/curriculum/search',
             type:     'GET',
             data:     {},
             dataType: 'json'
         },
         multiple: true,
         selectize: {
-            plugins: ['remove_button', 'restore_on_backspace'],
-            create: function(input) {
-                var freeEntry = {};
-                freeEntry[this.settings.valueField]  = input;
-                freeEntry[this.settings.searchField] = input;
-                return freeEntry;
-            }
+            plugins: ['remove_button', 'restore_on_backspace']
+//            ,
+//            create: function(input) {
+//                var freeEntry = {};
+//                freeEntry[this.settings.valueField]  = input;
+//                freeEntry[this.settings.searchField] = input;
+//                return freeEntry;
+//            }
         }
-    }
-    $('#curriculum-codes').selectizeSelector($.extend({}, options, {value: {REPLYTO}}))
+    });
 
 
 });
