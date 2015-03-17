@@ -14,6 +14,7 @@ namespace Schoolbox\Resource;
 use Schoolbox;
 use Schoolbox\FileInterface;
 use Schoolbox\Resource\File\Mapper;
+use Schoolbox\Resource\File\Model as File;
 use Schoolbox\Storage;
 
 /**
@@ -22,7 +23,7 @@ use Schoolbox\Storage;
  * @deprecated
  * @package Schoolbox\Resource
  */
-class FileMapper extends Mapper implements FileLocatorInterface, Schoolbox\StorageMapperInterface {
+class FileMapper extends Mapper implements Schoolbox\StorageMapperInterface {
 
     /**
      * @deprecated
@@ -47,6 +48,7 @@ class FileMapper extends Mapper implements FileLocatorInterface, Schoolbox\Stora
 	 * Copies this file to the storage engine, or returns the existing copy if
 	 * it's already there.
 	 *
+     * @deprecated
 	 * @param  File $file The file object to copy to storage.
 	 * @throws Exception If the file stored in $file can't be loaded.
 	 * @return Storage The new storage item or existing item.
@@ -83,6 +85,7 @@ class FileMapper extends Mapper implements FileLocatorInterface, Schoolbox\Stora
 
     /**
      * Returns the location where files should be saved
+     * @deprecated
      * @return string
      */
     private function getSaveLocation() {
@@ -93,6 +96,7 @@ class FileMapper extends Mapper implements FileLocatorInterface, Schoolbox\Stora
     /**
      * Convenience method for creating and saving a file via this mapper.
      *
+     * @deprecated
      * @param string $filename     the file's name.
      * @param string $tempLocation the location of the file to save.
      * @param int    $userId       the user to associate with the file.
@@ -106,15 +110,15 @@ class FileMapper extends Mapper implements FileLocatorInterface, Schoolbox\Stora
             return $this->findById($matches[1]);
         }
 
-        /** @var File $file */
-        $file = $this->createModel();
-        $file->setTempFileLocation($tempLocation);
-        $file->setOwner($this->getJoinMapper('user')->createModel()->setId($userId));
-        $file->setFilename($filename);
-        $file->setFilesize(filesize($tempLocation));
+        // not in SBFS? accept into storage
+        $storage = $this->getStorageMapper()->accept($filename, $tempLocation, false);
 
-        // TODO either rename this method entirely, or find a way to pass enough data thru to persist this object
+        $file = $this->createModel()->setStorage($storage);
+        $file->setOwner($this->getJoinMapper('owner')->createModel()->setId($userId));
+        $file->setFilename($filename);
+
         return $file;
     }
+
 
 }
