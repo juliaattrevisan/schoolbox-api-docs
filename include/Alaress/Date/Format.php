@@ -27,6 +27,11 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     protected $timezone;
 
     /**
+     * @var Alaress_Date_Locale_Interface
+     */
+    protected $locale;
+
+    /**
      * Any warnings that might have been raised in creation of this object.
      *
      * @var array
@@ -194,10 +199,9 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     /**
      * Get Locale configuration object
      *
-     * @param  Alaress_Date_Locale_Interface $val
-     * @return void
+     * @return Alaress_Date_Locale_Interface
      */
-    public function getLocale($val)
+    public function getLocale()
     {
         return $this->locale;
     }
@@ -668,7 +672,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function getLong()
     {
-        return $this->getUsingFormat('l F jS Y g:ia');
+        return $this->getUsingFormat($this->getLocale()->longDateFormat());
     }
 
     /**
@@ -769,7 +773,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function getCalendarDate()
     {
-        return $this->getUsingFormat($this->getLocale()->getCalendarDate());
+        return $this->getUsingFormat($this->getLocale()->calendarDate());
     }
 
     /**
@@ -779,7 +783,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function getCalendarDateTime()
     {
-        return $this->getUsingFormat($this->getLocale()->getCalendarDateTime());
+        return $this->getUsingFormat($this->getLocale()->calendarDateTime());
     }
 
     /**

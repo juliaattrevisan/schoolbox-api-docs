@@ -20,8 +20,14 @@ use \Schoolbox\Config\Loader;
 
 class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract {
 
+    /**
+     * @var Loader
+     */
     var $config;
 
+    /**
+     * @return Loader
+     */
     public function getConfig(){
         if(!$this->config instanceof Loader) {
             $this->config = new Loader;
@@ -70,7 +76,7 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract {
     /**
      * Get a shortened format
      *
-     * @return
+     * @return string
      */
     public function shortFormat() {
         return $this->getConfig()->get('date_short').' '.$this->getConfig()->get('date_time');
@@ -79,7 +85,7 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract {
     /**
      * Get the date-only format
      *
-     * @return
+     * @return string
      */
     public function dateOnlyFormat() {
         return $this->getConfig()->get('date_short');
