@@ -18,6 +18,7 @@ use Monolog\Logger;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\Realtime;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
@@ -30,6 +31,9 @@ class EventMetadataNotifier extends AbstractModuleNotifier
     const TRIGGER_SUBMITTED = 'submitted';
     const TRIGGER_UPDATED = 'updated';
     const TRIGGER_STATUSCHANGED = 'statuschanged';
+    const TRIGGER_UPCOMING      = 'upcoming';
+
+    const REMINDER_INTERVAL = 86400;
 
     /**
      * Namespace slug, as defined in msg_namespace
@@ -77,8 +81,59 @@ class EventMetadataNotifier extends AbstractModuleNotifier
 
             // process the other kinds of updates
             $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
+
+
+            /** @var EventMetadata $object */
+            $object = $bundle->getEvent()->getObject();
+
+            $status = $object->getStatus();
+
+            // if in a final state, don't add extra reminders
+            if ($status->isApproved() || $status->isRejected()) {
+                return;
+            }
         }
+
+        $bundle->attach(self::TRIGGER_UPCOMING, array($this, 'getNextReminderTime'));
     }
+
+
+    /**
+     * This is a callback method for deriving the time for a recurring reminder trigger
+     *
+     * @param Realtime\Schedule\Event $event
+     * @return int
+     */
+    public function getNextReminderTime(Realtime\Schedule\Event $event)
+    {
+        $eotcConf  = ConfigMapper::getInstance();
+        $threshold = $eotcConf->findOneByColumn('name', 'daily_reminder')->getValue();
+
+        /** @var EventMetadata $object */
+        $object = $event->getObject();
+
+        // retrieve the event that this metadata object is connected to
+        $eventCollection = EventMetadataMapper::getInstance()->findEventsForMetadata($object);
+
+        $relEvent  = EventMapper::getInstance()->findById($eventCollection->first()->getId());
+
+        $startTime = $relEvent->getStartDateTime()->getUnixTimestamp();
+
+        // iterate across the number of days to remind
+        for ($i = $threshold; $i > 0; --$i) {
+            // step back in daily increments
+            $reminderTime = $startTime - (self::REMINDER_INTERVAL * $i);
+
+            // if this is in the future, schedule it
+            if ($reminderTime > time()) {
+                return $reminderTime;
+            }
+        }
+
+        // all reminders are in the past. discard this trigger
+        return -1;
+    }
+
 
     /**
      * @param string $label
@@ -95,6 +150,61 @@ class EventMetadataNotifier extends AbstractModuleNotifier
             );
         }
         return array();
+    }
+
+
+    /**
+     * @param EventMetadata $eventMetadata
+     * @param User          $effector
+     * @param array         $diff
+     * @return Envelope
+     */
+    public function notifyUpcoming($eventMetadata, $effector, $diff = null)
+    {
+        $envelope = new Envelope();
+        $bob      = new Builder();
+
+        // retrieve the event that this metadata object is connected to
+        $eventCollection = EventMetadataMapper::getInstance()->findEventsForMetadata($eventMetadata);
+
+        // no event? no messages
+        if (!$eventCollection->count()) {
+            return $envelope;
+        }
+
+        /** @var Event $relEvent */
+        $relEvent      = EventMapper::getInstance()->findById($eventCollection->first()->getId());
+        $relEventId    = $relEvent->getId();
+        $relEventStart = (int)$relEvent->getStartDateTime()->getUnixTimestamp();
+        $currentStatus = $eventMetadata->getStatus();
+
+        $userIds = $this->getInterestedUsers(
+            $relEvent,
+            $currentStatus instanceof EventStatus ? $currentStatus->getId() : (int)$currentStatus
+        );
+
+        // TODO make this use Carbon-based ADF once it's merged into 15.0
+        $days = (int)round(($relEventStart - time()) / self::REMINDER_INTERVAL);
+
+        $href = "/modules/eotc/status/modify/$relEventId";
+
+        $bob->setTitle(":event starts in $days days, but has not been given final approval")
+            ->setHref($href)
+            ->setParams(array(
+                'event' => new Param($relEvent->getTitle(), $href)
+            ))
+            ->setSeverity(Logger::WARNING)
+            ->setNamespace($this->getSlug())
+            ->addTopic("eotc.$relEventId.".self::TRIGGER_UPCOMING)
+            ->setIcon("/images/icon.php?icon=clock&size=32");
+
+        $msg = $bob->build();
+
+        foreach ($userIds as $userId) {
+            $envelope->targetToUser($userId, $msg);
+        }
+
+        return $envelope;
     }
 
 
