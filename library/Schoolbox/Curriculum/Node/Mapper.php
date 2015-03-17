@@ -12,7 +12,7 @@ namespace Schoolbox\Curriculum\Node;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 
-class Mapper extends BaseMapper
+class Mapper extends BaseMapper implements BaseMapper\Searchable
 {
     public function mapping()
     {
@@ -165,18 +165,23 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Searches for a node that matches a search term.
-     *
-     * @param  string $keyword
-     * @param  int    $offset
-     * @param  int    $limit
-     * @param  string $sort_by  Sort field, defaults to 'name' but can be 'modified_at'
-     * @param  string $sort_dir Sort direction, defaults to 'ASC'
+     * @param \Schoolbox\User $user
+     * @param string          $keyword
+     * @param int             $offset
+     * @param int             $limit
+     * @param string          $sortProperty
+     * @param string          $sortDirection
      *
      * @return Collection|Model[]
      */
-    public function search($keyword, $offset = 0, $limit = 20, $sort_by = 'name', $sort_dir = 'ASC')
-    {
+    public function search(
+        $user,
+        $keyword,
+        $offset = 0,
+        $limit = self::DEFAULT_LIMIT,
+        $sortProperty = '',
+        $sortDirection = 'DESC'
+    ) {
         $query = "
             SELECT {$this->getColumnString('n')}
             FROM {$this->getTable()} n

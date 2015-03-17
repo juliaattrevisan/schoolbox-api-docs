@@ -66,7 +66,10 @@ class Controller extends Base
         $this->getResponse()->content->set(
             array(
                 'format' => 'json',
-                'data'   => $this->getNodeMapper()->search($search),
+                'data'   => $this->getNodeMapper()->search(
+                    $this->getSession()->getAuthUser(),
+                    $search
+                ),
             )
         );
     }
