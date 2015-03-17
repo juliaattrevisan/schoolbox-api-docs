@@ -104,20 +104,42 @@ class Controller extends Base {
 
         /* All the students' values
          */
-        $allRubrics = array();
+        $groupedMarks = array();
 
         foreach($registry->getAllStudentRegistry() as $unitId => $allStudents) {
             foreach ($allStudents as $currentStudent) {
+
+                /* TODO: Probably put folders in a collection for iteration
+                 */
                 $allMarks = $rubricHandler->getStudentMarksByCriteriaInCategory($currentStudent->getId(), $metadata->getSelectedFolder());
 
                 foreach($allMarks as $criterionId => $currentMark) {
-                    $allRubrics[$criterionId][] = array(
+                    $groupedMarks[$criterionId][] = array(
                         'user' => $currentStudent->getId(),
                         'value' => $currentMark,
                     );
                 }
             }
         }
+
+        /* Recombine and preserve criterion grouping
+         */
+        $allRubrics = array();
+
+        foreach ($allCriteria as $criteriaGroup => $currentCriterion) {
+            foreach ($currentCriterion as $criterionId => $details) {
+                $reforged = $details;
+                $reforged['values'] = $groupedMarks[$reforged['id']];
+
+                $allRubrics[$criteriaGroup][$criterionId] = $reforged;
+            }
+
+            /* Sort in order of spawn
+             */
+            asort($allRubrics[$criteriaGroup]);
+        }
+
+        new \Alaress_Probe($allRubrics);
 
         /* Twig data
          */
@@ -145,7 +167,7 @@ class Controller extends Base {
                         'allUnits' => $stackedUnitProgress->getStackedUnitProgress(),
                     ),
                     'rubrics' => array(
-                        'allCriteria' => $allCriteria,
+                        'allRubrics' => $allRubrics,
                     )
                 )
             )
