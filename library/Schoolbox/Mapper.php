@@ -1948,6 +1948,8 @@ abstract class Mapper implements Serializable
             $column = "`{$this->soft_delete_column}`";
             if (isset($alias)) {
                 $column = "`$alias`.$column";
+            } else {
+                $column = "{$this->getTable()}.$column";
             }
             if (!isset($value)) {
                 return "$column IS NULL";
