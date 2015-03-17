@@ -74,7 +74,6 @@ class Generator implements GeneratorInterface
     {
         if (!$this->xUserHandler) {
             $this->setExternalUserHandler(new External_User());
-            $this->xUserHandler->getCurrentSemester();
         }
 
         return $this->xUserHandler;

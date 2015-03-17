@@ -32,10 +32,6 @@ abstract class Synchronise_Synergetic_Strategy_Abstract implements Synchronise_S
 		$this->setGroupHandler(new Group());
 		$this->setExternalUserHandler(new External_User());
 
-		/* Set up ninja variable
-		 */
-		$this->getExternalUserHandler()->getCurrentSemester();
-
 		/* Optional setup hook
 		 * Does nothing by default so established sync scripts shouldn't be affected
 		 */

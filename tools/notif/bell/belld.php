@@ -55,11 +55,6 @@ $kernel->run(function ($di, $loop, $log, $opts) {
 
         $clock = new \Alaress\Date\Clock();
 
-
-        // SESSION MAGICZ BECAUSE REASONS!!
-        $eu = new External_User();
-        $eu->getCurrentSemester();
-
         $stompFactory = new \React\Stomp\Factory($loop);
         $client = $stompFactory->createClient(array(
             'host'      => $conf->get('amqp_host'),

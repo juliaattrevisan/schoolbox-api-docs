@@ -76,9 +76,6 @@ abstract class Synchronise_Base_Strategy
         $this->group_handler         = new Group();
         $this->external_user_handler = new External_User();
      //
-     // Set up current_semester and current_year BS
-        $this->external_user_handler->getCurrentSemester();
-     //
      // Set up a base verbose filter, which you can override in setup()
         $this->verbose_filter = new Synchronise_Base_Verbose();
         $this->setup();

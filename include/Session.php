@@ -389,10 +389,6 @@ class Session
         $groupHandler = new Group;
         $folderMapper = new \Schoolbox\Resource\CategoryMapper();
 
-        //setup a users enrolement for the session
-
-        $synUser->getCurrentSemester($_SESSION['sid']);
-
         $synergy_id = $_SESSION['sid'];
 
         //
