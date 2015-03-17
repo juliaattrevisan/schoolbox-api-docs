@@ -18,7 +18,7 @@ $eventMapper = EventMapper::getInstance();
 if (isset($_GET['s']) && is_numeric($_GET['s'])) {
     try {
         $event = $eventMapper->findNextInSeries($_GET['s']);
-        $selectedDate = $event->getStartDateTime()->getUsingFormat('d-m-Y');
+        $selectedDate = $event->getStartDateTime()->getURLDate();
 
     } catch (Schoolbox\Mapper\Exception $e) {
         // invalid series ID

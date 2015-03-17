@@ -182,7 +182,7 @@ class Decorator extends NotificationBundle
                 // convert the time into human readable
                 $date                             = new \Alaress_Date_Format($n->getTimestamp(), 'U');
                 $context[$n->getId()]['longtime'] = $date->getLong();
-                $context[$n->getId()]['timeonly'] = $date->getUsingFormat('g:ia');
+                $context[$n->getId()]['timeonly'] = $date->getTimeOnly();
             } catch (UnderflowException $e) {
                 // TODO log this somewhere
                 unset($context[$n->getId()]);

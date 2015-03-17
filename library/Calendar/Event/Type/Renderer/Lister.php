@@ -215,7 +215,7 @@ class Calendar_Event_Type_Renderer_Lister extends Calendar_Event_Type_Renderer_A
                     'EVENT_BUTTON_HREF' => sprintf(
                         '/resource-booking/item/%s?date=%s',
                         $currentEvent->getBooking()->getResource()->getId(),
-                        $currentEvent->getBooking()->getEvent()->getStartDateTime()->getUsingFormat('d-m-Y')
+                        $currentEvent->getBooking()->getEvent()->getStartDateTime()->getURLDate()
                     ),
                 )
             );

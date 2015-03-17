@@ -463,8 +463,8 @@ class ArticleMapper extends Mapper implements Searchable
                 $publishDate = $item->getPublishDate();
                 $expireStamp = $item->getExpiryDate()->getUnixTimestamp();
 
-                $yearMatch  = $year ? $publishDate->getUsingFormat('Y') == $year : true;
-                $monthMatch = $month ? $publishDate->getUsingFormat('m') == $month : true;
+                $yearMatch  = $year ? $publishDate->getYear() == $year : true;
+                $monthMatch = $month ? $publishDate->getMonth() == $month : true;
 
                 return ($archive ? $expireStamp < time() : $expireStamp > time()) && $monthMatch && $yearMatch;
             }

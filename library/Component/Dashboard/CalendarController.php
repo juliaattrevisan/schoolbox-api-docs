@@ -137,7 +137,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
             $eventOutput = array(
                 'DATE'                            => $currentDay->getLongDateOnly(),
-                'CALENDAR_DATE'                   => $currentDay->getUsingFormat('d-m-Y'),
+                'CALENDAR_DATE'                   => $currentDay->getURLDate(),
                 'TIME'                            => $currentEvent->getEventSpan(),
                 'FULL_TIME'                       => $currentEvent->getFullDate(),
                 'LOCATION'                        => Scrub::text($currentEvent->getLocation()),
@@ -223,7 +223,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
                     sprintf(
                         '/resource-booking/item/%s?date=%s',
                         $currentEvent->getBooking()->getResource()->getId(),
-                        $currentEvent->getBooking()->getEvent()->getStartDateTime()->getUsingFormat('d-m-Y')
+                        $currentEvent->getBooking()->getEvent()->getStartDateTime()->getURLDate()
                     )
                 );
                 $this->parse('modify_button_block', 'modify_button');

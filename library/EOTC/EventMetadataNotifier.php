@@ -293,7 +293,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
 
         $hrefMod = "/modules/eotc/status/modify/$relEventId";
         $hrefOwn = "/modules/eotc/manage/modify.php?eventID=$relEventId";
-        $hrefReg = "/calendar/full/" . $relEvent->getStartDateTime()->getUsingFormat('d-m-Y');
+        $hrefReg = "/calendar/full/" . $relEvent->getStartDateTime()->getURLDate();
 
         /** @var EventMetadataMapper $mapper */
         $mapper   = $this->mapper;

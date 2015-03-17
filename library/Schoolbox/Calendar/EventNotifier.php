@@ -127,7 +127,7 @@ class EventNotifier extends AbstractModuleNotifier
     {
         $href = $event->getSeriesId()
             ? '?s='.$event->getSeriesId()
-            : ($event->getStartDateTime()->getUsingFormat('d-m-Y') . '?id=' . $event->getId());
+            : ($event->getStartDateTime()->getURLDate() . '?id=' . $event->getId());
 
         $bob = new Builder();
         $bob->setNamespace(NSMapper::NS_CALENDAR)

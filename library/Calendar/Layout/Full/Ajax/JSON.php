@@ -87,7 +87,7 @@ class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract {
 		$midSequence = new Alaress_Date_Format((intval($_GET['start']) + intval($_GET['end'])) / 2, 'U');
 
 		// Also store the current user in the history
-		$page->saveHistory('/calendar/full/' . $midSequence->getUsingFormat('d-m-Y') . '/' . $this->getUser()->getId());
+		$page->saveHistory('/calendar/full/' . $midSequence->getURLDate() . '/' . $this->getUser()->getId());
 		exit();
 	}
 }

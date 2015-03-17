@@ -263,12 +263,7 @@ class External_Maze_Timetable implements External_TimetableInterface
     private function isWeekend($date)
     {
         $object = new \Alaress_Date_Format(strtotime($date), 'U');
-
-        if ($object->getUsingFormat('N') > 5) {
-            return true;
-        }
-
-        return false;
+        return $object->isWeekend();
     }
 
     /**

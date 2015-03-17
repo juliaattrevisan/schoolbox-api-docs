@@ -42,6 +42,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     const DATABASE_DATE_FORMAT = 'Y-m-d';
     const DATABASE_TIME_FORMAT = 'H:i:s';
     const TIMESTAMP = 'U';
+    const URL_FORMAT = 'd-m-Y';
 
     /**
      * Returns an instance of self at the current time.
@@ -485,11 +486,13 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
+     * 1975-12-25T14:15:16-05:00
+     *
      * @return string
      */
     public function toRfc3339String()
     {
-        // 1975-12-25T14:15:16-05:00
+        //
         return $this->getDateTimeObject()->toRfc3339String();
 
     }
@@ -672,7 +675,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function getLong()
     {
-        return $this->getUsingFormat($this->getLocale()->longDateFormat());
+        return $this->getUsingFormat($this->getLocale()->longFormat());
     }
 
     /**
@@ -754,6 +757,14 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     public function getUnixTimeStamp()
     {
         return $this->getUsingFormat(self::TIMESTAMP);
+    }
+
+    /**
+     * Format used when passing dates around on the URL
+     * @return string
+     */
+    public function getURLDate(){
+        return $this->getUsingFormat(self::URL_FORMAT);
     }
 
     /**

@@ -247,7 +247,7 @@ if ($file_links->count() > 0) {
                 'FILE_THUMB' => $file->getMimetype()->getIconFile(),
                 'FILE_SIZE'  => Alaress_Byte_Format::bytesToString($file->getFilesize()),
                 'FILE_NAME'  => $file->getFilename(),
-                'FILE_DATE'  => $file->getUploadedOn()->getUsingFormat('jS M Y, g:ia')
+                'FILE_DATE'  => $file->getUploadedOn()->getLong()
             )
         );
         $this->parse('download_block', 'download', true);

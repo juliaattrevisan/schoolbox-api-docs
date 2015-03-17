@@ -64,7 +64,7 @@ class Renderer extends Handler
                     'EVENT_TYPE' => Scrub::text($event['eventType']),
                     'EVENT_DETAIL' => TextFormatter::cutSentence(Scrub::html2text($event['detail']), 150),
                     'EVENT_DATE' => $date->getDateOnly(),
-                    'EVENT_DATE_RAW' => $date->getUsingFormat('d-m-Y'),
+                    'EVENT_DATE_RAW' => $date->getURLDate(),
                     'EVENT_LOCATION' => $event['location'],
                     'EVENT_TIME' => $event_time
                 ));

@@ -92,11 +92,11 @@ class API extends Generic\API {
 
         $due = new Alaress_Date_Format($box['date'], 'Y-m-d H:i:s');
 
-        $d = $due->getUsingFormat('jS M');
+        $d = $due->getDateOnly();
         $rel = $due->getRelativeTime();
 
         if (!$due->isAtEndOfDay()) {
-            $d .= $due->getUsingFormat(' h:ia');
+            $d .= $due->getTimeOnly();
         }
         $d = "$rel ($d)";
 
