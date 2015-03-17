@@ -82,17 +82,15 @@ class Module extends BaseModule {
 
                     /* All the unit instances associated with $params['folderId']
                      */
-                    $allUnitInstances = $unitInstanceMapper->findByColumn('category_id', $params['folderId']);
-
                     $allUnitCategoryIds = array();
 
-                    foreach ($allUnitInstances as $currentUnitInstance) {
-                        $allUnitCategoryIds[$currentUnitInstance->getUnitCategory()->getId()] = '';
-                    }
+                    $allUnitInstances = $unitInstanceMapper->findByColumn('category_id', $params['folderId']);
 
                     /* All the folders that used the same units
                      */
-                    $allUnitCategoryIds = array_keys($allUnitCategoryIds);
+                    foreach ($allUnitInstances as $currentUnitInstance) {
+                        $allUnitCategoryIds[] = $currentUnitInstance->getUnitCategory()->getId();
+                    }
 
                     /* All the units associated with folders which used the same
                      * course as $params['folderId']
