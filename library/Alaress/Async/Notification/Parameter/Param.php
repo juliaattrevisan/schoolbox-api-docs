@@ -88,7 +88,7 @@ class Param implements ParameterInterface {
 	 * @return string
 	 */
 	public function __toString() {
-		return json_encode(Json::applyJsonSerializable($this));
+		return json_encode($this);
 	}
 
 
