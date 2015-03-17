@@ -695,6 +695,9 @@ class Group extends DeprecatedModel
             }
         }
 
+        if (!is_array($allFolders)) {
+            $allFolders = array();
+        }
         return $allFolders;
     }
 
