@@ -15,29 +15,19 @@ use Schoolbox\Resource\File;
 class FileSystemHandler implements TypeHandlerInterface
 {
 
-    /** @var string */
-    protected $prefix;
-
-    /** @var  */
+    /** @var File\ILocator */
     protected $locator;
 
     /** @var File\IFileMapper */
     protected $receiver;
 
-    /** @var string */
-    protected $dir;
-
 
     /**
-     * @param string           $prefix
-     * @param string           $dir
      * @param File\ILocator    $locator
      * @param File\IFileMapper $receiver
      */
-    public function __construct($prefix, $dir, File\ILocator $locator, File\IFileMapper $receiver)
+    public function __construct(File\ILocator $locator, File\IFileMapper $receiver)
     {
-        $this->prefix  = $prefix . '.';
-        $this->dir     = $dir;
         $this->locator = $locator;
         $this->receiver = $receiver;
     }

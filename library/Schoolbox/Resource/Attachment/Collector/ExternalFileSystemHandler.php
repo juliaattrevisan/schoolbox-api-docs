@@ -22,21 +22,18 @@ class ExternalFileSystemHandler extends FileSystemHandler {
 
 
     /**
-     * @param string           $prefix
-     * @param FetcherInterface $fetcher
      * @param File\ILocator    $locator
      * @param File\IFileMapper $receiver
+     * @param FetcherInterface $fetcher
      */
-    public function __construct($prefix, FetcherInterface $fetcher, File\ILocator $locator, File\IFileMapper $receiver)
+    public function __construct(File\ILocator $locator, File\IFileMapper $receiver, FetcherInterface $fetcher)
     {
-        parent::__construct($prefix, null, $locator, $receiver);
+        parent::__construct($locator, $receiver);
         $this->fetcher = $fetcher;
     }
 
 
     /**
-     * TODO for now, we are simply copying resources from SBFS to Storage. Upgrade by intelligently linking through to storage
-     *
      * @param string $id
      * @throws Resource\Exception
      * @return FileInterface

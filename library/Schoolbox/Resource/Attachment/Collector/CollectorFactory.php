@@ -50,24 +50,23 @@ class CollectorFactory {
         $storage  = StorageMapper::getInstance();
         $file     = FileMapper::getInstance();
         $myFile   = MyFileMapper::getInstance();
-        $conf     = new Loader();
 
         $this->add(NodeFactory::STORE, function () use ($storage, $mapper) {
             return new StorageHandler($storage, $mapper);
         });
 
-        $this->add(NodeFactory::SBFS, function () use ($conf, $file, $mapper) {
-            return new FileSystemHandler(NodeFactory::SBFS, $conf->get('file_dir'), $file, $mapper);
+        $this->add(NodeFactory::SBFS, function () use ($file, $mapper) {
+            return new FileSystemHandler($file, $mapper);
         });
 
-        $this->add(NodeFactory::MYFILE, function () use ($conf, $myFile, $mapper) {
-            return new FileSystemHandler(NodeFactory::MYFILE, $conf->get('myfile_dir'), $myFile, $mapper);
+        $this->add(NodeFactory::MYFILE, function () use ($myFile, $mapper) {
+            return new FileSystemHandler($myFile, $mapper);
         });
 
         try {
             $dav = PortfolioWebDAV::factory();
             $this->add(NodeFactory::WEBDAV, function () use ($dav, $mapper) {
-                return new ExternalFileSystemHandler(NodeFactory::WEBDAV, $dav, $dav, $mapper); // yup. totally passed $dav in twice
+                return new ExternalFileSystemHandler($dav, $mapper, $dav); // yup. totally passed $dav in twice
             });
 
         } catch (\DomainException $e) {
