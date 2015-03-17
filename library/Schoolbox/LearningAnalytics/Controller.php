@@ -110,6 +110,9 @@ class Controller extends Base {
             foreach ($allStudents as $currentStudent) {
 
                 /* TODO: Probably put folders in a collection for iteration
+                 * Oddly enough this method gets the students' marks for a
+                 * criterion spanning across the entire course, which is
+                 * nice and convenient
                  */
                 $allMarks = $rubricHandler->getStudentMarksByCriteriaInCategory($currentStudent->getId(), $metadata->getSelectedFolder());
 
@@ -129,7 +132,7 @@ class Controller extends Base {
         foreach ($allCriteria as $criteriaGroup => $currentCriterion) {
             foreach ($currentCriterion as $criterionId => $details) {
                 $reforged = $details;
-                $reforged['values'] = $groupedMarks[$reforged['id']];
+                $reforged['allValues'] = $groupedMarks[$reforged['id']];
 
                 $allRubrics[$criteriaGroup][$criterionId] = $reforged;
             }
@@ -138,8 +141,6 @@ class Controller extends Base {
              */
             asort($allRubrics[$criteriaGroup]);
         }
-
-        new \Alaress_Probe($allRubrics);
 
         /* Twig data
          */

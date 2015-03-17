@@ -147,11 +147,12 @@
              * five-point summaries
              */
             allAssessments: [
-{% for group, currentCriterion in rubrics.allCriteria %}
+{% for group, currentCriterion in rubrics.allRubrics %}
 {% for criterionId,criterionData in currentCriterion %}
-"{{ group }}: {{ criterionData.name }}"{% if not loop.last %},{% endif %}
-{% endfor %}
-{% if not loop.last %},{% endif %}
+"{{ group }}: {{ criterionData.name }}"{% if not loop.last %},
+{% endif %}
+{% endfor %}{% if not loop.last %},
+{% endif %}
 {% endfor %}
 
             ],
@@ -159,50 +160,41 @@
             /* All the raw data
              */
             allData: $.fn.boxPlotCalculateAllSeriesData([
-                [{
-                    info: null,
-                    uid: null,
-                    value: -100
-                }],
-                [{
-                    info: null,
-                    uid: null,
-                    value: -100
-                }],
-                [{
-                    info: null,
-                    uid: null,
-                    value: -100
-                }],
-                [{
-                    info: null,
-                    uid: null,
-                    value: -100
-                }],
-                [{
-                    info: null,
-                    uid: null,
-                    value: -100
-                }],
-                [{
-                    info: null,
-                    uid: null,
-                    value: -100
-                }],
-                [{
-                    info: null,
-                    uid: null,
-                    value: -100
-                }],
-                [{
-                    info: null,
-                    uid: null,
-                    value: -100
-                }]
+{% for group, allCriteria in rubrics.allRubrics %}
+{% for currentCriterion in allCriteria %}
+[
+{# Highcharts won't render without at least one data point #}
+{% if currentCriterion.allValues|length == 0 %}
+    {
+        info: null,
+        uid: null,
+        value: -100
+    }
+{% endif %}
+{% for currentValue in currentCriterion.allValues %}
+    {
+        info: "{{ currentValue.user }}",
+        uid: '{{ currentValue.user }}',
+        value: {% if currentValue.value %}{{ currentValue.value }}{% else %}null{% endif %}
+
+    }{% if not loop.last %},
+{% endif %}
+{% endfor %}
+
+]{% if not loop.last %},
+{% endif %}
+
+{% endfor %}{% if not loop.last %},
+{% endif %}
+{% endfor %}
             ])
         });
     });
 </script>
+
+<pre>
+</pre>
+
 
 <h1>{{ metadata.pageTitle }}</h1>
 
