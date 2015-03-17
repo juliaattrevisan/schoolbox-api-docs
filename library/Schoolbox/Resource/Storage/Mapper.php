@@ -25,7 +25,7 @@ use Schoolbox\File\MimetypeMapper;
  * @method Model hydrate()
  * @method Model createModel()
  */
-class Mapper extends Schoolbox\Mapper
+class Mapper extends Schoolbox\Mapper implements Receiver
 {
 
     /** @var Manager */
@@ -84,8 +84,8 @@ class Mapper extends Schoolbox\Mapper
 
 
     /**
-     * @param $hash
-     * @return object
+     * @param string $hash
+     * @return Model
      */
     public function findByHash($hash)
     {
