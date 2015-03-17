@@ -30,6 +30,6 @@ interface FetcherInterface {
      * @throws OutOfBoundsException
      * @return string
      */
-    function fetchToFile($fileId);
+    public function fetchToFile($fileId);
 
 } 
