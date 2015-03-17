@@ -1,8 +1,8 @@
 <?php
 
 use Schoolbox\Resource\Attachment\GenericZone;
-use \Schoolbox\Resource\FileMapper;
-use \Schoolbox\Resource\CategoryMapper;
+use \Schoolbox\Resource\File\Mapper as FileMapper;
+use \Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 
 
 $groupHandler = new Group;
@@ -20,7 +20,7 @@ if(is_numeric($this->arg[0])) {
 	/* Modify existing file */
     try {
         $file   = FileMapper::getInstance()->findById($this->arg[0]);
-        $folder = CategoryMapper::getInstance()->findById($file->getFolder()->getId());
+        $folder = $file->getFolder();
     }
     catch (Exception $e) {
 		error(41);
@@ -44,11 +44,11 @@ if(is_numeric($this->arg[0])) {
 		'ACTION' => 'Modify',
         'ACTION_DESC' => 'replace the existing file',
 		'FILE_ID' => $file->getId(),
-		'DESCRIPTION' => Scrub::text($file->getDescription()),
-		'COMMENT' => Scrub::text($file->getComment()),
-		'HIDDEN_SELECTED' => $file->getHidden() > 0 ? 'checked="checked"' : '',
+		'DESCRIPTION' => Scrub::text($file->getTitle()),
+		'COMMENT' => Scrub::text($file->getDescription()),
+		'HIDDEN_SELECTED' => $file->isHidden() ? 'checked="checked"' : '',
 		'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
-		'CATEGORY_ID' => $file->getFolder()->getId(),
+		'CATEGORY_ID' => $folder->getId(),
 		'CATEGORY_NAME' => Scrub::text($folder->getName()),
 		'DUE_DAY' => '',
 		'DUE_MONTH' => '',
