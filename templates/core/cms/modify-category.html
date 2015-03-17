@@ -1,4 +1,6 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript">
 $(function() {
 
@@ -24,6 +26,25 @@ $(function() {
   }, "Please select write access for this group.");
 
 
+    var options = {
+        ajax: {
+            url:      '/curriculum/node/search.json',
+            type:     'GET',
+            data:     {},
+            dataType: 'json'
+        },
+        multiple: true,
+        selectize: {
+            plugins: ['remove_button', 'restore_on_backspace'],
+            create: function(input) {
+                var freeEntry = {};
+                freeEntry[this.settings.valueField]  = input;
+                freeEntry[this.settings.searchField] = input;
+                return freeEntry;
+            }
+        }
+    }
+    $('#curriculum-codes').selectizeSelector($.extend({}, options, {value: {REPLYTO}}))
 
 
 });
@@ -114,9 +135,10 @@ $(function() {
 		<!-- END synergy_input -->
         <tr>
             <td><h4>Curriculum Codes</h4>
-                <em>If you want to associate curriculum codes with this folder, enter them here.</em></td>
+                <em>If you want to associate curriculum codes with this folder, enter them here.
+                    You may enter multiple curriculum codes by separating them with a comma.</em></td>
             <td>
-                <textarea name="code">{CURRICULUM_CODE_LIST}</textarea>
+                <textarea id="curriculum-codes" name="curriculumCodes">{CURRICULUM_CODE_LIST}</textarea>
                 <a href="#"
                    class="btn inline-block"
                 ><span></span>Search for codes</a>
