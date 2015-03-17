@@ -36,9 +36,12 @@ class TimetableNotifier extends WorkNotifier {
      * @param LoggerInterface $log
      * @param IClock          $clock
      */
-    public function __construct($configLoader = null, $log = null, $clock = null)
+    public function __construct($configLoader = null, $log = null, IClock $clock = null)
     {
         parent::__construct($configLoader, $log);
+        if ($clock instanceof IClock) {
+            $this->clock = $clock;
+        }
     }
 
 
