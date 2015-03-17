@@ -13,6 +13,7 @@ use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Resource;
+use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\UserMapper;
 
 /**
@@ -23,7 +24,7 @@ use Schoolbox\UserMapper;
  * @method Model findById($id)
  * @method Model createModel()
  */
-class Mapper extends \Schoolbox\Mapper
+class Mapper extends \Schoolbox\Mapper implements ILocator, IFileMapper
 {
     /**
      * @var Resource\Storage\Mapper
@@ -162,11 +163,21 @@ class Mapper extends \Schoolbox\Mapper
      * Return the files contained within the folder with the given ID
      *
      * @param int $nodeId
-     * @return Collection|IFile[]
+     * @return Collection|Model[]
      */
     public function findByFolderId($nodeId)
     {
         return $this->findByColumn('category', $nodeId);
     }
 
-} 
+
+    /**
+     * @param Storage $storage
+     * @return IFile
+     */
+    public function wrap(Storage $storage)
+    {
+        return $this->createModel()->setStorage($storage);
+    }
+
+}
