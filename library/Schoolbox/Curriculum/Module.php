@@ -36,7 +36,7 @@ class Module extends BaseModule
     {
         $router->attachResource('curriculum', $basePath);
         $router->attachResourcePostAlias('curriculum', $basePath);
-//        $router->addGet('curriculum.browse', $basePath . '/');
+        $router->addGet('curriculum.search', $basePath . '/search');
 //        // Attach standard REST routes
 //        $router->attachResource('tile', $basePath);
 //        $router->attachResourcePostAlias('tile', $basePath);

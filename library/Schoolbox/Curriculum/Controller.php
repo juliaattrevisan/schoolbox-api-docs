@@ -58,6 +58,20 @@ class Controller extends Base
     }
 
     /**
+     * JSON search for curriculum nodes
+     */
+    public function search()
+    {
+        $search = trim($this->getRequest()->query['query']);
+        $this->getResponse()->content->set(
+            array(
+                'format' => 'json',
+                'data'   => $this->getNodeMapper()->search($search),
+            )
+        );
+    }
+
+    /**
      * Gets a list of LearningArea\Model or LearningLevel\Model objects as a
      * list, grouped by source.
      *
