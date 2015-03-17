@@ -27,6 +27,7 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
     $this->setBlock('student_list', 'medical', 'medical_block');
     $this->setBlock('student_list', 'special', 'special_block');
     $this->setBlock('student_list', 'eportfolio', 'eportfolio_block');
+    $this->setBlock('student_list', 'pastoral_care', 'pastoral_care_block');
 
     $this->setBlock('student_list', 'name_with_link', 'name_with_link_block');
     $this->setBlock('student_list', 'name_without_link', 'name_without_link_block');
@@ -113,6 +114,15 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
                 'SELECT' => $user->getEmail() ? sprintf('<input id="c%s" name="c%s" type="checkbox" value="%s"/>', $j, $j, $emailaddr) : '',
             ));
 
+            // Show pastoral care link to Synergetic
+            if($groupHandler->isStaff() && Config::get('external_type') == 'synergetic' && Config::get('external_staff_portal') ) {
+                $this->setVar('SYNWEB_URL', Config::get('external_staff_portal'));
+                $this->parse('pastoral_care_block', 'pastoral_care');
+            }
+            else {
+                $this->setVar('pastoral_care_block', '');
+            }
+
             $this->setVar(array(
                 'select_student_block' => '',
                 'select_student_below_block' => '',
@@ -129,17 +139,13 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
             if (!empty($student['StudentMedicalAlert']) && Cfg::get('protect_medicalspecial') == 0) {
                 $this->parse('medical_block', 'medical');
             } else {
-                $this->setVar(array(
-                    'medical_block' => ''
-                ));
+                $this->setVar('medical_block', '');
             }
 
             if (!empty($student['StudentSpecialNeedsFlag']) && Cfg::get('protect_medicalspecial') == 0) {
                 $this->parse('special_block', 'special');
             } else {
-                $this->setVar(array(
-                    'special_block' => ''
-                ));
+                $this->setVar('special_block', '');
             }
 
             /* If the user has an enabled eportfolio, enable link
