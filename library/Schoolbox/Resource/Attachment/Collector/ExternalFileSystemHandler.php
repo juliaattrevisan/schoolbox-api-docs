@@ -12,9 +12,8 @@ namespace Schoolbox\Resource\Attachment\Collector;
 
 use Alaress\File\Remote\FetcherInterface;
 use Schoolbox\FileInterface;
-use Schoolbox\Resource\FileLocatorInterface;
+use Schoolbox\Resource\File;
 use Schoolbox\Resource;
-use Schoolbox\StorageMapperInterface;
 
 class ExternalFileSystemHandler extends FileSystemHandler {
 
@@ -23,14 +22,14 @@ class ExternalFileSystemHandler extends FileSystemHandler {
 
 
     /**
-     * @param string                 $prefix
-     * @param FetcherInterface       $fetcher
-     * @param FileLocatorInterface   $locator
-     * @param StorageMapperInterface $storage
+     * @param string           $prefix
+     * @param FetcherInterface $fetcher
+     * @param File\ILocator    $locator
+     * @param File\IFileMapper $receiver
      */
-    public function __construct($prefix, FetcherInterface $fetcher, FileLocatorInterface $locator, StorageMapperInterface $storage)
+    public function __construct($prefix, FetcherInterface $fetcher, File\ILocator $locator, File\IFileMapper $receiver)
     {
-        parent::__construct($prefix, null, $locator, $storage);
+        parent::__construct($prefix, null, $locator, $receiver);
         $this->fetcher = $fetcher;
     }
 
@@ -46,16 +45,16 @@ class ExternalFileSystemHandler extends FileSystemHandler {
     {
         $file = $this->locator->findById($id);
 
-        if (!$file instanceof FileInterface) {
+        if (!$file instanceof File\IFile) {
             throw new Resource\Exception("Invalid type: resource is folder, not file", Resource\Exception::CODE_UNKNOWN);
         }
 
         $tempFilename = $this->fetcher->fetchToFile($file->getId());
         $filename     = $file->getFilename();
-        $owner        = $file->getOwner()->getId();
 
-        return $this->storage->upload($filename, $tempFilename, $owner);
+        $storage = $this->receiver->getStorageMapper()->accept($filename, $tempFilename, false);
 
+        return $this->receiver->wrap($storage);
     }
 
 }

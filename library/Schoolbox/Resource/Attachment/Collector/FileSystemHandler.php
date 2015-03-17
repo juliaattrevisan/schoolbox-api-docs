@@ -9,61 +9,53 @@
 
 namespace Schoolbox\Resource\Attachment\Collector;
 
-use Schoolbox\FileInterface;
 use Schoolbox\Resource;
-use Schoolbox\Resource\FileLocatorInterface;
-use Schoolbox\StorageMapperInterface;
+use Schoolbox\Resource\File;
 
-class FileSystemHandler implements TypeHandlerInterface {
+class FileSystemHandler implements TypeHandlerInterface
+{
 
     /** @var string */
     protected $prefix;
 
-    /** @var FileLocatorInterface */
+    /** @var  */
     protected $locator;
 
-    /** @var StorageMapperInterface */
-    protected $storage;
+    /** @var File\IFileMapper */
+    protected $receiver;
 
     /** @var string */
     protected $dir;
 
+
     /**
-     * @param string                 $prefix
-     * @param string                 $dir
-     * @param FileLocatorInterface   $locator
-     * @param StorageMapperInterface $storage
+     * @param string           $prefix
+     * @param string           $dir
+     * @param File\ILocator    $locator
+     * @param File\IFileMapper $receiver
      */
-    public function __construct($prefix, $dir, FileLocatorInterface $locator, StorageMapperInterface $storage)
+    public function __construct($prefix, $dir, File\ILocator $locator, File\IFileMapper $receiver)
     {
         $this->prefix  = $prefix . '.';
         $this->dir     = $dir;
         $this->locator = $locator;
-        $this->storage = $storage;
+        $this->receiver = $receiver;
     }
 
 
     /**
-     * TODO for now, we are simply copying resources from SBFS to Storage. Upgrade by intelligently linking through to storage
-     *
      * @param string $id
-     * @throws \Schoolbox\Resource\Exception
-     * @return FileInterface
+     * @throws Resource\Exception
+     * @return File\IFile
      */
     public function fetch($id)
     {
-        $file = $this->locator->findById($id);
-
-        $pattern  = $this->dir . '/%d.dat';
-        $filename = $file->getFilename();
-        $location = sprintf($pattern, $file->getId());
-        $owner    = $file->getOwner()->getId();
-
-        try {
-            return $this->storage->upload($filename, $location, $owner);
-        } catch (\PDOException $e) {
-            throw new Resource\Exception("Could not copy file", Resource\Exception::CODE_COPY_TO_STORAGE_FAILED, $e);
+        // if receiver and locator are the same, just return a findById()
+        if ($this->receiver instanceof $this->locator) {
+            return $this->locator->findById($id);
         }
+        // get the storage object from the nominated file, and wrap that in the target class
+        return $this->receiver->wrap($this->locator->findById($id)->getStorage());
     }
 
 }
