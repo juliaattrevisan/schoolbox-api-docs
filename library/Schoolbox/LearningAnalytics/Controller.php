@@ -93,6 +93,32 @@ class Controller extends Base {
          */
         $stackedUnitProgress = new AllUnitProgress($registry);
 
+        /**
+         * Rubrics
+         */
+        $rubricHandler = new \DueWork_Rubric_Handler();
+
+        /* A list of all the criteria for this folder
+         */
+        $allCriteria = $rubricHandler->getAvailableCriteria($metadata->getSelectedFolder());
+
+        /* All the students' values
+         */
+        $allRubrics = array();
+
+        foreach($registry->getAllStudentRegistry() as $unitId => $allStudents) {
+            foreach ($allStudents as $currentStudent) {
+                $allMarks = $rubricHandler->getStudentMarksByCriteriaInCategory($currentStudent->getId(), $metadata->getSelectedFolder());
+
+                foreach($allMarks as $criterionId => $currentMark) {
+                    $allRubrics[$criterionId][] = array(
+                        'user' => $currentStudent->getId(),
+                        'value' => $currentMark,
+                    );
+                }
+            }
+        }
+
         /* Twig data
          */
         $this->getResponse()->content->set(
@@ -118,6 +144,9 @@ class Controller extends Base {
                     'progress' => array(
                         'allUnits' => $stackedUnitProgress->getStackedUnitProgress(),
                     ),
+                    'rubrics' => array(
+                        'allCriteria' => $allCriteria,
+                    )
                 )
             )
         );
