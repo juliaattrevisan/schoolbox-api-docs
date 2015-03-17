@@ -55,18 +55,9 @@ class ResolutionManager {
      * @throws \OutOfBoundsException
      * @return int
      */
-	public function detachTrigger($trigger) {
-		// see if this trigger is referenced
-        if (!array_key_exists($trigger->getHash(), $this->resolversIndexedByTriggerHash)) {
-            throw new OutOfBoundsException("Given trigger is not attached to any resolver");
-        }
-
-        // we know this trigger existed once, but its resolver has already been acknowledged
-        if (is_null($this->resolversIndexedByTriggerHash[$trigger->getHash()])) {
-            throw new OutOfBoundsException("Resolver for this trigger has already been acknowledged");
-        }
-
-        $resolver = $this->resolversIndexedByTriggerHash[$trigger->getHash()];
+    public function detachTrigger($trigger)
+    {
+        $resolver = $this->getResolverByTrigger($trigger);
 
         /** @var SplObjectStorage|TriggerInterface[] $triggers */
         $triggers = $this->resolvers->offsetGet($resolver);
@@ -93,7 +84,7 @@ class ResolutionManager {
         }
 
         return $this->getTriggerCount($resolver);
-	}
+    }
 
 	/**
 	 * Gets the data for the given resolver, implicitly attaching it first if necessary
@@ -129,6 +120,26 @@ class ResolutionManager {
 		}
 		return -1;
 	}
+
+
+    /**
+     * @param TriggerInterface $trigger
+     * @return AckResolver
+     */
+    public function getResolverByTrigger($trigger)
+    {
+        // see if this trigger is referenced
+        if (!array_key_exists($trigger->getHash(), $this->resolversIndexedByTriggerHash)) {
+            throw new OutOfBoundsException("Given trigger is not attached to any resolver");
+        }
+
+        // we know this trigger existed once, but its resolver has already been acknowledged
+        if (is_null($this->resolversIndexedByTriggerHash[$trigger->getHash()])) {
+            throw new OutOfBoundsException("Resolver for this trigger has already been acknowledged");
+        }
+
+        return $this->resolversIndexedByTriggerHash[$trigger->getHash()];
+    }
 
 
     /**
