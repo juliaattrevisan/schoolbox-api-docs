@@ -10,6 +10,7 @@
 namespace Schoolbox\Resource\File;
 
 
+use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
 
 interface IFile
@@ -43,5 +44,10 @@ interface IFile
      * @return User
      */
     public function getOwner();
+
+    /**
+     * @return Storage
+     */
+    public function getStorage();
 
 } 
