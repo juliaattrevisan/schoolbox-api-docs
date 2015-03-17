@@ -127,6 +127,80 @@
 
             ]
         });
+
+        /**
+         *  Boxplots for Rubrics
+         */
+        $.fn.boxPlotRender({
+            element: '[data-graph=rubrics]',
+
+            /* Title of the graph
+             */
+            title: '',
+
+            /* Orientation of the box plots
+             */
+            orientation: 'horizontal',
+
+            /* A list of all the assessment names that are being graphed
+             * These correspond to a series of data and their respective
+             * five-point summaries
+             */
+            allAssessments: [
+{% for group, currentCriterion in rubrics.allCriteria %}
+{% for criterionId,criterionData in currentCriterion %}
+"{{ group }}: {{ criterionData.name }}"{% if not loop.last %},{% endif %}
+{% endfor %}
+{% if not loop.last %},{% endif %}
+{% endfor %}
+
+            ],
+
+            /* All the raw data
+             */
+            allData: $.fn.boxPlotCalculateAllSeriesData([
+                [{
+                    info: null,
+                    uid: null,
+                    value: -100
+                }],
+                [{
+                    info: null,
+                    uid: null,
+                    value: -100
+                }],
+                [{
+                    info: null,
+                    uid: null,
+                    value: -100
+                }],
+                [{
+                    info: null,
+                    uid: null,
+                    value: -100
+                }],
+                [{
+                    info: null,
+                    uid: null,
+                    value: -100
+                }],
+                [{
+                    info: null,
+                    uid: null,
+                    value: -100
+                }],
+                [{
+                    info: null,
+                    uid: null,
+                    value: -100
+                }],
+                [{
+                    info: null,
+                    uid: null,
+                    value: -100
+                }]
+            ])
+        });
     });
 </script>
 
@@ -194,3 +268,6 @@
 
 <h2>Unit Progress</h2>
 <div data-graph='unit-progress' class='learning-analytics unit-progress' style="height:{{ ((progress.allUnits|length)*50)+50 }}px"></div>
+
+<h2>Rubrics</h2>
+<div data-graph="rubrics" class='learning-analytics boxplots'></div>
