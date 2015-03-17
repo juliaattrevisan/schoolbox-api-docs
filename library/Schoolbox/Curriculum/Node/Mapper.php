@@ -183,8 +183,17 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         $sortDirection = 'DESC'
     ) {
         $query = "
-            SELECT {$this->getColumnString('n')}
+            SELECT
+                {$this->getColumnString('n')},
+                {$this->getJoinColumnString('level', 'nl')},
+                {$this->getJoinColumnString('level.source', 'nls')},
+                {$this->getJoinColumnString('area', 'na')},
+                {$this->getJoinColumnString('area.source', 'nas')}
             FROM {$this->getTable()} n
+            INNER JOIN {$this->getJoinSql('level', 'n', 'nl')}
+            INNER JOIN {$this->getJoinSql('level.source', 'nl', 'nls')}
+            INNER JOIN {$this->getJoinSql('area', 'n', 'na')}
+            INNER JOIN {$this->getJoinSql('area.source', 'na', 'nas')}
             WHERE n.code LIKE :codeLike
             OR (n.code != '' AND n.name LIKE :nameLike)
         ";
@@ -196,6 +205,26 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
                 'nameLike' => '%' . $quotedLike . '%',
             )
         );
-        return $this->hydrateList($statement, 'n');
+        return $this->hydrateList(
+            $statement,
+            'n',
+            function ($mapper, $model, $row) {
+                /** @var self $mapper */
+                /** @var Model $model */
+                $model
+                    ->setLearningArea($mapper->hydrateJoin($row, 'area', 'na'))
+                    ->setLearningLevel($mapper->hydrateJoin($row, 'level', 'nl'))
+                ;
+                $model->getLearningArea()
+                    ->setSource(
+                        $mapper->hydrateJoin($row, 'area.source', 'nas')
+                    );
+                $model->getLearningLevel()
+                    ->setSource(
+                        $mapper->hydrateJoin($row, 'level.source', 'nls')
+                    );
+                return $model;
+            }
+        );
     }
 }
