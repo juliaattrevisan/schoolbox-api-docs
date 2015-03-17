@@ -16,7 +16,7 @@ use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Redis;
 use Alaress\Session\Factory;
 use Alaress\Web\Router\RouterFactory;
-use Alaress_Date_Locale_Australian;
+use Alaress_Date_Locale_Config;
 use Aura\Di;
 use Autoloader;
 use Config;
@@ -333,7 +333,7 @@ class Bootstrap implements BootstrapInterface {
 					// Global access to config object and a date locale object
 					$twig->addGlobal('config', $config);
 					$twig->addGlobal('locale', array(
-						'date' => new Alaress_Date_Locale_Australian()
+						'date' => new Alaress_Date_Locale_Config()
 					));
 
 					// Add the route lookup and authorization methods

@@ -87,42 +87,6 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
 	}
 
 	/**
-	 * Get a database format
-	 *
-	 * @return
-	 */
-	public function databaseFormat() {
-		return $this->database;
-	}
-
-	/**
-	 * Get a database date format
-	 *
-	 * @return mixed
-	 */
-	public function databaseDateFormat() {
-		return $this->databaseDate;
-	}
-
-	/**
-	 * Get a database time format
-	 *
-	 * @return
-	 */
-	public function databaseTimeFormat() {
-		return $this->databaseTime;
-	}
-
-	/**
-	 * Get the timestamp format
-	 *
-	 * @return
-	 */
-	public function timestampFormat() {
-		return $this->timestamp;
-	}
-
-	/**
 	 * Get the calendar date format
 	 *
 	 * @return mixed

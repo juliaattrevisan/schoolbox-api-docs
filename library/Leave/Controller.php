@@ -968,11 +968,11 @@ class Leave_Controller extends Controller
                     $rowData[] = $request->getUser()->getId();
                     $rowData[] = $request->getUser()->formatName();
                     $rowData[] = $request->getUser()->getYear();
-                    $rowData[] = $request->getStart()->getAustralian();
-                    $rowData[] = $request->getFinish()->getAustralian();
+                    $rowData[] = $request->getStart()->getLocal();
+                    $rowData[] = $request->getFinish()->getLocal();
                     $rowData[] = $request->getHostType()->getName();
                     $rowData[] = $request->getStatus(true);
-                    $rowData[] = $request->getAuthorisationDatetime(true)->getAustralian();
+                    $rowData[] = $request->getAuthorisationDatetime(true)->getLocal();
                     $rowData[] = $request->getAuthorisationUser()->formatName();
 
                     $allRows[] = TextFormatter::outputCSV($rowData);

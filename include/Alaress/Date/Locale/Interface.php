@@ -16,10 +16,6 @@ interface Alaress_Date_Locale_Interface {
 	public function shortFormat();
 	public function dateOnlyFormat();
 	public function timeOnlyFormat();
-	public function databaseFormat();
-	public function databaseDateFormat();
-	public function databaseTimeFormat();
-	public function timestampFormat();
 
 	public function localFormat();
 	public function longDateOnlyFormat();

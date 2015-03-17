@@ -33,6 +33,11 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     protected $warnings = array();
 
+    const DATABASE_FORMAT = 'Y-m-d H:i:s';
+    const DATABASE_DATE_FORMAT = 'Y-m-d';
+    const DATABASE_TIME_FORMAT = 'H:i:s';
+    const TIMESTAMP = 'U';
+
     /**
      * Returns an instance of self at the current time.
      * Method gives precedence to REQUEST_TIME, but accepts that outside HTTP requests, it doesn't exist.
@@ -61,14 +66,25 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      * @param string $dateFormat
      * @param DateTimeZone $timezone The timezone of the date, or null to use default
      */
-    public function __construct($dateTime = null, $dateFormat = null, DateTimeZone $timezone = null)
+    public function __construct($dateTime = null, $dateFormat = null, DateTimeZone $timezone = null, $locale = null)
     {
+
         if (!($timezone instanceof DateTimeZone)) {
             $timezone = new DateTimeZone(date_default_timezone_get());
         }
+
+        if($locale instanceof Alaress_Date_Locale_Interface) {
+            $this->setLocale($locale);
+        }
+        else {
+            $this->setLocale(new Alaress_Date_Locale_Config());
+        }
+
+
+
         $this->setTimezone($timezone);
         $this->setFromFormat($dateTime, $dateFormat);
-        $this->setLocale(new Alaress_Date_Locale_Australian());
+
     }
 
     /**
@@ -176,6 +192,18 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
+     * Get Locale configuration object
+     *
+     * @param  Alaress_Date_Locale_Interface $val
+     * @return void
+     */
+    public function getLocale($val)
+    {
+        return $this->locale;
+    }
+
+
+    /**
      * @param $year
      * @return $this
      */
@@ -237,12 +265,12 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
 
 
     /**
-     * @param $timezone
+     * @param DateTimeZone $timezone
      * @return $this
      */
     public function setTimezone($timezone)
     {
-        $this->getDateTimeObject()->setTimezone($timezone);
+        $this->timezone = $timezone;
         return $this;
     }
 
@@ -634,23 +662,13 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
-     * Transform the datetime into an Australianised version
-     *
-     * @return string
-     */
-    public function getAustralian()
-    {
-        return $this->getLocal();
-    }
-
-    /**
      * Use long format
      *
      * @return string
      */
     public function getLong()
     {
-        return $this->getUsingFormat($this->getLocale()->longFormat());
+        return $this->getUsingFormat('l F jS Y g:ia');
     }
 
     /**
@@ -701,7 +719,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function getDatabase()
     {
-        return $this->getUsingFormat($this->getLocale()->databaseFormat());
+        return $this->getUsingFormat(self::DATABASE_FORMAT);
     }
 
     /**
@@ -711,7 +729,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function getDatabaseDate()
     {
-        return $this->getUsingFormat($this->getLocale()->databaseDateFormat());
+        return $this->getUsingFormat(self::DATABASE_DATE_FORMAT);
     }
 
     /**
@@ -721,7 +739,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function getDatabaseTime()
     {
-        return $this->getUsingFormat($this->getLocale()->databaseTimeFormat());
+        return $this->getUsingFormat(self::DATABASE_TIME_FORMAT);
     }
 
     /**
@@ -731,7 +749,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function getUnixTimeStamp()
     {
-        return $this->getUsingFormat($this->getLocale()->timestampFormat());
+        return $this->getUsingFormat(self::TIMESTAMP);
     }
 
     /**
@@ -751,7 +769,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function getCalendarDate()
     {
-        return $this->getUsingFormat($this->getLocale()->calendarDate());
+        return $this->getUsingFormat($this->getLocale()->getCalendarDate());
     }
 
     /**
@@ -761,7 +779,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function getCalendarDateTime()
     {
-        return $this->getUsingFormat($this->getLocale()->calendarDateTime());
+        return $this->getUsingFormat($this->getLocale()->getCalendarDateTime());
     }
 
     /**
@@ -784,6 +802,17 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     {
         return $this->datetime;
     }
+
+    /**
+     * Gets datetime object out of this wrapper
+     *
+     * @param LaravelDate $dateObject
+     */
+    public function setDateTimeObject($dateObject)
+    {
+        $this->datetime = $dateObject;
+    }
+
 
     /**
      * Returns whether this date is valid
