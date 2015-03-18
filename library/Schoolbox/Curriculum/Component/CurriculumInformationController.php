@@ -1,6 +1,6 @@
 <?php
 /**
- * Tile component for dashboard
+ * Curriculum information component
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
@@ -10,22 +10,33 @@
 namespace Schoolbox\Curriculum\Component;
 
 use Component_Homepage_ControllerAbstract;
-
-//use Component_Instance;
-//use Group as GroupHandler;
-//use Schoolbox\Mapper\Exception as MapperException;
-//use Schoolbox\User;
-//use SitePage;
+use Schoolbox\Curriculum\Node;
+use Schoolbox\Resource\Folder;
 
 class CurriculumInformationController extends Component_Homepage_ControllerAbstract
 {
     /**
-     * Loads the grid component into its set configuration.
+     * The curriculum to display.
+     *
+     * @var Node\Model
+     */
+    protected $curriculumNode = null;
+
+    /**
+     * Loads the component's configuration.
      *
      * @return true
      */
     public function execute()
     {
+        // Show first curriculum for now
+        /** @var Folder\Model $context */
+        $context = $this->getContext();
+        if ($context->getCurriculumNodes()->count()) {
+            $this->curriculumNode = $context->getCurriculumNodes()->first();
+        } elseif (!$this->hasReadAccess()) {
+            return false;
+        }
         return true;
     }
 
@@ -42,4 +53,11 @@ class CurriculumInformationController extends Component_Homepage_ControllerAbstr
         );
     }
 
+    /**
+     * @return Node\Model
+     */
+    public function getCurriculumNode()
+    {
+        return $this->curriculumNode;
+    }
 }

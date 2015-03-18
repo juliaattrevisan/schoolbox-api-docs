@@ -1,3 +1,9 @@
 <div class="box clearfix">
-    {# this is a component #}
+    {% set node = component.getCurriculumNode() %}
+    {% if node %}
+        <h3>{{ node.name }} [{{ node.code }}]</h3>
+        {% if node.description %}
+            {{ node.description|purify }}
+        {% endif %}
+    {% endif %}
 </div>
