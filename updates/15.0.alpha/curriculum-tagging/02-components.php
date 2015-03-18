@@ -22,6 +22,11 @@ $component = array(
             'default_value' => 'Curriculum Information',
             'label'         => 'Heading',
         ),
+        // Select a curriculum code from the ones on the page.
+        'curriculumCode' => array(
+            'default_value' => '',
+            'label'         => 'Curriculum Code',
+        ),
     )
 );
 
