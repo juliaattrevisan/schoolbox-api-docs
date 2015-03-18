@@ -621,4 +621,34 @@ abstract class Component_ControllerAbstract
         $this->maximumPermission = $maximumPermission;
         return $this;
     }
+
+    /**
+     * Checks if the user's permission on this component is at least read level.
+     *
+     * @return bool
+     */
+    public function hasReadAccess()
+    {
+        return $this->permission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_READ;
+    }
+
+    /**
+     * Checks if the user's permission on this component is at least write level.
+     *
+     * @return bool
+     */
+    public function hasWriteAccess()
+    {
+        return $this->permission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE;
+    }
+
+    /**
+     * Checks if the user's permission on this component is admin level.
+     *
+     * @return bool
+     */
+    public function hasFullAccess()
+    {
+        return $this->permission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL;
+    }
 }
