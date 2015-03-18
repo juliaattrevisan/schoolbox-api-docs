@@ -176,6 +176,7 @@
             <!-- END campus_row -->
             <div class="form-advanced" {SHOW_ADVANCED}>
                 <div {OPAC_ADVANCED}>
+                    <hr>
                     <h2>
                         Add users
                         <span class="header-actions">
@@ -189,6 +190,7 @@
             </div>
             <div class="form-advanced" {SHOW_ADVANCED}>
                 <div {OPAC_ADVANCED}>
+                    <hr>
                     <h2>
                         Publish Date
                         <span class="header-actions">
@@ -197,7 +199,7 @@
                     </h2>
                 </div>
                 <div {OPAC_ADVANCED}>
-                <input type="text" class="required" name="item_datetime_published" id="item_datetime_published" size="12" maxlength="50" value="{ITEM_DATETIME_PUBLISHED}"/>
+                    <input type="text" class="required" name="item_datetime_published" id="item_datetime_published" size="12" maxlength="50" value="{ITEM_DATETIME_PUBLISHED}"/>
                 </div>
             </div>
             
@@ -208,11 +210,12 @@
                     <span data-tooltip="exp-date" class="has-tip tip-left secondary label icon-help no-text" data-width="250" title="Select a date for when this item will expire."></span>
                 </span>
             </h2>
-            <input type="text" class="required" name="item_datetime_expires" id="item_datetime_expires" size="12"
-                   maxlength="50" value="{ITEM_DATETIME_EXPIRES}"/>
-            <input class="submit-btn-plain" type="submit" name="submit" value="{ACTION} News"/>
+            <input type="text" class="required" name="item_datetime_expires" id="item_datetime_expires" size="12" maxlength="50" value="{ITEM_DATETIME_EXPIRES}"/>
+
+            <hr>
+            <input class="button success" type="submit" name="submit" value="{ACTION} News"/>
             <!-- BEGIN delete_button -->
-            <input type="button" name="delete" value="Delete News" class="submit-btn-plain" onclick="confirmDelete({NEWS_ID});"/>
+            <input class="button alert" type="button" name="delete" value="Delete News" onclick="confirmDelete({NEWS_ID});"/>
             <!-- END delete_button -->
         </form>
     </div>
