@@ -42,7 +42,6 @@ if ($_POST['name']) {
             error(6);
         }
         $model->setId($_POST['categoryID']);
-        $model->setId($_POST['categoryID']);
     } elseif ($groupHandler->getPermission($_POST['parent']) < WRITE_ACCESS) {
         error(6);
     }
@@ -56,6 +55,27 @@ if ($_POST['name']) {
             CategoryCodeMapper::getInstance()->findByColumn('categoryID', $model->getId())
         );
     }
+
+    // Only privileged users (teachers?) get to change curriculum codes?
+    if (isset($_POST['curriculumCodes'])) {
+        $model->setCurriculumNodes(
+            Schoolbox\Curriculum\Node\Mapper::getInstance()
+                ->findByColumn('id', $_POST['curriculumCodes'])
+        );
+    } elseif ($model->getId()) {
+        $existingModel = $categoryMapper->findById($model);
+        $model->setCurriculumNodes($existingModel->getCurriculumNodes());
+    }
+    foreach (explode(',', $_POST['code']) as $code) {
+        $trimmedCode = trim($code);
+        if (strlen($trimmedCode)) {
+            $codeModel = new \Schoolbox\Resource\CategoryCode();
+            $codeModel->setCode($trimmedCode);
+            $codeCollection->add($codeModel);
+        }
+    }
+    $model->setCodes($codeCollection);
+
     $affectedIds = $categoryMapper->save($model);
 
     if ($affectedIds === false) {
