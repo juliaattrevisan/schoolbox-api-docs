@@ -1,9 +1,15 @@
 <div class="box clearfix">
-    {% set node = component.getCurriculumNode() %}
     {% if node %}
         <h3>{{ node.name }} [{{ node.code }}]</h3>
         {% if node.description %}
             {{ node.description|purify }}
         {% endif %}
+    {% else %}
+        No curriculum codes have been set for this folder.
+        You may set them in the
+        <a href="/cms/category/{{ context.id }}">
+            <span class="btn modify"></span> Modify Folder
+        </a>
+        screen.
     {% endif %}
 </div>
