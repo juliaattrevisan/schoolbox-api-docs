@@ -197,6 +197,12 @@ class Controller extends BaseController
     {
         $sessionUser = $this->getSession()->getAuthUser();
 
+        if ($folderId) {
+            $this->getSession()->set('resourcesID', $folderId);
+        } else {
+            $folderId = $this->getSession()->get('resourcesID', 0);
+        }
+
         $tree = new Resource\Folder\TreeBuilder(
             $this->folderMapper,
             $this->taskMapper,
