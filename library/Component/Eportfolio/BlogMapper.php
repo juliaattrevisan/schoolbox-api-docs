@@ -171,10 +171,11 @@ class BlogMapper extends Schoolbox\Mapper {
 	 */
 	public function findRecent($uid, $limit) {
 		$query = "
-            SELECT {$this->getColumnString()}
-            FROM `{$this->table}`
-            WHERE uid = :uid
-            ORDER BY created_at DESC
+            SELECT {$this->getColumnString('b')}
+            FROM `{$this->table}` `b`
+            INNER JOIN {$this->getJoinSql('page', 'b', 'p')}
+            WHERE b.uid = :uid
+            ORDER BY b.created_at DESC
             LIMIT :limit
 		";
 
@@ -187,6 +188,6 @@ class BlogMapper extends Schoolbox\Mapper {
 
 		$rowset = $statement->fetchAll();
 
-		return $this->hydrateList($rowset);
+		return $this->hydrateList($rowset, 'b');
 	}
 }
