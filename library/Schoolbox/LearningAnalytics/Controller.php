@@ -22,6 +22,7 @@ use Schoolbox\LearningAnalytics\Results\TaskResults;
 use Schoolbox\LearningAnalytics\Metadata\Base as Metadata;
 use Schoolbox\LearningAnalytics\Metadata\Course as MetadataCourse;
 use Schoolbox\LearningAnalytics\Metadata\Folder as MetadataFolder;
+use Schoolbox\LearningAnalytics\Rubrics\AllRubrics;
 
 class Controller extends Base {
 
@@ -96,80 +97,7 @@ class Controller extends Base {
         /**
          * Rubrics
          */
-        $rubricHandler = new \DueWork_Rubric_Handler();
-
-        /* A list of all the criteria for this folder
-         */
-        $allCriteria = $rubricHandler->getAvailableCriteria($metadata->getSelectedFolder()->getId());
-
-        /* All the students' values
-         */
-        $groupedMarks = array();
-
-        foreach($registry->getAllStudentRegistry() as $unitId => $allStudents) {
-            foreach ($allStudents as $currentStudent) {
-
-                /* Put folders in a collection for iteration
-
-                 * Oddly enough this method gets the students' marks for a
-                 * criterion spanning across the entire course, which is
-                 * nice and convenient
-                 */
-                foreach ($metadata->getAllAggregateFolders() as $currentFolder) {
-                    $allMarks = $rubricHandler->getStudentMarksByCriteriaInCategory($currentStudent->getId(), $currentFolder->getId());
-
-                    foreach($allMarks as $criterionId => $current) {
-                        $groupedMarks[$current['name']][] = array(
-                            'user' => $currentStudent->getId(),
-                            'value' => $current['value'],
-                        );
-                    }
-                }
-            }
-        }
-
-        /* Recombine and preserve criterion grouping
-         *
-         * You cannot aggregate criteria by their id, because when you
-         * spawn rubrics for multiple homepages, criteria get their db rows
-         * copied and pasted as entirely new records. They don't have any
-         * persistent relations to the parent rubric from which they
-         * were copied. That means you have to aggregate based on their
-         * name, rather than their id.
-         *
-         * There is no record of a decision being made about whether a
-         * rubric instance is the same as another:
-         *
-         * + based on their originating id, or
-         * + based on their name
-         *
-         * I suppose one could say that once you change a rubric criterion's
-         * name it becomes an entirely new criterion. But then again, that
-         * also captures changes that aren't substantial but purely cosmetic
-         * like punctuation and other slight changes like that. The names need
-         * to be exactly the same in order to aggregate.
-         */
-        $allRubrics = array();
-
-        foreach ($allCriteria as $criteriaGroup => $currentCriterion) {
-            foreach ($currentCriterion as $criterionId => $details) {
-                $reforged = $details;
-                $reforged['allValues'] = $groupedMarks[$reforged['name']];
-
-                /* Group by rubric name, not id
-                 */
-                if (isset($allRubrics[$criteriaGroup][$details['name']])) {
-                    $allRubrics[$criteriaGroup][$details['name']]['allValues'] = array_merge($allRubrics[$criteriaGroup][$details['name']], $reforged['allValues']);
-                }
-                else {
-                    $allRubrics[$criteriaGroup][$details['name']] = $reforged;
-                }
-            }
-
-            /* Sort in order of spawn
-             */
-            asort($allRubrics[$criteriaGroup]);
-        }
+        $allRubrics = new AllRubrics($metadata, $registry);
 
         /* Twig data
          */
@@ -197,7 +125,7 @@ class Controller extends Base {
                         'allUnits' => $stackedUnitProgress->getStackedUnitProgress(),
                     ),
                     'rubrics' => array(
-                        'allRubrics' => $allRubrics,
+                        'allRubrics' => $allRubrics->getAllRubrics(),
                     )
                 )
             )
