@@ -37,13 +37,13 @@ $button-font-weight: $font-weight-normal;
 // $button-border-width: 0px;
 // $button-border-style: solid;
 $button-bg-color: $primary-color;
-$button-bg-hover: tint($button-bg-color, 32%);
+$button-bg-hover: tint($button-bg-color, 20%);
 $button-border-color: transparent;
-$secondary-button-bg-hover: tint($secondary-color, 32%);
+$secondary-button-bg-hover: tint($secondary-color, 20%);
 $secondary-button-border-color: transparent;
-$success-button-bg-hover: tint($success-color, 32%);
+$success-button-bg-hover: tint($success-color, 20%);
 $success-button-border-color: transparent;
-$alert-button-bg-hover: tint($alert-color, 32%);
+$alert-button-bg-hover: tint($alert-color, 20%);
 $alert-button-border-color: transparent;
 
 // We use this to set the default radius used throughout the core.
