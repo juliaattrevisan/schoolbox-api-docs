@@ -14,6 +14,12 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Config;
+use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource;
+use Schoolbox\UserMapper;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 
@@ -51,6 +57,21 @@ class Module extends BaseModule
             'controller:resourceBrowser',
             $injector->lazyNew(Controller::class)
         );
+
+        $setters = [
+            'setFolderMapper'     => Resource\Folder\Mapper::class,
+            'setFileMapper'       => Resource\FileMapper::class,
+            'setUserMapper'       => UserMapper::class,
+            'setTaskMapper'       => TaskMapper::class,
+            'setUserAccessMapper' => UserAccessMapper::class,
+            'setRoleAccessMapper' => RoleAccessMapper::class,
+            'setConfig'           => Config\Loader::class
+        ];
+
+        foreach ($setters as $method => $class) {
+            $injector->setters[Controller::class][$method] = $injector->lazyNew($class);
+        }
+
     }
 
 } 

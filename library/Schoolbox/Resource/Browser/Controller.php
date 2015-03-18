@@ -37,9 +37,6 @@ class Controller extends BaseController
     /** @var UserMapper */
     protected $userMapper;
 
-    /** @var User */
-    protected $sessionUser;
-
     /** @var Config\Loader */
     protected $conf;
 
@@ -47,17 +44,83 @@ class Controller extends BaseController
     protected $taskMapper;
 
 
-    function __construct()
+    /**
+     * @param Config\Loader $conf
+     * @return self
+     */
+    public function setConfig($conf)
     {
-        // TODO inject deps
-        $this->folderMapper     = Resource\Folder\Mapper::getInstance();
-        $this->fileMapper       = Resource\FileMapper::getInstance();
-        $this->userAccessMapper = UserAccessMapper::getInstance();
-        $this->roleAccessMapper = RoleAccessMapper::getInstance();
-        $this->userMapper       = UserMapper::getInstance();
-        $this->conf             = new Config\Loader();
-        $this->taskMapper       = TaskMapper::getInstance();
+        $this->conf = $conf;
+        return $this;
     }
+
+
+    /**
+     * @param Resource\FileMapper $fileMapper
+     * @return self
+     */
+    public function setFileMapper($fileMapper)
+    {
+        $this->fileMapper = $fileMapper;
+        return $this;
+    }
+
+
+    /**
+     * @param Resource\Folder\Mapper $folderMapper
+     * @return self
+     */
+    public function setFolderMapper($folderMapper)
+    {
+        $this->folderMapper = $folderMapper;
+        return $this;
+    }
+
+
+    /**
+     * @param RoleAccessMapper $roleAccessMapper
+     * @return self
+     */
+    public function setRoleAccessMapper($roleAccessMapper)
+    {
+        $this->roleAccessMapper = $roleAccessMapper;
+        return $this;
+    }
+
+
+    /**
+     * @param TaskMapper $taskMapper
+     * @return self
+     */
+    public function setTaskMapper($taskMapper)
+    {
+        $this->taskMapper = $taskMapper;
+        return $this;
+    }
+
+
+    /**
+     * @param UserAccessMapper $userAccessMapper
+     * @return self
+     */
+    public function setUserAccessMapper($userAccessMapper)
+    {
+        $this->userAccessMapper = $userAccessMapper;
+        return $this;
+    }
+
+
+    /**
+     * @param UserMapper $userMapper
+     * @return self
+     */
+    public function setUserMapper($userMapper)
+    {
+        $this->userMapper = $userMapper;
+        return $this;
+    }
+
+
 
 
     /**
@@ -66,8 +129,7 @@ class Controller extends BaseController
      */
     protected function getFolderData($folderId)
     {
-        // TODO inject deps
-        $this->sessionUser = $_SESSION['user'];
+        $sessionUser = $this->getSession()->getAuthUser();
 
         try {
             $folder = $this->folderMapper->findById($folderId);
@@ -89,12 +151,19 @@ class Controller extends BaseController
 
         try {
             $access = $this->userAccessMapper
-                ->getAccess($this->sessionUser, $folderId)
+                ->getAccess($sessionUser, $folderId)
                 ->getAccessLevel();
 
         } catch (\Schoolbox\Mapper\Exception $e) {
-            // no accesseses found...you get nothin'
-            $access = null;
+            try {
+                $access = $this->roleAccessMapper
+                               ->getAccess($sessionUser, $folderId)
+                               ->getType();
+
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // no accesseses found...you get nothin'
+                $access = null;
+            }
         }
 
         if ($admins->count()) {
@@ -109,7 +178,7 @@ class Controller extends BaseController
             'admin'  => $admin,
             'roles'  => $roles,
             'access' => $access,
-            'user'   => $this->sessionUser,
+            'user'   => $sessionUser,
             'conf'   => $this->conf
         ];
 
@@ -126,15 +195,14 @@ class Controller extends BaseController
      */
     public function browse($folderId = 0)
     {
-        // TODO inject deps
-        $this->sessionUser = $_SESSION['user'];
+        $sessionUser = $this->getSession()->getAuthUser();
 
         $tree = new Resource\Folder\TreeBuilder(
             $this->folderMapper,
             $this->taskMapper,
             $this->userAccessMapper,
             $this->roleAccessMapper,
-            $this->sessionUser
+            $sessionUser
         );
 
         $data = $this->getFolderData($folderId);
@@ -192,9 +260,7 @@ class Controller extends BaseController
      */
     public function showFileInfo($fileId)
     {
-        // TODO inject deps
-        $this->sessionUser = $_SESSION['user'];
-
+        $sessionUser = $this->getSession()->getAuthUser();
 
         /** @var Resource\File $file */
         $file = $this->fileMapper->findById($fileId);
@@ -205,12 +271,18 @@ class Controller extends BaseController
 
         try {
             $data['access'] = $this->userAccessMapper
-                                   ->getAccess($this->sessionUser, $file->getFolder()->getId())
+                                   ->getAccess($sessionUser, $file->getFolder()->getId())
                                    ->getAccessLevel();
 
         } catch (\Schoolbox\Mapper\Exception $e) {
             // no accesseses found...you get nothin'
-            $data['access'] = UserAccess::ACCESS_DENY;
+            try {
+                $data['access'] = $this->roleAccessMapper
+                                       ->getAccess($sessionUser, $file->getFolder()->getId())
+                                       ->getType();
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $data['access'] = UserAccess::ACCESS_DENY;
+            }
         }
 
         $this->getResponse()->content->set([
