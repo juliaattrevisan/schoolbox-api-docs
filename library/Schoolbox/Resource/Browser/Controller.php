@@ -197,11 +197,16 @@ class Controller extends BaseController
     {
         $sessionUser = $this->getSession()->getAuthUser();
 
+        // if a folder ID was supplied, stash that in session then redirect
         if ($folderId) {
             $this->getSession()->set('resourcesID', $folderId);
-        } else {
-            $folderId = $this->getSession()->get('resourcesID', 0);
+
+            $this->getResponse()->redirect->to(
+                $this->getRouter()->generate('resourceBrowser.browse', array())
+            );
         }
+
+        $folderId = $this->getSession()->get('resourcesID', 0);
 
         $tree = new Resource\Folder\TreeBuilder(
             $this->folderMapper,
