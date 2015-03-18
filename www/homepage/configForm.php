@@ -1,5 +1,9 @@
 <?php
-require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
+// The kernel contains the dependency injection engine.
+// If you inject the dependency injection engine into Sitepage,
+// it can use Twig to generate component content.
+/** @var \Schoolbox\Application\WebRequest\Kernel $kernel */
+$kernel = require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
 $page         = new SitePage();
 $groupHandler = new Group(HOMEPAGE_SERVICE);
@@ -81,7 +85,9 @@ if (is_numeric($_REQUEST['cid'])) {
         }
 
         // get the Instance's Definition's Controller
-        $factory = new Component_Homepage_Factory(new \Schoolbox\User(), new SitePage(false));
+        $componentSitepage = new SitePage(false);
+        $componentSitepage->setDi($kernel->getDependencyInjector());
+        $factory = new Component_Homepage_Factory(new \Schoolbox\User(), $componentSitepage);
 
         // $component instanceof Component_ControllerAbstract
         $componentList = $componentInstanceMapper->findByInstanceId($instanceID);
