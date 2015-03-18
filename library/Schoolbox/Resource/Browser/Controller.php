@@ -146,25 +146,9 @@ class Controller extends BaseController
         $admins = $this->userAccessMapper->findAdminsInCategory($folder);
         $roles  = $this->roleAccessMapper->findAllForFolder($folder);
 
-        // TODO hydrate roles for these users
         $folder->loadTeachers();
 
-        try {
-            $access = $this->userAccessMapper
-                ->getAccess($sessionUser, $folderId)
-                ->getAccessLevel();
-
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            try {
-                $access = $this->roleAccessMapper
-                               ->getAccess($sessionUser, $folderId)
-                               ->getType();
-
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                // no accesseses found...you get nothin'
-                $access = null;
-            }
-        }
+        $access = $this->getAccess($sessionUser, $folderId);
 
         if ($admins->count()) {
             $admin = $this->userMapper->findById($admins->first()->getId());
@@ -278,23 +262,10 @@ class Controller extends BaseController
         // urgh...
         $file->setOwner($this->userMapper->findById($file->getOwner()->getId()));
 
-        $data = [ 'file' => $file ];
-
-        try {
-            $data['access'] = $this->userAccessMapper
-                                   ->getAccess($sessionUser, $file->getFolder()->getId())
-                                   ->getAccessLevel();
-
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            // no accesseses found...you get nothin'
-            try {
-                $data['access'] = $this->roleAccessMapper
-                                       ->getAccess($sessionUser, $file->getFolder()->getId())
-                                       ->getType();
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $data['access'] = UserAccess::ACCESS_DENY;
-            }
-        }
+        $data = [
+            'file'   => $file,
+            'access' => $this->getAccess($sessionUser, $file->getFolder()->getId())
+        ];
 
         $this->getResponse()->content->set([
             'template' => '@resourceBrowser/showFileInfo.twig',
@@ -302,4 +273,31 @@ class Controller extends BaseController
             'data'     => $data,
         ]);
     }
+
+
+    /**
+     * @param User $user
+     * @param int  $folderId
+     * @return int
+     */
+    protected function getAccess($user, $folderId)
+    {
+        try {
+            return $this->userAccessMapper
+                ->getAccess($user, $folderId)
+                ->getAccessLevel();
+
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            try {
+                return $this->roleAccessMapper
+                    ->getAccess($user, $folderId)
+                    ->getType();
+
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // no accesseses found...you get nothin'
+                return null;
+            }
+        }
+    }
+
 }
