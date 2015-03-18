@@ -116,7 +116,10 @@ class Unit {
         $allValues = array();
 
         foreach ($this->getUnit()->getTasks() as $currentTask) {
-            $allValues[$currentTask->getId()] = new Collection();
+
+            /* Group by originating task id, not task instance id
+             */
+            $allValues[$currentTask->getTask()->getId()] = new Collection();
 
             /* Get all the stuff out of $studentSubmissionList[$submissionBoxId]
              */
@@ -124,7 +127,7 @@ class Unit {
                 $allUsers = array_values($studentSubmissionList[$currentTask->getSubmissionBox()->getId()]);
 
                 foreach ($allUsers as $currentUser) {
-                    $allValues[$currentTask->getId()]->add(array(
+                    $allValues[$currentTask->getTask()->getId()]->add(array(
                         'user' => $currentUser['user']['instance'],
                         'value' => $currentUser['return']['norm_mark']
                     ));
@@ -144,7 +147,7 @@ class Unit {
                             if ($currentUser['maxMark'] > 0) {
                                 $normalised = 100 * $currentUser['totalMarks']/$currentUser['maxMark'];
 
-                                $allValues[$currentTask->getId()]->add(array(
+                                $allValues[$currentTask->getTask()->getId()]->add(array(
                                     'user' => $this->getUserMapper()->findById($currentUser['user_id']),
                                     'value' => $normalised
                                 ));

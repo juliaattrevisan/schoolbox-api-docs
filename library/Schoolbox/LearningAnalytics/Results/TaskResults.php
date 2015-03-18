@@ -54,12 +54,13 @@ class TaskResults {
              */
             $results = new Unit($allStudents, $currentUnit);
 
-            foreach ($results->getAllValues() as $unitId => $currentResultValue) {
-                if ($allResults[$unitId] instanceof Collection) {
-                    $allResults[$unitId]->merge($currentResultValue->getAll());
+            foreach ($results->getAllValues() as $taskId => $currentResultValue) {
+
+                if (count($allResults[$taskId])) {
+                    $allResults[$taskId] = array_merge($allResults[$taskId], $currentResultValue->getAll());
                 }
                 else {
-                    $allResults[$unitId] = $currentResultValue->getAll();
+                    $allResults[$taskId] = $currentResultValue->getAll();
                 }
             }
         }

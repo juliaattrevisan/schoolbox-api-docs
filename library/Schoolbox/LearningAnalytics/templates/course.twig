@@ -87,14 +87,14 @@
 {% for currentTask in results.allTasks %}
 [
     {# Highcharts won't render without at least one data point #}
-    {% if results.allResults[currentTask.getId()]|length == 0 %}
+    {% if results.allResults[currentTask.getTask().getId()]|length == 0 %}
     {
         info: null,
         uid: null,
         value: -100
     }
     {% endif %}
-    {% for currentValue in results.allResults[currentTask.getId()] %}
+    {% for currentValue in results.allResults[currentTask.getTask().getId()] %}
     {
         info: "{{ currentValue.user.getFullName() }}",
         uid: '{{ currentValue.user.getId() }}',
@@ -193,10 +193,6 @@
 {% endif %}
     });
 </script>
-
-<pre>
-</pre>
-
 
 <h1>{{ metadata.pageTitle }}</h1>
 
