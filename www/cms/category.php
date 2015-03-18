@@ -154,6 +154,7 @@ if (is_numeric($this->arg[0])) {
             'CATEGORY_ID' => '',
             'NAME' => '',
             'CODE' => '',
+            'CURRICULUM_CODE_LIST' => json_encode([]),
             'PARENT_ID' => $folderParent->getId(),
             'PARENT_NAME' => Scrub::text($folderParent->getName()),
             'REQUIRED_PERMS' => $_SESSION['gid'],
