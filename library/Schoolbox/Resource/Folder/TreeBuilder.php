@@ -160,7 +160,7 @@ class TreeBuilder
 
         // Open $categoryId's node and its parents
         foreach ($partialTree as &$leaf) {
-            $leaf['state']['opened']   = in_array($leaf['id'], $parentList);
+            $leaf['state']['opened']   = in_array($leaf['id'], $parentList) || $categoryId == 0;
             $leaf['state']['selected'] = ($leaf['id'] == $categoryId);
         }
         unset($leaf);
