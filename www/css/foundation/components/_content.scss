@@ -216,7 +216,7 @@ $table-border-size: 0;
 
 // These control the table head styles
 $table-head-bg: tint($tertiary, 87%);
-$table-head-font-size: rem-calc(($base-font-size));
+$table-head-font-size: rem-calc(($base-font-size - 2));
 $table-head-font-color: $black;
 $table-head-font-weight: $font-weight-bold;
 $table-head-padding: rem-calc(($base-font-size - 2));
@@ -549,6 +549,7 @@ $tooltip-font-color: $white;
 	}
 }
 
+// Actions in lists & tables
 .action-list{
 	list-style: none;
 	margin: 0;
@@ -558,6 +559,24 @@ $tooltip-font-color: $white;
 			.actions{
 				opacity: 1;
 			}
+		}
+	}
+}
+
+.table-actions{
+	[class^="icon-"]:before,
+	[class*=" icon-"]:before{
+		opacity: 0.5;
+		padding: rem-calc(($base-font-size - 2));
+		@include single-transition(all, 0.15s, linear);
+	}
+}
+
+tr:hover{
+	.table-actions{
+		[class^="icon-"]:before,
+		[class*=" icon-"]:before{
+			opacity: 1;
 		}
 	}
 }

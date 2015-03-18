@@ -461,69 +461,67 @@
 		});
     });
 </script>
+
+<link rel="stylesheet" type="text/css" media="screen" href="/css/foundation/chrome.css?v={SITE_VERSION}" />
+<script type="text/javascript">
+    $(function() {
+        $('#container').addClass('foundation').foundation();
+    });
+</script>
 <!-- END custom_head -->
 
-<h1>{HEADING} Due Work</h1>
-<form action="/submission/submissionForm.php" method="post" name="form" class="clearfix" id="createSubmissionForm"
-      enctype="multipart/form-data">
-<input type="hidden" name="category" value="{CATEGORY}"/>
-<input type="hidden" name="unit_id" value="{UNIT_ID}"/>
-<input name="is_task" type="hidden" value="{IS_TASK}" />
-<table class="standardForm table">
-    <tr>
-        <td class="formLabelWidth"><h4>Title</h4></td>
-        <td><label>
-            <input class="required" name="name" type="text" value="{NAME}" size="30"/>
-        </label></td>
-    </tr>
-
-    <tr>
-        <td class="formLabelWidth"><h4>Description</h4></td>
-        <td><label>
-            <textarea id="description-box" name="description" style="width:100%;height:350px">{DESCRIPTION}</textarea>
-        </label></td>
-    </tr>
-    <tr>
-        <td class="formLabelWidth">
-            <h4>Attach Files</h4>
+<div class="row full-width">
+    <div class="large-12 columns no-pad">
+        <h1>{HEADING} Due Work</h1>
+    </div>
+</div>
+<div class="row full-width">
+    <div class="island">
+        <form action="/submission/submissionForm.php" method="post" name="form" class="clearfix" id="createSubmissionForm" enctype="multipart/form-data">
+            <input type="hidden" name="category" value="{CATEGORY}"/>
+            <input type="hidden" name="unit_id" value="{UNIT_ID}"/>
+            <input name="is_task" type="hidden" value="{IS_TASK}" />
+            
+            <h2>Title</h2>
+            <label>
+                <input class="required" name="name" type="text" value="{NAME}" size="30"/>
+            </label>
+            
+            <hr>
+            <h2>Description</h2>
+            <label>
+                <textarea id="description-box" name="description" style="width:100%;height:350px">{DESCRIPTION}</textarea>
+            </label>
+            
+            <hr>
+            <h2>Attach Files</h2>
             <em>Select files to attach to this Due Work</em>
-        </td>
-        <td>
-            {ATTACH_ZONE}
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <h4>Due Work Type</h4>
+
+                {ATTACH_ZONE}
+
+            <h2>Due Work Type</h2>
             <em>What kind of assessment is this?</em>
-        </td>
-        <td>
             <select name="type" class="formfield">
                 <!-- BEGIN type_drop -->
                 <option value="{TYPE_VALUE}"
                 {TYPE_VALUE_SELECTED}>{TYPE_TEXT}</option>
                 <!-- END type_drop -->
             </select>
-        </td>
-    </tr>
-    <!-- BEGIN marktype -->
-    <tr>
-        <td><h4>Mark Type</h4>
+            <!-- BEGIN marktype -->
+            
+            <hr>
+            <h2>Mark Type</h2>
             <em>How this assessment will be graded.</em></td>
-        <td>
             <select name="marktype" class="formfield" id="marktype">
                 <!-- BEGIN marktype_drop -->
                 <option data-slug="{MARKTYPE_SLUG}" value="{MARKTYPE_VALUE}"
                 {MARKTYPE_VALUE_SELECTED}>{MARKTYPE_TEXT}</option>
                 <!-- END marktype_drop -->
             </select>
-        </td>
-    </tr>
-    <tr id="marktype-letter" class="marks-hide dark">
-        <td>
-            <h4>Grade Group</h4>
+            
+            <hr>
+            <h2>Grade Group</h2>
             <em>The grouping that is used for this type.</em></td>
-        <td>
             <select name="gradegroup" class="formfield" id="gradegroup">
                 <!-- BEGIN gradegroup_drop -->
                 <option value="{GRADEGROUP_VALUE}" {GRADEGROUP_VALUE_SELECTED}>{GRADEGROUP_TEXT}</option>
@@ -533,33 +531,23 @@
 
             <div id="gradegroup_explanation">
             <!-- BEGIN gradegroup_explanation -->
-            <table class="table gradegroup_explanation" id="gradegroup_explanation-{GRADEGROUP_ID}">
-                <tbody>
+            <div class="table gradegroup_explanation" id="gradegroup_explanation-{GRADEGROUP_ID}">
                 <!-- BEGIN gradegroup_explanation_level -->
-                <tr>
-                    <td>{GRADEGROUP_LEVEL_LOWER_BOUND}+</td>
-                    <td>{GRADEGROUP_LEVEL_CAPTION}</td>
+                {GRADEGROUP_LEVEL_LOWER_BOUND}+
+                {GRADEGROUP_LEVEL_CAPTION}
                 <!-- END gradegroup_explanation_level -->
-                </tr>
-                </tbody>
-            </table>
-            <!-- END gradegroup_explanation -->
             </div>
-        </td>
-    </tr>
-    <tr id="marktype-total" class="marks-hide dark">
-        <td>
-            <h4>Total Mark</h4>
+            <!-- END gradegroup_explanation -->
+            
+            <hr>
+            <h2>Total Mark</h2>
             <em>The maximum mark for this assessment.</em></td>
-        <td>
             <label>
                 <input name="markvalue" type="text" value="{TOTAL_MARK}" size="4"/>
             </label>
-        </td>
-    </tr>
-    <tr id="marktype-rubric" class="noline marks-hide dark marktype-rubric">
-        <td>
-            <h4>Rubric</h4>
+            
+            <hr>
+            <h2>Rubric</h2>
             <em>Select <i>at least one</i> criterion to be assessed, and possible results.<br/>
                By default descriptors are ordered lowest to highest, you may rearrange if you wish.
             </em>
@@ -574,42 +562,33 @@
                 </ul>
             </div>
             <!-- END existing_marks_warning -->
-        </td>
-        <td id="rubric">
 
-            <div id="rubric-results">
-                <em>Result set</em>
-                <!-- BEGIN resultset -->
-                <p>
-                    <input id="rs-{RS_ID}" type="radio" name="resultset" value="{RS_ID}"{RS_CHECKED} />
-                    <label for="rs-{RS_ID}">
-                        <!-- BEGIN result -->
-                        <span class="result">{RS_RESULT_LABEL}</span>
-                        <!-- END result -->
-                    </label>
-                </p>
-                <!-- END resultset -->
-                <p>
-                    <input id="rs-0" type="radio" name="resultset" value="0"{RS_0_CHECKED} />
-                    <label for="rs-0" class="result">Assessment specific descriptors:
-                        <select id="descriptor-count" name="descrip-count">
-                            <!-- BEGIN des_count -->
-                            <option value="{DES_COUNT_VALUE}"
-                            {DES_COUNT_VALUE_SELECTED}>{DES_COUNT_VALUE}</option>
-                            <!-- END des_count -->
-                        </select> levels
-                    </label>
-                </p>
+            <em>Result set</em>
+            <!-- BEGIN resultset -->
+            <p>
+                <input id="rs-{RS_ID}" type="radio" name="resultset" value="{RS_ID}"{RS_CHECKED} />
+                <label for="rs-{RS_ID}">
+                    <!-- BEGIN result -->
+                    <span class="result">{RS_RESULT_LABEL}</span>
+                    <!-- END result -->
+                </label>
+            </p>
+            <!-- END resultset -->
+            <p>
+                <input id="rs-0" type="radio" name="resultset" value="0"{RS_0_CHECKED} />
+                <label for="rs-0" class="result">Assessment specific descriptors:
+                    <select id="descriptor-count" name="descrip-count">
+                        <!-- BEGIN des_count -->
+                        <option value="{DES_COUNT_VALUE}"
+                        {DES_COUNT_VALUE_SELECTED}>{DES_COUNT_VALUE}</option>
+                        <!-- END des_count -->
+                    </select> levels
+                </label>
+            </p>
 
-                <!-- Invisible input required for jQuery validate, because it doesn't validate hidden or display:none input -->
-                <input type="text" style="visibility: hidden; height: 0" name="result_set" />
-            </div>
-            <div class="clearfix"></div>
+            <!-- Invisible input required for jQuery validate, because it doesn't validate hidden or display:none input -->
+            <input type="text" style="visibility: hidden; height: 0" name="result_set" />
 
-        </td>
-    </tr>
-    <tr class="marks-hide dark marktype-rubric">
-        <td colspan="2">
             <div id="rubric-criteria" class="rubrics">
 
                 {COURSE_CRITERIA}
@@ -618,46 +597,39 @@
                 <!-- Invisible input required for jQuery validate, because it doesn't validate hidden or display:none input -->
                 <input type="text" style="visibility: hidden; height: 0" name="criteria" />
             </div>
-        </td>
-    </tr>
-    <tr>
-        <td><h4>Mark Visibility</h4>
-            <em>Who will be able to view marks for this assessment?</em></td>
-        <td>
+            
+            <hr>
+            <h2>Mark Visibility</h2>
+            <em>Who will be able to view marks for this assessment?</em>
             <select name="mark_visibility" class="formfield">
                 <!-- BEGIN mark_visibility_drop -->
                 <option value="{MARK_VISIBILITY_VALUE}" {MARK_VISIBILITY_VALUE_SELECTED}>{MARK_VISIBILITY_TEXT}</option>
                 <!-- END mark_visibility_drop -->
             </select>
-        </td>
-    </tr>
-    <!-- END marktype -->
-    <!-- BEGIN mark_weight -->
-    <tr>
-      <td><h4>Mark Weight</h4>
-        <em>What is the weighting of this due work towards the student's overall grade average? (Default is 0).</em>
-      </td>
-      <td><input name="weight" type="text" value="{SUBMISSION_WEIGHT}" maxlength="3" /></td>
-    </tr>
-    <!-- END mark_weight -->
-    <tr>
-        <td><h4>Accept Submissions</h4>
-            <em>Will this work be submitted electronically?</em></td>
-        <td><input name="accept_submission" type="checkbox" value="true" {ACCEPT_SUBMISSION}></td>
-    </tr>
-    <tr class="accept-hide dark">
-        <td><h4>Multiple Submissions</h4>
+            <!-- END marktype -->
+            <!-- BEGIN mark_weight -->
+            
+            <hr>
+            <h2>Mark Weight</h2>
+            <em>What is the weighting of this due work towards the student's overall grade average? (Default is 0).</em>
+            <input name="weight" type="text" value="{SUBMISSION_WEIGHT}" maxlength="3" />
+            <!-- END mark_weight -->
+            
+            <hr>
+            <h2>Accept Submissions</h2>
+            <em>Will this work be submitted electronically?</em>
+            <input name="accept_submission" type="checkbox" value="true" {ACCEPT_SUBMISSION}>
+            
+            <hr>
+            <h2>Multiple Submissions</h2>
             <em>Should multiple submissions be accepted?</em></td>
-        <td><input name="multi_submission" type="checkbox" value="true" {MULTI_SUBMISSION}></td>
-    </tr>
+            <input name="multi_submission" type="checkbox" value="true" {MULTI_SUBMISSION}>
 
-    <!-- BEGIN duework_timespan -->
-    <tr class="dark">
-        <td class="formLabelWidth"><h4>Publish Date</h4>
+            <hr>
+            <!-- BEGIN duework_timespan -->
+            <h2>Publish Date</h2>
             <em>This due work will not show on your student's calendar until this date.
                 To publish at the start of the day, leave the time fields blank.</em>
-        </td>
-        <td>
             <input name="publish_date" id="publish_date" type="text" value="{PUBLISH_DATE}" size="20" data-default_time="00:00" />
             <input name="publish_hour" type="text" maxlength="2" value="{PUBLISH_HOUR}" class="timeField"/>
             <span>:</span>
@@ -667,14 +639,11 @@
                 <option value="pm"
                 {PUBLISH_PM}>PM</option>
             </select>
-        </td>
-    </tr>
-    <tr class="dark accept-hide">
-        <td class="formLabelWidth"><h4>Open Date</h4>
+            
+            <hr>
+            <h2>Open Date</h2>
             <em>The date from when the due work will be available for submission.
                 To allow submissions from the start of the day, leave the time fields blank.</em>
-        </td>
-        <td>
             <input name="open_date" id="open_date" type="text" value="{OPEN_DATE}" size="20" data-default_time="00:00" />
             <input name="open_hour" type="text" maxlength="2" value="{OPEN_HOUR}" class="timeField"/>
             <span>:</span>
@@ -684,13 +653,11 @@
                 <option value="pm"
                 {OPEN_PM}>PM</option>
             </select>
-        </td>
-    </tr>
-    <tr>
-        <td><h4>Due Date</h4>
+            
+            <hr>
+            <h2>Due Date</h2>
             <em>Actual date the work is due. This is the date that will be published.
-                To allow submissions until the end of the day, leave the time fields blank.</em></td>
-        <td>
+                To allow submissions until the end of the day, leave the time fields blank.</em>
             <input name="due_date" id="due_date" type="text" value="{DUE_DATE}" size="20" data-default_time="23:59" />
             <input name="due_hour" type="text" maxlength="2" value="{DUE_HOUR}" class="timeField">
             <span>:</span>
@@ -700,13 +667,11 @@
                 <option value="pm"
                 {DUE_PM}>PM</option>
             </select>
-        </td>
-    </tr>
-    <tr class="accept-hide dark">
-        <td><h4>Late Date</h4>
+            
+            <hr>
+            <h2>Late Date</h2>
             <em>Students will not be able to submit after this date.
-                To allow submissions until the end of the day, leave the time fields blank.</em></td>
-        <td>
+                To allow submissions until the end of the day, leave the time fields blank.</em>
             <input name="late_date" id="late_date" type="text" value="{LATE_DATE}" size="20" data-default_time="23:59" />
             <input name="late_hour" type="text" maxlength="2" value="{LATE_HOUR}" class="timeField">
             <span>:</span>
@@ -716,16 +681,16 @@
                 <option value="pm"
                 {LATE_PM}>PM</option>
             </select>
-        </td>
-    </tr>
-    <!-- END duework_timespan -->
-</table>
-<input type="hidden" name='fileId' value="{FILEID}"/>
-<input type="hidden" name="id" value="{ID}"/></td>
-<input type="submit" name="Submit" value="{HEADING}" class="submit-btn-plain"/>
+            <!-- END duework_timespan -->
 
-<!-- BEGIN delete_button -->
-<input id='deleteBox' type="button" class="submit-btn-plain"  value="Delete" />
-<!-- END delete_button -->
+            <input type="hidden" name='fileId' value="{FILEID}"/>
+            <input type="hidden" name="id" value="{ID}"/></td>
+            <input type="submit" name="Submit" value="{HEADING}" class="submit-btn-plain"/>
 
-</form>
+            <!-- BEGIN delete_button -->
+            <input id='deleteBox' type="button" class="submit-btn-plain"  value="Delete" />
+            <!-- END delete_button -->
+
+        </form>
+    </div>
+</div>
