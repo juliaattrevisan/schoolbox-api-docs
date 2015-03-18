@@ -175,6 +175,7 @@ class BlogMapper extends Schoolbox\Mapper {
             FROM `{$this->table}` `b`
             INNER JOIN {$this->getJoinSql('page', 'b', 'p')}
             WHERE b.uid = :uid
+            AND b.deleted_at IS NULL
             ORDER BY b.created_at DESC
             LIMIT :limit
 		";
