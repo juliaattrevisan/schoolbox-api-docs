@@ -116,8 +116,7 @@
             hovered          = 'jstree-hovered',
             childrenUri      = '/:id/children',
             folderInfoUri    = '/:id/info',
-            fileInfoUri      = '/file/:id/info',
-            multifileInfoUri = '/:id/info/multifile';
+            fileInfoUri      = '/file/:id/info';
 
         tree.resourceTree({
             data: {
@@ -139,7 +138,7 @@
             'click', anchor,
             function (e) {
 
-                var node1, node2, len,
+                var node1, node2, len, files,
                     link = $(this),
                     item = link.closest(listItem);
 
@@ -178,7 +177,8 @@
                 if (len == 1) {
                     loadPanel(metaData, fileInfoUri, link.data('id'));
                 } else {
-                    loadPanel(metaData, multifileInfoUri+'?n='+len, fileList.data('nodeId'));
+                    files = $('#file-list').children('.selected').map(function(k, v) { return $(v).children('a').data('id'); });
+                    loadPanel(metaData, fileInfoUri, files.toArray().join(','));
                 }
 
             }

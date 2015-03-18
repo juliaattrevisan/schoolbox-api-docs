@@ -33,6 +33,7 @@ class Module extends BaseModule
         $routes->addGet('resourceBrowser.listResources', $basePath.'/{folderId}/children')->addTokens([ 'folderId' => '\d+' ]);
         $routes->addGet('resourceBrowser.showFolderInfo', $basePath.'/{folderId}/info')->addTokens([ 'folderId' => '\d+' ]);
         $routes->addGet('resourceBrowser.showFileInfo', $basePath.'/file/{fileId}/info')->addTokens([ 'fileId' => '\d+' ]);
+        $routes->addGet('resourceBrowser.showMultiFileInfo', $basePath.'/file/{fileIds}/info')->addTokens([ 'folderId' => '(\d+,)+(\d+)' ]);
     }
 
 

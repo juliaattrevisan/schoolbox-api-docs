@@ -1,0 +1,17 @@
+<ul class="information-list">
+    <li class="center">
+        <span class="p128">
+            <img class="icon" src="/images/mime/128x128/multi.png" alt="Multiple Files Selected"/>
+        </span>
+        <h3 class="meta-title">{{ files|length }} files selected</h3>
+    </li>
+    {% if access >= 2 %}
+    <li>
+        <h4>Actions</h4>
+            <a class="button secondary icon-delete" data-action="delete" href="/cms/fileForm.php?fileList={{ files|join(',') }}&deleteList=1">Delete</a>
+    </li>
+    {% endif %}
+</ul>
+
+
+

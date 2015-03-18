@@ -12,6 +12,7 @@ namespace Schoolbox\Resource\Browser;
 use Alaress\Web\Controller\Base as BaseController;
 
 use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Collection;
 use Schoolbox\Config;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -269,6 +270,40 @@ class Controller extends BaseController
 
         $this->getResponse()->content->set([
             'template' => '@resourceBrowser/showFileInfo.twig',
+            'format'   => 'nochrome',
+            'data'     => $data,
+        ]);
+    }
+
+
+    /**
+     * @api GET /resources/file/:fileIds/info
+     * @param $fileIds
+     */
+    public function showMultiFileInfo($fileIds)
+    {
+        $fileIds   = json_decode("[$fileIds]", true);
+        $files     = $this->fileMapper->findByColumn('id', $fileIds);
+        $folders   = new Collection($files->getColumnValues('folder'));
+        $folderIds = array_unique($folders->getColumnValues('id'));
+
+
+        if ($this->getUser()->isSuperuser()) {
+            $access = UserAccess::ACCESS_FULL;
+        } else {
+            $access = $this->userAccessMapper->userHasMinimumAccessToAll($this->getUser()->getId(), $folderIds, UserAccess::ACCESS_WRITE)
+                ? UserAccess::ACCESS_WRITE
+                : UserAccess::ACCESS_DENY;
+        }
+
+        $data = [
+            'files'  => $fileIds,
+            'user'   => $this->getUser(),
+            'access' => $access
+        ];
+
+        $this->getResponse()->content->set([
+            'template' => '@resourceBrowser/showMultiFileInfo.twig',
             'format'   => 'nochrome',
             'data'     => $data,
         ]);
