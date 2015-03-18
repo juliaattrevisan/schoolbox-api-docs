@@ -123,7 +123,11 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
             Node\Mapper::class,
             'id',
             'curriculum_node_id',
-            'category_id'
+            'category_id',
+            null,
+            null,
+            null,
+            'curriculumNodes'
         );
 
         $this->hasMap(
