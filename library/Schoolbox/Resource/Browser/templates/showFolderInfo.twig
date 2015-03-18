@@ -87,7 +87,7 @@
     </ul>
 </li>
 {% endif %}
-
+{% if user.role.type == 'staff' %}
 <li>
     <h4>Permissions</h4>
     <ul>
@@ -103,6 +103,7 @@
     {% endfor %}
     </ul>
 </li>
+{% endif %}
 {% else %}
 <li>
     <img class="icon" src="/images/core/icons/error-icon.png" alt="No access"/>
