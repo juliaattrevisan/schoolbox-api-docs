@@ -31,6 +31,8 @@ class Mapper extends Schoolbox\Mapper implements Receiver
     /** @var Manager */
     protected $mgr;
 
+    /** @var bool */
+    protected $checkPrevious = true;
 
     /**
      * @return void
@@ -74,7 +76,7 @@ class Mapper extends Schoolbox\Mapper implements Receiver
      */
     protected function postSave(Model $storage, Model $previous = null)
     {
-        if ($previous) {
+        if ($previous && $this->checkPrevious) {
             // not the first time we've seen this file? no copying to take place
             return true;
         }
@@ -210,5 +212,15 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         return $this;
     }
 
+
+    /**
+     * @param bool $bool
+     * @return self
+     */
+    public function checkPrevious($bool)
+    {
+        $this->checkPrevious = $bool;
+        return $this;
+    }
 
 }

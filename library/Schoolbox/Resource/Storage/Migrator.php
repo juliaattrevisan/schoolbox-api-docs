@@ -38,7 +38,10 @@ class Migrator
         $this->factory    = new Resource\FilesystemFactory();
         $this->abf        = new Alaress_Byte_Format();
 
-        $this->storageMapper  = Storage\Mapper::getInstance();
+        // intentionally not singleton, so as to keep checkPrevious value separated
+        $this->storageMapper  = new Storage\Mapper();
+        $this->storageMapper->checkPrevious(false);
+
         $this->mimetypeMapper = File\MimetypeMapper::getInstance();
 
         $this->db = Database::getInstance();
