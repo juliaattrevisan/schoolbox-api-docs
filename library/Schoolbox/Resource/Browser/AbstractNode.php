@@ -16,10 +16,10 @@ namespace Schoolbox\Resource\Browser;
 
 use InvalidArgumentException;
 use Schoolbox\File\MimetypeMapper;
-use Schoolbox\Mapper;
-use Schoolbox\Resource\FileLocatorInterface;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
-use Schoolbox\Resource\FolderLocatorInterface;
+use Schoolbox\Mapper;
+use Schoolbox\Resource\File\ILocator as FileLocatorInterface;
+use Schoolbox\Resource\Folder\ILocator as FolderLocatorInterface;
 
 abstract class AbstractNode implements NodeInterface
 {
@@ -256,10 +256,10 @@ abstract class AbstractNode implements NodeInterface
             $record = array(
                 'type'   => 'file',
                 'fileId' => $currentFile->getId(),
-                'name'   => $currentFile->getDescription(),
+                'name'   => $currentFile->getTitle(),
                 'mime'   => $mimetype->getMime(),
                 'icon'   => $mimetype->getIconFile(),
-                'size'   => $currentFile->getFilesize(),
+                'size'   => $currentFile->getSize(),
             );
 
             $output[] = $record;
