@@ -100,7 +100,7 @@ class Controller extends Base {
 
         /* A list of all the criteria for this folder
          */
-        $allCriteria = $rubricHandler->getAvailableCriteria($metadata->getSelectedFolder());
+        $allCriteria = $rubricHandler->getAvailableCriteria($metadata->getSelectedFolder()->getId());
 
         /* All the students' values
          */
@@ -109,31 +109,20 @@ class Controller extends Base {
         foreach($registry->getAllStudentRegistry() as $unitId => $allStudents) {
             foreach ($allStudents as $currentStudent) {
 
-                /* TODO: Probably put folders in a collection for iteration
+                /* Put folders in a collection for iteration
+
                  * Oddly enough this method gets the students' marks for a
                  * criterion spanning across the entire course, which is
                  * nice and convenient
                  */
-                if ($metadata->getRoute() == 'folder') {
-                    $allMarks = $rubricHandler->getStudentMarksByCriteriaInCategory($currentStudent->getId(), $metadata->getSelectedFolder());
+                foreach ($metadata->getAllAggregateFolders() as $currentFolder) {
+                    $allMarks = $rubricHandler->getStudentMarksByCriteriaInCategory($currentStudent->getId(), $currentFolder->getId());
 
                     foreach($allMarks as $criterionId => $current) {
                         $groupedMarks[$current['name']][] = array(
                             'user' => $currentStudent->getId(),
                             'value' => $current['value'],
                         );
-                    }
-                }
-                else {
-                    foreach ($metadata->getAllFolders() as $currentFolder) {
-                        $allMarks = $rubricHandler->getStudentMarksByCriteriaInCategory($currentStudent->getId(), $currentFolder->getId());
-
-                        foreach($allMarks as $criterionId => $current) {
-                            $groupedMarks[$current['name']][] = array(
-                                'user' => $currentStudent->getId(),
-                                'value' => $current['value'],
-                            );
-                        }
                     }
                 }
             }

@@ -13,6 +13,7 @@ namespace Schoolbox\LearningAnalytics\Metadata;
 use Schoolbox\Collection;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Resource\Category as Folder;
+use Schoolbox\Resource\CategoryMapper as FolderMapper;
 
 abstract class Base {
 
@@ -39,10 +40,19 @@ abstract class Base {
 
     /**
      * A Collection of Folder instances which are using the same Course
+     * This is used for navigational purposes
      *
-     * @var null
+     * @var Collection
      */
     protected $allFolders = null;
+
+    /**
+     * A Collection of Folder instances which should be used to aggregate
+     * numeric data (a subset of $allFolders)
+     *
+     * @var Collection
+     */
+    protected $allAggregateFolders = null;
 
     /**
      * The originating Course folder, used to spawn the Units used in the
@@ -51,6 +61,13 @@ abstract class Base {
      * @var Folder
      */
     protected $courseFolder = null;
+
+    /**
+     * The folder corresponding to the id in the url
+     *
+     * @var Folder
+     */
+    protected $selectedFolder = null;
 
     /**
      * Constructor
@@ -62,6 +79,8 @@ abstract class Base {
         $this->setParams($params);
 
         $this->setAllUnitInstances($allUnitInstances);
+        $this->setAllFolders(new Collection());
+        $this->setAllAggregateFolders(new Collection());
 
         $this->process();
     }
@@ -70,6 +89,17 @@ abstract class Base {
      * Process
      */
     protected function process() {
+        $folderMapper = new FolderMapper();
+        $params = $this->getParams();
+
+        try {
+            $this->setSelectedFolder($folderMapper->findById($params['folderId']));
+        }
+        catch (\Exception $e) {
+
+            /* TODO: Error, folder does not exist
+             */
+        }
 
         /* Find title of the course by deriving the parent folder
          * of a unit_category_id
@@ -89,6 +119,16 @@ abstract class Base {
                 $this->setCourseFolder($unitInstanceMapper->findCourseForUnit($firstUnit));
                 $this->setAllFolders($unitInstanceMapper->findAllFoldersUsingCourse($this->getCourseFolder()));
                 $this->setPageTitle($this->getCourseFolder()->getName());
+
+                /* Only aggregate for one folder in 'folder' route
+                 * Otherwise aggregate for all folders
+                 */
+                if ($this->getRoute() == 'folder') {
+                    $this->getAllAggregateFolders()->add($this->getSelectedFolder());
+                }
+                else {
+                    $this->setAllAggregateFolders($this->getAllFolders());
+                }
             }
             catch (\Exception $e) {
             }
@@ -96,17 +136,12 @@ abstract class Base {
     }
 
     /**
-     * Get selected folder
-     *
-     * @return int
-     */
-    public function getSelectedFolder()
-    {
-        return $this->params['folderId'];
-    }
-
-    /**
      * Get route
+     *
+     * Used to determine which screen you wanted (either 'folder' or 'course')
+     * Each screen uses slightly different data
+     *
+     * Passed directly through to twig
      *
      * @return string
      */
@@ -215,5 +250,45 @@ abstract class Base {
     protected function getParams()
     {
         return $this->params;
+    }
+
+    /**
+     * Set all aggregate folders
+     *
+     * @param \Schoolbox\Collection $allAggregateFolders
+     */
+    protected function setAllAggregateFolders($allAggregateFolders)
+    {
+        $this->allAggregateFolders = $allAggregateFolders;
+    }
+
+    /**
+     * Get all aggregate folders
+     *
+     * @return \Schoolbox\Collection
+     */
+    public function getAllAggregateFolders()
+    {
+        return $this->allAggregateFolders;
+    }
+
+    /**
+     * Set selected folder
+     *
+     * @param \Schoolbox\Resource\Category $selectedFolder
+     */
+    protected function setSelectedFolder($selectedFolder)
+    {
+        $this->selectedFolder = $selectedFolder;
+    }
+
+    /**
+     * Get selected folder
+     *
+     * @return \Schoolbox\Resource\Category
+     */
+    public function getSelectedFolder()
+    {
+        return $this->selectedFolder;
     }
 }
