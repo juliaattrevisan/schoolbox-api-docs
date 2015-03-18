@@ -120,8 +120,9 @@ class External_Edumate_Import_Task extends External_Edumate_Connection {
 				$submissionBox->setName($edumateTask->getTask());
 				$submissionBox->setDescription($edumateTask->getDescription());
 
-				/* Assign dates
+				/* Assign dates (assume publish date = open date)
 				 */
+				$submissionBox->setPublishDate(new \Alaress_Date_Format($edumateTask->getSetDate(), 'Y-m-d'));
 				$submissionBox->setOpenDate(new \Alaress_Date_Format($edumateTask->getSetDate(), 'Y-m-d'));
 				$submissionBox->setDueDate(new \Alaress_Date_Format($edumateTask->getDueDate(), 'Y-m-d'));
 				$submissionBox->setLateDate(new \Alaress_Date_Format($edumateTask->getCloseDate(), 'Y-m-d'));
