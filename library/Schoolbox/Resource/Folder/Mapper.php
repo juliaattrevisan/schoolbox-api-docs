@@ -14,6 +14,7 @@ namespace Schoolbox\Resource\Folder;
 
 use External_UserInterface;
 use Schoolbox\Collection;
+use Schoolbox\Curriculum\Node;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\FileMapper;
@@ -119,7 +120,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
         $this->joinsVia(
             'curriculum_node_for_category',
-            \Schoolbox\Curriculum\Node\Mapper::class,
+            Node\Mapper::class,
             'id',
             'curriculum_node_id',
             'category_id'
@@ -410,12 +411,20 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
                 {$code_mapper->getColumnString('cc')},
                 {$homepageConfig_mapper->getColumnString('hp')},
                 {$group_mapper->getColumnString('ug')},
-                {$this->getJoinColumnString('curriculum_node_for_category', 'cn')}
+                {$this->getJoinColumnString('curriculum_node_for_category', 'cn')},
+                {$this->getJoinColumnString('curriculum_node_for_category.level', 'cnl')},
+                {$this->getJoinColumnString('curriculum_node_for_category.level.source', 'cnls')},
+                {$this->getJoinColumnString('curriculum_node_for_category.area', 'cna')},
+                {$this->getJoinColumnString('curriculum_node_for_category.area.source', 'cnas')}
             FROM {$this->getTable()} c
             LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
             LEFT JOIN {$this->getJoinSql('homepages', 'c', 'hp')}
             LEFT JOIN {$this->getJoinSql('groups', 'c', 'ug')}
             LEFT JOIN {$this->getJoinSql('curriculum_node_for_category', 'c', 'cn')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.level', 'cn', 'cnl')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.level.source', 'cnl', 'cnls')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.area', 'cn', 'cna')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.area.source', 'cna', 'cnas')}
         ";
     }
 
@@ -510,8 +519,23 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
             // Hydrate curriculum node codes (avoiding duplicates)
             // BTW fetching multiple 1-M relations in a single query
             // is how you get ants!
+            /** @var Node\Model $curriculumNode */
             $curriculumNode = $this->getJoinMapper('curriculum_node_for_category')->hydrate($row, 'cn');
             if ($curriculumNode->getId()) {
+                $curriculumNode->setLearningArea(
+                    $this->getJoinMapper('curriculum_node_for_category.area')->hydrate($row, 'cna')
+                        ->setSource(
+                            $this->getJoinMapper('curriculum_node_for_category.area.source')
+                                ->hydrate($row, 'cnas')
+                        )
+                );
+                $curriculumNode->setLearningLevel(
+                    $this->getJoinMapper('curriculum_node_for_category.level')->hydrate($row, 'cnl')
+                        ->setSource(
+                            $this->getJoinMapper('curriculum_node_for_category.level.source')
+                                ->hydrate($row, 'cnls')
+                        )
+                );
                 $addedCurriculumNodes[$curriculumNode->getId()] = $curriculumNode;
             }
         }
