@@ -497,7 +497,7 @@
             <h2>Attach Files</h2>
             <em>Select files to attach to this Due Work</em>
 
-                {ATTACH_ZONE}
+            {ATTACH_ZONE}
 
             <h2>Due Work Type</h2>
             <em>What kind of assessment is this?</em>
@@ -507,11 +507,11 @@
                 {TYPE_VALUE_SELECTED}>{TYPE_TEXT}</option>
                 <!-- END type_drop -->
             </select>
+
             <!-- BEGIN marktype -->
-            
             <hr>
             <h2>Mark Type</h2>
-            <em>How this assessment will be graded.</em></td>
+            <em>How this assessment will be graded.</em>
             <select name="marktype" class="formfield" id="marktype">
                 <!-- BEGIN marktype_drop -->
                 <option data-slug="{MARKTYPE_SLUG}" value="{MARKTYPE_VALUE}"
@@ -521,7 +521,7 @@
             
             <hr>
             <h2>Grade Group</h2>
-            <em>The grouping that is used for this type.</em></td>
+            <em>The grouping that is used for this type.</em>
             <select name="gradegroup" class="formfield" id="gradegroup">
                 <!-- BEGIN gradegroup_drop -->
                 <option value="{GRADEGROUP_VALUE}" {GRADEGROUP_VALUE_SELECTED}>{GRADEGROUP_TEXT}</option>
@@ -541,7 +541,7 @@
             
             <hr>
             <h2>Total Mark</h2>
-            <em>The maximum mark for this assessment.</em></td>
+            <em>The maximum mark for this assessment.</em>
             <label>
                 <input name="markvalue" type="text" value="{TOTAL_MARK}" size="4"/>
             </label>
@@ -607,8 +607,8 @@
                 <!-- END mark_visibility_drop -->
             </select>
             <!-- END marktype -->
+
             <!-- BEGIN mark_weight -->
-            
             <hr>
             <h2>Mark Weight</h2>
             <em>What is the weighting of this due work towards the student's overall grade average? (Default is 0).</em>
@@ -622,7 +622,7 @@
             
             <hr>
             <h2>Multiple Submissions</h2>
-            <em>Should multiple submissions be accepted?</em></td>
+            <em>Should multiple submissions be accepted?</em>
             <input name="multi_submission" type="checkbox" value="true" {MULTI_SUBMISSION}>
 
             <hr>
@@ -684,7 +684,7 @@
             <!-- END duework_timespan -->
 
             <input type="hidden" name='fileId' value="{FILEID}"/>
-            <input type="hidden" name="id" value="{ID}"/></td>
+            <input type="hidden" name="id" value="{ID}"/>
             <input type="submit" name="Submit" value="{HEADING}" class="submit-btn-plain"/>
 
             <!-- BEGIN delete_button -->
