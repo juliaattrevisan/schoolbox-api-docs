@@ -306,7 +306,7 @@ input[type=submit]				{ border: none;
 	}
 }
 
-input[type=submit] 				{ @include button-style; padding: $button-med; }
+input[type=submit] 				{ @include button-style; }
 
 // Button Group
 .button-group > li {
