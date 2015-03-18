@@ -499,12 +499,13 @@ abstract class Component_ControllerAbstract
      *                               Just pass $templateHandle from
      *                               $this->renderTemplate($templateHandle).
      * @param string $twigTemplate   The path to a Twig template.
+     * @param array  $twigData       Data to pass into the Twig template.
      * @param bool   $renderHeader   Set to false if you don't want the PHPLib
      *                               controlled header and configuration to show.
      *
      * @return bool Was the template renderable?
      */
-    protected function renderTwigTemplate($templateHandle, $twigTemplate, $renderHeader = true)
+    protected function renderTwigTemplate($templateHandle, $twigTemplate, $twigData = [], $renderHeader = true)
     {
         if (!$this->loadTemplate($templateHandle, 'twig', 'component/')) {
             return false;
@@ -521,10 +522,7 @@ abstract class Component_ControllerAbstract
 
         // Render the twig template
         try {
-            $content = $this->sitepage->getTwig()->render(
-                $twigTemplate,
-                array('component' => $this,)
-            );
+            $content = $this->sitepage->getTwig()->render($twigTemplate, $twigData);
         } catch (\Exception $e) {
             return false;
         }
