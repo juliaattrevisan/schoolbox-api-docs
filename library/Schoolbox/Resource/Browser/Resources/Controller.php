@@ -1,0 +1,122 @@
+<?php
+/**
+ * 
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2015, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Schoolbox\Resource\Browser\Resources;
+
+
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource;
+use Schoolbox\Resource\Browser\AbstractController;
+use Schoolbox\Mapper;
+use Schoolbox\User;
+
+class Controller extends AbstractController
+{
+
+    /**
+     * @param int $folderId
+     * @return array
+     */
+    protected function getFolderData($folderId)
+    {
+        $data = parent::getFolderData($folderId);
+
+        $data['roles']  = $this->roleAccessMapper->findAllForFolder($data['folder']);
+        $data['access'] = $this->getAccess([ $folderId ]);
+
+        $admins = $this->userAccessMapper->findAdminsInCategory($data['folder']);
+
+        if ($admins->count()) {
+            $data['admin'] = $this->userMapper->findById($admins->first()->getId());
+        } else {
+            $data['admin'] = new User();
+            $data['admin']->setFirstname('Nobody');
+        }
+
+        return $data;
+    }
+
+
+    /**
+     * @param int $fileId
+     * @return Resource\File
+     * @throws Mapper\Exception
+     */
+    protected function getFile($fileId)
+    {
+        /** @var Resource\File $file */
+        $file = $this->fileMapper->findById($fileId);
+        // urgh...
+        $file->setOwner($this->userMapper->findById($file->getOwner()->getId()));
+
+        return $file;
+    }
+
+
+    /**
+     * @param int $folderId
+     * @return Resource\Folder\IFolder|Resource\Folder\Model
+     * @throws Mapper\Exception
+     */
+    protected function getFolder($folderId)
+    {
+        try {
+            $folder = $this->folderMapper->findById($folderId);
+            $folder->loadTeachers();
+
+        } catch (Mapper\Exception\Deleted $e) {
+            // Deleted: load the parent (recursively)
+            return $this->getFolder($e->getDeletedObject()->getParent()->getId());
+
+        } catch (Mapper\Exception $e) {
+            $folder = $this->folderMapper->createModel();
+            $folder->setId(0);
+        }
+
+        return $folder;
+    }
+
+
+
+    /**
+     * @param array $folderIds
+     * @return int
+     */
+    protected function getAccess(array $folderIds)
+    {
+        if ($this->getUser()->isSuperuser()) {
+            return UserAccess::ACCESS_FULL;
+        }
+
+        if (count($folderIds) != 1) {
+            return $this->userAccessMapper
+                        ->userHasMinimumAccessToAll($this->getUser()->getId(), $folderIds, UserAccess::ACCESS_WRITE)
+                ? UserAccess::ACCESS_WRITE
+                : UserAccess::ACCESS_DENY;
+        }
+
+        try {
+            return $this->userAccessMapper
+                ->getAccess($this->getUser(), $folderIds[0])
+                ->getAccessLevel();
+
+        } catch (Mapper\Exception $e) {
+            try {
+                return $this->roleAccessMapper
+                    ->getAccess($this->getUser(), $folderIds[0])
+                    ->getType();
+
+            } catch (Mapper\Exception $e) {
+                // no accesseses found...you get nothin'
+                return null;
+            }
+        }
+    }
+
+} 

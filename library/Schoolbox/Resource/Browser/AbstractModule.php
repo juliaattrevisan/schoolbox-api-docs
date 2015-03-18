@@ -23,7 +23,7 @@ use Schoolbox\UserMapper;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 
-class Module extends BaseModule
+abstract class AbstractModule extends BaseModule
 {
 
     public function initRoutes(Router $router, $basePath)
@@ -56,7 +56,7 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:resourceBrowser',
-            $injector->lazyNew(Controller::class)
+            $injector->lazyNew($this->getControllerClass())
         );
 
         $setters = [
@@ -70,9 +70,15 @@ class Module extends BaseModule
         ];
 
         foreach ($setters as $method => $class) {
-            $injector->setters[Controller::class][$method] = $injector->lazyNew($class);
+            $injector->setters[$this->getControllerClass()][$method] = $injector->lazyNew($class);
         }
 
     }
+
+
+    /**
+     * @return string
+     */
+    protected abstract function getControllerClass();
 
 } 

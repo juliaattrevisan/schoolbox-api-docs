@@ -26,7 +26,7 @@ class Resource implements ModuleConfigInterface
     {
         $di = $kernel->getDependencyInjector();
 
-        $browserModule = new Schoolbox\Resource\Browser\Module($di);
+        $browserModule = new Schoolbox\Resource\Browser\Resources\Module($di);
 
         $browserModule->init('/resourceses');
 

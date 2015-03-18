@@ -14,14 +14,14 @@ use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Collection;
 use Schoolbox\Config;
+use Schoolbox\FileInterface;
+use Schoolbox\FolderInterface;
 use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-class Controller extends BaseController
+abstract class AbstractController extends BaseController
 {
     /** @var Resource\Folder\Mapper */
     protected $folderMapper;
@@ -122,51 +122,18 @@ class Controller extends BaseController
     }
 
 
-
-
     /**
      * @param int $folderId
      * @return array
      */
     protected function getFolderData($folderId)
     {
-        $sessionUser = $this->getSession()->getAuthUser();
-
-        try {
-            $folder = $this->folderMapper->findById($folderId);
-
-        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-            // Deleted: load the parent
-            $folder = $e->getDeletedObject()->getParent();
-        }
-        catch (\Schoolbox\Mapper\Exception $e) {
-            $folder = $this->folderMapper->createModel();
-            $folder->setId(0);
-        }
-
-        $admins = $this->userAccessMapper->findAdminsInCategory($folder);
-        $roles  = $this->roleAccessMapper->findAllForFolder($folder);
-
-        $folder->loadTeachers();
-
-        $access = $this->getAccess($sessionUser, $folderId);
-
-        if ($admins->count()) {
-            $admin = $this->userMapper->findById($admins->first()->getId());
-        } else {
-            $admin = new User();
-            $admin->setFirstname('Nobody');
-        }
-
         return [
-            'folder' => $folder,
-            'admin'  => $admin,
-            'roles'  => $roles,
-            'access' => $access,
-            'user'   => $sessionUser,
+            'folder' => $this->getFolder($folderId),
+            'access' => $this->getAccess([ $folderId ]),
+            'user'   => $this->getUser(),
             'conf'   => $this->conf
         ];
-
     }
 
 
@@ -256,16 +223,11 @@ class Controller extends BaseController
      */
     public function showFileInfo($fileId)
     {
-        $sessionUser = $this->getSession()->getAuthUser();
-
-        /** @var Resource\File $file */
-        $file = $this->fileMapper->findById($fileId);
-        // urgh...
-        $file->setOwner($this->userMapper->findById($file->getOwner()->getId()));
+        $file = $this->getFile($fileId);
 
         $data = [
             'file'   => $file,
-            'access' => $this->getAccess($sessionUser, $file->getFolder()->getId())
+            'access' => $this->getAccess([ $file->getFolder()->getId() ])
         ];
 
         $this->getResponse()->content->set([
@@ -287,19 +249,10 @@ class Controller extends BaseController
         $folders   = new Collection($files->getColumnValues('folder'));
         $folderIds = array_unique($folders->getColumnValues('id'));
 
-
-        if ($this->getUser()->isSuperuser()) {
-            $access = UserAccess::ACCESS_FULL;
-        } else {
-            $access = $this->userAccessMapper->userHasMinimumAccessToAll($this->getUser()->getId(), $folderIds, UserAccess::ACCESS_WRITE)
-                ? UserAccess::ACCESS_WRITE
-                : UserAccess::ACCESS_DENY;
-        }
-
         $data = [
             'files'  => $fileIds,
             'user'   => $this->getUser(),
-            'access' => $access
+            'access' => $this->getAccess($folderIds)
         ];
 
         $this->getResponse()->content->set([
@@ -311,28 +264,22 @@ class Controller extends BaseController
 
 
     /**
-     * @param User $user
-     * @param int  $folderId
+     * @param int $fileId
+     * @return FileInterface
+     */
+    protected abstract function getFile($fileId);
+
+
+    /**
+     * @param int $folderId
+     * @return FolderInterface
+     */
+    protected abstract function getFolder($folderId);
+
+    /**
+     * @param array $folderIds
      * @return int
      */
-    protected function getAccess($user, $folderId)
-    {
-        try {
-            return $this->userAccessMapper
-                ->getAccess($user, $folderId)
-                ->getAccessLevel();
-
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            try {
-                return $this->roleAccessMapper
-                    ->getAccess($user, $folderId)
-                    ->getType();
-
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                // no accesseses found...you get nothin'
-                return null;
-            }
-        }
-    }
+    protected abstract function getAccess(array $folderIds);
 
 }
