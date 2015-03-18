@@ -87,7 +87,7 @@
     </ul>
 </li>
 {% endif %}
-{% if user.role.type == 'staff' %}
+{% if user.role.type == 'staff' and folder.id > 0 %}
 <li>
     <h4>Permissions</h4>
     <ul>
