@@ -36,19 +36,10 @@ class CurriculumInformationController extends Component_Homepage_ControllerAbstr
      */
     public function renderTemplate($templateHandle)
     {
-        // Make a generic method for Twig based components?
-        if (!$this->loadTemplate($templateHandle, 'twig')) {
-            return false;
-        }
-        $this->parseConfig();
-        $this->setVar(
-            'COMPONENT_CONTENT',
-            $this->fetchTwigContent(
-                '@curriculum/component/curriculumInformation.twig',
-                $this->sitepage
-            )
+        return $this->renderTwigTemplate(
+            $templateHandle,
+            '@curriculum/component/curriculumInformation.twig'
         );
-        return true;
     }
 
 }

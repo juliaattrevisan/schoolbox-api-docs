@@ -491,6 +491,49 @@ abstract class Component_ControllerAbstract
     }
 
     /**
+     * Renders a Twig component.
+     *
+     * Call from $this->renderTemplate($templateHandle)
+     *
+     * @param string $templateHandle Some PHPLib BS which I don't understand.
+     *                               Just pass $templateHandle from
+     *                               $this->renderTemplate($templateHandle).
+     * @param string $twigTemplate   The path to a Twig template.
+     * @param bool   $renderHeader   Set to false if you don't want the PHPLib
+     *                               controlled header and configuration to show.
+     *
+     * @return bool Was the template renderable?
+     */
+    protected function renderTwigTemplate($templateHandle, $twigTemplate, $renderHeader = true)
+    {
+        if (!$this->loadTemplate($templateHandle, 'twig', 'component/')) {
+            return false;
+        }
+        $this->parseConfig();
+
+        // Residual blockage
+        $this->setBlock($templateHandle, 'header', 'header_block');
+        if ($renderHeader) {
+            $this->parse('header_block', 'header');
+        } else {
+            $this->setVar('header_block', '');
+        }
+
+        // Render the twig template
+        try {
+            $content = $this->sitepage->getTwig()->render(
+                $twigTemplate,
+                array('component' => $this,)
+            );
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        $this->setVar('COMPONENT_CONTENT', $content);
+        return true;
+    }
+
+    /**
      * @return \Schoolbox\Resource\Folder\Model
      */
     protected function getContext()
