@@ -8,6 +8,7 @@
  * @version     SVN: $Id$
  */
 namespace Component\Eportfolio;
+use Eportfolio\PageMapper;
 use Schoolbox;
 
 class BlogMapper extends Schoolbox\Mapper {
@@ -28,10 +29,16 @@ class BlogMapper extends Schoolbox\Mapper {
 			'identifier' => true
 		));
 
+        // TODO make this mapping a model
 		$this->hasMap(array(
 			'column'     => 'page_id',
 			'property'   => 'pageId',
 			'type'       => self::TYPE_INTEGER,
+            'join'     => 'page',
+            'join_def' => array(
+                'mapper'    => PageMapper::class,
+                'other_key' => 'page_id',
+            ),
 		));
 
 		$this->hasMap(array(
