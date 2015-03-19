@@ -261,5 +261,5 @@
 
 {% if rubrics.allRubrics|length > 0 %}
 <h2>Rubrics</h2>
-<div data-graph="rubrics" class='learning-analytics boxplots'></div>
+<div data-graph="rubrics" class='learning-analytics boxplots' style="height:{{ ((rubrics.allRubrics|length)*150)+75 }}px"></div>
 {% endif %}
