@@ -433,6 +433,7 @@ abstract class Mapper implements Serializable
         }
 
         if (!empty($parentIds)) {
+            // Load all parents of $collection in one query
             $parents = [];
             foreach ($this->loadAncestors(
                 $this->findByColumn($this->getIdentifier()['column'], $parentIds),
@@ -441,7 +442,7 @@ abstract class Mapper implements Serializable
             ) as $parent) {
                 $parents[$parent->$getId()] = $parent;
             }
-            // set parents of all $collection
+            // and add them as the parent of each item in $collection.
             foreach ($collection as $node) {
                 $parentId = $node->$getParent()->$getId();
                 if (array_key_exists($parentId, $parents)) {
@@ -490,6 +491,7 @@ abstract class Mapper implements Serializable
         }
 
         if (!empty($ids)) {
+            // Load all children of $collection in one query
             $children = [];
             foreach ($this->loadDescendants(
                 $this->findByColumn($this->getMap()->getOffset($parentField)['column'], $ids),
@@ -499,6 +501,7 @@ abstract class Mapper implements Serializable
             ) as $child) {
                 $children[$child->$getParent()->$getId()][] = $child;
             }
+            // and add them as the children of each item in $collection.
             foreach ($collection as $node) {
                 $id = $node->$getId();
                 if (array_key_exists($id, $children)) {
