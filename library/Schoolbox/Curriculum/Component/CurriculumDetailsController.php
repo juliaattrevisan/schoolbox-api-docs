@@ -2,6 +2,8 @@
 /**
  * Curriculum information component
  *
+ * Displays the full details of a single curriculum item, without any children.
+ *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
