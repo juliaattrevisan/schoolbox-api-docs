@@ -48,7 +48,7 @@ class Renderer extends Handler
             ));
 
             foreach ($result as $event) {
-                $date = new Alaress_Date_Format($event['startDate'], 'Y-m-d');
+                $date = new Alaress_Date_Format($event['start_datetime'], Alaress_Date_Format::DATABASE_FORMAT);
                 $event_time = '';
 
                 if (!empty($event['startTime']) && $event['startTime'] != '12:00AM') {
