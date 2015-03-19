@@ -12,7 +12,6 @@ namespace Schoolbox\LearningAnalytics\Rubrics;
 
 use Schoolbox\LearningAnalytics\Metadata\Base as Metadata;
 use Schoolbox\LearningAnalytics\Registry;
-use Schoolbox\Collection;
 
 class AllRubrics {
 
