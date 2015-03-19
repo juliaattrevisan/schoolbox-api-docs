@@ -28,6 +28,6 @@ class Json extends Base {
      */
     protected function outputResponseBody() {
         $response = $this->getResponse()->content->get();
-        echo json_encode(JsonHelper::applyJsonSerializable($response['data']));
+        echo json_encode($response['data']);
     }
 }
