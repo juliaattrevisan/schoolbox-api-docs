@@ -298,7 +298,7 @@ abstract class Component_ControllerAbstract
         // there is configuration
         if (is_array($config) && count($config)) {
             // have write access
-            if ($this->permission > READ_ACCESS) {
+            if ($this->controlPermission > READ_ACCESS) {
                 // display full configuration block
                 list($hasWriteAccess, $processConfig, $displayConfig) = array(true, true, true);
             } // do not have write access
@@ -309,7 +309,7 @@ abstract class Component_ControllerAbstract
         } // there is no configuration
         else {
             // have write access
-            if ($this->permission > READ_ACCESS) {
+            if ($this->controlPermission > READ_ACCESS) {
                 // display delete option
                 list($hasWriteAccess, $processConfig, $displayConfig) = array(true, false, false);
             } // do not have write access
