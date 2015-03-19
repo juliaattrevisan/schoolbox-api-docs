@@ -65,12 +65,12 @@
             series: [
                 {
                     name: 'Most Advanced Student',
-                    data: [options.mostAdvancedStudent],
+                    data: [parseFloat(options.mostAdvancedStudent.toFixed(1))],
                     color: '#ffcc66'
                 },
                 {
                     name: 'Entire Class',
-                    data: [options.classCompletions],
+                    data: [parseFloat(options.classCompletions.toFixed(1))],
                     color: '#66ccff'
                 }
             ],
