@@ -31,6 +31,12 @@
     .learning-analytics.unit-progress {
         width: 100%;
     }
+
+    /* Effort
+     */
+    .learning-analytics.effort {
+        width: 100%;
+    }
 </style>
 
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
@@ -219,8 +225,6 @@
     });
 </script>
 
-<div data-graph="effort" class='learning-analytics effort'></div>
-
 <h1>
     {{ metadata.pageTitle }}
     {% if metadata.route == 'folder' %}
@@ -291,7 +295,14 @@
 <h2>Unit Progress</h2>
 <div data-graph='unit-progress' class='learning-analytics unit-progress' style="height:{{ ((progress.allUnits|length)*50)+75 }}px"></div>
 
+<div class="clearfix"></div>
+
 {% if rubrics.allRubrics|length > 0 %}
 <h2>Rubrics</h2>
 <div data-graph="rubrics" class='learning-analytics boxplots' style="height:{{ ((rubrics.allRubrics|length)*150)+75 }}px"></div>
+
+<div class="clearfix"></div>
 {% endif %}
+
+<h2>Effort</h2>
+<div data-graph="effort" class='learning-analytics effort'></div>
