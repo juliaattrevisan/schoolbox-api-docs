@@ -9,6 +9,10 @@
  */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
+use Schoolbox\News\ArticleMapper;
+use Schoolbox\News\TopicMapper;
+use Schoolbox\News\Topic;
+
 $page = new SitePage(false);
 
 $user = null;
@@ -29,6 +33,7 @@ if (strlen($userKey)) {
     try {
         $userMapper = new \Schoolbox\UserMapper();
         $user = $userMapper->findOneByColumn('key', $userKey);
+        $user = $userMapper->findById($user->getId());
     } catch (\Exception $e) {
         error(31);
     }
@@ -37,15 +42,19 @@ if (strlen($userKey)) {
      */
     if (is_numeric($topicId)) {
         try {
-            $newsTopicMapper = new \Schoolbox\News\TopicMapper();
+            $newsTopicMapper = new TopicMapper();
             $newsTopic = $newsTopicMapper->findById($topicId);
         } catch (\Exception $e) {
+            $newsTopic = new Topic;
         }
+    }
+    else {
+        $newsTopic = new Topic;
     }
 
     /* Find the articles
      */
-    $articleMapper = new \Schoolbox\News\ArticleMapper();
+    $articleMapper = new ArticleMapper();
     $allNews = $articleMapper->findAllForUserAndTopic($user, $newsTopic);
 
     /* Render all this stuff
