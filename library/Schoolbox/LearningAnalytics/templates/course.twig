@@ -38,6 +38,7 @@
 <script type="text/javascript" src="/learninganalytics/js/progress/overall.js"></script>
 <script type="text/javascript" src="/learninganalytics/js/boxPlot.js"></script>
 <script type="text/javascript" src="/learninganalytics/js/progress/unit.js"></script>
+<script type="text/javascript" src="/learninganalytics/js/effort/scatter.js"></script>
 <script type="text/javascript">
     $(function () {
 
@@ -191,8 +192,29 @@
             ])
         });
 {% endif %}
+
+
+        /**
+         *  Scatter for Effort
+         */
+        $.fn.scatterRender({
+            element: '[data-graph=effort]',
+
+            /* Title of the graph
+             */
+            title: '',
+
+            allData: [
+                {% for userId, currentTally in effort.allEffort %}
+                [{{ currentTally.hits }},{{ currentTally.average }}]{% if not loop.last %},
+                {% endif %}
+                {% endfor %}
+            ]
+        });
     });
 </script>
+
+<div data-graph="effort" class='learning-analytics effort'></div>
 
 <h1>
     {{ metadata.pageTitle }}
