@@ -47,6 +47,11 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
         } elseif (!$this->hasReadAccess()) {
             return false;
         }
+
+        // Load child nodes of the node model.
+        if ($this->curriculumNode instanceof Node\Model) {
+            Node\Mapper::getInstance()->loadDescendants($this->curriculumNode);
+        }
         return true;
     }
 
