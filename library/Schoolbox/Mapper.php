@@ -399,6 +399,60 @@ abstract class Mapper implements Serializable
     }
 
     /**
+     * Loads all ancestors of this model or collection.
+     *
+     * Attempts to perform this action in as few queries as possible.
+     *
+     * @param        $object
+     * @param string $parentField
+     * @param int    $currentDepth
+     *
+     * @return $object
+     */
+    public function loadAncestors(
+        $object,
+        $parentField = 'parent',
+        $currentDepth = 1
+    ) {
+        // Recursive relation protection
+        if ($currentDepth <= 50) {
+            return $object;
+        }
+        $collection = $this->getModelAsCollection($object);
+        $getId      = $this->getGetIdentifierMethodName();
+        $getParent  = $this->getGetMethodName($parentField);
+        $setParent  = $this->getSetMethodName($parentField);
+
+        // Get parent ID of each $object
+        $parentIds = [];
+        foreach ($collection as $node) {
+            $parentId = $node->$getParent()->$getId();
+            if ($parentId) {
+                $parentIds[] = $parentId;
+            }
+        }
+
+        if (!empty($parentIds)) {
+            $parents = [];
+            foreach ($this->loadAncestors(
+                $this->findByColumn($this->getIdentifier()['column'], $parentIds),
+                $parentField,
+                $currentDepth+1
+            ) as $parent) {
+                $parents[$parent->$getId()] = $parent;
+            }
+            // set parents of all $collection
+            foreach ($collection as $node) {
+                $parentId = $node->$getParent()->$getId();
+                if (array_key_exists($parentId, $parents)) {
+                    $node->$setParent($parents[$parentId]);
+                }
+            }
+        }
+        return $object;
+    }
+
+    /**
      * Loads all descendants of this model or collection.
      *
      * Attempts to perform this action in as few queries as possible.
