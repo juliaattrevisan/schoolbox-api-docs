@@ -24,7 +24,8 @@ class External_DatabaseFactory
      *
      * @return External_ClassInterface|External_AttendanceInterface|
      *         External_PingInterface|External_TimetableInterface|
-     *         External_UserInterface|External_UserDetentionInterface
+     *         External_UserInterface|External_UserDetentionInterface|
+     *         External_MarkbookInterface
      *         (depends on value of $databaseType)
      * @throws LogicException if even the offline class could be created.
      *                        (This probably means you passed an invalid value
@@ -133,7 +134,7 @@ class External_DatabaseFactory
      * Builds a markbook connector.
      *
      * @param  string $databaseName
-     * @return External_UserDetentionInterface
+     * @return External_MarkbookInterface
      */
     public function buildMarkbookConnector($databaseName = '')
     {
