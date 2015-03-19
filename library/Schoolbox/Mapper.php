@@ -399,6 +399,63 @@ abstract class Mapper implements Serializable
     }
 
     /**
+     * Loads all descendants of this model or collection.
+     *
+     * Attempts to perform this action in as few queries as possible.
+     *
+     * @param        $object
+     * @param string $parentField
+     * @param string $childField
+     * @param int    $currentDepth
+     *
+     * @return $object
+     */
+    public function loadDescendants(
+        $object,
+        $parentField = 'parent',
+        $childField = 'children',
+        $currentDepth = 1
+    ) {
+        // Recursive relation protection
+        if ($currentDepth > 50) {
+            return $object;
+        }
+
+        $collection  = $this->getModelAsCollection($object);
+        $getId       = $this->getGetIdentifierMethodName();
+        $getParent   = $this->getGetMethodName($parentField);
+        $setChildren = $this->getSetMethodName($childField);
+
+        // Get IDs of each $object, use them to get children
+        $ids = [];
+        foreach ($collection as $node) {
+            $id = $node->$getId();
+            if ($id) {
+                $ids[] = $id;
+            }
+        }
+
+        if (!empty($ids)) {
+            $children = [];
+            foreach ($this->loadDescendants(
+                $this->findByColumn($this->getMap()->getOffset($parentField)['column'], $ids),
+                $parentField,
+                $childField,
+                $currentDepth+1
+            ) as $child) {
+                $children[$child->$getParent()->$getId()][] = $child;
+            }
+            foreach ($collection as $node) {
+                $id = $node->$getId();
+                if (array_key_exists($id, $children)) {
+                    $node->$setChildren($this->createCollection($children[$id]));
+                }
+            }
+        }
+        return $object;
+    }
+
+    /**
      * Gets name of get method for identifier column.
      *
      * @return string
