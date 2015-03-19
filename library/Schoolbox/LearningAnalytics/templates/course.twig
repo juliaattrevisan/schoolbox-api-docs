@@ -194,12 +194,17 @@
     });
 </script>
 
-<h1>{{ metadata.pageTitle }}</h1>
+<h1>
+    {{ metadata.pageTitle }}
+    {% if metadata.route == 'folder' %}
+    - {{ metadata.selectedFolder.getName() }}
+    {% endif %}
+</h1>
 
 <ul class="admin-nav">
     <li>
         <a href='/learningAnalytics/{{ metadata.selectedFolder.getId() }}/course' class="{% if metadata.route == 'course' %}current{% endif %}">
-            Course ({{ metadata.pageTitle }})
+            Course
         </a>
     </li>
     {% for folder in metadata.allFolders %}
