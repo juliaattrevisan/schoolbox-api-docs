@@ -41,6 +41,14 @@ class ManyManyRelation extends \Schoolbox\Mapper {
 		$this->setJoin($join);
 	}
 
+    /**
+     * Implemented out of necessity
+     */
+    protected function mapping()
+    {
+        // noop
+    }
+
 	/**
 	 * Find results of join
 	 *
