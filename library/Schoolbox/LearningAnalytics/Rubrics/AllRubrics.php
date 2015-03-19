@@ -12,6 +12,7 @@ namespace Schoolbox\LearningAnalytics\Rubrics;
 
 use Schoolbox\LearningAnalytics\Metadata\Base as Metadata;
 use Schoolbox\LearningAnalytics\Registry;
+use Schoolbox\Collection;
 
 class AllRubrics {
 
@@ -61,32 +62,35 @@ class AllRubrics {
      * Process
      */
     private function process() {
+        $allCriteria = array();
 
         /* A list of all the criteria for this folder
          */
-        $allCriteria = $this->getRubricHandler()->getAvailableCriteria($this->getMetadata()->getSelectedFolder()->getId());
+        foreach($this->getMetadata()->getAllAggregateFolders() as $currentFolder) {
+            $allCriteria = $allCriteria + $this->getRubricHandler()->getAvailableCriteria($currentFolder->getId());
 
-        /* All the students' values
-         */
-        $groupedMarks = array();
+            /* All the students' values
+             */
+            $groupedMarks = array();
 
-        foreach($this->getRegistry()->getAllStudentRegistry() as $unitId => $allStudents) {
-            foreach ($allStudents as $currentStudent) {
+            foreach($this->getRegistry()->getAllStudentRegistry() as $unitId => $allStudents) {
+                foreach ($allStudents as $currentStudent) {
 
-                /* Put folders in a collection for iteration
+                    /* Put folders in a collection for iteration
 
-                 * Oddly enough this method gets the students' marks for a
-                 * criterion spanning across the entire course, which is
-                 * nice and convenient
-                 */
-                foreach ($this->getMetadata()->getAllAggregateFolders() as $currentFolder) {
-                    $allMarks = $this->getRubricHandler()->getStudentMarksByCriteriaInCategory($currentStudent->getId(), $currentFolder->getId());
+                     * Oddly enough this method gets the students' marks for a
+                     * criterion spanning across the entire course, which is
+                     * nice and convenient
+                     */
+                    foreach ($this->getMetadata()->getAllAggregateFolders() as $currentFolder) {
+                        $allMarks = $this->getRubricHandler()->getStudentMarksByCriteriaInCategory($currentStudent->getId(), $currentFolder->getId());
 
-                    foreach($allMarks as $criterionId => $current) {
-                        $groupedMarks[$current['name']][] = array(
-                            'user' => $currentStudent->getId(),
-                            'value' => $current['value'],
-                        );
+                        foreach($allMarks as $criterionId => $current) {
+                            $groupedMarks[$current['name']][] = array(
+                                'user' => $currentStudent->getId(),
+                                'value' => $current['value'],
+                            );
+                        }
                     }
                 }
             }
