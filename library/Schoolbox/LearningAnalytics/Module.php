@@ -42,12 +42,12 @@ class Module extends BaseModule {
         /* folderId is associated with a course, a set of units. This finds all
          * the units associated with all the folders that use the course.
          */
-        $router->addGet('learningAnalytics.course', "{$basePath}/{folderId}/course");
+        $router->addGet('learningAnalytics.course', "{$basePath}/{courseId}");
 
         /* folderId is associated with a course, a set of units. This finds all
          * the units associated with a particular folder that uses the course.
          */
-        $router->addGet('learningAnalytics.folder', "{$basePath}/{folderId}");
+        $router->addGet('learningAnalytics.folder', "{$basePath}/{courseId}/{folderId}");
     }
 
     /**
@@ -67,38 +67,60 @@ class Module extends BaseModule {
                  */
                 $group = new Group();
 
-                if ($group->getPermission($params['folderId']) < WRITE_ACCESS) {
+                if ($group->getPermission($params['courseId']) < WRITE_ACCESS) {
                     error(6);
                 }
 
                 /* Load folders
                  */
                 $unitInstanceMapper = new UnitInstanceMapper();
+                $folderMapper = new FolderMapper();
                 $allUnitInstances = new Collection();
+
+                /* Try to find the parent course folder which spawned minions
+                 */
+                try {
+                    $courseFolder = $folderMapper->findById($params['courseId']);
+                }
+                catch (\Exception $e) {
+
+                    /* TODO: Folder/Course not found
+                     */
+                }
+
+                /* Try to find all the folders which used $courseFolder as a source
+                 */
+                $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder);
 
                 /* Acrobatics
                  */
-                try {
+                if ($allFoldersUsingCourse->count()) {
+                    try {
 
-                    /* All the unit instances associated with $params['folderId']
-                     */
-                    $allUnitCategoryIds = array();
+                        /* All the unit instances associated with $params['folderId']
+                         */
+                        $allCategoryIds = array();
 
-                    $allUnitInstances = $unitInstanceMapper->findByColumn('category_id', $params['folderId']);
+                        foreach ($allFoldersUsingCourse as $currentFolder) {
+                            $allCategoryIds[] = $currentFolder->getId();
+                        }
 
-                    /* All the folders that used the same units
-                     */
-                    foreach ($allUnitInstances as $currentUnitInstance) {
-                        $allUnitCategoryIds[] = $currentUnitInstance->getUnitCategory()->getId();
+                        /* Uniquify
+                         */
+                        $allCategoryIds = array_unique($allCategoryIds);
+
+                        /* All the units associated with folders which used the same
+                         * $courseFolder as a source
+                         */
+                        $allUnitInstances = $unitInstanceMapper->findByColumn('category_id', $allCategoryIds);
                     }
-
-                    /* All the units associated with folders which used the same
-                     * course as $params['folderId']
-                     */
-                    $allUnitInstances = $unitInstanceMapper->findByColumn('unit_category_id', $allUnitCategoryIds);
+                    catch (Exception $e) {
+                        error(159);
+                    }
                 }
-                catch (Exception $e) {
-                    error(159);
+                else {
+                    /* TODO: No folders using this course
+                     */
                 }
 
                 /* Inject
@@ -107,6 +129,8 @@ class Module extends BaseModule {
 
                 return array(
                     'params' => $params,
+                    'courseFolder' => $courseFolder,
+                    'allFoldersUsingCourse' => $allFoldersUsingCourse,
                     'allUnitInstances' => $allUnitInstances
                 );
             }
@@ -146,6 +170,8 @@ class Module extends BaseModule {
 
                 return array(
                     'params' => $params,
+                    'courseFolder' => $courseFolder,
+                    'allFoldersusingCourse' => $allFoldersUsingCourse,
                     'allUnitInstances' => $allUnitInstances
                 );
             }
