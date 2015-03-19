@@ -196,20 +196,17 @@
 
 <h1>
     {{ metadata.pageTitle }}
-    {% if metadata.route == 'folder' %}
-    - {{ metadata.selectedFolder.getName() }}
-    {% endif %}
 </h1>
 
 <ul class="admin-nav">
     <li>
-        <a href='/learningAnalytics/{{ metadata.selectedFolder.getId() }}/course' class="{% if metadata.route == 'course' %}current{% endif %}">
+        <a href='/learningAnalytics/{{ metadata.courseFolder.getId() }}' class="{% if metadata.route == 'course' %}current{% endif %}">
             Course
         </a>
     </li>
     {% for folder in metadata.allFolders %}
     <li>
-        <a href='/learningAnalytics/{{ folder.getId() }}' class="{% if (folder.getId() == metadata.selectedFolder.getId()) and (metadata.route == 'folder') %}current{% endif %}">
+        <a href='/learningAnalytics/{{ metadata.courseFolder.getId() }}/{{ folder.getId() }}' class="{% if (folder.getId() == metadata.selectedFolder.getId()) and (metadata.route == 'folder') %}current{% endif %}">
             {{ folder.getName() }}
         </a>
     </li>
