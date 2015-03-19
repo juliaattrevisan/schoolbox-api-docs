@@ -205,10 +205,15 @@
             title: '',
 
             allData: [
-                {% for userId, currentTally in effort.allEffort %}
-                [{{ currentTally.hits }},{{ currentTally.average }}]{% if not loop.last %},
-                {% endif %}
-                {% endfor %}
+{% for userId, currentTally in effort.allEffort %}
+{
+    info: "{{ currentTally.user.getFullname() }}",
+    uid: '{{ currentTally.user.getExternalId() }}',
+    value: [{{ currentTally.hits }},{{ currentTally.average }}]{% if not loop.last %},
+{% endif %}
+}{% if not loop.last %},
+{% endif %}
+{% endfor %}
             ]
         });
     });

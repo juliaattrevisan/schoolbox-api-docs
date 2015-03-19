@@ -13,7 +13,6 @@
             allData: []
         };
 
-        console.log(options.allData);
         /* The plot unfolds
          */
         $(options.element).highcharts({
@@ -75,8 +74,47 @@
                         }
                     },
                     tooltip: {
-                        headerFormat: '<b>{series.name}</b><br>',
-                        pointFormat: '{point.x} hits, {point.y}%'
+
+                        /**
+                         * Sigh, find all the values in the series which match the
+                         * outlier value and concat it all into one giant tooltip
+                         *
+                         * so goofy
+                         *
+                         * @returns {string}
+                         */
+                        pointFormatter: function() {
+
+                            /* Basic template for each outlier
+                             */
+                            var template =
+                                '<tr>' +
+                                    '<td>' +
+                                        '<span style="display:block;width:32px;height:32px;background-image:url(/portrait.php?userId={UID}&size=square32);"></span>' +
+                                    '</td>' +
+                                    '<td>' +
+                                        '<em>{NAME}</em><br />{VALUE}' +
+                                    '</td>' +
+                                '</tr>';
+
+                            /* Concatenate everything
+                             */
+                            var allTooltipContent = 'glop';
+
+                            for (var i = 0; i < options.allData.length; i++) {
+                                if ((options.allData[i].value[0] == this.x) && (options.allData[i].value[1] == this.y)) {
+                                    var tooltipContent = template;
+
+                                    tooltipContent = tooltipContent.replace(/{UID}/, options.allData[i].uid);
+                                    tooltipContent = tooltipContent.replace(/{NAME}/, options.allData[i].info);
+                                    tooltipContent = tooltipContent.replace(/{VALUE}/, this.y);
+
+                                    allTooltipContent += tooltipContent;
+                                }
+                            }
+
+                            return '<table><tbody>' + allTooltipContent + '</tbody></table>';
+                        }
                     }
                 }
             },
@@ -85,12 +123,28 @@
                 {
                     name: 'Blap',
                     color: 'rgba(223, 83, 83, .5)',
-                    data: options.allData,
+                    data: $.fn.scatterCalculateSeriesData(options.allData),
                     tooltip: {
                         headerFormat: ''
                     }
                 }
             ]
         });
+    }
+
+    /**
+     * Some preprocessing for highcharts
+     *
+     * @param input
+     * @returns {Array}
+     */
+    $.fn.scatterCalculateSeriesData = function(input) {
+        var output = [];
+
+        for (i = 0; i < input.length; i++) {
+            output.push(input[i].value);
+        }
+
+        return output;
     }
 }(jQuery));
