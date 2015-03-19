@@ -107,7 +107,7 @@
 
                                     tooltipContent = tooltipContent.replace(/{UID}/, options.allData[i].uid);
                                     tooltipContent = tooltipContent.replace(/{NAME}/, options.allData[i].info);
-                                    tooltipContent = tooltipContent.replace(/{VALUE}/, this.y);
+                                    tooltipContent = tooltipContent.replace(/{VALUE}/, this.y.toFixed(1) + '%');
 
                                     allTooltipContent += tooltipContent;
                                 }
