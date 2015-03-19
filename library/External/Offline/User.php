@@ -7,8 +7,6 @@
  * @version     SVN: $Id$
  */
 
-use Alaress\DebugBar\Instance as DebugBar;
-
 class External_Offline_User implements External_UserInterface
 {
 
