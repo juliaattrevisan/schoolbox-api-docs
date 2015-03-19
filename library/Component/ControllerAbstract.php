@@ -40,9 +40,22 @@ abstract class Component_ControllerAbstract
     protected $config;
 
     /**
+     * Permission for component contents.
+     *
      * @var int
      */
     protected $permission = 0;
+
+    /**
+     * Permission for component controls, as opposed to the component content.
+     *
+     * These permissions are always based off of the component's context, as
+     * opposed to component content permissions (@see $this->permission), which
+     * may be based off of an alternate source.
+     *
+     * @var int
+     */
+    protected $controlPermission = 0;
 
     /**
      * The maximum permission allowed for this component.

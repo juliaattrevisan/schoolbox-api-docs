@@ -27,7 +27,8 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
     {
         parent::setup($context, $config);
 
-        $this->permission = $_SESSION['su'] ? FULL_ACCESS : $context['permission'];
+        $this->permission        = $_SESSION['su'] ? FULL_ACCESS : $context['permission'];
+        $this->controlPermission = $this->permission;
 
         /* Check primary key is being used correctly!
          */

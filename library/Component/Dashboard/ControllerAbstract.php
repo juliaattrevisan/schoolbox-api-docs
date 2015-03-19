@@ -14,7 +14,8 @@ abstract class Component_Dashboard_ControllerAbstract extends Component_Controll
     public function setup(array $context, array $config)
     {
         // if you're able to see the component, you're in admin mode so full access is granted
-        $this->permission = FULL_ACCESS;
+        $this->permission        = FULL_ACCESS;
+        $this->controlPermission = FULL_ACCESS;
 
         // roll the config specified into what we already have
         if (count($config)) {
