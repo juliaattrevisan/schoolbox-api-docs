@@ -1,0 +1,24 @@
+<div class="box clearfix">
+    {% if node %}
+        <h3>
+            {% if node.code %}
+                {% if isRouteAuthorized('curriculum.browse') %}
+                    [<a title="View in curriculum browser" href="{{ routeLookup('curriculum.browse') }}#{{ node.id }}">{{ node.code }}</a>]
+                {% else %}
+                    [{{ node.code }}]
+                {% endif %}
+            {% endif %}
+            {{ node.name }}
+        </h3>
+        {% if node.description %}
+            {{ node.description|purify }}
+        {% endif %}
+    {% else %}
+        No curriculum codes have been set for this folder.
+        You may set them in the
+        <a href="/cms/category/{{ context.id }}" class="btn modify inline-block">
+            <span></span> Modify Folder
+        </a>
+        screen.
+    {% endif %}
+</div>
