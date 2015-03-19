@@ -99,7 +99,7 @@
 
                             /* Concatenate everything
                              */
-                            var allTooltipContent = 'glop';
+                            var allTooltipContent = '';
 
                             for (var i = 0; i < options.allData.length; i++) {
                                 if ((options.allData[i].value[0] == this.x) && (options.allData[i].value[1] == this.y)) {
@@ -121,7 +121,7 @@
 
             series: [
                 {
-                    name: 'Blap',
+                    name: 'Grade Average vs Hits',
                     color: 'rgba(223, 83, 83, .5)',
                     data: $.fn.scatterCalculateSeriesData(options.allData),
                     tooltip: {
