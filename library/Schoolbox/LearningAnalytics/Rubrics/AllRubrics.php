@@ -76,7 +76,7 @@ class AllRubrics {
                 foreach ($allStudents as $currentStudent) {
 
                     /* Put folders in a collection for iteration
-
+                     *
                      * Oddly enough this method gets the students' marks for a
                      * criterion spanning across the entire course, which is
                      * nice and convenient
