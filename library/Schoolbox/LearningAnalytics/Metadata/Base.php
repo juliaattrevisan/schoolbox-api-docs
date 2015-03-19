@@ -163,7 +163,7 @@ abstract class Base {
      *
      * @return \Schoolbox\Collection
      */
-    protected function getAllUnitInstances()
+    public function getAllUnitInstances()
     {
         return $this->allUnitInstances;
     }
@@ -183,7 +183,7 @@ abstract class Base {
      *
      * @return \Schoolbox\LearningAnalytics\Folder
      */
-    protected function getCourseFolder()
+    public function getCourseFolder()
     {
         return $this->courseFolder;
     }
@@ -223,7 +223,7 @@ abstract class Base {
      *
      * @return array
      */
-    protected function getParams()
+    public function getParams()
     {
         return $this->params;
     }
