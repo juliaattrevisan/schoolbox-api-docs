@@ -263,7 +263,7 @@ class Mapper extends BaseMapper
             $query .= ' AND eo.id IN '
                     . $this->getArrayPlaceholders($extra['owner_id'], 'owner');
         }
-        $query .= ' ORDER BY e.startDate ASC, e.startTime ASC';
+        $query .= ' ORDER BY e.start_datetime ASC';
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
 
