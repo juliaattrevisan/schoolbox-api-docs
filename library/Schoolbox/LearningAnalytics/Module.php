@@ -153,7 +153,23 @@ class Module extends BaseModule {
                 /* Load folders
                  */
                 $unitInstanceMapper = new UnitInstanceMapper();
+                $folderMapper = new FolderMapper();
                 $allUnitInstances = new Collection();
+
+                /* Try to find the parent course folder which spawned minions
+                 */
+                try {
+                    $courseFolder = $folderMapper->findById($params['courseId']);
+                }
+                catch (\Exception $e) {
+
+                    /* TODO: Folder/Course not found
+                     */
+                }
+
+                /* Try to find all the folders which used $courseFolder as a source
+                 */
+                $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder);
 
                 /* No acrobatics required
                  */
@@ -171,7 +187,7 @@ class Module extends BaseModule {
                 return array(
                     'params' => $params,
                     'courseFolder' => $courseFolder,
-                    'allFoldersusingCourse' => $allFoldersUsingCourse,
+                    'allFoldersUsingCourse' => $allFoldersUsingCourse,
                     'allUnitInstances' => $allUnitInstances
                 );
             }
