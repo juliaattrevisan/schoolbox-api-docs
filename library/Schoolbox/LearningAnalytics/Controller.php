@@ -56,10 +56,10 @@ class Controller extends Base {
      * $allUnitInstances will be:
      *
      * + either all the units relevant to the course belonging to the
-     * "learningAnalytics/$param['folderId']/course" route
+     * "learningAnalytics/$param['courseId']" route
      *
      * + or all the units relevant to a particular folder in the
-     * "learningAnalytics/$param['folderId']" route
+     * "learningAnalytics/$param['courseId']/$param['folderId']" route
      *
      * Both are processed identically as data is grouped based on task
      * instances' originating task id, not the individual instance id
