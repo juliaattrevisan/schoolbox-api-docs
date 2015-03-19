@@ -23,6 +23,7 @@ use Schoolbox\LearningAnalytics\Metadata\Base as Metadata;
 use Schoolbox\LearningAnalytics\Metadata\Course as MetadataCourse;
 use Schoolbox\LearningAnalytics\Metadata\Folder as MetadataFolder;
 use Schoolbox\LearningAnalytics\Rubrics\AllRubrics;
+use Schoolbox\LearningAnalytics\Effort\AllEffort;
 
 class Controller extends Base {
 
@@ -103,6 +104,13 @@ class Controller extends Base {
          */
         $allRubrics = new AllRubrics($metadata, $registry);
 
+        /**
+         * Effort
+         *
+         * A metric based on Homepage accesses to grade average
+         */
+        $allEffort = new AllEffort($registry, $metadata, $allAverages);
+
         /* Twig data
          */
         $this->getResponse()->content->set(
@@ -131,6 +139,9 @@ class Controller extends Base {
                     ),
                     'rubrics' => array(
                         'allRubrics' => $allRubrics->getAllRubrics(),
+                    ),
+                    'effort' => array(
+                        'allEffort' => $allEffort->getTally(),
                     )
                 )
             )
