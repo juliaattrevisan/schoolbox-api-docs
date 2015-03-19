@@ -14,8 +14,8 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
     {
         parent::setup($context, $config);
         $g = new Group();
-        // Managing permissions for alternate sources:
-        // alt-source permission overrides homepage perm.
+        // Content permission: based on alt source if it's there
+        // Control permission: always based on current context
         if (!empty($config['src']['value'])) {
             $sourceId = $config['src']['value'];
         } else {
