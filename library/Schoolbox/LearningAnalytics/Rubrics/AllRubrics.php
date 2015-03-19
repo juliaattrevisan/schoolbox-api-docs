@@ -63,36 +63,32 @@ class AllRubrics {
     private function process() {
         $allCriteria = array();
 
+        /* All the students' values
+         */
+        $groupedMarks = array();
+
         /* A list of all the criteria for this folder
          */
         foreach($this->getMetadata()->getAllAggregateFolders() as $currentFolder) {
-            $allCriteria = $allCriteria + $this->getRubricHandler()->getAvailableCriteria($currentFolder->getId());
-
-            /* All the students' values
-             */
-            $groupedMarks = array();
-
             foreach($this->getRegistry()->getAllStudentRegistry() as $unitId => $allStudents) {
                 foreach ($allStudents as $currentStudent) {
 
-                    /* Put folders in a collection for iteration
-                     *
-                     * Oddly enough this method gets the students' marks for a
+                    /* Oddly enough this method gets the students' marks for a
                      * criterion spanning across the entire course, which is
                      * nice and convenient
                      */
-                    foreach ($this->getMetadata()->getAllAggregateFolders() as $currentFolder) {
-                        $allMarks = $this->getRubricHandler()->getStudentMarksByCriteriaInCategory($currentStudent->getId(), $currentFolder->getId());
+                    $allMarks = $this->getRubricHandler()->getStudentMarksByCriteriaInCategory($currentStudent->getId(), $currentFolder->getId());
 
-                        foreach($allMarks as $criterionId => $current) {
-                            $groupedMarks[$current['name']][] = array(
-                                'user' => $currentStudent->getId(),
-                                'value' => $current['value'],
-                            );
-                        }
+                    foreach($allMarks as $criterionId => $current) {
+                        $groupedMarks[$current['name']][] = array(
+                            'user' => $currentStudent->getId(),
+                            'value' => $current['value'],
+                        );
                     }
                 }
             }
+
+            $allCriteria = $allCriteria + $this->getRubricHandler()->getAvailableCriteria($currentFolder->getId());
         }
 
         /* Recombine and preserve criterion grouping
