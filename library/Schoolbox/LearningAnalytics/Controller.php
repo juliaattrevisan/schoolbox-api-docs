@@ -111,6 +111,7 @@ class Controller extends Base {
                 'data' => array(
                     'metadata' => array(
                         'pageTitle' => $metadata->getPageTitle(),
+                        'courseFolder' => $metadata->getCourseFolder(),
                         'allFolders' => $metadata->getAllFolders(),
                         'selectedFolder' => $metadata->getSelectedFolder(),
                         'route' => $metadata->getRoute(),
