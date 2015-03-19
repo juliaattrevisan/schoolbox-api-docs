@@ -13,7 +13,7 @@ use Component_Homepage_ControllerAbstract;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Resource\Folder;
 
-class CurriculumInformationController extends Component_Homepage_ControllerAbstract
+class CurriculumDetailsController extends Component_Homepage_ControllerAbstract
 {
     /**
      * The curriculum to display.

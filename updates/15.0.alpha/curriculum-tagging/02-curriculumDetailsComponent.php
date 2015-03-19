@@ -10,16 +10,15 @@
 require_once __DIR__ . '/../../../include/Bootstrap.php';
 
 $component = array(
-    'name'               => 'Curriculum Information',
+    'name'               => 'Curriculum Details',
     'module'             => 'homepage',
     'component_category' => '3', // Learning
-    'class'              => 'Schoolbox\\Curriculum\\Component\\CurriculumInformationController',
-    'description'        => 'Shows curriculum information',
-    'multiple'           => 'true',
+    'class'              => 'Schoolbox\\Curriculum\\Component\\CurriculumDetailsController',
+    'description'        => 'Shows the full details of a curriculum code that has been attached to this homepage',    'multiple'           => 'true',
     'visible'            => 'true',
     'config'             => array(
         'componentname' => array(
-            'default_value' => 'Curriculum Information',
+            'default_value' => 'Curriculum Details',
             'label'         => 'Heading',
         ),
         // Select a curriculum code from the ones on the page.
