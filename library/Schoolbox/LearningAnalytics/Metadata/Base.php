@@ -73,13 +73,18 @@ abstract class Base {
      * Constructor
      *
      * @param array $params
+     * @param Folder $courseFolder
+     * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
      */
-    public function __construct($params, Collection $allUnitInstances) {
+    public function __construct($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances) {
         $this->setParams($params);
 
+        $this->setCourseFolder($courseFolder);
+        $this->setPageTitle($this->getCourseFolder()->getName());
+
         $this->setAllUnitInstances($allUnitInstances);
-        $this->setAllFolders(new Collection());
+        $this->setAllFolders($allFoldersUsingCourse);
         $this->setAllAggregateFolders(new Collection());
 
         $this->process();
@@ -94,44 +99,15 @@ abstract class Base {
 
         try {
             $this->setSelectedFolder($folderMapper->findById($params['folderId']));
+            $this->getAllAggregateFolders()->add($this->getSelectedFolder());
         }
-        catch (\Exception $e) {
-
-            /* TODO: Error, folder does not exist
-             */
-        }
-
-        /* Find title of the course by deriving the parent folder
-         * of a unit_category_id
+        /* Only aggregate for one folder in 'folder' route
+         * That is defined by having a $params['folderId']
+         *
+         * Otherwise aggregate for all folders that used the same course
          */
-        if ($this->getAllUnitInstances()->count()) {
-            try {
-                $unitInstanceMapper = new UnitInstanceMapper();
-
-                /* Assumption: A Folder using a Course cannot have Units from
-                 * a different Course (no hybrid Courses)
-                 *
-                 * Under that assumption, all Units associated with a Folder
-                 * must have come from the same originating Course Folder
-                 */
-                $firstUnit = $this->getAllUnitInstances()->first();
-
-                $this->setCourseFolder($unitInstanceMapper->findCourseForUnit($firstUnit));
-                $this->setAllFolders($unitInstanceMapper->findAllFoldersUsingCourse($this->getCourseFolder()));
-                $this->setPageTitle($this->getCourseFolder()->getName());
-
-                /* Only aggregate for one folder in 'folder' route
-                 * Otherwise aggregate for all folders
-                 */
-                if ($this->getRoute() == 'folder') {
-                    $this->getAllAggregateFolders()->add($this->getSelectedFolder());
-                }
-                else {
-                    $this->setAllAggregateFolders($this->getAllFolders());
-                }
-            }
-            catch (\Exception $e) {
-            }
+        catch (\Exception $e) {
+            $this->setAllAggregateFolders($this->getAllFolders());
         }
     }
 
