@@ -33,7 +33,14 @@ class CurriculumInformationController extends Component_Homepage_ControllerAbstr
         /** @var Folder\Model $context */
         $context = $this->getContext();
         if ($context->getCurriculumNodes()->count()) {
+            // No curriculum item selected? just use the first.
             $this->curriculumNode = $context->getCurriculumNodes()->first();
+            foreach ($context->getCurriculumNodes() as $node) {
+                if ($node->getCode() == $this->getConfig('curriculumCode')) {
+                    $this->curriculumNode = $node;
+                    break;
+                }
+            }
         } elseif (!$this->hasReadAccess()) {
             return false;
         }
