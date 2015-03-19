@@ -57,7 +57,22 @@ class TaskList {
 
         foreach ($this->getRegistry()->getAllUnitRegistry() as $currentUnit) {
             foreach ($currentUnit->getTasks() as $currentTask) {
-                $allTasks[$currentTask->getTask()->getId()] = $currentTask;
+
+                /* A task that has a mark is one that has either
+                 * + A submission box instance with a numeric id, or
+                 * + An assessment instance with a numeric id
+                 *
+                 * Tasks come with objects for submission_box and assessment,
+                 * but they could be entirely empty. That denotes a task which
+                 * requires no mark.
+                 *
+                 * Ignore all tasks which have no mark requirement. Ignoring them
+                 * here prevents matching in TaskResults(), effectively removing
+                 * them from the boxplots.
+                 */
+                if (is_numeric($currentTask->getSubmissionBox()->getId()) || is_numeric($currentTask->getAssessment()->getId())) {
+                    $allTasks[$currentTask->getTask()->getId()] = $currentTask;
+                }
             }
         }
 
