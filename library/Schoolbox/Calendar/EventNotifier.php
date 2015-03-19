@@ -210,7 +210,7 @@ class EventNotifier extends AbstractModuleNotifier
         }
 
         // time changed
-        if (isset($diff['startDate']) || isset($diff['startTime'])) {
+        if (isset($diff['start_datetime'])) {
             $bob->setTitle(':user changed the start time of :name to :time')
                 ->setParams(
                     array(
@@ -221,8 +221,7 @@ class EventNotifier extends AbstractModuleNotifier
                 );
 
             $instances[] = $bob->build();
-            unset($diff['startDate']);
-            unset($diff['startTime']);
+            unset($diff['start_datetime']);
         }
 
         // something else changed
