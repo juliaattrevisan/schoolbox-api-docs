@@ -75,4 +75,4 @@ echo '*' . "\n";
 echo "\n# " . md5($hashes) . "\n";
 
 // FOR TESTING. Ensures we'll get an appcache update (every minute).
-//echo '# ' . date("n/j/Y h:i");
+//echo '# ' . date("n/j/Y H:i");

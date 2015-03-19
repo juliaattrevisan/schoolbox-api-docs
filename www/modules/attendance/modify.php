@@ -49,7 +49,7 @@ if (!is_numeric(preg_replace('/[^0-9]+/', '', $this->arg[3]))) {
  * Check that you are allowed to edit something in a particular date range
  * (You cannot edit anything older than the previous week)
  */
-$attendanceDate = new Alaress_Date_Format($this->arg[2], 'y-m-d');
+$attendanceDate = new Alaress_Date_Format($this->arg[2], 'Y-m-d');
 $now = new Alaress_Date_Format(time(), 'U');
 
 if ($attendanceDate->getUsingFormat('W') < ($now->getUsingFormat('W') - 1)) {

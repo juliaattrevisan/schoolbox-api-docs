@@ -91,8 +91,8 @@ $this->setBlock(TEMPLATE_content, 'prevSection', 'prevSection_block');
 $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
 $this->setTitle('Assessment: ' . $assess['title']);
 
-$start = new Alaress_Date_Format($attempt['start'], 'y-m-d h:i:s');
-$finish = new Alaress_Date_Format($attempt['finish'], 'y-m-d h:i:s');
+$start = new Alaress_Date_Format($attempt['start'], 'Y-m-d H:i:s');
+$finish = new Alaress_Date_Format($attempt['finish'], 'Y-m-d H:i:s');
 $user = $attemptHandler->getUser($attempt['attempt_id']);
 
 /* Show current Section's data, and other mandatory tokens needed to complete

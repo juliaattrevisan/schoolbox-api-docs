@@ -43,7 +43,7 @@ $this->setVar(array(
     'EVENT_LOCATION' => $event->getLocation(),
     'EVENT_DETAIL' => $event->getDetail(),
     'EVENT_CREATED_AT' => $event->getMetadata()->getCreatedAt()->getShort(),
-    'EVENT_DATESTAMP' => $event->getStartDateTime()->getUsingFormat('d-m-Y'),
+    'EVENT_DATESTAMP' => $event->getStartDateTime()->getURLDate(),
     'EVENT_START' => $event->getStartDateTime()->getShort(),
     'EVENT_END' => $event->getEndDateTime()->getShort(),
     'EVENT_STATUS' => $event->getMetadata()->getStatus()->getName(),

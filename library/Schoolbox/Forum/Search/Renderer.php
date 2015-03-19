@@ -13,7 +13,7 @@ namespace Schoolbox\Forum\Search;
 use Schoolbox\Resource\Search\Renderer\Handler;
 use Scrub;
 use TextFormatter;
-use Alaress_Date_Relative;
+use Alaress_Date_Format;
 
 class Renderer extends Handler
 {
@@ -55,7 +55,7 @@ class Renderer extends Handler
                     $forum['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
                 }
 
-                $createdTime = new Alaress_Date_Relative($forum['date']);
+                $createdTime = new Alaress_Date_Format($forum['date'], 'Y-m-d H:i:s');
 
                 $this->getPage()->setVar(array(
                     'FORUM_CID' => $forum['categoryID'],

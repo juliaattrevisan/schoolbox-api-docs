@@ -293,7 +293,7 @@ class ThreadsSlow
         $i = 0;
 
         foreach ($this->getTree() as $currentPost) {
-            $rel = new \Alaress_Date_Relative($currentPost->getCreatedAt());
+            $rel = new \Alaress_Date_Format($currentPost->getCreatedAt());
             $page->setVar(
                 array(
                     'COMPONENT_INSTANCE_ID'              => $this->getInstance()->getId(),
@@ -357,7 +357,7 @@ class ThreadsSlow
             /* Descendents
              */
             foreach ($currentPost->getChildren() as $currentComment) {
-                $rel = new \Alaress_Date_Relative($currentComment->getCreatedAt());
+                $rel = new \Alaress_Date_Format($currentComment->getCreatedAt());
                 $page->setVar(
                     array(
                         'COMPONENT_INSTANCE_ID'                 => $this->getInstance()->getId(),
@@ -419,7 +419,7 @@ class ThreadsSlow
                 /* Descendents
                  */
                 foreach ($currentComment->getChildren() as $currentReply) {
-                    $rel = new \Alaress_Date_Relative($currentReply->getCreatedAt());
+                    $rel = new \Alaress_Date_Format($currentReply->getCreatedAt());
                     $page->setVar(
                         array(
                             'COMPONENT_INSTANCE_ID'               => $this->getInstance()->getId(),

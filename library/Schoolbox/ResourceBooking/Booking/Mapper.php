@@ -253,10 +253,7 @@ class Mapper extends BaseMapper
             LEFT  JOIN {$this->getJoinSql('resource.image',    'i', 'im')}
             WHERE b.deleted_at IS NULL
             AND   s.id IN {$this->getArrayPlaceholders($statusIds, 'status')}
-            AND NOT (
-                CONCAT(e.endDate, ' ', e.endTime) < :startWindow
-                OR CONCAT(e.startDate, ' ', e.startTime) > :endWindow
-            )
+            AND NOT (e.end_datetime < :startWindow OR e.start_datetime > :endWindow)
         ";
         if (!empty($extra['resource_id'])) {
             $query .= ' AND b.resource_id IN '
@@ -266,7 +263,7 @@ class Mapper extends BaseMapper
             $query .= ' AND eo.id IN '
                     . $this->getArrayPlaceholders($extra['owner_id'], 'owner');
         }
-        $query .= ' ORDER BY e.startDate ASC, e.startTime ASC';
+        $query .= ' ORDER BY e.start_datetime ASC';
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
 

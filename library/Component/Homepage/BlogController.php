@@ -126,8 +126,6 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
             $i = 0;
 
             foreach ($allItems as $currentItem) {
-                $createdTime = new Alaress_Date_Relative($currentItem->getCreated()->getDatabase());
-
                 $this->setVar(
                     array(
                         'BLOG_ID' => $currentItem->getId(),
@@ -138,7 +136,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                         'BLOG_AUTHOR_NAME' => $currentItem->getOwner()->formatName(),
                         'BLOG_AUTHOR_THUMB' => "/portrait.php?userId={$currentItem->getOwner()->getExternalId(
                             )}&size=square32",
-                        'BLOG_CREATED' => $createdTime->getRelativeTime(),
+                        'BLOG_CREATED' => $currentItem->getCreated()->getRelativeTime(),
                         'BLOG_SHADING' => ++$i % 2 ? '' : 'dark',
                         'BLOG_COMMENTS' => '',
                     )
@@ -150,15 +148,13 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                     $j = 0;
 
                     foreach ($allComments as $currentComment) {
-                        $createdTime = new Alaress_Date_Relative($currentComment->getCreated()->getDatabase());
-
                         $this->setVar(
                             array(
                                 'COMMENT_COMMENT_ID' => $currentComment->getId(),
                                 'COMMENT_BODY' => nl2br(Scrub::text($currentComment->getBody())),
                                 'COMMENT_AUTHOR_ID' => $currentComment->getOwner()->getId(),
                                 'COMMENT_AUTHOR_NAME' => $currentComment->getOwner()->formatName(),
-                                'COMMENT_CREATED' => $createdTime->getRelativeTime(),
+                                'COMMENT_CREATED' => $currentComment->getCreated()->getRelativeTime(),
                                 'COMMENT_AUTHOR_EXTERNAL_ID' => $currentComment->getOwner()->getExternalId(),
                                 'ON_OFF' => ++$j % 2 ? 'dark' : ''
                             )

@@ -36,7 +36,7 @@ if (is_array($calendarList)) {
             $time = $calendar['startTime'].' - '.$calendar['endTime'];
         }
 
-        $itemDate = new Alaress_Date_Format($calendar['date'], 'y-m-d');
+        $itemDate = new Alaress_Date_Format($calendar['date'], 'Y-m-d');
 
         $output = array(
             'ITEM_TITLE'       => Scrub::xml($calendar['note']),

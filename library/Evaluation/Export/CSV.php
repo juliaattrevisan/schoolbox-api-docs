@@ -220,10 +220,10 @@ abstract class Evaluation_Export_CSV {
 				 */
 				$user = $this->getAttemptHandler()->getUser($currentAttempt['attempt_id']);
 
-				$start = new Alaress_Date_Format($currentAttempt['start'], 'y-m-d h:i:s');
+				$start = new Alaress_Date_Format($currentAttempt['start'], 'Y-m-d H:i:s');
 
 				if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
-					$finish = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d h:i:s');
+					$finish = new Alaress_Date_Format($currentAttempt['finish'], 'Y-m-d H:i:s');
 					$finishTime = $finish->getShort();
 				}
 				else {

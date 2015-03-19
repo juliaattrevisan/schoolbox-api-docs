@@ -656,14 +656,13 @@ class StudentReportCard
     {
         $workTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper();
         $workType       = $workTypeMapper->findById($box->getWorkType()->getId());
-        $due            = new \Alaress_Date_Relative($box->getDueDate());
         $urgency        = $box->getGradientIndex();
         $output         = array(
             'WORK_TITLE'   => $box->getName(),
             'WORK_ID'      => $box->getId(),
             'WORK_TYPE'    => $workType->getName(),
-            'WORK_DATE'    => $due->getRelativeTime(),
-            'WORK_TIME'    => $due->getDateOnly(),
+            'WORK_DATE'    => $box->getDueDate()->getRelativeTime(),
+            'WORK_TIME'    => $box->getDueDate()->getDateOnly(),
             'WORK_URGENCY' => $urgency,
             'WORK_HREF'    => 'submission/submissionHistory/',
             'buttons'      => array()
@@ -702,14 +701,13 @@ class StudentReportCard
         $workType       = $workTypeMapper->findById($oa->getWorkType()->getId());
         // marks are contained inside a single-element array, pull it out of itself
         $marks                     = $marks[0];
-        $due                       = new \Alaress_Date_Relative($oa->getFinish());
         $urgency                   = $oa->getGradientIndex();
         $output                    = array(
             'WORK_TITLE'   => $oa->getTitle(),
             'WORK_ID'      => $marks ? "{$oa->getId()}/{$marks['section_id']}/{$marks['attempt_id']}" : $oa->getId(),
             'WORK_TYPE'    => $workType->getName(),
-            'WORK_DATE'    => $due->getRelativeTime(),
-            'WORK_TIME'    => $due->getDateOnly(),
+            'WORK_DATE'    => $oa->getFinish()->getRelativeTime(),
+            'WORK_TIME'    => $oa->getFinish()->getDateOnly(),
             'WORK_URGENCY' => $urgency,
             'WORK_HREF'    => 'assess/intro/',
             'buttons'      => array()
@@ -821,8 +819,7 @@ class StudentReportCard
         if ($comments->count()) {
             foreach ($comments as $comment) {
                 /** @var Comment $comment */
-                $adr  = new \Alaress_Date_Relative($comment->getCreated());
-                $date = $adr->getRelativeTime();
+                $date = $comment->getCreated()->getRelativeTime();
                 if ($comment->getModified()) {
                     $date .= " &ndash; edited";
                 }
@@ -832,7 +829,7 @@ class StudentReportCard
                     'USER_BYLINE' => $comment->getCommenter()->getRole()->getName(),
                     'USER_EXTID'  => $comment->getCommenter()->getExternalId(),
                     'DATE'        => $date,
-                    'DATETIME'    => $adr->getDatabase(),
+                    'DATETIME'    => $comment->getCreated()->getDatabase(),
                     'BODY'        => $comment->getBody(),
                 );
                 // these vars determine the state of the little person icons

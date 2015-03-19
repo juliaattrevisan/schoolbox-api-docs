@@ -98,11 +98,15 @@ class EventRecurrenceMapper
             return array();
         }
 
-        $dateFirst = new Alaress_Date_Format($series->first()->getStartDate(), 'y-m-d');
-        $dateNext  = new Alaress_Date_Format($series->next()->current()->getStartDate(), 'y-m-d');
-        $dateLast  = new Alaress_Date_Format($series->last()->getStartDate(), 'y-m-d');
+        $dateFirst = $series->first()->getStartDateTime();
+        $dateFirst->startOfDay();
+        $dateNext  = $series->next()->current()->getStartDateTime();
+        $dateNext->startOfDay();
+        $dateLast  = $series->last()->getStartDateTime();
+        $dateLast->startOfDay();
 
-        $diff = (int)(($dateNext->getUnixTimestamp() - $dateFirst->getUnixTimestamp()) / 86400);
+        //$diff = (int)(($dateNext->getUnixTimestamp() - $dateFirst->getUnixTimestamp()) / 86400);
+        $diff = $dateFirst->diffInDays($dateNext);
 
         $recurMap = array(
             1  => 'daily',
@@ -359,10 +363,11 @@ class EventRecurrenceMapper
         } else {
             // dateSource could be a datePeriod
             // How many days are there between $start and $end?
-            $startDate = new DateTime($event->getStartDate() . ' 00:00:00');
-            $endDate   = new DateTime($event->getEndDate() . ' 00:00:00');
-            $diff      = $startDate->diff($endDate);
-            $dayDiff   = $diff->days;
+            $startDate = $event->getStartDateTime();
+            $endDate   = $event->getStartDateTime();
+            $startDate->startOfDay();
+            $endDate->startOfDay();
+            $dayDiff      = $startDate->diffInDays($endDate);
             $seriesId  = $this->getEventMapper()->getUpperSeriesIndex();
             foreach ($dateSource as $currentDate) {
                 $newEvent = clone $event;

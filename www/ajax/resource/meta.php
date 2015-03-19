@@ -275,7 +275,7 @@ function getSingleFileMeta($folderId, $fileId)
             break;
     }
 
-    $modified = new Alaress_Date_Relative($file->getModified());
+    $modified = new Alaress_Date_Format($file->getModified());
 
     $file = array(
         'kind'        => 'file',

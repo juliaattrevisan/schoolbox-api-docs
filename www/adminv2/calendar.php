@@ -208,8 +208,8 @@ if (is_array($typeList)) {
             /* If both dates specified, find events between those two dates inclusive
              */
             if (isset($_GET['cleanupFrom']) && isset($_GET['cleanupTo'])) {
-                $from = new \Alaress_Date_Format($_GET['cleanupFrom'], 'd/m/y');
-                $to = new \Alaress_Date_Format($_GET['cleanupTo'], 'd/m/y');
+                $from = new \Alaress_Date_Format($_GET['cleanupFrom'], 'd/m/Y');
+                $to = new \Alaress_Date_Format($_GET['cleanupTo'], 'd/m/Y');
             } else {
                 $from = new \Alaress_Date_Format(strtotime('-1 month'), 'U');
                 $to = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');

@@ -77,11 +77,11 @@ class Csv extends Base {
 			 * If access is 3, then the sid corresponds to campus id's
 			 * If access is 2, then the sid corresponds to group id's
 			 */
-			$start = new Alaress_Date_Format($start_date, 'd/m/y');
+			$start = new Alaress_Date_Format($start_date, 'd/m/Y');
 			//
 			// Finish empty? Use start date as the finish.
 			$finish = (strlen(trim($finish_date))) ?
-				new Alaress_Date_Format($finish_date, 'd/m/y'):
+				new Alaress_Date_Format($finish_date, 'd/m/Y'):
 				clone $start;
 
 			//
@@ -181,8 +181,8 @@ class Csv extends Base {
 				$event->setOwner($this->getUser());
 				$event->setAuthor($this->getAuthor());
 				$event->setAccess($this->getAccess());
-				$event->setStartDateTime(new Alaress_Date_Format($start->getDatabaseDate() . ' ' . $start_time, 'y-m-d h:i:s'));
-				$event->setEndDateTime(new Alaress_Date_Format($finish->getDatabaseDate() . ' ' . $finish_time, 'y-m-d h:i:s'));
+				$event->setStartDateTime($startDatetime);
+				$event->setEndDateTime($finishDatetime);
 				$event->setTitle($name);
 				$event->setDetail(nl2br(\Scrub::text($detail)));
 				$event->setLocation($location);
@@ -194,7 +194,7 @@ class Csv extends Base {
 				/* If a publish date is specified, use it; otherwise leave as empty
 				 */
 				if (strlen(trim($publish_date))) {
-					$pdate = new Alaress_Date_Format($publish_date, 'd/m/y');
+					$pdate = new Alaress_Date_Format($publish_date, 'd/m/Y');
 					$event->setPublishDateTime($pdate);
 				}
 

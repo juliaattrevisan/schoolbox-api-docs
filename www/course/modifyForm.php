@@ -59,8 +59,8 @@ if (!$permission_denied) {
             // Figure out which unit instance ID (if any) is attached
             $unit_id   = $unit_data['unit_id'];
             $import    = !empty($unit_data['import']);
-            $open_date = new Alaress_Date_Format($unit_data['open_date'], 'd/m/y');
-            $due_date  = new Alaress_Date_Format($unit_data['due_date'], 'd/m/y');
+            $open_date = new Alaress_Date_Format($unit_data['open_date'], 'd/m/Y');
+            $due_date  = new Alaress_Date_Format($unit_data['due_date'], 'd/m/Y');
             try {
                 // Is there a unit instance? If so fetch it, otherwise fetch by unit
                 // category and component.

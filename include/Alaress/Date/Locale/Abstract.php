@@ -26,7 +26,7 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
 	/**
 	 * Get the preferred local format
 	 *
-	 * @return
+	 * @return string
 	 */
 	public function localFormat() {
 		return $this->local;
@@ -35,7 +35,7 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
 	/**
 	 * Get the preferred local short format
 	 *
-	 * @return
+	 * @return string
 	 */
 	public function localShortFormat() {
 		return $this->localShort;
@@ -44,7 +44,7 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
 	/**
 	 * Get a long format
 	 *
-	 * @return
+	 * @return string
 	 */
 	public function longFormat() {
 		return $this->long;
@@ -53,7 +53,7 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
 	/**
 	 * Get a long date only format
 	 *
-	 * @return
+	 * @return string
 	 */
 	public function longDateOnlyFormat() {
 		return $this->longDateOnly;
@@ -62,7 +62,7 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
 	/**
 	 * Get a shortened format
 	 *
-	 * @return
+	 * @return string
 	 */
 	public function shortFormat() {
 		return $this->short;
@@ -71,7 +71,7 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
 	/**
 	 * Get the date-only format
 	 *
-	 * @return
+	 * @return string
 	 */
 	public function dateOnlyFormat() {
 		return $this->dateOnly;
@@ -80,52 +80,16 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
 	/**
 	 * Get the time-only format
 	 *
-	 * @return
+	 * @return string
 	 */
 	public function timeOnlyFormat() {
 		return $this->timeOnly;
 	}
 
 	/**
-	 * Get a database format
-	 *
-	 * @return
-	 */
-	public function databaseFormat() {
-		return $this->database;
-	}
-
-	/**
-	 * Get a database date format
-	 *
-	 * @return mixed
-	 */
-	public function databaseDateFormat() {
-		return $this->databaseDate;
-	}
-
-	/**
-	 * Get a database time format
-	 *
-	 * @return
-	 */
-	public function databaseTimeFormat() {
-		return $this->databaseTime;
-	}
-
-	/**
-	 * Get the timestamp format
-	 *
-	 * @return
-	 */
-	public function timestampFormat() {
-		return $this->timestamp;
-	}
-
-	/**
 	 * Get the calendar date format
 	 *
-	 * @return mixed
+	 * @return string
 	 */
 	public function calendarDate() {
 		return $this->calendarDate;
@@ -134,7 +98,7 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
 	/**
 	 * Get the calendar datetime format
 	 *
-	 * @return mixed
+	 * @return string
 	 */
 	public function calendarDateTime() {
 		return $this->calendarDateTime;

@@ -114,11 +114,6 @@ class Leave_Kings_Report_House_Web
                 $decorationEnd = $this->getDecorationApprovedEnd();
             }
 
-            /* Start and end of leave
-                */
-            $requestDateStart = new Alaress_Date_Format($request->getStart(), 'y-m-d h:i:s');
-            $requestDateFinish = new Alaress_Date_Format($request->getFinish(), 'y-m-d h:i:s');
-
             /* For each day that the person is on leave within the prescribed period of time, show an
                 * icon. If they are starting or ending their leave on this day, show the time as well
                 *
@@ -129,11 +124,18 @@ class Leave_Kings_Report_House_Web
                 * Night: 21:00:00 to 6:59:59
                 */
             $data = $this->getData();
+            $morningStart = $data['reportStart'];
+            $morningStart->addHours(7);
 
-            $morningStart = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp() + 7 * 60 * 60, 'U');
-            $dayStart = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp() + 11 * 60 * 60, 'U');
-            $nightStart = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp() + 21 * 60 * 60, 'U');
-            $nightEnd = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp() + 31 * 60 * 60, 'U');
+            $dayStart = $data['reportStart'];
+            $dayStart->addHours(11);
+
+            $nightStart = $data['reportStart'];
+            $nightStart->addHours(21);
+
+            $nightEnd = $data['reportStart'];
+            $nightEnd->addHours(31);
+
 
             $showStartTime = true;
 
@@ -151,15 +153,15 @@ class Leave_Kings_Report_House_Web
                                * then he left and returned in the same period
                                */
                         if (!$request->getOccupancy($dayStart, $nightStart)) {
-                            $requestPeriodMorning = $requestDateStart->getTimeOnly(
-                            ) . ' ' . $requestDateFinish->getTimeOnly();
+                            $requestPeriodMorning = $request->getStart()->getTimeOnly(
+                            ) . ' ' . $request->getFinish()->getTimeOnly();
                             $requestPeriodMorningDirection = self::LEAVING;
                         } else {
 
                             /* Specifically check for this day, to account for multi-week leave
                                     */
-                            if ($requestDateStart->getDatabaseDate() == $morningStart->getDatabaseDate()) {
-                                $requestPeriodMorning = $requestDateStart->getTimeOnly();
+                            if ($request->getStart()->getDatabaseDate() == $morningStart->getDatabaseDate()) {
+                                $requestPeriodMorning = $request->getStart()->getTimeOnly();
                                 $requestPeriodMorningDirection = self::LEAVING;
                             } else {
                                 $requestPeriodMorning = 'L';
@@ -170,7 +172,7 @@ class Leave_Kings_Report_House_Web
                         $showStartTime = false;
                     } else {
                         if (!$showStartTime && !$request->getOccupancy($dayStart, $nightStart)) {
-                            $requestPeriodMorning = $requestDateFinish->getTimeOnly();
+                            $requestPeriodMorning = $request->getFinish()->getTimeOnly();
                             $requestPeriodMorningDirection = self::RETURNING;
                         } else {
                             $requestPeriodMorning = 'L';
@@ -184,12 +186,12 @@ class Leave_Kings_Report_House_Web
                 if ($request->getOccupancy($dayStart, $nightStart)) {
                     if ($showStartTime) {
                         if (!$request->getOccupancy($nightStart, $nightEnd)) {
-                            $requestPeriodDay = $requestDateStart->getTimeOnly(
-                            ) . ' ' . $requestDateFinish->getTimeOnly();
+                            $requestPeriodDay = $request->getStart()->getTimeOnly(
+                            ) . ' ' . $request->getFinish()->getTimeOnly();
                             $requestPeriodDayDirection = self::LEAVING;
                         } else {
-                            if ($requestDateStart->getDatabaseDate() == $dayStart->getDatabaseDate()) {
-                                $requestPeriodDay = $requestDateStart->getTimeOnly();
+                            if ($request->getStart()->getDatabaseDate() == $dayStart->getDatabaseDate()) {
+                                $requestPeriodDay = $request->getStart()->getTimeOnly();
                                 $requestPeriodDayDirection = self::LEAVING;
                             } else {
                                 $requestPeriodDay = 'L';
@@ -200,7 +202,7 @@ class Leave_Kings_Report_House_Web
                         $showStartTime = false;
                     } else {
                         if (!$showStartTime && !$request->getOccupancy($nightStart, $nightEnd)) {
-                            $requestPeriodDay = $requestDateFinish->getTimeOnly();
+                            $requestPeriodDay = $request->getFinish()->getTimeOnly();
                             $requestPeriodDayDirection = self::RETURNING;
                         } else {
                             $requestPeriodDay = 'L';
@@ -215,17 +217,17 @@ class Leave_Kings_Report_House_Web
 
                     /* Check whether the next morning is occupied
                           */
-                    $nextMorning = new Alaress_Date_Format($dayStart->getDatabase(), 'y-m-d h:i:s');
+                    $nextMorning = $dayStart->getDatabase();
                     $nextMorning->addDays(1);
 
                     if ($showStartTime) {
                         if (!$request->getOccupancy($nightEnd, $nextMorning)) {
-                            $requestPeriodNight = $requestDateStart->getTimeOnly(
-                            ) . ' ' . $requestDateFinish->getTimeOnly();
+                            $requestPeriodNight = $request->getStart()->getTimeOnly(
+                            ) . ' ' . $request->getFinish()->getTimeOnly();
                             $requestPeriodNightDirection = self::LEAVING;
                         } else {
-                            if ($requestDateStart->getDatabaseDate() == $nightStart->getDatabaseDate()) {
-                                $requestPeriodNight = $requestDateStart->getTimeOnly();
+                            if ($request->getStart()->getDatabaseDate() == $nightStart->getDatabaseDate()) {
+                                $requestPeriodNight = $request->getStart()->getTimeOnly();
                                 $requestPeriodNightDirection = self::LEAVING;
                             } else {
                                 $requestPeriodNight = 'L';
@@ -236,7 +238,7 @@ class Leave_Kings_Report_House_Web
                         $showStartTime = false;
                     } else {
                         if (!$showStartTime && !$request->getOccupancy($nightEnd, $nextMorning)) {
-                            $requestPeriodNight = $requestDateFinish->getTimeOnly();
+                            $requestPeriodNight = $request->getFinish()->getTimeOnly();
                             $requestPeriodNightDirection = self::RETURNING;
 
                         } else {
@@ -503,7 +505,7 @@ class Leave_Kings_Report_House_Web
             /* Parse out the headings
                 */
             for ($i = 0; $i < $this->getRange(); $i++) {
-                $headerDate = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp(), 'U');
+                $headerDate = $data['reportStart'];
                 $headerDate->addDays($i);
 
                 $this->getPage()->setVar(

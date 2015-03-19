@@ -144,7 +144,7 @@ class Renderer extends Handler
                     $now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
                     $this->getPage()->setVar(array(
-                            'USER_CALENDAR_CURRENTDATE' => $now->getUsingFormat('d-m-Y'),
+                            'USER_CALENDAR_CURRENTDATE' => $now->getURLDate(),
                         ));
 
                     $this->getPage()->parse('user_calendar_block', 'user_calendar');

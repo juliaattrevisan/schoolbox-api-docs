@@ -7,7 +7,7 @@
  *                       is left out, the DOM node in 'this' is used instead.
  * * converter:          a callback used to convert the value of startDate and
  *                       endDate into Date objects.
- *                       Defaults to working with dates in d/m/y format.
+ *                       Defaults to working with dates in d/m/Y format.
  */
 (function($) {
     $.fn.syncDates = function(options) {

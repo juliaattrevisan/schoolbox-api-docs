@@ -252,7 +252,7 @@ abstract class Calendar_Event_Type_Abstract
      */
     public function getFullDate()
     {
-        $startDate = $this->getStartTime()->getUsingFormat('l, jS F');
+        $startDate = $this->getStartTime()->getLongDateOnly();
         if (!$this->getAllDay()) {
             $formattedTime = $startDate . ', ' . $this->getTime();
         } else {
@@ -271,7 +271,7 @@ abstract class Calendar_Event_Type_Abstract
         if ($this->getAllDay()) {
             return false;
         } else {
-            return $this->getStartTime()->getUsingFormat('g:iA');
+            return $this->getStartTime()->getTimeOnly();
         }
     }
 
@@ -685,7 +685,7 @@ abstract class Calendar_Event_Type_Abstract
      */
     public function setPublishDate($publishDate)
     {
-        $this->publishDate = new Alaress_Date_Format($publishDate ? : '1970-01-01 00:00:00', 'y-m-d h:i:s');
+        $this->publishDate = new Alaress_Date_Format($publishDate ? : '1970-01-01 00:00:00', 'Y-m-d H:i:s');
     }
 
     /**

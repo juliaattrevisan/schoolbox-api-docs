@@ -192,8 +192,8 @@ if ($folder->getCodes()->count()) {
     }
 }
 
-$dueDate     = new Alaress_Date_Relative($submission->getDueDate(), 'y-m-d');
-$createdDate = new Alaress_Date_Relative($submission->getCreated(), 'y-m-d');
+$dueDate     = new Alaress_Date_Format($submission->getDueDate(), 'Y-m-d');
+$createdDate = new Alaress_Date_Format($submission->getCreated(), 'Y-m-d');
 
 $submit_mapper      = new Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
 /** @var Schoolbox\Assessment\ActivityCollection|Schoolbox\Assessment\Activity[] $submission_history */
@@ -247,7 +247,7 @@ if ($file_links->count() > 0) {
                 'FILE_THUMB' => $file->getMimetype()->getIconFile(),
                 'FILE_SIZE'  => Alaress_Byte_Format::bytesToString($file->getFilesize()),
                 'FILE_NAME'  => $file->getFilename(),
-                'FILE_DATE'  => $file->getUploadedOn()->getUsingFormat('jS M Y, g:ia')
+                'FILE_DATE'  => $file->getUploadedOn()->getLong()
             )
         );
         $this->parse('download_block', 'download', true);
@@ -336,7 +336,7 @@ if (count($submission_history)) {
             )
         );
 
-        $workDate = new Alaress_Date_Relative($activity_item->getDate(), 'U');
+        $workDate = new Alaress_Date_Format($activity_item->getDate(), 'U');
 
         // if submission item
         $mark      = '';
@@ -522,7 +522,7 @@ if (isset($recent_submission)) {
         $this->setVar('overdue_block', '');
     }
 
-    $recentSubmissionDate = new Alaress_Date_Relative($recent_submission->getDate(), 'U');
+    $recentSubmissionDate = new Alaress_Date_Format($recent_submission->getDate(), 'U');
 
     // get filetype details
     $student_submission = $recent_submission->getSubmission();
@@ -673,7 +673,7 @@ if (isset($recent_return) && !(\Cfg::get('restrict_parent_grades') && $groupHand
     $ftype  = $allowedHandler->getByField('mime', $mime);
     $size   = Alaress_Byte_Format::bytesToString($return->getFilesize());
 
-    $returnDate = new Alaress_Date_Relative($submission->getDueDate(), 'y-m-d');
+    $returnDate = new Alaress_Date_Format($submission->getDueDate(), 'Y-m-d');
 
     $this->setVar(
         array(

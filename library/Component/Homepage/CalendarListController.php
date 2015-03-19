@@ -64,15 +64,16 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
 
         //event limit changed from posts to days
         if ($this->getConfig('size') != 0 && $this->getConfig('size') != '') {
-            $where = " AND startDate < ADDDATE(CURDATE(), INTERVAL {$this->getConfig('size')} DAY) ";
+            $where = " AND DATE(start_datetime) < ADDDATE(CURDATE(), INTERVAL {$this->getConfig('size')} DAY) ";
         } else {
                     $where = "";
         }
         $this->setVar('CALENDAR_TITLE', 'Campus Calendar');
 
-        $query = "SELECT event.id, UNIX_TIMESTAMP(startDate) as outputDate, owner,
-			TIME_FORMAT(startTime, '" . Cfg::get('calendar_time_format') . "') as startTimeString, TIME_FORMAT(endTime,
-			'" . Cfg::get('calendar_time_format') . "') as endTimeString,priority, note, location, detail,
+        $query = "SELECT event.id, UNIX_TIMESTAMP(start_datetime) as outputDate, owner,
+			TIME_FORMAT(start_datetime, '" . Cfg::get('calendar_time_format') . "') as startTimeString,
+			TIME_FORMAT(end_datetime, '" . Cfg::get('calendar_time_format') . "') as endTimeString,
+			priority, note, location, detail,
 			user.id as uid, title, firstname, lastname,
 			eventType, eventColour, attendance
 		FROM event
@@ -83,8 +84,8 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
 		WHERE access = 3
 			AND event_campus.campus_id IN(" . implode(",", $_SESSION['campus']) . ")
 			AND event_group.group_id = {$_SESSION['gid']}
-			AND ( startDate >= CURRENT_DATE() $where)
-		ORDER BY startDate, startTime";
+			AND ( DATE(start_datetime) >= CURRENT_DATE() $where)
+		ORDER BY start_datetime";
 
         $eventList = $this->db->getAll($query);
 

@@ -47,8 +47,8 @@ $url = new Url($topic['name'], false);
 $user = $userHandler->getByID($article['item_owner']);
 $fullname = $userHandler->formatName($user);
 
-$d = new Alaress_Date_Format($article['item_datetime_posted'], 'y-m-d');
-$e = new Alaress_Date_Format($article['item_datetime_expires'], 'y-m-d');
+$d = new Alaress_Date_Format($article['item_datetime_posted'], 'Y-m-d H:i:s');
+$e = new Alaress_Date_Format($article['item_datetime_expires'], 'Y-m-d');
 
 $output = array(
     'NEWS_ID' => $article['item_id'],
@@ -86,7 +86,7 @@ if (($permission = $groupHandler->getPermission(0)) >= WRITE_ACCESS) {
 // If expiry date has passed, mark news as expired
 // If today is the expiry date though, don't mark it
 $expiry        = new Alaress_Date_Format(strtotime('00:00:00', $_SERVER['REQUEST_TIME']), 'U');
-$articleExpiry = new Alaress_Date_Format($article['item_datetime_expires'], 'y-m-d');
+$articleExpiry = new Alaress_Date_Format($article['item_datetime_expires'], 'Y-m-d');
 $expired       = $articleExpiry->getUnixTimestamp() < $expiry->getUnixTimestamp();
 
 // generate news and topic lists

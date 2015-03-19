@@ -387,7 +387,7 @@ class Healthcheck
         $splist[] = array(
          'klp_GetTimetable',
          array(
-             array('@Today', date('Y-m-d h:i:s'), SQLVARCHAR, false, false, -1),
+             array('@Today', date('Y-m-d H:i:s'), SQLVARCHAR, false, false, -1),
              array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
          )
         );

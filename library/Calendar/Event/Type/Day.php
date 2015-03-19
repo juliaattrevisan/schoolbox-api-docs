@@ -92,16 +92,19 @@ class Calendar_Event_Type_Day extends Calendar_Event_Type_Abstract {
         if ($this->getAllday()) {
             return '';
         }
-        if ($this->getStartTime()->getDatabaseDate() != $this->getEndTime()->getDatabaseDate()) {
+        if ($this->getStartTime()->ne($this->getEndTime())) {
             return '';
         }
-        $startFormat = $this->getStartTime()->getUsingFormat('g:iA');
-        $endFormat = $this->getEndTime()->getUsingFormat('g:iA');
 
-        $formattedTime = rtrim(
-            ($startFormat != "12:00AM" ? $startFormat : "") .
-                ($endFormat != "12:00AM" ? " &ndash; " . $endFormat : "")
-        );
+        $formattedTime = '';
+
+        if(!$this->getStartTime()->isAtStartOfDay()) {
+            $formattedTime = $this->getStartTime()->getTimeOnly();
+
+            if(!$this->getEndTime()->isAtStartOfDay()) {
+                $formattedTime .= " &ndash; ". $this->getEndTime()->getTimeOnly();
+            }
+        }
 
         return $formattedTime;
     }

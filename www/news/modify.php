@@ -37,8 +37,8 @@ if (is_numeric($this->arg[0])) {
 		error(23);
 	}
 
-	$publishedDate = new Alaress_Date_Format($news['item_datetime_published'], 'y-m-d');
-	$expiryDate = new Alaress_Date_Format($news['item_datetime_expires'], 'y-m-d');
+	$publishedDate = new Alaress_Date_Format($news['item_datetime_published'], 'Y-m-d');
+	$expiryDate = new Alaress_Date_Format($news['item_datetime_expires'], 'Y-m-d');
 
 	$output = array(
 		'ACTION' => 'Modify',

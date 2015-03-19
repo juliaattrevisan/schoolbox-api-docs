@@ -263,12 +263,7 @@ class External_Maze_Timetable implements External_TimetableInterface
     private function isWeekend($date)
     {
         $object = new \Alaress_Date_Format(strtotime($date), 'U');
-
-        if ($object->getUsingFormat('N') > 5) {
-            return true;
-        }
-
-        return false;
+        return $object->isWeekend();
     }
 
     /**
@@ -519,8 +514,8 @@ class External_Maze_Timetable implements External_TimetableInterface
         if (is_array($result) && count($result)) {
             foreach ($result as $currentResult) {
                 $processed[] = array(
-                    'startTime' => new \Alaress_Date_Format($currentResult['startTime'], 'y-m-d h:i:s'),
-                    'endTime'   => new \Alaress_Date_Format($currentResult['endTime'], 'y-m-d h:i:s'),
+                    'startTime' => new \Alaress_Date_Format($currentResult['startTime'], 'Y-m-d H:i:s'),
+                    'endTime'   => new \Alaress_Date_Format($currentResult['endTime'], 'Y-m-d H:i:s'),
                 );
             }
         }

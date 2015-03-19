@@ -64,11 +64,11 @@ if ($dateList = $blogHandler->getOccupiedDateList($category->getId())) {
             )
         );
 
-        $month = new Alaress_Date_Format($date['created'], 'y-m-d');
+        $month = new Alaress_Date_Format($date['created'], 'Y-m-d');
 
         /* Highlight only for the selected month and selected year
          */
-        if (($month->getUsingFormat('m') == $monthNumber) && ($month->getUsingFormat('Y') == $yearNumber)) {
+        if (($month->getMonth() == $monthNumber) && ($month->getYear() == $yearNumber)) {
             $monthClass = 'current';
         } else {
             $monthClass = '';
@@ -77,7 +77,7 @@ if ($dateList = $blogHandler->getOccupiedDateList($category->getId())) {
         $this->setVar(
             array(
                 'MONTH' => $month->getUsingFormat('F'),
-                'MONTH_NUMBER' => $month->getUsingFormat('m'),
+                'MONTH_NUMBER' => $month->getMonth(),
                 'MONTH_ClASS' => $monthClass,
             )
         );
@@ -146,7 +146,7 @@ if ($blogList = $blogHandler->getByYearAndMonth($category->getId(), $yearNumber,
             $userHandler = new User();
 
             foreach ($comments as $comment) {
-                $createdTime = new Alaress_Date_Relative($comment['created']);
+                $createdTime = new Alaress_Date_Format($comment['created'], 'Y-m-d H:i:s');
 
                 $comment['name'] = $userHandler->formatName($comment);
 

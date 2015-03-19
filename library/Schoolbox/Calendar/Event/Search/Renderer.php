@@ -48,7 +48,7 @@ class Renderer extends Handler
             ));
 
             foreach ($result as $event) {
-                $date = new Alaress_Date_Format($event['startDate'], 'Y-m-d');
+                $date = new Alaress_Date_Format($event['start_datetime'], Alaress_Date_Format::DATABASE_FORMAT);
                 $event_time = '';
 
                 if (!empty($event['startTime']) && $event['startTime'] != '12:00AM') {
@@ -64,7 +64,7 @@ class Renderer extends Handler
                     'EVENT_TYPE' => Scrub::text($event['eventType']),
                     'EVENT_DETAIL' => TextFormatter::cutSentence(Scrub::html2text($event['detail']), 150),
                     'EVENT_DATE' => $date->getDateOnly(),
-                    'EVENT_DATE_RAW' => $date->getUsingFormat('d-m-Y'),
+                    'EVENT_DATE_RAW' => $date->getURLDate(),
                     'EVENT_LOCATION' => $event['location'],
                     'EVENT_TIME' => $event_time
                 ));

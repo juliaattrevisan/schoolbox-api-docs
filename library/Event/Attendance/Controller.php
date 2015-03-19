@@ -51,7 +51,7 @@ class Event_Attendance_Controller extends Controller
 
 		if (is_array($data) && count($data)) {
 			foreach($data as $currentEvent) {
-				$eventDate = new Alaress_Date_Format(new DateTime($currentEvent['startDate'] . ' ' . $currentEvent['startTime']));
+				$eventDate = new Alaress_Date_Format($currentEvent['start_datetime'], Alaress_Date_Format::DATABASE_FORMAT);
 
 				// check security perms
 				if ($this->getCalendarHandler()->getPerm($currentEvent['id']) < 2) {
@@ -336,8 +336,8 @@ class Event_Attendance_Controller extends Controller
     }
 
     private function createLeaveRequest ($event, $attendance) {
-        $start = new Alaress_Date_Format(new DateTime("{$event['startDate']} {$event['startTime']}"));
-        $finish = new Alaress_Date_Format(new DateTime("{$event['endDate']} {$event['endTime']}"));
+        $start = new Alaress_Date_Format($event['start_datetime'], Alaress_Date_Format::DATABASE_FORMAT);
+        $finish = new Alaress_Date_Format($event['end_datetime'], Alaress_Date_Format::DATABASE_FORMAT);
 
         $created = new Alaress_Date_Format( time(), 'U');
 

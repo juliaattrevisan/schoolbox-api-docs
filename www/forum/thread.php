@@ -139,11 +139,11 @@ if (is_array($postList)) {
                       'lastname' => $post['userLastname'],
         );
 
-        $postTime = new Alaress_Date_Relative($post['date']);
-        $postTime->setPrefix('');
-
-        $modifiedTime = new Alaress_Date_Relative($post['date']);
-        $modifiedTime->setNow(strtotime($post['modified']))->setPrefix('')->setSuffix('later');
+        $postTime = new Alaress_Date_Format($post['date'], 'Y-m-d H:i:s');
+        // This should be a null date, it will currently parse as now.
+        // Doesn't matter much here, because this block won't be shown
+        // if it is null.
+        $modifiedTime = new Alaress_Date_Format($post['modified'], 'Y-m-d H:i:s');
 
         $output = array('POST_ID' => $post['postID'],
                         'POST_TITLE' => Scrub::text($post['title']),
@@ -152,7 +152,7 @@ if (is_array($postList)) {
                         'POST_TIME' => $postTime->getRelativeTime(),
                         'POST_USER_ID' => $post['userID'],
                         'POST_BODY' => Scrub::html($post['body']),
-                        'POST_MODIFIED' => $modifiedTime->getRelativeTime(),
+                        'POST_MODIFIED' => $modifiedTime->getRelativeTime($postTime),
                         'POST_CENSORED' => $post['censored'] == 'true' ? '(Administrator)' : '',
                         'POST_AUTHOR_EXTERNAL_ID' => $post['synergy_id'],
                         'POST_AUTHOR_NAME' => $post['firstname'] . ' ' . $post['lastname'],

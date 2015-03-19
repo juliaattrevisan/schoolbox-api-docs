@@ -13,7 +13,7 @@ namespace Schoolbox\Folder\News\Search;
 use Schoolbox\Resource\Search\Renderer\Handler;
 use Scrub;
 use TextFormatter;
-use Alaress_Date_Relative;
+use Alaress_Date_Format;
 use DateTime;
 
 class Renderer extends Handler
@@ -65,7 +65,7 @@ class Renderer extends Handler
                     $news['link'] = "/homepage/{$news['code']}#news-{$news['id']}";
                 }
 
-                $createdTime = new Alaress_Date_Relative($news['datetime_posted']);
+                $createdTime = new Alaress_Date_Format($news['datetime_posted']);
 
                 $this->getPage()->setVar(array(
                     'HOMEPAGENEWS_ID' => $news['id'],

@@ -65,7 +65,7 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
                 }
                 // If the item has a pubDate
                 if ($currentRss['pubDate'] instanceof DateTime) {
-                    $postedDate = new Alaress_Date_Relative($currentRss['pubDate']);
+                    $postedDate = new Alaress_Date_Format($currentRss['pubDate']);
 
                     $this->setVar('RSS_POSTED_DATE', $postedDate->getRelativeTime());
                     $this->parse('rss_date_block', 'rss_date');

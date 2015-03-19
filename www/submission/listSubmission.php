@@ -171,21 +171,19 @@ if (!empty($subList) && is_array($subList)) {
 
         $openADF = new Alaress_Date_Format($sub['open'], 'U');
         $closeADF = new Alaress_Date_Format($sub['date'], 'U');
-        $formatDateOnly = 'D, jS M Y';
-        $formatDateTime = $formatDateOnly . ' g:ia';
 
         if($openADF->isAtStartOfDay()) {
-            $openString = $openADF->getUsingFormat($formatDateOnly);
+            $openString = $openADF->getLongDateOnly();
         }
         else {
-            $openString = $openADF->getUsingFormat($formatDateTime);
+            $openString = $openADF->getLong();
         }
 
         if($closeADF->isAtEndOfDay()) {
-            $closeString = $closeADF->getUsingFormat($formatDateOnly);
+            $closeString = $closeADF->getLongDateOnly();
         }
         else {
-            $closeString = $closeADF->getUsingFormat($formatDateTime);
+            $closeString = $closeADF->getLong();
         }
 
         $this->setVar(array(

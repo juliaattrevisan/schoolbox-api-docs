@@ -95,7 +95,7 @@ class Leave_Request {
      */
     public function getCreated($datetime = false) {
         if ($datetime) {
-            return new Alaress_Date_Format($this->created, 'y-m-d');
+            return new Alaress_Date_Format($this->created, 'Y-m-d');
         } else {
             return $this->created;
         }
@@ -134,7 +134,7 @@ class Leave_Request {
      * @return Alaress_Date_Format
      */
     public function getFinish() {
-        return new Alaress_Date_Format($this->finish, 'y-m-d h:i:s');
+        return new Alaress_Date_Format($this->finish, 'Y-m-d H:i:s');
     }
 
     /**
@@ -225,7 +225,7 @@ class Leave_Request {
      * @return Alaress_Date_Format
      */
     public function getStart() {
-        return new Alaress_Date_Format($this->start, 'y-m-d h:i:s');
+        return new Alaress_Date_Format($this->start, 'Y-m-d H:i:s');
     }
 
     /**
@@ -379,7 +379,7 @@ class Leave_Request {
      */
     public function getAuthorisationDatetime($datetime = false) {
         if ($datetime) {
-            return new Alaress_Date_Format($this->authorisationDatetime, 'y-m-d');
+            return new Alaress_Date_Format($this->authorisationDatetime, 'Y-m-d');
         } else {
             return $this->authorisationDatetime;
         }

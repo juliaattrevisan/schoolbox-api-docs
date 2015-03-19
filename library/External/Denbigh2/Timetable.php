@@ -92,8 +92,8 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
                                     $end = new \Alaress_Date_Format($currentPeriod->{'Period End Time'}, 'H:i:s');
 
                                     $timetableDef['desc'][$i] = "Period {$currentPeriod->{'Period'}}";
-                                    $timetableDef['start'][$i] = $start->getUsingFormat('h:ia');
-                                    $timetableDef['end'][$i] = $end->getUsingFormat('h:ia');
+                                    $timetableDef['start'][$i] = $start->getTimeOnly();
+                                    $timetableDef['end'][$i] = $end->getTimeOnly();
                                     $timetableDef['number'][$i] = $currentPeriod->{'Period'};
                                     $timetableDef['sequence'][$i] = 1;
 
@@ -173,7 +173,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
         }
 
         for ($i = 0; $i < count($definition['start']); $i++) {
-            if ($definition['start'][$i] > $now->getUsingFormat('H:i:s')) {
+            if ($definition['start'][$i] > $now->getDatabaseTime()) {
                 return array(
                     'PeriodNumber' => $definition['number'][$i-1],
                     'PeriodNumberSeq' => $definition['sequence'][$i-1],

@@ -56,7 +56,7 @@ class Component_Homepage_Statistics_RecentVisitorsController extends Component_H
         $this->setBlock($templateHandle, 'recent_visitor', 'recent_visitor_block');
 
         for ($i = 0; $i < 8 && $i < count($this->visitors); ++$i) {
-            $dtime = new Alaress_Date_Relative($this->visitors[$i]['datetime']);
+            $dtime = new Alaress_Date_Format($this->visitors[$i]['datetime'], 'Y-m-d H:i:s');
             $this->setVar(
                 array(
                     'VISITOR_ID' => $this->visitors[$i]['id'],

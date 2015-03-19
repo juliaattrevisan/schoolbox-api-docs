@@ -2,11 +2,22 @@
 
 class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
 
+    /**
+     * Skip these tests for Alaress_Date_Strategy_LaravelDate
+     */
+    protected function setUp()
+    {
+        $date = new Alaress_Date_Format();
+        if ($date->getDateTimeObject() instanceof \Carbon\Carbon) {
+            $this->markTestSkipped('This test only applies to Alaress_Date_Strategy_V52');
+        }
+    }
+
 	public function testRelativeTimePastSeconds1() {
 		$input = '2011-08-31 12:12:00';
 		$expected = '10 seconds ago';
 
-		$relativeDate = new Alaress_Date_Relative($input);
+		$relativeDate = new Alaress_Date_Format(new DateTime($input));
 		$relativeDate->setNow(date('U', strtotime('2011-08-31 12:12:10')));
 
 		$result = $relativeDate->getRelativeTime();
@@ -18,7 +29,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
 		$input = '2011-08-31 12:12:01';
 		$expected = '54 seconds ago';
 
-		$relativeDate = new Alaress_Date_Relative($input);
+		$relativeDate = new Alaress_Date_Format(new DateTime($input));
 		$relativeDate->setNow(date('U', strtotime('2011-08-31 12:12:55')));
 
 		$result = $relativeDate->getRelativeTime();
@@ -30,7 +41,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
 		$input = '2011-08-31 12:12:01';
 		$expected = '1 minute ago';
 
-		$relativeDate = new Alaress_Date_Relative($input);
+		$relativeDate = new Alaress_Date_Format(new DateTime($input));
 		$relativeDate->setNow(date('U', strtotime('2011-08-31 12:13:01')));
 
 		$result = $relativeDate->getRelativeTime();
@@ -42,7 +53,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
 		$input = '2011-08-31 12:12:01';
 		$expected = '2 minutes ago';
 
-		$relativeDate = new Alaress_Date_Relative($input);
+		$relativeDate = new Alaress_Date_Format(new DateTime($input));
 		$relativeDate->setNow(date('U', strtotime('2011-08-31 12:14:01')));
 
 		$result = $relativeDate->getRelativeTime();
@@ -54,7 +65,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
 		$input = '2011-08-31 13:12:01';
 		$expected = '1 hour ago';
 
-		$relativeDate = new Alaress_Date_Relative($input);
+		$relativeDate = new Alaress_Date_Format(new DateTime($input));
 		$relativeDate->setNow(date('U', strtotime('2011-08-31 14:12:01')));
 
 		$result = $relativeDate->getRelativeTime();
@@ -66,7 +77,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
 		$input = '2011-08-31 13:12:01';
 		$expected = '5 hours ago';
 
-		$relativeDate = new Alaress_Date_Relative($input);
+		$relativeDate = new Alaress_Date_Format(new DateTime($input));
 		$relativeDate->setNow(date('U', strtotime('2011-08-31 18:12:01')));
 
 		$result = $relativeDate->getRelativeTime();
@@ -78,7 +89,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
 		$input = '2011-08-30 13:12:01';
 		$expected = 'Yesterday';
 
-		$relativeDate = new Alaress_Date_Relative($input);
+		$relativeDate = new Alaress_Date_Format(new DateTime($input));
 		$relativeDate->setNow(date('U', strtotime('2011-08-31 13:12:01')));
 
 		$result = $relativeDate->getRelativeTime();
@@ -90,7 +101,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
 		$input = '2011-08-26 13:12:01';
 		$expected = '5 days ago';
 
-		$relativeDate = new Alaress_Date_Relative($input);
+		$relativeDate = new Alaress_Date_Format(new DateTime($input));
 		$relativeDate->setNow(date('U', strtotime('2011-08-31 13:12:01')));
 
 		$result = $relativeDate->getRelativeTime();
@@ -102,7 +113,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
         $input = '2011-08-23 05:00:14';
         $expected = 'Last week';
 
-        $relativeDate = new Alaress_Date_Relative($input);
+        $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $relativeDate->setNow(date('U', strtotime('2011-08-31 17:40:11')));
 
         $result = $relativeDate->getRelativeTime();
@@ -115,7 +126,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
         $input = '2011-08-08 05:00:14';
         $expected = '3 weeks ago';
 
-        $relativeDate = new Alaress_Date_Relative($input);
+        $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $relativeDate->setNow(date('U', strtotime('2011-08-31 17:40:11')));
 
         $result = $relativeDate->getRelativeTime();
@@ -129,7 +140,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
         $input = '2011-06-08 05:00:14';
         $expected = '2 months ago';
 
-        $relativeDate = new Alaress_Date_Relative($input);
+        $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $relativeDate->setNow(date('U', strtotime('2011-08-08 17:40:11')));
 
         $result = $relativeDate->getRelativeTime();
@@ -146,7 +157,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
 		$input = '2001-01-03 02:02:12';
 		$expected = 'on 3rd Jan 2001';
 
-		$relativeDate = new Alaress_Date_Relative($input);
+		$relativeDate = new Alaress_Date_Format(new DateTime($input));
 		$relativeDate->setNow(date('U', strtotime('2011-08-31 17:40:11')));
 
 		$result = $relativeDate->getRelativeTime();
@@ -159,7 +170,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
         $input = '2011-06-08 05:01:01';
         $expected = 'just then';
 
-        $relativeDate = new Alaress_Date_Relative($input);
+        $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $relativeDate->setNow(date('U', strtotime($input)));
 
         $result = $relativeDate->getRelativeTime();
@@ -171,7 +182,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
         $input = '2011-06-08 05:01:03';
         $expected = 'in 2 seconds';
 
-        $relativeDate = new Alaress_Date_Relative($input);
+        $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $relativeDate->setNow(date('U', strtotime('2011-06-08 05:01:01')));
 
         $result = $relativeDate->getRelativeTime();
@@ -182,7 +193,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
         $input = '2011-06-08 05:02:00';
         $expected = 'in 59 seconds';
 
-        $relativeDate = new Alaress_Date_Relative($input);
+        $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $relativeDate->setNow(date('U', strtotime('2011-06-08 05:01:01')));
 
         $result = $relativeDate->getRelativeTime();
@@ -194,7 +205,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
         $input = '2011-06-08 05:02:05';
         $expected = 'in 1 minute';
 
-        $relativeDate = new Alaress_Date_Relative($input);
+        $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $relativeDate->setNow(date('U', strtotime('2011-06-08 05:01:01')));
 
         $result = $relativeDate->getRelativeTime();
@@ -205,7 +216,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
         $input = '2011-06-08 05:55:00';
         $expected = 'in 54 minutes';
 
-        $relativeDate = new Alaress_Date_Relative($input);
+        $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $relativeDate->setNow(date('U', strtotime('2011-06-08 05:01:01')));
 
         $result = $relativeDate->getRelativeTime();
@@ -216,7 +227,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
         $input = '2011-06-08 06:10:00';
         $expected = 'in 1 hour';
 
-        $relativeDate = new Alaress_Date_Relative($input);
+        $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $relativeDate->setNow(date('U', strtotime('2011-06-08 05:01:01')));
 
         $result = $relativeDate->getRelativeTime();
@@ -227,7 +238,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
         $input = '2011-06-09 04:30:00';
         $expected = 'in 23 hours';
 
-        $relativeDate = new Alaress_Date_Relative($input);
+        $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $relativeDate->setNow(date('U', strtotime('2011-06-08 05:01:01')));
 
         $result = $relativeDate->getRelativeTime();
@@ -238,7 +249,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
         $input = '2011-06-09 06:01:03';
         $expected = 'Tomorrow';
 
-        $relativeDate = new Alaress_Date_Relative($input);
+        $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $relativeDate->setNow(date('U', strtotime('2011-06-08 05:01:01')));
 
         $result = $relativeDate->getRelativeTime();
@@ -253,7 +264,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
         $dayofweek = date('l', strtotime($input));
         $expected = 'on ' . $dayofweek;
 
-        $relativeDate = new Alaress_Date_Relative($input);
+        $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $relativeDate->setNow(date('U', strtotime('2011-06-08 05:01:01')));
 
         $result = $relativeDate->getRelativeTime();
@@ -269,7 +280,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
         $dayofweek = date('l', strtotime($input));
         $expected = 'next ' . $dayofweek;
 
-        $relativeDate = new Alaress_Date_Relative($input);
+        $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $relativeDate->setNow(date('U', strtotime('2011-06-08 05:01:01')));
 
         $result = $relativeDate->getRelativeTime();
@@ -280,7 +291,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
         $input = '2011-06-22 05:01:01';
         $expected = 'in 2 weeks';
 
-        $relativeDate = new Alaress_Date_Relative($input);
+        $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $relativeDate->setNow(date('U', strtotime('2011-06-08 05:01:01')));
 
         $result = $relativeDate->getRelativeTime();
@@ -291,7 +302,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
         $input = '2011-07-09 05:01:02';
         $expected = 'in 4 weeks';
 
-        $relativeDate = new Alaress_Date_Relative($input);
+        $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $relativeDate->setNow(date('U', strtotime('2011-06-08 05:01:01')));
 
         $result = $relativeDate->getRelativeTime();
@@ -305,7 +316,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
         $input = '2011-03-05 05:01:01';
         $expected = 'in 1 month';
 
-        $relativeDate = new Alaress_Date_Relative($input);
+        $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $relativeDate->setNow(date('U', strtotime('2011-02-01 05:01:01')));
 
         $result = $relativeDate->getRelativeTime();
@@ -319,7 +330,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
         $input = '2012-01-10 05:01:01';
         $expected = 'in 11 months';
 
-        $relativeDate = new Alaress_Date_Relative($input);
+        $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $relativeDate->setNow(date('U', strtotime('2011-02-01 05:01:01')));
 
         $result = $relativeDate->getRelativeTime();
@@ -333,7 +344,7 @@ class DatetimeAlaressDateRelativeTest extends PHPUnit_Framework_TestCase {
         $input = '2211-06-10 10:01:01';
         $expected = 'on 10th Jun 2211';
 
-        $relativeDate = new Alaress_Date_Relative($input);
+        $relativeDate = new Alaress_Date_Format(new DateTime($input));
         $relativeDate->setNow(date('U', strtotime('2011-06-08 05:01:01')));
 
         $result = $relativeDate->getRelativeTime();

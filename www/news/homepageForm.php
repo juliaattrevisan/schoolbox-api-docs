@@ -38,8 +38,8 @@ if ($permission == WRITE_ACCESS
 // setup various data
 $cat = new \Schoolbox\Resource\Category();
 $cat->setId($_POST['code']);
-$publishedDate = new Alaress_Date_Format($_POST['datetime_published'], 'd/m/y');
-$expiryDate = new Alaress_Date_Format($_POST['datetime_expires'], 'd/m/y');
+$publishedDate = new Alaress_Date_Format($_POST['datetime_published'], 'd/m/Y');
+$expiryDate = new Alaress_Date_Format($_POST['datetime_expires'], 'd/m/Y');
 
 $news
 	->setHeading($_POST['heading'])

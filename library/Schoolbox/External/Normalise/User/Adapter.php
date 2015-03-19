@@ -1160,8 +1160,8 @@ class Adapter  implements \External_UserInterface {
                         ->setExtension($currentResult['StaffExtension'])
                         ->getPosition()
                             ->setDescription($currentResult['JobPositionDescription'])
-                            ->setStartDate(new \Alaress_Date_Format($currentResult['StaffJobPositionStartDate'], 'y-m-d h:i:s'))
-                            ->setEndDate(new \Alaress_Date_Format($currentResult['StaffJobPositionEndDate'], 'y-m-d h:i:s'))
+                            ->setStartDate(new \Alaress_Date_Format($currentResult['StaffJobPositionStartDate'], 'Y-m-d H:i:s'))
+                            ->setEndDate(new \Alaress_Date_Format($currentResult['StaffJobPositionEndDate'], 'Y-m-d H:i:s'))
                 ;
 
                 $staff

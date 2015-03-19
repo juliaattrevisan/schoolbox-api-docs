@@ -244,7 +244,7 @@ class Contents
                 $node->setSize($currentFileNode['file_size'] > 0 ? \Alaress_Byte_Format::bytesToString($currentFileNode['file_size']) : "--");
                 $node->setCategory($this->getCategory());
                 $node->setCss(implode(' ', $class));
-                $node->setModifiedAt(new \Alaress_Date_Relative($currentFileNode['modified']));
+                $node->setModifiedAt(new \Alaress_Date_Format($currentFileNode['modified'], 'U'));
 
                 $this->getFileNodes()->add($node);
             }

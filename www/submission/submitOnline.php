@@ -34,8 +34,8 @@ $box_id  = $this->arg[0];
 // Should be some permissions on whether a user is a member of group
 
 $submission_box = $box_mapper->findById($this->arg[0]);
-$dueDate        = new Alaress_Date_Relative($submission_box->getDueDate(), 'y-m-d');
-$createdDate    = new Alaress_Date_Relative($submission_box->getCreated(), 'y-m-d');
+$dueDate        = new Alaress_Date_Format($submission_box->getDueDate(), 'Y-m-d');
+$createdDate    = new Alaress_Date_Format($submission_box->getCreated(), 'Y-m-d');
 $gradient       = $submission_box->getGradientIndex();
 
 //

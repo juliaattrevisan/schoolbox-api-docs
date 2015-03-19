@@ -157,8 +157,8 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                 }
 
                 $date            = new Alaress_Date_Format($file['submitted'], 'U');
-                $posted_relative = new Alaress_Date_Relative($file['submitted'], 'U');
-                $modified        = new Alaress_Date_Relative($file['modified'], 'U');
+                $posted_relative = new Alaress_Date_Format($file['submitted'], 'U');
+                $modified        = new Alaress_Date_Format($file['modified'], 'U');
                 $output          = array(
                     'FILE_DESCRIPTION'     => Scrub::text($file['description']),
                     'FILE_ID'              => $file['id'],

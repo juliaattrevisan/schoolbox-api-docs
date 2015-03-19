@@ -88,7 +88,7 @@ class DueWork_Detail
                     $insertion['submissions']    = array();
                     $insertion['user']['status'] = self::UNSUBMITTED;
                     $insertion['user']['class']  = self::CLASS_UNSUBMITTED;
-                    $insertion['user']['time']   = new Alaress_Date_Format(0);
+                    $insertion['user']['time']   = new Alaress_Date_Format(0, 'U');
                     $submissions                 = array();
                 }
                 else {
@@ -100,8 +100,8 @@ class DueWork_Detail
                     }
 
                     // determine whether to give the ontime or late class
-                    $submitTime                = new Alaress_Date_Format($submissions[0]['datestamp'], 'y-m-d');
-                    $dueTime                   = new Alaress_Date_Format($this->dueWork['date'], 'y-m-d');
+                    $submitTime                = new Alaress_Date_Format($submissions[0]['datestamp'], 'Y-m-d');
+                    $dueTime                   = new Alaress_Date_Format($this->dueWork['date'], 'Y-m-d');
                     $insertion['user']['time'] = $submitTime;
 
 
@@ -162,13 +162,11 @@ class DueWork_Detail
         $page->setVar('plag_deleted_block', '');
 
         $closeADF       = $this->getDueDate();
-        $formatDateOnly = 'l, jS F Y';
-        $formatDateTime = $formatDateOnly . ' g:ia';
 
         if ($closeADF->isAtEndOfDay()) {
-            $closeString = $closeADF->getUsingFormat($formatDateOnly);
+            $closeString = $closeADF->getLongDateOnly();
         } else {
-            $closeString = $closeADF->getUsingFormat($formatDateTime);
+            $closeString = $closeADF->getLong();
         }
 
         $page->setVar(
@@ -398,7 +396,7 @@ class DueWork_Detail
      */
     public function isArchived()
     {
-        return $this->getDueDate()->getUsingFormat('Y') < date('Y');
+        return $this->getDueDate()->getYear() < date('Y');
     }
 
 
@@ -432,6 +430,6 @@ class DueWork_Detail
      */
     public function getDueDate()
     {
-        return new Alaress_Date_Format($this->dueWork['date'], 'y-m-d');
+        return new Alaress_Date_Format($this->dueWork['date'], 'Y-m-d');
     }
 }

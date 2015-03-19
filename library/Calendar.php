@@ -42,10 +42,8 @@ class Calendar extends DeprecatedModel
 			SELECT
 				event.id,
 				event.title,
-				event.startDate,
-				event.startTime,
-				event.endDate,
-				event.endTime,
+				event.start_datetime,
+				event.end_datetime,
 				event.location,
 				event.owner,
 				user.firstname,
@@ -58,7 +56,7 @@ class Calendar extends DeprecatedModel
 			WHERE attendance = 1
 			AND publish_date < NOW()
 			GROUP BY event.id
-			ORDER BY CONCAT(event.startDate, ' ', event.startTime) DESC
+			ORDER BY event.start_datetime DESC
 		";
 
         return $this->db->getAll($query);
@@ -362,10 +360,10 @@ class Calendar extends DeprecatedModel
     {
         $query = "
 			SELECT
-				e.id, e.series_id, e.owner, e.author_id, e.access, e.type, e.title, e.startDate, e.endDate,
+				e.id, e.series_id, e.owner, e.author_id, e.access, e.type, e.title, e.start_datetime, e.end_datetime,
 				e.location, e.attendance, e.detail, e.publish_date, e.allday,
-				DATE_FORMAT(e.startTime, '" . Cfg::get('calendar_time_format') . "') startTime,
-				DATE_FORMAT(e.endTime, '" . Cfg::get('calendar_time_format') . "') endTime,
+				DATE_FORMAT(e.start_datetime, '" . Cfg::get('calendar_time_format') . "') startTime,
+				DATE_FORMAT(e.end_datetime, '" . Cfg::get('calendar_time_format') . "') endTime,
 				u.title AS userTitle, u.firstname, u.lastname
 			FROM {$this->_table} e
 			LEFT JOIN user u ON u.id = e.owner
@@ -380,15 +378,14 @@ class Calendar extends DeprecatedModel
 
         //event limit changed from posts to days
         if ($config['days'] != 0 && $config['days'] != '') {
-            $where = " AND startDate < ADDDATE(CURDATE(), INTERVAL {$config['days']} DAY) ";
+            $where = " AND start_datetime < ADDDATE(CURDATE(), INTERVAL {$config['days']} DAY) ";
         } else {
             $where = "";
         }
 
-        $query = "SELECT event.id, DATE_FORMAT(startDate, '%a %D %b') as outputDate,
-						startDate, endDate,
-						DATE_FORMAT(startDate, '%Y') as year, DATE_FORMAT(startDate, '%c') as month, DATE_FORMAT(startDate, '%e') as day,
-						startTime, endTime,
+        $query = "SELECT event.id, DATE_FORMAT(start_datetime, '%a %D %b') as outputDate,
+						start_datetime, end_datetime,
+						DATE_FORMAT(start_datetime, '%Y') as year, DATE_FORMAT(start_datetime, '%c') as month, DATE_FORMAT(start_datetime, '%e') as day,
 						type, title, location, detail,
 						user.id as uid, title, firstname, lastname,
 						eventType, eventColour,
@@ -396,86 +393,13 @@ class Calendar extends DeprecatedModel
 				  FROM event
 				  LEFT JOIN user ON owner = user.id
 				  LEFT JOIN luEventType ON type = eventTypeID
-				  WHERE access = '2' AND sid = '" . $categoryID . "' AND( startDate >= CURRENT_DATE() $where) ORDER BY startDate, startTime";
+				  WHERE access = '2' AND sid = '" . $categoryID . "' AND( start_datetime >= CURRENT_DATE() $where) ORDER BY start_datetime";
         if (!empty($config['size'])) {
             $query .= ' LIMIT ' . $config['size'];
         }
         return $this->db->getAll($query);
     }
 
-    function getAllInSeriesByEventID($eventID)
-    {
-        $query = "SELECT * FROM event WHERE series_id = (
-                    SELECT series_id FROM event WHERE id = '$eventID'
-                  )";
-        return $this->db->getAll($query);
-    }
-
-    function getSeriesID($eventID)
-    {
-        $query = "SELECT `series_id` FROM `event` WHERE `id` = '$eventID'";
-        return $this->db->getOne($query);
-    }
-
-    function isInSeries($eventID)
-    {
-        return $this->getSeriesID($eventID) != null;
-    }
-
-    function getAllInSeries($seriesID)
-    {
-        $query = "SELECT *
-                  FROM `event`
-                  WHERE `series_id` = '$seriesID'
-                  ORDER BY `startDate` ASC";
-        return $this->db->getAll($query);
-    }
-
-    function getUpperSeriesIndex()
-    {
-        $query = "SELECT `series_id`
-                  FROM `event`
-                  ORDER BY series_id DESC";
-        return $this->db->getOne($query);
-    }
-
-    function getSeriesRecurrence($seriesID)
-    {
-        $series = $this->getAllInSeries($seriesID);
-        $first  = 0;
-        $next   = 1;
-        $last   = count($series) - 1;
-
-        $dateFirst = new Alaress_Date_Format($series[$first]['startDate'], 'y-m-d');
-        $dateNext  = new Alaress_Date_Format($series[$next]['startDate'], 'y-m-d');
-        $dateLast  = new Alaress_Date_Format($series[$last]['startDate'], 'y-m-d');
-
-        $diff = (int)(($dateNext->getUnixTimestamp() - $dateFirst->getUnixTimestamp()) / 86400);
-
-        $recurMap = array(
-            1  => 'daily',
-            7  => 'weekly',
-            14 => 'fortnightly',
-            28 => 'monthly',
-            29 => 'monthly',
-            30 => 'monthly',
-            31 => 'monthly',
-        );
-
-        if (isset($recurMap[$diff])) {
-            return array(
-                'freq'  => $recurMap[$diff],
-                'start' => $dateFirst,
-                'end'   => $dateLast
-            );
-        }
-
-        return array(
-            'freq'  => 'periodically',
-            'start' => $dateFirst,
-            'end'   => $dateLast
-        );
-    }
 
     /**
      * Get all the submission events for the specified day
@@ -554,7 +478,7 @@ class Calendar extends DeprecatedModel
                 $event->setSubmissionBoxName($submission['name']);
                 $event->setSubmissionBoxDetail($submission['description']);
                 $event->setColour($this->displayColour(4));
-                $event->setStartTime(new Alaress_Date_Format($submission['date'], 'y-m-d h:i:s'));
+                $event->setStartTime(new Alaress_Date_Format($submission['date'], 'Y-m-d H:i:s'));
                 $event->setAllDay(stristr($submission['date'], '23:59:59'));
 
                 $stack->add($event);
@@ -598,7 +522,7 @@ class Calendar extends DeprecatedModel
         }
 
         if ($sort_by == 'diff') {
-            $sort_by  = 'ABS( DATEDIFF( startDate, NOW() ) )';
+            $sort_by  = 'ABS( DATEDIFF( start_datetime, NOW() ) )';
             $sort_dir = '';
         }
 
@@ -615,11 +539,11 @@ class Calendar extends DeprecatedModel
 
         $event_query = "SELECT DISTINCT event.id, owner,
                             GROUP_CONCAT(DISTINCT event_campus.campus_id) as campusList,
-                            TIME_FORMAT(startTime, '" . Cfg::get('calendar_time_format') . "') as startTime,
-                            TIME_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') as endTime,
-                            TIME_TO_SEC(startTime) as startTimestamp,
-                            TIME_TO_SEC(endTime) as endTimestamp,
-                            startDate, endDate,
+                            TIME_FORMAT(start_datetime, '" . Cfg::get('calendar_time_format') . "') as startTime,
+                            TIME_FORMAT(end_datetime, '" . Cfg::get('calendar_time_format') . "') as endTime,
+                            TIME_TO_SEC(start_datetime) as startTimestamp,
+                            TIME_TO_SEC(end_datetime) as endTimestamp,
+                            start_datetime, end_datetime,
                             type, event.title, access, location, detail,
                             user.id as uid, user.title AS userTitle, firstname, lastname,
                             eventType, eventColour,
@@ -635,7 +559,7 @@ class Calendar extends DeprecatedModel
                                   OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . $_SESSION['id'] . "')
                                 )
                             AND MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword')
-                            AND ( startDate >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND startDate <= DATE_ADD(NOW(), INTERVAL 6 MONTH) )
+                            AND ( start_datetime >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND start_datetime <= DATE_ADD(NOW(), INTERVAL 6 MONTH) )
                         GROUP BY id
                         ORDER BY $sort_by $sort_dir
                         LIMIT $offset, $limit";
@@ -654,7 +578,7 @@ class Calendar extends DeprecatedModel
 							OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . $_SESSION['id'] . "')
 						)
 						AND MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword')
-						AND ( startDate >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND startDate <= DATE_ADD(NOW(), INTERVAL 6 MONTH) )
+						AND ( start_datetime >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND start_datetime <= DATE_ADD(NOW(), INTERVAL 6 MONTH) )
 						";
 
         $events = $this->db->getAll($event_query);
@@ -785,11 +709,11 @@ class Calendar extends DeprecatedModel
         $dateQueryParts = array();
         if (isset($startTimestamp)) {
             // Start timestamp: don't get events which end before or on that time
-            $dateQueryParts[] = sprintf("DATE(endDate) < DATE(FROM_UNIXTIME('%d'))", $startTimestamp);
+            $dateQueryParts[] = sprintf("DATE(end_datetime) < DATE(FROM_UNIXTIME('%d'))", $startTimestamp);
         }
         if (isset($endTimestamp)) {
             // End timestamp: don't get events which start after that time
-            $dateQueryParts[] = sprintf("DATE(startDate) >= DATE(FROM_UNIXTIME('%d'))", $endTimestamp);
+            $dateQueryParts[] = sprintf("DATE(start_datetime) >= DATE(FROM_UNIXTIME('%d'))", $endTimestamp);
         }
         if (!empty($dateQueryParts)) {
             $dateQuery = "AND (NOT (".implode(' OR ', $dateQueryParts).'))';
@@ -800,8 +724,8 @@ class Calendar extends DeprecatedModel
         $query = "
 			SELECT DISTINCT event.id, owner,
 				GROUP_CONCAT(DISTINCT event_campus.campus_id) as campusList,
-				startDate, startTime, endDate, endTime, allday,
-				SUBSTR(event.startDate, 1, 4) AS year,
+				start_datetime, end_datetime, allday,
+				YEAR(event.start_datetime) AS year,
 				type, event.title, access, location, detail, attendance,
 				user.id as uid, user.title as userTitle, firstname, lastname,
 				eventType, eventColour,
@@ -828,8 +752,7 @@ class Calendar extends DeprecatedModel
 				$filter_query
 			GROUP BY id
 			ORDER BY
-				event.startDate, event.endDate,
-				event.startTime, event.endTime
+				event.start_datetime, event.end_datetime
 		";
 
         $allEvents = $this->db->getAll($query);
@@ -846,16 +769,10 @@ class Calendar extends DeprecatedModel
                 $event->setAuthorId($currentEvent['uid']);
                 $event->setEventId($currentEvent['id']);
                 $event->setStartTime(
-                    new Alaress_Date_Format(
-                        $currentEvent['startDate'] . ' ' . $currentEvent['startTime'],
-                        'y-m-d h:i:s'
-                    )
+                    new Alaress_Date_Format($currentEvent['start_datetime'],'Y-m-d H:i:s')
                 );
                 $event->setEndTime(
-                    new Alaress_Date_Format(
-                        $currentEvent['endDate'] . ' ' . $currentEvent['endTime'],
-                        'y-m-d h:i:s'
-                    )
+                    new Alaress_Date_Format($currentEvent['end_datetime'],'Y-m-d H:i:s' )
                 );
                 $event->setType($currentEvent['type']);
                 $event->setTitle($currentEvent['title']);
@@ -897,19 +814,19 @@ class Calendar extends DeprecatedModel
     {
 
         $query = "SELECT DISTINCT id, owner,
-							TIME_FORMAT(startTime, '" . Cfg::get('calendar_time_format') . "') as startTime,
-							TIME_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') as endTime,
+							TIME_FORMAT(start_datetime, '" . Cfg::get('calendar_time_format') . "') as startTime,
+							TIME_FORMAT(end_datetime, '" . Cfg::get('calendar_time_format') . "') as endTime,
 							type, title, location, detail, access, event_campus.campus_id as sid
 						FROM event
 						LEFT JOIN event_campus ON event.id = event_campus.event_id
 						LEFT JOIN event_group ON event.id = event_group.event_id
-						WHERE startDate = '" . date("Y-m-d", $currentDay) . "'
+						WHERE start_datetime = '" . date("Y-m-d", $currentDay) . "'
 							AND (
 								  (access = '3' AND event_campus.campus_id IN(" . implode(',', $campusList)
             . ") AND event_group.group_id IN(" . implode(',', $groupList) . ") )
 								)
 						GROUP BY id
-						ORDER BY event.startTime, event.endTime";
+						ORDER BY event.start_datetime, event.end_datetime";
 
         return $this->db->getAll($query);
     }

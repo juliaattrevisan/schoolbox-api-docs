@@ -10,7 +10,7 @@
 namespace Schoolbox\MobileApp;
 
 
-use Alaress_Date_Format_Interface;
+use Alaress_Date_Format;
 use Schoolbox\User;
 
 class Registry {
@@ -28,10 +28,10 @@ class Registry {
     /** @var string */
     protected $provider;
 
-    /** @var Alaress_Date_Format_Interface */
+    /** @var Alaress_Date_Format */
     protected $createdAt;
 
-    /** @var Alaress_Date_Format_Interface */
+    /** @var Alaress_Date_Format */
     protected $touchedAt;
 
 
@@ -76,7 +76,7 @@ class Registry {
 
 
     /**
-     * @return Alaress_Date_Format_Interface
+     * @return Alaress_Date_Format
      */
     public function getTouchedAt()
     {
@@ -85,7 +85,7 @@ class Registry {
 
 
     /**
-     * @param Alaress_Date_Format_Interface $touchedAt
+     * @param Alaress_Date_Format $touchedAt
      * @return self
      */
     public function setTouchedAt($touchedAt)
@@ -116,7 +116,7 @@ class Registry {
 
 
     /**
-     * @return Alaress_Date_Format_Interface
+     * @return Alaress_Date_Format
      */
     public function getCreatedAt()
     {
@@ -125,7 +125,7 @@ class Registry {
 
 
     /**
-     * @param Alaress_Date_Format_Interface $createdAt
+     * @param Alaress_Date_Format $createdAt
      * @return self
      */
     public function setCreatedAt($createdAt)

@@ -116,24 +116,14 @@ class EventMapper extends Schoolbox\External\Mapper
             'type' => self::TYPE_STRING,
         ));
         $this->hasMap(array(
-            'column'   => 'startDate',
-            'property' => 'startDate',
-            'type'     => self::TYPE_STRING,
+                'column'   => 'start_datetime',
+                'property' => 'startDateTime',
+                'type'     => self::TYPE_DATETIME,
         ));
         $this->hasMap(array(
-            'column'   => 'startTime',
-            'property' => 'startTime',
-            'type'     => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'   => 'endDate',
-            'property' => 'endDate',
-            'type'     => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'   => 'endTime',
-            'property' => 'endTime',
-            'type'     => self::TYPE_STRING,
+                'column'   => 'end_datetime',
+                'property' => 'endDateTime',
+                'type'     => self::TYPE_DATETIME,
         ));
         $this->hasMap(array(
             'column' => 'allday',
@@ -349,12 +339,12 @@ class EventMapper extends Schoolbox\External\Mapper
         }
         return $this->findByColumnList(
             array(
-            'series_id' => $seriesId,
+                'series_id' => $seriesId,
             ),
             array(
-            'order' => array(
-                'startDate' => 'ASC'
-            )
+                'order' => array(
+                    'start_datetime' => 'ASC'
+                )
             )
         );
     }
@@ -594,9 +584,9 @@ class EventMapper extends Schoolbox\External\Mapper
         $stmt = $this->getDatabase()->prepare("
             SELECT {$this->getColumnString('e')}
             FROM `{$this->getTable()}` e
-            WHERE startDate >= :now
-            AND series_id = :sid
-            ORDER BY startDate ASC
+            WHERE e.start_datetime >= :now
+            AND e.series_id = :sid
+            ORDER BY e.start_datetime ASC
             LIMIT 0, 1
         ");
 
@@ -611,7 +601,7 @@ class EventMapper extends Schoolbox\External\Mapper
 
         // no future events for this series ID? go to the last one
         $series = $this->findByColumn('series_id', $seriesId, array(
-            'order' => array('startDate' => 'DESC')
+            'order' => array('start_datetime' => 'DESC')
         ));
 
         if (!$series->count()) {

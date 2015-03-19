@@ -144,8 +144,8 @@ foreach ($course_list as $unit) {
             'UNIT_ENABLED_CHECKED' => 'checked',
             'UNIT_INSTANCE_ID'     => Scrub::text($unit->getId()),
             'UNIT_NAME'            => Scrub::text($unit->getUnitCategory()->getName()),
-            'UNIT_OPEN_DATE'       => $unit->getOpenDate()->getUsingFormat('d/m/Y'),
-            'UNIT_DUE_DATE'        => $unit->getDueDate()->getUsingFormat('d/m/Y'),
+            'UNIT_OPEN_DATE'       => $unit->getOpenDate()->getLocalShort(),
+            'UNIT_DUE_DATE'        => $unit->getDueDate()->getLocalShort(),
         )
     );
     $this->parse('unit_update_due_date_block', 'unit_update_due_date');

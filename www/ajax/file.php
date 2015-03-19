@@ -56,7 +56,7 @@ if (is_numeric($_POST['categoryID']) && $_POST['categoryID']) {
         $node->setName('Homepage');
         $node->setCategory($category);
         $node->setCss(array());
-        $node->setModifiedAt(new \Alaress_Date_Relative($_SERVER['REQUEST_TIME']));
+        $node->setModifiedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 
         $allNodes->prepend($node);
     }
@@ -64,9 +64,7 @@ if (is_numeric($_POST['categoryID']) && $_POST['categoryID']) {
     /* Mash it out
      */
     foreach ($allNodes as $currentNode) {
-        $adr = new \Alaress_Date_Relative($currentNode->getModifiedAt()->getUnixTimestamp());
-        $adr->setPrefix('');
-
+        $adr = new \Alaress_Date_Format($currentNode->getModifiedAt()->getUnixTimestamp(), 'U');
         $output[] = array(
             'id' => $currentNode->getNodeId(),
             'user' => $currentNode->getUser()->formatName(),

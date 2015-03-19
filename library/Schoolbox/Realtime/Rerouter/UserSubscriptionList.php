@@ -83,7 +83,7 @@ class UserSubscriptionList extends SubscriptionList {
             if ($i == $n) {
                 $b   = microtime(true);
                 $ttl = ($b - $a) * ($count - $n) / $n;
-                $adr = new \Alaress_Date_Relative(time() + $ttl);
+                $adr = new \Alaress_Date_Format(time() + $ttl, 'U');
                 $this->log->info(sprintf("Loading estimated to be complete ".$adr->getRelativeTime()), array('char' => '?'));
             }
 

@@ -14,7 +14,7 @@ use Schoolbox\Resource\CategoryMapper;
 use Response_HTTP;
 use Cfg;
 use Submission;
-use Alaress_Date_Relative;
+use Alaress_Date_Format;
 use User;
 use Group;
 use File;
@@ -90,13 +90,13 @@ class API extends Generic\API {
             )) ? 'false' : 'true';
         }
 
-        $due = new Alaress_Date_Relative($box['date'], 'y-m-d');
+        $due = new Alaress_Date_Format($box['date'], 'Y-m-d H:i:s');
 
-        $d = $due->getUsingFormat('jS M');
+        $d = $due->getDateOnly();
         $rel = $due->getRelativeTime();
 
         if (!$due->isAtEndOfDay()) {
-            $d .= $due->getUsingFormat(' h:ia');
+            $d .= $due->getTimeOnly();
         }
         $d = "$rel ($d)";
 
@@ -126,7 +126,7 @@ class API extends Generic\API {
 
         if(is_array($allWork) && count($allWork)) {
             foreach($allWork as $currentWork) {
-                $workDate = new Alaress_Date_Relative($currentWork['date'], 'U');
+                $workDate = new Alaress_Date_Format($currentWork['date'], 'U');
                 $historyContent[] = array(
                     'date'           => $workDate->getShort(),
                     'date_relative'  => $workDate->getRelativeTime(),

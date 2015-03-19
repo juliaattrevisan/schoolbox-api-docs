@@ -155,7 +155,7 @@ class Notifier extends AbstractModuleNotifier
             $object->getResource()->getId(),
             http_build_query(
                 array(
-                    'date' => $startDate->getUsingFormat('d-m-Y'),
+                    'date' => $startDate->getURLDate(),
                     'view' => 'day',
                 )
             )
@@ -165,7 +165,7 @@ class Notifier extends AbstractModuleNotifier
             'resource' => array($object->getResource()->getName(), $resourceUrl),
             'date'     => array(
                 $startDate->getLocal(),
-                '/calendar/full/' . $startDate->getUsingFormat('d-m-Y') . '/' . $owner->getId()
+                '/calendar/full/' . $startDate->getURLDate() . '/' . $owner->getId()
             ),
             'owner'    => array($owner->formatName(), '/search/user/' . $owner->getId())
         );

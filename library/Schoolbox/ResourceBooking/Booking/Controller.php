@@ -688,14 +688,8 @@ class Controller extends Base
         // unset all timespan related errors.
         // This allows someone to change its notes.
         if ($existingBooking instanceof Model) {
-            $existingStart = new DateTime(
-                $existingBooking->getEvent()->getStartDate() . ' ' .
-                $existingBooking->getEvent()->getStartTime()
-            );
-            $existingEnd   = new DateTime(
-                $existingBooking->getEvent()->getEndDate() . ' ' .
-                $existingBooking->getEvent()->getEndTime()
-            );
+            $existingStart = $existingBooking->getEvent()->getStartDateTime()->getDateTimeObject();
+            $existingEnd   =  $existingBooking->getEvent()->getEndDateTime()->getDateTimeObject();
             if ($startDate == $existingStart && $endDate == $existingEnd) {
                 unset($errors['start_datetime'], $errors['end_datetime']);
             }

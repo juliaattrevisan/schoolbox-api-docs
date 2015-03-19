@@ -158,8 +158,8 @@ function getSingleFileMeta($folderId, $fileId) {
 	}
 
 
-	$modified = new Alaress_Date_Relative(strtotime($file['submitted']));
-    $created = new Alaress_Date_Relative($file['ctime']);
+	$modified = new Alaress_Date_Format(strtotime($file['submitted']), 'U');
+    $created = new Alaress_Date_Format(strtotime($file['ctime']), 'U');
 
 	$file = array(
 		'kind' => 'file',

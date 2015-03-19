@@ -86,7 +86,7 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_TITLE'          => $event->getTitle(),
             'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? 'checked="checked"' : '',
             'EVENT_TIMEINPUTS'     => $event->getAllDay() ? 'hide' : '',
-            'EVENT_START_DATE'     => $event->getStartDateTime()->getUsingFormat('d/m/Y'),
+            'EVENT_START_DATE'     => $event->getStartDateTime()->getLocalShort(),
             'EVENT_START_HOUR'     => $event->getStartDateTime()->getUsingFormat('g'),
             'EVENT_START_MIN'      => $event->getStartDateTime()->getUsingFormat('i'),
             'EVENT_START_AM'       => $event->getStartDateTime()->getUsingFormat('A') == 'AM'
@@ -95,7 +95,7 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_START_PM'       => $event->getStartDateTime()->getUsingFormat('A') == 'PM'
                     ? 'selected="selected"'
                     : '',
-            'EVENT_END_DATE'       => $event->getEndDateTime()->getUsingFormat('d/m/Y'),
+            'EVENT_END_DATE'       => $event->getEndDateTime()->getLocalShort(),
             'EVENT_END_HOUR'       => $event->getEndDateTime()->getUsingFormat('g'),
             'EVENT_END_MIN'        => $event->getEndDateTime()->getUsingFormat('i'),
             'EVENT_END_AM'         => $event->getEndDateTime()->getUsingFormat('A') == 'AM'
@@ -109,7 +109,7 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_DETAIL'         => $event->getDetail(),
             'EVENT_REDIRECT'       => $event->setupRedirect(
                 $_GET['returnTo'],
-                $event->getStartDateTime()->getUsingFormat('d-m-Y'),
+                $event->getStartDateTime()->getURLDate(),
                 $_GET['homepageId'],
                 $_GET['userId']
             ),
@@ -176,7 +176,7 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_TITLE'          => isset($_GET['title']) ? $_GET['title'] : '',
             'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? 'checked="checked"' : '',
             'EVENT_TIMEINPUTS'     => $event->getAllDay() ? 'hide' : '',
-            'EVENT_START_DATE'     => $event->getStartDateTime()->getUsingFormat('d/m/Y'),
+            'EVENT_START_DATE'     => $event->getStartDateTime()->getLocalShort(),
             'EVENT_START_HOUR'     => $event->getStartDateTime()->getUsingFormat('g'),
             'EVENT_START_MIN'      => $event->getStartDateTime()->getUsingFormat('i'),
             'EVENT_START_AM'       => $event->getStartDateTime()->getUsingFormat('A') == 'AM'
@@ -185,7 +185,7 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_START_PM'       => $event->getStartDateTime()->getUsingFormat('A') == 'PM'
                     ? 'selected="selected"'
                     : '',
-            'EVENT_END_DATE'       => $event->getEndDateTime()->getUsingFormat('d/m/Y'),
+            'EVENT_END_DATE'       => $event->getEndDateTime()->getLocalShort(),
             'EVENT_END_HOUR'       => $event->getEndDateTime()->getUsingFormat('g'),
             'EVENT_END_MIN'        => $event->getEndDateTime()->getUsingFormat('i'),
             'EVENT_END_AM'         => $event->getEndDateTime()->getUsingFormat('A') == 'AM'
@@ -199,7 +199,7 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_DETAIL'         => '',
             'EVENT_REDIRECT'       => $event->setupRedirect(
                 $_GET['returnTo'],
-                $event->getStartDateTime()->getUsingFormat('d-m-Y'),
+                $event->getStartDateTime()->getURLDate(),
                 $_GET['homepageId'],
                 $_GET['userId']
             ),

@@ -64,7 +64,7 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
                     $this->parse('rss_brief_output_block', 'rss_brief_output');
                 }
                 if ($item['pubDate'] instanceof DateTime) {
-                    $postedDate = new Alaress_Date_Relative($item['pubDate']);
+                    $postedDate = new Alaress_Date_Format($item['pubDate']);
                     $this->setVar('RSS_POSTED_DATE', $postedDate->getRelativeTime());
                     $this->parse('rss_date_block', 'rss_date');
                 }

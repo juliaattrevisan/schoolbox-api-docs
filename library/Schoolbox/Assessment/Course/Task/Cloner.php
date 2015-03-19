@@ -248,9 +248,8 @@ class Cloner
      */
     public function getOpenTimeFromTask()
     {
-        return new \Alaress_Date_Format(
-            new \DateTime($this->unit->getOpenDate()->getUsingFormat('Y-m-d 00:00:00'))
-        );
+        $openDate = $this->unit->getOpenDate();
+        return $openDate->startOfDay();
     }
 
     /**
@@ -262,9 +261,8 @@ class Cloner
      */
     public function getSubmissionBoxCloseTimeFromTask()
     {
-        $close_date = new \DateTime($this->unit->getDueDate()->getUsingFormat('Y-m-d 23:59:59'));
-
-        return new \Alaress_Date_Format($close_date);
+        $closeDate = $this->unit->getDueDate();
+        return $closeDate->endOfDay();
     }
 
     /**
@@ -276,8 +274,7 @@ class Cloner
      */
     public function getAssessmentCloseTimeFromTask()
     {
-        $close_date = new \DateTime($this->unit->getDueDate()->getUsingFormat('Y-m-d 23:59:59'));
-
-        return new \Alaress_Date_Format($close_date);
+        $closeDate = $this->unit->getDueDate();
+        return $closeDate->endOfDay();
     }
 }

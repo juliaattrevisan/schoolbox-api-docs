@@ -216,7 +216,7 @@ class External_Denbigh_User implements External_UserInterface {
             $adaption['StudentGiven1'] = $student['given_names'];
             $adaption['StudentSurname'] = $student['surname'];
 
-            $birthdate = new Alaress_Date_Format($student['dateOfBirth'], 'y-m-d');
+            $birthdate = new Alaress_Date_Format($student['dateOfBirth'], 'Y-m-d');
             $adaption['StudentBirthDate'] = $birthdate->getUnixTimestamp();
 
             $adaption['TeacherTutorID'] = $student['tutor_denbighID'];

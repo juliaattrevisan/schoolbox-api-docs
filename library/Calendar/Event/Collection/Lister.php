@@ -114,7 +114,7 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
                     $clone->setAllDay(false);
                 }
 
-                $clone->setStartTime(new \Alaress_Date_Format("{$startDate} {$startTime}", 'y-m-d h:i:s'));
+                $clone->setStartTime(new \Alaress_Date_Format("{$startDate} {$startTime}", 'Y-m-d H:i:s'));
 
                 /* Special note to Renderer class
                  */

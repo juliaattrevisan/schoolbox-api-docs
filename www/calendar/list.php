@@ -44,7 +44,7 @@ else {
 
     /* Take them on a date
      */
-    $start  = new \Alaress_Date_Format($this->arg[0], 'd-m-y');
+    $start  = new \Alaress_Date_Format($this->arg[0], 'd-m-Y');
     $finish = new \Alaress_Date_Format(strtotime('+1 month', $start->getUnixTimestamp()), 'U');
 }
 
@@ -55,11 +55,11 @@ $this->setVar(
     array(
         'USER_ID'                   => $user->getId(),
         'USER_TOKEN'                => $user->getKey(),
-        'CALENDAR_PARAMS'           => "{$start->getUsingFormat('d-m-Y')}/{$user->getId()}",
-        'SELECTED_START'            => $start->getUsingFormat('d/m/Y'),
-        'SELECTED_FINISH'           => $finish->getUsingFormat('d/m/Y'),
-        'SELECTED_FORMATTED_START'  => $start->getUsingFormat('d-m-Y'),
-        'SELECTED_FORMATTED_FINISH' => $finish->getUsingFormat('d-m-Y'),
+        'CALENDAR_PARAMS'           => "{$start->getURLDate()}/{$user->getId()}",
+        'SELECTED_START'            => $start->getLocalShort(),
+        'SELECTED_FINISH'           => $finish->getLocalShort(),
+        'SELECTED_FORMATTED_START'  => $start->getURLDate(),
+        'SELECTED_FORMATTED_FINISH' => $finish->getURLDate(),
     )
 );
 

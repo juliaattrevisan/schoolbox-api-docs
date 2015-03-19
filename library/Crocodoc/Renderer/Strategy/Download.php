@@ -35,8 +35,6 @@ class Download extends Base {
 	public function render() {
 		$this->getPage()->setFile('injectable', $this->getTemplateFile());
 		$this->getPage()->setBlock('injectable', 'plag_score', 'plag_score_block');
-
-		$recentSubmissionDate = new \Alaress_Date_Relative($this->getSubmission()->getSubmitted(), 'U');
 		$this->plag();
 
 		try {
@@ -57,7 +55,7 @@ class Download extends Base {
 			'MOST_RECENT_SUBMISSION_FILE_NAME' => $this->getSubmission()->getFilename(),
 			'MOST_RECENT_SUBMISSION_FILE_SIZE' => \Alaress_Byte_Format::bytesToString($this->getSubmission()->getFilesize()),
 			'MOST_RECENT_SUBMISSION_FILE_THUMB' => $this->getSubmission()->getMimeType()->getIconFile(),
-			'MOST_RECENT_SUBMISSION_FILE_DATE'  => $recentSubmissionDate->getRelativeTime(),
+			'MOST_RECENT_SUBMISSION_FILE_DATE'  => $this->getSubmission()->getSubmitted()->getRelativeTime(),
 			'MOST_RECENT_SUBMISSION_FILE_PLAG_HREF' => base64_encode($plagHref)
 		));
 

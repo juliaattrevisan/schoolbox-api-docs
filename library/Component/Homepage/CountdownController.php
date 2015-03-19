@@ -48,12 +48,12 @@ class Component_Homepage_CountdownController extends Component_Homepage_Controll
         }
 
         $this->setVar(array(
-            'DEADLINE_YEAR' => $deadline->getUsingFormat('Y'),
-            'DEADLINE_MONTH' => $deadline->getUsingFormat('m'),
-            'DEADLINE_DAY' => $deadline->getUsingFormat('d'),
-            'DEADLINE_HOUR' => $deadline->getUsingFormat('H'),
-            'DEADLINE_MIN' => $deadline->getUsingFormat('i'),
-            'DEADLINE_SEC' => $deadline->getUsingFormat('s'),
+            'DEADLINE_YEAR' => $deadline->getYear(),
+            'DEADLINE_MONTH' => $deadline->getMonth(),
+            'DEADLINE_DAY' => $deadline->getDay(),
+            'DEADLINE_HOUR' => $deadline->getHour(),
+            'DEADLINE_MIN' => $deadline->getMinute(),
+            'DEADLINE_SEC' => $deadline->getSecond(),
         ));
 
         return true;

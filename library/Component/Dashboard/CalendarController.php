@@ -46,9 +46,9 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
      */
     public function execute()
     {
-        $now         = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
-        $this->start = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'y-m-d h:i:s');
-        $this->end   = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'y-m-d h:i:s');
+        $now         = Alaress_Date_Format::now();
+        $this->start = $now->startOfDay();
+        $this->end   = $this->start;
         $days        = $this->getConfig('days');
 
         /* Get 30 days of events by default
@@ -136,8 +136,8 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
             $this->setVar('LIST_DATE', $currentDay->getDateOnly());
 
             $eventOutput = array(
-                'DATE'                            => $currentDay->getUsingFormat('l jS F'),
-                'CALENDAR_DATE'                   => $currentDay->getUsingFormat('d-m-Y'),
+                'DATE'                            => $currentDay->getLongDateOnly(),
+                'CALENDAR_DATE'                   => $currentDay->getURLDate(),
                 'TIME'                            => $currentEvent->getEventSpan(),
                 'FULL_TIME'                       => $currentEvent->getFullDate(),
                 'LOCATION'                        => Scrub::text($currentEvent->getLocation()),
@@ -223,7 +223,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
                     sprintf(
                         '/resource-booking/item/%s?date=%s',
                         $currentEvent->getBooking()->getResource()->getId(),
-                        $currentEvent->getBooking()->getEvent()->getStartDateTime()->getUsingFormat('d-m-Y')
+                        $currentEvent->getBooking()->getEvent()->getStartDateTime()->getURLDate()
                     )
                 );
                 $this->parse('modify_button_block', 'modify_button');

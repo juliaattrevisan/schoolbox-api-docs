@@ -106,7 +106,7 @@ if (is_numeric($this->arg[0])) {
 
         $this->setVar(
             array(
-                'USER_CALENDAR_CURRENTDATE' => $now->getUsingFormat('d-m-Y'),
+                'USER_CALENDAR_CURRENTDATE' => $now->getURLDate(),
             )
         );
 

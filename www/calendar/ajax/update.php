@@ -36,11 +36,11 @@ if (isset($_POST['resize']) && $_POST['resize']) {
 //    $dayDelta    = $_POST['dayDelta'];
     $minuteDelta = $_POST['minuteDelta'];
 
-    $startTime = new Alaress_Date_Format(strtotime($event['startDate'] . ' ' . $event['startTime']), 'U');
+    $startTime = new Alaress_Date_Format(strtotime($event['start_datetime']), 'U');
 //    $startTime->addDays($dayDelta);
     $startTime->addMinutes($minuteDelta);
 
-    $endTime = new Alaress_Date_Format(strtotime($event['endDate'] . ' ' . $event['endTime']), 'U');
+    $endTime = new Alaress_Date_Format(strtotime($event['end_datetime']), 'U');
 //    $endTime->addDays($dayDelta);
     $endTime->addMinutes($minuteDelta);
 }
@@ -52,10 +52,8 @@ $updatedEvent['id']        = $event['id'];
 $updatedEvent['owner']     = $event['owner'];
 $updatedEvent['author_id'] = $event['author_id'];
 $updatedEvent['access']    = $event['access'];
-$updatedEvent['startDate'] = $startTime->getDatabaseDate();
-$updatedEvent['startTime'] = $startTime->getDatabaseTime();
-$updatedEvent['endDate']   = $endTime->getDatabaseDate();
-$updatedEvent['endTime']   = $endTime->getDatabaseTime();
+$updatedEvent['start_datetime'] = $startTime->getDatabase();
+$updatedEvent['end_datetime']   = $endTime->getDatabase();
 
 if (isset($_POST['allDay'])) {
     //
@@ -65,8 +63,8 @@ if (isset($_POST['allDay'])) {
     $updatedEvent['allday'] = $event['allday'];
 }
 if ($updatedEvent['allday']) {
-    $updatedEvent['startTime'] = '00:00:00';
-    $updatedEvent['endTime']   = '00:00:00';
+    $updatedEvent['start_datetime'] = $startTime->getDatabaseDate().' 00:00:00';
+    $updatedEvent['end_datetime']   = $endTime->getDatabase().' 00:00:00';
 }
 
 if (isset($_POST['title']) && isset($_POST['detail'])) {

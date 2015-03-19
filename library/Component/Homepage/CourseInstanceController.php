@@ -311,7 +311,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
 
         if ($is_completed) {
             $completion_status = 'Completed';
-            $rel_time          = new Alaress_Date_Relative(max($completion_date_list));
+            $rel_time          = new Alaress_Date_Format(max($completion_date_list));
             $urgency           = 10;
         } else {
             // Otherwise, show a standard open/due message.
