@@ -534,7 +534,7 @@ abstract class Component_ControllerAbstract
     /**
      * @return \Schoolbox\Resource\Folder\Model
      */
-    protected function getContext()
+    public function getContext()
     {
         return $this->context;
     }
