@@ -116,24 +116,14 @@ class EventMapper extends Schoolbox\External\Mapper
             'type' => self::TYPE_STRING,
         ));
         $this->hasMap(array(
-            'column'   => 'startDate',
-            'property' => 'startDate',
-            'type'     => self::TYPE_STRING,
+                'column'   => 'start_datetime',
+                'property' => 'startDateTime',
+                'type'     => self::TYPE_DATETIME,
         ));
         $this->hasMap(array(
-            'column'   => 'startTime',
-            'property' => 'startTime',
-            'type'     => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'   => 'endDate',
-            'property' => 'endDate',
-            'type'     => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'   => 'endTime',
-            'property' => 'endTime',
-            'type'     => self::TYPE_STRING,
+                'column'   => 'end_datetime',
+                'property' => 'endDateTime',
+                'type'     => self::TYPE_DATETIME,
         ));
         $this->hasMap(array(
             'column' => 'allday',

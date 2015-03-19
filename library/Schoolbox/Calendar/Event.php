@@ -709,20 +709,11 @@ class Event
     {
         // preserve time if already set
         list($year, $month, $day) = explode('-',$endDate);
-        $this->endDateTime->setDate($year,$month,$day);
+        $this->getEndDateTime()->setDate($year,$month,$day);
 
         return $this;
     }
 
-    /**
-     * Get end date
-     *
-     * @return string
-     */
-    public function getEndDate()
-    {
-        return $this->endDateTime->getDatabaseDate();
-    }
 
     /**
      * Set end time
@@ -734,7 +725,7 @@ class Event
     {
         // preserve date if already set
         list($hour, $min, $sec) = explode(':',$endTime);
-        $this->endDateTime->setTime($hour,$min,$sec);
+        $this->getEndDateTime()->setTime($hour,$min,$sec);
 
         return $this;
     }
@@ -750,7 +741,7 @@ class Event
     {
         // preserve time if set
         list($year, $month, $day) = explode('-',$startDate);
-        $this->startDateTime->setDate($year,$month,$day);
+        $this->getStartDateTime()->setDate($year,$month,$day);
         return $this;
     }
 
@@ -764,10 +755,9 @@ class Event
     public function setStartTime($startTime)
     {
         list($hour, $min, $sec) = explode(':',$startTime);
-        $this->startDateTime->setTime($hour,$min,$sec);
+        $this->getStartDateTime()->setTime($hour,$min,$sec);
         return $this;
     }
-
 
     /**
      * Set publish datetime

@@ -98,11 +98,15 @@ class EventRecurrenceMapper
             return array();
         }
 
-        $dateFirst = new Alaress_Date_Format($series->first()->getStartDate(), 'Y-m-d');
-        $dateNext  = new Alaress_Date_Format($series->next()->current()->getStartDate(), 'Y-m-d');
-        $dateLast  = new Alaress_Date_Format($series->last()->getStartDate(), 'Y-m-d');
+        $dateFirst = $series->first()->getStartDateTime();
+        $dateFirst->startOfDay();
+        $dateNext  = $series->next()->current()->getStartDateTime();
+        $dateNext->startOfDay();
+        $dateLast  = $series->last()->getStartDateTime();
+        $dateLast->startOfDay();
 
-        $diff = (int)(($dateNext->getUnixTimestamp() - $dateFirst->getUnixTimestamp()) / 86400);
+        //$diff = (int)(($dateNext->getUnixTimestamp() - $dateFirst->getUnixTimestamp()) / 86400);
+        $diff = $dateFirst->diffInDays($dateNext);
 
         $recurMap = array(
             1  => 'daily',
