@@ -30,20 +30,24 @@ class Controller extends Base {
      * Same calculations as process(), just for a different set of units
      *
      * @param array $params
+     * @param Folder $courseFolder
+     * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
      */
-    public function course($params, Collection $allUnitInstances) {
-        $this->process($allUnitInstances, new MetadataCourse($params, $allUnitInstances));
+    public function course($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances) {
+        $this->process($allUnitInstances, new MetadataCourse($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances));
     }
 
     /**
      * Same calculations as process(), just for a different set of units
      *
      * @param array $params
+     * @param Folder $courseFolder
+     * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
      */
-    public function folder($params, Collection $allUnitInstances) {
-        $this->process($allUnitInstances, new MetadataFolder($params, $allUnitInstances));
+    public function folder($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances) {
+        $this->process($allUnitInstances, new MetadataFolder($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances));
     }
 
     /**
