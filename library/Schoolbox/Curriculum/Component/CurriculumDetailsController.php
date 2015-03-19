@@ -58,7 +58,7 @@ class CurriculumDetailsController extends Component_Homepage_ControllerAbstract
     {
         return $this->renderTwigTemplate(
             $templateHandle,
-            '@curriculum/component/curriculumInformation.twig',
+            '@curriculum/component/curriculumDetails.twig',
             array(
                 'context' => $this->getContext(),
                 'node'    => $this->curriculumNode,
