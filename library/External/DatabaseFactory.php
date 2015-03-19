@@ -128,4 +128,16 @@ class External_DatabaseFactory
     {
         return $this->buildConnector('UserDetention', $databaseName);
     }
+
+    /**
+     * Builds a markbook connector.
+     *
+     * @param  string $databaseName
+     * @return External_UserDetentionInterface
+     */
+    public function buildMarkbookConnector($databaseName = '')
+    {
+        return $this->buildConnector('Markbook', $databaseName);
+    }
+
 }
