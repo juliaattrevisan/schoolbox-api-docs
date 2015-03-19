@@ -22,7 +22,6 @@ use Schoolbox\Permission\Access\UserAccess;
 
 use Schoolbox\Resource\CategoryMapper as FolderMapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Group;
 use Schoolbox\Collection;
@@ -83,9 +82,7 @@ class Module extends BaseModule {
                     $courseFolder = $folderMapper->findById($params['courseId']);
                 }
                 catch (\Exception $e) {
-
-                    /* TODO: Folder/Course not found
-                     */
+                    error(148);
                 }
 
                 /* Try to find all the folders which used $courseFolder as a source
@@ -123,7 +120,7 @@ class Module extends BaseModule {
                      */
                 }
 
-                /* Inject
+                /* Inject (this is used in twig)
                  */
                 $params['route'] = 'course';
 
@@ -162,9 +159,7 @@ class Module extends BaseModule {
                     $courseFolder = $folderMapper->findById($params['courseId']);
                 }
                 catch (\Exception $e) {
-
-                    /* TODO: Folder/Course not found
-                     */
+                    error(148);
                 }
 
                 /* Try to find all the folders which used $courseFolder as a source
@@ -180,7 +175,7 @@ class Module extends BaseModule {
                     error(159);
                 }
 
-                /* Inject
+                /* Inject (this is used in twig)
                  */
                 $params['route'] = 'folder';
 
