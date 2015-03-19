@@ -139,8 +139,8 @@ class EventRecurrence {
 		if ($this->isValidInterval() && $this->getUntil()->getUnixTimestamp()) {
 			$this->setSeriesId($this->getCalendarHandler()->getUpperSeriesIndex());
 
-			$start_timestamp = $this->getStartDateTime()->getUnixTimeStamp();
-			$end_timestamp = $this->getEndDateTime()->getUnixTimestamp();
+			$start_timestamp = $this->getStartDate()->getUnixTimeStamp();
+			$end_timestamp = $this->getEndDate()->getUnixTimestamp();
 
 			// Repeat of events: repeat until the start date is after the until
 			// date (or x100, whatever is less)
