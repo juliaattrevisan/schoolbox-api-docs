@@ -309,7 +309,9 @@ if ($table) {
                 } elseif ($col['Type'] === 'tinyint(1)') {
                     $this->parse('table_cell_block', 'table_cell_checkbox', true);
                 } else {
+                    $this->setVar('NULLABLE_CLASS', '');
                     if ($currentColumn['nullable']) {
+                        $this->setVar('NULLABLE_CLASS', 'nullable');
                         $this->setVar('TABLE_DATA_NULL_CHECKED', !isset($data) ? 'checked' : '');
                         $this->parse('table_cell_null_block', 'table_cell_null');
                     } else {
@@ -370,7 +372,9 @@ if ($table) {
                     $this->setVar('TYPE', 'text');
                     $this->setVar('READONLY', '');
                     $this->setVar('VALUE', '');
+                    $this->setVar('NULLABLE_CLASS', '');
                     if ($selectedTable['fields'][$key]['nullable']) {
+                        $this->setVar('NULLABLE_CLASS', 'nullable');
                         $this->parse('newInput_null_block', 'newInput_null');
                     } else {
                         $this->setVar('newInput_null_block', '');
