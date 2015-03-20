@@ -221,6 +221,56 @@ class UnitInstanceMapper extends Mapper {
     }
 
     /**
+     * A macro version of findAllCoursesUsedInFolder()
+     *
+     * Pass it an array of folderIds and this will give you a list of
+     * associated course folders, all in one query, rather than multiple
+     *
+     * Returns an associative collection of folderId-courseFolderCollection
+     *
+     * (or you could have had a folder-course relation in the db)
+     *
+     * @param $folderIds
+     * @return \Schoolbox\Collection
+     */
+    public function findAllCoursesUsedInFolders($folderIds) {
+        $folderMapper = $this->getJoinMapper('unit_category');
+
+        $query = "
+            SELECT
+                {$this->getColumnString('ui')},
+                {$folderMapper->getColumnString('cf')}
+            FROM {$this->getTable()} `ui`
+            LEFT JOIN {$this->getJoinSql('unit_category', 'ui', 'uc')}
+            LEFT JOIN {$this->getJoinSql('course_folder', 'uc', 'cf')}
+            WHERE `ui`.`category_id` IN {$this->getArrayPlaceholders($folderIds)}
+            GROUP BY `cf`.`id`, ui.`category_id`
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($this->getArrayParameters($folderIds));
+
+        $collection = new Collection();
+
+        while ($row = $statement->fetch()) {
+            $unitInstance = $this->hydrate($row, 'ui');
+            $courseFolder = $folderMapper->hydrate($row, 'cf');
+
+            if ($collection->getOffset($unitInstance->getCategory()->getId()) instanceof Collection) {
+                $collection->getOffset($unitInstance->getCategory()->getId())->add($courseFolder);
+            }
+            else {
+                $subcollection = new Collection();
+                $subcollection->add($courseFolder);
+
+                $collection->setOffset($unitInstance->getCategory()->getId(), $subcollection);
+            }
+        }
+
+        return $collection;
+    }
+
+    /**
      * Retrieves unit instances for the given component.
      *
      * @param  Component_Instance        $component

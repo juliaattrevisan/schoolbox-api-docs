@@ -122,18 +122,28 @@ if (Cfg::get('external_enable')) {
 
 $this->setVar(array('category_block' => ''));
 
-/* A list of course folders which spawned the ids, which
- * correspond to unitCategory()->getId()
+/* $allCoursesUsedInFolder is a collection of folderId-courseFolders
  *
- * Used as a registry to prevent so many additional usages of
- * findCourseForUnit()
+ * Get everything at the start in one query, rather than
+ * ram them in to the weird loop below.
+ *
+ * Or you could have had a folder-course relation in the db
  */
-$courseFolderUsing = array();
+$allFolderIds = array();
 
+foreach ($subList as $currentSub) {
+    $allFolderIds[] = $currentSub['category'];
+}
+
+$allFolderIds = array_values(array_unique($allFolderIds));
+
+$unitInstanceMapper = new \Schoolbox\Assessment\Course\UnitInstanceMapper();
+$allCoursesUsedInFolder = $unitInstanceMapper->findAllCoursesUsedInFolders($allFolderIds);
+
+/* Iterate
+ */
 if (!empty($subList) && is_array($subList)) {
     $i = 0;
-
-    $unitInstanceMapper = new \Schoolbox\Assessment\Course\UnitInstanceMapper();
 
     foreach ($subList as $sub) {
 
@@ -171,7 +181,7 @@ if (!empty($subList) && is_array($subList)) {
                     'learning_analytics_block' => ''
                 ));
 
-                $allCoursesUsed = $unitInstanceMapper->findAllCoursesUsedInFolder($curCategory);
+                $allCoursesUsed = $allCoursesUsedInFolder->getOffset($curCategory->getId());
 
                 foreach ($allCoursesUsed as $courseFolder) {
                     $this->setVar(array(
@@ -332,7 +342,7 @@ if (!empty($subList) && is_array($subList)) {
             'learning_analytics_block' => ''
         ));
 
-        $allCoursesUsed = $unitInstanceMapper->findAllCoursesUsedInFolder($curCategory);
+        $allCoursesUsed = $allCoursesUsedInFolder->getOffset($curCategory->getId());
 
         foreach ($allCoursesUsed as $courseFolder) {
             $this->setVar(array(
