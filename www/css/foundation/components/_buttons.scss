@@ -8,22 +8,26 @@ $include-html-button-classes: $include-html-classes;
 // $button-tny: rem-calc(10);
 // $button-sml: rem-calc(14);
 // $button-med: rem-calc(12);
-$button-med: rem-calc(14, 40);
+$button-med: rem-calc(($base-font-size - 8));
 // $button-lrg: rem-calc(18);
 
 // We use this to control the display property.
 // $button-display: inline-block;
-// $button-margin-bottom: rem-calc(20);
+$button-margin-bottom: rem-calc(($base-font-size - 2));
 
 // We use these to control button text styles.
 // $button-font-family: $body-font-family;
 $button-font-color: $white;
-$button-font-color-alt: $black;
+$button-font-color-alt: $primary-color;
 // $button-font-tny: rem-calc(11);
 // $button-font-sml: rem-calc(13);
-// $button-font-med: rem-calc(16);
+$button-font-med: rem-calc(($base-font-size - 2));
+//$button-font-tny: rem-calc(11);
+//$button-font-sml: rem-calc(13);
+//$button-font-lrg: rem-calc(20);
+
 // $button-font-lrg: rem-calc(20);
-$button-font-weight: $font-weight-bold;
+$button-font-weight: $font-weight-normal;
 // $button-font-align: center;
 
 // We use these to control various hover effects.
@@ -33,13 +37,13 @@ $button-font-weight: $font-weight-bold;
 // $button-border-width: 0px;
 // $button-border-style: solid;
 $button-bg-color: $primary-color;
-$button-bg-hover: tint($button-bg-color, 12%);
+$button-bg-hover: tint($button-bg-color, 20%);
 $button-border-color: transparent;
-$secondary-button-bg-hover: tint($secondary-color, 12%);
+$secondary-button-bg-hover: tint($secondary-color, 20%);
 $secondary-button-border-color: transparent;
-$success-button-bg-hover: tint($success-color, 12%);
+$success-button-bg-hover: tint($success-color, 20%);
 $success-button-border-color: transparent;
-$alert-button-bg-hover: tint($alert-color, 12%);
+$alert-button-bg-hover: tint($alert-color, 20%);
 $alert-button-border-color: transparent;
 
 // We use this to set the default radius used throughout the core.
@@ -141,7 +145,7 @@ $split-button-pip-color-alt: $white;
 
 // We use these to set the color of the pip in dropdown buttons
 $dropdown-button-pip-color: $white;
-$dropdown-button-pip-color-alt: $white;
+$dropdown-button-pip-color-alt: $primary-color;
 
 // $button-pip-tny: rem-calc(6);
 // $button-pip-sml: rem-calc(7);
@@ -196,8 +200,8 @@ $f-dropdown-margin-top: 0px;
 // $f-dropdown-margin-bottom: $f-dropdown-margin-top;
 
 // We use this to control the background color
-$f-dropdown-bg: tint($primary-color, 11%);
-$f-dropdown-content-bg: tint($secondary-color, 80%);
+$f-dropdown-bg: $primary-color;
+$f-dropdown-content-bg: tint($secondary-color, 11%);
 
 // We use this to set the border styles for dropdowns.
 // $f-dropdown-border-style: solid;
@@ -212,14 +216,14 @@ $f-dropdown-triangle-size: 0px;
 // We use these to control styles for the list elements.
 // $f-dropdown-list-style: none;
 $f-dropdown-font-color: $white;
-$f-dropdown-font-size: rem-calc(16);
-$f-dropdown-list-padding: rem-calc(16);
+$f-dropdown-font-size: rem-calc(($base-font-size - 2));
+$f-dropdown-list-padding: rem-calc(($base-font-size - 2));
 // $f-dropdown-line-height: rem-calc(18);
 $f-dropdown-list-hover-bg: tint($primary-color, 32%);
 // $dropdown-mobile-default-float: 0;
 
 // We use this to control the styles for when the dropdown has custom content.
-$f-dropdown-content-padding: rem-calc(16);
+$f-dropdown-content-padding: rem-calc(($base-font-size - 2));
 
 // Default radius for dropdown.
 // $f-dropdown-radius: $global-radius;
@@ -231,18 +235,18 @@ $f-dropdown-content-padding: rem-calc(16);
 // $include-pagination-classes: $include-html-classes;
 
 // We use these to control the pagination container
-$pagination-height: rem-calc(48);
+$pagination-height: rem-calc(($base-font-size + 21));
 $pagination-margin: rem-calc(0);
 
 // We use these to set the list-item properties
 // $pagination-li-float: $default-float;
-$pagination-li-height: rem-calc(48);
+$pagination-li-height: rem-calc(($base-font-size + 21));
 $pagination-li-font-color: $primary-color;
-$pagination-li-font-size: rem-calc(16);
+$pagination-li-font-size: rem-calc(($base-font-size - 2));
 $pagination-li-margin: rem-calc(0);
 
 // We use these for the pagination anchor links
-$pagination-link-pad: rem-calc(8 16 8);
+$pagination-link-pad: rem-calc(($base-font-size - 9, $base-font-size - 2));
 $pagination-link-font-color: $primary-color;
 $pagination-link-active-bg: tint($tertiary, 87%);
 
@@ -263,18 +267,17 @@ $pagination-link-current-active-bg: $pagination-link-active-bg;
 //
 
 // $include-html-tabs-classes: $include-html-classes;
-
-// $tabs-navigation-padding: rem-calc(16);
+$tabs-navigation-padding: rem-calc(($base-font-size - 4));
 $tabs-navigation-bg-color: tint($tertiary, 74%);
 $tabs-navigation-active-bg-color: $white;
 $tabs-navigation-hover-bg-color: tint($tertiary, 87%);
 // $tabs-navigation-font-color: $jet;
 // $tabs-navigation-active-font-color: $tabs-navigation-font-color;
-// $tabs-navigation-font-size: rem-calc(16);
+$tabs-navigation-font-size: rem-calc(($base-font-size - 2));
 // $tabs-navigation-font-family: $body-font-family;
 
 // $tabs-content-margin-bottom: rem-calc(24);
-$tabs-content-padding: ($column-gutter/5);
+$tabs-content-padding: rem-calc(($base-font-size - 2));
 
 // $tabs-vertical-navigation-margin-bottom: 1.25rem;
 
@@ -291,12 +294,12 @@ $tabs-content-padding: ($column-gutter/5);
 // CUSTOM OVERRIDES
 //
 .button,
-input[type=submit]				{ padding: 0.825rem 2.5rem; border: none;
+input[type=submit]				{ border: none;
 	&.secondary 				{ color: $primary-color;
 		&:hover 				{ color: $primary-color; }
 	}
 	&.alert 					{ 
-		&:hover 				{ color: $white; }
+		&:hover 				{ color: $white !important; }
 	}
 	&.warning 					{ background-color: $warning-color;
 		&:hover 				{ background-color: tint($warning-color, 11%); }
@@ -314,39 +317,87 @@ input[type=submit] 				{ @include button-style; }
 .actions{
 	height: 100%;
 	a{
-		padding: 0 1.125em;
+		padding: 0 1rem;
 		height: 100%;
 		display: inline-block;
 		float: right;
-		// &:hover{
-		// 	background: darken($ocean-sunset, 5%);
-		// }
 	}
 }
 
+// Header Actions - for when you need buttons inline with the heading
+.header-actions {
+  	float: right;
+	a{
+		//margin: 0;
+	}
+}
 
+// Dropdown
+.f-dropdown{
+	@include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));
+}
 
-// Custom SB breadcrumbs
-.breadcrumb 					{ margin: 0; list-style: none; overflow: hidden;
-	li 							{
-		a 						{ color: $black; text-decoration: none; padding: 13px 0 13px 50px; background-color: tint($tertiary, 74%);
-								position: relative;display: block;float: left; @include single-transition(all, 0.15s, linear);
-								margin-right: 0; white-space: nowrap; border: none;
-			&:before, &:after 	{ content: " "; display: block; width: 0; height: 0; border-top: 50px solid transparent; @include single-transition(all, 0.15s, linear);
-								border-bottom: 50px solid transparent; position: absolute; top: 50%; margin-top: -50px; left: 100%; z-index: 2;
+#contentDrop{ 
+	background-color: $f-dropdown-content-bg;
+}
+
+// Custom breadcrumbs
+.breadcrumb{
+	margin: 0;
+	list-style: none;
+	overflow: hidden;
+	li{
+		a{
+			color: $black;
+			text-decoration: none;
+			padding: rem-calc(($base-font-size - 2));
+			padding-left: 50px;
+			background-color: tint($tertiary, 74%);
+			position: relative;
+			display: block;
+			float: left;
+			margin-right: 0;
+			white-space: nowrap;
+			border: none;
+			@include single-transition(all, 0.15s, linear);
+
+			&:before,
+			&:after{
+				content: " ";
+				display: block;
+				width: 0;
+				height: 0;
+				border-top: 50px solid transparent;
+				@include single-transition(all, 0.15s, linear);
+				border-bottom: 50px solid transparent;
+				position: absolute;
+				top: 50%;
+				margin-top: -50px;
+				left: 100%;
+				z-index: 2;
 			}
-			&:before			{ margin-left: 1px; border-left: 30px solid $white; }
-			&:after 			{ border-left: 30px solid tint($tertiary, 74%); }
-			&:hover 			{ background-color: tint($tertiary, 87%); }
-			&:hover:after 		{ border-left-color: tint($tertiary, 87%) !important; }
+			&:before{
+				margin-left: 1px; border-left: 30px solid $white;
+			}
+			&:after{
+				border-left: 30px solid tint($tertiary, 74%);
+			}
+			&:hover{
+				background-color: tint($tertiary, 87%);
+			}
+			&:hover:after{
+				border-left-color: tint($tertiary, 87%) !important;
+			}
 		}
 	}
-	li:first-child a 			{ padding-left: 22px; }
-}
-
-.f-dropdown.open				{ 
-	.content 					{ background-color: $f-dropdown-content-bg; }
+	li:first-child a{
+		padding-left: 22px;
+	}
 }
 
 ul.pagination li a,
-ul.pagination li button 		{ background-color: tint($tertiary, 74%); border-radius: 0px; font-weight: $font-weight-bold; }
+ul.pagination li button{
+	background-color: tint($tertiary, 74%);
+	border-radius: 0px;
+	font-weight: $font-weight-bold;
+}

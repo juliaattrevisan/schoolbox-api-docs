@@ -22,14 +22,14 @@ $side-nav-padding: rem-calc(0 0);
 $side-nav-list-margin: rem-calc(0 0 0 0);
 
 // We use these to control link styles.
-$side-nav-link-color: $white;
+$side-nav-link-color: $primary-color;
 $side-nav-link-color-active: $side-nav-link-color;
 $side-nav-link-color-hover: $side-nav-link-color-active;
-$side-nav-link-bg: $primary-color;
-$side-nav-link-bg-hover: tint($primary-color, 32%);
-// $side-nav-link-margin: 0;
-$side-nav-link-padding: rem-calc(16 16);
-$side-nav-font-size: rem-calc(16);
+$side-nav-link-bg: $secondary-color;
+$side-nav-link-bg-hover: tint($secondary-color, 32%);
+$side-nav-link-margin: 1px;
+$side-nav-link-padding: rem-calc(($base-font-size - 2));
+$side-nav-font-size: rem-calc(($base-font-size - 2));
 // $side-nav-font-weight: $font-weight-normal;
 // $side-nav-font-weight-active: $side-nav-font-weight;
 // $side-nav-font-family: $body-font-family;
@@ -58,11 +58,11 @@ $sub-nav-list-margin: 0;
 
 // We use this to control the definition
 // $sub-nav-font-family: $body-font-family;
-$sub-nav-font-size: rem-calc(16);
+$sub-nav-font-size: rem-calc(($base-font-size - 2));
 $sub-nav-font-color: $primary-color;
 // $sub-nav-font-weight: $font-weight-normal;
 // $sub-nav-text-decoration: none;
-$sub-nav-padding: rem-calc(14 28);
+$sub-nav-padding: rem-calc(($base-font-size - 2, $base-font-size + 8));
 $sub-nav-border-radius: 0px;
 $sub-nav-font-color-hover: $sub-nav-font-color;
 
@@ -92,17 +92,18 @@ $topbar-bg-color: $primary-color;
 $topbar-bg: $topbar-bg-color;
 
 // Height and margin
-$topbar-height: rem-calc(45);
+$topbar-height: rem-calc(($base-font-size * 3));
 // $topbar-margin-bottom: 0;
 
 // Controlling the styles for the title in the top bar
 $topbar-title-weight: 700;
-$topbar-title-font-size: rem-calc(16);
+$topbar-title-font-size: $base-font-size - 2;
 
 // Style the top bar dropdown elements
 $topbar-dropdown-bg: $topbar-bg-color;
 $topbar-dropdown-link-color: $white;
 $topbar-dropdown-link-bg: tint($primary-color, 11%);
+$topbar-dropdown-link-bg-hover: tint($primary-color, 32%);
 $topbar-dropdown-link-weight: $font-weight-normal;
 $topbar-dropdown-toggle-size: 6px;
 $topbar-dropdown-toggle-color: $white;
@@ -114,7 +115,7 @@ $topbar-link-color-hover: $topbar-link-color;
 $topbar-link-color-active: $topbar-link-color;
 $topbar-link-color-active-hover: $topbar-link-color;
 // $topbar-link-weight: $font-weight-normal;
-$topbar-link-font-size: rem-calc(16);
+$topbar-link-font-size: rem-calc(($base-font-size - 2));
 $topbar-link-hover-lightness: -10%; // Darken by 10%
 $topbar-link-bg: $topbar-bg;
 $topbar-link-bg-color-hover: $white;
@@ -133,7 +134,7 @@ $topbar-button-top: rem-calc(0px);
 $topbar-dropdown-label-color: $white;
 $topbar-dropdown-label-text-transform: none;
 $topbar-dropdown-label-font-weight: $font-weight-normal;
-$topbar-dropdown-label-font-size: rem-calc(13);
+$topbar-dropdown-label-font-size: rem-calc(($base-font-size - 3));
 $topbar-dropdown-label-font-style: italic;
 $topbar-dropdown-label-bg: $topbar-dropdown-link-bg;
 
@@ -173,7 +174,7 @@ $tabbar-height: rem-calc(200);
 $tabbar-icon-width: $tabbar-height;
 $tabbar-line-height: $tabbar-height;
 $tabbar-color: #fff;
-$tabbar-middle-padding: 0 rem-calc(10);
+$tabbar-middle-padding: 0 rem-calc(($base-font-size - 4));
 
 // Off Canvas Divider Styles
 $tabbar-left-section-border: solid 1px scale-color($tabbar-bg, $lightness: -50%);
@@ -191,10 +192,10 @@ $off-canvas-width: rem-calc(250);
 $off-canvas-bg: #333;
 
 // Off Canvas Menu List Variables
-$off-canvas-label-padding: 0.3rem rem-calc(15);
+$off-canvas-label-padding: rem-calc(($base-font-size - 2));
 $off-canvas-label-color: #999;
 $off-canvas-label-text-transform: uppercase;
-$off-canvas-label-font-size: rem-calc(12);
+$off-canvas-label-font-size: rem-calc(($base-font-size - 4));
 $off-canvas-label-font-weight: $font-weight-bold;
 $off-canvas-label-bg: #444;
 $off-canvas-label-border-top: 1px solid scale-color($off-canvas-label-bg, $lightness: 14%);
@@ -208,12 +209,12 @@ $off-canvas-link-border-bottom: 1px solid scale-color($off-canvas-bg, $lightness
 $tabbar-menu-icon-color: #FFF;
 $tabbar-menu-icon-hover: scale-color($tabbar-menu-icon-color, $lightness: -30%);
 
-$tabbar-menu-icon-text-indent: rem-calc(35) ;
+$tabbar-menu-icon-text-indent: rem-calc(35);
 $tabbar-menu-icon-width: $tabbar-icon-width;
 $tabbar-menu-icon-height: $tabbar-height;
 $tabbar-menu-icon-padding: 0;
 
-$tabbar-hamburger-icon-width: rem-calc(16);
+$tabbar-hamburger-icon-width: rem-calc(($base-font-size - 2));
 $tabbar-hamburger-icon-left: false;
 $tabbar-hamburger-icon-top: false;
 $tabbar-hamburger-icon-thickness: 1px;
@@ -244,30 +245,30 @@ $menu-slide: "transform 500ms ease";
 }
 
 // Spawning my own sub-nav
-.sub-nav{
-	background-color: $sub-nav-bg-color;
-	padding: 10px 10px 10px 0;
-	dt{
-		margin: 0 1rem;
-	}
-	dd, li{
-		margin-left: 0;
-	}
-	a{
-		font-weight: $font-weight-bold;
-		@include single-transition(all, 0.15s, linear);
-		&:hover{
-			background-color: tint($tertiary, 87%);
-			color: $white;
-		}
-	}
-	.active{
-		background-color: $white;
-		&:hover{
-			@extend .active;
-		}
-	}
-}
+// .sub-nav{
+// 	background-color: $sub-nav-bg-color;
+// 	padding: 10px 10px 10px 0;
+// 	dt{
+// 		margin: 0 1rem;
+// 	}
+// 	dd, li{
+// 		margin-left: 0;
+// 	}
+// 	a{
+// 		font-weight: $font-weight-bold;
+// 		@include single-transition(all, 0.15s, linear);
+// 		&:hover{
+// 			background-color: tint($tertiary, 87%);
+// 			color: $white;
+// 		}
+// 	}
+// 	.active{
+// 		background-color: $white;
+// 		&:hover{
+// 			@extend .active;
+// 		}
+// 	}
+// }
 
 .top-bar-section 			{ 
 	.dropdown label 		{ font-style: $topbar-dropdown-label-font-style; }

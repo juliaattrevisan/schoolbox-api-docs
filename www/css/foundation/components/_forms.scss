@@ -5,19 +5,19 @@
 //$include-html-form-classes: $include-html-classes;
 
 // We use this to set the base for lots of form spacing and positioning styles
-$form-spacing: rem-calc(22);
+$form-spacing: rem-calc(($base-font-size));
 
 // We use these to style the labels in different ways
 // $form-label-pointer: pointer;
-$form-label-font-size: rem-calc(16);
+$form-label-font-size: rem-calc(($base-font-size - 2));
 $form-label-font-weight: $font-weight-bold;
 $form-label-line-height: 1.4rem;
 $form-label-font-color: $black;
 // $form-label-small-transform: capitalize;
-$form-label-bottom-margin: rem-calc(16);
+$form-label-bottom-margin: rem-calc(($base-font-size - 2));
 // $input-font-family: inherit;
 $input-font-color: $body-grey;
-$input-font-size: rem-calc(16);
+$input-font-size: rem-calc(($base-font-size - 2));
 $input-bg-color: $white;
 $input-focus-bg-color: $ocean-sunset;
 $input-focus-color: $black;
@@ -37,7 +37,7 @@ $input-box-shadow: none;
 // $fieldset-border-width: 1px;
 // $fieldset-border-color: $gainsboro;
 // $fieldset-padding: rem-calc(20);
-$fieldset-margin: rem-calc(16 0);
+$fieldset-margin: rem-calc(($base-font-size - 2, 0));
 
 // We use these to style the legends when you use them
 // $legend-bg: $white;
@@ -57,9 +57,9 @@ $fieldset-margin: rem-calc(16 0);
 // $input-number-spinners: true;
 
 // We use these to style the error states for inputs and labels
-$input-error-message-padding: rem-calc(8);
+$input-error-message-padding: rem-calc(($base-font-size - 8));
 $input-error-message-top: -1px;
-$input-error-message-font-size: rem-calc(12);
+$input-error-message-font-size: rem-calc(($base-font-size - 4));
 $input-error-message-font-weight: $font-weight-normal;
 // $input-error-message-font-style: italic;
 // $input-error-message-font-color: $white;
@@ -99,7 +99,7 @@ $switch-height-med: rem-calc(32);
 // We use these to control default font sizes for our classes.
 // $switch-font-size-tny: 11px;
 // $switch-font-size-sml: 12px;
-$switch-font-size-med: 16px;
+$switch-font-size-med: 14px;
 // $switch-font-size-lrg: 17px;
 // $switch-label-side-padding: 6px;
 
@@ -127,7 +127,6 @@ $switch-negative-color: tint($secondary-color, 74%);
 
 form 						{ @include placeholder-color($body-grey, $font-weight-normal); @include placeholder-hover-color($black); }
 
-input 						{ height: 3rem; }
 input,
 textarea,
 select 						{ @include single-transition(all, 0.15s, linear); font-weight: $font-weight-normal;
@@ -157,6 +156,26 @@ label.radio-label			{ background-position: 0 -48px; }
 input[type=checkbox]:checked +
 label.checkbox-label		{ background-position: 0 -120px; }
 
+//  Show/Hide Advanced form fields
+.form-advanced{
+	display: none;
+	&.show{
+		display: block;
+	}
+}
+
+// Date & Time fields
+.date-time{
+	width: 22% !important;
+	float: left;
+	margin: 0 rem-calc(($base-font-size - 10)) 0 0 !important;
+}
+
+.time-separator{
+	float: left;
+	padding: 0.5rem 0;
+	margin: 0 rem-calc(($base-font-size - 10)) 0 0;
+}
 
 //  DATEPICKER
 .ui-datepicker{

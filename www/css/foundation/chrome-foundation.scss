@@ -8,12 +8,13 @@
 @import "utils/variables";
 
 // Settings
-
+@import "settings";
 
 #container.foundation {
+  background: $silver;
   // Base
-  @import "base/reset";
-  @import "settings";
+  //@import "base/reset";
+  
   @import "base/typography";
   @import "base/compatibility";
 

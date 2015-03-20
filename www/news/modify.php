@@ -66,7 +66,7 @@ if (is_numeric($this->arg[0])) {
 	if (is_array($userList)) {
         // set the advanced options to be shown by default since there is information in there
         $this->setVar(array(
-            'SHOW_ADVANCED' => ' style="display: table-row;"',
+            'SHOW_ADVANCED' => ' style="display: block;"',
             'OPAC_ADVANCED' => ' style="opacity: 1;"',
             'ADV_OFF'       => ' style="display:none"',
             'ADV_ON'        => '',

@@ -14,7 +14,7 @@ $joyride-tip-border: 0;
 
 // Here, we're setting the tip font styles
 $joyride-tip-font-color: $white;
-$joyride-tip-font-size: rem-calc(16);
+$joyride-tip-font-size: rem-calc(($base-font-size - 2));
 $joyride-tip-header-weight: $font-weight-bold;
 
 // This changes the nub size
