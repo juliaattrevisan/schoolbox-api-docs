@@ -99,10 +99,9 @@ abstract class AbstractTreeBuilder
         // Did I ask for the root node? get it
         if ($folderId === '#') {
             $output[] = $this->generateNodeArray(
-                0,
-                '#',
-                $this->getRootNodeLabel(),
+                $this->locator->findById(0),
                 'root',
+                $this->getRootNodeLabel(),
                 [ 'data-permission' => $this->getNodePermission($folderId) ]
             );
 
@@ -150,7 +149,7 @@ abstract class AbstractTreeBuilder
     {
         $array = array(
             'id'       => $folder->getId(),
-            'parent'   => $folder->getParent()->getId() ?: '0',
+            'parent'   => $folder->getParent() instanceof IFolder ? $folder->getParent()->getId() : '0',
             'text'     => $name ?: $folder->getName(),
             'children' => $this->getNodeHasChildren($folder->getId()),
             'type'     => $type,

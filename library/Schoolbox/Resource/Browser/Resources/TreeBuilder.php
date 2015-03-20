@@ -39,7 +39,7 @@ class TreeBuilder extends AbstractTreeBuilder
 
 
     /**
-     * @param Folder\ILocator           $locator
+     * @param Folder\ILocator  $locator
      * @param TaskMapper       $taskMapper
      * @param UserAccessMapper $userAccessMapper
      * @param RoleAccessMapper $roleAccessMapper
@@ -91,11 +91,7 @@ class TreeBuilder extends AbstractTreeBuilder
         }
 
         // Output something.
-        return $this->generateNodeArray(
-            $folder->getId(),
-            $folder->getParent()->getId() ?: '0',
-            $type,
-            $name,
+        return $this->generateNodeArray($folder, $type, $name,
             [ 'data-permission' => $permission ],
             [ 'href' => '/homepage/' . $folder->getId() ]
         );
