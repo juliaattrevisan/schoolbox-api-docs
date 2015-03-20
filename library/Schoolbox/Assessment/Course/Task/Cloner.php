@@ -81,6 +81,9 @@ class Cloner
             $factory  = new Assess_Factory();
             $question = new Assess_Question();
             $assess   = $handler->getByID($assess_id);
+            if (empty($assess) || $assess['deleted_at']) {
+                throw new ClonerException('No assessment is attached to this task');
+            }
 
             // Export, then import
             $export = new Assess_Export_Xml(
