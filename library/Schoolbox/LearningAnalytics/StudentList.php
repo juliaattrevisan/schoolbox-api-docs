@@ -14,7 +14,7 @@
 
 namespace Schoolbox\LearningAnalytics;
 
-use Schoolbox\Resource\Category as Folder;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Config;
 use Schoolbox\UserMapper;
 use Group;

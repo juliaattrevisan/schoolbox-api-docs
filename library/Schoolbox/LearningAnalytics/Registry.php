@@ -12,7 +12,7 @@ namespace Schoolbox\LearningAnalytics;
 
 use Schoolbox\Collection;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
-use Schoolbox\Resource\CategoryMapper as FolderMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Registry {
 

@@ -12,7 +12,7 @@ namespace Schoolbox\LearningAnalytics;
 
 use Alaress\Web\Controller\Base;
 
-use Schoolbox\Resource\Category as Folder;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Collection;
 use Schoolbox\LearningAnalytics\Progress\Overall;
 use Schoolbox\LearningAnalytics\Progress\AllUnits as AllUnitProgress;

@@ -13,7 +13,7 @@ namespace Schoolbox\LearningAnalytics\Effort;
 use Schoolbox\LearningAnalytics\Registry;
 use Schoolbox\LearningAnalytics\Metadata\Base as Metadata;
 use Schoolbox\LearningAnalytics\Results\Averages;
-use Schoolbox\Resource\CategoryLogMapper as FolderMapper;
+use Schoolbox\Resource\Folder\Log\Mapper as FolderLogMapper;
 
 class AllEffort {
 
@@ -78,7 +78,7 @@ class AllEffort {
 
         /* Find all the hits this person made to each homepage using the course
          */
-        $folderLogMapper = new FolderMapper();
+        $folderLogMapper = new FolderLogMapper();
 
         /* Unify $allGradeAverages and $tally
          */

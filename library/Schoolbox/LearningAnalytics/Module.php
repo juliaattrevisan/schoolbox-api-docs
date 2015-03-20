@@ -20,7 +20,7 @@ use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 use Schoolbox\Permission\Access\UserAccess;
 
-use Schoolbox\Resource\CategoryMapper as FolderMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Group;

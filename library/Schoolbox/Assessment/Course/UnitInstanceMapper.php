@@ -17,7 +17,7 @@ use Schoolbox\Assessment\Course\Task\Cloner;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\User;
-use Schoolbox\Resource\Category as Folder;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 class UnitInstanceMapper extends Mapper {
 

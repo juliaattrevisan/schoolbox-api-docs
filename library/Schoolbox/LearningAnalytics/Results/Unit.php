@@ -81,7 +81,7 @@ class Unit {
          */
         foreach ($this->getUnit()->getTasks() as $currentTask) {
             if (($currentTask->getSubmissionBox() instanceof SubmissionBox) && is_numeric($currentTask->getSubmissionBox()->getId())) {
-                $detail = new \DueWork_Detail($currentTask->getSubmissionBox()->getId(), $currentTask->getSubmissionBox());
+                $detail = new \DueWork_Detail($currentTask->getSubmissionBox(), $currentTask->getSubmissionBox());
                 $detail->processStudents($this->getAllStudents());
 
                 $studentSubmissionList[$currentTask->getSubmissionBox()->getId()] = $detail->getSitepageData();
