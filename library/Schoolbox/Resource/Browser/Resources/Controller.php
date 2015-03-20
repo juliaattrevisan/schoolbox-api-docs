@@ -10,14 +10,74 @@
 namespace Schoolbox\Resource\Browser\Resources;
 
 
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractController;
 use Schoolbox\Mapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class Controller extends AbstractController
 {
+    /** @var RoleAccessMapper */
+    protected $roleAccessMapper;
+
+    /** @var UserAccessMapper */
+    protected $userAccessMapper;
+
+    /** @var UserMapper */
+    protected $userMapper;
+
+    /** @var Resource\Folder\Mapper */
+    protected $folderMapper;
+
+
+    /**
+     * @param Resource\Folder\Mapper $folderMapper
+     * @return self
+     */
+    public function setFolderMapper($folderMapper)
+    {
+        $this->folderMapper = $folderMapper;
+        return $this;
+    }
+
+
+    /**
+     * @param RoleAccessMapper $roleAccessMapper
+     * @return self
+     */
+    public function setRoleAccessMapper($roleAccessMapper)
+    {
+        $this->roleAccessMapper = $roleAccessMapper;
+        return $this;
+    }
+
+
+    /**
+     * @param UserAccessMapper $userAccessMapper
+     * @return self
+     */
+    public function setUserAccessMapper($userAccessMapper)
+    {
+        $this->userAccessMapper = $userAccessMapper;
+        return $this;
+    }
+
+
+    /**
+     * @param UserMapper $userMapper
+     * @return self
+     */
+    public function setUserMapper($userMapper)
+    {
+        $this->userMapper = $userMapper;
+        return $this;
+    }
+
+
 
     /**
      * @param int $folderId
@@ -81,7 +141,6 @@ class Controller extends AbstractController
 
         return $folder;
     }
-
 
 
     /**
