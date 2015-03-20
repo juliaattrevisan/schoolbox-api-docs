@@ -32,7 +32,13 @@
                     {{ workItem.pretty_mark }}
                 {% endif %}
             </td>
-            <td>{{ workItem.date|date('jS F') }}</td>
+            <td>
+                {% if workItem.assessment %}
+                    {{ workItem.assessment.dueDate|date('jS F') }}
+                {% elseif workItem.quiz %}
+                    {{ workItem.quiz.finish|date('jS F') }}
+                {% endif %}
+            </td>
         </tr>
         {% endfor %}
         </tbody>
