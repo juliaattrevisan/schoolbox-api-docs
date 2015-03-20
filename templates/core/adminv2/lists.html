@@ -54,6 +54,9 @@
                                 <!-- END table_cell_select_option -->
                             </select></td>
                         <!-- END table_cell_select -->
+                        <!-- BEGIN table_cell_checkbox -->
+                        <td><input name="{TABLE_COLUMN}[]" type="checkbox" value="1" {TABLE_DATA_CHECKED}/></td>
+                        <!-- END table_cell_checkbox -->
 					</tr>
 					<!-- END table_row -->
 				</tbody>
@@ -70,7 +73,7 @@
 	<tbody>
 		<tr>
 			<!-- BEGIN newInput -->
-			<td><input name="{TABLE_COLUMN}[]" type="{TYPE}" {READONLY} value="" /></td>
+			<td><input name="{TABLE_COLUMN}[]" type="{TYPE}" {READONLY} value="{VALUE}" /></td>
 			<!-- END newInput -->
             <!-- BEGIN newSelect -->
                 <td><select name="{TABLE_COLUMN}[]">

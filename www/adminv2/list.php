@@ -15,6 +15,7 @@ $this->setBlock(TEMPLATE_content, 'table_row', 'table_row_block');
 $this->setBlock('table_row', 'table_cell_static', 'table_cell_static_block');
 $this->setBlock('table_row', 'table_cell', 'table_cell_block');
 $this->setBlock('table_row', 'table_cell_select', 'table_cell_select_block');
+$this->setBlock('table_row', 'table_cell_checkbox', 'table_cell_checkbox_block');
 $this->setBlock('table_cell_select', 'table_cell_select_option', 'table_cell_select_option_block');
 $this->setBlock(TEMPLATE_content, 'table_schema', 'table_schema_block');
 $this->setBlock(TEMPLATE_content, 'newInput', 'newInput_block');
@@ -28,6 +29,7 @@ $nav->parse($this, 'list');
 
 $this->setVar('table_cell_static_block', '');
 $this->setVar('table_cell_select_block', '');
+$this->setVar('table_cell_checkbox_block', '');
 $this->setVar('newSelect_block', '');
 
 $tableList = array(
@@ -100,6 +102,9 @@ $tableList = array(
             'normalise_as' => array(
                 'caption' => 'Normalised Mark',
             ),
+            'is_default_for_new_submissions' => array(
+                'caption' => 'Default for new submissions?',
+            )
         ),
     ),
     array(
@@ -199,6 +204,7 @@ if ($table) {
     foreach ($table as $row) {
         foreach ($row as $keys => $data) {
             $this->setVar('TABLE_DATA', Scrub::text($data));
+            $this->setVar('TABLE_DATA_CHECKED', $data ? 'checked' : '');
             $this->setVar('TABLE_COLUMN', $keys);
 
             $currentColumn = $selectedTable['fields'][$keys];
@@ -220,11 +226,11 @@ if ($table) {
             }
 
             if (!$rowOne) {
-if ((isset($currentColumn['caption']))) {
+                if ((isset($currentColumn['caption']))) {
                     $this->setVar('TABLE_HEAD', $currentColumn['caption']);
-} else {
-                        $this->setVar('TABLE_HEAD', ucwords(str_replace('_', ' ', $keys)));
-                    }
+                } else {
+                    $this->setVar('TABLE_HEAD', ucwords(str_replace('_', ' ', $keys)));
+                }
 
 
                 $this->parse('table_heading_block', 'table_heading', true);
@@ -252,10 +258,17 @@ if ((isset($currentColumn['caption']))) {
                                 $this->parse('newSelect_option_block', 'newSelect_option', true);
                             }
                             $this->parse('newSelect_block', 'newSelect', true);
-                        } // generically, just go with a text input
-                        else {
+                        } elseif ($col['Type'] === 'tinyint(1)') {
+                            // boolean
+                            $this->setVar('TYPE', 'checkbox');
+                            $this->setVar('READONLY', '');
+                            $this->setVar('VALUE', '1');
+                            $this->parse('newInput_block', 'newInput', true);
+                        } else {
+                            // generically, just go with a text input
                             $this->setVar('TYPE', 'text');
                             $this->setVar('READONLY', '');
+                            $this->setVar('VALUE', '');
                             $this->parse('newInput_block', 'newInput', true);
                         }
                     }
@@ -279,6 +292,8 @@ if ((isset($currentColumn['caption']))) {
                         $this->parse('table_cell_select_option_block', 'table_cell_select_option', true);
                     }
                     $this->parse('table_cell_block', 'table_cell_select', true);
+                } elseif ($col['Type'] === 'tinyint(1)') {
+                    $this->parse('table_cell_block', 'table_cell_checkbox', true);
                 } else {
                     $this->parse('table_cell_block', 'table_cell', true);
                 }
