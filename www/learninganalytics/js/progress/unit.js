@@ -25,6 +25,24 @@
             classCompletions: []
         };
 
+        /* Data formatting
+         */
+        var formattedMostAdvancedStudents = [];
+
+        for (i = 0; i < options.mostAdvancedStudents.length; i++) {
+            formattedMostAdvancedStudents[i] = parseFloat(options.mostAdvancedStudents[i].toFixed(1))
+        }
+
+        options.mostAdvancedStudents = formattedMostAdvancedStudents;
+
+        var formattedClassCompletions = [];
+
+        for (i = 0; i < options.classCompletions.length; i++) {
+            formattedClassCompletions[i] = parseFloat(options.classCompletions[i].toFixed(1))
+        }
+
+        options.classCompletions = formattedClassCompletions;
+
         /* The plot unfolds
          */
         $(options.element).highcharts({
