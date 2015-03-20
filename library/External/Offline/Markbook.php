@@ -38,11 +38,10 @@ class External_Offline_Markbook implements External_MarkbookInterface
     /**
      * Updates an existing markbook assessment
      *
-     * @param string
      * @param \Schoolbox\Assessment\Component\SubmissionBox $assessment
      * @return array
      */
-    public function updateAssessment($assessmentRemoteID, \Schoolbox\Assessment\Component\SubmissionBox $assessment)
+    public function updateAssessment(\Schoolbox\Assessment\Component\SubmissionBox $assessment)
     {
         // NOOP
         return array();
@@ -51,11 +50,10 @@ class External_Offline_Markbook implements External_MarkbookInterface
     /**
      * Creates or updates the mark for a student in the remote markbook
      *
-     * @param string
      * @param \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $returnedWork
      * @return bool
      */
-    public function setMark($assessmentRemoteID, \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $returnedWork)
+    public function setMark(\Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $returnedWork)
     {
         // NOOP
         return false;

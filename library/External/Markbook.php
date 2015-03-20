@@ -5,6 +5,9 @@
  * @copyright   Copyright 2015, Alaress Pty Ltd
  */
 
+use \Schoolbox\Assessment\Component\SubmissionBox;
+use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+
 class External_Markbook implements External_MarkbookInterface
 {
 
@@ -27,7 +30,7 @@ class External_Markbook implements External_MarkbookInterface
      * @param \Schoolbox\Assessment\Component\SubmissionBox $assessment
      * @return array
      */
-    public function getAssessment(\Schoolbox\Assessment\Component\SubmissionBox $assessment)
+    public function getAssessment(SubmissionBox $assessment)
     {
         return $this->getDatabase()->getAssessment($assessment);
     }
@@ -38,7 +41,7 @@ class External_Markbook implements External_MarkbookInterface
      * @param \Schoolbox\Assessment\Component\SubmissionBox $assessment
      * @return mixed
      */
-    public function createAssessment(\Schoolbox\Assessment\Component\SubmissionBox $assessment)
+    public function createAssessment(SubmissionBox $assessment)
     {
         return $this->getDatabase()->createAssessment($assessment);
     }
@@ -46,25 +49,23 @@ class External_Markbook implements External_MarkbookInterface
     /**
      * Updates an existing markbook assessment
      *
-     * @param string
      * @param \Schoolbox\Assessment\Component\SubmissionBox $assessment
      * @return mixed
      */
-    public function updateAssessment($assessmentRemoteID, \Schoolbox\Assessment\Component\SubmissionBox $assessment)
+    public function updateAssessment(SubmissionBox $assessment)
     {
-        return $this->getDatabase()->createAssessment($assessmentRemoteID, $assessment);
+        return $this->getDatabase()->createAssessment($assessment);
     }
 
     /**
      * Creates or updates the mark for a student in the remote markbook
      *
-     * @param string
      * @param \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $returnedWork
      * @return bool
      */
-    public function setMark($assessmentRemoteID, \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $returnedWork)
+    public function setMark(ReturnedWork $returnedWork)
     {
-        return $this->getDatabase()->setMark($assessmentRemoteID, $returnedWork);
+        return $this->getDatabase()->setMark($returnedWork);
     }
 
     /**

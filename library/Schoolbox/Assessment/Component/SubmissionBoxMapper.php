@@ -22,6 +22,7 @@ use Schoolbox\Resource\Storage;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\Course\Task;
+use External_Markbook;
 
 /**
  * Class SubmissionBoxMapper
@@ -206,6 +207,28 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         return true;
     }
 
+    /**
+    * Post-save method for submission boxes - saves new submission box files
+    *
+    * @param SubmissionBox $object
+    * @param SubmissionBox $previous
+    *
+    * @return void
+    */
+    public function postSave(SubmissionBox $object, $previous = null)
+    {
+        /**
+         * This saves the assessment to the remote system
+         */
+        $externalMarkbook = new External_Markbook();
+        if(is_null($previous)) {
+            $externalMarkbook->createAssessment($object);
+        }
+        else {
+            $assementID = $externalMarkbook->getAssessment($previous);
+            $externalMarkbook->updateAssessment($object, $assementID);
+        }
+    }
 
     /**
     * Conversion of SubmissionBoxHandler->getAllYearsByUser().

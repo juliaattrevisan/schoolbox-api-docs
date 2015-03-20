@@ -5,6 +5,12 @@
  * @copyright   Copyright 2015, Alaress Pty Ltd
  */
 
+use \Schoolbox\Assessment\Component\SubmissionBox;
+use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use \Schoolbox\UserMapper;
+use Alaress\DebugBar\Instance as DebugBar;
+
 class External_Synergetic_Markbook implements External_MarkbookInterface
 {
     /**
@@ -41,7 +47,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @param \Schoolbox\Assessment\Component\SubmissionBox $assessment
      * @return array
      */
-    public function getAssessment(\Schoolbox\Assessment\Component\SubmissionBox $assessment)
+    public function getAssessment(SubmissionBox $assessment)
     {
         $query = "SELECT * FROM StaffAssessmentMarkBook WHERE HdgAbbrev2 = '".$assessment->getId()."'";
         return $this->getDatabase()->getAll($query);
@@ -54,17 +60,20 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @param \Schoolbox\Assessment\Component\SubmissionBox $assessment
      * @return array
      */
-    public function createAssessment(\Schoolbox\Assessment\Component\SubmissionBox $assessment)
+    public function createAssessment(SubmissionBox $assessment)
     {
         $folder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assessment->getCategory());
         $externalClass = new External_Synergetic_Class();
+        $owner = UserMapper::getInstance()->findById($assessment->getOwner());
 
-        $fileYear = $this->getExternalUser()->getCurrentYear($assessment->getOwner()->getExternalId());
-        $fileSemester = $this->getExternalUser()->getCurrentSemester($assessment->getOwner()->getExternalId());
+        $fileYear = $this->getExternalUser()->getCurrentYear($owner->getExternalId());
+        $fileSemester = $this->getExternalUser()->getCurrentSemester($owner->getExternalId());
+        $multipleCodes = $folder->getCodes()->count();
 
         foreach($folder->getCodes() as $classCode) {
 
-            $class = $externalClass->getClass($classCode);
+            $class = $externalClass->getClass($classCode->getCode());
+            $staffID = $multipleCodes > 1 ? $owner->getExternalId() : 0;
 
             $query = "INSERT INTO StaffAssessmentMarkBook (
                         FileType,
@@ -78,50 +87,28 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                         HdgAbbrev1,
                         HdgAbbrev2,
                         ResultType,
-                        MarkOutOf
+                        MarkOutOf,
+                        WeightingFactor
                     ) VALUES (
                       '{$class['FileType']}',
                       '{$fileYear}',
                       '{$fileSemester}',
-                      ".$assessment->getOwner()->getExternalId().",
+                      '{$staffID}',
                       '{$class['ClassCampus']}',
                       '{$class['ClassCode']}',
-                      '".$this->getStaffMarkBookSequence($class['FileType'], $fileYear, $fileSemester, $class['ClassCampus'], $class['ClassCode'] )."',
-                      '".$this->getDatabase()->quote($assessment->getDescription())."',
-                      '".$this->getDatabase()->quote(TextFormatter::cutString($assessment->getDescription(),15)).",
+                      '',
+                      '".$this->getDatabase()->quote($assessment->getName())."',
+                      '".$this->getDatabase()->quote(TextFormatter::cutString($assessment->getName(),15))."',
                       '".$assessment->getId()."',
-                      'Raw',
-                      '100'
-                    )
-                    ";
-            $this->getDatabase()->query($query);
+                      'OGRaw',
+                      '100',
+                      '0'
+                    )";
+            $result = $this->getDatabase()->query($query);
         }
-
+        return $result;
     }
 
-    /**
-     *
-     * Fetches the current total count of items in the marbook to determine the next sequence number
-     *
-     * @param $fileType
-     * @param $fileYear
-     * @param $fileSemester
-     * @param $classCampus
-     * @param $classCode
-     * @return int
-     */
-    public function getStaffMarkBookSequence($fileType, $fileYear, $fileSemester, $classCampus, $classCode) {
-        $query = "SELECT COUNT(*)
-                    FROM StaffAssessmentMarkBook
-                    WHERE
-                        FileType = '{$fileType}' AND
-                        FileYear = '{$fileYear}' AND
-                        FileSemester = '{$fileSemester}' AND
-                        ClassCampus = '{$classCampus}' AND
-                        ClassCode = '{$classCode}'
-                 ";
-        return $this->getDatabase()->getOne($query);
-    }
 
     /**
      * Updates an existing markbook assessment
@@ -130,7 +117,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @param \Schoolbox\Assessment\Component\SubmissionBox $assessment
      * @return array
      */
-    public function updateAssessment($assessmentRemoteID, \Schoolbox\Assessment\Component\SubmissionBox $assessment)
+    public function updateAssessment(SubmissionBox $assessment)
     {
         $query = "UPDATE StaffAssessmentMarkBook SET
                         Heading = '".$this->getDatabase()->quote($assessment->getDescription())."',
@@ -148,44 +135,113 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @param \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $returnedWork
      * @return bool
      */
-    public function setMark($assessmentRemoteID, \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $returnedWork)
+    public function setMark(ReturnedWork $returnedWork)
     {
-        $assessmentRemote = $this->getAssessment($returnedWork->getSubmissionBox());
+        $assessmentRemoteList = $this->getAssessment($returnedWork->getSubmissionBox());
 
-        $query = "INSERT INTO StudentAssessmentMarkBook (
-                          FileType
-                          FileYear,
-                          FileSemester,
-                          StaffID,
-                          ClassCampus,
-                          ClassCode,
-                          ID,
-                          MarkBookSeq,
-                          Result,
-                          TopicComment,
-                          StudentAssessmentMarkBookSeq,
-                          ResultDate,
-                          ModifiedByID,
-                          ModifiedDate
-                          ) VALUES (
-                            '{$assessmentRemote['FileType']}',
-                            '{$assessmentRemote['FileYear']}',
-                            '{$assessmentRemote['FileSemester']}',
-                            ".$returnedWork->getMarker()->getExternalId().",
-                            '{$assessmentRemote['ClassCampus']}',
-                            '{$assessmentRemote['ClassCode']}',
-                            ".$returnedWork->getOwner()->getExternalId().",
-                            '{$assessmentRemote['MarkBookSeq']}',,
-                            '".$returnedWork->getNormalizedMark()."',
-                            '".$returnedWork->getComment()."',
-                            CURDATE(),
-                            ".$returnedWork->getMarker()->getExternalId().",
-                            CURDATE()
-                          )
-      ";
+        // If assessment box does not exist, create it first
+        if(!is_array($assessmentRemoteList) || count($assessmentRemoteList) < 1 ) {
+            $submissionBox = $this->createAssessment(SubmissionBoxMapper::getInstance()->findById($returnedWork->getSubmissionBox()->getId()));
+            $assessmentRemoteList = $this->getAssessment($submissionBox);
+        }
 
-        return $this->getDatabase()->query($query);
+        foreach($assessmentRemoteList as $assessmentRemote ) {
+
+            $marker = UserMapper::getInstance()->findById($returnedWork->getMarker());
+            $student = UserMapper::getInstance()->findById($returnedWork->getOwner()->getId());
+
+
+            if($this->isMarkExist($assessmentRemote['FileType'],
+                $assessmentRemote['FileYear'],
+                $assessmentRemote['FileSemester'],
+                $assessmentRemote['ClassCampus'],
+                $assessmentRemote['ClassCode'],
+                $assessmentRemote['MarkBookSeq'],
+                $student->getExternalId())
+              ) {
+
+                $query = "UPDATE StudentAssessmentMarkBook SET
+                            Result = '".$returnedWork->getNormalizedMark()."',
+                            TopicComment = '".$returnedWork->getComment()."'
+                          WHERE
+                              FileType = '{$assessmentRemote['FileType']}' AND
+                              FileYear = '{$assessmentRemote['FileYear']}' AND
+                              FileSemester = '{$assessmentRemote['FileSemester']}' AND
+                              ClassCampus = '{$assessmentRemote['ClassCampus']}' AND
+                              ClassCode = '{$assessmentRemote['ClassCode']}' AND
+                              ID = '" . $student->getExternalId() . "' AND
+                              MarkBookSeq = '{$assessmentRemote['MarkBookSeq']}'
+                         ";
+            }
+            else {
+
+                $query = "INSERT INTO StudentAssessmentMarkBook (
+                                  FileType
+                                  FileYear,
+                                  FileSemester,
+                                  StaffID,
+                                  ClassCampus,
+                                  ClassCode,
+                                  ID,
+                                  MarkBookSeq,
+                                  Result,
+                                  TopicComment,
+                                  StudentAssessmentMarkBookSeq,
+                                  ResultDate,
+                                  ModifiedByID,
+                                  ModifiedDate
+                                  ) VALUES (
+                                    '{$assessmentRemote['FileType']}',
+                                    '{$assessmentRemote['FileYear']}',
+                                    '{$assessmentRemote['FileSemester']}',
+                                    ".$marker->getExternalId().",
+                                    '{$assessmentRemote['ClassCampus']}',
+                                    '{$assessmentRemote['ClassCode']}',
+                                    ".$student->getExternalId().",
+                                    '{$assessmentRemote['MarkBookSeq']}',
+                                    '".$returnedWork->getNormalizedMark()."',
+                                    '".$returnedWork->getComment()."',
+                                    '',
+                                    CURDATE(),
+                                    ".$marker->getExternalId().",
+                                    CURDATE()
+                                  )
+              ";
+            }
+          $result = $this->getDatabase()->query($query);
+        }
+        return $result;
     }
+
+    /**
+     *
+     * Determines if a student has already been marked or not, used to determining if to use insert or update
+     *
+     * @param $fileType
+     * @param $fileYear
+     * @param $fileSemester
+     * @param $classCampus
+     * @param $classCode
+     * @param $assessmentID
+     * @param $studentID
+     * @return int
+     */
+    public function isMarkExist($fileType, $fileYear, $fileSemester, $classCampus, $classCode, $assessmentID, $studentID) {
+        $query = "SELECT COUNT(*) as result
+                    FROM StudentAssessmentMarkBook
+                    WHERE
+                        FileType = '{$fileType}' AND
+                        FileYear = '{$fileYear}' AND
+                        FileSemester = '{$fileSemester}' AND
+                        ClassCampus = '{$classCampus}' AND
+                        ClassCode = '{$classCode}' AND
+                        MarkBookSeq = '{$assessmentID}' AND
+                        ID = '{$studentID}'
+                 ";
+        $result = $this->getDatabase()->getRow($query);
+        return $result['result'] > 0;
+    }
+
 
     /**
      * @param MSSQL $database
