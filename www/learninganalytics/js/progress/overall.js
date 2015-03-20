@@ -65,13 +65,11 @@
             series: [
                 {
                     name: 'Most Advanced Student',
-                    data: [parseFloat(options.mostAdvancedStudent.toFixed(1))],
-                    color: '#ffcc66'
+                    data: [parseFloat(options.mostAdvancedStudent.toFixed(1))]
                 },
                 {
                     name: 'Entire Class',
-                    data: [parseFloat(options.classCompletions.toFixed(1))],
-                    color: '#66ccff'
+                    data: [parseFloat(options.classCompletions.toFixed(1))]
                 }
             ],
             tooltip: {

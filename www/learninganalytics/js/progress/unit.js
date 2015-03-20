@@ -83,13 +83,11 @@
             series: [
                 {
                     name: 'Most Advanced Student',
-                    data: options.mostAdvancedStudents,
-                    color: '#ffcc66'
+                    data: options.mostAdvancedStudents
                 },
                 {
                     name: 'Class Completion',
-                    data: options.classCompletions,
-                    color: '#66ccff'
+                    data: options.classCompletions
                 }
             ],
             tooltip: {
