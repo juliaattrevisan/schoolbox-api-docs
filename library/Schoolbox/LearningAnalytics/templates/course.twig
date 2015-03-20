@@ -47,6 +47,7 @@
 <script type="text/javascript" src="/learninganalytics/js/effort/scatter.js"></script>
 <script type="text/javascript">
     $(function () {
+        $('#container').addClass('foundation').foundation();
 
         /* Mr Squiggle
          */
@@ -232,20 +233,20 @@
     {% endif %}
 </h1>
 
-<ul class="admin-nav">
-    <li>
-        <a href='/learningAnalytics/{{ metadata.courseFolder.getId() }}' class="{% if metadata.route == 'course' %}current{% endif %}">
+<dl class="tabs">
+    <dd class="{% if metadata.route == 'course' %}active{% endif %}">
+        <a href='/learningAnalytics/{{ metadata.courseFolder.getId() }}'>
             Course
         </a>
-    </li>
+    </dd>
     {% for folder in metadata.allFolders %}
-    <li>
-        <a href='/learningAnalytics/{{ metadata.courseFolder.getId() }}/{{ folder.getId() }}' class="{% if (folder.getId() == metadata.selectedFolder.getId()) and (metadata.route == 'folder') %}current{% endif %}">
+    <dd class="{% if (folder.getId() == metadata.selectedFolder.getId()) and (metadata.route == 'folder') %}active{% endif %}">
+        <a href='/learningAnalytics/{{ metadata.courseFolder.getId() }}/{{ folder.getId() }}'>
             {{ folder.getName() }}
         </a>
-    </li>
+    </dd>
     {% endfor %}
-</ul>
+</dl>
 
 <div class="clearfix"></div>
 
