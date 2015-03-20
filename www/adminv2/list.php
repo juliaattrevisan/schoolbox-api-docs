@@ -31,7 +31,9 @@ $nav->parse($this, 'list');
 $this->setVar('table_cell_static_block', '');
 $this->setVar('table_cell_select_block', '');
 $this->setVar('table_cell_checkbox_block', '');
+$this->setVar('newInput_block', '');
 $this->setVar('newSelect_block', '');
+$this->setVar('newCheckbox_block', '');
 
 $tableList = array(
     array(
