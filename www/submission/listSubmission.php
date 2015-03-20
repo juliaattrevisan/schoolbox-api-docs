@@ -133,6 +133,8 @@ $courseFolderUsing = array();
 if (!empty($subList) && is_array($subList)) {
     $i = 0;
 
+    $unitInstanceMapper = new \Schoolbox\Assessment\Course\UnitInstanceMapper();
+
     foreach ($subList as $sub) {
 
         // TODO fully rewrite this awful copypasted loop
@@ -163,45 +165,22 @@ if (!empty($subList) && is_array($subList)) {
 
                 $this->setVar('CATEGORY_ID', $curCategory->getId());
 
-                /* TODO: Learning Analytics courses buttons go here
+                /* Learning Analytics courses buttons go here
                  */
                 $this->setVar(array(
                     'learning_analytics_block' => ''
                 ));
 
-
-
-                $unitInstanceMapper = new \Schoolbox\Assessment\Course\UnitInstanceMapper();
                 $allCoursesUsed = $unitInstanceMapper->findAllCoursesUsedInFolder($curCategory);
 
-                new \Alaress_Probe($allCoursesUsed);
-//                $allUnits = $unitInstanceMapper->findByColumn('category_id', $curCategory->getId());
-//
-//                if ($allUnits->count()) {
-//                    foreach ($allUnits as $currentUnit) {
-//
-//                        /* Save the new $courseFolder into the registry for recycling
-//                         * Otherwise get it from a previous iteration
-//                         */
-//                        if (!in_array($currentUnit->getUnitCategory()->getId(), array_keys($courseFolderUsing))) {
-//                            $courseFolder = $unitInstanceMapper->findCourseForUnit($currentUnit);
-//
-//                            echo "Saving {$courseFolder->getId()} into registry via {$currentUnit->getUnitCategory()->getId()}.<BR>";
-//                            $courseFolderUsing[$currentUnit->getUnitCategory()->getId()] = $courseFolder;
-//                        }
-//                        else {
-//                            $courseFolder = $courseFolderUsing[$currentUnit->getUnitCategory()->getId()];
-//                            echo "Getting {$courseFolder->getId()} from registry.<BR>";
-//                        }
-//
-//                        $this->setVar(array(
-//                                'COURSE_FOLDER_ID' => $courseFolder->getId(),
-//                                'COURSE_FOLDER_NAME' => $courseFolder->getName()
-//                            ));
-//
-//                        $this->parse('learning_analytics_block', 'learning_analytics', true);
-//                    }
-//                }
+                foreach ($allCoursesUsed as $courseFolder) {
+                    $this->setVar(array(
+                        'COURSE_FOLDER_ID' => $courseFolder->getId(),
+                        'COURSE_FOLDER_NAME' => $courseFolder->getName()
+                    ));
+
+                    $this->parse('learning_analytics_block', 'learning_analytics', true);
+                }
 
                 $this->parse('category_block', 'category_listing', true);
                 $this->setVar('submission_block', '');
@@ -347,39 +326,21 @@ if (!empty($subList) && is_array($subList)) {
 
         $this->setVar('CATEGORY_ID', $prevCat['category']);
 
-        /* TODO: Learning Analytics courses buttons go here
+        /* Learning Analytics courses buttons go here
          */
         $this->setVar(array(
             'learning_analytics_block' => ''
         ));
 
-        $unitInstanceMapper = new \Schoolbox\Assessment\Course\UnitInstanceMapper();
-        $allUnits = $unitInstanceMapper->findByColumn('category_id', $curCategory->getId());
+        $allCoursesUsed = $unitInstanceMapper->findAllCoursesUsedInFolder($curCategory);
 
-        if ($allUnits->count()) {
-            foreach ($allUnits as $currentUnit) {
+        foreach ($allCoursesUsed as $courseFolder) {
+            $this->setVar(array(
+                'COURSE_FOLDER_ID' => $courseFolder->getId(),
+                'COURSE_FOLDER_NAME' => $courseFolder->getName()
+            ));
 
-                /* Save the new $courseFolder into the registry for recycling
-                 * Otherwise get it from a previous iteration
-                 */
-                if (!in_array($currentUnit->getUnitCategory()->getId(), array_keys($courseFolderUsing))) {
-                    $courseFolder = $unitInstanceMapper->findCourseForUnit($currentUnit);
-
-                    echo "Saving {$courseFolder->getId()} into registry via {$currentUnit->getUnitCategory()->getId()}.<BR>";
-                    $courseFolderUsing[$currentUnit->getUnitCategory()->getId()] = $courseFolder;
-                }
-                else {
-                    $courseFolder = $courseFolderUsing[$currentUnit->getUnitCategory()->getId()];
-                    echo "Getting {$courseFolder->getId()} from registry.<BR>";
-                }
-
-                $this->setVar(array(
-                    'COURSE_FOLDER_ID' => $courseFolder->getId(),
-                    'COURSE_FOLDER_NAME' => $courseFolder->getName()
-                ));
-
-                $this->parse('learning_analytics_block', 'learning_analytics', true);
-            }
+            $this->parse('learning_analytics_block', 'learning_analytics', true);
         }
 
         $this->parse("category_block", "category_listing", true);
