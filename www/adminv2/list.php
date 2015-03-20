@@ -20,6 +20,7 @@ $this->setBlock('table_cell_select', 'table_cell_select_option', 'table_cell_sel
 $this->setBlock(TEMPLATE_content, 'table_schema', 'table_schema_block');
 $this->setBlock(TEMPLATE_content, 'newInput', 'newInput_block');
 $this->setBlock(TEMPLATE_content, 'newSelect', 'newSelect_block');
+$this->setBlock(TEMPLATE_content, 'newCheckbox', 'newCheckbox_block');
 $this->setBlock('newSelect', 'newSelect_option', 'newSelect_option_block');
 $this->setBlock(TEMPLATE_content, 'create_new', 'create_new_block');
 
@@ -201,7 +202,7 @@ if (isset($selectedTable['fields'])) {
 }
 
 if ($table) {
-    foreach ($table as $row) {
+    foreach ($table as $rowNumber => $row) {
         foreach ($row as $keys => $data) {
             $this->setVar('TABLE_DATA', Scrub::text($data));
             $this->setVar('TABLE_DATA_CHECKED', $data ? 'checked' : '');
@@ -226,6 +227,8 @@ if ($table) {
             }
 
             if (!$rowOne) {
+                // New row
+                $this->setVar('ROW_NUMBER', -1);
                 if ((isset($currentColumn['caption']))) {
                     $this->setVar('TABLE_HEAD', $currentColumn['caption']);
                 } else {
@@ -263,7 +266,7 @@ if ($table) {
                             $this->setVar('TYPE', 'checkbox');
                             $this->setVar('READONLY', '');
                             $this->setVar('VALUE', '1');
-                            $this->parse('newInput_block', 'newInput', true);
+                            $this->parse('newCheckbox_block', 'newCheckbox', true);
                         } else {
                             // generically, just go with a text input
                             $this->setVar('TYPE', 'text');
@@ -273,9 +276,10 @@ if ($table) {
                         }
                     }
                 }
-
             }
 
+            // Existing rows
+            $this->setVar('ROW_NUMBER', $rowNumber);
             if ($keys == $selectedTable['index'] || (isset($currentColumn) && $currentColumn['readonly'] == '1')) {
                 $this->parse('table_cell_block', 'table_cell_static', true);
             } else {
@@ -305,8 +309,10 @@ if ($table) {
         $this->parse('table_row_block', 'table_row', true);
         $this->setVar('table_cell_block', '');
     }
-} // else table contains no data. still display headers
-else {foreach ($tableDefinition as $col) {
+} else {
+    // else table contains no data. still display headers
+    foreach ($tableDefinition as $col) {
+        $this->setVar('ROW_NUMBER', -1);
         $key = $col['Field'];
         if ((isset($selectedTable['fields'][$key]['caption']))) {
             $this->setVar('TABLE_HEAD', $selectedTable['fields'][$key]['caption']);
@@ -337,10 +343,17 @@ else {foreach ($tableDefinition as $col) {
                         $this->parse('newSelect_option_block', 'newSelect_option', true);
                     }
                     $this->parse('newSelect_block', 'newSelect', true);
-                } // generically, just go with a text input
-                else {
+                } elseif ($col['Type'] === 'tinyint(1)') {
+                    // boolean
+                    $this->setVar('TYPE', 'checkbox');
+                    $this->setVar('READONLY', '');
+                    $this->setVar('VALUE', '1');
+                    $this->parse('newCheckbox_block', 'newCheckbox', true);
+                } else {
+                    // generically, just go with a text input
                     $this->setVar('TYPE', 'text');
                     $this->setVar('READONLY', '');
+                    $this->setVar('VALUE', '');
                     $this->parse('newInput_block', 'newInput', true);
                 }
             }
