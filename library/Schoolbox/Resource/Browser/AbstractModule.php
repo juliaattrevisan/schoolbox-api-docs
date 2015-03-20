@@ -12,68 +12,89 @@ namespace Schoolbox\Resource\Browser;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Config;
-use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource;
-use Schoolbox\UserMapper;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 
 abstract class AbstractModule extends BaseModule
 {
+    /** @var string */
+    protected $basename = '';
 
+
+    /**
+     * @param Router $router
+     * @param string $basePath
+     */
     public function initRoutes(Router $router, $basePath)
     {
         $routes = $router->getRoutes();
-        $routes->addGet('resourceBrowser.browse', $basePath.'{/folderId}')->addTokens([ 'folderId' => '\d+' ]);
-        $routes->addGet('resourceBrowser.listResources', $basePath.'/{folderId}/children')->addTokens([ 'folderId' => '\d+' ]);
-        $routes->addGet('resourceBrowser.showFolderInfo', $basePath.'/{folderId}/info')->addTokens([ 'folderId' => '\d+' ]);
-        $routes->addGet('resourceBrowser.showFileInfo', $basePath.'/file/{fileId}/info')->addTokens([ 'fileId' => '\d+' ]);
-        $routes->addGet('resourceBrowser.showMultiFileInfo', $basePath.'/file/{fileIds}/info')->addTokens([ 'folderId' => '(\d+,)+(\d+)' ]);
+        $routes->addGet("$this->basename.browse", $basePath.'{/folderId}')->addTokens([ 'folderId' => '\d+' ]);
+        $routes->addGet("$this->basename.listResources", $basePath.'/{folderId}/children')->addTokens([ 'folderId' => '\d+' ]);
+        $routes->addGet("$this->basename.showFolderInfo", $basePath.'/{folderId}/info')->addTokens([ 'folderId' => '\d+' ]);
+        $routes->addGet("$this->basename.showFileInfo", $basePath.'/file/{fileId}/info')->addTokens([ 'fileId' => '\d+' ]);
+        $routes->addGet("$this->basename.showMultiFileInfo", $basePath.'/file/{fileIds}/info')->addTokens([ 'folderId' => '(\d+,)+(\d+)' ]);
     }
 
 
-
+    /**
+     * @param Authorizer $authorizer
+     */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $authorizer->addRule('/^resourceBrowser\.(?:.+)$/', new Rule\IsLoggedIn());
+        $authorizer->addRule("/^{$this->basename}\.(?:.+)$/", new Rule\IsLoggedIn());
     }
 
 
+    /**
+     * @param Twig_Loader_Chain $templateLoader
+     * @throws \Twig_Error_Loader
+     */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
         $loader = new Twig_Loader_Filesystem(array());
-        $loader->addPath(__DIR__.'/templates', 'resourceBrowser');
+        $loader->addPath(__DIR__.'/templates', $this->basename);
         $templateLoader->addLoader($loader);
     }
 
 
+    /**
+     * @param ContainerInterface $injector
+     */
     public function initControllers(ContainerInterface $injector)
     {
+        // set
         $injector->set(
-            'controller:resourceBrowser',
+            "controller:$this->basename",
             $injector->lazyNew($this->getControllerClass())
         );
 
-        $setters = [
-            'setFolderMapper'     => Resource\Folder\Mapper::class,
-            'setFileMapper'       => Resource\FileMapper::class,
-            'setUserMapper'       => UserMapper::class,
-            'setTaskMapper'       => TaskMapper::class,
-            'setUserAccessMapper' => UserAccessMapper::class,
-            'setRoleAccessMapper' => RoleAccessMapper::class,
-            'setConfig'           => Config\Loader::class
-        ];
-
-        foreach ($setters as $method => $class) {
-            $injector->setters[$this->getControllerClass()][$method] = $injector->lazyNew($class);
-        }
-
+        $this->initSetters($injector);
     }
+
+
+    /**
+     * @return array
+     */
+    protected function getSetterList()
+    {
+        return [
+            'setFileMapper'       => Resource\FileMapper::class,
+            'setConfig'           => Config\Loader::class,
+            'setTreeBuilder'      => null
+        ];
+    }
+
+
+    /**
+     * @param Container $injector
+     * @return void
+     */
+    protected abstract function initSetters(Container $injector);
 
 
     /**

@@ -10,38 +10,34 @@
 namespace Schoolbox\Resource\Browser;
 
 use Alaress\Web\Controller\Base as BaseController;
-use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Collection;
 use Schoolbox\Config;
 use Schoolbox\FileInterface;
 use Schoolbox\FolderInterface;
-use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource;
-use Schoolbox\UserMapper;
 
 abstract class AbstractController extends BaseController
 {
-    /** @var Resource\Folder\Mapper */
-    protected $folderMapper;
+
+    /** @var AbstractTreeBuilder */
+    protected $treeBuilder;
 
     /** @var Resource\FileMapper */
     protected $fileMapper;
 
-    /** @var UserAccessMapper */
-    protected $userAccessMapper;
-
-    /** @var RoleAccessMapper */
-    protected $roleAccessMapper;
-
-    /** @var UserMapper */
-    protected $userMapper;
-
     /** @var Config\Loader */
     protected $conf;
 
-    /** @var TaskMapper */
-    protected $taskMapper;
+
+    /**
+     * @param AbstractTreeBuilder $treeBuilder
+     * @return self
+     */
+    public function setTreeBuilder($treeBuilder)
+    {
+        $this->treeBuilder = $treeBuilder;
+        return $this;
+    }
 
 
     /**
@@ -62,61 +58,6 @@ abstract class AbstractController extends BaseController
     public function setFileMapper($fileMapper)
     {
         $this->fileMapper = $fileMapper;
-        return $this;
-    }
-
-
-    /**
-     * @param Resource\Folder\Mapper $folderMapper
-     * @return self
-     */
-    public function setFolderMapper($folderMapper)
-    {
-        $this->folderMapper = $folderMapper;
-        return $this;
-    }
-
-
-    /**
-     * @param RoleAccessMapper $roleAccessMapper
-     * @return self
-     */
-    public function setRoleAccessMapper($roleAccessMapper)
-    {
-        $this->roleAccessMapper = $roleAccessMapper;
-        return $this;
-    }
-
-
-    /**
-     * @param TaskMapper $taskMapper
-     * @return self
-     */
-    public function setTaskMapper($taskMapper)
-    {
-        $this->taskMapper = $taskMapper;
-        return $this;
-    }
-
-
-    /**
-     * @param UserAccessMapper $userAccessMapper
-     * @return self
-     */
-    public function setUserAccessMapper($userAccessMapper)
-    {
-        $this->userAccessMapper = $userAccessMapper;
-        return $this;
-    }
-
-
-    /**
-     * @param UserMapper $userMapper
-     * @return self
-     */
-    public function setUserMapper($userMapper)
-    {
-        $this->userMapper = $userMapper;
         return $this;
     }
 
@@ -146,8 +87,6 @@ abstract class AbstractController extends BaseController
      */
     public function browse($folderId = 0)
     {
-        $sessionUser = $this->getSession()->getAuthUser();
-
         // if a folder ID was supplied, stash that in session then redirect
         if ($folderId) {
             $this->getSession()->set('resourcesID', $folderId);
@@ -159,19 +98,11 @@ abstract class AbstractController extends BaseController
 
         $folderId = $this->getSession()->get('resourcesID', 0);
 
-        $tree = new Resources\TreeBuilder(
-            $this->folderMapper,
-            $this->taskMapper,
-            $this->userAccessMapper,
-            $this->roleAccessMapper,
-            $sessionUser
-        );
-
         $data = $this->getFolderData($folderId);
 
         // add files to that
         $data['files']    = $this->fileMapper->findByFolderId($folderId)->getAll();
-        $data['treedata'] = json_encode($tree->buildPartialTree($folderId));
+        $data['treedata'] = json_encode($this->treeBuilder->buildPartialTree($folderId));
 
         $this->getResponse()->content->set([
             'template' => '@resourceBrowser/browse.twig',
