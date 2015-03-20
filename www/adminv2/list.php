@@ -84,6 +84,25 @@ $tableList = array(
         'index' => 'id'
     ),
     array(
+        'name'   => 'submission_errors',
+        'title'  => 'Submission States',
+        'index'  => 'id',
+        'fields' => array(
+            'id' => array(
+                'readonly' => '1'
+            ),
+            'code' => array(
+                'caption' => 'Code',
+            ),
+            'display_as' => array(
+                'caption' => 'Display Name',
+            ),
+            'normalise_as' => array(
+                'caption' => 'Normalised Mark',
+            ),
+        ),
+    ),
+    array(
         'name' => 'component_definition',
         'title' => 'Components',
         'index' => 'id',
