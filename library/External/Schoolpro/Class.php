@@ -67,19 +67,6 @@ class External_Schoolpro_Class implements External_ClassInterface {
 				}
 			}
 		}
-
-		/* Sort by lastname then by firstname
-		 */
-		usort($allStudents, function($a, $b) {
-			$last = strcmp($a['lastname'], $b['lastname']);
-
-			if ($last == 0) {
-				return strcmp($a['firstname'],$b['firstname']);
-			}
-
-			return $last;
-		});
-
 		return $allStudents;
 	}
 
