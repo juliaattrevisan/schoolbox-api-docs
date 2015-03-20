@@ -493,11 +493,10 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             $dueDate = $task->getAssessment()->getFinish();
         }
         if ($dueDate instanceof Alaress_Date_Format) {
-            $relativeDate = new Alaress_Date_Relative($dueDate);
             $this->setVar(
                 array(
                     'UNIT_TASK_DUE_DATE'          => Scrub::text($dueDate->getDateOnly()),
-                    'UNIT_TASK_RELATIVE_DUE_DATE' => Scrub::text($relativeDate->getRelativeTime())
+                    'UNIT_TASK_RELATIVE_DUE_DATE' => Scrub::text($dueDate->getRelativeTime())
                 )
             );
             $this->parse('unit_task_due_date_block', 'unit_task_due_date');
