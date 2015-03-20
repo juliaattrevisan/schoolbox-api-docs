@@ -10,6 +10,8 @@
 namespace Schoolbox\Resource\Folder;
 
 
+use Schoolbox\Collection;
+
 interface ILocator {
 
     /**
@@ -25,7 +27,7 @@ interface ILocator {
      * Return the folders contained within the folder with the given ID
      *
      * @param int $nodeId
-     * @return IFolder[]
+     * @return Collection|IFolder[]
      */
     public function findByParentId($nodeId);
 } 
