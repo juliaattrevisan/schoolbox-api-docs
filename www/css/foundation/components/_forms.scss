@@ -156,13 +156,25 @@ label.radio-label			{ background-position: 0 -48px; }
 input[type=checkbox]:checked +
 label.checkbox-label		{ background-position: 0 -120px; }
 
-
 //  Show/Hide Advanced form fields
 .form-advanced{
 	display: none;
 	&.show{
 		display: block;
 	}
+}
+
+// Date & Time fields
+.date-time{
+	width: 22% !important;
+	float: left;
+	margin: 0 rem-calc(($base-font-size - 10)) 0 0 !important;
+}
+
+.time-separator{
+	float: left;
+	padding: 0.5rem 0;
+	margin: 0 rem-calc(($base-font-size - 10)) 0 0;
 }
 
 //  DATEPICKER
