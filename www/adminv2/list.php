@@ -14,11 +14,13 @@ $this->setBlock(TEMPLATE_content, 'table_heading', 'table_heading_block');
 $this->setBlock(TEMPLATE_content, 'table_row', 'table_row_block');
 $this->setBlock('table_row', 'table_cell_static', 'table_cell_static_block');
 $this->setBlock('table_row', 'table_cell', 'table_cell_block');
+$this->setBlock('table_cell', 'table_cell_null', 'table_cell_null_block');
 $this->setBlock('table_row', 'table_cell_select', 'table_cell_select_block');
 $this->setBlock('table_row', 'table_cell_checkbox', 'table_cell_checkbox_block');
 $this->setBlock('table_cell_select', 'table_cell_select_option', 'table_cell_select_option_block');
 $this->setBlock(TEMPLATE_content, 'table_schema', 'table_schema_block');
 $this->setBlock(TEMPLATE_content, 'newInput', 'newInput_block');
+$this->setBlock('newInput', 'newInput_null', 'newInput_null_block');
 $this->setBlock(TEMPLATE_content, 'newSelect', 'newSelect_block');
 $this->setBlock(TEMPLATE_content, 'newCheckbox', 'newCheckbox_block');
 $this->setBlock('newSelect', 'newSelect_option', 'newSelect_option_block');
@@ -104,6 +106,7 @@ $tableList = array(
             ),
             'normalise_as' => array(
                 'caption' => 'Normalised Mark',
+                'nullable' => true,
             ),
             'is_default_for_new_submissions' => array(
                 'caption' => 'Default for new submissions?',
@@ -274,6 +277,11 @@ if ($table) {
                             $this->setVar('TYPE', 'text');
                             $this->setVar('READONLY', '');
                             $this->setVar('VALUE', '');
+                            if ($currentColumn['nullable']) {
+                                $this->parse('newInput_null_block', 'newInput_null');
+                            } else {
+                                $this->setVar('newInput_null_block', '');
+                            }
                             $this->parse('newInput_block', 'newInput', true);
                         }
                     }
@@ -301,6 +309,12 @@ if ($table) {
                 } elseif ($col['Type'] === 'tinyint(1)') {
                     $this->parse('table_cell_block', 'table_cell_checkbox', true);
                 } else {
+                    if ($currentColumn['nullable']) {
+                        $this->setVar('TABLE_DATA_NULL_CHECKED', !isset($data) ? 'checked' : '');
+                        $this->parse('table_cell_null_block', 'table_cell_null');
+                    } else {
+                        $this->setVar('table_cell_null_block', '');
+                    }
                     $this->parse('table_cell_block', 'table_cell', true);
                 }
             }
@@ -356,6 +370,11 @@ if ($table) {
                     $this->setVar('TYPE', 'text');
                     $this->setVar('READONLY', '');
                     $this->setVar('VALUE', '');
+                    if ($selectedTable['fields'][$key]['nullable']) {
+                        $this->parse('newInput_null_block', 'newInput_null');
+                    } else {
+                        $this->setVar('newInput_null_block', '');
+                    }
                     $this->parse('newInput_block', 'newInput', true);
                 }
             }
