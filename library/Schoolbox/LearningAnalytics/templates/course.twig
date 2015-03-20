@@ -7,41 +7,20 @@
     }
 
 </style>
-
+<link rel="stylesheet" type="text/css" media="screen" href="/css/foundation/chrome.css?v={SITE_VERSION}" />
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts-more.js"></script>
 <script type="text/javascript" src="/learninganalytics/js/progress/overall.js"></script>
 <script type="text/javascript" src="/learninganalytics/js/boxPlot.js"></script>
 <script type="text/javascript" src="/learninganalytics/js/progress/unit.js"></script>
 <script type="text/javascript" src="/learninganalytics/js/effort/scatter.js"></script>
+<script type="text/javascript" src="/learninganalytics/js/schoolboxTheme.js"></script>
 <script type="text/javascript">
     $(function () {
         $('#container').addClass('foundation').foundation();
 
         /* Mr Squiggle
          */
-
-        var schoolboxTheme = {
-            colors: [
-                /* First series color: also default colour of
-                 * borders and stuff
-                 */
-                '#ddebf4',
-
-                /* Second series color
-                 */
-                '#0066b0'
-            ],
-            plotBorderColor: '#00ff00',
-            plotOptions: {
-                boxplot: {
-                    color: '#0066b0',
-                    fillColor: '#ddebf4'
-                }
-            }
-        };
-
-        Highcharts.setOptions(schoolboxTheme);
 
         /**
          * How much of the course has been completed by all students
@@ -239,57 +218,65 @@
     {% endfor %}
 </dl>
 
-<h2>Overall Progress</h2>
-<div data-graph='overall' class='learning-analytics overall medium-6 columns'></div>
+<div class="row">
+    <h2>Overall Progress</h2>
+    <div data-graph='overall' class='learning-analytics overall medium-6 columns'></div>
 
-<div class="medium-3 columns">
-    <h3>Top Students</h3>
-    {% if results.topStudents|length > 0 %}
-    <ul>
-        {% for currentStudent in results.topStudents|slice(0,3) %}
-        <li>
-            <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
-            {{ currentStudent.average|number_format(1) }}%
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>
-        Nobody has attempted these tasks yet.
-    </p>
-    {% endif %}
+    <div class="medium-3 columns">
+        <h3>Top Students</h3>
+        {% if results.topStudents|length > 0 %}
+        <ul>
+            {% for currentStudent in results.topStudents|slice(0,3) %}
+            <li>
+                <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
+                {{ currentStudent.average|number_format(1) }}%
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>
+            Nobody has attempted these tasks yet.
+        </p>
+        {% endif %}
+    </div>
+    <div class="medium-3 columns">
+        <h3>Bottom Students</h3>
+        {% if results.topStudents|length > 0 %}
+        <ul>
+            {% for currentStudent in results.bottomStudents|slice(0,3) %}
+            <li>
+                <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
+                {{ currentStudent.average|number_format(1) }}%
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>
+            Nobody has attempted these tasks yet.
+        </p>
+        {% endif %}
+    </div>
 </div>
-<div class="medium-3 columns">
-    <h3>Bottom Students</h3>
-    {% if results.topStudents|length > 0 %}
-    <ul>
-        {% for currentStudent in results.bottomStudents|slice(0,3) %}
-        <li>
-            <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
-            {{ currentStudent.average|number_format(1) }}%
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>
-        Nobody has attempted these tasks yet.
-    </p>
-    {% endif %}
+
+<div class="row">
+    <h2>Results</h2>
+    <div data-graph="boxplots" class='learning-analytics boxplots'></div>
 </div>
 
-<div class="clearfix"></div>
-
-<h2>Results</h2>
-<div data-graph="boxplots" class='learning-analytics boxplots'></div>
-
-<h2>Unit Progress</h2>
-<div data-graph='unit-progress' class='learning-analytics unit-progress' style="height:{{ ((progress.allUnits|length)*50)+75 }}px"></div>
+<div class="row">
+    <h2>Unit Progress</h2>
+    <div data-graph='unit-progress' class='learning-analytics unit-progress' style="height:{{ ((progress.allUnits|length)*50)+75 }}px"></div>
+</div>
 
 {% if rubrics.allRubrics|length > 0 %}
-<h2>Rubrics</h2>
-<div data-graph="rubrics" class='learning-analytics boxplots' style="height:{{ ((rubrics.allRubrics|length)*150)+75 }}px"></div>
+<div class="row">
+    <h2>Rubrics</h2>
+    <div data-graph="rubrics" class='learning-analytics boxplots' style="height:{{ ((rubrics.allRubrics|length)*150)+75 }}px"></div>
+</div>
 
 {% endif %}
 
-<h2>Effort</h2>
-<div data-graph="effort" class='learning-analytics effort'></div>
+<div class="row">
+    <h2>Effort</h2>
+    <div data-graph="effort" class='learning-analytics effort'></div>
+</div>
