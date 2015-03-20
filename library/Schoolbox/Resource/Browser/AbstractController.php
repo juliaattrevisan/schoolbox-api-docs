@@ -10,7 +10,6 @@
 namespace Schoolbox\Resource\Browser;
 
 use Alaress\Web\Controller\Base as BaseController;
-
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Collection;
 use Schoolbox\Config;
@@ -160,7 +159,7 @@ abstract class AbstractController extends BaseController
 
         $folderId = $this->getSession()->get('resourcesID', 0);
 
-        $tree = new Resource\Folder\TreeBuilder(
+        $tree = new Resources\TreeBuilder(
             $this->folderMapper,
             $this->taskMapper,
             $this->userAccessMapper,

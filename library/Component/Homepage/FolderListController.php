@@ -82,7 +82,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
         $this->setBlock('folders', 'modify_folder', 'modify_folder_block');
 
 
-        $treeBuilder = new Folder\TreeBuilder(
+        $treeBuilder = new \Schoolbox\Resource\Browser\Resources\TreeBuilder(
             Folder\Mapper::getInstance(),
             TaskMapper::getInstance(),
             UserAccessMapper::getInstance(),

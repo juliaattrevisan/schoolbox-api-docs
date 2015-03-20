@@ -26,7 +26,7 @@ $output = array('FILE_CATEGORY_ID'	=> $_GET['categoryID'],
                 );
 $page->setVar($output);
 
-$treeBuilder = new Folder\TreeBuilder(
+$treeBuilder = new \Schoolbox\Resource\Browser\Resources\TreeBuilder(
     Folder\Mapper::getInstance(),
     TaskMapper::getInstance(),
     UserAccessMapper::getInstance(),

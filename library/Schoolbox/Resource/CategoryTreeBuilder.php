@@ -21,7 +21,7 @@ use Schoolbox\User;
  * @deprecated in favour of Resource\Folder\TreeBuilder, this class retained for backward compatibility
  * @package Schoolbox\Resource
  */
-class CategoryTreeBuilder extends Folder\TreeBuilder
+class CategoryTreeBuilder extends Browser\Resources\TreeBuilder
 {
 
     /**

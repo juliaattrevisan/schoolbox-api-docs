@@ -7,12 +7,13 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Resource\Folder;
+namespace Schoolbox\Resource\Browser\Resources;
 
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder\Mapper;
 use Schoolbox\User;
 
 

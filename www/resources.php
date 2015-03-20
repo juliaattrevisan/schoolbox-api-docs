@@ -2,10 +2,10 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
+use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Assessment\Course\TaskMapper;
 
 $this->setFile(TEMPLATE_content, 'resources.html');
 $this->setBlock(TEMPLATE_content, 'file_list', 'file_list_block');
@@ -80,7 +80,7 @@ catch (Schoolbox\Mapper\Exception $e) {
 }
 
 // Build a tree up to the last resource we looked at
-$treeBuilder = new Folder\TreeBuilder(
+$treeBuilder = new \Schoolbox\Resource\Browser\Resources\TreeBuilder(
     Folder\Mapper::getInstance(),
     TaskMapper::getInstance(),
     UserAccessMapper::getInstance(),

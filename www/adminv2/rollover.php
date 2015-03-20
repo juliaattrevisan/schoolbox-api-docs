@@ -30,7 +30,7 @@ $nav->parse($this, 'rollover');
 $openCategory = 0;
 
 // shamelessly copied from resources.php
-$treeBuilder = new Folder\TreeBuilder(
+$treeBuilder = new \Schoolbox\Resource\Browser\Resources\TreeBuilder(
     Folder\Mapper::getInstance(),
     TaskMapper::getInstance(),
     UserAccessMapper::getInstance(),
