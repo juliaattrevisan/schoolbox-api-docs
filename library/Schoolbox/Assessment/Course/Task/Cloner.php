@@ -17,7 +17,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
-use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
 
@@ -130,7 +130,11 @@ class Cloner
     {
         $box_id = $this->task_instance->getTask()->getSubmissionBox()->getId();
         if ($box_id) {
-            $box = SubmissionBoxMapper::getInstance()->findById($box_id);
+            try {
+                $box = SubmissionBoxMapper::getInstance()->findById($box_id);
+            } catch (MapperException $e) {
+                throw new ClonerException('No submission box is attached to this task');
+            }
             $box
                 ->setTask(null)
                 ->setTaskInstance($this->task_instance)
