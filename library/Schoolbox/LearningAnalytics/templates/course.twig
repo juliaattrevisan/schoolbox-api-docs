@@ -1,42 +1,41 @@
 <style type="text/css">
 
-    /* Overall Progress
-     */
+    /* Overall Progress*/
+
     .learning-analytics.overall {
-        width: 100%;
         height: 125px;
     }
 
-    .learning-analytics.boxplots {
-        width: 100%;
-    }
+    /*.learning-analytics.boxplots {*/
+        /*width: 100%;*/
+    /*}*/
 
-    /* Top/Bottom students
-     */
-    .learning-analytics.hall {
-        width: 49%;
-        float: left;
-    }
+    /* Top/Bottom students*/
+     /**/
+    /*.learning-analytics.hall {*/
+        /*width: 49%;*/
+        /*float: left;*/
+    /*}*/
 
-    .learning-analytics.hall.top-students {
-        float: left;
-    }
+    /*.learning-analytics.hall.top-students {*/
+        /*float: left;*/
+    /*}*/
 
-    .learning-analytics.hall.bottom-students {
-        float: right;
-    }
+    /*.learning-analytics.hall.bottom-students {*/
+        /*float: right;*/
+    /*}*/
 
-    /* Unit Progress
-     */
-    .learning-analytics.unit-progress {
-        width: 100%;
-    }
+    /* Unit Progress*/
+     /**/
+    /*.learning-analytics.unit-progress {*/
+        /*width: 100%;*/
+    /*}*/
 
-    /* Effort
-     */
-    .learning-analytics.effort {
-        width: 100%;
-    }
+    /* Effort*/
+     /**/
+    /*.learning-analytics.effort {*/
+        /*width: 100%;*/
+    /*}*/
 </style>
 
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
@@ -248,16 +247,11 @@
     {% endfor %}
 </dl>
 
-<div class="clearfix"></div>
-
 <h2>Overall Progress</h2>
-<div data-graph='overall' class='learning-analytics overall'></div>
+<div data-graph='overall' class='learning-analytics overall medium-6 columns'></div>
 
-<h2>Results</h2>
-<div data-graph="boxplots" class='learning-analytics boxplots'></div>
-
-<div class="learning-analytics hall top-students">
-    <h2>Top Students</h2>
+<div class="medium-3 columns">
+    <h3>Top Students</h3>
     {% if results.topStudents|length > 0 %}
     <ul>
         {% for currentStudent in results.topStudents|slice(0,3) %}
@@ -273,8 +267,8 @@
     </p>
     {% endif %}
 </div>
-<div class="learning-analytics hall bottom-students">
-    <h2>Bottom Students</h2>
+<div class="medium-3 columns">
+    <h3>Bottom Students</h3>
     {% if results.topStudents|length > 0 %}
     <ul>
         {% for currentStudent in results.bottomStudents|slice(0,3) %}
@@ -293,16 +287,16 @@
 
 <div class="clearfix"></div>
 
+<h2>Results</h2>
+<div data-graph="boxplots" class='learning-analytics boxplots'></div>
+
 <h2>Unit Progress</h2>
 <div data-graph='unit-progress' class='learning-analytics unit-progress' style="height:{{ ((progress.allUnits|length)*50)+75 }}px"></div>
-
-<div class="clearfix"></div>
 
 {% if rubrics.allRubrics|length > 0 %}
 <h2>Rubrics</h2>
 <div data-graph="rubrics" class='learning-analytics boxplots' style="height:{{ ((rubrics.allRubrics|length)*150)+75 }}px"></div>
 
-<div class="clearfix"></div>
 {% endif %}
 
 <h2>Effort</h2>
