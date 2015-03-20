@@ -218,65 +218,65 @@
     {% endfor %}
 </dl>
 
-<div class="row">
-    <h2>Overall Progress</h2>
-    <div data-graph='overall' class='learning-analytics overall medium-6 columns'></div>
+<div class="clearfix"></div>
 
-    <div class="medium-3 columns">
-        <h3>Top Students</h3>
-        {% if results.topStudents|length > 0 %}
-        <ul>
-            {% for currentStudent in results.topStudents|slice(0,3) %}
-            <li>
-                <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
-                {{ currentStudent.average|number_format(1) }}%
-            </li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <p>
-            Nobody has attempted these tasks yet.
-        </p>
-        {% endif %}
-    </div>
-    <div class="medium-3 columns">
-        <h3>Bottom Students</h3>
-        {% if results.topStudents|length > 0 %}
-        <ul>
-            {% for currentStudent in results.bottomStudents|slice(0,3) %}
-            <li>
-                <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
-                {{ currentStudent.average|number_format(1) }}%
-            </li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <p>
-            Nobody has attempted these tasks yet.
-        </p>
-        {% endif %}
-    </div>
+<h2>Overall Progress</h2>
+<div data-graph='overall' class='learning-analytics overall medium-6 columns'></div>
+
+<div class="medium-3 columns">
+    <h3>Top Students</h3>
+    {% if results.topStudents|length > 0 %}
+    <ul>
+        {% for currentStudent in results.topStudents|slice(0,3) %}
+        <li>
+            <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
+            {{ currentStudent.average|number_format(1) }}%
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>
+        Nobody has attempted these tasks yet.
+    </p>
+    {% endif %}
+</div>
+<div class="medium-3 columns">
+    <h3>Bottom Students</h3>
+    {% if results.topStudents|length > 0 %}
+    <ul>
+        {% for currentStudent in results.bottomStudents|slice(0,3) %}
+        <li>
+            <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
+            {{ currentStudent.average|number_format(1) }}%
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>
+        Nobody has attempted these tasks yet.
+    </p>
+    {% endif %}
 </div>
 
-<div class="row">
-    <h2>Results</h2>
-    <div data-graph="boxplots" class='learning-analytics boxplots'></div>
-</div>
+<div class="clearfix"></div>
 
-<div class="row">
-    <h2>Unit Progress</h2>
-    <div data-graph='unit-progress' class='learning-analytics unit-progress' style="height:{{ ((progress.allUnits|length)*50)+75 }}px"></div>
-</div>
+<h2>Results</h2>
+<div data-graph="boxplots" class='learning-analytics boxplots'></div>
+
+<div class="clearfix"></div>
+
+<h2>Unit Progress</h2>
+<div data-graph='unit-progress' class='learning-analytics unit-progress' style="height:{{ ((progress.allUnits|length)*50)+75 }}px"></div>
 
 {% if rubrics.allRubrics|length > 0 %}
-<div class="row">
-    <h2>Rubrics</h2>
-    <div data-graph="rubrics" class='learning-analytics boxplots' style="height:{{ ((rubrics.allRubrics|length)*150)+75 }}px"></div>
-</div>
+<div class="clearfix"></div>
+
+<h2>Rubrics</h2>
+<div data-graph="rubrics" class='learning-analytics boxplots' style="height:{{ ((rubrics.allRubrics|length)*150)+75 }}px"></div>
 
 {% endif %}
 
-<div class="row">
-    <h2>Effort</h2>
-    <div data-graph="effort" class='learning-analytics effort'></div>
-</div>
+<div class="clearfix"></div>
+
+<h2>Effort</h2>
+<div data-graph="effort" class='learning-analytics effort'></div>
