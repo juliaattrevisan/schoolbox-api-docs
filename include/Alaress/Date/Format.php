@@ -778,6 +778,19 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
+     * Gets the year half of this date.
+     *
+     * * Jan-Jun: 1
+     * * Jul-Dec: 2
+     *
+     * @return int
+     */
+    public function getYearHalf()
+    {
+        return $this->getUsingFormat('m') <= 6 ? 1 : 2;
+    }
+
+    /**
      * Extract the numeric representation of the day of the week
      *
      * @return Integer
