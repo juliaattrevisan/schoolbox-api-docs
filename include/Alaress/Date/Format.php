@@ -791,7 +791,8 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
-     * Extract the numeric representation of the day of the week
+     * Extract the numeric representation of the day of the week, starting at 1
+     * for Monday, through to 7 for Sunday.
      *
      * @return Integer
      */
