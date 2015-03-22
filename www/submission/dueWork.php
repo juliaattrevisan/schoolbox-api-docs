@@ -181,7 +181,7 @@ $output = array(
 $this->setVar($output);
 
 $selectedMonth = $targetDate->getUsingFormat('n');
-$selectedYear  = $targetDate->getUsingFormat('Y');
+$selectedYear  = $targetDate->getYear();
 
 /* calculate month layout
  */

@@ -768,6 +768,16 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
+     * Extract the year of this date
+     *
+     * @return int
+     */
+    public function getYear()
+    {
+        return $this->getUsingFormat('Y');
+    }
+
+    /**
      * Extract the numeric representation of the day of the week
      *
      * @return Integer
