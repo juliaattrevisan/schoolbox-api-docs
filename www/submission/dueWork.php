@@ -180,7 +180,7 @@ $output = array(
 
 $this->setVar($output);
 
-$selectedMonth = $targetDate->getUsingFormat('n');
+$selectedMonth = $targetDate->getMonth();
 $selectedYear  = $targetDate->getYear();
 
 /* calculate month layout

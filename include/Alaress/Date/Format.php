@@ -778,6 +778,16 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
+     * Extract the month of this date
+     *
+     * @return int
+     */
+    public function getMonth()
+    {
+        return $this->getUsingFormat('n');
+    }
+
+    /**
      * Gets the year half of this date.
      *
      * * Jan-Jun: 1
