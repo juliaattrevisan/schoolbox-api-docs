@@ -12,7 +12,7 @@ Package: schoolbox
 Architecture: all
 Depends: apache2-mpm-prefork, libapache2-mod-php5,
  php5-cli, php5-imap, php5-gd, php5-curl, php5-mysql, php5-sybase, php5-ldap,
- php-pear, php-apc, php5-imagick,
+ php-pear, php-apc, php5-imagick, php5-json,
  mysql-client, mysql-server,
  freetds-common,
  wget,
@@ -37,7 +37,7 @@ Package: schoolbox-dr
 Architecture: all
 Depends: apache2-mpm-prefork, libapache2-mod-php5,
  php5-cli, php5-imap, php5-gd, php5-curl, php5-mysql, php5-sybase, php5-ldap,
- php-pear, php-apc,
+ php-pear, php-apc, php5-imagick, php5-json,
  mysql-client, mysql-server,
  freetds-common,
  wget,
@@ -46,6 +46,7 @@ Depends: apache2-mpm-prefork, libapache2-mod-php5,
  redis-server, php5-redis,
  libpspell-dev, php5-pspell, aspell-en,
  schoolbox-epl,
+ imagemagick,
  ${misc:Depends}
 Conflicts: javascript-common
 Description: Schoolbox Disaster Recovery dependencies and scripts
