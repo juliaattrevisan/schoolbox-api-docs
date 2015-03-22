@@ -20,6 +20,7 @@ use House;
 use HouseMapper;
 use Schoolbox\Assessment\Grades;
 use Schoolbox\External\SubjectMapper;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Twig_Loader_Chain;
@@ -141,7 +142,7 @@ class Module extends BaseModule
         $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Factory']['gateway']
             = $injector->lazyNew('Custom\\Meriden\\Pastoral\\StudentInvolvement\\Gateway');
         $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Factory']['categoryMapper']
-            = $injector->lazyNew('Schoolbox\\Resource\\CategoryMapper');
+            = $injector->lazyNew(Folder\Mapper::class);
         $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Factory']['userMapper']
             = $injector->lazyNew('Schoolbox\\UserMapper');
         $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Factory']['gradesService']

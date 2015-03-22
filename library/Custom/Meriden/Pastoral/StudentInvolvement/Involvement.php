@@ -11,7 +11,7 @@ namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\User;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Category;
 
 class Involvement
 {
