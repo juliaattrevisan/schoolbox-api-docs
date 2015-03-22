@@ -30,20 +30,6 @@ class Controller extends AbstractController
     /** @var UserMapper */
     protected $userMapper;
 
-    /** @var Resource\Folder\Mapper */
-    protected $folderMapper;
-
-
-    /**
-     * @param Resource\Folder\Mapper $folderMapper
-     * @return self
-     */
-    public function setFolderMapper($folderMapper)
-    {
-        $this->folderMapper = $folderMapper;
-        return $this;
-    }
-
 
     /**
      * @param RoleAccessMapper $roleAccessMapper

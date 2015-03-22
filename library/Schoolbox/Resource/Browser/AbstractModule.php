@@ -85,7 +85,8 @@ abstract class AbstractModule extends BaseModule
         return [
             'setFileMapper'       => Resource\FileMapper::class,
             'setConfig'           => Config\Loader::class,
-            'setTreeBuilder'      => null
+            'setTreeBuilder'      => null,
+            'setFolderMapper'     => null,
         ];
     }
 

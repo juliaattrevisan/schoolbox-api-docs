@@ -28,6 +28,20 @@ abstract class AbstractController extends BaseController
     /** @var Config\Loader */
     protected $conf;
 
+    /** @var Resource\Folder\Mapper */
+    protected $folderMapper;
+
+
+    /**
+     * @param Resource\Folder\Mapper $folderMapper
+     * @return self
+     */
+    public function setFolderMapper($folderMapper)
+    {
+        $this->folderMapper = $folderMapper;
+        return $this;
+    }
+
 
     /**
      * @param AbstractTreeBuilder $treeBuilder
