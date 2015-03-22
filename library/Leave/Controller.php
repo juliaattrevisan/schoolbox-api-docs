@@ -388,7 +388,7 @@ class Leave_Controller extends Controller
         }
 
         $thresholdDateTime = new \Alaress_Date_Format($startDate, 'd/m/Y');
-        $weekdayIndex = $thresholdDateTime->getUsingFormat('N');
+        $weekdayIndex = $thresholdDateTime->getWeekDayNumber();
 
         /* Get back to nearest Friday, which comes after furthest Thursday
 		 */
