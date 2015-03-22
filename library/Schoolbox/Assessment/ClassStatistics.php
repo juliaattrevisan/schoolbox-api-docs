@@ -82,7 +82,7 @@ class ClassStatistics {
 		);
 		foreach($boxCollection as $box) {
 			$due = $box->getDueDate();
-			$dueYear = $due->getUsingFormat('Y');
+			$dueYear = $due->getYear();
 			$dueSemester = $due->getUsingFormat('m') > 6 ? 2 : 1;
 
 			// if year (and possibly also semester) are given, filter dates
@@ -118,7 +118,7 @@ class ClassStatistics {
 		foreach($assessCollection as $assess) {
             /* @var Assess $assess */
             $due = $assess->getFinish();
-            $dueYear = $due->getUsingFormat('Y');
+            $dueYear = $due->getYear();
             $dueSemester = $due->getUsingFormat('m') > 6 ? 2 : 1;
             // if year (and possibly also semester) are given, filter dates
             if($year) {
