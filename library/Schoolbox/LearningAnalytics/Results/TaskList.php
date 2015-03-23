@@ -124,7 +124,7 @@ class TaskList {
     /**
      * Set registry
      *
-     * @param \Schoolbox\LearningAnalytics\Registry $registry
+     * @param Registry $registry
      */
     private function setRegistry($registry)
     {
@@ -134,7 +134,7 @@ class TaskList {
     /**
      * Get registry
      *
-     * @return \Schoolbox\LearningAnalytics\Registry
+     * @return Registry
      */
     private function getRegistry()
     {
@@ -164,7 +164,7 @@ class TaskList {
     /**
      * Set metadata
      *
-     * @param \Schoolbox\LearningAnalytics\Metadata\Base $metadata
+     * @param Metadata $metadata
      */
     private function setMetadata($metadata)
     {
@@ -174,7 +174,7 @@ class TaskList {
     /**
      * Get metadata
      *
-     * @return \Schoolbox\LearningAnalytics\Metadata\Base
+     * @return Metadata
      */
     private function getMetadata()
     {

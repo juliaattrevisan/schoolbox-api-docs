@@ -102,7 +102,7 @@ class AllUnits {
     /**
      * Set registry
      *
-     * @param \Schoolbox\LearningAnalytics\Registry $registry
+     * @param Registry $registry
      */
     private function setRegistry($registry)
     {
@@ -112,7 +112,7 @@ class AllUnits {
     /**
      * Get registry
      *
-     * @return \Schoolbox\LearningAnalytics\Registry
+     * @return Registry
      */
     private function getRegistry()
     {

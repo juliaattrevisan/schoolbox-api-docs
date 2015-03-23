@@ -73,7 +73,7 @@ class TaskResults {
     /**
      * Set registry
      *
-     * @param \Schoolbox\LearningAnalytics\Registry $registry
+     * @param Registry $registry
      */
     private function setRegistry($registry)
     {
@@ -83,7 +83,7 @@ class TaskResults {
     /**
      * Get registry
      *
-     * @return \Schoolbox\LearningAnalytics\Registry
+     * @return Registry
      */
     private function getRegistry()
     {

@@ -112,7 +112,7 @@ class AllEffort {
     /**
      * Set registry
      *
-     * @param \Schoolbox\LearningAnalytics\Registry $registry
+     * @param Registry $registry
      */
     private function setRegistry($registry)
     {
@@ -122,7 +122,7 @@ class AllEffort {
     /**
      * Get registry
      *
-     * @return \Schoolbox\LearningAnalytics\Registry
+     * @return Registry
      */
     private function getRegistry()
     {
@@ -132,7 +132,7 @@ class AllEffort {
     /**
      * Set all averages
      *
-     * @param \Schoolbox\LearningAnalytics\Results\Averages $allAverages
+     * @param Averages $allAverages
      */
     private function setAllAverages($allAverages)
     {
@@ -142,7 +142,7 @@ class AllEffort {
     /**
      * Get all averages
      *
-     * @return \Schoolbox\LearningAnalytics\Results\Averages
+     * @return Averages
      */
     private function getAllAverages()
     {
@@ -152,7 +152,7 @@ class AllEffort {
     /**
      * Set metadata
      *
-     * @param \Schoolbox\LearningAnalytics\Metadata\Base $metadata
+     * @param Metadata $metadata
      */
     private function setMetadata($metadata)
     {
@@ -162,7 +162,7 @@ class AllEffort {
     /**
      * Get metadata
      *
-     * @return \Schoolbox\LearningAnalytics\Metadata\Base
+     * @return Metadata
      */
     private function getMetadata()
     {

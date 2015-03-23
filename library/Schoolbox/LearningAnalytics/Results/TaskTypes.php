@@ -73,7 +73,7 @@ class TaskTypes {
     /**
      * Set all task types
      *
-     * @param \Schoolbox\Collection $allTaskTypes
+     * @param Collection $allTaskTypes
      */
     private function setAllTaskTypes($allTaskTypes)
     {
@@ -83,7 +83,7 @@ class TaskTypes {
     /**
      * Get all task types
      *
-     * @return \Schoolbox\Collection
+     * @return Collection
      */
     public function getAllTaskTypes()
     {
@@ -93,7 +93,7 @@ class TaskTypes {
     /**
      * Set metadata
      *
-     * @param \Schoolbox\LearningAnalytics\Metadata\Base $metadata
+     * @param Metadata $metadata
      */
     private function setMetadata($metadata)
     {
@@ -103,7 +103,7 @@ class TaskTypes {
     /**
      * Get metadata
      *
-     * @return \Schoolbox\LearningAnalytics\Metadata\Base
+     * @return Metadata
      */
     private function getMetadata()
     {

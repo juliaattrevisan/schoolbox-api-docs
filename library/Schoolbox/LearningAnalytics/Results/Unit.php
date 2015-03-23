@@ -207,7 +207,7 @@ class Unit {
     /**
      * Set all students
      *
-     * @param \Schoolbox\Collection $allStudents
+     * @param Collection $allStudents
      */
     private function setAllStudents($allStudents)
     {
@@ -217,7 +217,7 @@ class Unit {
     /**
      * Get all students
      *
-     * @return \Schoolbox\Collection
+     * @return Collection
      */
     private function getAllStudents()
     {
@@ -227,7 +227,7 @@ class Unit {
     /**
      * Set user mapper
      *
-     * @param \Schoolbox\UserMapper $userMapper
+     * @param UserMapper $userMapper
      */
     private function setUserMapper($userMapper)
     {
@@ -237,7 +237,7 @@ class Unit {
     /**
      * Get user mapper
      *
-     * @return \Schoolbox\UserMapper
+     * @return UserMapper
      */
     private function getUserMapper()
     {

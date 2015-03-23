@@ -197,7 +197,7 @@ class Unit {
     /**
      * Set all students
      *
-     * @param \Schoolbox\Collection $allStudents
+     * @param Collection $allStudents
      */
     private function setAllStudents($allStudents)
     {
@@ -207,7 +207,7 @@ class Unit {
     /**
      * Get all students
      *
-     * @return \Schoolbox\Collection
+     * @return Collection
      */
     private function getAllStudents()
     {
