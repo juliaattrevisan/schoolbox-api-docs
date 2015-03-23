@@ -78,7 +78,6 @@
 
 			$.each(allDatepickerElements, function(index, element) {
 				$(element).datepicker({
-					dateFormat: 'dd/mm/yy',
 					showOn: 'both',
 					buttonImage: '/images/core/calendar/calendar-click.png',
 					buttonImageOnly: true,

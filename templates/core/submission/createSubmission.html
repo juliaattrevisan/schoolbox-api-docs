@@ -36,7 +36,6 @@
         var dueDate     = $('#due_date');
         var lateDate    = $('#late_date');
         openDate.add(dueDate).add(lateDate).add(publishDate).datepicker({
-            dateFormat:'dd/mm/yy',
             onClose:function (string) {
                 var input = $(this);
 

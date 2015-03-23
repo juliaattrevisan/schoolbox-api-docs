@@ -7,7 +7,6 @@
 
         // Setup datepickers
         form.find('input[data-interaction="datepicker"]').datepicker({
-            dateFormat:'dd/mm/yy',
             showOn:'both',
             buttonImage:'/images/core/calendar/calendar-click.png',
             buttonImageOnly:true,
