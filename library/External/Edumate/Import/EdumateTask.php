@@ -56,7 +56,7 @@ class EdumateTask {
 	private $description = '';
 
 	/**
-	 * Synonymous with Open Date
+	 * Synonymous with Open Date (and publish date)
 	 *
 	 * @var string
 	 */
