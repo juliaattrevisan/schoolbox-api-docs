@@ -112,7 +112,7 @@ class Controller extends Base {
          */
         $taskList = new TaskList($registry);
         $taskResults = new TaskResults($registry);
-        $taskTypes = new TaskTypes();
+        $taskTypes = new TaskTypes($metadata);
 
         /**
          * Grade Averages for student rankings
@@ -156,8 +156,8 @@ class Controller extends Base {
                     ),
                     'results' => array(
                         'taskTypes' => array(
-                            'allTaskTypes' => $taskTypes->getAllTaskTypes(),
-                            'selected' => $metadata->getSelectedTaskIdFilter(),
+                            'all' => $taskTypes->getAllTaskTypes(),
+                            'selected' => $taskTypes->getSelectedTaskFilter(),
                         ),
                         'allTasks' => $taskList->getAllTasks(),
                         'allResults' => $taskResults->getAllResults(),

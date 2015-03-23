@@ -251,17 +251,22 @@
 
 <div class="clearfix"></div>
 
-<h2>Results</h2>
-<a class="button icon-menu"href="#" data-dropdown="taskFilter">Options</a>
+<h2>
+    Results
+    {% if results.taskTypes.selected.getId() > 0 %}
+    ({{ results.taskTypes.selected.getName() }})
+    {% endif %}
+</h2>
+<a class="button icon-menu"href="#" data-dropdown="taskFilter">Type Filter</a>
 <ul class="f-dropdown" data-dropdown-content="" id="taskFilter">
     {% if metadata.route == 'course' %}
         <li><a href="/learningAnalytics/course/{{ metadata.courseFolder.getId() }}">All</a></li>
-        {% for currentTaskType in results.taskTypes.allTaskTypes %}
+        {% for currentTaskType in results.taskTypes.all %}
         <li><a href="/learningAnalytics/course/{{ metadata.courseFolder.getId() }}/task/{{ currentTaskType.getId() }}">{{ currentTaskType.getName() }}</a></li>
         {% endfor %}
     {% elseif metadata.route == 'folder' %}
         <li><a href="/learningAnalytics/course/{{ metadata.courseFolder.getId() }}/folder/{{ metadata.selectedFolder.getId() }}">All</a></li>
-        {% for currentTaskType in results.taskTypes.allTaskTypes %}
+        {% for currentTaskType in results.taskTypes.all %}
         <li><a href="/learningAnalytics/course/{{ metadata.courseFolder.getId() }}/folder/{{ metadata.selectedFolder.getId() }}/task/{{ currentTaskType.getId() }}">{{ currentTaskType.getName() }}</a></li>
         {% endfor %}
     {% endif %}
