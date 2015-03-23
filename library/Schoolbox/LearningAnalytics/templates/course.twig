@@ -252,15 +252,20 @@
 <div class="clearfix"></div>
 
 <h2>Results</h2>
-<select data-filter="task">
-    <option value="">All</option>
-    {% for currentTaskType in results.taskTypes.allTaskTypes %}
-
-    <option value="{{ currentTaskType.getId() }}" {% if currentTaskType.getId() == results.taskTypes.selected %}selected='selected'{% endif %}>
-        {{ currentTaskType.getName() }}
-    </option>
-    {% endfor %}
-</select>
+<a class="button icon-menu"href="#" data-dropdown="taskFilter">Options</a>
+<ul class="f-dropdown" data-dropdown-content="" id="taskFilter">
+    {% if metadata.route == 'course' %}
+        <li><a href="/learningAnalytics/course/{{ metadata.courseFolder.getId() }}">All</a></li>
+        {% for currentTaskType in results.taskTypes.allTaskTypes %}
+        <li><a href="/learningAnalytics/course/{{ metadata.courseFolder.getId() }}/task/{{ currentTaskType.getId() }}">{{ currentTaskType.getName() }}</a></li>
+        {% endfor %}
+    {% elseif metadata.route == 'folder' %}
+        <li><a href="/learningAnalytics/course/{{ metadata.courseFolder.getId() }}/folder/{{ metadata.selectedFolder.getId() }}">All</a></li>
+        {% for currentTaskType in results.taskTypes.allTaskTypes %}
+        <li><a href="/learningAnalytics/course/{{ metadata.courseFolder.getId() }}/folder/{{ metadata.selectedFolder.getId() }}/task/{{ currentTaskType.getId() }}">{{ currentTaskType.getName() }}</a></li>
+        {% endfor %}
+    {% endif %}
+</ul>
 <div data-graph="boxplots" class='learning-analytics boxplots'></div>
 
 <div class="clearfix"></div>
