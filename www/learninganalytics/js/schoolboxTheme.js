@@ -15,6 +15,9 @@ $(function () {
             boxplot: {
                 color: '#0066b0',
                 fillColor: '#ddebf4'
+            },
+            scatter: {
+                color: 'rgba(0,102,176, .5)'
             }
         }
     };

@@ -122,7 +122,6 @@
             series: [
                 {
                     name: 'Grade Average vs Hits',
-                    color: 'rgba(223, 83, 83, .5)',
                     data: $.fn.scatterCalculateSeriesData(options.allData),
                     tooltip: {
                         headerFormat: ''
