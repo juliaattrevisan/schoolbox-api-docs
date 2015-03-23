@@ -12,8 +12,6 @@
 
 namespace Schoolbox\LearningAnalytics\Results;
 
-use Schoolbox\Assessment\Course\UnitInstance;
-use Schoolbox\Collection;
 use Schoolbox\LearningAnalytics\Sorter;
 
 class Averages {

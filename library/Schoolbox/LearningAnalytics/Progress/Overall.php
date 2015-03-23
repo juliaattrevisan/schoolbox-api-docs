@@ -10,10 +10,7 @@
 
 namespace Schoolbox\LearningAnalytics\Progress;
 
-use Schoolbox\Collection;
-use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\LearningAnalytics\Registry;
-use Schoolbox\LearningAnalytics\Sorter;
 
 class Overall {
 

@@ -11,7 +11,6 @@
 namespace Schoolbox\LearningAnalytics\Results;
 
 use Schoolbox\LearningAnalytics\Registry;
-use Schoolbox\Collection;
 
 class TaskResults {
 

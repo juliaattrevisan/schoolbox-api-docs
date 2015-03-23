@@ -11,7 +11,6 @@
 namespace Schoolbox\LearningAnalytics\Metadata;
 
 use Schoolbox\Collection;
-use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
