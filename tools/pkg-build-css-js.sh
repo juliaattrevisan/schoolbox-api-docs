@@ -22,8 +22,10 @@ PATH="$PATH:$instdir/node_modules/.bin";
 npm install;
 
 # Install SASS
-apt-get -y install ruby-bundler;
-bundle install;
+gem install sass --no-rdoc --no-ri --version "3.4.13"
+# Don't install from bundle for now, as that process runs out of memory
+#apt-get -y install ruby-bundler;
+#bundle install;
 
 # Installing and building Bower submodules
 grunt bower build.deps;
