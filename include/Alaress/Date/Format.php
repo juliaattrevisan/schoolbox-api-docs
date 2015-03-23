@@ -850,8 +850,10 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function isAM()
     {
-        // Is this locale sensitive?
-        return $this->getMeridiem() === self::AM;
+        // "AM" or "PM" could be locale sensitive, so determine mathematically
+        // 0:00  - 11:59: AM
+        // 12:00 - 23:59: PM
+        return $this->get24Hour() < 12;
     }
 
     /**
