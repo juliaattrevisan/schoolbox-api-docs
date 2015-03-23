@@ -270,7 +270,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function setMonth($month)
     {
-        $this->getDateTimeObject()->setYear($month);
+        $this->getDateTimeObject()->setMonth($month);
         return $this;
     }
 
@@ -280,7 +280,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function setDay($day)
     {
-        $this->getDateTimeObject()->setYear($day);
+        $this->getDateTimeObject()->setDay($day);
         return $this;
     }
 
@@ -339,7 +339,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function setHour($hour)
     {
-        $this->getDateTimeObject()->setYear($hour);
+        $this->getDateTimeObject()->setHour($hour);
         return $this;
     }
 
@@ -349,7 +349,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function setMinute($minute)
     {
-        $this->getDateTimeObject()->setYear($minute);
+        $this->getDateTimeObject()->setMinute($minute);
         return $this;
     }
 
@@ -359,7 +359,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function setSecond($second)
     {
-        $this->getDateTimeObject()->setYear($second);
+        $this->getDateTimeObject()->setSecond($second);
         return $this;
     }
 
