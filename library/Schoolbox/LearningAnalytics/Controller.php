@@ -139,48 +139,46 @@ class Controller extends Base {
 
         /* Twig data
          */
-        $this->getResponse()->content->set(
-            array(
-                'template' => '@learningAnalytics/course.twig',
-                'data' => array(
-                    'metadata' => array(
-                        'pageTitle' => $metadata->getPageTitle(),
-                        'route' => $metadata->getRoute(),
-                        'folder' => array(
-                            'all' => $metadata->getAllFolders(),
-                            'course' => $metadata->getCourseFolder(),
-                            'selected' => $metadata->getSelectedFolder(),
-                        ),
-                    ),
-                    'overallProgress' => array(
-                        'mostAdvancedStudent' => $overallProgress->getMostAdvancedStudent(),
-                        'classCompletions' => $overallProgress->getClassCompletions(),
-                    ),
-                    'results' => array(
-                        'all' => $taskResults->getAllResults(),
-                        'tasks' => array(
-                            'all' => $taskList->getAllTasks(),
-                            'types' => array(
-                                'all' => $taskTypes->getAllTaskTypes(),
-                                'selected' => $taskTypes->getSelectedTaskFilter(),
-                            ),
-                        ),
-                        'ranking' => array(
-                            'top' => $allAverages->findDescending('average'),
-                            'bottom' => $allAverages->findAscending('average'),
-                        ),
-                    ),
-                    'progress' => array(
-                        'allUnits' => $stackedUnitProgress->getStackedUnitProgress(),
-                    ),
-                    'rubrics' => array(
-                        'allRubrics' => $allRubrics->getAllRubrics(),
-                    ),
-                    'effort' => array(
-                        'allEffort' => $allEffort->getTally(),
-                    )
-                )
-            )
-        );
+        $this->getResponse()->content->set([
+            'template' => '@learningAnalytics/course.twig',
+            'data' => [
+                'metadata' => [
+                    'pageTitle' => $metadata->getPageTitle(),
+                    'route' => $metadata->getRoute(),
+                    'folder' => [
+                        'all' => $metadata->getAllFolders(),
+                        'course' => $metadata->getCourseFolder(),
+                        'selected' => $metadata->getSelectedFolder(),
+                    ],
+                ],
+                'overallProgress' => [
+                    'mostAdvancedStudent' => $overallProgress->getMostAdvancedStudent(),
+                    'classCompletions' => $overallProgress->getClassCompletions(),
+                ],
+                'results' => [
+                    'all' => $taskResults->getAllResults(),
+                    'tasks' => [
+                        'all' => $taskList->getAllTasks(),
+                        'types' => [
+                            'all' => $taskTypes->getAllTaskTypes(),
+                            'selected' => $taskTypes->getSelectedTaskFilter(),
+                        ],
+                    ],
+                    'ranking' => [
+                        'top' => $allAverages->findDescending('average'),
+                        'bottom' => $allAverages->findAscending('average'),
+                    ],
+                ],
+                'progress' => [
+                    'allUnits' => $stackedUnitProgress->getStackedUnitProgress(),
+                ],
+                'rubrics' => [
+                    'allRubrics' => $allRubrics->getAllRubrics(),
+                ],
+                'effort' => [
+                    'allEffort' => $allEffort->getTally(),
+                ]
+            ]
+        ]);
     }
 }
