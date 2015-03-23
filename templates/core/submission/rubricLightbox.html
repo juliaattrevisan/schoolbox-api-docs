@@ -30,12 +30,14 @@
         <!-- END rubric_crit -->
         </tbody>
     </table>
+    <!-- BEGIN rubric_display -->
     <div class="rubric-display">
         <div class="rubric-grade">
             <span id="sum">{RUBRIC_GRADE_SUM}</span> / <span id="max">{RUBRIC_GRADE_MAX}</span>
         </div>
         <div id="rubric-chart"></div>
     </div>
+    <!-- END rubric_display -->
 
 
     <a href="#" id="closebox" class="submit-btn-plain"><span></span>Close</a>
@@ -48,21 +50,23 @@
 </script>
 
 <script type="text/javascript">
-    var rubricData = setupRubricChart({GRAPH_DATA}, {GRAPH_LEGS}, {GRAPH_MAX});
-    $(function() {
-        var plot = $.plot($('#rubric-chart'), rubricData.spidata.points, rubricData.options);
-        $(document).ready(function() {
-            plot.draw();
-        });
+    if ({GRAPH_DATA}.length) {
+        var rubricData = setupRubricChart({GRAPH_DATA}, {GRAPH_LEGS}, {GRAPH_MAX});
+        $(function() {
+            var plot = $.plot($('#rubric-chart'), rubricData.spidata.points, rubricData.options);
+            $(document).ready(function() {
+                plot.draw();
+            });
 
-        $(document).ready(function() {
-            var radios = $('#rubric-tbody :radio');
-            radios.removeClass('focused').parent('td').removeClass('focused');
-            $('#rubric-tbody :checked').each(function() {
-                var self = $(this);
-                self.addClass('focused').parent('td').addClass('focused');
-                self.closest('tr').children('.warning').first().children('div').css('visibility', 'hidden');
+            $(document).ready(function() {
+                var radios = $('#rubric-tbody :radio');
+                radios.removeClass('focused').parent('td').removeClass('focused');
+                $('#rubric-tbody :checked').each(function() {
+                    var self = $(this);
+                    self.addClass('focused').parent('td').addClass('focused');
+                    self.closest('tr').children('.warning').first().children('div').css('visibility', 'hidden');
+                })
             })
         })
-    })
+    }
 </script>

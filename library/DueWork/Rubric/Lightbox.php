@@ -20,7 +20,7 @@ class DueWork_Rubric_Lightbox {
         $this->rubricHandler = new DueWork_Rubric_Handler();
     }
 
-    public function render($templateHandle, $submissionBoxID, $studentID) {
+    public function render($templateHandle, $submissionBoxID, $studentID, $showMarks = true) {
 
         // make sure it actually has permission to render
         // to see this, you have to be the student in question, a parent of the student in question, or staff
@@ -56,6 +56,7 @@ class DueWork_Rubric_Lightbox {
 
         $page->setBlock($templateHandle, 'rubric_rating', 'rubric_rating_block');
         $page->setBlock($templateHandle, 'rubric_crit', 'rubric_crit_block');
+        $page->setBlock($templateHandle, 'rubric_display', 'rubric_display_block');
         $page->setBlock('rubric_crit', 'rubric_crit_rating', 'rubric_crit_rating_block');
         $page->setBlock('rubric_crit', 'rubric_grouping', 'rubric_grouping_block');
 
@@ -107,13 +108,25 @@ class DueWork_Rubric_Lightbox {
             $max += count($data['criteria'][0]['results']) - 1;
         }
 
-        $page->setVar(array(
-            'GRAPH_DATA' => json_encode($json),
-            'GRAPH_LEGS' => json_encode($legs),
-            'GRAPH_MAX'  => count($data['criteria'][0]['results']) - 1,
-            'RUBRIC_GRADE_SUM' => $sum,
-            'RUBRIC_GRADE_MAX' => $max,
-        ));
+        if ($showMarks) {
+            $page->setVar(array(
+                'GRAPH_DATA' => json_encode($json),
+                'GRAPH_LEGS' => json_encode($legs),
+                'GRAPH_MAX'  => count($data['criteria'][0]['results']) - 1,
+                'RUBRIC_GRADE_SUM' => $sum,
+                'RUBRIC_GRADE_MAX' => $max,
+            ));
+            $page->parse('rubric_display_block', 'rubric_display');
+        } else {
+            $page->setVar(array(
+                'GRAPH_DATA' => json_encode(array()),
+                'GRAPH_LEGS' => json_encode(array()),
+                'GRAPH_MAX'  => 0,
+                'RUBRIC_GRADE_SUM' => 0,
+                'RUBRIC_GRADE_MAX' => 0,
+            ));
+            $page->setVar('rubric_display_block', '');
+        }
 
 
     }
