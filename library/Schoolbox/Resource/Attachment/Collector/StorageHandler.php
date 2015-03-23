@@ -18,35 +18,35 @@ class StorageHandler implements TypeHandlerInterface {
     /** @var Storage\Mapper */
     protected $mapper;
 
-    /** @var File\IReceiver */
-    protected $receiver;
+    /** @var File\IStorageWrapper */
+    protected $wrapper;
+
 
     /**
      * @param Storage\Mapper $mapper
-     * @param File\IReceiver $receiver
+     * @param File\IStorageWrapper $wrapper
      */
-    public function __construct(Storage\Mapper $mapper, File\IReceiver $receiver = null)
+    public function __construct(Storage\Mapper $mapper, File\IStorageWrapper $wrapper = null)
     {
-        $this->mapper = $mapper;
-        $this->receiver = $receiver;
+        $this->mapper   = $mapper;
+        $this->wrapper = $wrapper;
     }
 
 
     /**
      * @param string $id
-     * @return File\IFile
+     * @return Storage\IStorage
      */
     public function fetch($id)
     {
         // storage file has already been uploaded, so retrieve it
         $storage = $this->mapper->findByHash($id);
 
-        if ($this->receiver) {
+        if ($this->wrapper) {
             // the receiver needs to take the storage object and return some IFile
-            return $this->receiver->wrap($storage);
+            return $this->wrapper->wrap($storage);
         }
 
-        // TODO fix this interface breach :/
         return $storage;
     }
 

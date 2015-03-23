@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Attachment\Collector;
 
 use Schoolbox\Resource;
 use Schoolbox\Resource\File;
+use Schoolbox\Resource\Storage;
 
 class FileSystemHandler implements TypeHandlerInterface
 {
@@ -18,34 +19,41 @@ class FileSystemHandler implements TypeHandlerInterface
     /** @var File\ILocator */
     protected $locator;
 
-    /** @var File\IReceiver */
-    protected $receiver;
+    /** @var File\IStorageWrapper */
+    protected $wrapper;
 
 
     /**
      * @param File\ILocator    $locator
-     * @param File\IReceiver $receiver
+     * @param File\IStorageWrapper $wrapper
      */
-    public function __construct(File\ILocator $locator, File\IReceiver $receiver)
+    public function __construct(File\ILocator $locator, File\IStorageWrapper $wrapper = null)
     {
         $this->locator = $locator;
-        $this->receiver = $receiver;
+        $this->wrapper = $wrapper;
     }
 
 
     /**
      * @param string $id
      * @throws Resource\Exception
-     * @return File\IFile
+     * @return Storage\IStorage
      */
     public function fetch($id)
     {
         // if receiver and locator are the same, just return a findById()
-        if ($this->receiver instanceof $this->locator) {
+        if ($this->wrapper instanceof $this->locator) {
             return $this->locator->findById($id);
         }
-        // get the storage object from the nominated file, and wrap that in the target class
-        return $this->receiver->wrap($this->locator->findById($id)->getStorage());
+
+        $storage = $this->locator->findById($id)->getStorage();
+
+        if ($this->wrapper) {
+            // get the storage object from the nominated file, and wrap that in the target class
+            return $this->wrapper->wrap($storage);
+        }
+
+        return $storage;
     }
 
 }

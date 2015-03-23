@@ -11,7 +11,6 @@ namespace Schoolbox\Resource\Attachment\Collector;
 
 
 use Alaress\File\Remote\FetcherInterface;
-use Schoolbox\FileInterface;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource;
 
@@ -20,26 +19,32 @@ class ExternalFileSystemHandler extends FileSystemHandler {
     /** @var FetcherInterface */
     protected $fetcher;
 
-    /** @var File\IFileMapper */
+    /** @var Resource\Storage\Receiver */
     protected $receiver;
 
 
     /**
-     * @param File\ILocator    $locator
-     * @param File\IFileMapper $fileMapper
-     * @param FetcherInterface $fetcher
+     * @param File\ILocator             $locator
+     * @param Resource\Storage\Receiver $receiver
+     * @param FetcherInterface          $fetcher
+     * @param File\IStorageWrapper      $wrapper
      */
-    public function __construct(File\ILocator $locator, File\IFileMapper $fileMapper, FetcherInterface $fetcher)
-    {
-        parent::__construct($locator, $fileMapper);
-        $this->fetcher = $fetcher;
+    public function __construct(
+        File\ILocator $locator,
+        Resource\Storage\Receiver $receiver,
+        FetcherInterface $fetcher,
+        File\IStorageWrapper $wrapper = null
+    ) {
+        parent::__construct($locator, $wrapper);
+        $this->receiver = $receiver;
+        $this->fetcher  = $fetcher;
     }
 
 
     /**
      * @param string $id
      * @throws Resource\Exception
-     * @return FileInterface
+     * @return Resource\Storage\IStorage
      */
     public function fetch($id)
     {
@@ -52,9 +57,13 @@ class ExternalFileSystemHandler extends FileSystemHandler {
         $tempFilename = $this->fetcher->fetchToFile($file->getId());
         $filename     = $file->getFilename();
 
-        $storage = $this->receiver->getStorageMapper()->accept($filename, $tempFilename, false);
+        $storage = $this->receiver->accept($filename, $tempFilename, false);
 
-        return $this->receiver->wrap($storage);
+        if ($this->wrapper) {
+            return $this->wrapper->wrap($storage);
+        }
+
+        return $storage;
     }
 
 }

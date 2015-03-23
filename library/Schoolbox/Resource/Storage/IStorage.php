@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Resource\Storage;
 
+use Alaress_Date_Format as ADF;
 
 interface IStorage
 {
@@ -24,5 +25,20 @@ interface IStorage
      * @return int
      */
     public function getSize();
+
+    /**
+     * @return string
+     */
+    public function getHash();
+
+    /**
+     * @return ADF
+     */
+    public function getCreatedAt();
+
+    /**
+     * @return ADF
+     */
+    public function getLastAccessed();
 
 } 

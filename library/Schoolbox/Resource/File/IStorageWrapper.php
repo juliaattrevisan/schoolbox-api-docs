@@ -11,7 +11,7 @@ namespace Schoolbox\Resource\File;
 
 use Schoolbox\Resource\Storage;
 
-interface IReceiver
+interface IStorageWrapper
 {
 
     /**

@@ -21,7 +21,6 @@ use Schoolbox\Resource\Storage\Model as Storage;
  * Class Model
  *
  * @package Schoolbox\Resource\File
- * @method string   getHash()
  * @method Model    setHash($hash)
  * @method Mimetype getMimetype()
  * @method Model    setMimetype(Mimetype $mimetype)
@@ -322,6 +321,24 @@ class Model implements IFile, ISoftDeletable
     public function getSize()
     {
         return $this->getStorage()->getSize();
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getHash()
+    {
+        return $this->getStorage()->getHash();
+    }
+
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getLastAccessed()
+    {
+        return $this->getStorage()->getLastAccessed();
     }
 
 

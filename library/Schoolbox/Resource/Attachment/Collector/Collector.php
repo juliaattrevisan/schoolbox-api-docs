@@ -10,8 +10,8 @@
 namespace Schoolbox\Resource\Attachment\Collector;
 
 
-use Schoolbox\FileInterface;
 use Schoolbox\Resource\Exception as ResourceException;
+use Schoolbox\Resource\Storage\IStorage;
 
 class Collector
 {
@@ -43,7 +43,7 @@ class Collector
     /**
      * @param int $filter
      * @throws ResourceException
-     * @return FileInterface
+     * @return IStorage
      */
     public function getFirst($filter = self::TYPE_ALL)
     {
@@ -63,7 +63,7 @@ class Collector
 
     /**
      * @param int $filter
-     * @return FileInterface[]
+     * @return IStorage[]
      */
     public function getAll($filter = self::TYPE_ALL)
     {
@@ -87,7 +87,7 @@ class Collector
     /**
      * @param int $type
      * @param string $id
-     * @return FileInterface
+     * @return IStorage
      */
     protected function get($type, $id)
     {
