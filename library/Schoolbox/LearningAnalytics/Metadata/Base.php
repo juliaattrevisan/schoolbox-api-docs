@@ -125,6 +125,15 @@ abstract class Base {
         return $this->params['route'];
     }
 
+    /**
+     * Get the selected task type to filter by
+     *
+     * @return mixed
+     */
+    public function getSelectedTaskIdFilter() {
+        return $this->params['taskId'];
+    }
+
     /* Getters/Setters
      */
 

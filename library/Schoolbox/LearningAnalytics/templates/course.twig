@@ -252,6 +252,15 @@
 <div class="clearfix"></div>
 
 <h2>Results</h2>
+<select data-filter="task">
+    <option value="">All</option>
+    {% for currentTaskType in results.taskTypes.allTaskTypes %}
+
+    <option value="{{ currentTaskType.getId() }}" {% if currentTaskType.getId() == results.taskTypes.selected %}selected='selected'{% endif %}>
+        {{ currentTaskType.getName() }}
+    </option>
+    {% endfor %}
+</select>
 <div data-graph="boxplots" class='learning-analytics boxplots'></div>
 
 <div class="clearfix"></div>

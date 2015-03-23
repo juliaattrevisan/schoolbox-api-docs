@@ -19,6 +19,7 @@ use Schoolbox\LearningAnalytics\Progress\AllUnits as AllUnitProgress;
 use Schoolbox\LearningAnalytics\Results\Averages;
 use Schoolbox\LearningAnalytics\Results\TaskList;
 use Schoolbox\LearningAnalytics\Results\TaskResults;
+use Schoolbox\LearningAnalytics\Results\TaskTypes;
 use Schoolbox\LearningAnalytics\Metadata\Base as Metadata;
 use Schoolbox\LearningAnalytics\Metadata\Course as MetadataCourse;
 use Schoolbox\LearningAnalytics\Metadata\Folder as MetadataFolder;
@@ -111,6 +112,7 @@ class Controller extends Base {
          */
         $taskList = new TaskList($registry);
         $taskResults = new TaskResults($registry);
+        $taskTypes = new TaskTypes();
 
         /**
          * Grade Averages for student rankings
@@ -153,6 +155,10 @@ class Controller extends Base {
                         'classCompletions' => $overallProgress->getClassCompletions(),
                     ),
                     'results' => array(
+                        'taskTypes' => array(
+                            'allTaskTypes' => $taskTypes->getAllTaskTypes(),
+                            'selected' => $metadata->getSelectedTaskIdFilter(),
+                        ),
                         'allTasks' => $taskList->getAllTasks(),
                         'allResults' => $taskResults->getAllResults(),
                         'topStudents' => $allAverages->findDescending('average'),
