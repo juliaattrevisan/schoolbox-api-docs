@@ -18,15 +18,15 @@ class FileSystemHandler implements TypeHandlerInterface
     /** @var File\ILocator */
     protected $locator;
 
-    /** @var File\IFileMapper */
+    /** @var File\IReceiver */
     protected $receiver;
 
 
     /**
      * @param File\ILocator    $locator
-     * @param File\IFileMapper $receiver
+     * @param File\IReceiver $receiver
      */
-    public function __construct(File\ILocator $locator, File\IFileMapper $receiver)
+    public function __construct(File\ILocator $locator, File\IReceiver $receiver)
     {
         $this->locator = $locator;
         $this->receiver = $receiver;

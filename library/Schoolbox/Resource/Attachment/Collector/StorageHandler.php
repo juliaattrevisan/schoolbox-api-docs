@@ -18,14 +18,14 @@ class StorageHandler implements TypeHandlerInterface {
     /** @var Storage\Mapper */
     protected $mapper;
 
-    /** @var File\IFileMapper */
+    /** @var File\IReceiver */
     protected $receiver;
 
     /**
-     * @param Storage\Mapper   $mapper
-     * @param File\IFileMapper $receiver
+     * @param Storage\Mapper $mapper
+     * @param File\IReceiver $receiver
      */
-    public function __construct(Storage\Mapper $mapper, File\IFileMapper $receiver = null)
+    public function __construct(Storage\Mapper $mapper, File\IReceiver $receiver = null)
     {
         $this->mapper = $mapper;
         $this->receiver = $receiver;

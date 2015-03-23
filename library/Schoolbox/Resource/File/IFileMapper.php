@@ -11,20 +11,12 @@ namespace Schoolbox\Resource\File;
 
 use Schoolbox\Resource\Storage;
 
-interface IFileMapper
+interface IFileMapper extends IReceiver
 {
 
     /**
      * @return Storage\Mapper
      */
     public function getStorageMapper();
-
-    /**
-     * Wrap a given storage model in your appropriate filetype
-     *
-     * @param Storage\Model $storage
-     * @return IFile
-     */
-    public function wrap(Storage\Model $storage);
 
 } 

@@ -20,15 +20,18 @@ class ExternalFileSystemHandler extends FileSystemHandler {
     /** @var FetcherInterface */
     protected $fetcher;
 
+    /** @var File\IFileMapper */
+    protected $receiver;
+
 
     /**
      * @param File\ILocator    $locator
-     * @param File\IFileMapper $receiver
+     * @param File\IFileMapper $fileMapper
      * @param FetcherInterface $fetcher
      */
-    public function __construct(File\ILocator $locator, File\IFileMapper $receiver, FetcherInterface $fetcher)
+    public function __construct(File\ILocator $locator, File\IFileMapper $fileMapper, FetcherInterface $fetcher)
     {
-        parent::__construct($locator, $receiver);
+        parent::__construct($locator, $fileMapper);
         $this->fetcher = $fetcher;
     }
 
