@@ -54,7 +54,7 @@ class External_Markbook implements External_MarkbookInterface
      */
     public function updateAssessment(SubmissionBox $assessment)
     {
-        return $this->getDatabase()->createAssessment($assessment);
+        return $this->getDatabase()->updateAssessment($assessment);
     }
 
     /**

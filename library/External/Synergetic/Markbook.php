@@ -98,7 +98,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                       '{$class['ClassCode']}',
                       '',
                       '".$this->getDatabase()->quote($assessment->getName())."',
-                      '".$this->getDatabase()->quote(TextFormatter::cutString($assessment->getName(),15))."',
+                      '".$this->getDatabase()->quote(TextFormatter::cutString($assessment->getName(),10))."',
                       '".$assessment->getId()."',
                       'OGRaw',
                       '100',
@@ -120,8 +120,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     public function updateAssessment(SubmissionBox $assessment)
     {
         $query = "UPDATE StaffAssessmentMarkBook SET
-                        Heading = '".$this->getDatabase()->quote($assessment->getDescription())."',
-                        HdgAbbrev1 = '".$this->getDatabase()->quote($assessment->getDescription())."',
+                        Heading = '".$this->getDatabase()->quote($assessment->getName())."',
+                        HdgAbbrev1 = '".$this->getDatabase()->quote(TextFormatter::cutString($assessment->getName(),10))."'
                   WHERE
                         HdgAbbrev2 = '".$assessment->getId()."'
                     ";
