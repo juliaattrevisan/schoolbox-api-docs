@@ -17,7 +17,6 @@ use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractModule;
-use Schoolbox\UserMapper;
 
 class Module extends AbstractModule
 {
@@ -50,7 +49,7 @@ class Module extends AbstractModule
         return array_merge(parent::getSetterList(), [
             'setTreeBuilder'      => Resource\Browser\Resources\TreeBuilder::class,
             'setFolderMapper'     => Resource\Folder\Mapper::class,
-            'setUserMapper'       => UserMapper::class,
+            'setFileMapper'       => Resource\FileMapper::class,
             'setUserAccessMapper' => UserAccessMapper::class,
             'setRoleAccessMapper' => RoleAccessMapper::class
         ]);

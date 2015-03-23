@@ -17,6 +17,7 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Config;
 use Schoolbox\Resource;
+use Schoolbox\UserMapper;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 
@@ -83,8 +84,9 @@ abstract class AbstractModule extends BaseModule
     protected function getSetterList()
     {
         return [
-            'setFileMapper'       => Resource\FileMapper::class,
+            'setFileMapper'       => null,
             'setConfig'           => Config\Loader::class,
+            'setUserMapper'       => UserMapper::class,
             'setTreeBuilder'      => null,
             'setFolderMapper'     => null,
         ];
