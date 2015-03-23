@@ -285,21 +285,24 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
-     * Sets a 12 hour time.
+     * Calculates a 24 hour from a 12 hour and a meridiem.
      *
-     * @param int    $hour     The hour to set in 12 hour time
+     * @param int    $hour     The hour in 12 hour time
      * @param string $meridiem The associated meridiem: "AM" or "PM"
      *
-     * @return $this
+     * @return int|null The hour, or null if calculation failed.
+     *                  Note this can return int(0) - you need to check whether
+     *                  the result isset(), a !empty() or truthy check is not
+     *                  sufficient.
      */
-    public function set12Hour($hour, $meridiem)
+    protected function calculate24HourFrom12Hour($hour, $meridiem)
     {
         if ($hour < 1 || $hour > 12) {
             trigger_error(
-                sprintf('hour "%s" must be between 1 and 12 - not adjusting date', $hour),
+                sprintf('hour "%s" must be between 1 and 12', $hour),
                 E_USER_WARNING
             );
-            return $this;
+            return null;
         }
         switch (strtoupper($meridiem)) {
             case self::AM:
@@ -325,10 +328,31 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
             default:
                 // meridiem is wrong
                 trigger_error(
-                    sprintf('meridiem "%s" must be "AM" or "PM" - not adjusting date', $meridiem),
+                    sprintf('meridiem "%s" must be "AM" or "PM"', $meridiem),
                     E_USER_WARNING
                 );
-                return $this;
+                return null;
+        }
+        return $adjustedHour;
+    }
+
+    /**
+     * Sets a 12 hour time.
+     *
+     * @param int    $hour     The hour to set in 12 hour time
+     * @param string $meridiem The associated meridiem: "AM" or "PM"
+     *
+     * @return $this
+     */
+    public function set12Hour($hour, $meridiem)
+    {
+        $adjustedHour = $this->calculate24HourFrom12Hour($hour, $meridiem);
+        if (!isset($adjustedHour)) {
+            trigger_error(
+                'either hour or meridiem was invalid - not adjusting time',
+                E_USER_WARNING
+            );
+            return $this;
         }
         return $this->setHour($adjustedHour);
     }
