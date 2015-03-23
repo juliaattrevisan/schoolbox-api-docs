@@ -30,6 +30,10 @@ class Resource implements ModuleConfigInterface
 
         $browserModule->init('/resourceses');
 
+        $myBrowserModule = new Schoolbox\Resource\Browser\MyFiles\Module($di);
+
+        $myBrowserModule->init('/my-files');
+
     }
 
 } 
