@@ -13,6 +13,7 @@ namespace Schoolbox\LearningAnalytics;
 use Schoolbox\Collection;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
 class Registry {
 
@@ -51,6 +52,7 @@ class Registry {
     private function findRegistries(Collection $allUnitInstances) {
         $unitInstanceMapper = new UnitInstanceMapper();
         $folderMapper = new FolderMapper();
+        $submissionBoxMapper = new SubmissionBoxMapper();
 
         /* A registry of unitId-studentList relations
          */
@@ -71,6 +73,21 @@ class Registry {
             $allUnits = $unitInstanceMapper->findForCategoryId($folder->getId());
 
             foreach ($allUnits as $currentUnit) {
+
+                /* Rehydrate submission box in each taskInstance of the unit
+                 * This feels viciously expensive. May be able to solve this
+                 * by writing yet another custom query and mapping them all
+                 * together manually, because I need the workType hydration
+                 */
+                foreach ($currentUnit->getTasks() as $currentTask) {
+                    try {
+                        $submissionBox = $submissionBoxMapper->findById($currentTask->getSubmissionBox()->getId());
+                        $currentTask->setSubmissionBox($submissionBox);
+                    }
+                    catch (\Exception $e) {
+                    }
+                }
+
                 $allUnitRegistryTemp[$currentUnit->getId()] = $currentUnit;
 
                 $studentListProcessor = new StudentList($folder, $currentUnit);
