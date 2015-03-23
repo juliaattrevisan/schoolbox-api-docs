@@ -10,6 +10,7 @@
 namespace Schoolbox\Resource\My\File;
 
 
+use Schoolbox\Collection;
 use Schoolbox\Resource;
 use Schoolbox\Resource\AbstractFileMapper;
 use Schoolbox\Resource\File\IFileMapper;
@@ -48,4 +49,30 @@ class Mapper extends AbstractFileMapper implements ILocator, IFileMapper
         $this->joins($this->getFolderFieldname(), Resource\My\Folder\Mapper::class, 'id', null, null, 'folder');
     }
 
+
+    /**
+     * Return the files contained within the folder with the given ID
+     *
+     * @param int $nodeId
+     * @return Model[]
+     */
+    public function findByFolderId($nodeId)
+    {
+        return $this->findByColumnList(array(
+            'parent' => $nodeId,
+            'owner'  => $_SESSION['id'] // TODO: FIX. DO NOT MERGE THIS
+        ));
+    }
+
+
+    /**
+     * Find all image files owned by a particular user
+     *
+     * @param $userId
+     * @return Collection
+     */
+    public function findAllImagesByUser($userId)
+    {
+        return $this->findByColumn('owner', $userId, [ 'mime' => 'image/*' ]);
+    }
 }

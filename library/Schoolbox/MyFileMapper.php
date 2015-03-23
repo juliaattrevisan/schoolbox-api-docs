@@ -11,41 +11,19 @@ namespace Schoolbox;
 
 use Schoolbox\File\MimetypeMapper;
 
+/**
+ * Class MyFileMapper
+ *
+ * @deprecated
+ * @package Schoolbox
+ */
 class MyFileMapper extends Resource\My\File\Mapper implements Resource\FileLocatorInterface, StorageMapperInterface {
 
 	protected function mapping () {
-
+        parent::mapping();
 		$this->registerCallback('postSave', array($this, 'postSave'));
 	}
 
-	/**
-	 * Find all image files owned by a particular user
-	 *
-	 * @param $userId
-	 * @return Collection
-	 */
-	public function findAllImagesByUser($userId) {
-		$query = "
-			SELECT
-				{$this->getColumnString('mf')}
-			FROM `{$this->table}` mf
-			WHERE mf.mime_type LIKE '%image/%'
-			AND mf.deleted IS FALSE
-			AND mf.owner = :userId
-		";
-
-		$statement = $this->database->prepare($query);
-		$statement->bindParam(':userId', $userId, \PDO::PARAM_INT);
-		$statement->execute();
-
-		$collection = new Collection();
-
-		while ($row = $statement->fetch()) {
-			$collection->add($this->hydrate($row, 'mf'));
-		}
-
-		return $collection;
-	}
 
 	/**
 	 * Save the file to the correct location
@@ -92,23 +70,9 @@ class MyFileMapper extends Resource\My\File\Mapper implements Resource\FileLocat
 
 
     /**
-     * Return the files contained within the folder with the given ID
-     *
-     * @param int $nodeId
-     * @return FileInterface[]
-     */
-    public function findByFolderId($nodeId)
-    {
-        return $this->findByColumnList(array(
-            'parent' => $nodeId,
-            'owner'  => $_SESSION['id'] // TODO: FIX. DO NOT MERGE THIS
-        ));
-    }
-
-
-    /**
      * Convenience method for creating and saving a file via this mapper.
      *
+     * @deprecated
      * @param string $filename     the file's name.
      * @param string $tempLocation the location of the file to save.
      * @param int    $userId       the user to associate with the file.
