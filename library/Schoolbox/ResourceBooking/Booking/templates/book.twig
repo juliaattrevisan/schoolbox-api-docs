@@ -7,7 +7,8 @@
 <script type="text/javascript" src="/javascript/jquery.validate.extensions.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-    var momentFormat = dateFormats.momentJs;
+    // A global variable
+    var momentFormat = dateDisplayFormats.momentJs;
     $.fn.alaressTiny({
        mode: 'textareas'
     });
