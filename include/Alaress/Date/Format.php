@@ -43,6 +43,8 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     const DATABASE_TIME_FORMAT = 'H:i:s';
     const TIMESTAMP = 'U';
     const URL_FORMAT = 'd-m-Y';
+    const AM = 'AM';
+    const PM = 'PM';
 
     /**
      * Returns an instance of self at the current time.
@@ -778,7 +780,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
-     * Extract the month of this date
+     * Extract the month of this date, without leading zeroes.
      *
      * @return int
      */
@@ -809,6 +811,58 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     public function getWeekDayNumber()
     {
         return $this->getUsingFormat('N');
+    }
+
+    /**
+     * Extracts the meridiem of this date.
+     *
+     * @return string
+     */
+    public function getMeridiem()
+    {
+        return $this->getUsingFormat('A');
+    }
+
+    /**
+     * Is this date an AM time?
+     *
+     * @return bool
+     */
+    public function isAM()
+    {
+        // Is this locale sensitive?
+        return $this->getMeridiem() === self::AM;
+    }
+
+    /**
+     * Is this date a PM time?
+     *
+     * @return bool
+     */
+    public function isPM()
+    {
+        // Is this locale sensitive?
+        return !$this->isAM();
+    }
+
+    /**
+     * Is this date the given meridiem?
+     *
+     * @param string $meridiem self::AM or self::PM or "AM" or "PM"
+     *
+     * @return bool
+     * @throws InvalidArgumentException if $meridiem isn't valid
+     */
+    public function isMeridiem($meridiem)
+    {
+        switch (strtoupper($meridiem)) {
+            case self::AM:
+                return $this->isAM();
+            case self::PM:
+                return $this->isPM();
+            default:
+                throw new InvalidArgumentException('$meridiem must be "AM" or "PM"');
+        }
     }
 
     /**
