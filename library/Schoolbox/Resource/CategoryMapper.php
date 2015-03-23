@@ -17,7 +17,7 @@ namespace Schoolbox\Resource;
  * @deprecated
  * @package Schoolbox\Resource
  */
-class CategoryMapper extends Folder\Mapper
+class CategoryMapper extends Folder\Mapper implements FolderLocatorInterface
 {
 
     /**

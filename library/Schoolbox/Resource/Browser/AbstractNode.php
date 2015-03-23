@@ -16,9 +16,9 @@ namespace Schoolbox\Resource\Browser;
 
 use InvalidArgumentException;
 use Schoolbox\File\MimetypeMapper;
-use Schoolbox\FolderInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\FileLocatorInterface;
+use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\Resource\FolderLocatorInterface;
 
 abstract class AbstractNode implements NodeInterface
