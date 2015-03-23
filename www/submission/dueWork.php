@@ -166,7 +166,7 @@ if (!isset($categoryIDList)) {
 // output general data
 $output = array(
     'CURRENT_DATE'   => date('F Y', $targetDate->getUnixTimestamp()),
-    'NOT_TODAY'      => $targetDate->getUsingFormat('dmY') == date('dmY') ? '' : 'not-today',
+    'NOT_TODAY'      => $targetDate->isToday() ? '' : 'not-today',
     'TODAY_DATE'     => date('Y-m-d'),
     'NEXT_MONTH'     => date('Y-m-d', strtotime('+1 month', $targetDate->getUnixTimeStamp())),
     'PREV_MONTH'     => date('Y-m-d', strtotime('-1 month', $targetDate->getUnixTimeStamp())),
