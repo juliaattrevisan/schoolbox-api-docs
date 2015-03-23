@@ -8,6 +8,7 @@
  * @version     SVN: $Id$
  */
 namespace Component\Eportfolio;
+use Eportfolio\PageMapper;
 use Schoolbox;
 
 class BlogMapper extends Schoolbox\Mapper {
@@ -28,10 +29,16 @@ class BlogMapper extends Schoolbox\Mapper {
 			'identifier' => true
 		));
 
+        // TODO make this mapping a model
 		$this->hasMap(array(
 			'column'     => 'page_id',
 			'property'   => 'pageId',
 			'type'       => self::TYPE_INTEGER,
+            'join'     => 'page',
+            'join_def' => array(
+                'mapper'    => PageMapper::class,
+                'other_key' => 'page_id',
+            ),
 		));
 
 		$this->hasMap(array(
@@ -164,10 +171,12 @@ class BlogMapper extends Schoolbox\Mapper {
 	 */
 	public function findRecent($uid, $limit) {
 		$query = "
-            SELECT {$this->getColumnString()}
-            FROM `{$this->table}`
-            WHERE uid = :uid
-            ORDER BY created_at DESC
+            SELECT {$this->getColumnString('b')}
+            FROM `{$this->table}` `b`
+            INNER JOIN {$this->getJoinSql('page', 'b', 'p')}
+            WHERE b.uid = :uid
+            AND b.deleted_at IS NULL
+            ORDER BY b.created_at DESC
             LIMIT :limit
 		";
 
@@ -180,6 +189,6 @@ class BlogMapper extends Schoolbox\Mapper {
 
 		$rowset = $statement->fetchAll();
 
-		return $this->hydrateList($rowset);
+		return $this->hydrateList($rowset, 'b');
 	}
 }
