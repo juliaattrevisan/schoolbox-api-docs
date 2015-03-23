@@ -45,55 +45,55 @@ $markbookExternal = new External_Markbook();
 $now = Alaress_Date_Format::now();
 $startTime = new Alaress_Date_Format;
 $endTime = new Alaress_Date_Format;
-if($now->getMonth() > 6) {
-    $startTime->now()->setMonth(7)->setDay(1)->setTime(0,0,0);
-    $endTime->now()->setMonth(12)->setDay(31)->setTime(23,59,59);
+if($now->getUsingFormat('m') > 6) {
+    $startTime->setDate(date('Y'),7,1)->setTime(0,0,0);
+    $endTime->setDate(date('Y'),12,30)->setTime(23,59,59);
 }
 else {
-    $startTime->now()->setMonth(1)->setDay(1)->setTime(0,0,0);
-    $endTime->now()->setMonth(6)->setDay(30)->setTime(23,59,59);
+    $startTime->setDate(date('Y'),1,1)->setTime(0,0,0);
+    $endTime->setDate(date('Y'),6,30)->setTime(23,59,59);
 }
 
-printf('Only syncing work between %s and %s\n', $startTime->getLocalShort(), $endTime->getLocalShort());
+printf("Only syncing work between %s and %s\n", $startTime->getLocalShort(), $endTime->getLocalShort());
 
 $categoryList = traverse($parentId, $folderMapper);
 
 foreach($categoryList as $category) {
-    printf('Processing assessments from: %s (%s)\n', $category->getName(), $category->getCodeString());
+    printf("Processing assessments from: %s (%s)\n", $category->getName(), $category->getCodeString());
     $submissionBoxList = $submissionMapper->getDueActivities(array($category->getId()),$startTime->getUnixTimestamp(), $endTime->getUnixTimestamp());
     foreach($submissionBoxList as $submissionBox) {
-        $markbook = $markbookExternal->getAssessment($submissionBox);
+        $markbook = $markbookExternal->getAssessment($submissionBox->getSubmissionBox());
 
         if(is_array($markbook)) {
-            printf('Updating existing assessment: %s', $submissionBox->getName());
+            printf("Updating existing assessment: %s\n", $submissionBox->getName());
             if(!$dryRun) {
-                $markbookExternal->updateAssessment($submissionBox);
+                $markbookExternal->updateAssessment($submissionBox->getSubmissionBox());
             }
         }
         elseif( !$updateOnly) {
-            printf('Creating new assessment: %s', $submissionBox->getName());
+            printf("Creating new assessment: %s\n", $submissionBox->getName());
             if(!$dryRun) {
-                $markbookExternal->createAssessment($submissionBox);
+                $markbookExternal->createAssessment($submissionBox->getSubmissionBox());
             }
         }
         else {
-            printf('Skipping creation in update only mode: %s', $submissionBox->getName());
+            printf("Skipping creation in update only mode: %s\n", $submissionBox->getName());
             continue;
         }
 
         $classList = $markbookHandler->getStudentListByBoxId($submissionBox->getId());
-        printf('Setting marks for %s students', count($classList));
+        printf("Setting marks for %s students\n", count($classList));
         foreach($classList as $student) {
             $result = $markbookHandler->getByUser($student['uid'], $submissionBox->getId());
 
             // Pretending to be a mapper, even though I dont have one yet.
             $return = new Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork();
-            $return->setSubmissionBox($submissionBox);
-            $return->setNormalizedMark($result['norm_mark']);
-            $return->setMarker($result['marker']);
+            $return->setSubmissionBox($submissionBox->getSubmissionBox());
+            $return->setNormalizedMark($result[0]['norm_mark']);
+            $return->setMarker($result[0]['marker']);
             $return->setOwner(new \Schoolbox\User);
-            $return->getOwner()->setId($result['owner']);
-            $return->setComment($result['comment']);
+            $return->getOwner()->setId($result[0]['owner']);
+            $return->setComment($result[0]['comment']);
 
             if(!$dryRun) {
                 $markbookExternal->setMark($return);

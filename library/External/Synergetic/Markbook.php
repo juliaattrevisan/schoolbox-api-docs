@@ -62,9 +62,22 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function createAssessment(SubmissionBox $assessment)
     {
-        $folder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assessment->getCategory());
+        /** Fix the hydrations */
+        if($assessment->getCategory() instanceof Schoolbox\Resource\Folder\Model) {
+            $folder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assessment->getCategory()->getId());
+        }
+        else {
+            $folder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assessment->getCategory());
+        }
+
         $externalClass = new External_Synergetic_Class();
-        $owner = UserMapper::getInstance()->findById($assessment->getOwner());
+        if($assessment->getOwner() instanceof Schoolbox\User) {
+            $owner = $assessment->getOwner();
+        } else {
+            $owner = UserMapper::getInstance()->findById($assessment->getOwner());
+        }
+
+
 
         $fileYear = $this->getExternalUser()->getCurrentYear($owner->getExternalId());
         $fileSemester = $this->getExternalUser()->getCurrentSemester($owner->getExternalId());
@@ -161,8 +174,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
               ) {
 
                 $query = "UPDATE StudentAssessmentMarkBook SET
-                            Result = '".$returnedWork->getNormalizedMark()."',
-                            TopicComment = '".$returnedWork->getComment()."'
+                            Result = '".round($returnedWork->getNormalizedMark())."',
+                            TopicComment = '".$this->getDatabase()->quote($returnedWork->getComment())."'
                           WHERE
                               FileType = '{$assessmentRemote['FileType']}' AND
                               FileYear = '{$assessmentRemote['FileYear']}' AND
