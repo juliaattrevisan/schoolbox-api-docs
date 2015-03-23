@@ -295,7 +295,8 @@ class SitePage extends Page
             $debug_bar_body = $renderer->render();
         }
 
-        // Figure out WTH the datepicker format should be
+        // Convert date format to datepicker and moment formats.
+        // (long date formats shouldn't be used in date_local, but they're supported)
         $datepickerFormat = strtr(
             Config::get('date_local'),
             array(
@@ -312,6 +313,24 @@ class SitePage extends Page
                 // year formats
                 'y' => 'y',
                 'Y' => 'yy',
+            )
+        );
+        $momentFormat = strtr(
+            Config::get('date_local'),
+            array(
+                // day formats
+                'j' => 'D',
+                'd' => 'DD',
+                'D' => 'ddd',
+                'l' => 'dddd',
+                // month formats
+                'n' => 'M',
+                'm' => 'MM',
+                'M' => 'MMM',
+                'F' => 'MMMM',
+                // year formats
+                'y' => 'YY',
+                'Y' => 'YYYY',
             )
         );
         $templateVar = array(
