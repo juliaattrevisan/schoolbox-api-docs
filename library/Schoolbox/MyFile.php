@@ -10,84 +10,32 @@
 namespace Schoolbox;
 
 use Alaress_Date_Format;
-use Schoolbox\File\Mimetype;
+use Schoolbox\Resource;
 
-class MyFile implements FileInterface {
-
-	/**
-	 * @var int
-	 */
-	protected $id;
-
-	/**
-	 * Parent folder
-	 *
-	 * @var MyFolder
-	 */
-	protected $parent;
+/**
+ * Class MyFile
+ *
+ * @package Schoolbox
+ * @deprecated
+ */
+class MyFile extends Resource\My\File\Model implements FileInterface {
 
 	/**
-	 * User id of the file owner
-	 *
-	 * @var User
-	 */
-	protected $owner;
-
-	/**
-	 * The actual filename
-	 *
-	 * @var string
-	 */
-	protected $filename;
-
-	/**
-	 * The datetime the file was added
-	 *
-	 * @var Alaress_Date_Format
-	 */
-	protected $created_at;
-
-	/**
-	 * A file description
-	 *
-	 * @var string
-	 */
-	protected $description;
-
-	/**
-	 * The size of the file
-	 *
-	 * @var int
-	 */
-	protected $filesize;
-
-	/**
-	 * The mime type
-	 *
-	 * @var Mimetype
-	 */
-	protected $mime;
-
-	/**
-	 * Whether this is softdeleted or not
-	 *
-	 * @var bool
-	 */
-	protected $deleted;
-
-	/**
+     * @deprecated
 	 * @var IConfigLoader
 	 */
-	protected $config_loader;
+	private $config_loader;
 
 	/**
 	 * Location of file prior to creation
+     * @deprecated
 	 * @var string
 	 */
-	protected $tempFileLocation;
+	private $tempFileLocation;
 
 	/**
 	 * Creates object and sets up sub-objects.
+     * @deprecated
 	 */
 	public function __construct() {
 		//
@@ -95,85 +43,27 @@ class MyFile implements FileInterface {
 		$this->config_loader = new Config\Loader();
 	}
 
-	/**
-	 * @param  string $filename
-	 * @return $this
-	 */
-	public function setFilename($filename) {
-		$this->filename = $filename;
-		return $this;
-	}
 
 	/**
-	 * @return string
-	 */
-	public function getFilename() {
-		return $this->filename;
-	}
-
-	/**
-	 * @param  int $id
-	 * @return $this
-	 */
-	public function setId($id) {
-		$this->id = $id;
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
-
-	/**
+     * @deprecated
 	 * @param  int $filesize
 	 * @return $this
 	 */
 	public function setFilesize($filesize) {
-		$this->filesize = $filesize;
-		return $this;
+		return $this->setSize($filesize);
 	}
 
 	/**
+     * @deprecated
 	 * @return int
 	 */
 	public function getFilesize() {
-		return $this->filesize;
+		return $this->getSize();
 	}
 
-	/**
-	 * Set mime object
-	 *
-	 * @param  MimeType $mime
-	 * @return $this
-	 */
-	public function setMimetype($mime) {
-		$this->mime = $mime;
-
-		return $this;
-	}
-
-    /**
-     * Get mime object
-     * @return Mimetype
-     */
-    public function getMimetype()
-    {
-        return $this->mime;
-    }
 
 	/**
-	 * Get mime string
-	 *
-	 * @return string
-	 */
-	public function getMime() {
-		return $this->mime->getMime();
-	}
-
-	/**
+     * @deprecated
 	 * @param  IConfigLoader $config_loader
 	 * @return $this
 	 */
@@ -183,108 +73,46 @@ class MyFile implements FileInterface {
 	}
 
 	/**
+     * @deprecated
 	 * @return IConfigLoader
 	 */
 	public function getConfigLoader() {
 		return $this->config_loader;
 	}
 
-	/**
-	 * Set parent id
-	 *
-	 * @param MyFolder $parent
-	 */
-	public function setParent($parent) {
-		$this->parent = $parent;
-	}
-
-
-    /**
-     * Get parent id
-     *
-     * @return MyFolder
-     */
-	public function getParent() {
-		return $this->parent;
-	}
-
-	/**
-	 * Set owner id
-	 *
-	 * @param User $owner
-	 */
-	public function setOwner($owner) {
-		$this->owner = $owner;
-	}
-
-
-    /**
-     * Get owner id
-     *
-     * @return User
-     */
-	public function getOwner() {
-		return $this->owner;
-	}
-
-	/**
-	 * Set created at
-	 *
-	 * @param Alaress_Date_Format $created_at
-	 */
-	public function setCreatedAt($created_at) {
-		$this->created_at = $created_at;
-	}
-
-
-    /**
-     * Get created at
-     *
-     * @return Alaress_Date_Format
-     */
-	public function getCreatedAt() {
-		return $this->created_at;
-	}
-
-	/**
-	 * Set description
-	 *
-	 * @param string $description
-	 */
-	public function setDescription($description) {
-		$this->description = $description;
-	}
-
-
-    /**
-     * Get description
-     *
-     * @return string
-     */
-	public function getDescription() {
-		return $this->description;
-	}
 
 	/**
 	 * Set deleted
 	 *
+     * @deprecated
 	 * @param bool $deleted
 	 */
 	public function setDeleted($deleted) {
-		$this->deleted = $deleted;
+		$this->setDeletedAt($deleted ? Alaress_Date_Format::now() : null);
 	}
 
     /**
      * Get deleted
      *
+     * @deprecated
      * @return bool
      */
 	public function getDeleted() {
-		return $this->deleted;
+		return $this->getDeletedAt() instanceof Alaress_Date_Format;
 	}
+
+
+    /**
+     * @deprecated
+     * @return bool
+     */
+    public function isDeleted() {
+        return $this->getDeleted();
+    }
 
 	/**
 	 * Use this function to set the location of the file when creating a new file record
+     * @deprecated
 	 * @param string $tempFileLocation
 	 */
 	public function setTempFileLocation($tempFileLocation) {
@@ -293,6 +121,7 @@ class MyFile implements FileInterface {
 
 	/**
 	 * This function only exists to move the uploaded file into the correct location on save
+     * @deprecated
 	 * @return string
 	 */
 	public function getTempFileLocation() {
@@ -301,22 +130,12 @@ class MyFile implements FileInterface {
 
     /**
      * Return location of file in filesystem
+     * @deprecated
      * @return string
      */
     public function getFileLocation()
     {
         return $this->config_loader->get('myfile_dir') . '/' . $this->getId() . '.dat';
-    }
-
-
-    /**
-     * Returns the size on disk of the file
-     *
-     * @return int
-     */
-    public function getSize()
-    {
-        return $this->getFilesize();
     }
 
 }

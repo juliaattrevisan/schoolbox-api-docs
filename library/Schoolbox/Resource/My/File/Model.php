@@ -1,0 +1,42 @@
+<?php
+/**
+ * 
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2015, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Schoolbox\Resource\My\File;
+
+
+use Alaress_Date_Format;
+use Schoolbox\Resource\AbstractFile;
+use Schoolbox\Resource\File\IFile;
+
+class Model extends AbstractFile implements IFile
+{
+    /** @var Alaress_Date_Format */
+    protected $publishedAt;
+
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getPublishedAt()
+    {
+        return $this->publishedAt;
+    }
+
+
+    /**
+     * @param Alaress_Date_Format $publishedAt
+     * @return self
+     */
+    public function setPublishedAt($publishedAt)
+    {
+        $this->publishedAt = $publishedAt;
+        return $this;
+    }
+
+}

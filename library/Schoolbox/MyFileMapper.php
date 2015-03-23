@@ -11,93 +11,9 @@ namespace Schoolbox;
 
 use Schoolbox\File\MimetypeMapper;
 
-class MyFileMapper extends Mapper implements Resource\FileLocatorInterface, StorageMapperInterface {
+class MyFileMapper extends Resource\My\File\Mapper implements Resource\FileLocatorInterface, StorageMapperInterface {
 
 	protected function mapping () {
-		$this->hasTable('myFile');
-		$this->hasModel('\\Schoolbox\\MyFile');
-
-		$this->hasMap(array(
-			'column'     => 'id',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'parent',
-			'property'   => 'parent',
-			'type'       => self::TYPE_MODEL,
-            'join'       => 'parent'
-		));
-
-		$this->hasMap(array(
-			'column'     => 'owner',
-			'property'   => 'owner',
-			'type'       => self::TYPE_MODEL,
-            'join'       => 'owner'
-		));
-
-		$this->hasMap(array(
-			'column'     => 'realname',
-			'property'   => 'filename',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'submitted',
-			'property'   => 'createdAt',
-			'type'       => self::TYPE_DATETIME,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'description',
-			'property'   => 'description',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'file_size',
-			'property'   => 'filesize',
-			'type'       => self::TYPE_INTEGER,
-		));
-
-        $hydrator = new Column\Model();
-        $hydrator->setIdentifierProperty('mime');
-
-        $this->hasMap(array(
-            'column'     => 'mime_type',
-            'property'   => 'mimetype',
-            'hydrator'   => $hydrator,
-            'join'       => 'allowedFileType',
-        ));
-
-		$this->hasMap(array(
-			'column'     => 'deleted',
-			'property'   => 'deleted',
-			'type'       => self::TYPE_BOOLEAN,
-		));
-
-
-        $this->hasJoin('parent', array(
-            'mapper'    => '\\Schoolbox\\MyFolderMapper',
-            'this_key'  => 'parent',
-            'other_key' => 'id'
-        ));
-
-		$this->hasJoin('allowedFileType', array(
-			'mapper'    => '\\Schoolbox\\File\\MimetypeMapper',
-			'this_key'  => 'mime_type',
-			'other_key' => 'mime',
-		));
-
-		$this->hasJoin('owner', array(
-			'mapper'    => '\\Schoolbox\\UserMapper',
-			'this_key'  => 'owner',
-			'other_key' => 'id',
-		));
-
-        $this->hasSoftDeleteBooleanField('deleted');
 
 		$this->registerCallback('postSave', array($this, 'postSave'));
 	}
