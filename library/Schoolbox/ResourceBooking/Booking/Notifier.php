@@ -20,6 +20,7 @@ use Aura\Router\Router;
 use Monolog\Logger;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Mapper\Exception\Deleted as DeletedException;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Permission\Access\UserAccess;
@@ -122,7 +123,12 @@ class Notifier extends AbstractModuleNotifier
     {
         // Ensure that object is hydrated. Why does this happen?
         /** @var Model $object */
-        $object    = $this->mapper->findById($object->getId());
+        try {
+            $object = $this->mapper->findById($object->getId());
+        } catch (DeletedException $e) {
+            $object = $e->getDeletedObject();
+            $event  = 'cancelled';
+        }
         $messenger = new Messenger();
 
         // Hydrate event owner
