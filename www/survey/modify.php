@@ -97,7 +97,7 @@ else {
 
     /* Render starting times
      */
-    $assessStartHour = $assessStartDate->getUsingFormat('h');
+    $assessStartHour = $assessStartDate->get24Hour();
     $assessStartMinute = $assessStartDate->getUsingFormat('i');
     $assessStartMeridiem = $assessStartDate->getMeridiem();
 
@@ -117,7 +117,7 @@ else {
 
     /* Render finish times
      */
-    $assessFinishHour = $assessFinishDate->getUsingFormat('h');
+    $assessFinishHour = $assessFinishDate->get24Hour();
     $assessFinishMinute = $assessFinishDate->getUsingFormat('i');
     $assessFinishMeridiem = $assessFinishDate->getMeridiem();
 
