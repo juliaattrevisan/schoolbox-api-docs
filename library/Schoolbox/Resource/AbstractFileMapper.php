@@ -149,8 +149,7 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
 
         if (isset($options['mime'])) {
             $mime = str_replace('*', '%', $options['mime']);
-            $parts['where'][] = sprintf("%s LIKE %s",
-                $this->database->quoteIdentifier('mime_type'),
+            $parts['where'][] = sprintf("`allowedFileTypes`.`mime` LIKE %s",
                 $this->database->quote($mime)
             );
         }
