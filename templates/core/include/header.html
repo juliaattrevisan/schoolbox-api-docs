@@ -23,6 +23,10 @@
   $(document).ready(function() {
       $('#nav').touchMenu();
   });
+  // Datepicker format
+  $.datepicker.setDefaults({
+      dateFormat: '{DATEPICKER_FORMAT}'
+  })
 </script>
 <!-- Classes on document for when IE < 11 -->
 <!--[if lt IE 10]>

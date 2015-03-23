@@ -295,6 +295,25 @@ class SitePage extends Page
             $debug_bar_body = $renderer->render();
         }
 
+        // Figure out WTH the datepicker format should be
+        $datepickerFormat = strtr(
+            Config::get('date_local'),
+            array(
+                // day formats
+                'j' => 'd',
+                'd' => 'dd',
+                'D' => 'D',
+                'l' => 'DD',
+                // month formats
+                'n' => 'm',
+                'm' => 'mm',
+                'M' => 'M',
+                'F' => 'MM',
+                // year formats
+                'y' => 'y',
+                'Y' => 'yy',
+            )
+        );
         $templateVar = array(
             'TEMPLATE_YEAR'          => date('Y'),
             'SITE_NAME'              => Cfg::get('school_name'),
@@ -315,7 +334,8 @@ class SitePage extends Page
             'WEBSOCKET_UNREAD_COUNT' => $_SESSION['msg-count'] ? : 0,
             'WEBSOCKET_UNREAD_LABEL' => $_SESSION['msg-count'] ? : '',
             'WEBSOCKET_STACK_LIMIT'  => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
-            'PAGE_SECURE'            => empty($_SERVER['HTTPS']) ? 'false' : 'true'
+            'PAGE_SECURE'            => empty($_SERVER['HTTPS']) ? 'false' : 'true',
+            'DATEPICKER_FORMAT'      => $datepickerFormat,
         );
 
         $this->setVar($templateVar);
