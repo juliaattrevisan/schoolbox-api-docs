@@ -19,7 +19,7 @@ class Component_Config_Date extends Component_Config_Abstract
      */
     public function dehydrate($value, Component_ControllerAbstract $controller)
     {
-        // Assume date was sent as d/m/Y, otherwise try to parse with strtotime
+        // Assume date was sent as a local short date
         if (empty($value)) {
             return '';
         }
