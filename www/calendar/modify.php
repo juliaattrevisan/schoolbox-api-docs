@@ -89,19 +89,19 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_START_DATE'     => $event->getStartDateTime()->getLocalShort(),
             'EVENT_START_HOUR'     => $event->getStartDateTime()->getUsingFormat('g'),
             'EVENT_START_MIN'      => $event->getStartDateTime()->getUsingFormat('i'),
-            'EVENT_START_AM'       => $event->getStartDateTime()->getUsingFormat('A') == 'AM'
+            'EVENT_START_AM'       => $event->getStartDateTime()->isAM()
                     ? 'selected="selected"'
                     : '',
-            'EVENT_START_PM'       => $event->getStartDateTime()->getUsingFormat('A') == 'PM'
+            'EVENT_START_PM'       => $event->getStartDateTime()->isPM()
                     ? 'selected="selected"'
                     : '',
             'EVENT_END_DATE'       => $event->getEndDateTime()->getLocalShort(),
             'EVENT_END_HOUR'       => $event->getEndDateTime()->getUsingFormat('g'),
             'EVENT_END_MIN'        => $event->getEndDateTime()->getUsingFormat('i'),
-            'EVENT_END_AM'         => $event->getEndDateTime()->getUsingFormat('A') == 'AM'
+            'EVENT_END_AM'         => $event->getEndDateTime()->isAM()
                     ? 'selected="selected"'
                     : '',
-            'EVENT_END_PM'         => $event->getEndDateTime()->getUsingFormat('A') == 'PM'
+            'EVENT_END_PM'         => $event->getEndDateTime()->isPM()
                     ? 'selected="selected"'
                     : '',
             'EVENT_PUBLISH_DATE'   => $publishDate,
@@ -179,19 +179,19 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_START_DATE'     => $event->getStartDateTime()->getLocalShort(),
             'EVENT_START_HOUR'     => $event->getStartDateTime()->getUsingFormat('g'),
             'EVENT_START_MIN'      => $event->getStartDateTime()->getUsingFormat('i'),
-            'EVENT_START_AM'       => $event->getStartDateTime()->getUsingFormat('A') == 'AM'
+            'EVENT_START_AM'       => $event->getStartDateTime()->isAM()
                     ? 'selected="selected"'
                     : '',
-            'EVENT_START_PM'       => $event->getStartDateTime()->getUsingFormat('A') == 'PM'
+            'EVENT_START_PM'       => $event->getStartDateTime()->isPM()
                     ? 'selected="selected"'
                     : '',
             'EVENT_END_DATE'       => $event->getEndDateTime()->getLocalShort(),
             'EVENT_END_HOUR'       => $event->getEndDateTime()->getUsingFormat('g'),
             'EVENT_END_MIN'        => $event->getEndDateTime()->getUsingFormat('i'),
-            'EVENT_END_AM'         => $event->getEndDateTime()->getUsingFormat('A') == 'AM'
+            'EVENT_END_AM'         => $event->getEndDateTime()->isAM()
                     ? 'selected="selected"'
                     : '',
-            'EVENT_END_PM'         => $event->getEndDateTime()->getUsingFormat('A') == 'PM'
+            'EVENT_END_PM'         => $event->getEndDateTime()->isPM()
                     ? 'selected="selected"'
                     : '',
             'EVENT_PUBLISH_DATE'   => '',

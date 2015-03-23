@@ -154,7 +154,7 @@ else {
     foreach (array('AM', 'PM') as $meridiem) {
         $this->setVar(array(
             'START_MERIDIEM_VALUE' => $meridiem,
-            'START_MERIDIEM_SELECTED' => $meridiem == $assessStartDate->getUsingFormat('A') ? 'selected=\'selected\'' : '',
+            'START_MERIDIEM_SELECTED' => $assessStartDate->isMeridiem($meridiem) ? 'selected=\'selected\'' : '',
         ));
 
         $this->parse('startMeridiem_block', 'startMeridiem', true);
@@ -170,7 +170,7 @@ else {
 	foreach (array('AM', 'PM') as $meridiem) {
         $this->setVar(array(
             'FINISH_MERIDIEM_VALUE' => $meridiem,
-            'FINISH_MERIDIEM_SELECTED' => $meridiem == $assessFinishDate->getUsingFormat('A') ? 'selected=\'selected\'' : '',
+            'FINISH_MERIDIEM_SELECTED' => $assessFinishDate->isMeridiem($meridiem) ? 'selected=\'selected\'' : '',
         ));
 
         $this->parse('finishMeridiem_block', 'finishMeridiem', true);
