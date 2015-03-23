@@ -41,12 +41,12 @@ class Module extends BaseModule {
         /* folderId is associated with a course, a set of units. This finds all
          * the units associated with all the folders that use the course.
          */
-        $router->addGet('learningAnalytics.course', "{$basePath}/{courseId}");
+        $router->addGet('learningAnalytics.course', "{$basePath}/course/{courseId}");
 
         /* folderId is associated with a course, a set of units. This finds all
          * the units associated with a particular folder that uses the course.
          */
-        $router->addGet('learningAnalytics.folder', "{$basePath}/{courseId}/{folderId}");
+        $router->addGet('learningAnalytics.folder', "{$basePath}/course/{courseId}/folder/{folderId}");
     }
 
     /**

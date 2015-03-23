@@ -196,13 +196,13 @@
 
 <dl class="tabs">
     <dd class="{% if metadata.route == 'course' %}active{% endif %}">
-        <a href='/learningAnalytics/{{ metadata.courseFolder.getId() }}'>
+        <a href='/learningAnalytics/course/{{ metadata.courseFolder.getId() }}'>
             Course
         </a>
     </dd>
     {% for folder in metadata.allFolders %}
     <dd class="{% if (folder.getId() == metadata.selectedFolder.getId()) and (metadata.route == 'folder') %}active{% endif %}">
-        <a href='/learningAnalytics/{{ metadata.courseFolder.getId() }}/{{ folder.getId() }}'>
+        <a href='/learningAnalytics/course/{{ metadata.courseFolder.getId() }}/folder/{{ folder.getId() }}'>
             {{ folder.getName() }}
         </a>
     </dd>
