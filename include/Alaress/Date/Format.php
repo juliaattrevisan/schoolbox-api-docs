@@ -789,6 +789,16 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
         return $this;
     }
 
+    /**
+     * Equivalent of `DateTime->modify()`.
+     *
+     * @see http://php.net/manual/en/datetime.modify.php
+     */
+    public function modify($modify)
+    {
+        $this->getDateTimeObject()->modify($modify);
+        return $this;
+    }
 
     /**
      * Transform the datetime into a localised version
