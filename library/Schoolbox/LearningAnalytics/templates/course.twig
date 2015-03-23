@@ -200,7 +200,7 @@
             Course
         </a>
     </dd>
-    {% for folder in metadata.folders.all %}
+    {% for folder in metadata.folder.all %}
     <dd class="{% if (folder.getId() == metadata.folder.selected.getId()) and (metadata.route == 'folder') %}active{% endif %}">
         <a href='/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ folder.getId() }}'>
             {{ folder.getName() }}
