@@ -318,7 +318,7 @@ class SitePage extends Page
             'WEBSOCKET_STACK_LIMIT'  => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
             'PAGE_SECURE'            => empty($_SERVER['HTTPS']) ? 'false' : 'true',
             'DATEPICKER_FORMAT'      => json_encode(Alaress_Date_Format_Converter::toDatepicker($dateFormat)),
-            'MOMENT_FORMAT'          => json_encode(Alaress_Date_Format_Converter::toMomentJs($dateFormat)),
+            'MOMENTJS_FORMAT'        => json_encode(Alaress_Date_Format_Converter::toMomentJs($dateFormat)),
         );
 
         $this->setVar($templateVar);
