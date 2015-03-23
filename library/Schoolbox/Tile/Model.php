@@ -11,7 +11,7 @@ namespace Schoolbox\Tile;
 
 use Alaress_Date_Format;
 use Alaress\Color\Color;
-use Schoolbox\Storage;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Tile\Layout;
 use Schoolbox\ISoftDeletable;
 
@@ -71,7 +71,7 @@ class Model implements ISoftDeletable, \JsonSerializable
     protected $link;
 
     /**
-     * @var Storage
+     * @var IStorage
      */
     protected $backgroundImage;
 
@@ -168,7 +168,7 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
-     * @param  Storage $backgroundImage
+     * @param  IStorage $backgroundImage
      * @return $this
      */
     public function setBackgroundImage($backgroundImage)
@@ -178,7 +178,7 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
-     * @return Storage
+     * @return IStorage
      */
     public function getBackgroundImage()
     {

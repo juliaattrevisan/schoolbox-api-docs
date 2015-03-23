@@ -78,7 +78,6 @@ if ($group->getPermission($category_id) < WRITE_ACCESS) {
             if (is_array($_POST['attachment'])) {
                 try {
                     $factory = new CollectorFactory();
-                    /** @var \Schoolbox\Storage $file */
                     $file = $factory->build($_POST['attachment'])->getFirst();
 
                     $url = '/storage/fetch.php?hash=' . $file->getHash();

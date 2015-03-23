@@ -117,8 +117,8 @@ if ($_POST['heading']) {
 
 	    if(is_object($mime) && $mime->getEnable() == 'true' && stristr($mime->getMime(),'image/')) {
             try {
-                $imageResource = Schoolbox\StorageMapper::getInstance()->upload(
-                    $_FILES['file']['name'], $_FILES['file']['tmp_name'], $_SESSION['id']
+                $imageResource = Schoolbox\Resource\Storage\Mapper::getInstance()->accept(
+                    $_FILES['file']['name'], $_FILES['file']['tmp_name']
                 );
                 $article->setImage($imageResource);
             }
