@@ -10,7 +10,7 @@
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use Schoolbox\Resource\File;
+use Schoolbox\Resource;
 use Schoolbox\Resource\Storage;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
@@ -27,10 +27,11 @@ $kernel->run(function ($di, $loop, $log, $opts) {
      * @var array           $opts
      */
 
-    $migrator    = new Storage\Migrator($log);
+    $migrator = new Storage\Migrator($log);
 
     $patterns = [
-        new File\Migration()
+        new Resource\File\Migration(),
+        new Resource\My\File\Migration()
     ];
 
     $migrator->migrateEach($patterns);
