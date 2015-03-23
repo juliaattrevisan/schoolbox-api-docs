@@ -843,6 +843,53 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
+     * Extracts the minute of this date.
+     *
+     * @param bool $leadingZero True if leading zero is fetched, false if not
+     *                          Defaults to false.
+     *
+     * @return int
+     */
+    public function getMinute($leadingZero = false)
+    {
+        $result = $this->getUsingFormat('i');
+        if (!$leadingZero) {
+            return $this->stripLeadingZero($result);
+        }
+        return $result;
+    }
+
+    /**
+     * Extracts the second part of this date.
+     *
+     * @param bool $leadingZero True if leading zero is fetched, false if not
+     *                          Defaults to false.
+     *
+     * @return int
+     */
+    public function getSecond($leadingZero = false)
+    {
+        $result = $this->getUsingFormat('s');
+        if (!$leadingZero) {
+            return $this->stripLeadingZero($result);
+        }
+        return $result;
+    }
+
+    /**
+     * Strips a leading zero - used by getMinute() and getSecond() as there's
+     * no format for minute and second with no leading zero.
+     *
+     * @param string $result
+     *
+     * @return string
+     */
+    protected function stripLeadingZero($result)
+    {
+        return preg_replace('/^0/', '', $result);
+    }
+
+    /**
      * Extracts the meridiem of this date.
      *
      * @return string
