@@ -787,11 +787,11 @@ class Leave_Controller extends Controller
                 $rowData[] = $request->getUser()->getLastname();
                 $rowData[] = $house->getHouse();
                 $rowData[] = $request->getUser()->getYear();
-                $rowData[] = $request->getStart()->getAustralian();
-                $rowData[] = $request->getFinish()->getAustralian();
+                $rowData[] = $request->getStart()->getLocal();
+                $rowData[] = $request->getFinish()->getLocal();
                 $rowData[] = $request->getHostType()->getName();
                 $rowData[] = $request->getStatus(true);
-                $rowData[] = $request->getAuthorisationDatetime(true)->getAustralian();
+                $rowData[] = $request->getAuthorisationDatetime(true)->getLocal();
                 $rowData[] = $request->getAuthorisationUser()->getFirstname() . ' ' . $request->getAuthorisationUser(
                 )->getLastname();
 
@@ -859,7 +859,7 @@ class Leave_Controller extends Controller
                     'USER_YEAR' => $request->getUser()->getYear(),
                     'USER_BOARDING_STATUS' => $request->getUser()->getAbbreviatedBoardingStatus(),
                     'REQUEST_ID' => $request->getId(),
-                    'REQUEST_START' => $request->getStart()->getAustralian(),
+                    'REQUEST_START' => $request->getStart()->getLocal(),
                     'REQUEST_DURATION' => $request->getDuration(),
                     'REQUEST_HOST_TYPE' => $this->getHostTypes()->getBy('id', $request->getHostType()->getId())->getName()
                 ));
@@ -872,8 +872,7 @@ class Leave_Controller extends Controller
                     $this->getPage()->setVar(
                         array(
                             'REQUEST_STATUS' => $request->getStatus(true),
-                            'REQUEST_AUTHORISATION_DATETIME' => $request->getAuthorisationDatetime(true)->getAustralian(
-                            ),
+                            'REQUEST_AUTHORISATION_DATETIME' => $request->getAuthorisationDatetime(true)->getLocal(),
                             'REQUEST_AUTHORISATION_USER_ID' => $request->getAuthorisationUser()->getId(),
                             'REQUEST_AUTHORISATION_USER_NAME' => $request->getAuthorisationUser()->formatName(),
                         )
@@ -1044,7 +1043,7 @@ class Leave_Controller extends Controller
                             'USER_NAME' => $request->getUser()->formatName(),
                             'USER_YEAR' => $request->getUser()->getYear(),
                             'REQUEST_ID' => $request->getId(),
-                            'REQUEST_START' => $request->getStart()->getAustralian(),
+                            'REQUEST_START' => $request->getStart()->getLocal(),
                             'REQUEST_DURATION' => $request->getDuration(),
                             'REQUEST_HOST_TYPE' => $request->getHostType()->getName()
                         )
@@ -1058,9 +1057,7 @@ class Leave_Controller extends Controller
                         $this->getPage()->setVar(
                             array(
                                 'REQUEST_STATUS' => $request->getStatus(true),
-                                'REQUEST_AUTHORISATION_DATETIME' => $request->getAuthorisationDatetime(
-                                    true
-                                )->getAustralian(),
+                                'REQUEST_AUTHORISATION_DATETIME' => $request->getAuthorisationDatetime(true)->getLocal(),
                                 'REQUEST_AUTHORISATION_USER_ID' => $request->getAuthorisationUser()->getId(),
                                 'REQUEST_AUTHORISATION_USER_NAME' => $request->getAuthorisationUser()->formatName(),
                             )
