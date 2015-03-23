@@ -780,13 +780,16 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
-     * Extract the month of this date, without leading zeroes.
+     * Extract the month of this date.
+     *
+     * @param bool $leadingZero True if leading zero is fetched, false if not
+     *                          Defaults to false.
      *
      * @return int
      */
-    public function getMonth()
+    public function getMonth($leadingZero = false)
     {
-        return $this->getUsingFormat('n');
+        return $this->getUsingFormat($leadingZero ? 'm' : 'n');
     }
 
     /**
@@ -814,23 +817,29 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
-     * Extracts the 12-hour time of this date, without leading zeroes.
+     * Extracts the 12-hour time of this date.
+     *
+     * @param bool $leadingZero True if leading zero is fetched, false if not
+     *                          Defaults to false.
      *
      * @return int
      */
-    public function get12Hour()
+    public function get12Hour($leadingZero = false)
     {
-        return $this->getUsingFormat('g');
+        return $this->getUsingFormat($leadingZero ? 'G' : 'g');
     }
 
     /**
-     * Extracts the 24-hour time of this date, without leading zeroes.
+     * Extracts the 24-hour time of this date.
+     *
+     * @param bool $leadingZero True if leading zero is fetched, false if not
+     *                          Defaults to false.
      *
      * @return int
      */
-    public function get24Hour()
+    public function get24Hour($leadingZero = false)
     {
-        return $this->getUsingFormat('h');
+        return $this->getUsingFormat($leadingZero ? 'H' : 'h');
     }
 
     /**
