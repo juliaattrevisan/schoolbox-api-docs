@@ -171,7 +171,7 @@ abstract class Base {
     /**
      * Set course folder
      *
-     * @param \Schoolbox\LearningAnalytics\Folder $courseFolder
+     * @param Folder $courseFolder
      */
     protected function setCourseFolder($courseFolder)
     {
@@ -181,7 +181,7 @@ abstract class Base {
     /**
      * Get course folder
      *
-     * @return \Schoolbox\LearningAnalytics\Folder
+     * @return Folder
      */
     public function getCourseFolder()
     {
@@ -251,7 +251,7 @@ abstract class Base {
     /**
      * Set selected folder
      *
-     * @param \Schoolbox\Resource\Category $selectedFolder
+     * @param Folder $selectedFolder
      */
     protected function setSelectedFolder($selectedFolder)
     {
@@ -261,7 +261,7 @@ abstract class Base {
     /**
      * Get selected folder
      *
-     * @return \Schoolbox\Resource\Category
+     * @return Folder
      */
     public function getSelectedFolder()
     {
