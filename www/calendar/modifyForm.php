@@ -75,16 +75,14 @@ switch ($_POST['action']) {
         }
         /* Start and end dates
          */
-        $start     = $_POST['startDate']
-            . ' ' . $_POST['startHour']
-            . ':' . $_POST['startMinute']
-            . ' ' . $_POST['startPeriod'];
-        $end       = $_POST['endDate']
-            . ' ' . $_POST['endHour']
-            . ':' . $_POST['endMinute']
-            . ' ' . $_POST['endPeriod'];
-        $startDate = new Alaress_Date_Format($start, 'd/m/Y h:i a');
-        $endDate   = new Alaress_Date_Format($end, 'd/m/Y h:i a');
+        $startDate = Alaress_Date_Format::newLocalShort($_POST['startDate'])
+            ->set12Hour($_POST['startHour'], $_POST['startPeriod'])
+            ->setMinute($_POST['startMinute'])
+        ;
+        $endDate = Alaress_Date_Format::newLocalShort($_POST['endDate'])
+            ->set12Hour($_POST['endHour'], $_POST['endPeriod'])
+            ->setMinute($_POST['endMinute'])
+        ;
         // Don't allow start to be after end
         if ($startDate->getUnixTimestamp() > $endDate->getUnixTimestamp()) {
             error(145);

@@ -30,8 +30,14 @@ if (!empty($_POST)) {
 
     /* Format date, time
      */
-    $start = new Alaress_Date_Format($_POST['start']['date'] . ' ' . $_POST['start']['hour'] . ':' . $_POST['start']['minute'] . ' ' . $_POST['start']['meridiem'], 'd/m/Y h:i a');
-    $finish = new Alaress_Date_Format($_POST['finish']['date'] . ' ' . $_POST['finish']['hour'] . ':' . $_POST['finish']['minute'] . ' ' . $_POST['finish']['meridiem'], 'd/m/Y h:i a');
+    $start = Alaress_Date_Format::newLocalShort($_POST['start']['date'])
+        ->set12Hour($_POST['start']['hour'], $_POST['start']['meridiem'])
+        ->setMinute($_POST['start']['minute'])
+    ;
+    $finish = Alaress_Date_Format::newLocalShort($_POST['finish']['date'])
+        ->set12Hour($_POST['finish']['hour'], $_POST['finish']['meridiem'])
+        ->setMinute($_POST['finish']['minute'])
+    ;
 
 	/* Check for valid dates
 	 */
