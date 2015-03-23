@@ -242,7 +242,7 @@
             var date = moment(data.date)
             self.dateDisplay
                 .attr('datetime', date.format('YYYY-MM-DD'))
-                .text(date.format(self.dateFormat))
+                .text(date.format(self.options.dateFormat))
             self.buttons.prop('disabled', false).removeClass('disabled').show()
             self.triggerSelectDateEvent()
         })
