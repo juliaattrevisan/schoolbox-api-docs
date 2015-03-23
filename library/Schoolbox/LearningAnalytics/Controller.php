@@ -155,14 +155,18 @@ class Controller extends Base {
                         'classCompletions' => $overallProgress->getClassCompletions(),
                     ),
                     'results' => array(
-                        'taskTypes' => array(
-                            'all' => $taskTypes->getAllTaskTypes(),
-                            'selected' => $taskTypes->getSelectedTaskFilter(),
+                        'all' => $taskResults->getAllResults(),
+                        'tasks' => array(
+                            'all' => $taskList->getAllTasks(),
+                            'types' => array(
+                                'all' => $taskTypes->getAllTaskTypes(),
+                                'selected' => $taskTypes->getSelectedTaskFilter(),
+                            ),
                         ),
-                        'allTasks' => $taskList->getAllTasks(),
-                        'allResults' => $taskResults->getAllResults(),
-                        'topStudents' => $allAverages->findDescending('average'),
-                        'bottomStudents' => $allAverages->findAscending('average'),
+                        'ranking' => array(
+                            'top' => $allAverages->findDescending('average'),
+                            'bottom' => $allAverages->findAscending('average'),
+                        ),
                     ),
                     'progress' => array(
                         'allUnits' => $stackedUnitProgress->getStackedUnitProgress(),

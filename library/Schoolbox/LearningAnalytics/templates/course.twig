@@ -43,7 +43,7 @@
              * five-point summaries
              */
             allAssessments: [
-{% for currentTask in results.allTasks %}
+{% for currentTask in results.tasks.all %}
 "{{ currentTask.getTitle() }}"{% if not loop.last %},
 {% endif %}
 {% endfor %}
@@ -53,17 +53,17 @@
             /* All the raw data
              */
             allData: $.fn.boxPlotCalculateAllSeriesData([
-{% for currentTask in results.allTasks %}
+{% for currentTask in results.tasks.all %}
 [
     {# Highcharts won't render without at least one data point #}
-    {% if results.allResults[currentTask.getTask().getId()]|length == 0 %}
+    {% if results.all[currentTask.getTask().getId()]|length == 0 %}
     {
         info: null,
         uid: null,
         value: -100
     }
     {% endif %}
-    {% for currentValue in results.allResults[currentTask.getTask().getId()] %}
+    {% for currentValue in results.all[currentTask.getTask().getId()] %}
     {
         info: "{{ currentValue.user.getFullName() }}",
         uid: '{{ currentValue.user.getId() }}',
@@ -216,9 +216,9 @@
 
 <div class="medium-3 columns">
     <h3>Top Students</h3>
-    {% if results.topStudents|length > 0 %}
+    {% if results.ranking.top|length > 0 %}
     <ul>
-        {% for currentStudent in results.topStudents|slice(0,3) %}
+        {% for currentStudent in results.ranking.top|slice(0,3) %}
         <li>
             <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
             {{ currentStudent.average|number_format(1) }}%
@@ -233,9 +233,9 @@
 </div>
 <div class="medium-3 columns">
     <h3>Bottom Students</h3>
-    {% if results.topStudents|length > 0 %}
+    {% if results.ranking.bottom|length > 0 %}
     <ul>
-        {% for currentStudent in results.bottomStudents|slice(0,3) %}
+        {% for currentStudent in results.ranking.bottom|slice(0,3) %}
         <li>
             <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
             {{ currentStudent.average|number_format(1) }}%
@@ -253,20 +253,20 @@
 
 <h2>
     Results
-    {% if results.taskTypes.selected.getId() > 0 %}
-    ({{ results.taskTypes.selected.getName() }})
+    {% if results.tasks.types.selected.getId() > 0 %}
+    ({{ results.tasks.types.selected.getName() }})
     {% endif %}
 </h2>
 <a class="button icon-menu"href="#" data-dropdown="taskFilter">Type Filter</a>
 <ul class="f-dropdown" data-dropdown-content="" id="taskFilter">
     {% if metadata.route == 'course' %}
         <li><a href="/learningAnalytics/course/{{ metadata.courseFolder.getId() }}">All</a></li>
-        {% for currentTaskType in results.taskTypes.all %}
+        {% for currentTaskType in results.tasks.types.all %}
         <li><a href="/learningAnalytics/course/{{ metadata.courseFolder.getId() }}/task/{{ currentTaskType.getId() }}">{{ currentTaskType.getName() }}</a></li>
         {% endfor %}
     {% elseif metadata.route == 'folder' %}
         <li><a href="/learningAnalytics/course/{{ metadata.courseFolder.getId() }}/folder/{{ metadata.selectedFolder.getId() }}">All</a></li>
-        {% for currentTaskType in results.taskTypes.all %}
+        {% for currentTaskType in results.task.types.all %}
         <li><a href="/learningAnalytics/course/{{ metadata.courseFolder.getId() }}/folder/{{ metadata.selectedFolder.getId() }}/task/{{ currentTaskType.getId() }}">{{ currentTaskType.getName() }}</a></li>
         {% endfor %}
     {% endif %}
