@@ -64,6 +64,50 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
+     * Static constructor: creates a new date, with the format based on
+     * $locale->localFormat().
+     *
+     * @param string                        $dateTime
+     * @param DateTimeZone                  $timezone Optional timezone
+     * @param Alaress_Date_Locale_Interface $locale   Optional locale, falls back to
+     *                                                new Alaress_Date_Locale_Config()
+     *
+     * @return static
+     */
+    public static function newLocal(
+        $dateTime,
+        DateTimeZone $timezone = null,
+        Alaress_Date_Locale_Interface $locale = null
+    ) {
+        if (!$locale instanceof Alaress_Date_Locale_Interface) {
+            $locale = new Alaress_Date_Locale_Config();
+        }
+        return new static($dateTime, $locale->localFormat(), $timezone, $locale);
+    }
+
+    /**
+     * Static constructor: creates a new date, with the format based on
+     * $locale->localShortFormat().
+     *
+     * @param string                        $dateTime
+     * @param DateTimeZone                  $timezone Optional timezone
+     * @param Alaress_Date_Locale_Interface $locale   Optional locale, falls back to
+     *                                                new Alaress_Date_Locale_Config()
+     *
+     * @return static
+     */
+    public static function newLocalShort(
+        $dateTime,
+        DateTimeZone $timezone = null,
+        Alaress_Date_Locale_Interface $locale = null
+    ) {
+        if (!$locale instanceof Alaress_Date_Locale_Interface) {
+            $locale = new Alaress_Date_Locale_Config();
+        }
+        return new static($dateTime, $locale->localShortFormat(), $timezone, $locale);
+    }
+
+    /**
      * Set up datetime data for processing. Choose your strategy here!
      * Choose your locale as well; this would probably come from the Config
      * table rather than have a concrete instantiation
