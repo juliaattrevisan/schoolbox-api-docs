@@ -47,7 +47,31 @@ class Controller extends Base {
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
      */
+    public function courseWithTask($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances) {
+        $this->process($allUnitInstances, new MetadataCourse($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances));
+    }
+
+    /**
+     * Same calculations as process(), just for a different set of units
+     *
+     * @param array $params
+     * @param Folder $courseFolder
+     * @param Collection $allFoldersUsingCourse
+     * @param Collection $allUnitInstances
+     */
     public function folder($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances) {
+        $this->process($allUnitInstances, new MetadataFolder($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances));
+    }
+
+    /**
+     * Same calculations as process(), just for a different set of units
+     *
+     * @param array $params
+     * @param Folder $courseFolder
+     * @param Collection $allFoldersUsingCourse
+     * @param Collection $allUnitInstances
+     */
+    public function folderWithTask($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances) {
         $this->process($allUnitInstances, new MetadataFolder($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances));
     }
 
