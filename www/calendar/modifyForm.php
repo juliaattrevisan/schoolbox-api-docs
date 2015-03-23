@@ -66,12 +66,12 @@ switch ($_POST['action']) {
          * TODO: Fix validator in Alaress Date Format
          */
         if (strlen($_POST['publishDate'])) {
-            $pubDateObject = new Alaress_Date_Format($_POST['publishDate'], 'd/m/Y');
+            $pubDateObject = Alaress_Date_Format::newLocalShort($_POST['publishDate']);
         }
         /* Events recur until this time
          */
         if (strlen($_POST['repeat_until'])) {
-            $until = new Alaress_Date_Format($_POST['repeat_until'], 'd/m/Y');
+            $until = Alaress_Date_Format::newLocalShort($_POST['repeat_until']);
         }
         /* Start and end dates
          */

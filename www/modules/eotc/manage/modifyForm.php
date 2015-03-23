@@ -101,7 +101,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			/* Events recur until this time
 			 */
 			if (strlen($_POST['repeat_until'])) {
-				$until = new Alaress_Date_Format($_POST['repeat_until'], 'd/m/Y');
+				$until = Alaress_Date_Format::newLocalShort($_POST['repeat_until']);
 			}
 
 			/* Start and end dates

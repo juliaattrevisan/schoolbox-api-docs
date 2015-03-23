@@ -521,7 +521,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 	 */
 	public function getCateringReport($date) {
 		if (!is_a($date, 'Alaress_Date_Format')) {
-			$date = new Alaress_Date_Format($date, 'd/m/Y');
+			$date = Alaress_Date_Format::newLocalShort($date);
 		}
 
 		$breakfastStart = new Alaress_Date_Format(strtotime( $date->getDatabaseDate() .' '. Cfg::get('boarder_breakfast_start')), 'U');

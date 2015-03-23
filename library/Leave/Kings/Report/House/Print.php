@@ -18,7 +18,7 @@ class Leave_Kings_Report_House_Print extends Leave_Kings_Report_House_Web {
 	protected function renderMetaDetails() {
 		parent::renderMetaDetails();
 
-		$weekEnding = new Alaress_Date_Format($this->getReportDate(), 'd/m/Y');
+		$weekEnding = Alaress_Date_Format::newLocalShort($this->getReportDate());
 		$weekEnding->addDays(Leave_Controller::SUNDAY - $weekEnding->getWeekDayNumber());
 
 		$this->getPage()->setVar(array(

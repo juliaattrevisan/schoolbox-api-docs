@@ -387,7 +387,7 @@ class Leave_Controller extends Controller
             return true;
         }
 
-        $thresholdDateTime = new \Alaress_Date_Format($startDate, 'd/m/Y');
+        $thresholdDateTime = \Alaress_Date_Format::newLocalShort($startDate);
         $weekdayIndex = $thresholdDateTime->getWeekDayNumber();
 
         /* Get back to nearest Friday, which comes after furthest Thursday
@@ -1200,10 +1200,10 @@ class Leave_Controller extends Controller
         /* Mess with these two magic numbers to change the range, in conjunction
            * with the class constant RANGE
            */
-        $reportStart = new Alaress_Date_Format($date, 'd/m/Y');
+        $reportStart = Alaress_Date_Format::newLocalShort($date);
         $reportStart->addDays(self::FRIDAY - $reportStart->getWeekDayNumber());
 
-        $reportFinish = new Alaress_Date_Format($date, 'd/m/Y');
+        $reportFinish = Alaress_Date_Format::newLocalShort($date);
         $reportFinish->addDays(self::SUNDAY - $reportFinish->getWeekDayNumber());
         $reportFinish->addHours(24);
 
@@ -1281,7 +1281,7 @@ class Leave_Controller extends Controller
         /* Skip Friday
            */
         for ($i = self::SATURDAY; $i <= self::SUNDAY; $i++) {
-            $currentDate = new Alaress_Date_Format($date, 'd/m/Y');
+            $currentDate = Alaress_Date_Format::newLocalShort($date);
             $currentDate->addDays($i - $currentDate->getWeekDayNumber());
 
             $data['dateList'][] = $currentDate;
