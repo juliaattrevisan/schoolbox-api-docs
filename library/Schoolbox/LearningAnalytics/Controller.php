@@ -20,9 +20,6 @@ use Schoolbox\LearningAnalytics\Results\Averages;
 use Schoolbox\LearningAnalytics\Results\TaskList;
 use Schoolbox\LearningAnalytics\Results\TaskResults;
 use Schoolbox\LearningAnalytics\Results\TaskTypes;
-use Schoolbox\LearningAnalytics\Metadata\Base as Metadata;
-use Schoolbox\LearningAnalytics\Metadata\Course as MetadataCourse;
-use Schoolbox\LearningAnalytics\Metadata\Folder as MetadataFolder;
 use Schoolbox\LearningAnalytics\Rubrics\AllRubrics;
 use Schoolbox\LearningAnalytics\Effort\AllEffort;
 
@@ -37,7 +34,7 @@ class Controller extends Base {
      * @param Collection $allUnitInstances
      */
     public function course($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances) {
-        $this->process($allUnitInstances, new MetadataCourse($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances));
+        $this->process($allUnitInstances, new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances));
     }
 
     /**
@@ -49,7 +46,7 @@ class Controller extends Base {
      * @param Collection $allUnitInstances
      */
     public function courseWithTask($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances) {
-        $this->process($allUnitInstances, new MetadataCourse($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances));
+        $this->process($allUnitInstances, new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances));
     }
 
     /**
@@ -61,7 +58,7 @@ class Controller extends Base {
      * @param Collection $allUnitInstances
      */
     public function folder($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances) {
-        $this->process($allUnitInstances, new MetadataFolder($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances));
+        $this->process($allUnitInstances, new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances));
     }
 
     /**
@@ -73,7 +70,7 @@ class Controller extends Base {
      * @param Collection $allUnitInstances
      */
     public function folderWithTask($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances) {
-        $this->process($allUnitInstances, new MetadataFolder($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances));
+        $this->process($allUnitInstances, new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances));
     }
 
     /**

@@ -8,13 +8,13 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\LearningAnalytics\Metadata;
+namespace Schoolbox\LearningAnalytics;
 
 use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
-abstract class Base {
+class Metadata {
 
     /**
      * An array of params from aura

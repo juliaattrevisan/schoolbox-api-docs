@@ -11,7 +11,7 @@
 namespace Schoolbox\LearningAnalytics\Results;
 
 use Schoolbox\LearningAnalytics\Registry;
-use Schoolbox\LearningAnalytics\Metadata\Base as Metadata;
+use Schoolbox\LearningAnalytics\Metadata;
 
 class TaskList {
 

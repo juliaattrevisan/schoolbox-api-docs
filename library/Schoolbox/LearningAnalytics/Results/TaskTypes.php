@@ -13,7 +13,7 @@ namespace Schoolbox\LearningAnalytics\Results;
 use Schoolbox\Collection;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
-use Schoolbox\LearningAnalytics\Metadata\Base as Metadata;
+use Schoolbox\LearningAnalytics\Metadata;
 
 class TaskTypes {
 

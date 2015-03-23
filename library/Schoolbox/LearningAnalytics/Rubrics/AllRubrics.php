@@ -10,7 +10,7 @@
 
 namespace Schoolbox\LearningAnalytics\Rubrics;
 
-use Schoolbox\LearningAnalytics\Metadata\Base as Metadata;
+use Schoolbox\LearningAnalytics\Metadata;
 use Schoolbox\LearningAnalytics\Registry;
 
 class AllRubrics {
@@ -143,7 +143,7 @@ class AllRubrics {
     /**
      * Set metadata
      *
-     * @param \Schoolbox\LearningAnalytics\Metadata\Base $metadata
+     * @param Metadata $metadata
      */
     private function setMetadata($metadata)
     {
@@ -153,7 +153,7 @@ class AllRubrics {
     /**
      * Get metadata
      *
-     * @return \Schoolbox\LearningAnalytics\Metadata\Base
+     * @return Metadata
      */
     private function getMetadata()
     {

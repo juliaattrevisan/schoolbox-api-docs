@@ -11,7 +11,7 @@
 namespace Schoolbox\LearningAnalytics\Effort;
 
 use Schoolbox\LearningAnalytics\Registry;
-use Schoolbox\LearningAnalytics\Metadata\Base as Metadata;
+use Schoolbox\LearningAnalytics\Metadata;
 use Schoolbox\LearningAnalytics\Results\Averages;
 use Schoolbox\Resource\Folder\Log\Mapper as FolderLogMapper;
 
