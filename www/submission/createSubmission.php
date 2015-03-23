@@ -319,7 +319,7 @@ $late_date    = $submission->getLateDate();
 $publish_hour = '';
 $publish_min  = '';
 if (!$publish_date->isAtStartOfDay()) {
-    $publish_hour = $publish_date->getUsingFormat('g');
+    $publish_hour = $publish_date->get12Hour();
     $publish_min  = $publish_date->getUsingFormat('i');
 }
 
@@ -327,7 +327,7 @@ if ($open_date->isAtStartOfDay()) {
     $open_hour = '';
     $open_min  = '';
 } else {
-    $open_hour = $open_date->getUsingFormat('g');
+    $open_hour = $open_date->get12Hour();
     $open_min  = $open_date->getUsingFormat('i');
 }
 
@@ -335,7 +335,7 @@ if ($due_date->isAtEndOfDay()) {
     $due_hour = '';
     $due_min  = '';
 } else {
-    $due_hour = $due_date->getUsingFormat('g');
+    $due_hour = $due_date->get12Hour();
     $due_min  = $due_date->getUsingFormat('i');
 }
 
@@ -343,7 +343,7 @@ if ($late_date->isAtEndOfDay()) {
     $late_hour = '';
     $late_min  = '';
 } else {
-    $late_hour = $late_date->getUsingFormat('g');
+    $late_hour = $late_date->get12Hour();
     $late_min  = $late_date->getUsingFormat('i');
 }
 

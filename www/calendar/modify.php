@@ -87,7 +87,7 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? 'checked="checked"' : '',
             'EVENT_TIMEINPUTS'     => $event->getAllDay() ? 'hide' : '',
             'EVENT_START_DATE'     => $event->getStartDateTime()->getLocalShort(),
-            'EVENT_START_HOUR'     => $event->getStartDateTime()->getUsingFormat('g'),
+            'EVENT_START_HOUR'     => $event->getStartDateTime()->get12Hour(),
             'EVENT_START_MIN'      => $event->getStartDateTime()->getUsingFormat('i'),
             'EVENT_START_AM'       => $event->getStartDateTime()->isAM()
                     ? 'selected="selected"'
@@ -96,7 +96,7 @@ if (is_numeric($_GET['eventID'])) {
                     ? 'selected="selected"'
                     : '',
             'EVENT_END_DATE'       => $event->getEndDateTime()->getLocalShort(),
-            'EVENT_END_HOUR'       => $event->getEndDateTime()->getUsingFormat('g'),
+            'EVENT_END_HOUR'       => $event->getEndDateTime()->get12Hour(),
             'EVENT_END_MIN'        => $event->getEndDateTime()->getUsingFormat('i'),
             'EVENT_END_AM'         => $event->getEndDateTime()->isAM()
                     ? 'selected="selected"'
@@ -177,7 +177,7 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? 'checked="checked"' : '',
             'EVENT_TIMEINPUTS'     => $event->getAllDay() ? 'hide' : '',
             'EVENT_START_DATE'     => $event->getStartDateTime()->getLocalShort(),
-            'EVENT_START_HOUR'     => $event->getStartDateTime()->getUsingFormat('g'),
+            'EVENT_START_HOUR'     => $event->getStartDateTime()->get12Hour(),
             'EVENT_START_MIN'      => $event->getStartDateTime()->getUsingFormat('i'),
             'EVENT_START_AM'       => $event->getStartDateTime()->isAM()
                     ? 'selected="selected"'
@@ -186,7 +186,7 @@ if (is_numeric($_GET['eventID'])) {
                     ? 'selected="selected"'
                     : '',
             'EVENT_END_DATE'       => $event->getEndDateTime()->getLocalShort(),
-            'EVENT_END_HOUR'       => $event->getEndDateTime()->getUsingFormat('g'),
+            'EVENT_END_HOUR'       => $event->getEndDateTime()->get12Hour(),
             'EVENT_END_MIN'        => $event->getEndDateTime()->getUsingFormat('i'),
             'EVENT_END_AM'         => $event->getEndDateTime()->isAM()
                     ? 'selected="selected"'

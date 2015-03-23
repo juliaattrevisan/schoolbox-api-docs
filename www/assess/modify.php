@@ -147,7 +147,7 @@ else {
     /* Render starting times
      */
 	$this->setVar(array(
-		'START_HOUR_VALUE' => $assessStartDate->getUsingFormat('g'),
+		'START_HOUR_VALUE' => $assessStartDate->get12Hour(),
 		'START_MINUTE_VALUE' => $assessStartDate->getUsingFormat('i'),
 	));
 
@@ -163,7 +163,7 @@ else {
     /* Render finish times
      */
 	$this->setVar(array(
-		'FINISH_HOUR_VALUE' => $assessFinishDate->getUsingFormat('g'),
+		'FINISH_HOUR_VALUE' => $assessFinishDate->get12Hour(),
 		'FINISH_MINUTE_VALUE' => $assessFinishDate->getUsingFormat('i'),
 	));
 
