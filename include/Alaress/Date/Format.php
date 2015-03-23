@@ -17,7 +17,7 @@ use Jenssegers\Date\Date as LaravelDate;
 class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
 {
     /**
-     * @var LavarelDate
+     * @var LaravelDate
      */
     protected $datetime;
 
