@@ -10,29 +10,18 @@
 namespace Schoolbox\Resource\File;
 
 
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
 
-interface IFile
+interface IFile extends IStorage
 {
-
-    /**
-     * Returns the full mime string for the file
-     * @return string
-     */
-    public function getMime();
 
     /**
      * Returns the ID of the file
      * @return int
      */
     public function getId();
-
-    /**
-     * Returns the size on disk of the file
-     * @return int
-     */
-    public function getSize();
 
     /**
      * Returns the real filename of the file
