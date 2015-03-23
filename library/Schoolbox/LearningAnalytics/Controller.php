@@ -128,7 +128,7 @@ class Controller extends Base {
         /**
          * Rubrics
          */
-        $allRubrics = new AllRubrics($metadata, $registry);
+        $allRubrics = new AllRubrics($registry, $metadata);
 
         /**
          * Effort

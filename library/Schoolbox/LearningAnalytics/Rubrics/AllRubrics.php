@@ -46,10 +46,10 @@ class AllRubrics {
     /**
      * Constructor
      *
-     * @param Metadata $metadata
      * @param Registry $registry
+     * @param Metadata $metadata
      */
-    public function __construct(Metadata $metadata, Registry $registry) {
+    public function __construct(Registry $registry, Metadata $metadata) {
         $this->setMetadata($metadata);
         $this->setRegistry($registry);
         $this->setRubricHandler(new \DueWork_Rubric_Handler());
@@ -163,7 +163,7 @@ class AllRubrics {
     /**
      * Set registry
      *
-     * @param \Schoolbox\LearningAnalytics\Registry $registry
+     * @param Registry $registry
      */
     private function setRegistry($registry)
     {
@@ -173,7 +173,7 @@ class AllRubrics {
     /**
      * Get registry
      *
-     * @return \Schoolbox\LearningAnalytics\Registry
+     * @return Registry
      */
     private function getRegistry()
     {
