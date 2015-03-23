@@ -23,9 +23,13 @@
   $(document).ready(function() {
       $('#nav').touchMenu();
   });
-  // Datepicker format
+  // Date formats (global variable)
+  var dateDisplayFormats = {
+      datepicker: {DATEPICKER_FORMAT},
+      momentJs:   {MOMENTJS_FORMAT}
+  };
   $.datepicker.setDefaults({
-      dateFormat: '{DATEPICKER_FORMAT}'
+      dateFormat: dateDisplayFormats.datepicker
   })
 </script>
 <!-- Classes on document for when IE < 11 -->
