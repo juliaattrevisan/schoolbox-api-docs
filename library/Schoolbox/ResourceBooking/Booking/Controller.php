@@ -611,13 +611,19 @@ class Controller extends Base
                 );
 
                 // Check each in series (if there is one)
-                $repeatUntil = DateTime::createFromFormat('d/m/Y', $this->getRequest()->post['repeat_until']);
-                $series      = array();
-                if ($repeatUntil instanceof DateTime) {
+                $series = array();
+                try {
+                    $repeatUntil = Alaress_Date_Format::newLocalShort(
+                        $this->getRequest()->post['repeat_until']
+                    );
+                } catch (\Exception $e) {
+                    $repeatUntil = null;
+                }
+                if ($repeatUntil instanceof Alaress_Date_Format) {
                     $series = $this->getRecurrencePeriod(
                         $startDate,
                         $this->request->post['repeat'],
-                        $repeatUntil,
+                        $repeatUntil->getDateTimeObject(),
                         $this->request->post['timetable']['campus']
                     );
                 }
@@ -796,20 +802,18 @@ class Controller extends Base
      */
     protected function getDateFromForm($paramName)
     {
-        $datetime = DateTime::createFromFormat(
-            'd/m/Y g:iA',
-            sprintf(
-                '%s %02d:%02d%s',
-                $this->getRequest()->post[$paramName]['date'],
-                $this->getRequest()->post[$paramName]['hour'],
-                $this->getRequest()->post[$paramName]['minute'],
-                $this->getRequest()->post[$paramName]['meridien']
-            )
-        );
-        if (!($datetime instanceof DateTime)) {
-            throw new \UnexpectedValueException('Could not build date out of form inputs');
+        try {
+            $dateObject = Alaress_Date_Format::newLocalShort($this->getRequest()->post[$paramName]['date'])
+                ->set12Hour(
+                    $this->getRequest()->post[$paramName]['hour'],
+                    $this->getRequest()->post[$paramName]['meridien']
+                )
+                ->setMinute($this->getRequest()->post[$paramName]['minute'])
+            ;
+        } catch (\Exception $e) {
+            throw new \UnexpectedValueException('Could not build date out of form inputs', 0, $e);
         }
-        return $datetime;
+        return $dateObject->getDateTimeObject();
     }
 
     /**
