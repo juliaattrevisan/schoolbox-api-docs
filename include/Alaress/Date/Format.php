@@ -933,6 +933,19 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
+     * Extract the day of this date.
+     *
+     * @param bool $leadingZero True if leading zero is fetched, false if not
+     *                          Defaults to false.
+     *
+     * @return int
+     */
+    public function getDay($leadingZero = false)
+    {
+        return $this->getUsingFormat($leadingZero ? 'd' : 'j');
+    }
+
+    /**
      * Gets the year half of this date.
      *
      * * Jan-Jun: 1
