@@ -814,6 +814,26 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
+     * Extracts the 12-hour time of this date, without leading zeroes.
+     *
+     * @return int
+     */
+    public function get12Hour()
+    {
+        return $this->getUsingFormat('g');
+    }
+
+    /**
+     * Extracts the 24-hour time of this date, without leading zeroes.
+     *
+     * @return int
+     */
+    public function get24Hour()
+    {
+        return $this->getUsingFormat('h');
+    }
+
+    /**
      * Extracts the meridiem of this date.
      *
      * @return string
