@@ -148,7 +148,7 @@ else {
      */
 	$this->setVar(array(
 		'START_HOUR_VALUE' => $assessStartDate->get12Hour(),
-		'START_MINUTE_VALUE' => $assessStartDate->getUsingFormat('i'),
+		'START_MINUTE_VALUE' => $assessStartDate->getMinute(true),
 	));
 
     foreach (array('AM', 'PM') as $meridiem) {
@@ -164,7 +164,7 @@ else {
      */
 	$this->setVar(array(
 		'FINISH_HOUR_VALUE' => $assessFinishDate->get12Hour(),
-		'FINISH_MINUTE_VALUE' => $assessFinishDate->getUsingFormat('i'),
+		'FINISH_MINUTE_VALUE' => $assessFinishDate->getMinute(true),
 	));
 
 	foreach (array('AM', 'PM') as $meridiem) {
