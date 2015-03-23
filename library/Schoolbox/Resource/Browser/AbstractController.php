@@ -14,7 +14,9 @@ use Schoolbox\Collection;
 use Schoolbox\Config;
 use Schoolbox\FileInterface;
 use Schoolbox\FolderInterface;
+use Schoolbox\Mapper;
 use Schoolbox\Resource;
+use Schoolbox\UserMapper;
 
 abstract class AbstractController extends BaseController
 {
@@ -31,6 +33,19 @@ abstract class AbstractController extends BaseController
     /** @var Resource\Folder\Mapper */
     protected $folderMapper;
 
+    /** @var UserMapper */
+    protected $userMapper;
+
+
+    /**
+     * @param UserMapper $userMapper
+     * @return self
+     */
+    public function setUserMapper($userMapper)
+    {
+        $this->userMapper = $userMapper;
+        return $this;
+    }
 
     /**
      * @param Resource\Folder\Mapper $folderMapper
@@ -210,8 +225,20 @@ abstract class AbstractController extends BaseController
     /**
      * @param int $fileId
      * @return FileInterface
+     * @throws Mapper\Exception
      */
-    protected abstract function getFile($fileId);
+    protected function getFile($fileId)
+    {
+        /** @var FileInterface $file */
+        $file = $this->fileMapper->findById($fileId);
+
+        // urgh...
+        if (method_exists($file, 'setOwner')) {
+            $file->setOwner($this->userMapper->findById($file->getOwner()->getId()));
+        }
+
+        return $file;
+    }
 
 
     /**

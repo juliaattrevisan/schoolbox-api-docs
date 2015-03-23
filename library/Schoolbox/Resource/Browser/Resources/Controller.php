@@ -17,7 +17,6 @@ use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractController;
 use Schoolbox\Mapper;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 class Controller extends AbstractController
 {
@@ -26,9 +25,6 @@ class Controller extends AbstractController
 
     /** @var UserAccessMapper */
     protected $userAccessMapper;
-
-    /** @var UserMapper */
-    protected $userMapper;
 
 
     /**
@@ -54,18 +50,6 @@ class Controller extends AbstractController
 
 
     /**
-     * @param UserMapper $userMapper
-     * @return self
-     */
-    public function setUserMapper($userMapper)
-    {
-        $this->userMapper = $userMapper;
-        return $this;
-    }
-
-
-
-    /**
      * @param int $folderId
      * @return array
      */
@@ -86,22 +70,6 @@ class Controller extends AbstractController
         }
 
         return $data;
-    }
-
-
-    /**
-     * @param int $fileId
-     * @return Resource\File
-     * @throws Mapper\Exception
-     */
-    protected function getFile($fileId)
-    {
-        /** @var Resource\File $file */
-        $file = $this->fileMapper->findById($fileId);
-        // urgh...
-        $file->setOwner($this->userMapper->findById($file->getOwner()->getId()));
-
-        return $file;
     }
 
 
