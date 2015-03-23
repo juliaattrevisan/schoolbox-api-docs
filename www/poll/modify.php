@@ -72,7 +72,7 @@ if (is_numeric($this->arg[0])) {
         'OPTION_7' => '',
         'OPTION_8' => '',
         'OPTION_9' => '',
-        'CLOSE' => date("d/m/Y", strtotime("+1 month")),
+        'CLOSE' => Alaress_Date_Format::now()->addMonths(1)->getLocalShort(),
         'FREQUENCY_ONCE_SELECTED' => '',
         'FREQUENCY_HOURLY_SELECTED' => '',
         'FREQUENCY_DAILY_SELECTED' => '',
