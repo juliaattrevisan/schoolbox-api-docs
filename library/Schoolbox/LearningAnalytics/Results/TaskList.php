@@ -11,6 +11,7 @@
 namespace Schoolbox\LearningAnalytics\Results;
 
 use Schoolbox\LearningAnalytics\Registry;
+use Schoolbox\LearningAnalytics\Metadata\Base as Metadata;
 
 class TaskList {
 
@@ -20,6 +21,13 @@ class TaskList {
      * @var Registry
      */
     private $registry = null;
+
+    /**
+     * Request metadata
+     *
+     * @var Metadata
+     */
+    private $metadata = null;
 
     /**
      * An array of taskId-task relations
@@ -35,9 +43,11 @@ class TaskList {
      * Constructor
      *
      * @param Registry $registry
+     * @param Metadata $metadata
      */
-    public function __construct(Registry $registry) {
+    public function __construct(Registry $registry, Metadata $metadata) {
         $this->setRegistry($registry);
+        $this->setMetadata($metadata);
 
         $this->process();
     }
@@ -69,8 +79,38 @@ class TaskList {
 
         foreach ($this->getRegistry()->getAllUnitRegistry() as $currentUnit) {
             foreach ($currentUnit->getTasks() as $currentTask) {
-                if (is_numeric($currentTask->getSubmissionBox()->getId()) || is_numeric($currentTask->getAssessment()->getId())) {
-                    $allTasks[$currentTask->getTask()->getId()] = $currentTask;
+
+                /* If this is a submissionBox
+                 */
+                if (is_numeric($currentTask->getSubmissionBox()->getId())) {
+
+                    /* If a taskId filter was selected, only include those types
+                     * Otherwise include them all
+                     */
+                    if ($this->getMetadata()->getSelectedTaskIdFilter()) {
+                        if ($this->getMetadata()->getSelectedTaskIdFilter() == $currentTask->getSubmissionBox()->getWorkType()->getId()) {
+                            $allTasks[$currentTask->getTask()->getId()] = $currentTask;
+                        }
+                    }
+                    else {
+                        $allTasks[$currentTask->getTask()->getId()] = $currentTask;
+                    }
+                }
+                /* If this is a Quiz
+                 */
+                else if (is_numeric($currentTask->getAssessment()->getId())) {
+
+                    /* If a taskId filter was selected, only include those types
+                     * Otherwise include them all
+                     */
+                    if ($this->getMetadata()->getSelectedTaskIdFilter()) {
+                        if ($this->getMetadata()->getSelectedTaskIdFilter() == $currentTask->getAsssessment()->getWorkType()->getId()) {
+                            $allTasks[$currentTask->getTask()->getId()] = $currentTask;
+                        }
+                    }
+                    else {
+                        $allTasks[$currentTask->getTask()->getId()] = $currentTask;
+                    }
                 }
             }
         }
@@ -120,4 +160,25 @@ class TaskList {
     {
         return $this->allTasks;
     }
+
+    /**
+     * Set metadata
+     *
+     * @param \Schoolbox\LearningAnalytics\Metadata\Base $metadata
+     */
+    private function setMetadata($metadata)
+    {
+        $this->metadata = $metadata;
+    }
+
+    /**
+     * Get metadata
+     *
+     * @return \Schoolbox\LearningAnalytics\Metadata\Base
+     */
+    private function getMetadata()
+    {
+        return $this->metadata;
+    }
+
 }
