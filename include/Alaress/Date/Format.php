@@ -990,9 +990,19 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      *
      * @return int
      */
-    public function get24Hour($leadingZero = false)
+    public function getHour($leadingZero = false)
     {
         return $this->getUsingFormat($leadingZero ? 'H' : 'h');
+    }
+
+    /**
+     * Alias of `$this->getHour()`.
+     *
+     * @see $this->getHour()
+     */
+    public function get24Hour($leadingZero = false)
+    {
+        return $this->getHour($leadingZero);
     }
 
     /**
