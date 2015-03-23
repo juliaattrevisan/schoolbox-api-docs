@@ -21,6 +21,10 @@ PATH="$PATH:$instdir/node_modules/.bin";
 # Installing NPM dependencies
 npm install;
 
+# Install SASS
+apt-get -y install ruby-bundler;
+bundle install;
+
 # Installing and building Bower submodules
 grunt bower build.deps;
 
@@ -29,3 +33,6 @@ grunt build.js;
 
 # Building CSS files via LessCSS
 grunt build.css;
+
+# Build SASS files
+grunt sass;
