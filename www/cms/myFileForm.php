@@ -70,8 +70,8 @@ if (isset($_POST['description'])) {
     // set attributes
     $file->setCreatedAt(Alaress_Date_Format::now());
     $file->setOwner($_SESSION['user']);
-    $file->setDescription($_POST['description']);
-    $file->setParent(\Schoolbox\MyFolderMapper::getInstance()->createModel()->setId($_POST['parent']));
+    $file->setTitle($_POST['description']);
+    $file->setFolder(\Schoolbox\Resource\My\Folder\Mapper::getInstance()->createModel()->setId($_POST['parent']));
 
     try {
         $affectedIds = MyFileMapper::getInstance()->create($file);
@@ -204,7 +204,7 @@ elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
         if ($file->getOwner()->getId() != $_SESSION['id']) {
             die('Insufficient permissions');
         }
-        $file->getParent()->setId($_POST['categoryID']);
+        $file->getFolder()->setId($_POST['categoryID']);
         MyFileMapper::getInstance()->save($file);
     } catch (Schoolbox\Resource\Exception $e) {
         die('Failed');
@@ -228,7 +228,7 @@ function deleteMyFile($fileId)
 
         if ($ownerId == $sessionId || $isSuper) {
             if (MyFileMapper::getInstance()->delete($file)) {
-                return $file->getParent()->getId();
+                return $file->getFolder()->getId();
             }
             throw new Schoolbox\Resource\Exception("Error", 2); // fail to delete
         }

@@ -11,9 +11,16 @@ namespace Schoolbox\Resource\My\File;
 
 
 use Alaress_Date_Format;
+use Schoolbox\Resource;
 use Schoolbox\Resource\AbstractFile;
 use Schoolbox\Resource\File\IFile;
 
+/**
+ * Class Model
+ *
+ * @package Schoolbox\Resource\My\File
+ * @method Resource\My\Folder\Model getFolder()
+ */
 class Model extends AbstractFile implements IFile
 {
     /** @var Alaress_Date_Format */
