@@ -109,7 +109,7 @@ class StudentList {
 
             /* Get a list of externalIds
              */
-            if (is_array($student_list)) {
+            if (is_array($student_list) && is_array($class_list)) {
                 $externalIdList = array_map(
                     function($student) {
                         return $student['synergy_id'];
