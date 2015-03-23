@@ -176,13 +176,19 @@ class InstanceMapper extends Mapper {
             $task = $object->getTask();
             if ($task instanceof Task && $task->getId()) {
                 $cloner = new Cloner($object);
-                if (($assess_id = $task->getAssessment()->getId())) {
-                    $assessment = $cloner->cloneAssessment();
-                    $this->updateAll($object, 'assess_id', $assessment->getId());
-                }
-                if (($box_id = $task->getSubmissionBox()->getId())) {
-                    $box = $cloner->cloneSubmissionBox();
-                    $this->updateAll($object, 'box_id', $box->getId());
+                try {
+                    if (($assess_id = $task->getAssessment()->getId())) {
+                        $assessment = $cloner->cloneAssessment();
+                        $this->updateAll($object, 'assess_id', $assessment->getId());
+                    }
+                    if (($box_id = $task->getSubmissionBox()->getId())) {
+                        $box = $cloner->cloneSubmissionBox();
+                        $this->updateAll($object, 'box_id', $box->getId());
+                    }
+                } catch (ClonerException $e) {
+                    // something went wrong in the clone process.
+                    // Leave this task alone.
+                    // (it probably shouldn't have been imported at all.)
                 }
             }
         }
