@@ -814,7 +814,7 @@ Bubble.prototype.fillForm = function(formId, vars) {
      * @param element
      * @param value
      */
-    var fillElement = function(element, value) {
+    var fillElement = function(element, key, value, allVars) {
         if (element) {
             if (element.length && value && value.length) {
                 if (element.data('is-html')) {
@@ -822,6 +822,15 @@ Bubble.prototype.fillForm = function(formId, vars) {
                 }
                 else {
                     element.text(value)
+                }
+                // Maybe this element is a link?
+                // If so, fill its URL in.
+                if (element.data('is-user-link')) {
+                    if (key + 'Id' in allVars) {
+                        element.attr('href', '/search/user/'+allVars[key+'Id']).prop('disabled', true);
+                    } else {
+                        element.attr('href', '#').prop('disabled', true);
+                    }
                 }
             }
             else {
@@ -852,7 +861,7 @@ Bubble.prototype.fillForm = function(formId, vars) {
         }
         // if no form input element found, try for an element with the right class
         else {
-            fillElement(form.find('.'+k), v)
+            fillElement(form.find('.'+k), k, v, vars)
         }
     })
 }
