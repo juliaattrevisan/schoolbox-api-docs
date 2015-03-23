@@ -14,15 +14,15 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
     {
         parent::setup($context, $config);
         $g = new Group();
-        // Managing permissions for alternate sources:
-        // alt-source permission overrides homepage perm.
+        // Content permission: based on alt source if it's there
+        // Control permission: always based on current context
         if (!empty($config['src']['value'])) {
             $sourceId = $config['src']['value'];
         } else {
             $sourceId = $this->getContext()->getId();
         }
-
-        $this->permission = min($g->getPermission($sourceId), $this->getMaximumPermission());
+        $this->permission        = min($g->getPermission($sourceId), $this->getMaximumPermission());
+        $this->controlPermission = min($g->getPermission($this->getContext()->getId()), $this->getMaximumPermission());
         $this->sitepage->setVar('ID', $this->getContext()->getId());
 
         $this->postConstruct();
@@ -42,4 +42,6 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
 
         return parent::getTemplate($templateName, $templatePath);
     }
+
+
 }

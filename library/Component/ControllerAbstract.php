@@ -40,9 +40,22 @@ abstract class Component_ControllerAbstract
     protected $config;
 
     /**
+     * Permission for component contents.
+     *
      * @var int
      */
     protected $permission = 0;
+
+    /**
+     * Permission for component controls, as opposed to the component content.
+     *
+     * These permissions are always based off of the component's context, as
+     * opposed to component content permissions (@see $this->permission), which
+     * may be based off of an alternate source.
+     *
+     * @var int
+     */
+    protected $controlPermission = 0;
 
     /**
      * The maximum permission allowed for this component.
@@ -285,7 +298,7 @@ abstract class Component_ControllerAbstract
         // there is configuration
         if (is_array($config) && count($config)) {
             // have write access
-            if ($this->permission > READ_ACCESS) {
+            if ($this->controlPermission > READ_ACCESS) {
                 // display full configuration block
                 list($hasWriteAccess, $processConfig, $displayConfig) = array(true, true, true);
             } // do not have write access
@@ -296,7 +309,7 @@ abstract class Component_ControllerAbstract
         } // there is no configuration
         else {
             // have write access
-            if ($this->permission > READ_ACCESS) {
+            if ($this->controlPermission > READ_ACCESS) {
                 // display delete option
                 list($hasWriteAccess, $processConfig, $displayConfig) = array(true, false, false);
             } // do not have write access
