@@ -56,18 +56,18 @@ class Alaress_Date_Format_Converter
             $format,
             array(
                 // day formats
-                'j' => 'd',
-                'd' => 'dd',
-                'D' => 'D',
-                'l' => 'DD',
+                'j' => 'D',
+                'd' => 'DD',
+                'D' => 'ddd',
+                'l' => 'dddd',
                 // month formats
-                'n' => 'm',
-                'm' => 'mm',
-                'M' => 'M',
-                'F' => 'MM',
+                'n' => 'M',
+                'm' => 'MM',
+                'M' => 'MMM',
+                'F' => 'MMMM',
                 // year formats
-                'y' => 'y',
-                'Y' => 'yy',
+                'y' => 'YY',
+                'Y' => 'YYYY',
             )
         );
     }
