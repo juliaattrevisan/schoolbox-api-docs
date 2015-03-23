@@ -295,44 +295,6 @@ class SitePage extends Page
             $debug_bar_body = $renderer->render();
         }
 
-        // Convert date format to datepicker and moment formats.
-        // (long date formats shouldn't be used in date_local, but they're supported)
-        $datepickerFormat = strtr(
-            Config::get('date_local'),
-            array(
-                // day formats
-                'j' => 'd',
-                'd' => 'dd',
-                'D' => 'D',
-                'l' => 'DD',
-                // month formats
-                'n' => 'm',
-                'm' => 'mm',
-                'M' => 'M',
-                'F' => 'MM',
-                // year formats
-                'y' => 'y',
-                'Y' => 'yy',
-            )
-        );
-        $momentFormat = strtr(
-            Config::get('date_local'),
-            array(
-                // day formats
-                'j' => 'D',
-                'd' => 'DD',
-                'D' => 'ddd',
-                'l' => 'dddd',
-                // month formats
-                'n' => 'M',
-                'm' => 'MM',
-                'M' => 'MMM',
-                'F' => 'MMMM',
-                // year formats
-                'y' => 'YY',
-                'Y' => 'YYYY',
-            )
-        );
         $templateVar = array(
             'TEMPLATE_YEAR'          => date('Y'),
             'SITE_NAME'              => Cfg::get('school_name'),
@@ -354,7 +316,8 @@ class SitePage extends Page
             'WEBSOCKET_UNREAD_LABEL' => $_SESSION['msg-count'] ? : '',
             'WEBSOCKET_STACK_LIMIT'  => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
             'PAGE_SECURE'            => empty($_SERVER['HTTPS']) ? 'false' : 'true',
-            'DATEPICKER_FORMAT'      => $datepickerFormat,
+            'DATEPICKER_FORMAT'      => Alaress_Date_Format_Converter::toDatepicker(Config::get('date_local')),
+            'MOMENT_FORMAT'          => Alaress_Date_Format_Converter::toMomentJs(Config::get('date_local')),
         );
 
         $this->setVar($templateVar);
