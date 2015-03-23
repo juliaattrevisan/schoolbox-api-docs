@@ -96,15 +96,15 @@ class Metadata {
         $folderMapper = new FolderMapper();
         $params = $this->getParams();
 
-        try {
-            $this->setSelectedFolder($folderMapper->findById($params['folderId']));
-            $this->getAllAggregateFolders()->add($this->getSelectedFolder());
-        }
         /* Only aggregate for one folder in 'folder' route
          * That is defined by having a $params['folderId']
          *
          * Otherwise aggregate for all folders that used the same course
          */
+        try {
+            $this->setSelectedFolder($folderMapper->findById($params['folderId']));
+            $this->getAllAggregateFolders()->add($this->getSelectedFolder());
+        }
         catch (\Exception $e) {
             $this->setAllAggregateFolders($this->getAllFolders());
         }
