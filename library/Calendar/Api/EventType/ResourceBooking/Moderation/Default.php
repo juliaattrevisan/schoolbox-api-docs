@@ -12,7 +12,8 @@ use Alaress\Authorizer\Failure;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ResourceBooking\Booking;
 
-class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar_Api_EventType_ResourceBooking_Base {
+class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar_Api_EventType_ResourceBooking_Base
+{
 
     /**
      * Can the current user moderate ANY resource item?
@@ -35,7 +36,8 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
     /**
      * Sets up permissions for moderated items
      */
-    protected function setup() {
+    protected function setup()
+    {
         parent::setup();
         $this->loadPermissions();
     }
@@ -46,39 +48,22 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
      *
      * @return Calendar_Event_Collection
      */
-    protected function loadPermissions() {
-
-        // Permissions for bookings that this user moderates.
-        // If the user passes this permission, then they can moderate any item.
-        $baseManageRule = new Rule\Any(
-            new Rule\IsSuperuser(),
-            new Rule\HasServicePermission(
-                UserAccess::SERVICE_RESOURCE_BOOKING,
-                UserAccess::ACCESS_FULL
-            )
+    protected function loadPermissions()
+    {
+        // We no longer show moderators bookings for all items [SB-6802]
+        // Maybe they are a moderator for some items?
+        $items = $this->getBookingMapper()->getJoinMapper('resource')->findForModerator(
+            $this->user->getId()
         );
-        $restrictedIds = array();
-        try {
-            $baseManageRule->authorize(array(), $this->getUser());
-            $this->setUserCanModerate(true)->setUserRestrictedToIds(array());
+        foreach ($items as $item) {
+            $restrictedIds[] = $item->getId();
         }
-        catch (Failure\Base $e) {
-            // This user isn't a moderator.
-            // Maybe they are a moderator for some items?
-            $items = $this->getBookingMapper()->getJoinMapper('resource')->findForModerator(
-                $this->user->getId()
-            );
-            foreach ($items as $item) {
-                $restrictedIds[] = $item->getId();
-            }
-            // If I still don't moderate any items - return empty collection.
-            // There should be notice that this user doesn't moderate any items.
-            if (empty($restrictedIds)) {
-                $this->setUserCanModerate(false);
-            }
-            else {
-                $this->setUserCanModerate(true)->setUserRestrictedToIds($restrictedIds);
-            }
+        // If I still don't moderate any items - return empty collection.
+        // There should be notice that this user doesn't moderate any items.
+        if (empty($restrictedIds)) {
+            $this->setUserCanModerate(false);
+        } else {
+            $this->setUserCanModerate(true)->setUserRestrictedToIds($restrictedIds);
         }
     }
 
@@ -90,7 +75,8 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
      *
      * @return Calendar_Event_Collection|Calendar_Event_Type_ResourceBooking[]
      */
-    public function getEvents($startTimestamp, $endTimestamp) {
+    public function getEvents($startTimestamp, $endTimestamp)
+    {
 
         // If I can't moderate anything - don't even bother looking.
         if (!$this->getUserCanModerate()) {
@@ -133,7 +119,8 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
      * @param $eventId
      * @return Calendar_Event_Collection
      */
-    public function getEvent($eventId) {
+    public function getEvent($eventId)
+    {
 //        return $this->getCalendarHandler()->getEvent($eventId);
     }
 
@@ -144,7 +131,8 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
      * @param  bool  $userCanModerate
      * @return $this
      */
-    protected function setUserCanModerate($userCanModerate) {
+    protected function setUserCanModerate($userCanModerate)
+    {
         $this->userCanModerate = $userCanModerate;
         return $this;
     }
@@ -152,7 +140,8 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
     /**
      * @return bool
      */
-    public function getUserCanModerate() {
+    public function getUserCanModerate()
+    {
         return $this->userCanModerate;
     }
 
@@ -163,7 +152,8 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
      * @param  array $userRestrictedToIds
      * @return $this
      */
-    protected function setUserRestrictedToIds($userRestrictedToIds) {
+    protected function setUserRestrictedToIds($userRestrictedToIds)
+    {
         $this->userRestrictedToIds = $userRestrictedToIds;
         return $this;
     }
@@ -171,7 +161,8 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
     /**
      * @return array
      */
-    public function getUserRestrictedToIds() {
+    public function getUserRestrictedToIds()
+    {
         return $this->userRestrictedToIds;
     }
 
@@ -179,7 +170,8 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
      * @param  Booking\Mapper $bookingMapper
      * @return $this
      */
-    public function setBookingMapper($bookingMapper) {
+    public function setBookingMapper($bookingMapper)
+    {
         $this->bookingMapper = $bookingMapper;
         return $this;
     }
@@ -187,8 +179,8 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
     /**
      * @return Booking\Mapper
      */
-    public function getBookingMapper() {
+    public function getBookingMapper()
+    {
         return $this->bookingMapper;
     }
-
 }
