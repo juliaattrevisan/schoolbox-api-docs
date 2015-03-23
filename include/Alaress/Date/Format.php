@@ -285,6 +285,55 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
+     * Sets a 12 hour time.
+     *
+     * @param int    $hour     The hour to set in 12 hour time
+     * @param string $meridiem The associated meridiem: "AM" or "PM"
+     *
+     * @return $this
+     */
+    public function set12Hour($hour, $meridiem)
+    {
+        if ($hour < 1 || $hour > 12) {
+            trigger_error(
+                sprintf('hour "%s" must be between 1 and 12 - not adjusting date', $hour),
+                E_USER_WARNING
+            );
+            return $this;
+        }
+        switch (strtoupper($meridiem)) {
+            case self::AM:
+                // 12 AM: 0
+                //  1 AM: 1
+                // 11 AM: 11
+                if ($hour == 12) {
+                    $adjustedHour = 0;
+                } else {
+                    $adjustedHour = $hour;
+                }
+                break;
+            case self::PM:
+                // 12 PM: 12
+                //  1 PM: 13
+                // 11 PM: 23
+                if ($hour == 12) {
+                    $adjustedHour = $hour;
+                } else {
+                    $adjustedHour = $hour + 12;
+                }
+                break;
+            default:
+                // meridiem is wrong
+                trigger_error(
+                    sprintf('meridiem "%s" must be "AM" or "PM" - not adjusting date', $meridiem),
+                    E_USER_WARNING
+                );
+                return $this;
+        }
+        return $this->setHour($adjustedHour);
+    }
+
+    /**
      * @param $hour
      * @return $this
      */
