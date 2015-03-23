@@ -145,10 +145,12 @@ class Controller extends Base {
                 'data' => array(
                     'metadata' => array(
                         'pageTitle' => $metadata->getPageTitle(),
-                        'courseFolder' => $metadata->getCourseFolder(),
-                        'allFolders' => $metadata->getAllFolders(),
-                        'selectedFolder' => $metadata->getSelectedFolder(),
                         'route' => $metadata->getRoute(),
+                        'folder' => array(
+                            'all' => $metadata->getAllFolders(),
+                            'course' => $metadata->getCourseFolder(),
+                            'selected' => $metadata->getSelectedFolder(),
+                        ),
                     ),
                     'overallProgress' => array(
                         'mostAdvancedStudent' => $overallProgress->getMostAdvancedStudent(),

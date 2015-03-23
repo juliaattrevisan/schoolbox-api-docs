@@ -190,19 +190,19 @@
 <h1>
     {{ metadata.pageTitle }}
     {% if metadata.route == 'folder' %}
-    - {{ metadata.selectedFolder.getName() }}
+    - {{ metadata.folder.selected.getName() }}
     {% endif %}
 </h1>
 
 <dl class="tabs">
     <dd class="{% if metadata.route == 'course' %}active{% endif %}">
-        <a href='/learningAnalytics/course/{{ metadata.courseFolder.getId() }}'>
+        <a href='/learningAnalytics/course/{{ metadata.folder.course.getId() }}'>
             Course
         </a>
     </dd>
-    {% for folder in metadata.allFolders %}
-    <dd class="{% if (folder.getId() == metadata.selectedFolder.getId()) and (metadata.route == 'folder') %}active{% endif %}">
-        <a href='/learningAnalytics/course/{{ metadata.courseFolder.getId() }}/folder/{{ folder.getId() }}'>
+    {% for folder in metadata.folders.all %}
+    <dd class="{% if (folder.getId() == metadata.folder.selected.getId()) and (metadata.route == 'folder') %}active{% endif %}">
+        <a href='/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ folder.getId() }}'>
             {{ folder.getName() }}
         </a>
     </dd>
@@ -260,14 +260,14 @@
 <a class="button icon-menu"href="#" data-dropdown="taskFilter">Type Filter</a>
 <ul class="f-dropdown" data-dropdown-content="" id="taskFilter">
     {% if metadata.route == 'course' %}
-        <li><a href="/learningAnalytics/course/{{ metadata.courseFolder.getId() }}">All</a></li>
+        <li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}">All</a></li>
         {% for currentTaskType in results.tasks.types.all %}
-        <li><a href="/learningAnalytics/course/{{ metadata.courseFolder.getId() }}/task/{{ currentTaskType.getId() }}">{{ currentTaskType.getName() }}</a></li>
+        <li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/task/{{ currentTaskType.getId() }}">{{ currentTaskType.getName() }}</a></li>
         {% endfor %}
     {% elseif metadata.route == 'folder' %}
-        <li><a href="/learningAnalytics/course/{{ metadata.courseFolder.getId() }}/folder/{{ metadata.selectedFolder.getId() }}">All</a></li>
+        <li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}">All</a></li>
         {% for currentTaskType in results.task.types.all %}
-        <li><a href="/learningAnalytics/course/{{ metadata.courseFolder.getId() }}/folder/{{ metadata.selectedFolder.getId() }}/task/{{ currentTaskType.getId() }}">{{ currentTaskType.getName() }}</a></li>
+        <li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}/task/{{ currentTaskType.getId() }}">{{ currentTaskType.getName() }}</a></li>
         {% endfor %}
     {% endif %}
 </ul>
