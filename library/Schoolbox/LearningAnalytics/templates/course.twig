@@ -266,7 +266,7 @@
         {% endfor %}
     {% elseif metadata.route == 'folder' %}
         <li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}">All</a></li>
-        {% for currentTaskType in results.task.types.all %}
+        {% for currentTaskType in results.tasks.types.all %}
         <li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}/task/{{ currentTaskType.getId() }}">{{ currentTaskType.getName() }}</a></li>
         {% endfor %}
     {% endif %}
