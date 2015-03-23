@@ -426,14 +426,37 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
-     * @param $hour
-     * @param $min
-     * @param $sec
+     * @param int $hour
+     * @param int $min
+     * @param int $sec
      * @return $this
      */
     public function setTime($hour, $min, $sec)
     {
         $this->getDateTimeObject()->setTime($hour, $min, $sec);
+        return $this;
+    }
+
+    /**
+     * 12 hour time equivalent of setTime()
+     *
+     * @param int    $hour
+     * @param int    $min
+     * @param int    $sec
+     * @param string $meridiem
+     * @return $this
+     */
+    public function set12HourTime($hour, $min, $sec, $meridiem)
+    {
+        $adjustedHour = $this->calculate24HourFrom12Hour($hour, $meridiem);
+        if (!isset($adjustedHour)) {
+            trigger_error(
+                'either hour or meridiem was invalid - not adjusting time',
+                E_USER_WARNING
+            );
+            return $this;
+        }
+        $this->getDateTimeObject()->setTime($adjustedHour, $min, $sec);
         return $this;
     }
 
