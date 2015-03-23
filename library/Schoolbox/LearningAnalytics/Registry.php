@@ -14,6 +14,7 @@ use Schoolbox\Collection;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 
 class Registry {
 
@@ -53,6 +54,7 @@ class Registry {
         $unitInstanceMapper = new UnitInstanceMapper();
         $folderMapper = new FolderMapper();
         $submissionBoxMapper = new SubmissionBoxMapper();
+        $quizMapper = new OnlineAssessmentMapper();
 
         /* A registry of unitId-studentList relations
          */
@@ -80,11 +82,21 @@ class Registry {
                  * together manually, because I need the workType hydration
                  */
                 foreach ($currentUnit->getTasks() as $currentTask) {
-                    try {
-                        $submissionBox = $submissionBoxMapper->findById($currentTask->getSubmissionBox()->getId());
-                        $currentTask->setSubmissionBox($submissionBox);
+                    if (is_numeric($currentTask->getSubmissionBox()->getId())) {
+                        try {
+                            $submissionBox = $submissionBoxMapper->findById($currentTask->getSubmissionBox()->getId());
+                            $currentTask->setSubmissionBox($submissionBox);
+                        }
+                        catch (\Exception $e) {
+                        }
                     }
-                    catch (\Exception $e) {
+                    else if (is_numeric($currentTask->getAssessment()->getId())) {
+                        try {
+                            $quiz = $quizMapper->findById($currentTask->getAssessment()->getId());
+                            $currentTask->setAssessment($quiz);
+                        }
+                        catch (\Exception $e) {
+                        }
                     }
                 }
 
