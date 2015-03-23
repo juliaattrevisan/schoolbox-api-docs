@@ -7,6 +7,7 @@
 <script type="text/javascript" src="/javascript/jquery.validate.extensions.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
+    var momentFormat = dateFormats.momentJs;
     $.fn.alaressTiny({
        mode: 'textareas'
     });
@@ -51,6 +52,7 @@ $(document).ready(function() {
     {#var campusList         = {{ campusList|json_encode|raw }}#}
     $('[data-interaction="timetableSelector"]')
         .timetableDaySelector({
+            dateFormat: momentFormat,
             campusList: {{ campusList|json_encode|raw }},
             getChangeDateAjax: function(campus, day, date, previous) {
                 return {
@@ -69,7 +71,7 @@ $(document).ready(function() {
             var timetableTab = $('#timetableSelector')
             date = moment(date)
             if (date.isValid()) {
-                var dateOutput = date.format('DD/MM/YYYY')
+                var dateOutput = date.format(momentFormat)
                 timetableTab.find('input[name="start_datetime[date]"]').val(dateOutput)
                 timetableTab.find('input[name="end_datetime[date]"]').val(dateOutput)
             }

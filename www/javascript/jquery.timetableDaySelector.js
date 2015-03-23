@@ -10,6 +10,7 @@
         var self     = this
         self.element = element
         var defaults = {
+            dateFormat: 'DD/MM/YYYY',
             // Lists of campus, and its day counts and periods
             campusList: {},
 
@@ -241,7 +242,7 @@
             var date = moment(data.date)
             self.dateDisplay
                 .attr('datetime', date.format('YYYY-MM-DD'))
-                .text(date.format('DD/MM/YYYY'))
+                .text(date.format(self.dateFormat))
             self.buttons.prop('disabled', false).removeClass('disabled').show()
             self.triggerSelectDateEvent()
         })
