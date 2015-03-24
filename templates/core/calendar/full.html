@@ -412,13 +412,14 @@
             $('#calendar-export-dialog').dialog({
                 open: function(event, ui) {
                     $(event.target).find('#calendar-export-dialog-url')
-                        .text($.getExportCalendarLink('{USER_TOKEN}', form.serializeArray()));
+                        .text($.getExportCalendarLink('{USER_TOKEN}', form.serializeArray())).select();
                 },
                 minWidth: 400,
                 modal: true
             });
         });
 
+        //Copy and paste button
         var client = new ZeroClipboard($('#copy-button'));
 
         // Copypasted code for updating booking in series
