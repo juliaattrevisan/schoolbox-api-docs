@@ -190,11 +190,11 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
                 );
             }
 
-            $newDateTime = DateTime::createFromFormat($inputDateFormat, $dateTime);
+            $newDateTime = DateTime::createFromFormat($inputDateFormat, $dateTime, $timezone);
             $errors = DateTime::getLastErrors();
             if ($errors['error_count']) {
                 // I don't have a datetime, try again with trailing data allowed
-                $newDateTime = DateTime::createFromFormat($inputDateFormat . '+', $dateTime);
+                $newDateTime = DateTime::createFromFormat($inputDateFormat . '+', $dateTime, $timezone);
                 if (!($newDateTime instanceof DateTime)) {
                     // I still don't have a datetime, exception out
                     $errors = DateTime::getLastErrors();
