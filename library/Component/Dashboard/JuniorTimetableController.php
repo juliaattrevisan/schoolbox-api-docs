@@ -146,7 +146,11 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
                 /* Start restructuring
                  */
                 if (count($timetable[$i]['class'])) {
-                    $period                   = $timetable[$i]['class'][0];
+
+                    /* Fix for SB-7048 prevents you from using first element
+                     * in the stack directly, have to array_values first
+                     */
+                    $period = array_shift(array_values($timetable[$i]['class']));
                     $period['periodStart']    = $timetable[$i]['periodStart'];
                     $period['periodEnd']      = $timetable[$i]['periodEnd'];
                     $period['periodNumber']   = $timetable[$i]['periodNumber'];
