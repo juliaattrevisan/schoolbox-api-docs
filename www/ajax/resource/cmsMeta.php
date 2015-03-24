@@ -9,7 +9,6 @@
  */
 
 require_once('../../../include/Bootstrap.php');
-use Schoolbox\Resource\FileMapper;
 use Schoolbox\File\MimetypeMapper;
 
 // kickstart a session
@@ -126,14 +125,15 @@ function getFolderMeta($folderId) {
  */
 function getSingleFileMeta($folderId, $fileId) {
 
-	$fileHandler = new MyFile();
-	$file = $fileHandler->getByArray(array('id' => $fileId, 'deleted' => 0));
+	$fileHandler = Schoolbox\Resource\My\File\Mapper::getInstance();
 
-	if(!$file) {
+    try {
+        /** @var Schoolbox\Resource\My\File\Model $file */
+        $file = $fileHandler->findById($fileId);
+    } catch (Schoolbox\Mapper\Exception $e) {
 		sendError('No file with the specified ID exists');
+        exit;
 	}
-
-	$file = $file[0];
 
 	// write access provides actions
 	$actions = array('modify', 'delete', 'open', 'download');
@@ -152,25 +152,14 @@ function getSingleFileMeta($folderId, $fileId) {
 		$publishTo[] = $pageData;
 	}
 
-	$mtypeMap = new MimetypeMapper();
-
-	$postDate = new Alaress_Date_Format($file['submitted'], 'Y-m-d H:i:s');
-
-	try {
-		$mimetype = $mtypeMap->getByFilename($file['realname']);
-	}
-	catch (\Exception $e) {
-		$mimetype = $mtypeMap->getUnknownMime();
-	}
-
 	$file = array(
 		'kind' => 'file',
-		'id' => $file['id'],
-		'name' => $file['description'],
-		'mime' => $mimetype->getIconFile(),
-		'filesize' => Alaress_Byte_Format::bytesToString($file['file_size']),
+		'id' => $file->getId(),
+		'name' => $file->getTitle(),
+		'mime' => $file->getMimetype()->getIconFile(),
+		'filesize' => Alaress_Byte_Format::bytesToString($file->getSize()),
 		'posted_by' => 'you',
-		'posted_date' => $postDate->getDateOnly(),
+		'posted_date' => $file->getCreatedAt()->getDateOnly(),
 		'actions' => $actions,
 		'publish' => $publishTo
 	);

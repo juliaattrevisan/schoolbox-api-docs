@@ -1,8 +1,8 @@
 <?php
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
-use \Schoolbox\MyFileMapper;
-use \Schoolbox\MyFile;
+use \Schoolbox\Resource\My\File\Mapper as MyFileMapper;
+use \Schoolbox\Resource\My\File\Model as MyFile;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 $ajax = isset($_GET['ajax']) && $_GET['ajax'];
@@ -68,6 +68,10 @@ if (isset($_POST['description'])) {
     }
 
     // set attributes
+    if (is_null($file->getFilename()) || preg_match('`^[0-9a-f]{40}`', $file->getFilename())) {
+        $file->setFilename($file->getHash() . '.' . $file->getStorage()->getExtension());
+    }
+
     $file->setCreatedAt(Alaress_Date_Format::now());
     $file->setOwner($_SESSION['user']);
     $file->setTitle($_POST['description']);
