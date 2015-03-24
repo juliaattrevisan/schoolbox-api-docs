@@ -276,7 +276,7 @@ class External_Maze_Timetable implements External_TimetableInterface
     {
         $object = new \Alaress_Date_Format(strtotime($date), 'U');
 
-        $dayIndex = $object->getUsingFormat('N');
+        $dayIndex = $object->getWeekDayNumber();
 
         /* Find out how may days to add to find the next Monday
          * Saturday is 6, Sunday is 7

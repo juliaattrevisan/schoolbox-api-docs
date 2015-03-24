@@ -140,10 +140,10 @@ else {
             $end            = $unit->getDueDate()->getDateTimeObject();
             $end->modify('00:00:00 +1 day');
             $assessEndDate  = new Alaress_Date_Format($end);
-            $startHour      = $assessDate->getUsingFormat('g');
-            $startMeridiem  = $assessDate->getUsingFormat('A');
-            $finishHour     = $assessEndDate->getUsingFormat('g');
-            $finishMeridiem = $assessEndDate->getUsingFormat('A');
+            $startHour      = $assessDate->get12Hour();
+            $startMeridiem  = $assessDate->getMeridiem();
+            $finishHour     = $assessEndDate->get12Hour();
+            $finishMeridiem = $assessEndDate->getMeridiem();
         }
         catch (Schoolbox\Mapper\Exception $e) {
             error(126);

@@ -97,9 +97,9 @@ else {
 
     /* Render starting times
      */
-    $assessStartHour = $assessStartDate->getUsingFormat('h');
-    $assessStartMinute = $assessStartDate->getUsingFormat('i');
-    $assessStartMeridiem = $assessStartDate->getUsingFormat('A');
+    $assessStartHour = $assessStartDate->get24Hour();
+    $assessStartMinute = $assessStartDate->getMinute(true);
+    $assessStartMeridiem = $assessStartDate->getMeridiem();
 
 	$this->setVar(array(
 		'START_HOUR_VALUE' => $assessStartHour,
@@ -117,9 +117,9 @@ else {
 
     /* Render finish times
      */
-    $assessFinishHour = $assessFinishDate->getUsingFormat('h');
-    $assessFinishMinute = $assessFinishDate->getUsingFormat('i');
-    $assessFinishMeridiem = $assessFinishDate->getUsingFormat('A');
+    $assessFinishHour = $assessFinishDate->get24Hour();
+    $assessFinishMinute = $assessFinishDate->getMinute(true);
+    $assessFinishMeridiem = $assessFinishDate->getMeridiem();
 
 	/* Render finish times
 	 */

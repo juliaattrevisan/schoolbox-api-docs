@@ -319,32 +319,32 @@ $late_date    = $submission->getLateDate();
 $publish_hour = '';
 $publish_min  = '';
 if (!$publish_date->isAtStartOfDay()) {
-    $publish_hour = $publish_date->getUsingFormat('g');
-    $publish_min  = $publish_date->getUsingFormat('i');
+    $publish_hour = $publish_date->get12Hour();
+    $publish_min  = $publish_date->getMinute(true);
 }
 
 if ($open_date->isAtStartOfDay()) {
     $open_hour = '';
     $open_min  = '';
 } else {
-    $open_hour = $open_date->getUsingFormat('g');
-    $open_min  = $open_date->getUsingFormat('i');
+    $open_hour = $open_date->get12Hour();
+    $open_min  = $open_date->getMinute(true);
 }
 
 if ($due_date->isAtEndOfDay()) {
     $due_hour = '';
     $due_min  = '';
 } else {
-    $due_hour = $due_date->getUsingFormat('g');
-    $due_min  = $due_date->getUsingFormat('i');
+    $due_hour = $due_date->get12Hour();
+    $due_min  = $due_date->getMinute(true);
 }
 
 if ($late_date->isAtEndOfDay()) {
     $late_hour = '';
     $late_min  = '';
 } else {
-    $late_hour = $late_date->getUsingFormat('g');
-    $late_min  = $late_date->getUsingFormat('i');
+    $late_hour = $late_date->get12Hour();
+    $late_min  = $late_date->getMinute(true);
 }
 
 $output = array(
@@ -362,19 +362,19 @@ $output = array(
     'OPEN_DATE'         => $open_date->getUsingFormat('d/m/Y'),
     'OPEN_HOUR'         => $open_hour,
     'OPEN_MIN'          => $open_min,
-    'OPEN_PM'           => $open_date->getUsingFormat('a') == 'pm' ? 'selected' : '',
+    'OPEN_PM'           => $open_date->isPM() ? 'selected' : '',
     'PUBLISH_DATE'      => $publish_date->getUsingFormat('d/m/Y'),
     'PUBLISH_HOUR'      => $publish_hour,
     'PUBLISH_MIN'       => $publish_min,
-    'PUBLISH_PM'        => $publish_date->getUsingFormat('a') == 'pm' ? 'selected' : '',
+    'PUBLISH_PM'        => $publish_date->isPM() ? 'selected' : '',
     'DUE_DATE'          => $due_date->getUsingFormat('d/m/Y'),
     'DUE_HOUR'          => $due_hour,
     'DUE_MIN'           => $due_min,
-    'DUE_PM'            => $due_date->getUsingFormat('a') == 'pm' ? 'selected' : '',
+    'DUE_PM'            => $due_date->isPM() ? 'selected' : '',
     'LATE_DATE'         => $late_date->getUsingFormat('d/m/Y'),
     'LATE_HOUR'         => $late_hour,
     'LATE_MIN'          => $late_min,
-    'LATE_PM'           => $late_date->getUsingFormat('a') == 'pm' ? 'selected' : '',
+    'LATE_PM'           => $late_date->isPM() ? 'selected' : '',
     'FILE_MAX_UPLOAD'   => Cfg::get('file_upload_count'),
     'MAX_FILE_SIZE'     => Cfg::get('max_file_size'),
     'SESSION_NAME'      => session_name(),

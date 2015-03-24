@@ -17,7 +17,7 @@ use Jenssegers\Date\Date as LaravelDate;
 class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
 {
     /**
-     * @var LavarelDate
+     * @var LaravelDate
      */
     protected $datetime;
 
@@ -43,6 +43,8 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     const DATABASE_TIME_FORMAT = 'H:i:s';
     const TIMESTAMP = 'U';
     const URL_FORMAT = 'd-m-Y';
+    const AM = 'AM';
+    const PM = 'PM';
 
     /**
      * Returns an instance of self at the current time.
@@ -778,13 +780,167 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
-     * Extract the numeric representation of the day of the week
+     * Extract the month of this date.
+     *
+     * @param bool $leadingZero True if leading zero is fetched, false if not
+     *                          Defaults to false.
+     *
+     * @return int
+     */
+    public function getMonth($leadingZero = false)
+    {
+        return $this->getUsingFormat($leadingZero ? 'm' : 'n');
+    }
+
+    /**
+     * Gets the year half of this date.
+     *
+     * * Jan-Jun: 1
+     * * Jul-Dec: 2
+     *
+     * @return int
+     */
+    public function getYearHalf()
+    {
+        return $this->getUsingFormat('m') <= 6 ? 1 : 2;
+    }
+
+    /**
+     * Extract the numeric representation of the day of the week, starting at 1
+     * for Monday, through to 7 for Sunday.
      *
      * @return Integer
      */
     public function getWeekDayNumber()
     {
         return $this->getUsingFormat('N');
+    }
+
+    /**
+     * Extracts the 12-hour time of this date.
+     *
+     * @param bool $leadingZero True if leading zero is fetched, false if not
+     *                          Defaults to false.
+     *
+     * @return int
+     */
+    public function get12Hour($leadingZero = false)
+    {
+        return $this->getUsingFormat($leadingZero ? 'G' : 'g');
+    }
+
+    /**
+     * Extracts the 24-hour time of this date.
+     *
+     * @param bool $leadingZero True if leading zero is fetched, false if not
+     *                          Defaults to false.
+     *
+     * @return int
+     */
+    public function get24Hour($leadingZero = false)
+    {
+        return $this->getUsingFormat($leadingZero ? 'H' : 'h');
+    }
+
+    /**
+     * Extracts the minute of this date.
+     *
+     * @param bool $leadingZero True if leading zero is fetched, false if not
+     *                          Defaults to false.
+     *
+     * @return int
+     */
+    public function getMinute($leadingZero = false)
+    {
+        $result = $this->getUsingFormat('i');
+        if (!$leadingZero) {
+            return $this->stripLeadingZero($result);
+        }
+        return $result;
+    }
+
+    /**
+     * Extracts the second part of this date.
+     *
+     * @param bool $leadingZero True if leading zero is fetched, false if not
+     *                          Defaults to false.
+     *
+     * @return int
+     */
+    public function getSecond($leadingZero = false)
+    {
+        $result = $this->getUsingFormat('s');
+        if (!$leadingZero) {
+            return $this->stripLeadingZero($result);
+        }
+        return $result;
+    }
+
+    /**
+     * Strips a leading zero - used by getMinute() and getSecond() as there's
+     * no format for minute and second with no leading zero.
+     *
+     * @param string $result
+     *
+     * @return string
+     */
+    protected function stripLeadingZero($result)
+    {
+        return preg_replace('/^0/', '', $result);
+    }
+
+    /**
+     * Extracts the meridiem of this date.
+     *
+     * @return string
+     */
+    public function getMeridiem()
+    {
+        return $this->getUsingFormat('A');
+    }
+
+    /**
+     * Is this date an AM time?
+     *
+     * @return bool
+     */
+    public function isAM()
+    {
+        // "AM" or "PM" could be locale sensitive, so determine mathematically
+        // 0:00  - 11:59: AM
+        // 12:00 - 23:59: PM
+        return $this->get24Hour() < 12;
+    }
+
+    /**
+     * Is this date a PM time?
+     *
+     * @return bool
+     */
+    public function isPM()
+    {
+        // Is this locale sensitive?
+        return !$this->isAM();
+    }
+
+    /**
+     * Is this date the given meridiem?
+     *
+     * @param string $meridiem self::AM or self::PM or "AM" or "PM"
+     *
+     * @return bool
+     * @throws InvalidArgumentException if $meridiem isn't valid
+     */
+    public function isMeridiem($meridiem)
+    {
+        switch (strtoupper($meridiem)) {
+            case self::AM:
+                return $this->isAM();
+            case self::PM:
+                return $this->isPM();
+            default:
+                throw new InvalidArgumentException('$meridiem must be "AM" or "PM"');
+        }
     }
 
     /**

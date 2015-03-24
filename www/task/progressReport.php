@@ -74,7 +74,7 @@ if (!isset($unit_id)) {
             $firstId = $unit->getId();
         }
         $unitYear     = $unit->getOpenDate()->getYear();
-        $unitSemester = $unit->getOpenDate()->getUsingFormat('m') <= 6 ? 1 : 2;
+        $unitSemester = $unit->getOpenDate()->getYearHalf();
         if ($year == $unitYear && $semester == $unitSemester) {
             $unit_id = $unit->getId();
             break;
@@ -198,10 +198,10 @@ $this->setVar(
 // Unit dropdown, with semester optgroups
 $unit_year_list   = array();
 $current_year     = $current_unit->getOpenDate()->getYear();
-$current_semester = $current_unit->getOpenDate()->getUsingFormat('m') <= 6 ? 1 : 2;
+$current_semester = $current_unit->getOpenDate()->getYearHalf();
 foreach ($unit_list as $unit) {
     $year     = $unit->getOpenDate()->getYear();
-    $semester = $unit->getOpenDate()->getUsingFormat('m') <= 6 ? 1 : 2;
+    $semester = $unit->getOpenDate()->getYearHalf();
     $unit_year_list[$year][$semester][] = $unit;
 }
 foreach (array_reverse($unit_year_list, true) as $year => $unit_semester_list) {

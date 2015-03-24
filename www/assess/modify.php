@@ -147,14 +147,14 @@ else {
     /* Render starting times
      */
 	$this->setVar(array(
-		'START_HOUR_VALUE' => $assessStartDate->getUsingFormat('g'),
-		'START_MINUTE_VALUE' => $assessStartDate->getUsingFormat('i'),
+		'START_HOUR_VALUE' => $assessStartDate->get12Hour(),
+		'START_MINUTE_VALUE' => $assessStartDate->getMinute(true),
 	));
 
     foreach (array('AM', 'PM') as $meridiem) {
         $this->setVar(array(
             'START_MERIDIEM_VALUE' => $meridiem,
-            'START_MERIDIEM_SELECTED' => $meridiem == $assessStartDate->getUsingFormat('A') ? 'selected=\'selected\'' : '',
+            'START_MERIDIEM_SELECTED' => $assessStartDate->isMeridiem($meridiem) ? 'selected=\'selected\'' : '',
         ));
 
         $this->parse('startMeridiem_block', 'startMeridiem', true);
@@ -163,14 +163,14 @@ else {
     /* Render finish times
      */
 	$this->setVar(array(
-		'FINISH_HOUR_VALUE' => $assessFinishDate->getUsingFormat('g'),
-		'FINISH_MINUTE_VALUE' => $assessFinishDate->getUsingFormat('i'),
+		'FINISH_HOUR_VALUE' => $assessFinishDate->get12Hour(),
+		'FINISH_MINUTE_VALUE' => $assessFinishDate->getMinute(true),
 	));
 
 	foreach (array('AM', 'PM') as $meridiem) {
         $this->setVar(array(
             'FINISH_MERIDIEM_VALUE' => $meridiem,
-            'FINISH_MERIDIEM_SELECTED' => $meridiem == $assessFinishDate->getUsingFormat('A') ? 'selected=\'selected\'' : '',
+            'FINISH_MERIDIEM_SELECTED' => $assessFinishDate->isMeridiem($meridiem) ? 'selected=\'selected\'' : '',
         ));
 
         $this->parse('finishMeridiem_block', 'finishMeridiem', true);
