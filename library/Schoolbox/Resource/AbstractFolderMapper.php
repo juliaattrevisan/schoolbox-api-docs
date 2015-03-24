@@ -23,7 +23,7 @@ abstract class AbstractFolderMapper extends Schoolbox\Mapper
     {
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
-        $this->joins('parent', self::class, 'id');
+        $this->joins('parent', static::class, 'id');
     }
 
 } 
