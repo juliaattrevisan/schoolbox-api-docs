@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Preview\Chain\Strategy\oEmbed;
+namespace Schoolbox\Preview\Chain\Strategy\oEmbed\Strategy;
 
 
 abstract class Base {

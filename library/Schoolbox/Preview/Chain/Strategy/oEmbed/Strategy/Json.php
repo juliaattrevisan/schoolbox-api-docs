@@ -8,10 +8,10 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Preview\Chain\Strategy\oEmbed;
+namespace Schoolbox\Preview\Chain\Strategy\oEmbed\Strategy;
 
 
-class Xml extends Base {
+class Json extends Base {
 
     /**
      * Search for element
@@ -19,22 +19,22 @@ class Xml extends Base {
      * @return string
      */
     public function test() {
-        $xmlResult = $this->findXmlEmbeddable($this->getXml());
+        $jsonResult = $this->findJsonEmbeddable($this->getXml());
 
-        if (strlen($xmlResult)) {
-            return "An XML oEmbeddable video at {$xmlResult}";
+        if (strlen($jsonResult)) {
+            return "A JSON oEmbeddable video at {$jsonResult}";
         }
     }
 
     /**
-     * Find first instance of oEmbed for xml
+     * Find first instance of oEmbed for json
      * (in case someone made multiple definitions somehow)
      *
      * @param $xml
      * @return mixed
      */
-    private function findXmlEmbeddable($xml) {
-        $query = "//link[@type='text/xml+oembed']";
+    private function findJsonEmbeddable($xml) {
+        $query = "//link[@type='application/json+oembed']";
 
         return $this->findFirstMatching($xml, $query, 'href');
     }
