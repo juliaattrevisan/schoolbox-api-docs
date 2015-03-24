@@ -11,6 +11,7 @@
 namespace Schoolbox\Preview\Chain;
 
 use Schoolbox\Preview\Chain\Strategy\Image;
+use Schoolbox\Preview\Chain\Strategy\Html;
 use Schoolbox\Preview\Chain\Strategy\Other;
 
 class Start extends Base {
@@ -28,6 +29,7 @@ class Start extends Base {
 
         $this->start([
             new Image($headers),
+            new Html($headers),
             new Other($headers),
         ]);
     }
