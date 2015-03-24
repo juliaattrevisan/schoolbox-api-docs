@@ -22,11 +22,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     protected $datetime;
 
     /**
-     * @var DateTimeZone
-     */
-    protected $timezone;
-
-    /**
      * @var Alaress_Date_Locale_Interface
      */
     protected $locale;
@@ -132,28 +127,27 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
             $this->setLocale(new Alaress_Date_Locale_Config());
         }
 
-
-
-        $this->setTimezone($timezone);
-        $this->setFromFormat($dateTime, $dateFormat);
-
+        $this->setFromFormat($dateTime, $dateFormat, $timezone);
     }
 
     /**
      * Attempts to create a Laravel date out of $dateTime.
      *
-     * * empty: creates as now
-     * *
-     * @param mixed $dateTime
+     * * `empty($dateTime)`: creates as now
+     * * `$dateTime instanceof DateTime`: copies at same time
+     * * `$dateTime instanceof Alaress_Date_Format`: copies at same time
+     *
+     * @param mixed        $dateTime
+     * @param DateTimeZone $timezone The timezone of the date, or null to use default
      *
      * @return LaravelDate
      * @throws InvalidArgumentException if date couldn't be built
      */
-    protected function buildLaravelDate($dateTime = null)
+    protected function buildLaravelDate($dateTime = null, DateTimeZone $timezone = null)
     {
         if (!isset($dateTime)) {
             // Nothing set? set it to now
-            return LaravelDate::now($this->timezone);
+            return LaravelDate::now($timezone);
         } elseif ($dateTime instanceof DateTime || $dateTime instanceof DateTimeInterface) {
             // Build out of timestamp and timezone
             return LaravelDate::createFromTimestamp(
@@ -173,6 +167,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     /**
      * @param DateTimeInterface|Alaress_Date_Format|string $dateTime
      * @param string $inputDateFormat
+     * @param DateTimeZone $timezone The timezone of the date, or null to use default
      *
      * @return void
      * @throws InvalidArgumentException if no $inputDateFormat was set and $dateTime
@@ -180,8 +175,11 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      * @throws RuntimeException         if $dateTime is a string and it can't be
      *                                  parsed in $inputDateFormat
      */
-    public function setFromFormat($dateTime, $inputDateFormat)
-    {
+    public function setFromFormat(
+        $dateTime,
+        $inputDateFormat,
+        DateTimeZone $timezone = null
+    ) {
         try {
             $newDateTime = $this->buildLaravelDate($dateTime);
             $this->setDateTimeObject($newDateTime);
@@ -226,7 +224,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
 
             // Did I specify a timezone? If not, set it to the default
             if (!preg_match('/[eOPT]/', $inputDateFormat)) {
-                $laravelDate->setTimezone($this->timezone);
+                $laravelDate->setTimezone($timezone);
             }
             $this->setDateTimeObject($laravelDate);
         }
@@ -394,7 +392,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function setTimezone($timezone)
     {
-        $this->timezone = $timezone;
+        $this->getDateTimeObject()->setTimezone($timezone);
         return $this;
     }
 
