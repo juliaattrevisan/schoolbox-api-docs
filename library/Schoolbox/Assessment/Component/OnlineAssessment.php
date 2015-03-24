@@ -15,6 +15,7 @@ use \Alaress_Date_Format;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Category;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 
@@ -23,6 +24,10 @@ class OnlineAssessment implements ISoftDeletable
 
     const AVAILABILITY_ASSESS = 'assess';
     const AVAILABILITY_SURVEY = 'survey';
+
+    const MARK_VISIBILITY_PRIVATE = 0;
+    const MARK_VISIBILITY_STUDENT = 1;
+    const MARK_VISIBILITY_PARENT_STUDENT = 2;
 
     /**
     * @var int
@@ -120,6 +125,48 @@ class OnlineAssessment implements ISoftDeletable
      * @var int
      */
     protected $mark_visibility = 0;
+
+    /**
+     * Is this mark shown to students?
+     *
+     * @return bool
+     */
+    public function isMarkShownToStudents()
+    {
+        return in_array(
+            $this->getMarkVisibility(),
+            array(self::MARK_VISIBILITY_STUDENT, self::MARK_VISIBILITY_PARENT_STUDENT)
+        );
+    }
+
+    /**
+     * Is this mark shown to parents?
+     *
+     * @return bool
+     */
+    public function isMarkShownToParents()
+    {
+        return $this->getMarkVisibility() == self::MARK_VISIBILITY_PARENT_STUDENT;
+    }
+
+    /**
+     * Is this mark shown to the given user role?
+     *
+     * @param Role $role
+     *
+     * @return bool
+     */
+    public function isMarkShownToRole(Role $role)
+    {
+        if ($role->isStaff()) {
+            return true;
+        } elseif ($role->isStudent() && $this->isMarkShownToStudents()) {
+            return true;
+        } elseif ($role->isParent() && $this->isMarkShownToParents()) {
+            return true;
+        }
+        return false;
+    }
 
     /**
     * Get index of gradient

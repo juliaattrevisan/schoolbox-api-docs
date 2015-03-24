@@ -1,0 +1,228 @@
+<link rel="stylesheet" type="text/css" href="/css/meriden/pastoral.css" />
+<script type="text/javascript">
+    (function($){
+        $(function(){
+            // Jump menu for changing semester
+            $('#semester, #enrolled-subjects').on('change', function() {
+                window.location.href = this.value;
+            });
+        })
+    })(jQuery);
+</script>
+
+<div id="pastoral-report">
+    <div id="meriden-crest">
+        {% include '@customMeridenPastoral/sub/crestSvg.twig' %}
+    </div>
+
+    <h1>School Report - {{ report.tutorGroupReport.year }}</h1>
+
+    <div id="context">
+        {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
+        {% include '@customMeridenPastoral/sub/selector.twig' with {
+            tutorGroupList:   report.tutorGroupList,
+            subjectList:      report.subjectList,
+            student:          report.student,
+            tutorGroupReport: report.tutorGroupReport
+        } %}
+    </div>
+
+    <ul id="house-info">
+        <li>
+            <dl>
+                <dt>House</dt>
+                <dd>{{ report.student.schoolHouse.house }}</dd>
+            </dl>
+        </li>
+        <li>
+            <dl>
+                <dt>Year Coordinator</dt>
+                {% for coordinator in report.tutorGroupReport.coordinators %}
+                    <dd><a href="/search/user/{{ coordinator.id }}">{{ coordinator.formatName }}</a></dd>
+                {% endfor %}
+            </dl>
+        </li>
+        <li>
+            <dl>
+                <dt>Tutor</dt>
+                {# Show only the last tutor (as list is ordered by semester asc #}
+                {% for tutor in report.tutorGroupReport.tutors %}
+                    {% if loop.last %}
+                    <dd>{{ tutor.tch_name }}</dd>
+                    {% endif %}
+                {% endfor %}
+            </dl>
+        </li>
+    </ul>
+
+    <ul id="attendance-info">
+        <li>
+            <dl>
+                <dt>Days Absent</dt>
+                <dd>{{ report.tutorGroupReport.attendances.absent }}</dd>
+            </dl>
+        </li>
+        <li>
+            <dl>
+                <dt>Days Late</dt>
+                <dd>{{ report.tutorGroupReport.attendances.late }}</dd>
+            </dl>
+        </li>
+        <li>
+            <dl>
+                <dt>Detentions</dt>
+                <dd>{{ report.tutorGroupReport.attendances.detentions }}</dd>
+            </dl>
+        </li>
+        {% if report.tutorGroupReport.attendances.endorsedLeave %}
+        <li>
+            <dl>
+                {# Don't show endorsed leave at all if there is none #}
+                <dt>Endorsed Leave</dt>
+                <dd>{{ report.tutorGroupReport.attendances.endorsedLeave }}</dd>
+            </dl>
+        </li>
+        {% endif %}
+        <li>
+            <dl>
+                <dt>Athletics Carnival</dt>
+                <dd>
+                    {% if report.tutorGroupReport.namedGrades.athletics %}
+                        {%
+                        include '@customMeridenPastoral/sub/assessmentResult.twig'
+                        with {grade: report.tutorGroupReport.namedGrades.athletics}
+                        %}
+                    {% else %}
+                        Unknown
+                    {% endif %}
+                </dd>
+            </dl>
+        </li>
+        <li>
+            <dl>
+                <dt>Swimming Carnival</dt>
+                <dd>
+                    {% if report.tutorGroupReport.namedGrades.swimming %}
+                        {%
+                        include '@customMeridenPastoral/sub/assessmentResult.twig'
+                        with {grade: report.tutorGroupReport.namedGrades.swimming}
+                        %}
+                    {% else %}
+                        Unknown
+                    {% endif %}
+                </dd>
+            </dl>
+        </li>
+        <li>
+            <dl>
+                <dt>School Camp</dt>
+                <dd>
+                    {% if report.tutorGroupReport.namedGrades.camp %}
+                        {%
+                        include '@customMeridenPastoral/sub/assessmentResult.twig'
+                        with {grade: report.tutorGroupReport.namedGrades.camp}
+                        %}
+                    {% else %}
+                        Unknown
+                    {% endif %}
+                </dd>
+            </dl>
+        </li>
+        <li>
+            <dl>
+                <dt>Uniform</dt>
+                <dd>
+                    {% if report.tutorGroupReport.namedGrades.uniform %}
+                        {%
+                        include '@customMeridenPastoral/sub/assessmentResult.twig'
+                        with {grade: report.tutorGroupReport.namedGrades.uniform}
+                        %}
+                    {% else %}
+                        Unknown
+                    {% endif %}
+                </dd>
+            </dl>
+        </li>
+        <li>
+            <dl>
+                <dt>Pastoral activities involvement</dt>
+                <dd>
+                    {% if report.tutorGroupReport.namedGrades.pastoral %}
+                        {%
+                        include '@customMeridenPastoral/sub/assessmentResult.twig'
+                        with {grade: report.tutorGroupReport.namedGrades.pastoral}
+                        %}
+                    {% else %}
+                        Unknown
+                    {% endif %}
+                </dd>
+            </dl>
+        </li>
+        <li>
+            <dl>
+                {##
+                 # Athletics, Swimming, Camp, Uniform, Pastoral Services:
+                 # All these are attendances, and are based off of assessments in the grade page.
+                 #}
+                {% for grade in report.tutorGroupReport.grades %}
+                    <dt>{{ grade.assessment.name }}</dt>
+                    <dd>{{ grade.pretty_mark }}</dd>
+                {% endfor %}
+            </dl>
+        </li>
+    </ul>
+
+    <dl id="awards-info">
+        <dt>Awards and Prizes</dt>
+        {% for award in report.tutorGroupReport.activities.awards %}
+            <dd>{{ award.act_desc }}</dd>
+        {% endfor %}
+
+        <dt>Co-curricular Activities</dt>
+        {% for activity in report.tutorGroupReport.activities.cocurricular %}
+            <dd>{{ activity.act_desc }}</dd>
+        {% endfor %}
+
+        <dt>Community Service</dt>
+        {% for service in report.tutorGroupReport.activities.service %}
+            <dd>{{ service.act_desc }}</dd>
+        {% endfor %}
+
+        <dt>Positions of Office</dt>
+        {% for position in report.tutorGroupReport.activities.positions %}
+            <dd>{{ position.act_desc }}</dd>
+        {% endfor %}
+    </dl>
+
+    {##
+     # Subjects: exactly the same as the subject list on /search/user/{{ report.student.id }},
+     # except I guess they will link to this page instead.
+     #
+     # Meriden have requested that no email links display on this page,
+     # due to the possiblilty of parents getting drunk and sending emails to teachers.
+     #}
+    <div class="directory">
+        <div class="subjects">
+            <div id="subject-info">
+                <h2>Subjects</h2>
+                {# Split half the subjects in one column, half in the other #}
+                {% set reportHalf = (report.subjectList|length / 2)|round(0, 'ceil') %}
+                <ul>
+                    {% for subject in report.subjectList|slice(0, reportHalf) %}
+                        {% include '@customMeridenPastoral/sub/subject.twig' with {subject: subject, showEmail: false, showPortrait: false} %}
+                    {% endfor %}
+                </ul>
+                {##
+                 # The second half has a ul per subject,
+                 # the first only has a single ul for all subjects.
+                 # Go figure!
+                 #}
+                {% for subject in report.subjectList|slice(reportHalf) %}
+                    <ul>
+                        {% include '@customMeridenPastoral/sub/subject.twig' with {subject: subject, showEmail: false, showPortrait: false} %}
+                    </ul>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>

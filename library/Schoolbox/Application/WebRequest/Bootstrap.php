@@ -364,13 +364,28 @@ class Bootstrap implements BootstrapInterface {
 
 
 		// Initialise module configuration
-		require_once 'conf/modules/ModuleConfigInterface.php';
+		require_once SITE_root . '/conf/modules/ModuleConfigInterface.php';
+        $customModuleLocation = sprintf(
+            '/conf/modules/Custom/%s/',
+            ucfirst($this->kernel->getDependencyInjector()->get('config')->get('site_location'))
+        );
+        $modulePaths = array_merge(
+            glob(SITE_root . '/conf/modules/*.php'),
+            glob(SITE_root . $customModuleLocation . '*.php')
+        );
 
-		foreach(glob(SITE_root . '/conf/modules/*.php') as $routePath) {
+		foreach ($modulePaths as $routePath) {
 			require_once $routePath;
-			$start = strrpos($routePath, '/') + 1;
-			$length = strrpos($routePath, '.php') - $start;
-			$class = 'Config\\Modules\\' . substr($routePath, $start, $length);
+
+            // Get a route name out of this path
+//            $path = dirname($routePath);
+            $path = preg_replace('/^'.preg_quote(SITE_root.'/conf/modules/', '/').'/', '', $routePath);
+            $path = preg_replace('/\\.php$/', '', $path);
+            $path = preg_replace('/\\//', '\\', $path);
+
+//			$start = strrpos($routePath, '/') + 1;
+//			$length = strrpos($routePath, '.php') - $start;
+			$class = 'Config\\Modules\\' . $path;
 
 			if(class_exists($class, false)) {
 				/** @var Config\Modules\ModuleConfigInterface $obj */

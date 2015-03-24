@@ -1,0 +1,46 @@
+<div class="listing">
+    <table class="upcoming-work table ruler">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Result</th>
+                <th>Date Due</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for workItem in work %}
+        <tr>
+            <td>
+                {% if workItem.assessment %}
+                    {% set showMark = workItem.assessment.isMarkShownToRole(user.role) %}
+                    <a class="title" href="/submission/submissionHistory/{{ workItem.assessment.id }}/{{ student.id }}">
+                        {{ workItem.assessment.name }}
+                    </a>
+                {% elseif workItem.quiz %}
+                    {% set showMark = workItem.quiz.isMarkShownToRole(user.role) %}
+                    <a class="title" href="/assess/attempts/{{ workItem.quiz.id }}/{{ student.id }}">
+                        {{ workItem.quiz.title }}
+                    </a>
+                {% else %}
+                    {% set showMark = false %}
+                    Unknown
+                {% endif %}
+            </td>
+            <td class="grade">
+                {# Does the current user have the right to view this assessment's mark? #}
+                {% if showMark %}
+                    {{ workItem.pretty_mark }}
+                {% endif %}
+            </td>
+            <td>
+                {% if workItem.assessment %}
+                    {{ workItem.assessment.dueDate|date('jS F') }}
+                {% elseif workItem.quiz %}
+                    {{ workItem.quiz.finish|date('jS F') }}
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

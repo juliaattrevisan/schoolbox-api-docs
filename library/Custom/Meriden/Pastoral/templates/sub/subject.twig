@@ -1,0 +1,33 @@
+{% if showEmail is null %}
+    {% set showEmail = true %}
+{% endif %}
+{% if showPortrait is null %}
+    {% set showPortrait = true %}
+{% endif %}
+<li>
+    <div class="subject">
+        <a class="to-subject" href="/homepage/code/{{ subject.subjectCode }}">
+            {{ subject.name }}
+            <span class="icon"></span>
+        </a>
+    </div>
+    {% for teacher in subject.teachers %}
+        <div class="profile">
+            <a href="/search/user/{{ teacher.id }}"
+               class="teacher-profile{% if not showEmail %} no-email{% endif %}{% if not showPortrait %} no-portrait{% endif %}">
+                {% if showPortrait %}
+                <img src="/portrait.php?userId={{ teacher.externalId }}&amp;size=square32">
+                {% endif %}
+                <span class="name">{{ teacher.formatName }}</span>
+                <span class="role">{{ teacher.role.name }}</span>
+            </a>
+            {% if showEmail %}
+                {##
+                 # The href relies on a session variable -_-
+                 # /mail/createMail.php or mailto:
+                 #}
+                <a class="mail-teacher" href="/mail/createMail.php?replyto={{ teacher.email }}">Mail</a>
+            {% endif %}
+        </div>
+    {% endfor %}
+</li>

@@ -1,0 +1,191 @@
+/**
+ * Styles for Meriden's pastoral page
+ */
+
+@media print {
+    #pastoral-report,
+    #student-report,
+    #subject-report {
+        font-family: "Arial", sans-serif;
+        font-size: 12px !important;
+    }
+    #container {
+        width: auto !important;
+    }
+    #container h1,
+    #container h2 {
+        font-weight: bold;
+    }
+    #container h1 {
+        font-size: 16px;
+    }
+    #container h2 {
+        font-size: 14px;
+    }
+    #container p,
+    #container dt,
+    #container dd,
+    #container li,
+    #container table {
+        font-size: 12px;
+        margin: 0;
+    }
+    #container p#course-description,
+    #container dl#course-info {
+        margin-bottom: 16px;
+    }
+}
+
+#pastoral-report,
+#student-report,
+#subject-report {
+    font-family: "Arial", sans-serif;
+    font-size: 12px !important;
+}
+
+#meriden-crest {
+    text-align: center;
+}
+#meriden-crest svg {
+    width: 92px;
+}
+.teacher-profile.no-email {
+    margin-right: 0;
+}
+
+/**
+ * Undo default SB heading styles
+ */
+h1 {
+    font-size: 16px;
+    line-height: 28px;
+    padding: 0;
+    margin: 0 0 20px 0;
+}
+h2 {
+    background: inherit;
+    color: inherit;
+    font-size: 14px;
+    line-height: 24px;
+    padding: 0;
+    margin: 0;
+}
+.directory h2 {
+    margin: 0;
+}
+
+#house-info li,
+#attendance-info li {
+    width: 33%;
+    display: inline-block;
+    vertical-align: top;
+}
+
+#house-info dt,
+#attendance-info dt,
+#awards-info dt {
+    width: auto;
+    float: none;
+    clear: both;
+}
+#house-info dt,
+#attendance-info dt,
+#awards-info dt:first-child {
+    margin-top: 12px;
+}
+/* Add a little space between award types with no awards */
+#awards-info dt+dt {
+    margin-top: 6px;
+}
+#awards-info dt:last-child {
+    margin-bottom: 6px;
+}
+
+#house-info dd,
+#attendance-info dd,
+#awards-info dd,
+dt.fullwidth,
+dd.fullwidth {
+    width: auto;
+    float: none;
+    clear: both;
+    margin-bottom: 0;
+}
+
+#awards-info {
+    margin-left: 16px;
+    margin-right: 16px;
+}
+#awards-info dt,
+#awards-info dd {
+    display: block;
+    width: auto;
+}
+#awards-info dd {
+    margin-left: 33%
+}
+
+.directory .subjects {
+    width: 100%;
+}
+#subject-info h2 {
+    font-size: 13px;
+}
+#subject-info ul {
+    margin: 0;
+}
+
+/**
+ * Course info finagling
+ */
+#course-description {
+    margin-bottom: 16px;
+}
+#course-info,
+#house-info,
+#attendance-info,
+#awards-info {
+    margin: 0;
+}
+#course-info table {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+#course-info th,
+#course-info td {
+    border: 1px solid black;
+    padding: 0.8em;
+}
+#course-info ul {
+    margin: 0;
+}
+#course-info dt {
+    margin-bottom: 6px;
+}
+#course-info dd {
+    margin-bottom: 24px;
+}
+#course-info .description-link {
+    font-size: 10px;
+    font-weight: normal;
+}
+#course-info .course-grade {
+    font-weight: bold;
+}
+
+#course-info .learning-approaches,
+#course-info .learning-approaches tr,
+#course-info .learning-approaches th,
+#course-info .learning-approaches td {
+    border-width: 0;
+    padding: 0 5px 0 0;
+}
+
+#assessment-info .feedback {
+    padding-left:3em;
+    font-weight: normal;
+    font-size: 12px;
+}
+#assessment-info .upcoming-work td {
+    color: inherit;
+}

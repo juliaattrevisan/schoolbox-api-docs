@@ -1,0 +1,12 @@
+{% if grade.rubric.criteria %}
+    <table>
+        {% for criterion in grade.rubric.criteria %}
+            <tr>
+                <th>{{ criterion.label }}</th>
+                <td>{{ criterion.results[criterion.value] }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    {{ grade.pretty_mark }}
+{% endif %}

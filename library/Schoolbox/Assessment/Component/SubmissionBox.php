@@ -19,6 +19,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Role;
 use Schoolbox\User;
 
 class SubmissionBox implements ISoftDeletable
@@ -181,7 +182,7 @@ class SubmissionBox implements ISoftDeletable
      */
     public function isRubric()
     {
-        if ($this->getMarkType()->getSlug() == 'rubric') {
+        if ($this->getMarkType()->getId() == MarkType::TYPE_RUBRIC) {
             return true;
         }
 
@@ -217,6 +218,25 @@ class SubmissionBox implements ISoftDeletable
     public function isMarkShownToParents()
     {
         return $this->getMarkVisibility() == self::MARK_VISIBILITY_PARENT_STUDENT;
+    }
+
+    /**
+     * Is this mark shown to the given user role?
+     *
+     * @param Role $role
+     *
+     * @return bool
+     */
+    public function isMarkShownToRole(Role $role)
+    {
+        if ($role->isStaff()) {
+            return true;
+        } elseif ($role->isStudent() && $this->isMarkShownToStudents()) {
+            return true;
+        } elseif ($role->isParent() && $this->isMarkShownToParents()) {
+            return true;
+        }
+        return false;
     }
 
     /**
