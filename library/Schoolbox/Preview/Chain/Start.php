@@ -22,15 +22,40 @@ class Start extends Base {
      * @param $url
      */
     public function __construct($url) {
-
-        /* Decode url and format header output
-         */
-        $headers = get_headers(urldecode($url), 1);
+        $headers = $this->findHeaders($url);
 
         $this->start([
             new Image($headers),
             new Html($headers),
             new Other($headers),
         ]);
+    }
+
+    /**
+     * Decode url and format header output
+     */
+    private function findHeaders($url) {
+        $headers = get_headers(urldecode($url), 1);
+
+        /* Rebuild array if you got redirected around the place
+         */
+        $numRedirects = count($headers['Content-Type']);
+
+        if ($numRedirects > 1) {
+            $newHeaders = array();
+
+            foreach(array_keys($headers) as $currentKey) {
+                if (is_array($headers[$currentKey])) {
+                    $newHeaders[$currentKey] = $headers[$currentKey][$numRedirects-1];
+                }
+                else {
+                    $newHeaders[0] = $headers[$numRedirects-1];
+                }
+            }
+
+            $headers = $newHeaders;
+        }
+
+        return $headers;
     }
 }
