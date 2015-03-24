@@ -532,6 +532,16 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      * @param $val
      * @return $this
      */
+    public function addYears($val)
+    {
+        $this->getDateTimeObject()->addYears($val);
+        return $this;
+    }
+
+    /**
+     * @param $val
+     * @return $this
+     */
     public function addWeeks($val)
     {
         $this->getDateTimeObject()->addWeeks($val);
