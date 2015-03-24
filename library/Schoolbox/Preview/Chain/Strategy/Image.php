@@ -13,9 +13,51 @@ namespace Schoolbox\Preview\Chain\Strategy;
 
 class Image extends Base {
 
-    public function test() {
-        echo "Testing {$this->url} as Image<br>";
+    /**
+     * Content Types for this strategy
+     *
+     * @var array
+     */
+    private $contentTypes = [
+        'image/jpeg',
+        'image/pjpeg',
+        'image/gif',
+        'image/png',
+    ];
 
-        $this->testNext();
+    /**
+     * Test the Content-Types
+     *
+     * @return string
+     */
+    public function test() {
+        if (in_array($this->findContentType(), $this->getContentTypes())) {
+            return 'Is an image';
+        }
+
+        return $this->testNext();
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Set content types
+     *
+     * @param array $contentTypes
+     */
+    private function setContentTypes($contentTypes)
+    {
+        $this->contentTypes = $contentTypes;
+    }
+
+    /**
+     * Get content types
+     *
+     * @return array
+     */
+    private function getContentTypes()
+    {
+        return $this->contentTypes;
     }
 }
