@@ -25,6 +25,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     private $externalUser;
 
+    const ASSESSMENT_PREFIX = 'a';
+    const SUBMISSION_PREFIX = 's';
+
     /**
      * Constructor
      */
@@ -51,8 +54,18 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function getAssessment(Activity $assessment)
     {
-        $query = "SELECT * FROM StaffAssessmentMarkBook WHERE HdgAbbrev2 = '".$assessment->getId()."'";
+        $query = "SELECT * FROM StaffAssessmentMarkBook WHERE HdgAbbrev2 = '".  $this->getPrefix($assessment) . $assessment->getId()."'";
         return $this->getDatabase()->getAll($query);
+    }
+
+    /**
+     * Returns the prefix string used to differentiate assessment IDs from submission box IDs
+     *
+     * @param Activity $assessment
+     * @return string
+     */
+    private function getPrefix(Activity $assessment) {
+        return $assessment->isAssessment() ? self::ASSESSMENT_PREFIX : self::SUBMISSION_PREFIX;
     }
 
     /**
@@ -114,7 +127,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                       '',
                       '".$this->getDatabase()->quote($assessment->getName())."',
                       '".$this->getDatabase()->quote(TextFormatter::cutString($assessment->getName(),10))."',
-                      '".$assessment->getId()."',
+                      '".$this->getPrefix($assessment).$assessment->getId()."',
                       'OGRaw',
                       '100',
                       '0'
@@ -138,7 +151,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                         Heading = '".$this->getDatabase()->quote($assessment->getName())."',
                         HdgAbbrev1 = '".$this->getDatabase()->quote(TextFormatter::cutString($assessment->getName(),10))."'
                   WHERE
-                        HdgAbbrev2 = '".$assessment->getId()."'
+                        HdgAbbrev2 = '".$this->getPrefix($assessment).$assessment->getId()."'
                     ";
         $this->getDatabase()->query($query);
     }
