@@ -81,9 +81,9 @@ class BasicGetSetTest extends PHPUnit_Framework_TestCase
 
     public function testGetSetTimestamp()
     {
-        $date = $this->getTestDateObject();
-        // Need a timezone to test timestamps reliably
-        $date->setTimezone(new DateTimeZone('UTC'))->setTimestamp(1);
+        // a timezone is required to test timestamps reliably
+        $date = $this->buildDateObject(time(), 'U', new DateTimeZone('UTC'));
+        $date->setTimestamp(1);
         $this->assertEquals($date->getDatabase(), '1970-01-01 00:00:01');
     }
 }
