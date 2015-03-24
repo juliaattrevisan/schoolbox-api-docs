@@ -55,7 +55,7 @@ class Mapper extends AbstractFileMapper implements ILocator, IFileMapper
      * Return the files contained within the folder with the given ID
      *
      * @param int $nodeId
-     * @return Model[]
+     * @return Collection|Model[]
      */
     public function findByFolderId($nodeId)
     {

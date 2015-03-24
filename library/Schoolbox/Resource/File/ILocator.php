@@ -10,6 +10,8 @@
 namespace Schoolbox\Resource\File;
 
 
+use Schoolbox\Collection;
+
 interface ILocator
 {
 
@@ -25,7 +27,7 @@ interface ILocator
      * Return the files contained within the folder with the given ID
      *
      * @param int $nodeId
-     * @return IFile[]
+     * @return Collection|IFile[]
      */
     public function findByFolderId($nodeId);
 
