@@ -13,9 +13,10 @@ namespace Schoolbox\Preview\Chain\Strategy;
 
 class Other extends Base {
 
+    /**
+     * Base case
+     */
     public function test() {
-        echo "Testing {$this->url} as Other<br>";
-
-        $this->testNext();
+        return 'Is some kind of generic file';
     }
 }

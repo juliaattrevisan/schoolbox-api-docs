@@ -25,6 +25,7 @@ class Controller extends Base
             "https://s-media-cache-ak0.pinimg.com/236x/fb/c7/7c/fbc77c27b92b84fa99c9295d6d307a2d.jpg",
             "http://en.wikipedia.org/wiki/FR._Lee_Ermey",
             "https://twitter.com/arstechnica/status/533056992592818176",
+            "http://s3.majorleaguegaming.com/files/OrlandoChamp.zip",
         ];
 
         /* Rummage
