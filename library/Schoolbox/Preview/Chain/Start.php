@@ -21,7 +21,10 @@ class Start extends Base {
      * @param $url
      */
     public function __construct($url) {
-        $headers = 'le goog';
+
+        /* Decode url and format header output
+         */
+        $headers = get_headers(urldecode($url), 1);
 
         $this->start([
             new Image($headers),
