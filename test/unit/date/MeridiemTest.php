@@ -89,4 +89,67 @@ class MeridiemTest extends PHPUnit_Framework_TestCase
         $date = $this->buildDateObject();
         $date->set12Hour($hour, $meridiem);
     }
+
+    /**
+     * Data sets for testSet12HourTime
+     */
+    public function getSet12HourTimeData()
+    {
+        return [
+            [12, 0, 0, 'am', '00:00:00'],
+            [11, 59, 59, 'am', '11:59:59'],
+            [12, 0, 0, 'pm', '12:00:00'],
+            [11, 59, 59, 'pm', '23:59:59'],
+        ];
+    }
+
+    /**
+     * @dataProvider getSet12HourTimeData
+     *
+     * @param int    $hour
+     * @param int    $minute
+     * @param int    $second
+     * @param string $meridiem
+     * @param string $expectedTime in H:i:s format
+     */
+    public function testSet12HourTime($hour, $minute, $second, $meridiem, $expectedTime)
+    {
+        $date = $this->buildDateObject();
+        $date->set12HourTime($hour, $minute, $second, $meridiem);
+        $this->assertEquals($expectedTime, $date->getUsingFormat('H:i:s'));
+    }
+
+    /**
+     * Data sets for testSetInvalid12HourTime
+     */
+    public function getSetInvalid12HourTimeData()
+    {
+        return [
+            [0, 0, 0, 'am'],
+            [13, 0, 0, 'am'],
+            [0, 0, 0, 'pm'],
+            [13, 0, 0, 'pm'],
+            [1, 0, 0, 'bm',],
+            [2, 0, 0, 'cm',],
+            [null, 0, 0, 'am',],
+            [null, 0, 0, null,],
+            [3, 0, 0, null,],
+        ];
+    }
+
+    /**
+     * @dataProvider getSetInvalid12HourTimeData
+     *
+     * @expectedException PHPUnit_Framework_Error_Warning
+     *
+     * @param int    $hour
+     * @param int    $minute
+     * @param int    $second
+     * @param string $meridiem
+     */
+    public function testSetInvalid12HourTime($hour, $minute, $second, $meridiem)
+    {
+        $date = $this->buildDateObject();
+        $date->set12HourTime($hour, $minute, $second, $meridiem);
+    }
 }
