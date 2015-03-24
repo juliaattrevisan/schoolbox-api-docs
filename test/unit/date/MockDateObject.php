@@ -1,0 +1,33 @@
+<?php
+/**
+ * Trait for loading date objects with a mock locale that does not attempt to
+ * access the database.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright 2015 Alaress Pty Ltd
+ * @link      http://www.alaress.com.au
+ */
+
+trait MockDateObject
+{
+    /**
+     * Builds a date object which defaults to using a static locale.
+     *
+     * @see Alaress_Date_Format->__construct()
+     *
+     * @return Alaress_Date_Format
+     */
+    protected function buildDateObject(
+        $dateTime = null,
+        $dateFormat = null,
+        DateTimeZone $timezone = null,
+        Alaress_Date_Locale_Interface $locale = null
+    ) {
+        return new Alaress_Date_Format(
+            $dateTime,
+            $dateFormat,
+            $timezone,
+            ($locale instanceof Alaress_Date_Locale_Interface ? $locale : new Alaress_Date_Locale_Static())
+        );
+    }
+}
