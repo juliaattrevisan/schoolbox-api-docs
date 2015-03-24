@@ -8,6 +8,13 @@
  * @link      http://www.alaress.com.au
  */
 
+namespace Alaress\Test\Date;
+
+use Alaress_Date_Format;
+use Alaress_Date_Locale_Interface;
+use Alaress_Date_Locale_Static;
+use DateTimeZone;
+
 trait MockDateObject
 {
     /**
