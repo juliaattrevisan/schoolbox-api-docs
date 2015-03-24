@@ -46,4 +46,10 @@ class Model extends AbstractFile implements IFile
         return $this;
     }
 
+    public function isPublished()
+    {
+        return $this->getPublishedAt() instanceof Alaress_Date_Format
+            && $this->getPublishedAt()->getUnixTimeStamp() < Alaress_Date_Format::now()->getUnixTimeStamp();
+    }
+
 }
