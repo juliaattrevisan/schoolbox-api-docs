@@ -989,7 +989,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function get12Hour($leadingZero = false)
     {
-        return $this->getUsingFormat($leadingZero ? 'G' : 'g');
+        return $this->getUsingFormat($leadingZero ? 'h' : 'g');
     }
 
     /**
@@ -1002,7 +1002,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function getHour($leadingZero = false)
     {
-        return $this->getUsingFormat($leadingZero ? 'H' : 'h');
+        return $this->getUsingFormat($leadingZero ? 'H' : 'G');
     }
 
     /**
