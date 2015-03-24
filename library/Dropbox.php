@@ -10,13 +10,27 @@
 
 define('DROPBOX_COMPONENT', 25);
 
+/**
+ * Class Dropbox
+ * @deprecated
+ */
 class Dropbox {
+
+    /**
+     * @deprecated
+     */
     function Dropbox() {
         //always gonna need the db so lets create one..
 	    $this->db = DeprecatedDatabase::getInstance();
         $this->groupHandler = new Group;
     }
 
+
+    /**
+     * @deprecated
+     * @param $category
+     * @return int|mixed
+     */
     function checkWriteAccess($category) {
         //anyone with read can put something in the dropbox
         if (($permission = $this->groupHandler->getPermission($category)) < READ_ACCESS) {
@@ -31,6 +45,12 @@ class Dropbox {
         return $permission;
     }
 
+
+    /**
+     * @deprecated
+     * @param $cid
+     * @return bool
+     */
     function checkDropBoxExists($cid) {
 
         $query = "SELECT ci.id FROM component_instance ci JOIN component_definition cd ON ci.`component_definition_id`=cd.`id` WHERE class = 'Component_Homepage_DropBoxController' AND ci.module = 'homepage' AND identifier = $cid";
@@ -41,6 +61,16 @@ class Dropbox {
         }
     }
 
+
+    /**
+     * @deprecated
+     * @param $file_name
+     * @param $file_type
+     * @param $file_loc
+     * @param $description
+     * @param $category
+     * @return int|string
+     */
     function addFile($file_name, $file_type, $file_loc, $description, $category) {
         //check allowed perms to add to specified category before proceeding
         $this->checkWriteAccess($category);
@@ -74,6 +104,12 @@ class Dropbox {
 
     }
 
+
+    /**
+     * @deprecated
+     * @param $id
+     * @return mixed
+     */
     function deleteFile($id) {
         //check sanity and valid rights
         //check file exists. and user has nescessary rights
@@ -95,6 +131,12 @@ class Dropbox {
         return $fileInfo['category'];
     }
 
+
+    /**
+     * @deprecated
+     * @param $id
+     * @return array|bool|null
+     */
     function getFile($id) {
         $query = "SELECT category, description FROM dropbox WHERE id = '$id'";
         return $this->db->getRow($query);
@@ -103,6 +145,7 @@ class Dropbox {
 	/**
 	 * Get a list of files in the dropbox associated with $cid
 	 *
+     * @deprecated
 	 * @param $cid
 	 * @return array|bool
 	 */
@@ -121,6 +164,12 @@ class Dropbox {
         return $this->db->getAll($query);
     }
 
+
+    /**
+     * @deprecated
+     * @param $id
+     * @param $save
+     */
     function outputFile($id, $save) {
         //sends file
         $query = "SELECT realname,category, mime_type FROM dropbox WHERE id = '$id'";
@@ -153,6 +202,11 @@ class Dropbox {
         exit;
     }
 
+
+    /**
+     * @deprecated
+     * @param $cid
+     */
     function homepageClean($cid) {
 
         $query = "SELECT id FROM dropbox WHERE category = '$cid'";
