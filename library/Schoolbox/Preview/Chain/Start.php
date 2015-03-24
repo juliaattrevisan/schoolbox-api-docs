@@ -12,7 +12,7 @@ namespace Schoolbox\Preview\Chain;
 
 use Schoolbox\Preview\Chain\Strategy\Image;
 use Schoolbox\Preview\Chain\Strategy\Html;
-use Schoolbox\Preview\Chain\Strategy\OEmbed;
+use Schoolbox\Preview\Chain\Strategy\Embed;
 use Schoolbox\Preview\Chain\Strategy\Other;
 
 class Start extends Base {
@@ -29,7 +29,7 @@ class Start extends Base {
 
         $this->start([
             new Image($decodedUrl, $headers),
-            new oEmbed($decodedUrl, $headers),
+            new Embed($decodedUrl, $headers),
             new Html($decodedUrl, $headers),
             new Other($decodedUrl, $headers),
         ]);
