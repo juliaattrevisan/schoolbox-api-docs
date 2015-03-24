@@ -14,13 +14,6 @@ class Synchronise_Synergetic_Jpc_Strategy_Parent extends Synchronise_Synergetic_
 	protected $strategyTitle = "Update Schoolbox Parent Details Synchronisation";
 
     /**
-     * A list of synced parent IDs
-     *
-     * @var array
-     */
-    protected $syncedExternalIds = array();
-
-    /**
      * Role ID for parents
      */
     const PARENT_ROLE_ID = 4;
@@ -61,38 +54,6 @@ class Synchronise_Synergetic_Jpc_Strategy_Parent extends Synchronise_Synergetic_
 			 */
 			$this->executeCreateUpdate($this->setupUserDetails($currentUser));
 		}
-
-        // set parents not touched by this sync into previous parents role.
-        foreach ($this->getUserHandler()->getByGroup(self::PARENT_ROLE_ID) as $existingParent) {
-            $synergyId = $existingParent['synergy_id'];
-            if (!$this->isExternalIdSynced($synergyId)) {
-                $newParent             = $existingParent;
-                $newParent['group_id'] = self::PAST_PARENT_ROLE_ID;
-                $synergyParent         = $this->getExternalUserHandler()->getParentSync($synergyId);
-                if (!empty($synergyParent)) {
-                    if ($this->getPerformUpdate() === true) {
-                        $this->getUserHandler()->update($newParent);
-                        $this->getVerboseFilter()->performUpdate(
-                            $existingParent,
-                            $synergyId,
-                            $newParent,
-                            $synergyParent
-                        );
-                    } else {
-                        $this->getVerboseFilter()->planUpdate(
-                            $existingParent,
-                            $synergyId,
-                            $newParent,
-                            $synergyParent
-                        );
-                    }
-                    $this->getVerboseFilter()->incrementUpdated();
-                } else {
-                    $this->getVerboseFilter()->skip($existingParent, $synergyId);
-                    $this->getVerboseFilter()->incrementSkipped();
-                }
-            }
-        }
 
 		$this->getVerboseFilter()->summary();
 	}
@@ -157,8 +118,17 @@ class Synchronise_Synergetic_Jpc_Strategy_Parent extends Synchronise_Synergetic_
 					$updatedUser['alt_email'] = '';
 				}
 
-                // Store that this user was updated
-                $this->setExternalIdAsSynced($currentSynergyId);
+                // Get all of this parent's students.
+                // If they have got no current ones, they are a current parent.
+                $roleId = self::PAST_PARENT_ROLE_ID;
+                foreach ($this->getExternalUserHandler()->getEnrolledStudents($currentSynergyId) as $student) {
+                    // Is this student current?
+                    if ($this->getExternalUserHandler()->getStudent($student['RelatedID'])) {
+                        $roleId = self::PARENT_ROLE_ID;
+                        break;
+                    }
+                }
+                $updatedUser['group_id'] = $roleId;
 
 				/* Actually perform db update
 				 */
@@ -192,28 +162,4 @@ class Synchronise_Synergetic_Jpc_Strategy_Parent extends Synchronise_Synergetic_
 
 		return true;
 	}
-
-    /**
-     * Sets this external ID as having been synced.
-     *
-     * @todo implement something like this for the base sync
-     *
-     * @param string $externalId
-     */
-    protected function setExternalIdAsSynced($externalId)
-    {
-        $this->syncedExternalIds[$externalId] = true;
-    }
-
-    /**
-     * Is this external ID synced?
-     *
-     * @param string $externalId
-     *
-     * @return bool
-     */
-    protected function isExternalIdSynced($externalId)
-    {
-        return array_key_exists($externalId, $this->syncedExternalIds);
-    }
 }
