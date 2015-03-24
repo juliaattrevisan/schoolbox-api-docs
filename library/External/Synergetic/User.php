@@ -265,8 +265,8 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getStudent($synID)
     {
-        $studentYear     = $this->getCurrentYear($synID);
-        $studentSemester = $this->getCurrentSemester($synID);
+        $currentYear     = $this->getCurrentYear();
+        $currentSemester = $this->getCurrentSemester();
         $query   = "SELECT
                     vStudents.StudentID,
                     vStudents.StudentGiven1,
@@ -313,8 +313,8 @@ class External_Synergetic_User implements External_UserInterface
                     LEFT JOIN luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
                 WHERE
                     vStudents.StudentID = '$synID'
-                    AND vStudents.FileSemester='" . $this->database->quote($studentSemester) . "'
-                    AND vStudents.FileYear='" . $this->database->quote($studentYear) . "'
+                    AND vStudents.FileSemester='" . $this->database->quote($currentSemester) . "'
+                    AND vStudents.FileYear='" . $this->database->quote($currentYear) . "'
         ";
 
 		$student = false;
