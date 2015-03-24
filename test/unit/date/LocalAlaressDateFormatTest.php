@@ -1,6 +1,6 @@
 <?php
 
-class AustralianAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
+class LocalAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 
     use Alaress\Test\Date\MockDateObject;
 
