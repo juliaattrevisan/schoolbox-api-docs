@@ -13,7 +13,7 @@ namespace Schoolbox\Resource\Attachment\Collector;
 use InvalidArgumentException;
 use PortfolioWebDAV;
 use Schoolbox\Config\Loader;
-use Schoolbox\MyFileMapper;
+use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
 use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Resource\File\IStorageWrapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
@@ -66,7 +66,7 @@ class CollectorFactory {
         try {
             $dav = PortfolioWebDAV::factory();
             $this->add(NodeFactory::WEBDAV, function () use ($dav, $wrapper, $storage) {
-                return new ExternalFileSystemHandler($dav, $wrapper, $storage, $dav); // yup. totally passing things in multiple times
+                return new ExternalFileSystemHandler($dav, $storage, $dav, $wrapper); // yup. totally passing things in multiple times
             });
 
         } catch (\DomainException $e) {
