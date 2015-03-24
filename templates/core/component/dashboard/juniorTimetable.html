@@ -1,0 +1,42 @@
+<div class="box tt clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    <h2>{COMPONENT_NAME} - Day {DAYNUMBER}</h2>
+
+    <!-- BEGIN campus_timetable -->
+    <!-- BEGIN timetable_campus_name -->
+    <!-- END timetable_campus_name -->
+    <table id="timetable" class="timetable">
+        <thead>
+            <tr>
+                <!-- BEGIN timetable_header -->
+                <th width="{TIMETABLE_FIELD_WIDTH}%" scope="col" class="{PERIOD_TH_CLASS}">{PERIOD_NAME}
+                    <span class="time">{PERIOD_START} - {PERIOD_END}</span></th>
+                <!-- END timetable_header -->
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <!-- BEGIN timetable_period -->
+                <td width="{TIMETABLE_FIELD_WIDTH}%" class="{PERIOD_CLASS}">
+                    <!-- BEGIN period_class_link -->
+                    <a href="{PERIOD_URL}" class="class" style="background:{PERIOD_COLOUR};">
+                        <span class="title">{PERIOD_DESC}</span>
+                        {PERIOD_CODE}<br/>{PERIOD_ROOM}
+                    </a>
+                    <!-- END period_class_link -->
+                    <!-- BEGIN period_class -->
+                    <span class="class" style="background:{PERIOD_COLOUR};">
+                        <span class="title" >{PERIOD_DESC}</span>
+                        {PERIOD_CODE}<br/>{PERIOD_ROOM}
+                    </span>
+                    <!-- END period_class -->
+                    <!-- BEGIN has_attendances -->
+                    <a class="btn modify float-left attendance" href='/modules/attendance/modify/{ATTENDANCE_CLASS_CODE}/{ATTENDANCE_ATTENDANCE_DATE}/{ATTENDANCE_ATTENDANCE_PERIOD}'>
+                        <span></span>Mark Attendance</a>
+                    <!-- END has_attendances -->
+                </td>
+                <!-- END timetable_period -->
+            </tr>
+        </tbody>
+    </table>
+    <!-- END campus_timetable -->
+</div>
