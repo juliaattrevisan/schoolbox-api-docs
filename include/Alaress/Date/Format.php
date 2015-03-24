@@ -387,7 +387,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
 
 
     /**
-     * @param DateTimeZone $timezone
+     * @param DateTimeZone|string $timezone
      * @return $this
      */
     public function setTimezone($timezone)
@@ -1055,6 +1055,14 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
             return $this->stripLeadingZero($result);
         }
         return $result;
+    }
+
+    /**
+     * @return DateTimeZone
+     */
+    public function getTimezone()
+    {
+        return $this->getDateTimeObject()->getTimezone();
     }
 
     /**
