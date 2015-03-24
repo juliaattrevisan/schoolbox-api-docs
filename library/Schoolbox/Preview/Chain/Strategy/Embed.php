@@ -27,7 +27,7 @@ class Embed extends Base {
         /* If the url is the same as $embedCode, nothing to replace
          */
         if ($embedCode != $this->getUrl()) {
-            return $embedCode;
+            return "Is an Embera-embeddable html fragment";
         }
 
         return $this->testNext();

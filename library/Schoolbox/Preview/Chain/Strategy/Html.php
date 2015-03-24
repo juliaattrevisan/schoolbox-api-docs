@@ -30,7 +30,7 @@ class Html extends Base {
     public function test() {
         foreach ($this->getContentTypes() as $currentContentType) {
             if (strstr($this->findContentType(), $currentContentType)) {
-                return 'Is an html fragment';
+                return 'Is a website';
             }
         }
 
