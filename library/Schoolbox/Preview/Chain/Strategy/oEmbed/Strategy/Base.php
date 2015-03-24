@@ -14,6 +14,13 @@ namespace Schoolbox\Preview\Chain\Strategy\oEmbed\Strategy;
 abstract class Base {
 
     /**
+     * Next in the chain
+     *
+     * @var Base
+     */
+    protected $next;
+
+    /**
      * A DOMXPath thingy
      *
      * @var DOMXPath instance
@@ -68,6 +75,35 @@ abstract class Base {
 
     /* Getters/Setters
      */
+
+    /**
+     * Set next
+     *
+     * @param  $next
+     */
+    public function setNext($next) {
+        $this->next = $next;
+    }
+
+    /**
+     * Get next
+     *
+     * @return bool
+     */
+    public function getNext() {
+        return $this->next;
+    }
+
+    /**
+     * Test with next strategy in the sequence
+     *
+     * @return mixed
+     */
+    protected function testNext() {
+        if ($this->getNext()) {
+            return $this->getNext()->test();
+        }
+    }
 
     /**
      * Set xml

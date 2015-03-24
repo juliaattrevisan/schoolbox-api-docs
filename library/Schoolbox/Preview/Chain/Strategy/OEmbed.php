@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Preview\Chain\Strategy;
 
+use Schoolbox\Preview\Chain\Strategy\oEmbed\Start;
 
 class OEmbed extends Base {
 
@@ -35,11 +36,14 @@ class OEmbed extends Base {
 
         $xml = new \DOMXpath($document);
 
-        $json = new oEmbed\Json($xml);
-        $jsonResult = $json->test();
+        /* oEmbed chain
+         */
+        $chain = new Start($xml);
+        $result = $chain->getResult();
 
-        $xml = new oEmbed\Xml($xml);
-        $xmlResult = $xml->test();
+        if ($result !== false) {
+            return $result;
+        }
 
         /* No other oEmbed options, continue as normal
          */
