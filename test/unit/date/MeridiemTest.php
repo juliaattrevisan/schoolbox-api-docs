@@ -7,14 +7,14 @@
  * @link      http://www.alaress.com.au
  */
 
-class MeridiemTest extends PHPUnit_Framework_TestCase {
-
+class MeridiemTest extends PHPUnit_Framework_TestCase
+{
     use Alaress\Test\Date\MockDateObject;
 
     /**
-     * Data sets for testSet12HourTime
+     * Data sets for testSet12Hour
      */
-    public function getSet12HourTimeData()
+    public function getSet12HourData()
     {
         return [
             [12, 'am', 0],
@@ -45,12 +45,13 @@ class MeridiemTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @dataProvider getSet12HourTimeData
+     * @dataProvider getSet12HourData
      *
      * @param int    $hour
      * @param string $meridiem
+     * @param int    $expectedHour
      */
-    public function testSet12HourTime($hour, $meridiem, $expectedHour)
+    public function testSet12Hour($hour, $meridiem, $expectedHour)
     {
         $date = $this->buildDateObject();
         $date->set12Hour($hour, $meridiem);
@@ -58,9 +59,9 @@ class MeridiemTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Data sets for testSetInvalid12HourTime
+     * Data sets for testSetInvalid12Hour
      */
-    public function getSetInvalid12HourTimeData()
+    public function getSetInvalid12HourData()
     {
         return [
             [0, 'am'],
@@ -76,14 +77,14 @@ class MeridiemTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @dataProvider getSetInvalid12HourTimeData
+     * @dataProvider getSetInvalid12HourData
      *
      * @expectedException PHPUnit_Framework_Error_Warning
      *
      * @param int    $hour
      * @param string $meridiem
      */
-    public function testSetInvalid12HourTime($hour, $meridiem)
+    public function testSetInvalid12Hour($hour, $meridiem)
     {
         $date = $this->buildDateObject();
         $date->set12Hour($hour, $meridiem);
