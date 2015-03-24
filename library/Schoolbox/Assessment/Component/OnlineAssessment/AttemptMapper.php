@@ -71,8 +71,21 @@ class AttemptMapper extends Mapper
             'this_key'  => 'user_id',
             'other_key' => 'id'
         ));
+
+        $this->registerCallback('postSave', array($this, 'postSave'));
     }
 
+
+    /**
+     * On post save, write mark data back into remote markbook
+     * @param Attempt $object
+     * @param Attempt|null $previous
+     */
+    public function postSave(Attempt $object, $previous = null) {
+        //Copy data to remote system
+        $externalMarkbook = new \External_Markbook();
+        $externalMarkbook->setMark($object);
+    }
 
     /**
      * Gets a string of placeholders for an array - usually used for creating a

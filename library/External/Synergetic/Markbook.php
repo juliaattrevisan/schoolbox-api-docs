@@ -25,8 +25,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     private $externalUser;
 
-    const ASSESSMENT_PREFIX = 'a';
-    const SUBMISSION_PREFIX = 's';
+    const ASSESSMENT_PREFIX = 'Q-';
+    const SUBMISSION_PREFIX = 'W-';
 
     /**
      * Constructor
@@ -159,28 +159,50 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * Creates or updates the mark for a student in the remote markbook
      *
-     * @param string
-     * @param ReturnedWork|Attempt $returnedWork
+     * @param Attempt|ReturnedWork $result
      * @return bool
+     * @throws Exception
      */
-    public function setMark( $returnedWork)
+    public function setMark( $result)
     {
 
         $activity = new Activity;
-        $activity->setSubmissionBox($returnedWork->getSubmissionBox());
+
+        if($result instanceof ReturnedWork) {
+            /* Handle submission box result */
+            $activity->setSubmissionBox(SubmissionBoxMapper::getInstance()->findById($result->getSubmissionBox()->getId()));
+            $marker = UserMapper::getInstance()->findById($result->getMarker());
+            $student = UserMapper::getInstance()->findById($result->getOwner()->getId());
+            $mark = $result->getNormalizedMark();
+            $comment = $result->getComment();
+
+        }
+        else if($result instanceof Attempt) {
+            /* Handle quiz attempt */
+            $activity->setAssessment(\Schoolbox\Assessment\Component\OnlineAssessmentMapper::getInstance()->findByID($result->getAssessment()->getId()));
+            $student = UserMapper::getInstance()->findById($result->getUser()->getId());
+            $marker = $activity->getAssessment()->getUser();
+
+            /* TODO Some old handler action needs to be deprecated */
+            $evAttempt = new Assess_Attempt();
+            $total = $evAttempt->getTotalMarks($result->getAssessment()->getId(), $result->getId());
+            $actual = $evAttempt->getMarksForAttempt($result->getId());
+            $mark = ($actual / $total)*100;
+            $comment = '';
+        }
+        else {
+            throw new \Exception('Unknown object passed');
+        }
+
         $assessmentRemoteList = $this->getAssessment($activity);
 
         // If assessment box does not exist, create it first
         if(!is_array($assessmentRemoteList) || count($assessmentRemoteList) < 1 ) {
-            $submissionBox = $this->createAssessment(SubmissionBoxMapper::getInstance()->findById($returnedWork->getSubmissionBox()->getId()));
-            $assessmentRemoteList = $this->getAssessment($submissionBox);
+            $this->createAssessment($activity);
+            $assessmentRemoteList = $this->getAssessment($activity);
         }
 
         foreach($assessmentRemoteList as $assessmentRemote ) {
-
-            $marker = UserMapper::getInstance()->findById($returnedWork->getMarker());
-            $student = UserMapper::getInstance()->findById($returnedWork->getOwner()->getId());
-
 
             if($this->isMarkExist($assessmentRemote['FileType'],
                 $assessmentRemote['FileYear'],
@@ -192,8 +214,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
               ) {
 
                 $query = "UPDATE StudentAssessmentMarkBook SET
-                            Result = '".round($returnedWork->getNormalizedMark())."',
-                            TopicComment = '".$this->getDatabase()->quote($returnedWork->getComment())."'
+                            Result = '".round($mark)."',
+                            TopicComment = '".$this->getDatabase()->quote($comment)."'
                           WHERE
                               FileType = '{$assessmentRemote['FileType']}' AND
                               FileYear = '{$assessmentRemote['FileYear']}' AND
@@ -207,17 +229,16 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             else {
 
                 $query = "INSERT INTO StudentAssessmentMarkBook (
-                                  FileType
+                                  FileType,
                                   FileYear,
                                   FileSemester,
-                                  StaffID,
                                   ClassCampus,
                                   ClassCode,
                                   ID,
+                                  StaffID,
                                   MarkBookSeq,
                                   Result,
                                   TopicComment,
-                                  StudentAssessmentMarkBookSeq,
                                   ResultDate,
                                   ModifiedByID,
                                   ModifiedDate
@@ -225,23 +246,23 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                                     '{$assessmentRemote['FileType']}',
                                     '{$assessmentRemote['FileYear']}',
                                     '{$assessmentRemote['FileSemester']}',
-                                    ".$marker->getExternalId().",
                                     '{$assessmentRemote['ClassCampus']}',
                                     '{$assessmentRemote['ClassCode']}',
-                                    ".$student->getExternalId().",
+                                    '".$student->getExternalId()."',
+                                    '0',
                                     '{$assessmentRemote['MarkBookSeq']}',
-                                    '".$returnedWork->getNormalizedMark()."',
-                                    '".$returnedWork->getComment()."',
-                                    '',
-                                    CURDATE(),
-                                    ".$marker->getExternalId().",
-                                    CURDATE()
+                                    '".round($mark)."',
+                                    '".$this->getDatabase()->quote($comment)."',
+                                    CURRENT_TIMESTAMP,
+                                    '".$marker->getExternalId()."',
+                                    CURRENT_TIMESTAMP
                                   )
               ";
             }
-          $result = $this->getDatabase()->query($query);
+
+          $success = $this->getDatabase()->query($query);
         }
-        return $result;
+        return $success;
     }
 
     /**
