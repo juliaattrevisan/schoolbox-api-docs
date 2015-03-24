@@ -78,4 +78,12 @@ class BasicGetSetTest extends PHPUnit_Framework_TestCase
         $date->setDateTime(100, 11, 9, 1, 7, 47);
         $this->assertEquals($date->getDatabase(), '0100-11-09 01:07:47');
     }
+
+    public function testGetSetTimestamp()
+    {
+        $date = $this->getTestDateObject();
+        // Need a timezone to test timestamps reliably
+        $date->setTimezone(new DateTimeZone('UTC'))->setTimestamp(1);
+        $this->assertEquals($date->getDatabase(), '1970-01-01 00:00:01');
+    }
 }
