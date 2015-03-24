@@ -1,1 +1,15 @@
-{{ url.resultType }}
+<style type="text/css">
+    td {
+        border: 1px solid #666;
+        font-family: Arial;
+        font-size: 13px;
+    }
+</style>
+<table>
+    {% for url, resultType in results %}
+    <tr>
+        <td width="50%">{{ url }}</td>
+        <td width="50%">{{ resultType }}</td>
+    </tr>
+    {% endfor %}
+</table>

@@ -15,22 +15,32 @@ class Controller extends Base
 
     /**
      * Test method
-     *
-     * http%3A%2F%2Fwww.taylorswift.com
-     * http%3A%2F%2Farstechnica.com%2Finformation-technology%2F2015%2F03%2Ffor-a-brighter-robotics-future-its-time-to-offload-their-brains%2F
-     * http%3A%2F%2F192.168.36.10%2Fhomepage%2F501
-     * https%3A%2F%2Fwww.google.com.au%2Fwebhp%3Fsourceid%3Dchrome-instant%26ion%3D1%26espv%3D2%26ie%3DUTF-8%23q%3Dphilosoraptor
-     * https%3A%2F%2Fs-media-cache-ak0.pinimg.com%2F236x%2Ffb%2Fc7%2F7c%2Ffbc77c27b92b84fa99c9295d6d307a2d.jpg
      */
     public function index($params) {
-        $chain = new Start($params['encodedUrl']);
+        $testUrls = [
+            "http://www.taylorswift.com/",
+            "http://edition.cnn.com/",
+            "http://192.168.36.10/learningAnalytics/177",
+            "https://www.google.com.au/search?q=taylor+swift&oq=taylor+swift&aqs=chrome..69i57j69i65j69i60l4.1253j0j4&sourceid=chrome&es_sm=93&ie=UTF-8",
+            "https://s-media-cache-ak0.pinimg.com/236x/fb/c7/7c/fbc77c27b92b84fa99c9295d6d307a2d.jpg",
+            "http://Fen.wikipedia.org/wiki/FR._Lee_Ermey",
+            "https://twitter.com/arstechnica/status/533056992592818176",
+        ];
+
+        /* Rummage
+         */
+        $results = [];
+
+        foreach ($testUrls as $currentUrl) {
+            $chain = new Start(urlencode($currentUrl));
+
+            $results[$currentUrl] = $chain->getResult();
+        }
 
         $this->getResponse()->content->set([
             'template' => '@preview/index.twig',
             'data' => [
-                'url' => [
-                    'resultType' => $chain->getResult()
-                ]
+                'results' => $results
             ]
         ]);
     }
