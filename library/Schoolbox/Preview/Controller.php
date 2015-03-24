@@ -31,21 +31,8 @@ class Controller extends Base
             "https://soundcloud.com/majorlazer",
         ];
 
-        /* Rummage
-         */
-        $results = [];
+        $chain = new Start(urlencode($testUrls[4]));
 
-        foreach ($testUrls as $currentUrl) {
-            $chain = new Start(urlencode($currentUrl));
-
-            $results[$currentUrl] = $chain->getResult();
-        }
-
-        $this->getResponse()->content->set([
-            'template' => '@preview/index.twig',
-            'data' => [
-                'results' => $results
-            ]
-        ]);
+        $this->getResponse()->content->set($chain->getResult());
     }
 }
