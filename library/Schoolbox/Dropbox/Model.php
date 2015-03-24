@@ -15,6 +15,13 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
 
+/**
+ * Class Model
+ *
+ * TODO consider refactoring this into the Resource\AbstractFile abstraction once merged with SB-7185
+ *
+ * @package Schoolbox\Dropbox
+ */
 class Model implements ISoftDeletable
 {
     /** @var int */
