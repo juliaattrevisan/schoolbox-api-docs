@@ -20,7 +20,7 @@ use Schoolbox\Storage;
 /**
  * Class FileMapper
  *
- * @deprecated
+ * @deprecated in favour of Resource\File\Mapper, this class retained for backward compatibility
  * @package Schoolbox\Resource
  */
 class FileMapper extends Mapper implements Schoolbox\StorageMapperInterface {

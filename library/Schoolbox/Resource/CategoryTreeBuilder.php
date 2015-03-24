@@ -16,7 +16,7 @@ use Schoolbox\Resource\Folder\Mapper;
 /**
  * Class CategoryTreeBuilder
  *
- * @deprecated
+ * @deprecated in favour of Resource\Folder\TreeBuilder, this class retained for backward compatibility
  * @package Schoolbox\Resource
  */
 class CategoryTreeBuilder extends Folder\TreeBuilder

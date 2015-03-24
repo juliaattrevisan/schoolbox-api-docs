@@ -10,6 +10,12 @@
 
 namespace Schoolbox\Resource;
 
+/**
+ * Class CategoryLog
+ *
+ * @deprecated in favour of Resource\Folder\Log\Model, this class retained for backward compatibility
+ * @package Schoolbox\Resource
+ */
 class CategoryLog extends Folder\Log\Model
 {
 

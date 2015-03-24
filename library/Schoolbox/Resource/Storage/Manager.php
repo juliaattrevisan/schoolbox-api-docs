@@ -122,7 +122,7 @@ class Manager
      * Create symlink for backward-compatibility.
      * TODO once nothing points to the old system, remove this method completely
      *
-     * @deprecated
+     * @deprecated, remove once all references to old storage systems are removed
      * @param Model $storage
      */
     private function reverseSymlink(Model $storage)

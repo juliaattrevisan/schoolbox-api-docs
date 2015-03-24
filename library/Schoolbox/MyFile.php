@@ -16,7 +16,7 @@ use Schoolbox\Resource;
  * Class MyFile
  *
  * @package Schoolbox
- * @deprecated
+ * @deprecated in favour of Resource\My\File\Model, this class retained for backward compatibility
  */
 class MyFile extends Resource\My\File\Model implements FileInterface {
 

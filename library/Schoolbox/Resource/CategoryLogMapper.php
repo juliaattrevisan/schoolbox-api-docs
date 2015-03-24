@@ -12,7 +12,7 @@ namespace Schoolbox\Resource;
 /**
  * Class CategoryLogMapper
  *
- * @deprecated
+ * @deprecated in favour of Resource\Folder\Log\Mapper, this class retained for backward compatibility
  * @package Schoolbox\Resource
  */
 class CategoryLogMapper extends Folder\Log\Mapper

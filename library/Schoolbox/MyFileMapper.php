@@ -14,7 +14,7 @@ use Schoolbox\File\MimetypeMapper;
 /**
  * Class MyFileMapper
  *
- * @deprecated
+ * @deprecated in favour of Resource\My\File\Mapper, this class retained for backward compatibility
  * @package Schoolbox
  */
 class MyFileMapper extends Resource\My\File\Mapper implements Resource\FileLocatorInterface, StorageMapperInterface {

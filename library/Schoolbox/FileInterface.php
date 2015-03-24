@@ -14,7 +14,7 @@ namespace Schoolbox;
 /**
  * Interface FileInterface
  *
- * @deprecated
+ * @deprecated in favour of Resource\File\IFile, this interface retained for backward compatibility
  * @package Schoolbox
  */
 interface FileInterface /* extends IFile */

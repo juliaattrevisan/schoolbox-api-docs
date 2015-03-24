@@ -17,7 +17,7 @@ use Schoolbox\File\Mimetype;
 /**
  * Class File
  *
- * @deprecated
+ * @deprecated in favour of Resource\File\Model, this class retained for backward compatibility
  * @package Schoolbox\Resource
  */
 class File extends File\Model implements FileInterface {
