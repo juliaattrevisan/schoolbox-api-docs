@@ -8,6 +8,7 @@
 namespace Schoolbox\Preview;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Preview\Chain\Start;
 
 class Controller extends Base
 {
@@ -21,6 +22,8 @@ class Controller extends Base
      * https%3A%2F%2Fwww.google.com.au%2Fwebhp%3Fsourceid%3Dchrome-instant%26ion%3D1%26espv%3D2%26ie%3DUTF-8%23q%3Dphilosoraptor
      */
     public function index($params) {
+        $chain = new Start('http%3A%2F%2Fwww.taylorswift.com');
+
         $this->getResponse()->content->set([
             'template' => '@preview/index.twig',
             'data' => [
