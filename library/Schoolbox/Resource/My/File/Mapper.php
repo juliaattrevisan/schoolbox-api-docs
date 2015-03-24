@@ -16,6 +16,7 @@ use Schoolbox\Resource\AbstractFileMapper;
 use Schoolbox\Resource\File\IFileMapper;
 use Schoolbox\Resource\File\ILocator;
 use Schoolbox\Resource\Storage;
+use Schoolbox\User;
 
 class Mapper extends AbstractFileMapper implements ILocator, IFileMapper
 {
@@ -60,10 +61,20 @@ class Mapper extends AbstractFileMapper implements ILocator, IFileMapper
     {
         return $this->findByColumnList(array(
             'parent' => $nodeId,
-            'owner'  => $_SESSION['id'] // TODO: FIX. DO NOT MERGE THIS
+            'owner'  => $this->getSessionUserId()
         ));
     }
 
+
+    /**
+     * @return int
+     */
+    protected function getSessionUserId()
+    {
+        return $this->sessionData['user'] instanceof User
+            ? $this->sessionData['user']->getId()
+            : null;
+    }
 
     /**
      * Find all image files owned by a particular user
