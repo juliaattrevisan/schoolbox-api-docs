@@ -21,19 +21,19 @@ abstract class Base {
     protected $next;
 
     /**
-     * The url to test
+     * Header data from get_headers()
      *
-     * @var string
+     * @var array
      */
-    protected $url = '';
+    protected $headers = array();
 
     /**
      * Constructor
      *
-     * @param $url
+     * @param $headers
      */
-    public function __construct($url) {
-        $this->setUrl($url);
+    public function __construct($headers) {
+        $this->setHeaders($headers);
     }
 
     /**
@@ -45,6 +45,27 @@ abstract class Base {
         if ($this->getNext()) {
             return $this->getNext()->test();
         }
+    }
+
+    /**
+     * Macro method
+     *
+     * @return mixed
+     */
+    protected function findContentType() {
+        return $this->findByKey('Content-Type');
+    }
+
+    /**
+     * Get a header key
+     *
+     * @param $key
+     * @return mixed
+     */
+    protected function findByKey($key) {
+        $headers = $this->getHeaders();
+
+        return $headers[$key];
     }
 
     /* Getters/Setters
@@ -69,22 +90,22 @@ abstract class Base {
     }
 
     /**
-     * Set url
+     * Set headers
      *
-     * @param string $url
+     * @param array $headers
      */
-    protected function setUrl($url)
+    protected function setHeaders($headers)
     {
-        $this->url = $url;
+        $this->headers = $headers;
     }
 
     /**
-     * Get url
+     * Get headers
      *
-     * @return string
+     * @return array
      */
-    protected function getUrl()
+    protected function getHeaders()
     {
-        return $this->url;
+        return $this->headers;
     }
 }
