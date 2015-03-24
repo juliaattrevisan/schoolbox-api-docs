@@ -20,6 +20,13 @@ use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\UserMapper;
 
+/**
+ * Class AbstractFileMapper
+ *
+ * Provides common mapping functionality for AbstractFiles
+ *
+ * @package Schoolbox\Resource
+ */
 abstract class AbstractFileMapper extends Schoolbox\Mapper
 {
 

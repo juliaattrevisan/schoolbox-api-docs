@@ -12,6 +12,13 @@ namespace Schoolbox\Resource;
 
 use Schoolbox\Resource\Folder\IFolder;
 
+/**
+ * Class AbstractFolder
+ *
+ * Provides common functionality for tree-based filesystem implementations (ie. can have an IFolder parent)
+ *
+ * @package Schoolbox\Resource
+ */
 abstract class AbstractFolder implements IFolder
 {
     /**

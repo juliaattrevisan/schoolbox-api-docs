@@ -18,6 +18,8 @@ use Schoolbox\Resource\File\IFile;
 /**
  * Class Model
  *
+ * The MyFile Model. Represents a file within the portfolio system.
+ *
  * @package Schoolbox\Resource\My\File
  * @method Resource\My\Folder\Model getFolder()
  */

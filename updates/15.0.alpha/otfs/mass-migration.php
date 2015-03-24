@@ -1,6 +1,7 @@
 <?php
 /**
- * 
+ * This script performs a mass migration of the given $patterns from brokenFS to OTFS
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/

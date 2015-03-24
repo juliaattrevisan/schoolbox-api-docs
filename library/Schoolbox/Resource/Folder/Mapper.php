@@ -24,6 +24,8 @@ use Schoolbox\User;
 /**
  * Class Mapper
  *
+ * SBFS Folder Mapper. Maps category table to SBFS folder objects.
+ *
  * @package Schoolbox\Resource\Folder
  * @method Model createModel()
  * @method Model hydrate(array $row, $alias = '', $callback = null)

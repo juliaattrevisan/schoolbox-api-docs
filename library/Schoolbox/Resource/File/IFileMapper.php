@@ -11,6 +11,13 @@ namespace Schoolbox\Resource\File;
 
 use Schoolbox\Resource\Storage;
 
+/**
+ * Interface IFileMapper
+ *
+ * Must be implemented by all mappers that have a model that implements IFile
+ *
+ * @package Schoolbox\Resource\File
+ */
 interface IFileMapper extends IStorageWrapper
 {
 

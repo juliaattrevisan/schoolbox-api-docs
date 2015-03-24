@@ -12,6 +12,14 @@ namespace Schoolbox\Resource\Storage;
 
 use PDOStatement;
 
+/**
+ * Interface MigrationPattern
+ *
+ * Implementing classes aid in transition from brokenFS to OTFS for their particular domain.
+ * @see Migrator for how it's used
+ *
+ * @package Schoolbox\Resource\Storage
+ */
 interface MigrationPattern
 {
 

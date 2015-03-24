@@ -14,6 +14,13 @@ use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
 
+/**
+ * Interface IFile
+ *
+ * Provides common access methods across all File implementations
+ *
+ * @package Schoolbox\Resource\File
+ */
 interface IFile extends IStorage
 {
 

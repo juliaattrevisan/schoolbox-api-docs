@@ -13,6 +13,13 @@ namespace Schoolbox\Resource\My\Folder;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\User;
 
+/**
+ * Class Model
+ *
+ * The MyFolder Model. Represents a folder within the portfolio system.
+ *
+ * @package Schoolbox\Resource\My\Folder
+ */
 class Model extends AbstractFolder
 {
 

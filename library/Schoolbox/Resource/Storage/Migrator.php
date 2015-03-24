@@ -22,6 +22,13 @@ use Schoolbox\Resource;
 use Schoolbox\Resource\Storage;
 use League\Flysystem;
 
+/**
+ * Class Migrator
+ *
+ * For every supplied MigrationPattern, Migrator transitions files safely from the given brokenFS storage to OTFS
+ *
+ * @package Schoolbox\Resource\Storage
+ */
 class Migrator
 {
 

@@ -16,6 +16,8 @@ use Schoolbox\Resource\AbstractFile;
 /**
  * Class Model
  *
+ * The SBFS File Model. Represents a file within SBFS.
+ *
  * @package Schoolbox\Resource\File
  */
 class Model extends AbstractFile

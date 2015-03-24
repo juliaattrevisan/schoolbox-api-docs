@@ -15,6 +15,13 @@ use PDOStatement;
 use Schoolbox\Config\Loader;
 use Schoolbox\Resource\Storage\MigrationPattern;
 
+/**
+ * Class Migration
+ *
+ * Migration Pattern for SBFS. Facilitates the transition of SBFS files from from brokenFS to OTFS
+ *
+ * @package Schoolbox\Resource\File
+ */
 class Migration implements MigrationPattern
 {
     /** @var Database */

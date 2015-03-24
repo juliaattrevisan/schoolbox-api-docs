@@ -11,6 +11,13 @@ namespace Schoolbox\Resource\Storage;
 
 use Alaress_Date_Format as ADF;
 
+/**
+ * Interface IStorage
+ *
+ * Common methods for basic file-based functionality, extended by IFile
+ *
+ * @package Schoolbox\Resource\Storage
+ */
 interface IStorage
 {
 

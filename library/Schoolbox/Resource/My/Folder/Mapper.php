@@ -15,6 +15,13 @@ use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Resource\Folder\ILocator;
 use Schoolbox\UserMapper;
 
+/**
+ * Class Mapper
+ *
+ * MyFolder Mapper. Maps myFolder table to portfolio folder objects.
+ *
+ * @package Schoolbox\Resource\My\Folder
+ */
 class Mapper extends AbstractFolderMapper implements ILocator
 {
 

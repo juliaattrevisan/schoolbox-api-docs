@@ -17,6 +17,15 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
 use Schoolbox\File;
 
+/**
+ * Class Manager
+ *
+ * Mappers are to Models as this Manager is to files.
+ * In principle, Mappers DO NOT influence the filesystem in anyway - that's what this class is for.
+ * This is essentially a Schoolbox abstraction around Flysystem's MountManager.
+ *
+ * @package Schoolbox\Resource\Storage
+ */
 class Manager
 {
 

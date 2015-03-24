@@ -11,6 +11,13 @@ namespace Schoolbox\Resource;
 
 use Schoolbox;
 
+/**
+ * Class AbstractFolderMapper
+ *
+ * Provides common mapping functionality for AbstractFolders
+ *
+ * @package Schoolbox\Resource
+ */
 abstract class AbstractFolderMapper extends Schoolbox\Mapper
 {
 

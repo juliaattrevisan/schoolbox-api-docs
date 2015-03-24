@@ -15,6 +15,13 @@ use PDOStatement;
 use Schoolbox\Config\Loader;
 use Schoolbox\Resource\Storage\MigrationPattern;
 
+/**
+ * Class Migration
+ *
+ * Migration Pattern for MyFiles. Facilitates the transition of MyFile files from from brokenFS to OTFS
+ *
+ * @package Schoolbox\Resource\My\File
+ */
 class Migration implements MigrationPattern
 {
     /** @var Database */

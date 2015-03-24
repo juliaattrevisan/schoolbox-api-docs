@@ -18,6 +18,13 @@ use Schoolbox\Resource\File\ILocator;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
+/**
+ * Class Mapper
+ *
+ * MyFile Mapper. Maps myFile table to portfolio File objects
+ *
+ * @package Schoolbox\Resource\My\File
+ */
 class Mapper extends AbstractFileMapper implements ILocator, IFileMapper
 {
 

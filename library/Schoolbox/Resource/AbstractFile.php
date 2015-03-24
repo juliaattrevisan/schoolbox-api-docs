@@ -20,6 +20,8 @@ use Schoolbox\User;
 /**
  * Class AbstractFile
  *
+ * Provides common file-based functionality for files stored in a directory structure (ie. can have an IFolder parent)
+ *
  * @package Schoolbox\Resource
  * @method AbstractFile setHash($hash)
  * @method Mimetype     getMimetype()

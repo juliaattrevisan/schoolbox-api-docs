@@ -14,6 +14,8 @@ use Schoolbox\Resource;
 /**
  * Class Mapper
  *
+ * File Mapper. Maps file table to SBFS file objects.
+ *
  * @package Schoolbox\Resource\File
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model findById($id)

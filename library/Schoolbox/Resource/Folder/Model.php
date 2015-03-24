@@ -18,6 +18,13 @@ use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * Class Model
+ *
+ * The SBFS Folder Model. Represents a folder within SBFS.
+ *
+ * @package Schoolbox\Resource\Folder
+ */
 class Model extends AbstractFolder implements ISoftDeletable
 {
 

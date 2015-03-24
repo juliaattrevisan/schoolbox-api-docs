@@ -20,6 +20,8 @@ use Schoolbox\File\MimetypeMapper;
 /**
  * Class Mapper
  *
+ * Storage Mapper. Maps storage table to Schoolbox storage objects
+ *
  * @package Schoolbox\Resource\Storage
  *
  * @method Model hydrate()

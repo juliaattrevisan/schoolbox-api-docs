@@ -9,7 +9,15 @@
 
 namespace Schoolbox\Resource\Storage;
 
-
+/**
+ * Interface Receiver
+ *
+ * Implementing classes are capable of storing a temporary file permanently.
+ * In reality, this is probably only going to be the StorageMapper,
+ * but it's much better to rely on an interface for specific functionality.
+ *
+ * @package Schoolbox\Resource\Storage
+ */
 interface Receiver
 {
 

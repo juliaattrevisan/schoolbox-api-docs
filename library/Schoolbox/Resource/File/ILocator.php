@@ -12,6 +12,13 @@ namespace Schoolbox\Resource\File;
 
 use Schoolbox\Collection;
 
+/**
+ * Interface ILocator
+ *
+ * Common interface for classes (usually mappers) that are capable of locating a specific file by its ID or parent folder
+ *
+ * @package Schoolbox\Resource\File
+ */
 interface ILocator
 {
 

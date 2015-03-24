@@ -11,6 +11,14 @@ namespace Schoolbox\Resource\File;
 
 use Schoolbox\Resource\Storage;
 
+/**
+ * Interface IStorageWrapper
+ *
+ * Must be implemented by mappers that depend on Storage.
+ * Provides a method for returning the mapper's model wrapped around the given storage object.
+ *
+ * @package Schoolbox\Resource\File
+ */
 interface IStorageWrapper
 {
 
