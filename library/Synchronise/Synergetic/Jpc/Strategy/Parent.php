@@ -119,7 +119,7 @@ class Synchronise_Synergetic_Jpc_Strategy_Parent extends Synchronise_Synergetic_
 				}
 
                 // Get all of this parent's students.
-                // If they have got no current ones, they are a current parent.
+                // If they have got no current ones, they are a past parent.
                 $roleId = self::PAST_PARENT_ROLE_ID;
                 foreach ($this->getExternalUserHandler()->getEnrolledStudents($currentSynergyId) as $student) {
                     // Is this student current?
