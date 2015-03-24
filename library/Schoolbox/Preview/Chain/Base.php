@@ -56,7 +56,7 @@ abstract class Base {
      *
      * @return null
      */
-    protected function getResult()
+    public function getResult()
     {
         return $this->result;
     }

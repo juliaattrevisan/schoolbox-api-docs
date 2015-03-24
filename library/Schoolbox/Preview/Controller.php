@@ -29,8 +29,7 @@ class Controller extends Base
             'template' => '@preview/index.twig',
             'data' => [
                 'url' => [
-                    'original' => $params['encodedUrl'],
-                    'decoded' => urldecode($params['encodedUrl'])
+                    'resultType' => $chain->getResult()
                 ]
             ]
         ]);
