@@ -91,6 +91,8 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
     {
         $hashJoin = $this->getJoinMapper('hash');
 
+        $table = $this->getTable();
+
         // much join.
         return "
             SELECT {$this->getColumnString()},
@@ -98,11 +100,11 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
                    {$hashJoin->getJoinColumnString('allowedFileExtension', 'm')},
                    {$this->getJoinColumnString('owner', 'u')},
                    {$this->getJoinColumnString($this->getFolderFieldname(), 'c')}
-            FROM `{$this->getTable()}`
-            LEFT JOIN {$this->getJoinSql('hash', 'file', 'h')}
+            FROM `$table`
+            LEFT JOIN {$this->getJoinSql('hash', $table, 'h')}
             LEFT JOIN {$hashJoin->getJoinSql('allowedFileExtension', 'h', 'm', true)}
-            LEFT JOIN {$this->getJoinSql('owner', 'file', 'u')}
-            LEFT JOIN {$this->getJoinSql($this->getFolderFieldname(), 'file', 'c')}
+            LEFT JOIN {$this->getJoinSql('owner', $table, 'u')}
+            LEFT JOIN {$this->getJoinSql($this->getFolderFieldname(), $table, 'c')}
         ";
     }
 
