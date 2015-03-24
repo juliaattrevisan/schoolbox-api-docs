@@ -35,87 +35,14 @@ class OEmbed extends Base {
 
         $xml = new \DOMXpath($document);
 
-        /* Prefer JSON first
-         */
-        $jsonResult = $this->findJsonEmbeddable($xml);
+        $json = new oEmbed\Json($xml);
+        $jsonResult = $json->test();
 
-        if (strlen($jsonResult)) {
-            return "A JSON oEmbeddable video at {$jsonResult}";
-        }
-
-        /* Then try the XML version
-         */
-        $xmlResult = $this->findXmlEmbeddable($xml);
-
-        if (strlen($xmlResult)) {
-            return "An XML oEmbeddable video at {$xmlResult}";
-        }
+        $xml = new oEmbed\Xml($xml);
+        $xmlResult = $xml->test();
 
         /* No other oEmbed options, continue as normal
          */
         return $this->testNext();
     }
-
-    /**
-     * Find first instance of oEmbed for json
-     * (in case someone made multiple definitions somehow)
-     *
-     * @param $xml
-     * @return mixed
-     */
-    private function findJsonEmbeddable($xml) {
-        $query = "//link[@type='application/json+oembed']";
-
-        return $this->findFirstMatching($xml, $query, 'href');
-    }
-
-    /**
-     * Find first instance of oEmbed for xml
-     * (in case someone made multiple definitions somehow)
-     *
-     * @param $xml
-     * @return mixed
-     */
-    private function findXmlEmbeddable($xml) {
-        $query = "//link[@type='text/xml+oembed']";
-
-        return $this->findFirstMatching($xml, $query, 'href');
-    }
-
-    /**
-     * Find first element containing informatin about $attribute
-     * matching $query
-     *
-     * @param $xml
-     * @param $query
-     * @param $attribute
-     * @return mixed
-     */
-    private function findFirstMatching($xml, $query, $attribute) {
-        return array_shift($this->analyse($xml, $query, $attribute));
-    }
-
-    /**
-     * Have a think about $query and return whatever it found
-     *
-     * @param $xml
-     * @param $query
-     * @param $attribute
-     * @return string
-     */
-    private function analyse($xml, $query, $attribute) {
-        $allElements = $xml->query($query);
-
-        $stack = [];
-
-        foreach($allElements as $currentElement) {
-            foreach($currentElement->attributes as $currentAttribute) {
-                if ($currentAttribute->nodeName == $attribute) {
-                    $stack[] = $currentAttribute->nodeValue;
-                }
-            }
-        }
-
-        return $stack;
-    }
-} 
+}
