@@ -158,7 +158,7 @@ class Synchronise_Synergetic_Jpc_Strategy_Parent extends Synchronise_Synergetic_
 				}
 
                 // Store that this user was updated
-                $this->setExternalIdAsSynced($updatedUser['synergy_id']);
+                $this->setExternalIdAsSynced($currentSynergyId);
 
 				/* Actually perform db update
 				 */
