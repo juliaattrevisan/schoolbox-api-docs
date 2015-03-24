@@ -26,7 +26,7 @@ class Module extends BaseModule
     {
         // All of these URLs relate to the resource ID, not a booking ID.
         // Therefore, they should probably be moved to the item module.
-        $router->addGet('preview.index', $basePath);
+        $router->addGet('preview.index', $basePath . '/{encodedUrl}');
     }
 
     /**
@@ -39,6 +39,7 @@ class Module extends BaseModule
             '/^preview\.index/',
             function($params) {
                 return array(
+                    'params' => $params
                 );
             }
         );

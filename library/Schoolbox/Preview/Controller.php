@@ -12,12 +12,23 @@ use Alaress\Web\Controller\Base;
 class Controller extends Base
 {
 
-    public function index() {
-        echo 'test';
-
+    /**
+     * Test method
+     *
+     * http%3A%2F%2Fwww.taylorswift.com
+     * http%3A%2F%2Farstechnica.com%2Finformation-technology%2F2015%2F03%2Ffor-a-brighter-robotics-future-its-time-to-offload-their-brains%2F
+     * http%3A%2F%2F192.168.36.10%2Fhomepage%2F501
+     * https%3A%2F%2Fwww.google.com.au%2Fwebhp%3Fsourceid%3Dchrome-instant%26ion%3D1%26espv%3D2%26ie%3DUTF-8%23q%3Dphilosoraptor
+     */
+    public function index($params) {
         $this->getResponse()->content->set([
             'template' => '@preview/index.twig',
-            'data' => []
+            'data' => [
+                'url' => [
+                    'original' => $params['encodedUrl'],
+                    'decoded' => urldecode($params['encodedUrl'])
+                ]
+            ]
         ]);
     }
 }
