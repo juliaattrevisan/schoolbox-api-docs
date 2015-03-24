@@ -11,9 +11,9 @@ class BasicGetSetTest extends PHPUnit_Framework_TestCase
 {
     use Alaress\Test\Date\MockDateObject;
 
-    protected function getTestDateObject()
+    protected function getTestDateObject(DateTimeZone $timezone = null)
     {
-        return $this->buildDateObject('2015-03-25 08:01:13', Alaress_Date_Format::DATABASE_FORMAT);
+        return $this->buildDateObject('2015-03-25 08:01:13', Alaress_Date_Format::DATABASE_FORMAT, $timezone);
     }
 
     public function testGetSetSecond()
@@ -85,5 +85,18 @@ class BasicGetSetTest extends PHPUnit_Framework_TestCase
         $date = $this->buildDateObject(time(), 'U', new DateTimeZone('UTC'));
         $date->setTimestamp(1);
         $this->assertEquals($date->getDatabase(), '1970-01-01 00:00:01');
+    }
+
+    public function testGetSetTimezone()
+    {
+        // Doesn't test creating a date with a timezone yet, or test time
+        // when changing a timezone.
+        $date = $this->getTestDateObject(new DateTimeZone('UTC'));
+        // QLD: GMT+10
+        $date->setTimezone('Australia/Queensland');
+        $this->assertEquals($date->getDatabase(), '2015-03-25 18:01:13');
+        // VIC: GMT+11 (DST)
+        $date->setTimezone('Australia/Victoria');
+        $this->assertEquals($date->getDatabase(), '2015-03-25 19:01:13');
     }
 }
