@@ -21,6 +21,13 @@ abstract class Base {
     protected $next;
 
     /**
+     * The requested url
+     *
+     * @var string
+     */
+    protected $url = '';
+
+    /**
      * Header data from get_headers()
      *
      * @var array
@@ -30,9 +37,11 @@ abstract class Base {
     /**
      * Constructor
      *
+     * @param $url
      * @param $headers
      */
-    public function __construct($headers) {
+    public function __construct($url, $headers) {
+        $this->setUrl($url);
         $this->setHeaders($headers);
     }
 
@@ -107,5 +116,25 @@ abstract class Base {
     protected function getHeaders()
     {
         return $this->headers;
+    }
+
+    /**
+     * Set url
+     *
+     * @param string $url
+     */
+    protected function setUrl($url)
+    {
+        $this->url = $url;
+    }
+
+    /**
+     * Get url
+     *
+     * @return string
+     */
+    protected function getUrl()
+    {
+        return $this->url;
     }
 }

@@ -12,6 +12,7 @@ namespace Schoolbox\Preview\Chain;
 
 use Schoolbox\Preview\Chain\Strategy\Image;
 use Schoolbox\Preview\Chain\Strategy\Html;
+use Schoolbox\Preview\Chain\Strategy\OEmbed;
 use Schoolbox\Preview\Chain\Strategy\Other;
 
 class Start extends Base {
@@ -22,12 +23,15 @@ class Start extends Base {
      * @param $url
      */
     public function __construct($url) {
-        $headers = $this->findHeaders($url);
+        $decodedUrl = urldecode($url);
+        
+        $headers = $this->findHeaders($decodedUrl);
 
         $this->start([
-            new Image($headers),
-            new Html($headers),
-            new Other($headers),
+            new Image($decodedUrl, $headers),
+            new OEmbed($decodedUrl, $headers),
+            new Html($decodedUrl, $headers),
+            new Other($decodedUrl, $headers),
         ]);
     }
 
@@ -35,7 +39,7 @@ class Start extends Base {
      * Decode url and format header output
      */
     private function findHeaders($url) {
-        $headers = get_headers(urldecode($url), 1);
+        $headers = get_headers($url, 1);
 
         /* Rebuild array if you got redirected around the place
          */
