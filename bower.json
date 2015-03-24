@@ -35,6 +35,7 @@
     "jquery.tablesorter": "2.14.5",
     "momentjs": "2.9.0",
     "jstree": "3.0.4",
+    "zeroclipboard": "2.2.0",
     "foundation": "5.5.0"
   },
   "ignore": [

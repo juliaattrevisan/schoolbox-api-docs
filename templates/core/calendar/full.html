@@ -2,9 +2,11 @@
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
 <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
+
 <script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
 <script type="text/javascript" src="/javascript/jquery.fullcalendar.js"></script>
 <script type="text/javascript" src="/javascript/jquery.greenerize.js"></script>
+<script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
 <script type="text/javascript">
 
     // provide page-wide access to the calendar object so the callbacks can actually use it
@@ -417,6 +419,8 @@
             });
         });
 
+        var client = new ZeroClipboard($('#copy-button'));
+
         // Copypasted code for updating booking in series
         $('#calendar-bubble').find('#editEvent').on(
             'click',
@@ -700,7 +704,8 @@
 	<div id="calendar-export-dialog-text">
 		Use the following URL as the source for your feed.
 	</div>
-	<textarea readonly id="calendar-export-dialog-url"></textarea>
+	<textarea readonly id="calendar-export-dialog-url" rows="6"></textarea>
+    <button class="btn no-icon" id="copy-button" data-clipboard-target="calendar-export-dialog-url" title="Click to copy me.">Copy to Clipboard</button>
 </div>
 
 <div id="dialog-booking-bulk-update" title="This booking is part of a series">
