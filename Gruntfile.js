@@ -138,6 +138,10 @@ module.exports = function(grunt) {
         },
         less: buildTasks,
         sass: {
+            // Don't run from bundle for now, as installing bundle runs out of memory
+            //options: {
+            //    bundleExec: true
+            //},
             dist: {
                 files: {
                     'www/css/foundation/chrome.css': 'www/css/foundation/chrome-foundation.scss'
