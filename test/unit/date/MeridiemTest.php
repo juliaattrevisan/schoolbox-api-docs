@@ -12,7 +12,7 @@ class MeridiemTest extends PHPUnit_Framework_TestCase {
     use Alaress\Test\Date\MockDateObject;
 
     /**
-     * Valid data sets for testSet12HourTime
+     * Data sets for testSet12HourTime
      */
     public function getSet12HourTimeData()
     {
@@ -49,12 +49,43 @@ class MeridiemTest extends PHPUnit_Framework_TestCase {
      *
      * @param int    $hour
      * @param string $meridiem
-     * @param string $expectedHour
      */
     public function testSet12HourTime($hour, $meridiem, $expectedHour)
     {
         $date = $this->buildDateObject();
         $date->set12Hour($hour, $meridiem);
         $this->assertEquals($expectedHour, $date->get24Hour());
+    }
+
+    /**
+     * Data sets for testSetInvalid12HourTime
+     */
+    public function getSetInvalid12HourTimeData()
+    {
+        return [
+            [0, 'am'],
+            [13, 'am'],
+            [0, 'pm'],
+            [13, 'pm'],
+            [1, 'bm',],
+            [2, 'cm',],
+            [null, 'am',],
+            [null, null,],
+            [3, null,],
+        ];
+    }
+
+    /**
+     * @dataProvider getSetInvalid12HourTimeData
+     *
+     * @expectedException PHPUnit_Framework_Error_Warning
+     *
+     * @param int    $hour
+     * @param string $meridiem
+     */
+    public function testSetInvalid12HourTime($hour, $meridiem)
+    {
+        $date = $this->buildDateObject();
+        $date->set12Hour($hour, $meridiem);
     }
 }
