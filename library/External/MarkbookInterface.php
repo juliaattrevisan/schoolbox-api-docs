@@ -6,8 +6,10 @@
  * @copyright   Copyright 2015, Alaress Pty Ltd
  */
 
-use \Schoolbox\Assessment\Component\SubmissionBox;
+use \Schoolbox\Assessment\Activity;
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use \Schoolbox\Assessment\Component\OnlineAssessment\Attempt;
+
 
 interface External_MarkbookInterface
 {
@@ -15,34 +17,34 @@ interface External_MarkbookInterface
     /**
      * Returns the assessment information if found in remote system
      *
-     * @param \Schoolbox\Assessment\Component\SubmissionBox $assessment
+     * @param Activity $assessment
      * @return array
      */
-    public function getAssessment(SubmissionBox $assessment);
+    public function getAssessment(Activity $assessment);
 
     /**
      * Creates a new assessment item in the markbook
      *
-     * @param \Schoolbox\Assessment\Component\SubmissionBox $assessment
+     * @param Activity $assessment
      * @return array
      */
-    public function createAssessment(SubmissionBox $assessment);
+    public function createAssessment(Activity $assessment);
 
     /**
      * Updates an existing markbook assessment
      *
-     * @param \Schoolbox\Assessment\Component\SubmissionBox $assessment
+     * @param Activity $assessment
      * @return array
      */
-    public function updateAssessment(SubmissionBox $assessment);
+    public function updateAssessment(Activity $assessment);
 
     /**
      * Creates or updates the mark for a student in the remote markbook
      *
-     * @param \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $returnedWork
+     * @param ReturnedWork|Attempt  $returnedWork
      * @return bool
      */
-    public function setMark(ReturnedWork $returnedWork);
+    public function setMark($returnedWork);
 
 }
 

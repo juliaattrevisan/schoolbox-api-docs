@@ -5,8 +5,9 @@
  * @copyright   Copyright 2015, Alaress Pty Ltd
  */
 
-use \Schoolbox\Assessment\Component\SubmissionBox;
+use \Schoolbox\Assessment\Activity;
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use \Schoolbox\Assessment\Component\OnlineAssessment\Attempt;
 
 class External_Markbook implements External_MarkbookInterface
 {
@@ -27,10 +28,10 @@ class External_Markbook implements External_MarkbookInterface
     /**
      * Returns the assessment information if found in remote system
      *
-     * @param \Schoolbox\Assessment\Component\SubmissionBox $assessment
+     * @param Activity $assessment
      * @return array
      */
-    public function getAssessment(SubmissionBox $assessment)
+    public function getAssessment(Activity $assessment)
     {
         return $this->getDatabase()->getAssessment($assessment);
     }
@@ -38,10 +39,10 @@ class External_Markbook implements External_MarkbookInterface
     /**
      * Creates a new assessment item in the markbook
      *
-     * @param \Schoolbox\Assessment\Component\SubmissionBox $assessment
+     * @param Activity $assessment
      * @return mixed
      */
-    public function createAssessment(SubmissionBox $assessment)
+    public function createAssessment(Activity $assessment)
     {
         return $this->getDatabase()->createAssessment($assessment);
     }
@@ -49,10 +50,10 @@ class External_Markbook implements External_MarkbookInterface
     /**
      * Updates an existing markbook assessment
      *
-     * @param \Schoolbox\Assessment\Component\SubmissionBox $assessment
+     * @param Activity $assessment
      * @return mixed
      */
-    public function updateAssessment(SubmissionBox $assessment)
+    public function updateAssessment(Activity $assessment)
     {
         return $this->getDatabase()->updateAssessment($assessment);
     }
@@ -60,10 +61,10 @@ class External_Markbook implements External_MarkbookInterface
     /**
      * Creates or updates the mark for a student in the remote markbook
      *
-     * @param \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $returnedWork
+     * @param ReturnedWork|Attempt $returnedWork
      * @return bool
      */
-    public function setMark(ReturnedWork $returnedWork)
+    public function setMark( $returnedWork)
     {
         return $this->getDatabase()->setMark($returnedWork);
     }

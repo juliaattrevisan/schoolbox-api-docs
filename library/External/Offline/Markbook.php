@@ -9,15 +9,19 @@
  * @copyright   Copyright 2015, Alaress Pty Ltd
  */
 
+use \Schoolbox\Assessment\Activity;
+use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use \Schoolbox\Assessment\Component\OnlineAssessment\Attempt;
+
 class External_Offline_Markbook implements External_MarkbookInterface
 {
     /**
      * Returns the assessment information if found in remote system
      *
-     * @param \Schoolbox\Assessment\Component\SubmissionBox $assessment
+     * @param Activity $assessment
      * @return array
      */
-    public function getAssessment(\Schoolbox\Assessment\Component\SubmissionBox $assessment)
+    public function getAssessment(Activity $assessment)
     {
         // NOOP
         return array();
@@ -26,10 +30,10 @@ class External_Offline_Markbook implements External_MarkbookInterface
     /**
      * Creates a new assessment item in the markbook
      *
-     * @param \Schoolbox\Assessment\Component\SubmissionBox $assessment
+     * @param Activity $assessment
      * @return array
      */
-    public function createAssessment(\Schoolbox\Assessment\Component\SubmissionBox $assessment)
+    public function createAssessment(Activity $assessment)
     {
         // NOOP
         return array();
@@ -38,10 +42,10 @@ class External_Offline_Markbook implements External_MarkbookInterface
     /**
      * Updates an existing markbook assessment
      *
-     * @param \Schoolbox\Assessment\Component\SubmissionBox $assessment
+     * @param Activity $assessment
      * @return array
      */
-    public function updateAssessment(\Schoolbox\Assessment\Component\SubmissionBox $assessment)
+    public function updateAssessment(Activity $assessment)
     {
         // NOOP
         return array();
@@ -50,10 +54,10 @@ class External_Offline_Markbook implements External_MarkbookInterface
     /**
      * Creates or updates the mark for a student in the remote markbook
      *
-     * @param \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $returnedWork
+     * @param ReturnedWork|Attempt $returnedWork
      * @return bool
      */
-    public function setMark(\Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $returnedWork)
+    public function setMark($returnedWork)
     {
         // NOOP
         return false;

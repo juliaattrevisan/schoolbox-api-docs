@@ -6,8 +6,10 @@
  */
 
 use \Schoolbox\Assessment\Component\SubmissionBox;
+use \Schoolbox\Assessment\Activity;
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use \Schoolbox\Assessment\Component\OnlineAssessment\Attempt;
 use \Schoolbox\UserMapper;
 use Alaress\DebugBar\Instance as DebugBar;
 
@@ -44,10 +46,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * Returns the assessment information if found in remote system
      *
-     * @param \Schoolbox\Assessment\Component\SubmissionBox $assessment
+     * @param Activity $assessment
      * @return array
      */
-    public function getAssessment(SubmissionBox $assessment)
+    public function getAssessment(Activity $assessment)
     {
         $query = "SELECT * FROM StaffAssessmentMarkBook WHERE HdgAbbrev2 = '".$assessment->getId()."'";
         return $this->getDatabase()->getAll($query);
@@ -57,10 +59,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * Creates a new assessment item in the markbook
      *
      * @param \Schoolbox\User
-     * @param \Schoolbox\Assessment\Component\SubmissionBox $assessment
+     * @param Activity $assessment
      * @return array
      */
-    public function createAssessment(SubmissionBox $assessment)
+    public function createAssessment(Activity $assessment)
     {
         /** Fix the hydrations */
         if($assessment->getCategory() instanceof Schoolbox\Resource\Folder\Model) {
@@ -127,10 +129,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * Updates an existing markbook assessment
      *
      * @param string
-     * @param \Schoolbox\Assessment\Component\SubmissionBox $assessment
+     * @param Activity $assessment
      * @return array
      */
-    public function updateAssessment(SubmissionBox $assessment)
+    public function updateAssessment(Activity $assessment)
     {
         $query = "UPDATE StaffAssessmentMarkBook SET
                         Heading = '".$this->getDatabase()->quote($assessment->getName())."',
@@ -145,12 +147,15 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * Creates or updates the mark for a student in the remote markbook
      *
      * @param string
-     * @param \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $returnedWork
+     * @param ReturnedWork|Attempt $returnedWork
      * @return bool
      */
-    public function setMark(ReturnedWork $returnedWork)
+    public function setMark( $returnedWork)
     {
-        $assessmentRemoteList = $this->getAssessment($returnedWork->getSubmissionBox());
+
+        $activity = new Activity;
+        $activity->setSubmissionBox($returnedWork->getSubmissionBox());
+        $assessmentRemoteList = $this->getAssessment($activity);
 
         // If assessment box does not exist, create it first
         if(!is_array($assessmentRemoteList) || count($assessmentRemoteList) < 1 ) {

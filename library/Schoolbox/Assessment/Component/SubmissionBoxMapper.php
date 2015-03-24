@@ -221,12 +221,12 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
          * This saves the assessment to the remote system
          */
         $externalMarkbook = new External_Markbook();
+        $activityFactory = new ActivityFactory();
         if(is_null($previous)) {
-            $externalMarkbook->createAssessment($object);
+            $externalMarkbook->createAssessment($activityFactory->buildFromSubmissionBox($object,'upcoming'));
         }
         else {
-            $assementID = $externalMarkbook->getAssessment($previous);
-            $externalMarkbook->updateAssessment($object, $assementID);
+            $externalMarkbook->updateAssessment($activityFactory->buildFromSubmissionBox($object,'upcoming'));
         }
     }
 
