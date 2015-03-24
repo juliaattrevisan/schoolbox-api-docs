@@ -4,17 +4,6 @@ class LaravelTimestampAlaressDateRelativeTest extends PHPUnit_Framework_TestCase
 {
     use Alaress\Test\Date\MockDateObject;
 
-    /**
-     * Skip these tests for Alaress_Date_Strategy_LaravelDate
-     */
-    protected function setUp()
-    {
-        $date = $this->buildDateObject();
-        if (!$date->getDateTimeObject() instanceof \Carbon\Carbon) {
-            $this->markTestSkipped('This test only applies to Alaress_Date_Strategy_LaravelDate');
-        }
-    }
-
     public function testRelativeTimeSeconds1()
     {
         $input    = date('U', strtotime('2011-08-31 12:12:00'));
