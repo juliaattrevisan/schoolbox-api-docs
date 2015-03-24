@@ -62,12 +62,34 @@ class Synchronise_Synergetic_Jpc_Strategy_Parent extends Synchronise_Synergetic_
 			$this->executeCreateUpdate($this->setupUserDetails($currentUser));
 		}
 
-        if ($this->getPerformUpdate() === true) {
-            // set parents not touched by this sync into previous parents role.
-            foreach ($this->getUserHandler()->getByGroup(self::PARENT_ROLE_ID) as $parent) {
-                if (!$this->isExternalIdSynced($parent['synergy_id'])) {
-                    $parent['group_id'] = self::PAST_PARENT_ROLE_ID;
-                    $this->getUserHandler()->update($parent);
+        // set parents not touched by this sync into previous parents role.
+        foreach ($this->getUserHandler()->getByGroup(self::PARENT_ROLE_ID) as $existingParent) {
+            $synergyId = $existingParent['synergy_id'];
+            if (!$this->isExternalIdSynced($synergyId)) {
+                $newParent             = $existingParent;
+                $newParent['group_id'] = self::PAST_PARENT_ROLE_ID;
+                $synergyParent         = $this->getExternalUserHandler()->getParentSync($synergyId);
+                if (!empty($synergyParent)) {
+                    if ($this->getPerformUpdate() === true) {
+                        $this->getUserHandler()->update($newParent);
+                        $this->getVerboseFilter()->performUpdate(
+                            $existingParent,
+                            $synergyId,
+                            $newParent,
+                            $synergyParent
+                        );
+                    } else {
+                        $this->getVerboseFilter()->planUpdate(
+                            $existingParent,
+                            $synergyId,
+                            $newParent,
+                            $synergyParent
+                        );
+                    }
+                    $this->getVerboseFilter()->incrementUpdated();
+                } else {
+                    $this->getVerboseFilter()->skip($existingParent, $synergyId);
+                    $this->getVerboseFilter()->incrementSkipped();
                 }
             }
         }
