@@ -53,7 +53,7 @@ abstract class Base {
      * @return mixed
      */
     protected function findContentType() {
-        return $this->findByKey('Content-Type');
+        return $this->findByKey('content-type');
     }
 
     /**

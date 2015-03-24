@@ -42,7 +42,7 @@ class Start extends Base {
         $numRedirects = count($headers['Content-Type']);
 
         if ($numRedirects > 1) {
-            $newHeaders = array();
+            $newHeaders = [];
 
             foreach(array_keys($headers) as $currentKey) {
                 if (is_array($headers[$currentKey])) {
@@ -56,6 +56,19 @@ class Start extends Base {
             $headers = $newHeaders;
         }
 
+        /* Lowercase all the array keys, because of places like twitter
+         * which are not camelcased
+         */
+        $temp = [];
+
+        foreach(array_keys($headers) as $currentKey) {
+            $temp[strtolower($currentKey)] = $headers[$currentKey];
+        }
+
+        $headers = $temp;
+
+        /* Finally
+         */
         return $headers;
     }
 }
