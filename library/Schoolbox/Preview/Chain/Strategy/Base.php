@@ -11,7 +11,7 @@
 namespace Schoolbox\Preview\Chain\Strategy;
 
 
-class Base {
+abstract class Base {
 
     /**
      * Next in the chain
