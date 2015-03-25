@@ -23,13 +23,14 @@ class Internal extends Base {
      * Constructor
      *
      * @param $url
+     * @param $hash
      */
-    public function __construct($url) {
+    public function __construct($url, $hash) {
         $this->start([
-            new Image(),
-            new Embed(),
-            new Html(),
-            new Redirect(),
+            new Image($url, $hash),
+            new Embed($url, $hash),
+            new Html($url, $hash),
+            new Redirect($url, $hash),
         ]);
     }
 }

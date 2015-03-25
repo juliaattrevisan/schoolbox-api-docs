@@ -19,6 +19,16 @@ class Image extends Base {
      * @return mixed
      */
     public function test() {
+        return [
+            'type' => 'html-fragment',
+            'twig' => [
+                'template' => '@preview/Strategy/Image.twig',
+                'data' => [
+                    'src' => $this->getUrl()
+                ]
+            ]
+        ];
+
         return $this->testNext();
     }
 } 
