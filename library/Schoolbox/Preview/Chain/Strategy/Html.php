@@ -31,9 +31,12 @@ class Html extends Base {
         foreach ($this->getContentTypes() as $currentContentType) {
             if (strstr($this->findContentType(), $currentContentType)) {
                 return [
-                    'template' => '@preview/Strategy/Html.twig',
-                    'data' => [
-                        'src' => $this->getUrl()
+                    'type' => 'html-fragment',
+                    'twig' => [
+                        'template' => '@preview/Strategy/Html.twig',
+                        'data' => [
+                            'src' => $this->getUrl()
+                        ]
                     ]
                 ];
             }

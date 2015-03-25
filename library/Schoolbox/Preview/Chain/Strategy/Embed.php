@@ -28,9 +28,12 @@ class Embed extends Base {
          */
         if ($embedCode != $this->getUrl()) {
             return [
-                'template' => '@preview/Strategy/Embed.twig',
-                'data' => [
-                    'src' => $embedCode
+                'type' => 'html-fragment',
+                'twig' => [
+                    'template' => '@preview/Strategy/Embed.twig',
+                    'data' => [
+                        'src' => $embedCode
+                    ]
                 ]
             ];
         }

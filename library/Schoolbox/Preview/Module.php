@@ -32,7 +32,7 @@ class Module extends BaseModule
          */
         $router->addGet('preview.preview', $basePath . '/{encodedUrl}')
             ->addValues([
-                'format' => '.nochrome'
+                'format' => '.json'
             ]);
     }
 

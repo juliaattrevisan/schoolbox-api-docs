@@ -41,14 +41,27 @@ class Controller extends Base
      */
     public function preview($params) {
         $chain = new External(urlencode($params['encodedUrl']));
+        $result = $chain->getResult();
 
-        $this->getResponse()->content->set($chain->getResult());
+        /* Set up html fragment
+         */
+        $this->getResponse()->content->set($result['twig']);
 
+        /* Render it
+         */
         $output = $this->di->get("webOutput:nochrome");
         $output->setResponse($this->getResponse());
-        $temp = $output->getAsString();
+        $fragment = $output->getAsString();
 
-        var_dump($temp);
-die();
+        $previewResponse = [
+            'type' => $result['type'],
+            'fragment' => $fragment
+        ];
+
+        /* Regurgitate it
+         */
+        $this->getResponse()->content->set([
+            'data' => $previewResponse
+        ]);
     }
 }
