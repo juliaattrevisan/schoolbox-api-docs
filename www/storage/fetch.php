@@ -14,8 +14,8 @@ try {
     if (isset($_GET['hash']) && $_GET['hash']) {
         $page = new SitePage;
 
-        /* @var $resource Schoolbox\Storage */
-        $resource = Schoolbox\StorageMapper::getInstance()->findByHash($_GET['hash']);
+        /* @var $resource Schoolbox\Resource\Storage\Model */
+        $resource = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($_GET['hash']);
 
         if ($_GET['save']) {
             $attach = "attachment;";
@@ -32,9 +32,9 @@ try {
 
         header("Pragma: ");
         header("Cache-control: ");
-        header("Content-Disposition: $attach filename=\"" . $resource->getFilename() . "\"");
-        header("Content-Length: ".$resource->getFilesize());
-        readfile($resource->getFileLocation());
+        header(sprintf('Content-Disposition: %s filename="%s.%s"', $attach, $resource->getHash(), $resource->getExtension()));
+        header("Content-Length: ".$resource->getSize());
+        fpassthru($resource->readStream());
         exit;
     }
 }
