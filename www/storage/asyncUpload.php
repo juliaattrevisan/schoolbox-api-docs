@@ -83,15 +83,15 @@ header(':', true, $result['error']);
 // TODO create a browscap service, and inject it around places
 try {
 
-$browscap = new \phpbrowscap\Browscap(SITE_root.'/tools/browscap');
-$browscap->doAutoUpdate = false;
-$browscap->updateMethod = 'local';
-$browscap->updateInterval = '31536000';
-if ($browscap->getBrowser()->Browser == 'IE' && $browscap->getBrowser()->MajorVer <= 9) {
-    header('Content-Type: text/plain');
-} else {
-    header('Content-Type: application/json');
-}
+    $browscap                 = new \phpbrowscap\Browscap(SITE_root . '/tools/browscap');
+    $browscap->doAutoUpdate   = false;
+    $browscap->updateMethod   = 'local';
+    $browscap->updateInterval = '31536000';
+    if ($browscap->getBrowser()->Browser == 'IE' && $browscap->getBrowser()->MajorVer <= 9) {
+        header('Content-Type: text/plain');
+    } else {
+        header('Content-Type: application/json');
+    }
 
 } catch (Exception $e) {
     // if in doubt, err on the side of recklessness
