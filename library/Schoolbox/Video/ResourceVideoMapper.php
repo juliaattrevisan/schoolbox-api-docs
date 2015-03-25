@@ -102,10 +102,10 @@ class ResourceVideoMapper extends Mapper
         $fileMapper = new FileMapper;
 
         $query = "
-            SELECT {$this->getJoinMapper('file')->getColumnString('f')}, {$this->getColumnString('vq')}, {$fileMapper->getJoinMapper('user')->getColumnString('u')}
+            SELECT {$this->getJoinMapper('file')->getColumnString('f')}, {$this->getColumnString('vq')}, {$fileMapper->getJoinMapper('owner')->getColumnString('u')}
             FROM `{$this->getTable()}` vq
             JOIN {$this->getJoinSQL('file', 'vq', 'f')}
-            LEFT JOIN {$fileMapper->getJoinSQL('user', 'f', 'u')}
+            LEFT JOIN {$fileMapper->getJoinSQL('owner', 'f', 'u')}
             WHERE category = :cat AND vq.status != 'failed' AND f.deleted='0' AND f.mime_type like :mime
         ";
 
@@ -151,9 +151,9 @@ class ResourceVideoMapper extends Mapper
             $video->setFile($fileMapper->hydrate($row, 'f'));
 
             if ($row['u.id']) {
-                $video->getFile()->setOwner($fileMapper->getJoinMapper('user')->hydrate($row, 'u'));
+                $video->getFile()->setOwner($fileMapper->getJoinMapper('owner')->hydrate($row, 'u'));
             } else {
-                $video->getFile()->setOwner($fileMapper->getJoinMapper('user')->getUnknownUser());
+                $video->getFile()->setOwner($fileMapper->getJoinMapper('owner')->getUnknownUser());
             }
             $videoList->add($video);
         }
