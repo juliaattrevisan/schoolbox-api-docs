@@ -11,6 +11,14 @@
 namespace Schoolbox\Preview\Chain\Strategy\Internal;
 
 
-class Redirect {
+class Redirect extends Base {
 
+    /**
+     * Test
+     *
+     * @return mixed
+     */
+    public function test() {
+        return false;
+    }
 } 

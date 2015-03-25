@@ -11,6 +11,14 @@
 namespace Schoolbox\Preview\Chain\Strategy\Internal;
 
 
-class Image {
+class Image extends Base {
 
+    /**
+     * Test
+     *
+     * @return mixed
+     */
+    public function test() {
+        return $this->testNext();
+    }
 } 

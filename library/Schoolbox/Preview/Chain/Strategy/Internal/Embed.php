@@ -11,6 +11,14 @@
 namespace Schoolbox\Preview\Chain\Strategy\Internal;
 
 
-class Embed {
+class Embed extends Base {
 
+    /**
+     * Test
+     *
+     * @return mixed
+     */
+    public function test() {
+        return $this->testNext();
+    }
 } 
