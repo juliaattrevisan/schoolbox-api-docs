@@ -43,7 +43,7 @@
 @banner-height:     			152px;
 
 // Modules
-@module-heading: 				#000000;
+@module-heading: 				#5bba52;
 @module-background: 			#E5EFF7;
 
 // Refers to the left navigation
@@ -288,14 +288,12 @@ body.login{
   box-shadow:         -1px 0px 4px 0px rgba(50, 50, 50, 0.25);
 
   h2{
-    color: #5bba52;
     margin: 4px;
     padding: 0 11px;
-    background: #ecf5f9 url("/images/loyola/h2-bg.png") bottom left repeat-x;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    border: 1px solid #c0d2de;
+    .border-radius(4px);
+    background-image: url("/images/loyola/h2-bg.png");
+    background-position: bottom left;
+    background-repeat: repeat-x;
     -webkit-box-shadow: 0px 3px 5px 0px #e4e4e4;
     box-shadow: 0px 3px 5px 0px #e4e4e4;
     font-family: Georgia, Times, "Times New Roman", serif;
