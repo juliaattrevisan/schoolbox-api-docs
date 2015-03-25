@@ -13,6 +13,16 @@
 class Synchronise_Synergetic_Jpc_Strategy_Parent extends Synchronise_Synergetic_Jpc_Strategy_Abstract {
 	protected $strategyTitle = "Update Schoolbox Parent Details Synchronisation";
 
+    /**
+     * Role ID for parents
+     */
+    const PARENT_ROLE_ID = 4;
+
+    /**
+     * Role ID for past parents
+     */
+    const PAST_PARENT_ROLE_ID = 16;
+
 	/**
 	 * Setup
 	 */
@@ -107,6 +117,18 @@ class Synchronise_Synergetic_Jpc_Strategy_Parent extends Synchronise_Synergetic_
 				else {
 					$updatedUser['alt_email'] = '';
 				}
+
+                // Get all of this parent's students.
+                // If they have got no current ones, they are a past parent.
+                $roleId = self::PAST_PARENT_ROLE_ID;
+                foreach ($this->getExternalUserHandler()->getEnrolledStudents($currentSynergyId) as $student) {
+                    // Is this student current?
+                    if ($this->getExternalUserHandler()->getStudent($student['RelatedID'])) {
+                        $roleId = self::PARENT_ROLE_ID;
+                        break;
+                    }
+                }
+                $updatedUser['group_id'] = $roleId;
 
 				/* Actually perform db update
 				 */
