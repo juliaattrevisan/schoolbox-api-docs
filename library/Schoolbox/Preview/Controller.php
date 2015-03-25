@@ -8,7 +8,7 @@
 namespace Schoolbox\Preview;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Preview\Chain\Start;
+use Schoolbox\Preview\Chain\External;
 
 class Controller extends Base
 {
@@ -31,7 +31,7 @@ class Controller extends Base
             "https://soundcloud.com/majorlazer",
         ];
 
-        $chain = new Start(urlencode($testUrls[8]));
+        $chain = new External(urlencode($testUrls[8]));
 
         $this->getResponse()->content->set($chain->getResult());
     }

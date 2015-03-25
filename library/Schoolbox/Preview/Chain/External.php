@@ -2,6 +2,8 @@
 /**
  * Chain
  *
+ * Seeks preview from an External (non-local) url
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -15,7 +17,7 @@ use Schoolbox\Preview\Chain\Strategy\Embed;
 use Schoolbox\Preview\Chain\Strategy\Html;
 use Schoolbox\Preview\Chain\Strategy\Redirect;
 
-class Start extends Base {
+class External extends Base {
 
     /**
      * Constructor
