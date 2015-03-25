@@ -7,9 +7,8 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Resource\Browser\Office;
+namespace Schoolbox\Resource\Browser\Office365;
 
-use Schoolbox\Config\Loader;
 use Schoolbox\Resource\Browser\AbstractNode;
 
 class Node extends AbstractNode
@@ -18,19 +17,17 @@ class Node extends AbstractNode
     /**
      * @param int    $nodeId
      * @param string $mimeFilter
+     * @param Tenant $tenant
      * @param string $oAuthToken
      */
-    public function __construct($nodeId, $mimeFilter = null, $oAuthToken = null)
+    public function __construct($nodeId, $mimeFilter = null, $tenant = null, $oAuthToken = null)
     {
         // bypass parent node-must-be-numeric check
         $this->setNodeId($nodeId);
         $this->setMimeFilter($mimeFilter);
 
         // TODO unhide dependency
-        $conf     = new Loader();
-        $tenant   = $conf->get('sharepoint_tenant');
-        $sitePath = $conf->get('sharepoint_sitepath') ?: null;
-        $locator  = new Locator($tenant, $oAuthToken, $sitePath);
+        $locator = new Locator($tenant, $oAuthToken);
 
         $this->setFileLocator($locator);
         $this->setFolderLocator($locator);

@@ -7,9 +7,10 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Resource\Browser\Office;
+namespace Schoolbox\Resource\Browser\Office365;
 
 
+use Alaress\Authorizer\Failure\Unauthorized;
 use InvalidArgumentException;
 use Proxy;
 use RuntimeException;
@@ -22,32 +23,41 @@ use Schoolbox\Resource\FolderLocatorInterface;
 
 class Locator implements FileLocatorInterface, FolderLocatorInterface
 {
-
-    /** @var string */
-    protected $baseUri;
+    /** @var Tenant */
+    protected $tenant;
 
     /** @var string */
     protected $oAuthToken;
 
+
     /**
-     * @param string $tenant
+     * @param Tenant $tenant
      * @param string $oAuthToken
-     * @param string $sitePath if supplied, will operate in SharePoint mode, otherwise OneDrive
-     * @param string $version
      */
-    public function __construct($tenant, $oAuthToken, $sitePath = null, $version = 'v1.0')
+    public function __construct(Tenant $tenant, $oAuthToken = null)
     {
-        if (!$tenant) {
-            throw new InvalidArgumentException('A tenant must be provided');
-        }
+        $this->tenant = $tenant;
+        $this->setOAuthToken($oAuthToken);
+    }
 
-        if ($sitePath) {
-            $this->baseUri = sprintf("https://%s.sharepoint.com/%s/_api/%s", $tenant, $sitePath, $version);
-        } else {
-            $this->baseUri = sprintf("https://%s-my.sharepoint.com/_api/%s/me", $tenant, $version);
-        }
 
+    /**
+     * @return Tenant
+     */
+    public function getTenant()
+    {
+        return $this->tenant;
+    }
+
+
+    /**
+     * @param string $oAuthToken
+     * @return self
+     */
+    public function setOAuthToken($oAuthToken)
+    {
         $this->oAuthToken = $oAuthToken;
+        return $this;
     }
 
 
@@ -80,6 +90,7 @@ class Locator implements FileLocatorInterface, FolderLocatorInterface
      */
     public function findByFolderId($nodeId)
     {
+        $nodeId = $nodeId ?: 'root';
         $items = $this->rq("/files/$nodeId/children");
 
         // iterate, filtering to files only and casting to file objects
@@ -105,13 +116,18 @@ class Locator implements FileLocatorInterface, FolderLocatorInterface
      */
     public function findByParentId($nodeId)
     {
+        $nodeId = $nodeId ?: 'root';
         $items = $this->rq("/files/$nodeId/children");
 
         // iterate, filtering to folders only and casting to folder objects
         $folders = [];
 
         foreach ($items['value'] as $item) {
-            $folders[] = $this->parseFolder($item);
+            try {
+                $folders[] = $this->parseFolder($item);
+            } catch (InvalidArgumentException $e) {
+                // noop
+            }
         }
 
         return $folders;
@@ -153,7 +169,7 @@ class Locator implements FileLocatorInterface, FolderLocatorInterface
      */
     protected function parseFolder(array $item)
     {
-        if ($item['Type'] != 'Folder') {
+        if ($item['type'] != 'Folder') {
             throw new InvalidArgumentException('Not a folder');
         }
 
@@ -177,7 +193,7 @@ class Locator implements FileLocatorInterface, FolderLocatorInterface
      */
     protected function rq($path)
     {
-        $ch = Proxy\Server::getInstance()->curl_init($this->baseUri.$path);
+        $ch = Proxy\Server::getInstance()->curl_init($this->getTenant()->getBaseUri().$path);
 
         curl_setopt_array($ch, [
             CURLOPT_HTTPHEADER     => [ 'Authorization: Bearer ' . $this->oAuthToken ],
@@ -188,8 +204,13 @@ class Locator implements FileLocatorInterface, FolderLocatorInterface
 
         $data = json_decode($rs, true);
 
+        // interpret errors
         if (isset($data['error'])) {
-            throw new RuntimeException('Office 365 Exception: ' . $data['error']['message']);
+            throw new RuntimeException('Office 365 Exception: '.$data['error']['message']);
+
+        } elseif (isset($data['error_description'])) {
+            throw new Unauthorized('Office 365 Security Exception: '.$data['error_description']);
+
         }
 
         return $data;
