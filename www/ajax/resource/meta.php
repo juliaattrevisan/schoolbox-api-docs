@@ -10,7 +10,7 @@
 
 require_once('../../../include/Bootstrap.php');
 use Schoolbox\UserMapper;
-use Schoolbox\Resource\FileMapper;
+use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 
 // kickstart a session
@@ -245,7 +245,7 @@ function getSingleFileMeta($folderId, $fileId)
 
     $groupHandler = new Group();
 
-    $fmap = new FileMapper();
+    $fmap = FileMapper::getInstance();
     $file = $fmap->findById($fileId);
     try {
         $owner = UserMapper::getInstance()->findById($file->getOwner()->getId());
@@ -275,18 +275,18 @@ function getSingleFileMeta($folderId, $fileId)
             break;
     }
 
-    $modified = new Alaress_Date_Format($file->getModified());
+    $modified = new Alaress_Date_Format($file->getModifiedAt());
 
     $file = array(
         'kind'        => 'file',
         'id'          => $file->getId(),
-        'name'        => $file->getDescription(),
-        'mime'        => $file->getMimeType()->getIconFile(), //TODO: mime type data should be part of resource object
-        'filesize'    => Alaress_Byte_Format::bytesToString($file->getFilesize()),
+        'name'        => $file->getTitle(),
+        'mime'        => $file->getStorage()->getMimeType()->getIconFile(),
+        'filesize'    => Alaress_Byte_Format::bytesToString($file->getSize()),
         'hidden'      => $file->getHidden() ? 1 : 0,
-        'description' => $file->getComment(),
+        'description' => $file->getDescription(),
         'posted_by'   => $owner->formatName(),
-        'posted_date' => $file->getSubmitted()->getDateOnly(),
+        'posted_date' => $file->getCreatedAt()->getDateOnly(),
         'modified'    => $modified->getRelativeTime(),
         'actions'     => $actions
     );

@@ -20,7 +20,7 @@ if (isset($this->arg[0])) {
 }
 
 //$folderHandler = new MyFolder;
-$fileHandler = new MyFile();
+$fileHandler = Schoolbox\Resource\My\File\Mapper::getInstance();
 $openFolder  = (int)$openFolder;
 
 // Build a tree up to the last resource we looked at
@@ -41,30 +41,25 @@ $this->setVar(
     )
 );
 
-$fileList = $fileHandler->getAllInFolder($openFolder);
-if (is_array($fileList) && count($fileList) > 0) {
+$fileList = $fileHandler->findByFolderId($openFolder);
+if ($fileList->count()) {
 
     foreach ($fileList as $file) {
 
         $class = array();
 
         // icon
-        $class[] = $allowedFiles->getClass(!empty($file['iconFile']) ? $file["iconFile"] : "txt.png");
-
-        /* Note that WebDAV returns the $file['submitted'] value in a different format
-           * than Schoolbox.
-           */
-        $modifiedTime = new Alaress_Date_Format(strtotime($file['submitted']), 'U');
+        $class[] = $allowedFiles->getClass($file->getMimetype()->getIconFile());
 
         $output = array(
-            'FILE_ID' => $file['id'],
+            'FILE_ID' => $file->getId(),
             'TYPE' => 'file',
-            'FILE_NAME' => Scrub::text($file['description']),
-            'FILE_MODIFIED' => $modifiedTime->getShort(),
-            'FILE_SIZE' => $file['file_size'] > 0 ? Alaress_Byte_Format::bytesToString($file['file_size']) : "--",
-            'FOLDER_ID' => $file['parent'],
+            'FILE_NAME' => Scrub::text($file->getTitle()),
+            'FILE_MODIFIED' => $file->getCreatedAt()->getShort(),
+            'FILE_SIZE' => Alaress_Byte_Format::bytesToString($file->getSize()),
+            'FOLDER_ID' => $file->getFolder()->getId(),
             'CLASS' => implode(" ", $class),
-            'PUBLISHED' => $file['published'] != '' ? $file['published'] : '',
+            'PUBLISHED' => $file->isPublished() ? $file->getPublishedAt()->getShort() : '',
         );
 
         $this->setVar($output);

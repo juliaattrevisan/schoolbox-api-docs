@@ -17,7 +17,8 @@ namespace SocialStream\Post\Factory;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
-use Schoolbox\Storage;
+use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\Resource\Storage;
 use SocialStream\UrlDetection;
 
 class Creational extends AbstractFactory {
@@ -70,6 +71,7 @@ class Creational extends AbstractFactory {
             $factory = new CollectorFactory();
             try {
                 // posts (should) only have one attachment
+                /** @var Storage\Model $storage */
                 $storage = $factory->build($data['attachment'])->getFirst();
                 $this->parseStorageMetadata($storage, $data);
             } catch (\Schoolbox\Resource\Exception $e) {
@@ -179,10 +181,10 @@ class Creational extends AbstractFactory {
 
 
     /**
-     * @param Storage $storage
-     * @param array   $data
+     * @param Storage\Model $storage
+     * @param array    $data
      */
-    protected function parseStorageMetadata(Storage $storage, array $data)
+    protected function parseStorageMetadata(Storage\Model $storage, array $data)
     {
         $uploadedFile = $this->constructFromUpload($storage);
         $this->populate($data);
@@ -237,10 +239,10 @@ class Creational extends AbstractFactory {
 	/**
 	 * Construct a post from a link by doing mimetype analysis
 	 *
-	 * @param  \Schoolbox\Storage $resource
-	 * @return \Schoolbox\Storage
+	 * @param  Storage\Model $resource
+	 * @return Storage\Model
 	 */
-	private function constructFromUpload($resource) {
+	private function constructFromUpload(Storage\Model $resource) {
 
 		/* Figure out if it's a video
 		 */
@@ -395,19 +397,19 @@ class Creational extends AbstractFactory {
 	/**
 	 * Get the title and description
 	 *
-	 * @param \Schoolbox\Storage $uploadedFile
+	 * @param Storage\Model $uploadedFile
 	 */
-	private function spawnMetadataFromUpload(\Schoolbox\Storage $uploadedFile) {
-		$this->getProduct()->setExternalTitle($uploadedFile->getFilename());
+	private function spawnMetadataFromUpload(Storage\Model $uploadedFile) {
+		$this->getProduct()->setExternalTitle($uploadedFile->getHash() . '.' . $uploadedFile->getExtension());
 		$this->getProduct()->setExternalBody('');
 	}
 
 	/**
 	 * Get the thumbnail usage
 	 *
-	 * @param \Schoolbox\Storage $uploadedFile
+	 * @param Storage\Model $uploadedFile
 	 */
-	private function spawnThumbnailFromUpload(\Schoolbox\Storage $uploadedFile) {
+	private function spawnThumbnailFromUpload(Storage\Model $uploadedFile) {
 
 		/* Set up video thumbnails
 		 */

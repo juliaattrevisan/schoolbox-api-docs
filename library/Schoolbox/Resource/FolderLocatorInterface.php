@@ -13,7 +13,7 @@ namespace Schoolbox\Resource;
 /**
  * Interface FolderLocatorInterface
  *
- * @deprecated
+ * @deprecated in favour of Resource\Folder\ILocator, this interface retained for backward compatibility
  * @package Schoolbox\Resource
  */
 interface FolderLocatorInterface extends Folder\ILocator

@@ -10,13 +10,13 @@
 namespace Schoolbox\Resource\Attachment\Collector;
 
 
-use Schoolbox\FileInterface;
+use Schoolbox\Resource\Storage\IStorage;
 
 interface TypeHandlerInterface {
 
     /**
      * @param string $id
-     * @return FileInterface
+     * @return IStorage
      */
     public function fetch($id);
 

@@ -20,17 +20,21 @@ use Schoolbox\File\MimetypeMapper;
 /**
  * Class Mapper
  *
+ * Storage Mapper. Maps storage table to Schoolbox storage objects
+ *
  * @package Schoolbox\Resource\Storage
  *
  * @method Model hydrate()
  * @method Model createModel()
  */
-class Mapper extends Schoolbox\Mapper
+class Mapper extends Schoolbox\Mapper implements Receiver
 {
 
     /** @var Manager */
     protected $mgr;
 
+    /** @var bool */
+    protected $checkPrevious = true;
 
     /**
      * @return void
@@ -39,7 +43,7 @@ class Mapper extends Schoolbox\Mapper
     {
         // TODO this does not belong here, but where does it go
         $factory = new Schoolbox\Resource\FilesystemFactory();
-        $this->mgr = new Manager($factory->build($this->config_loader->get('storage_dir')), new Alaress_Byte_Format());
+        $this->setManager(new Manager($factory->build($this->config_loader->get('storage_dir')), new Alaress_Byte_Format()));
     }
 
 
@@ -74,7 +78,7 @@ class Mapper extends Schoolbox\Mapper
      */
     protected function postSave(Model $storage, Model $previous = null)
     {
-        if ($previous) {
+        if ($previous && $this->checkPrevious) {
             // not the first time we've seen this file? no copying to take place
             return true;
         }
@@ -84,8 +88,8 @@ class Mapper extends Schoolbox\Mapper
 
 
     /**
-     * @param $hash
-     * @return object
+     * @param string $hash
+     * @return Model
      */
     public function findByHash($hash)
     {
@@ -128,6 +132,26 @@ class Mapper extends Schoolbox\Mapper
         }
 
         return $c;
+    }
+
+
+    /**
+     * @param array $columnList
+     * @param array $options
+     * @return array
+     */
+    protected function buildWherePart($columnList, $options)
+    {
+        $parts = parent::buildWherePart($columnList, $options);
+
+        if (isset($options['mime'])) {
+            $mime = str_replace('*', '%', $options['mime']);
+            $parts['where'][] = sprintf("`allowedFileTypes`.`mime` LIKE %s",
+                $this->database->quote($mime)
+            );
+        }
+
+        return $parts;
     }
 
 
@@ -188,6 +212,37 @@ class Mapper extends Schoolbox\Mapper
         $this->save($storage);
 
         return $storage;
+    }
+
+
+    /**
+     * @return Manager
+     */
+    public function getManager()
+    {
+        return $this->mgr;
+    }
+
+
+    /**
+     * @param Manager $mgr
+     * @return self
+     */
+    public function setManager($mgr)
+    {
+        $this->mgr = $mgr;
+        return $this;
+    }
+
+
+    /**
+     * @param bool $bool
+     * @return self
+     */
+    public function checkPrevious($bool)
+    {
+        $this->checkPrevious = $bool;
+        return $this;
     }
 
 }

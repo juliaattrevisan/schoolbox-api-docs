@@ -15,7 +15,7 @@ namespace Schoolbox\Resource;
 /**
  * Class CategoryCodeMapper
  *
- * @deprecated
+ * @deprecated in favour of Resource\Folder\Code\Mapper, this class retained for backward compatibility
  * @package Schoolbox\Resource
  */
 class CategoryCodeMapper extends Folder\Code\Mapper

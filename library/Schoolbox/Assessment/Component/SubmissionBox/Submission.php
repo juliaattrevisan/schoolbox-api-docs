@@ -474,5 +474,17 @@ class Submission implements FileInterface {
 
 		return substr(strrchr($filename, '.'), 1);
 	}
+
+
+    /**
+     * Returns the size on disk of the file
+     *
+     * @return int
+     */
+    public function getSize()
+    {
+        return $this->getFilesize();
+    }
+
 }
 

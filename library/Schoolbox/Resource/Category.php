@@ -13,7 +13,7 @@ namespace Schoolbox\Resource;
 /**
  * Class Category
  *
- * @deprecated
+ * @deprecated in favour of Resource\Folder\Model, this class retained for backward compatibility
  * @package Schoolbox\Resource
  */
 class Category extends Folder\Model

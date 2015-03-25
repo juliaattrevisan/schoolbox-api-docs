@@ -1,9 +1,10 @@
 <?php
 use Alaress\File\Remote\FetcherInterface;
-use Schoolbox\FileInterface;
-use Schoolbox\FolderInterface;
-use Schoolbox\Resource\FileLocatorInterface;
-use Schoolbox\Resource\FolderLocatorInterface;
+use Schoolbox\Resource;
+use Schoolbox\Resource\File\IFile as FileInterface;
+use Schoolbox\Resource\File\ILocator as FileLocatorInterface;
+use Schoolbox\Resource\Folder\IFolder as FolderInterface;
+use Schoolbox\Resource\Folder\ILocator as FolderLocatorInterface;
 
 class Sabre_DAV_Client_Extended extends Sabre\DAV\Client
 {
@@ -120,6 +121,12 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
      */
     private $lite;
 
+    /** @var Resource\Folder\Mapper */
+    protected $folderMapper;
+
+    /** @var Resource\File\Mapper */
+    protected $fileMapper;
+
     /**
      * @param \Sabre_DAV_Client_Extended $client
      * @param array $paths List of paths from the baseUri to access
@@ -132,6 +139,9 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         $this->rootPaths = $paths;
 
         $this->lite = $lite;
+
+        $this->folderMapper = Resource\Folder\Mapper::getInstance();
+        $this->fileMapper   = Resource\File\Mapper::getInstance();
 
         $this->buildTree();
     }
@@ -894,9 +904,9 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
      */
     protected function parseFolder($data)
     {
-        $folder = new \Schoolbox\Resource\Category();
+        $folder = $this->folderMapper->createModel();
 
-        $parent = new \Schoolbox\Resource\Category();
+        $parent = $this->folderMapper->createModel();
         $parent->setId($data['parent']);
 
         $folder->setId($data['id']);
@@ -912,20 +922,19 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
      */
     protected function parseFile($data)
     {
-        $file = new \Schoolbox\Resource\File();
+        $file = $this->fileMapper->createModel();
 
         $owner = new \Schoolbox\User();
         $owner->setId($data['owner']);
 
-        $cat = new \Schoolbox\Resource\Category();
+        $cat = $this->folderMapper->createModel();
         $cat->setId($data['parent']);
 
         $file->setId($data['id']);
         $file->setFolder($cat);
-        $file->setTempFileLocation($data['path']);
         $file->setFilename($data['name']);
-        $file->setDescription($data['description']);
-        $file->setFilesize($data['file_size']);
+        $file->setTitle($data['description']);
+        $file->setSize($data['file_size']);
         $file->setOwner($owner);
 
         return $file;

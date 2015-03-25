@@ -1360,7 +1360,7 @@ abstract class Mapper implements Serializable
         $where_parts = array();
         $params      = array();
         foreach ($columnList as $columnName => $columnValue) {
-            $escaped_name = $this->database->quoteIdentifier($columnName);
+            $escaped_name = $this->database->quoteIdentifier($this->getTable()) . '.' . $this->database->quoteIdentifier($columnName);
             if (!isset($columnValue)) {
                 $where_parts[] = "$escaped_name IS NULL";
             } else {
@@ -1948,6 +1948,8 @@ abstract class Mapper implements Serializable
             $column = "`{$this->soft_delete_column}`";
             if (isset($alias)) {
                 $column = "`$alias`.$column";
+            } else {
+                $column = "{$this->getTable()}.$column";
             }
             if (!isset($value)) {
                 return "$column IS NULL";

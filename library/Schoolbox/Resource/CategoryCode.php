@@ -14,7 +14,7 @@ namespace Schoolbox\Resource;
 /**
  * Class CategoryCode
  *
- * @deprecated
+ * @deprecated in favour of Resource\Folder\Code\Model, this class retained for backward compatibility
  * @package Schoolbox\Resource
  */
 class CategoryCode extends Folder\Code\Model

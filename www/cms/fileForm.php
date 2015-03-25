@@ -3,8 +3,8 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\CategoryMapper;
-use Schoolbox\Resource\File;
-use Schoolbox\Resource\FileMapper;
+use Schoolbox\Resource\File\Model as File;
+use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Link;
 use Schoolbox\Resource\LinkMapper;
 
@@ -28,7 +28,6 @@ if ($ajax) {
 $page = new SitePage();
 $page->setAjax($ajax);
 
-$fileHandler  = new File();
 $groupHandler = new Group();
 
 $modifyExisting = is_numeric($_POST['fileID']);
@@ -53,24 +52,13 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
             $result = $factory->build($_POST['attachment'])->getFirst();
 
             // if the attachment is an already-existing file
-            if ($result->getId()) {
-                if ($result->getId() == $file->getId()) {
-                    // mirror, mirror (the file on disk was not changed)
-                    $file = $result;
+            if ($result->getId() && $result->getId() == $file->getId()) {
+                // mirror, mirror (the file on disk was not changed)
+                $file = $result;
 
-                } else {
-                    // target attachment is from SBFS, but a different file - set our temp location to its actual location
-                    $file->setTempFileLocation($result->getFileLocation());
-                    $file->setFilename($result->getFilename());
-                    $file->setFilesize($result->getFilesize());
-
-                }
             } else {
-                // target attachment is not from SBFS
-                $file->setTempFileLocation($result->getTempFileLocation());
-                $file->setFilename($result->getFilename());
-                $file->setFilesize($result->getFilesize());
-
+                // target attachment is from SBFS, but a different file: override storage
+                $file->setStorage($result->getStorage());
             }
         }
 
@@ -84,22 +72,28 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
 
     // if file was synchronously uploaded
     if ($_FILES['file']['name'] && is_uploaded_file($_FILES['file']['tmp_name'])) {
-        $file->setTempFileLocation($_FILES['file']['tmp_name']);
-        $file->setFilename($_FILES['file']['name']);
-        $file->setFilesize(filesize($_FILES['file']['tmp_name']));
-    } elseif (!$modifyExisting) {
-        $originalLocation = $file->getFileLocation();
-        if ($originalLocation) {
-            $file->setTempFileLocation($originalLocation);
-        }
+        // do a storage upload, then wrap it in the SBFS file from earlier
+        $storage = Schoolbox\Resource\Storage\Mapper::getInstance()->accept($_FILES['file']['name'], $_FILES['file']['tmp_name'], false);
+        $file->setStorage($storage);
+
+    // TODO not sure if this needs to remain or not
+    // } elseif (!$modifyExisting) {
+    //     $originalLocation = $file->getFileLocation();
+    //     if ($originalLocation) {
+    //         $file->setTempFileLocation($originalLocation);
+    //     }
     }
 
     // set attributes
-    $file->setOwner($_SESSION['id']);
-    $file->setDescription($_POST['description']);
-    $file->setComment($_POST['comment']);
+    if (is_null($file->getFilename()) || preg_match('`^[0-9a-f]{40}`', $file->getFilename())) {
+        $file->setFilename($file->getHash() . '.' . $file->getStorage()->getExtension());
+    }
+
+    $file->setOwner($_SESSION['user']);
+    $file->setTitle($_POST['description']);
+    $file->setDescription($_POST['comment']);
     $file->setHidden($_POST['hidden'] ? true : false);
-    $file->setModified(Alaress_Date_Format::now());
+    $file->setModifiedAt(Alaress_Date_Format::now());
 
     try {
         // sooo, this case is much simpler
@@ -180,7 +174,7 @@ elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
             $result = "Insufficient permssions";
         } else {
             $file->setFolder(CategoryMapper::getInstance()->createModel($_POST['categoryID']));
-            $file->setModified(Alaress_Date_Format::now());
+            $file->setModifiedAt(Alaress_Date_Format::now());
 
             FileMapper::getInstance()->save($file);
             $result = "success";

@@ -12,33 +12,21 @@ namespace Schoolbox\Resource\Folder;
 
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\CategoryCode;
 use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-class Model implements ISoftDeletable, IFolder
+/**
+ * Class Model
+ *
+ * The SBFS Folder Model. Represents a folder within SBFS.
+ *
+ * @package Schoolbox\Resource\Folder
+ */
+class Model extends AbstractFolder implements ISoftDeletable
 {
-    /**
-     * Identifier
-     *
-     * @var int
-     */
-    protected $id;
-
-    /**
-     * Category name
-     *
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * A category instance
-     *
-     * @var self
-     */
-    protected $parent;
 
     /**
      * A homepage instance
@@ -209,72 +197,6 @@ class Model implements ISoftDeletable, IFolder
     public function getCodes()
     {
         return $this->codes;
-    }
-
-    /**
-     * Set id
-     *
-     * @param  int $id
-     * @return $this
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * Get id
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * Set name
-     *
-     * @param  string $name
-     * @return $this
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-        return $this;
-    }
-
-    /**
-     * Get name
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * Set parent
-     *
-     * @param  self $parent
-     * @return $this
-     */
-    public function setParent($parent)
-    {
-        $this->parent = $parent;
-        return $this;
-    }
-
-    /**
-     * Get parent
-     *
-     * @return self
-     */
-    public function getParent()
-    {
-        return $this->parent;
     }
 
     /**

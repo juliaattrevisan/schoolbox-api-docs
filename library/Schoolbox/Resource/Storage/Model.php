@@ -22,7 +22,7 @@ use Schoolbox\File\Mimetype;
  *
  * @package Schoolbox\Resource\Storage
  */
-class Model extends File
+class Model extends File implements IStorage
 {
 
     /** @var string */
@@ -91,6 +91,17 @@ class Model extends File
     {
         $this->mimetype = $mimetype;
         return $this;
+    }
+
+
+    /**
+     * Returns the full mime string for the file
+     *
+     * @return string
+     */
+    public function getMime()
+    {
+        return $this->getMimetype()->getMime();
     }
 
 

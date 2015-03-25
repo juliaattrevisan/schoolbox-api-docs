@@ -94,6 +94,13 @@ cd tools;
 ./build-sql-update.sh >/dev/null;
 cd /vagrant;
 
+echo "$vag Generating data dir sql fixes";
+cp -f $cachedir/schoolboxdemo-vagrant-latest.sql /tmp/schoolboxdemo-vagrant-latest.sql;
+/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /tmp/schoolboxdemo-vagrant-latest.sql;
+
+echo "$vag Applying vagrant SQL fixes";
+mysql -u root -ptnp879 schoolbox < /tmp/schoolboxdemo-vagrant-latest.sql
+
 echo "$vag Upgrading demo data with latest SQL updates";
 mkdir /var/lib/vagrant -p > /dev/null;
 /vagrant/tools/update-sql.sh;

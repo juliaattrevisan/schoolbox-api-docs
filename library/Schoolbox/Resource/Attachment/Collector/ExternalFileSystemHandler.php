@@ -11,51 +11,59 @@ namespace Schoolbox\Resource\Attachment\Collector;
 
 
 use Alaress\File\Remote\FetcherInterface;
-use Schoolbox\FileInterface;
-use Schoolbox\Resource\FileLocatorInterface;
+use Schoolbox\Resource\File;
 use Schoolbox\Resource;
-use Schoolbox\StorageMapperInterface;
 
 class ExternalFileSystemHandler extends FileSystemHandler {
 
     /** @var FetcherInterface */
     protected $fetcher;
 
+    /** @var Resource\Storage\Receiver */
+    protected $receiver;
+
 
     /**
-     * @param string                 $prefix
-     * @param FetcherInterface       $fetcher
-     * @param FileLocatorInterface   $locator
-     * @param StorageMapperInterface $storage
+     * @param File\ILocator             $locator
+     * @param Resource\Storage\Receiver $receiver
+     * @param FetcherInterface          $fetcher
+     * @param File\IStorageWrapper      $wrapper
      */
-    public function __construct($prefix, FetcherInterface $fetcher, FileLocatorInterface $locator, StorageMapperInterface $storage)
-    {
-        parent::__construct($prefix, null, $locator, $storage);
-        $this->fetcher = $fetcher;
+    public function __construct(
+        File\ILocator $locator,
+        Resource\Storage\Receiver $receiver,
+        FetcherInterface $fetcher,
+        File\IStorageWrapper $wrapper = null
+    ) {
+        parent::__construct($locator, $wrapper);
+        $this->receiver = $receiver;
+        $this->fetcher  = $fetcher;
     }
 
 
     /**
-     * TODO for now, we are simply copying resources from SBFS to Storage. Upgrade by intelligently linking through to storage
-     *
      * @param string $id
      * @throws Resource\Exception
-     * @return FileInterface
+     * @return Resource\Storage\IStorage
      */
     public function fetch($id)
     {
         $file = $this->locator->findById($id);
 
-        if (!$file instanceof FileInterface) {
+        if (!$file instanceof File\IFile) {
             throw new Resource\Exception("Invalid type: resource is folder, not file", Resource\Exception::CODE_UNKNOWN);
         }
 
         $tempFilename = $this->fetcher->fetchToFile($file->getId());
         $filename     = $file->getFilename();
-        $owner        = $file->getOwner()->getId();
 
-        return $this->storage->upload($filename, $tempFilename, $owner);
+        $storage = $this->receiver->accept($filename, $tempFilename, false);
 
+        if ($this->wrapper) {
+            return $this->wrapper->wrap($storage);
+        }
+
+        return $storage;
     }
 
 }

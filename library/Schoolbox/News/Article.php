@@ -13,6 +13,7 @@ namespace Schoolbox\News;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Role;
 use Schoolbox\Storage;
 use Schoolbox\User;
@@ -142,7 +143,7 @@ class Article implements ISoftDeletable {
 	}
 
 	/**
-	 * @param \Schoolbox\Storage $image
+	 * @param IStorage $image
 	 * @return self
 	 */
 	public function setImage($image) {
@@ -151,7 +152,7 @@ class Article implements ISoftDeletable {
 	}
 
 	/**
-	 * @return \Schoolbox\Storage
+	 * @return IStorage
 	 */
 	public function getImage() {
 		return $this->image;

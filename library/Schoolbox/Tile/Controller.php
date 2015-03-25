@@ -292,7 +292,6 @@ class Controller extends Base
         if (is_array($post['attachment'])) {
             try {
                 $factory = new CollectorFactory();
-                /** @var \Schoolbox\Storage $image */
                 $image = $factory->build($post['attachment'])->getFirst();
                 $item->setBackgroundImage($image);
             } catch (\Schoolbox\Resource\Exception $e) {

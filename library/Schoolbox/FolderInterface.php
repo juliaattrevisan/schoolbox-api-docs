@@ -15,7 +15,7 @@ use Schoolbox\Resource\Folder\IFolder;
 /**
  * Interface FolderInterface
  *
- * @deprecated
+ * @deprecated in favour of Resource\Folder\IFolder, this interface retained for backward compatibility
  * @package Schoolbox
  */
 interface FolderInterface extends IFolder

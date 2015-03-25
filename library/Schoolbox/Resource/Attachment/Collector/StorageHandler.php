@@ -10,48 +10,44 @@
 namespace Schoolbox\Resource\Attachment\Collector;
 
 
-use Schoolbox\FileInterface;
-use Schoolbox\StorageMapper;
-use Schoolbox\StorageMapperInterface;
+use Schoolbox\Resource\Storage;
+use Schoolbox\Resource\File;
 
 class StorageHandler implements TypeHandlerInterface {
 
-    /** @var StorageMapper */
+    /** @var Storage\Mapper */
     protected $mapper;
 
-    /** @var StorageMapperInterface */
-    protected $storer;
+    /** @var File\IStorageWrapper */
+    protected $wrapper;
+
 
     /**
-     * @param StorageMapper          $mapper
-     * @param StorageMapperInterface $storer
+     * @param Storage\Mapper $mapper
+     * @param File\IStorageWrapper $wrapper
      */
-    public function __construct(StorageMapper $mapper, StorageMapperInterface $storer)
+    public function __construct(Storage\Mapper $mapper, File\IStorageWrapper $wrapper = null)
     {
-        $this->mapper = $mapper;
-        $this->storer = $storer;
+        $this->mapper   = $mapper;
+        $this->wrapper = $wrapper;
     }
 
 
     /**
      * @param string $id
-     * @return FileInterface
+     * @return Storage\IStorage
      */
     public function fetch($id)
     {
-        $sourcefile = $this->mapper->findByHash($id);
+        // storage file has already been uploaded, so retrieve it
+        $storage = $this->mapper->findByHash($id);
 
-        // don't try to put storage in storage
-        if ($this->storer instanceof StorageMapper) {
-            return $sourcefile;
+        if ($this->wrapper) {
+            // the receiver needs to take the storage object and return some IFile
+            return $this->wrapper->wrap($storage);
         }
 
-        // transfer from storage to wherever this storer wants to put it
-        return $this->storer->upload(
-            $sourcefile->getFilename(),
-            $sourcefile->getFileLocation(),
-            $sourcefile->getOwner()->getId()
-        );
+        return $storage;
     }
 
 }

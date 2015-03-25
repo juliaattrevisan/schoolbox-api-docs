@@ -14,13 +14,13 @@
 namespace Schoolbox\Resource\Browser\Resources;
 
 
+use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Browser\AbstractNode;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Category;
+use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 use Schoolbox\Resource\Exception;
-use Schoolbox\Resource\FileMapper;
-use Schoolbox\Resource\Folder\IFolder as FolderInterface;
+use Schoolbox\Resource\File\Mapper as FileMapper;
 
 /**
  * Class Node

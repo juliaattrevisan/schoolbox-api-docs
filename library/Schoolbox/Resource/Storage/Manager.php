@@ -11,11 +11,21 @@ namespace Schoolbox\Resource\Storage;
 
 
 use Alaress_Byte_Format;
+use ErrorException;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
 use Schoolbox\File;
 
+/**
+ * Class Manager
+ *
+ * Mappers are to Models as this Manager is to files.
+ * In principle, Mappers DO NOT influence the filesystem in anyway - that's what this class is for.
+ * This is essentially a Schoolbox abstraction around Flysystem's MountManager.
+ *
+ * @package Schoolbox\Resource\Storage
+ */
 class Manager
 {
 
@@ -100,13 +110,18 @@ class Manager
             return true;
         }
 
-        // attempt to copy the file
-        if (!$this->copy($tempPath, $storage)) {
-            // copy failed, let's get out of here
-            throw new File\Exception("Failed to copy uploaded file to storage");
-        }
+        try {
+            // attempt to copy the file
+            if (!$this->copy($tempPath, $storage)) {
+                // copy failed, let's get out of here
+                throw new File\Exception("Failed to copy uploaded file to storage");
+            }
 
-        $this->reverseSymlink($storage);
+            $this->reverseSymlink($storage);
+        } catch (\League\Flysystem\FileExistsException $e) {
+            // the target file already exists, and that's ok
+            // should probably log the dedupe event though...
+        }
 
         return true;
     }
@@ -116,14 +131,12 @@ class Manager
      * Create symlink for backward-compatibility.
      * TODO once nothing points to the old system, remove this method completely
      *
-     * @deprecated
+     * @deprecated, remove once all references to old storage systems are removed
      * @param Model $storage
-     * @throws File\Exception
      */
     private function reverseSymlink(Model $storage)
     {
-        $stmt = \Database::getInstance()->prepare("SELECT storage_id FROM `storage` WHERE `hash` = ?");
-        $stmt->execute([ $storage->getHash() ]);
+        $stmt = \Database::getInstance()->query("SELECT storage_id FROM `storage` WHERE `hash` = ?", [ $storage->getHash() ]);
 
         $internalId = $stmt->fetchColumn();
 
@@ -136,8 +149,10 @@ class Manager
         $path = $adpt->getPathPrefix() . $storage->getPath();
         $link = $adpt->getPathPrefix() . $internalId . ".dat";
 
-        if (!symlink($path, $link)) {
-            throw new File\Exception("Could not symlink");
+        try {
+            symlink($path, $link);
+        } catch (ErrorException $e) {
+            // in daemon mode, symlink will throw an exception, but we don't care.
         }
     }
 

@@ -13,16 +13,13 @@ namespace Schoolbox\Resource\Attachment\Collector;
 use InvalidArgumentException;
 use PortfolioWebDAV;
 use Schoolbox\Config\Loader;
-use Schoolbox\MyFileMapper;
+use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
 use Schoolbox\Resource\Browser\NodeFactory;
-use Schoolbox\Resource\FileMapper;
-use Schoolbox\StorageMapper;
-use Schoolbox\StorageMapperInterface;
+use Schoolbox\Resource\File\IStorageWrapper;
+use Schoolbox\Resource\File\Mapper as FileMapper;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 class CollectorFactory {
-
-    /** @var StorageMapperInterface */
-    protected $storer;
 
     /** @var StorageMapper */
     protected $storage;
@@ -46,33 +43,30 @@ class CollectorFactory {
      * The mapper passed in here defines the model that will be returned by self->build()->get*();
      * eg. by default, assumes StorageMapper, which means that Collector would return Storage objects.
      *
-     * @param StorageMapperInterface $mapper
+     * @param IStorageWrapper $wrapper
      */
-    public function __construct(StorageMapperInterface $mapper = null)
+    public function __construct(IStorageWrapper $wrapper = null)
     {
-        $storage = StorageMapper::getInstance();
-        $file    = FileMapper::getInstance();
-        $myFile  = MyFileMapper::getInstance();
-        $conf    = new Loader();
+        $storage  = StorageMapper::getInstance();
+        $file     = FileMapper::getInstance();
+        $myFile   = MyFileMapper::getInstance();
 
-        $storer  = $mapper ?: $storage;
-
-        $this->add(NodeFactory::STORE, function () use ($storage, $storer) {
-            return new StorageHandler($storage, $storer);
+        $this->add(NodeFactory::STORE, function () use ($storage, $wrapper) {
+            return new StorageHandler($storage, $wrapper);
         });
 
-        $this->add(NodeFactory::SBFS, function () use ($conf, $file, $storer) {
-            return new FileSystemHandler(NodeFactory::SBFS, $conf->get('file_dir'), $file, $storer);
+        $this->add(NodeFactory::SBFS, function () use ($file, $wrapper) {
+            return new FileSystemHandler($file, $wrapper);
         });
 
-        $this->add(NodeFactory::MYFILE, function () use ($conf, $myFile, $storer) {
-            return new FileSystemHandler(NodeFactory::MYFILE, $conf->get('myfile_dir'), $myFile, $storer);
+        $this->add(NodeFactory::MYFILE, function () use ($myFile, $wrapper) {
+            return new FileSystemHandler($myFile, $wrapper);
         });
 
         try {
             $dav = PortfolioWebDAV::factory();
-            $this->add(NodeFactory::WEBDAV, function () use ($dav, $storer) {
-                return new ExternalFileSystemHandler(NodeFactory::WEBDAV, $dav, $dav, $storer); // yup. totally passed it in twice
+            $this->add(NodeFactory::WEBDAV, function () use ($dav, $wrapper, $storage) {
+                return new ExternalFileSystemHandler($dav, $storage, $dav, $wrapper); // yup. totally passing things in multiple times
             });
 
         } catch (\DomainException $e) {

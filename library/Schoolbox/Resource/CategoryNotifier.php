@@ -12,7 +12,7 @@ namespace Schoolbox\Resource;
 /**
  * Class CategoryNotifier
  *
- * @deprecated
+ * @deprecated in favour of Resource\Folder\Notifier, this class retained for backward compatibility
  * @package Schoolbox\Resource
  */
 class CategoryNotifier extends Folder\Notifier
