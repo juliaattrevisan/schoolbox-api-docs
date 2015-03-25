@@ -31,7 +31,11 @@
 
                 /* The attribute to analyse
                  */
-                attribute: 'href'
+                attribute: 'href',
+
+                /* Base url where preview is located
+                 */
+                baseUrl: '/preview'
             }
 
             var derived = {
@@ -56,7 +60,9 @@
                     }
                 });
 
-                $.get($(this).attr(config.attribute), function(response) {
+                var url = config.baseUrl + '/' + encodeURIComponent($(this).attr(config.attribute));
+
+                $.get(url, function(response) {
                     $.magnificPopup.close();
 
                     if (response.type == 'redirect') {

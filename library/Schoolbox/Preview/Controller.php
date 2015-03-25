@@ -43,7 +43,7 @@ class Controller extends Base
      * Test method
      */
     public function preview($params) {
-        $chain = new External(urlencode($params['encodedUrl']));
+        $chain = new External($params['encodedUrl']);
         $result = $chain->getResult();
 
         /* Set up html fragment
