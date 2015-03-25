@@ -16,8 +16,27 @@
         $(config.element).click(function(event) {
             event.preventDefault();
 
-            $.get($(this).attr('href'), function(responseText) {
-                console.log(responseText);
+            $.magnificPopup.open({
+                items: {
+                    src: "<div class='loader' style='width:200px;padding:20px 20px 50px 20px;margin:0 auto;background-color:#fff;text-align:center'>Loading data...</div>",
+                    type: 'inline'
+                }
+            });
+
+            $.get($(this).attr('href'), function(response) {
+                $.magnificPopup.close();
+
+                if (response.type == 'redirect') {
+                    window.location.href = response.fragment;
+                }
+                else {
+                    $.magnificPopup.open({
+                        items: {
+                            src: "<div style='text-align:center'>" + response.fragment + "</div>",
+                            type: 'inline'
+                        }
+                    });
+                }
             });
         });
 
