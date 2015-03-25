@@ -13,32 +13,7 @@
          */
         var config = init(options, this);
 
-        $(config.element).click(function(event) {
-            event.preventDefault();
-
-            $.magnificPopup.open({
-                items: {
-                    src: "<div class='preview loader'>Loading data...</div>",
-                    type: 'inline'
-                }
-            });
-
-            $.get($(this).attr('href'), function(response) {
-                $.magnificPopup.close();
-
-                if (response.type == 'redirect') {
-                    window.location.href = response.fragment;
-                }
-                else {
-                    $.magnificPopup.open({
-                        items: {
-                            src: "<div class='preview fragment'>" + response.fragment + "</div>",
-                            type: 'inline'
-                        }
-                    });
-                }
-            });
-        });
+        preview();
 
         /**
          * Initialise parameters
@@ -49,7 +24,14 @@
          */
         function init(options, element) {
             var defaults = {
-                element: element
+
+                /* The element that activated preview
+                 */
+                element: element,
+
+                /* The attribute to analyse
+                 */
+                attribute: 'href'
             }
 
             var derived = {
@@ -58,6 +40,38 @@
             var merged = $.extend(defaults, derived, options);
 
             return merged;
+        }
+
+        /**
+         * Preview
+         */
+        function preview() {
+            $(config.element).click(function(event) {
+                event.preventDefault();
+
+                $.magnificPopup.open({
+                    items: {
+                        src: "<div class='preview loader'>Loading data...</div>",
+                        type: 'inline'
+                    }
+                });
+
+                $.get($(this).attr(config.attribute), function(response) {
+                    $.magnificPopup.close();
+
+                    if (response.type == 'redirect') {
+                        window.location.href = response.fragment;
+                    }
+                    else {
+                        $.magnificPopup.open({
+                            items: {
+                                src: "<div class='preview fragment'>" + response.fragment + "</div>",
+                                type: 'inline'
+                            }
+                        });
+                    }
+                });
+            });
         }
     }
 }(jQuery));
