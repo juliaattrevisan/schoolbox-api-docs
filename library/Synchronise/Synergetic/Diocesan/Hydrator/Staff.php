@@ -47,8 +47,11 @@ class Staff extends Synchronise_Base_Hydrator_Staff
 
         $newUser['group_id'] = self::ROLE_STAFF;
 
-        // we only reset campi for teachers
+        // non teachers go in all campus
         if ($externalUser['StaffCategoryType'] != 'TEACHER') {
+            $newUser['campus'] = array(self::CAMPUS_SENIOR, self::CAMPUS_JUNHIGH,self::CAMPUS_JUNIOR);
+            $newUser['defaultCampus'] = $newUser['campus'][0];
+
             return $newUser;
         }
 

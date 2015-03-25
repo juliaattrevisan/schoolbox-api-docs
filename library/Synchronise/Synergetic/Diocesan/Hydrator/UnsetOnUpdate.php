@@ -16,4 +16,23 @@ class UnsetOnUpdate extends Synchronise_Base_Hydrator_UnsetOnUpdate
 {
     /** @var array */
     protected $clearFields = array('su', 'enabled');
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function hydrateOnUpdate($externalUser, $newUser)
+    {
+        foreach ($this->getClearFields() as $clearField) {
+            unset($newUser[$clearField]);
+        }
+
+        /* Don't change non teacher staff campus */
+        if($externalUser['StaffCategoryType'] != 'TEACHER') {
+            unset($newUser['campus']);
+            unset($newUser['defaultCampus']);
+        }
+
+        return $newUser;
+    }
+
 } 
