@@ -66,6 +66,7 @@
         var stream;
         var video = document.getElementById(userMediaOptions.el);
         var recorder;
+        var dz;
         abUploadControls.on(
             'click',
             recorderButtons.start,
@@ -80,7 +81,7 @@
                         if (userMediaOptions.context === 'webrtc') {
                             // WebRTC
                             video.src = window.URL.createObjectURL(stream);
-                            recorder  = RecordRTC(s, {sampleRate: 11025});
+                            recorder  = RecordRTC(s);
                             recorder.startRecording();
                         } else {
                             // Flash - do something else, I know not what
@@ -147,12 +148,13 @@
                 )
                 .done(function(response) {
                     // dropzone
-                    abUploadForm.data('dropzone').addFile({
-                        name: 'blob.wav',
-                        type: blob.type,
-                        size: blob.size,
+                    var data = {
+                        title: 'blob.wav',
+                        mimeType: blob.type,
+                        filesize: blob.size,
                         hash: response.hash
-                    });
+                    };
+                    window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
                 });
 
                 // Get the contents of stream blob or src.
@@ -276,7 +278,7 @@
             },
 
             init: function () {
-                var dz = this;
+                dz = this;
 
                 abUpload.data('dropzone', this);
 
