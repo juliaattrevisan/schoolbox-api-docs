@@ -13,6 +13,9 @@ namespace Schoolbox\Resource\Attachment\Collector;
 use InvalidArgumentException;
 use PortfolioWebDAV;
 use Schoolbox\Config\Loader;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Resource\Browser\Office365\Locator;
+use Schoolbox\Resource\Browser\Office365\Tenant;
 use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
 use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Resource\File\IStorageWrapper;
@@ -33,7 +36,7 @@ class CollectorFactory {
     /** @var PortfolioWebDAV */
     protected $dav;
 
-    /** @var Loader */
+    /** @var IConfigLoader */
     protected $conf;
 
     /** @var callable[] */
@@ -50,6 +53,8 @@ class CollectorFactory {
         $storage  = StorageMapper::getInstance();
         $file     = FileMapper::getInstance();
         $myFile   = MyFileMapper::getInstance();
+
+        $this->conf = new Loader();
 
         $this->add(NodeFactory::STORE, function () use ($storage, $wrapper) {
             return new StorageHandler($storage, $wrapper);
@@ -71,6 +76,17 @@ class CollectorFactory {
 
         } catch (\DomainException $e) {
             // DAV isn't configured. we're ok with that.
+        }
+
+        try {
+            $locator = new Locator(new Tenant($this->conf->get('sharepoint_tenant')), $_SESSION['azureAccessToken']);
+
+            $this->add(NodeFactory::OFFICE, function () use ($locator, $wrapper, $storage) {
+                return new ExternalFileSystemHandler($locator, $storage, $locator, $wrapper);
+            });
+
+        } catch (InvalidArgumentException $e) {
+            // Office 365 isn't configured. we're ok with that.
         }
     }
 
@@ -115,7 +131,8 @@ class CollectorFactory {
             NodeFactory::STORE  => Collector::TYPE_STORAGE,
             NodeFactory::SBFS   => Collector::TYPE_SBFS,
             NodeFactory::MYFILE => Collector::TYPE_MYFILE,
-            NodeFactory::WEBDAV => Collector::TYPE_WEBDAV
+            NodeFactory::WEBDAV => Collector::TYPE_WEBDAV,
+            NodeFactory::OFFICE => Collector::TYPE_OFFICE
         );
 
         $indexedAttachments = array();

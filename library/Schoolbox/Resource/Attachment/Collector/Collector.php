@@ -20,7 +20,8 @@ class Collector
     const TYPE_SBFS    = 0x2;
     const TYPE_MYFILE  = 0x4;
     const TYPE_WEBDAV  = 0x8;
-    const TYPE_ALL     = 0xF;
+    const TYPE_OFFICE  = 0x10;
+    const TYPE_ALL     = 0xFF;
 
     /** @var array */
     protected $source;
