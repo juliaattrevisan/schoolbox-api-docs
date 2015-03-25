@@ -5,26 +5,35 @@
         var abUpload          = $('#ab-upload'),
             abUploadForm      = abUpload.find('form.dzone'),
             abUploadControls  = abUpload.siblings('div.ctrl'),
-            abUploadSubmitBtn = abUploadControls.children('a.submit-btn-plain'),
+            abUploadSubmitBtn = abUploadControls.children('a[data-interaction="file-upload"]'),
             abUploadCancelBtn = abUploadControls.children('a.cancel'),
             maxFiles           = {MAX_FILES};
 
         // Setup of the user media recorder
         var userMediaOptions  = {
-            audio:   false,
-            video:   true,
-            el:      'playback',
+            audio:   true,
+            video:   false,
+            el:      'microphone',
             swfFile: '/javascript/getusermedia-js/dist/fallback/jscam_canvas_only.swf',
-            onSave:  function (data) {
+            onCapture: function () {
+                // Capture of fallback stream
+                window.webcam.save();
+            },
+            onSave: function (data) {
                 // Shove this into a mediajs element or something.
             }
-        }
+        };
+
+        // States:
+        // before recording
+        // recording
 
         var recorderButtons = {
             start:     'a[data-interaction="audio-record-start"]',
             recording: 'a[data-interaction="audio-record-recording"]',
 //            pause:     'a[data-interaction="audio-record-pause"]',
             stop:      'a[data-interaction="audio-record-stop"]',
+            upload:    'a[data-interaction="audio-record-upload"]',
             disabled:  'a[data-interaction="audio-record-disabled"]'
         };
         var onDisableRecording = function () {
@@ -32,6 +41,7 @@
             abUploadControls.find(recorderButtons.recording).hide().prop('disabled', true);
 //            abUploadControls.find(recorderButtons.pause).show();
             abUploadControls.find(recorderButtons.stop).hide().prop('disabled', true);
+            abUploadControls.find(recorderButtons.upload).hide().prop('disabled', true);
             abUploadControls.find(recorderButtons.disabled).show();
         };
         var onStartRecording = function () {
@@ -39,6 +49,7 @@
             abUploadControls.find(recorderButtons.recording).show().prop('disabled', false);
 //            abUploadControls.find(recorderButtons.pause).show();
             abUploadControls.find(recorderButtons.stop).show().prop('disabled', false);
+            abUploadControls.find(recorderButtons.upload).show().prop('disabled', false);
             abUploadControls.find(recorderButtons.disabled).hide();
         };
         var onStopRecording = function () {
@@ -46,6 +57,7 @@
             abUploadControls.find(recorderButtons.recording).hide().prop('disabled', true);
 //            abUploadControls.find(recorderButtons.pause).show();
             abUploadControls.find(recorderButtons.stop).hide().prop('disabled', true);
+            abUploadControls.find(recorderButtons.upload).show().prop('disabled', false);
             abUploadControls.find(recorderButtons.disabled).hide();
         };
         // Hide controls by default
@@ -53,6 +65,7 @@
 
         var stream;
         var video = document.getElementById(userMediaOptions.el);
+        var recorder;
         abUploadControls.on(
             'click',
             recorderButtons.start,
@@ -67,9 +80,11 @@
                         if (userMediaOptions.context === 'webrtc') {
                             // WebRTC
                             video.src = window.URL.createObjectURL(stream);
-                            video.play();
+                            recorder  = RecordRTC(s, {sampleRate: 11025});
+                            recorder.startRecording();
                         } else {
                             // Flash - do something else, I know not what
+                            // Use https://github.com/michalstocki/FlashWavRecorder
                         }
                     },
                     function (error) {
@@ -91,15 +106,70 @@
 //                // on next play, append stream onto end
 //            }
 //        );
+
+        var formData;
+        var blob;
         abUploadControls.on(
             'click',
             recorderButtons.stop,
             function (event) {
                 event.preventDefault();
                 onStopRecording();
-                video.pause();
                 stream.stop();
+                recorder.stopRecording(function (audioVideoWebMURL) {
+                    video.src = audioVideoWebMURL;
+                    formData = new FormData();
+                    blob     = recorder.getBlob();
+                    formData.append('upload', blob, 'blob.wav');
+                });
+
+//                video.pause();
+//                stream.stop();
+//                recorder.clear();
                 // remove contents of video completely
+            }
+        );
+        abUploadControls.on(
+            'click',
+            recorderButtons.upload,
+            function (event) {
+                event.preventDefault();
+
+                // async upload
+                $.ajax(
+                    {
+                        url: abUploadForm.attr('action'),
+                        type: 'post',
+                        data: formData,
+                        contentType: false,
+                        processData: false
+                    }
+                )
+                .done(function(response) {
+                    // dropzone
+                    abUploadForm.data('dropzone').addFile({
+                        name: 'blob.wav',
+                        type: blob.type,
+                        size: blob.size,
+                        hash: response.hash
+                    });
+                });
+
+                // Get the contents of stream blob or src.
+//                var reader = new FileReader();
+//                reader.addEventListener('loadend', function() {
+//                    // blobby
+//                    console.log(reader.result);
+//                });
+//                console.log(stream);
+//                console.log(window.URL.createObjectURL(stream));
+//                reader.readAsArrayBuffer(new Blob([stream]));
+//                abUploadForm.dropzone.addFile({
+//                    name: 'recordedVideo.mp4',
+//                    type: 'video/mp4',
+//                    size: 'something',
+//                    hash: 'brownhole'
+//                });
             }
         );
 
@@ -328,12 +398,13 @@
   </form>
 </div>
 <div class="ctrl">
-  <a role="button" class="submit-btn-plain" disabled="disabled" href="#">Upload</a>
+  <a role="button" class="submit-btn-plain" data-interaction="file-upload" disabled="disabled" href="#">Upload</a>
   <a role="button" class="submit-btn-plain record" data-interaction="audio-record-start" href="#">Record Audio</a>
   <a role="button" class="submit-btn-plain recording hide" data-interaction="audio-record-recording" disabled href="#">Recording...</a>
   <a role="button" class="submit-btn-plain disabled" data-interaction="audio-record-disabled" disabled href="#">No recording devices available</a>
   <!--<a role="button" class="submit-btn-plain pause hide" data-interaction="audio-record-pause" href="#">Pause</a>-->
   <a role="button" class="submit-btn-plain stop hide" data-interaction="audio-record-stop" href="#">Stop</a>
+  <a role="button" class="submit-btn-plain stop hide" data-interaction="audio-record-upload" href="#">Upload Audio</a>
   <a role="button" class="btn no-icon float-left cancel" href="#">Cancel</a>
 </div>
 <div id="microphone"></div>
