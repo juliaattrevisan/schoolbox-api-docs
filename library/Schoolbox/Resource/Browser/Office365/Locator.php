@@ -11,17 +11,15 @@ namespace Schoolbox\Resource\Browser\Office365;
 
 
 use Alaress\Authorizer\Failure\Unauthorized;
+use Alaress\File\Remote\FetcherInterface;
+use Alaress_Date_Format;
 use InvalidArgumentException;
+use OutOfBoundsException;
 use Proxy;
 use RuntimeException;
-use Schoolbox\FileInterface;
-use Schoolbox\FolderInterface;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\File;
-use Schoolbox\Resource\FileLocatorInterface;
-use Schoolbox\Resource\FolderLocatorInterface;
+use Schoolbox\Resource;
 
-class Locator implements FileLocatorInterface, FolderLocatorInterface
+class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, FetcherInterface
 {
     /** @var Tenant */
     protected $tenant;
@@ -67,11 +65,11 @@ class Locator implements FileLocatorInterface, FolderLocatorInterface
      * Return the file or folder by the given ID
      *
      * @param string $nodeId
-     * @return FileInterface|FolderInterface
+     * @return Resource\File\IFile|Resource\Folder\IFolder
      */
     public function findById($nodeId)
     {
-        $item = $this->rq("/files/$nodeId");
+        $item = $this->fetchMetaData($nodeId);
 
         if ($item['type'] == 'File') {
             return $this->parseFile($item);
@@ -86,7 +84,7 @@ class Locator implements FileLocatorInterface, FolderLocatorInterface
      * Return the files contained within the folder with the given ID
      *
      * @param string $nodeId
-     * @return FileInterface[]
+     * @return Resource\File\IFile[]
      */
     public function findByFolderId($nodeId)
     {
@@ -112,7 +110,7 @@ class Locator implements FileLocatorInterface, FolderLocatorInterface
      * Return the folders contained within the folder with the given ID
      *
      * @param string $nodeId
-     * @return FolderInterface[]
+     * @return Resource\Folder\IFolder[]
      */
     public function findByParentId($nodeId)
     {
@@ -136,7 +134,7 @@ class Locator implements FileLocatorInterface, FolderLocatorInterface
 
     /**
      * @param $item
-     * @return File
+     * @return Resource\File\Model
      */
     protected function parseFile($item)
     {
@@ -144,21 +142,27 @@ class Locator implements FileLocatorInterface, FolderLocatorInterface
             throw new InvalidArgumentException('Not a file');
         }
 
-        $file = new File();
+        $file = Resource\File\Mapper::getInstance()->createModel();
         $file->setId($item['id']);
         $file->setFilename($item['name']);
-        $file->setDescription($item['name']);
-        $file->setFilesize($item['size']);
-        $file->setSubmitted(new \Alaress_Date_Format(
+        $file->setTitle($item['name']);
+        $file->setSize($item['size']);
+
+        // TODO @armatronic why is this exploding?
+        /*
+        $file->setCreatedAt(new Alaress_Date_Format(
             $item['dateTimeCreated'], 'c'
         ));
-        $file->setModified(new \Alaress_Date_Format(
+
+        $file->setModifiedAt(new Alaress_Date_Format(
             $item['dateTimeLastModified'], 'c'
         ));
+        */
 
-        $folder = new Category();
+        $folder = Resource\Folder\Mapper::getInstance()->createModel();
         $folder->setId($item['parentReference']['id']);
         $file->setFolder($folder);
+
 
         return $file;
     }
@@ -166,7 +170,7 @@ class Locator implements FileLocatorInterface, FolderLocatorInterface
 
     /**
      * @param array $item
-     * @return Category
+     * @return Resource\Folder\Model
      */
     protected function parseFolder(array $item)
     {
@@ -174,12 +178,12 @@ class Locator implements FileLocatorInterface, FolderLocatorInterface
             throw new InvalidArgumentException('Not a folder');
         }
 
-        $folder = new Category();
+        $folder = Resource\Folder\Mapper::getInstance()->createModel();
 
         $folder->setId($item['id']);
         $folder->setName($item['name']);
 
-        $parent = new Category();
+        $parent = Resource\Folder\Mapper::getInstance()->createModel();
         $parent->setId($item['parentReference']['id']);
 
         $folder->setParent($parent);
@@ -217,4 +221,54 @@ class Locator implements FileLocatorInterface, FolderLocatorInterface
         return $data;
     }
 
-} 
+
+    /**
+     * Retrieves the metadata for the given fileId
+     *
+     * @param int $nodeId
+     * @return array
+     */
+    public function fetchMetaData($nodeId)
+    {
+        return $this->rq("/files/$nodeId");
+    }
+
+
+    /**
+     * Attempts to retrieve remote source to local destination, returns the path of the saved file.
+     *
+     * @param int $fileId
+     * @throws OutOfBoundsException
+     * @return string
+     */
+    public function fetchToFile($fileId)
+    {
+        $file = $this->fetchMetaData($fileId);
+
+        // "URL for downloading the file's content."
+        $url = $file['contentUrl'];
+
+        if (!$url) {
+            throw new OutOfBoundsException("No url found for download");
+        }
+
+        $destination = tempnam(sys_get_temp_dir(), 'sp');
+
+        if (!($fp = fopen($destination, 'w'))) {
+            throw new OutOfBoundsException("Could not open target");
+        }
+
+        $ch = Proxy\Server::getInstance()->curl_init($url);
+
+        curl_setopt_array($ch, [
+            CURLOPT_FILE       => $fp,
+            CURLOPT_HTTPHEADER => [ 'Authorization: Bearer ' . $this->oAuthToken ]
+        ]);
+        curl_exec($ch);
+        curl_close($ch);
+        fclose($fp);
+
+        return $destination;
+    }
+
+}
