@@ -30,7 +30,12 @@ class Html extends Base {
     public function test() {
         foreach ($this->getContentTypes() as $currentContentType) {
             if (strstr($this->findContentType(), $currentContentType)) {
-                return 'Is a website';
+                return [
+                    'template' => '@preview/Strategy/Html.twig',
+                    'data' => [
+                        'src' => $this->getUrl()
+                    ]
+                ];
             }
         }
 

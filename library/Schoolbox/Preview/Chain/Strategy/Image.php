@@ -33,7 +33,7 @@ class Image extends Base {
     public function test() {
         if (in_array($this->findContentType(), $this->getContentTypes())) {
             return [
-                'template' => '@preview/strategy/Image.twig',
+                'template' => '@preview/Strategy/Image.twig',
                 'data' => [
                     'src' => $this->getUrl()
                 ]
