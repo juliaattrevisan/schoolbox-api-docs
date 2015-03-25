@@ -29,9 +29,11 @@ abstract class Base extends StrategyBase {
     /**
      * Constructor
      *
+     * @param $url
      * @param $hash
      */
-    public function __construct($hash) {
+    public function __construct($url, $hash) {
+        $this->setUrl($url);
         $this->setHash($hash);
     }
 
