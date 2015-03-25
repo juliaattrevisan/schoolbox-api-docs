@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Resource\Browser\Office365;
 
+use RuntimeException;
 use Schoolbox\Resource\Browser\AbstractNode;
 
 class Node extends AbstractNode
@@ -27,6 +28,9 @@ class Node extends AbstractNode
         $this->setMimeFilter($mimeFilter);
 
         // TODO unhide dependency
+        if (!$tenant instanceof Tenant) {
+            throw new RuntimeException("No tenant supplied");
+        }
         $locator = new Locator($tenant, $oAuthToken);
 
         $this->setFileLocator($locator);
