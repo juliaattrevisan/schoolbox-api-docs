@@ -8,6 +8,7 @@
 namespace Schoolbox\Preview;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Preview\Chain\Internal;
 use Schoolbox\Preview\Chain\External;
 
 class Controller extends Base
