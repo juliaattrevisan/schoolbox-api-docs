@@ -147,6 +147,7 @@ class Locator implements FileLocatorInterface, FolderLocatorInterface
         $file = new File();
         $file->setId($item['id']);
         $file->setFilename($item['name']);
+        $file->setDescription($item['name']);
         $file->setFilesize($item['size']);
         $file->setSubmitted(new \Alaress_Date_Format(
             $item['dateTimeCreated'], 'c'
