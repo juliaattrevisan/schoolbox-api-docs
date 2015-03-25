@@ -20,16 +20,14 @@ if (is_numeric($_GET['id'])) {
         if ($groupHandler->getPermission($_GET['id']) < READ_ACCESS)
             error(5);
 
-
-
         $config = array(
-            'sort' => 'Date',
+            'sort' => 'date',
             'sortdir' => 'DESC',
             'size' => 1,
         );
 
         $fileHandler = new File;
-        $file = $fileHandler->getAllInCategory($_GET['id']);
+        $file = $fileHandler->getAllInCategory($_GET['id'], $config);
         $file = $file[0];
 
         if (!is_array($file))
