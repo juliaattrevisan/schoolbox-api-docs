@@ -19,16 +19,31 @@ class Image extends Base {
      * @return mixed
      */
     public function test() {
-        return [
-            'type' => 'html-fragment',
-            'twig' => [
-                'template' => '@preview/Strategy/Image.twig',
-                'data' => [
-                    'src' => $this->getUrl()
+        if ($this->isStorage()) {
+            return [
+                'type' => 'html-fragment',
+                'twig' => [
+                    'template' => '@preview/Strategy/Image.twig',
+                    'data' => [
+                        'src' => $this->getUrl()
+                    ]
                 ]
-            ]
-        ];
+            ];
+        }
 
         return $this->testNext();
+    }
+
+    /**
+     * Check if this is a storage url, it could contain anything
+     */
+    private function isStorage() {
+        preg_match('#storage\/fetch\.php#', $this->getUrl(), $matches);
+
+        if (count($matches)) {
+            return true;
+        }
+
+        return false;
     }
 } 
