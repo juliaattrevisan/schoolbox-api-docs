@@ -12,10 +12,10 @@
 
 namespace Schoolbox\Preview\Chain;
 
-use Schoolbox\Preview\Chain\Strategy\Image;
-use Schoolbox\Preview\Chain\Strategy\Embed;
-use Schoolbox\Preview\Chain\Strategy\Html;
-use Schoolbox\Preview\Chain\Strategy\Redirect;
+use Schoolbox\Preview\Chain\Strategy\External\Image;
+use Schoolbox\Preview\Chain\Strategy\External\Embed;
+use Schoolbox\Preview\Chain\Strategy\External\Html;
+use Schoolbox\Preview\Chain\Strategy\External\Redirect;
 
 class External extends Base {
 

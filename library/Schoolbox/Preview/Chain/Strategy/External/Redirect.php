@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Preview\Chain\Strategy;
+namespace Schoolbox\Preview\Chain\Strategy\External;
 
 
 class Redirect extends Base {

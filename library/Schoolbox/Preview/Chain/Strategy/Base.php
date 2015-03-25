@@ -21,31 +21,6 @@ abstract class Base {
     protected $next;
 
     /**
-     * The requested url
-     *
-     * @var string
-     */
-    protected $url = '';
-
-    /**
-     * Header data from get_headers()
-     *
-     * @var array
-     */
-    protected $headers = array();
-
-    /**
-     * Constructor
-     *
-     * @param $url
-     * @param $headers
-     */
-    public function __construct($url, $headers) {
-        $this->setUrl($url);
-        $this->setHeaders($headers);
-    }
-
-    /**
      * Test with next strategy in the sequence
      *
      * @return mixed
@@ -54,27 +29,6 @@ abstract class Base {
         if ($this->getNext()) {
             return $this->getNext()->test();
         }
-    }
-
-    /**
-     * Macro method
-     *
-     * @return mixed
-     */
-    protected function findContentType() {
-        return $this->findByKey('content-type');
-    }
-
-    /**
-     * Get a header key
-     *
-     * @param $key
-     * @return mixed
-     */
-    protected function findByKey($key) {
-        $headers = $this->getHeaders();
-
-        return $headers[$key];
     }
 
     /* Getters/Setters
@@ -96,45 +50,5 @@ abstract class Base {
      */
     public function getNext() {
         return $this->next;
-    }
-
-    /**
-     * Set headers
-     *
-     * @param array $headers
-     */
-    protected function setHeaders($headers)
-    {
-        $this->headers = $headers;
-    }
-
-    /**
-     * Get headers
-     *
-     * @return array
-     */
-    protected function getHeaders()
-    {
-        return $this->headers;
-    }
-
-    /**
-     * Set url
-     *
-     * @param string $url
-     */
-    protected function setUrl($url)
-    {
-        $this->url = $url;
-    }
-
-    /**
-     * Get url
-     *
-     * @return string
-     */
-    protected function getUrl()
-    {
-        return $this->url;
     }
 }

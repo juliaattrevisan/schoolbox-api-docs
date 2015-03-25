@@ -29,6 +29,8 @@ class Controller extends Base
             "http://globe-views.com/dcim/dreams/owl/owl-03.jpg",
             "http://pugetsoundbirds.org/wp-content/uploads/2010/06/Northern-saw-whet-owl.jpg",
             "http://www.libertyscentre.co.uk/Owls/large/Collared%20Scops%20Owl.jpg",
+
+            "http://192.168.36.10/storage/fetch.php?hash=62f643c3b484a87f3ce2e3a8216c7f232787af02"
         ];
 
         $this->getResponse()->content->set([
@@ -43,8 +45,24 @@ class Controller extends Base
      * Test method
      */
     public function preview($params) {
-        $chain = new External($params['encodedUrl']);
-        $result = $chain->getResult();
+
+        /* Detect whether to use a Local or External chain
+         * Each has a different way to determine their type
+         */
+        $url = new \Url($params['encodedUrl']);
+
+        /* Local Chain
+         */
+        if ($url->isLocalURL()) {
+            $chain = new Internal($params['encodedUrl']);
+            $result = $chain->getResult();
+        }
+        /* External Chain
+         */
+        else {
+            $chain = new External($params['encodedUrl']);
+            $result = $chain->getResult();
+        }
 
         /* Set up html fragment
          */

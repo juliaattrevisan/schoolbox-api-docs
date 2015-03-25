@@ -8,10 +8,10 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Preview\Chain\Strategy;
+namespace Schoolbox\Preview\Chain\Strategy\External;
 
 
-class Image extends Base {
+class Html extends Base {
 
     /**
      * Content Types for this strategy
@@ -19,10 +19,7 @@ class Image extends Base {
      * @var array
      */
     private $contentTypes = [
-        'image/jpeg',
-        'image/pjpeg',
-        'image/gif',
-        'image/png',
+        'text/html',
     ];
 
     /**
@@ -31,16 +28,18 @@ class Image extends Base {
      * @return string
      */
     public function test() {
-        if (in_array($this->findContentType(), $this->getContentTypes())) {
-            return [
-                'type' => 'html-fragment',
-                'twig' => [
-                    'template' => '@preview/Strategy/Image.twig',
-                    'data' => [
-                        'src' => $this->getUrl()
+        foreach ($this->getContentTypes() as $currentContentType) {
+            if (strstr($this->findContentType(), $currentContentType)) {
+                return [
+                    'type' => 'html-fragment',
+                    'twig' => [
+                        'template' => '@preview/Strategy/Html.twig',
+                        'data' => [
+                            'src' => $this->getUrl()
+                        ]
                     ]
-                ]
-            ];
+                ];
+            }
         }
 
         return $this->testNext();
