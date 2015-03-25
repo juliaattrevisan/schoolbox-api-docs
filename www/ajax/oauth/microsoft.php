@@ -27,9 +27,9 @@ $sesskey = 'sp_oauth2state';
 /* CONF */
 $conf = new Loader();
 
-$clientId     = 'dbb4ee95-3af3-4059-b0ac-2f1f026e216f';
-$clientSecret = 'IkcMS+0NpOXhbRLYP8Qb1qgj23SE0zamKobY1epvDrU=';
-$clientName   = $conf->get('sharepoint_tenant');
+$clientId     = $conf->get('office365_client');
+$clientSecret = $conf->get('office365_secret');
+$clientName   = $conf->get('office365_tenant');
 /* /CONF */
 
 

@@ -26,7 +26,7 @@ class Office365Controller extends NavigatorController implements ExternalInterfa
     {
         parent::__construct($multi, $mimeFilter);
 
-        if (!$conf->get('sharepoint_tenant')) {
+        if (!$conf->get('office365_tenant')) {
             throw new OutOfRangeException("Office 365 tenancy not specified");
         }
     }

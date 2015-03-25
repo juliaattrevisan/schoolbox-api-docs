@@ -79,7 +79,7 @@ class CollectorFactory {
         }
 
         try {
-            $locator = new Locator(new Tenant($this->conf->get('sharepoint_tenant')), $_SESSION['azureAccessToken']);
+            $locator = new Locator(new Tenant($this->conf->get('office365_tenant')), $_SESSION['azureAccessToken']);
 
             $this->add(NodeFactory::OFFICE, function () use ($locator, $wrapper, $storage) {
                 return new ExternalFileSystemHandler($locator, $storage, $locator, $wrapper);

@@ -53,7 +53,7 @@ try {
 
     if ($oAuthToken = $_SESSION['azureAccessToken']) {
         $conf       = new Loader();
-        $tenant     = new Tenant($conf->get('sharepoint_tenant'), $conf->get('sharepoint_sitepath') ?: null);
+        $tenant     = new Tenant($conf->get('office365_tenant'), $conf->get('sharepoint_sitepath') ?: null);
         $browser    = $factory->buildOAuth($source, $resourceId, $tenant, $oAuthToken, $mimeFilter);
 
     } else {
