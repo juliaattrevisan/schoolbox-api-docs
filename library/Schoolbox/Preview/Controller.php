@@ -26,6 +26,9 @@ class Controller extends Base
             "http://s3.majorleaguegaming.com/files/OrlandoChamp.zip",
             "https://www.youtube.com/watch?v=zPonioDYnoY",
             "https://soundcloud.com/majorlazer",
+            "http://globe-views.com/dcim/dreams/owl/owl-03.jpg",
+            "http://pugetsoundbirds.org/wp-content/uploads/2010/06/Northern-saw-whet-owl.jpg",
+            "http://www.libertyscentre.co.uk/Owls/large/Collared%20Scops%20Owl.jpg",
         ];
 
         $this->getResponse()->content->set([
