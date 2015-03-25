@@ -43,5 +43,12 @@ class Controller extends Base
         $chain = new External(urlencode($params['encodedUrl']));
 
         $this->getResponse()->content->set($chain->getResult());
+
+        $output = $this->di->get("webOutput:nochrome");
+        $output->setResponse($this->getResponse());
+        $temp = $output->getAsString();
+
+        var_dump($temp);
+die();
     }
 }

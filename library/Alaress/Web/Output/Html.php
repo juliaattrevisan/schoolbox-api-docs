@@ -30,6 +30,17 @@ class Html extends Base {
     }
 
     /**
+     * Returns the contents of the responseBody from the response object
+     * as a string
+     *
+     * @return string
+     */
+    public function getAsString() {
+        $response = $this->getResponse()->content->get();
+        return $this->getTemplateEngine()->render($response['template'], $response['data']);
+    }
+
+    /**
      * @param  \Twig_Environment $templateEngine
      * @return $this
      */
