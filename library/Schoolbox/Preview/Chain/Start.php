@@ -11,9 +11,9 @@
 namespace Schoolbox\Preview\Chain;
 
 use Schoolbox\Preview\Chain\Strategy\Image;
-use Schoolbox\Preview\Chain\Strategy\Html;
 use Schoolbox\Preview\Chain\Strategy\Embed;
-use Schoolbox\Preview\Chain\Strategy\Other;
+use Schoolbox\Preview\Chain\Strategy\Html;
+use Schoolbox\Preview\Chain\Strategy\Redirect;
 
 class Start extends Base {
 
@@ -31,7 +31,7 @@ class Start extends Base {
             new Image($decodedUrl, $headers),
             new Embed($decodedUrl, $headers),
             new Html($decodedUrl, $headers),
-            new Other($decodedUrl, $headers),
+            new Redirect($decodedUrl, $headers),
         ]);
     }
 

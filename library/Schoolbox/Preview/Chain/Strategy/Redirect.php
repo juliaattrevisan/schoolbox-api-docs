@@ -1,6 +1,6 @@
 <?php
 /**
- * Other
+ * Redirect
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -11,12 +11,19 @@
 namespace Schoolbox\Preview\Chain\Strategy;
 
 
-class Other extends Base {
+class Redirect extends Base {
 
     /**
      * Base case
+     *
+     * Just redirect to the location via twig
      */
     public function test() {
-        return 'Is some kind of generic file';
+        return [
+            'template' => '@preview/Strategy/Redirect.twig',
+            'data' => [
+                'src' => $this->getUrl()
+            ]
+        ];
     }
-}
+} 
