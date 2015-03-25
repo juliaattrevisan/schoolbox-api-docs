@@ -19,10 +19,9 @@
     }
 </style>
 <table>
-    {% for url, resultType in results %}
+    {% for currentUrl in allUrls %}
     <tr>
-        <td width="50%">{{ url }}</td>
-        <td width="50%">{{ resultType }}</td>
+        <td><a href="/preview/{{ currentUrl|url_encode }}">{{ currentUrl }}</td>
     </tr>
     {% endfor %}
 </table>

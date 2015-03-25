@@ -24,10 +24,16 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        // All of these URLs relate to the resource ID, not a booking ID.
-        // Therefore, they should probably be moved to the item module.
-        $router->addGet('preview.index', $basePath . '/{encodedUrl}')
-            ->addValues(array('format' => '.nochrome'));
+        /* Default index page
+         */
+        $router->addGet('preview.index', $basePath);
+
+        /* Render html fragment, or redirect
+         */
+        $router->addGet('preview.preview', $basePath . '/{encodedUrl}')
+            ->addValues([
+                'format' => '.nochrome'
+            ]);
     }
 
     /**
@@ -35,9 +41,8 @@ class Module extends BaseModule
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
-        // Add the booking item to params, if ID is in the route.
         $matcher->add(
-            '/^preview\.index/',
+            '/^preview\.(index|preview)/',
             function($params) {
                 return array(
                     'params' => $params

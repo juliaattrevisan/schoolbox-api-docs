@@ -13,9 +13,6 @@ use Schoolbox\Preview\Chain\External;
 class Controller extends Base
 {
 
-    /**
-     * Test method
-     */
     public function index($params) {
         $testUrls = [
             "http://www.taylorswift.com/",
@@ -31,7 +28,19 @@ class Controller extends Base
             "https://soundcloud.com/majorlazer",
         ];
 
-        $chain = new External(urlencode($testUrls[9]));
+        $this->getResponse()->content->set([
+            'template' => '@preview/Index.twig',
+            'data' => [
+                'allUrls' => $testUrls,
+            ]
+        ]);
+    }
+
+    /**
+     * Test method
+     */
+    public function preview($params) {
+        $chain = new External(urlencode($params['encodedUrl']));
 
         $this->getResponse()->content->set($chain->getResult());
     }
