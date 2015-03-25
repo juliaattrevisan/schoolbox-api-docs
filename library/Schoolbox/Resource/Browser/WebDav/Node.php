@@ -11,15 +11,14 @@ namespace Schoolbox\Resource\Browser\WebDav;
 
 
 use InvalidArgumentException;
-use Sabre\DAV\Exception\NotAuthenticated;
 use Schoolbox\Resource\Browser\AbstractNode;
 
 class Node extends AbstractNode {
 
 
     /**
-     * @param int  $nodeId
-     * @param null $mimeFilter
+     * @param int    $nodeId
+     * @param string $mimeFilter
      * @throws InvalidArgumentException
      */
     public function __construct($nodeId, $mimeFilter = null)

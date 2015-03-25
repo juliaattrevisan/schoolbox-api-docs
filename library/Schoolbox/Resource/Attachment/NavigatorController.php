@@ -11,8 +11,6 @@ namespace Schoolbox\Resource\Attachment;
 
 
 use SitePage;
-use SocialStream\Browser\Node;
-use SocialStream\Browser\NodeRenderer;
 
 abstract class NavigatorController extends AbstractController {
 
