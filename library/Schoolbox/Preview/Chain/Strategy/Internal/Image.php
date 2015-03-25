@@ -10,8 +10,21 @@
 
 namespace Schoolbox\Preview\Chain\Strategy\Internal;
 
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 class Image extends Base {
+
+    /**
+     * Content Types for this strategy
+     *
+     * @var array
+     */
+    private $contentTypes = [
+        'image/jpeg',
+        'image/pjpeg',
+        'image/gif',
+        'image/png',
+    ];
 
     /**
      * Test
@@ -20,15 +33,26 @@ class Image extends Base {
      */
     public function test() {
         if ($this->isStorage()) {
-            return [
-                'type' => 'html-fragment',
-                'twig' => [
-                    'template' => '@preview/Strategy/Image.twig',
-                    'data' => [
-                        'src' => $this->getUrl()
-                    ]
-                ]
-            ];
+            $storageMapper = new StorageMapper();
+
+            try {
+                $item = $storageMapper->findByHash($this->getHash());
+
+                if (in_array($item->getMimetype()->getMime(), $this->getContentTypes())) {
+                    return [
+                        'type' => 'html-fragment',
+                        'twig' => [
+                            'template' => '@preview/Strategy/Image.twig',
+                            'data' => [
+                                'src' => $this->getUrl()
+                            ]
+                        ]
+                    ];
+                }
+            }
+            catch (\Exception $e) {
+                error(41);
+            }
         }
 
         return $this->testNext();
@@ -45,5 +69,28 @@ class Image extends Base {
         }
 
         return false;
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Set content types
+     *
+     * @param array $contentTypes
+     */
+    private function setContentTypes($contentTypes)
+    {
+        $this->contentTypes = $contentTypes;
+    }
+
+    /**
+     * Get content types
+     *
+     * @return array
+     */
+    private function getContentTypes()
+    {
+        return $this->contentTypes;
     }
 } 
