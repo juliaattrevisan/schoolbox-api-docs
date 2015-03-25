@@ -18,10 +18,16 @@
         padding: 16px;
     }
 </style>
+<script type="text/javascript" src="/javascript/preview/preview.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('[data-modal=preview]').preview();
+    });
+</script>
 <table>
     {% for currentUrl in allUrls %}
     <tr>
-        <td><a href="/preview/{{ currentUrl|url_encode }}">{{ currentUrl }}</td>
+        <td><a data-modal='preview' href="/preview/{{ currentUrl|url_encode }}">{{ currentUrl }}</td>
     </tr>
     {% endfor %}
 </table>
