@@ -31,7 +31,7 @@ class Controller extends Base
             "https://soundcloud.com/majorlazer",
         ];
 
-        $chain = new External(urlencode($testUrls[8]));
+        $chain = new External(urlencode($testUrls[9]));
 
         $this->getResponse()->content->set($chain->getResult());
     }
