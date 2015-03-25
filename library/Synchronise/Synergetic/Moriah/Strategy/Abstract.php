@@ -41,7 +41,7 @@ abstract class Synchronise_Synergetic_Moriah_Strategy_Abstract extends Synchroni
     const MD =  6; // Dover Rd Preschool;
     const MG =  7; // Glenayr Ave Preschool;
     const MR =  8; // Randwick Preschool;
-    const MS =  9; // Middle School;
+    //const MS =  9; // Middle School;
     const P  = 10; // Preschool;
     const PS = 11; // Primary School 3-5;
     const Z  = 12; // Mt Zion;

@@ -79,15 +79,14 @@ class Synchronise_Synergetic_Moriah_Strategy_Staff extends Synchronise_Synergeti
                     self::MD,
                     self::MG,
                     self::MR,
-                    self::MS,
                     self::P,
                     self::PS,
                     self::Z
                 );
                 $newUser['defaultCampus'] = self::HS;
             }
-            else if($currentUser['StaffCampus'] == 'S') { //Users in Secondary School are put in MS & HS
-                $newUser['campus'] = array(self::MS,self::HS);
+            else if($currentUser['StaffCampus'] == 'S') { //Users in Secondary School are put in HS
+                $newUser['campus'] = array(self::HS);
                 $newUser['defaultCampus'] = self::HS;
             }
             else {
