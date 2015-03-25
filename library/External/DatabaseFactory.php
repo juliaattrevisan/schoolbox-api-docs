@@ -131,14 +131,19 @@ class External_DatabaseFactory
     }
 
     /**
-     * Builds a markbook connector.
+     * Builds a markbook connector. If its enabled
      *
      * @param  string $databaseName
      * @return External_MarkbookInterface
      */
     public function buildMarkbookConnector($databaseName = '')
     {
-        return $this->buildConnector('Markbook', $databaseName);
+        if(Config::get('external_markbook')) {
+            return $this->buildConnector('Markbook', $databaseName);
+        }
+        else {
+            return $this->buildConnector('Markbook', 'Offline');
+        }
     }
 
 }
