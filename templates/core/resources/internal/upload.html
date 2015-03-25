@@ -1,3 +1,4 @@
+<script type="text/javascript" src="/javascript/getusermedia-js/dist/getUserMedia.js"></script>
 <script type="text/javascript">
     $(function () {
 
@@ -7,6 +8,88 @@
             abUploadSubmitBtn = abUploadControls.children('a.submit-btn-plain'),
             abUploadCancelBtn = abUploadControls.children('a.cancel'),
             maxFiles           = {MAX_FILES};
+
+        // Setup of the user media recorder
+        var userMediaOptions  = {
+            audio:   false,
+            video:   true,
+            el:      'playback',
+            swfFile: '/javascript/getusermedia-js/dist/fallback/jscam_canvas_only.swf',
+            onSave:  function (data) {
+                // Shove this into a mediajs element or something.
+            }
+        }
+
+        var recorderButtons = {
+            start:     'a[data-interaction="audio-record-start"]',
+            recording: 'a[data-interaction="audio-record-recording"]',
+//            pause:     'a[data-interaction="audio-record-pause"]',
+            stop:      'a[data-interaction="audio-record-stop"]'
+        };
+        var onStartRecording = function () {
+            abUploadControls.find(recorderButtons.start).hide().prop('disabled', true);
+            abUploadControls.find(recorderButtons.recording).show().prop('disabled', false);
+//            abUploadControls.find(recorderButtons.pause).show();
+            abUploadControls.find(recorderButtons.stop).show().prop('disabled', false);
+        };
+        var onStopRecording = function () {
+            abUploadControls.find(recorderButtons.start).show().prop('disabled', false);
+            abUploadControls.find(recorderButtons.recording).hide().prop('disabled', true);
+//            abUploadControls.find(recorderButtons.pause).show();
+            abUploadControls.find(recorderButtons.stop).hide().prop('disabled', true);
+        };
+        // Hide controls by default
+        onStopRecording();
+
+        var stream;
+        var video = document.getElementById(userMediaOptions.el);
+        abUploadControls.on(
+            'click',
+            recorderButtons.start,
+            function (event) {
+                event.preventDefault();
+                getUserMedia(
+                    userMediaOptions,
+                    function (s) {
+                        onStartRecording();
+                        stream = s;
+                        // success callback
+                        if (userMediaOptions.context === 'webrtc') {
+                            // WebRTC
+                            video.src = window.URL.createObjectURL(stream);
+                            video.play();
+                        } else {
+                            // Flash - do something else, I know not what
+                        }
+                    },
+                    function (error) {
+                        // error callback
+                    }
+                );
+            }
+        );
+
+        abUploadControls.on(
+            'click',
+            recorderButtons.pause,
+            function (event) {
+                event.preventDefault();
+                video.pause();
+                stream.stop();
+                // on next play, append stream onto end
+            }
+        );
+        abUploadControls.on(
+            'click',
+            recorderButtons.stop,
+            function (event) {
+                event.preventDefault();
+                onStopRecording();
+                video.pause();
+                stream.stop();
+                // remove contents of video completely
+            }
+        );
 
         abUploadForm.dropzone({
             paramName: 'upload',
@@ -234,5 +317,12 @@
 </div>
 <div class="ctrl">
   <a role="button" class="submit-btn-plain" disabled="disabled" href="#">Upload</a>
+  <a role="button" class="submit-btn-plain record" data-interaction="audio-record-start" href="#">Record Audio</a>
+  <a role="button" class="submit-btn-plain recording hide" data-interaction="audio-record-recording" disabled href="#">Recording...</a>
+  <!--<a role="button" class="submit-btn-plain pause hide" data-interaction="audio-record-pause" href="#">Pause</a>-->
+  <a role="button" class="submit-btn-plain stop hide" data-interaction="audio-record-stop" href="#">Stop</a>
   <a role="button" class="btn no-icon float-left cancel" href="#">Cancel</a>
 </div>
+<div id="microphone"></div>
+<!-- transform: scaleX(-1) if recording from a webcam -->
+<video id="playback"></video>
