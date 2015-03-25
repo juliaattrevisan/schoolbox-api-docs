@@ -24,19 +24,29 @@
             start:     'a[data-interaction="audio-record-start"]',
             recording: 'a[data-interaction="audio-record-recording"]',
 //            pause:     'a[data-interaction="audio-record-pause"]',
-            stop:      'a[data-interaction="audio-record-stop"]'
+            stop:      'a[data-interaction="audio-record-stop"]',
+            disabled:  'a[data-interaction="audio-record-disabled"]'
+        };
+        var onDisableRecording = function () {
+            abUploadControls.find(recorderButtons.start).hide().prop('disabled', true);
+            abUploadControls.find(recorderButtons.recording).hide().prop('disabled', true);
+//            abUploadControls.find(recorderButtons.pause).show();
+            abUploadControls.find(recorderButtons.stop).hide().prop('disabled', true);
+            abUploadControls.find(recorderButtons.disabled).show();
         };
         var onStartRecording = function () {
             abUploadControls.find(recorderButtons.start).hide().prop('disabled', true);
             abUploadControls.find(recorderButtons.recording).show().prop('disabled', false);
 //            abUploadControls.find(recorderButtons.pause).show();
             abUploadControls.find(recorderButtons.stop).show().prop('disabled', false);
+            abUploadControls.find(recorderButtons.disabled).hide();
         };
         var onStopRecording = function () {
             abUploadControls.find(recorderButtons.start).show().prop('disabled', false);
             abUploadControls.find(recorderButtons.recording).hide().prop('disabled', true);
 //            abUploadControls.find(recorderButtons.pause).show();
             abUploadControls.find(recorderButtons.stop).hide().prop('disabled', true);
+            abUploadControls.find(recorderButtons.disabled).hide();
         };
         // Hide controls by default
         onStopRecording();
@@ -64,21 +74,23 @@
                     },
                     function (error) {
                         // error callback
+                        // Show some message saying no recording devices are available,
+                        // or alternately open upload screen.
+                        onDisableRecording();
                     }
                 );
             }
         );
-
-        abUploadControls.on(
-            'click',
-            recorderButtons.pause,
-            function (event) {
-                event.preventDefault();
-                video.pause();
-                stream.stop();
-                // on next play, append stream onto end
-            }
-        );
+//        abUploadControls.on(
+//            'click',
+//            recorderButtons.pause,
+//            function (event) {
+//                event.preventDefault();
+//                video.pause();
+//                stream.stop();
+//                // on next play, append stream onto end
+//            }
+//        );
         abUploadControls.on(
             'click',
             recorderButtons.stop,
@@ -319,6 +331,7 @@
   <a role="button" class="submit-btn-plain" disabled="disabled" href="#">Upload</a>
   <a role="button" class="submit-btn-plain record" data-interaction="audio-record-start" href="#">Record Audio</a>
   <a role="button" class="submit-btn-plain recording hide" data-interaction="audio-record-recording" disabled href="#">Recording...</a>
+  <a role="button" class="submit-btn-plain disabled" data-interaction="audio-record-disabled" disabled href="#">No recording devices available</a>
   <!--<a role="button" class="submit-btn-plain pause hide" data-interaction="audio-record-pause" href="#">Pause</a>-->
   <a role="button" class="submit-btn-plain stop hide" data-interaction="audio-record-stop" href="#">Stop</a>
   <a role="button" class="btn no-icon float-left cancel" href="#">Cancel</a>
