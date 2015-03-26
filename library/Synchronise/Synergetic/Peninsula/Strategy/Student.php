@@ -123,4 +123,26 @@ class Synchronise_Synergetic_Peninsula_Strategy_Student extends Synchronise_Base
             return 0;
     }
 
+    /**
+     * Set eportfolio to on for 5,6,7,8
+     * Don't touch the rest
+     *
+     * @param  array $currentUser
+     *
+     * @return bool
+     */
+    public function getEportfolioEnabledFromUser($currentUser)
+    {
+        switch ($currentUser['StudentYearLevel']) {
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+                return 1;
+            break;
+            default:
+                return null;
+        }
+    }
+
 }
