@@ -150,7 +150,8 @@ class Manager
         $link = $adpt->getPathPrefix() . $internalId . ".dat";
 
         try {
-            symlink($path, $link);
+            // in http mode, symlink will raise a warning, but we don't care.
+            @symlink($path, $link);
         } catch (ErrorException $e) {
             // in daemon mode, symlink will throw an exception, but we don't care.
         }
