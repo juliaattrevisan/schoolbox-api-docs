@@ -2,7 +2,7 @@
 
   var WORKER_PATH = 'recorderWorker.js';
 
-  var Recorder = function(source, cfg){
+  var WebRtcRecorder = function(source, cfg){
     var config = cfg || {};
     var bufferLen = config.bufferLen || 4096;
     var numChannels = config.numChannels || 2;
@@ -77,7 +77,7 @@
     this.node.connect(this.context.destination);    //this should not be necessary
   };
 
-  Recorder.forceDownload = function(blob, filename){
+  WebRtcRecorder.forceDownload = function(blob, filename){
     var url = (window.URL || window.webkitURL).createObjectURL(blob);
     var link = window.document.createElement('a');
     link.href = url;
@@ -87,6 +87,6 @@
     link.dispatchEvent(click);
   }
 
-  window.Recorder = Recorder;
+  window.WebRtcRecorder = WebRtcRecorder;
 
 })(window);
