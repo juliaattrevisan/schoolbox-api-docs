@@ -10,7 +10,7 @@
             maxFiles           = {MAX_FILES};
 
         // Setup of the user media recorder
-        var userMediaOptions  = {
+        var userMediaOptions = {
             audio: true,
             video: false
         };
@@ -94,7 +94,7 @@
             function (event) {
                 event.preventDefault();
                 // on next play, append stream onto end
-                recorder.pause();
+                recorder.pauseRecording();
             }
         );
 
@@ -117,11 +117,6 @@
                     ;
                     formData.append('upload', blob, 'blob.wav');
                 });
-
-//                video.pause();
-//                stream.stop();
-//                recorder.clear();
-                // remove contents of video completely
             }
         );
         abUploadControls.on(
@@ -129,8 +124,7 @@
             recorderButtons.upload,
             function (event) {
                 event.preventDefault();
-
-                // async upload
+                // post this file to the storage engine
                 $.ajax(
                     {
                         url: abUploadForm.attr('action'),
@@ -141,7 +135,8 @@
                     }
                 )
                 .done(function(response) {
-                    // dropzone
+                    // put it in the dropzone, and inform the dropzone opener
+                    // that a file was posted to it.
                     var data = {
                         title: 'blob.wav',
                         mimeType: blob.type,
@@ -150,22 +145,6 @@
                     };
                     window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
                 });
-
-                // Get the contents of stream blob or src.
-//                var reader = new FileReader();
-//                reader.addEventListener('loadend', function() {
-//                    // blobby
-//                    console.log(reader.result);
-//                });
-//                console.log(stream);
-//                console.log(window.URL.createObjectURL(stream));
-//                reader.readAsArrayBuffer(new Blob([stream]));
-//                abUploadForm.dropzone.addFile({
-//                    name: 'recordedVideo.mp4',
-//                    type: 'video/mp4',
-//                    size: 'something',
-//                    hash: 'brownhole'
-//                });
             }
         );
 
