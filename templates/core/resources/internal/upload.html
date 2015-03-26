@@ -67,23 +67,21 @@
                     userMediaOptions,
                     function (s) {
                         onStartRecording();
-                        stream = s;
-                        // success callback
-                        if (userMediaOptions.context === 'webrtc') {
-                            // WebRTC
-//                            video.src = window.URL.createObjectURL(stream);
-                            recorder  = RecordRTC(s);
-                            recorder.startRecording();
-                        } else {
-                            // Flash - do something else, I know not what
-                            // Use https://github.com/michalstocki/FlashWavRecorder
-                            // has a getBlob() method, which is good
-                        }
+                        stream   = s;
+                        recorder = RecordRTC(s);
+                        recorder.startRecording();
                     },
                     function (error) {
-                        // error callback
-                        // Show some message saying no recording devices are available,
-                        // or alternately open upload screen.
+                        if (userMediaOptions.context === 'flash') {
+                            // For Flash - do something else, I know not what
+                            // Use https://github.com/michalstocki/FlashWavRecorder
+                            // has a getBlob() method, which is good
+                            // If even that doesn't work, do something else again
+
+                            // error callback
+                            // Show some message saying no recording devices are available,
+                            // or alternately open upload screen.
+                        }
                         onDisableRecording();
                     }
                 );
