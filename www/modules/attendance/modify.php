@@ -123,6 +123,8 @@ if ($class) {
         /* Dropdown options
          */
         $absenceDropdownOptions = $attendanceHandler->findAbsenceDropdownOptions();
+        $reasonDropdownOptions = $attendanceHandler->findReasonDropdownOptions();
+
 
         /* Iterate each guy
          */
@@ -154,8 +156,14 @@ if ($class) {
 
             $this->dropDown(
                 'absence_options', $absenceDropdownOptions, $currentStudent['PossibleAbsenceCode'], 'student',
+                array('Code' => 'ABSENCE_OPTIONS_VALUE', 'Description' => 'ABSENCE_OPTIONS_DESCRIPTION')
+            );
+
+            $this->dropDown(
+                'reason_options', $reasonDropdownOptions, $currentStudent['PossibleReasonCode'], 'student',
                 array('Code' => 'REASON_OPTIONS_VALUE', 'Description' => 'REASON_OPTIONS_DESCRIPTION')
             );
+
 
 
             $this->parse('student_block', 'student', true);
