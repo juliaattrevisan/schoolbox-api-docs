@@ -31,10 +31,21 @@ class Controller extends Base
             "http://pugetsoundbirds.org/wp-content/uploads/2010/06/Northern-saw-whet-owl.jpg",
             "http://www.libertyscentre.co.uk/Owls/large/Collared%20Scops%20Owl.jpg",
 
+            /* Jpg
+             */
             "/storage/fetch.php?hash=62f643c3b484a87f3ce2e3a8216c7f232787af02",
+
+            /* Png
+             */
             "/storage/fetch.php?hash=c28763abce0725ccde28dbdd84aec956844a596d",
+
+            /* Video
+             */
             "/storage/fetch.php?hash=10d6e62fec60bbbff5cdae4aae78c8aa64b69ef9",
-            "/storage/fetch.php?hash=9b0d9ca403a85c54cdbb294492db3ab55ab17028",
+
+            /* Audio
+             */
+            "/storage/fetch.php?hash=0f5ad33468ff91ff4ea3f30788467905bd454fc5",
         ];
 
         $this->getResponse()->content->set([

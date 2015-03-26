@@ -26,11 +26,22 @@ class Media extends Base {
             try {
                 $item = $storageMapper->findByHash($this->getHash());
 
-                if ($item->getMimetype()->isVideo() || $item->getMime()->isAudio()) {
+                if ($item->getMimetype()->isVideo()) {
                     return [
                         'type' => 'html-fragment',
                         'twig' => [
-                            'template' => '@preview/Strategy/Media.twig',
+                            'template' => '@preview/Strategy/Internal/Video.twig',
+                            'data' => [
+                                'hash' => $this->getHash()
+                            ]
+                        ]
+                    ];
+                }
+                elseif ($item->getMimetype()->isAudio()) {
+                    return [
+                        'type' => 'html-fragment',
+                        'twig' => [
+                            'template' => '@preview/Strategy/Internal/Audio.twig',
                             'data' => [
                                 'hash' => $this->getHash()
                             ]
