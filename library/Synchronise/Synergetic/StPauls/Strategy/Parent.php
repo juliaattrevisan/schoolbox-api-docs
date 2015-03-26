@@ -48,6 +48,7 @@ class Synchronise_Synergetic_StPauls_Strategy_Parent extends Synchronise_Synerge
         $newUser['firstname']  = $currentUser['StudentContactPreferred'];
         $newUser['lastname']   = $currentUser['StudentContactSurname'];
         $newUser['alt_email']  = $currentUser['StudentContactDefaultEmail'];
+        $newUser['local_email'] = 0;
 
         // get campuses of attached children
         $newUser['campus']        = array($this->getCampusFromCurrentUser($currentUser));
@@ -76,6 +77,7 @@ class Synchronise_Synergetic_StPauls_Strategy_Parent extends Synchronise_Synerge
         $newUser['firstname']  = $currentUser['StudentContactSpousePreferred'];
         $newUser['lastname']   = $currentUser['StudentContactSpouseSurname'];
         $newUser['alt_email']  = $currentUser['StudentContactSpouseDefaultEmail'];
+        $newUser['local_email'] = 0;
 
         // get campuses of kids
         $newUser['campus']        = array($this->getCampusFromCurrentUser($currentUser));
