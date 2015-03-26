@@ -224,7 +224,8 @@ class External_Maze_User implements External_UserInterface {
 
 			$query = "
 				SELECT
-					DFKEY AS RelatedID,
+					DF1.DFKEY AS RelatedID1,
+					DF2.DFKEY AS RelatedID2,
 					DF1.M_EMAIL AS FamilyEmail1,
 					DF1.F_EMAIL AS FamilyEmail2,
 					DF2.M_EMAIL AS AltFamilyEmail1,
@@ -242,22 +243,39 @@ class External_Maze_User implements External_UserInterface {
 			if (is_array($allEmails) && count($allEmails)) {
 				foreach($allEmails as $currentEmail) {
 
-					/* Choose one of two possibilities
-					 *
-					 * How to choose for split parents?
-					 *
-					 * I have assumed that the record in FAMILY is the primary
-					 * record to use, so decide which of the FAMILY emails to use
-					 */
-					if (strlen($currentEmail['FamilyEmail1'])) {
-						$processed['RelatedID'] = $currentEmail['FamilyEmail1'];
-					}
-					else if (strlen($currentEmail['FamilyEmail2'])) {
-						$processed['RelatedID'] = $currentEmail['FamilyEmail2'];
-					}
+                    /* Choose one of two possibilities
+                     *
+                     * How to choose for split parents?
+                     *
+                     * I have assumed that the record in FAMILY is the primary
+                     * record to use, so decide which of the FAMILY emails to use
+                     */
+                    if (strlen($currentEmail['RelatedID1'])) {
+                        if (strlen($currentEmail['FamilyEmail1'])) {
+                            $processed[$currentEmail['RelatedID1']] = $currentEmail['FamilyEmail1'];
+                        }
+                        else if (strlen($currentEmail['FamilyEmail2'])) {
+                            $processed[$currentEmail['RelatedID1']] = $currentEmail['FamilyEmail2'];
+                        }
+                    }
+
+                    /* Can't tell whether a parent should be emailed at all,
+                     * or ignored, in a split-family scenario
+                     *
+                     * Assume they will be emailed, split out the split parents
+                     * into their own record in the processed stack
+                     */
+                    if (strlen($currentEmail['RelatedID2'])) {
+                        if (strlen($currentEmail['AltFamilyEmail1'])) {
+                            $processed[$currentEmail['RelatedID2']] = $currentEmail['AltFamilyEmail1'];
+                        }
+                        else if (strlen($currentEmail['AltFamilyEmail2'])) {
+                            $processed[$currentEmail['RelatedID2']] = $currentEmail['AltFamilyEmail2'];
+                        }
+                    }
 				}
 			}
-
+            
 			return $processed;
 		}
 	}
