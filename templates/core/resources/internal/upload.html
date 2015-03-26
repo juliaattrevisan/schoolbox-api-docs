@@ -1,4 +1,5 @@
 <script type="text/javascript" src="/javascript/getusermedia-js-shim-only/dist/getUserMedia.js"></script>
+<script type="text/javascript" src="/javascript/recorder/recorder.js"></script>
 <script type="text/javascript">
     $(function () {
 
@@ -13,6 +14,10 @@
         var userMediaOptions = {
             audio: true,
             video: false
+        };
+
+        var recorderOptions = {
+            workerPath: '/javascript/recorder/recorderWorker.js'
         };
 
         // States:
