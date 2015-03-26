@@ -1,46 +1,71 @@
-<h1>{NEWS_TITLE}</h1>
-<span class="header_option">
-    <!-- BEGIN add_news -->
-    <a class="btn add" href="/news/modify"><span></span>Add News</a>
-    <!-- END add_news -->
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" type="text/css" media="screen" href="/css/foundation/chrome.css?v={SITE_VERSION}" />
+<script type="text/javascript">
+    $(function() {
+        $('#container').addClass('foundation').foundation();
+    });
+</script>
+<!-- END custom_head -->
+<div class="row full-width">
+    <div class="large-12 columns no-pad">
+        <h1>
+            {NEWS_TITLE}
+            <span class="header-actions">
+                <a class="button icon-menu" href="#" data-dropdown="newsitemOptions">Options</a>
+            </span>
 
-    <!-- BEGIN modify_news -->
-    <a class="btn modify" href="/news/modify/{NEWS_ID}"><span></span>Modify Article</a>
-    <!-- END modify_news -->
-</span>
-<div class="news left clearfix">
-    <p class="author">
-        <a href="/search/user/{POSTER_ID}" class="author">
-            <img width="32" height="32" src="/portrait.php?userId={POSTER_EXTERNAL_ID}&size=square32"/>
-            <span class="name">{POSTER}</span>
-        </a>
-        <span class="subtitle">{DATETIME}</span>
-    </p>
-    <!-- BEGIN featured_image -->
-    <img class="featured_image" src="/storage/image.php?hash={NEWS_IMAGE}&size=constrain200"/>
-    <!-- END featured_image -->
-    <div class="wysiwyg">
-        {NEWS_BODY}
+            <ul class="f-dropdown" data-dropdown-content="" id="newsitemOptions">
+                <!-- BEGIN modify_news -->
+                <li><a class="icon-modify" href="/news/modify/{NEWS_ID}">Modify Article</a></li>
+                <!-- END modify_news -->
+                <!-- BEGIN previous_article -->
+                <li><a class="icon-previous" href="/news/item/{PREVIOUS_ARTICLE_ID}">{PREVIOUS_ARTICLE_TITLE}</a></li>
+                <!-- END previous_article -->
+                <!-- BEGIN next_article -->
+                <li><a class="icon-next" href="/news/item/{NEXT_ARTICLE_ID}">{NEXT_ARTICLE_TITLE}</a></li>
+                <!-- END next_article -->
+            </ul>
+        </h1>
+        <!-- BEGIN add_news -->
+        <!-- END add_news -->
+        <!-- <dl class="tabs" data-tab> -->
+            <!-- BEGIN topic_list -->
+            
+            <!-- <dd class="active {LIST_TOPIC_SELECTED}"><a href="#panel2-1">{LIST_TOPIC_NAME}</a></dd> -->
+            
+            <!-- END topic_list -->
+
+            <!--<dd><a href="#panel2-2">General</a></dd>
+            <dd><a href="#panel2-3">Music</a></dd>
+            <dd><a href="#panel2-4">Sport</a></dd>
+            <dd><a href="#panel2-4">Academic</a></dd>
+            
+        </dl> -->
+        <!-- BEGIN allnews_button -->
+        <!-- END allnews_button -->
+
+    </div>
+</div>
+<div class="row full-width">
+    <div class="large-12 columns island">
+        <div class="large-2 columns no-pad">
+            <!-- BEGIN featured_image -->
+            <img class="featured_image" width="200" height="200" src="/storage/image.php?hash={NEWS_IMAGE}&size=constrain200"/>
+            <!-- END featured_image -->
+        </div>
+        <div class="large-10 columns">
+        	<div class="wysiwyg">
+        		{NEWS_BODY}
+        	</div>
+            <p class="meta">
+                <a href="/search/user/{POSTER_ID}" class="author">
+                    <img width="32" height="32" src="/portrait.php?userId={POSTER_EXTERNAL_ID}&size=square32"/>
+                    <span class="name">{POSTER}</span>
+                </a>
+                <span class="subtitle">{DATETIME}</span>
+            </p>
+        </div>
     </div>
 
-    <p class="clear">
-        <!-- BEGIN previous_article -->
-        <a class="btn no-icon float-left" href="/news/item/{PREVIOUS_ARTICLE_ID}">&laquo; {PREVIOUS_ARTICLE_TITLE}</a>
-        <!-- END previous_article -->
-        <!-- BEGIN next_article -->
-        <a class="btn no-icon" href="/news/item/{NEXT_ARTICLE_ID}">{NEXT_ARTICLE_TITLE} &raquo;</a>
-        <!-- END next_article -->
-    </p>
-</div>
-
-<div class="right">
-    <h2>Topics</h2>
-    <ul class="admin-nav vertical">
-        <!-- BEGIN topic_list -->
-        <li><a href="/news/{LIST_TOPIC_CLEAN}" class="{LIST_TOPIC_SELECTED}">{LIST_TOPIC_NAME}</a></li>
-        <!-- END topic_list -->
-    </ul>
-    <!-- BEGIN allnews_button -->
-    <p><a href="/news-archive/{TOPIC_CLEAN}" class="btn"><span></span>View Archived News</a></p>
-    <!-- END allnews_button -->
+    </div>
 </div>

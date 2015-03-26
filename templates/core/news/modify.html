@@ -17,10 +17,7 @@
         });
 
         $('#item_datetime_published, #item_datetime_expires').datepicker({
-            showOn:'both',
-            buttonImage:'/images/core/calendar/calendar-click.png',
-            buttonImageOnly:true,
-            constrainInput:false,
+            dateFormat:'dd/mm/yy',
             onClose:function (string) {
                 var input = $(this);
 

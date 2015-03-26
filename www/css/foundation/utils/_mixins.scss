@@ -85,9 +85,15 @@
 	transform-origin: $transform-origin;
 }
 
-@mixin transition ($transition) {
-	-webkit-transition: $transition;
-	transition: $transition;
+
+@mixin transition($properties: all, $duration: .3s, $easing: ease-out) {
+	@if length($properties) > 1 {
+		transition-property: $properties;
+		transition-duration: $duration;
+		transition-timing-function: $easing;
+	} @else {
+		transition: $properties $duration $easing;
+	}
 }
 
 @mixin transition-property($transition-property: all) {
