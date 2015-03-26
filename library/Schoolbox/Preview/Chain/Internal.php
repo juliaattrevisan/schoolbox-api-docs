@@ -28,8 +28,8 @@ class Internal extends Base {
     public function __construct($url, $hash) {
         $this->start([
             new Image($url, $hash),
-            new Embed($url, $hash),
-            new Html($url, $hash),
+//            new Embed($url, $hash),
+//            new Html($url, $hash),
             new Redirect($url, $hash),
         ]);
     }

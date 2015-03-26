@@ -15,18 +15,6 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 class Image extends Base {
 
     /**
-     * Content Types for this strategy
-     *
-     * @var array
-     */
-    private $contentTypes = [
-        'image/jpeg',
-        'image/pjpeg',
-        'image/gif',
-        'image/png',
-    ];
-
-    /**
      * Test
      *
      * @return mixed
@@ -38,7 +26,7 @@ class Image extends Base {
             try {
                 $item = $storageMapper->findByHash($this->getHash());
 
-                if (in_array($item->getMimetype()->getMime(), $this->getContentTypes())) {
+                if ($item->getMimetype()->isImage()) {
                     return [
                         'type' => 'html-fragment',
                         'twig' => [
@@ -70,27 +58,4 @@ class Image extends Base {
 
         return false;
     }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set content types
-     *
-     * @param array $contentTypes
-     */
-    private function setContentTypes($contentTypes)
-    {
-        $this->contentTypes = $contentTypes;
-    }
-
-    /**
-     * Get content types
-     *
-     * @return array
-     */
-    private function getContentTypes()
-    {
-        return $this->contentTypes;
-    }
-} 
+}
