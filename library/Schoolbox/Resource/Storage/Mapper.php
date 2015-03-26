@@ -16,7 +16,9 @@ use Schoolbox;
 use Schoolbox\File;
 use Schoolbox\Collection;
 use Schoolbox\File\MimetypeMapper;
-
+use Schoolbox\Video;
+use Schoolbox\Video\Queue;
+use Schoolbox\Video\QueueMapper;
 /**
  * Class Mapper
  *
@@ -83,9 +85,22 @@ class Mapper extends Schoolbox\Mapper implements Receiver
             return true;
         }
 
-        return $this->mgr->save($storage);
-    }
+        /* Ram media files into Video Queue table for transcoding
+         */
+        $saveResult = $this->mgr->save($storage);
 
+        if ($storage->getMimeType()->isVideo() || $storage->getMimetype()->isAudio()) {
+            $mapper = new QueueMapper();
+            $videoQ = new Queue();
+            $videoQ->setFileID($mapper->findFileInternalId($storage));
+            $videoQ->setStatus(QueueMapper::STATUS_PENDING);
+            $videoQ->setType(QueueMapper::FILE_TYPE_STORAGE);
+
+            $mapper->save($videoQ);
+        }
+
+        return $saveResult;
+    }
 
     /**
      * @param string $hash
