@@ -55,18 +55,24 @@ if (!in_array($_SESSION['sid'], $externalClass->getTeacherName($_POST['classCode
 /* Attendance Period
  */
 $attendancePeriod = $_POST['attendancePeriod'];
+$attendanceDay = $_POST['attendanceDay'];
 
 /* Deal with it all
  */
-$externalUserHandler = new External_User();
-$attendanceHandler   = new External_Synergetic_Attendance(
-    $class,
-    $attendanceDate,
-    $attendancePeriod,
-    $externalUserHandler->getCurrentYear(),
-    $externalUserHandler->getCurrentSemester(),
-    MSSQL::getInstance()
-);
+try {
+    $externalUserHandler = new External_User();
+    $attendanceHandler   = new External_Synergetic_Attendance(
+        $class,
+        $attendanceDate,
+        $attendanceDay,
+        $attendancePeriod,
+        $externalUserHandler->getCurrentYear(),
+        $externalUserHandler->getCurrentSemester(),
+        MSSQL::getInstance()
+    );
+} catch(Exception $e) {
+    error(148); //Class does not exist
+}
 
 /* Create everyone's attendance initially
  */
@@ -114,6 +120,10 @@ if (is_array($_POST['studentID'])) {
 
     }
 
-    $attendanceHandler->getAttendanceMaster()->save();
+
+    if(! $attendanceHandler->getAttendanceMaster()->save()) {
+        error(148);
+    }
 }
+
 $this->backToTheFuture(-1);

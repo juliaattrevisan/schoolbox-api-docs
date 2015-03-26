@@ -21,11 +21,12 @@
 </style>
 <!-- END custom_head -->
 
-<h1>Student Attendances for {ATTENDANCE_PERIOD_LONG} - {CLASS_CODE}</h1>
+<h1>Student Attendances for {ATTENDANCE_PERIOD_LONG} on day {ATTENDANCE_DAY} - {CLASS_CODE}</h1>
 <h2>{ATTENDANCE_DATE_FORMATTED}</h2>
 <form method='post' action='/modules/attendance/modifyForm' class='collectible'>
     <input name='classCode' type='hidden' value='{CLASS_CODE}' />
     <input name='attendanceDate' type='hidden' value='{ATTENDANCE_DATE}' />
+    <input name='attendanceDay' type='hidden' value='{ATTENDANCE_DAY}' />
     <input name='attendancePeriod' type='hidden' value='{ATTENDANCE_PERIOD}' />
     <table class="table ruler">
         <colgroup>

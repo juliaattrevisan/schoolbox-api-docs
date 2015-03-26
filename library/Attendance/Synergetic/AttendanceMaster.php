@@ -28,11 +28,25 @@ class Attendance_Synergetic_AttendanceMaster
     protected $classCode = '';
 
     /**
+     * The classCampus whose attendances you are marking
+     *
+     * @var string
+     */
+    protected $classCampus = '';
+
+    /**
      * The date in Y-m-d of the class
      *
      * @var string
      */
     protected $attendanceDate = '';
+
+    /**
+     * The day number of the class
+     *
+     * @var string
+     */
+    protected $attendanceDay = '';
 
     /**
      * The AttendancePeriod of the class
@@ -83,16 +97,19 @@ class Attendance_Synergetic_AttendanceMaster
      *
      * @param $class
      * @param $attendanceDate
+     * @param $attendanceDay
      * @param $attendancePeriod
      * @param $fileYear
      * @param $fileSemester
      * @param $database
      */
-    public function __construct($class, $attendanceDate, $attendancePeriod, $fileYear, $fileSemester, $database)
+    public function __construct($class, $attendanceDate, $attendanceDay, $attendancePeriod, $fileYear, $fileSemester, $database)
     {
         $this->setClass($class);
+        $this->setClassCampus($class['ClassCampus']);
         $this->setClassCode($class['ClassCode']);
         $this->setAttendanceDate($attendanceDate->getDatabaseDate());
+        $this->setAttendanceDay($attendanceDay);
         $this->setAttendancePeriod($attendancePeriod);
         $this->setFileYear($fileYear);
         $this->setFileSemester($fileSemester);
@@ -147,23 +164,7 @@ class Attendance_Synergetic_AttendanceMaster
      */
     protected function getTimetableDayNumber()
     {
-        $query = "
-			SELECT *
-			FROM SynergyOne.dbo.Timetable
-			WHERE FileType = 'A'
-			AND FileYear = '{$this->getFileYear()}'
-			AND FileSemester = '{$this->getFileSemester()}'
-			AND PeriodNumber = '{$this->getAttendancePeriod()}'
-			AND ClassCode = '{$this->getClassCode()}'
-		";
-
-        $result = $this->getDatabase()->getRow($query);
-
-        if (is_array($result)) {
-            return $result['DayNumber'];
-        }
-
-        return false;
+        return $this->attendanceDay;
     }
 
     /**
@@ -182,6 +183,7 @@ class Attendance_Synergetic_AttendanceMaster
 			AND FileSemester = '{$this->getFileSemester()}'
 			AND PeriodNumber = '{$this->getAttendancePeriod()}'
 			AND ClassCode = '{$this->getClassCode()}'
+			AND ClassCampus = '{$this->getClassCampus()}'
 		";
 
         $result = $this->getDatabase()->getRow($query);
@@ -448,4 +450,29 @@ class Attendance_Synergetic_AttendanceMaster
     {
         return $this->attendanceMasterSeq;
     }
+
+    /**
+     * @param string $attendanceDay
+     */
+    public function setAttendanceDay($attendanceDay)
+    {
+        $this->attendanceDay = $attendanceDay;
+    }
+
+    /**
+     * @param string $classCampus
+     */
+    public function setClassCampus($classCampus)
+    {
+        $this->classCampus = $classCampus;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClassCampus()
+    {
+        return $this->classCampus;
+    }
+
 }

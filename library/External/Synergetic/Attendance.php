@@ -87,7 +87,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
      * @param $fileSemester
      * @param $database
      */
-    public function __construct($class, Alaress_Date_Format $attendanceDate, $attendancePeriod, $fileYear, $fileSemester, $database)
+    public function __construct($class, Alaress_Date_Format $attendanceDate, $attendanceDay, $attendancePeriod, $fileYear, $fileSemester, $database)
     {
         $this->setClassCode($class['ClassCode']);
         $this->setAttendanceDate($attendanceDate->getDatabaseDate());
@@ -107,7 +107,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
          * This can be encapsulated further in a Factory
         */
 
-        $attendanceMaster = new Attendance_Synergetic_AttendanceMaster($class, $attendanceDate, $attendancePeriod, $fileYear, $fileSemester, $database);
+        $attendanceMaster = new Attendance_Synergetic_AttendanceMaster($class, $attendanceDate, $attendanceDay, $attendancePeriod, $fileYear, $fileSemester, $database);
         $this->setAttendanceMaster($attendanceMaster);
 
         $attendanceMaster->setupWork();
@@ -318,7 +318,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
     /**
      * Get attendance master
      *
-     * @return null
+     * @return Attendance_Synergetic_AttendanceMaster
      */
     public function getAttendanceMaster()
     {
