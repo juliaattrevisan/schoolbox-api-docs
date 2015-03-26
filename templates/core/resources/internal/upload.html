@@ -1,4 +1,4 @@
-<script type="text/javascript" src="/javascript/getusermedia-js/dist/getUserMedia.js"></script>
+<script type="text/javascript" src="/javascript/getusermedia-js-shim-only/dist/getUserMedia.js"></script>
 <script type="text/javascript">
     $(function () {
 
@@ -11,17 +11,8 @@
 
         // Setup of the user media recorder
         var userMediaOptions  = {
-            audio:   true,
-            video:   false,
-            el:      'microphone',
-            swfFile: '/javascript/getusermedia-js/dist/fallback/jscam_canvas_only.swf',
-            onCapture: function () {
-                // Capture of fallback stream
-                window.webcam.save();
-            },
-            onSave: function (data) {
-                // Shove this into a mediajs element or something.
-            }
+            audio: true,
+            video: false
         };
 
         // States:
@@ -64,7 +55,7 @@
         onStopRecording();
 
         var stream;
-        var video = document.getElementById(userMediaOptions.el);
+        var playbacker = $('#playback');
         var recorder;
         var dz;
         abUploadControls.on(
@@ -80,12 +71,13 @@
                         // success callback
                         if (userMediaOptions.context === 'webrtc') {
                             // WebRTC
-                            video.src = window.URL.createObjectURL(stream);
+//                            video.src = window.URL.createObjectURL(stream);
                             recorder  = RecordRTC(s);
                             recorder.startRecording();
                         } else {
                             // Flash - do something else, I know not what
                             // Use https://github.com/michalstocki/FlashWavRecorder
+                            // has a getBlob() method, which is good
                         }
                     },
                     function (error) {
@@ -97,16 +89,16 @@
                 );
             }
         );
-//        abUploadControls.on(
-//            'click',
-//            recorderButtons.pause,
-//            function (event) {
-//                event.preventDefault();
-//                video.pause();
-//                stream.stop();
-//                // on next play, append stream onto end
-//            }
-//        );
+
+        abUploadControls.on(
+            'click',
+            recorderButtons.pause,
+            function (event) {
+                event.preventDefault();
+                // on next play, append stream onto end
+                recorder.pause();
+            }
+        );
 
         var formData;
         var blob;
@@ -118,9 +110,13 @@
                 onStopRecording();
                 stream.stop();
                 recorder.stopRecording(function (audioVideoWebMURL) {
-                    video.src = audioVideoWebMURL;
+                    console.log(audioVideoWebMURL);
                     formData = new FormData();
                     blob     = recorder.getBlob();
+                    playbacker
+                            .attr('src', window.URL.createObjectURL(blob))
+                            .attr('width', '100%')
+                    ;
                     formData.append('upload', blob, 'blob.wav');
                 });
 
@@ -409,6 +405,10 @@
   <a role="button" class="submit-btn-plain stop hide" data-interaction="audio-record-upload" href="#">Upload Audio</a>
   <a role="button" class="btn no-icon float-left cancel" href="#">Cancel</a>
 </div>
-<div id="microphone"></div>
-<!-- transform: scaleX(-1) if recording from a webcam -->
-<video id="playback"></video>
+<audio id="playback" controls width="100%"></audio>
+<div id="recordingContainer">
+    <!--
+    <audio id="microphone"></audio>
+    <video id="playback" style="transform: scaleX(-1)"></video>
+    -->
+</div>
