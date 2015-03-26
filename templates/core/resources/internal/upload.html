@@ -63,6 +63,12 @@
         var playbacker = $('#playback');
         var recorder;
         var dz;
+
+        var recorderJs;
+        var audioContextConstructor = window.AudioContext || window.webkitAudioContext;
+        var audioContext = new audioContextConstructor();
+        console.log(audioContext);
+
         abUploadControls.on(
             'click',
             recorderButtons.start,
@@ -71,10 +77,14 @@
                 getUserMedia(
                     userMediaOptions,
                     function (s) {
+                        // use RecorderJS
                         onStartRecording();
-                        stream   = s;
-                        recorder = RecordRTC(s);
-                        recorder.startRecording();
+                        stream     = s;
+                        recorderJs = new Recorder(
+                            audioContext.createMediaStreamSource(s),
+                            recorderOptions
+                        );
+                        recorderJs.record();
                     },
                     function (error) {
                         if (userMediaOptions.context === 'flash') {
@@ -93,15 +103,16 @@
             }
         );
 
-        abUploadControls.on(
-            'click',
-            recorderButtons.pause,
-            function (event) {
-                event.preventDefault();
-                // on next play, append stream onto end
-                recorder.pauseRecording();
-            }
-        );
+//        abUploadControls.on(
+//            'click',
+//            recorderButtons.pause,
+//            function (event) {
+//                event.preventDefault();
+//                // on next play, append stream onto end
+////                recorder.pauseRecording();
+//                recorderJs.stop();
+//            }
+//        );
 
         var formData;
         var blob;
@@ -111,15 +122,16 @@
             function (event) {
                 event.preventDefault();
                 onStopRecording();
+
                 stream.stop();
-                recorder.stopRecording(function (audioVideoWebMURL) {
-                    console.log(audioVideoWebMURL);
-                    formData = new FormData();
-                    blob     = recorder.getBlob();
+                recorderJs.stop();
+                recorderJs.exportWAV(function(wavBlob) {
+                    blob = wavBlob;
                     playbacker
                             .attr('src', window.URL.createObjectURL(blob))
                             .attr('width', '100%')
                     ;
+                    formData = new FormData();
                     formData.append('upload', blob, 'blob.wav');
                 });
             }
