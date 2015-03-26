@@ -25,6 +25,7 @@
     "tinycolor": "0.9.16",
     "mediaelement": "2.15.1",
     "swfobject": "2.2",
+    "recordrtc": "7c52b854d8f6345c5e6d49441eec0f9fb5e7ba74",
     "imagesloaded": "3.0.4",
     "eventEmitter": "4.2.6",
     "eventie": "1.0.3",
