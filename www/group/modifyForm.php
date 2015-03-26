@@ -124,14 +124,17 @@ elseif(isset($_REQUEST['accept'])) {
 /* Add user */
 elseif(isset($_POST['userID'])) {
 	$ua->setServiceIdentifier($_GET['categoryID']);
-
+    $folder = $catMapper->findById($_GET['categoryID']);
 	/** @var Collection|User[] $userList */
 	$userList = $userMapper->findByColumn('id', $_POST['userID']);
 
 	foreach ($userList as $userObject) {
-		$ua->setUser($userObject)
-		   ->setAccessLevel(UserAccess::ACCESS_READ);
-		$uaMapper->save($ua);
+        /* Do not demote existing owner */
+        if(!$uaMapper->isFolderOwner($userObject, $folder)) {
+            $ua->setUser($userObject)
+               ->setAccessLevel(UserAccess::ACCESS_READ);
+            $uaMapper->save($ua);
+        }
 	}
 	SitePage::localRedir('/group/modify/' . $_GET['categoryID']);
 }
