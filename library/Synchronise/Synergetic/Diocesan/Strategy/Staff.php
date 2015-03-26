@@ -34,6 +34,7 @@ class Staff extends Synchronise_Base_Strategy_Staff
             ->addHydrator(new \Synchronise_Base_Hydrator_Webmail())
 
             ->addHydrator(new Diocesan\Hydrator\UnsetOnUpdate())
+            ->addHydrator(new Diocesan\Hydrator\StaffUnsetOnUpdate())
             ->addHydrator(new \Synchronise_Base_Hydrator_Clear());
     }
 

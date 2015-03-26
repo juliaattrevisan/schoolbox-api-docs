@@ -69,7 +69,7 @@ class Student extends Synchronise_Base_Hydrator_Student
                 7  => array(self::ROLE_YR_7, self::CAMPUS_JUNHIGH),
                 8  => array(self::ROLE_YR_8, self::CAMPUS_JUNHIGH),
                 9  => array(self::ROLE_YR_9, self::CAMPUS_JUNHIGH),
-                10 => array(self::ROLE_YR_10, self::CAMPUS_SENIOR),
+                10 => array(self::ROLE_YR_10, self::CAMPUS_JUNHIGH),
                 11 => array(self::ROLE_YR_11, self::CAMPUS_SENIOR),
                 12 => array(self::ROLE_YR_12, self::CAMPUS_SENIOR),
                 13 => array(self::ROLE_YR_13, self::CAMPUS_SENIOR),
