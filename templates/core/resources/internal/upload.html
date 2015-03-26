@@ -152,8 +152,14 @@
         var dz;
 
         var recorderJs;
+
+        // AudioContext: supported in some form by non-IE browsers
+        // If it isn't supported, fall back to Flash no matter what.
         var audioContextConstructor = window.AudioContext || window.webkitAudioContext;
-        var audioContext = new audioContextConstructor();
+        var audioContext;
+        if (audioContextConstructor) {
+            audioContext = new audioContextConstructor()
+        }
 
         abUploadControls.on(
             'click',
@@ -177,13 +183,12 @@
                             // For Flash - do something else, I know not what
                             // Use https://github.com/michalstocki/FlashWavRecorder
                             // has a getBlob() method, which is good
-                            // If even that doesn't work, do something else again
-
-                            // error callback
-                            // Show some message saying no recording devices are available,
-                            // or alternately open upload screen.
+                            onStartRecording();
+                            FWRecorder.record('flashRecorder', 'audio.wav');
+                        } else {
+                            // this is actually an error. Open up a file upload box.
+                            onDisableRecording();
                         }
-                        onDisableRecording();
                     }
                 );
             }
@@ -209,9 +214,7 @@
                 event.preventDefault();
                 onStopRecording();
 
-                stream.stop();
-                recorderJs.stop();
-                recorderJs.exportWAV(function(wavBlob) {
+                var onExport = function(wavBlob) {
                     blob = wavBlob;
                     playbacker
                             .attr('src', window.URL.createObjectURL(blob))
@@ -219,7 +222,17 @@
                     ;
                     formData = new FormData();
                     formData.append('upload', blob, 'blob.wav');
-                });
+                };
+                if (userMediaOptions.context === 'flash') {
+                    FWRecorder.stopRecording('flashRecorder');
+                    // put it in the playbacker
+                    console.log(FWRecorder.getBlob('blob.wav'));
+                    onExport(FWRecorder.getBlob('blob.wav'));
+                } else {
+                    stream.stop();
+                    recorderJs.stop();
+                    recorderJs.exportWAV(onExport);
+                }
             }
         );
         abUploadControls.on(
