@@ -32,7 +32,7 @@
         recorderButtons.recording.hide().prop('disabled', true);
         recorderButtons.play.hide().prop('disabled', true);
         recorderButtons.stop.hide().prop('disabled', true);
-        recorderButtons.upload.show().prop('disabled', false);
+        recorderButtons.upload.hide().prop('disabled', true);
         recorderButtons.disabled.hide();
 
         recorderContainer.recorder({
@@ -55,7 +55,7 @@
             recorderButtons.recording.hide().prop('disabled', true);
             recorderButtons.play.hide().prop('disabled', true);
             recorderButtons.stop.hide().prop('disabled', true);
-            recorderButtons.upload.show().prop('disabled', false);
+            recorderButtons.upload.show().prop('disabled', true);
             recorderButtons.disabled.hide();
         });
         recorderContainer.on('recorder.recordingStart', function(event, recorder) {
@@ -63,7 +63,7 @@
             recorderButtons.recording.show().prop('disabled', false);
             recorderButtons.play.hide().prop('disabled', true);
             recorderButtons.stop.show().prop('disabled', false);
-            recorderButtons.upload.show().prop('disabled', false);
+            recorderButtons.upload.show().prop('disabled', true);
             recorderButtons.disabled.hide();
         });
         recorderContainer.on('recorder.recordingStop', function(event, recorder) {
@@ -105,8 +105,8 @@
             // Go back to recordingReady state
             recorderButtons.start.show().prop('disabled', false);
             recorderButtons.recording.hide().prop('disabled', true);
-//            recorderButtons.play.hide().prop('disabled', true);
-//            recorderButtons.stop.hide().prop('disabled', true);
+            recorderButtons.play.hide().prop('disabled', true);
+            recorderButtons.stop.hide().prop('disabled', true);
             recorderButtons.upload.show().prop('disabled', false);
             recorderButtons.disabled.hide();
         });

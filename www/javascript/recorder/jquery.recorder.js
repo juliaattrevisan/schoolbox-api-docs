@@ -34,8 +34,8 @@
         this._attemptWebRtcSetup();
         this._attemptFlashSetup();
         if (this.isWebRtcSupported() || this.isFlashSupported()) {
-            this.triggerEvent('setup');
-            this.triggerEvent('recordingReady');
+            this.triggerEvent('setup', []);
+            this.triggerEvent('recordingReady', []);
             this.bindEvent('recordingStart', function(event, recorder) {
                 recorder.recording = true;
             });
@@ -49,7 +49,7 @@
                 recorder.playing = false;
             });
         } else {
-            this.triggerEvent('setupFailed');
+            this.triggerEvent('setupFailed', []);
         }
     };
 
@@ -113,7 +113,7 @@
             }
         );
         self.webrtc.recorder.record();
-        self.triggerEvent('recordingStart');
+        self.triggerEvent('recordingStart', []);
         return this;
     };
 
@@ -133,7 +133,7 @@
         });
         self.flash.recorder.record({
             start: function() {
-                self.triggerEvent('recordingStart');
+                self.triggerEvent('recordingStart', []);
             }
         });
         return this;
@@ -191,10 +191,10 @@
         if (this.isWebRtcUsed()) {
             this.webrtc.audioElement[0].currentTime = 0;
             this.webrtc.audioElement[0].play();
-            this.triggerEvent('playbackStart');
+            this.triggerEvent('playbackStart', []);
         } else if (this.isFlashUsed()) {
             this.flash.recorder.play();
-            this.triggerEvent('playbackStart');
+            this.triggerEvent('playbackStart', []);
         }
     };
 
@@ -204,7 +204,7 @@
      * @returns {Recorder}
      */
     Recorder.prototype.stopPlaying = function() {
-        this.triggerEvent('playbackStop');
+        this.triggerEvent('playbackStop', []);
         if (this.isWebRtcUsed()) {
             this.webrtc.audioElement[0].pause();
         } else if (this.isFlashUsed()) {
@@ -231,16 +231,16 @@
                         .attr('src', window.URL.createObjectURL(blob))
                     ;
                     // Trigger an event saying I'm ready for play and upload.
-                    self.triggerEvent('playbackReady');
-                    self.triggerEvent('uploadReady');
+                    self.triggerEvent('playbackReady', []);
+                    self.triggerEvent('uploadReady', []);
                 }
             );
-            self.triggerEvent('recordingStop');
+            self.triggerEvent('recordingStop', []);
         } else if (self.isFlashUsed()) {
             self.flash.recorder.stop();
-            self.triggerEvent('recordingStop');
-            self.triggerEvent('playbackReady');
-            self.triggerEvent('uploadReady');
+            self.triggerEvent('recordingStop', []);
+            self.triggerEvent('playbackReady', []);
+            self.triggerEvent('uploadReady', []);
         }
         return this;
     };
@@ -323,7 +323,7 @@
                 },
                 error: function() {
                     // Don't know if there's any params that get passed here
-                    self.triggerEvent('uploadFailed');
+                    self.triggerEvent('uploadFailed', []);
                 }
             })
         }
@@ -356,7 +356,7 @@
      */
     Recorder.prototype.triggerEvent = function(eventName, extraParams) {
         var params = [this];
-        if (!!extraParams) {
+        if (extraParams && extraParams.length) {
             $.each(extraParams, function(i, v) {
                 params.push(v);
             });
