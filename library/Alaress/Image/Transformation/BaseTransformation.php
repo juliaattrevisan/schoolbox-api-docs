@@ -12,8 +12,9 @@ namespace Alaress\Image\Transformation;
 
 use Exception_Schoolbox;
 
-class BaseTransformation
+class BaseTransformation implements Transformation
 {
+    /** @var array */
     protected $allTransformations = array();
 
     /**
