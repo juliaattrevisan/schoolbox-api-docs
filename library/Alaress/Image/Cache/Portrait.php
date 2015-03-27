@@ -11,109 +11,65 @@
 
 namespace Alaress\Image\Cache;
 
-use Cfg;
+use Exception_Schoolbox;
 use Exception_Schoolbox_AccessDenied;
 use Exception_Schoolbox_NotFound;
 use External_User;
 use Group;
-use User;
+use Schoolbox\Config\Loader;
+use Schoolbox\File\Exception;
+use Schoolbox\IConfigLoader;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+use League\Flysystem;
 
-class Portrait implements CacheInterface
+class Portrait extends BrokenFS
 {
 
-    /* The image to load
-      */
-    private $filename = null;
-
-    /* The $key is a way to uniquely associate a cached image with a particular
-      * series of transformations applied to it. In this caching implementation,
-      * it's the fileID concatenated with the name of the transformation applied.
-      *
-      * e.g. 51-Web.dat
-      */
-    private $key = null;
-
-    /* This is where cached images are stored
-      */
-    private $cacheLocation = '';
-
-    /* The filepath for processed image output
-      * Defaults to /tmp if it couldn't figure out where the file goes
-      */
-    private $cachedFileLocation = '/tmp';
-
-    /* Remember whether we loaded from the cached file. If it was loaded from the
-      * cache, we can skip transformations as we assume they have been done in the past.
-      * Otherwise we would be re-transforming an already-transformed image repeatedly
-      */
-    private $loadedFromCache = false;
-
-    /* Placeholder image file
-      */
-    private $placeholder = '';
-
-    /* External user id
-      */
+    /** @var int */
     private $externalUserId = -1;
 
-    /* Handlers -_-
-      */
+    /** @var External_User */
     private $externalHandler = null;
-    private $groupHandler = null;
-    protected $userHandler = null;
+
+    /** @var UserMapper */
+    private $userMapper;
+
+    /** @var User */
+    private $sessionUser;
+
+    /** @var IConfigLoader */
+    private $conf;
+
 
     /**
-     * Schoolbox user ID (as opposed to external ID)
+     * @param int    $externalId
+     * @param string $key
+     * @param User   $sessionUser
+     * @throws Exception_Schoolbox
      */
-    protected $user_id = null;
-
-    /**
-     * Constructor
-     * Remembers what image you are trying to load from cache
-     *
-     * @param $externalUserId
-     * @param $key
-     */
-    public function __construct($externalUserId, $key)
+    public function __construct($externalId, $key, User $sessionUser)
     {
-        $this->setExternalUserId($externalUserId);
-        $this->setKey($key);
-
-        $this->setUserHandler(new User());
+        $this->setConfig(new Loader());
+        $this->setSessionUser($sessionUser);
         $this->setExternalHandler(new External_User());
-        $this->setGroupHandler(new Group());
+        $this->setUserMapper(UserMapper::getInstance());
+        $this->setExternalUserId($externalId);
 
-        $this->setPlaceholder(WEB_root . '/images/core/placeholder.png');
-        $this->setCacheLocation(Cfg::get('stream_dir') . '/portrait');
+        $portraitPath = $this->getExternalHandler()->getPortrait($this->getExternalUserId());
 
-        $this->loadPortraitPath();
-    }
+        // truncate the dir for Flysystem
+        $portraitPath = str_replace($this->getConfig()->get('portrait_dir'), '', $portraitPath);
 
-    /**
-     * Loads the path for this user's portrait.
-     *
-     * @throws Exception_Schoolbox_NotFound     if the portrait wasn't found
-     * @throws Exception_Schoolbox_AccessDenied if the current user doesn't have
-     *                                          permission to view portrait of
-     *                                          this user
-     */
-    private function loadPortraitPath()
-    {
+        try {
+            parent::__construct($this->getConfig()->get('portrait_dir'), $portraitPath, $key);
+        } catch (Exception $e) {
+            throw new Exception_Schoolbox_NotFound('Portrait not found');
+        }
 
-        /* If you are able to view this portrait, try finding image file
-           * Otherwise use a placeholder image instead
-           */
-        if ($this->canViewImage()) {
-            $portraitPath = $this->getExternalHandler()->getPortrait($this->getExternalUserId());
+        $this->purgeOldTransformations();
 
-            /* If the portrait path exists, use it
-                */
-            if ($portraitPath) {
-                $this->setFilename($portraitPath);
-            } else {
-                throw new Exception_Schoolbox_NotFound('Portrait not found');
-            }
-        } else {
+        if (!$this->canViewImage()) {
             throw new Exception_Schoolbox_AccessDenied('Cannot view image');
         }
     }
@@ -123,16 +79,27 @@ class Portrait implements CacheInterface
      */
     public function purgeOldTransformations()
     {
-        $portraitPath = $this->filename;
-        if (!empty($portraitPath)) {
-            $portraitAge  = filemtime($portraitPath);
-            $portraitFile = pathinfo($portraitPath, PATHINFO_FILENAME);
-            $pattern      = $this->cacheLocation . '/' . $portraitFile . '-*.dat';
-            foreach (glob($pattern) as $cacheFile) {
-                if (filemtime($cacheFile) < $portraitAge) {
-                    unlink($cacheFile);
+        if (!$this->resource->exists()) {
+            return;
+        }
+
+        $portraitAge = $this->resource->getTimestamp();
+
+        $cachePath = $this->loadCache()->getPath();
+        $cacheDir  = pathinfo($cachePath, PATHINFO_DIRNAME);
+
+        try {
+            /** @var Flysystem\Directory $dir */
+            $dir = $this->cacheFs->get($cacheDir);
+
+            foreach ($dir->getContents() as $meta) {
+                $modTime = $this->cacheFs->getTimestamp($meta['path']);
+                if ($modTime < $portraitAge) {
+                    $this->cacheFs->delete($meta['path']);
                 }
             }
+        } catch (Flysystem\FileNotFoundException $e) {
+            // this simply means the cache directory doesn't exist
         }
     }
 
@@ -143,36 +110,37 @@ class Portrait implements CacheInterface
      */
     private function canViewImage()
     {
+        // TODO kill it! kill it with fire!
+        $group = new Group();
 
         /* Staff members can always see all portraits
            */
-        if ($this->getGroupHandler()->isStaff()) {
+        if ($group->isStaff()) {
             return true;
         }
 
         // Get all users with a synergy ID, and test them against policy.
-        /** @var \Schoolbox\User[] $userList */
-        $userList = \Schoolbox\UserMapper::getInstance()->findByColumn(
-            'synergy_id',
-            $this->getExternalUserId()
-        );
+
+        /** @var User[] $userList */
+        $userList = $this->getUserMapper()->findByColumn('synergy_id', $this->getExternalUserId());
+
         foreach ($userList as $user) {
-            /* Everyone can always see their own pics
+            /* Everyone can always see their own face
              */
-            $user_id = $user->getId();
-            if ($_SESSION['id'] == $user_id) {
+            $userId = $user->getId();
+            if ($this->getSessionUser()->getId() == $userId) {
                 return true;
             }
 
             // Student photos:
             // always visible by their parents
             // visible by other students if photos are not protected.
-            if ($this->getGroupHandler()->isParentOfChild($user_id)) {
+            if ($group->isParentOfChild($userId)) {
                 return true;
             }
-            if ($this->getGroupHandler()->isStudent($user_id)) {
-                if (!Cfg::get('protect_student_photo')
-                    && $this->getGroupHandler()->isStudent()
+            if ($group->isStudent($userId)) {
+                if (!$this->getConfig()->get('protect_student_photo')
+                    && $group->isStudent()
                 ) {
                     return true;
                 }
@@ -180,9 +148,9 @@ class Portrait implements CacheInterface
 
             // Staff photos:
             // visible by students and parents, if staff photos aren't protected.
-            if ($this->getGroupHandler()->isStaff($user_id)) {
-                if (!Cfg::get('protect_teacher_photo')
-                    && ($this->getGroupHandler()->isStudent() || $this->getGroupHandler()->isParent())
+            if ($group->isStaff($userId)) {
+                if (!$this->getConfig()->get('protect_teacher_photo')
+                    && ($group->isStudent() || $group->isParent())
                 ) {
                     return true;
                 }
@@ -190,221 +158,6 @@ class Portrait implements CacheInterface
         }
 
         return false;
-    }
-
-    /**
-     * Load an image by an id
-     *
-     * @throws Exception_Schoolbox_NotFound if file isn't found
-     * @return mixed
-     */
-    public function load()
-    {
-        if (file_exists($this->getFilename())) {
-            $info = getimagesize($this->getFilename());
-
-            $info['filepath'] = $this->getFilename();
-            $info['filename'] = basename($this->getFilename());
-            $info['size']     = filesize($this->getFilename());
-
-            /* We do this step if we are using Filesystem Cache directly
-             */
-
-            /* If this particular transformation key existed at some point,
-             * this is what it's name would be
-             *
-             * e.g. <id>-Web.dat, <id>-ChickenPox.dat, etc. where Web and ChickenPox
-             * correspond to a series of transformations
-             */
-            $id = substr($info['filename'], 0, strrpos($info['filename'], '.'));
-
-            $cachedFilename = $id . '-' . $this->getKey() . '.dat';
-
-            /* This is where you'd find it in the filesystem if it existed previously
-             */
-            $this->setCachedFileLocation($this->getCacheLocation() . '/' . $cachedFilename);
-
-            /* Load a preprocessed version directly from cache
-             */
-            if (file_exists($this->getCachedFileLocation())) {
-                $this->setLoadedFromCache(true);
-
-                $info             = getimagesize($this->getCachedFileLocation());
-                $info['filepath'] = $this->getCachedFileLocation();
-                $info['filename'] = $cachedFilename;
-                $info['size']     = filesize($this->getCachedFileLocation());
-            }
-
-            return $this->standardise($info);
-        } else {
-            throw new Exception_Schoolbox_NotFound(sprintf('Could not read file "%s"', $this->getFilename()));
-        }
-    }
-
-    /**
-     * Standard temporary interface
-     *
-     * @param $imageArray
-     *
-     * @return array
-     */
-    public function standardise($imageArray)
-    {
-        return array(
-            'fileID'   => $imageArray['filename'],
-            'filepath' => $imageArray['filepath'],
-            'filename' => $imageArray['filename'],
-            'mime'     => $imageArray['mime'],
-            'size'     => $imageArray['size'],
-        );
-    }
-
-    /**
-     * Set loaded from cache
-     * Enforce boolean
-     *
-     * @param $loadedFromCache
-     */
-    private function setLoadedFromCache($loadedFromCache)
-    {
-        if ($loadedFromCache === false) {
-            $this->loadedFromCache = $loadedFromCache;
-        } else {
-            $this->loadedFromCache = true;
-        }
-    }
-
-    /**
-     * Find out whether we loaded from cache or not
-     *
-     * @return bool
-     */
-    public function isLoadedFromCache()
-    {
-        return $this->loadedFromCache;
-    }
-
-    /* Getters/Setters
-      */
-
-    /**
-     * Set filename
-     *
-     * @param $filename
-     */
-    private function setFilename($filename)
-    {
-        $this->filename = $filename;
-    }
-
-    /**
-     * Get filename
-     *
-     * @return null
-     */
-    private function getFilename()
-    {
-        return $this->filename;
-    }
-
-    /**
-     * Set key
-     *
-     * @param $key
-     */
-    private function setKey($key)
-    {
-        $this->key = $key;
-    }
-
-    /**
-     * Get key
-     *
-     * @return null
-     */
-    public function getKey()
-    {
-        return $this->key;
-    }
-
-    /**
-     * Set cache location
-     *
-     * @param $cacheLocation
-     */
-    private function setCacheLocation($cacheLocation)
-    {
-        $this->cacheLocation = $cacheLocation;
-    }
-
-    /**
-     * Get cache location
-     *
-     * @return string
-     */
-    private function getCacheLocation()
-    {
-        return $this->cacheLocation;
-    }
-
-    /**
-     * Set cached file location
-     *
-     * @param $cachedFileLocation
-     */
-    private function setCachedFileLocation($cachedFileLocation)
-    {
-        $this->cachedFileLocation = $cachedFileLocation;
-    }
-
-    /**
-     * Get cached file location
-     *
-     * @return string
-     */
-    public function getCachedFileLocation()
-    {
-        return $this->cachedFileLocation;
-    }
-
-    /**
-     * Set placeholder
-     *
-     * @param $placeholder
-     */
-    private function setPlaceholder($placeholder)
-    {
-        $this->placeholder = $placeholder;
-    }
-
-    /**
-     * Get placeholder
-     *
-     * @return string
-     */
-    private function getPlaceholder()
-    {
-        return $this->placeholder;
-    }
-
-    /**
-     * Set group handler
-     *
-     * @param Group $groupHandler
-     */
-    private function setGroupHandler($groupHandler)
-    {
-        $this->groupHandler = $groupHandler;
-    }
-
-    /**
-     * Get group handler
-     *
-     * @return Group
-     */
-    private function getGroupHandler()
-    {
-        return $this->groupHandler;
     }
 
     /**
@@ -429,23 +182,61 @@ class Portrait implements CacheInterface
 
 
     /**
-     * Sets Schoolbox user handler, required for retrieving user's ID.
-     *
-     * @param $userHandler
+     * @return UserMapper
      */
-    public function setUserHandler($userHandler)
+    private function getUserMapper()
     {
-        $this->userHandler = $userHandler;
+        return $this->userMapper;
+    }
+
+
+    /**
+     * @param UserMapper $userMapper
+     * @return self
+     */
+    private function setUserMapper($userMapper)
+    {
+        $this->userMapper = $userMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return User
+     */
+    private function getSessionUser()
+    {
+        return $this->sessionUser;
+    }
+
+
+    /**
+     * @param User $sessionUser
+     * @return self
+     */
+    private function setSessionUser($sessionUser)
+    {
+        $this->sessionUser = $sessionUser;
+        return $this;
+    }
+
+
+    /**
+     * @return IConfigLoader
+     */
+    private function getConfig()
+    {
+        return $this->conf;
     }
 
     /**
-     * Gets Schoolbox user handler.
-     *
-     * @return User
+     * @param IConfigLoader $conf
+     * @return self
      */
-    public function getUserHandler()
+    private function setConfig($conf)
     {
-        return $this->userHandler;
+        $this->conf = $conf;
+        return $this;
     }
 
     /**

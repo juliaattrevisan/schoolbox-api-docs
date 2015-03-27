@@ -9,14 +9,24 @@
 
 namespace Alaress\Image\Cache;
 
+use League\Flysystem;
+
 interface CacheInterface
 {
     /**
      * Loads an image somehow.
      *
-     * @return array
+     * @return Flysystem\File
      */
     public function load();
+
+
+    /**
+     * Loads the cached version of the file, even if absent
+     *
+     * @return Flysystem\File
+     */
+    public function loadCache();
 
     /**
      * Find out whether we loaded from cache or not
@@ -32,10 +42,4 @@ interface CacheInterface
      */
     public function getKey();
 
-    /**
-     * Get cache file location.
-     *
-     * @return string
-     */
-    public function getCachedFileLocation();
 }
