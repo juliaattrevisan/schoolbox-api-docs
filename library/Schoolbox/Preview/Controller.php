@@ -25,48 +25,27 @@ class Controller extends Base
 
             /* Generic locations
              */
-            "http://www.taylorswift.com/",
-            "http://edition.cnn.com/",
-            "http://192.168.36.10/learningAnalytics/177",
-            "https://www.google.com.au/search?q=taylor+swift&oq=taylor+swift&aqs=chrome..69i57j69i65j69i60l4.1253j0j4&sourceid=chrome&es_sm=93&ie=UTF-8",
-            "https://s-media-cache-ak0.pinimg.com/236x/fb/c7/7c/fbc77c27b92b84fa99c9295d6d307a2d.jpg",
-            "http://en.wikipedia.org/wiki/FR._Lee_Ermey",
-            "https://vimeo.com/channels/staffpicks/23371242",
-            "https://twitter.com/arstechnica/status/533056992592818176",
-            "https://www.youtube.com/watch?v=zPonioDYnoY",
-            "https://soundcloud.com/majorlazer",
-            "http://globe-views.com/dcim/dreams/owl/owl-03.jpg",
-            "http://pugetsoundbirds.org/wp-content/uploads/2010/06/Northern-saw-whet-owl.jpg",
-            "http://www.libertyscentre.co.uk/Owls/large/Collared%20Scops%20Owl.jpg",
-
-            /* File downloads
-             */
-            "http://s3.majorleaguegaming.com/files/OrlandoChamp.zip",
-
-            /* Jpg uploads into Course Builder
-             */
-            "/storage/fetch.php?hash=62f643c3b484a87f3ce2e3a8216c7f232787af02",
-
-            /* Png uploads into Course Builder
-             */
-            "/storage/fetch.php?hash=c28763abce0725ccde28dbdd84aec956844a596d",
-
-            /* Video uploads into Course Builder
-             */
-            "/storage/fetch.php?hash=10d6e62fec60bbbff5cdae4aae78c8aa64b69ef9",
-            "/storage/fetch.php?hash=fcd9618abc108c9b1e7a110b429cc3f4b7df3d4c",
-
-            /* Audio uploads into Course Builder
-             */
-            "/storage/fetch.php?hash=0f5ad33468ff91ff4ea3f30788467905bd454fc5",
-
-            /* XML file
-             */
-            "/storage/fetch.php?hash=f5ce8f8a0192c7de2602a4c132ad66b7ee0b13d6",
-
-            /* PDF file
-             */
-            "/storage/fetch.php?hash=9048cf1e07568ed0d35396c0e5fd70e852d3c285",
+            ['External Generic url' => "http://www.taylorswift.com/"],
+            ['External Generic url' => "http://edition.cnn.com/"],
+            ['External Generic url' => "http://192.168.36.10/learningAnalytics/177"],
+            ['External Generic url' => "https://www.google.com.au/search?q=taylor+swift&oq=taylor+swift&aqs=chrome..69i57j69i65j69i60l4.1253j0j4&sourceid=chrome&es_sm=93&ie=UTF-8"],
+            ['External Generic url' => "http://en.wikipedia.org/wiki/FR._Lee_Ermey"],
+            ['External Generic url' => "https://twitter.com/arstechnica/status/533056992592818176"],
+            ['External Video Vimeo' => "https://vimeo.com/channels/staffpicks/23371242"],
+            ['External Video Youtube' => "https://www.youtube.com/watch?v=zPonioDYnoY"],
+            ['External Audio Soundcloud' => "https://soundcloud.com/majorlazer"],
+            ['External Image JPG' => "https://s-media-cache-ak0.pinimg.com/236x/fb/c7/7c/fbc77c27b92b84fa99c9295d6d307a2d.jpg"],
+            ['External Image JPG' => "http://globe-views.com/dcim/dreams/owl/owl-03.jpg"],
+            ['External Image JPG' => "http://pugetsoundbirds.org/wp-content/uploads/2010/06/Northern-saw-whet-owl.jpg"],
+            ['External Image JPG' => "http://www.libertyscentre.co.uk/Owls/large/Collared%20Scops%20Owl.jpg"],
+            ['External File Zip' => "http://s3.majorleaguegaming.com/files/OrlandoChamp.zip"],
+            ['Local Image JPG' => "/storage/fetch.php?hash=62f643c3b484a87f3ce2e3a8216c7f232787af02"],
+            ['Local Image PNG' => "/storage/fetch.php?hash=c28763abce0725ccde28dbdd84aec956844a596d"],
+            ['Local Video' => "/storage/fetch.php?hash=10d6e62fec60bbbff5cdae4aae78c8aa64b69ef9"],
+            ['Local Video' => "/storage/fetch.php?hash=fcd9618abc108c9b1e7a110b429cc3f4b7df3d4c"],
+            ['Local Audio' => "/storage/fetch.php?hash=0f5ad33468ff91ff4ea3f30788467905bd454fc5"],
+            ['Local XML' => "/storage/fetch.php?hash=f5ce8f8a0192c7de2602a4c132ad66b7ee0b13d6"],
+            ['Local PDF' => "/storage/fetch.php?hash=9048cf1e07568ed0d35396c0e5fd70e852d3c285"],
         ];
 
         $this->getResponse()->content->set([

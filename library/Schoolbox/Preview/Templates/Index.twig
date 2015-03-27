@@ -26,8 +26,11 @@
 </script>
 <table>
     {% for currentUrl in allUrls %}
-    <tr>
-        <td><a data-modal='preview' href="{{ currentUrl }}">{{ currentUrl }}</td>
-    </tr>
+        {% for type, url in currentUrl %}
+        <tr>
+            <td>{{ type }}</td>
+            <td><a data-modal='preview' href="{{ url }}">{{ url }}</td>
+        </tr>
+        {% endfor %}
     {% endfor %}
 </table>
