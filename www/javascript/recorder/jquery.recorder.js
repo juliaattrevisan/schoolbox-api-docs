@@ -180,7 +180,7 @@
      *
      * @returns {Recorder}
      */
-    Recorder.prototype.playRecorded = function() {
+    Recorder.prototype.startPlaying = function() {
         // Starting playing stops any current recording and playing.
         if (this.isRecording()) {
             this.stopRecording();

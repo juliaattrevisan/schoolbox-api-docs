@@ -100,29 +100,33 @@
             // Go back to recordingReady state
             recorderButtons.start.show().prop('disabled', false);
             recorderButtons.recording.hide().prop('disabled', true);
-            recorderButtons.play.hide().prop('disabled', true);
-            recorderButtons.stop.hide().prop('disabled', true);
+//            recorderButtons.play.hide().prop('disabled', true);
+//            recorderButtons.stop.hide().prop('disabled', true);
             recorderButtons.upload.show().prop('disabled', false);
             recorderButtons.disabled.hide();
         });
 
         // Button events
-        recorderButtons.start.click(function() {
-            recorder.startRecording();
+        recorderButtons.start.click(function(event) {
+            event.preventDefault();
+            recorderInterface.startRecording();
         });
-        recorderButtons.play.click(function() {
-            recorder.playRecorded();
+        recorderButtons.play.click(function(event) {
+            event.preventDefault();
+            recorderInterface.startPlaying();
         });
-        recorderButtons.stop.click(function() {
-            if (recorder.isRecording()) {
-                recorder.stopRecording();
-            } else if (recorder.isPlaying()) {
-                recorder.stopPlaying();
+        recorderButtons.stop.click(function(event) {
+            event.preventDefault();
+            if (recorderInterface.isRecording()) {
+                recorderInterface.stopRecording();
+            } else if (recorderInterface.isPlaying()) {
+                recorderInterface.stopPlaying();
             }
         });
-        recorderButtons.upload.click(function() {
+        recorderButtons.upload.click(function(event) {
+            event.preventDefault();
             // prompt for a name
-            recorder.uploadRecorded('butts.wav');
+            recorderInterface.uploadRecorded('butts.wav');
         });
 
         // Init dropzone
@@ -352,15 +356,16 @@
 </div>
 <div class="ctrl">
   <a role="button" class="submit-btn-plain" data-interaction="file-upload" disabled="disabled" href="#">Upload</a>
+
+  <a role="button" class="submit-btn-plain record" data-interaction="audio-record-start" href="#">Record Audio</a>
+  <a role="button" class="submit-btn-plain recording hide" data-interaction="audio-record-recording" disabled href="#">Recording...</a>
+  <a role="button" class="submit-btn-plain disabled" data-interaction="audio-record-disabled" disabled href="#">No recording devices available</a>
+  <!--<a role="button" class="submit-btn-plain pause hide" data-interaction="audio-record-pause" href="#">Pause</a>-->
+  <a role="button" class="submit-btn-plain play hide" data-interaction="audio-record-play" href="#">Play</a>
+  <a role="button" class="submit-btn-plain stop hide" data-interaction="audio-record-stop" href="#">Stop</a>
+  <a role="button" class="submit-btn-plain stop hide" data-interaction="audio-record-upload" href="#">Upload Audio</a>
+
   <a role="button" class="btn no-icon float-left cancel" href="#">Cancel</a>
 </div>
-<audio id="playback" controls width="100%"></audio>
-<div id="recorder">
-    <a role="button" class="submit-btn-plain record" data-interaction="audio-record-start" href="#">Record Audio</a>
-    <a role="button" class="submit-btn-plain recording hide" data-interaction="audio-record-recording" disabled href="#">Recording...</a>
-    <a role="button" class="submit-btn-plain disabled" data-interaction="audio-record-disabled" disabled href="#">No recording devices available</a>
-    <!--<a role="button" class="submit-btn-plain pause hide" data-interaction="audio-record-pause" href="#">Pause</a>-->
-    <a role="button" class="submit-btn-plain play hide" data-interaction="audio-record-play" href="#">Play</a>
-    <a role="button" class="submit-btn-plain stop hide" data-interaction="audio-record-stop" href="#">Stop</a>
-    <a role="button" class="submit-btn-plain stop hide" data-interaction="audio-record-upload" href="#">Upload Audio</a>
-</div>
+<audio id="player" width="100%" controls></audio>
+<div id="recorder"></div>
