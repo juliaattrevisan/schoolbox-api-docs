@@ -34,7 +34,13 @@
         recorderButtons.stop.hide().prop('disabled', true);
         recorderButtons.upload.show().prop('disabled', false);
         recorderButtons.disabled.hide();
-        recorderContainer.recorder();
+
+        recorderContainer.recorder({
+            upload: {
+                url: abUploadForm.attr('action')
+            }
+        });
+        recorderInterface = recorderContainer.data('recorder');
         recorderContainer.on('recorder.setupFailed', function(event, recorder) {
             // Disable all buttons
             recorderButtons.start.hide().prop('disabled', true);
@@ -45,7 +51,6 @@
             recorderButtons.disabled.show();
         });
         recorderContainer.on('recorder.recordingReady', function(event, recorder) {
-            recorderInterface = recorder;
             recorderButtons.start.show().prop('disabled', false);
             recorderButtons.recording.hide().prop('disabled', true);
             recorderButtons.play.hide().prop('disabled', true);
@@ -367,5 +372,4 @@
 
   <a role="button" class="btn no-icon float-left cancel" href="#">Cancel</a>
 </div>
-<audio id="player" width="100%" controls></audio>
 <div id="recorder"></div>
