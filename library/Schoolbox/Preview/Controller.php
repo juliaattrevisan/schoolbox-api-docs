@@ -41,6 +41,7 @@ class Controller extends Base
             ['Local Video' => "/storage/fetch.php?hash=10d6e62fec60bbbff5cdae4aae78c8aa64b69ef9"],
             ['Local Video' => "/storage/fetch.php?hash=fcd9618abc108c9b1e7a110b429cc3f4b7df3d4c"],
             ['Local Audio' => "/storage/fetch.php?hash=0f5ad33468ff91ff4ea3f30788467905bd454fc5"],
+            ['Local HTML' => "/storage/fetch.php?hash=330c579c668d2c88c37f0c1572abc876fb2cbe67"],
             ['Local XML' => "/storage/fetch.php?hash=f5ce8f8a0192c7de2602a4c132ad66b7ee0b13d6"],
             ['Local PDF' => "/storage/fetch.php?hash=afaafce41021389f0cc857dfc03b136d6d1b2f29"],
         ];
