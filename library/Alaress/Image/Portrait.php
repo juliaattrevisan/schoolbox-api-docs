@@ -12,75 +12,28 @@
 
 namespace Alaress\Image;
 
-class Portrait
+use Alaress\Image\Transformation\Transformation;
+use Schoolbox\User;
+
+class Portrait extends AbstractHandler
 {
 
     /**
-     * @var Processor\Standard
-     */
-    protected $imageProcessor = null;
-
-    /**
-     * Constructor
-     *
      * Sets up the caching implementation, image processor and streams it
      *
-     * @param $externalUserId
-     * @param $key
-     * @param $transformations
+     * @param int            $externalUserId
+     * @param string         $key
+     * @param Transformation $transformations
+     * @param User           $sessionUser
      */
-    public function __construct($externalUserId, $key, $transformations)
+    public function __construct($externalUserId, $key, Transformation $transformations, User $sessionUser)
     {
-
         /* Choose a caching method to use
          */
-        $cache = new Cache\Portrait($externalUserId, $key);
+        $cache = new Cache\Portrait($externalUserId, $key, $sessionUser);
         $cache->purgeOldTransformations();
 
-        /* Process and stream image
-         */
-        $this->imageProcessor = new Processor\Standard(
-            $cache,
-            $transformations,
-            new \Alaress\Image\Implementation\Imagine\Filetype\Factory(),
-            new \Alaress\Image\Implementation\Imagine\Processor\Strategy\Factory()
-        );
-        $this->imageProcessor->load()->transformAll();
+        $this->initProcessor($cache, $transformations);
     }
 
-    /**
-     * Outputs the image
-     */
-    public function stream()
-    {
-        $this->imageProcessor->stream();
-    }
-
-    /**
-     * Saves the image
-     * @return string Location of saved image
-     */
-    public function save()
-    {
-        $this->imageProcessor->save();
-        return $this->imageProcessor->getCachedFileLocation();
-    }
-
-    /**
-     * Sets the image processor
-     * @param Processor\Standard $imageProcessor
-     */
-    private function setImageProcessor(Processor\Standard $imageProcessor)
-    {
-        $this->imageProcessor = $imageProcessor;
-    }
-
-    /**
-     * Gets the image processor
-     * @return Processor\Standard
-     */
-    private function getImageProcessor()
-    {
-        return $this->imageProcessor;
-    }
 }

@@ -13,33 +13,22 @@
 namespace Alaress\Image;
 
 use Schoolbox;
-use Alaress\Image\Transformation;
+use Schoolbox\Resource;
+use Alaress\Image\Transformation\Transformation;
+use Alaress\Image\Implementation\Imagine;
 
-class Storage
+class Storage extends AbstractHandler
 {
     /**
-    * Consructor
     * Sets up the caching implementation, image processor and streams it
     *
-    * @param Schoolbox\Storage                 $resource
-    * @param string                            $key
-    * @param Transformation\BaseTransformation $transformations
+    * @param Resource\Storage\Model $resource
+    * @param string                 $key
+    * @param Transformation         $transformations
     */
-    public function __construct($resource, $key, $transformations)
+    public function __construct(Resource\Storage\Model $resource, $key, Transformation $transformations)
     {
-
-        /* Choose a caching method to use
-         */
-        $cache = new Cache\Storage($resource, $key);
-
-        /* Process and stream image
-         */
-        $imageProcessor = new Processor\Standard(
-            $cache,
-            $transformations,
-            new \Alaress\Image\Implementation\Imagine\Filetype\Factory(),
-            new \Alaress\Image\Implementation\Imagine\Processor\Strategy\Factory()
-        );
-        $imageProcessor->load()->stream();
+        // Process the given storage object
+        $this->initProcessor(new Cache\Storage($resource, $key), $transformations);
     }
 }
