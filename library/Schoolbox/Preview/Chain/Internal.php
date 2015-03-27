@@ -27,7 +27,6 @@ class Internal extends Base {
      * @param $hash
      */
     public function __construct($url, $hash) {
-
         if ($this->isStorage($url)) {
             $storageMapper = new StorageMapper();
 

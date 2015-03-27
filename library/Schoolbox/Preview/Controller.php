@@ -45,6 +45,7 @@ class Controller extends Base
             ['Local XML' => "/storage/fetch.php?hash=f5ce8f8a0192c7de2602a4c132ad66b7ee0b13d6"],
             ['Local PDF' => "/storage/fetch.php?hash=afaafce41021389f0cc857dfc03b136d6d1b2f29"],
             ['Local ZIP' => "/storage/fetch.php?hash=bb85de4fb0f04e27556763f7beaf7f8a0094c8ab"],
+            ['Local URL' => "/homepage/43"],
         ];
 
         $this->getResponse()->content->set([
@@ -78,6 +79,12 @@ class Controller extends Base
 
                 $chain = new Internal($params['encodedUrl'], $hash);
                 $result = $chain->getResult();
+            }
+            /* Special case: redirect to internal urls
+             */
+            else {
+                $element = new \Schoolbox\Preview\Chain\Strategy\Internal\Redirect($params['encodedUrl'], new \Schoolbox\Resource\Storage\Model());
+                $result = $element->test();
             }
         }
         /* External Chain
