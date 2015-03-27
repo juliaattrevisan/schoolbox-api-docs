@@ -44,6 +44,7 @@ class Controller extends Base
             ['Local HTML' => "/storage/fetch.php?hash=330c579c668d2c88c37f0c1572abc876fb2cbe67"],
             ['Local XML' => "/storage/fetch.php?hash=f5ce8f8a0192c7de2602a4c132ad66b7ee0b13d6"],
             ['Local PDF' => "/storage/fetch.php?hash=afaafce41021389f0cc857dfc03b136d6d1b2f29"],
+            ['Local ZIP' => "/storage/fetch.php?hash=bb85de4fb0f04e27556763f7beaf7f8a0094c8ab"],
         ];
 
         $this->getResponse()->content->set([
