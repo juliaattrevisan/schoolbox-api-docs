@@ -7,20 +7,23 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-use Alaress\Image\Cache\Image;
+use Alaress\Image\Cache;
+use Alaress\Image\Implementation\Imagine;
 use Alaress\Image\Processor\Freeform;
+use Alaress\Image\Transformation;
 
-require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
+require_once __DIR__ . '/../../include/Bootstrap.php';
 
 /* Preserve old checks
  */
 session_start();
 
+$fileDir = Cfg::get('file_dir');
+
 if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
     $db = DeprecatedDatabase::getInstance();
 
     $query = "SELECT id, mime_type, category, deleted FROM file WHERE id = {$db->smartQuote($_GET['id'])}";
-    $fileDir = Cfg::get('file_dir');
 
     $imageInfo = $db->getRow($query);
 
@@ -39,19 +42,19 @@ if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
 
 /* Choose a caching method to use
  */
-$key = $_GET['width'] . 'x' . $_GET['height'];
-
-$cache = new Image($_GET['id'], $key);
+$key   = $_GET['width'] . 'x' . $_GET['height'];
+$file  = Schoolbox\Resource\File\Mapper::getInstance()->findById($_GET['id']);
+$store = $file->getStorage();
 
 /* Process and stream image
  */
-$imageProcessor = new Freeform(
-    $cache,
-    new \Alaress\Image\Transformation\MyImage($_GET['width'], $_GET['height']),
-    new \Alaress\Image\Implementation\Imagine\Filetype\Factory(),
-    new \Alaress\Image\Implementation\Imagine\Processor\Strategy\Factory()
-);
 try {
+    $imageProcessor = new Freeform(
+        new Cache\Storage($store, $key),
+        new Transformation\MyImage($_GET['width'], $_GET['height']),
+        new Imagine\Filetype\Factory(),
+        new Imagine\Processor\Strategy\Factory()
+    );
     $imageProcessor->load()->stream();
 } catch (Exception_Schoolbox_NotFound $e) {
     SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
