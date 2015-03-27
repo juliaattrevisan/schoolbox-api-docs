@@ -33,23 +33,7 @@
         if (!(this.isWebRtcSupported() || this.isFlashSupported())) {
             throw new Error('Neither WebRTC nor Flash is supported');
         }
-
-        // Set up the bound events.
-        // onReady(this)
-
-        // onRecordingReady(this)
-        // onRecordingStart(this)
-        // onRecordingStartFailed(this)
-        // onRecordingStop(this)
-
-        // onPlaybackReady(this)
-        // onPlaybackStart(this)
-        // onPlaybackStartFailed(this)
-        // onPlaybackStop(this)
-
-        // onUploadReady(this)
-        // onUploadComplete(this, responseData)
-        // onUploadFailed(this, responseData)
+        this.triggerEvent('recordingReady');
     };
 
     /**
@@ -104,7 +88,7 @@
                     }
                 );
                 self.webrtc.recorder.record();
-                // Trigger a start recording method
+                self.triggerEvent('recordingStart');
             },
             function (error) {
                 // Try to fall back to Flash.
@@ -116,11 +100,11 @@
                     });
                     self.flash.recorder.record({
                         start: function() {
-                            // Trigger a start recording method
+                            self.triggerEvent('recordingStart');
                         }
                     });
                 } else {
-                    // Trigger an error event, which may just be a file upload box.
+                    self.triggerEvent('recordingStartFailed', [error]);
                 }
             }
         );
@@ -132,6 +116,7 @@
     Recorder.prototype.playRecorded = function() {
         this.stopRecording();
         this.stopPlaying();
+        this.triggerEvent('playbackStop');
         if (this.isWebRtcUsed()) {
             this.webrtc.audioElement.play();
         } else if (this.isFlashUsed()) {
@@ -143,10 +128,11 @@
      * Stops playing back whatever was recorded.
      */
     Recorder.prototype.stopPlaying = function() {
+        this.triggerEvent('playbackStop');
         if (this.isWebRtcUsed()) {
             this.webrtc.audioElement.stop();
         } else if (this.isFlashUsed()) {
-            self.flash.recorder.stop();
+            this.flash.recorder.stop();
         }
     };
 
@@ -167,11 +153,16 @@
                         .attr('src', window.URL.createObjectURL(blob))
                     ;
                     // Trigger an event saying I'm ready for play and upload.
+                    self.triggerEvent('playbackReady');
+                    self.triggerEvent('uploadReady');
                 }
             );
+            self.triggerEvent('recordingStop');
         } else if (self.isFlashUsed()) {
             self.flash.recorder.stop();
-            // Trigger an event saying I'm ready for upload
+            self.triggerEvent('recordingStop');
+            self.triggerEvent('playbackReady');
+            self.triggerEvent('uploadReady');
         }
     };
 
@@ -196,7 +187,8 @@
                     processData: false
                 }
             )
-            .done(function(response) {
+            .done(function(response, textStatus, jqXHR) {
+                self.triggerEvent('uploadComplete', [response, textStatus, jqXHR]);
                 // inform any listeners that a file was uploaded.
                 // put it in the dropzone, and inform the dropzone opener
                 // that a file was posted to it.
@@ -209,8 +201,8 @@
                 // Replace with a uploadDone event
                 window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
             })
-            .fail(function() {
-                // trigger a failed message
+            .fail(function(jqXHR, textStatus, errorThrown) {
+                self.triggerEvent('uploadFailed', [jqXHR, textStatus, errorThrown]);
             });
         } else if (self.isFlashUsed()) {
             var params = {};
@@ -220,14 +212,32 @@
                 method: 'post',
                 audioParam: 'upload',
                 params: params,
-                success: function(responseText) {
-                    // inform listeners. Assume that response text is JSON for now
+                success: function(response) {
+                    self.triggerEvent('uploadComplete', [response]);
                 },
                 error: function() {
-                    // trigger a failed message
+                    // Don't know if there's any params that get passed here
+                    self.triggerEvent('uploadFailed');
                 }
             })
         }
+    };
+
+    /**
+     * Triggers an event on the element that this is a recorder for.
+     *
+     * This object is always passed as the first extra parameter to the event
+     * listener.
+     *
+     * @param eventName
+     * @param extraParams
+     */
+    Recorder.prototype.triggerEvent = function(eventName, extraParams) {
+        var params = [this];
+        $.each(extraParams, function(i, v) {
+            params.push(v);
+        });
+        this.element.trigger(PLUGIN_NAME+'.'+eventName, params);
     };
 
     /**
