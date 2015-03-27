@@ -30,7 +30,6 @@ class Internal extends Base {
         $this->start([
             new Image($url, $hash),
             new Media($url, $hash),
-//            new Embed($url, $hash),
 //            new Html($url, $hash),
 //            new Redirect($url, $hash),
         ]);
