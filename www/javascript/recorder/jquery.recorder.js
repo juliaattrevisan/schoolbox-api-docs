@@ -305,9 +305,11 @@
      */
     Recorder.prototype.triggerEvent = function(eventName, extraParams) {
         var params = [this];
-        $.each(extraParams, function(i, v) {
-            params.push(v);
-        });
+        if (!!extraParams) {
+            $.each(extraParams, function(i, v) {
+                params.push(v);
+            });
+        }
         this.element.trigger(PLUGIN_NAME+'.'+eventName, params);
     };
 
