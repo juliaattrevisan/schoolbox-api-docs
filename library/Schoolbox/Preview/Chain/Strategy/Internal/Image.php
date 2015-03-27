@@ -10,8 +10,6 @@
 
 namespace Schoolbox\Preview\Chain\Strategy\Internal;
 
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-
 class Image extends Base {
 
     /**
@@ -20,27 +18,16 @@ class Image extends Base {
      * @return mixed
      */
     public function test() {
-        if ($this->isStorage()) {
-            $storageMapper = new StorageMapper();
-
-            try {
-                $item = $storageMapper->findByHash($this->getHash());
-
-                if ($item->getMimetype()->isImage()) {
-                    return [
-                        'type' => 'html-fragment',
-                        'twig' => [
-                            'template' => '@preview/Strategy/Shared/Image.twig',
-                            'data' => [
-                                'src' => $this->getUrl()
-                            ]
-                        ]
-                    ];
-                }
-            }
-            catch (\Exception $e) {
-                error(41);
-            }
+        if ($this->getItem()->getMimetype()->isImage()) {
+            return [
+                'type' => 'html-fragment',
+                'twig' => [
+                    'template' => '@preview/Strategy/Shared/Image.twig',
+                    'data' => [
+                        'src' => $this->getUrl()
+                    ]
+                ]
+            ];
         }
 
         return $this->testNext();

@@ -11,67 +11,37 @@
 namespace Schoolbox\Preview\Chain\Strategy\Internal;
 
 use Schoolbox\Preview\Chain\Strategy\Base as StrategyBase;
+use Schoolbox\Resource\Storage\Model as StorageModel;
 
 abstract class Base extends StrategyBase {
 
     /**
-     * Url to test
+     * The url to test
      *
      * @var string
      */
     protected $url = '';
 
     /**
-     * @var string
+     * A storage model to test
+     *
+     * @var StorageModel
      */
-    protected $hash = '';
+    protected $item = null;
 
     /**
      * Constructor
      *
      * @param $url
-     * @param $hash
+     * @param $item
      */
-    public function __construct($url, $hash) {
+    public function __construct($url, StorageModel $item) {
         $this->setUrl($url);
-        $this->setHash($hash);
-    }
-
-    /**
-     * Check if this is a storage url, it could contain anything
-     */
-    protected function isStorage() {
-        preg_match('#storage\/fetch\.php#', $this->getUrl(), $matches);
-
-        if (count($matches)) {
-            return true;
-        }
-
-        return false;
+        $this->setItem($item);
     }
 
     /* Getters/Setters
      */
-
-    /**
-     * Set hash
-     *
-     * @param string $hash
-     */
-    protected function setHash($hash)
-    {
-        $this->hash = $hash;
-    }
-
-    /**
-     * Get hash
-     *
-     * @return string
-     */
-    protected function getHash()
-    {
-        return $this->hash;
-    }
 
     /**
      * Set url
@@ -91,5 +61,25 @@ abstract class Base extends StrategyBase {
     protected function getUrl()
     {
         return $this->url;
+    }
+
+    /**
+     * Set item
+     *
+     * @param StorageModel $item
+     */
+    protected function setItem($item)
+    {
+        $this->item = $item;
+    }
+
+    /**
+     * Get item
+     *
+     * @return StorageModel
+     */
+    protected function getItem()
+    {
+        return $this->item;
     }
 }

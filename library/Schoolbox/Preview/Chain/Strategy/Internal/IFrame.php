@@ -12,8 +12,6 @@
 
 namespace Schoolbox\Preview\Chain\Strategy\Internal;
 
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-
 class IFrame extends Base {
 
     /**
@@ -31,27 +29,16 @@ class IFrame extends Base {
      * @return string
      */
     public function test() {
-        if ($this->isStorage()) {
-            $storageMapper = new StorageMapper();
-
-            try {
-                $item = $storageMapper->findByHash($this->getHash());
-
-                if (in_array($item->getExtension(), $this->getContentTypes())) {
-                    return [
-                        'type' => 'html-fragment',
-                        'twig' => [
-                            'template' => '@preview/Strategy/Shared/IFrame.twig',
-                            'data' => [
-                                'src' => $this->getUrl()
-                            ]
-                        ]
-                    ];
-                }
-            }
-            catch (\Exception $e) {
-                error(41);
-            }
+        if (in_array($this->getItem()->getExtension(), $this->getContentTypes())) {
+            return [
+                'type' => 'html-fragment',
+                'twig' => [
+                    'template' => '@preview/Strategy/Shared/IFrame.twig',
+                    'data' => [
+                        'src' => $this->getUrl()
+                    ]
+                ]
+            ];
         }
 
         return $this->testNext();
