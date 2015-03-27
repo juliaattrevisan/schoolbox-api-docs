@@ -91,6 +91,12 @@ class Migrator
 
             $fileId   = $pattern->readId($row);
             $filename = $pattern->readFilename($row);
+
+            if (!$filename) {
+                $this->log->warning("No filename, cannot detect mime; skipping");
+                continue;
+            }
+
             $mime     = $this->mimetypeMapper->getByFilename($filename);
             $ext      = pathinfo($filename, PATHINFO_EXTENSION);
 
@@ -107,10 +113,19 @@ class Migrator
             // TODO find a way to do this in Flysystem
             // assert: file exists, is NOT link, is readable
             $filePath = "$fileDir/$fileId.dat";
-            if (!(file_exists($filePath) && !is_link($filePath) && is_readable($filePath))) {
+            $type     = substr($fileDir, strrpos($fileDir, '/') + 1);
+
+            if (file_exists($filePath) && is_readable($filePath)) {
+
+                if (is_link($filePath)) {
+                    $this->log->notice("File $type.$fileId is a link, assuming has already been moved");
+                    continue;
+                }
+
+            } else {
                 // actually, this file IS deleted, so mark it as such
                 $pattern->flagAsDeleted($fileId);
-                $this->log->notice("Flagged file.$fileId as deleted, file doesn't seem to exist");
+                $this->log->notice("Flagged $type.$fileId as deleted, file doesn't seem to exist");
                 continue;
             }
 
@@ -118,7 +133,7 @@ class Migrator
             $pattern->injectHash($fileId, $file->getHash());
 
 
-            $this->log->info("Attached hash {$file->getHash()} to file.$fileId");
+            $this->log->info("Attached hash {$file->getHash()} to $type.$fileId");
 
             // save the storage file, which will also copy the actual file into the new storage
             try {
