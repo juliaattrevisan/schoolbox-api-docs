@@ -24,44 +24,6 @@ class Freeform extends Standard
     protected $transform_key = 'Constrain';
 
     /**
-     * Perform all transformations if we didn't load an image from the cache.
-     * Otherwise transformations were done previously and saved, and we can skip
-     * this step entirely
-     *
-     * @return $this
-     */
-    public function transformAll()
-    {
-
-        /* Retrieve the list of transformations and do 'em, if we haven't already
-         * done them at some point in the past
-         */
-        if (!$this->getCache()->isLoadedFromCache()) {
-
-            /* 'Constrain' can be converted into an $_GET querystring parameter
-             * or rammed into the constructor as an additional param, if you want
-             * other parameterised transformation definitions.
-             */
-            $allTransformations = array(
-                array(
-                    'method' => 'RotateOrientation',
-                    'args'   => array('FilePath' => $this->getFilePath())
-                )
-            );
-
-            $allTransformations = array_merge($allTransformations, $this->getTransformations()->retrieve($this->getTransformKey()));
-
-            /* Do it
-             */
-            foreach ($allTransformations as $currentTransformation) {
-                $this->transform($currentTransformation['method'], $currentTransformation['args']);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @param  string $transform_key
      *
      * @return $this
@@ -73,9 +35,11 @@ class Freeform extends Standard
     }
 
     /**
+     * Overwrite parent method of getting transform key from the cache
+     *
      * @return string
      */
-    public function getTransformKey()
+    protected function getTransformKey()
     {
         return $this->transform_key;
     }
