@@ -38,6 +38,13 @@
         recorderContainer.recorder({
             upload: {
                 url: abUploadForm.attr('action')
+            },
+            flash: {
+                flashContainer: $('#flashContainer')[0],
+                session: {
+                    name: '{SESSION_NAME}',
+                    id:   '{SESSION_ID}'
+                }
             }
         });
         recorderInterface = recorderContainer.data('recorder');
