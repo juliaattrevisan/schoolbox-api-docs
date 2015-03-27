@@ -248,10 +248,14 @@ class Queue extends ResourceVideo
 
     private function getSourceFile()
     {
+
         if ($this->getType() == QueueMapper::FILE_TYPE_SBFS) {
             return \Schoolbox\Resource\FileMapper::getInstance()->findById($this->fileID);
         } elseif ($this->getType() == QueueMapper::FILE_TYPE_STORAGE) {
-            return \Schoolbox\StorageMapper::getInstance()->findById($this->fileID);
+            $oldStorage = \Schoolbox\StorageMapper::getInstance()->findById($this->fileID);
+            $newStorage = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($oldStorage->getHash());
+
+            return $newStorage;
         } elseif ($this->getType() == QueueMapper::FILE_TYPE_SUBMISSION) {
             return \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper::getInstance()->findById($this->fileID);
         } else if ($this->getType() == QueueMapper::FILE_TYPE_MYFILE) {
@@ -266,7 +270,10 @@ class Queue extends ResourceVideo
         if ($this->getType() == QueueMapper::FILE_TYPE_SBFS) {
             return $sourceObject->getFileLocation();
         } elseif ($this->getType() == QueueMapper::FILE_TYPE_STORAGE) {
-            return $sourceObject->getFileLocation();
+            $configLoader = new \Schoolbox\Config\Loader();
+            $path = $configLoader->get('storage_dir'). '/' . $sourceObject->getPath();
+
+            return $path;
         } elseif ($this->getType() == QueueMapper::FILE_TYPE_SUBMISSION) {
             return $sourceObject->getFileLocation();
         } else if ($this->getType() == QueueMapper::FILE_TYPE_MYFILE) {
