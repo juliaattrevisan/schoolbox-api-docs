@@ -11,7 +11,7 @@
  */
 namespace SocialStream\Cache;
 
-class Filesystem extends \Alaress\Image\Cache\Filesystem {
+class Filesystem extends \Alaress\Image\Cache\BrokenFS {
 
 	/**
 	 * Constructor
@@ -22,8 +22,6 @@ class Filesystem extends \Alaress\Image\Cache\Filesystem {
 	 * @param $key
 	 */
 	public function __construct($filename, $key) {
-		$this->setFilename($filename);
-		$this->setKey($key);
-		$this->setCacheLocation(\Cfg::get('stream_dir') . '/socialstream/thumbnails');
+        parent::__construct(\Cfg::get('stream_dir') . '/socialstream/thumbnails', $filename, $key);
 	}
 }

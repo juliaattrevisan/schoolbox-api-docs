@@ -10,19 +10,18 @@
 require_once '../../include/Bootstrap.php';
 
 try {
-	if (isset($_GET['hash']) && $_GET['hash']) {
-		/* @var $resource Schoolbox\Storage */
-		$resource = Schoolbox\StorageMapper::getInstance()->findByHash($_GET['hash']);
+    if (isset($_GET['hash']) && $_GET['hash']) {
+        $resource = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($_GET['hash']);
 
-		if ($resource != false) {
-			$image = new Alaress\Image\Storage(
-                $resource,
-                $_GET['size'],
-                new \Alaress\Image\Transformation\Storage()
-            );
-			exit;
-		}
-	}
+        $image = new Alaress\Image\Storage(
+            $resource,
+            $_GET['size'],
+            new \Alaress\Image\Transformation\Storage()
+        );
+
+        $image->stream();
+        exit;
+    }
 }
 catch (Exception $e) { }
 SitePage::redirectToBrokenImageWithTransform('storage', $_GET['size'], 404);

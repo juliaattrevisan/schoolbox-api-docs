@@ -9,6 +9,9 @@
  */
 namespace SocialStream;
 
+use Alaress\Image;
+use Alaress\Image\Implementation\Imagine;
+
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $postId = $_GET['id'];
@@ -29,11 +32,11 @@ $cache->init($post->getThumbnail());
 $cache = new Cache\Filesystem($cache->getCachedFile(), $size);
 
 try {
-    $processor = new \Alaress\Image\Processor\Standard(
+    $processor = new Image\Processor\Standard(
         $cache,
-        new \Alaress\Image\Transformation\Storage(),
-        new \Alaress\Image\Implementation\Imagine\Filetype\Factory(),
-        new \Alaress\Image\Implementation\Imagine\Processor\Strategy\Factory()
+        new Image\Transformation\Storage(),
+        new Imagine\Filetype\Factory(),
+        new Imagine\Processor\Strategy\Factory()
     );
     $processor->load()->stream();
 } catch (\Exception_Schoolbox $e) {
