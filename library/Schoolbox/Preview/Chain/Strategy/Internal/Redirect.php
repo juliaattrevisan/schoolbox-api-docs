@@ -19,6 +19,14 @@ class Redirect extends Base {
      * @return mixed
      */
     public function test() {
-        return false;
+        return [
+            'type' => 'redirect',
+            'twig' => [
+                'template' => '@preview/Strategy/Redirect.twig',
+                'data' => [
+                    'src' => $this->getUrl()
+                ]
+            ]
+        ];
     }
 } 

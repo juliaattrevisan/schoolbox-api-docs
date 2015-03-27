@@ -30,7 +30,7 @@ class Internal extends Base {
             new Image($url, $hash),
             new Media($url, $hash),
             new IFrame($url, $hash),
-//            new Redirect($url, $hash),
+            new Redirect($url, $hash),
         ]);
     }
 }
