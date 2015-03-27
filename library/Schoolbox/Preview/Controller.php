@@ -16,6 +16,9 @@ class Controller extends Base
 
     public function index($params) {
         $testUrls = [
+
+            /* Generic locations
+             */
             "http://www.taylorswift.com/",
             "http://edition.cnn.com/",
             "http://192.168.36.10/learningAnalytics/177",
@@ -24,26 +27,30 @@ class Controller extends Base
             "http://en.wikipedia.org/wiki/FR._Lee_Ermey",
             "https://vimeo.com/channels/staffpicks/23371242",
             "https://twitter.com/arstechnica/status/533056992592818176",
-            "http://s3.majorleaguegaming.com/files/OrlandoChamp.zip",
             "https://www.youtube.com/watch?v=zPonioDYnoY",
             "https://soundcloud.com/majorlazer",
             "http://globe-views.com/dcim/dreams/owl/owl-03.jpg",
             "http://pugetsoundbirds.org/wp-content/uploads/2010/06/Northern-saw-whet-owl.jpg",
             "http://www.libertyscentre.co.uk/Owls/large/Collared%20Scops%20Owl.jpg",
 
-            /* Jpg
+            /* File downloads
+             */
+            "http://s3.majorleaguegaming.com/files/OrlandoChamp.zip",
+
+            /* Jpg uploads into Course Builder
              */
             "/storage/fetch.php?hash=62f643c3b484a87f3ce2e3a8216c7f232787af02",
 
-            /* Png
+            /* Png uploads into Course Builder
              */
             "/storage/fetch.php?hash=c28763abce0725ccde28dbdd84aec956844a596d",
 
-            /* Video
+            /* Video uploads into Course Builder
              */
             "/storage/fetch.php?hash=10d6e62fec60bbbff5cdae4aae78c8aa64b69ef9",
+            "/storage/fetch.php?hash=fcd9618abc108c9b1e7a110b429cc3f4b7df3d4c",
 
-            /* Audio
+            /* Audio uploads into Course Builder
              */
             "/storage/fetch.php?hash=0f5ad33468ff91ff4ea3f30788467905bd454fc5",
         ];
