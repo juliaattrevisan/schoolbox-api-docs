@@ -30,7 +30,7 @@ class Image extends Base {
                     return [
                         'type' => 'html-fragment',
                         'twig' => [
-                            'template' => '@preview/Strategy/Image.twig',
+                            'template' => '@preview/Strategy/Shared/Image.twig',
                             'data' => [
                                 'src' => $this->getUrl()
                             ]

@@ -22,7 +22,7 @@ class Redirect extends Base {
         return [
             'type' => 'redirect',
             'twig' => [
-                'template' => '@preview/Strategy/Redirect.twig',
+                'template' => '@preview/Strategy/Shared/Redirect.twig',
                 'data' => [
                     'src' => $this->getUrl()
                 ]

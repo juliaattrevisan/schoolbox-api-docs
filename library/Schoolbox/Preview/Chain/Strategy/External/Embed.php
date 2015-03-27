@@ -30,7 +30,7 @@ class Embed extends Base {
             return [
                 'type' => 'html-fragment',
                 'twig' => [
-                    'template' => '@preview/Strategy/Embed.twig',
+                    'template' => '@preview/Strategy/External/Embed.twig',
                     'data' => [
                         'src' => $embedCode
                     ]

@@ -41,7 +41,7 @@ class IFrame extends Base {
                     return [
                         'type' => 'html-fragment',
                         'twig' => [
-                            'template' => '@preview/Strategy/IFrame.twig',
+                            'template' => '@preview/Strategy/Shared/IFrame.twig',
                             'data' => [
                                 'src' => $this->getUrl()
                             ]
