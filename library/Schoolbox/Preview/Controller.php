@@ -14,6 +14,12 @@ use Schoolbox\Preview\Chain\External;
 class Controller extends Base
 {
 
+    /**
+     * A list of test urls to try
+     * Can delete this later
+     * 
+     * @param $params
+     */
     public function index($params) {
         $testUrls = [
 
