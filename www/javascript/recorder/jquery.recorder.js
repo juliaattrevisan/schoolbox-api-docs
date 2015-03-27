@@ -24,15 +24,29 @@
     };
 
     var Recorder = function(element, options) {
-        this.element = element;
-        this.options = $.extend(true, {}, defaultOptions, options);
-        this.flash   = {};
-        this.webrtc  = {};
+        this.element   = element;
+        this.options   = $.extend(true, {}, defaultOptions, options);
+        this.flash     = {};
+        this.webrtc    = {};
+        this.recording = false;
+        this.playing   = false;
         this.attemptWebRtcSetup();
         this.attemptFlashSetup();
         if (this.isWebRtcSupported() || this.isFlashSupported()) {
             this.triggerEvent('setup');
             this.triggerEvent('recordingReady');
+            this.bindEvent('recordingStart', function(event, recorder) {
+                recorder.recording = true;
+            });
+            this.bindEvent('recordingStop', function(event, recorder) {
+                recorder.recording = false;
+            });
+            this.bindEvent('playbackStart', function(event, recorder) {
+                recorder.playing = true;
+            });
+            this.bindEvent('playbackStop', function(event, recorder) {
+                recorder.playing = false;
+            });
         } else {
             this.triggerEvent('setupFailed');
         }
@@ -189,6 +203,42 @@
     };
 
     /**
+     * @returns {boolean}
+     */
+    Recorder.prototype.isRecording = function() {
+        return this.recording;
+    };
+
+    /**
+     * @returns {boolean}
+     */
+    Recorder.prototype.isPlaying = function() {
+        return this.playing;
+    };
+
+    /**
+     * Gets the MIME type of the uploaded file.
+     *
+     * Only works for WebRTC uploads.
+     *
+     * @returns {string}
+     */
+    Recorder.prototype.getUploadedFileMimeType = function() {
+        return this.webrtc.blob.type;
+    };
+
+    /**
+     * Gets the size of the uploaded file.
+     *
+     * Only works for WebRTC uploads.
+     *
+     * @returns {string}
+     */
+    Recorder.prototype.getUploadedFileSize = function() {
+        return this.webrtc.blob.size;
+    };
+
+    /**
      * Upload whatever has been recorded.
      *
      * @param filename A filename to upload with.
@@ -210,18 +260,7 @@
                 }
             )
             .done(function(response, textStatus, jqXHR) {
-                self.triggerEvent('uploadComplete', [response, textStatus, jqXHR]);
-                // inform any listeners that a file was uploaded.
-                // put it in the dropzone, and inform the dropzone opener
-                // that a file was posted to it.
-                var data = {
-                    title:    filename,
-                    mimeType: self.webrtc.blob.type,
-                    filesize: self.webrtc.blob.size,
-                    hash:     response.hash
-                };
-                // Replace with a uploadDone event
-                window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
+                self.triggerEvent('uploadComplete', [filename, response, textStatus, jqXHR]);
             })
             .fail(function(jqXHR, textStatus, errorThrown) {
                 self.triggerEvent('uploadFailed', [jqXHR, textStatus, errorThrown]);
@@ -235,7 +274,7 @@
                 audioParam: 'upload',
                 params: params,
                 success: function(response) {
-                    self.triggerEvent('uploadComplete', [response]);
+                    self.triggerEvent('uploadComplete', [filename, response]);
                 },
                 error: function() {
                     // Don't know if there's any params that get passed here
@@ -243,6 +282,16 @@
                 }
             })
         }
+    };
+
+    /**
+     * Binds an event callback to an event name.
+     *
+     * @param eventName
+     * @param eventCallback
+     */
+    Recorder.prototype.bindEvent = function(eventName, eventCallback) {
+        this.element.bind(PLUGIN_NAME+'.'+eventName, eventCallback);
     };
 
     /**
