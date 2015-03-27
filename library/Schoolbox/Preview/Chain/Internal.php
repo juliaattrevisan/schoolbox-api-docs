@@ -14,7 +14,7 @@ namespace Schoolbox\Preview\Chain;
 
 use Schoolbox\Preview\Chain\Strategy\Internal\Image;
 use Schoolbox\Preview\Chain\Strategy\Internal\Media;
-use Schoolbox\Preview\Chain\Strategy\Internal\Iframe;
+use Schoolbox\Preview\Chain\Strategy\Internal\IFrame;
 use Schoolbox\Preview\Chain\Strategy\Internal\Redirect;
 
 class Internal extends Base {

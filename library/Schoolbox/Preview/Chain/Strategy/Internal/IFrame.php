@@ -12,6 +12,7 @@
 
 namespace Schoolbox\Preview\Chain\Strategy\Internal;
 
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 class IFrame extends Base {
 
@@ -21,7 +22,7 @@ class IFrame extends Base {
      * @var array
      */
     private $contentTypes = [
-        'html', 'htm', 'txt', 'csv', 'pdf', 'swf', 'xml',
+        'html', 'htm', 'txt', 'csv', 'pdf', 'swf',
     ];
 
     /**
@@ -30,21 +31,43 @@ class IFrame extends Base {
      * @return string
      */
     public function test() {
-        foreach ($this->getContentTypes() as $currentContentType) {
-            if (strstr($this->findContentType(), $currentContentType)) {
-                return [
-                    'type' => 'html-fragment',
-                    'twig' => [
-                        'template' => '@preview/Strategy/IFrame.twig',
-                        'data' => [
-                            'src' => $this->getUrl()
+        if ($this->isStorage()) {
+            $storageMapper = new StorageMapper();
+
+            try {
+                $item = $storageMapper->findByHash($this->getHash());
+
+                if (in_array($item->getExtension(), $this->getContentTypes())) {
+                    return [
+                        'type' => 'html-fragment',
+                        'twig' => [
+                            'template' => '@preview/Strategy/IFrame.twig',
+                            'data' => [
+                                'src' => $this->getUrl()
+                            ]
                         ]
-                    ]
-                ];
+                    ];
+                }
+            }
+            catch (\Exception $e) {
+                error(41);
             }
         }
 
         return $this->testNext();
+    }
+
+    /**
+     * Check if this is a storage url, it could contain anything
+     */
+    private function isStorage() {
+        preg_match('#storage\/fetch\.php#', $this->getUrl(), $matches);
+
+        if (count($matches)) {
+            return true;
+        }
+
+        return false;
     }
 
     /* Getters/Setters

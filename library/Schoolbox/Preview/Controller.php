@@ -59,6 +59,14 @@ class Controller extends Base
             /* Audio uploads into Course Builder
              */
             "/storage/fetch.php?hash=0f5ad33468ff91ff4ea3f30788467905bd454fc5",
+
+            /* XML file
+             */
+            "/storage/fetch.php?hash=f5ce8f8a0192c7de2602a4c132ad66b7ee0b13d6",
+
+            /* PDF file
+             */
+            "/storage/fetch.php?hash=9048cf1e07568ed0d35396c0e5fd70e852d3c285",
         ];
 
         $this->getResponse()->content->set([
