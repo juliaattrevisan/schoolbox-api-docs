@@ -1,6 +1,8 @@
 <?php
 /**
- * Image
+ * IFrame
+ *
+ * Load url in an iframe
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -11,7 +13,7 @@
 namespace Schoolbox\Preview\Chain\Strategy\External;
 
 
-class Html extends Base {
+class IFrame extends Base {
 
     /**
      * Content Types for this strategy
