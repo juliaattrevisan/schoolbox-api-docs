@@ -22,9 +22,6 @@ class Controller extends Base
      */
     public function index($params) {
         $testUrls = [
-
-            /* Generic locations
-             */
             ['External Generic url' => "http://www.taylorswift.com/"],
             ['External Generic url' => "http://edition.cnn.com/"],
             ['External Generic url' => "http://192.168.36.10/learningAnalytics/177"],
@@ -45,7 +42,7 @@ class Controller extends Base
             ['Local Video' => "/storage/fetch.php?hash=fcd9618abc108c9b1e7a110b429cc3f4b7df3d4c"],
             ['Local Audio' => "/storage/fetch.php?hash=0f5ad33468ff91ff4ea3f30788467905bd454fc5"],
             ['Local XML' => "/storage/fetch.php?hash=f5ce8f8a0192c7de2602a4c132ad66b7ee0b13d6"],
-            ['Local PDF' => "/storage/fetch.php?hash=9048cf1e07568ed0d35396c0e5fd70e852d3c285"],
+            ['Local PDF' => "/storage/fetch.php?hash=afaafce41021389f0cc857dfc03b136d6d1b2f29"],
         ];
 
         $this->getResponse()->content->set([
