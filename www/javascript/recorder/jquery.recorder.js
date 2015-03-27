@@ -146,6 +146,13 @@
      * @returns {Recorder}
      */
     Recorder.prototype.startRecording = function() {
+        // Starting recording stops any current recording and playing.
+        if (this.isRecording()) {
+            this.stopRecording();
+        }
+        if (this.isPlaying()) {
+            this.stopPlaying();
+        }
         var self = this;
         if (self.isWebRtcSupported()) {
             getUserMedia(
@@ -174,9 +181,13 @@
      * @returns {Recorder}
      */
     Recorder.prototype.playRecorded = function() {
-        this.stopRecording();
-        this.stopPlaying();
-        this.triggerEvent('playbackStop');
+        // Starting playing stops any current recording and playing.
+        if (this.isRecording()) {
+            this.stopRecording();
+        }
+        if (this.isPlaying()) {
+            this.stopPlaying();
+        }
         if (this.isWebRtcUsed()) {
             this.webrtc.audioElement[0].currentTime = 0;
             this.webrtc.audioElement[0].play();
