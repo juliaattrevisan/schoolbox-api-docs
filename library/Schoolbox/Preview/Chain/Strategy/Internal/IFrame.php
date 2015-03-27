@@ -26,7 +26,7 @@ class IFrame extends Base {
     ];
 
     /**
-     * Test the Content-Types
+     * IFrameable content
      *
      * @return string
      */
@@ -55,19 +55,6 @@ class IFrame extends Base {
         }
 
         return $this->testNext();
-    }
-
-    /**
-     * Check if this is a storage url, it could contain anything
-     */
-    private function isStorage() {
-        preg_match('#storage\/fetch\.php#', $this->getUrl(), $matches);
-
-        if (count($matches)) {
-            return true;
-        }
-
-        return false;
     }
 
     /* Getters/Setters

@@ -19,12 +19,12 @@ abstract class Base extends StrategyBase {
      *
      * @var string
      */
-    private $url = '';
+    protected $url = '';
 
     /**
      * @var string
      */
-    private $hash = '';
+    protected $hash = '';
 
     /**
      * Constructor
@@ -35,6 +35,19 @@ abstract class Base extends StrategyBase {
     public function __construct($url, $hash) {
         $this->setUrl($url);
         $this->setHash($hash);
+    }
+
+    /**
+     * Check if this is a storage url, it could contain anything
+     */
+    protected function isStorage() {
+        preg_match('#storage\/fetch\.php#', $this->getUrl(), $matches);
+
+        if (count($matches)) {
+            return true;
+        }
+
+        return false;
     }
 
     /* Getters/Setters

@@ -15,7 +15,7 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 class Media extends Base {
 
     /**
-     * Test
+     * Audio/visual files
      *
      * @return mixed
      */
@@ -55,18 +55,5 @@ class Media extends Base {
         }
 
         return $this->testNext();
-    }
-
-    /**
-     * Check if this is a storage url, it could contain anything
-     */
-    private function isStorage() {
-        preg_match('#storage\/fetch\.php#', $this->getUrl(), $matches);
-
-        if (count($matches)) {
-            return true;
-        }
-
-        return false;
     }
 }
