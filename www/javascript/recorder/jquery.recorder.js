@@ -16,7 +16,8 @@
         webrtc: {
             preview: '',
             channels: 1,
-            workerPath: '/javascript/recorder/webrtc/recorderWorker.js'
+            workerPath: '/javascript/recorder/webrtc/recorderWorker.js',
+            audioElement: null
         },
         upload: {
             url: ''
@@ -30,8 +31,8 @@
         this.webrtc    = {};
         this.recording = false;
         this.playing   = false;
-        this.attemptWebRtcSetup();
-        this.attemptFlashSetup();
+        this._attemptWebRtcSetup();
+        this._attemptFlashSetup();
         if (this.isWebRtcSupported() || this.isFlashSupported()) {
             this.triggerEvent('setup');
             this.triggerEvent('recordingReady');
@@ -55,17 +56,23 @@
     /**
      * Try to set up WebRTC recording.
      *
+     * @private
+     *
      * @returns {Recorder}
      */
-    Recorder.prototype.attemptWebRtcSetup = function() {
+    Recorder.prototype._attemptWebRtcSetup = function() {
         // If audio context doesn't exist, there's no way we can use WebRTC
+        var self = this;
         var audioContextConstructor = window.AudioContext || window.webkitAudioContext;
         if (audioContextConstructor) {
-            this.webrtc.supported    = true;
-            this.webrtc.audioContext = new audioContextConstructor();
-            this.webrtc.audioElement = $('<audio />');
+            self.webrtc.supported    = true;
+            self.webrtc.audioContext = new audioContextConstructor();
+            self.webrtc.audioElement = self.options.webrtc.audioElement || $('<audio />');
+            self.webrtc.audioElement.on('ended', function() {
+                self.triggerEvent('playbackStop');
+            });
         } else {
-            this.webrtc.supported = false;
+            self.webrtc.supported = false;
         }
         return this;
     };
@@ -73,9 +80,11 @@
     /**
      * Try to set up Flash recording.
      *
-     *  @returns {Recorder}
+     * @private
+     *
+     * @returns {Recorder}
      */
-    Recorder.prototype.attemptFlashSetup = function() {
+    Recorder.prototype._attemptFlashSetup = function() {
         // Is Flash even supported? I expect SWFObject to be present to determine that.
         this.flash.supported =
             swfobject
@@ -86,12 +95,16 @@
     };
 
     /**
-     * Private method: start recording in WebRTC mode
+     * Start recording in WebRTC mode
+     *
+     * @private
+     *
+     * @returns {Recorder}
      */
-    var startRecordingWebRtc = function() {
+    Recorder.prototype._startRecordingWebRtc = function(stream) {
         var self             = this;
         self.mode            = 'webrtc';
-        self.webrtc.stream   = s;
+        self.webrtc.stream   = stream;
         self.webrtc.recorder = new WebRtcRecorder(
             self.webrtc.audioContext.createMediaStreamSource(self.webrtc.stream),
             {
@@ -101,12 +114,17 @@
         );
         self.webrtc.recorder.record();
         self.triggerEvent('recordingStart');
+        return this;
     };
 
     /**
-     * Private method: start recording in Flash mode
+     * Start recording in Flash mode
+     *
+     * @private
+     *
+     * @returns {Recorder}
      */
-    var startRecordingFlash = function() {
+    Recorder.prototype._startRecordingFlash = function() {
         var self            = this;
         self.mode           = 'flash';
         self.flash.recorder = FlashRecorder;
@@ -118,6 +136,7 @@
                 self.triggerEvent('recordingStart');
             }
         });
+        return this;
     };
 
     /**
@@ -131,20 +150,20 @@
         if (self.isWebRtcSupported()) {
             getUserMedia(
                 self.options.userMedia,
-                function(s) {
-                    startRecordingWebRtc();
+                function(stream) {
+                    self._startRecordingWebRtc(stream);
                 },
                 function(error) {
                     // Try to fall back to Flash.
                     if (self.isFlashSupported()) {
-                        startRecordingFlash();
+                        self._startRecordingFlash();
                     } else {
                         self.triggerEvent('recordingStartFailed', [error]);
                     }
                 }
             );
         } else {
-            startRecordingFlash();
+            self._startRecordingFlash();
         }
         return this;
     };
@@ -159,9 +178,12 @@
         this.stopPlaying();
         this.triggerEvent('playbackStop');
         if (this.isWebRtcUsed()) {
-            this.webrtc.audioElement.play();
+            this.webrtc.audioElement[0].currentTime = 0;
+            this.webrtc.audioElement[0].play();
+            this.triggerEvent('playbackStart');
         } else if (this.isFlashUsed()) {
             this.flash.recorder.play();
+            this.triggerEvent('playbackStart');
         }
     };
 
@@ -173,7 +195,7 @@
     Recorder.prototype.stopPlaying = function() {
         this.triggerEvent('playbackStop');
         if (this.isWebRtcUsed()) {
-            this.webrtc.audioElement.stop();
+            this.webrtc.audioElement[0].pause();
         } else if (this.isFlashUsed()) {
             this.flash.recorder.stop();
         }
@@ -369,7 +391,7 @@
     };
 
     $.fn[PLUGIN_NAME] = function(options) {
-        this.each(function(element) {
+        this.each(function(i, element) {
             var $element = $(element);
             $element.data(PLUGIN_NAME, new Recorder($element, options));
         });
