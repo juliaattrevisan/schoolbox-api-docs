@@ -24,8 +24,6 @@ class Controller extends Base
         $testUrls = [
             ['External Generic url' => "http://www.taylorswift.com/"],
             ['External Generic url' => "http://edition.cnn.com/"],
-            ['External Generic url' => "http://192.168.36.10/learningAnalytics/177"],
-            ['External Generic url' => "https://www.google.com.au/search?q=taylor+swift&oq=taylor+swift&aqs=chrome..69i57j69i65j69i60l4.1253j0j4&sourceid=chrome&es_sm=93&ie=UTF-8"],
             ['External Generic url' => "http://en.wikipedia.org/wiki/FR._Lee_Ermey"],
             ['External Generic url' => "https://twitter.com/arstechnica/status/533056992592818176"],
             ['External Video Vimeo' => "https://vimeo.com/channels/staffpicks/23371242"],
@@ -46,6 +44,18 @@ class Controller extends Base
             ['Local PDF' => "/storage/fetch.php?hash=afaafce41021389f0cc857dfc03b136d6d1b2f29"],
             ['Local ZIP' => "/storage/fetch.php?hash=bb85de4fb0f04e27556763f7beaf7f8a0094c8ab"],
             ['Local URL' => "/homepage/43"],
+
+            /**
+             * Special cases
+             */
+
+            /* This url can't be embedded because X-Frame-Options is set to SAMEORIGIN
+             * In that case, skip directly to the redirect - but I can't even do that
+             * because http_response_code() always returns 404 (regardless of url) and
+             * getHeaders() is always 400 Bad Request. This url will just be an empty
+             * modal. Not sure how I'm going to get around that yet.
+             */
+            ['External Generic url' => "http://www.google.com.au/search?q=taylor+swift&oq=taylor+swift&aqs=chrome..69i57j69i65j69i60l4.1253j0j4&sourceid=chrome&es_sm=93&ie=UTF-8"],
         ];
 
         $this->getResponse()->content->set([
