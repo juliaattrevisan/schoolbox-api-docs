@@ -7,9 +7,8 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-use Alaress\Image\Cache\MyImage;
-use Alaress\Image\Processor\Freeform;
-use Alaress\Image\Processor\Standard;
+use Alaress\Image\Cache;
+use Alaress\Image\Processor;
 
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
@@ -17,74 +16,68 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
  */
 session_start();
 
-if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
-    if (empty($_SESSION['id'])) {
-        Sitepage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 403);
-    }
+if (empty($_SESSION['id'])) {
+    redirectToBroken(403);
+}
 
-//	$db = DeprecatedDatabase::getInstance();
-//
-//	$query = "SELECT id, owner, mime_type, deleted FROM myFile WHERE id = {$_GET['id']}";
-//	$fileDir = Cfg::get('myfile_dir');
-//
-//	$imageInfo = $db->getRow($query);
+try {
+    $image = Schoolbox\Resource\My\File\Mapper::getInstance()->findById($_GET['id']);
+} catch (Schoolbox\Mapper\Exception $e) {
+    redirectToBroken(404);
+    exit;
+}
 
-    /* TODO: Add permissions later to prevent people from manufacturing
-	 * links to other people's images
-	 */
-//	/* See if you can view this image
-//	 */
-//	$eportfolioHandler = new Eportfolio_Container($imageInfo['owner']);
-//
-//	if (!$eportfolioHandler->canEdit($imageInfo['owner'])) {
-//		error(5);
-//	}
+if (isset($_GET['key'])) {
+    $key = $_GET['key'];
+    $transform = new \Alaress\Image\Transformation\Storage();
 
-    /* Choose a caching method to use
-	 */
+} elseif (isset($_GET['width']) && isset($_GET['height'])) {
     $key = $_GET['width'] . 'x' . $_GET['height'];
+    $transform = new \Alaress\Image\Transformation\MyImage($_GET['width'], $_GET['height']);
 
-    $cache = new MyImage($_GET['id'], $key);
-
-    /* Process and stream image
-	 */
-    $imageProcessor = new Freeform(
-        $cache,
-        new \Alaress\Image\Transformation\MyImage($_GET['width'], $_GET['height']),
-        new \Alaress\Image\Implementation\Imagine\Filetype\Factory(),
-        new \Alaress\Image\Implementation\Imagine\Processor\Strategy\Factory()
-    );
-    try {
-        $imageProcessor->load()->stream();
-    } catch (Exception_Schoolbox_NotFound $e) {
-        SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
-    }
-    catch (Exception $e) {
-        SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 500);
-    }
 } else {
-    if (empty($_SESSION['id'])) {
-        SitePage::redirectToBrokenImageWithTransform('storage', $_GET['key'], 403);
-    }
+    redirectToBroken(400);
+    exit;
+}
 
-    $cache = new MyImage($_GET['id'], $_GET['key']);
+try {
+    $cache = new Cache\Storage($image->getStorage(), $key);
+    createProcessor($cache, $transform)->load()->stream();
 
-    /* Process and stream image
-	 */
-    $imageProcessor = new Standard(
-        $cache,
-        new \Alaress\Image\Transformation\Storage(),
-        new \Alaress\Image\Implementation\Imagine\Filetype\Factory(),
-        new \Alaress\Image\Implementation\Imagine\Processor\Strategy\Factory()
-    );
-    try {
-        $imageProcessor->load()->stream();
-    } catch (Exception_Schoolbox_NotFound $e) {
-        //
-        // Pass transform to broken image selector
-        SitePage::redirectToBrokenImageWithTransform('storage', $_GET['key'], 404);
+} catch (Exception_Schoolbox_NotFound $e) {
+    redirectToBroken(404);
+
+} catch (Exception $e) {
+    redirectToBroken(500);
+}
+
+exit;
+
+/**
+ * @param int $code
+ */
+function redirectToBroken($code = 500)
+{
+    if (isset($_GET['key'])) {
+        SitePage::redirectToBrokenImageWithTransform('storage', $_GET['key'], $code);
+    } elseif (isset($_GET['width'])) {
+        SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height '] ?: $_GET['width'], $code);
     }
-    catch (Exception $e) {
-        SitePage::redirectToBrokenImageWithTransform('storage', $_GET['key'], 500);
+}
+
+/**
+ * @param $cache
+ * @param $transform
+ * @return Processor\Standard
+ */
+function createProcessor($cache, $transform)
+{
+    $ftFactory    = new \Alaress\Image\Implementation\Imagine\Filetype\Factory();
+    $stratFactory = new \Alaress\Image\Implementation\Imagine\Processor\Strategy\Factory();
+
+    if (isset($_GET['key'])) {
+        return new Processor\Standard($cache, $transform, $ftFactory, $stratFactory);
+    } else {
+        return new Processor\Freeform($cache, $transform, $ftFactory, $stratFactory);
     }
 }

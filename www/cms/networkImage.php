@@ -7,27 +7,8 @@
  * @version     SVN: $Id$
  */
 
-use Alaress\Image\Cache\MyImage;
 
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
+// a bit heavy-handed, but I guess we're not implementing file previews for network??
 SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
-
-if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
-	if (empty($_SESSION['id'])) {
-		Sitepage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 403);
-	}
-
-	$key = $_GET['width'] . 'x' . $_GET['height'];
-
-	$cache = new MyImage('network-' . $_GET['id'], $key);
-
-	$fileHandler = PortfolioWebDAV::factory();
-	try {
-		$filename = $fileHandler->getFile($_GET['id']);
-	}
-	catch (Sabre\DAV\Exception $ex) {
-		error(41);
-	}
-
-}
