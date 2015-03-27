@@ -14,8 +14,7 @@ namespace Schoolbox\Preview\Chain;
 
 use Schoolbox\Preview\Chain\Strategy\Internal\Image;
 use Schoolbox\Preview\Chain\Strategy\Internal\Media;
-use Schoolbox\Preview\Chain\Strategy\Internal\Embed;
-use Schoolbox\Preview\Chain\Strategy\Internal\Html;
+use Schoolbox\Preview\Chain\Strategy\Internal\Iframe;
 use Schoolbox\Preview\Chain\Strategy\Internal\Redirect;
 
 class Internal extends Base {
@@ -30,7 +29,7 @@ class Internal extends Base {
         $this->start([
             new Image($url, $hash),
             new Media($url, $hash),
-//            new Html($url, $hash),
+            new IFrame($url, $hash),
 //            new Redirect($url, $hash),
         ]);
     }
