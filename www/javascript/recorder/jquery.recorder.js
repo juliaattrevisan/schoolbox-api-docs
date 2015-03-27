@@ -30,10 +30,12 @@
         this.webrtc  = {};
         this.attemptWebRtcSetup();
         this.attemptFlashSetup();
-        if (!(this.isWebRtcSupported() || this.isFlashSupported())) {
-            throw new Error('Neither WebRTC nor Flash is supported');
+        if (this.isWebRtcSupported() || this.isFlashSupported()) {
+            this.triggerEvent('setup');
+            this.triggerEvent('recordingReady');
+        } else {
+            this.triggerEvent('setupFailed');
         }
-        this.triggerEvent('recordingReady');
     };
 
     /**
@@ -70,44 +72,64 @@
     };
 
     /**
-     * Starts recording.
+     * Private method: start recording in WebRTC mode
+     */
+    var startRecordingWebRtc = function() {
+        var self             = this;
+        self.mode            = 'webrtc';
+        self.webrtc.stream   = s;
+        self.webrtc.recorder = new WebRtcRecorder(
+            self.webrtc.audioContext.createMediaStreamSource(self.webrtc.stream),
+            {
+                workerPath: self.options.webrtc.workerPath,
+                numChannels: self.options.webrtc.channels
+            }
+        );
+        self.webrtc.recorder.record();
+        self.triggerEvent('recordingStart');
+    };
+
+    /**
+     * Private method: start recording in Flash mode
+     */
+    var startRecordingFlash = function() {
+        var self            = this;
+        self.mode           = 'flash';
+        self.flash.recorder = FlashRecorder;
+        self.flash.recorder.initialize({
+            swfSrc: self.options.flash.swfSrc
+        });
+        self.flash.recorder.record({
+            start: function() {
+                self.triggerEvent('recordingStart');
+            }
+        });
+    };
+
+    /**
+     * Starts recording, in Flash or WebRTC mode depending on which setup
+     * succeeded or failed.
      */
     Recorder.prototype.startRecording = function() {
         var self = this;
-        getUserMedia(
-            self.options.userMedia,
-            function(s) {
-                // use RecorderJS
-                self.mode            = 'webrtc';
-                self.webrtc.stream   = s;
-                self.webrtc.recorder = new WebRtcRecorder(
-                    self.webrtc.audioContext.createMediaStreamSource(self.webrtc.stream),
-                    {
-                        workerPath: self.options.webrtc.workerPath,
-                        numChannels: self.options.webrtc.channels
+        if (self.isWebRtcSupported()) {
+            getUserMedia(
+                self.options.userMedia,
+                function(s) {
+                    startRecordingWebRtc();
+                },
+                function(error) {
+                    // Try to fall back to Flash.
+                    if (self.isFlashSupported()) {
+                        startRecordingFlash();
+                    } else {
+                        self.triggerEvent('recordingStartFailed', [error]);
                     }
-                );
-                self.webrtc.recorder.record();
-                self.triggerEvent('recordingStart');
-            },
-            function (error) {
-                // Try to fall back to Flash.
-                if (self.isFlashSupported()) {
-                    self.mode = 'flash';
-                    self.flash.recorder = FlashRecorder;
-                    self.flash.recorder.initialize({
-                        swfSrc: self.options.flash.swfSrc
-                    });
-                    self.flash.recorder.record({
-                        start: function() {
-                            self.triggerEvent('recordingStart');
-                        }
-                    });
-                } else {
-                    self.triggerEvent('recordingStartFailed', [error]);
                 }
-            }
-        );
+            );
+        } else {
+            startRecordingFlash();
+        }
     };
 
     /**
