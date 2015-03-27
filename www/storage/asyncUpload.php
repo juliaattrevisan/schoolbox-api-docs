@@ -14,8 +14,8 @@ require_once __DIR__ . '/../../include/Bootstrap.php';
 
 $returnMeta = false;
 
-// Force session usage due to flash uploader
-// http://www.uploadify.com/documentation/uploadify/using-sessions-with-uploadify/
+// Force session usage due to flash audio recorder.
+// (Uploadify will die, but this is still needed for flash audio upload.)
 if (isset($_POST[session_name()])) {
     session_id($_POST[session_name()]);
     session_start();
