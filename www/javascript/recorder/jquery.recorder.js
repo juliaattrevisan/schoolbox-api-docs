@@ -55,7 +55,7 @@
     /**
      * Try to set up WebRTC recording.
      *
-     * @returns {boolean}
+     * @returns {Recorder}
      */
     Recorder.prototype.attemptWebRtcSetup = function() {
         // If audio context doesn't exist, there's no way we can use WebRTC
@@ -67,13 +67,13 @@
         } else {
             this.webrtc.supported = false;
         }
-        return this.isWebRtcSupported();
+        return this;
     };
 
     /**
      * Try to set up Flash recording.
      *
-     * @returns {boolean}
+     *  @returns {Recorder}
      */
     Recorder.prototype.attemptFlashSetup = function() {
         // Is Flash even supported? I expect SWFObject to be present to determine that.
@@ -82,7 +82,7 @@
             && swfobject.hasFlashPlayerVersion
             && swfobject.hasFlashPlayerVersion('10.1')
         ;
-        return this.isFlashSupported();
+        return this;
     };
 
     /**
@@ -123,6 +123,8 @@
     /**
      * Starts recording, in Flash or WebRTC mode depending on which setup
      * succeeded or failed.
+     *
+     * @returns {Recorder}
      */
     Recorder.prototype.startRecording = function() {
         var self = this;
@@ -144,10 +146,13 @@
         } else {
             startRecordingFlash();
         }
+        return this;
     };
 
     /**
      * Plays back a recorded sound.
+     *
+     * @returns {Recorder}
      */
     Recorder.prototype.playRecorded = function() {
         this.stopRecording();
@@ -162,6 +167,8 @@
 
     /**
      * Stops playing back whatever was recorded.
+     *
+     * @returns {Recorder}
      */
     Recorder.prototype.stopPlaying = function() {
         this.triggerEvent('playbackStop');
@@ -174,6 +181,8 @@
 
     /**
      * Stops recording.
+     *
+     * @returns {Recorder}
      */
     Recorder.prototype.stopRecording = function() {
         var self = this;
@@ -200,6 +209,7 @@
             self.triggerEvent('playbackReady');
             self.triggerEvent('uploadReady');
         }
+        return this;
     };
 
     /**
@@ -242,6 +252,8 @@
      * Upload whatever has been recorded.
      *
      * @param filename A filename to upload with.
+     *
+     * @returns {Recorder}
      */
     Recorder.prototype.uploadRecorded = function(filename) {
         var self = this;
@@ -282,6 +294,7 @@
                 }
             })
         }
+        return this;
     };
 
     /**
@@ -289,9 +302,12 @@
      *
      * @param eventName
      * @param eventCallback
+     *
+     * @returns {Recorder}
      */
     Recorder.prototype.bindEvent = function(eventName, eventCallback) {
         this.element.bind(PLUGIN_NAME+'.'+eventName, eventCallback);
+        return this;
     };
 
     /**
@@ -302,6 +318,8 @@
      *
      * @param eventName
      * @param extraParams
+     *
+     * @returns {Recorder}
      */
     Recorder.prototype.triggerEvent = function(eventName, extraParams) {
         var params = [this];
@@ -311,6 +329,7 @@
             });
         }
         this.element.trigger(PLUGIN_NAME+'.'+eventName, params);
+        return this;
     };
 
     /**
