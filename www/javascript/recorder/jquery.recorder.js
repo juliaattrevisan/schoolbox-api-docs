@@ -11,7 +11,9 @@
                 name: '',
                 id: ''
             },
-            swfSrc: '/javascript/recorder/flash/recorder.swf'
+            swfSrc: '/javascript/recorder/flash/recorder.swf',
+            flashContainer: null,
+            onFlashSecurity: $.noop
         },
         webrtc: {
             preview: '',
@@ -69,7 +71,7 @@
             self.webrtc.audioContext = new audioContextConstructor();
             self.webrtc.audioElement = self.options.webrtc.audioElement || $('<audio />');
             self.webrtc.audioElement.on('ended', function() {
-                self.triggerEvent('playbackStop');
+                self.triggerEvent('playbackStop', []);
             });
         } else {
             self.webrtc.supported = false;
@@ -91,6 +93,14 @@
             && swfobject.hasFlashPlayerVersion
             && swfobject.hasFlashPlayerVersion('10.1')
         ;
+        if (this.isFlashSupported()) {
+            this.flash.recorder = FlashRecorder;
+            this.flash.recorder.initialize({
+                swfSrc: this.options.flash.swfSrc,
+                flashContainer: this.options.flash.flashContainer,
+                onFlashSecurity: this.options.flash.onFlashSecurity
+            });
+        }
         return this;
     };
 
@@ -127,15 +137,9 @@
     Recorder.prototype._startRecordingFlash = function() {
         var self            = this;
         self.mode           = 'flash';
-        self.flash.recorder = FlashRecorder;
-        self.flash.recorder.initialize({
-            swfSrc: self.options.flash.swfSrc
-        });
-        self.flash.recorder.record({
-            start: function() {
-                self.triggerEvent('recordingStart', []);
-            }
-        });
+        // start() never seems to trigger
+        self.triggerEvent('recordingStart', []);
+        self.flash.recorder.record();
         return this;
     };
 
@@ -311,9 +315,11 @@
                 self.triggerEvent('uploadFailed', [jqXHR, textStatus, errorThrown]);
             });
         } else if (self.isFlashUsed()) {
-            var params = {};
-            params[self.flash.session.name] = self.flash.session.id;
-            FlashRecorder.upload({
+            var params = {
+                filename: filename
+            };
+            params[self.options.flash.session.name] = self.options.flash.session.id;
+            self.flash.recorder.upload({
                 url: self.options.upload.url,
                 method: 'post',
                 audioParam: 'upload',
