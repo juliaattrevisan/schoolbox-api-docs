@@ -286,7 +286,7 @@
             formData.append('upload', self.webrtc.blob, filename);
             $.ajax(
                 {
-                    url: self.upload.url,
+                    url: self.options.upload.url,
                     type: 'post',
                     data: formData,
                     contentType: false,
@@ -303,7 +303,7 @@
             var params = {};
             params[self.flash.session.name] = self.flash.session.id;
             FlashRecorder.upload({
-                url: self.upload.url,
+                url: self.options.upload.url,
                 method: 'post',
                 audioParam: 'upload',
                 params: params,
