@@ -63,12 +63,25 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                     $checked_campus_list[$campus_code] = true;
                     $day_number = $timetableHandler->getDayNumber($campus_id);
                     if ($day_number) {
+
                         $this->dayNumber[$campus_id] = $timetableHandler->getDayNumber($campus_id);
+                        $this->dayName[$campus_id] = $timetableHandler->getDayName($day_number);
                         $this->currentPeriod[$campus_id] = $timetableHandler->getPeriodNumber($campus_id);
                         $this->timetable[$campus_id] = $timetableHandler->getDayTimetable(
                             $_SESSION['sid'], $_SESSION['id'], $campus_id, $day_number
                         );
                     }
+                    else {
+                        /* Default to first day of timetable */
+                        $this->dayNumber[$campus_id] = 1;
+                        $this->dayName[$campus_id] = $timetableHandler->getDayName(1);
+                        $this->currentPeriod[$campus_id] = -1;
+                        $this->timetable[$campus_id] = $timetableHandler->getDayTimetable(
+                            $_SESSION['sid'], $_SESSION['id'], $campus_id, 1
+                        );
+                    }
+
+
                 }
             }
         }
@@ -78,6 +91,11 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         return true;
 
 
+    }
+
+    function __call($name, $arguments)
+    {
+        // TODO: Implement __call() method.
     }
 
     public function renderTemplate($templateHandle)
@@ -135,7 +153,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                 } else {
                     $this->setVar('timetable_campus_name_block', '');
                 }
-                $this->setVar("DAYNUMBER", $this->dayNumber[$campus_id]);
+                $this->setVar("DAYNAME", $this->dayName[$campus_id]);
                 $current_period = $this->currentPeriod[$campus_id];
                 /* Setup colour map */
                 $subjectColourMap = array();
