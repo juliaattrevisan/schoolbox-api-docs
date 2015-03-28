@@ -7,7 +7,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('include/time.php');
 
 $groupHandler  = new Group();
 $assessHandler = new Survey_Main();
