@@ -51,11 +51,20 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
         if ( $this->getConfig('poll') && is_numeric($this->getConfig('poll')) ) {
             $poll = $pollHandler->getByID($this->getConfig('poll'));
 
+            $created = new Alaress_Date_Format;
+            $created->setFromFormat($poll['created'], Alaress_Date_Format::DATABASE_FORMAT);
+
+            $author = \Schoolbox\UserMapper::getInstance()->findById($poll['created_by']);
+
             if ($poll['pollID']) {
                 $this->setVar(array(
                     'POLL_ID'		=> $poll['pollID'],
                     'POLL_TITLE'	=> strlen(trim($this->getConfig('componentname'))) ? $this->getConfig( 'componentname') : 'Poll',
                     'POLL_QUESTION'	=> Scrub::text($poll['question']),
+                    'POLL_AUTHOR_ID'=> $author->getId(),
+                    'POLL_AUTHOR_THUMB' =>  "/portrait.php?userId={$author->getExternalId()}&size=square32",
+                    'POLL_AUTHOR_NAME'   => $author->getFullName(),
+                    'POLL_CREATED'  => $created->getRelativeTime(),
                 ));
 
                 $pollData = $pollHandler->getData($poll['pollID']);
