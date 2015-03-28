@@ -152,6 +152,18 @@ class External_Tass_Timetable implements External_TimetableInterface
         }
     }
 
+    /**
+     * Returns the day name
+     *
+     * @param $dayNumber
+     * @return String
+     */
+    public function getDayName($dayNumber)
+    {
+        return $dayNumber;
+    }
+
+
     function getLastDay($date, $campus)
     {
 

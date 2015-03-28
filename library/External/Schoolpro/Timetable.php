@@ -123,6 +123,17 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     }
 
     /**
+     * Returns the day name
+     *
+     * @param $dayNumber
+     * @return String
+     */
+    public function getDayName($dayNumber)
+    {
+        return $dayNumber;
+    }
+
+    /**
      * Get period number for a particular campus
      *
      * @param int $campusId

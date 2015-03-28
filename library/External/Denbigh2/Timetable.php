@@ -148,6 +148,19 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
         return unserialize($encoded);
     }
 
+
+    /**
+     * Returns the day name
+     *
+     * @param $dayNumber
+     * @return String
+     */
+    public function getDayName($dayNumber)
+    {
+        return $dayNumber;
+    }
+
+
     /**
      * Calculates the current period based on the current time
      *

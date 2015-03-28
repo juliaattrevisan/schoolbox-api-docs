@@ -111,6 +111,18 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         return $currentDay;
     }
 
+
+    /**
+     * Returns the day name
+     *
+     * @param $dayNumber
+     * @return String
+     */
+    public function getDayName($dayNumber)
+    {
+        return $dayNumber;
+    }
+
     public function getPeriodNumber($campusId, $now = 0)
     {
         return 0;

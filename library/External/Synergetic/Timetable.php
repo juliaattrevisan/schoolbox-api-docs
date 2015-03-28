@@ -209,6 +209,27 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         }
     }
 
+    /**
+     * Returns the day name
+     *
+     * @param $dayNumber
+     * @return String
+     */
+    public function getDayName($dayNumber)
+    {
+        $query = "SELECT Description FROM `luDays` WHERE `Code` = '{$this->getDatabase()->quote($dayNumber)}'";
+        $this->getDayNumber()->getRow($query);
+
+        if($query['Description']) {
+            return $query['Description'];
+        }
+        else {
+            return $dayNumber;
+        }
+
+    }
+
+
     public function getLastSynergeticDay($date, $campus)
     {
         //This function gets all start of term days entered into synergetic from the date provided backwards.

@@ -38,6 +38,15 @@ interface External_TimetableInterface
     public function getDayNumber($campusId, $date = 0);
 
     /**
+     * Returns the name of the current day
+     *
+     * @param $dayNumber
+     * @return String
+     *
+     */
+    function getDayName($dayNumber);
+
+    /**
      * Calculates the current period based on the current time
      *
      * The returned data structure is required for Dashboard Timetable Controller

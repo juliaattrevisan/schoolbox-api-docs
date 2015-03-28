@@ -56,6 +56,17 @@ class External_Timetable implements External_TimetableInterface
     }
 
     /**
+     * Returns the name of the current day
+     *
+     * @param $dayNumber
+     * @return String
+     *
+     */
+    function getDayName($dayNumber) {
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
+    }
+
+    /**
      * Determines the period number
      *
      * @param Integer $campusId

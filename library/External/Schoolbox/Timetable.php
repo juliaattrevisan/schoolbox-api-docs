@@ -89,6 +89,18 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         return $currentDay;
     }
 
+
+    /**
+     * Returns the day name
+     *
+     * @param $dayNumber
+     * @return String
+     */
+    public function getDayName($dayNumber)
+    {
+        return $dayNumber;
+    }
+
     /**
      * Gets a statement for fetching the periods for a given campus. Has
      * parameters :campusId (and :day if $single_day is true).

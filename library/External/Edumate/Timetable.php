@@ -138,6 +138,17 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     }
 
     /**
+     * Returns the day name
+     *
+     * @param $dayNumber
+     * @return String
+     */
+    public function getDayName($dayNumber)
+    {
+        return $dayNumber;
+    }
+
+    /**
      * Calculates the current period based on the current time
      *
      * @param int $campusId

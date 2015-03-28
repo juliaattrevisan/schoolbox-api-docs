@@ -189,6 +189,17 @@ class External_Maze_Timetable implements External_TimetableInterface
     }
 
     /**
+     * Returns the day name
+     *
+     * @param $dayNumber
+     * @return String
+     */
+    public function getDayName($dayNumber)
+    {
+        return $dayNumber;
+    }
+
+    /**
      * Calculates the current period based on the current time
      *
      * The returned data structure is required for Dashboard Timetable Controller
