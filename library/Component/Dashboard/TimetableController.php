@@ -71,17 +71,6 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                             $_SESSION['sid'], $_SESSION['id'], $campus_id, $day_number
                         );
                     }
-                    else {
-                        /* Default to first day of timetable */
-                        $this->dayNumber[$campus_id] = 1;
-                        $this->dayName[$campus_id] = $timetableHandler->getDayName(1);
-                        $this->currentPeriod[$campus_id] = -1;
-                        $this->timetable[$campus_id] = $timetableHandler->getDayTimetable(
-                            $_SESSION['sid'], $_SESSION['id'], $campus_id, 1
-                        );
-                    }
-
-
                 }
             }
         }
