@@ -85,6 +85,8 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
                 if ($dayNumber <= 0) {
                     continue;
                 }
+                $dayName = $this->getExternalTimetable()->getDayName($dayNumber);
+
                 $event = new Calendar_Event_Type_Day();
                 $event->setAllday(true);
                 $event->setStartTime(
@@ -94,7 +96,7 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
                     new Alaress_Date_Format(strtotime('00:00:00', $currentTimestamp), 'U')
                 );
                 $event->setPublishDate(null);
-                $event->setTitle(sprintf("%s: Day %d", $campusName, $dayNumber));
+                $event->setTitle(sprintf("%s: %s", $campusName, $dayName));
                 $event->setCampusList($campusId);
                 $event->setAccess(Calendar_Event_Type_Day::CAMPUS_ACCESS);
                 $event->setType($eventType);
