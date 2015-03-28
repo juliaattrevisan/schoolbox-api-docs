@@ -52,6 +52,7 @@ if (!empty($_POST)) {
         'anonymous_result' => $_POST['anonymous_result'],
         'notify_author' => $_POST['notify_author'],
         'max_attempts' => $_POST['max_attempts'],
+        'completion_message' => $_POST['completion_message'],
         'created_at' => 'NOW()',
     ));
 
@@ -96,6 +97,7 @@ else {
         'ASSESS_FINISH_DATE' => $assessEndDate->getLocalShort(),
         'ASSESS_ANONYMOUS_RESULT_CHECKED' => '',
         'ASSESS_NOTIFY_AUTHOR_CHECKED' => '',
+        'ASSESS_COMPLETION_MESSAGE' => '',
     ));
 
     /* Select default settings

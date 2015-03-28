@@ -66,6 +66,7 @@ if (!empty($_POST)) {
         'anonymous_result' => $_POST['anonymous_result'],
         'notify_author' => $_POST['notify_author'],
         'max_attempts' => $_POST['max_attempts'],
+        'completion_message' => $_POST['completion_message'],
     ));
 
     SitePage::localRedir('/survey/summary/' . $this->arg[0]);
@@ -99,6 +100,7 @@ else {
         'ASSESS_FINISH_DATE' => $assessFinishDate->getLocalShort(),
         'ASSESS_ANONYMOUS_RESULT_CHECKED' => $assess['anonymous_result'] ? 'checked="checked"' : '',
         'ASSESS_NOTIFY_AUTHOR_CHECKED' => $assess['notify_author'] ? 'checked="checked"' : '',
+        'ASSESS_COMPLETION_MESSAGE' => Scrub::text($assess['completion_message']),
     ));
 
     /* Render starting times
