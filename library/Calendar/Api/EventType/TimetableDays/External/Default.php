@@ -81,7 +81,7 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
             foreach ($this->getUser()->getCampusCollection() as $campus) {
                 $campusId  = $campus->getId();
                 $campusName = $campus->getName();
-                $dayNumber = $this->getExternalTimetable()->getDayNumber($campusId, $currentTimestamp);
+                $dayNumber = $this->getExternalTimetable()->getDayNumber($campus, $currentTimestamp);
                 if ($dayNumber <= 0) {
                     continue;
                 }
