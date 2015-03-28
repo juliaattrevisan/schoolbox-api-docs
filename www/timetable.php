@@ -179,7 +179,7 @@ if (is_array($outputList)) {
                             } else {
                                 $this->setVar('TIMETABLE_CLASS', 'normal');
                             }
-                            $this->setVar('DAY_NUMBER', $dayCount);
+                            $this->setVar('DAY_NAME', $timetableHandler->getDayName($dayCount));
                             $this->parse('day_header_listing', 'day_header', true);
                         }
 
