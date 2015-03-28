@@ -120,7 +120,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
      */
     public function getDayName($dayNumber)
     {
-        return $dayNumber;
+        return 'Day ' . $dayNumber;
     }
 
     public function getPeriodNumber($campusId, $now = 0)

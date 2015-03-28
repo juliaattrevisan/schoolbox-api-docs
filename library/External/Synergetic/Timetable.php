@@ -217,14 +217,14 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      */
     public function getDayName($dayNumber)
     {
-        $query = "SELECT Description FROM `luDays` WHERE `Code` = '{$this->getDatabase()->quote($dayNumber)}'";
-        $this->getDayNumber()->getRow($query);
+        $query = "SELECT Description FROM luDays WHERE Code = '{$this->getDatabase()->quote($dayNumber)}'";
+        $result = $this->getDatabase()->getRow($query);
 
-        if($query['Description']) {
-            return $query['Description'];
+        if($result['Description']) {
+            return $result['Description'];
         }
         else {
-            return $dayNumber;
+            return 'Day ' . $dayNumber;
         }
 
     }

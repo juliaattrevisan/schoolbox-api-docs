@@ -157,7 +157,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
      */
     public function getDayName($dayNumber)
     {
-        return $dayNumber;
+        return 'Day ' . $dayNumber;
     }
 
 

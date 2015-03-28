@@ -145,7 +145,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      */
     public function getDayName($dayNumber)
     {
-        return $dayNumber;
+        return 'Day ' . $dayNumber;
     }
 
     /**
