@@ -87,7 +87,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         }
 
         $timetableDef['periodCount'] = $periodCount;
-        $timetableDef['dayCount']    = $campusModel->getTimetableDay();
+        $timetableDef['dayCount']    = $this->getTotalDays($campusModel);
         return $timetableDef;
     }
 
@@ -99,7 +99,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         if (!($campusModel instanceof \Schoolbox\Campus)) {
             return false;
         }
-        $days = $campusModel->getTimetableDay();
+        $days = $this->getTotalDays($campusModel);
 
         if (!$date) {
             $date = time();
@@ -252,7 +252,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         if (!($campusModel instanceof \Schoolbox\Campus)) {
             return false;
         }
-        $days = $campusModel->getTimetableDay();
+        $days = $this->getTotalDays($campusModel);
 
         $nowmssqldate = date('Y-m-d', $date) . ' 00:00:00';
 
@@ -619,6 +619,19 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         }
 
         return ($aTime > $bTime) ? +1 : -1;
+    }
+
+    /**
+     * Returns the number of days in a particular timetable groups cycle
+     * Note that this means you do not need to set the days in the campus table for synergetic, we fetch it directly
+     *
+     * @param \Schoolbox\Campus $campus
+     * @return int
+     */
+    public function getTotalDays(\Schoolbox\Campus $campus) {
+        $query = "SELECT CycleDays FROM luTimetableGroup WHERE Code = '{$campus->getExtTimetableCode()}'";
+        $result = $this->getDatabase()->getRow($query);
+        return $result['CycleDays'];
     }
 
     /**
