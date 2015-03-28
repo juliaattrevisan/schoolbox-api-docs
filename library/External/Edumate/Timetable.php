@@ -16,27 +16,14 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     protected $campusCache;
 
     /**
-     * @param int $campusId
-     * @return string
-     */
-    protected function getCampusCode($campusId)
-    {
-        if (empty($this->campusCache[$campusId])) {
-            $this->campusCache[$campusId] = \Schoolbox\CampusMapper::getInstance()->findById($campusId)->getExtTimetableCode();
-        }
-
-        return $this->campusCache[$campusId];
-    }
-
-    /**
      * Returns the timetable definition for a particular campus *FOR A PARTICULAR DAY*
      *
      * @param string $externalUserId
-     * @param $campusId
+     * @param \Schoolbox\Campus $campus
      * @param int $day
      * @return array
      */
-    public function getTimetableDefinition($externalUserId, $campusId, $day = 0)
+    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
     {
 
         $definition = array();
@@ -52,7 +39,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
         $stmt->execute(array(
             'day'    => $day ?: 1, // there is no day 0 in this definition
-            'campus' => $this->getCampusCode($campusId)
+            'campus' => $campus->getExtTimetableCode()
         ));
 
         while ($r = $stmt->fetch(DB2::FETCH_ASSOC)) {
@@ -70,7 +57,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
         $definition['periodCount'] = $periodCount;
 
-        $definition['dayCount'] = $this->getCycleLength($campusId);
+        $definition['dayCount'] = $this->getCycleLength($campus);
 
         return $definition;
 
@@ -89,10 +76,10 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
     /**
      * Helper function to retrieve the length of the timetable cycle in edumate
-     * @param int $campusId
+     * @param \Schoolbox\Campus $campus
      * @return int
      */
-    protected function getCycleLength($campusId)
+    protected function getCycleLength(\Schoolbox\Campus $campus)
     {
         $stmt = $this->getDatabase()->prepare('
             SELECT day_number
@@ -102,18 +89,18 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             FETCH FIRST 1 ROW ONLY
         ');
 
-        $stmt->execute(array('campus' => $this->getCampusCode($campusId)));
+        $stmt->execute(array('campus' => $campus->getExtTimetableCode()));
 
         return $stmt->fetchColumn();
     }
 
 
     /**
-     * @param int $campusId
-     * @param int $time
+     * @param int|\Schoolbox\Campus $campus
+     * @param int $date
      * @return bool|string
      */
-    public function getDayNumber($campusId, $time = 0)
+    public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
     {
         $stmt = $this->getDatabase()->prepare('
             SELECT "DAY"
@@ -124,8 +111,8 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         ');
 
         $params = array(
-            'date'   => date('Y-m-d', $time ?: time()),
-            'campus' => $this->getCampusCode($campusId),
+            'date'   => date('Y-m-d', $date ?: time()),
+            'campus' => $campus->getExtTimetableCode(),
         );
 
         $stmt->execute($params);
@@ -151,15 +138,15 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     /**
      * Calculates the current period based on the current time
      *
-     * @param int $campusId
+     * @param int|\Schoolbox\Campus $campus
      * @param int $now
      * @return int
      */
-    public function getPeriodNumber($campusId, $now = 0)
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0)
     {
         $now = date('g:ia', $now ?: time());
 
-        $defn = $this->getTimetableDefinition(null, $campusId);
+        $defn = $this->getTimetableDefinition(null, $campus);
         $sequence = 0;
 
         for ($i = 0; $i < count($defn['sequence']); ++$i) {
@@ -178,16 +165,16 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      *
      * @param $externalUserId
      * @param $userId
-     * @param $campusId int ignored
+     * @param \Schoolbox\Campus $campus
      * @param $dayNumber
      * @return array|bool
      */
-    public function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber)
+    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
     {
         if (empty($externalUserId)) {
             return array();
         }
-        if (!($definition = $this->getTimetableDefinition($externalUserId, $campusId, $dayNumber))) {
+        if (!($definition = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber))) {
             return false;
         }
 
@@ -263,15 +250,15 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      *
      * @param $externalUserId
      * @param $userId
-     * @param $campusId
+     * @param \Schoolbox\Campus $campus
      * @return array|bool
      */
-    public function getFullTimetable($externalUserId, $userId, $campusId)
+    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
     {
         if (empty($externalUserId)) {
             return array();
         }
-        $definition = $this->getTimetableDefinition($externalUserId, $campusId);
+        $definition = $this->getTimetableDefinition($externalUserId, $campus);
         $dayCount = is_numeric($definition['dayCount']) ? $definition['dayCount'] : 0;
 
         if (!$dayCount) {
@@ -381,7 +368,8 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         $statement->execute(array('room' => $roomCode));
 
         // Join with Edumate's (currently hardcoded and campusless) timetable.
-        $campusTimetable = $this->getTimetableDefinition(null, 1);
+        $campus = new \Schoolbox\Campus;
+        $campusTimetable = $this->getTimetableDefinition(null, $campus);
         $result = array();
         foreach ($statement->fetchAll(DB2::FETCH_ASSOC) as $row) {
 // Match day and period against a start and end.

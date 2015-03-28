@@ -25,13 +25,6 @@ class External_Maze_Timetable implements External_TimetableInterface
     private $helper = null;
 
     /**
-     * An instance of CampusMapper
-     *
-     * @var null
-     */
-    private $campusMapper = null;
-
-    /**
      * An instance of Group
      *
      * @var Group
@@ -59,7 +52,6 @@ class External_Maze_Timetable implements External_TimetableInterface
     {
         $this->setDb(MSSQL::getInstance());
         $this->setHelper(new External_Maze_Helper());
-        $this->setCampusMapper(new \Schoolbox\CampusMapper());
         $this->setGroupHandler(new Group());
     }
 
@@ -101,11 +93,11 @@ class External_Maze_Timetable implements External_TimetableInterface
      * from left to right containing all the times and day numbers
      *
      * @param string $externalUserId
-     * @param $campusId
+     * @param \Schoolbox\Campus $campus
      * @param int $day
      * @return array
      */
-    public function getTimetableDefinition($externalUserId, $campusId, $day = 0)
+    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
     {
         $query = "
 			SELECT TOP 50 *
@@ -170,11 +162,11 @@ class External_Maze_Timetable implements External_TimetableInterface
     /**
      * Get the current day number
      *
-     * @param $campusId
+     * @param \Schoolbox\Campus $campus
      * @param int $date
      * @return bool
      */
-    public function getDayNumber($campusId, $date = 0)
+    public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
     {
         $query = "
 			SELECT TOP 1 QCOL
@@ -204,11 +196,11 @@ class External_Maze_Timetable implements External_TimetableInterface
      *
      * The returned data structure is required for Dashboard Timetable Controller
      *
-     * @param int $campusId
+     * @param int|\Schoolbox\Campus $campus
      * @param int $now
      * @return int
      */
-    public function getPeriodNumber($campusId, $now = 0)
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0)
     {
         if ($now) {
             $now = new \Alaress_Date_Format($now, 'U');
@@ -247,11 +239,11 @@ class External_Maze_Timetable implements External_TimetableInterface
      *
      * @param $externalUserId
      * @param $userId
-     * @param $campusId int ignored
+     * @param \Schoolbox\Campus $campus
      * @param $dayNumber
      * @return array|bool
      */
-    public function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber)
+    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
     {
         if (empty($externalUserId)) {
             return array();
@@ -539,10 +531,10 @@ class External_Maze_Timetable implements External_TimetableInterface
      *
      * @param $externalUserId
      * @param $userId
-     * @param $campusId
+     * @param \Schoolbox\Campus $campus
      * @return array|bool
      */
-    public function getFullTimetable($externalUserId, $userId, $campusId)
+    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
     {
         if (empty($externalUserId)) {
             return array();
@@ -550,14 +542,10 @@ class External_Maze_Timetable implements External_TimetableInterface
         $timetable = array();
         $allDayTimetables = array();
 
-        /* This person's campus
-         */
-        $campus = $this->getCampusMapper()->findById($campusId);
-
         /* Get all the days' timetables first
          */
         for ($day = 1; $day <= $campus->getTimetableDay(); $day++) {
-            $allDayTimetables[] = $this->getDayTimetable($externalUserId, $userId, $campusId, $day);
+            $allDayTimetables[] = $this->getDayTimetable($externalUserId, $userId, $campus, $day);
         }
 
         /* Assemble into a 2D array
@@ -652,26 +640,6 @@ class External_Maze_Timetable implements External_TimetableInterface
     private function getHelper()
     {
         return $this->helper;
-    }
-
-    /**
-     * Set campus mapper
-     *
-     * @param null $campusMapper
-     */
-    private function setCampusMapper($campusMapper)
-    {
-        $this->campusMapper = $campusMapper;
-    }
-
-    /**
-     * Get campus mapper
-     *
-     * @return \Schoolbox\CampusMapper
-     */
-    private function getCampusMapper()
-    {
-        return $this->campusMapper;
     }
 
     /**

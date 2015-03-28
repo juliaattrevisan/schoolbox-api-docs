@@ -11,12 +11,12 @@ use Alaress\DebugBar\Instance as DebugBar;
 
 class External_Offline_Timetable implements External_TimetableInterface
 {
-    public function getTimetableDefinition($externalUserId, $campusId, $day = 0)
+    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
     {
         // Noop
     }
 
-    public function getDayNumber($campusId, $date = 0)
+    public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
     {
         // Noop
     }
@@ -27,17 +27,17 @@ class External_Offline_Timetable implements External_TimetableInterface
     }
 
 
-    public function getPeriodNumber($campusId, $now = 0)
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0)
     {
         // Noop
     }
 
-    public function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber)
+    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
     {
         // Noop
     }
 
-    public function getFullTimetable($externalUserId, $userId, $campusId)
+    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
     {
         // Throw exception to let the user know we cannot fetch it for them
         throw new Schoolbox\External\Exception("Timetable is unavailable.");

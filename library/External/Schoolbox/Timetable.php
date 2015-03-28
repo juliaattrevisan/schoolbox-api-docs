@@ -11,16 +11,12 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 {
     private $database;
 
-    private $group;
-
     public function __construct()
     {
         $this->setdatabase(Database::getInstance());
-
-        $this->setGroup(new Group);
     }
 
-    public function getTimetableDefinition($externalUserId, $campusId, $day = 0)
+    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
     {
         $statement = $this->getDatabase()->prepare(
             "
@@ -34,7 +30,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                     "
         );
 
-        $statement->execute(array(':campusId' => $campusId));
+        $statement->execute(array(':campusId' => $campus->getId()));
 
         if ($definition = $statement->fetch(PDO::FETCH_ASSOC)) {
             /* Adapt to spec */
@@ -47,9 +43,9 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         }
     }
 
-    public function getDayNumber($campusId, $date = 0)
+    public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
     {
-        if (!$definition = $this->getTimetableDefinition(null, $campusId)) {
+        if (!$definition = $this->getTimetableDefinition(null, $campus)) {
             return false;
         }
 
@@ -148,15 +144,15 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     /**
      * Hilariously this method doesn't return a number at all!
      *
-     * @param int $campusId
+     * @param \Schoolbox\Campus $campus
      * @param int $now
      * @return array
      */
-    public function getPeriodNumber($campusId, $now = 0)
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0)
     {
         // Surely this should take a day number????
 
-        if (!$definition = $this->getTimetableDefinition(null, $campusId)) {
+        if (!$definition = $this->getTimetableDefinition(null, $campus)) {
             return false;
         }
 
@@ -165,7 +161,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         }
 
         $periodStatement = $this->getPeriodStatement(false);
-        $periodStatement->execute(array(':campusId' => $campusId,));
+        $periodStatement->execute(array(':campusId' => $campus->getId(),));
         $current_time = date('H:i:s', $now ?: time());
         foreach ($periodStatement as $item) {
             if ($item['start'] <= $current_time && $item['finish'] >= $current_time) {
@@ -178,7 +174,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         return false;
     }
 
-    public function getFullTimetable($externalUserId, $userId, $campusId)
+    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
     {
         if (empty($externalUserId)) {
             return array();
@@ -187,7 +183,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         $periodStatement = $this->getPeriodStatement(false);
         $periodStatement->execute(
             array(
-                ':campusId' => $campusId,
+                ':campusId' => $campus->getId(),
             )
         );
 
@@ -204,7 +200,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
         $classList = $classStatement->fetchAll(PDO::FETCH_ASSOC);
 
-        $timetableDefinition = $this->getTimetableDefinition($externalUserId, $campusId);
+        $timetableDefinition = $this->getTimetableDefinition($externalUserId, $campus);
         $dayCount            = $timetableDefinition['dayCount'];
 
         $periodListAdaption = array();
@@ -239,7 +235,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         return $periodListAdaption;
     }
 
-    public function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber)
+    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
     {
         if (empty($externalUserId)) {
             return array();
@@ -248,7 +244,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         $periodStatement = $this->getPeriodStatement(true);
         $periodStatement->execute(
             array(
-                ':campusId' => $campusId,
+                ':campusId' => $campus->getId(),
                 ':day'      => $dayNumber
             )
         );
@@ -347,22 +343,5 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     private function getDatabase()
     {
         return $this->database;
-    }
-
-    /**
-     * @param Group $group
-     * @return void
-     */
-    private function setGroup(Group $group)
-    {
-        $this->group = $group;
-    }
-
-    /**
-     * @return Group
-     */
-    private function getGroup()
-    {
-        return $this->group;
     }
 }

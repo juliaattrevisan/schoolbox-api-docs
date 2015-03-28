@@ -34,11 +34,11 @@ class External_Timetable implements External_TimetableInterface
      * Returns the period definition for the schools timetable, can be optionally provided a day to fetch a specific
      * days definition.
      * @param string $externalUserId
-     * @param Integer $campusId
+     * @param \Schoolbox\Campus $campus
      * @param Integer $day
      * @return Array
      */
-    function getTimetableDefinition($externalUserId, $campusId, $day = 0)
+    function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
@@ -46,11 +46,11 @@ class External_Timetable implements External_TimetableInterface
     /**
      * Calculates the current day number in the cycle
      *
-     * @param Integer $campusId
+     * @param int|\Schoolbox\Campus $campus
      * @param String|Integer $date
      * @return Integer
      */
-    function getDayNumber($campusId, $date = 0)
+    function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
@@ -69,11 +69,11 @@ class External_Timetable implements External_TimetableInterface
     /**
      * Determines the period number
      *
-     * @param Integer $campusId
+     * @param int|\Schoolbox\Campus $campus
      * @param Integer $now
      * @return Integer
      */
-    function getPeriodNumber($campusId, $now = 0)
+    function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0)
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
@@ -166,10 +166,10 @@ class External_Timetable implements External_TimetableInterface
      *
      * @param Integer $externalUserId
      * @param Integer $userId
-     * @param Integer $campusId
+     * @param int|\Schoolbox\Campus $campus
      * @return Array
      */
-    function getFullTimetable($externalUserId, $userId, $campusId)
+    function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
@@ -194,11 +194,11 @@ class External_Timetable implements External_TimetableInterface
      *
      * @param Integer $externalUserId
      * @param Integer $userId
-     * @param Integer $campusId
+     * @param int|\Schoolbox\Campus $campus
      * @param Integer $dayNumber
      * @return Array
      */
-    function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber)
+    function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }

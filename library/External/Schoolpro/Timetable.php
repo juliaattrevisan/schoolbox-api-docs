@@ -13,16 +13,9 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     /**
      * An instance of MSSQL
      *
-     * @var null
+     * @var MSSQL
      */
     private $db = null;
-
-    /**
-     * An instance of CampusMapper
-     *
-     * @var null
-     */
-    private $campusMapper = null;
 
     /**
      * Constructor
@@ -30,7 +23,6 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     public function __construct()
     {
         $this->setDb(MSSQL::getInstance());
-        $this->setCampusMapper(new \Schoolbox\CampusMapper());
     }
 
     /**
@@ -47,14 +39,13 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
      * Get a timetable definition
      *
      * @param string $externalUserId
-     * @param     $campusId
+     * @param \Schoolbox\Campus $campus
      * @param int $day
      *
      * @return array|bool
      */
-    public function getTimetableDefinition($externalUserId, $campusId, $day = 0)
+    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
     {
-        $campus = $this->getCampusMapper()->findById($campusId);
         $this->setCycleLength($campus->getTimetableDay());
         $vars = array(
             'sbGetTimetableDefinition',
@@ -91,14 +82,13 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     /**
      * Get a day number
      *
-     * @param     $campusId
+     * @param \Schoolbox\Campus $campus
      * @param int $date
      *
      * @return bool
      */
-    public function getDayNumber($campusId, $date = 0)
+    public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
     {
-        $campus = $this->getCampusMapper()->findById($campusId);
         $this->setCycleLength($campus->getTimetableDay());
         /* Convert from timestamp to datetime
          */
@@ -136,13 +126,12 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     /**
      * Get period number for a particular campus
      *
-     * @param int $campusId
+     * @param int|\Schoolbox\Campus $campus
      * @param int $now
      * @return array
      */
-    public function getPeriodNumber($campusId, $now = 0)
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0)
     {
-        $campus = $this->getCampusMapper()->findById($campusId);
         $vars = array(
             'sbGetPeriodNumber',
             array(
@@ -165,14 +154,13 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
      * Get staff day timetable
      *
      * @param $externalUserId
-     * @param $campusId
+     * @param \Schoolbox\Campus $campus
      * @param $dayNumber
      *
      * @return array
      */
-    private function getStaffDayTimetable($externalUserId, $campusId, $dayNumber)
+    private function getStaffDayTimetable($externalUserId, \Schoolbox\Campus $campus, $dayNumber)
     {
-        $campus = $this->getCampusMapper()->findById($campusId);
         $vars = array(
             'sbGetStaffDayTimetable',
             array(
@@ -191,14 +179,13 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
      * Get staff day timetable
      *
      * @param $externalUserId
-     * @param $campusId
+     * @param \Schoolbox\Campus $campus
      * @param $dayNumber
      *
      * @return array
      */
-    private function getStudentDayTimetable($externalUserId, $campusId, $dayNumber)
+    private function getStudentDayTimetable($externalUserId, $campus, $dayNumber)
     {
-        $campus = $this->getCampusMapper()->findById($campusId);
         $vars = array(
             'sbGetStudentDayTimetable',
             array(
@@ -218,25 +205,25 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
      *
      * @param $externalUserId
      * @param $userId
-     * @param $campusId
+     * @param \Schoolbox\Campus $campus
      * @param $dayNumber
      *
      * @return bool|void
      */
-    public function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber)
+    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
     {
         if (empty($externalUserId)) {
             return array();
         }
         $groupHandler = new Group();
         if ($groupHandler->isStudent($userId)) {
-            $result = $this->getStudentDayTimetable($externalUserId, $campusId, $dayNumber);
+            $result = $this->getStudentDayTimetable($externalUserId, $campus, $dayNumber);
         } else {
             /* Else assume staff
              */
-            $result = $this->getStaffDayTimetable($externalUserId, $campusId, $dayNumber);
+            $result = $this->getStaffDayTimetable($externalUserId, $campus, $dayNumber);
         }
-        $definition = $this->getTimetableDefinition($externalUserId, $campusId, $dayNumber);
+        $definition = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber);
         if ($result['success'] && count($result['result'])) {
             $timetable = array();
             $allClasses = $result['result'];
@@ -296,22 +283,21 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
      *
      * @param $externalUserId
      * @param $userId
-     * @param $campusId
+     * @param \Schoolbox\Campus $campus
      *
      * @return array
      */
-    public function getFullTimetable($externalUserId, $userId, $campusId)
+    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
     {
         if (empty($externalUserId)) {
             return array();
         }
-        $campus = $this->getCampusMapper()->findById($campusId);
         $this->setCycleLength($campus->getTimetableDay());
         $allDayTimetables = array();
         /* Get all the days' timetables first
          */
         for ($i = 1; $i <= $this->getCycleLength(); $i++) {
-            $allDayTimetables[] = $this->getDayTimetable($externalUserId, $userId, $campusId, $i);
+            $allDayTimetables[] = $this->getDayTimetable($externalUserId, $userId, $campus, $i);
         }
         $timetable = array();
         /* If the $row has values and the definition hasn't already been rendered,
@@ -375,9 +361,9 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     /**
      * Set db
      *
-     * @param null $db
+     * @param MSSQL $db
      */
-    private function setDb($db)
+    private function setDb(\MSSQL $db)
     {
         $this->db = $db;
     }
@@ -385,30 +371,10 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     /**
      * Get db
      *
-     * @return null
+     * @return MSSQL
      */
     private function getDb()
     {
         return $this->db;
-    }
-
-    /**
-     * Set campus mapper
-     *
-     * @param null $campusMapper
-     */
-    private function setCampusMapper($campusMapper)
-    {
-        $this->campusMapper = $campusMapper;
-    }
-
-    /**
-     * Get campus mapper
-     *
-     * @return null
-     */
-    private function getCampusMapper()
-    {
-        return $this->campusMapper;
     }
 }
