@@ -9,7 +9,7 @@
  */
 require_once('include/time.php');
 
-$groupHandler = new Group();
+$groupHandler  = new Group();
 $assessHandler = new Survey_Main();
 
 if (!empty($_POST)) {
@@ -28,11 +28,11 @@ if (!empty($_POST)) {
         ->setMinute($_POST['finish']['minute'])
     ;
 
-	/* Check for valid dates
-	 */
-	if (!$start->isValid() || !$finish->isValid()) {
-		error(15);
-	}
+    /* Check for valid dates
+     */
+    if (!$start->isValid() || !$finish->isValid()) {
+        error(15);
+    }
 
     /* Check that finish time cannot be before start time
      */
@@ -40,29 +40,30 @@ if (!empty($_POST)) {
         error(145);
     }
 
-    $assess_id = $assessHandler->create(array(
-        'category_id' => $_POST['category_id'],
-        'user_id' => $_SESSION['id'],
-        'title' => $_POST['title'],
-        'description' => $_POST['description'],
-        'start' => $start->getDatabase(),
-        'finish' => $finish->getDatabase(),
-        'duration' => Survey_Main::UNLIMITED_DURATION,
-        'availability' => 'survey',
-        'anonymous_result' => $_POST['anonymous_result'],
-        'notify_author' => $_POST['notify_author'],
-        'max_attempts' => $_POST['max_attempts'],
-        'completion_message' => $_POST['completion_message'],
-        'created_at' => 'NOW()',
-    ));
+    $assess_id = $assessHandler->create(
+        array(
+            'category_id'        => $_POST['category_id'],
+            'user_id'            => $_SESSION['id'],
+            'title'              => $_POST['title'],
+            'description'        => $_POST['description'],
+            'start'              => $start->getDatabase(),
+            'finish'             => $finish->getDatabase(),
+            'duration'           => Survey_Main::UNLIMITED_DURATION,
+            'availability'       => 'survey',
+            'anonymous_result'   => $_POST['anonymous_result'],
+            'notify_author'      => $_POST['notify_author'],
+            'max_attempts'       => $_POST['max_attempts'],
+            'completion_message' => $_POST['completion_message'],
+            'created_at'         => 'NOW()',
+        )
+    );
 
     if (!$assess_id) {
         error(112);
     }
 
     SitePage::localRedir('/survey/section/create/' . $assess_id);
-}
-else {
+} else {
     if (!is_numeric($this->arg[0])) {
         error(117);
     }
@@ -81,64 +82,71 @@ else {
     $this->setBlock(TEMPLATE_content, 'importXML', 'importXML_block');
     $this->setTitle('Manage Assessment');
 
-    $assessDate = new Alaress_Date_Format(time(), 'U');
+    $assessDate    = new Alaress_Date_Format(time(), 'U');
     $assessEndDate = new Alaress_Date_Format(strtotime('+1 week'), 'U');
 
-    $this->setVar(array(
-        'ACTION' => 'create',
-        'ASSESS_ACTION' => 'Create',
-        'ASSESS_KIND_LC'   => 'survey',
-        'ASSESS_KIND'      => 'Survey',
-        'ASSESS_ASSESS_ID' => '',
-        'ASSESS_CATEGORY_ID' => $this->arg[0],
-        'ASSESS_TITLE' => '',
-        'ASSESS_DESCRIPTION' => '',
-        'ASSESS_START_DATE' => $assessDate->getLocalShort(),
-        'ASSESS_FINISH_DATE' => $assessEndDate->getLocalShort(),
-        'ASSESS_ANONYMOUS_RESULT_CHECKED' => '',
-        'ASSESS_NOTIFY_AUTHOR_CHECKED' => '',
-        'ASSESS_COMPLETION_MESSAGE' => '',
-    ));
+    $this->setVar(
+        array(
+            'ACTION'                          => 'create',
+            'ASSESS_ACTION'                   => 'Create',
+            'ASSESS_KIND_LC'                  => 'survey',
+            'ASSESS_KIND'                     => 'Survey',
+            'ASSESS_ASSESS_ID'                => '',
+            'ASSESS_CATEGORY_ID'              => $this->arg[0],
+            'ASSESS_TITLE'                    => '',
+            'ASSESS_DESCRIPTION'              => '',
+            'ASSESS_START_DATE'               => $assessDate->getLocalShort(),
+            'ASSESS_FINISH_DATE'              => $assessEndDate->getLocalShort(),
+            'ASSESS_ANONYMOUS_RESULT_CHECKED' => '',
+            'ASSESS_NOTIFY_AUTHOR_CHECKED'    => '',
+            'ASSESS_COMPLETION_MESSAGE'       => '',
+        )
+    );
 
     /* Select default settings
      */
-    $startHour = date('g', time() + 3600);
-    $startMinute = '00';
+    $startHour     = date('g', time() + 3600);
+    $startMinute   = '00';
     $startMeridiem = date('A', time() + 3600);
 
-    $finishHour = date('g', time() + 2 * 3600);
-    $finishMinute = '00';
+    $finishHour     = date('g', time() + 2 * 3600);
+    $finishMinute   = '00';
     $finishMeridiem = date('A', time() + 2 * 3600);
 
-	/* Render starting times
-	 */
-	$this->setVar(array(
-		'START_HOUR_VALUE' => $startHour,
-		'START_MINUTE_VALUE' => $startMinute,
-	));
+    /* Render starting times
+     */
+    $this->setVar(
+        array(
+            'START_HOUR_VALUE'   => $startHour,
+            'START_MINUTE_VALUE' => $startMinute,
+        )
+    );
 
     foreach (array('AM', 'PM') as $meridiem) {
         if ($meridiem == $startMeridiem) {
             $selected = 'selected=\'selected\'';
-        }
-		else {
+        } else {
             $selected = '';
         }
 
-        $this->setVar(array(
-            'START_MERIDIEM_VALUE' => $meridiem,
-            'START_MERIDIEM_SELECTED' => $selected
-        ));
+        $this->setVar(
+            array(
+                'START_MERIDIEM_VALUE'    => $meridiem,
+                'START_MERIDIEM_SELECTED' => $selected
+            )
+        );
 
         $this->parse('startMeridiem_block', 'startMeridiem', true);
     }
 
-	/* Render finish times
-	 */
-	$this->setVar(array(
-		'FINISH_HOUR_VALUE' => $finishHour,
-		'FINISH_MINUTE_VALUE' => $finishMinute,
-	));
+    /* Render finish times
+     */
+    $this->setVar(
+        array(
+            'FINISH_HOUR_VALUE'   => $finishHour,
+            'FINISH_MINUTE_VALUE' => $finishMinute,
+        )
+    );
 
     foreach (array('AM', 'PM') as $meridiem) {
         if ($meridiem == $finishMeridiem) {
@@ -147,19 +155,23 @@ else {
             $selected = '';
         }
 
-        $this->setVar(array(
-            'FINISH_MERIDIEM_VALUE' => $meridiem,
-            'FINISH_MERIDIEM_SELECTED' => $selected
-        ));
+        $this->setVar(
+            array(
+                'FINISH_MERIDIEM_VALUE'    => $meridiem,
+                'FINISH_MERIDIEM_SELECTED' => $selected
+            )
+        );
 
         $this->parse('finishMeridiem_block', 'finishMeridiem', true);
     }
 
-	/* Resit amounts
-	 */
-	$this->setVar(array(
-		'MAX_ATTEMPTS_CHECKED' => '',
-	));
+    /* Resit amounts
+     */
+    $this->setVar(
+        array(
+            'MAX_ATTEMPTS_CHECKED' => '',
+        )
+    );
 
     /* Don't display questions contents, which appears in Modify
      */

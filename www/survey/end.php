@@ -8,17 +8,17 @@
  * @version     SVN: $Id$
  */
 
-$surveyHandler = new Survey_Main();
-$attemptHandler = new Survey_Attempt();
+$surveyHandler   = new Survey_Main();
+$attemptHandler  = new Survey_Attempt();
 $questionHandler = new Survey_Question();
 $responseHandler = new Survey_Response();
-$groupHandler = new Group();
+$groupHandler    = new Group();
 
 if (!is_numeric($_SESSION['attempt_id'])) {
     SitePage::localRedir('/survey/intro/' . $this->arg[0]);
 }
 
-$survey = $surveyHandler->getByID($this->arg[0]);
+$survey  = $surveyHandler->getByID($this->arg[0]);
 $attempt = $attemptHandler->getByID($_SESSION['attempt_id']);
 
 if (!$survey) {
@@ -56,18 +56,23 @@ $this->setTitle('Assessment: ' . $survey['title']);
 if ($attempt['finish'] == '0000-00-00 00:00:00') {
     $finishDate = new Alaress_Date_Format(time(), 'U');
 
-    $attemptHandler->update(array(
-        'attempt_id' => $_SESSION['attempt_id'],
-        'finish' => $finishDate->getDatabase(),
-    ));
+    $attemptHandler->update(
+        array(
+            'attempt_id' => $_SESSION['attempt_id'],
+            'finish'     => $finishDate->getDatabase(),
+        )
+    );
 
     $attemptEndDate = new Alaress_Date_Format(time(), 'U');
 
-    $this->setVar(array(
-        'ASSESS_TITLE' => Scrub::text($survey['title']),
-        'ASSESS_CATEGORY_ID' => $survey['category_id'],
-        'ATTEMPT_END' => $attemptEndDate->getShort()
-    ));
+    $this->setVar(
+        array(
+            'ASSESS_TITLE'              => Scrub::text($survey['title']),
+            'ASSESS_COMPLETION_MESSAGE' => Scrub::html($survey['completion_message']),
+            'ASSESS_CATEGORY_ID'        => $survey['category_id'],
+            'ATTEMPT_END'               => $attemptEndDate->getShort()
+        )
+    );
 
     $this->setVar('alreadyEnded_block', '');
     $this->parse('endAssess_block', 'endAssess');
@@ -82,11 +87,13 @@ if ($attempt['finish'] == '0000-00-00 00:00:00') {
 } else {
     $attemptEndDate = new Alaress_Date_Format(strtotime($attempt['finish']), 'U');
 
-    $this->setVar(array(
-        'ASSESS_TITLE' => Scrub::text($survey['title']),
-        'ASSESS_CATEGORY_ID' => $survey['category_id'],
-        'ATTEMPT_END' => $attemptEndDate->getShort()
-    ));
+    $this->setVar(
+        array(
+            'ASSESS_TITLE'       => Scrub::text($survey['title']),
+            'ASSESS_CATEGORY_ID' => $survey['category_id'],
+            'ATTEMPT_END'        => $attemptEndDate->getShort()
+        )
+    );
 
     $this->parse('alreadyEnded_block', 'alreadyEnded');
     $this->setVar('endAssess_block', '');
