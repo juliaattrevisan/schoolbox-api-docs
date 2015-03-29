@@ -245,4 +245,12 @@ class MeridiemTest extends PHPUnit_Framework_TestCase
             $date->getMeridiem()
         );
     }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidIsMeridiem()
+    {
+        $this->assertTrue($this->buildDateObject()->isMeridiem('cm'));
+    }
 }
