@@ -105,6 +105,46 @@ class MeridiemTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Data sets for testGet12HourTime
+     */
+    public function getGet12HourTimeData()
+    {
+        return [
+            // No leading zeros (default)
+            [$this->buildDateObject('2015-03-25 00:00:00', Alaress_Date_Format::DATABASE_FORMAT), '12', false],
+            [$this->buildDateObject('2015-03-25 00:00:01', Alaress_Date_Format::DATABASE_FORMAT), '12', false],
+            [$this->buildDateObject('2015-03-25 01:00:00', Alaress_Date_Format::DATABASE_FORMAT), '1',  false],
+            [$this->buildDateObject('2015-03-25 11:59:59', Alaress_Date_Format::DATABASE_FORMAT), '11', false],
+            [$this->buildDateObject('2015-03-25 12:00:00', Alaress_Date_Format::DATABASE_FORMAT), '12', false],
+            [$this->buildDateObject('2015-03-25 12:00:01', Alaress_Date_Format::DATABASE_FORMAT), '12', false],
+            [$this->buildDateObject('2015-03-25 13:00:00', Alaress_Date_Format::DATABASE_FORMAT), '1',  false],
+            [$this->buildDateObject('2015-03-25 23:59:59', Alaress_Date_Format::DATABASE_FORMAT), '11', false],
+            // Leading zeros
+            [$this->buildDateObject('2015-03-25 00:00:00', Alaress_Date_Format::DATABASE_FORMAT), '12', true],
+            [$this->buildDateObject('2015-03-25 00:00:01', Alaress_Date_Format::DATABASE_FORMAT), '12', true],
+            [$this->buildDateObject('2015-03-25 01:00:00', Alaress_Date_Format::DATABASE_FORMAT), '01', true],
+            [$this->buildDateObject('2015-03-25 11:59:59', Alaress_Date_Format::DATABASE_FORMAT), '11', true],
+            [$this->buildDateObject('2015-03-25 12:00:00', Alaress_Date_Format::DATABASE_FORMAT), '12', true],
+            [$this->buildDateObject('2015-03-25 12:00:01', Alaress_Date_Format::DATABASE_FORMAT), '12', true],
+            [$this->buildDateObject('2015-03-25 13:00:00', Alaress_Date_Format::DATABASE_FORMAT), '01', true],
+            [$this->buildDateObject('2015-03-25 23:59:59', Alaress_Date_Format::DATABASE_FORMAT), '11', true],
+        ];
+    }
+
+    /**
+     * @dataProvider getGet12HourTimeData
+     *
+     *
+     * @param Alaress_Date_Format $date
+     * @param int                 $expected
+     * @param bool                $leadingZero
+     */
+    public function testGet12HourTime($date, $expected, $leadingZero)
+    {
+        $this->assertSame($expected, $date->get12Hour($leadingZero));
+    }
+
+    /**
      * Data sets for testSet12HourTime
      */
     public function getSet12HourTimeData()
