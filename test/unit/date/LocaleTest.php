@@ -92,4 +92,16 @@ class LocaleTest extends PHPUnit_Framework_TestCase
         $date = $this->getTestDateObject();
         $this->assertEquals('8:01am', $date->getTimeOnly());
     }
+
+    public function testGetCalendarDate()
+    {
+        $date = $this->getTestDateObject();
+        $this->assertEquals('25th Mar', $date->getCalendarDate());
+    }
+
+    public function testGetCalendarDateTime()
+    {
+        $date = $this->getTestDateObject();
+        $this->assertEquals('25th Mar 8:01am', $date->getCalendarDateTime());
+    }
 }
