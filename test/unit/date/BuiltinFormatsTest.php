@@ -43,9 +43,7 @@ class BuiltinFormatsTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('25-03-2015', $date->getURLDate());
     }
 
-    // Carbon passthrus
-
-    public function testCarbonFormats()
+    public function testDateTimeBuiltinFormats()
     {
         $testDate = $this->buildDateObject(
             '2015-03-25 12:34:56',
@@ -58,10 +56,10 @@ class BuiltinFormatsTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Wed, 25 Mar 15 12:34:56 +0000', $testDate->toRfc822String());
         $this->assertEquals('Wednesday, 25-Mar-15 12:34:56 UTC', $testDate->toRfc850String());
         $this->assertEquals('Wed, 25 Mar 15 12:34:56 +0000', $testDate->toRfc1036String());
-        $this->assertEquals('Wed, 25 Mar 15 12:34:56 +0000', $testDate->toRfc1123String());
-        $this->assertEquals('Wed, 25 Mar 15 12:34:56 +0000', $testDate->toRfc2822String());
+        $this->assertEquals('Wed, 25 Mar 2015 12:34:56 +0000', $testDate->toRfc1123String());
+        $this->assertEquals('Wed, 25 Mar 2015 12:34:56 +0000', $testDate->toRfc2822String());
         $this->assertEquals('2015-03-25T12:34:56+00:00', $testDate->toRfc3339String());
-        $this->assertEquals('Wed, 25 Mar 15 12:34:56 +0000', $testDate->toRssString());
+        $this->assertEquals('Wed, 25 Mar 2015 12:34:56 +0000', $testDate->toRssString());
         $this->assertEquals('2015-03-25T12:34:56+00:00', $testDate->toW3cString());
     }
 }
