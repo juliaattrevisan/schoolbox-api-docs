@@ -66,4 +66,21 @@ class IsAtStartOrEndTest extends PHPUnit_Framework_TestCase
         $date = $this->getTestDateObject()->endOfYear();
         $this->assertEquals('2015-12-31 23:59:59', $date->getDatabase());
     }
+
+    public function testIsAtStartOfDay()
+    {
+        $date = $this->getTestDateObject();
+        $this->assertFalse($date->isAtStartOfDay());
+        $date->startOfDay();
+        $this->assertTrue($date->isAtStartOfDay());
+    }
+
+    public function testIsAtEndOfDay()
+    {
+        $date = $this->getTestDateObject();
+        $this->assertFalse($date->isAtEndOfDay());
+        $date->endOfDay();
+        $this->assertTrue($date->isAtEndOfDay());
+    }
+
 }
