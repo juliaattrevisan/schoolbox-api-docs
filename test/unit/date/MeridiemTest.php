@@ -182,4 +182,41 @@ class MeridiemTest extends PHPUnit_Framework_TestCase
         @$date->set12HourTime($hour, $minute, $second, $meridiem);
         $this->assertEquals($expectedTime, $date->getDatabase());
     }
+
+    /**
+     * Data sets for testIsAm and testIsPm
+     */
+    public function getIsAmData()
+    {
+        return [
+            [$this->buildDateObject('2015-03-25 00:00:00', Alaress_Date_Format::DATABASE_FORMAT), true],
+            [$this->buildDateObject('2015-03-25 00:00:01', Alaress_Date_Format::DATABASE_FORMAT), true],
+            [$this->buildDateObject('2015-03-25 11:59:59', Alaress_Date_Format::DATABASE_FORMAT), true],
+            [$this->buildDateObject('2015-03-25 12:00:00', Alaress_Date_Format::DATABASE_FORMAT), false],
+            [$this->buildDateObject('2015-03-25 12:00:01', Alaress_Date_Format::DATABASE_FORMAT), false],
+            [$this->buildDateObject('2015-03-25 23:59:59', Alaress_Date_Format::DATABASE_FORMAT), false],
+        ];
+    }
+
+    /**
+     * @dataProvider getIsAmData
+     *
+     * @param Alaress_Date_Format $date
+     * @param bool                $isAm
+     */
+    public function testIsAm($date, $isAm)
+    {
+        $this->assertEquals($isAm, $date->isAM());
+    }
+
+    /**
+     * @dataProvider getIsAmData
+     *
+     * @param Alaress_Date_Format $date
+     * @param bool                $isAm
+     */
+    public function testIsPm($date, $isAm)
+    {
+        $this->assertNotEquals($isAm, $date->isPM());
+    }
 }
