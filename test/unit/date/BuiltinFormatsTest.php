@@ -43,6 +43,16 @@ class BuiltinFormatsTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('25-03-2015', $date->getURLDate());
     }
 
+    public function testToStringFormat()
+    {
+        $date = $this->buildDateObject(
+            '2015-03-25 12:34:56',
+            Alaress_Date_Format::DATABASE_FORMAT,
+            new DateTimeZone('UTC')
+        );
+        $this->assertEquals('2015-03-25T12:34:56+00:00', $date->__toString());
+    }
+
     public function testDateTimeBuiltinFormats()
     {
         $testDate = $this->buildDateObject(
