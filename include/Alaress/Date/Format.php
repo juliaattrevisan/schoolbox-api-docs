@@ -571,14 +571,15 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
-     * 1975-12-25T14:15:16-0500
+     * 1975-12-25T14:15:16-05:00
      *
      * @return string
      */
     public function toIso8601String()
     {
-        return $this->getDateTimeObject()->toIso8601String();
-
+        // Carbon's implementation of toIso8601String() is wrong.
+        // It uses 'Y-m-d\TH:i:sO', should be 'Y-m-d\TH:i:sP';
+        return $this->getUsingFormat('Y-m-d\TH:i:sP');
     }
 
     /**
@@ -1519,6 +1520,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function __toString()
     {
-        return $this->getUsingFormat('c');
+        return $this->toIso8601String();
     }
 }

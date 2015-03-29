@@ -62,7 +62,7 @@ class BuiltinFormatsTest extends PHPUnit_Framework_TestCase
         );
         $this->assertEquals('2015-03-25T12:34:56+00:00', $testDate->toAtomString());
         $this->assertEquals('Wednesday, 25-Mar-2015 12:34:56 UTC', $testDate->toCookieString());
-        $this->assertEquals('2015-03-25T12:34:56+0000', $testDate->toIso8601String());
+        $this->assertEquals('2015-03-25T12:34:56+00:00', $testDate->toIso8601String());
         $this->assertEquals('Wed, 25 Mar 15 12:34:56 +0000', $testDate->toRfc822String());
         $this->assertEquals('Wednesday, 25-Mar-15 12:34:56 UTC', $testDate->toRfc850String());
         $this->assertEquals('Wed, 25 Mar 15 12:34:56 +0000', $testDate->toRfc1036String());
