@@ -63,11 +63,11 @@ class API {
 
 	        // most likely, default campus will be populated
 	        if($targetUser->getDefaultCampus()) {
-		        $campus = $targetUser->getDefaultCampus()->getId();
+		        $campus = $targetUser->getDefaultCampus();
 	        }
 	        // if not, attempt to retrieve the first campus from their list of campuses (campi?)
 	        elseif($targetUser->getCampusCollection()->count()) {
-		        $campus = $targetUser->getCampusCollection()->first()->getId();
+		        $campus = $targetUser->getCampusCollection()->first();
 	        }
 	        // if user not in any campus, cannot generate timetable: 404.
 	        else {

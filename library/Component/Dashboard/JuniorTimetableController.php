@@ -57,21 +57,20 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
         // already been added.
         $checked_campus_list = array();
 
-        foreach ($_SESSION['campus'] as $campus_id) {
-            $campus = Schoolbox\CampusMapper::getInstance()->findById($campus_id);
-
+        foreach ($_SESSION['user']->getCampusCollection() as $campus) {
             if ($campus instanceof Schoolbox\Campus) {
                 $campus_code = $campus->getExtTimetableCode();
+                $campus_id = $campus->getId();
 
                 if (!isset($checked_campus_list[$campus_code])) {
                     $checked_campus_list[$campus_code] = true;
-                    $day_number                        = $timetableHandler->getDayNumber($campus_id);
+                    $day_number                        = $timetableHandler->getDayNumber($campus);
 
                     if ($day_number) {
                         $timetable = $timetableHandler->getDayTimetable(
                             $_SESSION['user']->getExternalId(),
                             $_SESSION['user']->getId(),
-                            $campus_id,
+                            $campus,
                             $day_number
                         );
 

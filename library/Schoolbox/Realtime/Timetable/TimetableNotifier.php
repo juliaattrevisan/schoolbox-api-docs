@@ -113,8 +113,8 @@ class TimetableNotifier extends WorkNotifier {
         }
 
         $handler = new \External_Timetable();
-        $day     = $handler->getDayNumber($campus->getId());
-        $defn    = $handler->getTimetableDefinition(null, $campus->getId(), $day);
+        $day     = $handler->getDayNumber($campus);
+        $defn    = $handler->getTimetableDefinition(null, $campus, $day);
         $len     = count($defn['number']);
         $stamp   = $this->clock()->time();
         $stamp   = $stamp - ($stamp % 60);

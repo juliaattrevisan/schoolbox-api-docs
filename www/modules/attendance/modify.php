@@ -77,8 +77,8 @@ $externalTimetable = new External_Synergetic_Timetable();
 
 $definition = $externalTimetable->getTimetableDefinition(
     null,
-    $_SESSION['campus'],
-    $externalTimetable->getDayNumber($_SESSION['campus'], $attendanceDate->getUnixTimestamp())
+    $_SESSION['user']->getCampusCollection()->first(),
+    $externalTimetable->getDayNumber($_SESSION['user']->getCampusCollection()->first(), $attendanceDate->getUnixTimestamp())
 );
 $periods = array_keys($definition['number'], $attendancePeriod);
 $startTime = $definition['start'][$periods[0]];
