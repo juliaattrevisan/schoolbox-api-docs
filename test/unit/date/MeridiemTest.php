@@ -219,4 +219,30 @@ class MeridiemTest extends PHPUnit_Framework_TestCase
     {
         $this->assertNotEquals($isAm, $date->isPM());
     }
+
+    /**
+     * @dataProvider getIsAmData
+     *
+     * @param Alaress_Date_Format $date
+     * @param bool                $isAm
+     */
+    public function testIsMeridiem($date, $isAm)
+    {
+        $meridiem = $isAm ? Alaress_Date_Format::AM : Alaress_Date_Format::PM;
+        $this->assertTrue($date->isMeridiem($meridiem));
+    }
+
+    /**
+     * @dataProvider getIsAmData
+     *
+     * @param Alaress_Date_Format $date
+     * @param bool                $isAm
+     */
+    public function testGetMeridiem($date, $isAm)
+    {
+        $this->assertEquals(
+            $isAm ? 'AM' : 'PM',
+            $date->getMeridiem()
+        );
+    }
 }
