@@ -51,13 +51,9 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         // Don't output a timetable if it has the same code as another that has
         // already been added.
         $checked_campus_list = array();
-        foreach ($_SESSION['campus'] as $campus_id) {
-            try {
-                $campus = Schoolbox\CampusMapper::getInstance()->findById($campus_id);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                continue;
-            }
+        foreach ($_SESSION['user']->getCampusCollection() as $campus) {
             if ($campus instanceof Schoolbox\Campus) {
+                $campus_id = $campus->getId();
                 $campus_code = $campus->getExtTimetableCode();
                 if (!isset($checked_campus_list[$campus_code])) {
                     $checked_campus_list[$campus_code] = true;
