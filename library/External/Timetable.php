@@ -84,7 +84,7 @@ class External_Timetable implements External_TimetableInterface
      *
      * @todo this should be moved to a 5.4 trait, and used by External_*_Timetable
      *
-     * @param int $campusId The campus ID to get the date for.
+     * @param \Schoolbox\Campus $campus The campus ID to get the date for.
      * @param int $day The day number to get the date for.
      * @param int $date A Unix timestamp representing the date to get, or
      *                       today if not set.
@@ -96,7 +96,7 @@ class External_Timetable implements External_TimetableInterface
      *
      * @return DateTime
      */
-    protected function getDateForDayNumber($campusId, $day, $date = null, $previous = false)
+    protected function getDateForDayNumber($campus, $day, $date = null, $previous = false)
     {
         if (!isset($date)) {
             $date = time();
@@ -117,7 +117,7 @@ class External_Timetable implements External_TimetableInterface
             // Try for a year, that's long enough.
             $i = 0;
             while ($i++ < 365) {
-                $thisDayNumber = $this->getDayNumber($campusId, $thisDate->getTimestamp());
+                $thisDayNumber = $this->getDayNumber($campus, $thisDate->getTimestamp());
                 if ($thisDayNumber === false) {
                     throw new InvalidArgumentException('Invalid campus requested');
                 }
@@ -137,17 +137,17 @@ class External_Timetable implements External_TimetableInterface
     /**
      * @see $this->getDateForDayNumber
      */
-    public function getPreviousDateForDayNumber($campusId, $day, $date = null)
+    public function getPreviousDateForDayNumber($campus, $day, $date = null)
     {
-        return $this->getDateForDayNumber($campusId, $day, $date, true);
+        return $this->getDateForDayNumber($campus, $day, $date, true);
     }
 
     /**
      * @see $this->getDateForDayNumber
      */
-    public function getNextDateForDayNumber($campusId, $day, $date = null)
+    public function getNextDateForDayNumber($campus, $day, $date = null)
     {
-        return $this->getDateForDayNumber($campusId, $day, $date, false);
+        return $this->getDateForDayNumber($campus, $day, $date, false);
     }
 
     /**
