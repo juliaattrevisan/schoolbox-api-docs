@@ -41,6 +41,14 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     const AM = 'AM';
     const PM = 'PM';
 
+    const SUNDAY = 0;
+    const MONDAY = 1;
+    const TUESDAY = 2;
+    const WEDNESDAY = 3;
+    const THURSDAY = 4;
+    const FRIDAY = 5;
+    const SATURDAY = 6;
+
     /**
      * Returns an instance of self at the current time.
      * Method gives precedence to REQUEST_TIME, but accepts that outside HTTP requests, it doesn't exist.
