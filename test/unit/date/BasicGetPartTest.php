@@ -60,8 +60,7 @@ class BasicGetPartTest extends PHPUnit_Framework_TestCase
     public function testGetWeekdayNumber()
     {
         $date = $this->getTestDateObject();
-        // Thursday
-        $this->assertSame('4', $date->getWeekDayNumber());
+        $this->assertEquals(Alaress_Date_Format::THURSDAY, $date->getWeekDayNumber());
     }
 
     public function testGetTimezone()
