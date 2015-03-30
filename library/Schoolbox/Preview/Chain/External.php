@@ -14,7 +14,6 @@ namespace Schoolbox\Preview\Chain;
 
 use Schoolbox\Preview\Chain\Strategy\External\Image;
 use Schoolbox\Preview\Chain\Strategy\External\Embed;
-use Schoolbox\Preview\Chain\Strategy\External\IFrame;
 use Schoolbox\Preview\Chain\Strategy\External\Redirect;
 
 class External extends Base {
@@ -27,7 +26,10 @@ class External extends Base {
     public function __construct($url) {
         $decodedUrl = urldecode($url);
 
-        $headers = $this->findHeaders($decodedUrl);
+        /* Temporarily disabled
+         * $headers = $this->findHeaders($decodedUrl);
+         */
+        $headers = array();
 
         $this->start([
             new Image($decodedUrl, $headers),
@@ -38,6 +40,9 @@ class External extends Base {
 
     /**
      * Decode url and format header output
+     *
+     * Keept his in case you add strats which check for other
+     * content-types
      */
     private function findHeaders($url) {
         $headers = get_headers($url, 1);

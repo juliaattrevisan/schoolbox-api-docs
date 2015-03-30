@@ -26,12 +26,24 @@ class Image extends Base {
     ];
 
     /**
+     * A list of all the file extensions checked here
+     *
+     * This is a massive pipe assumption that urls end in this set of
+     * extensions to be classified as valid images; dynamic images,
+     * or any urls which are images and don't match these extensions,
+     * are going to be excluded from previewing.
+     *
+     * @var string
+     */
+    private $extensions = '/\.(jpg|pjpeg|gif|png|jpeg)$/';
+
+    /**
      * Test the Content-Types
      *
      * @return string
      */
     public function test() {
-        if (in_array($this->findContentType(), $this->getContentTypes())) {
+        if (preg_match($this->getExtensions(), $this->getUrl() )) {
             return [
                 'type' => 'html-fragment',
                 'twig' => [
@@ -67,5 +79,15 @@ class Image extends Base {
     private function getContentTypes()
     {
         return $this->contentTypes;
+    }
+
+    /**
+     * Get content types
+     *
+     * @return array
+     */
+    private function getExtensions()
+    {
+        return $this->extensions;
     }
 }
