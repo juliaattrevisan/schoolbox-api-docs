@@ -367,6 +367,16 @@ class SitePage extends Page
         }
 
         if ($_SESSION['id']) {
+            /* Output switch user options */
+            $this->setBlock('banner_logged_in', 'switch_user', 'switch_user_block');
+            $this->setVar('switch_user_block', '');
+            foreach($_SESSION['user']->getLinkedUser() as $linkedUser) {
+                $this->setVar(array(
+                                    'MENU_SWITCH_USERID'        => $linkedUser->getId(),
+                                    'MENU_SWITCH_USER_FULLNAME' => $linkedUser->getFullName(),));
+                $this->parse('switch_user_block', 'switch_user', true);
+            }
+
             $this->parse('MAIN_NAV_REGION', 'navTpl');
             $this->parse('MAIN_TAB_REGION', 'tabTpl');
             $this->parse('banner_logged_in_block', 'banner_logged_in');
