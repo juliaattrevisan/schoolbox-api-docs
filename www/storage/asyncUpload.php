@@ -50,9 +50,7 @@ if (!$_SESSION['id']) {
 
             } catch (Exception $e) {
                 $hashes[] = 'exception:'.$e->getMessage();
-                if ($returnMeta) {
-                    $metas[] = array();
-                }
+                $metas[]  = array();
             }
         }
         $result['hash'] = $hashes;
