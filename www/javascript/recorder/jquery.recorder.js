@@ -162,13 +162,13 @@
      */
     RecorderPlugin.prototype.startRecording = function() {
         // Starting recording stops any current recording and playing.
-        if (this.isRecording()) {
-            this.stopRecording();
-        }
-        if (this.isPlaying()) {
-            this.stopPlaying();
-        }
         var self = this;
+        if (self.isRecording()) {
+            self.stopRecording();
+        }
+        if (self.isPlaying()) {
+            self.stopPlaying();
+        }
         if (self.isWebRtcSupported()) {
             getUserMedia(
                 self.options.userMedia,
