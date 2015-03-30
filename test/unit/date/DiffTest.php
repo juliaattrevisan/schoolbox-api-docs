@@ -308,4 +308,62 @@ class DiffTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $a->diffInYears($b));
         $this->assertEquals($expected * -1, $b->diffInYears($a, false));
     }
+
+    public function getCompareData()
+    {
+        return [
+            [
+                $this->buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                $this->buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                true,
+            ],
+            [
+                $this->buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                $this->buildDateObject('2015-03-22 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
+                false,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getCompareData
+     *
+     * @param Alaress_Date_Format $a
+     * @param Alaress_Date_Format $b
+     * @param int                 $expected
+     */
+    public function testCompare($a, $b, $expected)
+    {
+        $this->assertEquals($expected, $a->compare($b));
+        $this->assertEquals($expected * -1, $b->compare($a));
+    }
+
+    public function getCompareDateOnlyData()
+    {
+        return [
+            [
+                $this->buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                $this->buildDateObject('2015-03-22 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
+                true,
+            ],
+            [
+                $this->buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                $this->buildDateObject('2015-03-23 12:34:52', Alaress_Date_Format::DATABASE_FORMAT),
+                false,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getCompareDateOnlyData
+     *
+     * @param Alaress_Date_Format $a
+     * @param Alaress_Date_Format $b
+     * @param int                 $expected
+     */
+    public function testCompareDateOnly($a, $b, $expected)
+    {
+        $this->assertEquals($expected, $a->compareDateOnly($b));
+        $this->assertEquals($expected * -1, $b->compareDateOnly($a));
+    }
 }
