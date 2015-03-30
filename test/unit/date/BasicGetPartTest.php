@@ -19,41 +19,48 @@ class BasicGetPartTest extends PHPUnit_Framework_TestCase
     public function testGetSecond()
     {
         $date = $this->getTestDateObject();
-        $this->assertSame($date->getSecond(), '3');
-        $this->assertSame($date->getSecond(true), '03');
+        $this->assertSame('3', $date->getSecond());
+        $this->assertSame('03', $date->getSecond(true));
     }
 
     public function testGetMinute()
     {
         $date = $this->getTestDateObject();
-        $this->assertSame($date->getMinute(), '1');
-        $this->assertSame($date->getMinute(true), '01');
+        $this->assertSame('1', $date->getMinute());
+        $this->assertSame('01', $date->getMinute(true));
     }
 
     public function testGetHour()
     {
         $date = $this->getTestDateObject();
-        $this->assertSame($date->getHour(), '8');
-        $this->assertSame($date->getHour(true), '08');
+        $this->assertSame('8', $date->getHour());
+        $this->assertSame('08', $date->getHour(true));
     }
 
     public function testGetDay()
     {
         $date = $this->getTestDateObject();
-        $this->assertSame($date->getDay(), '5');
-        $this->assertSame($date->getDay(true), '05');
+        $this->assertSame('5', $date->getDay());
+        $this->assertSame('05', $date->getDay(true));
     }
 
     public function testGetMonth()
     {
         $date = $this->getTestDateObject();
-        $this->assertSame($date->getMonth(), '3');
-        $this->assertSame($date->getMonth(true), '03');
+        $this->assertSame('3', $date->getMonth());
+        $this->assertSame('03', $date->getMonth(true));
     }
 
     public function testGetYear()
     {
         $date = $this->getTestDateObject();
-        $this->assertSame($date->getYear(), '2015');
+        $this->assertSame('2015', $date->getYear());
+    }
+
+    public function testGetWeekdayNumber()
+    {
+        $date = $this->getTestDateObject();
+        // Thursday
+        $this->assertSame('4', $date->getWeekDayNumber());
     }
 }
