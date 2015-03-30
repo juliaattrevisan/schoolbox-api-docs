@@ -17,6 +17,8 @@ use Schoolbox\Preview\Chain\Strategy\Internal\Media;
 use Schoolbox\Preview\Chain\Strategy\Internal\IFrame;
 use Schoolbox\Preview\Chain\Strategy\Internal\Redirect;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\Model as StorageModel;
+use Schoolbox\File\Mimetype;
 
 class Internal extends Base {
 
@@ -73,8 +75,11 @@ class Internal extends Base {
             $item = $storageMapper->findByHash($hash);
         }
         catch (\Exception $e) {
-            $item = new \Schoolbox\Resource\Storage\Model();
-            $item->setMimetype(new \Schoolbox\File\Mimetype());
+
+            /* A default stub object, for interface compatibility
+             */
+            $item = new StorageModel();
+            $item->setMimetype(new Mimetype());
         }
 
         $this->start([
