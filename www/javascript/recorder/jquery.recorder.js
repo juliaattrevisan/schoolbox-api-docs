@@ -305,8 +305,8 @@
                     processData: false
                 }
             )
-            .done(function(response, textStatus, jqXHR) {
-                self.triggerEvent('uploadComplete', [filename, response, textStatus, jqXHR]);
+            .done(function(response) {
+                self.triggerEvent('uploadComplete', [filename, response]);
             })
             .fail(function(jqXHR, textStatus, errorThrown) {
                 self.triggerEvent('uploadFailed', [jqXHR, textStatus, errorThrown]);
