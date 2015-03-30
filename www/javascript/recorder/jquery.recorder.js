@@ -323,7 +323,7 @@
                 audioParam: 'upload',
                 params: params,
                 success: function(response) {
-                    self.triggerEvent('uploadComplete', [filename, response]);
+                    self.triggerEvent('uploadComplete', [filename, JSON.parse(response)]);
                 },
                 error: function() {
                     // Don't know if there's any params that get passed here
