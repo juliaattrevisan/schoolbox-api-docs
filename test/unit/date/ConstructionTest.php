@@ -11,15 +11,34 @@ class ConstructionTest extends PHPUnit_Framework_TestCase
 {
     use Alaress\Test\Date\MockDateObject;
 
+    public function setup()
+    {
+        if (!isset($_SERVER['REQUEST_TIME'])) {
+            $this->markTestSkipped('No $_SERVER[REQUEST_TIME], cannot accurately test Alaress_Date_Format builders');
+        }
+    }
+
     public function testNow()
     {
-        $currentDatetime = $_SERVER['REQUEST_TIME'];
-        if (!$currentDatetime) {
-            $this->markTestSkipped('No $_SERVER[REQUEST_TIME], cannot accurately test Alaress_Date_Format::now()');
-        }
         $date = Alaress_Date_Format::now();
         $date->setLocale(new Alaress_Date_Locale_Static());
-        $this->assertEquals($currentDatetime, $date->getUnixTimeStamp());
+        $this->assertEquals($_SERVER['REQUEST_TIME'], $date->getUnixTimeStamp());
+    }
+
+    public function testCreateFromAlaressDateFormat()
+    {
+        $date = Alaress_Date_Format::now();
+        $date->setLocale(new Alaress_Date_Locale_Static());
+        $copiedDate = $this->buildDateObject($date);
+
+        $this->assertEquals($copiedDate->getDatabase(), $date->getDatabase());
+    }
+
+    public function testCreateFromDateTime()
+    {
+        $date       = DateTime::createFromFormat('U', $_SERVER['REQUEST_TIME']);
+        $copiedDate = $this->buildDateObject($date);
+        $this->assertEquals($copiedDate->getDatabase(), $date->format(Alaress_Date_Format::DATABASE_FORMAT));
     }
 
     public function testNewLocal()
