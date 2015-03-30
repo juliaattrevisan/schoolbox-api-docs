@@ -57,7 +57,6 @@ class ConstructionTest extends PHPUnit_Framework_TestCase
         $date       = DateTime::createFromFormat('U', $_SERVER['REQUEST_TIME'], new DateTimeZone('UTC'));
         $copiedDate = $this->buildDateObject($date, null, new DateTimeZone('Australia/Victoria'));
         $this->assertEquals($copiedDate->getUnixTimeStamp(), $date->getTimestamp());
-        $this->assertEquals('UTC', $date->getTimezone()->getName());
         $this->assertEquals('Australia/Victoria', $copiedDate->getTimezone()->getName());
     }
 
