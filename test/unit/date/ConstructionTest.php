@@ -41,6 +41,26 @@ class ConstructionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($copiedDate->getDatabase(), $date->format(Alaress_Date_Format::DATABASE_FORMAT));
     }
 
+    public function testCreateFromAlaressDateFormatWithTimezone()
+    {
+        $date = Alaress_Date_Format::now();
+        $date->setLocale(new Alaress_Date_Locale_Static());
+        $date->setTimezone(new DateTimeZone('UTC'));
+        $copiedDate = $this->buildDateObject($date, null, new DateTimeZone('Australia/Victoria'));
+        $this->assertEquals($copiedDate->getUnixTimeStamp(), $date->getUnixTimeStamp());
+        $this->assertEquals('UTC', $date->getTimezone()->getName());
+        $this->assertEquals('Australia/Victoria', $copiedDate->getTimezone()->getName());
+    }
+
+    public function testCreateFromDateTimeWithTimezone()
+    {
+        $date       = DateTime::createFromFormat('U', $_SERVER['REQUEST_TIME'], new DateTimeZone('UTC'));
+        $copiedDate = $this->buildDateObject($date, null, new DateTimeZone('Australia/Victoria'));
+        $this->assertEquals($copiedDate->getUnixTimeStamp(), $date->getTimestamp());
+        $this->assertEquals('UTC', $date->getTimezone()->getName());
+        $this->assertEquals('Australia/Victoria', $copiedDate->getTimezone()->getName());
+    }
+
     public function testNewLocal()
     {
         $date = Alaress_Date_Format::newLocal(
