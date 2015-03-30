@@ -32,7 +32,6 @@ class External extends Base {
         $this->start([
             new Image($decodedUrl, $headers),
             new Embed($decodedUrl, $headers),
-            new IFrame($decodedUrl, $headers),
             new Redirect($decodedUrl, $headers),
         ]);
     }
