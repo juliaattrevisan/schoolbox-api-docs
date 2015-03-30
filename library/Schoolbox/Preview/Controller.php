@@ -44,7 +44,11 @@ class Controller extends Base
             ['Local PDF' => "/storage/fetch.php?hash=afaafce41021389f0cc857dfc03b136d6d1b2f29"],
             ['Local ZIP' => "/storage/fetch.php?hash=bb85de4fb0f04e27556763f7beaf7f8a0094c8ab"],
             ['Local URL' => "/homepage/43"],
-            ['Local URL Redir' => "/redir.php?url=aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g%2Fdj16UG9uaW9EWW5vWQ%3D%3D"],
+
+            /* redir.php usage
+             */
+            ['Local URL Redir by ID' => "/redir.php?id=39"],
+            ['Local URL Redir by Base64Encoded' => "/redir.php?url=aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g%2Fdj16UG9uaW9EWW5vWQ%3D%3D"],
 
             /**
              * Special cases
