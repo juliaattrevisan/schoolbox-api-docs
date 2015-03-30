@@ -79,23 +79,8 @@ class Controller extends Base
         /* Local Chain
          */
         if ($url->isLocalURL()) {
-            $bits = parse_url($params['encodedUrl']);
-            $querystring = $bits['query'];
-
-            preg_match('/hash=([a-z0-9]+)/i', $querystring, $matches);
-
-            if (count($matches)) {
-                $hash = $matches[1];
-
-                $chain = new Internal($params['encodedUrl'], $hash);
-                $result = $chain->getResult();
-            }
-            /* Special case: redirect to internal urls
-             */
-            else {
-                $element = new \Schoolbox\Preview\Chain\Strategy\Internal\Redirect($params['encodedUrl'], new \Schoolbox\Resource\Storage\Model());
-                $result = $element->test();
-            }
+            $chain = new Internal($params['encodedUrl']);
+            $result = $chain->getResult();
         }
         /* External Chain
          */

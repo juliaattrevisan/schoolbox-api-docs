@@ -12,6 +12,7 @@
 
 namespace Schoolbox\Preview\Chain;
 
+use Schoolbox\Preview\Chain\Strategy\Internal\LinkRedir;
 use Schoolbox\Preview\Chain\Strategy\Internal\Image;
 use Schoolbox\Preview\Chain\Strategy\Internal\Media;
 use Schoolbox\Preview\Chain\Strategy\Internal\IFrame;
@@ -24,10 +25,15 @@ class Internal extends Base {
      * Constructor
      *
      * @param $url
-     * @param $hash
      */
-    public function __construct($url, $hash) {
+    public function __construct($url) {
+
+        /* Storage item: find the hash, and analyse it to find out
+         * how to display it (or redirect, if it can't be displayed)
+         */
         if ($this->isStorage($url)) {
+            $hash = $this->findHash($url);
+
             $storageMapper = new StorageMapper();
 
             try {
@@ -44,8 +50,30 @@ class Internal extends Base {
                 error(41);
             }
         }
+        /* LinkRedir: get the url, log the view, then redirect or open
+         * it in the Preview modal as usual
+         */
+        else if ($this->isLinkRedir($url)) {
+        }
     }
 
+    private function isLinkRedir($url) {
+    }
+
+    private function findHash($url) {
+        $hash = '';
+
+        $bits = parse_url($url);
+        $querystring = $bits['query'];
+
+        preg_match('/hash=([a-z0-9]+)/i', $querystring, $matches);
+
+        if (count($matches)) {
+            $hash = $matches[1];
+        }
+
+        return $hash;
+    }
 
     /**
      * Check if this is a storage url, it could contain anything
