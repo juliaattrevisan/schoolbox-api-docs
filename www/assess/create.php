@@ -42,7 +42,8 @@ if (!empty($_POST)) {
         ->setMaxAttempts($_POST['max_attempts'])
         ->setWeight($_POST['weight'])
         ->setAvailability('assess')
-		->setMarkVisibility($_POST['mark_visibility'])
+        ->setMarkVisibility($_POST['mark_visibility'])
+        ->setCompletionMessage($_POST['completion_message'])
     ;
 
     // Is this a task? If so, just set the start and finish to now.
@@ -190,6 +191,7 @@ else {
         'ASSESS_DESCRIPTION' => '',
         'ASSESS_START_DATE'  => $assessDate->getLocalShort(),
         'ASSESS_FINISH_DATE' => $assessEndDate->getLocalShort(),
+        'ASSESS_COMPLETION_MESSAGE' => '',
     ));
 
     /* Render starting times
