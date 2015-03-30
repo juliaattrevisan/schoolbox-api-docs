@@ -52,7 +52,9 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
         if (isset($_SERVER['REQUEST_TIME'])) {
             $time = $_SERVER['REQUEST_TIME'];
         } else {
+            // @codeCoverageIgnoreStart
             $time = time();
+            // @codeCoverageIgnoreEnd
         }
 
         return new static($time, 'U');
@@ -75,7 +77,9 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
         Alaress_Date_Locale_Interface $locale = null
     ) {
         if (!$locale instanceof Alaress_Date_Locale_Interface) {
+            // @codeCoverageIgnoreStart
             $locale = new Alaress_Date_Locale_Config();
+            // @codeCoverageIgnoreEnd
         }
         // Zero out unset parts - IMO that's the least surprising behavior
         return new static($dateTime, $locale->localFormat().'|', $timezone, $locale);
@@ -98,7 +102,9 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
         Alaress_Date_Locale_Interface $locale = null
     ) {
         if (!$locale instanceof Alaress_Date_Locale_Interface) {
+            // @codeCoverageIgnoreStart
             $locale = new Alaress_Date_Locale_Config();
+            // @codeCoverageIgnoreEnd
         }
         // Zero out unset parts - IMO that's the least surprising behavior.
         // If I create a date with no time, I'd expect its time to be 00:00:00
@@ -1517,14 +1523,20 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function getRelativeTime($now = null, $stripModifiers = false)
     {
+        // I can't test this method accurately by comparing with now, as that
+        // can and will change through the test.
         if (!isset($now)) {
+            // @codeCoverageIgnoreStart
             return $this->getDateTimeObject()->diffForHumans(null, $stripModifiers);
+            // @codeCoverageIgnoreEnd
         }
         // Convert now to a carbon object, if I can, otherwise assume now
         try {
             return $this->getDateTimeObject()->diffForHumans($this->buildLaravelDate($now), $stripModifiers);
         } catch (InvalidArgumentException $e) {
+            // @codeCoverageIgnoreStart
             return $this->getDateTimeObject()->diffForHumans(null, $stripModifiers);
+            // @codeCoverageIgnoreEnd
         }
     }
 
