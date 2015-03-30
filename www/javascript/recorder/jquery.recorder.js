@@ -293,6 +293,7 @@
 
         // Is this WebRTC? Post via AJAX if so
         if (self.isWebRtcUsed()) {
+            self.triggerEvent('uploadStart', []);
             var formData = new FormData();
             formData.append('upload', self.webrtc.blob, filename);
             $.ajax(
@@ -315,6 +316,7 @@
                 filename: filename
             };
             params[self.options.flash.session.name] = self.options.flash.session.id;
+            self.triggerEvent('uploadStart', []);
             self.flash.recorder.upload({
                 url: self.options.upload.url,
                 method: 'post',
