@@ -95,8 +95,8 @@
             // that a file was posted to it.
             var data = {
                 title:    filename,
-                mimeType: recorder.getUploadedFileMimeType(),
-                filesize: recorder.getUploadedFileSize(),
+                mimeType: response.meta.type,
+                filesize: response.meta.size,
                 hash:     response.hash
             };
             window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
