@@ -140,7 +140,29 @@ elseif (is_numeric($_GET['deleteService']) && is_numeric($_GET['sid']) && is_num
     $groupHandler->deleteUser(Scrub::text($_GET['sid']), Scrub::text($_GET['uid']));
 
     SitePage::localRedir('/adminv2/modify-user/' . Scrub::text($_GET['uid']) . '#permissions');
-} /* Switch logins to the current user being viewed
+}
+elseif (is_array($_POST['linkUser'])) {
+
+    try {
+        $originalUser = UserMapper::getInstance()->findById($_POST['userId']);
+    }
+    catch(\Schoolbox\Mapper\Exception $e)  {
+        error(2);
+    }
+
+    foreach($_POST['linkUser'] as $userId ){
+        try{
+            $linkedUser = UserMapper::getInstance()->findById($userId);
+
+            $originalUser->getLinkedUser()->add($linkedUser);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            //noop on user not found
+        }
+    }
+
+    UserMapper::getInstance()->save($originalUser);
+}
+/* Switch logins to the current user being viewed
  */
 elseif ($_POST['login']) {
     $oldSession = $_SESSION;

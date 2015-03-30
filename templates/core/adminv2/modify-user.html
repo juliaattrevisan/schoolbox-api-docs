@@ -706,7 +706,8 @@ $(function() {
         </tbody>
     </table>
     <form action="/adminv2/userForm.php" method="post">
-        <select id="linkUser" name="userID[]" multiple placeholder="Search Users"></select>
+        <input type="hidden" name="userID" value="{USERID}" />
+        <select id="linkUser" name="linkUser[]" multiple placeholder="Search Users"></select>
         <input type="submit" value="Add Users" class="submit-btn-plain disabled" disabled />
     </form>
 </div>
