@@ -6,6 +6,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Zend\Uri\UriFactory;
+
 class Component_Homepage_TwitterController extends Component_Homepage_ControllerAbstract {
 
     /**
@@ -46,12 +49,14 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
                 $color = ++$i % 2 ? '' : 'dark';
                 $date = new Alaress_Date_Format(strtotime($currentTweet['date']), 'U');
 
+                $avatarUrl = UriFactory::factory($currentTweet['avatar']);
+                $avatarUrl->setScheme(null);
                 $this->setVar(array(
                     'TWEET_TEXT' => Scrub::html($currentTweet['text']),
                     'TWEET_DATE' => $date->getShort(),
                     'TWEET_AUTHOR' => Scrub::text($currentTweet['author']),
                     'TWEET_FULLNAME' => Scrub::text($currentTweet['fullname']),
-                    'TWEET_AVATAR' => Scrub::text($currentTweet['avatar']),
+                    'TWEET_AVATAR' => Scrub::text($avatarUrl),
                     'ON_OFF' => $color,
                 ));
 
