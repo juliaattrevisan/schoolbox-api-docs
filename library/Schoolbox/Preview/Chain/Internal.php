@@ -12,7 +12,6 @@
 
 namespace Schoolbox\Preview\Chain;
 
-use Schoolbox\Preview\Chain\Strategy\Internal\LinkRedir;
 use Schoolbox\Preview\Chain\Strategy\Internal\Image;
 use Schoolbox\Preview\Chain\Strategy\Internal\Media;
 use Schoolbox\Preview\Chain\Strategy\Internal\IFrame;
@@ -32,57 +31,14 @@ class Internal extends Base {
          * how to display it (or redirect, if it can't be displayed)
          */
         if ($hash = $this->isStorage($url)) {
-            $storageMapper = new StorageMapper();
-
-            try {
-                $item = $storageMapper->findByHash($hash);
-
-                $this->start([
-                    new Image($url, $item),
-                    new Media($url, $item),
-                    new IFrame($url, $item),
-                    new Redirect($url, $item),
-                ]);
-            }
-            catch (\Exception $e) {
-                error(41);
-            }
+            $this->processStorage($url, $hash);
         }
-        /* LinkRedir: get the url, log the view, then redirect or open
-         * it in the Preview modal as usual
+
+        /* Just redirect straight there
          */
-        else if ($id = $this->isLinkRedir($url)) {
-            var_dump($id);
-            die();
-        }
-        /* None of the usual cases - just redirect there
-         */
-        else {
-            $this->start([
-                new Redirect($url, null),
-            ]);
-        }
-    }
-
-    /**
-     * Get the link id out of the url
-     *
-     * @param $url
-     * @return bool
-     */
-    private function isLinkRedir($url) {
-        $id = false;
-
-        $bits = parse_url($url);
-        $querystring = $bits['query'];
-
-        preg_match('/id=([0-9]+)/', $querystring, $matches);
-
-        if (count($matches)) {
-            $id = $matches[1];
-        }
-
-        return $id;
+        $this->start([
+            new Redirect($url, null),
+        ]);
     }
 
     /**
@@ -104,5 +60,30 @@ class Internal extends Base {
         }
 
         return $hash;
+    }
+
+    /**
+     * Process Storage file analysis
+     *
+     * @param $url
+     * @param $hash
+     */
+    private function processStorage($url, $hash) {
+        $storageMapper = new StorageMapper();
+
+        try {
+            $item = $storageMapper->findByHash($hash);
+        }
+        catch (\Exception $e) {
+            $item = new \Schoolbox\Resource\Storage\Model();
+            $item->setMimetype(new \Schoolbox\File\Mimetype());
+        }
+
+        $this->start([
+            new Image($url, $item),
+            new Media($url, $item),
+            new IFrame($url, $item),
+            new Redirect($url, $item),
+        ]);
     }
 }
