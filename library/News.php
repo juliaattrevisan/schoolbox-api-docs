@@ -504,41 +504,37 @@ class News extends DeprecatedModel
     }
 
     /**
-     * Comparison logic for posted-time only
+     * Comparison logic for publish then posted-time only
      * @param $a
      * @param $b
      * @return int
      */
     public function timecmp($a, $b)
     {
-        //if ($a['newsTopicID'] == $b['newsTopicID']) {
-        //just a quick function to enable sorting of news based on time
-        if ($a['item_datetime_posted'] == $b['item_datetime_posted']) {
-            return 0;
+        // Most recent published first
+        if ($result = strcmp($a['item_datetime_published'], $b['item_datetime_published'])) {
+            return $result * -1;
         }
-        return ($a['item_datetime_posted'] > $b['item_datetime_posted']) ? -1 : 1;
-        //} else {
-        //	return $a['newsTopicID'] > $b['newsTopicID']?1:-1;
-        //}
+        // Then most recently posted
+        if ($result = strcmp($a['item_datetime_posted'], $b['item_datetime_posted'])) {
+            return $result * -1;
+        }
+        return 0;
     }
 
     /**
-     * Comparison logic for posted-time SUBORDINATE TO topic
+     * Comparison logic for publish then posted-time SUBORDINATE TO topic
      * @param $a
      * @param $b
      * @return int
      */
     public function cattimecmp($a, $b)
     {
-        if ($a['newsTopicID'] == $b['newsTopicID']) {
-            //just a quick function to enable sorting of news based on time
-            if ($a['item_datetime_posted'] == $b['item_datetime_posted']) {
-                return 0;
-            }
-            return ($a['item_datetime_posted'] > $b['item_datetime_posted']) ? -1 : 1;
-        } else {
+        if ($a['newsTopicID'] != $b['newsTopicID']) {
             return $a['newsTopicID'] > $b['newsTopicID'] ? 1 : -1;
         }
+        // fall back to timecmp
+        return $this->timecmp($a, $b);
     }
 
     /**
