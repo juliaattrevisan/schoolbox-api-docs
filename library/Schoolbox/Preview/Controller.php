@@ -11,6 +11,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Preview\Chain\Internal;
 use Schoolbox\Preview\Chain\External;
 use Schoolbox\Resource\LinkMapper;
+use Schoolbox\Resource\Link;
 
 class Controller extends Base
 {
@@ -96,9 +97,7 @@ class Controller extends Base
 
             try {
                 $link = $linkMapper->findById($id);
-
-                /* TODO: Log visit
-                 */
+                $linkMapper->logAction($_SESSION['user'], 'access', $link);
 
                 $testUrl = $link->getUrl();
             }
