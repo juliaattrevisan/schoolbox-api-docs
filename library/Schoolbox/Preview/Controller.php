@@ -77,6 +77,9 @@ class Controller extends Base
      * Test method
      */
     public function preview($params) {
+
+        /* Distill a url from an encapsulating structure, if necessary
+         */
         $decoderRegistry = new Registry\Registry($params['encodedUrl']);
         $decoderRegistry->add(new LinkRedir());
         $decoderRegistry->add(new TaskRedir());
