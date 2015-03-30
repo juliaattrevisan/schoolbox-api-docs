@@ -12,8 +12,6 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 require_once __DIR__ . '/../../include/Bootstrap.php';
 
-$returnMeta = false;
-
 // Force session usage due to flash audio recorder.
 // (Uploadify will die, but this is still needed for flash audio upload.)
 if (isset($_POST[session_name()])) {
@@ -26,7 +24,6 @@ if (isset($_GET[session_name()])) {
 }
 if (isset($_POST['fallback']) && isset($_COOKIE[session_name()])) {
     session_start();
-    $returnMeta = true;
 }
 
 $result = array(
@@ -47,11 +44,9 @@ if (!$_SESSION['id']) {
         $metas = array();
         for ($i = 0; $i < count($meta['name']); ++$i) {
             try {
-                $result = attemptStorage(getFileAtIndex($meta, $i), $returnMeta);
+                $result = attemptStorage(getFileAtIndex($meta, $i));
                 $hashes[] = $result['hash'];
-                if ($returnMeta) {
-                    $metas[] = $result['meta'];
-                }
+                $metas[]  = $result['meta'];
 
             } catch (Exception $e) {
                 $hashes[] = 'exception:'.$e->getMessage();
@@ -61,18 +56,14 @@ if (!$_SESSION['id']) {
             }
         }
         $result['hash'] = $hashes;
-        if ($returnMeta) {
-            $result['meta'] = $metas;
-        }
+        $result['meta'] = $metas;
 
     } else {
         try {
-            $result = attemptStorage($meta, $returnMeta);
+            $result = attemptStorage($meta);
         } catch (Exception $e) {
             $result['hash'] = 'exception:'.$e->getMessage();
-            if ($returnMeta) {
-                $result['meta'] = array();
-            }
+            $result['meta'] = array();
         }
     }
 }
@@ -117,11 +108,10 @@ function getFileAtIndex($meta, $i)
 
 /**
  * @param array $fileData
- * @param bool $returnMeta
  * @throws Schoolbox\File\Exception
  * @return array
  */
-function attemptStorage($fileData, $returnMeta)
+function attemptStorage($fileData)
 {
     if (!is_readable($fileData['tmp_name'])) {
         throw new Schoolbox\File\Exception("Filedata not readable");
@@ -129,19 +119,14 @@ function attemptStorage($fileData, $returnMeta)
 
     $storage = StorageMapper::getInstance()->accept($fileData['name'], $fileData['tmp_name']);
 
-    $result = array(
+    return [
         'success' => true,
         'error'   => 200,
         'message' => 'OK',
         'hash'    => NodeFactory::STORE . ':' . $storage->getHash(),
-    );
-
-    if ($returnMeta) {
-        $result['meta'] = array(
+        'meta'    => [
             'type' => $storage->getMimetype()->getMime(),
-            'size' => $storage->getSize()
-        );
-    }
-
-    return $result;
+            'size' => $storage->getSize(),
+        ]
+    ];
 }
