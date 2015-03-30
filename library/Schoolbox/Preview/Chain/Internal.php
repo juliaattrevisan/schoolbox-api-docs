@@ -33,12 +33,13 @@ class Internal extends Base {
         if ($hash = $this->isStorage($url)) {
             $this->processStorage($url, $hash);
         }
-
         /* Just redirect straight there
          */
-        $this->start([
-            new Redirect($url, null),
-        ]);
+        else {
+            $this->start([
+                new Redirect($url, null),
+            ]);
+        }
     }
 
     /**
@@ -50,10 +51,7 @@ class Internal extends Base {
     private function isStorage($url) {
         $hash = false;
 
-        $bits = parse_url($url);
-        $querystring = $bits['query'];
-
-        preg_match('/storage\/fetch\.php?hash=([a-z0-9]+)/i', $querystring, $matches);
+        preg_match('/storage\/fetch\.php\?hash=([a-z0-9]+)/i', $url, $matches);
 
         if (count($matches)) {
             $hash = $matches[1];
