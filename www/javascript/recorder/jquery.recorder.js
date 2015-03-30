@@ -70,6 +70,12 @@
             self.webrtc.supported    = true;
             self.webrtc.audioContext = new audioContextConstructor();
             self.webrtc.audioElement = self.options.webrtc.audioElement || $('<audio />');
+            self.webrtc.audioElement.on('timeupdate', function() {
+                self.triggerEvent('playbackProgress', []);
+            });
+            self.webrtc.audioElement.on('playing', function() {
+                self.triggerEvent('playbackStart', []);
+            });
             self.webrtc.audioElement.on('ended', function() {
                 self.triggerEvent('playbackStop', []);
             });
@@ -132,14 +138,19 @@
      *
      * @private
      *
-     * @returns {Recorder}
+     * @returns {RecorderPlugin}
      */
-    Recorder.prototype._startRecordingFlash = function() {
-        var self            = this;
-        self.mode           = 'flash';
-        // start() never seems to trigger
-        self.triggerEvent('recordingStart', []);
-        self.flash.recorder.record();
+    RecorderPlugin.prototype._startRecordingFlash = function() {
+        var self  = this;
+        self.mode = 'flash';
+        self.flash.recorder.record({
+            start: function() {
+                self.triggerEvent('recordingStart', []);
+            },
+            progress: function(ms) {
+                self.triggerEvent('recordingProgress', [ms]);
+            }
+        });
         return this;
     };
 
@@ -186,19 +197,26 @@
      */
     RecorderPlugin.prototype.startPlaying = function() {
         // Starting playing stops any current recording and playing.
-        if (this.isRecording()) {
-            this.stopRecording();
+        var self = this;
+        if (self.isRecording()) {
+            self.stopRecording();
         }
-        if (this.isPlaying()) {
-            this.stopPlaying();
+        if (self.isPlaying()) {
+            self.stopPlaying();
         }
-        if (this.isWebRtcUsed()) {
-            this.webrtc.audioElement[0].currentTime = 0;
-            this.webrtc.audioElement[0].play();
-            this.triggerEvent('playbackStart', []);
-        } else if (this.isFlashUsed()) {
-            this.flash.recorder.play();
-            this.triggerEvent('playbackStart', []);
+        if (self.isWebRtcUsed()) {
+            self.webrtc.audioElement[0].currentTime = 0;
+            self.webrtc.audioElement[0].play();
+        } else if (self.isFlashUsed()) {
+            self.flash.recorder.play({
+                start: function() {
+                    self.triggerEvent('playbackStart', []);
+                },
+                progress: function(ms) {
+                    self.triggerEvent('playbackProgress', [ms]);
+                }
+            });
+            self.triggerEvent('playbackStart', []);
         }
     };
 
