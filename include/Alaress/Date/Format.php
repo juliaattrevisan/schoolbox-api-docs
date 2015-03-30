@@ -77,7 +77,8 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
         if (!$locale instanceof Alaress_Date_Locale_Interface) {
             $locale = new Alaress_Date_Locale_Config();
         }
-        return new static($dateTime, $locale->localFormat(), $timezone, $locale);
+        // Zero out unset parts - IMO that's the least surprising behavior
+        return new static($dateTime, $locale->localFormat().'|', $timezone, $locale);
     }
 
     /**
@@ -99,7 +100,9 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
         if (!$locale instanceof Alaress_Date_Locale_Interface) {
             $locale = new Alaress_Date_Locale_Config();
         }
-        return new static($dateTime, $locale->localShortFormat(), $timezone, $locale);
+        // Zero out unset parts - IMO that's the least surprising behavior.
+        // If I create a date with no time, I'd expect its time to be 00:00:00
+        return new static($dateTime, $locale->localShortFormat().'|', $timezone, $locale);
     }
 
     /**
