@@ -63,4 +63,10 @@ class BasicGetPartTest extends PHPUnit_Framework_TestCase
         // Thursday
         $this->assertSame('4', $date->getWeekDayNumber());
     }
+
+    public function testGetTimezone()
+    {
+        $date = $this->getTestDateObject(new DateTimeZone('Australia/Queensland'));
+        $this->assertEquals('Australia/Queensland', $date->getTimezone()->getName());
+    }
 }
