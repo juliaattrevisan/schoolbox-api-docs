@@ -130,7 +130,10 @@
         recorderButtons.upload.click(function(event) {
             event.preventDefault();
             // prompt for a name
-            recorderInterface.uploadRecorded('butts.wav');
+            var filename = prompt("Please enter a filename", "recording");
+            if (filename !== null) {
+                recorderInterface.uploadRecorded(filename + '.wav');
+            }
         });
 
         // Init dropzone
