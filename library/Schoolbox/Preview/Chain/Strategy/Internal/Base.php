@@ -24,8 +24,9 @@ abstract class Base extends StrategyBase {
 
     /**
      * A storage model to test
+     * A link model to test
      *
-     * @var StorageModel
+     * @var null
      */
     protected $item = null;
 
@@ -35,7 +36,7 @@ abstract class Base extends StrategyBase {
      * @param $url
      * @param $item
      */
-    public function __construct($url, StorageModel $item) {
+    public function __construct($url, $item) {
         $this->setUrl($url);
         $this->setItem($item);
     }
@@ -66,7 +67,7 @@ abstract class Base extends StrategyBase {
     /**
      * Set item
      *
-     * @param StorageModel $item
+     * @param $item
      */
     protected function setItem($item)
     {
@@ -76,7 +77,7 @@ abstract class Base extends StrategyBase {
     /**
      * Get item
      *
-     * @return StorageModel
+     * @return
      */
     protected function getItem()
     {

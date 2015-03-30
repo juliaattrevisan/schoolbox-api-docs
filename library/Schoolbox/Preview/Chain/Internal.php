@@ -31,9 +31,7 @@ class Internal extends Base {
         /* Storage item: find the hash, and analyse it to find out
          * how to display it (or redirect, if it can't be displayed)
          */
-        if ($this->isStorage($url)) {
-            $hash = $this->findHash($url);
-
+        if ($hash = $this->isStorage($url)) {
             $storageMapper = new StorageMapper();
 
             try {
@@ -53,38 +51,58 @@ class Internal extends Base {
         /* LinkRedir: get the url, log the view, then redirect or open
          * it in the Preview modal as usual
          */
-        else if ($this->isLinkRedir($url)) {
+        else if ($id = $this->isLinkRedir($url)) {
+            var_dump($id);
+            die();
+        }
+        /* None of the usual cases - just redirect there
+         */
+        else {
+            $this->start([
+                new Redirect($url, null),
+            ]);
         }
     }
 
+    /**
+     * Get the link id out of the url
+     *
+     * @param $url
+     * @return bool
+     */
     private function isLinkRedir($url) {
-    }
-
-    private function findHash($url) {
-        $hash = '';
+        $id = false;
 
         $bits = parse_url($url);
         $querystring = $bits['query'];
 
-        preg_match('/hash=([a-z0-9]+)/i', $querystring, $matches);
+        preg_match('/id=([0-9]+)/', $querystring, $matches);
+
+        if (count($matches)) {
+            $id = $matches[1];
+        }
+
+        return $id;
+    }
+
+    /**
+     * Get the hash out of a storage url
+     *
+     * @param $url
+     * @return bool
+     */
+    private function isStorage($url) {
+        $hash = false;
+
+        $bits = parse_url($url);
+        $querystring = $bits['query'];
+
+        preg_match('/storage\/fetch\.php?hash=([a-z0-9]+)/i', $querystring, $matches);
 
         if (count($matches)) {
             $hash = $matches[1];
         }
 
         return $hash;
-    }
-
-    /**
-     * Check if this is a storage url, it could contain anything
-     */
-    protected function isStorage($url) {
-        preg_match('#storage\/fetch\.php#', $url, $matches);
-
-        if (count($matches)) {
-            return true;
-        }
-
-        return false;
     }
 }
