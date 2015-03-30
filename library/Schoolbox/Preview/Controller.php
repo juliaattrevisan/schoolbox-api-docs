@@ -156,10 +156,7 @@ class Controller extends Base
     private function isLinkRedir($url) {
         $id = false;
 
-        $bits = parse_url($url);
-        $querystring = $bits['query'];
-
-        preg_match('/id=([0-9]+)/', $querystring, $matches);
+        preg_match('/redir\.php\?id=([0-9]+)/', $url, $matches);
 
         if (count($matches)) {
             $id = $matches[1];
