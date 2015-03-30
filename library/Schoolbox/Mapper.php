@@ -82,11 +82,14 @@ abstract class Mapper implements Serializable
     const CALLBACK_PRESOFTDELETE  = 'preSoftDelete';
     const CALLBACK_POSTSOFTDELETE = 'postSoftDelete';
 
+    // options for mapping methods
     const COLUMN_IDENTIFIER        = 1;
     const COLUMN_CREATED_TIMESTAMP = 2;
     const COLUMN_UPDATED_TIMESTAMP = 4;
     const COLUMN_JOIN_MULTI        = 8;
-    const COLUMN_SOFTDELETE        = 16;
+    const COLUMN_JOIN_READONLY     = 16;
+    const COLUMN_SOFTDELETE        = 32;
+
     /**
      * @var Database
      */
@@ -574,15 +577,15 @@ abstract class Mapper implements Serializable
     /**
      * The concise, typesave version of hasMap() + hasJoin(['multi'])
      *
-     * @param string      $viaTable       the manymany jointable
-     * @param string      $foreignMapper  the target Mapper on the other side (not a jointable Mapper)
-     * @param string      $foreignKey     the ID field of the foreign Model
-     * @param string      $viaForeign     the fieldname on the foreign side of the jointable
-     * @param string      $viaLocal       the fieldname of the local side of the jointable
-     * @param string      $localKey       optionally, the ID field of this Model, defaults to $this->identifier otherwise
-     * @param IColumnType $hydrator       optionally, a custom hydrator
-     * @param int         $options        optionally, any custom options required
-     * @param string      $property       opyionally, override the property name from default
+     * @param string          $viaTable      the manymany jointable
+     * @param string          $foreignMapper the target Mapper on the other side (not a jointable Mapper)
+     * @param string          $foreignKey    the ID field of the foreign Model
+     * @param string          $viaForeign    the fieldname on the foreign side of the jointable
+     * @param string          $viaLocal      the fieldname of the local side of the jointable
+     * @param string          $localKey      optionally, the ID field of this Model, defaults to $this->identifier otherwise
+     * @param int|IColumnType $hydrator      optionally, a custom hydrator
+     * @param int             $options       optionally, any custom options required
+     * @param string          $property      opyionally, override the property name from default
      * @throws Exception
      */
     protected function joinsVia($viaTable, $foreignMapper, $foreignKey, $viaForeign, $viaLocal, $localKey = null, $hydrator = null, $options = null, $property = null)
@@ -602,7 +605,8 @@ abstract class Mapper implements Serializable
             'multi'     => [
                 'via_table'  => $viaTable,
                 'this_key'   => $viaLocal,
-                'other_key'  => $viaForeign
+                'other_key'  => $viaForeign,
+                'read_only'  => !!($options & self::COLUMN_JOIN_READONLY)
             ]
         ];
         $this->hasMap($map);
@@ -1566,7 +1570,7 @@ abstract class Mapper implements Serializable
                 }
                 // also update n:n relation tables if they exist
                 foreach ($this->getMap() as $map) {
-                    if (empty($map['join']) || empty($this->joins[$map['join']]['multi'])) {
+                    if (empty($map['join']) || empty($this->joins[$map['join']]['multi']) || $map['join']['multi']['read_only']) {
                         // not interested
                         continue;
                     }
