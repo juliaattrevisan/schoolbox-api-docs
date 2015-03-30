@@ -49,6 +49,8 @@ class External extends Base {
         if ($numRedirects > 1) {
             $newHeaders = [];
 
+            /* Just get the destination, ignore all the intermediary redirect locations
+             */
             foreach(array_keys($headers) as $currentKey) {
                 if (is_array($headers[$currentKey])) {
                     $newHeaders[$currentKey] = $headers[$currentKey][$numRedirects-1];
