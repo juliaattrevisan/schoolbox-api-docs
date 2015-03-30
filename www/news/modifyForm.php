@@ -12,8 +12,8 @@ if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS) {
 }
 
 if ($_POST['heading']) {
-    $publishedDate = new Alaress_Date_Format($_POST['item_datetime_published'], 'd/m/Y');
-    $expiryDate = new Alaress_Date_Format($_POST['item_datetime_expires'], 'd/m/Y');
+    $publishedDate = Alaress_Date_Format::newLocalShort($_POST['item_datetime_published']);
+    $expiryDate = Alaress_Date_Format::newLocalShort($_POST['item_datetime_expires']);
 
     // Error out if there's campi that this user can't post to in $_POST[campus]
     $campusList = array();

@@ -90,16 +90,16 @@ $useDescriptors = $resultSetID == 0;
  * Also set the time to the start or end of the day if all_day is set
  */
 
-$publishDate = generateDate('publish', '00:00:00');
-$openDate    = generateDate('open', '00:00:00');
-$dueDate     = generateDate('due', '23:59:59');
+$publishDate = generateDate('publish', 0, 0, 0);
+$openDate    = generateDate('open', 0, 0, 0);
+$dueDate     = generateDate('due', 23, 59, 59);
 
 // if we're not accepting submissions. override the late date to due date
 // Open date: the date on which the event shows on student's calendars
 if (!$acceptSubmissions) {
     $lateDate = $dueDate;
 } else {
-    $lateDate = generateDate('late', '23:59:59');
+    $lateDate = generateDate('late', 23, 59, 59);
 }
 
 // If not a task: check if any of the dates failed to parse
@@ -280,33 +280,23 @@ $page->localRedir($is_task ? "/homepage/$categoryID" : '/submission/listSubmissi
 /**
  * Uses POST variables to create dates
  *
- * @param $field
- * @param $placeholder
+ * @param string $field
+ * @param int    $placeholderHour
+ * @param int    $placeholderMinute
+ * @param int    $placeholderSecond
  *
  * @return Alaress_Date_Format
  */
-function generateDate($field, $placeholder)
+function generateDate($field, $placeholderHour, $placeholderMinute, $placeholderSecond)
 {
+    $adf = Alaress_Date_Format::newLocalShort($_POST[$field . '_date']);
     if (empty($_POST[$field . '_hour'])) {
-        $adf = new Alaress_Date_Format(
-            sprintf(
-                "%s %s",
-                $_POST[$field . '_date'],
-                $placeholder
-            ),
-            'd/m/Y H:i:s'
-        );
+        $adf->setTime($placeholderHour, $placeholderMinute, $placeholderSecond);
     } else {
-        $adf = new Alaress_Date_Format(
-            sprintf(
-                "%s %s:%s %s",
-                $_POST[$field . '_date'],
-                $_POST[$field . '_hour'],
-                $_POST[$field . '_minute'],
-                $_POST[$field . '_period']
-            ),
-            'd/m/Y h:i a'
-        );
+        $adf
+            ->set12Hour($_POST[$field . '_hour'], $_POST[$field . '_period'])
+            ->setMinute($_POST[$field . '_minute'])
+        ;
     }
     return $adf;
 }

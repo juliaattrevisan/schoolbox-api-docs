@@ -11,7 +11,7 @@ $string = $_REQUEST['string'];
 $format = $_REQUEST['format'];
 
 if (empty($format)) {
-    $format = 'd/m/Y';
+    $format = Config::get('date_local');
 }
 
 /* Allow null values

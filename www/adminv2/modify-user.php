@@ -225,12 +225,14 @@ if(is_numeric($this->arg[0])) {
         $loginLog = $userHandler->getUserLogins($user['username']);
         if(is_array($loginLog)) {
             foreach($loginLog as $result) {
-                    $output = array (   'LOGIN_DATE'    => date('d/m/Y G:i',strtotime( $result['date'] )),
-                                        'LOGIN_IP' => $result['ip'],
-                                        'LOGIN_RESULT' => $result['login']?'Success':'Failed',
-                                                    );
-                    $this->setVar($output);
-                    $this->parse('login_log_block', 'login_log', true);
+                $loginDate = new Alaress_Date_Format(strtotime($result['date']), 'U');
+                $output    = array (
+                    'LOGIN_DATE'   => $loginDate->getLocal(),
+                    'LOGIN_IP'     => $result['ip'],
+                    'LOGIN_RESULT' => $result['login']?'Success':'Failed',
+                );
+                $this->setVar($output);
+                $this->parse('login_log_block', 'login_log', true);
             }
         } else
             $this->setVar('login_log_block', '');
@@ -245,11 +247,13 @@ if(is_numeric($this->arg[0])) {
 
         if(is_array($activityLog)) {
             foreach($activityLog as $result) {
-                    $output = array (    'ACTION_DATE'    => date('d/m/Y G:i',strtotime( $result['time'] )),
-                                            'ACTION_ACTION' => $lookupAction[$result['action']].' '.$result['object'].' '.$result[$result['object']],
-                                                    );
-                    $this->setVar($output);
-                    $this->parse('action_log_block', 'action_log', true);
+                $date   = new Alaress_Date_Format(strtotime($result['time']), 'U');
+                $output = array (
+                    'ACTION_DATE'   => $date->getLocal(),
+                    'ACTION_ACTION' => $lookupAction[$result['action']].' '.$result['object'].' '.$result[$result['object']],
+                );
+                $this->setVar($output);
+                $this->parse('action_log_block', 'action_log', true);
             }
         } else
                 $this->setVar('action_log_block', '');

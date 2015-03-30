@@ -28,12 +28,24 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract {
     /**
      * @return Loader
      */
-    public function getConfig(){
-        if(!$this->config instanceof Loader) {
-            $this->config = new Loader;
+    public function getConfig()
+    {
+        if (!$this->config instanceof Loader) {
+            $this->setConfig(new Loader());
         }
 
         return $this->config;
+    }
+
+    /**
+     * @param \Schoolbox\IConfigLoader $loader
+     *
+     * @return $this
+     */
+    public function setConfig(\Schoolbox\IConfigLoader $loader)
+    {
+        $this->config = $loader;
+        return $this;
     }
 
     /**

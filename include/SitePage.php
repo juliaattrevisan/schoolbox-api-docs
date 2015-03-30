@@ -295,6 +295,7 @@ class SitePage extends Page
             $debug_bar_body = $renderer->render();
         }
 
+        $dateFormat  = Config::get('date_local');
         $templateVar = array(
             'TEMPLATE_YEAR'          => date('Y'),
             'SITE_NAME'              => Cfg::get('school_name'),
@@ -315,7 +316,9 @@ class SitePage extends Page
             'WEBSOCKET_UNREAD_COUNT' => $_SESSION['msg-count'] ? : 0,
             'WEBSOCKET_UNREAD_LABEL' => $_SESSION['msg-count'] ? : '',
             'WEBSOCKET_STACK_LIMIT'  => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
-            'PAGE_SECURE'            => empty($_SERVER['HTTPS']) ? 'false' : 'true'
+            'PAGE_SECURE'            => empty($_SERVER['HTTPS']) ? 'false' : 'true',
+            'DATEPICKER_FORMAT'      => json_encode(Alaress_Date_Format_Converter::toDatepicker($dateFormat)),
+            'MOMENTJS_FORMAT'        => json_encode(Alaress_Date_Format_Converter::toMomentJs($dateFormat)),
         );
 
         $this->setVar($templateVar);

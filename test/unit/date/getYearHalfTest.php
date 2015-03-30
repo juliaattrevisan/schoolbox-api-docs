@@ -1,0 +1,37 @@
+<?php
+/**
+ * Test for verifying that getting the year half works.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright 2015 Alaress Pty Ltd
+ * @link      http://www.alaress.com.au
+ */
+
+class getYearPartTest extends PHPUnit_Framework_TestCase
+{
+    use Alaress\Test\Date\MockDateObject;
+
+    /**
+     * Data sets for testGetYearHalf
+     */
+    public function getTestYearHalfData()
+    {
+        return [
+            [$this->buildDateObject('2015-01-01 00:00:00', Alaress_Date_Format::DATABASE_FORMAT), 1],
+            [$this->buildDateObject('2015-06-30 23:59:59', Alaress_Date_Format::DATABASE_FORMAT), 1],
+            [$this->buildDateObject('2015-07-01 00:00:00', Alaress_Date_Format::DATABASE_FORMAT), 2],
+            [$this->buildDateObject('2015-12-31 23:59:59', Alaress_Date_Format::DATABASE_FORMAT), 2],
+        ];
+    }
+
+    /**
+     * @dataProvider getTestYearHalfData
+     *
+     * @param Alaress_Date_Format $date
+     * @param int                 $expectedHalf
+     */
+    public function testGetYearHalf($date, $expectedHalf)
+    {
+        $this->assertEquals($expectedHalf, $date->getYearHalf());
+    }
+}

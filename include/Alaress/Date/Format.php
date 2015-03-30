@@ -22,11 +22,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     protected $datetime;
 
     /**
-     * @var DateTimeZone
-     */
-    protected $timezone;
-
-    /**
      * @var Alaress_Date_Locale_Interface
      */
     protected $locale;
@@ -46,6 +41,14 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     const AM = 'AM';
     const PM = 'PM';
 
+    const SUNDAY = 0;
+    const MONDAY = 1;
+    const TUESDAY = 2;
+    const WEDNESDAY = 3;
+    const THURSDAY = 4;
+    const FRIDAY = 5;
+    const SATURDAY = 6;
+
     /**
      * Returns an instance of self at the current time.
      * Method gives precedence to REQUEST_TIME, but accepts that outside HTTP requests, it doesn't exist.
@@ -57,10 +60,63 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
         if (isset($_SERVER['REQUEST_TIME'])) {
             $time = $_SERVER['REQUEST_TIME'];
         } else {
+            // @codeCoverageIgnoreStart
             $time = time();
+            // @codeCoverageIgnoreEnd
         }
 
         return new static($time, 'U');
+    }
+
+    /**
+     * Static constructor: creates a new date, with the format based on
+     * $locale->localFormat().
+     *
+     * @param string                        $dateTime
+     * @param DateTimeZone                  $timezone Optional timezone
+     * @param Alaress_Date_Locale_Interface $locale   Optional locale, falls back to
+     *                                                new Alaress_Date_Locale_Config()
+     *
+     * @return static
+     */
+    public static function newLocal(
+        $dateTime,
+        DateTimeZone $timezone = null,
+        Alaress_Date_Locale_Interface $locale = null
+    ) {
+        if (!$locale instanceof Alaress_Date_Locale_Interface) {
+            // @codeCoverageIgnoreStart
+            $locale = new Alaress_Date_Locale_Config();
+            // @codeCoverageIgnoreEnd
+        }
+        // Zero out unset parts - IMO that's the least surprising behavior
+        return new static($dateTime, $locale->localFormat().'|', $timezone, $locale);
+    }
+
+    /**
+     * Static constructor: creates a new date, with the format based on
+     * $locale->localShortFormat().
+     *
+     * @param string                        $dateTime
+     * @param DateTimeZone                  $timezone Optional timezone
+     * @param Alaress_Date_Locale_Interface $locale   Optional locale, falls back to
+     *                                                new Alaress_Date_Locale_Config()
+     *
+     * @return static
+     */
+    public static function newLocalShort(
+        $dateTime,
+        DateTimeZone $timezone = null,
+        Alaress_Date_Locale_Interface $locale = null
+    ) {
+        if (!$locale instanceof Alaress_Date_Locale_Interface) {
+            // @codeCoverageIgnoreStart
+            $locale = new Alaress_Date_Locale_Config();
+            // @codeCoverageIgnoreEnd
+        }
+        // Zero out unset parts - IMO that's the least surprising behavior.
+        // If I create a date with no time, I'd expect its time to be 00:00:00
+        return new static($dateTime, $locale->localShortFormat().'|', $timezone, $locale);
     }
 
     /**
@@ -76,11 +132,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function __construct($dateTime = null, $dateFormat = null, DateTimeZone $timezone = null, $locale = null)
     {
-
-        if (!($timezone instanceof DateTimeZone)) {
-            $timezone = new DateTimeZone(date_default_timezone_get());
-        }
-
         if($locale instanceof Alaress_Date_Locale_Interface) {
             $this->setLocale($locale);
         }
@@ -88,39 +139,49 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
             $this->setLocale(new Alaress_Date_Locale_Config());
         }
 
+        $this->setFromFormat($dateTime, $dateFormat, $timezone);
+    }
 
-
-        $this->setTimezone($timezone);
-        $this->setFromFormat($dateTime, $dateFormat);
-
+    /**
+     * What's the default timezone?
+     * It should've been set by date_default_timezone_set.
+     *
+     * @return DateTimeZone
+     */
+    protected function getDefaultTimezone()
+    {
+        return new DateTimeZone(date_default_timezone_get());
     }
 
     /**
      * Attempts to create a Laravel date out of $dateTime.
+
+     * * `empty($dateTime)`: creates as now
+     * * `$dateTime instanceof DateTime or Alaress_Date_Format`:
+     *   copies $dateTime's time, and timezone if $timezone is null
      *
-     * * empty: creates as now
-     * *
-     * @param mixed $dateTime
+     * @param mixed        $dateTime
+     * @param DateTimeZone $timezone The timezone of the date, or null to use default
      *
      * @return LaravelDate
      * @throws InvalidArgumentException if date couldn't be built
      */
-    protected function buildLaravelDate($dateTime = null)
+    protected function buildLaravelDate($dateTime = null, DateTimeZone $timezone = null)
     {
         if (!isset($dateTime)) {
             // Nothing set? set it to now
-            return LaravelDate::now($this->timezone);
+            return LaravelDate::now($timezone ?: $this->getDefaultTimezone());
         } elseif ($dateTime instanceof DateTime || $dateTime instanceof DateTimeInterface) {
             // Build out of timestamp and timezone
             return LaravelDate::createFromTimestamp(
                 $dateTime->getTimestamp(),
-                $dateTime->getTimezone()
+                $timezone ?: clone $dateTime->getTimezone()
             );
         } elseif ($dateTime instanceof Alaress_Date_Format) {
             // Build out of date object's timestamp/timezone
             return LaravelDate::createFromTimestamp(
                 $dateTime->getDateTimeObject()->getTimestamp(),
-                $dateTime->getDateTimeObject()->getTimezone()
+                $timezone ?: clone $dateTime->getDateTimeObject()->getTimezone()
             );
         }
         throw new InvalidArgumentException('Could not create LaravelDate from $dateTime');
@@ -129,6 +190,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     /**
      * @param DateTimeInterface|Alaress_Date_Format|string $dateTime
      * @param string $inputDateFormat
+     * @param DateTimeZone $timezone The timezone of the date, or null to use default
      *
      * @return void
      * @throws InvalidArgumentException if no $inputDateFormat was set and $dateTime
@@ -136,10 +198,13 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      * @throws RuntimeException         if $dateTime is a string and it can't be
      *                                  parsed in $inputDateFormat
      */
-    public function setFromFormat($dateTime, $inputDateFormat)
-    {
+    public function setFromFormat(
+        $dateTime,
+        $inputDateFormat,
+        DateTimeZone $timezone = null
+    ) {
         try {
-            $newDateTime = $this->buildLaravelDate($dateTime);
+            $newDateTime = $this->buildLaravelDate($dateTime, $timezone);
             $this->setDateTimeObject($newDateTime);
         } catch (InvalidArgumentException $e) {
             if (!isset($inputDateFormat)) {
@@ -148,11 +213,12 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
                 );
             }
 
-            $newDateTime = DateTime::createFromFormat($inputDateFormat, $dateTime);
+            $newTimezone = $timezone ?: $this->getDefaultTimezone();
+            $newDateTime = DateTime::createFromFormat($inputDateFormat, $dateTime, $newTimezone);
             $errors = DateTime::getLastErrors();
             if ($errors['error_count']) {
                 // I don't have a datetime, try again with trailing data allowed
-                $newDateTime = DateTime::createFromFormat($inputDateFormat . '+', $dateTime);
+                $newDateTime = DateTime::createFromFormat($inputDateFormat . '+', $dateTime, $newTimezone);
                 if (!($newDateTime instanceof DateTime)) {
                     // I still don't have a datetime, exception out
                     $errors = DateTime::getLastErrors();
@@ -182,7 +248,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
 
             // Did I specify a timezone? If not, set it to the default
             if (!preg_match('/[eOPT]/', $inputDateFormat)) {
-                $laravelDate->setTimezone($this->timezone);
+                $laravelDate->setTimezone($newTimezone);
             }
             $this->setDateTimeObject($laravelDate);
         }
@@ -216,7 +282,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function setYear($year)
     {
-        $this->getDateTimeObject()->setYear($year);
+        $this->getDateTimeObject()->year($year);
         return $this;
     }
 
@@ -226,7 +292,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function setMonth($month)
     {
-        $this->getDateTimeObject()->setYear($month);
+        $this->getDateTimeObject()->month($month);
         return $this;
     }
 
@@ -236,8 +302,81 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function setDay($day)
     {
-        $this->getDateTimeObject()->setYear($day);
+        $this->getDateTimeObject()->day($day);
         return $this;
+    }
+
+    /**
+     * Calculates a 24 hour from a 12 hour and a meridiem.
+     *
+     * @param int    $hour     The hour in 12 hour time
+     * @param string $meridiem The associated meridiem: "AM" or "PM"
+     *
+     * @return int|null The hour, or null if calculation failed.
+     *                  Note this can return int(0) - you need to check whether
+     *                  the result isset(), a !empty() or truthy check is not
+     *                  sufficient.
+     */
+    protected function calculate24HourFrom12Hour($hour, $meridiem)
+    {
+        if ($hour < 1 || $hour > 12) {
+            trigger_error(
+                sprintf('hour "%s" must be between 1 and 12', $hour),
+                E_USER_WARNING
+            );
+            return null;
+        }
+        switch (strtoupper($meridiem)) {
+            case self::AM:
+                // 12 AM: 0
+                //  1 AM: 1
+                // 11 AM: 11
+                if ($hour == 12) {
+                    $adjustedHour = 0;
+                } else {
+                    $adjustedHour = $hour;
+                }
+                break;
+            case self::PM:
+                // 12 PM: 12
+                //  1 PM: 13
+                // 11 PM: 23
+                if ($hour == 12) {
+                    $adjustedHour = $hour;
+                } else {
+                    $adjustedHour = $hour + 12;
+                }
+                break;
+            default:
+                // meridiem is wrong
+                trigger_error(
+                    sprintf('meridiem "%s" must be "AM" or "PM"', $meridiem),
+                    E_USER_WARNING
+                );
+                return null;
+        }
+        return $adjustedHour;
+    }
+
+    /**
+     * Sets a 12 hour time.
+     *
+     * @param int    $hour     The hour to set in 12 hour time
+     * @param string $meridiem The associated meridiem: "AM" or "PM"
+     *
+     * @return $this
+     */
+    public function set12Hour($hour, $meridiem)
+    {
+        $adjustedHour = $this->calculate24HourFrom12Hour($hour, $meridiem);
+        if (!isset($adjustedHour)) {
+            trigger_error(
+                'either hour or meridiem was invalid - not adjusting time',
+                E_USER_WARNING
+            );
+            return $this;
+        }
+        return $this->setHour($adjustedHour);
     }
 
     /**
@@ -246,7 +385,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function setHour($hour)
     {
-        $this->getDateTimeObject()->setYear($hour);
+        $this->getDateTimeObject()->hour($hour);
         return $this;
     }
 
@@ -256,7 +395,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function setMinute($minute)
     {
-        $this->getDateTimeObject()->setYear($minute);
+        $this->getDateTimeObject()->minute($minute);
         return $this;
     }
 
@@ -266,18 +405,18 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function setSecond($second)
     {
-        $this->getDateTimeObject()->setYear($second);
+        $this->getDateTimeObject()->second($second);
         return $this;
     }
 
 
     /**
-     * @param DateTimeZone $timezone
+     * @param DateTimeZone|string $timezone
      * @return $this
      */
     public function setTimezone($timezone)
     {
-        $this->timezone = $timezone;
+        $this->getDateTimeObject()->setTimezone($timezone);
         return $this;
     }
 
@@ -309,14 +448,37 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
-     * @param $hour
-     * @param $min
-     * @param $sec
+     * @param int $hour
+     * @param int $min
+     * @param int $sec
      * @return $this
      */
     public function setTime($hour, $min, $sec)
     {
         $this->getDateTimeObject()->setTime($hour, $min, $sec);
+        return $this;
+    }
+
+    /**
+     * 12 hour time equivalent of setTime()
+     *
+     * @param int    $hour
+     * @param int    $min
+     * @param int    $sec
+     * @param string $meridiem
+     * @return $this
+     */
+    public function set12HourTime($hour, $min, $sec, $meridiem)
+    {
+        $adjustedHour = $this->calculate24HourFrom12Hour($hour, $meridiem);
+        if (!isset($adjustedHour)) {
+            trigger_error(
+                'either hour or meridiem was invalid - not adjusting time',
+                E_USER_WARNING
+            );
+            return $this;
+        }
+        $this->getDateTimeObject()->setTime($adjustedHour, $min, $sec);
         return $this;
     }
 
@@ -392,6 +554,16 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      * @param $val
      * @return $this
      */
+    public function addYears($val)
+    {
+        $this->getDateTimeObject()->addYears($val);
+        return $this;
+    }
+
+    /**
+     * @param $val
+     * @return $this
+     */
     public function addWeeks($val)
     {
         $this->getDateTimeObject()->addWeeks($val);
@@ -423,14 +595,15 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
-     * 1975-12-25T14:15:16-0500
+     * 1975-12-25T14:15:16-05:00
      *
      * @return string
      */
     public function toIso8601String()
     {
-        return $this->getDateTimeObject()->toIso8601String();
-
+        // Carbon's implementation of toIso8601String() is wrong.
+        // It uses 'Y-m-d\TH:i:sO', should be 'Y-m-d\TH:i:sP';
+        return $this->getUsingFormat('Y-m-d\TH:i:sP');
     }
 
     /**
@@ -649,6 +822,16 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
         return $this;
     }
 
+    /**
+     * Equivalent of `DateTime->modify()`.
+     *
+     * @see http://php.net/manual/en/datetime.modify.php
+     */
+    public function modify($modify)
+    {
+        $this->getDateTimeObject()->modify($modify);
+        return $this;
+    }
 
     /**
      * Transform the datetime into a localised version
@@ -793,6 +976,19 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
+     * Extract the day of this date.
+     *
+     * @param bool $leadingZero True if leading zero is fetched, false if not
+     *                          Defaults to false.
+     *
+     * @return int
+     */
+    public function getDay($leadingZero = false)
+    {
+        return $this->getUsingFormat($leadingZero ? 'd' : 'j');
+    }
+
+    /**
      * Gets the year half of this date.
      *
      * * Jan-Jun: 1
@@ -826,7 +1022,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function get12Hour($leadingZero = false)
     {
-        return $this->getUsingFormat($leadingZero ? 'G' : 'g');
+        return $this->getUsingFormat($leadingZero ? 'h' : 'g');
     }
 
     /**
@@ -837,9 +1033,19 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      *
      * @return int
      */
+    public function getHour($leadingZero = false)
+    {
+        return $this->getUsingFormat($leadingZero ? 'H' : 'G');
+    }
+
+    /**
+     * Alias of `$this->getHour()`.
+     *
+     * @see $this->getHour()
+     */
     public function get24Hour($leadingZero = false)
     {
-        return $this->getUsingFormat($leadingZero ? 'H' : 'h');
+        return $this->getHour($leadingZero);
     }
 
     /**
@@ -874,6 +1080,14 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
             return $this->stripLeadingZero($result);
         }
         return $result;
+    }
+
+    /**
+     * @return DateTimeZone
+     */
+    public function getTimezone()
+    {
+        return $this->getDateTimeObject()->getTimezone();
     }
 
     /**
@@ -1214,91 +1428,100 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
 
     /**
      * @param Alaress_Date_Format $diff
+     * @param bool                $absolute
      * @return int
      */
-    public function diffInYears(Alaress_Date_Format $diff)
+    public function diffInYears(Alaress_Date_Format $diff, $absolute = true)
     {
-        return $this->getDateTimeObject()->diffInYears($diff->getDateTimeObject());
+        return $this->getDateTimeObject()->diffInYears($diff->getDateTimeObject(), $absolute);
     }
 
 
     /**
      * @param Alaress_Date_Format $diff
+     * @param bool                $absolute
      * @return int
      */
-    public function diffInMonths(Alaress_Date_Format $diff)
+    public function diffInMonths(Alaress_Date_Format $diff, $absolute = true)
     {
-        return $this->getDateTimeObject()->diffInMonths($diff->getDateTimeObject());
+        return $this->getDateTimeObject()->diffInMonths($diff->getDateTimeObject(), $absolute);
     }
 
 
     /**
      * @param Alaress_Date_Format $diff
+     * @param bool                $absolute
      * @return int
      */
-    public function diffInWeeks(Alaress_Date_Format $diff)
+    public function diffInWeeks(Alaress_Date_Format $diff, $absolute = true)
     {
-        return $this->getDateTimeObject()->diffInWeeks($diff->getDateTimeObject());
+        return $this->getDateTimeObject()->diffInWeeks($diff->getDateTimeObject(), $absolute);
     }
 
 
     /**
      * @param Alaress_Date_Format $diff
+     * @param bool                $absolute
      * @return int
      */
-    public function diffInDays(Alaress_Date_Format $diff)
+    public function diffInDays(Alaress_Date_Format $diff, $absolute = true)
     {
-        return $this->getDateTimeObject()->diffInDays($diff->getDateTimeObject());
+        return $this->getDateTimeObject()->diffInDays($diff->getDateTimeObject(), $absolute);
     }
 
 
     /**
      * @param Alaress_Date_Format $diff
+     * @param bool                $absolute
      * @return int
      */
-    public function diffInWeekdays(Alaress_Date_Format $diff)
+    public function diffInWeekdays(Alaress_Date_Format $diff, $absolute = true)
     {
-        return $this->getDateTimeObject()->diffInWeekdays($diff->getDateTimeObject());
+        return $this->getDateTimeObject()->diffInWeekdays($diff->getDateTimeObject(), $absolute);
     }
 
 
     /**
      * @param Alaress_Date_Format $diff
+     * @param bool                $absolute
      * @return int
      */
-    public function diffInWeekendDays(Alaress_Date_Format $diff)
+    public function diffInWeekendDays(Alaress_Date_Format $diff, $absolute = true)
     {
-        return $this->getDateTimeObject()->diffInWeekendDays($diff->getDateTimeObject());
+        return $this->getDateTimeObject()->diffInWeekendDays($diff->getDateTimeObject(), $absolute);
     }
 
 
     /**
      * @param Alaress_Date_Format $diff
+     * @param bool                $absolute
      * @return int
      */
-    public function diffInHours(Alaress_Date_Format $diff)
+    public function diffInHours(Alaress_Date_Format $diff, $absolute = true)
     {
-        return $this->getDateTimeObject()->diffInHours($diff->getDateTimeObject());
+        return $this->getDateTimeObject()->diffInHours($diff->getDateTimeObject(), $absolute);
     }
 
 
     /**
      * @param Alaress_Date_Format $diff
+     * @param bool                $absolute
      * @return int
      */
-    public function diffInMinutes(Alaress_Date_Format $diff)
+    public function diffInMinutes(Alaress_Date_Format $diff, $absolute = true)
     {
-        return $this->getDateTimeObject()->diffInMinutes($diff->getDateTimeObject());
+        return $this->getDateTimeObject()->diffInMinutes($diff->getDateTimeObject(), $absolute);
     }
 
 
     /**
      * @param Alaress_Date_Format $diff
+     * @param bool                $absolute
      * @return int
      */
-    public function diffInSeconds(Alaress_Date_Format $diff)
+    public function diffInSeconds(Alaress_Date_Format $diff, $absolute = true)
     {
-        return $this->getDateTimeObject()->diffInSeconds($diff->getDateTimeObject());
+        return $this->getDateTimeObject()->diffInSeconds($diff->getDateTimeObject(), $absolute);
 
     }
 
@@ -1308,14 +1531,20 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function getRelativeTime($now = null, $stripModifiers = false)
     {
+        // I can't test this method accurately by comparing with now, as that
+        // can and will change through the test.
         if (!isset($now)) {
+            // @codeCoverageIgnoreStart
             return $this->getDateTimeObject()->diffForHumans(null, $stripModifiers);
+            // @codeCoverageIgnoreEnd
         }
         // Convert now to a carbon object, if I can, otherwise assume now
         try {
             return $this->getDateTimeObject()->diffForHumans($this->buildLaravelDate($now), $stripModifiers);
         } catch (InvalidArgumentException $e) {
+            // @codeCoverageIgnoreStart
             return $this->getDateTimeObject()->diffForHumans(null, $stripModifiers);
+            // @codeCoverageIgnoreEnd
         }
     }
 
@@ -1330,6 +1559,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      */
     public function __toString()
     {
-        return $this->getUsingFormat('c');
+        return $this->toIso8601String();
     }
 }

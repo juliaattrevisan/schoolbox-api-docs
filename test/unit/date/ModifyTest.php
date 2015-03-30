@@ -1,0 +1,34 @@
+<?php
+/**
+ * Tests for verifying modification of dates.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright 2015 Alaress Pty Ltd
+ * @link      http://www.alaress.com.au
+ */
+
+class ModifyTest extends PHPUnit_Framework_TestCase
+{
+    use Alaress\Test\Date\MockDateObject;
+
+    public function testModify()
+    {
+        $date = $this->buildDateObject('2015-03-25 00:00:00', Alaress_Date_Format::DATABASE_FORMAT);
+        $date->modify('+1 year');
+        $this->assertEquals('2016-03-25 00:00:00', $date->getDatabase());
+    }
+
+    public function testPrevious()
+    {
+        $date = $this->buildDateObject('2015-03-25 00:00:00', Alaress_Date_Format::DATABASE_FORMAT);
+        $date->previous(Alaress_Date_Format::MONDAY);
+        $this->assertEquals('2015-03-23 00:00:00', $date->getDatabase());
+    }
+
+    public function testNext()
+    {
+        $date = $this->buildDateObject('2015-03-25 00:00:00', Alaress_Date_Format::DATABASE_FORMAT);
+        $date->next(Alaress_Date_Format::MONDAY);
+        $this->assertEquals('2015-03-30 00:00:00', $date->getDatabase());
+    }
+}

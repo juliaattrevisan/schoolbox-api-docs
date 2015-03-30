@@ -1,0 +1,156 @@
+<?php
+/**
+ * Tests for verifying that a date is a particular type.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright 2015 Alaress Pty Ltd
+ * @link      http://www.alaress.com.au
+ */
+
+class IsATypeOfDateTest extends PHPUnit_Framework_TestCase
+{
+    use Alaress\Test\Date\MockDateObject;
+
+    public function getIsWeekdayData()
+    {
+        return [
+            [$this->buildDateObject('2015-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT), true,],
+            [$this->buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT), false,],
+        ];
+    }
+
+    /**
+     * @dataProvider getIsWeekdayData
+     *
+     * @param Alaress_Date_Format $date
+     * @param bool                $isWeekday
+     */
+    public function testIsWeekday($date, $isWeekday)
+    {
+        $this->assertEquals($isWeekday, $date->isWeekday());
+        $this->assertNotEquals($isWeekday, $date->isWeekend());
+    }
+
+    public function getIsLeapYearData()
+    {
+        return [
+            // Leap years: every 4 years
+            [$this->buildDateObject('2015-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT), false,],
+            [$this->buildDateObject('2016-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT), true,],
+            // Special rule: excluding every 500th year
+            [$this->buildDateObject('1500-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT), false,],
+            // Super special rule: but including every 2000th year
+            [$this->buildDateObject('2000-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT), true,],
+        ];
+    }
+
+    /**
+     * @dataProvider getIsLeapYearData
+     *
+     * @param Alaress_Date_Format $date
+     * @param bool                $isLeapYear
+     */
+    public function testIsLeapYear($date, $isLeapYear)
+    {
+        $this->assertEquals($isLeapYear, $date->isLeapYear());
+    }
+
+
+    public function getBetweenData()
+    {
+        return [
+            [
+                $this->buildDateObject('2015-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                $this->buildDateObject('2015-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                $this->buildDateObject('2015-03-25 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
+                true,
+                true,
+            ],
+            [
+                $this->buildDateObject('2015-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                $this->buildDateObject('2015-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                $this->buildDateObject('2015-03-25 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
+                false,
+                false,
+            ],
+            [
+                $this->buildDateObject('2015-03-25 12:34:53', Alaress_Date_Format::DATABASE_FORMAT),
+                $this->buildDateObject('2015-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                $this->buildDateObject('2015-03-25 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
+                true,
+                false,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getBetweenData
+     *
+     * @param Alaress_Date_Format $date
+     * @param Alaress_Date_Format $start
+     * @param Alaress_Date_Format $end
+     * @param bool                $equal
+     * @param bool                $result
+     */
+    public function testBetween($date, $start, $end, $equal, $result)
+    {
+        $this->assertEquals($result, $date->between($start, $end, $equal));
+    }
+
+    public function testComparators()
+    {
+        $now = Alaress_Date_Format::now();
+        $now->setLocale(new Alaress_Date_Locale_Static());
+        $now->endOfDay();
+
+        $date = $this->buildDateObject($now->getUnixTimeStamp(), Alaress_Date_Format::TIMESTAMP);
+        $this->assertTrue($date->isToday());
+        $this->assertFalse($date->isYesterday());
+        $this->assertFalse($date->isTomorrow());
+
+        // Compare with another date
+        $this->assertTrue($date->isSameDay($now));
+        $this->assertTrue($date->eq($now));
+        $this->assertFalse($date->ne($now));
+        $this->assertFalse($date->gt($now));
+        $this->assertTrue($date->gte($now));
+        $this->assertFalse($date->lt($now));
+        $this->assertTrue($date->lte($now));
+
+        $date = Alaress_Date_Format::now();
+        $date->setLocale(new Alaress_Date_Locale_Static());
+        $date->addDays(1);
+        $this->assertFalse($date->isToday());
+        $this->assertFalse($date->isYesterday());
+        $this->assertTrue($date->isTomorrow());
+        $this->assertTrue($date->isFuture());
+        $this->assertFalse($date->isPast());
+
+        $date = Alaress_Date_Format::now();
+        $date->setLocale(new Alaress_Date_Locale_Static());
+        $date->addDays(-1);
+        $this->assertFalse($date->isToday());
+        $this->assertTrue($date->isYesterday());
+        $this->assertFalse($date->isTomorrow());
+        $this->assertFalse($date->isFuture());
+        $this->assertTrue($date->isPast());
+
+        $date = Alaress_Date_Format::now();
+        $date->setLocale(new Alaress_Date_Locale_Static());
+        $date->addDays(2);
+        $this->assertFalse($date->isToday());
+        $this->assertFalse($date->isYesterday());
+        $this->assertFalse($date->isTomorrow());
+        $this->assertTrue($date->isFuture());
+        $this->assertFalse($date->isPast());
+
+        $date = Alaress_Date_Format::now();
+        $date->setLocale(new Alaress_Date_Locale_Static());
+        $date->addDays(-2);
+        $this->assertFalse($date->isToday());
+        $this->assertFalse($date->isYesterday());
+        $this->assertFalse($date->isTomorrow());
+        $this->assertFalse($date->isFuture());
+        $this->assertTrue($date->isPast());
+    }
+}
