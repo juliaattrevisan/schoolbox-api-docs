@@ -58,7 +58,7 @@ class Registry {
         foreach ($this->getDecoders() as $currentDecoder) {
             $outcome = $currentDecoder->decode($this->getUrl());
 
-            if ($outcome !== false) {
+            if (strlen($outcome)) {
                 return $outcome;
             }
         }

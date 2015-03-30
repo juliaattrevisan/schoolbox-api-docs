@@ -10,8 +10,8 @@ namespace Schoolbox\Preview;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Preview\Chain\Internal;
 use Schoolbox\Preview\Chain\External;
-use Schoolbox\Resource\LinkMapper;
-use Schoolbox\Resource\Link;
+use Schoolbox\Preview\Registry\Decoder\LinkRedir;
+use Schoolbox\Preview\Registry\Decoder\TaskRedir;
 
 class Controller extends Base
 {
@@ -77,33 +77,18 @@ class Controller extends Base
      * Test method
      */
     public function preview($params) {
-        $testUrl = $params['encodedUrl'];
+        $decoderRegistry = new Registry\Registry($params['encodedUrl']);
+        $decoderRegistry->add(new LinkRedir());
+        $decoderRegistry->add(new TaskRedir());
 
-        /* Local Redir - could be a link to anywhere, both
-         * internal or external. Decipher what is going on
-         * before sending them into the Chains to determine
-         * how to display the encoded link's contents.
-         *
-         * If it's in the form of redir.php?url=abcdefgh then
-         * it'll skip this part entirely and end up redirecting
-         * straight to that page, which then redirects you again.
-         *
-         * /redir.php classifies as a Local Url.
-         *
-         * This also logs the link view, for homepage stats
+        $testUrl = $decoderRegistry->findUrl();
+
+        /* No decoder could distill a url from the encapsulated structure
+         * or there was no encapsulating structure: just use the url by
+         * default, since nothing can be done about it
          */
-        if ($id = $this->isLinkRedir($params['encodedUrl'])) {
-            $linkMapper = new LinkMapper();
-
-            try {
-                $link = $linkMapper->findById($id);
-                $linkMapper->logAction($_SESSION['user'], 'access', $link);
-
-                $testUrl = $link->getUrl();
-            }
-            catch (\Exception $e) {
-                error(156);
-            }
+        if (!strlen($testUrl)) {
+            $testUrl = $params['encodedUrl'];
         }
 
         /* Detect whether to use a Local or External chain
@@ -144,23 +129,5 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'data' => $previewResponse
         ]);
-    }
-
-    /**
-     * Get the link id out of the url
-     *
-     * @param $url
-     * @return bool
-     */
-    private function isLinkRedir($url) {
-        $id = false;
-
-        preg_match('/redir\.php\?id=([0-9]+)/', $url, $matches);
-
-        if (count($matches)) {
-            $id = $matches[1];
-        }
-
-        return $id;
     }
 }
