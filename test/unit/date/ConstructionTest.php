@@ -34,6 +34,14 @@ class ConstructionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($copiedDate->getDatabase(), $date->getDatabase());
     }
 
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidCreate()
+    {
+        $this->buildDateObject('2015-03-25');
+    }
+
     public function testCreateFromDateTime()
     {
         $date       = DateTime::createFromFormat('U', $_SERVER['REQUEST_TIME']);
