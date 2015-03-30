@@ -1404,91 +1404,100 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
 
     /**
      * @param Alaress_Date_Format $diff
+     * @param bool                $absolute
      * @return int
      */
-    public function diffInYears(Alaress_Date_Format $diff)
+    public function diffInYears(Alaress_Date_Format $diff, $absolute = true)
     {
-        return $this->getDateTimeObject()->diffInYears($diff->getDateTimeObject());
+        return $this->getDateTimeObject()->diffInYears($diff->getDateTimeObject(), $absolute);
     }
 
 
     /**
      * @param Alaress_Date_Format $diff
+     * @param bool                $absolute
      * @return int
      */
-    public function diffInMonths(Alaress_Date_Format $diff)
+    public function diffInMonths(Alaress_Date_Format $diff, $absolute = true)
     {
-        return $this->getDateTimeObject()->diffInMonths($diff->getDateTimeObject());
+        return $this->getDateTimeObject()->diffInMonths($diff->getDateTimeObject(), $absolute);
     }
 
 
     /**
      * @param Alaress_Date_Format $diff
+     * @param bool                $absolute
      * @return int
      */
-    public function diffInWeeks(Alaress_Date_Format $diff)
+    public function diffInWeeks(Alaress_Date_Format $diff, $absolute = true)
     {
-        return $this->getDateTimeObject()->diffInWeeks($diff->getDateTimeObject());
+        return $this->getDateTimeObject()->diffInWeeks($diff->getDateTimeObject(), $absolute);
     }
 
 
     /**
      * @param Alaress_Date_Format $diff
+     * @param bool                $absolute
      * @return int
      */
-    public function diffInDays(Alaress_Date_Format $diff)
+    public function diffInDays(Alaress_Date_Format $diff, $absolute = true)
     {
-        return $this->getDateTimeObject()->diffInDays($diff->getDateTimeObject());
+        return $this->getDateTimeObject()->diffInDays($diff->getDateTimeObject(), $absolute);
     }
 
 
     /**
      * @param Alaress_Date_Format $diff
+     * @param bool                $absolute
      * @return int
      */
-    public function diffInWeekdays(Alaress_Date_Format $diff)
+    public function diffInWeekdays(Alaress_Date_Format $diff, $absolute = true)
     {
-        return $this->getDateTimeObject()->diffInWeekdays($diff->getDateTimeObject());
+        return $this->getDateTimeObject()->diffInWeekdays($diff->getDateTimeObject(), $absolute);
     }
 
 
     /**
      * @param Alaress_Date_Format $diff
+     * @param bool                $absolute
      * @return int
      */
-    public function diffInWeekendDays(Alaress_Date_Format $diff)
+    public function diffInWeekendDays(Alaress_Date_Format $diff, $absolute = true)
     {
-        return $this->getDateTimeObject()->diffInWeekendDays($diff->getDateTimeObject());
+        return $this->getDateTimeObject()->diffInWeekendDays($diff->getDateTimeObject(), $absolute);
     }
 
 
     /**
      * @param Alaress_Date_Format $diff
+     * @param bool                $absolute
      * @return int
      */
-    public function diffInHours(Alaress_Date_Format $diff)
+    public function diffInHours(Alaress_Date_Format $diff, $absolute = true)
     {
-        return $this->getDateTimeObject()->diffInHours($diff->getDateTimeObject());
+        return $this->getDateTimeObject()->diffInHours($diff->getDateTimeObject(), $absolute);
     }
 
 
     /**
      * @param Alaress_Date_Format $diff
+     * @param bool                $absolute
      * @return int
      */
-    public function diffInMinutes(Alaress_Date_Format $diff)
+    public function diffInMinutes(Alaress_Date_Format $diff, $absolute = true)
     {
-        return $this->getDateTimeObject()->diffInMinutes($diff->getDateTimeObject());
+        return $this->getDateTimeObject()->diffInMinutes($diff->getDateTimeObject(), $absolute);
     }
 
 
     /**
      * @param Alaress_Date_Format $diff
+     * @param bool                $absolute
      * @return int
      */
-    public function diffInSeconds(Alaress_Date_Format $diff)
+    public function diffInSeconds(Alaress_Date_Format $diff, $absolute = true)
     {
-        return $this->getDateTimeObject()->diffInSeconds($diff->getDateTimeObject());
+        return $this->getDateTimeObject()->diffInSeconds($diff->getDateTimeObject(), $absolute);
 
     }
 
