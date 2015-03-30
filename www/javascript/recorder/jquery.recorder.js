@@ -282,28 +282,6 @@
     };
 
     /**
-     * Gets the MIME type of the uploaded file.
-     *
-     * Only works for WebRTC uploads.
-     *
-     * @returns {string}
-     */
-    RecorderPlugin.prototype.getUploadedFileMimeType = function() {
-        return this.webrtc.blob.type;
-    };
-
-    /**
-     * Gets the size of the uploaded file.
-     *
-     * Only works for WebRTC uploads.
-     *
-     * @returns {string}
-     */
-    RecorderPlugin.prototype.getUploadedFileSize = function() {
-        return this.webrtc.blob.size;
-    };
-
-    /**
      * Upload whatever has been recorded.
      *
      * @param filename A filename to upload with.
