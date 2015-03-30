@@ -48,7 +48,7 @@
             }
         });
         recorderInterface = recorderContainer.data('recorder');
-        recorderContainer.on('recorder.setupFailed', function(event, recorder) {
+        recorderContainer.on('setupFailed.recorder', function(event, recorder) {
             // Disable all buttons
             recorderButtons.start.hide().prop('disabled', true);
             recorderButtons.recording.hide().prop('disabled', true);
@@ -57,11 +57,11 @@
             recorderButtons.upload.hide().prop('disabled', true);
             recorderButtons.disabled.show();
         });
-        recorderContainer.on('recorder.recordingReady', function(event, recorder) {
+        recorderContainer.on('recordingReady.recorder', function(event, recorder) {
             // Allow record button to show
             recorderButtons.start.show().prop('disabled', false);
         });
-        recorderContainer.on('recorder.recordingStart', function(event, recorder) {
+        recorderContainer.on('recordingStart.recorder', function(event, recorder) {
             // Show stop button only
             recorderButtons.start.hide().prop('disabled', true);
             recorderButtons.recording.show().prop('disabled', true);
@@ -69,27 +69,27 @@
             recorderButtons.stop.show().prop('disabled', false);
             recorderButtons.upload.hide().prop('disabled', true);
         });
-        recorderContainer.on('recorder.recordingStop', function(event, recorder) {
+        recorderContainer.on('recordingStop.recorder', function(event, recorder) {
             recorderButtons.start.show().prop('disabled', false);
             recorderButtons.recording.hide().prop('disabled', true);
             recorderButtons.play.show().prop('disabled', false);
             recorderButtons.stop.hide().prop('disabled', true);
             recorderButtons.upload.show().prop('disabled', false);
         });
-        recorderContainer.on('recorder.playbackStart', function(event, recorder) {
+        recorderContainer.on('playbackStart.recorder', function(event, recorder) {
             recorderButtons.start.show().prop('disabled', true);
             recorderButtons.play.hide().prop('disabled', true);
             recorderButtons.stop.show().prop('disabled', false);
             recorderButtons.upload.show().prop('disabled', false);
         });
-        recorderContainer.on('recorder.playbackStop', function(event, recorder) {
+        recorderContainer.on('playbackStop.recorder', function(event, recorder) {
             recorderButtons.start.show().prop('disabled', false);
             recorderButtons.play.show().prop('disabled', false);
             recorderButtons.stop.hide().prop('disabled', true);
             recorderButtons.upload.show().prop('disabled', false);
             recorderButtons.disabled.hide();
         });
-        recorderContainer.on('recorder.uploadComplete', function(event, recorder, filename, response) {
+        recorderContainer.on('uploadComplete.recorder', function(event, recorder, filename, response) {
             // inform any listeners that a file was uploaded.
             // put it in the dropzone, and inform the dropzone opener
             // that a file was posted to it.

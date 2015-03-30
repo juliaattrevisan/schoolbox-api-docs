@@ -345,7 +345,7 @@
      * @returns {Recorder}
      */
     Recorder.prototype.bindEvent = function(eventName, eventCallback) {
-        this.element.bind(PLUGIN_NAME+'.'+eventName, eventCallback);
+        this.element.on(eventName+'.'+PLUGIN_NAME, eventCallback);
         return this;
     };
 
@@ -367,7 +367,9 @@
                 params.push(v);
             });
         }
-        this.element.trigger(PLUGIN_NAME+'.'+eventName, params);
+        var namespacedEventName = eventName+'.'+PLUGIN_NAME;
+        console.log('Triggering event "'+namespacedEventName+"'");
+        this.element.trigger(namespacedEventName, params);
         return this;
     };
 
