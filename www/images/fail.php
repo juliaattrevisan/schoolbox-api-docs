@@ -7,8 +7,9 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Alaress\Image\Cache\Filesystem;
+use Alaress\Image\Cache;
 use Alaress\Image\Processor\Freeform;
+use Alaress\Image\Implementation\Imagine;
 
 require_once __DIR__.'/../../include/Bootstrap.php';
 
@@ -67,14 +68,13 @@ switch ($_GET['transform_type']) {
         break;
 }
 
-//
 // Try to output the fail image. If even THAT fails, just redirect to the image.
 try {
     $imageProcessor = new Freeform(
-        new Filesystem(WEB_root.$path, $cache_key),
+        new Cache\BrokenFS(WEB_root, $path, $cache_key),
         $transform,
-        new \Alaress\Image\Implementation\Imagine\Filetype\Factory(),
-        new \Alaress\Image\Implementation\Imagine\Processor\Strategy\Factory()
+        new Imagine\Filetype\Factory(),
+        new Imagine\Processor\Strategy\Factory()
     );
     if (isset($transform_key)) {
         $imageProcessor->setTransformKey($transform_key);

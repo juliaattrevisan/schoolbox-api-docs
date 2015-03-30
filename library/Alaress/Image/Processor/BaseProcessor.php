@@ -11,14 +11,21 @@
 namespace Alaress\Image\Processor;
 
 use Alaress\Image\Cache;
+use Alaress\Image\Cache\CacheInterface;
 use Alaress\Image\Filetype;
-use Alaress\Image\Transformation\BaseTransformation;
+use Alaress\Image\Transformation\Transformation;
 
 class BaseProcessor
 {
+    /**
+     * @var string
+     */
     protected $imageId = null;
 
-    /* Cache class to use
+    /**
+     * Cache class to use
+     *
+     * @var CacheInterface
 	 */
     protected $cache = null;
 
@@ -46,11 +53,17 @@ class BaseProcessor
      */
     protected $filetypeStrategy = null;
 
-    /* Image being manipulated
+    /**
+     * Image being manipulated
+     *
+     * @var string
 	 */
     protected $image;
 
-    /* A list of all the transformations
+    /**
+     * A list of all the transformations
+     *
+     * @var Transformation
 	 */
     protected $transformations = null;
 
@@ -68,10 +81,12 @@ class BaseProcessor
      * Set image id
      *
      * @param int $imageId
+     * @return static
      */
     protected function setImageId($imageId)
     {
         $this->imageId = $imageId;
+        return $this;
     }
 
     /**
@@ -88,10 +103,12 @@ class BaseProcessor
      * Set processing strategy
      *
      * @param Filetype\FiletypeInterface $filetypeStrategy
+     * @return static
      */
     protected function setFiletypeStrategy($filetypeStrategy)
     {
         $this->filetypeStrategy = $filetypeStrategy;
+        return $this;
     }
 
     /**
@@ -108,10 +125,12 @@ class BaseProcessor
      * Set processor strategy
      *
      * @param Strategy\StrategyInterface $processorStrategy
+     * @return static
      */
     protected function setProcessorStrategy($processorStrategy)
     {
         $this->processorStrategy = $processorStrategy;
+        return $this;
     }
 
     /**
@@ -166,10 +185,12 @@ class BaseProcessor
      * Set image resource being manipulated
      *
      * @param $image
+     * @return static
      */
     protected function setImage($image)
     {
         $this->image = $image;
+        return $this;
     }
 
     /**
@@ -186,10 +207,12 @@ class BaseProcessor
      * Set cache
      *
      * @param Cache\CacheInterface $cache
+     * @return static
      */
     protected function setCache($cache)
     {
         $this->cache = $cache;
+        return $this;
     }
 
     /**
@@ -205,17 +228,19 @@ class BaseProcessor
     /**
      * Set transformations
      *
-     * @param BaseTransformation $transformations
+     * @param Transformation $transformations
+     * @return static
      */
     protected function setTransformations($transformations)
     {
         $this->transformations = $transformations;
+        return $this;
     }
 
     /**
      * Get transformations
      *
-     * @return BaseTransformation
+     * @return Transformation
      */
     protected function getTransformations()
     {
@@ -226,10 +251,12 @@ class BaseProcessor
      * Set filepath
      *
      * @param string $filepath
+     * @return static
      */
     protected function setFilepath($filepath)
     {
         $this->filepath = $filepath;
+        return $this;
     }
 
     /**

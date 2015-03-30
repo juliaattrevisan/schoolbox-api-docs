@@ -10,21 +10,27 @@
 
 namespace Alaress\Image\Processor;
 
+use Alaress\Image\Cache\CacheInterface;
 use Alaress\Image\Filetype;
+use Alaress\Image\Transformation\Transformation;
+use League\Flysystem;
 
 class Standard extends BaseProcessor
 {
+    /** @var Flysystem\File */
+    private $file;
+
     /**
      * Constructor
      *
-     * @param                           $cache
-     * @param                           $transformations
+     * @param CacheInterface            $cache
+     * @param Transformation            $transformations
      * @param Filetype\FactoryInterface $filetypeFactory
      * @param Strategy\FactoryInterface $processorFactory
      */
     public function __construct(
-        $cache,
-        $transformations,
+        CacheInterface $cache,
+        Transformation $transformations,
         Filetype\FactoryInterface $filetypeFactory,
         Strategy\FactoryInterface $processorFactory
     ) {
@@ -35,24 +41,30 @@ class Standard extends BaseProcessor
     }
 
     /**
-     * Load an image, figure out how to render/manipulate it
+     * Load the image from the resource, and apply transformations
      * Supports chained methods
      *
-     * @return $this
+     * @return static
      */
     public function load()
     {
-        $imageArray = $this->getCache()->load();
+        $this->file = $file = $this->getCache()->load();
 
-        /* Figure out what kind of file it is
-         */
-        $this->setFilePath($imageArray['filepath']);
-        $this->setFiletypeStrategy($this->getFiletypeFactory()->build($imageArray));
+        $mime = $file->getMimetype();
 
-        /* Prepare an image resource for chained manipulation
-         */
+        $filetypeStrat = $this->getFiletypeFactory()->build([
+            'mime' => "$mime" // ensure this is actually a string (it may have been a mimetype object)
+        ]);
+
+        $this->setFiletypeStrategy($filetypeStrat);
+
+        $image = $this->getFiletypeStrategy()
+                      ->loadImageResource($file);
+
+        $this->setImage($image);
+
+        // Prepare an image resource for chained manipulation
         if (!$this->getCache()->isLoadedFromCache()) {
-            $this->setImage($this->getFiletypeStrategy()->create($this->getFilepath()));
             $this->transformAll();
         }
 
@@ -64,10 +76,10 @@ class Standard extends BaseProcessor
      * desired arguments in an associative array
      * Supports chained methods
      *
-     * @param      $strategy
-     * @param null $args
+     * @param string $strategy
+     * @param array  $args
      *
-     * @return $this
+     * @return static
      */
     private function loadProcessorStrategy($strategy, $args = null)
     {
@@ -86,29 +98,10 @@ class Standard extends BaseProcessor
      * the resultant image resource
      * Supports chained methods
      *
-     * @return $this
+     * @return static
      */
     private function manipulate()
     {
-        // The below was an attempt to process multiple layers of an animated
-        // GIF at once.
-        // Not needed once https://github.com/avalanche123/Imagine/pull/348
-        // is merged, and doesn't work completely anyway - this refuses to
-        // allow a GIF to play more than once.
-//        $manipulatedImage = $this->getImage();
-//        if ($manipulatedImage->layers()->count() > 1) {
-//            $manipulatedImage->layers()->coalesce();
-//            $newLayers = array();
-//            foreach ($manipulatedImage->layers() as $i => $layer) {
-//                $newLayers[$i] = $this->getProcessorStrategy()->manipulate($layer);
-//            }
-//            foreach ($newLayers as $i => $layer) {
-//                $manipulatedImage->layers()->set($i, $layer);
-//            }
-//            $manipulatedImage->layers()->animate('gif', null, 0);
-//        } else {
-//            $manipulatedImage = $this->getProcessorStrategy()->manipulate($this->getImage());
-//        }
         $manipulatedImage = $this->getProcessorStrategy()->manipulate($this->getImage());
 
         $this->setImage($manipulatedImage);
@@ -121,7 +114,7 @@ class Standard extends BaseProcessor
      * Otherwise transformations were done previously and saved, and we can skip
      * this step entirely
      *
-     * @return $this
+     * @return static
      */
     public function transformAll()
     {
@@ -129,30 +122,41 @@ class Standard extends BaseProcessor
         /* Retrieve the list of transformations and do 'em, if we haven't already
          * done them at some point in the past
          */
-        if (!$this->getCache()->isLoadedFromCache()) {
-            $allTransformations = array(
-                array(
-                    'method' => 'RotateOrientation',
-                    'args'   => array(
-                        'FilePath' => $this->getFilePath()
-                    )
-                )
-            );
+        if ($this->isCached()) {
+            return $this;
+        }
+
+        $allTransformations = array(
+            array(
+                'method' => 'RotateOrientation',
+            )
+        );
+        try {
             $allTransformations = array_merge(
                 $allTransformations,
                 $this->getTransformations()->retrieve(
-                    $this->getCache()->getKey()
+                    $this->getTransformKey()
                 )
             );
+        } catch (\Exception_Schoolbox $e) {
+            // sooo, failed to merge. I think we can live with that, will just output default
+        }
 
-            /* Do it
-             */
-            foreach ($allTransformations as $currentTransformation) {
-                $this->transform($currentTransformation['method'], $currentTransformation['args']);
-            }
+        /* Do it
+         */
+        foreach ($allTransformations as $currentTransformation) {
+            $this->transform($currentTransformation['method'], $currentTransformation['args']);
         }
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getTransformKey()
+    {
+        return $this->getCache()->getKey();
     }
 
     /**
@@ -164,7 +168,7 @@ class Standard extends BaseProcessor
      * @param      $strategy
      * @param null $args
      *
-     * @return $this
+     * @return static
      */
     public function transform($strategy, $args = null)
     {
@@ -180,36 +184,30 @@ class Standard extends BaseProcessor
      */
     public function stream()
     {
-        if ($this->getCache()->isLoadedFromCache()) {
-            $this->getFiletypeStrategy()->streamFile($this->getFilePath());
-        } else {
+        if (!$this->isCached() && $this->getCache()->getKey()) {
             $this->save();
-            $this->getFiletypeStrategy()->streamFile($this->getCache()->getCachedFileLocation());
         }
-    }
 
-    public function streamFile()
-    {
+        $this->getFiletypeStrategy()->stream($this->getImage());
+        // will exit
     }
 
     /**
      * Saves the transformed image
      *
-     * @return $this
+     * @return static
      */
-    public function save()
+    private function save()
     {
-        $this->getFiletypeStrategy()->save($this->getImage(), $this->getCache()->getCachedFileLocation());
+        $this->getFiletypeStrategy()->save($this->getImage(), $this->getCache()->loadCache());
         return $this;
     }
 
     /**
-     * Gets the filepath for processed image output
-     *
-     * @return string
+     * @return bool
      */
-    public function getCachedFileLocation()
+    private function isCached()
     {
-        return $this->getCache()->getCachedFileLocation();
+        return $this->getCache()->isLoadedFromCache();
     }
 }

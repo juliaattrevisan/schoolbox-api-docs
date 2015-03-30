@@ -15,6 +15,7 @@ use Imagine\Image\ImageInterface;
 use Imagine\Image\ImagineInterface;
 use Imagine\Image\Metadata\ExifMetadataReader;
 use Imagine\Imagick\Imagine;
+use League\Flysystem;
 
 abstract class BaseFiletype implements FiletypeInterface
 {
@@ -30,65 +31,41 @@ abstract class BaseFiletype implements FiletypeInterface
      */
     protected $imageManager;
 
+
+    /**
+     * TODO inject Imagine instead of building it here
+     */
     public function __construct()
     {
-        // TODO inject this instead of building it here
         $this->imageManager = new Imagine();
         $this->imageManager->setMetadataReader(new ExifMetadataReader());
     }
 
     /**
-    * Creates an image using the loadImageResource() method of the subclass.
-    *
-    * @param  $filename
-    * @throws \Exception_Schoolbox_NotFound if file can't be read
-    * @return ImageInterface
-    */
-    public function create($filename)
-    {
-        $im = false;
-        if (is_file($filename) && is_readable($filename)) {
-            $im = $this->loadImageResource($filename);
-        }
-        if (!$im) {
-            throw new \Exception_Schoolbox_NotFound(sprintf('Cannot read file "%s"', $filename));
-        }
-        return $im;
-    }
-
-    /**
      * Create an image
      *
-     * @param string $filename
+     * @param Flysystem\File $file
      * @return ImageInterface
      */
-    public function loadImageResource($filename)
+    public function loadImageResource(Flysystem\File $file)
     {
-        return $this->getImageManager()->open($filename);
+        return $this->getImageManager()->read($file->readStream());
     }
 
     /**
      * Save image to file system
      *
      * @param ImageInterface $image
-     * @param string         $filename
+     * @param Flysystem\File $file
      */
-    public function save($image, $filename)
+    public function save(ImageInterface $image, Flysystem\File $file)
     {
         $options = array();
         if ($image->layers()->count() > 1) {
             $options['animated'] = true;
             $options['animated.loops'] = 0;
         }
-        file_put_contents(
-            $filename,
-            $image->get($this->getFormat(), $options)
-        );
-//        if ($image->layers()->count() > 1) {
-//            // Awful hack to make animated GIFs loop, because imagick is buggy
-//            $filearg = escapeshellarg($filename);
-//            exec("convert $filearg -loop 0 $filearg");
-//        }
+        $file->write($image->get($this->getFormat(), $options));
     }
 
     /**
@@ -116,21 +93,10 @@ abstract class BaseFiletype implements FiletypeInterface
      */
     public function stream($image)
     {
+        $output = $image->get($this->getFormat());
+        header('Content-length: ' . strlen($output));
         $this->outputHeaders();
-        echo $image->get($this->getFormat());
-        exit;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function streamFile($filename)
-    {
-        $this->outputHeaders();
-        header('Content-length: ' . filesize($filename));
-        header('Last-Modified: ' . date('r', filemtime($filename)));
-        readfile($filename);
-        exit;
+        die($output);
     }
 
     /**

@@ -314,4 +314,14 @@ class Mimetype {
 
         return false;
     }
+
+
+    /**
+     * @return string
+     */
+    function __toString()
+    {
+        return (string)$this->getMime();
+    }
+
 }

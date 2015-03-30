@@ -24,6 +24,8 @@ use Schoolbox\User;
  * MyFile Mapper. Maps myFile table to portfolio File objects
  *
  * @package Schoolbox\Resource\My\File
+ * @method Model findById($id)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
 class Mapper extends AbstractFileMapper implements ILocator, IFileMapper
 {

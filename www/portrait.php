@@ -10,6 +10,10 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Alaress\Image;
+use Alaress\Image\Implementation\Imagine;
+
 require_once '../include/Bootstrap.php';
 
 //
@@ -17,19 +21,23 @@ require_once '../include/Bootstrap.php';
 session_start();
 
 try {
-	$image = new \Alaress\Image\Portrait(
-        trim($_GET['userId']),
-        $_GET['size'],
-        new \Alaress\Image\Transformation\Portrait()
+
+    $image = new Image\Processor\Standard(
+        new Image\Cache\Portrait(trim($_GET['userId']), $_GET['size'], $_SESSION['user']),
+        new Image\Transformation\Portrait(),
+        new Imagine\Filetype\Factory(),
+        new Imagine\Processor\Strategy\Factory()
     );
-	$image->stream();
-}
-catch (Exception_Schoolbox_AccessDenied $e) {
-	SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 403);
-}
-catch (Exception_Schoolbox_NotFound $e) {
-	SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 404);
-}
-catch (Exception $e) {
-	SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 500);
+
+    $image->load()->stream();
+
+} catch (Exception_Schoolbox_AccessDenied $e) {
+    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 403);
+
+} catch (Exception_Schoolbox_NotFound $e) {
+    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 404);
+
+} catch (Exception $e) {
+    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 500);
+
 }

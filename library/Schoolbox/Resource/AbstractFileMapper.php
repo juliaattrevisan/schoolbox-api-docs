@@ -26,6 +26,7 @@ use Schoolbox\UserMapper;
  * Provides common mapping functionality for AbstractFiles
  *
  * @package Schoolbox\Resource
+ * @method AbstractFile hydrate(array $row, $alias = '', $callback = null)
  */
 abstract class AbstractFileMapper extends Schoolbox\Mapper
 {
@@ -169,6 +170,11 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
                          $this->getJoinMapper('hash')
                               ->hydrateJoin($r, 'allowedFileExtension', 'm')
                      )
+            );
+
+            // ensure the path is set
+            $file->getStorage()->setPath(
+                $this->getStorageMapper()->getManager()->calcPath($file->getStorage())
             );
 
             $file->setOwner($this->hydrateJoin($r, 'owner', 'u'));

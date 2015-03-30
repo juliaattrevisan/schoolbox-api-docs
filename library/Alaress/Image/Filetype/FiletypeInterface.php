@@ -9,25 +9,19 @@
 
 namespace Alaress\Image\Filetype;
 
+use Imagine\Image\ImageInterface;
+use League\Flysystem;
+
 interface FiletypeInterface
 {
-    /**
-     * Create an image.
-     *
-     * @param  string $filename
-     * @throws \Exception_Schoolbox_NotFound if file can't be read
-     * @return mixed An image object instance, or a resource.
-     *               TODO write an adapter class to tie together implementations
-     */
-    public function create($filename);
 
     /**
      * Loads an image.
      *
-     * @param  string $filename
-     * @return mixed An image object instance, or a resource.
+     * @param  Flysystem\File $file
+     * @return ImageInterface
      */
-    public function loadImageResource($filename);
+    public function loadImageResource(Flysystem\File $file);
 
     /**
      * Streams an image from an image object, and then exits.
@@ -37,17 +31,10 @@ interface FiletypeInterface
     public function stream($image);
 
     /**
-     * Streams an image file, and exits.
-     *
-     * @param string $filename
-     */
-    public function streamFile($filename);
-
-    /**
      * Saves an image.
      *
-     * @param mixed  $image
-     * @param string $filename
+     * @param ImageInterface $image
+     * @param Flysystem\File $file
      */
-    public function save($image, $filename);
+    public function save(ImageInterface $image, Flysystem\File $file);
 }
