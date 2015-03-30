@@ -1,4 +1,4 @@
-var FlashRecorder = {
+var Recorder = {
   version: 1.13,
   swfObject: null,
   _callbacks: {},
@@ -18,9 +18,9 @@ var FlashRecorder = {
     }
 
     this.bind('initialized', function(){
-      FlashRecorder._initialized = true;
-      if(FlashRecorder._flashBlockCatched){
-        FlashRecorder._defaultOnHideFlash();
+      Recorder._initialized = true;
+      if(Recorder._flashBlockCatched){
+        Recorder._defaultOnHideFlash();
       }
       if(options.initialized){
         options.initialized();
@@ -32,7 +32,7 @@ var FlashRecorder = {
   },
 
   clear: function(){
-    FlashRecorder._events = {};
+    Recorder._events = {};
   },
 
   record: function(options){
@@ -71,7 +71,7 @@ var FlashRecorder = {
     options.params     = options.params || {};
     this.clearBindings("uploadSuccess");
     this.bind("uploadSuccess", function(responseText){
-      options.success(FlashRecorder._externalInterfaceDecode(responseText));
+      options.success(Recorder._externalInterfaceDecode(responseText));
     });
 
     this.flashInterface().upload(options.url, options.audioParam, options.params);
@@ -98,36 +98,36 @@ var FlashRecorder = {
   },
 
   clearBindings: function(eventName){
-    FlashRecorder._events[eventName] = [];
+    Recorder._events[eventName] = [];
   },
 
   bind: function(eventName, fn){
-    if(!FlashRecorder._events[eventName]){ FlashRecorder._events[eventName] = [] }
-    FlashRecorder._events[eventName].push(fn);
+    if(!Recorder._events[eventName]){ Recorder._events[eventName] = [] }
+    Recorder._events[eventName].push(fn);
   },
 
   triggerEvent: function(eventName, arg0, arg1){
-    FlashRecorder._executeInWindowContext(function(){
-      if (!FlashRecorder._events[eventName]) {
+    Recorder._executeInWindowContext(function(){
+      if (!Recorder._events[eventName]) {
         return;
       }
-      for(var i = 0, len = FlashRecorder._events[eventName].length; i < len; i++){
-        if(FlashRecorder._events[eventName][i]){
-          FlashRecorder._events[eventName][i].apply(FlashRecorder, [arg0, arg1]);
+      for(var i = 0, len = Recorder._events[eventName].length; i < len; i++){
+        if(Recorder._events[eventName][i]){
+          Recorder._events[eventName][i].apply(Recorder, [arg0, arg1]);
         }
       }
     });
   },
 
   triggerCallback: function(name, args){
-    FlashRecorder._executeInWindowContext(function(){
-      FlashRecorder._callbacks[name].apply(null, args);
+    Recorder._executeInWindowContext(function(){
+      Recorder._callbacks[name].apply(null, args);
     });
   },
 
   registerCallback: function(fn){
     var name = "CB" + parseInt(Math.random() * 999999, 10);
-    FlashRecorder._callbacks[name] = fn;
+    Recorder._callbacks[name] = fn;
     return name;
   },
 
@@ -166,41 +166,41 @@ var FlashRecorder = {
     this.options.flashContainer.appendChild(flashElement);
     swfobject.embedSWF(this.options.swfSrc, "recorderFlashObject", "231", "141", "10.1.0", undefined, undefined, {allowscriptaccess: "always"}, undefined, function(e){
       if(e.success){
-        FlashRecorder.swfObject = e.ref;
-        FlashRecorder._checkForFlashBlock();
+        Recorder.swfObject = e.ref;
+        Recorder._checkForFlashBlock();
       }else{
-        FlashRecorder._showFlashRequiredDialog();
+        Recorder._showFlashRequiredDialog();
       }
     });
   },
 
   _defaultOnShowFlash: function(){
-    var flashContainer = FlashRecorder.options.flashContainer;
+    var flashContainer = Recorder.options.flashContainer;
     flashContainer.style.left   = ((window.innerWidth  || document.body.offsetWidth)  / 2) - 115 + "px";
     flashContainer.style.top    = ((window.innerHeight || document.body.offsetHeight) / 2) - 70  + "px";
   },
 
   _defaultOnHideFlash: function(){
-    var flashContainer = FlashRecorder.options.flashContainer;
+    var flashContainer = Recorder.options.flashContainer;
     flashContainer.style.left = "-9999px";
     flashContainer.style.top  = "-9999px";
   },
 
   _checkForFlashBlock: function(){
     window.setTimeout(function(){
-      if(!FlashRecorder._initialized){
-        FlashRecorder._flashBlockCatched = true;
-        FlashRecorder.triggerEvent("showFlash");
+      if(!Recorder._initialized){
+        Recorder._flashBlockCatched = true;
+        Recorder.triggerEvent("showFlash");
       }
     }, 500);
   },
 
   _showFlashRequiredDialog: function(){
-    FlashRecorder.options.flashContainer.innerHTML = "<p>Adobe Flash Player 10.1 or newer is required to use this feature.</p><p><a href='http://get.adobe.com/flashplayer' target='_top'>Get it on Adobe.com.</a></p>";
-    FlashRecorder.options.flashContainer.style.color = "white";
-    FlashRecorder.options.flashContainer.style.backgroundColor = "#777";
-    FlashRecorder.options.flashContainer.style.textAlign = "center";
-    FlashRecorder.triggerEvent("showFlash");
+    Recorder.options.flashContainer.innerHTML = "<p>Adobe Flash Player 10.1 or newer is required to use this feature.</p><p><a href='http://get.adobe.com/flashplayer' target='_top'>Get it on Adobe.com.</a></p>";
+    Recorder.options.flashContainer.style.color = "white";
+    Recorder.options.flashContainer.style.backgroundColor = "#777";
+    Recorder.options.flashContainer.style.textAlign = "center";
+    Recorder.triggerEvent("showFlash");
   },
 
   _externalInterfaceDecode: function(data){

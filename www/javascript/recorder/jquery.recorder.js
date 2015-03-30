@@ -26,7 +26,7 @@
         }
     };
 
-    var Recorder = function(element, options) {
+    var RecorderPlugin = function(element, options) {
         this.element   = element;
         this.options   = $.extend(true, {}, defaultOptions, options);
         this.flash     = {};
@@ -60,9 +60,9 @@
      *
      * @private
      *
-     * @returns {Recorder}
+     * @returns {RecorderPlugin}
      */
-    Recorder.prototype._attemptWebRtcSetup = function() {
+    RecorderPlugin.prototype._attemptWebRtcSetup = function() {
         // If audio context doesn't exist, there's no way we can use WebRTC
         var self = this;
         var audioContextConstructor = window.AudioContext || window.webkitAudioContext;
@@ -84,9 +84,9 @@
      *
      * @private
      *
-     * @returns {Recorder}
+     * @returns {RecorderPlugin}
      */
-    Recorder.prototype._attemptFlashSetup = function() {
+    RecorderPlugin.prototype._attemptFlashSetup = function() {
         // Is Flash even supported? I expect SWFObject to be present to determine that.
         this.flash.supported =
             swfobject
@@ -94,7 +94,7 @@
             && swfobject.hasFlashPlayerVersion('10.1')
         ;
         if (this.isFlashSupported()) {
-            this.flash.recorder = FlashRecorder;
+            this.flash.recorder = Recorder;
             this.flash.recorder.initialize({
                 swfSrc: this.options.flash.swfSrc,
                 flashContainer: this.options.flash.flashContainer,
@@ -109,9 +109,9 @@
      *
      * @private
      *
-     * @returns {Recorder}
+     * @returns {RecorderPlugin}
      */
-    Recorder.prototype._startRecordingWebRtc = function(stream) {
+    RecorderPlugin.prototype._startRecordingWebRtc = function(stream) {
         var self             = this;
         self.mode            = 'webrtc';
         self.webrtc.stream   = stream;
@@ -147,9 +147,9 @@
      * Starts recording, in Flash or WebRTC mode depending on which setup
      * succeeded or failed.
      *
-     * @returns {Recorder}
+     * @returns {RecorderPlugin}
      */
-    Recorder.prototype.startRecording = function() {
+    RecorderPlugin.prototype.startRecording = function() {
         // Starting recording stops any current recording and playing.
         if (this.isRecording()) {
             this.stopRecording();
@@ -182,9 +182,9 @@
     /**
      * Plays back a recorded sound.
      *
-     * @returns {Recorder}
+     * @returns {RecorderPlugin}
      */
-    Recorder.prototype.startPlaying = function() {
+    RecorderPlugin.prototype.startPlaying = function() {
         // Starting playing stops any current recording and playing.
         if (this.isRecording()) {
             this.stopRecording();
@@ -205,9 +205,9 @@
     /**
      * Stops playing back whatever was recorded.
      *
-     * @returns {Recorder}
+     * @returns {RecorderPlugin}
      */
-    Recorder.prototype.stopPlaying = function() {
+    RecorderPlugin.prototype.stopPlaying = function() {
         this.triggerEvent('playbackStop', []);
         if (this.isWebRtcUsed()) {
             this.webrtc.audioElement[0].pause();
@@ -219,9 +219,9 @@
     /**
      * Stops recording.
      *
-     * @returns {Recorder}
+     * @returns {RecorderPlugin}
      */
-    Recorder.prototype.stopRecording = function() {
+    RecorderPlugin.prototype.stopRecording = function() {
         var self = this;
         if (self.isWebRtcUsed()) {
             self.webrtc.stream.stop();
@@ -252,14 +252,14 @@
     /**
      * @returns {boolean}
      */
-    Recorder.prototype.isRecording = function() {
+    RecorderPlugin.prototype.isRecording = function() {
         return this.recording;
     };
 
     /**
      * @returns {boolean}
      */
-    Recorder.prototype.isPlaying = function() {
+    RecorderPlugin.prototype.isPlaying = function() {
         return this.playing;
     };
 
@@ -270,7 +270,7 @@
      *
      * @returns {string}
      */
-    Recorder.prototype.getUploadedFileMimeType = function() {
+    RecorderPlugin.prototype.getUploadedFileMimeType = function() {
         return this.webrtc.blob.type;
     };
 
@@ -281,7 +281,7 @@
      *
      * @returns {string}
      */
-    Recorder.prototype.getUploadedFileSize = function() {
+    RecorderPlugin.prototype.getUploadedFileSize = function() {
         return this.webrtc.blob.size;
     };
 
@@ -290,9 +290,9 @@
      *
      * @param filename A filename to upload with.
      *
-     * @returns {Recorder}
+     * @returns {RecorderPlugin}
      */
-    Recorder.prototype.uploadRecorded = function(filename) {
+    RecorderPlugin.prototype.uploadRecorded = function(filename) {
         var self = this;
 
         // Is this WebRTC? Post via AJAX if so
@@ -342,9 +342,9 @@
      * @param eventName
      * @param eventCallback
      *
-     * @returns {Recorder}
+     * @returns {RecorderPlugin}
      */
-    Recorder.prototype.bindEvent = function(eventName, eventCallback) {
+    RecorderPlugin.prototype.bindEvent = function(eventName, eventCallback) {
         this.element.on(eventName+'.'+PLUGIN_NAME, eventCallback);
         return this;
     };
@@ -358,9 +358,9 @@
      * @param eventName
      * @param extraParams
      *
-     * @returns {Recorder}
+     * @returns {RecorderPlugin}
      */
-    Recorder.prototype.triggerEvent = function(eventName, extraParams) {
+    RecorderPlugin.prototype.triggerEvent = function(eventName, extraParams) {
         var params = [this];
         if (extraParams && extraParams.length) {
             $.each(extraParams, function(i, v) {
@@ -378,7 +378,7 @@
      *
      * @returns {boolean}
      */
-    Recorder.prototype.isWebRtcUsed = function() {
+    RecorderPlugin.prototype.isWebRtcUsed = function() {
         return this.mode == 'webrtc';
     };
 
@@ -387,7 +387,7 @@
      *
      * @returns {boolean}
      */
-    Recorder.prototype.isFlashUsed = function() {
+    RecorderPlugin.prototype.isFlashUsed = function() {
         return this.mode == 'flash';
     };
 
@@ -396,7 +396,7 @@
      *
      * @returns {boolean}
      */
-    Recorder.prototype.isWebRtcSupported = function() {
+    RecorderPlugin.prototype.isWebRtcSupported = function() {
         return this.webrtc.supported;
     };
 
@@ -405,14 +405,14 @@
      *
      * @returns {boolean}
      */
-    Recorder.prototype.isFlashSupported = function() {
+    RecorderPlugin.prototype.isFlashSupported = function() {
         return this.flash.supported;
     };
 
     $.fn[PLUGIN_NAME] = function(options) {
         this.each(function(i, element) {
             var $element = $(element);
-            $element.data(PLUGIN_NAME, new Recorder($element, options));
+            $element.data(PLUGIN_NAME, new RecorderPlugin($element, options));
         });
         return this;
     };
