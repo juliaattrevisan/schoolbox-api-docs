@@ -15,10 +15,9 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Twig_Loader_Chain;
-use Twig_Loader_Filesystem;
 use \Schoolbox\UserMapper;
 use \Schoolbox\User;
+use \Alaress\Authorizer\Failure\Unauthorized;
 
 class Module extends BaseModule
 {
@@ -28,7 +27,7 @@ class Module extends BaseModule
     public function initRoutes(Router $router, $basePath)
     {
         $router->addGet('user.impersonate', $basePath . '/switch/{userId}');
-        $router->addGet('user.recoverSession', $basePath . '/recoverSession/');
+        $router->addGet('user.recoverSession', $basePath . '/recoverSession');
 
 
     }

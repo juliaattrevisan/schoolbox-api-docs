@@ -20,18 +20,19 @@ class Controller extends Base
      * @param User $user
      */
     public function impersonate(User $user) {
-        $_SESSION['previous'] = $_SESSION;
+        $previous = $_SESSION;
         $session = new \Session();
         $session->create($user->getUsername());
-
+        $_SESSION['previous'] = $previous;
         $this->getResponse()->redirect->found('/');
     }
 
     /**
      * Return to your previous session, after imper
      */
-    public function sessionReturn() {
+    public function recoverSession() {
         $_SESSION = $_SESSION['previous'];
+        $this->getResponse()->redirect->found('/');
     }
 
 } 

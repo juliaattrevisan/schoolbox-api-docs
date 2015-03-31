@@ -16,8 +16,11 @@
         <a href="/logout.php">Logout</a>
       </li>
         <!-- BEGIN switch_user -->
-        <li><a href="/user/switch/{MENU_SWITCH_USERID}">Switch to {MENU_SWITCH_USER_FULLNAME}</a></li>
+        <li style="white-space: nowrap"><a href="/user/switch/{MENU_SWITCH_USERID}" title="Switch to" ><img height="32" width="32" src="/portrait.php?userId={MENU_SWITCH_USERID}&amp;size=square32" style="margin-right:6px">{MENU_SWITCH_USER_FULLNAME}</a></li>
         <!-- END switch_user -->
+        <!-- BEGIN recover_user -->
+        <li style="white-space: nowrap"><a href="/user/recoverSession" title="Return to"><img height="32" width="32" src="/portrait.php?userId={MENU_SWITCH_USERID}&amp;size=square32" style="margin-right:6px">{MENU_SWITCH_USER_FULLNAME}</a></li>
+        <!-- END recover_user -->
     </ul>
   </li>
   {INSTANTMESSAGE_BLOCK}

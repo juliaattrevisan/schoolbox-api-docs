@@ -373,9 +373,25 @@ class SitePage extends Page
             foreach($_SESSION['user']->getLinkedUser() as $linkedUser) {
                 $this->setVar(array(
                                     'MENU_SWITCH_USERID'        => $linkedUser->getId(),
-                                    'MENU_SWITCH_USER_FULLNAME' => $linkedUser->getFullName(),));
+                                    'MENU_SWITCH_USER_FULLNAME' => $linkedUser->getFullName(),
+                                    )
+                );
                 $this->parse('switch_user_block', 'switch_user', true);
             }
+
+            $this->setBlock('banner_logged_in', 'recover_user', 'recover_user_block');
+            $this->setVar('recover_user_block', '');
+
+            if($_SESSION['previous']['user'] instanceof \Schoolbox\User) {
+                $this->setVar(array(
+                                    'MENU_SWITCH_USERID'        => $_SESSION['previous']['user']->getId(),
+                                    'MENU_SWITCH_USER_FULLNAME' => $_SESSION['previous']['user']->getFullName(),
+                                    )
+                );
+                $this->parse('recover_user_block', 'recover_user', true);
+
+            }
+
 
             $this->parse('MAIN_NAV_REGION', 'navTpl');
             $this->parse('MAIN_TAB_REGION', 'tabTpl');
