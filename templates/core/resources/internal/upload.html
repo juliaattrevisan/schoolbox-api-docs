@@ -14,7 +14,7 @@
             abUploadCancelBtn  = abUploadControls.children('a.cancel'),
             recorderContainer  = $('#recorder'),
             recorderNameDialog = $('#recorderNameDialog'),
-            recorderNameInput  = $('#recorderNameDialog input[name="name"]'),
+            recorderNameInput  = $('#recorderNameDialog input[data-role="recording-name"]'),
             maxFiles           = {MAX_FILES},
             recorderInterface, // Recording plugin
             dz; // Dropzone
@@ -429,5 +429,5 @@
 <div id="recorder"></div>
 <div id="flashContainer"></div>
 <div id="recorderNameDialog" title="Please enter a name for this recording" class="hide">
-    <input name="name" type="text" value="recording" />
+    <input data-role="recording-name" type="text" value="recording" />
 </div>
