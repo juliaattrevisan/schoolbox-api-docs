@@ -6,7 +6,6 @@
 <script type="text/javascript">
     $(function() {
         var abUpload           = $('#ab-usermedia'),
-            abUploadForm       = abUpload.find('form'),
             abUploadControls   = abUpload.siblings('div.ctrl'),
             recorderContainer  = $('#recorder'),
             recorderNameDialog = $('#recorderNameDialog'),
@@ -70,7 +69,7 @@
 
         recorderContainer.recorder({
             upload: {
-                url: abUploadForm.attr('action')
+                url: '/storage/asyncUpload'
             },
             flash: {
                 flashContainer: $('#flashContainer')[0],
@@ -193,9 +192,7 @@
         * Should fall back to simple file upload for iPads
           (this supports usermedia natively)
     -->
-    <form action="/storage/asyncUpload">
-        <div class="dz-default"><span>Start recording audio or video</span></div>
-    </form>
+    <div class="dz-default"><span>Start recording audio or video</span></div>
 </div>
 <div class="ctrl">
     <a role="button" class="submit-btn-plain" data-interaction="file-upload" disabled="disabled" href="#">Upload</a>
