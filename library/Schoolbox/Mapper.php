@@ -1570,7 +1570,10 @@ abstract class Mapper implements Serializable
                 }
                 // also update n:n relation tables if they exist
                 foreach ($this->getMap() as $map) {
-                    if (empty($map['join']) || empty($this->joins[$map['join']]['multi']) || $map['join']['multi']['read_only']) {
+                    if (empty($map['join'])
+                        || empty($this->joins[$map['join']]['multi'])
+                        || $this->joins[$map['join']]['multi']['read_only']
+                    ) {
                         // not interested
                         continue;
                     }
