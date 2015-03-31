@@ -5,11 +5,10 @@
 <script type="text/javascript" src="/javascript/recorder/jquery.recorder.js"></script>
 <script type="text/javascript">
     $(function() {
-        var abUpload           = $('#ab-usermedia'),
-            abUploadControls   = abUpload.siblings('div.ctrl'),
-            recorderContainer  = $('#recorder'),
+        var recorderContainer  = $('#ab-usermedia'),
+            recorderControls   = $('#recorderButtons'),
             recorderNameDialog = $('#recorderNameDialog'),
-            recorderNameInput  = $('#recorderNameDialog input[data-role="recording-name"]'),
+            recorderNameInput  = recorderNameDialog.find('input[data-role="recording-name"]'),
             recorderInterface; // Recording plugin
 
         // Call this when I want to actually upload recorded sounds
@@ -49,13 +48,13 @@
 
         // Set up the recorder
         var recorderButtons = {
-            start:     abUploadControls.find('a[data-interaction="audio-record-start"]'),
-            recording: abUploadControls.find('a[data-interaction="audio-record-recording"]'),
-            play:      abUploadControls.find('a[data-interaction="audio-record-play"]'),
-            stop:      abUploadControls.find('a[data-interaction="audio-record-stop"]'),
-            upload:    abUploadControls.find('a[data-interaction="audio-record-upload"]'),
-            uploading: abUploadControls.find('a[data-interaction="audio-record-uploading"]'),
-            disabled:  abUploadControls.find('a[data-interaction="audio-record-disabled"]')
+            start:     recorderControls.find('a[data-interaction="audio-record-start"]'),
+            recording: recorderControls.find('a[data-interaction="audio-record-recording"]'),
+            play:      recorderControls.find('a[data-interaction="audio-record-play"]'),
+            stop:      recorderControls.find('a[data-interaction="audio-record-stop"]'),
+            upload:    recorderControls.find('a[data-interaction="audio-record-upload"]'),
+            uploading: recorderControls.find('a[data-interaction="audio-record-uploading"]'),
+            disabled:  recorderControls.find('a[data-interaction="audio-record-disabled"]')
         };
 
         // Switch off buttons by default
@@ -82,7 +81,7 @@
         recorderInterface = recorderContainer.data('recorder');
 
         // Set up button events
-        recorderContainer.on('setupFailed.recorder', function(event, recorder) {
+        recorderContainer.on('setupFailed.recorder', function() {
             // Disable all buttons
             recorderButtons.start.hide().prop('disabled', true);
             recorderButtons.recording.hide().prop('disabled', true);
@@ -91,11 +90,11 @@
             recorderButtons.upload.hide().prop('disabled', true);
             recorderButtons.disabled.show();
         });
-        recorderContainer.on('recordingReady.recorder', function(event, recorder) {
+        recorderContainer.on('recordingReady.recorder', function() {
             // Allow record button to show
             recorderButtons.start.show().prop('disabled', false);
         });
-        recorderContainer.on('recordingStart.recorder', function(event, recorder) {
+        recorderContainer.on('recordingStart.recorder', function() {
             // Show stop button only
             recorderButtons.start.hide().prop('disabled', true);
             recorderButtons.recording.show().prop('disabled', true);
@@ -103,26 +102,26 @@
             recorderButtons.stop.show().prop('disabled', false);
             recorderButtons.upload.hide().prop('disabled', true);
         });
-        recorderContainer.on('recordingStop.recorder', function(event, recorder) {
+        recorderContainer.on('recordingStop.recorder', function() {
             recorderButtons.start.show().prop('disabled', false);
             recorderButtons.recording.hide().prop('disabled', true);
             recorderButtons.play.show().prop('disabled', false);
             recorderButtons.stop.hide().prop('disabled', true);
             recorderButtons.upload.show().prop('disabled', false);
         });
-        recorderContainer.on('playbackStart.recorder', function(event, recorder) {
+        recorderContainer.on('playbackStart.recorder', function() {
             recorderButtons.start.show().prop('disabled', true);
             recorderButtons.play.hide().prop('disabled', true);
             recorderButtons.stop.show().prop('disabled', false);
             recorderButtons.upload.show().prop('disabled', false);
         });
-        recorderContainer.on('playbackStop.recorder', function(event, recorder) {
+        recorderContainer.on('playbackStop.recorder', function() {
             recorderButtons.start.show().prop('disabled', false);
             recorderButtons.play.show().prop('disabled', false);
             recorderButtons.stop.hide().prop('disabled', true);
             recorderButtons.upload.show().prop('disabled', false);
         });
-        recorderContainer.on('uploadStart.recorder', function(event, recorder) {
+        recorderContainer.on('uploadStart.recorder', function() {
             recorderButtons.start.hide().prop('disabled', true);
             recorderButtons.recording.hide().prop('disabled', true);
             recorderButtons.play.hide().prop('disabled', true);
@@ -194,9 +193,7 @@
     -->
     <div class="dz-default"><span>Start recording audio or video</span></div>
 </div>
-<div class="ctrl">
-    <a role="button" class="submit-btn-plain" data-interaction="file-upload" disabled="disabled" href="#">Upload</a>
-
+<div id="recorderButtons">
     <a role="button" class="submit-btn-plain record" data-interaction="audio-record-start" href="#">Record Audio</a>
     <a role="button" class="submit-btn-plain recording hide" data-interaction="audio-record-recording" disabled href="#">Recording...</a>
     <a role="button" class="submit-btn-plain disabled" data-interaction="audio-record-disabled" disabled href="#">No recording devices available</a>
@@ -204,10 +201,8 @@
     <a role="button" class="submit-btn-plain stop hide" data-interaction="audio-record-stop" href="#">Stop</a>
     <a role="button" class="submit-btn-plain upload hide" data-interaction="audio-record-upload" href="#">Upload Audio</a>
     <a role="button" class="submit-btn-plain uploading hide" data-interaction="audio-record-uploading" disabled href="#">Uploading...</a>
-
     <a role="button" class="btn no-icon float-left cancel" href="#">Cancel</a>
 </div>
-<div id="recorder"></div>
 <div id="flashContainer"></div>
 <div id="recorderNameDialog" title="Please enter a name for this recording" class="hide">
     <input data-role="recording-name" type="text" value="recording" />
