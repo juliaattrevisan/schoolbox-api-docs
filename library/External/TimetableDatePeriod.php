@@ -10,6 +10,8 @@
  * @link      http://www.alaress.com.au/
  */
 
+use \Schoolbox\Campus;
+
 class External_TimetableDatePeriod implements Iterator {
 
     /**
@@ -38,9 +40,9 @@ class External_TimetableDatePeriod implements Iterator {
     protected $invert;
 
     /**
-     * @var int
+     * @var Campus
      */
-    protected $campusId;
+    protected $campus;
 
     /**
      * @var External_Timetable
@@ -56,25 +58,25 @@ class External_TimetableDatePeriod implements Iterator {
      * @param  DateTime           $start
      * @param  DateTime           $end
      * @param  External_Timetable $externalTimetable
-     * @param  int                $campusId
-     * @throws InvalidArgumentException if $campusId is not a valid campus
+     * @param  Campus                $campus
+     * @throws InvalidArgumentException if $campus is not a valid campus
      * @throws InvalidArgumentException if $start does not have a timetable day
      */
-    public function __construct(DateTime $start, DateTime $end, External_Timetable $externalTimetable, $campusId) {
+    public function __construct(DateTime $start, DateTime $end, External_Timetable $externalTimetable, Campus $campus) {
 
         $this->start             = clone $start;
         $this->end               = clone $end;
         $this->externalTimetable = $externalTimetable;
-        $this->campusId          = $campusId;
+        $this->campus            = $campus;
 
         // Deal exclusively in dates
         $this->start->setTime(0,0,0);
         $this->end->setTime(0,0,0);
 
         // Figure out the day that $start starts at
-        $dayNumber = $externalTimetable->getDayNumber($campusId, $this->start->getTimestamp());
+        $dayNumber = $externalTimetable->getDayNumber($campus, $this->start->getTimestamp());
         if ($dayNumber === false) {
-            throw new InvalidArgumentException("Campus \"{$campusId}\" does not exist");
+            throw new InvalidArgumentException("Campus \"{$campus->getName()}\" does not exist");
         }
         if (!$dayNumber) {
             throw new InvalidArgumentException("Start date \"{$this->start->format('Y-m-d')}\" is not timetabled");
@@ -104,14 +106,14 @@ class External_TimetableDatePeriod implements Iterator {
         $this->index++;
         if ($this->invert) {
             $this->current = $this->externalTimetable->getPreviousDateForDayNumber(
-                $this->campusId,
+                $this->campus,
                 $this->dayNumber,
                 $this->current->getTimestamp()
             );
         }
         else {
             $this->current = $this->externalTimetable->getNextDateForDayNumber(
-                $this->campusId,
+                $this->campus,
                 $this->dayNumber,
                 $this->current->modify('+1 day')->getTimestamp()
             );

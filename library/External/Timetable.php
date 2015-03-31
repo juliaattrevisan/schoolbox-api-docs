@@ -34,11 +34,11 @@ class External_Timetable implements External_TimetableInterface
      * Returns the period definition for the schools timetable, can be optionally provided a day to fetch a specific
      * days definition.
      * @param string $externalUserId
-     * @param Integer $campusId
+     * @param \Schoolbox\Campus $campus
      * @param Integer $day
      * @return Array
      */
-    function getTimetableDefinition($externalUserId, $campusId, $day = 0)
+    function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
@@ -46,23 +46,34 @@ class External_Timetable implements External_TimetableInterface
     /**
      * Calculates the current day number in the cycle
      *
-     * @param Integer $campusId
+     * @param int|\Schoolbox\Campus $campus
      * @param String|Integer $date
      * @return Integer
      */
-    function getDayNumber($campusId, $date = 0)
+    function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
     {
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
+    }
+
+    /**
+     * Returns the name of the current day
+     *
+     * @param $dayNumber
+     * @return String
+     *
+     */
+    function getDayName($dayNumber) {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
     /**
      * Determines the period number
      *
-     * @param Integer $campusId
+     * @param int|\Schoolbox\Campus $campus
      * @param Integer $now
      * @return Integer
      */
-    function getPeriodNumber($campusId, $now = 0)
+    function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0)
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
@@ -73,7 +84,7 @@ class External_Timetable implements External_TimetableInterface
      *
      * @todo this should be moved to a 5.4 trait, and used by External_*_Timetable
      *
-     * @param int $campusId The campus ID to get the date for.
+     * @param \Schoolbox\Campus $campus The campus ID to get the date for.
      * @param int $day The day number to get the date for.
      * @param int $date A Unix timestamp representing the date to get, or
      *                       today if not set.
@@ -85,7 +96,7 @@ class External_Timetable implements External_TimetableInterface
      *
      * @return DateTime
      */
-    protected function getDateForDayNumber($campusId, $day, $date = null, $previous = false)
+    protected function getDateForDayNumber($campus, $day, $date = null, $previous = false)
     {
         if (!isset($date)) {
             $date = time();
@@ -106,7 +117,7 @@ class External_Timetable implements External_TimetableInterface
             // Try for a year, that's long enough.
             $i = 0;
             while ($i++ < 365) {
-                $thisDayNumber = $this->getDayNumber($campusId, $thisDate->getTimestamp());
+                $thisDayNumber = $this->getDayNumber($campus, $thisDate->getTimestamp());
                 if ($thisDayNumber === false) {
                     throw new InvalidArgumentException('Invalid campus requested');
                 }
@@ -126,17 +137,17 @@ class External_Timetable implements External_TimetableInterface
     /**
      * @see $this->getDateForDayNumber
      */
-    public function getPreviousDateForDayNumber($campusId, $day, $date = null)
+    public function getPreviousDateForDayNumber($campus, $day, $date = null)
     {
-        return $this->getDateForDayNumber($campusId, $day, $date, true);
+        return $this->getDateForDayNumber($campus, $day, $date, true);
     }
 
     /**
      * @see $this->getDateForDayNumber
      */
-    public function getNextDateForDayNumber($campusId, $day, $date = null)
+    public function getNextDateForDayNumber($campus, $day, $date = null)
     {
-        return $this->getDateForDayNumber($campusId, $day, $date, false);
+        return $this->getDateForDayNumber($campus, $day, $date, false);
     }
 
     /**
@@ -155,10 +166,10 @@ class External_Timetable implements External_TimetableInterface
      *
      * @param Integer $externalUserId
      * @param Integer $userId
-     * @param Integer $campusId
+     * @param int|\Schoolbox\Campus $campus
      * @return Array
      */
-    function getFullTimetable($externalUserId, $userId, $campusId)
+    function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
@@ -183,11 +194,11 @@ class External_Timetable implements External_TimetableInterface
      *
      * @param Integer $externalUserId
      * @param Integer $userId
-     * @param Integer $campusId
+     * @param int|\Schoolbox\Campus $campus
      * @param Integer $dayNumber
      * @return Array
      */
-    function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber)
+    function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }

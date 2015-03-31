@@ -137,13 +137,18 @@ class Controller extends Base
             $date = null;
         }
         try {
+            $campusObj = \Schoolbox\CampusMapper::getInstance()->findById($campus);
+
             $nearestDate = $previous ?
-                $this->externalTimetableHandler->getPreviousDateForDayNumber($campus, $dayNumber, $date) :
-                $this->externalTimetableHandler->getNextDateForDayNumber($campus, $dayNumber, $date);
+                $this->externalTimetableHandler->getPreviousDateForDayNumber($campusObj, $dayNumber, $date) :
+                $this->externalTimetableHandler->getNextDateForDayNumber($campusObj, $dayNumber, $date);
         } catch (\InvalidArgumentException $e) {
             $code  = 400;
             $error = $e->getMessage();
         } catch (\RangeException $e) {
+            $code  = 400;
+            $error = $e->getMessage();
+        } catch (\Schoolbox\Mapper\Exception $e) {
             $code  = 400;
             $error = $e->getMessage();
         }
@@ -984,7 +989,7 @@ class Controller extends Base
                 'periodList' => array(),
             );
 
-            $timetable = $this->externalTimetableHandler->getTimetableDefinition(null, $campusId);
+            $timetable = $this->externalTimetableHandler->getTimetableDefinition(null, $campus);
             // Somehow parse $timetable into a list of names, start and end, and
             // the next day they occur.
             // times always 12-hour, so convert to 24-hour time for consistency

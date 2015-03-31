@@ -36,7 +36,7 @@ class CurrentPeriod extends Generic {
             /* REFACTOR */
             $timetableHandler = new External_Timetable();
 
-            $campus = $user->getCampusCollection()->first()->getId();
+            $campus = $user->getCampusCollection()->first();
 
             /*
             $dayNum = 4;

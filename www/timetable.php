@@ -70,7 +70,7 @@ if ($groupHandler->isParent()) {
                     if (!isset($checked_campus_list[$campus_code])) {
                         $checked_campus_list[$campus_code] = true;
 
-                        $user['campus'] = $campus;
+                        $user['campus'] = $campusObj;
                         $user['campusName'] = $campusObj->getName();
                         $outputList[] = $user;
 
@@ -94,7 +94,7 @@ if ($groupHandler->isParent()) {
                     $campus_code = $campusObj->getExtTimetableCode();
                     if (!isset($checked_campus_list[$campus_code])) {
                         $checked_campus_list[$campus_code] = true;
-                        $user['campus'] = $campus;
+                        $user['campus'] = $campusObj;
                         $user['campusName'] = $campusObj->getName();
                         $outputList[] = $user;
                     }
@@ -179,7 +179,7 @@ if (is_array($outputList)) {
                             } else {
                                 $this->setVar('TIMETABLE_CLASS', 'normal');
                             }
-                            $this->setVar('DAY_NUMBER', $dayCount);
+                            $this->setVar('DAY_NAME', $timetableHandler->getDayName($dayCount));
                             $this->parse('day_header_listing', 'day_header', true);
                         }
 

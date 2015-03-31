@@ -18,13 +18,6 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     private $groupHandler = null;
 
     /**
-     * An instance of CampusMapper
-     *
-     * @var null
-     */
-    private $campusMapper = null;
-
-    /**
      * Redis cache duration
      *
      * @var int
@@ -37,7 +30,6 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     public function __construct()
     {
         $this->setGroupHandler(new Group());
-        $this->setCampusMapper(new \Schoolbox\CampusMapper());
     }
 
     /**
@@ -53,15 +45,12 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
      * $timetableDef['sequence'][]
      *
      * @param string $externalUserId
-     * @param $campusId
+     * @param $campus
      * @param int $day
      * @return array
      */
-    public function getTimetableDefinition($externalUserId, $campusId, $day = 0)
+    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
     {
-        $campusMapper = new \Schoolbox\CampusMapper();
-        $campus = $campusMapper->findById($campusId);
-
         $maxPeriodsPerDay = 6;
         $maxDays = $campus->getTimetableDay();
 
@@ -119,11 +108,11 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     /**
      * Get the current day number for a given campus
      *
-     * @param $campusId
+     * @param \Schoolbox\Campus $campus
      * @param int $date
      * @return int
      */
-    public function getDayNumber($campusId, $date = 0)
+    public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
     {
         $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
             "extdb:" . INSTANCE_ID . ":denbigh2.getTimetableDefinition",
@@ -148,6 +137,19 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
         return unserialize($encoded);
     }
 
+
+    /**
+     * Returns the day name
+     *
+     * @param $dayNumber
+     * @return String
+     */
+    public function getDayName($dayNumber)
+    {
+        return 'Day ' . $dayNumber;
+    }
+
+
     /**
      * Calculates the current period based on the current time
      *
@@ -156,15 +158,13 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
      * PeriodNumber
      * PeriodNumberSeq
      *
-     * @param $campusId
-     * @param $now
+     * @param \Schoolbox\Campus $campus
+     * @param int $now
      * @return array
      */
-    public function getPeriodNumber($campusId, $now = 0)
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0)
     {
-        $campusMapper = new \Schoolbox\CampusMapper();
-        $campus = $campusMapper->findById($campusId);
-        $definition = $this->getTimetableDefinition(null, $campus->getId());
+        $definition = $this->getTimetableDefinition(null, $campus);
 
         if (!$now) {
             $now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
@@ -207,17 +207,14 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
      *
      * @param $externalUserId
      * @param $userId
-     * @param $campusId
+     * @param \Schoolbox\Campus $campus
      * @param $dayNumber
      * @return mixed
      */
-    public function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber)
+    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
     {
         $timetable = array();
-
-        $campusMapper = new \Schoolbox\CampusMapper();
-        $campus = $campusMapper->findById($campusId);
-        $definition = $this->getTimetableDefinition($externalUserId, $campus->getId());
+        $definition = $this->getTimetableDefinition($externalUserId, $campus);
 
         if (!$definition) {
             return false;
@@ -408,16 +405,14 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
      *
      * @param $externalUserId
      * @param $userId
-     * @param $campusId
+     * @param \Schoolbox\Campus $campus
      * @return mixed
      */
-    public function getFullTimetable($externalUserId, $userId, $campusId)
+    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
     {
         $timetable = array();
 
-        $campusMapper = new \Schoolbox\CampusMapper();
-        $campus = $campusMapper->findById($campusId);
-        $definition = $this->getTimetableDefinition($externalUserId, $campus->getId());
+        $definition = $this->getTimetableDefinition($externalUserId, $campus);
 
         if (!$definition) {
             return false;
@@ -575,6 +570,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     /**
      * Gets the timetable for the given room.
      *
+     * @param String $roomCode
      * @return array
      */
     public function getRoomTimetable($roomCode)
@@ -603,26 +599,6 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     private function getGroupHandler()
     {
         return $this->groupHandler;
-    }
-
-    /**
-     * Set campus mapper
-     *
-     * @param null $campusMapper
-     */
-    private function setCampusMapper($campusMapper)
-    {
-        $this->campusMapper = $campusMapper;
-    }
-
-    /**
-     * Get campus mapper
-     *
-     * @return \Schoolbox\CampusMapper
-     */
-    private function getCampusMapper()
-    {
-        return $this->campusMapper;
     }
 
     /**

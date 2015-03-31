@@ -35,7 +35,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         $this->setGroup(new Group);
     }
 
-    public function getTimetableDefinition($externalUserId, $campusId, $day = 0)
+    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
     {
         $statement = $this->getInternalDatabase()->prepare(
             "
@@ -49,7 +49,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
                           "
         );
 
-        $statement->execute(array(':campusId' => $campusId));
+        $statement->execute(array(':campusId' => $campus->getId()));
 
         $definition = $statement->fetch(PDO::FETCH_ASSOC);
 
@@ -65,9 +65,9 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         }
     }
 
-    public function getDayNumber($campusId, $date = 0)
+    public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
     {
-        if (!$definition = $this->getTimetableDefinition(null, $campusId)) {
+        if (!$definition = $this->getTimetableDefinition(null, $campus)) {
             return false;
         }
 
@@ -111,18 +111,30 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         return $currentDay;
     }
 
-    public function getPeriodNumber($campusId, $now = 0)
+
+    /**
+     * Returns the day name
+     *
+     * @param $dayNumber
+     * @return String
+     */
+    public function getDayName($dayNumber)
+    {
+        return 'Day ' . $dayNumber;
+    }
+
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0)
     {
         return 0;
     }
 
-    public function getFullTimetable($externalUserId, $userId, $campusId)
+    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
     {
         if (empty($externalUserId)) {
             return array();
         }
         /* Setup skeleton timetable */
-        if (!$definition = $this->getTimetableDefinition($externalUserId, $campusId)) {
+        if (!$definition = $this->getTimetableDefinition($externalUserId, $campus)) {
             return false;
         }
 
@@ -191,13 +203,13 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         return $periodList;
     }
 
-    public function getDayTimetable($externalUserId, $userId, $campusId, $dayNumber)
+    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
     {
         if (empty($externalUserId)) {
             return array();
         }
         /* Setup skeleton timetable */
-        if (!$definition = $this->getTimetableDefinition($externalUserId, $campusId)) {
+        if (!$definition = $this->getTimetableDefinition($externalUserId, $campus)) {
             return false;
         }
 

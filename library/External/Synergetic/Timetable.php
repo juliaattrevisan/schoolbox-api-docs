@@ -40,13 +40,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $this->campusMapper = new \Schoolbox\CampusMapper();
     }
 
-    public function getTimetableDefinition($externalUserId, $campus, $day = 0)
+    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
     {
-
-        $campusModel = $this->campusMapper->findById($campus); //TODO campus object should be passed
-        if (!($campusModel instanceof \Schoolbox\Campus)) {
-            return array();
-        }
 
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
@@ -55,7 +50,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 					FROM SynergyOne.dbo.TimetableDefinition TimetableDefinition
 					WHERE TimetableDefinition.FileYear='{$fileYear}' AND
 						TimetableDefinition.FileSemester='{$fileSemester}' AND
-						TimetableDefinition.TimetableGroup='{$campusModel->getExtTimetableCode()}' AND
+						TimetableDefinition.TimetableGroup='{$campus->getExtTimetableCode()}' AND
 						(TimetableDefinition.DayNumber = '$day' )
 					ORDER BY TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq
 					";
@@ -87,19 +82,15 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         }
 
         $timetableDef['periodCount'] = $periodCount;
-        $timetableDef['dayCount']    = $campusModel->getTimetableDay();
+        $timetableDef['dayCount']    = $this->getTotalDays($campus);
         return $timetableDef;
     }
 
     //gets current day number
-    public function getDayNumber($campus, $date = 0)
+    public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
     {
 
-        $campusModel = $this->campusMapper->findById($campus); //TODO campus object should be passed
-        if (!($campusModel instanceof \Schoolbox\Campus)) {
-            return false;
-        }
-        $days = $campusModel->getTimetableDay();
+        $days = $this->getTotalDays($campus);
 
         if (!$date) {
             $date = time();
@@ -108,7 +99,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $result = $this->getDatabase()->executeProcedure(
             'spgTimetableDay',
             array(
-                array('@TimeTableGroup', $campusModel->getExtTimetableCode(), SQLVARCHAR, false, false, -1),
+                array('@TimeTableGroup', $campus->getExtTimetableCode(), SQLVARCHAR, false, false, -1),
                 array('@Date', date('Y-m-d', $date), SQLVARCHAR, false, false, -1),
                 array('@CurrentDay', 'day', SQLINT4, true, false, -1),
             )
@@ -209,7 +200,28 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         }
     }
 
-    public function getLastSynergeticDay($date, $campus)
+    /**
+     * Returns the day name
+     *
+     * @param $dayNumber
+     * @return String
+     */
+    public function getDayName($dayNumber)
+    {
+        $query = "SELECT Description FROM luDays WHERE Code = '{$this->getDatabase()->quote($dayNumber)}'";
+        $result = $this->getDatabase()->getRow($query);
+
+        if($result['Description']) {
+            return $result['Description'];
+        }
+        else {
+            return 'Day ' . $dayNumber;
+        }
+
+    }
+
+
+    public function getLastSynergeticDay($date, \Schoolbox\Campus $campus)
     {
         //This function gets all start of term days entered into synergetic from the date provided backwards.
         //It caches this info so you can get it later again.
@@ -227,11 +239,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             }
         }
 
-        $campusModel = $this->campusMapper->findById($campus); //TODO campus object should be passed
-        if (!($campusModel instanceof \Schoolbox\Campus)) {
-            return false;
-        }
-        $days = $campusModel->getTimetableDay();
+        $days = $this->getTotalDays($campus);
 
         $nowmssqldate = date('Y-m-d', $date) . ' 00:00:00';
 
@@ -239,7 +247,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         $query = "SELECT *, CONVERT(CHAR(19),CalendarEvents.CalendarDate) as startDate, CalendarEvents.CalendarType as type
 			FROM SynergyOne.dbo.CalendarEvents CalendarEvents
-			WHERE (CalendarEvents.CalendarType LIKE '" . $campusModel->getExtTimetableCode() . "_D%') AND CalendarEvents.CalendarDate <= '$nowmssqldate'
+			WHERE (CalendarEvents.CalendarType LIKE '" . $campus->getExtTimetableCode() . "_D%') AND CalendarEvents.CalendarDate <= '$nowmssqldate'
 			ORDER BY CalendarEvents.CalendarDate DESC";
 
         $result = $this->getDatabase()->query($query);
@@ -280,6 +288,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                 }
             }
         }
+
+        return false;
     }
 
     /**
@@ -289,22 +299,18 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      *       Either that, or a timetable group code, as all other external DB
      *       calls use the key in the external DB, instead of the Schoolbox key.
      *
-     * @param int $campus A campus ID (internal, not Synergetic)
-     * @param int $now    Optional override of time
+     * @param \Schoolbox\Campus $campus A campus object (internal, not Synergetic)
+     * @param int $now Optional override of time
      *
      * @return array
      */
-    public function getPeriodNumber($campus, $now = 0)
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0)
     {
         $now = $now ?: time();
 
         $secondsAfterMidnight = $now - strtotime('00:00:00', $now);
 
-        $campusModel = $this->campusMapper->findById($campus);
-        if (!($campusModel instanceof \Schoolbox\Campus)) {
-            return false;
-        }
-        $campusString = $campusModel->getExtTimetableCode();
+        $campusString = $campus->getExtTimetableCode();
 
         // firstly, what day number is it?
         $targetDay = $this->getDayNumber($campus);
@@ -362,26 +368,22 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         );
     }
 
-    public function getDayTimetable($synergy_id, $userID, $campus, $daynumber)
+    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
     {
-        if (empty($synergy_id)) {
+        if (empty($externalUserId)) {
             return array();
         }
-        $timetabledef = $this->getTimetableDefinition($synergy_id, $campus, $daynumber);
+        $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber);
 
         if (!is_array($timetabledef)) {
             return false;
         }
 
-        $campusModel = $this->campusMapper->findById($campus); //TODO campus object should be passed
-        if (!($campusModel instanceof \Schoolbox\Campus)) {
-            return false;
-        }
-        $campusString = $campusModel->getExtTimetableCode();
+        $campusString = $campus->getExtTimetableCode();
 
-        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($synergy_id));
-        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($synergy_id));
-        if ($this->groupHandler->isStudent($userID)) {
+        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
+        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
+        if ($this->groupHandler->isStudent($userId)) {
             $query = "SELECT
 				Timetable.Room, SubjectClasses.Description, Timetable.PeriodNumber, Timetable.ClassCampus, Timetable.ClassCode, StaffID
 				FROM
@@ -401,8 +403,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 				StudentClasses.ClassCode = SubjectClasses.ClassCode AND
 				Timetable.FileSemester='" . $fileSemester . "' AND
 				Timetable.FileYear='" . $fileYear . "' AND
-				(StudentClasses.ID='$synergy_id' AND
-				Timetable.DayNumber = '$daynumber' AND
+				(StudentClasses.ID='$externalUserId' AND
+				Timetable.DayNumber = '$dayNumber' AND
 				Timetable.TimetableGroup = '$campusString' AND
 				StudentClasses.StartDate <= getdate() AND
 				(StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL))
@@ -420,8 +422,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 				SubjectClasses.FileSemester='" . $fileSemester . "' AND
 				SubjectClasses.FileYear='" . $fileYear . "' AND
 				Timetable.TimetableGroup = '$campusString' AND
-				Timetable.StaffID='$synergy_id' AND
-				Timetable.DayNumber = '$daynumber'
+				Timetable.StaffID='$externalUserId' AND
+				Timetable.DayNumber = '$dayNumber'
 				ORDER BY Timetable.PeriodNumber";
         }
 
@@ -467,28 +469,24 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
     }
 
-    public function getFullTimetable($synergy_id, $userID, $campus)
+    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
     {
-        if (empty($synergy_id)) {
+        if (empty($externalUserId)) {
             return array();
         }
 
-        $timetabledef = $this->getTimetableDefinition($synergy_id, $campus, $this->getDayNumber($campus));
+        $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $this->getDayNumber($campus));
 
         if (!is_array($timetabledef['desc'])) {
             return false;
         }
 
-        try {
-            $campusModel  = $this->campusMapper->findById($campus); //TODO campus object should be passed
-            $campusString = $campusModel->getExtTimetableCode();
-        } catch (Exception $e) {
-            return false;
-        }
+        $campusString = $campus->getExtTimetableCode();
 
-        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($synergy_id));
-        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($synergy_id));
-        if ($this->groupHandler->isStudent($userID)) {
+
+        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
+        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
+        if ($this->groupHandler->isStudent($userId)) {
             $query = "SELECT
 						Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, Timetable.PeriodNumber,
 						Timetable.ClassCampus, Timetable.ClassCode, Timetable.StaffID, vStaff.StaffTitle, vStaff.StaffPreferredName,
@@ -513,7 +511,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 						((Timetable.FileSemester=" . $fileSemester . ") AND
 						(Timetable.FileYear=" . $fileYear . ") AND
 						Timetable.TimetableGroup = '$campusString' AND
-						(StudentClasses.ID='$synergy_id'))
+						(StudentClasses.ID='$externalUserId'))
 						AND StudentClasses.StartDate <= getdate() AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
 						AND DayNumber > 0 AND DayNumber <= " . $timetabledef['dayCount'] . " AND PeriodNumber <= " . $timetabledef['periodCount'] . "
 					ORDER BY Timetable.PeriodNumber, Timetable.DayNumber";
@@ -538,7 +536,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 						SubjectClasses.FileSemester='" . $fileSemester . "' AND
 						SubjectClasses.FileYear='" . $fileYear . "' AND
 						Timetable.TimetableGroup = '$campusString' AND
-						Timetable.StaffID='$synergy_id' AND
+						Timetable.StaffID='$externalUserId' AND
 						DayNumber > 0 AND DayNumber <= " . $timetabledef['dayCount'] . " AND
 						PeriodNumber <= " . $timetabledef['periodCount'] . "
 					ORDER BY Timetable.PeriodNumber, Timetable.DayNumber";
@@ -601,6 +599,19 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     }
 
     /**
+     * Returns the number of days in a particular timetable groups cycle
+     * Note that this means you do not need to set the days in the campus table for synergetic, we fetch it directly
+     *
+     * @param \Schoolbox\Campus $campus
+     * @return int
+     */
+    public function getTotalDays(\Schoolbox\Campus $campus) {
+        $query = "SELECT CycleDays FROM luTimetableGroup WHERE Code = '{$campus->getExtTimetableCode()}'";
+        $result = $this->getDatabase()->getRow($query);
+        return $result['CycleDays'];
+    }
+
+    /**
      * Gets the timetable for the given room.
      *
      * @param string $roomCode
@@ -656,7 +667,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                         'ext_timetable_code',
                         $timetableCode
                     );
-                    $campusTimetableList[$timetableCode] = $this->getTimetableDefinition(null, $campus->getId());
+                    $campusTimetableList[$timetableCode] = $this->getTimetableDefinition(null, $campus);
                 } catch (\Schoolbox\Mapper\Exception $e) {
                     // No campus found: error out
                     // TODO: make getTimetableDefinition() accept campus code instead of SB ID

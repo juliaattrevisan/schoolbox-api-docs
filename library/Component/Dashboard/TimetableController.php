@@ -51,22 +51,19 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         // Don't output a timetable if it has the same code as another that has
         // already been added.
         $checked_campus_list = array();
-        foreach ($_SESSION['campus'] as $campus_id) {
-            try {
-                $campus = Schoolbox\CampusMapper::getInstance()->findById($campus_id);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                continue;
-            }
+        foreach ($_SESSION['user']->getCampusCollection() as $campus) {
             if ($campus instanceof Schoolbox\Campus) {
+                $campus_id = $campus->getId();
                 $campus_code = $campus->getExtTimetableCode();
                 if (!isset($checked_campus_list[$campus_code])) {
                     $checked_campus_list[$campus_code] = true;
-                    $day_number = $timetableHandler->getDayNumber($campus_id);
+                    $day_number = $timetableHandler->getDayNumber($campus);
                     if ($day_number) {
-                        $this->dayNumber[$campus_id] = $timetableHandler->getDayNumber($campus_id);
-                        $this->currentPeriod[$campus_id] = $timetableHandler->getPeriodNumber($campus_id);
+                        $this->dayNumber[$campus_id] = $day_number;
+                        $this->dayName[$campus_id] = $timetableHandler->getDayName($day_number);
+                        $this->currentPeriod[$campus_id] = $timetableHandler->getPeriodNumber($campus);
                         $this->timetable[$campus_id] = $timetableHandler->getDayTimetable(
-                            $_SESSION['sid'], $_SESSION['id'], $campus_id, $day_number
+                            $_SESSION['sid'], $_SESSION['id'], $campus, $day_number
                         );
                     }
                 }
@@ -78,6 +75,11 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         return true;
 
 
+    }
+
+    function __call($name, $arguments)
+    {
+        // TODO: Implement __call() method.
     }
 
     public function renderTemplate($templateHandle)
@@ -135,7 +137,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                 } else {
                     $this->setVar('timetable_campus_name_block', '');
                 }
-                $this->setVar("DAYNUMBER", $this->dayNumber[$campus_id]);
+                $this->setVar("DAYNAME", $this->dayName[$campus_id]);
                 $current_period = $this->currentPeriod[$campus_id];
                 /* Setup colour map */
                 $subjectColourMap = array();

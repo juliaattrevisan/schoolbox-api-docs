@@ -29,36 +29,29 @@ class External_Tass_Timetable implements External_TimetableInterface
         $this->setDatabase(MSSQL::getInstance());
 
         $this->groupHandler = new Group;
-        $this->campusMapper = new \Schoolbox\CampusMapper();
         $this->externalUser = new External_User('tass');
     }
 
 
-    function getCampus($campus)
-    {
-        return $this->campusMapper->findByID($campus);
-    }
 
-    function getCampusCode($campus)
+    function getCampusCode(\Schoolbox\Campus $campus)
     {
-        list($campusCode, $timetableCode) = explode('-', $this->getCampus($campus)->getExtTimetableCode());
+        list($campusCode, $timetableCode) = explode('-', $campus->getExtTimetableCode());
         return $campusCode;
     }
 
-    function getTimetableCode($campus)
+    function getTimetableCode(\Schoolbox\Campus $campus)
     {
-        list($campusCode, $timetableCode) = explode('-', $this->getCampus($campus)->getExtTimetableCode());
+        list($campusCode, $timetableCode) = explode('-', $campus->getExtTimetableCode());
         return $timetableCode;
     }
 
-    function getDays($campus)
+    function getDays(\Schoolbox\Campus $campus)
     {
-
-        $campus = $this->campusMapper->findByID($campus);
         return $campus->getTimetableDay();
     }
 
-    function getTimetableDefinition($externalUserId, $campus, $day = 0)
+    function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
     {
 
         $campusCode    = $this->getCampusCode($campus);
@@ -97,7 +90,7 @@ class External_Tass_Timetable implements External_TimetableInterface
     }
 
     //gets current day number
-    function getDayNumber($campus, $date = 0)
+    function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
     {
 
         if (!$date) {
@@ -152,7 +145,19 @@ class External_Tass_Timetable implements External_TimetableInterface
         }
     }
 
-    function getLastDay($date, $campus)
+    /**
+     * Returns the day name
+     *
+     * @param $dayNumber
+     * @return String
+     */
+    public function getDayName($dayNumber)
+    {
+        return 'Day ' . $dayNumber;
+    }
+
+
+    function getLastDay($date, \Schoolbox\Campus $campus)
     {
 
         $nowmssqldate = date('Y-m-d', $date) . ' 00:00:00';
@@ -171,21 +176,21 @@ class External_Tass_Timetable implements External_TimetableInterface
     }
 
     //returns the period number for the current time
-    function getPeriodNumber($campus, $now = 0)
+    function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0)
     {
         return 0;
     }
 
-    function getDayTimetable($synergy_id, $userID, $campus, $daynumber)
+    function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
     {
-        if (empty($synergy_id)) {
+        if (empty($externalUserId)) {
             return array();
         }
-        $timetabledef = $this->getTimetableDefinition($synergy_id, $campus, $daynumber);
+        $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber);
 
-        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($synergy_id));
-        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($synergy_id));
-        if ($this->groupHandler->isStudent($userID)) {
+        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
+        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
+        if ($this->groupHandler->isStudent($userId)) {
             $query = "SELECT room_code, tch_code, ttmast.sub_code, ttmast.year_grp, ttmast.class, prd_code, sub_desc
                         FROM studsub
                         JOIN student ON studsub.stud_code = student.stud_code AND studsub.cmpy_code=student.cmpy_code
@@ -193,8 +198,8 @@ class External_Tass_Timetable implements External_TimetableInterface
                                 AND studsub.class=ttmast.class AND (student.year_grp=ttmast.year_grp OR ttmast.year_grp IS null) AND studsub.yr_study=ttmast.year_num
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                         WHERE yr_study = '$fileYear' AND studsub.semester = '$fileSemester'
-                                AND studsub.stud_code = '$synergy_id'
-                                AND day_code = '$daynumber' 
+                                AND studsub.stud_code = '$externalUserId'
+                                AND day_code = '$dayNumber'
                         ORDER BY prd_code";
         } else {
             $query = "SELECT room_code, tch_code, ttmast.sub_code, year_grp, class, prd_code, sub_desc
@@ -202,8 +207,8 @@ class External_Tass_Timetable implements External_TimetableInterface
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                         WHERE year_num = '$fileYear' AND semester = '$fileSemester'
                             AND ttmast.cmpy_code = '{$this->getCampusCode($campus)}'
-                            AND tch_code = '$synergy_id'
-                            AND day_code = '$daynumber'
+                            AND tch_code = '$externalUserId'
+                            AND day_code = '$dayNumber'
                          ORDER BY prd_code";
         }
 
@@ -243,16 +248,16 @@ class External_Tass_Timetable implements External_TimetableInterface
 
     }
 
-    function getFullTimetable($synergy_id, $userID, $campus)
+    function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
     {
-        if (empty($synergy_id)) {
+        if (empty($externalUserId)) {
             return array();
         }
-        $timetabledef = $this->getTimetableDefinition($synergy_id, $campus);
+        $timetabledef = $this->getTimetableDefinition($externalUserId, $campus);
 
-        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($synergy_id));
-        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($synergy_id));
-        if ($this->groupHandler->isStudent($userID)) {
+        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
+        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
+        if ($this->groupHandler->isStudent($userId)) {
             $query = "SELECT room_code, tch_code, ttmast.sub_code, ttmast.year_grp, ttmast.class, prd_code, sub_desc, day_code
                             FROM studsub
                             JOIN student ON studsub.stud_code = student.stud_code AND studsub.cmpy_code=student.cmpy_code
@@ -260,7 +265,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                                     AND studsub.class=ttmast.class AND (student.year_grp=ttmast.year_grp OR ttmast.year_grp IS NULL) AND studsub.yr_study=ttmast.year_num
                             JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                             WHERE yr_study = '$fileYear' AND studsub.semester = '$fileSemester'
-                                    AND studsub.stud_code = '$synergy_id'
+                                    AND studsub.stud_code = '$externalUserId'
                             ORDER BY prd_code, day_code";
 
         } else {
@@ -269,7 +274,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                         WHERE year_num = '$fileYear' AND semester = '$fileSemester'
                             AND ttmast.cmpy_code = '{$this->getCampusCode($campus)}'
-                            AND tch_code = '$synergy_id'
+                            AND tch_code = '$externalUserId'
                          ORDER BY prd_code, day_code";
         }
 

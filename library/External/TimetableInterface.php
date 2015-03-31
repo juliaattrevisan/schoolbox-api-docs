@@ -22,20 +22,30 @@ interface External_TimetableInterface
      * $timetableDef['sequence'][]
      *
      * @param string $externalUserId If set, the external user ID to get definition for.
-     * @param $campusId
+     * @param \Schoolbox\Campus $campus
      * @param int $day
      * @return array
      */
-    public function getTimetableDefinition($externalUserId, $campusId, $day = 0);
+    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0);
 
     /**
      * Get the current day number for a given campus
      *
-     * @param $campusId
+     * @param Schoolbox\Campus $campus
      * @param int $date
+     * @internal param $campusId
      * @return int
      */
-    public function getDayNumber($campusId, $date = 0);
+    public function getDayNumber(\Schoolbox\Campus $campus, $date = 0);
+
+    /**
+     * Returns the name of the current day
+     *
+     * @param $dayNumber
+     * @return String
+     *
+     */
+    function getDayName($dayNumber);
 
     /**
      * Calculates the current period based on the current time
@@ -45,11 +55,12 @@ interface External_TimetableInterface
      * PeriodNumber
      * PeriodNumberSeq
      *
-     * @param $campusId
-     * @param $now
+     * @param Schoolbox\Campus $campus
+     * @param int $now
+     * @internal param $campusId
      * @return array
      */
-	public function getPeriodNumber ($campusId, $now = 0);
+	public function getPeriodNumber (\Schoolbox\Campus $campus, $now = 0);
 
     /**
      * Return a user's timetable for a specific day
@@ -74,12 +85,13 @@ interface External_TimetableInterface
      *
      * @param $externalUserId
      * @param $userId
-     * @param $campusId
+     * @param Schoolbox\Campus $campus
      * @param $dayNumber
+     * @internal param $campusId
      * @return mixed
      */
-	public function getDayTimetable ($externalUserId, $userId, $campusId, $dayNumber);
-    
+	public function getDayTimetable ($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber);
+
     /**
      * Return the ENTIRE timetable for a user and campus
      *
@@ -125,10 +137,11 @@ interface External_TimetableInterface
      *
      * @param $externalUserId
      * @param $userId
-     * @param $campusId
+     * @param Schoolbox\Campus $campus
+     * @internal param $campusId
      * @return mixed
      */
-	public function getFullTimetable ($externalUserId, $userId, $campusId);
+	public function getFullTimetable ($externalUserId, $userId, \Schoolbox\Campus $campus);
 
 	/**
 	 * Gets the timetable for the given room.

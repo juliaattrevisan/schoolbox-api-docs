@@ -64,14 +64,14 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
         while ($currentTimestamp < $endTimestamp) {
             foreach ($this->getUser()->getCampusCollection() as $campus) {
                 $campusId  = $campus->getId();
-                $dayNumber = $this->getExternalTimetable()->getDayNumber($campusId, $currentTimestamp);
+                $dayNumber = $this->getExternalTimetable()->getDayNumber($campus, $currentTimestamp);
                 if ($dayNumber <= 0) {
                     continue;
                 }
                 // Building the timetable is an expensive process,
                 // so only do when necessary, and only once for each day/campus
                 if (!isset($dayTimetable[$dayNumber][$campusId])) {
-                    $dayTimetable[$dayNumber][$campusId] = $this->buildTimetable($campusId, $dayNumber);
+                    $dayTimetable[$dayNumber][$campusId] = $this->buildTimetable($campus, $dayNumber);
                 }
                 // Load events for this campus
                 if (isset($dayTimetable[$dayNumber][$campusId])) {
@@ -146,18 +146,18 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
     /**
      * Builds the timetable for a given campus for a given day.
      *
-     * @param int $campusId
+     * @param \Schoolbox\Campus $campus
      * @param int $day
      *
      * @return array
      */
-    protected function buildTimetable($campusId, $day)
+    protected function buildTimetable($campus, $day)
     {
         try {
             $timetable = $this->getExternalTimetable()->getDayTimetable(
                 $this->getUser()->getExternalId(),
                 $this->getUser()->getId(),
-                $campusId,
+                $campus,
                 $day
             );
         } catch (Schoolbox\External\Exception $e) {
