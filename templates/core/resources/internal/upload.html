@@ -23,6 +23,7 @@
             play:      abUploadControls.find('a[data-interaction="audio-record-play"]'),
             stop:      abUploadControls.find('a[data-interaction="audio-record-stop"]'),
             upload:    abUploadControls.find('a[data-interaction="audio-record-upload"]'),
+            uploading: abUploadControls.find('a[data-interaction="audio-record-uploading"]'),
             disabled:  abUploadControls.find('a[data-interaction="audio-record-disabled"]')
         };
         var recorderInterface;
@@ -34,6 +35,7 @@
         recorderButtons.stop.hide().prop('disabled', true);
         recorderButtons.upload.hide().prop('disabled', true);
         recorderButtons.disabled.hide();
+        recorderButtons.uploading.hide();
 
         recorderContainer.recorder({
             upload: {
@@ -87,7 +89,14 @@
             recorderButtons.play.show().prop('disabled', false);
             recorderButtons.stop.hide().prop('disabled', true);
             recorderButtons.upload.show().prop('disabled', false);
-            recorderButtons.disabled.hide();
+        });
+        recorderContainer.on('uploadStart.recorder', function(event, recorder) {
+            recorderButtons.start.hide().prop('disabled', true);
+            recorderButtons.recording.hide().prop('disabled', true);
+            recorderButtons.play.hide().prop('disabled', true);
+            recorderButtons.stop.hide().prop('disabled', true);
+            recorderButtons.upload.hide().prop('disabled', true);
+            recorderButtons.uploading.show();
         });
         recorderContainer.on('uploadComplete.recorder', function(event, recorder, filename, response) {
             // inform any listeners that a file was uploaded.
@@ -107,7 +116,16 @@
             recorderButtons.play.hide().prop('disabled', true);
             recorderButtons.stop.hide().prop('disabled', true);
             recorderButtons.upload.show().prop('disabled', false);
-            recorderButtons.disabled.hide();
+            recorderButtons.uploading.hide();
+        });
+        recorderContainer.on('uploadFailed.recorder', function(event, recorder) {
+            // Show some sort of failed message?
+            recorderButtons.start.hide().prop('disabled', true);
+            recorderButtons.recording.hide().prop('disabled', true);
+            recorderButtons.play.hide().prop('disabled', true);
+            recorderButtons.stop.hide().prop('disabled', true);
+            recorderButtons.upload.hide().prop('disabled', true);
+            recorderButtons.uploading.show();
         });
 
         // Button events
@@ -370,7 +388,8 @@
   <!--<a role="button" class="submit-btn-plain pause hide" data-interaction="audio-record-pause" href="#">Pause</a>-->
   <a role="button" class="submit-btn-plain play hide" data-interaction="audio-record-play" href="#">Play</a>
   <a role="button" class="submit-btn-plain stop hide" data-interaction="audio-record-stop" href="#">Stop</a>
-  <a role="button" class="submit-btn-plain stop hide" data-interaction="audio-record-upload" href="#">Upload Audio</a>
+  <a role="button" class="submit-btn-plain upload hide" data-interaction="audio-record-upload" href="#">Upload Audio</a>
+  <a role="button" class="submit-btn-plain uploading hide" data-interaction="audio-record-uploading" disabled href="#">Uploading...</a>
 
   <a role="button" class="btn no-icon float-left cancel" href="#">Cancel</a>
 </div>
