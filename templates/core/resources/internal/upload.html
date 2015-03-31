@@ -19,6 +19,12 @@
             recorderInterface, // Recording plugin
             dz; // Dropzone
 
+        var uploadRecorded = function() {
+            recorderNameInput.blur();
+            recorderInterface.uploadRecorded(recorderNameInput.val() + '.wav');
+            recorderNameDialog.dialog('close');
+        };
+
         // Set up the recorder's dialog
         recorderNameDialog.dialog({
             modal: true,
@@ -27,9 +33,7 @@
                 {
                     text:  'Upload',
                     click: function() {
-                        // Upload the item with this text
-                        recorderInterface.uploadRecorded(recorderNameInput.val() + '.wav');
-                        $(this).dialog('close');
+                        uploadRecorded();
                     }
                 },
                 {
@@ -41,6 +45,12 @@
             ]
         }).on('open', function() {
             recorderNameInput.focus();
+        });
+        // Did I press enter on the recorder name?
+        recorderNameInput.on('keypress', function(event) {
+            if (event.which == 13) {
+                uploadRecorded();
+            }
         });
 
         // Set up the recorder
