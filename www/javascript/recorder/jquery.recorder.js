@@ -123,13 +123,13 @@
             self.webrtc.supported    = true;
             self.webrtc.audioContext = new audioContextConstructor();
             self.webrtc.audioElement = self.options.webrtc.audioElement || $('<audio />');
-            self.webrtc.audioElement.on('timeupdate', function() {
-                self.triggerEvent('playbackProgress', []);
+            self.webrtc.audioElement.on('timeupdate.recorder', function() {
+                self.triggerEvent('playbackProgress', [this.currentTime]);
             });
-            self.webrtc.audioElement.on('playing', function() {
+            self.webrtc.audioElement.on('playing.recorder', function() {
                 self.triggerEvent('playbackStart', []);
             });
-            self.webrtc.audioElement.on('ended', function() {
+            self.webrtc.audioElement.on('ended.recorder', function() {
                 self.triggerEvent('playbackStop', []);
             });
         } else {
