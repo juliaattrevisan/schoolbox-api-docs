@@ -22,8 +22,16 @@ class Controller extends Base
     public function impersonate(User $user) {
         $previous = $_SESSION;
         $session = new \Session();
-        $session->create($user->getUsername());
-        $_SESSION['previous'] = $previous;
+
+        if ($session->create($user->getUsername())) {
+            $_SESSION['previous'] = $previous;
+
+            $logger = new \User_Logger_AssumeUser($previous, $user);
+            $logger->notify();
+        }
+        else {
+            $_SESSION = $previous; //Recover old session
+        }
         $this->getResponse()->redirect->found('/');
     }
 

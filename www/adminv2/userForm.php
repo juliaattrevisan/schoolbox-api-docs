@@ -172,7 +172,9 @@ elseif ($_POST['login']) {
     if ($sessionHandler->create($_POST['login'])) {
 /* Logging
 		 */
-        $logger = new User_Logger_AssumeUser($oldSession, $userHandler->getByUsername($_POST['login']));
+        $_SESSION['previous'] = $oldSession;
+
+        $logger = new User_Logger_AssumeUser($oldSession, $_SESSION['user']);
         $logger->notify();
 
         SitePage::localRedir('/');

@@ -18,9 +18,9 @@ class User_Logger_AssumeUser extends DeprecatedModel {
 
 	/**
 	 * @param $session
-	 * @param $user
+	 * @param \Schoolbox\User $user
 	 */
-	public function __construct($session, $user) {
+	public function __construct($session, \Schoolbox\User $user) {
 		$this->setSession($session);
 		$this->setUser($user);
 
@@ -36,7 +36,7 @@ class User_Logger_AssumeUser extends DeprecatedModel {
 
 		$log = array(
 			'user' => 'admin',
-			'assumed' => $user['username'],
+			'assumed' => $user->getUsername(),
 			'created_at' => $date->getDatabase(),
 			'ip' => $_SERVER['REMOTE_ADDR'],
 		);
