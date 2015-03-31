@@ -71,7 +71,9 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
     private function determineSourceFolder()
     {
         // remove any non-numeric values from the source config
-        $categoryId = $this->getConfig('src') ? preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) : $this->getContext('id');
+        $categoryId = $this->getConfig('src')
+            ? preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src'))
+            : $this->getContext()->getId();
 
         try {
             $this->setSource($this->getCategoryMapper()->findById($categoryId));
