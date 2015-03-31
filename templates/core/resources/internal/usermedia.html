@@ -93,6 +93,9 @@
             },
             flash: {
                 flashContainer: $('#flashContainer')[0],
+                onFlashSecurity: function() {
+                    $('#flashContainer').show();
+                },
                 session: {
                     name: '{SESSION_NAME}',
                     id:   '{SESSION_ID}'
@@ -214,6 +217,7 @@
           (this supports usermedia natively)
     -->
     <div class="dz-default"><span>Start recording audio</span></div>
+    <div id="flashContainer" class="hide"></div>
 </div>
 <div id="recorderButtons">
     <a role="button" class="submit-btn-plain record" data-interaction="audio-record-start" href="#">Record Audio</a>
@@ -225,7 +229,6 @@
     <a role="button" class="submit-btn-plain uploading hide" data-interaction="audio-record-uploading" disabled href="#">Uploading...</a>
     <a role="button" class="btn no-icon float-left cancel" href="#">Cancel</a>
 </div>
-<div id="flashContainer"></div>
 <div id="recorderNameDialog" title="Please enter a name for this recording" class="hide">
     <input data-role="recording-name" type="text" value="recording" />
 </div>
