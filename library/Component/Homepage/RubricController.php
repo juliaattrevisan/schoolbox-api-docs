@@ -38,7 +38,7 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
         // get rubric details
         $this->criteria = CriterionMapper::getInstance()->findByColumnList(
             array(
-                'parent_id'   => $this->getContext('id'),
+                'parent_id'   => $this->getContext()->getId(),
                 'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
             ),
             array('order' => array('grouping'=>'ASC', 'name'=>'ASC'))

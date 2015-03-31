@@ -81,7 +81,7 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
                 $this,
                 $this->delegate->fetchTwigContent($this, $this->sitepage),
                 $this->groupHandler->getPermission(
-                    $this->getContext('id'),
+                    $this->getContext()->getId(),
                     $this->user->getId()
                 )
             );
