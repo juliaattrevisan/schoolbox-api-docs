@@ -26,7 +26,7 @@ class IsSuperuser extends All
         ;
     }
 
-    public function authorize(array $params = array(), User $user = null)
+    public function authorizeMethod(array $params = array(), User $user = null)
     {
         if (!($user instanceof User && $user->getId() && $user->isSuperuser())) {
             throw new Unauthorized();
