@@ -74,6 +74,8 @@
         this.webrtc    = {};
         this.recording = false;
         this.playing   = false;
+        this.recordingStartTime = null;
+        this.intervalMethod     = null;
         this._attemptWebRtcSetup();
         this._attemptFlashSetup();
         if (this.isWebRtcSupported() || this.isFlashSupported()) {
@@ -164,6 +166,18 @@
     };
 
     /**
+     * Method for raising playback progress events.
+     *
+     * @private
+     */
+    RecorderPlugin.prototype._pollRecordingTime = function() {
+        this.triggerEvent(
+            'recordingProgress',
+            [(Date.now() - this.recordingStartTime) / 1000]
+        );
+    };
+
+    /**
      * Start recording in WebRTC mode
      *
      * @private
@@ -181,6 +195,12 @@
                 numChannels: self.options.webrtc.channels
             }
         );
+
+        // There's no webrtc event for recording progress,
+        // so fake it with setInterval.
+        self.recordingStartTime = Date.now();
+        self.intervalMethod     = setInterval(self._pollRecordingTime.bind(self), 1000);
+
         self.webrtc.recorder.record();
         self.triggerEvent('recordingStart', []);
         return this;
@@ -295,6 +315,7 @@
     RecorderPlugin.prototype.stopRecording = function() {
         var self = this;
         if (self.isWebRtcUsed()) {
+            clearInterval(self.intervalMethod);
             self.webrtc.stream.stop();
             self.webrtc.recorder.stop();
             // At this point I have a blob. Put it in the audio element.
