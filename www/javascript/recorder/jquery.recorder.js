@@ -282,11 +282,11 @@
             self.webrtc.audioElement[0].play();
         } else if (self.isFlashUsed()) {
             self.flash.recorder.play({
-                start: function() {
-                    self.triggerEvent('playbackStart', []);
-                },
                 progress: function(ms) {
                     self.triggerEvent('playbackProgress', [ms/1000]);
+                },
+                finish: function(ms) {
+                    self.triggerEvent('playbackStop', []);
                 }
             });
             self.triggerEvent('playbackStart', []);
