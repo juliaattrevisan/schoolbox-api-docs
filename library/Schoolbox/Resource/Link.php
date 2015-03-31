@@ -246,6 +246,11 @@ class Link implements ISoftDeletable
             return $this->getRelativeURL();
         } elseif ($this->isFTPURL()) {
             return $this->getUrl();
+        }
+        /* If this has an id, then log the visit for this instance
+         */
+        else if (is_numeric($this->getId())) {
+            return "/redir.php?id={$this->getId()}";
         } else {
             return $this->getBase64EncodedRedirect();
         }
