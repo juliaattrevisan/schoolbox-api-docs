@@ -32,7 +32,7 @@ class LinkRedir extends Base {
      *
      * @var string
      */
-    protected $regex = '/redir\.php\?id=([0-9]+)/';
+    protected $regex = '/redir\.php\?id=(\d+)/';
 
     /**
      * Distill a url from a Link instance
