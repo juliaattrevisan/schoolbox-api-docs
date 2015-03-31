@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Assessment\Component\Test;
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBox\Notification;
 use Schoolbox\Test\TestCase;
 
 class SubmissionBoxTest extends TestCase {
@@ -73,19 +72,4 @@ class SubmissionBoxTest extends TestCase {
 		$this->markTestIncomplete('Mark type model hasn\'t been added yet');
 	}
 
-	public function testNotification() {
-		$this->assertInstanceOf(
-			'\\Schoolbox\\Assessment\\Component\\SubmissionBox\\NotificationCollection',
-			$this->object->getNotifications()
-		);
-		//
-		// Set notification for overdue items.
-		$notification = new Notification();
-		$notification
-			->setEnabled(true)
-			->setSent(false)
-			->setType(Notification::TYPE_OVERDUE)
-		;
-		$this->object->addNotification($notification);
-	}
 }
