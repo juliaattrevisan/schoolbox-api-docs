@@ -141,10 +141,32 @@ elseif (is_numeric($_GET['deleteService']) && is_numeric($_GET['sid']) && is_num
 
     SitePage::localRedir('/adminv2/modify-user/' . Scrub::text($_GET['uid']) . '#permissions');
 }
-elseif (is_array($_POST['linkUser'])) {
+elseif (is_numeric($_GET['deleteUserLink']) && is_numeric($_GET['linkedUser']) ) {
+    /* Deletes linked users */
 
     try {
-        $originalUser = UserMapper::getInstance()->findById($_POST['userId']);
+        $originalUser = \Schoolbox\UserMapper::getInstance()->findById($_GET['deleteUserLink']);
+    }
+    catch(\Schoolbox\Mapper\Exception $e)  {
+        error(2);
+    }
+    $linkedUserList = new \Schoolbox\Collection;
+    foreach($originalUser->getLinkedUser() as $linkedUser) {
+        if($linkedUser->getId() != $_GET['linkedUser']) {
+            $linkedUserList->add($linkedUser);
+        }
+    }
+    $originalUser->setLinkedUser($linkedUserList);
+
+    \Schoolbox\UserMapper::getInstance()->save($originalUser);
+
+    SitePage::localRedir('/adminv2/modify-user/'.$originalUser->getId().'#linked');
+}
+elseif (is_array($_POST['linkUser'])) {
+    /* Adds linked users */
+
+    try {
+        $originalUser = \Schoolbox\UserMapper::getInstance()->findById($_POST['userID']);
     }
     catch(\Schoolbox\Mapper\Exception $e)  {
         error(2);
@@ -152,7 +174,7 @@ elseif (is_array($_POST['linkUser'])) {
 
     foreach($_POST['linkUser'] as $userId ){
         try{
-            $linkedUser = UserMapper::getInstance()->findById($userId);
+            $linkedUser = \Schoolbox\UserMapper::getInstance()->findById($userId);
 
             $originalUser->getLinkedUser()->add($linkedUser);
         } catch (\Schoolbox\Mapper\Exception $e) {
@@ -160,7 +182,9 @@ elseif (is_array($_POST['linkUser'])) {
         }
     }
 
-    UserMapper::getInstance()->save($originalUser);
+    \Schoolbox\UserMapper::getInstance()->save($originalUser);
+
+    SitePage::localRedir('/adminv2/modify-user/'.$originalUser->getId().'#linked');
 }
 /* Switch logins to the current user being viewed
  */

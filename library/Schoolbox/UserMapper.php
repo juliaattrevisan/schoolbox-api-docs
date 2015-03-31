@@ -211,7 +211,7 @@ class UserMapper extends Mapper
             )
         );
 
-        $this->joinsVia('user_link', UserMapper::class, 'id', 'linked_user_id', 'user_id', null, null, 'linkedUser');
+        $this->joinsVia('user_link', UserMapper::class, 'id', 'linked_user_id', 'user_id', null, null, null, 'linkedUser');
     }
 
     public function findById($id)
@@ -267,12 +267,14 @@ class UserMapper extends Mapper
             }
 
             $linkedUser = $this->hydrate($row,'lu');
-            if($linkedUser->getId()) {
-                $user->getLinkedUser()->add($linkedUser);
-            }
-
-
+            $linkedUserList[$linkedUser->getId()] = $linkedUser;
         }
+
+        if(is_array($linkedUserList) && count($linkedUserList) > 0) {
+            $linkedCollection = new Collection($linkedUserList);
+            $user->setLinkedUser($linkedCollection);
+        }
+
         if (!($user instanceof User)) {
             throw new Schoolbox\Mapper\Exception('Instance of object not found');
         }

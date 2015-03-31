@@ -242,6 +242,7 @@ if(is_numeric($this->arg[0])) {
 
         /* Output linked accounts */
         $this->setBlock(TEMPLATE_content, 'user_linked', 'user_linked_block');
+        $this->setVar('user_linked_block', '');
         foreach($userObj->getLinkedUser() as $linkedUser){
             /** @param \Schoolbox\User $linkedUser */
             $this->setVar(array('USER_LINKED_ID'  => $linkedUser->getId(),
