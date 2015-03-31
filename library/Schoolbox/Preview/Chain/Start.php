@@ -24,12 +24,12 @@ class Start extends Base {
      */
     public function __construct($url) {
         $decodedUrl = urldecode($url);
-        
+
         $headers = $this->findHeaders($decodedUrl);
 
         $this->start([
             new Image($decodedUrl, $headers),
-            new OEmbed($decodedUrl, $headers),
+            new oEmbed($decodedUrl, $headers),
             new Html($decodedUrl, $headers),
             new Other($decodedUrl, $headers),
         ]);

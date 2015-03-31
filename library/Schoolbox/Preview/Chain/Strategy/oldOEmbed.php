@@ -12,7 +12,7 @@ namespace Schoolbox\Preview\Chain\Strategy;
 
 use Schoolbox\Preview\Chain\Strategy\oEmbed\Start;
 
-class OEmbed extends Base {
+class oldOEmbed extends Base {
 
     /**
      * Test the oEmbed capability

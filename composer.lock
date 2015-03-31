@@ -1156,6 +1156,52 @@
             "time": "2013-11-14 19:48:31"
         },
         {
+            "name": "mpratt/embera",
+            "version": "1.8.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mpratt/Embera.git",
+                "reference": "6b7453615d7d60e6cb3880e68edd4037be424d88"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mpratt/Embera/zipball/6b7453615d7d60e6cb3880e68edd4037be424d88",
+                "reference": "6b7453615d7d60e6cb3880e68edd4037be424d88",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Embera": "Lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Pratt",
+                    "email": "pratt@hablarmierda.net",
+                    "homepage": "http://www.michael-pratt.com",
+                    "role": "Author/Developer"
+                }
+            ],
+            "description": "A Oembed consumer library, that gives you information about urls. It helps you replace urls to youtube or vimeo for example, with their html embed code.",
+            "homepage": "https://github.com/mpratt/Embera",
+            "keywords": [
+                "Auto embed",
+                "embed",
+                "oembed",
+                "vimeo",
+                "youtube"
+            ],
+            "time": "2015-02-05 02:48:34"
+        },
+        {
             "name": "mtdowling/cron-expression",
             "version": "v1.0.3",
             "source": {
@@ -4281,6 +4327,62 @@
             "description": "Symfony Finder Component",
             "homepage": "http://symfony.com",
             "time": "2015-01-03 08:01:59"
+        },
+        {
+            "name": "symfony/translation",
+            "version": "v2.5.5",
+            "target-dir": "Symfony/Component/Translation",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/Translation.git",
+                "reference": "170c0d895616e1a6a35681ffb0b9e339f58ab928"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/Translation/zipball/170c0d895616e1a6a35681ffb0b9e339f58ab928",
+                "reference": "170c0d895616e1a6a35681ffb0b9e339f58ab928",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "symfony/config": "~2.0",
+                "symfony/intl": "~2.3",
+                "symfony/yaml": "~2.2"
+            },
+            "suggest": {
+                "symfony/config": "",
+                "symfony/yaml": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.5-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\Translation\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                },
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                }
+            ],
+            "description": "Symfony Translation Component",
+            "homepage": "http://symfony.com",
+            "time": "2014-09-23 05:25:11"
         },
         {
             "name": "symfony/yaml",
