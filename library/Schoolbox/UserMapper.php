@@ -267,7 +267,9 @@ class UserMapper extends Mapper
             }
 
             $linkedUser = $this->hydrate($row,'lu');
-            $linkedUserList[$linkedUser->getId()] = $linkedUser;
+            if($linkedUser->getId()) {
+                $linkedUserList[$linkedUser->getId()] = $linkedUser;
+            }
         }
 
         if(is_array($linkedUserList) && count($linkedUserList) > 0) {

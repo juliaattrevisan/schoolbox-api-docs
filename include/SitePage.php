@@ -370,13 +370,26 @@ class SitePage extends Page
             /* Output switch user options */
             $this->setBlock('banner_logged_in', 'switch_user', 'switch_user_block');
             $this->setVar('switch_user_block', '');
+            $linkedUserList = array();
+
             foreach($_SESSION['user']->getLinkedUser() as $linkedUser) {
+
+                /* Fully hydrate, note this stores back in session so it only happens once */
+                if($linkedUser->getRole()->getName() == null) {
+                    $linkedUser = \Schoolbox\UserMapper::getInstance()->findById($linkedUser->getId());
+                    $linkedUserList[] = $linkedUser;
+                }
+
                 $this->setVar(array(
                                     'MENU_SWITCH_USERID'        => $linkedUser->getId(),
                                     'MENU_SWITCH_USER_FULLNAME' => $linkedUser->getFullName(),
+                                    'MENU_SWITCH_USER_ROLE'     => $linkedUser->getRole()->getName(),
                                     )
                 );
                 $this->parse('switch_user_block', 'switch_user', true);
+            }
+            if(count($linkedUserList) > 0) {
+                $_SESSION['user']->setLinkedUser($linkedUserList);
             }
 
             $this->setBlock('banner_logged_in', 'recover_user', 'recover_user_block');
@@ -386,6 +399,7 @@ class SitePage extends Page
                 $this->setVar(array(
                                     'MENU_SWITCH_USERID'        => $_SESSION['previous']['user']->getId(),
                                     'MENU_SWITCH_USER_FULLNAME' => $_SESSION['previous']['user']->getFullName(),
+                                    'MENU_SWITCH_USER_ROLE'     => $_SESSION['previous']['user']->getRole()->getName(),
                                     )
                 );
                 $this->parse('recover_user_block', 'recover_user', true);
