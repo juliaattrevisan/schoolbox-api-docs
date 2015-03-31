@@ -401,6 +401,17 @@
     };
 
     /**
+     * Unbinds all events added outside of this plugin.
+     *
+     * @returns {RecorderPlugin}
+     */
+    RecorderPlugin.prototype.unbindUserEvents = function() {
+        this.element.off('.'+PLUGIN_NAME);
+        this._bindInternalEvents();
+        return this;
+    };
+
+    /**
      * Triggers an event on the element that this is a recorder for.
      *
      * This object is always passed as the first extra parameter to the event
