@@ -40,6 +40,7 @@ if (is_numeric($_POST['pollID']) && is_numeric($_POST['categoryID']) && isset($_
         'option_8' => $_POST['option_8'],
         'option_9' => $_POST['option_9'],
         'frequency' => $_POST['frequency'],
+
         'close' => $date->getDatabase(),
     );
 
@@ -48,6 +49,8 @@ if (is_numeric($_POST['pollID']) && is_numeric($_POST['categoryID']) && isset($_
 
         $pollHandler->update($poll);
     } else {
+        $poll['created_by'] =  $_SESSION['id'];
+        $poll['created'] = Alaress_Date_Format::now()->getDatabase();
         $poll['pollID'] = $pollHandler->create($poll);
     }
 
@@ -65,8 +68,7 @@ if (is_numeric($_POST['pollID']) && is_numeric($_POST['categoryID']) && isset($_
         );
     }
     catch (Schoolbox\Mapper\Exception $e) {
-        error(19);
-        exit;
+        SitePage::localRedir("/homepage/" . $poll['categoryID']);
     }
 
     $confI = new Component_Config();
