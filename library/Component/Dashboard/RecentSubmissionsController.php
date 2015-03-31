@@ -44,9 +44,8 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
 
         // determine how many results to output
         $count = 0;
-        $limit = min(array($this->max, count($this->submissions)));
+        $limit = $this->getConfig('size');
 
-        $j = 0;
         if(is_array($this->submissions)) {
             foreach($this->submissions as $submit) {
                 // don't exceed the limit
@@ -62,7 +61,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
                     'WORK_DESCRIPTION' => Scrub::Text($submit['name']),
                     'WORK_COUNT'       => $submit['count'],
                     'WORK_BOX_ID'      => $submit['id'],
-                    'ROW_COLOR'        => ++$j%2 ? 'dark' : ''
+                    'ROW_COLOR'        => ++$count%2 ? 'dark' : ''
                 );
 
                 $this->setVar($output);
@@ -77,13 +76,13 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
                 }
 
                 $this->parse('work_block', 'work', true);
-
-                $count++;
             }
+
+            return true;
         }
-
-
-        return true;
+        else {
+            return false;
+        }
     }
 
     /**
