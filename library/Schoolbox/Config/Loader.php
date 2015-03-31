@@ -44,7 +44,7 @@ class Loader implements IConfigLoader, ArrayAccess {
      * @return mixed
      */
     public function get($var) {
-        if (empty($this->data)) {
+        if (empty($this->cache)) {
             $this->cache = $this->getData();
         }
         if (isset($this->cache[$var])) {
