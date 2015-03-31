@@ -13,7 +13,7 @@
             recorderNameInput  = $('#recorderNameDialog input[data-role="recording-name"]'),
             recorderInterface; // Recording plugin
 
-
+        // Call this when I want to actually upload recorded sounds
         var uploadRecorded = function() {
             recorderNameInput.blur();
             recorderInterface.uploadRecorded(recorderNameInput.val() + '.wav');
@@ -41,7 +41,7 @@
         }).on('open', function() {
             recorderNameInput.focus();
         });
-        // Did I press enter on the recorder name?
+        // Did I press enter on the recorder name? treat that as a form submit
         recorderNameInput.on('keypress', function(event) {
             if (event.which == 13) {
                 uploadRecorded();
@@ -81,6 +81,8 @@
             }
         });
         recorderInterface = recorderContainer.data('recorder');
+
+        // Set up button events
         recorderContainer.on('setupFailed.recorder', function(event, recorder) {
             // Disable all buttons
             recorderButtons.start.hide().prop('disabled', true);
