@@ -1,3 +1,43 @@
+/**
+ * Audio recorder plugin, with both Flash and WebRTC versions.
+ *
+ * This plugin provides no interface, but triggers events that an interface can
+ * attach to.
+ *
+ * All events have the following signature: (event, recorder)
+ * * event: the jQuery event that was raised
+ * * recorder: the recorder object
+ * Some events may have extra parameters.
+ *
+ * The plugin triggers the following events:
+ *
+ * Setup:
+ * * setup: when the plugin is set up
+ * * setupFailed: setup failed because neither Flash nor WebRTC are supported
+ *
+ * Recording:
+ * * recordingReady: when recording is ready
+ * * recordingStart: when recording starts
+ * * recordingStartFailed: recording failed for some reason
+ * * recordingProgress(ms): raised as recording occurs, with an extra parameter
+ *   for the number of milliseconds recording has gone on for
+ * * recordingStop: when recording stops
+ *
+ * Playback
+ * * playbackReady: when playback is ready (a recording has been made)
+ * * playbackStart: when playback starts
+ * * playbackStartFailed: playback failed for some reason. not yet implemented.
+ * * playbackProgress(ms): raised as playback occurs, with an extra parameter
+ *   for the number of milliseconds into the recording playback has gone
+ * * playbackStop: when playback stops
+ *
+ * Uploads
+ * * uploadReady: when upload is ready (a recording has been made)
+ * * uploadStart: when upload starts
+ * * uploadComplete(filename, response): when upload is complete. Receives a
+ *   filename, as well as an object response.
+ * * uploadFailed: upload failed for some reason
+ */
 (function($){
     var PLUGIN_NAME = 'recorder';
 
