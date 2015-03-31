@@ -10,6 +10,12 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox;
 
+/**
+ * Class File
+ *
+ * @deprecated since the Mapper::joinsVia() method now exists, which can do this without the need for a separate model
+ * @package Schoolbox\Assessment\Component\SubmissionBox
+ */
 class File {
 
 	/**
@@ -32,6 +38,10 @@ class File {
 	 */
 	protected $file;
 
+
+    /**
+     * @deprecated
+     */
 	public function __construct() {
 		$this->setFile(new Schoolbox\Storage());
 	}

@@ -10,6 +10,12 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox;
 
+/**
+ * Class FileMapper
+ *
+ * @deprecated since the Mapper::joinsVia() method now exists, which can do this without the need for a separate model
+ * @package Schoolbox\Assessment\Component\SubmissionBox
+ */
 class FileMapper extends Schoolbox\Mapper {
 
 	protected function mapping () {
