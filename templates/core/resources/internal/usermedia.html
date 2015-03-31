@@ -1,0 +1,15 @@
+<div id="ab-usermedia" class="ab-pane">
+    <!--
+        Usermedia uploader
+        * Audio for now, designed to be extendable to video
+        * Should fall back to simple file upload for iPads
+          (this supports usermedia natively)
+    -->
+    <form class="dzone" action="/storage/asyncUpload">
+        <div class="dz-default"><span>Start recording audio or video</span></div>
+    </form>
+</div>
+<div class="ctrl">
+    <a role="button" class="submit-btn-plain" disabled="disabled" href="#">Upload</a>
+    <a role="button" class="btn no-icon float-left cancel" href="#">Cancel</a>
+</div>
