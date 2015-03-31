@@ -5,10 +5,11 @@
 <script type="text/javascript" src="/javascript/recorder/jquery.recorder.js"></script>
 <script type="text/javascript">
     $(function() {
-        var recorderContainer  = $('#ab-usermedia'),
-            recorderControls   = $('#recorderButtons'),
-            recorderNameDialog = $('#recorderNameDialog'),
-            recorderNameInput  = recorderNameDialog.find('input[data-role="recording-name"]'),
+        var recorderContainer      = $('#ab-usermedia'),
+            recorderControls       = $('#recorderButtons'),
+            recorderNameDialog     = $('#recorderNameDialog'),
+            recorderDisabledDialog = $('#recorderDisabledDialog'),
+            recorderNameInput      = recorderNameDialog.find('input[data-role="recording-name"]'),
             recorderInterface; // Recording plugin
 
         // Call this when I want to actually upload recorded sounds
@@ -18,7 +19,7 @@
             recorderNameDialog.dialog('close');
         };
 
-        // Set up the recorder's dialog
+        // Set up the recorder's dialogs
         recorderNameDialog.dialog({
             modal: true,
             autoOpen: false,
@@ -39,6 +40,26 @@
         }).on('open', function() {
             recorderNameInput.focus();
         });
+        recorderDisabledDialog.dialog({
+            modal: true,
+            autoOpen: false,
+            buttons: [
+                {
+                    text:  'Try to upload a file',
+                    click: function() {
+                        $('#attachment-browser').find('a[href="#internal/upload"]').click();
+                        $(this).dialog('close');
+                    }
+                },
+                {
+                    text:  'Cancel',
+                    click: function() {
+                        $(this).dialog('close');
+                    }
+                }
+            ]
+        });
+
         // Did I press enter on the recorder name? treat that as a form submit
         recorderNameInput.on('keypress', function(event) {
             if (event.which == 13) {
@@ -89,6 +110,7 @@
             recorderButtons.stop.hide().prop('disabled', true);
             recorderButtons.upload.hide().prop('disabled', true);
             recorderButtons.disabled.show();
+            recorderDisabledDialog.dialog('open');
         });
         recorderContainer.on('recordingReady.recorder', function() {
             // Allow record button to show
@@ -191,7 +213,7 @@
         * Should fall back to simple file upload for iPads
           (this supports usermedia natively)
     -->
-    <div class="dz-default"><span>Start recording audio or video</span></div>
+    <div class="dz-default"><span>Start recording audio</span></div>
 </div>
 <div id="recorderButtons">
     <a role="button" class="submit-btn-plain record" data-interaction="audio-record-start" href="#">Record Audio</a>
@@ -206,4 +228,7 @@
 <div id="flashContainer"></div>
 <div id="recorderNameDialog" title="Please enter a name for this recording" class="hide">
     <input data-role="recording-name" type="text" value="recording" />
+</div>
+<div id="recorderDisabledDialog" title="Recording is not directly supported in your browser" class="hide">
+    Selecting a file to upload in the "Upload file" selector might work.
 </div>
