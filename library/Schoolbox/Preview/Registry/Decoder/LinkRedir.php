@@ -28,13 +28,20 @@ use Schoolbox\Resource\LinkMapper;
 class LinkRedir extends Base {
 
     /**
+     * Regex
+     *
+     * @var string
+     */
+    protected $regex = '/redir\.php\?id=([0-9]+)/';
+
+    /**
      * Distill a url from a Link instance
      *
      * @param $url
      * @return mixed|void
      */
     public function decode($url) {
-        if ($id = $this->isLinkRedir($url)) {
+        if ($id = $this->isThisDecoder($url)) {
             $linkMapper = new LinkMapper();
 
             try {
@@ -48,23 +55,5 @@ class LinkRedir extends Base {
         }
 
         return '';
-    }
-
-    /**
-     * Get the link id out of the url
-     *
-     * @param $url
-     * @return bool
-     */
-    private function isLinkRedir($url) {
-        $id = false;
-
-        preg_match('/redir\.php\?id=([0-9]+)/', $url, $matches);
-
-        if (count($matches)) {
-            $id = $matches[1];
-        }
-
-        return $id;
     }
 }

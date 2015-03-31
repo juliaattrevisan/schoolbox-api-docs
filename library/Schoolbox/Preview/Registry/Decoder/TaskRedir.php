@@ -17,13 +17,20 @@ use Schoolbox\Assessment\Course\UnitInstanceMapper;
 class TaskRedir extends Base {
 
     /**
+     * Regex
+     *
+     * @var string
+     */
+    protected $regex = '/task\/start\/(\d+)/';
+
+    /**
      * Distill a url from a Task instance
      *
      * @param $url
      * @return mixed|void
      */
     public function decode($url) {
-        if ($id = $this->isTaskRedir($url)) {
+        if ($id = $this->isThisDecoder($url)) {
             try {
 
                 // This should populate unit instance, task, component and all that too.
@@ -81,22 +88,4 @@ class TaskRedir extends Base {
 
         return '';
     }
-
-    /**
-     * Get the link id out of the url
-     *
-     * @param $url
-     * @return bool
-     */
-    private function isTaskRedir($url) {
-        $id = false;
-
-        preg_match('/task\/start\/(\d+)/', $url, $matches);
-
-        if (count($matches)) {
-            $id = $matches[1];
-        }
-
-        return $id;
-    }
-} 
+}
