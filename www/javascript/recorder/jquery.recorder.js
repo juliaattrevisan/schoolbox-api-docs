@@ -58,6 +58,7 @@
         webrtc: {
             preview: '',
             channels: 1,
+            sampleRate: 11025,
             workerPath: '/javascript/recorder/webrtc/recorderWorker.js',
             audioElement: null
         },
@@ -78,21 +79,33 @@
         if (this.isWebRtcSupported() || this.isFlashSupported()) {
             this.triggerEvent('setup', []);
             this.triggerEvent('recordingReady', []);
-            this.bindEvent('recordingStart', function(event, recorder) {
-                recorder.recording = true;
-            });
-            this.bindEvent('recordingStop', function(event, recorder) {
-                recorder.recording = false;
-            });
-            this.bindEvent('playbackStart', function(event, recorder) {
-                recorder.playing = true;
-            });
-            this.bindEvent('playbackStop', function(event, recorder) {
-                recorder.playing = false;
-            });
+            this._bindInternalEvents();
         } else {
             this.triggerEvent('setupFailed', []);
         }
+    };
+
+    /**
+     * Binds internal recording/playback start/stop events.
+     *
+     * @private
+     *
+     * @returns {RecorderPlugin}
+     */
+    RecorderPlugin.prototype._bindInternalEvents = function() {
+        this.bindEvent('recordingStart', function(event, recorder) {
+            recorder.recording = true;
+        });
+        this.bindEvent('recordingStop', function(event, recorder) {
+            recorder.recording = false;
+        });
+        this.bindEvent('playbackStart', function(event, recorder) {
+            recorder.playing = true;
+        });
+        this.bindEvent('playbackStop', function(event, recorder) {
+            recorder.playing = false;
+        });
+        return this;
     };
 
     /**
