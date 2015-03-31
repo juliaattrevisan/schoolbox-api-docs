@@ -7,14 +7,39 @@
 <script type="text/javascript">
     $(function () {
 
-        var abUpload          = $('#ab-upload'),
-            abUploadForm      = abUpload.find('form.dzone'),
-            abUploadControls  = abUpload.siblings('div.ctrl'),
-            abUploadSubmitBtn = abUploadControls.children('a[data-interaction="file-upload"]'),
-            abUploadCancelBtn = abUploadControls.children('a.cancel'),
-            recorderContainer = $('#recorder'),
-            maxFiles          = {MAX_FILES},
+        var abUpload           = $('#ab-upload'),
+            abUploadForm       = abUpload.find('form.dzone'),
+            abUploadControls   = abUpload.siblings('div.ctrl'),
+            abUploadSubmitBtn  = abUploadControls.children('a[data-interaction="file-upload"]'),
+            abUploadCancelBtn  = abUploadControls.children('a.cancel'),
+            recorderContainer  = $('#recorder'),
+            recorderNameDialog = $('#recorderNameDialog'),
+            recorderNameInput  = $('#recorderNameDialog input[name="name"]'),
+            maxFiles           = {MAX_FILES},
+            recorderInterface, // Recording plugin
             dz; // Dropzone
+
+        // Set up the recorder's dialog
+        recorderNameDialog.dialog({
+            modal: true,
+            autoOpen: false,
+            buttons: [
+                {
+                    text:  'Upload',
+                    click: function() {
+                        // Upload the item with this text
+                        recorderInterface.uploadRecorded(recorderNameInput.val() + '.wav');
+                        $(this).dialog('close');
+                    }
+                },
+                {
+                    text:  'Cancel',
+                    click: function() {
+                        $(this).dialog('close');
+                    }
+                }
+            ]
+        });
 
         // Set up the recorder
         var recorderButtons = {
@@ -26,7 +51,6 @@
             uploading: abUploadControls.find('a[data-interaction="audio-record-uploading"]'),
             disabled:  abUploadControls.find('a[data-interaction="audio-record-disabled"]')
         };
-        var recorderInterface;
 
         // Switch off buttons by default
         recorderButtons.start.show().prop('disabled', false);
@@ -148,10 +172,7 @@
         recorderButtons.upload.click(function(event) {
             event.preventDefault();
             // prompt for a name
-            var filename = prompt("Please enter a filename", "recording");
-            if (filename !== null) {
-                recorderInterface.uploadRecorded(filename + '.wav');
-            }
+            recorderNameDialog.dialog('open');
         });
 
         // Init dropzone
@@ -395,3 +416,6 @@
 </div>
 <div id="recorder"></div>
 <div id="flashContainer"></div>
+<div id="recorderNameDialog" title="Please enter a name for this recording" class="hide">
+    <input name="name" type="text" value="" />
+</div>
