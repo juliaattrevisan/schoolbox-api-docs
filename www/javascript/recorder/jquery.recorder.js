@@ -19,16 +19,16 @@
  * * recordingReady: when recording is ready
  * * recordingStart: when recording starts
  * * recordingStartFailed: recording failed for some reason
- * * recordingProgress(ms): raised as recording occurs, with an extra parameter
- *   for the number of milliseconds recording has gone on for
+ * * recordingProgress(seconds): raised as recording occurs, with extra parameter
+ *   for the number of seconds recording has gone on for
  * * recordingStop: when recording stops
  *
  * Playback
  * * playbackReady: when playback is ready (a recording has been made)
  * * playbackStart: when playback starts
  * * playbackStartFailed: playback failed for some reason. not yet implemented.
- * * playbackProgress(ms): raised as playback occurs, with an extra parameter
- *   for the number of milliseconds into the recording playback has gone
+ * * playbackProgress(seconds): raised as playback occurs, with extra parameter
+ *   for the number of seconds into the recording playback has gone
  * * playbackStop: when playback stops
  *
  * Uploads
@@ -201,7 +201,7 @@
                 self.triggerEvent('recordingStart', []);
             },
             progress: function(ms) {
-                self.triggerEvent('recordingProgress', [ms]);
+                self.triggerEvent('recordingProgress', [ms/1000]);
             }
         });
         return this;
@@ -266,7 +266,7 @@
                     self.triggerEvent('playbackStart', []);
                 },
                 progress: function(ms) {
-                    self.triggerEvent('playbackProgress', [ms]);
+                    self.triggerEvent('playbackProgress', [ms/1000]);
                 }
             });
             self.triggerEvent('playbackStart', []);
