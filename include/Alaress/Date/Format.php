@@ -1200,11 +1200,11 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
-     * Gets datetime object out of this wrapper
+     * Sets the datetime object in this wrapper
      *
      * @param LaravelDate $dateObject
      */
-    public function setDateTimeObject($dateObject)
+    protected function setDateTimeObject($dateObject)
     {
         $this->datetime = $dateObject;
     }
