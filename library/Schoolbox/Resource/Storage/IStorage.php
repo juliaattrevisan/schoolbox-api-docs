@@ -10,6 +10,7 @@
 namespace Schoolbox\Resource\Storage;
 
 use Alaress_Date_Format as ADF;
+use Schoolbox\File\Mimetype;
 
 /**
  * Interface IStorage
@@ -22,10 +23,22 @@ interface IStorage
 {
 
     /**
+     * Returns the real filename of the file
+     * @return string
+     */
+    public function getFilename();
+
+    /**
      * Returns the full mime string for the file
      * @return string
      */
     public function getMime();
+
+    /**
+     * Returns the full mime string for the file
+     * @return Mimetype
+     */
+    public function getMimetype();
 
     /**
      * Returns the size on disk of the file

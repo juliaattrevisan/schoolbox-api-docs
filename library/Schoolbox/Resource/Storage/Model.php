@@ -27,6 +27,9 @@ use Schoolbox\Video\Queue;
 class Model extends File implements IStorage
 {
     /** @var string */
+    protected $filename;
+
+    /** @var string */
     protected $hash;
 
     /** @var Mimetype */
@@ -76,6 +79,26 @@ class Model extends File implements IStorage
         $this->queue = $queue;
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getFilename()
+    {
+        return $this->filename;
+    }
+
+
+    /**
+     * @param string $filename
+     * @return static
+     */
+    public function setFilename($filename)
+    {
+        $this->filename = $filename;
+        return $this;
+    }
+
 
     /**
      * @return string
