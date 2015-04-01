@@ -565,7 +565,7 @@
             css.height = response.height;
         }
         replacement.animate(css, 550, function () {
-            replacement.empty().replaceWith(response);
+            replacement.empty().replaceWith(response.removeAttr('style'));
             masonry.saveSorting();
             masonry.refreshPalette();
         });
