@@ -310,16 +310,20 @@
             'submit',
             opt.component.controlPanelSelector+'.settings form',
             function(event) {
-                var form  = $(this),
-                    panel = form.closest(opt.component.controlPanelSelector),
-                    existing = panel.closest(opt.component.selector),
+                var form       = $(this),
+                    formData   = form.serializeArray(),
+                    formInputs = form.find(':input'),
+                    panel      = form.closest(opt.component.controlPanelSelector),
+                    existing   = panel.closest(opt.component.selector),
                     existingId = existing.attr('id');
                 event.preventDefault();
+                existing.addClass('saving');
+                formInputs.prop('disabled', true);
                 $.ajax(
                     {
                         url:  this.action,
                         type: this.method,
-                        data: form.serializeArray()
+                        data: formData
                     }
                 )
                     .done(function(response) {
@@ -327,6 +331,11 @@
                         // (Filter out everything that's not the component)
                         masonry.insertComponentInstance($(response).find('#'+existingId), existing);
                     })
+                    .fail(function() {
+                        existing.addClass('failed');
+                        // Later on, remove "failed" class
+                        formInputs.prop('disabled', false);
+                    });
             }
         );
     };
