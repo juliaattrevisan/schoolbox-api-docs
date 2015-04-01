@@ -95,6 +95,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                 $ids = $componentInstanceMapper->save($newComp);
 
                 $instanceID = $ids[0];
+                // Save the component's configuration here
             } else {
                 $instanceID = $_POST['reload'];
             }
@@ -114,20 +115,8 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                 die("<h2>Error adding component</h2><p>Could not find component to instantiate.</p>");
             }
 
-            $templateTarget = "component_position_{$component->getInstance()->getPosition()}";
-            $templateHandle = "component_{$component->getInstance()->getId()}";
-            $templateHandle = TEMPLATE_content;
-
-
-            //Setup permissions for component
-            $context['uid'] = $eportfolioHandler->getSettingsPageOwner();
-            $context['permission'] = \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE;
-
-            $component->setup($context, $component->getInstance()->getConfigArray() );
-
-            if ($component->execute() !== false) {
-/* Insert with config'd name
-				 */
+            // If this is a new component, set its name
+            if (is_numeric($_POST['add'])) {
                 foreach ($component->getInstance()->getConfig() as $currentConfig) {
                     /** @var Component_ConfigDefinition $currentConfig */
                     if ($currentConfig->getKey() == 'componentname') {
@@ -140,8 +129,8 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                             $componentName = $configInstance->getValue();
 
                             /* Presave a config for this newly added component
-							 * so it always has the name we gave it
-							 */
+                             * so it always has the name we gave it
+                             */
                             $newConfigInstance = new Component_Config();
                             $newConfigInstance->setId(null);
                             $newConfigInstance->setConfigDefinitionId($currentConfig->getId());
@@ -151,7 +140,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                             Component_ConfigMapper::getInstance()->save($newConfigInstance);
 
                             /* Force inherited name
-							 */
+                             */
                             $component->getInstance()->getConfig()->offsetGet($currentConfig->getId())
                                 ->setDefaultValue($componentName);
                         } else {
@@ -159,26 +148,10 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                         }
                     }
                 }
-
-                $component->parseConfig();
-
-                if ($component->renderTemplate($templateHandle) !== false) {
-                    $component->setVar(array(
-                        'COMPONENT_NAME' => $componentName,
-                    ));
-
-                    $component->parse($templateTarget, $templateHandle, true);
-                }
             }
 
-            /* These aren't normally parsed so have to do it explicitly
-			 */
-            $component->getPageTemplate()->setVar(array(
-                'USER_ID' => $eportfolioHandler->getUserId(),
-                'PAGE_ID' => $eportfolioHandler->getPageId(),
-            ));
-
-            $component->getPageTemplate()->pparse($templateTarget, $templateHandle);
+            $renderer = new Component_Renderer();
+            $renderer->renderEportfolioComponent($eportfolioHandler, $component);
         } /* AJAX new column widths
 		 */
         elseif (is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
@@ -249,8 +222,6 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                         $confI = new Component_Config();
                     }
 
-                    printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $confD->getKey(), $confI->getValue(), $config[$confD->getKey()]);
-
                     if (!($confI->getId())) {
                         $confI->setConfigDefinitionId($confD->getId());
                         $confI->setInstanceId($instance->getId());
@@ -262,7 +233,18 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                 }
             }
 
-            SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getUid()}/{$eportfolioHandler->getPageId()}");
+            if (SitePage::detectAjax()) {
+                // Just rebuild and refetch the component
+                $factory       = new Component_Eportfolio_Factory(new \Schoolbox\User(), new SitePage(false));
+                $componentList = $componentInstanceMapper->findByInstanceId($instance->getId());
+                $cList         = array_values($componentList);
+                $component     = $factory->buildComponent($cList[0]);
+                $renderer      = new Component_Renderer();
+                $renderer->renderEportfolioComponent($eportfolioHandler, $component);
+                exit;
+            } else {
+                SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getUid()}/{$eportfolioHandler->getPageId()}");
+            }
         }
     } else {
         error(19);
