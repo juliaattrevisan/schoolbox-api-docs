@@ -14,54 +14,24 @@
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
  */
-class Calendar_Event_Collection implements Iterator, Countable {
+
+namespace Calendar\Event;
+use Calendar\Event\Type\EventBase;
+
+class Collection implements Iterator, Countable {
 
 	/**
-	 * A bunch of Calendar_Event_Type_Abstract subclasses
+	 * A bunch of EventBase subclasses
 	 *
-	 * @var Calendar_Event_Type_Abstract[]
+	 * @var array
 	 */
 	private $stack = array();
-	private $position = 0;
 
-	/* Cached set of colours
-	 */
-	private $colourSet = array();
-
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-		$this->cacheColourSet();
-
-		$this->setup();
-	}
-
-	/**
-	 * Hook method
-	 */
-	protected function setup() {
-	}
-
-	/**
-	 * Cache colour set
-	 *
-	 * Temporarily disabled for now
-	 */
-	private function cacheColourSet() {
-//		$colours = array();
-//
-//		$query = "SELECT eventTypeID, eventColour FROM luEventType";
-//		$result = $this->db->query($query);
-//
-//		while($row = $this->db->getNextArray($result) ) {
-//			$colours[$row['eventTypeID']] = '#' . $row['eventColour'];
-//		}
-//
-//		$this->setColourSet($colours);
-	}
+    /**
+     * @var int
+     */
+    private $position = 0;
 
 	/**
 	 * The number of items in this collection
@@ -76,7 +46,7 @@ class Calendar_Event_Collection implements Iterator, Countable {
 	 * If the collection has at least one item in it,
 	 * return the first element in the stack
 	 *
-	 * @return mixed
+	 * @return EventBase $element
 	 */
 	public function getFirst() {
 		if ($this->getCount()) {
@@ -89,40 +59,23 @@ class Calendar_Event_Collection implements Iterator, Countable {
 	/* Getters/Setters
 	 */
 
-	/**
-	 * Set colour set
-	 *
-	 * @param $colourSet
-	 */
-	private function setColourSet($colourSet) {
-		$this->colourSet = $colourSet;
-	}
-
-	/**
-	 * Get colour set
-	 *
-	 * @return array
-	 */
-	private function getColourSet() {
-		return $this->colourSet;
-	}
 
 	/**
 	 * Add an Calendar_Event_Abstract-typed element to the stack
 	 *
-	 * @param Calendar_Event_Type_Abstract $element
+	 * @param EventBase $element
 	 */
-	public function add(Calendar_Event_Type_Abstract $element) {
+	public function add(EventBase $element) {
 		$this->stack[] = $element;
 	}
 
     /**
      * Merge another stack into this one
      *
-     * @param \Calendar_Event_Collection $collection
+     * @param Collection $collection
      * @return $this
      */
-	public function merge(Calendar_Event_Collection $collection) {
+	public function merge(Collection $collection) {
 		$merged = array_merge($this->getStack(), $collection->getStack());
 
 		$this->setStack($merged);
@@ -134,9 +87,9 @@ class Calendar_Event_Collection implements Iterator, Countable {
 	 * Merge another stack into this one, but ensures that duplicate events are
 	 * not added to the stack again.
 	 *
-	 * @param \Calendar_Event_Collection $collection
+	 * @param Collection $collection
 	 */
-	public function mergeWithoutDuplicates(Calendar_Event_Collection $collection) {
+	public function mergeWithoutDuplicates(Collection $collection) {
 		$id_list = array();
 		foreach ($this as $event) {
 			/** @var Calendar_Event_Type_Abstract $event */
@@ -158,11 +111,11 @@ class Calendar_Event_Collection implements Iterator, Countable {
 	 * Comparison - sorts on day of event, start time, end time, then finally name.
 	 * Also, all day events are always before timed events on the same day.
 	 *
-	 * @param $a
-	 * @param $b
+	 * @param EventBase $a
+	 * @param EventBase $b
 	 * @return int
 	 */
-	private function cmp($a, $b) {
+	private function cmp(EventBase $a, EventBase $b) {
 		//
 		// Sort on day of event only (not time)
 		$a_day = $a->getStartTime()->getUsingFormat('Ymd');
@@ -238,7 +191,7 @@ class Calendar_Event_Collection implements Iterator, Countable {
 	/**
 	 * Get iterator
 	 *
-	 * @return null
+	 * @return Collection
 	 */
 	public function getIterator() {
 		return $this;
@@ -247,7 +200,7 @@ class Calendar_Event_Collection implements Iterator, Countable {
 	/**
 	 * Set stack
 	 *
-	 * @param $stack
+	 * @param array $stack
 	 *
 	 * @return array
 	 */
@@ -258,7 +211,7 @@ class Calendar_Event_Collection implements Iterator, Countable {
 	/**
 	 * Get stack
 	 *
-	 * @return array|Calendar_Event_Type_Abstract[]
+	 * @return array|EventBase[]
 	 */
 	public function getStack() {
 		return $this->stack;
@@ -274,7 +227,7 @@ class Calendar_Event_Collection implements Iterator, Countable {
 	/**
 	 * Current
 	 *
-	 * @return Calendar_Event_Type_Abstract
+	 * @return EventBase
 	 */
 	public function current() {
 		return $this->stack[$this->position];

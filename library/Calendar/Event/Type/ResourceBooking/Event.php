@@ -7,9 +7,13 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Schoolbox\ResourceBooking\Booking\Model;
+namespace Calendar\Event\Type\ResourceBooking;
 
-class Calendar_Event_Type_ResourceBooking extends Calendar_Event_Type_Day {
+use Calendar\Event\Type\EventInterface;
+use Schoolbox\ResourceBooking\Booking\Model;
+use Calendar\Event\Type\Day\Event as DayEvent;
+
+class Event extends DayEvent implements EventInterface {
 
     protected $rendererClass = 'Calendar_Event_Type_ResourceBooking_Renderer_Javascript';
 

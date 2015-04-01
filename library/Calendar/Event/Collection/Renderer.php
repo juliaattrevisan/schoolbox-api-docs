@@ -5,15 +5,21 @@
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
  */
-class Calendar_Event_Collection_Renderer {
+
+namespace Calendar\Event\Collection;
+
+use Calendar_Api_EventType_Interface;
+use SitePage;
+use Calendar\Event\Collection;
+
+class Renderer {
 	protected $interfaceClass = 'Calendar_Api_EventType_Interface';
 
 	/**
 	 * An instance of a Calendar API class
 	 *
-	 * @var null
+	 * @var Calendar_Api_EventType_Interface
 	 */
 	protected $api = null;
 
@@ -34,7 +40,7 @@ class Calendar_Event_Collection_Renderer {
 	/**
 	 * An instance of sitepage
 	 *
-	 * @var null
+	 * @var SitePage
 	 */
 	protected $page = null;
 
@@ -42,9 +48,8 @@ class Calendar_Event_Collection_Renderer {
 	 */
 	/**
 	 * Mega-stack Calendar_Event_Collection instance which stores all events
-	 * An instance of Calendar_Event_Collection
 	 *
-	 * @var null
+	 * @var Collection
 	 */
 	protected $allEvents = null;
 
@@ -62,7 +67,7 @@ class Calendar_Event_Collection_Renderer {
 		$this->setEndTimestamp($endTimestamp);
 		$this->setPage($page);
 
-		$this->setAllEvents(new Calendar_Event_Collection());
+		$this->setAllEvents(new Collection());
 
 		$this->collectAllEvents();
 	}
@@ -75,7 +80,7 @@ class Calendar_Event_Collection_Renderer {
 
 		/* Only attempt to merge collections
 		 */
-		if (is_a($eventList, 'Calendar_Event_Collection')) {
+		if ($eventList instanceof Collection) {
 			$this->getAllEvents()->merge($eventList);
 		}
 
@@ -182,7 +187,7 @@ class Calendar_Event_Collection_Renderer {
 	/**
 	 * Set all events
 	 *
-	 * @param Calendar_Event_Collection $allEvents
+	 * @param Collection $allEvents
 	 */
 	protected function setAllEvents($allEvents) {
 		$this->allEvents = $allEvents;
@@ -191,7 +196,7 @@ class Calendar_Event_Collection_Renderer {
 	/**
 	 * Get all events
 	 *
-	 * @return Calendar_Event_Collection
+	 * @return Collection
 	 */
 	protected function getAllEvents() {
 		return $this->allEvents;

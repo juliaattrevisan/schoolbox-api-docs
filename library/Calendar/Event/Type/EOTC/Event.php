@@ -11,7 +11,12 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Calendar_Event_Type_EOTC extends Calendar_Event_Type_Abstract {
+namespace Calendar\Event\Type\EOTC;
+use Calendar\Event\Type\EventBase;
+use Calendar\Event\Type\EventInterface;
+
+
+class Event extends EventBase implements EventInterface {
 
     /* Renderer
      */

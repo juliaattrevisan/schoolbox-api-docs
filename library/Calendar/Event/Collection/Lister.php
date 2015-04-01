@@ -157,8 +157,6 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
             )
         );
 
-        $renderer = new Calendar_Event_Type_Renderer_Lister($this->getPage());
-
         $lastDate = false;
 
         if ($this->getAllEvents()->count()) {

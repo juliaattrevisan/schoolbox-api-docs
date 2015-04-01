@@ -1,42 +1,20 @@
 <?php
 
 /**
- * Calendar_Event_Type_Abstract
+ * The is the base class that all events inherit it is the minimal set of functions for all events
+ * Do not add anything in here unless it is shared by all events
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-abstract class Calendar_Event_Type_Abstract
+
+namespace Calendar\Event\Type;
+
+use Alaress_Date_Format;
+
+abstract class EventBase implements EventInterface
 {
-
-    /* These probably exist elsewhere.
-     */
-    const CAMPUS_ACCESS   = 3;
-    const GROUP_ACCESS    = 2;
-    const PERSONAL_ACCESS = 1;
-
-    /* Inheritable class vars
-     */
-    protected $eventId = -1;
-    protected $startTime = null;
-    protected $endTime = null;
-
-    /* Unholy selection of field names: eventType and type
-     *
-     * eventType is a human-friendly description of an event's type;
-     * e.g. Event, Excursion, Report etc. and comes from a lookup table
-     */
-    protected $eventType = '';
-
-    /**
-     * Event location
-     *
-     * @var string
-     */
-    protected $location = '';
-
     /**
      * Event title
      *
@@ -45,15 +23,51 @@ abstract class Calendar_Event_Type_Abstract
     protected $title = '';
 
     /**
+     * Unique event identifier
+     * @var string|int
+     */
+    protected $eventId = -1;
+
+    /**
+     * Start date and time of event
+     *
+     * @var Alaress_Date_Format
+     */
+    protected $startTime = null;
+
+    /**
+     * End date and time of event
+     * @var Alaress_Date_Format
+     */
+    protected $endTime = null;
+
+    /**
+     * The date when the event was published (made visible to users)
+     * Stored always as an Alaress_Date_Format() instance
+     *
+     * @var Alaress_Date_Format
+     */
+    protected $publishDate = null;
+
+
+
+    /**
      * Event description, typically
      *
      * @var string
      */
     protected $detail = '';
 
-    /* An int from the event table corresponding to $eventType
+    /** Event type ID
+     * @var int
      */
-    protected $type = -1;
+    protected $typeID = -1;
+
+    /** eventType is a human-friendly description of an event's type;
+     * e.g. Event, Excursion, Report etc. and comes from a lookup table
+     * @var string
+     */
+    protected $eventType = '';
 
     /**
      * The ID of the calendar connector this event came from
@@ -76,37 +90,10 @@ abstract class Calendar_Event_Type_Abstract
      */
     protected $authorId = -1;
 
-    /* A hex string representing the colour of this event
-     * This should be deprecated
-     */
-    protected $colour = '';
-
-    /**
-     * Access level
-     *
-     * @var int
-     */
-    protected $access = -1;
-
-    /* Category id and name
-     * This should be deprecated
-     */
-    protected $categoryId = -1;
-    protected $categoryName = '';
-
-    /**
-     * CSV separated list of campus ids relevant to this event.
-     *
+    /** A hex string representing the colour of this event
      * @var string
      */
-    protected $campusList = '';
-
-    /**
-     * Associated Groups (Type 2)
-     *
-     * @var null
-     */
-    protected $categoryCollection = null;
+    protected $colour = '';
 
     /**
      * The class used to render this event object. This should be
@@ -123,20 +110,6 @@ abstract class Calendar_Event_Type_Abstract
      */
     protected $isEditable = true;
 
-    /**
-     * The date when the event was published (made visible to users)
-     * Stored always as an Alaress_Date_Format() instance
-     *
-     * @var Alaress_Date_Format
-     */
-    protected $publishDate = null;
-
-    /**
-     * A generic variable for custom stuff
-     *
-     * @var array
-     */
-    protected $custom = array();
 
     /**
      * Is this an all day event?
@@ -145,12 +118,6 @@ abstract class Calendar_Event_Type_Abstract
      */
     protected $allday = false;
 
-    /**
-     * Whether or not this Task has been completed
-     *
-     * @var int
-     */
-    protected $completed = 0;
 
     /**
      * Constructor
@@ -162,14 +129,6 @@ abstract class Calendar_Event_Type_Abstract
         $this->setup();
     }
 
-    /**
-     * Use Visitor design pattern to render via an external class
-     *
-     * @abstract
-     *
-     * @param $visitor
-     */
-    abstract public function accept($visitor);
 
     /**
      * Hook method for your own customisations
@@ -196,38 +155,11 @@ abstract class Calendar_Event_Type_Abstract
     }
 
     /**
-     * Is campus access or not
-     *
-     * @return bool
-     */
-    protected function isCampusAccess()
-    {
-        if ($this->getAccess() == self::CAMPUS_ACCESS) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * is group access or not
-     *
-     * @return bool
-     */
-    protected function isGroupAccess()
-    {
-        if ($this->getAccess() == self::GROUP_ACCESS) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Get a string representing the full span of time for this event
      * This is used in the calendar dashboard
      *
      * @return string
+     * @deprecated
      */
     public function getEventSpan()
     {
@@ -249,6 +181,7 @@ abstract class Calendar_Event_Type_Abstract
      * Gets date of event in format like this: Thursday, 19th December, 2:00AM
      *
      * @return string
+     * @deprecate
      */
     public function getFullDate()
     {
@@ -265,6 +198,7 @@ abstract class Calendar_Event_Type_Abstract
      * Special time formattng
      *
      * @return string
+     * @deprecated
      */
     public function getTime()
     {
@@ -382,25 +316,7 @@ abstract class Calendar_Event_Type_Abstract
         return $this->eventType;
     }
 
-    /**
-     * Set location
-     *
-     * @param $location
-     */
-    public function setLocation($location)
-    {
-        $this->location = $location;
-    }
 
-    /**
-     * Get location
-     *
-     * @return null
-     */
-    public function getLocation()
-    {
-        return $this->location;
-    }
 
     /**
      * Set title
@@ -425,27 +341,27 @@ abstract class Calendar_Event_Type_Abstract
     /**
      * Set type
      *
-     * @param $type
+     * @param int $typeID
      */
-    public function setType($type)
+    public function setType($typeID)
     {
-        $this->type = $type;
+        $this->typeID = $typeID;
     }
 
     /**
      * Get type
      *
-     * @return null
+     * @return int
      */
     public function getType()
     {
-        return $this->type;
+        return $this->typeID;
     }
 
     /**
      * Set event id
      *
-     * @param $eventId
+     * @param int|string $eventId
      */
     public function setEventId($eventId)
     {
@@ -455,65 +371,26 @@ abstract class Calendar_Event_Type_Abstract
     /**
      * Get event id
      *
-     * @return null
+     * @return int|string
      */
     public function getEventId()
     {
         return $this->eventId;
     }
 
-    /**
-     * Set access
-     *
-     * @param $access
-     */
-    public function setAccess($access)
-    {
-        $this->access = $access;
-    }
-
-    /**
-     * Get access
-     *
-     * @return int
-     */
-    public function getAccess()
-    {
-        return $this->access;
-    }
-
-    /**
-     * Set campus list
-     *
-     * @param $campusList
-     */
-    public function setCampusList($campusList)
-    {
-        $this->campusList = $campusList;
-    }
-
-    /**
-     * Get campus list
-     *
-     * @return null
-     */
-    public function getCampusList()
-    {
-        return $this->campusList;
-    }
 
     /**
      * Set end time
      *
-     * @param $endTime
+     * @param Alaress_Date_Format $endTime
      */
-    public function setEndTime($endTime)
+    public function setEndTime(Alaress_Date_Format $endTime)
     {
         $this->endTime = $endTime;
     }
 
     /**
-     * Get end time
+     * Get end date and time
      *
      * @return Alaress_Date_Format
      */
@@ -523,63 +400,23 @@ abstract class Calendar_Event_Type_Abstract
     }
 
     /**
-     * Set start time
+     * Set start date and time
      *
-     * @param $startTime
+     * @param Alaress_Date_Format $startTime
      */
-    public function setStartTime($startTime)
+    public function setStartTime(Alaress_Date_Format $startTime)
     {
         $this->startTime = $startTime;
     }
 
     /**
-     * Get start time
+     * Get start date and time
      *
      * @return Alaress_Date_Format
      */
     public function getStartTime()
     {
         return $this->startTime;
-    }
-
-    /**
-     * Set category id
-     *
-     * @param $categoryId
-     */
-    public function setCategoryId($categoryId)
-    {
-        $this->categoryId = $categoryId;
-    }
-
-    /**
-     * Get category id
-     *
-     * @return int
-     */
-    public function getCategoryId()
-    {
-        return $this->categoryId;
-    }
-
-    /**
-     * Set category name
-     *
-     * @param $categoryName
-     */
-    public function setCategoryName($categoryName)
-    {
-        $this->categoryName = $categoryName;
-    }
-
-    /**
-     * Get category name
-     *
-     * @return string
-     */
-    public function getCategoryName()
-    {
-        return $this->categoryName;
     }
 
     /**
@@ -605,7 +442,7 @@ abstract class Calendar_Event_Type_Abstract
     /**
      * Set isEditable
      *
-     * @param $isEditable
+     * @param bool $isEditable
      */
     public function setIsEditable($isEditable)
     {
@@ -620,26 +457,6 @@ abstract class Calendar_Event_Type_Abstract
     public function getIsEditable()
     {
         return $this->isEditable;
-    }
-
-    /**
-     * Set completed
-     *
-     * @param int $completed
-     */
-    public function setCompleted($completed)
-    {
-        $this->completed = $completed;
-    }
-
-    /**
-     * Get completed
-     *
-     * @return int
-     */
-    public function getCompleted()
-    {
-        return $this->completed;
     }
 
     /**
@@ -698,53 +515,5 @@ abstract class Calendar_Event_Type_Abstract
         return $this->publishDate;
     }
 
-    /**
-     * Can someone attend this event? Defaults to false, subclasses can override.
-     *
-     * @return bool
-     */
-    public function canAttend()
-    {
-        return false;
-    }
 
-    /**
-     * Set custom
-     *
-     * @param string $custom
-     */
-    public function setCustom($custom)
-    {
-        $this->custom = $custom;
-    }
-
-    /**
-     * Get custom
-     *
-     * @return string
-     */
-    public function getCustom()
-    {
-        return $this->custom;
-    }
-
-    /**
-     * Set category collection
-     *
-     * @param null $categoryCollection
-     */
-    public function setCategoryCollection($categoryCollection)
-    {
-        $this->categoryCollection = $categoryCollection;
-    }
-
-    /**
-     * Get category collection
-     *
-     * @return null
-     */
-    public function getCategoryCollection()
-    {
-        return $this->categoryCollection;
-    }
 }
