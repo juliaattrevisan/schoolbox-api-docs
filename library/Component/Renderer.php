@@ -12,12 +12,12 @@ class Component_Renderer
     /**
      * Renders a template into the Sitepage within $component.
      *
-     * @param \Schoolbox\Resource\Folder\Model $folder
-     * @param Component_ControllerAbstract     $component
+     * @param \Schoolbox\Resource\Folder\Model      $folder
+     * @param Component_Homepage_ControllerAbstract $component
      */
-    function renderHomepageComponent(
+    public function renderHomepageComponent(
         Schoolbox\Resource\Folder\Model $folder,
-        Component_ControllerAbstract $component
+        Component_Homepage_ControllerAbstract $component
     ) {
         $templateTarget = "component_position_{$component->getInstance()->getPosition()}";
         $templateHandle = TEMPLATE_content;
