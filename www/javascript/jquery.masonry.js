@@ -552,23 +552,25 @@
     Masonry.prototype.insertComponentInstance = function(response, replacement, uiItem)
     {
         var masonry = this;
-        // nek level cheating for pretty animationz -_-
-        response.css({
-            visibility: 'hidden',
-            position: 'fixed',
-            width: uiItem.width()
-        });
 
-        // drop it invisibly onto the page
-        $('body').append(response);
-
-        // grab its computed height
-        var css = { height: response.height(), opacity: 0 };
-
-        var that = response;
-
+        // If this component already exists: don't drop it invisibly onto the page.
+        // That will cause issues with JS that depends on that component's ID.
+        // (such as dropzones)
+        var css = { opacity: 0 };
+        if (response.attr('id') != replacement.attr('id')) {
+            // nek level cheating for pretty animationz -_-
+            response.css({
+                visibility: 'hidden',
+                position: 'fixed',
+                width: uiItem.width()
+            });
+            // drop it invisibly onto the page so that it has a height
+            $('body').append(response);
+            // grab its computed height
+            css.height = response.height;
+        }
         uiItem.animate(css, 550, function () {
-            replacement.replaceWith(that.removeAttr('style'));
+            replacement.empty().replaceWith(response);
             masonry.saveSorting();
             masonry.refreshPalette();
         });
