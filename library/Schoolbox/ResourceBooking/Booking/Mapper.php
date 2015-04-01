@@ -295,6 +295,9 @@ class Mapper extends BaseMapper
                 $resource->setCategory($mapper->hydrateJoin($row, 'resource.category', 'ic'));
                 $resource->setImage($mapper->hydrateJoin($row, 'resource.image', 'im'));
                 $model->setResource($resource);
+                // Find all related bookings for this item too.
+                // TODO do this without a query for each row
+                $model->setRelatedBookingList($this->findRelatedBookings($model->getId()));
                 return $model;
             }
         );
