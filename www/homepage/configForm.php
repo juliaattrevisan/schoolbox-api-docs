@@ -95,35 +95,8 @@ if (is_numeric($_REQUEST['cid'])) {
 
         $folderMapper = new \Schoolbox\Resource\CategoryMapper();
         $folder = $folderMapper->findById($_POST['cid']);
-
-        $templateTarget = "component_position_{$component->getInstance()->getPosition()}";
-        $templateHandle = "component_{$component->getInstance()->getId()}";
-        $templateHandle = TEMPLATE_content;
-
-        $component->setup($folder, $component->getInstance()->getConfigArray());
-
-        if ($component->execute() !== false) {
-            $component->parseConfig();
-            if ($component->renderTemplate($templateHandle) !== false) {
-                $component->parse($templateTarget, $templateHandle, true);
-            }
-        }
-
-        /* Accumulate folder codes
-         */
-        $temp = array();
-
-        foreach ($folder->getCodes() as $currentCode) {
-            $temp[] = $currentCode->getCode();
-        }
-
-        $folderCodes = implode(', ', $temp);
-
-        $component->getPageTemplate()->setVar('CODE', urlencode(urlencode($folderCodes)));
-        $component->getPageTemplate()->setVar('HEADING', Scrub::text($folder->getName()));
-        $component->getPageTemplate()->setVar('SITE_LOCATION', Cfg::get('site_location'));
-        $component->getPageTemplate()->pparse($templateTarget, $templateHandle);
-
+        $renderer = new Component_Renderer();
+        $renderer->renderHomepageComponent($folder, $component);
     } // AJAX Save homepage colours
     elseif ($_POST['cid'] && is_array($_POST['colors'])) {
         $homepage = new Homepage($_POST['cid']);
@@ -186,6 +159,19 @@ if (is_numeric($_REQUEST['cid'])) {
                     $componentConfigInstanceMapper->save($confI);
 
                 }
+            }
+            if (SitePage::detectAjax()) {
+                // Just refetch the instance
+                $instance   = reset($componentInstanceMapper->findByInstanceId($instance->getId()));
+                $controller = new $cclass($instance, new \Schoolbox\User(), $page);
+
+                $folderMapper = new \Schoolbox\Resource\CategoryMapper();
+                $folder = $folderMapper->findById($_GET['cid']);
+                $renderer = new Component_Renderer();
+                $renderer->renderHomepageComponent($folder, $controller);
+                exit;
+            } else {
+                SitePage::localRedir("/homepage/" . $_GET['cid']);
             }
         }
         SitePage::localRedir("/homepage/" . $_GET['cid']);
