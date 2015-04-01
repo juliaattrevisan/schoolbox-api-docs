@@ -126,9 +126,10 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      *
      * @see Alaress_Date_Strategy_Abstract->setFromFormat() for param description
      *
-     * @param string|object $dateTime
-     * @param string $dateFormat
-     * @param DateTimeZone $timezone The timezone of the date, or null to use default
+     * @param string|object                 $dateTime
+     * @param string                        $dateFormat
+     * @param DateTimeZone                  $timezone The timezone of the date, or null to use default
+     * @param Alaress_Date_Locale_Interface $locale
      */
     public function __construct($dateTime = null, $dateFormat = null, DateTimeZone $timezone = null, $locale = null)
     {
@@ -155,7 +156,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
 
     /**
      * Attempts to create a Laravel date out of $dateTime.
-
+     *
      * * `empty($dateTime)`: creates as now
      * * `$dateTime instanceof DateTime or Alaress_Date_Format`:
      *   copies $dateTime's time, and timezone if $timezone is null
