@@ -326,11 +326,7 @@
                     .done(function(response) {
                         // AJAX in the new contents
                         var existing = panel.closest(opt.component.selector);
-                        masonry.insertComponentInstance(
-                            $(response),
-                            existing,
-                            existing
-                        );
+                        masonry.insertComponentInstance($(response), existing);
                     })
             }
         );
@@ -406,7 +402,7 @@
                     // retrieve a new instance of this component
                     masonry.newComponentInstance(cl)
                         .done(function(response) {
-                            masonry.insertComponentInstance($(response), $(this), ui.item);
+                            masonry.insertComponentInstance($(response), ui.item);
                         })
                         .fail(function() {
                             ui.item.addClass(failedClass).slideUp(
@@ -547,9 +543,8 @@
      *
      * @param response    The new HTML for the component
      * @param replacement The old HTML to replace
-     * @param uiItem      The container to animate?
      */
-    Masonry.prototype.insertComponentInstance = function(response, replacement, uiItem)
+    Masonry.prototype.insertComponentInstance = function(response, replacement)
     {
         var masonry = this;
 
@@ -562,14 +557,14 @@
             response.css({
                 visibility: 'hidden',
                 position: 'fixed',
-                width: uiItem.width()
+                width: replacement.width()
             });
             // drop it invisibly onto the page so that it has a height
             $('body').append(response);
             // grab its computed height
             css.height = response.height;
         }
-        uiItem.animate(css, 550, function () {
+        replacement.animate(css, 550, function () {
             replacement.empty().replaceWith(response);
             masonry.saveSorting();
             masonry.refreshPalette();
