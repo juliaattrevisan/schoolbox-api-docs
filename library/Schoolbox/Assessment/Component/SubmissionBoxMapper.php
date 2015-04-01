@@ -13,250 +13,62 @@ use PDO;
 use Schoolbox;
 use Schoolbox\Assessment\Activity;
 use Schoolbox\Collection;
-use Schoolbox\ConfigLoader;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Feed\FeedableMapperInterface;
-use Schoolbox\IConfigLoader;
 use Schoolbox\User;
-use Schoolbox\Resource\Folder\Model as CategoryModel;
+use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\File;
+use Schoolbox\Resource\Storage;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\Course\Task;
 
+/**
+ * Class SubmissionBoxMapper
+ *
+ * @package Schoolbox\Assessment\Component
+ * @method SubmissionBox hydrate(array $row, $alias = '', $callback = null)
+ */
 class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInterface
 {
 
     /**
-    * @var IConfigLoader
-    */
-    protected $config_loader;
-
-    /**
-    * @param  IConfigLoader $config_loader
-    *
-    * @return $this
-    */
-    public function setConfigLoader($config_loader)
-    {
-        $this->config_loader = $config_loader;
-        return $this;
-    }
-
-    /**
-    * @return IConfigLoader
-    */
-    public function getConfigLoader()
-    {
-        return $this->config_loader;
-    }
-
-    /**
-    * Sets up the config loader in this object.
-    */
-    public function setup()
-    {
-        parent::setup();
-        $this->setConfigLoader(new ConfigLoader());
-    }
-
+     * @throws Schoolbox\Mapper\Exception
+     */
     protected function mapping()
     {
         $this->hasTable('submission_box');
-        $this->hasModel('\\Schoolbox\\Assessment\\Component\\SubmissionBox');
-        $this->hasMap(array(
-            'column'     => 'id',
-            'property'   => 'id',
-            'type'       => self::TYPE_INTEGER,
-            'identifier' => true,
-        ));
-        $this->hasMap(array(
-            'column'     => 'category',
-            'property'   => 'category',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'category',
-        ));
-        $this->hasMap(array(
-            'column'     => 'type',
-            'property'   => 'workType',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'work_type',
-        ));
-        $this->hasMap(array(
-            'column'     => 'name',
-            'property'   => 'name',
-            'type'       => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'     => 'description',
-            'property'   => 'description',
-            'type'       => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'     => 'fid',
-            'property'   => 'legacyFileId',
-            'type'       => self::TYPE_INTEGER,
-        ));
-        $this->hasMap(array(
-            'column'     => 'owner',
-            'property'   => 'owner',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'owner',
-        ));
-        $this->hasMap(array(
-            'column'     => 'task_id',
-            'property'   => 'task',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'task',
-        ));
-        $this->hasMap(array(
-            'column'     => 'task_instance_id',
-            'property'   => 'taskInstance',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'task_instance',
-        ));
-        $this->hasMap(
-            array(
-                'column'   => 'publish_date',
-                'property' => 'publishDate',
-                'type'     => self::TYPE_DATETIME,
-            )
-        );
-        $this->hasMap(array(
-            'column'     => 'open_date',
-            'property'   => 'openDate',
-            'type'       => self::TYPE_DATETIME,
-        ));
-        $this->hasMap(array(
-            'column'     => 'date',
-            'property'   => 'dueDate',
-            'type'       => self::TYPE_DATETIME,
-        ));
-        $this->hasMap(array(
-            'column'     => 'late_date',
-            'property'   => 'lateDate',
-            'type'       => self::TYPE_DATETIME,
-        ));
-        $this->hasMap(array(
-            'column'     => 'accept_submission',
-            'property'   => 'acceptOnline',
-            'type'       => self::TYPE_BOOLEAN,
-        ));
-        $this->hasMap(array(
-            'column'     => 'multi_submission',
-            'property'   => 'acceptMultiple',
-            'type'       => self::TYPE_BOOLEAN,
-        ));
-        $this->hasMap(array(
-            'column'     => 'created',
-            'property'   => 'created',
-            'type'       => self::TYPE_DATETIME,
-            'created_timestamp' => true,
-        ));
-        $this->hasMap(array(
-            'column'     => 'weight',
-            'property'   => 'weight',
-            'type'       => self::TYPE_INTEGER,
-        ));
-        //
-        // TODO add TYPE_COLLECTION
-        $this->hasMap(array(
-            'column'     => 'mark_type',
-            'property'   => 'markType',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'mark_type',
-        ));
-        $this->hasMap(
-            array(
-                'column'   => 'submission_grade_group_id',
-                'property' => 'gradeGroup',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'gradeGroup',
-                'join_def' => array(
-                    'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\GradeLevel\\Group\\Mapper',
-                    'other_key' => 'id',
-                ),
-            )
-        );
-        $this->hasMap(array(
-            'column'     => 'max_mark',
-            'property'   => 'maxMark',
-            'type'       => self::TYPE_INTEGER,
-        ));
-        $this->hasMap(array(
-            'column'     => 'rubric_result_set',
-            'property'   => 'rubricResultSet',
-            'type'       => self::TYPE_INTEGER,
-        ));
-        $this->hasMap(array(
-            'column'     => 'mark_visibility',
-            'property'   => 'markVisibility',
-            'type'       => self::TYPE_INTEGER,
-        ));
-        $this->hasMap(array(
-            'column'     => 'skip_unsubmitted',
-            'property'   => 'skipUnsubmitted',
-            'type'       => self::TYPE_INTEGER,
-        ));
-        $this->hasMap(array(
-            'column'     => 'deleted',
-            'property'   => 'deleted',
-            'type'       => self::TYPE_BOOLEAN,
-        ));
 
-        //
-        // adds listeners:
-        // buildSelectQuery('\\Schoolbox\\Assessment\\Component\\SubmissionBox')
-        // undefinedMethod('hardDelete', function() {hard delete})
-        // $this->hasSoftDeleteField('deleted');
+        $this->hasPrototype(new SubmissionBox());
 
-        $this->hasJoin('category', array(
-            'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
-            //
-            // Define as mapper fields instead?
-            // this_property:     property for model object
-            // this_key_property: property for key (if there is one) if not, get
-            //                    ID value from this_property
-            // other_property:    property in mapped model in other object that
-            //                    links to this model
-            'this_key'  => 'category',
-            'other_key' => 'id',
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('name', self::TYPE_STRING);
+        $this->uses('description', self::TYPE_STRING);
+        $this->uses('publish_date', self::TYPE_DATETIME);
+        $this->uses('open_date', self::TYPE_DATETIME);
+        $this->uses('date', self::TYPE_DATETIME, null, 'dueDate');
+        $this->uses('late_date', self::TYPE_DATETIME);
+        $this->uses('accept_submission', self::TYPE_BOOLEAN, null, 'acceptOnline');
+        $this->uses('multi_submission', self::TYPE_BOOLEAN, null, 'acceptMultiple');
+        $this->uses('weight', self::TYPE_INTEGER);
+        $this->uses('max_mark', self::TYPE_INTEGER);
+        $this->uses('rubric_result_set', self::TYPE_INTEGER); // TODO this should be a MODEL join...
+        $this->uses('mark_visibility', self::TYPE_INTEGER);
+        $this->uses('skip_unsubmitted', self::TYPE_INTEGER);
+        $this->uses('created', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('deleted', self::TYPE_BOOLEAN, self::COLUMN_SOFTDELETE);
 
-            'this_property'  => 'category',
-            'other_property' => 'id',
-        ));
-        $this->hasJoin('files', array(
-            'multiple'  => true,
-            'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\FileMapper',
-            'this_key'  => 'id',
-            'other_key' => 'box_id',
-        ));
+        $this->joins('category', Folder\Mapper::class);
+        $this->joins('type', SubmissionBox\WorkTypeMapper::class, 'id', null, null, 'workType', 'work_type');
+        $this->joins('owner', Schoolbox\UserMapper::class);
+        $this->joins('task_id', Schoolbox\Assessment\Course\TaskMapper::class, 'id', null, null, 'task', 'task');
+        $this->joins('task_instance_id', Task\InstanceMapper::class, 'id', null, null, 'taskInstance', 'task_instance');
+        $this->joins('mark_type', SubmissionBox\MarkTypeMapper::class, 'mark_type_id');
+        $this->joins('submission_grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'gradeGroup');
 
-        $this->hasJoin('legacy_file', array(
-            'multiple'  => true,
-            'mapper'    => '\\Schoolbox\\Resource\\FileMapper',
-            'this_key'  => 'fid',
-            'other_key' => 'id',
-        ));
+        $this->joinsVia('submission_box_file', Storage\Mapper::class, 'hash', 'storage_id', 'box_id', 'id', null, null, 'attachments');
 
-        $this->hasJoin('work_type', array(
-            'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\WorkTypeMapper',
-            'this_key'  => 'type',
-            'other_key' => 'id',
-        ));
-
-        $this->hasJoin('mark_type', array(
-            'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\MarkTypeMapper',
-            'this_key'  => 'mark_type',
-            'other_key' => 'mark_type_id',
-        ));
-
-        $this->hasJoin('owner', array(
-            'mapper'    => '\\Schoolbox\\UserMapper',
-            'this_key'  => 'owner',
-            'other_key' => 'id',
-        ));
-
-        // TODO add Mapper->hasCollection?
+        // joins that have no column definition
         $this->hasJoin('submission', array(
             'multiple'  => true,
             'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\SubmissionMapper',
@@ -268,16 +80,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
             'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\ReturnedWorkMapper',
             'this_key'  => 'id',
             'other_key' => 'box_id',
-        ));
-        $this->hasJoin('task', array(
-            'mapper'    => '\\Schoolbox\\Assessment\\Course\\TaskMapper',
-            'this_key'  => 'task_id',
-            'other_key' => 'id',
-        ));
-        $this->hasJoin('task_instance', array(
-            'mapper'    => '\\Schoolbox\\Assessment\\Course\\Task\\InstanceMapper',
-            'this_key'  => 'task_instance_id',
-            'other_key' => 'id',
         ));
 
         $this->joinsVia(
@@ -296,7 +98,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 
         $this
             ->registerCallback('preSave', array($this, 'preSave'))
-            ->registerCallback('postSave', array($this, 'postSave'))
         ;
     }
 
@@ -307,9 +108,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
     */
     public function findById($id)
     {
-        $box_file_mapper = $this->getJoinMapper('files');
-        $file_mapper     = $box_file_mapper->getJoinMapper('file');
-        $mime_mapper     = $file_mapper->getJoinMapper('allowedFileType');
+        /** @var Storage\Mapper $attach_mapper */
+        $attach_mapper   = $this->getJoinMapper('submission_box_file');
         $worktype_mapper = $this->getJoinMapper('work_type');
         $marktype_mapper = $this->getJoinMapper('mark_type');
 
@@ -324,11 +124,15 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
                 {$this->getJoinColumnString('curriculum_node_for_submission_box.level', 'cnl')},
                 {$this->getJoinColumnString('curriculum_node_for_submission_box.level.source', 'cnls')},
                 {$this->getJoinColumnString('curriculum_node_for_submission_box.area', 'cna')},
-                {$this->getJoinColumnString('curriculum_node_for_submission_box.area.source', 'cnas')}
+                {$this->getJoinColumnString('curriculum_node_for_submission_box.area.source', 'cnas')},
+				{$attach_mapper->getColumnString('at')},
+				{$attach_mapper->getJoinColumnString('allowedFileExtension', 'mime')}
 			FROM {$this->getTable()} sb
 			LEFT JOIN {$this->getJoinSql('work_type', 'sb', 'wt')}
 			LEFT JOIN {$this->getJoinSql('mark_type', 'sb', 'mt')}
 			LEFT JOIN {$this->getJoinSql('category',  'sb', 'cat')}
+			LEFT JOIN {$this->getJoinSql('submission_box_file', 'sb', 'at')}
+			LEFT JOIN {$attach_mapper->getJoinSql('allowedFileExtension', 'at', 'mime')}
             LEFT JOIN {$this->getJoinSql('curriculum_node_for_submission_box', 'sb', 'cn')}
             LEFT JOIN {$this->getJoinSql('curriculum_node_for_submission_box.level', 'cn', 'cnl')}
             LEFT JOIN {$this->getJoinSql('curriculum_node_for_submission_box.level.source', 'cnl', 'cnls')}
@@ -360,31 +164,12 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 
         if ($submission_box instanceof SubmissionBox) {
             $submission_box->setCurriculumNodes(new Collection(array_values($curriculumNodes)));
-            // Get files? (This is more evidence separate file/link mapper isn't
-            // required.)
-            $query = "
-				SELECT
-					{$box_file_mapper->getColumnString('sm')},
-					{$file_mapper->getColumnString('f')},
-					{$mime_mapper->getColumnString('m')}
-				FROM {$box_file_mapper->getTable()} sm
-				LEFT JOIN {$box_file_mapper->getJoinSql('file', 'sm', 'f')}
-				LEFT JOIN {$file_mapper->getJoinSql('allowedFileType', 'f', 'm')}
-				WHERE sm.box_id=?
-			";
-            $statement = $this->database->prepare($query);
-            $statement->execute(array($id));
 
-            foreach ($statement as $row) {
-                $box_file     = $box_file_mapper->hydrate($row, 'sm');
-                /** @var Schoolbox\Storage $storage_file */
-                $storage_file = $file_mapper->hydrate($row, 'f');
-                $storage_file->setMimetype($mime_mapper->hydrate($row, 'm'));
-                $box_file->setFile($storage_file);
-                $submission_box->addFileLink($box_file);
-
-            }
+            $storage = $attach_mapper->hydrate($row, 'at');
+            $storage->setMimetype($attach_mapper->hydrateJoin($row, 'allowedFileExtension', 'mime'));
+            $submission_box->addAttachment($storage);
         }
+
         if (!($submission_box instanceof SubmissionBox)) {
             throw new Schoolbox\Mapper\Exception('Instance of object not found');
         }
@@ -394,7 +179,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 
     /**
     * Pre-save method for submission boxes.
-    * * converts legacy file to a new storage file
     * * Sets start, end and due time to now if this is a task
     *
     * @param SubmissionBox $object
@@ -403,18 +187,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
     */
     public function preSave(SubmissionBox $object)
     {
-        if ($legacy_file_id = $object->getLegacyFileId()) {
-            $old_file = $this->getJoinMapper('legacy_file')->findById($legacy_file_id);
-            $new_file = $this->getJoinMapper('legacy_file')->copyToStorage($old_file);
-
-            $new_link = $this->getJoinMapper('files')->createModel();
-            $new_link->setFile($new_file);
-            $object->getFileLinks()->add($new_link);
-
-            //
-            // Remove legacy file link because it is no longer needed.
-            $object->setLegacyFileId(null);
-        }
         if (!$object->getId()) {
             $task    = $object->getTask();
             $task_id = ($task instanceof Task) ? $task->getId() : $task;
@@ -427,27 +199,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
             }
         }
         return true;
-    }
-
-    /**
-    * Post-save method for submission boxes - saves new submission box files
-    *
-    * @param SubmissionBox $object
-    * @param SubmissionBox $previous
-    *
-    * @return void
-    */
-    public function postSave(SubmissionBox $object, $previous = null)
-    {
-        foreach ($object->getFileLinks() as $box_file) {
-            if ($box_file->hasFile()) {
-                if (!$previous) {
-                    $box_file->setId(null);
-                }
-                $box_file->setSubmissionBoxId($object->getId());
-                $this->getJoinMapper('files')->save($box_file);
-            }
-        }
     }
 
 
@@ -781,6 +532,10 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         }
         $statement->execute();
         $boxes = $this->hydrateList($statement, 'sb', function($mapper, $model, $row) {
+            /**
+             * @var SubmissionBox $model
+             * @var self $mapper
+             */
             $model->setCategory($mapper->getJoinMapper('category')->hydrate($row, 'c'));
             return $model;
         });
@@ -799,12 +554,13 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
     * given category.
     *
     * @param User     $user     The user to filter submissions for
-    * @param CategoryModel $category If set, restrict results to this category.
+    * @param Folder\Model $category If set, restrict results to this category.
     *
     * @return Collection
     */
-    public function getSubmittable(User $user, CategoryModel $category = null)
+    public function getSubmittable(User $user, Folder\Model $category = null)
     {
+        /** @var Folder\Mapper $cat_mapper */
         $cat_mapper = $this->getJoinMapper('category');
 
         //
@@ -850,15 +606,19 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         //
         // Load categories.
         $collection = $this->hydrateList($statement, 'sb', function($mapper, $model, $row) use ($cat_mapper) {
+            /** @var SubmissionBox $model */
             $model->setCategory($cat_mapper->hydrate($row, 'c'));
             return $model;
         });
 
         //
         // Load category codes too.
-        $cat_mapper->getJoinMapper('codes')->applyCodesToCategories(
-            $collection,
-            function($item) { return $item->getCategory();
+        /** @var Folder\Code\Mapper $code_mapper */
+        $code_mapper = $cat_mapper->getJoinMapper('codes');
+        $code_mapper->applyCodesToCategories($collection,
+            function ($item) {
+                /** @var SubmissionBox $item */
+                return $item->getCategory();
             }
         );
         return $collection;
@@ -916,9 +676,12 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
             $box->setCategory($cat_mapper->hydrate($row, 'c'));
             $collection->add($factory->buildFromSubmissionBox($box, 'overdue'));
         }
-        $cat_mapper->getJoinMapper('codes')->applyCodesToCategories(
-            $collection,
-            function($item) { return $item->getCategory();
+        /** @var Folder\Code\Mapper $code_mapper */
+        $code_mapper = $cat_mapper->getJoinMapper('codes');
+        $code_mapper->applyCodesToCategories($collection,
+            function ($item) {
+                /** @var SubmissionBox $item */
+                return $item->getCategory();
             }
         );
         return $collection;

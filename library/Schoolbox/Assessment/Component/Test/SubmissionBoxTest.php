@@ -23,39 +23,6 @@ class SubmissionBoxTest extends TestCase {
 		$this->object = new SubmissionBox();
 	}
 
-	//
-	// Unit test what?
-	// Setting of related objects, perhaps.
-	// Don't bother testing any getters or setters, unless their value can be
-	// affected by another method.
-
-	public function testFileLinks() {
-		$this->assertInstanceOf(
-			'\\Schoolbox\\Assessment\\Component\\SubmissionBox\\FileCollection',
-			$this->object->getFileLinks()
-		);
-		$this->assertCount(0, $this->object->getFileLinks());
-
-		//
-		// Test adding a file link - they now exist in multiples instead of only
-		// a single one.
-		$file = new SubmissionBox\File();
-		$file->setFileId(11);
-		$this->object->addFileLink($file);
-		$this->assertCount(1, $this->object->getFileLinks());
-
-		//
-		// and getting it out again.
-		foreach ($this->object->getFileLinks() as $file_link) {
-			$this->assertInstanceOf(
-				'\\Schoolbox\\Assessment\\Component\\SubmissionBox\\File',
-				$file_link
-			);
-			$this->assertEquals(11, $file_link->getFileId());
-			break;
-		}
-	}
-
 	public function testRubric() {
 		$this->markTestIncomplete('Rubric model hasn\'t been created yet');
 	}

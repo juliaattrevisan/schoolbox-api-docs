@@ -103,6 +103,14 @@ class Model extends File implements IStorage
     /**
      * @return string
      */
+    public function getBasename()
+    {
+        return $this->getFilename() . '.' . $this->getExtension();
+    }
+
+    /**
+     * @return string
+     */
     public function getHash()
     {
         // calculate hash if not known

@@ -24,15 +24,17 @@ try {
         }
 
         //send headers
-        if ($resource->getMimetype()->getMime()) {
-            header("Content-Type: {$resource->getMimetype()->getMime()}");
+        if ($resource->getMime()) {
+            header("Content-Type: {$resource->getMime()}");
         } else {
             header("Content-Type: application/octet-stream");
         }
 
+        $basename = $resource->getBasename();
+
         header("Pragma: ");
         header("Cache-control: ");
-        header(sprintf('Content-Disposition: %s filename="%s.%s"', $attach, $resource->getHash(), $resource->getExtension()));
+        header("Content-Disposition: $attach filename=\"$basename\"");
         header("Content-Length: ".$resource->getSize());
         fpassthru($resource->readStream());
         exit;

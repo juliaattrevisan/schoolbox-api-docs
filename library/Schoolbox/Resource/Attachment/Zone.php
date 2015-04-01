@@ -13,8 +13,8 @@ namespace Schoolbox\Resource\Attachment;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Browser\NodeFactory;
-use Schoolbox\Storage;
-use Schoolbox\StorageMapper;
+use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use UnexpectedValueException;
 
 /**
@@ -38,7 +38,7 @@ class Zone {
     /** @var string */
     protected $position;
 
-    /** @var Storage[] */
+    /** @var IStorage[] */
     protected $attachments;
 
     /** @var array */
@@ -99,7 +99,7 @@ class Zone {
 
     /**
      * @param string $hash
-     * @return Storage
+     * @return IStorage
      */
     protected function findFile($hash)
     {
@@ -295,7 +295,7 @@ class Zone {
     /**
      * Returns some PHPlibs, based on the File given
      *
-     * @param Storage $file
+     * @param IStorage $file
      * @return array
      */
     protected function deriveSitePageVars($file)
@@ -303,7 +303,7 @@ class Zone {
         // if it's an image, render it out, otherwise use its mime thumbnail
         $href = $file->getMimetype()->isImage()
             ? "/storage/image.php?hash={$file->getHash()}&size=square{$this->size}"
-            : '/ajax/mime/' . $file->getMimetype()->getMime();
+            : '/ajax/mime/' . $file->getMime();
 
         return array(
             'AZ_FILE_NAME'    => $file->getFilename(),

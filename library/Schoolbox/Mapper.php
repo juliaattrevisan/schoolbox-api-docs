@@ -667,9 +667,10 @@ abstract class Mapper implements Serializable
      * @param IColumnType $hydrator
      * @param int         $options
      * @param string      $property
+     * @param string      $name
      * @return bool
      */
-    protected function joins($column, $foreignMapper, $foreignKey, $hydrator = null, $options = null, $property = null)
+    protected function joins($column, $foreignMapper, $foreignKey = 'id', $hydrator = null, $options = null, $property = null, $name = null)
     {
         if ($hydrator) {
             $type = $hydrator;
@@ -679,7 +680,7 @@ abstract class Mapper implements Serializable
             $type = self::TYPE_MODEL;
         }
         $map = $this->buildColumnMap($column, $type, $options, $property);
-        $map['join'] = $column;
+        $map['join'] = $name ?: $column;
         $map['join_def'] = [
             'mapper'    => $foreignMapper,
             'other_key' => $foreignKey
@@ -1691,13 +1692,14 @@ abstract class Mapper implements Serializable
                         // not interested
                         continue;
                     }
-                    $joinSchema = $this->joins[$map['join']]['multi'];
-                    $thisKey    = $this->getModelProperty($model, $id_property);
+                    $joinSchema = $this->joins[$map['join']];
+                    $joinMulti  = $joinSchema['multi'];
+                    $thisKey    = $this->getModelProperty($model, $joinSchema['this_key']);
                     // step 1: delete existing relations in join table
                     $deleteRelationStatement = $this->database->prepare(
                         "
-						DELETE FROM `{$joinSchema['via_table']}`
-						WHERE `{$joinSchema['this_key']}` = :this_key
+						DELETE FROM `{$joinMulti['via_table']}`
+						WHERE `{$joinMulti['this_key']}` = :this_key
 					"
                     );
                     $deleteRelationStatement->bindValue(':this_key', $thisKey);
@@ -1708,8 +1710,8 @@ abstract class Mapper implements Serializable
                     // step 2: insert new relations in join table
                     $insertRelationStatement = $this->database->prepare(
                         "
-						INSERT INTO `{$joinSchema['via_table']}`
-							(`{$joinSchema['this_key']}`,`{$joinSchema['other_key']}`)
+						INSERT INTO `{$joinMulti['via_table']}`
+							(`{$joinMulti['this_key']}`,`{$joinMulti['other_key']}`)
 						VALUES
 							(:this_key, :other_key)
 					"

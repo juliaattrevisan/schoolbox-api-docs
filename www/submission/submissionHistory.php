@@ -235,39 +235,22 @@ if ($userID == $currentUserId) {
 
 /* Check whether a file is associated with the work
  */
-$legacy_file_id = $submission->getLegacyFileId();
-$file_links     = $submission->getFileLinks();
-if ($file_links->count() > 0) {
-    /** @var \Schoolbox\Assessment\Component\SubmissionBox\File[] $file_links */
-    foreach ($file_links as $file_link) {
-        $file = $file_link->getFile();
+$attachments = $submission->getAttachments();
+
+if ($attachments->count() > 0) {
+    foreach ($attachments as $attachment) {
         $this->setVar(
             array(
-                'FILE_HASH'  => $file->getHash(),
-                'FILE_THUMB' => $file->getMimetype()->getIconFile(),
-                'FILE_SIZE'  => Alaress_Byte_Format::bytesToString($file->getFilesize()),
-                'FILE_NAME'  => $file->getFilename(),
-                'FILE_DATE'  => $file->getUploadedOn()->getLong()
+                'FILE_HASH'  => $attachment->getHash(),
+                'FILE_THUMB' => $attachment->getMimetype()->getIconFile(),
+                'FILE_SIZE'  => Alaress_Byte_Format::bytesToString($attachment->getSize()),
+                'FILE_NAME'  => $attachment->getFilename(),
+                'FILE_DATE'  => $attachment->getCreatedAt()->getLong()
             )
         );
         $this->parse('download_block', 'download', true);
     }
     $this->setVar('legacy_download_block', '');
-} elseif ($legacy_file_id && is_numeric($legacy_file_id)) {
-    $fileHandler = new File();
-    $file        = $fileHandler->getByID($legacy_file_id);
-
-    $this->setVar(
-        array(
-            'FILE_ID'    => $legacy_file_id,
-            'FILE_THUMB' => $file['iconFile'] ?: 'txt.png',
-            'FILE_SIZE'  => Alaress_Byte_Format::bytesToString($file['file_size']),
-            'FILE_NAME'  => $file['realname'],
-            'FILE_DATE'  => date('jS M Y, g:ia', $file['submitted'])
-        )
-    );
-    $this->parse('legacy_download_block', 'legacy_download');
-    $this->setVar('download_block', '');
 } else {
     $this->setVar('legacy_download_block', '');
     $this->setVar('download_block', '');
@@ -354,7 +337,6 @@ if (count($submission_history)) {
             'HISTORY_DATETIME'             => $workDate->getRelativeTime(),
             'HISTORY_MARK'                 => '',
             'HISTORY_COMMENT'              => null,
-            'HISTORY_FILE_ID'              => $submission->getLegacyFileId(),
             'HISTORY_SUBMISSION_FILE_ID'   => null,
             'HISTORY_SUBMISSION_FILE_NAME' => null,
             'HISTORY_RETURN_FILE_ID'       => null,

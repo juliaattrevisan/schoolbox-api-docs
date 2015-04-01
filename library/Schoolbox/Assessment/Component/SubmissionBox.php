@@ -9,12 +9,10 @@
 
 namespace Schoolbox\Assessment\Component;
 
-use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Resource\Category;
-use Schoolbox\Assessment\Component\SubmissionBox\File;
-use Schoolbox\Assessment\Component\SubmissionBox\FileCollection;
+use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
@@ -36,7 +34,7 @@ class SubmissionBox implements ISoftDeletable
     protected $id;
 
     /**
-     * @var Category
+     * @var FolderModel
      */
     protected $category;
 
@@ -71,14 +69,9 @@ class SubmissionBox implements ISoftDeletable
     protected $task_instance;
 
     /**
-     * @var int
+     * @var Collection|IStorage
      */
-    protected $legacy_file_id;
-
-    /**
-     * @var FileCollection
-     */
-    protected $file_links;
+    protected $attachments;
 
     /**
      * @var User
@@ -163,8 +156,8 @@ class SubmissionBox implements ISoftDeletable
 
     public function __construct()
     {
-        $this->setFileLinks(new SubmissionBox\FileCollection(array()));
-        $this->setCategory(new Category());
+        $this->setAttachments(new Collection());
+        $this->setCategory(new FolderModel());
         $this->setWorkType(new WorkType());
         $this->setMarkType(new MarkType());
         $this->setGradeGroup(new GradeLevel\Group\Model());
@@ -244,7 +237,7 @@ class SubmissionBox implements ISoftDeletable
      */
 
     /**
-     * @param  Category $category
+     * @param  FolderModel $category
      * @return $this
      */
     public function setCategory($category)
@@ -254,7 +247,7 @@ class SubmissionBox implements ISoftDeletable
     }
 
     /**
-     * @return Category
+     * @return FolderModel
      */
     public function getCategory()
     {
@@ -295,24 +288,6 @@ class SubmissionBox implements ISoftDeletable
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @param  int $legacy_file_id
-     * @return $this
-     */
-    public function setLegacyFileId($legacy_file_id)
-    {
-        $this->legacy_file_id = $legacy_file_id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getLegacyFileId()
-    {
-        return $this->legacy_file_id;
     }
 
     /**
@@ -388,29 +363,31 @@ class SubmissionBox implements ISoftDeletable
     }
 
     /**
-     * @param  FileCollection $link
-     * @return $this
+     * @return Collection|IStorage[]
      */
-    public function setFileLinks($link)
+    public function getAttachments()
     {
-        $this->file_links = $link;
+        return $this->attachments;
+    }
+
+    /**
+     * @param Collection|IStorage[] $attachments
+     * @return static
+     */
+    public function setAttachments(Collection $attachments)
+    {
+        $this->attachments = $attachments;
         return $this;
     }
 
     /**
-     * @return FileCollection|File[]
+     * @param IStorage $attachment
+     * @return static
      */
-    public function getFileLinks()
+    public function addAttachment(IStorage $attachment)
     {
-        return $this->file_links;
-    }
-
-    /**
-     * @param File $file
-     */
-    public function addFileLink(File $file)
-    {
-        $this->file_links->add($file);
+        $this->attachments->add($attachment);
+        return $this;
     }
 
     /**

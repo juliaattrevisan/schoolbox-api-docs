@@ -24,7 +24,6 @@ use Schoolbox\User;
  *
  * @package Schoolbox\Resource
  * @method AbstractFile setHash($hash)
- * @method Mimetype     getMimetype()
  * @method AbstractFile setMimetype(Mimetype $mimetype)
  * @method AbstractFile setSize($size)
  */
@@ -102,9 +101,18 @@ abstract class AbstractFile implements IFile, ISoftDeletable
      */
     public function getMime()
     {
-        return $this->getStorage()
-                    ->getMimetype()
-                    ->getMime();
+        return $this->getMimetype()->getMime();
+    }
+
+
+    /**
+     * Returns the full mime string for the file
+     *
+     * @return Mimetype
+     */
+    public function getMimetype()
+    {
+        return $this->getStorage()->getMimetype();
     }
 
 
