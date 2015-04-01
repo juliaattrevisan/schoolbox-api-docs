@@ -167,7 +167,8 @@ function Calendar(id, bubbleId, opts) {
 
                 }
 
-                data.bookingActions = []
+                data.bookingActions = [];
+                data.relatedBookings = [];
                 if (calEvent.data.booking) {
                     // Booking butonyes (if available)
                     if (calEvent.data.booking.buttons) {
@@ -188,6 +189,9 @@ function Calendar(id, bubbleId, opts) {
                         data.reviewer   = calEvent.data.booking.reviewer.name;
                         data.reviewerId = calEvent.data.booking.reviewer.id;
                     }
+
+                    // Related bookings
+                    data.relatedBookings = calEvent.data.booking.related;
                 }
 
 
@@ -735,6 +739,14 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
         $('dd.reviewed-by').show();
     }
 
+    // Fill in resauce borking separately
+    $('ul.relatedBookings').empty();
+    eventData.relatedBookings.forEach(function(v) {
+        var row = $('<li />').text('('+v.status.name+') '+v.title);
+        $('ul.relatedBookings').append(row);
+    });
+    delete eventData.relatedBookings;
+
     var xPos = mouseEvent.pageX
     var yPos = mouseEvent.pageY + 5
     this.fillForm(id, eventData)
@@ -816,8 +828,10 @@ Bubble.prototype.fillForm = function(formId, vars) {
      * 'is-html' data element, then it gets filled with HTML - otherwise with
      * text.
      *
-     * @param element
-     * @param value
+     * @param element The bubble element
+     * @param key     The key that is getting updated
+     * @param value   The value that is added
+     * @param allVars All variables that are getting updated
      */
     var fillElement = function(element, key, value, allVars) {
         if (element) {
