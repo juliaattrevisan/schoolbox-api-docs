@@ -17,6 +17,12 @@ use Schoolbox\User;
 use Schoolbox\ConfigLoader;
 use Schoolbox\File\MimetypeMapper;
 
+/**
+ * Class Submission
+ *
+ * @deprecated in favour of separate Submission\File and Submission\Inline classes
+ * @package Schoolbox\Assessment\Component\SubmissionBox
+ */
 class Submission implements FileInterface {
 
 	/**
