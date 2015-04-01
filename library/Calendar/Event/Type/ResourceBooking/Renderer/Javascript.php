@@ -89,6 +89,19 @@ class Javascript extends Base
             );
         }
 
+        // Related booking display
+        $relatedBookings = [];
+        foreach ($currentEvent->getBooking()->getRelatedBookingList() as $relatedBooking) {
+            $relatedBookings[] = [
+                'title' => $relatedBooking->getEvent()->getTitle(),
+                'item'    => array(
+                    'id'   => $relatedBooking->getResource()->getId(),
+                    'name' => $relatedBooking->getResource()->getName(),
+                ),
+                'status'  => $relatedBooking->getStatus()->jsonSerialize(),
+            ];
+        }
+
         // Set title from resource name, and code and booking name
         // if either are there.
 
@@ -153,6 +166,7 @@ class Javascript extends Base
                         'id'   => $this->getEvent()->getBooking()->getReviewer()->getId() ?: -1,
                         'name' => $this->getEvent()->getBooking()->getReviewer()->formatName(),
                     ),
+                    'related' => $relatedBookings,
                 ),
             )
         );
