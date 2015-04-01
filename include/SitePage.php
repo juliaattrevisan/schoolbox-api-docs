@@ -241,7 +241,7 @@ class SitePage extends Page
      *
      * @return bool
      */
-    public function detectAjax()
+    public static function detectAjax()
     {
         return ($_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest');
     }
