@@ -427,7 +427,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
                 'periodEnd' => $definition['end'][$i],
                 'periodNumber' => $definition['number'][$i],
                 'periodSequence' => $definition['sequence'][$i],
-                'day' => array_fill(0, $campus->getTimetableDay(), array()),
+                'day' => array_fill(1, $campus->getTimetableDay(), array()),
             );
         }
 
@@ -467,13 +467,12 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
                                 $periodIndex = $periodNumber-1;
 
                                 $dayNumber = trim($currentPeriod->{'Day Number'});
-                                $dayIndex = $dayNumber-1;
 
                                 /* Trim out classes that fall beyond Timetable Days
                                  * specified in Admin/Lists/Campus
                                  */
                                 if ($dayNumber <= $timetableDay) {
-                                    $timetable[$periodIndex]['day'][$dayIndex][] = array(
+                                    $timetable[$periodIndex]['day'][$dayNumber][] = array(
                                         'description' => $currentPeriod->{'ClassCode'},
                                         'code' => $currentPeriod->{'ClassCode'},
                                         'campus' => $campusName,
@@ -534,13 +533,12 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
                                 $periodIndex = $periodNumber-1;
 
                                 $dayNumber = trim($currentPeriod->{'Day'});
-                                $dayIndex = $dayNumber-1;
 
                                 /* Trim out classes that fall beyond Timetable Days
                                  * specified in Admin/Lists/Campus
                                  */
                                 if ($dayNumber <= $timetableDay) {
-                                    $timetable[$periodIndex]['day'][$dayIndex][] = array(
+                                    $timetable[$periodIndex]['day'][$dayNumber][] = array(
                                         'description' => $currentPeriod->{'Description for Staff TT'},
                                         'code' => $currentPeriod->{'Class'},
                                         'campus' => $campusName,
