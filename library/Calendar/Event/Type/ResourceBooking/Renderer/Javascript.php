@@ -92,6 +92,13 @@ class Javascript extends Base
         // Related booking display
         $relatedBookings = [];
         foreach ($currentEvent->getBooking()->getRelatedBookingList() as $relatedBooking) {
+            $reviewHref = $this->getRouteIfAuthorized(
+                'resourceItem.read',
+                ['id' => $relatedBooking->getResource()->getId()]
+            );
+            if ($reviewHref) {
+                $reviewHref .= '?date='.urlencode($relatedBooking->getEvent()->getStartDateTime()->getURLDate());
+            }
             $relatedBookings[] = [
                 'title' => $relatedBooking->getEvent()->getTitle(),
                 'item'    => array(
@@ -99,6 +106,7 @@ class Javascript extends Base
                     'name' => $relatedBooking->getResource()->getName(),
                 ),
                 'status'  => $relatedBooking->getStatus()->jsonSerialize(),
+                'href'    => $reviewHref,
             ];
         }
 
