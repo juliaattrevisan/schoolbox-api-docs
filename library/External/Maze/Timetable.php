@@ -565,10 +565,11 @@ class External_Maze_Timetable implements External_TimetableInterface
             $timetable[$period]['periodSequence'] = $allDayTimetables[0][$period]['periodSequence'];
 
             /* Put in Day classes
+             * Note that $timetable is now using a 1-index array
              */
             for ($day = 0; $day < $campus->getTimetableDay(); $day++) {
                 if($allDayTimetables[$day][$period]['class'][0]['description']) {
-                    $timetable[$period]['day'][$day][0] = array(
+                    $timetable[$period]['day'][$day+1][0] = array(
                         'description'       => $allDayTimetables[$day][$period]['class'][0]['description'],
                         'code'              => $allDayTimetables[$day][$period]['class'][0]['code'],
                         'room'              => $allDayTimetables[$day][$period]['class'][0]['room'],
@@ -579,7 +580,7 @@ class External_Maze_Timetable implements External_TimetableInterface
                     );
                 }
                 else {
-                    $timetable[$period]['day'][$day] = array();
+                    $timetable[$period]['day'][$day+1] = array();
                 }
             }
         }
