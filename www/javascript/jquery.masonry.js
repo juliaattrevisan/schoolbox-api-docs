@@ -155,6 +155,8 @@
             this.initSpectrum();
         }
 
+        this.initForms();
+
         // set the appropriate classes on the columns
         this.refreshColumns();
 
@@ -296,6 +298,43 @@
 
     };
 
+    /**
+     * Initializes component configuration forms - ensures that forms are
+     * saved via AJAX.
+     */
+    Masonry.prototype.initForms = function () {
+        var masonry = this,
+            opt     = this.options,
+            page    = $(this.element),
+            btns    = [],
+            btnsSelector;
+        //
+        page.on(
+            'submit',
+            opt.component.controlPanelSelector+'.settings form',
+            function(event) {
+                var form  = $(this),
+                    panel = form.closest(opt.component.controlPanelSelector);
+                event.preventDefault();
+                $.ajax(
+                    {
+                        url:  this.action,
+                        type: this.method,
+                        data: form.serializeArray()
+                    }
+                )
+                    .done(function(response) {
+                        // AJAX in the new contents
+                        var existing = panel.closest(opt.component.selector);
+                        masonry.insertComponentInstance(
+                            $(response),
+                            existing,
+                            existing
+                        );
+                    })
+            }
+        );
+    };
 
     /**
      * Retrieve the column list for this page. Good to index this result.
@@ -367,28 +406,7 @@
                     // retrieve a new instance of this component
                     masonry.newComponentInstance(cl)
                         .done(function(response) {
-                            var $response = $(response);
-
-                            // nek level cheating for pretty animationz -_-
-                            $response.css({
-                                visibility: 'hidden',
-                                position: 'fixed',
-                                width: ui.item.width()
-                            });
-
-                            // drop it invisibly onto the page
-                            $('body').append($response);
-
-                            // grab its computed height
-                            var css = { height: $response.height(), opacity: 0 };
-
-                            var that = $response;
-
-                            ui.item.animate(css, 550, function () {
-                                $(this).replaceWith(that.removeAttr('style'));
-                                masonry.saveSorting();
-                                masonry.refreshPalette();
-                            });
+                            masonry.insertComponentInstance($(response), $(this), ui.item);
                         })
                         .fail(function() {
                             ui.item.addClass(failedClass).slideUp(
@@ -522,6 +540,38 @@
             dataType: 'html'
         });
 
+    };
+
+    /**
+     * Adds a new component to the page.
+     *
+     * @param response    The new HTML for the component
+     * @param replacement The old HTML to replace
+     * @param uiItem      The container to animate?
+     */
+    Masonry.prototype.insertComponentInstance = function(response, replacement, uiItem)
+    {
+        var masonry = this;
+        // nek level cheating for pretty animationz -_-
+        response.css({
+            visibility: 'hidden',
+            position: 'fixed',
+            width: uiItem.width()
+        });
+
+        // drop it invisibly onto the page
+        $('body').append(response);
+
+        // grab its computed height
+        var css = { height: response.height(), opacity: 0 };
+
+        var that = response;
+
+        uiItem.animate(css, 550, function () {
+            replacement.replaceWith(that.removeAttr('style'));
+            masonry.saveSorting();
+            masonry.refreshPalette();
+        });
     };
 
 
