@@ -329,7 +329,12 @@
                     .done(function(response) {
                         // AJAX in the new contents
                         // (Filter out everything that's not the component)
-                        masonry.insertComponentInstance($(response).find('#'+existingId), existing);
+                        var $response  = $(response);
+                        var newContent = $response.is('#'+existingId)
+                            ? $response
+                            : $response.find('#'+existingId)
+                        ;
+                        masonry.insertComponentInstance(newContent, existing);
                     })
                     .fail(function() {
                         existing.addClass('failed');
