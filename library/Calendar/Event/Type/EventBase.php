@@ -99,9 +99,11 @@ abstract class EventBase implements EventInterface
      * The class used to render this event object. This should be
      * just the class' name, not an actual instance of it
      *
-     * @var string
+     * @var array
      */
-    protected $rendererClass = '';
+    protected $renderClasses = array(   'javascript'    => RendererBase::class,
+                                        'html'          => RendererBase::class,
+                                    );
 
     /**
      * Whether or not to display the modify link
@@ -434,9 +436,9 @@ abstract class EventBase implements EventInterface
      *
      * @return string
      */
-    public function getRendererClass()
+    public function getRendererClass($type)
     {
-        return $this->rendererClass;
+        return $this->rendererClass[$type];
     }
 
     /**

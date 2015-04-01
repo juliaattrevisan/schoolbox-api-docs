@@ -185,7 +185,7 @@ interface EventInterface
      *
      * @return string
      */
-    public function getRendererClass();
+    public function getRendererClass($type);
 
     /**
      * Set isEditable

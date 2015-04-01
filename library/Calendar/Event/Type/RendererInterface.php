@@ -22,9 +22,9 @@ interface RendererInterface {
     /**
      * Set the event that you want to render
      *
-     * @return EventBase
+     * @param EventBase
      */
-    public function setEvent();
+    public function setEvent($event);
 
     /**
      * Get the event that you want to render

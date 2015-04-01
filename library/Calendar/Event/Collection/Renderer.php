@@ -92,21 +92,16 @@ class Renderer {
 	/**
 	 * Render all events
 	 */
-	public function renderAll() {
-		$collection = $this->getAllEvents();
+	public function renderAll($type) {
+		$output = '';
 
-		$registry = array();
-
-		foreach($collection as $currentEvent) {
-
-			$rendererClass = $currentEvent->getRendererClass();
-
-			if (!$registry[$rendererClass]) {
-				$registry[$rendererClass] = new $rendererClass($this->getPage());
-			}
-
-			$currentEvent->accept($registry[$rendererClass]);
+		foreach($this->getAllEvents() as $currentEvent) {
+			$rendererClass = $currentEvent->getRendererClass($type);
+			$renderObj = new $rendererClass($this->getPage(),$currentEvent);
+			$output .= $renderObj->render();
 		}
+
+        return $output;
 	}
 
 	/* Getters/Setters

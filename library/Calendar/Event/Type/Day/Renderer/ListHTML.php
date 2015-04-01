@@ -5,31 +5,36 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-class Calendar_Event_Type_Day_Renderer_Default extends Calendar_Event_Type_Renderer_Abstract {
+
+namespace Calendar\Event\Type\Day\Renderer;
+
+class ListHTML extends Base {
+
 
     /**
      * Render this event
      *
-     * @param Calendar_Event_Type_Abstract $currentEvent
      */
-    public function visit($currentEvent) {
-        if ($this->isVisible($currentEvent)) {
+    public function render()
+    {
 
-            /* Clear attendance blocks
-             */
-            $this->getPage()->setVar(array(
-				'attendance_icon_block' => '',
-				'attendance_status_block' => '',
-				'attendance_request_button_block' => '',
-				'attendance_list_button_block' => '',
-				'has_category_block' => '',
-			));
+        if ($this->isVisible()) {
+            return $this->getTemplate()->render('@calendar/type/day.twig',
+                array('event' => $this->getEvent())
+            );
+        } else {
+            return '';
+        }
+
+    }
+
+    public function old() {
+
 
             /* Future events are visible to superusers, event owners, group members with write access
              */
-            if ($currentEvent->getPublishDate()->getUnixTimestamp() >= time()) {
+            if ($this->getEvent()->getPublishDate()->getUnixTimestamp() >= time()) {
 				$cssClass = 'translucent';
 			}
 			else {
@@ -46,8 +51,6 @@ class Calendar_Event_Type_Day_Renderer_Default extends Calendar_Event_Type_Rende
 				'COLOUR' => $currentEvent->getColour(),
 				'LOCATION' => Scrub::text($currentEvent->getLocation()),
 				'DETAIL' => Scrub::html($currentEvent->getDetail()),
-				/* Wtf - EVENT_TYPE => 'type' . $event['type']; and TYPE => $event['eventType']
-				 */
 				'EVENT_TYPE' => 'type' . $currentEvent->getType(),
 				'TYPE' => $currentEvent->getEventType(),
 				'AUTHOR' => Scrub::text($currentEvent->getAuthorName()),
@@ -124,6 +127,7 @@ class Calendar_Event_Type_Day_Renderer_Default extends Calendar_Event_Type_Rende
             }
 
             $this->getPage()->parse('note_block', 'note', true);
-        }
     }
+
+
 }

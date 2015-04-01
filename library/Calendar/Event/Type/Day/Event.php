@@ -98,7 +98,9 @@ class Event extends EventBase implements EventInterface {
     /**
      * Renderer classes
      */
-    protected $renderer = '';
+    protected $renderClasses = array(   'javascript'    => Renderer\Javascript::class,
+                                        'html'          => Renderer\ListHTML::class,
+                                    );
 
     /**
      * Can someone attend this event

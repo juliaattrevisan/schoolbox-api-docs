@@ -11,8 +11,6 @@
  */
 namespace Calendar\Event\Type\Day\Renderer;
 
-use Calendar\Event\Type\Day\Renderer\Base;
-
 class Javascript extends Base {
 
 
