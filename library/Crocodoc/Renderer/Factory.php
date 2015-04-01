@@ -99,7 +99,10 @@ class Factory {
             } elseif ($work->getMimetype()->isVideo()) {
                 return new Strategy\Video($this->getPage(), $work, $this->getReturnedWork(), $this->getNavigationElements());
 
-            } elseif ($work->getMimeType()->matches('text/html')) {
+            } elseif ($work->getMimetype()->isAudio()) {
+                return new Strategy\Audio($this->getPage(), $this->getSubmission(), $this->getReturnedWork(), $this->getNavigationElements());
+            }
+            elseif ($work->getMimeType()->matches('text/html')) {
                 return new Strategy\Html($this->getPage(), $work, $this->getReturnedWork(), $this->getNavigationElements());
             }
 		}
