@@ -300,21 +300,20 @@
 
     /**
      * Initializes component configuration forms - ensures that forms are
-     * saved via AJAX.
+     * saved via AJAX, and that the form is updated via AJAX.
      */
     Masonry.prototype.initForms = function () {
         var masonry = this,
             opt     = this.options,
-            page    = $(this.element),
-            btns    = [],
-            btnsSelector;
-        //
+            page    = $(this.element);
         page.on(
             'submit',
             opt.component.controlPanelSelector+'.settings form',
             function(event) {
                 var form  = $(this),
-                    panel = form.closest(opt.component.controlPanelSelector);
+                    panel = form.closest(opt.component.controlPanelSelector),
+                    existing = panel.closest(opt.component.selector),
+                    existingId = existing.attr('id');
                 event.preventDefault();
                 $.ajax(
                     {
@@ -325,8 +324,8 @@
                 )
                     .done(function(response) {
                         // AJAX in the new contents
-                        var existing = panel.closest(opt.component.selector);
-                        masonry.insertComponentInstance($(response), existing);
+                        // (Filter out everything that's not the component)
+                        masonry.insertComponentInstance($(response).find('#'+existingId), existing);
                     })
             }
         );
