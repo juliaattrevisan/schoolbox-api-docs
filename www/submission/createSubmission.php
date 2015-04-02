@@ -383,6 +383,19 @@ $output = array(
     )
 );
 
+/** @var Schoolbox\User $user */
+$user          = $_SESSION['user'];
+$listGenerator = new Schoolbox\External\TimetableArrayExporter(new External_Timetable());
+$campusList    = $listGenerator->export($user);
+$output['TIMETABLE_SELECTOR'] = $this->getTwig()->render(
+    'sub/timetableSelector.twig',
+    [
+        'selectButtons' => true,
+        'campusList'    => $user->getCampusCollection(),
+    ]
+);
+$output['USER_CAMPUS_LIST'] = json_encode($campusList);
+
 $this->setVar($output);
 
 /**
