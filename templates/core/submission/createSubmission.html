@@ -400,8 +400,31 @@
         });
         form.on('click', 'a[data-interaction="selectTimetableDate"]', function(event) {
             event.preventDefault();
+            // Keep track of the button I clicked to open this
             timetableSelectorDialog.dialog('open');
         });
+
+        $('[data-interaction="timetableSelector"]')
+            .timetableDaySelector({
+                dateFormat: dateDisplayFormats.momentJs,
+                campusList: {USER_CAMPUS_LIST},
+                getChangeDateAjax: function(campus, day, date, previous) {
+                    return {
+                        // TODO change this to non RB
+                        url:      '/resource-booking/booking/dateForTimetableDay',
+                        dataType: 'json',
+                        data:     {
+                            campus:   campus,
+                            day:      day,
+                            previous: (previous ? 1 : 0),
+                            date:     date
+                        }
+                    }
+                }
+            })
+            .on('pickTime.timetableDaySelector', function(event, datetime) {
+                console.log(datetime);
+            });
     });
 </script>
 <!-- END custom_head -->
