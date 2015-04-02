@@ -27,6 +27,16 @@ class Alaress_Date_NullDate extends Alaress_Date_Format
     }
 
     /**
+     * This is a null date
+     *
+     * @return true
+     */
+    public function isNull()
+    {
+        return true;
+    }
+
+    /**
      * This is a null date - performing any sort of date operations will blow
      * up in your face.
      *

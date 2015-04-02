@@ -1231,6 +1231,16 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
         return empty($this->warnings);
     }
 
+    /**
+     * This isn't a null date
+     *
+     * @return false
+     */
+    public function isNull()
+    {
+        return false;
+    }
+
     /** COMPARIONS */
 
     /**
