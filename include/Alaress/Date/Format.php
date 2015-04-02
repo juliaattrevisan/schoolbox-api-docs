@@ -217,7 +217,13 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
             $newTimezone = $timezone ?: $this->getDefaultTimezone();
             if ($inputDateFormat === 'U') {
                 // Timestamp special case handling - make it work with negative datetimes
-                $laravelDate = LaravelDate::createFromTimestamp($dateTime, $newTimezone);
+                if (is_numeric($dateTime)) {
+                    $laravelDate = LaravelDate::createFromTimestamp($dateTime, $newTimezone);
+                } else {
+                    throw new InvalidArgumentException(
+                        '$dateTime must be numeric if $inputDateFormat is timestamp format'
+                    );
+                }
             } else {
                 $newDateTime = DateTime::createFromFormat($inputDateFormat, $dateTime, $newTimezone);
                 $errors      = DateTime::getLastErrors();
