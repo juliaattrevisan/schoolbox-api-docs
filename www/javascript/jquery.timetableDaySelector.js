@@ -231,14 +231,9 @@
          */
         self.pickStartTimeButton.on('click', function(event) {
             event.preventDefault();
-            var datetime = self.dateDisplay.attr('datetime'),
-                time;
-            if (time = self.startTimeDisplay.attr('datetime')) {
-                datetime += ' '+time;
-            }
             self.element.trigger(
                 'pickTime.timetableDaySelector',
-                [moment(datetime)]
+                [self.dateDisplay.attr('datetime'), self.startTimeDisplay.attr('datetime')]
             );
         });
 
@@ -247,14 +242,9 @@
          */
         self.pickEndTimeButton.on('click', function(event) {
             event.preventDefault();
-            var datetime = self.dateDisplay.attr('datetime'),
-                time;
-            if (time = self.endTimeDisplay.attr('datetime')) {
-                datetime += ' '+time;
-            }
             self.element.trigger(
                 'pickTime.timetableDaySelector',
-                [moment(datetime)]
+                [self.dateDisplay.attr('datetime'), self.endTimeDisplay.attr('datetime')]
             );
         });
     };
