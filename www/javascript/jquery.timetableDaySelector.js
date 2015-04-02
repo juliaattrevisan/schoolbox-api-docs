@@ -20,9 +20,11 @@
             periodSelector: 'select[data-role="periodSelector"]',
 
             // Selectors for buttons
-            useDateButton:      'a[data-interaction="useDate"]',
-            previousDateButton: 'a[data-interaction="previousDate"]',
-            nextDateButton:     'a[data-interaction="nextDate"]',
+            useDateButton:       'a[data-interaction="useDate"]',
+            previousDateButton:  'a[data-interaction="previousDate"]',
+            nextDateButton:      'a[data-interaction="nextDate"]',
+            pickStartTimeButton: 'a[data-interaction="pickStartTime"]',
+            pickEndTimeButton:   'a[data-interaction="pickEndTime"]',
 
             // Selectors for display of date, start and end times
             dateDisplay:      'time[data-role="selectedDate"]',
@@ -45,21 +47,25 @@
         self.options = $.extend({}, defaults, settings)
 
         // Interface elements
-        self.campusSelector     = element.find(self.options.campusSelector)
-        self.daySelector        = element.find(self.options.daySelector)
-        self.periodSelector     = element.find(self.options.periodSelector)
-        self.previousDateButton = element.find(self.options.previousDateButton)
-        self.nextDateButton     = element.find(self.options.nextDateButton)
-        self.useDateButton      = element.find(self.options.useDateButton)
-        self.dateDisplay        = element.find(self.options.dateDisplay)
-        self.startTimeDisplay   = element.find(self.options.startTimeDisplay)
-        self.endTimeDisplay     = element.find(self.options.endTimeDisplay)
+        self.campusSelector      = element.find(self.options.campusSelector)
+        self.daySelector         = element.find(self.options.daySelector)
+        self.periodSelector      = element.find(self.options.periodSelector)
+        self.previousDateButton  = element.find(self.options.previousDateButton)
+        self.nextDateButton      = element.find(self.options.nextDateButton)
+        self.useDateButton       = element.find(self.options.useDateButton)
+        self.pickStartTimeButton = element.find(self.options.pickStartTimeButton)
+        self.pickEndTimeButton   = element.find(self.options.pickEndTimeButton)
+        self.dateDisplay         = element.find(self.options.dateDisplay)
+        self.startTimeDisplay    = element.find(self.options.startTimeDisplay)
+        self.endTimeDisplay      = element.find(self.options.endTimeDisplay)
 
         // Generic selector for all buttons
         self.buttons = $()
             .add(self.previousDateButton)
             .add(self.nextDateButton)
             .add(self.useDateButton)
+            .add(self.pickStartTimeButton)
+            .add(self.pickEndTimeButton)
         self.buttons.hide()
 
         /**
@@ -218,8 +224,40 @@
                     self.endTimeDisplay.attr('datetime'),
                 ]
             )
-        })
-    }
+        });
+
+        /**
+         * Event when pick start time button is clicked.
+         */
+        self.pickStartTimeButton.on('click', function(event) {
+            event.preventDefault();
+            var datetime = self.dateDisplay.attr('datetime'),
+                time;
+            if (time = self.startTimeDisplay.attr('datetime')) {
+                datetime += ' '+time;
+            }
+            self.element.trigger(
+                'pickTime.timetableDaySelector',
+                [moment(datetime)]
+            );
+        });
+
+        /**
+         * Event when pick end time button is clicked.
+         */
+        self.pickEndTimeButton.on('click', function(event) {
+            event.preventDefault();
+            var datetime = self.dateDisplay.attr('datetime'),
+                time;
+            if (time = self.endTimeDisplay.attr('datetime')) {
+                datetime += ' '+time;
+            }
+            self.element.trigger(
+                'pickTime.timetableDaySelector',
+                [moment(datetime)]
+            );
+        });
+    };
 
     /**
      * Changes the date displayed on the timetable date selector.
@@ -263,10 +301,10 @@
             [
                 this.dateDisplay.attr('datetime'),
                 this.startTimeDisplay.attr('datetime'),
-                this.endTimeDisplay.attr('datetime'),
+                this.endTimeDisplay.attr('datetime')
             ]
         )
-    }
+    };
 
     /**
      * Sets up the timetable day selector.
