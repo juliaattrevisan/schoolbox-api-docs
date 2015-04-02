@@ -70,7 +70,12 @@ class DatetimeTest extends TestCase {
 	 * @dataProvider getTestHydrate
 	 */
 	public function testHydrate($input, $expected_output) {
-		$this->assertSame($expected_output, ($this->object->hydrate($input) instanceof DateWrapper));
+        // Silence errors: date creation warns on invalid but parseable dates
+        $hydrated = @$this->object->hydrate($input);
+        $this->assertSame(
+            $expected_output,
+            ($hydrated instanceof DateWrapper && !$hydrated instanceof \Alaress_Date_NullDate)
+        );
 	}
 
 	/**
