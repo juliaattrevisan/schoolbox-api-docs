@@ -1,36 +1,44 @@
+<script type="text/javascript" src="/javascript/jquery.collapsable.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('.box').find('[data-collapser=true]').collapsable();
+    });
+</script>
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
 
-	<ul class="information-list">
-		<!-- BEGIN news -->
-		<li class="{ON_OFF} clearfix">
-			<span class="actions">
-				{MOD_NEWS}
-			</span>
+    <div data-collapsable='true'>
+        <ul class="information-list">
+            <!-- BEGIN news -->
+            <li class="{ON_OFF} clearfix">
+                <span class="actions">
+                    {MOD_NEWS}
+                </span>
 
-			<h3>{NEWS_HEADING}</h3>
+                <h3>{NEWS_HEADING}</h3>
 
-			<p class="meta">
-				<a href="/search/user/{AUTHOR_ID}" class="author">
-					<img width="32" height="32" src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square32"/>
-					{AUTHOR}
-				</a><br />
-				Posted {POSTED_DATE}
-				<!-- BEGIN has_publish_date -->
-					(Published on {NEWS_PUBLISH_DATE})
-				<!-- END has_publish_date -->
-			</p>
+                <p class="meta">
+                    <a href="/search/user/{AUTHOR_ID}" class="author">
+                        <img width="32" height="32" src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square32"/>
+                        {AUTHOR}
+                    </a><br />
+                    Posted {POSTED_DATE}
+                    <!-- BEGIN has_publish_date -->
+                        (Published on {NEWS_PUBLISH_DATE})
+                    <!-- END has_publish_date -->
+                </p>
 
-			<div class="wysiwyg">{NEWS_BODY}</div>
-		</li>
-		<!-- END news -->
-	</ul>
+                <div class="wysiwyg">{NEWS_BODY}</div>
+            </li>
+            <!-- END news -->
+        </ul>
 
-    <p class="interact">
-		<a href="/homepage/newsArchive/{NEWS_CATEGORY_ID}" class="btn"><span></span>View News Archive</a>
-        <!-- BEGIN submit_news -->
-		<a href="/news/homepage/new/{NEWS_CATEGORY_ID}" class="btn up-arrow"><span></span>Post News</a>
-		<!-- END submit_news -->
-    </p>
+        <p class="interact">
+            <a href="/homepage/newsArchive/{NEWS_CATEGORY_ID}" class="btn"><span></span>View News Archive</a>
+            <!-- BEGIN submit_news -->
+            <a href="/news/homepage/new/{NEWS_CATEGORY_ID}" class="btn up-arrow"><span></span>Post News</a>
+            <!-- END submit_news -->
+        </p>
+    </div>
 </div>

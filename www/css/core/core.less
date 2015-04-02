@@ -1382,7 +1382,7 @@ Notifications
 
     a.close-delete {
         position: absolute;
-        right: 33px;
+        right: 53px;
         top: 6px;
         width: 84px;
         height: 26px;
@@ -1393,7 +1393,7 @@ Notifications
 
     a.edit {
         position: absolute;
-        right: 33px;
+        right: 53px;
         top: 6px;
         width: 84px;
         height: 26px;
@@ -13042,4 +13042,47 @@ dd.dz-wrap {
 
 .printEventList .dateSelector {
 	padding-left: 4px;
+}
+
+/* Component control buttons
+ */
+a.component-control-button {
+    width: 20px;
+    height: 20px;
+    top: 6px;
+    line-height: 20px;
+    text-align: center;
+    font-weight: bold;
+    position: absolute;
+    background: #fafafa;
+    color: #000000 !important;
+    &:hover {
+        text-decoration: none;
+        cursor: pointer;
+        em{
+            display: block;
+        }
+        span {
+            background: @black;
+            color: @white;
+        }
+    }
+    span {
+        width: 20px;
+        display: block;
+        height: 20px;
+        line-height: 20px;
+        text-align: center;
+        position: absolute;
+        top: 0;
+        right: 0;
+        color: @black;
+        background: @dark;
+    }
+}
+
+/* Collapse component contents
+ */
+a.component-control-button.collapse {
+    right: 30px;
 }
