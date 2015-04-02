@@ -398,9 +398,12 @@
             modal: true,
             autoOpen: false
         });
+
+        var timeToUpdate = '';
         form.on('click', 'a[data-interaction="selectTimetableDate"]', function(event) {
             event.preventDefault();
             // Keep track of the button I clicked to open this
+            timeToUpdate = $(this).data('relation');
             timetableSelectorDialog.dialog('open');
         });
 
@@ -422,8 +425,16 @@
                     }
                 }
             })
-            .on('pickTime.timetableDaySelector', function(event, datetime) {
-                console.log(datetime);
+            .on('pickTime.timetableDaySelector', function(event, date, time) {
+                var dateObject = moment(date);
+                form.find(':input[name="'+timeToUpdate+'_date"]').val(dateObject.format(dateDisplayFormats.momentJs));
+                if (time) {
+                    var timeObject = moment(time, 'H:mm');
+                    form.find(':input[name="' + timeToUpdate + '_hour"]').val(timeObject.format('h'));
+                    form.find(':input[name="' + timeToUpdate + '_minute"]').val(timeObject.format('mm'));
+                    form.find(':input[name="' + timeToUpdate + '_period"]').val(timeObject.format('a'));
+                }
+                timetableSelectorDialog.dialog('close');
             });
     });
 </script>
