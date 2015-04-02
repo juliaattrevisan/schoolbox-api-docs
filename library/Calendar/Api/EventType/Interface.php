@@ -2,7 +2,7 @@
 /**
  * Calendar_Api_EventType_Interface
  *
- * Each method must return an instance of Calendar_Event_Collection
+ * Each method must return an instance of \Calendar\Event\Collection
  * containing Calender_Event_Type subclasses in their stacks.
  *
  * When adding a new type of event collection e.g. getDayEvents(),

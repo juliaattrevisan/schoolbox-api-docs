@@ -1,15 +1,18 @@
 <?php
 /**
- * Calendar_Event_Type_Day_Renderer_Default
+ * Calendar_Event_Type_EOTC_Renderer_Default
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
+namespace Calendar\Event\Type\EOTC\Renderer;
 
-namespace Calendar\Event\Type\Day\Renderer;
+use Calendar\Event\Type\RendererBase;
 
-class ListHTML extends Base {
+class Html extends RendererBase {
+
 
 
     /**
@@ -20,7 +23,7 @@ class ListHTML extends Base {
     {
 
         if ($this->isVisible()) {
-            return $this->getTemplate()->render('@calendar/type/day.twig',
+            return $this->getTemplate()->render('@calendar/type/EOTC.twig',
                 array('event' => $this->getEvent())
             );
         } else {
@@ -29,12 +32,27 @@ class ListHTML extends Base {
 
     }
 
-    public function old() {
+    /**
+     * Render this event
+     *
+     * @param Calendar_Event_Type_Abstract $currentEvent
+     */
+    public function visit($currentEvent) {
+        if ($this->isVisible($currentEvent)) {
 
+            /* Clear attendance blocks
+             */
+            $this->getPage()->setVar(array(
+				'attendance_icon_block' => '',
+				'attendance_status_block' => '',
+				'attendance_request_button_block' => '',
+				'attendance_list_button_block' => '',
+				'has_category_block' => '',
+			));
 
             /* Future events are visible to superusers, event owners, group members with write access
              */
-            if ($this->getEvent()->getPublishDate()->getUnixTimestamp() >= time()) {
+            if ($currentEvent->getPublishDate()->getUnixTimestamp() >= time()) {
 				$cssClass = 'translucent';
 			}
 			else {
@@ -51,6 +69,8 @@ class ListHTML extends Base {
 				'COLOUR' => $currentEvent->getColour(),
 				'LOCATION' => Scrub::text($currentEvent->getLocation()),
 				'DETAIL' => Scrub::html($currentEvent->getDetail()),
+				/* Wtf - EVENT_TYPE => 'type' . $event['type']; and TYPE => $event['eventType']
+				 */
 				'EVENT_TYPE' => 'type' . $currentEvent->getType(),
 				'TYPE' => $currentEvent->getEventType(),
 				'AUTHOR' => Scrub::text($currentEvent->getAuthorName()),
@@ -127,7 +147,26 @@ class ListHTML extends Base {
             }
 
             $this->getPage()->parse('note_block', 'note', true);
+        }
     }
 
+    /**
+     * If the Publish Date hasn't been reached yet, only show the events to Superusers
+     * in a different way so they can still edit/click them. Otherwise, they don't appear
+     * at all for everyone else
+     *
+     * @param $currentEvent
+     * @return bool
+     */
+    private function isVisible($currentEvent) {
 
+        $isFutureEvent = ($currentEvent->getPublishDate()->getUnixTimestamp() >= time());
+        $isVisibleToUser = ($this->getGroupHandler()->isSuperuser() || $currentEvent->isOwner() || (is_numeric($currentEvent->getCategoryId()) && ($this->getGroupHandler()->getPermission($currentEvent->getCategoryId())) > READ_ACCESS));
+
+        if ($isFutureEvent && !($isVisibleToUser)) {
+            return false;
+        }
+
+        return true;
+    }
 }

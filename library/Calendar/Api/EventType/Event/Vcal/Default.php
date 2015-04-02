@@ -8,6 +8,10 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Calendar\Event\Collection;
+use Calendar\Event\Type\Day\Event;
+
+
 class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_Abstract
 {
 
@@ -59,7 +63,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
      * @param $endTimestamp
      *
      * @internal param $currentDay
-     * @return Calendar_Event_Collection
+     * @return Collection
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
@@ -102,7 +106,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
      *
      * @param  int $eventId
      *
-     * @return Calendar_Event_Collection
+     * @return Collection
      */
     public function getEvent($eventId)
     {
@@ -128,7 +132,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
      * @param  int      $endTimestamp     If set, only events before this are returned
      * @param  int      $limit            If set, only this many events are returned
      *
-     * @return Calendar_Event_Collection
+     * @return Collection
      */
     protected function getFilteredEventCollection(
         $filterFunction,
@@ -137,7 +141,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
         $limit = null
     ) {
 
-        $collection = new Calendar_Event_Collection();
+        $collection = new Collection();
 
         $currentConfig = $this->loadConnectorConfiguration();
         $decodedConfig = $currentConfig->decodeConfig();
@@ -275,7 +279,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
             $metaDetails = $this->findLuEventType($decodedConfig->getLuEventType());
         }
 
-        $event = new Calendar_Event_Type_Day();
+        $event = new Event();
 
         $event->setAuthorName('');
         $event->setAuthorId(-1);

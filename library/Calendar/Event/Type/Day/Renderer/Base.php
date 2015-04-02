@@ -20,9 +20,9 @@ class Base extends RendererBase
      *
      * @return bool
      */
-    protected function isVisible() {
-        $isFutureEvent = ($this->event->getPublishDate()->getUnixTimestamp() >= time());
-        $isVisibleToUser = ($this->getViewer()->isSuperuser() || $this->event->isOwner() || $this->event->isEditable());
+    public function isVisible() {
+        $isFutureEvent = ($this->getEvent()->getPublishDate()->getUnixTimestamp() >= time());
+        $isVisibleToUser = ($this->getViewer()->isSuperuser() || $this->getEvent()->isOwner() || $this->getEvent()->isEditable());
         if ($isFutureEvent && !($isVisibleToUser)) {
             return false;
         }

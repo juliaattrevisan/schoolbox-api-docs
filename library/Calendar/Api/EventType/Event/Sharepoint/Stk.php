@@ -8,8 +8,11 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+
+use Calendar\Event\Collection;
+use Calendar\Event\Type\Day\Event;
+
 class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType_Abstract
 {
 
@@ -133,7 +136,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
      * @param int $startTimestamp
      * @param int $endTimestamp
      *
-     * @return Calendar_Event_Collection
+     * @return Collection
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
@@ -148,7 +151,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
         // within $startTimestamp and $endTimestamp
         $collection->filter(
             function ($event) use ($startTimestamp, $endTimestamp) {
-                /** @var Calendar_Event_Type_Day $event */
+                /** @var Event $event */
                 return $event->getStartTime()->getUnixTimestamp() <= $endTimestamp
                 && $event->getEndTime()->getUnixTimestamp() >= $startTimestamp;
             }
@@ -167,7 +170,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
      * @param int $startTimestamp
      * @param int $endTimestamp
      *
-     * @return Calendar_Event_Collection
+     * @return Collection
      */
     protected function retrieveEventsBetweenTimespan($startTimestamp, $endTimestamp)
     {
@@ -181,7 +184,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 
         /* Fill in your query result set here and populate $collection
          */
-        $collection = new Calendar_Event_Collection();
+        $collection = new Collection();
 
         /* If the SOAP connection succeeded, proceed normally
          * Otherwise return an empty collection
@@ -232,7 +235,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 
                 /* An event is meant to display today so let's add it to the stack
                  */
-                $event = new Calendar_Event_Type_Day();
+                $event = new Event();
                 $event->setAuthorName('');
                 $event->setAuthorId('');
                 $event->setEventId((int)$attribs->ows_ID);
@@ -280,11 +283,11 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
      *
      * @param $eventId
      *
-     * @return Calendar_Event_Collection
+     * @return Collection
      */
     public function getEvent($eventId)
     {
-        $collection = new Calendar_Event_Collection();
+        $collection = new Collection();
         return $collection;
     }
 
@@ -333,7 +336,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
      * @deprecated This should no longer be needed, as we can now retrieve
      *             actual event recurrences from Sharepoint.
      *
-     * @param Calendar_Event_Collection    $collection     Collection to add to
+     * @param Collection    $collection     Collection to add to
      * @param Calendar_Event_Type_Abstract $event          Event to add. If it recurs,
      *                                                     clones of this are added
      *                                                     for each recurrence.
@@ -347,7 +350,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
      * @return void
      */
     protected function addEventsToCollection(
-        Calendar_Event_Collection $collection,
+        Collection $collection,
         Calendar_Event_Type_Abstract $event,
         $attributes,
         $from,
@@ -455,7 +458,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
     /**
      * Adds a single instance of an event.
      *
-     * @param Calendar_Event_Collection    $collection     Collection to add to
+     * @param Collection    $collection     Collection to add to
      * @param Calendar_Event_Type_Abstract $event          Event to add a copy of.
      * @param DateTime                     $start_time     When the event starts
      * @param int                          $duration       Number of seconds the
@@ -465,7 +468,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
      * @return bool
      */
     protected function addEventAtTime(
-        Calendar_Event_Collection $collection,
+        Collection $collection,
         Calendar_Event_Type_Abstract $event,
         DateTime $start_time,
         $duration,

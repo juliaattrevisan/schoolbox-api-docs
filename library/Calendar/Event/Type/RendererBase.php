@@ -10,6 +10,8 @@ namespace Calendar\Event\Type;
 use Calendar\Event\Type\EventBase;
 use \SitePage;
 use Twig_Environment;
+use \Schoolbox\User;
+use \Alaress_Date_Format;
 
 class RendererBase implements RendererInterface
 {
@@ -37,10 +39,12 @@ class RendererBase implements RendererInterface
     /**
      * @param SitePage $page
      * @param EventBase $event
+     * @param User $viewer
      */
-    public function __constructor($page, $event) {
+    public function __construct(SitePage $page, EventBase $event, User $viewer) {
         $this->setPage($page);
         $this->setEvent($event);
+        $this->setViewer($viewer);
     }
 
     /**
@@ -50,6 +54,17 @@ class RendererBase implements RendererInterface
      */
     public function render() {
         return '';
+    }
+
+    /**
+     * Is this event visible by this user, sometimes we can't tell till we render if we should show it
+     * or not apparently.  Would of thought that this would of been solved in the collection, but it might be render
+     * specific
+     *
+     * @return bool
+     */
+    public function isVisible() {
+        return true;
     }
 
     /**

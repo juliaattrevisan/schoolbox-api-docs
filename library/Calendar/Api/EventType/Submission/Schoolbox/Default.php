@@ -6,8 +6,9 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+use Calendar\Event\Collection;
+
 class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_EventType_Abstract
 {
     /** @var Calendar */
@@ -32,11 +33,11 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
      * @param $endTimestamp
      *
      * @internal param $currentDay
-     * @return Calendar_Event_Collection|Calendar_Event_Type_Submission[]
+     * @return Collection|Calendar_Event_Type_Submission[]
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
-        $stack = new Calendar_Event_Collection();
+        $stack = new Collection();
         // Configuration may not have been set, take this into account.
         try {
             $eventType = $this->loadConnectorConfiguration()->decodeConfig()->getLuEventType();
@@ -117,11 +118,11 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
      *
      * @param $eventId
      *
-     * @return Calendar_Event_Collection
+     * @return Collection
      */
     public function getEvent($eventId)
     {
-        $collection = new Calendar_Event_Collection();
+        $collection = new Collection();
 
         /* Fill in your query result set here and populate $collection
          */

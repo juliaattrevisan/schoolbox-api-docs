@@ -1,13 +1,10 @@
 <?php
 /**
- * Calendar_Event_Type_Day_Renderer_Javascript
- *
- * Renders out a JSON mob of event objects
+ * Renders out a JSON blob for day event objects, this is used by full calendar
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
  */
 namespace Calendar\Event\Type\Day\Renderer;
 
@@ -19,7 +16,7 @@ class Javascript extends Base {
 
 			/* Future events are visible to superusers, event owners, group members with write access
 			 */
-			if ($this->event->getPublishDate()->gt(\Alaress_Date_Time::now())) {
+			if ($this->event->getPublishDate()->gt(\Alaress_Date_Format::now())) {
 				$cssClass = 'translucent';
 			}
 			else {
@@ -131,7 +128,7 @@ class Javascript extends Base {
 					'meta' => array(
 						'eventId' => $this->event->getEventId(),
 						'time' => $this->event->getTime(),
-						'detail' => Scrub::html($this->event->getDetail()),
+						'detail' => \Scrub::html($this->event->getDetail()),
 						'location' => $this->event->getLocation(),
 						'eventTypeId' => $this->event->getType(),
 						'eventType' => 'type' . $this->event->getType(),
@@ -159,8 +156,7 @@ class Javascript extends Base {
 				)
 			);
 
-			echo json_encode($event);
-			echo ",";
+			return json_encode($event).',';
 		}
 	}
 

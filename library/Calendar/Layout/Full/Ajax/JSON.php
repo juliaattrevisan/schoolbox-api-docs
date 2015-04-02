@@ -10,8 +10,10 @@
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
  */
+
+use Calendar\Event\Collection\Renderer;
+
 class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract {
 
 	/**
@@ -66,14 +68,12 @@ class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract {
 
 		$startSequence = new Alaress_Date_Format($_GET['start'], 'U');
 		$endSequence = new Alaress_Date_Format($_GET['end'], 'U');
+        $renderer = new Renderer($this->getApi(), $startSequence->getUnixTimestamp(), $endSequence->getUnixTimestamp(), $this->getPage());
 
 		/* Render all registered event types
 		 */
 		echo "[";
-
-		$renderer = new Calendar_Event_Collection_Renderer($this->getApi(), $startSequence->getUnixTimestamp(), $endSequence->getUnixTimestamp(), $this->getPage());
-		$renderer->renderAll();
-
+		echo $renderer->renderAll('javascript');
 		/* Final null element to help keep IE happy
 		 */
 		echo "{}]";

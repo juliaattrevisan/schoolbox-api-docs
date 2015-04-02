@@ -1,6 +1,6 @@
 <?php
 /**
- * Calendar_Event_Collection_Exporter
+ * Collection_Exporter
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
@@ -10,7 +10,7 @@
 
 use Sabre\VObject\Component\VCalendar;
 
-class Calendar_Event_Collection_Exporter extends Calendar_Event_Collection_Renderer {
+class Collection_Exporter extends Collection_Renderer {
 
 	/**
 	 * Set up the V

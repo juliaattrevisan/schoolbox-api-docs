@@ -15,7 +15,12 @@ use Calendar\Event\Type\Day\Event as DayEvent;
 
 class Event extends DayEvent implements EventInterface {
 
-    protected $rendererClass = 'Calendar_Event_Type_ResourceBooking_Renderer_Javascript';
+    /**
+     * Renderer classes
+     */
+    protected $renderClasses = array(   'javascript'    => Renderer\Javascript::class,
+                                        'html'          => Renderer\Html::class,
+    );
 
     /**
      * @var Model

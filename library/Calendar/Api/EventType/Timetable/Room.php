@@ -1,6 +1,9 @@
 <?php
 use Schoolbox\Resource\Folder\Model as CategoryModel;
 use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
+use Calendar\Event\Collection;
+use Calendar\Event\Type\Day\Event;
+
 
 /**
  * Event type that represents events for a room.
@@ -43,11 +46,11 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
      *
      * @param $startTimestamp
      * @param $endTimestamp
-     * @return Calendar_Event_Collection
+     * @return Collection
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
-        $stack = new Calendar_Event_Collection();
+        $stack = new Collection();
 
         $roomTimetable = $this->externalTimetable->getRoomTimetable($this->roomCode);
 
@@ -107,10 +110,10 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                     continue;
                 }
 
-                $event = new Calendar_Event_Type_Day();
+                $event = new Event();
                 // Make this up as type: campus for now
                 // It also has a category.
-                $event->setType(Calendar_Event_Type_Day::CAMPUS_ACCESS);
+                $event->setType(Event::CAMPUS_ACCESS);
                 $event->setAllday(false);
                 $event->setLocation($this->roomCode);
                 $event->setStartTime(new Alaress_Date_Format($classStartTime));
@@ -168,12 +171,12 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
      * Find a particular event from this source
      *
      * @param $eventId
-     * @return Calendar_Event_Collection
+     * @return Collection
      */
     public function getEvent($eventId)
     {
         // Blah
-        $stack = new Calendar_Event_Collection();
+        $stack = new Collection();
         return $stack;
     }
 

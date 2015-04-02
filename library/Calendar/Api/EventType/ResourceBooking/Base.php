@@ -10,6 +10,7 @@
 use Schoolbox\ResourceBooking\Booking;
 use Schoolbox\Mapper;
 use Schoolbox\Calendar\EventTypeMapper;
+use Calendar\Event\Collection;
 
 abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_EventType_Abstract {
 
@@ -67,7 +68,7 @@ abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_
      * @param int $startTimestamp
      * @param int $endTimestamp
      *
-     * @return Calendar_Event_Collection
+     * @return Collection
      */
     abstract public function getEvents($startTimestamp, $endTimestamp);
 
@@ -77,7 +78,7 @@ abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_
      * Not implemented - at least not yet - for resource booking items.
      *
      * @param $eventId
-     * @return Calendar_Event_Collection
+     * @return Collection
      */
     public function getEvent($eventId) {}
 

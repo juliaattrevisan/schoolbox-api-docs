@@ -8,7 +8,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Renderer
+class Collection_Lister extends Collection_Renderer
 {
 
     /**
@@ -54,7 +54,7 @@ class Calendar_Event_Collection_Lister extends Calendar_Event_Collection_Rendere
      */
     private function detonate()
     {
-        $collection = new \Calendar_Event_Collection();
+        $collection = new \Collection();
 
         foreach ($this->getAllEvents() as $currentEvent) {
 

@@ -19,9 +19,12 @@ use Calendar\Event\Type\EventInterface;
 
 class Event extends EventBase implements EventInterface {
 
-    /* Renderer
+    /**
+     * Renderer classes
      */
-    protected $rendererClass = 'Calendar_Event_Type_Submission_Renderer_Javascript';
+    protected $renderClasses = array(   'javascript'    => Renderer\Javascript::class,
+                                        'html'          => Renderer\Html::class,
+    );
 
 
     /* Contextual: The owner of the submission box

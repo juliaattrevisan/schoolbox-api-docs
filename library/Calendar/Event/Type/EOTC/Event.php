@@ -1,10 +1,6 @@
 <?php
 /**
- * Calendar_Event_Type_Day
- *
- * Uses the Visitor pattern to render via an external class, finally decoupling
- * the data structure from rendering methodology in a highly granular environment
- * without needing to use singletons.
+ * Standard EOTC event for display in the calendar
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
@@ -12,15 +8,20 @@
  * @version     SVN: $Id$
  */
 namespace Calendar\Event\Type\EOTC;
+
 use Calendar\Event\Type\EventBase;
 use Calendar\Event\Type\EventInterface;
 
 
 class Event extends EventBase implements EventInterface {
 
-    /* Renderer
+    /**
+     * Renderer classes
+     * @var array
      */
-    protected $rendererClass = 'Calendar_Event_Type_EOTC_Renderer_Javascript';
+    protected $renderClasses = array(   'javascript'    => Renderer\Javascript::class,
+                                        'html'          => Renderer\Html::class,
+    );
 
     /* Attendance flag
      */

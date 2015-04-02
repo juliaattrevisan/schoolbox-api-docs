@@ -7,6 +7,8 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
+use Calendar\Event\Collection;
+
 class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventType_Abstract {
 
 	/**
@@ -33,7 +35,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	 * @param int $startTimestamp
 	 * @param int $endTimestamp
 	 *
-	 * @return Calendar_Event_Collection
+	 * @return \Calendar\Event\Collection
 	 */
 	public function getEvents($startTimestamp, $endTimestamp) {
 		$collection = $this->getEventsFromCalendarHandler($startTimestamp, $endTimestamp);
@@ -57,7 +59,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	 * @param int $startTimestamp
 	 * @param int $endTimestamp
 	 *
-	 * @return Calendar_Event_Collection
+	 * @return \Calendar\Event\Collection
 	 */
 	protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp) {
 		return $this->getCalendarHandler()->getDayEvents(
@@ -73,7 +75,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	 * (by /www/calendar/ajax/create.php, to display a new event)
 	 *
 	 * @param $eventId
-	 * @return Calendar_Event_Collection
+	 * @return \Calendar\Event\Collection
 	 */
 	public function getEvent($eventId) {
 		return $this->getCalendarHandler()->getDayEvents(

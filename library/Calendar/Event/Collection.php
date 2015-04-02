@@ -1,6 +1,6 @@
 <?php
 /**
- * Calendar_Event_Collection
+ * Collection
  *
  * A container for subclasses of Calendar_Event_Abstract.
  *
@@ -19,7 +19,7 @@
 namespace Calendar\Event;
 use Calendar\Event\Type\EventBase;
 
-class Collection implements Iterator, Countable {
+class Collection implements \Iterator, \Countable {
 
 	/**
 	 * A bunch of EventBase subclasses

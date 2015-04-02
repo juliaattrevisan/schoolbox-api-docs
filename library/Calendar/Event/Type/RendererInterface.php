@@ -32,4 +32,13 @@ interface RendererInterface {
      * @return EventBase
      */
     public function getEvent();
+
+    /**
+     * Is this event visible by this user, sometimes we can't tell till we render if we should show it
+     * or not apparently.  Would of thought that this would of been solved in the collection, but it might be render
+     * specific
+     *
+     * @return bool
+     */
+    public function isVisible();
 }

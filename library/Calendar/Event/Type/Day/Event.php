@@ -1,10 +1,9 @@
 <?php
 /**
- * Calendar_Event_Type_Day
+ * Implementation of our standard day event in Schoolbox.
+ * Note this events can be campus, group or personal events.
  *
- * Uses the Visitor pattern to render via an external class, finally decoupling
- * the data structure from rendering methodology in a highly granular environment
- * without needing to use singletons.
+ * Other event systems also use psuedo versions of this event timetable, sharepoint and Vcal
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
@@ -99,7 +98,7 @@ class Event extends EventBase implements EventInterface {
      * Renderer classes
      */
     protected $renderClasses = array(   'javascript'    => Renderer\Javascript::class,
-                                        'html'          => Renderer\ListHTML::class,
+                                        'html'          => Renderer\Html::class,
                                     );
 
     /**

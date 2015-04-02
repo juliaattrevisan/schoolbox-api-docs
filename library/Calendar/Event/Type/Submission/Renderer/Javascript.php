@@ -9,20 +9,24 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_Type_Renderer_Abstract
+namespace Calendar\Event\Type\Submission\Renderer;
+
+use Calendar\Event\Type\RendererBase;
+
+class Javascript extends RendererBase
 {
 
     /**
      * Visitor
      *
-     * @param $currentEvent
+     * @param $this->getEvent()
      */
-    public function visit($currentEvent)
+    public function render()
     {
-        if ($this->isVisible($currentEvent)) {
+        if ($this->isVisible($this->getEvent())) {
             /* Future events are visible to superusers, event owners, group members with write access
              */
-//            if ($currentEvent->getPublishDate()->getUnixTimestamp() >= time()) {
+//            if ($this->getEvent()->getPublishDate()->getUnixTimestamp() >= time()) {
 //                $cssClass = 'translucent';
 //            } else {
 //                $cssClass = '';
@@ -30,7 +34,7 @@ class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_
 
             /* Modify link. Should be templated...
              */
-            if ($currentEvent->getIsEditable() && ($currentEvent->getEventId() > -1)) {
+            if ($this->getEvent()->getIsEditable() && ($this->getEvent()->getEventId() > -1)) {
                 $editable = true;
             } else {
                 $editable = false;
@@ -38,9 +42,9 @@ class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_
 
             /* Show a homepage if appropriate
              */
-            if ($currentEvent->getCategoryId() > 0) {
-                $categoryId   = $currentEvent->getCategoryId();
-                $categoryName = $currentEvent->getCategoryName();
+            if ($this->getEvent()->getCategoryId() > 0) {
+                $categoryId   = $this->getEvent()->getCategoryId();
+                $categoryName = $this->getEvent()->getCategoryName();
             } else {
                 $categoryId   = '';
                 $categoryName = '';
@@ -55,23 +59,23 @@ class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_
 
             /* Congeal all that stuff
              */
-            $start   = $currentEvent->getStartTime()->getDatabaseDate();
-            $all_day = $currentEvent->getAllDay();
+            $start   = $this->getEvent()->getStartTime()->getDatabaseDate();
+            $all_day = $this->getEvent()->getAllDay();
             if (!$all_day) {
-                $start .= ' ' . $currentEvent->getStartTime()->getDatabaseTime();
+                $start .= ' ' . $this->getEvent()->getStartTime()->getDatabaseTime();
             }
 
             // Set classes
             $classes = array(
                 'group' . $categoryId,
-                'type' . $currentEvent->getType(),
+                'type' . $this->getEvent()->getType(),
             );
-            if (($connectorId = $currentEvent->getConnectorId()) > 0) {
+            if (($connectorId = $this->getEvent()->getConnectorId()) > 0) {
                 $classes[] = 'source' . $connectorId;
             }
 
             $event = array(
-                'title'     => $currentEvent->getTitle(),
+                'title'     => $this->getEvent()->getTitle(),
                 'start'     => "$start",
                 'end'       => "",
                 /* Whether you can edit this event or not
@@ -86,22 +90,22 @@ class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_
                 'allDay'    => $all_day,
                 /* Colour of the event
                  */
-                'color'     => $currentEvent->getColour(),
+                'color'     => $this->getEvent()->getColour(),
                 'className' => $classes,
                 /* Extra data that the Event Object doesn't directly support
                  */
                 'data'      => array(
                     'meta'       => array(
-                        'eventId'   => $currentEvent->getEventId(),
-                        'time'      => $currentEvent->getTime(),
-                        'detail'    => Scrub::html($currentEvent->getSubmissionBoxDetail()),
-                        'location'  => $currentEvent->getLocation(),
-                        'eventType' => 'type' . $currentEvent->getType(),
-                        'type'      => $currentEvent->getEventType(),
-                        'author'    => $currentEvent->getAuthorName(),
-                        'authorId'  => $currentEvent->getAuthorId(),
-                        'level'     => $currentEvent->getDerivedEventLevel(),
-                        'completed' => $currentEvent->getCompleted(),
+                        'eventId'   => $this->getEvent()->getEventId(),
+                        'time'      => $this->getEvent()->getTime(),
+                        'detail'    => Scrub::html($this->getEvent()->getSubmissionBoxDetail()),
+                        'location'  => $this->getEvent()->getLocation(),
+                        'eventType' => 'type' . $this->getEvent()->getType(),
+                        'type'      => $this->getEvent()->getEventType(),
+                        'author'    => $this->getEvent()->getAuthorName(),
+                        'authorId'  => $this->getEvent()->getAuthorId(),
+                        'level'     => $this->getEvent()->getDerivedEventLevel(),
+                        'completed' => $this->getEvent()->getCompleted(),
                     ),
                     'links'      => array(
                         'category' => array(
@@ -110,7 +114,7 @@ class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_
                         )
                     ),
                     'styles'     => array(
-                        'visible' => $this->isVisible($currentEvent),
+                        'visible' => $this->isVisible($this->getEvent()),
                     ),
                     'attendance' => array(
                         'icon'          => $hasIcon,
@@ -121,8 +125,7 @@ class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_
                 )
             );
 
-            echo json_encode($event);
-            echo ",";
+            return json_encode($event).',';
         }
     }
 }

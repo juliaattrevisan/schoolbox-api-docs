@@ -1,6 +1,6 @@
 <?php
 /**
- * Calendar_Event_Collection_Renderer
+ * Collection_Renderer
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
@@ -47,7 +47,7 @@ class Renderer {
 	/*
 	 */
 	/**
-	 * Mega-stack Calendar_Event_Collection instance which stores all events
+	 * Mega-stack Collection instance which stores all events
 	 *
 	 * @var Collection
 	 */
@@ -97,7 +97,7 @@ class Renderer {
 
 		foreach($this->getAllEvents() as $currentEvent) {
 			$rendererClass = $currentEvent->getRendererClass($type);
-			$renderObj = new $rendererClass($this->getPage(),$currentEvent);
+			$renderObj = new $rendererClass($this->getPage(),$currentEvent, $_SESSION['user']);
 			$output .= $renderObj->render();
 		}
 

@@ -424,21 +424,22 @@ abstract class EventBase implements EventInterface
     /**
      * Set renderer class
      *
-     * @param $rendererClass
+     * @param string $rendererClass
      */
-    public function setRendererClass($rendererClass)
+    public function setRendererClass($renderClasses)
     {
-        $this->rendererClass = $rendererClass;
+        $this->renderClasses = $renderClasses;
     }
 
     /**
      * Get renderer class
      *
+     * @param string
      * @return string
      */
     public function getRendererClass($type)
     {
-        return $this->rendererClass[$type];
+        return $this->renderClasses[$type];
     }
 
     /**
