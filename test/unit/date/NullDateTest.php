@@ -35,12 +35,24 @@ class NullDateTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test properties of non-null datetimes
+     */
+    public function testNonNullDateProperties()
+    {
+        $nonNullDate = $this->buildDateObject('2014-03-13', Alaress_Date_NullDate::DATABASE_DATE_FORMAT);
+        $this->assertNotEquals('', "$nonNullDate");
+        $this->assertFalse($nonNullDate->isNull());
+        $this->assertTrue($nonNullDate->isValid());
+    }
+
+    /**
      * Test properties of null datetimes
      */
-    public function testProperties()
+    public function testNullDateProperties()
     {
         $nullDate = new Alaress_Date_NullDate();
         $this->assertEquals('', "$nullDate");
+        $this->assertTrue($nullDate->isNull());
         $this->assertTrue($nullDate->isValid());
     }
 
