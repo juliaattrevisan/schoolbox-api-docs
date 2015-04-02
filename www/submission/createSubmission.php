@@ -10,6 +10,8 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 
+/** @var SitePage $this */
+
 $this->setFile(TEMPLATE_content, 'submission/createSubmission.html');
 $this->setTab('submission');
 
@@ -372,6 +374,10 @@ $output = array(
         'sub/curriculumCodeSelector.twig',
         ['codeList' => $submission->getCurriculumNodes()]
     ),
+    'TIMETABLE_SELECTOR' => $this->getTwig()->render(
+        'sub/timetableSelector.twig',
+        ['campus' => array(), 'selectButtons' => true,]
+    )
 );
 
 $this->setVar($output);

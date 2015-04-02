@@ -391,6 +391,16 @@
                 window.location = '/submission/submissionForm.php?deleteBox={ID}&next=2';
             }
         });
+
+        // Set up select from timetable thing
+        var timetableSelectorDialog = $('#timetableSelectorDialog').dialog({
+            modal: true,
+            hide: true
+        });
+        form.on('click', 'a[data-interaction="selectTimetableDate"]', function(event) {
+            event.preventDefault();
+            timetableSelectorDialog.dialog('open');
+        });
     });
 </script>
 <!-- END custom_head -->
@@ -686,3 +696,7 @@
 <!-- END delete_button -->
 
 </form>
+
+<div id="timetableSelectorDialog" class="hide" title="Choose a date from timetable">
+    {TIMETABLE_SELECTOR}
+</div>
