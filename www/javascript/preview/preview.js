@@ -48,35 +48,43 @@
 
         /**
          * Preview
+         *
+         * Only apply to left-click events (though IE can't seem to
+         * tell the difference)
          */
         function preview() {
             $(config.element).click(function(event) {
-                event.preventDefault();
+                if (event.which == 1) {
+                    event.preventDefault();
 
-                $.magnificPopup.open({
-                    items: {
-                        src: "<div class='preview loader'>Loading data...</div>",
-                        type: 'inline'
-                    }
-                });
+                    $.magnificPopup.open({
+                        items: {
+                            src: "<div class='preview loader'>Loading data...</div>",
+                            type: 'inline'
+                        }
+                    });
 
-                var url = config.baseUrl + '/' + encodeURIComponent($(this).attr(config.attribute));
+                    var url = config.baseUrl + '/' + encodeURIComponent($(this).attr(config.attribute));
 
-                $.get(url, function(response) {
-                    $.magnificPopup.close();
+                    $.get(url, function(response) {
+                        $.magnificPopup.close();
 
-                    if (response.type == 'redirect') {
-                        window.location.href = response.fragment;
-                    }
-                    else {
-                        $.magnificPopup.open({
-                            items: {
-                                src: "<div class='preview fragment'>" + response.fragment + "</div>",
-                                type: 'inline'
-                            }
-                        });
-                    }
-                });
+                        if (response.type == 'redirect') {
+                            window.location.href = response.fragment;
+                        }
+                        else {
+                            $.magnificPopup.open({
+                                items: {
+                                    src: "<div class='preview fragment'>" + response.fragment + "</div>",
+                                    type: 'inline'
+                                }
+                            });
+                        }
+                    });
+                }
+                else {
+                    console.log(event.which + 'mort');
+                }
             });
         }
     }
