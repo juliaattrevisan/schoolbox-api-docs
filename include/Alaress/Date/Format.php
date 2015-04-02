@@ -214,9 +214,20 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
                 );
             }
 
+            $errors      = [];
             $newTimezone = $timezone ?: $this->getDefaultTimezone();
-            $newDateTime = DateTime::createFromFormat($inputDateFormat, $dateTime, $newTimezone);
-            $errors = DateTime::getLastErrors();
+            if ($inputDateFormat === 'U') {
+                // Timestamp special case handling - make it work with negative datetimes
+                $newDateTime = new DateTime('now', $newTimezone);
+                $newDateTime->setTimestamp($dateTime);
+                $errors['errors']        = [];
+                $errors['warnings']      = [];
+                $errors['error_count']   = 0;
+                $errors['warning_count'] = 0;
+            } else {
+                $newDateTime = DateTime::createFromFormat($inputDateFormat, $dateTime, $newTimezone);
+                $errors      = DateTime::getLastErrors();
+            }
             if ($errors['error_count']) {
                 // I don't have a datetime, try again with trailing data allowed
                 $newDateTime = DateTime::createFromFormat($inputDateFormat . '+', $dateTime, $newTimezone);
