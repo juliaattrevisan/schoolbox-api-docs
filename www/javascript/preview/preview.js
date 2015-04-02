@@ -54,7 +54,7 @@
          */
         function preview() {
             $(config.element).click(function(event) {
-                if (event.which == 1) {
+                if (event.which <= 1) {
                     event.preventDefault();
 
                     $.magnificPopup.open({
@@ -81,9 +81,6 @@
                             });
                         }
                     });
-                }
-                else {
-                    console.log(event.which + 'mort');
                 }
             });
         }
