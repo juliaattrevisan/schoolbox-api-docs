@@ -76,7 +76,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
                     break;
                 }
 
-                /** @var Calendar_Event_Type_Day $eventObject */
+                /** @var Event $eventObject */
                 $eventId = $eventObject->getEventId();
                 $output  = array(
                     'CAL_DATE'      => $eventObject->getEventSpan(),

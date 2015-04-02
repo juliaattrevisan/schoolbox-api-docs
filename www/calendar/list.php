@@ -64,7 +64,7 @@ $this->setVar(
 );
 
 // Extend finish by one day for search
-$calendar = new Calendar_Event_Collection_Lister(
+$calendar = new Collection_Lister(
     $api,
     $start->getUnixTimestamp(),
     $finish->addDays(1)->getUnixTimestamp(),

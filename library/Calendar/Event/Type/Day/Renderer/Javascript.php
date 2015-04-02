@@ -9,8 +9,6 @@
 namespace Calendar\Event\Type\Day\Renderer;
 
 class Javascript extends Base {
-
-
 	public function render() {
 		if ($this->isVisible()) {
 

@@ -425,7 +425,7 @@ class API extends Generic\API
         $user            = $user ? : $_SESSION['user'];
         $calFactory      = new Calendar_Api_Factory($user);
         $calendarHandler = $calFactory->produce();
-        /** @var Calendar_Event_Type_Abstract[]|\Calendar_Event_Collection $eventList */
+        /** @var Calendar_Event_Type_Abstract[]|\Collection $eventList */
         $eventList = $calendarHandler->getEvents($start, $end);
         $eventList->sort();
 

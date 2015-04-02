@@ -85,7 +85,7 @@ try {
     //
     // API should always be a Calendar_Api_EventType_Interface object, no need
     // to check.
-    $exporter = new Calendar_Event_Collection_Exporter(
+    $exporter = new Collection_Exporter(
         $api,
         $_SERVER['REQUEST_TIME'],
         strtotime('+6 months', $_SERVER['REQUEST_TIME']),

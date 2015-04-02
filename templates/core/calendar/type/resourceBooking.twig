@@ -1,0 +1,44 @@
+<li class="clearfix">
+    <span class="eventListing"><strong>{{ event.getTime() }}</strong> <span style="background-color:{{ event.colour }}">{{ event.title }}<span
+            class="float-right">A</span><!-- END attendance_icon --></span></span>
+
+    <div class="hidden-fields clearfix">
+        <h3>{{ event.title }}</h3>
+        <h4>{{ event.eventType }}: {{ event.getStartTime()->getLong() }}</h4>
+        <em>{{ event.location }}</em>
+
+        <p class="meta">
+            {{ event.detail|raw}}
+
+        <div class="created">
+            {% if event.author %}
+            Posted by <a href="/search/user/{{ event.authorId }}">{{ event.author }}</a>
+            {% endif %}
+
+            {% if event.category %}
+            in <a href='/homepage/{{ event.categoryId }}'>{{ event.categoryName }}</a>
+            {% endif %}
+        </div>
+        </p>
+        {% if event.attendance %}
+        <p class="meta">Attendance Status: {ATTENDANCE_STATUS}</p>
+        {% endif %}
+        <div>
+            {% if event.attendance %}
+            <form method="post">
+                <input name="event[id]" type="hidden" value="{EVENT_ID}">
+                <a class="btn modify float-left attendance-request" href="#"><span></span>{ATTENDANCE_REQUEST_ACTION}</a>
+            </form>
+            {% endif %}
+
+            {%if event.attendance and event.isEditable %}
+            <a class="btn groups float-left"
+               href="/calendar/attendance/list/{EVENT_ID}"><span></span>Attendance List</a>
+            <!-- END attendance_list_button -->
+
+            {% if event.isEditable %}
+            <a class="btn modify float-left" href="/calendar/modify.php?eventID={{ event.eventId }}&returnTo=calendar"><span></span>Modify</a>
+            {% endif %}
+        </div>
+    </div>
+</li>

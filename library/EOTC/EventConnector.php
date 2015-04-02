@@ -28,7 +28,7 @@ class EventConnector extends EventMapper
      *
      * @param $eventId
      *
-     * @return \Calendar_Event_Collection
+     * @return \Collection
      */
     public function getEvent($eventId)
     {
@@ -51,7 +51,7 @@ class EventConnector extends EventMapper
 
         $row = $statement->fetch();
 
-        $collection = new \Calendar_Event_Collection();
+        $collection = new \Collection();
 
         if ($row) {
             /** @var Event $eventItem */
@@ -148,7 +148,7 @@ class EventConnector extends EventMapper
      * @param $startTimestamp
      * @param $endTimestamp
      *
-     * @return \Calendar_Event_Collection
+     * @return \Collection
      */
     public function getDayEvents($startTimestamp, $endTimestamp)
     {
@@ -178,7 +178,7 @@ class EventConnector extends EventMapper
         $statement->bindParam(":endTimestamp", $endTimestamp);
         $statement->execute();
 
-        $collection = new \Calendar_Event_Collection();
+        $collection = new \Collection();
 
         /* Anyone in the EOTC permissions sytem can also see it
          * We don't need to iterate with this, since $user doesn't

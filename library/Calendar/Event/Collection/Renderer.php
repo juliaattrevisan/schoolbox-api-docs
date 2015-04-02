@@ -2,9 +2,9 @@
 /**
  * Collection_Renderer
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
+ * @link        http://www.alaress.com.au/
  */
 
 namespace Calendar\Event\Collection;
@@ -13,196 +13,214 @@ use Calendar_Api_EventType_Interface;
 use SitePage;
 use Calendar\Event\Collection;
 
-class Renderer {
-	protected $interfaceClass = 'Calendar_Api_EventType_Interface';
+class Renderer
+{
+    protected $interfaceClass = 'Calendar_Api_EventType_Interface';
 
-	/**
-	 * An instance of a Calendar API class
-	 *
-	 * @var Calendar_Api_EventType_Interface
-	 */
-	protected $api = null;
+    /**
+     * An instance of a Calendar API class
+     *
+     * @var Calendar_Api_EventType_Interface
+     */
+    protected $api = null;
 
-	/**
-	 * A unix timestamp
-	 *
-	 * @var int
-	 */
-	protected $startTimestamp = -1;
+    /**
+     * A unix timestamp
+     *
+     * @var int
+     */
+    protected $startTimestamp = -1;
 
-	/**
-	 * A unix timestamp
-	 *
-	 * @var int
-	 */
-	protected $endTimestamp = -1;
+    /**
+     * A unix timestamp
+     *
+     * @var int
+     */
+    protected $endTimestamp = -1;
 
-	/**
-	 * An instance of sitepage
-	 *
-	 * @var SitePage
-	 */
-	protected $page = null;
+    /**
+     * An instance of sitepage
+     *
+     * @var SitePage
+     */
+    protected $page = null;
 
-	/*
-	 */
-	/**
-	 * Mega-stack Collection instance which stores all events
-	 *
-	 * @var Collection
-	 */
-	protected $allEvents = null;
+    /*
+     */
+    /**
+     * Mega-stack Collection instance which stores all events
+     *
+     * @var Collection
+     */
+    protected $allEvents = null;
 
-	/**
-	 * Constructor
-	 *
-	 * @param $api
-	 * @param $startTimestamp
-	 * @param $endTimestamp
-	 * @param $page
-	 */
-	public function __construct($api, $startTimestamp, $endTimestamp, $page) {
-		$this->setApi($api);
-		$this->setStartTimestamp($startTimestamp);
-		$this->setEndTimestamp($endTimestamp);
-		$this->setPage($page);
+    /**
+     * Constructor
+     *
+     * @param $api
+     * @param $startTimestamp
+     * @param $endTimestamp
+     * @param $page
+     */
+    public function __construct($api, $startTimestamp, $endTimestamp, $page)
+    {
+        $this->setApi($api);
+        $this->setStartTimestamp($startTimestamp);
+        $this->setEndTimestamp($endTimestamp);
+        $this->setPage($page);
 
-		$this->setAllEvents(new Collection());
+        $this->setAllEvents(new Collection());
 
-		$this->collectAllEvents();
-	}
+        $this->collectAllEvents();
+    }
 
-	/**
-	 * Collects all events from everywhere, for the current day
-	 */
-	protected function collectAllEvents() {
-		$eventList = $this->getApi()->getEvents($this->getStartTimestamp(), $this->getEndTimestamp());
+    /**
+     * Collects all events from everywhere, for the current day
+     */
+    protected function collectAllEvents()
+    {
+        $eventList = $this->getApi()->getEvents($this->getStartTimestamp(), $this->getEndTimestamp());
 
-		/* Only attempt to merge collections
-		 */
-		if ($eventList instanceof Collection) {
-			$this->getAllEvents()->merge($eventList);
-		}
+        /* Only attempt to merge collections
+         */
+        if ($eventList instanceof Collection) {
+            $this->getAllEvents()->merge($eventList);
+        }
 
-		/* Sort all the events in order of time
-		 */
-		$this->getAllEvents()->sort();
-	}
+        /* Sort all the events in order of time
+         */
+        $this->getAllEvents()->sort();
+    }
 
-	/**
-	 * Render all events
-	 */
-	public function renderAll($type) {
-		$output = '';
-
-		foreach($this->getAllEvents() as $currentEvent) {
-			$rendererClass = $currentEvent->getRendererClass($type);
-			$renderObj = new $rendererClass($this->getPage(),$currentEvent, $_SESSION['user']);
-			$output .= $renderObj->render();
-		}
-
+    /**
+     * Render all events
+     */
+    public function renderAll($type)
+    {
+        $output = '';
+        foreach ($this->getAllEvents() as $currentEvent) {
+            $output .= $this->renderEvent($currentEvent);
+        }
         return $output;
-	}
+    }
 
-	/* Getters/Setters
-	 */
+    public function renderEvent($event)
+    {
+        $rendererClass = $event->getRendererClass($type);
+        $renderObj = new $rendererClass($this->getPage(), $event, $_SESSION['user']);
+        return $renderObj->render();
+    }
 
-	/**
-	 * Set api
-	 *
-	 * @param Calendar_Api_EventType_Interface $api
-	 */
-	protected function setApi($api) {
-		$this->api = $api;
-	}
+    /* Getters/Setters
+     */
 
-	/**
-	 * Get api
-	 *
-	 * @return Calendar_Api_EventType_Interface
-	 */
-	protected function getApi() {
-		return $this->api;
-	}
+    /**
+     * Set api
+     *
+     * @param Calendar_Api_EventType_Interface $api
+     */
+    protected function setApi($api)
+    {
+        $this->api = $api;
+    }
 
-	/**
-	 * Set end timestamp
-	 *
-	 * @param int $endTimestamp
-	 */
-	protected function setEndTimestamp($endTimestamp) {
-		$this->endTimestamp = $endTimestamp;
-	}
+    /**
+     * Get api
+     *
+     * @return Calendar_Api_EventType_Interface
+     */
+    protected function getApi()
+    {
+        return $this->api;
+    }
 
-	/**
-	 * Get end timestamp
-	 *
-	 * @return int
-	 */
-	protected function getEndTimestamp() {
-		return $this->endTimestamp;
-	}
+    /**
+     * Set end timestamp
+     *
+     * @param int $endTimestamp
+     */
+    protected function setEndTimestamp($endTimestamp)
+    {
+        $this->endTimestamp = $endTimestamp;
+    }
 
-	/**
-	 * Set start timestamp
-	 *
-	 * @param int $startTimestamp
-	 */
-	protected function setStartTimestamp($startTimestamp) {
-		$this->startTimestamp = $startTimestamp;
-	}
+    /**
+     * Get end timestamp
+     *
+     * @return int
+     */
+    protected function getEndTimestamp()
+    {
+        return $this->endTimestamp;
+    }
 
-	/**
-	 * Get start timestamp
-	 *
-	 * @return int
-	 */
-	protected function getStartTimestamp() {
-		return $this->startTimestamp;
-	}
+    /**
+     * Set start timestamp
+     *
+     * @param int $startTimestamp
+     */
+    protected function setStartTimestamp($startTimestamp)
+    {
+        $this->startTimestamp = $startTimestamp;
+    }
 
-	/**
-	 * Set page
-	 *
-	 * @param $page
-	 */
-	protected function setPage($page) {
-		$this->page = $page;
-	}
+    /**
+     * Get start timestamp
+     *
+     * @return int
+     */
+    protected function getStartTimestamp()
+    {
+        return $this->startTimestamp;
+    }
 
-	/**
-	 * Get page
-	 *
-	 * @return null
-	 */
-	protected function getPage() {
-		return $this->page;
-	}
+    /**
+     * Set page
+     *
+     * @param $page
+     */
+    protected function setPage($page)
+    {
+        $this->page = $page;
+    }
 
-	/**
-	 * Set all events
-	 *
-	 * @param Collection $allEvents
-	 */
-	protected function setAllEvents($allEvents) {
-		$this->allEvents = $allEvents;
-	}
+    /**
+     * Get page
+     *
+     * @return null
+     */
+    protected function getPage()
+    {
+        return $this->page;
+    }
 
-	/**
-	 * Get all events
-	 *
-	 * @return Collection
-	 */
-	protected function getAllEvents() {
-		return $this->allEvents;
-	}
+    /**
+     * Set all events
+     *
+     * @param Collection $allEvents
+     */
+    protected function setAllEvents($allEvents)
+    {
+        $this->allEvents = $allEvents;
+    }
 
-	/**
-	 * The interface which defines accessible methods
-	 *
-	 * @return string
-	 */
-	public function getInterfaceClass() {
-		return $this->interfaceClass;
-	}
+    /**
+     * Get all events
+     *
+     * @return Collection
+     */
+    public function getAllEvents()
+    {
+        return $this->allEvents;
+    }
+
+    /**
+     * The interface which defines accessible methods
+     *
+     * @return string
+     */
+    public function getInterfaceClass()
+    {
+        return $this->interfaceClass;
+    }
 }

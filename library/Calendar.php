@@ -1,5 +1,8 @@
 <?php
 
+use Calendar\Event\Collection;
+use Calendar\Event\Type\Day\Event;
+
 class Calendar extends DeprecatedModel
 {
 
@@ -463,7 +466,7 @@ class Calendar extends DeprecatedModel
 
         /* Standardised output
          */
-        $stack = new Calendar_Event_Collection();
+        $stack = new Collection();
 
         if (is_array($submissions) && count($submissions)) {
             foreach ($submissions as $submission) {
@@ -606,7 +609,7 @@ class Calendar extends DeprecatedModel
      *                                * id: if set, only this event ID will be retrieved.
      *                                If empty, all events for user are retrieved.
      *
-     * @return Calendar_Event_Collection
+     * @return Collection
      */
     public function getDayEvents($user, $startTimestamp, $endTimestamp, $filter = array())
     {
@@ -759,11 +762,11 @@ class Calendar extends DeprecatedModel
 
         /* Standardised output
          */
-        $stack = new Calendar_Event_Collection();
+        $stack = new Collection();
 
         if (is_array($allEvents) && count($allEvents)) {
             foreach ($allEvents as $currentEvent) {
-                $event = new Calendar_Event_Type_Day();
+                $event = new Event();
 
                 $event->setAuthorName($currentEvent['firstname'] . ' ' . $currentEvent['lastname']);
                 $event->setAuthorId($currentEvent['uid']);
