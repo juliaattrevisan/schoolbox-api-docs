@@ -801,6 +801,6 @@ class Page implements ISoftDeletable{
 	 * @return bool
 	 */
 	public function isDeleted() {
-		return ($this->getDeletedAt() instanceof \Alaress_Date_Format);
+		return ($this->getDeletedAt() instanceof \Alaress_Date_Format && !$this->getDeletedAt()->isNull());
 	}
 }

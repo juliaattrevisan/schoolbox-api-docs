@@ -203,6 +203,7 @@ abstract class AbstractFile implements IFile, ISoftDeletable
     public function isDeleted()
     {
         return $this->deletedAt instanceof Alaress_Date_Format
+            && !$this->getDeletedAt()->isNull()
             && $this->deletedAt->getUnixTimestamp() < Alaress_Date_Format::now()->getUnixTimestamp();
     }
 
