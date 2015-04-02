@@ -15,17 +15,6 @@ class Datetime implements IColumnType {
 	protected $input_format  = 'Y-m-d H:i:s';
 	protected $output_format = 'Y-m-d H:i:s';
 
-//	/**
-//	 * @param string $value
-//	 *
-//	 * @return \DateTime
-//	 */
-//	protected function getInputDate($value) {
-//		//
-//		// ! in front of format sets all fields back to Unix epoch until reset.
-//		return DateObject::createFromFormat('!'.$this->input_format, $value);
-//	}
-
 	/**
 	 * @param string            $value
 	 * @param \Schoolbox\Mapper $mapper
