@@ -90,6 +90,11 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
     {
         $this->setCycleLength($campus->getTimetableDay());
+
+        if (!$date) {
+            $date = $_SERVER['REQUEST_TIME'];
+        }
+
         /* Convert from timestamp to datetime
          */
         if ($date) {
@@ -105,6 +110,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
                 )
             );
             $result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+
             if ($result['success'] && count($result['result'])) {
                 return $result['result'][0]['DayNumber'];
             }
