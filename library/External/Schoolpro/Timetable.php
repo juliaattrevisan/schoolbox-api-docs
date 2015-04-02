@@ -240,8 +240,8 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
              */
             for ($x = 0; isset($definition['desc'][$x]); $x++) {
                 $timetable[$x]['periodName'] = $definition['desc'][$x];
-                $timetable[$x]['periodStart'] = $definition['start'][$x];
-                $timetable[$x]['periodEnd'] = $definition['end'][$x];
+                $timetable[$x]['periodStart'] = substr($definition['start'][$x], 0, 5);
+                $timetable[$x]['periodEnd'] = substr($definition['end'][$x], 0, 5);
                 $timetable[$x]['periodNumber'] = $definition['number'][$x];
                 $timetable[$x]['periodSequence'] = $definition['sequence'][$x];
                 $timetable[$x]['class'] = array();
