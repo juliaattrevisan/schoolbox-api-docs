@@ -15,29 +15,32 @@ class Datetime implements IColumnType {
 	protected $input_format  = 'Y-m-d H:i:s';
 	protected $output_format = 'Y-m-d H:i:s';
 
-	/**
-	 * @param string $value
-	 *
-	 * @return \DateTime
-	 */
-	protected function getInputDate($value) {
-		//
-		// ! in front of format sets all fields back to Unix epoch until reset.
-		return DateObject::createFromFormat('!'.$this->input_format, $value);
-	}
+//	/**
+//	 * @param string $value
+//	 *
+//	 * @return \DateTime
+//	 */
+//	protected function getInputDate($value) {
+//		//
+//		// ! in front of format sets all fields back to Unix epoch until reset.
+//		return DateObject::createFromFormat('!'.$this->input_format, $value);
+//	}
 
 	/**
 	 * @param string            $value
 	 * @param \Schoolbox\Mapper $mapper
 	 *
-	 * @return \DateWrapper
+	 * @return DateWrapper
 	 */
 	public function hydrate($value, $mapper = null) {
-		$input_date = $this->getInputDate($value);
-		if ($input_date instanceof DateObject) {
-			return new DateWrapper($input_date, $this->input_format);
-		}
-		return false;
+        if (!isset($value)) {
+            return new \Alaress_Date_NullDate();
+        }
+        try {
+            return new DateWrapper($value, $this->input_format);
+        } catch (\Exception $e) {
+            return new \Alaress_Date_NullDate();
+        }
 	}
 
 	/**
@@ -51,6 +54,9 @@ class Datetime implements IColumnType {
 	 * @return string
 	 */
 	public function dehydrate($value, $mapper = null) {
+        if ($value instanceof \Alaress_Date_NullDate) {
+            return null;
+        }
 		if ($value instanceof DateWrapper) {
 			return $value->getUsingFormat($this->output_format);
 		}
