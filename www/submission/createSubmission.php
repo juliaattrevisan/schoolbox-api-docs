@@ -376,7 +376,10 @@ $output = array(
     ),
     'TIMETABLE_SELECTOR' => $this->getTwig()->render(
         'sub/timetableSelector.twig',
-        ['campus' => array(), 'selectButtons' => true,]
+        [
+            'campusList'    => $_SESSION['user']->getCampusCollection(),
+            'selectButtons' => true,
+        ]
     )
 );
 
