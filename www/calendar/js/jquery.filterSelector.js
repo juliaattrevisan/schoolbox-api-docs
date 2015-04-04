@@ -6,6 +6,7 @@
 
 		applyPopupToggle();
 		applyCheckboxToggle();
+        applyDefaultEventState();
 
 		/**
 		 * Init
@@ -57,13 +58,19 @@
 		/**
 		 * Turn events on/off based on checkbox selection
 		 */
-		function applyDefaultCheckboxState() {
+		function applyDefaultEventState() {
 			$.each($(config.filterContainer).find('.applyFilters'), function(index, element) {
 				var attribute = $(this).val();
 
-				$(element).attr('checked', true);
-				$(config.eventContainer).find('.'+attribute).show();
+				if ($(element).is(':checked')) {
+                    $(config.eventContainer).find('.'+attribute).show();
+                }
+                else {
+                    $(config.eventContainer).find('.'+attribute).hide();
+                }
 			});
+
+            toggleHeaders();
 		}
 
 		/**
