@@ -13,6 +13,8 @@ namespace Schoolbox\Assessment\Component;
 
 use \Alaress_Date_Format;
 use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Collection;
+use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Category;
 use Schoolbox\Role;
@@ -21,6 +23,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 
 class OnlineAssessment implements ISoftDeletable
 {
+    use HasCurriculumNodes;
 
     const AVAILABILITY_ASSESS = 'assess';
     const AVAILABILITY_SURVEY = 'survey';
@@ -130,6 +133,11 @@ class OnlineAssessment implements ISoftDeletable
      * @var int
      */
     protected $mark_visibility = 0;
+
+    public function __construct()
+    {
+        $this->setCurriculumNodes(new Collection());
+    }
 
     /**
      * Is this mark shown to students?
