@@ -15,6 +15,7 @@ use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
+use Schoolbox\Curriculum\Node;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper;
 
@@ -161,6 +162,18 @@ class OnlineAssessmentMapper extends Mapper implements FeedableMapperInterface {
 			'this_key'  => 'task_instance_id',
 			'other_key' => 'id',
 		));
+
+        $this->joinsVia(
+            'curriculum_node_for_assess',
+            Node\Model::class,
+            'id',
+            'curriculum_node_id',
+            'assess_id',
+            null,
+            null,
+            null,
+            'curriculumNodes'
+        );
 
 		$this->hasSoftDeleteDateField('deleted_at');
 

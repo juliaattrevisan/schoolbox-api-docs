@@ -14,6 +14,7 @@ use Schoolbox;
 use Schoolbox\Assessment\Activity;
 use Schoolbox\Collection;
 use Schoolbox\ConfigLoader;
+use Schoolbox\Curriculum\Node;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
@@ -278,6 +279,18 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
             'this_key'  => 'task_instance_id',
             'other_key' => 'id',
         ));
+
+        $this->joinsVia(
+            'curriculum_node_for_assess',
+            Node\Model::class,
+            'id',
+            'curriculum_node_id',
+            'assess_id',
+            null,
+            null,
+            null,
+            'curriculumNodes'
+        );
 
         $this->hasSoftDeleteBooleanField('deleted');
 
