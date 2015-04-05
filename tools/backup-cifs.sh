@@ -248,11 +248,17 @@ then
 	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Error: permission denied errors detected" >> $logfile;
 fi
 
+gethostname=$HOSTNAME;
+if [ -f /etc/puppet/puppet.conf ];
+then
+	gethostname=`grep certname /etc/puppet/puppet.conf | cut -d'=' -f2 | awk '{print $1}'`;
+fi
+
 # On error, email logfile and log fact
 if [ `grep -i error $logfile | wc -l` -ne 0 ];
 then
 	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Sending Email to support@schoolbox.com.au" >> $logfile;
-	mail -s "[`date +%Y-%m-%d\ %H:%M:%S`] Schoolbox Backup on '$HOSTNAME'" support@schoolbox.com.au < $logfile 2>>$logfile;
+	mail -s "[`date +%Y-%m-%d\ %H:%M:%S`] Schoolbox Backup on '$gethostname'" support@schoolbox.com.au < $logfile 2>>$logfile;
 	if [ `echo "$backup_failure_email" | grep '@' | wc -l` -eq 1 ];
 	then
 		echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Sending Email to $backup_failure_email" >> $logfile;
