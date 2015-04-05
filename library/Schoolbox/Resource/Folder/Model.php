@@ -28,6 +28,7 @@ use Schoolbox\UserMapper;
  */
 class Model extends AbstractFolder implements ISoftDeletable
 {
+    use Node\Traits\HasCurriculumNodes;
 
     /**
      * A homepage instance
@@ -42,13 +43,6 @@ class Model extends AbstractFolder implements ISoftDeletable
      * @var Collection|CategoryCode[]
      */
     protected $codes;
-
-    /**
-     * A collection of CurriculumNode instances
-     *
-     * @var Collection|Node\Model[]
-     */
-    protected $curriculumNodes;
 
     /**
      * Deleted at
@@ -219,25 +213,6 @@ class Model extends AbstractFolder implements ISoftDeletable
     public function getCodes()
     {
         return $this->codes;
-    }
-
-    /**
-     * @return Collection|Node\Model[]
-     */
-    public function getCurriculumNodes()
-    {
-        return $this->curriculumNodes;
-    }
-
-    /**
-     * @param  Collection|Node\Model[] $curriculumNodes
-     *
-     * @return $this
-     */
-    public function setCurriculumNodes($curriculumNodes)
-    {
-        $this->curriculumNodes = $curriculumNodes;
-        return $this;
     }
 
     /**
