@@ -132,6 +132,7 @@ if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         ->setWorkType(new SubmissionBox\WorkType())
         ->setMarkType(new SubmissionBox\MarkType())
         ->setMarkVisibility(Config::get('submission_access'))
+        ->setCurriculumNodes($category->getCurriculumNodes())
     ;
     $gradeGroup = new SubmissionBox\GradeLevel\Group\Model();
     $gradeGroup->setId(Config::get('default_grade_group'));
@@ -382,6 +383,7 @@ $output = array(
     'IS_TASK'           => $is_task ? 1 : 0,
     'UNIT_ID'           => $unit_id,
     'TASK_INSTANCE_ID'  => $task_instance_id,
+    'CURRICULUM_CODE_LIST' => json_encode($submission->getCurriculumNodes()),
 );
 
 $this->setVar($output);
