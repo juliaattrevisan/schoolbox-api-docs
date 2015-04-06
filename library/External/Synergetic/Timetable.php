@@ -606,9 +606,16 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      * @return int
      */
     public function getTotalDays(\Schoolbox\Campus $campus) {
-        $query = "SELECT CycleDays FROM luTimetableGroup WHERE Code = '{$campus->getExtTimetableCode()}'";
-        $result = $this->getDatabase()->getRow($query);
-        return $result['CycleDays'];
+
+        if(! isset($this->days[$campus->getExtTimetableCode()])) {
+
+            $query = "SELECT CycleDays FROM luTimetableGroup WHERE Code = '{$campus->getExtTimetableCode()}'";
+            $result = $this->getDatabase()->getRow($query);
+
+            $this->days[$campus->getExtTimetableCode()] = $result['CycleDays'];
+        }
+
+        return $this->days[$campus->getExtTimetableCode()];
     }
 
     /**

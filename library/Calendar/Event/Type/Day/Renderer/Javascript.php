@@ -39,7 +39,7 @@ class Javascript extends Base {
 					}
 				}
 
-				if ($this->getGroupHandler()->isStudent($_SESSION['id'])) {
+				if ($this->getViewer()->getRole()->isStudent()) {
 					if ($attendance = $this->getCalendarHandler()->getAttendanceByEventAndUser($this->event->getEventId(), $_SESSION['id'])) {
 
 						/* Attendance Status
@@ -60,7 +60,7 @@ class Javascript extends Base {
 						$hasAttendanceRequestButton = 'Attend';
 					}
 				}
-				else if ($this->getGroupHandler()->isStaff($_SESSION['id'])) {
+				else if ($this->getViewer()->getRole()->isStaff()) {
 					$hasListButton = true;
 				}
 			}

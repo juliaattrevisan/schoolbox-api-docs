@@ -12,6 +12,7 @@ namespace Calendar\Event\Collection;
 use Calendar_Api_EventType_Interface;
 use SitePage;
 use Calendar\Event\Collection;
+use \Schoolbox\User;
 
 class Renderer
 {
@@ -43,7 +44,25 @@ class Renderer
      *
      * @var SitePage
      */
-    protected $page = null;
+    protected $page;
+
+    /**
+     * @var User
+     */
+    protected $viewer;
+
+    /**
+     * Deprecated group handler for permission checks
+     * when rendering
+     * @var \Group
+     */
+    protected $groupHandler;
+
+    /**
+     * Deprecated calendar handler for permission checks when rendering
+     * @var \Calendar
+     */
+    protected $calendarHandler;
 
     /*
      */
@@ -60,14 +79,20 @@ class Renderer
      * @param $api
      * @param $startTimestamp
      * @param $endTimestamp
-     * @param $page
+     * @param \Schoolbox\User $viewer
+     * @param \SitePage $page
      */
-    public function __construct($api, $startTimestamp, $endTimestamp, $page)
+    public function __construct($api, $startTimestamp, $endTimestamp, User $viewer, \SitePage $page)
     {
         $this->setApi($api);
         $this->setStartTimestamp($startTimestamp);
         $this->setEndTimestamp($endTimestamp);
         $this->setPage($page);
+        $this->setViewer($viewer);
+
+        //TODO remove these deprecated dependencies
+        $this->setGroupHandler(new \Group());
+        $this->setCalendarHandler(new \Calendar());
 
         $this->setAllEvents(new Collection());
 
@@ -106,7 +131,7 @@ class Renderer
     public function renderEvent($event, $type)
     {
         $rendererClass = $event->getRendererClass($type);
-        $renderObj = new $rendererClass($this->getPage(), $event, $_SESSION['user']);
+        $renderObj = new $rendererClass($this->getPage(), $event, $this->getViewer(), $this->getGroupHandler(), $this->getCalendarHandler());
         return $renderObj->render();
     }
 
@@ -176,7 +201,7 @@ class Renderer
     /**
      * Set page
      *
-     * @param $page
+     * @param \SitePage $page
      */
     protected function setPage($page)
     {
@@ -186,7 +211,7 @@ class Renderer
     /**
      * Get page
      *
-     * @return null
+     * @return \SitePage
      */
     protected function getPage()
     {
@@ -222,4 +247,54 @@ class Renderer
     {
         return $this->interfaceClass;
     }
+
+    /**
+     * @param \Calendar $calendarHandler
+     */
+    public function setCalendarHandler($calendarHandler)
+    {
+        $this->calendarHandler = $calendarHandler;
+    }
+
+    /**
+     * @return \Calendar
+     */
+    public function getCalendarHandler()
+    {
+        return $this->calendarHandler;
+    }
+
+    /**
+     * @param \Group $groupHandler
+     */
+    public function setGroupHandler($groupHandler)
+    {
+        $this->groupHandler = $groupHandler;
+    }
+
+    /**
+     * @return \Group
+     */
+    public function getGroupHandler()
+    {
+        return $this->groupHandler;
+    }
+
+    /**
+     * @param User $viewer
+     */
+    public function setViewer($viewer)
+    {
+        $this->viewer = $viewer;
+    }
+
+    /**
+     * @return User
+     */
+    public function getViewer()
+    {
+        return $this->viewer;
+    }
+
+
 }

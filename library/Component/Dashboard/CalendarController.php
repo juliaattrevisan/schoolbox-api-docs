@@ -5,7 +5,6 @@
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
  * @copyright   2011 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
  *
  */
 
@@ -71,7 +70,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
          */
         $eventFactory = new Calendar_Api_Factory($this->user);
         $api = $eventFactory->produce();
-        $this->eventRenderer = new Renderer($api, $this->start->getUnixTimestamp(), $this->end->getUnixTimestamp(), $this->sitepage);
+        $this->eventRenderer = new Renderer($api, $this->start->getUnixTimestamp(), $this->end->getUnixTimestamp(), $this->user, $this->sitepage);
 
         return true;
     }

@@ -4,51 +4,7 @@
     <div class="listing">
         <ul class="js_happening">
             <!-- BEGIN note_block -->
-            <li class="{ON_OFF} clearfix">
-                <span class="eventListing"><strong>{TIME}</strong> <span style="background-color:{COLOUR}">{NOTE} <!-- BEGIN attendance_icon --><span
-                        class="float-right">A</span><!-- END attendance_icon --></span></span>
-
-                <div class="hidden-fields clearfix">
-                    <h3>{NOTE}</h3>
-                    <h4>{TYPE}: {FULL_TIME}</h4>
-                    <em>{LOCATION}</em>
-
-                    <p class="meta">
-                        {DETAIL}
-
-                    <div class="created">
-                        <!-- BEGIN has_posted_by -->
-                        Posted by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a>
-                        <!-- END has_posted_by -->
-
-                        <!-- BEGIN has_category -->
-                        in <a href='/homepage/{HAS_CATEGORY_ID}'>{HAS_CATEGORY_NAME}</a>
-                        <!-- END has_category -->
-                    </div>
-                    </p>
-                    <!-- BEGIN attendance_status -->
-                    <p class="meta">Attendance Status: {ATTENDANCE_STATUS}</p>
-                    <!-- END attendance_status -->
-                    <div>
-                        <!-- BEGIN attendance_request_button -->
-                        <form method="post">
-                            <input name="event[id]" type="hidden" value="{EVENT_ID}">
-                            <a class="btn modify float-left attendance-request" href="#"><span></span>{ATTENDANCE_REQUEST_ACTION}</a>
-                        </form>
-                        <!-- END attendance_request_button -->
-
-                        <!-- BEGIN attendance_list_button -->
-                        <a class="btn groups float-left"
-                           href="/calendar/attendance/list/{EVENT_ID}"><span></span>Attendance List</a>
-                        <!-- END attendance_list_button -->
-
-                        <!-- BEGIN modify_button -->
-                        <a class="btn {MODIFY_TYPE} float-left"
-                           href="{MODIFY_HREF}"><span></span>{MODIFY_ACTION}</a>
-                        <!-- END modify_button -->
-                    </div>
-                </div>
-            </li>
+                <!-- twig calendar events go here -->
             <!-- END note_block -->
         </ul>
 

@@ -37,14 +37,35 @@ class RendererBase implements RendererInterface
     var $page;
 
     /**
+     * Group Handler
+     * TODO: refactor this out
+     *
+     * @var \Group
+     */
+    var $groupHandler;
+
+    /**
+     * Calendar Handler
+     * TODO: refactor this out
+     *
+     * @var \Calendar
+     */
+    var $calendarHandler;
+
+    /**
      * @param SitePage $page
      * @param EventBase $event
      * @param User $viewer
+     * @param
      */
-    public function __construct(SitePage $page, EventBase $event, User $viewer) {
+    public function __construct(SitePage $page, EventBase $event, User $viewer, \Group $groupHandler, \Calendar $calHandler) {
         $this->setPage($page);
         $this->setEvent($event);
         $this->setViewer($viewer);
+
+        //TODO remove these
+        $this->setGroupHandler($groupHandler);
+        $this->setCalendarHandler($calHandler);
     }
 
     /**
@@ -122,6 +143,38 @@ class RendererBase implements RendererInterface
     public function setPage($page)
     {
         $this->page = $page;
+    }
+
+    /**
+     * @param mixed $calendarHandler
+     */
+    public function setCalendarHandler($calendarHandler)
+    {
+        $this->calendarHandler = $calendarHandler;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCalendarHandler()
+    {
+        return $this->calendarHandler;
+    }
+
+    /**
+     * @param mixed $groupHandler
+     */
+    public function setGroupHandler($groupHandler)
+    {
+        $this->groupHandler = $groupHandler;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getGroupHandler()
+    {
+        return $this->groupHandler;
     }
 
 

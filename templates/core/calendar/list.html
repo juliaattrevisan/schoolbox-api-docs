@@ -262,59 +262,7 @@
 	<h2>{EVENT_DATE}</h2>
 	<ul class="js_happening calendar">
 		<!-- BEGIN event -->
-		<li class="event {EVENT_SELECTORS}" style="background-color:{EVENT_COLOUR}">
-			<p class="{EVENT_CLASS}">
-				<span class="eventListing">
-					<!-- BEGIN event_allday -->
-					<strong class="duration">All Day</strong>
-					<!-- END event_allday -->
-
-					<!-- BEGIN event_timed -->
-					<strong class="duration">{EVENT_START}{EVENT_SEPARATOR}{EVENT_END}</strong>
-					<!-- END event_timed -->
-
-					<!-- BEGIN event_submission -->
-					<strong class="duration">{EVENT_END}</strong>
-					<!-- END event_submission -->
-
-					<span>{EVENT_TITLE}
-                        <!-- BEGIN event_location --> - <i>{EVENT_LOCATION}</i>
-                        <!-- END event_location --></span>
-				</span>
-			</p>
-
-            <div class="hidden-fields clearfix">
-                <h3>{EVENT_TITLE}</h3>
-                <h4>{EVENT_TYPE}: {EVENT_FULL_TIME}</h4>
-                <em>{EVENT_LOCATION}</em>
-
-                <p class="meta">
-                    {EVENT_DETAIL}
-                    <div class="created">Posted by <a href="/search/user/{EVENT_AUTHOR_ID}">{EVENT_AUTHOR}</a>
-                        <!-- BEGIN event_has_category -->
-                        in <a href='/homepage/{EVENT_CATEGORY_ID}'>{EVENT_CATEGORY_NAME}</a>
-                        <!-- END event_has_category -->
-                    </div>
-                </p>
-
-                <!-- BEGIN event_attendance_status -->
-                <p class="meta">Attendance Status: {EVENT_ATTENDANCE_STATUS}</p>
-                <!-- END event_attendance_status -->
-                <div>
-                    <!-- BEGIN event_attendance_request -->
-                    <form method="post">
-                        <input name="event[id]" type="hidden" value="{EVENT_ID}">
-                        <a class="btn modify float-left attendance-request" href="#"><span></span>{ATTENDANCE_REQUEST_ACTION}</a>
-                    </form>
-                    <!-- END event_attendance_request -->
-
-                    <!-- BEGIN event_buttons -->
-                    <a class="btn float-right {EVENT_BUTTON_TYPE}"
-                       href="{EVENT_BUTTON_HREF}"><span></span>{EVENT_BUTTON_TEXT}</a>
-                    <!-- END event_buttons -->
-                </div>
-            </div>
-		</li>
+            {TWIG_EVENT}
 		<!-- END event -->
 	</ul>
 	<!-- END date -->

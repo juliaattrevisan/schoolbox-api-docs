@@ -2,7 +2,7 @@
 	<script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
     <script type='text/javascript'>
         $(function () {
-            $(document).on('click', 'a.{CALENDAR_PREFIX}-attendance-request', function (event) {
+            $(document).on('click', 'a.attendance-request', function (event) {
                 event.preventDefault();
 
                 var button = $(this);
@@ -44,7 +44,6 @@
 
     <h2>{CALENDAR_TITLE}</h2>
     {CONFIGURATION}
-
     <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="listing clearfix">
             <ul class="js_happening calendar">
@@ -52,12 +51,12 @@
                 <li class="{ON_OFF} clearfix">
                     <span class="eventListing"><strong>{CAL_DATE}</strong> <span style="background-color:{CAL_COLOUR}">{CAL_TITLE} <!-- BEGIN attendance_icon --><span
                             class="float-right">A</span><!-- END attendance_icon --></span></span>
-
+    
                     <div class="hidden-fields clearfix">
                         <h3>{CAL_TITLE}</h3>
                         <h4>{CAL_TYPE}: {CAL_DATE} {CAL_TIME}</h4>
                         <em>{CAL_LOCATION}</em>
-
+    
                         <p class="meta">
                             {CAL_DETAIL}
                             Posted by <a href="/search/user/{CAL_AUTHOR_ID}">{CAL_AUTHOR}</a><br/>
@@ -65,15 +64,15 @@
                         <!-- BEGIN attendance_status -->
                         <p class="meta">Attendance Status: {ATTENDANCE_STATUS}</p>
                         <!-- END attendance_status -->
-
+    
                         <div class="modify-event">
                             <!-- BEGIN attendance_request_button -->
                             <form method="post">
                                 <input name="event[id]" type="hidden" value="{CAL_ID}">
-                                <a class="btn modify float-left {CALENDAR_PREFIX}-attendance-request" href="#"><span></span>{ATTENDANCE_REQUEST_ACTION}</a>
+                                <a class="btn modify float-left attendance-request" href="#"><span></span>{ATTENDANCE_REQUEST_ACTION}</a>
                             </form>
                             <!-- END attendance_request_button -->
-
+    
                             <!-- BEGIN attendance_list_button -->
                             <a class="btn modify float-left" href="/calendar/attendance/list/{CAL_ID}"><span></span>Attendance
                                 List</a>
@@ -104,5 +103,5 @@
             </div>
             <textarea readonly id="calendar-export-dialog-url"></textarea>
         </div>
-    </div>
+     </div>
 </div>
