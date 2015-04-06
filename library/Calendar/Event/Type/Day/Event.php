@@ -16,10 +16,6 @@ namespace Calendar\Event\Type\Day;
 use Calendar\Event\Type\EventBase;
 use Calendar\Event\Type\EventInterface;
 
-//use Renderer\Javascript;
-//use Renderer\List;
-//use \Calendar\Event\Type\Exporter\VObject;
-
 
 class Event extends EventBase implements EventInterface {
 
@@ -149,7 +145,6 @@ class Event extends EventBase implements EventInterface {
      * the start time is 12:00AM and the end time is something different.
      *
      * @return string
-     * @deprecated
      */
     public function getTime() {
         //
@@ -158,7 +153,7 @@ class Event extends EventBase implements EventInterface {
         if ($this->getAllday()) {
             return '';
         }
-        if ($this->getStartTime()->ne($this->getEndTime())) {
+        if ($this->getStartTime()->getDateOnly() != $this->getEndTime()->getDateOnly()) {
             return '';
         }
 

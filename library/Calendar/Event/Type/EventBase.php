@@ -169,8 +169,7 @@ abstract class EventBase implements EventInterface
             if ($this->getAllDay()) {
                 return $this->getStartTime()->getCalendarDate() . ' &ndash; ' . $this->getEndTime()->getCalendarDate();
             }
-            return $this->getStartTime()->getCalendarDateTime() . ' &ndash; ' . $this->getEndTime(
-            )->getCalendarDateTime();
+            return $this->getStartTime()->getCalendarDateTime() . ' &ndash; ' . $this->getEndTime()->getCalendarDateTime();
         } else {
             if ($this->getAllDay()) {
                 return $this->getStartTime()->getCalendarDate();
