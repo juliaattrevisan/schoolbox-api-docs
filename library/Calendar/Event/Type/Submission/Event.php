@@ -15,7 +15,7 @@
 namespace Calendar\Event\Type\Submission;
 use Calendar\Event\Type\EventBase;
 use Calendar\Event\Type\EventInterface;
-
+use Schoolbox\Resource\Category;
 
 class Event extends EventBase implements EventInterface {
 
@@ -36,6 +36,12 @@ class Event extends EventBase implements EventInterface {
      */
     protected $categoryName = '';
 
+    /**
+     * Category which the event is related to
+     * @var Category
+     */
+    protected $category = -1;
+
     /* TODO: Hardcoded?
      */
     protected $eventType = 'Due Work';
@@ -48,10 +54,6 @@ class Event extends EventBase implements EventInterface {
      * @var bool
      */
     protected $is_assessment = false;
-
-    /* CSV string of class (category) codes
-     */
-    private $categoryCodes = array();
 
     /* Submission box information
      */
@@ -85,7 +87,7 @@ class Event extends EventBase implements EventInterface {
             $extended = '';
         }
 
-        return $this->getCategoryName() . $extended . "\n" . $this->getSubmissionBoxName();
+        return $this->getCategory()->getName() . $extended . "\n" . $this->getSubmissionBoxName();
     }
 
 	/**
@@ -101,21 +103,12 @@ class Event extends EventBase implements EventInterface {
      */
 
     /**
-     * Set category codes
-     *
-     * @param $categoryCodes
-     */
-    public function setCategoryCodes($categoryCodes) {
-        $this->categoryCodes = $categoryCodes;
-    }
-
-    /**
      * Get category codes
      *
      * @return array
      */
     public function getCategoryCodes() {
-        return $this->categoryCodes;
+        return $this->getCategory()->getCodes();
     }
 
     /**
@@ -123,7 +116,7 @@ class Event extends EventBase implements EventInterface {
      * @return string
      */
     public function getCategoryCodeString() {
-        return implode(', ', $this->getCategoryCodes());
+        return $this->getCategory()->getCodeString();
     }
 
     /**
@@ -197,4 +190,23 @@ class Event extends EventBase implements EventInterface {
     public function getIsAssessment() {
         return $this->is_assessment;
     }
+
+    /**
+     * @param Category $category
+     */
+    public function setCategory($category)
+    {
+        $this->category = $category;
+    }
+
+    /**
+     * @return Category
+     */
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+
+
 }

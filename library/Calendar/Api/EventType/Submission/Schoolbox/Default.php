@@ -8,6 +8,7 @@
  * @link        http://www.alaress.com.au/
  */
 use Calendar\Event\Collection;
+use Calendar\Event\Type\Submission\Event;
 
 class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_EventType_Abstract
 {
@@ -33,7 +34,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
      * @param $endTimestamp
      *
      * @internal param $currentDay
-     * @return Collection|Calendar_Event_Type_Submission[]
+     * @return Collection|Submission[]
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
@@ -64,16 +65,8 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
         $activities->merge($assess_mapper->getDueActivities($category_id_list, $startTimestamp, $endTimestamp));
 
         foreach ($activities as $activity) {
-            $event = new Calendar_Event_Type_Submission();
-            $event->setCategoryId($activity->getCategory()->getId());
-            $event->setCategoryName($activity->getCategory()->getName());
-
-            $category_codes = array();
-            foreach ($activity->getCategory()->getCodes() as $code) {
-                $category_codes[] = $code->getCode();
-            }
-            $event->setCategoryCodes($category_codes);
-
+            $event = new Event();
+            $event->setCategory($activity->getCategory());
             $event->setType($eventType);
             $event->setColour($this->calendarHandler->displayColour($eventType));
             $event->setStartTime($activity->getDate());

@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -56,7 +55,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
         $calendarApi->setGroupId($this->getContext()->getId());
 
         // Render all events for group using html renderer
-        $eventRenderer = new Renderer($calendarApi, $this->start->getUnixTimestamp(), $this->end->getUnixTimestamp(), $_SESSION['user'], $this->sitepage);
+        $eventRenderer = new Renderer($calendarApi, $this->start->getUnixTimestamp(), $this->end->getUnixTimestamp(), $this->user, $this->sitepage);
         $this->setVar('group_events_block', $eventRenderer->renderAll('html'));
 
         //setup block for submission button
@@ -72,5 +71,115 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
         }
 
         return true;
+    }
+
+    public function old() {
+        $this->setBlock("group_events", "attendance_icon", "attendance_icon_block");
+        $this->setBlock("group_events", "attendance_status", "attendance_status_block");
+        $this->setBlock("group_events", "attendance_request_button", "attendance_request_button_block");
+        $this->setBlock("group_events", "attendance_list_button", "attendance_list_button_block");
+
+        $this->setVar(
+            array(
+                'CALENDAR_PREFIX' => 'group',
+                'USER_TOKEN'      => $_SESSION['key'],
+            )
+        );
+
+        $calendarHandler = new Calendar();
+
+        $this->setVar('CALENDAR_TITLE', 'Group Calendar');
+        $this->setVar('group_events_block', '');
+
+        if (count($eventList)) {
+            $j = 0;
+            foreach ($eventList as $eventObject) {
+                $j++;
+                if ($eventLimit > 0 && $j > $eventLimit) {
+                    break;
+                }
+
+                /** @var Event $eventObject */
+                $eventId = $eventObject->getEventId();
+                $output = array(
+                    'CAL_DATE' => $eventObject->getEventSpan(),
+                    'CAL_ID' => $eventId,
+                    'CAL_TITLE' => Scrub::text($eventObject->getTitle()),
+                    'CAL_LOCATION' => Scrub::text($eventObject->getLocation()),
+                    'CAL_DETAIL' => Scrub::html($eventObject->getDetail()),
+                    'CAL_COLOUR' => Scrub::text($eventObject->getColour()),
+                    'CAL_MODIFY' => $calendarHandler->getPerm($eventId) > READ_ACCESS
+                            ? "<a class=\"btn modify float-left\" href=\"/calendar/modify.php?eventID={$eventId}&homepageId={$this->getContext()->getId()}&returnTo=homepage\" title=\"Modify\"><span></span>Modify</a>"
+                            : '',
+                    'CAL_TYPE' => Scrub::text($eventObject->getEventType()),
+                    'CAL_AUTHOR' => $eventObject->getAuthorName(),
+                    'CAL_AUTHOR_ID' => $eventObject->getAuthorId(),
+                    'ON_OFF' => $j % 2 ? '' : 'dark',
+                );
+                $this->setVar($output);
+
+                // Clear attendance blocks
+                $this->setVar(
+                    array(
+                        'attendance_icon_block' => '',
+                        'attendance_status_block' => '',
+                        'attendance_request_button_block' => '',
+                        'attendance_list_button_block' => '',
+                    )
+                );
+
+                /* Event attendance
+                 */
+                if ($eventObject->getAttendance()) {
+                    $this->parse('attendance_icon_block', 'attendance_icon');
+
+                    /* Anyone with write access can approve attendance
+                     */
+                    if ($this->permission >= WRITE_ACCESS) {
+                        $this->parse('attendance_list_button_block', 'attendance_list_button');
+                    }
+
+                    if ($groupHandler->isStudent($_SESSION['id'])) {
+                        if ($attendance = $calendarHandler->getAttendanceByEventAndUser($eventId, $_SESSION['id'])) {
+                            /* Attendance Status
+                                                        */
+                            if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
+                                $this->setVar('ATTENDANCE_STATUS', 'Pending');
+                            } else {
+                                if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
+                                    $this->setVar('ATTENDANCE_STATUS', 'Approved');
+                                } else {
+                                    if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
+                                        $this->setVar('ATTENDANCE_STATUS', 'Rejected');
+                                    }
+                                }
+                            }
+
+                            $this->parse('attendance_status_block', 'attendance_status');
+
+                            $this->setVar('ATTENDANCE_REQUEST_ACTION', 'Unattend');
+                        } else {
+                            $this->setVar('ATTENDANCE_REQUEST_ACTION', 'Attend');
+                        }
+
+                        $this->parse('attendance_request_button_block', 'attendance_request_button');
+                    } else {
+                        if ($groupHandler->isStaff($_SESSION['id'])) {
+                            $this->parse('attendance_list_button_block', 'attendance_list_button');
+                        }
+                    }
+                }
+
+                $this->setVar("CAL_TIME", "");
+
+                $this->parse("group_events_block", "group_events", true);
+
+            }
+        } else {
+            $this->setVar("group_events_block", '');
+        }
+
+
+
     }
 }
