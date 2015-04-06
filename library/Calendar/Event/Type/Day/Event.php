@@ -106,12 +106,42 @@ class Event extends EventBase implements EventInterface {
         return $this->getAttendance();
     }
 
+
+    /**
+     * Classes to be used as filter selectors
+     *
+     * @return string
+     */
+    public function eventClasses()
+    {
+        $selectors = array(
+            'type' . $this->getType(),
+            'source' . $this->getConnectorId(),
+        );
+
+        /* Merge levels
+         */
+        $allLevels = explode(' ', $this->getCalenderClasses());
+        $selectors = array_merge($selectors, $allLevels);
+
+
+        /* Properly trim out spaces and stuff
+         */
+        foreach ($selectors as &$currentSelector) {
+            $currentSelector = trim($currentSelector);
+        }
+
+        $selectors = array_filter(array_unique($selectors));
+
+        return implode(' ', $selectors);
+    }
+
     /**
      * Event visibility; generates a CSS string
      *
      * @return string
      */
-    public function getDerivedEventLevel() {
+    public function getCalenderClasses() {
         $eventLevel = '';
 
         if ($this->isCampusAccess()) {

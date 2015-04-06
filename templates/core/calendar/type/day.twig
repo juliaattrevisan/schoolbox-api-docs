@@ -1,4 +1,4 @@
-<li class="{{ event.getDerivedEventLevel() }}">
+<li class="{{ event.eventClasses() }}">
     <span class="eventListing">
          {% if not event.startTime.isAtStartOfDay() %}
         <strong>{{ event.getEventSpan()|raw }}</strong>
