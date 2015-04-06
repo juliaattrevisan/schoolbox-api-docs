@@ -1561,4 +1561,12 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     {
         return $this->toIso8601String();
     }
+
+    /**
+     * Implements the clone method for this object, by cloning internal datetime object aswell
+     */
+    public function __clone() {
+        $this->datetime = clone $this->datetime;
+    }
+
 }
