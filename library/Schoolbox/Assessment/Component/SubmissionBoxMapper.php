@@ -313,16 +313,27 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $worktype_mapper = $this->getJoinMapper('work_type');
         $marktype_mapper = $this->getJoinMapper('mark_type');
 
+        // This is how you get ants!
         $query = "
 			SELECT
 				{$this->getColumnString('sb')},
 				{$worktype_mapper->getColumnString('wt')},
 				{$marktype_mapper->getColumnString('mt')},
-				{$this->getJoinColumnString('category', 'cat')}
+				{$this->getJoinColumnString('category', 'cat')},
+                {$this->getJoinColumnString('curriculum_node_for_category', 'cn')},
+                {$this->getJoinColumnString('curriculum_node_for_category.level', 'cnl')},
+                {$this->getJoinColumnString('curriculum_node_for_category.level.source', 'cnls')},
+                {$this->getJoinColumnString('curriculum_node_for_category.area', 'cna')},
+                {$this->getJoinColumnString('curriculum_node_for_category.area.source', 'cnas')}
 			FROM {$this->getTable()} sb
 			LEFT JOIN {$this->getJoinSql('work_type', 'sb', 'wt')}
 			LEFT JOIN {$this->getJoinSql('mark_type', 'sb', 'mt')}
 			LEFT JOIN {$this->getJoinSql('category',  'sb', 'cat')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category', 'c', 'cn')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.level', 'cn', 'cnl')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.level.source', 'cnl', 'cnls')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.area', 'cn', 'cna')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.area.source', 'cna', 'cnas')}
 			WHERE sb.id=?
 		";
         $statement = $this->database->prepare($query);
@@ -330,14 +341,37 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 
         $submission_box = false;
 
-        if (($row = $statement->fetch()) !== false) {
-            $submission_box = $this->hydrate($row, 'sb');
-            $submission_box->setWorkType($worktype_mapper->hydrate($row, 'wt'));
-            $submission_box->setMarkType($marktype_mapper->hydrate($row, 'mt'));
-            $submission_box->setCategory($this->hydrateJoin($row, 'category', 'cat'));
+        $curriculumNodes = [];
+        foreach ($statement as $row) {
+            if (!($submission_box instanceof SubmissionBox)) {
+                $submission_box = $this->hydrate($row, 'sb');
+                $submission_box->setWorkType($worktype_mapper->hydrate($row, 'wt'));
+                $submission_box->setMarkType($marktype_mapper->hydrate($row, 'mt'));
+                $submission_box->setCategory($this->hydrateJoin($row, 'category', 'cat'));
+            }
+            /** @var Node\Model $curriculumNode */
+            $curriculumNode = $this->getJoinMapper('curriculum_node_for_category')->hydrate($row, 'cn');
+            if ($curriculumNode->getId()) {
+                $curriculumNode->setLearningArea(
+                    $this->getJoinMapper('curriculum_node_for_category.area')->hydrate($row, 'cna')
+                        ->setSource(
+                            $this->getJoinMapper('curriculum_node_for_category.area.source')
+                                ->hydrate($row, 'cnas')
+                        )
+                );
+                $curriculumNode->setLearningLevel(
+                    $this->getJoinMapper('curriculum_node_for_category.level')->hydrate($row, 'cnl')
+                        ->setSource(
+                            $this->getJoinMapper('curriculum_node_for_category.level.source')
+                                ->hydrate($row, 'cnls')
+                        )
+                );
+                $curriculumNodes[$curriculumNode->getId()] = $curriculumNode;
+            }
         }
 
         if ($submission_box instanceof SubmissionBox) {
+            $submission_box->setCurriculumNodes(array_values($curriculumNodes));
             // Get files? (This is more evidence separate file/link mapper isn't
             // required.)
             $query = "
