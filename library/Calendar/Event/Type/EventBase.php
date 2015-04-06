@@ -439,7 +439,13 @@ abstract class EventBase implements EventInterface
      */
     public function getRendererClass($type)
     {
-        return $this->renderClasses[$type];
+        if($this->renderClasses[$type]) {
+            return $this->renderClasses[$type];
+        }
+        else {
+            throw new \Exception("Unable to find rendering class for $type");
+        }
+
     }
 
     /**

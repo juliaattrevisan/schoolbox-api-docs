@@ -1,14 +1,30 @@
 <li class="clearfix">
-    <span class="eventListing"><strong>{{ event.getTime() }}</strong> <span style="background-color:{{ event.colour }}">{{ event.title }}<span
-            class="float-right">A</span><!-- END attendance_icon --></span></span>
+    <span class="eventListing">
+         {% if not event.startTime.isAtStartOfDay() %}
+        <strong>{{ event.startTime.getTimeOnly() }}
+        {% endif %}
+        {% if not event.endTime.isAtStartOfDay() %}
+        : {{ event.endTime.getTimeOnly() }}
+        {% endif %}
+        </strong>
+        <span style="background-color:{{ event.colour }}">{{ event.title }}
+            {% if event.attendance %}
+            <span class="float-right">A</span>
+            {% endif %}
+        </span>
+    </span>
 
     <div class="hidden-fields clearfix">
         <h3>{{ event.title }}</h3>
-        <h4>{{ event.eventType }}: {{ event.getStartTime()->getLong() }}</h4>
+        <h4>
+            {% if event.eventType %}
+            {{ event.eventType }}:
+            {% endif %}
+            {{ event.startTime.getLong() }}</h4>
         <em>{{ event.location }}</em>
 
-        <p class="meta">
-            {{ event.detail|raw}}
+        <p class="wysiwyg meta">
+            {{ event.detail|purify}}
 
         <div class="created">
             {% if event.author %}
@@ -34,7 +50,7 @@
             {%if event.attendance and event.isEditable %}
             <a class="btn groups float-left"
                href="/calendar/attendance/list/{EVENT_ID}"><span></span>Attendance List</a>
-            <!-- END attendance_list_button -->
+            {% endif %}
 
             {% if event.isEditable %}
             <a class="btn modify float-left" href="/calendar/modify.php?eventID={{ event.eventId }}&returnTo=calendar"><span></span>Modify</a>

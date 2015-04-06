@@ -80,7 +80,6 @@ class Renderer
     protected function collectAllEvents()
     {
         $eventList = $this->getApi()->getEvents($this->getStartTimestamp(), $this->getEndTimestamp());
-
         /* Only attempt to merge collections
          */
         if ($eventList instanceof Collection) {
@@ -99,12 +98,12 @@ class Renderer
     {
         $output = '';
         foreach ($this->getAllEvents() as $currentEvent) {
-            $output .= $this->renderEvent($currentEvent);
+            $output .= $this->renderEvent($currentEvent, $type);
         }
         return $output;
     }
 
-    public function renderEvent($event)
+    public function renderEvent($event, $type)
     {
         $rendererClass = $event->getRendererClass($type);
         $renderObj = new $rendererClass($this->getPage(), $event, $_SESSION['user']);

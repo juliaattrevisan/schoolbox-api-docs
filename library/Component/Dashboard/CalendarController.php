@@ -56,7 +56,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
     {
         $now         = Alaress_Date_Format::now();
         $this->start = $now->startOfDay();
-        $this->end   = $this->start;
+        $this->end   = clone $this->start;
         $days        = $this->getConfig('days');
 
         /* Get 30 days of events by default
@@ -78,28 +78,29 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
     public function renderTemplate($templateHandle)
     {
-        $this->setVar("note_listing", "");
 
         if (!$this->loadTemplate($templateHandle, 'calendar')) {
             return false;
         }
 
         $this->setBlock($templateHandle, 'day', 'day_block');
-        $this->setBlock('day', "note_block", "note_listing");
-        $this->setBlock('day', "no_events", "no_events_block");
+        $this->setBlock('day', 'note_block', 'note_listing');
+        $this->setBlock('day', 'no_events', 'no_events_block');
+        $this->setVar('no_events_block','');
 
         $this->setVar(
             array(
-                'DATE'                            => date('l jS F', $_SERVER['REQUEST_TIME']),
-                'CALENDAR_DATE'                   => date('d-m-Y', $_SERVER['REQUEST_TIME']),
+                'DATE'           => $this->start->getLongDateOnly(),
+                'CALENDAR_DATE'  => $this->start->getLocalShort(),
             )
         );
 
         $prevDay = false;
 
-        $j = 0;
-        if (count($this->eventList) === 0) {
+        if (count($this->eventRenderer->getAllEvents()) === 0) {
+            $this->setVar('note_listing', '');
             $this->parse('no_events_block', 'no_events');
+
         }
         foreach ($this->eventRenderer->getAllEvents() as $currentEvent) {
 
@@ -116,7 +117,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
             $this->setVar('LIST_DATE', $currentDay->getDateOnly());
 
-            $this->setVar('note_block', $this->eventRenderer->renderEvent($currentEvent));
+            $this->setVar('note_block', $this->eventRenderer->renderEvent($currentEvent, 'html'));
 
             $this->parse("note_listing", "note_block", true);
 

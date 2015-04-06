@@ -18,7 +18,7 @@ class Html extends RendererBase {
     {
 
         if ($this->isVisible()) {
-            return $this->getTemplate()->render('@calendar/type/submission.twig',
+            return $this->getTemplate()->render('calendar/type/submission.twig',
                 array('event' => $this->getEvent())
             );
         } else {

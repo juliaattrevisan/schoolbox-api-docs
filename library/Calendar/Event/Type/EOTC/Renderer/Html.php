@@ -23,7 +23,7 @@ class Html extends RendererBase {
     {
 
         if ($this->isVisible()) {
-            return $this->getTemplate()->render('@calendar/type/EOTC.twig',
+            return $this->getTemplate()->render('calendar/type/EOTC.twig',
                 array('event' => $this->getEvent())
             );
         } else {

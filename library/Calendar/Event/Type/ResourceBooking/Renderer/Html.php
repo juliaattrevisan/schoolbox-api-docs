@@ -20,7 +20,7 @@ class Html extends RendererBase {
     {
 
         if ($this->isVisible()) {
-            return $this->getTemplate()->render('@calendar/type/resourceBooking.twig',
+            return $this->getTemplate()->render('calendar/type/resourceBooking.twig',
                 array('event' => $this->getEvent())
             );
         } else {
