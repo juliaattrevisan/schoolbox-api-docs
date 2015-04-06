@@ -282,7 +282,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 
         $this->joinsVia(
             'curriculum_node_for_assess',
-            Node\Model::class,
+            Node\Mapper::class,
             'id',
             'curriculum_node_id',
             'assess_id',
