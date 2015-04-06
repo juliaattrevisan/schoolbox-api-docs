@@ -281,11 +281,11 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         ));
 
         $this->joinsVia(
-            'curriculum_node_for_assess',
+            'curriculum_node_for_submission_box',
             Node\Mapper::class,
             'id',
             'curriculum_node_id',
-            'assess_id',
+            'submission_box_id',
             null,
             null,
             null,
@@ -320,20 +320,20 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 				{$worktype_mapper->getColumnString('wt')},
 				{$marktype_mapper->getColumnString('mt')},
 				{$this->getJoinColumnString('category', 'cat')},
-                {$this->getJoinColumnString('curriculum_node_for_category', 'cn')},
-                {$this->getJoinColumnString('curriculum_node_for_category.level', 'cnl')},
-                {$this->getJoinColumnString('curriculum_node_for_category.level.source', 'cnls')},
-                {$this->getJoinColumnString('curriculum_node_for_category.area', 'cna')},
-                {$this->getJoinColumnString('curriculum_node_for_category.area.source', 'cnas')}
+                {$this->getJoinColumnString('curriculum_node_for_submission_box', 'cn')},
+                {$this->getJoinColumnString('curriculum_node_for_submission_box.level', 'cnl')},
+                {$this->getJoinColumnString('curriculum_node_for_submission_box.level.source', 'cnls')},
+                {$this->getJoinColumnString('curriculum_node_for_submission_box.area', 'cna')},
+                {$this->getJoinColumnString('curriculum_node_for_submission_box.area.source', 'cnas')}
 			FROM {$this->getTable()} sb
 			LEFT JOIN {$this->getJoinSql('work_type', 'sb', 'wt')}
 			LEFT JOIN {$this->getJoinSql('mark_type', 'sb', 'mt')}
 			LEFT JOIN {$this->getJoinSql('category',  'sb', 'cat')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category', 'c', 'cn')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.level', 'cn', 'cnl')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.level.source', 'cnl', 'cnls')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.area', 'cn', 'cna')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.area.source', 'cna', 'cnas')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_submission_box', 'sb', 'cn')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_submission_box.level', 'cn', 'cnl')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_submission_box.level.source', 'cnl', 'cnls')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_submission_box.area', 'cn', 'cna')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_submission_box.area.source', 'cna', 'cnas')}
 			WHERE sb.id=?
 		";
         $statement = $this->database->prepare($query);
@@ -349,20 +349,21 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
                 $submission_box->setMarkType($marktype_mapper->hydrate($row, 'mt'));
                 $submission_box->setCategory($this->hydrateJoin($row, 'category', 'cat'));
             }
+            // Hydrate curriculum nodes
             /** @var Node\Model $curriculumNode */
-            $curriculumNode = $this->getJoinMapper('curriculum_node_for_category')->hydrate($row, 'cn');
+            $curriculumNode = $this->getJoinMapper('curriculum_node_for_submission_box')->hydrate($row, 'cn');
             if ($curriculumNode->getId()) {
                 $curriculumNode->setLearningArea(
-                    $this->getJoinMapper('curriculum_node_for_category.area')->hydrate($row, 'cna')
+                    $this->getJoinMapper('curriculum_node_for_submission_box.area')->hydrate($row, 'cna')
                         ->setSource(
-                            $this->getJoinMapper('curriculum_node_for_category.area.source')
+                            $this->getJoinMapper('curriculum_node_for_submission_box.area.source')
                                 ->hydrate($row, 'cnas')
                         )
                 );
                 $curriculumNode->setLearningLevel(
-                    $this->getJoinMapper('curriculum_node_for_category.level')->hydrate($row, 'cnl')
+                    $this->getJoinMapper('curriculum_node_for_submission_box.level')->hydrate($row, 'cnl')
                         ->setSource(
-                            $this->getJoinMapper('curriculum_node_for_category.level.source')
+                            $this->getJoinMapper('curriculum_node_for_submission_box.level.source')
                                 ->hydrate($row, 'cnls')
                         )
                 );
@@ -371,7 +372,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         }
 
         if ($submission_box instanceof SubmissionBox) {
-            $submission_box->setCurriculumNodes(array_values($curriculumNodes));
+            $submission_box->setCurriculumNodes(new Collection(array_values($curriculumNodes)));
             // Get files? (This is more evidence separate file/link mapper isn't
             // required.)
             $query = "
