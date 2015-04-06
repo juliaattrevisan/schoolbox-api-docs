@@ -13,7 +13,8 @@ class Alaress_Date_NullDate extends Alaress_Date_Format
      */
     public function __construct()
     {
-        // ignore everything
+        // set a locale so that locale based formatting doesn't fatal error
+        $this->setLocale(new Alaress_Date_Locale_Static());
     }
 
     /**
