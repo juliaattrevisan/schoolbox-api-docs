@@ -2,30 +2,32 @@
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
 
-	<ul class="information-list">
-		<!-- BEGIN forum -->
-		<li class="{ON_OFF}">
-			<!-- BEGIN forum_reply -->
-			<span class="actions">
-				<a class="btn no-text chat" href="/forum/modify/{ID}/{THREAD_ID}" title="Post a reply"><span></span></a>
-			</span>
-			<!-- END forum_reply -->
-			<h3><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE}</a></h3>
+    <div data-collapsable='true'>
+        <ul class="information-list">
+            <!-- BEGIN forum -->
+            <li class="{ON_OFF}">
+                <!-- BEGIN forum_reply -->
+                <span class="actions">
+                    <a class="btn no-text chat" href="/forum/modify/{ID}/{THREAD_ID}" title="Post a reply"><span></span></a>
+                </span>
+                <!-- END forum_reply -->
+                <h3><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE}</a></h3>
 
-			<p class="meta">
-				<a href="/search/user/{THREAD_USER_ID}" class="author">
-					<img height="32" width="32" src="/portrait.php?userId={THREAD_USER_EXTERNAL_ID}&size=square32"/>
-					{THREAD_USER}
-				</a><br />
-				Posted on {THREAD_DATE}</p>
-		</li>
-		<!-- END forum -->
-	</ul>
+                <p class="meta">
+                    <a href="/search/user/{THREAD_USER_ID}" class="author">
+                        <img height="32" width="32" src="/portrait.php?userId={THREAD_USER_EXTERNAL_ID}&size=square32"/>
+                        {THREAD_USER}
+                    </a><br />
+                    Posted on {THREAD_DATE}</p>
+            </li>
+            <!-- END forum -->
+        </ul>
 
-    <p class="interact">
-        <a href="/forum/{COMPONENT_CONFIG_SRC_ID}" class="btn go-to"><span></span>Go to Forum</a>
-        <!-- BEGIN forum_post -->
-        <a class="btn add" href="/forum/modify/{COMPONENT_CONFIG_SRC_ID}"><span></span>Post Thread</a>
-        <!-- END forum_post -->
-    </p>
+        <p class="interact">
+            <a href="/forum/{COMPONENT_CONFIG_SRC_ID}" class="btn go-to"><span></span>Go to Forum</a>
+            <!-- BEGIN forum_post -->
+            <a class="btn add" href="/forum/modify/{COMPONENT_CONFIG_SRC_ID}"><span></span>Post Thread</a>
+            <!-- END forum_post -->
+        </p>
+    </div>
 </div>

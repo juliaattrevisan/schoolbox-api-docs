@@ -1,6 +1,4 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
-    <h2>{COMPONENT_NAME}</h2>
-    {CONFIGURATION}
     <script type="text/javascript" src="/javascript/components/jquery.countdown/dist/jquery.countdown.js"></script>
     <script type='text/javascript'>
         $(function () {
@@ -11,6 +9,7 @@
             var minuteDisplay = element.find('.minutes_dash .digit');
             var secondDisplay = element.find('.seconds_dash .digit');
             var endTime = new Date({DEADLINE_YEAR}, ({DEADLINE_MONTH}-1), {DEADLINE_DAY}, {DEADLINE_HOUR}, {DEADLINE_MIN}, {DEADLINE_SEC});
+
             $('#countdown{COMPONENT_INSTANCE_ID}').countdown(endTime)
                 .on('update.countdown', function(event) {
                     // Parse time into weeks, days, hours, minutes, seconds
@@ -26,34 +25,39 @@
                     hourDisplay.text('00');
                     minuteDisplay.text('00');
                     secondDisplay.text('00');
-                })
-
+                });
         });
     </script>
-    <div id='countdown{COMPONENT_INSTANCE_ID}'>
-        <div class="dash weeks_dash">
-            <span class="dash_title">weeks</span>
-            <div class="digit">00</div>
-        </div>
 
-        <div class="dash days_dash">
-            <span class="dash_title">days</span>
-            <div class="digit">00</div>
-        </div>
+    <h2>{COMPONENT_NAME}</h2>
+    {CONFIGURATION}
 
-        <div class="dash hours_dash">
-            <span class="dash_title">hours</span>
-            <div class="digit">00</div>
-        </div>
+    <div data-collapsable='true'>
+        <div id='countdown{COMPONENT_INSTANCE_ID}'>
+            <div class="dash weeks_dash">
+                <span class="dash_title">weeks</span>
+                <div class="digit">00</div>
+            </div>
 
-        <div class="dash minutes_dash">
-            <span class="dash_title">minutes</span>
-            <div class="digit">00</div>
-        </div>
+            <div class="dash days_dash">
+                <span class="dash_title">days</span>
+                <div class="digit">00</div>
+            </div>
 
-        <div class="dash seconds_dash">
-            <span class="dash_title">seconds</span>
-            <div class="digit">00</div>
+            <div class="dash hours_dash">
+                <span class="dash_title">hours</span>
+                <div class="digit">00</div>
+            </div>
+
+            <div class="dash minutes_dash">
+                <span class="dash_title">minutes</span>
+                <div class="digit">00</div>
+            </div>
+
+            <div class="dash seconds_dash">
+                <span class="dash_title">seconds</span>
+                <div class="digit">00</div>
+            </div>
         </div>
     </div>
 </div>

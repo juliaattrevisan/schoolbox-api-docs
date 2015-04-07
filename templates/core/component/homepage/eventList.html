@@ -41,64 +41,68 @@
             });
         });
     </script>
+
     <h2>{CALENDAR_TITLE}</h2>
     {CONFIGURATION}
-    <div class="listing clearfix">
-        <ul class="js_happening calendar">
-            <!-- BEGIN group_events -->
-            <li class="{ON_OFF} clearfix">
-                <span class="eventListing"><strong>{CAL_DATE}</strong> <span style="background-color:{CAL_COLOUR}">{CAL_TITLE} <!-- BEGIN attendance_icon --><span
-                        class="float-right">A</span><!-- END attendance_icon --></span></span>
 
-                <div class="hidden-fields clearfix">
-                    <h3>{CAL_TITLE}</h3>
-                    <h4>{CAL_TYPE}: {CAL_DATE} {CAL_TIME}</h4>
-                    <em>{CAL_LOCATION}</em>
+    <div data-collapsable='true'>
+        <div class="listing clearfix">
+            <ul class="js_happening calendar">
+                <!-- BEGIN group_events -->
+                <li class="{ON_OFF} clearfix">
+                    <span class="eventListing"><strong>{CAL_DATE}</strong> <span style="background-color:{CAL_COLOUR}">{CAL_TITLE} <!-- BEGIN attendance_icon --><span
+                            class="float-right">A</span><!-- END attendance_icon --></span></span>
 
-                    <p class="meta">
-                        {CAL_DETAIL}
-                        Posted by <a href="/search/user/{CAL_AUTHOR_ID}">{CAL_AUTHOR}</a><br/>
-                    </p>
-                    <!-- BEGIN attendance_status -->
-                    <p class="meta">Attendance Status: {ATTENDANCE_STATUS}</p>
-                    <!-- END attendance_status -->
+                    <div class="hidden-fields clearfix">
+                        <h3>{CAL_TITLE}</h3>
+                        <h4>{CAL_TYPE}: {CAL_DATE} {CAL_TIME}</h4>
+                        <em>{CAL_LOCATION}</em>
 
-                    <div class="modify-event">
-                        <!-- BEGIN attendance_request_button -->
-                        <form method="post">
-                            <input name="event[id]" type="hidden" value="{CAL_ID}">
-                            <a class="btn modify float-left {CALENDAR_PREFIX}-attendance-request" href="#"><span></span>{ATTENDANCE_REQUEST_ACTION}</a>
-                        </form>
-                        <!-- END attendance_request_button -->
+                        <p class="meta">
+                            {CAL_DETAIL}
+                            Posted by <a href="/search/user/{CAL_AUTHOR_ID}">{CAL_AUTHOR}</a><br/>
+                        </p>
+                        <!-- BEGIN attendance_status -->
+                        <p class="meta">Attendance Status: {ATTENDANCE_STATUS}</p>
+                        <!-- END attendance_status -->
 
-                        <!-- BEGIN attendance_list_button -->
-                        <a class="btn modify float-left" href="/calendar/attendance/list/{CAL_ID}"><span></span>Attendance
-                            List</a>
-                        <!-- END attendance_list_button -->
-                        {CAL_MODIFY}
+                        <div class="modify-event">
+                            <!-- BEGIN attendance_request_button -->
+                            <form method="post">
+                                <input name="event[id]" type="hidden" value="{CAL_ID}">
+                                <a class="btn modify float-left {CALENDAR_PREFIX}-attendance-request" href="#"><span></span>{ATTENDANCE_REQUEST_ACTION}</a>
+                            </form>
+                            <!-- END attendance_request_button -->
+
+                            <!-- BEGIN attendance_list_button -->
+                            <a class="btn modify float-left" href="/calendar/attendance/list/{CAL_ID}"><span></span>Attendance
+                                List</a>
+                            <!-- END attendance_list_button -->
+                            {CAL_MODIFY}
+                        </div>
                     </div>
-                </div>
-            </li>
-            <!-- END group_events -->
-        </ul>
-    </div>
-    <p class="interact">
-        <!-- BEGIN submit_event -->
-        <a href="/calendar/modify.php?level=2&homepageId={ID}&returnTo=homepage" class="btn add"><span></span>Add Event</a>
-        <!-- END submit_event -->
-        <a id="calendar-export" href="#" class="btn export"><span></span>Export Events</a>
-		<!-- BEGIN import_events -->
-		<a href="/calendar/import/{ID}" class="btn up-arrow"><span></span>Import Events</a>
-		<!-- END import_events -->
-    </p>
-    <!--
-    Dialog for export. There's only one calendar component per homepage, so it's
-    okay to add item with ID here?
-    -->
-    <div id="calendar-export-dialog">
-        <div id="calendar-export-dialog-text">
-            Use the following URL as the source for your feed.
+                </li>
+                <!-- END group_events -->
+            </ul>
         </div>
-        <textarea readonly id="calendar-export-dialog-url"></textarea>
+        <p class="interact">
+            <!-- BEGIN submit_event -->
+            <a href="/calendar/modify.php?level=2&homepageId={ID}&returnTo=homepage" class="btn add"><span></span>Add Event</a>
+            <!-- END submit_event -->
+            <a id="calendar-export" href="#" class="btn export"><span></span>Export Events</a>
+            <!-- BEGIN import_events -->
+            <a href="/calendar/import/{ID}" class="btn up-arrow"><span></span>Import Events</a>
+            <!-- END import_events -->
+        </p>
+        <!--
+        Dialog for export. There's only one calendar component per homepage, so it's
+        okay to add item with ID here?
+        -->
+        <div id="calendar-export-dialog">
+            <div id="calendar-export-dialog-text">
+                Use the following URL as the source for your feed.
+            </div>
+            <textarea readonly id="calendar-export-dialog-url"></textarea>
+        </div>
     </div>
 </div>

@@ -1,44 +1,42 @@
 <ul class='breadcrumb'>
-  <li>
-    <a href='#' rel='0'>Home</a>
-  </li>
-  <!-- BEGIN breadcrumb -->
-  <li class="{BREADCRUMB_CLASS}">
-    <a href='#' rel='{BREADCRUMB_CATEGORY_ID}'>{BREADCRUMB_NAME}</a>
-  </li>
-  <!-- END breadcrumb -->
+    <li>
+        <a href='#' rel='0'>Home</a>
+    </li>
+    <!-- BEGIN breadcrumb -->
+    <li class="{BREADCRUMB_CLASS}">
+        <a href='#' rel='{BREADCRUMB_CATEGORY_ID}'>{BREADCRUMB_NAME}</a>
+    </li>
+    <!-- END breadcrumb -->
 </ul>
 <ul class="socialstream-node listing file-browser">
 
-  <!-- Don't rename socialstream-node-category class as it's used to navigate around -->
-  <!-- BEGIN node_category -->
-  <li class='socialstream-node-category {NODE_CATEGORY_ON_OFF}'>
-    <a href="#" rel="{NODE_CATEGORY_ID}" title="{NODE_CATEGORY_NAME}">
-      <img src="/images/mime/22x22/{NODE_CATEGORY_TYPE}.png" alt="{NODE_CATEGORY_NAME}"/>
-      {NODE_CATEGORY_NAME}
-    </a>
-  </li>
-  <!-- END node_category -->
+    <!-- Don't rename socialstream-node-category class as it's used to navigate around -->
+    <!-- BEGIN node_category -->
+    <li class='socialstream-node-category {NODE_CATEGORY_ON_OFF}'>
+        <a href="#" rel="{NODE_CATEGORY_ID}" title="{NODE_CATEGORY_NAME}">
+            <img src="/images/mime/22x22/{NODE_CATEGORY_TYPE}.png" alt="{NODE_CATEGORY_NAME}"/>
+            {NODE_CATEGORY_NAME}
+        </a>
+    </li>
+    <!-- END node_category -->
 
-  <!-- Don't rename socialstream-node-file class as it's used to navigate around -->
-  <!-- BEGIN node_file -->
-  <li class="socialstream-node-file {NODE_FILE_ON_OFF}">
-    <a href="/send.php?id={NODE_FILE_ID}" title="{NODE_FILE_NAME}" data-mime="{NODE_MIME_TYPE}" data-size="{NODE_FILE_SIZE}">
-      <img src="/images/mime/22x22/{NODE_FILE_ICON}" alt="{NODE_FILE_NAME}"/>
-      {NODE_FILE_NAME}
-    </a>
-  </li>
-  <!-- END node_file -->
+    <!-- Don't rename socialstream-node-file class as it's used to navigate around -->
+    <!-- BEGIN node_file -->
+    <li class="socialstream-node-file {NODE_FILE_ON_OFF}">
+        <a href="/send.php?id={NODE_FILE_ID}" title="{NODE_FILE_NAME}" data-mime="{NODE_MIME_TYPE}"
+           data-size="{NODE_FILE_SIZE}">
+            <img src="/images/mime/22x22/{NODE_FILE_ICON}" alt="{NODE_FILE_NAME}"/>
+            {NODE_FILE_NAME}
+        </a>
+    </li>
+    <!-- END node_file -->
 </ul>
 
 <!-- Don't rename socialstream-node-use-folder either -->
 <!-- BEGIN use_folder -->
 <div class="socialstream-node-use-folder float-right">
-  <a href="{NODE_LINK}"
-     class="submit-btn-plain"
-     title="Use this folder"
-     data-filename_html="<img src=&quot;/images/mime/22x22/folder.png&quot; alt=&quot;{NODE_NAME}&quot; /> {NODE_NAME}">
-    <span></span>Use this folder
-  </a>
+    <a href="{NODE_LINK}" class="submit-btn-plain" title="Use this folder" data-filename_html="<img src=&quot;/images/mime/22x22/folder.png&quot; alt=&quot;{NODE_NAME}&quot; /> {NODE_NAME}">
+        <span></span>Use this folder
+    </a>
 </div>
 <!-- END use_folder -->

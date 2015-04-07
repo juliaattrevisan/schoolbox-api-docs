@@ -12,71 +12,73 @@
 	<h2>Audio</h2>
 	{CONFIGURATION}
 
-    <!-- BEGIN default_audio -->
-    <div class="audioWrapper">
-        <h3 class="mejs-player-title" data-role="media-playlist-title">{DEFAULT_AUDIO_TITLE}</h3>
-        <audio id="schoolbox_audio{COMPONENT_INSTANCE_ID}"
-               data-role="media-playlist-player"
-               controls
-               preload="none"
-               width="100%">
-            <source src="/cms/sendVideo.php?type=sbfs&id={DEFAULT_AUDIO_ID}" type="audio/mp3" />
-        </audio>
-    </div>
-    <!-- END default_audio -->
+    <div data-collapsable='true'>
+        <!-- BEGIN default_audio -->
+        <div class="audioWrapper">
+            <h3 class="mejs-player-title" data-role="media-playlist-title">{DEFAULT_AUDIO_TITLE}</h3>
+            <audio id="schoolbox_audio{COMPONENT_INSTANCE_ID}"
+                   data-role="media-playlist-player"
+                   controls
+                   preload="none"
+                   width="100%">
+                <source src="/cms/sendVideo.php?type=sbfs&id={DEFAULT_AUDIO_ID}" type="audio/mp3" />
+            </audio>
+        </div>
+        <!-- END default_audio -->
 
-  <div class="dz-wrap">
-    <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="audio"></form>
-	<ul class="information-list dz-container">
-		<!-- BEGIN audio_list -->
-        <li class="{ON_OFF}">
-            <a class="audio-link" href="/cms/sendVideo.php?type=sbfs&id={AUDIO_LIST_ID}" data-role="media-playlist-track">
-                <!-- Replace audio thumb with a play button -->
-                <!--<img class="thumbnail" width="64" height="64" src="{AUDIO_LIST_STATUSIMG}" title="Currently transcoding {AUDIO_LIST_TITLE}" />-->
-                <!--<img class="thumbnail" width="64" height="64" src="/cms/audioThumb.php?type=sbfs&id={AUDIO_LIST_ID}" />-->
-                <h4>{AUDIO_LIST_TITLE}</h4>
-            </a>
-            <p class="meta">{AUDIO_LIST_DURATION} | Posted by <a href="/search/user/{AUDIO_LIST_POSTER_ID}">{AUDIO_LIST_POSTER}</a></p>
-            <p>{AUDIO_LIST_COMMENT}</p>
-        </li>
-		<!-- END audio_list -->
-        <!-- BEGIN audio_pending_list -->
-        <li class="{ON_OFF}">
-            <img class="thumbnail" width="64" height="64" src="{AUDIO_LIST_STATUSIMG}" title="Currently transcoding {AUDIO_LIST_TITLE}" />
-            <h4>{AUDIO_LIST_TITLE}</h4>
-            <p class="meta">Posted by <a href="/search/user/{AUDIO_LIST_POSTER_ID}">{AUDIO_LIST_POSTER}</a></p>
-            <p>{AUDIO_LIST_COMMENT}</p>
-        </li>
-        <!-- END audio_pending_list -->
-	</ul>
-  </div>
-	<!-- BEGIN submit_file -->
-	<p class="interact">
-		<a href="/cms/file/new/{ID}" class="btn up-arrow"><span></span>Post File</a>
-	</p>
-  <script type="text/javascript">
-      $(function() {
-          $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
-              wrapClass: 'dragging',
-              previewsContainer: '#component{COMPONENT_INSTANCE_ID} .information-list',
-              dictDefaultMessage: 'You can drag audio files into this space.',
-              refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
-              refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
-              tplWrap: '<li class="dz-preview" />',
-              addedfile: function (file) {
-                  $(file.previewElement).addClass('category-{ID}').data('node', {ID});
-              },
-              sending: function (file, xhr, formData) {
-                  formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                  formData.append('category', $(file.previewElement).data('node'));
-                  formData.append('comment', '');
-                  formData.append('hidden', 0);
-              },
-              complete: function (file) {
-                  $(file.previewElement).find('img').remove();
-              }
-          });
-      })
-  </script>
-	<!-- END submit_file -->
+        <div class="dz-wrap">
+            <form class="dropzone" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="audio"></form>
+            <ul class="information-list dz-container">
+                <!-- BEGIN audio_list -->
+                <li class="{ON_OFF}">
+                    <a class="audio-link" href="/cms/sendVideo.php?type=sbfs&id={AUDIO_LIST_ID}" data-role="media-playlist-track">
+                        <!-- Replace audio thumb with a play button -->
+                        <!--<img class="thumbnail" width="64" height="64" src="{AUDIO_LIST_STATUSIMG}" title="Currently transcoding {AUDIO_LIST_TITLE}" />-->
+                        <!--<img class="thumbnail" width="64" height="64" src="/cms/audioThumb.php?type=sbfs&id={AUDIO_LIST_ID}" />-->
+                        <h4>{AUDIO_LIST_TITLE}</h4>
+                    </a>
+                    <p class="meta">{AUDIO_LIST_DURATION} | Posted by <a href="/search/user/{AUDIO_LIST_POSTER_ID}">{AUDIO_LIST_POSTER}</a></p>
+                    <p>{AUDIO_LIST_COMMENT}</p>
+                </li>
+                <!-- END audio_list -->
+                <!-- BEGIN audio_pending_list -->
+                <li class="{ON_OFF}">
+                    <img class="thumbnail" width="64" height="64" src="{AUDIO_LIST_STATUSIMG}" title="Currently transcoding {AUDIO_LIST_TITLE}" />
+                    <h4>{AUDIO_LIST_TITLE}</h4>
+                    <p class="meta">Posted by <a href="/search/user/{AUDIO_LIST_POSTER_ID}">{AUDIO_LIST_POSTER}</a></p>
+                    <p>{AUDIO_LIST_COMMENT}</p>
+                </li>
+                <!-- END audio_pending_list -->
+            </ul>
+        </div>
+        <!-- BEGIN submit_file -->
+        <p class="interact">
+            <a href="/cms/file/new/{ID}" class="btn up-arrow"><span></span>Post File</a>
+        </p>
+        <script type="text/javascript">
+            $(function() {
+                $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+                    wrapClass: 'dragging',
+                    previewsContainer: '#component{COMPONENT_INSTANCE_ID} .information-list',
+                    dictDefaultMessage: 'You can drag audio files into this space.',
+                    refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                    refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
+                    tplWrap: '<li class="dz-preview" />',
+                    addedfile: function (file) {
+                        $(file.previewElement).addClass('category-{ID}').data('node', {ID});
+                    },
+                    sending: function (file, xhr, formData) {
+                        formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                        formData.append('category', $(file.previewElement).data('node'));
+                        formData.append('comment', '');
+                        formData.append('hidden', 0);
+                    },
+                    complete: function (file) {
+                        $(file.previewElement).find('img').remove();
+                    }
+                });
+            });
+        </script>
+        <!-- END submit_file -->
+    </div>
 </div>

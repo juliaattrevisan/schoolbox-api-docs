@@ -1,27 +1,30 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
-	<ul class="information-list">
-		<!-- BEGIN tweet -->
-		<li class="{ON_OFF}">
-			<p class="meta">
-                <a class="author" href="https://twitter.com/{TWEET_AUTHOR}">
-                    <img height="32" width="32" src="{TWEET_AVATAR}" />
-                    {TWEET_FULLNAME} @{TWEET_AUTHOR}
-                </a><br />
-				Tweeted on {TWEET_DATE}
-			</p>
-			<p>{TWEET_TEXT}<p>
 
-			<div>
-				<!-- BEGIN tweet_media -->
-				<img src="{TWEET_MEDIA_URL}:small" /><br />
-				<!-- END tweet_media -->
-			</div>
-		</li>
-		<!-- END tweet -->
-	</ul>
-	<p class="interact">
-		<a class="btn search" href="{SEARCH_URL}"><span></span>Search on Twitter</a>
-	</p>
+    <div data-collapsable='true'>
+        <ul class="information-list">
+            <!-- BEGIN tweet -->
+            <li class="{ON_OFF}">
+                <p class="meta">
+                    <a class="author" href="https://twitter.com/{TWEET_AUTHOR}">
+                        <img height="32" width="32" src="{TWEET_AVATAR}" />
+                        {TWEET_FULLNAME} @{TWEET_AUTHOR}
+                    </a><br />
+                    Tweeted on {TWEET_DATE}
+                </p>
+                <p>{TWEET_TEXT}<p>
+
+                <div>
+                    <!-- BEGIN tweet_media -->
+                    <img src="{TWEET_MEDIA_URL}:small" /><br />
+                    <!-- END tweet_media -->
+                </div>
+            </li>
+            <!-- END tweet -->
+        </ul>
+        <p class="interact">
+            <a class="btn search" href="{SEARCH_URL}"><span></span>Search on Twitter</a>
+        </p>
+    </div>
 </div>

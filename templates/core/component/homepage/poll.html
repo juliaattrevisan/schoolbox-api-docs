@@ -3,80 +3,90 @@
     <script type='text/javascript' src='/javascript/components/flot/jquery.flot.js'></script>
     <script type='text/javascript' src='/javascript/components/flot/jquery.flot.resize.js'></script>
     <!-- END custom_head-->
+
     <h2>{POLL_TITLE}</h2>
     {CONFIGURATION}
-    <ul class="information-list"><li>
 
-    <h3>{POLL_QUESTION}</h3>
-    <p class="meta">
-        <a href="/search/user/{POLL_AUTHOR_ID}" class="author">
-            <img width="32" height="32" src="{POLL_AUTHOR_THUMB}" />
-            {POLL_AUTHOR_NAME}
-        </a><br />
-        Posted {POLL_CREATED}
-    </p>
-    <!-- BEGIN poll_vote -->
-    <script type="text/javascript">
-        function validatePoll () {
-            var valid = false;
-            $('input.pollOption').each(function () {
-                if ($(this).prop('checked'))
-                    valid = true;
-            });
-            if (valid)
-                return valid;
-            alert('Please select an option.');
-            return valid;
-        }
-    </script>
-    <form action="/poll/modifyForm.php" method="post" class="clearfix" id="pollForm">
-        <input type="hidden" name="pollID" value="{POLL_ID}" />
-        <input type="hidden" name="categoryID" value="{ID}" />
-        <!-- BEGIN poll_options -->
-        <label for="{POLL_OPTION_INDEX}">
-            <input type="radio" name="vote" class="pollOption" id="{POLL_OPTION_INDEX}" value="{POLL_OPTION_INDEX}" />
-            {POLL_OPTION}</label>
-        <!-- END poll_options -->
-        <input type="submit" value="Vote" onclick="return validatePoll();" class="submit-btn-plain"/>
-    </form>
-    <!-- END poll_vote -->
-    <!-- BEGIN poll_chart -->
-    <script type='text/javascript'>
-    $(function() {
-        $.plot($("#poll-graph{POLL_ID}"),
-            [
-                <!-- BEGIN poll_responses -->
-                {
-                    label: "{POLL_OPTION}",
-                    data: [[{POLL_OPTION_INDEX}, {VALUE}]],
-                    bars: {show:true}
-                }<!-- BEGIN series_separator -->,<!-- END series_separator -->
-                <!-- END poll_responses -->
-            ],
-            {
-                legend: {container: '#poll_legend{POLL_ID}'},
-                xaxis: {show:false}
-            }
-        );
-    });
-    </script>
-    <div class="pad-it">
-        <div id='poll-graph{POLL_ID}' style="width:100%; height:300px; "></div>
+    <div data-collapsable='true'>
+        <ul class="information-list">
+            <li>
+
+                <h3>{POLL_QUESTION}</h3>
+
+                <p class="meta">
+                    <a href="/search/user/{POLL_AUTHOR_ID}" class="author">
+                        <img width="32" height="32" src="{POLL_AUTHOR_THUMB}" />
+                        {POLL_AUTHOR_NAME}
+                    </a><br />
+                    Posted {POLL_CREATED}
+                </p>
+
+                <!-- BEGIN poll_vote -->
+                <script type="text/javascript">
+                    function validatePoll () {
+                        var valid = false;
+                        $('input.pollOption').each(function () {
+                            if ($(this).prop('checked'))
+                                valid = true;
+                        });
+                        if (valid)
+                            return valid;
+                        alert('Please select an option.');
+                        return valid;
+                    }
+                </script>
+                <form action="/poll/modifyForm.php" method="post" class="clearfix" id="pollForm">
+                    <input type="hidden" name="pollID" value="{POLL_ID}" />
+                    <input type="hidden" name="categoryID" value="{ID}" />
+                    <!-- BEGIN poll_options -->
+                    <label for="{POLL_OPTION_INDEX}">
+                        <input type="radio" name="vote" class="pollOption" id="{POLL_OPTION_INDEX}" value="{POLL_OPTION_INDEX}" />
+                        {POLL_OPTION}</label>
+                    <!-- END poll_options -->
+                    <input type="submit" value="Vote" onclick="return validatePoll();" class="submit-btn-plain"/>
+                </form>
+                <!-- END poll_vote -->
+
+                <!-- BEGIN poll_chart -->
+                <script type='text/javascript'>
+                $(function() {
+                    $.plot($("#poll-graph{POLL_ID}"),
+                        [
+                            <!-- BEGIN poll_responses -->
+                            {
+                                label: "{POLL_OPTION}",
+                                data: [[{POLL_OPTION_INDEX}, {VALUE}]],
+                                bars: {show:true}
+                            }<!-- BEGIN series_separator -->,<!-- END series_separator -->
+                            <!-- END poll_responses -->
+                        ],
+                        {
+                            legend: {container: '#poll_legend{POLL_ID}'},
+                            xaxis: {show:false}
+                        }
+                    );
+                });
+                </script>
+                <div class="pad-it">
+                    <div id='poll-graph{POLL_ID}' style="width:100%; height:300px; "></div>
+                </div>
+                <!-- END poll_chart -->
+            </li>
+        </ul>
+
+        <p class="interact">
+            <!-- BEGIN modify_poll -->
+            <a href="/poll/modifyForm.php?delete={POLL_ID}&amp;homepageComponentID={COMPONENT_INSTANCE_ID}" onclick="return confirm('Delete this poll and all of the results?');" class="btn delete"><span></span>Delete</a>
+            <a href="/poll/modify/{POLL_ID}" class="btn modify"><span></span>Modify</a>
+            <!-- END modify_poll -->
+            <!-- BEGIN new_poll -->
+            <a href="/poll/modify/new/{ID}/{COMPONENT_INSTANCE_ID}" class="btn add"><span></span>Create Poll</a>
+            <!-- END new_poll -->
+            <!-- BEGIN show_results -->
+            <a href="/homepage/{ID}/pollResults" class="btn statistics"><span></span>Show results</a>
+            <!-- END show_results -->
+        </p>
+
+        <div id='poll_legend{POLL_ID}'></div>
     </div>
-    <!-- END poll_chart -->
-    </li></ul>
-    <p class="interact">
-        <!-- BEGIN modify_poll -->
-        <a href="/poll/modifyForm.php?delete={POLL_ID}&amp;homepageComponentID={COMPONENT_INSTANCE_ID}" onclick="return confirm('Delete this poll and all of the results?');" class="btn delete"><span></span>Delete</a>
-        <a href="/poll/modify/{POLL_ID}" class="btn modify"><span></span>Modify</a>
-        <!-- END modify_poll -->
-        <!-- BEGIN new_poll -->
-        <a href="/poll/modify/new/{ID}/{COMPONENT_INSTANCE_ID}" class="btn add"><span></span>Create Poll</a>
-        <!-- END new_poll -->
-        <!-- BEGIN show_results -->
-        <a href="/homepage/{ID}/pollResults" class="btn statistics"><span></span>Show results</a>
-        <!-- END show_results -->
-    </p>
-
-    <div id='poll_legend{POLL_ID}'></div>
 </div>

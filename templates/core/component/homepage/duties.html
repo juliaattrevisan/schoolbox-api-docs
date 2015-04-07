@@ -1,17 +1,20 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>{DATE}</h2>
     {CONFIGURATION}
-    <div class="listing clearfix">
-        <ul>
-            <!-- BEGIN duties -->
-            <li class="{ON_OFF} clearfix">
-                <h3>{DUTY}</h3>
-                <p class="interact">{ASSIGNEDUSER}</p>
-            </li>
-            <!-- END duties -->
-        </ul>
+
+    <div data-collapsable='true'>
+        <div class="listing clearfix">
+            <ul>
+                <!-- BEGIN duties -->
+                <li class="{ON_OFF} clearfix">
+                    <h3>{DUTY}</h3>
+                    <p class="interact">{ASSIGNEDUSER}</p>
+                </li>
+                <!-- END duties -->
+            </ul>
+        </div>
+        <!-- BEGIN edit_duties -->
+        <p class="interact"><a href="/modules/duties/editDuties.php?category={ID}">Edit Duties</a></p>
+        <!-- END edit_duties -->
     </div>
-    <!-- BEGIN edit_duties -->
-    <p class="interact"><a href="/modules/duties/editDuties.php?category={ID}">Edit Duties</a></p>
-    <!-- END edit_duties -->
 </div>

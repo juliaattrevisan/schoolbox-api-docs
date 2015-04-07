@@ -1,19 +1,22 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>Homepage Feed</h2>
     {CONFIGURATION}
-    <div class="long">
-        <ul class="events message-list time-right">
-          <!-- BEGIN event -->
-          <li class="event {EVENT_DARK}">
-            <span>
-              <a href="{EVENT_HREF}" class="time">
-                <time title="{EVENT_LONGTIME}">{EVENT_TIME}</time>
-              </a>
-              <img src="{EVENT_ICON}" alt="" width="24" height="24" />
-              <span class="body">{EVENT_BODY}</span>
-            </span>
-          </li>
-          <!-- END event -->
-        </ul>
+
+    <div data-collapsable='true'>
+        <div class="long">
+            <ul class="events message-list time-right">
+              <!-- BEGIN event -->
+              <li class="event {EVENT_DARK}">
+                <span>
+                  <a href="{EVENT_HREF}" class="time">
+                    <time title="{EVENT_LONGTIME}">{EVENT_TIME}</time>
+                  </a>
+                  <img src="{EVENT_ICON}" alt="" width="24" height="24" />
+                  <span class="body">{EVENT_BODY}</span>
+                </span>
+              </li>
+              <!-- END event -->
+            </ul>
+        </div>
     </div>
 </div>

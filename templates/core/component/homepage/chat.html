@@ -45,22 +45,24 @@
 <div class="box chat clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>Chat<span class="light"></span></h2>
     {CONFIGURATION}
-    <div class="chat-box">
-        <ul class="information-list grid chat-users"></ul>
-        <a href="#" class="show-users"></a>
-        <ul class="chat-messages"></ul>
-        <form action="#" method="post" class="chat-send" id="chatSend">
-            <!-- BEGIN chat_state_active -->
-            <div class="chat-message-container">
-                <textarea id="component{COMPONENT_INSTANCE_ID}-chatmessage" name="message" class="chat-message-box"></textarea>
-            </div>
-            <a href="#" class="btn chat float-right"><span></span>Send</a>
-            <!-- END chat_state_active -->
-            <!-- BEGIN chat_state_inactive -->
-            <p class="bold">The chat is inactive. <a href="/homepage/configForm.php?cid={ID}&type=config&component={CHAT_COMPONENT_ID}&state=Active&teacher_timestamp=">Please click here to activate the chat.</a></p>
-            <!-- END chat_state_inactive -->
-        </form>
-        <a href="/homepage/chatArchive/{ID}/" class="btn"><span></span>View Chat Archive</a>
+    <div data-collapsable='true'>
+        <div class="chat-box">
+            <ul class="information-list grid chat-users"></ul>
+            <a href="#" class="show-users"></a>
+            <ul class="chat-messages"></ul>
+            <form action="#" method="post" class="chat-send" id="chatSend">
+                <!-- BEGIN chat_state_active -->
+                <div class="chat-message-container">
+                    <textarea id="component{COMPONENT_INSTANCE_ID}-chatmessage" name="message" class="chat-message-box"></textarea>
+                </div>
+                <a href="#" class="btn chat float-right"><span></span>Send</a>
+                <!-- END chat_state_active -->
+                <!-- BEGIN chat_state_inactive -->
+                <p class="bold">The chat is inactive. <a href="/homepage/configForm.php?cid={ID}&type=config&component={CHAT_COMPONENT_ID}&state=Active&teacher_timestamp=">Please click here to activate the chat.</a></p>
+                <!-- END chat_state_inactive -->
+            </form>
+            <a href="/homepage/chatArchive/{ID}/" class="btn"><span></span>View Chat Archive</a>
+        </div>
+        <div class="chat-error hide"></div>
     </div>
-    <div class="chat-error hide"></div>
 </div>
