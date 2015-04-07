@@ -196,6 +196,12 @@ sub {
     bottom: -0.25em;
 }
 
+// De-emphasise meta information
+.meta, .footnote {
+	color: @secondary-text;
+	margin: 0;
+}
+
 /*--------------------------------------------------------------
 CSS commands
 --------------------------------------------------------------*/
@@ -642,13 +648,17 @@ Notifications
 		}
 		&.first {
 			&.avatar > a {
-				margin-right: 39px;
+				//margin-right: 39px;
 			}
 			> a {
-				margin-right: 8px;
+				//margin-right: 8px;
 				white-space: nowrap;
+				span{
+					float: left;
+				}
 				img {
 					margin-left: 10px;
+					float: left;
 				}
 			}
 			> span {
@@ -661,12 +671,11 @@ Notifications
 		}
 		> a {
 			color: @banner-links;
-			//		text-decoration: none;
 		}
     }
 	img {
-		position: absolute;
-		overflow: hidden;
+		//position: absolute;
+		//overflow: hidden;
 	}
 	// styles specific to the messages dropdown
 	.bell {
@@ -716,19 +725,35 @@ Notifications
 			width: 32px;
 		}
 		li {
+			white-space: nowrap;
 			&:last-child a {
 				border-bottom: none;
 			}
 			a {
-				padding: 5px 30px 5px 10px;
+				padding: 6px 40px 12px 6px;
+				margin: 0;
 				display: block;
 				border-bottom: solid 1px @border-color;
 				color: @flyout-color;
 				text-decoration: none;
+				img{
+					margin: 0 6px 0 0;
+					display: block;
+					float: left;
+				}
 				&:hover {
 					text-decoration: underline;
 					background: @flyout-hover-background;
 					color: @flyout-hover-color;
+				}
+			}
+			img {
+				//position: relative;
+			}
+			&.switch-user{
+				a:hover .meta{
+					color: @flyout-hover-color;
+					text-decoration: none;
 				}
 			}
 		}
@@ -1781,11 +1806,6 @@ Notifications
 	}
 	h3 + p, h4 + p, .meta + p {
 		margin-top: 8px;
-	}
-	// De-emphasise meta information
-	.meta, .footnote {
-		color: @secondary-text !important;
-		margin: 0;
 	}
 	.footnote {
 		text-align: right;
