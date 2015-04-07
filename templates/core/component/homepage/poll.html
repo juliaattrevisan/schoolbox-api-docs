@@ -47,15 +47,7 @@
             <script type='text/javascript'>
             $(function() {
                 $.plot($("#poll-graph{POLL_ID}"),
-                    [
-                        <!-- BEGIN poll_responses -->
-                        {
-                            label: "{POLL_OPTION}",
-                            data: [[{POLL_OPTION_INDEX}, {VALUE}]],
-                            bars: {show:true}
-                        }<!-- BEGIN series_separator -->,<!-- END series_separator -->
-                        <!-- END poll_responses -->
-                    ],
+                    {POLL_DATA},
                     {
                         legend: {container: '#poll_legend{POLL_ID}'},
                         xaxis: {show:false}
