@@ -23,7 +23,7 @@ if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
         ->setCategory(\Schoolbox\Resource\CategoryMapper::getInstance()->createModel()->setId($_POST['categoryID']))
         ->setHeading($_POST['textBoxHeading'])
         ->setBody($_POST['textBoxBody'])
-        ->setDeletedAt($now->getDatabase());
+        ->setDeletedAt(null);
 
     if (is_numeric($_POST['textBoxID'])) {
         $textbox->setId($_POST['textBoxID']);
