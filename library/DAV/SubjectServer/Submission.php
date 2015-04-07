@@ -8,7 +8,7 @@
  */
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
-use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
+use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
 class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
@@ -20,7 +20,7 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
     protected $user;
 
     /**
-     * @var Submission
+     * @var Submission\File
      */
     protected $submission;
 
@@ -44,7 +44,7 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
     }
 
     /**
-     * @param Submission $submission
+     * @param Submission\File $submission
      *
      * @return $this
      */
@@ -55,7 +55,7 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
     }
 
     /**
-     * @return Submission
+     * @return Submission\File
      */
     public function getSubmission()
     {
@@ -70,8 +70,8 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
     public function getLastModified()
     {
         $submission = $this->getSubmission();
-        if ($submission instanceof Submission) {
-            $date = $submission->getSubmitted();
+        if ($submission instanceof Submission\ISubmission) {
+            $date = $submission->getCreatedAt();
             if ($date instanceof Alaress_Date_Format) {
                 return $date->getUnixTimestamp();
             }
@@ -105,7 +105,7 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
         //
         // If the file was updated less than, say, 5 minutes ago, accept the
         // request - otherwise, reject it.
-        $submit_time  = $this->getSubmission()->getSubmitted()->getUnixTimestamp();
+        $submit_time  = $this->getSubmission()->getCreatedAt()->getUnixTimestamp();
         $current_time = $_SERVER['REQUEST_TIME'];
         if (($current_time - $submit_time) > 300) {
             throw new Sabre\DAV\Exception\Forbidden('Cannot overwrite an existing file with the same name');
@@ -113,15 +113,13 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
 
         //
         // Load this file's contents.
-        $temp_file = tempnam(sys_get_temp_dir(), 'sb');
-        $fp        = fopen($temp_file, 'wb');
-        stream_copy_to_stream($data, $fp, -1, 0);
-        fclose($fp);
+        $storage = Storage\Mapper::getInstance()->createModel();
+        $storage->writeStream($data);
 
         //
         // And put it in the submission object.
-        $mapper = new SubmissionMapper();
-        $mapper->save($this->getSubmission()->setTempLocation($temp_file));
+        $mapper = new Submission\Mapper();
+        $mapper->save($this->getSubmission()->setStorage($storage));
         return null;
     }
 }

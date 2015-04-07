@@ -9,7 +9,8 @@
 
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
-use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
 class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
@@ -69,7 +70,7 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
      */
     public function loadChildren()
     {
-        $mapper        = new SubmissionMapper();
+        $mapper        = new Submission\Mapper();
         $nameGenerator = new DAV_NameGenerator();
         $files         = $mapper->findByColumnList(
             array(
@@ -78,14 +79,21 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
             )
         );
         foreach ($files as $file) {
-            $file_location = $file->getFileLocation();
-            if (file_exists($file_location)) {
+
+            if (!$file instanceof Submission\File) {
+                continue;
+            }
+
+            /** @var Storage\Model $storage */
+            $storage = $file->getStorage();
+
+            if ($storage->exists()) {
                 $child = new DAV_SubjectServer_Submission(
                     $nameGenerator->getUniqueChildName(
                         $this,
                         $nameGenerator->sanitiseName($file->getFilename())
                     ),
-                    file_get_contents($file_location)
+                    $storage->read()
                 );
                 $child
                     ->setUser($this->getUser())
@@ -112,29 +120,29 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
         //
         // If a resource is supplied, its file could be deleted before it can
         // be copied to its destination.
-        // Copy it to a temp file before this happens.
-        $temp_file = tempnam(sys_get_temp_dir(), 'sb');
-        if (!is_resource($data)) {
+        if (is_resource($data)) {
+            $storage = Storage\Mapper::getInstance()->createModel();
+            $storage->writeStream($data);
+
+        } elseif ($data) {
+            // Copy it to a temp file before this happens.
+            $temp_file = tempnam(sys_get_temp_dir(), 'sb');
             file_put_contents($temp_file, $data);
-        } else {
-            $fp = fopen($temp_file, 'wb');
-            stream_copy_to_stream($data, $fp, -1, 0);
-            fclose($fp);
+            $storage = Storage\Mapper::getInstance()->accept($name, $temp_file, false);
         }
 
         $late_timestamp = $this->getAssessment()->getDueDate()->getUnixTimestamp();
         $submit_date    = new DateTime('now');
         $is_late        = ($late_timestamp < $submit_date->getTimestamp());
 
-        $submission = new Submission();
+        $submission = new Submission\File();
         $submission
             ->setSubmissionBox($this->getAssessment())
             ->setOwner($this->getUser())
             ->setFilename($name)
-            ->setTempLocation($temp_file)
-            ->setSubmitted($submit_date)
+            ->setCreatedAt($submit_date)
             ->setLate($is_late)
-            ->loadMimetypeFromFilename();
+            ->setStorage($storage);
 
         //
         // Reasons a student couldn't submit a file:
@@ -143,18 +151,24 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
         // * The submission is late
         // * They've already submitted and it's not a multi-submission assess
         // All of these are covered in SubmissionMapper->checkUploadability
-        $mapper = new SubmissionMapper();
+        $mapper = new Submission\Mapper();
         try {
-            $mapper->checkUploadability($submission, array());
+            SubmissionBoxMapper::getInstance()->checkUploadability($this->getAssessment(), $this->getUser());
+
         } catch (Schoolbox\Resource\Exception $e) {
             throw new Sabre\DAV\Exception\Forbidden($e->getMessage(), $e->getCode(), $e);
+
         }
+
+
         $mapper->save($submission);
+
         // Queue it for Plagscanning as well, if that's supported.
         if (Config::get('plagscan_api_key') && Config::get('plagscan_username')) {
             $plagdoc = Plagscan_DocumentMapper::getInstance()->createFromSubmission($submission);
             Plagscan_DocumentMapper::getInstance()->save($plagdoc);
         }
+
         return null;
 
 //		$dav_file = new Sabre\DAV\SimpleFile(
