@@ -73,7 +73,7 @@
 <script type="text/javascript" src="/javascript/jquery.masonry.js"></script>
 <script type="text/javascript" src="/javascript/jquery.masonry.spectrum.js"></script>
 <script type="text/javascript" src="/javascript/jquery.droptab.js"></script>
-
+<script type="text/javascript" src="/javascript/jquery.collapsable.js"></script>
 <script type="text/javascript">
     $(function() {
 
@@ -161,6 +161,9 @@
             }
         });
 
+        /* Collapse content on components
+         */
+        $('.box').find('[data-collapser=true]').collapsable();
     });
 </script>
 <!-- END modify_layout -->
