@@ -226,20 +226,47 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
             function ($mapper, $model, $row) {
                 /** @var self $mapper */
                 /** @var Model $model */
-                $model
-                    ->setLearningArea($mapper->hydrateJoin($row, 'area', 'na'))
-                    ->setLearningLevel($mapper->hydrateJoin($row, 'level', 'nl'))
-                ;
-                $model->getLearningArea()
-                    ->setSource(
-                        $mapper->hydrateJoin($row, 'area.source', 'nas')
-                    );
-                $model->getLearningLevel()
-                    ->setSource(
-                        $mapper->hydrateJoin($row, 'level.source', 'nls')
-                    );
-                return $model;
+                return $mapper->hydrateWithRelatedJoins($row, 'na', 'nas', 'nl', 'nls');
             }
         );
+    }
+
+    /**
+     * Hydrates a curriculum node, with joins to area+source and level+source.
+     *
+     * @param array  $row
+     * @param string $alias
+     * @param string $areaAlias
+     * @param string $areaSourceAlias
+     * @param string $levelAlias
+     * @param string $levelSourceAlias
+     *
+     * @return Model
+     */
+    public function hydrateWithRelatedJoins(
+        $row,
+        $alias = null,
+        $areaAlias = 'cna',
+        $areaSourceAlias = 'cnas',
+        $levelAlias = 'cnl',
+        $levelSourceAlias = 'cnls'
+    ) {
+        /** @var Model $curriculumNode */
+        $curriculumNode = $this->hydrate($row, $alias);
+        if ($curriculumNode->getId()) {
+            $curriculumNode->setLearningArea(
+                $this->getJoinMapper('area')->hydrate($row, $areaAlias)
+                    ->setSource(
+                        $this->getJoinMapper('area.source')->hydrate($row, $areaSourceAlias)
+                    )
+            );
+            $curriculumNode->setLearningLevel(
+                $this->getJoinMapper('level')->hydrate($row, $levelAlias)
+                    ->setSource(
+                        $this->getJoinMapper('level.source')->hydrate($row, $levelSourceAlias)
+                    )
+            );
+        }
+        return $curriculumNode;
     }
 }

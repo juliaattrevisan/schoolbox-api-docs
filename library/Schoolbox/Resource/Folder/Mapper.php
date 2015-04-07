@@ -524,22 +524,9 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
             // BTW fetching multiple 1-M relations in a single query
             // is how you get ants!
             /** @var Node\Model $curriculumNode */
-            $curriculumNode = $this->getJoinMapper('curriculum_node_for_category')->hydrate($row, 'cn');
+            $curriculumNode = $this->getJoinMapper('curriculum_node_for_category')
+                ->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
             if ($curriculumNode->getId()) {
-                $curriculumNode->setLearningArea(
-                    $this->getJoinMapper('curriculum_node_for_category.area')->hydrate($row, 'cna')
-                        ->setSource(
-                            $this->getJoinMapper('curriculum_node_for_category.area.source')
-                                ->hydrate($row, 'cnas')
-                        )
-                );
-                $curriculumNode->setLearningLevel(
-                    $this->getJoinMapper('curriculum_node_for_category.level')->hydrate($row, 'cnl')
-                        ->setSource(
-                            $this->getJoinMapper('curriculum_node_for_category.level.source')
-                                ->hydrate($row, 'cnls')
-                        )
-                );
                 $addedCurriculumNodes[$curriculumNode->getId()] = $curriculumNode;
             }
         }

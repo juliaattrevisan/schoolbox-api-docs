@@ -351,22 +351,9 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
             }
             // Hydrate curriculum nodes
             /** @var Node\Model $curriculumNode */
-            $curriculumNode = $this->getJoinMapper('curriculum_node_for_submission_box')->hydrate($row, 'cn');
+            $curriculumNode = $this->getJoinMapper('curriculum_node_for_submission_box')
+                ->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
             if ($curriculumNode->getId()) {
-                $curriculumNode->setLearningArea(
-                    $this->getJoinMapper('curriculum_node_for_submission_box.area')->hydrate($row, 'cna')
-                        ->setSource(
-                            $this->getJoinMapper('curriculum_node_for_submission_box.area.source')
-                                ->hydrate($row, 'cnas')
-                        )
-                );
-                $curriculumNode->setLearningLevel(
-                    $this->getJoinMapper('curriculum_node_for_submission_box.level')->hydrate($row, 'cnl')
-                        ->setSource(
-                            $this->getJoinMapper('curriculum_node_for_submission_box.level.source')
-                                ->hydrate($row, 'cnls')
-                        )
-                );
                 $curriculumNodes[$curriculumNode->getId()] = $curriculumNode;
             }
         }

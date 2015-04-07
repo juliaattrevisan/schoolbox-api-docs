@@ -614,22 +614,9 @@ class OnlineAssessmentMapper extends Mapper implements FeedableMapperInterface {
             }
             // Hydrate curriculum nodes
             /** @var Node\Model $curriculumNode */
-            $curriculumNode = $this->getJoinMapper('curriculum_node_for_assess')->hydrate($row, 'cn');
+            $curriculumNode = $this->getJoinMapper('curriculum_node_for_assess')
+                ->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
             if ($curriculumNode->getId()) {
-                $curriculumNode->setLearningArea(
-                    $this->getJoinMapper('curriculum_node_for_assess.area')->hydrate($row, 'cna')
-                        ->setSource(
-                            $this->getJoinMapper('curriculum_node_for_assess.area.source')
-                                ->hydrate($row, 'cnas')
-                        )
-                );
-                $curriculumNode->setLearningLevel(
-                    $this->getJoinMapper('curriculum_node_for_assess.level')->hydrate($row, 'cnl')
-                        ->setSource(
-                            $this->getJoinMapper('curriculum_node_for_assess.level.source')
-                                ->hydrate($row, 'cnls')
-                        )
-                );
                 $curriculumNodes[$curriculumNode->getId()] = $curriculumNode;
             }
         }
