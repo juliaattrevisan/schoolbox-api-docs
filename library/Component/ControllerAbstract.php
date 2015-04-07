@@ -362,15 +362,21 @@ abstract class Component_ControllerAbstract
         $this->sitepage->setFile('configTpl', $this->determineTemplate());
         $this->sitepage->setBlock('configTpl', 'settings_link', 'settings_link_block');
         $this->sitepage->setBlock('configTpl', 'settings_panel', 'settings_panel_block');
+        $this->sitepage->setBlock('configTpl', 'settings_collapse', 'settings_collapse_block');
         $this->sitepage->setBlock('settings_panel', 'config_element', 'config_element_block');
         $this->sitepage->setVar(array(
             $targetHandle => '',
             'config_element_block' => '',
-            'settings_panel_block' => '',
 
             /* The little triangle which drops down the config options
+             * contained in settings_panel_block
              */
-            'settings_link_block' => ''
+            'settings_link_block' => '',
+            'settings_panel_block' => '',
+
+            /* Collapsable control button
+             */
+            'settings_collapse_block' => '',
         ));
     }
 
