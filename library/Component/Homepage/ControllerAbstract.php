@@ -97,14 +97,14 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
     {
         if ($this->getConfig('collapse')) {
             return array(
-                'title' => '(collapsed)',
+                'icon' => '&boxplus;',
                 'class' => 'hide',
                 'data'  => 'collapsed'
             );
         }
 
         return array(
-            'title' => '',
+            'icon' => '&boxminus;',
             'class' => '',
             'data'  => 'uncollapsed'
         );
@@ -119,7 +119,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
 
         $this->setVar(
             array(
-                'CONFIG_COLLAPSED_TITLE' => $state['title'],
+                'CONFIG_COLLAPSED_ICON' => $state['icon'],
                 'CONFIG_COLLAPSED_CLASS' => $state['class'],
                 'CONFIG_COLLAPSED_STATE' => $state['data'],
             )
