@@ -10,6 +10,8 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 
+use DueWork_Error;
+use Marksheet_Abstract;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\User;
@@ -70,14 +72,14 @@ class Factory
     /**
      * A thing that came out of Marksheet_Factory
      *
-     * @var null
+     * @var Marksheet_Abstract
      */
     private $marksheet = null;
 
     /**
      * Crocodoc uuid
      *
-     * @var null
+     * @var string
      */
     private $uuid = null;
 
@@ -153,7 +155,7 @@ class Factory
         $errors = array();
 
         foreach ($allErrors as $currentError) {
-            /* @var $e DueWork_Error */
+            /* @var $currentError DueWork_Error */
             $errors[$currentError->getDisplayAs()] = $currentError;
         }
 
@@ -410,7 +412,7 @@ class Factory
     /**
      * Set submission box
      *
-     * @param null $submissionBox
+     * @param SubmissionBox $submissionBox
      */
     private function setSubmissionBox($submissionBox)
     {
@@ -420,7 +422,7 @@ class Factory
     /**
      * Get submission box
      *
-     * @return null
+     * @return SubmissionBox
      */
     private function getSubmissionBox()
     {
@@ -430,7 +432,7 @@ class Factory
     /**
      * Set user
      *
-     * @param null $user
+     * @param User $user
      */
     private function setUser($user)
     {
@@ -440,7 +442,7 @@ class Factory
     /**
      * Get user
      *
-     * @return null
+     * @return User
      */
     private function getUser()
     {
@@ -470,7 +472,7 @@ class Factory
     /**
      * Set returned work mapper
      *
-     * @param null $returnedWorkMapper
+     * @param ReturnedWorkMapper $returnedWorkMapper
      */
     private function setReturnedWorkMapper($returnedWorkMapper)
     {
@@ -480,7 +482,7 @@ class Factory
     /**
      * Get returned work mapper
      *
-     * @return null
+     * @return ReturnedWorkMapper
      */
     private function getReturnedWorkMapper()
     {
@@ -490,7 +492,7 @@ class Factory
     /**
      * Set marksheet
      *
-     * @param null $marksheet
+     * @param Marksheet_Abstract $marksheet
      */
     private function setMarksheet($marksheet)
     {
@@ -500,7 +502,7 @@ class Factory
     /**
      * Get marksheet
      *
-     * @return null
+     * @return Marksheet_Abstract
      */
     private function getMarksheet()
     {
@@ -510,7 +512,7 @@ class Factory
     /**
      * Set update window
      *
-     * @param mixed $updateWindow
+     * @param int $updateWindow
      */
     private function setUpdateWindow($updateWindow)
     {
@@ -520,7 +522,7 @@ class Factory
     /**
      * Get update window
      *
-     * @return mixed
+     * @return int
      */
     private function getUpdateWindow()
     {
@@ -550,7 +552,7 @@ class Factory
     /**
      * Set errors
      *
-     * @param array $errors
+     * @param DueWork_Error[] $errors
      */
     private function setErrors($errors)
     {
@@ -560,7 +562,7 @@ class Factory
     /**
      * Get errors
      *
-     * @return array
+     * @return DueWork_Error[]
      */
     private function getErrors()
     {
@@ -570,7 +572,7 @@ class Factory
     /**
      * Set uuid
      *
-     * @param null $uuid
+     * @param string $uuid
      */
     private function setUuid($uuid)
     {
@@ -580,7 +582,7 @@ class Factory
     /**
      * Get uuid
      *
-     * @return null
+     * @return string
      */
     private function getUuid()
     {

@@ -9,6 +9,7 @@
 
 namespace Schoolbox;
 
+use Countable;
 use Database;
 use PDO;
 use PDOStatement;
@@ -21,6 +22,7 @@ use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\NotifInterface;
 use Schoolbox\Realtime\Schedule\Event;
 use Serializable;
+use Traversable;
 
 abstract class Mapper implements Serializable
 {
@@ -1488,7 +1490,7 @@ abstract class Mapper implements Serializable
                 // that the query could ever return anything, so just return
                 // an empty collection.
                 if (is_array($columnValue)
-                    || ($columnValue instanceof \Traversable && $columnValue instanceof \Countable)
+                    || ($columnValue instanceof Traversable && $columnValue instanceof Countable)
                 ) {
                     if (count($columnValue) === 0) {
                         throw new \UnderflowException('List of column values is empty');
@@ -1946,9 +1948,9 @@ abstract class Mapper implements Serializable
     /**
      * Hydrates a row from the database into a model.
      *
-     * @param array    $rowList  The rows from the database.
-     * @param string   $alias    The prefix of this mapper's table cells in $row
-     * @param callable $callback A callback to apply on all models (@see $this->hydrate)
+     * @param Traversable|array $rowList  The rows from the database.
+     * @param string            $alias    The prefix of this mapper's table cells in $row
+     * @param callable          $callback A callback to apply on all models (@see $this->hydrate)
      *
      * @return Collection
      */
