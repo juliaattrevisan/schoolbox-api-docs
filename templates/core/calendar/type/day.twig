@@ -1,4 +1,4 @@
-<li class="{{ event.eventClasses() }}">
+<li class="{{ event.eventClasses() }} {% if renderer.isTranslucent %}translucent{% endif %}">
     <span class="eventListing">
         <strong>{{ event.getEventSpan()|raw }}</strong>
         <span style="background-color:{{ event.colour }}">{{ event.title }}
@@ -35,7 +35,7 @@
                 <form method="post">
                     <input name="event[id]" type="hidden" value="{{ event.eventId }}">
                     {% if event.renderer.attendanceStatus() %}
-                    <a class="btn modify float-left attendance-request" href="#"><span></span>Not Going</a>
+                    <a class="btn modify float-left attendance-request" href="#"><span></span>Unattend</a>
                     {% else %}
                     <a class="btn modify float-left attendance-request" href="#"><span></span>RSVP</a>
                     {% endif %}
