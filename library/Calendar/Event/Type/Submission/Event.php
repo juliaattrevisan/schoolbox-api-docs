@@ -32,10 +32,6 @@ class Event extends EventBase implements EventInterface {
     protected $authorId = -1;
     protected $authorName = '';
 
-    /* Category to which this submission box belongs
-     */
-    protected $categoryName = '';
-
     /**
      * Category which the event is related to
      * @var Category
@@ -61,7 +57,8 @@ class Event extends EventBase implements EventInterface {
     private $submissionBoxName = '';
     private $submissionBoxDetail = '';
 
-	/**
+
+    /**
 	 * Render via external class
 	 *
 	 * @param \Calendar_Event_StudentBirthday_Renderer $visitor
@@ -95,7 +92,7 @@ class Event extends EventBase implements EventInterface {
 	 *
 	 * @return string
 	 */
-	public function getDerivedEventLevel() {
+	public function getCalendarClasses() {
 		return 'personal';
 	}
 

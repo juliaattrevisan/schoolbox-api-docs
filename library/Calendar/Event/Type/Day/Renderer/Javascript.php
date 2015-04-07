@@ -82,21 +82,7 @@ class Javascript extends Base {
 
 			//
 			// Add campus list to list of classes
-			$classes = array(
-				$this->event->getDerivedEventLevel(),
-				'type' . $this->event->getType(),
-			);
-			if (($connectorId = $this->event->getConnectorId()) > 0) {
-				$classes[] = 'source' . $connectorId;
-			}
-			$campus_list = array_filter(array_map('trim', explode(',', $this->event->getCampusList())));
-			foreach ($campus_list as &$campus) {
-				$campus = 'campus'.trim($campus);
-			}
-			unset($campus);
-			if (!empty($campus_list)) {
-				$classes[] = implode(' ', $campus_list);
-			}
+			$classes = $this->getEvent()->eventClasses();
 
 			$event = array(
 				'title' => $this->event->getTitle(),
@@ -133,7 +119,7 @@ class Javascript extends Base {
 						'type' => $this->event->getEventType(),
 						'author' => $this->event->getAuthorName(),
 						'authorId' => $this->event->getAuthorId(),
-						'level' => $this->event->getDerivedEventLevel(),
+						'level' => $this->event->getCalenderClasses(),
 						'completed' => $this->event->getCompleted(),
 					),
 					'links' => array(

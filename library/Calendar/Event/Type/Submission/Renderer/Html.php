@@ -9,22 +9,17 @@
  */
 namespace Calendar\Event\Type\Submission\Renderer;
 
-use Calendar\Event\Type\RendererBase;
+use Calendar\Event\Type\Submission\Renderer\Base;
 
-class Html extends RendererBase {
+class Html extends Base {
 
 
     public function render()
     {
-
-        if ($this->isVisible()) {
-            return $this->getTemplate()->render('calendar/type/submission.twig',
-                array('event' => $this->getEvent())
-            );
-        } else {
-            return '';
-        }
-
+        return $this->getTemplate()->render('calendar/type/submission.twig',
+            array(  'event' => $this->getEvent(),
+                    'renderer' => $this)
+        );
     }
 
     /**
@@ -46,26 +41,7 @@ class Html extends RendererBase {
             )
         );
 
-        /* Get status to set action
-         */
-        if ($this->getGroupHandler()->isStudent($_SESSION['id'])) {
-            $action = 'View Details';
-            $this->getPage()->setVar(
-                'MODIFY',
-                '<a class="btn go-to float-left" href="/submission/submissionHistory/' . $currentEvent->getSubmissionBoxId(
-                ) . '/'. $_SESSION['id'] . '"><span></span>' . $action . '</a>'
-            );
-        } else {
-            if ($this->getGroupHandler()->isStaff($_SESSION['id'])) {
-                $this->getPage()->setVar(
-                    'MODIFY',
-                    '<a class="btn go-to float-left" href="/submission/viewSubmission/' . $currentEvent->getSubmissionBoxId(
-                    ) . '"><span></span>View Submissions</a>'
-                );
-            } else {
-                $this->getPage()->setVar('MODIFY', '');
-            }
-        }
+
 
         $this->getPage()->setVar(
             array(
