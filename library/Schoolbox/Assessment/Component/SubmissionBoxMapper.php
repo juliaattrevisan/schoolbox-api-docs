@@ -28,6 +28,7 @@ use Schoolbox\Assessment\Course\Task;
  *
  * @package Schoolbox\Assessment\Component
  * @method SubmissionBox hydrate(array $row, $alias = '', $callback = null)
+ * @method Collection|SubmissionBox[] findByColumnList($columnList, $options = [])
  */
 class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInterface
 {

@@ -25,7 +25,7 @@ use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -48,8 +48,8 @@ class SubmissionNotifier extends AbstractModuleNotifier
     /** @var UserMapper */
     protected $userMapper;
 
-    /** @var CategoryMapper */
-    protected $categoryMapper;
+    /** @var Folder\Mapper */
+    protected $folderMapper;
 
 
     /**
@@ -69,11 +69,47 @@ class SubmissionNotifier extends AbstractModuleNotifier
      */
     public function loadDependencies($dependencies = null)
     {
-        $this->submissionBoxMapper = SubmissionBoxMapper::getInstance();
-        $this->userMapper          = UserMapper::getInstance();
-        $this->categoryMapper      = CategoryMapper::getInstance();
+        $dependencies['submissionBoxMapper'] = $dependencies['submissionBoxMapper'] ?: SubmissionBoxMapper::getInstance();
+        $dependencies['userMapper']          = $dependencies['userMapper'] ?: UserMapper::getInstance();
+        $dependencies['folderMapper']        = $dependencies['folderMapper'] ?: Folder\Mapper::getInstance();
+        $dependencies['mapper']              = $dependencies['mapper'] ?: new Submission\Mapper();
+
         parent::loadDependencies($dependencies);
     }
+
+
+    /**
+     * @param Folder\Mapper $folderMapper
+     * @return static
+     */
+    protected function setFolderMapper($folderMapper)
+    {
+        $this->folderMapper = $folderMapper;
+        return $this;
+    }
+
+
+    /**
+     * @param SubmissionBoxMapper $submissionBoxMapper
+     * @return static
+     */
+    protected function setSubmissionBoxMapper($submissionBoxMapper)
+    {
+        $this->submissionBoxMapper = $submissionBoxMapper;
+        return $this;
+    }
+
+
+    /**
+     * @param UserMapper $userMapper
+     * @return static
+     */
+    protected function setUserMapper($userMapper)
+    {
+        $this->userMapper = $userMapper;
+        return $this;
+    }
+
 
     /**
      * This notifier does not actually use future scheduling - all events fire immediately, if at all.
@@ -88,7 +124,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
         $submission = $bundle->getEvent()->getObject();
         $diff       = $bundle->getEvent()->getDiff();
 
-        if (!$submission instanceof Submission) {
+        if (!$submission instanceof SubmissionBox\Submission\ISubmission) {
             return;
         }
 
@@ -102,7 +138,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
             case Mapper::METHOD_CREATE: // new submission created
 
                 // is this in draft mode? if so, do nothing
-                if ($submission->getDraft()) {
+                if ($submission instanceof Submission\Inline && $submission->isDraft()) {
                     break;
                 }
 
@@ -154,7 +190,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
 
     /**
      * @param string $type
-     * @param Submission $submission
+     * @param Submission\ISubmission $submission
      * @param User $user
      * @param array|null $diff
      * @return Messenger
@@ -166,7 +202,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
         $studentExtId = $user->getExternalId();
 
         $box = $this->submissionBoxMapper->findById($submission->getSubmissionBox()->getId());
-        $cat = $this->categoryMapper->findById($box->getCategory()->getId());
+        $cat = $this->folderMapper->findById($box->getCategory()->getId());
 
         $boxId = $box->getId();
 
@@ -200,7 +236,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
     /**
      * Notify a teacher that students have submitted to their submission box
      *
-     * @param Submission $submission
+     * @param Submission\ISubmission $submission
      * @param User $user
      * @param array|null $diff
      * @return Messenger
@@ -214,7 +250,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
     /**
      * Notify a teacher that a student has submitted to their submission box...again
      *
-     * @param Submission $submission
+     * @param Submission\ISubmission $submission
      * @param User $user
      * @param array|null $diff
      * @return Messenger
@@ -228,7 +264,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
     /**
      * Notify a student that their (only) submission has been deleted, so they can resubmit.
      *
-     * @param Submission $submission
+     * @param Submission\ISubmission $submission
      * @param User $user
      * @param array|null $diff
      * @return Messenger
@@ -243,7 +279,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
         $box   = $this->submissionBoxMapper->findById($submission->getSubmissionBox()->getId());
         $boxId = $box->getId();
 
-        $cat   = $this->categoryMapper->findById($box->getCategory()->getId());
+        $cat   = $this->folderMapper->findById($box->getCategory()->getId());
         $catId = $cat->getId();
 
         $ownerId    = $user->getId();

@@ -20,7 +20,12 @@ use Schoolbox\Curriculum\Node;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper;
 
-
+/**
+ * Class OnlineAssessmentMapper
+ *
+ * @package Schoolbox\Assessment\Component
+ * @method Collection|OnlineAssessment[] findByColumnList($columnList, $options = [])
+ */
 class OnlineAssessmentMapper extends Mapper implements IActivityMapper, FeedableMapperInterface {
 
 	protected function mapping () {

@@ -38,7 +38,7 @@ class ClassStatistics {
 	protected $submissionBoxMapper;
 
 	/**
-	 * @var SubmissionMapper
+	 * @var Submission\Mapper
 	 */
 	protected $submissionMapper;
 
@@ -63,14 +63,14 @@ class ClassStatistics {
 	 * @param Category $category
 	 * @param int $year
 	 * @param int $semester
-	 * @param \Schoolbox\User $user
+	 * @param User $user
 	 */
-	public function __construct($category, $year = 0, $semester = 0, \Schoolbox\User $user) {
+	public function __construct($category, $year = 0, $semester = 0, User $user) {
 		$this->category = $category;
 
 		// compile the due work, assessments, marks returned, et al
 		$this->submissionBoxMapper = new SubmissionBoxMapper();
-		$this->submissionMapper = new SubmissionMapper();
+		$this->submissionMapper = new Submission\Mapper();
 		$this->returnMapper = new SubmissionBox\ReturnedWorkMapper();
 
 		$this->assessMapper = new OnlineAssessmentMapper();
@@ -116,7 +116,6 @@ class ClassStatistics {
 			'mark_visibility' => $quizVisibilities
 		));
 		foreach($assessCollection as $assess) {
-            /* @var Assess $assess */
             $due = $assess->getFinish();
             $dueYear = $due->getYear();
             $dueSemester = $due->getUsingFormat('m') > 6 ? 2 : 1;
@@ -228,23 +227,17 @@ class ClassStatistics {
 			'box_id' => $box->getId(),
 		));
 
-		foreach($submissions as $submission) {
-			/* @var $submission Submission */
+		foreach ($submissions as $submission) {
 			$userId = $submission->getOwner()->getId();
-			if(!array_key_exists($userId, $marks)) {
+			if (!array_key_exists($userId, $marks)) {
 				$marks[$userId]['attempts'] = 1;
-			}
-			else {
+			} else {
 				$marks[$userId]['attempts']++;
 			}
 		}
 
 		// calculate and insert an average
 		$marks['avg'] = $count ? $sum / $count : null;
-
-//		echo "<b>MARRRKS</b><br/>\n";
-//		var_dump($marks);
-//		echo "<br/><br/>\n";
 
 		return $marks;
 	}
