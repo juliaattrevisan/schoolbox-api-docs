@@ -396,7 +396,16 @@
         // Set up select from timetable thing
         var timetableSelectorDialog = $('#timetableSelectorDialog').dialog({
             modal: true,
-            autoOpen: false
+            autoOpen: false,
+            buttons: [
+                {
+                    text: 'Cancel',
+                    click: function() {
+                        timetableSelectorDialog.dialog('close');
+                    }
+                }
+            ],
+            minWidth: 500
         });
 
         var timeToUpdate = '';
