@@ -11,6 +11,7 @@
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Storage;
 
@@ -34,7 +35,8 @@ $kernel->run(function ($di, $loop, $log, $opts) {
         new Resource\Storage\Migration(),
         new Resource\File\Migration(),
         new Resource\My\File\Migration(),
-        new Schoolbox\Dropbox\Migration()
+        new SubmissionBox\Submission\Migration(),
+        new Schoolbox\Dropbox\Migration(),
     ];
 
     $migrator->migrateEach($patterns);
