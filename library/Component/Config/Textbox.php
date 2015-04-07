@@ -32,7 +32,7 @@ class Component_Config_Textbox extends Component_Config_Abstract
         if (is_numeric($altSource) && $altSource) {
             $allTextboxes = $textboxMapper->findByColumn('categoryID', $altSource);
         } else {
-            $allTextboxes = $textboxMapper->findByColumn('categoryID', $this->getCategory('id'));
+            $allTextboxes = $textboxMapper->findByColumn('categoryID', $this->getCategory()->getId());
         }
 
         $page->setBlock($keyblock, 'textbox_select', 'textbox_select_block');
