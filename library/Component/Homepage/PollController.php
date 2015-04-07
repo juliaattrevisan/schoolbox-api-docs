@@ -184,10 +184,12 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
             else {
                 $this->parse('new_poll_block', 'new_poll');
             }
-
         }
+
+        /* Detroit
+         */
+        $this->applyCollapsedState();
 
         return true;
     }
-
 }

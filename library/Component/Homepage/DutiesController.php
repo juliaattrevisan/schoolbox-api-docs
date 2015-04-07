@@ -63,6 +63,10 @@ class Component_Homepage_DutiesController extends Component_Homepage_ControllerA
             $this->parse("edit_duties_block", "edit_duties");
         }
 
+        /* Detroit
+         */
+        $this->applyCollapsedState();
+
         return true;
     }
 }

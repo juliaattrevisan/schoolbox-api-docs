@@ -39,7 +39,6 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
         /* If no url is specified it might time out -_-
          * So just hide all this instead
          */
-
         if (strlen(trim($this->getConfig('url')))) {
             /* Pattern match the necessary code out of a url given to us
              * by the Wolfram Alpha
@@ -74,6 +73,10 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
         } else {
             $this->setVar('has_wolfram_block', '');
         }
+
+        /* Detroit
+         */
+        $this->applyCollapsedState();
 
         return true; // everything went according to plan
     }

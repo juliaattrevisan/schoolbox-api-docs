@@ -268,6 +268,10 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             }
         }
 
+        /* Detroit
+         */
+        $this->applyCollapsedState();
+
         return true;
     }
 }

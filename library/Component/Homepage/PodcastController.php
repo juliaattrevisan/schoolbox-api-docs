@@ -101,6 +101,10 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
             $this->setVar('podcast_list_block', '');
         }
 
+        /* Detroit
+         */
+        $this->applyCollapsedState();
+
         return true; // everything went according to plan
     }
 }

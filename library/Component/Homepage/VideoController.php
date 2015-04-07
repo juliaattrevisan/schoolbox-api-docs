@@ -173,6 +173,11 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         } else {
             $this->setVar('submit_video_block', '');
         }
+
+        /* Detroit
+         */
+        $this->applyCollapsedState();
+
         return true; // everything went according to plan
     }
 }

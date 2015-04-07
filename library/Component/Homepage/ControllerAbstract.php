@@ -35,7 +35,6 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
      */
     protected function getTemplate($templateName = '', $templatePath = '')
     {
-
         if (empty($templatePath)) {
             $templatePath = "component/homepage";
         }
@@ -43,5 +42,27 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
         return parent::getTemplate($templateName, $templatePath);
     }
 
+    /**
+     * The default collapsed state of the content, upon component load
+     *
+     * Returns the css class to hide an element
+     *
+     * @return string
+     */
+    protected function getDefaultCollapsedState() {
+        if ($this->getConfig('collapse')) {
+            return 'hide';
+        }
 
+        return '';
+    }
+
+    /**
+     * Apply current collapsed state setting
+     */
+    protected function applyCollapsedState() {
+        $this->setVar(array(
+            'CONFIG_COLLAPSED_CLASS' => $this->getDefaultCollapsedState()
+        ));
+    }
 }

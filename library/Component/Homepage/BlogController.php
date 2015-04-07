@@ -238,6 +238,10 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
             $this->parse('create_blog_block', 'create_blog');
         }
 
+        /* Detroit
+         */
+        $this->applyCollapsedState();
+
         return true;
     }
 

@@ -140,6 +140,10 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
             $this->setVar("forum_block", '');
         }
 
+        /* Detroit
+         */
+        $this->applyCollapsedState();
+
         return true;
     }
 

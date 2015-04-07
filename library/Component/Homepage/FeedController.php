@@ -69,6 +69,10 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
             $this->parse('event_block', 'event', true);
         }
 
+        /* Detroit
+         */
+        $this->applyCollapsedState();
+
         return true;
     }
 }

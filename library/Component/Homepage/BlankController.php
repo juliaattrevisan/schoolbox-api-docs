@@ -31,8 +31,12 @@ class Component_Homepage_BlankController extends Component_Homepage_ControllerAb
         if(!parent::loadTemplate($templateHandle, $this->getConfig('template'))) {
             return false;
         }
-   
-        return true;
+
+       /* Detroit
+        */
+       $this->applyCollapsedState();
+
+       return true;
     }
     
 }

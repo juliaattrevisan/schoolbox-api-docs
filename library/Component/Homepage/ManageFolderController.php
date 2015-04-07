@@ -104,6 +104,10 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
             $this->setVar('view_stats_block', '');
         }
 
+        /* Detroit
+         */
+        $this->applyCollapsedState();
+
         return true; // everything went according to plan
     }
 }

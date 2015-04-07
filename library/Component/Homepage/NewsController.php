@@ -187,8 +187,11 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
             }
         }
 
-        return true;
+        /* Detroit
+         */
+        $this->applyCollapsedState();
 
+        return true;
     }
 
     /* Getters/Setters

@@ -71,7 +71,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
             $i = 0;
 
             foreach ($allSurveys as $currentSurvey) {
-// Do not show the survey if you are a participant and the survey is not yet open
+                // Do not show the survey if you are a participant and the survey is not yet open
                 if (($this->permission >= WRITE_ACCESS) || $surveyHandler->isOpen($currentSurvey)) {
                     $createdTime = new Alaress_Date_Format($currentSurvey['created_at'], 'Y-m-d H:i:s');
 
@@ -153,7 +153,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
 
                         $this->parse('reviewLink_block', 'reviewLink');
                     } else {
-// show to everyone unless expired
+                        // show to everyone unless expired
                         if (strtotime($currentSurvey['finish']) < time()) {
                             $this->parse('surveyNoLink_block', 'surveyNoLink');
                             $this->setVar('surveyLink_block', '');
@@ -178,7 +178,10 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
             }
         }
 
-        return true; // everything went according to plan
+        /* Detroit
+         */
+        $this->applyCollapsedState();
 
+        return true; // everything went according to plan
     }
 }

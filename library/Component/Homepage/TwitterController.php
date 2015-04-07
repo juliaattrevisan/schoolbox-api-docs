@@ -102,7 +102,10 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
 			'SEARCH_URL' => $q
 		));
 
+        /* Detroit
+         */
+        $this->applyCollapsedState();
+
         return true;
     }
-
 }

@@ -112,6 +112,9 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
             $this->setVar('select_video_block', '');
         }
 
+        /* Detroit
+         */
+        $this->applyCollapsedState();
 
         return true; // everything went according to plan
     }

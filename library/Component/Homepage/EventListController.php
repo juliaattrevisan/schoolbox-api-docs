@@ -117,7 +117,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 
                     if ($groupHandler->isStudent($_SESSION['id'])) {
                         if ($attendance = $calendarHandler->getAttendanceByEventAndUser($eventId, $_SESSION['id'])) {
-/* Attendance Status
+                            /* Attendance Status
                             */
                             if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
                                 $this->setVar('ATTENDANCE_STATUS', 'Pending');
@@ -167,6 +167,10 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
             $this->parse("submit_event_block", "submit_event");
             $this->parse('import_events_block', 'import_events');
         }
+
+        /* Detroit
+         */
+        $this->applyCollapsedState();
 
         return true;
     }

@@ -133,6 +133,10 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
             $this->parse('image_gallery_block', 'image_gallery', true);
         }
 
+        /* Detroit
+         */
+        $this->applyCollapsedState();
+
         // everything went according to plan
         return true;
     }

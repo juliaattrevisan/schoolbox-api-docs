@@ -56,7 +56,10 @@ class Component_Homepage_CountdownController extends Component_Homepage_Controll
             'DEADLINE_SEC' => $deadline->getSecond(),
         ));
 
+        /* Detroit
+         */
+        $this->applyCollapsedState();
+
         return true;
     }
-
 }

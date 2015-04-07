@@ -174,6 +174,10 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
 
         $this->newZone('az-new-task', 'ATTACH_ZONE');
 
+        /* Detroit
+         */
+        $this->applyCollapsedState();
+
         return true;
     }
 

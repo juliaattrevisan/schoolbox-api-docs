@@ -34,6 +34,10 @@ class Component_Homepage_BialikSearchController extends Component_Homepage_Contr
                     'Bialik Search'
         );
 
+        /* Detroit
+         */
+        $this->applyCollapsedState();
+
         return true;
     }
 }

@@ -178,6 +178,9 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             $this->setVar('student_email_block', '');
         }
 
+        /* Detroit
+         */
+        $this->applyCollapsedState();
 
         return true;
     }

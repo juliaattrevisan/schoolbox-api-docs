@@ -109,6 +109,10 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 			'SOCIALSTREAM_NUM_POSTS' => $numPosts
 		));
 
+        /* Detroit
+         */
+        $this->applyCollapsedState();
+
 		return true;
 	}
 }

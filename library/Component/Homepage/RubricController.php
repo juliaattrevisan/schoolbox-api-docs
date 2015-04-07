@@ -66,10 +66,10 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
 
         /* Create group structure */
         $criteriaList = array();
+
         foreach ($this->criteria as $crit) {
             $criteriaList[$crit->getGrouping()][] = $crit;
         }
-
 
         foreach ($criteriaList as $criterion_group => $criterions) {
             $this->setVar('CRITERION_GROUP', Scrub::text($criterion_group));
@@ -87,6 +87,10 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
         } else {
             $this->setVar('modify_rubric_block', '');
         }
+
+        /* Detroit
+         */
+        $this->applyCollapsedState();
 
         return true;
     }

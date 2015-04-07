@@ -86,8 +86,11 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
             }
 
             $this->parse("drop_staff_block", "drop_staff");
-
         }
+
+        /* Detroit
+         */
+        $this->applyCollapsedState();
 
         return true;
     }
