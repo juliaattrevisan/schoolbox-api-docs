@@ -90,6 +90,11 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
     {
         $this->setCycleLength($campus->getTimetableDay());
+
+        if (!$date) {
+            $date = $_SERVER['REQUEST_TIME'];
+        }
+
         /* Convert from timestamp to datetime
          */
         if ($date) {
@@ -105,6 +110,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
                 )
             );
             $result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+
             if ($result['success'] && count($result['result'])) {
                 return $result['result'][0]['DayNumber'];
             }
@@ -234,8 +240,8 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
              */
             for ($x = 0; isset($definition['desc'][$x]); $x++) {
                 $timetable[$x]['periodName'] = $definition['desc'][$x];
-                $timetable[$x]['periodStart'] = $definition['start'][$x];
-                $timetable[$x]['periodEnd'] = $definition['end'][$x];
+                $timetable[$x]['periodStart'] = substr($definition['start'][$x], 0, 5);
+                $timetable[$x]['periodEnd'] = substr($definition['end'][$x], 0, 5);
                 $timetable[$x]['periodNumber'] = $definition['number'][$x];
                 $timetable[$x]['periodSequence'] = $definition['sequence'][$x];
                 $timetable[$x]['class'] = array();
@@ -306,10 +312,10 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
          * in them, producing and empty $row and thus empty definitions
          */
         for ($period = 0; $period < count($allDayTimetables[0]); $period++) {
-            for ($day = 0; $day < $this->getCycleLength(); $day++) {
+            for ($day = 1; $day <= $this->getCycleLength(); $day++) {
                 $timetable[$period]['day'][$day] = array();
-                if (!empty($allDayTimetables[$day][$period]['class'][0])) {
-                    $timetable[$period]['day'][$day][] = $allDayTimetables[$day][$period]['class'][0];
+                if (!empty($allDayTimetables[$day-1][$period]['class'][0])) {
+                    $timetable[$period]['day'][$day][] = $allDayTimetables[$day-1][$period]['class'][0];
                 }
                 /* TODO: Have these use convert(varchar(10), theDate, 120) in stored proc
                  */
