@@ -105,11 +105,11 @@ class Factory
      *
      * @param User $user
      * @param SubmissionBox $submissionBox
-     * @param $mark
-     * @param $comment
-     * @param $rubric
-     * @param $attachments
-     * @param $uuid
+     * @param string $mark
+     * @param string $comment
+     * @param array $rubric
+     * @param array $attachments
+     * @param string $uuid
      */
     public function __construct(User $user, SubmissionBox $submissionBox, $mark, $comment, $rubric, $attachments, $uuid)
     {
@@ -343,20 +343,7 @@ class Factory
         $factory = new CollectorFactory();
 
         try {
-            $file   = $factory->build($this->getAttachments())->getFirst();
-
-
-
-            $return = $this->getReturnedWorkMapper()->createModel();
-
-
-
-            $returnedWork
-                ->setFilesize($return->getFilesize())
-                ->setMimetype($return->getMimetype())
-                ->setFilename($return->getFilename())
-                ->setTempLocation($return->getTempLocation())
-                ->loadFilesizeFromTempLocation();
+            $returnedWork->setStorage($factory->build($this->getAttachments())->getFirst());
 
         } catch (\Schoolbox\Resource\Exception $e) {
             // noop
