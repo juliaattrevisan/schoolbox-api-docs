@@ -47,10 +47,15 @@
                 if (component.attr('data-collapse-state') == 'collapsed') {
                     component.stop().slideDown();
                     component.attr('data-collapse-state', 'uncollapsed');
+
+
+                    $(this).find('span').html('-');
                 }
                 else {
                     component.attr('data-collapse-state', 'collapsed');
                     component.stop().slideUp();
+
+                    $(this).find('span').html('+');
                 }
             });
         }
