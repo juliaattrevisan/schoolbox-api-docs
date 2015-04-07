@@ -24,7 +24,7 @@ use Schoolbox\Realtime\Schedule\Event;
 use Serializable;
 use Traversable;
 
-abstract class Mapper implements Serializable
+abstract class Mapper implements IMapper, Serializable
 {
     /**
      * Represents a boolean data type.
