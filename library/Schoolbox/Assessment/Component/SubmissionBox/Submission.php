@@ -105,6 +105,7 @@ class Submission implements FileInterface {
 	protected $uuid;
 
 	/**
+     * @deprecated in favour of separate Submission\File and Submission\Inline classes
 	 * Creates object and sets up related objects.
 	 */
 	public function __construct() {
