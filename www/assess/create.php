@@ -185,10 +185,17 @@ else {
     $this->setBlock('assess_timespan', 'finishMeridiem', 'finishMeridiem_block');
     $this->setBlock(TEMPLATE_content,  'importXML', 'importXML_block');
     $this->setBlock(TEMPLATE_content,  'max_attempts', 'max_attempts_block');
+    $this->setBlock(TEMPLATE_content, 'curriculum_code_input', 'curriculum_code_input_block');
 
     $this->setTitle('Manage Assessment');
 
     $this->setVar('assess_timespan_block', '');
+
+    if (Config::get('curriculum_tagging_enabled')) {
+        $this->parse('curriculum_code_input_block', 'curriculum_code_input');
+    } else {
+        $this->setVar('curriculum_code_input_block', '');
+    }
 
     $this->setVar(array(
         'ACTION'             => 'create',
