@@ -305,6 +305,9 @@ abstract class Component_ControllerAbstract
             } // do not have write access
             else {
                 // parse configuration display variables for readonly
+
+                /* One of the schools will tell us what this meant
+                 */
                 return array(false, true, false);
             }
         } // there is no configuration
