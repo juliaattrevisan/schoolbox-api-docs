@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Resource;
+namespace Schoolbox\Textbox;
 
 
 use Alaress\Async\Notification\Instance\Builder;
@@ -20,6 +20,9 @@ use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Resource\Category;
+use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\LogMapper;
+use Schoolbox\Resource\ResourceNotifier;
 use Schoolbox\User;
 
 class Notifier extends ResourceNotifier {
@@ -28,7 +31,7 @@ class Notifier extends ResourceNotifier {
 	/**
 	 * @param string  $action
 	 * @param string  $roletype
-	 * @param Textbox $resource
+	 * @param Model   $resource
 	 * @param User    $effector
 	 * @param array   $diff
 	 * @return Envelope
@@ -62,7 +65,7 @@ class Notifier extends ResourceNotifier {
 
 	/**
 	 * @param string $roletype
-	 * @param Textbox $resource
+	 * @param Model $resource
 	 * @param User $author
 	 * @param array $diff
 	 * @return Envelope
@@ -74,7 +77,7 @@ class Notifier extends ResourceNotifier {
 
 	/**
 	 * @param string $roletype
-	 * @param Textbox $resource
+	 * @param Model $resource
 	 * @param User $effector
 	 * @param array $diff
 	 * @return Envelope
@@ -86,7 +89,7 @@ class Notifier extends ResourceNotifier {
 
 	/**
 	 * @param string $roletype
-	 * @param Textbox $resource
+	 * @param Model $resource
 	 * @param User $effector
 	 * @param array $diff
 	 * @return Envelope
@@ -111,7 +114,7 @@ class Notifier extends ResourceNotifier {
 
 
 	/**
-	 * @param Textbox $resource
+	 * @param Model $resource
 	 * @return string
 	 */
 	protected function getResourceName($resource) {
