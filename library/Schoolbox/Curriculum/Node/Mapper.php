@@ -226,7 +226,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
             function ($mapper, $model, $row) {
                 /** @var self $mapper */
                 /** @var Model $model */
-                return $mapper->hydrateWithRelatedJoins($row, 'na', 'nas', 'nl', 'nls');
+                return $mapper->hydrateWithRelatedJoins($row, 'n', 'na', 'nas', 'nl', 'nls');
             }
         );
     }
