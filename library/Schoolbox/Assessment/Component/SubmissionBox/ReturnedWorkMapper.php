@@ -15,7 +15,6 @@ use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
-use Schoolbox\FileInterface;
 
 /**
  * Class ReturnedWorkMapper
@@ -25,7 +24,7 @@ use Schoolbox\FileInterface;
  * @method ReturnedWork hydrate(array $row, $alias = '', $callback = null)
  * @method ReturnedWork createModel()
  */
-class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\StorageMapperInterface, Schoolbox\Assessment\IActivityMapper
+class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessment\IActivityMapper
 {
 
     protected function mapping()
@@ -94,13 +93,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\StorageMa
         );
         $this->hasMap(
             array(
-                'column' => 'filesize',
-                'property' => 'filesize',
-                'type' => self::TYPE_INTEGER,
-            )
-        );
-        $this->hasMap(
-            array(
                 'column' => 'submitted',
                 'property' => 'submitted',
                 'type' => self::TYPE_DATETIME,
@@ -148,27 +140,8 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\StorageMa
             )
         );
 
-        /* Relation to Allowed Files
-         */
-        $hydrator = new Schoolbox\Column\Model();
-        $hydrator->setIdentifierProperty('mime');
-        $this->hasMap(
-            array(
-                'column' => 'mime_type',
-                'property' => 'mimetype',
-                'hydrator' => $hydrator,
-                'join' => 'allowedFileType',
-            )
-        );
+        $this->joins('hash', Schoolbox\Resource\Storage\Mapper::class, 'hash', null, null, 'storage', 'storage');
 
-        $this->hasJoin(
-            'allowedFileType',
-            array(
-                'mapper' => '\\Schoolbox\\File\\MimetypeMapper',
-                'this_key' => 'mime_type',
-                'other_key' => 'mime',
-            )
-        );
         $this->registerCallback('postSave', array($this, 'postSave'));
     }
 
@@ -198,14 +171,21 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\StorageMa
         $factory = new ActivityFactory();
         $box_join = $this->getJoinMapper('submission_box');
         $category_join = $box_join->getJoinMapper('category');
+        $storage_join = $this->getJoinMapper('storage');
+        $mime_join = $storage_join->getJoinMapper('allowedFileExtension');
+
         $query = "
 			SELECT
 				{$this->getColumnString('sr')},
 				{$box_join->getColumnString('sb')},
-				{$category_join->getColumnString('c')}
+				{$category_join->getColumnString('c')},
+				{$storage_join->getColumnString('file')},
+				{$mime_join->getColumnString('mime')}
 			FROM {$this->getTable()} sr
 			LEFT JOIN {$this->getJoinSql('submission_box', 'sr', 'sb')}
 			LEFT JOIN {$box_join->getJoinSql('category', 'sb', 'c')}
+			LEFT JOIN {$this->getJoinSql('storage', 'sr', 'file')}
+			LEFT JOIN {$storage_join->getJoinSql('allowedFileExtension', 'file', 'mime')}
 			WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 			AND sb.mark_visibility IN {$this->getArrayPlaceholders($visibilities, 'vis')}
 			AND sr.owner = :user_id
@@ -372,9 +352,10 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\StorageMa
      * Custom hydration method used by methods that get an activity list.
      *
      * This expects the following aliases:
-     * * sr: this return
-     * * sb: submission box
-     * * c:  category
+     * * sr:   this return
+     * * sb:   submission box
+     * * c:    category
+     * * file: attached storage, if applicable
      *
      * @param array $row
      *
@@ -382,15 +363,26 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\StorageMa
      */
     protected function hydrateForActivityList($row)
     {
-
-        $box_join = $this->getJoinMapper('submission_box');
+        $box_join      = $this->getJoinMapper('submission_box');
         $category_join = $box_join->getJoinMapper('category');
+        $storage_join  = $this->getJoinMapper('storage');
+        $mime_join     = $storage_join->getJoinMapper('allowedFileExtension');
 
-        $return = $this->hydrate($row, 'sr');
-        $box = $box_join->hydrate($row, 'sb');
+        $return   = $this->hydrate($row, 'sr');
+        $box      = $box_join->hydrate($row, 'sb');
         $category = $category_join->hydrate($row, 'c');
+
         $box->setCategory($category);
         $return->setSubmissionBox($box);
+
+        if ($row['file.hash']) {
+            $storage  = $storage_join->hydrate($row, 'file');
+            $mime     = $mime_join->hydrate($row, 'mime');
+
+            $storage->setMimetype($mime);
+            $return->setStorage($storage);
+        }
+
         return $return;
     }
 
@@ -442,8 +434,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\StorageMa
      */
     public function postSave(ReturnedWork $object, $previous = null)
     {
-        $object->copyFromTempLocation();
-
         // Doesn't matter whether it's new or not - only whether the mark is
         // greater than 0.
 
@@ -465,9 +455,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\StorageMa
                         $task_instance_id,
                         $object->getOwner()->getId()
                     );
-                    $is_already_completed =
-                        ($recent_completion->getCompletionStatus(
-                            ) == Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE);
+                    $is_already_completed = ($recent_completion->getCompletionStatus() == Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE);
                 } catch (Schoolbox\Mapper\Exception $e) {
                     $is_already_completed = false;
                 }
@@ -482,38 +470,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\StorageMa
                 }
             }
         }
-    }
-
-
-    /**
-     * Convenience method for creating and saving a file via this mapper.
-     *
-     * @param string $filename     the file's name.
-     * @param string $tempLocation the location of the file to save.
-     * @param int    $userId       the user to associate with the file.
-     * @throws \Schoolbox\File\Exception       if the upload was not allowed.
-     * @return FileInterface
-     */
-    public function upload($filename, $tempLocation, $userId)
-    {
-        $return = new ReturnedWork();
-
-        $return
-            ->setTempLocation($tempLocation)
-            ->setFilename($filename)
-            ->setMimetype(\Schoolbox\File\MimetypeMapper::getInstance()->getByFilename($filename))
-            ->setOwner($this->getJoinMapper('owner')->findById($userId))
-            ->loadFilesizeFromTempLocation();
-
-        /**
-         * TODO
-         * So, returnedwork should not actually *have* filedata on it: it should be referenced
-         * from a join table. This method by all rights should save the returnedwork, but can't
-         * because there is data lacking, so we just return it as is, expecting the calling
-         * class to fill in the blanks then save the data (which ReturnedWork\Factory will)
-         */
-
-        return $return;
     }
 
 }

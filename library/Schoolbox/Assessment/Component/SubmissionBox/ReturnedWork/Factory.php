@@ -277,7 +277,7 @@ class Factory
      */
     private function spawnNewReturnedWork()
     {
-        $returnedWork = new ReturnedWork();
+        $returnedWork = $this->getReturnedWorkMapper()->createModel();
         $returnedWork->setOwner($this->getUser());
         $returnedWork->setSubmissionBox($this->getSubmissionBox());
         $returnedWork->setReturned(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
@@ -340,19 +340,16 @@ class Factory
      */
     private function addFile($returnedWork)
     {
-        $factory = new CollectorFactory(ReturnedWorkMapper::getInstance());
+        $factory = new CollectorFactory();
 
-        /**
-         * So Collector->getFirst() returns a ReturnedWork...but we've already got one...
-         *
-         * Since the one that was passed in will contain all the data we want, we'll copy
-         * the data from the one we just built into it. This isn't how Collectors were
-         * intended to work, but...it will do for now.
-         *
-         * @var ReturnedWork $return
-         */
         try {
-            $return = $factory->build($this->getAttachments())->getFirst();
+            $file   = $factory->build($this->getAttachments())->getFirst();
+
+
+
+            $return = $this->getReturnedWorkMapper()->createModel();
+
+
 
             $returnedWork
                 ->setFilesize($return->getFilesize())
