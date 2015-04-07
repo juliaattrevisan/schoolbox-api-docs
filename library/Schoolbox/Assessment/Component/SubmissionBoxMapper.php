@@ -160,14 +160,18 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
             if ($curriculumNode->getId()) {
                 $curriculumNodes[$curriculumNode->getId()] = $curriculumNode;
             }
-        }
 
+            if ($row['at.hash']) {
+                $storage = $attach_mapper->hydrate($row, 'at');
+                $storage->setMimetype($attach_mapper->hydrateJoin($row, 'allowedFileExtension', 'mime'));
+
+                $submission_box->addAttachment($storage);
+            }
+
+        }
+            
         if ($submission_box instanceof SubmissionBox) {
             $submission_box->setCurriculumNodes(new Collection(array_values($curriculumNodes)));
-
-            $storage = $attach_mapper->hydrate($row, 'at');
-            $storage->setMimetype($attach_mapper->hydrateJoin($row, 'allowedFileExtension', 'mime'));
-            $submission_box->addAttachment($storage);
         }
 
         if (!($submission_box instanceof SubmissionBox)) {
