@@ -1,6 +1,7 @@
 <?php
 
 use Schoolbox\Assessment\Component;
+use Schoolbox\Config\ConfigMapper;
 
 // not in sitepage context, redirect
 if (!isset($this)) {
@@ -59,9 +60,12 @@ if ($this->arg[0] == false) {
     error(2);
 }
 
-$mapper           = new Component\SubmissionBoxMapper();
-$submissionMapper = new Component\SubmissionBox\SubmissionMapper();
+$boxMapper        = new Component\SubmissionBoxMapper();
+$submissionMapper = new Component\SubmissionBox\Submission\Mapper();
 $work_mapper      = new Component\SubmissionBox\WorkTypeMapper();
+$return_mapper    = new Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
+$folderMapper     = new \Schoolbox\Resource\Folder\Mapper();
+$conf             = ConfigMapper::getInstance();
 
 $userHandler       = new User;
 $groupHandler      = new Group;
@@ -69,7 +73,7 @@ $submissionHandler = new Submission;
 $returnHandler     = new SubmissionReturn;
 $allowedHandler    = new AllowedFile;
 
-$currentUserId = $_SESSION['user']->getId();
+$currentUserId = $_SESSION['id'];
 
 // if no second argument supplied and student, assume current user rather than just dying
 if ($this->arg[1] == false && $groupHandler->isStudent()) {
@@ -97,7 +101,7 @@ if (is_numeric($this->arg[1])
 $parentOnly = $groupHandler->isParent()
     && !$groupHandler->isStaff()
     && !$groupHandler->isSuperuser();
-if ($parentOnly && Config::get('restrict_student_submissions')) {
+if ($parentOnly && $conf->get('restrict_student_submissions')) {
     error(19);
 }
 
@@ -110,9 +114,12 @@ if (!isset($user['uid'])) {
 
 if ($user['synergy_id'] || $user['synergy_id'] === 0) {
     $categoryList = $groupHandler->involvedInCategoryList($user['uid']);
+} else {
+    $categoryList = array();
 }
 
 $categoryIDList = array();
+
 if (is_array($categoryList)) {
     foreach ($categoryList as $category) {
         $categoryIDList[] = $category['id'];
@@ -123,19 +130,19 @@ if (is_array($categoryList)) {
  */
 
 try {
-    $submission = $mapper->findById($this->arg[0]);
+    $box = $boxMapper->findById($this->arg[0]);
 } catch (Schoolbox\Mapper\Exception $e) {
     error(17);
     exit;
 }
 
 $is_mark_shown = true;
-if ($groupHandler->isStudent() && !$submission->isMarkShownToStudents()) {
+if ($groupHandler->isStudent() && !$box->isMarkShownToStudents()) {
     $is_mark_shown = false;
-} elseif ($parentOnly && !$submission->isMarkShownToParents()) {
+} elseif ($parentOnly && !$box->isMarkShownToParents()) {
     $is_mark_shown = false;
 }
-$owner = $userHandler->getByID($submission->getOwner()->getId());
+$owner = $userHandler->getByID($box->getOwner()->getId());
 
 $this->setVar(
     array(
@@ -146,11 +153,8 @@ $this->setVar(
 );
 
 $externalClassHandler = new External_Class();
-$userHandler          = new User();
-$groupHandler         = new Group();
 
-$folderMapper = new \Schoolbox\Resource\CategoryMapper();
-$folder = $folderMapper->findById($submission->getCategory()->getId());
+$folder = $folderMapper->findById($box->getCategory()->getId());
 
 if ($folder->getCodes()->count()) {
 /* Get all the folder codes, implode them into a csv
@@ -192,36 +196,33 @@ if ($folder->getCodes()->count()) {
     }
 }
 
-$dueDate     = new Alaress_Date_Format($submission->getDueDate(), 'Y-m-d');
-$createdDate = new Alaress_Date_Format($submission->getCreated(), 'Y-m-d');
+$dueDate     = new Alaress_Date_Format($box->getDueDate(), 'Y-m-d');
+$createdDate = new Alaress_Date_Format($box->getCreated(), 'Y-m-d');
 
-$submit_mapper      = new Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
-/** @var Schoolbox\Assessment\ActivityCollection|Schoolbox\Assessment\Activity[] $submission_history */
-$submission_history = $submit_mapper->getHistory($userID, $this->arg[0]);
+$submission_history = $submissionMapper->getHistory($userID, $this->arg[0]);
+
 if ($is_mark_shown) {
-    $return_mapper = new Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
-    //
     // Filter out items with a mark, instead of showing this way?
     // Returns probably should not show at all if marks aren't shown?
     $submission_history->merge($return_mapper->getHistory($userID, $this->arg[0]));
 }
 $submission_history->sortBy('date', 'desc');
 
-$gradient = $submission->getGradientIndex();
+$gradient = $box->getGradientIndex();
 
 $this->setVar(
     array(
-        'CATEGORY_NAME'        => Scrub::text($submission->getCategory()->getName()),
-        'CATEGORY_ID'          => $submission->getCategory()->getId(),
+        'CATEGORY_NAME'        => Scrub::text($box->getCategory()->getName()),
+        'CATEGORY_ID'          => $box->getCategory()->getId(),
         'CATEGORY_THUMB'       => '',
         'BOX_DUEDATE'          => $dueDate->getRelativeTime(),
         'BOX_DUETIME'          => $dueDate->isAtEndOfDay() ? $dueDate->getDateOnly() : $dueDate->getShort(),
         'BOX_DUEDATE_GRADIENT' => $gradient,
-        'BOX_ID'               => $submission->getId(),
-        'BOX_NAME'             => Scrub::text($submission->getName()),
+        'BOX_ID'               => $box->getId(),
+        'BOX_NAME'             => Scrub::text($box->getName()),
         'BOX_OWNER'            => $userHandler->formatName($user),
-        'BOX_DESCRIPTION'      => Scrub::html($submission->getDescription()),
-        'BOX_TYPE'             => $work_mapper->getNameFromId($submission->getWorkType()->getId()),
+        'BOX_DESCRIPTION'      => Scrub::html($box->getDescription()),
+        'BOX_TYPE'             => $work_mapper->getNameFromId($box->getWorkType()->getId()),
         'BOX_CREATED'          => $createdDate->getRelativeTime()
     )
 );
@@ -235,7 +236,7 @@ if ($userID == $currentUserId) {
 
 /* Check whether a file is associated with the work
  */
-$attachments = $submission->getAttachments();
+$attachments = $box->getAttachments();
 
 if ($attachments->count() > 0) {
     foreach ($attachments as $attachment) {
@@ -257,7 +258,7 @@ if ($attachments->count() > 0) {
 }
 
 // set the teacher details
-$teacher = $userHandler->getByID($submission->getOwner()->getId());
+$teacher = $userHandler->getByID($box->getOwner()->getId());
 
 $teacher_details = array(
     'TEACHER_ID'    => $teacher['uid'],
@@ -269,7 +270,7 @@ $this->setVar($teacher_details);
 
 /* Output student submission terms, only if they actually have them.
  */
-$policy    = Config::get('lms_student_policy');
+$policy    = $conf->get('lms_student_policy');
 $html2text = new \Html2Text\Html2Text($policy);
 // Ensure that a policy that contains ONLY an image still displays,
 // by allowing img tags through unmolested
@@ -293,7 +294,7 @@ $zone->setAttachPrompt('Attach submission')
 
 $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
-$recent_submission = null;
+$recent_activity = null;
 $recent_return     = null;
 if (count($submission_history)) {
     $j = 0;
@@ -346,14 +347,17 @@ if (count($submission_history)) {
             $history['HISTORY_CLASS'] = 'submit';
             $history['HISTORY_ICON']  = 'up-arrow';
 
-            //
-            // submission file ID, submission file name
-            $history['HISTORY_SUBMISSION_FILE_ID']   = $activity_item->getSubmission()->getId();
-            $history['HISTORY_SUBMISSION_FILE_NAME'] = $activity_item->getSubmission()->getFilename();
+            $submission = $activity_item->getSubmission();
 
-            //
+            // submission file ID, submission file name
+            if ($submission instanceof Component\SubmissionBox\Submission\File) {
+                $history['HISTORY_SUBMISSION_FILE_ID']   = $submission->getId();
+                $history['HISTORY_SUBMISSION_FILE_NAME'] = $submission->getFilename();
+            }
+
             // Name, icon and ID of user: use student's
-            $owner = $activity_item->getSubmission()->getOwner()->getId();
+            $owner = $submission->getOwner()->getId();
+
         } elseif ($activity_item->isReturn()) {
             // if return item
             if ($activity_item->getReturnedWork()->getFilename()) {
@@ -369,7 +373,7 @@ if (count($submission_history)) {
             $mark      = $activity_item->getReturnedWork()->getMark();
             $norm_mark = $activity_item->getReturnedWork()->getNormalizedMark();
 
-            if ($submission->getMarkType()->getId() == Component\SubmissionBox\MarkType::TYPE_LETTER
+            if ($box->getMarkType()->getId() == Component\SubmissionBox\MarkType::TYPE_LETTER
                 || in_array($mark, $errors)
             ) {
                 $mark = $returnHandler->shortenGrade($mark);
@@ -418,13 +422,13 @@ if (count($submission_history)) {
             }
 
             // Remember most recent submission
-            if (!isset($recent_submission)) {
-                $recent_submission = $activity_item;
+            if (!isset($recent_activity)) {
+                $recent_activity = $activity_item;
             }
 
         }
         // return by teacher
-        $parentsCanSee = !(\Cfg::get('restrict_parent_grades') && $groupHandler->isParent());
+        $parentsCanSee = !($conf->get('restrict_parent_grades') && $groupHandler->isParent());
         $isSuperuser   = $groupHandler->isSuperuser();
 
         if ($activity_item->isReturn()) {
@@ -486,7 +490,7 @@ if (count($submission_history)) {
     $this->parse('subject_block', 'subject');
 }
 
-if (isset($recent_submission)) {
+if (isset($recent_activity)) {
     /* Show most recent submission
      * Hide Submit form
      * If multi-submit is enabled, show the Resubmit form
@@ -496,7 +500,7 @@ if (isset($recent_submission)) {
     // override the due gradient because we have submitted
     $this->setVar('BOX_DUEDATE_GRADIENT', 'black');
 
-    if ($recent_submission->getDate()->getUnixTimestamp() > $submission->getDueDate()->getUnixTimestamp()) {
+    if ($recent_activity->getDate()->getUnixTimestamp() > $box->getDueDate()->getUnixTimestamp()) {
         $this->setVar('OVERDUE', 'overdue');
         $this->parse('overdue_block', 'overdue');
     } else {
@@ -504,40 +508,42 @@ if (isset($recent_submission)) {
         $this->setVar('overdue_block', '');
     }
 
-    $recentSubmissionDate = new Alaress_Date_Format($recent_submission->getDate(), 'U');
+    $recentSubmissionDate = new Alaress_Date_Format($recent_activity->getDate(), 'U');
 
     // get filetype details
-    $student_submission = $recent_submission->getSubmission();
-    $mime               = $student_submission->getMimetype()->getMime();
-    if ($student_submission->isOnlineSubmission()) {
-        $size = strlen($student_submission->getBody());
-    } else {
-        $ext  = pathinfo($recent_submission->getSubmission()->getFilename(), PATHINFO_EXTENSION);
-        $size = $recent_submission->getSubmission()->getFilesize();
-    }
-    $ftype = $allowedHandler->getByField('mime', $mime);
-    $size  = Alaress_Byte_Format::bytesToString($size);
+    $student_submission = $recent_activity->getSubmission();
 
     // populate details into page
-    $this->setVar(
-        array(
-            'MOST_RECENT_SUBMISSION_FILE_NAME'  => $recent_submission->getSubmission()->getFilename(),
-            'MOST_RECENT_SUBMISSION_FILE_SIZE'  => $size,
-            'MOST_RECENT_SUBMISSION_FILE_THUMB' => $ftype['iconFile'] ?: 'txt.png',
+    if ($student_submission instanceof Component\SubmissionBox\Submission\File) {
+        $output = array(
+            'MOST_RECENT_SUBMISSION_FILE_NAME'  => $student_submission->getFilename(),
+            'MOST_RECENT_SUBMISSION_FILE_SIZE'  => Alaress_Byte_Format::bytesToString($student_submission->getSize()),
+            'MOST_RECENT_SUBMISSION_FILE_THUMB' => $student_submission->getMimetype()->getIconFile() ?: 'txt.png',
             'MOST_RECENT_SUBMISSION_FILE_DATE'  => $recentSubmissionDate->getRelativeTime(),
-            'MOST_RECENT_SUBMISSION_FILE_ID'    => $recent_submission->getSubmission()->getId(),
-        )
-    );
+            'MOST_RECENT_SUBMISSION_FILE_ID'    => $recent_activity->getSubmission()->getId(),
+        );
+    } elseif ($student_submission instanceof Component\SubmissionBox\Submission\Inline) {
+        $output = [
+            'MOST_RECENT_SUBMISSION_FILE_NAME'  => 'Online Submission',
+            'MOST_RECENT_SUBMISSION_FILE_SIZE'  => Alaress_Byte_Format::bytesToString(strlen($student_submission->getBody())),
+            'MOST_RECENT_SUBMISSION_FILE_THUMB' => 'html.png',
+            'MOST_RECENT_SUBMISSION_FILE_DATE'  => $recentSubmissionDate->getRelativeTime(),
+            'MOST_RECENT_SUBMISSION_FILE_ID'    => $recent_activity->getSubmission()->getId(),
+        ];
+    } else {
+        $output = [];
+    }
 
+    $this->setVar($output);
 
     // if we are the owning student, display plagiarism details if they are available
-    if ($userID == $currentUserId && Config::get('plagscan_student_visible')) {
+    if ($userID == $currentUserId && $conf->get('plagscan_student_visible')) {
         // retrieve plagiarism score, if available
         $docMapper = Plagscan_DocumentMapper::getInstance();
         $plagDoc   = null;
         try {
             /* @var $plagDoc Plagscan_Document */
-            $plagDoc = $docMapper->findOneByColumn('file_id', $recent_submission->getSubmission()->getId());
+            $plagDoc = $docMapper->findOneByColumn('file_id', $recent_activity->getSubmission()->getId());
             if ($plagDoc->getId() && $plagDoc->getStatus() == Plagscan_Document::STATUS_COMPLETE) {
                 // what colour should the plagiarism text be, and what should the tooltip say?
                 if ($plagDoc->getScore() > 60) {
@@ -569,22 +575,22 @@ if (isset($recent_submission)) {
         $this->setVar('plag_score_block', '');
     }
 
-    $submission->getOpenDate();
-    $submission->getAcceptMultiple();
+    $box->getOpenDate();
+    $box->getAcceptMultiple();
     // only allow a resubmission:
     // if the current user is the owner
     // if the submission box is accepting submissions
     // and if the current time is between open and late
     if (
         $userID == $currentUserId &&
-        (time() > $submission->getOpenDate()->getUnixTimestamp()) &&
-        (time() < $submission->getLateDate()->getUnixTimestamp()) &&
-        $submission->getAcceptOnline() &&
-        $submission->getAcceptMultiple()
+        (time() > $box->getOpenDate()->getUnixTimestamp()) &&
+        (time() < $box->getLateDate()->getUnixTimestamp()) &&
+        $box->getAcceptOnline() &&
+        $box->getAcceptMultiple()
     ) {
         // Which edit button gets shown?
-        $drafts = $submissionMapper->getDrafts($userID, $submission->getId(), 1);
-        if (count($drafts) === 0) {
+        $drafts = $submissionMapper->getDrafts($userID, $box->getId(), 1);
+        if ($drafts->count() === 0) {
             $this->parse('action_resubmit_online_create_block', 'action_resubmit_online_create');
         } else {
             /** @var Component\SubmissionBox\Submission $draft */
@@ -615,13 +621,13 @@ if (isset($recent_submission)) {
      * Hide the Resubmit form
      */
     if ($userID == $currentUserId
-        && time() > $submission->getOpenDate()->getUnixTimestamp()
-        && time() < $submission->getLateDate()->getUnixTimestamp()
-        && $submission->getAcceptOnline()
+        && time() > $box->getOpenDate()->getUnixTimestamp()
+        && time() < $box->getLateDate()->getUnixTimestamp()
+        && $box->getAcceptOnline()
     ) {
         // Which edit button gets shown (is there already a draft?)
-        $drafts = $submissionMapper->getDrafts($userID, $submission->getId(), 1);
-        if (count($drafts) === 0) {
+        $drafts = $submissionMapper->getDrafts($userID, $box->getId(), 1);
+        if ($drafts->count() === 0) {
             $this->parse('action_submit_online_create_block', 'action_submit_online_create');
         } else {
             $this->parse('action_submit_online_update_block', 'action_submit_online_update');
@@ -636,7 +642,7 @@ if (isset($recent_submission)) {
 
 }
 
-if (!in_array($submission->getCategory()->getId(), $categoryIDList)) {
+if (!in_array($box->getCategory()->getId(), $categoryIDList)) {
     $this->setVar(
         array(
             'action_submit_block'   => '',
@@ -647,7 +653,7 @@ if (!in_array($submission->getCategory()->getId(), $categoryIDList)) {
 
 /* Detect returned work
  */
-if (isset($recent_return) && !(\Cfg::get('restrict_parent_grades') && $groupHandler->isParent())) {
+if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHandler->isParent())) {
     // get filetype details
     $return = $recent_return->getReturnedWork();
     $ext    = pathinfo($return->getFilename(), PATHINFO_EXTENSION);
@@ -655,7 +661,7 @@ if (isset($recent_return) && !(\Cfg::get('restrict_parent_grades') && $groupHand
     $ftype  = $allowedHandler->getByField('mime', $mime);
     $size   = Alaress_Byte_Format::bytesToString($return->getFilesize());
 
-    $returnDate = new Alaress_Date_Format($submission->getDueDate(), 'Y-m-d');
+    $returnDate = new Alaress_Date_Format($box->getDueDate(), 'Y-m-d');
 
     $this->setVar(
         array(
@@ -675,7 +681,7 @@ if (isset($recent_return) && !(\Cfg::get('restrict_parent_grades') && $groupHand
      */
     if ($return->getUuid()) {
         try {
-            $associatedSubmission = $submit_mapper->findOneByColumn('uuid', $return->getUuid());
+            $associatedSubmission = $submissionMapper->findOneByColumn('uuid', $return->getUuid());
 
             $this->setVar(
                 array(
@@ -708,9 +714,9 @@ if (isset($recent_return) && !(\Cfg::get('restrict_parent_grades') && $groupHand
 }
 
 // do fun rubric things
-if ($submission->isRubric()) {
+if ($box->isRubric()) {
     $rb = new DueWork_Rubric_Lightbox($this);
-    $rb->render('rubric_block', $submission->getId(), $user['uid'], canViewRubric($submission, $_SESSION['user']));
+    $rb->render('rubric_block', $box->getId(), $user['uid'], canViewRubric($box, $_SESSION['user']));
 } else {
     $this->setVar('rubric_block', '');
 }
@@ -724,19 +730,19 @@ $showcaseMapper = new \Eportfolio\ShowcaseMapper();
 $existingShowcasedItem = $showcaseMapper->findByColumnList(
     array(
         'uid'               => $user['uid'],
-        'submission_box_id' => $submission->getId()
+        'submission_box_id' => $box->getId()
     )
 );
 
 /* If it has either a recent submission or recent return, and hasn't been published,
  * allow it to be published
  */
-if ($user['eportfolio_enabled'] && (isset($recent_submission) || isset($recent_return))) {
+if ($user['eportfolio_enabled'] && (isset($recent_activity) || isset($recent_return))) {
     if (!$existingShowcasedItem->count()) {
         $this->setVar(
             array(
                 'PUBLISH_TYPE'    => 'boxId',
-                'PUBLISH_ID'      => $submission->getId(),
+                'PUBLISH_ID'      => $box->getId(),
                 'PUBLISH_USER_ID' => $user['uid'],
                 'PUBLISH_ACTION'  => 'publish',
                 'PUBLISH_BUTTON'  => 'Publish to ePortfolio'

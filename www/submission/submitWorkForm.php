@@ -3,11 +3,11 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
-use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
+//use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use Schoolbox\UserMapper;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Video\QueueMapper;
 
 $page = new SitePage;
@@ -15,10 +15,10 @@ $page = new SitePage;
 // attachment submission
 if (is_numeric($_POST['box_id'])) {
 
-    $subMap = SubmissionMapper::getInstance();
+    $subMap = Submission\FileMapper::getInstance();
     $boxMap = SubmissionBoxMapper::getInstance();
 
-    /** @var Collection|Submission[] $submissions */
+    /** @var Collection|Submission\File[] $submissions */
     $submissions = new Collection();
 
     if (is_array($_POST['attachment'])) {
@@ -29,17 +29,22 @@ if (is_numeric($_POST['box_id'])) {
             // check uploading to this box is permitted
             $boxMap->checkUploadability($box, $_SESSION['user']);
 
-            $factory = new CollectorFactory($subMap);
+            $factory = new CollectorFactory();
 
-            /** @var Submission[] $subs */
-            $subs = $factory->build($_POST['attachment'])->getAll();
+            /** @var IStorage[] $subs */
+            $attachments = $factory->build($_POST['attachment'])->getAll();
 
-            foreach ($subs as $submission) {
-                // all other data have been set for this object
-                $submission
+            $now = Alaress_Date_Format::now();
+
+            foreach ($attachments as $storage) {
+                $submission = $subMap->createModel()
+                    ->setCreatedAt($now)
+                    ->setStorage($storage)
+                    ->setFilename($storage->getFilename())
                     ->setSubmissionBox($box)
                     ->setOwner($_SESSION['user'])
-                    ->loadIsLate();
+                    ->setLate($box->getDueDate()->lt($now))
+                ;
 
                 $submissions->add($submission);
             }
@@ -51,40 +56,9 @@ if (is_numeric($_POST['box_id'])) {
             // something wasn't allowed to exist
             error(9, $e->getMessage());
         }
-    } // legacy fallback file submit
-    elseif (isset($_FILES['file']['name']) && $_FILES['file']['name']) {
-        $allowedFileHandler = new AllowedFile;
-        $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
+    }
 
-        $submitDir = Cfg::get('submission_dir') . "/";
-        if (!is_writable($submitDir)) {
-            error(9, "unable to upload file to submission box.<br />Please try again, and if the problem persists please contact your teacher or system administrator.");
-        }
-
-        $user           = $_SESSION['user'];
-        $submission_box = $boxMap->findById($_POST['box_id']);
-
-        $submission = new Submission();
-        $submission
-            ->setSubmissionBox($submission_box)
-            ->setOwner($user)
-            ->setSubmitted(new Alaress_Date_Format(new DateTime('now'), 'U'))
-            ->setFilename($_FILES['file']['name'])
-            ->setTempLocation($_FILES['file']['tmp_name'])
-            ->setFilesize($_FILES['file']['size'])
-            ->loadMimetypeFromFilename()
-            ->loadIsLate();
-
-        // Check uploadability before saving
-        try {
-            $subMap->checkUploadability($submission);
-        } catch (Schoolbox\Resource\Exception $e) {
-            error(17);
-        }
-
-        $submissions->add($submission);
-
-    } /* Exceeded PHP max file size */
+    /* Exceeded PHP max file size */
     elseif (upload_failed()) {
         error(10);
     }
@@ -129,9 +103,9 @@ if (is_numeric($_POST['box_id'])) {
             $document->setFile(array(
                 'id'   => $submissionId,
                 'name' => $submission->getFilename(),
-                'file' => $submission->getFileLocation()
+                'file' => $submission->getStorage()
             ));
-            Plagscan_DocumentMapper::getInstance()->save($document);
+//            Plagscan_DocumentMapper::getInstance()->save($document);
         }
     }
 } else {

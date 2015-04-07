@@ -1,5 +1,12 @@
 <?php
 
+use Schoolbox\Assessment\Activity;
+use Schoolbox\Assessment\ActivityCollection;
+use Schoolbox\Assessment\Component\OnlineAssessment;
+use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+
 if (!isset($this)) {
     require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
     SitePage::localRedir('/submission/dueWork');
@@ -31,15 +38,15 @@ $submissionHandler = new Submission();
 // If student: allow student
 // If staff or superuser: allow private
 $visibilities = array(
-    \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
+    SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
 );
 $isStaff = false;
 if ($groupHandler->isStudent()) {
-    $visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
+    $visibilities[] = SubmissionBox::MARK_VISIBILITY_STUDENT;
 } elseif ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
     $isStaff        = true;
-    $visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE;
-    $visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
+    $visibilities[] = SubmissionBox::MARK_VISIBILITY_PRIVATE;
+    $visibilities[] = SubmissionBox::MARK_VISIBILITY_STUDENT;
 }
 
 /* Instantiate for current date time
@@ -274,7 +281,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 
 
 // create a custom instance of the upcoming work controller, and set it up for this context
-$chf        = new Component_Homepage_Factory(new \Schoolbox\User(), $this);
+$chf        = new Component_Homepage_Factory(new Schoolbox\User(), $this);
 $cdm        = Component_DefinitionMapper::getInstance();
 $definition = $cdm->findOneByColumn('class', 'Component_Dashboard_UpcomingWorkController');
 $instance   = new Component_Instance();
@@ -301,8 +308,8 @@ $dueWorkController->renderTemplate('UPCOMING_WORK');
 $j        = 0;
 $synClass = new External_Class;
 
-$return_mapper = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
-$assess_mapper = new \Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper();
+$return_mapper = new SubmissionBox\ReturnedWorkMapper();
+$assess_mapper = new OnlineAssessment\AttemptMapper();
 
 $restrict_grades = Cfg::get('restrict_parent_grades') && $groupHandler->isParent();
 
@@ -467,7 +474,7 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
     //
     // box URL depends on whether this is an assessment or submission
     $boxUrl = $taskName;
-    if ($activity->getType() == \Schoolbox\Assessment\Component\SubmissionBox\WorkType::TYPE_ONLINE_ASSESSMENT) {
+    if ($activity->getType() == SubmissionBox\WorkType::TYPE_ONLINE_ASSESSMENT) {
         if ($activity->getEvent() == 'closed') {
             $boxUrl = $activity->getName();
         } else {
@@ -531,7 +538,7 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
                         $rtn['slug'],
                         ($activity->isSubmission()
                             ? $activity->getSubmissionBox()
-                            : new \Schoolbox\Assessment\Component\SubmissionBox()
+                            : new SubmissionBox()
                         )
                     );
 
@@ -627,18 +634,14 @@ foreach ($summary as $category) {
  * @param array $visibilities  Which submission box visibilities are viewable?
  * @param bool  $is_restricted Are student's marks restricted?
  *
- * @return \Schoolbox\Assessment\ActivityCollection|\Schoolbox\Assessment\Activity[]
+ * @return ActivityCollection|Activity[]
  */
 function getActivities($user, $limit, $categories, $visibilities, $is_restricted)
 {
-    $box_mapper    = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
-    $assess_mapper = new \Schoolbox\Assessment\Component\OnlineAssessmentMapper();
-    $submit_mapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
-    $return_mapper = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
-    $params        = array(
-        'categories'   => $categories,
-        'visibilities' => $visibilities,
-    );
+    $box_mapper    = new SubmissionBoxMapper();
+    $assess_mapper = new OnlineAssessmentMapper();
+    $submit_mapper = new SubmissionBox\Submission\Mapper();
+    $return_mapper = new SubmissionBox\ReturnedWorkMapper();
     $activities    = $box_mapper
         ->getActivities($user, $limit, $categories)
         ->merge($assess_mapper->getActivities($user, $limit, $categories))
