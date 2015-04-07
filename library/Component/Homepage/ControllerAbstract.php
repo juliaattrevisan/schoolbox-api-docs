@@ -45,24 +45,34 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
     /**
      * The default collapsed state of the content, upon component load
      *
-     * Returns the css class to hide an element
+     * Returns the css class to hide an element, and the data attribute
+     * for the toggler
      *
      * @return string
      */
     protected function getDefaultCollapsedState() {
         if ($this->getConfig('collapse')) {
-            return 'hide';
+            return array(
+                'class' => 'hide',
+                'data' => 'collapsed'
+            );
         }
 
-        return '';
+        return array(
+            'class' => '',
+            'data' => 'uncollapsed'
+        );
     }
 
     /**
      * Apply current collapsed state setting
      */
     protected function applyCollapsedState() {
+        $state = $this->getDefaultCollapsedState();
+
         $this->setVar(array(
-            'CONFIG_COLLAPSED_CLASS' => $this->getDefaultCollapsedState()
+            'CONFIG_COLLAPSED_CLASS' => $state['class'],
+            'CONFIG_COLLAPSED_STATE' => $state['data'],
         ));
     }
 }
