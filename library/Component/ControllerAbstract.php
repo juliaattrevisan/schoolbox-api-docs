@@ -470,10 +470,10 @@ abstract class Component_ControllerAbstract
 
                 $this->sitepage->parse('settings_link_block', 'settings_link');
             }
-        }
 
-        $this->sitepage->parse('settings_collapse_block', 'settings_collapse');
-        $this->sitepage->parse($targetHandle, 'configTpl', false);
+            $this->sitepage->parse('settings_collapse_block', 'settings_collapse');
+            $this->sitepage->parse($targetHandle, 'configTpl', false);
+        }
 
         return true;
     }

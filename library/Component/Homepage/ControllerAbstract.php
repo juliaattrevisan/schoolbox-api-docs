@@ -29,6 +29,46 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
     }
 
     /**
+     * Parse configuration and settings panels for each component
+     *
+     * Facade method
+     *
+     * @param string $targetHandle
+     * @param bool $is_for_template
+     * @return bool
+     */
+    public function parseConfig($targetHandle = 'CONFIGURATION', $is_for_template = false)
+    {
+        // DETERMINE WHAT TO DISPLAY
+        // there is configuration
+        list ($hasWriteAccess, $processConfig) = $this->determineConfigPermissions($this->instance->getConfigArray());
+
+        $this->setupConfigRendering($targetHandle);
+
+        /* If you don't have write access, just render the collapse and go away
+         */
+        if (!$hasWriteAccess) {
+            $this->sitepage->parse('settings_collapse_block', 'settings_collapse');
+        }
+        else {
+            /* If you want to process the config, then do so and display it
+             * Also provide a triangle so you can alter them through the ui
+             *
+             * Otherwise do nothing
+             */
+            if ($processConfig) {
+                $this->renderConfigElements($processConfig, $is_for_template);
+
+                $this->sitepage->parse('settings_link_block', 'settings_link');
+            }
+        }
+
+        $this->sitepage->parse($targetHandle, 'configTpl', false);
+
+        return true;
+    }
+
+    /**
      * @param string $templateName
      * @param string $templatePath
      * @return string
