@@ -14,8 +14,9 @@ $component = array(
     'module'             => 'homepage',
     'component_category' => '3', // Learning
     'class'              => 'Schoolbox\\Curriculum\\Component\\CurriculumDetailsController',
-    'description'        => 'Shows the full details of a curriculum code that has been attached to this homepage',    'multiple'           => 'true',
-    'visible'            => 'true',
+    'description'        => 'Shows the full details of a curriculum code that has been attached to this homepage',
+    'multiple'           => 'true',
+    'visible'            => 'false',
     'config'             => array(
         'componentname' => array(
             'default_value' => 'Curriculum Details',
