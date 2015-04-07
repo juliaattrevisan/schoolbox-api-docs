@@ -48,7 +48,6 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
         $this->setVar('resumeLink_block', '');
         $this->setVar('assess_block', '');
 
-        $groupHandler = new Group();
         $assessHandler = new Assess_Main();
         $attemptHandler = new Assess_Attempt();
         $sectionHandler = new Assess_Section();
