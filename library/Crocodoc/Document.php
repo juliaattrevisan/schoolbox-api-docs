@@ -10,6 +10,8 @@
 
 namespace Crocodoc;
 
+use Schoolbox\Assessment\Component\SubmissionBox\Submission;
+use Schoolbox\Resource\Storage\Model;
 
 class Document
 {
@@ -17,7 +19,7 @@ class Document
     /**
      * Contains API keys
      *
-     * @var null
+     * @var Authenticator
      */
     private $authenticator = null;
 
@@ -31,7 +33,7 @@ class Document
     /**
      * An instance of Schoolbox\Assessment\Component\SubmissionBox\Submission
      *
-     * @var null
+     * @var Submission\File
      */
     private $submission = null;
 
@@ -45,21 +47,23 @@ class Document
     /**
      * Constructor
      *
-     * @param \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission
+     * @param Submission\File $submission
      */
-    public function __construct(\Schoolbox\Assessment\Component\SubmissionBox\Submission $submission)
+    public function __construct(Submission\File $submission)
     {
         $this->setAuthenticator(new Authenticator());
         $this->setSubmission($submission);
 
-        /* Decide where to load the file from
-         */
-        $source = \Cfg::get('submission_dir') . '/' . $submission->getId() . '.dat';
-        $destination = \Cfg::get('submission_upload_tmp_dir') . '/' . $this->getSubmission()->getId(
-            ) . '_' . $this->getSubmission()->getFilename();
+        /** @var Model $storage */
+        $storage     = $submission->getStorage();
+        $destination = \Cfg::get('submission_upload_tmp_dir') . '/' . $this->getSubmission()->getId() . '_' . $this->getSubmission()->getFilename();
 
-        if (copy($source, $destination)) {
-            $this->setUrl($destination);
+        // copy the file contents to the temp directory
+        if ($fp = fopen($destination, 'w')) {
+            if (fwrite($fp, $storage->readStream())) {
+                $this->setUrl($destination);
+            }
+            fclose($fp);
         }
     }
 
@@ -103,7 +107,7 @@ class Document
     /**
      * Set authenticator
      *
-     * @param null $authenticator
+     * @param Authenticator $authenticator
      */
     private function setAuthenticator($authenticator)
     {
@@ -113,7 +117,7 @@ class Document
     /**
      * Get authenticator
      *
-     * @return null
+     * @return Authenticator
      */
     private function getAuthenticator()
     {
@@ -163,7 +167,7 @@ class Document
     /**
      * Set submission
      *
-     * @param null $submission
+     * @param Submission\File $submission
      */
     private function setSubmission($submission)
     {
@@ -173,7 +177,7 @@ class Document
     /**
      * Get submission
      *
-     * @return null
+     * @return Submission\File
      */
     private function getSubmission()
     {

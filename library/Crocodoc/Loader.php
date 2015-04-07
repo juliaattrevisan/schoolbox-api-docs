@@ -9,7 +9,8 @@
  */
 namespace Crocodoc;
 
-use \Schoolbox\User;
+use Alaress_Curl_Url;
+use Schoolbox\User;
 
 class Loader
 {
@@ -17,14 +18,14 @@ class Loader
     /**
      * Contains API keys
      *
-     * @var null
+     * @var Authenticator
      */
     private $authenticator = null;
 
     /**
      * The user doing the marking
      *
-     * @var null
+     * @var User
      */
     private $user = null;
 
@@ -38,14 +39,14 @@ class Loader
     /**
      * A group handler
      *
-     * @var null
+     * @var \Group
      */
     private $groupHandler = null;
 
     /**
      * Curl object
      *
-     * @var null
+     * @var Alaress_Curl_Url
      */
     private $curl = null;
 
@@ -61,7 +62,7 @@ class Loader
         $this->setUuid($uuid);
         $this->setUser($user);
         $this->setGroupHandler(new \Group());
-        $this->setCurl(new \Alaress_Curl_Url('https://crocodoc.com/api/v2/session/create'));
+        $this->setCurl(new Alaress_Curl_Url('https://crocodoc.com/api/v2/session/create'));
     }
 
     /**
@@ -73,17 +74,17 @@ class Loader
         /* Handle postfields different from student viewers and teacher/superuser viewers
          */
         if ($this->getGroupHandler()->isStudent($this->getUser()->getId())) {
-            $postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&editable=false";
-        } else {
-            if ($this->getGroupHandler()->isStaff($this->getUser()->getId()) || $this->getGroupHandler()->isSuperuser(
-                    $this->getUser()->getId()
-                )
-            ) {
-                $userTuple = "{$this->getUser()->getId()},{$this->getUser()->getUsername()}";
+            $postFields = "token={$this->getAuthenticator()
+                                       ->getApiToken()}&uuid={$this->getUuid()}&editable=false";
 
-                $postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid(
-                )}&editable=true&user={$userTuple}";
-            }
+        } elseif ($this->getGroupHandler()->isStaff($this->getUser()->getId())
+            || $this->getGroupHandler()->isSuperuser($this->getUser()->getId())) {
+
+            $userTuple  = "{$this->getUser()->getId()},{$this->getUser()->getUsername()}";
+            $postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&editable=true&user={$userTuple}";
+
+        } else {
+            $postFields = '';
         }
 
         /* Bicep curl
@@ -117,7 +118,7 @@ class Loader
     /**
      * Set user
      *
-     * @param null $user
+     * @param User $user
      */
     private function setUser($user)
     {
@@ -127,7 +128,7 @@ class Loader
     /**
      * Get user
      *
-     * @return null
+     * @return User
      */
     private function getUser()
     {
@@ -157,7 +158,7 @@ class Loader
     /**
      * Set authenticator
      *
-     * @param null $authenticator
+     * @param Authenticator $authenticator
      */
     private function setAuthenticator($authenticator)
     {
@@ -167,7 +168,7 @@ class Loader
     /**
      * Get authenticator
      *
-     * @return null
+     * @return Authenticator
      */
     private function getAuthenticator()
     {
@@ -177,7 +178,7 @@ class Loader
     /**
      * Set group handler
      *
-     * @param null $groupHandler
+     * @param \Group $groupHandler
      */
     private function setGroupHandler($groupHandler)
     {
@@ -187,7 +188,7 @@ class Loader
     /**
      * Get group handler
      *
-     * @return null
+     * @return \Group
      */
     private function getGroupHandler()
     {
@@ -197,7 +198,7 @@ class Loader
     /**
      * Set curl
      *
-     * @param null $curl
+     * @param Alaress_Curl_Url $curl
      */
     private function setCurl($curl)
     {
@@ -207,7 +208,7 @@ class Loader
     /**
      * Get curl
      *
-     * @return null
+     * @return Alaress_Curl_Url
      */
     private function getCurl()
     {
