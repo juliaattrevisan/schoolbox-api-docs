@@ -130,10 +130,6 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             $this->setVar('member_email_block', '');
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true; // everything went according to plan
     }
 }

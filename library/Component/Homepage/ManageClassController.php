@@ -80,10 +80,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $this->setVar('class_mark_block', '');
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true; // everything went according to plan
     }
 }

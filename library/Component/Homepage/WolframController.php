@@ -74,10 +74,6 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
             $this->setVar('has_wolfram_block', '');
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true; // everything went according to plan
     }
 }

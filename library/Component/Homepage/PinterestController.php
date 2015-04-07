@@ -80,10 +80,6 @@ class Component_Homepage_PinterestController extends Component_Homepage_Controll
             }
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true;
     }
 } 

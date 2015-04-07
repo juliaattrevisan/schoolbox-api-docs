@@ -130,10 +130,6 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
             $this->parse("submit_folder_block", "submit_folder");
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true;
     }
 

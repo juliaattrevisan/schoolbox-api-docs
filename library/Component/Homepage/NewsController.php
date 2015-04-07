@@ -188,10 +188,6 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
             }
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true;
     }
 

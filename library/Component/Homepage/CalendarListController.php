@@ -209,10 +209,6 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
             $this->parse("submit_event_block", "submit_event");
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true;
     }
 }

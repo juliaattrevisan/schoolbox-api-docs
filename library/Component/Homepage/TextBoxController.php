@@ -122,10 +122,6 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             $this->parse('text_locked_block', 'text_locked');
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true; // everything went according to plan
     }
 

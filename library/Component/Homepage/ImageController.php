@@ -90,10 +90,6 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
             $this->parse('submit_image_block', 'submit_image');
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true; // everything went according to plan
     }
 }

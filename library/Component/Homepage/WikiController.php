@@ -150,10 +150,6 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
             }
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true; // everything went according to plan
     }
 

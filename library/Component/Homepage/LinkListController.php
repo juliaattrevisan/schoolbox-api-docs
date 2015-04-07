@@ -156,10 +156,6 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             $this->parse("submit_link_block", "submit_link");
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true;
     }
 

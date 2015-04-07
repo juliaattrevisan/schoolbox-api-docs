@@ -115,10 +115,6 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
             )
         );
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true;
     }
 }

@@ -171,10 +171,6 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
             $this->parse('import_events_block', 'import_events');
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true;
     }
 }

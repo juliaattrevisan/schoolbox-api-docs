@@ -104,10 +104,6 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
             }
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true; // everything went according to plan
     }
 }

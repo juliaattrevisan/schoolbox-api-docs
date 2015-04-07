@@ -193,10 +193,6 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
             $this->renderTemplateForCourseSelector();
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true;
     }
 

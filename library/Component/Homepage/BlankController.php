@@ -33,11 +33,6 @@ class Component_Homepage_BlankController extends Component_Homepage_ControllerAb
             return false;
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true;
     }
-
 }

@@ -178,10 +178,6 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
             }
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true; // everything went according to plan
     }
 }

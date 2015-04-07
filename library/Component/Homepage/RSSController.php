@@ -88,10 +88,6 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
             $this->setVar('rss_block', '');
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true; // everything went according to plan
     }
 }

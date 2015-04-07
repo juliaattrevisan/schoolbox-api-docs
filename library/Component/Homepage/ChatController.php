@@ -68,10 +68,6 @@ class Component_Homepage_ChatController extends Component_Homepage_ControllerAbs
             $this->setVar('chat_staff_js_block', '');
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true; // everything went according to plan
     }
 }

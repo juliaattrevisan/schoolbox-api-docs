@@ -61,10 +61,6 @@ class Component_Homepage_CountdownController extends Component_Homepage_Controll
             )
         );
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true;
     }
 }

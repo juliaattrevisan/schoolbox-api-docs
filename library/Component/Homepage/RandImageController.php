@@ -68,10 +68,6 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
             $this->setVar("preview_block", "");
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true; // everything went according to plan
     }
 }

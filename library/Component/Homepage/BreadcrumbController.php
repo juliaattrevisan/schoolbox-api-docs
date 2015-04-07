@@ -72,10 +72,6 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
         $this->setVar('BREADCRUMB_CATEGORY_CLASS', 'last');
         $this->parse('category_breadcrumb_block', 'category_breadcrumb', true);
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true; // everything went according to plan
     }
 

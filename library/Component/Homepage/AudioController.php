@@ -144,10 +144,6 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
             $this->parse("submit_file_block", "submit_file");
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true;
     }
 }

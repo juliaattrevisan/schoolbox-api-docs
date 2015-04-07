@@ -269,10 +269,6 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
             }
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true; // everything went according to plan
     }
 }

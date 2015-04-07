@@ -48,6 +48,11 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
         /* If you don't have write access, just render the collapse and go away
          */
         if (!$hasWriteAccess) {
+
+            /* Detroit
+             */
+            $this->applyCollapsedState();
+
             $this->sitepage->parse('settings_collapse_block', 'settings_collapse');
         }
         else {
@@ -58,6 +63,10 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
              */
             if ($processConfig) {
                 $this->renderConfigElements($processConfig, $is_for_template);
+
+                /* Detroit
+                 */
+                $this->applyCollapsedState();
 
                 $this->sitepage->parse('settings_collapse_block', 'settings_collapse');
                 $this->sitepage->parse('settings_link_block', 'settings_link');

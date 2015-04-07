@@ -121,10 +121,6 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
             )
         );
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true;
     }
 }

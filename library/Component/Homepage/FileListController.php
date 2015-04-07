@@ -206,10 +206,6 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
             $this->parse("submit_file_block", "submit_file");
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true;
     }
 

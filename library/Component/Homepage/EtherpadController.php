@@ -142,10 +142,6 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
             $this->parse('etherpad_has_create_block', 'etherpad_has_create');
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true;
     }
 

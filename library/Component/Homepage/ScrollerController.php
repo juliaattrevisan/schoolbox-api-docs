@@ -134,10 +134,6 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
             $this->parse('image_scroller_block', 'image_scroller', true);
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true; // everything went according to plan
     }
 

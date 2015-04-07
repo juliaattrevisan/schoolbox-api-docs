@@ -88,10 +88,6 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
             $this->setVar('modify_rubric_block', '');
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true;
     }
 }

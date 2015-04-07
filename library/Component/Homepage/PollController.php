@@ -194,10 +194,6 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
             }
         }
 
-        /* Detroit
-         */
-        $this->applyCollapsedState();
-
         return true;
     }
 }
