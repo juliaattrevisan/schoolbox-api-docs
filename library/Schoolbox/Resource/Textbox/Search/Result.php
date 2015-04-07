@@ -47,7 +47,7 @@ class Result extends Base
 					AND a.uid = :user_id
 			WHERE
 				(p.cid OR a.sid)
-				AND t.deleted = 'false'
+				AND t.deleted IS NULL
 				AND MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()})
 			ORDER BY t.{$sanitiser->getSortBy()} {$sanitiser->getSortDir()}
 			LIMIT {$sanitiser->getOffset()}, {$sanitiser->getLimit()}
@@ -99,7 +99,7 @@ class Result extends Base
 					AND a.uid = :user_id
 			WHERE
 				(p.cid OR a.sid)
-				AND t.deleted = 'false'
+				AND t.deleted IS NULL
 				AND MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()})
 		";
 
