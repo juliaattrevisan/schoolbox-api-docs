@@ -363,10 +363,15 @@ abstract class Component_ControllerAbstract
         $this->sitepage->setBlock('configTpl', 'settings_link', 'settings_link_block');
         $this->sitepage->setBlock('configTpl', 'settings_panel', 'settings_panel_block');
         $this->sitepage->setBlock('configTpl', 'settings_collapse', 'settings_collapse_block');
+        $this->sitepage->setBlock('configTpl', 'settings_close', 'settings_close_block');
         $this->sitepage->setBlock('settings_panel', 'config_element', 'config_element_block');
         $this->sitepage->setVar(array(
             $targetHandle => '',
             'config_element_block' => '',
+
+            /* The close button which removes components
+             */
+            'settings_close_block' => '',
 
             /* The little triangle which drops down the config options
              * contained in settings_panel_block
@@ -471,7 +476,7 @@ abstract class Component_ControllerAbstract
                 $this->sitepage->parse('settings_link_block', 'settings_link');
             }
 
-            $this->sitepage->parse('settings_collapse_block', 'settings_collapse');
+            $this->sitepage->parse('settings_close_block', 'settings_close');
             $this->sitepage->parse($targetHandle, 'configTpl', false);
         }
 

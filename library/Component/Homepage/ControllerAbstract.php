@@ -59,7 +59,9 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
             if ($processConfig) {
                 $this->renderConfigElements($processConfig, $is_for_template);
 
+                $this->sitepage->parse('settings_collapse_block', 'settings_collapse');
                 $this->sitepage->parse('settings_link_block', 'settings_link');
+                $this->sitepage->parse('settings_close_block', 'settings_close');
             }
         }
 
