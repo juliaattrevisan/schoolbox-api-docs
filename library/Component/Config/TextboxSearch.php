@@ -6,17 +6,48 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Collection;
+use Schoolbox\Textbox\Model;
+use Schoolbox\Textbox\Mapper;
+
 class Component_Config_TextboxSearch extends Component_Config_Abstract
 {
-
+    /**
+     * Parse
+     *
+     * @param SitePage $page
+     * @param string $key
+     * @param string $keyblock
+     * @param mixed $configValue
+     * @param Component_ControllerAbstract $component
+     */
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
-        $page->setVar('COMPONENT_TEXTBOX_ID', $configValue);
+        $mapper = new Mapper();
 
-        $handler = new TextBox();
+        try {
+            $textbox = $mapper->findById($configValue);
 
-        $textbox = $handler->getByID($configValue);
+            $allUsages = $mapper->findComponentUsage($textbox);
+        } catch (\Exception $e) {
+            $textbox = new Model();
 
-        $page->setVar('COMPONENT_TEXTBOX_NAME', $textbox['heading']);
+            $allUsages = new Collection();
+            $allUsages->add(new \Component_instance());
+        }
+
+        /* Because you can have multiple textbox components displaying the
+         * same textbox, just pick the first one that uses the textbox
+         */
+        $componentId = $allUsages->first()->getId();
+
+        $page->setVar(
+            array(
+                'COMPONENT_TEXTBOX_ID'   => $configValue,
+                'COMPONENT_TEXTBOX_NAME' => $textbox->getHeading(),
+                'VIEW_URL'               => "/homepage/{$textbox->getCategory()->getId()}#component{$componentId}",
+                'EDIT_URL'               => "/homepage/{$textbox->getCategory()->getId()}/textBoxModify/{$componentId}#component{$componentId}",
+            )
+        );
     }
 }

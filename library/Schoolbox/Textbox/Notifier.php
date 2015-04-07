@@ -22,7 +22,7 @@ use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Resource\Category;
 use Schoolbox\User;
 
-class TextboxNotifier extends ResourceNotifier {
+class Notifier extends ResourceNotifier {
 
 
 	/**

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -9,17 +10,25 @@
 class Component_Config_Textbox extends Component_Config_Abstract
 {
 
+    /**
+     * Parse
+     *
+     * @param SitePage $page
+     * @param string $key
+     * @param string $keyblock
+     * @param mixed $configValue
+     * @param Component_ControllerAbstract $component
+     */
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
-        $textboxMapper = new \Schoolbox\Resource\TextboxMapper();
+        $textboxMapper = new \Schoolbox\Textbox\Mapper();
 
         // has an internal block for the select element
 
         /* Select a textbox from some other homepage
 		 */
-        $altSource = $component instanceof Component_ControllerAbstract
-            ? $component->getConfig('src')
-            : null;
+        $altSource = $component instanceof Component_ControllerAbstract ? $component->getConfig('src') : null;
+
         if (is_numeric($altSource) && $altSource) {
             $allTextboxes = $textboxMapper->findByColumn('categoryID', $altSource);
         } else {
@@ -29,22 +38,26 @@ class Component_Config_Textbox extends Component_Config_Abstract
         $page->setBlock($keyblock, 'textbox_select', 'textbox_select_block');
         $page->setVar('textbox_select_block', '');
 
-        if ($allTextboxes->count()) {
+        if (is_array($allTextboxes)) {
             foreach ($allTextboxes as $currentTextbox) {
-                $page->setVar(array(
+                $page->setVar(
+                    array(
                     'COMPONENT_CONFIG_BOXSELECT_NAME'       => Scrub::text($currentTextbox->getHeading()),
                     'COMPONENT_CONFIG_BOXSELECT_VALUE' 	    => $currentTextbox->getId(),
                     'COMPONENT_CONFIG_BOXSELECT_SELECTED'   => $currentTextbox->getId() == $configValue ? 'selected="selected"' : '',
-                ));
+                    )
+                );
 
                 $page->parse("textbox_select_block", "textbox_select", true);
             }
         } else {
-            $page->setVar(array(
+            $page->setVar(
+                array(
                 'COMPONENT_CONFIG_BOXSELECT_NAME'       => Scrub::text(' (none) '),
                 'COMPONENT_CONFIG_BOXSELECT_VALUE'      => '0',
                 'COMPONENT_CONFIG_BOXSELECT_SELECTED'   => 'disabled="disabled"',
-            ));
+                )
+            );
 
             $page->parse("textbox_select_block", "textbox_select", true);
         }

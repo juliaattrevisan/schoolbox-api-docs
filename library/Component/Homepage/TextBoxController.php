@@ -10,7 +10,7 @@
 class Component_Homepage_TextBoxController extends Component_Homepage_ControllerAbstract
 {
 
-    /** @var \Schoolbox\Resource\Textbox */
+    /** @var \Schoolbox\Textbox\Model */
     protected $textbox;
 
     /** @var Group */
@@ -25,13 +25,13 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         $this->groupHandler = new Group();
 
         try {
-            $this->textbox = \Schoolbox\Resource\TextboxMapper::getInstance()->findById($this->getConfig('textbox'));
-            if ($this->getTextbox()->getDeleted()) {
+            $this->textbox = \Schoolbox\Textbox\Mapper::getInstance()->findById($this->getConfig('textbox'));
+            if ($this->getTextbox()->getDeletedAt()) {
                 throw new \Schoolbox\Mapper\Exception("Requested textbox has been deleted");
             }
         } catch (\Schoolbox\Mapper\Exception $e) {
             // didn't find it or it's been deleted: create a blank template box instead
-            $this->textbox = new \Schoolbox\Resource\Textbox();
+            $this->textbox = new \Schoolbox\Textbox\Model();
             $this->textbox
                 ->setHeading('Text Box')
                 ->setCategory(\Schoolbox\Resource\CategoryMapper::getInstance()->createModel()->setId($this->getContext()->getId()));
@@ -59,7 +59,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         $this->setBlock('text_locked', 'modify_text', 'modify_text_block');
         $this->setBlock('text_locked', 'create_text', 'create_text_block');
 
-        if ($this->textbox instanceof \Schoolbox\Resource\Textbox) {
+        if ($this->textbox instanceof \Schoolbox\Textbox\Model) {
             $sourceCategory = $this->textbox->getCategory()->getId();
         } else {
             $sourceCategory = $this->getContext()->getId();
@@ -127,7 +127,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
     }
 
     /**
-     * @return \Schoolbox\Resource\Textbox
+     * @return \Schoolbox\Textbox\Model
      */
     protected function getTextbox()
     {

@@ -13,7 +13,6 @@ require_once('../../../include/Bootstrap.php');
  */
 $page = new SitePage();
 $groupHandler = new Group();
-$textboxHandler = new TextBox();
 $allElements = array();
 
 /* Check permissions
@@ -39,19 +38,20 @@ if (is_numeric($_GET['categoryId'])) {
                 break;
             case 'textbox':
             default:
-                $allTextboxes = $textboxHandler->getAllByCategory($_GET['categoryId']);
-                if (is_array($allTextboxes) && count($allTextboxes)) {
-                    foreach ($allTextboxes as $currentTextbox) {
-                        $element = array(
-                            'name' => Scrub::text($currentTextbox['heading']),
-                            'value' => $currentTextbox['textBoxID'],
-                        );
+                $textboxMapper = new \Schoolbox\Textbox\Mapper();
+                $allTextboxes = $textboxMapper->findByColumn('categoryID', $_GET['categoryId']);
 
-                        $allElements[] = $element;
-                    }
+                foreach ($allTextboxes as $currentTextbox) {
+                    $element = array(
+                        'name' => Scrub::text($currentTextbox->getHeading()),
+                        'value' => $currentTextbox->getId(),
+                    );
+
+                    $allElements[] = $element;
                 }
                 break;
         }
     }
 }
+
 echo json_encode($allElements);
