@@ -25,11 +25,18 @@ $this->setBlock('marktype', 'gradegroup_explanation', 'gradegroup_explanation_bl
 $this->setBlock('gradegroup_explanation', 'gradegroup_explanation_level', 'gradegroup_explanation_level_block');
 $this->setBlock(TEMPLATE_content, 'mark_weight', 'mark_weight_block');
 $this->setBlock(TEMPLATE_content, 'duework_timespan', 'duework_timespan_block');
+$this->setBlock(TEMPLATE_content, 'curriculum_code_input', 'curriculum_code_input_block');
 
 $this->setVar('category_select_block', '');
 $this->setVar('existing_marks_warning_block', '');
 $this->setVar('COURSE_CRITERIA', '');
 $this->setVar('CLASS_CRITERIA', '');
+
+if (Config::get('curriculum_tagging_enabled')) {
+    $this->parse('curriculum_code_input_block', 'curriculum_code_input');
+} else {
+    $this->setVar('curriculum_code_input_block', '');
+}
 
 $this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 
