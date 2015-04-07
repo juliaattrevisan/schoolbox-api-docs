@@ -3,7 +3,6 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
-//use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -96,16 +95,8 @@ if (is_numeric($_POST['box_id'])) {
 
         /* Submit to PlagScan for plagiarism check */
         if ($plagscanApiKey && $plagscanUsername && is_numeric($submissionId)) {
-            $document = new Plagscan_Document();
-
-            $document->setFileId($submissionId);
-
-            $document->setFile(array(
-                'id'   => $submissionId,
-                'name' => $submission->getFilename(),
-                'file' => $submission->getStorage()
-            ));
-//            Plagscan_DocumentMapper::getInstance()->save($document);
+            $plagMap = Plagscan_DocumentMapper::getInstance();
+            $plagMap->save($plagMap->createModel()->setFile($submission));
         }
     }
 } else {

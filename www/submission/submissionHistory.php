@@ -593,10 +593,10 @@ if (isset($recent_activity)) {
         if ($drafts->count() === 0) {
             $this->parse('action_resubmit_online_create_block', 'action_resubmit_online_create');
         } else {
-            /** @var Component\SubmissionBox\Submission $draft */
+            /** @var Component\SubmissionBox\Submission\Inline $draft */
             $draft = $drafts->first();
             // Is draft before most recent submission? show create new draft
-            if ($draft->getSubmitted()->getUnixTimestamp() < $recentSubmissionDate->getUnixTimestamp()) {
+            if ($draft->getCreatedAt()->getUnixTimestamp() < $recentSubmissionDate->getUnixTimestamp()) {
                 $this->parse('action_resubmit_online_create_block', 'action_resubmit_online_create');
             } else {
                 $this->parse('action_resubmit_online_update_block', 'action_resubmit_online_update');

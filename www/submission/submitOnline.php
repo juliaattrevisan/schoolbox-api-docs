@@ -1,5 +1,9 @@
 <?php
 
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission;
+
 // not in sitepage context, redirect
 if(!isset($this)) {
     require_once(dirname(__FILE__). '/../../include/Bootstrap.php');
@@ -18,12 +22,8 @@ $this->setTab('submission');
 // Same sort of permission as on edit?
 // allow teachers to mark this?
 
-use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission;
-use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
 $box_mapper        = new SubmissionBoxMapper();
-$submission_mapper = new SubmissionMapper();
+$submission_mapper = new Submission\Mapper();
 
 //
 // Submission mapper - will get the most recent submission for this student.
@@ -61,5 +61,5 @@ $this->setVar(array(
     'BOX_NAME'      => Scrub::text($submission_box->getName()),
     'BOX_TYPE'      => $submission_box->getWorkType()->getName(),
     'BOX_CREATED'   => $createdDate->getRelativeTime(),
-    'TEXTBOX_BODY'  => ($draft instanceof Submission ? Scrub::text($draft->getBody()) : ''),
+    'TEXTBOX_BODY'  => ($draft instanceof Submission\Inline ? Scrub::text($draft->getBody()) : ''),
 ));

@@ -113,23 +113,9 @@ if (!$permission_denied && !$isDraft) {
 	$submission_id    = $submission->getId();
 
 	if (!empty($plagscanApiKey) && !empty($plagscanUsername) && !empty($submission_id)) {
-		$document = new Plagscan_Document();
-		$document->setFileId($submission_id);
-
-		//
-		// Make a temp file for Plagscan to work with.
-		// Molest the filename so that Plagscan always accepts the document as
-		// scannable.
-		$tempfile = tempnam(sys_get_temp_dir(), 'sb_pgs');
-		file_put_contents($tempfile, $body);
-		$document->setFile(array(
-			'id'   => $submission_id,
-			'name' => "$tempfile.html",
-			'file' => $tempfile,
-		));
-
 		// Plagscan service: this should be able to return AJAX and keep
 		// processing in the background.
-		Plagscan_DocumentMapper::getInstance()->save($document);
+        $plagMap = Plagscan_DocumentMapper::getInstance();
+        $plagMap->save($plagMap->createModel()->setFile($submission));
 	}
 }
