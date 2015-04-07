@@ -12,11 +12,20 @@ namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\FileInterface;
 
-class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\StorageMapperInterface
+/**
+ * Class ReturnedWorkMapper
+ *
+ * @package Schoolbox\Assessment\Component\SubmissionBox
+ * @method ReturnedWork findById($id)
+ * @method ReturnedWork hydrate(array $row, $alias = '', $callback = null)
+ * @method ReturnedWork createModel()
+ */
+class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\StorageMapperInterface, Schoolbox\Assessment\IActivityMapper
 {
 
     protected function mapping()
@@ -176,7 +185,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\StorageMa
      *
      * @return ActivityCollection
      */
-    public function getActivities($user_id, $limit, $categories, $visibilities)
+    public function getActivities($user_id, $limit, array $categories, array $visibilities = [ SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT ])
     {
 
         //
