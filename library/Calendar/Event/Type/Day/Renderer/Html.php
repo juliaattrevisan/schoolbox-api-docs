@@ -21,7 +21,8 @@ class Html extends Base {
 
         if ($this->isVisible()) {
             return $this->getTemplate()->render('calendar/type/day.twig',
-                array('event' => $this->getEvent())
+                array(  'event' => $this->getEvent(),
+                        'renderer' => $this)
             );
         } else {
             return '';

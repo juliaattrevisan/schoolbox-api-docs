@@ -33,24 +33,29 @@
         </div>
         </p>
         {% if event.attendance %}
-        <p class="meta">Attendance Status: {ATTENDANCE_STATUS}</p>
+        <p class="meta">Attendance Status: {{ renderer.attendanceStatus() }}</p>
         {% endif %}
         <div>
             {% if event.attendance %}
-            <form method="post">
-                <input name="event[id]" type="hidden" value="{EVENT_ID}">
-                <a class="btn modify float-left attendance-request" href="#"><span></span>{ATTENDANCE_REQUEST_ACTION}</a>
-            </form>
-            {% endif %}
+                <form method="post">
+                    <input name="event[id]" type="hidden" value="{{ event.eventId }}">
+                    {% if event.renderer.attendanceStatus() %}
+                    <a class="btn modify float-left attendance-request" href="#"><span></span>Not Going</a>
+                    {% else %}
+                    <a class="btn modify float-left attendance-request" href="#"><span></span>RSVP</a>
+                    {% endif %}
+                </form>
 
-            {%if event.attendance and event.isEditable %}
-            <a class="btn groups float-left"
-               href="/calendar/attendance/list/{EVENT_ID}"><span></span>Attendance List</a>
+                {%if event.isEditable %}
+                <a class="btn groups float-left"
+                   href="/calendar/attendance/list/{{ event.eventId }}"><span></span>Attendees</a>
+                {% endif %}
             {% endif %}
-
             {% if event.isEditable %}
             <a class="btn modify float-left" href="/calendar/modify.php?eventID={{ event.eventId }}&returnTo=calendar"><span></span>Modify</a>
+            <a class="btn delete float-left" href="/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}&returnTo=calendar" onclick="return(confirm('Are you sure you wish to delete this event?'))"><span></span>Delete</a>
             {% endif %}
         </div>
+
     </div>
 </li>

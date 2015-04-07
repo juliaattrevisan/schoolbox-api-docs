@@ -41,7 +41,7 @@ try {
     // noop
 }
 
-switch ($_POST['action']) {
+switch ($_REQUEST['action']) {
     case 'Add':
     case 'Update':
         /* Default
@@ -184,7 +184,7 @@ switch ($_POST['action']) {
     case 'Delete':
         $eventMapper = new \Schoolbox\Calendar\EventMapper();
         try {
-            $event = $eventMapper->findById($_POST['id']);
+            $event = $eventMapper->findById($_REQUEST['id']);
         } catch (\Exception $e) {
             error(160);
         }

@@ -28,4 +28,26 @@ class Base extends RendererBase
         }
         return true;
     }
+
+    /**
+     * Returns the current attendance status for the viewer of a given attendance event
+     *
+     * @return string
+     */
+    public function attendanceStatus() {
+        if ($attendance = $this->getCalendarHandler()->getAttendanceByEventAndUser($this->getEvent()->getEventId(), $this->getViewer()->getId())) {
+            if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
+                return 'Pending';
+            }
+            else if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
+                return 'Approved';
+            }
+            else if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
+                return 'Rejected';
+            }
+        }
+
+        return '';
+    }
+
 } 
