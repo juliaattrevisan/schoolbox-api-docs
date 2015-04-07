@@ -10,15 +10,32 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\Submission;
 
 
+use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\User;
 
 interface ISubmission
 {
 
     /**
+     * @return int
+     */
+    public function getId();
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getCreatedAt();
+
+    /**
      * @return SubmissionBox
      */
     public function getSubmissionBox();
+
+    /**
+     * @return User
+     */
+    public function getOwner();
 
     /**
      * @return bool
