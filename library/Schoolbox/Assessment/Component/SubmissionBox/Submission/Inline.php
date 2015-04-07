@@ -49,6 +49,16 @@ class Inline extends AbstractSubmission
 
 
     /**
+     * @deprecated for mapper use only
+     * @return bool
+     */
+    public function getDraft()
+    {
+        return $this->isDraft();
+    }
+
+
+    /**
      * @param boolean $draft
      * @return static
      */
