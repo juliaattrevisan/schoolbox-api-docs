@@ -48,7 +48,6 @@
                     component.stop().slideDown();
                     component.attr('data-collapse-state', 'uncollapsed');
 
-
                     $(this).find('span').html('-');
                 }
                 else {

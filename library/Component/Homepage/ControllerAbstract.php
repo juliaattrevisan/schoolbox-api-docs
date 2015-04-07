@@ -95,7 +95,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
      */
     protected function getDefaultCollapsedState()
     {
-        if ($this->getConfig('collapse')) {
+        if ($this->getConfig('collapse') == 1) {
             return array(
                 'icon' => '+',
                 'class' => 'hide',
@@ -104,7 +104,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
         }
 
         return array(
-            'icon' => '_',
+            'icon' => '-',
             'class' => '',
             'data'  => 'uncollapsed'
         );
