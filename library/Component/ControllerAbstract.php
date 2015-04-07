@@ -363,6 +363,11 @@ abstract class Component_ControllerAbstract
         $this->sitepage->setVar(array(
             $targetHandle => '',
             'config_element_block' => '',
+            'settings_panel_block' => '',
+
+            /* The little triangle which drops down the config options
+             */
+            'settings_link_block' => ''
         ));
     }
 
@@ -377,6 +382,11 @@ abstract class Component_ControllerAbstract
         // it's possible hiding configs will hide all; check for this and hide the config dropdown if need be
         $configCount = 0;
 
+        /* Conditionally decide whether to render each config ingredient
+         *
+         * If you didn't need to display it, don't iterate through every
+         * element and set it up, to save some processing
+         */
         if ($processConfig) {
             // every config key has a corresponding controller and template to be called
             foreach ($this->instance->getConfigArray() as $key => $params) {
@@ -409,11 +419,7 @@ abstract class Component_ControllerAbstract
             }
 
             $this->sitepage->parse('settings_panel_block', 'settings_panel', false);
-        } // don't process the config
-        else {
         }
-
-        return $configCount;
     }
 
     /**
@@ -429,26 +435,32 @@ abstract class Component_ControllerAbstract
     {
         // DETERMINE WHAT TO DISPLAY
         // there is configuration
-        list ($hasWriteAccess, $processConfig, $displayConfig) = $this->determineConfigPermissions($this->instance->getConfigArray());
+        list ($hasWriteAccess, $processConfig) = $this->determineConfigPermissions($this->instance->getConfigArray());
 
         // if all 3 above vars are false, bug out
-        if (!($hasWriteAccess || $processConfig || $displayConfig)) {
+        if (!($hasWriteAccess || $processConfig)) {
             return false;
         }
 
         $this->setupConfigRendering($targetHandle);
-        $configCount = $this->renderConfigElements($processConfig, $is_for_template);
 
-        // now clear things we don't want seen
-        if (!$displayConfig || $configCount == 0) {
-            $this->sitepage->setVar('settings_link_block', '');
-            $this->sitepage->setVar('settings_panel_block', '');
-        } else {
-            $this->sitepage->parse('settings_link_block', 'settings_link');
-        }
-
+        /* If you don't have write access, just leave before dealing with any
+         * config element rendering and stuff
+         */
         if (!$hasWriteAccess) {
             return false;
+        }
+        else {
+            /* If you want to process the config, then do so and display it
+             * Also provide a triangle so you can alter them through the ui
+             *
+             * Otherwise do nothing
+             */
+            if ($processConfig) {
+                $this->renderConfigElements($processConfig, $is_for_template);
+
+                $this->sitepage->parse('settings_link_block', 'settings_link');
+            }
         }
 
         $this->sitepage->parse($targetHandle, 'configTpl', false);
