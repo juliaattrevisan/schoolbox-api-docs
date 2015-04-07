@@ -343,7 +343,7 @@ class External_Schoolpro_User implements External_UserInterface {
 			$allStudents = array();
 
 			foreach($result['result'] as $currentStudent) {
-				$allStudents[] = $currentStudent['RelationSchoolNum'];
+				$allStudents[] = ['RelatedID' => $currentStudent['RelationSchoolNum']];
 			}
 
 			return $allStudents;
