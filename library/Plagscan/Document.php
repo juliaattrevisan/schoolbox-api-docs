@@ -9,6 +9,7 @@
  * 
  */
 
+use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\ISoftDeletable;
 
 class Plagscan_Document implements ISoftDeletable {
@@ -29,16 +30,10 @@ class Plagscan_Document implements ISoftDeletable {
 	protected $id;
 
 	/**
-	 * The file from $_FILES?
-	 *
-	 * @var array
+	 * @var Submission\ISubmission
 	 */
 	protected $file;
 
-	/**
-	 * @var int
-	 */
-	protected $fileId;
 
 	/**
 	 * Is this even used?
@@ -77,27 +72,11 @@ class Plagscan_Document implements ISoftDeletable {
 	 */
 	protected $deleted;
 
-	/**
-	 * @param  int $fileId
-	 *
-	 * @return $this
-	 */
-	public function setFileId($fileId) {
-		$this->fileId = $fileId;
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getFileId() {
-		return $this->fileId;
-	}
 
 	/**
 	 * @param  string $html
 	 *
-	 * @return $this
+	 * @return static
 	 */
 	public function setHtml($html) {
 		$this->html = $html;
@@ -114,7 +93,7 @@ class Plagscan_Document implements ISoftDeletable {
 	/**
 	 * @param  int $id
 	 *
-	 * @return $this
+	 * @return static
 	 */
 	public function setId($id) {
 		$this->id = $id;
@@ -131,7 +110,7 @@ class Plagscan_Document implements ISoftDeletable {
 	/**
 	 * @param  int $plagscanId
 	 *
-	 * @return $this
+	 * @return static
 	 */
 	public function setPlagscanId($plagscanId) {
 		$this->plagscanId = $plagscanId;
@@ -148,7 +127,7 @@ class Plagscan_Document implements ISoftDeletable {
 	/**
 	 * @param  float $score
 	 *
-	 * @return $this
+	 * @return static
 	 */
 	public function setScore($score) {
 		$this->score = $score;
@@ -165,7 +144,7 @@ class Plagscan_Document implements ISoftDeletable {
 	/**
 	 * @param  int $state
 	 *
-	 * @return $this
+	 * @return static
 	 */
 	public function setState($state) {
 		$this->state = $state;
@@ -182,7 +161,7 @@ class Plagscan_Document implements ISoftDeletable {
 	/**
 	 * @param  int $status
 	 *
-	 * @return $this
+	 * @return static
 	 */
 	public function setStatus($status) {
 		$this->status = $status;
@@ -197,9 +176,9 @@ class Plagscan_Document implements ISoftDeletable {
 	}
 
 	/**
-	 * @param  array $file
+	 * @param  Submission\ISubmission $file
 	 *
-	 * @return $this
+	 * @return static
 	 */
 	public function setFile($file) {
 		$this->file = $file;
@@ -207,7 +186,7 @@ class Plagscan_Document implements ISoftDeletable {
 	}
 
 	/**
-	 * @return array
+	 * @return Submission\ISubmission
 	 */
 	public function getFile() {
 		return $this->file;
@@ -215,7 +194,7 @@ class Plagscan_Document implements ISoftDeletable {
 
 	/**
 	 * @param  Alaress_Date_Format $deleted
-	 * @return $this
+	 * @return static
 	 */
 	public function setDeleted($deleted) {
 		$this->deleted = $deleted;

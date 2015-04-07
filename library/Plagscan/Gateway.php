@@ -1,4 +1,5 @@
 <?php
+use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 
 /**
  *
@@ -58,22 +59,53 @@ class Plagscan_Gateway
         return $this->errorMessage;
     }
 
-    public function submit($documentName, $documentFile)
+
+    /**
+     * TODO consider perhaps this should already be sorted by the time we get here?
+     *
+     * @param Submission\ISubmission $submission
+     * @return string
+     */
+    public function submit(Submission\ISubmission $submission)
     {
-        $parameterList = $this->createParameters(
-            array(
-                'METHOD' => self::METHOD_SUBMIT
-            )
-        );
+        if ($submission instanceof Submission\File) {
+            $documentName = $submission->getFilename();
+
+            /** @var Schoolbox\Resource\Storage\Model $file */
+            $file = $submission->getStorage();
+            $documentData = $file->read();
+
+        } elseif ($submission instanceof Submission\Inline) {
+            $documentName = 'online-submission.html';
+            $documentData = $submission->getBody();
+
+        } else {
+            return null;
+        }
+
+        return $this->postForToken($documentName, $documentData);
+    }
+
+
+    /**
+     * POSTs the given filedata to Plagscan, and returns the ID assigned
+     *
+     * @param string $documentName
+     * @param string $documentData
+     * @return string
+     */
+    protected function postForToken($documentName, $documentData) {
+        $parameterList = $this->createParameters([
+            'METHOD' => self::METHOD_SUBMIT
+        ]);
 
         $documentParameter = '';
 
         $fileInfo = new finfo(FILEINFO_MIME);
 
-        $documentData = file_get_contents($documentFile);
         $documentType = $fileInfo->buffer($documentData);
 
-        $documentExtension = strtolower(trim(array_pop(explode('.', $documentName))));
+        $documentExtension = pathinfo($documentName, PATHINFO_EXTENSION);
 
         $validDocumentExtensionList = array(
             'docx',
@@ -85,7 +117,7 @@ class Plagscan_Gateway
         );
 
         if (!in_array($documentExtension, $validDocumentExtensionList)) {
-            return false;
+            return null;
         }
 
         $documentParameter .= "Content-Disposition: form-data; name=\"DATA\"; filename=\"$documentName\"\n";
