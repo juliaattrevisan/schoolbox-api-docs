@@ -50,6 +50,12 @@ if (!empty($_POST)) {
         ->setMarkVisibility($_POST['mark_visibility'])
         ->setCompletionMessage($_POST['completion_message'])
     ;
+    if (isset($_POST['curriculumCodes'])) {
+        $assessment->setCurriculumNodes(
+            Schoolbox\Curriculum\Node\Mapper::getInstance()
+                ->findByColumn('id', $_POST['curriculumCodes'])
+        );
+    }
 
     // Is this a task? If so, just set the start and finish to now.
     $task_id = $assessment->getTask()->getId();
@@ -149,6 +155,7 @@ else {
         'ALLOW_RESIT_CHECKED'     => $assessment->getMaxAttempts() == 1 ? 'checked=\'checked\'' : '',
         'ASSESS_DURATION_CHECKED' => $assessment->getDuration() >= 0 ? 'checked=\'checked\'' : '',
         'ASSESS_COMPLETION_MESSAGE' => Scrub::text($assessment->getCompletionMessage()),
+        'CURRICULUM_CODE_LIST'    => json_encode($assessment->getCurriculumNodes()),
     ));
 
     /* Render starting times

@@ -160,6 +160,13 @@ else {
         error(117);
     }
 
+    try {
+        $category = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($category_id);
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        error(117);
+        exit;
+    }
+
     if ($groupHandler->getPermission($category_id) < WRITE_ACCESS) {
         error(126);
     }
@@ -193,6 +200,12 @@ else {
         'ASSESS_FINISH_DATE' => $assessEndDate->getLocalShort(),
         'ASSESS_COMPLETION_MESSAGE' => '',
     ));
+
+    // Curriculum codes: by default use the ones that are part of the folder
+    $this->setVar(
+        'CURRICULUM_CODE_LIST',
+        json_encode($category->getCurriculumNodes())
+    );
 
     /* Render starting times
      */
