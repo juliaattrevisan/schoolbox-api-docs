@@ -101,7 +101,7 @@ class LogMapper extends Mapper {
 		));
 
 		$this->hasJoin('text', array(
-			'mapper'    => '\\Schoolbox\\Resource\\TextboxMapper',
+			'mapper'    => \Schoolbox\Textbox\Mapper::class,
 			'this_key'  => 'objectId',
 			'other_key' => 'textBoxID'
 		));
