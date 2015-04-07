@@ -64,7 +64,7 @@ class Javascript extends Base
 
             //
             // Add campus list to list of classes
-            $classes = $this->getEvent()->eventClasses();
+            $classes = $this->getEvent()->getEventClasses();
 
             $event = array(
                 'title'     => $this->event->getTitle(),
@@ -101,7 +101,7 @@ class Javascript extends Base
                         'type'        => $this->event->getEventType(),
                         'author'      => $this->event->getAuthorName(),
                         'authorId'    => $this->event->getAuthorId(),
-                        'level'       => $this->event->getCalenderClasses(),
+                        'level'       => $this->event->getEventClasses(),
                         'completed'   => $this->event->getCompleted(),
                     ),
                     'links'      => array(

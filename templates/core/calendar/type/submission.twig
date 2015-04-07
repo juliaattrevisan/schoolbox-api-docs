@@ -1,4 +1,4 @@
-<li class="clearfix">
+<li class="{{ event.getEventClasses() }}">
     <span class="eventListing">
         <strong>{{ event.getEventSpan()|raw }}</strong>
         <span style="background-color:{{ event.colour }}">{{ event.title }}</span>

@@ -53,15 +53,6 @@ class Javascript extends Base
             $start .= ' ' . $this->getEvent()->getStartTime()->getDatabaseTime();
         }
 
-        // Set classes
-        $classes = array(
-            'group' . $categoryId,
-            'type' . $this->getEvent()->getType(),
-        );
-        if (($connectorId = $this->getEvent()->getConnectorId()) > 0) {
-            $classes[] = 'source' . $connectorId;
-        }
-
         $event = array(
             'title'     => $this->getEvent()->getTitle(),
             'start'     => $start,
@@ -79,7 +70,7 @@ class Javascript extends Base
             /* Colour of the event
              */
             'color'     => $this->getEvent()->getColour(),
-            'className' => $classes,
+            'className' => $this->getEvent()->getEventClasses(),
             /* Extra data that the Event Object doesn't directly support
              */
             'data'      => array(
@@ -92,7 +83,7 @@ class Javascript extends Base
                     'type'      => $this->getEvent()->getEventType(),
                     'author'    => $this->getEvent()->getAuthorName(),
                     'authorId'  => $this->getEvent()->getAuthorId(),
-                    'level'     => $this->getEvent()->getCalendarClasses(),
+                    'level'     => $this->getEvent()->getEventClasses(),
                     'completed' => '',
                 ),
                 'links'      => array(

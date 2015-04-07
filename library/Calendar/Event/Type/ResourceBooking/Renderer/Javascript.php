@@ -12,34 +12,12 @@
 
 namespace Calendar\Event\Type\ResourceBooking\Renderer;
 
-use Calendar\Event\Type\RendererBase;
-use Aura\Router\Router;
-use Alaress\Authorizer\Authorizer;
+use Calendar\Event\Type\ResourceBooking\Renderer\Base;
 use Schoolbox\ResourceBooking\Booking;
+use \Scrub;
 
-class Javascript extends RendererBase
+class Javascript extends Base
 {
-
-    /**
-     * @var Router
-     */
-    protected $router;
-
-    /**
-     * @var Authorizer
-     */
-    protected $authorizer;
-
-    /**
-     * Setup: injects global router into this object, so it can use it to look
-     * up URLs relating to actions on an event.
-     */
-    protected function setup()
-    {
-        $this->router     = $this->getPage()->getDi()->get('router');
-        $this->authorizer = $this->getPage()->getDi()->get('authorizer');
-    }
-
     /**
      * Renders an event
      *
@@ -47,31 +25,15 @@ class Javascript extends RendererBase
      */
     public function render()
     {
-//        // Future events are visible to superusers, event owners, group members with write access
-//        if ($this->getEvent()->getPublishDate()->getUnixTimestamp() >= time()) {
-//            $cssClass = 'translucent';
-//        }
-//        else {
-//            $cssClass = '';
-//        }
-
         // Resource bookings are never all day events.
-        $start = $this->getEvent()->getStartTime()->getDatabaseDate()
-               . ' ' . $this->getEvent()->getStartTime()->getDatabaseTime();
-        $end   = $this->getEvent()->getEndTime()->getDatabaseDate()
-               . ' ' . $this->getEvent()->getEndTime()->getDatabaseTime();
+        $start = $this->getEvent()->getStartTime()->getDatabase();
+        $end   = $this->getEvent()->getEndTime()->getDatabase();
 
         // Putting any class other than "personal", "group" or "type{whatever}"
         // prevents this object from rendering, so add classes later.
         $classes = array(
-            $this->getEvent()->getDerivedEventLevel(),
+            $this->getEvent()->getEventClasses(),
         );
-        if (($eventType = $this->getEvent()->getType()) > 0) {
-            $classes[] = 'type' . $eventType;
-        }
-        if (($connectorId = $this->getEvent()->getConnectorId()) > 0) {
-            $classes[] = 'source' . $connectorId;
-        }
 
         // Bookings might have a campus one day, currently they do not.
 //        $campus_list = array_filter(array_map('trim', explode(',', $this->getEvent()->getCampusList())));
@@ -89,10 +51,7 @@ class Javascript extends RendererBase
         $bookingButtons = array();
 
         // Modify butonye
-        $editUrl = $this->getRouteIfAuthorized(
-            'resourceBooking.edit',
-            array('id' => $bookingId, 'item' => $booking,)
-        );
+        $editUrl = $this->getEditURL();
         if ($editUrl !== false) {
             $bookingButtons[] = array(
                 'label' => 'Modify',
@@ -102,10 +61,7 @@ class Javascript extends RendererBase
         }
 
         // Cancel butonye
-        $cancelUrl = $this->getRouteIfAuthorized(
-            'resourceBooking.cancel',
-            array('id' => $bookingId, 'item' => $booking,)
-        );
+        $cancelUrl = $this->getCancelURL();
         if ($cancelUrl !== false) {
             $bookingButtons[] = array(
                 'label' => 'Delete',
@@ -115,50 +71,33 @@ class Javascript extends RendererBase
         }
 
         // Approve butonye (if not already approved)
-        $status = $this->getEvent()->getBooking()->getStatus()->getId();
-        if ($status != Booking\Status\Model::STATUS_APPROVED) {
-            $approveUrl = $this->getRouteIfAuthorized(
-                'resourceBooking.approve',
-                array('id' => $bookingId, 'item' => $booking,)
+        $approveUrl = $this->getApproveURL();
+        if ($approveUrl !== false) {
+            $bookingButtons[] = array(
+                'label' => 'Approve',
+                'class' => 'tick booking-approve',
+                'href'  => $approveUrl,
             );
-            if ($approveUrl !== false) {
-                $bookingButtons[] = array(
-                    'label' => 'Approve',
-                    'class' => 'tick booking-approve',
-                    'href'  => $approveUrl,
-                );
-            }
         }
 
         // Rejected butonye (if not already rejected)
-        if ($status != Booking\Status\Model::STATUS_REJECTED) {
-            $rejectUrl = $this->getRouteIfAuthorized(
-                'resourceBooking.reject',
-                array('id' => $bookingId, 'item' => $booking,)
+        $rejectUrl = $this->getRejectURL();
+        if ($rejectUrl !== false) {
+            $bookingButtons[] = array(
+                'label' => 'Reject',
+                'class' => 'reply booking-reject',
+                'href'  => $rejectUrl,
             );
-            if ($rejectUrl !== false) {
-                $bookingButtons[] = array(
-                    'label' => 'Reject',
-                    'class' => 'reply booking-reject',
-                    'href'  => $rejectUrl,
-                );
-            }
         }
 
         // Set title from resource name, and code and booking name
         // if either are there.
-        $title = $this->getEvent()->getBooking()->getResource()->getName();
-        if ($this->getEvent()->getBooking()->getResource()->getRoomCode()) {
-            $title .= ' ['.$this->getEvent()->getBooking()->getResource()->getRoomCode().']';
-        }
-        if ($this->getEvent()->getBooking()->getName()) {
-            $title .= ': '.$this->getEvent()->getBooking()->getName();
-        }
+
         $detail = $this->getEvent()->getDetail();
         $event  = array(
-            'title' => $title,
-            'start' => "$start",
-            'end' => "$end",
+            'title' => $this->getEvent()->getTitle(),
+            'start' => $start,
+            'end' => $end,
 
             /* Whether you can edit this event or not
              */
@@ -184,13 +123,13 @@ class Javascript extends RendererBase
                     'eventId' => $this->getEvent()->getEventId(),
                     'time' => $this->getEvent()->getTime(),
                     'detail' => Scrub::html($detail),
-                    'location' => $this->getEvent()->getLocation(),
+                    'location' => '',
                     'eventTypeId' => $this->getEvent()->getType(),
                     'eventType' => 'type' . $this->getEvent()->getType(),
                     'type' => $this->getEvent()->getEventType(),
                     'author' => $this->getEvent()->getAuthorName(),
                     'authorId' => $this->getEvent()->getAuthorId(),
-                    'level' => $this->getEvent()->getDerivedEventLevel(),
+                    'level' => $this->getEvent()->getEventClasses(),
                     'completed' => $this->getEvent()->getCompleted(),
                     'seriesId' => $this->getEvent()->getBooking()->getEvent()->getSeriesId(),
                 ),
@@ -220,21 +159,5 @@ class Javascript extends RendererBase
         );
 
         return json_encode($event).',';
-    }
-
-    /**
-     * Helper function - gets whether access to a route is allowed.
-     *
-     * @param string $name
-     * @param array  $params
-     *
-     * @return bool|string False if not authorized, a URL if it is.
-     */
-    public function getRouteIfAuthorized($name, array $params = array())
-    {
-        if ($this->authorizer->isPathAuthorizedForUser($name, $params, $_SESSION['user'])) {
-            return $this->router->generate($name, $params);
-        }
-        return false;
     }
 }

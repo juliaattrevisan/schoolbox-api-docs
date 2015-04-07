@@ -92,7 +92,7 @@ class Event extends EventBase implements EventInterface {
 	 *
 	 * @return string
 	 */
-	public function getCalendarClasses() {
+	public function getFilterClasses() {
 		return 'personal';
 	}
 

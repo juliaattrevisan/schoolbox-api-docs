@@ -19,6 +19,7 @@ use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Item;
 use Calendar\Event\Type\ResourceBooking\Renderer\Javascript;
+use Calendar\Event\Collection\Renderer;
 
 class Controller extends Base
 {
@@ -896,17 +897,16 @@ class Controller extends Base
         $source
             ->setResourceId($item->getId())
             ->setStatus($this->getRequest()->query['status']);
-        $events = $source->getEvents(
+
+        $calendar = new Renderer(
+            $source,
             $this->getRequest()->query['start'],
-            $this->getRequest()->query['end']
+            $this->getRequest()->query['end'],
+            $this->getUser(),
+            $this->getDi()->get('sitePage')
         );
 
-        // Pass event to the resource outputter, and deal with its peculiarities
-        // TODO make Collection and Calendar_Event_Type_Abstract implement JsonSerializable
-        foreach ($events as $event) {
-            $renderer = new Javascript( $this->getDi()->get('sitePage'),$event);
-            $output = $renderer->render();
-        }
+        $output = $calendar->renderAll('javascript');
 
         // Get timetabled classes for this room, if there are any.
         $roomCode = $item->getRoomCode();

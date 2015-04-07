@@ -9,9 +9,9 @@
  */
 namespace Calendar\Event\Type\ResourceBooking\Renderer;
 
-use Calendar\Event\Type\RendererBase;
+use Calendar\Event\Type\ResourceBooking\Renderer\Base;
 
-class Html extends RendererBase {
+class Html extends Base {
     /**
      * Render this event
      *
@@ -21,7 +21,8 @@ class Html extends RendererBase {
 
         if ($this->isVisible()) {
             return $this->getTemplate()->render('calendar/type/resourceBooking.twig',
-                array('event' => $this->getEvent())
+                array(  'event' => $this->getEvent(),
+                        'renderer' => $this)
             );
         } else {
             return '';

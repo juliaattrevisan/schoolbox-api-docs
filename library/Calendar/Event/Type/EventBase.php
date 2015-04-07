@@ -182,7 +182,6 @@ abstract class EventBase implements EventInterface
      * Gets date of event in format like this: Thursday, 19th December, 2:00AM
      *
      * @return string
-     * @deprecate
      */
     public function getFullDate()
     {
@@ -199,7 +198,6 @@ abstract class EventBase implements EventInterface
      * Special time formattng
      *
      * @return string
-     * @deprecated
      */
     public function getTime()
     {
@@ -208,6 +206,44 @@ abstract class EventBase implements EventInterface
         } else {
             return $this->getStartTime()->getTimeOnly();
         }
+    }
+
+    /**
+     * Classes used for filter selectors
+     *
+     * @return string
+     */
+    public function getEventClasses()
+    {
+        $selectors = array(
+            'type' . $this->getType(),
+            'source' . $this->getConnectorId(),
+        );
+
+        /* Merge levels
+         */
+        $allLevels = explode(' ', $this->getFilterClasses());
+        $selectors = array_merge($selectors, $allLevels);
+
+
+        /* Properly trim out spaces and stuff
+         */
+        foreach ($selectors as &$currentSelector) {
+            $currentSelector = trim($currentSelector);
+        }
+
+        $selectors = array_filter(array_unique($selectors));
+
+        return implode(' ', $selectors);
+    }
+
+    /**
+     * Event visibility; generates a CSS string
+     *
+     * @return string
+     */
+    public function getFilterClasses() {
+        return '';
     }
 
     /* Getters/Setters

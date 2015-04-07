@@ -215,5 +215,16 @@ interface EventInterface
      */
     public function getConnectorId();
 
+    /**
+     * Gets classes to append for event display
+     *
+     * @return string
+     */
+    public function getEventClasses();
 
+    /**
+     * This can be overridden to append specific classes for the event
+     * @return mixed
+     */
+    public function getFilterClasses();
 }

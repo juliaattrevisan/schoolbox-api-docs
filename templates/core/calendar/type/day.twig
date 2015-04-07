@@ -1,4 +1,4 @@
-<li class="{{ event.eventClasses() }} {% if renderer.isTranslucent %}translucent{% endif %}">
+<li class="{{ event.getEventClasses() }} {% if renderer.isTranslucent() %}translucent{% endif %}">
     <span class="eventListing">
         <strong>{{ event.getEventSpan()|raw }}</strong>
         <span style="background-color:{{ event.colour }}">{{ event.title }}
