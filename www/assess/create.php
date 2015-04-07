@@ -45,6 +45,12 @@ if (!empty($_POST)) {
         ->setMarkVisibility($_POST['mark_visibility'])
         ->setCompletionMessage($_POST['completion_message'])
     ;
+    if (isset($_POST['curriculumCodes'])) {
+        $assessment->setCurriculumNodes(
+            Schoolbox\Curriculum\Node\Mapper::getInstance()
+                ->findByColumn('id', $_POST['curriculumCodes'])
+        );
+    }
 
     // Is this a task? If so, just set the start and finish to now.
     $is_task       = !empty($_POST['is_task']);
