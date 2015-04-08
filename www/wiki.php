@@ -119,7 +119,7 @@ if ($this->arg[0] == 'revision') {
     }
 } /* Load an existing wiki by its category id and slug
  */
-else if (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
+elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
     $wiki = $wikiHandler->getByCategoryAndSlug($this->arg[0], $this->arg[1]);
 
     /* If the wiki wasn't found, offer some information and a link

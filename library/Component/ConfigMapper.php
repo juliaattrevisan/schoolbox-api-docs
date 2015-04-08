@@ -96,8 +96,7 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
 
         if ($collection->count()) {
             return $collection->first()->getValue();
-        }
-        /* Otherwise spawn default values
+        } /* Otherwise spawn default values
          */
         else {
             $componentConfigDefinition = \Component_ConfigDefinitionMapper::getInstance()->findByColumn('key', $key);
