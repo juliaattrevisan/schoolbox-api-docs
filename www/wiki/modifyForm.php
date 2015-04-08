@@ -48,7 +48,8 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
             ->setCategory($cat)
             ->setLatestRevision(new \Schoolbox\Wiki\Revision())
             ->setCreated($now)
-            ->setSlug(strlen($_POST['slug']) ? $_POST['slug'] : $url->getSlug())
+            // Never set slug from form
+            ->setSlug($url->getSlug())
             ->setLocked(false)
             ->setDeleted(false);
     }
