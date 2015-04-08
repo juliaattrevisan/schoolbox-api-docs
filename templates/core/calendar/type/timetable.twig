@@ -17,7 +17,9 @@
             {{ event.getFullDate()|raw }}</h4>
         <em>{{ event.location }}</em>
         <div>
+            {% if event.categoryId > 0 %}
             <a class="btn float-right" href="/homepage/{{ event.categoryId }}"><span></span>Go to homepage</a>
+            {% endif %}
         </div>
     </div>
 
