@@ -25,10 +25,6 @@ $(function() {
           return true;
         }
     }, "Please select write access for this group.");
-
-    $('#curriculum-codes').curriculumSelector({
-        value: {CURRICULUM_CODE_LIST}
-    });
 });
 </script>
 <style type="text/css">
@@ -119,16 +115,7 @@ $(function() {
         <tr>
             <td><h4>Curriculum Codes</h4>
                 <em>If you want to associate curriculum codes with this folder, enter them here.</em></td>
-            <td>
-                <select id="curriculum-codes" name="curriculumCodes[]" multiple></select>
-                <a href="#"
-                   class="btn inline-block"
-                   data-interaction="open-search"
-                ><span></span>Search for codes</a>
-                <a href="/curriculum"
-                   class="btn modify inline-block"
-                ><span></span>Manage Curriculum</a>
-            </td>
+            <td>{CURRICULUM_CODE_INPUT}</td>
         </tr>
         <!-- END curriculum_code_input -->
 	</table>
