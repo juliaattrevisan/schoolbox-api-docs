@@ -27,91 +27,107 @@ $(function(){
     });
 });
 </script>
+
+<link rel="stylesheet" type="text/css" media="screen" href="/css/foundation/chrome.css?v={SITE_VERSION}" />
+<script type="text/javascript">
+    $(function() {
+        $('#container').addClass('foundation').foundation();
+    });
+</script>
 <!-- END custom_head -->
-<h1>Student Submissions</h1>
-<div id="list-submission-context">
-  {CONTEXT_SELECTOR}
+
+<div class="row full-width">
+    <div class="large-12 columns no-pad">
+        <h1>Student Submissions</h1>
+    </div>
 </div>
 <!-- BEGIN category_listing -->
-<div class="box">
-    <h2><a href="/homepage/{CATEGORY_ID}">{CATEGORY}</a> ({STUDENTS} Students)</h2>
-    <table class="table ruler tablesorter">
-    <thead>
-            <tr>
-                <th>Assignment Title</th>
-                <th>Type</th>
-                <th>Open Date</th>
-                <th>Due Date</th>
-                <th class="center">Submitted</th>
-                <th class="center">Graded</th>
-                <th class="center">Visibility</th>
-                <th class="center">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- BEGIN submission_listing -->
-            <tr>
-                <!-- BEGIN normalSubmission -->
-                <td><a href="/submission/viewSubmission/{ID}">{ASSDESC}</a></td>
-                <td>{TYPE}</td>
-                <td data-timestamp="{ASSESS_START_TIMESTAMP}">
-                    <!-- BEGIN writable_open -->
-                    {OPENDATE}
-                    <!-- END writable_open -->
-                    <!-- BEGIN readonly_open -->
-                    {OPENDATE}
-                    <!-- END readonly_open -->
-                </td>
-                <td data-timestamp="{ASSESS_FINISH_TIMESTAMP}">
-                    <!-- BEGIN writable_close -->
-                    {DUEDATE}
-                    <!-- END writable_close -->
-                    <!-- BEGIN readonly_close -->
-                    {DUEDATE}
-                    <!-- END readonly_close -->
-                </td>
-                <td class="center">{TOTAL}</td>
-                <td class="center">{MARKED}</td>
-                <td class="center"><span class="visibility-btn visibility_{ASSESS_VISIBILITY_ID}" title="{ASSESS_VISIBILITY}"></span></td>
-                <!-- BEGIN readonly_duework -->
-                <td class="center"></td>
-                    <!-- END readonly_duework -->
-                    <!-- BEGIN writable_duework -->
-                <td>
-                    <span class="actions two-buttons">
-                        <a href="/submission/submissionForm.php?deleteBox={ID}" class="btn delete no-text float-left"  title="Delete" onclick='return(confirm("Remove {JAVAASSDESC}?"));'><span></span></a>
-                        <a href="/submission/createSubmission/modify/{ID}" class="btn modify no-text float-left" title="Modify"><span></span></a>
-                    </span>
-                </td>
-                    <!-- END writable_duework -->
-                <!-- END normalSubmission -->
-                <!-- BEGIN onlineAssessment -->
-                <td><a href="/assess/results/{ASSESS_ASSESS_ID}">{ASSESS_TITLE}</a></td>
-                <td>{ASSESS_TYPE}</td>
-                <td data-timestamp="{ASSESS_START_TIMESTAMP}">{ASSESS_START}</td>
-                <td data-timestamp="{ASSESS_FINISH_TIMESTAMP}">{ASSESS_FINISH}</td>
-                <td class="center">{ASSESS_ATTEMPTS}</td>
-                <td class="center">{ASSESS_REVIEWED}</td>
-                <td class="center"><span class="visibility-btn visibility_{ASSESS_VISIBILITY_ID}" title="{ASSESS_VISIBILITY}"></span></td>
-                    <!-- BEGIN readonly_assess -->
-                <td class="center"></td>
-                    <!-- END readonly_assess -->
-                    <!-- BEGIN writable_assess -->
-                <td>
-                    <span class="actions two-buttons">
-                        <a href="/assess/delete/{ASSESS_ASSESS_ID}" class="btn delete no-text float-left" title="Delete" onclick='return(confirm("Remove {JAVAASSDESC}?"));'><span></span></a>
-                        <a href="/assess/modify/{ASSESS_ASSESS_ID}" class="btn modify no-text float-left" title="Modify"><span></span></a>
-                    </span>
-                </td>
-                  <!-- END writable_assess -->
-                <!-- END onlineAssessment -->
-            </tr>
-            <!-- END submission_listing -->
-        </tbody>
-    </table>
-    <a href="/task/progressReport/{CATEGORY_ID}{SEM_SLUG}" class="btn line-graph"><span></span>Progress Report</a>
-    <a href="/submission/markSheet/{CATEGORY_ID}{SEM_SLUG}" class="btn modify"><span></span>Class Mark Sheet</a>
-    <a href="/assess/create/{CATEGORY_ID}/" class="btn add"><span></span>Create Quiz</a>
-    <a href="/submission/createSubmission/new/{CATEGORY_ID}/" class="btn add" ><span></span>Post Due Work</a>
+<div class="row full-width">
+    <div class="island">  
+        <h2><a href="/homepage/{CATEGORY_ID}">{CATEGORY}</a> ({STUDENTS} Students)</h2>
+        <div id="list-submission-context">
+            {CONTEXT_SELECTOR}
+        </div>
+        <table class="tablesorter submissions">
+            <thead>
+                <tr>
+                    <th>Assignment Title</th>
+                    <th>Type</th>
+                    <th>Open Date</th>
+                    <th>Due Date</th>
+                    <th>Submitted</th>
+                    <th>Graded</th>
+                    <th>Visibility</th>
+    				<th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- BEGIN submission_listing -->
+                <tr>
+                    <!-- BEGIN normalSubmission -->
+                    <td><a href="/submission/viewSubmission/{ID}">{ASSDESC}</a></td>
+                    <td>{TYPE}</td>
+                    <td data-timestamp="{ASSESS_START_TIMESTAMP}">
+                        <!-- BEGIN writable_open -->
+                        {OPENDATE}
+                        <!-- END writable_open -->
+                        <!-- BEGIN readonly_open -->
+                        {OPENDATE}
+                        <!-- END readonly_open -->
+                    </td>
+                    <td data-timestamp="{ASSESS_FINISH_TIMESTAMP}">
+                        <!-- BEGIN writable_close -->
+                        {DUEDATE}
+                        <!-- END writable_close -->
+                        <!-- BEGIN readonly_close -->
+                        {DUEDATE}
+                        <!-- END readonly_close -->
+                    </td>
+                    <td>{TOTAL}</td>
+                    <td>{MARKED}</td>
+                    <td><span class="visibility-btn visibility_{ASSESS_VISIBILITY_ID}" title="{ASSESS_VISIBILITY}"></span></td>
+                    <!-- BEGIN readonly_duework -->
+                    <td></td>
+                        <!-- END readonly_duework -->
+                        <!-- BEGIN writable_duework -->
+                    <td>
+                        <span class="table-actions">
+                            <a href="/submission/submissionForm.php?deleteBox={ID}" class="icon-delete no-text"  title="Delete" onclick='return(confirm("Remove {JAVAASSDESC}?"));'></a>
+                            <a href="/submission/createSubmission/modify/{ID}" class="icon-modify no-text" title="Modify"></a>
+                        </span>
+                    </td>
+                        <!-- END writable_duework -->
+                    <!-- END normalSubmission -->
+                    <!-- BEGIN onlineAssessment -->
+                    <td><a href="/assess/results/{ASSESS_ASSESS_ID}">{ASSESS_TITLE}</a></td>
+                    <td>{ASSESS_TYPE}</td>
+                    <td data-timestamp="{ASSESS_START_TIMESTAMP}">{ASSESS_START}</td>
+                    <td data-timestamp="{ASSESS_FINISH_TIMESTAMP}">{ASSESS_FINISH}</td>
+                    <td>{ASSESS_ATTEMPTS}</td>
+                    <td>{ASSESS_REVIEWED}</td>
+                    <td>
+                        <span class="visibility-btn visibility_{ASSESS_VISIBILITY_ID}" title="{ASSESS_VISIBILITY}"></span>
+                    </td>
+                        <!-- BEGIN readonly_assess -->
+                    <td></td>
+                        <!-- END readonly_assess -->
+                        <!-- BEGIN writable_assess -->
+                    <td>
+                        <span class="table-actions">
+                            <a href="/assess/delete/{ASSESS_ASSESS_ID}" class="icon-delete no-text" title="Delete" onclick='return(confirm("Remove {JAVAASSDESC}?"));'></a>
+                            <a href="/assess/modify/{ASSESS_ASSESS_ID}" class="icon-modify no-text" title="Modify"></a>
+                        </span>
+                    </td>
+                      <!-- END writable_assess -->
+                    <!-- END onlineAssessment -->
+                </tr>
+                <!-- END submission_listing -->
+            </tbody>
+        </table>
+        <a href="/task/progressReport/{CATEGORY_ID}{SEM_SLUG}" class="button icon-progress">Progress Report</a>
+        <a href="/submission/markSheet/{CATEGORY_ID}{SEM_SLUG}" class="button icon-modify">Class Mark Sheet</a>
+        <a href="/assess/create/{CATEGORY_ID}/" class="button icon-quiz">Create Quiz</a>
+        <a href="/submission/createSubmission/new/{CATEGORY_ID}/" class="button icon-due-work" >Post Due Work</a>
+    </div>
 </div>
 <!-- END category_listing -->

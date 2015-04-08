@@ -185,6 +185,42 @@ class UnitInstanceMapper extends Mapper {
     }
 
     /**
+     * Find all the Courses which have been applied to folders
+     *
+     * Used on the submission/listSubmission screen to show a list of
+     * courses for each listed category
+     *
+     * @param Folder $folder
+     * @return Collection
+     */
+    public function findAllCoursesUsedInFolder(Folder $folder) {
+        $folderMapper = $this->getJoinMapper('unit_category');
+
+        $query = "
+            SELECT {$folderMapper->getColumnString('cf')}
+            FROM {$this->getTable()} `ui`
+            LEFT JOIN {$this->getJoinSql('unit_category', 'ui', 'uc')}
+            LEFT JOIN {$this->getJoinSql('course_folder', 'uc', 'cf')}
+            WHERE `ui`.`category_id` = :folderId
+            GROUP BY `cf`.`id`
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute(array(
+            'folderId' => $folder->getId()
+        ));
+
+        $collection = new Collection();
+
+        while ($row = $statement->fetch()) {
+            $folder = $folderMapper->hydrate($row, 'cf');
+            $collection->add($folder);
+        }
+
+        return $collection;
+    }
+
+    /**
      * Retrieves unit instances for the given component.
      *
      * @param  Component_Instance        $component
