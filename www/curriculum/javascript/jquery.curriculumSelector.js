@@ -9,7 +9,7 @@
         },
         multiple: true,
         selectize: {
-            plugins: ['remove_button', 'restore_on_backspace'],
+            plugins: ['remove_button'],
             searchField: ['name', 'code'],
             render: {
                 option: function (option, escape) {
