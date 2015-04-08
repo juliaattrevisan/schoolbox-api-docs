@@ -9,30 +9,30 @@
  * To use this component a config option must be set with the component definition with a default value of the template you wish to use
  *
  */
-
-
-class Component_Homepage_BlankController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_BlankController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
         return true;
     }
-    
+
     /**
-    * Outputs HTML template defined by config variable 'template'
-    *
-    * @return bool
-    */ 
-   public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, $this->getConfig('template'))) {
+     * Outputs HTML template defined by config variable 'template'
+     *
+     * @return bool
+     */
+    public function renderTemplate($templateHandle)
+    {
+        if (!parent::loadTemplate($templateHandle, $this->getConfig('template'))) {
             return false;
         }
-   
+
         return true;
     }
-    
 }

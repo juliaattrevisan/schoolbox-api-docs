@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -62,8 +63,8 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
             $this->setVar('drop_staff_block', '');
         } else {
             $this->setVar('drop_student_block', '');
-            $dropbox = new Dropbox;
-            $fileList = $dropbox->getFileList($this->getContext()->getId());
+            $dropbox     = new Dropbox;
+            $fileList    = $dropbox->getFileList($this->getContext()->getId());
             $userHandler = new User();
 
             if (is_array($fileList)) {
@@ -71,12 +72,13 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
                 foreach ($fileList as $file) {
                     $date = new Alaress_Date_Format($file['subdate'], 'Y-m-d H:i:s');
 
-                    $output = array('DROPBOX_MIME_IMAGE'	=> $this->allowedFileHandler->getClass($file["iconFile"]),
+                    $output = array(
+                        'DROPBOX_MIME_IMAGE'  => $this->allowedFileHandler->getClass($file["iconFile"]),
                         'DROPBOX_DESCRIPTION' => Scrub::text($file['description']),
-                        'DROPBOX_ID'		=> $file['id'],
-                        'DROP_SUBMITTED_BY' => "<a href=\"/search/user/{$file['uid']}\">".$userHandler->formatName($file).'</a>',
-                        'DROP_SUBMITTED_TIME'=> $date->getShort(),
-                        'ON_OFF' => ++$j % 2 ? '' : 'dark',
+                        'DROPBOX_ID'          => $file['id'],
+                        'DROP_SUBMITTED_BY'   => "<a href=\"/search/user/{$file['uid']}\">" . $userHandler->formatName($file) . '</a>',
+                        'DROP_SUBMITTED_TIME' => $date->getShort(),
+                        'ON_OFF'              => ++$j % 2 ? '' : 'dark',
                     );
                     $this->setVar($output);
                     $this->parse("drop_file_block", "drop_file", true);
@@ -86,7 +88,6 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
             }
 
             $this->parse("drop_staff_block", "drop_staff");
-
         }
 
         return true;

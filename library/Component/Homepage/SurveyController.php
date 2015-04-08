@@ -52,10 +52,10 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
         $this->setVar('resumeLink_block', '');
         $this->setVar('reviewLink_block', '');
 
-        $surveyHandler = new Survey_Main();
+        $surveyHandler  = new Survey_Main();
         $attemptHandler = new Survey_Attempt();
         $sectionHandler = new Survey_Section();
-        $userHandler = new User();
+        $userHandler    = new User();
 
         $allSurveys = $surveyHandler->getList($this->getContext()->getId());
 
@@ -71,7 +71,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
             $i = 0;
 
             foreach ($allSurveys as $currentSurvey) {
-// Do not show the survey if you are a participant and the survey is not yet open
+                // Do not show the survey if you are a participant and the survey is not yet open
                 if (($this->permission >= WRITE_ACCESS) || $surveyHandler->isOpen($currentSurvey)) {
                     $createdTime = new Alaress_Date_Format($currentSurvey['created_at'], 'Y-m-d H:i:s');
 
@@ -96,10 +96,10 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
 					 *
 					 * Set up Attempt vars
 					 */
-                    $attempt = $attemptHandler->getLatestForUser($currentSurvey['assess_id'], $_SESSION['id']);
-                    $attemptStartTime = strtotime($attempt['start']);
+                    $attempt              = $attemptHandler->getLatestForUser($currentSurvey['assess_id'], $_SESSION['id']);
+                    $attemptStartTime     = strtotime($attempt['start']);
                     $attemptTimeRemaining = $attemptStartTime + $currentSurvey['duration'] - time();
-                    $attemptEndTime = $attemptStartTime + $currentSurvey['duration'];
+                    $attemptEndTime       = $attemptStartTime + $currentSurvey['duration'];
 
                     /* Tests can be undertaken if:
                   	 *
@@ -109,7 +109,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
 	                 * 4. You aren't the owner of the test
                    	 */
                     if (is_array($attempt)) {
-                        $numAttempts = $attemptHandler->userHasAttempted($currentSurvey['assess_id'], $_SESSION['id']);
+                        $numAttempts  = $attemptHandler->userHasAttempted($currentSurvey['assess_id'], $_SESSION['id']);
                         $firstSection = $sectionHandler->getFirst($currentSurvey['assess_id']);
 
                         // If the last assess is not completed provide resume link
@@ -153,7 +153,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
 
                         $this->parse('reviewLink_block', 'reviewLink');
                     } else {
-// show to everyone unless expired
+                        // show to everyone unless expired
                         if (strtotime($currentSurvey['finish']) < time()) {
                             $this->parse('surveyNoLink_block', 'surveyNoLink');
                             $this->setVar('surveyLink_block', '');
@@ -179,6 +179,5 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
         }
 
         return true; // everything went according to plan
-
     }
 }

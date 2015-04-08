@@ -93,12 +93,12 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
 
         $this->setVar(
             array(
-                'modify_blog_block' => '',
-                'create_blog_block' => '',
-                'has_comments_block' => '',
-                'comment_block' => '',
+                'modify_blog_block'        => '',
+                'create_blog_block'        => '',
+                'has_comments_block'       => '',
+                'comment_block'            => '',
                 'has_comment_delete_block' => '',
-                'blog_block' => '',
+                'blog_block'               => '',
             )
         );
 
@@ -106,15 +106,15 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
          */
         $this->setVar(
             array(
-                'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig(
-                    'componentname'
-                ) : 'Blog',
+                'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig(
+                        'componentname'
+                    ) : 'Blog',
                 // These are for the Select Alternate Source resourcebrowser
-                'COMPONENT_CONFIG_SRC_ID' => $this->source->getId(),
+                'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
                 'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext()->getId() ? 'Local' : $this->source->getName(),
                 /* Have update form to back to this homepage, not the wiki's homepage
                  */
-                'BLOG_CATEGORY_ID' => $this->source->getId(),
+                'BLOG_CATEGORY_ID'          => $this->source->getId(),
             )
         );
 
@@ -128,17 +128,16 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
             foreach ($allItems as $currentItem) {
                 $this->setVar(
                     array(
-                        'BLOG_ID' => $currentItem->getId(),
-                        'BLOG_HEADING' => Scrub::text($currentItem->getHeading()),
-                        'BLOG_BODY' => Scrub::html($currentItem->getBody()),
-                        'BLOG_AUTHOR_ID' => $currentItem->getOwner()->getId(),
+                        'BLOG_ID'                 => $currentItem->getId(),
+                        'BLOG_HEADING'            => Scrub::text($currentItem->getHeading()),
+                        'BLOG_BODY'               => Scrub::html($currentItem->getBody()),
+                        'BLOG_AUTHOR_ID'          => $currentItem->getOwner()->getId(),
                         'BLOG_AUTHOR_EXTERNAL_ID' => $currentItem->getOwner()->getExternalId(),
-                        'BLOG_AUTHOR_NAME' => $currentItem->getOwner()->formatName(),
-                        'BLOG_AUTHOR_THUMB' => "/portrait.php?userId={$currentItem->getOwner()->getExternalId(
-                            )}&size=square32",
-                        'BLOG_CREATED' => $currentItem->getCreated()->getRelativeTime(),
-                        'BLOG_SHADING' => ++$i % 2 ? '' : 'dark',
-                        'BLOG_COMMENTS' => '',
+                        'BLOG_AUTHOR_NAME'        => $currentItem->getOwner()->formatName(),
+                        'BLOG_AUTHOR_THUMB'       => "/portrait.php?userId={$currentItem->getOwner()->getExternalId()}&size=square32",
+                        'BLOG_CREATED'            => $currentItem->getCreated()->getRelativeTime(),
+                        'BLOG_SHADING'            => ++$i % 2 ? '' : 'dark',
+                        'BLOG_COMMENTS'           => '',
                     )
                 );
 
@@ -150,13 +149,13 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                     foreach ($allComments as $currentComment) {
                         $this->setVar(
                             array(
-                                'COMMENT_COMMENT_ID' => $currentComment->getId(),
-                                'COMMENT_BODY' => nl2br(Scrub::text($currentComment->getBody())),
-                                'COMMENT_AUTHOR_ID' => $currentComment->getOwner()->getId(),
-                                'COMMENT_AUTHOR_NAME' => $currentComment->getOwner()->formatName(),
-                                'COMMENT_CREATED' => $currentComment->getCreated()->getRelativeTime(),
+                                'COMMENT_COMMENT_ID'         => $currentComment->getId(),
+                                'COMMENT_BODY'               => nl2br(Scrub::text($currentComment->getBody())),
+                                'COMMENT_AUTHOR_ID'          => $currentComment->getOwner()->getId(),
+                                'COMMENT_AUTHOR_NAME'        => $currentComment->getOwner()->formatName(),
+                                'COMMENT_CREATED'            => $currentComment->getCreated()->getRelativeTime(),
                                 'COMMENT_AUTHOR_EXTERNAL_ID' => $currentComment->getOwner()->getExternalId(),
-                                'ON_OFF' => ++$j % 2 ? 'dark' : ''
+                                'ON_OFF'                     => ++$j % 2 ? 'dark' : ''
                             )
                         );
 
@@ -194,7 +193,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                      */
                     $this->setVar(
                         array(
-                            'comment_block' => '',
+                            'comment_block'            => '',
                             'has_comment_delete_block' => '',
                         )
                     );
@@ -224,9 +223,9 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                  */
                 $this->setVar(
                     array(
-                        'modify_blog_block' => '',
+                        'modify_blog_block'  => '',
                         'has_comments_block' => '',
-                        'comment_block' => ''
+                        'comment_block'      => ''
                     )
                 );
             }

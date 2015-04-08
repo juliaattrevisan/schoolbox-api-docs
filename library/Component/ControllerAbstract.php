@@ -268,6 +268,13 @@ abstract class Component_ControllerAbstract
     }
 
     /**
+     * Component Config facade ingredients
+     *
+     * This should really have been a separate class, but I'll probably do that
+     * another time
+     */
+
+    /**
      * Parses configuration for display when rendering a template. Some config
      * options don't show on templates, but do when an instance of the template
      * gets shown.
@@ -282,75 +289,122 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * @return bool
+     * Determine the permissions for this particular config
+     *
+     * Ingredient of parseConfig() facade
+     *
+     * @param $config
+     * @return array
      */
-    public function parseConfig($targetHandle = 'CONFIGURATION', $is_for_template = false)
-    {
-
-        $page = $this->sitepage;
-
-        $page->setVar($targetHandle, '');
-
-        $config = $this->instance->getConfigArray();
-
-        // DETERMINE WHAT TO DISPLAY
-
-        // there is configuration
+    protected function determineConfigPermissions($config) {
         if (is_array($config) && count($config)) {
             // have write access
             if ($this->controlPermission > READ_ACCESS) {
                 // display full configuration block
-                list($hasWriteAccess, $processConfig, $displayConfig) = array(true, true, true);
+                return array(true, true, true);
             } // do not have write access
             else {
                 // parse configuration display variables for readonly
-                list($hasWriteAccess, $processConfig, $displayConfig) = array(false, true, false);
+
+                /* One of the schools will tell us what this meant
+                 */
+                return array(false, true, false);
             }
         } // there is no configuration
         else {
             // have write access
             if ($this->controlPermission > READ_ACCESS) {
                 // display delete option
-                list($hasWriteAccess, $processConfig, $displayConfig) = array(true, false, false);
+                return array(true, false, false);
             } // do not have write access
             else {
                 // no config, no write access: do nothing
-                list($hasWriteAccess, $processConfig, $displayConfig) = array(false, false, false);
+                return array(false, false, false);
             }
         }
+    }
 
-        // if all 3 above vars are false, bug out
-        if (!($hasWriteAccess || $processConfig || $displayConfig)) {
-            return false;
-        }
-
-        // if we're building in the context of the admin system, use a different template (_templatewrapper.html),
-        // otherwise use the regular one (_wrapper.html)
+    /**
+     * Determine which config template to use
+     *
+     * Ingredient of parseConfig() facade
+     *
+     * @return string
+     */
+    protected function determineTemplate() {
         if (in_array($this->instance->getModule(), array('dashboard', 'homepage_template', 'eportfolio_template'))) {
             $template = 'component/config/_templatewrapper.html';
-        } else {
-            if (in_array($this->instance->getModule(), array('homepage', 'eportfolio'))) {
-/* eportfolio uses a special version of le wrapier
-                 */
-                $template = 'component/config/' . $this->instance->getModule() . '_wrapper.html';
-            } else {
-                $template = 'component/config/_wrapper.html';
-            }
         }
-        $page->setFile('configTpl', $template);
+        /* eportfolio uses a special version of le wrapier
+         */
+        else if (in_array($this->instance->getModule(), array('homepage', 'eportfolio'))) {
+            $template = 'component/config/' . $this->instance->getModule() . '_wrapper.html';
+        }
+        /* default template
+         */
+        else {
+            $template = 'component/config/_wrapper.html';
+        }
 
-        $page->setBlock('configTpl', 'settings_link', 'settings_link_block');
-        $page->setBlock('configTpl', 'settings_panel', 'settings_panel_block');
-        $page->setBlock('settings_panel', 'config_element', 'config_element_block');
-        $page->setVar('config_element_block', '');
+        return $template;
+    }
 
+    /**
+     * Set up statue of phpliberty
+     *
+     * Ingredient of parseConfig() facade
+     *
+     * @param $targetHandle
+     */
+    protected function setupConfigRendering($targetHandle) {
+        // if we're building in the context of the admin system, use a different template (_templatewrapper.html),
+        // otherwise use the regular one (_wrapper.html)
+        $this->sitepage->setFile('configTpl', $this->determineTemplate());
+        $this->sitepage->setBlock('configTpl', 'settings_link', 'settings_link_block');
+        $this->sitepage->setBlock('configTpl', 'settings_panel', 'settings_panel_block');
+        $this->sitepage->setBlock('configTpl', 'settings_collapse', 'settings_collapse_block');
+        $this->sitepage->setBlock('configTpl', 'settings_close', 'settings_close_block');
+        $this->sitepage->setBlock('settings_panel', 'config_element', 'config_element_block');
+        $this->sitepage->setVar(array(
+            $targetHandle => '',
+            'config_element_block' => '',
+
+            /* The close button which removes components
+             */
+            'settings_close_block' => '',
+
+            /* The little triangle which drops down the config options
+             * contained in settings_panel_block
+             */
+            'settings_link_block' => '',
+            'settings_panel_block' => '',
+
+            /* Collapsable control button
+             */
+            'settings_collapse_block' => '',
+        ));
+    }
+
+    /**
+     * Render each config element into the statue
+     *
+     * @param $processConfig
+     * @param $is_for_template
+     * @return int
+     */
+    protected function renderConfigElements($processConfig, $is_for_template) {
         // it's possible hiding configs will hide all; check for this and hide the config dropdown if need be
         $configCount = 0;
 
+        /* Conditionally decide whether to render each config ingredient
+         *
+         * If you didn't need to display it, don't iterate through every
+         * element and set it up, to save some processing
+         */
         if ($processConfig) {
             // every config key has a corresponding controller and template to be called
-            foreach ($config as $key => $params) {
-                $page->setVar(
+            foreach ($this->instance->getConfigArray() as $key => $params) {
+                $this->sitepage->setVar(
                     array(
                         'CONFIG_ELEMENT_LABEL' => $params['label'],
                         'CONFIG_ELEMENT_CLASS' => str_replace(' ', '', strtolower($params['label']))
@@ -358,9 +412,11 @@ abstract class Component_ControllerAbstract
                 );
 
                 $fields = array();
+
                 if ($this->sortFields) {
                     $fields['sort'] = $this->sortFields;
                 }
+
                 if ($this->filterFields) {
                     $fields['filter'] = $this->filterFields;
                 }
@@ -368,30 +424,61 @@ abstract class Component_ControllerAbstract
                 // attempt to build a configuration instance from the key provided
                 if ($conf = Component_Config_Factory::build($key, $this->context, $fields)) {
                     if (!($is_for_template && !$conf->isShownOnTemplate())) {
-                        $this->parseConfigInstance($conf, $key, $page, $params, $config);
+                        $this->parseConfigInstance($conf, $key, $this->sitepage, $params, $this->instance->getConfigArray());
                         ++$configCount;
                     }
                 }
-                $page->setVar('CONFIG_ELEMENT_CONTENT', '');
+
+                $this->sitepage->setVar('CONFIG_ELEMENT_CONTENT', '');
             }
-            $page->parse('settings_panel_block', 'settings_panel', false);
-        } // don't process the config
-        else {
-        }
 
-        // now clear things we don't want seen
-        if (!$displayConfig || $configCount == 0) {
-            $page->setVar('settings_link_block', '');
-            $page->setVar('settings_panel_block', '');
-        } else {
-            $page->parse('settings_link_block', 'settings_link');
+            $this->sitepage->parse('settings_panel_block', 'settings_panel', false);
         }
+    }
 
-        if (!$hasWriteAccess) {
+    /**
+     * Parse configuration and settings panels for each component
+     *
+     * Facade method
+     *
+     * @param string $targetHandle
+     * @param bool $is_for_template
+     * @return bool
+     */
+    public function parseConfig($targetHandle = 'CONFIGURATION', $is_for_template = false)
+    {
+        // DETERMINE WHAT TO DISPLAY
+        // there is configuration
+        list ($hasWriteAccess, $processConfig) = $this->determineConfigPermissions($this->instance->getConfigArray());
+
+        // if all 3 above vars are false, bug out
+        if (!($hasWriteAccess || $processConfig)) {
             return false;
         }
 
-        $page->parse($targetHandle, 'configTpl', false);
+        $this->setupConfigRendering($targetHandle);
+
+        /* If you don't have write access, just leave before dealing with any
+         * config element rendering and stuff
+         */
+        if (!$hasWriteAccess) {
+            return false;
+        }
+        else {
+            /* If you want to process the config, then do so and display it
+             * Also provide a triangle so you can alter them through the ui
+             *
+             * Otherwise do nothing
+             */
+            if ($processConfig) {
+                $this->renderConfigElements($processConfig, $is_for_template);
+
+                $this->sitepage->parse('settings_link_block', 'settings_link');
+            }
+
+            $this->sitepage->parse('settings_close_block', 'settings_close');
+            $this->sitepage->parse($targetHandle, 'configTpl', false);
+        }
 
         return true;
     }

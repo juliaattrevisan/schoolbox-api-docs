@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -48,7 +49,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, "student_grades", "student_grades_block");
 
 
-
         // Determine the year and semester for the grades link
         $this->setVar(
             array(
@@ -59,8 +59,9 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 
         /* Output student grades link to students of this class */
         if ($this->permission == READ_ACCESS && (
-            $this->groupHandler->involvedInGroup($_SESSION['id'], $this->getContext()->getId()) ||
-            $this->groupHandler->involvedInSubject($this->getContext()->getCodeString()))) {
+                $this->groupHandler->involvedInGroup($_SESSION['id'], $this->getContext()->getId()) ||
+                $this->groupHandler->involvedInSubject($this->getContext()->getCodeString()))
+        ) {
             $this->parse('student_grades_block', 'student_grades');
         } else {
             $this->setVar('student_grades_block', '');
@@ -78,8 +79,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         } else {
             $this->setVar('class_mark_block', '');
         }
-
-
 
         return true; // everything went according to plan
     }

@@ -1,23 +1,26 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>RSS Feed - {RSS_NAME}</h2>
     {CONFIGURATION}
-    <div class="listing">
-        <ul>
-            <!-- BEGIN rss_stories -->
-            <li class=" clearfix {ON_OFF}">
-                <div class="clearfix">
-                    <h4><a href="/redir.php?url={RSS_URL}">{RSS_TITLE}</a></h4>
-                    <div class="small-right">
-                        <!-- BEGIN rss_date -->
-                        <p class="small summ">Posted {RSS_POSTED_DATE}</p>
-                        <!-- END rss_date -->
+
+    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="listing">
+            <ul>
+                <!-- BEGIN rss_stories -->
+                <li class=" clearfix {ON_OFF}">
+                    <div class="clearfix">
+                        <h4><a href="/redir.php?url={RSS_URL}">{RSS_TITLE}</a></h4>
+                        <div class="small-right">
+                            <!-- BEGIN rss_date -->
+                            <p class="small summ">Posted {RSS_POSTED_DATE}</p>
+                            <!-- END rss_date -->
+                        </div>
                     </div>
-                </div>
-                <!-- BEGIN rss_brief_output -->
-                    <div class='wysiwyg'>{RSS_BRIEF}</div>
-                <!-- END rss_brief_output -->
-            </li>
-            <!-- END rss_stories -->
-        </ul>
+                    <!-- BEGIN rss_brief_output -->
+                        <div class='wysiwyg'>{RSS_BRIEF}</div>
+                    <!-- END rss_brief_output -->
+                </li>
+                <!-- END rss_stories -->
+            </ul>
+        </div>
     </div>
 </div>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -6,14 +7,16 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_PollController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_PollController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
 
         // TODO: Implement execute() method.
 
@@ -24,8 +27,9 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'poll')) {
+    public function renderTemplate($templateHandle)
+    {
+        if (!parent::loadTemplate($templateHandle, 'poll')) {
             return false;
         }
         $this->parseConfig();
@@ -48,7 +52,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
 
         $this->setVar('show_results_block', '');
 
-        if ( $this->getConfig('poll') && is_numeric($this->getConfig('poll')) ) {
+        if ($this->getConfig('poll') && is_numeric($this->getConfig('poll'))) {
             $poll = $pollHandler->getByID($this->getConfig('poll'));
 
             $created = new Alaress_Date_Format;
@@ -56,50 +60,54 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
 
             try {
                 $author = \Schoolbox\UserMapper::getInstance()->findById($poll['created_by']);
-            }
-            catch (\Schoolbox\Mapper\Exception $e) {
+            } catch (\Schoolbox\Mapper\Exception $e) {
                 $author = \Schoolbox\UserMapper::getInstance()->getUnknownUser();
             }
             if ($poll['pollID']) {
-                $this->setVar(array(
-                    'POLL_ID'		=> $poll['pollID'],
-                    'POLL_TITLE'	=> strlen(trim($this->getConfig('componentname'))) ? $this->getConfig( 'componentname') : 'Poll',
-                    'POLL_QUESTION'	=> Scrub::text($poll['question']),
-                    'POLL_AUTHOR_ID'=> $author->getId(),
-                    'POLL_AUTHOR_THUMB' =>  "/portrait.php?userId={$author->getExternalId()}&size=square32",
-                    'POLL_AUTHOR_NAME'   => $author->getFullName(),
-                    'POLL_CREATED'  => $created->getRelativeTime(),
-                ));
+                $this->setVar(
+                    array(
+                        'POLL_ID'           => $poll['pollID'],
+                        'POLL_TITLE'        => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Poll',
+                        'POLL_QUESTION'     => Scrub::text($poll['question']),
+                        'POLL_AUTHOR_ID'    => $author->getId(),
+                        'POLL_AUTHOR_THUMB' => "/portrait.php?userId={$author->getExternalId()}&size=square32",
+                        'POLL_AUTHOR_NAME'  => $author->getFullName(),
+                        'POLL_CREATED'      => $created->getRelativeTime(),
+                    )
+                );
 
                 $pollData = $pollHandler->getData($poll['pollID']);
 
-                if ($pollHandler->hasVoted($poll['pollID']) || !$pollHandler->open($poll['pollID']) || $this->sitepage->arg[1] == 'pollResults' )  {
+                if ($pollHandler->hasVoted($poll['pollID']) || !$pollHandler->open($poll['pollID']) || $this->sitepage->arg[1] == 'pollResults') {
                     /* Show poll as user has voted or the poll has closed to votes */
 
-                    $this->setVar(array(
-                        'POLL_HEIGHT'        => count($pollData) * 30 + 70,
-                        'poll_vote_block'    => '',
-                        'response_count'     => count($pollData)
-                    ));
+                    $this->setVar(
+                        array(
+                            'POLL_HEIGHT'     => count($pollData) * 30 + 70,
+                            'poll_vote_block' => '',
+                            'response_count'  => count($pollData)
+                        )
+                    );
 
                     if (is_array($pollData)) {
                         $i = 0;
                         $a = 'A';
 
                         foreach ($pollData as $data) {
-                            $this->setVar(array(
-                                'POLL_OPTION_INDEX'	=> $i,
-                                'POLL_OPTION'		=> Scrub::text($data['option']),
-                                'POLL_ON_OFF'		=> $i % 2 ? 'polloff':'',
-                                'OPTION'		    => htmlspecialchars($data['option']),
-                                'OPTION_SHORT'	    => $a++,
-                                'VALUE'			    => htmlspecialchars($data['result']),
-                            ));
+                            $this->setVar(
+                                array(
+                                    'POLL_OPTION_INDEX' => $i,
+                                    'POLL_OPTION'       => Scrub::text($data['option']),
+                                    'POLL_ON_OFF'       => $i % 2 ? 'polloff' : '',
+                                    'OPTION'            => htmlspecialchars($data['option']),
+                                    'OPTION_SHORT'      => $a++,
+                                    'VALUE'             => htmlspecialchars($data['result']),
+                                )
+                            );
 
                             if ($i < (count($pollData)) - 1) {
                                 $this->parse('series_separator_block', 'series_separator');
-                            }
-                            else {
+                            } else {
                                 $this->setVar('series_separator_block', '');
                             }
                             $this->parse("poll_responses_block", "poll_responses", true);
@@ -107,8 +115,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                         }
                     }
                     $this->parse('poll_chart_block', 'poll_chart');
-                }
-                else {
+                } else {
                     /* User has not voted yet */
                     $this->setVar('poll_options_block', '');
 
@@ -116,11 +123,13 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                         $i = 0;
 
                         foreach ($pollData as $data) {
-                            $this->setVar(array(
-                                'POLL_OPTION_INDEX'	=> $i,
-                                'POLL_OPTION'		=> Scrub::text($data['option']),
-                                'POLL_ON_OFF'		=> $i % 2 ? 'polloff':'',
-                            ));
+                            $this->setVar(
+                                array(
+                                    'POLL_OPTION_INDEX' => $i,
+                                    'POLL_OPTION'       => Scrub::text($data['option']),
+                                    'POLL_ON_OFF'       => $i % 2 ? 'polloff' : '',
+                                )
+                            );
 
                             $this->parse('poll_options_block', 'poll_options', true);
 
@@ -134,60 +143,57 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                     $this->parse('poll_vote_block', 'poll_vote');
                 }
 
-                if ($this->permission < WRITE_ACCESS ) {
+                if ($this->permission < WRITE_ACCESS) {
                     $this->setVar("modify_poll_block", "");
                     $this->setVar('new_poll_block', '');
-                }
-                else {
+                } else {
                     $this->parse("modify_poll_block", "modify_poll");
                     $this->parse('new_poll_block', 'new_poll');
                 }
 
-            }
-            else {
-                $this->setVar(array(
-                    'POLL_ID'		=> '',
-                    'POLL_TITLE'	=> 'Poll',
-                    'POLL_QUESTION'	=> '',
-                ));
+            } else {
+                $this->setVar(
+                    array(
+                        'POLL_ID'       => '',
+                        'POLL_TITLE'    => 'Poll',
+                        'POLL_QUESTION' => '',
+                    )
+                );
 
                 $this->setVar('poll_chart_block', '');
                 $this->setVar('poll_vote_block', '');
                 $this->setVar('modify_poll_block', '');
 
-                if ($this->permission < WRITE_ACCESS ) {
+                if ($this->permission < WRITE_ACCESS) {
                     $this->setVar('new_poll_block', '');
-                }
-                else {
+                } else {
                     $this->parse('new_poll_block', 'new_poll');
                 }
 
             }
 
             $current = $poll;
-        }
-        else {
-            $this->setVar(array(
-                'POLL_ID'		=> '',
-                'POLL_TITLE'	=> 'Poll',
-                'POLL_QUESTION'	=> '',
-            ));
+        } else {
+            $this->setVar(
+                array(
+                    'POLL_ID'       => '',
+                    'POLL_TITLE'    => 'Poll',
+                    'POLL_QUESTION' => '',
+                )
+            );
 
             $this->setVar("poll_chart_block", '');
             $this->setVar("poll_vote_block", "");
             $this->setVar('show_results_block', '');
             $this->setVar('modify_poll_block', '');
 
-            if ($this->permission < WRITE_ACCESS ) {
+            if ($this->permission < WRITE_ACCESS) {
                 $this->setVar('new_poll_block', '');
-            }
-            else {
+            } else {
                 $this->parse('new_poll_block', 'new_poll');
             }
-
         }
 
         return true;
     }
-
 }

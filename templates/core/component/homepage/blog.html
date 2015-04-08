@@ -1,7 +1,6 @@
 <div class="box component blog clearfix" id="component{COMPONENT_INSTANCE_ID}">
 	<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 	<script type="text/javascript" src="/javascript/jquery.blogCommentary.js"></script>
-
 	<script type="text/javascript">
 	$(function() {
         $('a.delete-comment').click(function(event) {
@@ -16,70 +15,72 @@
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
 
-	<ul class="information-list">
-		<!-- BEGIN blog -->
-		<li class="{BLOG_SHADING}" id="blog_{BLOG_ID}">
-			<!-- BEGIN modify_blog -->
-			<span class="actions">
-				<a class="btn no-text modify" href="/blog/modify/{BLOG_ID}" title="Modify Blog post"><span></span></a>
-			</span>
-			<!-- END modify_blog -->
+    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <ul class="information-list">
+            <!-- BEGIN blog -->
+            <li class="{BLOG_SHADING}" id="blog_{BLOG_ID}">
+                <!-- BEGIN modify_blog -->
+                <span class="actions">
+                    <a class="btn no-text modify" href="/blog/modify/{BLOG_ID}" title="Modify Blog post"><span></span></a>
+                </span>
+                <!-- END modify_blog -->
 
-			<h3>{BLOG_HEADING}</h3>
+                <h3>{BLOG_HEADING}</h3>
 
-			<p class="meta">
-				<a href="/search/user/{BLOG_AUTHOR_ID}" class="author">
-					<img width="32" height="32" src="{BLOG_AUTHOR_THUMB}" />
-					{BLOG_AUTHOR_NAME}
-				</a><br />
-				Posted {BLOG_CREATED}
-			</p>
+                <p class="meta">
+                    <a href="/search/user/{BLOG_AUTHOR_ID}" class="author">
+                        <img width="32" height="32" src="{BLOG_AUTHOR_THUMB}" />
+                        {BLOG_AUTHOR_NAME}
+                    </a><br />
+                    Posted {BLOG_CREATED}
+                </p>
 
-			<div class="wysiwyg">{BLOG_BODY}</div>
+                <div class="wysiwyg">{BLOG_BODY}</div>
 
-			<!-- BEGIN has_comments -->
-			<ul class="comments" id="blogComment_{BLOG_ID}">
-				<!-- BEGIN comment -->
-				<li class="viewCommentThread {ON_OFF}">
-					<!-- BEGIN has_comment_delete -->
-					<span class="actions">
-						<a class="delete-comment btn delete no-text" href="/blog/comment/delete/{COMMENT_COMMENT_ID}"><span></span></a>
-					</span>
-					<!-- END has_comment_delete -->
+                <!-- BEGIN has_comments -->
+                <ul class="comments" id="blogComment_{BLOG_ID}">
+                    <!-- BEGIN comment -->
+                    <li class="viewCommentThread {ON_OFF}">
+                        <!-- BEGIN has_comment_delete -->
+                        <span class="actions">
+                            <a class="delete-comment btn delete no-text" href="/blog/comment/delete/{COMMENT_COMMENT_ID}"><span></span></a>
+                        </span>
+                        <!-- END has_comment_delete -->
 
-					<p class="meta">
-						<a href="/search/user/{COMMENT_AUTHOR_ID}" class="author">
-							<img src="/portrait.php?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square32" />
-							{COMMENT_AUTHOR_NAME}
-						</a>
-						Commented {COMMENT_CREATED}
-					</p>
+                        <p class="meta">
+                            <a href="/search/user/{COMMENT_AUTHOR_ID}" class="author">
+                                <img src="/portrait.php?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square32" />
+                                {COMMENT_AUTHOR_NAME}
+                            </a>
+                            Commented {COMMENT_CREATED}
+                        </p>
 
-					<p class="comment-body">{COMMENT_BODY}</p>
-				</li>
-				<!-- END comment -->
-			</ul>
-			<!-- END has_comments -->
+                        <p class="comment-body">{COMMENT_BODY}</p>
+                    </li>
+                    <!-- END comment -->
+                </ul>
+                <!-- END has_comments -->
 
-			<form id='modify_blogcomment_form_{BLOG_ID}' class="modifyForm hide" action="/blog/comment/new/{BLOG_ID}" method="post">
-				<p>
-					<textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
-					<input type="submit" class="submit-btn-plain" name="comment" value="Add comment"/>
-				</p>
-			</form>
+                <form id='modify_blogcomment_form_{BLOG_ID}' class="modifyForm hide" action="/blog/comment/new/{BLOG_ID}" method="post">
+                    <p>
+                        <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
+                        <input type="submit" class="submit-btn-plain" name="comment" value="Add comment"/>
+                    </p>
+                </form>
 
-			<p class="interact">
-				<a href="#" class="viewComments btn chat show-comments" rel='viewComments_{BLOG_ID}' data-numcomments="{BLOG_TOTAL_COMMENTS}"><span></span>Show Comments ({BLOG_TOTAL_COMMENTS})</a>
-				<a rel='modify_blogcomment_form_{BLOG_ID}' class='closeComment btn chat'><span></span>Add Comment</a>
-			</p>
-		</li>
-		<!-- END blog -->
-	</ul>
+                <p class="interact">
+                    <a href="#" class="viewComments btn chat show-comments" rel='viewComments_{BLOG_ID}' data-numcomments="{BLOG_TOTAL_COMMENTS}"><span></span>Show Comments ({BLOG_TOTAL_COMMENTS})</a>
+                    <a rel='modify_blogcomment_form_{BLOG_ID}' class='closeComment btn chat'><span></span>Add Comment</a>
+                </p>
+            </li>
+            <!-- END blog -->
+        </ul>
 
-    <p class="interact">
-        <a href="/homepage/blogArchive/{BLOG_CATEGORY_ID}" class="btn"><span></span>View Blog Archive</a>
-        <!-- BEGIN create_blog -->
-        <a href="/blog/modify/new/{BLOG_CATEGORY_ID}" class="btn up-arrow"><span></span>Post Blog</a>
-        <!-- END create_blog -->
-    </p>
+        <p class="interact">
+            <a href="/homepage/blogArchive/{BLOG_CATEGORY_ID}" class="btn"><span></span>View Blog Archive</a>
+            <!-- BEGIN create_blog -->
+            <a href="/blog/modify/new/{BLOG_CATEGORY_ID}" class="btn up-arrow"><span></span>Post Blog</a>
+            <!-- END create_blog -->
+        </p>
+    </div>
 </div>

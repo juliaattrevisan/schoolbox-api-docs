@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -77,30 +78,30 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 
                 /** @var Calendar_Event_Type_Day $eventObject */
                 $eventId = $eventObject->getEventId();
-                $output = array(
-                    'CAL_DATE' => $eventObject->getEventSpan(),
-                    'CAL_ID' => $eventId,
-                    'CAL_TITLE' => Scrub::text($eventObject->getTitle()),
-                    'CAL_LOCATION' => Scrub::text($eventObject->getLocation()),
-                    'CAL_DETAIL' => Scrub::html($eventObject->getDetail()),
-                    'CAL_COLOUR' => Scrub::text($eventObject->getColour()),
-                    'CAL_MODIFY' => $calendarHandler->getPerm($eventId) > READ_ACCESS
+                $output  = array(
+                    'CAL_DATE'      => $eventObject->getEventSpan(),
+                    'CAL_ID'        => $eventId,
+                    'CAL_TITLE'     => Scrub::text($eventObject->getTitle()),
+                    'CAL_LOCATION'  => Scrub::text($eventObject->getLocation()),
+                    'CAL_DETAIL'    => Scrub::html($eventObject->getDetail()),
+                    'CAL_COLOUR'    => Scrub::text($eventObject->getColour()),
+                    'CAL_MODIFY'    => $calendarHandler->getPerm($eventId) > READ_ACCESS
                             ? "<a class=\"btn modify float-left\" href=\"/calendar/modify.php?eventID={$eventId}&homepageId={$this->getContext()->getId()}&returnTo=homepage\" title=\"Modify\"><span></span>Modify</a>"
                             : '',
-                    'CAL_TYPE' => Scrub::text($eventObject->getEventType()),
-                    'CAL_AUTHOR' => $eventObject->getAuthorName(),
+                    'CAL_TYPE'      => Scrub::text($eventObject->getEventType()),
+                    'CAL_AUTHOR'    => $eventObject->getAuthorName(),
                     'CAL_AUTHOR_ID' => $eventObject->getAuthorId(),
-                    'ON_OFF' => $j % 2 ? '' : 'dark',
+                    'ON_OFF'        => $j % 2 ? '' : 'dark',
                 );
                 $this->setVar($output);
 
                 // Clear attendance blocks
                 $this->setVar(
                     array(
-                        'attendance_icon_block' => '',
-                        'attendance_status_block' => '',
+                        'attendance_icon_block'           => '',
+                        'attendance_status_block'         => '',
                         'attendance_request_button_block' => '',
-                        'attendance_list_button_block' => '',
+                        'attendance_list_button_block'    => '',
                     )
                 );
 
@@ -117,7 +118,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 
                     if ($groupHandler->isStudent($_SESSION['id'])) {
                         if ($attendance = $calendarHandler->getAttendanceByEventAndUser($eventId, $_SESSION['id'])) {
-/* Attendance Status
+                            /* Attendance Status
                             */
                             if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
                                 $this->setVar('ATTENDANCE_STATUS', 'Pending');
@@ -159,10 +160,12 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
         //setup block for submission button
         $this->setBlock($templateHandle, "submit_event", "submit_event_block");
         if ($this->permission < WRITE_ACCESS) {
-            $this->setVar(array(
-                'submit_event_block' => '',
-                'import_events_block' => ''
-            ));
+            $this->setVar(
+                array(
+                    'submit_event_block'  => '',
+                    'import_events_block' => ''
+                )
+            );
         } else {
             $this->parse("submit_event_block", "submit_event");
             $this->parse('import_events_block', 'import_events');

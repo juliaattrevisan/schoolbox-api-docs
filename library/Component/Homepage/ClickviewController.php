@@ -70,7 +70,7 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
              * ></iframe>
              */
 
-            $patternRedir = '/clickv\.ie\/w\/([a-zA-Z0-9\-]+)/';
+            $patternRedir  = '/clickv\.ie\/w\/([a-zA-Z0-9\-]+)/';
             $patternIframe = '/(\?|&)shareCode=([a-zA-Z0-9\-]+)/i';
 
 
@@ -111,7 +111,6 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
         } else {
             $this->setVar('select_video_block', '');
         }
-
 
         return true; // everything went according to plan
     }

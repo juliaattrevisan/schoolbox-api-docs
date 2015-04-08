@@ -73,19 +73,24 @@
     </script>
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
-    <div id="galleryCycle-{COMPONENT_INSTANCE_ID}" class="scroller box clearfix" style="padding:0;border:0;margin:0;">
-        <!-- BEGIN image_scroller -->
-        <div class="slideshow-cycle">
-            <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}"
-                 alt="{IMAGE_NAME}"/>
-            <!-- BEGIN show_caption -->
-            <div class="caption-holder">{IMAGE_NAME}</div>
-            <!-- END show_caption -->
+
+    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div id="galleryCycle-{COMPONENT_INSTANCE_ID}" class="scroller box clearfix" style="padding:0;border:0;margin:0;">
+            <!-- BEGIN image_scroller -->
+            <div class="slideshow-cycle">
+                <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}"
+                     alt="{IMAGE_NAME}"/>
+                <!-- BEGIN show_caption -->
+                <div class="caption-holder">{IMAGE_NAME}</div>
+                <!-- END show_caption -->
+            </div>
+            <!-- END image_scroller -->
         </div>
-        <!-- END image_scroller -->
+
+        <!-- BEGIN submit_image -->
+        <p class="interact clearfix">
+            <a href="/cms/file/multi/{IMAGESCROLLER_CATEGORY_ID}" class="btn up-arrow"><span></span>Post Images</a>
+        </p>
+        <!-- END submit_image -->
     </div>
-    <!-- BEGIN submit_image -->
-    <p class="interact clearfix"><a href="/cms/file/multi/{IMAGESCROLLER_CATEGORY_ID}"
-                                    class="btn up-arrow"><span></span>Post Images</a></p>
-    <!-- END submit_image -->
 </div>

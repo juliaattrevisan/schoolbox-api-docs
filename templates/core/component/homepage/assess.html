@@ -1,54 +1,57 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
 	<h2>Quizzes</h2>
     {CONFIGURATION}
-	<ul class="information-list">
-		<!-- BEGIN assess -->
-		<li class="{ON_OFF}">
-			<span class="actions">
-				<!-- BEGIN resultLink -->
-				<a class="btn no-text statistics" href="/assess/results/{ASSESS_ASSESS_ID}" title="View Results"><span></span></a>
-				<!-- END resultLink -->
 
-				<!-- BEGIN teacherLink -->
-				<a class="btn no-text modify" href="/assess/modify/{ASSESS_ASSESS_ID}" title="Modify Quiz"><span></span></a>
-				<!-- END teacherLink -->
+    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <ul class="information-list">
+            <!-- BEGIN assess -->
+            <li class="{ON_OFF}">
+                <span class="actions">
+                    <!-- BEGIN resultLink -->
+                    <a class="btn no-text statistics" href="/assess/results/{ASSESS_ASSESS_ID}" title="View Results"><span></span></a>
+                    <!-- END resultLink -->
 
-				<!-- BEGIN has_previous_attempts -->
-				<a class="btn no-text list" href="/assess/attempts/{ASSESS_ASSESS_ID}/{ASSESS_RESPONDENT_ID}" title="See previous attempts"><span></span></a>
-				<!-- END has_previous_attempts -->
-			</span>
+                    <!-- BEGIN teacherLink -->
+                    <a class="btn no-text modify" href="/assess/modify/{ASSESS_ASSESS_ID}" title="Modify Quiz"><span></span></a>
+                    <!-- END teacherLink -->
 
-        	<!-- BEGIN assessLink -->
-			<h4><a href="/assess/intro/{ASSESS_ASSESS_ID}">{ASSESS_TITLE}</a></h4>
-        	<!-- END assessLink -->
+                    <!-- BEGIN has_previous_attempts -->
+                    <a class="btn no-text list" href="/assess/attempts/{ASSESS_ASSESS_ID}/{ASSESS_RESPONDENT_ID}" title="See previous attempts"><span></span></a>
+                    <!-- END has_previous_attempts -->
+                </span>
 
-			<!-- BEGIN resumeLink -->
-			<h4><a href="/assess/attempt/{ASSESS_ASSESS_ID}/{ASSESS_SECTION_ID}">{ASSESS_TITLE}</a></h4>
-			<!-- END resumeLink -->
+                <!-- BEGIN assessLink -->
+                <h4><a href="/assess/intro/{ASSESS_ASSESS_ID}">{ASSESS_TITLE}</a></h4>
+                <!-- END assessLink -->
 
-			<!-- BEGIN assessNoLink -->
-			<h4>{ASSESS_TITLE}</h4>
-			<!-- END assessNoLink -->
+                <!-- BEGIN resumeLink -->
+                <h4><a href="/assess/attempt/{ASSESS_ASSESS_ID}/{ASSESS_SECTION_ID}">{ASSESS_TITLE}</a></h4>
+                <!-- END resumeLink -->
 
-			<!-- BEGIN assessDue -->
-			<p class="meta">
-				<span class="gradient-{ASSESS_FINISH_URGENCY}">Due {ASSESS_FINISH_RELATIVE_DATE}</span>
-				<!-- BEGIN assess_finish_date -->
-				on {ASSESS_FINISH_DATE}
-				<!-- END assess_finish_date -->
-			</p>
-			<!-- END assessDue -->
+                <!-- BEGIN assessNoLink -->
+                <h4>{ASSESS_TITLE}</h4>
+                <!-- END assessNoLink -->
 
-			<div class="wysiwyg summ {COMPONENT_COMPACTMODE} ">{ASSESS_DESCRIPTION}</div>
+                <!-- BEGIN assessDue -->
+                <p class="meta">
+                    <span class="gradient-{ASSESS_FINISH_URGENCY}">Due {ASSESS_FINISH_RELATIVE_DATE}</span>
+                    <!-- BEGIN assess_finish_date -->
+                    on {ASSESS_FINISH_DATE}
+                    <!-- END assess_finish_date -->
+                </p>
+                <!-- END assessDue -->
 
-			<p class="footnote {COMPONENT_COMPACTMODE}">Created by <a href='/search/user/{ASSESS_USER_ID}'>{ASSESS_USER_FIRSTNAME} {ASSESS_USER_LASTNAME}</a> {ASSESS_CREATED}</p>
-		</li>
-		<!-- END assess -->
-	</ul>
+                <div class="wysiwyg summ {COMPONENT_COMPACTMODE} ">{ASSESS_DESCRIPTION}</div>
 
-	<!-- BEGIN createAssessment -->
-	<p class="interact">
-		<a href="/assess/create/{ID}" class="btn add"><span></span>Create Quiz</a>
-	</p>
-	<!-- END createAssessment -->
+                <p class="footnote {COMPONENT_COMPACTMODE}">Created by <a href='/search/user/{ASSESS_USER_ID}'>{ASSESS_USER_FIRSTNAME} {ASSESS_USER_LASTNAME}</a> {ASSESS_CREATED}</p>
+            </li>
+            <!-- END assess -->
+        </ul>
+
+        <!-- BEGIN createAssessment -->
+        <p class="interact">
+            <a href="/assess/create/{ID}" class="btn add"><span></span>Create Quiz</a>
+        </p>
+        <!-- END createAssessment -->
+    </div>
 </div>

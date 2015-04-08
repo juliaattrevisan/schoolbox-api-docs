@@ -4,7 +4,6 @@
     <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
     <script type="text/javascript">
         $(function() {
-
             $('input[type=file].pretty-file-input').prettyFileInput({
                 additionalButtonClasses: 'no-marg float-left',
                 buttonActiveClass: 'tick',
@@ -16,43 +15,47 @@
         });
     </script>
     <!-- END custom_head -->
+
     <h2>Drop Box</h2>
     {CONFIGURATION}
-    <div class="listing clearfix">
-        <!-- BEGIN drop_student -->
-        <form action="/subject/modDropBox.php" method="post" enctype="multipart/form-data" class="dropBox" >
-            <!-- BEGIN drop_success -->
-            <fieldset>
-                <p class="icons success pad">File upload completed successfully.</p>
-            </fieldset>
-            <!-- END drop_success -->
-            <fieldset class="drop-left">
-                <h3>Description</h3>
-                <label>
-                    <input name="description" class="required" type="text" />
-                </label>
-                <input type="hidden" name="category" value="{ID}" />
-            </fieldset>
-            <fieldset class="drop-right">{ATTACH_ZONE}</fieldset>
-            <fieldset class="submit">
-                <input type="submit" value="Upload" class="drop-submit submit-btn-plain"/>
-            </fieldset>
-        </form>
-        <!-- END drop_student -->
-        <!-- BEGIN drop_staff -->
-        <ul class="information-list">
-            <!-- BEGIN drop_file -->
-            <li class="{ON_OFF}">
-                <span class="actions">
-                    <a class="btn delete no-text" href="/subject/modDropBox.php?delete={DROPBOX_ID}" title="Delete"><span></span></a>
-                </span>
-                <h4>
-                    <a class="icons {DROPBOX_MIME_IMAGE}" href="/subject/modDropBox.php?id={DROPBOX_ID}" rel="external">{DROPBOX_DESCRIPTION}</a>
-                </h4>
-                <p class="meta">By {DROP_SUBMITTED_BY} on {DROP_SUBMITTED_TIME}</p>
-            </li>
-            <!-- END drop_file -->
-        </ul>
-        <!-- END drop_staff -->
+
+    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="listing clearfix">
+            <!-- BEGIN drop_student -->
+            <form action="/subject/modDropBox.php" method="post" enctype="multipart/form-data" class="dropBox" >
+                <!-- BEGIN drop_success -->
+                <fieldset>
+                    <p class="icons success pad">File upload completed successfully.</p>
+                </fieldset>
+                <!-- END drop_success -->
+                <fieldset class="drop-left">
+                    <h3>Description</h3>
+                    <label>
+                        <input name="description" class="required" type="text" />
+                    </label>
+                    <input type="hidden" name="category" value="{ID}" />
+                </fieldset>
+                <fieldset class="drop-right">{ATTACH_ZONE}</fieldset>
+                <fieldset class="submit">
+                    <input type="submit" value="Upload" class="drop-submit submit-btn-plain"/>
+                </fieldset>
+            </form>
+            <!-- END drop_student -->
+            <!-- BEGIN drop_staff -->
+            <ul class="information-list">
+                <!-- BEGIN drop_file -->
+                <li class="{ON_OFF}">
+                    <span class="actions">
+                        <a class="btn delete no-text" href="/subject/modDropBox.php?delete={DROPBOX_ID}" title="Delete"><span></span></a>
+                    </span>
+                    <h4>
+                        <a class="icons {DROPBOX_MIME_IMAGE}" href="/subject/modDropBox.php?id={DROPBOX_ID}" rel="external">{DROPBOX_DESCRIPTION}</a>
+                    </h4>
+                    <p class="meta">By {DROP_SUBMITTED_BY} on {DROP_SUBMITTED_TIME}</p>
+                </li>
+                <!-- END drop_file -->
+            </ul>
+            <!-- END drop_staff -->
+        </div>
     </div>
 </div>

@@ -4,36 +4,40 @@
     <script src="/javascript/components/mediaelement/build/mediaelement-and-player.min.js"></script>
     <script src="/javascript/jquery.mediaPlaylist.js"></script>
     <!-- END custom_head -->
-	<h2>{PODCAST_COMPONENT_TITLE}</h2>
-	{CONFIGURATION}
 
-    <!-- BEGIN default_podcast -->
-    <div class="audioWrapper">
-        <h3 class="mejs-player-title" data-role="media-playlist-title">{DEFAULT_PODCAST_TITLE}</h3>
-        <audio id="schoolbox_audio{COMPONENT_INSTANCE_ID}"
-               data-role="media-playlist-player"
-               controls
-               preload="none"
-               width="100%">
-            <source src="{DEFAULT_PODCAST_URL}" type="audio/mp3" />
-        </audio>
-    </div>
-    <!-- END default_podcast -->
-
-	<ul class="information-list">
-		<!-- BEGIN podcast_list -->
-		<li class="{ON_OFF}">
-            <a class="audio-link" href="{PODCAST_URL}" data-role="media-playlist-track">
-                <h4>{PODCAST_TITLE}</h4>
-            </a>
-            <div class="wysiwyg {COMPONENT_COMPACTMODE}">{PODCAST_DESCRIPTION}</div>
-		</li>
-		<!-- END podcast_list -->
-	</ul>
-	<script type="text/javascript">
+    <script type="text/javascript">
         $(function() {
             // Turn all audio components into media elements
             $('#component{COMPONENT_INSTANCE_ID}').mediaPlaylist();
         });
     </script>
+
+	<h2>{PODCAST_COMPONENT_TITLE}</h2>
+	{CONFIGURATION}
+
+    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <!-- BEGIN default_podcast -->
+        <div class="audioWrapper">
+            <h3 class="mejs-player-title" data-role="media-playlist-title">{DEFAULT_PODCAST_TITLE}</h3>
+            <audio id="schoolbox_audio{COMPONENT_INSTANCE_ID}"
+                   data-role="media-playlist-player"
+                   controls
+                   preload="none"
+                   width="100%">
+                <source src="{DEFAULT_PODCAST_URL}" type="audio/mp3" />
+            </audio>
+        </div>
+        <!-- END default_podcast -->
+
+        <ul class="information-list">
+            <!-- BEGIN podcast_list -->
+            <li class="{ON_OFF}">
+                <a class="audio-link" href="{PODCAST_URL}" data-role="media-playlist-track">
+                    <h4>{PODCAST_TITLE}</h4>
+                </a>
+                <div class="wysiwyg {COMPONENT_COMPACTMODE}">{PODCAST_DESCRIPTION}</div>
+            </li>
+            <!-- END podcast_list -->
+        </ul>
+    </div>
 </div>

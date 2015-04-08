@@ -1,23 +1,28 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
-    <div class="rubric_listing listing box clearfix">
-        <ul class="information-list">
-            <!-- BEGIN rubric_criterion -->
-            <li class="criterion clearfix {DARK}">
-                <h4>{CRITERION_GROUP}</h4>
-                <ul>
-                    <!-- BEGIN rubric_descriptor -->
-                    <li class="descriptor"><span class="name">{CRITERION_NAME}</span></li>
-                    <!-- END rubric_descriptor -->
-                </ul>
-            </li>
-            <!-- END rubric_criterion -->
-        </ul>
-        <!-- BEGIN modify_rubric -->
-        <p class="interact">
-            <a href="/submission/rubricCriteria/{ID}" class="btn modify"><span></span>Edit Rubrics</a>
-        </p>
-        <!-- END modify_rubric -->
+
+    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="rubric_listing listing box clearfix">
+            <ul class="information-list">
+                <!-- BEGIN rubric_criterion -->
+                <li class="criterion clearfix {DARK}">
+                    <h4>{CRITERION_GROUP}</h4>
+
+                    <ul>
+                        <!-- BEGIN rubric_descriptor -->
+                        <li class="descriptor"><span class="name">{CRITERION_NAME}</span></li>
+                        <!-- END rubric_descriptor -->
+                    </ul>
+                </li>
+                <!-- END rubric_criterion -->
+            </ul>
+
+            <!-- BEGIN modify_rubric -->
+            <p class="interact">
+                <a href="/submission/rubricCriteria/{ID}" class="btn modify"><span></span>Edit Rubrics</a>
+            </p>
+            <!-- END modify_rubric -->
+        </div>
     </div>
 </div>

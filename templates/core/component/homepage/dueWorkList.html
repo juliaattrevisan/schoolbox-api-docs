@@ -1,9 +1,11 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
 	<h2>Due Work</h2>
 	{CONFIGURATION}
-    <ul class="information-list">
-			<!-- BEGIN duework -->
-			<li class="{ON_OFF}">
+
+    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <ul class="information-list">
+            <!-- BEGIN duework -->
+            <li class="{ON_OFF}">
                 <!-- BEGIN has_actions -->
                 <span class="actions">
                     <!-- BEGIN duework_result_link -->
@@ -21,17 +23,18 @@
                 <!-- END duework_due_date -->
                 <div class="wysiwyg {COMPONENT_COMPACTMODE}">{DUE_COMMENT}</div>
             </li>
-			<!-- END duework -->
-    </ul>
+            <!-- END duework -->
+        </ul>
 
-	<p class="interact">
-		<!-- BEGIN allwork_button -->
-		<a href="/submission/allWork/{USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ID}" title="View grades"  class="btn tick"><span></span>View Grades</a>
-		<!-- END allwork_button -->
-		<!-- BEGIN submit_dw -->
-		<a href="/submission/createSubmission/new/{ID}/" class="btn due-work"><span></span>Post Due Work</a>
-        <a href="/submission/listSubmission/{WORK_YEAR}/{WORK_SEMESTER}/{ID}/" class="btn"><span></span>View All Work</a>
-		<a href="/submission/rubricCriteria/{ID}" class="btn modify"><span></span>Edit Rubric Criteria</a>
-		<!-- END submit_dw -->
-	</p>
+        <p class="interact">
+            <!-- BEGIN allwork_button -->
+            <a href="/submission/allWork/{USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ID}" title="View grades"  class="btn tick"><span></span>View Grades</a>
+            <!-- END allwork_button -->
+            <!-- BEGIN submit_dw -->
+            <a href="/submission/createSubmission/new/{ID}/" class="btn due-work"><span></span>Post Due Work</a>
+            <a href="/submission/listSubmission/{WORK_YEAR}/{WORK_SEMESTER}/{ID}/" class="btn"><span></span>View All Work</a>
+            <a href="/submission/rubricCriteria/{ID}" class="btn modify"><span></span>Edit Rubric Criteria</a>
+            <!-- END submit_dw -->
+        </p>
+    </div>
 </div>

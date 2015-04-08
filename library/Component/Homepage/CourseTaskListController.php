@@ -53,20 +53,22 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
     public function execute()
     {
         $this->group_handler = new Group();
-        $categoryId = $this->getContext()->getId();
+        $categoryId          = $this->getContext()->getId();
         if ($categoryId > 0) {
             $this->category = CategoryMapper::getInstance()->findById($categoryId);
         }
         $this->task_list = TaskMapper::getInstance()->findByCategory($this->category);
 
         // What pages have this course?
-        $this->unitList = UnitInstanceMapper::getInstance()->findByUnitCategoryId($categoryId);
+        $this->unitList             = UnitInstanceMapper::getInstance()->findByUnitCategoryId($categoryId);
         $this->categoryWithUnitList = CategoryMapper::getInstance()->findByColumn(
             'id',
-            $this->unitList->map(function($unit) {
-                /** @var UnitInstance $unit */
-                return $unit->getComponent()->getIdentifier();
-            })
+            $this->unitList->map(
+                function ($unit) {
+                    /** @var UnitInstance $unit */
+                    return $unit->getComponent()->getIdentifier();
+                }
+            )
         );
     }
 
@@ -93,19 +95,21 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
         $this->setBlock('task', 'task_no_link', 'task_no_link_block');
         $this->setBlock('task', 'edit_task_form', 'edit_task_form_block');
 
-        $this->setVar(array(
-            'SESSION_NAME'   => session_name(),
-            'SESSION_ID'     => session_id(),
-            'COMPONENT_NAME' => $this->getConfig('componentname'),
-            'UNIT_LIST'      => json_encode(
-                $this->unitList->map(
-                    function($unit) {
-                        /** @var UnitInstance $unit */
-                        return $unit->getComponent()->getIdentifier();
-                    }
-                )->getAll()
-            ),
-        ));
+        $this->setVar(
+            array(
+                'SESSION_NAME'   => session_name(),
+                'SESSION_ID'     => session_id(),
+                'COMPONENT_NAME' => $this->getConfig('componentname'),
+                'UNIT_LIST'      => json_encode(
+                    $this->unitList->map(
+                        function ($unit) {
+                            /** @var UnitInstance $unit */
+                            return $unit->getComponent()->getIdentifier();
+                        }
+                    )->getAll()
+                ),
+            )
+        );
 
         // Start spamming out tasks into the template
         $this->setVar('category_breadcrumb_block', '');
@@ -131,7 +135,7 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
                     'TASK_CLASS'       => Scrub::text($task->getIconClass()),
                     'TASK_LINK'        => Scrub::text($task->getLink()),
                     'TASK_SELF_ASSESS' => ($task->getRequiresConfirmation() ? '' : 'checked'),
-                    'DARK'             => ($i++%2 === 1 ? 'dark' : ''),
+                    'DARK'             => ($i++ % 2 === 1 ? 'dark' : ''),
                 )
             );
             $this->parse('task_no_link_block', 'task_no_link');
@@ -140,20 +144,24 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
             $task_type = $task->getType();
             $this->setVar('edit_task_form_block', '');
             if ($task_type === Task::TYPE_TASK) {
-                $zone = $this->newZone('az-task-'.$task->getId());
+                $zone = $this->newZone('az-task-' . $task->getId());
 
                 if (strpos($task->getLink(), '/storage/fetch.php') === 0) {
                     $zone->attachFiles(array(substr($task->getLink(), -40)));
-                    $this->setVar(array(
-                        'TASK_ATTACH_DISPLAY' => 'display: block;',
-                        'TASK_URL_DISPLAY'    => 'display: none;'
-                    ));
+                    $this->setVar(
+                        array(
+                            'TASK_ATTACH_DISPLAY' => 'display: block;',
+                            'TASK_URL_DISPLAY'    => 'display: none;'
+                        )
+                    );
 
                 } else {
-                    $this->setVar(array(
-                        'TASK_ATTACH_DISPLAY' => 'display: none;',
-                        'TASK_URL_DISPLAY'    => 'display: block;'
-                    ));
+                    $this->setVar(
+                        array(
+                            'TASK_ATTACH_DISPLAY' => 'display: none;',
+                            'TASK_URL_DISPLAY'    => 'display: block;'
+                        )
+                    );
                 }
 
                 $zone->renderIntoSitePage($this->sitepage, 'ATTACH_ZONE');
@@ -187,12 +195,12 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
     {
         $zone = new \Schoolbox\Resource\Attachment\Zone($id);
         $zone->setMulti(false)
-             ->setReadOnly(false)
-             ->setMimeFilter(null)
-             ->setAttachmentsLabel('')
-             ->setAttachPrompt('Attach file or folder')
-             ->setModalTitle('Select File or Folder')
-             ->setThumbnailSize(32);
+            ->setReadOnly(false)
+            ->setMimeFilter(null)
+            ->setAttachmentsLabel('')
+            ->setAttachPrompt('Attach file or folder')
+            ->setModalTitle('Select File or Folder')
+            ->setThumbnailSize(32);
 
         if ($target) {
             $zone->renderIntoSitePage($this->sitepage, $target);

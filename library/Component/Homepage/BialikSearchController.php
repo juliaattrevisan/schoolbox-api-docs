@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
@@ -6,14 +7,16 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_BialikSearchController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_BialikSearchController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
     }
 
     /**
@@ -21,17 +24,18 @@ class Component_Homepage_BialikSearchController extends Component_Homepage_Contr
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'bialikSearch')) {
+    public function renderTemplate($templateHandle)
+    {
+        if (!parent::loadTemplate($templateHandle, 'bialikSearch')) {
             return false;
         }
 
         $this->parseConfig();
         $this->setVar(
             'COMPONENT_NAME',
-                strlen(trim($this->getConfig('componentname'))) ?
-                    $this->getConfig('componentname') :
-                    'Bialik Search'
+            strlen(trim($this->getConfig('componentname'))) ?
+                $this->getConfig('componentname') :
+                'Bialik Search'
         );
 
         return true;

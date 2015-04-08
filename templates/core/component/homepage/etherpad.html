@@ -2,27 +2,29 @@
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
 
-	<ul class="information-list">
-		<!-- BEGIN etherpad_pad -->
-		<li>
-			<span class="actions">
-				<!-- BEGIN etherpad_has_modify -->
-				<a class="btn no-text modify" href="/collabdoc/modify/{ETHERPAD_PAD_ID}" title="Modify Collab Doc"><span></span></a>
-				<!-- END etherpad_has_modify -->
-			</span>
+    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <ul class="information-list">
+            <!-- BEGIN etherpad_pad -->
+            <li>
+                <span class="actions">
+                    <!-- BEGIN etherpad_has_modify -->
+                    <a class="btn no-text modify" href="/collabdoc/modify/{ETHERPAD_PAD_ID}" title="Modify Collab Doc"><span></span></a>
+                    <!-- END etherpad_has_modify -->
+                </span>
 
-			<h4>
-				<a href='/collabdoc/edit/{ETHERPAD_PAD_ID}/{ID}'>{ETHERPAD_NAME}</a>
-			</h4>
-			<p class="meta">
-				Last updated on
-				{ETHERPAD_UPDATED_AT}
-			</p>
-		</li>
-		<!-- END etherpad_pad -->
-	</ul>
+                <h4>
+                    <a href='/collabdoc/edit/{ETHERPAD_PAD_ID}/{ID}'>{ETHERPAD_NAME}</a>
+                </h4>
+                <p class="meta">
+                    Last updated on
+                    {ETHERPAD_UPDATED_AT}
+                </p>
+            </li>
+            <!-- END etherpad_pad -->
+        </ul>
 
-	<!-- BEGIN etherpad_has_create -->
-	<a href="/collabdoc/create/{ID}" class="btn create"><span></span>Create Document</a>
-	<!-- END etherpad_has_create -->
+        <!-- BEGIN etherpad_has_create -->
+        <a href="/collabdoc/create/{ID}" class="btn create"><span></span>Create Document</a>
+        <!-- END etherpad_has_create -->
+    </div>
 </div>

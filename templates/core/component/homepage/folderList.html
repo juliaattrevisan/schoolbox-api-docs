@@ -1,21 +1,24 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
-	<ul class="information-list">
-		<!-- BEGIN folders -->
-		<li class="{ON_OFF}">
-			<!-- BEGIN modify_folder -->
-			<span class="actions">
-				<a class="btn no-text modify" href="/cms/category/{FOLDER_ID}" title="Modify Folder"><span></span></a>
-			</span>
-			<!-- END modify_folder -->
 
-			<h4><a class="icons {FOLDER_ICON}" href="/homepage/{FOLDER_ID}/">{FOLDER_NAME}</a></h4>
-		</li>
-		<!-- END folders -->
-	</ul>
+    <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <ul class="information-list">
+            <!-- BEGIN folders -->
+            <li class="{ON_OFF}">
+                <!-- BEGIN modify_folder -->
+                <span class="actions">
+                    <a class="btn no-text modify" href="/cms/category/{FOLDER_ID}" title="Modify Folder"><span></span></a>
+                </span>
+                <!-- END modify_folder -->
 
-    <!-- BEGIN submit_folder -->
-    <p class="interact"><a href="/cms/category/new/{FOLDER_CAT_ID}" class="btn add"><span></span>Add Folder</a></p>
-    <!-- END submit_folder -->
+                <h4><a class="icons {FOLDER_ICON}" href="/homepage/{FOLDER_ID}/">{FOLDER_NAME}</a></h4>
+            </li>
+            <!-- END folders -->
+        </ul>
+
+        <!-- BEGIN submit_folder -->
+        <p class="interact"><a href="/cms/category/new/{FOLDER_CAT_ID}" class="btn add"><span></span>Add Folder</a></p>
+        <!-- END submit_folder -->
+    </div>
 </div>

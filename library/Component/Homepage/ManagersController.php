@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -61,9 +62,11 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
         );
 
         $display = $this->getConfig('displayPortraits') ? $this->getConfig('displayPortraits') : 'grid';
-        $this->setVar(array(
-            'LIST_STYLE' => $displayOptions[$display]['css'],
-        ));
+        $this->setVar(
+            array(
+                'LIST_STYLE' => $displayOptions[$display]['css'],
+            )
+        );
 
         $userHandler = new User;
         $managerList = $userHandler->getManagers($this->getContext()->getId());
@@ -73,9 +76,9 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
         if (is_array($managerList)) {
             $j = 0;
             foreach ($managerList as $manager) {
-                $name = $userHandler->formatName($manager);
+                $name  = $userHandler->formatName($manager);
                 $email = $emailObj->formatEmailFromArray($manager);
-                $meta = $userHandler->getByID($manager['uid']);
+                $meta  = $userHandler->getByID($manager['uid']);
 
                 if ($manager['type'] == 3) {
                     $name .= " (Group Admin.)";
@@ -85,13 +88,15 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                     $emailall[] = $email;
                 }
 
-                $this->setVar(array(
-                    'ON_OFF' => ++$j % 2 ? '' : 'dark',
-                    'PERSON_UID' => $manager['uid'],
-                    'PERSON_NAME' => $name,
-                    'PERSON_EXTERNAL_ID' => $manager['synergy_id'],
-                    'PERSON_GROUP' => Scrub::text($meta['gname']),
-                ));
+                $this->setVar(
+                    array(
+                        'ON_OFF'             => ++$j % 2 ? '' : 'dark',
+                        'PERSON_UID'         => $manager['uid'],
+                        'PERSON_NAME'        => $name,
+                        'PERSON_EXTERNAL_ID' => $manager['synergy_id'],
+                        'PERSON_GROUP'       => Scrub::text($meta['gname']),
+                    )
+                );
 
                 /* Don't display images in list view
 			  	 */

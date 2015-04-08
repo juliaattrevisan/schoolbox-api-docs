@@ -115,8 +115,8 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         $this->setVar(
             array(
                 'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname')))
-                    ? $this->getConfig('componentname')
-                    : 'Video',
+                        ? $this->getConfig('componentname')
+                        : 'Video',
                 'FILE_CAT_ID'    => $this->source_category_id,
             )
         );
@@ -173,6 +173,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         } else {
             $this->setVar('submit_video_block', '');
         }
+
         return true; // everything went according to plan
     }
 }

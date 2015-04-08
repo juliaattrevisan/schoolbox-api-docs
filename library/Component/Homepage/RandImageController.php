@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -67,8 +68,6 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
             $this->setVar("preview_block", "");
         }
 
-
         return true; // everything went according to plan
-
     }
 }

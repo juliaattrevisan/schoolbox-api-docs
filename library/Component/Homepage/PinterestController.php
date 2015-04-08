@@ -39,7 +39,7 @@ class Component_Homepage_PinterestController extends Component_Homepage_Controll
 
         $this->setVar(
             array(
-                'has_pinterest_user_block' => '',
+                'has_pinterest_user_block'  => '',
                 'has_pinterest_board_block' => '',
             )
         );

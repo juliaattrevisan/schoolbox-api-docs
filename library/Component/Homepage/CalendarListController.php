@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -28,7 +29,7 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
      */
     public function execute()
     {
-        $this->db = DeprecatedDatabase::getInstance();
+        $this->db              = DeprecatedDatabase::getInstance();
         $this->calendarHandler = new Calendar();
 
     }
@@ -42,7 +43,8 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
     {
         if (!parent::loadTemplate($templateHandle, 'calendarList')) {
             return false;
-        }         $this->parseConfig();
+        }
+        $this->parseConfig();
 
         /* Output a group calendar */
         $this->setBlock($templateHandle, "group_events", "group_events_block");
@@ -66,7 +68,7 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
         if ($this->getConfig('size') != 0 && $this->getConfig('size') != '') {
             $where = " AND DATE(start_datetime) < ADDDATE(CURDATE(), INTERVAL {$this->getConfig('size')} DAY) ";
         } else {
-                    $where = "";
+            $where = "";
         }
         $this->setVar('CALENDAR_TITLE', 'Campus Calendar');
 
@@ -93,21 +95,21 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
 
         if (is_array($eventList)) {
             $userHandler = new User();
-            $j = 0;
+            $j           = 0;
 
             foreach ($eventList as $event) {
                 if ($event['startTime'] == "0:00" || strtolower($event['startTime']) == "12:00am" || strtolower(
-                    $event['startTime']
-                ) == "12:00 am" || $event['startTime'] == ''
+                        $event['startTime']
+                    ) == "12:00 am" || $event['startTime'] == ''
                 ) {
                     $this->setVar("TIME", "");
                 } elseif ($event['endTime'] == "0:00" || strtolower($event['endTime']) == "12:00am" || strtolower(
-                    $event['endTime']
-) == "12:00 am" || $event['endTime'] == ''
+                        $event['endTime']
+                    ) == "12:00 am" || $event['endTime'] == ''
                 ) {
                     $this->setVar("TIME", $event['startTime']);
                 } else {
-                        $this->setVar("TIME", $event['startTime'] . " - " . $event['endTime']);
+                    $this->setVar("TIME", $event['startTime'] . " - " . $event['endTime']);
                 }
 
                 $event['colour'] = $this->calendarHandler->displayColour($event['type']);
@@ -115,23 +117,23 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
                 $calendarDate = new Alaress_Date_Format($event['outputDate'], 'U');
 
                 $output = array(
-                    'CAL_TIME' => rtrim(
+                    'CAL_TIME'      => rtrim(
                         ($event['startTime'] != "12:00AM" ? $event['startTime'] : "") . " - " . ($event['endTime'] != "12:00AM" ? $event['endTime'] : ""),
                         "- "
                     ),
-                    'CAL_DATE' => $calendarDate->getDateOnly(),
-                    'CAL_ID' => $event['id'],
-                    'CAL_TITLE' => Scrub::text($event['title']),
-                    'CAL_LOCATION' => Scrub::text($event['location']),
-                    'CAL_DETAIL' => Scrub::html($event['detail']),
-                    'CAL_COLOUR' => Scrub::text($event['colour']),
-                    'CAL_MODIFY' => $this->calendarHandler->getPerm(
-                        $event['id']
-                    ) > 1 ? "<a class=\"btn modify float-left\" href=\"/calendar/modify.php?eventID={$event['id']}&homepageId={$this->getContext()->getId()}&returnTo=homepage\" title=\"Modify\"><span></span>Modify</a>" : '',
-                    'CAL_TYPE' => Scrub::text($event['eventType']),
-                    'CAL_AUTHOR' => $userHandler->formatName($event),
+                    'CAL_DATE'      => $calendarDate->getDateOnly(),
+                    'CAL_ID'        => $event['id'],
+                    'CAL_TITLE'     => Scrub::text($event['title']),
+                    'CAL_LOCATION'  => Scrub::text($event['location']),
+                    'CAL_DETAIL'    => Scrub::html($event['detail']),
+                    'CAL_COLOUR'    => Scrub::text($event['colour']),
+                    'CAL_MODIFY'    => $this->calendarHandler->getPerm(
+                            $event['id']
+                        ) > 1 ? "<a class=\"btn modify float-left\" href=\"/calendar/modify.php?eventID={$event['id']}&homepageId={$this->getContext()->getId()}&returnTo=homepage\" title=\"Modify\"><span></span>Modify</a>" : '',
+                    'CAL_TYPE'      => Scrub::text($event['eventType']),
+                    'CAL_AUTHOR'    => $userHandler->formatName($event),
                     'CAL_AUTHOR_ID' => $event['owner'],
-                    'ON_OFF' => ++$j % 2 ? '' : 'dark',
+                    'ON_OFF'        => ++$j % 2 ? '' : 'dark',
                 );
 
                 $this->setVar($output);
@@ -139,10 +141,10 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
                 // Clear attendance blocks
                 $this->setVar(
                     array(
-                        'attendance_icon_block' => '',
-                        'attendance_status_block' => '',
+                        'attendance_icon_block'           => '',
+                        'attendance_status_block'         => '',
                         'attendance_request_button_block' => '',
-                        'attendance_list_button_block' => '',
+                        'attendance_list_button_block'    => '',
                     )
                 );
 
@@ -160,8 +162,8 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
                             $event['id'], $_SESSION['id']
                         )
                         ) {
-/* Attendance Status
-                            */
+                            /* Attendance Status
+                                                        */
                             if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
                                 $this->setVar('ATTENDANCE_STATUS', 'Pending');
                             } elseif ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
@@ -187,7 +189,7 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
                 } elseif ($event['endTimeString'] == "12:00AM") {
                     $this->setVar("CAL_TIME", $event['startTimeString']);
                 } else {
-                        $this->setVar("CAL_TIME", $event['startTimeString'] . "&ndash;" . $event['endTimeString']);
+                    $this->setVar("CAL_TIME", $event['startTimeString'] . "&ndash;" . $event['endTimeString']);
                 }
 
                 $this->parse("group_events_block", "group_events", true);
@@ -199,7 +201,7 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
         }
 
 
-//setup block for submission button
+        //setup block for submission button
         $this->setBlock($templateHandle, "submit_event", "submit_event_block");
         if ($this->permission < WRITE_ACCESS) {
             $this->setVar("submit_event_block", "");

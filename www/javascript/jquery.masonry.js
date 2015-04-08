@@ -258,7 +258,7 @@
 
             // eeeeeeeeeiww... but it works
             box.children(opt.component.controlPanelSelector).slideUp();
-            box.children(btnsSelector).removeClass(activeClass);
+            box.find(btnsSelector).removeClass(activeClass);
 
             if (open) {
                 target.off('click', opt.component.removeActionSelector);
