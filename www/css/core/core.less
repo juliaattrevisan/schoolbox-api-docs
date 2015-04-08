@@ -1380,64 +1380,61 @@ Notifications
         }
     }
 
-    a.close-delete {
+    /* Component control container
+     */
+    section.component-control-container {
+        width: 300px;
+        height: 20px;
         position: absolute;
-        right: 53px;
         top: 6px;
-        width: 84px;
-        height: 26px;
-        color: @black !important;
-        font-size: 22px;
-        background: @dark;
-    }
+        right: 6px;
 
-    a.edit {
-        position: absolute;
-        right: 53px;
-        top: 6px;
-        width: 84px;
-        height: 26px;
-        color: @black !important;
-        &:hover {
-            text-decoration: none;
-            cursor: pointer;
-            em{
-				display: block;
-            }
-            span {
-                background: @black;
-                color: @white;
-            }
-        }
-        em {
-            font-style: normal;
-            position: absolute;
-            right: 27px;
-            top: 3px;
-            color: @black !important;
-            width: 50px;
-            height: 20px;
-            display: none;
-            &.show-it {
-                display: block;
-            }
-            &.active {
-                background: @lgrey;
-            }
-        }
-        span {
+        /* Component control buttons
+         */
+        a.component-control-button {
             width: 20px;
-            display: block;
             height: 20px;
             line-height: 20px;
             text-align: center;
-            position: absolute;
-            top: 0;
-            right: 0;
-            color: @black;
-            background: @dark;
+            font-weight: bold;
+            background: #fafafa;
+            margin-left: 2px;
+            float: right;
+            color: #000000 !important;
+            &:hover {
+                text-decoration: none;
+                cursor: pointer;
+                em {
+                    display: block;
+                }
+                span {
+                    background: @black;
+                    color: @white;
+                }
+            }
+            span {
+                width: 20px;
+                display: block;
+                height: 20px;
+                line-height: 20px;
+                text-align: center;
+                color: @black;
+                background: @dark;
+            }
+        }
+
+        /* Collapse component button customisation
+         */
+        a.component-control-button.collapse {
+        }
+
+        a.component-control-button.delete {
+        }
+
+        a.component-control-button.settings {
         }
     }
+
     a.active{
     	background: @lgrey;
     	em{
@@ -13044,45 +13041,3 @@ dd.dz-wrap {
 	padding-left: 4px;
 }
 
-/* Component control buttons
- */
-a.component-control-button {
-    width: 20px;
-    height: 20px;
-    top: 6px;
-    line-height: 20px;
-    text-align: center;
-    font-weight: bold;
-    position: absolute;
-    background: #fafafa;
-    color: #000000 !important;
-    &:hover {
-        text-decoration: none;
-        cursor: pointer;
-        em{
-            display: block;
-        }
-        span {
-            background: @black;
-            color: @white;
-        }
-    }
-    span {
-        width: 20px;
-        display: block;
-        height: 20px;
-        line-height: 20px;
-        text-align: center;
-        position: absolute;
-        top: 0;
-        right: 0;
-        color: @black;
-        background: @dark;
-    }
-}
-
-/* Collapse component contents
- */
-a.component-control-button.collapse {
-    right: 30px;
-}
