@@ -104,7 +104,7 @@ class TaskList {
                      * Otherwise include them all
                      */
                     if ($this->getMetadata()->getSelectedTaskIdFilter()) {
-                        if ($this->getMetadata()->getSelectedTaskIdFilter() == $currentTask->getAsssessment()->getWorkType()->getId()) {
+                        if ($this->getMetadata()->getSelectedTaskIdFilter() == $currentTask->getAssessment()->getWorkType()->getId()) {
                             $allTasks[$currentTask->getTask()->getId()] = $currentTask;
                         }
                     }
