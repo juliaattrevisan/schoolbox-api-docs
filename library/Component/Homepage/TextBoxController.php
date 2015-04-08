@@ -79,7 +79,6 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             'TEXTBOX_BODY'        => Scrub::html($this->getTextbox()->getBody()),
             'TEXTBOX_ID'          => $this->getTextbox()->getId(),
             'TEXTBOX_CATEGORY_ID' => $this->getTextbox()->getCategory()->getId(),
-
             'text_editable_block' => '',
             'modify_text_block'   => '',
             'create_text_block'   => '',
@@ -99,14 +98,14 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                     )
                 );
             } elseif ($this->sitepage->arg[1] == 'textBoxCreate') {
-                    $this->setVar(
-                        array(
+                $this->setVar(
+                    array(
                         'TEXTBOX_HEADING'     => '',
                         'TEXTBOX_BODY'        => '',
                         'TEXTBOX_ID'          => '',
                         'TEXTBOX_CATEGORY_ID' => $sourceCategory,
-                        )
-                    );
+                    )
+                );
             }
             $this->parse('text_editable_block', 'text_editable');
         } else {

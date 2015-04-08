@@ -8,87 +8,92 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_EtherpadController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_EtherpadController extends Component_Homepage_ControllerAbstract
+{
 
-	/**
-	 * The sort options made available to the dropdown
-	 *
-	 * @var array
-	 */
-	protected $sortFields = array();
+    /**
+     * The sort options made available to the dropdown
+     *
+     * @var array
+     */
+    protected $sortFields = array();
 
-	/**
-	 * Map human-friendly versions to db-friendly versions
-	 *
-	 * @var array
-	 */
-	private $sortMapping = array(
-		'Name' => 'name',
-		'Created' => 'created_at',
-		'Last Updated' => 'updated_at',
-	);
+    /**
+     * Map human-friendly versions to db-friendly versions
+     *
+     * @var array
+     */
+    private $sortMapping = array(
+        'Name'         => 'name',
+        'Created'      => 'created_at',
+        'Last Updated' => 'updated_at',
+    );
 
-	/**
-	 * Get sort key to be used in query, translated from human-friendly
-	 *
-	 * @param $key
-	 * @return string
-	 */
-	private function getSortKey($key) {
-		if (array_key_exists($key, $this->getSortMapping())) {
-			return $this->sortMapping[$key];
-		}
+    /**
+     * Get sort key to be used in query, translated from human-friendly
+     *
+     * @param $key
+     * @return string
+     */
+    private function getSortKey($key)
+    {
+        if (array_key_exists($key, $this->getSortMapping())) {
+            return $this->sortMapping[$key];
+        }
 
-		return 'name';
-	}
+        return 'name';
+    }
 
     /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
      */
-    public function execute() {
-		$this->setSortFields(array('Name', 'Created', 'Last Updated'));
+    public function execute()
+    {
+        $this->setSortFields(array('Name', 'Created', 'Last Updated'));
 
         return true;
     }
 
-	/**
-	 * Outputs HTML template defined by config variable 'template'
-	 *
-	 * @param String $templateHandle
-	 * @return bool
-	 */
-	public function renderTemplate($templateHandle) {
-		if (!parent::loadTemplate($templateHandle, 'etherpad')) {
-			return false;
-		}
+    /**
+     * Outputs HTML template defined by config variable 'template'
+     *
+     * @param String $templateHandle
+     * @return bool
+     */
+    public function renderTemplate($templateHandle)
+    {
+        if (!parent::loadTemplate($templateHandle, 'etherpad')) {
+            return false;
+        }
 
-		$this->parseConfig();
+        $this->parseConfig();
 
-		$this->setBlock($templateHandle, 'etherpad_pad', 'etherpad_pad_block');
-		$this->setBlock($templateHandle, 'etherpad_has_create', 'etherpad_has_create_block');
-		$this->setBlock('etherpad_pad', 'etherpad_has_modify', 'etherpad_has_modify_block');
+        $this->setBlock($templateHandle, 'etherpad_pad', 'etherpad_pad_block');
+        $this->setBlock($templateHandle, 'etherpad_has_create', 'etherpad_has_create_block');
+        $this->setBlock('etherpad_pad', 'etherpad_has_modify', 'etherpad_has_modify_block');
 
-		$this->setVar(array(
-			'etherpad_pad_block' => '',
-			'etherpad_has_create_block' => '',
-			'etherpad_has_modify_block' => '',
-		));
+        $this->setVar(
+            array(
+                'etherpad_pad_block'        => '',
+                'etherpad_has_create_block' => '',
+                'etherpad_has_modify_block' => '',
+            )
+        );
 
-		/* Decide which homepage to stream from
-		 */
-		if (is_numeric($this->getConfig('src'))) {
-			$homepageSource = $this->getConfig('src');
-		}
-		else {
-			$homepageSource = $this->instance->getIdentifier();
-		}
+        /* Decide which homepage to stream from
+         */
+        if (is_numeric($this->getConfig('src'))) {
+            $homepageSource = $this->getConfig('src');
+        } else {
+            $homepageSource = $this->instance->getIdentifier();
+        }
 
-		/* Find all the pads associated with this list of groups
-		 * Apply all the component powers
-		 */
-		$padMapper = new \Etherpad\PadMapper();
+        /* Find all the pads associated with this list of groups
+         * Apply all the component powers
+         */
+        $padMapper = new \Etherpad\PadMapper();
 
         $options = array(
             'order' => array(
@@ -102,71 +107,78 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
             $options['limit'] = $this->getConfig('size');
         }
 
-		$allPads = $padMapper->findByColumn('homepage_id', $homepageSource, $options);
+        $allPads = $padMapper->findByColumn('homepage_id', $homepageSource, $options);
 
-		/* Only provide Modify Document button to those with write access
-		 */
-		foreach ($allPads as $currentPad) {
-			$this->setVar(array(
-				'HOMEPAGE_ID' => $this->instance->getIdentifier(),
-				'ETHERPAD_PAD_ID' => $currentPad->getId(),
-				'ETHERPAD_NAME' => $currentPad->getDisplayName(),
-				'ETHERPAD_UPDATED_AT' => $currentPad->getUpdatedAt()->getShort(),
-			));
+        /* Only provide Modify Document button to those with write access
+         */
+        foreach ($allPads as $currentPad) {
+            $this->setVar(
+                array(
+                    'HOMEPAGE_ID'         => $this->instance->getIdentifier(),
+                    'ETHERPAD_PAD_ID'     => $currentPad->getId(),
+                    'ETHERPAD_NAME'       => $currentPad->getDisplayName(),
+                    'ETHERPAD_UPDATED_AT' => $currentPad->getUpdatedAt()->getShort(),
+                )
+            );
 
-			if ($this->permission > READ_ACCESS) {
-				$this->parse('etherpad_has_modify_block', 'etherpad_has_modify');
-			}
+            if ($this->permission > READ_ACCESS) {
+                $this->parse('etherpad_has_modify_block', 'etherpad_has_modify');
+            }
 
-			$this->parse('etherpad_pad_block', 'etherpad_pad', true);
+            $this->parse('etherpad_pad_block', 'etherpad_pad', true);
 
-			/* Clear children after parsing out the parent
-			 */
-			$this->setVar(array(
-				'etherpad_has_modify_block' => ''
-			));
-		}
+            /* Clear children after parsing out the parent
+             */
+            $this->setVar(
+                array(
+                    'etherpad_has_modify_block' => ''
+                )
+            );
+        }
 
-		/* Only provide Create Document button to those with write access
-		 */
-		if ($this->permission > READ_ACCESS) {
-			$this->parse('etherpad_has_create_block', 'etherpad_has_create');
-		}
+        /* Only provide Create Document button to those with write access
+         */
+        if ($this->permission > READ_ACCESS) {
+            $this->parse('etherpad_has_create_block', 'etherpad_has_create');
+        }
 
         /* Detroit
          */
         $this->applyCollapsedState();
 
-		return true;
+        return true;
     }
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set sort fields
-	 *
-	 * @param array $sortFields
-	 */
-	protected function setSortFields($sortFields) {
-		$this->sortFields = $sortFields;
-	}
+    /**
+     * Set sort fields
+     *
+     * @param array $sortFields
+     */
+    protected function setSortFields($sortFields)
+    {
+        $this->sortFields = $sortFields;
+    }
 
-	/**
-	 * Set sort mapping
-	 *
-	 * @param array $sortMapping
-	 */
-	private function setSortMapping($sortMapping) {
-		$this->sortMapping = $sortMapping;
-	}
+    /**
+     * Set sort mapping
+     *
+     * @param array $sortMapping
+     */
+    private function setSortMapping($sortMapping)
+    {
+        $this->sortMapping = $sortMapping;
+    }
 
-	/**
-	 * Get sort mapping
-	 *
-	 * @return array
-	 */
-	private function getSortMapping() {
-		return $this->sortMapping;
-	}
+    /**
+     * Get sort mapping
+     *
+     * @return array
+     */
+    private function getSortMapping()
+    {
+        return $this->sortMapping;
+    }
 }

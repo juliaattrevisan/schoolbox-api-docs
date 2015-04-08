@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -73,13 +74,15 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
                         $fileType = new FileType($item->enclosure->attributes()->url, $item->enclosure->attributes()->type);
 
                         if ($fileType->isAudio() || $fileType->isVideo()) {
-                            $this->setVar(array(
-                                'PODCAST_URL' => Scrub::text($item->enclosure['url']),
-                                'PODCAST_TITLE' => Scrub::text($item->title),
-                                'PODCAST_DESCRIPTION' => Scrub::html($item->description),
-                                'ON_OFF'  => ++$j % 2 ? '' : 'dark',
-                                'PODCAST_ID' => md5($item->title),
-                            ));
+                            $this->setVar(
+                                array(
+                                    'PODCAST_URL'         => Scrub::text($item->enclosure['url']),
+                                    'PODCAST_TITLE'       => Scrub::text($item->title),
+                                    'PODCAST_DESCRIPTION' => Scrub::html($item->description),
+                                    'ON_OFF'              => ++$j % 2 ? '' : 'dark',
+                                    'PODCAST_ID'          => md5($item->title),
+                                )
+                            );
 
                             $this->parse('podcast_list_block', 'podcast_list', true);
                         }

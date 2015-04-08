@@ -90,12 +90,12 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                 // These are for the Select Alternate Source resourcebrowser
                 'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
                 'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext()->getId()
-                    ? 'Local'
-                    : $this->source->getName(),
+                        ? 'Local'
+                        : $this->source->getName(),
                 'LINK_CATEGORY_ID'          => $this->source->getId(),
                 'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname')))
-                    ? $this->getConfig('componentname')
-                    : 'News',
+                        ? $this->getConfig('componentname')
+                        : 'News',
             )
         );
 

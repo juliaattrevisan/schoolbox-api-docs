@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -105,12 +106,11 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
                 }
                 if (count($this->outputList) > 1) {
                     $output = array(
-                        'AUDIO_LIST_ID' => $audio->getFile()->getId(),
-
+                        'AUDIO_LIST_ID'        => $audio->getFile()->getId(),
                         'AUDIO_LIST_TITLE'     => Scrub::text($audio->getFile()->getDescription()),
                         'AUDIO_LIST_DURATION'  => $audio->getDuration() >= 3600
-                            ? gmdate('H:i:s', $audio->getDuration())
-                            : gmdate('i:s', $audio->getDuration()),
+                                ? gmdate('H:i:s', $audio->getDuration())
+                                : gmdate('i:s', $audio->getDuration()),
                         'AUDIO_LIST_COMMENT'   => Scrub::text($audio->getFile()->getComment()),
                         'AUDIO_LIST_HIDDEN'    => $audio->getFile()->getHidden() ? 'hidden' : '',
                         'AUDIO_LIST_POSTER_ID' => $audio->getFile()->getOwner()->getId(),

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -65,11 +66,11 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
             $pixel = $this->getConfig('pixel');
         }
 
-            $this->setVar("IMAGE_ALIGN", $this->getConfig('align'));
-            $this->setVar("PREVIEW_IMAGE_URL", "/cms/image.php?id={$image['id']}&height=$pixel&width=$pixel");
-            $this->setVar("PREVIEW_IMAGE_DESC", Scrub::text($image['comment']));
+        $this->setVar("IMAGE_ALIGN", $this->getConfig('align'));
+        $this->setVar("PREVIEW_IMAGE_URL", "/cms/image.php?id={$image['id']}&height=$pixel&width=$pixel");
+        $this->setVar("PREVIEW_IMAGE_DESC", Scrub::text($image['comment']));
 
-            $url = new Url($this->getConfig('url'));
+        $url = new Url($this->getConfig('url'));
 
         if ($url->isUrl()) {
             $this->setVar("CONTENT_URL_START", "<a href=\"" . $url->getBase64EncodedRedirect() . "\" target=\"_blank\">");
@@ -78,7 +79,7 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
             $this->setVar("CONTENT_URL_START", "");
             $this->setVar("CONTENT_URL_END", "");
         }
-            $this->parse("preview_block", "previewimage");
+        $this->parse("preview_block", "previewimage");
 
 
         //setup block for submission button

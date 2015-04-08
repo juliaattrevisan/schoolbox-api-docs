@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -50,33 +51,37 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                 'css'   => '',
             ),
         );
-        $display = $this->getConfig('displayPortraits') ? $this->getConfig('displayPortraits') : 'grid';
-        $this->setVar(array(
-            'LIST_STYLE' => $displayOptions[$display]['css'],
-        ));
+        $display        = $this->getConfig('displayPortraits') ? $this->getConfig('displayPortraits') : 'grid';
+        $this->setVar(
+            array(
+                'LIST_STYLE' => $displayOptions[$display]['css'],
+            )
+        );
 
         if (($this->getContext()->getCodeString() != '') && Cfg::get('external_enable')) {
             $externalClassHandler = new External_Class();
-            $userHandler = new User();
-            $groupHandler = new Group();
+            $userHandler          = new User();
+            $groupHandler         = new Group();
 
-            $listSyns = $externalClassHandler->getTeacherName($this->getContext()->getCodeString());
+            $listSyns    = $externalClassHandler->getTeacherName($this->getContext()->getCodeString());
             $staffGroups = $groupHandler->getStaffGroupTypeIds();
 
             if (is_array($listSyns)) {
                 $j = 0;
                 foreach ($listSyns as $synid) {
                     $teacher = $userHandler->getBySynergyAndGroup($synid, $staffGroups);
-                    $meta = $userHandler->getByID($teacher['uid']);
+                    $meta    = $userHandler->getByID($teacher['uid']);
 
                     if (is_array($teacher)) {
-                        $this->setVar(array(
-                            'ON_OFF' => ++$j % 2 ? '' : 'dark',
-                            'PERSON_UID' => $teacher['uid'],
-                            'PERSON_NAME' => $teacher['firstname'] . ' ' . $teacher['lastname'],
-                            'PERSON_EXTERNAL_ID' => $synid,
-                            'PERSON_GROUP' => Scrub::text($meta['gname']),
-                        ));
+                        $this->setVar(
+                            array(
+                                'ON_OFF'             => ++$j % 2 ? '' : 'dark',
+                                'PERSON_UID'         => $teacher['uid'],
+                                'PERSON_NAME'        => $teacher['firstname'] . ' ' . $teacher['lastname'],
+                                'PERSON_EXTERNAL_ID' => $synid,
+                                'PERSON_GROUP'       => Scrub::text($meta['gname']),
+                            )
+                        );
 
                         /* Don't display images in list view
                        */

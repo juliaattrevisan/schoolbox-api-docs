@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -6,14 +7,16 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_CountdownController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_CountdownController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
 
     }
 
@@ -22,8 +25,9 @@ class Component_Homepage_CountdownController extends Component_Homepage_Controll
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'countdown')) {
+    public function renderTemplate($templateHandle)
+    {
+        if (!parent::loadTemplate($templateHandle, 'countdown')) {
             return false;
         }
         $this->parseConfig();
@@ -38,23 +42,24 @@ class Component_Homepage_CountdownController extends Component_Homepage_Controll
             $time = '00:00:00';
         }
         try {
-            $deadline = new Alaress_Date_Format(new DateTime($date.' '.$time));
-        }
-        catch (Exception $e) {
+            $deadline = new Alaress_Date_Format(new DateTime($date . ' ' . $time));
+        } catch (Exception $e) {
             // Couldn't create a date, so default to now.
             // Use +1 seconds to offset some js rendering weirdness
             // This way it initialises at 00/00/00/00/00
-            $deadline = new Alaress_Date_Format(time()+1, 'U');
+            $deadline = new Alaress_Date_Format(time() + 1, 'U');
         }
 
-        $this->setVar(array(
-            'DEADLINE_YEAR' => $deadline->getYear(),
-            'DEADLINE_MONTH' => $deadline->getMonth(),
-            'DEADLINE_DAY' => $deadline->getDay(),
-            'DEADLINE_HOUR' => $deadline->getHour(),
-            'DEADLINE_MIN' => $deadline->getMinute(),
-            'DEADLINE_SEC' => $deadline->getSecond(),
-        ));
+        $this->setVar(
+            array(
+                'DEADLINE_YEAR'  => $deadline->getYear(),
+                'DEADLINE_MONTH' => $deadline->getMonth(),
+                'DEADLINE_DAY'   => $deadline->getDay(),
+                'DEADLINE_HOUR'  => $deadline->getHour(),
+                'DEADLINE_MIN'   => $deadline->getMinute(),
+                'DEADLINE_SEC'   => $deadline->getSecond(),
+            )
+        );
 
         /* Detroit
          */

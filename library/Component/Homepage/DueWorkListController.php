@@ -34,8 +34,8 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
 
         $this->submissionList = new Collection(
             SubmissionBoxMapper::getInstance()
-            ->getUpcomingActivities(null, $this->getConfig('size'), $this->getContext()->getId())
-            ->getColumnValues('submissionBox')
+                ->getUpcomingActivities(null, $this->getConfig('size'), $this->getContext()->getId())
+                ->getColumnValues('submissionBox')
         );
     }
 

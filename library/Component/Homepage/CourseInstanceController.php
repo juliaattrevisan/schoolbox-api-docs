@@ -361,8 +361,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
     /**
      * Displays this task in the list of tasks for a unit.
      *
-     * @param Task\Instance             $task            The task that is being rendered
-     * @param UnitInstance              $unit            The unit that the task is rendered into
+     * @param Task\Instance $task The task that is being rendered
+     * @param UnitInstance $unit The unit that the task is rendered into
      * @param Task\InstanceCompletion[] $completion_list The list of completions, keyed by student
      */
     public function renderTaskInUnit(Task\Instance $task, UnitInstance $unit, $completion_list)

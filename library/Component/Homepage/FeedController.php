@@ -14,8 +14,8 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
 {
 
     /**
-    * @var Feed
-    */
+     * @var Feed
+     */
     protected $feed;
 
     /**
@@ -35,10 +35,10 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
     }
 
     /**
-    * Renders the data into the SitePage. Presentation logic.
-    * @param String $templateHandle
-    * @return boolean
-    */
+     * Renders the data into the SitePage. Presentation logic.
+     * @param String $templateHandle
+     * @return boolean
+     */
     public function renderTemplate($templateHandle)
     {
         if (!parent::loadTemplate($templateHandle, 'feed')) {
@@ -58,14 +58,16 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
         $j = 0;
         foreach ($this->feed->renderAsFeedArray() as $n) {
             $date = new Alaress_Date_Format($n['time'], 'U');
-            $this->setVar(array(
-                'EVENT_HREF'     => $n['href'],
-                'EVENT_ICON'     => $n['icon'],
-                'EVENT_BODY'     => $n['title'],
-                'EVENT_TIME'     => $date->getShort(),
-                'EVENT_LONGTIME' => $date->getLong(),
-                'EVENT_DARK'     => $j++ % 2 ? 'dark' : '',
-            ));
+            $this->setVar(
+                array(
+                    'EVENT_HREF'     => $n['href'],
+                    'EVENT_ICON'     => $n['icon'],
+                    'EVENT_BODY'     => $n['title'],
+                    'EVENT_TIME'     => $date->getShort(),
+                    'EVENT_LONGTIME' => $date->getLong(),
+                    'EVENT_DARK'     => $j++ % 2 ? 'dark' : '',
+                )
+            );
             $this->parse('event_block', 'event', true);
         }
 

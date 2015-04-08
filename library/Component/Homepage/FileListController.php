@@ -106,13 +106,13 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         $this->setVar(
             array(
                 'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname')))
-                    ? $this->getConfig('componentname')
-                    : 'Files',
+                        ? $this->getConfig('componentname')
+                        : 'Files',
                 // These are for the Select Alternate Source resourcebrowser
                 'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
                 'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext()->getId()
-                    ? 'Local'
-                    : $this->source->getName(),
+                        ? 'Local'
+                        : $this->source->getName(),
                 'FILES_CATEGORY_ID'         => $this->source->getId(),
             )
         );

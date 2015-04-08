@@ -48,10 +48,10 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
         $this->setVar('resumeLink_block', '');
         $this->setVar('assess_block', '');
 
-        $assessHandler = new Assess_Main();
+        $assessHandler  = new Assess_Main();
         $attemptHandler = new Assess_Attempt();
         $sectionHandler = new Assess_Section();
-        $userHandler = new User();
+        $userHandler    = new User();
 
         if ($this->permission >= WRITE_ACCESS) {
             $this->parse('createAssessment_block', 'createAssessment');
@@ -79,7 +79,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
 
                     /* Use an additional date if finish date not yet reached
                      */
-                    $now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+                    $now    = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
                     $finish = new \Alaress_Date_Format(strtotime($currentAssess['finish']), 'U');
 
                     $this->setVar(
@@ -107,11 +107,11 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
                         )
                     );
 
-                    $attempt = $attemptHandler->getLatestForUser($currentAssess['assess_id'], $_SESSION['id']);
-                    $attemptStartTime = strtotime($attempt['start']);
+                    $attempt              = $attemptHandler->getLatestForUser($currentAssess['assess_id'], $_SESSION['id']);
+                    $attemptStartTime     = strtotime($attempt['start']);
                     $attemptTimeRemaining = $attemptStartTime + $currentAssess['duration'] - time();
-                    $attemptEndTime = $attemptStartTime + $currentAssess['duration'];
-                    $numAttempts = 0;
+                    $attemptEndTime       = $attemptStartTime + $currentAssess['duration'];
+                    $numAttempts          = 0;
 
                     /* Tests can be undertaken if:
                      *
@@ -213,7 +213,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
                             );
                         } else {
                             $quizMapper = new \Schoolbox\Assessment\Component\OnlineAssessmentMapper();
-                            $quiz = $quizMapper->findById($currentAssess['assess_id']);
+                            $quiz       = $quizMapper->findById($currentAssess['assess_id']);
 
                             $urgency = $quiz->getGradientIndex();
 

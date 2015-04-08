@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -6,14 +7,16 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_RSSController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_RSSController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
 
     }
 
@@ -22,8 +25,9 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'rss')) {
+    public function renderTemplate($templateHandle)
+    {
+        if (!parent::loadTemplate($templateHandle, 'rss')) {
             return false;
         }
         $this->parseConfig();
@@ -38,28 +42,32 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
         $rss->stream();
 
         // Set up feed info
-        $this->setVar(array(
-            'RSS_NAME' => Scrub::text($rss->getTitle()),
-            'RSS_LINK' => $rss->getLink(),
-        ));
+        $this->setVar(
+            array(
+                'RSS_NAME' => Scrub::text($rss->getTitle()),
+                'RSS_LINK' => $rss->getLink(),
+            )
+        );
 
         $this->setVar('rss_block', '');
 
         // Process each item in feed
-        $allRss = $rss->getOutput();
+        $allRss      = $rss->getOutput();
         $compactMode = $this->getConfig('compactMode');
         if (count($allRss)) {
             $j = 0;
 
-            foreach($allRss as $currentRss) {
+            foreach ($allRss as $currentRss) {
 
-                $this->setVar(array(
-                    'ON_OFF'    => ++$j % 2 ? '' : 'dark',
-                    'RSS_TITLE' => Scrub::text($currentRss['title']),
-                    'RSS_URL'   => urlencode(base64_encode($currentRss['link'])),
-                    'RSS_BRIEF' => Scrub::html( $currentRss['content'] ? $currentRss['content'] : $currentRss['description']),
-                    'rss_brief_output_block' => '',
-                ));
+                $this->setVar(
+                    array(
+                        'ON_OFF'                 => ++$j % 2 ? '' : 'dark',
+                        'RSS_TITLE'              => Scrub::text($currentRss['title']),
+                        'RSS_URL'                => urlencode(base64_encode($currentRss['link'])),
+                        'RSS_BRIEF'              => Scrub::html($currentRss['content'] ? $currentRss['content'] : $currentRss['description']),
+                        'rss_brief_output_block' => '',
+                    )
+                );
                 if (!$compactMode) {
                     $this->parse('rss_brief_output_block', 'rss_brief_output');
                 }
@@ -69,16 +77,14 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
 
                     $this->setVar('RSS_POSTED_DATE', $postedDate->getRelativeTime());
                     $this->parse('rss_date_block', 'rss_date');
-                }
-                else {
+                } else {
                     $this->setVar('rss_date_block', '');
                 }
 
                 // Parse the rss item row
                 $this->parse('rss_block', 'rss_stories', true);
             }
-        }
-        else {
+        } else {
             $this->setVar('rss_block', '');
         }
 

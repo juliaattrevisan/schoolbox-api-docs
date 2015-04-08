@@ -12,21 +12,21 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
      * @var Group
      */
     private $groupHandler;
-    
+
     /**
      * An instance of Category
      *
      * @var \Schoolbox\Resource\Category
      */
     private $source;
-    
+
     /**
      * Category Mapper
      *
      * @var \Schoolbox\Resource\CategoryMapper
      */
     private $categoryMapper = null;
-    
+
     /**
      * Prepares data for the render function. Business logic.
      *
@@ -46,7 +46,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
 
             try {
                 $folderMapper = new \Schoolbox\Resource\CategoryMapper();
-                $folder = $folderMapper->findById($id);
+                $folder       = $folderMapper->findById($id);
 
                 $this->source = $folder;
             } catch (\Exception $e) {
@@ -78,7 +78,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
 
 
         $treeBuilder = new \Schoolbox\Resource\CategoryTreeBuilder(new \Schoolbox\Resource\CategoryMapper(), new \Schoolbox\Assessment\Course\TaskMapper(), new \Group());
-        $allFolders = $treeBuilder->buildChildNodes($this->source->getId());
+        $allFolders  = $treeBuilder->buildChildNodes($this->source->getId());
 
         $this->setVar('folders_block', '');
 
@@ -86,14 +86,14 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
             $j = 0;
 
             $this->setVar('folders_block', '');
-            
+
             foreach ($allFolders as $currentFolder) {
                 //set name
                 $output = array(
-                    'FOLDER_ID'		=> $currentFolder['id'],
-                    'FOLDER_NAME'	=> Scrub::text($currentFolder['text']),
-                    'FOLDER_ICON'	=> $currentFolder['type'] == 'homepage' ? 'house' : 'folder_blue_full',
-                    'ON_OFF'		=> ++$j % 2 ? '' : 'dark',
+                    'FOLDER_ID'   => $currentFolder['id'],
+                    'FOLDER_NAME' => Scrub::text($currentFolder['text']),
+                    'FOLDER_ICON' => $currentFolder['type'] == 'homepage' ? 'house' : 'folder_blue_full',
+                    'ON_OFF'      => ++$j % 2 ? '' : 'dark',
                 );
 
                 $this->setVar($output);
@@ -110,12 +110,14 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
             $this->setVar('folders_block', '');
         }
 
-        $this->setvar(array(
-            'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Folders',
-            'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
-            'COMPONENT_CONFIG_SRC_NAME' => $this->source->getName(),
-            'COMPONENT_HANDLE'          => strtolower($templateHandle)
-        ));
+        $this->setvar(
+            array(
+                'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Folders',
+                'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
+                'COMPONENT_CONFIG_SRC_NAME' => $this->source->getName(),
+                'COMPONENT_HANDLE'          => strtolower($templateHandle)
+            )
+        );
 
         //setup block for submission button
         $this->setVar('FOLDER_CAT_ID', $this->source->getId());

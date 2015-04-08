@@ -33,7 +33,7 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
      */
     public function execute()
     {
-        $this->group_handler  = new Group();
+        $this->group_handler = new Group();
 
         // get rubric details
         $this->criteria = CriterionMapper::getInstance()->findByColumnList(
@@ -41,7 +41,7 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
                 'parent_id'   => $this->getContext()->getId(),
                 'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
             ),
-            array('order' => array('grouping'=>'ASC', 'name'=>'ASC'))
+            array('order' => array('grouping' => 'ASC', 'name' => 'ASC'))
         );
     }
 
@@ -73,7 +73,7 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
 
         foreach ($criteriaList as $criterion_group => $criterions) {
             $this->setVar('CRITERION_GROUP', Scrub::text($criterion_group));
-            $this->setVar('DARK', ($i++%2 === 1 ? 'dark' : ''));
+            $this->setVar('DARK', ($i++ % 2 === 1 ? 'dark' : ''));
             $this->setVar('rubric_descriptor_block', '');
             foreach ($criterions as $crit) {
                 $this->setVar('CRITERION_NAME', Scrub::text($crit->getName()));

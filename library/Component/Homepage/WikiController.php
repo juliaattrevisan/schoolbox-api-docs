@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -84,9 +85,11 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
         $userHandler = new User();
 
         // Set up component name
-        $this->setVar(array(
-            'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Wiki',
-        ));
+        $this->setVar(
+            array(
+                'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Wiki',
+            )
+        );
 
         /* Prevent multiple blog entries from other categories stacking up in the wrong place
         * and initialise empty wiki roll by default
@@ -95,9 +98,11 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
 
         $wikiList = $wikiHandler->getByCategory($this->source->getId(), strtolower($this->getConfig('sort')), $this->getConfig('sortdir'), $this->getConfig('size'));
 
-        $this->setVar(array(
-            'WIKI_CATEGORY_ID' => $this->source->getId()
-        ));
+        $this->setVar(
+            array(
+                'WIKI_CATEGORY_ID' => $this->source->getId()
+            )
+        );
 
         // Controls such as Post News
         if ($this->permission < WRITE_ACCESS) {
@@ -112,16 +117,18 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
             foreach ($wikiList as $wiki) {
                 $modifiedTime = new Alaress_Date_Format($wiki['modified'], 'U');
 
-                $this->setVar(array(
-                    'WIKI_ID' => $wiki['wikiID'],
-                    'WIKI_CATEGORYID' => $wiki['categoryID'],
-                    'WIKI_SLUG' => $wiki['slug'],
-                    'WIKI_HEADING' => Scrub::text($wiki['heading']),
-                    'WIKI_AUTHOR' => $userHandler->formatName($wiki),
-                    'WIKI_AUTHOR_ID' => $wiki['userID'],
-                    'WIKI_MODIFIED' => $modifiedTime->getRelativeTime(),
-                    'ON_OFF' => ++$j % 2 ? '' : 'dark',
-                ));
+                $this->setVar(
+                    array(
+                        'WIKI_ID'         => $wiki['wikiID'],
+                        'WIKI_CATEGORYID' => $wiki['categoryID'],
+                        'WIKI_SLUG'       => $wiki['slug'],
+                        'WIKI_HEADING'    => Scrub::text($wiki['heading']),
+                        'WIKI_AUTHOR'     => $userHandler->formatName($wiki),
+                        'WIKI_AUTHOR_ID'  => $wiki['userID'],
+                        'WIKI_MODIFIED'   => $modifiedTime->getRelativeTime(),
+                        'ON_OFF'          => ++$j % 2 ? '' : 'dark',
+                    )
+                );
 
                 if ($this->getConfig('compactMode')) {
                     $this->setVar('compact_hide_block', '');
@@ -129,9 +136,11 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
                     $this->parse('compact_hide_block', 'compact_hide');
                 }
 
-                $this->setVar(array(
-                    'modify_wiki_block' => ''
-                ));
+                $this->setVar(
+                    array(
+                        'modify_wiki_block' => ''
+                    )
+                );
 
                 if (($this->permission >= READ_ACCESS && $wiki['locked'] == 'false') || $this->permission >= WRITE_ACCESS) {
                     $this->parse('modify_wiki_block', 'modify_wiki');

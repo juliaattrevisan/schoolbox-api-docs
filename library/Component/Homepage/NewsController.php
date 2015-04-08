@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -41,7 +42,7 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
     public function execute()
     {
         $this->groupHandler = new Group();
-        $this->newsHandler = new CategoryNews();
+        $this->newsHandler  = new CategoryNews();
         $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
 
         $this->source = $this->getContext();
@@ -81,13 +82,13 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
          */
         $this->setVar(
             array(
-                'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig(
-                    'componentname'
-                ) : 'News',
+                'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig(
+                        'componentname'
+                    ) : 'News',
                 // These are for the Select Alternate Source resourcebrowser
-                'COMPONENT_CONFIG_SRC_ID' => $this->source->getId(),
+                'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
                 'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext()->getId() ? 'Local' : $this->source->getName(),
-                'NEWS_CATEGORY_ID' => $this->source->getId(),
+                'NEWS_CATEGORY_ID'          => $this->source->getId(),
             )
         );
 
@@ -148,17 +149,17 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
 
                 $this->setVar(
                     array(
-                        "NEWS_ID" => $news['id'],
-                        "NEWS_HEADING" => Scrub::text($news['heading']),
-                        "NEWS_BODY" => Scrub::html($news['body']),
-                        "EMAIL_CONTACT" => "<a href=\"/search/user/{$news['uid']}\">"
+                        "NEWS_ID"            => $news['id'],
+                        "NEWS_HEADING"       => Scrub::text($news['heading']),
+                        "NEWS_BODY"          => Scrub::html($news['body']),
+                        "EMAIL_CONTACT"      => "<a href=\"/search/user/{$news['uid']}\">"
                             . $userHandler->formatName($news)
                             . "</a>",
-                        "AUTHOR" => $userHandler->formatName($news),
-                        "AUTHOR_ID" => $news['uid'],
+                        "AUTHOR"             => $userHandler->formatName($news),
+                        "AUTHOR_ID"          => $news['uid'],
                         "AUTHOR_EXTERNAL_ID" => $news['synid'],
-                        "POSTED_DATE" => $postedTime->getRelativeTime(),
-                        'ON_OFF' => ++$j % 2 ? '' : 'dark'
+                        "POSTED_DATE"        => $postedTime->getRelativeTime(),
+                        'ON_OFF'             => ++$j % 2 ? '' : 'dark'
                     )
                 );
 

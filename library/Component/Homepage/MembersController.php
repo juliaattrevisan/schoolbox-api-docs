@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -55,21 +56,23 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
         );
 
         $display = $this->getConfig('displayPortraits') ? $this->getConfig('displayPortraits') : 'grid';
-        $this->setVar(array(
-            'LIST_STYLE' => $displayOptions[$display]['css'],
-        ));
+        $this->setVar(
+            array(
+                'LIST_STYLE' => $displayOptions[$display]['css'],
+            )
+        );
 
         $userHandler = new User;
-        $userList = $userHandler->getAllInCategory($this->getContext()->getId());
-        $emailObj = new Email();
+        $userList    = $userHandler->getAllInCategory($this->getContext()->getId());
+        $emailObj    = new Email();
 
         $emailall = array();
         if (is_array($userList)) {
             $j = 0;
             foreach ($userList as $user) {
-                $name = $userHandler->formatName($user);
+                $name  = $userHandler->formatName($user);
                 $email = $emailObj->formatEmailFromArray($user);
-                $meta = $userHandler->getByID($user['uid']);
+                $meta  = $userHandler->getByID($user['uid']);
 
                 if ($user['type'] == 3) {
                     $name .= " (Group Admin.)";
@@ -79,14 +82,16 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                     $emailall[] = $email;
                 }
 
-                $this->setVar(array(
-                    'ON_OFF' => ++$j % 2 ? '' : 'dark',
-                    'PERSON_UID' => $user['uid'],
-                    'PERSON_NAME' => $name,
-                    'PERSON_EXTERNAL_ID' => $user['synergy_id'],
-                    'PERSON_GROUP' => Scrub::text($meta['gname']),
-                    'LIST_STYLE' => $displayOptions[$display]['css'],
-                ));
+                $this->setVar(
+                    array(
+                        'ON_OFF'             => ++$j % 2 ? '' : 'dark',
+                        'PERSON_UID'         => $user['uid'],
+                        'PERSON_NAME'        => $name,
+                        'PERSON_EXTERNAL_ID' => $user['synergy_id'],
+                        'PERSON_GROUP'       => Scrub::text($meta['gname']),
+                        'LIST_STYLE'         => $displayOptions[$display]['css'],
+                    )
+                );
 
                 /* Don't display images in list view
 			   */
@@ -113,9 +118,11 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             if (\Cfg::get('mail_enable')) {
                 $this->parse("member_email_block", "member_email");
             } else {
-                $this->setVar(array(
-                    'member_email_block' => ''
-                ));
+                $this->setVar(
+                    array(
+                        'member_email_block' => ''
+                    )
+                );
             }
         } else {
             $this->setVar('member_email_block', '');

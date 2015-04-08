@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -54,14 +55,14 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
          */
         $displayOptions = array(
             'grid' => array(
-                'name' => 'Grid',
+                'name'  => 'Grid',
                 'value' => 'grid',
-                'css' => 'grid',
+                'css'   => 'grid',
             ),
             'list' => array(
-                'name' => 'List',
+                'name'  => 'List',
                 'value' => 'list',
-                'css' => '',
+                'css'   => '',
             ),
         );
 
@@ -74,9 +75,9 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
         /* Get all the students belonging to this category code
          */
         $externalClassHandler = new External_Class();
-        $allStudents = $externalClassHandler->getStudents($this->getContext()->getCodeString());
+        $allStudents          = $externalClassHandler->getStudents($this->getContext()->getCodeString());
 
-        $userHandler = new User();
+        $userHandler  = new User();
         $emailHandler = new Email();
 
         $allStudentEmails = array();
@@ -89,7 +90,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                 /* Get the schoolbox user and process it if it exists
                    */
                 if (is_array($user)) {
-                    $name = $userHandler->formatName($user);
+                    $name  = $userHandler->formatName($user);
                     $email = $emailHandler->formatEmailFromArray($user);
 
                     /* Accumulate this for a giant parent-based bcc
@@ -104,11 +105,11 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
                     $this->setVar(
                         array(
-                            'ON_OFF' => ++$j % 2 ? '' : 'dark',
-                            'PERSON_UID' => $user['uid'],
+                            'ON_OFF'             => ++$j % 2 ? '' : 'dark',
+                            'PERSON_UID'         => $user['uid'],
                             'PERSON_EXTERNAL_ID' => $user['synergy_id'],
-                            'PERSON_NAME' => $name,
-                            'PERSON_GROUP' => Scrub::text($user['gname']),
+                            'PERSON_NAME'        => $name,
+                            'PERSON_GROUP'       => Scrub::text($user['gname']),
                         )
                     );
 
@@ -138,7 +139,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             if ($this->permission > READ_ACCESS && \Cfg::get('mail_enable')) {
                 $this->setVar(
                     array(
-                        'REPLY_TO' => $emailHandler->formatEmailFromArray($_SESSION),
+                        'REPLY_TO'           => $emailHandler->formatEmailFromArray($_SESSION),
                         'EMAIL_ALL_STUDENTS' => $emailAllStudents,
                     )
                 );
@@ -156,7 +157,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                 && \Cfg::get('mail_enable')
             ) {
                 $externalHandler = new External_User();
-                $allParents = $externalHandler->getParentEmails($synergyIds);
+                $allParents      = $externalHandler->getParentEmails($synergyIds);
 
                 /* Uniquify emails
 				*/
@@ -164,7 +165,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
                 $this->setVar(
                     array(
-                        'REPLY_TO' => $emailHandler->formatEmailFromArray($_SESSION),
+                        'REPLY_TO'          => $emailHandler->formatEmailFromArray($_SESSION),
                         'EMAIL_ALL_PARENTS' => $emailAllParents,
                     )
                 );

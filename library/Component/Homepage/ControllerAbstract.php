@@ -51,32 +51,36 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
      *
      * @return string
      */
-    protected function getDefaultCollapsedState() {
+    protected function getDefaultCollapsedState()
+    {
         if ($this->getConfig('collapse')) {
             return array(
                 'title' => '(collapsed)',
                 'class' => 'hide',
-                'data' => 'collapsed'
+                'data'  => 'collapsed'
             );
         }
 
         return array(
             'title' => '',
             'class' => '',
-            'data' => 'uncollapsed'
+            'data'  => 'uncollapsed'
         );
     }
 
     /**
      * Apply current collapsed state setting
      */
-    protected function applyCollapsedState() {
+    protected function applyCollapsedState()
+    {
         $state = $this->getDefaultCollapsedState();
 
-        $this->setVar(array(
-            'CONFIG_COLLAPSED_TITLE' => $state['title'],
-            'CONFIG_COLLAPSED_CLASS' => $state['class'],
-            'CONFIG_COLLAPSED_STATE' => $state['data'],
-        ));
+        $this->setVar(
+            array(
+                'CONFIG_COLLAPSED_TITLE' => $state['title'],
+                'CONFIG_COLLAPSED_CLASS' => $state['class'],
+                'CONFIG_COLLAPSED_STATE' => $state['data'],
+            )
+        );
     }
 }

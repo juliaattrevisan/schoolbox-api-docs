@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -41,7 +42,7 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
     public function execute()
     {
         $this->groupHandler = new Group();
-        $this->fileHandler = new File();
+        $this->fileHandler  = new File();
         $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
 
         $this->source = $this->getContext();
@@ -78,14 +79,16 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         // Make sure there a config option
         $pixel = $this->getConfig('pixel') ? $this->getConfig('pixel') : 200;
 
-        $this->setVar(array(
-            'COMPONENT_ALIGN' => $this->getConfig('align'),
-            'COMPONENT_PIXEL' => $pixel,
-            'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getConfig('timing') ? $this->getConfig(
-                'timing'
-            ) * 1000 : '2000',
-            'COMPONENT_CONFIG_RANDOM_STARTING_SLIDE' => $this->getConfig('randomStartingSlide')
-        ));
+        $this->setVar(
+            array(
+                'COMPONENT_ALIGN'                        => $this->getConfig('align'),
+                'COMPONENT_PIXEL'                        => $pixel,
+                'COMPONENT_CONFIG_TIMING_VALUE_MS'       => $this->getConfig('timing') ? $this->getConfig(
+                            'timing'
+                        ) * 1000 : '2000',
+                'COMPONENT_CONFIG_RANDOM_STARTING_SLIDE' => $this->getConfig('randomStartingSlide')
+            )
+        );
 
         // Set up component name
         $this->setVar(
@@ -115,8 +118,8 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         foreach ($allFiles as $currentFile) {
             $this->setVar(
                 array(
-                    'IMAGE_ID' => $currentFile->getId(),
-                    'IMAGE_NAME' => $currentFile->getDescription(),
+                    'IMAGE_ID'        => $currentFile->getId(),
+                    'IMAGE_NAME'      => $currentFile->getDescription(),
                     'IMAGE_DIMENSION' => $pixel
                 )
             );

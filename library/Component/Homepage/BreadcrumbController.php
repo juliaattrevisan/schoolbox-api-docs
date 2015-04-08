@@ -53,7 +53,7 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
         if (!parent::loadTemplate($templateHandle, 'breadcrumb')) {
             return false;
         }
-        
+
         $this->parseConfig();
 
         $this->setBlock($templateHandle, 'category_breadcrumb', 'category_breadcrumb_block');

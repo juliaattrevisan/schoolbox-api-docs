@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -96,15 +97,19 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
         /* Prevent multiple galleries from other categories stacking up in the wrong place
          * and initialise empty gallery by default
          */
-        $this->setVar(array(
-            'image_gallery_block' => ''
-        ));
+        $this->setVar(
+            array(
+                'image_gallery_block' => ''
+            )
+        );
 
         // Controls such as Post News
         if ($this->permission < WRITE_ACCESS) {
-            $this->setVar(array(
-                'submit_image_block' => ''
-            ));
+            $this->setVar(
+                array(
+                    'submit_image_block' => ''
+                )
+            );
         } else {
             $this->parse('submit_image_block', 'submit_image');
         }
@@ -113,22 +118,26 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
          *
          * Have update form point to the gallery's homepage, not this page (if this is from an alt source)
          */
-        $this->setVar(array(
-            'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Image Gallery',
-            'IMAGEGALLERY_CATEGORY_ID' => $this->getSource()->getId()
-        ));
+        $this->setVar(
+            array(
+                'COMPONENT_NAME'           => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Image Gallery',
+                'IMAGEGALLERY_CATEGORY_ID' => $this->getSource()->getId()
+            )
+        );
 
         // Load images for the requested homepage
         $allImages = $this->getCategoryMapper()->findImages($this->getSource(), $limit, true);
 
         // Iterate
         foreach ($allImages as $currentImage) {
-            $this->setVar(array(
-                'THUMBNAIL_ID' => $currentImage->getId(),
-                'THUMBNAIL_DESCRIPTION' => $currentImage->getDescription(),
-                'THUMBNAIL_SIZE' =>	Cfg::get('thumbnail_size'),
-                'IMAGE_HEIGHT' => Cfg::get('thumbnail_size'),
-            ));
+            $this->setVar(
+                array(
+                    'THUMBNAIL_ID'          => $currentImage->getId(),
+                    'THUMBNAIL_DESCRIPTION' => $currentImage->getDescription(),
+                    'THUMBNAIL_SIZE'        => Cfg::get('thumbnail_size'),
+                    'IMAGE_HEIGHT'          => Cfg::get('thumbnail_size'),
+                )
+            );
 
             $this->parse('image_gallery_block', 'image_gallery', true);
         }

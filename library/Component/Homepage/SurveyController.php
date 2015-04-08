@@ -52,10 +52,10 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
         $this->setVar('resumeLink_block', '');
         $this->setVar('reviewLink_block', '');
 
-        $surveyHandler = new Survey_Main();
+        $surveyHandler  = new Survey_Main();
         $attemptHandler = new Survey_Attempt();
         $sectionHandler = new Survey_Section();
-        $userHandler = new User();
+        $userHandler    = new User();
 
         $allSurveys = $surveyHandler->getList($this->getContext()->getId());
 
@@ -96,10 +96,10 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
 					 *
 					 * Set up Attempt vars
 					 */
-                    $attempt = $attemptHandler->getLatestForUser($currentSurvey['assess_id'], $_SESSION['id']);
-                    $attemptStartTime = strtotime($attempt['start']);
+                    $attempt              = $attemptHandler->getLatestForUser($currentSurvey['assess_id'], $_SESSION['id']);
+                    $attemptStartTime     = strtotime($attempt['start']);
                     $attemptTimeRemaining = $attemptStartTime + $currentSurvey['duration'] - time();
-                    $attemptEndTime = $attemptStartTime + $currentSurvey['duration'];
+                    $attemptEndTime       = $attemptStartTime + $currentSurvey['duration'];
 
                     /* Tests can be undertaken if:
                   	 *
@@ -109,7 +109,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
 	                 * 4. You aren't the owner of the test
                    	 */
                     if (is_array($attempt)) {
-                        $numAttempts = $attemptHandler->userHasAttempted($currentSurvey['assess_id'], $_SESSION['id']);
+                        $numAttempts  = $attemptHandler->userHasAttempted($currentSurvey['assess_id'], $_SESSION['id']);
                         $firstSection = $sectionHandler->getFirst($currentSurvey['assess_id']);
 
                         // If the last assess is not completed provide resume link

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -38,7 +39,7 @@ class Component_Homepage_DutiesController extends Component_Homepage_ControllerA
         $dutyHandler = new Duty;
 
         $dutyList = $dutyHandler->getAllInCategory($this->getContext()->getId());
-        $this->setVar("DATE", 'Duties for '.date('l, jS \of F Y'));
+        $this->setVar("DATE", 'Duties for ' . date('l, jS \of F Y'));
 
         $block = false;
         if (is_array($dutyList)) {
