@@ -21,6 +21,7 @@ class Event extends DayEvent implements EventInterface {
     protected $renderClasses = array(   'javascript'    => Renderer\Javascript::class,
                                         'html'          => Renderer\Html::class,
                                         'vcal'          => Renderer\VObject::class,
+                                        'csv'           => Renderer\Csv::class,
     );
 
     /**

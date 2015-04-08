@@ -12,6 +12,7 @@
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 use Calendar\Event\Collection\Exporter;
+use Calendar\Event\Collection\CSVExporter;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -21,7 +22,7 @@ try {
     $token = $_GET['token'];
     $export_type = $_GET['export'];
     $api = null;
-    $filename = 'calendar.ics';
+    $filename = 'calendar';
     if (empty($token)) {
         throw new Exception_Schoolbox('No token provided', 401);
     }
@@ -41,7 +42,7 @@ try {
     switch ($export_type) {
         case 'personal':
             $api = new Calendar_Api_EventType_Event_Schoolbox_Personal($user, array());
-            $filename = 'personal.ics';
+            $filename = 'personal';
             break;
 
         case 'group':
@@ -52,7 +53,7 @@ try {
             } else {
                 throw new Exception_Schoolbox('A group ID must be provided', 400);
             }
-            $filename = sprintf('group%d.ics', $export_id);
+            $filename = sprintf('group%d', $export_id);
             break;
 
         case 'campus':
@@ -63,12 +64,12 @@ try {
             } else {
                 throw new Exception_Schoolbox('A campus ID must be provided', 400);
             }
-            $filename = sprintf('campus%d.ics', $export_id);
+            $filename = sprintf('campus%d', $export_id);
             break;
 
         case 'duework':
             $api = new Calendar_Api_EventType_Submission_Schoolbox_Default($user, array());
-            $filename = 'duework.ics';
+            $filename = 'duework';
             break;
 
         case 'all':
@@ -85,20 +86,35 @@ try {
             break;
     }
 
-    //
-    // API should always be a Calendar_Api_EventType_Interface object, no need
-    // to check.
-    $exporter = new Exporter(
-        $api,
-        $_SERVER['REQUEST_TIME'],
-        strtotime('+6 months', $_SERVER['REQUEST_TIME']),
-        $user,
-        new SitePage(false)
-    );
-    // for IE8
-//	header('Cache-Control: private');
-//	header('Content-Type: text/calendar; charset=utf-8');
-//	header('Content-Disposition: inline; filename='.$filename);
+
+    if($_GET['format'] == 'csv') {
+
+        header('Cache-Control: private');
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: filename='.$filename.'.csv');
+
+        $exporter = new CSVExporter(
+            $api,
+            $_SERVER['REQUEST_TIME'],
+            strtotime('+6 months', $_SERVER['REQUEST_TIME']),
+            $user,
+            new SitePage(false)
+        );
+    }
+    else {
+        header('Cache-Control: private');
+        header('Content-Type: text/calendar; charset=utf-8');
+        header('Content-Disposition: filename='.$filename.'.ics');
+
+        $exporter = new Exporter(
+            $api,
+            $_SERVER['REQUEST_TIME'],
+            strtotime('+6 months', $_SERVER['REQUEST_TIME']),
+            $user,
+            new SitePage(false)
+        );
+    }
+
     $exporter->renderAll();
 } catch (Exception_Schoolbox $e) {
     //
