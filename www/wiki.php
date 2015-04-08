@@ -130,7 +130,8 @@ else if (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
 
         $this->setVar(array(
             'WIKI_CATEGORYID' => $this->arg[0],
-            'WIKI_SLUG' => $this->arg[1]
+            'WIKI_SLUG' => $this->arg[1],
+            'WIKI_COMPONENT_ID' => 0,
         ));
     } /* Otherwise load it
 	 */
