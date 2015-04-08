@@ -216,8 +216,11 @@ else {
 
     // Curriculum codes: by default use the ones that are part of the folder
     $this->setVar(
-        'CURRICULUM_CODE_LIST',
-        json_encode($category->getCurriculumNodes())
+        'CURRICULUM_CODE_INPUT',
+        $this->getTwig()->render(
+            'sub/curriculumCodeSelector.twig',
+            ['codeList' => $category->getCurriculumNodes()]
+        )
     );
 
     /* Render starting times

@@ -162,7 +162,10 @@ else {
         'ALLOW_RESIT_CHECKED'     => $assessment->getMaxAttempts() == 1 ? 'checked=\'checked\'' : '',
         'ASSESS_DURATION_CHECKED' => $assessment->getDuration() >= 0 ? 'checked=\'checked\'' : '',
         'ASSESS_COMPLETION_MESSAGE' => Scrub::text($assessment->getCompletionMessage()),
-        'CURRICULUM_CODE_LIST'    => json_encode($assessment->getCurriculumNodes()),
+        'CURRICULUM_CODE_INPUT'   => $this->getTwig()->render(
+            'sub/curriculumCodeSelector.twig',
+            ['codeList' => $assessment->getCurriculumNodes()]
+        ),
     ));
 
     /* Render starting times
