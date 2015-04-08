@@ -11,7 +11,7 @@
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
 use Calendar\Event\Collection;
-use Calendar\Event\Type\Day\Event;
+use Calendar\Event\Type\Timetable\Event;
 
 
 class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api_EventType_Abstract

@@ -1,7 +1,7 @@
 <?php
 use Schoolbox\Resource\Folder\Model as CategoryModel;
 use Calendar\Event\Collection;
-use Calendar\Event\Type\Day\Event;
+use Calendar\Event\Type\Timetable\Event;
 
 
 /**

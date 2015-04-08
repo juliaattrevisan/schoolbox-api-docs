@@ -1,0 +1,24 @@
+<li class="{{ event.getEventClasses() }} {% if renderer.isTranslucent() %}translucent{% endif %}">
+    <span class="eventListing">
+        <strong>{{ event.getEventSpan()|raw }}</strong>
+        <span style="background-color:{{ event.colour }}">{{ event.title }}
+            {% if event.attendance %}
+            <span class="float-right">A</span>
+            {% endif %}
+        </span>
+    </span>
+
+    <div class="hidden-fields clearfix">
+        <h3>{{ event.title }}</h3>
+        <h4>
+            {% if event.eventType %}
+            {{ event.eventType }}:
+            {% endif %}
+            {{ event.getFullDate()|raw }}</h4>
+        <em>{{ event.location }}</em>
+        <div>
+            <a class="btn float-right" href="/homepage/{{ event.categoryId }}"><span></span>Go to homepage</a>
+        </div>
+    </div>
+
+</li>

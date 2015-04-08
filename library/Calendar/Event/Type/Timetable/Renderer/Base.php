@@ -1,0 +1,17 @@
+<?php
+/**
+ * This is the base renderer for day events,
+ * it provides support functions for determining how to render a day event
+ *
+ * @author      James Leckie <jleckie@alaress.com.au>
+ * @copyright   Copyright 2015, Alaress Pty Ltd
+ */
+
+namespace Calendar\Event\Type\Timetable\Renderer;
+
+use \Calendar\Event\Type\RendererBase;
+
+class Base extends RendererBase
+{
+
+} 
