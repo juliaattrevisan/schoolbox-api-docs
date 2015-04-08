@@ -15,14 +15,6 @@ use Schoolbox\User;
 
 class Lister extends Renderer
 {
-
-    /**
-     * User
-     *
-     * @var \Schoolbox\User
-     */
-    private $user = null;
-
     /**
      * Constructor
      *
@@ -39,7 +31,7 @@ class Lister extends Renderer
         /* Detonate multi-day events into their individual day ingredients
          * Merje and sort
          */
-        $this->setAllEvents($this->detonate($this->getAllEvents()));
+        $this->setAllEvents($this->detonate());
         $this->getAllEvents()->sort();
     }
 
@@ -57,80 +49,48 @@ class Lister extends Renderer
      */
     private function detonate()
     {
-        $collection = new Collection();
+        $startTime = new \Alaress_Date_Format($this->getStartTimestamp(), 'U');
+        $endTime = new \Alaress_Date_Format($this->getEndTimestamp(), 'U');
+
+        $newCollection = new Collection;
 
         foreach ($this->getAllEvents() as $currentEvent) {
+            if ($currentEvent->getStartTime()->getDatabaseDate() != $currentEvent->getEndTime()->getDatabaseDate()) {
 
-            /* Same-day event, just throw it into the pile
-             */
-            if ($currentEvent->getStartTime()->getDatabaseDate() == $currentEvent->getEndTime()->getDatabaseDate()) {
-                $collection->add($currentEvent);
-            } /* Otherwise, multi-day event - detonate it
-             */
-            else {
+                // Event is multiday so add clones for each day in our timespan
 
-                /* Special note to Renderer class
-                 * Alter the end date of the first instance, so it doesn't
-                 * display the end time at the start of the span
-                 */
-                $currentEvent->setCustom(
-                    array(
-                        'hideEnd' => true
-                    )
-                );
+                if($currentEvent->getStartTime()->gt($startTime)) {
+                    $eventStartTime = clone $currentEvent->getStartTime();
+                }
+                else {
+                    $eventStartTime = clone $startTime;
+                }
 
-                $collection->add($currentEvent);
+                if($currentEvent->getEndTime()->lt($endTime)) {
+                    $eventEndTime = clone $currentEvent->getEndTime();
+                }
+                else {
+                    $eventEndTime = clone $endTime;
+                }
 
-                /* Independence Day!
-                 * Free clones from their imperial counterparts
-                 */
-                $clone      = clone($currentEvent);
-                $cloneStart = new \Alaress_Date_Format($currentEvent->getStartTime()->getUnixTimestamp(), 'U');
-                $clone->setStartTime($cloneStart);
+                for($i=0; $eventStartTime->lt($eventEndTime); $i++)  {
+                    $clone      = clone($currentEvent);
+                    $clone->setStartTime(clone $eventStartTime);
+                    $clone->setEndTime(clone $eventStartTime);
 
-                /* Add each detonated instance into collection
-                 */
-                while ($clone->getStartTime()->addDays(1)->getDatabaseDate() < $currentEvent->getEndTime()->getDatabaseDate()) {
-
-                    /* Set all-day flag for the clones
-                     */
                     $clone->setAllDay(true);
-                    $collection->add($clone);
 
-                    /* Self replicate, self independence
-                     */
-                    $clone = clone($clone);
-                    $clone->setStartTime(new \Alaress_Date_Format($clone->getStartTime()->getUnixTimestamp(), 'U'));
+                    $newCollection->add($clone);
+
+                    //Increment day counter
+                    $eventStartTime->addDays(1);
                 }
-
-                /* This is the day on which start matches end.
-                 * Display datetime in a special way
-                 */
-                $startDate = $clone->getStartTime()->getDatabaseDate();
-                $startTime = $currentEvent->getStartTime()->getDatabaseTime();
-
-                $clone = clone($clone);
-
-                /* Reset AllDay status conditionally
-                 */
-                if (!$currentEvent->getAllDay()) {
-                    $clone->setAllDay(false);
-                }
-
-                $clone->setStartTime(new \Alaress_Date_Format("{$startDate} {$startTime}", 'Y-m-d H:i:s'));
-
-                /* Special note to Renderer class
-                 */
-                $clone->setCustom(
-                    array(
-                        'hideStart' => true
-                    )
-                );
-
-                $collection->add($clone);
+            }
+            else {
+                $newCollection->add($currentEvent);
             }
         }
 
-        return $collection;
+        return $newCollection;
     }
 }

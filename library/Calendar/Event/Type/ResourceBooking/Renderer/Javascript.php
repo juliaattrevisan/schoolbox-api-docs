@@ -21,7 +21,6 @@ class Javascript extends Base
     /**
      * Renders an event
      *
-     * @param Calendar_Event_Type_ResourceBooking $this->getEvent()
      */
     public function render()
     {

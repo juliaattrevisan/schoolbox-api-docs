@@ -199,7 +199,7 @@ interface EventInterface
      *
      * @return bool
      */
-    public function getIsEditable();
+    public function isEditable();
 
     /**
      * Set connector id

@@ -34,7 +34,7 @@ class Javascript extends Base
 
                 /* Anyone with write access can approve attendance
                  */
-                if ($this->event->getIsEditable()) {
+                if ($this->event->isEditable()) {
                     $hasListButton = true;
                 }
 
@@ -73,7 +73,7 @@ class Javascript extends Base
 
                 /* Whether you can edit this event or not
                  */
-                'editable'  => $this->event->getIsEditable(),
+                'editable'  => $this->event->isEditable(),
 
                 /* Whether it's an all-day event or not
                  * If allDay is true, then you can't resize it

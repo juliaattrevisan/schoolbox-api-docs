@@ -27,7 +27,7 @@ class Javascript extends Base
     {
         /* Modify link. Should be templated...
          */
-        if ($this->getEvent()->getIsEditable() && ($this->getEvent()->getEventId() > -1)) {
+        if ($this->getEvent()->isEditable() && ($this->getEvent()->getEventId() > -1)) {
             $editable = true;
         } else {
             $editable = false;

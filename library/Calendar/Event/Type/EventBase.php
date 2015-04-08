@@ -498,7 +498,7 @@ abstract class EventBase implements EventInterface
      *
      * @return bool
      */
-    public function getIsEditable()
+    public function isEditable()
     {
         return $this->isEditable;
     }
@@ -559,5 +559,14 @@ abstract class EventBase implements EventInterface
         return $this->publishDate;
     }
 
+    /**
+     * Cloning magic, when expanding multiday events we use clone, this ensures they have independent dates
+     */
+    public function __clone() {
+        $this->startTime =  clone $this->startTime;
+        $this->endTime = clone $this->endTime;
+        $this->publishDate = clone $this->publishDate;
+
+    }
 
 }
