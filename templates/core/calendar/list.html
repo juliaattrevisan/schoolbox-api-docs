@@ -2,6 +2,7 @@
 <script type="text/javascript" src="/calendar/js/jquery.filterSelector.js"></script>
 <script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectAll.js"></script>
+<script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
 <script type="text/javascript">
 	$(function() {
 
@@ -73,6 +74,13 @@
 		//
 		// Form listener for exporter - brings up a dialog box that offers a URL
 		// to click.
+        $('#download-calendar-export').click(function(event) {
+            event.preventDefault();
+            var form = $(event.target).closest('form');
+            window.location = $.getExportCalendarLink('{USER_TOKEN}', form.serializeArray())+'&format=csv';
+        });
+
+
 		$('#calendar-export form').submit(function(event) {
 			event.preventDefault();
 			var form = $(this);
@@ -85,6 +93,9 @@
 				modal: true
 			});
 		});
+
+        //Copy and paste button
+        var client = new ZeroClipboard($('#copy-button'));
 
 		$('.filter-cat.sources').selectAll({
 			key: 'selectallsources',
@@ -165,20 +176,20 @@
 							</select>
 						</label>
 					</div>
-					<input type="submit" value="Generate URL" class="btn submit-btn-plain" />
+					<input type="submit" id="open-calendar-export-dialog" value="Generate URL" class="btn submit-btn-plain" />
+                    <input type="submit" id="download-calendar-export" value="Download CSV" class="btn submit-btn-plain" />
 				</form>
 			</div>
 		</div>
 	</div>
 </div>
 <div id="calendar-export-dialog">
-	<div id="calendar-export-dialog-text">
-		Use the following URL as the source for your feed.
-	</div>
-	<textarea readonly id="calendar-export-dialog-url"></textarea>
+    <div id="calendar-export-dialog-text">
+        Use the following address to subscribe your favourite calendar application to a live feed.
+    </div>
+    <textarea readonly id="calendar-export-dialog-url" rows="6"></textarea>
+    <button class="btn no-icon" id="copy-button" data-clipboard-target="calendar-export-dialog-url" title="Click to copy me.">Copy to Clipboard</button>
 </div>
-<div class="clearfix"></div>
-
 <div id="calendar-list" class='printEventList' data-eventlist="true">
 	<div class="calendar-controls">
 		<div class="link-case">

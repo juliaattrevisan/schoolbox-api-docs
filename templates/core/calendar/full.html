@@ -403,6 +403,13 @@
             }
         })
 
+
+        $('#download-calendar-export').click(function(event) {
+            event.preventDefault();
+            var form = $(event.target).closest('form');
+            window.location = $.getExportCalendarLink('{USER_TOKEN}', form.serializeArray())+'&format=csv';
+        });
+
         //
         // Form listener for exporter - brings up a dialog box that offers a URL
         // to click.
@@ -692,7 +699,8 @@
 							</select>
 						</label>
 					</div>
-					<input type="submit" value="Generate URL" class="btn submit-btn-plain" />
+                    <input type="submit" id="open-calendar-export-dialog" value="Generate URL" class="btn submit-btn-plain" />
+                    <input type="submit" id="download-calendar-export" value="Download CSV" class="btn submit-btn-plain" />
 				</form>
 			</div>
 		</div>
