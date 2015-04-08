@@ -8,7 +8,10 @@
 <script type="text/javascript" src="/learninganalytics/js/schoolboxTheme.js"></script>
 <script type="text/javascript">
     $(function () {
-        $('#container').addClass('foundation').foundation();
+
+        /* Un-foundate
+           $('#container').addClass('foundation').foundation();
+         */
 
         /* Mr Squiggle
          */
@@ -186,7 +189,9 @@
         });
     });
 </script>
+<style type="text/css">
 
+</style>
 <h1>
     {{ metadata.pageTitle }}
     {% if metadata.route == 'folder' %}
@@ -214,7 +219,7 @@
 <h2>Overall Progress</h2>
 <div data-graph='overall' class='learning-analytics overall medium-6 columns'></div>
 
-<div class="medium-3 columns">
+<div class="learning-analytics medium-3 columns">
     <h3>Top Students</h3>
     {% if results.ranking.top|length > 0 %}
     <ul>
@@ -231,7 +236,7 @@
     </p>
     {% endif %}
 </div>
-<div class="medium-3 columns">
+<div class="learning-analytics medium-3 columns">
     <h3>Bottom Students</h3>
     {% if results.ranking.bottom|length > 0 %}
     <ul>
