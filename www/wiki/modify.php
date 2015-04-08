@@ -57,25 +57,12 @@ if (is_numeric($this->arg[0])) {
             'BODY'        => '',
             'REVISION'    => '',
             'INSTANCE_ID' => $this->arg[2],
+            /* If a slug was provided, create a new wiki page
+             * with this slug. Otherwise just leave it empty
+             */
+            'SLUG'        => (strlen($this->arg[3]) ? $this->arg[3] : ''),
         )
     );
-
-    /* If a slug was provided, create a new wiki page
-     * with this slug. Otherwise just leave it empty
-     */
-    if (strlen($this->arg[2])) {
-        $this->setVar(
-            array(
-                'SLUG' => $this->arg[2]
-            )
-        );
-    } else {
-        $this->setVar(
-            array(
-                'SLUG' => ''
-            )
-        );
-    }
 } else {
     error(2);
 }
