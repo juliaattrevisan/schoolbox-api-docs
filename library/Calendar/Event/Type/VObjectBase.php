@@ -10,25 +10,18 @@
  * @link      http://www.alaress.com.au/
  */
 
+namespace Calendar\Event\Type;
+
 use Html2Text\Html2Text;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Property\ICalendar;
-use Schoolbox\Calendar\EventTypeMapper;
-use Schoolbox\Mapper;
+use DateTimeZone;
+use DateInterval;
+use DateTime;
 
-class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_Abstract
+
+class VObjectBase extends RendererBase
 {
-    /**
-     * @var EventTypeMapper
-     */
-    protected $eventTypeMapper;
-
-    protected function setup()
-    {
-        $this->setEventTypeMapper(EventTypeMapper::getInstance());
-        $this->setTextConverter(new \Html2Text\Html2Text());
-    }
-
     /**
      * @var VCalendar
      */
@@ -39,45 +32,40 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
      */
     protected $textConverter;
 
+
     /**
      * Render this event
      *
-     * @param Calendar_Event_Type_Abstract $currentEvent
-     * @return Sabre\VObject\Component\Vevent
+     * @return string
      */
-    public function visit($currentEvent)
+    public function render()
     {
         // Output event times as UTC,
         // no client should be able to mess that up.
         $utcTimezone = new DateTimeZone('UTC');
         /* Show visible events only, in export
          */
-        if ($this->isVisible($currentEvent)) {
+        if ($this->isVisible()) {
             /** @var Sabre\VObject\Component\Vevent $vevent */
             $vevent = $this->vcalendar->create('VEVENT');
-            // Generate a UID based on $currentEvent->getEventId()
-            $vevent->add('UID', $currentEvent->getEventId() . '/' . $currentEvent->getConnectorId());
+            // Generate a UID based on $this->getEvent()->getEventId()
+            $vevent->add('UID', $this->getEvent()->getEventId() . '/' . $this->getEvent()->getConnectorId());
             $vevent->add('DTSTAMP', DateTime::createFromFormat('U', $_SERVER['REQUEST_TIME']));
-            try {
-                $eventType = $this->getEventTypeMapper()->findById($currentEvent->getType());
-                $vevent->add('CATEGORIES', $eventType->getType());
-            } catch (Mapper\Exception $e) {
-                // noop
-            }
-            $vevent->add('LOCATION', $currentEvent->getLocation());
+            $vevent->add('CATEGORIES', $this->getEvent()->getEventType());
+            $vevent->add('LOCATION', $this->getEvent()->getLocation());
 
-            $this->getTextConverter()->set_html($currentEvent->getDetail());
+            $this->getTextConverter()->set_html($this->getEvent()->getDetail());
             $vevent->add('DESCRIPTION', $this->getTextConverter()->get_text());
 
-            $start_time = $currentEvent->getStartTime()->getDateTimeObject();
+            $start_time = $this->getEvent()->getStartTime()->getDateTimeObject();
             if (!($start_time instanceof DateTime)) {
-                $start_time = new DateTime($currentEvent->getStartTime()->getDatabase());
+                $start_time = new DateTime($this->getEvent()->getStartTime()->getDatabase());
             }
-            $end_time = $currentEvent->getEndTime()->getDateTimeObject();
+            $end_time = $this->getEvent()->getEndTime()->getDateTimeObject();
             if (!($end_time instanceof DateTime)) {
-                $end_time = new DateTime($currentEvent->getEndTime()->getDatabase());
+                $end_time = new DateTime($this->getEvent()->getEndTime()->getDatabase());
             }
-            if (!$currentEvent->getAllday()) {
+            if (!$this->getEvent()->getAllday()) {
                 $start_time->setTimezone($utcTimezone);
                 $end_time->setTimezone($utcTimezone);
                 $vevent->add('DTSTART', $start_time);
@@ -88,11 +76,10 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
                 $vevent->add('DTEND', $end_time->format('Ymd'), array('VALUE' => 'DATE'));
             }
 
-            $vevent->add('SUMMARY', $currentEvent->getTitle());
+            $vevent->add('SUMMARY', $this->getEvent()->getTitle());
 
-            echo $vevent->serialize();
+            return $vevent->serialize();
         }
-        return $this->getVCalendar();
     }
 
     /**
@@ -111,24 +98,6 @@ class Calendar_Event_Type_Exporter_VObject extends Calendar_Event_Type_Renderer_
     public function getVCalendar()
     {
         return $this->vcalendar;
-    }
-
-    /**
-     * @return EventTypeMapper
-     */
-    public function getEventTypeMapper()
-    {
-        return $this->eventTypeMapper;
-    }
-
-    /**
-     * @param  EventTypeMapper $eventTypeMapper
-     * @return $this
-     */
-    public function setEventTypeMapper($eventTypeMapper)
-    {
-        $this->eventTypeMapper = $eventTypeMapper;
-        return $this;
     }
 
     /**

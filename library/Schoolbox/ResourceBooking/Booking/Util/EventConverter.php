@@ -13,7 +13,6 @@
 
 namespace Schoolbox\ResourceBooking\Booking\Util;
 
-use Alaress_Date_Format;
 use Calendar\Event\Type\ResourceBooking\Event as ResourceBookingEvent;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventType;

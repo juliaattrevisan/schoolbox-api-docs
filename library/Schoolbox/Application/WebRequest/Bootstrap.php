@@ -286,7 +286,7 @@ class Bootstrap implements BootstrapInterface {
 						$di->get('templateEngine:loader'),
 						array(
 							'cache' => $config->get('stream_dir') . '/templates/',
-							'debug' => 0,
+							'debug' => $config->get('debug_templates'),
 						)
 					);
 

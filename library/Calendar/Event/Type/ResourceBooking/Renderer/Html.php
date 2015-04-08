@@ -18,7 +18,6 @@ class Html extends Base {
      */
     public function render()
     {
-
         if ($this->isVisible()) {
             return $this->getTemplate()->render('calendar/type/resourceBooking.twig',
                 array(  'event' => $this->getEvent(),

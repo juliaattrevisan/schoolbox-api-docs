@@ -12,7 +12,7 @@
         <h3>{{ event.getTitle() }}</h3>
         <h4>
             {{ event.getFullDate()|raw }}</h4>
-        <em>{{ event.location }}</em>
+        <em>{{ event.getCategory() }}</em>
 
         <p class="wysiwyg meta">{{ event.detail|purify}}</p>
         <div class="created">

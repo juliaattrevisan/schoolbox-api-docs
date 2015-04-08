@@ -11,8 +11,11 @@
  */
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
+use Calendar\Event\Collection\Exporter;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+
+
 
 try {
     $token = $_GET['token'];
@@ -28,9 +31,9 @@ try {
     // places that need a token.
     try {
         //TODO: fix hydration so we only need one call
-        $user = Schoolbox\UserMapper::getInstance()->findOneByColumn('key', $token);
+        $user = UserMapper::getInstance()->findOneByColumn('key', $token);
         // Rehydrate with campus collection
-        $user = Schoolbox\UserMapper::getInstance()->findById($user->getId());
+        $user = UserMapper::getInstance()->findById($user->getId());
     } catch (Exception $ex) {
         throw new Exception_Schoolbox('Invalid token', 401);
     }
@@ -85,10 +88,11 @@ try {
     //
     // API should always be a Calendar_Api_EventType_Interface object, no need
     // to check.
-    $exporter = new Collection_Exporter(
+    $exporter = new Exporter(
         $api,
         $_SERVER['REQUEST_TIME'],
         strtotime('+6 months', $_SERVER['REQUEST_TIME']),
+        $user,
         new SitePage(false)
     );
     // for IE8

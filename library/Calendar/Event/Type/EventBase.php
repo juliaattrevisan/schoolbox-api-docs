@@ -103,6 +103,7 @@ abstract class EventBase implements EventInterface
      */
     protected $renderClasses = array(   'javascript'    => RendererBase::class,
                                         'html'          => RendererBase::class,
+                                        'vcal'          => VObjectBase::class,
                                     );
 
     /**

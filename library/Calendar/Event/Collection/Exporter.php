@@ -5,61 +5,111 @@
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
  */
 
+namespace Calendar\Event\Collection;
+
 use Sabre\VObject\Component\VCalendar;
+use Html2Text\Html2Text;
+use Schoolbox\User;
+use SitePage;
+use Config;
 
-class Collection_Exporter extends Collection_Renderer {
+class Exporter extends Renderer {
 
-	/**
-	 * Set up the V
-	 *
-	 * @return VCalendar
-	 */
-	private function setupVcal() {
-		$calendar = new VCalendar();
-		$calendar->add('method', 'PUBLISH');
-		$calendar->add('X-WR-CALNAME', Config::get('title').' Calendar');
-		$calendar->add('X-WR-CALDESC', 'Calendar for '.Config::get('school_name'));
-		return $calendar;
+    /**
+     * @var Sabre\VObject\Component\VCalendar
+     */
+    var $vCalendar;
+
+    /**
+     * @var Html2Text
+     */
+    protected $textConverter;
+
+    /**
+     * Constructor
+     *
+     * @param $api
+     * @param $startTimestamp
+     * @param $endTimestamp
+     * @param $viewer
+     * @param $page
+     */
+    public function __construct($api, $startTimestamp, $endTimestamp, User $viewer, \SitePage $page)
+    {
+        parent::__construct($api, $startTimestamp, $endTimestamp, $viewer, $page);
+
+		$this->setVCalendar(new VCalendar());
+		$this->getVCalendar()->add('method', 'PUBLISH');
+        $this->getVCalendar()->add('X-WR-CALNAME', Config::get('title').' Calendar');
+        $this->getVCalendar()->add('X-WR-CALDESC', 'Calendar for '.Config::get('school_name'));
+
+        $this->setTextConverter(new \Html2Text\Html2Text());
 	}
 
-	/**
-	 * Collects all events from everywhere, for the current day
-	 *
-	 * Do this by using ReflectionClass on the API Interface to
-	 * get all the mandatory methods
-	 */
-	protected function collectAllEvents() {
-		$this->setAllEvents($this->getApi()->getEvents($this->getStartTimestamp(), $this->getEndTimestamp()));
-		$this->getAllEvents()->sort();
-	}
-
-	/**
-	 * Render all events
-	 */
-	public function renderAll() {
-		$v = $this->setupVcal();
-
-		/** @var Calendar_Event_Type_Abstract[] $collection */
-		$collection = $this->getAllEvents();
-		$renderer   = new Calendar_Event_Type_Exporter_VObject(null);
-		$renderer->setVCalendar($v);
-
+    /**
+     * This will stream the vcal output as it parses over the event collection
+     */
+    public function renderAll() {
 		// Output base calendar, and output its start and end separately
-		echo trim(str_replace('END:VCALENDAR', '', $v->serialize()))."\r\n";
-		foreach ($collection as $currentEvent) {
-			$currentEvent->accept($renderer);
-		}
-		echo "END:VCALENDAR";
+		echo trim(str_replace('END:VCALENDAR', '', $this->getVCalendar()->serialize()))."\r\n";
 
-		//
-		// Add timezone AFTER adding all events. Hooray, IcalCreator is smart
-		// enough to add them for me!
-//		iCalUtilityFunctions::createTimezone($v, Cfg::get('date_timezone'));
-//		$str = $v->output();
-//		echo $str;
-//		echo $v->serialize();
+		foreach ($this->getAllEvents() as $currentEvent) {
+            echo $this->renderEvent($currentEvent, 'vcal');
+		}
+
+        echo "END:VCALENDAR";
 	}
+
+    /**
+     * This overrides the default in order to inject the vCalendar object into the renderer, which is obviously
+     *
+     * @param $event
+     * @param $type
+     * @return mixed
+     */
+    public function renderEvent($event, $type)
+    {
+        $rendererClass = $event->getRendererClass($type);
+        $renderObj = new $rendererClass($this->getPage(), $event, $this->getViewer(), $this->getGroupHandler(), $this->getCalendarHandler());
+        $renderObj->setVCalendar($this->getVCalendar());
+        $renderObj->setTextConverter($this->getTextConverter());
+        return $renderObj->render();
+    }
+
+    /**
+     * @param \Sabre\VObject\Component\VCalendar $vCalendar
+     */
+    public function setVCalendar($vCalendar)
+    {
+        $this->vCalendar = $vCalendar;
+    }
+
+    /**
+     * @return \Sabre\VObject\Component\VCalendar
+     */
+    public function getVCalendar()
+    {
+        return $this->vCalendar;
+    }
+
+    /**
+     * @param \Html2Text\Html2Text $textConverter
+     */
+    public function setTextConverter($textConverter)
+    {
+        $this->textConverter = $textConverter;
+    }
+
+    /**
+     * @return \Html2Text\Html2Text
+     */
+    public function getTextConverter()
+    {
+        return $this->textConverter;
+    }
+
+
+
 }

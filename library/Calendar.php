@@ -796,6 +796,7 @@ class Calendar extends DeprecatedModel
                 }
 
                 if ($currentEvent['access'] == self::ACCESS_GROUP) {
+                    //TODO: refactor this so its no so resource intensive, we only need a list of IDs
                     $mapper       = new \Schoolbox\Calendar\Relation\CategoryMapper();
                     $allRelations = $mapper->findByColumn('event_id', $currentEvent['id']);
                     $event->setCategoryCollection($allRelations);
