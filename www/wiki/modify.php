@@ -48,19 +48,20 @@ if (is_numeric($this->arg[0])) {
         error(19);
     }
 
+    // slug to title: let's just say all - convert to spaces, and capitalize all words
+    $slug  = strlen($this->arg[3]) ? $this->arg[3] : '';
+    $title = ucwords(str_replace('-', ' ', $slug));
+
     $this->setVar(
         array(
             'ACTION'      => 'Add',
             'WIKI_ID'     => '',
             'CATEGORY_ID' => $this->arg[1],
-            'HEADING'     => '',
+            'HEADING'     => $title,
             'BODY'        => '',
             'REVISION'    => '',
             'INSTANCE_ID' => $this->arg[2],
-            /* If a slug was provided, create a new wiki page
-             * with this slug. Otherwise just leave it empty
-             */
-            'SLUG'        => (strlen($this->arg[3]) ? $this->arg[3] : ''),
+            'SLUG'        => '',
         )
     );
 } else {
