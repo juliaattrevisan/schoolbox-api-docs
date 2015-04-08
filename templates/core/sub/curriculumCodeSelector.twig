@@ -1,0 +1,29 @@
+{##
+ # Curriculum code selector
+ #}
+<script type="text/javascript">
+    // Set up the curriculum code selection
+    $(function(){
+        $('#curriculum-codes').curriculumSelector({
+            value: {{ codeList|json_encode|raw }}
+        });
+    });
+</script>
+
+{# Empty code so that when no code is selected something is actually sent to form.
+ # This distinguishes between all codes being cleared and this input not existing at all.
+ #}
+<input type="hidden" name="curriculumCodes[]" value="" />
+<select id="curriculum-codes" name="curriculumCodes[]" multiple></select>
+
+{# Not yet implemented - resource browser like search #}
+{#
+<a href="#"
+   class="btn inline-block"
+   data-interaction="open-search"
+        ><span></span>Search for codes</a>
+#}
+{# Can this user manage curriculum? #}
+{% if isRouteAuthorized('curriculum.browse') %}
+    <a href="{{ routeLookup('curriculum.browse') }}" class="btn modify inline-block" ><span></span>Manage Curriculum</a>
+{% endif %}
