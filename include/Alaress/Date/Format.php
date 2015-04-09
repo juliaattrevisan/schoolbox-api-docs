@@ -126,9 +126,10 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      *
      * @see Alaress_Date_Strategy_Abstract->setFromFormat() for param description
      *
-     * @param string|object $dateTime
-     * @param string $dateFormat
-     * @param DateTimeZone $timezone The timezone of the date, or null to use default
+     * @param string|object                 $dateTime
+     * @param string                        $dateFormat
+     * @param DateTimeZone                  $timezone The timezone of the date, or null to use default
+     * @param Alaress_Date_Locale_Interface $locale
      */
     public function __construct($dateTime = null, $dateFormat = null, DateTimeZone $timezone = null, $locale = null)
     {
@@ -155,7 +156,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
 
     /**
      * Attempts to create a Laravel date out of $dateTime.
-
+     *
      * * `empty($dateTime)`: creates as now
      * * `$dateTime instanceof DateTime or Alaress_Date_Format`:
      *   copies $dateTime's time, and timezone if $timezone is null
@@ -214,41 +215,52 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
             }
 
             $newTimezone = $timezone ?: $this->getDefaultTimezone();
-            $newDateTime = DateTime::createFromFormat($inputDateFormat, $dateTime, $newTimezone);
-            $errors = DateTime::getLastErrors();
-            if ($errors['error_count']) {
-                // I don't have a datetime, try again with trailing data allowed
-                $newDateTime = DateTime::createFromFormat($inputDateFormat . '+', $dateTime, $newTimezone);
-                if (!($newDateTime instanceof DateTime)) {
-                    // I still don't have a datetime, exception out
-                    $errors = DateTime::getLastErrors();
+            if ($inputDateFormat === 'U') {
+                // Timestamp special case handling - make it work with negative datetimes
+                if (is_numeric($dateTime)) {
+                    $laravelDate = LaravelDate::createFromTimestamp($dateTime, $newTimezone);
+                } else {
                     throw new InvalidArgumentException(
-                        sprintf(
-                            'LaravelDate creation failed with %d errors: (%s)',
-                            $errors['error_count'],
-                            implode(', ', $errors['errors'])
-                        )
+                        '$dateTime must be numeric if $inputDateFormat is timestamp format'
                     );
                 }
-            }
-            if ($errors['warning_count']) {
-                // I have a datetime, but it's not what I expected. Warn the user.
-                // This date will also fail isValid()
-                $this->warnings = $errors['warnings'];
-                trigger_error(
-                    sprintf(
-                        'LaravelDate creation raised %d warnings: (%s)',
-                        $errors['warning_count'],
-                        implode(', ', $errors['warnings'])
-                    ),
-                    E_USER_WARNING
-                );
-            }
-            $laravelDate = LaravelDate::instance($newDateTime);
+            } else {
+                $newDateTime = DateTime::createFromFormat($inputDateFormat, $dateTime, $newTimezone);
+                $errors      = DateTime::getLastErrors();
+                if ($errors['error_count']) {
+                    // I don't have a datetime, try again with trailing data allowed
+                    $newDateTime = DateTime::createFromFormat($inputDateFormat . '+', $dateTime, $newTimezone);
+                    if (!($newDateTime instanceof DateTime)) {
+                        // I still don't have a datetime, exception out
+                        $errors = DateTime::getLastErrors();
+                        throw new InvalidArgumentException(
+                            sprintf(
+                                'LaravelDate creation failed with %d errors: (%s)',
+                                $errors['error_count'],
+                                implode(', ', $errors['errors'])
+                            )
+                        );
+                    }
+                }
+                if ($errors['warning_count']) {
+                    // I have a datetime, but it's not what I expected. Warn the user.
+                    // This date will also fail isValid()
+                    $this->warnings = $errors['warnings'];
+                    trigger_error(
+                        sprintf(
+                            'LaravelDate creation raised %d warnings: (%s)',
+                            $errors['warning_count'],
+                            implode(', ', $errors['warnings'])
+                        ),
+                        E_USER_WARNING
+                    );
+                }
+                $laravelDate = LaravelDate::instance($newDateTime);
 
-            // Did I specify a timezone? If not, set it to the default
-            if (!preg_match('/[eOPT]/', $inputDateFormat)) {
-                $laravelDate->setTimezone($newTimezone);
+                // Did I specify a timezone? If not, set it to the default
+                if (!preg_match('/[eOPT]/', $inputDateFormat)) {
+                    $laravelDate->setTimezone($newTimezone);
+                }
             }
             $this->setDateTimeObject($laravelDate);
         }
@@ -1199,11 +1211,11 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
-     * Gets datetime object out of this wrapper
+     * Sets the datetime object in this wrapper
      *
      * @param LaravelDate $dateObject
      */
-    public function setDateTimeObject($dateObject)
+    protected function setDateTimeObject($dateObject)
     {
         $this->datetime = $dateObject;
     }
@@ -1217,6 +1229,16 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     public function isValid()
     {
         return empty($this->warnings);
+    }
+
+    /**
+     * This isn't a null date
+     *
+     * @return false
+     */
+    public function isNull()
+    {
+        return false;
     }
 
     /** COMPARIONS */

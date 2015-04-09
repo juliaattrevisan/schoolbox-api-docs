@@ -25,14 +25,15 @@ class DateTest extends DatetimeTest {
 	}
 
 	public function getTestHydrate() {
-		//
-		// Only Y-m-d format results are able to be hydrated.
+		// Anything that can be parsed as Y-m-d will parse, even if there's
+		// trailing characters.
 		return array(
 			array(null, false),
-			array('2012-01-01 01:40:23', false),
+			array('2012-01-01 01:40:23', true),
 			array('2012-01-01',          true),
-			array('0000-01-01 01:40:23', false),
-			array('9999-01-01 01:40:23', false),
+			array('0000-01-01 01:40:23', true),
+			array('9999-01-01 01:40:23', true),
+			array('2012-01', false),
 		);
 	}
 

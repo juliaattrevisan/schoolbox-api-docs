@@ -16,23 +16,6 @@ class Timestamp extends Datetime implements IColumnType {
 	protected $output_format = 'U';
 
 	/**
-	 * Overridden to work with -ve timestamps (DateTime::createFromFormat('U')
-	 * doesn't).
-	 *
-	 * @param string $value
-	 *
-	 * @return \DateTime
-	 */
-	public function getInputDate($value) {
-		if (!is_numeric($value)) {
-			return false;
-		}
-		$date = new DateObject();
-		$date->setTimestamp($value);
-		return $date;
-	}
-
-	/**
 	 * Overridden to cast result to integer.
 	 *
 	 * @param mixed             $value

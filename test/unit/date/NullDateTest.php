@@ -1,0 +1,91 @@
+<?php
+/**
+ * Test for verifying that null dates work as expected.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright 2015 Alaress Pty Ltd
+ * @link      http://www.alaress.com.au
+ */
+
+class NullDateTest extends PHPUnit_Framework_TestCase
+{
+    use Alaress\Test\Date\MockDateObject;
+
+    /**
+     * Test construction of null datetimes
+     */
+    public function testConstruction()
+    {
+        $nullDate = Alaress_Date_NullDate::now();
+        $this->assertInstanceOf(Alaress_Date_NullDate::class, $nullDate);
+
+        $nullDate = Alaress_Date_NullDate::newLocalShort(
+            '03/03/2015',
+            new DateTimeZone('UTC'),
+            new Alaress_Date_Locale_Static()
+        );
+        $this->assertInstanceOf(Alaress_Date_NullDate::class, $nullDate);
+
+        $nullDate = Alaress_Date_NullDate::newLocal(
+            '03/03/2015 8:16am',
+            new DateTimeZone('UTC'),
+            new Alaress_Date_Locale_Static()
+        );
+        $this->assertInstanceOf(Alaress_Date_NullDate::class, $nullDate);
+    }
+
+    /**
+     * Test properties of non-null datetimes
+     */
+    public function testNonNullDateProperties()
+    {
+        $nonNullDate = $this->buildDateObject('2014-03-13', Alaress_Date_NullDate::DATABASE_DATE_FORMAT);
+        $this->assertNotEquals('', "$nonNullDate");
+        $this->assertFalse($nonNullDate->isNull());
+        $this->assertTrue($nonNullDate->isValid());
+    }
+
+    /**
+     * Test properties of null datetimes
+     */
+    public function testNullDateProperties()
+    {
+        $nullDate = new Alaress_Date_NullDate();
+        $this->assertEquals('', "$nullDate");
+        $this->assertTrue($nullDate->isNull());
+        $this->assertTrue($nullDate->isValid());
+    }
+
+    /**
+     * Test that operations on null datetimes don't work
+     *
+     * @expectedException BadMethodCallException
+     */
+    public function testOperations()
+    {
+        $nullDate = new Alaress_Date_NullDate();
+        $nullDate->getUsingFormat($nullDate::DATABASE_FORMAT);
+    }
+
+    /**
+     * Test that locale-based formatting on null datetimes doesn't work
+     *
+     * @expectedException BadMethodCallException
+     */
+    public function testLocale()
+    {
+        $nullDate = new Alaress_Date_NullDate();
+        $nullDate->getLocal();
+    }
+
+    /**
+     * Test that comparisons on null datetimes don't work
+     *
+     * @expectedException BadMethodCallException
+     */
+    public function testComparison()
+    {
+        $nullDate = new Alaress_Date_NullDate();
+        $nullDate->eq($this->buildDateObject('2014-03-13', Alaress_Date_NullDate::DATABASE_DATE_FORMAT));
+    }
+}

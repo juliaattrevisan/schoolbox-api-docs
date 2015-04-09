@@ -235,7 +235,7 @@ class UnitInstance implements ISoftDeletable {
      * {@inheritdoc}
      */
     public function isDeleted() {
-        return ($this->getDeleted() instanceof \Alaress_Date_Format);
+        return ($this->getDeleted() instanceof \Alaress_Date_Format && !$this->getDeleted()->isNull());
     }
 
     /**
