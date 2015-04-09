@@ -68,11 +68,12 @@ class OnlineAssessmentMapper extends Mapper implements FeedableMapperInterface {
 			'property'   => 'title',
 			'type'       => self::TYPE_STRING,
 		));
-		$this->hasMap(array(
-			'column'     => 'description',
-			'property'   => 'description',
-			'type'       => self::TYPE_STRING,
-		));
+        $this->hasMap(array(
+            'column'     => 'description',
+            'property'   => 'description',
+            'type'       => self::TYPE_STRING,
+        ));
+        $this->uses('completion_message', self::TYPE_STRING);
 		$this->hasMap(array(
 			'column'     => 'start',
 			'property'   => 'start',

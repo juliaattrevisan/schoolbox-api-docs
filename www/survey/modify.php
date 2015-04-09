@@ -7,9 +7,8 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('include/time.php');
 
-$groupHandler = new Group();
+$groupHandler  = new Group();
 $assessHandler = new Survey_Main();
 
 $assess = $assessHandler->getByID($this->arg[0]);
@@ -39,11 +38,11 @@ if (!empty($_POST)) {
         ->setMinute($_POST['finish']['minute'])
     ;
 
-	/* Check for valid dates
-	 */
-	if (!$start->isValid() || !$finish->isValid()) {
-		error(15);
-	}
+    /* Check for valid dates
+     */
+    if (!$start->isValid() || !$finish->isValid()) {
+        error(15);
+    }
 
     /* Check that finish time cannot be before start time
       */
@@ -55,22 +54,24 @@ if (!empty($_POST)) {
       * Doing so would change ownership; thus, changes made by a superuser would prevent the
       * original author from being able to modify it.
       */
-    $assessHandler->update(array(
-        'assess_id' => $this->arg[0],
-        'category_id' => $_POST['category_id'],
-        'title' => $_POST['title'],
-        'description' => $_POST['description'],
-        'start' => $start->getDatabase(),
-        'finish' => $finish->getDatabase(),
-        'duration' => Survey_Main::UNLIMITED_DURATION,
-        'anonymous_result' => $_POST['anonymous_result'],
-        'notify_author' => $_POST['notify_author'],
-        'max_attempts' => $_POST['max_attempts'],
-    ));
+    $assessHandler->update(
+        array(
+            'assess_id'          => $this->arg[0],
+            'category_id'        => $_POST['category_id'],
+            'title'              => $_POST['title'],
+            'description'        => $_POST['description'],
+            'start'              => $start->getDatabase(),
+            'finish'             => $finish->getDatabase(),
+            'duration'           => Survey_Main::UNLIMITED_DURATION,
+            'anonymous_result'   => $_POST['anonymous_result'],
+            'notify_author'      => $_POST['notify_author'],
+            'max_attempts'       => $_POST['max_attempts'],
+            'completion_message' => $_POST['completion_message'],
+        )
+    );
 
     SitePage::localRedir('/survey/summary/' . $this->arg[0]);
-}
-else {
+} else {
 
     /* Render modify page
      */
@@ -83,23 +84,26 @@ else {
     $this->setBlock(TEMPLATE_content, 'importXML', 'importXML_block');
     $this->setTitle('Manage Survey');
 
-    $assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
+    $assessStartDate  = new Alaress_Date_Format(strtotime($assess['start']), 'U');
     $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
 
-    $this->setVar(array(
-        'ACTION' => 'modify',
-        'ASSESS_ASSESS_ID' => $assess['assess_id'],
-        'ASSESS_ACTION'    => 'Modify',
-        'ASSESS_KIND'      => 'Survey',
-        'ASSESS_KIND_LC'   => 'survey',
-        'ASSESS_CATEGORY_ID' => $assess['category_id'],
-        'ASSESS_TITLE' => Scrub::text($assess['title']),
-        'ASSESS_DESCRIPTION' => $assess['description'],
-        'ASSESS_START_DATE' => $assessStartDate->getLocalShort(),
-        'ASSESS_FINISH_DATE' => $assessFinishDate->getLocalShort(),
-        'ASSESS_ANONYMOUS_RESULT_CHECKED' => $assess['anonymous_result'] ? 'checked="checked"' : '',
-        'ASSESS_NOTIFY_AUTHOR_CHECKED' => $assess['notify_author'] ? 'checked="checked"' : '',
-    ));
+    $this->setVar(
+        array(
+            'ACTION'                          => 'modify',
+            'ASSESS_ASSESS_ID'                => $assess['assess_id'],
+            'ASSESS_ACTION'                   => 'Modify',
+            'ASSESS_KIND'                     => 'Survey',
+            'ASSESS_KIND_LC'                  => 'survey',
+            'ASSESS_CATEGORY_ID'              => $assess['category_id'],
+            'ASSESS_TITLE'                    => Scrub::text($assess['title']),
+            'ASSESS_DESCRIPTION'              => $assess['description'],
+            'ASSESS_START_DATE'               => $assessStartDate->getLocalShort(),
+            'ASSESS_FINISH_DATE'              => $assessFinishDate->getLocalShort(),
+            'ASSESS_ANONYMOUS_RESULT_CHECKED' => $assess['anonymous_result'] ? 'checked="checked"' : '',
+            'ASSESS_NOTIFY_AUTHOR_CHECKED'    => $assess['notify_author'] ? 'checked="checked"' : '',
+            'ASSESS_COMPLETION_MESSAGE'       => Scrub::text($assess['completion_message']),
+        )
+    );
 
     /* Render starting times
      */
@@ -107,16 +111,20 @@ else {
     $assessStartMinute = $assessStartDate->getMinute(true);
     $assessStartMeridiem = $assessStartDate->getMeridiem();
 
-	$this->setVar(array(
-		'START_HOUR_VALUE' => $assessStartHour,
-		'START_MINUTE_VALUE' => $assessStartMinute,
-	));
+    $this->setVar(
+        array(
+            'START_HOUR_VALUE'   => $assessStartHour,
+            'START_MINUTE_VALUE' => $assessStartMinute,
+        )
+    );
 
-	foreach (array('AM', 'PM') as $meridiem) {
-        $this->setVar(array(
-            'START_MERIDIEM_VALUE' => $meridiem,
-            'START_MERIDIEM_SELECTED' => ($meridiem == $assessStartMeridiem) ? 'selected=\'selected\'' : '',
-        ));
+    foreach (array('AM', 'PM') as $meridiem) {
+        $this->setVar(
+            array(
+                'START_MERIDIEM_VALUE'    => $meridiem,
+                'START_MERIDIEM_SELECTED' => ($meridiem == $assessStartMeridiem) ? 'selected=\'selected\'' : '',
+            )
+        );
 
         $this->parse('startMeridiem_block', 'startMeridiem', true);
     }
@@ -127,27 +135,33 @@ else {
     $assessFinishMinute = $assessFinishDate->getMinute(true);
     $assessFinishMeridiem = $assessFinishDate->getMeridiem();
 
-	/* Render finish times
-	 */
-	$this->setVar(array(
-		'FINISH_HOUR_VALUE' => $assessFinishHour,
-		'FINISH_MINUTE_VALUE' => $assessFinishMinute,
-	));
+    /* Render finish times
+     */
+    $this->setVar(
+        array(
+            'FINISH_HOUR_VALUE'   => $assessFinishHour,
+            'FINISH_MINUTE_VALUE' => $assessFinishMinute,
+        )
+    );
 
-	foreach (array('AM', 'PM') as $meridiem) {
-        $this->setVar(array(
-            'FINISH_MERIDIEM_VALUE' => $meridiem,
-            'FINISH_MERIDIEM_SELECTED' => ($meridiem == $assessFinishMeridiem) ? 'selected=\'selected\'' : '',
-        ));
+    foreach (array('AM', 'PM') as $meridiem) {
+        $this->setVar(
+            array(
+                'FINISH_MERIDIEM_VALUE'    => $meridiem,
+                'FINISH_MERIDIEM_SELECTED' => ($meridiem == $assessFinishMeridiem) ? 'selected=\'selected\'' : '',
+            )
+        );
 
         $this->parse('finishMeridiem_block', 'finishMeridiem', true);
     }
 
-	/* Resit amounts
-	 */
-	$this->setVar(array(
-		'MAX_ATTEMPTS_CHECKED' => $assess['max_attempts'] == 0 ? 'checked="checked"' : '',
-	));
+    /* Resit amounts
+     */
+    $this->setVar(
+        array(
+            'MAX_ATTEMPTS_CHECKED' => $assess['max_attempts'] == 0 ? 'checked="checked"' : '',
+        )
+    );
 
     /* Show this Survey's contents
      */

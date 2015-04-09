@@ -67,9 +67,14 @@ class OnlineAssessment implements ISoftDeletable
     protected $task_instance;
 
     /**
-    * @var string
-    */
+     * @var string
+     */
     protected $description;
+
+    /**
+     * @var string
+     */
+    protected $completion_message;
 
     /**
     * @var Alaress_Date_Format
@@ -312,6 +317,25 @@ class OnlineAssessment implements ISoftDeletable
     public function getDescription()
     {
         return $this->description;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCompletionMessage()
+    {
+        return $this->completion_message;
+    }
+
+    /**
+     * @param  string $completion_message
+     *
+     * @return $this
+     */
+    public function setCompletionMessage($completion_message)
+    {
+        $this->completion_message = $completion_message;
+        return $this;
     }
 
     /**

@@ -72,13 +72,12 @@ if ($attempt['finish'] == '0000-00-00 00:00:00') {
 
     AttemptMapper::getInstance()->save($attempt);
 
-    $this->setVar(
-        array(
-            'ASSESS_TITLE'       => Scrub::text($assess['title']),
-            'ASSESS_CATEGORY_ID' => $assess['category_id'],
-            'ATTEMPT_END'        => $attemptFinishDate->getShort(),
-        )
-    );
+    $this->setVar(array(
+        'ASSESS_TITLE' => Scrub::text($assess['title']),
+        'ASSESS_CATEGORY_ID' => $assess['category_id'],
+        'ATTEMPT_END' => $attemptFinishDate->getShort(),
+        'ASSESS_COMPLETION_MESSAGE' => Scrub::html($assess['completion_message']),
+    ));
 
     // Does this item have a task instance associated? if so, set it as
     // completed (pending, instead of completed?)

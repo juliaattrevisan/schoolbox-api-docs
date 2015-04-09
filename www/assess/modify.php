@@ -7,7 +7,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('include/time.php');
 
 use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
@@ -48,7 +47,8 @@ if (!empty($_POST)) {
         ->setDuration($duration)
         ->setMaxAttempts($_POST['max_attempts'])
         ->setWeight($_POST['weight'])
-		->setMarkVisibility($_POST['mark_visibility'])
+        ->setMarkVisibility($_POST['mark_visibility'])
+        ->setCompletionMessage($_POST['completion_message'])
     ;
 
     // Is this a task? If so, just set the start and finish to now.
@@ -148,6 +148,7 @@ else {
         'ASSESS_FINISH_DATE'      => $assessFinishDate->getLocalShort(),
         'ALLOW_RESIT_CHECKED'     => $assessment->getMaxAttempts() == 1 ? 'checked=\'checked\'' : '',
         'ASSESS_DURATION_CHECKED' => $assessment->getDuration() >= 0 ? 'checked=\'checked\'' : '',
+        'ASSESS_COMPLETION_MESSAGE' => Scrub::text($assessment->getCompletionMessage()),
     ));
 
     /* Render starting times

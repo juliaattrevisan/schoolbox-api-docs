@@ -7,7 +7,7 @@
 $(function() {
 	$.fn.alaressTiny({
 		mode: 'exact',
-		elements: 'description',
+		elements: "description, completion-message",
 		file_browser_category_id: '{ASSESS_CATEGORY_ID}'
 	});
 
@@ -153,6 +153,14 @@ $(function() {
 					</div>
 				</td>
 			</tr>
+            <tr>
+                <td>
+                    <strong>Completion Message</strong>
+                    <div class="textarea-container">
+                        <textarea id='completion-message' name="completion_message">{ASSESS_COMPLETION_MESSAGE}</textarea>
+                    </div>
+                </td>
+            </tr>
 			<tr>
 				<td>
                     <label>
