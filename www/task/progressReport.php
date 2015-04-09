@@ -190,6 +190,7 @@ $this->setVar(
     array(
         'CATEGORY'      => $category->getName(),
         'CATEGORY_ID'   => $category->getId(),
+        'CATEGORY_CODE' => $category->getCodeString(),
         'student_block' => '',
         'unit_selector_semester_block' => '',
     )

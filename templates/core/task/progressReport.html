@@ -76,7 +76,8 @@
 
 <!-- END custom_head -->
 
-<h1>Unit Progress Report – {CATEGORY}</h1>
+<h1>Unit Progress Report – <a href="/homepage/{CATEGORY_ID}/">{CATEGORY} {CATEGORY_CODE}</a></h1>
+
 <div id="context">
 	<form id="enrolment" action="/task/progressReport/" method="get">
 		<input type="hidden" name="category_id" value="{CATEGORY_ID}" />
