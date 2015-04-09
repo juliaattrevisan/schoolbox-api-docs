@@ -112,22 +112,22 @@ class InstanceCompletionMapper extends Mapper {
      */
     protected function mark($task_instance_id, $student_id, $status)
     {
-        // Is there already a completion record for this item? If so, don't
-        // create a new one.
-        $existing = $this->findByColumnList(
-            array(
-                'task_instance_id' => $task_instance_id,
-                'student_id'       => $student_id,
-            ),
-            array('limit' => 1)
-        );
-        if (count($existing) > 0) {
-            return array();
+        // What's the most recent completion record?
+        // Don't create a new one if it's the same status as the one I want to create.
+        try {
+            $existing = $this->findOneByColumnList(
+                array(
+                    'task_instance_id' => $task_instance_id,
+                    'student_id'       => $student_id,
+                ),
+                array('completion_date' => 'desc')
+            );
+            if ($existing->getCompletionStatus() == $status) {
+                return array();
+            }
+        } catch (Mapper\Exception $e) {
+            // no existing completion. Continue
         }
-
-        // Get the related task instance (should it have been passed?) for the
-        // completion status to set.
-        //$task_instance = $this->getJoinMapper('task_instance')->findById($task_instance_id);
 
         $model = new InstanceCompletion();
         $model
