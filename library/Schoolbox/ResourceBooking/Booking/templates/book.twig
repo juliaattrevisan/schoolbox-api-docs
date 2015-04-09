@@ -457,6 +457,42 @@ $(document).ready(function() {
                 {% endif %}
             </td>
         </tr>
+        <tr>
+            <td class="formLabelWidth" valign="top">
+                <h4>Ignore rules?</h4>
+                <em>
+                    If this is selected, this booking will be created even if it:
+                    <ul>
+                        <li>is already booked for this time</li>
+                        {% if item.resource.minLeadTime.minuteTotal %}
+                            <li>
+                                starts in less than
+                                {% include 'sub/interval.twig' with {interval: item.resource.minLeadTime} %}
+                            </li>
+                        {% endif %}
+                        {% if item.resource.minReservationTime.minuteTotal %}
+                            <li>
+                                goes for less than
+                                {% include 'sub/interval.twig' with {interval: item.resource.minReservationTime} %}
+                            </li>
+                        {% endif %}
+                        {% if item.resource.maxReservationTime.minuteTotal %}
+                            <li>
+                                goes for more than
+                                {% include 'sub/interval.twig' with {interval: item.resource.maxReservationTime} %}
+                            </li>
+                        {% endif %}
+                    </ul>
+                </em>
+            </td>
+            <td>
+                <input id="resource-booking-override-validation"
+                       type="checkbox"
+                       name="override_validation"
+                       value="1"
+                        />
+            </td>
+        </tr>
         {% if item.event.id is empty %}
         <tr>
         <td class="formLabelWidth" valign="top">

@@ -551,6 +551,7 @@ class Controller extends Base
         $errors    = array();
         $startDate = null;
         $endDate   = null;
+        $override  = !empty($this->getRequest()->post['override_validation']);
         try {
             $startDate = $this->getDateFromForm('start_datetime');
         } catch (\UnexpectedValueException $e) {
@@ -606,8 +607,7 @@ class Controller extends Base
             // I do however want to allow a booking to start at the same time
             // that the previous booking ended.
             // (We may need to implement a down time between bookings.)
-            $allowConflicts = !empty($this->getRequest()->post['allow_conflicts']);
-            if (!$allowConflicts) {
+            if (!$override) {
                 $errors = array_merge_recursive(
                     $errors,
                     $this->validateForConflicts($resource, $startDate, $endDate, $existingBooking)
@@ -662,7 +662,7 @@ class Controller extends Base
                     }
                 }
 
-                if (!$allowConflicts) {
+                if (!$override) {
                     foreach ($dateParts as $check) {
                         list($resource, $thisStart, $thisEnd) = $check;
                         $errors = array_merge_recursive(
@@ -693,7 +693,7 @@ class Controller extends Base
                     }
                 }
 
-                if (!$allowConflicts) {
+                if (!$override) {
                     foreach ($dateParts as $check) {
                         list($resource, $thisStart, $thisEnd, $thisBooking) = $check;
                         $errors = array_merge_recursive(
