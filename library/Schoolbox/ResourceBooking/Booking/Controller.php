@@ -577,7 +577,6 @@ class Controller extends Base
                     $errors['start_datetime'][] = 'too_early';
                 }
             }
-
         }
 
         // I need both start and end to check reservation span.
@@ -600,10 +599,6 @@ class Controller extends Base
                     $errors['end_datetime'][] = 'too_long';
                 }
             }
-            
-//            // Check conflicts in series and for related items.
-//            $relatedItems = $this->request->post['related_item'];
-
 
             // Check conflicting bookings as well for this item.
             // Only check approved bookings. Wow, the calendar population method
@@ -611,10 +606,13 @@ class Controller extends Base
             // I do however want to allow a booking to start at the same time
             // that the previous booking ended.
             // (We may need to implement a down time between bookings.)
-            $errors = array_merge_recursive(
-                $errors,
-                $this->validateForConflicts($resource, $startDate, $endDate, $existingBooking)
-            );
+            $allowConflicts = !empty($this->getRequest()->post['allow_conflicts']);
+            if (!$allowConflicts) {
+                $errors = array_merge_recursive(
+                    $errors,
+                    $this->validateForConflicts($resource, $startDate, $endDate, $existingBooking)
+                );
+            }
             if (!($existingBooking instanceof Model)) {
                 // Validating a new booking?
                 // Expand this single booking out to a list of related items,
@@ -664,12 +662,14 @@ class Controller extends Base
                     }
                 }
 
-                foreach ($dateParts as $check) {
-                    list($resource, $thisStart, $thisEnd) = $check;
-                    $errors = array_merge_recursive(
-                        $errors,
-                        $this->validateForConflicts($resource, $thisStart, $thisEnd)
-                    );
+                if (!$allowConflicts) {
+                    foreach ($dateParts as $check) {
+                        list($resource, $thisStart, $thisEnd) = $check;
+                        $errors = array_merge_recursive(
+                            $errors,
+                            $this->validateForConflicts($resource, $thisStart, $thisEnd)
+                        );
+                    }
                 }
             } else {
                 // Validating an existing booking?
@@ -693,12 +693,14 @@ class Controller extends Base
                     }
                 }
 
-                foreach ($dateParts as $check) {
-                    list($resource, $thisStart, $thisEnd, $thisBooking) = $check;
-                    $errors = array_merge_recursive(
-                        $errors,
-                        $this->validateForConflicts($resource, $thisStart, $thisEnd, $thisBooking)
-                    );
+                if (!$allowConflicts) {
+                    foreach ($dateParts as $check) {
+                        list($resource, $thisStart, $thisEnd, $thisBooking) = $check;
+                        $errors = array_merge_recursive(
+                            $errors,
+                            $this->validateForConflicts($resource, $thisStart, $thisEnd, $thisBooking)
+                        );
+                    }
                 }
             }
         }
