@@ -548,10 +548,10 @@ class Controller extends Base
     {
         // Check:
         // Beginning and end of booking are valid datetime
+        // (These checks can't be overridden.)
         $errors    = array();
         $startDate = null;
         $endDate   = null;
-        $override  = !empty($this->getRequest()->post['override_validation']);
         try {
             $startDate = $this->getDateFromForm('start_datetime');
         } catch (\UnexpectedValueException $e) {
@@ -563,8 +563,10 @@ class Controller extends Base
             $errors['end_datetime'][] = 'invalid';
         }
 
+        $override = !empty($this->getRequest()->post['override_validation']);
+
         // As long as I have startTime, I can check leadtime.
-        if (isset($startDate)) {
+        if (isset($startDate) && !$override) {
             // Start date before present gets covered by too_early
             // Start time before earliest possible time
             $now = new DateTime();
@@ -583,86 +585,91 @@ class Controller extends Base
         // I need both start and end to check reservation span.
         if (isset($startDate, $endDate)) {
             // Obviously start must be before end (gets covered by too_short too)
+            // (This can't be overridden)
             if ($startDate > $endDate) {
                 $errors['end_datetime'][] = 'before_start';
             }
-            // End date before earliest possible end
-            $earliestEnd = clone $startDate;
-            $earliestEnd->add($resource->getMinReservationTime()->getAsDateInterval());
-            if ($endDate < $earliestEnd) {
-                $errors['end_datetime'][] = 'too_short';
-            }
-            // End date after latest possible end (Only if there is an actual max time)
-            if ($resource->getMaxReservationTime()->getSecondTotal() > 0) {
-                $latestEnd = clone $startDate;
-                $latestEnd->add($resource->getMaxReservationTime()->getAsDateInterval());
-                if ($endDate > $latestEnd) {
-                    $errors['end_datetime'][] = 'too_long';
-                }
-            }
 
-            // Check conflicting bookings as well for this item.
-            // Only check approved bookings. Wow, the calendar population method
-            // can do exactly that!
-            // I do however want to allow a booking to start at the same time
-            // that the previous booking ended.
-            // (We may need to implement a down time between bookings.)
+            // Am I overriding? Perform no other validation if so
             if (!$override) {
+                // End date before earliest possible end
+                $earliestEnd = clone $startDate;
+                $earliestEnd->add($resource->getMinReservationTime()->getAsDateInterval());
+                if ($endDate < $earliestEnd) {
+                    $errors['end_datetime'][] = 'too_short';
+                }
+                // End date after latest possible end (Only if there is an actual max time)
+                if ($resource->getMaxReservationTime()->getSecondTotal() > 0) {
+                    $latestEnd = clone $startDate;
+                    $latestEnd->add($resource->getMaxReservationTime()->getAsDateInterval());
+                    if ($endDate > $latestEnd) {
+                        $errors['end_datetime'][] = 'too_long';
+                    }
+                }
+
+                // Check conflicting bookings as well for this item.
+                // Only check approved bookings. Wow, the calendar population method
+                // can do exactly that!
+                // I do however want to allow a booking to start at the same time
+                // that the previous booking ended.
+                // (We may need to implement a down time between bookings.)
                 $errors = array_merge_recursive(
                     $errors,
                     $this->validateForConflicts($resource, $startDate, $endDate, $existingBooking)
                 );
-            }
-            if (!($existingBooking instanceof Model)) {
-                // Validating a new booking?
-                // Expand this single booking out to a list of related items,
-                // and validate them all.
-                $dateParts = array(
-                    array($resource, $startDate, $endDate),
-                );
-
-                // Check each in series (if there is one)
-                $series = array();
-                try {
-                    $repeatUntil = Alaress_Date_Format::newLocalShort(
-                        $this->getRequest()->post['repeat_until']
+                if (!($existingBooking instanceof Model)) {
+                    // Validating a new booking?
+                    // Expand this single booking out to a list of related items,
+                    // and validate them all.
+                    $dateParts = array(
+                        array($resource, $startDate, $endDate),
                     );
-                } catch (\Exception $e) {
-                    $repeatUntil = null;
-                }
-                if ($repeatUntil instanceof Alaress_Date_Format) {
-                    $series = $this->getRecurrencePeriod(
-                        $startDate,
-                        $this->request->post['repeat'],
-                        $repeatUntil->getDateTimeObject(),
-                        $this->request->post['timetable']['campus']
-                    );
-                }
-                $difference = $startDate->diff($endDate);
-                foreach ($series as $occurenceStart) {
-                    $occurenceEnd = clone $occurenceStart;
-                    $occurenceEnd->add($difference);
 
-                    // Check all of $occurenceStart and $occurenceEnd
-                    $dateParts[] = array($resource, $occurenceStart, $occurenceEnd);
-                }
+                    // Check each in series (if there is one)
+                    $series = array();
+                    try {
+                        $repeatUntil = Alaress_Date_Format::newLocalShort(
+                            $this->getRequest()->post['repeat_until']
+                        );
+                    } catch (\Exception $e) {
+                        $repeatUntil = null;
+                    }
+                    if ($repeatUntil instanceof Alaress_Date_Format) {
+                        $series = $this->getRecurrencePeriod(
+                            $startDate,
+                            $this->request->post['repeat'],
+                            $repeatUntil->getDateTimeObject(),
+                            $this->request->post['timetable']['campus']
+                        );
+                    }
+                    $difference = $startDate->diff($endDate);
+                    foreach ($series as $occurenceStart) {
+                        $occurenceEnd = clone $occurenceStart;
+                        $occurenceEnd->add($difference);
+                        // Check all of $occurenceStart and $occurenceEnd
+                        $dateParts[] = array($resource, $occurenceStart, $occurenceEnd);
+                    }
 
                 $relatedItems = $this->getRelatedItemsFromForm();
                 foreach ($resource->getRelatedResourceList() as $relatedResource) {
                     if (array_key_exists($relatedResource->getId(), $relatedItems)) {
                         $dateParts[] = array($relatedResource, $startDate, $endDate);
 
-                        foreach ($series as $occurenceStart) {
-                            $occurenceEnd = clone $occurenceStart;
-                            $occurenceEnd->add($difference);
+                    $relatedItems = $this->request->post['related_item'] ?: array();
+                    foreach ($resource->getRelatedResourceList() as $relatedResource) {
+                        if (in_array($relatedResource->getId(), $relatedItems)) {
+                            $dateParts[] = array($relatedResource, $startDate, $endDate);
 
-                            // Check all of $occurenceStart and $occurenceEnd
-                            $dateParts[] = array($resource, $occurenceStart, $occurenceEnd);
+                            foreach ($series as $occurenceStart) {
+                                $occurenceEnd = clone $occurenceStart;
+                                $occurenceEnd->add($difference);
+
+                                // Check all of $occurenceStart and $occurenceEnd
+                                $dateParts[] = array($resource, $occurenceStart, $occurenceEnd);
+                            }
                         }
                     }
-                }
 
-                if (!$override) {
                     foreach ($dateParts as $check) {
                         list($resource, $thisStart, $thisEnd) = $check;
                         $errors = array_merge_recursive(
@@ -686,14 +693,13 @@ class Controller extends Base
                     $isTimeChanged
                 );
 
-                $dateParts = array();
-                foreach ($series as $thisBooking) {
-                    if (!($thisBooking->isDeleted())) {
-                        $dateParts[] = array($thisBooking->getResource(), $startDate, $endDate, $thisBooking);
+                    $dateParts = array();
+                    foreach ($series as $thisBooking) {
+                        if (!($thisBooking->isDeleted())) {
+                            $dateParts[] = array($thisBooking->getResource(), $startDate, $endDate, $thisBooking);
+                        }
                     }
-                }
 
-                if (!$override) {
                     foreach ($dateParts as $check) {
                         list($resource, $thisStart, $thisEnd, $thisBooking) = $check;
                         $errors = array_merge_recursive(
