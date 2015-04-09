@@ -31,6 +31,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
     $migrator = new Storage\Migrator($log);
 
     $patterns = [
+        new Resource\Storage\Migration(),
         new Resource\File\Migration(),
         new Resource\My\File\Migration()
     ];
