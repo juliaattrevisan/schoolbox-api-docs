@@ -13,6 +13,32 @@ use Calendar\Event\Type\CsvBase;
 
 class Csv extends CsvBase {
 
+    /**
+     * Render this event out as CSV data
+     *
+     */
+    public function render()
+    {
+        $fd = fopen('php://temp/maxmemory:10000', 'rw');
 
+
+        $data = array($this->getEvent()->getStartTime()->getLocalShort(),
+                      $this->getEvent()->getStartTime()->getTimeOnly(),
+                      $this->getEvent()->getEndTime()->getLocalShort(),
+                      $this->getEvent()->getEndTime()->getTimeOnly(),
+                      $this->getEvent()->getAllday(),
+                      $this->getEvent()->getTitle(),
+                      $this->getEvent()->getDetail(),
+                      '',
+                      $this->getEvent()->getEventType(),
+                      $this->getEVent()->getPublishDate()->getLocalShort(),);
+
+        fputcsv($fd, $data);
+        rewind($fd);
+        $row = fread($fd, 10000);
+
+        return $row;
+
+    }
 }
 

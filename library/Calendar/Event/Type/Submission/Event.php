@@ -53,12 +53,6 @@ class Event extends EventBase implements EventInterface {
      */
     protected $is_assessment = false;
 
-    /* Submission box information
-     */
-    private $submissionBoxId = -1;
-    private $submissionBoxName = '';
-    private $submissionBoxDetail = '';
-
 
     /**
 	 * Render via external class
@@ -86,7 +80,7 @@ class Event extends EventBase implements EventInterface {
             $extended = '';
         }
 
-        return $this->getCategory()->getName() . $extended . "\n" . $this->getSubmissionBoxName();
+        return $this->getCategory()->getName() . $extended . "\n" . $this->title;
     }
 
 	/**
@@ -116,61 +110,6 @@ class Event extends EventBase implements EventInterface {
      */
     public function getCategoryCodeString() {
         return $this->getCategory()->getCodeString();
-    }
-
-    /**
-     * Set submission box id
-     *
-     * @param $submissionBoxId
-     */
-    public function setSubmissionBoxId($submissionBoxId) {
-        $this->submissionBoxId = $submissionBoxId;
-    }
-
-    /**
-     * Get submission box id
-     *
-     * @return int
-     */
-    public function getSubmissionBoxId() {
-        return $this->submissionBoxId;
-    }
-
-    /**
-     * Set submission box name
-     *
-     * @param $submissionBoxName
-     */
-    public function setSubmissionBoxName($submissionBoxName) {
-        $this->submissionBoxName = $submissionBoxName;
-    }
-
-
-    /**
-     * Get submission box name
-     *
-     * @return string
-     */
-    public function getSubmissionBoxName() {
-        return $this->submissionBoxName;
-    }
-
-    /**
-     * Set submission box detail
-     *
-     * @param $submissionBoxName
-     */
-    public function setSubmissionBoxDetail($submissionBoxDetail) {
-        $this->submissionBoxDetail = $submissionBoxDetail;
-    }
-
-    /**
-     * Get submission box name
-     *
-     * @return string
-     */
-    public function getSubmissionBoxDetail() {
-        return $this->submissionBoxDetail;
     }
 
     /**

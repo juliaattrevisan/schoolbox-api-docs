@@ -83,17 +83,17 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
                 $assessment = $activity->getAssessment();
                 $owner      = $assessment->getUser();
                 $event->setIsAssessment(true);
-                $event->setSubmissionBoxId($assessment->getId());
-                $event->setSubmissionBoxName($assessment->getTitle());
-                $event->setSubmissionBoxDetail($assessment->getDescription());
+                $event->setEventId($assessment->getId());
+                $event->setTitle($assessment->getTitle());
+                $event->setDetail($assessment->getDescription());
                 $event->setPublishDate($assessment->getStart());
             } else {
                 $submission_box = $activity->getSubmissionBox();
                 $owner          = $submission_box->getOwner();
                 $event->setIsAssessment(false);
-                $event->setSubmissionBoxId($submission_box->getId());
-                $event->setSubmissionBoxName($submission_box->getName());
-                $event->setSubmissionBoxDetail($submission_box->getDescription());
+                $event->setEventId($submission_box->getId());
+                $event->setTitle($submission_box->getName());
+                $event->setDetail($submission_box->getDescription());
                 $event->setPublishDate($submission_box->getPublishDate());
             }
 

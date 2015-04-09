@@ -32,9 +32,9 @@ class CsvBase extends RendererBase
 
 
         $data = array($this->getEvent()->getStartTime()->getLocalShort(),
-            $this->getEvent()->getStartTime()->getTimeOnly(),
+            $this->getEvent()->getAllday() ? '' : $this->getEvent()->getStartTime()->getTimeOnly(),
             $this->getEvent()->getEndTime()->getLocalShort(),
-            $this->getEvent()->getEndTime()->getTimeOnly(),
+            $this->getEvent()->getAllday() ? '' : $this->getEvent()->getEndTime()->getTimeOnly(),
             $this->getEvent()->getAllday(),
             $this->getEvent()->getTitle(),
             $this->getEvent()->getDetail(),
