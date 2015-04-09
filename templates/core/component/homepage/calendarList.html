@@ -1,4 +1,4 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div class="box calendar clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <script type='text/javascript'>
         $(function () {
             $(document).on('click', 'a.{CALENDAR_PREFIX}-attendance-request', function (event) {
@@ -26,47 +26,17 @@
     {CONFIGURATION}
 
     <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <!-- BEGIN campus_event_day -->
+        <h3>{LIST_DATE}</h3>
         <div class="listing clearfix">
-            <ul class="js_happening calendar-event">
-                <!-- BEGIN group_events -->
-                <li class="{ON_OFF} clearfix">
-                    <span class="eventListing"><strong>{CAL_DATE} {CAL_TIME}</strong> <span style="background-color:{CAL_COLOUR}">{CAL_TITLE} <!-- BEGIN attendance_icon --><span
-                            class="float-right">A</span><!-- END attendance_icon --></span></span>
+            <ul class="js_happening">
 
-                    <div class="hidden-fields clearfix">
-                        <h3>{CAL_TITLE}</h3>
-                        <h4>{CAL_DATE} {CAL_TIME}</h4>
-                        <em>{CAL_LOCATION}</em>
-
-                        <p class="meta">
-                            Event Type: {CAL_TYPE}<br/>
-                            Created by: <a href="/search/user/{CAL_AUTHOR_ID}">{CAL_AUTHOR}</a><br/>
-                            {CAL_LOCATION} {CAL_DETAIL}
-                        </p>
-
-                        <!-- BEGIN attendance_status -->
-                        <p class="meta">Attendance Status: {ATTENDANCE_STATUS}</p>
-                        <!-- END attendance_status -->
-
-                        <div class="modify-event">
-                            <!-- BEGIN attendance_request_button -->
-                            <form method="post">
-                                <input name="event[id]" type="hidden" value="{CAL_ID}">
-                                <a class="btn modify float-left {CALENDAR_PREFIX}-attendance-request" href="#"><span></span>{ATTENDANCE_REQUEST_ACTION}</a>
-                            </form>
-                            <!-- END attendance_request_button -->
-
-                            <!-- BEGIN attendance_list_button -->
-                            <a class="btn modify float-left" href="/calendar/attendance/list/{CAL_ID}"><span></span>Attendance
-                                List</a>
-                            <!-- END attendance_list_button -->
-                            {CAL_MODIFY}
-                        </div>
-                    </div>
-                </li>
-                <!-- END group_events -->
+                <!-- BEGIN campus_events -->
+                    <!-- twig data goes here -->
+                <!-- END campus_events -->
             </ul>
         </div>
+        <!-- END campus_event_day -->
         <!-- BEGIN submit_event -->
         <p class="interact"><a href="/calendar/modify.php?level=3&homepageId={ID}&returnTo=homepage" class="btn add"><span></span>Add Event</a></p>
         <!-- END submit_event -->
