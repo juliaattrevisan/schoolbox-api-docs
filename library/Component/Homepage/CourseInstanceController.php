@@ -368,6 +368,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         // Output whether this item is complete.
         $unit_task_class  = '';
         $unit_task_status = '';
+        $undoable         = false;
         if ($this->readOnly) {
             $unit_task_class = 'incomplete';
             $completion_item = $completion_list[$_SESSION['id']];
@@ -380,6 +381,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                     case Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION:
                         $unit_task_class  = 'pending';
                         $unit_task_status = 'Completed';
+                        $undoable         = true;
                         break;
                     case Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE:
                     default:
@@ -436,6 +438,8 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
 
             }
             if ($unit->isOpen() && !$task->getRequiresConfirmation()) {
+                // Have I, the student, completed this yet?
+                $this->setVar('UNIT_TASK_UNDO', $undoable ? '/undo': '');
                 $this->parse('unit_task_start_block', 'unit_task_start');
             }
             if ($task->getType() == Task::TYPE_ONLINE_ASSESS) {
