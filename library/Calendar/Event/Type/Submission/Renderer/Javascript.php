@@ -38,13 +38,6 @@ class Javascript extends Base
         $categoryId   = $this->getEvent()->getCategory()->getId();
         $categoryName = $this->getEvent()->getCategory()->getName();
 
-        /* Event attendance
-         */
-        $hasIcon                    = false;
-        $hasStatus                  = false;
-        $hasAttendanceRequestButton = false;
-        $hasListButton              = false;
-
         /* Congeal all that stuff
          */
         $start   = $this->getEvent()->getStartTime()->getDatabaseDate();
@@ -77,7 +70,7 @@ class Javascript extends Base
                 'meta'       => array(
                     'eventId'   => $this->getEvent()->getEventId(),
                     'time'      => $this->getEvent()->getTime(),
-                    'detail'    => Scrub::html($this->getEvent()->getSubmissionBoxDetail()),
+                    'detail'    => Scrub::html($this->getEvent()->getDetail()),
                     'location'  => '',
                     'eventType' => 'type' . $this->getEvent()->getType(),
                     'type'      => $this->getEvent()->getEventType(),
@@ -96,10 +89,13 @@ class Javascript extends Base
                     'visible' => true,
                 ),
                 'attendance' => array(
-                    'icon'          => $hasIcon,
-                    'status'        => $hasStatus,
-                    'requestButton' => $hasAttendanceRequestButton,
-                    'listButton'    => $hasListButton,
+                    'icon'          => false,
+                    'status'        => false,
+                    'requestButton' => false,
+                    'listButton'    => false,
+                ),
+                'custom' => array(
+                    'modifyLink' => '/submission/createSubmission/modify/' . $this->getEvent()->getEventId(),
                 )
             )
         );

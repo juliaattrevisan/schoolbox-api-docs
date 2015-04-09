@@ -13,11 +13,11 @@
                 $.post('/service/attendance/processToggleAttendance', data, function (data) {
 
                     if (data.error == undefined) {
-                        if (button.text() == 'Attend') {
+                        if (button.text() == 'RSVP') {
                             button.html('<span></span>Unattend');
                         }
                         else {
-                            button.html('<span></span>Attend');
+                            button.html('<span></span>RSVP');
                         }
                     }
                 });

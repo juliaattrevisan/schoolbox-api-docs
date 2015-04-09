@@ -130,14 +130,13 @@ class Calendar extends DeprecatedModel
 
     public function getAttendeeList($eventId)
     {
-        $event = $this->getByID($eventId);
-
         $query = "
-            SELECT u.*,
+            SELECT u.*, g.name as groupName,
                 ea.id, ea.status, ea.intention
             FROM event_attendance ea
-            LEFT JOIN user u ON u.id = ea.user_id
-            WHERE ea.event_id = {$eventId}
+            JOIN `user` u ON u.id = ea.user_id
+            JOIN `groups` g ON g.id = u.group_id
+            WHERE ea.event_id = '{$eventId}'
         ";
 
         return $this->db->getAll($query);

@@ -1,87 +1,84 @@
 <h1>Attendance for {EVENT_NAME}</h1>
-<span class="header_option">
-</span>
-<div class="indent">
-    <!-- BEGIN no_attendees -->
-    {EVENT_NAME} has no attendees.
-    <!-- END no_attendees -->
 
-    <!-- BEGIN pending_attendee_list -->
-    <form name="modifyListForm" action="/calendar/attendance/processModifyAttendanceList" method="post">
-        <h2>Pending Attendees</h2>
-        <span class="header_option in-h2"><a href="/calendar/attendance/exportPending/{EVENT_ID}" class="btn download"><span></span>Export To CSV</a></span>
-        <table id="pendingAttendeeList" class="ruler table">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>Name</th>
-                    <th>Year</th>
-                    <th class="center">Remove</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- BEGIN pending_attendee -->
-                <tr class="{CLASS}">
-                    <td><input name="attendanceList[][id]" type="checkbox" value="{ATTENDANCE_ID}" /></td>
-                    <td><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
-                    <td>{USER_YEAR}</td>
-                    <td class="center"><a href="/calendar/attendance/processRemoveAttendance/{ATTENDANCE_ID}">Remove</a></td>
-                </tr>
-                <!-- END pending_attendee -->
-            </tbody>
-        </table>
+<!-- BEGIN no_attendees -->
+<p>Currently no one has RSVP.</p>
+<!-- END no_attendees -->
 
-        <div class="clearfix">
-            <input type="hidden" name="event[id]" value="{EVENT_ID}">
-            <input type="submit" name="approve" value="Approve Selected" class="submit-btn-plain">
-            <input type="submit" name="reject" value="Reject Selected" class="submit-btn-plain">
-        </div>
-    </form>
-    <!-- END pending_attendee_list -->
-
-    <!-- BEGIN approved_attendee_list -->
-    <h2>Approved Attendees</h2>
-    <span class="header_option in-h2"><a href="/calendar/attendance/exportAttending/{EVENT_ID}" class="btn download"><span></span>Export To CSV</a></span>
-    <table id="approvedAttendeeList" class="ruler table">
+<!-- BEGIN pending_attendee_list -->
+<form name="modifyListForm" action="/calendar/attendance/processModifyAttendanceList" method="post">
+    <h2>Pending Attendees</h2>
+    <span class="header_option in-h2"><a href="/calendar/attendance/exportPending/{EVENT_ID}" class="btn download"><span></span>Export To CSV</a></span>
+    <table id="pendingAttendeeList" class="ruler table">
         <thead>
             <tr>
+                <th></th>
                 <th>Name</th>
-                <th>Year</th>
+                <th>Role</th>
                 <th class="center">Remove</th>
             </tr>
         </thead>
         <tbody>
-            <!-- BEGIN approved_attendee -->
+            <!-- BEGIN pending_attendee -->
             <tr class="{CLASS}">
+                <td><input name="attendanceList[][id]" type="checkbox" value="{ATTENDANCE_ID}" /></td>
                 <td><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
-                <td>{USER_YEAR}</td>
-                <td class="center"><a href="/calendar/attendance/processRemoveAttendance/{ATTENDANCE_ID}">Remove</a></td>
+                <td>{USER_ROLE}</td>
+                <td><span class="actions one-button"><a href="/calendar/attendance/processRemoveAttendance/{ATTENDANCE_ID}" class="btn delete no-text float-left" title="Delete"><span></span></a></span></td>
             </tr>
-            <!-- END approved_attendee -->
+            <!-- END pending_attendee -->
         </tbody>
     </table>
-    <!-- END approved_attendee_list -->
 
-    <!-- BEGIN rejected_attendee_list -->
-    <h2>Rejected Attendees</h2>
-    <span class="header_option in-h2"><a href="/calendar/attendance/exportRejected/{EVENT_ID}" class="btn download"><span></span>Export To CSV</a></span>
-    <table id="rejectedAttendeeList" class="ruler table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Year</th>
-				<th class="center">Remove</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- BEGIN rejected_attendee -->
-            <tr class="{CLASS}">
-                <td><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
-                <td>{USER_YEAR}</td>
-                <td class="center"><a href="/calendar/attendance/processRemoveAttendance/{ATTENDANCE_ID}">Remove</a></td>
-            </tr>
-            <!-- END rejected_attendee -->
-        </tbody>
-    </table>
-    <!-- END rejected_attendee_list -->
-</div>
+    <div class="clearfix">
+        <input type="hidden" name="event[id]" value="{EVENT_ID}">
+        <input type="submit" name="approve" value="Approve Selected" class="submit-btn-plain">
+        <input type="submit" name="reject" value="Reject Selected" class="submit-btn-plain">
+    </div>
+</form>
+<!-- END pending_attendee_list -->
+
+<!-- BEGIN approved_attendee_list -->
+<h2>Approved Attendees</h2>
+<span class="header_option in-h2"><a href="/calendar/attendance/exportAttending/{EVENT_ID}" class="btn download"><span></span>Export To CSV</a></span>
+<table id="approvedAttendeeList" class="ruler table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Role</th>
+            <th class="center">Remove</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- BEGIN approved_attendee -->
+        <tr class="{CLASS}">
+            <td><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
+            <td>{USER_ROLE}</td>
+            <td><span class="actions one-button"><a href="/calendar/attendance/processRemoveAttendance/{ATTENDANCE_ID}" class="btn delete no-text float-left" title="Delete"><span></span></a></span></td>
+        </tr>
+        <!-- END approved_attendee -->
+    </tbody>
+</table>
+<!-- END approved_attendee_list -->
+
+<!-- BEGIN rejected_attendee_list -->
+<h2>Rejected Attendees</h2>
+<span class="header_option in-h2"><a href="/calendar/attendance/exportRejected/{EVENT_ID}" class="btn download"><span></span>Export To CSV</a></span>
+<table id="rejectedAttendeeList" class="ruler table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Remove</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- BEGIN rejected_attendee -->
+        <tr class="{CLASS}">
+            <td><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
+            <td>{USER_ROLE}</td>
+            <td><span class="actions one-button"><a href="/calendar/attendance/processRemoveAttendance/{ATTENDANCE_ID}" class="btn delete no-text float-left" title="Delete"><span></span></a></span>/td>
+        </tr>
+        <!-- END rejected_attendee -->
+    </tbody>
+</table>
+<!-- END rejected_attendee_list -->

@@ -26,7 +26,7 @@ class Javascript extends Base
              */
             $hasIcon = false;
             $hasStatus = false;
-            $hasAttendanceRequestButton = false;
+            $hasAttendanceRequestButton = true;
             $hasListButton = false;
 
             if ($this->event->canAttend()) {

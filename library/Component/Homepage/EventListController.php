@@ -66,7 +66,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
         $eventCount = 0;
 
         // Render all events for group using html renderer
-        $eventRenderer = new Lister($calendarApi, $this->start->getUnixTimestamp(), $this->end->getUnixTimestamp(), $this->user, $this->sitepage);
+        $eventRenderer = new Lister($calendarApi, $this->start->getUnixTimestamp(), $this->end->getUnixTimestamp(), $_SESSION['user'], $this->sitepage);
         foreach ($eventRenderer->getAllEvents() as $currentEvent) {
 
             if($eventLimit > 0 && $eventCount++ >= $eventLimit) {

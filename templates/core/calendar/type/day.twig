@@ -28,13 +28,13 @@
             {% endif %}
         </div>
         {% if event.attendance %}
-        <p class="meta">Attendance Status: {{ renderer.attendanceStatus() }}</p>
+        <p class="meta">Attendance {{ renderer.attendanceStatus() }}</p>
         {% endif %}
         <div>
             {% if event.attendance %}
                 <form method="post">
                     <input name="event[id]" type="hidden" value="{{ event.eventId }}">
-                    {% if event.renderer.attendanceStatus() %}
+                    {% if renderer.attendanceStatus() %}
                     <a class="btn modify float-left attendance-request" href="#"><span></span>Unattend</a>
                     {% else %}
                     <a class="btn modify float-left attendance-request" href="#"><span></span>RSVP</a>
