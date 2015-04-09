@@ -377,6 +377,28 @@ $(document).ready(function() {
         })
         .change()
 
+    // Related Resources:
+    // show/hide name and notes
+    form.on(
+        'change',
+        'input[data-interaction="display-notes"]',
+        function(event) {
+            var notes = $(this)
+                .closest('[data-relation="related-resource"]')
+                .find('[data-relation="related-resource-notes"]')
+            ;
+            if (this.checked) {
+                // Dunno if this disables tinyboxes
+                notes.slideDown('fast', function() {
+                    notes.find(':input').prop('disabled', false);
+                });
+            } else {
+                notes.slideUp('fast', function() {
+                    notes.find(':input').prop('disabled', true);
+                });
+            }
+        }
+    )
 })
 </script>
 <!-- END custom_header -->
@@ -404,7 +426,7 @@ $(document).ready(function() {
         </tr>
         <tr>
             <td class="formLabelWidth">
-                <h4>Name</h4>
+                <h4>Title</h4>
             </td>
             <td>
                 <input name="name" type="text" value="{{ item.name }}" />
@@ -477,7 +499,7 @@ $(document).ready(function() {
         {% endif %}
         <tr>
             <td class="formLabelWidth"><h4>Notes</h4></td>
-            <td><textarea name="notes" style="width:100%;">{{ item.event.detail }}</textarea></td>
+            <td><textarea name="notes" style="width:100%;">{{ item.notes }}</textarea></td>
         </tr>
         <tr>
             <td class="formLabelWidth">
@@ -490,25 +512,40 @@ $(document).ready(function() {
                 {# Related resources - not sure whether this list should be editable after save #}
                 <ul class="information-list related-resource-list">
                     {% for relatedItem in item.resource.relatedResourceList %}
-                    <li class="resource">
-                        <label for="related-item-{{ relatedItem.id }}">
-                            <input id="related-item-{{ relatedItem.id }}"
-                                   type="checkbox"
-                                   name="related_item[]"
-                                   value="{{ relatedItem.id }}"
-                                   {% if item.hasRelatedBookingForResource(relatedItem.id) %}checked{% endif %}
-                                    />
-                            <span class="resource-name">{{ relatedItem.name }}</span>
-                            <a href="{{ routeLookup('resourceItem.read', {id: relatedItem.id}) }}"
-                               class="resource-read-link btn no-text"
-                               id="resource-read-{{relatedItem.id}}"
-                               title="View Bookings"
-                            ><span></span></a>
-                        </label>
-                    </li>
-                {% else %}
-                    <li>This resource has no related resources.</li>
-                {% endfor %}
+                        {% if item.hasRelatedBookingForResource(relatedItem.id) %}
+                            {% set relatedBooking = item.getRelatedBookingForResource(relatedItem.id) %}
+                        {% else %}
+                            {% set relatedBooking = {} %}
+                        {% endif %}
+                        <li class="resource" data-relation="related-resource">
+                            <label for="related-item-{{ relatedItem.id }}">
+                                <input id="related-item-{{ relatedItem.id }}"
+                                       type="checkbox"
+                                       name="related_item[{{ relatedItem.id }}][resource_id]"
+                                       value="{{ relatedItem.id }}"
+                                       data-interaction="display-notes"
+                                       {% if relatedBooking is not empty %}checked{% endif %}
+                                        />
+                                <span class="resource-name">{{ relatedItem.name }}</span>
+                                <a href="{{ routeLookup('resourceItem.read', {id: relatedItem.id}) }}"
+                                   class="resource-read-link btn no-text"
+                                   id="resource-read-{{relatedItem.id}}"
+                                   title="View Bookings"
+                                ><span></span></a>
+                            </label>
+
+                            <div data-relation="related-resource-notes" class="{% if relatedBooking is empty %}hide{% endif %}">
+                                <dl>
+                                    <dt>Title</dt>
+                                    <dd><input name="related_item[{{ relatedItem.id }}][name]" type="text" value="{{ relatedBooking.name }}" /></dd>
+                                    <dt>Notes</dt>
+                                    <dd><textarea name="related_item[{{ relatedItem.id }}][notes]" style="width:100%;">{{ relatedBooking.notes }}</textarea></dd>
+                                </dl>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li>This resource has no related resources.</li>
+                    {% endfor %}
                 </ul>
             </td>
         </tr>

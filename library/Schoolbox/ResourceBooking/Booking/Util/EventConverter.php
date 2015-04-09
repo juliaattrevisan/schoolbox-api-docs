@@ -62,7 +62,7 @@ class EventConverter {
             $event->setColour($eventType->getColor());
         }
 
-        $event->setDetail($eventItem->getDetail());
+        $event->setDetail($booking->getNotes());
         $event->setLocation($eventItem->getLocation());
         $event->setAllDay($eventItem->getAllDay());
         // Resource booking events: not editable in the conventional way

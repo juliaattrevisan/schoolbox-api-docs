@@ -190,7 +190,10 @@ class Controller extends Base
 
             // Build the booking
             $booking = $this->getBookingFromEvent($item, $event);
-            $booking->setName($this->request->post['name']);
+            $booking
+                ->setName($this->request->post['name'])
+                ->setNotes($this->request->post['notes'])
+            ;
             $bookingList = new Collection();
             $bookingList->add($booking);
 
@@ -219,11 +222,9 @@ class Controller extends Base
             }
 
             // Expand into related items.
-            if (!empty($this->request->post['related_item'])) {
-                $bookingList = $this->getBookingsForRelatedItems(
-                    $bookingList,
-                    $this->request->post['related_item'] ? : array()
-                );
+            $relatedItems = $this->getRelatedItemsFromForm();
+            if (!empty($relatedItems)) {
+                $bookingList = $this->getBookingsForRelatedItems($bookingList, $relatedItems);
             }
             $this->bookingMapper->save($bookingList);
         } else {
@@ -278,11 +279,15 @@ class Controller extends Base
 
         if (empty($errors)) {
             $isTimeChanged = false;
+            $item
+                ->setName($this->request->post['name'])
+                ->setNotes($this->request->post['notes'])
+            ;
             $series = $this->getUpdatedSeries(
                 $item,
                 $this->getDateFromForm('start_datetime'),
                 $this->getDateFromForm('end_datetime'),
-                $this->request->post['related_item'] ?: array(),
+                $this->getRelatedItemsFromForm(),
                 $this->request->post['efficacy'],
                 $isTimeChanged
             );
@@ -294,11 +299,8 @@ class Controller extends Base
                 // Role and campus currently need to be set to something.
                 $event->setRoleCollection(new Collection());
                 $event->setCampusCollection(new Collection());
-                $event->setDetail($this->request->post['notes']);
+                $event->setDetail($booking->getNotes());
                 $this->eventMapper->save($event);
-
-                // Adjust $booking
-                $booking->setName($this->request->post['name']);
 
                 // getUpdatedSeries() sets deleted field if the item isn't in
                 // the sequence.
@@ -362,12 +364,16 @@ class Controller extends Base
         $newList = new Collection();
         foreach ($bookingList as $booking) {
             foreach ($booking->getResource()->getRelatedResourceList() as $relatedResource) {
-                if (in_array($relatedResource->getId(), $relatedItems)) {
+                if (array_key_exists($relatedResource->getId(), $relatedItems)) {
+                    $relatedItemInputs = $relatedItems[$relatedResource->getId()];
                     $relatedBooking = $this->getBookingFromEvent(
                         $relatedResource,
                         $booking->getEvent()
                     );
-                    $relatedBooking->setName($booking->getName());
+                    $relatedBooking
+                        ->setName($relatedItemInputs['name'])
+                        ->setNotes($relatedItemInputs['notes'])
+                    ;
                     // Add related booking relation in both directions
                     $booking->addRelatedBooking($relatedBooking);
                     $relatedBooking->addRelatedBooking($booking);
@@ -641,9 +647,9 @@ class Controller extends Base
                     $dateParts[] = array($resource, $occurenceStart, $occurenceEnd);
                 }
 
-                $relatedItems = $this->request->post['related_item'] ?: array();
+                $relatedItems = $this->getRelatedItemsFromForm();
                 foreach ($resource->getRelatedResourceList() as $relatedResource) {
-                    if (in_array($relatedResource->getId(), $relatedItems)) {
+                    if (array_key_exists($relatedResource->getId(), $relatedItems)) {
                         $dateParts[] = array($relatedResource, $startDate, $endDate);
 
                         foreach ($series as $occurenceStart) {
@@ -673,7 +679,7 @@ class Controller extends Base
                     $this->bookingMapper->findById($existingBooking->getId()),
                     $startDate,
                     $endDate,
-                    $this->request->post['related_item'] ?: array(),
+                    $this->getRelatedItemsFromForm(),
                     $this->request->post['efficacy'],
                     $isTimeChanged
                 );
@@ -822,6 +828,22 @@ class Controller extends Base
     }
 
     /**
+     * Gets selected related items out of the form, along with notes and name.
+     *
+     * @return array
+     */
+    protected function getRelatedItemsFromForm()
+    {
+        $relatedItems = array();
+        foreach ($this->request->post['related_item'] ?: array() as $relatedItem) {
+            if ($relatedItem['resource_id']) {
+                $relatedItems[$relatedItem['resource_id']] = $relatedItem;
+            }
+        }
+        return $relatedItems;
+    }
+
+    /**
      * Helper for creating events for resource bookings.
      *
      * @return Calendar\Event
@@ -867,7 +889,9 @@ class Controller extends Base
             ->setEvent($event)
             ->setResource($resource)
             ->setStatus(Status\Model::STATUS_PENDING)
-            ->setName($this->getRequest()->post['name']);
+            ->setName($this->getRequest()->post['name'])
+            ->setNotes($this->getRequest()->post['notes'])
+        ;
         // What about the resource? If it's an open resource, confirm the
         // booking immediately.
         if ($resource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
@@ -1366,7 +1390,7 @@ class Controller extends Base
                         break;
                     }
                 }
-                $inNew = in_array($relatedResource->getId(), $relatedItems);
+                $inNew = array_key_exists($relatedResource->getId(), $relatedItems);
 
                 if ($inNew) {
                     if ($relatedBooking instanceof Model) {
@@ -1384,6 +1408,10 @@ class Controller extends Base
                             ->setResource($relatedResource)
                             ->setStatus(Status\Model::STATUS_PENDING);
                     }
+                    $relatedBooking
+                        ->setName($relatedItems[$relatedResource->getId()]['name'])
+                        ->setNotes($relatedItems[$relatedResource->getId()]['notes'])
+                    ;
 
                     // Open resource: automatically confirm
                     if ($relatedResource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
