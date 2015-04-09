@@ -6,7 +6,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-use Calendar\Event\Collection\Renderer;
+use Calendar\Event\Collection\Lister;
 
 class Component_Homepage_EventListController extends Component_Homepage_ControllerAbstract
 {
@@ -63,9 +63,15 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
         $calendarApi  = new Calendar_Api_EventType_Event_Schoolbox_Group($_SESSION['user'], array());
         $calendarApi->setGroupId($this->getContext()->getId());
 
+        $eventCount = 0;
+
         // Render all events for group using html renderer
-        $eventRenderer = new Renderer($calendarApi, $this->start->getUnixTimestamp(), $this->end->getUnixTimestamp(), $this->user, $this->sitepage);
+        $eventRenderer = new Lister($calendarApi, $this->start->getUnixTimestamp(), $this->end->getUnixTimestamp(), $this->user, $this->sitepage);
         foreach ($eventRenderer->getAllEvents() as $currentEvent) {
+
+            if($eventLimit > 0 && $eventCount++ >= $eventLimit) {
+                break;
+            }
 
             //
             // Current day: will never be before the start time

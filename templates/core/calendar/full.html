@@ -415,6 +415,10 @@
         // to click.
         $('#calendar-export form').submit(function(event) {
             event.preventDefault();
+
+            //Copy and paste button
+            var client = new ZeroClipboard($('#copy-button'));
+
             var form = $(this);
             $('#calendar-export-dialog').dialog({
                 open: function(event, ui) {
@@ -426,8 +430,7 @@
             });
         });
 
-        //Copy and paste button
-        var client = new ZeroClipboard($('#copy-button'));
+
 
         // Copypasted code for updating booking in series
         $('#calendar-bubble').find('#editEvent').on(

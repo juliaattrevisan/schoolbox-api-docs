@@ -11,7 +11,7 @@
  *
  */
 
-use Calendar\Event\Collection\Renderer;
+use Calendar\Event\Collection\Lister;
 
 class Component_Homepage_CalendarListController extends Component_Homepage_ControllerAbstract
 {
@@ -54,21 +54,14 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
         $this->setBlock('campus_event_day', 'campus_events', 'campus_events_block');
 
 
-        //event limit changed from posts to days
-        /*if ($this->getConfig('size') != 0 && $this->getConfig('size') != '') {
-            $where = " AND DATE(start_datetime) < ADDDATE(CURDATE(), INTERVAL {$this->getConfig('size')} DAY) ";
-        } else {
-            $where = "";
-        }*/
-
 
         $this->setVar('CALENDAR_TITLE', 'Campus Calendar');
 
-        if($this->getConfig('size')) {
+        if($this->getConfig('size') > 0) {
             $days = $this->getConfig('size');
         }
         else {
-            $days = 31;
+            $days = 160;
         }
 
         $now         = Alaress_Date_Format::now();
@@ -81,7 +74,7 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
         $calendarApi  = new Calendar_Api_EventType_Event_Schoolbox_Campus($_SESSION['user'], array());
 
         // Render all events for group using html renderer
-        $eventRenderer = new Renderer($calendarApi, $this->start->getUnixTimestamp(), $this->end->getUnixTimestamp(), $this->user, $this->sitepage);
+        $eventRenderer = new Lister($calendarApi, $this->start->getUnixTimestamp(), $this->end->getUnixTimestamp(), $this->user, $this->sitepage);
         foreach ($eventRenderer->getAllEvents() as $currentEvent) {
 
             //
