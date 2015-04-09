@@ -1378,24 +1378,41 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      *
      * @param Alaress_Date_Format $other
      *
-     * @return bool
+     * @return int -1 if $this < $other, 0 if $this == $other, +1 if $this > $other
      */
     public function compare($other)
     {
-        return $this->eq($other);
+        if ($this->lt($other)) {
+            return -1;
+        }
+        if ($this->gt($other)) {
+            return 1;
+        }
+        return 0;
     }
 
     /**
      * Compares dates of two Alaress_Date_Format objects, ignoring the time
-     * component completely.
+     * and timezone components completely.
      *
      * @param Alaress_Date_Format $other
      *
-     * @return bool
+     * @return int -1 if $this < $other, 0 if $this == $other, +1 if $this > $other
      */
     public function compareDateOnly($other)
     {
-        return $this->isSameDay($other);
+        $thisDate  = $this->getUsingFormat('Ymd');
+        $otherDate = $other->getUsingFormat('Ymd');
+        if ($thisDate === $otherDate) {
+            return 0;
+        }
+        if ($thisDate < $otherDate) {
+            return -1;
+        }
+        if ($thisDate > $otherDate) {
+            return 1;
+        }
+        return 0;
     }
 
 
