@@ -56,11 +56,7 @@ class Model implements ISoftDeletable
      */
     public function isDeleted()
     {
-        if ($this->getDeletedAt() instanceof \Alaress_Date_Format) {
-            return true;
-        }
-
-        return false;
+        return ($this->getDeletedAt() instanceof \Alaress_Date_Format && !$this->getDeletedAt()->isNull());
     }
 
     /**
@@ -120,7 +116,7 @@ class Model implements ISoftDeletable
     /**
      * Set deleted at
      *
-     * @param string $deletedAt
+     * @param \Alaress_Date_Format $deletedAt
      * @return $this
      */
     public function setDeletedAt($deletedAt)
@@ -132,7 +128,7 @@ class Model implements ISoftDeletable
     /**
      * Get deleted at
      *
-     * @return string
+     * @return \Alaress_Date_Format
      */
     public function getDeletedAt()
     {
