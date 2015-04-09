@@ -198,7 +198,7 @@ elseif ($_POST['login']) {
 		 */
         $_SESSION['previous'] = $oldSession;
 
-        $logger = new User_Logger_AssumeUser($oldSession, $_SESSION['user']);
+        $logger = new User_Logger_AssumeUser($oldSession['user'], $_SESSION['user']);
         $logger->notify();
 
         SitePage::localRedir('/');

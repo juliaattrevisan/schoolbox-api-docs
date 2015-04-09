@@ -26,7 +26,7 @@ class Controller extends Base
         if ($session->create($user->getUsername())) {
             $_SESSION['previous'] = $previous;
 
-            $logger = new \User_Logger_AssumeUser($previous, $user);
+            $logger = new \User_Logger_AssumeUser($previous['user'], $user);
             $logger->notify();
         }
         else {
