@@ -159,50 +159,68 @@
 
 <div id="calendar-export" class="calendar-controls no-height clearfix">
 	<div class="link-case">
-		<div class="filter-drop clearfix">
-			<div class="filter-list">
-				<form class="clearfix">
-					<div class="export-cat all-events">
-						<label title="All events" for="export-all">
-							<input type="radio" name="export" value="all" id="export-all" checked />
-							All events
-						</label>
-					</div>
-					<div class="export-cat personal-events">
-						<label title="Personal events only" for="export-personal">
-							<input type="radio" name="export" value="personal" id="export-personal" />
-							Personal events only
-						</label>
-					</div>
-					<div class="export-cat group-events">
-						<label title="Events for group" for="export-group">
-							<input type="radio" name="export" value="group" id="export-group" />
-							Events for group:
-							<select name="group">
-								<option value="">-- select --</option>
-								<!-- BEGIN export_group -->
-								<option label="{EXPORT_GROUP_NAME}" value="{EXPORT_GROUP_ID}">{EXPORT_GROUP_NAME}</option>
-								<!-- END export_group -->
-							</select>
-						</label>
-					</div>
-					<div class="export-cat campus-events">
-						<label title="Events for campus" for="export-campus">
-							<input type="radio" name="export" value="campus" id="export-campus" />
-							Events for campus:
-							<select name="campus">
-								<option value="">-- select --</option>
-								<!-- BEGIN export_campus -->
-								<option label="{EXPORT_CAMPUS_NAME}" value="{EXPORT_CAMPUS_ID}" >{EXPORT_CAMPUS_NAME}</option>
-								<!-- END export_campus -->
-							</select>
-						</label>
-					</div>
-					<input type="submit" id="open-calendar-export-dialog" value="Generate URL" class="btn submit-btn-plain" />
+        <div class="filter-drop clearfix">
+            <div class="filter-list">
+                <form class="clearfix">
+                    <div class="export-cat all-events">
+                        <label title="All events" for="export-all">
+                            <input type="radio" name="export" value="all" id="export-all" checked />
+                            All events
+                        </label>
+                    </div>
+                    <div class="export-cat personal-events">
+                        <label title="Personal events only" for="export-personal">
+                            <input type="radio" name="export" value="personal" id="export-personal" />
+                            Personal events only
+                        </label>
+                    </div>
+                    <div class="export-cat group-events">
+                        <label title="Events for group" for="export-group">
+                            <input type="radio" name="export" value="group" id="export-group" />
+                            Events for group:
+                            <select name="group">
+                                <option value="">-- select --</option>
+                                <!-- BEGIN export_group -->
+                                <option label="{EXPORT_GROUP_NAME}" value="{EXPORT_GROUP_ID}">{EXPORT_GROUP_NAME}</option>
+                                <!-- END export_group -->
+                            </select>
+                        </label>
+                    </div>
+                    <div class="export-cat campus-events">
+                        <label title="Events for campus" for="export-campus">
+                            <input type="radio" name="export" value="campus" id="export-campus" />
+                            Events for campus:
+                            <select name="campus">
+                                <option value="">-- select --</option>
+                                <!-- BEGIN export_campus -->
+                                <option label="{EXPORT_CAMPUS_NAME}" value="{EXPORT_CAMPUS_ID}">{EXPORT_CAMPUS_NAME}</option>
+                                <!-- END export_campus -->
+                            </select>
+                        </label>
+                    </div>
+                    <div class="export-cat timetable-events">
+                        <label title="Timetable Classes" for="export-timetable">
+                            <input type="radio" name="export" value="timetable" id="export-timetable" />
+                            Timetable Classes
+                        </label>
+                    </div>
+                    <div class="export-cat timetableday-events">
+                        <label title="Timetable days" for="export-timetableday">
+                            <input type="radio" name="export" value="timetabledays" id="export-timetableday" />
+                            Timetable Days
+                        </label>
+                    </div>
+                    <div class="export-cat duework-events">
+                        <label title="Due Work" for="export-duework">
+                            <input type="radio" name="export" value="duework" id="export-duework" />
+                            Due Work
+                        </label>
+                    </div>
+                    <input type="submit" id="open-calendar-export-dialog" value="Generate URL" class="btn submit-btn-plain" />
                     <input type="submit" id="download-calendar-export" value="Download CSV" class="btn submit-btn-plain" />
-				</form>
-			</div>
-		</div>
+                </form>
+            </div>
+        </div>
 	</div>
 </div>
 <div id="calendar-export-dialog">

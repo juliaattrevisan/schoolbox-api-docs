@@ -39,6 +39,10 @@ try {
         throw new Exception_Schoolbox('Invalid token', 401);
     }
 
+    // Default start and end times
+    $start = strtotime('-1 months', $_SERVER['REQUEST_TIME']);
+    $end   = strtotime('+12 months', $_SERVER['REQUEST_TIME']);
+
     switch ($export_type) {
         case 'personal':
             $api = new Calendar_Api_EventType_Event_Schoolbox_Personal($user, array());
@@ -72,9 +76,28 @@ try {
             $filename = 'duework';
             break;
 
+        case 'timetable':
+            $api = new Calendar_Api_EventType_Timetable_External_Default($user, array());
+            $filename = 'timetable';
+            $start = $_SERVER['REQUEST_TIME'];
+            $end = strtotime('+3 months', $_SERVER['REQUEST_TIME']);
+            break;
+
+        case 'timetabledays':
+            $api = new Calendar_Api_EventType_TimetableDays_External_Default($user, array());
+            $filename = 'timetabledays';
+            $start = $_SERVER['REQUEST_TIME'];
+            $end = strtotime('+3 months', $_SERVER['REQUEST_TIME']);
+            break;
+
         case 'all':
-            $factory = new Calendar_Api_Factory($user);
-            $api = $factory->produce();
+
+            // All day events, but exclude other sources
+            $api = new Calendar_Api_Composite();
+            $api->add(new Calendar_Api_EventType_Event_Schoolbox_Campus($user, array()));
+            $api->add(new Calendar_Api_EventType_Event_Schoolbox_Group($user, array()));
+            $api->add(new Calendar_Api_EventType_Event_Schoolbox_Personal($user, array()));
+
             break;
 
         case '':
@@ -95,8 +118,8 @@ try {
 
         $exporter = new CSVExporter(
             $api,
-            $_SERVER['REQUEST_TIME'],
-            strtotime('+6 months', $_SERVER['REQUEST_TIME']),
+            $start,
+            $end,
             $user,
             new SitePage(false)
         );
@@ -108,8 +131,8 @@ try {
 
         $exporter = new Exporter(
             $api,
-            $_SERVER['REQUEST_TIME'],
-            strtotime('+6 months', $_SERVER['REQUEST_TIME']),
+            $start,
+            $end,
             $user,
             new SitePage(false)
         );
