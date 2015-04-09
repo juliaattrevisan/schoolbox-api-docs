@@ -84,7 +84,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
                 $this->setVar('group_events_block', '');
             }
 
-            $this->setVar('LIST_DATE', $currentDay->getDateOnly());
+            $this->setVar('LIST_DATE', $currentDay->getLongDateOnly());
 
             $this->setVar('group_events', $eventRenderer->renderEvent($currentEvent, 'html'));
 

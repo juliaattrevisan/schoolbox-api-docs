@@ -88,7 +88,7 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
                 $this->setVar('campus_events_block', '');
             }
 
-            $this->setVar('LIST_DATE', $currentDay->getDateOnly());
+            $this->setVar('LIST_DATE', $currentDay->getLongDateOnly());
 
             $this->setVar('campus_events', $eventRenderer->renderEvent($currentEvent, 'html'));
 

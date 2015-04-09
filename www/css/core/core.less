@@ -5921,7 +5921,7 @@ CALENDAR
             li {
                 border-top: 1px solid @dark;
                 margin: 0;
-                padding: 4px;
+                padding: 5px;
             }
             .event-time, .event-brief {
                 display: block;
@@ -6273,7 +6273,7 @@ ul.js_happening {
         overflow: hidden;
         span {
             display: block;
-            padding: 3px;
+            padding: 5px;
             cursor: pointer;
             overflow: hidden;
             .float-right {
@@ -6905,6 +6905,10 @@ COMPONENT
     float: left;
     width: 125px;
     padding: 5px 0;
+}
+
+.calendar .eventListing {
+  padding:  0;
 }
 
 /********************************************
@@ -10876,6 +10880,9 @@ table img { max-width: none; }
     }
     .fc-event {
         font-size: 1em;
+        .fc-bg {
+          opacity: 0.4;
+        }
     }
     .fc-event-skin {
         color: @black;

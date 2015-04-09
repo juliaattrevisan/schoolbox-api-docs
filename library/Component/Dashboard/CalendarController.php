@@ -114,7 +114,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
                 $this->setVar('note_listing', '');
             }
 
-            $this->setVar('LIST_DATE', $currentDay->getDateOnly());
+            $this->setVar('LIST_DATE', $currentDay->getLongDateOnly());
 
             $this->setVar('note_block', $this->eventRenderer->renderEvent($currentEvent, 'html'));
 

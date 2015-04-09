@@ -1,19 +1,17 @@
 <div class="box text clearfix calendar">
     <!-- BEGIN day -->
-    <h2><a href="/calendar/full/{CALENDAR_DATE}/#week">{DATE}</a></h2>
-    <div class="listing">
-        <ul class="js_happening">
-            <!-- BEGIN note_block -->
-                <!-- twig calendar events go here -->
-            <!-- END note_block -->
-        </ul>
+    <h2><a href="/calendar/full/{CALENDAR_DATE}/#week">{LIST_DATE}</a></h2>
+    <ul class="js_happening calendar">
+        <!-- BEGIN note_block -->
+            <!-- twig calendar events go here -->
+        <!-- END note_block -->
+    </ul>
 
-        <!-- BEGIN no_events -->
-        <div class="no_events">
-            <em>There are no upcoming events.</em>
-        </div>
-        <!-- END no_events -->
+    <!-- BEGIN no_events -->
+    <div class="no_events">
+        <em>There are no upcoming events.</em>
     </div>
+    <!-- END no_events -->
     <!-- END day -->
 </div>
 
