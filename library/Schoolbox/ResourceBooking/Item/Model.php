@@ -10,6 +10,7 @@
 namespace Schoolbox\ResourceBooking\Item;
 
 use Schoolbox\Collection;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Storage;
@@ -402,6 +403,38 @@ class Model implements ISoftDeletable, JsonSerializable {
      */
     public function isDeleted() {
         return ($this->getDeletedAt() instanceof Alaress_Date_Format && !$this->getDeletedAt()->isNull());
+    }
+
+    /**
+     * Is this user allowed to moderate this item?
+     *
+     * They can if:
+     * * They're a superuser
+     * * They have the resource booking service at level "moderate"
+     * * They are a moderator for this item
+     *
+     * @param User $user
+     *
+     * @return bool
+     */
+    public function canUserModerateThisItem(User $user)
+    {
+        if ($user->isSuperuser()) {
+            return true;
+        }
+        foreach ($user->getAccessList() as $access) {
+            if ($access->getService() == UserAccess::SERVICE_RESOURCE_BOOKING
+                && $access->getAccessLevel() == UserAccess::ACCESS_FULL
+            ) {
+                return true;
+            }
+        }
+        foreach ($this->getModeratorList() as $moderator) {
+            if ($moderator->getId() == $user->getId()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

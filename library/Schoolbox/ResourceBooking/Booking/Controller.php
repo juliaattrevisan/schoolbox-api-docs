@@ -107,9 +107,10 @@ class Controller extends Base
             array(
                 'template' => '@resourceBooking/book.twig',
                 'data'     => array(
-                    'item'        => $item,
-                    'campusList'  => $this->getCampusList(),
-                    'callbackUrl' => $this->getRequest()->query['callbackUrl'],
+                    'item'          => $item,
+                    'campusList'    => $this->getCampusList(),
+                    'callbackUrl'   => $this->getRequest()->query['callbackUrl'],
+                    'allowOverride' => $item->getResource()->canUserModerateThisItem($this->getUser())
                 ),
             )
         );
@@ -563,7 +564,9 @@ class Controller extends Base
             $errors['end_datetime'][] = 'invalid';
         }
 
-        $override = !empty($this->getRequest()->post['override_validation']);
+        // Only moderators of this booking may override validation
+        $override = !empty($this->getRequest()->post['override_validation'])
+            && $resource->canUserModerateThisItem($this->getUser());
 
         // As long as I have startTime, I can check leadtime.
         if (isset($startDate) && !$override) {
