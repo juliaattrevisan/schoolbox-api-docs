@@ -28,6 +28,7 @@ class User implements JsonSerializable
     private $year;
     private $schoolHouse;
     private $residentialHouse;
+    private $linkedUser;
 
     /**
      * The hash value is actually a digest key and it will change
@@ -92,6 +93,7 @@ class User implements JsonSerializable
     {
         $this->setCampusCollection(new CampusCollection(array()));
         $this->setConfigLoader(new ConfigLoader());
+        $this->setLinkedUser(new \Schoolbox\Collection(array()));
     }
 
     /**
@@ -697,4 +699,22 @@ class User implements JsonSerializable
             'lastname'  => $this->getLastname(),
         );
     }
+
+    /**
+     * @param \Schoolbox\Collection $linkedUser
+     */
+    public function setLinkedUser($linkedUser)
+    {
+        $this->linkedUser = $linkedUser;
+    }
+
+    /**
+     * @return \Schoolbox\Collection
+     */
+    public function getLinkedUser()
+    {
+        return $this->linkedUser;
+    }
+
+
 }

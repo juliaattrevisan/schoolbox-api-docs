@@ -115,7 +115,7 @@ class Session
 
             // add mobile session data
             $sbmAuth = new Authenticator();
-            return $sbmAuth->appendSession($username);
+            return $sbmAuth->appendSession($user['uid']);
 
         } else {
             return false;

@@ -59,13 +59,17 @@ class Authenticator {
         $this->destroySession();
 
         // start by creating a desktop session, then we will add the mobile elements into it
-        $session = new Session();
-        $session->create($username, $remember);
-
-        return session_start() ? $this->appendSession($username) : false;
+        if(session_start()) {
+            $session = new Session();
+            $session->create($username, $remember);
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
-    public function appendSession($username) {
+    public function appendSession($userID) {
         /**
          *
          * @var UserMapper $userMapper
@@ -73,10 +77,8 @@ class Authenticator {
         $userMapper = UserMapper::getInstance();
 
         try {
-            $user = $userMapper->findOneByColumn('username', $username);
-
             // yep, you ACTUALLY have to do this otherwise hydrations don't get done
-            $user = $userMapper->findById($user->getId());
+            $user = $userMapper->findById($userID);
 
             /**
              * Map subjects onto the user object retrieved, and dump into session

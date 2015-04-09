@@ -39,6 +39,9 @@ if(is_numeric($this->arg[0])) {
 	 */
     $user = $userHandler->getByID($this->arg[0]);
 
+    // TODO: remove double handling while we convert
+    $userObj = \Schoolbox\UserMapper::getInstance()->findById($this->arg[0]);
+
     if (is_array($user)) {
 
         /* Prepend a please select at the start of every campus list
@@ -237,6 +240,16 @@ if(is_numeric($this->arg[0])) {
         } else
             $this->setVar('login_log_block', '');
 
+        /* Output linked accounts */
+        $this->setBlock(TEMPLATE_content, 'user_linked', 'user_linked_block');
+        $this->setVar('user_linked_block', '');
+        foreach($userObj->getLinkedUser() as $linkedUser){
+            /** @param \Schoolbox\User $linkedUser */
+            $this->setVar(array('USER_LINKED_ID'  => $linkedUser->getId(),
+                            'LINKED_USER'   => $linkedUser->getFullName(),
+                            'LINKED_USER_DATE' => '',));
+            $this->parse('user_linked_block', 'user_linked',true);
+        }
 
          /* Output activity log */
          $this->setBlock(TEMPLATE_content, 'action_log', 'action_log_block');

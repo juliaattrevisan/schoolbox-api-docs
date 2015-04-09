@@ -16,7 +16,8 @@
  * @version     SVN: $Id$
  */
 
-use \Schoolbox\Config\Loader;
+use \Schoolbox\Config\ConfigMapper;
+use \Schoolbox\IConfigLoader;
 
 class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract {
 
@@ -30,8 +31,8 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract {
      */
     public function getConfig()
     {
-        if (!$this->config instanceof Loader) {
-            $this->setConfig(new Loader());
+        if (!$this->config instanceof IConfigLoader) {
+            $this->setConfig(ConfigMapper::getInstance());
         }
 
         return $this->config;
@@ -42,7 +43,7 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract {
      *
      * @return $this
      */
-    public function setConfig(\Schoolbox\IConfigLoader $loader)
+    public function setConfig(IConfigLoader $loader)
     {
         $this->config = $loader;
         return $this;

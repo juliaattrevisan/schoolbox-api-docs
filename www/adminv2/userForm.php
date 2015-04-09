@@ -140,7 +140,53 @@ elseif (is_numeric($_GET['deleteService']) && is_numeric($_GET['sid']) && is_num
     $groupHandler->deleteUser(Scrub::text($_GET['sid']), Scrub::text($_GET['uid']));
 
     SitePage::localRedir('/adminv2/modify-user/' . Scrub::text($_GET['uid']) . '#permissions');
-} /* Switch logins to the current user being viewed
+}
+elseif (is_numeric($_GET['deleteUserLink']) && is_numeric($_GET['linkedUser']) ) {
+    /* Deletes linked users */
+
+    try {
+        $originalUser = \Schoolbox\UserMapper::getInstance()->findById($_GET['deleteUserLink']);
+    }
+    catch(\Schoolbox\Mapper\Exception $e)  {
+        error(2);
+    }
+    $linkedUserList = new \Schoolbox\Collection;
+    foreach($originalUser->getLinkedUser() as $linkedUser) {
+        if($linkedUser->getId() != $_GET['linkedUser']) {
+            $linkedUserList->add($linkedUser);
+        }
+    }
+    $originalUser->setLinkedUser($linkedUserList);
+
+    \Schoolbox\UserMapper::getInstance()->save($originalUser);
+
+    SitePage::localRedir('/adminv2/modify-user/'.$originalUser->getId().'#linked');
+}
+elseif (is_array($_POST['linkUser'])) {
+    /* Adds linked users */
+
+    try {
+        $originalUser = \Schoolbox\UserMapper::getInstance()->findById($_POST['userID']);
+    }
+    catch(\Schoolbox\Mapper\Exception $e)  {
+        error(2);
+    }
+
+    foreach($_POST['linkUser'] as $userId ){
+        try{
+            $linkedUser = \Schoolbox\UserMapper::getInstance()->findById($userId);
+
+            $originalUser->getLinkedUser()->add($linkedUser);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            //noop on user not found
+        }
+    }
+
+    \Schoolbox\UserMapper::getInstance()->save($originalUser);
+
+    SitePage::localRedir('/adminv2/modify-user/'.$originalUser->getId().'#linked');
+}
+/* Switch logins to the current user being viewed
  */
 elseif ($_POST['login']) {
     $oldSession = $_SESSION;
@@ -150,7 +196,9 @@ elseif ($_POST['login']) {
     if ($sessionHandler->create($_POST['login'])) {
 /* Logging
 		 */
-        $logger = new User_Logger_AssumeUser($oldSession, $userHandler->getByUsername($_POST['login']));
+        $_SESSION['previous'] = $oldSession;
+
+        $logger = new User_Logger_AssumeUser($oldSession['user'], $_SESSION['user']);
         $logger->notify();
 
         SitePage::localRedir('/');

@@ -2,6 +2,8 @@
 <link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
 <script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript" src="/javascript/components/jquery-validation/additional-methods.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript">
 
 $(function() {
@@ -274,6 +276,28 @@ $(function() {
       }
   })
 
+    // Handles autosuggest for linking users to other user accounts
+    var addUserSelector = $('#linkUser');
+    var addUserButton   = addUserSelector.closest('form').find(':submit');
+    addUserSelector.selectizeSelector({
+                multiple: true,
+                ajax: {
+                    url:      '/ajax/user.php',
+                    type:     'GET',
+                    data:     {groupID: 0},
+                    dataType: 'json'
+                }
+            })
+            .on('selectize.item_add', function(event, value) {
+                addUserButton.prop('disabled', false).removeClass('disabled');
+            })
+            .on('selectize.item_remove', function() {
+                // Disable only if empty
+                if ($(this).data('selectize').items.length === 0) {
+                    addUserButton.prop('disabled', true).addClass('disabled');
+                }
+            });
+
 });
 </script>
 
@@ -417,9 +441,8 @@ $(function() {
 		<input type="submit" name="delete" class="submit-btn-plain" value="Delete User" onclick="return(confirm('Are you sure you want to delete {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME}'));" />
 	</form>
 </div>
+<h2>Groups</h2>
 <div class="level clearfix">
-	<h3>Groups</h3>
-	<h3>Manage</h3>
 	<table class="table ruler">
 		<colgroup>
 			<col width="10%" />
@@ -453,7 +476,6 @@ $(function() {
 			<!-- END user_group -->
             </tbody>
         </table>
-            <h3 style="margin-top:16px;">Add</h3>
 					<form action="/adminv2/userForm.php" method="post" class="clearfix" id="groupAdd">
 						<fieldset>
 							<input type="hidden" name="groupSubmit" />
@@ -475,9 +497,8 @@ $(function() {
 					</form>
 
 </div>
+<h2 id="permissions">Permissions</h2>
 <div class="level clearfix">
-	<h3 id="permissions">Permissions</h3>
-	<h3>Manage</h3>
 	<table class="table ruler" id="permissions-list">
 		<colgroup>
 			<col width="10%" />
@@ -602,7 +623,6 @@ $(function() {
             <!-- END user_resource_booking -->
 			</tbody>
             </table>
-					<h3 style="margin-top:16px;">Add</h3>
 					<form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" class="clearfix">
 							<input type="hidden" name="addService" />
 							<input type="hidden" value="{USERID}" name="uid">
@@ -660,8 +680,39 @@ $(function() {
 						</table>
 					</form>
 </div>
+<h2><a name="linked"></a>Linked Accounts</h2>
 <div class="level clearfix">
-    <h3>Recent Activity Logs</h3>
+    <table class="table ruler">
+        <colgroup>
+            <col width="10%" />
+            <col width="60%" />
+            <col width="30%" />
+        </colgroup>
+        <thead>
+        <tr>
+            <th>Remove</th>
+            <th>Person</th>
+            <th>Date Linked</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- BEGIN user_linked -->
+        <tr>
+            <td><a href="/adminv2/userForm.php?deleteUserLink={USERID}&amp;linkedUser={USER_LINKED_ID}" ><img title="remove" src="/images/famicons/delete.png" /></a></td>
+            <td><a href="/adminv2/modify-user/{LINKED_USER_ID}">{LINKED_USER}</a></td>
+            <td>{LINKED_USER_DATE}</td>
+        </tr>
+        <!-- END user_linked -->
+        </tbody>
+    </table>
+    <form action="/adminv2/userForm.php" method="post">
+        <input type="hidden" name="userID" value="{USERID}" />
+        <select id="linkUser" name="linkUser[]" multiple placeholder="Search Users"></select>
+        <input type="submit" value="Add Users" class="submit-btn-plain disabled" disabled />
+    </form>
+</div>
+<h2>Recent Activity Logs</h2>
+<div class="level clearfix">
     <div class="split-container forty">
         <div class="split">
             <h3>Logins <a class="btn in-heading-absolute" href="/adminv2/reports/login/user={USERNAME}"><span></span>See All</a></h3>
@@ -707,8 +758,8 @@ $(function() {
 		</div>
 	</div>
 </div>
+<h2>Send Message to {FULLNAME}</h2>
 <div class="level clearfix last">
-  <h3>Send Message to {FULLNAME}</h3>
   <p>
     <em>{FIRSTNAME} must be signed in to receive a popup alert</em>
   </p>

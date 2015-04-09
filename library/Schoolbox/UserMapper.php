@@ -210,6 +210,8 @@ class UserMapper extends Mapper
                 'multiple' => true,
             )
         );
+
+        $this->joinsVia('user_link', UserMapper::class, 'id', 'linked_user_id', 'user_id', null, null, null, 'linkedUser');
     }
 
     public function findById($id)
@@ -223,12 +225,14 @@ class UserMapper extends Mapper
             "
 			SELECT {$this->getColumnString('u')}, IF(su.id, 1, 0) as `u.superuser`,
 					{$roleMapper->getColumnString('g')},
-					{$campusMapper->getColumnString('c')}, uc.defaultCampus as `uc.defaultCampus`
+					{$campusMapper->getColumnString('c')}, uc.defaultCampus as `uc.defaultCampus`,
+					{$this->getColumnString('lu')}
 					FROM `user` u
 			LEFT JOIN `groups` g ON group_id = g.`id`
 			LEFT JOIN userCampus uc ON uc.`uid`=u.id
 			LEFT JOIN superusers su ON su.id = u.id
 			LEFT JOIN luCampus c ON c.id = uc.`campus`
+			LEFT JOIN {$this->getJoinSql('user_link', 'u', 'lu')}
 			WHERE u.id = ?
 			"
         );
@@ -262,8 +266,17 @@ class UserMapper extends Mapper
                 }
             }
 
-
+            $linkedUser = $this->hydrate($row,'lu');
+            if($linkedUser->getId()) {
+                $linkedUserList[$linkedUser->getId()] = $linkedUser;
+            }
         }
+
+        if(is_array($linkedUserList) && count($linkedUserList) > 0) {
+            $linkedCollection = new Collection($linkedUserList);
+            $user->setLinkedUser($linkedCollection);
+        }
+
         if (!($user instanceof User)) {
             throw new Schoolbox\Mapper\Exception('Instance of object not found');
         }

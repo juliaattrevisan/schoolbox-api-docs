@@ -13,15 +13,23 @@ class User_Logger_AssumeUser extends DeprecatedModel {
 
 	/* Details of who assumed who
 	 */
-	private $session = array();
-	private $user = array();
+
+    /**
+     * @var \Schoolbox\User
+     */
+    private $currentUser;
+
+    /**
+     * @var \Schoolbox\USer
+     */
+    private $user;
 
 	/**
 	 * @param $session
-	 * @param $user
+	 * @param \Schoolbox\User $user
 	 */
-	public function __construct($session, $user) {
-		$this->setSession($session);
+	public function __construct(\Schoolbox\User $currentUser, \Schoolbox\User $user) {
+		$this->setCurrentUser($currentUser);
 		$this->setUser($user);
 
 		parent::DeprecatedModel();
@@ -35,8 +43,8 @@ class User_Logger_AssumeUser extends DeprecatedModel {
 		$user = $this->getUser();
 
 		$log = array(
-			'user' => 'admin',
-			'assumed' => $user['username'],
+			'user' => $this->getCurrentUser()->getUsername(),
+			'assumed' => $user->getUsername(),
 			'created_at' => $date->getDatabase(),
 			'ip' => $_SERVER['REMOTE_ADDR'],
 		);
@@ -47,32 +55,32 @@ class User_Logger_AssumeUser extends DeprecatedModel {
 	/**
 	 * Set session
 	 *
-	 * @param $session
+	 * @param \Schoolbox\User $currentUser
 	 */
-	private function setSession($session) {
-		$this->session = $session;
+	private function setCurrentUser($currentUser) {
+		$this->currentUser = $currentUser;
 	}
 
 	/**
 	 * Get session
 	 *
-	 * @return array
+	 * @return \Schoolbox\User
 	 */
-	private function getSession() {
-		return $this->session;
+	private function getCurrentUser() {
+		return $this->currentUser;
 	}
 
 	/**
 	 * Set user
 	 *
-	 * @param $user
+	 * @param \Schoolbox\User $user
 	 */
 	private function setUser($user) {
 		$this->user = $user;
 	}
 
 	/**
-	 * @return array
+	 * @return \Schoolbox\User
 	 */
 	private function getUser() {
 		return $this->user;
