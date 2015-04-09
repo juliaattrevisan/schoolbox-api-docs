@@ -83,7 +83,11 @@
 
 		$('#calendar-export form').submit(function(event) {
 			event.preventDefault();
-			var form = $(this);
+
+            //Copy and paste button
+            var client = new ZeroClipboard($('#copy-button'));
+
+            var form = $(this);
 			$('#calendar-export-dialog').dialog({
 				open: function(event, ui) {
 					$(event.target).find('#calendar-export-dialog-url')
@@ -94,8 +98,6 @@
 			});
 		});
 
-        //Copy and paste button
-        var client = new ZeroClipboard($('#copy-button'));
 
 		$('.filter-cat.sources').selectAll({
 			key: 'selectallsources',
