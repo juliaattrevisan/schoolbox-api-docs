@@ -155,6 +155,8 @@
             this.initSpectrum();
         }
 
+        this.initForms();
+
         // set the appropriate classes on the columns
         this.refreshColumns();
 
@@ -296,6 +298,52 @@
 
     };
 
+    /**
+     * Initializes component configuration forms - ensures that forms are
+     * saved via AJAX, and that the form is updated via AJAX.
+     */
+    Masonry.prototype.initForms = function () {
+        var masonry = this,
+            opt     = this.options,
+            page    = $(this.element);
+        page.on(
+            'submit',
+            opt.component.controlPanelSelector+'.settings form',
+            function(event) {
+                var form       = $(this),
+                    formData   = form.serializeArray(),
+                    formInputs = form.find(':input'),
+                    panel      = form.closest(opt.component.controlPanelSelector),
+                    existing   = panel.closest(opt.component.selector),
+                    existingId = existing.attr('id');
+                event.preventDefault();
+                existing.addClass('saving');
+                formInputs.prop('disabled', true);
+                $.ajax(
+                    {
+                        url:  this.action,
+                        type: this.method,
+                        data: formData
+                    }
+                )
+                    .done(function(response) {
+                        // AJAX in the new contents
+                        // (Filter out everything that's not the component)
+                        var $response  = $(response);
+                        var newContent = $response.is('#'+existingId)
+                            ? $response
+                            : $response.find('#'+existingId)
+                        ;
+                        masonry.insertComponentInstance(newContent, existing);
+                    })
+                    .fail(function() {
+                        existing.addClass('failed');
+                        // Later on, remove "failed" class
+                        formInputs.prop('disabled', false);
+                    });
+            }
+        );
+    };
 
     /**
      * Retrieve the column list for this page. Good to index this result.
@@ -367,28 +415,7 @@
                     // retrieve a new instance of this component
                     masonry.newComponentInstance(cl)
                         .done(function(response) {
-                            var $response = $(response);
-
-                            // nek level cheating for pretty animationz -_-
-                            $response.css({
-                                visibility: 'hidden',
-                                position: 'fixed',
-                                width: ui.item.width()
-                            });
-
-                            // drop it invisibly onto the page
-                            $('body').append($response);
-
-                            // grab its computed height
-                            var css = { height: $response.height(), opacity: 0 };
-
-                            var that = $response;
-
-                            ui.item.animate(css, 550, function () {
-                                $(this).replaceWith(that.removeAttr('style'));
-                                masonry.saveSorting();
-                                masonry.refreshPalette();
-                            });
+                            masonry.insertComponentInstance($(response), ui.item);
                         })
                         .fail(function() {
                             ui.item.addClass(failedClass).slideUp(
@@ -522,6 +549,39 @@
             dataType: 'html'
         });
 
+    };
+
+    /**
+     * Adds a new component to the page.
+     *
+     * @param response    The new HTML for the component
+     * @param replacement The old HTML to replace
+     */
+    Masonry.prototype.insertComponentInstance = function(response, replacement)
+    {
+        var masonry = this;
+
+        // If this component already exists: don't drop it invisibly onto the page.
+        // That will cause issues with JS that depends on that component's ID.
+        // (such as dropzones)
+        var css = { opacity: 0 };
+        if (response.attr('id') != replacement.attr('id')) {
+            // nek level cheating for pretty animationz -_-
+            response.css({
+                visibility: 'hidden',
+                position: 'fixed',
+                width: replacement.width()
+            });
+            // drop it invisibly onto the page so that it has a height
+            $('body').append(response);
+            // grab its computed height
+            css.height = response.height;
+        }
+        replacement.animate(css, 550, function () {
+            replacement.empty().replaceWith(response.removeAttr('style'));
+            masonry.saveSorting();
+            masonry.refreshPalette();
+        });
     };
 
 
