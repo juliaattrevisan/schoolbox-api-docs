@@ -315,12 +315,26 @@ class DiffTest extends PHPUnit_Framework_TestCase
             [
                 $this->buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
                 $this->buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
-                true,
+                0,
             ],
             [
                 $this->buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
                 $this->buildDateObject('2015-03-22 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
-                false,
+                -1,
+            ],
+            [
+                // Date 2's date is greater, but date 1 is greater because of timezone.
+                $this->buildDateObject(
+                    '2015-03-21 23:59:59',
+                    Alaress_Date_Format::DATABASE_FORMAT,
+                    new DateTimeZone('UTC')
+                ),
+                $this->buildDateObject(
+                    '2015-03-22 00:00:00',
+                    Alaress_Date_Format::DATABASE_FORMAT,
+                    new DateTimeZone('Australia/Queensland')
+                ),
+                1,
             ],
         ];
     }
@@ -344,12 +358,27 @@ class DiffTest extends PHPUnit_Framework_TestCase
             [
                 $this->buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
                 $this->buildDateObject('2015-03-22 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
-                true,
+                0,
             ],
             [
                 $this->buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
                 $this->buildDateObject('2015-03-23 12:34:52', Alaress_Date_Format::DATABASE_FORMAT),
-                false,
+                -1,
+            ],
+            [
+                // Date 2's date is greater, but date 1 is greater because of timezone.
+                // compareDateOnly ignores timezone completely, so date 1 < date 2.
+                $this->buildDateObject(
+                    '2015-03-21 23:59:59',
+                    Alaress_Date_Format::DATABASE_FORMAT,
+                    new DateTimeZone('UTC')
+                ),
+                $this->buildDateObject(
+                    '2015-03-22 00:00:00',
+                    Alaress_Date_Format::DATABASE_FORMAT,
+                    new DateTimeZone('Australia/Queensland')
+                ),
+                -1,
             ],
         ];
     }
