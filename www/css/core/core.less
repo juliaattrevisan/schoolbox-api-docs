@@ -1856,7 +1856,6 @@ Notifications
 td,li,span,.row {
   .actions {
     position: relative;
-    z-index: 1;
     float: right;
     // Put all buttons on the one row
     &.oneline {
@@ -1872,6 +1871,7 @@ td,li,span,.row {
       .transition(all 0.2s);
       float: none;
       display: inline-block;
+      z-index: 1;
     }
   }
 }
