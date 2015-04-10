@@ -18,7 +18,7 @@
 
             $.magnificPopup.open({
                 items: {
-                    src: "<div class='loader' style='width:200px;padding:20px 20px 50px 20px;margin:0 auto;background-color:#fff;text-align:center'>Loading data...</div>",
+                    src: "<div class='preview loader'>Loading data...</div>",
                     type: 'inline'
                 }
             });
@@ -32,7 +32,7 @@
                 else {
                     $.magnificPopup.open({
                         items: {
-                            src: "<div style='text-align:center'>" + response.fragment + "</div>",
+                            src: "<div class='preview fragment'>" + response.fragment + "</div>",
                             type: 'inline'
                         }
                     });
