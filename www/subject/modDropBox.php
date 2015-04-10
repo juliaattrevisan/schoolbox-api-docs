@@ -24,7 +24,7 @@ if (is_numeric($_GET['delete'])) {
 
 } elseif (is_numeric($_GET['id'])) {
     try {
-        $file = $dropbox->findById($_GET['delete']);
+        $file = $dropbox->findById($_GET['id']);
 
         // TODO: replace with UAM once merged with SB-7185
         $g = new Group();
