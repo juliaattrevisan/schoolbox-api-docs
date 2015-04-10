@@ -89,13 +89,13 @@ class Mapper extends Schoolbox\Mapper
     public function folderHasDropbox(Resource\Folder\Model $folder)
     {
         return $this->getDatabase()->query("
-            SELECT ci.id
+            SELECT COUNT(*)
             FROM component_instance ci
             JOIN component_definition cd ON ci.`component_definition_id`=cd.`id`
             WHERE class = 'Component_Homepage_DropBoxController'
             AND ci.module = 'homepage'
             AND identifier = ?
-        ", [ $folder->getId() ])->fetchColumn() == $folder->getId();
+        ", [ $folder->getId() ])->fetchColumn() > 0;
     }
 
 } 
