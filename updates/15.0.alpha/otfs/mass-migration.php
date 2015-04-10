@@ -33,7 +33,8 @@ $kernel->run(function ($di, $loop, $log, $opts) {
     $patterns = [
         new Resource\Storage\Migration(),
         new Resource\File\Migration(),
-        new Resource\My\File\Migration()
+        new Resource\My\File\Migration(),
+        new Schoolbox\Dropbox\Migration()
     ];
 
     $migrator->migrateEach($patterns);
