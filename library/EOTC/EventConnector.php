@@ -10,6 +10,8 @@
 
 namespace EOTC;
 
+use Calendar\Event\Collection;
+use Calendar\Event\Type\EOTC\Event;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\User;
 
@@ -28,7 +30,7 @@ class EventConnector extends EventMapper
      *
      * @param $eventId
      *
-     * @return \Collection
+     * @return Collection
      */
     public function getEvent($eventId)
     {
@@ -51,7 +53,7 @@ class EventConnector extends EventMapper
 
         $row = $statement->fetch();
 
-        $collection = new \Collection();
+        $collection = new Collection();
 
         if ($row) {
             /** @var Event $eventItem */
@@ -80,7 +82,7 @@ class EventConnector extends EventMapper
             /* Translate an \EOTC\Event type into a
              * Calendar_Event_Type_Abstract type
              */
-            $event = new \Calendar_Event_Type_EOTC();
+            $event = new Event();
             $event->setAuthorName($eventItem->getAuthor()->getFullname());
             $event->setAuthorId($eventItem->getAuthor()->getId());
             $event->setEventId($eventItem->getId());
@@ -148,7 +150,7 @@ class EventConnector extends EventMapper
      * @param $startTimestamp
      * @param $endTimestamp
      *
-     * @return \Collection
+     * @return Collection
      */
     public function getDayEvents($startTimestamp, $endTimestamp)
     {
@@ -178,7 +180,7 @@ class EventConnector extends EventMapper
         $statement->bindParam(":endTimestamp", $endTimestamp);
         $statement->execute();
 
-        $collection = new \Collection();
+        $collection = new Collection();
 
         /* Anyone in the EOTC permissions sytem can also see it
          * We don't need to iterate with this, since $user doesn't
@@ -319,7 +321,7 @@ class EventConnector extends EventMapper
                 /* Translate an \EOTC\Event type into a
                                  * Calendar_Event_Type_Abstract type
                                  */
-                $event = new \Calendar_Event_Type_EOTC();
+                $event = new Event();
                 $event->setAuthorName($eventItem->getAuthor()->getFullname());
                 $event->setAuthorId($eventItem->getAuthor()->getId());
                 $event->setEventId($eventItem->getId());
