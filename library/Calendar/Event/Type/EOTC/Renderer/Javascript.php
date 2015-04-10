@@ -109,7 +109,7 @@ class Javascript extends RendererBase {
 					'meta' => array(
 						'eventId' => $this->getEvent()->getEventId(),
 						'time' => $this->getEvent()->getTime(),
-						'detail' => Scrub::html($this->getEvent()->getDetail()),
+						'detail' => \Scrub::html($this->getEvent()->getDetail()),
 						'location' => $this->getEvent()->getLocation(),
 						'eventTypeId' => $this->getEvent()->getType(),
 						'eventType' => 'type' . $this->getEvent()->getType(),
