@@ -9,11 +9,11 @@
  */
 namespace Calendar\Event\Type\EOTC;
 
-use Calendar\Event\Type\EventBase;
+use Calendar\Event\Type\Day;
 use Calendar\Event\Type\EventInterface;
 
 
-class Event extends EventBase implements EventInterface {
+class Event extends Day\Event implements EventInterface {
 
     /**
      * Renderer classes
