@@ -29,6 +29,13 @@ class Event extends Day\Event implements EventInterface {
      */
     private $attendance = 0;
 
+    /**
+     * Some custom thing
+     *
+     * @var array
+     */
+    protected $custom = [];
+
 	/**
 	 * Render via external class
 	 *
@@ -126,5 +133,24 @@ class Event extends Day\Event implements EventInterface {
      */
     public function getAttendance() {
         return $this->attendance;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCustom()
+    {
+        return $this->custom;
+    }
+
+    /**
+     * @param  array $custom
+     *
+     * @return $this
+     */
+    public function setCustom($custom)
+    {
+        $this->custom = $custom;
+        return $this;
     }
 }
