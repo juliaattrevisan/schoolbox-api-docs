@@ -38,7 +38,7 @@ $selectize-padding-y: 7px;
 $selectize-padding-item-x: 7px;
 $selectize-padding-item-y: 7px;
 
-@import "../../javascript/components/selectize/src/selectize.scss";
+@import "../core/selectize/src/selectize.scss";
 
 .selectize-input > input {
 	padding: 0.5rem !important;
