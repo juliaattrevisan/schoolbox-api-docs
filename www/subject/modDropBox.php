@@ -71,6 +71,7 @@ if (is_numeric($_GET['delete'])) {
         $storage = $factory->build($_POST['attachment'])->getFirst();
 
         $file = $dropbox->createModel()
+                        ->setOwner($_SESSION['user'])
                         ->setStorage($storage)
                         ->setTitle($_POST['description'])
                         ->setFolder($folder)
