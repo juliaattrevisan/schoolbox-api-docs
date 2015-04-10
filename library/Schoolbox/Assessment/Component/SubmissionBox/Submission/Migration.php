@@ -43,7 +43,7 @@ class Migration implements MigrationPattern
      */
     public function getFileDir()
     {
-        $this->conf->get('submission_dir');
+        return $this->conf->get('submission_dir');
     }
 
 
