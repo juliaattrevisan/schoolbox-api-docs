@@ -84,6 +84,10 @@ class GradeSummaryTable extends Base {
             $finalStack[$currentRecord['StudentYearLevel']][$currentRecord['StrippedResult']] = $currentRecord['num'];
         }
 
+        foreach($finalStack as $key => $values) {
+            $finalStack[$key]['total'] = array_sum($values);
+        }
+
         new Probe($schema, $allRecords, $finalStack);
 
         return $finalStack;
