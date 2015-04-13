@@ -101,7 +101,20 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
             }
             $display = true;
         }
-        $this->unvisitors = array_values($this->unvisitors);
+
+        // Sort unvisitors by lastname then firstname
+        usort(
+            $this->unvisitors,
+            function ($a, $b) {
+                foreach (['lastname', 'firstname'] as $key) {
+                    $result = strcasecmp($a[$key], $b[$key]);
+                    if ($result != 0) {
+                        return $result;
+                    }
+                }
+                return 0;
+            }
+        );
 
         // if neither of the above 2 conditions are met, then this is an open homepage with no formal membership
         // therefore there non-visited block is irrelevant and to be hidden
