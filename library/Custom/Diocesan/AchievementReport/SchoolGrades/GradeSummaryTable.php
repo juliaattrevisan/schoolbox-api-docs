@@ -50,47 +50,73 @@ class GradeSummaryTable extends Base {
      * Obtain data
      */
     public function findData($externalUserId) {
-        $this->debug();
+//        $this->debug();
+//
+//        $query = "
+//            SELECT TOP 2 *
+//            FROM SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
+//            WHERE classyear = '{$this->getYear()}'
+//        ";
+//
+//        $schema = $this->getDb()->getAll($query);
+//
+//        /* Ignore all StrippedResults when they are empty string
+//         */
+//        $query = "
+//            SELECT
+//                StudentYearLevel,
+//                StrippedResult,
+//                COUNT(*) AS num
+//            FROM SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
+//            WHERE ID = '{$externalUserId}'
+//            AND StrippedResult != ''
+//            GROUP BY StudentYearLevel, StrippedResult
+//            ORDER BY StudentYearLevel DESC, StrippedResult DESC
+//        ";
+//
+//        $allRecords = $this->getDb()->getAll($query);
+//
+//        /* Rearrange everything into a nice order
+//         */
+//        $finalStack = array();
+//
+//        foreach ($allRecords as $currentRecord) {
+//            $finalStack[$currentRecord['StudentYearLevel']][$currentRecord['StrippedResult']] = $currentRecord['num'];
+//        }
+//
+//        foreach($finalStack as $key => $values) {
+//            $finalStack[$key]['total'] = array_sum($values);
+//        }
+//
+//        new Probe($schema, $allRecords, $finalStack);
+//
+//        return $finalStack;
 
+        $this->findEnteredGrades($externalUserId);
+    }
+
+    /**
+     * Get counts for Entered Grades across all the years
+     * for a particular student
+     *
+     * @param $externalUserId
+     * @return array|bool
+     */
+    private function findEnteredGrades($externalUserId) {
         $query = "
-            SELECT TOP 2 *
-            FROM SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
-            WHERE classyear = '{$this->getYear()}'
-        ";
-
-        $schema = $this->getDb()->getAll($query);
-
-        /* Ignore all StrippedResults when they are empty string
-         */
-        $query = "
-            SELECT
+            SELECT DISTINCT
                 StudentYearLevel,
                 StrippedResult,
-                COUNT(*) AS num
-            FROM SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
+                COUNT(StrippedResult) AS num
+            FROM
+                SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
             WHERE ID = '{$externalUserId}'
             AND StrippedResult != ''
             GROUP BY StudentYearLevel, StrippedResult
             ORDER BY StudentYearLevel DESC, StrippedResult DESC
         ";
 
-        $allRecords = $this->getDb()->getAll($query);
-
-        /* Rearrange everything into a nice order
-         */
-        $finalStack = array();
-
-        foreach ($allRecords as $currentRecord) {
-            $finalStack[$currentRecord['StudentYearLevel']][$currentRecord['StrippedResult']] = $currentRecord['num'];
-        }
-
-        foreach($finalStack as $key => $values) {
-            $finalStack[$key]['total'] = array_sum($values);
-        }
-
-        new Probe($schema, $allRecords, $finalStack);
-
-        return $finalStack;
+        return $this->getDb()->getAll($query);
     }
 
     /* Getters/Setters
