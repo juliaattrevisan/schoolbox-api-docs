@@ -49,6 +49,11 @@
                 $("#confirmDialog").dialog("open");
             }
         });
+
+        // Disable re-submission on pressing the submit button
+        $('#submission-history form').submit(function() {
+            $(this).find(':submit').prop('disabled', true);
+        })
     });
 </script>
 <!-- END custom_head -->
