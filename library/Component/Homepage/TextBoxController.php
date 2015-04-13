@@ -26,7 +26,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 
         try {
             $this->textbox = \Schoolbox\Textbox\Mapper::getInstance()->findById($this->getConfig('textbox'));
-            if ($this->getTextbox()->getDeletedAt()) {
+            if ($this->getTextbox()->isDeleted()) {
                 throw new \Schoolbox\Mapper\Exception("Requested textbox has been deleted");
             }
         } catch (\Schoolbox\Mapper\Exception $e) {

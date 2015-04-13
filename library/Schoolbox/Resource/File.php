@@ -198,7 +198,7 @@ class File extends File\Model implements FileInterface {
 	 * @return bool
 	 */
 	public function getDeleted() {
-		return $this->getDeletedAt() instanceof Alaress_Date_Format;
+		return $this->getDeletedAt() instanceof Alaress_Date_Format && !$this->getDeletedAt()->isNull();
 	}
 
     /**
