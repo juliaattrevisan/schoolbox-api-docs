@@ -27,7 +27,8 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
         }
 
         // is this a class? if it has a class code, then yes
-        if ($code = $this->getContext('code')) {
+        $display = false;
+        if ($code = $this->getContext()->getCodeString()) {
             $synergeticClass = new External_Class;
             $classList = $synergeticClass->getStudents($code);
 
@@ -64,10 +65,10 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
                     $student['id'] = $row['id'];
                     $student['title'] = $row['title'];
                     $student['gname'] = $row['gname'];
-                    $this->unvisitors[] = $student;
+                    $this->unvisitors[$row['id']] = $student;
                 }
             }
-            return true;
+            $display = true;
         }
 
         // else is this a group?
@@ -96,14 +97,28 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
             $stmt->execute(array('cid' => $this->getContext()->getId()));
 
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $this->unvisitors[] = $row;
+                $this->unvisitors[$row['id']] = $row;
             }
-            return true;
+            $display = true;
         }
+
+        // Sort unvisitors by lastname then firstname
+        usort(
+            $this->unvisitors,
+            function ($a, $b) {
+                foreach (['lastname', 'firstname'] as $key) {
+                    $result = strcasecmp($a[$key], $b[$key]);
+                    if ($result != 0) {
+                        return $result;
+                    }
+                }
+                return 0;
+            }
+        );
 
         // if neither of the above 2 conditions are met, then this is an open homepage with no formal membership
         // therefore there non-visited block is irrelevant and to be hidden
-        return false;
+        return $display;
 
     }
 
