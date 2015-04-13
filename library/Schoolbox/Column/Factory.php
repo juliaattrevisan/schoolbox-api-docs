@@ -66,6 +66,9 @@ class Factory implements IFactory
             case Mapper::TYPE_COLOR:
                 $column = new Color();
                 break;
+            case Mapper::TYPE_SET:
+                $column = new Set();
+                break;
             default:
                 break;
         }
