@@ -12,6 +12,7 @@ namespace Schoolbox\Tile\Component;
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
 use Group as GroupHandler;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Tile\Layout;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -80,10 +81,7 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
             ->parseBlocks(
                 $this,
                 $this->delegate->fetchTwigContent($this, $this->sitepage),
-                $this->groupHandler->getPermission(
-                    $this->getContext()->getId(),
-                    $this->user->getId()
-                )
+                UserAccess::ACCESS_READ
             );
         return true;
     }
