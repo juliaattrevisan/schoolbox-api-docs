@@ -119,7 +119,7 @@ if ($this->arg[0] == 'revision') {
     }
 } /* Load an existing wiki by its category id and slug
  */
-else if (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
+elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
     $wiki = $wikiHandler->getByCategoryAndSlug($this->arg[0], $this->arg[1]);
 
     /* If the wiki wasn't found, offer some information and a link
@@ -130,7 +130,8 @@ else if (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
 
         $this->setVar(array(
             'WIKI_CATEGORYID' => $this->arg[0],
-            'WIKI_SLUG' => $this->arg[1]
+            'WIKI_SLUG' => $this->arg[1],
+            'WIKI_COMPONENT_ID' => 0,
         ));
     } /* Otherwise load it
 	 */

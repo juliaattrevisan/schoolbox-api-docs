@@ -87,7 +87,8 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
         // Set up component name
         $this->setVar(
             array(
-                'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Wiki',
+                'COMPONENT_NAME'        => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Wiki',
+                'COMPONENT_INSTANCE_ID' => $this->instance->getId(),
             )
         );
 
@@ -105,9 +106,19 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
         );
 
         // Controls such as Post News
-        if ($this->permission < WRITE_ACCESS) {
+
+        /* First check that Allow Create is active. If it is, continue;
+         * otherwise proceed to the usual getPermission()
+         */
+        $value = \Component_ConfigMapper::getInstance()->findValue('allowCreate', $this->instance->getId());
+
+        if (((int)$value === 1) && ($this->permission < WRITE_ACCESS)) {
+            $this->parse("submit_wiki_block", "submit_wiki");
+        } elseif ($this->permission < WRITE_ACCESS) {
             $this->setVar("submit_wiki_block", "");
         } else {
+            /* Allow Create is off
+             */
             $this->parse("submit_wiki_block", "submit_wiki");
         }
 

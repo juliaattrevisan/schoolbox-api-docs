@@ -48,9 +48,22 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
             ->setCategory($cat)
             ->setLatestRevision(new \Schoolbox\Wiki\Revision())
             ->setCreated($now)
-            ->setSlug(strlen($_POST['slug']) ? $_POST['slug'] : $url->getSlug())
+            // Never set slug from form
+            ->setSlug($url->getSlug())
             ->setLocked(false)
             ->setDeleted(false);
+
+        // Only check component's create permissions for a new wiki.
+        /* First check that Allow Create is active. If it is, continue;
+         * otherwise proceed to the usual getPermission()
+         */
+        $value = \Component_ConfigMapper::getInstance()->findValue('allowCreate', (int)$_POST['instanceId']);
+
+        /* Allow Create is off
+         */
+        if (((int)$value === 0) && ($groupHandler->getPermission($wiki->getCategory()->getId()) < WRITE_ACCESS)) {
+            error(19);
+        }
     }
 
     // check category permission

@@ -1,6 +1,6 @@
 <?php
 
-$wikiHandler = new Wiki;
+$wikiHandler  = new Wiki;
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
 $this->setTitle('Modify Wiki');
@@ -8,66 +8,61 @@ $this->setTab('resources');
 $this->setFile(TEMPLATE_content, 'wiki/modify.html');
 
 if (is_numeric($this->arg[0])) {
-	$wiki = $wikiHandler->getByID($this->arg[0]);
+    $wiki = $wikiHandler->getByID($this->arg[0]);
 
-	if (!isset($wiki['wikiID'])) {
-		error(101);
-	}
+    if (!isset($wiki['wikiID'])) {
+        error(101);
+    }
 
-	// check permission
-	if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < READ_ACCESS) {
-		error(19);
-	}
+    // check permission
+    if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < READ_ACCESS) {
+        error(19);
+    }
 
-	// check locked
-	if ($wiki['locked'] == 'true' && $permission < WRITE_ACCESS) {
-		error(19);
-	}
+    // check locked
+    if ($wiki['locked'] == 'true' && $permission < WRITE_ACCESS) {
+        error(19);
+    }
 
-	$output = array(
-		'ACTION' => 'Modify',
-		'WIKI_ID' => $wiki['wikiID'],
-		'SLUG' => $wiki['slug'],
-		'CATEGORY_ID' => $wiki['categoryID'],
-		'HEADING' => Scrub::text($wiki['heading']),
-		'BODY' => Scrub::text($wiki['body']),
-		'REVISION' => $wiki['latestRevision'],
-	);
+    $output = array(
+        'ACTION'      => 'Modify',
+        'WIKI_ID'     => $wiki['wikiID'],
+        'SLUG'        => $wiki['slug'],
+        'CATEGORY_ID' => $wiki['categoryID'],
+        'HEADING'     => Scrub::text($wiki['heading']),
+        'BODY'        => Scrub::text($wiki['body']),
+        'REVISION'    => $wiki['latestRevision'],
+    );
 
-	$this->setVar($output);
+    $this->setVar($output);
+} elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1]) && is_numeric($this->arg[2])) {
+    /* Check permission
+     *
+     * First check that Allow Create is active. If it is, continue;
+     * otherwise proceed to the usual getPermission()
+     */
+    $value = \Component_ConfigMapper::getInstance()->findValue('allowCreate', $this->arg[2]);
+
+    if (((int)$value === 0) && ($groupHandler->getPermission($this->arg[1]) < WRITE_ACCESS)) {
+        error(19);
+    }
+
+    // slug to title: let's just say all - convert to spaces, and capitalize all words
+    $slug  = strlen($this->arg[3]) ? $this->arg[3] : '';
+    $title = ucwords(str_replace('-', ' ', $slug));
+
+    $this->setVar(
+        array(
+            'ACTION'      => 'Add',
+            'WIKI_ID'     => '',
+            'CATEGORY_ID' => $this->arg[1],
+            'HEADING'     => $title,
+            'BODY'        => '',
+            'REVISION'    => '',
+            'INSTANCE_ID' => $this->arg[2],
+            'SLUG'        => '',
+        )
+    );
+} else {
+    error(2);
 }
-else if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
-
-	/* Check permission
-	 */
-	if ($groupHandler->getPermission($this->arg[1]) < WRITE_ACCESS) {
-		error(19);
-	}
-
-	$this->setVar(array(
-		'ACTION' => 'Add',
-		'WIKI_ID' => '',
-		'CATEGORY_ID' => $this->arg[1],
-		'HEADING' => '',
-		'BODY' => '',
-		'REVISION' => '',
-	));
-
-	/* If a slug was provided, create a new wiki page
-	 * with this slug. Otherwise just leave it empty
-	 */
-	if (strlen($this->arg[2])) {
-		$this->setVar(array(
-			'SLUG' => $this->arg[2]
-		));
-	}
-	else {
-		$this->setVar(array(
-			'SLUG' => ''
-		));
-	}
-}
-else {
-	error(2);
-}
-
