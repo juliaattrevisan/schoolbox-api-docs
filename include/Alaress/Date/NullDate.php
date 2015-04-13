@@ -38,8 +38,22 @@ class Alaress_Date_NullDate extends Alaress_Date_Format
     }
 
     /**
+     * This is a null date - it always formats as an empty string.
+     *
+     * @param string $format
+     *
+     * @return string
+     */
+    public function getUsingFormat($format)
+    {
+        return '';
+    }
+
+    /**
      * This is a null date - performing any sort of date operations will blow
      * up in your face.
+     *
+     * Note that `getUsingFormat()` bypasses this and returns an empty string.
      *
      * @throws BadMethodCallException
      */

@@ -57,25 +57,21 @@ class NullDateTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test that operations on null datetimes don't work
-     *
-     * @expectedException BadMethodCallException
+     * Test that operations on null datetimes returns empty string
      */
     public function testOperations()
     {
         $nullDate = new Alaress_Date_NullDate();
-        $nullDate->getUsingFormat($nullDate::DATABASE_FORMAT);
+        $this->assertSame('', $nullDate->getUsingFormat($nullDate::DATABASE_FORMAT));
     }
 
     /**
-     * Test that locale-based formatting on null datetimes doesn't work
-     *
-     * @expectedException BadMethodCallException
+     * Test that locale-based formatting on null datetimes returns empty string
      */
     public function testLocale()
     {
         $nullDate = new Alaress_Date_NullDate();
-        $nullDate->getLocal();
+        $this->assertSame('', $nullDate->getLocal());
     }
 
     /**
