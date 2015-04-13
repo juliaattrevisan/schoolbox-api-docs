@@ -38,17 +38,6 @@ class WorkTypeMapper extends Schoolbox\Mapper {
 		return false;
 	}
 
-	public function getAll() {
-		$query = "SELECT {$this->getColumnString('t')} FROM {$this->getTable()} t";
-		$statement = $this->database->prepare($query);
-		$statement->execute();
-		$collection = new Schoolbox\Collection(array());
-		foreach ($statement as $row) {
-			$collection->add($this->hydrate($row, 't'));
-		}
-		return $collection;
-	}
-
 	public function getAllExcept($type) {
 		$query = "
 			SELECT {$this->getColumnString('t')}
