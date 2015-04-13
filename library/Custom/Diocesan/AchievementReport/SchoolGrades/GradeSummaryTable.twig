@@ -14,13 +14,23 @@
 <table>
     <thead>
         <tr>
-            <th>Mort</th>
+            <th>Year</th>
+            <th>S</th>
+            <th>A</th>
+            <th>M</th>
+            <th>E</th>
+            <th>D</th>
         </tr>
     </thead>
     <tbody>
-        {% for currentYearRecord in gradeSummary.data %}
+        {% for year, values in gradeSummary.data %}
         <tr>
-            <td>Bart</td>
+            <td>{{ year }}</td>
+            <td>{{ values.S}}</td>
+            <td>{{ values.A}}</td>
+            <td>{{ values.M}}</td>
+            <td>{{ values.E}}</td>
+            <td>{{ values.D}}</td>
         </tr>
         {% endfor %}
     </tbody>
