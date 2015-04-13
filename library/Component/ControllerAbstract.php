@@ -30,7 +30,7 @@ abstract class Component_ControllerAbstract
     /**
      * The category the component is on, if any.
      *
-     * @var \Schoolbox\Resource\Category
+     * @var \Schoolbox\Resource\Folder\Model
      */
     protected $context;
 
@@ -504,19 +504,10 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * @param string $key
-     * @return mixed
+     * @return \Schoolbox\Resource\Folder\Model
      */
-    protected function getContext($key = '')
+    protected function getContext()
     {
-        if ($key) {
-            if (is_object($this->context)) {
-                return isset($this->context->$key) ? $this->context->$key : false;
-            } else {
-                return isset($this->context[$key]) ? $this->context[$key] : false;
-            }
-        }
-
         return $this->context;
     }
 
