@@ -11,13 +11,6 @@
 class External_Denbigh2_Class implements External_ClassInterface {
 
     /**
-     * Redis cache duration
-     *
-     * @var int
-     */
-    private $cacheTime = 7200;
-
-    /**
      * Get a list of students in a particular $classCode
      *
      * lastname,
@@ -34,60 +27,50 @@ class External_Denbigh2_Class implements External_ClassInterface {
      */
     public function getStudents($classCode)
     {
-        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "extdb:" . INSTANCE_ID . ":denbigh2.getStudents",
+        $students = array();
 
-            function ($params) {
-                $students = array();
+        $api = new External_Denbigh2_Api('Enrolments', array(
+            'Class' => $classCode
+        ));
 
-                $api = new External_Denbigh2_Api('Enrolments', array(
-                    'Class' => $params
-                ));
+        if (!$api->hasErrors()) {
+            $allStudents = $api->getResult()->data;
 
-                if (!$api->hasErrors()) {
-                    $allStudents = $api->getResult()->data;
+            if (count($allStudents)) {
+                foreach ($allStudents as $currentStudent) {
 
-                    if (count($allStudents)) {
-                        foreach ($allStudents as $currentStudent) {
+                    /* Find out more about each student
+                     */
+                    $api = new External_Denbigh2_Api('Students', array(
+                        'Student ID' => $currentStudent->{'Student ID'}
+                    ));
 
-                            /* Find out more about each student
-                             */
-                            $api = new External_Denbigh2_Api('Students', array(
-                                'Student ID' => $currentStudent->{'Student ID'}
-                            ));
+                    if (!$api->hasErrors()) {
+                        $allStudentData = $api->getResult()->data;
 
-                            if (!$api->hasErrors()) {
-                                $allStudentData = $api->getResult()->data;
+                        if (count($allStudentData)) {
+                            foreach ($allStudentData as $currentStudentData) {
 
-                                if (count($allStudentData)) {
-                                    foreach ($allStudentData as $currentStudentData) {
+                                // TODO: No campus for classes?
 
-                                        // TODO: No campus for classes?
-
-                                        $students[] = array(
-                                            'lastname' => $currentStudentData->{'Surname'},
-                                            'firstname' => $currentStudentData->{'Preferred Name'},
-                                            'yearlevel' => $currentStudentData->{'Academic Year'},
-                                            'house' => $currentStudentData->{'House'},
-                                            'StudentMedicalAlert' => $currentStudentData->{'Medical Alert Label'},
-                                            'StudentSpecialNeedsFlag' => $currentStudentData->{'Special Needs'},
-                                            'synergy_id' => $currentStudentData->{'Student ID'},
-                                            'ClassCampus' => ''
-                                        );
-                                    }
-                                }
+                                $students[] = array(
+                                    'lastname' => $currentStudentData->{'Surname'},
+                                    'firstname' => $currentStudentData->{'Preferred Name'},
+                                    'yearlevel' => $currentStudentData->{'Academic Year'},
+                                    'house' => $currentStudentData->{'House'},
+                                    'StudentMedicalAlert' => $currentStudentData->{'Medical Alert Label'},
+                                    'StudentSpecialNeedsFlag' => $currentStudentData->{'Special Needs'},
+                                    'synergy_id' => $currentStudentData->{'Student ID'},
+                                    'ClassCampus' => ''
+                                );
                             }
                         }
                     }
                 }
+            }
+        }
 
-                return serialize($students);
-            },
-            $classCode,
-            $this->getCacheTime()
-        );
-
-        return unserialize($encoded);
+        return $students;
     }
 
     /**
@@ -99,57 +82,24 @@ class External_Denbigh2_Class implements External_ClassInterface {
      */
     public function getTeacherName($classCode)
     {
-        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "extdb:" . INSTANCE_ID . ":denbigh2.getTeacherName",
+        $ids = array();
 
-            function ($params) {
-                $ids = array();
+        $api = new External_Denbigh2_Api('Classes', array(
+            'Class' => $classCode
+        ));
 
-                $api = new External_Denbigh2_Api('Classes', array(
-                    'Class' => $params
-                ));
+        if (!$api->hasErrors()) {
+            $allClasses = $api->getResult()->data;
 
-                if (!$api->hasErrors()) {
-                    $allClasses = $api->getResult()->data;
-
-                    if (count($allClasses)) {
-                        foreach ($allClasses as $currentClass) {
-                            if ($currentClass->{'Class'} == $params) {
-                                $ids[] = $currentClass->{'Teacher Code'};
-                            }
-                        }
+            if (count($allClasses)) {
+                foreach ($allClasses as $currentClass) {
+                    if ($currentClass->{'Class'} == $classCode) {
+                        $ids[] = $currentClass->{'Teacher Code'};
                     }
                 }
+            }
+        }
 
-                return serialize($ids);
-            },
-            $classCode,
-            $this->getCacheTime()
-        );
-
-        return unserialize($encoded);
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set cache time
-     *
-     * @param int $cacheTime
-     */
-    private function setCacheTime($cacheTime)
-    {
-        $this->cacheTime = $cacheTime;
-    }
-
-    /**
-     * Get cache time
-     *
-     * @return int
-     */
-    private function getCacheTime()
-    {
-        return $this->cacheTime;
+        return $ids;
     }
 }

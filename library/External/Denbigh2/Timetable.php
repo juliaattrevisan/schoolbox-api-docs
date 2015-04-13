@@ -18,13 +18,6 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     private $groupHandler = null;
 
     /**
-     * Redis cache duration
-     *
-     * @var int
-     */
-    private $cacheTime = 7200;
-
-    /**
      * Constructor
      */
     public function __construct()
@@ -54,55 +47,45 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
         $maxPeriodsPerDay = 6;
         $maxDays = $campus->getTimetableDay();
 
-        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "extdb:" . INSTANCE_ID . ":denbigh2.getTimetableDefinition",
+        $timetableDef = array();
 
-            function ($params) {
-                list($maxPeriodsPerDay, $maxDays, $day) = $params;
-                $timetableDef = array();
+        $api = new External_Denbigh2_Api('PeriodTimes', array());
 
-                $api = new External_Denbigh2_Api('PeriodTimes', array());
+        if (!$api->hasErrors()) {
+            $allPeriods = $api->getResult()->data;
 
-                if (!$api->hasErrors()) {
-                    $allPeriods = $api->getResult()->data;
+            /* Day-specific e.g. for Dashboard
+             */
+            $i = 0;
 
-                    /* Day-specific e.g. for Dashboard
-                     */
-                    $i = 0;
+            if (count($allPeriods)) {
+                foreach ($allPeriods as $currentPeriod) {
+                    if ($i < $maxPeriodsPerDay) {
+                        if (!$day || $currentPeriod->{'Day of Cycle'} == $day) {
 
-                    if (count($allPeriods)) {
-                        foreach ($allPeriods as $currentPeriod) {
-                            if ($i < $maxPeriodsPerDay) {
-                                if (!$day || $currentPeriod->{'Day of Cycle'} == $day) {
+                            /* Format some times
+                             */
+                            $start = new \Alaress_Date_Format($currentPeriod->{'Period Start Time'}, 'H:i:s');
+                            $end = new \Alaress_Date_Format($currentPeriod->{'Period End Time'}, 'H:i:s');
 
-                                    /* Format some times
-                                     */
-                                    $start = new \Alaress_Date_Format($currentPeriod->{'Period Start Time'}, 'H:i:s');
-                                    $end = new \Alaress_Date_Format($currentPeriod->{'Period End Time'}, 'H:i:s');
+                            $timetableDef['desc'][$i] = "Period {$currentPeriod->{'Period'}}";
+                            $timetableDef['start'][$i] = $start->getTimeOnly();
+                            $timetableDef['end'][$i] = $end->getTimeOnly();
+                            $timetableDef['number'][$i] = $currentPeriod->{'Period'};
+                            $timetableDef['sequence'][$i] = 1;
 
-                                    $timetableDef['desc'][$i] = "Period {$currentPeriod->{'Period'}}";
-                                    $timetableDef['start'][$i] = $start->getTimeOnly();
-                                    $timetableDef['end'][$i] = $end->getTimeOnly();
-                                    $timetableDef['number'][$i] = $currentPeriod->{'Period'};
-                                    $timetableDef['sequence'][$i] = 1;
-
-                                    $i++;
-                                }
-                            }
+                            $i++;
                         }
                     }
                 }
+            }
+        }
 
-                $timetableDef['periodCount'] = $maxPeriodsPerDay;
-                $timetableDef['dayCount'] = $maxDays;
+        $timetableDef['periodCount'] = $maxPeriodsPerDay;
+        $timetableDef['dayCount'] = $maxDays;
 
-                return serialize($timetableDef);
-            },
-            array($maxPeriodsPerDay, $maxDays, $day),
-            $this->getCacheTime()
-        );
+        return $timetableDef;
 
-        return unserialize($encoded);
     }
 
     /**
@@ -114,27 +97,17 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
      */
     public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
     {
-        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "extdb:" . INSTANCE_ID . ":denbigh2.getTimetableDefinition",
+        $dayNumber = 0;
 
-            function ($params) {
-                $dayNumber = 1;
+        $api = new External_Denbigh2_Api('CurrentDay', array());
 
-                $api = new External_Denbigh2_Api('CurrentDay', array());
+        if (!$api->hasErrors()) {
+            $dayNumber = $api->getResult()->data[0]->{'Current Day of Cycle'};
+        }
 
-                if (!$api->hasErrors()) {
-                    $dayNumber = $api->getResult()->data[0]->{'Current Day of Cycle'};
-                }
-
-                /* Just highlight day 1 by default, I guess
-                 */
-                return serialize($dayNumber);
-            },
-            null,
-            $this->getCacheTime()
-        );
-
-        return unserialize($encoded);
+        /* Just highlight day 1 by default, I guess
+         */
+        return $dayNumber;
     }
 
 
@@ -233,134 +206,112 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
         /* Api connect
          */
         if ($this->getGroupHandler()->isStudent($userId)) {
-            $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-                "extdb:" . INSTANCE_ID . ":denbigh2.getDayTimetable",
 
-                function ($params) {
-                    list($externalUserId, $dayNumber, $timetable, $definition) = $params;
+            $api = new External_Denbigh2_Api('StudentTimetable', array(
+                'Student ID' => $externalUserId
+            ));
 
-                    $api = new External_Denbigh2_Api('StudentTimetable', array(
-                        'Student ID' => $externalUserId
-                    ));
+            if (!$api->hasErrors()) {
 
-                    if (!$api->hasErrors()) {
+                /* Data collectors
+                 */
+                $allPeriods = $api->getResult()->data;
 
-                        /* Data collectors
-                         */
-                        $allPeriods = $api->getResult()->data;
+                if (count($allPeriods)) {
+                    foreach($allPeriods as $currentPeriod) {
+                        if (!$dayNumber || $currentPeriod->{'Day Number'} == $dayNumber) {
 
-                        if (count($allPeriods)) {
-                            foreach($allPeriods as $currentPeriod) {
-                                if (!$dayNumber || $currentPeriod->{'Day Number'} == $dayNumber) {
+                            /* You dumdums put the teacher's name concatted with the
+                             * subject name >.< So instead of booming it and using the
+                             * first shrapnel I'm just going to strreplace it out, so
+                             * this will work even if they change their format to
+                             * some other ridiculous thing
+                             */
+                            $className = trim(str_replace($currentPeriod->{'Teacher'}, '', $currentPeriod->{'TT Description'}));
 
-                                    /* You dumdums put the teacher's name concatted with the
-                                     * subject name >.< So instead of booming it and using the
-                                     * first shrapnel I'm just going to strreplace it out, so
-                                     * this will work even if they change their format to
-                                     * some other ridiculous thing
-                                     */
-                                    $className = trim(str_replace($currentPeriod->{'Teacher'}, '', $currentPeriod->{'TT Description'}));
+                            /* wtf
+                             * ...or I could preg_match it out of 1/3/0001, wherever that came from
+                             */
+                            $periodNumber = str_replace('Period', '', $currentPeriod->{'Period Name'});
 
-                                    /* wtf
-                                     * ...or I could preg_match it out of 1/3/0001, wherever that came from
-                                     */
-                                    $periodNumber = str_replace('Period', '', $currentPeriod->{'Period Name'});
-
-                                    $timetable[$periodNumber-1] = array(
-                                        'periodName' => $currentPeriod->{'Period Name'},
-                                        'periodStart' =>  $definition['start'][$periodNumber-1],
-                                        'periodEnd' => $definition['end'][$periodNumber-1],
-                                        'periodNumber' => $periodNumber,
-                                        'periodSequence' => 1,
-                                        'class' => array(
-                                            array(
-                                                'description' => $className,
-                                                'code' => $currentPeriod->{'ClassCode'},
-                                                'room' => $currentPeriod->{'Room'},
-                                                'staffID' => $currentPeriod->{'TeacherCode'},
-                                                'staffTitle' => '',
-                                                'staffFirstname' => $currentPeriod->{'Teacher'},
-                                                'staffSurname' => '',
-                                            )
-                                        )
-                                    );
-                                }
-                            }
+                            $timetable[$periodNumber-1] = array(
+                                'periodName' => $currentPeriod->{'Period Name'},
+                                'periodStart' =>  $definition['start'][$periodNumber-1],
+                                'periodEnd' => $definition['end'][$periodNumber-1],
+                                'periodNumber' => $periodNumber,
+                                'periodSequence' => 1,
+                                'class' => array(
+                                    array(
+                                        'description' => $className,
+                                        'code' => $currentPeriod->{'ClassCode'},
+                                        'room' => $currentPeriod->{'Room'},
+                                        'staffID' => $currentPeriod->{'TeacherCode'},
+                                        'staffTitle' => '',
+                                        'staffFirstname' => $currentPeriod->{'Teacher'},
+                                        'staffSurname' => '',
+                                    )
+                                )
+                            );
                         }
                     }
+                }
+            }
 
-                    return serialize($timetable);
-                },
-                array($externalUserId, $dayNumber, $timetable, $definition),
-                $this->getCacheTime()
-            );
-
-            return unserialize($encoded);
+            return $timetable;
         }
         elseif ($this->getGroupHandler()->isStaff($userId)) {
-            $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-                "extdb:" . INSTANCE_ID . ":denbigh2.getDayTimetable",
 
-                function ($params) {
-                    list($externalUserId, $dayNumber, $timetable, $definition) = $params;
-
-                    $api = new External_Denbigh2_Api('TimetableLessons',
-                        array(
-                            'Teacher Code' => $externalUserId
-                        ),
-                        array(
-                            'RFMmax' => 0
-                        )
-                    );
-
-                    if (!$api->hasErrors()) {
-                        $allPeriods = $api->getResult()->data;
-
-                        /* Assemble into a 2D array
-                         * Each row represents a Period across each Day in the cycle
-                         *
-                         * [Period1 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
-                         * [Period2 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
-                         * [Period3 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
-                         * [PeriodN [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
-                         * ...
-                         */
-                        if (count($allPeriods)) {
-                            foreach($allPeriods as $currentPeriod) {
-                                if (!$dayNumber || $currentPeriod->{'Day'} == $dayNumber) {
-                                    $periodName = "Period {$currentPeriod->{'Period'}}";
-                                    $periodNumber = $currentPeriod->{'Period'};
-
-                                    $timetable[$periodNumber-1] = array(
-                                        'periodName' => $periodName,
-                                        'periodStart' =>  $definition['start'][$periodNumber-1],
-                                        'periodEnd' => $definition['end'][$periodNumber-1],
-                                        'periodNumber' => $periodNumber,
-                                        'periodSequence' => 1,
-                                        'class' => array(
-                                            array(
-                                                'description' => $currentPeriod->{'Description for Staff TT'},
-                                                'code' => $currentPeriod->{'Class'},
-                                                'room' => "Room {$currentPeriod->{'Room'}}",
-                                                'staffID' => $currentPeriod->{'Teacher Code'},
-                                                'staffTitle' => '',
-                                                'staffFirstname' => $currentPeriod->{'Teacher'},
-                                                'staffSurname' => '',
-                                            )
-                                        )
-                                    );
-                                }
-                            }
-                        }
-                    }
-
-                    return serialize($timetable);
-                },
-                array($externalUserId, $dayNumber, $timetable, $definition),
-                $this->getCacheTime()
+            $api = new External_Denbigh2_Api('TimetableLessons',
+                array(
+                    'Teacher Code' => $externalUserId
+                ),
+                array(
+                    'RFMmax' => 0
+                )
             );
 
-            return unserialize($encoded);
+            if (!$api->hasErrors()) {
+                $allPeriods = $api->getResult()->data;
+
+                /* Assemble into a 2D array
+                 * Each row represents a Period across each Day in the cycle
+                 *
+                 * [Period1 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                 * [Period2 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                 * [Period3 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                 * [PeriodN [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                 * ...
+                 */
+                if (count($allPeriods)) {
+                    foreach($allPeriods as $currentPeriod) {
+                        if (!$dayNumber || $currentPeriod->{'Day'} == $dayNumber) {
+                            $periodName = "Period {$currentPeriod->{'Period'}}";
+                            $periodNumber = $currentPeriod->{'Period'};
+
+                            $timetable[$periodNumber-1] = array(
+                                'periodName' => $periodName,
+                                'periodStart' =>  $definition['start'][$periodNumber-1],
+                                'periodEnd' => $definition['end'][$periodNumber-1],
+                                'periodNumber' => $periodNumber,
+                                'periodSequence' => 1,
+                                'class' => array(
+                                    array(
+                                        'description' => $currentPeriod->{'Description for Staff TT'},
+                                        'code' => $currentPeriod->{'Class'},
+                                        'room' => "Room {$currentPeriod->{'Room'}}",
+                                        'staffID' => $currentPeriod->{'Teacher Code'},
+                                        'staffTitle' => '',
+                                        'staffFirstname' => $currentPeriod->{'Teacher'},
+                                        'staffSurname' => '',
+                                    )
+                                )
+                            );
+                        }
+                    }
+                }
+            }
+
+            return $timetable;
         }
 
         return '';
@@ -435,131 +386,109 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
          * Guess what - both loops have different data structs
          */
         if ($this->getGroupHandler()->isStudent($userId)) {
-            $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-                "extdb:" . INSTANCE_ID . ":denbigh2.getFullTimetable",
 
-                function ($params) {
-                    list($externalUserId, $timetable, $timetableDay, $campusName) = $params;
+            $api = new External_Denbigh2_Api('StudentTimetable', array(
+                'Student ID' => $externalUserId,
+            ));
 
-                    $api = new External_Denbigh2_Api('StudentTimetable', array(
-                        'Student ID' => $externalUserId,
-                    ));
+            if (!$api->hasErrors()) {
+                $allPeriods = $api->getResult()->data;
 
-                    if (!$api->hasErrors()) {
-                        $allPeriods = $api->getResult()->data;
+                /* Assemble into a 2D array
+                 * Each row represents a Period across each Day in the cycle
+                 *
+                 * [Period1 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                 * [Period2 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                 * [Period3 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                 * [PeriodN [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                 * ...
+                 */
+                if (count($allPeriods)) {
+                    foreach($allPeriods as $currentPeriod) {
 
-                        /* Assemble into a 2D array
-                         * Each row represents a Period across each Day in the cycle
-                         *
-                         * [Period1 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
-                         * [Period2 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
-                         * [Period3 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
-                         * [PeriodN [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
-                         * ...
+                        /* wtf
+                         * ...or I could preg_match it out of 1/3/0001, wherever that came from
                          */
-                        if (count($allPeriods)) {
-                            foreach($allPeriods as $currentPeriod) {
+                        $periodNumber = trim(str_replace('Period', '', $currentPeriod->{'Period Name'}));
+                        $periodIndex = $periodNumber-1;
 
-                                /* wtf
-                                 * ...or I could preg_match it out of 1/3/0001, wherever that came from
-                                 */
-                                $periodNumber = trim(str_replace('Period', '', $currentPeriod->{'Period Name'}));
-                                $periodIndex = $periodNumber-1;
+                        $dayNumber = trim($currentPeriod->{'Day Number'});
 
-                                $dayNumber = trim($currentPeriod->{'Day Number'});
-
-                                /* Trim out classes that fall beyond Timetable Days
-                                 * specified in Admin/Lists/Campus
-                                 */
-                                if ($dayNumber <= $timetableDay) {
-                                    $timetable[$periodIndex]['day'][$dayNumber][] = array(
-                                        'description' => $currentPeriod->{'ClassCode'},
-                                        'code' => $currentPeriod->{'ClassCode'},
-                                        'campus' => $campusName,
-                                        'room' => "Room {$currentPeriod->{'Room'}}",
-                                        'staffID' => $currentPeriod->{'TeacherCode'},
-                                        'staffFirstname' => $currentPeriod->{'Teacher'},
-                                        'staffSurname' => '',
-                                        'staffTitle' => '',
-                                    );
-                                }
-                            }
+                        /* Trim out classes that fall beyond Timetable Days
+                         * specified in Admin/Lists/Campus
+                         */
+                        if ($dayNumber <= $campus->getTimetableDay()) {
+                            $timetable[$periodIndex]['day'][$dayNumber][] = array(
+                                'description' => $currentPeriod->{'ClassCode'},
+                                'code' => $currentPeriod->{'ClassCode'},
+                                'campus' => $campus->getName(),
+                                'room' => "Room {$currentPeriod->{'Room'}}",
+                                'staffID' => $currentPeriod->{'TeacherCode'},
+                                'staffFirstname' => $currentPeriod->{'Teacher'},
+                                'staffSurname' => '',
+                                'staffTitle' => '',
+                            );
                         }
                     }
+                }
+            }
 
-                    return serialize($timetable);
-                },
-                array($externalUserId, $timetable, $campus->getTimetableDay(), $campus->getName()),
-                $this->getCacheTime()
-            );
-
-            return unserialize($encoded);
+            return $timetable;
         }
         else if ($this->getGroupHandler()->isStaff($userId)) {
-            $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-                "extdb:" . INSTANCE_ID . ":denbigh2.getFullTimetable",
 
-                function ($params) {
-                    list($externalUserId, $timetable, $timetableDay, $campusName) = $params;
-
-                    $api = new External_Denbigh2_Api('TimetableLessons',
-                        array(
-                            'Teacher Code' => $externalUserId
-                        ),
-                        array(
-                            'RFMmax' => 0
-                        )
-                    );
-
-                    if (!$api->hasErrors()) {
-                        $allPeriods = $api->getResult()->data;
-
-                        /* Assemble into a 2D array
-                         * Each row represents a Period across each Day in the cycle
-                         *
-                         * [Period1 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
-                         * [Period2 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
-                         * [Period3 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
-                         * [PeriodN [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
-                         * ...
-                         */
-                        if (count($allPeriods)) {
-                            foreach($allPeriods as $currentPeriod) {
-
-                                /* wtf
-                                 * ...or I could preg_match it out of 1/3/0001, wherever that came from
-                                 */
-                                $periodNumber = trim(str_replace('Period', '', $currentPeriod->{'Period'}));
-                                $periodIndex = $periodNumber-1;
-
-                                $dayNumber = trim($currentPeriod->{'Day'});
-
-                                /* Trim out classes that fall beyond Timetable Days
-                                 * specified in Admin/Lists/Campus
-                                 */
-                                if ($dayNumber <= $timetableDay) {
-                                    $timetable[$periodIndex]['day'][$dayNumber][] = array(
-                                        'description' => $currentPeriod->{'Description for Staff TT'},
-                                        'code' => $currentPeriod->{'Class'},
-                                        'campus' => $campusName,
-                                        'room' => "Room {$currentPeriod->{'Room'}}",
-                                        'staffID' => $currentPeriod->{'Teacher Code'},
-                                        'staffFirstname' => $currentPeriod->{'Teacher'},
-                                        'staffSurname' => '',
-                                        'staffTitle' => '',
-                                    );
-                                }
-                            }
-                        }
-                    }
-
-                    return serialize($timetable);
-                },
-                array($externalUserId, $timetable, $campus->getTimetableDay(), $campus->getName()),
-                $this->getCacheTime()
+            $api = new External_Denbigh2_Api('TimetableLessons',
+                array(
+                    'Teacher Code' => $externalUserId
+                ),
+                array(
+                    'RFMmax' => 0
+                )
             );
 
-            return unserialize($encoded);
+            if (!$api->hasErrors()) {
+                $allPeriods = $api->getResult()->data;
+
+                /* Assemble into a 2D array
+                 * Each row represents a Period across each Day in the cycle
+                 *
+                 * [Period1 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                 * [Period2 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                 * [Period3 [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                 * [PeriodN [Day1 [Classes], Day2 [Classes], Day3 [Classes], DayN [Classes]...]]
+                 * ...
+                 */
+                if (count($allPeriods)) {
+                    foreach($allPeriods as $currentPeriod) {
+
+                        /* wtf
+                         * ...or I could preg_match it out of 1/3/0001, wherever that came from
+                         */
+                        $periodNumber = trim(str_replace('Period', '', $currentPeriod->{'Period'}));
+                        $periodIndex = $periodNumber-1;
+
+                        $dayNumber = trim($currentPeriod->{'Day'});
+
+                        /* Trim out classes that fall beyond Timetable Days
+                         * specified in Admin/Lists/Campus
+                         */
+                        if ($dayNumber <= $campus->getTimetableDay()) {
+                            $timetable[$periodIndex]['day'][$dayNumber][] = array(
+                                'description' => $currentPeriod->{'Description for Staff TT'},
+                                'code' => $currentPeriod->{'Class'},
+                                'campus' => $campus->getName(),
+                                'room' => "Room {$currentPeriod->{'Room'}}",
+                                'staffID' => $currentPeriod->{'Teacher Code'},
+                                'staffFirstname' => $currentPeriod->{'Teacher'},
+                                'staffSurname' => '',
+                                'staffTitle' => '',
+                            );
+                        }
+                    }
+                }
+            }
+
+            return $timetable;
         }
 
         return array();
@@ -597,25 +526,5 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
     private function getGroupHandler()
     {
         return $this->groupHandler;
-    }
-
-    /**
-     * Set cache time
-     *
-     * @param int $cacheTime
-     */
-    private function setCacheTime($cacheTime)
-    {
-        $this->cacheTime = $cacheTime;
-    }
-
-    /**
-     * Get cache time
-     *
-     * @return int
-     */
-    private function getCacheTime()
-    {
-        return $this->cacheTime;
     }
 }

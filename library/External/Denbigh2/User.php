@@ -19,13 +19,6 @@ class External_Denbigh2_User implements External_UserInterface
     private $groupHandler = null;
 
     /**
-     * Redis cache duration
-     *
-     * @var int
-     */
-    private $cacheTime = 7200;
-
-    /**
      * Constructor
      */
     public function __construct()
@@ -75,65 +68,55 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStudent($externalUserId)
     {
-        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "extdb:" . INSTANCE_ID . ":denbigh2.getStudent",
+        $data = array();
 
-            function ($params) {
-                $data = array();
+        $api = new External_Denbigh2_Api('Students', array(
+            'Student ID' => $externalUserId,
+        ));
 
-                $api = new External_Denbigh2_Api('Students', array(
-                    'Student ID' => $params,
-                ));
+        if (!$api->hasErrors()) {
+            $result = $api->getResult()->data[0];
 
-                if (!$api->hasErrors()) {
-                    $result = $api->getResult()->data[0];
+            $dobby = new \Alaress_Date_Format($result->{'Date of Birth'}, 'm/d/y');
 
-                    $dobby = new \Alaress_Date_Format($result->{'Date of Birth'}, 'm/d/y');
+            $data = array(
+                'StudentID' => $result->{'Student ID'},
+                'StudentGiven1' => $result->{'Given Names'},
+                'StudentSurname' => $result->{'Surname'},
+                'StudentBirthDate' => $dobby->getUnixTimestamp(),
+                'StudentHouseDescription' => $result->{'House'},
+                'StudentHouse' => $result->{'House'},
+                'HeadOfHouseID' => '',
+                'StudentHeadOfHouse' => '',
+                'StudentBoarder' => '',
+                'StudentForm' => '',
+                'FormDescription' => '',
+                'StudentFormStaffName' => '',
+                'StudentTutor' => '',
+                'StudentTutorName' => '',
+                'StudentTutorDescription' => '',
+                'TeacherFormID' => '',
+                'TeacherTutorID' => '',
+                'StudentYearLevel' => $result->{'Academic Year'},
+                'YearLevelCoordID' => '',
+                'StudentYearLevelCoordinator' => '',
+                'StudentLockerBook' => '',
+                'StudentEmergencyName' => $result->{'Father'} . ' ' . $result->{'Father Surname'},
+                'StudentEmergencyPhone' => $result->{'Father Phone'},
+                'StudentEmergencyPhoneAlt' => '',
+                'StudentEmergency2Name' => $result->{'Mother'} . ' ' . $result->{'Mother Surname'},
+                'StudentEmergency2Phone' => $result->{'Mother Phone'},
+                'StudentEmergency2PhoneAlt' => '',
+                'StudentEmergency3Name' => '',
+                'StudentEmergency3Phone' => '',
+                'StudentEmergency3PhoneAlt' => '',
+                'StudentMedicalAlert' => $result->{'Medical Alert Label'},
+                'StudentSpecialNeedsFlag' => $result->{'Special Needs'},
+                'AlertMessage' => '',
+            );
+        }
 
-                    $data = array(
-                        'StudentID' => $result->{'Student ID'},
-                        'StudentGiven1' => $result->{'Given Names'},
-                        'StudentSurname' => $result->{'Surname'},
-                        'StudentBirthDate' => $dobby->getUnixTimestamp(),
-                        'StudentHouseDescription' => $result->{'House'},
-                        'StudentHouse' => $result->{'House'},
-                        'HeadOfHouseID' => '',
-                        'StudentHeadOfHouse' => '',
-                        'StudentBoarder' => '',
-                        'StudentForm' => '',
-                        'FormDescription' => '',
-                        'StudentFormStaffName' => '',
-                        'StudentTutor' => '',
-                        'StudentTutorName' => '',
-                        'StudentTutorDescription' => '',
-                        'TeacherFormID' => '',
-                        'TeacherTutorID' => '',
-                        'StudentYearLevel' => $result->{'Academic Year'},
-                        'YearLevelCoordID' => '',
-                        'StudentYearLevelCoordinator' => '',
-                        'StudentLockerBook' => '',
-                        'StudentEmergencyName' => $result->{'Father'} . ' ' . $result->{'Father Surname'},
-                        'StudentEmergencyPhone' => $result->{'Father Phone'},
-                        'StudentEmergencyPhoneAlt' => '',
-                        'StudentEmergency2Name' => $result->{'Mother'} . ' ' . $result->{'Mother Surname'},
-                        'StudentEmergency2Phone' => $result->{'Mother Phone'},
-                        'StudentEmergency2PhoneAlt' => '',
-                        'StudentEmergency3Name' => '',
-                        'StudentEmergency3Phone' => '',
-                        'StudentEmergency3PhoneAlt' => '',
-                        'StudentMedicalAlert' => $result->{'Medical Alert Label'},
-                        'StudentSpecialNeedsFlag' => $result->{'Special Needs'},
-                        'AlertMessage' => '',
-                    );
-                }
-
-                return serialize($data);
-            },
-            $externalUserId,
-            $this->getCacheTime()
-        );
-
-        return unserialize($encoded);
+        return $data;
     }
 
     /**
@@ -171,65 +154,55 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStudentContactList($externalUserId)
     {
-        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "extdb:" . INSTANCE_ID . ":denbigh2.getStudentContactList",
+        $data = array();
 
-            function ($params) {
-                $data = array();
+        /* Gotta get the famiry code out of the Student result set
+         */
+        $api = new External_Denbigh2_Api('Students', array(
+            'Student ID' => $externalUserId,
+        ));
 
-                /* Gotta get the famiry code out of the Student result set
-                 */
-                $api = new External_Denbigh2_Api('Students', array(
-                    'Student ID' => $params,
-                ));
+        if (!$api->hasErrors()) {
+            $result = $api->getResult()->data[0];
 
-                if (!$api->hasErrors()) {
-                    $result = $api->getResult()->data[0];
+            $api = new External_Denbigh2_Api('Family', array(
+                'Family Code' => $result->{'Family Code'},
+            ));
 
-                    $api = new External_Denbigh2_Api('Family', array(
-                        'Family Code' => $result->{'Family Code'},
-                    ));
+            if (!$api->hasErrors()) {
+                $family = $api->getResult()->data[0];
 
-                    if (!$api->hasErrors()) {
-                        $family = $api->getResult()->data[0];
+                $data[] = array(
+                    'StudentContactID' => '',
+                    'StudentContactTitle' => $family->{'Father Title'},
+                    'StudentContactPreferred' => $family->{'Father Preferred Name'},
+                    'StudentContactSurname' => $family->{'Father Surname'},
+                    'StudentContactDefaultEmail' => $family->{'Father email'},
+                    'ValidAddressFlag' => '',
+                    'StudentContactAddress1' => $family->{'Residential Address Street'},
+                    'StudentContactAddress2' => '',
+                    'StudentContactAddress3' => '',
+                    'StudentContactSuburb' => $family->{'Residential Address Suburb'},
+                    'StudentContactPostCode' => $family->{'Residential Address PostCode'},
+                    'StudentContactState' => $family->{'Residential Address State'},
+                    'StudentContactPhoneActual' => '',
+                    'StudentContactMobilePhone' => $family->{'Father Mobile'},
+                    'StudentContactOccupPhone' => $family->{'Father Phone'},
+                    'StudentContactRelation' => '',
+                    'StudentContactSpouseID' => '',
+                    'StudentContactSpouseTitle' => $family->{'Mother Title'},
+                    'StudentContactSpousePreferred' => $family->{'Mother Preferred Name'},
+                    'StudentContactSpouseSurname' => $family->{'Mother Surname'},
+                    'StudentContactSpouseMobilePhone' => $family->{'Mother Mobile'},
+                    'StudentContactSpouseOccupPhone' => $family->{'Mother Phone'},
+                    'StudentContactSpouseDefaultEmail' => $family->{'Mother Email'},
+                    'StudentContactType' => '',
+                    'StudentContactSpouseRelation' => '',
+                );
+            }
+        }
 
-                        $data[] = array(
-                            'StudentContactID' => '',
-                            'StudentContactTitle' => $family->{'Father Title'},
-                            'StudentContactPreferred' => $family->{'Father Preferred Name'},
-                            'StudentContactSurname' => $family->{'Father Surname'},
-                            'StudentContactDefaultEmail' => $family->{'Father email'},
-                            'ValidAddressFlag' => '',
-                            'StudentContactAddress1' => $family->{'Residential Address Street'},
-                            'StudentContactAddress2' => '',
-                            'StudentContactAddress3' => '',
-                            'StudentContactSuburb' => $family->{'Residential Address Suburb'},
-                            'StudentContactPostCode' => $family->{'Residential Address PostCode'},
-                            'StudentContactState' => $family->{'Residential Address State'},
-                            'StudentContactPhoneActual' => '',
-                            'StudentContactMobilePhone' => $family->{'Father Mobile'},
-                            'StudentContactOccupPhone' => $family->{'Father Phone'},
-                            'StudentContactRelation' => '',
-                            'StudentContactSpouseID' => '',
-                            'StudentContactSpouseTitle' => $family->{'Mother Title'},
-                            'StudentContactSpousePreferred' => $family->{'Mother Preferred Name'},
-                            'StudentContactSpouseSurname' => $family->{'Mother Surname'},
-                            'StudentContactSpouseMobilePhone' => $family->{'Mother Mobile'},
-                            'StudentContactSpouseOccupPhone' => $family->{'Mother Phone'},
-                            'StudentContactSpouseDefaultEmail' => $family->{'Mother Email'},
-                            'StudentContactType' => '',
-                            'StudentContactSpouseRelation' => '',
-                        );
-                    }
-                }
-
-                return serialize($data);
-            },
-            $externalUserId,
-            $this->getCacheTime()
-        );
-
-        return unserialize($encoded);
+        return $data;
     }
 
     /**
@@ -323,57 +296,46 @@ class External_Denbigh2_User implements External_UserInterface
 
         /* TODO: Boarding house and Form information not available?
          */
-        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "extdb:" . INSTANCE_ID . ":denbigh2.getStudentContactListExtended",
+        $collection = array();
 
-            function ($params) {
-                $collection = array();
-                list($pregName, $pattern, $allNameSources) = $params;
+        /* Proceed
+         */
+        $api = new External_Denbigh2_Api('Students', array($pregName, $pattern, $allNameSources));
 
-                /* Proceed
-                 */
-                $api = new External_Denbigh2_Api('Students', $params);
+        if (!$api->hasErrors()) {
+            $allStudents = $api->getResult()->data;
 
-                if (!$api->hasErrors()) {
-                    $allStudents = $api->getResult()->data;
+            /* Filter people out by name, if provided
+             * Otherwise just restack them
+             */
+            if (count($allStudents)) {
+                foreach ($allStudents as $currentStudent) {
 
-                    /* Filter people out by name, if provided
-                     * Otherwise just restack them
+                    /* Filter by name
                      */
-                    if (count($allStudents)) {
-                        foreach ($allStudents as $currentStudent) {
+                    if ($pregName) {
+                        foreach($allNameSources as $currentSource) {
 
-                            /* Filter by name
+                            /* Check names
                              */
-                            if ($pregName) {
-                                foreach($allNameSources as $currentSource) {
-
-                                    /* Check names
-                                     */
-                                    if (preg_match($pattern, $currentStudent->{$currentSource})) {
-                                        $collection[] = $currentStudent;
-                                        break;
-                                    }
-                                }
-                            }
-                            /* TODO: Check anything else in a similar manner
-                             */
-                            /* Otherwise just stack up everyone
-                             */
-                            else {
+                            if (preg_match($pattern, $currentStudent->{$currentSource})) {
                                 $collection[] = $currentStudent;
+                                break;
                             }
                         }
                     }
+                    /* TODO: Check anything else in a similar manner
+                     */
+                    /* Otherwise just stack up everyone
+                     */
+                    else {
+                        $collection[] = $currentStudent;
+                    }
                 }
+            }
+        }
 
-                return serialize($collection);
-            },
-            array($pregName, $pattern, $allNameSources),
-            $this->getCacheTime()
-        );
-
-        return unserialize($encoded);
+        return $collection;
     }
 
     /**
@@ -397,49 +359,39 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStudentUserAccountInfo()
     {
-        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "extdb:" . INSTANCE_ID . ":denbigh2.getStudentUserAccountInfo",
+        $allStudents = array();
 
-            function ($params) {
-                $allStudents = array();
+        $api = new External_Denbigh2_Api('Students', array());
 
-                $api = new External_Denbigh2_Api('Students', array());
+        if (!$api->hasErrors()) {
+            if (count($api->getResult()->data)) {
+                foreach ($api->getResult()->data as $currentStudent) {
+                    // TODO: I guess I need the NetworkLogin
+                    // TODO: Campus isn't being populated
+                    // TODO: Boarders - dunno
 
-                if (!$api->hasErrors()) {
-                    if (count($api->getResult()->data)) {
-                        foreach ($api->getResult()->data as $currentStudent) {
-                            // TODO: I guess I need the NetworkLogin
-                            // TODO: Campus isn't being populated
-                            // TODO: Boarders - dunno
+                    $student = array(
+                        'StudentID' => $currentStudent->{'Student ID'},
+                        'NetworkLogin' => '',
+                        'StudentTitle' => '',
+                        'StudentPreferred' => $currentStudent->{'Preferred Name'},
+                        'StudentSurname' => $currentStudent->{'Surname'},
+                        'StudentGender' => $currentStudent->{'Gender'},
+                        'StudentEmail' => $currentStudent->{'Email Address'},
+                        'StudentOccupEmail' => '',
+                        'StudentYearLevel' => $currentStudent->{'Academic Year'},
+                        'StudentHouse' => $currentStudent->{'House'},
+                        'StudentBoarder' => '',
+                        'StudentBoardingHouse' => '',
+                        'StudentCampus' => $currentStudent->{'Campus'},
+                    );
 
-                            $student = array(
-                                'StudentID' => $currentStudent->{'Student ID'},
-                                'NetworkLogin' => '',
-                                'StudentTitle' => '',
-                                'StudentPreferred' => $currentStudent->{'Preferred Name'},
-                                'StudentSurname' => $currentStudent->{'Surname'},
-                                'StudentGender' => $currentStudent->{'Gender'},
-                                'StudentEmail' => $currentStudent->{'Email Address'},
-                                'StudentOccupEmail' => '',
-                                'StudentYearLevel' => $currentStudent->{'Academic Year'},
-                                'StudentHouse' => $currentStudent->{'House'},
-                                'StudentBoarder' => '',
-                                'StudentBoardingHouse' => '',
-                                'StudentCampus' => $currentStudent->{'Campus'},
-                            );
-
-                            $allStudents[] = $student;
-                        }
-                    }
+                    $allStudents[] = $student;
                 }
+            }
+        }
 
-                return serialize($allStudents);
-            },
-            null,
-            $this->getCacheTime()
-        );
-
-        return unserialize($encoded);
+        return $allStudents;
     }
 
     /**
@@ -454,39 +406,23 @@ class External_Denbigh2_User implements External_UserInterface
         $allEmails = array();
 
         if (count($synergyIds)) {
-            $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-                "extdb:" . INSTANCE_ID . ":denbigh2.getParentEmails",
+                foreach($synergyIds as $currentExternalId) {
+                    $api = new External_Denbigh2_Api('Students', array(
+                        'Student ID' => $currentExternalId,
+                    ));
 
-                function ($params) {
-                    $allEmails = array();
+                    if (!$api->hasErrors()) {
+                        $currentStudent = $api->getResult()->data[0];
 
-                    if (is_array($params) && count($params)) {
-                        foreach($params as $currentExternalId) {
-                            $api = new External_Denbigh2_Api('Students', array(
-                                'Student ID' => $currentExternalId,
-                            ));
+                        if (strlen(trim($currentStudent->{'email Father'}))) {
+                            $allEmails[] = $currentStudent->{'email Father'};
+                        }
 
-                            if (!$api->hasErrors()) {
-                                $currentStudent = $api->getResult()->data[0];
-
-                                if (strlen(trim($currentStudent->{'email Father'}))) {
-                                    $allEmails[] = $currentStudent->{'email Father'};
-                                }
-
-                                if (strlen(trim($currentStudent->{'email Mother'}))) {
-                                    $allEmails[] = $currentStudent->{'email Mother'};
-                                }
-                            }
+                        if (strlen(trim($currentStudent->{'email Mother'}))) {
+                            $allEmails[] = $currentStudent->{'email Mother'};
                         }
                     }
-
-                    return serialize($allEmails);
-                },
-                $synergyIds,
-                $this->getCacheTime()
-            );
-
-            return unserialize($encoded);
+                }
         }
 
         return $allEmails;
@@ -521,49 +457,40 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getParent($externalUserId)
     {
-        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "extdb:" . INSTANCE_ID . ":denbigh2.getParent",
+        $parent = array();
 
-            function ($params) {
-                $parent = array();
+        $api = new External_Denbigh2_Api('Family', array(
+            'Family Code' => $externalUserId
+        ));
 
-                $api = new External_Denbigh2_Api('Family', array(
-                    'Family Code' => $params
-                ));
+        if (!$api->hasErrors()) {
+            $family = $api->getResult()->data[0];
 
-                if (!$api->hasErrors()) {
-                    $family = $api->getResult()->data[0];
+            $parent = array(
+                'Title' => $family->{'Father Title'},
+                'Preferred' => $family->{'Father Preferred Name'},
+                'Surname' => $family->{'Father Surname'},
+                'Email' => $family->{'Father email'},
+                'OccupEmail' => $family->{'Father Email Work'},
+                'DefaultEmailCode' => '',
+                'HomePhone' => $family->{'Father Phone'},
+                'SilentPhoneFlag' => '',
+                'MobilePhone' => $family->{'Father Mobile'},
+                'DirectoryIncludeFlag' => '',
+                'SpouseID' => $family->{'Mother Community ID'},
+                'SpouseTitle' => $family->{'Mother Title'},
+                'SpousePreferred' => $family->{'Mother Preferred Name'},
+                'SpouseSurname' => $family->{'Mother Surname'},
+                'SpouseEmail' => $family->{'Mother Email'},
+                'SpouseOccupEmail' => $family->{'Mother Email Work'},
+                'SpouseDefaultEmailCode' => '',
+                'SpouseMobilePhone' => $family->{'Mother Mobile'},
+                'SpouseDirectoryIncludeFlag' => '',
+            );
+        }
 
-                    $parent = array(
-                        'Title' => $family->{'Father Title'},
-                        'Preferred' => $family->{'Father Preferred Name'},
-                        'Surname' => $family->{'Father Surname'},
-                        'Email' => $family->{'Father email'},
-                        'OccupEmail' => $family->{'Father Email Work'},
-                        'DefaultEmailCode' => '',
-                        'HomePhone' => $family->{'Father Phone'},
-                        'SilentPhoneFlag' => '',
-                        'MobilePhone' => $family->{'Father Mobile'},
-                        'DirectoryIncludeFlag' => '',
-                        'SpouseID' => $family->{'Mother Community ID'},
-                        'SpouseTitle' => $family->{'Mother Title'},
-                        'SpousePreferred' => $family->{'Mother Preferred Name'},
-                        'SpouseSurname' => $family->{'Mother Surname'},
-                        'SpouseEmail' => $family->{'Mother Email'},
-                        'SpouseOccupEmail' => $family->{'Mother Email Work'},
-                        'SpouseDefaultEmailCode' => '',
-                        'SpouseMobilePhone' => $family->{'Mother Mobile'},
-                        'SpouseDirectoryIncludeFlag' => '',
-                    );
-                }
+        return $parent;
 
-                return serialize($parent);
-            },
-            $externalUserId,
-            $this->getCacheTime()
-        );
-
-        return unserialize($encoded);
     }
 
     /**
@@ -608,79 +535,58 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getParentSync($externalUserId)
     {
+        $parent = array();
+
         if (is_array($externalUserId)) {
-            $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-                "extdb:" . INSTANCE_ID . ":denbigh2.getParentSync",
 
-                function ($params) {
-                    $parent = array();
+            foreach($externalUserId as $current) {
+                $api = new External_Denbigh2_Api('Family', array(
+                    'Family Code' => $current
+                ));
 
-                    foreach($params as $current) {
-                        $api = new External_Denbigh2_Api('Family', array(
-                            'Family Code' => $current
-                        ));
-
-                        if (!$api->hasErrors()) {
-                            if (count($api->getResult()->data)) {
-                                foreach ($api->getResult()->data as $family) {
-                                    $parent[] = array(
-                                        'ID' => $family->{'Father Community ID'},
-                                        'Title' => $family->{'Father Title'},
-                                        'Preferred' => $family->{'Father Preferred Name'},
-                                        'Surname' => $family->{'Father Surname'},
-                                        'Email' => $family->{'Father email'},
-                                        'OccupEmail' => $family->{'Father Email Work'},
-                                        'DefaultEmailCode' => '',
-                                        'DirectoryIncludeFlag' => '',
-                                    );
-                                }
-                            }
+                if (!$api->hasErrors()) {
+                    if (count($api->getResult()->data)) {
+                        foreach ($api->getResult()->data as $family) {
+                            $parent[] = array(
+                                'ID' => $family->{'Father Community ID'},
+                                'Title' => $family->{'Father Title'},
+                                'Preferred' => $family->{'Father Preferred Name'},
+                                'Surname' => $family->{'Father Surname'},
+                                'Email' => $family->{'Father email'},
+                                'OccupEmail' => $family->{'Father Email Work'},
+                                'DefaultEmailCode' => '',
+                                'DirectoryIncludeFlag' => '',
+                            );
                         }
                     }
+                }
+            }
 
-                    return serialize($params);
-                },
-                $externalUserId,
-                $this->getCacheTime()
-            );
 
-            return unserialize($encoded);
 
         }
         else {
-            $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-                "extdb:" . INSTANCE_ID . ":denbigh2.getParentSync",
+            $api = new External_Denbigh2_Api('Family', array(
+                'Family Code' => $externalUserId
+            ));
 
-                function ($params) {
-                    $parent = array();
+            if (!$api->hasErrors()) {
+                $family = $api->getResult()->data[0];
 
-                    $api = new External_Denbigh2_Api('Family', array(
-                        'Family Code' => $params
-                    ));
-
-                    if (!$api->hasErrors()) {
-                        $family = $api->getResult()->data[0];
-
-                        $parent = array(
-                            'ID' => $family->{'Father Community ID'},
-                            'Title' => $family->{'Father Title'},
-                            'Preferred' => $family->{'Father Preferred Name'},
-                            'Surname' => $family->{'Father Surname'},
-                            'Email' => $family->{'Father email'},
-                            'OccupEmail' => $family->{'Father Email Work'},
-                            'DefaultEmailCode' => '',
-                            'DirectoryIncludeFlag' => '',
-                        );
-                    }
-
-                    return serialize($parent);
-                },
-                $externalUserId,
-                $this->getCacheTime()
-            );
-
-            return unserialize($encoded);
+                $parent = array(
+                    'ID' => $family->{'Father Community ID'},
+                    'Title' => $family->{'Father Title'},
+                    'Preferred' => $family->{'Father Preferred Name'},
+                    'Surname' => $family->{'Father Surname'},
+                    'Email' => $family->{'Father email'},
+                    'OccupEmail' => $family->{'Father Email Work'},
+                    'DefaultEmailCode' => '',
+                    'DirectoryIncludeFlag' => '',
+                );
+            }
         }
+
+        return $parent;
     }
 
     /**
@@ -709,52 +615,42 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getParentUserAccountInfo()
     {
-        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "extdb:" . INSTANCE_ID . ":denbigh2.getParentUserAccountInfo",
+        $allParents = array();
 
-            function ($params) {
-                $allParents = array();
+        $api = new External_Denbigh2_Api('Students', array());
 
-                $api = new External_Denbigh2_Api('Students', array());
+        if (!$api->hasErrors()) {
+            $allStudents = $api->getResult()->data;
 
-                if (!$api->hasErrors()) {
-                    $allStudents = $api->getResult()->data;
+            if (count($allStudents)) {
+                foreach($allStudents as $currentStudent) {
+                    // TODO: Parents have no networkLogin equivalent?
+                    // TODO: Parents have no unique id?
 
-                    if (count($allStudents)) {
-                        foreach($allStudents as $currentStudent) {
-                            // TODO: Parents have no networkLogin equivalent?
-                            // TODO: Parents have no unique id?
+                    $parent = array(
+                        'StudentContactNetworkLogin' => '',
+                        'StudentContactID' => '',
+                        'StudentContactTitle' => $currentStudent->{'Father Title'},
+                        'StudentContactPreferred' => $currentStudent->{'Father'},
+                        'StudentContactSurname' => $currentStudent->{'Father Surname'},
+                        'StudentContactDefaultEmail' => $currentStudent->{'email Father'},
+                        'StudentContactSpouseNetworkLogin' => '',
+                        'StudentContactSpouseID' => '',
+                        'StudentContactSpouseTitle' => $currentStudent->{'Mother Title'},
+                        'StudentContactSpousePreferred' => $currentStudent->{'Mother'},
+                        'StudentContactSpouseSurname' => $currentStudent->{'Mother Surname'},
+                        'StudentContactSpouseDefaultEmail' => $currentStudent->{'email Mother'},
+                        'StudentYearLevel' => $currentStudent->{'Academic Year'},
+                        'StudentCampus' => $currentStudent->{'Campus'},
+                        'StudentGender' => $currentStudent->{'Gender'},
+                    );
 
-                            $parent = array(
-                                'StudentContactNetworkLogin' => '',
-                                'StudentContactID' => '',
-                                'StudentContactTitle' => $currentStudent->{'Father Title'},
-                                'StudentContactPreferred' => $currentStudent->{'Father'},
-                                'StudentContactSurname' => $currentStudent->{'Father Surname'},
-                                'StudentContactDefaultEmail' => $currentStudent->{'email Father'},
-                                'StudentContactSpouseNetworkLogin' => '',
-                                'StudentContactSpouseID' => '',
-                                'StudentContactSpouseTitle' => $currentStudent->{'Mother Title'},
-                                'StudentContactSpousePreferred' => $currentStudent->{'Mother'},
-                                'StudentContactSpouseSurname' => $currentStudent->{'Mother Surname'},
-                                'StudentContactSpouseDefaultEmail' => $currentStudent->{'email Mother'},
-                                'StudentYearLevel' => $currentStudent->{'Academic Year'},
-                                'StudentCampus' => $currentStudent->{'Campus'},
-                                'StudentGender' => $currentStudent->{'Gender'},
-                            );
-
-                            $allParents[] = $parent;
-                        }
-                    }
+                    $allParents[] = $parent;
                 }
+            }
+        }
 
-                return serialize($allParents);
-            },
-            null,
-            $this->getCacheTime()
-        );
-
-        return unserialize($encoded);
+        return $allParents;
     }
 
     /**
@@ -775,39 +671,29 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStaff($externalUserId)
     {
-        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "extdb:" . INSTANCE_ID . ":denbigh2.getStaff",
+        $staff = array();
 
-            function ($params) {
-                $staff = array();
+        $api = new External_Denbigh2_Api('Staff', array(
+            'Staff Code' => $externalUserId
+        ));
 
-                $api = new External_Denbigh2_Api('Staff', array(
-                    'Staff Code' => $params
-                ));
+        if (!$api->hasErrors()) {
+            $currentStaff = $api->getResult()->data[0];
 
-                if (!$api->hasErrors()) {
-                    $currentStaff = $api->getResult()->data[0];
+            $staff = array(
+                'SchoolStaffCode' => $currentStaff->{'Staff Code'},
+                'StaffBuilding' => '',
+                'StaffRoom' => '',
+                'StaffExtension' => $currentStaff->{'Telephone Extension'},
+                'StaffMobilePhone' => '',
+                'StaffCampusDescription' => $currentStaff->{'Campus'},
+                'StaffCategoryDescription' => '',
+                'StaffDepartment' => '',
+                'StaffVoiceMail' => '',
+            );
+        }
 
-                    $staff = array(
-                        'SchoolStaffCode' => $currentStaff->{'Staff Code'},
-                        'StaffBuilding' => '',
-                        'StaffRoom' => '',
-                        'StaffExtension' => $currentStaff->{'Telephone Extension'},
-                        'StaffMobilePhone' => '',
-                        'StaffCampusDescription' => $currentStaff->{'Campus'},
-                        'StaffCategoryDescription' => '',
-                        'StaffDepartment' => '',
-                        'StaffVoiceMail' => '',
-                    );
-                }
-
-                return serialize($staff);
-            },
-            $externalUserId,
-            $this->getCacheTime()
-        );
-
-        return unserialize($encoded);
+        return $staff;
     }
 
     /**
@@ -835,43 +721,33 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStaffUserAccountInfo()
     {
-        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "extdb:" . INSTANCE_ID . ":denbigh2.getStaffUserAccountInfo",
+        $staff = array();
 
-            function ($params) {
-                $staff = array();
+        $api = new External_Denbigh2_Api('Staff', array());
 
-                $api = new External_Denbigh2_Api('Staff', array());
-
-                if (!$api->hasErrors()) {
-                    if (count($api->getResult()->data)) {
-                        foreach($api->getResult()->data as $currentStaff) {
-                            $staff[] = array(
-                                'StaffID' => $currentStaff->{'Staff Code'},
-                                'NetworkLogin' => '',
-                                'ActiveFlag' => '',
-                                'StaffTitle' => $currentStaff->{'Title'},
-                                'StaffPreferredName' => $currentStaff->{'First Name'},
-                                'StaffSurname' => $currentStaff->{'Surname'},
-                                'DefaultEmailCode' => '',
-                                'OccupEmail' => '',
-                                'Email' => $currentStaff->{'Email Address'},
-                                'StaffCampus' => $currentStaff->{'Campus'},
-                                'StaffCategoryType' => '',
-                                'StaffCategory' => '',
-                                'StaffDepartment' => '',
-                            );
-                        }
-                    }
+        if (!$api->hasErrors()) {
+            if (count($api->getResult()->data)) {
+                foreach($api->getResult()->data as $currentStaff) {
+                    $staff[] = array(
+                        'StaffID' => $currentStaff->{'Staff Code'},
+                        'NetworkLogin' => '',
+                        'ActiveFlag' => '',
+                        'StaffTitle' => $currentStaff->{'Title'},
+                        'StaffPreferredName' => $currentStaff->{'First Name'},
+                        'StaffSurname' => $currentStaff->{'Surname'},
+                        'DefaultEmailCode' => '',
+                        'OccupEmail' => '',
+                        'Email' => $currentStaff->{'Email Address'},
+                        'StaffCampus' => $currentStaff->{'Campus'},
+                        'StaffCategoryType' => '',
+                        'StaffCategory' => '',
+                        'StaffDepartment' => '',
+                    );
                 }
+            }
+        }
 
-                return serialize($staff);
-            },
-            null,
-            $this->getCacheTime()
-        );
-
-        return unserialize($encoded);
+        return $staff;
     }
 
     /**
@@ -901,47 +777,37 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStaffContactListExtended()
     {
-        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "extdb:" . INSTANCE_ID . ":denbigh2.getStaffContactListExtended",
+        $staff = array();
 
-            function ($params) {
-                $staff = array();
+        $api = new External_Denbigh2_Api('Staff', array());
 
-                $api = new External_Denbigh2_Api('Staff', array());
-
-                if (!$api->hasErrors()) {
-                    if (count($api->getResult()->data)) {
-                        foreach($api->getResult()->data as $currentStaff) {
-                            $staff[] = array(
-                                'StaffID' => $currentStaff->{'Staff Code'},
-                                'SchoolStaffCode' => '',
-                                'StaffTitle' => $currentStaff->{'Staff Title'},
-                                'StaffPreferredName' => $currentStaff->{'First Name'},
-                                'StaffSurname' => $currentStaff->{'Surname'},
-                                'StaffOccupPhone' => $currentStaff->{'Telephone'},
-                                'StaffOccupEmail' => $currentStaff->{'Email Address'},
-                                'StaffExtension' => $currentStaff->{'Telephone Extension'},
-                                'StaffCampusDescription' => $currentStaff->{'Campus'},
-                                'StaffCategory' => '',
-                                'StaffCategoryType' => '',
-                                'StaffDefaultMobilePhone' => '',
-                                'StaffVoiceMail' => '',
-                                'StaffDepartmentDescription' => '',
-                                'JobPositionDescription' => '',
-                                'StaffJobPositionStartDate' => '',
-                                'StaffJobPositionEndDate' => '',
-                            );
-                        }
-                    }
+        if (!$api->hasErrors()) {
+            if (count($api->getResult()->data)) {
+                foreach($api->getResult()->data as $currentStaff) {
+                    $staff[] = array(
+                        'StaffID' => $currentStaff->{'Staff Code'},
+                        'SchoolStaffCode' => '',
+                        'StaffTitle' => $currentStaff->{'Staff Title'},
+                        'StaffPreferredName' => $currentStaff->{'First Name'},
+                        'StaffSurname' => $currentStaff->{'Surname'},
+                        'StaffOccupPhone' => $currentStaff->{'Telephone'},
+                        'StaffOccupEmail' => $currentStaff->{'Email Address'},
+                        'StaffExtension' => $currentStaff->{'Telephone Extension'},
+                        'StaffCampusDescription' => $currentStaff->{'Campus'},
+                        'StaffCategory' => '',
+                        'StaffCategoryType' => '',
+                        'StaffDefaultMobilePhone' => '',
+                        'StaffVoiceMail' => '',
+                        'StaffDepartmentDescription' => '',
+                        'JobPositionDescription' => '',
+                        'StaffJobPositionStartDate' => '',
+                        'StaffJobPositionEndDate' => '',
+                    );
                 }
+            }
+        }
 
-                return serialize($staff);
-            },
-            null,
-            $this->getCacheTime()
-        );
-
-        return unserialize($encoded);
+        return $staff;
     }
 
     /**
@@ -985,109 +851,83 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getSubjectList($externalUserId, $userId)
     {
+        $class = array();
+
         if ($this->getGroupHandler()->isStudent($userId)) {
-            $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-                "extdb:" . INSTANCE_ID . ":denbigh2.getSubjectList",
+            $api = new External_Denbigh2_Api('Enrolments', array(
+                'Student ID' => $externalUserId
+            ));
 
-                function ($params) {
-                    $class = array();
+            /* Calling userMapper->findById() for user 689 causes Avondale
+             * to time out with Error code: ERR_EMPTY_RESPONSE
+             *
+             * This is needed to get the campusCode
+             */
+            if (!$api->hasErrors()) {
+                $allEnrolments = $api->getResult()->data;
 
-                    $api = new External_Denbigh2_Api('Enrolments', array(
-                        'Student ID' => $params
-                    ));
+                if (count($allEnrolments)) {
+                    foreach($allEnrolments as $currentEnrolment) {
 
-                    /* Calling userMapper->findById() for user 689 causes Avondale
-                     * to time out with Error code: ERR_EMPTY_RESPONSE
-                     *
-                     * This is needed to get the campusCode
-                     */
-                    if (!$api->hasErrors()) {
-                        $allEnrolments = $api->getResult()->data;
+                        /* Find out more info about the class
+                         */
+                        $api = new External_Denbigh2_Api('Classes', array(
+                            'Class' => $currentEnrolment->{'Class'}
+                        ));
 
-                        if (count($allEnrolments)) {
-                            foreach($allEnrolments as $currentEnrolment) {
+                        if (!$api->hasErrors()) {
+                            $classData = $api->getResult()->data[0];
 
-                                /* Find out more info about the class
-                                 */
-                                $api = new External_Denbigh2_Api('Classes', array(
-                                    'Class' => $currentEnrolment->{'Class'}
-                                ));
+                            // TODO: No campus for class?
 
-                                if (!$api->hasErrors()) {
-                                    $classData = $api->getResult()->data[0];
-
-                                    // TODO: No campus for class?
-
-                                    $class[] = array(
-                                        'code' => $classData->{'Class'},
-                                        'name' => $classData->{'Subject Name'},
-                                        'classType' => 'Academic',
-                                        'campusCode' => ''
-                                    );
-                                }
-                            }
+                            $class[] = array(
+                                'code' => $classData->{'Class'},
+                                'name' => $classData->{'Subject Name'},
+                                'classType' => 'Academic',
+                                'campusCode' => ''
+                            );
                         }
                     }
-
-                    return serialize($class);
-                },
-                $externalUserId,
-                $this->getCacheTime()
-            );
-
-            return unserialize($encoded);
+                }
+            }
         }
         else if ($this->getGroupHandler()->isStaff($userId)) {
-            $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-                "extdb:" . INSTANCE_ID . ":denbigh2.getSubjectList",
-
-                function ($params) {
-                    $class = array();
-
-                    $api = new External_Denbigh2_Api('Classes',
-                        array(
-                            'Teacher Code' => $params
-                        ),
-                        array(
-                            'RFMmax' => 0
-                        )
-                    );
-
-                    /* Calling userMapper->findById() for user 689 causes Avondale
-                     * to time out with Error code: ERR_EMPTY_RESPONSE
-                     *
-                     * This is needed to get the campusCode
-                     */
-                    if (!$api->hasErrors()) {
-                        $stack = array();
-
-                        $allClasses = $api->getResult()->data;
-
-                        if (count($allClasses)) {
-                            foreach ($allClasses as $currentClass) {
-
-                                /* Awesome uniquify
-                                 */
-                                $stack[$currentClass->{'Class'}] = array(
-                                    'code' => $currentClass->{'Class'},
-                                    'name' => $currentClass->{'Subject Name'},
-                                    'classType' => 'Academic',
-                                    'campusCode' => ''
-                                );
-                            }
-                        }
-
-                        $class = array_values($stack);
-                    }
-
-                    return serialize($class);
-                },
-                $externalUserId,
-                $this->getCacheTime()
+            $api = new External_Denbigh2_Api('Classes',
+                array(
+                    'Teacher Code' => $externalUserId
+                ),
+                array(
+                    'RFMmax' => 0
+                )
             );
 
-            return unserialize($encoded);
+            /* Calling userMapper->findById() for user 689 causes Avondale
+             * to time out with Error code: ERR_EMPTY_RESPONSE
+             *
+             * This is needed to get the campusCode
+             */
+            if (!$api->hasErrors()) {
+                $stack = array();
+
+                $allClasses = $api->getResult()->data;
+
+                if (count($allClasses)) {
+                    foreach ($allClasses as $currentClass) {
+
+                        /* Awesome uniquify
+                         */
+                        $stack[$currentClass->{'Class'}] = array(
+                            'code' => $currentClass->{'Class'},
+                            'name' => $currentClass->{'Subject Name'},
+                            'classType' => 'Academic',
+                            'campusCode' => ''
+                        );
+                    }
+                }
+                $class = array_values($stack);
+            }
         }
+        return $class;
     }
 
     /**
@@ -1101,35 +941,25 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getEnrolledStudents($externalUserId)
     {
-        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "extdb:" . INSTANCE_ID . ":denbigh2.getEnrolledStudents",
+        $ids = array();
 
-            function ($params) {
-                $ids = array();
+        // TODO: Made an assumption that the Family Code can get us there
 
-                // TODO: Made an assumption that the Family Code can get us there
+        $api = new External_Denbigh2_Api('Students', array(
+            'Family Code' => $externalUserId
+        ));
 
-                $api = new External_Denbigh2_Api('Students', array(
-                    'Family Code' => $params
-                ));
+        if (!$api->hasErrors()) {
+            $allStudents = $api->getResult()->data;
 
-                if (!$api->hasErrors()) {
-                    $allStudents = $api->getResult()->data;
-
-                    if (count($allStudents)) {
-                        foreach($allStudents as $currentStudent) {
-                            $ids[] = $currentStudent->{'Student ID'};
-                        }
-                    }
+            if (count($allStudents)) {
+                foreach($allStudents as $currentStudent) {
+                    $ids[] = $currentStudent->{'Student ID'};
                 }
+            }
+        }
 
-                return serialize($ids);
-            },
-            $externalUserId,
-            $this->getCacheTime()
-        );
-
-        return unserialize($encoded);
+        return $ids;
     }
 
     /**
@@ -1140,40 +970,30 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getEmail($externalUserId)
     {
-        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "extdb:" . INSTANCE_ID . ":denbigh2.getEmail",
+        $emailAddress = '';
 
-            function ($params) {
-                $emailAddress = '';
+        // TODO: Currently no way of knowing which parent to return email address for
 
-                // TODO: Currently no way of knowing which parent to return email address for
+        $api = new External_Denbigh2_Api('Students', array(
+            'Student ID' => $externalUserId
+        ));
 
-                $api = new External_Denbigh2_Api('Students', array(
-                    'Student ID' => $params
-                ));
+        if (!$api->hasErrors()) {
+            $currentStudent = $api->getResult()->data[0];
 
-                if (!$api->hasErrors()) {
-                    $currentStudent = $api->getResult()->data[0];
+            /* School address normally
+             */
+            if (strlen(trim($currentStudent->{'Email Address'}))) {
+                $emailAddress = $currentStudent->{'Email Address'};
+            }
+            /* Try emailing home lol
+             */
+            else if (strlen(trim($currentStudent->{'email Home'}))) {
+                $emailAddress = $currentStudent->{'email Home'};
+            }
+        }
 
-                    /* School address normally
-                     */
-                    if (strlen(trim($currentStudent->{'Email Address'}))) {
-                        $emailAddress = $currentStudent->{'Email Address'};
-                    }
-                    /* Try emailing home lol
-                     */
-                    else if (strlen(trim($currentStudent->{'email Home'}))) {
-                        $emailAddress = $currentStudent->{'email Home'};
-                    }
-                }
-
-                return $emailAddress;
-            },
-            $externalUserId,
-            $this->getCacheTime()
-        );
-
-        return $encoded;
+        return $emailAddress;
     }
 
     /**
@@ -1185,80 +1005,46 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getPortrait($externalUserId)
     {
-        $userMapper = new \Schoolbox\UserMapper();
-
-        try {
-            $user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
+        $photoPath = Config::get('portrait_dir') . '/' . $externalUserId . '.jpg';
+        if(is_readable($photoPath)) {
+            return $photoPath;
         }
-        catch (\Exception $e) {
-            return false;
-        }
+        else {
 
-        $isStudent = $this->getGroupHandler()->isStudent($user->getId());
-        $isStaff = $this->getGroupHandler()->isStaff($user->getId());
+            $userMapper = new \Schoolbox\UserMapper();
 
-        $encoded = Alaress\Redis::getInstance()->cacheFunctionCall(
-            "extdb:" . INSTANCE_ID . ":denbigh2.getPortrait",
-
-            function ($params) {
-                list($externalUserId, $isStudent, $isStaff) = $params;
-
-                /* Different columns for different types!
-                 */
-                if ($isStudent) {
-                    $api = new External_Denbigh2_Api('Photos', array(
-                        'Community ID' => $externalUserId
-                    ));
-                }
-                elseif ($isStaff) {
-                    $api = new External_Denbigh2_Api('Photos', array(
-                        'z_StaffCode' => $externalUserId
-                    ));
-                }
-
-
-                /* Deal with the pic
-                 */
-                if (!$api->hasErrors()) {
-                    if (count($api->getResult()->data) && strlen($api->getResult()->data[0]->{'PhotoBase64Encoded'})) {
-                        $photoPath = Config::get('portrait_dir') . '/' . $externalUserId . '.jpg';
-
-                        //TODO: delete photos on rollover
-
-                        /* If the cached file doesn't exist, or the synergetic image is more recent than our
-                         * last known cached version, regenerate cached version.
-                         *
-                         * Separate the queries out, fetching the photo data only if it's newer than the cached
-                         * version, or if the cache version doesn't already exist.
-                         */
-                        $cacheTime = @filemtime($photoPath);
-
-                        /* Denbigh only provided a modified date, without time
-                         */
-                        $modifiedTime = strtotime($api->getResult()->data[0]->{'z_ModificationDate'});
-
-                        if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
-                            $binary = base64_decode($api->getResult()->data[0]->{'PhotoBase64Encoded'});
-
-                            /* Save the image
-                             */
-                            $photoHandle = fopen($photoPath, "w");
-                            fwrite($photoHandle, $binary);
-                            fclose($photoHandle);
-                        }
-
-                        return $photoPath;
-                    }
-                }
-
+            try {
+                $user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
+            }
+            catch (\Exception $e) {
                 return false;
-            },
-            array($externalUserId, $isStudent, $isStaff),
-            $this->getCacheTime()
-        );
+            }
 
-        return $encoded;
+            if ($user->getRole()->isStudent()) {
+                $api = new External_Denbigh2_Api('Photos', array(
+                    'Community ID' => $externalUserId
+                ));
+            }
+            elseif ($user->getRole()->isStaff()) {
+                $api = new External_Denbigh2_Api('Photos', array(
+                    'z_StaffCode' => $externalUserId
+                ));
+            }
+            else {
+                return false;
+            }
+
+            if (!$api->hasErrors()) {
+                if (count($api->getResult()->data) && strlen($api->getResult()->data[0]->{'PhotoBase64Encoded'})) {
+                    file_put_contents($photoPath, base64_decode($api->getResult()->data[0]->{'PhotoBase64Encoded'}));
+                    return $photoPath;
+                }
+            }
+        }
+
+        return false;
     }
+
 
     /**
      * Determine whether someone is a day boarder or not
@@ -1314,23 +1100,4 @@ class External_Denbigh2_User implements External_UserInterface
         return $this->groupHandler;
     }
 
-    /**
-     * Set cache time
-     *
-     * @param int $cacheTime
-     */
-    private function setCacheTime($cacheTime)
-    {
-        $this->cacheTime = $cacheTime;
-    }
-
-    /**
-     * Get cache time
-     *
-     * @return int
-     */
-    private function getCacheTime()
-    {
-        return $this->cacheTime;
-    }
 }
