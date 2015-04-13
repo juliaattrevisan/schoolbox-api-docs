@@ -173,14 +173,16 @@ function Calendar(id, bubbleId, opts) {
                     // Booking butonyes (if available)
                     if (calEvent.data.booking.buttons) {
                         $.each(calEvent.data.booking.buttons, function() {
-                            data.bookingActions.push(
-                                $('<a class="btn float-right" />')
-                                    .data('seriesId', calEvent.data.meta.seriesId)
-                                    .addClass(this.class)
-                                    .attr('href', this.href)
-                                    .text(this.label)
-                                    .prepend('<span />')
-                            )
+                            if (this.href) {
+                                data.bookingActions.push(
+                                    $('<a class="btn float-right" />')
+                                        .data('seriesId', calEvent.data.meta.seriesId)
+                                        .addClass(this.class)
+                                        .attr('href', this.href)
+                                        .text(this.label)
+                                        .prepend('<span />')
+                                )
+                            }
                         })
                     }
 
