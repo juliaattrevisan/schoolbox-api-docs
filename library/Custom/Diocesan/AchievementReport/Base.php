@@ -72,10 +72,10 @@ abstract class Base {
     /**
      * Returns data for twig rendering
      *
-     * @param $externalStudentId
+     * @param $externalUserId
      * @return mixed
      */
-    abstract public function findData($externalStudentId);
+    abstract public function findData($externalUserId);
 
     /* Getters/Setters
      */

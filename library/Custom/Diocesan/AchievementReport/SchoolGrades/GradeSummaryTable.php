@@ -43,7 +43,7 @@ class GradeSummaryTable extends Base {
     /**
      * Obtain data
      */
-    public function findData($externalStudentId) {
+    public function findData($externalUserId) {
         $this->debug();
 
         $query = "
@@ -62,7 +62,7 @@ class GradeSummaryTable extends Base {
                 StrippedResult,
                 COUNT(*) AS num
             FROM SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
-            WHERE ID = '{$externalStudentId}'
+            WHERE ID = '{$externalUserId}'
             AND StrippedResult != ''
             GROUP BY StudentYearLevel, StrippedResult
             ORDER BY StudentYearLevel DESC, StrippedResult DESC
