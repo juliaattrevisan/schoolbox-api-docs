@@ -100,7 +100,7 @@ class Javascript extends Base
                 $reviewHref .= '?date='.urlencode($relatedBooking->getEvent()->getStartDateTime()->getURLDate());
             }
             $relatedBookings[] = [
-                'title' => $relatedBooking->getEvent()->getTitle(),
+                'title' => $relatedBooking->getResource()->getName(),
                 'item'    => array(
                     'id'   => $relatedBooking->getResource()->getId(),
                     'name' => $relatedBooking->getResource()->getName(),
