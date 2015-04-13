@@ -60,6 +60,7 @@ class Module extends BaseModule {
     {
         $loader = new Twig_Loader_Filesystem(array());
         $loader->addPath(__DIR__.'/Templates', 'achievementreport');
+        $loader->addPath(__DIR__.'/SchoolGrades', 'schoolgrades');
         $templateLoader->addLoader($loader);
     }
 
