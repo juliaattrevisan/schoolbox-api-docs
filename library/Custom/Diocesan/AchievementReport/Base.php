@@ -26,6 +26,13 @@ abstract class Base {
     protected $db = null;
 
     /**
+     * Table heading
+     *
+     * @var string
+     */
+    protected $heading = '';
+
+    /**
      * Constructor
      *
      * @param MSSQL $db
@@ -65,9 +72,10 @@ abstract class Base {
     /**
      * Returns data for twig rendering
      *
+     * @param $externalStudentId
      * @return mixed
      */
-    abstract public function findData();
+    abstract public function findData($externalStudentId);
 
     /* Getters/Setters
      */
@@ -91,4 +99,24 @@ abstract class Base {
     {
         return $this->db;
     }
-} 
+
+    /**
+     * Set heading
+     *
+     * @param string $heading
+     */
+    protected function setHeading($heading)
+    {
+        $this->heading = $heading;
+    }
+
+    /**
+     * Get heading
+     *
+     * @return string
+     */
+    public function getHeading()
+    {
+        return $this->heading;
+    }
+}
