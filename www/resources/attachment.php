@@ -36,6 +36,7 @@ $factory = new \Schoolbox\Resource\Attachment\Factory(array(
     'external' => array(
         'webdav' => "$base\\External\\WebdavController",
         'google' => "$base\\External\\GoogleController",
+        'office' => "$base\\External\\Office365Controller"
     )
 ));
 

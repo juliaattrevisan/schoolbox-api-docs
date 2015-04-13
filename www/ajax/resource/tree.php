@@ -1,4 +1,8 @@
 <?php
+use Alaress\Authorizer\Failure\Unauthorized;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader;
+use Schoolbox\Resource\Browser\Office365\Tenant;
 use Schoolbox\Resource\Browser\Resources\Node;
 
 /**
@@ -21,7 +25,7 @@ header('Content-Type: text/html');
 
 /* signature
 
-    /ajax/resource/tree/[cms|epf|dav]?[resourceID=:root][mimeFilter=:filter][nofiles=1]
+  /ajax/resource/tree/[cms|epf|dav|office365]?[relationID=:root][mimeFilter=:filter][nofiles=1]
 
 */
 
@@ -46,15 +50,29 @@ if (isset($_REQUEST['mimeFilter'])) {
 
 try {
     $factory  = new \Schoolbox\Resource\Browser\NodeFactory();
-    $browser  = $factory->build($source, $resourceId, $mimeFilter);
+
+    if ($oAuthToken = $_SESSION['azureAccessToken']) {
+        $conf       = new Loader();
+        $tenant     = new Tenant($conf->get('office365_tenant'), $conf->get('sharepoint_sitepath') ?: null);
+        $browser    = $factory->buildOAuth($source, $resourceId, $tenant, $oAuthToken, $mimeFilter);
+
+    } else {
+        $browser = $factory->build($source, $resourceId, $mimeFilter);
+
+    }
+
     $nodeData = $browser->render();
 
     // Render the stuff in this node
     $renderer = new \Schoolbox\Resource\Browser\NodeRenderer($this, $nodeData);
     $renderer->render($useFolders);
 
+} catch (Unauthorized $e) {
+    $this->error(2);
 } catch (\Schoolbox\Resource\Exception $e) {
     $this->error(6);
 } catch (OutOfBoundsException $e) {
     $this->error(2);
+} catch (RuntimeException $e) {
+    die('Click <a data-gettoken href="/ajax/oauth/microsoft">here</a> to connect your Office 365 account.');
 }
