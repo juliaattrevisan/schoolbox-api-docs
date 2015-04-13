@@ -10,10 +10,27 @@
 
 namespace Custom\Diocesan\AchievementReport\SchoolGrades;
 
+use Custom\Diocesan\AchievementReport\Base;
 
-class GradeSummaryTable {
+class GradeSummaryTable extends Base {
 
-    public function __construct() {
-        echo 'mort';
+    /**
+     * Hook method
+     *
+     * @return mixed
+     */
+    protected function setup()
+    {
+        // TODO: Implement setup() method.
     }
-} 
+
+    /**
+     * Returns data for twig rendering
+     *
+     * @return mixed
+     */
+    public function getData()
+    {
+        // TODO: Implement getData() method.
+    }
+}

@@ -11,6 +11,7 @@
 namespace Custom\Diocesan\AchievementReport;
 
 use Alaress\Web\Controller\Base;
+use MSSQL;
 
 class Controller extends Base {
 
@@ -18,9 +19,15 @@ class Controller extends Base {
      * Index
      */
     public function index() {
+        $db = new MSSQL();
+
+        $gradeSummaryTable = new SchoolGrades\GradeSummaryTable($db);
+
         $this->getResponse()->content->set([
             'template' => '@achievementreport/index.twig',
-            'data' => []
+            'data' => [
+                'gradeSummaryTable' => $gradeSummaryTable->getData()
+            ]
         ]);
     }
 } 
