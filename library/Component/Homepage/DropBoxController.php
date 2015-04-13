@@ -11,10 +11,7 @@ use Schoolbox\Collection;
 class Component_Homepage_DropBoxController extends Component_Homepage_ControllerAbstract
 {
 
-    /**
-     * @var AllowedFile
-     */
-    private $allowedFileHandler;
+
 
     /**
      * Prepares data for the render function. Business logic.
@@ -23,7 +20,7 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
      */
     public function execute()
     {
-        $this->allowedFileHandler = new AllowedFile();
+
     }
 
     /**
@@ -72,7 +69,7 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
                 $j = 0;
                 foreach ($fileList as $file) {
                     $output = array(
-                        'DROPBOX_MIME_IMAGE'  => $this->allowedFileHandler->getClass($file->getStorage()->getMimetype()->getIconFile()),
+                        'DROPBOX_MIME_IMAGE'  => $file->getStorage()->getMimetype()->getClass(),
                         'DROPBOX_DESCRIPTION' => Scrub::text($file->getTitle()),
                         'DROPBOX_ID'          => $file->getId(),
                         'DROP_SUBMITTED_BY'   => sprintf('<a href="/search/user/%s">%s</a>', $file->getOwner()->getId(), $file->getOwner()->formatName()),
