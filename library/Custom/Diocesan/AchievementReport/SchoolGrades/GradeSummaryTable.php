@@ -17,6 +17,13 @@ use Schoolbox\Collection;
 class GradeSummaryTable extends Base {
 
     /**
+     * Heading for this table
+     *
+     * @var string
+     */
+    protected $heading = 'Grade Summary';
+
+    /**
      * The year for which to obtain data
      *
      * @var string
@@ -36,7 +43,7 @@ class GradeSummaryTable extends Base {
     /**
      * Obtain data
      */
-    public function findData() {
+    public function findData($externalStudentId) {
         $this->debug();
 
         $query = "
@@ -55,7 +62,7 @@ class GradeSummaryTable extends Base {
                 StrippedResult,
                 COUNT(*) AS num
             FROM SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
-            WHERE ID = 12174
+            WHERE ID = '{$externalStudentId}'
             AND StrippedResult != ''
             GROUP BY StudentYearLevel, StrippedResult
             ORDER BY StudentYearLevel DESC, StrippedResult DESC
