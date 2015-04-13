@@ -32,5 +32,6 @@ class GradeSummaryTable extends Base {
     public function getData()
     {
         // TODO: Implement getData() method.
+        return 'output of getData()';
     }
 }
