@@ -85,6 +85,7 @@ class Document
                 CURLOPT_POST => 1,
                 CURLOPT_POSTFIELDS => $postfields,
                 CURLOPT_FOLLOWLOCATION => 1,
+                CURLOPT_TIMEOUT_MS => 60000,
             )
         );
 
