@@ -50,37 +50,79 @@ class GradeSummaryTable extends Base {
      * Obtain data
      */
     public function findData($externalUserId) {
-        $allEnteredGrades = $this->findEnteredGrades($externalUserId);
+        new Probe($this->getDb()->getAll("SELECT TOP 2 * FROM  SynergyOne.dbo.uvSchoolBoxSchoolGradeResults"));
+
+        $allEnteredGradesCurrentYear = $this->findEnteredGradesCurrentYear($externalUserId);
+        $allEnteredGradesPreviousYear = $this->findEnteredGradesPreviousYear($externalUserId);
 
         /* Rearrange everything into a nice order
          */
         $finalStack = array();
 
-        foreach ($allEnteredGrades as $currentEnteredGrade) {
-            $finalStack[$currentEnteredGrade['StudentYearLevel']][$currentEnteredGrade['StrippedResult']] = $currentEnteredGrade['num'];
+        /* Do it for the current year
+         */
+        foreach ($allEnteredGradesCurrentYear as $current) {
+            $finalStack[$current['StudentYearLevel']]['enteredGrades'] += $current['num'];
         }
+
+        /* And I suppose do it for all the previous years too
+         */
+        foreach ($allEnteredGradesPreviousYear as $current) {
+            $finalStack[$current['StudentYearLevel']]['enteredGrades'] += $current['num'];
+        }
+
+        new Probe($allEnteredGradesCurrentYear, $allEnteredGradesPreviousYear, $finalStack);
 
         return $finalStack;
     }
 
     /**
-     * Get counts for Entered Grades across all the years
+     * Get counts for Entered Grades for the current year
      * for a particular student
      *
      * @param $externalUserId
      * @return array|bool
      */
-    private function findEnteredGrades($externalUserId) {
+    private function findEnteredGradesCurrentYear($externalUserId) {
         $query = "
-            SELECT DISTINCT
+            SELECT DISTINCT (classcode + AssessAreaHeading),
                 StudentYearLevel,
                 StrippedResult,
                 COUNT(StrippedResult) AS num
             FROM
                 SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
             WHERE ID = '{$externalUserId}'
-            AND StrippedResult != ''
-            GROUP BY StudentYearLevel, StrippedResult
+            AND classyear = '{$this->getYear()}'
+            GROUP BY (classcode + AssessAreaHeading), StudentYearLevel, StrippedResult
+            ORDER BY StudentYearLevel DESC, StrippedResult DESC
+        ";
+
+        return $this->getDb()->getAll($query);
+    }
+
+    /**
+     * Get counts for Entered Grades for all previous years
+     * for a particular student
+     *
+     * I'm not entirely sure why this needs to be separated but
+     * whatever, I'm just going to follow the spreadsheet word for
+     * word because who knows
+     *
+     * @param $externalUserId
+     * @return array|bool
+     */
+    private function findEnteredGradesPreviousYear($externalUserId) {
+        $query = "
+            SELECT DISTINCT (classcode + AssessAreaHeading),
+                StudentYearLevel,
+                StrippedResult,
+                COUNT(StrippedResult) AS num
+            FROM
+                SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
+            WHERE ID = '{$externalUserId}'
+            AND classyear < '{$this->getYear()}'
+            AND Result != ''
+            GROUP BY (classcode + AssessAreaHeading), StudentYearLevel, StrippedResult
             ORDER BY StudentYearLevel DESC, StrippedResult DESC
         ";
 
