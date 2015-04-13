@@ -7,7 +7,30 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Calendar_Event_Type_EOTC_Renderer_Default extends Calendar_Event_Type_Renderer_Abstract {
+namespace Calendar\Event\Type\EOTC\Renderer;
+
+use Calendar\Event\Type\RendererBase;
+
+class Html extends RendererBase {
+
+
+
+    /**
+     * Render this event
+     *
+     */
+    public function render()
+    {
+
+        if ($this->isVisible()) {
+            return $this->getTemplate()->render('calendar/type/EOTC.twig',
+                array('event' => $this->getEvent())
+            );
+        } else {
+            return '';
+        }
+
+    }
 
     /**
      * Render this event

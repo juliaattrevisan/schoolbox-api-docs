@@ -7,21 +7,24 @@
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
  */
-class Calendar_Event_Type_EOTC_Renderer_Javascript extends Calendar_Event_Type_Renderer_Abstract {
+namespace Calendar\Event\Type\EOTC\Renderer;
+
+use Calendar\Event\Type\RendererBase;
+
+class Javascript extends RendererBase {
 
 	/**
 	 * Visitor
 	 *
-	 * @param $currentEvent
+	 * @param $this->getEvent()
 	 */
-	public function visit($currentEvent) {
-		if ($this->isVisible($currentEvent)) {
+	public function render() {
+		if ($this->isVisible($this->getEvent())) {
 
 			/* Events not in Approved state appear translucent
 			 */
-			$customSettings = $currentEvent->getCustom();
+			$customSettings = $this->getEvent()->getCustom();
 
 			if ($customSettings['approved'])  {
 				$cssClass = '';
@@ -32,7 +35,7 @@ class Calendar_Event_Type_EOTC_Renderer_Javascript extends Calendar_Event_Type_R
 
 			/* Modify link. Should be templated...
 			 */
-			if ($currentEvent->getIsEditable() && ($currentEvent->getEventId() > -1)) {
+			if ($this->getEvent()->isEditable() && ($this->getEvent()->getEventId() > -1)) {
 				$editable = true;
 			}
 			else {
@@ -44,29 +47,29 @@ class Calendar_Event_Type_EOTC_Renderer_Javascript extends Calendar_Event_Type_R
 
 			/* All-day settings
 			 */
-			if ($currentEvent->getAllDay()) {
+			if ($this->getEvent()->getAllDay()) {
  				// Compensate for FullCalendar/vCal having exclusive end times
 				$allDay = true;
-				$start  = $currentEvent->getStartTime()->getDatabaseDate();
-				$end    = $currentEvent->getEndTime()->addDays(1)->getDatabaseDate();
+				$start  = $this->getEvent()->getStartTime()->getDatabaseDate();
+				$end    = $this->getEvent()->getEndTime()->addDays(1)->getDatabaseDate();
 			}
 			else {
 				$allDay = false;
-				$start  = $currentEvent->getStartTime()->getDatabase();
-				$end    = $currentEvent->getEndTime()->getDatabase();
+				$start  = $this->getEvent()->getStartTime()->getDatabase();
+				$end    = $this->getEvent()->getEndTime()->getDatabase();
 			}
 
 			//
 			// Add campus list to list of classes
 			$classes = array(
-				$currentEvent->getDerivedEventLevel(),
-				'type' . $currentEvent->getType(),
+				$this->getEvent()->getDerivedEventLevel(),
+				'type' . $this->getEvent()->getType(),
 			);
-			if (($connectorId = $currentEvent->getConnectorId()) > 0) {
+			if (($connectorId = $this->getEvent()->getConnectorId()) > 0) {
 				$classes[] = 'source' . $connectorId;
 			}
 
-			$campus_list = array_filter(array_map('trim', explode(',', $currentEvent->getCampusList())));
+			$campus_list = array_filter(array_map('trim', explode(',', $this->getEvent()->getCampusList())));
 
 			foreach ($campus_list as &$campus) {
 				$campus = 'campus'.trim($campus);
@@ -79,7 +82,7 @@ class Calendar_Event_Type_EOTC_Renderer_Javascript extends Calendar_Event_Type_R
 			}
 
 			$event = array(
-				'title' => $currentEvent->getTitle(),
+				'title' => $this->getEvent()->getTitle(),
 				'start' => "$start",
 				'end' => "$end",
 
@@ -94,7 +97,7 @@ class Calendar_Event_Type_EOTC_Renderer_Javascript extends Calendar_Event_Type_R
 
 				/* Colour of the event
 				 */
-				'color' => $currentEvent->getColour(),
+				'color' => $this->getEvent()->getColour(),
 
 				/* Campus slug so you can filter events
 				 */
@@ -104,17 +107,17 @@ class Calendar_Event_Type_EOTC_Renderer_Javascript extends Calendar_Event_Type_R
 				 */
 				'data' => array(
 					'meta' => array(
-						'eventId' => $currentEvent->getEventId(),
-						'time' => $currentEvent->getTime(),
-						'detail' => Scrub::html($currentEvent->getDetail()),
-						'location' => $currentEvent->getLocation(),
-						'eventTypeId' => $currentEvent->getType(),
-						'eventType' => 'type' . $currentEvent->getType(),
-						'type' => $currentEvent->getEventType(),
-						'author' => $currentEvent->getAuthorName(),
-						'authorId' => $currentEvent->getAuthorId(),
-						'level' => $currentEvent->getDerivedEventLevel(),
-						'completed' => $currentEvent->getCompleted(),
+						'eventId' => $this->getEvent()->getEventId(),
+						'time' => $this->getEvent()->getTime(),
+						'detail' => \Scrub::html($this->getEvent()->getDetail()),
+						'location' => $this->getEvent()->getLocation(),
+						'eventTypeId' => $this->getEvent()->getType(),
+						'eventType' => 'type' . $this->getEvent()->getType(),
+						'type' => $this->getEvent()->getEventType(),
+						'author' => $this->getEvent()->getAuthorName(),
+						'authorId' => $this->getEvent()->getAuthorId(),
+						'level' => $this->getEvent()->getDerivedEventLevel(),
+						'completed' => $this->getEvent()->getCompleted(),
 					),
 					'links' => array(
 						'category' => array(
@@ -132,37 +135,23 @@ class Calendar_Event_Type_EOTC_Renderer_Javascript extends Calendar_Event_Type_R
 						'listButton' => false,
 					),
 					'custom' => array(
-						'modifyLink' => '/modules/eotc/manage/modify.php?eventID=' . $currentEvent->getEventId(),
+						'modifyLink' => '/modules/eotc/manage/modify.php?eventID=' . $this->getEvent()->getEventId(),
 					)
 				)
 			);
 
-			echo json_encode($event);
-			echo ",";
+			return json_encode($event).',';
 		}
-	}
-
-	/**
-	 * If the Publish Date hasn't been reached yet, only show the events to Superusers
-	 * in a different way so they can still edit/click them. Otherwise, they don't appear
-	 * at all for everyone else
-	 *
-	 * @param $currentEvent
-	 *
-	 * @return bool
-	 */
-	protected function isVisible($currentEvent) {
-		return true;
 	}
 
     /**
      * Determine whether an event is a task or not
      *
-     * @param $currentEvent
+     * @param $this->getEvent()
      * @return bool
      */
-    private function isTask($currentEvent) {
-        if ($currentEvent->getType() == $this->getTaskTypeId()) {
+    private function isTask() {
+        if ($this->getEvent()->getType() == $this->getTaskTypeId()) {
             return true;
         }
 

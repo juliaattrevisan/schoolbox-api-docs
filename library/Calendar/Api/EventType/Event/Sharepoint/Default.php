@@ -5,8 +5,10 @@
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
  */
+
+use \Calendar\Event\Collection;
+
 class Calendar_Api_EventType_Event_Sharepoint_Default extends Calendar_Api_EventType_Abstract {
 
 	/**
@@ -25,10 +27,10 @@ class Calendar_Api_EventType_Event_Sharepoint_Default extends Calendar_Api_Event
 	 * @param $endTimestamp
 	 * @internal param $currentDay
 	 *
-	 * @return Calendar_Event_Collection
+	 * @return Collection
 	 */
 	public function getEvents($startTimestamp, $endTimestamp) {
-		$collection = new Calendar_Event_Collection();
+		$collection = new Collection();
 
 		/* Fill in your query result set here and populate $collection
 		 */
@@ -43,10 +45,10 @@ class Calendar_Api_EventType_Event_Sharepoint_Default extends Calendar_Api_Event
 	 * Find a particular event from this source
 	 *
 	 * @param $eventId
-	 * @return Calendar_Event_Collection
+	 * @return Collection
 	 */
 	public function getEvent($eventId) {
-		$collection = new Calendar_Event_Collection();
+		$collection = new Collection();
 
 		/* Fill in your query result set here and populate $collection
 		 */

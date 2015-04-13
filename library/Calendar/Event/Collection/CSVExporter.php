@@ -1,0 +1,77 @@
+<?php
+/**
+ * Collection_Exporter
+ *
+ * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @link		http://www.alaress.com.au/
+ */
+
+namespace Calendar\Event\Collection;
+
+use Schoolbox\User;
+use SitePage;
+use Config;
+
+class CSVExporter extends Renderer {
+
+    var $csvFormat = array( 'start_date',
+                            'start_time',
+                            'finish_date',
+                            'finish_time',
+                            'all_day',
+                            'name',
+                            'detail',
+                            'location',
+                            'event_type',
+                            'publish_date',
+                            'attendance',
+                           );
+
+    /**
+     * This will stream the vcal output as it parses over the event collection
+     */
+    public function renderAll() {
+		// Output base calendar, and output its start and end separately
+		echo implode(',',$this->csvFormat)."\n";
+
+		foreach ($this->getAllEvents() as $currentEvent) {
+            echo $this->renderEvent($currentEvent, 'csv');
+		}
+	}
+
+    /**
+     * @param \Sabre\VObject\Component\VCalendar $vCalendar
+     */
+    public function setVCalendar($vCalendar)
+    {
+        $this->vCalendar = $vCalendar;
+    }
+
+    /**
+     * @return \Sabre\VObject\Component\VCalendar
+     */
+    public function getVCalendar()
+    {
+        return $this->vCalendar;
+    }
+
+    /**
+     * @param \Html2Text\Html2Text $textConverter
+     */
+    public function setTextConverter($textConverter)
+    {
+        $this->textConverter = $textConverter;
+    }
+
+    /**
+     * @return \Html2Text\Html2Text
+     */
+    public function getTextConverter()
+    {
+        return $this->textConverter;
+    }
+
+
+
+}

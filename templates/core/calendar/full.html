@@ -151,19 +151,6 @@
 
                     $(jsEvent).addClass(calEvent.data.styles.visible);
 
-                    // Add booking styles
-                    if (calEvent.data.booking) {
-                        jsEvent.addClass('booking');
-                        if (calEvent.data.booking.status.isRejected) {
-                            jsEvent.addClass('rejected');
-                        }
-                        if (calEvent.data.booking.status.isApproved) {
-                            jsEvent.addClass('approved');
-                        }
-                        if (calEvent.data.booking.status.isPending) {
-                            jsEvent.addClass('pending');
-                        }
-                    }
                 },
 
                 /**
@@ -348,10 +335,10 @@
                 var btn = c.getForm('editEvent').find('.attendanceRequestButton a')
                 if (data.error == undefined) {
                     if (btn.text() == 'Attend') {
-                        btn.html('Unattend')
+                        btn.html('<span></span>Unattend')
                     }
                     else {
-                        btn.html('Attend')
+                        btn.html('<span></span>Attend')
                     }
                 }
             })
@@ -403,11 +390,22 @@
             }
         })
 
+
+        $('#download-calendar-export').click(function(event) {
+            event.preventDefault();
+            var form = $(event.target).closest('form');
+            window.location = $.getExportCalendarLink('{USER_TOKEN}', form.serializeArray())+'&format=csv';
+        });
+
         //
         // Form listener for exporter - brings up a dialog box that offers a URL
         // to click.
         $('#calendar-export form').submit(function(event) {
             event.preventDefault();
+
+            //Copy and paste button
+            var client = new ZeroClipboard($('#copy-button'));
+
             var form = $(this);
             $('#calendar-export-dialog').dialog({
                 open: function(event, ui) {
@@ -419,8 +417,7 @@
             });
         });
 
-        //Copy and paste button
-        var client = new ZeroClipboard($('#copy-button'));
+
 
         // Copypasted code for updating booking in series
         $('#calendar-bubble').find('#editEvent').on(
@@ -565,6 +562,7 @@
                         <dd>
                             <span class="homepageLink" data-is-html="1"></span>
                             <span class="modifyLink" data-is-html="1"></span>
+                            <span class="deleteLink" data-is-html="1"></span>
                             <span class="attendanceListButton" data-is-html="1"></span>
                             <span class="attendanceRequestButton" data-is-html="1"></span>
                         </dd>
@@ -692,7 +690,26 @@
 							</select>
 						</label>
 					</div>
-					<input type="submit" value="Generate URL" class="btn submit-btn-plain" />
+                    <div class="export-cat timetable-events">
+                        <label title="Timetable Classes" for="export-timetable">
+                            <input type="radio" name="export" value="timetable" id="export-timetable" />
+                            Timetable Classes
+                        </label>
+                    </div>
+                    <div class="export-cat timetableday-events">
+                        <label title="Timetable days" for="export-timetableday">
+                            <input type="radio" name="export" value="timetabledays" id="export-timetableday" />
+                            Timetable Days
+                        </label>
+                    </div>
+                    <div class="export-cat duework-events">
+                        <label title="Due Work" for="export-duework">
+                            <input type="radio" name="export" value="duework" id="export-duework" />
+                            Due Work
+                        </label>
+                    </div>
+                    <input type="submit" id="open-calendar-export-dialog" value="Generate URL" class="btn submit-btn-plain" />
+                    <input type="submit" id="download-calendar-export" value="Download CSV" class="btn submit-btn-plain" />
 				</form>
 			</div>
 		</div>

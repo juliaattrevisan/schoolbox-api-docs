@@ -217,8 +217,9 @@ class Event_Attendance_Controller extends Controller
 
             $this->getPage()->setVar( array(
                 'EVENT_ID' => $event['id'],
-                'EVENT_NAME' => $event['note'],
-                'EVENT_DATE' => $event['date']
+                'EVENT_NAME' => $event['title'],
+                'EVENT_DATE' => $event['date'],
+                'EVENT_DETAIL' => $event['detail'],
             ) );
 
             if ( is_array($attendeeList) ) {
@@ -231,35 +232,23 @@ class Event_Attendance_Controller extends Controller
                 foreach ( $attendeeList as $attendee ) {
                     $this->getPage()->setVar( array(
                         'USER_NAME' => $this->getUserHandler()->formatName($attendee),
-                        'USER_YEAR' => $attendee['year'],
+                        'USER_ROLE' => $attendee['groupName'],
                         'ATTENDANCE_ID' => $attendee['id']
                     ) );
 
                     if ( $attendee['status'] == Calendar::ATTENDANCE_STATUS_PENDING ) {
-                        $this->getPage()->setVar( array(
-                            'CLASS' => $pendingAttendeeCount % 2 ? '' : 'dark',
-                        ) );
-
                         $this->getPage()->parse('pending_attendee_block', 'pending_attendee', true);
 
                         $pendingAttendeeCount++;
                     }
 
                     elseif ( $attendee['status'] == Calendar::ATTENDANCE_STATUS_APPROVED ) {
-                        $this->getPage()->setVar( array(
-                            'CLASS' => $approvedAttendeeCount % 2 ? '' : 'dark',
-                        ) );
-
-                        $this->getPage()->parse('approved_attendee_block', 'approved_attendee', true);
+                          $this->getPage()->parse('approved_attendee_block', 'approved_attendee', true);
 
                         $approvedAttendeeCount++;
                     }
 
                     elseif ( $attendee['status'] == Calendar::ATTENDANCE_STATUS_REJECTED ) {
-                        $this->getPage()->setVar( array(
-                            'CLASS' => $rejectedAttendeeCount % 2 ? '' : 'dark',
-                        ) );
-
                         $this->getPage()->parse('rejected_attendee_block', 'rejected_attendee', true);
 
                         $rejectedAttendeeCount++;
@@ -351,7 +340,7 @@ class Event_Attendance_Controller extends Controller
         $request->setHostName( $this->getUserHandler()->formatName($event) );
         $request->setHostPhone('');
         $request->setUserPhone('');
-        $request->setDescription($event['note']);
+        $request->setDescription($event['title']);
         $request->setStatus(Leave_Request::STATUS_PENDING);
         $request->setCreated( $created->getDatabase() );
 

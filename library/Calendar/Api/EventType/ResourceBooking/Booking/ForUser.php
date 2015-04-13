@@ -8,6 +8,7 @@
  */
 
 use Schoolbox\ResourceBooking\Booking;
+use Calendar\Event\Collection;
 
 class Calendar_Api_EventType_ResourceBooking_Booking_ForUser extends Calendar_Api_EventType_ResourceBooking_Base {
 
@@ -17,7 +18,7 @@ class Calendar_Api_EventType_ResourceBooking_Booking_ForUser extends Calendar_Ap
      * @param int $startTimestamp
      * @param int $endTimestamp
      *
-     * @return Calendar_Event_Collection
+     * @return Collection
      */
     public function getEvents($startTimestamp, $endTimestamp) {
         // Get all items out of booking mapper that I am the owner of.
@@ -27,7 +28,7 @@ class Calendar_Api_EventType_ResourceBooking_Booking_ForUser extends Calendar_Ap
             $endTimestamp,
             $this->getStatus()
         );
-        $collection = new Calendar_Event_Collection();
+        $collection = new Collection();
         foreach ($bookings as $booking) {
             $calendarEvent = $this->getEventConverter()->convertEventToCalendarEvent(
                 $booking->getEvent(), $booking

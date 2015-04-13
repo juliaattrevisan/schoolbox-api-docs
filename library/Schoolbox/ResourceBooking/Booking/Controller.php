@@ -18,6 +18,8 @@ use Schoolbox\Calendar;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Item;
+use Calendar\Event\Type\ResourceBooking\Renderer\Javascript;
+use Calendar\Event\Collection\Renderer;
 
 class Controller extends Base
 {
@@ -919,20 +921,16 @@ class Controller extends Base
         $source
             ->setResourceId($item->getId())
             ->setStatus($this->getRequest()->query['status']);
-        $events = $source->getEvents(
-            $this->getRequest()->query['start'],
-            $this->getRequest()->query['end']
-        );
 
-        // Pass event to the resource outputter, and deal with its peculiarities
-        // TODO make Calendar_Event_Collection and Calendar_Event_Type_Abstract implement JsonSerializable
-        $renderer = new \Calendar_Event_Type_ResourceBooking_Renderer_Javascript(
+        $calendar = new Renderer(
+            $source,
+            $this->getRequest()->query['start'],
+            $this->getRequest()->query['end'],
+            $this->getUser(),
             $this->getDi()->get('sitePage')
         );
-        ob_start();
-        foreach ($events as $event) {
-            $renderer->visit($event);
-        }
+
+        $output = $calendar->renderAll('javascript');
 
         // Get timetabled classes for this room, if there are any.
         $roomCode = $item->getRoomCode();
@@ -946,15 +944,13 @@ class Controller extends Base
                 $this->getRequest()->query['start'],
                 $this->getRequest()->query['end']
             );
-            $roomRenderer = new \Calendar_Event_Type_Day_Renderer_Javascript(
-                $this->getDi()->get('sitePage')
-            );
+
             foreach ($roomEvents as $event) {
-                $roomRenderer->visit($event);
+                $renderer = new Javascript( $this->getDi()->get('sitePage'),$event);
+                $output = $renderer->render();
             }
         }
 
-        $output = ob_get_clean();
         $output = json_decode('[' . $output . '{}]');
 
         $this->getResponse()->content->set(

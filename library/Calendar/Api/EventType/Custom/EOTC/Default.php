@@ -38,7 +38,7 @@ class Calendar_Api_EventType_Custom_EOTC_Default extends Calendar_Api_EventType_
      * @param int $startTimestamp
      * @param int $endTimestamp
      *
-     * @return Calendar_Event_Collection
+     * @return \Calendar\Event\Collection
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
@@ -59,7 +59,7 @@ class Calendar_Api_EventType_Custom_EOTC_Default extends Calendar_Api_EventType_
      *
      * @param $eventId
      *
-     * @return Calendar_Event_Collection
+     * @return \Calendar\Event\Collection
      */
     public function getEvent($eventId)
     {

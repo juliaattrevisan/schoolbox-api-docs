@@ -1,5 +1,8 @@
 <?php
 use Schoolbox\Resource\Folder\Model as CategoryModel;
+use Calendar\Event\Collection;
+use Calendar\Event\Type\Timetable\Event;
+
 
 /**
  * Event type that represents events from the external timetable handler.
@@ -34,7 +37,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
      * @param $startTimestamp
      * @param $endTimestamp
      *
-     * @return Calendar_Event_Collection
+     * @return Collection
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
@@ -89,7 +92,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                                 );
                                 continue;
                             }
-                            $event = new Calendar_Event_Type_Day();
+                            $event = new Event();
                             $event->setAllday(false);
                             $event->setLocation($period['room']);
                             $event->setStartTime(new Alaress_Date_Format($startTime, 'U'));
@@ -112,10 +115,10 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                                 $event->setCategoryCollection(
                                     new Schoolbox\Collection(array($eventCategory))
                                 );
-                                $event->setAccess(Calendar_Event_Type_Day::GROUP_ACCESS);
+                                $event->setAccess(Event::GROUP_ACCESS);
                             } else {
                                 // Make this up as a campus event if it has no category
-                                $event->setAccess(Calendar_Event_Type_Day::CAMPUS_ACCESS);
+                                $event->setAccess(Event::CAMPUS_ACCESS);
                             }
                             $event->setType($eventType);
 
@@ -138,7 +141,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
             }
             $currentTimestamp = strtotime('+1 day', $currentTimestamp);
         }
-        $stack = new Calendar_Event_Collection();
+        $stack = new Collection();
         $stack->setStack(array_values($addedEvents));
         return $stack;
     }
@@ -238,12 +241,12 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
      *
      * @param $eventId
      *
-     * @return Calendar_Event_Collection
+     * @return Collection
      */
     public function getEvent($eventId)
     {
         // Blah
-        $stack = new Calendar_Event_Collection();
+        $stack = new Collection();
         return $stack;
     }
 

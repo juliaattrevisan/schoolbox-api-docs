@@ -2,6 +2,7 @@
 <script type="text/javascript" src="/calendar/js/jquery.filterSelector.js"></script>
 <script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectAll.js"></script>
+<script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
 <script type="text/javascript">
 	$(function() {
 
@@ -73,9 +74,20 @@
 		//
 		// Form listener for exporter - brings up a dialog box that offers a URL
 		// to click.
+        $('#download-calendar-export').click(function(event) {
+            event.preventDefault();
+            var form = $(event.target).closest('form');
+            window.location = $.getExportCalendarLink('{USER_TOKEN}', form.serializeArray())+'&format=csv';
+        });
+
+
 		$('#calendar-export form').submit(function(event) {
 			event.preventDefault();
-			var form = $(this);
+
+            //Copy and paste button
+            var client = new ZeroClipboard($('#copy-button'));
+
+            var form = $(this);
 			$('#calendar-export-dialog').dialog({
 				open: function(event, ui) {
 					$(event.target).find('#calendar-export-dialog-url')
@@ -85,6 +97,7 @@
 				modal: true
 			});
 		});
+
 
 		$('.filter-cat.sources').selectAll({
 			key: 'selectallsources',
@@ -117,6 +130,26 @@
 				$('input[name=events]').change();
 			}
 		});
+
+        $(document).on('click', 'a.attendance-request', function (event) {
+            event.preventDefault();
+
+            var button = $(this);
+
+            var data = button.parent('form').serialize();
+
+            $.post('/service/attendance/processToggleAttendance', data, function (data) {
+                if (data.error == undefined) {
+                    if (button.text() == 'RSVP') {
+                        button.html('<span></span>Unattend');
+                    }
+                    else {
+                        button.html('<span></span>RSVP');
+                    }
+                }
+            });
+        });
+
 	});
 </script>
 
@@ -126,59 +159,77 @@
 
 <div id="calendar-export" class="calendar-controls no-height clearfix">
 	<div class="link-case">
-		<div class="filter-drop clearfix">
-			<div class="filter-list">
-				<form class="clearfix">
-					<div class="export-cat all-events">
-						<label title="All events" for="export-all">
-							<input type="radio" name="export" value="all" id="export-all" checked />
-							All events
-						</label>
-					</div>
-					<div class="export-cat personal-events">
-						<label title="Personal events only" for="export-personal">
-							<input type="radio" name="export" value="personal" id="export-personal" />
-							Personal events only
-						</label>
-					</div>
-					<div class="export-cat group-events">
-						<label title="Events for group" for="export-group">
-							<input type="radio" name="export" value="group" id="export-group" />
-							Events for group:
-							<select name="group">
-								<option value="">-- select --</option>
-								<!-- BEGIN export_group -->
-								<option label="{EXPORT_GROUP_NAME}" value="{EXPORT_GROUP_ID}">{EXPORT_GROUP_NAME}</option>
-								<!-- END export_group -->
-							</select>
-						</label>
-					</div>
-					<div class="export-cat campus-events">
-						<label title="Events for campus" for="export-campus">
-							<input type="radio" name="export" value="campus" id="export-campus" />
-							Events for campus:
-							<select name="campus">
-								<option value="">-- select --</option>
-								<!-- BEGIN export_campus -->
-								<option label="{EXPORT_CAMPUS_NAME}" value="{EXPORT_CAMPUS_ID}" >{EXPORT_CAMPUS_NAME}</option>
-								<!-- END export_campus -->
-							</select>
-						</label>
-					</div>
-					<input type="submit" value="Generate URL" class="btn submit-btn-plain" />
-				</form>
-			</div>
-		</div>
+        <div class="filter-drop clearfix">
+            <div class="filter-list">
+                <form class="clearfix">
+                    <div class="export-cat all-events">
+                        <label title="All events" for="export-all">
+                            <input type="radio" name="export" value="all" id="export-all" checked />
+                            All events
+                        </label>
+                    </div>
+                    <div class="export-cat personal-events">
+                        <label title="Personal events only" for="export-personal">
+                            <input type="radio" name="export" value="personal" id="export-personal" />
+                            Personal events only
+                        </label>
+                    </div>
+                    <div class="export-cat group-events">
+                        <label title="Events for group" for="export-group">
+                            <input type="radio" name="export" value="group" id="export-group" />
+                            Events for group:
+                            <select name="group">
+                                <option value="">-- select --</option>
+                                <!-- BEGIN export_group -->
+                                <option label="{EXPORT_GROUP_NAME}" value="{EXPORT_GROUP_ID}">{EXPORT_GROUP_NAME}</option>
+                                <!-- END export_group -->
+                            </select>
+                        </label>
+                    </div>
+                    <div class="export-cat campus-events">
+                        <label title="Events for campus" for="export-campus">
+                            <input type="radio" name="export" value="campus" id="export-campus" />
+                            Events for campus:
+                            <select name="campus">
+                                <option value="">-- select --</option>
+                                <!-- BEGIN export_campus -->
+                                <option label="{EXPORT_CAMPUS_NAME}" value="{EXPORT_CAMPUS_ID}">{EXPORT_CAMPUS_NAME}</option>
+                                <!-- END export_campus -->
+                            </select>
+                        </label>
+                    </div>
+                    <div class="export-cat timetable-events">
+                        <label title="Timetable Classes" for="export-timetable">
+                            <input type="radio" name="export" value="timetable" id="export-timetable" />
+                            Timetable Classes
+                        </label>
+                    </div>
+                    <div class="export-cat timetableday-events">
+                        <label title="Timetable days" for="export-timetableday">
+                            <input type="radio" name="export" value="timetabledays" id="export-timetableday" />
+                            Timetable Days
+                        </label>
+                    </div>
+                    <div class="export-cat duework-events">
+                        <label title="Due Work" for="export-duework">
+                            <input type="radio" name="export" value="duework" id="export-duework" />
+                            Due Work
+                        </label>
+                    </div>
+                    <input type="submit" id="open-calendar-export-dialog" value="Generate URL" class="btn submit-btn-plain" />
+                    <input type="submit" id="download-calendar-export" value="Download CSV" class="btn submit-btn-plain" />
+                </form>
+            </div>
+        </div>
 	</div>
 </div>
 <div id="calendar-export-dialog">
-	<div id="calendar-export-dialog-text">
-		Use the following URL as the source for your feed.
-	</div>
-	<textarea readonly id="calendar-export-dialog-url"></textarea>
+    <div id="calendar-export-dialog-text">
+        Use the following address to subscribe your favourite calendar application to a live feed.
+    </div>
+    <textarea readonly id="calendar-export-dialog-url" rows="6"></textarea>
+    <button class="btn no-icon" id="copy-button" data-clipboard-target="calendar-export-dialog-url" title="Click to copy me.">Copy to Clipboard</button>
 </div>
-<div class="clearfix"></div>
-
 <div id="calendar-list" class='printEventList' data-eventlist="true">
 	<div class="calendar-controls">
 		<div class="link-case">
@@ -262,59 +313,7 @@
 	<h2>{EVENT_DATE}</h2>
 	<ul class="js_happening calendar">
 		<!-- BEGIN event -->
-		<li class="event {EVENT_SELECTORS}" style="background-color:{EVENT_COLOUR}">
-			<p class="{EVENT_CLASS}">
-				<span class="eventListing">
-					<!-- BEGIN event_allday -->
-					<strong class="duration">All Day</strong>
-					<!-- END event_allday -->
-
-					<!-- BEGIN event_timed -->
-					<strong class="duration">{EVENT_START}{EVENT_SEPARATOR}{EVENT_END}</strong>
-					<!-- END event_timed -->
-
-					<!-- BEGIN event_submission -->
-					<strong class="duration">{EVENT_END}</strong>
-					<!-- END event_submission -->
-
-					<span>{EVENT_TITLE}
-                        <!-- BEGIN event_location --> - <i>{EVENT_LOCATION}</i>
-                        <!-- END event_location --></span>
-				</span>
-			</p>
-
-            <div class="hidden-fields clearfix">
-                <h3>{EVENT_TITLE}</h3>
-                <h4>{EVENT_TYPE}: {EVENT_FULL_TIME}</h4>
-                <em>{EVENT_LOCATION}</em>
-
-                <p class="meta">
-                    {EVENT_DETAIL}
-                    <div class="created">Posted by <a href="/search/user/{EVENT_AUTHOR_ID}">{EVENT_AUTHOR}</a>
-                        <!-- BEGIN event_has_category -->
-                        in <a href='/homepage/{EVENT_CATEGORY_ID}'>{EVENT_CATEGORY_NAME}</a>
-                        <!-- END event_has_category -->
-                    </div>
-                </p>
-
-                <!-- BEGIN event_attendance_status -->
-                <p class="meta">Attendance Status: {EVENT_ATTENDANCE_STATUS}</p>
-                <!-- END event_attendance_status -->
-                <div>
-                    <!-- BEGIN event_attendance_request -->
-                    <form method="post">
-                        <input name="event[id]" type="hidden" value="{EVENT_ID}">
-                        <a class="btn modify float-left attendance-request" href="#"><span></span>{ATTENDANCE_REQUEST_ACTION}</a>
-                    </form>
-                    <!-- END event_attendance_request -->
-
-                    <!-- BEGIN event_buttons -->
-                    <a class="btn float-right {EVENT_BUTTON_TYPE}"
-                       href="{EVENT_BUTTON_HREF}"><span></span>{EVENT_BUTTON_TEXT}</a>
-                    <!-- END event_buttons -->
-                </div>
-            </div>
-		</li>
+            {TWIG_EVENT}
 		<!-- END event -->
 	</ul>
 	<!-- END date -->

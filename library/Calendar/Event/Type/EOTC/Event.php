@@ -1,25 +1,40 @@
 <?php
 /**
- * Calendar_Event_Type_Day
- *
- * Uses the Visitor pattern to render via an external class, finally decoupling
- * the data structure from rendering methodology in a highly granular environment
- * without needing to use singletons.
+ * Standard EOTC event for display in the calendar
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Calendar_Event_Type_EOTC extends Calendar_Event_Type_Abstract {
+namespace Calendar\Event\Type\EOTC;
 
-    /* Renderer
+use Calendar\Event\Type\Day;
+use Calendar\Event\Type\EventInterface;
+
+
+class Event extends Day\Event implements EventInterface {
+
+    /**
+     * Renderer classes
+     * @var array
      */
-    protected $rendererClass = 'Calendar_Event_Type_EOTC_Renderer_Javascript';
+    protected $renderClasses = array(   'javascript'    => Renderer\Javascript::class,
+                                        'html'          => Renderer\Html::class,
+                                        'vcal'          => Renderer\VObject::class,
+                                        'csv'          => Renderer\Csv::class,
+    );
 
     /* Attendance flag
      */
     private $attendance = 0;
+
+    /**
+     * Some custom thing
+     *
+     * @var array
+     */
+    protected $custom = [];
 
 	/**
 	 * Render via external class
@@ -118,5 +133,24 @@ class Calendar_Event_Type_EOTC extends Calendar_Event_Type_Abstract {
      */
     public function getAttendance() {
         return $this->attendance;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCustom()
+    {
+        return $this->custom;
+    }
+
+    /**
+     * @param  array $custom
+     *
+     * @return $this
+     */
+    public function setCustom($custom)
+    {
+        $this->custom = $custom;
+        return $this;
     }
 }

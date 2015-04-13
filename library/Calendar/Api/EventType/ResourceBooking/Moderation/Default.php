@@ -11,6 +11,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Authorizer\Failure;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ResourceBooking\Booking;
+use Calendar\Event\Collection;
 
 class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar_Api_EventType_ResourceBooking_Base
 {
@@ -46,7 +47,7 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
      * Loads permissions for resource bookings - whether the user can moderate
      * at all, and the items they're restricted to if any.
      *
-     * @return Calendar_Event_Collection
+     * @return Collection
      */
     protected function loadPermissions()
     {
@@ -73,14 +74,14 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
      * @param int $startTimestamp
      * @param int $endTimestamp
      *
-     * @return Calendar_Event_Collection|Calendar_Event_Type_ResourceBooking[]
+     * @return Collection|Calendar_Event_Type_ResourceBooking[]
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
 
         // If I can't moderate anything - don't even bother looking.
         if (!$this->getUserCanModerate()) {
-            return new Calendar_Event_Collection();
+            return new Collection();
         }
 
         // Get bookings and convert them into a collection of calendar events.
@@ -96,7 +97,7 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
             $params
         );
         $converter  = new Booking\Util\EventConverter();
-        $collection = new Calendar_Event_Collection();
+        $collection = new Collection();
         foreach ($bookings as $booking) {
             // Don't add this booking if it's my own, it will show in my
             // resource booking event feed.
@@ -117,7 +118,7 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
      * Find a particular event from this source
      *
      * @param $eventId
-     * @return Calendar_Event_Collection
+     * @return Collection
      */
     public function getEvent($eventId)
     {

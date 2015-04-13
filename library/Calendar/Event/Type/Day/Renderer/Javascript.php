@@ -1,251 +1,130 @@
 <?php
 /**
- * Calendar_Event_Type_Day_Renderer_Javascript
+ * Renders out a JSON blob for day event objects, this is used by full calendar
  *
- * Renders out a JSON mob of event objects
- *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
  */
-class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Renderer_Abstract {
+namespace Calendar\Event\Type\Day\Renderer;
 
-    /**
-     * The typeId of Task event types
-     *
-     * @var int
-     */
-    private $taskTypeId = -1;
+class Javascript extends Base
+{
+    public function render()
+    {
+        if ($this->isVisible()) {
 
-    /**
-     * Sets up the type of event that is considered tasks.
-     */
-    protected function setup() {
-        $this->detectTaskTypeId();
-    }
+            /* Future events are visible to superusers, event owners, group members with write access
+             */
+            if ($this->isTranslucent()) {
+                $cssClass = 'translucent';
+            } else {
+                $cssClass = '';
+            }
 
-    /**
-     * Detect the task type id
-     */
-    private function detectTaskTypeId() {
-        $allTypes = $this->getCalendarHandler()->getTypeList();
+            /* Event attendance
+             */
+            $hasIcon = false;
+            $hasStatus = false;
+            $hasAttendanceRequestButton = false;
+            $hasListButton = false;
 
-        if (is_array($allTypes) && count($allTypes)) {
-            foreach($allTypes as $currentType) {
+            if ($this->event->canAttend()) {
+                $hasIcon = true;
 
-                /* Event Task id
+                /* Anyone with write access can approve attendance
                  */
-                if ($currentType['eventType'] == 'Task') {
-                    $this->setTaskTypeId($currentType['eventTypeID']);
+                if ($this->event->isEditable()) {
+                    $hasListButton = true;
+                }
+
+                $hasStatus = $this->attendanceStatus();
+
+                if ($hasStatus) {
+                    $hasAttendanceRequestButton = 'Unattend';
+                } else {
+                    $hasAttendanceRequestButton = 'RSVP';
                 }
             }
-        }
-    }
 
-	/**
-	 * Visitor
-	 *
-	 * @param $currentEvent
-	 */
-	public function visit($currentEvent) {
-		if ($this->isVisible($currentEvent)) {
-
-			/* Future events are visible to superusers, event owners, group members with write access
-			 */
-			if ($currentEvent->getPublishDate()->getUnixTimestamp() > $_SERVER['REQUEST_TIME']) {
-				$cssClass = 'translucent';
-			}
-			else {
-				$cssClass = '';
-			}
-
-			/* Modify link. Should be templated...
-			 */
-			if ($currentEvent->getIsEditable() && ($currentEvent->getEventId() > -1)) {
-				$editable = true;
-			}
-			else {
-				$editable = false;
-			}
-
-			/* Show a homepage if appropriate
-			 */
-			if ($currentEvent->getCategoryId() > 0) {
-				$categoryId = $currentEvent->getCategoryId();
-				$categoryName = $currentEvent->getCategoryName();
-			}
-			else {
-				$categoryId = '';
-				$categoryName = '';
-			}
-
-			/* Event attendance
-			 */
-			$hasIcon = false;
-			$hasStatus = false;
-			$hasAttendanceRequestButton = false;
-			$hasListButton = false;
-
-			if ($currentEvent->canAttend()) {
-				$hasIcon = true;
-
-				/* Anyone with write access can approve attendance
-				 */
-				if (is_numeric($currentEvent->getCategoryId())) {
-					if ($this->getGroupHandler()->getPermission($currentEvent->getCategoryId()) > READ_ACCESS) {
-						$hasListButton = true;
-					}
-				}
-
-				if ($this->getGroupHandler()->isStudent($_SESSION['id'])) {
-					if ($attendance = $this->getCalendarHandler()->getAttendanceByEventAndUser($currentEvent->getEventId(), $_SESSION['id'])) {
-
-						/* Attendance Status
-	  					 */
-						if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
-							$hasStatus = 'Pending';
-						}
-						else if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
-							$hasStatus = 'Approved';
-						}
-						else if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
-							$hasStatus = 'Rejected';
-						}
-
-						$hasAttendanceRequestButton = 'Unattend';
-					}
-					else {
-						$hasAttendanceRequestButton = 'Attend';
-					}
-				}
-				else if ($this->getGroupHandler()->isStaff($_SESSION['id'])) {
-					$hasListButton = true;
-				}
-			}
-
-			/* Congeal all that stuff
-			 */
-			$start   = $currentEvent->getStartTime()->getDatabaseDate();
-			$end     = $currentEvent->getEndTime()->getDatabaseDate();
-			$all_day = $currentEvent->getAllDay();
-			if (!$all_day) {
-				$start .= ' ' . $currentEvent->getStartTime()->getDatabaseTime();
-				$end   .= ' ' . $currentEvent->getEndTime()->getDatabaseTime();
-			} else {
+            /* Congeal all that stuff
+             */
+            $start = $this->event->getStartTime()->getDatabaseDate();
+            $end = $this->event->getEndTime()->getDatabaseDate();
+            $all_day = $this->event->getAllDay();
+            if (!$all_day) {
+                $start .= ' ' . $this->event->getStartTime()->getDatabaseTime();
+                $end .= ' ' . $this->event->getEndTime()->getDatabaseTime();
+            } else {
                 // FullCalendar (and vCal) 2.0 treats event ends as exclusive.
                 // Doesn't really matter for timed events, but all day events
                 // get truncated by one day.
-                $end = $currentEvent->getEndTime()->addDays(1)->getDatabaseDate();
+                $end = $this->event->getEndTime()->addDays(1)->getDatabaseDate();
             }
 
-			//
-			// Add campus list to list of classes
-			$classes = array(
-				$currentEvent->getDerivedEventLevel(),
-				'type' . $currentEvent->getType(),
-			);
-			if (($connectorId = $currentEvent->getConnectorId()) > 0) {
-				$classes[] = 'source' . $connectorId;
-			}
-			$campus_list = array_filter(array_map('trim', explode(',', $currentEvent->getCampusList())));
-			foreach ($campus_list as &$campus) {
-				$campus = 'campus'.trim($campus);
-			}
-			unset($campus);
-			if (!empty($campus_list)) {
-				$classes[] = implode(' ', $campus_list);
-			}
+            //
+            // Add campus list to list of classes
+            $classes = $this->getEvent()->getEventClasses();
 
-			$event = array(
-				'title' => $currentEvent->getTitle(),
-				'start' => "$start",
-				'end' => "$end",
+            $event = array(
+                'title'     => $this->event->getTitle(),
+                'start'     => $start,
+                'end'       => $end,
 
-				/* Whether you can edit this event or not
-				 */
-				'editable' => $editable,
+                /* Whether you can edit this event or not
+                 */
+                'editable'  => $this->event->isEditable(),
 
-				/* Whether it's an all-day event or not
-				 * If allDay is true, then you can't resize it
-				 */
-				'allDay' => $all_day,
+                /* Whether it's an all-day event or not
+                 * If allDay is true, then you can't resize it
+                 */
+                'allDay'    => $all_day,
 
-				/* Colour of the event
-				 */
-				'color' => $currentEvent->getColour(),
+                /* Colour of the event
+                 */
+                'color'     => $this->event->getColour(),
 
-				/* Campus slug so you can filter events
-				 */
-				'className' => $classes,
+                /* Campus slug so you can filter events
+                 */
+                'className' => $classes,
 
-				/* Extra data that the Event Object doesn't directly support
-				 */
-				'data' => array(
-					'meta' => array(
-						'eventId' => $currentEvent->getEventId(),
-						'time' => $currentEvent->getTime(),
-						'detail' => Scrub::html($currentEvent->getDetail()),
-						'location' => $currentEvent->getLocation(),
-						'eventTypeId' => $currentEvent->getType(),
-						'eventType' => 'type' . $currentEvent->getType(),
-						'type' => $currentEvent->getEventType(),
-						'author' => $currentEvent->getAuthorName(),
-						'authorId' => $currentEvent->getAuthorId(),
-						'level' => $currentEvent->getDerivedEventLevel(),
-						'completed' => $currentEvent->getCompleted(),
-					),
-					'links' => array(
-						'category' => array(
-							'id' => $categoryId,
-							'name' => $categoryName,
-						)
-					),
-					'styles' => array(
-						'visible' => $cssClass,
-					),
-					'attendance' => array(
-						'icon' => $hasIcon,
-						'status' => $hasStatus,
-						'requestButton' => $hasAttendanceRequestButton,
-						'listButton' => $hasListButton,
-					)
-				)
-			);
+                /* Extra data that the Event Object doesn't directly support
+                 */
+                'data'      => array(
+                    'meta'       => array(
+                        'eventId'     => $this->event->getEventId(),
+                        'time'        => $this->event->getTime(),
+                        'detail'      => \Scrub::html($this->event->getDetail()),
+                        'location'    => $this->event->getLocation(),
+                        'eventTypeId' => $this->event->getType(),
+                        'eventType'   => 'type' . $this->event->getType(),
+                        'type'        => $this->event->getEventType(),
+                        'author'      => $this->event->getAuthorName(),
+                        'authorId'    => $this->event->getAuthorId(),
+                        'level'       => $this->event->getEventClasses(),
+                        'completed'   => $this->event->getCompleted(),
+                    ),
+                    'links'      => array(
+                        'category' => array(
+                            'id'   => $this->event->getCategoryId(),
+                            'name' => $this->event->getCategoryName(),
+                        )
+                    ),
+                    'styles'     => array(
+                        'visible' => $cssClass,
+                    ),
+                    'attendance' => array(
+                        'icon'          => $hasIcon,
+                        'status'        => $hasStatus,
+                        'requestButton' => $hasAttendanceRequestButton,
+                        'listButton'    => $hasListButton,
+                    )
+                )
+            );
 
-			echo json_encode($event);
-			echo ",";
-		}
-	}
-
-    /**
-     * Determine whether an event is a task or not
-     *
-     * @param $currentEvent
-     * @return bool
-     */
-    private function isTask($currentEvent) {
-        if ($currentEvent->getType() == $this->getTaskTypeId()) {
-            return true;
+            return json_encode($event) . ',';
         }
-
-        return false;
     }
 
-    /* Getters/Setters
-     */
 
-    /**
-     * @param int $taskTypeId
-     */
-    private function setTaskTypeId($taskTypeId) {
-        $this->taskTypeId = $taskTypeId;
-    }
-
-    /**
-     * @return int
-     */
-    private function getTaskTypeId() {
-        return $this->taskTypeId;
-    }
 }

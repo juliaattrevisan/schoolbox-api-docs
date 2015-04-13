@@ -11,14 +11,18 @@
  */
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
+use Calendar\Event\Collection\Exporter;
+use Calendar\Event\Collection\CSVExporter;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+
+
 
 try {
     $token = $_GET['token'];
     $export_type = $_GET['export'];
     $api = null;
-    $filename = 'calendar.ics';
+    $filename = 'calendar';
     if (empty($token)) {
         throw new Exception_Schoolbox('No token provided', 401);
     }
@@ -28,17 +32,21 @@ try {
     // places that need a token.
     try {
         //TODO: fix hydration so we only need one call
-        $user = Schoolbox\UserMapper::getInstance()->findOneByColumn('key', $token);
+        $user = UserMapper::getInstance()->findOneByColumn('key', $token);
         // Rehydrate with campus collection
-        $user = Schoolbox\UserMapper::getInstance()->findById($user->getId());
+        $user = UserMapper::getInstance()->findById($user->getId());
     } catch (Exception $ex) {
         throw new Exception_Schoolbox('Invalid token', 401);
     }
 
+    // Default start and end times
+    $start = strtotime('-1 months', $_SERVER['REQUEST_TIME']);
+    $end   = strtotime('+12 months', $_SERVER['REQUEST_TIME']);
+
     switch ($export_type) {
         case 'personal':
             $api = new Calendar_Api_EventType_Event_Schoolbox_Personal($user, array());
-            $filename = 'personal.ics';
+            $filename = 'personal';
             break;
 
         case 'group':
@@ -49,7 +57,7 @@ try {
             } else {
                 throw new Exception_Schoolbox('A group ID must be provided', 400);
             }
-            $filename = sprintf('group%d.ics', $export_id);
+            $filename = sprintf('group%d', $export_id);
             break;
 
         case 'campus':
@@ -60,17 +68,36 @@ try {
             } else {
                 throw new Exception_Schoolbox('A campus ID must be provided', 400);
             }
-            $filename = sprintf('campus%d.ics', $export_id);
+            $filename = sprintf('campus%d', $export_id);
             break;
 
         case 'duework':
             $api = new Calendar_Api_EventType_Submission_Schoolbox_Default($user, array());
-            $filename = 'duework.ics';
+            $filename = 'duework';
+            break;
+
+        case 'timetable':
+            $api = new Calendar_Api_EventType_Timetable_External_Default($user, array());
+            $filename = 'timetable';
+            $start = $_SERVER['REQUEST_TIME'];
+            $end = strtotime('+3 months', $_SERVER['REQUEST_TIME']);
+            break;
+
+        case 'timetabledays':
+            $api = new Calendar_Api_EventType_TimetableDays_External_Default($user, array());
+            $filename = 'timetabledays';
+            $start = $_SERVER['REQUEST_TIME'];
+            $end = strtotime('+3 months', $_SERVER['REQUEST_TIME']);
             break;
 
         case 'all':
-            $factory = new Calendar_Api_Factory($user);
-            $api = $factory->produce();
+
+            // All day events, but exclude other sources
+            $api = new Calendar_Api_Composite();
+            $api->add(new Calendar_Api_EventType_Event_Schoolbox_Campus($user, array()));
+            $api->add(new Calendar_Api_EventType_Event_Schoolbox_Group($user, array()));
+            $api->add(new Calendar_Api_EventType_Event_Schoolbox_Personal($user, array()));
+
             break;
 
         case '':
@@ -82,19 +109,35 @@ try {
             break;
     }
 
-    //
-    // API should always be a Calendar_Api_EventType_Interface object, no need
-    // to check.
-    $exporter = new Calendar_Event_Collection_Exporter(
-        $api,
-        $_SERVER['REQUEST_TIME'],
-        strtotime('+6 months', $_SERVER['REQUEST_TIME']),
-        new SitePage(false)
-    );
-    // for IE8
-//	header('Cache-Control: private');
-//	header('Content-Type: text/calendar; charset=utf-8');
-//	header('Content-Disposition: inline; filename='.$filename);
+
+    if($_GET['format'] == 'csv') {
+
+        header('Cache-Control: private');
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: filename='.$filename.'.csv');
+
+        $exporter = new CSVExporter(
+            $api,
+            $start,
+            $end,
+            $user,
+            new SitePage(false)
+        );
+    }
+    else {
+        header('Cache-Control: private');
+        header('Content-Type: text/calendar; charset=utf-8');
+        header('Content-Disposition: filename='.$filename.'.ics');
+
+        $exporter = new Exporter(
+            $api,
+            $start,
+            $end,
+            $user,
+            new SitePage(false)
+        );
+    }
+
     $exporter->renderAll();
 } catch (Exception_Schoolbox $e) {
     //

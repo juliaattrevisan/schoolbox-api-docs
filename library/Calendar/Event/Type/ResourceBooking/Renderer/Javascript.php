@@ -10,68 +10,32 @@
  * @copiedFrom Steve Chan <steve.chan@alaress.com.au>
  */
 
-use Aura\Router\Router;
-use Alaress\Authorizer\Authorizer;
+namespace Calendar\Event\Type\ResourceBooking\Renderer;
+
+use Calendar\Event\Type\ResourceBooking\Renderer\Base;
 use Schoolbox\ResourceBooking\Booking;
+use \Scrub;
 
-class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_Event_Type_Renderer_Abstract
+class Javascript extends Base
 {
-
-    /**
-     * @var Router
-     */
-    protected $router;
-
-    /**
-     * @var Authorizer
-     */
-    protected $authorizer;
-
-    /**
-     * Setup: injects global router into this object, so it can use it to look
-     * up URLs relating to actions on an event.
-     */
-    protected function setup()
-    {
-        $this->router     = $this->getPage()->getDi()->get('router');
-        $this->authorizer = $this->getPage()->getDi()->get('authorizer');
-    }
-
     /**
      * Renders an event
      *
-     * @param Calendar_Event_Type_ResourceBooking $currentEvent
      */
-    public function visit($currentEvent)
+    public function render()
     {
-//        // Future events are visible to superusers, event owners, group members with write access
-//        if ($currentEvent->getPublishDate()->getUnixTimestamp() >= time()) {
-//            $cssClass = 'translucent';
-//        }
-//        else {
-//            $cssClass = '';
-//        }
-
         // Resource bookings are never all day events.
-        $start = $currentEvent->getStartTime()->getDatabaseDate()
-               . ' ' . $currentEvent->getStartTime()->getDatabaseTime();
-        $end   = $currentEvent->getEndTime()->getDatabaseDate()
-               . ' ' . $currentEvent->getEndTime()->getDatabaseTime();
+        $start = $this->getEvent()->getStartTime()->getDatabase();
+        $end   = $this->getEvent()->getEndTime()->getDatabase();
 
         // Putting any class other than "personal", "group" or "type{whatever}"
         // prevents this object from rendering, so add classes later.
         $classes = array(
-            $currentEvent->getDerivedEventLevel(),
+            $this->getEvent()->getEventClasses(),
         );
-        if (($eventType = $currentEvent->getType()) > 0) {
-            $classes[] = 'type' . $eventType;
-        }
-        if (($connectorId = $currentEvent->getConnectorId()) > 0) {
-            $classes[] = 'source' . $connectorId;
-        }
 
         // Bookings might have a campus one day, currently they do not.
-//        $campus_list = array_filter(array_map('trim', explode(',', $currentEvent->getCampusList())));
+//        $campus_list = array_filter(array_map('trim', explode(',', $this->getEvent()->getCampusList())));
 //        foreach ($campus_list as &$campus) {
 //            $campus = 'campus'.trim($campus);
 //        }
@@ -81,15 +45,12 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
 //        }
 
         // Show booking butonyes I have permission to view
-        $booking        = $currentEvent->getBooking();
+        $booking        = $this->getEvent()->getBooking();
         $bookingId      = $booking->getId();
         $bookingButtons = array();
 
         // Modify butonye
-        $editUrl = $this->getRouteIfAuthorized(
-            'resourceBooking.edit',
-            array('id' => $bookingId, 'item' => $booking,)
-        );
+        $editUrl = $this->getEditURL();
         if ($editUrl !== false) {
             $bookingButtons[] = array(
                 'label' => 'Modify',
@@ -99,10 +60,7 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
         }
 
         // Cancel butonye
-        $cancelUrl = $this->getRouteIfAuthorized(
-            'resourceBooking.cancel',
-            array('id' => $bookingId, 'item' => $booking,)
-        );
+        $cancelUrl = $this->getCancelURL();
         if ($cancelUrl !== false) {
             $bookingButtons[] = array(
                 'label' => 'Delete',
@@ -112,50 +70,33 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
         }
 
         // Approve butonye (if not already approved)
-        $status = $currentEvent->getBooking()->getStatus()->getId();
-        if ($status != Booking\Status\Model::STATUS_APPROVED) {
-            $approveUrl = $this->getRouteIfAuthorized(
-                'resourceBooking.approve',
-                array('id' => $bookingId, 'item' => $booking,)
+        $approveUrl = $this->getApproveURL();
+        if ($approveUrl !== false) {
+            $bookingButtons[] = array(
+                'label' => 'Approve',
+                'class' => 'tick booking-approve',
+                'href'  => $approveUrl,
             );
-            if ($approveUrl !== false) {
-                $bookingButtons[] = array(
-                    'label' => 'Approve',
-                    'class' => 'tick booking-approve',
-                    'href'  => $approveUrl,
-                );
-            }
         }
 
         // Rejected butonye (if not already rejected)
-        if ($status != Booking\Status\Model::STATUS_REJECTED) {
-            $rejectUrl = $this->getRouteIfAuthorized(
-                'resourceBooking.reject',
-                array('id' => $bookingId, 'item' => $booking,)
+        $rejectUrl = $this->getRejectURL();
+        if ($rejectUrl !== false) {
+            $bookingButtons[] = array(
+                'label' => 'Reject',
+                'class' => 'reply booking-reject',
+                'href'  => $rejectUrl,
             );
-            if ($rejectUrl !== false) {
-                $bookingButtons[] = array(
-                    'label' => 'Reject',
-                    'class' => 'reply booking-reject',
-                    'href'  => $rejectUrl,
-                );
-            }
         }
 
         // Set title from resource name, and code and booking name
         // if either are there.
-        $title = $currentEvent->getBooking()->getResource()->getName();
-        if ($currentEvent->getBooking()->getResource()->getRoomCode()) {
-            $title .= ' ['.$currentEvent->getBooking()->getResource()->getRoomCode().']';
-        }
-        if ($currentEvent->getBooking()->getName()) {
-            $title .= ': '.$currentEvent->getBooking()->getName();
-        }
-        $detail = $currentEvent->getDetail();
+
+        $detail = $this->getEvent()->getDetail();
         $event  = array(
-            'title' => $title,
-            'start' => "$start",
-            'end' => "$end",
+            'title' => $this->getEvent()->getTitle(),
+            'start' => $start,
+            'end' => $end,
 
             /* Whether you can edit this event or not
              */
@@ -168,7 +109,7 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
 
             /* Colour of the event
              */
-            'color' => $currentEvent->getColour(),
+            'color' => $this->getEvent()->getColour(),
 
             /* Campus slug so you can filter events
              */
@@ -178,18 +119,18 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
              */
             'data' => array(
                 'meta' => array(
-                    'eventId' => $currentEvent->getEventId(),
-                    'time' => $currentEvent->getTime(),
+                    'eventId' => $this->getEvent()->getEventId(),
+                    'time' => $this->getEvent()->getTime(),
                     'detail' => Scrub::html($detail),
-                    'location' => $currentEvent->getLocation(),
-                    'eventTypeId' => $currentEvent->getType(),
-                    'eventType' => 'type' . $currentEvent->getType(),
-                    'type' => $currentEvent->getEventType(),
-                    'author' => $currentEvent->getAuthorName(),
-                    'authorId' => $currentEvent->getAuthorId(),
-                    'level' => $currentEvent->getDerivedEventLevel(),
-                    'completed' => $currentEvent->getCompleted(),
-                    'seriesId' => $currentEvent->getBooking()->getEvent()->getSeriesId(),
+                    'location' =>  $this->getEvent()->getCategory(),
+                    'eventTypeId' => $this->getEvent()->getType(),
+                    'eventType' => 'type' . $this->getEvent()->getType(),
+                    'type' => $this->getEvent()->getEventType(),
+                    'author' => $this->getEvent()->getAuthorName(),
+                    'authorId' => $this->getEvent()->getAuthorId(),
+                    'level' => $this->getEvent()->getEventClasses(),
+                    'completed' => $this->getEvent()->getCompleted(),
+                    'seriesId' => $this->getEvent()->getBooking()->getEvent()->getSeriesId(),
                 ),
                 'links' => array(),
                 'styles' => array(
@@ -203,36 +144,19 @@ class Calendar_Event_Type_ResourceBooking_Renderer_Javascript extends Calendar_E
                 ),
                 'booking' => array(
                     'item'    => array(
-                        'id'   => $currentEvent->getBooking()->getResource()->getId(),
-                        'name' => $currentEvent->getBooking()->getResource()->getName(),
+                        'id'   => $this->getEvent()->getBooking()->getResource()->getId(),
+                        'name' => $this->getEvent()->getBooking()->getResource()->getName(),
                     ),
-                    'status'  => $currentEvent->getBooking()->getStatus()->jsonSerialize(),
+                    'status'  => $this->getEvent()->getBooking()->getStatus()->jsonSerialize(),
                     'buttons' => $bookingButtons,
                     'reviewer' => array(
-                        'id'   => $currentEvent->getBooking()->getReviewer()->getId() ?: -1,
-                        'name' => $currentEvent->getBooking()->getReviewer()->formatName(),
+                        'id'   => $this->getEvent()->getBooking()->getReviewer()->getId() ?: -1,
+                        'name' => $this->getEvent()->getBooking()->getReviewer()->formatName(),
                     ),
                 ),
             )
         );
 
-        echo json_encode($event);
-        echo ",";
-    }
-
-    /**
-     * Helper function - gets whether access to a route is allowed.
-     *
-     * @param string $name
-     * @param array  $params
-     *
-     * @return bool|string False if not authorized, a URL if it is.
-     */
-    public function getRouteIfAuthorized($name, array $params = array())
-    {
-        if ($this->authorizer->isPathAuthorizedForUser($name, $params, $_SESSION['user'])) {
-            return $this->router->generate($name, $params);
-        }
-        return false;
+        return json_encode($event).',';
     }
 }

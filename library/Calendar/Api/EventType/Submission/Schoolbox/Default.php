@@ -6,8 +6,10 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+use Calendar\Event\Collection;
+use Calendar\Event\Type\Submission\Event;
+
 class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_EventType_Abstract
 {
     /** @var Calendar */
@@ -32,11 +34,11 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
      * @param $endTimestamp
      *
      * @internal param $currentDay
-     * @return Calendar_Event_Collection|Calendar_Event_Type_Submission[]
+     * @return Collection|Submission[]
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
-        $stack = new Calendar_Event_Collection();
+        $stack = new Collection();
         // Configuration may not have been set, take this into account.
         try {
             $eventType = $this->loadConnectorConfiguration()->decodeConfig()->getLuEventType();
@@ -63,16 +65,8 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
         $activities->merge($assess_mapper->getDueActivities($category_id_list, $startTimestamp, $endTimestamp));
 
         foreach ($activities as $activity) {
-            $event = new Calendar_Event_Type_Submission();
-            $event->setCategoryId($activity->getCategory()->getId());
-            $event->setCategoryName($activity->getCategory()->getName());
-
-            $category_codes = array();
-            foreach ($activity->getCategory()->getCodes() as $code) {
-                $category_codes[] = $code->getCode();
-            }
-            $event->setCategoryCodes($category_codes);
-
+            $event = new Event();
+            $event->setCategory($activity->getCategory());
             $event->setType($eventType);
             $event->setColour($this->calendarHandler->displayColour($eventType));
             $event->setStartTime($activity->getDate());
@@ -89,17 +83,17 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
                 $assessment = $activity->getAssessment();
                 $owner      = $assessment->getUser();
                 $event->setIsAssessment(true);
-                $event->setSubmissionBoxId($assessment->getId());
-                $event->setSubmissionBoxName($assessment->getTitle());
-                $event->setSubmissionBoxDetail($assessment->getDescription());
+                $event->setEventId($assessment->getId());
+                $event->setTitle($assessment->getTitle());
+                $event->setDetail($assessment->getDescription());
                 $event->setPublishDate($assessment->getStart());
             } else {
                 $submission_box = $activity->getSubmissionBox();
                 $owner          = $submission_box->getOwner();
                 $event->setIsAssessment(false);
-                $event->setSubmissionBoxId($submission_box->getId());
-                $event->setSubmissionBoxName($submission_box->getName());
-                $event->setSubmissionBoxDetail($submission_box->getDescription());
+                $event->setEventId($submission_box->getId());
+                $event->setTitle($submission_box->getName());
+                $event->setDetail($submission_box->getDescription());
                 $event->setPublishDate($submission_box->getPublishDate());
             }
 
@@ -117,11 +111,11 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
      *
      * @param $eventId
      *
-     * @return Calendar_Event_Collection
+     * @return Collection
      */
     public function getEvent($eventId)
     {
-        $collection = new Calendar_Event_Collection();
+        $collection = new Collection();
 
         /* Fill in your query result set here and populate $collection
          */

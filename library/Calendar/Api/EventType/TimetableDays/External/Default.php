@@ -10,6 +10,9 @@
 
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
+use Calendar\Event\Collection;
+use Calendar\Event\Type\Timetable\Event;
+
 
 class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api_EventType_Abstract
 {
@@ -49,11 +52,11 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
      * @param $startTimestamp
      * @param $endTimestamp
      *
-     * @return Calendar_Event_Collection
+     * @return Collection
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
-        $stack            = new Calendar_Event_Collection();
+        $stack            = new Collection();
         $currentTimestamp = $startTimestamp;
 
         // Figure out event type
@@ -87,7 +90,7 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
                 }
                 $dayName = $this->getExternalTimetable()->getDayName($dayNumber);
 
-                $event = new Calendar_Event_Type_Day();
+                $event = new Event();
                 $event->setAllday(true);
                 $event->setStartTime(
                     new Alaress_Date_Format(strtotime('00:00:00', $currentTimestamp), 'U')
@@ -98,7 +101,7 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
                 $event->setPublishDate(null);
                 $event->setTitle(sprintf("%s: %s", $campusName, $dayName));
                 $event->setCampusList($campusId);
-                $event->setAccess(Calendar_Event_Type_Day::CAMPUS_ACCESS);
+                $event->setAccess(Event::CAMPUS_ACCESS);
                 $event->setType($eventType);
                 $event->setColour($eventColor);
                 $event->setConnectorId($this->getConnectorId());
@@ -114,12 +117,12 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
      *
      * @param $eventId
      *
-     * @return Calendar_Event_Collection
+     * @return Collection
      */
     public function getEvent($eventId)
     {
         // Blah
-        $stack = new Calendar_Event_Collection();
+        $stack = new Collection();
         return $stack;
     }
 

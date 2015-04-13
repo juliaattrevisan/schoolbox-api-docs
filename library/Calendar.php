@@ -1,5 +1,8 @@
 <?php
 
+use Calendar\Event\Collection;
+use Calendar\Event\Type\Day\Event;
+
 class Calendar extends DeprecatedModel
 {
 
@@ -127,14 +130,13 @@ class Calendar extends DeprecatedModel
 
     public function getAttendeeList($eventId)
     {
-        $event = $this->getByID($eventId);
-
         $query = "
-            SELECT u.*,
+            SELECT u.*, g.name as groupName,
                 ea.id, ea.status, ea.intention
             FROM event_attendance ea
-            LEFT JOIN user u ON u.id = ea.user_id
-            WHERE ea.event_id = {$eventId}
+            JOIN `user` u ON u.id = ea.user_id
+            JOIN `groups` g ON g.id = u.group_id
+            WHERE ea.event_id = '{$eventId}'
         ";
 
         return $this->db->getAll($query);
@@ -463,7 +465,7 @@ class Calendar extends DeprecatedModel
 
         /* Standardised output
          */
-        $stack = new Calendar_Event_Collection();
+        $stack = new Collection();
 
         if (is_array($submissions) && count($submissions)) {
             foreach ($submissions as $submission) {
@@ -606,7 +608,7 @@ class Calendar extends DeprecatedModel
      *                                * id: if set, only this event ID will be retrieved.
      *                                If empty, all events for user are retrieved.
      *
-     * @return Calendar_Event_Collection
+     * @return Collection
      */
     public function getDayEvents($user, $startTimestamp, $endTimestamp, $filter = array())
     {
@@ -759,11 +761,11 @@ class Calendar extends DeprecatedModel
 
         /* Standardised output
          */
-        $stack = new Calendar_Event_Collection();
+        $stack = new Collection();
 
         if (is_array($allEvents) && count($allEvents)) {
             foreach ($allEvents as $currentEvent) {
-                $event = new Calendar_Event_Type_Day();
+                $event = new Event();
 
                 $event->setAuthorName($currentEvent['firstname'] . ' ' . $currentEvent['lastname']);
                 $event->setAuthorId($currentEvent['uid']);
@@ -793,6 +795,7 @@ class Calendar extends DeprecatedModel
                 }
 
                 if ($currentEvent['access'] == self::ACCESS_GROUP) {
+                    //TODO: refactor this so its no so resource intensive, we only need a list of IDs
                     $mapper       = new \Schoolbox\Calendar\Relation\CategoryMapper();
                     $allRelations = $mapper->findByColumn('event_id', $currentEvent['id']);
                     $event->setCategoryCollection($allRelations);

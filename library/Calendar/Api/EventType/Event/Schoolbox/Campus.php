@@ -9,6 +9,8 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+use Calendar\Event\Collection;
+
 class Calendar_Api_EventType_Event_Schoolbox_Campus extends Calendar_Api_EventType_Event_Schoolbox_Default {
 
 	/**
@@ -24,7 +26,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Campus extends Calendar_Api_EventTy
 	 * @param int $startTimestamp
 	 * @param int $endTimestamp
 	 *
-	 * @return Calendar_Event_Collection
+	 * @return \Calendar\Event\Collection
 	 */
 	protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp) {
 		return $this->getCalendarHandler()->getDayEvents(

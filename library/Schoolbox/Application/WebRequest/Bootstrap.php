@@ -13,6 +13,8 @@ namespace Schoolbox\Application\WebRequest;
 use Alaress\Application\Boot\BootstrapInterface;
 use Alaress\DebugBar\DataCollector\XhprofCollector;
 use Alaress\DebugBar\Instance as DebugBar;
+use DebugBar\Bridge\Twig\TraceableTwigEnvironment;
+use DebugBar\Bridge\Twig\TwigCollector;
 use Alaress\Redis;
 use Alaress\Session\Factory;
 use Alaress\Web\Router\RouterFactory;
@@ -287,6 +289,12 @@ class Bootstrap implements BootstrapInterface {
 							'debug' => $config->get('debug_templates'),
 						)
 					);
+
+                    if($this->debugEnabled) {
+                        $twig = new TraceableTwigEnvironment($twig);
+                        DebugBar::getInstance()->addCollector(new TwigCollector($twig));
+                    }
+
 					$twig->addExtension(new Twig_Extension_Debug());
 					$twig->addExtension(new Twig_Extensions_Extension_Text());
 

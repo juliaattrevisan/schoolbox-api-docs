@@ -10,8 +10,10 @@
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
  */
+
+use Calendar\Event\Collection;
+
 class Calendar_Api_Composite implements Calendar_Api_EventType_Interface {
 
 	/**
@@ -27,10 +29,10 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface {
 	 * @param $startTimestamp
 	 * @param $endTimestamp
 	 * @internal param $currentDay
-	 * @return Calendar_Event_Collection
+	 * @return Collection
 	 */
 	public function getEvents($startTimestamp, $endTimestamp) {
-		$result = new Calendar_Event_Collection();
+		$result = new Collection();
 
 		foreach($this->getApi() as $currentApi) {
 			$result->merge($currentApi->getEvents($startTimestamp, $endTimestamp));
@@ -47,7 +49,7 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface {
 	 * @return Calendar_Event_Type_Abstract
 	 */
 	public function getEvent($eventId) {
-		$result = new Calendar_Event_Collection();
+		$result = new Collection();
 
 		foreach($this->getApi() as $currentApi) {
 			$result->merge($currentApi->getEvent($eventId));

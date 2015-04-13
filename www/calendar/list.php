@@ -7,6 +7,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Calendar\Event\Collection\Lister;
+
 $userMapper = new \Schoolbox\UserMapper();
 
 /* If three args were provided, assume userId and two dates respectively
@@ -48,13 +51,24 @@ else {
     $finish = new \Alaress_Date_Format(strtotime('+1 month', $start->getUnixTimestamp()), 'U');
 }
 
-$factory = new Calendar_Api_Factory($user);
-$api     = $factory->produce();
+
+$this->setFile(TEMPLATE_content, 'calendar/list.html');
+$this->setBlock(TEMPLATE_content, 'has_no_events', 'has_no_events_block');
+$this->setBlock(TEMPLATE_content, 'date', 'date_block');
+$this->setBlock('date', 'event', 'event_block');
+
+$this->setVar(
+    array(
+        'date_block'          => '',
+        'has_no_events_block' => ''
+    )
+);
 
 $this->setVar(
     array(
         'USER_ID'                   => $user->getId(),
         'USER_TOKEN'                => $user->getKey(),
+        'USER_FULLNAME'             => $user->getFullname(),
         'CALENDAR_PARAMS'           => "{$start->getURLDate()}/{$user->getId()}",
         'SELECTED_START'            => $start->getLocalShort(),
         'SELECTED_FINISH'           => $finish->getLocalShort(),
@@ -63,13 +77,129 @@ $this->setVar(
     )
 );
 
+
+$factory = new Calendar_Api_Factory($user);
+$api     = $factory->produce();
+
 // Extend finish by one day for search
-$calendar = new Calendar_Event_Collection_Lister(
+$calendar = new Lister(
     $api,
     $start->getUnixTimestamp(),
     $finish->addDays(1)->getUnixTimestamp(),
-    $this,
-    $user
+    $user,
+    $this
 );
 
-$calendar->renderAll();
+
+
+
+$lastDate = false;
+
+if ($calendar->getAllEvents()->count()) {
+    foreach ($calendar->getAllEvents() as $currentEvent) {
+        $currentDate = $currentEvent->getStartTime()->getDatabaseDate();
+
+        if ($lastDate && ($lastDate != $currentDate)) {
+            $this->parse('date_block', 'date', true);
+            $this->setVar('event_block', '');
+        }
+
+        $this->setVar('EVENT_DATE', $currentEvent->getStartTime()->getLongDateOnly());
+
+        $this->setVar('TWIG_EVENT', $calendar->renderEvent($currentEvent, 'html'));
+        $this->parse('event_block', 'event', true);
+        $lastDate = $currentDate;
+    }
+    // Parze out blox after last event
+    $this->parse('date_block', 'date', true);
+} else {
+    $this->parse('has_no_events_block', 'has_no_events');
+}
+
+
+$groupHandler  = new Group();
+$category_list = $groupHandler->involvedInCategoryList($user->getId());
+
+$calendarHandler = new Calendar();
+$campus_list     = $calendarHandler->getFilterCampusList($user->getId());
+
+/* Render everything else out
+ */
+// Load sources
+$sourceList = Calendar_Api_Config_Mapper::getInstance()->getSourceListForCalendar();
+// select all types
+$typeList = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findAll();
+if (isset($_SESSION['calendarFilter'])) {
+    $selected['group']      = $_SESSION['calendarFilter']['groups'];
+    $selected['campus']     = $_SESSION['calendarFilter']['campus'];
+    $selected['event_type'] = $_SESSION['calendarFilter']['events'];
+    $selected['source']     = $_SESSION['calendarFilter']['sources'];
+} else {
+    // select all groups
+    if (count($category_list)) {
+        foreach ($category_list as $cat) {
+            $selected['group'][] = $cat['id'];
+        }
+    }
+
+    // select all campuses
+    $selected['campus'] = $_SESSION['campus'];
+
+    foreach ($typeList as $type) {
+        $selected['event_type'][] = $type->getId();
+    }
+
+    // select all sources
+    foreach ($sourceList as $source) {
+        $selected['source'][] = $source['id'];
+    }
+}
+
+$this->dropDown(
+    'export_group',
+    $category_list,
+    array(),
+    TEMPLATE_content,
+    array('name' => 'EXPORT_GROUP_NAME', 'id' => 'EXPORT_GROUP_ID')
+);
+$this->dropDown(
+    'export_campus',
+    $campus_list,
+    array(),
+    TEMPLATE_content,
+    array('CAMPUS_NAME' => 'EXPORT_CAMPUS_NAME', 'CAMPUS_ID' => 'EXPORT_CAMPUS_ID')
+);
+
+$this->checkList(
+    'filter_group',
+    $category_list,
+    $selected['group'],
+    TEMPLATE_content,
+    array('name' => 'GROUP_NAME', 'id' => 'GROUP_ID')
+);
+// Might need special PHPLibs here
+$this->checkList(
+    'filter_source',
+    $sourceList,
+    $selected['source'],
+    TEMPLATE_content,
+    array('name' => 'SOURCE_NAME', 'id' => 'SOURCE_ID')
+);
+$this->checkList(
+    'filter_campus',
+    $campus_list,
+    $selected['campus'],
+    TEMPLATE_content,
+    array('name' => 'CAMPUS_NAME', 'id' => 'CAMPUS_ID')
+);
+$this->checkList(
+    'filter_event_type',
+    $typeList,
+    $selected['event_type'],
+    TEMPLATE_content,
+    array(
+        'type'  => 'EVENT_TYPE_NAME',
+        'id'    => 'EVENT_TYPE_ID',
+        'color' => 'EVENT_TYPE_COLOUR'
+    )
+);

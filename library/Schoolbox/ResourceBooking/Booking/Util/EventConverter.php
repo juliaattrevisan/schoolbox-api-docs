@@ -13,8 +13,7 @@
 
 namespace Schoolbox\ResourceBooking\Booking\Util;
 
-use Alaress_Date_Format;
-use Calendar_Event_Type_ResourceBooking;
+use Calendar\Event\Type\ResourceBooking\Event as ResourceBookingEvent;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\ResourceBooking\Booking;
@@ -34,14 +33,14 @@ class EventConverter {
      * @param Event         $eventItem
      * @param Booking\Model $booking
      *
-     * @return Calendar_Event_Type_ResourceBooking
+     * @return ResourceBookingEvent
      */
     public function convertEventToCalendarEvent(Event $eventItem, Booking\Model $booking) {
 
         /* Translate a \Schoolbox\Event type into a
          * Calendar_Event_Type_Abstract type
          */
-        $event = new \Calendar_Event_Type_ResourceBooking();
+        $event = new ResourceBookingEvent();
         $event->setBooking($booking);
         // Should be able to set owner ID too, but for now that has to be
         // referenced from the booking object.
@@ -56,10 +55,11 @@ class EventConverter {
         $event->setAccess($eventItem->getAccess());
 
         // Set the event's type and color if there's a type for bookings
-        $eventType = $this->getBookingEventType();
-        if ($eventType instanceof EventType) {
-            $event->setType($eventType->getId());
-            $event->setColour($eventType->getColor());
+        if($booking->getStatus()->isApproved()) {
+            $event->setColour('e7f5e0');
+        }
+        if($booking->getStatus()->isPending()) {
+            $event->setColour('ffffe5');
         }
 
         $event->setDetail($booking->getNotes());

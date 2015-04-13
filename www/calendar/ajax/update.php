@@ -1,4 +1,8 @@
 <?php
+
+use Calendar\Event\Type\Day\Renderer\Javascript;
+
+
 /**
  * ${NAME}
  *
@@ -87,15 +91,13 @@ if (isset($_POST['title']) && isset($_POST['detail'])) {
 // Get event back out of the connector, so I know the rendering is consistent
 $owner = UserMapper::getInstance()->createModel()->setId($event['owner']);
 if ($eventId = $calendarHandler->update($updatedEvent)) {
-    ob_start();
     $connector = new Calendar_Api_EventType_Event_Schoolbox_Default($owner, null);
-    $renderer  = new Calendar_Event_Type_Day_Renderer_Javascript(new SitePage());
+
     foreach ($connector->getEvent($eventId) as $calendarEvent) {
-        $renderer->visit($calendarEvent);
+        $renderer  = new Javascript(new SitePage(), $calendarEvent);
+        $output = $renderer->render();
     }
-    // Panel-beat Steve's calendar JSON into shape
-    $jsonList  = json_decode('['.ob_get_clean().'{}]');
-    $jsonEvent = $jsonList[0];
-    echo json_encode($jsonEvent);
+    echo $output;
+
 }
 exit(1);
