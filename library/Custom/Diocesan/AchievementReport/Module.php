@@ -28,7 +28,7 @@ class Module extends BaseModule {
     {
         // All of these URLs relate to the resource ID, not a booking ID.
         // Therefore, they should probably be moved to the item module.
-        $router->addGet('achievementreport.index', $basePath);
+        $router->addGet('achievementreport.schoolGrades', $basePath . '/schoolgrades/{externalUserId}');
     }
 
     /**
@@ -36,11 +36,21 @@ class Module extends BaseModule {
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
-            // Add the booking item to params, if ID is in the route.
-            $matcher->add(
-                '/^achievementreport\.index/',
-                function($params) {
-                    return array(
+        // Add the booking item to params, if ID is in the route.
+        $matcher->add(
+            '/^achievementreport\.schoolGrades/',
+            function($params) {
+                $externalUserHandler = new \External_User();
+                $externalUser = $externalUserHandler->getStudent($params['externalUserId']);
+
+                /* TODO: When selected user doesn't exist
+                 */
+                if (!$externalUser) {
+                    error(2);
+                }
+
+                return array(
+                    'externalUser' => $externalUser
                 );
             }
         );

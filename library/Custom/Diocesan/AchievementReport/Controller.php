@@ -12,13 +12,14 @@ namespace Custom\Diocesan\AchievementReport;
 
 use Alaress\Web\Controller\Base;
 use MSSQL;
+use Alaress_Probe as Probe;
 
 class Controller extends Base {
 
     /**
      * Index
      */
-    public function index() {
+    public function schoolGrades($externalUser) {
         $db = new MSSQL();
 
         $gradeSummaryTable = new SchoolGrades\GradeSummaryTable($db);
@@ -26,7 +27,11 @@ class Controller extends Base {
         $this->getResponse()->content->set(array(
             'template' => '@achievementreport/index.twig',
             'data' => array(
-                'gradeSummaryTable' => $gradeSummaryTable->findData()
+                'gradeSummary' => array(
+                    'externalUser' => $externalUser,
+                    'heading' => $gradeSummaryTable->getHeading(),
+                    'data' => $gradeSummaryTable->findData($externalUser['StudentID'])
+                )
             )
         ));
     }
