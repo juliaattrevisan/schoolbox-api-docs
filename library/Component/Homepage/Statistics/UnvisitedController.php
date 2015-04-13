@@ -27,7 +27,7 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
         }
 
         // is this a class? if it has a class code, then yes
-        if ($code = $this->getContext('code')) {
+        if ($code = $this->getContext()->getCodeString()) {
             $synergeticClass = new External_Class;
             $classList = $synergeticClass->getStudents($code);
 
