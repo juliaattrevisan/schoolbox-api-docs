@@ -31,6 +31,7 @@ class Synchronise_Synergetic_Donvale_Hydrator_Group_Student implements Synchroni
         $year = $externalUser['StudentYearLevel'];
 
         switch ($year) {
+            case 0: return 60;
             case 1: return 59;
 			case 2: return 58;
 			case 3: return 57;
