@@ -15,22 +15,24 @@
     <thead>
         <tr>
             <th>Year</th>
-            <th>S</th>
+            <th>N</th>
             <th>A</th>
             <th>M</th>
             <th>E</th>
             <th>D</th>
+            <th>S</th>
         </tr>
     </thead>
     <tbody>
         {% for year, values in gradeSummary.data %}
         <tr>
             <td>{{ year }}</td>
-            <td>{{ values.S}}</td>
-            <td>{{ values.A}}</td>
-            <td>{{ values.M}}</td>
-            <td>{{ values.E}}</td>
-            <td>{{ values.D}}</td>
+            <td>{{ values.N }}</td>
+            <td>{{ values.A }}</td>
+            <td>{{ values.M }}</td>
+            <td>{{ values.E }}</td>
+            <td>{{ values.D }}</td>
+            <td>{{ values.S }}</td>
         </tr>
         {% endfor %}
     </tbody>
