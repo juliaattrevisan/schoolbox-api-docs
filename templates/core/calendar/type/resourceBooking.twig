@@ -19,6 +19,14 @@
                 Requested by <a href="/search/user/{{ event.authorId }}">{{ event.authorName }}</a>
             {% endif %}
         </div>
+        <ul class="relatedBookings">
+            {% for relatedBooking in event.booking.relatedBookingList %}
+            <li>
+                ({{ relatedBooking.status.name }}) {{ relatedBooking.resource.name }}
+                <a href="{{ routeLookup('resourceItem.read', {id: relatedBooking.item.id}) }}?date={{ event.getURLDate() }}">Review</a>
+            </li>
+            {% endfor %}
+        </ul>
         <div>
             {% if renderer.getEditURL() != '' %}
             <a class="btn float-right modify booking-modify" href="{{ renderer.getEditURL() }}"><span></span>Modify</a>
