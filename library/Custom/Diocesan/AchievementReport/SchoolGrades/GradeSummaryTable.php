@@ -38,6 +38,12 @@ class GradeSummaryTable extends Base {
     protected function setup()
     {
         $this->setYear(date('Y'));
+
+        /* Set heading
+         */
+        $externalUser = $this->getExternalUser();
+
+        $this->setHeading("Grade Summary for {$externalUser['StudentGiven1']} {$externalUser['StudentSurname']}");
     }
 
     /**

@@ -26,6 +26,13 @@ abstract class Base {
     protected $db = null;
 
     /**
+     * An externalUser array
+     *
+     * @var array
+     */
+    protected $externalUser = array();
+
+    /**
      * Table heading
      *
      * @var string
@@ -35,9 +42,11 @@ abstract class Base {
     /**
      * Constructor
      *
+     * @param $externalUser
      * @param MSSQL $db
      */
-    public function __construct(MSSQL $db) {
+    public function __construct($externalUser, MSSQL $db) {
+        $this->setExternalUser($externalUser);
         $this->setDb($db);
 
         $this->setup();
@@ -118,5 +127,25 @@ abstract class Base {
     public function getHeading()
     {
         return $this->heading;
+    }
+
+    /**
+     * Set externalUser
+     *
+     * @param array $externalUser
+     */
+    protected function setExternalUser($externalUser)
+    {
+        $this->externalUser = $externalUser;
+    }
+
+    /**
+     * Get externalUser
+     *
+     * @return array
+     */
+    protected function getExternalUser()
+    {
+        return $this->externalUser;
     }
 }
