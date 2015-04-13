@@ -67,7 +67,7 @@ abstract class Base {
      *
      * @return mixed
      */
-    abstract public function getData();
+    abstract public function findData();
 
     /* Getters/Setters
      */

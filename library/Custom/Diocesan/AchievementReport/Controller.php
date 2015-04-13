@@ -26,7 +26,7 @@ class Controller extends Base {
         $this->getResponse()->content->set(array(
             'template' => '@achievementreport/index.twig',
             'data' => array(
-                'gradeSummaryTable' => $gradeSummaryTable->getData()
+                'gradeSummaryTable' => $gradeSummaryTable->findData()
             )
         ));
     }
