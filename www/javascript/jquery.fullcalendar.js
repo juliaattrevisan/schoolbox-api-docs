@@ -741,13 +741,15 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
 
     // Fill in resauce borking separately
     $('ul.relatedBookings').empty();
-    eventData.relatedBookings.forEach(function(v) {
-        var row = $('<li />').text('('+v.status.name+') '+v.title);
-        if (v.href) {
-            row.append($('<a>Review</a>').attr('href', v.href));
-        }
-        $('ul.relatedBookings').append(row);
-    });
+    if ('relatedBookings' in eventData) {
+        eventData.relatedBookings.forEach(function(v) {
+            var row = $('<li />').text('('+v.status.name+') '+v.title);
+            if (v.href) {
+                row.append($('<a>Review</a>').attr('href', v.href));
+            }
+            $('ul.relatedBookings').append(row);
+        });
+    }
     delete eventData.relatedBookings;
 
     var xPos = mouseEvent.pageX
