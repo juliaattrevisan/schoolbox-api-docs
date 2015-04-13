@@ -25,8 +25,9 @@ try {
     error(2);
 }
 
-
-
+// Am I a student undoing their task completion?
+// I can only undo self-assessable items, all others will have no effect.
+$isUndo = isset($this->arg[1]) && $this->arg[1] == 'undo';
 
 // Check permissions
 /** @var UnitInstance $unit_instance */
@@ -72,8 +73,17 @@ switch ($task->getType()) {
         // Redirect to the link if there is one, otherwise redirect back to the
         // homepage this is on.
         if (!$task->getRequiresConfirmation()) {
+            if ($isUndo) {
+                Task\InstanceCompletionMapper::getInstance()->unmarkAsCompleted(
+                    $task->getId(),
+                    $_SESSION['id']
+                );
+                SitePage::localRedir('/homepage/'.$component->getIdentifier().'/');
+                exit;
+            }
             Task\InstanceCompletionMapper::getInstance()->markAsCompleted(
-                $task->getId(), $_SESSION['id']
+                $task->getId(),
+                $_SESSION['id']
             );
         }
 

@@ -72,6 +72,21 @@ class InstanceCompletionMapper extends Mapper {
     }
 
     /**
+     * Unsets this task instance as having been completed by the student.
+     *
+     * Only tasks set to self assessment may be marked as completed by the student
+     *
+     * @param int $task_instance_id
+     * @param int $student_id
+     *
+     * @return array
+     */
+    public function unmarkAsCompleted($task_instance_id, $student_id)
+    {
+        return $this->mark($task_instance_id, $student_id, InstanceCompletion::COMPLETION_STATUS_INCOMPLETE);
+    }
+
+    /**
      * Sets this task instance as having been completed by the student.
      *
      * Only tasks set to self assessment may be marked as completed by the student
@@ -81,32 +96,45 @@ class InstanceCompletionMapper extends Mapper {
      *
      * @return array
      */
-    public function markAsCompleted($task_instance_id, $student_id) {
+    public function markAsCompleted($task_instance_id, $student_id)
+    {
+        return $this->mark($task_instance_id, $student_id, InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION);
+    }
 
-        // Is there already a completion record for this item? If so, don't
-        // create a new one.
-        $existing = $this->findByColumnList(
-            array(
-                'task_instance_id' => $task_instance_id,
-                'student_id'       => $student_id,
-            ),
-            array('limit' => 1)
-        );
-        if (count($existing) > 0) {
-            return array();
+    /**
+     * Internal method used by unmarkAsCompleted and markAsCompleted.
+     *
+     * @param int $task_instance_id
+     * @param int $student_id
+     * @param int $status
+     *
+     * @return array
+     */
+    protected function mark($task_instance_id, $student_id, $status)
+    {
+        // What's the most recent completion record?
+        // Don't create a new one if it's the same status as the one I want to create.
+        try {
+            $existing = $this->findOneByColumnList(
+                array(
+                    'task_instance_id' => $task_instance_id,
+                    'student_id'       => $student_id,
+                ),
+                array('completion_date' => 'desc')
+            );
+            if ($existing->getCompletionStatus() == $status) {
+                return array();
+            }
+        } catch (Mapper\Exception $e) {
+            // no existing completion. Continue
         }
-
-
-        // Get the related task instance (should it have been passed?) for the
-        // completion status to set.
-        //$task_instance = $this->getJoinMapper('task_instance')->findById($task_instance_id);
 
         $model = new InstanceCompletion();
         $model
             ->setTaskInstance($task_instance_id)
             ->setStudent($student_id)
             ->setCompletionDate(new \Alaress_Date_Format(new \DateTime('now')))
-            ->setCompletionStatus(InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION)
+            ->setCompletionStatus($status)
         ;
         return $this->save($model);
     }
