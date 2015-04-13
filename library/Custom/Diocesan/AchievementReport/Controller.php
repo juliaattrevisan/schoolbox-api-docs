@@ -23,11 +23,11 @@ class Controller extends Base {
 
         $gradeSummaryTable = new SchoolGrades\GradeSummaryTable($db);
 
-        $this->getResponse()->content->set([
+        $this->getResponse()->content->set(array(
             'template' => '@achievementreport/index.twig',
-            'data' => [
+            'data' => array(
                 'gradeSummaryTable' => $gradeSummaryTable->getData()
-            ]
-        ]);
+            )
+        ));
     }
 } 
