@@ -45,8 +45,8 @@ class Javascript extends Base
 //        }
 
         // Show booking butonyes I have permission to view
+        /** @var Booking\Model $booking */
         $booking        = $this->getEvent()->getBooking();
-        $bookingId      = $booking->getId();
         $bookingButtons = array();
 
         // Modify butonye
@@ -91,7 +91,7 @@ class Javascript extends Base
 
         // Related booking display
         $relatedBookings = [];
-        foreach ($currentEvent->getBooking()->getRelatedBookingList() as $relatedBooking) {
+        foreach ($booking->getRelatedBookingList() as $relatedBooking) {
             $reviewHref = $this->getRouteIfAuthorized(
                 'resourceItem.read',
                 ['id' => $relatedBooking->getResource()->getId()]
