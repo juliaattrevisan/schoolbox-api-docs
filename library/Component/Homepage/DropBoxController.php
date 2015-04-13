@@ -1,4 +1,5 @@
 <?php
+use Schoolbox\Collection;
 
 /**
  *
@@ -10,10 +11,7 @@
 class Component_Homepage_DropBoxController extends Component_Homepage_ControllerAbstract
 {
 
-    /**
-     * @var AllowedFile
-     */
-    private $allowedFileHandler;
+
 
     /**
      * Prepares data for the render function. Business logic.
@@ -22,7 +20,7 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
      */
     public function execute()
     {
-        $this->allowedFileHandler = new AllowedFile();
+
     }
 
     /**
@@ -63,21 +61,19 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
             $this->setVar('drop_staff_block', '');
         } else {
             $this->setVar('drop_student_block', '');
-            $dropbox     = new Dropbox;
-            $fileList    = $dropbox->getFileList($this->getContext()->getId());
-            $userHandler = new User();
 
-            if (is_array($fileList)) {
+            /** @var Collection|Schoolbox\Dropbox\Model[] $fileList */
+            $fileList = Schoolbox\Dropbox\Mapper::getInstance()->findByColumn('category', $this->getContext()->getId());
+
+            if ($fileList->count()) {
                 $j = 0;
                 foreach ($fileList as $file) {
-                    $date = new Alaress_Date_Format($file['subdate'], 'Y-m-d H:i:s');
-
                     $output = array(
-                        'DROPBOX_MIME_IMAGE'  => $this->allowedFileHandler->getClass($file["iconFile"]),
-                        'DROPBOX_DESCRIPTION' => Scrub::text($file['description']),
-                        'DROPBOX_ID'          => $file['id'],
-                        'DROP_SUBMITTED_BY'   => "<a href=\"/search/user/{$file['uid']}\">" . $userHandler->formatName($file) . '</a>',
-                        'DROP_SUBMITTED_TIME' => $date->getShort(),
+                        'DROPBOX_MIME_IMAGE'  => $file->getStorage()->getMimetype()->getClass(),
+                        'DROPBOX_DESCRIPTION' => Scrub::text($file->getTitle()),
+                        'DROPBOX_ID'          => $file->getId(),
+                        'DROP_SUBMITTED_BY'   => sprintf('<a href="/search/user/%s">%s</a>', $file->getOwner()->getId(), $file->getOwner()->formatName()),
+                        'DROP_SUBMITTED_TIME' => $file->getCreatedAt()->getShort(),
                         'ON_OFF'              => ++$j % 2 ? '' : 'dark',
                     );
                     $this->setVar($output);

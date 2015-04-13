@@ -1,29 +1,85 @@
 <?php
 
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource;
+
 require_once '../../include/Bootstrap.php';
 
-$dropbox = new Dropbox();
+$dropbox = Schoolbox\Dropbox\Mapper::getInstance();
 $page    = new SitePage();
 $page->setAjax(true);
 
 if (is_numeric($_GET['delete'])) {
-    $cid = $dropbox->deleteFile($_GET['delete']);
+    try {
+        $file = $dropbox->findById($_GET['delete']);
+        $cid  = $file->getFolder()->getId();
+
+        $dropbox->delete($file);
+
+    } catch (Schoolbox\Mapper\Exception $e) {
+        error(43);
+        exit;
+    }
     $page->localRedir("/homepage/$cid");
 
 } elseif (is_numeric($_GET['id'])) {
-    $dropbox->outputFile($_GET['id'], $_GET['save']);
+    try {
+        $file = $dropbox->findById($_GET['id']);
+
+        // TODO: replace with UAM once merged with SB-7185
+        $g = new Group();
+        $access = $g->getPermission($file->getFolder()->getId());
+        if ($access < UserAccess::ACCESS_WRITE) {
+            error(5);
+        }
+        if (!$dropbox->folderHasDropbox($file->getFolder())) {
+            error(5);
+        }
+
+        $attach = $_GET['save'] ? 'attachment;' : '';
+
+        //send headers
+        header("Content-Type: {$file->getStorage()->getMimetype()->getMime()}");
+        header("Content-Disposition: $attach filename=\"" . $file->getFilename() . "\"");
+        header("Content-Length: " . $file->getStorage()->getSize());
+
+        fpassthru($file->getStorage()->readStream());
+        exit;
+
+    } catch (Schoolbox\Mapper\Exception $e) {
+        error(5);
+        exit;
+    }
 
 } elseif (is_numeric($_POST['category']) && $_POST['description'] && is_array($_POST['attachment'])) {
-    // this is a bit roundabout, but this is really the only way to store this file without entirely rewriting the dropbox handler
+
+    // TODO replace with UAM once merged with SB-7185
+    $g = new Group();
+    $access = $g->getPermission($_POST['category']);
+    $folder = Resource\Folder\Mapper::getInstance()->createModel()->setId($_POST['category']);
+    if ($access < UserAccess::ACCESS_READ) {
+        error(5);
+    }
+    if (!$dropbox->folderHasDropbox($folder)) {
+        error(5);
+    }
+
     $factory = new \Schoolbox\Resource\Attachment\Collector\CollectorFactory();
 
     try {
-        /** @var \Schoolbox\Storage $storage */
+        /** @var Resource\Storage\Model $storage */
         $storage = $factory->build($_POST['attachment'])->getFirst();
 
-        if ($fileId = $dropbox->addFile($storage->getFilename(), $storage->getMime(), $storage->getFileLocation(), $_POST['description'], $_POST['category'])) {
-            $_SESSION['dropSuccess'] = 1;
-        }
+        $file = $dropbox->createModel()
+                        ->setOwner($_SESSION['user'])
+                        ->setStorage($storage)
+                        ->setTitle($_POST['description'])
+                        ->setFolder($folder)
+                        ->setFilename($storage->getHash() . '.' . $storage->getExtension());
+
+        $dropbox->create($file);
+
+        $_SESSION['dropSuccess'] = 1;
 
     } catch (\Schoolbox\Resource\Exception $e) {
         error(43);
