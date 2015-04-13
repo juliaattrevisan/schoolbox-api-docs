@@ -29,16 +29,8 @@ class GradeSummaryTable extends Base {
      * Obtain data
      */
     private function findData() {
-        $query = "
-            SELECT *
-            FROM uvSchoolBoxSchoolGradesResults
-            GROUP BY StudentYearLevel, StrippedResult
-            ORDER BY StudentYearLevel DESC
-        ";
+        $this->debug();
 
-        $stuff = $this->getDb()->getAll($query);
-
-        new Probe($stuff);
     }
 
     /**
@@ -48,7 +40,6 @@ class GradeSummaryTable extends Base {
      */
     public function getData()
     {
-        // TODO: Implement getData() method.
-        return 'output of getData()';
+        return $this->findData();
     }
 }

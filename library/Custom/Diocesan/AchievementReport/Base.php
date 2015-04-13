@@ -14,6 +14,7 @@
 namespace Custom\Diocesan\AchievementReport;
 
 use MSSQL;
+use Alaress_Probe as Probe;
 
 abstract class Base {
 
@@ -33,6 +34,25 @@ abstract class Base {
         $this->setDb($db);
 
         $this->setup();
+    }
+
+    /**
+     * Get a list of all the views with 'uv' as a prefix
+     */
+    protected function debug() {
+        $query = "
+            SELECT TABLE_CATALOG,
+            TABLE_SCHEMA,
+            TABLE_NAME,
+            TABLE_TYPE
+            FROM INFORMATION_SCHEMA.TABLES
+            WHERE TABLE_NAME LIKE 'uv%'
+            AND TABLE_TYPE = 'VIEW'
+        ";
+
+        $stuff = $this->getDb()->getAll($query);
+
+        new Probe($stuff);
     }
 
     /**
