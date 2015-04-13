@@ -130,7 +130,7 @@ class Eportfolio_Authenticator
                         'page_id' => $this->getPageId(),
                     )
                 );
-                if ($exists && ($exists->getDeletedAt() == null)) {
+                if ($exists && !$exists->isDeleted()) {
                     return true;
                 }
             } catch (Schoolbox\Mapper\Exception $e) {

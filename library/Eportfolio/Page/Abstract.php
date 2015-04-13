@@ -178,7 +178,7 @@ abstract class Eportfolio_Page_Abstract {
 		if ($allPages->count()) {
 			foreach ($allPages as $currentPage) {
 				/** @var Eportfolio\Page $currentPage */
-				if ($currentPage->getDeletedAt() == null) {
+				if (!$currentPage->isDeleted()) {
 					$this->getPage()->setVar(array(
 						'EPORTFOLIO_PAGE_ID' => $currentPage->getPageId(),
 						'EPORTFOLIO_PAGE_NAME' => $currentPage->getPageTitle(),
