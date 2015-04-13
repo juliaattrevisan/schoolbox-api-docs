@@ -78,13 +78,10 @@ class GradeSummaryTable extends Base {
 
         /* Rearrange everything into a nice order
          */
-        $finalStack = new Collection();
+        $finalStack = array();
 
         foreach ($allRecords as $currentRecord) {
-            $newRecord = array();
-            $newRecord[$currentRecord['StudentYearLevel']][$currentRecord['StrippedResult']] = $currentRecord['num'];
-
-            $finalStack->add($newRecord);
+            $finalStack[$currentRecord['StudentYearLevel']][$currentRecord['StrippedResult']] = $currentRecord['num'];
         }
 
         new Probe($schema, $allRecords, $finalStack);
