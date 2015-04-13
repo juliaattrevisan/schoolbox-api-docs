@@ -50,10 +50,15 @@ class GradeSummaryTable extends Base {
      * Obtain data
      */
     public function findData($externalUserId) {
-        new Probe($this->getDb()->getAll("SELECT TOP 2 * FROM  SynergyOne.dbo.uvSchoolBoxSchoolGradeResults"));
+        $explorer = $this->getDb()->getAll("SELECT TOP 2 * FROM  SynergyOne.dbo.uvSchoolBoxSchoolGradeResults");
 
         $allEnteredGradesCurrentYear = $this->findEnteredGradesCurrentYear($externalUserId);
         $allEnteredGradesPreviousYear = $this->findEnteredGradesPreviousYear($externalUserId);
+
+        $N = $this->findLetter($externalUserId, 'N');
+        $A = $this->findLetter($externalUserId, 'A');
+        $M = $this->findLetter($externalUserId, 'M');
+        $E = $this->findLetter($externalUserId, 'E');
 
         /* Rearrange everything into a nice order
          */
@@ -71,7 +76,18 @@ class GradeSummaryTable extends Base {
             $finalStack[$current['StudentYearLevel']]['enteredGrades'] += $current['num'];
         }
 
-        new Probe($allEnteredGradesCurrentYear, $allEnteredGradesPreviousYear, $finalStack);
+        /* And for all the letters
+         */
+        $allLetters = array($N, $A, $M, $E);
+
+        foreach ($allLetters as $currentLetter) {
+            foreach ($currentLetter as $current) {
+                $finalStack[$current['StudentYearLevel']]['letters'][$current['StrippedResult']] += $current['num'];
+            }
+        }
+
+        new Probe($N, $A, $M, $E, $finalStack);
+//        new Probe($allEnteredGradesCurrentYear, $allEnteredGradesPreviousYear, $finalStack);
 
         return $finalStack;
     }
@@ -122,6 +138,34 @@ class GradeSummaryTable extends Base {
             WHERE ID = '{$externalUserId}'
             AND classyear < '{$this->getYear()}'
             AND Result != ''
+            GROUP BY (classcode + AssessAreaHeading), StudentYearLevel, StrippedResult
+            ORDER BY StudentYearLevel DESC, StrippedResult DESC
+        ";
+
+        return $this->getDb()->getAll($query);
+    }
+
+    /**
+     * Find letters.
+     *
+     * N/A/M/E all have definitions, but what is D and S?
+     *
+     * @param $externalUserId
+     * @param $letter
+     * @return array|bool
+     */
+    private function findLetter($externalUserId, $letter) {
+        $letter = strtoupper($letter);
+
+        $query = "
+            SELECT DISTINCT (classcode + AssessAreaHeading),
+                StudentYearLevel,
+                StrippedResult,
+                COUNT(StrippedResult) AS num
+            FROM
+                SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
+            WHERE ID = '{$externalUserId}'
+            AND StrippedResult = '{$letter}'
             GROUP BY (classcode + AssessAreaHeading), StudentYearLevel, StrippedResult
             ORDER BY StudentYearLevel DESC, StrippedResult DESC
         ";
