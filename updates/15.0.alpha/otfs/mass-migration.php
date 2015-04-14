@@ -36,6 +36,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
         new Resource\File\Migration(),
         new Resource\My\File\Migration(),
         new SubmissionBox\Submission\Migration(),
+        new SubmissionBox\ReturnedWork\Migration(),
         new Schoolbox\Dropbox\Migration(),
     ];
 
