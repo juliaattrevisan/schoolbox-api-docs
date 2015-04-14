@@ -86,7 +86,7 @@ class YearlyBreakdownTable extends Base {
             }
         }
 
-        //new \Alaress_Probe($explorer, $allEnteredGradesCurrentYear, $allEnteredGradesPreviousYear, $finalStack);
+        new \Alaress_Probe($explorer, $allEnteredGradesCurrentYear, $allEnteredGradesPreviousYear, $finalStack);
 
         return $finalStack;
     }

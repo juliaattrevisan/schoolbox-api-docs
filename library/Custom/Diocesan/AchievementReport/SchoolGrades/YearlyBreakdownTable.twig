@@ -1,1 +1,29 @@
-Yearly Breakdown
+{% for year, allCourses in yearlyBreakdown.data %}
+    <h2>{{ yearlyBreakdown.heading }} {{ year }}</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Course</th>
+                <th>Entered Grades</th>
+                <th>N</th>
+                <th>A</th>
+                <th>M</th>
+                <th>E</th>
+                <th>Available</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for courseName, data in allCourses %}
+            <tr>
+                <td>{{ courseName }}</td>
+                <td>{{ data.enteredGrades }}</td>
+                <td>{{ data.letters.N }}</td>
+                <td>{{ data.letters.A }}</td>
+                <td>{{ data.letters.M }}</td>
+                <td>{{ data.letters.E }}</td>
+                <td>{{ data.availableGrades }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endfor %}
