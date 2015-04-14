@@ -1,4 +1,10 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    <script type='text/javascript' src='/javascript/preview/preview.js'></script>
+    <script type="text/javascript">
+        $(function() {
+            $('[data-plugin="preview"]').preview();
+        });
+    </script>
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
 
@@ -17,7 +23,7 @@
 
                     <!-- BEGIN file_url -->
                     <h4>
-                        <a class="icons {HIDDEN} {FILE_MIME_IMAGE}" href="{FILE_URL}" rel="external">{FILE_DESCRIPTION}</a>
+                        <a data-plugin="preview" class="icons {HIDDEN} {FILE_MIME_IMAGE}" href="{FILE_URL}" rel="external">{FILE_DESCRIPTION}</a>
                     </h4>
                     <!-- END file_url -->
 

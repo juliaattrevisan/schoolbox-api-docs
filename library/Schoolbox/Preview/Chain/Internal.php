@@ -16,9 +16,8 @@ use Schoolbox\Preview\Chain\Strategy\Internal\Image;
 use Schoolbox\Preview\Chain\Strategy\Internal\Media;
 use Schoolbox\Preview\Chain\Strategy\Internal\IFrame;
 use Schoolbox\Preview\Chain\Strategy\Internal\Redirect;
+use Schoolbox\Resource\FileMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\Resource\Storage\Model as StorageModel;
-use Schoolbox\File\Mimetype;
 
 class Internal extends Base {
 
@@ -33,7 +32,20 @@ class Internal extends Base {
          * how to display it (or redirect, if it can't be displayed)
          */
         if ($hash = $this->isStorage($url)) {
-            $this->processStorage($url, $hash);
+            try {
+                $item = StorageMapper::getInstance()->findByHash($hash);
+                $this->processStorage($url, $item);
+            } catch (\Schoolbox\Mapper\Exception $e ) {
+                //noop
+            }
+        }
+        else if($id = $this->isSend($url)) {
+            try {
+                $item = FileMapper::getInstance()->findById($id);
+                $this->processStorage($url, $item);
+            } catch (\Schoolbox\Mapper\Exception $e ) {
+                //noop
+            }
         }
         /* Just redirect straight there
          */
@@ -48,7 +60,7 @@ class Internal extends Base {
      * Get the hash out of a storage url
      *
      * @param $url
-     * @return bool
+     * @return string
      */
     private function isStorage($url) {
         $hash = false;
@@ -63,25 +75,29 @@ class Internal extends Base {
     }
 
     /**
+     * Get the id from a send URL
+     *
+     * @param $url
+     * @return string
+     */
+    private function isSend($url) {
+        preg_match('/send.php\?id=([0-9]+)/i', $url, $matches);
+
+        if (count($matches)) {
+            $id = $matches[1];
+        }
+
+        return $id;
+    }
+
+
+    /**
      * Process Storage file analysis
      *
      * @param $url
-     * @param $hash
+     * @param $item
      */
-    private function processStorage($url, $hash) {
-        $storageMapper = new StorageMapper();
-
-        try {
-            $item = $storageMapper->findByHash($hash);
-        }
-        catch (\Exception $e) {
-
-            /* A default stub object, for interface compatibility
-             */
-            $item = new StorageModel();
-            $item->setMimetype(new Mimetype());
-        }
-
+    private function processStorage($url, $item) {
         $this->start([
             new Image($url, $item),
             new Media($url, $item),

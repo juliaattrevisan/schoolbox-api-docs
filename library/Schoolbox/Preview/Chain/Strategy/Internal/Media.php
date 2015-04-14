@@ -18,13 +18,27 @@ class Media extends Base {
      * @return mixed
      */
     public function test() {
+
+        if($this->getItem() instanceof \Schoolbox\Resource\File\Model) {
+            $type = 'sbfs';
+            $id = $this->getItem()->getId();
+        }
+        else if($this->getItem() instanceof \Schoolbox\Storage) {
+            $type = 'storage';
+            $id = $this->getItem()->getHash();
+        }
+        else {
+            return $this->testNext();
+        }
+
         if ($this->getItem()->getMimetype()->isVideo()) {
             return [
                 'type' => 'html-fragment',
                 'twig' => [
                     'template' => '@preview/Strategy/Internal/Video.twig',
                     'data' => [
-                        'hash' => $this->getItem()->getHash()
+                        'type' => $type,
+                        'hash' => $id
                     ]
                 ]
             ];
@@ -35,7 +49,8 @@ class Media extends Base {
                 'twig' => [
                     'template' => '@preview/Strategy/Internal/Audio.twig',
                     'data' => [
-                        'hash' => $this->getItem()->getHash()
+                        'type' => $type,
+                        'hash' => $id
                     ]
                 ]
             ];
