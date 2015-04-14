@@ -24,6 +24,7 @@ if (is_numeric($this->arg[0])) {
         $this->setBlock(TEMPLATE_content, "eportfolio", "eportfolio_block");
         $this->setBlock(TEMPLATE_content, "boarder_leave", "boarder_leave_block");
         $this->setBlock(TEMPLATE_content, 'user_calendar', 'user_calendar_block');
+        $this->setBlock(TEMPLATE_content, 'pastoral_care', 'pastoral_care_block');
         $this->setBlock(TEMPLATE_content, 'modify', 'modify_block');
         $this->setBlock(TEMPLATE_content, "student_synergy_form", "student_synergy_form_block");
         $this->setBlock(TEMPLATE_content, "student_synergy_tutor", "student_synergy_tutor_block");
@@ -88,7 +89,8 @@ if (is_numeric($this->arg[0])) {
         'staff_synergy_block'         => '',
         'group_block'                 => '',
         'group_row_block'             => '',
-        'user_calendar_block'         => ''
+        'user_calendar_block'         => '',
+        'pastoral_care_block'         => '',
 
     );
 
@@ -233,6 +235,12 @@ if (is_numeric($this->arg[0])) {
                         $this->setVar('grades_button_block', '');
                     } else {
                         $this->parse('grades_button_block', 'grades_button');
+                    }
+
+                    // Show pastoral care link to Synergetic
+                    if($groupHandler->isStaff() && Config::get('external_type') == 'synergetic' && Config::get('external_staff_portal') ) {
+                        $this->setVar('SYNWEB_URL', Config::get('external_staff_portal'));
+                        $this->parse('pastoral_care_block', 'pastoral_care');
                     }
 
                     $synInfo = $synUserHandler->getStudent($user['synergy_id']);
