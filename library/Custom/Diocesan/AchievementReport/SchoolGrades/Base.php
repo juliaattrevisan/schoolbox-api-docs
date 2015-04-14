@@ -37,16 +37,28 @@ abstract class Base extends AchievementReportBase {
      */
     protected function findEnteredGradesCurrentYear($externalUserId) {
         $query = "
-            SELECT DISTINCT (classcode + ' ' + AssessAreaHeading),
+            SELECT DISTINCT
+                (classcode + ' ' + AssessAreaHeading),
+                classcode,
+                AssessAreaHeading,
+                CourseName,
                 StudentYearLevel,
                 StrippedResult,
                 Fileyear,
+                CourseName,
                 COUNT(StrippedResult) AS num
             FROM
                 SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
             WHERE ID = '{$externalUserId}'
             AND classyear = '{$this->getYear()}'
-            GROUP BY (classcode + ' ' + AssessAreaHeading), StudentYearLevel, StrippedResult, Fileyear
+            GROUP BY
+                (classcode + ' ' + AssessAreaHeading),
+                classcode,
+                AssessAreaHeading,
+                CourseName,
+                StudentYearLevel,
+                StrippedResult,
+                Fileyear
             ORDER BY StudentYearLevel DESC, StrippedResult DESC
         ";
 
@@ -66,7 +78,11 @@ abstract class Base extends AchievementReportBase {
      */
     protected function findEnteredGradesPreviousYear($externalUserId) {
         $query = "
-            SELECT DISTINCT (classcode + ' ' + AssessAreaHeading),
+            SELECT DISTINCT
+                (classcode + ' ' + AssessAreaHeading),
+                classcode,
+                AssessAreaHeading,
+                CourseName,
                 StudentYearLevel,
                 StrippedResult,
                 Fileyear,
@@ -76,7 +92,14 @@ abstract class Base extends AchievementReportBase {
             WHERE ID = '{$externalUserId}'
             AND classyear < '{$this->getYear()}'
             AND Result != ''
-            GROUP BY (classcode + ' ' + AssessAreaHeading), StudentYearLevel, StrippedResult, Fileyear
+            GROUP BY
+                (classcode + ' ' + AssessAreaHeading),
+                classcode,
+                AssessAreaHeading,
+                CourseName,
+                StudentYearLevel,
+                StrippedResult,
+                Fileyear
             ORDER BY StudentYearLevel DESC, StrippedResult DESC
         ";
 
