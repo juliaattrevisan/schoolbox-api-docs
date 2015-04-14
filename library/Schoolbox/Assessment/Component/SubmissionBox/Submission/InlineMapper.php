@@ -101,6 +101,7 @@ class InlineMapper extends AbstractMapper
             LEFT JOIN {$box_join->getJoinSql('category', 'sb', 'c')}
             WHERE sb.category IN {$box_join->getArrayPlaceholders($categories, 'category')}
             AND ss.owner = :user_id
+            AND ss.body IS NOT NULL
             AND ss.draft IS FALSE
             ORDER BY ss.submitted DESC
             LIMIT :limit
