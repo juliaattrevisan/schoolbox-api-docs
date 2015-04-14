@@ -5,7 +5,8 @@
 /** @var \Schoolbox\Application\WebRequest\Kernel $kernel */
 $kernel = require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
-$page         = new SitePage();
+$page = new SitePage();
+$page->setDi($kernel->getDependencyInjector());
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
 if (is_numeric($_REQUEST['cid'])) {
@@ -84,10 +85,7 @@ if (is_numeric($_REQUEST['cid'])) {
             $instanceID = $_POST['reload'];
         }
 
-        // get the Instance's Definition's Controller
-        $componentSitepage = new SitePage(false);
-        $componentSitepage->setDi($kernel->getDependencyInjector());
-        $factory = new Component_Homepage_Factory(new \Schoolbox\User(), $componentSitepage);
+        $factory = new Component_Homepage_Factory(new \Schoolbox\User(), $page);
 
         // $component instanceof Component_ControllerAbstract
         $componentList = $componentInstanceMapper->findByInstanceId($instanceID);
