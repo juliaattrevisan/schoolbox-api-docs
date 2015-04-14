@@ -55,7 +55,8 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
 
 
 
-        $this->setVar('CALENDAR_TITLE', 'Campus Calendar');
+        $this->setVar(array('CALENDAR_TITLE' => 'Campus Calendar',
+                            'LIST_DATE'      => '',));
 
         if($this->getConfig('size') > 0) {
             $days = $this->getConfig('size');

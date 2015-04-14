@@ -41,6 +41,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
             array(
                 'CALENDAR_PREFIX' => 'group',
                 'USER_TOKEN'      => $_SESSION['key'],
+                'LIST_DATE'       => '',
                 'group_events_block'=> '',
             )
         );
