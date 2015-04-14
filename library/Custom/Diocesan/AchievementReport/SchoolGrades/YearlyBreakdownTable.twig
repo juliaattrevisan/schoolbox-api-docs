@@ -31,39 +31,39 @@
         <thead>
             <tr>
                 <th>Course</th>
-                <th>Entered Grades</th>
-                <th>N</th>
-                <th>A</th>
-                <th>M</th>
-                <th>E</th>
-                <th>Achieved?</th>
-                <th>Available</th>
+                <th class="numeric">Entered Grades</th>
+                <th class="letter">N</th>
+                <th class="letter">A</th>
+                <th class="letter">M</th>
+                <th class="letter">E</th>
+                <th class="numeric">Achieved?</th>
+                <th class="numeric">Available</th>
             </tr>
         </thead>
         <tbody>
             {% for courseName, yearlyValues in allCourses %}
             <tr>
                 <td>{{ courseName }}</td>
-                <td>{{ yearlyValues.enteredGrades }}</td>
-                <td>{{ yearlyValues.letters.N }}</td>
-                <td>{{ yearlyValues.letters.A }}</td>
-                <td>{{ yearlyValues.letters.M }}</td>
-                <td>{{ yearlyValues.letters.E }}</td>
-                <td>?</td>
-                <td>{{ yearlyValues.availableGrades }}</td>
+                <td class="numeric">{{ yearlyValues.enteredGrades }}</td>
+                <td class="letter">{{ yearlyValues.letters.N }}</td>
+                <td class="letter">{{ yearlyValues.letters.A }}</td>
+                <td class="letter">{{ yearlyValues.letters.M }}</td>
+                <td class="letter">{{ yearlyValues.letters.E }}</td>
+                <td class="numeric">?</td>
+                <td class="numeric">{{ yearlyValues.availableGrades }}</td>
             </tr>
             {% endfor %}
         </tbody>
         <tfoot>
             <tr>
                 <td></td>
-                <td>{{ yearlyBreakdown.data.totals[year].enteredGrades }}</td>
-                <td>{{ yearlyBreakdown.data.totals[year].letters.N }}</td>
-                <td>{{ yearlyBreakdown.data.totals[year].letters.A }}</td>
-                <td>{{ yearlyBreakdown.data.totals[year].letters.M }}</td>
-                <td>{{ yearlyBreakdown.data.totals[year].letters.E }}</td>
-                <td>?</td>
-                <td>{{ yearlyBreakdown.data.totals[year].availableGrades }}</td>
+                <td class="numeric">{{ yearlyBreakdown.data.totals[year].enteredGrades }}</td>
+                <td class="letter">{{ yearlyBreakdown.data.totals[year].letters.N }}</td>
+                <td class="letter">{{ yearlyBreakdown.data.totals[year].letters.A }}</td>
+                <td class="letter">{{ yearlyBreakdown.data.totals[year].letters.M }}</td>
+                <td class="letter">{{ yearlyBreakdown.data.totals[year].letters.E }}</td>
+                <td class="numeric">?</td>
+                <td class="numeric">{{ yearlyBreakdown.data.totals[year].availableGrades }}</td>
             </tr>
         </tfoot>
     </table>

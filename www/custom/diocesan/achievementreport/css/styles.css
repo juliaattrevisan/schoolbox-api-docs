@@ -1,9 +1,29 @@
 .achievement-report table {
+    width: 100%;
     border-collapse: collapse;
 }
 
-.achievement-report table, td, th {
-    border: 1px dashed #f00;
-    padding: 20px;
+.achievement-report table, th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
     text-align: left;
+}
+
+.achievement-report tfoot td {
+    border-top: 3px solid #ddd;
+    font-style: italic;
+}
+
+.achievement-report th.letter,
+.achievement-report td.letter
+{
+    width: 40px;
+    text-align: right;
+}
+
+.achievement-report th.numeric,
+.achievement-report td.numeric
+{
+    width: 90px;
+    text-align: right;
 }
