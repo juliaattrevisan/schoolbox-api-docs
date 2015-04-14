@@ -25,35 +25,33 @@
     });
 </script>
 
-<div class="achievement-report">
-    <h2>{{ gradeSummary.heading }}</h2>
+<h2>{{ gradeSummary.heading }}</h2>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Year</th>
-                <th>Entered Grades</th>
-                <th>N</th>
-                <th>A</th>
-                <th>M</th>
-                <th>E</th>
-                <th>Available Grades</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for year, values in gradeSummary.data %}
-            <tr>
-                <td>{{ year }}</td>
-                <td>{{ values.enteredGrades }}</td>
-                <td>{{ values.letters.N }}</td>
-                <td>{{ values.letters.A }}</td>
-                <td>{{ values.letters.M }}</td>
-                <td>{{ values.letters.E }}</td>
-                <td>{{ values.availableGrades }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<table>
+    <thead>
+        <tr>
+            <th>Year</th>
+            <th>Entered Grades</th>
+            <th>N</th>
+            <th>A</th>
+            <th>M</th>
+            <th>E</th>
+            <th>Available Grades</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for year, values in gradeSummary.data %}
+        <tr>
+            <td>{{ year }}</td>
+            <td>{{ values.enteredGrades }}</td>
+            <td>{{ values.letters.N }}</td>
+            <td>{{ values.letters.A }}</td>
+            <td>{{ values.letters.M }}</td>
+            <td>{{ values.letters.E }}</td>
+            <td>{{ values.availableGrades }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
-    <div data-graph="resultSummary"></div>
-</div>
+<div data-graph="resultSummary"></div>
