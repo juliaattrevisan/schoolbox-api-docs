@@ -101,8 +101,11 @@ class GradeSummaryTable extends Base {
             }
         }
 
-        new Probe($finalStack);
-//        new Probe($allEnteredGradesCurrentYear, $allEnteredGradesPreviousYear, $finalStack);
+        /* Available Grades
+         */
+        foreach($finalStack as $currentYear => $data) {
+            $finalStack[$currentYear]['availableGrades'] = $data['enteredGrades'] - array_sum($data['letters']);
+        }
 
         return $finalStack;
     }
