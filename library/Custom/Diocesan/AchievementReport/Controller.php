@@ -21,8 +21,9 @@ class Controller extends Base {
      */
     public function schoolGrades($externalUser, $year) {
         $db = new MSSQL();
-var_dump($year);
+
         $gradeSummaryTable = new SchoolGrades\GradeSummaryTable($externalUser, $db);
+        $yearlyBreakdownTable = new SchoolGrades\YearlyBreakdownTable($externalUser, $db);
 
         $this->getResponse()->content->set(array(
             'template' => '@achievementreport/index.twig',
@@ -35,7 +36,10 @@ var_dump($year);
                     'columns' => array_merge($gradeSummaryTable->getLetterRegistry(), array('availableGrades'))
                 ),
 
-
+                'yearlyBreakdown' => array(
+                    'heading' => $yearlyBreakdownTable->getHeading(),
+                    'data' => $yearlyBreakdownTable->findData($externalUser['StudentID']),
+                )
             )
         ));
     }
