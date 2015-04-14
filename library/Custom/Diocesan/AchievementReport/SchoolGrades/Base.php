@@ -62,7 +62,13 @@ abstract class Base extends AchievementReportBase {
             ORDER BY StudentYearLevel DESC, StrippedResult DESC
         ";
 
-        return $this->getDb()->getAll($query);
+        $result = $this->getDb()->getAll($query);
+
+        if (is_array($result)) {
+            return $result;
+        }
+
+        return array();
     }
 
     /**
@@ -103,7 +109,13 @@ abstract class Base extends AchievementReportBase {
             ORDER BY StudentYearLevel DESC, StrippedResult DESC
         ";
 
-        return $this->getDb()->getAll($query);
+        $result = $this->getDb()->getAll($query);
+
+        if (is_array($result)) {
+            return $result;
+        }
+
+        return array();
     }
 
     /* Getters/Setters
