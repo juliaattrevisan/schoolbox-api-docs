@@ -9,6 +9,56 @@
     }
 </style>
 
+<script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
+{#<script type="text/javascript">#}
+    {#$(function() {#}
+        {#$('[data-graph="resultSummary"]').highcharts({#}
+            {#chart: {#}
+                {#type: 'bar'#}
+            {#},#}
+            {#title: {#}
+                {#text: 'Stacked bar chart'#}
+            {#},#}
+            {#xAxis: {#}
+                {#categories: ['N', 'A', 'M', 'E']#}
+            {#},#}
+            {#yAxis: {#}
+                {#min: 0,#}
+                {#title: {#}
+                    {#text: ''#}
+                {#}#}
+            {#},#}
+            {#legend: {#}
+                {#reversed: true#}
+            {#},#}
+            {#plotOptions: {#}
+                {#series: {#}
+                    {#stacking: 'normal'#}
+                {#}#}
+            {#},#}
+            {#series: [#}
+
+            {#]#}
+        {#});#}
+    {#});#}
+{#</script>#}
+
+<pre>
+{% for currentColumn in gradeSummary.columns %}
+{% if currentColumn != 'availableGrades' %}
+    {
+        name: '{{ currentColumn }}',
+        data: [{% for year, values in gradeSummary.data %}{{ values.letters[currentColumn] }}{% if not loop.last %}, {% endif %}{% endfor %}]
+    },
+{% else %}
+    {
+        name: '{{ currentColumn }}',
+        data: [{% for year, values in gradeSummary.data %}{{ values[currentColumn] }}{% if not loop.last %}, {% endif %}{% endfor %}]
+    }
+{% endif %}
+{% endfor %}
+</pre>
+
 <h2>{{ gradeSummary.heading }}</h2>
 
 <table>
@@ -37,3 +87,5 @@
         {% endfor %}
     </tbody>
 </table>
+
+<div data-graph="resultSummary"></div>

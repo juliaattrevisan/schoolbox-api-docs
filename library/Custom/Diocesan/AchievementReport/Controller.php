@@ -30,7 +30,8 @@ class Controller extends Base {
                 'externalUser' => $externalUser,
                 'gradeSummary' => array(
                     'heading' => $gradeSummaryTable->getHeading(),
-                    'data' => $gradeSummaryTable->findData($externalUser['StudentID'])
+                    'data' => $gradeSummaryTable->findData($externalUser['StudentID']),
+                    'columns' => array_merge($gradeSummaryTable->getLetterRegistry(), array('availableGrades'))
                 )
             )
         ));

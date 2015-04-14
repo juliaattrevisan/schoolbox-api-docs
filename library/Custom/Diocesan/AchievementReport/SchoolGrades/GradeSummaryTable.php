@@ -225,7 +225,7 @@ class GradeSummaryTable extends Base {
      *
      * @return array
      */
-    private function getLetterRegistry()
+    public function getLetterRegistry()
     {
         return $this->letterRegistry;
     }
