@@ -185,14 +185,6 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $this->setVar('course_unit_list_block', '');
         $this->setVar('course_modify_block', '');
 
-        /* Learning Analytics butonye
-         */
-        $this->setBlock('unit', 'learning_analytics', 'learning_analytics_block');
-
-        $this->setVar(array(
-            'learning_analytics_block' => ''
-        ));
-
         $this->setVar('UNIT_READONLY', ($this->readOnly ? 'true' : 'false'));
 
         // If courseHomepage is set, a course has been selected.
@@ -297,24 +289,6 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 'unit_add_task_actions_block' => '',
             )
         );
-
-        /* Link to Learning Analytics
-         */
-        try {
-            $unitInstanceMapper = new UnitInstanceMapper();
-            $courseFolder = $unitInstanceMapper->findCourseForUnit($unit);
-
-            $this->setVar(array(
-                'COURSE_FOLDER_ID' => $courseFolder->getId()
-            ));
-
-            $this->parse('learning_analytics_block', 'learning_analytics');
-        }
-        catch (\Exception $e) {
-            $this->setVar(array(
-                'learning_analytics_block' => ''
-            ));
-        }
 
         if (!$this->readOnly) {
             $this->parse('unit_delete_block', 'unit_delete');
