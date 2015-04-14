@@ -28,7 +28,10 @@ class Module extends BaseModule {
     {
         // All of these URLs relate to the resource ID, not a booking ID.
         // Therefore, they should probably be moved to the item module.
-        $router->addGet('achievementreport.schoolGrades', $basePath . '/schoolgrades/{externalUserId}');
+        $router->addGet('achievementreport.schoolGrades', $basePath . '/schoolgrades/{externalUserId}{/year}')
+            ->addTokens(array(
+                'year' => '\d{4}'
+            ));
     }
 
     /**
