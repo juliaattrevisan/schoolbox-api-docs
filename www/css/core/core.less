@@ -175,22 +175,20 @@ Notifications
   right: 0;
   margin: 8px;
   border: 0;
-  height: auto;
+  height: auto;  
   fieldset {
     width: 100%;
   }
 }
 
 #search-field {
-  color: @white;
-  font-size: 13px;
-  line-height: 13px;
-  padding: 6px 0 0 27px;
-  width: 189px;
-  height: 20px;
   border: 0;
+  color: @white;
+  line-height: 13px;
+  padding: 6px;
+  width: 176px;
+  height: 20px;
   background: rgba(255,255,255,0.3);
-  font-family: Arial, Helvetica, sans-serif;
   .placeholder(@search-color);
 }
 
@@ -692,24 +690,20 @@ Notifications
     margin: 8px 0;
     border: 0;
     height: auto;
-    .placeholder(@search-color);
     fieldset {
       width: 100%;
     }
   }
 
   #search-field {
-    color: @search-color;
-    font-size: 13px;
-    line-height: 18px;
-    padding: 6px;
-	width: 189px;
-    height: 20px;
-    border: 0;
-    background: saturate(lighten(@banner-background,25%),-70%);
-    background: rgba(255,255,255,0.2);
-    font-family: Arial, Helvetica, sans-serif;
-
+  	border: 0;
+    color: @white;
+	line-height: 13px;
+	padding: 6px;
+	width: 176px;
+	height: 20px;
+	background: rgba(255,255,255,0.3);
+	.placeholder(@search-color);
   }
 
   #search-button {
