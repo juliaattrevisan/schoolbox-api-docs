@@ -112,6 +112,7 @@ class FileMapper extends AbstractMapper
             LEFT JOIN {$boxJoin->getJoinSql('category', 'sb', 'c')}
             WHERE sb.id = :box_id
             AND ss.owner = :user_id
+            AND ss.body IS NULL
             AND ss.draft IS FALSE
             ORDER BY ss.submitted DESC
         ";
