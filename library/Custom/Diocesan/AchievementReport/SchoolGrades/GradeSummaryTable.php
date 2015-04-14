@@ -57,7 +57,7 @@ class GradeSummaryTable extends Base {
      * Obtain data
      */
     public function findData($externalUserId) {
-        $explorer = $this->getDb()->getAll("SELECT TOP 2 * FROM  SynergyOne.dbo.uvSchoolBoxSchoolGradeResults");
+        // $explorer = $this->getDb()->getAll("SELECT TOP 2 * FROM  SynergyOne.dbo.uvSchoolBoxSchoolGradeResults");
 
         /* Entered Grades
          */
