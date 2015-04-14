@@ -52,7 +52,10 @@ class Module extends BaseModule {
                     error(2);
                 }
 
+                $db = new \MSSQL();
+
                 return array(
+                    'db' => $db,
                     'externalUser' => $externalUser
                 );
             }

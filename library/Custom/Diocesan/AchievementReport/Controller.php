@@ -19,9 +19,7 @@ class Controller extends Base {
     /**
      * Index
      */
-    public function schoolGrades($externalUser, $year) {
-        $db = new MSSQL();
-
+    public function schoolGrades($db, $externalUser, $year) {
         $gradeSummaryTable = new SchoolGrades\GradeSummaryTable($externalUser, $db);
         $yearlyBreakdownTable = new SchoolGrades\YearlyBreakdownTable($externalUser, $db);
 
