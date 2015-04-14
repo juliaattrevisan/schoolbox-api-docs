@@ -33,7 +33,7 @@ class Media extends Base {
 
         if ($this->getItem()->getMimetype()->isVideo()) {
             return [
-                'type' => 'html-fragment',
+                'type' => 'inline',
                 'twig' => [
                     'template' => '@preview/Strategy/Internal/Video.twig',
                     'data' => [
@@ -45,7 +45,7 @@ class Media extends Base {
         }
         elseif ($this->getItem()->getMimetype()->isAudio()) {
             return [
-                'type' => 'html-fragment',
+                'type' => 'inline',
                 'twig' => [
                     'template' => '@preview/Strategy/Internal/Audio.twig',
                     'data' => [

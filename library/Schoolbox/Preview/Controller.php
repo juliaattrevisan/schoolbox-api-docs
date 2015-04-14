@@ -114,13 +114,18 @@ class Controller extends Base
 
         /* Set up html fragment
          */
-        $this->getResponse()->content->set($result['twig']);
+        if($result['type'] == 'inline') {
+            $this->getResponse()->content->set($result['twig']);
 
-        /* Render it
-         */
-        $output = $this->di->get("webOutput:nochrome");
-        $output->setResponse($this->getResponse());
-        $fragment = $output->getAsString();
+            /* Render it
+             */
+            $output = $this->di->get("webOutput:nochrome");
+            $output->setResponse($this->getResponse());
+            $fragment = $output->getAsString();
+        }
+        else {
+            $fragment = $result['src'];
+        }
 
         $previewResponse = [
             'type' => $result['type'],

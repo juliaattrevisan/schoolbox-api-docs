@@ -59,7 +59,7 @@
 
                     $.magnificPopup.open({
                         items: {
-                            src: "<div class='preview loader'>Loading data...</div>",
+                            src: "<div class='preview loader'>Attempting to preview...</div>",
                             type: 'inline'
                         }
                     });
@@ -71,6 +71,22 @@
 
                         if (response.type == 'redirect') {
                             window.location.href = response.fragment;
+                        }
+                        else if( response.type == 'image') {
+                            $.magnificPopup.open({
+                                items: {
+                                    src: response.fragment,
+                                    type: 'image'
+                                }
+                            });
+                        }
+                        else if( response.type == 'iframe') {
+                            $.magnificPopup.open({
+                                items: {
+                                    src: response.fragment,
+                                    type: 'iframe'
+                                }
+                            });
                         }
                         else {
                             $.magnificPopup.open({

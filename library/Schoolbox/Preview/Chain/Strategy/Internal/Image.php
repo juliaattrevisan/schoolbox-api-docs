@@ -20,13 +20,8 @@ class Image extends Base {
     public function test() {
         if ($this->getItem()->getMimetype()->isImage()) {
             return [
-                'type' => 'html-fragment',
-                'twig' => [
-                    'template' => '@preview/Strategy/Shared/Image.twig',
-                    'data' => [
-                        'src' => $this->getUrl()
-                    ]
-                ]
+                'type' => 'image',
+                'src' => $this->getUrl()
             ];
         }
 

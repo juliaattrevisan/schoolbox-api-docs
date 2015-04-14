@@ -33,13 +33,8 @@ class IFrame extends Base {
         foreach ($this->getContentTypes() as $currentContentType) {
             if (strstr($this->findContentType(), $currentContentType)) {
                 return [
-                    'type' => 'html-fragment',
-                    'twig' => [
-                        'template' => '@preview/Strategy/Shared/IFrame.twig',
-                        'data' => [
-                            'src' => $this->getUrl()
-                        ]
-                    ]
+                    'type' => 'iframe',
+                    'src' => $this->getUrl(),
                 ];
             }
         }
