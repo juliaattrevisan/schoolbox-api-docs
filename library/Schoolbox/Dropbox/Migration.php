@@ -52,7 +52,7 @@ class Migration implements MigrationPattern
     public function getFetchStatement()
     {
         return $this->db->query("
-            SELECT id, realname FROM file WHERE deleted = 0 and hash = ''
+            SELECT id, realname FROM dropbox WHERE deleted = 0 and hash = ''
         ");
     }
 
