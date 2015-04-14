@@ -92,16 +92,16 @@
             categories: [{% for year, values in gradeSummary.data %}'Year {{ year }}'{% if not loop.last %}, {% endif %}{% endfor %}],
             series: [
                 {% for currentColumn in gradeSummary.columns %}
-                {% if currentColumn != 'availableGrades' %}
+                {% if currentColumn == 'availableGrades' %}
+                {
+                    name: 'Available Grades',
+                    data: [{% for year, values in gradeSummary.data %}{{ values[currentColumn] }}{% if not loop.last %}, {% endif %}{% endfor %}]
+                }
+                {% else %}
                 {
                     name: '{{ currentColumn }}',
                     data: [{% for year, values in gradeSummary.data %}{{ values.letters[currentColumn] }}{% if not loop.last %}, {% endif %}{% endfor %}]
                 },
-                {% else %}
-                {
-                    name: '{{ currentColumn }}',
-                    data: [{% for year, values in gradeSummary.data %}{{ values[currentColumn] }}{% if not loop.last %}, {% endif %}{% endfor %}]
-                }
                 {% endif %}
                 {% endfor %}
             ]
