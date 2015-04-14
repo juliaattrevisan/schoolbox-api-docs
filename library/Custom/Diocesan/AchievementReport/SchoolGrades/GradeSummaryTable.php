@@ -55,38 +55,52 @@ class GradeSummaryTable extends Base {
         $allEnteredGradesCurrentYear = $this->findEnteredGradesCurrentYear($externalUserId);
         $allEnteredGradesPreviousYear = $this->findEnteredGradesPreviousYear($externalUserId);
 
-        $N = $this->findLetter($externalUserId, 'N');
-        $A = $this->findLetter($externalUserId, 'A');
-        $M = $this->findLetter($externalUserId, 'M');
-        $E = $this->findLetter($externalUserId, 'E');
+        $allLetters = array(
+            $this->findLetter($externalUserId, 'N'),
+            $this->findLetter($externalUserId, 'A'),
+            $this->findLetter($externalUserId, 'M'),
+            $this->findLetter($externalUserId, 'E')
+        );
 
         /* Rearrange everything into a nice order
          */
         $finalStack = array();
 
         /* Do it for the current year
+         * Initialise The Letters
          */
         foreach ($allEnteredGradesCurrentYear as $current) {
             $finalStack[$current['StudentYearLevel']]['enteredGrades'] += $current['num'];
+            $finalStack[$current['StudentYearLevel']]['letters'] = array(
+                'N' => 0,
+                'A' => 0,
+                'M' => 0,
+                'E' => 0
+            );
         }
 
         /* And I suppose do it for all the previous years too
+         * Initialise The Letters
          */
         foreach ($allEnteredGradesPreviousYear as $current) {
             $finalStack[$current['StudentYearLevel']]['enteredGrades'] += $current['num'];
+            $finalStack[$current['StudentYearLevel']]['letters'] = array(
+                'N' => 0,
+                'A' => 0,
+                'M' => 0,
+                'E' => 0
+            );
         }
 
         /* And for all the letters
          */
-        $allLetters = array($N, $A, $M, $E);
-
         foreach ($allLetters as $currentLetter) {
             foreach ($currentLetter as $current) {
                 $finalStack[$current['StudentYearLevel']]['letters'][$current['StrippedResult']] += $current['num'];
             }
         }
 
-        new Probe($N, $A, $M, $E, $finalStack);
+        new Probe($finalStack);
 //        new Probe($allEnteredGradesCurrentYear, $allEnteredGradesPreviousYear, $finalStack);
 
         return $finalStack;
