@@ -109,6 +109,12 @@ class GradeSummaryTable extends Base {
             $finalStack[$currentYear]['availableGrades'] = $data['enteredGrades'] - array_sum($data['letters']);
         }
 
+        /* Yearly Breakdown thingo
+         */
+        new Probe($allEnteredGradesCurrentYear, $allEnteredGradesPreviousYear);
+
+
+
         return $finalStack;
     }
 
@@ -121,7 +127,7 @@ class GradeSummaryTable extends Base {
      */
     private function findEnteredGradesCurrentYear($externalUserId) {
         $query = "
-            SELECT DISTINCT (classcode + AssessAreaHeading),
+            SELECT DISTINCT (classcode + ' ' + AssessAreaHeading),
                 StudentYearLevel,
                 StrippedResult,
                 Fileyear,
@@ -130,7 +136,7 @@ class GradeSummaryTable extends Base {
                 SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
             WHERE ID = '{$externalUserId}'
             AND classyear = '{$this->getYear()}'
-            GROUP BY (classcode + AssessAreaHeading), StudentYearLevel, StrippedResult, Fileyear
+            GROUP BY (classcode + ' ' + AssessAreaHeading), StudentYearLevel, StrippedResult, Fileyear
             ORDER BY StudentYearLevel DESC, StrippedResult DESC
         ";
 
@@ -150,7 +156,7 @@ class GradeSummaryTable extends Base {
      */
     private function findEnteredGradesPreviousYear($externalUserId) {
         $query = "
-            SELECT DISTINCT (classcode + AssessAreaHeading),
+            SELECT DISTINCT (classcode + ' ' + AssessAreaHeading),
                 StudentYearLevel,
                 StrippedResult,
                 Fileyear,
@@ -160,7 +166,7 @@ class GradeSummaryTable extends Base {
             WHERE ID = '{$externalUserId}'
             AND classyear < '{$this->getYear()}'
             AND Result != ''
-            GROUP BY (classcode + AssessAreaHeading), StudentYearLevel, StrippedResult, Fileyear
+            GROUP BY (classcode + ' ' + AssessAreaHeading), StudentYearLevel, StrippedResult, Fileyear
             ORDER BY StudentYearLevel DESC, StrippedResult DESC
         ";
 
@@ -180,7 +186,7 @@ class GradeSummaryTable extends Base {
         $letter = strtoupper($letter);
 
         $query = "
-            SELECT DISTINCT (classcode + AssessAreaHeading),
+            SELECT DISTINCT (classcode + ' ' + AssessAreaHeading),
                 StudentYearLevel,
                 StrippedResult,
                 COUNT(StrippedResult) AS num
@@ -188,7 +194,7 @@ class GradeSummaryTable extends Base {
                 SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
             WHERE ID = '{$externalUserId}'
             AND StrippedResult = '{$letter}'
-            GROUP BY (classcode + AssessAreaHeading), StudentYearLevel, StrippedResult
+            GROUP BY (classcode + ' ' + AssessAreaHeading), StudentYearLevel, StrippedResult
             ORDER BY StudentYearLevel DESC, StrippedResult DESC
         ";
 
