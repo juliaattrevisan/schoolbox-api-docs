@@ -109,9 +109,13 @@ $(function(){
             <!-- END submission_listing -->
         </tbody>
     </table>
+    <!-- BEGIN learning_analytics -->
+    <a href="/learningAnalytics/course/{COURSE_FOLDER_ID}" class="btn statistics"><span></span>{COURSE_FOLDER_NAME} Analytics</a>
+    <!-- END learning_analytics -->
     <a href="/task/progressReport/{CATEGORY_ID}{SEM_SLUG}" class="btn line-graph"><span></span>Progress Report</a>
-    <a href="/submission/markSheet/{CATEGORY_ID}{SEM_SLUG}" class="btn modify"><span></span>Class Mark Sheet</a>
+    <a href="/submission/markSheet/{CATEGORY_ID}{SEM_SLUG}" class="btn modify"><span></span>Marksheet</a>
     <a href="/assess/create/{CATEGORY_ID}/" class="btn add"><span></span>Create Quiz</a>
     <a href="/submission/createSubmission/new/{CATEGORY_ID}/" class="btn add" ><span></span>Post Due Work</a>
+
 </div>
 <!-- END category_listing -->

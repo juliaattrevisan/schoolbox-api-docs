@@ -1,0 +1,348 @@
+<link rel="stylesheet" type="text/css" media="screen" href="/css/foundation/chrome.css?v={SITE_VERSION}" />
+<script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
+<script type="text/javascript" src="/javascript/components/highcharts/highcharts-more.js"></script>
+<script type="text/javascript" src="/learninganalytics/js/progress/overall.js"></script>
+<script type="text/javascript" src="/learninganalytics/js/boxPlot.js"></script>
+<script type="text/javascript" src="/learninganalytics/js/progress/unit.js"></script>
+<script type="text/javascript" src="/learninganalytics/js/effort/scatter.js"></script>
+<script type="text/javascript" src="/learninganalytics/js/schoolboxTheme.js"></script>
+<script type="text/javascript">
+    $(function () {
+
+        /* Un-foundate
+           $('#container').addClass('foundation').foundation();
+         */
+
+        /* Mr Squiggle
+         */
+
+        /**
+         * How much of the course has been completed by all students
+         * compared to the person who has completed the most
+         */
+        $.fn.overallProgressRender({
+            element: '[data-graph=overall]',
+            title: '',
+            mostAdvancedStudent: {{ overallProgress.mostAdvancedStudent }},
+            classCompletions: {{ overallProgress.classCompletions }}
+        });
+
+        /**
+         *  Boxplots for each Task in the Unit
+         */
+        $.fn.boxPlotRender({
+            element: '[data-graph=boxplots]',
+
+            /* Title of the graph
+             */
+            title: '',
+
+            /* Orientation of the box plots
+             */
+            orientation: 'vertical',
+
+            /* A list of all the assessment names that are being graphed
+             * These correspond to a series of data and their respective
+             * five-point summaries
+             */
+            allAssessments: [
+{% for currentTask in results.tasks.all %}
+"{{ currentTask.getTitle() }}"{% if not loop.last %},
+{% endif %}
+{% endfor %}
+
+            ],
+
+            /* All the raw data
+             */
+            allData: $.fn.boxPlotCalculateAllSeriesData([
+{% for currentTask in results.tasks.all %}
+[
+    {# Highcharts won't render without at least one data point #}
+    {% if results.all[currentTask.getTask().getId()]|length == 0 %}
+    {
+        info: null,
+        uid: null,
+        value: -100
+    }
+    {% endif %}
+    {% for currentValue in results.all[currentTask.getTask().getId()] %}
+    {
+        info: "{{ currentValue.user.getFullName() }}",
+        uid: '{{ currentValue.user.getId() }}',
+        value: {% if currentValue.value %}{{ currentValue.value }}{% else %}null{% endif %}
+    }{% if not loop.last %},
+    {% endif %}
+    {% endfor %}
+]{% if not loop.last %},
+{% endif %}
+{% endfor %}
+])
+        });
+
+        /**
+         *  Progress for each Unit in the Course
+         */
+        $.fn.unitProgressRender({
+            element: '[data-graph=unit-progress]',
+            title: '',
+            units: [
+                {% for currentUnit in progress.allUnits %}"{{ currentUnit.unit.getTitle() }}"{% if not loop.last %},{% endif %}{% endfor %}
+
+            ],
+            mostAdvancedStudents: [
+                {% for currentUnit in progress.allUnits %}{{ currentUnit.mostAdvancedStudent }}{% if not loop.last %},{% endif %}{% endfor %}
+
+            ],
+            classCompletions: [
+                {% for currentUnit in progress.allUnits %}{{ currentUnit.classCompletions }}{% if not loop.last %},{% endif %}{% endfor %}
+
+            ]
+        });
+
+{% if rubrics.allRubrics|length > 0 %}
+        /**
+         *  Boxplots for Rubrics
+         */
+        $.fn.boxPlotRender({
+            element: '[data-graph=rubrics]',
+
+            /* Title of the graph
+             */
+            title: '',
+
+            /* Orientation of the box plots
+             */
+            orientation: 'horizontal',
+
+            /* A list of all the assessment names that are being graphed
+             * These correspond to a series of data and their respective
+             * five-point summaries
+             */
+            allAssessments: [
+{% for group, currentCriterion in rubrics.allRubrics %}
+{% for criterionId,criterionData in currentCriterion %}
+"{{ group }}: {{ criterionData.name }}"{% if not loop.last %},
+{% endif %}
+{% endfor %}{% if not loop.last %},
+{% endif %}
+{% endfor %}
+
+            ],
+
+            /* All the raw data
+             */
+            allData: $.fn.boxPlotCalculateAllSeriesData([
+{% for group, allCriteria in rubrics.allRubrics %}
+{% for currentCriterion in allCriteria %}
+[
+{# Highcharts won't render without at least one data point #}
+{% if currentCriterion.allValues|length == 0 %}
+    {
+        info: null,
+        uid: null,
+        value: -100
+    }
+{% endif %}
+{% for currentValue in currentCriterion.allValues %}
+    {
+        info: "{{ currentValue.user }}",
+        uid: '{{ currentValue.user }}',
+        value: {% if currentValue.value %}{{ currentValue.value }}{% else %}null{% endif %}
+
+    }{% if not loop.last %},
+{% endif %}
+{% endfor %}
+
+]{% if not loop.last %},
+{% endif %}
+
+{% endfor %}{% if not loop.last %},
+{% endif %}
+{% endfor %}
+            ])
+        });
+{% endif %}
+
+
+        /**
+         *  Scatter for Effort
+         */
+        $.fn.scatterRender({
+            element: '[data-graph=effort]',
+
+            /* Title of the graph
+             */
+            title: '',
+
+            allData: [
+{% for userId, currentTally in effort.allEffort %}
+{
+    info: "{{ currentTally.user.getFullname() }}",
+    uid: '{{ currentTally.user.getExternalId() }}',
+    value: [{{ currentTally.hits }},{{ currentTally.average }}]{% if not loop.last %},
+{% endif %}
+}{% if not loop.last %},
+{% endif %}
+{% endfor %}
+            ]
+        });
+    });
+</script>
+<style type="text/css">
+
+</style>
+<h1>
+    Learning Analytics - {{ metadata.pageTitle }}
+    {% if metadata.route == 'folder' %}
+    - {{ metadata.folder.selected.getName() }}
+    {% endif %}
+</h1>
+
+{# Foundation-friendly setup#}
+{#<dl class="tabs">#}
+    {#<dd class="{% if metadata.route == 'course' %}active{% endif %}">#}
+        {#<a href='/learningAnalytics/course/{{ metadata.folder.course.getId() }}'>#}
+            {#Course#}
+        {#</a>#}
+    {#</dd>#}
+    {#{% for folder in metadata.folder.all %}#}
+    {#<dd class="{% if (folder.getId() == metadata.folder.selected.getId()) and (metadata.route == 'folder') %}active{% endif %}">#}
+        {#<a href='/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ folder.getId() }}'>#}
+            {#{{ folder.getName() }}#}
+        {#</a>#}
+    {#</dd>#}
+    {#{% endfor %}#}
+{#</dl>#}
+
+{# Un-Founded variant #}
+<ul class="admin-nav">
+    <li>
+        <a href='/learningAnalytics/course/{{ metadata.folder.course.getId() }}' class="{% if metadata.route == 'course' %}current{% endif %}">
+            Course
+        </a>
+    </li>
+    {% for folder in metadata.folder.all %}
+    <li>
+        <a href='/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ folder.getId() }}' class="{% if (folder.getId() == metadata.folder.selected.getId()) and (metadata.route == 'folder') %}current{% endif %}">
+            {{ folder.getName() }}
+        </a>
+    </li>
+    {% endfor %}
+</ul>
+
+<div class="clearfix"></div>
+
+<h2>Overall Progress</h2>
+<div data-graph='overall' class='learning-analytics overall medium-6 columns'></div>
+
+<div class="learning-analytics medium-3 columns">
+    <h3>Top Students</h3>
+    {% if results.ranking.top|length > 0 %}
+    <ul>
+        {% for currentStudent in results.ranking.top|slice(0,3) %}
+        <li>
+            <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
+            {{ currentStudent.average|number_format(1) }}%
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>
+        Nobody has attempted these tasks yet.
+    </p>
+    {% endif %}
+</div>
+<div class="learning-analytics medium-3 columns">
+    <h3>Bottom Students</h3>
+    {% if results.ranking.bottom|length > 0 %}
+    <ul>
+        {% for currentStudent in results.ranking.bottom|slice(0,3) %}
+        <li>
+            <a href='/search/user/{{ currentStudent.user.getId() }}'>{{ currentStudent.user.getFullName() }}</a>
+            {{ currentStudent.average|number_format(1) }}%
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>
+        Nobody has attempted these tasks yet.
+    </p>
+    {% endif %}
+</div>
+
+<div class="clearfix"></div>
+
+
+{# Foundation-friendly setup #}
+{#<h2>#}
+    {#Results#}
+    {#{% if results.tasks.types.selected.getId() > 0 %}#}
+        {#({{ results.tasks.types.selected.getName() }})#}
+    {#{% endif %}#}
+{#</h2>#}
+{#<a class="button icon-menu"href="#" data-dropdown="taskFilter">Type Filter</a>#}
+{#<ul class="f-dropdown" data-dropdown-content="" id="taskFilter">#}
+    {#{% if metadata.route == 'course' %}#}
+        {#<li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}">All</a></li>#}
+        {#{% for currentTaskType in results.tasks.types.all %}#}
+        {#<li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/task/{{ currentTaskType.getId() }}">{{ currentTaskType.getName() }}</a></li>#}
+        {#{% endfor %}#}
+    {#{% elseif metadata.route == 'folder' %}#}
+        {#<li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}">All</a></li>#}
+        {#{% for currentTaskType in results.tasks.types.all %}#}
+        {#<li><a href="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}/task/{{ currentTaskType.getId() }}">{{ currentTaskType.getName() }}</a></li>#}
+        {#{% endfor %}#}
+    {#{% endif %}#}
+{#</ul>#}
+
+{# Un-Founded variant #}
+<script type="text/javascript">
+    $(function() {
+        $('select[data-taskfilter=true]').change(function(event) {
+            event.preventDefault();
+
+            window.location.href = $(this).val();
+        });
+    });
+</script>
+<h2>
+    Results
+    {% if results.tasks.types.selected.getId() > 0 %}
+        ({{ results.tasks.types.selected.getName() }})
+    {% endif %}
+
+    <select class="learning-analytics task-filter" data-taskfilter="true">
+        {% if metadata.route == 'course' %}
+            <option value="/learningAnalytics/course/{{ metadata.folder.course.getId() }}">All</option>
+            {% for currentTaskType in results.tasks.types.all %}
+                <option value="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/task/{{ currentTaskType.getId() }}">{{ currentTaskType.getName() }}</option>
+            {% endfor %}
+        {% elseif metadata.route == 'folder' %}
+            <option value="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}">All</option>
+            {% for currentTaskType in results.tasks.types.all %}
+                <option value="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}/task/{{ currentTaskType.getId() }}">{{ currentTaskType.getName() }}</option>
+            {% endfor %}
+        {% endif %}
+    </select>
+</h2>
+
+<div data-graph="boxplots" class='learning-analytics boxplots'></div>
+
+<div class="clearfix"></div>
+
+<h2>Unit Progress</h2>
+<div data-graph='unit-progress' class='learning-analytics unit-progress' style="height:{{ ((progress.allUnits|length)*50)+75 }}px"></div>
+
+{% if rubrics.allRubrics|length > 0 %}
+<div class="clearfix"></div>
+
+<h2>Rubrics</h2>
+<div data-graph="rubrics" class='learning-analytics boxplots' style="height:{{ ((rubrics.allRubrics|length)*150)+75 }}px"></div>
+
+{% endif %}
+
+<div class="clearfix"></div>
+
+<h2>Effort</h2>
+<div data-graph="effort" class='learning-analytics effort'></div>

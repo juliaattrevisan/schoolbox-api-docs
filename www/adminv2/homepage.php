@@ -89,7 +89,7 @@ foreach ($componentCollection as $component) {
     }
 
     $component->setup(
-        array('id' => '-1', 'code' => '', 'name' => ''),
+        new Schoolbox\Resource\Folder\Model(),
         $component->getInstance()->getConfigArray()
     );
 

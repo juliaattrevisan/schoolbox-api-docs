@@ -502,8 +502,8 @@ class StudentReportCard
                     $page->setVar('subject_crit_item_block', '');
                     $page->setVar('CRIT_GROUP_NAME', \Scrub::text($group));
                     foreach ($items as $item) {
-                        $score = isset($results[$item->getId()])
-                            ? $returnHandler->percent2letter($results[$item->getId()])
+                        $score = isset($results[$item->getId()]['value'])
+                            ? $returnHandler->percent2letter($results[$item->getId()]['value'])
                             : 'Not Assessed';
                         $page->setVar(
                             array(

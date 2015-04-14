@@ -17,6 +17,7 @@ use Schoolbox\Assessment\Course\Task\Cloner;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\User;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 class UnitInstanceMapper extends Mapper {
 
@@ -88,6 +89,11 @@ class UnitInstanceMapper extends Mapper {
             'this_key'  => 'unit_category_id',
             'other_key' => 'id',
         ));
+        $this->hasJoin('course_folder', array(
+            'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
+            'this_key'  => 'parent',
+            'other_key' => 'id',
+        ));
         $this->hasJoin('component', array(
             'mapper'    => 'Component_InstanceMapper',
             'this_key'  => 'component_id',
@@ -104,6 +110,128 @@ class UnitInstanceMapper extends Mapper {
         $this->registerCallback('postSave',       array($this, 'postSave'));
         $this->registerCallback('postDelete',     array($this, 'postDelete'));
         $this->registerCallback('postSoftDelete', array($this, 'postDelete'));
+    }
+
+    /**
+     * Find the course, whose units from which a Unit
+     * $unitInstance was spawned
+     *
+     * @param UnitInstance $unitInstance
+     * @return object
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function findCourseForUnit(UnitInstance $unitInstance) {
+        $folderMapper = $this->getJoinMapper('course_folder');
+
+        $query = "
+            SELECT {$folderMapper->getColumnString('cf')}
+            FROM {$this->getTable()} `ui`
+            LEFT JOIN {$this->getJoinSql('unit_category', 'ui', 'uc')}
+            LEFT JOIN {$this->getJoinSql('course_folder', 'uc', 'cf')}
+            WHERE `ui`.`unit_category_id` = :unitId
+            GROUP BY `cf`.`id`
+            LIMIT 1
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute(array(
+            'unitId' => $unitInstance->getUnitCategory()->getId()
+        ));
+
+        $row = $statement->fetch();
+
+        if ($row != false) {
+            $folder = $folderMapper->hydrate($row, 'cf');
+
+            return $folder;
+        }
+
+        throw new \Schoolbox\Mapper\Exception('Instance of object not found');
+    }
+
+    /**
+     * Find all the folders which use a Unit that was spawned from
+     * the original Course folder, $folder
+     *
+     * @param Folder $folder
+     * @return Collection
+     */
+    public function findAllFoldersUsingCourse(Folder $folder) {
+        $folderMapper = $this->getJoinMapper('unit_category');
+
+        $query = "
+            SELECT {$folderMapper->getColumnString('c')}
+            FROM {$this->getTable()} `ui`
+            LEFT JOIN {$this->getJoinSql('unit_category', 'ui', 'uc')}
+            LEFT JOIN {$this->getJoinSql('course_folder', 'uc', 'cf')}
+            LEFT JOIN {$this->getJoinSql('category', 'ui', 'c')}
+            WHERE `cf`.`id` = :folderId
+            GROUP BY `c`.`id`
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute(array(
+            'folderId' => $folder->getId()
+        ));
+
+        $collection = new Collection();
+
+        while ($row = $statement->fetch()) {
+            $folder = $folderMapper->hydrate($row, 'c');
+            $collection->add($folder);
+        }
+
+        return $collection;
+    }
+
+    /**
+     * A macro version of findAllCoursesUsedInFolder()
+     *
+     * Pass it an array of folderIds and this will give you a list of
+     * associated course folders, all in one query, rather than multiple
+     *
+     * Returns an associative collection of folderId-courseFolderCollection
+     *
+     * (or you could have had a folder-course relation in the db)
+     *
+     * @param $folderIds
+     * @return \Schoolbox\Collection
+     */
+    public function findAllCoursesUsedInFolders($folderIds) {
+        $folderMapper = $this->getJoinMapper('unit_category');
+
+        $query = "
+            SELECT
+                {$this->getColumnString('ui')},
+                {$folderMapper->getColumnString('cf')}
+            FROM {$this->getTable()} `ui`
+            LEFT JOIN {$this->getJoinSql('unit_category', 'ui', 'uc')}
+            LEFT JOIN {$this->getJoinSql('course_folder', 'uc', 'cf')}
+            WHERE `ui`.`category_id` IN {$this->getArrayPlaceholders($folderIds)}
+            GROUP BY `cf`.`id`, ui.`category_id`
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($this->getArrayParameters($folderIds));
+
+        $collection = new Collection();
+
+        while ($row = $statement->fetch()) {
+            $unitInstance = $this->hydrate($row, 'ui');
+            $courseFolder = $folderMapper->hydrate($row, 'cf');
+
+            if ($collection->getOffset($unitInstance->getCategory()->getId()) instanceof Collection) {
+                $collection->getOffset($unitInstance->getCategory()->getId())->add($courseFolder);
+            }
+            else {
+                $subcollection = new Collection();
+                $subcollection->add($courseFolder);
+
+                $collection->setOffset($unitInstance->getCategory()->getId(), $subcollection);
+            }
+        }
+
+        return $collection;
     }
 
     /**

@@ -4,6 +4,8 @@
  * Before a course is selected, it contains a selector for the course - after
  * this, it contains a list of units and tasks within the course.
  *
+ * This is the Course Outline component.
+ *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
@@ -182,6 +184,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
         $this->setVar('course_selector_block', '');
         $this->setVar('course_unit_list_block', '');
         $this->setVar('course_modify_block', '');
+
         $this->setVar('UNIT_READONLY', ($this->readOnly ? 'true' : 'false'));
 
         // If courseHomepage is set, a course has been selected.
@@ -286,6 +289,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 'unit_add_task_actions_block' => '',
             )
         );
+
         if (!$this->readOnly) {
             $this->parse('unit_delete_block', 'unit_delete');
             $this->parse('unit_modify_block', 'unit_modify');

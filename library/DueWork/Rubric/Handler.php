@@ -165,6 +165,7 @@ class DueWork_Rubric_Handler
                     sb.id AS box_id,
                     rm.criterion_id,
                     rm.mark,
+                    rc.name,
                     (
                         SELECT MAX(rd.value)
                         FROM rubric_descriptor rd
@@ -179,6 +180,8 @@ class DueWork_Rubric_Handler
                     ) AS rmax_mark,
                     rm.tstamp
                 FROM rubric_mark rm
+                LEFT JOIN rubric_criterion rc
+                    ON rm.criterion_id = rc.id
                 LEFT JOIN
                     submission_box sb
                     ON rm.submission_box_id = sb.id
@@ -203,11 +206,16 @@ class DueWork_Rubric_Handler
         );
         // create a normalised value for each criterion
         $crits = array();
+        $names = array();
+
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $names[$row['criterion_id']] = $row['name'];
+
             // only use the most recent mark for each submission/criterion
             if (isset($crits[$row['criterion_id']][$row['box_id']])) {
                 continue;
             }
+
             if ($row['dmax_mark']) {
                 $localAvg = $row['mark'] / $row['dmax_mark'];
             } elseif ($row['rmax_mark']) {
@@ -215,12 +223,17 @@ class DueWork_Rubric_Handler
             } else {
                 continue;
             }
+
             $crits[$row['criterion_id']][$row['box_id']] = $localAvg;
         }
+
         $return = array();
+
         foreach ($crits as $critID => $marks) {
-            $return[$critID] = (array_sum($marks) / count($marks)) * 100;
+            $return[$critID]['name'] = $names[$critID];
+            $return[$critID]['value'] = (array_sum($marks) / count($marks)) * 100;
         }
+
         return $return;
     }
 

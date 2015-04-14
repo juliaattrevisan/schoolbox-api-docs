@@ -16,17 +16,29 @@ class Alaress_Probe {
 
 	/**
 	 * Constructor
-	 *
-	 * @param $dataStructure
 	 */
-	public function __construct($dataStructure) {
+	public function __construct() {
+        $numArgs = func_num_args();
+
 		if (DebugBar::isEnabled()) {
-			DebugBar::getInstance()->getCollector('messages')->addMessage($dataStructure);
+            for ($i = 0; $i < $numArgs; $i++) {
+                DebugBar::getInstance()->getCollector('messages')->addMessage(func_get_arg($i));
+            }
 		}
 		else {
-			echo "<pre>";
-			print_r($dataStructure);
-			echo "</pre>";
+            $width = floor(100/$numArgs);
+
+            echo "<div class='clearfix'></div>";
+
+            for ($i = 0; $i < $numArgs; $i++) {
+                echo "<div style='width:{$width}%;float:left;display:block;overflow:auto;'>";
+                echo "<pre>";
+                print_r(func_get_arg($i));
+                echo "</pre>";
+                echo "</div>";
+            }
+
+            echo "<div class='clearfix'></div>";
 		}
 	}
 }

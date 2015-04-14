@@ -49,6 +49,8 @@ $this->setBlock('normalSubmission', 'readonly_close', 'readonly_close_block');
 $this->setBlock('normalSubmission', 'writable_open', 'writable_open_block');
 $this->setBlock('normalSubmission', 'writable_close', 'writable_close_block');
 
+$this->setBlock('category_listing', 'learning_analytics', 'learning_analytics_block');
+
 $this->setVar('SEM_SLUG', $semesterSlug);
 
 $submissionHandler = new Submission();
@@ -56,7 +58,7 @@ $groupHandler = new Group();
 
 $contextSelector = new ContextSelector('submission/listSubmission');
 
-if(!$groupHandler->isStaff() ) {
+if(!$_SESSION['user']->getRole()->isStaff() ) {
     error(19);
 }
 
@@ -65,9 +67,6 @@ for($i = 5; $i >= 0; $i--) {
 	$years[] = $currentYear - $i;
 }
 $contextSelector->setYears($years);
-
-
-
 
 $subjectList = array();
 /* Use provided ID, or check for the subjects the user is involved with */
@@ -123,6 +122,26 @@ if (Cfg::get('external_enable')) {
 
 $this->setVar(array('category_block' => ''));
 
+/* $allCoursesUsedInFolder is a collection of folderId-courseFolders
+ *
+ * Get everything at the start in one query, rather than
+ * ram them in to the weird loop below.
+ *
+ * Or you could have had a folder-course relation in the db
+ */
+$allFolderIds = array();
+
+foreach ($subList as $currentSub) {
+    $allFolderIds[] = $currentSub['category'];
+}
+
+$allFolderIds = array_values(array_unique($allFolderIds));
+
+$unitInstanceMapper = new \Schoolbox\Assessment\Course\UnitInstanceMapper();
+$allCoursesUsedInFolder = $unitInstanceMapper->findAllCoursesUsedInFolders($allFolderIds);
+
+/* Iterate
+ */
 if (!empty($subList) && is_array($subList)) {
     $i = 0;
 
@@ -155,6 +174,24 @@ if (!empty($subList) && is_array($subList)) {
                 }
 
                 $this->setVar('CATEGORY_ID', $curCategory->getId());
+
+                /* Learning Analytics courses buttons go here
+                 */
+                $this->setVar(array(
+                    'learning_analytics_block' => ''
+                ));
+
+                $allCoursesUsed = $allCoursesUsedInFolder->getOffset($curCategory->getId());
+
+                foreach ($allCoursesUsed as $courseFolder) {
+                    $this->setVar(array(
+                        'COURSE_FOLDER_ID' => $courseFolder->getId(),
+                        'COURSE_FOLDER_NAME' => $courseFolder->getName()
+                    ));
+
+                    $this->parse('learning_analytics_block', 'learning_analytics', true);
+                }
+
                 $this->parse('category_block', 'category_listing', true);
                 $this->setVar('submission_block', '');
 
@@ -167,7 +204,7 @@ if (!empty($subList) && is_array($subList)) {
 
         $totals = $submissionHandler->getBoxCount($sub['id']);
 
-        $readonly = !($groupHandler->isSuperuser() || date('Y',$sub['date']) >= date('Y'));
+        $readonly = !($_SESSION['user']->isSuperuser() || date('Y',$sub['date']) >= date('Y'));
 
         $openADF = new Alaress_Date_Format($sub['open'], 'U');
         $closeADF = new Alaress_Date_Format($sub['date'], 'U');
@@ -299,7 +336,30 @@ if (!empty($subList) && is_array($subList)) {
 
         $this->setVar('CATEGORY_ID', $prevCat['category']);
 
+        /* Learning Analytics courses buttons go here
+         */
+        $this->setVar(array(
+            'learning_analytics_block' => ''
+        ));
+
+        $allCoursesUsed = $allCoursesUsedInFolder->getOffset($curCategory->getId());
+
+        foreach ($allCoursesUsed as $courseFolder) {
+            $this->setVar(array(
+                'COURSE_FOLDER_ID' => $courseFolder->getId(),
+                'COURSE_FOLDER_NAME' => $courseFolder->getName()
+            ));
+
+            $this->parse('learning_analytics_block', 'learning_analytics', true);
+        }
+
         $this->parse("category_block", "category_listing", true);
+
+        /* Clear children after parsing out the parent
+         */
+        $this->setVar(array(
+            'learning_analytics_block' => ''
+        ));
     }
     catch (Exception $e) {
         // Couldn't find category, probably as it wasn't set.
