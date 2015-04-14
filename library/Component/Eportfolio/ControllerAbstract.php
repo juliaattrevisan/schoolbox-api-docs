@@ -23,7 +23,7 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
      * @param array $context
      * @param array $config
      */
-    public function setup(array $context, array $config)
+    public function setup($context, array $config)
     {
         parent::setup($context, $config);
 
