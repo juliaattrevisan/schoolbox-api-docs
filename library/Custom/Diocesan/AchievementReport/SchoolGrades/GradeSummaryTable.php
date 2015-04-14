@@ -31,6 +31,13 @@ class GradeSummaryTable extends Base {
     private $year = 0;
 
     /**
+     * A bunch of letters to obtain
+     *
+     * @var array
+     */
+    private $letterRegistry = array('N', 'A', 'M', 'E');
+
+    /**
      * Hook method
      *
      * @return mixed
@@ -52,17 +59,21 @@ class GradeSummaryTable extends Base {
     public function findData($externalUserId) {
         $explorer = $this->getDb()->getAll("SELECT TOP 2 * FROM  SynergyOne.dbo.uvSchoolBoxSchoolGradeResults");
 
+        /* Entered Grades
+         */
         $allEnteredGradesCurrentYear = $this->findEnteredGradesCurrentYear($externalUserId);
         $allEnteredGradesPreviousYear = $this->findEnteredGradesPreviousYear($externalUserId);
 
-        $allLetters = array(
-            $this->findLetter($externalUserId, 'N'),
-            $this->findLetter($externalUserId, 'A'),
-            $this->findLetter($externalUserId, 'M'),
-            $this->findLetter($externalUserId, 'E')
-        );
+        /* All the counts for the letters
+         */
+        $allLetters = array();
 
-        /* Rearrange everything into a nice order
+        foreach ($this->getLetterRegistry() as $currentLetter) {
+            $allLetters[] = $this->findLetter($externalUserId, $currentLetter);
+        }
+
+        /**
+         * Rearrange everything into a nice order
          */
         $finalStack = array();
 
@@ -71,12 +82,7 @@ class GradeSummaryTable extends Base {
          */
         foreach ($allEnteredGradesCurrentYear as $current) {
             $finalStack[$current['StudentYearLevel']]['enteredGrades'] += $current['num'];
-            $finalStack[$current['StudentYearLevel']]['letters'] = array(
-                'N' => 0,
-                'A' => 0,
-                'M' => 0,
-                'E' => 0
-            );
+            $finalStack[$current['StudentYearLevel']]['letters'] = array_fill_keys($this->getLetterRegistry(), 0);
         }
 
         /* And I suppose do it for all the previous years too
@@ -84,12 +90,7 @@ class GradeSummaryTable extends Base {
          */
         foreach ($allEnteredGradesPreviousYear as $current) {
             $finalStack[$current['StudentYearLevel']]['enteredGrades'] += $current['num'];
-            $finalStack[$current['StudentYearLevel']]['letters'] = array(
-                'N' => 0,
-                'A' => 0,
-                'M' => 0,
-                'E' => 0
-            );
+            $finalStack[$current['StudentYearLevel']]['letters'] = array_fill_keys($this->getLetterRegistry(), 0);
         }
 
         /* And for all the letters
@@ -204,5 +205,25 @@ class GradeSummaryTable extends Base {
     public function getYear()
     {
         return $this->year;
+    }
+
+    /**
+     * Set letter registry
+     *
+     * @param array $letterRegistry
+     */
+    private function setLetterRegistry($letterRegistry)
+    {
+        $this->letterRegistry = $letterRegistry;
+    }
+
+    /**
+     * Get letter registry
+     *
+     * @return array
+     */
+    private function getLetterRegistry()
+    {
+        return $this->letterRegistry;
     }
 }
