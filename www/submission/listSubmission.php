@@ -122,28 +122,30 @@ if (Cfg::get('external_enable')) {
 
 $this->setVar(array('category_block' => ''));
 
-/* $allCoursesUsedInFolder is a collection of folderId-courseFolders
- *
- * Get everything at the start in one query, rather than
- * ram them in to the weird loop below.
- *
- * Or you could have had a folder-course relation in the db
- */
-$allFolderIds = array();
 
-foreach ($subList as $currentSub) {
-    $allFolderIds[] = $currentSub['category'];
-}
-
-$allFolderIds = array_values(array_unique($allFolderIds));
-
-$unitInstanceMapper = new \Schoolbox\Assessment\Course\UnitInstanceMapper();
-$allCoursesUsedInFolder = $unitInstanceMapper->findAllCoursesUsedInFolders($allFolderIds);
 
 /* Iterate
  */
 if (!empty($subList) && is_array($subList)) {
     $i = 0;
+
+    /* $allCoursesUsedInFolder is a collection of folderId-courseFolders
+     *
+     * Get everything at the start in one query, rather than
+     * ram them in to the weird loop below.
+     *
+     * Or you could have had a folder-course relation in the db
+     */
+    $allFolderIds = array();
+
+    foreach ($subList as $currentSub) {
+        $allFolderIds[] = $currentSub['category'];
+    }
+
+    $allFolderIds = array_values(array_unique($allFolderIds));
+
+    $unitInstanceMapper = new \Schoolbox\Assessment\Course\UnitInstanceMapper();
+    $allCoursesUsedInFolder = $unitInstanceMapper->findAllCoursesUsedInFolders($allFolderIds);
 
     foreach ($subList as $sub) {
 
