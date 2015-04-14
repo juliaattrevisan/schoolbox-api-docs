@@ -25,7 +25,7 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
      *                       permission: the permission level (READ_ACCESS, etc)
      * @param array $config
      */
-    public function setup($context, array $config)
+    public function setup($context = null, array $config = array())
     {
         parent::setup($context, $config);
 

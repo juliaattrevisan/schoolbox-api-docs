@@ -10,7 +10,7 @@
 abstract class Component_Homepage_ControllerAbstract extends Component_ControllerAbstract
 {
 
-    public function setup(\Schoolbox\Resource\Folder\Model $context, array $config)
+    public function setup(\Schoolbox\Resource\Folder\Model $context = null, array $config = array())
     {
         parent::setup($context, $config);
         $g = new Group();
