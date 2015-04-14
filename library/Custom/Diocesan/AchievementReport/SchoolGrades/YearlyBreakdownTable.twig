@@ -1,29 +1,40 @@
-{% for year, allCourses in yearlyBreakdown.data %}
-    <h2>{{ yearlyBreakdown.heading }} {{ year }}</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Course</th>
-                <th>Entered Grades</th>
-                <th>N</th>
-                <th>A</th>
-                <th>M</th>
-                <th>E</th>
-                <th>Available</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for courseName, data in allCourses %}
-            <tr>
-                <td>{{ courseName }}</td>
-                <td>{{ data.enteredGrades }}</td>
-                <td>{{ data.letters.N }}</td>
-                <td>{{ data.letters.A }}</td>
-                <td>{{ data.letters.M }}</td>
-                <td>{{ data.letters.E }}</td>
-                <td>{{ data.availableGrades }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+{% for year, allCourses in yearlyBreakdown.data.yearStack %}
+<h2>{{ yearlyBreakdown.heading }} {{ year }}</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Course</th>
+            <th>Entered Grades</th>
+            <th>N</th>
+            <th>A</th>
+            <th>M</th>
+            <th>E</th>
+            <th>Available</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for courseName, yearlyValues in allCourses %}
+        <tr>
+            <td>{{ courseName }}</td>
+            <td>{{ yearlyValues.enteredGrades }}</td>
+            <td>{{ yearlyValues.letters.N }}</td>
+            <td>{{ yearlyValues.letters.A }}</td>
+            <td>{{ yearlyValues.letters.M }}</td>
+            <td>{{ yearlyValues.letters.E }}</td>
+            <td>{{ yearlyValues.availableGrades }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td></td>
+            <td>{{ yearlyBreakdown.data.totals[year].enteredGrades }}</td>
+            <td>{{ yearlyBreakdown.data.totals[year].letters.N }}</td>
+            <td>{{ yearlyBreakdown.data.totals[year].letters.A }}</td>
+            <td>{{ yearlyBreakdown.data.totals[year].letters.M }}</td>
+            <td>{{ yearlyBreakdown.data.totals[year].letters.E }}</td>
+            <td>{{ yearlyBreakdown.data.totals[year].availableGrades }}</td>
+        </tr>
+    </tfoot>
+</table>
 {% endfor %}

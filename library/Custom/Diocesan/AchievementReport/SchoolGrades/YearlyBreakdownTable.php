@@ -107,8 +107,13 @@ class YearlyBreakdownTable extends Base {
             }
         }
 
-        new \Alaress_Probe($yearStack, $totals);
+        $finalStack = array(
+            'yearStack' => $yearStack,
+            'totals' => $totals
+        );
 
-        return $yearStack;
+        new \Alaress_Probe($finalStack);
+
+        return $finalStack;
     }
 }
