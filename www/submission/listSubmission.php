@@ -58,7 +58,7 @@ $groupHandler = new Group();
 
 $contextSelector = new ContextSelector('submission/listSubmission');
 
-if(!$groupHandler->isStaff() ) {
+if(!$_SESSION['user']->getRole()->isStaff() ) {
     error(19);
 }
 
@@ -204,7 +204,7 @@ if (!empty($subList) && is_array($subList)) {
 
         $totals = $submissionHandler->getBoxCount($sub['id']);
 
-        $readonly = !($groupHandler->isSuperuser() || date('Y',$sub['date']) >= date('Y'));
+        $readonly = !($_SESSION['user']->isSuperuser() || date('Y',$sub['date']) >= date('Y'));
 
         $openADF = new Alaress_Date_Format($sub['open'], 'U');
         $closeADF = new Alaress_Date_Format($sub['date'], 'U');

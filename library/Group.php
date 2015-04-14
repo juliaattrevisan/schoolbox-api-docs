@@ -479,9 +479,8 @@ class Group extends DeprecatedModel
         }
 
         // allow staff write access to NEWS_SERVICE by default except at shore...
-        if ($this->isStaff($userID) && (Cfg::get(
-            'news_staff_post_enabled'
-        ) == '1') && ($this->_service == NEWS_SERVICE) && ($permission < WRITE_ACCESS)
+        if (($this->_service == NEWS_SERVICE) && $permission < WRITE_ACCESS &&
+            Cfg::get('news_staff_post_enabled') == '1' && $this->isStaff($userID)
         ) {
             $permission = WRITE_ACCESS;
         }
