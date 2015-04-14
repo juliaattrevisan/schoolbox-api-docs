@@ -81,6 +81,7 @@ class GradeSummaryTable extends Base {
          * Initialise The Letters
          */
         foreach ($allEnteredGradesCurrentYear as $current) {
+            $finalStack[$current['StudentYearLevel']]['fileYear'] = $current['Fileyear'];
             $finalStack[$current['StudentYearLevel']]['enteredGrades'] += $current['num'];
             $finalStack[$current['StudentYearLevel']]['letters'] = array_fill_keys($this->getLetterRegistry(), 0);
         }
@@ -89,6 +90,7 @@ class GradeSummaryTable extends Base {
          * Initialise The Letters
          */
         foreach ($allEnteredGradesPreviousYear as $current) {
+            $finalStack[$current['StudentYearLevel']]['fileYear'] = $current['Fileyear'];
             $finalStack[$current['StudentYearLevel']]['enteredGrades'] += $current['num'];
             $finalStack[$current['StudentYearLevel']]['letters'] = array_fill_keys($this->getLetterRegistry(), 0);
         }
@@ -122,12 +124,13 @@ class GradeSummaryTable extends Base {
             SELECT DISTINCT (classcode + AssessAreaHeading),
                 StudentYearLevel,
                 StrippedResult,
+                Fileyear,
                 COUNT(StrippedResult) AS num
             FROM
                 SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
             WHERE ID = '{$externalUserId}'
             AND classyear = '{$this->getYear()}'
-            GROUP BY (classcode + AssessAreaHeading), StudentYearLevel, StrippedResult
+            GROUP BY (classcode + AssessAreaHeading), StudentYearLevel, StrippedResult, Fileyear
             ORDER BY StudentYearLevel DESC, StrippedResult DESC
         ";
 
@@ -150,13 +153,14 @@ class GradeSummaryTable extends Base {
             SELECT DISTINCT (classcode + AssessAreaHeading),
                 StudentYearLevel,
                 StrippedResult,
+                Fileyear,
                 COUNT(StrippedResult) AS num
             FROM
                 SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
             WHERE ID = '{$externalUserId}'
             AND classyear < '{$this->getYear()}'
             AND Result != ''
-            GROUP BY (classcode + AssessAreaHeading), StudentYearLevel, StrippedResult
+            GROUP BY (classcode + AssessAreaHeading), StudentYearLevel, StrippedResult, Fileyear
             ORDER BY StudentYearLevel DESC, StrippedResult DESC
         ";
 
