@@ -10,54 +10,104 @@
 </style>
 
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
-{#<script type="text/javascript">#}
-    {#$(function() {#}
-        {#$('[data-graph="resultSummary"]').highcharts({#}
-            {#chart: {#}
-                {#type: 'bar'#}
-            {#},#}
-            {#title: {#}
-                {#text: 'Stacked bar chart'#}
-            {#},#}
-            {#xAxis: {#}
-                {#categories: ['N', 'A', 'M', 'E']#}
-            {#},#}
-            {#yAxis: {#}
-                {#min: 0,#}
-                {#title: {#}
-                    {#text: ''#}
-                {#}#}
-            {#},#}
-            {#legend: {#}
-                {#reversed: true#}
-            {#},#}
-            {#plotOptions: {#}
-                {#series: {#}
-                    {#stacking: 'normal'#}
-                {#}#}
-            {#},#}
-            {#series: [#}
+<script type="text/javascript">
+    (function() {
+        $.fn.nameGraph = function(options) {
+            options = options || {};
 
-            {#]#}
-        {#});#}
-    {#});#}
-{#</script>#}
+            var config = init(options, this);
 
-<pre>
-{% for currentColumn in gradeSummary.columns %}
-{% if currentColumn != 'availableGrades' %}
-    {
-        name: '{{ currentColumn }}',
-        data: [{% for year, values in gradeSummary.data %}{{ values.letters[currentColumn] }}{% if not loop.last %}, {% endif %}{% endfor %}]
-    },
-{% else %}
-    {
-        name: '{{ currentColumn }}',
-        data: [{% for year, values in gradeSummary.data %}{{ values[currentColumn] }}{% if not loop.last %}, {% endif %}{% endfor %}]
-    }
-{% endif %}
-{% endfor %}
-</pre>
+            graph();
+
+            /**
+             * Init
+             *
+             * @param options
+             * @param element
+             * @returns {*}
+             */
+            function init(options, element) {
+                var defaults = {
+                    element: element,
+
+                    /* Graph title
+                     */
+                    title: '',
+
+                    /* Year 10, 9, 8...
+                     */
+                    categories: [],
+
+                    /* Data for N/A/M/E/AvailableGrades
+                     */
+                    series: []
+                }
+
+                var derived = {
+                }
+
+                var merged = $.extend(defaults, derived, options);
+
+                return merged;
+            }
+
+            /**
+             * Graph it
+             */
+            function graph() {
+                $(config.element).highcharts({
+                    chart: {
+                        type: 'bar'
+                    },
+                    title: {
+                        text: config.title
+                    },
+                    xAxis: {
+                        categories: config.categories
+                    },
+                    yAxis: {
+                        min: 0,
+                        reversedStacks: false,
+                        title: {
+                            text: ''
+                        }
+                    },
+                    legend: {
+                        reversed: false
+                    },
+                    plotOptions: {
+                        series: {
+                            stacking: 'normal'
+                        }
+                    },
+                    series: config.series
+                });
+            }
+        }
+    }(jQuery));
+
+    $(function() {
+        $('[data-graph="resultSummary"]').nameGraph({
+            title: 'Result Summary',
+            categories: [{% for year, values in gradeSummary.data %}'Year {{ year }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+            series: [
+                {% for currentColumn in gradeSummary.columns %}
+                {% if currentColumn != 'availableGrades' %}
+                {
+                    name: '{{ currentColumn }}',
+                    data: [{% for year, values in gradeSummary.data %}{{ values.letters[currentColumn] }}{% if not loop.last %}, {% endif %}{% endfor %}]
+                },
+                {% else %}
+                {
+                    name: '{{ currentColumn }}',
+                    data: [{% for year, values in gradeSummary.data %}{{ values[currentColumn] }}{% if not loop.last %}, {% endif %}{% endfor %}]
+                }
+                {% endif %}
+                {% endfor %}
+            ]
+        });
+    });
+</script>
 
 <h2>{{ gradeSummary.heading }}</h2>
 
