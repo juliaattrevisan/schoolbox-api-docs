@@ -1,91 +1,7 @@
-<style type="text/css">
-    table {
-        border-collapse: collapse;
-    }
-    table, td, th {
-        border: 1px dashed #f00;
-        padding: 20px;
-        text-align: left;
-    }
-</style>
-
+<link href="/custom/diocesan/achievementreport/css/styles.css" media="screen" rel="stylesheet" type='text/css' />
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
+<script type="text/javascript" src="/custom/diocesan/achievementreport/js/nameGraph.js"></script>
 <script type="text/javascript">
-    (function() {
-        $.fn.nameGraph = function(options) {
-            options = options || {};
-
-            var config = init(options, this);
-
-            graph();
-
-            /**
-             * Init
-             *
-             * @param options
-             * @param element
-             * @returns {*}
-             */
-            function init(options, element) {
-                var defaults = {
-                    element: element,
-
-                    /* Graph title
-                     */
-                    title: '',
-
-                    /* Year 10, 9, 8...
-                     */
-                    categories: [],
-
-                    /* Data for N/A/M/E/AvailableGrades
-                     */
-                    series: []
-                }
-
-                var derived = {
-                }
-
-                var merged = $.extend(defaults, derived, options);
-
-                return merged;
-            }
-
-            /**
-             * Graph it
-             */
-            function graph() {
-                $(config.element).highcharts({
-                    chart: {
-                        type: 'bar'
-                    },
-                    title: {
-                        text: config.title
-                    },
-                    xAxis: {
-                        categories: config.categories
-                    },
-                    yAxis: {
-                        min: 0,
-                        reversedStacks: false,
-                        title: {
-                            text: ''
-                        }
-                    },
-                    legend: {
-                        reversed: false
-                    },
-                    plotOptions: {
-                        series: {
-                            stacking: 'normal'
-                        }
-                    },
-                    series: config.series
-                });
-            }
-        }
-    }(jQuery));
-
     $(function() {
         $('[data-graph="resultSummary"]').nameGraph({
             title: 'Result Summary',
@@ -109,33 +25,35 @@
     });
 </script>
 
-<h2>{{ gradeSummary.heading }}</h2>
+<div class="achievement-report">
+    <h2>{{ gradeSummary.heading }}</h2>
 
-<table>
-    <thead>
-        <tr>
-            <th>Year</th>
-            <th>Entered Grades</th>
-            <th>N</th>
-            <th>A</th>
-            <th>M</th>
-            <th>E</th>
-            <th>Available Grades</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for year, values in gradeSummary.data %}
-        <tr>
-            <td>{{ year }}</td>
-            <td>{{ values.enteredGrades }}</td>
-            <td>{{ values.letters.N }}</td>
-            <td>{{ values.letters.A }}</td>
-            <td>{{ values.letters.M }}</td>
-            <td>{{ values.letters.E }}</td>
-            <td>{{ values.availableGrades }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    <table>
+        <thead>
+            <tr>
+                <th>Year</th>
+                <th>Entered Grades</th>
+                <th>N</th>
+                <th>A</th>
+                <th>M</th>
+                <th>E</th>
+                <th>Available Grades</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for year, values in gradeSummary.data %}
+            <tr>
+                <td>{{ year }}</td>
+                <td>{{ values.enteredGrades }}</td>
+                <td>{{ values.letters.N }}</td>
+                <td>{{ values.letters.A }}</td>
+                <td>{{ values.letters.M }}</td>
+                <td>{{ values.letters.E }}</td>
+                <td>{{ values.availableGrades }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-<div data-graph="resultSummary"></div>
+    <div data-graph="resultSummary"></div>
+</div>

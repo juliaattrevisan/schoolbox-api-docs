@@ -1,0 +1,9 @@
+.achievement-report table {
+    border-collapse: collapse;
+}
+
+.achievement-report table, td, th {
+    border: 1px dashed #f00;
+    padding: 20px;
+    text-align: left;
+}
