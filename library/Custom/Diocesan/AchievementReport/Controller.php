@@ -28,6 +28,7 @@ class Controller extends Base {
         $this->getResponse()->content->set(array(
             'template' => '@achievementreport/index.twig',
             'data' => array(
+                'preselectedYear' => $year,
                 'externalUser' => $externalUser,
 
                 'gradeSummary' => array(

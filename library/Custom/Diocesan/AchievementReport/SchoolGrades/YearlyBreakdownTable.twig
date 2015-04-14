@@ -1,5 +1,17 @@
 <script type="text/javascript">
     $(function() {
+
+        /* Preselected breakdown year
+         */
+        var preselectedYear = '{{ preselectedYear }}';
+
+        if (!isNaN(preselectedYear)) {
+            $('[data-year="' + preselectedYear + '"').addClass('current');
+            $('[data-yearly-breakdown-year="' + preselectedYear + '"]').show();
+        }
+
+        /* Select a breakdown to view
+         */
         $('[data-year-selector]').find('a').click(function(event) {
             event.preventDefault();
 
