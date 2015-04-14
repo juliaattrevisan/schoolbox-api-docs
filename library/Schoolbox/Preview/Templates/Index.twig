@@ -1,0 +1,36 @@
+<style type="text/css">
+    table {
+        border-collapse:collapse;
+    }
+
+    tr:nth-child(even) {
+        background: #eee
+    }
+
+    tr:nth-child(odd) {
+        background: #fff
+    }
+
+    td {
+        border: 1px solid #666;
+        font-family: Arial;
+        font-size: 13px;
+        padding: 16px;
+    }
+</style>
+<script type="text/javascript" src="/javascript/preview/preview.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('[data-modal=preview]').preview();
+    });
+</script>
+<table>
+    {% for currentUrl in allUrls %}
+        {% for type, url in currentUrl %}
+        <tr>
+            <td>{{ type }}</td>
+            <td><a data-modal='preview' href="{{ url }}">{{ url }}</td>
+        </tr>
+        {% endfor %}
+    {% endfor %}
+</table>

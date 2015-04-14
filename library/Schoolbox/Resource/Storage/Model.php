@@ -46,7 +46,6 @@ class Model extends File implements IStorage
     /** @var string */
     protected $extension;
 
-
     /**
      * @return string
      */

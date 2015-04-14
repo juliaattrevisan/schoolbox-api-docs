@@ -1,4 +1,11 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    <script type='text/javascript' src='/javascript/preview/preview.js'></script>
+    <script type="text/javascript">
+        $(function() {
+            $('[data-plugin="preview"]').preview();
+        });
+    </script>
+
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
 
@@ -12,10 +19,8 @@
                 </span>
                 <!-- END modify_link -->
 
-                <h4><a class="icons link {HIDDEN}" rel="{LINK_TARGET}" href="{LINK_URL}">{LINK_NAME}</a></h4>
-
+                <h4><a data-plugin="preview" class="icons link {HIDDEN}" rel="{LINK_TARGET}" href="/redir.php?id={LINK_ID}">{LINK_NAME}</a></h4>
                 <p class="{COMPONENT_COMPACTMODE}">{LINK_COMMENT}</p>
-
                 <p class="{COMPONENT_COMPACTMODE} footnote">
                     Posted by <a href="/search/user/{LINK_POSTED_BY_ID}">{LINK_POSTED_BY}</a> on {LINK_POSTED_DATE}
                 </p>

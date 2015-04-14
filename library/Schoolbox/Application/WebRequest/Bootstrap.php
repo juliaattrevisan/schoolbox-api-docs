@@ -238,6 +238,7 @@ class Bootstrap implements BootstrapInterface {
 		$di->setters['Alaress\\Web\\Output\\Html']['setTemplateEngine'] = $di->lazyGet('templateEngine');
 		$di->setters['Alaress\\Web\\Output\\ThemedHtml']['setSitepage'] = $di->lazyGet('layoutEngine');
 		$di->set('webOutput:html', $di->lazyNew('Alaress\\Web\\Output\\ThemedHtml'));
+		$di->set('webOutput:nochrome', $di->lazyNew('Alaress\\Web\\Output\\Html'));
 		$di->set('webOutput:json', $di->lazyNew('Alaress\\Web\\Output\\Json'));
 		$di->set('webOutput:file', $di->lazyNew('Alaress\\Web\\Output\\File'));
 
