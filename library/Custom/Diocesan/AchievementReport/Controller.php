@@ -19,7 +19,7 @@ class Controller extends Base {
     /**
      * School Grades page
      */
-    public function schoolGrades($db, $externalUser, $year) {
+    public function schoolGrades($db, $user, $externalUser, $year) {
         $gradeSummaryTable = new SchoolGrades\GradeSummaryTable($externalUser, $db);
         $yearlyBreakdownTable = new SchoolGrades\YearlyBreakdownTable($externalUser, $db);
         $entriesAndResultsTable = new SchoolGrades\EntriesAndResultsTable($externalUser, $db);
@@ -29,6 +29,7 @@ class Controller extends Base {
             'data' => array(
                 'preselectedYear' => $year,
                 'externalUser' => $externalUser,
+                'user' => $user,
 
                 'gradeSummary' => array(
                     'heading' => $gradeSummaryTable->getHeading(),

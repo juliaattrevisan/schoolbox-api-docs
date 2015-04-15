@@ -46,9 +46,19 @@ class Module extends BaseModule {
                 $externalUserHandler = new \External_User();
                 $externalUser = $externalUserHandler->getStudent($params['externalUserId']);
 
-                /* TODO: When selected user doesn't exist
+                /* TODO: When selected user doesn't exist in external db
                  */
                 if (!$externalUser) {
+                    error(2);
+                }
+
+                /* TODO: When selected user doesn't exist in schoolbox
+                 */
+                try {
+                    $userMapper = new \Schoolbox\UserMapper();
+                    $user = $userMapper->findOneByColumn('synergy_id', $params['externalUserId']);
+                }
+                catch (\Exception $e) {
                     error(2);
                 }
 
@@ -56,7 +66,8 @@ class Module extends BaseModule {
 
                 return array(
                     'db' => $db,
-                    'externalUser' => $externalUser
+                    'externalUser' => $externalUser,
+                    'user' => $user
                 );
             }
         );
