@@ -51,3 +51,15 @@
     border-left: 0px;
     border-right: 0px;
 }
+
+/**
+ * Key
+ */
+.achievement-report dl.key {
+    width: 50%;
+}
+
+.achievement-report dl.key dt {
+    width: 40px;
+}
+

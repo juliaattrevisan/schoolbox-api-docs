@@ -1,6 +1,47 @@
 <h1>School Grades</h1>
 
 <div class="achievement-report">
-{% include '@schoolgrades/GradeSummaryTable.twig' %}
-{% include '@schoolgrades/YearlyBreakdownTable.twig' %}
+    {% include '@schoolgrades/GradeSummaryTable.twig' %}
+    {% include '@schoolgrades/YearlyBreakdownTable.twig' %}
+
+    <h2>Report Grades Key</h2>
+
+    <p>
+        This report details the academic achievement and progress to date.
+        Internal assessments are often ongoing and may not be finalised
+        until later in this term. The internal assessment grades that have
+        not been finalised will be in brackets e.g. [M].
+    </p>
+
+    <dl class="key float-left">
+        <dt>N</dt>
+        <dd>Not Achieved</dd>
+
+        <dt>A</dt>
+        <dd>Achieved</dd>
+
+        <dt>M</dt>
+        <dd>Achieved With Merit</dd>
+
+        <dt>E</dt>
+        <dd>Achieved With Excellence</dd>
+
+        <dt>SNA</dt>
+        <dd>Standard Not Attempted</dd>
+    </dl>
+
+    <dl class="key float-right">
+        <dt>[N]</dt>
+        <dd>Not Achieved progress grade</dd>
+
+        <dt>[A]</dt>
+        <dd>Achieved progress grade</dd>
+
+        <dt>[M]</dt>
+        <dd>Achieved With Merit progress grade</dd>
+
+        <dt>[E]</dt>
+        <dd>Achieved With Excellence progress grade</dd>
+    </dl>
 </div>
+
