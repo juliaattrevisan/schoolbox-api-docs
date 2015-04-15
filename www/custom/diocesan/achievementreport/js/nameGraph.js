@@ -54,6 +54,9 @@
                 chart: {
                     type: 'bar'
                 },
+                colors: [
+                    '#CF0E0E', '#CF950E', '#98CF0E', '#0ECF32', '#697585'
+                ],
                 title: {
                     text: config.title
                 },
