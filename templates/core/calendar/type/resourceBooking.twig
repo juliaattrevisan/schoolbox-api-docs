@@ -14,20 +14,25 @@
         <em>{{ event.getCategory() }}</em>
 
         <p class="wysiwyg meta">{{ event.detail|purify}}</p>
+
         <div class="created">
             {% if event.authorName %}
                 Requested by <a href="/search/user/{{ event.authorId }}">{{ event.authorName }}</a>
             {% endif %}
         </div>
-        <ul class="relatedBookings">
-            {% for relatedBooking in event.booking.relatedBookingList %}
-            <li>
-                ({{ relatedBooking.status.name }}) {{ relatedBooking.resource.name }}
-                <a href="{{ routeLookup('resourceItem.read', {id: relatedBooking.item.id}) }}?date={{ event.getURLDate() }}">Review</a>
-            </li>
-            {% endfor %}
-        </ul>
+        {% if event.booking.relatedBookingList is iterable %}
+            <br />
+            <h3>Related Bookings</h3>
+            <ul class="relatedBookings">
+                {% for relatedBooking in event.booking.relatedBookingList %}
+                    <li>
+                        ({{ relatedBooking.status.name }}) <a href="{{ routeLookup('resourceItem.read', {id: relatedBooking.resource.id}) }}?date={{ event.getStartTime().getURLDate() }}">{{ relatedBooking.resource.name }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {%  endif %}
         <div>
+
             {% if renderer.getEditURL() != '' %}
             <a class="btn float-right modify booking-modify" href="{{ renderer.getEditURL() }}"><span></span>Modify</a>
             {% endif %}
