@@ -49,8 +49,10 @@ abstract class Base extends AchievementReportBase {
                 COUNT(StrippedResult) AS num
             FROM
                 SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
-            WHERE ID = '{$externalUserId}'
-            AND classyear = '{$this->getYear()}'
+            WHERE
+                ID = '{$externalUserId}'
+                AND classyear = '{$this->getYear()}'
+                AND Result != 'SNA'
             GROUP BY
                 (classcode + ' ' + AssessAreaHeading),
                 classcode,
@@ -95,9 +97,11 @@ abstract class Base extends AchievementReportBase {
                 COUNT(StrippedResult) AS num
             FROM
                 SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
-            WHERE ID = '{$externalUserId}'
-            AND classyear < '{$this->getYear()}'
-            AND Result != ''
+            WHERE
+                ID = '{$externalUserId}'
+                AND classyear < '{$this->getYear()}'
+                AND Result != ''
+                AND Result != 'SNA'
             GROUP BY
                 (classcode + ' ' + AssessAreaHeading),
                 classcode,
