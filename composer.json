@@ -73,7 +73,7 @@
         "twig/twig": "~1.15.1",
         "twig/extensions": "~1.0.1",
         "swiftmailer/swiftmailer": "5.2.*",
-        "maximebf/debugbar": "1.5.*",
+        "maximebf/debugbar": "~1.10.4",
         "shareworks/xml-security": "dev-master",
         "predis/predis": "0.8.*",
         "monolog/monolog": "1.7.0",
