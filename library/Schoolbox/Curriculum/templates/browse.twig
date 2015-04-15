@@ -310,13 +310,17 @@
                     <tr>
                         <th>
                             Curricula
+                            {% if isRouteAuthorized('curriculum.add') %}
                             <a href="{{ routeLookup('curriculum.add')|escape('html_attr') }}"
                                id="create-curriculum-button"
                                class="submit-btn-plain float-right inline-block"
                             >Create New Curriculum</a>
+                            {% endif %}
+                            {% if isRouteAuthorized('curriculumImport.browse') %}
                             <a href="{{ routeLookup('curriculumImport.browse')|escape('html_attr') }}"
                                class="submit-btn-plain float-right inline-block"
                             >Import Curriculum</a>
+                            {% endif %}
                         </th>
                     </tr>
                 </thead>
