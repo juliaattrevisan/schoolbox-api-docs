@@ -17,7 +17,7 @@ use Alaress_Probe as Probe;
 class Controller extends Base {
 
     /**
-     * Index
+     * School Grades page
      */
     public function schoolGrades($db, $externalUser, $year) {
         $gradeSummaryTable = new SchoolGrades\GradeSummaryTable($externalUser, $db);
