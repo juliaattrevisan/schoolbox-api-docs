@@ -45,8 +45,8 @@ class Javascript extends Base
 //        }
 
         // Show booking butonyes I have permission to view
+        /** @var Booking\Model $booking */
         $booking        = $this->getEvent()->getBooking();
-        $bookingId      = $booking->getId();
         $bookingButtons = array();
 
         // Modify butonye
@@ -87,6 +87,27 @@ class Javascript extends Base
                 'class' => 'reply booking-reject',
                 'href'  => $rejectUrl,
             );
+        }
+
+        // Related booking display
+        $relatedBookings = [];
+        foreach ($booking->getRelatedBookingList() as $relatedBooking) {
+            $reviewHref = $this->getRouteIfAuthorized(
+                'resourceItem.read',
+                ['id' => $relatedBooking->getResource()->getId()]
+            );
+            if ($reviewHref) {
+                $reviewHref .= '?date='.urlencode($relatedBooking->getEvent()->getStartDateTime()->getURLDate());
+            }
+            $relatedBookings[] = [
+                'title' => $relatedBooking->getResource()->getName(),
+                'item'    => array(
+                    'id'   => $relatedBooking->getResource()->getId(),
+                    'name' => $relatedBooking->getResource()->getName(),
+                ),
+                'status'  => $relatedBooking->getStatus()->jsonSerialize(),
+                'href'    => $reviewHref,
+            ];
         }
 
         // Set title from resource name, and code and booking name
@@ -153,6 +174,7 @@ class Javascript extends Base
                         'id'   => $this->getEvent()->getBooking()->getReviewer()->getId() ?: -1,
                         'name' => $this->getEvent()->getBooking()->getReviewer()->formatName(),
                     ),
+                    'related' => $relatedBookings,
                 ),
             )
         );

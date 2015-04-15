@@ -295,6 +295,9 @@ class Mapper extends BaseMapper
                 $resource->setCategory($mapper->hydrateJoin($row, 'resource.category', 'ic'));
                 $resource->setImage($mapper->hydrateJoin($row, 'resource.image', 'im'));
                 $model->setResource($resource);
+                // Find all related bookings for this item too.
+                // TODO do this without a query for each row
+                $model->setRelatedBookingList($this->findRelatedBookings($model->getId()));
                 return $model;
             }
         );
@@ -419,12 +422,14 @@ class Mapper extends BaseMapper
             SELECT
                 {$this->getColumnString('b')},
                 {$this->getJoinColumnString('resource', 'r')},
-                {$this->getJoinColumnString('event',    'e')}
+                {$this->getJoinColumnString('event',    'e')},
+                {$this->getJoinColumnString('status',   's')}
             FROM {$this->getTable()} b
             INNER JOIN {$this->getTable()} rb
                 ON b.event_id = rb.event_id AND b.id != rb.id AND rb.id = :bookingId
             INNER JOIN {$this->getJoinSql('resource', 'b', 'r')}
             INNER JOIN {$this->getJoinSql('event',    'b', 'e')}
+            INNER JOIN {$this->getJoinSql('status',   'b', 's')}
             WHERE b.deleted_at IS NULL AND b.id != :bookingId
         ";
         $statement = $this->getDatabase()->prepare($query);
@@ -436,6 +441,7 @@ class Mapper extends BaseMapper
             return $model
                 ->setResource($mapper->hydrateJoin($row, 'resource', 'r'))
                 ->setEvent($mapper->hydrateJoin($row, 'event', 'e'))
+                ->setStatus($mapper->hydrateJoin($row, 'status', 's'))
             ;
         });
     }
