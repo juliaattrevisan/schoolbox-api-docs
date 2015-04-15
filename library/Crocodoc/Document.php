@@ -11,6 +11,7 @@
 namespace Crocodoc;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
+use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
 use Schoolbox\Resource\Storage\Model;
 
 class Document
@@ -31,7 +32,7 @@ class Document
     private $url = '';
 
     /**
-     * An instance of Schoolbox\Assessment\Component\SubmissionBox\Submission
+     * The student submission containing the file we wish to preview
      *
      * @var Submission\File
      */
@@ -95,9 +96,18 @@ class Document
          */
         unlink($this->getUrl());
 
+        // Crocodoc-related errors, when a file dies in crocodoc
+        $result = json_decode($curl->getResult());
+
+        if (isset($result->uuid)) {
+            /* Save reference to uploaded file */
+            $this->getSubmission()->setUuid($result->uuid);
+            SubmissionMapper::getInstance()->save($this->getSubmission());
+        }
+
         return array(
-            'result' => json_decode($curl->getResult()),
-            'errors' => $curl->getErrors()
+            'result' => $result,
+            'errors' => isset($result->error) ? $result->error : $curl->getErrors(),
         );
     }
 
@@ -109,7 +119,7 @@ class Document
      *
      * @param Authenticator $authenticator
      */
-    private function setAuthenticator($authenticator)
+    private function setAuthenticator(Authenticator $authenticator)
     {
         $this->authenticator = $authenticator;
     }
@@ -169,7 +179,7 @@ class Document
      *
      * @param Submission\File $submission
      */
-    private function setSubmission($submission)
+    private function setSubmission(Submission $submission)
     {
         $this->submission = $submission;
     }

@@ -10,9 +10,9 @@
 
 namespace Crocodoc;
 
-
 use Exception;
-use Schoolbox\User;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 
 class Facade {
@@ -56,50 +56,17 @@ class Facade {
 		/* If this was previously uploaded in the past, resume scribbling
 		 * Otherwise upload it and start a new scribble
 		 */
-		if (strlen($submission->getUuid())) {
-			$loader = new Loader($submission->getUuid(), $this->getUser());
-			echo $loader->render();
+		if (!strlen($submission->getUuid())) {
+            $document = new Document($submission);
+            $response = $document->upload();
+
+            if($response['error']) {
+                echo json_encode($response);
+            }
 		}
-		else {
-			$document = new Document($submission);
-			$response = $document->upload();
 
-			/* Crocodoc-related errors, when a file dies in crocodoc
-			 */
-			if (isset($response['result']->error)) {
-
-				/* To prevent vertical display of error message
-				 */
-				if (is_array($response['result']->error)) {
-					echo json_encode(array(
-						'errors' => $response['result']->error,
-					));
-				}
-				else {
-					echo json_encode(array(
-						'errors' => array($response['result']->error),
-					));
-				}
-			}
-			/* If crocodoc is unreachable, or curl/network-related errors
-			 */
-			else if (count($response['errors'])) {
-				echo json_encode(array(
-					'errors' => $response['errors'],
-				));
-			}
-			/* Otherwise everything went okay, thump out the url to the crocodoc
-			 */
-			else if (isset($response['result']->uuid)) {
-				$loader = new Loader($response['result']->uuid, $this->getUser());
-				echo $loader->render();
-
-				/* Allow resuming of marking
-				 */
-				$submission->setUuid($response['result']->uuid);
-				$submissionMapper->save($submission);
-			}
-		}
+        $loader = new Loader($submission->getUuid(), $this->getUser());
+        echo $loader->render();
 	}
 
 	/* Getters/Setters
@@ -128,7 +95,7 @@ class Facade {
 	 *
 	 * @param User $user
 	 */
-	private function setUser($user) {
+	private function setUser(User $user) {
 		$this->user = $user;
 	}
 

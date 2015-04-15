@@ -73,16 +73,12 @@ class Loader
 
         /* Handle postfields different from student viewers and teacher/superuser viewers
          */
-        if ($this->getGroupHandler()->isStudent($this->getUser()->getId())) {
-            $postFields = "token={$this->getAuthenticator()
-                                       ->getApiToken()}&uuid={$this->getUuid()}&editable=false";
-
-        } elseif ($this->getGroupHandler()->isStaff($this->getUser()->getId())
-            || $this->getGroupHandler()->isSuperuser($this->getUser()->getId())) {
-
-            $userTuple  = "{$this->getUser()->getId()},{$this->getUser()->getUsername()}";
-            $postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&editable=true&user={$userTuple}";
-
+        if($this->getUser()->getRole()->isStudent()) {
+            $postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&editable=false";
+        }
+        else if ($this->getUser()->getRole()->isStaff() || $this->getUser()->isSuperuser()) {
+            $userTuple = "{$this->getUser()->getId()},{$this->getUser()->getUsername()}";
+            $postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid}&editable=true&user={$userTuple}";
         } else {
             $postFields = '';
         }
