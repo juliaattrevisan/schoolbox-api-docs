@@ -22,6 +22,9 @@ class Controller extends Base {
     public function schoolGrades($db, $externalUser, $year) {
         $gradeSummaryTable = new SchoolGrades\GradeSummaryTable($externalUser, $db);
         $yearlyBreakdownTable = new SchoolGrades\YearlyBreakdownTable($externalUser, $db);
+        $entriesAndResultsTable = new SchoolGrades\EntriesAndResultsTable($externalUser, $db);
+
+
 
         $this->getResponse()->content->set(array(
             'template' => '@achievementreport/index.twig',
@@ -38,6 +41,11 @@ class Controller extends Base {
                 'yearlyBreakdown' => array(
                     'heading' => $yearlyBreakdownTable->getHeading(),
                     'data' => $yearlyBreakdownTable->findData($externalUser['StudentID']),
+                ),
+
+                'entriesAndResults' => array(
+                    'heading' => $entriesAndResultsTable->getHeading(),
+                    'data' => $entriesAndResultsTable->findData($externalUser['StudentID']),
                 )
             )
         ));
