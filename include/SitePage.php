@@ -642,6 +642,14 @@ class SitePage extends Page
                     }
                     break;
 
+                case 'peninsula':
+                    if ($this->groupHandler->isStaff()) {
+                        $location = Cfg::get('mail_webmail');
+                    } elseif ($this->groupHandler->isStudent()) {
+                        $location = 'https://outlook.com/owa/tps.vic.edu.au';
+                    }
+                    break;
+
                 default:
                     $location = Cfg::get('mail_webmail');
                     break;
