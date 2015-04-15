@@ -30,8 +30,12 @@
                 return row;
             });
 
-            // Method for building the form
-            // Tears down and sets up TinyMCE dynamically too
+            /**
+             * Builds a readonly view of the curriculum node
+             *
+             * @param actions
+             * @param data
+             */
             var buildView = function(actions, data) {
                 data.actions  = actions;
                 data.readonly = readonly;
@@ -43,8 +47,22 @@
                     event.preventDefault();
                     buildForm(actions, data);
                 });
+                // Add child to existing curriculum
+                formPanel.find('#create-child-button').click(function(event) {
+                    event.preventDefault();
+                    var form = $(this).closest('form');
+                    buildForm({ save: createUri }, { parent: form.data('nodeid') }, data);
+                });
             };
-            var buildForm = function(actions, data) {
+
+            /**
+             * Builds a writable view of the curriculum node
+             *
+             * @param actions
+             * @param data
+             * @param previous If creating a subsection, fall back to this data
+             */
+            var buildForm = function(actions, data, previous) {
                 tinyMCE.execCommand('mceRemoveControl', true, 'node-description');
                 data.actions = actions;
                 data.areas   = areas;
@@ -55,7 +73,12 @@
                 // Cancel editing
                 formPanel.find('#cancel-button').click(function(event) {
                     event.preventDefault();
-                    buildView(actions, data);
+                    // Is data empty? Load data from whatever the current node is.
+                    if (!data.id) {
+                        buildView(actions, previous);
+                    } else {
+                        buildView(actions, data);
+                    }
                 });
                 tinyMCE.execCommand('mceAddControl', true, 'node-description');
             };
@@ -223,13 +246,6 @@
             treePanel.on('click', '#create-curriculum-button', function(event) {
                 event.preventDefault();
                 buildForm({ save: createUri }, {});
-            });
-
-            // Add child to existing curriculum
-            formPanel.on('click', '#create-child-button', function(event) {
-                event.preventDefault();
-                var form = $(this).closest('form');
-                buildForm({ save: createUri }, { parent: form.data('nodeid') });
             });
         })
     })(jQuery);
