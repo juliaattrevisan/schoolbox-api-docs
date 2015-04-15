@@ -83,13 +83,21 @@
     <h2>{{ entriesAndResults.heading }} {{ year }}</h2>
     <table>
         <tbody>
-            {% for courseName, allAreas in entriesAndResults.data[year] %}
+            {% for courseName, areaData in entriesAndResults.data[year] %}
             <tr>
-                <td class="subheading">{{ courseName }}</strong></td>
+                <td class="subheading">
+                    {{ courseName }}
+
+                    <ul class="teacher-list">
+                        {% for currentTeacher in areaData.allTeachers %}
+                        <li><a href='#'>{{ currentTeacher }}</a>{% if not loop.last %}, {% endif %}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
                 <td class="subheading">Term 2</td>
                 <td class="subheading">Term 4</td>
             </tr>
-            {% for currentArea, values in allAreas %}
+            {% for currentArea, values in areaData.allAreas %}
             <tr>
                 <td>{{ currentArea }}</td>
                 <td>{{ values.letters.term2 }}</td>

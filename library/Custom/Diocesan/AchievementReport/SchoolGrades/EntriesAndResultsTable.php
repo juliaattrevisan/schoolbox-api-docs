@@ -52,19 +52,19 @@ class EntriesAndResultsTable extends Base {
             /* List of teachers - uniquify and exclude empties
              */
             if (!is_array($finalStack[$year][$courseName][$assessArea]['teachers'])) {
-                $finalStack[$year][$courseName][$assessArea]['teachers'] = array();
+                $finalStack[$year][$courseName]['allTeachers'] = array();
             }
 
             foreach(array($currentEntry['ClassTeacher1'], $currentEntry['ClassTeacher2'], $currentEntry['ClassTeacher3']) as $currentTeacher) {
-                if (strlen($currentTeacher) && !in_array($currentTeacher, $finalStack[$year][$courseName][$assessArea]['teachers'])) {
-                    $finalStack[$year][$courseName][$assessArea]['teachers'][] = $currentTeacher;
+                if (strlen($currentTeacher) && !in_array($currentTeacher, $finalStack[$year][$courseName]['allTeachers'])) {
+                    $finalStack[$year][$courseName]['allTeachers'][] = $currentTeacher;
                 }
             }
 
             /* Initialise Term 2 and Term 4 marks
              */
             if (!is_array($finalStack[$year][$courseName][$assessArea]['letters'])) {
-                $finalStack[$year][$courseName][$assessArea]['letters'] = array(
+                $finalStack[$year][$courseName]['allAreas'][$assessArea]['letters'] = array(
                     'term2' => '',
                     'term4' => ''
                 );
@@ -72,7 +72,7 @@ class EntriesAndResultsTable extends Base {
 
             /* Term 2 and Term 4 marks
              */
-            $finalStack[$year][$courseName][$assessArea]['letters']['term' . $term] = $result;
+            $finalStack[$year][$courseName]['allAreas'][$assessArea]['letters']['term' . $term] = $result;
         }
 
         return $finalStack;
