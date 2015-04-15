@@ -216,9 +216,34 @@
     })(jQuery);
 </script>
 
-<!-- Template for the display of a curriculum node -->
+<!-- Template for displaying of a curriculum node -->
 {% verbatim %}
 <script id="node-template" type="text/x-dot-template">
+    <h1>
+        {{? it.code }}
+            [{{! it.code }}]
+        {{?}}
+        {{! it.name }}
+    </h1>
+
+    {{? it.reference }}
+    <p>
+        <strong>Reference:</strong>
+        <a href="{{! it.reference }}">{{! it.reference }}</a>
+    </p>
+    {{?}}
+
+    {{= it.description }}
+
+    {{? it.actions.delete }}
+    <form action="{{! it.actions.delete }}" id="node-delete-form" method="post"></form>
+    {{?}}
+</script>
+{% endverbatim %}
+
+<!-- Template for editing a curriculum node -->
+{% verbatim %}
+<script id="node-edit-template" type="text/x-dot-template">
     <form id="node-form" method="post" action="{{! it.actions.save }}" data-nodeid="{{! it.id }}">
         <input type="hidden" name="parent" value="{{! it.parent }}" />
         <!--
