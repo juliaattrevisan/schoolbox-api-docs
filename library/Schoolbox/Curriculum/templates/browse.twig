@@ -20,7 +20,7 @@
 
             // add classes to tree, because jstree doesn't allow me to define
             // a base style for trees
-            var tree = {{ tree|json_encode|raw }}.map(function(row) {
+            var treeData = {{ tree|json_encode|raw }}.map(function(row) {
                 try {
                     row.li_attr.class += ' curriculum-node';
                 } catch (e) {
@@ -31,6 +31,12 @@
 
             // Method for building the form
             // Tears down and sets up TinyMCE dynamically too
+            var buildView = function(actions, data) {
+                data.actions = actions;
+                formPanel
+                    .empty()
+                    .append(template(data));
+            };
             var buildForm = function(actions, data) {
                 tinyMCE.execCommand('mceRemoveControl', true, 'node-description');
                 data.actions = actions;
@@ -38,17 +44,18 @@
                 data.levels  = levels;
                 formPanel
                     .empty()
-                    .append(template(data));
+                    .append(editTemplate(data));
                 tinyMCE.execCommand('mceAddControl', true, 'node-description');
             };
 
-            var template  = doT.template($('script#node-template').html().trim());
-            var treePanel = $('.curriculum-selector');
-            var formPanel = $('.curriculum-editor');
-            var tree      = $('.curriculum-tree').jstree({
+            var template     = doT.template($('script#node-template').html().trim());
+            var editTemplate = doT.template($('script#node-edit-template').html().trim());
+            var treePanel    = $('.curriculum-selector');
+            var formPanel    = $('.curriculum-editor');
+            var tree         = $('.curriculum-tree').jstree({
                 core: {
                     animation: 50,
-                    data: tree,
+                    data: treeData,
                     force_text: true,
                     multiple: false,
                     check_callback: true,
@@ -96,7 +103,7 @@
                         .find(':input').prop('disabled', true);
                     $.getJSON(jstree.node.a_attr.href+'.json')
                         .done(function(data) {
-                            buildForm(
+                            buildView(
                                 {
                                     save:   jstree.node.a_attr['data-saveuri'],
                                     delete: jstree.node.a_attr['data-deleteuri']
@@ -203,14 +210,14 @@
             // Create new curriculum
             treePanel.on('click', '#create-curriculum-button', function(event) {
                 event.preventDefault();
-                buildForm({ save: createUri }, {});
+                buildView({ save: createUri }, {});
             });
 
             // Add child to existing curriculum
             formPanel.on('click', '#create-child-button', function(event) {
                 event.preventDefault();
                 var form = $(this).closest('form');
-                buildForm({ save: createUri }, { parent: form.data('nodeid') });
+                buildView({ save: createUri }, { parent: form.data('nodeid') });
             });
         })
     })(jQuery);
