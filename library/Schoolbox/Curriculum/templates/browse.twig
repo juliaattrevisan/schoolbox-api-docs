@@ -14,6 +14,7 @@
             });
 
             // Twig-generated JS
+            var readonly  = {% if readonly %}true{% else %}false{% endif %};
             var areas     = {{ areas|json_encode|raw }};
             var levels    = {{ levels|json_encode|raw }};
             var createUri = {{ routeLookup('curriculum.create')|json_encode|raw }};
@@ -32,7 +33,8 @@
             // Method for building the form
             // Tears down and sets up TinyMCE dynamically too
             var buildView = function(actions, data) {
-                data.actions = actions;
+                data.actions  = actions;
+                data.readonly = readonly;
                 formPanel
                     .empty()
                     .append(template(data));
@@ -242,8 +244,26 @@
 
     {{= it.description }}
 
-    {{? it.actions.delete }}
-    <form action="{{! it.actions.delete }}" id="node-delete-form" method="post"></form>
+    {{? !it.readonly }}
+    <form id="node-form" method="post" action="{{! it.actions.save }}" data-nodeid="{{! it.id }}">
+        <input type="submit"
+               class="submit-btn-plain"
+               value="Edit"
+               id="edit-button"
+        />
+        <input type="submit"
+               class="submit-btn-plain"
+               value="Add Subsection"
+               id="create-child-button"
+        />
+    </form>
+    <form action="{{! it.actions.delete }}" method="post">
+        <input type="submit"
+               class="submit-btn-plain"
+               value="Delete"
+               id="delete-button"
+        />
+    </form>
     {{?}}
 </script>
 {% endverbatim %}
@@ -342,13 +362,11 @@
                     <tr>
                         <th>
                             Curricula
-                            {% if isRouteAuthorized('curriculum.add') %}
+                            {% if not readonly %}
                             <a href="{{ routeLookup('curriculum.add')|escape('html_attr') }}"
                                id="create-curriculum-button"
                                class="submit-btn-plain float-right inline-block"
                             >Create New Curriculum</a>
-                            {% endif %}
-                            {% if isRouteAuthorized('curriculumImport.browse') %}
                             <a href="{{ routeLookup('curriculumImport.browse')|escape('html_attr') }}"
                                class="submit-btn-plain float-right inline-block"
                             >Import Curriculum</a>

@@ -52,6 +52,12 @@ class Controller extends Base
                     'tree'   => $tree,
                     'areas'  => $this->getAsGroupedList($this->getAreaMapper()->findAllWithSource()),
                     'levels' => $this->getAsGroupedList($this->getLevelMapper()->findAllWithSource()),
+                    // Readonly check - for now, check without any parameters
+                    'readonly' => !$this->getAuthorizer()->isPathAuthorizedForUser(
+                        'curriculum.edit',
+                        [],
+                        $this->getUser()
+                    ),
                 ),
             )
         );
