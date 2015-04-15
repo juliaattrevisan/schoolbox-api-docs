@@ -5,42 +5,43 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Crocodoc;
 
 use Exception;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
+use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 
-class Facade {
+class Facade
+{
 
-	/**
-	 * The submission id to upload
-	 *
-	 * @var string
-	 */
-	private $submissionId = '';
+    /**
+     * The submission id to upload
+     *
+     * @var string
+     */
+    private $submissionId = '';
 
-	/**
-	 * An instance of Schoobox\User
-	 *
-	 * @var User
-	 */
-	private $user = null;
+    /**
+     * @var User
+     */
+    private $user = null;
 
-	/**
-	 * Constructor
-	 *
-	 * @param $submissionId
-	 * @param User $user
-	 */
-	public function __construct($submissionId, User $user) {
-		$this->setSubmissionId($submissionId);
-		$this->setUser($user);
-	}
+    /**
+     * Constructor
+     *
+     * @param $submissionId
+     * @param User $user
+     */
+    public function __construct($submissionId, User $user)
+    {
+        $this->setSubmissionId($submissionId);
+        $this->setUser($user);
+    }
 
 	/**
 	 * Start biting
@@ -53,59 +54,63 @@ class Facade {
         /** @var Submission\File $submission */
 		$submission = $submissionMapper->findById($this->getSubmissionId());
 
-		/* If this was previously uploaded in the past, resume scribbling
-		 * Otherwise upload it and start a new scribble
-		 */
-		if (!strlen($submission->getUuid())) {
+        /* If this was previously uploaded in the past, resume scribbling
+         * Otherwise upload it and start a new scribble
+         */
+        if (!strlen($submission->getUuid())) {
             $document = new Document($submission);
             $response = $document->upload();
 
-            if($response['error']) {
+            if ($response['error']) {
                 echo json_encode($response);
             }
-		}
+        }
 
         $loader = new Loader($submission->getUuid(), $this->getUser());
         echo $loader->render();
-	}
+    }
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set submission id
-	 *
-	 * @param string $submissionId
-	 */
-	private function setSubmissionId($submissionId) {
-		$this->submissionId = $submissionId;
-	}
+    /**
+     * Set submission id
+     *
+     * @param string $submissionId
+     */
+    private function setSubmissionId($submissionId)
+    {
+        $this->submissionId = $submissionId;
+    }
 
-	/**
-	 * Get submission id
-	 *
-	 * @return string
-	 */
-	private function getSubmissionId() {
-		return $this->submissionId;
-	}
+    /**
+     * Get submission id
+     *
+     * @return string
+     */
+    private function getSubmissionId()
+    {
+        return $this->submissionId;
+    }
 
-	/**
-	 * Set user
-	 *
-	 * @param User $user
-	 */
-	private function setUser(User $user) {
-		$this->user = $user;
-	}
+    /**
+     * Set user
+     *
+     * @param User $user
+     */
+    private function setUser(User $user)
+    {
+        $this->user = $user;
+    }
 
-	/**
-	 * Get user
-	 *
-	 * @return User
-	 */
-	private function getUser() {
-		return $this->user;
-	}
+    /**
+     * Get user
+     *
+     * @return User
+     */
+    private function getUser()
+    {
+        return $this->user;
+    }
 }
 

@@ -5,7 +5,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Crocodoc\Renderer\Strategy;
@@ -17,31 +16,33 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 
-class Download extends Base {
+class Download extends Base
+{
 
-	/**
-	 * The template file to inject
-	 *
-	 * @var string
-	 */
-	protected $templateFile = 'submission/inlineGrading/injectables/views/download.html';
+    /**
+     * The template file to inject
+     *
+     * @var string
+     */
+    protected $templateFile = 'submission/inlineGrading/injectables/views/download.html';
 
-	/**
-	 * Control file, to determine how to return work
-	 *
-	 * @var string
-	 */
-	protected $controlFile = 'submission/inlineGrading/injectables/controls/redirect-return-control.html';
+    /**
+     * Control file, to determine how to return work
+     *
+     * @var string
+     */
+    protected $controlFile = 'submission/inlineGrading/injectables/controls/redirect-return-control.html';
 
-	/**
-	 * Render injectable
-	 *
-	 * @return mixed|void
-	 */
-	public function render() {
-		$this->getPage()->setFile('injectable', $this->getTemplateFile());
-		$this->getPage()->setBlock('injectable', 'plag_score', 'plag_score_block');
-		$this->plag();
+    /**
+     * Render injectable
+     *
+     * @return mixed|void
+     */
+    public function render()
+    {
+        $this->getPage()->setFile('injectable', $this->getTemplateFile());
+        $this->getPage()->setBlock('injectable', 'plag_score', 'plag_score_block');
+        $this->plag();
 
         $work = $this->getSubmission();
 
@@ -49,14 +50,13 @@ class Download extends Base {
 			$plagMapper = new Plagscan_DocumentMapper();
 			$plagDocument = $plagMapper->findOneByColumn('file_id', $work->getId());
 
-			$plagHref = sprintf(
-				"%s%s/submission/plagiarismReport/%s/?zx_h=600px",
-				$this->getPage()->conType(), $_SERVER['HTTP_HOST'], $plagDocument->getPlagscanId()
-			);
-		}
-		catch (\Exception $e) {
-			$plagHref = '';
-		}
+            $plagHref = sprintf(
+                "%s%s/submission/plagiarismReport/%s/?zx_h=600px",
+                $this->getPage()->conType(), $_SERVER['HTTP_HOST'], $plagDocument->getPlagscanId()
+            );
+        } catch (\Exception $e) {
+            $plagHref = '';
+        }
 
         $filename = $work->getFilename();
         $filesize = $work->getSize();
@@ -71,18 +71,20 @@ class Download extends Base {
 			'MOST_RECENT_SUBMISSION_FILE_PLAG_HREF' => base64_encode($plagHref)
 		));
 
-		$this->getPage()->parse('INJECTED_INTERFACE_TEMPLATE', 'injectable');
+        $this->getPage()->parse('INJECTED_INTERFACE_TEMPLATE', 'injectable');
 
-		/* Upload File
-		 */
-		$this->parseInjectableUpload();
+        /* Upload File
+         */
+        $this->parseInjectableUpload();
 
-		/* Control how Return Work is done
-		 */
-		$this->getPage()->setVar(array(
-			'INJECTED_INTERFACE_CONTROL' => ''
-		));
-	}
+        /* Control how Return Work is done
+         */
+        $this->getPage()->setVar(
+            array(
+                'INJECTED_INTERFACE_CONTROL' => ''
+            )
+        );
+    }
 
 	/**
 	 * Plag it
@@ -101,25 +103,23 @@ class Download extends Base {
 			$docMapper = Plagscan_DocumentMapper::getInstance();
 			$plagDoc = null;
 
-			try {
-				/* @var $plagDoc Plagscan_Document */
-				$plagDoc = $docMapper->findOneByColumn('file_id', $this->getSubmission()->getId());
+            try {
+                /* @var $plagDoc Plagscan_Document */
+                $plagDoc = $docMapper->findOneByColumn('file_id', $this->getSubmission()->getId());
 
-				if ($plagDoc->getId() && $plagDoc->getStatus() == \Plagscan_Document::STATUS_COMPLETE) {
+                if ($plagDoc->getId() && $plagDoc->getStatus() == \Plagscan_Document::STATUS_COMPLETE) {
 
-					// what colour should the plagiarism text be, and what should the tooltip say?
-					if($plagDoc->getScore() > 60) {
-						$status = 'critical';
-						$tooltip = 'Your submission is extremely similar to other documents scanned.';
-					}
-					elseif($plagDoc->getScore() > 20) {
-						$status = 'warn';
-						$tooltip = 'Your submission is somewhat similar to other documents scanned.';
-					}
-					else {
-						$status = 'ok';
-						$tooltip = 'Your submission is quite different to other documents scanned.';
-					}
+                    // what colour should the plagiarism text be, and what should the tooltip say?
+                    if ($plagDoc->getScore() > 60) {
+                        $status = 'critical';
+                        $tooltip = 'Your submission is extremely similar to other documents scanned.';
+                    } elseif ($plagDoc->getScore() > 20) {
+                        $status = 'warn';
+                        $tooltip = 'Your submission is somewhat similar to other documents scanned.';
+                    } else {
+                        $status = 'ok';
+                        $tooltip = 'Your submission is quite different to other documents scanned.';
+                    }
 
 					$this->getPage()->setVar(array(
 						'MOST_RECENT_SUBMISSION_FILE_PLAG_CLASS' => $status,

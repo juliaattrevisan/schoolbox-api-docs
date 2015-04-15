@@ -12,6 +12,7 @@ namespace Crocodoc;
 use Alaress_Curl_Url;
 use Schoolbox\User;
 
+
 class Loader
 {
 
@@ -37,13 +38,6 @@ class Loader
     private $uuid = '';
 
     /**
-     * A group handler
-     *
-     * @var \Group
-     */
-    private $groupHandler = null;
-
-    /**
      * Curl object
      *
      * @var Alaress_Curl_Url
@@ -61,7 +55,6 @@ class Loader
         $this->setAuthenticator(new Authenticator());
         $this->setUuid($uuid);
         $this->setUser($user);
-        $this->setGroupHandler(new \Group());
         $this->setCurl(new Alaress_Curl_Url('https://crocodoc.com/api/v2/session/create'));
     }
 
@@ -81,6 +74,9 @@ class Loader
             $postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid}&editable=true&user={$userTuple}";
         } else {
             $postFields = '';
+        }
+        else {
+            return false;
         }
 
         /* Bicep curl
@@ -116,7 +112,7 @@ class Loader
      *
      * @param User $user
      */
-    private function setUser($user)
+    private function setUser(User $user)
     {
         $this->user = $user;
     }
@@ -156,7 +152,7 @@ class Loader
      *
      * @param Authenticator $authenticator
      */
-    private function setAuthenticator($authenticator)
+    private function setAuthenticator(Authenticator $authenticator)
     {
         $this->authenticator = $authenticator;
     }
@@ -172,31 +168,11 @@ class Loader
     }
 
     /**
-     * Set group handler
-     *
-     * @param \Group $groupHandler
-     */
-    private function setGroupHandler($groupHandler)
-    {
-        $this->groupHandler = $groupHandler;
-    }
-
-    /**
-     * Get group handler
-     *
-     * @return \Group
-     */
-    private function getGroupHandler()
-    {
-        return $this->groupHandler;
-    }
-
-    /**
      * Set curl
      *
      * @param Alaress_Curl_Url $curl
      */
-    private function setCurl($curl)
+    private function setCurl(Alaress_Curl_Url $curl)
     {
         $this->curl = $curl;
     }

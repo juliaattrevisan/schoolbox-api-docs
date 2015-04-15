@@ -5,7 +5,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Crocodoc\Renderer\Strategy;
@@ -56,9 +55,9 @@ class Crocodoc extends Base
         $this->getPage()->setFile('injectable', $this->getTemplateFile());
         $this->getPage()->parse('INJECTED_INTERFACE_TEMPLATE', 'injectable');
 
-		/* Upload File
-		 */
-		$this->parseInjectableUpload();
+        /* Upload File
+         */
+        $this->parseInjectableUpload();
 
         /* Control how Return Work is done
          */
@@ -71,10 +70,10 @@ class Crocodoc extends Base
 
         $this->getPage()->setVar(
             array(
-                'INJECTABLE_CONTROL_URL' => $downloadUrl,
-                'INJECTABLE_CONTROL_NEXT_URL' => $this->getNextUrl(),
+                'INJECTABLE_CONTROL_URL'           => $downloadUrl,
+                'INJECTABLE_CONTROL_NEXT_URL'      => $this->getNextUrl(),
                 'INJECTABLE_CONTROL_SUBMISSION_ID' => $this->getSubmission()->getId(),
-                'INJECTABLE_CONTROL_UUID' => $this->getSubmission()->getUuid(),
+                'INJECTABLE_CONTROL_UUID'          => $this->getSubmission()->getUuid(),
             )
         );
 

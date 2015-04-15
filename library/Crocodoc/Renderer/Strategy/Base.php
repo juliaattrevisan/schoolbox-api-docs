@@ -161,7 +161,7 @@ abstract class Base {
 	 *
 	 * @param SitePage $page
 	 */
-	protected function setPage($page) {
+	protected function setPage(SitePage $page) {
 		$this->page = $page;
 	}
 
@@ -269,7 +269,7 @@ abstract class Base {
 	 *
 	 * @param ReturnedWork $returnedWork
 	 */
-	protected function setReturnedWork($returnedWork) {
+	protected function setReturnedWork(ReturnedWork $returnedWork) {
 		$this->returnedWork = $returnedWork;
 	}
 

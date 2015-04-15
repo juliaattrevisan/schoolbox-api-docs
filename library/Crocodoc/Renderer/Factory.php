@@ -5,7 +5,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Crocodoc\Renderer;
@@ -13,7 +12,8 @@ namespace Crocodoc\Renderer;
 use \Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 
-class Factory {
+class Factory
+{
 
 	/**
 	 * An instance of Submission
@@ -29,31 +29,31 @@ class Factory {
 	 */
 	private $returnedWork = null;
 
-	/**
-	 * Supported mime types
-	 *
-	 * @var array
-	 */
-	private $allowedFileTypes = array(
-		'doc', 'docx',
-		'xls', 'xlsx',
-		'ppt', 'pptx',
-		'pdf'
-	);
+    /**
+     * Supported mime types
+     *
+     * @var array
+     */
+    private $allowedFileTypes = array(
+        'doc', 'docx',
+        'xls', 'xlsx',
+        'ppt', 'pptx',
+        'pdf'
+    );
 
-	/**
-	 * An instance of SitePage
-	 *
-	 * @var null
-	 */
-	private $page = null;
+    /**
+     * An instance of SitePage
+     *
+     * @var \SitePage
+     */
+    private $page = null;
 
-	/**
-	 * An array of previous, current and next students
-	 *
-	 * @var array
-	 */
-	private $navigationElements = array();
+    /**
+     * An array of previous, current and next students
+     *
+     * @var array
+     */
+    private $navigationElements = array();
 
 	/**
 	 * Force a submission object, or null
@@ -68,22 +68,23 @@ class Factory {
 	 * @param ReturnedWork $returnedWork
 	 * @param $navigationElements
 	 */
-	public function __construct($page, Submission\File $submission = null, ReturnedWork $returnedWork = null, $navigationElements) {
+	public function __construct($page, Submission\File $submission = null, ReturnedWork $returnedWork = null, $navigationElements) 
+    {
 		$this->setPage($page);
 		$this->setSubmission($submission);
 		$this->setReturnedWork($returnedWork);
 		$this->setNavigationElements($navigationElements);
 	}
 
-	/**
-	 * Decide which template file to load based on the submission contents
-	 * Spawn a renderer
-	 */
-	public function produce()
+    /**
+     * Decide which template file to load based on the submission contents
+     * Spawn a renderer
+     */
+    public function produce()
     {
         $work = $this->getSubmission();
 
-		if ($work === null) {
+        if ($work === null) {
             // No submission
             return new Strategy\None($this->getPage(), $work, $this->getReturnedWork(), $this->getNavigationElements());
 
@@ -130,7 +131,8 @@ class Factory {
 	 *
 	 * @param Submission\File $submission
 	 */
-	private function setSubmission($submission) {
+	private function setSubmission($submission) 
+    {
 		$this->submission = $submission;
 	}
 
@@ -139,79 +141,88 @@ class Factory {
 	 *
 	 * @return Submission\File
 	 */
-	private function getSubmission() {
+	private function getSubmission() 
+    {
 		return $this->submission;
 	}
 
-	/**
-	 * Set allowed file types
-	 *
-	 * @param array $allowedFileTypes
-	 */
-	private function setAllowedFileTypes($allowedFileTypes) {
-		$this->allowedFileTypes = $allowedFileTypes;
-	}
+    /**
+     * Set allowed file types
+     *
+     * @param array $allowedFileTypes
+     */
+    private function setAllowedFileTypes($allowedFileTypes)
+    {
+        $this->allowedFileTypes = $allowedFileTypes;
+    }
 
-	/**
-	 * Get allowed file types
-	 *
-	 * @return array
-	 */
-	private function getAllowedFileTypes() {
-		return $this->allowedFileTypes;
-	}
+    /**
+     * Get allowed file types
+     *
+     * @return array
+     */
+    private function getAllowedFileTypes()
+    {
+        return $this->allowedFileTypes;
+    }
 
-	/**
-	 * Set page
-	 *
-	 * @param null $page
-	 */
-	private function setPage($page) {
-		$this->page = $page;
-	}
+    /**
+     * Set page
+     *
+     * @param SitePage $page
+     */
+    private function setPage($page)
+    {
+        $this->page = $page;
+    }
 
-	/**
-	 * Get page
-	 *
-	 * @return null
-	 */
-	private function getPage() {
-		return $this->page;
-	}
+    /**
+     * Get page
+     *
+     * @return SitePage
+     */
+    private function getPage()
+    {
+        return $this->page;
+    }
 
-	/**
-	 * Set navigation elements
-	 *
-	 * @param array $navigationElements
-	 */
-	private function setNavigationElements($navigationElements) {
-		$this->navigationElements = $navigationElements;
-	}
+    /**
+     * Set navigation elements
+     *
+     * @param array $navigationElements
+     */
+    private function setNavigationElements($navigationElements)
+    {
+        $this->navigationElements = $navigationElements;
+    }
 
-	/**
-	 * Get navigation elements
-	 *
-	 * @return array
-	 */
-	private function getNavigationElements() {
-		return $this->navigationElements;
-	}
+    /**
+     * Get navigation elements
+     *
+     * @return array
+     */
+    private function getNavigationElements()
+    {
+        return $this->navigationElements;
+    }
 
-	/**
-	 * Set returned work
-	 *
-	 * @param ReturnedWork $returnedWork
-	 */
-	private function setReturnedWork($returnedWork) {
-		$this->returnedWork = $returnedWork;
-	}
+    /**
+     * Set returned work
+     *
+     * @param ReturnedWork $returnedWork
+     */
+    private function setReturnedWork($returnedWork)
+    {
+        $this->returnedWork = $returnedWork;
+    }
 
-	/**
-	 * Get returned work
-	 *
-	 * @return ReturnedWork
-	 */
-	private function getReturnedWork() {
-		return $this->returnedWork;
-	}
+    /**
+     * Get returned work
+     *
+     * @return ReturnedWork
+     */
+    private function getReturnedWork()
+    {
+        return $this->returnedWork;
+    }
 }
