@@ -30,25 +30,25 @@
 <table>
     <thead>
         <tr>
-            <th>Year</th>
-            <th>Entered Grades</th>
-            <th>N</th>
-            <th>A</th>
-            <th>M</th>
-            <th>E</th>
-            <th>Available Grades</th>
+            <th class="numeric">Year</th>
+            <th class="numeric">Entered Grades</th>
+            <th class="letter">N</th>
+            <th class="letter">A</th>
+            <th class="letter">M</th>
+            <th class="letter">E</th>
+            <th class="numeric">Available</th>
         </tr>
     </thead>
     <tbody>
         {% for year, values in gradeSummary.data %}
         <tr>
-            <td>{{ year }}</td>
-            <td>{{ values.enteredGrades }}</td>
-            <td>{{ values.letters.N }}</td>
-            <td>{{ values.letters.A }}</td>
-            <td>{{ values.letters.M }}</td>
-            <td>{{ values.letters.E }}</td>
-            <td>{{ values.availableGrades }}</td>
+            <td class="numeric">{{ year }}</td>
+            <td class="numeric">{{ values.enteredGrades }}</td>
+            <td class="letter">{{ values.letters.N }}</td>
+            <td class="letter">{{ values.letters.A }}</td>
+            <td class="letter">{{ values.letters.M }}</td>
+            <td class="letter">{{ values.letters.E }}</td>
+            <td class="numeric">{{ values.availableGrades }}</td>
         </tr>
         {% endfor %}
     </tbody>
