@@ -79,5 +79,33 @@
             </tr>
         </tfoot>
     </table>
+
+    <h2>{{ entriesAndResults.heading }} {{ year }}</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Term 2</th>
+                <th>Term 4</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for courseName, allAreas in entriesAndResults.data[year] %}
+            <tr>
+                <td><strong>{{ courseName }}</strong></td>
+                <td></td>
+                <td></td>
+            </tr>
+            {% for currentArea, values in allAreas %}
+            <tr>
+                <td>{{ currentArea }}</td>
+                <td>{{ values.letters.term2 }}</td>
+                <td>{{ values.letters.term4 }}</td>
+            </tr>
+            {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endfor %}
