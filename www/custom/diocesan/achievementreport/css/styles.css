@@ -3,11 +3,16 @@
     border-collapse: collapse;
 }
 
-.achievement-report table, th, td {
+.achievement-report th,
+.achievement-report td {
     border: 1px solid #ddd;
     padding: 10px;
     text-align: left;
 }
+
+/**
+ * Yearly Breakdown
+ */
 
 .achievement-report tfoot td {
     border-top: 3px solid #ddd;
@@ -26,4 +31,22 @@
 {
     width: 90px;
     text-align: right;
+}
+
+/**
+ * Entries And Results
+ */
+
+/* thead/tr/th style subheading, for subheadings which can't
+ * go in thead element
+ */
+.achievement-report td.subheading {
+    font-weight: bold;
+}
+
+/* Spacer row
+ */
+.achievement-report tr.spacer td {
+    border-left: 0px;
+    border-right: 0px;
 }

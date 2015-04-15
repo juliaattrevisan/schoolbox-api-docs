@@ -81,21 +81,13 @@
     </table>
 
     <h2>{{ entriesAndResults.heading }} {{ year }}</h2>
-
     <table>
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Term 2</th>
-                <th>Term 4</th>
-            </tr>
-        </thead>
         <tbody>
             {% for courseName, allAreas in entriesAndResults.data[year] %}
             <tr>
-                <td><strong>{{ courseName }}</strong></td>
-                <td></td>
-                <td></td>
+                <td class="subheading">{{ courseName }}</strong></td>
+                <td class="subheading">Term 2</td>
+                <td class="subheading">Term 4</td>
             </tr>
             {% for currentArea, values in allAreas %}
             <tr>
@@ -104,6 +96,11 @@
                 <td>{{ values.letters.term4 }}</td>
             </tr>
             {% endfor %}
+            {% if not loop.last %}
+            <tr class="spacer">
+                <td colspan="3"></td>
+            </tr>
+            {% endif %}
             {% endfor %}
         </tbody>
     </table>
