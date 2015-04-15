@@ -9,7 +9,7 @@
 class Component_Config_Size extends Component_Config_Abstract
 {
 
-    protected $max           = 10;
+    protected $options       = array(0,1,2,3,4,5,10,15,25,30);
     protected $showAllOption = true;
 
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
@@ -19,7 +19,7 @@ class Component_Config_Size extends Component_Config_Abstract
         $page->setBlock($keyblock, 'sizes', 'sizes_block');
         $page->setVar('sizes_block', '');
 
-        for ($i = 0; $i <= $this->max; $i++) {
+        foreach($this->options as $i) {
             // Don't show "All" option if it's disabled
             if ($i === 0 && !$this->showAllOption) {
                 continue;
