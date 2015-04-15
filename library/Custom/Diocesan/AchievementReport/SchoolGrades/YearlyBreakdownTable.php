@@ -32,8 +32,6 @@ class YearlyBreakdownTable extends Base {
      */
     public function findData($externalUserId)
     {
-        // $explorer = $this->getDb()->getAll("SELECT TOP 2 * FROM  SynergyOne.dbo.uvSchoolBoxSchoolGradeResults");
-
         /* Entered Grades
          */
         $allEnteredGradesCurrentYear = $this->findEnteredGradesCurrentYear($externalUserId);

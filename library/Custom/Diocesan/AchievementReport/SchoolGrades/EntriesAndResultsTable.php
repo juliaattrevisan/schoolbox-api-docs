@@ -59,7 +59,7 @@ class EntriesAndResultsTable extends Base {
                 }
             }
 
-            /* Initailise Term 2 and Term 4 marks
+            /* Initialise Term 2 and Term 4 marks
              */
             if (!is_array($finalStack[$year][$courseName][$assessArea]['letters'])) {
                 $finalStack[$year][$courseName][$assessArea]['letters'] = array(
@@ -89,13 +89,6 @@ class EntriesAndResultsTable extends Base {
      * @return array|bool
      */
     private function findEntries($externalUserId) {
-//        $explorer = $this->getDb()->getAll("
-//            SELECT TOP 50 *
-//            FROM SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
-//            WHERE ID = {$externalUserId}
-//            ORDER BY Fileyear DESC, AreaSeq
-//        ");
-
         $query = "
             SELECT
                 Fileyear,
@@ -127,8 +120,6 @@ class EntriesAndResultsTable extends Base {
         ";
 
         $result = $this->getDb()->getAll($query);
-
-//        new Probe($explorer, $result);
 
         return $result;
     }
