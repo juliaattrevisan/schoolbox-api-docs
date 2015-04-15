@@ -32,18 +32,18 @@ class Controller extends Base {
 
                 'gradeSummary' => array(
                     'heading' => $gradeSummaryTable->getHeading(),
-                    'data' => $gradeSummaryTable->findData($externalUser['StudentID']),
+                    'data' => $gradeSummaryTable->findData(),
                     'columns' => array_merge($gradeSummaryTable->getLetterRegistry(), array('availableGrades'))
                 ),
 
                 'yearlyBreakdown' => array(
                     'heading' => $yearlyBreakdownTable->getHeading(),
-                    'data' => $yearlyBreakdownTable->findData($externalUser['StudentID']),
+                    'data' => $yearlyBreakdownTable->findData(),
                 ),
 
                 'entriesAndResults' => array(
                     'heading' => $entriesAndResultsTable->getHeading(),
-                    'data' => $entriesAndResultsTable->findData($externalUser['StudentID']),
+                    'data' => $entriesAndResultsTable->findData(),
                 )
             )
         ));

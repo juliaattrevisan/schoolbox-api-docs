@@ -27,11 +27,13 @@ class YearlyBreakdownTable extends Base {
     /**
      * Returns data for twig rendering
      *
-     * @param $externalUserId
      * @return mixed
      */
-    public function findData($externalUserId)
+    public function findData()
     {
+        $externalUser = $this->getExternalUser();
+        $externalUserId = $externalUser['StudentID'];
+
         /* Entered Grades
          */
         $allEnteredGradesCurrentYear = $this->findEnteredGradesCurrentYear($externalUserId);

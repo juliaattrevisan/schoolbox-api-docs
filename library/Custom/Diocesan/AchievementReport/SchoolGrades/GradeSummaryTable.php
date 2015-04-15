@@ -41,7 +41,9 @@ class GradeSummaryTable extends Base {
     /**
      * Obtain data
      */
-    public function findData($externalUserId) {
+    public function findData() {
+        $externalUser = $this->getExternalUser();
+        $externalUserId = $externalUser['StudentID'];
 
         /* Entered Grades
          */
