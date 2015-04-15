@@ -86,11 +86,11 @@ class Component_DefinitionMapper extends Schoolbox\Mapper {
 	 * @return \Schoolbox\Collection
 	 */
 	public function findAllForModule($module, $sortBy = '') {
-		$sort = '';
+		$sort = 'ORDER BY name ASC';
 		if($sortBy) {
 			foreach($this->map as $m)
 			if($m['column'] == $sortBy) {
-				$sort = "ORDER BY $sortBy ASC";
+				$sort = "ORDER BY $sortBy ASC, name ASC";
 				break;
 			}
 		}
