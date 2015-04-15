@@ -38,6 +38,11 @@
                 formPanel
                     .empty()
                     .append(template(data));
+                // Add an edit existing curriculum event to the edit button here
+                formPanel.find('#edit-button').click(function(event) {
+                    event.preventDefault();
+                    buildForm(actions, data);
+                });
             };
             var buildForm = function(actions, data) {
                 tinyMCE.execCommand('mceRemoveControl', true, 'node-description');
@@ -47,6 +52,11 @@
                 formPanel
                     .empty()
                     .append(editTemplate(data));
+                // Cancel editing
+                formPanel.find('#cancel-button').click(function(event) {
+                    event.preventDefault();
+                    buildView(actions, data);
+                });
                 tinyMCE.execCommand('mceAddControl', true, 'node-description');
             };
 
@@ -212,14 +222,14 @@
             // Create new curriculum
             treePanel.on('click', '#create-curriculum-button', function(event) {
                 event.preventDefault();
-                buildView({ save: createUri }, {});
+                buildForm({ save: createUri }, {});
             });
 
             // Add child to existing curriculum
             formPanel.on('click', '#create-child-button', function(event) {
                 event.preventDefault();
                 var form = $(this).closest('form');
-                buildView({ save: createUri }, { parent: form.data('nodeid') });
+                buildForm({ save: createUri }, { parent: form.data('nodeid') });
             });
         })
     })(jQuery);
@@ -331,7 +341,6 @@
         </dl>
         {{? it.id }}
             <input type="submit" class="submit-btn-plain" value="Save Changes" />
-            <input type="submit" class="submit-btn-plain" value="Add New Subsection" id="create-child-button" />
         {{?}}
         {{? !it.id && it.parent }}
             <input type="submit" class="submit-btn-plain" value="Create Subsection" />
@@ -339,18 +348,12 @@
         {{? !it.id && !it.parent }}
             <input type="submit" class="submit-btn-plain" value="Create Curriculum" />
         {{?}}
-        {{? it.actions.delete }}
-            <input type="submit"
-                   class="submit-btn-plain"
-                   value="Delete"
-                   id="delete-button"
-                   form="node-delete-form"
-            />
-        {{?}}
+        <input type="submit"
+               class="submit-btn-plain"
+               value="Cancel"
+               id="cancel-button"
+        />
     </form>
-    {{? it.actions.delete }}
-    <form action="{{! it.actions.delete }}" id="node-delete-form" method="post"></form>
-    {{?}}
 </script>
 {% endverbatim %}
 
