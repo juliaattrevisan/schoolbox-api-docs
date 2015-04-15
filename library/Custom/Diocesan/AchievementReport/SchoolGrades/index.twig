@@ -1,6 +1,11 @@
-<h1>School Grades</h1>
-
 <div class="achievement-report">
+    <section class="avatar">
+        <img src="/portrait.php?userId={{ externalUser.StudentID }}&size=square32" />
+        {{ externalUser.StudentGiven1 }} {{ externalUser.StudentSurname }}
+    </section>
+
+    <h1>School Grades</h1>
+
     {% include '@schoolgrades/GradeSummaryTable.twig' %}
     {% include '@schoolgrades/YearlyBreakdownTable.twig' %}
 
