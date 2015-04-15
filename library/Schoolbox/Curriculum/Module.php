@@ -68,13 +68,14 @@ class Module extends BaseModule
     }
 
     /**
-     * Curricula are only editable by users with the curriculum service.
+     * Everyone has read permission to a curriculum, but only users with write
+     * permission to the curriculum service may create or modify them.
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
         $authorizer->addRule('/^curriculum\\..*/', new Rule\IsLoggedIn());
         $authorizer->addRule(
-            '/^curriculum\\..*/',
+            '/^curriculum\\.(?:edit|add|delete|create|update|replace)/',
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasServicePermission(
