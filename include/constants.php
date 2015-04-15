@@ -9,6 +9,7 @@
  * @version     SVN: $Id$
  */
 
+// TODO remove all of these services, use UserAccess::SERVICE_* constants
 define('HOMEPAGE_SERVICE',    1);
 define('CALENDAR_SERVICE',    2);
 define('NEWS_SERVICE',        3);
@@ -16,6 +17,7 @@ define('TUTORIAL_SERVICE',    4);
 define('CMS_SERVICE',         5);
 define('HOUSEMASTER_SERVICE', 6);
 define('RESOURCE_BOOKING_SERVICE', 7);
+define('CURRICULUM_SERVICE', 8);
 
 define('DENY_ACCESS',  0);
 define('READ_ACCESS',  1);
