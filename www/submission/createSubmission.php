@@ -25,11 +25,18 @@ $this->setBlock('marktype', 'gradegroup_explanation', 'gradegroup_explanation_bl
 $this->setBlock('gradegroup_explanation', 'gradegroup_explanation_level', 'gradegroup_explanation_level_block');
 $this->setBlock(TEMPLATE_content, 'mark_weight', 'mark_weight_block');
 $this->setBlock(TEMPLATE_content, 'duework_timespan', 'duework_timespan_block');
+$this->setBlock(TEMPLATE_content, 'curriculum_code_input', 'curriculum_code_input_block');
 
 $this->setVar('category_select_block', '');
 $this->setVar('existing_marks_warning_block', '');
 $this->setVar('COURSE_CRITERIA', '');
 $this->setVar('CLASS_CRITERIA', '');
+
+if (Config::get('curriculum_tagging_enabled')) {
+    $this->parse('curriculum_code_input_block', 'curriculum_code_input');
+} else {
+    $this->setVar('curriculum_code_input_block', '');
+}
 
 $this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 
@@ -132,6 +139,7 @@ if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         ->setWorkType(new SubmissionBox\WorkType())
         ->setMarkType(new SubmissionBox\MarkType())
         ->setMarkVisibility(Config::get('submission_access'))
+        ->setCurriculumNodes($category->getCurriculumNodes())
     ;
     $gradeGroup = new SubmissionBox\GradeLevel\Group\Model();
     $gradeGroup->setId(Config::get('default_grade_group'));
@@ -382,6 +390,10 @@ $output = array(
     'IS_TASK'           => $is_task ? 1 : 0,
     'UNIT_ID'           => $unit_id,
     'TASK_INSTANCE_ID'  => $task_instance_id,
+    'CURRICULUM_CODE_INPUT' => $this->getTwig()->render(
+        'sub/curriculumCodeSelector.twig',
+        ['codeList' => $submission->getCurriculumNodes()]
+    ),
 );
 
 $this->setVar($output);

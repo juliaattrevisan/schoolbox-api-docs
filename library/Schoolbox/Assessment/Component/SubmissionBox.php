@@ -9,6 +9,8 @@
 
 namespace Schoolbox\Assessment\Component;
 
+use Schoolbox\Collection;
+use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Category;
 use Schoolbox\Assessment\Component\SubmissionBox\File;
@@ -24,6 +26,7 @@ use Schoolbox\User;
 
 class SubmissionBox implements ISoftDeletable
 {
+    use HasCurriculumNodes;
 
     const MARK_VISIBILITY_PRIVATE = 0;
     const MARK_VISIBILITY_STUDENT = 1;
@@ -173,6 +176,7 @@ class SubmissionBox implements ISoftDeletable
         $this->setWorkType(new WorkType());
         $this->setMarkType(new MarkType());
         $this->setGradeGroup(new GradeLevel\Group\Model());
+        $this->setCurriculumNodes(new Collection());
     }
 
     /**

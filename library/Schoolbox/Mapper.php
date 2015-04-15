@@ -399,6 +399,120 @@ abstract class Mapper implements Serializable
     }
 
     /**
+     * Loads all ancestors of this model or collection.
+     *
+     * Attempts to perform this action in as few queries as possible.
+     *
+     * @param        $object
+     * @param string $parentField
+     * @param int    $currentDepth
+     *
+     * @return $object
+     */
+    public function loadAncestors(
+        $object,
+        $parentField = 'parent',
+        $currentDepth = 1
+    ) {
+        // Recursive relation protection
+        if ($currentDepth <= 50) {
+            return $object;
+        }
+        $collection = $this->getModelAsCollection($object);
+        $getId      = $this->getGetIdentifierMethodName();
+        $getParent  = $this->getGetMethodName($parentField);
+        $setParent  = $this->getSetMethodName($parentField);
+
+        // Get parent ID of each $object
+        $parentIds = [];
+        foreach ($collection as $node) {
+            $parentId = $node->$getParent()->$getId();
+            if ($parentId) {
+                $parentIds[] = $parentId;
+            }
+        }
+
+        if (!empty($parentIds)) {
+            // Load all parents of $collection in one query
+            $parents = [];
+            foreach ($this->loadAncestors(
+                $this->findByColumn($this->getIdentifier()['column'], $parentIds),
+                $parentField,
+                $currentDepth+1
+            ) as $parent) {
+                $parents[$parent->$getId()] = $parent;
+            }
+            // and add them as the parent of each item in $collection.
+            foreach ($collection as $node) {
+                $parentId = $node->$getParent()->$getId();
+                if (array_key_exists($parentId, $parents)) {
+                    $node->$setParent($parents[$parentId]);
+                }
+            }
+        }
+        return $object;
+    }
+
+    /**
+     * Loads all descendants of this model or collection.
+     *
+     * Attempts to perform this action in as few queries as possible.
+     *
+     * @param        $object
+     * @param string $parentField
+     * @param string $childField
+     * @param int    $currentDepth
+     *
+     * @return $object
+     */
+    public function loadDescendants(
+        $object,
+        $parentField = 'parent',
+        $childField = 'children',
+        $currentDepth = 1
+    ) {
+        // Recursive relation protection
+        if ($currentDepth > 50) {
+            return $object;
+        }
+
+        $collection  = $this->getModelAsCollection($object);
+        $getId       = $this->getGetIdentifierMethodName();
+        $getParent   = $this->getGetMethodName($parentField);
+        $setChildren = $this->getSetMethodName($childField);
+
+        // Get IDs of each $object, use them to get children
+        $ids = [];
+        foreach ($collection as $node) {
+            $id = $node->$getId();
+            if ($id) {
+                $ids[] = $id;
+            }
+        }
+
+        if (!empty($ids)) {
+            // Load all children of $collection in one query
+            $children = [];
+            foreach ($this->loadDescendants(
+                $this->findByColumn($this->getMap()->getOffset($parentField)['column'], $ids),
+                $parentField,
+                $childField,
+                $currentDepth+1
+            ) as $child) {
+                $children[$child->$getParent()->$getId()][] = $child;
+            }
+            // and add them as the children of each item in $collection.
+            foreach ($collection as $node) {
+                $id = $node->$getId();
+                if (array_key_exists($id, $children)) {
+                    $node->$setChildren($this->createCollection($children[$id]));
+                }
+            }
+        }
+        return $object;
+    }
+
+    /**
      * Gets name of get method for identifier column.
      *
      * @return string

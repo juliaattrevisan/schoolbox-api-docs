@@ -50,6 +50,12 @@ if (!empty($_POST)) {
         ->setMarkVisibility($_POST['mark_visibility'])
         ->setCompletionMessage($_POST['completion_message'])
     ;
+    if (isset($_POST['curriculumCodes'])) {
+        $assessment->setCurriculumNodes(
+            Schoolbox\Curriculum\Node\Mapper::getInstance()
+                ->findByColumn('id', $_POST['curriculumCodes'])
+        );
+    }
 
     // Is this a task? If so, just set the start and finish to now.
     $task_id = $assessment->getTask()->getId();
@@ -114,6 +120,7 @@ else {
     $this->setBlock(TEMPLATE_content,  'importXML', 'importXML_block');
     $this->setBlock(TEMPLATE_content,  'max_attempts', 'max_attempts_block');
 	$this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
+    $this->setBlock(TEMPLATE_content, 'curriculum_code_input', 'curriculum_code_input_block');
     $this->setTitle('Manage Assessment');
 
     $this->setVar('question_block', '');
@@ -132,6 +139,12 @@ else {
     $assessStartDate  = $assessment->getStart();
     $assessFinishDate = $assessment->getFinish();
 
+    if (Config::get('curriculum_tagging_enabled')) {
+        $this->parse('curriculum_code_input_block', 'curriculum_code_input');
+    } else {
+        $this->setVar('curriculum_code_input_block', '');
+    }
+
     $this->setVar(array(
         'ACTION'                  => 'modify',
         'ASSESS_ACTION'           => 'Modify',
@@ -149,6 +162,10 @@ else {
         'ALLOW_RESIT_CHECKED'     => $assessment->getMaxAttempts() == 1 ? 'checked=\'checked\'' : '',
         'ASSESS_DURATION_CHECKED' => $assessment->getDuration() >= 0 ? 'checked=\'checked\'' : '',
         'ASSESS_COMPLETION_MESSAGE' => Scrub::text($assessment->getCompletionMessage()),
+        'CURRICULUM_CODE_INPUT'   => $this->getTwig()->render(
+            'sub/curriculumCodeSelector.twig',
+            ['codeList' => $assessment->getCurriculumNodes()]
+        ),
     ));
 
     /* Render starting times

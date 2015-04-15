@@ -1,7 +1,9 @@
 <?php
-require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
+/** @var \Schoolbox\Application\WebRequest\Kernel $kernel */
+$kernel = require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
 $page = new SitePage();
+$page->setDi($kernel->getDependencyInjector());
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
 /* Update page, or its stuff

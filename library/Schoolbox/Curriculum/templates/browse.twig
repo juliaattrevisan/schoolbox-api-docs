@@ -14,13 +14,14 @@
             });
 
             // Twig-generated JS
+            var readonly  = {% if readonly %}true{% else %}false{% endif %};
             var areas     = {{ areas|json_encode|raw }};
             var levels    = {{ levels|json_encode|raw }};
             var createUri = {{ routeLookup('curriculum.create')|json_encode|raw }};
 
             // add classes to tree, because jstree doesn't allow me to define
             // a base style for trees
-            var tree = {{ tree|json_encode|raw }}.map(function(row) {
+            var treeData = {{ tree|json_encode|raw }}.map(function(row) {
                 try {
                     row.li_attr.class += ' curriculum-node';
                 } catch (e) {
@@ -29,26 +30,67 @@
                 return row;
             });
 
-            // Method for building the form
-            // Tears down and sets up TinyMCE dynamically too
-            var buildForm = function(actions, data) {
+            /**
+             * Builds a readonly view of the curriculum node
+             *
+             * @param actions
+             * @param data
+             */
+            var buildView = function(actions, data) {
+                data.actions  = actions;
+                data.readonly = readonly;
+                formPanel
+                    .empty()
+                    .append(template(data));
+                // Add an edit existing curriculum event to the edit button here
+                formPanel.find('#edit-button').click(function(event) {
+                    event.preventDefault();
+                    buildForm(actions, data);
+                });
+                // Add child to existing curriculum
+                formPanel.find('#create-child-button').click(function(event) {
+                    event.preventDefault();
+                    var form = $(this).closest('form');
+                    buildForm({ save: createUri }, { parent: form.data('nodeid') }, data);
+                });
+            };
+
+            /**
+             * Builds a writable view of the curriculum node
+             *
+             * @param actions
+             * @param data
+             * @param previous If creating a subsection, fall back to this data
+             */
+            var buildForm = function(actions, data, previous) {
                 tinyMCE.execCommand('mceRemoveControl', true, 'node-description');
                 data.actions = actions;
                 data.areas   = areas;
                 data.levels  = levels;
                 formPanel
                     .empty()
-                    .append(template(data));
+                    .append(editTemplate(data));
+                // Cancel editing
+                formPanel.find('#cancel-button').click(function(event) {
+                    event.preventDefault();
+                    // Is data empty? Load data from whatever the current node is.
+                    if (!data.id) {
+                        buildView(actions, previous);
+                    } else {
+                        buildView(actions, data);
+                    }
+                });
                 tinyMCE.execCommand('mceAddControl', true, 'node-description');
             };
 
-            var template  = doT.template($('script#node-template').html().trim());
-            var treePanel = $('.curriculum-selector');
-            var formPanel = $('.curriculum-editor');
-            var tree      = $('.curriculum-tree').jstree({
+            var template     = doT.template($('script#node-template').html().trim());
+            var editTemplate = doT.template($('script#node-edit-template').html().trim());
+            var treePanel    = $('.curriculum-selector');
+            var formPanel    = $('.curriculum-editor');
+            var tree         = $('.curriculum-tree').jstree({
                 core: {
                     animation: 50,
-                    data: tree,
+                    data: treeData,
                     force_text: true,
                     multiple: false,
                     check_callback: true,
@@ -96,7 +138,7 @@
                         .find(':input').prop('disabled', true);
                     $.getJSON(jstree.node.a_attr.href+'.json')
                         .done(function(data) {
-                            buildForm(
+                            buildView(
                                 {
                                     save:   jstree.node.a_attr['data-saveuri'],
                                     delete: jstree.node.a_attr['data-deleteuri']
@@ -205,20 +247,56 @@
                 event.preventDefault();
                 buildForm({ save: createUri }, {});
             });
-
-            // Add child to existing curriculum
-            formPanel.on('click', '#create-child-button', function(event) {
-                event.preventDefault();
-                var form = $(this).closest('form');
-                buildForm({ save: createUri }, { parent: form.data('nodeid') });
-            });
         })
     })(jQuery);
 </script>
 
-<!-- Template for the display of a curriculum node -->
+<!-- Template for displaying of a curriculum node -->
 {% verbatim %}
 <script id="node-template" type="text/x-dot-template">
+    <h1>
+        {{? it.code }}
+            [{{! it.code }}]
+        {{?}}
+        {{! it.name }}
+    </h1>
+
+    {{? it.reference }}
+    <p>
+        <strong>Reference:</strong>
+        <a href="{{! it.reference }}">{{! it.reference }}</a>
+    </p>
+    {{?}}
+
+    {{= it.description }}
+
+    {{? !it.readonly }}
+    <form id="node-form" method="post" action="{{! it.actions.save }}" data-nodeid="{{! it.id }}">
+        <input type="submit"
+               class="submit-btn-plain"
+               value="Edit"
+               id="edit-button"
+        />
+        <input type="submit"
+               class="submit-btn-plain"
+               value="Add Subsection"
+               id="create-child-button"
+        />
+    </form>
+    <form action="{{! it.actions.delete }}" method="post">
+        <input type="submit"
+               class="submit-btn-plain"
+               value="Delete"
+               id="delete-button"
+        />
+    </form>
+    {{?}}
+</script>
+{% endverbatim %}
+
+<!-- Template for editing a curriculum node -->
+{% verbatim %}
+<script id="node-edit-template" type="text/x-dot-template">
     <form id="node-form" method="post" action="{{! it.actions.save }}" data-nodeid="{{! it.id }}">
         <input type="hidden" name="parent" value="{{! it.parent }}" />
         <!--
@@ -279,7 +357,6 @@
         </dl>
         {{? it.id }}
             <input type="submit" class="submit-btn-plain" value="Save Changes" />
-            <input type="submit" class="submit-btn-plain" value="Add New Subsection" id="create-child-button" />
         {{?}}
         {{? !it.id && it.parent }}
             <input type="submit" class="submit-btn-plain" value="Create Subsection" />
@@ -287,18 +364,12 @@
         {{? !it.id && !it.parent }}
             <input type="submit" class="submit-btn-plain" value="Create Curriculum" />
         {{?}}
-        {{? it.actions.delete }}
-            <input type="submit"
-                   class="submit-btn-plain"
-                   value="Delete"
-                   id="delete-button"
-                   form="node-delete-form"
-            />
-        {{?}}
+        <input type="submit"
+               class="submit-btn-plain"
+               value="Cancel"
+               id="cancel-button"
+        />
     </form>
-    {{? it.actions.delete }}
-    <form action="{{! it.actions.delete }}" id="node-delete-form" method="post"></form>
-    {{?}}
 </script>
 {% endverbatim %}
 
@@ -310,6 +381,7 @@
                     <tr>
                         <th>
                             Curricula
+                            {% if not readonly %}
                             <a href="{{ routeLookup('curriculum.add')|escape('html_attr') }}"
                                id="create-curriculum-button"
                                class="submit-btn-plain float-right inline-block"
@@ -317,6 +389,7 @@
                             <a href="{{ routeLookup('curriculumImport.browse')|escape('html_attr') }}"
                                class="submit-btn-plain float-right inline-block"
                             >Import Curriculum</a>
+                            {% endif %}
                         </th>
                     </tr>
                 </thead>

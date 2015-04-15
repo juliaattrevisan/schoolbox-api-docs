@@ -167,6 +167,12 @@ $submission->setRubricResultSet($resultSetID ?: 0);
 $submission->setMaxMark($markMax);
 $submission->setMarkVisibility($_POST['mark_visibility']);
 $submission->setWeight(max(intval($_POST['weight']), 0));
+if (isset($_POST['curriculumCodes'])) {
+    $submission->setCurriculumNodes(
+        Schoolbox\Curriculum\Node\Mapper::getInstance()
+            ->findByColumn('id', $_POST['curriculumCodes'])
+    );
+}
 
 // create new
 try {

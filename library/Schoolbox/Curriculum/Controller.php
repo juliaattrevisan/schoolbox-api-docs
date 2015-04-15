@@ -52,6 +52,29 @@ class Controller extends Base
                     'tree'   => $tree,
                     'areas'  => $this->getAsGroupedList($this->getAreaMapper()->findAllWithSource()),
                     'levels' => $this->getAsGroupedList($this->getLevelMapper()->findAllWithSource()),
+                    // Readonly check - for now, check without any parameters
+                    'readonly' => !$this->getAuthorizer()->isPathAuthorizedForUser(
+                        'curriculum.edit',
+                        [],
+                        $this->getUser()
+                    ),
+                ),
+            )
+        );
+    }
+
+    /**
+     * JSON search for curriculum nodes
+     */
+    public function search()
+    {
+        $search = trim($this->getRequest()->query['query']);
+        $this->getResponse()->content->set(
+            array(
+                'format' => 'json',
+                'data'   => $this->getNodeMapper()->search(
+                    $this->getSession()->getAuthUser(),
+                    $search
                 ),
             )
         );

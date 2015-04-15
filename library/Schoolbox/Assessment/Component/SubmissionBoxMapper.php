@@ -14,6 +14,7 @@ use Schoolbox;
 use Schoolbox\Assessment\Activity;
 use Schoolbox\Collection;
 use Schoolbox\ConfigLoader;
+use Schoolbox\Curriculum\Node;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
@@ -279,6 +280,18 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
             'other_key' => 'id',
         ));
 
+        $this->joinsVia(
+            'curriculum_node_for_submission_box',
+            Node\Mapper::class,
+            'id',
+            'curriculum_node_id',
+            'submission_box_id',
+            null,
+            null,
+            null,
+            'curriculumNodes'
+        );
+
         $this->hasSoftDeleteBooleanField('deleted');
 
         $this
@@ -300,16 +313,27 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $worktype_mapper = $this->getJoinMapper('work_type');
         $marktype_mapper = $this->getJoinMapper('mark_type');
 
+        // This is how you get ants!
         $query = "
 			SELECT
 				{$this->getColumnString('sb')},
 				{$worktype_mapper->getColumnString('wt')},
 				{$marktype_mapper->getColumnString('mt')},
-				{$this->getJoinColumnString('category', 'cat')}
+				{$this->getJoinColumnString('category', 'cat')},
+                {$this->getJoinColumnString('curriculum_node_for_submission_box', 'cn')},
+                {$this->getJoinColumnString('curriculum_node_for_submission_box.level', 'cnl')},
+                {$this->getJoinColumnString('curriculum_node_for_submission_box.level.source', 'cnls')},
+                {$this->getJoinColumnString('curriculum_node_for_submission_box.area', 'cna')},
+                {$this->getJoinColumnString('curriculum_node_for_submission_box.area.source', 'cnas')}
 			FROM {$this->getTable()} sb
 			LEFT JOIN {$this->getJoinSql('work_type', 'sb', 'wt')}
 			LEFT JOIN {$this->getJoinSql('mark_type', 'sb', 'mt')}
 			LEFT JOIN {$this->getJoinSql('category',  'sb', 'cat')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_submission_box', 'sb', 'cn')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_submission_box.level', 'cn', 'cnl')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_submission_box.level.source', 'cnl', 'cnls')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_submission_box.area', 'cn', 'cna')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_submission_box.area.source', 'cna', 'cnas')}
 			WHERE sb.id=?
 		";
         $statement = $this->database->prepare($query);
@@ -317,14 +341,25 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 
         $submission_box = false;
 
-        if (($row = $statement->fetch()) !== false) {
-            $submission_box = $this->hydrate($row, 'sb');
-            $submission_box->setWorkType($worktype_mapper->hydrate($row, 'wt'));
-            $submission_box->setMarkType($marktype_mapper->hydrate($row, 'mt'));
-            $submission_box->setCategory($this->hydrateJoin($row, 'category', 'cat'));
+        $curriculumNodes = [];
+        foreach ($statement as $row) {
+            if (!($submission_box instanceof SubmissionBox)) {
+                $submission_box = $this->hydrate($row, 'sb');
+                $submission_box->setWorkType($worktype_mapper->hydrate($row, 'wt'));
+                $submission_box->setMarkType($marktype_mapper->hydrate($row, 'mt'));
+                $submission_box->setCategory($this->hydrateJoin($row, 'category', 'cat'));
+            }
+            // Hydrate curriculum nodes
+            /** @var Node\Model $curriculumNode */
+            $curriculumNode = $this->getJoinMapper('curriculum_node_for_submission_box')
+                ->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
+            if ($curriculumNode->getId()) {
+                $curriculumNodes[$curriculumNode->getId()] = $curriculumNode;
+            }
         }
 
         if ($submission_box instanceof SubmissionBox) {
+            $submission_box->setCurriculumNodes(new Collection(array_values($curriculumNodes)));
             // Get files? (This is more evidence separate file/link mapper isn't
             // required.)
             $query = "

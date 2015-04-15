@@ -1,4 +1,7 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+<script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
 <script type="text/javascript">
 $(function() {
 
@@ -11,21 +14,17 @@ $(function() {
 	});
 
 
-  jQuery.validator.addMethod("groupCheck", function(value, element, params) {
-    var hasDefaultPerms = $("input[name='group[{REQUIRED_PERMS}]']:checked").val();
-    var individualPerms = $('input[name=groupcheck]').is(':checked');
+    jQuery.validator.addMethod("groupCheck", function(value, element, params) {
+        var hasDefaultPerms = $("input[name='group[{REQUIRED_PERMS}]']:checked").val();
+        var individualPerms = $('input[name=groupcheck]').is(':checked');
 
-    if ((hasDefaultPerms < 2) && !individualPerms) {
-      return confirm("You do not currently have write access to this folder. Do you wish to continue?");
-    }
-    else {
-      return true;
-    }
-  }, "Please select write access for this group.");
-
-
-
-
+        if ((hasDefaultPerms < 2) && !individualPerms) {
+          return confirm("You do not currently have write access to this folder. Do you wish to continue?");
+        }
+        else {
+          return true;
+        }
+    }, "Please select write access for this group.");
 });
 </script>
 <style type="text/css">
@@ -112,6 +111,13 @@ $(function() {
 			<td><input type="text" name="code" size="40" value="{CODE}" /></td>
 		</tr>
 		<!-- END synergy_input -->
+        <!-- BEGIN curriculum_code_input -->
+        <tr>
+            <td><h4>Curriculum Codes</h4>
+                <em>If you want to associate curriculum codes with this folder, enter them here.</em></td>
+            <td>{CURRICULUM_CODE_INPUT}</td>
+        </tr>
+        <!-- END curriculum_code_input -->
 	</table>
 	<input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
 	<input type="submit" label="Submit" name="submit" value="{ACTION} Folder" class="submit-btn-plain"/>

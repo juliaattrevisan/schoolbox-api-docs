@@ -14,6 +14,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Permission\Access\UserAccess;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 
@@ -37,12 +38,21 @@ class Module extends BaseModule
     }
 
     /**
-     * For now, curricula are only editable by superusers.
+     * Only users with write permission to the curriculum service may import.
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
         $authorizer->addRule('/^curriculumImport\\..*/', new Rule\IsLoggedIn());
-        $authorizer->addRule('/^curriculumImport\\..*/', new Rule\IsSuperuser());
+        $authorizer->addRule(
+            '/^curriculumImport\\..*/',
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(
+                    UserAccess::SERVICE_CURRICULUM,
+                    UserAccess::ACCESS_WRITE
+                )
+            )
+        );
     }
 
     /**

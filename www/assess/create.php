@@ -45,6 +45,12 @@ if (!empty($_POST)) {
         ->setMarkVisibility($_POST['mark_visibility'])
         ->setCompletionMessage($_POST['completion_message'])
     ;
+    if (isset($_POST['curriculumCodes'])) {
+        $assessment->setCurriculumNodes(
+            Schoolbox\Curriculum\Node\Mapper::getInstance()
+                ->findByColumn('id', $_POST['curriculumCodes'])
+        );
+    }
 
     // Is this a task? If so, just set the start and finish to now.
     $is_task       = !empty($_POST['is_task']);
@@ -160,6 +166,13 @@ else {
         error(117);
     }
 
+    try {
+        $category = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($category_id);
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        error(117);
+        exit;
+    }
+
     if ($groupHandler->getPermission($category_id) < WRITE_ACCESS) {
         error(126);
     }
@@ -172,10 +185,17 @@ else {
     $this->setBlock('assess_timespan', 'finishMeridiem', 'finishMeridiem_block');
     $this->setBlock(TEMPLATE_content,  'importXML', 'importXML_block');
     $this->setBlock(TEMPLATE_content,  'max_attempts', 'max_attempts_block');
+    $this->setBlock(TEMPLATE_content, 'curriculum_code_input', 'curriculum_code_input_block');
 
     $this->setTitle('Manage Assessment');
 
     $this->setVar('assess_timespan_block', '');
+
+    if (Config::get('curriculum_tagging_enabled')) {
+        $this->parse('curriculum_code_input_block', 'curriculum_code_input');
+    } else {
+        $this->setVar('curriculum_code_input_block', '');
+    }
 
     $this->setVar(array(
         'ACTION'             => 'create',
@@ -193,6 +213,15 @@ else {
         'ASSESS_FINISH_DATE' => $assessEndDate->getLocalShort(),
         'ASSESS_COMPLETION_MESSAGE' => '',
     ));
+
+    // Curriculum codes: by default use the ones that are part of the folder
+    $this->setVar(
+        'CURRICULUM_CODE_INPUT',
+        $this->getTwig()->render(
+            'sub/curriculumCodeSelector.twig',
+            ['codeList' => $category->getCurriculumNodes()]
+        )
+    );
 
     /* Render starting times
      */

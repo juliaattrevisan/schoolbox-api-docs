@@ -14,6 +14,7 @@ namespace Schoolbox\Resource\Folder;
 
 use External_UserInterface;
 use Schoolbox\Collection;
+use Schoolbox\Curriculum\Node;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\FileMapper;
@@ -115,6 +116,18 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
                 'this_key'  => 'category',
                 'other_key' => 'id',
             )
+        );
+
+        $this->joinsVia(
+            'curriculum_node_for_category',
+            Node\Mapper::class,
+            'id',
+            'curriculum_node_id',
+            'category_id',
+            null,
+            null,
+            null,
+            'curriculumNodes'
         );
 
         $this->hasMap(
@@ -401,11 +414,21 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
                 {$this->getColumnString('c')},
                 {$code_mapper->getColumnString('cc')},
                 {$homepageConfig_mapper->getColumnString('hp')},
-                {$group_mapper->getColumnString('ug')}
+                {$group_mapper->getColumnString('ug')},
+                {$this->getJoinColumnString('curriculum_node_for_category', 'cn')},
+                {$this->getJoinColumnString('curriculum_node_for_category.level', 'cnl')},
+                {$this->getJoinColumnString('curriculum_node_for_category.level.source', 'cnls')},
+                {$this->getJoinColumnString('curriculum_node_for_category.area', 'cna')},
+                {$this->getJoinColumnString('curriculum_node_for_category.area.source', 'cnas')}
             FROM {$this->getTable()} c
             LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
             LEFT JOIN {$this->getJoinSql('homepages', 'c', 'hp')}
             LEFT JOIN {$this->getJoinSql('groups', 'c', 'ug')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category', 'c', 'cn')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.level', 'cn', 'cnl')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.level.source', 'cnl', 'cnls')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.area', 'cn', 'cna')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.area.source', 'cna', 'cnas')}
         ";
     }
 
@@ -473,6 +496,10 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         $homepageConfig_mapper = $this->getJoinMapper('homepages');
         $group_mapper = $this->getJoinMapper('groups');
         $category = null;
+
+        $addedCodes           = [];
+        $addedCurriculumNodes = [];
+
         foreach ($statement as $row) {
             if (!$category instanceof $this->model) {
                 $category = $this->hydrate($row, 'c');
@@ -480,19 +507,43 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
                     $category->setTaskCount($row['c.taskCount']);
                 }
             }
+
+            // Hydrate class codes (avoiding duplicates)
             $code = $code_mapper->hydrate($row, 'cc');
             if ($code->getCategory()->getId()) {
-                $category->addCode($code);
+                $addedCodes[$code->getCode()] = $code;
             }
+
             $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
             $category->setHomepage($homepageConfig);
 
             $group = $group_mapper->hydrate($row, 'ug');
             $category->setGroup($group);
+
+            // Hydrate curriculum node codes (avoiding duplicates)
+            // BTW fetching multiple 1-M relations in a single query
+            // is how you get ants!
+            /** @var Node\Model $curriculumNode */
+            $curriculumNode = $this->getJoinMapper('curriculum_node_for_category')
+                ->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
+            if ($curriculumNode->getId()) {
+                $addedCurriculumNodes[$curriculumNode->getId()] = $curriculumNode;
+            }
         }
         if (!($category instanceof Model)) {
             throw new \Schoolbox\Mapper\Exception('Instance of object not found');
         }
+        if (!empty($addedCodes)) {
+            foreach ($addedCodes as $code) {
+                $category->addCode($code);
+            }
+        }
+        if (!empty($addedCurriculumNodes)) {
+            foreach ($addedCurriculumNodes as $curriculumNode) {
+                $category->addCurriculumNode($curriculumNode);
+            }
+        }
+
         $this->throwIfDeleted($category);
         return $category;
     }

@@ -15,6 +15,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Permission\Access\UserAccess;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 
@@ -36,7 +37,7 @@ class Module extends BaseModule
     {
         $router->attachResource('curriculum', $basePath);
         $router->attachResourcePostAlias('curriculum', $basePath);
-//        $router->addGet('curriculum.browse', $basePath . '/');
+        $router->addGet('curriculum.search', $basePath . '/search');
 //        // Attach standard REST routes
 //        $router->attachResource('tile', $basePath);
 //        $router->attachResourcePostAlias('tile', $basePath);
@@ -67,12 +68,22 @@ class Module extends BaseModule
     }
 
     /**
-     * For now, curricula are only editable by superusers.
+     * Everyone has read permission to a curriculum, but only users with write
+     * permission to the curriculum service may create or modify them.
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
         $authorizer->addRule('/^curriculum\\..*/', new Rule\IsLoggedIn());
-        $authorizer->addRule('/^curriculum\\..*/', new Rule\IsSuperuser());
+        $authorizer->addRule(
+            '/^curriculum\\.(?:edit|add|delete|create|update|replace)/',
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(
+                    UserAccess::SERVICE_CURRICULUM,
+                    UserAccess::ACCESS_WRITE
+                )
+            )
+        );
     }
 
 

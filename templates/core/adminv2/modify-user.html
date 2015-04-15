@@ -133,7 +133,7 @@ $(function() {
 
 		/* Exclusions
 		 */
-		if ([5,6,7].indexOf(Number($(this).val())) >= 0) {
+		if ([5,6,7,8].indexOf(Number($(this).val())) >= 0) {
 			$('#serviceCloneForm').find('select[name=sid]').hide();
 		}
 		else {
@@ -621,6 +621,24 @@ $(function() {
                 </td>
             </tr>
             <!-- END user_resource_booking -->
+            <!-- BEGIN user_curriculum -->
+            <tr class="permissions-curriculum">
+                <td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
+                <td>Curriculum</td>
+                <td></td>
+                <td>
+                    <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
+                        <input type="hidden" name="uid" value="{USERID}" />
+                        <input type="hidden" name="sid" value="0" />
+                        <input type="hidden" name="service" value="{SERVICE_ID}" />
+
+                        <label><input type="radio" name="type" value="1" {READ_CHECKED} />No</label>
+                        <label><input type="radio" name="type" value="2" {WRITE_CHECKED} />Yes</label>
+                        <label><input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate</label>
+                    </form>
+                </td>
+            </tr>
+            <!-- END user_curriculum -->
 			</tbody>
             </table>
 					<form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" class="clearfix">
@@ -647,6 +665,7 @@ $(function() {
 								<option value="5">CMS</option>
                                 <option value="6">Housemaster</option>
                                 <option value="7">Resource Booking</option>
+                                <option value="8">Curriculum</option>
 							</select>
 						</label>
 						</td>

@@ -15,6 +15,7 @@ use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
+use Schoolbox\Curriculum\Node;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper;
 
@@ -161,6 +162,18 @@ class OnlineAssessmentMapper extends Mapper implements FeedableMapperInterface {
 			'this_key'  => 'task_instance_id',
 			'other_key' => 'id',
 		));
+
+        $this->joinsVia(
+            'curriculum_node_for_assess',
+            Node\Mapper::class,
+            'id',
+            'curriculum_node_id',
+            'assess_id',
+            null,
+            null,
+            null,
+            'curriculumNodes'
+        );
 
 		$this->hasSoftDeleteDateField('deleted_at');
 
@@ -568,27 +581,51 @@ class OnlineAssessmentMapper extends Mapper implements FeedableMapperInterface {
                 {$this->getColumnString('a')},
                 {$this->getJoinColumnString('category', 'c')},
                 {$this->getJoinColumnString('work_type', 't')},
-                {$this->getJoinColumnString('user', 'u')}
+                {$this->getJoinColumnString('user', 'u')},
+                {$this->getJoinColumnString('curriculum_node_for_assess', 'cn')},
+                {$this->getJoinColumnString('curriculum_node_for_assess.level', 'cnl')},
+                {$this->getJoinColumnString('curriculum_node_for_assess.level.source', 'cnls')},
+                {$this->getJoinColumnString('curriculum_node_for_assess.area', 'cna')},
+                {$this->getJoinColumnString('curriculum_node_for_assess.area.source', 'cnas')}
             FROM
                 `{$this->getTable()}` `a`
                 LEFT JOIN {$this->getJoinSql('category', 'a', 'c')}
                 LEFT JOIN {$this->getJoinSql('work_type', 'a', 't')}
                 LEFT JOIN {$this->getJoinSql('user', 'a', 'u')}
+                LEFT JOIN {$this->getJoinSql('curriculum_node_for_assess', 'a', 'cn')}
+                LEFT JOIN {$this->getJoinSql('curriculum_node_for_assess.level', 'cn', 'cnl')}
+                LEFT JOIN {$this->getJoinSql('curriculum_node_for_assess.level.source', 'cnl', 'cnls')}
+                LEFT JOIN {$this->getJoinSql('curriculum_node_for_assess.area', 'cn', 'cna')}
+                LEFT JOIN {$this->getJoinSql('curriculum_node_for_assess.area.source', 'cna', 'cnas')}
             WHERE
                 `a`.assess_id = :id
         ");
 
         $stmt->execute(array('id' => $identifierValue));
 
-        if (!($record = $stmt->fetch(PDO::FETCH_ASSOC))) {
+        $quiz = null;
+        $curriculumNodes = [];
+        foreach ($stmt as $row) {
+            if (!($quiz instanceof OnlineAssessment)) {
+                $quiz = $this->hydrate($row, 'a');
+                $quiz->setCategory($this->hydrateJoin($row, 'category', 'c'));
+                $quiz->setWorkType($this->hydrateJoin($row, 'work_type', 't'));
+                $quiz->setUser($this->hydrateJoin($row, 'user', 'u'));
+            }
+            // Hydrate curriculum nodes
+            /** @var Node\Model $curriculumNode */
+            $curriculumNode = $this->getJoinMapper('curriculum_node_for_assess')
+                ->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
+            if ($curriculumNode->getId()) {
+                $curriculumNodes[$curriculumNode->getId()] = $curriculumNode;
+            }
+        }
+        $quiz->setCurriculumNodes(new Collection(array_values($curriculumNodes)));
+
+        if (!($quiz instanceof OnlineAssessment)) {
             throw new Mapper\Exception("Instance of object not found");
         }
-
-        $quiz = $this->hydrate($record, 'a');
-        $quiz->setCategory($this->hydrateJoin($record, 'category', 'c'));
-        $quiz->setWorkType($this->hydrateJoin($record, 'work_type', 't'));
-        $quiz->setUser($this->hydrateJoin($record, 'user', 'u'));
-
+        $this->throwIfDeleted($quiz);
         return $quiz;
     }
 

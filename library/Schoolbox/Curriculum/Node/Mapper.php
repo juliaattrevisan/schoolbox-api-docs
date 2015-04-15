@@ -9,9 +9,10 @@
 
 namespace Schoolbox\Curriculum\Node;
 
+use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 
-class Mapper extends BaseMapper
+class Mapper extends BaseMapper implements BaseMapper\Searchable
 {
     public function mapping()
     {
@@ -161,5 +162,111 @@ class Mapper extends BaseMapper
                 )
             )
         );
+    }
+
+    /**
+     * @param \Schoolbox\User $user
+     * @param string          $keyword
+     * @param int             $offset
+     * @param int             $limit
+     * @param string          $sortProperty  Ignored for this search for now
+     * @param string          $sortDirection Ignored for this search for now
+     *
+     * @return Collection|Model[]
+     */
+    public function search(
+        $user,
+        $keyword,
+        $offset = 0,
+        $limit = self::DEFAULT_LIMIT,
+        $sortProperty = '',
+        $sortDirection = 'DESC'
+    ) {
+        $query = "
+            SELECT
+                {$this->getColumnString('n')},
+                {$this->getJoinColumnString('level', 'nl')},
+                {$this->getJoinColumnString('level.source', 'nls')},
+                {$this->getJoinColumnString('area', 'na')},
+                {$this->getJoinColumnString('area.source', 'nas')}
+            FROM {$this->getTable()} n
+            INNER JOIN {$this->getJoinSql('level', 'n', 'nl')}
+            INNER JOIN {$this->getJoinSql('level.source', 'nl', 'nls')}
+            INNER JOIN {$this->getJoinSql('area', 'n', 'na')}
+            INNER JOIN {$this->getJoinSql('area.source', 'na', 'nas')}
+            WHERE n.code LIKE :codeLike
+            OR (n.code != '' AND n.name LIKE :nameLike)
+        ";
+        $quotedLike = $this->getDatabase()->quoteForLike($keyword);
+        $params     = [
+            'codeLike' => $quotedLike . '%',
+            'nameLike' => '%' . $quotedLike . '%',
+        ];
+        if ($limit) {
+            $query .= ' LIMIT :limit';
+        }
+        if ($offset) {
+            $query .= ' OFFSET :offset';
+        }
+        $statement = $this->getDatabase()->prepare($query);
+        foreach ($params as $param => $value) {
+            $statement->bindValue($param, $value);
+        }
+        if ($limit) {
+            $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
+        }
+        if ($offset) {
+            $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
+        }
+
+        $statement->execute();
+        return $this->hydrateList(
+            $statement,
+            'n',
+            function ($mapper, $model, $row) {
+                /** @var self $mapper */
+                /** @var Model $model */
+                return $mapper->hydrateWithRelatedJoins($row, 'n', 'na', 'nas', 'nl', 'nls');
+            }
+        );
+    }
+
+    /**
+     * Hydrates a curriculum node, with joins to area+source and level+source.
+     *
+     * @param array  $row
+     * @param string $alias
+     * @param string $areaAlias
+     * @param string $areaSourceAlias
+     * @param string $levelAlias
+     * @param string $levelSourceAlias
+     *
+     * @return Model
+     */
+    public function hydrateWithRelatedJoins(
+        $row,
+        $alias = null,
+        $areaAlias = 'cna',
+        $areaSourceAlias = 'cnas',
+        $levelAlias = 'cnl',
+        $levelSourceAlias = 'cnls'
+    ) {
+        /** @var Model $curriculumNode */
+        $curriculumNode = $this->hydrate($row, $alias);
+        if ($curriculumNode->getId()) {
+            $curriculumNode->setLearningArea(
+                $this->getJoinMapper('area')->hydrate($row, $areaAlias)
+                    ->setSource(
+                        $this->getJoinMapper('area.source')->hydrate($row, $areaSourceAlias)
+                    )
+            );
+            $curriculumNode->setLearningLevel(
+                $this->getJoinMapper('level')->hydrate($row, $levelAlias)
+                    ->setSource(
+                        $this->getJoinMapper('level.source')->hydrate($row, $levelSourceAlias)
+                    )
+            );
+        }
+        return $curriculumNode;
     }
 }

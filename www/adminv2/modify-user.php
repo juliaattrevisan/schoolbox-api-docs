@@ -22,6 +22,7 @@ if(is_numeric($this->arg[0])) {
     $this->setBlock(TEMPLATE_content, 'user_cms', 'user_cms_block');
     $this->setBlock(TEMPLATE_content, 'user_housemaster', 'user_housemaster_block');
     $this->setBlock(TEMPLATE_content, 'user_resource_booking', 'user_resource_booking_block');
+    $this->setBlock(TEMPLATE_content, 'user_curriculum', 'user_curriculum_block');
 
     // include the admin navigation
     $nav = new AdminV2_Nav();
@@ -33,6 +34,7 @@ if(is_numeric($this->arg[0])) {
         'user_cms_block'=> '',
         'user_housemaster_block'=> '',
         'user_resource_booking_block'=> '',
+        'user_curriculum_block'=> '',
     ));
 
     /* Modify existing user
@@ -214,6 +216,13 @@ if(is_numeric($this->arg[0])) {
 					 */
                     case RESOURCE_BOOKING_SERVICE:
                         $this->parse('user_resource_booking_block', 'user_resource_booking', true);
+                        break;
+
+                    /* Curriculum
+                     * Use the constants for now, but they should be removed
+                     */
+                    case CURRICULUM_SERVICE:
+                        $this->parse('user_curriculum_block', 'user_curriculum', true);
                         break;
                 }
 

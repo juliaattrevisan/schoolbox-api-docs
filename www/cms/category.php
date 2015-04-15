@@ -33,11 +33,18 @@ if (is_numeric($this->arg[0])) {
     $this->setBlock(TEMPLATE_content, 'reset_content', 'reset_content_block');
     $this->setBlock(TEMPLATE_content, 'synergy_input', 'synergy_input_block');
     $this->setBlock(TEMPLATE_content, 'recursive', 'recursive_block');
+    $this->setBlock(TEMPLATE_content, 'curriculum_code_input', 'curriculum_code_input_block');
 
     if ($groupHandler->isSuperuser()) {
         $this->parse('recursive_block', 'recursive');
     } else {
         $this->setVar('recursive_block', '');
+    }
+
+    if (Config::get('curriculum_tagging_enabled')) {
+        $this->parse('curriculum_code_input_block', 'curriculum_code_input');
+    } else {
+        $this->setVar('curriculum_code_input_block', '');
     }
 
     $this->setTitle('Modify Category');
@@ -53,6 +60,10 @@ if (is_numeric($this->arg[0])) {
         'USER_GROUP' => $_SESSION['gid'],
         'DATABASE_TYPE' => ucfirst(Cfg::get('external_type')),
         'REQUIRED_PERMS' => $_SESSION['gid'],
+        'CURRICULUM_CODE_INPUT' => $this->getTwig()->render(
+            'sub/curriculumCodeSelector.twig',
+            ['codeList' => $folder->getCurriculumNodes()]
+        ),
     );
 
     $this->setVar($output);
@@ -153,6 +164,7 @@ if (is_numeric($this->arg[0])) {
             'CATEGORY_ID' => '',
             'NAME' => '',
             'CODE' => '',
+            'CURRICULUM_CODE_LIST' => json_encode([]),
             'PARENT_ID' => $folderParent->getId(),
             'PARENT_NAME' => Scrub::text($folderParent->getName()),
             'REQUIRED_PERMS' => $_SESSION['gid'],

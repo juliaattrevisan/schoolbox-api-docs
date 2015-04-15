@@ -6,6 +6,9 @@
 <script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+<script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
 
 <script type="text/javascript">
     // from http://stackoverflow.com/a/5259788
@@ -719,6 +722,15 @@
         </td>
     </tr>
     <!-- END duework_timespan -->
+    <!-- BEGIN curriculum_code_input -->
+    <tr>
+        <td><h4>Curriculum Codes</h4>
+            <em>If you want to associate curriculum codes with this submission, enter them here.</em>
+            <em>(By default, it will be associated with the same codes that its folder is.)</em>
+        </td>
+        <td>{CURRICULUM_CODE_INPUT}</td>
+    </tr>
+    <!-- END curriculum_code_input -->
 </table>
 <input type="hidden" name='fileId' value="{FILEID}"/>
 <input type="hidden" name="id" value="{ID}"/></td>

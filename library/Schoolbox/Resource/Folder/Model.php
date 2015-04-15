@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Folder;
 
 
 use Schoolbox\Collection;
+use Schoolbox\Curriculum\Node;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\CategoryCode;
@@ -27,6 +28,7 @@ use Schoolbox\UserMapper;
  */
 class Model extends AbstractFolder implements ISoftDeletable
 {
+    use Node\Traits\HasCurriculumNodes;
 
     /**
      * A homepage instance
@@ -78,6 +80,7 @@ class Model extends AbstractFolder implements ISoftDeletable
     public function __construct()
     {
         $this->setCodes(new Collection(array()));
+        $this->setCurriculumNodes(new Collection());
     }
 
     /**
@@ -124,6 +127,19 @@ class Model extends AbstractFolder implements ISoftDeletable
         $this->getCodes()->add($code);
         return $this;
     }
+
+    /**
+     * Add curriculum node
+     *
+     * @param  Node\Model $node
+     * @return $this
+     */
+    public function addCurriculumNode(Node\Model $node)
+    {
+        $this->getCurriculumNodes()->add($node);
+        return $this;
+    }
+
 
     /**
      * Populates the teacher collection

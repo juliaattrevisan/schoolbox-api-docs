@@ -5,3 +5,7 @@
         editable: false
     }
 %}
+{% if showButtons %}
+<a href="/tile/layout/{{ tile_component_instance_id }}" class="btn modify"><span></span>Modify Layout</a>
+<a href="/tile/add/{{ tile_component_instance_id }}" class="btn add"><span></span>Add Tile</a>
+{% endif %}

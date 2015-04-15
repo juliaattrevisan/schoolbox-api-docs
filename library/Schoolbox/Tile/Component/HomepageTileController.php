@@ -71,18 +71,16 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
      */
     public function renderTemplate($templateHandle)
     {
-        if (!$this->loadTemplate($templateHandle, 'tile')) {
-            return false;
-        }
-        $this->parseConfig();
-        $this->delegate
-            ->setupBlocks($this, $templateHandle)
-            ->parseBlocks(
-                $this,
-                $this->delegate->fetchTwigContent($this, $this->sitepage),
-                $this->permission
-            );
-        return true;
+        return $this->renderTwigTemplate(
+            $templateHandle,
+            '@tile/component/tile.twig',
+            array(
+                'component'                  => $this,
+                'showButtons'                => $this->hasWriteAccess(),
+                'tile_component_instance_id' => $this->getConfig('tileSource') ?: $this->getInstance()->getId(),
+            ),
+            $this->hasWriteAccess()
+        );
     }
 
     /**
