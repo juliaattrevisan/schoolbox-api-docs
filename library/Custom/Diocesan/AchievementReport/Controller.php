@@ -24,10 +24,8 @@ class Controller extends Base {
         $yearlyBreakdownTable = new SchoolGrades\YearlyBreakdownTable($externalUser, $db);
         $entriesAndResultsTable = new SchoolGrades\EntriesAndResultsTable($externalUser, $db);
 
-
-
         $this->getResponse()->content->set(array(
-            'template' => '@achievementreport/index.twig',
+            'template' => '@schoolgrades/index.twig',
             'data' => array(
                 'preselectedYear' => $year,
                 'externalUser' => $externalUser,
