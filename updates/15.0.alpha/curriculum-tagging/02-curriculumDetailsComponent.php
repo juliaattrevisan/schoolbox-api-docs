@@ -18,6 +18,10 @@ $component = array(
     'multiple'           => 'true',
     'visible'            => 'false',
     'config'             => array(
+        'collapse' => array(
+            'default_value' => 0,
+            'label'         => 'Collapse Content',
+        ),
         'componentname' => array(
             'default_value' => 'Curriculum Details',
             'label'         => 'Heading',
