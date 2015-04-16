@@ -206,7 +206,7 @@ class Migrator
                                 }
 
                                 // Point old to new
-                                if (!symlink($newFilename, $oldFilename)) {
+                                if (!symlink($newFilepath, $oldFilepath)) {
                                     throw new Flysystem\Exception("Symlinking queue file '$oldFilename' failed.");
                                 }
                             }
