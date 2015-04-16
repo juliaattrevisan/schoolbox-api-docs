@@ -57,7 +57,7 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         $this->hasTable('storage');
         $this->hasPrototype(new Model($this->mgr->getFilesystem(Manager::FS_STORAGE)));
 
-        $this->uses('id', self::TYPE_INTEGER);
+        $this->uses('storage_id', self::TYPE_INTEGER, null, 'id');
         $this->uses('hash', self::TYPE_STRING, self::COLUMN_IDENTIFIER);
         $this->uses('filesize', self::TYPE_INTEGER, null, 'size');
         $this->uses('uploaded_on', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'createdAt');
