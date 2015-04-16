@@ -71,6 +71,17 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 
         $this->source_category_id = $source;
 
+
+        $allVideos = Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
+            [$source],
+            [
+                'filter'  => ['video'],
+                'size'    => $this->getConfig('size'),
+                'sort'    => $this->getConfig('sort'),
+                'sortdir' => $this->getConfig('sortdir'),
+            ]
+        );
+
         if ($this->getConfig('size') >= 1) {
             $this->outputList = $videoResourceMapper->findByCategory(
                 $source,

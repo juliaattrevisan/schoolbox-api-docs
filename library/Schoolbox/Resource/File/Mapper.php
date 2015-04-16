@@ -96,11 +96,13 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
         // much join many wow
         $table     = $this->getTable();
         $baseQuery = "
-            SELECT {$this->getColumnString()},
-                   {$this->getJoinColumnString('hash', 'h')},
-                   {$this->getJoinColumnString('hash.allowedFileExtension', 'm')},
-                   {$this->getJoinColumnString('owner', 'u')},
-                   {$this->getJoinColumnString($this->getFolderFieldname(), 'c')}
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('hash', 'h')},
+                {$this->getJoinColumnString('hash.allowedFileExtension', 'm')},
+                {$this->getJoinColumnString('hash.queue', 'q')},
+                {$this->getJoinColumnString('owner', 'u')},
+                {$this->getJoinColumnString($this->getFolderFieldname(), 'c')}
             FROM {$table}
             LEFT JOIN {$this->getJoinSql('hash', $table, 'h')}
             LEFT JOIN {$this->getJoinSql('hash.allowedFileExtension', 'h', 'm', true)}
