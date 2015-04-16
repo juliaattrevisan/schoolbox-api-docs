@@ -197,9 +197,15 @@ class Migrator
                                 $newFilename = pathinfo($newFilepath, PATHINFO_FILENAME);
 
                                 $this->log->info("Migrating queue file '$oldFilename' to '$newFilename'");
-                                if (!rename($oldFilepath, $newFilepath)) {
+                                if (file_exists($newFilepath)) {
+                                    $this->log->debug(
+                                        "Queue file '$newFilename' already exists, assuming it is already imported'"
+                                    );
+                                } elseif (!rename($oldFilepath, $newFilepath)) {
                                     throw new Flysystem\Exception("Migrating queue file '$oldFilename' failed.");
                                 }
+
+                                // Point old to new
                                 if (!symlink($newFilename, $oldFilename)) {
                                     throw new Flysystem\Exception("Symlinking queue file '$oldFilename' failed.");
                                 }
