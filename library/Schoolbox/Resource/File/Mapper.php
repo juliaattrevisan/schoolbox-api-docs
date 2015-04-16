@@ -136,7 +136,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
                 $whereParts[] = implode(
                     ' OR ',
                     array_map(
-                        function($m) { return "h.mimetype LIKE '$m'"; },
+                        function($m) { return "m.mime LIKE '$m'"; },
                         $mimetypes
                     )
                 );
