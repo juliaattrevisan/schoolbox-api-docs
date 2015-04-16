@@ -166,6 +166,6 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
             $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
         }
         $statement->execute();
-        return $this->hydrateList($statement);
+        return $this->hydrateSelect($statement);
     }
 }
