@@ -141,6 +141,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                 'filter'  => $filter,
                 'sort'    => $this->getConfig('sort'),
                 'sortdir' => $this->getConfig('sortdir'),
+                'hidden'  => $this->permission < WRITE_ACCESS,
             )
         );
 
