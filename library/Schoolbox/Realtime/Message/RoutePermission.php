@@ -18,14 +18,29 @@ class RoutePermission {
 	protected $msgSource;
 	/** @var int */
 	protected $role;
-	/** @var int */
+    /** @var array */
+    protected $default;
+    /** @var array */
+    protected $mask;
+
+    /**
+     * @deprecated use $mask
+     * @var int
+     */
 	protected $minLevel;
-	/** @var int */
+    /**
+     * @deprecated use $mask
+     * @var int
+     */
 	protected $maxLevel;
-	/** @var int */
+    /**
+     * @deprecated use $default
+     * @var int
+     */
 	protected $defaultLevel;
 
 	/**
+     * @deprecated use setDefault()
 	 * @param int $defaultLevel
 	 */
 	public function setDefaultLevel($defaultLevel) {
@@ -33,6 +48,7 @@ class RoutePermission {
 	}
 
 	/**
+	 * @deprecated use getDefault()
 	 * @return int
 	 */
 	public function getDefaultLevel() {
@@ -40,6 +56,7 @@ class RoutePermission {
 	}
 
 	/**
+	 * @deprecated use setDefault()
 	 * @param int $maxLevel
 	 */
 	public function setMaxLevel($maxLevel) {
@@ -47,6 +64,7 @@ class RoutePermission {
 	}
 
 	/**
+	 * @deprecated use getMask()
 	 * @return int
 	 */
 	public function getMaxLevel() {
@@ -54,6 +72,7 @@ class RoutePermission {
 	}
 
 	/**
+	 * @deprecated use setMask()
 	 * @param int $minLevel
 	 */
 	public function setMinLevel($minLevel) {
@@ -61,18 +80,21 @@ class RoutePermission {
 	}
 
 	/**
+	 * @deprecated use getMask()
 	 * @return int
 	 */
 	public function getMinLevel() {
 		return $this->minLevel;
 	}
 
-	/** @return array */
+    /**
+     * @return array
+     */
 	public function getLevels() {
 		return array(
-			'max' => $this->maxLevel,
-			'default' => $this->defaultLevel,
-			'min' => $this->minLevel
+			'max'     => $this->getMaxLevel(),
+			'default' => $this->getDefaultLevel(),
+			'min'     => $this->getMinLevel()
 		);
 	}
 
@@ -103,6 +125,46 @@ class RoutePermission {
 	public function getRole() {
 		return $this->role;
 	}
+
+
+    /**
+     * @return array
+     */
+    public function getDefault()
+    {
+        return $this->default;
+    }
+
+
+    /**
+     * @param array $default
+     * @return static
+     */
+    public function setDefault($default)
+    {
+        $this->default = $default;
+        return $this;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getMask()
+    {
+        return $this->mask;
+    }
+
+
+    /**
+     * @param array $mask
+     * @return static
+     */
+    public function setMask($mask)
+    {
+        $this->mask = $mask;
+        return $this;
+    }
 
 
 

@@ -53,6 +53,9 @@ class RoutePermissionMapper extends Mapper {
 			'type'       => self::TYPE_INTEGER,
 		));
 
+        $this->uses('MASK', self::TYPE_SET, null, 'mask');
+        $this->uses('DEF', self::TYPE_SET,  null, 'default');
+
 		$this->hasJoin('msg_source', array(
 			'mapper'    => '\\Schoolbox\\Realtime\\Message\\SourceMapper',
 			'this_key'  => 'msg_source_id',
@@ -64,6 +67,30 @@ class RoutePermissionMapper extends Mapper {
 			'other_key' => 'id',
 		));
 	}
+
+
+    /**
+     * @param RoutePermission $object
+     * @return array
+     */
+    public function save($object)
+    {
+        // if this perm is silent, don't save it; delete it!
+        if ($object->getMask() === [ 'MU' ] && $object->getDefault() === [ 'MU' ]) {
+
+            // permissions are a composite-key object, so delete() doesn't work
+            $cols = [
+                'msg_source_id' => $object->getMsgSource()->getId(),
+                'role_id'       => $object->getRole()->getId()
+            ];
+
+            $this->deleteByColumnList($cols);
+
+            return [ $cols ];
+        }
+
+        return parent::save($object);
+    }
 
 
     /**
