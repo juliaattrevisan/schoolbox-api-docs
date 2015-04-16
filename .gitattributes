@@ -1,0 +1,6 @@
+# Here's how to deal with composer.lock conflicts:
+# git reset HEAD composer.lock
+# ./composer.phar update [package1] ...
+# git add composer.lock
+# git rebase --continue
+composer.lock binary
