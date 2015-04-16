@@ -135,7 +135,6 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
         $fileList = Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
             [$this->source->getId()],
-            $filter,
             array(
                 'size'      => $this->getConfig('size'),
                 'filter'    => $filter,
