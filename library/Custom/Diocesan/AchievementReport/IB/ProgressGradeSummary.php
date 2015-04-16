@@ -50,7 +50,7 @@ class ProgressGradeSummary extends Base {
          */
         foreach ($allProgressGrades as $current) {
             if (strlen($current['ProgressGrade'])) {
-                $year = $current['classyear'];
+                $year = $current['StudentYearlevel'];
                 $term = $current['Term'];
                 $progressGrade = $current['ProgressGrade'];
 
@@ -75,7 +75,7 @@ class ProgressGradeSummary extends Base {
                 $finalStack[$year][$term]['progressGrades'][$progressGrade]++;
             }
         }
-
+        new Probe($allProgressGrades, $finalStack);
         return $finalStack;
     }
 
