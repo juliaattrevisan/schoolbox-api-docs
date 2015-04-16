@@ -1,0 +1,128 @@
+<script type="text/javascript">
+    $(function () {
+
+        var selTable = $('#adv-selection'),
+            posTable = $('#adv-possibilities');
+
+        posTable.on('click preclick', 'input', function (e) {
+
+            var src  = $(this),
+                perm = src.val(),
+                tgt  = selTable.find('input[data-perm='+perm+']');
+
+            if (src.prop('checked')) {
+                // enable corresponding input in Step 2
+                tgt.removeAttr('disabled');
+            } else {
+                // disable correspondible input in Step 2
+                tgt.prop('checked', false)         // ensure not still checked
+                   .attr('disabled', 'disabled');  // disable
+
+                if (tgt.data('perm') == 1) {
+                    // deselect the other perms
+                    src.closest('tr').find('input').filter(
+                        function () {
+                            return this.value > 1 && this.value < 8
+                        }
+                    ).prop('checked', false).trigger('preclick');
+                }
+
+                if (selTable.find('input:checked').length == 0) {
+                    // we need *something* selected
+
+                    $.each([1, 0, 8], function (k, i) {
+                        if (posTable.find('input[value='+i+']:checked').length) {
+                            selTable.find('input[data-perm='+i+']').prop('checked', 'checked');
+                            return false; // "break"
+                        }
+                    });
+
+                    // if there's STILL nothing
+                    if (selTable.find('input[data-perm]:checked').length == 0) {
+                        // *sigh* re-enable mute and set that.
+                        posTable.find('input[value=0]').prop('checked', 'checked').trigger('preclick');
+                        selTable.find('input[data-perm=0]').prop('checked', 'checked');
+                    }
+                }
+            }
+        });
+
+        posTable.on('click preclick', 'input[value=2], input[value=4]', function (e) {
+            if ($(this).prop('checked')) {
+                // ensure instant is checked
+                $(this).closest('tr').find('input[value=1]').prop('checked', true).trigger('preclick');
+            }
+        });
+
+        posTable.find('input').trigger('preclick');
+
+        // inlineify all SVGs and apply message admin constraints
+        $('#adv')
+            .svgInline()
+            .msgadmin({
+                roleSelector: 'tr[data-role]',
+                permSelector: 'td.perm',
+                toggleSelector: null,
+                muteSelector: null,
+                customSelector: null
+            });
+
+        posTable.closest('form').on('submit', function (e) {
+            e.preventDefault();
+            $(this).find('input[type=submit]').attr('disabled', 'disabled').val('Saving');
+
+            $.post('/adminv2/messages/configure', $(this).serialize(), function (data) {
+                console.log(data);
+                customiserCallback(data);
+                $('#slider-modal').dialog('destroy');
+            });
+        });
+
+    });
+</script>
+<ul class="namespaces" id="adv">
+<li class="source" data-source="{{ source.id }}">
+    <form method="post" action="">
+        <h4>
+            <span class="label">"Send a message when {{ source.description }}."</span>
+            <em class="summary">&rarr; {{ role.name }}</em>
+        </h4>
+        <p>
+            <strong>Step 1:</strong> Select the settings that members of '{{ role.name }}' are <em>allowed to select</em> for this message when customizing their notifications.
+            If you only select a single option, users will be locked to that option.
+        </p>
+        <table class="roles digest-settings" id="adv-possibilities">
+            <tr class="role">
+                {% for level, perm in perms %}
+                    <td class="perm">
+                        <input id="opt-{{ source.id }}-{{ role.id }}-{{ level }}"
+                               name="data[{{ ns[namespace.id].slug ?: 0 }}][{{ source.key ?: 0 }}][{{ role.id }}][mask][]"
+                               value="{{ level }}" type="checkbox"
+                               {% if perm[1] | slice(0, 2) | upper in role.mask %}checked="checked"{% endif %}
+                        />
+                        <label for="opt-{{ source.id }}-{{ role.id }}-{{ level }}" title="{{ perm[1] }}">
+                            <span>
+                                <img src="/images/core/messaging/{{ perm[1] | lower }}.svg" alt="{{ perm[1] }}" />
+                                {#{% include '@adminMessages/icons/' ~ perm[1] | lower ~ '.svg' %}#}
+                                {#{{ perm[1] | slice(0, 2) | upper }}#}
+                            </span>
+                        </label>
+                    </td>
+                    {% if level == 1 %}<td>+</td>{% endif %}
+                {% endfor %}
+            </tr>
+        </table>
+        <p><strong>Step 2:</strong> Select the default setting for members of '{{ role.name }}' for this message.</p>
+        <table class="roles digest-settings" data-settings id="adv-selection">
+            <tr class="role" data-role="{{ role.id }}">
+                {% include '@adminMessages/options.twig' with { mode: 'def' } %}
+            </tr>
+        </table>
+        <label class="float-right">
+            <input type="checkbox" name="copy-to" value="{{ roletype ?: 'all' }}" /> Copy these message settings for all {{ roletype }} roles
+        </label>
+        <input type="submit" class="submit-btn-plain" value="Save" />
+    </form>
+</li>
+</ul>
+

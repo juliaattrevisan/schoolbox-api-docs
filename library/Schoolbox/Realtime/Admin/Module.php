@@ -33,6 +33,7 @@ class Module extends BaseModule
 //        $routes->addGet('admin.messages', $basePath);
 //        $routes->addPost('admin.messages.setDigest', "$basePath/digest");
 
+        $routes->addGet('adminMessages.customConfig', "$basePath/configure/custom");
         $routes->addGet('adminMessages.configure', "$basePath/configure{/roletype}");
         $routes->addPost('adminMessages.saveConfig', "$basePath/configure");
     }

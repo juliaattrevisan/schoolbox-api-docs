@@ -4,10 +4,13 @@
     }
     .digest-settings tr {
         transition: height 200ms ease-out;
+        height: 32px;
+        line-height: 32px;
     }
     .digest-settings td {
         overflow: hidden;
         border: none;
+        /*line-height: 48px;*/
     }
     td.perm {
         min-width: 32px;
@@ -34,216 +37,248 @@
         /*opacity: 0;*/
     }
     .perm label span {
-        font-size: 18px;
+        /*font-size: 18px;*/
     }
     .digest-settings td.disable * {
         visibility: hidden;
     }
     .digest-settings tr.show-advanced td {
-        height: 200px;
-        vertical-align: top !important;
+        /*height: 200px;*/
+        /*vertical-align: top !important;*/
     }
-    .digest-settings tr.show-advanced td.perm {
+    .digest-settings tr.show-advanced td.simple {
         display: none;
     }
+    .digest-settings tr.show-advanced td.custom {
+        width: 345px;
+    }
+    .digest-settings td.custom > div {
+        display: none;
+    }
+    .digest-settings tr.show-advanced td.custom > div {
+        display: block;
+    }
+    td .actions {
+        float: right;
+        padding-top: 4px;
+    }
+    .digest-settings svg {
+        width: 16px;
+        margin-top: 5px;
+    }
+    .digest-settings td.perm input:checked + label svg {
+        fill: #fff;
+    }
+    .custom-descrip {
+        display: none;
+    }
+    .expanded .custom-descrip {
+        display: inline;
+    }
 </style>
+<script type="text/javascript" src="/javascript/jquery.msgConfig.js"></script>
+<script type="text/javascript" src="/javascript/jquery.svgInline.js"></script>
+<!--suppress NonShortCircuitBooleanExpressionJS -->
 <script type="text/javascript">
 
     var levelOff     = 0,
-        levelDigest  = 200,
-        levelInstant = 250,
-        levelPush    = 300,
-        levelEmail   = 400,
+        levelInstant = 1,
+        levelPush    = 2,
+        levelEmail   = 4,
+        levelDigest  = 8,
         desc         = {};
 
     desc[levelOff]      = 'off';
     desc[levelDigest]   = 'digest';
     desc[levelInstant]  = 'instant';
-    desc[levelPush]     = 'push';
+    desc[levelPush]     = 'mobile';
     desc[levelEmail]    = 'email';
 
     $(function () {
 
-        var ds = $('.digest-settings');
+        var ii;
 
-        ds.find('.toggle').on('change', 'input', function (e) {
-            var val = parseInt($(this).val()),
-                chk = $(this).is(':checked'),
-                tds = $(this).closest('tr').children('.mutable, .perm, .custom');
+        // inlineify all SVGs
+        $('body').svgInline();
 
-            if (chk) {
-                if (val) {
-                    tds.removeClass('disable');
+        $('#configurator').msgconfig({
+            sourceSelector: 'li.source',
+            tableSelector:  '.digest-settings',
+            roleSelector:   'tr',
+            toggleSelector: '.toggle',
+            muteSelector:   '.mutable',
+            customSelector: 'td.custom',
+            permSelector:   '.perm',
+            persist: function () {
+                var form = this.children('form[method=post]');
 
-                } else {
-                    tds.addClass('disable');
-
-                }
-            }
-
-            describe($(this).closest('li'));
-        });
-
-        ds.find('.mutable').on('change', 'input', function () {
-            var chk = $(this).is(':checked'),
-                non = $(this).closest('tr')
-                             .children('.perm').eq(0)
-                             .find('input');
-
-            if (chk) {
-                non.removeAttr('disabled');
-            } else {
-                non.prop('checked', false)
-                   .attr('disabled', 'disabled')
-                   .trigger('change');
-            }
-
-        });
-
-        ds.find('.perm').on('change', 'input', function (e) {
-
-            var self = $(this),
-                opt  = self.data('perm'),
-                chk  = self.is(':checked'),
-                row  = self.closest('tr');
-
-            if (chk) {
-                // if i have been checked
-
-                // select requisite options
-                if (opt > levelInstant) {
-                    row.find('[data-perm=250]').prop('checked', true);
-                } else if (opt < levelInstant) {
-                    row.find('[data-perm]').filter(function () {
-                        var p = $(this).data('perm');
-                        return p > levelInstant;
-                    }).prop('checked', false);
+                // clear any previous cache-timeout
+                if (ii) {
+                    clearTimeout(ii);
                 }
 
-            } else {
-                // if i have been unchecked
+                ii = setTimeout(function () {
+                    $.post(form.attr('action'), form.serialize(), customiserCallback);
+                }, 1000);
 
-                // deselect subordinate options
-                if (opt == levelInstant) {
-                    row.find('[data-perm]').filter(
-                        function () {
-                            var e = $(this).data('perm');
-                            return e > levelInstant;
-                        }
-                    ).prop('checked', false);
-                }
+            },
+            describe: function () {
 
-                // ensure *something* is set
-                if (row.find('[data-perm]:checked').length == 0) {
-                    var fallback;
+                var summary = this.find('h4 em.summary'),
+                    table   = this.find('table.roles'),
+                    rows    = table.find('tr.role'),
+                    text    = 'Sent to ',
+                    count   = 0;
 
-                    if (row.children('.mutable').children('input:checked').length == 0) {
-                        fallback = row.find('[data-perm=250]');
-                    } else {
-                        fallback = row.find('[data-perm=0]');
-                    }
+                rows.each(function () {
+                    var row  = $(this),
+                            ins  = row.find('input[data-perm]:checked'),
+                            role = row.children('th').text(),
+                            sum  = 0;
 
-                    fallback.prop('checked', true);
-                }
-            }
+                    if (!role) {
+                        --count;
+                        return;
 
-            describe($(this).closest('li'));
-        });
+                    } else if (ins.length == 0) {
+                        return;
 
-        ds.find('.mutable input, .perm input').trigger('change');
-
-        ds.on('click', 'td.custom a', function (e) {
-
-            e.preventDefault();
-            e.stopPropagation();
-
-            var self = $(this),
-                cell = self.closest('td'),
-                row  = self.closest('tr');
-
-
-            if (self.hasClass('modify')) {
-                self.removeClass('modify').addClass('cross');
-                row.addClass('show-advanced');
-                cell.attr('colspan', '6').addClass('expanded');
-
-
-            } else {
-                self.removeClass('cross').addClass('modify');
-                row.removeClass('show-advanced');
-                cell.removeAttr('colspan').removeClass('expanded');
-
-            }
-        });
-
-        $('#configurator').on('click', 'a.exp', function (e) {
-
-            e.preventDefault();
-            e.stopPropagation();
-
-            var self = $(this),
-                form = self.closest('form').siblings('form');
-
-            if (self.hasClass('darr')) {
-                // change to uarr, expand content
-                self.removeClass('darr').addClass('uarr').html("&#9650;");
-                form.show(200);
-            } else {
-                // change to darr, contract content
-                self.removeClass('uarr').addClass('darr').html("&#9660;");
-                form.hide(200);
-            }
-        });
-
-        describe($('li.source'));
-
-    });
-
-    function describe(sources) {
-        sources.each(function() {
-            var source  = $(this),
-                summary = source.find('h4 em.summary'),
-                table   = source.find('table.roles'),
-                rows    = table.find('tr.role'),
-                text    = 'Sent to ',
-                count   = 0;
-
-            rows.each(function () {
-                var row  = $(this),
-                    ins  = row.find('input[data-perm]:checked'),
-                    role = row.children('th').text();
-
-                if (ins.length == 0 || ins.data('perm') == 0) {
-                    return;
-                }
-
-                text += role + ' via ';
-
-                ins.each(function () {
-                    var i   = $(this),
-                        lbl = desc[i.data('perm')];
-
-                    if (typeof lbl === 'undefined' || lbl === 'off') {
+                    } else if (ins.eq(0).data('perm') == 0) {
+                        row.data('sum', 0);
                         return;
                     }
 
-                    text += lbl + ' + ';
+                    text += role + ' via ';
+
+                    ins.each(function () {
+                        var i   = $(this),
+                                lbl = desc[i.data('perm')];
+
+                        if (typeof lbl === 'undefined' || lbl === 'off') {
+                            return;
+                        }
+
+                        text += lbl + ' + ';
+                        sum  += i.data('perm');
+                    });
+
+                    text = text.slice(0, text.length - 3);
+
+                    text += '; ';
+                    ++count;
                 });
 
-                text = text.slice(0, text.length - 3);
+                if (count < 0) {
+                    return;
+                } else if (count == 0) {
+                    text += 'nobody';
+                } else {
+                    text = text.slice(0, text.length - 2);
+                }
 
-                text += '; ';
-                count++;
+                summary.text(text + '.');
+
+            },
+            onShowAdvanced: function () {
+                var row    = this.closest('tr'),
+                    dialog = $('#slider-modal'),
+                    query  = [
+                        'source='+row.closest('[data-source]').data('source'),
+                        'slug='+row.closest('[data-namespace]').data('namespace'),
+                        {% if filters.options[filters.selected] != 'all' %}'roletype={{ filters.options[filters.selected] }}',{% endif %}{# twig inside js... what could possibly go wrong... #}
+                        'role='+row.data('role')
+                    ].join('&');
+
+
+                hideSimpleSettings.apply(this);
+
+                dialog.load('/adminv2/messages/configure/custom', query, function () {
+                    dialog.dialog({
+                        modal: true,
+                        resizable: false,
+                        width: 640,
+                        title: 'Advanced Settings'
+                    });
+                });
+
+            },
+            onShowSimple: showSimpleSettings
+        });
+    });
+
+    function hideSimpleSettings() {
+        this.closest('tr').addClass('show-advanced');
+        this.closest('td').attr('colspan', 8).addClass('expanded');
+    }
+
+    function showSimpleSettings() {
+        this.closest('tr').removeClass('show-advanced');
+        this.closest('td').removeAttr('colspan').removeClass('expanded');
+    }
+
+    function customiserCallback(data) {
+
+        console.log(data);
+
+        $.each(data, function (slug, sources) {
+
+            var $ns = $('#configurator').find('li[data-namespace='+slug+']');
+
+            $.each(sources, function (source, roles) {
+
+                var $src = $ns.find('li[data-source='+source+']');
+
+                $.each(roles, function (role, config) {
+
+                    var $role   = $src.find('tr[data-role='+role+']'),
+                        bitwise = function () {
+                            // bitwise! single &
+                            return !!(config.default & $(this).data('perm'));
+                        },
+                        descrip, $custom;
+
+                    // turned off
+                    if (config == false) {
+                        showSimpleSettings.apply($role.find('a.btn.modify'));
+                        // ensure off selected
+                        $role.find('td.toggle input[value=0]').prop('checked', true);
+
+                        return true; // jq:continue
+                    }
+
+                    // ensure on selected
+                    $role.find('td.toggle input[value=1]').prop('checked', true);
+
+                    // if custom settings, show custom
+                    if (config.custom) {
+                        hideSimpleSettings.apply($role.find('a.btn.modify'));
+
+                        descrip = $role.find('td[data-perm]').filter(bitwise).find('label').map(function () {
+                            return this.title;
+                        }).toArray().join(' + ');
+
+                        $custom = $role.find('td.custom');
+
+                        if ($custom.find('span.custom-descrip').length == 0) {
+                            $custom.prepend($('<span class="custom-descrip" />'));
+                        }
+
+                        $custom.find('span.custom-descrip').text('Custom (default '+descrip.toLowerCase()+')');
+
+                        return true; // jq:continue
+                    }
+
+                    // turn the appropriate inputs on and off
+                    showSimpleSettings.apply($role.find('a.btn.modify'));
+
+                    // first check 'mutable'
+                    $role.find('td.mutable input').prop('checked', config.mutable).trigger('change.force');
+
+                    // then turn on only the relevant options
+                    $role.find('td[data-perm]').prop('checked', false).filter(bitwise).prop('checked', true).trigger('change.force');
+
+                });
             });
-
-            if(count == 0) {
-                text += 'nobody';
-            }
-            else {
-                text = text.slice(0, text.length - 2);
-            }
-
-            summary.text(text + '.');
         });
     }
 
@@ -259,10 +294,10 @@
             Use this page to configure the messages the system will send to users:
         </p>
         <ul style="list-style: disc;padding-left:20px;">
-          <li><strong>On / Off</strong>: can users in this role receive this message at all</li>
+          <li><strong>Enabled</strong>: can users in this role receive this message at all</li>
           <li><strong>Mutable</strong>: do users in this role have the option to turn this message off</li>
           <li><strong>Default Setting</strong>: by default, how should this message be sent to users in this role (users can customise their personal settings)</li>
-          <li>If you need more fine-grained control for a message, click the edit button next to the role for advanced settings</li>
+          <li>If you need more fine-grained control for a message, click the customise button next to the role for advanced settings</li>
         </ul>
         <ul class="filter admin-nav clearfix">
             <li>
@@ -270,64 +305,18 @@
             </li>
             {% for i, filter in filters.options %}
             <li>
-                <a href="/adminv2/messages/configure{{ filter == 'all' ? '' : ['/', filter] | join }}" class="{% if filters.selected == i %}current{% endif %}">{{ filter | capitalize }}</a>
+                <a href="/adminv2/messages/configure{{ filter == 'all' ? '' : ('/' ~ filter) }}" class="{% if filters.selected == i %}current{% endif %}">{{ filter | capitalize }}</a>
             </li>
             {% endfor %}
         </ul>
         <div class="clearfix pad-it"></div>
         <ul id="configurator" class="namespaces">
             {% for namespace in config %}
-            <li class="namespace">
+            <li class="namespace" data-namespace="{{ ns[namespace.id].slug }}">
                 <h3>{{ ns[namespace.id].label }}</h3>
                 <ul class="sources">
                 {% for source in namespace.sources %}
-                    <li class="source">
-                        <form>
-                            <h4>
-                                <a class="exp darr" href="#">&#9660;</a>
-                                <span class="label">"Send a message when {{ sources[source.id].description }}."</span>
-                                <em class="summary">&nbsp;</em>
-                            </h4>
-                        </form>
-                        <form method="post" action="{{ GetTheActionBackHRef }}" style="display:none;">
-                            <table class="roles digest-settings">
-                                <tr class="thead">
-                                    <th width="300">Role</th>
-                                    <th width="150">Enabled</th>
-                                    <th width="100">Mutable</th>
-                                    <th colspan="6">Default Setting</th>
-                                </tr>
-                                {% for role in source.roles %}
-                                <tr class="role">
-                                    <th>{{ roles[role.id].name }}</th>
-                                    <td class="toggle">
-                                        {% for val, state in ['off', 'on'] %}
-                                        <label>
-                                            <input class="toggle" {% if role.enabled == val %}checked="checked"{% endif %} type="radio" value="{{ val }}" name="data[{{ ns[namespace.id].slug }}][{{ sources[source.id].key }}][{{ role.id }}][enabled]" />
-                                            {{ state | capitalize }}
-                                        </label>
-                                        {% endfor %}
-                                    </td>
-                                    <td class="mutable {% if role.enabled == false %}disable{% endif %}">
-                                        <input {% if role.mutable %}checked="checked"{% endif %} type="checkbox" name="data[{{ ns[namespace.id].slug }}][{{ sources[source.id].key }}][{{ role.id }}][muted]" />
-                                    </td>
-                                    {% for level, perm in perms %}
-                                    <td class="perm {% if role.enabled == false %}disable{% endif %}">
-                                        <input id="p-{{ ns[namespace.id].slug }}-{{ source.id }}-{{ role.id }}-{{ level }}" name="data[{{ ns[namespace.id].slug }}][{{ sources[source.id].key }}][{{ role.id }}][perm][]" data-perm="{{ level }}" type="{{ level <= 250 ? 'radio' : 'checkbox' }}" {% if perms[role.default][0] == perm[0] %}checked="checked"{% endif %} />
-                                        <label for="p-{{ ns[namespace.id].slug }}-{{ source.id }}-{{ role.id }}-{{ level }}">
-                                            <span>{{ perm[0] | raw }}</span>
-                                        </label>
-                                    </td>
-                                    {% endfor %}
-                                    <td class="custom {% if role.enabled == false %}disable{% endif %}">
-                                        <span class="actions">
-                                            <a href="#" class="btn no-text modify"><span></span></a>
-                                        </span>
-                                    </td>
-                                {% endfor %}
-                            </table>
-                        </form>
-                    </li>
+                    {% include '@adminMessages/source.twig' with { source: source } %}
                 {% endfor %}
                 </ul>
             </li>
@@ -335,3 +324,4 @@
         </ul>
     </div>
 </div>
+<div id="slider-modal" class="namespaces"></div>
