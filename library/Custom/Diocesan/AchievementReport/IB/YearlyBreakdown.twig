@@ -21,6 +21,10 @@
 
             $('[data-yearly-breakdown="true"]').hide();
             $('[data-yearly-breakdown-year="' + $(this).attr('data-year') + '"]').show();
+
+            /* http://stackoverflow.com/questions/16216722/highcharts-hidden-charts-dont-get-re-size-properly
+             */
+            $(window).resize();
         });
     });
 </script>
@@ -81,8 +85,8 @@
                 <td class="centered">4</td>
                 <td>{{ values.allTerms.4.level }}</td>
                 <td>{{ values.allTerms.4.progressGrade }}</td>
-                <td rowspan="2">
-                    <div data-yearly-breakdown-graph="{{ values.classcode }}_{{ year }}"></div>
+                <td class='yearly-breakdown-graph' rowspan="2">
+                    <div class='yearly-breakdown-graph' data-yearly-breakdown-graph="{{ values.classcode }}_{{ year }}"></div>
                 </td>
             </tr>
             <tr>

@@ -60,6 +60,7 @@
                 },
                 yAxis: {
                     min: 0,
+                    max: 7,
                     title: {
                         text: ''
                     }

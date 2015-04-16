@@ -89,3 +89,7 @@
 .achievement-report.ib td {
     width: 100px;
 }
+
+.achievement-report.ib .yearly-breakdown-graph {
+    height: 100px;
+}
