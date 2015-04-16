@@ -64,7 +64,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
      *               * name: an exact filename to show
      *               * size: number of items to show
      *               * filter: list of filetypes to show (all, audio, video, image, document)
-     *               * sort: field to sort on (name, date)
+     *               * sort: field to sort on (name, date, random)
      *               * sortdir: direction to sort on (asc, desc)
      *               * getHidden: get hidden files too (default to false)
      *
@@ -153,8 +153,9 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
 
         // Put together sort parts
         $sortFields = array(
-            'name' => "$table.description",
-            'date' => "$table.submitted",
+            'name'   => "$table.description",
+            'date'   => "$table.submitted",
+            'random' => "RAND()",
         );
 
         $sortColumn    = isset($sortFields[$sortColumn]) ? $sortColumn : 'name';
