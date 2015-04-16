@@ -24,13 +24,6 @@ use Schoolbox\File\Mimetype;
  */
 class Model extends File implements IStorage
 {
-    /**
-     * Auto-incrementing ID
-     *
-     * @var int
-     */
-    protected $id;
-
     /** @var string */
     protected $hash;
 
@@ -51,25 +44,6 @@ class Model extends File implements IStorage
 
     /** @var string */
     protected $extension;
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param  int $id
-     *
-     * @return $this
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
 
     /**
      * @return string

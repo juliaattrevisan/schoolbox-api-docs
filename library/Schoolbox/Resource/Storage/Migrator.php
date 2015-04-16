@@ -56,7 +56,14 @@ class Migrator
         $this->queueMapper    = QueueMapper::getInstance();
 
         $this->db = Database::getInstance();
-
+        $this->selectStorageId = $this->db->prepare("
+            SELECT storage_id FROM storage WHERE hash = :hash
+        ");
+        $this->updateQueue = $this->db->prepare("
+            UPDATE video_queue vq
+            SET vq.type = :newType, vq.file_id = :newId
+            WHERE vq.type = :oldType AND vq.file_id = :oldId
+        ");
     }
 
 
@@ -168,35 +175,35 @@ class Migrator
             $queueType = $pattern->getQueueType();
             if (isset($queueType)) {
                 try {
-                    /** @var Queue $queue */
-                    $queue = $this->queueMapper->findOneByColumnList(
-                        [
-                            'type'    => $queueType,
-                            'file_id' => $fileId,
-                        ]
-                    );
-                    // Update the queue and hope to god it's not processing
-                    $this->log->info("Migrating queue for $type.$fileId to storage.{$file->getHash()}");
-                    $queue
-                        ->setId($file->getId())
-                        ->setType(QueueMapper::FILE_TYPE_STORAGE)
-                    ;
-                    $this->queueMapper->save($queue);
+                    // What's the hash ID?
+                    $newId = null;
+                    $this->selectStorageId->execute(['hash' => $file->getHash()]);
+                    $newId = $this->selectStorageId->fetchColumn();
+                    if ($newId) {
+                        $this->updateQueue->execute([
+                            'newType' => QueueMapper::FILE_TYPE_STORAGE,
+                            'newId'   => $newId,
+                            'oldType' => $queueType,
+                            'oldId'   => $fileId,
+                        ]);
+                        if ($this->updateQueue->rowCount()) {
+                            // Move and symlink files
+                            $oldFiles = glob($this->queueDir.'/'.$queueType.'-'.$fileId.'{-,.}*', GLOB_BRACE);
+                            foreach ($oldFiles as $oldFilepath) {
+                                $oldPrefix   = $queueType.'-'.$fileId;
+                                $newPrefix   = QueueMapper::FILE_TYPE_STORAGE.'-'.$newId;
+                                $newFilepath = str_replace($oldPrefix, $newPrefix, $oldFilepath);
+                                $oldFilename = pathinfo($oldFilepath, PATHINFO_FILENAME);
+                                $newFilename = pathinfo($newFilepath, PATHINFO_FILENAME);
 
-                    // Move and symlink files
-                    foreach (glob($this->queueDir.'/'.$queueType.'-'.$fileId.'{-,.}*', GLOB_BRACE) as $oldFilepath) {
-                        $oldPrefix   = $queueType.'-'.$fileId;
-                        $newPrefix   = QueueMapper::FILE_TYPE_STORAGE.'-'.$file->getId();
-                        $newFilepath = str_replace($oldPrefix, $newPrefix, $oldFilepath);
-                        $oldFilename = pathinfo($oldFilepath, PATHINFO_FILENAME);
-                        $newFilename = pathinfo($newFilepath, PATHINFO_FILENAME);
-
-                        $this->log->info("Migrating queue file '$oldFilename' to '$newFilename'");
-                        if (!rename($oldFilepath, $newFilepath)) {
-                            throw new Flysystem\Exception("Migrating queue file '$oldFilename' failed.");
-                        }
-                        if (!symlink($newFilename, $oldFilename)) {
-                            throw new Flysystem\Exception("Symlinking queue file '$oldFilename' failed.");
+                                $this->log->info("Migrating queue file '$oldFilename' to '$newFilename'");
+                                if (!rename($oldFilepath, $newFilepath)) {
+                                    throw new Flysystem\Exception("Migrating queue file '$oldFilename' failed.");
+                                }
+                                if (!symlink($newFilename, $oldFilename)) {
+                                    throw new Flysystem\Exception("Symlinking queue file '$oldFilename' failed.");
+                                }
+                            }
                         }
                     }
                 } catch (\Schoolbox\Mapper\Exception $e) {
