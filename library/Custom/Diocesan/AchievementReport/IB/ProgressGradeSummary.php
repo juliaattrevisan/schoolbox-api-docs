@@ -10,6 +10,7 @@
 
 namespace Custom\Diocesan\AchievementReport\IB;
 
+use Alaress_Probe as Probe;
 
 class ProgressGradeSummary extends Base {
 
@@ -38,6 +39,18 @@ class ProgressGradeSummary extends Base {
      */
     public function findData()
     {
-        // TODO: Implement findData() method.
+        $this->explorerReporting();
+    }
+
+    /**
+     * Explorer, reporting!
+     */
+    private function explorerReporting() {
+        $explorer = $this->getDb()->getAll("
+            SELECT TOP 20 *
+            FROM SynergyOne.dbo.uvSchoolBoxIBResults
+        ");
+
+        new Probe($explorer);
     }
 }
