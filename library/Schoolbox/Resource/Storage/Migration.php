@@ -85,4 +85,13 @@ class Migration implements MigrationPattern
         return $row['filename'];
     }
 
+    /**
+     * Storage of course has a queue type, but it isn't meant to be migrated.
+     *
+     * @return null
+     */
+    public function getQueueType()
+    {
+        return null;
+    }
 } 

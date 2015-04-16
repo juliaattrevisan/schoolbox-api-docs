@@ -14,6 +14,7 @@ use Database;
 use PDOStatement;
 use Schoolbox\Config\Loader;
 use Schoolbox\Resource\Storage\MigrationPattern;
+use Schoolbox\Video\QueueMapper;
 
 /**
  * Class Migration
@@ -105,4 +106,11 @@ class Migration implements MigrationPattern
         return $row['realname'];
     }
 
+    /**
+     * @return string
+     */
+    public function getQueueType()
+    {
+        return QueueMapper::FILE_TYPE_SBFS;
+    }
 } 
