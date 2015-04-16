@@ -61,6 +61,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
      *
      * @param array  $folderIds
      * @param array  $options
+     *               * name: an exact filename to show
      *               * size: number of items to show
      *               * filter: list of filetypes to show (all, audio, video, image, document)
      *               * sort: field to sort on (name, date)
@@ -71,6 +72,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
      */
     public function findForFolders($folderIds, $options = array())
     {
+        $name          = isset($options['name']) ? $options['name'] : '';
         $limit         = !empty($options['size']) ? $options['size'] : 0;
         $showHidden    = !empty($options['hidden']);
         $fileTypes     = !empty($options['filter']) ? $options['filter'] : array();
@@ -101,6 +103,11 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
         $whereParams = $this->getArrayParameters($folderIds, 'folder');
         if (!$showHidden) {
             $whereParts[] = "$table.hidden IS FALSE";
+        }
+
+        if (strlen($name)) {
+            $whereParts[]            = "$table.description = :filename";
+            $whereParams['filename'] = $name;
         }
 
         // Put together mimetype filters
