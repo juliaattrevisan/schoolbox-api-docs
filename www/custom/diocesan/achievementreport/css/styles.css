@@ -19,20 +19,20 @@
  * Yearly Breakdown
  */
 
-.achievement-report tfoot td {
+.achievement-report.school-grades tfoot td {
     border-top: 3px solid #ddd;
     font-style: italic;
 }
 
-.achievement-report th.letter,
-.achievement-report td.letter
+.achievement-report.school-grades th.letter,
+.achievement-report.school-grades td.letter
 {
     width: 40px;
     text-align: right;
 }
 
-.achievement-report th.numeric,
-.achievement-report td.numeric
+.achievement-report.school-grades th.numeric,
+.achievement-report.school-grades td.numeric
 {
     width: 90px;
     text-align: right;
@@ -45,13 +45,13 @@
 /* thead/tr/th style subheading, for subheadings which can't
  * go in thead element
  */
-.achievement-report td.subheading {
+.achievement-report.school-grades td.subheading {
     font-weight: bold;
 }
 
 /* Spacer row
  */
-.achievement-report tr.spacer td {
+.achievement-report.school-grades tr.spacer td {
     border-left: 0px;
     border-right: 0px;
 }
@@ -59,11 +59,11 @@
 /**
  * Key
  */
-.achievement-report dl.key {
+.achievement-report.school-grades dl.key {
     width: 50%;
 }
 
-.achievement-report dl.key dt {
+.achievement-report.school-grades dl.key dt {
     width: 40px;
 }
 

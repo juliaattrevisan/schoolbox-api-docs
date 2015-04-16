@@ -79,8 +79,10 @@ class GradeSummaryTable extends Base {
         /* And for all the letters
          */
         foreach ($allLetters as $currentLetter) {
-            foreach ($currentLetter as $current) {
-                $finalStack[$current['StudentYearLevel']]['letters'][$current['StrippedResult']] += $current['num'];
+            if (is_array($currentLetter) && count($currentLetter)) {
+                foreach ($currentLetter as $current) {
+                    $finalStack[$current['StudentYearLevel']]['letters'][$current['StrippedResult']] += $current['num'];
+                }
             }
         }
 
