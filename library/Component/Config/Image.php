@@ -18,9 +18,9 @@ class Component_Config_Image extends Component_Config_Abstract
         $allImages = \Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
             [$this->getCategory()->getId()],
             [
-                'filter' => ['image'],
-                'sort'   => 'date',
-                'hidden' => true,
+                'filter'    => ['image'],
+                'sort'      => 'date',
+                'getHidden' => true,
             ]
         );
 

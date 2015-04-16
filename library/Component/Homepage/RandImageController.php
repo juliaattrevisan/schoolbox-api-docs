@@ -41,7 +41,7 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
         $this->setBlock($templateHandle, "previewimage", "preview_block");
         $this->setVar('IMAGE_TITLE', 'Random Image');
 
-        //get image id
+        // get image id
         $query = "SELECT id, comment
                   FROM file
                   WHERE category = {$this->getContext()->getId()}

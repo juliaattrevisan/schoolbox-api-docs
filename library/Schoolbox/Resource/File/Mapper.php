@@ -66,7 +66,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
      *               * filter: list of filetypes to show (all, audio, video, image, document)
      *               * sort: field to sort on (name, date)
      *               * sortdir: direction to sort on (asc, desc)
-     *               * hidden: display hidden (default to false)
+     *               * getHidden: get hidden files too (default to false)
      *
      * @return Collection|Model[]
      */
@@ -74,7 +74,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
     {
         $name          = isset($options['name']) ? $options['name'] : '';
         $limit         = !empty($options['size']) ? $options['size'] : 0;
-        $showHidden    = !empty($options['hidden']);
+        $getHidden     = !empty($options['getHidden']);
         $fileTypes     = !empty($options['filter']) ? $options['filter'] : array();
         $sortColumn    = !empty($options['sort']) ? $options['sort'] : 'name';
         $sortDirection = !empty($options['sortdir']) ? $options['sortdir'] : 'asc';
@@ -101,7 +101,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
             "category IN {$this->getArrayPlaceholders($folderIds, 'folder')}"
         ];
         $whereParams = $this->getArrayParameters($folderIds, 'folder');
-        if (!$showHidden) {
+        if (!$getHidden) {
             $whereParts[] = "$table.hidden IS FALSE";
         }
 

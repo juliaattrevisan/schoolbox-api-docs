@@ -46,24 +46,24 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
         $images = Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
             [$this->getContext()->getId()],
             [
-                'name'   => $this->getConfig('image'),
-                'filter' => ['image'],
-                'sort'   => 'date',
-                'hidden' => true,
-                'size'   => 1,
+                'name'      => $this->getConfig('image'),
+                'filter'    => ['image'],
+                'sort'      => 'date',
+                'getHidden' => true,
+                'size'      => 1,
             ]
         );
         if (count($images)) {
             $image = $images->first();
         } else {
-            // First image
+            // First non-hidden image
             $images = Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
                 [$this->getContext()->getId()],
                 [
-                    'filter' => ['image'],
-                    'sort'   => 'date',
-                    'hidden' => true,
-                    'size'   => 1,
+                    'filter'    => ['image'],
+                    'sort'      => 'date',
+                    'getHidden' => false,
+                    'size'      => 1,
                 ]
             );
             if (count($images)) {
