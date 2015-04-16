@@ -78,8 +78,6 @@ class ProgressGradeSummary extends Base {
             }
         }
 
-//        new Probe($this->explorerReporting(), $allProgressGrades, $finalStack);
-
         return $finalStack;
     }
 
@@ -100,17 +98,5 @@ class ProgressGradeSummary extends Base {
         ";
 
         return $this->getDb()->getAll($query);
-    }
-
-    /**
-     * Explorer, reporting!
-     */
-    private function explorerReporting() {
-        $explorer = $this->getDb()->getAll("
-            SELECT TOP 50 *
-            FROM SynergyOne.dbo.uvSchoolBoxIBResults
-        ");
-
-        return $explorer;
     }
 }
