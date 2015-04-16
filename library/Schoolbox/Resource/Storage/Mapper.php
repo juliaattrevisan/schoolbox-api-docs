@@ -64,6 +64,18 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         $this->uses('public', self::TYPE_BOOLEAN);
         $this->uses('ext', self::TYPE_STRING, null, 'extension');
 
+        // This joins to video Q now, and I can't hydrate it manually because
+        // it joins to ID and if I define ID on this mapper I can no longer save
+        $this->hasJoin(
+            'queue',
+            [
+                'mapper' => QueueMapper::class,
+                'this_key' => 'id',
+                'other_key' => 'file_id',
+                'extra'     => ":other_alias.type = 'storage'",
+            ]
+        );
+
         // derived field; mimetype automatically joined via the extension
         $this->joinsVia('allowedFileExtension', MimetypeMapper::class, 'fileTypeID', 'fileTypeID', 'extension', 'ext', self::TYPE_MODEL, self::COLUMN_JOIN_READONLY, 'mimetype');
 
