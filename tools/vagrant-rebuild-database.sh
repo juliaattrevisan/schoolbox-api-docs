@@ -12,6 +12,16 @@ vag="[schoolbox]";
 
 cachedir='/vagrant/vagrantcache';
 
+echo "$vag Removing current Schoolbox Data directory";
+rm /vagrant/data/* -fR;
+
+echo "$vag Creating Schoolbox data directories";
+cd /vagrant;
+tar -xzf $cachedir/schoolboxdemo-latest.tar.gz;
+rm -rf /vagrant/data/cache;
+cd /vagrant/tools;
+./create-data-dirs.sh /vagrant/data;
+
 echo "$vag Removing current Schoolbox MySQL database";
 mysql -u root -ptnp879 -e "drop database if exists schoolbox";
 
