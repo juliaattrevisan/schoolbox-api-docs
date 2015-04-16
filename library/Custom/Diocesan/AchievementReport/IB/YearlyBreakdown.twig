@@ -1,3 +1,4 @@
+<script type="text/javascript" src="/custom/diocesan/achievementreport/js/ibYearlyBreakdown.js"></script>
 <script type="text/javascript">
     $(function() {
 
@@ -20,6 +21,16 @@
 
             $('[data-yearly-breakdown="true"]').hide();
             $('[data-yearly-breakdown-year="' + $(this).attr('data-year') + '"]').show();
+        });
+
+        /* Graphs
+         */
+        $('[data-yearly-breakdown-graph="2014"]').ibYearlyBreakdown({
+            title: '',
+            categories: ['Term 4', 'Term 2'],
+            series: [{
+                data: [5, 1]
+            }]
         });
     });
 </script>
@@ -56,7 +67,7 @@
                 <td>{{ values.allTerms.4.level }}</td>
                 <td>{{ values.allTerms.4.progressGrade }}</td>
                 <td rowspan="2">
-                    <div data-yearly-breakdown-graph
+                    <div style="width:100%;" data-yearly-breakdown-graph="{{ year }}"></div>
                 </td>
             </tr>
             <tr>
