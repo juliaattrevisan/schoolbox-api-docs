@@ -170,6 +170,9 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
                          $this->getJoinMapper('hash')
                               ->hydrateJoin($r, 'allowedFileExtension', 'm')
                      )
+                    ->setQueue(
+                        $this->hydrateJoin($r, 'hash.queue', 'q')
+                    )
             );
 
             // ensure the path is set
