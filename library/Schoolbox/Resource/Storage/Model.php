@@ -12,6 +12,7 @@ namespace Schoolbox\Resource\Storage;
 
 use Alaress_Date_Format;
 use League\Flysystem\File;
+use League\Flysystem\FilesystemInterface;
 use Schoolbox\File\Mimetype;
 use Schoolbox\Video\Queue;
 
@@ -51,8 +52,9 @@ class Model extends File implements IStorage
      */
     protected $queue;
 
-    public function __construct()
+    public function __construct(FilesystemInterface $filesystem = null, $path = null)
     {
+        parent::__construct($filesystem, $path);
         $this->setQueue(new Queue());
     }
 
