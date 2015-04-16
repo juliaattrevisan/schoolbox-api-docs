@@ -175,6 +175,19 @@ class Mimetype {
 		return $this->iconFile;
 	}
 
+    /**
+     * Gets the CSS class for this icon.
+     *
+     * @return string
+     */
+    public function getIconClass()
+    {
+        // Old code in `AllowedFile->getClass()`
+//        $url = new \Url(substr($iconFile, 0, strrpos($iconFile, ".")));
+//        return $url->getSlug();
+        return str_replace('_', '', pathinfo($this->getIconFile(), PATHINFO_FILENAME));
+    }
+
 	/**
 	 * Set inline
 	 *
