@@ -51,5 +51,20 @@ class Controller extends Base {
     }
 
     public function ib($db, $user, $externalUser, $year) {
+        $progressGradeSummary = new IB\ProgressGradeSummary($externalUser, $db);
+
+        $this->getResponse()->content->set(array(
+                'template' => '@ib/index.twig',
+                'data' => array(
+                    'preselectedYear' => $year,
+                    'externalUser' => $externalUser,
+                    'user' => $user,
+
+                    'progressGradeSummary' => array(
+                        'heading' => $progressGradeSummary->getHeading(),
+                        'data' => $progressGradeSummary->findData(),
+                    ),
+                )
+            ));
     }
 } 

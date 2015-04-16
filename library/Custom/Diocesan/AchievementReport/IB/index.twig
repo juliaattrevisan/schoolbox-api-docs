@@ -1,0 +1,13 @@
+<div class="achievement-report">
+    <section class="avatar">
+        <a href='/search/user/{{ user.getId() }}'>
+            <img src="/portrait.php?userId={{ externalUser.StudentID }}&size=square32" />
+            {{ externalUser.StudentGiven1 }} {{ externalUser.StudentSurname }}
+        </a>
+    </section>
+
+    <h1>IB Results</h1>
+
+    {% include '@ib/ProgressGradeSummary.twig' %}
+</div>
+
