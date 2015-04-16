@@ -53,21 +53,21 @@ class ProgressGradeSummary extends Base {
         foreach ($allProgressGrades as $current) {
             if (strlen($current['ProgressGrade'])) {
                 $year = $current['classyear'];
-                $term = 'term' . $current['Term'];
+                $term = $current['Term'];
                 $progressGrade = $current['ProgressGrade'];
 
                 /* Initialise
                  */
                 if (!is_array($finalStack[$year])) {
                     $finalStack[$year] = array(
-                        'term2' => array(
+                        '4' => array(
+                            'enteredGrades' => 0,
+                            'progressGrades' => array_fill_keys(array('1', '2', '3', '4', '5', '6', '7'), 0)
+                        ),
+                        '2' => array(
                             'enteredGrades' => 0,
                             'progressGrades' => array_fill_keys(array('1', '2', '3', '4', '5', '6', '7'), 0),
                         ),
-                        'term4' => array(
-                            'enteredGrades' => 0,
-                            'progressGrades' => array_fill_keys(array('1', '2', '3', '4', '5', '6', '7'), 0)
-                        )
                     );
                 }
 
@@ -78,7 +78,7 @@ class ProgressGradeSummary extends Base {
             }
         }
 
-        new Probe($this->explorerReporting(), $allProgressGrades, $finalStack);
+//        new Probe($this->explorerReporting(), $allProgressGrades, $finalStack);
 
         return $finalStack;
     }

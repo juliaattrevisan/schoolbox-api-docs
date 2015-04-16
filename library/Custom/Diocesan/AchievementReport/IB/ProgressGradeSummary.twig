@@ -8,3 +8,36 @@
 
 <h2>{{ progressGradeSummary.heading }}</h2>
 
+<table>
+    <thead>
+        <tr>
+            <th class='centered year' rowspan="2">Year</th>
+            <th class='centered term' rowspan="2">Term</th>
+            <th class='numeric' rowspan="2">Entered Grades</th>
+            <th class='centered' colspan="7">Progress Grades</th>
+        </tr>
+        <tr class="progress-grade">
+            <th class='numeric'>1</th>
+            <th class='numeric'>2</th>
+            <th class='numeric'>3</th>
+            <th class='numeric'>4</th>
+            <th class='numeric'>5</th>
+            <th class='numeric'>6</th>
+            <th class='numeric'>7</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for year, allTerms in progressGradeSummary.data %}
+        {% for currentTerm, values in allTerms %}
+        <tr>
+            <td class='centered year'>{{ year }}</td>
+            <td class='centered term'>{{ currentTerm }}</td>
+            <td class='numeric'>{{ values.enteredGrades }}</td>
+            {% for i in range(1, 7) %}
+            <td class='numeric'>{{ values.progressGrades[i] }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+        {% endfor %}
+    </tbody>
+</table>

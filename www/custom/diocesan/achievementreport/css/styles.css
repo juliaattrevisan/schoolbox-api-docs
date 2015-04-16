@@ -67,3 +67,25 @@
     width: 40px;
 }
 
+/**
+ * IB Progress Grade Summary
+ */
+.achievement-report.ib th.centered,
+.achievement-report.ib td.centered {
+    text-align: center;
+}
+
+.achievement-report.ib th.year,
+.achievement-report.ib td.year {
+    width: 100px;
+}
+
+.achievement-report.ib th.term,
+.achievement-report.ib td.term {
+    width: 100px;
+}
+
+.achievement-report.ib tr.progress-grade,
+.achievement-report.ib td {
+    width: 100px;
+}
