@@ -1,3 +1,6 @@
+<link href="/custom/diocesan/achievementreport/css/styles.css" media="screen" rel="stylesheet" type='text/css' />
+<script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
+
 <div class="achievement-report ib">
     <section class="avatar">
         <a href='/search/user/{{ user.getId() }}'>
@@ -9,5 +12,6 @@
     <h1>IB Results</h1>
 
     {% include '@ib/ProgressGradeSummary.twig' %}
+    {% include '@ib/YearlyBreakdown.twig' %}
 </div>
 
