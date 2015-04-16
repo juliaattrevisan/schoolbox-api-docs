@@ -52,19 +52,25 @@ class Controller extends Base {
 
     public function ib($db, $user, $externalUser, $year) {
         $progressGradeSummary = new IB\ProgressGradeSummary($externalUser, $db);
+        $yearlyBreakdown = new IB\YearlyBreakdown($externalUser, $db);
 
         $this->getResponse()->content->set(array(
-                'template' => '@ib/index.twig',
-                'data' => array(
-                    'preselectedYear' => $year,
-                    'externalUser' => $externalUser,
-                    'user' => $user,
+            'template' => '@ib/index.twig',
+            'data' => array(
+                'preselectedYear' => $year,
+                'externalUser' => $externalUser,
+                'user' => $user,
 
-                    'progressGradeSummary' => array(
-                        'heading' => $progressGradeSummary->getHeading(),
-                        'data' => $progressGradeSummary->findData(),
-                    ),
+                'progressGradeSummary' => array(
+                    'heading' => $progressGradeSummary->getHeading(),
+                    'data' => $progressGradeSummary->findData(),
+                ),
+
+                'yearlyBreakdown' => array(
+                    'heading' => $yearlyBreakdown->getHeading(),
+                    'data' => $yearlyBreakdown->findData()
                 )
-            ));
+            )
+        ));
     }
 } 
