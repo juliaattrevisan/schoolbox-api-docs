@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\File;
 
 use Schoolbox\Collection;
 use Schoolbox\Resource;
+use Schoolbox\Video\ResourceVideoMapper;
 
 /**
  * Class Mapper
@@ -54,6 +55,17 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
         $this->uses('modified', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP, 'modifiedAt');
 
         $this->joins($this->getFolderFieldname(), Resource\Folder\Mapper::class, 'id', null, null, 'folder');
+
+        // defined longwise because $this->joins doesn't support extra
+        $this->hasJoin(
+            'queue',
+            [
+                'mapper'    => ResourceVideoMapper::class,
+                'this_key'  => 'id',
+                'other_key' => 'file_id',
+                'extra'     => ":other_alias.type = 'sbfs'",
+            ]
+        );
     }
 
     /**
