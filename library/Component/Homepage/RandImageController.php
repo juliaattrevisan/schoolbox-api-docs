@@ -42,26 +42,30 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
         $this->setVar('IMAGE_TITLE', 'Random Image');
 
         // get image id
-        $query = "SELECT id, comment
-                  FROM file
-                  WHERE category = {$this->getContext()->getId()}
-                  AND deleted = '0'
-                  AND hidden = '0'
-                  AND INSTR(mime_type, 'image/')
-                  ORDER BY RAND() LIMIT 1";
+        $fileList = Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
+            [$this->getContext()->getId()],
+            array(
+                'size'      => 1,
+                'filter'    => ['image'],
+                'sort'      => 'random',
+                'getHidden' => false,
+            )
+        );
 
-        $this->db->query($query);
-
-        if ($image = $this->db->getNextArray()) {
-            $pixel = $this->getConfig('pixel') < 20 ? '400' : ($this->getConfig('pixel') > 600 ? 600 : $this->getConfig(
-                'pixel'
-            ));
+        if (count($fileList)) {
+            $image = $fileList->first();
+            $pixel = $this->getConfig('pixel') < 20
+                ? '400'
+                : ($this->getConfig('pixel') > 600
+                    ? 600
+                    : $this->getConfig('pixel')
+                );
 
             //get link
-            $imageurl = "/cms/image.php?id={$image['id']}&height=$pixel&width=$pixel";
+            $imageurl = "/cms/image.php?id={$image->getId()}&height=$pixel&width=$pixel";
 
             $this->setVar("PREVIEW_IMAGE_URL", $imageurl);
-            $this->setVar("PREVIEW_IMAGE_DESC", Scrub::text($image['comment']));
+            $this->setVar("PREVIEW_IMAGE_DESC", Scrub::text($image->getDescription()));
 
             $this->parse("preview_block", "previewimage");
         } else {
