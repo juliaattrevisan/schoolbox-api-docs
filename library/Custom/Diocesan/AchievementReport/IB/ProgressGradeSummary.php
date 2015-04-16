@@ -75,7 +75,7 @@ class ProgressGradeSummary extends Base {
                 $finalStack[$year][$term]['progressGrades'][$progressGrade]++;
             }
         }
-        new Probe($allProgressGrades, $finalStack);
+        
         return $finalStack;
     }
 
