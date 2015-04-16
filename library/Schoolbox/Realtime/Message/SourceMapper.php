@@ -86,4 +86,24 @@ class SourceMapper extends Mapper {
 		return $collection;
 	}
 
+
+    /**
+     * Override so we can implicitly search on namespace.slug
+     *
+     * @param array $columnList
+     * @param array $options
+     * @return Collection
+     */
+    public function findByColumnList($columnList, $options = array())
+    {
+        // cast slug to namespace ID
+        if (isset($columnList['slug'])) {
+            $slug = $columnList['slug'];
+            unset($columnList['slug']);
+            $columnList['namespace'] = $this->getJoinMapper('namespace')->findOneByColumn('slug', $slug)->getId();
+        }
+
+        return parent::findByColumnList($columnList, $options);
+    }
+
 }
