@@ -71,7 +71,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 
         $this->source_category_id = $source;
 
-
+        // All the videos
         $allVideos = Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
             [$source],
             [
@@ -81,18 +81,6 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                 'sortdir' => $this->getConfig('sortdir'),
             ]
         );
-
-        if ($this->getConfig('size') >= 1) {
-            $this->outputList = $videoResourceMapper->findByCategory(
-                $source,
-                $sortConfig,
-                $this->getConfig('size')
-            );
-        } elseif ($this->getConfig('size') == 0) {
-            $this->outputList = $videoResourceMapper->findByCategory($source, $sortConfig);
-        } else {
-            $this->outputList = new \Schoolbox\Collection(array());
-        }
 
         // Select a video to play by default.
         // Only show a video that has actually finished encoding, though.

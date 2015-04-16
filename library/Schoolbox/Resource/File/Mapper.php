@@ -56,16 +56,16 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
 
         $this->joins($this->getFolderFieldname(), Resource\Folder\Mapper::class, 'id', null, null, 'folder');
 
-        // defined longwise because $this->joins doesn't support extra
-        $this->hasJoin(
-            'queue',
-            [
-                'mapper'    => ResourceVideoMapper::class,
-                'this_key'  => 'id',
-                'other_key' => 'file_id',
-                'extra'     => ":other_alias.type = 'sbfs'",
-            ]
-        );
+//        // defined longwise because $this->joins doesn't support extra
+//        $this->hasJoin(
+//            'queue',
+//            [
+//                'mapper'    => ResourceVideoMapper::class,
+//                'this_key'  => 'id',
+//                'other_key' => 'file_id',
+//                'extra'     => ":other_alias.type = 'sbfs'",
+//            ]
+//        );
     }
 
     /**
@@ -106,6 +106,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
             FROM {$table}
             LEFT JOIN {$this->getJoinSql('hash', $table, 'h')}
             LEFT JOIN {$this->getJoinSql('hash.allowedFileExtension', 'h', 'm', true)}
+            LEFT JOIN {$this->getJoinSql('hash.queue', 'h', 'q')}
             LEFT JOIN {$this->getJoinSql('owner', $table, 'u')}
             LEFT JOIN {$this->getJoinSql($this->getFolderFieldname(), $table, 'c')}
         ";

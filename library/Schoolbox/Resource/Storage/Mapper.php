@@ -69,8 +69,8 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         $this->hasJoin(
             'queue',
             [
-                'mapper' => QueueMapper::class,
-                'this_key' => 'id',
+                'mapper'    => QueueMapper::class,
+                'this_key'  => 'storage_id',
                 'other_key' => 'file_id',
                 'extra'     => ":other_alias.type = 'storage'",
             ]
