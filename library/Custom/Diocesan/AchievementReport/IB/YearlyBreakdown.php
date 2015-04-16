@@ -40,15 +40,15 @@ class YearlyBreakdown extends Base {
 
         foreach ($allProgressGrades as $current) {
             $courseName = trim($current['CourseName']);
-            $term = $current['Term'];
+            $classcode = trim($current['classcode']);
             $year = $current['classyear'];
+            $term = $current['Term'];
 
+
+            $finalStack[$year][$courseName]['classcode'] = $classcode;
             $finalStack[$year][$courseName]['allTerms'][$term]['level'] = $current['Level'];
             $finalStack[$year][$courseName]['allTerms'][$term]['progressGrade'] = $current['ProgressGrade'];
         }
-
-//        new Probe($finalStack);
-//        new Probe($this->explorerReporting(), $allProgressGrades, $finalStack);
 
         return $finalStack;
     }
