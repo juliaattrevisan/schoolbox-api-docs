@@ -39,8 +39,6 @@ class ProgressGradeSummary extends Base {
      */
     public function findData()
     {
-        $this->explorerReporting();
-
         $allProgressGrades = $this->findAllProgressGrades();
 
         /**
