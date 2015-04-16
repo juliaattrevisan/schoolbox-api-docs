@@ -8,7 +8,7 @@
  */
 
 
-use \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
+use \Schoolbox\Assessment\Component\SubmissionBox\Submission\Mapper as SubmissionMapper;
 use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use \Schoolbox\Assessment\Activity;
@@ -190,15 +190,6 @@ $latestReturnedActivity = $returnWorkMapper->getHistory($user->getId(), $submiss
 
 if ($latestReturnedActivity instanceof Activity) {
 	$latestReturnedWork = $latestReturnedActivity->getReturnedWork();
-
-	/* Find the Mime again if a file was returned with the Return
-	 */
-	$mimetypeMapper = new MimetypeMapper();
-
-    if ($latestReturnedWork->getMimeType()->getFileTypeID() !== null) {
-        $mime = $mimetypeMapper->findOneByColumn('mime', $latestReturnedWork->getMimeType()->getMime());
-        $latestReturnedWork->setMimetype($mime);
-    }
 }
 
 /* Augment array with data

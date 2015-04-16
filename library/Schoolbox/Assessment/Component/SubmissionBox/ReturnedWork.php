@@ -181,6 +181,34 @@ class ReturnedWork implements ISoftDeletable
     }
 
 
+
+    /**
+     * Gets the filename for the attached returned work
+     *
+     * @return string
+     */
+    public function getFilename()
+    {
+        return $this->getStorage()->getFilename();
+    }
+
+    /**
+     * Gets the file size for the attached returned work
+     *
+     * @return string
+     * @deprecated
+     */
+    public function getFilesize()
+    {
+        return $this->getStorage()->getSize();
+    }
+
+    public function getMimeType() {
+        return $this->getStorage()->getMimeType();
+    }
+
+
+
     /**
      * @param  \Alaress_Date_Format $submitted
      *

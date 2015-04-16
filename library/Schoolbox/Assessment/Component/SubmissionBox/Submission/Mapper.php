@@ -25,7 +25,7 @@ use Schoolbox\Collection;
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox\Submission
  */
-class Mapper implements IMapper, IActivityMapper
+class Mapper extends \Schoolbox\Mapper implements IMapper, IActivityMapper
 {
 
     /**
@@ -41,6 +41,12 @@ class Mapper implements IMapper, IActivityMapper
      */
     public function __construct()
     {
+
+        $this->mapping();
+
+    }
+
+    public function mapping() {
         $i = InlineMapper::getInstance();
         $f = FileMapper::getInstance();
 

@@ -107,7 +107,7 @@ abstract class Base {
         $return = $this->getReturnedWork();
 
         if ($return instanceof ReturnedWork) {
-            if ($return->getStorage() != null) {
+            if ($return->getStorage()->getFilename() != null) {
                 $storage = $return->getStorage();
 
                 $this->getPage()->setVar(array(
