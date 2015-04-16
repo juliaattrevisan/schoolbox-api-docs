@@ -15,15 +15,25 @@ class Component_Config_Image extends Component_Config_Abstract
         $page->setBlock($keyblock, 'config_images', 'config_images_block');
         $page->setVar('config_images_block', '');
 
-        $folderMapper = new \Schoolbox\Resource\CategoryMapper();
-        $allImages = $folderMapper->findImages($this->getCategory(), 0, true);
+        $allImages = \Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
+            [$this->getCategory()->getId()],
+            [
+                'filter' => ['image'],
+                'sort'   => 'date',
+                'hidden' => true,
+            ]
+        );
 
         if ($allImages->count()) {
             foreach ($allImages as $currentImage) {
-                $page->setVar(array(
-                    'COMPONENT_CONFIG_IMAGE' => $currentImage->getDescription(),
-                    'COMPONENT_CONFIG_IMAGE_SELECTED', $currentImage->getDescription() == $configValue ? ' selected="selected"' : ''
-                ));
+                $page->setVar(
+                    array(
+                        'COMPONENT_CONFIG_IMAGE'          => $currentImage->getTitle(),
+                        'COMPONENT_CONFIG_IMAGE_SELECTED' => $currentImage->getTitle() == $configValue
+                            ? ' selected="selected"'
+                            : ''
+                    )
+                );
 
                 $page->parse('config_images_block', 'config_images', true);
             }
