@@ -18,11 +18,12 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @return void
+     * @return true
      */
     public function execute()
     {
         $this->db = DeprecatedDatabase::getInstance();
+        return true;
     }
 
     /**
