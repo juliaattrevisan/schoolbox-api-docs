@@ -21,6 +21,8 @@ use Schoolbox\File;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Storage;
 use League\Flysystem;
+use Schoolbox\Video\Queue;
+use Schoolbox\Video\QueueMapper;
 
 /**
  * Class Migrator
@@ -41,6 +43,7 @@ class Migrator
 
         $conf             = new Loader();
         $this->storageDir = $conf->get('storage_dir');
+        $this->queueDir   = $conf->get('video_dir');
 
         $this->factory    = new Resource\FilesystemFactory();
         $this->abf        = new Alaress_Byte_Format();
@@ -50,6 +53,7 @@ class Migrator
         $this->storageMapper->checkPrevious(false);
 
         $this->mimetypeMapper = File\MimetypeMapper::getInstance();
+        $this->queueMapper    = QueueMapper::getInstance();
 
         $this->db = Database::getInstance();
 
@@ -160,6 +164,45 @@ class Migrator
                 throw $e;
             }
 
+            // Migrate the queue
+            $queueType = $pattern->getQueueType();
+            if (isset($queueType)) {
+                try {
+                    /** @var Queue $queue */
+                    $queue = $this->queueMapper->findOneByColumnList(
+                        [
+                            'type'    => $queueType,
+                            'file_id' => $fileId,
+                        ]
+                    );
+                    // Update the queue and hope to god it's not processing
+                    $this->log->info("Migrating queue for $type.$fileId to storage.{$file->getHash()}");
+                    $queue
+                        ->setId($file->getId())
+                        ->setType(QueueMapper::FILE_TYPE_STORAGE)
+                    ;
+                    $this->queueMapper->save($queue);
+
+                    // Move and symlink files
+                    foreach (glob($this->queueDir.'/'.$queueType.'-'.$fileId.'{-,.}*', GLOB_BRACE) as $oldFilepath) {
+                        $oldPrefix   = $queueType.'-'.$fileId;
+                        $newPrefix   = QueueMapper::FILE_TYPE_STORAGE.'-'.$file->getId();
+                        $newFilepath = str_replace($oldPrefix, $newPrefix, $oldFilepath);
+                        $oldFilename = pathinfo($oldFilepath, PATHINFO_FILENAME);
+                        $newFilename = pathinfo($newFilepath, PATHINFO_FILENAME);
+
+                        $this->log->info("Migrating queue file '$oldFilename' to '$newFilename'");
+                        if (!rename($oldFilepath, $newFilepath)) {
+                            throw new Flysystem\Exception("Migrating queue file '$oldFilename' failed.");
+                        }
+                        if (!symlink($newFilename, $oldFilename)) {
+                            throw new Flysystem\Exception("Symlinking queue file '$oldFilename' failed.");
+                        }
+                    }
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    // No queue exists, that's okay
+                }
+            }
         }
 
     }
