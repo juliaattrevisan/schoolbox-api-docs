@@ -26,9 +26,12 @@ class Module extends BaseModule {
      */
     public function initRoutes(Router $router, $basePath)
     {
-        // All of these URLs relate to the resource ID, not a booking ID.
-        // Therefore, they should probably be moved to the item module.
         $router->addGet('achievementreport.schoolGrades', $basePath . '/schoolgrades/{externalUserId}{/year}')
+            ->addTokens(array(
+                'year' => '\d{4}'
+            ));
+
+        $router->addGet('achievementreport.ib', $basePath . '/ib/{externalUserId}{/year}')
             ->addTokens(array(
                 'year' => '\d{4}'
             ));
@@ -39,37 +42,61 @@ class Module extends BaseModule {
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
+        /* For php < 5.4
+         */
+        $self = $this;
+
         // Add the booking item to params, if ID is in the route.
         $matcher->add(
             '/^achievementreport\.schoolGrades/',
-            function($params) {
-                $externalUserHandler = new \External_User();
-                $externalUser = $externalUserHandler->getStudent($params['externalUserId']);
-
-                /* TODO: When selected user doesn't exist in external db
-                 */
-                if (!$externalUser) {
-                    error(2);
-                }
-
-                /* TODO: When selected user doesn't exist in schoolbox
-                 */
-                try {
-                    $userMapper = new \Schoolbox\UserMapper();
-                    $user = $userMapper->findOneByColumn('synergy_id', $params['externalUserId']);
-                }
-                catch (\Exception $e) {
-                    error(2);
-                }
-
-                $db = new \MSSQL();
-
-                return array(
-                    'db' => $db,
-                    'externalUser' => $externalUser,
-                    'user' => $user
-                );
+            function($params) use ($self) {
+                return $self->getEverything($params);
             }
+        );
+
+        // Add the booking item to params, if ID is in the route.
+        $matcher->add(
+            '/^achievementreport\.ib/',
+            function($params) use ($self) {
+                return $self->getEverything($params);
+            }
+        );
+    }
+
+    /**
+     * Macro method
+     *
+     * public because of php version
+     *
+     * @param $params
+     * @return array
+     */
+    public function getEverything($params) {
+        $externalUserHandler = new \External_User();
+        $externalUser = $externalUserHandler->getStudent($params['externalUserId']);
+
+        /* TODO: When selected user doesn't exist in external db
+         */
+        if (!$externalUser) {
+            error(2);
+        }
+
+        /* TODO: When selected user doesn't exist in schoolbox
+         */
+        try {
+            $userMapper = new \Schoolbox\UserMapper();
+            $user = $userMapper->findOneByColumn('synergy_id', $params['externalUserId']);
+        }
+        catch (\Exception $e) {
+            error(2);
+        }
+
+        $db = new \MSSQL();
+
+        return array(
+            'db' => $db,
+            'externalUser' => $externalUser,
+            'user' => $user
         );
     }
 
@@ -88,6 +115,7 @@ class Module extends BaseModule {
         $loader = new Twig_Loader_Filesystem(array());
         $loader->addPath(__DIR__.'/Templates', 'achievementreport');
         $loader->addPath(__DIR__.'/SchoolGrades', 'schoolgrades');
+        $loader->addPath(__DIR__.'/IB', 'ib');
         $templateLoader->addLoader($loader);
     }
 

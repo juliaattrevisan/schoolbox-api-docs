@@ -49,4 +49,7 @@ class Controller extends Base {
             )
         ));
     }
+
+    public function ib($db, $user, $externalUser, $year) {
+    }
 } 
