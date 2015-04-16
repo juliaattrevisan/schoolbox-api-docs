@@ -40,6 +40,66 @@ class ProgressGradeSummary extends Base {
     public function findData()
     {
         $this->explorerReporting();
+
+        $allProgressGrades = $this->findAllProgressGrades();
+
+        /**
+         * Rearrange everything into a nice order
+         */
+        $finalStack = array();
+
+        /* Only accumulate non-empty progressgrade values
+         */
+        foreach ($allProgressGrades as $current) {
+            if (strlen($current['ProgressGrade'])) {
+                $year = $current['classyear'];
+                $term = 'term' . $current['Term'];
+                $progressGrade = $current['ProgressGrade'];
+
+                /* Initialise
+                 */
+                if (!is_array($finalStack[$year])) {
+                    $finalStack[$year] = array(
+                        'term2' => array(
+                            'enteredGrades' => 0,
+                            'progressGrades' => array_fill_keys(array('1', '2', '3', '4', '5', '6', '7'), 0),
+                        ),
+                        'term4' => array(
+                            'enteredGrades' => 0,
+                            'progressGrades' => array_fill_keys(array('1', '2', '3', '4', '5', '6', '7'), 0)
+                        )
+                    );
+                }
+
+                /* Accumulate
+                 */
+                $finalStack[$year][$term]['enteredGrades']++;
+                $finalStack[$year][$term]['progressGrades'][$progressGrade]++;
+            }
+        }
+
+        new Probe($this->explorerReporting(), $allProgressGrades, $finalStack);
+
+        return $finalStack;
+    }
+
+    /**
+     * Find all progress grades
+     *
+     * @return array
+     */
+    private function findAllProgressGrades() {
+        $externalUser = $this->getExternalUser();
+        $externalUserId = $externalUser['StudentID'];
+
+        $query = "
+            SELECT *
+            FROM SynergyOne.dbo.uvSchoolBoxIBResults
+            WHERE ID = '{$externalUserId}'
+            ORDER BY classyear DESC, Term DESC
+        ";
+
+        return $this->getDb()->getAll($query);
     }
 
     /**
@@ -47,10 +107,10 @@ class ProgressGradeSummary extends Base {
      */
     private function explorerReporting() {
         $explorer = $this->getDb()->getAll("
-            SELECT TOP 20 *
+            SELECT TOP 50 *
             FROM SynergyOne.dbo.uvSchoolBoxIBResults
         ");
 
-        new Probe($explorer);
+        return $explorer;
     }
 }
