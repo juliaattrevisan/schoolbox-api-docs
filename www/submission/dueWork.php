@@ -246,15 +246,15 @@ for ($i = 0; $i < $totalDays; $i++) {
     foreach ($eventList as $event) {
         $date = $event->getStartTime();
 
-        $event_id = $event->getSubmissionBoxId();
+        $event_id = $event->getEventId();
         if ($event->getIsAssessment()) {
             $event_id = 'assess-' . $event_id;
         }
-        $category_id = $event->getCategoryId();
+        $category_id = $event->getCategory()->getId();
         $output      = array(
             'EVENT_ID'     => $event_id,
             'TIME'         => $event->getTime(),
-            'EVENT'        => Scrub::text($event->getSubmissionBoxName()),
+            'EVENT'        => Scrub::text($event->getTitle()),
             'EVENT_CAT_ID' => $category_id,
         );
 
@@ -263,10 +263,10 @@ for ($i = 0; $i < $totalDays; $i++) {
 
         /* record overview for summary box */
         $summary[$category_id] = array(
-            'name'  => $event->getCategoryName(),
+            'name'  => $event->getTitle(),
             'cid'   => $category_id,
             'total' => ++$summary[$category_id]['total'],
-            'code'  => $event->getCategoryCodeString(),
+            'code'  => $event->getCategory()->getCodeString(),
         );
     }
 

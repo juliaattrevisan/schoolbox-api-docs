@@ -2145,7 +2145,7 @@ abstract class Mapper implements IMapper, Serializable
             $model = new $this->model;
         }
         else {
-            throw new Exception("Cannot create nonexistent model");
+            throw new Exception("Cannot create nonexistent model -> {$this->model}");
         }
 
         if ($idValue) {

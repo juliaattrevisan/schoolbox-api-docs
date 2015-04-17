@@ -9,8 +9,10 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Submission;
 
+use PDOStatement;
 use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\ActivityCollection;
+use Schoolbox\Mapper;
 use Schoolbox\Resource\Storage;
 
 /**
@@ -40,6 +42,64 @@ class FileMapper extends AbstractMapper
         $this->uses('uuid', self::TYPE_STRING);
 
         $this->joins('hash', Storage\Mapper::class, 'hash', null, null, 'storage', 'storage');
+
+    }
+
+    protected function getSelectString()
+    {
+        $hashJoin = $this->getJoinMapper('storage');
+        $plag = \Plagscan_DocumentMapper::getInstance();
+
+        $table = $this->getTable();
+
+        // much join.
+        return "
+            SELECT {$this->getColumnString()},
+                   {$this->getJoinColumnString('storage', 'h')},
+                   {$hashJoin->getJoinColumnString('allowedFileExtension', 'm')},
+                   {$this->getJoinColumnString('owner', 'u')},
+                   {$plag->getColumnString('p')}
+            FROM `$table`
+            LEFT JOIN {$this->getJoinSql('storage', $table, 'h')}
+            LEFT JOIN {$hashJoin->getJoinSql('allowedFileExtension', 'h', 'm', true)}
+            LEFT JOIN {$this->getJoinSql('owner', $table, 'u')}
+            LEFT JOIN {$plag->getTable()} AS `p` ON `{$table}`.`id` = `p`.`file_id`
+        ";
+    }
+
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $c = $this->createCollection();
+
+        $plag = \Plagscan_DocumentMapper::getInstance();
+
+        while ($r = $statement->fetch(\PDO::FETCH_ASSOC)) {
+
+            $file = $this->hydrate($r);
+
+            $file->setPlagscan($plag->hydrate($r, 'p'));
+
+            // just in case we wanted this to be simple
+            $file->setStorage(
+                $this->hydrateJoin($r, 'storage', 'h')
+                    ->setMimetype(
+                        $this->getJoinMapper('storage')
+                            ->hydrateJoin($r, 'allowedFileExtension', 'm')
+                    )
+            );
+
+            // ensure the path is set
+            $file->getStorage()->setPath(
+                $this->getStorageMapper()->getManager()->calcPath($file->getStorage())
+            );
+
+            $file->setOwner($this->hydrateJoin($r, 'owner', 'u'));
+
+            $c->add($file);
+        }
+
+        return $c;
+
     }
 
 

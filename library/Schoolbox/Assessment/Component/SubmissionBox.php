@@ -19,6 +19,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Role;
 use Schoolbox\User;
+use Schoolbox\Collection;
 
 class SubmissionBox implements ISoftDeletable
 {

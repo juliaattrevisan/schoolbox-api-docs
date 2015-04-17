@@ -107,7 +107,7 @@ abstract class AbstractMapper extends Mapper implements IActivityMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $collection = parent::hydrateSelect($statement);
+
         $class  = $this->getModel();
 
         // confirm that we retrieved the correct type of Submission

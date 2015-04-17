@@ -31,7 +31,7 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 		$plagscanApiKey   = $this->getConfigLoader()->get('plagscan_api_key');
 		$plagscanUsername = $this->getConfigLoader()->get('plagscan_username');
 
-        $this->submissionMapper = new Submission\Mapper();
+        $this->submissionMapper = new Submission\FileMapper();
 
 		$this->gateway = new Plagscan_Gateway($plagscanUsername, $plagscanApiKey);
 	}
@@ -78,7 +78,7 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper
 
 		$this->hasSoftDeleteDateField('deleted');
 
-        $this->joins('file_id', Submission\Mapper::class, 'id', null, null);
+        $this->joins('file_id', Submission\FileMapper::class, 'id', null, null);
 
 	}
 

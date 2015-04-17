@@ -27,6 +27,10 @@ class File extends AbstractSubmission implements IFile
     /** @var string */
     protected $uuid;
 
+    /**
+     * @var \Plagscan_Document
+     */
+    protected $plagscan;
 
     /**
      * @return string
@@ -136,5 +140,23 @@ class File extends AbstractSubmission implements IFile
         $this->uuid = $uuid;
         return $this;
     }
+
+    /**
+     * @param \Plagscan_Document $plagscan
+     */
+    public function setPlagscan($plagscan)
+    {
+        $this->plagscan = $plagscan;
+    }
+
+    /**
+     * @return \Plagscan_Document
+     */
+    public function getPlagscan()
+    {
+        return $this->plagscan;
+    }
+
+
 
 }
