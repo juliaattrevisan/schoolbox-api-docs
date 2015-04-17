@@ -16,7 +16,6 @@
         tableSelector:  'table[data-settings]',
         roleSelector:   'tr',
         toggleSelector: 'td[data-toggle]',
-        muteSelector:   'td[data-mutable]',
         customSelector: 'td[data-custom]',
         permSelector:   '[data-perm]',
 
@@ -40,22 +39,17 @@
         showAdvancedClass: 'show-advanced',
         expandedClass:     'expanded',
 
-        dictSimple:   'Switch to Simple',
-        dictAdvanced: 'Switch to Advanced',
-
         // in these callbacks, `this` refers to the relevant `opts.sourceSelector`
         persist: noop,
         describe: noop,
-
-        onShowAdvanced: noop,
-        onShowSimple: noop,
+        advanced: noop,
 
         level: {
-            off: 0,
+            off:     0,
             instant: 1,
-            push: 2,
-            email: 4,
-            digest: 8
+            push:    2,
+            email:   4,
+            digest:  8
         },
 
         description: {}
@@ -92,7 +86,7 @@
                     src = $(this).closest(self.sel('source')),
                     chk = $(this).is(':checked'),
                     tds = $(this).closest(self.sel('role')).find([
-                        self.sel('perm'), self.sel('mute'), self.sel('custom')
+                        self.sel('perm'), self.sel('custom')
                     ].join(', '));
 
                 if (chk) {
@@ -114,28 +108,6 @@
             });
         }
 
-        if (self.options.muteSelector) {
-            $(this.element).on(change, this.sel('mute', 'input'), function (e) {
-                var chk = $(this).is(':checked'),
-                    non = $(this).closest(self.options.roleSelector)
-                        .children(self.options.permSelector).eq(0)
-                        .find('input');
-
-                if (chk) {
-                    non.removeAttr('disabled');
-                } else {
-                    non.prop('checked', false)
-                        .attr('disabled', 'disabled')
-                        .trigger('change.force');
-                }
-
-                // do not persist if this is a forced change
-                if (e.namespace != 'force') {
-                    self.options.persist.call($(this).closest(self.sel('source')));
-                }
-            });
-        }
-
         if (self.options.customSelector) {
             $(this.element).on('click', this.sel('custom', 'a'), function (e) {
                 var link = $(this);
@@ -143,21 +115,7 @@
                 e.preventDefault();
                 e.stopPropagation();
 
-                if (link.hasClass(self.options.simpleClass)) {
-                    link.removeClass(self.options.simpleClass)
-                        .addClass(self.options.advancedClass)
-                        .attr('title', self.options.dictSimple);
-
-                    self.options.onShowAdvanced.call(link);
-
-                } else if (link.hasClass(self.options.advancedClass)) {
-                    link.removeClass(self.options.advancedClass)
-                        .addClass(self.options.simpleClass)
-                        .attr('title', self.options.dictAdvanced);
-
-                    self.options.onShowSimple.call(link);
-                }
-
+                self.options.advanced.call(link);
             });
         }
 
@@ -225,14 +183,7 @@
 
                 // ensure *something* is set
                 if (role.find(self.sel('perm', 'input:checked')).length == 0) {
-
-                    if (role.find(self.sel('mute', 'input:checked')).length == 0) {
-                        fallback = role.find(inst);
-                    } else {
-                        fallback = role.find(off);
-                    }
-
-                    fallback.prop('checked', true);
+                    role.find(inst).prop('checked', true);
                 }
             }
 
@@ -246,7 +197,7 @@
         });
 
         // FORCE A CHANGE (now that we've got our listeners set up)
-        $(this.element).find([ this.sel('mute', 'input'), this.sel('perm', 'input') ].join(', ')).trigger('change.force');
+        $(this.element).find(this.sel('perm', 'input')).trigger('change.force');
 
     }
 
