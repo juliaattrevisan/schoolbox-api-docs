@@ -1,0 +1,2 @@
+UPDATE `assess_luQuestionType` SET `description` = 'Multiple Choice (Single Answer)' WHERE `classname` = 'Radio';
+UPDATE `assess_luQuestionType` SET `description` = 'Multiple Choice (Multiple Answer)' WHERE `classname` = 'Multi';
