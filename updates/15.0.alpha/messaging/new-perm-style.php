@@ -11,6 +11,8 @@ use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Collection;
+use Schoolbox\Realtime\Message\Reroute;
+use Schoolbox\Realtime\Message\RerouteMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 
@@ -40,7 +42,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
 
     $stmt = Database::getInstance()->prepare("
         UPDATE msg_route_perm
-        SET MASK = :mask, DEF = :def
+        SET mask = :mask, role_default = :def
         WHERE msg_source_id = :source
         AND role_id = :role
     ");
@@ -63,6 +65,10 @@ $kernel->run(function ($di, $loop, $log, $opts) {
 
         $def = $map[$def];
 
+        if (is_null($def)) {
+            continue;
+        }
+
         $stmt->execute([
             'mask'   => implode(',', $mrg),
             'def'    => implode(',', $def),
@@ -78,5 +84,37 @@ $kernel->run(function ($di, $loop, $log, $opts) {
     }
 
 
+
+    /** @var Collection|Reroute[] $reroutes */
+    $reroutes = RerouteMapper::getInstance()->findAll();
+
+    $stmt = Database::getInstance()->prepare("
+        UPDATE msg_reroute
+        SET delivery = :delivery
+        WHERE msg_source_id = :source
+        AND user_id = :user
+    ");
+
+    foreach ($reroutes as $reroute) {
+        $outgoing = $reroute->getOutgoingLevel();
+        $delivery = isset($map[$outgoing]) ? $map[$outgoing] : $map[0];
+
+        if (is_null($delivery)) {
+            continue;
+        }
+
+        $stmt->execute([
+            'delivery' => implode(',', $delivery),
+            'source'   => $reroute->getSource()->getId(),
+            'user'     => $reroute->getUser()->getId()
+        ]);
+
+        $log->info(sprintf("[src:%02d, u:%02d]  %14s",
+            $reroute->getSource()->getId(),
+            $reroute->getUser()->getId(),
+            implode(' ', $delivery))
+        );
+
+    }
 
 });
