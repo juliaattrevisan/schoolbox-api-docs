@@ -24,7 +24,8 @@ class Set implements IColumnType
      */
     public function hydrate($value, $mapper = null)
     {
-        return explode(',', (string)$value);
+        $value = (string)$value;
+        return $value ? explode(',', $value) : [];
     }
 
 
