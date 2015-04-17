@@ -495,6 +495,12 @@ $tooltip-font-color: $white;
 	);
 	color: $primary-color;
 }
+.warning.label {
+	@include label(
+		$bg: tint($warning-color, 74%)
+	);
+	color: $warning-color;
+}
 
 .highlight-panel {
 	@include panel(
@@ -533,7 +539,9 @@ $tooltip-font-color: $white;
 		position: relative;
 		padding: rem-calc(($base-font-size - 2)) 0;
 		overflow: auto;
-
+		&:last-child{
+			border: 0;
+		}
 		.thumbnail{
 			@media #{$small-up} { @include grid-column(1); }
 			@extend .no-pad;
@@ -546,16 +554,47 @@ $tooltip-font-color: $white;
 			@media #{$medium-up} { @include grid-column(11); }
 		}
 	}
-	> li:last-child{
-		border: 0;
-	}
+}
+
+// Show & Hide Task List
+.task-list{
+	max-height: 0;
+	overflow: hidden;
+	margin: 0 0 0 rem-calc(($base-font-size * 2));
+	will-change: transition;
+	@include single-transition(max-height, 0.3s, ease-out);
 }
 
 // Lists with action buttons
 .action-list{
 	@extend .information-list;
-	li:hover .actions a{
+	> li:hover .actions a{
 		opacity: 1;
+	}
+	.expanded .task-list{
+		max-height: 700px;
+		@include single-transition(max-height, 0.3s, ease-in);
+	}
+}
+
+
+.grid{
+	li{
+		border-right: 1px solid $silver;
+		&:last-child{
+			border: 0;
+		}
+	}
+	.thumbnail{
+		@media #{$small-up} { @include grid-column(2); }
+		@extend .no-pad;
+
+		img{
+			max-width: 100%;
+		}
+	}
+	.content{
+		@media #{$medium-up} { @include grid-column(10); }
 	}
 }
 

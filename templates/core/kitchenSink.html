@@ -1,5 +1,5 @@
 <div class="scroll-container" role="main">
-    <h1>Files Component</h1>
+    <h1>Files Component - List Layout</h1>
     <div class="row full-width">
         <nav class="top-bar" data-topbar>
             <ul class="title-area">
@@ -128,8 +128,94 @@
         </div>
     </div>
     <hr>
+    
+    <h1>Course Outline - List Layout</h1>
+    <div class="row full-width">
+        <nav class="top-bar" data-topbar>
+            <ul class="title-area">
+                <!-- Title Area -->
+                <li class="name">
+                    <h1><a href="#">Files</a></h1>
+                </li>
+            </ul>
+            <section class="top-bar-section">
+                <!-- Right Nav Section -->
+                <ul class="right">
+                    <li class="divider"></li>
+                    <li><a href="#" data-reveal-id="courseModal" class="button icon-settings" title="File Settings">Settings</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#" class="button no-text icon-close" data-target="delete-it" title="Close"></a></li>
+                    <!-- Settings Modal -->
+                </ul>
+                <div id="courseModal" class="reveal-modal" data-reveal>
+                    <h2>Course Outline Settings</h2>
+                    <form action="/homepage/configForm.php" method="GET">
+                        <label>
+                            Heading
+                            <input id="componentname" type="text" name="componentname" value="Files">
+                        </label>
+                        
+                        <label for="submit">
+                            <input id="submit" type="submit" value="Update" class="button success">
+                        </label>
+                        
+                    </form>
+                    <a class="close-reveal-modal">&#215;</a>
+                </div>
+            </section>
+        </nav>
+        <div class="island">
+            <ul class="action-list">
+                <li class="unit interact">
+                    <div class="row collapse full-width">
+                        <div class="small-12 medium-10 columns">
+                            <h3>
+                                <a href="#" class="expand-link button no-text icon-add" data-interaction="toggle-expanded"></a>
+                                <a href="#">Unit 666: Atomic destruction</a>
+                            </h3>
+                            <span class="warning label">Due in 2 weeks</span>
+                        </div>
+                        <div class="actions two">
+                            <a href="#" class="no-text icon-delete"></a>
+                            <a href="#" class="no-text icon-modify"></a>
+                        </div>
+                    </div>
+                    <ul class="action-list task-list">
+                        <li>
+                            <div class="row collapse full-width">
+                                <div class="small-12 medium-10 columns">
+                                    <h3><a href="#" class="file icon-document">Mank</a></h3>
+                                </div>
+                                <div class="actions two">
+                                    <a href="#" class="no-text icon-modify"></a>
+                                    <a href="#" class="no-text icon-calendar"></a>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="row collapse full-width">
+                                <div class="small-12 medium-9 columns">
+                                    <h3><a href="#" class="file icon-document">Shakespear Assignment IV</a></h3>
+                                </div>
+                                <div class="actions three">
+                                    <a href="#" class="no-text icon-modify"></a>
+                                    <a href="#" class="no-text icon-chat"></a>
+                                    <a href="#" class="no-text icon-calendar"></a>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <a href="#" class="button icon-approve">Add Task</a>
+            <a href="#" class="button icon-quiz">Create Quiz</a>
+            <a href="#" class="button icon-due-work">Post Due Work</a>
+            <a href="#" class="button icon-progress">Progress Report</a>
+        </div>
+    </div>
+    <hr>
 
-    <h1>Members Component</h1>
+    <h1>Members Component - Grid Layout</h1>
     <div class="row full-width">
         <nav class="top-bar" data-topbar>
             <ul class="title-area">
@@ -172,38 +258,63 @@
             </section>
         </nav>
         <div class="island">
-            <ul class="information-list small-block-grid-3">
+            <ul class="grid small-block-grid-2 large-block-grid-4">
                 <li>
                     <div class="row collapse full-width">
+                        <a href="#">
                         <div class="thumbnail">
-                            <img src="https://placekitten.com/g/70/70" alt="Moggy">
+                            <a href="#">
+                                <img src="https://placekitten.com/g/70/70" alt="Moggy">
+                            </a>
                         </div>
                         <div class="content">
                             <h3><a href="#">Steve "Mort" Chan</a></h3>
+                            <p class="meta">Teachers</p>
+                        </div>
+                        </a>
+                    </div>
+                </li>
+                <li>
+                    <div class="row collapse full-width">
+                        <div class="thumbnail">
+                            <a href="#">
+                                <img src="https://placekitten.com/g/70/70" alt="Moggy">
+                            </a>
+                        </div>
+                        <div class="content">
+                            <h3><a href="#">Steve "Mort" Chan</a></h3>
+                            <p class="meta">Teachers</p>
                         </div>
                     </div>
                 </li>
                 <li>
                     <div class="row collapse full-width">
                         <div class="thumbnail">
-                            <img src="https://placekitten.com/g/70/70" alt="Moggy">
+                            <a href="#">
+                                <img src="https://placekitten.com/g/70/70" alt="Moggy">
+                            </a>
                         </div>
                         <div class="content">
                             <h3><a href="#">Steve "Mort" Chan</a></h3>
+                            <p class="meta">Teachers</p>
                         </div>
                     </div>
                 </li>
                 <li>
                     <div class="row collapse full-width">
                         <div class="thumbnail">
-                            <img src="https://placekitten.com/g/70/70" alt="Moggy">
+                            <a href="#">
+                                <img src="https://placekitten.com/g/70/70" alt="Moggy">
+                            </a>
                         </div>
                         <div class="content">
                             <h3><a href="#">Steve "Mort" Chan</a></h3>
+                            <p class="meta">Teachers</p>
                         </div>
                     </div>
                 </li>
             </ul>
+            <a href="#" class="button icon-email">Email all</a>
         </div>
     </div>
 
@@ -226,6 +337,7 @@
         <hr>
         <h1 id="buttons">Icons</h1>
         <div class="small-12 large-12 columns">
+            <a href="#" class="button icon-add">icon-add</a>
             <a href="#" class="button icon-advanced-list">icon-advanced-list</a>
             <a href="#" class="button icon-alert">icon-alert</a>
             <a href="#" class="button icon-anchor">icon-anchor</a>
@@ -290,7 +402,7 @@
             <a href="#" class="button icon-poll">icon-poll</a>
             <a href="#" class="button icon-previous">icon-previous</a>
             <a href="#" class="button icon-print">icon-print</a>
-            <a href="#" class="button icon-progress">icon-mobile</a>
+            <a href="#" class="button icon-progress">icon-progress</a>
             <a href="#" class="button icon-quiz">icon-quiz</a>
             <a href="#" class="button icon-random-image">icon-random-image</a>
             <a href="#" class="button icon-refresh">icon-refresh</a>
@@ -1152,5 +1264,12 @@
         Dropzone.options.myAwesomeDropzone = {
             addRemoveLinks: true,
         };
+
+        $('a[data-interaction="toggle-expanded"]').on('click', function(){
+            $(this).toggleClass('icon-add icon-collapse');
+            $(this).closest('li').toggleClass('expanded');
+            event.preventDefault();
+        });
+
     });
 </script>
