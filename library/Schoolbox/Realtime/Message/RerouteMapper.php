@@ -38,6 +38,7 @@ class RerouteMapper extends Mapper {
 			'property'   => 'outgoingLevel',
 			'type'       => self::TYPE_INTEGER,
 		));
+        $this->uses('delivery', self::TYPE_SET);
 		$this->hasJoin('source', array(
 			'mapper'     => '\\Schoolbox\\Realtime\\Message\\SourceMapper',
 			'this_key'   => 'msg_source_id',
@@ -53,10 +54,10 @@ class RerouteMapper extends Mapper {
 
 	/**
 	 * @param int $userId
-	 * @param int $msgSrcId
+	 * @param int $msgSrcId default 0 to retain interface compatibility
 	 * @return Reroute
 	 */
-	public function findById($userId, $msgSrcId) {
+	public function findById($userId, $msgSrcId = 0) {
 		return parent::findOneByColumnList(array(
 			'user_id'        => $userId,
 			'msg_source_id'  => $msgSrcId,

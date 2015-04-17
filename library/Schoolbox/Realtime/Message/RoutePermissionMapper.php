@@ -53,8 +53,8 @@ class RoutePermissionMapper extends Mapper {
 			'type'       => self::TYPE_INTEGER,
 		));
 
-        $this->uses('MASK', self::TYPE_SET, null, 'mask');
-        $this->uses('DEF', self::TYPE_SET,  null, 'default');
+        $this->uses('mask', self::TYPE_SET);
+        $this->uses('role_default', self::TYPE_SET,  null, 'default');
 
 		$this->hasJoin('msg_source', array(
 			'mapper'    => '\\Schoolbox\\Realtime\\Message\\SourceMapper',
