@@ -39,6 +39,7 @@ $this->setVar(array(
     'ASSESS_START' => $assessStartDate->getShort(),
     'ASSESS_FINISH' => $assessFinishDate->getShort(),
     'FIRST_SECTION' => $allSections[0]['section_id'],
+    'ASSESS_CATEGORY_ID'   => $assess['category_id'],
 ));
 
 $this->setFile(TEMPLATE_content, 'survey/summary.html');
