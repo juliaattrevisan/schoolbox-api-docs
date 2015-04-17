@@ -10,9 +10,9 @@
 namespace Schoolbox\Realtime\Admin;
 
 use Alaress\Web\Controller\Base as BaseController;
+use Schoolbox\Realtime\Config;
 use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Message\NSMapper;
-use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Message\Source;
 use Schoolbox\Realtime\Message\SourceMapper;
@@ -32,6 +32,9 @@ class Controller extends BaseController
 
     /** @var RoutePermissionMapper */
     protected $routePermissionMapper;
+
+    /** @var Config */
+    protected $config;
 
 
     /**
@@ -115,18 +118,16 @@ class Controller extends BaseController
 
 
     /**
-     * @return array
+     * @return Config
      */
-    protected function getPermissionList()
+    protected function getConfig()
     {
-        // the order here is intentional and important
-        return [
-            0 => ['&times;', 'Muted'],
-            8 => ['D', 'Digest'],
-            1 => ['I', 'Instant'],
-            2 => ['M', 'Mobile'],
-            4 => ['E', 'Email'],
-        ];
+        // lazyload
+        if (empty($this->config)) {
+            $this->config = new Config($this->getRoleMapper(), $this->getSourceMapper(), $this->getRoutePermissionMapper());
+        }
+
+        return $this->config;
     }
 
 
@@ -164,7 +165,7 @@ class Controller extends BaseController
                                ->indexBy('id')
                                ->getAll();
 
-        $config = $this->findConfig($rolec->getColumnValues('id'));
+        $config = $this->getConfig()->find($rolec->getColumnValues('id'));
 
         $this->getResponse()->content->set([
             'title'    => 'Global Message Configuration',
@@ -174,66 +175,12 @@ class Controller extends BaseController
                 'roles'   => $roles,
                 'ns'      => $ns,
                 'sources' => $sources,
-                'perms'   => $this->getPermissionList(),
+                'perms'   => $this->getConfig()->getPermissionList(),
                 'config'  => $config,
             ]
         ]);
     }
 
-
-    /**
-     * @param int|array $roleIds
-     * @param string    $sourceKey
-     * @param string    $slug
-     * @return array
-     */
-    protected function findConfig($roleIds, $sourceKey = null, $slug = null)
-    {
-        if (is_array($roleIds)) {
-            $roleIds = implode(',', $roleIds);
-        }
-
-        if ($sourceKey && $slug) {
-            $params = [ $sourceKey, $slug ];
-            $sourceKey = "AND s.key = ? AND n.slug = ?";
-        } else {
-            $params = null;
-        }
-
-        // TODO move this to a mapper
-        $stmt = \Database::getInstance()->query("
-            SELECT n.id namespace_id, s.id source_id, s.description source_description, r.id role_id, rp.MASK mask, rp.DEF def
-            FROM msg_namespace n
-            LEFT JOIN msg_source s ON n.id = s.namespace
-            LEFT JOIN groups r ON r.group_type = s.role_type
-            LEFT JOIN msg_route_perm rp ON rp.msg_source_id = s.id AND rp.role_id = r.id
-
-            WHERE r.id IN ($roleIds)
-            $sourceKey
-
-            ORDER BY namespace_id, source_id, role_id
-        ", $params);
-
-        $config = [];
-
-        while ($r = $stmt->fetch(\PDO::FETCH_NUM)) {
-
-            list($namespaceId, $sourceId, $sDescription, $roleId, $mask, $default) = $r;
-
-            $config[$namespaceId]['id']                           = $namespaceId;
-            $config[$namespaceId]['sources'][$sDescription]['id'] = $sourceId;
-
-            $config[$namespaceId]['sources'][$sDescription]['roles'][$roleId] = [
-                'id'      => $roleId,
-                'enabled' => $mask != null,
-                'mask'    => explode(',', $mask),
-                'default' => explode(',', $default)
-            ];
-
-        }
-
-        return $config;
-    }
 
 
     /**
@@ -244,7 +191,7 @@ class Controller extends BaseController
     {
         $q = $this->getRequest()->query;
 
-        $config = $this->findConfig($q['role'], $q['source'], $q['slug']);
+        $config = $this->getConfig()->find($q['role'], $q['source'], $q['slug']);
 
         if (count($config)) {
             $ns     = reset($config);
@@ -276,7 +223,7 @@ class Controller extends BaseController
                 'sources'   => [ $source->getId() => $source ],
                 'source'    => $source,
                 'role'      => $role,
-                'perms'     => $this->getPermissionList(),
+                'perms'     => $this->getConfig()->getPermissionList(),
                 'roletype'  => $q['roletype'] ?: ''
             ],
             'format' => 'nochrome'
@@ -315,7 +262,7 @@ class Controller extends BaseController
                     // we need a list of relevant role IDs
                     foreach ($list->getColumnValues('id') as $roleId) {
                         try {
-                            $conf[$slug][$key][$roleId] = $this->persist($roleId, $slug, $key, $settings);
+                            $conf[$slug][$key][$roleId] = $this->getConfig()->persist($roleId, $slug, $key, $settings);
                         } catch (\Schoolbox\Mapper\Exception $e) {
                             // this roletype does not support this message
                         }
@@ -323,10 +270,9 @@ class Controller extends BaseController
 
                 } else {
                     foreach ($roles as $roleId => $settings) {
-                        $conf[$slug][$key][$roleId] = $this->persist($roleId, $slug, $key, $settings);
+                        $conf[$slug][$key][$roleId] = $this->getConfig()->persist($roleId, $slug, $key, $settings);
                     }
                 }
-
             }
         }
 
@@ -336,105 +282,5 @@ class Controller extends BaseController
         ]);
     }
 
-
-    /**
-     * @param int    $roleId
-     * @param string $slug
-     * @param string $key
-     * @param array  $settings
-     * @throws \Schoolbox\Mapper\Exception
-     * @return array
-     */
-    protected function persist($roleId, $slug, $key, array $settings)
-    {
-        $role = $this->getRoleMapper()->findById($roleId);
-
-        if (isset($settings['mask'])) {
-            // $mode = 'advanced';
-
-            // do advanced (ironically the easiest to get)
-            $mask    = $settings['mask'];
-            $default = $settings['perm'];
-
-        } elseif ($settings['enabled']) {
-            // do simple
-            $mask = [ 1, 2, 4, 8 ];
-
-            if ($settings['mutable']) {
-                array_unshift($mask, 0);
-            }
-
-            $default = $settings['perm'];
-
-        } else {
-            // do disabled
-            $mask    = [ 0 ];
-            $default = [ 0 ];
-        }
-
-        // acquire msg source, or throw exception if this message isn't relevant to this roletype
-        $src = $this->getSourceMapper()->findOneByColumnList([
-            'slug'      => $slug,
-            'key'       => $key,
-            'role_type' => $role->getType()
-        ]);
-
-        try {
-            /** @var RoutePermission $routePermission */
-            $routePermission = $this->getRoutePermissionMapper()->findOneByColumnList([
-                'msg_source_id' => $src->getId(),
-                'role_id'       => $roleId
-            ]);
-
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            /** @var RoutePermission $routePermission */
-            $routePermission = $this->getRoutePermissionMapper()->createModel();
-            $routePermission->setRole($role);
-            $routePermission->setMsgSource($src);
-        }
-
-
-        $routePermission->setMask($this->applyMap($mask));
-        $routePermission->setDefault($this->applyMap($default));
-
-        $this->getRoutePermissionMapper()->save($routePermission);
-
-        return $this->getSum($mask, $default);
-    }
-
-    /**
-     * @param array $mask
-     * @param array $default
-     * @return array
-     */
-    protected function getSum($mask, $default)
-    {
-        if ($mask === [ 0 ] && $default === [ 0 ]) {
-            return false;
-        }
-
-        return [
-            'custom'  => array_sum($mask) != 15,
-            'mutable' => in_array('MU', $mask),
-            'default' => array_sum($default)
-        ];
-    }
-
-    /**
-     * @param array $array
-     * @return array
-     */
-    protected function applyMap($array)
-    {
-        $map = $this->getPermissionList();
-
-        $result = [];
-
-        foreach ($array as $i) {
-            $result[] = strtoupper(substr($map[$i][1], 0, 2));
-        }
-
-        return $result;
-    }
 
 }
