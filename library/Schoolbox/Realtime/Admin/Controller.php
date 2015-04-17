@@ -262,7 +262,7 @@ class Controller extends BaseController
                     // we need a list of relevant role IDs
                     foreach ($list->getColumnValues('id') as $roleId) {
                         try {
-                            $conf[$slug][$key][$roleId] = $this->getConfig()->persist($roleId, $slug, $key, $settings);
+                            $conf[$slug][$key][$roleId] = $this->getConfig()->persistRole($roleId, $slug, $key, $settings);
                         } catch (\Schoolbox\Mapper\Exception $e) {
                             // this roletype does not support this message
                         }
@@ -270,7 +270,7 @@ class Controller extends BaseController
 
                 } else {
                     foreach ($roles as $roleId => $settings) {
-                        $conf[$slug][$key][$roleId] = $this->getConfig()->persist($roleId, $slug, $key, $settings);
+                        $conf[$slug][$key][$roleId] = $this->getConfig()->persistRole($roleId, $slug, $key, $settings);
                     }
                 }
             }
