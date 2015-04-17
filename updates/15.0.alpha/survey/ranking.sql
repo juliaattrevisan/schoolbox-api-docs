@@ -1,1 +1,1 @@
-INSERT INTO `assess_luQuestionType` (`classname`, `filename`, `description`, `moodle`, `automated_marking`, `availability`, `has_config`) VALUES ('Ranking', 'ranking', 'Ranking', 'ranking', 'false', 'survey', 'true');
+INSERT INTO `assess_luQuestionType` (`classname`, `filename`, `description`, `moodle`, `automated_marking`, `availability`, `has_config`) VALUES ('Ranking', 'ranking', 'Preferences', 'ranking', 'false', 'survey', 'true');
