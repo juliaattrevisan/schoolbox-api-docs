@@ -10,10 +10,14 @@
 namespace Schoolbox\Realtime;
 
 use Schoolbox\Mapper;
+use Schoolbox\Realtime\Message\Reroute;
+use Schoolbox\Realtime\Message\RerouteMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
+use Schoolbox\Realtime\Message\Source;
 use Schoolbox\Realtime\Message\SourceMapper;
 use Schoolbox\RoleMapper;
+use Schoolbox\User;
 
 class Config 
 {
@@ -152,7 +156,7 @@ class Config
 
         // TODO move this to a mapper
         $stmt = \Database::getInstance()->query("
-            SELECT n.id namespace_id, s.id source_id, s.description source_description, r.id role_id, rp.MASK mask, rp.DEF def
+            SELECT n.id namespace_id, s.id source_id, s.description source_description, r.id role_id, rp.mask, rp.role_default def
             FROM msg_namespace n
             LEFT JOIN msg_source s ON n.id = s.namespace
             LEFT JOIN groups r ON r.group_type = s.role_type
@@ -194,7 +198,7 @@ class Config
      * @throws \Schoolbox\Mapper\Exception
      * @return array
      */
-    public function persist($roleId, $slug, $key, array $settings)
+    public function persistRole($roleId, $slug, $key, array $settings)
     {
         $role = $this->getRoleMapper()->findById($roleId);
 
@@ -248,6 +252,35 @@ class Config
 
 
     /**
+     * @param  User   $user
+     * @param  string $slug
+     * @param  string $key
+     * @param  array  $settings
+     * @throws \Schoolbox\Mapper\Exception if the source is not relevant to the given user
+     * @return int
+     */
+    public function persistUser($user, $slug, $key, array $settings)
+    {
+        /** @var Source $src */
+        $src = $this->getSourceMapper()->findOneByColumnList([
+            'slug'      => $slug,
+            'key'       => $key,
+            'role_type' => $user->getRole()->getType()
+        ]);
+
+        /** @var Reroute $rr */
+        $rr = RerouteMapper::getInstance()->createModel();
+
+        $rr->setSource($src);
+        $rr->setUser($user);
+        $rr->setDelivery($this->applyMap($settings['perm']));
+
+        RerouteMapper::getInstance()->save($rr);
+
+        return array_sum($settings['perm']);
+    }
+
+    /**
      * @param  array $mask
      * @param  array $default
      * @return array|bool
@@ -256,9 +289,6 @@ class Config
     {
         // non-array values means off
         if (!is_array($mask) || !is_array($default)) {
-            var_dump($mask);
-            var_dump($default);
-            exit;
             return false;
         }
 
@@ -279,7 +309,7 @@ class Config
      * @param  array $array
      * @return array
      */
-    protected function applyMap($array)
+    public function applyMap($array)
     {
         $map = $this->getPermissionList();
 
@@ -297,7 +327,7 @@ class Config
      * @param  array $array
      * @return array
      */
-    protected function removeMap($array)
+    public function removeMap($array)
     {
         $result = [];
         $map = [];
