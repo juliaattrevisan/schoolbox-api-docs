@@ -1,0 +1,20 @@
+{% for level, perm in perms %}
+    <td data-perm="{{ level }}" class="simple perm{% if role.enabled == false %} disable{% endif %}">
+        <input id="{{ mode }}-{{ ns[namespace.id].slug ?: 0 }}-{{ source.id ?: 0 }}{%if role %}-{{ role.id }}{% endif %}-{{ level }}"
+               name="data[{{ ns[namespace.id].slug ?: 0 }}][{{ sources[source.id].key ?: 0 }}]{% if role %}[{{ role.id }}]{% endif %}[perm][]"
+               value="{{ level }}" data-perm="{{ level }}" type="{{ level <= 1 or level > 4 ? 'radio' : 'checkbox' }}"
+               {% if perm[1] | slice(0, 2) | upper in role.default %}checked="checked"{% endif %}
+               {% if perm[1] | slice(0, 2) | upper not in role.mask %}disabled="disabled"{% endif %}
+        />
+        <label for="{{ mode }}-{{ ns[namespace.id].slug ?: 0 }}-{{ source.id ?: 0 }}{%if role %}-{{ role.id }}{% endif %}-{{ level }}"
+               title="{{ perm[1] }}{% if perm[1] | slice(0, 2) | upper not in role.mask %} (disabled){% endif %}"
+        >
+            <span>
+                <img src="/images/core/messaging/{{ perm[1] | lower }}.svg" alt="{{ perm[1] }}" width="16" />
+                {#{% include '@adminMessages/icons/' ~ perm[1] | lower ~ '.svg' %}#}
+                {#{{ perm[1] | slice(0, 2) | upper }}#}
+            </span>
+        </label>
+    </td>
+    {% if level == 1 %}<td class="simple{% if role.enabled == false %} disable{% endif %}">+</td>{% endif %}
+{% endfor %}
