@@ -59,7 +59,7 @@
         // inlineify all SVGs and apply message admin constraints
         $('#adv')
             .svgInline()
-            .msgadmin({
+            .msgconfig({
                 roleSelector: 'tr[data-role]',
                 permSelector: 'td.perm',
                 toggleSelector: null,
@@ -115,7 +115,7 @@
         <p><strong>Step 2:</strong> Select the default setting for members of '{{ role.name }}' for this message.</p>
         <table class="roles digest-settings" data-settings id="adv-selection">
             <tr class="role" data-role="{{ role.id }}">
-                {% include '@adminMessages/options.twig' with { mode: 'def' } %}
+                {% include '@messages/options.twig' with { mode: 'def' } %}
             </tr>
         </table>
         <label class="float-right">

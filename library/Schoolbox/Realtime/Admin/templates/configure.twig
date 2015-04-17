@@ -3,14 +3,12 @@
         /*opacity: 1 !important;*/
     }
     .digest-settings tr {
-        transition: height 200ms ease-out;
         height: 32px;
         line-height: 32px;
     }
     .digest-settings td {
         overflow: hidden;
         border: none;
-        /*line-height: 48px;*/
     }
     td.perm {
         min-width: 32px;
@@ -22,47 +20,20 @@
     td.toggle {
         white-space: nowrap;
     }
-    .digest-settings td.mutable input[type=checkbox] {
-        position: static;
-        opacity: 1;
-        margin-left: 24px;
-    }
     .digest-settings input[disabled] + label {
         opacity: 0.2;
     }
     .admin-nav.filter {
         margin-top: 2em;
     }
-    .mutable.disable, .perm.disable, .custom.disable {
-        /*opacity: 0;*/
-    }
-    .perm label span {
-        /*font-size: 18px;*/
-    }
-    .digest-settings td.disable * {
-        visibility: hidden;
-    }
-    .digest-settings tr.show-advanced td {
-        /*height: 200px;*/
-        /*vertical-align: top !important;*/
-    }
-    .digest-settings tr.show-advanced td.simple {
-        display: none;
-    }
-    .digest-settings tr.show-advanced td.custom {
-        width: 345px;
-    }
     .digest-settings td.custom > div {
         display: none;
-    }
-    .digest-settings tr.show-advanced td.custom > div {
-        display: block;
     }
     td .actions {
         float: right;
         padding-top: 4px;
     }
-    .digest-settings svg {
+    .digest-settings svg, .digest-settings img[src^=".svg"] {
         width: 16px;
         margin-top: 5px;
     }
@@ -106,7 +77,6 @@
             tableSelector:  '.digest-settings',
             roleSelector:   'tr',
             toggleSelector: '.toggle',
-            muteSelector:   '.mutable',
             customSelector: 'td.custom',
             permSelector:   '.perm',
             persist: function () {
@@ -179,7 +149,7 @@
                 summary.text(text + '.');
 
             },
-            onShowAdvanced: function () {
+            advanced: function () {
                 var row    = this.closest('tr'),
                     dialog = $('#slider-modal'),
                     query  = [
@@ -189,9 +159,6 @@
                         'role='+row.data('role')
                     ].join('&');
 
-
-                hideSimpleSettings.apply(this);
-
                 dialog.load('/adminv2/messages/configure/custom', query, function () {
                     dialog.dialog({
                         modal: true,
@@ -200,21 +167,9 @@
                         title: 'Advanced Settings'
                     });
                 });
-
-            },
-            onShowSimple: showSimpleSettings
+            }
         });
     });
-
-    function hideSimpleSettings() {
-        this.closest('tr').addClass('show-advanced');
-        this.closest('td').attr('colspan', 8).addClass('expanded');
-    }
-
-    function showSimpleSettings() {
-        this.closest('tr').removeClass('show-advanced');
-        this.closest('td').removeAttr('colspan').removeClass('expanded');
-    }
 
     function customiserCallback(data) {
 
@@ -230,16 +185,21 @@
 
                 $.each(roles, function (role, config) {
 
-                    var $role   = $src.find('tr[data-role='+role+']'),
-                        bitwise = function () {
+                    var $role = $src.find('tr[data-role='+role+']'),
+                        options,
+                        inDefault = function () {
+                            var p = $(this).data('perm');
                             // bitwise! single &
-                            return !!(config.default & $(this).data('perm'));
+                            return !!(config.default & p || (config.default == 0 && p == 0));
                         },
-                        descrip, $custom;
+                        inMask    = function () {
+                            var p = $(this).data('perm');
+                            // bitwise! single &
+                            return !!(config.mask[1] & p || (config.mask[0] && p == 0));
+                        };
 
                     // turned off
                     if (config == false) {
-                        showSimpleSettings.apply($role.find('a.btn.modify'));
                         // ensure off selected
                         $role.find('td.toggle input[value=0]').prop('checked', true);
 
@@ -247,36 +207,16 @@
                     }
 
                     // ensure on selected
-                    $role.find('td.toggle input[value=1]').prop('checked', true);
+                    $role.find('td.toggle input[value=1]').prop('checked', true).trigger('change.force');
 
-                    // if custom settings, show custom
-                    if (config.custom) {
-                        hideSimpleSettings.apply($role.find('a.btn.modify'));
+                    // reset all
+                    options = $role.find('td[data-perm]');
+                    options.find('input').prop('checked', false).attr('disabled', 'disabled');
 
-                        descrip = $role.find('td[data-perm]').filter(bitwise).find('label').map(function () {
-                            return this.title;
-                        }).toArray().join(' + ');
+                    options.filter(inMask).find('input').removeAttr('disabled');
+                    options.filter(inDefault).find('input').prop('checked', true);
 
-                        $custom = $role.find('td.custom');
-
-                        if ($custom.find('span.custom-descrip').length == 0) {
-                            $custom.prepend($('<span class="custom-descrip" />'));
-                        }
-
-                        $custom.find('span.custom-descrip').text('Custom (default '+descrip.toLowerCase()+')');
-
-                        return true; // jq:continue
-                    }
-
-                    // turn the appropriate inputs on and off
-                    showSimpleSettings.apply($role.find('a.btn.modify'));
-
-                    // first check 'mutable'
-                    $role.find('td.mutable input').prop('checked', config.mutable).trigger('change.force');
-
-                    // then turn on only the relevant options
-                    $role.find('td[data-perm]').prop('checked', false).filter(bitwise).prop('checked', true).trigger('change.force');
-
+                    options.eq(0).trigger('change.force');
                 });
             });
         });
@@ -290,15 +230,16 @@
         <a class="btn go-back float-left" href="{{ '/adminv2/messages' }}"><span></span>Back to Messages</a>
     </p>
     <div class="level clearfix">
-        <p>
-            Use this page to configure the messages the system will send to users:
-        </p>
-        <ul style="list-style: disc;padding-left:20px;">
-          <li><strong>Enabled</strong>: can users in this role receive this message at all</li>
-          <li><strong>Mutable</strong>: do users in this role have the option to turn this message off</li>
-          <li><strong>Default Setting</strong>: by default, how should this message be sent to users in this role (users can customise their personal settings)</li>
-          <li>If you need more fine-grained control for a message, click the customise button next to the role for advanced settings</li>
+        <p>Use this page to configure the messages the system will send to users.</p>
+        <h3>Settings</h3>
+        <ul>
+            <li><strong>Enabled</strong>: Whether the given role can receive this message at all.</li>
+            <li><strong>Default</strong>: The <em>default</em> way this message should be received (remembering users can personalise their settings).</li>
         </ul>
+        <p>
+            <br/><em>For more control, the modify button allows you to restrict users' delivery options.</em>
+        </p>
+        {% include '@messages/legend.twig' with { digest: true, mobile: 'plural', who: 'users' } %}
         <ul class="filter admin-nav clearfix">
             <li>
                 <span>Filter messages relevant to:</span>
@@ -316,7 +257,7 @@
                 <h3>{{ ns[namespace.id].label }}</h3>
                 <ul class="sources">
                 {% for source in namespace.sources %}
-                    {% include '@adminMessages/source.twig' with { source: source } %}
+                    {% include '@messages/source.twig' with { source: source } %}
                 {% endfor %}
                 </ul>
             </li>
