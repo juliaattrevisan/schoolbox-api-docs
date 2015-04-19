@@ -102,7 +102,7 @@ class Node
     /**
      * Set category
      *
-     * @param \Schoolbox\Resource\Category $category
+     * @param \Schoolbox\Resource\Folder\Model $category
      */
     public function setCategory($category)
     {
