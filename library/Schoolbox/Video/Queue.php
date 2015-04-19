@@ -119,7 +119,6 @@ class Queue extends ResourceVideo
             $strict = false;
         }
 
-
         // Get information about width and height of video file
         exec("$info_exec -show_streams " . escapeshellarg($sourceFile) . ' 2>&1', $info_message, $info_return);
         $info_message = implode("\n", $info_message);
@@ -195,6 +194,7 @@ class Queue extends ResourceVideo
             ($strict ? '-strict -2 ' : '') .
             '-ac 2 ' . escapeshellarg($this->getVideoLocation()) . ' 2>&1';
 
+        print $processString;
         exec($processString, $message, $return);
         $this->setMessage(implode("\n", $message));
 
@@ -267,13 +267,13 @@ class Queue extends ResourceVideo
 
     private function getSourceLocation($sourceObject)
     {
-        if ($this->getType() == QueueMapper::FILE_TYPE_SBFS) {
-            return $sourceObject->getFileLocation();
-        } elseif ($this->getType() == QueueMapper::FILE_TYPE_STORAGE) {
-            $configLoader = new \Schoolbox\Config\Loader();
-            $path = $configLoader->get('storage_dir'). '/' . $sourceObject->getPath();
+        $configLoader = new \Schoolbox\Config\Loader();
 
-            return $path;
+
+        if ($this->getType() == QueueMapper::FILE_TYPE_SBFS) {
+            return $configLoader->get('storage_dir'). '/' . $sourceObject->getPath();
+        } elseif ($this->getType() == QueueMapper::FILE_TYPE_STORAGE) {
+            return $configLoader->get('storage_dir'). '/' . $sourceObject->getPath();
         } elseif ($this->getType() == QueueMapper::FILE_TYPE_SUBMISSION) {
             return $sourceObject->getFileLocation();
         } else if ($this->getType() == QueueMapper::FILE_TYPE_MYFILE) {
