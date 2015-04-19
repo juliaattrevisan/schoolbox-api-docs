@@ -31,6 +31,13 @@ class ResourceVideoMapper extends Mapper
         );
         $this->hasMap(
             array(
+                'column'   => 'hash',
+                'property' => 'hash',
+                'type'     => self::TYPE_STRING,
+            )
+        );
+        $this->hasMap(
+            array(
                 'column'   => 'type',
                 'property' => 'type',
                 'type'     => self::TYPE_STRING,
@@ -60,29 +67,29 @@ class ResourceVideoMapper extends Mapper
         $this->hasJoin(
             'file', array(
                 'mapper'    => '\\Schoolbox\\Resource\\FileMapper',
-                'this_key'  => 'file_id',
-                'other_key' => 'id',
+                'this_key'  => 'hash',
+                'other_key' => 'hash',
             )
         );
         $this->hasJoin(
             'storage', array(
                 'mapper'    => '\\Schoolbox\\StorageMapper',
-                'this_key'  => 'file_id',
-                'other_key' => 'storage_id',
+                'this_key'  => 'hash',
+                'other_key' => 'hash',
             )
         );
         $this->hasJoin(
             'student_submission', array(
                 'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\SubmissionMapper',
-                'this_key'  => 'file_id',
-                'other_key' => 'id',
+                'this_key'  => 'hash',
+                'other_key' => 'hash',
             )
         );
         $this->hasJoin(
             'eportfolio_filelist', array(
                 'mapper'    => '\\Component\\Eportfolio\\FileListMapper',
-                'this_key'  => 'file_id',
-                'other_key' => 'file_id',
+                'this_key'  => 'hash',
+                'other_key' => 'hash',
             )
         );
     }
@@ -105,8 +112,11 @@ class ResourceVideoMapper extends Mapper
             SELECT {$this->getJoinMapper('file')->getColumnString('f')}, {$this->getColumnString('vq')}, {$fileMapper->getJoinMapper('owner')->getColumnString('u')}
             FROM `{$this->getTable()}` vq
             JOIN {$this->getJoinSQL('file', 'vq', 'f')}
+            JOIN storage s ON s.hash = f.hash
+            JOIN allowedFileExtension e ON s.ext = e.extension
+            JOIN allowedFileTypes ft ON ft.fileTypeID = e.fileTypeID
             LEFT JOIN {$fileMapper->getJoinSQL('owner', 'f', 'u')}
-            WHERE category = :cat AND vq.status != 'failed' AND f.deleted='0' AND f.mime_type like :mime
+            WHERE category = :cat AND vq.status != 'failed' AND f.deleted='0' AND ft.mime like :mime
         ";
 
         /* Sort order

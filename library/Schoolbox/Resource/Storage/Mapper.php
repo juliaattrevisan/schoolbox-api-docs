@@ -70,9 +70,8 @@ class Mapper extends Schoolbox\Mapper implements Receiver
             'queue',
             [
                 'mapper'    => QueueMapper::class,
-                'this_key'  => 'storage_id',
-                'other_key' => 'file_id',
-                'extra'     => ":other_alias.type = 'storage'",
+                'this_key'  => 'hash',
+                'other_key' => 'hash',
             ]
         );
 
@@ -105,6 +104,7 @@ class Mapper extends Schoolbox\Mapper implements Receiver
             $mapper = new QueueMapper();
             $videoQ = new Queue();
             $videoQ->setFileID($mapper->findFileInternalId($storage));
+            $videoQ->setHash($storage->getHash());
             $videoQ->setStatus(QueueMapper::STATUS_PENDING);
             $videoQ->setType(QueueMapper::FILE_TYPE_STORAGE);
 

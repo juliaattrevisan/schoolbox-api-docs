@@ -53,6 +53,11 @@ class QueueMapper extends Mapper {
                 'type'       => self::TYPE_INTEGER,
             ));
         $this->hasMap(array(
+            'column'     => 'hash',
+            'property'   => 'hash',
+            'type'       => self::TYPE_STRING,
+        ));
+        $this->hasMap(array(
                 'column'     => 'type',
                 'property'   => 'type',
                 'type'       => self::TYPE_STRING,

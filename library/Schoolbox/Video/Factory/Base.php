@@ -43,12 +43,12 @@ abstract class Base {
 	 * Constructor
 	 *
 	 * @param $type
-	 * @param $id
+	 * @param $hash
 	 */
-	public function __construct($type, $id) {
+	public function __construct($hash, $type) {
 		$this->setGroupHandler(new \Group());
 		$this->setType($type);
-		$this->setId($id);
+		$this->setId($hash);
 	}
 
 	/**
@@ -65,16 +65,16 @@ abstract class Base {
 				return $videoMapper->findByStorageHash($this->getId());
 
 			case QueueMapper::FILE_TYPE_SBFS:
-				$video = $videoMapper->findByFileId($this->getId());
+                return $videoMapper->findByStorageHash($this->getId());
 				$this->permissionCheck($video);
 				return $video;
 
 			case QueueMapper::FILE_TYPE_SUBMISSION:
-				$video = $videoMapper->findBySubmissionId($this->getId());
+                return $videoMapper->findByStorageHash($this->getId());
 				return $video;
 
 			case QueueMapper::FILE_TYPE_MYFILE:
-				$video = $videoMapper->findByMyFileId($this->getId());
+                return $videoMapper->findByStorageHash($this->getId());
 				return $video;
 		}
 

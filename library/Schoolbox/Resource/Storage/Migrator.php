@@ -61,7 +61,7 @@ class Migrator
         ");
         $this->updateQueue = $this->db->prepare("
             UPDATE video_queue vq
-            SET vq.type = :newType, vq.file_id = :newId
+            SET hash = :hash
             WHERE vq.type = :oldType AND vq.file_id = :oldId
         ");
     }
@@ -136,7 +136,7 @@ class Migrator
             } else {
                 // actually, this file IS deleted, so mark it as such
                 $pattern->flagAsDeleted($fileId);
-                $this->log->notice("Flagged $type.$fileId as deleted, file doesn't seem to exist");
+                $this->log->notice("Flagged $type.$filePath as deleted, file doesn't seem to exist");
                 continue;
             }
 
@@ -181,8 +181,7 @@ class Migrator
                     $newId = $this->selectStorageId->fetchColumn();
                     if ($newId) {
                         $this->updateQueue->execute([
-                            'newType' => QueueMapper::FILE_TYPE_STORAGE,
-                            'newId'   => $newId,
+                            'hash'   => $file->getHash(),
                             'oldType' => $queueType,
                             'oldId'   => $fileId,
                         ]);
@@ -191,7 +190,7 @@ class Migrator
                             $oldFiles = glob($this->queueDir.'/'.$queueType.'-'.$fileId.'{-,.}*', GLOB_BRACE);
                             foreach ($oldFiles as $oldFilepath) {
                                 $oldPrefix   = $queueType.'-'.$fileId;
-                                $newPrefix   = QueueMapper::FILE_TYPE_STORAGE.'-'.$newId;
+                                $newPrefix   = $file->getHash();
                                 $newFilepath = str_replace($oldPrefix, $newPrefix, $oldFilepath);
                                 $oldFilename = pathinfo($oldFilepath, PATHINFO_FILENAME);
                                 $newFilename = pathinfo($newFilepath, PATHINFO_FILENAME);

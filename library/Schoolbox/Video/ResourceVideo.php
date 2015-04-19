@@ -16,6 +16,7 @@ use Schoolbox\Resource\File;
 class ResourceVideo
 {
     protected $id;
+    protected $hash;
     protected $type;
     protected $status;
     protected $duration;
@@ -43,22 +44,22 @@ class ResourceVideo
 
     public function getVideoLocation()
     {
-        return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '.mp4';
+        return $this->config->get('video_dir').'/'.$this->getHash() . '.mp4';
     }
 
     public function getAudioLocation()
     {
-        return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '.mp3';
+        return $this->config->get('video_dir').'/'.$this->getHash() . '.mp3';
     }
 
     public function getThumbnailLocation()
     {
-        return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '-64.jpg';
+        return $this->config->get('video_dir').'/'.$this->getHash() . '-64.jpg';
     }
 
     public function getPosterLocation()
     {
-        return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '-poster.jpg';
+        return $this->config->get('video_dir').'/'.$this->getHash() . '-poster.jpg';
     }
 
 
@@ -171,4 +172,22 @@ class ResourceVideo
     {
         return $this->fileID;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getHash()
+    {
+        return $this->hash;
+    }
+
+    /**
+     * @param mixed $hash
+     */
+    public function setHash($hash)
+    {
+        $this->hash = $hash;
+    }
+
+
 }
