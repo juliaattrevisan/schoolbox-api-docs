@@ -143,7 +143,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
                         $mimetypes[] = "%image%";
                         break;
                     case 'audio':
-                        $mimetypes[] = "%image%";
+                        $mimetypes[] = "%audio%";
                         break;
                     case 'video':
                         $mimetypes[] = "%video%";
