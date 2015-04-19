@@ -59,6 +59,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
             } else {
                 // target attachment is from SBFS, but a different file: override storage
                 $file->setStorage($result->getStorage());
+                $file->setFilename($result->getFilename());
             }
         }
 
