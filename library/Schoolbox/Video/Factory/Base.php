@@ -15,6 +15,7 @@ namespace Schoolbox\Video\Factory;
 use \Schoolbox\Video\QueueMapper;
 use Schoolbox\Video\ResourceVideo;
 use \Schoolbox\Video\ResourceVideoMapper;
+use Schoolbox\Resource\File\Mapper as FileMapper;
 
 abstract class Base {
 
@@ -42,13 +43,13 @@ abstract class Base {
 	/**
 	 * Constructor
 	 *
+	 * @param $id
 	 * @param $type
-	 * @param $hash
 	 */
-	public function __construct($hash, $type) {
+	public function __construct($id, $type) {
 		$this->setGroupHandler(new \Group());
 		$this->setType($type);
-		$this->setId($hash);
+		$this->setId($id);
 	}
 
 	/**
@@ -65,16 +66,19 @@ abstract class Base {
 				return $videoMapper->findByStorageHash($this->getId());
 
 			case QueueMapper::FILE_TYPE_SBFS:
-                $video = $videoMapper->findByStorageHash($this->getId());
-				$this->permissionCheck($video);
-				return $video;
+
+                // For SBFS we must first check submission then resolve the hash
+                $file = FileMapper::getInstance()->findById($this->getId());
+                $this->permissionCheck($file);
+
+                return $videoMapper->findByStorageHash($file->getHash());
 
 			case QueueMapper::FILE_TYPE_SUBMISSION:
-                return $videoMapper->findByStorageHash($this->getId());
+                return $videoMapper->findBySubmissionId($this->getId());
 				return $video;
 
 			case QueueMapper::FILE_TYPE_MYFILE:
-                return $videoMapper->findByStorageHash($this->getId());
+                return $videoMapper->findByMyFileId($this->getId());
 				return $video;
 		}
 

@@ -27,7 +27,7 @@ if (isset($type) && isset($id)) {
     $videoQueueMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
     try {
-        $videoFactory = new \Schoolbox\Video\Factory\Video($type, $id);
+        $videoFactory = new \Schoolbox\Video\Factory\Video($id, $type);
         $video        = $videoFactory->produce();
     } catch (Schoolbox\Mapper\Exception $e) {
         /* Video not found */

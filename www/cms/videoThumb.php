@@ -28,7 +28,7 @@ if (isset($type) && isset($id) ) {
 	$videoQueueMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
     try {
-		$thumbnailFactory = new \Schoolbox\Video\Factory\Thumbnail($type, $id);
+		$thumbnailFactory = new \Schoolbox\Video\Factory\Thumbnail($id, $type);
 		$video = $thumbnailFactory->produce();
     }
     catch (Schoolbox\Mapper\Exception $e){
@@ -65,5 +65,5 @@ if (isset($type) && isset($id) ) {
 
     }
 } else {
-    SitePage::redirectToBrokenImageOfSize(64, 64, 500);
+   SitePage::redirectToBrokenImageOfSize(64, 64, 500);
 }

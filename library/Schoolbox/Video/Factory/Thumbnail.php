@@ -16,11 +16,11 @@ class Thumbnail extends Base {
 	/**
 	 * Check perms
 	 *
-	 * @param $video
+	 * @param $file
 	 * @throws \Exception
 	 */
-	protected function permissionCheck($video) {
-		if ($this->getGroupHandler()->getPermission($video->getFile()->getFolder()->getId()) < READ_ACCESS) {
+	protected function permissionCheck($file) {
+		if ($this->getGroupHandler()->getPermission($file->getFolder()->getId()) < READ_ACCESS) {
 			\SitePage::redirectToBrokenImageOfSize(64, 64, 403);
 		}
 	}
