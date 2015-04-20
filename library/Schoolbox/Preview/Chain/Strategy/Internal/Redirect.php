@@ -21,12 +21,7 @@ class Redirect extends Base {
     public function test() {
         return [
             'type' => 'redirect',
-            'twig' => [
-                'template' => '@preview/Strategy/Shared/Redirect.twig',
-                'data' => [
-                    'src' => $this->getUrl()
-                ]
-            ]
+            'src' => $this->getUrl(),
         ];
     }
 } 
