@@ -2,14 +2,15 @@
 <?php
 
 use Alaress\Async\UserQueue\UserQueue;
+use Alaress\Async\Notification\Cloud;
 use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategyBuilder;
 use Aura\Di;
 use Ratchet\Session\Serialize\PhpHandler;
 use React\EventLoop\LoopInterface;
 use React\Socket\ConnectionException;
 use React\Stomp\Factory;
+use Schoolbox\MobileApp;
 use Schoolbox\Notif\MQ\Connector;
-use Schoolbox\Notif\Queue\Builder\Plan;
 use Schoolbox\Notif\Queue\QueueFactory;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Realtime\Pipe\SessionValidator;
@@ -83,6 +84,20 @@ $kernel->run(
            $conf             = $di->get('config');
            $sessionValidator = new SessionValidator($redis, new PhpHandler(), $conf->get('session_length'), Database::getInstance());
 
+           // configure push services as required
+           $services = array();
+
+           if ($conf->get('push_notifications_enabled')) {
+               if ($conf->get('push_gcm_api_key')) {
+                   $services[] = new Cloud\Google\GCM($conf->get('push_gcm_api_key'));
+               }
+               if ($conf->get('push_apns_cert_path')) {
+                   $services[] = new Cloud\Apple\APNS(ZendService\Apple\Apns\Client\Message::SANDBOX_URI, $conf->get('push_apns_cert_path'), $conf->get('push_apns_cert_key') ?: null);
+               }
+           }
+
+           $cloudManager = new MobileApp\ServiceManager($services);
+
            $stompFactory = new Factory($loop);
 
            // we have but one STOMP client (ie. socket connection) to rabbit for all our subscriptions
@@ -96,7 +111,7 @@ $kernel->run(
 
            $client->connect(2)
                   ->then(
-                  function ($client) use ($loop, $sessionValidator, $log, $poolStrat, $opts, $redis) {
+                  function ($client) use ($loop, $sessionValidator, $cloudManager, $log, $poolStrat, $opts, $redis) {
 
                       $mqConn = Connector::getInstance();
 
@@ -104,7 +119,7 @@ $kernel->run(
                       $queueFactory->setAMQP($mqConn);
                       $queueFactory->setKind(UserQueue::Q_UNREAD);
 
-                      $pipeManager  = new PipeManager($loop, $sessionValidator, $client, $queueFactory, $log, $poolStrat);
+                      $pipeManager  = new PipeManager($loop, $sessionValidator, $client, $queueFactory, $cloudManager, $log, $poolStrat);
 
                       $wss = new Ratchet\WebSocket\WsServer($pipeManager);
                       $wss->disableVersion(0);
