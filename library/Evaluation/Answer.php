@@ -31,7 +31,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
 	/**
 	 * An instance of Assess/Survey ResponseHandler
 	 *
-	 * @var null
+	 * @var Survey_Response
 	 */
 	protected $responseHandler = null;
 
@@ -307,7 +307,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
 	/**
 	 * Set response handler
 	 *
-	 * @param null $responseHandler
+	 * @param Survey_Response $responseHandler
 	 */
 	protected function setResponseHandler($responseHandler) {
 		$this->responseHandler = $responseHandler;
@@ -316,7 +316,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
 	/**
 	 * Get response handler
 	 *
-	 * @return null
+	 * @return Survey_Response
 	 */
 	protected function getResponseHandler() {
 		return $this->responseHandler;

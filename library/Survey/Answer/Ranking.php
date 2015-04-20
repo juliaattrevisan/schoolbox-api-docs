@@ -273,57 +273,19 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
 
         /* Find all the responses that people made
          */
-        $allResults = $this->getResponseHandler()->getAllByField('question_id', $questionId);
+        $allResults = $this->getResponseHandler()->getResponsesToQuestion($questionId);
 
         /* Collate each response into $allValues
          */
-        foreach ($allResults as $currentResult) {
-            $response = unserialize($currentResult['response']);
+        if(is_array($allResults)) {
+            foreach ($allResults as $currentResult) {
+                $response = unserialize($currentResult['response']);
 
-            for ($i = 0; $i < count($response); $i++) {
-                $scoreboard[$i][$response[$i]]++;
+                for ($i = 0; $i < count($response); $i++) {
+                    $scoreboard[$i][$response[$i]]++;
+                }
             }
         }
-
-        /* NOTE: Gigantic stupid problem encountered
-         * https://bugs.php.net/bug.php?id=29992
-         *
-         * Be uber careful with these foreaches as they corrupt data.
-         * Stupid php
-         *
-         * This is the reason behind the unset()
-         */
-//        foreach ($scoreboard as &$currentPosition) {
-//
-//            arsort($currentPosition);
-//        }
-////
-//        unset($currentPosition);
-//
-//        /* Find the maximum value and unset anything that isn't the same
-//         */
-//        for ($i = 0; $i < count($scoreboard); $i++) {
-//            $currentPosition = $scoreboard[$i];
-//
-//            $max = false;
-//
-//            foreach ($currentPosition as $key => $value) {
-//                if ($max === false) {
-//                    $max = $value;
-//                }
-//
-//                /* Transfer to a different var
-//                 */
-//                if ($value == $max) {
-//                    $finalScoreboard[$i][$key] = $value;
-//                }
-//                /* For continuity in flot
-//                 */
-//                else {
-//                    $finalScoreboard[$i][$key] = 0;
-//                }
-//            }
-//        }
 
         /* James prefers to see all the values, not just the maximum
          * in each position in the stack
