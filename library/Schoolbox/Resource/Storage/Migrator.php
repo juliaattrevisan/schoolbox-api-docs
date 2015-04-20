@@ -50,8 +50,13 @@ class Migrator
 
         // intentionally not singleton, so as to keep checkPrevious value separated
         $this->storageMapper  = new Storage\Mapper();
-        $this->storageMapper->checkPrevious(false);
-
+        $this->storageMapper->dePostSave();
+        $this->storageMapper->registerCallback(
+            Storage\Mapper::CALLBACK_POSTSAVE,
+            function($storage) {
+                $saveResult = $this->storageMapper->getManager()->save($storage);
+                return $saveResult;
+            });
         $this->mimetypeMapper = File\MimetypeMapper::getInstance();
         $this->queueMapper    = QueueMapper::getInstance();
 

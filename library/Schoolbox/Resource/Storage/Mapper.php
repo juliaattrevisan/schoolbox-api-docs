@@ -35,9 +35,6 @@ class Mapper extends Schoolbox\Mapper implements Receiver
     /** @var Manager */
     protected $mgr;
 
-    /** @var bool */
-    protected $checkPrevious = true;
-
     /**
      * @return void
      */
@@ -83,6 +80,13 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         $this->registerCallback(self::CALLBACK_POSTDELETE, [ $this->mgr, 'delete' ]);
     }
 
+    /**
+     * Call back hook to clear postsave queue
+     * @deprecated
+     */
+    public function dePostSave() {
+        unset($this->callback_queue[self::CALLBACK_POSTSAVE]);
+    }
 
     /**
      * @param Model $storage
@@ -91,7 +95,7 @@ class Mapper extends Schoolbox\Mapper implements Receiver
      */
     protected function postSave(Model $storage, Model $previous = null)
     {
-        if ($previous && $this->checkPrevious) {
+        if ($previous) {
             // not the first time we've seen this file? no copying to take place
             return true;
         }
