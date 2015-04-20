@@ -1,13 +1,14 @@
-/**
- * Manufactures a IB Yearly Breakdown barchart
- *
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2011, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
- */
 (function() {
-    $.fn.ibYearlyBreakdown = function(options) {
+
+    /**
+     * Manufactures a IB Yearly Breakdown barchart
+     *
+     * @author      Steve Chan <steve.chan@alaress.com.au>
+     * @copyright   Copyright 2011, Alaress Pty Ltd
+     * @link        http://www.alaress.com.au/
+     * @version     SVN: $Id$
+     */
+    $.fn.ib_yearlyBreakdown = function(options) {
         options = options || {};
 
         var config = init(options, this);

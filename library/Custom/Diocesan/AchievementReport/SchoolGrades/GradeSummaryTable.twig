@@ -1,6 +1,6 @@
 <script type="text/javascript">
     $(function() {
-        $('[data-graph="resultSummary"]').nameGraph({
+        $('[data-graph="resultSummary"]').schoolGrades_nameGraph({
             title: 'Result Summary',
             categories: [{% for year, values in gradeSummary.data %}'Year {{ year }}'{% if not loop.last %}, {% endif %}{% endfor %}],
             series: [
