@@ -31,7 +31,7 @@ if (isset($type) && isset($id) ) {
 		$thumbnailFactory = new \Schoolbox\Video\Factory\Thumbnail($type, $id);
 		$video = $thumbnailFactory->produce();
     }
-    catch (Schoolbox\Mapper\Exception $e) {
+    catch (Schoolbox\Mapper\Exception $e){
         /* Video not found */
         SitePage::redirectToBrokenImageOfSize(64, 64, 500);
     }

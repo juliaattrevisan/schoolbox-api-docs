@@ -21,6 +21,7 @@ class ResourceVideo
     protected $status;
     protected $duration;
     protected $file;
+    protected $storage;
     protected $fileID;
     protected $config;
 
@@ -144,6 +145,24 @@ class ResourceVideo
     {
         return $this->file;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getStorage()
+    {
+        return $this->storage;
+    }
+
+    /**
+     * @param mixed $storage
+     */
+    public function setStorage($storage)
+    {
+        $this->storage = $storage;
+    }
+
+
 
     /**
     * @param  mixed $id

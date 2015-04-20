@@ -62,7 +62,9 @@ if (isset($type) && isset($id)) {
             break;
     }
 
-    $fileHandler->logAction($id, 'access');
+    if($type = \Schoolbox\Video\QueueMapper::FILE_TYPE_SBFS) {
+        $fileHandler->logAction($id, 'access');
+    }
 
     if (is_readable($filename)) {
         $filesize = @filesize($filename);

@@ -59,7 +59,6 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
             } else {
                 // target attachment is from SBFS, but a different file: override storage
                 $file->setStorage($result->getStorage());
-                $file->setFilename($result->getFilename());
             }
         }
 
@@ -87,7 +86,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
 
     // set attributes
     if (is_null($file->getFilename()) || preg_match('`^[0-9a-f]{40}`', $file->getFilename())) {
-        $file->setFilename($_FILES['file']['name']);
+        $file->setFilename($file->getHash() . '.' . $file->getStorage()->getExtension());
     }
 
     $file->setOwner($_SESSION['user']);

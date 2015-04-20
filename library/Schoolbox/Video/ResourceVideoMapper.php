@@ -112,10 +112,10 @@ class ResourceVideoMapper extends Mapper
             SELECT {$this->getJoinMapper('file')->getColumnString('f')}, {$this->getColumnString('vq')}, {$fileMapper->getJoinMapper('owner')->getColumnString('u')}
             FROM `{$this->getTable()}` vq
             JOIN {$this->getJoinSQL('file', 'vq', 'f')}
+            LEFT JOIN {$fileMapper->getJoinSQL('owner', 'f', 'u')}
             JOIN storage s ON s.hash = f.hash
             JOIN allowedFileExtension e ON s.ext = e.extension
             JOIN allowedFileTypes ft ON ft.fileTypeID = e.fileTypeID
-            LEFT JOIN {$fileMapper->getJoinSQL('owner', 'f', 'u')}
             WHERE category = :cat AND vq.status != 'failed' AND f.deleted='0' AND ft.mime like :mime
         ";
 
@@ -364,12 +364,15 @@ class ResourceVideoMapper extends Mapper
     {
 
         $storageMapper = $this->getJoinMapper('storage');
+        $fileMapper = $this->getJoinMapper('file');
+
         $statement     = $this->database->prepare(
             "
-            SELECT {$storageMapper->getColumnString('s')}, {$this->getColumnString('vq')}
+            SELECT {$storageMapper->getColumnString('s')}, {$this->getColumnString('vq')},  {$fileMapper->getColumnString('f')}
             FROM `{$this->getTable()}` vq
-            INNER JOIN {$this->getJoinSQL('storage', 'vq', 's')}
-            WHERE s.hash = ? AND vq.status = 'completed' AND vq.type='storage'
+            JOIN {$this->getJoinSQL('storage', 'vq', 's')}
+            JOIN {$this->getJoinSQL('file', 'vq', 'f')}
+            WHERE s.hash = ? AND vq.status = 'completed'
         "
         );
 
@@ -378,7 +381,8 @@ class ResourceVideoMapper extends Mapper
         $video = null;
         if (($row = $statement->fetch())) {
             $video = $this->hydrate($row, 'vq');
-            $video->setFile($storageMapper->hydrate($row, 's'));
+            $video->setStorage($storageMapper->hydrate($row, 's'));
+            $video->setFile($fileMapper->hydrate($row, 'f'));
         }
 
         if (!($video instanceof ResourceVideo)) {

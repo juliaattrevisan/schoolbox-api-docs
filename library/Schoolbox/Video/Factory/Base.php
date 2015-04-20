@@ -65,7 +65,7 @@ abstract class Base {
 				return $videoMapper->findByStorageHash($this->getId());
 
 			case QueueMapper::FILE_TYPE_SBFS:
-                return $videoMapper->findByStorageHash($this->getId());
+                $video = $videoMapper->findByStorageHash($this->getId());
 				$this->permissionCheck($video);
 				return $video;
 
