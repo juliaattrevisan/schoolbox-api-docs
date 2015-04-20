@@ -23,9 +23,9 @@
 
                     /* Ignore empty answers that weren't removed
                      */
-                    if (($.trim(answerLeft) != '') && ($.trim(answerRight) != '')) {
+                    if ($.trim(answerRight) != '') {
                         answerCollection.push({
-                            answerRight: $.trim(answerRight)
+                            answerRight: answerRight
                         });
                     }
                 });
