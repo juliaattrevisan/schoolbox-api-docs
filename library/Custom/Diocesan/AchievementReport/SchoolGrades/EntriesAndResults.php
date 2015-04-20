@@ -10,9 +10,7 @@
 
 namespace Custom\Diocesan\AchievementReport\SchoolGrades;
 
-use Alaress_Probe as Probe;
-
-class EntriesAndResultsTable extends Base {
+class EntriesAndResults extends Base {
 
     /**
      * Hook method

@@ -20,9 +20,9 @@ class Controller extends Base {
      * School Grades page
      */
     public function schoolGrades($db, $user, $externalUser, $year) {
-        $gradeSummaryTable = new SchoolGrades\GradeSummaryTable($externalUser, $db);
-        $yearlyBreakdownTable = new SchoolGrades\YearlyBreakdownTable($externalUser, $db);
-        $entriesAndResultsTable = new SchoolGrades\EntriesAndResultsTable($externalUser, $db);
+        $gradeSummaryTable = new SchoolGrades\GradeSummary($externalUser, $db);
+        $yearlyBreakdownTable = new SchoolGrades\YearlyBreakdown($externalUser, $db);
+        $entriesAndResultsTable = new SchoolGrades\EntriesAndResults($externalUser, $db);
 
         $this->getResponse()->content->set(array(
             'template' => '@schoolgrades/index.twig',

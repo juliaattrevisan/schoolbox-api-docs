@@ -10,8 +10,7 @@
 
 namespace Custom\Diocesan\AchievementReport\SchoolGrades;
 
-
-class YearlyBreakdownTable extends Base {
+class YearlyBreakdown extends Base {
 
     /**
      * Hook method

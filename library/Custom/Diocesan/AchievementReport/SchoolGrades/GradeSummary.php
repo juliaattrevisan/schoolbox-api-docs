@@ -10,10 +10,7 @@
 
 namespace Custom\Diocesan\AchievementReport\SchoolGrades;
 
-use Alaress_Probe as Probe;
-use Schoolbox\Collection;
-
-class GradeSummaryTable extends Base {
+class GradeSummary extends Base {
 
     /**
      * Heading for this table
