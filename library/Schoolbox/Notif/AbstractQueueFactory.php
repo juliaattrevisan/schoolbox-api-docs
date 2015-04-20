@@ -16,7 +16,7 @@ use InvalidArgumentException;
 use Predis\ClientInterface;
 use UnexpectedValueException;
 
-abstract class AbstractQueueFactory {
+abstract class AbstractQueueFactory implements IQueueFactory {
 
     /** @var AMQPInterface */
     private $amqp  = null;

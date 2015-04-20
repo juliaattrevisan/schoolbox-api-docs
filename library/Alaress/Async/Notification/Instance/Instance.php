@@ -12,7 +12,6 @@ namespace Alaress\Async\Notification\Instance;
 
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
-use Alaress\Json;
 use Html2Text\Html2Text;
 use InvalidArgumentException;
 use JsonSerializable;
