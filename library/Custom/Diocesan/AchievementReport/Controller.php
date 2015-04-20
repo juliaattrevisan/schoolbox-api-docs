@@ -75,12 +75,19 @@ class Controller extends Base {
     }
 
     public function ncea($db, $user, $externalUser, $year) {
+        $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($externalUser, $db);
+
         $this->getResponse()->content->set(array(
             'template' => '@ncea/index.twig',
             'data' => array(
                 'preselectedYear' => $year,
                 'externalUser' => $externalUser,
                 'user' => $user,
+
+                'literacyNumeracyCheckbox' => array(
+                    'heading' => $literacyNumeracyCheckbox->getHeading(),
+                    'data' => $literacyNumeracyCheckbox->findData()
+                )
             )
         ));
     }

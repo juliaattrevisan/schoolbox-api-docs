@@ -10,8 +10,6 @@
 
 namespace Custom\Diocesan\AchievementReport\IB;
 
-use Alaress_Probe as Probe;
-
 class YearlyBreakdown extends Base {
 
     /**
@@ -81,17 +79,5 @@ class YearlyBreakdown extends Base {
         ";
 
         return $this->getDb()->getAll($query);
-    }
-
-    /**
-     * Explorer, reporting!
-     */
-    private function explorerReporting() {
-        $explorer = $this->getDb()->getAll("
-            SELECT TOP 50 *
-            FROM SynergyOne.dbo.uvSchoolBoxIBResults
-        ");
-
-        return $explorer;
     }
 }
