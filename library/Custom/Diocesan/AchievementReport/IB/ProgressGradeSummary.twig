@@ -1,37 +1,13 @@
 <script type="text/javascript">
     $(function() {
-        $('#element').highcharts({
-            chart: {
-                type: 'bar'
-            },
-            title: {
-                text: ''
-            },
-            xAxis: {
-                categories: [
-                    {% for year, allTerms in progressGradeSummary.data.tableStack %}
-                    {% for currentTerm, values in allTerms %}
-                    'Year {{ year }}, Term {{ currentTerm }}'{% if not loop.last %}, {% endif %}
-                    {% endfor %}
-                    {% endfor %}
-                ]
-            },
-            yAxis: {
-                min: 0,
-                max: 100,
-                reversedStacks: false,
-                title: {
-                    text: 'Percentage'
-                }
-            },
-            legend: {
-                reversed: false
-            },
-            plotOptions: {
-                series: {
-                    stacking: 'normal'
-                }
-            },
+        $('#element').ib_progressGradeSummary({
+            categories: [
+                {% for year, allTerms in progressGradeSummary.data.tableStack %}
+                {% for currentTerm, values in allTerms %}
+                'Year {{ year }}, Term {{ currentTerm }}'{% if not loop.last %}, {% endif %}
+                {% endfor %}
+                {% endfor %}
+            ],
             series: [
                 {% for progressGrade, allYearValues in progressGradeSummary.data.graphStack %}
                 {
@@ -45,28 +21,7 @@
                 }{% if not loop.last %},
                 {% endif %}
                 {% endfor %}
-
-            ],
-            tooltip: {
-
-                /**
-                 * Sigh, find all the values in the series which match the
-                 * outlier value and concat it all into one giant tooltip
-                 *
-                 * so goofy
-                 *
-                 * @returns {string}
-                 */
-                formatter: function() {
-                    var template = '<strong>{NAME}</strong> ({VALUE}%)';
-
-                    var tooltipContent = template;
-                    tooltipContent = tooltipContent.replace(/{NAME}/, this.series.name);
-                    tooltipContent = tooltipContent.replace(/{VALUE}/, this.y.toFixed(1));
-
-                    return tooltipContent;
-                }
-            }
+            ]
         });
     });
 </script>
