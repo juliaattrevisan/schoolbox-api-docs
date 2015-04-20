@@ -5183,7 +5183,6 @@ ul.section-options a.drop-arrow {
 
 .evaluation-content .evaluation-answer {
     background: @white;
-    padding: 7px 16px;
 }
 
 .evaluation-content .evaluation-answer label {
@@ -5318,7 +5317,7 @@ ul.section-options a.drop-arrow {
 
 .evaluation-content .answer-given-container,
 .evaluation-content .correct-answer-container {
-    border: 1px solid darken(@dark,@darken-value / 4);
+   // border: 1px solid darken(@dark,@darken-value / 4);
     padding: 10px;
     margin: 5px 0;
 }
@@ -5351,17 +5350,27 @@ ul.section-options a.drop-arrow {
 
 /*match*/
 
-.matchPairs li {
+.matchPairs {
+  float: left;
+  li {
     font-size: 12px;
     margin-bottom: 10px;
     background: @lgrey;
     border: 1px solid @lgrey;
     padding: 5px;
 	position: relative;
+  }
 }
 
-.matchPairs {
-    float: left;
+.matchRank {
+  margin-left: 16px;
+  li {
+    min-width: 0;
+    position: relative;
+    border: 1px solid @lgrey;
+    margin-bottom: 10px;
+    padding: 10px;
+  }
 }
 
 .match-left {

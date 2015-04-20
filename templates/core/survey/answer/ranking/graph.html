@@ -1,0 +1,35 @@
+<script type='text/javascript'>
+$(function() {
+	$.plot($("#{GRAPH_ID}"), [
+        <!-- BEGIN series -->
+        {label: "{SERIES_NAME}", data: [{SERIES_DATA}]}<!-- BEGIN series_separator -->,<!-- END series_separator -->
+        <!-- END series -->
+    ], {
+        series: {
+            stack: true,
+            bars: {
+                show: true,
+                barWidth: 0.5,
+                lineWidth: 0,
+                align: 'center'
+            }
+        },
+
+        legend: {
+            container: $('#legend_{GRAPH_ID}')
+        },
+
+        xaxis: {
+            ticks: [{TICKS}]
+        },
+        yaxis: {
+            tickDecimals: 0
+        }
+    });
+});
+</script>
+<div class="evaluation-graph-holder clearfix">
+	<div id='{GRAPH_ID}' class="graph"></div>
+	<div id='legend_{GRAPH_ID}' class="legend"></div>
+</div>
+

@@ -268,4 +268,15 @@ abstract class Evaluation_Response extends DeprecatedModel
 
         return $this->db->getRow($query);
     }
+
+    /**
+     * Fetches responses to a question, used by ranking question type for graphing
+     *
+     * @param $question_id
+     * @return array
+     */
+    public function getResponsesToQuestion($question_id) {
+        $query = "SELECT * FROM assess_response WHERE question_id = " . $this->db->smartQuote($question_id)." AND deleted_at IS NULL";
+        return $this->db->getAll($query);
+    }
 }

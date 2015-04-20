@@ -1,0 +1,27 @@
+<script type='text/javascript'>
+	$(function() {
+		$('#questionForm-{QUESTION_ID}').{QUESTION_PLUGIN}({
+			id: {QUESTION_ID}
+		});
+	});
+</script>
+
+<span data-mandatory="{CONFIGURATION_MANDATORY}"></span>
+<p class="information-notification">Re-order the items  by dragging them.</p>
+
+<ul class="evaluation-matchingpairs-left match-it option">
+    <!-- BEGIN answerOptionLeft -->
+    <li class="left-answer clearfix">
+        <strong>{ANSWER_LEFT_VALUE}</strong>
+    </li>
+    <!-- END answerOptionLeft -->
+</ul>
+
+<ul class="evaluation-matchingpairs-right match-it option">
+	<!-- BEGIN answerOptionRight -->
+	<li class="right-answer clearfix">
+        <input name="answerRight[]" class="answerRight" type="hidden" readonly="readonly" value="{ANSWER_RIGHT_VALUE}" />
+        <strong>{ANSWER_RIGHT_VALUE}</strong>
+	</li>
+	<!-- END answerOptionRight -->
+</ul>
