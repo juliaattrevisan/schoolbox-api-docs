@@ -13,6 +13,8 @@ use React\EventLoop\LoopInterface;
 use Schoolbox\Collection;
 use Schoolbox\Realtime\Message\Reroute;
 use Schoolbox\Realtime\Message\RerouteMapper;
+use Schoolbox\Realtime\Message\RerouteOverride;
+use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 
@@ -76,7 +78,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
             'role'   => $perm->getRole()->getId()
         ]);
 
-        $log->info(sprintf("[src:%02d, r:%02d]  %14s (%s)",
+        $log->info(sprintf("[src:%03d, r:%03d]  %14s (%s)",
             $perm->getMsgSource()->getId(),
             $perm->getRole()->getId(),
             implode(' ', $mrg), implode(' ', $def))
@@ -109,10 +111,43 @@ $kernel->run(function ($di, $loop, $log, $opts) {
             'user'     => $reroute->getUser()->getId()
         ]);
 
-        $log->info(sprintf("[src:%02d, u:%02d]  %14s",
+        $log->info(sprintf("[src:%03d, u:%03d]  %14s",
             $reroute->getSource()->getId(),
             $reroute->getUser()->getId(),
             implode(' ', $delivery))
+        );
+
+    }
+
+
+    /** @var Collection|RerouteOverride[] $overrides */
+    $overrides = RerouteOverrideMapper::getInstance()->findAll();
+
+    $stmt = Database::getInstance()->prepare("
+        UPDATE msg_reroute_override
+        SET delivery = :delivery
+        WHERE user_id = :user
+        AND msg_route_key = :route
+    ");
+
+    foreach ($overrides as $override) {
+        $outgoing = $override->getOutgoingLevel();
+        $delivery = isset($map[$outgoing]) ? $map[$outgoing] : $map[0];
+
+        if (is_null($delivery)) {
+            continue;
+        }
+
+        $stmt->execute([
+            'delivery' => implode(',', $delivery),
+            'user'     => $override->getUser()->getId(),
+            'route'    => $override->getRouteKey()
+        ]);
+
+        $log->info(sprintf("[key:%-32s, u:%03d]  %14s",
+                $override->getRouteKey(),
+                $override->getUser()->getId(),
+                implode(' ', $delivery))
         );
 
     }

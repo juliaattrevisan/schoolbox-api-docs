@@ -11,3 +11,9 @@ ALTER TABLE `msg_route_perm`
 ALTER TABLE `msg_reroute`
   CHANGE `outgoing_level` `outgoing_level` INT(10) UNSIGNED NULL,
   ADD COLUMN `delivery` SET('MU','DI','IN','MO','EM') NULL AFTER `outgoing_level`;
+
+
+/* Make integer fields nullable, and add SET */
+ALTER TABLE `msg_reroute_override`
+  CHANGE `outgoing_level` `outgoing_level` INT(10) UNSIGNED NULL,
+  ADD COLUMN `delivery` SET('MU','DI','IN','MO','EM') NULL AFTER `outgoing_level`;
