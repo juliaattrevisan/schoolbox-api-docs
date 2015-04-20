@@ -11,7 +11,7 @@ class Synchronise_Synergetic_Genazzano_Hydrator_Student_Email implements Synchro
      * Hydrates the Email field, rather than the stand occup email field
      */
     public function hydrate($externalUser, $newUser) {
-        $newUser['alt_email'] = trim($externalUser['OccupEmail']);
+        $newUser['alt_email'] = trim($externalUser['StudentOccupEmail']);
         return $newUser;
     }
 }
