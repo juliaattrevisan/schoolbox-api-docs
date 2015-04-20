@@ -8,7 +8,7 @@
 <meta http-equiv="Content-Language" content="en-au" />
 <meta name="author" content="Alaress Pty Ltd"/>
 <meta name="application-name" content="Schoolbox" />
-<meta name="msapplication-TileColor" content="#0066b0" />
+<meta name="msapplication-TileColor" content="#7e0039" />
 <meta name="msapplication-square70x70logo" content="/images/{SITE_LOCATION}/smalltile.png" />
 <meta name="msapplication-square150x150logo" content="/images/{SITE_LOCATION}/mediumtile.png" />
 <meta name="msapplication-wide310x150logo" content="/images/{SITE_LOCATION}/widetile.png" />
@@ -17,6 +17,7 @@
 <link rel="apple-touch-icon" sizes="76x76" href="/images/{SITE_LOCATION}/apple-touch-icon-ipad.png">
 <link rel="apple-touch-icon" sizes="120x120" href="/images/{SITE_LOCATION}/apple-touch-icon-iphone-retina.png">
 <link rel="apple-touch-icon" sizes="152x152" href="/images/{SITE_LOCATION}/apple-touch-icon-ipad-retina.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/{SITE_LOCATION}/apple-touch-icon-180x180.png">
 <link rel="Shortcut Icon" href="/images/{SITE_LOCATION}/favicon.ico" type="image/x-icon" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/chrome.css" />
 <script type="text/javascript">
@@ -35,7 +36,7 @@ function init(){
 <body class="login">
 <div id="container" class=" login">
 	<div id="content" class="clearfix">
-        <a href="/" class="logo"><img src="/images/{SITE_LOCATION}/login-logo.png" alt="{SITE_NAME}" /></a>
+        <a href="/" class="logo"><img src="/images/{SITE_LOCATION}/login-logo.png" width="258" height="80" alt="Rory - The Hutchins Portal" /></a>
 		<p class="error">{ERROR}</p>
 		<form id="loginForm" method="post" class="clearfix" action="/loginForm.php?{GET_PARAMS}">
 			<fieldset>
@@ -52,7 +53,7 @@ function init(){
             <label><input type="checkbox" name="rememberme" value="1" />Remember me</label>
             <!-- END remember_me -->
         </form>
-		<p class="forgotten"><a href="/forgotten-password.php">Parents, forgotten your password?</a></p>
+		
 	</div>
 </div>
 <div id="footer" class="login">
@@ -66,9 +67,6 @@ function init(){
         <li><a href="http://alaress.com.au" title="Web Development Melbourne">Web Development</a> by <a href="http://alaress.com.au">Alaress</a></li>
 		<li class="last"><a href="/feedback.php" title="Web Designers">Feedback and Support</a></li>
 	</ul>
-</div>
-<div id="login-bg">
-    <img src="/images/{SITE_LOCATION}/login-bg.jpg" alt="RORY">
 </div>
 </body>
 </html>
