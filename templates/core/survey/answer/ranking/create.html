@@ -41,7 +41,8 @@
                     type_id: theForm.find('select[name=type_id]').val(),
                     question: tinyMCE.get('question').getContent(),
                     marks: theForm.find('input[name=marks]').val(),
-                    allAnswers: JSON.stringify(answerCollection)
+                    allAnswers: JSON.stringify(answerCollection),
+                    configuration: JSON.stringify($('#configuration').find('input, textarea, select').serializeArray())
                 }
 
                 /* Submit via POST and redirect to question creation screen upon done
