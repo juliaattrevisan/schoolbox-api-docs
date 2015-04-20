@@ -177,6 +177,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
          * because we have two columns to parse per iteration.
          */
         $page->setBlock('answerFormFragment', 'answerOptionRight', 'answerOptionRight_block');
+        $page->setBlock('answerFormFragment', 'answerOptionLeft', 'answerOptionLeft_block');
 
         $left  = array();
         $right = array();
@@ -209,11 +210,13 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
             for ($i = 0; $i < $answerCount; $i++) {
                 $page->setVar(
                     array(
+                        'ANSWER_LEFT_VALUE'  => ($i+1).')',
                         'ANSWER_RIGHT_VALUE' => Scrub::text($right[$i]),
                     )
                 );
 
                 $page->parse('answerOptionRight_block', 'answerOptionRight', true);
+                $page->parse('answerOptionLeft_block', 'answerOptionLeft', true);
             }
         }
 
@@ -239,6 +242,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
     public function cleanupParse($page)
     {
         $page->setVar('answerOptionRight_block', '');
+        $page->setVar('answerOptionLeft_block', '');
     }
 
     /**
