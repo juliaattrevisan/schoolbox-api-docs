@@ -21,8 +21,8 @@
 // =============================================================================
 // Dimensions
 @search-width: 					192px;
-@logo-width: 					90px;
-@logo-height: 					121px;
+@logo-width: 					89px;
+@logo-height: 					120px;
 @infopanel-bellsprite:			'/images/hutchins/bell.png';
 
 // Generic colors
@@ -102,6 +102,12 @@ h2{ font-size: 20px; border-bottom: 1px solid #cccccc; }
 #wrap-inner{ padding: 0; }
 #footer{ background: @content-background; }
 
+input:focus,
+select:focus,
+textarea:focus{
+    box-shadow: none;
+}
+
 #header{
     #search-field{
         background: @white;
@@ -164,17 +170,19 @@ h2{ font-size: 20px; border-bottom: 1px solid #cccccc; }
 }
 
 body.login{
+    background: @white url('/images/hutchins/login-bg.jpg') repeat scroll 50% 50%; 
+    background-size: cover;
+
     #container {
         background: @content-background;
         .logo img {
             margin: 0;
         }
         #loginForm{
-
+            margin: 0;
             input[type=text],
             input[type=password]{
                 background: #e9e8e6;
-                font-weight: bold;
                 font-size: 14px;
                 padding: 6px 13px;
                 .placeholder(@black);
