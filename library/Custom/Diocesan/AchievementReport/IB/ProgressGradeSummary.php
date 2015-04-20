@@ -44,7 +44,7 @@ class ProgressGradeSummary extends Base {
         /**
          * Rearrange everything into a nice order
          */
-        $finalStack = array();
+        $tableStack = array();
 
         /* Only accumulate non-empty progressgrade values
          */
@@ -56,8 +56,8 @@ class ProgressGradeSummary extends Base {
 
                 /* Initialise
                  */
-                if (!is_array($finalStack[$year])) {
-                    $finalStack[$year] = array(
+                if (!is_array($tableStack[$year])) {
+                    $tableStack[$year] = array(
                         '4' => array(
                             'enteredGrades' => 0,
                             'progressGrades' => array_fill_keys(array('1', '2', '3', '4', '5', '6', '7'), 0)
@@ -71,11 +71,33 @@ class ProgressGradeSummary extends Base {
 
                 /* Accumulate
                  */
-                $finalStack[$year][$term]['enteredGrades']++;
-                $finalStack[$year][$term]['progressGrades'][$progressGrade]++;
+                $tableStack[$year][$term]['enteredGrades']++;
+                $tableStack[$year][$term]['progressGrades'][$progressGrade]++;
             }
         }
-        
+
+        /* Rearrange for charting
+         */
+        $graphStack = array();
+
+        foreach ($tableStack as $year => $allTerms) {
+            foreach ($allTerms as $currentTerm => $values) {
+                foreach ($values['progressGrades'] as $progressGrade => $num) {
+                    $denominator = array_sum($values['progressGrades']);
+
+                    if ($denominator) {
+                        $graphStack[$progressGrade][$year][$currentTerm] = 100*($num/$denominator);
+                    }
+                    else {
+                        $graphStack[$progressGrade][$year][$currentTerm] = 0;
+                    }
+                }
+            }
+        }
+
+        $finalStack['tableStack'] = $tableStack;
+        $finalStack['graphStack'] = $graphStack;
+
         return $finalStack;
     }
 
