@@ -73,4 +73,15 @@ class Controller extends Base {
             )
         ));
     }
+
+    public function ncea($db, $user, $externalUser, $year) {
+        $this->getResponse()->content->set(array(
+            'template' => '@ncea/index.twig',
+            'data' => array(
+                'preselectedYear' => $year,
+                'externalUser' => $externalUser,
+                'user' => $user,
+            )
+        ));
+    }
 } 

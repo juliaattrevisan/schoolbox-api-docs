@@ -35,6 +35,11 @@ class Module extends BaseModule {
             ->addTokens(array(
                 'year' => '\d{4}'
             ));
+
+        $router->addGet('achievementreport.ncea', $basePath . '/ncea/{externalUserId}{/year}')
+            ->addTokens(array(
+                'year' => '\d{4}'
+            ));
     }
 
     /**
@@ -46,7 +51,6 @@ class Module extends BaseModule {
          */
         $self = $this;
 
-        // Add the booking item to params, if ID is in the route.
         $matcher->add(
             '/^achievementreport\.schoolGrades/',
             function($params) use ($self) {
@@ -54,9 +58,15 @@ class Module extends BaseModule {
             }
         );
 
-        // Add the booking item to params, if ID is in the route.
         $matcher->add(
             '/^achievementreport\.ib/',
+            function($params) use ($self) {
+                return $self->getEverything($params);
+            }
+        );
+
+        $matcher->add(
+            '/^achievementreport\.ncea/',
             function($params) use ($self) {
                 return $self->getEverything($params);
             }
@@ -115,6 +125,7 @@ class Module extends BaseModule {
         $loader = new Twig_Loader_Filesystem(array());
         $loader->addPath(__DIR__.'/SchoolGrades', 'schoolgrades');
         $loader->addPath(__DIR__.'/IB', 'ib');
+        $loader->addPath(__DIR__.'/NCEA', 'ncea');
         $templateLoader->addLoader($loader);
     }
 
