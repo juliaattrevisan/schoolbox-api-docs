@@ -88,7 +88,7 @@
             },
 
             errorPlacement: function(error, element) {
-                error.insertAfter(element.parent().children(':last-child'))
+                error.insertAfter(element.closest('ul'))
             }
         });
 
@@ -111,7 +111,7 @@
 
             return fieldsAreFilled;
 
-        }, 'You\'ve missed a an item on the right');
+        }, 'Please complete all answer fields');
 
         jQuery.validator.addMethod("greaterThanZero", function(value, element) {
             return this.optional(element) || (parseFloat(value) > 0);
@@ -141,28 +141,26 @@
         }
     });
 </script>
-<fieldset>
-    <label>Answer</label>
-    <div class="answer-collection">
-        <ul id="answerCollection">
-            <!-- BEGIN answerOption -->
-            <li class="answerTemplate inputs clearfix">
-                <label class="drag-me right-option"><input name="answerRight[]" class="answerRight text-box" type="text" value="{ANSWER_RIGHT_VALUE}" /></label>
-                <div class="delete"></div>
-            </li>
-            <!-- END answerOption -->
-        </ul>
+<label>Answer</label>
+<div class="answer-collection">
+    <ul id="answerCollection">
+        <!-- BEGIN answerOption -->
+        <li class="answerTemplate inputs clearfix">
+            <label class="drag-me right-option"><input name="answerRight[]" class="answerRight text-box" type="text" value="{ANSWER_RIGHT_VALUE}" /></label>
+            <div class="delete"></div>
+        </li>
+        <!-- END answerOption -->
+    </ul>
 
-        <label for="answerRight[]" generated="true" class="error" id="rightError" >You've missed a an item on the right</label>
-    </div>
     <p class="clearfix"><a href="#" class="add-answer btn add float-left" id="makeNewAnswer"><span></span>Add answer option</a></p>
 
-    <div class="hide hidden-clone">
-        <ul>
-            <li class="answerTemplate inputs clearfix">
-                <label class="drag-me right-option"><input name="answerRight[]" class="answerRight text-box" type="text" value="" /></label>
-                <div class="delete"></div>
-            </li>
-        </ul>
-    </div>
-</fieldset>
+</div>
+
+<div class="hide hidden-clone">
+    <ul>
+        <li class="answerTemplate inputs clearfix">
+            <label class="drag-me right-option"><input name="answerRight[]" class="answerRight text-box" type="text" value="" /></label>
+            <div class="delete"></div>
+        </li>
+    </ul>
+</div>
