@@ -11,6 +11,7 @@
 namespace Custom\Diocesan\AchievementReport\SchoolGrades;
 
 use Custom\Diocesan\AchievementReport\Base;
+use Alaress_Probe as Probe;
 
 class GradeSummaryTable extends Base {
 
@@ -22,6 +23,22 @@ class GradeSummaryTable extends Base {
     protected function setup()
     {
         // TODO: Implement setup() method.
+    }
+
+    /**
+     * Obtain data
+     */
+    private function findData() {
+        $query = "
+            SELECT *
+            FROM uvSchoolBoxSchoolGradesResults
+            GROUP BY StudentYearLevel, StrippedResult
+            ORDER BY StudentYearLevel DESC
+        ";
+
+        $stuff = $this->getDb()->getAll($query);
+
+        new Probe($stuff);
     }
 
     /**
