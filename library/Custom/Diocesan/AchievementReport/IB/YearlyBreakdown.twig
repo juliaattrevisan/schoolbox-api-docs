@@ -63,7 +63,12 @@
                     data: tempData
                 }]
             });
+
             {% endfor %}
+
+            /* http://stackoverflow.com/questions/16216722/highcharts-hidden-charts-dont-get-re-size-properly
+             */
+            $(window).resize();
         });
     </script>
     <h2>{{ yearlyBreakdown.heading }} {{ year }}</h2>
