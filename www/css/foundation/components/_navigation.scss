@@ -96,7 +96,7 @@ $topbar-height: rem-calc(($base-font-size + 17));
 // $topbar-margin-bottom: 0;
 
 // Controlling the styles for the title in the top bar
-$topbar-title-weight: 700;
+$topbar-title-weight: $font-weight-normal;
 $topbar-title-font-size: $base-font-size - 2;
 
 // Style the top bar dropdown elements

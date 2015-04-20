@@ -1,5 +1,5 @@
 <div class="scroll-container" role="main">
-    <h1>Files Component - List Layout</h1>
+    <h1>Files Component - information-list</h1>
     <div class="row full-width">
         <nav class="top-bar" data-topbar>
             <ul class="title-area">
@@ -89,6 +89,9 @@
                 </div>
             </section>
         </nav>
+        <div class="delete-it">
+            <p>Are you sure you want to remove this component? <a href="#" class="success button">Yes</a> <a href="#" class="button">No</a></p>
+        </div>
         <div class="island">
             <ul class="action-list">
                 <li>
@@ -128,8 +131,78 @@
         </div>
     </div>
     <hr>
+
+    <h1>Due Work History - activity-list</h1>
+    <div class="row full-width">
+        <nav class="top-bar" data-topbar>
+            <ul class="title-area">
+                <!-- Title Area -->
+                <li class="name">
+                    <h1><a href="#">Due Work History</a></h1>
+                </li>
+            </ul>
+            <section class="top-bar-section">
+                <!-- Right Nav Section -->
+                <ul class="right">
+                    <li class="divider"></li>
+                    <li><a href="#" class="button no-text icon-close" data-target="delete-it" title="Close"></a></li>
+                    <!-- Settings Modal -->
+                </ul>
+            </section>
+        </nav>
+        <div class="island">
+            <ul class="activity-list">
+                <li>
+                    <div class="row collapse full-width">
+                        <div class="icon columns">
+                            <span class="no-text icon-news"></span>
+                        </div>
+                        <div class="thumbnail columns">
+                            <a href="#">
+                                <img src="https://placekitten.com/g/50/50" alt="Moggy">
+                            </a>
+                        </div>
+                        <div class="content columns">
+                            <p class="meta"><a href="#">Ms Celia Glenn</a> posted <a href="#">Shakespeare Assignment 1</a></p>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="row collapse full-width">
+                        <div class="thumbnail columns">
+                            <a href="#">
+                                <img src="https://placekitten.com/g/50/50" alt="Moggy">
+                            </a>
+                        </div>
+                        <div class="content columns">
+                            <p class="meta"><a href="#">Ms Celia Glenn</a> posted <a href="#">Shakespeare Assignment 1</a></p>
+                        </div>
+                        <div class="icon columns">
+                            <span class="no-text icon-download"></span>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="row collapse full-width">
+                        <div class="icon columns">
+                            <span class="no-text icon-showcase"></span>
+                        </div>
+                        <div class="thumbnail columns">
+                            <a href="#">
+                                <img src="https://placekitten.com/g/50/50" alt="Moggy">
+                            </a>
+                        </div>
+                        <div class="content columns">
+                            <p class="meta"><a href="#">Ms Celia Glenn</a> posted <a href="#">Shakespeare Assignment 1</a></p>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <hr>
     
-    <h1>Course Outline - List Layout</h1>
+    <h1>Course Outline - action-list</h1>
     <div class="row full-width">
         <nav class="top-bar" data-topbar>
             <ul class="title-area">
@@ -1264,6 +1337,10 @@
         Dropzone.options.myAwesomeDropzone = {
             addRemoveLinks: true,
         };
+
+        $('[data-target="delete-it"]').on('click', function(){
+            $('.delete-it').addClass('show');
+        });
 
         $('a[data-interaction="toggle-expanded"]').on('click', function(){
             $(this).toggleClass('icon-add icon-collapse');
