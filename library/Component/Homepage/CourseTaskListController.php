@@ -133,6 +133,7 @@ class Component_Homepage_CourseTaskListController extends Component_Homepage_Con
                     'TASK_TYPE'        => '',
                     'TASK_TYPE_LABEL'  => Scrub::text($task->getLabel()),
                     'TASK_CLASS'       => Scrub::text($task->getIconClass()),
+                    'TASK_PREVIEW'     => $task->getType() == Task::TYPE_TASK ? 'data-plugin="preview"' : '',
                     'TASK_LINK'        => Scrub::text($task->getLink()),
                     'TASK_SELF_ASSESS' => ($task->getRequiresConfirmation() ? '' : 'checked'),
                     'DARK'             => ($i++ % 2 === 1 ? 'dark' : ''),

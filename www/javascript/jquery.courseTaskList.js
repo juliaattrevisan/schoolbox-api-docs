@@ -85,10 +85,6 @@
                 $.post(form.attr('action'), params, reloadTaskList, 'json');
             })
 
-            /* Apply Preview to all anchor links in the task-list for
-             * this component
-             */
-            component.find('.task-list h4 a').preview();
         };
         initTaskList();
 
