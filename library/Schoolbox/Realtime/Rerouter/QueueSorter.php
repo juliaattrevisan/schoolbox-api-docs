@@ -19,8 +19,8 @@ use Monolog\Logger;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use React\Stomp\Protocol\Frame;
-use Schoolbox\Notif\Notif;
-use Schoolbox\Notif\Queue\QueueFactory;
+use Schoolbox\Notif\IQueueFactory;
+use Schoolbox\Notif\NotifInterface;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Rerouter\Filter\FilterException;
 use Schoolbox\Realtime\Rerouter\Filter\FilterInterface;
@@ -39,26 +39,33 @@ class QueueSorter implements FilterInterface {
 	/** @var RoutePermissionMapper */
 	protected $permMapper;
 
-	/** @var Notif */
+	/** @var NotifInterface */
 	protected $notif;
 
-    /** @var QueueFactory */
+    /** @var IQueueFactory */
     protected $qFactory;
 
+    /** @var array */
+    protected $map = [
+        'DI' => Logger::INFO,
+        'IN' => Logger::NOTICE,
+        'MO' => Logger::WARNING,
+        'EM' => Logger::ERROR
+    ];
 
     /**
      * @param FilterInterface[]     $filters
      * @param LoggerInterface       $log
-     * @param Notif                 $notif
-     * @param QueueFactory          $qFactory
+     * @param NotifInterface        $notif
+     * @param IQueueFactory         $qFactory
      * @param RoutePermissionMapper $permMapper
      * @throws \InvalidArgumentException
      */
     public function __construct(
         array $filters,
         LoggerInterface $log,
-        Notif $notif,
-        QueueFactory $qFactory,
+        NotifInterface $notif,
+        IQueueFactory $qFactory,
         RoutePermissionMapper $permMapper
     ) {
         $this->filters = array();
@@ -94,30 +101,20 @@ class QueueSorter implements FilterInterface {
 
 		try {
 			$this->validate($instance, $formatted, $user);
-			$newLevel = $this->getReroutedLevel($user, $formatted['channel']);
+			$outputLevels = $this->getReroutedLevel($user, $formatted['channel']);
 
-			switch($newLevel) {
-				// digest
-				case Logger::INFO:
-					$method = UserQueue::Q_DIGEST;
-					break;
+            if (in_array('MU', $outputLevels)) {
+                throw new FilterException("Reroute level is zero");
 
-				// instant
-				case Logger::NOTICE:
-				// instant + email
-				case Logger::WARNING:
-				case Logger::ERROR:
-                    $method = UserQueue::Q_LISTED;
-					break;
+            } elseif (in_array('DI', $outputLevels)) {
+                $method = UserQueue::Q_DIGEST;
 
-				// total suppression
-				case 0:
-					throw new FilterException("Reroute level is zero");
+            } elseif (in_array('IN', $outputLevels)) {
+                $method = UserQueue::Q_LISTED;
 
-				//invalid level
-				default:
-					throw new FilterException("Reroute level is unacceptable ($newLevel)");
-			}
+            } else {
+                throw new FilterException("Reroute level is unacceptable ($outputLevels)");
+            }
 
             // put the instance in redis: it will always end up being stored in one queue or the other
             $q = $this->qFactory->setKind($method)->buildForUser($user->getId());
@@ -129,10 +126,16 @@ class QueueSorter implements FilterInterface {
             // cast 'listed' to 'instant'
 			$newTopic = ($method == UserQueue::Q_LISTED ? 'instant' : $method) . ".user.{$user->getId()}";
 
-			$this->log->info(sprintf('SEND %s:%s -> %s @ %s', $instance->getBaseHash(), $instance->getParamHash(), $newTopic, $newLevel));
-			$this->notif->logTo($newTopic, $newLevel, $formatted['message'], $formatted['context']);
+            $this->log->info(sprintf('SEND %s:%s -> %s @ %s', $instance->getBaseHash(), $instance->getParamHash(), $newTopic, json_encode($outputLevels)));
 
-
+            // log for each expected output level
+            foreach ($outputLevels as $level) {
+                if (isset($this->map[$level])) {
+                    $this->notif->logTo($newTopic, $this->map[$level], $formatted['message'], $formatted['context']);
+                } else {
+                    $this->log->warning("Unable to SEND: could not map priority '$level'");
+                }
+            }
 
 			return true;
 		}
@@ -175,26 +178,21 @@ class QueueSorter implements FilterInterface {
 	/**
 	 * @param User $user
 	 * @param string $channel
-	 * @return int
+	 * @return array
 	 */
 	protected function getReroutedLevel(User $user, $channel) {
-		$levels = $this->permMapper->findRouteLevels($channel, $user->getRole()->getId(), $user->getId());
+		$intent = $this->permMapper->findRouteLevels($channel, $user->getRole()->getId(), $user->getId());
 
-		if(!count($levels)) {
+		if (count($intent) == 0) {
 			// if we got nothing back, this user isn't meant to see this message
             $this->log->debug("Got no levels back, msg source is disabled for this user's role");
-			return 0;
+            return [ 'MU' ];
 		}
 
-		// ensure bounds checking
-		$intent = is_null($levels['out']) ? $levels['def'] : $levels['out'];
-		$intent = max($intent, $levels['min']);
-		$intent = min($intent, $levels['max']);
-
 		// if the user in question has no digest schedule and digest level is selected, escalate to instant
-		if((string)$user->getRole()->getDigestSchedule() == (string)Role::DIGEST_NEVER && $intent == Logger::INFO) {
+		if ((string)$user->getRole()->getDigestSchedule() == (string)Role::DIGEST_NEVER && in_array('DI', $intent)) {
 			$this->log->info("User doesn't have digest schedule: upgrading to instant");
-			$intent = Logger::NOTICE;
+			$intent = [ 'IN' ];
 		}
 
 		return $intent;

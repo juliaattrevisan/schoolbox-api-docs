@@ -117,8 +117,7 @@ class RoutePermissionMapper extends Mapper {
 		// find the routing levels that match this role, user and topic regex
 		$stmt = $this->prepare("
 			SELECT
-				ns.slug, src.key,
-				perm.min_level, perm.default_level, reroute.outgoing_level, perm.max_level
+				perm.mask, perm.role_default, reroute.delivery
 			FROM msg_source src
 			LEFT JOIN msg_namespace ns ON src.namespace = ns.id
 			LEFT JOIN msg_route_perm perm ON src.id = perm.msg_source_id AND perm.role_id = :role_id
@@ -138,19 +137,23 @@ class RoutePermissionMapper extends Mapper {
 
         // if no record matches, this message is not appropriate to this user/role, so dismiss
         if (!$r) {
-            return array();
+            return [];
         }
 
-        $result = array(
-            'min' => $r['min_level'],
-            'def' => $r['default_level'],
-            'out' => $r['outgoing_level'],
-            'max' => $r['max_level'],
-        );
+        $mask     = $r['mask']         ? explode(',', $r['mask'])         : [];
+        $default  = $r['role_default'] ? explode(',', $r['role_default']) : [];
+        $delivery = $r['delivery']     ? explode(',', $r['delivery'])     : [];
 
-		// find overrides where
+        // last-chance bounds checking
+        $masked = array_intersect($delivery, $mask);
+
+        if (!count($masked)) {
+            $masked = array_intersect($default, $mask);
+        }
+
+		// find overrides matching both global and user-specific
 		$stmt = $this->prepare("
-			SELECT user_id, msg_route_key, outgoing_level
+			SELECT user_id, msg_route_key, delivery
 			FROM msg_reroute_override override
 			WHERE user_id IN (0, :user_id)
 		");
@@ -171,37 +174,33 @@ class RoutePermissionMapper extends Mapper {
 				$leftness = $matches[0][1];
 				$rightness = isset($matches[1][1]) ? $matches[1][1] : PHP_INT_MAX;
 
-				$precedence[$r['user_id']][$leftness][$rightness] = $r['outgoing_level'];
+				$precedence[$r['user_id']][$leftness][$rightness] = $r['delivery'];
 			}
 
 		}
 
-        // no overrides, just return the result we got from the global config query
-		if(!count($precedence)) {
-			return $result;
-		}
+        // handle overrides
+        if (count($precedence)) {
+            /*
+             * Override precedence is:
+             *   1. specific to the user > global
+             *   2. how far left the literal first matches
+             *   3. how far right the wildcard matches
+             */
 
+            // take highest userId
+            $a = $precedence[max(array_keys($precedence))];
 
-		/*
-		 * Override precedence is:
-		 *   1. specific to the user > global
-		 *   2. how far left the literal first matches
-		 *   3. how far right the wildcard matches
-		 */
+            // lowest leftness
+            $b = $a[min(array_keys($a))];
 
-		// take highest userId
-		$a = $precedence[max(array_keys($precedence))];
+            // highest rightness
+            $c = $b[max(array_keys($b))];
 
-		// lowest leftness
-		$b = $a[min(array_keys($a))];
+            $masked = explode(',', $c);
+        }
 
-		// highest rightness
-		$c = $b[max(array_keys($b))];
-
-		$result['out'] = $c;
-
-		return $result;
-
+        return $masked;
 	}
 
 	/**
