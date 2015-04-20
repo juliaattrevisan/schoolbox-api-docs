@@ -50,6 +50,7 @@
                     $(this).closest('form').find('input[name=url]').val('').prop('readonly', false);
                 });
 
+                $('[data-plugin="preview"]').preview();
             });
         })(jQuery);
     </script>
@@ -162,7 +163,7 @@
                             -->
                             <span class="icon {UNIT_TASK_CLASS}" title="{UNIT_TASK_TYPE_LABEL}"><span></span></span>
 
-                            <h4><a href="/task/start/{UNIT_TASK_ID}">{UNIT_TASK_NAME}</a></h4>
+                            <h4><a {UNIT_TASK_PREVIEW} href="/task/start/{UNIT_TASK_ID}">{UNIT_TASK_NAME}</a></h4>
 
                             <p class="meta">
                                 <!-- BEGIN unit_task_completion -->

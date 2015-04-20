@@ -18,11 +18,12 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @return void
+     * @return true
      */
     public function execute()
     {
         $this->db = DeprecatedDatabase::getInstance();
+        return true;
     }
 
     /**
@@ -41,22 +42,39 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
         $this->setBlock($templateHandle, 'previewimage', 'preview_block');
         $this->setVar('IMAGE_TITLE', 'Feature Image');
 
-        //get image id
-        $query = "SELECT id, description, comment FROM file WHERE category = '" . $this->getContext()->getId() . "' AND deleted = '0' AND description LIKE " . $this->db->smartQuote($this->getConfig('image'));
-        $image = $this->db->getRow($query);
-
-        if (!is_array($image)) {
-            //try to find another image if we cant find the configured one
-            $query = "SELECT id, description, comment FROM file WHERE category = " . $this->getContext()->getId() . " AND deleted = '0' AND INSTR(mime_type, 'image/')";
-            $image = $this->db->getRow($query);
-
-            if (!is_array($image)) {
+        // Get the image
+        $images = Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
+            [$this->getContext()->getId()],
+            [
+                'name'      => $this->getConfig('image'),
+                'filter'    => ['image'],
+                'sort'      => 'date',
+                'getHidden' => true,
+                'size'      => 1,
+            ]
+        );
+        if (count($images)) {
+            $image = $images->first();
+        } else {
+            // First non-hidden image
+            $images = Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
+                [$this->getContext()->getId()],
+                [
+                    'filter'    => ['image'],
+                    'sort'      => 'date',
+                    'getHidden' => false,
+                    'size'      => 1,
+                ]
+            );
+            if (count($images)) {
+                $image = $images->first();
+            } else {
                 $this->setVar('preview_block', '');
                 return true;
             }
         }
-
-        $this->setVar('IMAGE_TITLE', $image['description']);
+        /** @var Schoolbox\Resource\File\Model $image */
+        $this->setVar('IMAGE_TITLE', $image->getTitle());
 
         if ($this->getConfig('pixel') > 600) {
             $pixel = 600;
@@ -67,8 +85,8 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
         }
 
         $this->setVar("IMAGE_ALIGN", $this->getConfig('align'));
-        $this->setVar("PREVIEW_IMAGE_URL", "/cms/image.php?id={$image['id']}&height=$pixel&width=$pixel");
-        $this->setVar("PREVIEW_IMAGE_DESC", Scrub::text($image['comment']));
+        $this->setVar("PREVIEW_IMAGE_URL", "/cms/image.php?id={$image->getId()}&height=$pixel&width=$pixel");
+        $this->setVar("PREVIEW_IMAGE_DESC", Scrub::text($image->getDescription()));
 
         $url = new Url($this->getConfig('url'));
 

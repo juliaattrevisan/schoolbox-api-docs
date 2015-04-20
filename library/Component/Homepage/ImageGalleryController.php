@@ -126,14 +126,20 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
         );
 
         // Load images for the requested homepage
-        $allImages = $this->getCategoryMapper()->findImages($this->getSource(), $limit, true);
+        $allImages = Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
+            [$this->getSource()->getId()],
+            [
+                'filter' => ['image'],
+                'size'   => $limit,
+            ]
+        );
 
         // Iterate
         foreach ($allImages as $currentImage) {
             $this->setVar(
                 array(
                     'THUMBNAIL_ID'          => $currentImage->getId(),
-                    'THUMBNAIL_DESCRIPTION' => $currentImage->getDescription(),
+                    'THUMBNAIL_DESCRIPTION' => $currentImage->getTitle(),
                     'THUMBNAIL_SIZE'        => Cfg::get('thumbnail_size'),
                     'IMAGE_HEIGHT'          => Cfg::get('thumbnail_size'),
                 )

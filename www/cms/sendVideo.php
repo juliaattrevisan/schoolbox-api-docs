@@ -27,7 +27,7 @@ if (isset($type) && isset($id)) {
     $videoQueueMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
     try {
-        $videoFactory = new \Schoolbox\Video\Factory\Video($type, $id);
+        $videoFactory = new \Schoolbox\Video\Factory\Video($id, $type);
         $video        = $videoFactory->produce();
     } catch (Schoolbox\Mapper\Exception $e) {
         /* Video not found */
@@ -62,7 +62,9 @@ if (isset($type) && isset($id)) {
             break;
     }
 
-    $fileHandler->logAction($id, 'access');
+    if($type = \Schoolbox\Video\QueueMapper::FILE_TYPE_SBFS) {
+        $fileHandler->logAction($id, 'access');
+    }
 
     if (is_readable($filename)) {
         $filesize = @filesize($filename);

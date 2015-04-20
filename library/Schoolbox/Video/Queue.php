@@ -15,11 +15,13 @@ class Queue extends ResourceVideo
     protected $id;
     protected $fileID;
     protected $type;
+    protected $hash;
     protected $status;
     protected $message;
     protected $duration;
     protected $created;
     protected $modified;
+
 
     /**
      * Primary binary program used for conversion
@@ -55,10 +57,10 @@ class Queue extends ResourceVideo
     {
         $sourceFile = $this->getSourceFile();
 
-        if(stristr($sourceFile->getMime(),'audio/')){
+        if($sourceFile->getMimetype()->isAudio()){
             return $this->processAudio($this->getSourceLocation($sourceFile));
         }
-        else if(stristr($sourceFile->getMime(), 'video/')){
+        else if($sourceFile->getMimeType()->isVideo()){
             return $this->processVideo($this->getSourceLocation($sourceFile));
         }
 
@@ -118,7 +120,6 @@ class Queue extends ResourceVideo
         else {
             $strict = false;
         }
-
 
         // Get information about width and height of video file
         exec("$info_exec -show_streams " . escapeshellarg($sourceFile) . ' 2>&1', $info_message, $info_return);
@@ -246,41 +247,31 @@ class Queue extends ResourceVideo
 
     }
 
+    /**
+     * Returns the source object related to this video queue item
+     * This has been deprecated to be replaced by a proper join on hash
+     *
+     * @return \Schoolbox\Resource\Storage\Model
+     * @deprecated
+     */
     private function getSourceFile()
     {
-
-        if ($this->getType() == QueueMapper::FILE_TYPE_SBFS) {
-            return \Schoolbox\Resource\FileMapper::getInstance()->findById($this->fileID);
-        } elseif ($this->getType() == QueueMapper::FILE_TYPE_STORAGE) {
-            $oldStorage = \Schoolbox\StorageMapper::getInstance()->findById($this->fileID);
-            $newStorage = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($oldStorage->getHash());
-
-            return $newStorage;
-        } elseif ($this->getType() == QueueMapper::FILE_TYPE_SUBMISSION) {
-            return \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper::getInstance()->findById($this->fileID);
-        } else if ($this->getType() == QueueMapper::FILE_TYPE_MYFILE) {
-            return \Schoolbox\MyFileMapper::getInstance()->findById($this->fileID);
-        } else {
-            throw new \Exception_Schoolbox('Processing of this type of file is not implemented');
-        }
+        $newStorage = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($this->getHash());
+        return $newStorage;
     }
 
+    /**
+     * This returns the location of the original file on disk
+     * This has been deprecated as it needs to be replaced by a Flysystem equivalent
+     *
+     * @param $sourceObject
+     * @return string
+     * @deprecated
+     */
     private function getSourceLocation($sourceObject)
     {
-        if ($this->getType() == QueueMapper::FILE_TYPE_SBFS) {
-            return $sourceObject->getFileLocation();
-        } elseif ($this->getType() == QueueMapper::FILE_TYPE_STORAGE) {
-            $configLoader = new \Schoolbox\Config\Loader();
-            $path = $configLoader->get('storage_dir'). '/' . $sourceObject->getPath();
-
-            return $path;
-        } elseif ($this->getType() == QueueMapper::FILE_TYPE_SUBMISSION) {
-            return $sourceObject->getFileLocation();
-        } else if ($this->getType() == QueueMapper::FILE_TYPE_MYFILE) {
-            return $sourceObject->getFileLocation();
-        } else {
-            throw new \Exception_Schoolbox('Processing of this type of file is not implemented');
-        }
+        $configLoader = new \Schoolbox\Config\Loader();
+        return $configLoader->get('storage_dir'). '/' . $sourceObject->getPath();
     }
 
     /**
@@ -345,6 +336,24 @@ class Queue extends ResourceVideo
     {
         return $this->modified;
     }
+
+    /**
+     * @return string
+     */
+    public function getHash()
+    {
+        return $this->hash;
+    }
+
+    /**
+     * @param string $hash
+     */
+    public function setHash($hash)
+    {
+        $this->hash = $hash;
+    }
+
+
 
     /**
      * Ensures $dimensions are contained within $maxDimensions

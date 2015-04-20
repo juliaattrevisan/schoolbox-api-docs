@@ -49,6 +49,8 @@
                     $(this).closest('form').find('input[name=url]').val('').prop('readonly', false);
                 });
 
+                $('[data-plugin="preview"]').preview();
+
             });
         })(jQuery);
     </script>
@@ -80,7 +82,7 @@
                     <span class="icon {TASK_CLASS}" title="{TASK_TYPE_LABEL}"><span></span></span>
 
                     <!-- BEGIN task_link -->
-                    <h4><a href="{TASK_LINK}">{TASK_TITLE}</a></h4>
+                    <h4><a {TASK_PREVIEW} href="{TASK_LINK}">{TASK_TITLE}</a></h4>
                     <!-- END task_link -->
                     <!-- BEGIN task_no_link -->
                     <h4>{TASK_TITLE}</h4>

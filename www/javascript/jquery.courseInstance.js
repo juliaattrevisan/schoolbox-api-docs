@@ -300,9 +300,6 @@
         };
         initTaskList();
 
-        /* Apply Preview to all anchor links in the task-list for
-         * this component
-         */
-        component.find('.unit-task.interact h4 a').preview();
+
     }
 })(jQuery);

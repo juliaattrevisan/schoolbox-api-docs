@@ -100,4 +100,13 @@ class Migration implements MigrationPattern
         return $row['realname'];
     }
 
+    /**
+     * Dropbox has no queue
+     *
+     * @return null
+     */
+    public function getQueueType()
+    {
+        return null;
+    }
 } 

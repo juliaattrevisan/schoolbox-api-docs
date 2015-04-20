@@ -414,6 +414,7 @@ class Component_Homepage_CourseInstanceController extends Component_Homepage_Con
                 'UNIT_TASK_NAME'                  => Scrub::text($task->getTitle()),
                 'UNIT_TASK_LINK'                  => Scrub::text($task->getLink()),
                 'UNIT_TASK_CLASS'                 => Scrub::text($task->getIconClass()),
+                'UNIT_TASK_PREVIEW'               => $task->getType() == Task::TYPE_TASK ? 'data-plugin="preview"' : '',
                 'UNIT_TASK_TYPE_LABEL'            => Scrub::text($task->getLabel()),
                 'UNIT_TASK_SELF_ASSESS'           => ($task->getRequiresConfirmation() ? '' : 'checked'),
                 'UNIT_TASK_COMPLETION_COUNT'      => $complete_count,

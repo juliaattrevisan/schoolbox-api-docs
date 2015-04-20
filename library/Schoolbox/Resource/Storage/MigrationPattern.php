@@ -62,4 +62,14 @@ interface MigrationPattern
      * @return string
      */
     public function readFilename(array $row);
+
+    /**
+     * Each storage type that has a queue has a corresponding type
+     * (in video_queue.type) - this returns that type so that the queue can be
+     * migrated.
+     *
+     * @return string A Schoolbox\Video\QueueMapper::FILE_TYPE_* constant,
+     *                or null if it has no queue.
+     */
+    public function getQueueType();
 }

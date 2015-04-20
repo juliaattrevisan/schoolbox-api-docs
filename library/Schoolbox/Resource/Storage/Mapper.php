@@ -35,9 +35,6 @@ class Mapper extends Schoolbox\Mapper implements Receiver
     /** @var Manager */
     protected $mgr;
 
-    /** @var bool */
-    protected $checkPrevious = true;
-
     /**
      * @return void
      */
@@ -64,6 +61,17 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         $this->uses('public', self::TYPE_BOOLEAN);
         $this->uses('ext', self::TYPE_STRING, null, 'extension');
 
+        // This joins to video Q now, and I can't hydrate it manually because
+        // it joins to ID and if I define ID on this mapper I can no longer save
+        $this->hasJoin(
+            'queue',
+            [
+                'mapper'    => QueueMapper::class,
+                'this_key'  => 'hash',
+                'other_key' => 'hash',
+            ]
+        );
+
         // derived field; mimetype automatically joined via the extension
         $this->joinsVia('allowedFileExtension', MimetypeMapper::class, 'fileTypeID', 'fileTypeID', 'extension', 'ext', self::TYPE_MODEL, self::COLUMN_JOIN_READONLY, 'mimetype');
 
@@ -72,6 +80,13 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         $this->registerCallback(self::CALLBACK_POSTDELETE, [ $this->mgr, 'delete' ]);
     }
 
+    /**
+     * Call back hook to clear postsave queue
+     * @deprecated
+     */
+    public function dePostSave() {
+        unset($this->callback_queue[self::CALLBACK_POSTSAVE]);
+    }
 
     /**
      * @param Model $storage
@@ -80,7 +95,7 @@ class Mapper extends Schoolbox\Mapper implements Receiver
      */
     protected function postSave(Model $storage, Model $previous = null)
     {
-        if ($previous && $this->checkPrevious) {
+        if ($previous) {
             // not the first time we've seen this file? no copying to take place
             return true;
         }
@@ -93,6 +108,7 @@ class Mapper extends Schoolbox\Mapper implements Receiver
             $mapper = new QueueMapper();
             $videoQ = new Queue();
             $videoQ->setFileID($mapper->findFileInternalId($storage));
+            $videoQ->setHash($storage->getHash());
             $videoQ->setStatus(QueueMapper::STATUS_PENDING);
             $videoQ->setType(QueueMapper::FILE_TYPE_STORAGE);
 

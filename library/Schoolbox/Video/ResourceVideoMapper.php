@@ -31,6 +31,13 @@ class ResourceVideoMapper extends Mapper
         );
         $this->hasMap(
             array(
+                'column'   => 'hash',
+                'property' => 'hash',
+                'type'     => self::TYPE_STRING,
+            )
+        );
+        $this->hasMap(
+            array(
                 'column'   => 'type',
                 'property' => 'type',
                 'type'     => self::TYPE_STRING,
@@ -60,29 +67,29 @@ class ResourceVideoMapper extends Mapper
         $this->hasJoin(
             'file', array(
                 'mapper'    => '\\Schoolbox\\Resource\\FileMapper',
-                'this_key'  => 'file_id',
-                'other_key' => 'id',
+                'this_key'  => 'hash',
+                'other_key' => 'hash',
             )
         );
         $this->hasJoin(
             'storage', array(
                 'mapper'    => '\\Schoolbox\\StorageMapper',
-                'this_key'  => 'file_id',
-                'other_key' => 'storage_id',
+                'this_key'  => 'hash',
+                'other_key' => 'hash',
             )
         );
         $this->hasJoin(
             'student_submission', array(
                 'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\SubmissionMapper',
-                'this_key'  => 'file_id',
-                'other_key' => 'id',
+                'this_key'  => 'hash',
+                'other_key' => 'hash',
             )
         );
         $this->hasJoin(
             'eportfolio_filelist', array(
                 'mapper'    => '\\Component\\Eportfolio\\FileListMapper',
-                'this_key'  => 'file_id',
-                'other_key' => 'file_id',
+                'this_key'  => 'hash',
+                'other_key' => 'hash',
             )
         );
     }
@@ -106,7 +113,10 @@ class ResourceVideoMapper extends Mapper
             FROM `{$this->getTable()}` vq
             JOIN {$this->getJoinSQL('file', 'vq', 'f')}
             LEFT JOIN {$fileMapper->getJoinSQL('owner', 'f', 'u')}
-            WHERE category = :cat AND vq.status != 'failed' AND f.deleted='0' AND f.mime_type like :mime
+            JOIN storage s ON s.hash = f.hash
+            JOIN allowedFileExtension e ON s.ext = e.extension
+            JOIN allowedFileTypes ft ON ft.fileTypeID = e.fileTypeID
+            WHERE category = :cat AND vq.status != 'failed' AND f.deleted='0' AND ft.mime like :mime
         ";
 
         /* Sort order
@@ -354,12 +364,15 @@ class ResourceVideoMapper extends Mapper
     {
 
         $storageMapper = $this->getJoinMapper('storage');
+        $fileMapper = $this->getJoinMapper('file');
+
         $statement     = $this->database->prepare(
             "
-            SELECT {$storageMapper->getColumnString('s')}, {$this->getColumnString('vq')}
+            SELECT {$storageMapper->getColumnString('s')}, {$this->getColumnString('vq')},  {$fileMapper->getColumnString('f')}
             FROM `{$this->getTable()}` vq
-            INNER JOIN {$this->getJoinSQL('storage', 'vq', 's')}
-            WHERE s.hash = ? AND vq.status = 'completed' AND vq.type='storage'
+            JOIN {$this->getJoinSQL('storage', 'vq', 's')}
+            JOIN {$this->getJoinSQL('file', 'vq', 'f')}
+            WHERE s.hash = ? AND vq.status = 'completed'
         "
         );
 
@@ -368,7 +381,8 @@ class ResourceVideoMapper extends Mapper
         $video = null;
         if (($row = $statement->fetch())) {
             $video = $this->hydrate($row, 'vq');
-            $video->setFile($storageMapper->hydrate($row, 's'));
+            $video->setStorage($storageMapper->hydrate($row, 's'));
+            $video->setFile($fileMapper->hydrate($row, 'f'));
         }
 
         if (!($video instanceof ResourceVideo)) {

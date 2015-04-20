@@ -17,8 +17,8 @@ use Schoolbox\Collection;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\Resource\Browser\Tree\Node;
 use Schoolbox\Resource\Browser\Tree\Node\Icon;
-use Schoolbox\UserMapper;
 use Schoolbox\User;
+use Schoolbox\Resource\File\Mapper as FileMapper;
 
 class Contents
 {
@@ -66,18 +66,19 @@ class Contents
     private $allNodes = null;
 
     /**
-     * An instance of \Schoolbox\UserMapper
-     *
-     * @var \Schoolbox\UserMapper
-     */
-    private $userMapper = null;
-
-    /**
      * An instance of \Schoolbox\Resource\LinkMapper
      *
      * @var \Schoolbox\Resource\LinkMapper
      */
     private $linkMapper = null;
+
+
+    /**
+     * An instance of FileMapper
+     *
+     * @var FileMapper
+     */
+    private $fileMapper = null;
 
     /**
      * An instance of group handler
@@ -86,19 +87,9 @@ class Contents
      */
     private $groupHandler = null;
 
-    /**
-     * An instance of allowed files handler
-     *
-     * @var \AllowedFile
-     */
-    private $allowedFiles = null;
 
-    /**
-     * An instance of file handler
-     *
-     * @var \File
-     */
-    private $fileHandler = null;
+
+
 
     /**
      * Constructor
@@ -109,22 +100,19 @@ class Contents
     public function __construct(CategoryModel $category, $filterOptions = null)
     {
 
-        /* Handlers
-         */
-        $this->setGroupHandler(new \Group());
-        $this->setAllowedFiles(new \AllowedFile());
-        $this->setFileHandler(new \File());
-
         /* Mappers
          */
-        $this->setUserMapper(new UserMapper());
         $this->setLinkMapper(new LinkMapper());
+        $this->setFileMapper(new FileMapper());
+
 
         /* Other
          */
+        $this->setGroupHandler(new \Group());
         $this->setCategory($category);
         $this->setPermission($this->getGroupHandler()->getPermission($category->getId()));
         $this->setFilterOptions($filterOptions);
+
 
         /* Collections
          */
@@ -168,6 +156,7 @@ class Contents
         /* Process links
          */
         foreach ($allLinkNodes as $currentLinkNode) {
+            /** @var \Schoolbox\Resource\Link $currentLinkNode */
             $node = new Node();
             $node->setNodeId($currentLinkNode->getId());
             $node->setUser($currentLinkNode->getOwner());
@@ -190,89 +179,57 @@ class Contents
      */
     private function buildFiles()
     {
-        $allFileNodes = $this->getFileHandler()->getAllInCategory($this->getCategory()->getId(), $this->getFilterOptions());
+        $allFileNodes = $this->getFileMapper()->findForFolders(array($this->getCategory()->getId()), $this->getFilterOptions());
 
         /* Process files
          */
-        if (is_array($allFileNodes) && count($allFileNodes)) {
-            foreach ($allFileNodes as $currentFileNode) {
-// if the file is associated with due work, it shouldn't be visible here
-                if ($currentFileNode['type'] || $currentFileNode['typeName']) {
-                    continue;
-                }
+        foreach ($allFileNodes as $currentFileNode) {
 
-                /* css for the node
-                 */
-                $class = array();
+            /* css for the node
+             */
+            $class = array();
 
-                // write access
-                if ($this->getPermission() >= WRITE_ACCESS) {
-                    $class[] = "write";
-                }
-
-                // is hidden
-                if ($currentFileNode['hidden'] > 0) {
-                    $class[] = "hidden";
-                }
-
-                // icon
-                $class[] = !empty($currentFileNode['iconFile']) ? $this->getAllowedFiles()->getClass($currentFileNode["iconFile"]) : "binary";
-
-                try {
-                    $user = $this->getUserMapper()->findById($currentFileNode['owner']);
-                } catch (\Exception $e) {
-                    $user = new User();
-                    $user->setId($currentFileNode['owner']);
-                }
-
-                /* Detect which icon to display
-                 * $allowedFiles->getClass() returns empty string for iconFile 'html_alt1'
-                 */
-                $icon = new Icon();
-
-                if (!empty($currentFileNode['iconFile'])) {
-                    $icon->setCss($this->getAllowedFiles()->getClass($currentFileNode["iconFile"]));
-                    $icon->setFile($currentFileNode["iconFile"]);
-                }
-
-                $node = new Node();
-                $node->setNodeId($currentFileNode['id']);
-                $node->setUser($user);
-                $node->setType('file');
-                $node->setIcon($icon);
-                $node->setName(\Scrub::text($currentFileNode['description']));
-                $node->setSize($currentFileNode['file_size'] > 0 ? \Alaress_Byte_Format::bytesToString($currentFileNode['file_size']) : "--");
-                $node->setCategory($this->getCategory());
-                $node->setCss(implode(' ', $class));
-                $node->setModifiedAt(new \Alaress_Date_Format($currentFileNode['modified'], 'U'));
-
-                $this->getFileNodes()->add($node);
+            // write access
+            if ($this->getPermission() >= WRITE_ACCESS) {
+                $class[] = "write";
             }
+
+            // is hidden
+            if ($currentFileNode->isHidden()) {
+                $class[] = "hidden";
+            }
+
+            // icon
+            $class[] = $currentFileNode->getMimetype()->getIconClass() ? $currentFileNode->getMimetype()->getIconClass() : "binary";
+
+
+            /* Detect which icon to display
+             * $allowedFiles->getClass() returns empty string for iconFile 'html_alt1'
+             */
+            $icon = new Icon();
+
+            if (!empty($currentFileNode->getMimetype()->getIconFile())) {
+                $icon->setCss($currentFileNode->getMimetype()->getIconClass());
+                $icon->setFile($currentFileNode->getMimetype()->getIconFile());
+            }
+
+            $node = new Node();
+            $node->setNodeId($currentFileNode->getId());
+            $node->setUser($currentFileNode->getOwner());
+            $node->setType('file');
+            $node->setIcon($icon);
+            $node->setName(\Scrub::text($currentFileNode->getTitle()));
+            $node->setSize($currentFileNode->getSize() > 0 ? \Alaress_Byte_Format::bytesToString($currentFileNode->getSize()) : "--");
+            $node->setCategory($this->getCategory());
+            $node->setCss(implode(' ', $class));
+            $node->setModifiedAt($currentFileNode->getModifiedAt());
+
+            $this->getFileNodes()->add($node);
         }
     }
 
     /* Getters/Setters
      */
-
-    /**
-     * Set allowed files
-     *
-     * @param \AllowedFile $allowedFiles
-     */
-    private function setAllowedFiles($allowedFiles)
-    {
-        $this->allowedFiles = $allowedFiles;
-    }
-
-    /**
-     * Get allowed files
-     *
-     * @return \AllowedFile
-     */
-    private function getAllowedFiles()
-    {
-        return $this->allowedFiles;
-    }
 
     /**
      * Set category
@@ -354,25 +311,6 @@ class Contents
         return $this->filterOptions;
     }
 
-    /**
-     * Set user mapper
-     *
-     * @param \Schoolbox\UserMapper $userMapper
-     */
-    private function setUserMapper($userMapper)
-    {
-        $this->userMapper = $userMapper;
-    }
-
-    /**
-     * Get user mapper
-     *
-     * @return \Schoolbox\UserMapper
-     */
-    private function getUserMapper()
-    {
-        return $this->userMapper;
-    }
 
     /**
      * Set all nodes
@@ -394,25 +332,6 @@ class Contents
         return $this->allNodes;
     }
 
-    /**
-     * Set file handler
-     *
-     * @param \File $fileHandler
-     */
-    private function setFileHandler($fileHandler)
-    {
-        $this->fileHandler = $fileHandler;
-    }
-
-    /**
-     * Get file handler
-     *
-     * @return \File
-     */
-    private function getFileHandler()
-    {
-        return $this->fileHandler;
-    }
 
     /**
      * Set link mapper
@@ -432,6 +351,22 @@ class Contents
     private function getLinkMapper()
     {
         return $this->linkMapper;
+    }
+
+    /**
+     * @return FileMapper
+     */
+    public function getFileMapper()
+    {
+        return $this->fileMapper;
+    }
+
+    /**
+     * @param FileMapper $fileMapper
+     */
+    public function setFileMapper($fileMapper)
+    {
+        $this->fileMapper = $fileMapper;
     }
 
     /**
