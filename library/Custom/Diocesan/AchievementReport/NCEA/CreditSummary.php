@@ -32,8 +32,67 @@ class CreditSummary extends Base {
      */
     public function findData()
     {
-//        new Probe($this->explorerReporting());
+        $externalUser = $this->getExternalUser();
+        $externalUserId = $externalUser['StudentID'];
+
+        $allResults = $this->getDb()->getAll("
+            SELECT
+                id,
+                Level,
+                InternalorExternalAssessment,
+                EnteredCredits,
+                StrippedResult,
+                ResultCredits
+            FROM
+                SynergyOne.dbo.uvSchoolBoxNCEAResults
+            WHERE
+                id = '{$externalUserId}' AND
+                WithdrawnFlag = 0 AND
+                NOT (StudentYear = '{$this->getYear()}' AND InternalorExternalAssessment = 'EX')
+        ");
+
+        /**
+         * Rearrange everything into a nice order
+         */
+        $finalStack = array();
+
+        foreach ($allResults as $current) {
+            $level = $current['Level'];
+            $internalExternal = $current['InternalorExternalAssessment'];
+            $letter = $current['StrippedResult'];
+
+            if (!is_array($finalStack[$level])) {
+                $finalStack[$level] = $this->initialiseLevel();
+            }
+
+            $finalStack[$level][$internalExternal]['enteredCredits'] += $current['EnteredCredits'];
+            $finalStack[$level][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
+            $finalStack[$level][$internalExternal]['availableCredits'] += ($current['EnteredCredits'] - $current['ResultCredits']);
+        }
+
+        new Probe($this->explorerReporting(), $allResults, $finalStack);
 
         return;
+    }
+
+    /**
+     * Set up a new level
+     *
+     * @return array
+     */
+    private function initialiseLevel() {
+        return array(
+            'totalEnteredCredits' => 0,
+            'IN' => array(
+                'enteredCredits' => 0,
+                'letters' => array_fill_keys($this->getLetterRegistry(), 0),
+                'availableCredits' => 0
+            ),
+            'EX' => array(
+                'enteredCredits' => 0,
+                'letters' => array_fill_keys($this->getLetterRegistry(), 0),
+                'availableCredits' => 0
+            )
+        );
     }
 }

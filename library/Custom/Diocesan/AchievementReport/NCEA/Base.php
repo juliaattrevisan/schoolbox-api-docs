@@ -21,6 +21,13 @@ abstract class Base extends AchievementReportBase {
      */
     protected $year = 0;
 
+    /**
+     * A bunch of letters to obtain
+     *
+     * @var array
+     */
+    protected $letterRegistry = array('N', 'A', 'M', 'E');
+
     /* Getters/Setters
      */
 
@@ -38,6 +45,26 @@ abstract class Base extends AchievementReportBase {
     public function getYear()
     {
         return $this->year;
+    }
+
+    /**
+     * Set letter registry
+     *
+     * @param array $letterRegistry
+     */
+    protected function setLetterRegistry($letterRegistry)
+    {
+        $this->letterRegistry = $letterRegistry;
+    }
+
+    /**
+     * Get letter registry
+     *
+     * @return array
+     */
+    public function getLetterRegistry()
+    {
+        return $this->letterRegistry;
     }
 
     /**
