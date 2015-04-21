@@ -35,6 +35,7 @@ class Migration implements MigrationPattern
         $this->conf = new Loader();
 
         $this->stmtHash = $this->db->prepare("UPDATE student_submission SET hash = :hash WHERE id = :id");
+        $this->stmtBody = $this->db->prepare("SELECT body FROM student_submission WHERE mime_type = 'text/html' AND filesize IS NULL and id = :id");
     }
 
 
@@ -93,12 +94,27 @@ class Migration implements MigrationPattern
 
 
     /**
+     * Hey! Know what?! If this is an online/inline submission, we're gonna convert that to a FILE and then HASH THAT!
+     *
      * @param array $row
      * @return string
      */
     public function readFilename(array $row)
     {
-        return $row['realname'];
+        $filename = $row['realname'];
+
+        // push "inline submissions" out into the filesystem
+        if ($filename == 'Online Submission') {
+            $this->stmtBody->execute([ 'id' => $row['id'] ]);
+
+            if ($body = $this->stmtBody->fetchColumn()) {
+                file_put_contents($this->getFileDir() ."/" . $row['id'] . ".dat", $body);
+            }
+
+            return 'online-submission.html';
+        }
+
+        return $filename;
     }
 
 } 
