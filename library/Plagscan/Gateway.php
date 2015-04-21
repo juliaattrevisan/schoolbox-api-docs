@@ -61,27 +61,16 @@ class Plagscan_Gateway
 
 
     /**
-     * TODO consider perhaps this should already be sorted by the time we get here?
-     *
-     * @param Submission\ISubmission $submission
+     * @param Submission\File $submission
      * @return string
      */
-    public function submit(Submission\ISubmission $submission)
+    public function submit(Submission\File $submission)
     {
-        if ($submission instanceof Submission\File) {
-            $documentName = $submission->getFilename();
+        $documentName = $submission->getFilename();
 
-            /** @var Schoolbox\Resource\Storage\Model $file */
-            $file = $submission->getStorage();
-            $documentData = $file->read();
-
-        } elseif ($submission instanceof Submission\Inline) {
-            $documentName = 'online-submission.html';
-            $documentData = $submission->getBody();
-
-        } else {
-            return null;
-        }
+        /** @var Schoolbox\Resource\Storage\Model $file */
+        $file = $submission->getStorage();
+        $documentData = $file->read();
 
         return $this->postForToken($documentName, $documentData);
     }

@@ -64,11 +64,11 @@ class Factory {
 	 * (some submissions don't use crocodoc)
 	 *
 	 * @param $page
-	 * @param Submission\ISubmission $submission
+	 * @param Submission\File $submission
 	 * @param ReturnedWork $returnedWork
 	 * @param $navigationElements
 	 */
-	public function __construct($page, Submission\ISubmission $submission = null, ReturnedWork $returnedWork = null, $navigationElements) {
+	public function __construct($page, Submission\File $submission = null, ReturnedWork $returnedWork = null, $navigationElements) {
 		$this->setPage($page);
 		$this->setSubmission($submission);
 		$this->setReturnedWork($returnedWork);
@@ -128,7 +128,7 @@ class Factory {
 	/**
 	 * Set submission
 	 *
-	 * @param Submission\ISubmission $submission
+	 * @param Submission\File $submission
 	 */
 	private function setSubmission($submission) {
 		$this->submission = $submission;
@@ -137,7 +137,7 @@ class Factory {
 	/**
 	 * Get submission
 	 *
-	 * @return Submission\ISubmission
+	 * @return Submission\File
 	 */
 	private function getSubmission() {
 		return $this->submission;

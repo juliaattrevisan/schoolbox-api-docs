@@ -114,7 +114,7 @@ class Migrator
             }
 
             try {
-                $mime     = $this->mimetypeMapper->getByFilename($basename);
+                $mime = $this->mimetypeMapper->getByFilename($basename);
             }
             catch(\Schoolbox\File\Exception $e) {
                 $this->log->warning("Cannot detect mime; skipping");

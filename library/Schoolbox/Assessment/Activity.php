@@ -14,7 +14,7 @@ use Schoolbox\User;
 use Schoolbox\Resource;
 use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\ISubmission;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\File;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 
 class Activity {
@@ -40,7 +40,7 @@ class Activity {
 	protected $assessment;
 
 	/**
-	 * @var ISubmission
+	 * @var File
 	 */
 	protected $submission;
 
@@ -115,7 +115,7 @@ class Activity {
 	}
 
 	/**
-	 * @param ISubmission $submission
+	 * @param File $submission
 	 *
 	 * @return $this
 	 */
@@ -125,7 +125,7 @@ class Activity {
 	}
 
 	/**
-	 * @return ISubmission
+	 * @return File
 	 */
 	public function getSubmission() {
 		return $this->submission;

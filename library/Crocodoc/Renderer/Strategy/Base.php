@@ -26,7 +26,7 @@ abstract class Base {
 	/**
 	 * The submission
 	 *
-	 * @var Submission\ISubmission
+	 * @var Submission\File
 	 */
 	protected $submission = null;
 
@@ -69,11 +69,11 @@ abstract class Base {
 	 * Constructor
 	 *
 	 * @param $page
-	 * @param Submission\ISubmission $submission
+	 * @param Submission\File $submission
 	 * @param ReturnedWork $returnedWork
 	 * @param $navigationElements
 	 */
-	public function __construct($page, Submission\ISubmission $submission = null, ReturnedWork $returnedWork = null, $navigationElements)
+	public function __construct($page, Submission\File $submission = null, ReturnedWork $returnedWork = null, $navigationElements)
     {
 		$this->setPage($page);
 		$this->setSubmission($submission);
@@ -195,7 +195,7 @@ abstract class Base {
 	/**
 	 * Set submission
 	 *
-	 * @param Submission\ISubmission $submission
+	 * @param Submission\File $submission
 	 */
 	protected function setSubmission($submission) {
 		$this->submission = $submission;
@@ -204,7 +204,7 @@ abstract class Base {
 	/**
 	 * Get submission
 	 *
-	 * @return Submission\ISubmission
+	 * @return Submission\File
 	 */
 	protected function getSubmission() {
 		return $this->submission;

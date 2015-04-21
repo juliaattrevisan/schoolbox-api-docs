@@ -70,7 +70,7 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
     public function getLastModified()
     {
         $submission = $this->getSubmission();
-        if ($submission instanceof Submission\ISubmission) {
+        if ($submission instanceof Submission\File) {
             $date = $submission->getCreatedAt();
             if ($date instanceof Alaress_Date_Format) {
                 return $date->getUnixTimestamp();

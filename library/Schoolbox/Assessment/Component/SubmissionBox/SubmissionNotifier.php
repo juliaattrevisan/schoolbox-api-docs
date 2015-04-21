@@ -124,7 +124,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
         $submission = $bundle->getEvent()->getObject();
         $diff       = $bundle->getEvent()->getDiff();
 
-        if (!$submission instanceof SubmissionBox\Submission\ISubmission) {
+        if (!$submission instanceof SubmissionBox\Submission\File) {
             return;
         }
 
@@ -138,7 +138,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
             case Mapper::METHOD_CREATE: // new submission created
 
                 // is this in draft mode? if so, do nothing
-                if ($submission instanceof Submission\Inline && $submission->isDraft()) {
+                if ($submission->isDraft()) {
                     break;
                 }
 
@@ -190,7 +190,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
 
     /**
      * @param string $type
-     * @param Submission\ISubmission $submission
+     * @param Submission\File $submission
      * @param User $user
      * @param array|null $diff
      * @return Messenger
@@ -236,7 +236,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
     /**
      * Notify a teacher that students have submitted to their submission box
      *
-     * @param Submission\ISubmission $submission
+     * @param Submission\File $submission
      * @param User $user
      * @param array|null $diff
      * @return Messenger
@@ -250,7 +250,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
     /**
      * Notify a teacher that a student has submitted to their submission box...again
      *
-     * @param Submission\ISubmission $submission
+     * @param Submission\File $submission
      * @param User $user
      * @param array|null $diff
      * @return Messenger
@@ -264,7 +264,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
     /**
      * Notify a student that their (only) submission has been deleted, so they can resubmit.
      *
-     * @param Submission\ISubmission $submission
+     * @param Submission\File $submission
      * @param User $user
      * @param array|null $diff
      * @return Messenger
