@@ -1,7 +1,6 @@
 <?php
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use Schoolbox\Storage;
-use Schoolbox\StorageMapper;
+use Schoolbox\Resource\Storage;
 
 /************************************************************
 *                                                           *
@@ -106,12 +105,11 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments = array())
     $mail->setBody($converter->get_text(), null, 'utf-8');
     $mail->addPart($message, 'text/html', 'utf-8');
 
-    $factory = new CollectorFactory(StorageMapper::getInstance());
-    /** @var Storage[] $files */
+    $factory = new CollectorFactory();
     $files = $factory->build($attachments)->getAll();
 
     foreach ($files as $storage) {
-        $attach = Swift_Attachment::fromPath($storage->getFileLocation());
+        $attach = Swift_Attachment::newInstance($storage->read(), $storage->getFilename(), $storage->getMime());
         $attach->setFilename($storage->getFilename());
         $attach->setContentType($storage->getMime());
         $mail->attach($attach);

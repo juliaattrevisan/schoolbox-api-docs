@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Video;
 
+use Schoolbox;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\FileMapper;
@@ -16,6 +17,9 @@ use Schoolbox\Resource\FileMapper;
 class ResourceVideoMapper extends Mapper
 {
 
+    /**
+     * @return void
+     */
     protected function mapping()
     {
         $this->hasTable('video_queue');
@@ -73,7 +77,7 @@ class ResourceVideoMapper extends Mapper
         );
         $this->hasJoin(
             'storage', array(
-                'mapper'    => '\\Schoolbox\\StorageMapper',
+                'mapper'    => Schoolbox\Resource\Storage\Mapper::class,
                 'this_key'  => 'hash',
                 'other_key' => 'hash',
             )
@@ -252,7 +256,7 @@ class ResourceVideoMapper extends Mapper
      * @param $id
      *
      * @return ResourceVideo
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Mapper\Exception
      */
     public function findByFileId($id)
     {
@@ -275,7 +279,7 @@ class ResourceVideoMapper extends Mapper
             $video->setFile($fileMapper->hydrate($row, 'f'));
         }
         if (!($video instanceof ResourceVideo)) {
-            throw new \Schoolbox\Mapper\Exception('Instance of object not found');
+            throw new Mapper\Exception('Instance of object not found');
         }
         return $video;
 
@@ -287,11 +291,11 @@ class ResourceVideoMapper extends Mapper
      * @param $id
      *
      * @return ResourceVideo
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Mapper\Exception
      */
     public function findByMyFileId($id)
     {
-        $fileMapper = new \Schoolbox\Resource\FileMapper;
+        $fileMapper = new Schoolbox\Resource\FileMapper;
 
         $statement = $this->database->prepare(
             "
@@ -316,7 +320,7 @@ class ResourceVideoMapper extends Mapper
         }
 
         if (!($video instanceof ResourceVideo)) {
-            throw new \Schoolbox\Mapper\Exception('Instance of object not found');
+            throw new Mapper\Exception('Instance of object not found');
         }
 
         return $video;
@@ -324,7 +328,7 @@ class ResourceVideoMapper extends Mapper
 
     public function findByStorageId($id)
     {
-        $storageMapper = new \Schoolbox\StorageMapper;
+        $storageMapper = Schoolbox\Resource\Storage\Mapper::getInstance();
 
         $statement = $this->database->prepare(
             "
@@ -344,7 +348,7 @@ class ResourceVideoMapper extends Mapper
         }
 
         if (!($video instanceof ResourceVideo)) {
-            throw new \Schoolbox\Mapper\Exception('Instance of object not found');
+            throw new Mapper\Exception('Instance of object not found');
         }
         return $video;
 
@@ -354,7 +358,7 @@ class ResourceVideoMapper extends Mapper
      * Like findByStorageId() except it accepts a brownhole hash instead of a
      * brownhole storage ID.
      *
-     * @throws \Schoolbox\Mapper\Exception if no video with this hash was found
+     * @throws Mapper\Exception if no video with this hash was found
      *
      * @param  string $hash
      *
@@ -386,7 +390,7 @@ class ResourceVideoMapper extends Mapper
         }
 
         if (!($video instanceof ResourceVideo)) {
-            throw new \Schoolbox\Mapper\Exception('Instance of object not found');
+            throw new Mapper\Exception('Instance of object not found');
         }
         return $video;
     }
@@ -397,7 +401,7 @@ class ResourceVideoMapper extends Mapper
      * @param $id
      *
      * @return ResourceVideo
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Mapper\Exception
      */
     public function findBySubmissionId($id)
     {
@@ -420,7 +424,7 @@ class ResourceVideoMapper extends Mapper
         }
 
         if (!($video instanceof ResourceVideo)) {
-            throw new \Schoolbox\Mapper\Exception('Instance of object not found');
+            throw new Mapper\Exception('Instance of object not found');
         }
 
         return $video;

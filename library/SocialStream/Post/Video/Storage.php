@@ -11,7 +11,7 @@
 namespace SocialStream\Post\Video;
 
 use Schoolbox\Mapper;
-use Schoolbox\StorageMapper;
+use Schoolbox\Resource\Storage as Store;
 use Schoolbox\Video\ResourceVideo;
 use Schoolbox\Video\ResourceVideoMapper;
 use SocialStream\Post\Player\Player;
@@ -54,13 +54,13 @@ class Storage extends Player {
 			// Figure out status of video
 			$status = 'failed';
 			try {
-				/** @var \Schoolbox\Storage $storage */
+				/** @var Store\Model $storage */
 				/** @var ResourceVideo      $video */
-				$storage = StorageMapper::getInstance()->findOneByColumn('hash', $hash);
+				$storage = Store\Mapper::getInstance()->findOneByColumn('hash', $hash);
 				$video   = ResourceVideoMapper::getInstance()->findOneByColumnList(
 					array(
-						'file_id' => $storage->getId(),
-						'type'    => 'storage',
+						'hash' => $storage->getHash(),
+						'type' => 'storage',
 					)
 				);
 				$status = $video->getStatus();

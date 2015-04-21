@@ -2,7 +2,7 @@
 use Alaress\File\Remote\GDriveFetcher;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Browser\NodeFactory;
-use Schoolbox\StorageMapper;
+use Schoolbox\Resource\Storage;
 
 /**
  * 
@@ -25,7 +25,7 @@ $conf    = $this->getDi()->get('config');
 $headers = apache_request_headers();
 $proxy   = new Proxy\Server($conf);
 $grive   = new GDriveFetcher(sys_get_temp_dir(), $proxy->curl_init(), $headers['Authorization']);
-$mapper  = StorageMapper::getInstance();
+$mapper  = Storage\Mapper::getInstance();
 $files   = array();
 
 foreach ($_POST['docs'] as $doc) {
@@ -34,9 +34,9 @@ foreach ($_POST['docs'] as $doc) {
 
     try {
         // this will return an existing record if the file previously existed
-        $storageFile      = $mapper->upload(basename($dest), $dest, $_SESSION['id']);
+        $storageFile      = $mapper->accept(basename($dest), $dest, $_SESSION['id']);
         $meta['hash']     = NodeFactory::STORE . ':' . $storageFile->getHash();
-        $meta['filesize'] = $storageFile->getFilesize();
+        $meta['filesize'] = $storageFile->getSize();
 
         $files[] = $meta;
     }

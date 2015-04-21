@@ -38,7 +38,7 @@ if ($authenticator->canModify()) {
 				$coverPhoto->setUpdatedAt($now);
 
                 try {
-				    $imageResource = Schoolbox\StorageMapper::getInstance()->upload($uploadedFilename, $uploadedLocation, $uploadedUid);
+				    $imageResource = Schoolbox\Resource\Storage\Mapper::getInstance()->accept($uploadedFilename, $uploadedLocation, $uploadedUid);
 				    $coverPhoto->setImagehash($imageResource->getHash());
                 } catch (Exception $e) {
                     //Silently fail if image cannot be uploaded

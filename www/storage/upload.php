@@ -12,7 +12,7 @@ $sitePage = new SitePage;
 
 if (is_readable($_FILES['file']['tmp_name'])) {
 	try {
-		$imageResource = Schoolbox\StorageMapper::getInstance()->upload(
+		$imageResource = Schoolbox\Resource\Storage\Mapper::getInstance()->accept(
 			$_FILES['file']['name'], $_FILES['file']['tmp_name'], $_SESSION['id']
 		);
 		$hash = $imageResource->getHash();

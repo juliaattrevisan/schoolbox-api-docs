@@ -192,7 +192,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 					// php wy u do fials liek dis
 					foreach ($_FILES['ramsFile']['name'] as $i => $fileName) {
 						if ($_FILES['ramsFile']['error'][$i] === UPLOAD_ERR_OK) {
-							$newFile = \Schoolbox\StorageMapper::getInstance()->upload(
+							$newFile = \Schoolbox\Resource\Storage\Mapper::getInstance()->accept(
 								$fileName,
 								$_FILES['ramsFile']['tmp_name'][$i],
 								$author->getId()

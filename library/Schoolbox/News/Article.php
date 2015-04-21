@@ -13,9 +13,8 @@ namespace Schoolbox\News;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Role;
-use Schoolbox\Storage;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 
 class Article implements ISoftDeletable {
@@ -50,7 +49,7 @@ class Article implements ISoftDeletable {
 	/** @var User */
 	protected $owner;
 
-	/** @var Storage */
+	/** @var IStorage */
 	protected $image;
 
 	/** @var Role[]|Collection */

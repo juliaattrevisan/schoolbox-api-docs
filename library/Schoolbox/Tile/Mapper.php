@@ -86,7 +86,7 @@ class Mapper extends BaseMapper
                 'type'     => self::TYPE_MODEL,
                 'join'     => 'backgroundImage',
                 'join_def' => array(
-                    'mapper'    => '\\Schoolbox\\StorageMapper',
+                    'mapper'    => \Schoolbox\Resource\Storage\Mapper::class,
                     'other_key' => 'storage_id',
                 )
             )

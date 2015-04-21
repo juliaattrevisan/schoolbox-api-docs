@@ -20,7 +20,8 @@ use Component_InstanceMapper;
 use External_UserInterface;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Storage;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 
@@ -40,7 +41,7 @@ class Module extends BaseModule
      *
      * Required for fetching the category that the component belongs to.
      *
-     * @var CategoryMapper
+     * @var Folder\Mapper
      */
     protected $categoryMapper;
 
@@ -235,7 +236,7 @@ class Module extends BaseModule
         $injector->setters['Schoolbox\\Tile\\Controller']['setComponentConfigMapper']
             = $injector->lazyNew('Component_ConfigMapper');
         $injector->setters['Schoolbox\\Tile\\Controller']['setStorageMapper']
-            = $injector->lazyNew('Schoolbox\\StorageMapper');
+            = $injector->lazyNew(Storage\Mapper::class);
         $injector->set(
             'controller:tile',
             $injector->lazyNew('Schoolbox\\Tile\\Controller')
@@ -243,7 +244,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @param  CategoryMapper $categoryMapper
+     * @param  Folder\Mapper $categoryMapper
      * @return $this
      */
     public function setCategoryMapper($categoryMapper)
@@ -253,7 +254,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return CategoryMapper
+     * @return Folder\Mapper
      */
     public function getCategoryMapper()
     {

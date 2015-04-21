@@ -12,7 +12,7 @@ namespace Schoolbox\ResourceBooking\Item;
 use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Storage;
+use Schoolbox\Resource\Storage\IStorage;
 use Alaress_Date_Format;
 use Alaress\Date\Interval;
 use Schoolbox\User;
@@ -31,7 +31,7 @@ class Model implements ISoftDeletable, JsonSerializable {
     protected $category;
 
     /**
-     * @var Storage
+     * @var IStorage
      */
     protected $image;
 
@@ -305,7 +305,7 @@ class Model implements ISoftDeletable, JsonSerializable {
     }
 
     /**
-     * @param  Storage $image
+     * @param  IStorage $image
      * @return $this
      */
     public function setImage($image) {
@@ -314,7 +314,7 @@ class Model implements ISoftDeletable, JsonSerializable {
     }
 
     /**
-     * @return Storage
+     * @return IStorage
      */
     public function getImage() {
         return $this->image;
