@@ -31,6 +31,11 @@ class TopicMapper extends Mapper {
 			'type' => Mapper::TYPE_STRING,
 		));
 
+        $this->hasMap(array(
+                'column' => 'sequence',
+                'property' => 'sequence',
+                'type' => Mapper::TYPE_STRING,
+            ));
 	}
 
 }

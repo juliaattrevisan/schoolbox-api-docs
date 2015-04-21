@@ -1,0 +1,1 @@
+ALTER TABLE `newsTopic` ADD COLUMN `sequence` INT NULL AFTER `name`;
