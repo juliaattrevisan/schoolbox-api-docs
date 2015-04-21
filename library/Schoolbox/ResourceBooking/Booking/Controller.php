@@ -18,7 +18,7 @@ use Schoolbox\Calendar;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Item;
-use Calendar\Event\Type\ResourceBooking\Renderer\Javascript;
+use Calendar\Event\Type\Timetable\Renderer\Javascript;
 use Calendar\Event\Collection\Renderer;
 
 class Controller extends Base
@@ -658,11 +658,6 @@ class Controller extends Base
                     if (array_key_exists($relatedResource->getId(), $relatedItems)) {
                         $dateParts[] = array($relatedResource, $startDate, $endDate);
 
-                    $relatedItems = $this->request->post['related_item'] ?: array();
-                    foreach ($resource->getRelatedResourceList() as $relatedResource) {
-                        if (in_array($relatedResource->getId(), $relatedItems)) {
-                            $dateParts[] = array($relatedResource, $startDate, $endDate);
-
                             foreach ($series as $occurenceStart) {
                                 $occurenceEnd = clone $occurenceStart;
                                 $occurenceEnd->add($difference);
@@ -673,13 +668,12 @@ class Controller extends Base
                         }
                     }
 
-                    foreach ($dateParts as $check) {
-                        list($resource, $thisStart, $thisEnd) = $check;
-                        $errors = array_merge_recursive(
-                            $errors,
-                            $this->validateForConflicts($resource, $thisStart, $thisEnd)
-                        );
-                    }
+                foreach ($dateParts as $check) {
+                    list($resource, $thisStart, $thisEnd) = $check;
+                    $errors = array_merge_recursive(
+                        $errors,
+                        $this->validateForConflicts($resource, $thisStart, $thisEnd)
+                    );
                 }
             } else {
                 // Validating an existing booking?
@@ -957,7 +951,7 @@ class Controller extends Base
             );
 
             foreach ($roomEvents as $event) {
-                $renderer = new Javascript( $this->getDi()->get('sitePage'),$event);
+                $renderer = new Javascript( $this->getDi()->get('sitePage'),$event,  $this->getUser(), new \Group, new \Calendar);
                 $output = $renderer->render();
             }
         }
