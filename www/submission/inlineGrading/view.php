@@ -11,6 +11,7 @@
 use \Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionMapper;
 use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use \Schoolbox\Assessment\Activity;
 use \Schoolbox\File\MimetypeMapper;
 use Schoolbox\Resource\Attachment\Zone;
@@ -220,8 +221,10 @@ $zone->setMulti(false)
     ->setModalTitle('Select file')
     ->setAttachmentsLabel('');
 
-if ($hash = $latestReturnedWork->getStorage()->getHash()) {
-    $zone->attachFiles([ $hash ]);
+if($latestReturnedWork instanceof ReturnedWork) {
+    if ($hash = $latestReturnedWork->getStorage()->getHash()) {
+        $zone->attachFiles([$hash]);
+    }
 }
 
 $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
