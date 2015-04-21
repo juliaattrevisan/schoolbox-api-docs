@@ -35,7 +35,7 @@ class CreditSummary extends Base {
         $allResults = $this->findValues();
 
         $finalStack['table']['creditSummary'] = $this->findTable($allResults);
-        $finalStack['graph']['totalAchievedCredits'] = '';
+        $finalStack['graph']['totalAchievedCredits'] = $this->findTotalAchievedCredits($allResults);
 
         return $finalStack;
     }
@@ -116,12 +116,44 @@ class CreditSummary extends Base {
      * Find values to populate Total Achieved Credits graph
      *
      * @param $allResults
+     * @return array
      */
     private function findTotalAchievedCredits($allResults) {
         $finalStack = array();
 
-        foreach ($allResults as $current) {
+        $exclusions = array('N');
+        $totalEnteredCredits = array();
 
+        /* Accumulate "Achieved" values
+         */
+        foreach ($allResults as $current) {
+            $level = $current['Level'];
+
+            if (!is_array($finalStack[$level])) {
+                $finalStack[$level] = array(
+                    'achieved' => 0,
+                    'available' => 0,
+                );
+
+                $totalEnteredCredits[$level] = 0;
+            }
+
+            /* Sum of A, M, E values from both Internally Assessed
+             * and Externally Assessed types
+             */
+            if (!in_array($current['StrippedResult'], $exclusions)) {
+                $finalStack[$level]['achieved'] += $current['ResultCredits'];
+            }
+
+            $totalEnteredCredits[$level] += $current['EnteredCredits'];
         }
+
+        /* Accumulate "Available" values
+         */
+        foreach ($finalStack as $level => $totals) {
+            $finalStack[$level]['available'] = $totalEnteredCredits[$level] - $totals['achieved'];
+        }
+
+        return $finalStack;
     }
 }
