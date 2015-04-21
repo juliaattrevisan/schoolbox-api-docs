@@ -39,35 +39,15 @@
 
 <script type="text/javascript">
     $(function() {
-        $('[data-graph="total-achieved-credits"]').highcharts({
-            chart: {
-                type: 'bar'
-            },
-            title: {
-                text: 'Total Achieved Credits'
-            },
-            xAxis: {
-                categories: [
-                    {% for currentLevel, allLevelValues in creditSummary.data.graph.totalAchievedCredits %}
-                    '{{ currentLevel }}'{% if not loop.last %}, {% endif %}
-                    {% endfor %}
-                ]
-            },
-            yAxis: {
-                min: 0,
-                reversedStacks: false,
-                title: {
-                    text: ''
-                }
-            },
-            legend: {
-                reversed: false
-            },
-            plotOptions: {
-                series: {
-                    stacking: 'normal'
-                }
-            },
+        $('[data-graph="total-achieved-credits"]').ncea_stackedBar({
+            title: 'Total Achieved Credits',
+
+            categories: [
+                {% for currentLevel, allLevelValues in creditSummary.data.graph.totalAchievedCredits %}
+                '{{ currentLevel }}'{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            ],
+
             series: [
                 {
                     name: 'Total Achieved',
