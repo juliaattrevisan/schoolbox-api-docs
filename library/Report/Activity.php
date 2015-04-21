@@ -33,7 +33,7 @@ class Report_Activity extends Report_Abstract implements Report_IReport {
 
     // fields that we will permit sorting on
     private $sortable = array('time', 'action', 'user');
-    private $filterable = array('keyword', 'user');
+    private $filterable = array('keyword', 'user', 'action');
     private $defaultOrderBy = 'time';
 
     /**
@@ -134,6 +134,10 @@ class Report_Activity extends Report_Abstract implements Report_IReport {
                 if ($key == 'user') {
                     $sqlFilter[]    = "(username LIKE :user OR firstname LIKE :user OR lastname LIKE :user)";
                     $params['user'] = $value;
+                }
+                else if($key == 'action') {
+                    $sqlFilter[] = "cl.action = :action";
+                    $params['action'] = $value;
                 }
                 // custom filter by keyword
                 else if ($key == 'keyword') {
