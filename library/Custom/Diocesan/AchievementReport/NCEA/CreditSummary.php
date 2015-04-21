@@ -36,6 +36,7 @@ class CreditSummary extends Base {
 
         $finalStack['table']['creditSummary'] = $this->findTable($allResults);
         $finalStack['graph']['totalAchievedCredits'] = $this->findTotalAchievedCredits($allResults);
+        $finalStack['graph']['standardType'] = $this->findStandardType($allResults);
 
         return $finalStack;
     }
@@ -56,7 +57,8 @@ class CreditSummary extends Base {
                 InternalorExternalAssessment,
                 EnteredCredits,
                 StrippedResult,
-                ResultCredits
+                ResultCredits,
+                StandardType
             FROM
                 SynergyOne.dbo.uvSchoolBoxNCEAResults
             WHERE
@@ -152,6 +154,44 @@ class CreditSummary extends Base {
          */
         foreach ($finalStack as $level => $totals) {
             $finalStack[$level]['available'] = $totalEnteredCredits[$level] - $totals['achieved'];
+        }
+
+        return $finalStack;
+    }
+
+    /**
+     * Find values to populate Standard Type graph
+     *
+     * @param $allResults
+     * @return array
+     */
+    private function findStandardType($allResults) {
+        $finalStack = array();
+
+        $unitTypeList = array('U');
+        $unitResultList = array('A', 'M', 'E');
+        $achievementTypeList = array('A');
+
+        foreach ($allResults as $current) {
+            $level = $current['Level'];
+
+            if (!is_array($finalStack[$level])) {
+                $finalStack[$level] = array(
+                    'unit' => 0,
+                    'achievement' => 0,
+                );
+            }
+
+            /* Only accumulate some values
+             */
+            if (in_array($current['StrippedResult'], $unitResultList)) {
+                if (in_array($current['StandardType'], $unitTypeList)) {
+                    $finalStack[$level]['unit'] += $current['ResultCredits'];
+                }
+                elseif (in_array($current['StandardType'], $achievementTypeList)) {
+                    $finalStack[$level]['achievement'] += $current['ResultCredits'];
+                }
+            }
         }
 
         return $finalStack;
