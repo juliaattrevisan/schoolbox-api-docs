@@ -53,7 +53,7 @@
          * tell the difference)
          */
         function preview() {
-            $(config.element).click(function(event) {
+            $(config.element).off().click(function(event) {
                 if (event.which <= 1) {
                     event.preventDefault();
 
