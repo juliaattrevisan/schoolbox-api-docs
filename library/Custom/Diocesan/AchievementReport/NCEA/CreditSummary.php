@@ -32,6 +32,20 @@ class CreditSummary extends Base {
      */
     public function findData()
     {
+        $allResults = $this->findValues();
+
+        $finalStack['table']['creditSummary'] = $this->findTable($allResults);
+        $finalStack['graph']['totalAchievedCredits'] = '';
+
+        return $finalStack;
+    }
+
+    /**
+     * Find all the numeric data to be used throughout this section
+     *
+     * @return array|bool
+     */
+    private function findValues() {
         $externalUser = $this->getExternalUser();
         $externalUserId = $externalUser['StudentID'];
 
@@ -51,9 +65,17 @@ class CreditSummary extends Base {
                 NOT (StudentYear = '{$this->getYear()}' AND InternalorExternalAssessment = 'EX')
         ");
 
-        /**
-         * Rearrange everything into a nice order
-         */
+        return $allResults;
+    }
+
+    /**
+     * Find values to populate the Credit Summary - All Years table
+     * Rearrange everything into a nice order
+     *
+     * @param $allResults
+     * @return array
+     */
+    private function findTable($allResults) {
         $finalStack = array();
 
         foreach ($allResults as $current) {
@@ -62,7 +84,19 @@ class CreditSummary extends Base {
             $letter = $current['StrippedResult'];
 
             if (!is_array($finalStack[$level])) {
-                $finalStack[$level] = $this->initialiseLevel();
+                $finalStack[$level] = array(
+                    'totalEnteredCredits' => 0,
+                    'IN' => array(
+                        'enteredCredits' => 0,
+                        'letters' => array_fill_keys($this->getLetterRegistry(), 0),
+                        'availableCredits' => 0
+                    ),
+                    'EX' => array(
+                        'enteredCredits' => 0,
+                        'letters' => array_fill_keys($this->getLetterRegistry(), 0),
+                        'availableCredits' => 0
+                    )
+                );
             }
 
             $finalStack[$level][$internalExternal]['enteredCredits'] += $current['EnteredCredits'];
@@ -79,23 +113,15 @@ class CreditSummary extends Base {
     }
 
     /**
-     * Set up a new level
+     * Find values to populate Total Achieved Credits graph
      *
-     * @return array
+     * @param $allResults
      */
-    private function initialiseLevel() {
-        return array(
-            'totalEnteredCredits' => 0,
-            'IN' => array(
-                'enteredCredits' => 0,
-                'letters' => array_fill_keys($this->getLetterRegistry(), 0),
-                'availableCredits' => 0
-            ),
-            'EX' => array(
-                'enteredCredits' => 0,
-                'letters' => array_fill_keys($this->getLetterRegistry(), 0),
-                'availableCredits' => 0
-            )
-        );
+    private function findTotalAchievedCredits($allResults) {
+        $finalStack = array();
+
+        foreach ($allResults as $current) {
+
+        }
     }
 }

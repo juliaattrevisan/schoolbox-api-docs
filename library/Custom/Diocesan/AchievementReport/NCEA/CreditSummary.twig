@@ -21,7 +21,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for currentLevel, allLevelValues in creditSummary.data %}
+        {% for currentLevel, allLevelValues in creditSummary.data.table.creditSummary %}
         <tr>
             <td class="centered">{{ currentLevel }}</td>
             <td class="numeric">{{ allLevelValues.totalEnteredCredits }}</td>
@@ -36,3 +36,53 @@
         {% endfor %}
     </tbody>
 </table>
+
+<script type="text/javascript">
+    $(function() {
+        $('[data-graph="total-achieved-credits"]').highcharts({
+            chart: {
+                type: 'bar'
+            },
+            title: {
+                text: ''
+            },
+            xAxis: {
+                categories: [
+                    'Level 1', 'Level 2', 'Level 3'
+                ]
+            },
+            yAxis: {
+                min: 0,
+                max: 100,
+                reversedStacks: false,
+                title: {
+                    text: ''
+                }
+            },
+            legend: {
+                reversed: false
+            },
+            plotOptions: {
+                series: {
+                    stacking: 'normal'
+                }
+            },
+            series: [
+                {
+                    name: 'Total Achieved',
+                    data: [
+                        {% for currentLevel, allLevelValues in creditSummary.data %}
+                        {% endfor %}
+                    ]
+                },
+                {
+                    name: 'Total Available',
+                    data: [
+                        1, 2, 3
+                    ]
+                }
+            ]
+        });
+    });
+</script>
+<div data-graph="total-achieved-credits"></div>
