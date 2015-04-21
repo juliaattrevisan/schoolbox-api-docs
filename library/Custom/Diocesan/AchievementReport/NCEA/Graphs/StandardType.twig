@@ -1,0 +1,33 @@
+<script type="text/javascript">
+    $(function() {
+        $('[data-graph="standard-type"]').ncea_stackedBar({
+            title: 'Standard Type',
+
+            categories: [
+                {% for currentLevel, allLevelValues in creditSummary.data.graph.standardType %}
+                '{{ currentLevel }}'{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            ],
+
+            series: [
+                {
+                    name: 'Unit',
+                    data: [
+                        {% for currentLevel, allLevelValues in creditSummary.data.graph.standardType %}
+                        {{ allLevelValues.unit }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    ]
+                },
+                {
+                    name: 'Achieved',
+                    data: [
+                        {% for currentLevel, allLevelValues in creditSummary.data.graph.standardType %}
+                        {{ allLevelValues.achievement }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    ]
+                }
+            ]
+        });
+    });
+</script>
+<div data-graph="standard-type"></div>

@@ -37,6 +37,18 @@
     </tbody>
 </table>
 
-<div style="width:25%;height:400px;float:left;margin-bottom:32px;">
-{% include '@ncea/Graphs/TotalAchievedCredits.twig' %}
+<style type="text/css">
+    .achievement-report.ncea div.graph-socket {
+        width:25%;
+        height:400px;
+        margin-bottom:32px;
+        float:left;
+    }
+</style>
+
+<div class="graph-socket">
+    {% include '@ncea/Graphs/TotalAchievedCredits.twig' %}
+</div>
+<div class="graph-socket">
+    {% include '@ncea/Graphs/StandardType.twig' %}
 </div>
