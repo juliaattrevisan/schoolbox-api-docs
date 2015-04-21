@@ -11,6 +11,12 @@ namespace Schoolbox;
 use Schoolbox\File\Mimetype;
 use Schoolbox\Resource\Storage\IStorage;
 
+/**
+ * Class Storage
+ *
+ * @deprecated use Schoolbox\Resource\Storage\Model
+ * @package Schoolbox
+ */
 class Storage implements FileInterface, IStorage {
 
 	/**
