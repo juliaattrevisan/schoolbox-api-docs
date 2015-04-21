@@ -12,7 +12,9 @@ namespace Schoolbox\Resource\Storage;
 
 use Alaress_Date_Format;
 use League\Flysystem\File;
+use League\Flysystem\FileNotFoundException;
 use League\Flysystem\FilesystemInterface;
+use RuntimeException;
 use Schoolbox\File\Mimetype;
 use Schoolbox\Video\Queue;
 
@@ -168,12 +170,17 @@ class Model extends File implements IStorage
 
     /**
      * @return int
+     * @throws FileNotFoundException
      */
     public function getSize()
     {
         // calculate size if not known
         if (!$this->size) {
-            $this->setSize(parent::getSize());
+            try {
+                $this->setSize(parent::getSize());
+            } catch (RuntimeException $e) {
+                throw new FileNotFoundException($this->getPath(), 0, $e);
+            }
         }
         return $this->size;
     }
