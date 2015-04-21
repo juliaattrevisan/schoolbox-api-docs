@@ -419,17 +419,14 @@ $(document).ready(function() {
     <input type="hidden" name="callbackUrl" value="{{ callbackUrl }}" />
     <table class="standardForm table">
         <tr>
-            <td class="formLabelWidth"><h4>Rules</h4></td>
-            <td>
-                {% include '@resourceItem/sub/rules.twig' with {item: item.resource} %}
-            </td>
-        </tr>
-        <tr>
             <td class="formLabelWidth">
                 <h4>Title</h4>
             </td>
             <td>
+                <label>
                 <input name="name" type="text" value="{{ item.name }}" />
+                </label>
+                {% include '@resourceItem/sub/rules.twig' with {item: item.resource} %}
             </td>
         </tr>
         <tr>
@@ -462,29 +459,8 @@ $(document).ready(function() {
         {% if allowOverride %}
         <tr>
             <td class="formLabelWidth" valign="top">
-                <h4>Ignore rules?</h4>
-                <em>If this is selected, this booking will be created even if it:</em>
-                <ul>
-                    <li class="wysiwyg">is already booked for this time</li>
-                    {% if item.resource.minLeadTime.minuteTotal %}
-                        <li class="wysiwyg">
-                            starts in less than
-                            {% include 'sub/interval.twig' with {interval: item.resource.minLeadTime} %}
-                        </li>
-                    {% endif %}
-                    {% if item.resource.minReservationTime.minuteTotal %}
-                        <li class="wysiwyg">
-                            goes for less than
-                            {% include 'sub/interval.twig' with {interval: item.resource.minReservationTime} %}
-                        </li>
-                    {% endif %}
-                    {% if item.resource.maxReservationTime.minuteTotal %}
-                        <li class="wysiwyg">
-                            goes for more than
-                            {% include 'sub/interval.twig' with {interval: item.resource.maxReservationTime} %}
-                        </li>
-                    {% endif %}
-                </ul>
+                <h4>Bypass Validation</h4>
+                <em>Only select this if you are certain you wish to override the system rules</em>
             </td>
             <td>
                 <input id="resource-booking-override-validation"
@@ -573,12 +549,7 @@ $(document).ready(function() {
                             </label>
 
                             <div data-relation="related-resource-notes" class="{% if relatedBooking is empty %}hide{% endif %}">
-                                <dl>
-                                    <dt>Title</dt>
-                                    <dd><input name="related_item[{{ relatedItem.id }}][name]" type="text" value="{{ relatedBooking.name }}" /></dd>
-                                    <dt>Notes</dt>
-                                    <dd><textarea name="related_item[{{ relatedItem.id }}][notes]" style="width:100%;">{{ relatedBooking.notes }}</textarea></dd>
-                                </dl>
+                             <textarea name="related_item[{{ relatedItem.id }}][notes]" style="width:100%;">{{ relatedBooking.notes }}</textarea>
                             </div>
                         </li>
                     {% else %}
