@@ -108,7 +108,9 @@ class Controller extends Base {
 
                 'creditSummary' => array(
                     'heading' => $creditSummary->getHeading(),
-                    'data' => $creditSummary->findData()
+                    'data' => $creditSummary->findData(),
+                    'allLetters' => $creditSummary->getLetterRegistry(),
+                    'allTypes' => array('IN', 'EX')
                 )
             )
         ));

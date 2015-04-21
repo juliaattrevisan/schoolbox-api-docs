@@ -1,4 +1,4 @@
-<h2>Credit Summary (All years)</h2>
+<h2>{{ creditSummary.heading }}</h2>
 
 <table class="credit-summary">
     <thead>
@@ -11,36 +11,28 @@
         <tr class="equal-widths">
             <th class="centered">Level</th>
             <th class="numeric">Total Entered Credits</th>
+            {% for currentType in creditSummary.allTypes %}
             <th class="numeric">Entered Credits</th>
-            <th class="letter">N</th>
-            <th class="letter">A</th>
-            <th class="letter">M</th>
-            <th class="letter">E</th>
+            {% for currentLetter in creditSummary.allLetters %}
+            <th class="letter">{{ currentLetter }}</th>
+            {% endfor %}
             <th class="numeric">Available</th>
-            <th class="numeric">Entered Credits</th>
-            <th class="letter">N</th>
-            <th class="letter">A</th>
-            <th class="letter">M</th>
-            <th class="letter">E</th>
-            <th class="numeric">Available</th>
+            {% endfor %}
         </tr>
     </thead>
     <tbody>
+        {% for currentLevel, allLevelValues in creditSummary.data %}
         <tr>
-            <td class="centered">2</td>
-            <td class="numeric">132</td>
-            <td class="numeric">71</td>
-            <td class="letter">0</td>
-            <td class="letter">10</td>
-            <td class="letter">8</td>
-            <td class="letter">28</td>
-            <td class="numeric">43</td>
-            <td class="numeric">61</td>
-            <td class="letter">0</td>
-            <td class="letter">0</td>
-            <td class="letter">0</td>
-            <td class="letter">0</td>
-            <td class="numeric">61</td>
+            <td class="centered">{{ currentLevel }}</td>
+            <td class="numeric">{{ allLevelValues.totalEnteredCredits }}</td>
+            {% for currentType in creditSummary.allTypes %}
+            <td class="numeric">{{ allLevelValues[currentType].enteredCredits }}</td>
+            {% for currentLetter in creditSummary.allLetters %}
+            <td class="letter">{{ allLevelValues[currentType].letters[currentLetter] }}</td>
+            {% endfor %}
+            <td class="numeric">{{ allLevelValues[currentType].availableCredits }}</td>
+            {% endfor %}
         </tr>
+        {% endfor %}
     </tbody>
 </table>

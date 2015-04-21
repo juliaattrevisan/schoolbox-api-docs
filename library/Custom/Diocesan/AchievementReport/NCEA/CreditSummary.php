@@ -22,7 +22,7 @@ class CreditSummary extends Base {
     protected function setup()
     {
         $this->setYear(date('Y'));
-        $this->setHeading('Credit Summary');
+        $this->setHeading('Credit Summary - All Years');
     }
 
     /**
@@ -70,9 +70,9 @@ class CreditSummary extends Base {
             $finalStack[$level][$internalExternal]['availableCredits'] += ($current['EnteredCredits'] - $current['ResultCredits']);
         }
 
-        new Probe($this->explorerReporting(), $allResults, $finalStack);
+//        new Probe($this->explorerReporting(), $allResults, $finalStack);
 
-        return;
+        return $finalStack;
     }
 
     /**
