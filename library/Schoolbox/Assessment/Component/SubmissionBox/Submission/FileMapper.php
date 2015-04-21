@@ -152,23 +152,28 @@ class FileMapper extends Mapper
 
         while ($r = $statement->fetch(\PDO::FETCH_ASSOC)) {
 
+            // can't set storage if it doesn't exist
+            if (!$r['h.hash']) {
+                continue;
+            }
+
             $file = $this->hydrate($r);
 
             $file->setPlagscan($plag->hydrate($r, 'p'));
 
             // just in case we wanted this to be simple
-            $file->setStorage(
-                $this->hydrateJoin($r, 'storage', 'h')
-                    ->setMimetype(
-                        $this->getJoinMapper('storage')
-                            ->hydrateJoin($r, 'allowedFileExtension', 'm')
-                    )
-            );
+
+            /** @var Storage\Model $store */
+            $store = $this->hydrateJoin($r, 'storage', 'h')
+                         ->setMimetype(
+                             $this->getJoinMapper('storage')
+                                  ->hydrateJoin($r, 'allowedFileExtension', 'm')
+                         );
 
             // ensure the path is set
-            $file->getStorage()->setPath(
-                $this->getStorageMapper()->getManager()->calcPath($file->getStorage())
-            );
+            $store->setPath($this->getStorageMapper()->getManager()->calcPath($store));
+
+            $file->setStorage($store);
 
             $file->setOwner($this->hydrateJoin($r, 'owner', 'u'));
 
@@ -325,6 +330,28 @@ class FileMapper extends Mapper
         $submission->setStorage($storage);
 
         return $submission;
+    }
+
+    /**
+     * Retrieves draft submissions for this user and box, ordered by most recent first.
+     *
+     * @param int $user_id
+     * @param int $box_id
+     * @param int $limit
+     *
+     * @return Collection|File[]
+     */
+    public function getDrafts($user_id, $box_id, $limit = null)
+    {
+        return $this->findByColumnList([
+            'box_id' => $box_id,
+            'owner'  => $user_id,
+            'draft'  => true
+        ], [
+            'limit'  => $limit,
+            'order'  => [ 'submitted' => 'desc' ],
+        ]);
+
     }
 
 } 
