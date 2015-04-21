@@ -29,6 +29,11 @@ interface IStorage
     public function getFilename();
 
     /**
+     * @return string
+     */
+    public function getExtension();
+
+    /**
      * Returns the full mime string for the file
      * @return string
      */
@@ -60,5 +65,29 @@ interface IStorage
      * @return ADF
      */
     public function getLastAccessed();
+
+    /**
+     * Check whether the file exists.
+     *
+     * @inherited from Flysystem\File
+     * @return bool
+     */
+    public function exists();
+
+    /**
+     * Read the file.
+     *
+     * @inherited from Flysystem\File
+     * @return string file contents
+     */
+    public function read();
+
+    /**
+     * Read the file as a stream.
+     *
+     * @inherited from Flysystem\File
+     * @return resource file stream
+     */
+    public function readStream();
 
 } 
