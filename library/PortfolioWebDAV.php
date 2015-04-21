@@ -502,6 +502,35 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 return false;
             }
         }
+        else if ($site_location=='sheldon') {
+            $settings = array(
+                'baseUri' => 'https://sviisdev01.sheldoncollege.com/',
+                'userName' => $_SESSION['username'] . "@sheldoncollege.com",
+                'password' => $_SESSION['password'],
+            );
+
+            if ($groupHandler->isStaff()) {
+                $paths = array(
+                    $settings['baseUri'].'StaffHomesC/' . $_SESSION['username'] . '/',
+                    $settings['baseUri'].'CollegeShareC/',
+                );
+                $roleid = $_SESSION['user']->getRole()->getId();
+                if ($roleid != '3' AND $roleid != '4') {
+                    $paths = array_merge($paths, array(
+                        $settings['baseUri'].'AcademicShareC/',
+                        $settings['baseUri'].'StudentShareC/',
+                    ));
+                }
+            } else if ($groupHandler->isStudent()) {
+                $paths = array(
+                    $settings['baseUri'].'StudentHomesC/' . $_SESSION['username'] . '/',
+                    $settings['baseUri'].'StudentShareC/',
+                );
+            } else {
+                return false;
+            }
+
+        }
         else if ($site_location=='meriden') {
             $settings = array(
                 'baseUri' => 'http://webdav.meriden.nsw.edu.au/',
