@@ -1,0 +1,33 @@
+<script type="text/javascript">
+    $(function() {
+        $('[data-graph="total-achieved-credits"]').ncea_stackedBar({
+            title: 'Total Achieved Credits',
+
+            categories: [
+                {% for currentLevel, allLevelValues in creditSummary.data.graph.totalAchievedCredits %}
+                '{{ currentLevel }}'{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            ],
+
+            series: [
+                {
+                    name: 'Total Achieved',
+                    data: [
+                        {% for currentLevel, allLevelValues in creditSummary.data.graph.totalAchievedCredits %}
+                        {{ allLevelValues.achieved }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    ]
+                },
+                {
+                    name: 'Total Available',
+                    data: [
+                        {% for currentLevel, allLevelValues in creditSummary.data.graph.totalAchievedCredits %}
+                        {{ allLevelValues.available }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    ]
+                }
+            ]
+        });
+    });
+</script>
+<div data-graph="total-achieved-credits"></div>

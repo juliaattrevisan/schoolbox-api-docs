@@ -63,7 +63,7 @@
                     type: 'bar'
                 },
                 title: {
-                    text: ''
+                    text: config.title
                 },
                 xAxis: {
                     categories: config.categories
