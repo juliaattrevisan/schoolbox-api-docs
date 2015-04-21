@@ -48,15 +48,10 @@ class Facade {
 	 * @throws Exception
 	 */
 	public function start() {
-		$submissionMapper = new Submission\Mapper();
+		$submissionMapper = new Submission\FileMapper();
 
         /** @var Submission\File $submission */
 		$submission = $submissionMapper->findById($this->getSubmissionId());
-
-        // don't attempt to work on Inlines
-        if ($submission instanceof Submission\Inline) {
-            return;
-        }
 
 		/* If this was previously uploaded in the past, resume scribbling
 		 * Otherwise upload it and start a new scribble

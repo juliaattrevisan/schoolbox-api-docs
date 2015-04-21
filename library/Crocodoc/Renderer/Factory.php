@@ -102,9 +102,6 @@ class Factory {
             } elseif ($work->getMimeType()->matches('text/html')) {
                 return new Strategy\Html($this->getPage(), $work, $this->getReturnedWork(), $this->getNavigationElements());
             }
-
-        } elseif ($work instanceof Submission\Inline) {
-            return new Strategy\Html($this->getPage(), $work, $this->getReturnedWork(), $this->getNavigationElements());
 		}
 
         // Otherwise just download the file

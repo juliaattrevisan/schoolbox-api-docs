@@ -1,5 +1,6 @@
 <?php
 
+use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\Component;
 use Schoolbox\Config\ConfigMapper;
 
@@ -61,7 +62,7 @@ if ($this->arg[0] == false) {
 }
 
 $boxMapper        = new Component\SubmissionBoxMapper();
-$submissionMapper = new Component\SubmissionBox\Submission\Mapper();
+$submissionMapper = new Component\SubmissionBox\Submission\FileMapper();
 $work_mapper      = new Component\SubmissionBox\WorkTypeMapper();
 $return_mapper    = new Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
 $folderMapper     = new \Schoolbox\Resource\Folder\Mapper();
@@ -308,6 +309,7 @@ if (count($submission_history)) {
     $errors = $dem->listDisplayValues();
 
     foreach ($submission_history as $activity_item) {
+        /** @var Activity $activity_item */
         // reset blocks
         foreach ($historyActivityTypes as $historyType) {
             $this->setVar("history_{$historyType}_block", '');
@@ -522,14 +524,6 @@ if (isset($recent_activity)) {
             'MOST_RECENT_SUBMISSION_FILE_DATE'  => $recentSubmissionDate->getRelativeTime(),
             'MOST_RECENT_SUBMISSION_FILE_ID'    => $recent_activity->getSubmission()->getId(),
         );
-    } elseif ($student_submission instanceof Component\SubmissionBox\Submission\Inline) {
-        $output = [
-            'MOST_RECENT_SUBMISSION_FILE_NAME'  => 'Online Submission',
-            'MOST_RECENT_SUBMISSION_FILE_SIZE'  => Alaress_Byte_Format::bytesToString(strlen($student_submission->getBody())),
-            'MOST_RECENT_SUBMISSION_FILE_THUMB' => 'html.png',
-            'MOST_RECENT_SUBMISSION_FILE_DATE'  => $recentSubmissionDate->getRelativeTime(),
-            'MOST_RECENT_SUBMISSION_FILE_ID'    => $recent_activity->getSubmission()->getId(),
-        ];
     } else {
         $output = [];
     }
@@ -593,7 +587,7 @@ if (isset($recent_activity)) {
         if ($drafts->count() === 0) {
             $this->parse('action_resubmit_online_create_block', 'action_resubmit_online_create');
         } else {
-            /** @var Component\SubmissionBox\Submission\Inline $draft */
+            /** @var Component\SubmissionBox\Submission\File $draft */
             $draft = $drafts->first();
             // Is draft before most recent submission? show create new draft
             if ($draft->getCreatedAt()->getUnixTimestamp() < $recentSubmissionDate->getUnixTimestamp()) {

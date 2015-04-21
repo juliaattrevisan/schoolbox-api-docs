@@ -70,7 +70,7 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
      */
     public function loadChildren()
     {
-        $mapper        = new Submission\Mapper();
+        $mapper        = new Submission\FileMapper();
         $nameGenerator = new DAV_NameGenerator();
         $files         = $mapper->findByColumnList(
             array(
@@ -151,7 +151,7 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
         // * The submission is late
         // * They've already submitted and it's not a multi-submission assess
         // All of these are covered in SubmissionMapper->checkUploadability
-        $mapper = new Submission\Mapper();
+        $mapper = new Submission\FileMapper();
         try {
             SubmissionBoxMapper::getInstance()->checkUploadability($this->getAssessment(), $this->getUser());
 

@@ -8,7 +8,7 @@
  */
 
 
-use \Schoolbox\Assessment\Component\SubmissionBox\Submission\Mapper as SubmissionMapper;
+use \Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionMapper;
 use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use \Schoolbox\Assessment\Activity;

@@ -23,7 +23,7 @@ $this->setTab('submission');
 // allow teachers to mark this?
 
 $box_mapper        = new SubmissionBoxMapper();
-$submission_mapper = new Submission\Mapper();
+$submission_mapper = Submission\FileMapper::getInstance();
 
 //
 // Submission mapper - will get the most recent submission for this student.
@@ -42,10 +42,17 @@ $gradient       = $submission_box->getGradientIndex();
 // Find most recent submissions for this user - later, consider showing drafts
 // across side of screen.
 $drafts = $submission_mapper->getDrafts($user_id, $box_id, 10);
+
+if ($drafts->count()) {
+    /** @var Submission\File $draft */
+    $draft = $drafts->first();
+    $body  = $draft->getStorage()->read();
+}
+
 $body   = '';
 if (count($drafts)) {
 	foreach ($drafts as $draft) {
-		$body = $draft->getBody();
+		$body = $draft->getStorage()->read();
 		break;
 	}
 }
@@ -61,5 +68,5 @@ $this->setVar(array(
     'BOX_NAME'      => Scrub::text($submission_box->getName()),
     'BOX_TYPE'      => $submission_box->getWorkType()->getName(),
     'BOX_CREATED'   => $createdDate->getRelativeTime(),
-    'TEXTBOX_BODY'  => ($draft instanceof Submission\Inline ? Scrub::text($draft->getBody()) : ''),
+    'TEXTBOX_BODY'  => $body,
 ));

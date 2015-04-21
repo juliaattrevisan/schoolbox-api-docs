@@ -118,7 +118,7 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
 
         //
         // And put it in the submission object.
-        $mapper = new Submission\Mapper();
+        $mapper = new Submission\FileMapper();
         $mapper->save($this->getSubmission()->setStorage($storage));
         return null;
     }

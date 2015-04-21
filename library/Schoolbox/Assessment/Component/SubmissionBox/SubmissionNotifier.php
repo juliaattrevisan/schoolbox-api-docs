@@ -72,7 +72,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
         $dependencies['submissionBoxMapper'] = $dependencies['submissionBoxMapper'] ?: SubmissionBoxMapper::getInstance();
         $dependencies['userMapper']          = $dependencies['userMapper'] ?: UserMapper::getInstance();
         $dependencies['folderMapper']        = $dependencies['folderMapper'] ?: Folder\Mapper::getInstance();
-        $dependencies['mapper']              = $dependencies['mapper'] ?: new Submission\Mapper();
+        $dependencies['mapper']              = $dependencies['mapper'] ?: Submission\FileMapper::getInstance();
 
         parent::loadDependencies($dependencies);
     }

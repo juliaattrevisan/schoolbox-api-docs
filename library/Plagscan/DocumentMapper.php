@@ -16,7 +16,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission;
  */
 class Plagscan_DocumentMapper extends Schoolbox\Mapper
 {
-    /** @var Submission\Mapper */
+    /** @var Submission\FileMapper */
     protected $submissionMapper;
 
 	/**

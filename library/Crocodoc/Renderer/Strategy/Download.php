@@ -14,7 +14,6 @@ use Alaress_Byte_Format;
 use Plagscan_Document;
 use Plagscan_DocumentMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
-use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 
@@ -59,16 +58,9 @@ class Download extends Base {
 			$plagHref = '';
 		}
 
-        if ($work instanceof Submission\File) {
-            $filename = $work->getFilename();
-            $filesize = $work->getSize();
-            $mimetype = $work->getMimetype();
-
-        } elseif ($work instanceof Submission\Inline) {
-            $filename = 'Online Submission';
-            $filesize = strlen($work->getBody());
-            $mimetype = MimetypeMapper::getInstance()->getByFilename('body.html');
-        }
+        $filename = $work->getFilename();
+        $filesize = $work->getSize();
+        $mimetype = $work->getMimetype();
 
 		$this->getPage()->setVar(array(
 			'MOST_RECENT_SUBMISSION_FILE_ID'        => $work->getId(),
