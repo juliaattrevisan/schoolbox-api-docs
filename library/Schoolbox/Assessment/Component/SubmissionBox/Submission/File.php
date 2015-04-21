@@ -11,12 +11,18 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Submission;
 
 
 use Alaress_Date_Format as ADF;
+use Plagscan_Document;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\File\Mimetype;
 use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\User;
 
-class File extends AbstractSubmission implements IFile
+class File implements IFile
 {
+
+    /** @var int */
+    protected $id;
 
     /** @var IStorage */
     protected $storage;
@@ -27,10 +33,27 @@ class File extends AbstractSubmission implements IFile
     /** @var string */
     protected $uuid;
 
-    /**
-     * @var \Plagscan_Document
-     */
+    /** @var bool */
+    protected $draft;
+
+    /** @var Plagscan_Document */
     protected $plagscan;
+
+    /** @var SubmissionBox */
+    protected $submissionBox;
+
+    /** @var bool */
+    protected $marked;
+
+    /** @var bool */
+    protected $late;
+
+    /** @var User */
+    protected $owner;
+
+    /** @var ADF */
+    protected $createdAt;
+
 
     /**
      * @return string
@@ -142,7 +165,7 @@ class File extends AbstractSubmission implements IFile
     }
 
     /**
-     * @param \Plagscan_Document $plagscan
+     * @param Plagscan_Document $plagscan
      */
     public function setPlagscan($plagscan)
     {
@@ -150,7 +173,7 @@ class File extends AbstractSubmission implements IFile
     }
 
     /**
-     * @return \Plagscan_Document
+     * @return Plagscan_Document
      */
     public function getPlagscan()
     {
@@ -158,5 +181,172 @@ class File extends AbstractSubmission implements IFile
     }
 
 
+    /**
+     * @return boolean
+     */
+    public function isDraft()
+    {
+        return $this->draft;
+    }
+
+
+    /**
+     * @deprecated only exists for mapper compatibility
+     * @return boolean
+     */
+    public function getDraft()
+    {
+        return $this->isDraft();
+    }
+
+
+    /**
+     * @param boolean $draft
+     * @return static
+     */
+    public function setDraft($draft)
+    {
+        $this->draft = $draft;
+        return $this;
+    }
+
+
+    /**
+     * @return ADF
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+
+    /**
+     * @param ADF $createdAt
+     * @return static
+     */
+    public function setCreatedAt($createdAt)
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+
+    /**
+     * @param int $id
+     * @return static
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+
+    /**
+     * @return User
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+
+    /**
+     * @param User $owner
+     * @return static
+     */
+    public function setOwner($owner)
+    {
+        $this->owner = $owner;
+        return $this;
+    }
+
+
+    /**
+     * @return SubmissionBox
+     */
+    public function getSubmissionBox()
+    {
+        return $this->submissionBox;
+    }
+
+
+    /**
+     * @param SubmissionBox $submissionBox
+     * @return static
+     */
+    public function setSubmissionBox($submissionBox)
+    {
+        $this->submissionBox = $submissionBox;
+        return $this;
+    }
+
+
+    /**
+     * @return boolean
+     */
+    public function isLate()
+    {
+        return $this->late;
+    }
+
+    /**
+     * @deprecated for mapper use only
+     * @return bool
+     */
+    public function getLate()
+    {
+        return $this->isLate();
+    }
+
+
+    /**
+     * @param boolean $late
+     * @return static
+     */
+    public function setLate($late)
+    {
+        $this->late = $late;
+        return $this;
+    }
+
+
+    /**
+     * @return boolean
+     */
+    public function isMarked()
+    {
+        return $this->marked;
+    }
+
+
+    /**
+     * @deprecated for mapper use only
+     * @return bool
+     */
+    public function getMarked()
+    {
+        return $this->isMarked();
+    }
+
+
+    /**
+     * @param boolean $marked
+     * @return static
+     */
+    public function setMarked($marked)
+    {
+        $this->marked = $marked;
+        return $this;
+    }
 
 }
