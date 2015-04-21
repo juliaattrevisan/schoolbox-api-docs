@@ -164,7 +164,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
                 );
             }
         }
-        $baseQuery .= ' WHERE ('.implode(') AND (', $whereParts).')';
+        $baseQuery .= ' WHERE '.$table.'.deleted_at IS NULL AND ('.implode(') AND (', $whereParts).')';
 
         // Put together sort parts
         $sortFields = array(
