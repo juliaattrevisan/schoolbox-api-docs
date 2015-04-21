@@ -663,28 +663,12 @@ class Group extends DeprecatedModel
                         try {
                             $folder = $folderMapper->findByCode($currentSubject['code']);
 
-                            /* Find folder owner
-                             */
-                            $userAccessMapper = new \Schoolbox\Permission\Access\UserAccessMapper();
-                            $allFolderOwners = $userAccessMapper->findUsersInCategory($folder, \Schoolbox\Role::STAFF, \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL);
-
-                            if (!$allFolderOwners->count()) {
-                                $folderOwner = new \Schoolbox\User();
-                            } else {
-                                $folderOwner = $allFolderOwners->first();
-                            }
-
                             $allFolders[] = array(
                                 'id' => $folder->getId(),
                                 'name' => $folder->getName(),
                                 'parent' => $folder->getParent()->getId(),
                                 'deleted_at' => $folder->getDeletedAt(),
                                 'code' => $folder->getCodeString(),
-                                'owner' => $folderOwner->getId(),
-                                'title' => $folderOwner->getTitle(),
-                                'firstname' => $folderOwner->getFirstname(),
-                                'lastname' => $folderOwner->getLastname(),
-                                'type' => $folder->getGroup()->getType(),
                                 'template' => $folder->getHomepage()->getTemplate()->getId(),
                             );
                         } catch (\Exception $e) {
