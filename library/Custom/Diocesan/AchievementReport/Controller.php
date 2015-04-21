@@ -50,6 +50,14 @@ class Controller extends Base {
         ));
     }
 
+    /**
+     * IB page
+     *
+     * @param $db
+     * @param $user
+     * @param $externalUser
+     * @param $year
+     */
     public function ib($db, $user, $externalUser, $year) {
         $progressGradeSummary = new IB\ProgressGradeSummary($externalUser, $db);
         $yearlyBreakdown = new IB\YearlyBreakdown($externalUser, $db);
@@ -74,8 +82,17 @@ class Controller extends Base {
         ));
     }
 
+    /**
+     * NCEA page
+     *
+     * @param $db
+     * @param $user
+     * @param $externalUser
+     * @param $year
+     */
     public function ncea($db, $user, $externalUser, $year) {
         $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($externalUser, $db);
+        $creditSummary = new NCEA\CreditSummary($externalUser, $db);
 
         $this->getResponse()->content->set(array(
             'template' => '@ncea/index.twig',
@@ -87,6 +104,11 @@ class Controller extends Base {
                 'literacyNumeracyCheckbox' => array(
                     'heading' => $literacyNumeracyCheckbox->getHeading(),
                     'data' => $literacyNumeracyCheckbox->findData()
+                ),
+
+                'creditSummary' => array(
+                    'heading' => $creditSummary->getHeading(),
+                    'data' => $creditSummary->findData()
                 )
             )
         ));

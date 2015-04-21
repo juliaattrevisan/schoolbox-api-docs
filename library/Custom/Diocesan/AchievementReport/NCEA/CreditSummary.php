@@ -32,6 +32,8 @@ class CreditSummary extends Base {
      */
     public function findData()
     {
-        // TODO: Implement findData() method.
+//        new Probe($this->explorerReporting());
+
+        return;
     }
 }

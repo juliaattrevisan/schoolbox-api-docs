@@ -1,3 +1,6 @@
+/**
+ * Global styles
+ */
 .achievement-report section.avatar {
     margin-bottom: 40px;
 }
@@ -15,27 +18,31 @@
     text-align: left;
 }
 
-/**
- * Yearly Breakdown
- */
-
-.achievement-report.school-grades tfoot td {
-    border-top: 3px solid #ddd;
-    font-style: italic;
-}
-
-.achievement-report.school-grades th.letter,
-.achievement-report.school-grades td.letter
+.achievement-report th.letter,
+.achievement-report td.letter
 {
     width: 40px;
     text-align: right;
 }
 
-.achievement-report.school-grades th.numeric,
-.achievement-report.school-grades td.numeric
+.achievement-report th.numeric,
+.achievement-report td.numeric
 {
     width: 90px;
     text-align: right;
+}
+
+.achievement-report th.centered,
+.achievement-report td.centered {
+    text-align: center;
+}
+
+/**
+ * Yearly Breakdown
+ */
+.achievement-report.school-grades tfoot td {
+    border-top: 3px solid #ddd;
+    font-style: italic;
 }
 
 /**
@@ -70,11 +77,6 @@
 /**
  * IB Progress Grade Summary
  */
-.achievement-report.ib th.centered,
-.achievement-report.ib td.centered {
-    text-align: center;
-}
-
 .achievement-report.ib th.year,
 .achievement-report.ib td.year {
     width: 100px;
@@ -92,4 +94,13 @@
 
 .achievement-report.ib .yearly-breakdown-graph {
     height: 100px;
+}
+
+/**
+ * NCEA
+ */
+.achievement-report.ncea table.credit-summary .equal-widths th,
+.achievement-report.ncea table.credit-summary .equal-widths td
+{
+    width: 7.14%
 }
