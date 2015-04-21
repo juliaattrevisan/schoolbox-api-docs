@@ -76,7 +76,10 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
                  */
                 $this->applyCollapsedState();
 
-                $this->sitepage->parse('settings_collapse_block', 'settings_collapse');
+                if(!$is_for_template) {
+                    // We don't show the collapse option when building templates
+                    $this->sitepage->parse('settings_collapse_block', 'settings_collapse');
+                }
                 $this->sitepage->parse('settings_link_block', 'settings_link');
                 $this->sitepage->parse('settings_close_block', 'settings_close');
             }
