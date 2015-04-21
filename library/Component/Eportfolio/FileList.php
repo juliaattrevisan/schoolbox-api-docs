@@ -28,7 +28,7 @@ class FileList extends ListItem {
 	/**
 	 * A Schoolbox\MyFile instance
 	 *
-	 * @var \Schoolbox\MyFile
+	 * @var \Schoolbox\Resource\My\File\Model
 	 */
 	private $file;
 
@@ -129,7 +129,7 @@ class FileList extends ListItem {
 	/**
 	 * Set file
 	 *
-	 * @param \Schoolbox\MyFile $file
+	 * @param \Schoolbox\Resource\My\File\Model $file
 	 */
 	public function setFile($file) {
 		$this->file = $file;
@@ -138,7 +138,7 @@ class FileList extends ListItem {
 	/**
 	 * Get file
 	 *
-	 * @return \Schoolbox\MyFile
+	 * @return \Schoolbox\Resource\My\File\Model
 	 */
 	public function getFile() {
 		return $this->file;
