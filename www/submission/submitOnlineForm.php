@@ -10,7 +10,7 @@ use Schoolbox\Config\ConfigMapper;
 $page = new SitePage();
 $conf = ConfigMapper::getInstance();
 $box_mapper        = new SubmissionBoxMapper();
-$submission_mapper = new Submission\InlineMapper();
+$submission_mapper = new Submission\FileMapper();
 
 /** @var Schoolbox\User $user */
 $user    = $_SESSION['user'];
@@ -19,31 +19,22 @@ $isDraft = isset($_POST['save_draft']);
 $body    = $_POST['body'];
 
 if (!empty($_POST['submission_id'])) {
-	$submission = $submission_mapper->findById($_POST['submission_id']);
+    $submission = $submission_mapper->findById($_POST['submission_id']);
+    $box   = $submission->getSubmissionBox();
+    $boxId = $box->getId();
 
 } else {
-	// Find a draft submission for this box and user - override it if possible.
-	try {
-		$submission = $submission_mapper->findOneByColumnList(
-			array(
-				'box_id' => $_POST['box_id'],
-				'owner'  => $user->getId(),
-				'draft'  => true,
-			),
-			array('submitted' => 'desc')
-		);
+    // Find a draft submission for this box and user - override it if possible.
+    try {
+        $submission = $submission_mapper->getDrafts($user->getId(), $boxId, 1)->first();
+    } catch (Schoolbox\Mapper\Exception $e) {
+        $submission = $submission_mapper->createModel();
+    }
 
-	}
-	catch (Schoolbox\Mapper\Exception $e) {
-		$submission = $submission_mapper->createModel();
-
-	}
-	$submission->setOwner($user);
+    $submission->setOwner($user);
 }
 
 // fully hydrate, complete with overwrites -_-
-$box   = $submission->getSubmissionBox();
-$boxId = $box->getId();
 $submission->setSubmissionBox($box = $box_mapper->findById($boxId));
 
 //
@@ -55,27 +46,33 @@ $submission->setSubmissionBox($box = $box_mapper->findById($boxId));
 $permission_denied = false;
 try {
     $box_mapper->checkUploadability($box, $user);
-}
-catch (Schoolbox\Resource\Exception $e) {
-	//
-	// what's access denied error?
-	$permission_denied = true;
+
+} catch (Schoolbox\Resource\Exception $e) {
+    // what's access denied error?
+    $permission_denied = true;
 }
 
 if (!$permission_denied) {
-	$submission
-		->setCreatedAt(Alaress_Date_Format::now())
-		->setBody($body)
-		->setDraft($isDraft)
-	;
-	// Is this a final copy? always create a new entry, don't save over an
-	// existing draft.
-	if (!$isDraft) {
-		$submission_mapper->create($submission);
-	}
-	else {
-		$submission_mapper->save($submission);
-	}
+
+    // write body to a tempfile and accept into storage
+    $tmp = tempnam(sys_get_temp_dir(), 'osub');
+    file_put_contents($tmp, $body);
+
+    $storage = Schoolbox\Resource\Storage\Mapper::getInstance()->accept('online-submission.html', $tmp, false);
+
+    $submission
+        ->setFilename('Online Submission')
+        ->setCreatedAt(Alaress_Date_Format::now())
+        ->setStorage($storage)
+        ->setDraft($isDraft);
+
+    // Is this a final copy? always create a new entry, don't save over an
+    // existing draft.
+    if ($isDraft) {
+        $submission_mapper->save($submission);
+    } else {
+        $submission_mapper->create($submission);
+    }
 }
 
 if ($page->detectAjax()) {

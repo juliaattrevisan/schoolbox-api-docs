@@ -220,6 +220,10 @@ $zone->setMulti(false)
     ->setModalTitle('Select file')
     ->setAttachmentsLabel('');
 
+if ($hash = $latestReturnedWork->getStorage()->getHash()) {
+    $zone->attachFiles([ $hash ]);
+}
+
 $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
 /* Render injectable views

@@ -650,12 +650,9 @@ if (!in_array($box->getCategory()->getId(), $categoryIDList)) {
 if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHandler->isParent())) {
     // get filetype details
     $return = $recent_return->getReturnedWork();
-    $ext    = pathinfo($return->getFilename(), PATHINFO_EXTENSION);
-    $mime   = $allowedHandler->getMime($ext);
-    $ftype  = $allowedHandler->getByField('mime', $mime);
-    $size   = Alaress_Byte_Format::bytesToString($return->getFilesize());
 
-    $returnDate = new Alaress_Date_Format($box->getDueDate(), 'Y-m-d');
+
+    $storage = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($return->getStorage()->getHash());
 
     $this->setVar(
         array(
@@ -664,10 +661,10 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
             'RETURNED_WORK_MARK'       => Scrub::Text($return->getMark()),
             'RETURNED_WORK_FILE_ID'    => $return->getId(),
             'RETURNED_WORK_GRADIENT'   => $return->getGradientFromNormalizedMark(),
-            'RETURNED_WORK_FILE_SIZE'  => $size,
-            'RETURNED_WORK_FILE_NAME'  => Scrub::Text($return->getFilename()),
-            'RETURNED_WORK_FILE_DATE'  => $returnDate->getLongDateOnly(),
-            'RETURNED_WORK_FILE_THUMB' => $ftype['iconFile'] ?: 'txt.png',
+            'RETURNED_WORK_FILE_SIZE'  => Alaress_Byte_Format::bytesToString($storage->getSize()),
+            'RETURNED_WORK_FILE_NAME'  => Scrub::Text($storage->getFilename()),
+            'RETURNED_WORK_FILE_DATE'  => $return->getReturned()->getRelativeTime(),
+            'RETURNED_WORK_FILE_THUMB' => $storage->getMimetype()->getIconFile() ?: 'txt.png',
         )
     );
 
@@ -696,7 +693,7 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
         );
     }
 
-    if ($return->getFilename() && !$parentOnly) {
+    if ($return->getStorage()->getHash() && !$parentOnly) {
         $this->parse('return_file_block', 'return_file');
     } else {
         $this->setVar('return_file_block', '');
