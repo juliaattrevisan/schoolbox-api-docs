@@ -68,9 +68,12 @@ class CreditSummary extends Base {
             $finalStack[$level][$internalExternal]['enteredCredits'] += $current['EnteredCredits'];
             $finalStack[$level][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
             $finalStack[$level][$internalExternal]['availableCredits'] += ($current['EnteredCredits'] - $current['ResultCredits']);
-        }
 
-//        new Probe($this->explorerReporting(), $allResults, $finalStack);
+            /* Total Entered Credits = Internally Assessed Entered Credits + Externally Assessed Entered Credits
+             *                       = sum(EnteredCredits)
+             */
+            $finalStack[$level]['totalEnteredCredits'] += $current['EnteredCredits'];
+        }
 
         return $finalStack;
     }
