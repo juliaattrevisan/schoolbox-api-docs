@@ -8,12 +8,24 @@
  * @version     SVN: $Id$
  */
 namespace Component\Eportfolio;
+use PDOStatement;
 use Schoolbox;
 use Schoolbox\Collection;
 
-class FileListMapper extends Schoolbox\Mapper {
+class FileListMapper extends Schoolbox\Mapper
+{
 
-	/**
+    /* properties for consistent joinage between methods */
+    protected $myFileAlias   = 'mf';
+    protected $storageAlias  = 'st';
+    protected $mimeAlias     = 'mt';
+
+    protected $myFileJoin    = 'files';
+    protected $storageJoin   = 'hash';
+    protected $mimeJoin      = 'allowedFileExtension';
+
+
+    /**
 	 * Define column/property mapping
 	 *
 	 * @return Bool|void
@@ -59,9 +71,9 @@ class FileListMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_DATETIME,
 		));
 
-		$this->hasJoin('files', array(
+		$this->hasJoin($this->myFileJoin, array(
 			'multiple'  => true,
-			'mapper'    => '\\Schoolbox\\MyFileMapper',
+			'mapper'    => Schoolbox\Resource\My\File\Mapper::class,
 			'this_key'  => 'file_id',
 			'other_key' => 'id',
 		));
@@ -74,7 +86,7 @@ class FileListMapper extends Schoolbox\Mapper {
 		));
 
 		$this->hasJoin('myfile', array(
-			'mapper'    => '\\Schoolbox\\MyFileMapper',
+			'mapper'    => Schoolbox\Resource\My\File\Mapper::class,
 			'this_key'  => 'file_id',
 			'other_key' => 'id',
 		));
@@ -87,28 +99,10 @@ class FileListMapper extends Schoolbox\Mapper {
 	 * @return Collection
 	 */
 	public function findAllImagesByPage($pageId) {
-		$query = "
-			SELECT
-				{$this->getColumnString('fl')},
-				{$this->getJoinColumnString('files', 'f')}
-			FROM `{$this->table}` fl
-			LEFT JOIN {$this->getJoinSql('files', 'fl', 'f')}
-			WHERE f.mime_type LIKE '%image/%'
-			AND f.deleted IS FALSE
-			AND fl.page_id = :pageId
-		";
-
-		$statement = $this->database->prepare($query);
-
-		$statement->bindParam(':pageId', $pageId, \PDO::PARAM_INT);
-
-		$statement->execute();
-
-		return $this->hydrateList($statement, 'fl', function($mapper, $model, $row) {
-			$model->setFile($mapper->hydrateJoin($row, 'files', 'f'));
-			return $model;
-		});
+        // no need to make it any harder than it needs to be
+        return $this->findByColumn('page_id', $pageId, [ 'mime' => 'image/*' ]);
 	}
+
 
 	/**
 	 * Retrieves a list of recently-published images
@@ -117,87 +111,114 @@ class FileListMapper extends Schoolbox\Mapper {
 	 * @param $limit
 	 * @return Collection
 	 */
-	public function findRecent($uid, $limit) {
-		$query = "
-			SELECT
-				{$this->getColumnString('fl')},
-				{$this->getJoinColumnString('files', 'f')}
-			FROM `{$this->table}` fl
-			LEFT JOIN {$this->getJoinSql('files', 'fl', 'f')}
-			WHERE f.mime_type LIKE '%image/%'
-			AND f.owner = :uid
-			AND f.deleted IS FALSE
-			GROUP BY fl.file_id
-			ORDER BY fl.created_at DESC
-			LIMIT :limit
-		";
-
-		$statement = $this->database->prepare($query);
-
-		$statement->bindParam(':uid', $uid, \PDO::PARAM_INT);
-		$statement->bindParam(':limit', $limit, \PDO::PARAM_INT);
-
-		$statement->execute();
-
-		return $this->hydrateList($statement, 'fl', function($mapper, $model, $row) {
-			$model->setFile($mapper->hydrateJoin($row, 'files', 'f'));
-			return $model;
-		});
+	public function findRecent($uid, $limit)
+    {
+        return $this->findByColumnList([
+            "{$this->myFileAlias}.owner" => $uid,
+        ], [
+            'mime'  => 'image/*',
+            'limit' => $limit,
+            'order' => [
+                'created_at' => 'DESC'
+            ]
+        ]);
 	}
 
-	/**
-	 * Find all the published files that belong to a particular page
-	 *
-	 * @param $pageId
-	 * @return Collection|FileList[]
-	 */
-	public function findForPage($pageId) {
-		$file_mapper = $this->getJoinMapper('files');
-		$mime_mapper = $file_mapper->getJoinMapper('allowedFileType');
 
-		$query = "
+    /**
+     * Find all the published files that belong to a particular page
+     *
+     * @param int $pageId
+     * @return Collection|FileList[]
+     */
+    public function findForPage($pageId)
+    {
+        return $this->findByColumn('page_id', $pageId, [
+            'order' => [ 'created_at' => 'DESC' ]
+        ]);
+    }
+
+
+    /**
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        $myFileMapper  = $this->getJoinMapper($this->myFileJoin);
+        $storageMapper = $myFileMapper->getJoinMapper($this->storageJoin);
+        $mimeMapper    = $storageMapper->getJoinMapper($this->mimeJoin);
+
+        return "
             SELECT
-            	{$this->getColumnString('fl')},
-            	{$file_mapper->getColumnString('f')},
-            	{$mime_mapper->getColumnString('af')}
-            FROM `{$this->table}` fl
-            LEFT JOIN {$this->getJoinSql('files', 'fl', 'f')}
-            LEFT JOIN {$file_mapper->getJoinSql('allowedFileType', 'f', 'af')}
-            WHERE fl.page_id = :pageId
-            ORDER BY created_at DESC
-		";
+                {$this->getColumnString()},
+                {$myFileMapper->getColumnString($this->myFileAlias)},
+                {$storageMapper->getColumnString($this->storageAlias)},
+                {$mimeMapper->getColumnString($this->mimeAlias)}
+            FROM `{$this->table}`
+            LEFT JOIN {$this->getJoinSql($this->myFileJoin, $this->table, $this->myFileAlias)}
+            LEFT JOIN {$myFileMapper->getJoinSql($this->storageJoin, $this->myFileAlias, $this->storageAlias)}
+            LEFT JOIN {$storageMapper->getJoinSql($this->mimeJoin, $this->storageAlias, $this->mimeAlias)}
+        ";
+    }
 
-		$statement = $this->database->prepare($query);
 
-		$statement->bindParam(':pageId', $pageId, \PDO::PARAM_INT);
+    /**
+     * @param array $columnList
+     * @param array $options
+     * @return array
+     */
+    protected function buildWherePart($columnList, $options)
+    {
+        $parts = parent::buildWherePart($columnList, $options);
 
-		$statement->execute();
+        if (isset($options['mime'])) {
+            $mime = str_replace('*', '%', $options['mime']);
+            $parts['where'][] = sprintf("{$this->mimeAlias}.`mime` LIKE %s",
+                $this->database->quote($mime)
+            );
+        }
 
-		$collection = new Collection();
+        return $parts;
+    }
 
-		foreach ($statement as $row) {
+
+    /**
+     * @param PDOStatement $statement
+     * @return Collection
+     * @throws Schoolbox\Mapper\Exception
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $myFileMapper  = $this->getJoinMapper($this->myFileJoin);
+        $storageMapper = $myFileMapper->getJoinMapper($this->storageJoin);
+        $mimeMapper    = $storageMapper->getJoinMapper($this->mimeJoin);
+
+        $collection = new Collection();
+
+        foreach ($statement as $row) {
             /** @var FileList $fileListItem */
-			$fileListItem = $this->hydrate($row, 'fl');
+            $fileListItem = $this->hydrate($row);
 
-            /** @var Schoolbox\MyFile $file */
-			$file = $file_mapper->hydrate($row, 'f');
+            /** @var Schoolbox\Resource\My\File\Model $file */
+            $file = $myFileMapper->hydrate($row, $this->myFileAlias);
+
+            /** @var Schoolbox\Resource\Storage\Model $storage */
+            $storage = $storageMapper->hydrate($row, $this->storageAlias);
 
             /** @var Schoolbox\File\Mimetype $mime */
-			$mime = $mime_mapper->hydrate($row, 'af');
+            $mime = $mimeMapper->hydrate($row, $this->mimeAlias);
 
-			/* Put mime type instance into file instance
-			 */
-			$file->setMimetype($mime);
+            // aaaaaand rewind...
+            $storage->setMimetype($mime);
+            $file->setStorage($storage);
+            $fileListItem->setFile($file);
 
-			/* Put file instance into file list item instance
-			 */
-			$fileListItem->setFile($file);
+            /* Put file list item instance into collection
+             */
+            $collection->add($fileListItem);
+        }
 
-			/* Put file list item instance into collection
-			 */
-			$collection->add($fileListItem);
-		}
+        return $collection;
+    }
 
-		return $collection;
-	}
 }
