@@ -16,7 +16,7 @@ use Component_Instance;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
-use Schoolbox\StorageMapper;
+use Schoolbox\Resource\Storage;
 
 class Controller extends Base
 {
@@ -36,7 +36,7 @@ class Controller extends Base
     protected $componentConfigMapper;
 
     /**
-     * @var StorageMapper
+     * @var Storage\Mapper
      */
     protected $storageMapper;
 
@@ -406,7 +406,7 @@ class Controller extends Base
     }
 
     /**
-     * @param  StorageMapper $storageMapper
+     * @param  Storage\Mapper $storageMapper
      * @return $this
      */
     public function setStorageMapper($storageMapper)
@@ -416,7 +416,7 @@ class Controller extends Base
     }
 
     /**
-     * @return StorageMapper
+     * @return Storage\Mapper
      */
     public function getStorageMapper()
     {

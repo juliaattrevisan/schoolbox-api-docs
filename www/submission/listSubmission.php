@@ -152,7 +152,7 @@ if (!empty($subList) && is_array($subList)) {
         // TODO fully rewrite this awful copypasted loop
         if ($prevCat['category'] != $sub['category'] && $prevCat['category'] != '') {
             try {
-                $curCategory = \Schoolbox\Resource\CategoryMapper::getInstance()->findById($prevCat['category']);
+                $curCategory = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($prevCat['category']);
                 /* @param  \Schoolbox\Resource\Category $curCategory */
 
                 /* Get full student list of class to show those who have not submitted
@@ -185,13 +185,15 @@ if (!empty($subList) && is_array($subList)) {
 
                 $allCoursesUsed = $allCoursesUsedInFolder->getOffset($curCategory->getId());
 
-                foreach ($allCoursesUsed as $courseFolder) {
-                    $this->setVar(array(
-                        'COURSE_FOLDER_ID' => $courseFolder->getId(),
-                        'COURSE_FOLDER_NAME' => $courseFolder->getName()
-                    ));
+                if(isset($allCoursesUsed)) {
+                    foreach ($allCoursesUsed as $courseFolder) {
+                        $this->setVar(array(
+                            'COURSE_FOLDER_ID' => $courseFolder->getId(),
+                            'COURSE_FOLDER_NAME' => $courseFolder->getName()
+                        ));
 
-                    $this->parse('learning_analytics_block', 'learning_analytics', true);
+                        $this->parse('learning_analytics_block', 'learning_analytics', true);
+                    }
                 }
 
                 $this->parse('category_block', 'category_listing', true);
@@ -317,7 +319,7 @@ if (!empty($subList) && is_array($subList)) {
     /* Get full student list of class to show those who have not submitted
       */
     try {
-        $curCategory = \Schoolbox\Resource\CategoryMapper::getInstance()->findById($prevCat['category']);
+        $curCategory = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($prevCat['category']);
         if (count($curCategory->getCodes()) > 0 && Cfg::get('external_enable')) {
             /* If synergy code, get synergy students
                */
@@ -344,7 +346,7 @@ if (!empty($subList) && is_array($subList)) {
             'learning_analytics_block' => ''
         ));
 
-        $allCoursesUsed = $allCoursesUsedInFolder->getOffset($curCategory->getId());
+        $allCoursesUsed = (array)$allCoursesUsedInFolder->getOffset($curCategory->getId());
 
         foreach ($allCoursesUsed as $courseFolder) {
             $this->setVar(array(

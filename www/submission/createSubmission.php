@@ -1,5 +1,14 @@
 <?php
 
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Descriptor;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 
 $this->setFile(TEMPLATE_content, 'submission/createSubmission.html');
 $this->setTab('submission');
@@ -40,19 +49,13 @@ if (Config::get('curriculum_tagging_enabled')) {
 
 $this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 
-use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Course\UnitInstanceMapper;
-use Schoolbox\Resource\Attachment\Zone;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
 
 $mapper      = new SubmissionBoxMapper();
+$cat_mapper  = new CategoryMapper();
 $type_mapper = new SubmissionBox\WorkTypeMapper();
 $mark_mapper = new SubmissionBox\MarkTypeMapper();
 $groupMapper = new SubmissionBox\GradeLevel\Group\Mapper();
+$conf_mapper = new ConfigMapper();
 
 $groupHandler  = new Group;
 $rubricHandler = new DueWork_Rubric_Handler();
@@ -75,8 +78,8 @@ $gradeGroups = $groupMapper->findAllWithGradeLevels();
 
 $title            = '';
 $heading          = '';
-$submission       = new SubmissionBox();
-$category         = new Category();
+$submission       = $mapper->createModel();
+$category         = $cat_mapper->createModel();
 $is_task          = false;
 $unit_id          = null;
 $task_instance_id = null;
@@ -96,7 +99,7 @@ if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         error(17);
     }
 
-    $category         = CategoryMapper::getInstance()->findById($submission->getCategory()->getId());
+    $category         = $cat_mapper->findById($submission->getCategory()->getId());
     $task_id          = $submission->getTask()->getId();
     $is_task          = (bool)$task_id;
     $task_instance_id = $submission->getTaskInstance()->getId();
@@ -105,14 +108,7 @@ if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
      */
     $this->parse('delete_button_block', 'delete_button');
 
-    // collate attachments
-    $boxFileMapper = SubmissionBox\FileMapper::getInstance();
-    $files         = $boxFileMapper->findByColumn('box_id', $submission_id);
-
-    /** @var \Schoolbox\Collection|\Schoolbox\Storage[] $storages */
-    $storages = \Schoolbox\StorageMapper::getInstance()->findByColumn('storage_id', $files->getColumnValues('fileId'));
-
-    $zone->attachFiles($storages->getColumnValues('hash'));
+    $zone->attachFiles($submission->getAttachments()->getColumnValues('hash'));
 
 } elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     $this->setVar(
@@ -138,11 +134,12 @@ if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         ->setLateDate(new Alaress_Date_Format(new DateTime('+2 day 23:59:59')))
         ->setWorkType(new SubmissionBox\WorkType())
         ->setMarkType(new SubmissionBox\MarkType())
+        ->setMarkVisibility($conf_mapper->get('submission_access'))
         ->setMarkVisibility(Config::get('submission_access'))
         ->setCurriculumNodes($category->getCurriculumNodes())
     ;
     $gradeGroup = new SubmissionBox\GradeLevel\Group\Model();
-    $gradeGroup->setId(Config::get('default_grade_group'));
+    $gradeGroup->setId($conf_mapper->get('default_grade_group'));
     $submission->setGradeGroup($gradeGroup);
 
     // Is this a task?
@@ -171,24 +168,6 @@ if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
             ->setLateDate($due_date_object);
     }
 
-    // Has a file been attached in $this->arg[2]?
-    if (is_numeric($this->arg[2]) && $this->arg[2] > 0) {
-        /* File ID submitted, associate box with file */
-        $has_file_preset = true;
-        $fileHandler     = new File();
-        $file            = $fileHandler->getByID($this->arg[2]);
-        if (is_array($file)) {
-            $submission
-                ->setLegacyFileId($file['id'])
-                ->setDescription($file['description'])
-                ->setName($file['name']);
-        }
-    }
-
-    // Was a work type set?
-    if (!empty($this->arg[3])) {
-        $submission->setWorkType(SubmissionBox\WorkTypeMapper::getInstance()->findById($this->arg[3]));
-    }
 } else {
     error(2);
 }
@@ -361,7 +340,6 @@ $output = array(
     'ID'                => $submission->getId(),
     'NAME'              => Scrub::text($submission->getName()),
     'DESCRIPTION'       => Scrub::text($submission->getDescription()),
-    'FILEID'            => $submission->getLegacyFileId(),
     'ACCEPT_SUBMISSION' => $submission->getAcceptOnline() ? ' checked' : '',
     'MULTI_SUBMISSION'  => $submission->getAcceptMultiple() ? ' checked' : '',
     'TOTAL_MARK'        => $submission->getMaxMark(),
@@ -383,8 +361,8 @@ $output = array(
     'LATE_HOUR'         => $late_hour,
     'LATE_MIN'          => $late_min,
     'LATE_PM'           => $late_date->isPM() ? 'selected' : '',
-    'FILE_MAX_UPLOAD'   => Cfg::get('file_upload_count'),
-    'MAX_FILE_SIZE'     => Cfg::get('max_file_size'),
+    'FILE_MAX_UPLOAD'   => $conf_mapper->get('file_upload_count'),
+    'MAX_FILE_SIZE'     => $conf_mapper->get('max_file_size'),
     'SESSION_NAME'      => session_name(),
     'SESSION_ID'        => session_id(),
     'IS_TASK'           => $is_task ? 1 : 0,
@@ -398,7 +376,11 @@ $output = array(
 
 $this->setVar($output);
 
-
+/**
+ * @param SitePage  $page
+ * @param int       $checkedIndex
+ * @param int       $descriptorCount
+ */
 function outputResultSets(SitePage $page, $checkedIndex = -1, $descriptorCount = 2)
 {
     $rubricHandler = new DueWork_Rubric_Handler();
@@ -429,7 +411,7 @@ function outputResultSets(SitePage $page, $checkedIndex = -1, $descriptorCount =
         $desCounts[] = array('value' => $i);
     }
     $page->dropdown(
-        'des_count', $desCounts, $descriptorCount, 'marktype', array(
+        'des_count', $desCounts, [ $descriptorCount ], 'marktype', array(
             'value' => 'DES_COUNT_VALUE',
         )
     );
@@ -439,13 +421,13 @@ function outputResultSets(SitePage $page, $checkedIndex = -1, $descriptorCount =
 
 
 /**
- * @param SitePage                          $page
- * @param                                   $catID
- * @param                                   $checkedIDs
- * @param SubmissionBox\Rubric\Descriptor[] $descriptors
- * @param int                               $descriptorCount
- * @param bool                              $is_course
- * @param bool                              $is_for_task
+ * @param SitePage $page
+ * @param int      $catID
+ * @param array    $checkedIDs
+ * @param array    $descriptors
+ * @param int      $descriptorCount
+ * @param bool     $is_course
+ * @param bool     $is_for_task
  */
 function outputCriteria(
     SitePage $page,
@@ -524,6 +506,7 @@ function outputCriteria(
 
                 if (is_array($descriptors[$criterion->getId()])) {
                     foreach ($descriptors[$criterion->getId()] as $descriptor) {
+                        /** @var Descriptor $descriptor */
                         $page->setVar(
                             array(
                                 'CRIT_INPUT_VALUE'  => $descriptor->getDescription(),

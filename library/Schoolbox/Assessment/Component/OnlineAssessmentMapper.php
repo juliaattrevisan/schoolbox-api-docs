@@ -14,13 +14,19 @@ use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Assessment\IActivityMapper;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper;
 
-
-class OnlineAssessmentMapper extends Mapper implements FeedableMapperInterface {
+/**
+ * Class OnlineAssessmentMapper
+ *
+ * @package Schoolbox\Assessment\Component
+ * @method Collection|OnlineAssessment[] findByColumnList($columnList, $options = [])
+ */
+class OnlineAssessmentMapper extends Mapper implements IActivityMapper, FeedableMapperInterface {
 
 	protected function mapping () {
 		$this->hasTable('assess');
@@ -218,7 +224,7 @@ class OnlineAssessmentMapper extends Mapper implements FeedableMapperInterface {
 	 *
 	 * @return ActivityCollection
 	 */
-	public function getActivities($user_id, $limit, $categories) {
+	public function getActivities($user_id, $limit, array $categories) {
 		$factory    = new ActivityFactory();
 		$collection = new ActivityCollection();
 		$queries = array(

@@ -11,6 +11,10 @@
 namespace Crocodoc;
 
 
+use Exception;
+use Schoolbox\User;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission;
+
 class Facade {
 
 	/**
@@ -23,7 +27,7 @@ class Facade {
 	/**
 	 * An instance of Schoobox\User
 	 *
-	 * @var null
+	 * @var User
 	 */
 	private $user = null;
 
@@ -31,9 +35,9 @@ class Facade {
 	 * Constructor
 	 *
 	 * @param $submissionId
-	 * @param \Schoolbox\User $user
+	 * @param User $user
 	 */
-	public function __construct($submissionId, \Schoolbox\User $user) {
+	public function __construct($submissionId, User $user) {
 		$this->setSubmissionId($submissionId);
 		$this->setUser($user);
 	}
@@ -44,7 +48,9 @@ class Facade {
 	 * @throws Exception
 	 */
 	public function start() {
-		$submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
+		$submissionMapper = new Submission\FileMapper();
+
+        /** @var Submission\File $submission */
 		$submission = $submissionMapper->findById($this->getSubmissionId());
 
 		/* If this was previously uploaded in the past, resume scribbling
@@ -120,7 +126,7 @@ class Facade {
 	/**
 	 * Set user
 	 *
-	 * @param null $user
+	 * @param User $user
 	 */
 	private function setUser($user) {
 		$this->user = $user;
@@ -129,7 +135,7 @@ class Facade {
 	/**
 	 * Get user
 	 *
-	 * @return null
+	 * @return User
 	 */
 	private function getUser() {
 		return $this->user;

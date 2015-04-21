@@ -23,7 +23,7 @@ class Media extends Base {
             $type = 'sbfs';
             $id = $this->getItem()->getId();
         }
-        else if($this->getItem() instanceof \Schoolbox\Storage) {
+        else if($this->getItem() instanceof \Schoolbox\Resource\Storage\IStorage) {
             $type = 'storage';
             $id = $this->getItem()->getHash();
         }

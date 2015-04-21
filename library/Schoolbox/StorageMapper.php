@@ -13,6 +13,12 @@ use Schoolbox;
 use Schoolbox\Mapper;
 use Schoolbox\File\MimetypeMapper;
 
+/**
+ * Class StorageMapper
+ *
+ * @deprecated
+ * @package Schoolbox
+ */
 class StorageMapper extends Mapper implements StorageMapperInterface {
 	protected function mapping () {
 		$this->hasTable('storage');

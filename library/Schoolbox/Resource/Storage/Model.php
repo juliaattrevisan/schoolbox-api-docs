@@ -12,7 +12,9 @@ namespace Schoolbox\Resource\Storage;
 
 use Alaress_Date_Format;
 use League\Flysystem\File;
+use League\Flysystem\FileNotFoundException;
 use League\Flysystem\FilesystemInterface;
+use RuntimeException;
 use Schoolbox\File\Mimetype;
 use Schoolbox\Video\Queue;
 
@@ -26,6 +28,9 @@ use Schoolbox\Video\Queue;
  */
 class Model extends File implements IStorage
 {
+    /** @var string */
+    protected $filename;
+
     /** @var string */
     protected $hash;
 
@@ -75,6 +80,34 @@ class Model extends File implements IStorage
     {
         $this->queue = $queue;
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFilename()
+    {
+        return $this->filename;
+    }
+
+
+    /**
+     * @param string $filename
+     * @return static
+     */
+    public function setFilename($filename)
+    {
+        $this->filename = $filename;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getBasename()
+    {
+        return $this->getFilename() . '.' . $this->getExtension();
     }
 
     /**
@@ -137,12 +170,17 @@ class Model extends File implements IStorage
 
     /**
      * @return int
+     * @throws FileNotFoundException
      */
     public function getSize()
     {
         // calculate size if not known
         if (!$this->size) {
-            $this->setSize(parent::getSize());
+            try {
+                $this->setSize(parent::getSize());
+            } catch (RuntimeException $e) {
+                throw new FileNotFoundException($this->getPath(), 0, $e);
+            }
         }
         return $this->size;
     }

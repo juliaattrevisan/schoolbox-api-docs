@@ -16,7 +16,7 @@ use Schoolbox\Collection;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\RoleMapper;
-use Schoolbox\StorageMapper;
+use Schoolbox\Resource\Storage;
 
 class Controller extends Base
 {
@@ -288,7 +288,7 @@ class Controller extends Base
         ;
         if (($upload = $files['image']) && empty($upload['error'])) {
             // Rectumize the file that was uploaded
-            $image = StorageMapper::getInstance()->upload(
+            $image = Storage\Mapper::getInstance()->accept(
                 $upload['name'], $upload['tmp_name'], $this->getUser()->getId()
             );
             $model->setImage($image);

@@ -8,9 +8,10 @@
  */
 
 
-use \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
+use \Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionMapper;
 use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use \Schoolbox\Assessment\Activity;
 use \Schoolbox\File\MimetypeMapper;
 use Schoolbox\Resource\Attachment\Zone;
@@ -190,15 +191,6 @@ $latestReturnedActivity = $returnWorkMapper->getHistory($user->getId(), $submiss
 
 if ($latestReturnedActivity instanceof Activity) {
 	$latestReturnedWork = $latestReturnedActivity->getReturnedWork();
-
-	/* Find the Mime again if a file was returned with the Return
-	 */
-	$mimetypeMapper = new MimetypeMapper();
-
-    if ($latestReturnedWork->getMimeType()->getFileTypeID() !== null) {
-        $mime = $mimetypeMapper->findOneByColumn('mime', $latestReturnedWork->getMimeType()->getMime());
-        $latestReturnedWork->setMimetype($mime);
-    }
 }
 
 /* Augment array with data
@@ -228,6 +220,12 @@ $zone->setMulti(false)
     ->setAttachPrompt('Attach file to return')
     ->setModalTitle('Select file')
     ->setAttachmentsLabel('');
+
+if($latestReturnedWork instanceof ReturnedWork) {
+    if ($hash = $latestReturnedWork->getStorage()->getHash()) {
+        $zone->attachFiles([$hash]);
+    }
+}
 
 $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 

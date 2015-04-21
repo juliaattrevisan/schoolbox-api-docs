@@ -1,4 +1,5 @@
 <?php
+use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 
 /**
  *
@@ -58,22 +59,42 @@ class Plagscan_Gateway
         return $this->errorMessage;
     }
 
-    public function submit($documentName, $documentFile)
+
+    /**
+     * @param Submission\File $submission
+     * @return string
+     */
+    public function submit(Submission\File $submission)
     {
-        $parameterList = $this->createParameters(
-            array(
-                'METHOD' => self::METHOD_SUBMIT
-            )
-        );
+        $documentName = $submission->getFilename();
+
+        /** @var Schoolbox\Resource\Storage\Model $file */
+        $file = $submission->getStorage();
+        $documentData = $file->read();
+
+        return $this->postForToken($documentName, $documentData);
+    }
+
+
+    /**
+     * POSTs the given filedata to Plagscan, and returns the ID assigned
+     *
+     * @param string $documentName
+     * @param string $documentData
+     * @return string
+     */
+    protected function postForToken($documentName, $documentData) {
+        $parameterList = $this->createParameters([
+            'METHOD' => self::METHOD_SUBMIT
+        ]);
 
         $documentParameter = '';
 
         $fileInfo = new finfo(FILEINFO_MIME);
 
-        $documentData = file_get_contents($documentFile);
         $documentType = $fileInfo->buffer($documentData);
 
-        $documentExtension = strtolower(trim(array_pop(explode('.', $documentName))));
+        $documentExtension = pathinfo($documentName, PATHINFO_EXTENSION);
 
         $validDocumentExtensionList = array(
             'docx',
@@ -85,7 +106,7 @@ class Plagscan_Gateway
         );
 
         if (!in_array($documentExtension, $validDocumentExtensionList)) {
-            return false;
+            return null;
         }
 
         $documentParameter .= "Content-Disposition: form-data; name=\"DATA\"; filename=\"$documentName\"\n";

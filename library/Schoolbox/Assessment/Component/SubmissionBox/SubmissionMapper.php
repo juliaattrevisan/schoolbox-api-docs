@@ -18,6 +18,12 @@ use Schoolbox\Collection;
 use Schoolbox\File\Exception as FileException;
 use Schoolbox\FileInterface;
 
+/**
+ * Class SubmissionMapper
+ *
+ * @deprecated in favour of separate Submission\File and Submission\Inline classes
+ * @package Schoolbox\Assessment\Component\SubmissionBox
+ */
 class SubmissionMapper extends Schoolbox\Mapper implements Schoolbox\StorageMapperInterface {
 
 	protected function mapping () {
@@ -118,6 +124,8 @@ class SubmissionMapper extends Schoolbox\Mapper implements Schoolbox\StorageMapp
 	 * An activity is returned for each submission that this user has made into
 	 * a submission box in the given categories.
 	 *
+	 * @deprecated ported to Submission\AbstractMapper::getActivities()
+	 *
 	 * @param $user_id
 	 * @param $limit
 	 * @param $categories
@@ -164,6 +172,7 @@ class SubmissionMapper extends Schoolbox\Mapper implements Schoolbox\StorageMapp
 
 	/**
 	 * Retrieves drafts for this user and box, ordered by most recent first.
+	 * @deprecated ported to Submission\Inline::getDrafts()
 	 *
 	 * @param int $user_id
 	 * @param int $box_id
@@ -195,6 +204,8 @@ class SubmissionMapper extends Schoolbox\Mapper implements Schoolbox\StorageMapp
 
 	/**
 	 * Returns an activity collection for the given user and submission box.
+	 *
+	 * @deprecated ported to Submission\AbstractMapper::getHistory()
 	 *
 	 * @param $user_id
 	 * @param $box_id
@@ -251,6 +262,8 @@ class SubmissionMapper extends Schoolbox\Mapper implements Schoolbox\StorageMapp
 	 * * ss: this submission
 	 * * sb: submission box
 	 * * c:  category
+	 *
+	 * @deprecated ported to Submission\AbstractMapper::hydrateForActivityList()
 	 *
 	 * @param array $row
 	 *

@@ -9,19 +9,30 @@
  * 
  */
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
-use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
 
-class Plagscan_DocumentMapper extends Schoolbox\Mapper {
+/**
+ * Class Plagscan_DocumentMapper
+ * @method Plagscan_Document createModel()
+ */
+class Plagscan_DocumentMapper extends Schoolbox\Mapper
+{
+    /** @var Submission\FileMapper */
+    protected $submissionMapper;
 
 	/**
 	 * @var Plagscan_Gateway
 	 */
 	private $gateway;
 
-	protected function setup() {
+	protected function setup()
+    {
 		parent::setup();
-		$plagscanApiKey = Config::get('plagscan_api_key');
-		$plagscanUsername = Config::get('plagscan_username');
+
+		$plagscanApiKey   = $this->getConfigLoader()->get('plagscan_api_key');
+		$plagscanUsername = $this->getConfigLoader()->get('plagscan_username');
+
+        $this->submissionMapper = new Submission\FileMapper();
+
 		$this->gateway = new Plagscan_Gateway($plagscanUsername, $plagscanApiKey);
 	}
 
@@ -33,12 +44,6 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper {
 			'property'   => 'id',
 			'type'       => self::TYPE_INTEGER,
 			'identifier' => true
-		));
-
-		$this->hasMap(array(
-			'column'     => 'file_id',
-			'property'   => 'fileId',
-			'type'       => self::TYPE_INTEGER,
 		));
 
 		$this->hasMap(array(
@@ -72,6 +77,9 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper {
 		));
 
 		$this->hasSoftDeleteDateField('deleted');
+
+        $this->joins('file_id', Submission\FileMapper::class, 'id', null, null);
+
 	}
 
 	/**
@@ -91,8 +99,7 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper {
 		catch (Schoolbox\Mapper\Exception $e) {}
 		if (!isset($existing_id)) {
 			$this->clearPreviousVersions($dirtyDocument);
-			$file = $dirtyDocument->getFile();
-			$documentId = $this->gateway->submit($file['name'], $file['file']);
+			$documentId = $this->gateway->submit($dirtyDocument->getFile());
 
 			if (!empty($documentId)) {
 				$this->gateway->check($documentId);
@@ -113,11 +120,10 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper {
      * @param Plagscan_Document $dirtyDocument
      */
     public function clearPreviousVersions($dirtyDocument) {
-        /** @var Submission $file */
-        $file = SubmissionMapper::getInstance()->findById($dirtyDocument->getFileId());
+        $file = $this->submissionMapper->findById($dirtyDocument->getFile()->getId());
 
         // Previous submissions of this file for this box and student.
-        $fileList = SubmissionMapper::getInstance()->findByColumnList(
+        $fileList = $this->submissionMapper->findByColumnList(
             array(
                 'box_id' => $file->getSubmissionBox()->getId(),
                 'owner'  => $file->getOwner()->getId(),
@@ -140,17 +146,12 @@ class Plagscan_DocumentMapper extends Schoolbox\Mapper {
      * Populates a Plagscan document out of a submission. Doesn't actually save
      * it, though.
      *
-     * @param  Submission        $submission
+     * @param  Submission\File $submission
      * @return Plagscan_Document
      */
-    public function createFromSubmission(Submission $submission) {
-        $document = new Plagscan_Document();
-        $document->setFileId($submission->getId());
-        $document->setFile(array(
-            'id'   => $submission->getId(),
-            'name' => $submission->getFilename(),
-            'file' => $submission->getTempLocation(),
-        ));
-        return $document;
+    public function createFromSubmission(Submission\File $submission)
+    {
+        $plagMap = Plagscan_DocumentMapper::getInstance();
+        return $plagMap->createModel()->setFile($submission);
     }
 }

@@ -18,14 +18,14 @@ class Factory {
 	/**
 	 * An instance of Submission
 	 *
-	 * @var null
+	 * @var Submission\File
 	 */
 	private $submission = null;
 
 	/**
 	 * An instance of ReturnedWork
 	 *
-	 * @var null
+	 * @var ReturnedWork
 	 */
 	private $returnedWork = null;
 
@@ -64,11 +64,11 @@ class Factory {
 	 * (some submissions don't use crocodoc)
 	 *
 	 * @param $page
-	 * @param Submission $submission
+	 * @param Submission\File $submission
 	 * @param ReturnedWork $returnedWork
 	 * @param $navigationElements
 	 */
-	public function __construct($page, Submission $submission = null, ReturnedWork $returnedWork = null, $navigationElements) {
+	public function __construct($page, Submission\File $submission = null, ReturnedWork $returnedWork = null, $navigationElements) {
 		$this->setPage($page);
 		$this->setSubmission($submission);
 		$this->setReturnedWork($returnedWork);
@@ -79,38 +79,45 @@ class Factory {
 	 * Decide which template file to load based on the submission contents
 	 * Spawn a renderer
 	 */
-	public function produce() {
+	public function produce()
+    {
+        $work = $this->getSubmission();
 
-		/* No submission
-		 */
-		if ($this->getSubmission() === null) {
-			return new Strategy\None($this->getPage(), $this->getSubmission(), $this->getReturnedWork(), $this->getNavigationElements());
-		}
-		/* Crocodoc-friendly file types (only if Crocodoc is active with an api token)
-		 */
-		else if (strlen(\Cfg::get('crocodoc_api_token')) && in_array($this->getSubmission()->getFileExtension(), $this->getAllowedFileTypes())) {
-			return new Strategy\Crocodoc($this->getPage(), $this->getSubmission(), $this->getReturnedWork(), $this->getNavigationElements());
-		}
-		/* Other special presentation methods for inline viewing of media
-		 * such as images and videos
-		 */
-		else if (preg_match('#^image/*#',($this->getSubmission()->getMimeType()->getMime()))) {
-			return new Strategy\Image($this->getPage(), $this->getSubmission(), $this->getReturnedWork(), $this->getNavigationElements());
-		}
-		else if (preg_match('#^video/*#',($this->getSubmission()->getMimeType()->getMime()))) {
-			return new Strategy\Video($this->getPage(), $this->getSubmission(), $this->getReturnedWork(), $this->getNavigationElements());
-		}
-		else if (preg_match('#^text/html#',($this->getSubmission()->getMimeType()->getMime()))) {
-			return new Strategy\Html($this->getPage(), $this->getSubmission(), $this->getReturnedWork(), $this->getNavigationElements());
-		}
-		/* Otherwise just download the file
-		 */
-		else {
-			return new Strategy\Download($this->getPage(), $this->getSubmission(), $this->getReturnedWork(), $this->getNavigationElements());
+		if ($work === null) {
+            // No submission
+            return new Strategy\None($this->getPage(), $work, $this->getReturnedWork(), $this->getNavigationElements());
+
+        } elseif ($work instanceof Submission\File) {
+            if ($this->crocodocable($work)) {
+                // Crocodoc-friendly file types (only if Crocodoc is active with an api token)
+                return new Strategy\Crocodoc($this->getPage(), $work, $this->getReturnedWork(), $this->getNavigationElements());
+
+            } elseif ($work->getMimeType()->isImage()) {
+                // Other special presentation methods for inline viewing of media such as images and videos
+                return new Strategy\Image($this->getPage(), $work, $this->getReturnedWork(), $this->getNavigationElements());
+
+            } elseif ($work->getMimetype()->isVideo()) {
+                return new Strategy\Video($this->getPage(), $work, $this->getReturnedWork(), $this->getNavigationElements());
+
+            } elseif ($work->getMimeType()->matches('text/html')) {
+                return new Strategy\Html($this->getPage(), $work, $this->getReturnedWork(), $this->getNavigationElements());
+            }
 		}
 
-		return new Strategy\None($this->getPage(), $this->getSubmission(), $this->getReturnedWork(), $this->getNavigationElements());
+        // Otherwise just download the file
+        return new Strategy\Download($this->getPage(), $work, $this->getReturnedWork(), $this->getNavigationElements());
 	}
+
+    /**
+     * @param Submission\File $submission
+     * @return bool
+     */
+    private function crocodocable(Submission\File $submission)
+    {
+        $ext = pathinfo($submission->getStorage()->getFilename(), PATHINFO_EXTENSION);
+
+        return strlen(\Cfg::get('crocodoc_api_token')) && in_array($ext, $this->getAllowedFileTypes());
+    }
 
 	/* Getters/Setters
 	 */
@@ -118,7 +125,7 @@ class Factory {
 	/**
 	 * Set submission
 	 *
-	 * @param null $submission
+	 * @param Submission\File $submission
 	 */
 	private function setSubmission($submission) {
 		$this->submission = $submission;
@@ -127,7 +134,7 @@ class Factory {
 	/**
 	 * Get submission
 	 *
-	 * @return null
+	 * @return Submission\File
 	 */
 	private function getSubmission() {
 		return $this->submission;
@@ -190,7 +197,7 @@ class Factory {
 	/**
 	 * Set returned work
 	 *
-	 * @param null $returnedWork
+	 * @param ReturnedWork $returnedWork
 	 */
 	private function setReturnedWork($returnedWork) {
 		$this->returnedWork = $returnedWork;
@@ -199,7 +206,7 @@ class Factory {
 	/**
 	 * Get returned work
 	 *
-	 * @return null
+	 * @return ReturnedWork
 	 */
 	private function getReturnedWork() {
 		return $this->returnedWork;

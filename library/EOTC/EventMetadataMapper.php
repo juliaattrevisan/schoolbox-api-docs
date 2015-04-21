@@ -171,7 +171,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 				'relation' => array(
 					'column' => 'storage_id',
 					'key' => 'storage_id',
-					'mapper' => new \Schoolbox\StorageMapper()
+					'mapper' => \Schoolbox\Resource\Storage\Mapper::getInstance()
 				),
 			)
 		);

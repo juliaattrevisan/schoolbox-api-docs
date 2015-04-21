@@ -11,7 +11,6 @@ namespace Schoolbox\Resource\File;
 
 
 use Schoolbox\Resource\Storage\IStorage;
-use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
 
 /**
@@ -31,18 +30,12 @@ interface IFile extends IStorage
     public function getId();
 
     /**
-     * Returns the real filename of the file
-     * @return string
-     */
-    public function getFilename();
-
-    /**
      * @return User
      */
     public function getOwner();
 
     /**
-     * @return Storage
+     * @return IStorage
      */
     public function getStorage();
 

@@ -15,6 +15,7 @@ use ReflectionMethod;
 use RuntimeException;
 use Schoolbox\Collection;
 use Schoolbox\IConfigLoader;
+use Schoolbox\IMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -31,7 +32,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
     /** @var IConfigLoader */
     protected $conf;
 
-    /** @var Mapper */
+    /** @var IMapper */
     protected $mapper;
 
     /** @var NS */
@@ -99,7 +100,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
      */
     protected function setMapper($mapper = null)
     {
-        if ($mapper instanceof Mapper) {
+        if ($mapper instanceof IMapper) {
             $this->mapper = $mapper;
             return;
         }
@@ -113,8 +114,8 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
         if (method_exists($mapperClass, 'getInstance')) {
             $mapper = $mapperClass::getInstance();
         }
-        if (!$mapper instanceof Mapper) {
-            throw new ScheduleException("Class '$mapperClass' must be an instance of Mapper");
+        if (!$mapper instanceof IMapper) {
+            throw new ScheduleException("Class '$mapperClass' must be an instance of IMapper");
         }
 
         $this->mapper = $mapper;
@@ -147,7 +148,8 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
      */
     protected function hydrate($model)
     {
-        if (!$this->isHydrated($model)) {
+        // this will actually exist most of the time
+        if (method_exists($this->mapper, 'getGetIdentifierMethodName') && !$this->isHydrated($model)) {
             $getId = $this->mapper->getGetIdentifierMethodName();
             $model = $this->mapper->findById($model->$getId());
         }

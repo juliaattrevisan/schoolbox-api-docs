@@ -9,6 +9,7 @@
 
 namespace Schoolbox;
 
+use Countable;
 use Database;
 use PDO;
 use PDOStatement;
@@ -21,8 +22,9 @@ use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\NotifInterface;
 use Schoolbox\Realtime\Schedule\Event;
 use Serializable;
+use Traversable;
 
-abstract class Mapper implements Serializable
+abstract class Mapper implements IMapper, Serializable
 {
     /**
      * Represents a boolean data type.
@@ -667,9 +669,10 @@ abstract class Mapper implements Serializable
      * @param IColumnType $hydrator
      * @param int         $options
      * @param string      $property
+     * @param string      $name
      * @return bool
      */
-    protected function joins($column, $foreignMapper, $foreignKey, $hydrator = null, $options = null, $property = null)
+    protected function joins($column, $foreignMapper, $foreignKey = 'id', $hydrator = null, $options = null, $property = null, $name = null)
     {
         if ($hydrator) {
             $type = $hydrator;
@@ -679,7 +682,7 @@ abstract class Mapper implements Serializable
             $type = self::TYPE_MODEL;
         }
         $map = $this->buildColumnMap($column, $type, $options, $property);
-        $map['join'] = $column;
+        $map['join'] = $name ?: $column;
         $map['join_def'] = [
             'mapper'    => $foreignMapper,
             'other_key' => $foreignKey
@@ -1487,7 +1490,7 @@ abstract class Mapper implements Serializable
                 // that the query could ever return anything, so just return
                 // an empty collection.
                 if (is_array($columnValue)
-                    || ($columnValue instanceof \Traversable && $columnValue instanceof \Countable)
+                    || ($columnValue instanceof Traversable && $columnValue instanceof Countable)
                 ) {
                     if (count($columnValue) === 0) {
                         throw new \UnderflowException('List of column values is empty');
@@ -1691,13 +1694,14 @@ abstract class Mapper implements Serializable
                         // not interested
                         continue;
                     }
-                    $joinSchema = $this->joins[$map['join']]['multi'];
-                    $thisKey    = $this->getModelProperty($model, $id_property);
+                    $joinSchema = $this->joins[$map['join']];
+                    $joinMulti  = $joinSchema['multi'];
+                    $thisKey    = $this->getModelProperty($model, $joinSchema['this_key']);
                     // step 1: delete existing relations in join table
                     $deleteRelationStatement = $this->database->prepare(
                         "
-						DELETE FROM `{$joinSchema['via_table']}`
-						WHERE `{$joinSchema['this_key']}` = :this_key
+						DELETE FROM `{$joinMulti['via_table']}`
+						WHERE `{$joinMulti['this_key']}` = :this_key
 					"
                     );
                     $deleteRelationStatement->bindValue(':this_key', $thisKey);
@@ -1708,8 +1712,8 @@ abstract class Mapper implements Serializable
                     // step 2: insert new relations in join table
                     $insertRelationStatement = $this->database->prepare(
                         "
-						INSERT INTO `{$joinSchema['via_table']}`
-							(`{$joinSchema['this_key']}`,`{$joinSchema['other_key']}`)
+						INSERT INTO `{$joinMulti['via_table']}`
+							(`{$joinMulti['this_key']}`,`{$joinMulti['other_key']}`)
 						VALUES
 							(:this_key, :other_key)
 					"
@@ -1944,9 +1948,9 @@ abstract class Mapper implements Serializable
     /**
      * Hydrates a row from the database into a model.
      *
-     * @param array    $rowList  The rows from the database.
-     * @param string   $alias    The prefix of this mapper's table cells in $row
-     * @param callable $callback A callback to apply on all models (@see $this->hydrate)
+     * @param Traversable|array $rowList  The rows from the database.
+     * @param string            $alias    The prefix of this mapper's table cells in $row
+     * @param callable          $callback A callback to apply on all models (@see $this->hydrate)
      *
      * @return Collection
      */
@@ -2141,7 +2145,7 @@ abstract class Mapper implements Serializable
             $model = new $this->model;
         }
         else {
-            throw new Exception("Cannot create nonexistent model");
+            throw new Exception("Cannot create nonexistent model -> {$this->model}");
         }
 
         if ($idValue) {

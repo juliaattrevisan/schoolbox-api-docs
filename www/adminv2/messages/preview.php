@@ -134,7 +134,7 @@ switch ($this->arg[0]) {
             $article = \Schoolbox\News\ArticleMapper::getInstance()->findById($article->getId());
 
             try {
-                $image = \Schoolbox\StorageMapper::getInstance()->findById($article->getImage()->getId());
+                $image = \Schoolbox\Resource\Storage\Mapper::getInstance()->findById($article->getImage()->getId());
                 $image = '/storage/image.php?size=square64&hash=' . $article->getImage()->getHash();
                 $thumb = '/storage/image.php?size=square200&hash=' . $article->getImage()->getHash();
             } catch (\Schoolbox\Mapper\Exception $e) {

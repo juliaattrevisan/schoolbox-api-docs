@@ -36,6 +36,7 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Collection;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 $mapper = new SubmissionBoxMapper();
@@ -174,6 +175,12 @@ if (isset($_POST['curriculumCodes'])) {
     );
 }
 
+if (isset($_POST['attachment'])) {
+    $factory = new CollectorFactory();
+    $attachments = $factory->build($_POST['attachment'])->getAll();
+    $submission->setAttachments(new Collection($attachments));
+}
+
 // create new
 try {
     if ($action == 'create') {
@@ -258,27 +265,6 @@ if (isset($rubric)) {
         isset($invalidateExistingMarks) ? $invalidateExistingMarks : false,
         $submissionBoxID
     );
-}
-
-// clean and rebuild the manymany file relation
-SubmissionBox\FileMapper::getInstance()->deleteByColumn('box_id', $submissionBoxID);
-
-if (isset($_POST['attachment'])) {
-    $factory = new CollectorFactory();
-    /** @var \Schoolbox\Storage[] $storages */
-    $storages = $factory->build($_POST['attachment'])->getAll();
-
-    $files = new \Schoolbox\Collection();
-
-    // iterate and link up
-    foreach ($storages as $storage) {
-        $file = new SubmissionBox\File();
-        $file->setFile($storage);
-        $file->setFileId($storage->getId());
-        $file->setSubmissionBoxId($submissionBoxID);
-        $files->add($file);
-    }
-    SubmissionBox\FileMapper::getInstance()->save($files);
 }
 
 $page->localRedir($is_task ? "/homepage/$categoryID" : '/submission/listSubmission/');

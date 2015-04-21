@@ -106,19 +106,28 @@ class Migrator
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
             $fileId   = $pattern->readId($row);
-            $filename = $pattern->readFilename($row);
+            $basename = $pattern->readFilename($row);
 
-            if (!$filename) {
+            if (!$basename) {
                 $this->log->warning("No filename, cannot detect mime; skipping");
                 continue;
             }
 
-            $mime     = $this->mimetypeMapper->getByFilename($filename);
-            $ext      = pathinfo($filename, PATHINFO_EXTENSION);
+            try {
+                $mime = $this->mimetypeMapper->getByFilename($basename);
+            }
+            catch(\Schoolbox\File\Exception $e) {
+                $this->log->warning("Cannot detect mime; skipping");
+                continue;
+            }
+
+            $filename = pathinfo($basename, PATHINFO_FILENAME);
+            $ext      = pathinfo($basename, PATHINFO_EXTENSION);
 
             // generate a "temporary file"
             $file = $this->storageMapper
                          ->createModel()
+                         ->setFilename($filename)
                          ->setExtension($ext)
                          ->setHash(null)
                          ->setMimetype($mime)

@@ -19,6 +19,7 @@ use Schoolbox\Mapper\Searchable;
 use Schoolbox\Resource\Folder\Model as CategoryModel;
 use Schoolbox\Resource\Category\NewsMapper;
 use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
+use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
 class ArticleMapper extends Mapper implements Searchable
@@ -172,7 +173,7 @@ class ArticleMapper extends Mapper implements Searchable
 
         $this->hasJoin(
             'image', array(
-                'mapper'    => '\\Schoolbox\\StorageMapper',
+                'mapper'    => Storage\Mapper::class,
                 'this_key'  => 'item_image',
                 'other_key' => 'hash',
             )
@@ -688,7 +689,7 @@ class ArticleMapper extends Mapper implements Searchable
      * @param int $offset
      * @param int $time
      *
-     * @return Collection|News[]
+     * @return Collection|Article[]
      */
     public function findForTopic(Topic $topic, $limit, $offset = 0, $time = 0)
     {
@@ -733,7 +734,7 @@ class ArticleMapper extends Mapper implements Searchable
         $c = $this->createCollection();
 
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            /** @var News $news */
+            /** @var Article $news */
             $news = $this->hydrate($r, 'n');
             $news->setOwner($this->hydrateJoin($r, 'owner', 'u'));
             $news->setTopic($this->hydrateJoin($r, 'topic', 't'));

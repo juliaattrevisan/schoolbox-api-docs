@@ -81,10 +81,10 @@ class DueWork_Detail
             // accepts submissions
             if ($this->getSubmissionType() != self::ACCEPT_NONE) {
                 $insertion['user']['instance'] = $user;
-                $submissions                   = $this->submissionStudentHandler->getByUserID($this->dueWork['id'], $user->getId());
+                $submissions = Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper::getInstance()->findByColumnList(array('owner'=>$user->getId(), 'box_id'=>$this->dueWork['id']));
 
                 // an empty array is preferred to false
-                if (!$submissions) {
+                if ($submissions->count() < 1) {
                     $insertion['submissions']    = array();
                     $insertion['user']['status'] = self::UNSUBMITTED;
                     $insertion['user']['class']  = self::CLASS_UNSUBMITTED;
@@ -93,14 +93,14 @@ class DueWork_Detail
                 }
                 else {
                     $insertion['submissions'] = $submissions;
-                    if (count($submissions) > 1) {
+                    if ($submissions->count() > 1) {
                         $insertion['user']['status'] = self::RESUBMITTED;
                     } else {
                         $insertion['user']['status'] = self::SUBMITTED;
                     }
 
                     // determine whether to give the ontime or late class
-                    $submitTime                = new Alaress_Date_Format($submissions[0]['datestamp'], 'Y-m-d');
+                    $submitTime                = $submissions->first()->getCreatedAt();
                     $dueTime                   = new Alaress_Date_Format($this->dueWork['date'], 'Y-m-d');
                     $insertion['user']['time'] = $submitTime;
 
@@ -224,7 +224,7 @@ class DueWork_Detail
                 $returnTime = new Alaress_Date_Format($record['return']['returned'], 'Y-m-d H:i:s');
 
                 foreach ($record['submissions'] as $submission) {
-                    $submitTime = new Alaress_Date_Format($submission['datestamp'], 'Y-m-d H:i:s');
+                    $submitTime = $submission->getCreatedAt();
 
                     if ($submitTime->getUnixTimestamp() > $returnTime->getUnixTimestamp() && $returnTime->getUnixTimestamp() > 0) {
                         $page->parse('submission_after_mark_block', 'submission_after_mark');
@@ -244,47 +244,49 @@ class DueWork_Detail
                         $submissionTimeDescription = 'Submitted On Time';
                     }
 
+                    $plagScan = new Plagscan_Document();
+
                     // needing to do this just to get the icon associated with an extension is slightly ridiculous
-                    if ($submission['is_online_submission']) {
-                        $mime = 'text/html';
-                    } else {
-                        $filename = $submission['realname'];
-                        $mime     = $allowedHandler->getMime(substr($filename, strripos($filename, '.') + 1));
-                    }
-                    $icon = $fileTypeHandler->getIconFile($mime);
+                    if ($submission->getStorage()->getMimeType()) {
 
-                    $plagClass = self::CLASS_PLAG_0;
+                        $icon = $submission->getStorage()->getMimeType()->getIconFile();
 
-                    if (is_numeric($submission['score'])) {
-                        if ($submission['score'] >= 60) {
-                            $plagClass = self::CLASS_PLAG_60;
-                        } elseif ($submission['score'] >= 20) {
-                            $plagClass = self::CLASS_PLAG_20;
+                        $plagScan = $submission->getPlagscan();
+
+                        $plagClass = self::CLASS_PLAG_0;
+
+                        if (is_numeric($plagScan->getScore())) {
+                            if ($plagScan->getScore() >= 60) {
+                                $plagClass = self::CLASS_PLAG_60;
+                            } elseif ($plagScan->getScore() >= 20) {
+                                $plagClass = self::CLASS_PLAG_20;
+                            }
                         }
+
+                        $plagHref = sprintf(
+                            "%s%s/submission/plagiarismReport/%s/?zx_h=600px",
+                            $page->conType(),
+                            $_SERVER['HTTP_HOST'],
+                            $plagScan->getPlagscanId()
+                        );
                     }
 
-                    $plagHref = sprintf(
-                        "%s%s/submission/plagiarismReport/%s/?zx_h=600px",
-                        $page->conType(),
-                        $_SERVER['HTTP_HOST'],
-                        $submission['plag_doc_id']
-                    );
 
                     $page->setVar(
                         array(
-                            'SUBMISSION_ID'               => $submission['id'],
-                            'SUBMISSION_TIME'             => $submission['date'],
-                            'SUBMISSION_FILENAME'         => $submission['realname'],
+                            'SUBMISSION_ID'               => $submission->getId(),
+                            'SUBMISSION_TIME'             => $submission->getCreatedAt()->getShort(),
+                            'SUBMISSION_FILENAME'         => $submission->getStorage()->getBaseName(),
                             'SUBMISSION_CLASS'            => $class,
                             'SUBMISSION_TIME_DESCRIPTION' => $submissionTimeDescription,
                             'SUBMISSION_AFTER_MARK'       => $afterMark,
-                            'SUBMISSION_PLAG_SCORE'       => sprintf("%d%%", $submission['score']),
+                            'SUBMISSION_PLAG_SCORE'       => sprintf("%d%%", $plagScan->getScore()),
                             'SUBMISSION_PLAG_CLASS'       => $plagClass,
                             'SUBMISSION_PLAG_HREF'        => base64_encode($plagHref),
                             'SUBMISSION_EXPANDABLE'       => $this->getSubmissionType() == self::ACCEPT_MULTI
                                     ? 'hide expandable'
                                     : '',
-                            'SUBMISSION_SELECTED'         => $page->arg[2] == $submission['id'] ? 'highlight' : '',
+                            'SUBMISSION_SELECTED'         => $page->arg[2] == $submission->getId() ? 'highlight' : '',
                             'SUBMISSION_MIMEICON'         => $icon
                         )
                     );
@@ -292,21 +294,21 @@ class DueWork_Detail
                     // if plagscan is not registered for use, then clear the indicator rather than show 0%
                     if (Cfg::get('plagscan_api_key')) {
                         // if it's deleted (pre- or post-completion) treat it as such
-                        if ($submission['plag_deleted'] || $submission['plag_status'] == Plagscan_Document::STATUS_UNSCANNABLE) {
+                        if ($plagScan->isDeleted() || $plagScan->getStatus() == Plagscan_Document::STATUS_UNSCANNABLE) {
                             $page->setVar('plag_enabled_block', '');
 
                             // do we have a number we can output for a score?
-                            if ($submission['plag_status'] == Plagscan_Document::STATUS_COMPLETE) {
+                            if ($plagScan->getStatus() == Plagscan_Document::STATUS_COMPLETE) {
                                 $page->parse('plag_deleted_block', 'plag_deleted');
                             } // no value returned, hide it
                             else {
                                 $page->setVar('plag_deleted_block', '');
                             }
                         } // not deleted? ok, is it completed?
-                        elseif ($submission['plag_status'] == Plagscan_Document::STATUS_COMPLETE) {
+                        elseif ($plagScan->getStatus() == Plagscan_Document::STATUS_COMPLETE) {
                             $page->parse('plag_enabled_block', 'plag_enabled');
                         } // not complete? is this even a plagiarism document?
-                        elseif (!$submission['plag_doc_id']) {
+                        elseif (!$plagScan->getPlagscanId()) {
                             $page->setVar('plag_enabled_block', '');
                         } // it's a plag doc, but is being checked and still pending, so tell the user
                         else {

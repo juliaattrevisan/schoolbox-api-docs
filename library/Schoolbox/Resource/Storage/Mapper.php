@@ -55,6 +55,7 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         $this->hasPrototype(new Model($this->mgr->getFilesystem(Manager::FS_STORAGE)));
 
         $this->uses('hash', self::TYPE_STRING, self::COLUMN_IDENTIFIER);
+        $this->uses('filename', self::TYPE_STRING);
         $this->uses('filesize', self::TYPE_INTEGER, null, 'size');
         $this->uses('uploaded_on', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'createdAt');
         $this->uses('last_accessed', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
@@ -233,6 +234,7 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         $storage->setPath($tempLocation);
 
         // set filetype metadata
+        $storage->setFilename(pathinfo($filename, PATHINFO_FILENAME));
         $storage->setExtension(pathinfo($filename, PATHINFO_EXTENSION));
         $storage->setMimetype($mtm->getByFilename($filename));
 

@@ -10,37 +10,40 @@
 
 namespace Crocodoc;
 
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission;
+use Schoolbox\Resource\Storage;
 
 class Download {
 
 	/**
 	 * Contains API keys
 	 *
-	 * @var null
+	 * @var Authenticator
 	 */
 	private $authenticator = null;
 
 	/**
-	 * An instance of \Schoolbox\Assessment\Component\SubmissionBox\Submission
+	 * An instance of SubmissionBox\Submission
 	 *
-	 * @var null
+	 * @var Submission\File
 	 */
 	private $submission = null;
 
 	/**
-	 * An instance of \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork
+	 * An instance of SubmissionBox\ReturnedWork
 	 *
-	 * @var null
+	 * @var SubmissionBox\ReturnedWork
 	 */
 	private $returnedWork = null;
 
 	/**
 	 * Constructor
 	 *
-	 * @param \Schoolbox\Assessment\Component\SubmissionBox\Submission $submission
-	 * @param \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $returnedWork
+	 * @param Submission\File $submission
+	 * @param SubmissionBox\ReturnedWork $returnedWork
 	 */
-	public function __construct(\Schoolbox\Assessment\Component\SubmissionBox\Submission $submission, \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $returnedWork) {
+	public function __construct(Submission\File $submission, SubmissionBox\ReturnedWork $returnedWork) {
 		$this->setAuthenticator(new Authenticator());
 		$this->setSubmission($submission);
 		$this->setReturnedWork($returnedWork);
@@ -61,23 +64,20 @@ class Download {
 		/* If there were no errors, download/attach/save
 		 * Otherwise, ignore altogether
 		 */
-		if (!count($curl->getErrors())) {
+        if (count($curl->getErrors())) {
+            return;
+        }
 
-			/* Download to a temp dir
-			 */
-			$path = \Cfg::get('returns_dir') . '/' . $this->getReturnedWork()->getId() . '.dat';
+        $temp = tempnam(sys_get_temp_dir(), 'cd');
+        file_put_contents($temp, $data);
 
-			file_put_contents($path, $data);
+        $filename = 'return_' . $this->getSubmission()->getFilename() . '.pdf';
+        $storage  = Storage\Mapper::getInstance()->accept($filename, $temp, false);
 
-			/* Update the return with some extra info
-			 */
-			$this->getReturnedWork()->setFilename('return_' . $this->getSubmission()->getFilename() . '.pdf');
-			$this->getReturnedWork()->setFilesize(filesize($path));
-			$this->getReturnedWork()->setMimeType('application/pdf');
+        $this->getReturnedWork()->setStorage($storage);
 
-			$returnMapper = \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper::getInstance();
-			$returnMapper->save($this->getReturnedWork());
-		}
+        $returnMapper = SubmissionBox\ReturnedWorkMapper::getInstance();
+        $returnMapper->save($this->getReturnedWork());
 	}
 
 	/* Getters/Setters
@@ -86,7 +86,7 @@ class Download {
 	/**
 	 * Set authenticator
 	 *
-	 * @param null $authenticator
+	 * @param Authenticator $authenticator
 	 */
 	private function setAuthenticator($authenticator) {
 		$this->authenticator = $authenticator;
@@ -95,7 +95,7 @@ class Download {
 	/**
 	 * Get authenticator
 	 *
-	 * @return null
+	 * @return Authenticator
 	 */
 	private function getAuthenticator() {
 		return $this->authenticator;
@@ -104,7 +104,7 @@ class Download {
 	/**
 	 * Set submission
 	 *
-	 * @param null $submission
+	 * @param Submission\File $submission
 	 */
 	private function setSubmission($submission) {
 		$this->submission = $submission;
@@ -113,7 +113,7 @@ class Download {
 	/**
 	 * Get submission
 	 *
-	 * @return null
+	 * @return Submission\File
 	 */
 	private function getSubmission() {
 		return $this->submission;
@@ -122,7 +122,7 @@ class Download {
 	/**
 	 * Set returned work
 	 *
-	 * @param null $returnedWork
+	 * @param SubmissionBox\ReturnedWork $returnedWork
 	 */
 	private function setReturnedWork($returnedWork) {
 		$this->returnedWork = $returnedWork;
@@ -131,7 +131,7 @@ class Download {
 	/**
 	 * Get returned work
 	 *
-	 * @return null
+	 * @return SubmissionBox\ReturnedWork
 	 */
 	private function getReturnedWork() {
 		return $this->returnedWork;

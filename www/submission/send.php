@@ -5,180 +5,164 @@
 *                                                           *
 ************************************************************/
 //this script opens files for download and send them to the user with correct filename
-//future enhancements could include storing the content type to help browser file recognition
-//rather than just octet stream
 
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 
 //includes
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 $groupHandler = new Group;
 
-if (is_numeric($_GET['id'])) {
-	$page = new SitePage;
+if (!is_numeric($_GET['id'])) {
+    error(2);
+    exit;
+}
 
-	//
-	// File name and/or contents, size and mime type
-	$file     = null;
-	$contents = null;
-	$size     = null;
-	$mime     = null;
-	$attach   = $_GET['save'] ? 'attachment;' : '';
-	if(is_numeric($_GET['return'])) {
-		$mapper = new ReturnedWorkMapper();
-		try {
-			$return = $mapper->findById($_GET['id']);
-		}
-		catch (Schoolbox\Mapper\Exception $e) {
-			error(44);
-			exit;
-		}
+$file     = null;
+$filename = null;
+$content  = null;
+$size     = null;
+$mime     = null;
 
-		// Allow file return owner, parent of owner or all staff access to this file
-		$owner        = $return->getOwner()->getId();
-		if (!($owner == $_SESSION['id']
-			|| $groupHandler->isParentOfChild($owner)
-			|| $groupHandler->isStaff()
-		)) {
-        	error(44);
-		}
+$page     = new SitePage;
+$attach   = $_GET['save'] ? 'attachment;' : '';
 
-		$file = $return->getFileLocation();
+if (is_numeric($_GET['return'])) {
+    $mapper = new ReturnedWorkMapper();
 
-		// does this file exist, and is it readable?
-		if (!is_readable($file)) {
-			error(9, "the requested file could not be read.<br />Please try again, and if the problem persists contact your system administrator.");
-		}
+    try {
+        $return = $mapper->findById($_GET['id']);
 
-		$size     = $return->getFilesize();
-		$filename = $return->getFilename();
-	}
-	else {
-		$mapper = new SubmissionMapper();
-		try {
-			$studentSub = $mapper->findById($_GET['id']);
-			// Now lazy model is gone, need to load submission box and owner manually
-			$studentSub->setSubmissionBox(
-				SubmissionBoxMapper::getInstance()->findById(
-					$studentSub->getSubmissionBox()->getId()
-				)
-			);
-			$studentSub->setOwner(
-				Schoolbox\UserMapper::getInstance()->findById(
-					$studentSub->getOwner()->getId()
-				)
-			);
-		}
-		catch (Schoolbox\Mapper\Exception $e) {
-			error(44);
-			exit;
-		}
+    } catch (Schoolbox\Mapper\Exception $e) {
+        error(44);
+        exit;
+    }
 
-		$subBox = $studentSub->getSubmissionBox();
+    // Allow file return owner, parent of owner or all staff access to this file
+    $owner = $return->getOwner()->getId();
+    if (!($owner == $_SESSION['id']
+        || $groupHandler->isParentOfChild($owner)
+        || $groupHandler->isStaff()
+    )) {
+        error(44);
+    }
 
+    // hydrate
+    $file = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($return->getStorage()->getHash());
 
+    // does this file exist, and is it readable?
+    if (!$file->exists()) {
+        error(9, "the requested file could not be read.<br />Please try again, and if the problem persists contact your system administrator.");
+    }
+
+    $size     = $file->getSize();
+    $filename = $return->getFilename();
+    $mime     = $file->getMime();
+
+} else {
+    $mapper = new FileMapper();
+
+    try {
+        $studentSub = $mapper->findById($_GET['id']);
+
+        // Now lazy model is gone, need to load submission box and owner manually
+        $studentSub->setSubmissionBox(
+            SubmissionBoxMapper::getInstance()->findById(
+                $studentSub->getSubmissionBox()->getId()
+            )
+        );
+        $studentSub->setOwner(
+            Schoolbox\UserMapper::getInstance()->findById(
+                $studentSub->getOwner()->getId()
+            )
+        );
+
+    } catch (Schoolbox\Mapper\Exception $e) {
+        error(44);
+        exit;
+    }
+
+    $subBox = $studentSub->getSubmissionBox();
+
+    try {
         // Check if file has been published/showcased in the ePortfolio, if so anyone can download the file
+        $showcase = Eportfolio\ShowcaseMapper::getInstance()->findOneByColumn('submission_box_id', $studentSub->getSubmissionBox()->getId());
+        $published = true;
+
+    } catch (Schoolbox\Mapper\Exception $e) {
         $published = false;
-
-        try {
-            $showcase = Eportfolio\ShowcaseMapper::getInstance()->findOneByColumn('submission_box_id',$studentSub->getSubmissionBox()->getId());
-            $published = true;
-        }
-        catch (Schoolbox\Mapper\Exception $e) {$published = false;
-        }
-
-        //Check if staff has permission
-        $permission = $groupHandler->getPermission($subBox->getCategory()->getId());
-
-
-		/* Allow students to view their own submitted work
-		* Allow staff members with write permission to this folder access
-		* Allow work that has been showcased to be viewed
-		*/
-		if (($studentSub->getOwner()->getId() != $_SESSION['id'])
-			&& $permission < WRITE_ACCESS
-            && !$published 
-		) {
-			error(44);
-		}
-
-		// filename format to be {lastname-firstname_month-day_hour-minute_{sanitised(filename)}}
-		// eg. Day-Matt_0816-1432_MyAssignment.docx (from 'My Assign!ment.docx')
-		$filename = sprintf("%s-%s_%s_%s",
-			$studentSub->getOwner()->getLastName(),
-			$studentSub->getOwner()->getFirstName(),
-			$studentSub->getSubmitted()->getUsingFormat("md-Hi"),
-			$studentSub->getFilename()
-		);
-
-		//
-		// Load the file (whether an upload or an online submission)
-		$file = $studentSub->getFileLocation();
-		$name = $studentSub->getFilename();
-		$mime = $studentSub->getMimetype()->getMime();
-		if (is_readable($file)) {
-			$size = $studentSub->getFilesize();
-		}
-		else {
-			//
-			// Always show online submissions as inline - don't offer for
-			// download, because they may include uploaded images.
-			$attach   = '';
-			$wrapper  = new Alaress\Html\Wrapper($filename, $studentSub->getBody());
-			$wrapper->loadBaseHrefFromServerVars($_SERVER);
-			$contents = $wrapper->render();
-			$size     = strlen($contents);
-
-			if ($size === 0) {
-				error(9, "the requested file could not be read.<br />Please try again, and if the problem persists contact your system administrator.");
-			}
-		}
-	}
-
-	// sanitise
-	$filename = preg_replace("#[^a-z0-9_\\-\\(\\)\\.]#i", "", $filename);
-
-	// get the mime-type (if not set already)
-	if (!isset($mime)) {
-		$allowedHandler = new AllowedFile();
-		$mime = $allowedHandler->getMime(substr($filename, strripos($filename, '.') + 1));
-	}
-
-	//send headers (cache-control off stops IE8 from failing to download)
-	header ("Pragma: ");
-	header ("Cache-control: ");
-	header ("Content-Type: $mime");
-	header ("Content-Disposition: $attach filename=\"".$filename."\"");
-	if (isset($contents)) {
-        header ("Content-Length: ".$size);
-        echo $contents;
-    }
-    elseif (is_readable($file)) {
-
-		/* Scrub it, if option is specified in the querystring
-		 */
-		if ($_GET['scrub'] == 1) {
-			$contents = Scrub::html(file_get_contents($file));
-			$size = strlen($contents);
-
-			header ("Content-Length: ".$size);
-			echo $contents;
-			exit();
-		}
-		else {
-			if (empty($size)) {
-				$size = filesize($file);
-			}
-
-			header ("Content-Length: ".$size);
-			readfile($file);
-		}
     }
 
-	die(); // just in case
+    // Check if staff has permission
+    $permission = $groupHandler->getPermission($subBox->getCategory()->getId());
+
+    /* Allow students to view their own submitted work
+    * Allow staff members with write permission to this folder access
+    * Allow work that has been showcased to be viewed
+    */
+    if (($studentSub->getOwner()->getId() != $_SESSION['id'])
+        && $permission < WRITE_ACCESS
+        && !$published
+    ) {
+        error(44);
+    }
+
+    // filename format to be {lastname-firstname_month-day_hour-minute_{sanitised(filename)}}
+    // eg. Day-Matt_0816-1432_MyAssignment.docx (from 'My Assign!ment.docx')
+    $filename = sprintf("%s-%s_%s_%s",
+        $studentSub->getOwner()->getLastName(),
+        $studentSub->getOwner()->getFirstName(),
+        $studentSub->getCreatedAt()->getUsingFormat('Ymd-Hi'),
+        $studentSub->getBasename()
+    );
+
+    $file = $studentSub->getStorage();
+
+    // does this file exist, and is it readable?
+    if (!$file->exists()) {
+        error(9, "the requested file could not be read.<br/>Please try again, and if the problem persists contact your system administrator.");
+    }
+
+    $mime = $file->getMime();
+    $size = $file->getSize();
+
+    // wrap HTML in niceness
+    if ($studentSub->getMimetype()->matches('text/html')) {
+        $wrapper = new Alaress\Html\Wrapper(preg_replace("#[^a-z0-9_\\-\\(\\)\\.]#i", "", $filename), $file->read());
+        $wrapper->loadBaseHrefFromServerVars($_SERVER);
+
+        $content = $wrapper->render();
+        $size    = strlen($content);
+        $attach  = '';
+
+        if ($size === 0) {
+            error(9, "the requested file could not be read.<br/>Please try again, and if the problem persists contact your system administrator.");
+        }
+    }
 }
-else {
-	error(2);
+
+// sanitise
+$filename = preg_replace("#[^a-z0-9_\\-\\(\\)\\.]#i", "", $filename);
+
+//send headers (cache-control off stops IE8 from failing to download)
+header ("Pragma: ");
+header ("Cache-control: ");
+header ("Content-Type: $mime");
+header ("Content-Disposition: $attach filename=\"".$filename."\"");
+
+// Scrub it, if option is specified in the querystring
+if ($_GET['scrub'] == 1) {
+    $content = Scrub::html($content ?: $file->read());
 }
+
+if ($content) {
+    header("Content-Length: $size");
+    die($content);
+}
+
+header("Content-Length: $size");
+fpassthru($file->readStream());
+
+// just in case
+exit;

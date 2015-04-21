@@ -13,6 +13,7 @@ use Alaress_Date_Format;
 use Schoolbox\File\Mimetype;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\File\IFile;
+use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
@@ -24,12 +25,13 @@ use Schoolbox\User;
  *
  * @package Schoolbox\Resource
  * @method AbstractFile setHash($hash)
- * @method Mimetype     getMimetype()
  * @method AbstractFile setMimetype(Mimetype $mimetype)
  * @method AbstractFile setSize($size)
  */
 abstract class AbstractFile implements IFile, ISoftDeletable
 {
+    use StorableTrait;
+
     /** @var int */
     protected $id;
 
@@ -50,9 +52,6 @@ abstract class AbstractFile implements IFile, ISoftDeletable
 
     /** @var IFolder */
     protected $folder;
-
-    /** @var Storage */
-    protected $storage;
 
 
     /**
@@ -102,9 +101,18 @@ abstract class AbstractFile implements IFile, ISoftDeletable
      */
     public function getMime()
     {
-        return $this->getStorage()
-                    ->getMimetype()
-                    ->getMime();
+        return $this->getMimetype()->getMime();
+    }
+
+
+    /**
+     * Returns the full mime string for the file
+     *
+     * @return Mimetype
+     */
+    public function getMimetype()
+    {
+        return $this->getStorage()->getMimetype();
     }
 
 
@@ -215,26 +223,6 @@ abstract class AbstractFile implements IFile, ISoftDeletable
     public function setDeletedAt($deletedAt)
     {
         $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-
-    /**
-     * @return Storage
-     */
-    public function getStorage()
-    {
-        return $this->storage;
-    }
-
-
-    /**
-     * @param Storage $storage
-     * @return self
-     */
-    public function setStorage($storage)
-    {
-        $this->storage = $storage;
         return $this;
     }
 

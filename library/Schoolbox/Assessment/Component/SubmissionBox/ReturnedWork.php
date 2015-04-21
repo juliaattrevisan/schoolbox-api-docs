@@ -10,14 +10,11 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\File\Mimetype;
-use Schoolbox\FileInterface;
-use Schoolbox\IConfigLoader;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 
-class ReturnedWork implements ISoftDeletable, FileInterface
+class ReturnedWork implements ISoftDeletable
 {
 
     /**
@@ -56,23 +53,6 @@ class ReturnedWork implements ISoftDeletable, FileInterface
     protected $normalized_mark;
 
     /**
-     * @var string
-     */
-    protected $filename;
-
-    /**
-     * @var Mimetype
-     */
-    protected $mimetype;
-
-    /**
-     * Size of the file attached to the return
-     *
-     * @var null
-     */
-    protected $filesize = null;
-
-    /**
      * @var \Alaress_Date_Format
      */
     protected $submitted;
@@ -90,21 +70,15 @@ class ReturnedWork implements ISoftDeletable, FileInterface
     protected $deleted;
 
     /**
-     * @var string
-     */
-    protected $temp_location;
-
-    /**
-     * @var IConfigLoader
-     */
-    protected $config_loader;
-
-    /**
      * Optional crocodoc uuid
      *
      * @var null
      */
     protected $uuid = null;
+
+    /** @var IStorage */
+    protected $storage;
+
 
     /**
      * Creates object and sets up related objects.
@@ -113,7 +87,6 @@ class ReturnedWork implements ISoftDeletable, FileInterface
     {
         $this->setSubmissionBox(new SubmissionBox());
         $this->setOwner(new User());
-        $this->setConfigLoader(ConfigMapper::getInstance());
     }
 
     /**
@@ -125,81 +98,6 @@ class ReturnedWork implements ISoftDeletable, FileInterface
     public function getGradientFromNormalizedMark()
     {
         return max(0, min(10, (int)($this->getNormalizedMark() / 10)));
-    }
-
-    /**
-     * Gets the location at which this file would be stored.
-     *
-     * @return string
-     */
-    public function getFileLocation()
-    {
-        $id = $this->getId();
-        if (!isset($id)) {
-            return false;
-        }
-        return $this->config_loader->get('returns_dir') . '/' . $id . '.dat';
-    }
-
-    /**
-     * Set filesize
-     *
-     * @param $filesize
-     * @return $this
-     */
-    public function setFilesize($filesize)
-    {
-        $this->filesize = $filesize;
-        return $this;
-    }
-
-    /**
-     * Get filesize
-     *
-     * @return null
-     */
-    public function getFilesize()
-    {
-        return $this->filesize;
-    }
-
-    /**
-     * Gets the size of this file (from where it's stored on the file system),
-     * or false if it doesn't exist.
-     *
-     * @return bool|int
-     */
-    public function getFilesizeByPath()
-    {
-        if (($location = $this->getFileLocation()) !== false) {
-            if (file_exists($location)) {
-                return filesize($location);
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Auto-generated methods
-     */
-
-    /**
-     * @param  string $filename
-     *
-     * @return $this
-     */
-    public function setFilename($filename)
-    {
-        $this->filename = $filename;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFilename()
-    {
-        return $this->filename;
     }
 
     /**
@@ -281,6 +179,34 @@ class ReturnedWork implements ISoftDeletable, FileInterface
     {
         return $this->marker;
     }
+
+
+
+    /**
+     * Gets the filename for the attached returned work
+     *
+     * @return string
+     */
+    public function getFilename()
+    {
+        return $this->getStorage()->getFilename();
+    }
+
+    /**
+     * Gets the file size for the attached returned work
+     *
+     * @return string
+     * @deprecated
+     */
+    public function getFilesize()
+    {
+        return $this->getStorage()->getSize();
+    }
+
+    public function getMimeType() {
+        return $this->getStorage()->getMimeType();
+    }
+
 
 
     /**
@@ -379,44 +305,6 @@ class ReturnedWork implements ISoftDeletable, FileInterface
     }
 
     /**
-     * @param $config_loader
-     *
-     * @return $this
-     */
-    public function setConfigLoader($config_loader)
-    {
-        $this->config_loader = $config_loader;
-        return $this;
-    }
-
-    /**
-     * @return IConfigLoader
-     */
-    public function getConfigLoader()
-    {
-        return $this->config_loader;
-    }
-
-    /**
-     * @param  Mimetype $mimetype
-     *
-     * @return $this
-     */
-    public function setMimetype($mimetype)
-    {
-        $this->mimetype = $mimetype;
-        return $this;
-    }
-
-    /**
-     * @return Mimetype
-     */
-    public function getMimetype()
-    {
-        return $this->mimetype;
-    }
-
-    /**
      * Set deleted
      *
      * @param mixed $deleted
@@ -434,57 +322,6 @@ class ReturnedWork implements ISoftDeletable, FileInterface
     public function getDeleted()
     {
         return $this->deleted;
-    }
-
-    // File related methods
-
-    /**
-     * @param  string $temp_location
-     * @return $this
-     */
-    public function setTempLocation($temp_location)
-    {
-        $this->temp_location = $temp_location;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTempLocation()
-    {
-        return $this->temp_location;
-    }
-
-    /**
-     * Loads the file size for this file, based on the temp location.
-     *
-     * @return bool
-     */
-    public function loadFilesizeFromTempLocation()
-    {
-        if (file_exists($temp_location = $this->getTempLocation())) {
-            $this->setFilesize(filesize($temp_location));
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Copies file from its temp location to permanent upload location.
-     *
-     * @todo Traits would be great here.
-     *
-     * @return bool
-     */
-    public function copyFromTempLocation()
-    {
-        $temp_location = $this->getTempLocation();
-        $file_location = $this->getFileLocation();
-        if (file_exists($temp_location) && $file_location) {
-            return copy($temp_location, $file_location);
-        }
-        return false;
     }
 
     /**
@@ -524,26 +361,22 @@ class ReturnedWork implements ISoftDeletable, FileInterface
         return $this->uuid;
     }
 
-
     /**
-     * Returns the full mime string for the file
-     *
-     * @return string
+     * @return IStorage
      */
-    public function getMime()
+    public function getStorage()
     {
-        return $this->getMimetype()->getMime();
+        return $this->storage;
     }
 
-
     /**
-     * Returns the size on disk of the file
-     *
-     * @return int
+     * @param IStorage $storage
+     * @return static
      */
-    public function getSize()
+    public function setStorage($storage)
     {
-        return $this->getFilesize();
+        $this->storage = $storage;
+        return $this;
     }
 
 }

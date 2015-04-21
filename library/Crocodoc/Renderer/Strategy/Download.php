@@ -10,6 +10,12 @@
 
 namespace Crocodoc\Renderer\Strategy;
 
+use Alaress_Byte_Format;
+use Plagscan_Document;
+use Plagscan_DocumentMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission;
+use Schoolbox\Mapper;
+use Schoolbox\User;
 
 class Download extends Base {
 
@@ -37,9 +43,11 @@ class Download extends Base {
 		$this->getPage()->setBlock('injectable', 'plag_score', 'plag_score_block');
 		$this->plag();
 
+        $work = $this->getSubmission();
+
 		try {
-			$plagMapper = new \Plagscan_DocumentMapper();
-			$plagDocument = $plagMapper->findOneByColumn('file_id', $this->getSubmission()->getId());
+			$plagMapper = new Plagscan_DocumentMapper();
+			$plagDocument = $plagMapper->findOneByColumn('file_id', $work->getId());
 
 			$plagHref = sprintf(
 				"%s%s/submission/plagiarismReport/%s/?zx_h=600px",
@@ -50,12 +58,16 @@ class Download extends Base {
 			$plagHref = '';
 		}
 
+        $filename = $work->getFilename();
+        $filesize = $work->getSize();
+        $mimetype = $work->getMimetype();
+
 		$this->getPage()->setVar(array(
-			'MOST_RECENT_SUBMISSION_FILE_ID' => $this->getSubmission()->getId(),
-			'MOST_RECENT_SUBMISSION_FILE_NAME' => $this->getSubmission()->getFilename(),
-			'MOST_RECENT_SUBMISSION_FILE_SIZE' => \Alaress_Byte_Format::bytesToString($this->getSubmission()->getFilesize()),
-			'MOST_RECENT_SUBMISSION_FILE_THUMB' => $this->getSubmission()->getMimeType()->getIconFile(),
-			'MOST_RECENT_SUBMISSION_FILE_DATE'  => $this->getSubmission()->getSubmitted()->getRelativeTime(),
+			'MOST_RECENT_SUBMISSION_FILE_ID'        => $work->getId(),
+			'MOST_RECENT_SUBMISSION_FILE_NAME'      => $filename,
+			'MOST_RECENT_SUBMISSION_FILE_SIZE'      => Alaress_Byte_Format::bytesToString($filesize),
+			'MOST_RECENT_SUBMISSION_FILE_THUMB'     => $mimetype->getIconFile(),
+			'MOST_RECENT_SUBMISSION_FILE_DATE'      => $work->getCreatedAt()->getRelativeTime(),
 			'MOST_RECENT_SUBMISSION_FILE_PLAG_HREF' => base64_encode($plagHref)
 		));
 
@@ -75,14 +87,18 @@ class Download extends Base {
 	/**
 	 * Plag it
 	 */
-	private function plag() {
-		$isStaff = $_SESSION['user']->getRole()->isStaff();
-		$isOwner = $this->getSubmission()->getOwner()->getId() == $_SESSION['user']->getId();
+	private function plag()
+    {
+        /** @var User $sessionUser */
+        $sessionUser = $_SESSION['user'];
+
+		$isStaff = $sessionUser->getRole()->isStaff();
+		$isOwner = $this->getSubmission()->getOwner()->getId() == $sessionUser->getId();
 
 		if ($isStaff || ($isOwner && \Config::get('plagscan_student_visible'))) {
 
 			// retrieve plagiarism score, if available
-			$docMapper = \Plagscan_DocumentMapper::getInstance();
+			$docMapper = Plagscan_DocumentMapper::getInstance();
 			$plagDoc = null;
 
 			try {
@@ -116,7 +132,7 @@ class Download extends Base {
 					$this->getPage()->setVar('plag_score_block', '');
 				}
 			}
-			catch (\Schoolbox\Mapper\Exception $e) {
+			catch (Mapper\Exception $e) {
 				$this->getPage()->setVar('plag_score_block', '');
 			}
 		}

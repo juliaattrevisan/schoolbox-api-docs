@@ -10,6 +10,7 @@
 namespace Schoolbox\Resource\Storage;
 
 use Alaress_Date_Format as ADF;
+use Schoolbox\File\Mimetype;
 
 /**
  * Interface IStorage
@@ -22,10 +23,27 @@ interface IStorage
 {
 
     /**
+     * Returns the real filename of the file
+     * @return string
+     */
+    public function getFilename();
+
+    /**
+     * @return string
+     */
+    public function getExtension();
+
+    /**
      * Returns the full mime string for the file
      * @return string
      */
     public function getMime();
+
+    /**
+     * Returns the full mime string for the file
+     * @return Mimetype
+     */
+    public function getMimetype();
 
     /**
      * Returns the size on disk of the file
@@ -47,5 +65,29 @@ interface IStorage
      * @return ADF
      */
     public function getLastAccessed();
+
+    /**
+     * Check whether the file exists.
+     *
+     * @inherited from Flysystem\File
+     * @return bool
+     */
+    public function exists();
+
+    /**
+     * Read the file.
+     *
+     * @inherited from Flysystem\File
+     * @return string file contents
+     */
+    public function read();
+
+    /**
+     * Read the file as a stream.
+     *
+     * @inherited from Flysystem\File
+     * @return resource file stream
+     */
+    public function readStream();
 
 } 

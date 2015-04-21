@@ -11,6 +11,7 @@
 namespace Schoolbox\ResourceBooking\Item;
 
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Resource\Storage;
 use Schoolbox\Collection;
 
 class Mapper extends BaseMapper
@@ -47,7 +48,7 @@ class Mapper extends BaseMapper
                 'type'     => self::TYPE_MODEL,
                 'join'     => 'image',
                 'join_def' => array(
-                    'mapper'    => '\\Schoolbox\\StorageMapper',
+                    'mapper'    => Storage\Mapper::class,
                     'other_key' => 'storage_id',
                 )
             )

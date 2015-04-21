@@ -575,6 +575,7 @@ class Collection implements ICollection, JsonSerializable
     /**
     * Filters out elements from this collection based on the given callback
     *
+    * @deprecated use filter() instead
     * @param callable $callback {
     *                      param $item
     *                      return bool

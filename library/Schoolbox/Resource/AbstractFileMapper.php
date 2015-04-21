@@ -161,24 +161,24 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
 
+            // can't set storage if it doesn't exist
+            if (!$r['h.hash']) {
+                continue;
+            }
+
             $file = $this->hydrate($r);
 
-            // just in case we wanted this to be simple
-            $file->setStorage(
-                $this->hydrateJoin($r, 'hash', 'h')
-                     ->setMimetype(
-                         $this->getJoinMapper('hash')
-                              ->hydrateJoin($r, 'allowedFileExtension', 'm')
-                     )
-                    ->setQueue(
-                        $this->hydrateJoin($r, 'hash.queue', 'q')
-                    )
-            );
+            /** @var Storage $store */
+            $store = $this->hydrateJoin($r, 'storage', 'h')
+                         ->setMimetype(
+                             $this->getJoinMapper('storage')
+                                  ->hydrateJoin($r, 'allowedFileExtension', 'm')
+                         );
 
             // ensure the path is set
-            $file->getStorage()->setPath(
-                $this->getStorageMapper()->getManager()->calcPath($file->getStorage())
-            );
+            $store->setPath($this->getStorageMapper()->getManager()->calcPath($store));
+
+            $file->setStorage($store);
 
             $file->setOwner($this->hydrateJoin($r, 'owner', 'u'));
             $file->setFolder($this->hydrateJoin($r, $this->getFolderFieldname(), 'c'));

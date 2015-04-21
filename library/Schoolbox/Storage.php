@@ -9,8 +9,15 @@
 
 namespace Schoolbox;
 use Schoolbox\File\Mimetype;
+use Schoolbox\Resource\Storage\IStorage;
 
-class Storage implements FileInterface {
+/**
+ * Class Storage
+ *
+ * @deprecated use Schoolbox\Resource\Storage\Model
+ * @package Schoolbox
+ */
+class Storage implements FileInterface, IStorage {
 
 	/**
 	 * @var int
@@ -202,6 +209,13 @@ class Storage implements FileInterface {
 		return $this->uploaded_on;
 	}
 
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getCreatedAt()
+    {
+        return $this->getUploadedOn();
+    }
 
     /**
      * @param \Alaress_Date_Format $expired_at

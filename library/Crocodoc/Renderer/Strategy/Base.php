@@ -10,30 +10,30 @@
 
 namespace Crocodoc\Renderer\Strategy;
 
-use \Schoolbox\Assessment\Component\SubmissionBox\Submission;
-use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use \Schoolbox\File\MimetypeMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use SitePage;
 
 abstract class Base {
 
 	/**
 	 * An instance of sitepage
 	 *
-	 * @var null
+	 * @var SitePage
 	 */
 	protected $page = null;
 
 	/**
 	 * The submission
 	 *
-	 * @var null
+	 * @var Submission\File
 	 */
 	protected $submission = null;
 
 	/**
 	 * Returned work
 	 *
-	 * @var null
+	 * @var ReturnedWork
 	 */
 	protected $returnedWork = null;
 
@@ -69,23 +69,24 @@ abstract class Base {
 	 * Constructor
 	 *
 	 * @param $page
-	 * @param Submission $submission
+	 * @param Submission\File $submission
 	 * @param ReturnedWork $returnedWork
 	 * @param $navigationElements
 	 */
-	public function __construct($page, Submission $submission = null, ReturnedWork $returnedWork = null, $navigationElements) {
+	public function __construct($page, Submission\File $submission = null, ReturnedWork $returnedWork = null, $navigationElements)
+    {
 		$this->setPage($page);
 		$this->setSubmission($submission);
 		$this->setReturnedWork($returnedWork);
 		$this->setNavigationElements($navigationElements);
 
-        /* Fetch mimetype
-         */
-        if (($this->getReturnedWork() != null) && strlen($this->getReturnedWork()->getMimetype()->getMime())) {
-            $mimetypeMapper = new MimetypeMapper();
-            $mime = $mimetypeMapper->findOneByColumn('mime', $this->getReturnedWork()->getMimeType()->getMime());
-            $this->getReturnedWork()->setMimetype($mime);
-        }
+//        /* Fetch mimetype
+//         */
+//        if (($this->getReturnedWork() != null) && strlen($this->getReturnedWork()->getMimetype()->getMime())) {
+//            $mimetypeMapper = new MimetypeMapper();
+//            $mime = $mimetypeMapper->findOneByColumn('mime', $this->getReturnedWork()->getMimeType()->getMime());
+//            $this->getReturnedWork()->setMimetype($mime);
+//        }
 	}
 
 	/**
@@ -98,18 +99,23 @@ abstract class Base {
 	/**
 	 * Parse the Upload File injectable
 	 */
-	protected function parseInjectableUpload() {
+	protected function parseInjectableUpload()
+    {
 		$this->getPage()->setFile('injectableUpload', $this->getUploadFile());
 		$this->getPage()->setBlock('injectableUpload', 'returned_work', 'returned_work_block');
 
-		if ($this->getReturnedWork() !== null) {
-            if ($this->getReturnedWork()->getFilename() != null) {
+        $return = $this->getReturnedWork();
+
+        if ($return instanceof ReturnedWork) {
+            if ($return->getStorage()->getFilename() != null) {
+                $storage = $return->getStorage();
+
                 $this->getPage()->setVar(array(
-                    'MOST_RECENT_RETURN_FILE_ID' => $this->getReturnedWork()->getId(),
-                    'MOST_RECENT_RETURN_FILE_NAME' => $this->getReturnedWork()->getFilename(),
-                    'MOST_RECENT_RETURN_FILE_SIZE' => \Alaress_Byte_Format::bytesToString($this->getReturnedWork()->getFilesize()),
-                    'MOST_RECENT_RETURN_FILE_THUMB' => $this->getReturnedWork()->getMimeType()->getIconFile(),
-                    'MOST_RECENT_RETURN_FILE_DATE'  => $this->getReturnedWork()->getReturned()->getRelativeTime(),
+                    'MOST_RECENT_RETURN_FILE_ID'    => $return->getId(),
+                    'MOST_RECENT_RETURN_FILE_NAME'  => $storage->getFilename(),
+                    'MOST_RECENT_RETURN_FILE_SIZE'  => \Alaress_Byte_Format::bytesToString($storage->getSize()),
+                    'MOST_RECENT_RETURN_FILE_THUMB' => $storage->getMimeType()->getIconFile(),
+                    'MOST_RECENT_RETURN_FILE_DATE'  => $return->getReturned()->getRelativeTime(),
                 ));
 
                 $this->getPage()->parse('returned_work_block', 'returned_work');
@@ -153,7 +159,7 @@ abstract class Base {
 	/**
 	 * Set page
 	 *
-	 * @param null $page
+	 * @param SitePage $page
 	 */
 	protected function setPage($page) {
 		$this->page = $page;
@@ -162,7 +168,7 @@ abstract class Base {
 	/**
 	 * Get page
 	 *
-	 * @return null
+	 * @return SitePage
 	 */
 	protected function getPage() {
 		return $this->page;
@@ -189,7 +195,7 @@ abstract class Base {
 	/**
 	 * Set submission
 	 *
-	 * @param null $submission
+	 * @param Submission\File $submission
 	 */
 	protected function setSubmission($submission) {
 		$this->submission = $submission;
@@ -198,7 +204,7 @@ abstract class Base {
 	/**
 	 * Get submission
 	 *
-	 * @return null
+	 * @return Submission\File
 	 */
 	protected function getSubmission() {
 		return $this->submission;
@@ -261,7 +267,7 @@ abstract class Base {
 	/**
 	 * Set returned work
 	 *
-	 * @param null $returnedWork
+	 * @param ReturnedWork $returnedWork
 	 */
 	protected function setReturnedWork($returnedWork) {
 		$this->returnedWork = $returnedWork;
@@ -270,7 +276,7 @@ abstract class Base {
 	/**
 	 * Get returned work
 	 *
-	 * @return null
+	 * @return ReturnedWork
 	 */
 	protected function getReturnedWork() {
 		return $this->returnedWork;
