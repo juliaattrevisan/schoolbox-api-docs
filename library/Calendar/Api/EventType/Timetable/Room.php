@@ -80,15 +80,17 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                         $campusList[$timetableCode] = null;
                     }
                 }
+                $campus   = null;
                 $campusId = null;
                 if ($campusList[$timetableCode] instanceof Schoolbox\Campus) {
+                    $campus   = $campusList[$timetableCode];
                     $campusId = $campusList[$timetableCode]->getId();
                 }
 
                 // Cache lookups for external timetable
                 if (!isset($dayNumberList[$currentTimestamp][$campusId])) {
                     $dayNumberList[$currentTimestamp][$campusId] = $this->getExternalTimetable()->getDayNumber(
-                        $campusId,
+                        $campus,
                         $currentTimestamp
                     );
                 }

@@ -246,8 +246,13 @@ if (is_array($outputList)) {
 
                                 /* Lookup subject code and check permissions, if read access provide a link to the user */
                                 if (!isset($catCache[$class['code']])) {
-                                    $cat = $categoryMapper->findByCode($class['code']);
-                                    $catCache[$class['code']] = $cat->getId();
+                                    try {
+                                        $cat = $categoryMapper->findByCode($class['code']);
+                                        $catCache[$class['code']] = $cat->getId();
+
+                                    } catch (\Schoolbox\Mapper\Exception $e) {
+                                        //Subject not found
+                                    }
                                 }
 
                                 $this->setVar($outputPeriod);
