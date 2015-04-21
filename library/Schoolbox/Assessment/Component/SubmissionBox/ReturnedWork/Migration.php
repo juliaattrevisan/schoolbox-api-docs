@@ -100,4 +100,8 @@ class Migration implements MigrationPattern
     {
         return $row['filename'];
     }
+
+    public function getQueueType() {
+        return null;
+    }
 }

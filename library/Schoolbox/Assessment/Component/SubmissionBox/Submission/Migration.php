@@ -14,6 +14,7 @@ use Database;
 use PDOStatement;
 use Schoolbox\Config\Loader;
 use Schoolbox\Resource\Storage\MigrationPattern;
+use Schoolbox\Video\QueueMapper;
 
 class Migration implements MigrationPattern
 {
@@ -117,4 +118,7 @@ class Migration implements MigrationPattern
         return $filename;
     }
 
+    public function getQueueType() {
+        return QueueMapper::FILE_TYPE_SUBMISSION;
+    }
 } 
