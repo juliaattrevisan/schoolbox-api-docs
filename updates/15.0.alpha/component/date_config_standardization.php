@@ -31,15 +31,16 @@ foreach ($select as $row) {
     } catch (InvalidArgumentException $e) {
         // Not a valid date, update it
         $timestamp = strtotime($date);
+
+        if ($timestamp !== false) {
+            $dateObject = new Alaress_Date_Format($timestamp, Alaress_Date_Format::TIMESTAMP);
+        }
+
         $updates[] = [
             'id'       => $row['id'],
             'oldValue' => $date,
-            'newValue' => null,
+            'newValue' => $timestamp ? $dateObject->getDatabaseDate() : null,
         ];
-        if ($timestamp !== false) {
-            $dateObject = new Alaress_Date_Format($timestamp, Alaress_Date_Format::TIMESTAMP);
-            $updates['newValue'] = $dateObject->getDatabaseDate();
-        }
     }
 }
 
@@ -52,15 +53,17 @@ foreach ($select as $row) {
     } catch (InvalidArgumentException $e) {
         // Not a valid time, update it
         $timestamp = strtotime($date);
+        if ($timestamp !== false) {
+            $dateObject = new Alaress_Date_Format($timestamp, Alaress_Date_Format::TIMESTAMP);
+        }
+
         $updates[] = [
             'id'       => $row['id'],
             'oldValue' => $date,
-            'newValue' => null,
+            'newValue' => $timestamp ? $dateObject->getDatabaseTime() : null,
+
         ];
-        if ($timestamp !== false) {
-            $dateObject = new Alaress_Date_Format($timestamp, Alaress_Date_Format::TIMESTAMP);
-            $updates['newValue'] = $dateObject->getDatabaseDate();
-        }
+
     }
 }
 
@@ -68,6 +71,7 @@ foreach ($select as $row) {
 $logger->info(sprintf('Standardizing component configuration: %d to standardize', count($updates)));
 $update = $db->prepare("UPDATE component_config_instance SET value = :value WHERE id = :id");
 $counts = ['success' => 0, 'failure' => 0];
+var_dump($updates);
 foreach ($updates as $row) {
     if (!isset($row['newValue'])) {
         $logger->warning(
