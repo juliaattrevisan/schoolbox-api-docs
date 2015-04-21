@@ -14,6 +14,7 @@ use Alaress\Async\Notification\Cloud;
 use Monolog\Handler\AbstractProcessingHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\MobileApp;
+use Schoolbox\UserMapper;
 
 class PushHandler extends AbstractProcessingHandler
 {
@@ -26,8 +27,13 @@ class PushHandler extends AbstractProcessingHandler
      */
     protected function write(array $record)
     {
+        $conf = ConfigMapper::getInstance();
+
+        preg_match('`instant.user.([0-9]+)`', $record['channel'], $matches);
+        $user = UserMapper::getInstance()->findById($matches[1]);
+
         $services = array();
-        if (ConfigMapper::getInstance()->get('push_notifications_enabled')) {
+        if ($conf->get('push_notifications_enabled')) {
             if ($conf->get('push_gcm_api_key')) {
                 $services[] = new Cloud\Google\GCM($conf->get('push_gcm_api_key'));
             }
@@ -37,7 +43,7 @@ class PushHandler extends AbstractProcessingHandler
         }
         $cloudManager = new MobileApp\ServiceManager($services);
 
-        $cloudManager->push($userId, $data);
+        $cloudManager->push($user->getId(), $record['message']);
     }
 
 } 
