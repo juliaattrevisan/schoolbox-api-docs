@@ -39,4 +39,28 @@ abstract class Base extends AchievementReportBase {
     {
         return $this->year;
     }
+
+    /**
+     * Explorer, reporting!
+     */
+    protected function explorerReporting() {
+        $explorer = $this->getDb()->getAll("
+            SELECT TOP 25 *
+            FROM SynergyOne.dbo.uvSchoolBoxNCEAResults
+        ");
+
+//        $explorer = $this->getDb()->getAll("
+//            SELECT
+//                TABLE_CATALOG,
+//                TABLE_SCHEMA,
+//                TABLE_NAME,
+//                TABLE_TYPE
+//            FROM
+//                INFORMATION_SCHEMA.TABLES
+//            WHERE
+//                TABLE_NAME LIKE '%uv%'
+//        ");
+
+        return $explorer;
+    }
 } 

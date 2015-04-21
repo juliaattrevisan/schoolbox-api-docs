@@ -10,9 +10,8 @@
 
 namespace Custom\Diocesan\AchievementReport\NCEA;
 
-use Alaress_Probe as Probe;
-
 class LiteracyNumeracyCheckbox extends Base {
+
     /**
      * Hook method
      *
@@ -72,29 +71,5 @@ class LiteracyNumeracyCheckbox extends Base {
             'Level1LiteracyMet' => 0,
             'Level1NumeracyMet' => 0
         );
-    }
-
-    /**
-     * Explorer, reporting!
-     */
-    private function explorerReporting() {
-        $explorer = $this->getDb()->getAll("
-            SELECT TOP 25 *
-            FROM SynergyOne.dbo.uvSchoolBoxNCEAResults
-        ");
-
-//        $explorer = $this->getDb()->getAll("
-//            SELECT
-//                TABLE_CATALOG,
-//                TABLE_SCHEMA,
-//                TABLE_NAME,
-//                TABLE_TYPE
-//            FROM
-//                INFORMATION_SCHEMA.TABLES
-//            WHERE
-//                TABLE_NAME LIKE '%uv%'
-//        ");
-
-        return $explorer;
     }
 }
