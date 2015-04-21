@@ -71,7 +71,6 @@ foreach ($select as $row) {
 $logger->info(sprintf('Standardizing component configuration: %d to standardize', count($updates)));
 $update = $db->prepare("UPDATE component_config_instance SET value = :value WHERE id = :id");
 $counts = ['success' => 0, 'failure' => 0];
-var_dump($updates);
 foreach ($updates as $row) {
     if (!isset($row['newValue'])) {
         $logger->warning(
