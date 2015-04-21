@@ -419,8 +419,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
            * because we have three columns to parse per iteration.
            */
         $page->setBlock('answerFormFragment', 'answerOptionLeft', 'answerOptionLeft_block');
-        $page->setBlock('answerFormFragment', 'answerOptionRight', 'answerOptionRight_block');
-        $page->setBlock('answerFormFragment', 'answerOptionCorrectResponse', 'answerOptionCorrectResponse_block');
+        $page->setBlock('answerOptionLeft', 'answerOptionCorrectResponse', 'answerOptionCorrectResponse_block');
 
         $answerGroup = $this->getByQuestionID($question_id);
 
@@ -454,10 +453,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
                         'CORRECT'                       => $correct,
                     )
                 );
-
+                $page->parse('answerOptionCorrectResponse_block', 'answerOptionCorrectResponse', false);
                 $page->parse('answerOptionLeft_block', 'answerOptionLeft', true);
-                $page->parse('answerOptionRight_block', 'answerOptionRight', true);
-                $page->parse('answerOptionCorrectResponse_block', 'answerOptionCorrectResponse', true);
             }
         }
     }

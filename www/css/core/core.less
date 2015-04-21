@@ -5243,6 +5243,29 @@ ul.section-options a.drop-arrow {
     vertical-align: middle;
 }
 
+.inCorrectAnswer{
+	margin: 5px 0;
+	padding: 8px;
+	background-color: #F5CFCF;
+	position:relative;
+	.tick-cross {
+		background: url(/images/famicons/cross.png) 0 0 no-repeat;
+	}
+}
+
+.correctAnswer{
+	&:extend(.inCorrectAnswer);
+	background-color: @positive-color;
+	.tick-cross {
+		background: url(/images/famicons/tick.png) 0 0 no-repeat;
+	}
+}
+
+.suggestedAnswer {
+	&:extend(.inCorrectAnswer);
+	background-color: @highlight-color
+}
+
 .evaluation-content.take-test ul li.left-answer strong {
     padding: 5px 15px;
     height: 65px;
@@ -5317,8 +5340,6 @@ ul.section-options a.drop-arrow {
 
 .evaluation-content .answer-given-container,
 .evaluation-content .correct-answer-container {
-   // border: 1px solid darken(@dark,@darken-value / 4);
-    padding: 10px;
     margin: 5px 0;
 }
 
@@ -5329,7 +5350,7 @@ ul.section-options a.drop-arrow {
 
 .tick-cross {
     position: absolute;
-    top: 10px;
+    top: 7px;
     right: 10px;
     height: 15px;
     width: 15px;
@@ -5351,55 +5372,57 @@ ul.section-options a.drop-arrow {
 /*match*/
 
 .matchPairs {
-  float: left;
-  li {
-    font-size: 12px;
-    margin-bottom: 10px;
-    background: @lgrey;
-    border: 1px solid @lgrey;
-    padding: 5px;
-	position: relative;
-  }
+	/*because we support IE9. Otherwise use display:flex;*/
+	display: table;
+  	width: 100%;
+	li {
+		font-size: 12px;
+		margin-bottom: 10px;
+		background: @lgrey;
+		border: 1px solid @lgrey;
+		padding: 5px;
+		position: relative;
+	}
+	.correctAnswer{
+		&:extend(.match-right);
+		width: 30%;
+		padding: 8px;
+		background-color: @highlight-color;
+	}
 }
 
 .matchRank {
-  margin-left: 16px;
-  li {
-    min-width: 0;
-    position: relative;
-    border: 1px solid @lgrey;
-    margin-bottom: 10px;
-    padding: 10px;
-  }
+ 	margin-left: 16px;
+	li {
+		min-width: 0;
+		position: relative;
+		border: 1px solid @lgrey;
+		margin-bottom: 10px;
+		padding: 10px;
+	}
 }
 
-.match-left {
-    width: 49%
-}
-
+.match-left,
 .match-right {
-    width: 51%
+	display: table-cell;
+	width: 35%;
+  	padding: 8px 26px 8px 8px;
+  	position: relative;
+  	box-sizing: border-box;
+  	border-right: 1px solid @white;
+  	border-bottom: 1px solid @white;
 }
 
-.matchPairs li.matchCorrect {
+.matchPairs .matchCorrect {
     background-color: @positive-color;
 }
 
-.matchPairs li.matchIncorrect {
+.matchPairs .matchIncorrect {
     background-color: #F5CFCF;
 }
 
-.matchPairs li.matchIncorrect .tick-cross {
+.matchPairs .matchIncorrect .tick-cross {
     background: url(/images/famicons/cross.png) 0 0 no-repeat;
-}
-
-.matchPairs strong {
-    font-weight: normal;
-    background: @white;
-    width: 86%;
-    float: left;
-    padding: 10px 5px;
-	line-height: 0;
 }
 
 .matchPairs li.left-columns {
