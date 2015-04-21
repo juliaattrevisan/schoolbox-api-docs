@@ -13,7 +13,7 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder;
 
 $page = new SitePage();
 
@@ -23,6 +23,7 @@ $course_instance = UnitInstanceMapper::getInstance()->findById($course_instance_
 /** @var Component_Instance $component */
 $component   = Component_InstanceMapper::getInstance()->findById($course_instance->getComponent()->getId());
 $category_id = $component->getIdentifier();
+$category    = Folder\Mapper::getInstance()->findById($category_id);
 
 // Lame permission handling
 // Current user needs write access to the category this task instance is in.
@@ -143,18 +144,8 @@ if ($page->detectAjax()) {
 
             /** @var Component_Homepage_CourseInstanceController $controller */
             $controller = $chf->buildComponent($component);
-            $codeString = '';
-            try {
-                $codeString = CategoryMapper::getInstance()->findById($category_id)
-                    ->getCodeString();
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                // noop
-            }
             $controller->setup(
-                array(
-                    'id'   => $category_id,
-                    'code' => $codeString,
-                ),
+                $category,
                 $controller->getInstance()->getConfigArray()
             );
 

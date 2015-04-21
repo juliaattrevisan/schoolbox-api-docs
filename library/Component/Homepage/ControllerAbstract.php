@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,11 +6,20 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Schoolbox\Resource\Folder;
+
 abstract class Component_Homepage_ControllerAbstract extends Component_ControllerAbstract
 {
-
-    public function setup(\Schoolbox\Resource\Folder\Model $context, array $config)
+    /**
+     * @param Folder\Model $context If provided, the folder to render this component in
+     * @param array        $config
+     */
+    public function setup(Folder\Model $context = null, array $config = array())
     {
+        if (!$context instanceof Folder\Model) {
+            $context = new Folder\Model();
+        }
         parent::setup($context, $config);
         $g = new Group();
         // Content permission: based on alt source if it's there

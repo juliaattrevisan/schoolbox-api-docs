@@ -15,11 +15,12 @@ use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder;
 
 $page = new SitePage();
 
 $category_id = $_POST['category'];
+$category    = Folder\Mapper::getInstance()->findById($category_id);
 
 // Shitty permission handling
 $group             = new Group();
@@ -94,12 +95,10 @@ if ($group->getPermission($category_id) < WRITE_ACCESS) {
                 ->setTitle($_POST['title'])
                 ->setLink($url)
                 ->setRequiresConfirmation(!$_POST['self_assess']);
-            $category_id = $task->getCategory()->getId();
+            $category = $task->getCategory();
         } else {
             // Make the task and set various fields
-            $category_id = $_POST['category'];
-            $category    = CategoryMapper::getInstance()->findById($category_id);
-            $task        = new Task();
+            $task = new Task();
             $task
                 ->setOwner($_SESSION['id'])
                 ->setTitle($_POST['title'])
@@ -153,7 +152,7 @@ if ($page->detectAjax()) {
             /** @var Component_Homepage_CourseTaskListController $controller */
             $controller = $chf->buildComponent($component);
             $controller->setup(
-                array('id' => $category_id),
+                $category,
                 $controller->getInstance()->getConfigArray()
             );
 
@@ -179,5 +178,5 @@ if ($page->detectAjax()) {
     if ($permission_denied) {
         error(6);
     }
-    $page->localRedir("/homepage/$category_id/");
+    $page->localRedir("/homepage/{$category->getId()}/");
 }

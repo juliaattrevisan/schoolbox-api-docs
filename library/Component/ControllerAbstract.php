@@ -95,9 +95,11 @@ abstract class Component_ControllerAbstract
 
     /**
      * Method to provide global config details to the component
-     * @param array|object $config
+     *
+     * @param mixed $context Type is clarified in subclasses
+     * @param array $config
      */
-    public function setup($context, array $config)
+    public function setup($context = null, array $config = array())
     {
         $this->context = $context;
         $this->config  = $config;

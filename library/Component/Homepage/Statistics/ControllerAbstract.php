@@ -13,7 +13,7 @@ abstract class Component_Homepage_Statistics_ControllerAbstract extends Componen
     protected $groupType;
     private $validGroups = array('student','parent','staff','guest');
 
-    public function setup($context, array $config)
+    public function setup($context = null, array $config = array())
     {
         parent::setup($context, $config);
         $g = new Group();

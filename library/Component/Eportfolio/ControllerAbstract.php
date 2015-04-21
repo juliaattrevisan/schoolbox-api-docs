@@ -20,10 +20,12 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
     /**
      * Apply permissions here
      *
-     * @param array $context
+     * @param array $context Actually an array in this context. Has these keys:
+     *                       uid: the component owner's ID
+     *                       permission: the permission level (READ_ACCESS, etc)
      * @param array $config
      */
-    public function setup(array $context, array $config)
+    public function setup($context = null, array $config = array())
     {
         parent::setup($context, $config);
 

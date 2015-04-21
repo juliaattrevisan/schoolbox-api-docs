@@ -10,8 +10,13 @@
  */
 abstract class Component_Dashboard_ControllerAbstract extends Component_ControllerAbstract
 {
-
-    public function setup(array $context, array $config)
+    /**
+     * Sets up a dashboard component.
+     *
+     * @param array $context Ignored - dashboard components have no context
+     * @param array $config
+     */
+    public function setup($context = null, array $config = array())
     {
         // if you're able to see the component, you're in admin mode so full access is granted
         $this->permission        = FULL_ACCESS;
