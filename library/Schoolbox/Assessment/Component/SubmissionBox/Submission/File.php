@@ -15,20 +15,12 @@ use Plagscan_Document;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\File\Mimetype;
 use Schoolbox\Resource\File\IFile;
-use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\User;
 
 class File implements IFile
 {
-
-    /** @var int */
-    protected $id;
-
-    /** @var IStorage */
-    protected $storage;
-
-    /** @var string */
-    protected $filename;
+    use StorableTrait;
 
     /** @var string */
     protected $uuid;
@@ -53,45 +45,6 @@ class File implements IFile
 
     /** @var ADF */
     protected $createdAt;
-
-
-    /**
-     * @return string
-     */
-    public function getFilename()
-    {
-        return $this->filename;
-    }
-
-
-    /**
-     * @param string $filename
-     * @return static
-     */
-    public function setFilename($filename)
-    {
-        $this->filename = $filename;
-        return $this;
-    }
-
-    /**
-     * @return IStorage
-     */
-    public function getStorage()
-    {
-        return $this->storage;
-    }
-
-
-    /**
-     * @param IStorage $storage
-     * @return static
-     */
-    public function setStorage($storage)
-    {
-        $this->storage = $storage;
-        return $this;
-    }
 
 
     /**
@@ -227,26 +180,6 @@ class File implements IFile
     public function setCreatedAt($createdAt)
     {
         $this->createdAt = $createdAt;
-        return $this;
-    }
-
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-
-    /**
-     * @param int $id
-     * @return static
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
         return $this;
     }
 

@@ -13,6 +13,7 @@ use Alaress_Date_Format;
 use Schoolbox\File\Mimetype;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\File\IFile;
+use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
@@ -29,6 +30,8 @@ use Schoolbox\User;
  */
 abstract class AbstractFile implements IFile, ISoftDeletable
 {
+    use StorableTrait;
+
     /** @var int */
     protected $id;
 
@@ -49,9 +52,6 @@ abstract class AbstractFile implements IFile, ISoftDeletable
 
     /** @var IFolder */
     protected $folder;
-
-    /** @var Storage */
-    protected $storage;
 
 
     /**
@@ -223,26 +223,6 @@ abstract class AbstractFile implements IFile, ISoftDeletable
     public function setDeletedAt($deletedAt)
     {
         $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-
-    /**
-     * @return Storage
-     */
-    public function getStorage()
-    {
-        return $this->storage;
-    }
-
-
-    /**
-     * @param Storage $storage
-     * @return self
-     */
-    public function setStorage($storage)
-    {
-        $this->storage = $storage;
         return $this;
     }
 
