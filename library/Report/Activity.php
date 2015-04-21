@@ -136,14 +136,16 @@ class Report_Activity extends Report_Abstract implements Report_IReport {
                     $params['user'] = $value;
                 }
                 // custom filter by keyword
-                elseif ($key == 'keyword') {
+                else if ($key == 'keyword') {
                     $sqlFilter[] =
 "(
    c.name         LIKE :keyword
 OR f.description  LIKE :keyword
 OR f.realname     LIKE :keyword
+OR cfile.name     LIKE :keyword
 OR l.description  LIKE :keyword
 OR l.url          LIKE :keyword
+OR clink.name     LIKE :keyword
 OR mf.description LIKE :keyword
 OR mf.realname    LIKE :keyword
 OR ml.name        LIKE :keyword
@@ -166,9 +168,12 @@ OR ml.name        LIKE :keyword
             LEFT JOIN `user` u    ON u.id = cl.user
             LEFT JOIN category c  ON cl.objectID = c.id  AND cl.object = 'folder'
             LEFT JOIN `file` f    ON cl.objectID = f.id  AND cl.object = 'file'
+            LEFT JOIN category cfile ON f.category = cfile.id
             LEFT JOIN `link` l    ON cl.objectID = l.id  AND cl.object = 'link'
+            LEFT JOIN category clink ON l.category = clink.id
             LEFT JOIN myFile mf   ON cl.objectID = mf.id AND cl.object = 'myFile'
             LEFT JOIN myFolder ml ON cl.objectID = ml.id AND cl.object = 'myFolder'
+            LEFT JOIN textBox t   ON cl.objectID = t.textBoxId AND cl.object = 'content'
         ";
 
         // Get count separately from data
@@ -186,10 +191,11 @@ OR ml.name        LIKE :keyword
             cl.id AS cl_id, cl.object, cl.objectId, cl.action, cl.user AS user_id, cl.time,
             u.username, u.title, u.firstname, u.lastname,
             c.id AS c_id, c.name AS c_name,
-            f.id AS f_id, f.category AS f_cid, f.realname AS f_realname, f.description AS f_description,
-            l.id AS l_id, l.category AS l_cid, l.url AS l_url, l.description AS l_description,
+            f.id AS f_id, f.category AS f_cid, f.realname AS f_realname, f.description AS f_description, cfile.name AS f_catname,
+            l.id AS l_id, l.category AS l_cid, l.url AS l_url, l.description AS l_description,  clink.name AS l_catname,
             mf.id AS mf_id, mf.owner AS mf_owner, mf.realname AS mf_realname, mf.description AS mf_description,
-            ml.id AS ml_id, ml.owner AS ml_owner, ml.name AS ml_name
+            ml.id AS ml_id, ml.owner AS ml_owner, ml.name AS ml_name,
+            t.heading as textbox_heading, t.categoryID as textbox_cid
             FROM cmsLog cl
             $joins
             $sqlFilterString
@@ -249,6 +255,9 @@ OR ml.name        LIKE :keyword
                     case 'delete' :
                         $actionString .= 'Deleted ';
                         break;
+                    case 'access' :
+                        $actionString .= 'Accessed ';
+                        break;
                 }
 
                 switch($log['object']) {
@@ -256,10 +265,10 @@ OR ml.name        LIKE :keyword
                         $actionString .= 'folder <a href="/homepage/' . $log['c_id'] . '">' . $log['c_name'] . '</a>';
                         break;
                     case 'file':
-                        $actionString .= 'file <a href="/resources/' . $log['f_cid'] . '">' . $log['f_description'] . '</a>';
+                        $actionString .= 'file <a href="/send.php?id=' . $log['f_id'] . '">' . $log['f_description'] . '</a> in <a href=/homepage/'. $log['f_cid'] .'>'.$log['f_catname'].'</a>';
                         break;
                     case 'link':
-                        $actionString .= 'link <a href="/resources/' . $log['l_cid'] . '">' . $log['l_description'] . '</a>';
+                        $actionString .= 'link <a href="/redir.php?id=' . $log['l_cid'] . '">' . $log['l_description'] . '</a> in <a href=/homepage/'. $log['l_cid'] .'>'.$log['l_catname'].'</a>';
                         break;
                     case 'myfile':
                         $actionString .= 'myFile <a href="/cms/portfolio/' . $log['mf_id'] . '">' . $log['mf_description'] . '</a>';
@@ -267,9 +276,12 @@ OR ml.name        LIKE :keyword
                     case 'myfolder':
                         $actionString .= 'myFolder <a href="/cms/portfolio/' . $log['ml_id'] . '">' . $log['ml_name'] . '</a>';
                         break;
+                    case 'content':
+                        $actionString .= 'textbox <a href="/homepage/'.$log['textbox_cid'].'">'.$log['textbox_heading'].'</a>';
+                        break;
                     default:
                         $actionString .= 'unknown resource';
-
+                    break;
                 }
 
                 $userHandler = new User();
