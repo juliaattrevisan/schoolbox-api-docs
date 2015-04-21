@@ -71,12 +71,12 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 				$this->setVar(array(
 					'LIST_ITEM_ID' => $currentItem->getId(),
 					'FILE_ITEM_ID' => $currentItem->getFileId(),
-					'FILE_ITEM_TITLE' => Scrub::text($currentItem->getFile()->getDescription()),
+					'FILE_ITEM_TITLE' => Scrub::text($currentItem->getFile()->getTitle()),
 					'FILE_ITEM_FILENAME' => Scrub::text($currentItem->getFile()->getFilename()),
 					'FILE_ITEM_MIMETYPE' => $currentItem->getFile()->getMimetype()->getClass(),
 					'FILE_ITEM_CREATED_AT' => $currentItem->getCreatedAt()->getShort(),
 					'ON_OFF' => ++$j % 2 ? '' : 'dark',
-					'FILE_ITEM_FILESIZE' => Alaress_Byte_Format::bytesToString($currentItem->getFile()->getFilesize()),
+					'FILE_ITEM_FILESIZE' => Alaress_Byte_Format::bytesToString($currentItem->getFile()->getSize()),
 				));
 
 				/* Controls

@@ -18,7 +18,7 @@ class Component_Eportfolio_ImageController extends Component_Eportfolio_Controll
 	 * @return void
 	 */
 	public function execute() {
-		return true;
+		// noop
 	}
 
 	/**
@@ -52,12 +52,12 @@ class Component_Eportfolio_ImageController extends Component_Eportfolio_Controll
 		/* Load a file, if one exists - otherwise clear phplibs
 		 */
 		try {
-			$fileMapper = new \Schoolbox\MyFileMapper();
+			$fileMapper = new \Schoolbox\Resource\My\File\Mapper();
 			$file = $fileMapper->findById($this->getConfig('eportfolioImage'));
 
 			$this->setVar(array(
 				'PREVIEW_IMAGE_URL' => "/cms/myImage.php?id={$file->getId()}&height=$pixel&width=$pixel",
-				'PREVIEW_IMAGE_DESC' => Scrub::text($file->getDescription())
+				'PREVIEW_IMAGE_DESC' => Scrub::text($file->getTitle())
 			));
             $this->parse('image_block', 'image');
 		}

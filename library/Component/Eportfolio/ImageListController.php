@@ -25,7 +25,7 @@ class Component_Eportfolio_ImageListController extends Component_Eportfolio_Cont
 	 * @return void
 	 */
 	public function execute() {
-		return true;
+        // noop
 	}
 
 	/**
