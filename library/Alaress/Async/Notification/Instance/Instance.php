@@ -12,7 +12,6 @@ namespace Alaress\Async\Notification\Instance;
 
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
-use Alaress\Json;
 use Html2Text\Html2Text;
 use InvalidArgumentException;
 use JsonSerializable;
@@ -186,18 +185,24 @@ class Instance implements JsonSerializable {
     }
 
 
-	/**
-	 * Flatten this notification instance
-	 *
-	 * @return string
-	 */
-	public function __toString() {
+    /**
+     * Flatten this notification instance
+     *
+     * @return string
+     */
+    public function __toString()
+    {
         try {
-            return json_encode($this);
+            $json = json_encode($this);
+            if (is_string($json)) {
+                return $json;
+            }
+
         } catch (\Exception $e) {
-            return "";
+            // noop
         }
-	}
+        return "";
+    }
 
 
 	/**
