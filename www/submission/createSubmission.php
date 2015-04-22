@@ -383,8 +383,8 @@ $campusList    = $listGenerator->export($user);
 $output['TIMETABLE_SELECTOR'] = $this->getTwig()->render(
     'sub/timetableSelector.twig',
     [
-        'selectButtons' => true,
-        'campusList'    => $user->getCampusCollection(),
+        'select'     => 'radio',
+        'campusList' => $user->getCampusCollection(),
     ]
 );
 $output['USER_CAMPUS_LIST'] = json_encode($campusList);

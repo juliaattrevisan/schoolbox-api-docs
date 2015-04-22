@@ -399,9 +399,22 @@
             autoOpen: false,
             buttons: [
                 {
-                    text: 'Cancel',
-                    click: function() {
-                        timetableSelectorDialog.dialog('close');
+                    text: 'Use',
+                    type: 'submit',
+                    click: function () {
+
+                        var self    = timetableSelector.data('timetableDaySelector'),
+                            radio   = $(this).find('input:checked'),
+                            display = radio.val() + 'TimeDisplay';
+
+                      if (radio.length != 1) {
+                          return;
+                      }
+
+                      self.element.trigger(
+                          'pickTime.timetableDaySelector',
+                          [self.dateDisplay.attr('datetime'), self[display].attr('datetime')]
+                      );
                     }
                 }
             ],
@@ -417,7 +430,7 @@
             timetableSelectorDialog.dialog('open');
         });
 
-        $('[data-interaction="timetableSelector"]')
+        var timetableSelector = $('[data-interaction="timetableSelector"]')
             .timetableDaySelector({
                 dateFormat: dateDisplayFormats.momentJs,
                 campusList: {USER_CAMPUS_LIST},
