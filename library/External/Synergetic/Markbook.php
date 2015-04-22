@@ -204,7 +204,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         foreach($assessmentRemoteList as $assessmentRemote ) {
 
-            if($this->isMarkExist($assessmentRemote['FileType'],
+            if($this->doesMarkExist($assessmentRemote['FileType'],
                 $assessmentRemote['FileYear'],
                 $assessmentRemote['FileSemester'],
                 $assessmentRemote['ClassCampus'],
@@ -276,9 +276,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @param $classCode
      * @param $assessmentID
      * @param $studentID
-     * @return int
+     * @return bool
      */
-    public function isMarkExist($fileType, $fileYear, $fileSemester, $classCampus, $classCode, $assessmentID, $studentID) {
+    private function doesMarkExist($fileType, $fileYear, $fileSemester, $classCampus, $classCode, $assessmentID, $studentID) {
         $query = "SELECT COUNT(*) as result
                     FROM StudentAssessmentMarkBook
                     WHERE
