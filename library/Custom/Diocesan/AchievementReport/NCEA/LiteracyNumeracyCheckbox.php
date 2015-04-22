@@ -10,6 +10,8 @@
 
 namespace Custom\Diocesan\AchievementReport\NCEA;
 
+use Alaress_Probe as Probe;
+
 class LiteracyNumeracyCheckbox extends Base {
 
     /**
@@ -33,24 +35,24 @@ class LiteracyNumeracyCheckbox extends Base {
         $externalUser = $this->getExternalUser();
         $externalUserId = $externalUser['StudentID'];
 
-        $result = $this->getDb()->getRow("
+        $query = "
             SELECT
-                (SELECT COUNT(*)
+                (SELECT TOP 1 COUNT(*)
                  FROM SynergyOne.dbo.uvSchoolBoxNCEAResults
                  WHERE id = '{$externalUserId}'
                  GROUP BY UELiteracyMet
                 )/COUNT(*) AS 'UE Literacy',
-                (SELECT COUNT(*)
+                (SELECT TOP 1 COUNT(*)
                  FROM SynergyOne.dbo.uvSchoolBoxNCEAResults
                  WHERE id = '{$externalUserId}'
                  GROUP BY UENumeracyMet
                 )/COUNT(*) AS 'UE Numeracy',
-                (SELECT COUNT(*)
+                (SELECT TOP 1 COUNT(*)
                  FROM SynergyOne.dbo.uvSchoolBoxNCEAResults
                  WHERE id = '{$externalUserId}'
                  GROUP BY Level1LiteracyMet
                 )/COUNT(*) AS 'Level 1 Literacy',
-                (SELECT COUNT(*)
+                (SELECT TOP 1 COUNT(*)
                  FROM SynergyOne.dbo.uvSchoolBoxNCEAResults
                  WHERE id = '{$externalUserId}'
                  GROUP BY Level1NumeracyMet
@@ -59,17 +61,19 @@ class LiteracyNumeracyCheckbox extends Base {
                 SynergyOne.dbo.uvSchoolBoxNCEAResults
             WHERE
                 id = '{$externalUserId}'
-        ");
+        ";
+
+        $result = $this->getDb()->getRow($query);
 
         if (is_array($result)) {
             return $result;
         }
 
         return array(
-            'UELiteracyMet' => 0,
-            'UENumeracyMet' => 0,
-            'Level1LiteracyMet' => 0,
-            'Level1NumeracyMet' => 0
+            'UE Literacy' => 0,
+            'UE Numeracy' => 0,
+            'Level 1 Literacy' => 0,
+            'Level 1 Numeracy' => 0
         );
     }
 }
