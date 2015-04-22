@@ -93,9 +93,8 @@ class Controller extends Base {
     public function ncea($db, $user, $externalUser, $year) {
         $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($externalUser, $db, $year);
         $creditSummary = new NCEA\CreditSummary($externalUser, $db, false);
-        $creditSummaryYear = new NCEA\CreditSummary($externalUser, $db, $year);
 
-        $this->getResponse()->content->set(array(
+        $output = array(
             'template' => '@ncea/index.twig',
             'data' => array(
                 'preselectedYear' => $year,
@@ -122,18 +121,28 @@ class Controller extends Base {
                      */
                     'suffix' => 'all',
                 ),
-
-                /* Credit Summary graphs for a specific year
-                 */
-                'creditSummaryYear' => array(
-                    'data' => $creditSummaryYear->findData(),
-                    'allLetters' => $creditSummaryYear->getLetterRegistry(),
-
-                    /* Suffix for graph div id's
-                     */
-                    'suffix' => "year{$year}",
-                )
             )
-        ));
+        );
+
+        /* Conditionally, if a year was selected; do another round of
+         * processing specific to that year. Otherwise skip all this
+         * shenanigans altogether
+         */
+        if ($year) {
+            $creditSummaryYear = new NCEA\CreditSummary($externalUser, $db, $year);
+
+            /* Credit Summary graphs for a specific year
+             */
+            $output['data']['creditSummaryYear'] = array(
+                'data' => $creditSummaryYear->findData(),
+                'allLetters' => $creditSummaryYear->getLetterRegistry(),
+
+                /* Suffix for graph div id's
+                 */
+                'suffix' => "year{$year}",
+            );
+        }
+
+        $this->getResponse()->content->set($output);
     }
 } 
