@@ -37,10 +37,7 @@
     text-align: center;
 }
 
-/**
- * Yearly Breakdown
- */
-.achievement-report.school-grades tfoot td {
+.achievement-report tfoot tr.totals td {
     border-top: 3px solid #ddd;
     font-style: italic;
 }
