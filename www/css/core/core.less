@@ -1400,68 +1400,67 @@ Notifications
             line-height: 16px;
         }
     }
-
-    /* Component control container
-     */
-    section.component-control-container {
-        width: 70px;
-        height: 20px;
-        position: absolute;
-        top: 6px;
-        right: 6px;
-
-        /* Component control buttons
-         */
-        a.component-control-button {
-            width: 20px;
-            height: 20px;
-            line-height: 20px;
-            text-align: center;
-            font-weight: bold;
-            background: #fafafa;
-            margin-left: 2px;
-            float: right;
-            color: #000000 !important;
-            &:hover {
-                text-decoration: none;
-                cursor: pointer;
-                em {
-                    display: block;
-                }
-                span {
-                    background: @black;
-                    color: @white;
-                }
-            }
-            span {
-                width: 20px;
-                display: block;
-                height: 20px;
-                line-height: 20px;
-                text-align: center;
-                color: @black;
-                background: @dark;
-            }
-        }
-
-        /* Collapse component button customisation
-         */
-        a.component-control-button.collapse {
-        }
-
-        a.component-control-button.delete {
-        }
-
-        a.component-control-button.settings {
-        }
-    }
-
     a.active{
     	background: @lgrey;
     	em{
     		display: block;
     	}
     }	
+}
+
+/* Component control container
+ */
+section.component-control-container {
+    width: 70px;
+    height: 20px;
+    position: absolute;
+    top: 6px;
+    right: 6px;
+
+    /* Component control buttons
+     */
+    a.component-control-button {
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+        text-align: center;
+        font-weight: bold;
+        background: #fafafa;
+        margin-left: 2px;
+        float: right;
+        color: #000000 !important;
+        &:hover {
+            text-decoration: none;
+            cursor: pointer;
+            em {
+                display: block;
+            }
+            span {
+                background: @black;
+                color: @white;
+            }
+        }
+        span {
+            width: 20px;
+            display: block;
+            height: 20px;
+            line-height: 20px;
+            text-align: center;
+            color: @black;
+            background: @dark;
+        }
+    }
+
+    /* Collapse component button customisation
+     */
+    a.component-control-button.collapse {
+    }
+
+    a.component-control-button.delete {
+    }
+
+    a.component-control-button.settings {
+    }
 }
 
 .dark {
@@ -12017,16 +12016,18 @@ textarea.event-detail {
 	display: none;
 }
 
-.inline-grading-column-left {
-	width: 59%;
+.inline-grading-column{
+	position: relative;
+	.component-control-container .btn{
+		background: @white;
+		border: 0;
+		margin: 0;
+	}
 }
 
-.inline-grading-column-left.fullwidth{
+.inline-grading-column.fullwidth{
 	width: 100%;
-}
-
-.inline-grading-column-right {
-	width: 39%;
+	position: relative;
 }
 
 .dropdown-navigator {
