@@ -10,6 +10,8 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 
+/** @var SitePage $this */
+
 $this->setFile(TEMPLATE_content, 'submission/createSubmission.html');
 $this->setTab('submission');
 
@@ -371,8 +373,21 @@ $output = array(
     'CURRICULUM_CODE_INPUT' => $this->getTwig()->render(
         'sub/curriculumCodeSelector.twig',
         ['codeList' => $submission->getCurriculumNodes()]
-    ),
+    )
 );
+
+/** @var Schoolbox\User $user */
+$user          = $_SESSION['user'];
+$listGenerator = new Schoolbox\External\TimetableArrayExporter(new External_Timetable());
+$campusList    = $listGenerator->export($user);
+$output['TIMETABLE_SELECTOR'] = $this->getTwig()->render(
+    'sub/timetableSelector.twig',
+    [
+        'select'     => 'radio',
+        'campusList' => $user->getCampusCollection(),
+    ]
+);
+$output['USER_CAMPUS_LIST'] = json_encode($campusList);
 
 $this->setVar($output);
 

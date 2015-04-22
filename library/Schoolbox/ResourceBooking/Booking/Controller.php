@@ -17,6 +17,7 @@ use External_Timetable;
 use Schoolbox\Calendar;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
+use Schoolbox\External\TimetableArrayExporter;
 use Schoolbox\ResourceBooking\Item;
 use Calendar\Event\Type\Timetable\Renderer\Javascript;
 use Calendar\Event\Collection\Renderer;
@@ -1003,35 +1004,8 @@ class Controller extends Base
      */
     protected function getCampusList()
     {
-        $campusList = array();
-        foreach ($this->getUser()->getCampusCollection() as $campus) {
-            /** @var Campus $campus */
-            $campusId    = $campus->getId();
-            $campusArray = array(
-                'id'         => $campusId,
-                'name'       => $campus->getName(),
-                'days'       => 0,
-                'periodList' => array(),
-            );
-
-            $timetable = $this->externalTimetableHandler->getTimetableDefinition(null, $campus);
-            // Somehow parse $timetable into a list of names, start and end, and
-            // the next day they occur.
-            // times always 12-hour, so convert to 24-hour time for consistency
-            $campusArray['days'] = $timetable['dayCount'];
-            if (!empty($timetable)) {
-                foreach ($timetable['desc'] as $i => $name) {
-                    $campusArray['periodList'][] = array(
-                        'index' => $i,
-                        'desc'  => $name,
-                        'start' => date('H:i', strtotime($timetable['start'][$i])),
-                        'end'   => date('H:i', strtotime($timetable['end'][$i])),
-                    );
-                }
-                $campusList[$campusId] = $campusArray;
-            }
-        }
-        return $campusList;
+        $listGenerator = new TimetableArrayExporter($this->externalTimetableHandler);
+        return $listGenerator->export($this->getUser());
     }
 
     /**
