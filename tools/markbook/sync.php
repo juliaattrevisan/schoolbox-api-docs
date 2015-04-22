@@ -10,8 +10,10 @@
  * @copyright   Copyright 2015, Alaress Pty Ltd
  */
 
-
-
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Alaress\Lumberjack\Logger;
 
 require_once __DIR__ . '/../../include/Bootstrap.php';
 
@@ -34,12 +36,14 @@ Usage: sync.php -p[folderID] [--dry-run] [--update-only]
 HELP;
     exit(1);
 }
-$folderMapper = new Schoolbox\Resource\Folder\Mapper();
-$submissionMapper = new Schoolbox\Assessment\Component\SubmissionBoxMapper();
-$resultMapper = new Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
+$folderMapper = new FolderMapper();
+$submissionMapper = new SubmissionBoxMapper();
+$resultMapper = new ReturnedWorkMapper();
 $markbookHandler = new SubmissionReturn();
 
 $markbookExternal = new External_Markbook();
+
+$log = new Logger;
 
 /* Time period will be current semester only */
 $now = Alaress_Date_Format::now();
@@ -54,35 +58,35 @@ else {
     $endTime->setDate(date('Y'),6,30)->setTime(23,59,59);
 }
 
-printf("Only syncing work between %s and %s\n", $startTime->getLocalShort(), $endTime->getLocalShort());
+$log->notice("Only syncing work between {$startTime->getLocalShort()} and {$endTime->getLocalShort()}", array());
 
 $categoryList = traverse($parentId, $folderMapper);
 
 foreach($categoryList as $category) {
-    printf("Processing assessments from: %s (%s)\n", $category->getName(), $category->getCodeString());
+    $log->notice("Processing assessments from: {$category->getName()} ({$category->getCodeString()})", array());
     $submissionBoxList = $submissionMapper->getDueActivities(array($category->getId()),$startTime->getUnixTimestamp(), $endTime->getUnixTimestamp());
     foreach($submissionBoxList as $submissionBox) {
         $markbook = $markbookExternal->getAssessment($submissionBox->getSubmissionBox());
 
         if(is_array($markbook)) {
-            printf("Updating existing assessment: %s\n", $submissionBox->getName());
+            $log->info("Updating existing assessment: {$submissionBox->getName()}",array());
             if(!$dryRun) {
                 $markbookExternal->updateAssessment($submissionBox->getSubmissionBox());
             }
         }
         elseif( !$updateOnly) {
-            printf("Creating new assessment: %s\n", $submissionBox->getName());
+            $log->info("Creating new assessment: {$submissionBox->getName()}", array());
             if(!$dryRun) {
                 $markbookExternal->createAssessment($submissionBox->getSubmissionBox());
             }
         }
         else {
-            printf("Skipping creation in update only mode: %s\n", $submissionBox->getName());
+            $log->warning("Skipping creation in update only mode: {$submissionBox->getName()}",array());
             continue;
         }
 
         $classList = $markbookHandler->getStudentListByBoxId($submissionBox->getId());
-        printf("Setting marks for %s students\n", count($classList));
+        $log->notice("Setting marks for {count($classList)} students", array());
         foreach($classList as $student) {
             $result = $markbookHandler->getByUser($student['uid'], $submissionBox->getId());
 
