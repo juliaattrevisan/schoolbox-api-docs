@@ -37,6 +37,7 @@ class CreditSummary extends Base {
         $finalStack['table']['creditSummary'] = $this->findTable($allResults);
         $finalStack['graph']['totalAchievedCredits'] = $this->findTotalAchievedCredits($allResults);
         $finalStack['graph']['standardType'] = $this->findStandardType($allResults);
+        $finalStack['graph']['assessmentType'] = $this->findAssessmentType($allResults);
 
         return $finalStack;
     }
@@ -122,7 +123,6 @@ class CreditSummary extends Base {
      */
     private function findTotalAchievedCredits($allResults) {
         $finalStack = array();
-
         $exclusions = array('N');
         $totalEnteredCredits = array();
 
@@ -167,7 +167,6 @@ class CreditSummary extends Base {
      */
     private function findStandardType($allResults) {
         $finalStack = array();
-
         $unitTypeList = array('U');
         $unitResultList = array('A', 'M', 'E');
         $achievementTypeList = array('A');
@@ -191,6 +190,41 @@ class CreditSummary extends Base {
                 elseif (in_array($current['StandardType'], $achievementTypeList)) {
                     $finalStack[$level]['achievement'] += $current['ResultCredits'];
                 }
+            }
+        }
+
+        return $finalStack;
+    }
+
+    /**
+     * Find values to populate Assessment Type graph
+     *
+     * @param $allResults
+     * @return array
+     */
+    private function findAssessmentType($allResults) {
+        $finalStack = array();
+        $allLetters = array('A', 'M', 'E');
+
+        foreach ($allResults as $current) {
+            $level = $current['Level'];
+            $internalExternal = $current['InternalorExternalAssessment'];
+
+            if (!is_array($finalStack[$level])) {
+                $finalStack[$level] = array(
+                    'IN' => 0,
+                    'EX' => 0,
+                    'available' => 0,
+                );
+            }
+
+            $finalStack[$level]['available'] += $current['ResultCredits'];
+
+            /* Only accumulate some values
+             */
+            if (in_array($current['StrippedResult'], $allLetters)) {
+                $finalStack[$level][$internalExternal] += $current['ResultCredits'];
+                $finalStack[$level]['available'] -= $current['ResultCredits'];
             }
         }
 
