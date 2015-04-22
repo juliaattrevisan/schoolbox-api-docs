@@ -296,7 +296,7 @@ class Mapper extends BaseMapper
      *
      * @return object
      */
-    public function hydrate($row, $alias = '', $callback = null)
+    public function hydrate(array $row, $alias = '', $callback = null)
     {
         if (isset($callback)) {
             return parent::hydrate($row, $alias, $callback);
