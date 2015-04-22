@@ -200,14 +200,15 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             FROM db2inst1.schoolbox_timetable t
             LEFT JOIN db2inst1.schoolbox_classes cl ON t.class_code = cl.class_code
             $join
-            AND day_number = :d
+            AND day_number = :d AND campus = :campus
         "
         );
 
         $stmt->execute(
             array(
                 'sn' => $externalUserId,
-                'd'  => $dayNumber
+                'd'  => $dayNumber,
+                'campus' =>  $this->getCampusCode($campusId),
             )
         );
 
@@ -284,12 +285,14 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             FROM db2inst1.schoolbox_timetable t
             LEFT JOIN db2inst1.schoolbox_classes cl ON t.class_code = cl.class_code
             $join
+            AND campus = :campus
         "
         );
 
         $stmt->execute(
             array(
                 'sn' => $externalUserId,
+                'campus' => $this->getCampusCode($campusId),
             )
         );
 
