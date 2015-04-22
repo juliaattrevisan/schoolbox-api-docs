@@ -346,17 +346,15 @@ if (!empty($subList) && is_array($subList)) {
             'learning_analytics_block' => ''
         ));
 
-        $allCoursesUsed = $allCoursesUsedInFolder->getOffset($curCategory->getId());
+        $allCoursesUsed = (array)$allCoursesUsedInFolder->getOffset($curCategory->getId());
 
-        if(is_array($allCoursesUsed) || $allCoursesUsed instanceof \Traversable) {
-                foreach ($allCoursesUsed as $courseFolder) {
-                    $this->setVar(array(
-                        'COURSE_FOLDER_ID' => $courseFolder->getId(),
-                        'COURSE_FOLDER_NAME' => $courseFolder->getName()
-                    ));
+        foreach ($allCoursesUsed as $courseFolder) {
+            $this->setVar(array(
+                'COURSE_FOLDER_ID' => $courseFolder->getId(),
+                'COURSE_FOLDER_NAME' => $courseFolder->getName()
+            ));
 
-                    $this->parse('learning_analytics_block', 'learning_analytics', true);
-                }
+            $this->parse('learning_analytics_block', 'learning_analytics', true);
         }
 
         $this->parse("category_block", "category_listing", true);
