@@ -5,11 +5,11 @@
         <tr>
             <th>Course</th>
             <th class="numeric">Entered Credits</th>
-            {% for currentLetter in allLetters %}
+            {% for currentLetter in courseCreditSummary.allLetters %}
             <th class="numeric">{{ currentLetter }}</th>
             {% endfor %}
-            <th class="numeric">Total Achieved</th>
-            <th class="numeric">Total Attempted</th>
+            <th class="numeric">Achieved</th>
+            <th class="numeric">Attempted</th>
         </tr>
     </thead>
     <tbody>
@@ -17,11 +17,11 @@
         <tr>
             <td>{{ courseName }}</td>
             <td class="numeric">{{ allValues.enteredCredits }}</td>
-            {% for currentLetter in allLetters %}
+            {% for currentLetter in courseCreditSummary.allLetters %}
             <td class="numeric">{{ allValues.letters[currentLetter] }}</td>
             {% endfor %}
-            <td class="numeric">{{ allValues.total.achieved }}</td>
-            <td class="numeric">{{ allValues.total.attempted }}</td>
+            <td class="numeric">{{ allValues.achieved }}</td>
+            <td class="numeric">{{ allValues.attempted }}</td>
         </tr>
         {% endfor %}
     </tbody>

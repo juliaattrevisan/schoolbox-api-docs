@@ -78,10 +78,8 @@ class CourseCreditSummary extends Base {
                 $finalStack[$courseName] = array(
                     'enteredCredits' => 0,
                     'letters' => array_fill_keys($this->getLetterRegistry(), 0),
-                    'total' => array(
-                        'achieved' => 0,
-                        'attempted' => 0
-                    )
+                    'achieved' => 0,
+                    'attempted' => 0
                 );
             }
 
