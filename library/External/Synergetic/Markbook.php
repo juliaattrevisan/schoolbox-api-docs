@@ -54,7 +54,21 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function getAssessment(Activity $assessment)
     {
-        $query = "SELECT * FROM StaffAssessmentMarkBook WHERE HdgAbbrev2 = '".  $this->getPrefix($assessment) . $assessment->getId()."'";
+        $query = "SELECT FileType,
+                        FileYear,
+                        FileSemester,
+                        StaffID,
+                        ClassCampus,
+                        ClassCode,
+                        MarkBookSeq,
+                        Heading,
+                        HdgAbbrev1,
+                        HdgAbbrev2,
+                        ResultType,
+                        MarkOutOf,
+                        WeightingFactor
+                  FROM StaffAssessmentMarkBook
+                  WHERE HdgAbbrev2 = '".  $this->getPrefix($assessment) . $assessment->getId()."'";
         return $this->getDatabase()->getAll($query);
     }
 
