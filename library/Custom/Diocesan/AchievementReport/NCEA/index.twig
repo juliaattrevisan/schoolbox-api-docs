@@ -2,9 +2,10 @@
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
 <script type="text/javascript" src="/custom/diocesan/achievementreport/js/ncea/stackedBar.js"></script>
 
-<div class="achievement-report ncea">
-    {% include '@templates/Avatar.twig' %}
+{% include '@templates/Avatar.twig' %}
+{% include '@templates/Navigation.twig' %}
 
+<div class="achievement-report ncea">
     <h1>NCEA Index</h1>
 
     {% include '@ncea/LiteracyNumeracyCheckbox.twig' %}

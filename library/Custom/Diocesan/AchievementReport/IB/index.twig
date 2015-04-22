@@ -3,9 +3,10 @@
 <script type="text/javascript" src="/custom/diocesan/achievementreport/js/ib/progressGradeSummary.js"></script>
 <script type="text/javascript" src="/custom/diocesan/achievementreport/js/ib/yearlyBreakdown.js"></script>
 
-<div class="achievement-report ib">
-    {% include '@templates/Avatar.twig' %}
+{% include '@templates/Avatar.twig' %}
+{% include '@templates/Navigation.twig' %}
 
+<div class="achievement-report ib">
     <h1>IB Results</h1>
 
     {% include '@ib/ProgressGradeSummary.twig' %}

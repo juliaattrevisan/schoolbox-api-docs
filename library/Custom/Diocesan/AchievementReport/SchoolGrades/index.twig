@@ -2,9 +2,10 @@
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
 <script type="text/javascript" src="/custom/diocesan/achievementreport/js/schoolgrades/nameGraph.js"></script>
 
-<div class="achievement-report school-grades">
-    {% include '@templates/Avatar.twig' %}
+{% include '@templates/Avatar.twig' %}
+{% include '@templates/Navigation.twig' %}
 
+<div class="achievement-report school-grades">
     <h1>School Grades</h1>
 
     {% include '@schoolgrades/GradeSummary.twig' %}

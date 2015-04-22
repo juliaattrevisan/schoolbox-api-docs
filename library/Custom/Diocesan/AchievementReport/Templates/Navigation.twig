@@ -1,0 +1,9 @@
+<ul class="admin-nav">
+    {% for url, label in navigation %}
+    <li>
+        <a href="/modules/custom/diocesan/achievementreport/{{ url }}/{{ externalUser.StudentID }}">{{ label }}</a>
+    </li>
+    {% endfor %}
+</ul>
+
+<div class="clearfix"></div>

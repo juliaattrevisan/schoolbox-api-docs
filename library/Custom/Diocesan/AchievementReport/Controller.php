@@ -17,6 +17,17 @@ use Alaress_Probe as Probe;
 class Controller extends Base {
 
     /**
+     * Urls you can visit
+     *
+     * @var string
+     */
+    private $navigation = array(
+        'schoolgrades' => 'School Grades',
+        'ib' => 'IB',
+        'ncea' => 'NCEA'
+    );
+
+    /**
      * School Grades page
      */
     public function schoolGrades($db, $user, $externalUser, $year) {
@@ -27,6 +38,7 @@ class Controller extends Base {
         $this->getResponse()->content->set(array(
             'template' => '@schoolgrades/index.twig',
             'data' => array(
+                'navigation' => $this->getNavigation(),
                 'preselectedYear' => $year,
                 'externalUser' => $externalUser,
                 'user' => $user,
@@ -65,6 +77,7 @@ class Controller extends Base {
         $this->getResponse()->content->set(array(
             'template' => '@ib/index.twig',
             'data' => array(
+                'navigation' => $this->getNavigation(),
                 'preselectedYear' => $year,
                 'externalUser' => $externalUser,
                 'user' => $user,
@@ -97,6 +110,7 @@ class Controller extends Base {
         $output = array(
             'template' => '@ncea/index.twig',
             'data' => array(
+                'navigation' => $this->getNavigation(),
                 'preselectedYear' => $year,
                 'externalUser' => $externalUser,
                 'user' => $user,
@@ -153,4 +167,27 @@ class Controller extends Base {
 
         $this->getResponse()->content->set($output);
     }
-} 
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Set navigation
+     *
+     * @param string $navigation
+     */
+    private function setNavigation($navigation)
+    {
+        $this->navigation = $navigation;
+    }
+
+    /**
+     * Get navigation
+     *
+     * @return string
+     */
+    private function getNavigation()
+    {
+        return $this->navigation;
+    }
+}
