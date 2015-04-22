@@ -15,13 +15,6 @@ use Custom\Diocesan\AchievementReport\Base as AchievementReportBase;
 abstract class Base extends AchievementReportBase {
 
     /**
-     * A bunch of letters to obtain
-     *
-     * @var array
-     */
-    protected $letterRegistry = array('N', 'A', 'M', 'E');
-
-    /**
      * Get counts for Entered Grades for the current year
      * for a particular student
      *
@@ -114,27 +107,4 @@ abstract class Base extends AchievementReportBase {
 
         return array();
     }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set letter registry
-     *
-     * @param array $letterRegistry
-     */
-    protected function setLetterRegistry($letterRegistry)
-    {
-        $this->letterRegistry = $letterRegistry;
-    }
-
-    /**
-     * Get letter registry
-     *
-     * @return array
-     */
-    public function getLetterRegistry()
-    {
-        return $this->letterRegistry;
-    }
-} 
+}
