@@ -1,7 +1,7 @@
 <ul class="admin-nav">
-    {% for url, label in navigation %}
+    {% for url, label in navigation.all %}
     <li>
-        <a href="/modules/custom/diocesan/achievementreport/{{ url }}/{{ externalUser.StudentID }}">{{ label }}</a>
+        <a href="/modules/custom/diocesan/achievementreport/{{ url }}/{{ externalUser.StudentID }}" {% if url == navigation.selected %}class="current"{% endif %} %}>{{ label }}</a>
     </li>
     {% endfor %}
 </ul>

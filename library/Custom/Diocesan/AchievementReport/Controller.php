@@ -38,7 +38,10 @@ class Controller extends Base {
         $this->getResponse()->content->set(array(
             'template' => '@schoolgrades/index.twig',
             'data' => array(
-                'navigation' => $this->getNavigation(),
+                'navigation' => array(
+                    'all' => $this->getNavigation(),
+                    'selected' => 'schoolgrades'
+                ),
                 'preselectedYear' => $year,
                 'externalUser' => $externalUser,
                 'user' => $user,
@@ -77,7 +80,10 @@ class Controller extends Base {
         $this->getResponse()->content->set(array(
             'template' => '@ib/index.twig',
             'data' => array(
-                'navigation' => $this->getNavigation(),
+                'navigation' => array(
+                    'all' => $this->getNavigation(),
+                    'selected' => 'ib'
+                ),
                 'preselectedYear' => $year,
                 'externalUser' => $externalUser,
                 'user' => $user,
@@ -110,7 +116,10 @@ class Controller extends Base {
         $output = array(
             'template' => '@ncea/index.twig',
             'data' => array(
-                'navigation' => $this->getNavigation(),
+                'navigation' => array(
+                    'all' => $this->getNavigation(),
+                    'selected' => 'ncea'
+                ),
                 'preselectedYear' => $year,
                 'externalUser' => $externalUser,
                 'user' => $user,
