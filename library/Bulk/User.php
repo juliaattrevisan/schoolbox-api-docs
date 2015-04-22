@@ -58,7 +58,7 @@ class Bulk_User extends Bulk_Abstract
                         $output[] = array(
                             'username' => $user[0],
                             'status'   => 'Not Added',
-                            'error'    => 'Unknown Group',
+                            'error'    => 'Unknown Role',
                         );
                         continue;
                     }
