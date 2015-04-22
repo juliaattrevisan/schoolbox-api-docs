@@ -372,10 +372,9 @@ class ResourceVideoMapper extends Mapper
 
         $statement     = $this->database->prepare(
             "
-            SELECT {$storageMapper->getColumnString('s')}, {$this->getColumnString('vq')},  {$fileMapper->getColumnString('f')}
+            SELECT {$storageMapper->getColumnString('s')}, {$this->getColumnString('vq')}
             FROM `{$this->getTable()}` vq
             JOIN {$this->getJoinSQL('storage', 'vq', 's')}
-            JOIN {$this->getJoinSQL('file', 'vq', 'f')}
             WHERE s.hash = ? AND vq.status = 'completed'
         "
         );
@@ -386,7 +385,6 @@ class ResourceVideoMapper extends Mapper
         if (($row = $statement->fetch())) {
             $video = $this->hydrate($row, 'vq');
             $video->setStorage($storageMapper->hydrate($row, 's'));
-            $video->setFile($fileMapper->hydrate($row, 'f'));
         }
 
         if (!($video instanceof ResourceVideo)) {

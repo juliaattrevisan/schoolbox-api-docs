@@ -142,15 +142,6 @@ for ($i=0; $i < count($stack); $i++) {
 			$submission = $submissionMapper->findById($this->arg[2]);
 
 			if ($submission) {
-
-				/* Apply mime type
-				 */
-				$mimetypeMapper = new MimetypeMapper();
-				$mime = $mimetypeMapper->findOneByColumn('mime', $submission->getMimeType()->getMime());
-				$submission->setMimetype($mime);
-
-				/* Stack it
-				 */
 				$currentAugmented['submission'] = $submission;
 			}
 		}
