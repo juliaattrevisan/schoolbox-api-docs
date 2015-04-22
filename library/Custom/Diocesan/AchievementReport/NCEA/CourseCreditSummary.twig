@@ -13,7 +13,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for courseName, allValues in courseCreditSummary.data %}
+        {% for courseName, allValues in courseCreditSummary.data.courses %}
         <tr>
             <td>{{ courseName }}</td>
             <td class="numeric">{{ allValues.enteredCredits }}</td>
