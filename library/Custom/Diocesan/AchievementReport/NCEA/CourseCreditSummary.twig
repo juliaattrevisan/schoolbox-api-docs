@@ -25,4 +25,15 @@
         </tr>
         {% endfor %}
     </tbody>
+    <tfoot>
+        <tr class="totals">
+            <td></td>
+            <td class="numeric">{{ courseCreditSummary.data.totals.enteredCredits }}</td>
+            {% for currentLetter in courseCreditSummary.allLetters %}
+            <td class="numeric">{{ courseCreditSummary.data.totals.letters[currentLetter] }}</td>
+            {% endfor %}
+            <td class="numeric">{{ courseCreditSummary.data.totals.achieved }}</td>
+            <td class="numeric">{{ courseCreditSummary.data.totals.attempted }}</td>
+        </tr>
+    </tfoot>
 </table>
