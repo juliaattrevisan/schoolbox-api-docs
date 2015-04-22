@@ -87,7 +87,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      *
      * @param \Schoolbox\User
      * @param Activity $assessment
-     * @return array
+     * @return bool
      */
     public function createAssessment(Activity $assessment)
     {
@@ -157,7 +157,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      *
      * @param string
      * @param Activity $assessment
-     * @return array
+     * @return bool
      */
     public function updateAssessment(Activity $assessment)
     {
@@ -167,7 +167,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                   WHERE
                         HdgAbbrev2 = '".$this->getPrefix($assessment).$assessment->getId()."'
                     ";
-        $this->getDatabase()->query($query);
+        return $this->getDatabase()->query($query);
     }
 
     /**

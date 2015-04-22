@@ -26,7 +26,7 @@ interface External_MarkbookInterface
      * Creates a new assessment item in the markbook
      *
      * @param Activity $assessment
-     * @return array
+     * @return bool
      */
     public function createAssessment(Activity $assessment);
 
@@ -34,7 +34,7 @@ interface External_MarkbookInterface
      * Updates an existing markbook assessment
      *
      * @param Activity $assessment
-     * @return array
+     * @return bool
      */
     public function updateAssessment(Activity $assessment);
 
