@@ -373,13 +373,6 @@ $output = array(
     'CURRICULUM_CODE_INPUT' => $this->getTwig()->render(
         'sub/curriculumCodeSelector.twig',
         ['codeList' => $submission->getCurriculumNodes()]
-    ),
-    'TIMETABLE_SELECTOR' => $this->getTwig()->render(
-        'sub/timetableSelector.twig',
-        [
-            'campusList'    => $_SESSION['user']->getCampusCollection(),
-            'selectButtons' => true,
-        ]
     )
 );
 
