@@ -1,0 +1,28 @@
+<h2>Course Credit Summary - {{ year }}</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Course</th>
+            <th class="numeric">Entered Credits</th>
+            {% for currentLetter in allLetters %}
+            <th class="numeric">{{ currentLetter }}</th>
+            {% endfor %}
+            <th class="numeric">Total Achieved</th>
+            <th class="numeric">Total Attempted</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for courseName, allValues in courseCreditSummary.data %}
+        <tr>
+            <td>{{ courseName }}</td>
+            <td class="numeric">{{ allValues.enteredCredits }}</td>
+            {% for currentLetter in allLetters %}
+            <td class="numeric">{{ allValues.letters[currentLetter] }}</td>
+            {% endfor %}
+            <td class="numeric">{{ allValues.total.achieved }}</td>
+            <td class="numeric">{{ allValues.total.attempted }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

@@ -21,6 +21,8 @@
 
         <h2>Credit Summary - {{ year }}</h2>
         {% include '@ncea/CreditSummaryGraphs.twig' with {dataset: creditSummaryYear} %}
+
+        {% include '@ncea/CourseCreditSummary.twig' %}
     {% endif %}
 
     <div class='clearfix'></div>
