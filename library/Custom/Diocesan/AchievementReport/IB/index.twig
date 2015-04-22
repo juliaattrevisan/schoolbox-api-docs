@@ -4,12 +4,7 @@
 <script type="text/javascript" src="/custom/diocesan/achievementreport/js/ib/yearlyBreakdown.js"></script>
 
 <div class="achievement-report ib">
-    <section class="avatar">
-        <a href='/search/user/{{ user.getId() }}'>
-            <img src="/portrait.php?userId={{ externalUser.StudentID }}&size=square32" />
-            {{ externalUser.StudentGiven1 }} {{ externalUser.StudentSurname }}
-        </a>
-    </section>
+    {% include '@templates/Avatar.twig' %}
 
     <h1>IB Results</h1>
 

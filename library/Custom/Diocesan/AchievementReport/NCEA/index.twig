@@ -3,12 +3,7 @@
 <script type="text/javascript" src="/custom/diocesan/achievementreport/js/ncea/stackedBar.js"></script>
 
 <div class="achievement-report ncea">
-    <section class="avatar">
-        <a href='/search/user/{{ user.getId() }}'>
-            <img src="/portrait.php?userId={{ externalUser.StudentID }}&size=square32" />
-            {{ externalUser.StudentGiven1 }} {{ externalUser.StudentSurname }}
-        </a>
-    </section>
+    {% include '@templates/Avatar.twig' %}
 
     <h1>NCEA Index</h1>
 

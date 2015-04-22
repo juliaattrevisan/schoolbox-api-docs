@@ -126,6 +126,7 @@ class Module extends BaseModule {
         $loader->addPath(__DIR__.'/SchoolGrades', 'schoolgrades');
         $loader->addPath(__DIR__.'/IB', 'ib');
         $loader->addPath(__DIR__.'/NCEA', 'ncea');
+        $loader->addPath(__DIR__.'/Templates', 'templates');
         $templateLoader->addLoader($loader);
     }
 
