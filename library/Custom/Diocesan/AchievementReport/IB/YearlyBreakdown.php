@@ -13,13 +13,19 @@ namespace Custom\Diocesan\AchievementReport\IB;
 class YearlyBreakdown extends Base {
 
     /**
+     * Heading
+     *
+     * @var string
+     */
+    protected $heading = 'Yearly Breakdown';
+
+    /**
      * Hook method
      *
      * @return mixed
      */
     protected function setup()
     {
-        $this->setHeading('Progress Grade Summary');
     }
 
     /**

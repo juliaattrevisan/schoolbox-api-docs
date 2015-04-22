@@ -10,16 +10,14 @@
 
 namespace Custom\Diocesan\AchievementReport\IB;
 
-use Alaress_Probe as Probe;
-
 class ProgressGradeSummary extends Base {
 
     /**
-     * Heading for this table
+     * Heading
      *
      * @var string
      */
-    protected $heading = 'Grade Summary';
+    protected $heading = 'Progress Grade Summary';
 
     /**
      * Hook method
@@ -28,8 +26,6 @@ class ProgressGradeSummary extends Base {
      */
     protected function setup()
     {
-        $this->setYear(date('Y'));
-        $this->setHeading('Progress Grade Summary');
     }
 
     /**

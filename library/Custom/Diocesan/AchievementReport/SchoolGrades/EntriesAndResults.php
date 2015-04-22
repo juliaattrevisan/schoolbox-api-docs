@@ -13,6 +13,13 @@ namespace Custom\Diocesan\AchievementReport\SchoolGrades;
 class EntriesAndResults extends Base {
 
     /**
+     * Heading
+     *
+     * @var string
+     */
+    protected $heading = 'Entries And Results';
+
+    /**
      * Hook method
      *
      * @return mixed
@@ -20,7 +27,6 @@ class EntriesAndResults extends Base {
     protected function setup()
     {
         $this->setYear(date('Y'));
-        $this->setHeading('Entries And Results');
     }
 
     /**

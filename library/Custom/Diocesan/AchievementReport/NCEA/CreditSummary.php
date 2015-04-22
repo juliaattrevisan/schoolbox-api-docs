@@ -10,9 +10,14 @@
 
 namespace Custom\Diocesan\AchievementReport\NCEA;
 
-use Alaress_Probe as Probe;
-
 class CreditSummary extends Base {
+
+    /**
+     * Heading
+     *
+     * @var string
+     */
+    protected $heading = 'Credit Summary - All Years';
 
     /**
      * Hook method
@@ -22,7 +27,6 @@ class CreditSummary extends Base {
     protected function setup()
     {
         $this->setCurrentYear(date('Y'));
-        $this->setHeading('Credit Summary - All Years');
     }
 
     /**

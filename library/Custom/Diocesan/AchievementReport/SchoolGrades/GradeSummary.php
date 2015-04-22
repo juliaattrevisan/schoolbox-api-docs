@@ -13,7 +13,7 @@ namespace Custom\Diocesan\AchievementReport\SchoolGrades;
 class GradeSummary extends Base {
 
     /**
-     * Heading for this table
+     * Heading
      *
      * @var string
      */
@@ -27,7 +27,6 @@ class GradeSummary extends Base {
     protected function setup()
     {
         $this->setYear(date('Y'));
-        $this->setHeading('Grade Summary');
     }
 
     /**

@@ -10,9 +10,14 @@
 
 namespace Custom\Diocesan\AchievementReport\NCEA;
 
-use Alaress_Probe as Probe;
-
 class LiteracyNumeracyCheckbox extends Base {
+
+    /**
+     * Heading
+     *
+     * @var string
+     */
+    protected $heading = '';
 
     /**
      * Hook method
@@ -22,7 +27,6 @@ class LiteracyNumeracyCheckbox extends Base {
     protected function setup()
     {
         $this->setYear(date('Y'));
-        $this->setHeading('Progress Grade Summary');
     }
 
     /**

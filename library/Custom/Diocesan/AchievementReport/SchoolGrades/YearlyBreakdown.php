@@ -13,6 +13,13 @@ namespace Custom\Diocesan\AchievementReport\SchoolGrades;
 class YearlyBreakdown extends Base {
 
     /**
+     * Heading
+     *
+     * @var string
+     */
+    protected $heading = 'School Grades Summary';
+
+    /**
      * Hook method
      *
      * @return mixed
@@ -20,7 +27,6 @@ class YearlyBreakdown extends Base {
     protected function setup()
     {
         $this->setYear(date('Y'));
-        $this->setHeading('School Grades Summary');
     }
 
     /**
