@@ -34,6 +34,7 @@ class CreditSummary extends Base {
     {
         $allResults = $this->findValues();
 
+        $finalStack = array();
         $finalStack['table']['creditSummary'] = $this->findTable($allResults);
         $finalStack['graph']['totalAchievedCredits'] = $this->findTotalAchievedCredits($allResults);
         $finalStack['graph']['standardType'] = $this->findStandardType($allResults);
