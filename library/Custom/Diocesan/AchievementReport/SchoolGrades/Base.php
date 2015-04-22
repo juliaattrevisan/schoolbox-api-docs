@@ -37,7 +37,7 @@ abstract class Base extends AchievementReportBase {
                 SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
             WHERE
                 ID = '{$externalUserId}'
-                AND classyear = '{$this->getYear()}'
+                AND classyear = '{$this->getCurrentYear()}'
                 AND Result != 'SNA'
             GROUP BY
                 (classcode + ' ' + AssessAreaHeading),
@@ -85,7 +85,7 @@ abstract class Base extends AchievementReportBase {
                 SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
             WHERE
                 ID = '{$externalUserId}'
-                AND classyear < '{$this->getYear()}'
+                AND classyear < '{$this->getCurrentYear()}'
                 AND Result != ''
                 AND Result != 'SNA'
             GROUP BY
