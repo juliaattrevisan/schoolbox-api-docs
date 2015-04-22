@@ -42,6 +42,18 @@
     font-style: italic;
 }
 
+/* Key
+ */
+.achievement-report dl.key {
+    width: 50%;
+}
+
+.achievement-report dl.key dt {
+    width: 40px;
+}
+
+/**** Page Specific ****/
+
 /**
  * School Grades
  */
@@ -58,16 +70,6 @@
 .achievement-report.school-grades tr.spacer td {
     border-left: 0px;
     border-right: 0px;
-}
-
-/* Key
- */
-.achievement-report.school-grades dl.key {
-    width: 50%;
-}
-
-.achievement-report.school-grades dl.key dt {
-    width: 40px;
 }
 
 /**
