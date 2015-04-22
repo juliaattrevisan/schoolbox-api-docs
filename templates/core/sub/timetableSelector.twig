@@ -1,4 +1,5 @@
-<dl class="clearfix" data-interaction="timetableSelector">
+<div class="timetable-picker" data-interaction="timetableSelector">
+<dl class="clearfix" >
     <dt>Campus</dt>
     <dd>
         <select id="timetableCampus" name="timetable[campus]" data-role="campusSelector">
@@ -22,6 +23,8 @@
             <option disabled>-- select period --</option>
         </select>
     </dd>
+</dl>
+<dl class="clearfix">
     <dt>Date</dt>
     <dd>
         <time data-role="selectedDate" class="clearfix">Please select a campus and day.</time>
@@ -30,20 +33,31 @@
     </dd>
     <dt>Start Time</dt>
     <dd>
-        <time data-role="selectedTimeStart">Please select a period.</time>
-        {% if selectButtons %}
+        <label>
+            {% if select == 'radio' %}
+            <input type="radio" name="pickTime" value="start" />
+            {% endif %}
+            <time data-role="selectedTimeStart">Please select a period.</time>
+            {% if select == 'button' %}
             <a href="#"
                class="submit-btn-plain inline-block"
                data-interaction="pickStartTime">Use</a>
-        {% endif %}
+            {% endif %}
+        </label>
     </dd>
     <dt>End Time</dt>
     <dd>
-        <time data-role="selectedTimeEnd">Please select a period.</time>
-        {% if selectButtons %}
+        <label>
+            {% if select == 'radio' %}
+            <input type="radio" name="pickTime" value="end" />
+            {% endif %}
+            <time data-role="selectedTimeEnd">Please select a period.</time>
+            {% if select == 'button' %}
             <a href="#"
                class="submit-btn-plain inline-block"
                data-interaction="pickEndTime">Use</a>
-        {% endif %}
+            {% endif %}
+        </label>
     </dd>
 </dl>
+</div>

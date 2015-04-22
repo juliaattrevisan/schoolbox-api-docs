@@ -2246,6 +2246,34 @@ li:hover > .actions .btn,
 /**
  * Styles for the resource management booking component.
  */
+.timetable-picker {
+    margin-top: 8px;
+    dt {
+        float: none;
+        width: 100px;
+        font-weight: normal;
+        clear: left;
+        font-size: 0.9em;
+        padding: 0 0 4px 6px;
+        color: #777;
+    }
+    dl {
+        float: left;
+        &:first-child,  {
+            width: 200px;
+            margin-right: 32px;
+        }
+    }
+    dd {
+        select {
+            width: 200px;
+        }
+        .submit-btn-plain {
+            margin: 0 0 0 8px;
+        }
+    }
+}
+
 .component-resource-management {
     overflow: visible;
     .resource h3 {

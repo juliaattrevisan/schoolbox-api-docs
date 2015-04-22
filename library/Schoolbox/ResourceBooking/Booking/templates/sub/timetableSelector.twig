@@ -2,7 +2,7 @@
 <em>If you want this booking to recur for a timetable period, then
     make sure you select the "Timetable Based" option in "Repeat".</em>
 
-{% include 'sub/timetableSelector.twig' with {campusList: campusList, selectButtons: false} %}
+{% include 'sub/timetableSelector.twig' with {campusList: campusList, select: false} %}
 
 {# Form inputs for the date and time - match the datepicker inputs #}
 <input name="start_datetime[date]" type="hidden" />
