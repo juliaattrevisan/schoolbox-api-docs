@@ -15,13 +15,20 @@ use Alaress_Probe as Probe;
 class CreditSummary extends Base {
 
     /**
+     * The current year
+     *
+     * @var string
+     */
+    private $currentYear = '';
+
+    /**
      * Hook method
      *
      * @return mixed
      */
     protected function setup()
     {
-        $this->setYear(date('Y'));
+        $this->setCurrentYear(date('Y'));
         $this->setHeading('Credit Summary - All Years');
     }
 
@@ -53,7 +60,7 @@ class CreditSummary extends Base {
         $externalUser = $this->getExternalUser();
         $externalUserId = $externalUser['StudentID'];
 
-        $allResults = $this->getDb()->getAll("
+        $query = "
             SELECT
                 id,
                 Level,
@@ -61,14 +68,23 @@ class CreditSummary extends Base {
                 EnteredCredits,
                 StrippedResult,
                 ResultCredits,
-                StandardType
+                StandardType,
+                StudentYear
             FROM
                 SynergyOne.dbo.uvSchoolBoxNCEAResults
             WHERE
                 id = '{$externalUserId}' AND
                 WithdrawnFlag = 0 AND
-                NOT (StudentYear = '{$this->getYear()}' AND InternalorExternalAssessment = 'EX')
-        ");
+                NOT (StudentYear = '{$this->getCurrentYear()}' AND InternalorExternalAssessment = 'EX')
+        ";
+
+        if ($this->getYear()) {
+            $query .= "
+                AND StudentYear = '{$this->getYear()}'
+            ";
+        }
+
+        $allResults = $this->getDb()->getAll($query);
 
         return $allResults;
     }
@@ -261,5 +277,28 @@ class CreditSummary extends Base {
         }
 
         return $finalStack;
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Set current year
+     *
+     * @param string $currentYear
+     */
+    private function setCurrentYear($currentYear)
+    {
+        $this->currentYear = $currentYear;
+    }
+
+    /**
+     * Get current year
+     *
+     * @return string
+     */
+    private function getCurrentYear()
+    {
+        return $this->currentYear;
     }
 }

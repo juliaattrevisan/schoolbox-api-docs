@@ -20,9 +20,9 @@ class Controller extends Base {
      * School Grades page
      */
     public function schoolGrades($db, $user, $externalUser, $year) {
-        $gradeSummaryTable = new SchoolGrades\GradeSummary($externalUser, $db);
-        $yearlyBreakdownTable = new SchoolGrades\YearlyBreakdown($externalUser, $db);
-        $entriesAndResultsTable = new SchoolGrades\EntriesAndResults($externalUser, $db);
+        $gradeSummaryTable = new SchoolGrades\GradeSummary($externalUser, $db, $year);
+        $yearlyBreakdownTable = new SchoolGrades\YearlyBreakdown($externalUser, $db, $year);
+        $entriesAndResultsTable = new SchoolGrades\EntriesAndResults($externalUser, $db, $year);
 
         $this->getResponse()->content->set(array(
             'template' => '@schoolgrades/index.twig',
@@ -59,8 +59,8 @@ class Controller extends Base {
      * @param $year
      */
     public function ib($db, $user, $externalUser, $year) {
-        $progressGradeSummary = new IB\ProgressGradeSummary($externalUser, $db);
-        $yearlyBreakdown = new IB\YearlyBreakdown($externalUser, $db);
+        $progressGradeSummary = new IB\ProgressGradeSummary($externalUser, $db, $year);
+        $yearlyBreakdown = new IB\YearlyBreakdown($externalUser, $db, $year);
 
         $this->getResponse()->content->set(array(
             'template' => '@ib/index.twig',
@@ -91,8 +91,8 @@ class Controller extends Base {
      * @param $year
      */
     public function ncea($db, $user, $externalUser, $year) {
-        $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($externalUser, $db);
-        $creditSummary = new NCEA\CreditSummary($externalUser, $db);
+        $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($externalUser, $db, $year);
+        $creditSummary = new NCEA\CreditSummary($externalUser, $db, $year);
 
         $this->getResponse()->content->set(array(
             'template' => '@ncea/index.twig',

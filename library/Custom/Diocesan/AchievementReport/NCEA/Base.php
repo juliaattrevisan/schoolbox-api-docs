@@ -15,13 +15,6 @@ use Custom\Diocesan\AchievementReport\Base as AchievementReportBase;
 abstract class Base extends AchievementReportBase {
 
     /**
-     * The year for which to obtain data
-     *
-     * @var string
-     */
-    protected $year = 0;
-
-    /**
      * A bunch of letters to obtain
      *
      * @var array
@@ -30,22 +23,6 @@ abstract class Base extends AchievementReportBase {
 
     /* Getters/Setters
      */
-
-    /**
-     * @param string $year
-     */
-    public function setYear($year)
-    {
-        $this->year = $year;
-    }
-
-    /**
-     * @return string
-     */
-    public function getYear()
-    {
-        return $this->year;
-    }
 
     /**
      * Set letter registry

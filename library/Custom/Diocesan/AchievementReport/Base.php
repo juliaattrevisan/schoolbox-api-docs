@@ -40,14 +40,23 @@ abstract class Base {
     protected $heading = '';
 
     /**
+     * The year for which to obtain data
+     *
+     * @var string
+     */
+    protected $year = 0;
+
+    /**
      * Constructor
      *
      * @param $externalUser
      * @param MSSQL $db
+     * @param $year
      */
-    public function __construct($externalUser, MSSQL $db) {
+    public function __construct($externalUser, MSSQL $db, $year) {
         $this->setExternalUser($externalUser);
         $this->setDb($db);
+        $this->setYear($year);
 
         $this->setup();
     }
@@ -146,5 +155,21 @@ abstract class Base {
     protected function getExternalUser()
     {
         return $this->externalUser;
+    }
+
+    /**
+     * @param string $year
+     */
+    protected function setYear($year)
+    {
+        $this->year = $year;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getYear()
+    {
+        return $this->year;
     }
 }
