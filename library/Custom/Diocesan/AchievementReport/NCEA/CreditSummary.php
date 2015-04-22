@@ -38,6 +38,7 @@ class CreditSummary extends Base {
         $finalStack['graph']['totalAchievedCredits'] = $this->findTotalAchievedCredits($allResults);
         $finalStack['graph']['standardType'] = $this->findStandardType($allResults);
         $finalStack['graph']['assessmentType'] = $this->findAssessmentType($allResults);
+        $finalStack['graph']['result'] = $this->findResult($allResults);
 
         return $finalStack;
     }
@@ -224,6 +225,36 @@ class CreditSummary extends Base {
              */
             if (in_array($current['StrippedResult'], $allLetters)) {
                 $finalStack[$level][$internalExternal] += $current['ResultCredits'];
+                $finalStack[$level]['available'] -= $current['ResultCredits'];
+            }
+        }
+
+        return $finalStack;
+    }
+
+    /**
+     * Find values to populate Result graph
+     *
+     * @param $allResults
+     * @return array
+     */
+    private function findResult($allResults) {
+        $finalStack = array();
+        $allLetters = array('A', 'M', 'E');
+
+        foreach ($allResults as $current) {
+            $level = $current['Level'];
+
+            if (!is_array($finalStack[$level])) {
+                $finalStack[$level] = array_fill_keys($allLetters, 0);
+            }
+
+            $finalStack[$level]['available'] += $current['ResultCredits'];
+
+            /* Only accumulate some values
+             */
+            if (in_array($current['StrippedResult'], $allLetters)) {
+                $finalStack[$level][$current['StrippedResult']] += $current['ResultCredits'];
                 $finalStack[$level]['available'] -= $current['ResultCredits'];
             }
         }

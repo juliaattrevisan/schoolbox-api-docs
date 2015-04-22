@@ -1,0 +1,49 @@
+<script type="text/javascript">
+    $(function() {
+        $('[data-graph="result"]').ncea_stackedBar({
+            title: 'Result',
+
+            categories: [
+                {% for currentLevel, allLevelValues in creditSummary.data.graph.result %}
+                '{{ currentLevel }}'{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            ],
+
+            series: [
+                {
+                    name: 'Achieved',
+                    data: [
+                        {% for currentLevel, allLevelValues in creditSummary.data.graph.result %}
+                        {{ allLevelValues.A }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    ]
+                },
+                {
+                    name: 'Merit',
+                    data: [
+                        {% for currentLevel, allLevelValues in creditSummary.data.graph.result %}
+                        {{ allLevelValues.M }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    ]
+                },
+                {
+                    name: 'Excellence',
+                    data: [
+                        {% for currentLevel, allLevelValues in creditSummary.data.graph.result %}
+                        {{ allLevelValues.E }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    ]
+                },
+                {
+                    name: 'Available',
+                    data: [
+                        {% for currentLevel, allLevelValues in creditSummary.data.graph.result %}
+                        {{ allLevelValues.available }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    ]
+                }
+            ]
+        });
+    });
+</script>
+<div data-graph="result"></div>
