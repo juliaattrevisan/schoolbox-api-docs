@@ -19,7 +19,8 @@ class Report_Login extends Report_Abstract implements Report_IReport
         'date'  => 'date',
         'login' => 'action',
         'user'  => 'user',
-        'ip'    => 'ip'
+        'ip'    => 'ip',
+        'roletype' => 'roletype'
     );
 
     // csv mappings
@@ -29,11 +30,12 @@ class Report_Login extends Report_Abstract implements Report_IReport
         'user'      => 'user id',
         'firstname' => 'firstname',
         'lastname'  => 'lastname',
-        'ip'        => 'originating ip address'
+        'ip'        => 'originating ip address',
+        'roletype'  => 'role type'
     );
 
     // fields that we will permit sorting on
-    private $sortable = array('date', 'user', 'ip');
+    private $sortable = array('date', 'user', 'ip', 'roletype');
 
     // default sorting if none provided
     private $defaultOrderBy = 'date';
@@ -185,7 +187,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
             sprintf(" WHERE (%s)", implode(') AND (', $sqlFilter)) :
             '';
 
-        $joins = "LEFT JOIN `user` ON `user`.`username` = login_log.username";
+        $joins = "LEFT JOIN `user` ON `user`.`username` = login_log.username LEFT JOIN `groups` ON `user`.`group_id` = groups.id";
 
         // Get count separately from data
         $countStatement = $this->db->prepare("SELECT COUNT(*) FROM login_log $joins $sqlFilterString");
@@ -198,7 +200,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
             return 0;
         }
 
-        $dataQuery = "SELECT `date`, login, ip, user.id AS user, title, firstname, lastname
+        $dataQuery = "SELECT `date`, login, ip, user.id AS user, title, firstname, lastname, groups.group_type as roletype
                       FROM login_log
                       $joins
                       $sqlFilterString
@@ -265,7 +267,8 @@ class Report_Login extends Report_Abstract implements Report_IReport
                     'DATE'      => $log['date'],
                     'USERNAME'  => $displayName,
                     'ACTION'    => $action,
-                    'IP'        => $log['ip']
+                    'IP'        => $log['ip'],
+                    'ROLETYPE'  => $log['roletype']
                 ));
 
                 $page->parse('activity_block', 'activity', true);
