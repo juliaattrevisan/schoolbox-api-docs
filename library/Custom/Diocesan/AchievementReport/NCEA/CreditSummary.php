@@ -15,13 +15,6 @@ use Alaress_Probe as Probe;
 class CreditSummary extends Base {
 
     /**
-     * The current year
-     *
-     * @var string
-     */
-    private $currentYear = '';
-
-    /**
      * Hook method
      *
      * @return mixed
@@ -277,28 +270,5 @@ class CreditSummary extends Base {
         }
 
         return $finalStack;
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set current year
-     *
-     * @param string $currentYear
-     */
-    private function setCurrentYear($currentYear)
-    {
-        $this->currentYear = $currentYear;
-    }
-
-    /**
-     * Get current year
-     *
-     * @return string
-     */
-    private function getCurrentYear()
-    {
-        return $this->currentYear;
     }
 }

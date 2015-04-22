@@ -15,11 +15,42 @@ use Custom\Diocesan\AchievementReport\Base as AchievementReportBase;
 abstract class Base extends AchievementReportBase {
 
     /**
+     * The current year
+     *
+     * @var string
+     */
+    protected $currentYear = '';
+
+    /**
      * A bunch of letters to obtain
      *
      * @var array
      */
     protected $letterRegistry = array('N', 'A', 'M', 'E');
+
+    /**
+     * Explorer, reporting!
+     */
+    protected function explorerReporting() {
+        $explorer = $this->getDb()->getAll("
+            SELECT TOP 10 *
+            FROM SynergyOne.dbo.uvSchoolBoxNCEAResults
+        ");
+
+//        $explorer = $this->getDb()->getAll("
+//            SELECT
+//                TABLE_CATALOG,
+//                TABLE_SCHEMA,
+//                TABLE_NAME,
+//                TABLE_TYPE
+//            FROM
+//                INFORMATION_SCHEMA.TABLES
+//            WHERE
+//                TABLE_NAME LIKE '%uv%'
+//        ");
+
+        return $explorer;
+    }
 
     /* Getters/Setters
      */
@@ -45,26 +76,22 @@ abstract class Base extends AchievementReportBase {
     }
 
     /**
-     * Explorer, reporting!
+     * Set current year
+     *
+     * @param string $currentYear
      */
-    protected function explorerReporting() {
-        $explorer = $this->getDb()->getAll("
-            SELECT TOP 10 *
-            FROM SynergyOne.dbo.uvSchoolBoxNCEAResults
-        ");
+    protected function setCurrentYear($currentYear)
+    {
+        $this->currentYear = $currentYear;
+    }
 
-//        $explorer = $this->getDb()->getAll("
-//            SELECT
-//                TABLE_CATALOG,
-//                TABLE_SCHEMA,
-//                TABLE_NAME,
-//                TABLE_TYPE
-//            FROM
-//                INFORMATION_SCHEMA.TABLES
-//            WHERE
-//                TABLE_NAME LIKE '%uv%'
-//        ");
-
-        return $explorer;
+    /**
+     * Get current year
+     *
+     * @return string
+     */
+    protected function getCurrentYear()
+    {
+        return $this->currentYear;
     }
 } 
