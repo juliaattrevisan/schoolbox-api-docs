@@ -58,35 +58,35 @@ else {
     $endTime->setDate(date('Y'),6,30)->setTime(23,59,59);
 }
 
-$log->notice("Only syncing work between {$startTime->getLocalShort()} and {$endTime->getLocalShort()}", array());
+$log->notice("Only syncing work between {$startTime->getLocalShort()} and {$endTime->getLocalShort()}");
 
 $categoryList = traverse($parentId, $folderMapper);
 
 foreach($categoryList as $category) {
-    $log->notice("Processing assessments from: {$category->getName()} ({$category->getCodeString()})", array());
+    $log->notice("Processing assessments from: {$category->getName()} ({$category->getCodeString()})");
     $submissionBoxList = $submissionMapper->getDueActivities(array($category->getId()),$startTime->getUnixTimestamp(), $endTime->getUnixTimestamp());
     foreach($submissionBoxList as $submissionBox) {
-        $markbook = $markbookExternal->getAssessment($submissionBox->getSubmissionBox());
+        $markbook = $markbookExternal->getAssessment($submissionBox);
 
         if(is_array($markbook)) {
-            $log->info("Updating existing assessment: {$submissionBox->getName()}",array());
+            $log->info("Updating existing assessment: {$submissionBox->getName()}");
             if(!$dryRun) {
-                $markbookExternal->updateAssessment($submissionBox->getSubmissionBox());
+                $markbookExternal->updateAssessment($submissionBox);
             }
         }
         elseif( !$updateOnly) {
-            $log->info("Creating new assessment: {$submissionBox->getName()}", array());
+            $log->info("Creating new assessment: {$submissionBox->getName()}");
             if(!$dryRun) {
-                $markbookExternal->createAssessment($submissionBox->getSubmissionBox());
+                $markbookExternal->createAssessment($submissionBox);
             }
         }
         else {
-            $log->warning("Skipping creation in update only mode: {$submissionBox->getName()}",array());
+            $log->warning("Skipping creation in update only mode: {$submissionBox->getName()}");
             continue;
         }
 
         $classList = $markbookHandler->getStudentListByBoxId($submissionBox->getId());
-        $log->notice("Setting marks for {count($classList)} students", array());
+        $log->notice("Setting marks for ".count($classList)." students");
         foreach($classList as $student) {
             $result = $markbookHandler->getByUser($student['uid'], $submissionBox->getId());
 

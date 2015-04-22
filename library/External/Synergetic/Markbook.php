@@ -157,7 +157,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      *
      * @param string
      * @param Activity $assessment
-     * @return bool
+     * @return array
      */
     public function updateAssessment(Activity $assessment)
     {
@@ -167,7 +167,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                   WHERE
                         HdgAbbrev2 = '".$this->getPrefix($assessment).$assessment->getId()."'
                     ";
-        return $this->getDatabase()->query($query);
+        $this->getDatabase()->query($query);
     }
 
     /**
