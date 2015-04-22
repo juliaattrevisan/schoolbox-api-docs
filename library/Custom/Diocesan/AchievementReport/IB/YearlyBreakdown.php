@@ -84,6 +84,12 @@ class YearlyBreakdown extends Base {
                 Term DESC
         ";
 
-        return $this->getDb()->getAll($query);
+        $result = $this->getDb()->getAll($query);
+
+        if (is_array($result)) {
+            return $result;
+        }
+
+        return array();
     }
 }
