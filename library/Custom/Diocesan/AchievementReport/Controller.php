@@ -101,6 +101,7 @@ class Controller extends Base {
                 'preselectedYear' => $year,
                 'externalUser' => $externalUser,
                 'user' => $user,
+                'year' => $year,
 
                 /* That checkbox thing at the top
                  */
