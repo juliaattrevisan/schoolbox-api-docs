@@ -92,7 +92,8 @@ class Controller extends Base {
      */
     public function ncea($db, $user, $externalUser, $year) {
         $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($externalUser, $db, $year);
-        $creditSummary = new NCEA\CreditSummary($externalUser, $db, $year);
+        $creditSummary = new NCEA\CreditSummary($externalUser, $db, false);
+        $creditSummaryYear = new NCEA\CreditSummary($externalUser, $db, $year);
 
         $this->getResponse()->content->set(array(
             'template' => '@ncea/index.twig',
@@ -101,16 +102,35 @@ class Controller extends Base {
                 'externalUser' => $externalUser,
                 'user' => $user,
 
+                /* That checkbox thing at the top
+                 */
                 'literacyNumeracyCheckbox' => array(
                     'heading' => $literacyNumeracyCheckbox->getHeading(),
                     'data' => $literacyNumeracyCheckbox->findData()
                 ),
 
+                /* Credit Summary graphs for all years combined
+                 */
                 'creditSummary' => array(
                     'heading' => $creditSummary->getHeading(),
                     'data' => $creditSummary->findData(),
                     'allLetters' => $creditSummary->getLetterRegistry(),
-                    'allTypes' => array('IN', 'EX')
+                    'allTypes' => array('IN', 'EX'),
+
+                    /* Suffix for graph div id's
+                     */
+                    'suffix' => 'all',
+                ),
+
+                /* Credit Summary graphs for a specific year
+                 */
+                'creditSummaryYear' => array(
+                    'data' => $creditSummaryYear->findData(),
+                    'allLetters' => $creditSummaryYear->getLetterRegistry(),
+
+                    /* Suffix for graph div id's
+                     */
+                    'suffix' => "year{$year}",
                 )
             )
         ));

@@ -14,6 +14,10 @@
 
     {% include '@ncea/LiteracyNumeracyCheckbox.twig' %}
     {% include '@ncea/CreditSummary.twig' %}
+    {% include '@ncea/CreditSummaryGraphs.twig' with {dataset: creditSummary} %}
+
+    <h3>Year Specific Graphs</h3>
+    {% include '@ncea/CreditSummaryGraphs.twig' with {dataset: creditSummaryYear} %}
 
     <div class='clearfix'></div>
 

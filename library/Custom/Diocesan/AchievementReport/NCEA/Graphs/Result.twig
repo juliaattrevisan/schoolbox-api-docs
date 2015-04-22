@@ -1,10 +1,10 @@
 <script type="text/javascript">
     $(function() {
-        $('[data-graph="result"]').ncea_stackedBar({
+        $('[data-graph="result-{{ dataset.suffix }}"]').ncea_stackedBar({
             title: 'Result',
 
             categories: [
-                {% for currentLevel, allLevelValues in creditSummary.data.graph.result %}
+                {% for currentLevel, allLevelValues in dataset.data.graph.result %}
                 '{{ currentLevel }}'{% if not loop.last %}, {% endif %}
                 {% endfor %}
             ],
@@ -13,7 +13,7 @@
                 {
                     name: 'Achieved',
                     data: [
-                        {% for currentLevel, allLevelValues in creditSummary.data.graph.result %}
+                        {% for currentLevel, allLevelValues in dataset.data.graph.result %}
                         {{ allLevelValues.A }}{% if not loop.last %}, {% endif %}
                         {% endfor %}
                     ]
@@ -21,7 +21,7 @@
                 {
                     name: 'Merit',
                     data: [
-                        {% for currentLevel, allLevelValues in creditSummary.data.graph.result %}
+                        {% for currentLevel, allLevelValues in dataset.data.graph.result %}
                         {{ allLevelValues.M }}{% if not loop.last %}, {% endif %}
                         {% endfor %}
                     ]
@@ -29,7 +29,7 @@
                 {
                     name: 'Excellence',
                     data: [
-                        {% for currentLevel, allLevelValues in creditSummary.data.graph.result %}
+                        {% for currentLevel, allLevelValues in dataset.data.graph.result %}
                         {{ allLevelValues.E }}{% if not loop.last %}, {% endif %}
                         {% endfor %}
                     ]
@@ -37,7 +37,7 @@
                 {
                     name: 'Available',
                     data: [
-                        {% for currentLevel, allLevelValues in creditSummary.data.graph.result %}
+                        {% for currentLevel, allLevelValues in dataset.data.graph.result %}
                         {{ allLevelValues.available }}{% if not loop.last %}, {% endif %}
                         {% endfor %}
                     ]
@@ -46,4 +46,4 @@
         });
     });
 </script>
-<div data-graph="result"></div>
+<div data-graph="result-{{ dataset.suffix }}"></div>

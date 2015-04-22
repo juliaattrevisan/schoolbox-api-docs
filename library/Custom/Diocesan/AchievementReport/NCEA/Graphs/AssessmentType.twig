@@ -1,10 +1,10 @@
 <script type="text/javascript">
     $(function() {
-        $('[data-graph="assessment-type"]').ncea_stackedBar({
+        $('[data-graph="assessment-type-{{ dataset.suffix }}"]').ncea_stackedBar({
             title: 'Assessment Type',
 
             categories: [
-                {% for currentLevel, allLevelValues in creditSummary.data.graph.assessmentType %}
+                {% for currentLevel, allLevelValues in dataset.data.graph.assessmentType %}
                 '{{ currentLevel }}'{% if not loop.last %}, {% endif %}
                 {% endfor %}
             ],
@@ -13,7 +13,7 @@
                 {
                     name: 'Internal',
                     data: [
-                        {% for currentLevel, allLevelValues in creditSummary.data.graph.assessmentType %}
+                        {% for currentLevel, allLevelValues in dataset.data.graph.assessmentType %}
                         {{ allLevelValues.IN }}{% if not loop.last %}, {% endif %}
                         {% endfor %}
                     ]
@@ -21,7 +21,7 @@
                 {
                     name: 'External',
                     data: [
-                        {% for currentLevel, allLevelValues in creditSummary.data.graph.assessmentType %}
+                        {% for currentLevel, allLevelValues in dataset.data.graph.assessmentType %}
                         {{ allLevelValues.EX }}{% if not loop.last %}, {% endif %}
                         {% endfor %}
                     ]
@@ -29,7 +29,7 @@
                 {
                     name: 'Available',
                     data: [
-                        {% for currentLevel, allLevelValues in creditSummary.data.graph.assessmentType %}
+                        {% for currentLevel, allLevelValues in dataset.data.graph.assessmentType %}
                         {{ allLevelValues.available }}{% if not loop.last %}, {% endif %}
                         {% endfor %}
                     ]
@@ -38,4 +38,4 @@
         });
     });
 </script>
-<div data-graph="assessment-type"></div>
+<div data-graph="assessment-type-{{ dataset.suffix }}"></div>
