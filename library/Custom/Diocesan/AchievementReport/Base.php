@@ -47,6 +47,13 @@ abstract class Base {
     protected $year = 0;
 
     /**
+     * The current year
+     *
+     * @var string
+     */
+    protected $currentYear = 0;
+
+    /**
      * Constructor
      *
      * @param $externalUser
@@ -57,6 +64,7 @@ abstract class Base {
         $this->setExternalUser($externalUser);
         $this->setDb($db);
         $this->setYear($year);
+        $this->setCurrentYear(date('Y'));
 
         $this->setup();
     }
@@ -171,5 +179,25 @@ abstract class Base {
     protected function getYear()
     {
         return $this->year;
+    }
+
+    /**
+     * Set current year
+     *
+     * @param string $currentYear
+     */
+    protected function setCurrentYear($currentYear)
+    {
+        $this->currentYear = $currentYear;
+    }
+
+    /**
+     * Get current year
+     *
+     * @return string
+     */
+    protected function getCurrentYear()
+    {
+        return $this->currentYear;
     }
 }

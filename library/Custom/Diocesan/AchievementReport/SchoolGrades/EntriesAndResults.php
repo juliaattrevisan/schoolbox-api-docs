@@ -26,7 +26,6 @@ class EntriesAndResults extends Base {
      */
     protected function setup()
     {
-        $this->setYear(date('Y'));
     }
 
     /**

@@ -26,7 +26,6 @@ class YearlyBreakdown extends Base {
      */
     protected function setup()
     {
-        $this->setYear(date('Y'));
     }
 
     /**

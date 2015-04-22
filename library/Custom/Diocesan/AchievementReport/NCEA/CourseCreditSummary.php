@@ -26,7 +26,6 @@ class CourseCreditSummary extends Base {
      */
     protected function setup()
     {
-        $this->setCurrentYear(date('Y'));
     }
 
     /**

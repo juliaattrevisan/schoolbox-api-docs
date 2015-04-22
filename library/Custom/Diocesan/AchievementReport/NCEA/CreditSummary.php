@@ -26,7 +26,6 @@ class CreditSummary extends Base {
      */
     protected function setup()
     {
-        $this->setCurrentYear(date('Y'));
     }
 
     /**

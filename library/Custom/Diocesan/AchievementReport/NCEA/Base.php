@@ -15,13 +15,6 @@ use Custom\Diocesan\AchievementReport\Base as AchievementReportBase;
 abstract class Base extends AchievementReportBase {
 
     /**
-     * The current year
-     *
-     * @var string
-     */
-    protected $currentYear = '';
-
-    /**
      * A bunch of letters to obtain
      *
      * @var array
@@ -75,23 +68,5 @@ abstract class Base extends AchievementReportBase {
         return $this->letterRegistry;
     }
 
-    /**
-     * Set current year
-     *
-     * @param string $currentYear
-     */
-    protected function setCurrentYear($currentYear)
-    {
-        $this->currentYear = $currentYear;
-    }
 
-    /**
-     * Get current year
-     *
-     * @return string
-     */
-    protected function getCurrentYear()
-    {
-        return $this->currentYear;
-    }
 } 
