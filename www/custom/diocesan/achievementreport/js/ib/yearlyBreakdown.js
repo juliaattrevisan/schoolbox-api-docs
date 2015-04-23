@@ -62,6 +62,7 @@
                 yAxis: {
                     min: 0,
                     max: 7,
+                    allowDecimals: false,
                     title: {
                         text: ''
                     }
