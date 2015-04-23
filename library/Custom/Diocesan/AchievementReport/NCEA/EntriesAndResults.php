@@ -44,14 +44,15 @@ class EntriesAndResults extends Base {
         foreach ($allResults as $current) {
             $courseName = $current['CourseDescription'];
 
-            /* Trim empty teachers out for course teachers
+            /* Teachers
+             * Trim empty teachers out for course teachers
              */
             $finalStack[$courseName]['allTeachers'][] = $current['ClassTeacher1'];
             $finalStack[$courseName]['allTeachers'][] = $current['ClassTeacher2'];
             $finalStack[$courseName]['allTeachers'][] = $current['ClassTeacher3'];
             $finalStack[$courseName]['allTeachers'] = array_values(array_unique(array_filter($finalStack[$courseName]['allTeachers'])));
 
-            /* Misc data
+            /* Entries
              */
             $finalStack[$courseName]['allEntries'][] = array(
                 'NCEAStandardNumber' => $current['NCEAStandardNumber'],
@@ -62,6 +63,9 @@ class EntriesAndResults extends Base {
                 'StrippedResult' => $current['StrippedResult'],
                 'ResultBrackets' => $current['ResultBrackets']
             );
+
+            /* Letters
+             */
         }
 
         return $finalStack;
