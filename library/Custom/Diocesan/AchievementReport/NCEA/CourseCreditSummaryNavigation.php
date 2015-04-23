@@ -20,7 +20,7 @@ class CourseCreditSummaryNavigation extends Base {
      *
      * @var string
      */
-    protected $heading = 'Course Credit Summary Navigation';
+    protected $heading = 'Course Credit Summary';
 
     /**
      * Hook method
