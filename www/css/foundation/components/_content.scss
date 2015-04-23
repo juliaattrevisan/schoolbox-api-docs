@@ -532,7 +532,6 @@ $tooltip-font-color: $white;
 	padding: 0;
 	max-height: 0;
 	overflow: hidden;
-	will-change: transition;
 	@include single-transition(max-height, 0.3s, ease-out);
 	&.show{
 		max-height: 700px;
@@ -590,7 +589,6 @@ $tooltip-font-color: $white;
 	max-height: 0;
 	overflow: hidden;
 	margin: 0 0 0 rem-calc(($base-font-size * 2));
-	will-change: transition;
 	@include single-transition(max-height, 0.3s, ease-out);
 }
 
@@ -606,7 +604,7 @@ $tooltip-font-color: $white;
 	}
 }
 
-// 
+// Block Grid
 .grid{
 	li{
 		border-right: 1px solid $silver;
