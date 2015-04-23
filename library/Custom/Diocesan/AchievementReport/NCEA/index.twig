@@ -6,8 +6,6 @@
 {% include '@templates/Navigation.twig' %}
 
 <div class="achievement-report ncea">
-    <h1>NCEA Index</h1>
-
     {% include '@ncea/LiteracyNumeracyCheckbox.twig' %}
     {% include '@ncea/CreditSummary.twig' %}
     {% include '@ncea/CreditSummaryGraphs.twig' with {dataset: creditSummary} %}
@@ -22,7 +20,7 @@
 
     <div class='clearfix'></div>
 
-    <h2>Further Information</h2>
+    <h1>Further Information</h1>
 
     <dl class="key float-left">
         <dt>N</dt>
