@@ -169,11 +169,11 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
             $file = $this->hydrate($r);
 
             /** @var Storage $store */
-            $store = $this->hydrateJoin($r, 'storage', 'h')
-                         ->setMimetype(
-                             $this->getJoinMapper('storage')
-                                  ->hydrateJoin($r, 'allowedFileExtension', 'm')
-                         );
+            $store = $this->hydrateJoin($r, 'hash', 'h')
+                          ->setMimetype(
+                              $this->getJoinMapper('hash')
+                                   ->hydrateJoin($r, 'allowedFileExtension', 'm')
+                          );
 
             // ensure the path is set
             $store->setPath($this->getStorageMapper()->getManager()->calcPath($store));
