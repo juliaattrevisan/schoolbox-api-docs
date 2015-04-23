@@ -196,7 +196,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
         $stmt = $this->getDatabase()->prepare(
             "
-            SELECT period_number AS description, t.class_code AS code, c.{$type}_number AS staffID, room, cl.class
+            SELECT period_number, t.class_code AS code, c.{$type}_number AS staffID, room, cl.class
             FROM db2inst1.schoolbox_timetable t
             LEFT JOIN db2inst1.schoolbox_classes cl ON t.class_code = cl.class_code
             $join
@@ -212,34 +212,33 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             )
         );
 
-        $classes = array();
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            // index on description
-            $classes[$row['DESCRIPTION']] = $row;
+        // Build the timetable
+        $timetable = array();
+        foreach ($definition['desc'] as $x => $name) {
+            $timetable[$x]['periodName']     = $definition['desc'][$x];
+            $timetable[$x]['periodStart']    = $definition['start'][$x];
+            $timetable[$x]['periodEnd']      = $definition['end'][$x];
+            $timetable[$x]['periodNumber']   = $definition['number'][$x];
+            $timetable[$x]['periodSequence'] = $definition['sequence'][$x];
+            $timetable[$x]['class']          = array();
         }
 
-        // arrange data as $timetable[$sequence] = array('period[Name|Start|End|Number|Sequence]');
-        $timetable = array();
-        for ($i = 0; isset($definition['sequence'][$i]); ++$i) {
-            // the 'shortName' of the period
-            $code = $definition['number'][$i];
-
-            $timetable[$i] = array(
-                'periodName'     => $definition['desc'][$i],
-                'periodStart'    => $definition['start'][$i],
-                'periodEnd'      => $definition['end'][$i],
-                'periodNumber'   => $definition['number'][$i],
-                'periodSequence' => $definition['sequence'][$i]
-            );
-
-            // if no class on this period, skip it
-            if (isset($classes[$code])) {
-                $timetable[$i]['class'][0]['description'] = $classes[$code]['CLASS'];
-                $timetable[$i]['class'][0]['code'] = $classes[$code]['CODE'];
-                $timetable[$i]['class'][0]['room'] = $classes[$code]['ROOM'];
-                $timetable[$i]['class'][0]['staffID'] = $classes[$code]['STAFFID'];
+        // Add classes for each day into it
+        while ($desc = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            foreach ($timetable as $x => $timetablePeriod) {
+                if ($desc['PERIOD_NUMBER'] == $timetablePeriod['periodNumber']
+                    && !isset($timetable[$x]['class'][$desc['CODE']])
+                ) {
+                    $timetable[$x]['class'][$desc['CODE']] = array(
+                        'description'    => $desc['CLASS'],
+                        'code'           => $desc['CODE'],
+                        'campus'         => $desc['CAMPUS'],
+                        'room'           => $desc['ROOM'],
+                        'staffID'        => $desc['STAFFID'],
+                    );
+                    break;
+                }
             }
-
         }
 
         return $timetable;
