@@ -92,8 +92,8 @@ class ResourceVideoMapper extends Mapper
         $this->hasJoin(
             'eportfolio_filelist', array(
                 'mapper'    => '\\Component\\Eportfolio\\FileListMapper',
-                'this_key'  => 'hash',
-                'other_key' => 'hash',
+                'this_key'  => 'id',
+                'other_key' => 'file_id',
             )
         );
     }
@@ -187,7 +187,7 @@ class ResourceVideoMapper extends Mapper
     public function findByEportfolioPage($pageId, $options, $limit = false)
     {
         $videoList      = new Collection(array());
-        $myFileMapper   = new \Schoolbox\MyFileMapper;
+        $myFileMapper   = new \Schoolbox\Resource\My\File\Mapper();
         $fileListMapper = new \Component\Eportfolio\FileListMapper();
 
         $query = "
@@ -196,14 +196,12 @@ class ResourceVideoMapper extends Mapper
                 {$fileListMapper->getJoinMapper('myfile')->getColumnString('mf')},
                 {$myFileMapper->getJoinMapper('owner')->getColumnString('o')}
             FROM `{$this->getTable()}` vq
-            LEFT JOIN {$this->getJoinSQL('eportfolio_filelist', 'vq', 'fl')}
-            LEFT JOIN {$fileListMapper->getJoinSQL('myfile', 'vq', 'mf')}
+            JOIN `myFile` AS `mf` ON `vq`.`hash` = `mf`.`hash` AND `mf`.`deleted_at` IS NULL
+            JOIN {$this->getJoinSQL('eportfolio_filelist', 'mf', 'fl')}
             LEFT JOIN {$myFileMapper->getJoinSQL('owner', 'mf', 'o')}
             WHERE fl.page_id = :pageId
             AND vq.status != 'failed'
-            AND mf.deleted = 0
         ";
-
         /* Sort order
          */
         $sortFields = array(

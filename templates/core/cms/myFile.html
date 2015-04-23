@@ -15,6 +15,17 @@ $(function() {
 	<input type="hidden" name="component_instance_id" value="{COMPONENT_INSTANCE_ID}" />
 
 	<table class="standardForm table">
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Description</h4>
+                <em>One line description of the file for use as the title</em>
+            </td>
+            <td>
+                <label>
+                    <input type="text" name="description" maxlength="100" size="40" class="required" value="{DESCRIPTION}"/>
+                </label>
+            </td>
+        </tr>
 		<!-- BEGIN browse_row -->
 		<tr>
 			<td>
@@ -25,17 +36,6 @@ $(function() {
 			</td>
 		</tr>
 		<!-- END browse_row -->
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Description</h4>
-				<em>One line description of the file for use as the title</em>
-			</td>
-			<td>
-				<label>
-					<input type="text" name="description" maxlength="100" size="40" class="required" value="{DESCRIPTION}"/>
-				</label>
-			</td>
-		</tr>
 		<tr>
 			<td>
 				<h4>Location</h4>
