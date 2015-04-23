@@ -48,10 +48,11 @@ class YearlyBreakdown extends Base {
             $year = $current['classyear'];
             $term = $current['Term'];
 
-
             $finalStack[$year][$courseName]['classcode'] = $classcode;
             $finalStack[$year][$courseName]['allTerms'][$term]['level'] = $current['Level'];
             $finalStack[$year][$courseName]['allTerms'][$term]['progressGrade'] = $current['ProgressGrade'];
+
+            $finalStack[$year][$courseName]['allTerms']['2']['progressGrade'] = 1;
         }
 
         return $finalStack;

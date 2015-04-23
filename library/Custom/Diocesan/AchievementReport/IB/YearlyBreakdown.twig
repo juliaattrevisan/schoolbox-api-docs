@@ -48,17 +48,23 @@
 
             /* Hardcode term 4 and 2
              */
-            {% for i in [4, 2] %}
-            {% if values.allTerms[i].progressGrade|length  %}
-            tempData.push({{ values.allTerms[i].progressGrade }})
+            {% if values.allTerms[4].progressGrade|length  %}
+            tempData.push({y: {{ values.allTerms[4].progressGrade }}, color: '#fd9800'});
             {% else %}
-            tempData.push(0);
+            tempData.push({y: 0, color: '#fd9800'});
             {% endif %}
-            {% endfor %}
+
+            {% if values.allTerms[2].progressGrade|length  %}
+            tempData.push({y: {{ values.allTerms[2].progressGrade }}, color: '#7fc9fc'});
+            {% else %}
+            tempData.push({y: 0, color: '#7fc9fc'});
+            {% endif %}
 
             $('[data-yearly-breakdown-graph="{{ values.classcode }}_{{ year }}"]').ib_yearlyBreakdown({
                 title: '',
+
                 categories: ['Term 4', 'Term 2'],
+
                 series: [{
                     data: tempData
                 }]
