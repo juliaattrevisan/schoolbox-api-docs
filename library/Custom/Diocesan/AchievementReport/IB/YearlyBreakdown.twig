@@ -27,7 +27,7 @@
         });
     });
 </script>
-<h1>Yearly Breakdown</h1>
+<h1>Progress Grade Summary by Year</h1>
 
 <ul class="admin-nav" data-year-selector="true">
     {% for year, allCourses in yearlyBreakdown.data %}
@@ -77,16 +77,18 @@
             $(window).resize();
         });
     </script>
-    <h2>{{ yearlyBreakdown.heading }} {{ year }}</h2>
     <table>
         <thead>
-        <tr>
-            <th>Course</th>
-            <th class="centered">Term</th>
-            <th>Level</th>
-            <th>Progress Grade</th>
-            <th>Progress Chart</th>
-        </tr>
+            <tr class="generic-heading-highlight">
+                <th colspan="5">{{ yearlyBreakdown.heading }} {{ year }}</th>
+            </tr>
+            <tr>
+                <th>Course</th>
+                <th class="centered">Term</th>
+                <th>Level</th>
+                <th>Progress Grade</th>
+                <th>Progress Chart</th>
+            </tr>
         </thead>
         <tbody>
             {% for currentCourse, values in allCourses %}

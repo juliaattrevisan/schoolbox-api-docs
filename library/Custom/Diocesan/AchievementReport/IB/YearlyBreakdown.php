@@ -17,7 +17,7 @@ class YearlyBreakdown extends Base {
      *
      * @var string
      */
-    protected $heading = 'Yearly Breakdown';
+    protected $heading = 'Progress Grade Summary';
 
     /**
      * Hook method
