@@ -9,6 +9,9 @@
  */
 namespace Crocodoc\Renderer\Strategy;
 
+use Schoolbox\Video\QueueMapper;
+use Schoolbox\Video\Factory\Video as VideoFactory;
+
 class Video extends Base {
 
 	/**
@@ -51,7 +54,7 @@ class Video extends Base {
         ));
 
 		try {
-			$videoMapper = new \Schoolbox\Video\Factory\Video('submission', $this->getSubmission()->getId());
+			$videoMapper = new VideoFactory($this->getSubmission()->getHash(), QueueMapper::FILE_TYPE_STORAGE);
 			$video = $videoMapper->produce();
 		}
 		catch (\Exception $e) {
@@ -73,7 +76,7 @@ class Video extends Base {
 		if ($video->isComplete()) {
 			$this->getPage()->parse('injectable_video_player_block', 'injectable_video_player');
 			$this->getPage()->setVar(array(
-				'VIDEO_ID' => $video->getFile()->getId(),
+				'VIDEO_ID' => $this->getSubmission()->getId(),
 				'injectable_video_status_block' => ''
 			));
 		}

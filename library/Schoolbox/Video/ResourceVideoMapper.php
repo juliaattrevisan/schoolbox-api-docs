@@ -42,13 +42,6 @@ class ResourceVideoMapper extends Mapper
         );
         $this->hasMap(
             array(
-                'column'   => 'type',
-                'property' => 'type',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
                 'column'   => 'status',
                 'property' => 'status',
                 'type'     => self::TYPE_STRING,
@@ -58,13 +51,6 @@ class ResourceVideoMapper extends Mapper
             array(
                 'column'   => 'duration',
                 'property' => 'duration',
-                'type'     => self::TYPE_INTEGER,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'file_id',
-                'property' => 'fileID',
                 'type'     => self::TYPE_INTEGER,
             )
         );
@@ -273,7 +259,7 @@ class ResourceVideoMapper extends Mapper
             SELECT {$fileMapper->getColumnString('f')}, {$this->getColumnString('vq')}
                      FROM `{$this->getTable()}` vq
                     JOIN {$this->getJoinSQL('file', 'vq', 'f')}
-            WHERE f.id = ? AND vq.status = 'completed' AND vq.type='sbfs'
+            WHERE f.id = ? AND vq.status = 'completed'
             "
         );
 
@@ -298,6 +284,8 @@ class ResourceVideoMapper extends Mapper
      *
      * @return ResourceVideo
      * @throws Mapper\Exception
+     *
+     * @deprecated
      */
     public function findByMyFileId($id)
     {
@@ -331,34 +319,6 @@ class ResourceVideoMapper extends Mapper
         return $video;
     }
 
-    public function findByStorageId($id)
-    {
-        $storageMapper = Schoolbox\Resource\Storage\Mapper::getInstance();
-
-        $statement = $this->database->prepare(
-            "
-            SELECT {$storageMapper->getColumnString('s')}, {$this->getColumnString('vq')}
-                     FROM `{$this->getTable()}` vq
-                    JOIN {$this->getJoinSQL('storage', 'vq', 's')}
-            WHERE s.storage_id = ? AND vq.status = 'completed' AND vq.type='storage'
-            "
-        );
-
-        $statement->execute(array($id));
-
-        $video = null;
-        foreach ($statement as $row) {
-            $video = $this->hydrate($row, 'vq');
-            $video->setFile($storageMapper->hydrate($row, 's'));
-        }
-
-        if (!($video instanceof ResourceVideo)) {
-            throw new Mapper\Exception('Instance of object not found');
-        }
-        return $video;
-
-    }
-
     /**
      * Like findByStorageId() except it accepts a brownhole hash instead of a
      * brownhole storage ID.
@@ -373,14 +333,12 @@ class ResourceVideoMapper extends Mapper
     {
 
         $storageMapper = $this->getJoinMapper('storage');
-        $fileMapper = $this->getJoinMapper('file');
 
         $statement     = $this->database->prepare(
             "
-            SELECT {$storageMapper->getColumnString('s')}, {$this->getColumnString('vq')},  {$fileMapper->getColumnString('f')}
+            SELECT {$storageMapper->getColumnString('s')}, {$this->getColumnString('vq')}
             FROM `{$this->getTable()}` vq
             JOIN {$this->getJoinSQL('storage', 'vq', 's')}
-            JOIN {$this->getJoinSQL('file', 'vq', 'f')}
             WHERE s.hash = ? AND vq.status = 'completed'
         "
         );
@@ -391,7 +349,6 @@ class ResourceVideoMapper extends Mapper
         if (($row = $statement->fetch())) {
             $video = $this->hydrate($row, 'vq');
             $video->setStorage($storageMapper->hydrate($row, 's'));
-            $video->setFile($fileMapper->hydrate($row, 'f'));
         }
 
         if (!($video instanceof ResourceVideo)) {
@@ -400,38 +357,5 @@ class ResourceVideoMapper extends Mapper
         return $video;
     }
 
-    /**
-     * Gets a video for a submission, regardless of the video's processing status
-     *
-     * @param $id
-     *
-     * @return ResourceVideo
-     * @throws Mapper\Exception
-     */
-    public function findBySubmissionId($id)
-    {
-        $studentSubmissionMapper = $this->getJoinMapper('student_submission');
-        $statement               = $this->database->prepare(
-            "
-            SELECT {$studentSubmissionMapper->getColumnString('s')}, {$this->getColumnString('vq')}
-            FROM `{$this->getTable()}` vq
-            INNER JOIN {$this->getJoinSQL('student_submission', 'vq', 's')}
-            WHERE s.id = ? AND vq.type='submission'
-        "
-        );
 
-        $statement->execute(array($id));
-
-        $video = null;
-        if (($row = $statement->fetch())) {
-            $video = $this->hydrate($row, 'vq');
-            $video->setFile($studentSubmissionMapper->hydrate($row, 's'));
-        }
-
-        if (!($video instanceof ResourceVideo)) {
-            throw new Mapper\Exception('Instance of object not found');
-        }
-
-        return $video;
-    }
 }

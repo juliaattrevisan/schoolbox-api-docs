@@ -168,10 +168,8 @@ class StorageMapper extends Mapper implements StorageMapperInterface {
 	    if($file->getMimeType()->isVideo() && $file->getId() != 0) {
 		    $mapper = new Video\QueueMapper();
 	        $videoQ = new Video\Queue();
-		    $videoQ->setFileID($file->getId());
+		    $videoQ->setHash($file->getHash());
 		    $videoQ->setStatus( Video\QueueMapper::STATUS_PENDING );
-		    $videoQ->setType( Video\QueueMapper::FILE_TYPE_STORAGE);
-
 		    $mapper->save($videoQ);
 	    }
 

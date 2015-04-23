@@ -83,16 +83,6 @@ if (is_numeric($_POST['box_id'])) {
     foreach ($submissions as $submission) {
         $submissionId = $submission->getId();
 
-        /* If video add to video processing queue */
-        if ($submission->getMimetype()->isVideo()) {
-            $videoQ = new Schoolbox\Video\Queue();
-            $videoQ->setFileID($submissionId);
-            $videoQ->setStatus(QueueMapper::STATUS_PENDING);
-            $videoQ->setType(QueueMapper::FILE_TYPE_SUBMISSION);
-
-            $vqMapper->save($videoQ);
-        }
-
         /* Submit to PlagScan for plagiarism check */
         if ($plagscanApiKey && $plagscanUsername && is_numeric($submissionId)) {
             $plagMap = Plagscan_DocumentMapper::getInstance();

@@ -17,12 +17,10 @@ class ResourceVideo
 {
     protected $id;
     protected $hash;
-    protected $type;
     protected $status;
     protected $duration;
     protected $file;
     protected $storage;
-    protected $fileID;
     protected $config;
 
     /**
@@ -126,16 +124,6 @@ class ResourceVideo
         }
     }
 
-    public function setType($type)
-    {
-        $this->type = $type;
-    }
-
-    public function getType()
-    {
-        return $this->type;
-    }
-
     public function setFile($file)
     {
         $this->file = $file;
@@ -182,18 +170,9 @@ class ResourceVideo
         return $this->id;
     }
 
-    public function setFileID($fileID)
-    {
-        $this->fileID = $fileID;
-    }
-
-    public function getFileID()
-    {
-        return $this->fileID;
-    }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getHash()
     {
@@ -201,7 +180,7 @@ class ResourceVideo
     }
 
     /**
-     * @param mixed $hash
+     * @param string $hash
      */
     public function setHash($hash)
     {
