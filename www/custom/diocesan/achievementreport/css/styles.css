@@ -125,3 +125,9 @@
     width: 100px;
 }
 
+.achievement-report.ncea div.graph-socket {
+    width: 25%;
+    height: 400px;
+    margin-bottom: 32px;
+    float: left;
+}
