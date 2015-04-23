@@ -41,18 +41,9 @@ class Mapper extends BaseMapper
                 )
             )
         );
-        $this->hasMap(
-            array(
-                'column'   => 'storage_image_id',
-                'property' => 'image',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'image',
-                'join_def' => array(
-                    'mapper'    => Storage\Mapper::class,
-                    'other_key' => 'storage_id',
-                )
-            )
-        );
+
+        $this->joins('image_hash', Storage\Mapper::class, 'hash', null, null, 'image', 'image');
+
         $this->hasMap(
             array(
                 'column'   => 'resource_moderation_type_id',
@@ -323,16 +314,6 @@ class Mapper extends BaseMapper
                 $statement = $userMapper->getDatabase()->prepare($query);
                 $statement->execute(array($model->getId()));
                 $model->setModeratorList($userMapper->hydrateList($statement, 'u'));
-
-                // Populate image
-                $imageId = $model->getImage()->getId();
-                if ($imageId) {
-                    $imageMapper = $mapper->getJoinMapper('image');
-                    try {
-                        $model->setImage($imageMapper->findById($imageId));
-                    } catch (BaseMapper\Exception $ex) {
-                    }
-                }
 
                 // populate related resources
                 $relationMapper     = $mapper->getJoinMapper('related_resource');
