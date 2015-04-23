@@ -40,7 +40,7 @@ class Migration implements MigrationPattern
     public function getFetchStatement()
     {
         return $this->db->query("
-          SELECT `storage_id`, `filename` FROM `storage` WHERE filename != '' AND expired_at IS NULL
+          SELECT `storage_id`, `filename`, `ext` FROM `storage` WHERE filename != '' AND expired_at IS NULL
         ");
     }
 
@@ -82,7 +82,7 @@ class Migration implements MigrationPattern
      */
     public function readFilename(array $row)
     {
-        return $row['filename'];
+        return $row['filename'].'.'.$row['ext'];
     }
 
     /**

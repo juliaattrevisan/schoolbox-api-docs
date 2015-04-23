@@ -81,13 +81,13 @@ class Mapper extends BaseMapper
         // Background related fields
         $this->hasMap(
             array(
-                'column'   => 'background_image_id',
+                'column'   => 'background_image_hash',
                 'property' => 'backgroundImage',
                 'type'     => self::TYPE_MODEL,
                 'join'     => 'backgroundImage',
                 'join_def' => array(
                     'mapper'    => \Schoolbox\Resource\Storage\Mapper::class,
-                    'other_key' => 'storage_id',
+                    'other_key' => 'hash',
                 )
             )
         );
