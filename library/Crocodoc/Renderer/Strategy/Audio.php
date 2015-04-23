@@ -52,7 +52,7 @@ class Audio extends Base {
 
 		try {
             $audioMapper = new \Schoolbox\Video\ResourceVideoMapper();
-            $audio = $audioMapper->findBySubmissionId($this->getSubmission()->getId());
+            $audio = $audioMapper->findByStorageHash($this->getSubmission()->getHash());
 		}
 		catch (\Exception $e) {
             $this->getPage()->setVar(array(
@@ -72,7 +72,7 @@ class Audio extends Base {
 		if ($audio->isComplete()) {
 			$this->getPage()->parse('injectable_audio_player_block', 'injectable_audio_player');
 			$this->getPage()->setVar(array(
-				'AUDIO_ID' => $audio->getFile()->getId(),
+				'AUDIO_ID' => $this->getSubmission()->getId(),
 				'injectable_audio_status_block' => ''
 			));
 		}
