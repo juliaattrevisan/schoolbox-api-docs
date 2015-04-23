@@ -55,7 +55,7 @@ $urlString = "{$_SERVER['HTTP_HOST']}/feed/news-school-rss.php?user={$_SESSION['
 
 // generate news and topic lists
 $topicMapper = new \Schoolbox\News\TopicMapper();
-$topicList = $topicMapper->findAll();
+$topicList = $topicMapper->findAll(array('order'=>array('sequence'=>'ASC')));
 
 $all = new \Schoolbox\News\Topic();
 $all->setName('All');

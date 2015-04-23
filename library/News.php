@@ -246,7 +246,7 @@ class News extends DeprecatedModel
             UNIX_TIMESTAMP(news_items.item_datetime_posted) AS post_datetime, item_image,
             news_items.item_datetime_posted, news_items.item_datetime_modified, news_items.item_datetime_published,
             UNIX_TIMESTAMP(news_items.item_datetime_expires) AS expire_datetime,
-            user.lastname, user.title, user.id as uid, user.firstname, user.synergy_id synid, newsTopic.name topicName, newsTopicID
+            user.lastname, user.title, user.id as uid, user.firstname, user.synergy_id synid, newsTopic.name topicName, newsTopicID, sequence
          FROM `" . $this->_table . "`
          LEFT JOIN user ON news_items.item_owner = user.id
          JOIN newsCampus ON newsCampus.id = news_items.item_id
@@ -260,7 +260,7 @@ class News extends DeprecatedModel
             AND news_items.item_datetime_expires $beforeOrAfter CURDATE()
             $topicFilter $yearFilter $monthFilter
          GROUP BY news_items.item_id
-         ORDER BY newsTopic.newsTopicID, news_items.item_datetime_posted DESC";
+         ORDER BY newsTopic.sequence ASC, news_items.item_datetime_posted DESC";
 
             $shareResults = $this->db->getAll($query);
         }
@@ -269,7 +269,7 @@ class News extends DeprecatedModel
 		SELECT DISTINCT news_items.item_id, news_items.item_heading, news_items.item_owner, news_items.item_body, item_image,
 			UNIX_TIMESTAMP(news_items.item_datetime_posted) AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
 			UNIX_TIMESTAMP(news_items.item_datetime_expires) AS expire_datetime, news_items.item_datetime_published,
-			user.lastname, user.title, user.firstname, user.id as uid, user.synergy_id synid, newsTopic.name topicName, newsTopicID
+			user.lastname, user.title, user.firstname, user.id as uid, user.synergy_id synid, newsTopic.name topicName, newsTopicID, sequence
 		FROM `" . $this->_table . "`
 		LEFT JOIN user ON news_items.item_owner = user.id
         LEFT JOIN newsUser ON newsUser.newsID = news_items.item_id
@@ -307,7 +307,7 @@ class News extends DeprecatedModel
 
         $query .= " AND news_items.item_datetime_expires $beforeOrAfter CURDATE()
                     $topicFilter $yearFilter $monthFilter
-                    ORDER BY newsTopic.newsTopicID, news_items.item_datetime_posted DESC;";
+                    ORDER BY newsTopic.sequence ASC, news_items.item_datetime_posted DESC;";
 
         $userResults = $this->db->getAll($query);
 
@@ -530,8 +530,8 @@ class News extends DeprecatedModel
      */
     public function cattimecmp($a, $b)
     {
-        if ($a['newsTopicID'] != $b['newsTopicID']) {
-            return $a['newsTopicID'] > $b['newsTopicID'] ? 1 : -1;
+        if ($a['sequence'] != $b['sequence']) {
+            return $a['sequence'] > $b['sequence'] ? 1 : -1;
         }
         // fall back to timecmp
         return $this->timecmp($a, $b);
@@ -554,7 +554,7 @@ class News extends DeprecatedModel
 	 */
     public function getTopicList()
     {
-        $query = "SELECT * FROM `newsTopic` ORDER BY `name`";
+        $query = "SELECT * FROM `newsTopic` ORDER BY `sequence` ASC, `name`";
         return $this->db->getAll($query);
     }
 

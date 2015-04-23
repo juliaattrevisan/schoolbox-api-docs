@@ -21,6 +21,9 @@ class Topic
     /** @var  string */
     protected $slug;
 
+    /** @var  int */
+    protected $sequence;
+
     /**
      * @param int $id
      */
@@ -71,5 +74,22 @@ class Topic
     {
         return $this->slug;
     }
+
+    /**
+     * @param int $sequence
+     */
+    public function setSequence($sequence)
+    {
+        $this->sequence = $sequence;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSequence()
+    {
+        return $this->sequence;
+    }
+
 
 } 
