@@ -3607,6 +3607,9 @@ ADMIN NAV
 			line-height: 22px;
 		}
     }
+    &.filter {
+        margin-top: 2em;
+    }
 }
 
 /*-------------------------------------------------------------
@@ -4220,6 +4223,8 @@ ADMINV2/MESSAGES
 		}
 	}
 	tr:not(.thead) {
+        height: 32px;
+        line-height: 32px;
 		&:hover {
 			td, th {
 				opacity: 1;
@@ -4239,15 +4244,25 @@ ADMINV2/MESSAGES
 		}
 	}
 	td, th {
-		transition: opacity 0.1s linear;
+        overflow: hidden;
+        border: none;
+        transition: opacity 0.1s linear;
 		position: relative;
+        .actions {
+            float: right;
+            padding-top: 4px;
+        }
+        label {
+            text-align: center;
+        }
 	}
 	th {
 		padding: 4px 32px 4px 8px;
 		white-space: nowrap;
 	}
 	td.perm {
-		padding: 4px 0;
+        min-width: 32px;
+        padding: 0 2px !important; // sorry!! :(
 		width: 2em;
 		&:last-child {
 			width: 100%;
@@ -4256,8 +4271,22 @@ ADMINV2/MESSAGES
 		input:checked + label {
 			background: @submit-btn;
 			color: #fff;
+            svg {
+                fill: #fff;
+            }
 		}
+        label {
+            display: block;
+        }
 	}
+    td.toggle {
+        white-space: nowrap;
+    }
+    td.custom {
+        > div {
+            display: none;
+        }
+    }
 	label {
 		margin: 0 4px;
 		width: 2em;
@@ -4267,6 +4296,15 @@ ADMINV2/MESSAGES
 		transition: background-color 0.1s linear;
         cursor: pointer;
 	}
+    input[disabled] {
+        + label {
+            opacity: 0.2;
+        }
+    }
+    svg, img[src^=".svg"] {
+        width: 16px;
+        margin-top: 5px;
+    }
 	.perm input {
         &[type=checkbox],
         &[type=radio] {
@@ -4282,6 +4320,12 @@ ADMINV2/MESSAGES
 		width: auto;
 		text-align: left;
 	}
+    .custom-descrip {
+        display: none;
+    }
+    .expanded .custom-descrip {
+        display: inline;
+    }
 }
 
 /*--------------------------------------------------------------
@@ -4436,6 +4480,14 @@ ADMINV2/MESSAGES
 
 }
 
+tr.ns {
+    th {
+        background-color: #fafafa;
+        &:not(:first-child) {
+            text-align: center;
+        }
+    }
+}
 
 
 
