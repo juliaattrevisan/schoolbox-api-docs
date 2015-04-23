@@ -1,4 +1,11 @@
-<h2>Entries And Results</h2>
+<table class="no-bottom-margin">
+    <thead class="generic-heading-highlight">
+        <tr>
+            <th>Entries And Results {{ year }}</th>
+        </tr>
+    </thead>
+</table>
+
 {% for courseName, allData in entriesAndResults.data %}
 <table>
     <tbody>
