@@ -63,7 +63,7 @@ cp -f $cachedir/cache.txt /vagrant/tools/browscap/cache.php;
 
 echo "$vag Loading Schoolbox MySQL Demo data";
 mysql -u root -ptnp879 -e "create database schoolbox";
-mysql -u root -ptnp879 schoolbox < $cachedir/schoolboxdemo-latest.sql
+mysql -u root -ptnp879 schoolbox < $cachedir/schoolboxdemo-latest.sql;
 
 # Check if flag provided to use a specific External DB
 if [ ! -z $1 ];
@@ -114,6 +114,9 @@ cp -f $cachedir/schoolboxdemo-vagrant-latest.sql /tmp/schoolboxdemo-vagrant-late
 
 echo "$vag Applying vagrant SQL fixes";
 mysql -u root -ptnp879 schoolbox < /tmp/schoolboxdemo-vagrant-latest.sql
+
+echo "$vag Applying UTF8 schema patch";
+/vagrant/tools/schema/collation.sh schoolbox;
 
 echo "$vag Removing existing apache vhosts";
 rm -f /etc/apache2/sites-enabled/10*;
