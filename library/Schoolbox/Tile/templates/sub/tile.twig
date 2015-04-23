@@ -9,7 +9,7 @@
         {{ tile.backgroundColor.alpha|e('css') }}
     );
     {% endif %}
-    {% if tile.backgroundImage.id %}
+    {% if tile.backgroundImage.hash %}
     background-image: url("/storage/image.php?size=maxsize&hash={{ tile.backgroundImage.hash|e('css') }}");
     {% endif %}
 }
