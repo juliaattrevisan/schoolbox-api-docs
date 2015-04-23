@@ -13,8 +13,6 @@ class Queue extends ResourceVideo
 {
 
     protected $id;
-    protected $fileID;
-    protected $type;
     protected $hash;
     protected $status;
     protected $message;
