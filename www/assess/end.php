@@ -62,7 +62,7 @@ $this->setBlock(TEMPLATE_content, 'view_attempt', 'view_attempt_block');
 
 $this->setTitle('Assessment: ' . $assess['title']);
 
-if ($attempt['finish'] == '0000-00-00 00:00:00') {
+if ($attempt['finish']) {
     $attemptFinishDate = Alaress_Date_Format::now();
 
     /** @var Attempt $attempt */

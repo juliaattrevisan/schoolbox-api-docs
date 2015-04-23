@@ -53,8 +53,8 @@ $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
 $this->setBlock(TEMPLATE_content, 'alreadyEnded', 'alreadyEnded_block');
 $this->setTitle('Assessment: ' . $survey['title']);
 
-if ($attempt['finish'] == '0000-00-00 00:00:00') {
-    $finishDate = new Alaress_Date_Format(time(), 'U');
+if ($attempt['finish']) {
+    $finishDate = Alaress_Date_Format::now();
 
     $attemptHandler->update(
         array(
@@ -63,7 +63,7 @@ if ($attempt['finish'] == '0000-00-00 00:00:00') {
         )
     );
 
-    $attemptEndDate = new Alaress_Date_Format(time(), 'U');
+    $attemptEndDate = Alaress_Date_Format::now();
 
     $this->setVar(
         array(
@@ -85,7 +85,7 @@ if ($attempt['finish'] == '0000-00-00 00:00:00') {
     }
 
 } else {
-    $attemptEndDate = new Alaress_Date_Format(strtotime($attempt['finish']), 'U');
+    $attemptEndDate = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 
     $this->setVar(
         array(
