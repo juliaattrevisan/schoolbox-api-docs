@@ -42,6 +42,13 @@
     font-style: italic;
 }
 
+/* thead/tr/th style subheading, for subheadings which can't
+ * go in thead element
+ */
+.achievement-report td.subheading {
+    font-weight: bold;
+}
+
 /* Key
  */
 .achievement-report dl.key {
@@ -57,13 +64,6 @@
 /**
  * School Grades
  */
-
-/* thead/tr/th style subheading, for subheadings which can't
- * go in thead element
- */
-.achievement-report.school-grades td.subheading {
-    font-weight: bold;
-}
 
 /* Spacer row
  */

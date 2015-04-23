@@ -37,9 +37,34 @@ class EntriesAndResults extends Base {
      */
     public function findData()
     {
-        $result = $this->findEntries();
+        $finalStack = array();
 
-        new Probe($this->explorerReporting(), $result);
+        $allResults = $this->findEntries();
+
+        foreach ($allResults as $current) {
+            $courseName = $current['CourseDescription'];
+
+            /* Trim empty teachers out for course teachers
+             */
+            $finalStack[$courseName]['allTeachers'][] = $current['ClassTeacher1'];
+            $finalStack[$courseName]['allTeachers'][] = $current['ClassTeacher2'];
+            $finalStack[$courseName]['allTeachers'][] = $current['ClassTeacher3'];
+            $finalStack[$courseName]['allTeachers'] = array_values(array_unique(array_filter($finalStack[$courseName]['allTeachers'])));
+
+            /* Misc data
+             */
+            $finalStack[$courseName]['allEntries'][] = array(
+                'NCEAStandardNumber' => $current['NCEAStandardNumber'],
+                'InternalorExternalAssessment' => $current['InternalorExternalAssessment'],
+                'StandardTitle' => $current['StandardTitle'],
+                'Level' => $current['Level'],
+                'EnteredCredits' => $current['EnteredCredits'],
+                'StrippedResult' => $current['StrippedResult'],
+                'ResultBrackets' => $current['ResultBrackets']
+            );
+        }
+
+        return $finalStack;
     }
 
     /**
@@ -53,7 +78,6 @@ class EntriesAndResults extends Base {
 
         $query = "
             SELECT
-                StudentYear,
                 CourseDescription,
                 ClassTeacher1,
                 ClassTeacher2,
@@ -63,12 +87,14 @@ class EntriesAndResults extends Base {
                 StandardTitle,
                 Level,
                 EnteredCredits,
+                StrippedResult,
                 CAST(CASE WHEN StudentYear = '{$this->getCurrentYear()}' AND InternalorExternalAssessment = 'EX' THEN 1 ELSE 0 END AS bit) AS ResultBrackets
             FROM
                 SynergyOne.dbo.uvSchoolBoxNCEAResults
             WHERE
                 id = '{$externalUserId}' AND
                 WithdrawnFlag = 0
+                AND StudentYear = '{$this->getYear()}'
         ";
 
         $result = $this->getDb()->getAll($query);

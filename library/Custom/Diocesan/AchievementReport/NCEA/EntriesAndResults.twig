@@ -1,0 +1,42 @@
+<h2>Entries And Results</h2>
+{% for courseName, allData in entriesAndResults.data %}
+<table>
+    <tbody>
+        <tr>
+            <td class="subheading" colspan="6">
+                {{ courseName }}
+
+                <ul class="teacher-list">
+                    {% for currentTeacher in allData.allTeachers %}
+                    <li><a href='#'>{{ currentTeacher }}</a>{% if not loop.last %}, {% endif %}</li>
+                    {% endfor %}
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td class="subheading centered numeric">Std</td>
+            <td class="subheading centered numeric">Int/Ext</td>
+            <td class="subheading">Title</td>
+            <td class="subheading centered numeric">Lvl</td>
+            <td class="subheading centered numeric">Credits</td>
+            <td class="subheading centered numeric">Result</td>
+        </tr>
+        {% for currentEntry in allData.allEntries %}
+        <tr>
+            <td class="centered numeric">{{ currentEntry.NCEAStandardNumber }}</td>
+            <td class="centered numeric">{{ currentEntry.InternalorExternalAssessment }}</td>
+            <td>{{ currentEntry.StandardTitle }}</td>
+            <td class="centered numeric">{{ currentEntry.Level }}</td>
+            <td class="centered numeric">{{ currentEntry.EnteredCredits }}</td>
+            <td class="centered numeric">
+                {% if (currentEntry.ResultBrackets == 1) and (currentEntry.StrippedResult|length > 0) %}
+                [{{ currentEntry.StrippedResult }}]
+                {% else %}
+                {{ currentEntry.StrippedResult }}
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endfor %}
