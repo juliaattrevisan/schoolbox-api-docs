@@ -12,12 +12,13 @@
     {% include '@ncea/CreditSummary.twig' %}
     {% include '@ncea/CreditSummaryGraphs.twig' with {dataset: creditSummary} %}
 
+    {% include '@ncea/CourseCreditSummaryNavigation.twig' %}
+
     {% if year > 0 %}
         <div class='clearfix'></div>
 
         <h2>Credit Summary - {{ year }}</h2>
         {% include '@ncea/CreditSummaryGraphs.twig' with {dataset: creditSummaryYear} %}
-
         {% include '@ncea/CourseCreditSummary.twig' %}
     {% endif %}
 

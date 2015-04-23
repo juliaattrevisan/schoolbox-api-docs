@@ -147,31 +147,49 @@ class Controller extends Base {
             )
         );
 
-        /* Conditionally, if a year was selected; do another round of
-         * processing specific to that year. Otherwise skip all this
-         * shenanigans altogether
+        /* The selected year should contain data. If a selected
+         * year contains no data, probably 404 or something - you
+         * could fiddle with the url to get illegal values
          */
-        if ($year) {
-            $creditSummaryYear = new NCEA\CreditSummary($externalUser, $db, $year);
-            $courseCreditSummary = new NCEA\CourseCreditSummary($externalUser, $db, $year);
+        $navigation = new NCEA\CourseCreditSummaryNavigation($externalUser, $db, null);
+        $allYears = $navigation->findData();
 
-            /* Credit Summary graphs for a specific year
+        if (count($allYears)) {
+
+            /* Course Credit Summary year selectors
              */
-            $output['data']['creditSummaryYear'] = array(
-                'data' => $creditSummaryYear->findData(),
-                'allLetters' => $creditSummaryYear->getLetterRegistry(),
+            $output['data']['courseCreditSummaryNavigation'] = array(
+                'heading' => $navigation->getHeading(),
+                'all' => $allYears,
+                'selected' => $year
+            );
 
-                /* Suffix for graph div id's
+            /* Conditionally, if a year was selected; do another round of
+             * processing specific to that year. Otherwise skip all this
+             * shenanigans altogether
+             */
+            if ($year) {
+                $creditSummaryYear = new NCEA\CreditSummary($externalUser, $db, $year);
+                $courseCreditSummary = new NCEA\CourseCreditSummary($externalUser, $db, $year);
+
+                /* Course Credit Summary graphs for a specific year
                  */
-                'suffix' => "year{$year}",
-            );
+                $output['data']['creditSummaryYear'] = array(
+                    'data' => $creditSummaryYear->findData(),
+                    'allLetters' => $creditSummaryYear->getLetterRegistry(),
 
-            /* Course Credit Summary for a specific year
-             */
-            $output['data']['courseCreditSummary'] = array(
-                'data' => $courseCreditSummary->findData(),
-                'allLetters' => $courseCreditSummary->getLetterRegistry(),
-            );
+                    /* Suffix for graph div id's
+                     */
+                    'suffix' => "year{$year}",
+                );
+
+                /* Course Credit Summary for a specific year
+                 */
+                $output['data']['courseCreditSummary'] = array(
+                    'data' => $courseCreditSummary->findData(),
+                    'allLetters' => $courseCreditSummary->getLetterRegistry(),
+                );
+            }
         }
 
         $this->getResponse()->content->set($output);
