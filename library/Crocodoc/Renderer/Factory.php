@@ -114,7 +114,7 @@ class Factory {
      */
     private function crocodocable(Submission\File $submission)
     {
-        $ext = pathinfo($submission->getStorage()->getFilename(), PATHINFO_EXTENSION);
+        $ext = $submission->getStorage()->getExtension();
 
         return strlen(\Cfg::get('crocodoc_api_token')) && in_array($ext, $this->getAllowedFileTypes());
     }
