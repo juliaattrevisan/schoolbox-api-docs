@@ -171,6 +171,7 @@ class Controller extends Base {
             if ($year) {
                 $creditSummaryYear = new NCEA\CreditSummary($externalUser, $db, $year);
                 $courseCreditSummary = new NCEA\CourseCreditSummary($externalUser, $db, $year);
+                $entriesAndResults = new NCEA\EntriesAndResults($externalUser, $db, $year);
 
                 /* Course Credit Summary graphs for a specific year
                  */
@@ -188,6 +189,12 @@ class Controller extends Base {
                 $output['data']['courseCreditSummary'] = array(
                     'data' => $courseCreditSummary->findData(),
                     'allLetters' => $courseCreditSummary->getLetterRegistry(),
+                );
+
+                /* Entries And Results for a specific year
+                 */
+                $output['data']['entriesAndResults'] = array(
+                    'data' => $entriesAndResults->findData(),
                 );
             }
         }
