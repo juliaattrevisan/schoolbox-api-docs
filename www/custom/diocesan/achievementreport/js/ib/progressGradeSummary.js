@@ -30,6 +30,10 @@
                  */
                 title: '',
 
+                /* Colour stack for the bars
+                 */
+                colors: [],
+
                 /* Term 2, Term 4
                  */
                 categories: [],
@@ -53,6 +57,7 @@
                 chart: {
                     type: 'bar'
                 },
+                colors: config.colors,
                 title: {
                     text: ''
                 },

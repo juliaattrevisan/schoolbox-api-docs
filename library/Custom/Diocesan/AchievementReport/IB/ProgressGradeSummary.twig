@@ -1,6 +1,7 @@
 <script type="text/javascript">
     $(function() {
         $('#element').ib_progressGradeSummary({
+            colors: ['#5f0466', '#6399fd', '#2e9c2f', '#fe07fe', '#7fc9fc', '#fd9800', '#fe3299'],
             categories: [
                 {% for year, allTerms in progressGradeSummary.data.tableStack %}
                 {% for currentTerm, values in allTerms %}
