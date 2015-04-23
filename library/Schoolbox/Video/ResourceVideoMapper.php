@@ -76,6 +76,14 @@ class ResourceVideoMapper extends Mapper
             )
         );
         $this->hasJoin(
+            'myfile', array(
+                'mapper'    => '\\Schoolbox\\Resource\\My\\File\\Mapper',
+                'this_key'  => 'hash',
+                'other_key' => 'hash',
+            )
+        );
+
+        $this->hasJoin(
             'storage', array(
                 'mapper'    => Schoolbox\Resource\Storage\Mapper::class,
                 'this_key'  => 'hash',
@@ -293,7 +301,7 @@ class ResourceVideoMapper extends Mapper
      */
     public function findByMyFileId($id)
     {
-        $fileMapper = new Schoolbox\Resource\FileMapper;
+        $fileMapper = new \Schoolbox\Resource\My\File\Mapper();
 
         $statement = $this->database->prepare(
             "
@@ -301,10 +309,9 @@ class ResourceVideoMapper extends Mapper
                 {$fileMapper->getColumnString('mf')},
                 {$this->getColumnString('vq')}
             FROM `{$this->getTable()}` vq
-            JOIN {$this->getJoinSQL('file', 'vq', 'mf')}
+            JOIN {$this->getJoinSQL('myfile', 'vq', 'mf')}
             WHERE mf.id = ?
             AND vq.status = 'completed'
-            AND vq.type='myfile'
         "
         );
 
