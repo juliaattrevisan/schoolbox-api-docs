@@ -43,6 +43,8 @@ class EntriesAndResults extends Base {
 
         foreach ($allResults as $current) {
             $courseName = $current['CourseDescription'];
+            $internalExternal = $current['InternalorExternalAssessment'];
+            $letter = $current['StrippedResult'];
 
             /* Teachers
              * Trim empty teachers out for course teachers
@@ -64,8 +66,32 @@ class EntriesAndResults extends Base {
                 'ResultBrackets' => $current['ResultBrackets']
             );
 
-            /* Letters
+            /* Letter summary stuff
              */
+            if (!is_array($finalStack[$courseName]['summary'])) {
+                $finalStack[$courseName]['summary'] = array(
+                    'level' => '',
+                    'totalEnteredCredits' => 0,
+                    'type' => array(
+                        'IN' => array(
+                            'enteredCredits' => 0,
+                            'letters' => array_fill_keys($this->getLetterRegistry(), 0),
+                            'availableCredits' => 0
+                        ),
+                        'EX' => array(
+                            'enteredCredits' => 0,
+                            'letters' => array_fill_keys($this->getLetterRegistry(), 0),
+                            'availableCredits' => 0
+                        )
+                    )
+                );
+            }
+
+            $finalStack[$courseName]['summary']['level'] = $current['Level'];
+            $finalStack[$courseName]['summary']['totalEnteredCredits'] += $current['EnteredCredits'];
+            $finalStack[$courseName]['summary']['type'][$internalExternal]['enteredCredits'] += $current['EnteredCredits'];
+            $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
+            $finalStack[$courseName]['summary']['type'][$internalExternal]['availableCredits'] += ($current['EnteredCredits'] - $current['ResultCredits']);
         }
 
         return $finalStack;
@@ -92,6 +118,7 @@ class EntriesAndResults extends Base {
                 Level,
                 EnteredCredits,
                 StrippedResult,
+                ResultCredits,
                 CAST(CASE WHEN StudentYear = '{$this->getCurrentYear()}' AND InternalorExternalAssessment = 'EX' THEN 1 ELSE 0 END AS bit) AS ResultBrackets
             FROM
                 SynergyOne.dbo.uvSchoolBoxNCEAResults

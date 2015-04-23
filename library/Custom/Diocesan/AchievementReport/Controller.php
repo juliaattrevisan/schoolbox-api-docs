@@ -195,6 +195,8 @@ class Controller extends Base {
                  */
                 $output['data']['entriesAndResults'] = array(
                     'data' => $entriesAndResults->findData(),
+                    'allLetters' => $entriesAndResults->getLetterRegistry(),
+                    'allTypes' => array('IN', 'EX'),
                 );
             }
         }
