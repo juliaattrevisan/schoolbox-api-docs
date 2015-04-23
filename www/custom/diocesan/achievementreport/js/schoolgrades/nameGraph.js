@@ -30,6 +30,10 @@
                  */
                 title: '',
 
+                /* Colour stack for the bars
+                 */
+                colors: [],
+
                 /* Year 10, 9, 8...
                  */
                 categories: [],
@@ -55,9 +59,7 @@
                 chart: {
                     type: 'bar'
                 },
-                colors: [
-                    '#CF0E0E', '#CF950E', '#98CF0E', '#0ECF32', '#697585'
-                ],
+                colors: config.colors,
                 title: {
                     text: config.title
                 },
