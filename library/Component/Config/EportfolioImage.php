@@ -27,13 +27,13 @@ class Component_Config_EportfolioImage extends Component_Config_Abstract
             foreach ($allImages as $currentImage) {
                 $page->setVar(array(
                     'COMPONENT_CONFIG_FILE_ID' => $currentImage->getId(),
-                    'COMPONENT_CONFIG_FILE_DESCRIPTION' => $currentImage->getDescription()
+                    'COMPONENT_CONFIG_FILE_DESCRIPTION' => $currentImage->getTitle()
                 ));
 
                 if ($currentImage->getId() == $configValue) {
                     $page->setVar(array(
                         'COMPONENT_CONFIG_IMAGE_SELECTED' => ' selected="selected"',
-                        'IMAGE_TITLE' => $currentImage->getDescription()
+                        'IMAGE_TITLE' => $currentImage->getTitle()
                     ));
                 } else {
                     $page->setVar('COMPONENT_CONFIG_IMAGE_SELECTED', '');

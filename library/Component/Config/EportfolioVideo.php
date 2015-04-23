@@ -30,7 +30,7 @@ class Component_Config_EportfolioVideo extends Component_Config_Abstract
         if ($allVideos->count()) {
             foreach ($allVideos as $currentVideo) {
                 $page->setVar(array(
-                    'COMPONENT_CONFIG_VIDSELECT_NAME' => Scrub::text($currentVideo->getFile()->getDescription()),
+                    'COMPONENT_CONFIG_VIDSELECT_NAME' => Scrub::text($currentVideo->getFile()->getTitle()),
                     'COMPONENT_CONFIG_VIDSELECT_VALUE' => $currentVideo->getFile()->getId(),
                     'COMPONENT_CONFIG_VIDSELECT_SELECTED' => $currentVideo->getFile()->getId() == $configValue ? 'selected="selected"' : '',
                 ));

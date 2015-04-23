@@ -103,9 +103,9 @@ class Component_Eportfolio_VideoController extends Component_Eportfolio_Controll
             foreach ($this->outputList as $video) {
                 $this->setVar(array(
                     'VIDEO_LIST_ID' => $video->getFile()->getId(),
-                    'VIDEO_LIST_TITLE' => Scrub::text($video->getFile()->getDescription()),
+                    'VIDEO_LIST_TITLE' => Scrub::text($video->getFile()->getTitle()),
                     'VIDEO_LIST_DURATION' => $video->getDuration() >= 3600 ? gmdate('H:i:s', $video->getDuration()) : gmdate('i:s', $video->getDuration()),
-                    'VIDEO_LIST_COMMENT' => Scrub::text($video->getFile()->getDescription()),
+                    'VIDEO_LIST_COMMENT' => Scrub::text($video->getFile()->getTitle()),
                     'VIDEO_LIST_POSTER_ID' => $video->getFile()->getOwner()->getId(),
                     'VIDEO_LIST_POSTER' => $video->getFile()->getOwner()->getFullName(),
                     'ON_OFF' => ++$j % 2 ? '' : 'dark'

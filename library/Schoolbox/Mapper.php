@@ -1481,7 +1481,26 @@ abstract class Mapper implements IMapper, Serializable
         $where_parts = array();
         $params      = array();
         foreach ($columnList as $columnName => $columnValue) {
-            $escaped_name = $this->database->quoteIdentifier($this->getTable()) . '.' . $this->database->quoteIdentifier($columnName);
+
+            // accommodate joins
+            $xpl = explode('.', $columnName) ?: [];
+
+            if (count($xpl) == 1) {
+                $table = $this->getTable();
+                $field = $xpl[0];
+            } elseif (count($xpl) == 2) {
+                $table = $xpl[0];
+                $field = $xpl[1];
+
+                // remove the period so SQL doesn't freak out
+                $columnName = str_replace('.', '_', $columnName);
+
+            } else {
+                // bad
+                continue;
+            }
+
+            $escaped_name = $this->database->quoteIdentifier($table) . '.' . $this->database->quoteIdentifier($field);
             if (!isset($columnValue)) {
                 $where_parts[] = "$escaped_name IS NULL";
             } else {

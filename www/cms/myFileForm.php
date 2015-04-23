@@ -61,10 +61,11 @@ if (isset($_POST['description'])) {
 
     // if file was synchronously uploaded
     if ($_FILES['file']['name'] && is_uploaded_file($_FILES['file']['tmp_name'])) {
-        $file->setTempFileLocation($_FILES['file']['tmp_name']);
-        $file->setFilename($_FILES['file']['name']);
-        $file->setFilesize(filesize($_FILES['file']['tmp_name']));
-        $file->setMimetype(\Schoolbox\File\MimetypeMapper::getInstance()->getByFilename($file->getFilename()));
+        // dump into storage
+        $storage = Schoolbox\Resource\Storage\Mapper::getInstance()->accept($_FILES['file']['name'], $_FILES['file']['tmp_name'], false);
+
+        // and link onto a fresh object
+        $file = MyFileMapper::getInstance()->createModel()->setStorage($storage);
     }
 
     // set attributes
