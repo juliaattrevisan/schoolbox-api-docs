@@ -36,8 +36,8 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
       * Otherwise, show the last time their responses were updated, or that
       * they never even attempted the test.
       */
-    if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
-        $attemptFinishDate = new Alaress_Date_Format($currentAttempt['finish'], 'Y-m-d');
+    if ($currentAttempt['finish']) {
+        $attemptFinishDate = new Alaress_Date_Format($currentAttempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 
         $finish = $attemptFinishDate->getShort();
         $timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
@@ -47,7 +47,7 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         if (empty($finish)) {
             $finish = 'Unfinished';
         } else {
-            $attemptFinishDate = new Alaress_Date_Format(strtotime($finish), 'U');
+            $attemptFinishDate = new Alaress_Date_Format($finish, Alaress_Date_Format::DATABASE_FORMAT);
 
             $finish = $attemptFinishDate->getShort();
         }
@@ -68,7 +68,7 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
     /* Check when the test was reviewed
       */
     if ($currentAttempt['reviewed_at'] != '') {
-        $reviewedDate = new Alaress_Date_Format(strtotime($currentAttempt['reviewed_at']), 'U');
+        $reviewedDate = new Alaress_Date_Format($currentAttempt['reviewed_at'], Alaress_Date_Format::DATABASE_FORMAT);
 
         $reviewedAt = 'Reviewed on ' . $reviewedDate->getShort();
     } else {

@@ -582,6 +582,20 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
+     * Translates a column to a property field
+     *
+     * @param $column
+     * @return mixed
+     */
+    protected function getPropertyFromColumn($column) {
+        foreach($this->map as $map) {
+            if($map['column'] == $column) {
+                return $map['property'];
+            }
+        }
+    }
+
+    /**
      * Overridden to use setter and hydrator instead of setting property
      * directly.
      *
@@ -1715,7 +1729,7 @@ abstract class Mapper implements IMapper, Serializable
                     }
                     $joinSchema = $this->joins[$map['join']];
                     $joinMulti  = $joinSchema['multi'];
-                    $thisKey    = $this->getModelProperty($model, $joinSchema['this_key']);
+                    $thisKey    = $this->getModelProperty($model, $this->getPropertyFromColumn($joinSchema['this_key']));
                     // step 1: delete existing relations in join table
                     $deleteRelationStatement = $this->database->prepare(
                         "

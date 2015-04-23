@@ -91,7 +91,7 @@ if ($attempt['finish'] == '0000-00-00 00:00:00') {
     $this->setVar('alreadyEnded_block', '');
     $this->parse('endAssess_block', 'endAssess');
 } else {
-    $attemptFinishDate = new Alaress_Date_Format(strtotime($attempt['finish']), 'U');
+    $attemptFinishDate = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 
     $this->setVar(
         array(

@@ -61,7 +61,6 @@ if (is_array($allAttempts) && count($allAttempts)) {
 
     foreach ($allAttempts as $currentAttempt) {
         $i++;
-        $isFinished = false;
         $canReview = false;
 
         $firstSection = $sectionHandler->getFirst($this->arg[0]);
@@ -73,19 +72,18 @@ if (is_array($allAttempts) && count($allAttempts)) {
             'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
         ));
 
-        $startDate = new Alaress_Date_Format($currentAttempt['start'], 'Y-m-d H:i:s');
+        $startDate = new Alaress_Date_Format($currentAttempt['start'], Alaress_Date_Format::DATABASE_FORMAT);
 
         /* For attempts that are still in progress
          */
-        $isFinished = ($currentAttempt['finish'] != '0000-00-00 00:00:00') && strlen($currentAttempt['finish']);
 
-        if ($isFinished) {
+        if ($currentAttempt['finish']) {
 
 			/* Calculate time taken in hrs
 			 */
 			$timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
 
-			$finishDate = new Alaress_Date_Format($currentAttempt['finish'], 'Y-m-d H:i:s');
+			$finishDate = new Alaress_Date_Format($currentAttempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
             $finishDateValue = $finishDate->getShort();
 
 			/* Parse review link
@@ -150,7 +148,7 @@ if (is_array($allAttempts) && count($allAttempts)) {
 
         /* Parse these blocks first
          */
-        if ($isFinished) {
+        if ($currentAttempt['finish']) {
             if ($canReview) {
                 $this->setVar(array(
                         'attempt_resume_block' => ''

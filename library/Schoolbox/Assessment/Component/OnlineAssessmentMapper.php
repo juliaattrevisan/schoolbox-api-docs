@@ -169,7 +169,7 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
 			'other_key' => 'id',
 		));
 
-        $this->joinsVia(
+       $this->joinsVia(
             'curriculum_node_for_assess',
             Node\Mapper::class,
             'id',
