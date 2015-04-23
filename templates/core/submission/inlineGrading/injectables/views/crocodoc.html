@@ -1,16 +1,21 @@
 <h2>Document Preview</h2>
 <section class="component-control-container">
-	<a href="#" data-interaction="toggle-width" class="btn go-to no-text" title"Toggle width"><span></span></a>
+	<a href="#" data-interaction="toggle-width" class="btn go-to no-text" title="Toggle width"><span></span></a>
 </section>
 
 <iframe id="inline-grading" class="inline-grading-iframe"></iframe>
 
-<script>
+<script type="text/javascript">
     $(document).ready(function(){
 
-        $('a[data-interaction="toggle-width"]').on('click', function(){
-            $(this).closest('.inline-grading-column').toggleClass('fullwidth');
-            $(this).toggleClass('go-to go-back');
+        $('a[data-interaction="toggle-width"]').on('click', function (event) {
+            $(this)
+                .toggleClass('go-to go-back')
+                .closest('[data-interaction="crocodoc-frame"]')
+                .toggleClass('fullwidth')
+                .siblings('[data-interaction="mark-controls"]')
+                .toggleClass('right');
+
             event.preventDefault();
         });
 
