@@ -3,6 +3,8 @@
         $('[data-graph="total-achieved-credits-{{ dataset.suffix }}"]').ncea_stackedBar({
             title: 'Total Achieved Credits',
 
+            colors: ['#d0cecf', '#053563'],
+
             categories: [
                 {% for currentLevel, allLevelValues in dataset.data.graph.totalAchievedCredits %}
                 '{{ currentLevel }}'{% if not loop.last %}, {% endif %}

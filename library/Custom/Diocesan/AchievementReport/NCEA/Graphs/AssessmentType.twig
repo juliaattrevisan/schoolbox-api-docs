@@ -3,6 +3,8 @@
         $('[data-graph="assessment-type-{{ dataset.suffix }}"]').ncea_stackedBar({
             title: 'Assessment Type',
 
+            colors: ['#fe3299', '#7fc9fc', '#fd9800'],
+
             categories: [
                 {% for currentLevel, allLevelValues in dataset.data.graph.assessmentType %}
                 '{{ currentLevel }}'{% if not loop.last %}, {% endif %}

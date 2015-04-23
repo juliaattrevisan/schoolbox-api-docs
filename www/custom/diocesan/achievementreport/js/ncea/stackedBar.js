@@ -30,6 +30,10 @@
                  */
                 title: '',
 
+                /* Colour stack for the bars
+                 */
+                colors: [],
+
                 /* Y Axis title
                  *
                  * Note that in horizontal barcharts x and y are
@@ -62,6 +66,7 @@
                 chart: {
                     type: 'bar'
                 },
+                colors: config.colors,
                 title: {
                     text: config.title
                 },

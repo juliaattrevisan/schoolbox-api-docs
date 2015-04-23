@@ -3,6 +3,8 @@
         $('[data-graph="result-{{ dataset.suffix }}"]').ncea_stackedBar({
             title: 'Result',
 
+            colors: ['#5f0466', '#6399fd', '#2e9c2f', '#fe07fe'],
+
             categories: [
                 {% for currentLevel, allLevelValues in dataset.data.graph.result %}
                 '{{ currentLevel }}'{% if not loop.last %}, {% endif %}
