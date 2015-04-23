@@ -105,3 +105,8 @@
 {
     width: 7.14%
 }
+
+.achievement-report.ncea table.summary th.level,
+.achievement-report.ncea table.summary td.level {
+    width: 100px;
+}
