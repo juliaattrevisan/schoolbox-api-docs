@@ -49,6 +49,16 @@
     font-weight: bold;
 }
 
+/* Colours - Internal/External background colours
+ */
+.achievement-report .type-pink {
+    background-color: #ff33ff
+}
+
+.achievement-report .type-blue {
+    background-color: #66b2ff
+}
+
 /* Key
  */
 .achievement-report dl.key {
