@@ -22,6 +22,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vb.customize ["modifyvm", :id, "--memory", "2048"]
   end
 
+  config.vm.provider "vmware_fusion" do |vf|
+    vf.vmx["memsize"] = "2048"
+  end
+
   # Default provision script
   config.vm.provision "shell" do |s|
     s.path = "tools/vagrant-provision-ubuntu-1204.sh"
