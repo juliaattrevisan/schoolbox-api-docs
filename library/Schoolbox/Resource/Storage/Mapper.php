@@ -17,7 +17,6 @@ use Schoolbox\File;
 use Schoolbox\Collection;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Video;
-use Schoolbox\Video\Queue;
 use Schoolbox\Video\QueueMapper;
 /**
  * Class Mapper
@@ -62,17 +61,6 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         $this->uses('public', self::TYPE_BOOLEAN);
         $this->uses('ext', self::TYPE_STRING, null, 'extension');
 
-        // This joins to video Q now, and I can't hydrate it manually because
-        // it joins to ID and if I define ID on this mapper I can no longer save
-        $this->hasJoin(
-            'queue',
-            [
-                'mapper'    => QueueMapper::class,
-                'this_key'  => 'hash',
-                'other_key' => 'hash',
-            ]
-        );
-
         // derived field; mimetype automatically joined via the extension
         $this->joinsVia('allowedFileExtension', MimetypeMapper::class, 'fileTypeID', 'fileTypeID', 'extension', 'ext', self::TYPE_MODEL, self::COLUMN_JOIN_READONLY, 'mimetype');
 
@@ -106,8 +94,8 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         $saveResult = $this->mgr->save($storage);
 
         if ($storage->getMimeType()->isVideo() || $storage->getMimetype()->isAudio()) {
-            $mapper = new QueueMapper();
-            $videoQ = new Queue();
+            $mapper = QueueMapper::getInstance();
+            $videoQ = $mapper->createModel();
             $videoQ->setHash($storage->getHash());
             $videoQ->setStatus(QueueMapper::STATUS_PENDING);
 

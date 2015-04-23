@@ -16,7 +16,6 @@ use League\Flysystem\FileNotFoundException;
 use League\Flysystem\FilesystemInterface;
 use RuntimeException;
 use Schoolbox\File\Mimetype;
-use Schoolbox\Video\Queue;
 
 /**
  * Class Model
@@ -52,35 +51,16 @@ class Model extends File implements IStorage
     /** @var string */
     protected $extension;
 
-    /**
-     * @var Queue
-     */
-    protected $queue;
 
+    /**
+     * @param FilesystemInterface $filesystem
+     * @param string              $path
+     */
     public function __construct(FilesystemInterface $filesystem = null, $path = null)
     {
         parent::__construct($filesystem, $path);
-        $this->setQueue(new Queue());
     }
 
-    /**
-     * @return Queue
-     */
-    public function getQueue()
-    {
-        return $this->queue;
-    }
-
-    /**
-     * @param  Queue $queue
-     *
-     * @return $this
-     */
-    public function setQueue($queue)
-    {
-        $this->queue = $queue;
-        return $this;
-    }
 
     /**
      * @return string

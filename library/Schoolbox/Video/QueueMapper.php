@@ -26,18 +26,6 @@ class QueueMapper extends Mapper {
 	const FILE_TYPE_SUBMISSION = 'submission';
 	const FILE_TYPE_MYFILE = 'myfile';
 
-    /**
-     * @deprecated the video queue table should join by hash, not ID
-     *
-     * @param \Schoolbox\Resource\Storage\Model $storage
-     * @return int
-     */
-    public function findFileInternalId($storage)
-    {
-        $hash = $storage->getHash();
-        return $this->getDatabase()->query("SELECT storage_id FROM storage WHERE `hash` = ?", [ $hash ])->fetchColumn();
-    }
-
     protected function mapping () {
         $this->hasTable('video_queue');
         $this->hasModel('\\Schoolbox\\Video\\Queue');
