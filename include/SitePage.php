@@ -380,6 +380,7 @@ class SitePage extends Page
 
                 $this->setVar(array(
                                     'MENU_SWITCH_USERID'        => $linkedUser->getId(),
+                                    'MENU_SWITCH_EXTERNAL_ID'   => $linkedUser->getExternalId(),
                                     'MENU_SWITCH_USER_FULLNAME' => $linkedUser->getFullName(),
                                     'MENU_SWITCH_USER_ROLE'     => $linkedUser->getRole()->getName(),
                                     )
@@ -396,6 +397,7 @@ class SitePage extends Page
             if($_SESSION['previous']['user'] instanceof \Schoolbox\User) {
                 $this->setVar(array(
                                     'MENU_SWITCH_USERID'        => $_SESSION['previous']['user']->getId(),
+                                    'MENU_SWITCH_EXTERNAL_ID'   => $_SESSION['previous']['user']->getExternalId(),
                                     'MENU_SWITCH_USER_FULLNAME' => $_SESSION['previous']['user']->getFullName(),
                                     'MENU_SWITCH_USER_ROLE'     => $_SESSION['previous']['user']->getRole()->getName(),
                                     )
