@@ -17,7 +17,7 @@ class ZipFolder
         $this->allowedChars = "[^0-9a-zA-Z()_-]";
         $this->size = 0;
         $this->maxDepth = 5;
-        $this->maxSize = 262144000; //250MB
+        $this->maxSize = 1073741824; //1GB
 
         $this->groupHandler = new Group;
 
@@ -106,7 +106,7 @@ class ZipFolder
                     if ($this->getPermission($folder['id']) > DENY_ACCESS) {
                         $folderName = $this->cleanName($folder['name']);
                         $folderLocation = $currentDir . '/' . $folderName;
-                        @mkdir($folderLocation);
+                        mkdir($folderLocation);
                         $this->createDirectory($folderLocation, $folder['id'], $depth+1);
                     }
                 }
