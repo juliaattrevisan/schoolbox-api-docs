@@ -1,4 +1,5 @@
 <?php
+use Schoolbox\Resource\File\Model;
 
 /**
  *
@@ -94,27 +95,34 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
         if (count($this->outputList)) {
             $j = 0;
             foreach ($this->outputList as $audio) {
+
+                /**
+                 * We can be assured that files here are SBFS files
+                 * @var Model $file
+                 */
+                $file = $audio->getFile();
+
                 if ($j === 0) {
                     // output the default audio, and audio player
                     $this->setVar(
                         array(
-                            'DEFAULT_AUDIO_TITLE' => Scrub::text($audio->getFile()->getDescription()),
-                            'DEFAULT_AUDIO_ID'    => $audio->getFile()->getId(),
+                            'DEFAULT_AUDIO_TITLE' => Scrub::text($file->getTitle()),
+                            'DEFAULT_AUDIO_ID'    => $file->getId(),
                         )
                     );
                     $this->parse('default_audio_block', 'default_audio');
                 }
                 if (count($this->outputList) > 1) {
                     $output = array(
-                        'AUDIO_LIST_ID'        => $audio->getFile()->getId(),
-                        'AUDIO_LIST_TITLE'     => Scrub::text($audio->getFile()->getDescription()),
+                        'AUDIO_LIST_ID'        => $file->getId(),
+                        'AUDIO_LIST_TITLE'     => Scrub::text($file->getTitle()),
                         'AUDIO_LIST_DURATION'  => $audio->getDuration() >= 3600
                                 ? gmdate('H:i:s', $audio->getDuration())
                                 : gmdate('i:s', $audio->getDuration()),
-                        'AUDIO_LIST_COMMENT'   => Scrub::text($audio->getFile()->getComment()),
-                        'AUDIO_LIST_HIDDEN'    => $audio->getFile()->getHidden() ? 'hidden' : '',
-                        'AUDIO_LIST_POSTER_ID' => $audio->getFile()->getOwner()->getId(),
-                        'AUDIO_LIST_POSTER'    => $audio->getFile()->getOwner()->getFullName(),
+                        'AUDIO_LIST_COMMENT'   => Scrub::text($file->getDescription()),
+                        'AUDIO_LIST_HIDDEN'    => $file->isHidden() ? 'hidden' : '',
+                        'AUDIO_LIST_POSTER_ID' => $file->getOwner()->getId(),
+                        'AUDIO_LIST_POSTER'    => $file->getOwner()->getFullName(),
                         'ON_OFF'               => ++$j % 2 ? '' : 'dark'
                     );
 
