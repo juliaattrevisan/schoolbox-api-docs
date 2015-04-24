@@ -16,14 +16,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # your network, and is accessible by others.
   #
   # Comment this out for the vm to only be available on your machine.
-  #config.vm.network :public_network
+  config.vm.network :public_network
 
   config.vm.provider :virtualbox do |vb|
-    vb.customize ["modifyvm", :id, "--memory", "2048"]
+    vb.customize ["modifyvm", :id, "--memory", "1024"]
   end
 
   config.vm.provider "vmware_fusion" do |vf|
-    vf.vmx["memsize"] = "2048"
+    vf.vmx["memsize"] = "1024"
   end
 
   # Default provision script
