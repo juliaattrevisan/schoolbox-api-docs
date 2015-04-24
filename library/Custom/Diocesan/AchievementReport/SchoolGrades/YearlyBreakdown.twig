@@ -8,6 +8,10 @@
         if (!isNaN(preselectedYear)) {
             $('[data-year="' + preselectedYear + '"').addClass('current');
             $('[data-yearly-breakdown-year="' + preselectedYear + '"]').show();
+
+            /* Move to navigation element
+             */
+            $(document).scrollTop($('[data-year-selector="true"]').offset().top);
         }
 
         /* Select a breakdown to view
@@ -20,6 +24,19 @@
 
             $('[data-yearly-breakdown="true"]').hide();
             $('[data-yearly-breakdown-year="' + $(this).attr('data-year') + '"]').show();
+
+            /* Update url by removing the last four digits (selected year)
+             * and appending the newly selected year
+             *
+             * This allows you to bookmark hidden divs, since it works in
+             * conjunction with aura routing
+             */
+            var baseUrl = window.location.href.replace(/\/(\d{4})$/, '');
+            window.history.pushState('', '', baseUrl + '/' + $(this).attr('data-year'));
+
+            /* Move to navigation element
+             */
+            $(document).scrollTop($('[data-year-selector="true"]').offset().top);
         });
     });
 </script>
