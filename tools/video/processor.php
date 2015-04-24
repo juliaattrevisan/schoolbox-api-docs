@@ -47,7 +47,7 @@ $failed  = 0;
 $success = 0;
 foreach ($pendingQueue as $vid) {
 
-	$file_id = $vid->getFileID();
+	$file_id = $vid->getHash();
 
 	/* Update video to indicate processing has begun */
 	echo strftime("[%F %T] Starting process of media #$file_id\n");

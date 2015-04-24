@@ -1,0 +1,22 @@
+<h2>Audio</h2>
+
+<!-- BEGIN injectable_audio_player -->
+<link href="/javascript/components/mediaelement/build/mediaelementplayer.min.css" rel="stylesheet">
+<script src="/javascript/components/mediaelement/build/mediaelement-and-player.min.js"></script>
+<script>
+    var videoElement = $("#audio").mediaelementplayer();
+    var video        = videoElement.data('mediaelementplayer');
+</script>
+<div class="audioWrapper">
+	<audio id="audio" controls preload="none">
+		<source src="/cms/sendVideo.php?type=submission&id={AUDIO_ID}" type='audio/mp3'>
+	</audio>
+</div>
+<!-- END injectable_audio_player -->
+
+<!-- BEGIN injectable_audio_status -->
+<img src="{INJECTABLE_AUDIO_STATUS_SRC}" />
+<p>
+	{INJECTABLE_AUDIO_STATUS_MSG}
+</p>
+<!-- END injectable_audio_status -->
