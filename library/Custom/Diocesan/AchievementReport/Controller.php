@@ -133,6 +133,7 @@ class Controller extends Base {
         $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($externalUser, $db, $year);
         $qualifications = new NCEA\Qualifications($externalUser, $db, null);
         $creditSummary = new NCEA\CreditSummary($externalUser, $db, null);
+        $footer = new NCEA\Footer($externalUser, $db, null);
 
         $output = array(
             'template' => '@ncea/index.twig',
@@ -140,6 +141,9 @@ class Controller extends Base {
                 'navigation' => array(
                     'all' => $this->getNavigation(),
                     'selected' => 'ncea'
+                ),
+                'footer' => array(
+                    'data' => $footer->findData(),
                 ),
                 'preselectedYear' => $year,
                 'externalUser' => $externalUser,
