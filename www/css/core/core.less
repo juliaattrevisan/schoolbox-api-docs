@@ -11712,15 +11712,24 @@ form.comment-form label {
 	text-decoration: line-through;
 }
 
-.mark-sheet td{
-	width: @slanty-header-width;
-	border-color: @border-color;
-	border-top: 1px solid @border-color;
-	border-left: 1px solid @border-color;
-	vertical-align: middle;
-	text-align: center;
-	overflow: hidden;
-	padding: 7px !important;
+.ie9.mark-sheet-container{
+	overflow-x: scroll;
+	width: 100%;
+}
+
+.mark-sheet{
+	display: block;
+	overflow: auto;
+	td{
+		width: @slanty-header-width;
+		border-color: @border-color;
+		border-top: 1px solid @border-color;
+		border-left: 1px solid @border-color;
+		vertical-align: middle;
+		text-align: center;
+		overflow: hidden;
+		padding: 7px !important;
+	}
 
     form{
       width: 50px;

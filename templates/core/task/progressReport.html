@@ -108,80 +108,83 @@
 	</form>
 </div>
 
-<table class="mark-sheet table angled">
-    <thead>
-        <tr>
-            <th>&nbsp;</th>
-            <!-- BEGIN subheader_unit -->
-            <!-- BEGIN subheader_unit_task -->
-			<th scope="col" class="rotate">
-				<div><span>
-                <!-- BEGIN subheader_unit_task_submission_link -->
-                <a href="/submission/viewSubmission/{SUBHEADER_UNIT_TASK_SUBMISSION_ID}">{SUBHEADER_UNIT_TASK_NAME}</a>
-                <!-- END subheader_unit_task_submission_link -->
-                <!-- BEGIN subheader_unit_task_assess_link -->
-                <a href="/assess/results/{SUBHEADER_UNIT_TASK_ASSESS_ID}">{SUBHEADER_UNIT_TASK_NAME}</a>
-                <!-- END subheader_unit_task_assess_link -->
-                <!-- BEGIN subheader_unit_task_no_link -->
-                {SUBHEADER_UNIT_TASK_NAME}
-                <!-- END subheader_unit_task_no_link -->
-					</span>
-					</div>
-            </th>
-            <!-- END subheader_unit_task -->
-            <!-- END subheader_unit -->
-        </tr>
-    </thead>
-    <tbody>
-        <!-- BEGIN student -->
-        <tr class="{ON_OFF} {STUDENT_REMOVED_CLASS}">
-			<th class="avatar" scope="row">
-				<img height="32" width="32" src="/portrait.php?userId={STUDENT_SYNERGY_ID}&amp;size=square32">
-				{STUDENT_SURNAME}, {STUDENT_FIRSTNAME}
-            </th>
-            <!-- BEGIN student_unit -->
-            <!-- BEGIN student_unit_task -->
-            <td>
-                <!-- BEGIN student_unit_task_check -->
-                    <form action="/task/progressForm.php" method="POST">
-                        <input type="hidden" name="student_id" value="{STUDENT_ID}" />
-                        <input type="hidden" name="task_id"    value="{STUDENT_UNIT_TASK_ID}" />
-                        <input type="hidden" name="current_status" value="{STUDENT_UNIT_TASK_STATUS}" />
-                        <a href="#"
-                           class="ticks {STUDENT_UNIT_TASK_STATUS_CLASS}"
-                           title="{STUDENT_UNIT_TASK_STATUS_TEXT} - click to update"
-                           data-interaction="update_progress"
-                        ><span></span></a>
-                    </form>
-                <!-- END student_unit_task_check -->
+<!--Silly Scroll issue with IE9-->
+<!--[if gte IE 9]> <div class="ie9 mark-sheet-container"><![endif]-->
+    <table class="mark-sheet table angled">
+        <thead>
+            <tr>
+                <th>&nbsp;</th>
+                <!-- BEGIN subheader_unit -->
+                <!-- BEGIN subheader_unit_task -->
+    			<th scope="col" class="rotate">
+    				<div><span>
+                    <!-- BEGIN subheader_unit_task_submission_link -->
+                    <a href="/submission/viewSubmission/{SUBHEADER_UNIT_TASK_SUBMISSION_ID}">{SUBHEADER_UNIT_TASK_NAME}</a>
+                    <!-- END subheader_unit_task_submission_link -->
+                    <!-- BEGIN subheader_unit_task_assess_link -->
+                    <a href="/assess/results/{SUBHEADER_UNIT_TASK_ASSESS_ID}">{SUBHEADER_UNIT_TASK_NAME}</a>
+                    <!-- END subheader_unit_task_assess_link -->
+                    <!-- BEGIN subheader_unit_task_no_link -->
+                    {SUBHEADER_UNIT_TASK_NAME}
+                    <!-- END subheader_unit_task_no_link -->
+    					</span>
+    					</div>
+                </th>
+                <!-- END subheader_unit_task -->
+                <!-- END subheader_unit -->
+            </tr>
+        </thead>
+        <tbody>
+            <!-- BEGIN student -->
+            <tr class="{ON_OFF} {STUDENT_REMOVED_CLASS}">
+    			<th class="avatar" scope="row">
+    				<img height="32" width="32" src="/portrait.php?userId={STUDENT_SYNERGY_ID}&amp;size=square32">
+    				{STUDENT_SURNAME}, {STUDENT_FIRSTNAME}
+                </th>
+                <!-- BEGIN student_unit -->
+                <!-- BEGIN student_unit_task -->
+                <td>
+                    <!-- BEGIN student_unit_task_check -->
+                        <form action="/task/progressForm.php" method="POST">
+                            <input type="hidden" name="student_id" value="{STUDENT_ID}" />
+                            <input type="hidden" name="task_id"    value="{STUDENT_UNIT_TASK_ID}" />
+                            <input type="hidden" name="current_status" value="{STUDENT_UNIT_TASK_STATUS}" />
+                            <a href="#"
+                               class="ticks {STUDENT_UNIT_TASK_STATUS_CLASS}"
+                               title="{STUDENT_UNIT_TASK_STATUS_TEXT} - click to update"
+                               data-interaction="update_progress"
+                            ><span></span></a>
+                        </form>
+                    <!-- END student_unit_task_check -->
 
-                <!-- BEGIN student_unit_task_submission_box -->
-                    <!-- BEGIN student_unit_task_submission_box_mark -->
-                        <a href="/submission/submissionHistory/{STUDENT_UNIT_TASK_SUBMISSION_ID}/{STUDENT_ID}/"
-                           title="View submission history for this student"
-                           class="gradient-{STUDENT_UNIT_TASK_SUBMISSION_GRADIENT}"
-                        >{STUDENT_UNIT_TASK_SUBMISSION_MARK}</a>
-                    <!-- END student_unit_task_submission_box_mark -->
-                    <!-- BEGIN student_unit_task_submission_box_no_mark -->
-                        &nbsp;
-                    <!-- END student_unit_task_submission_box_no_mark -->
-                <!-- END student_unit_task_submission_box -->
+                    <!-- BEGIN student_unit_task_submission_box -->
+                        <!-- BEGIN student_unit_task_submission_box_mark -->
+                            <a href="/submission/submissionHistory/{STUDENT_UNIT_TASK_SUBMISSION_ID}/{STUDENT_ID}/"
+                               title="View submission history for this student"
+                               class="gradient-{STUDENT_UNIT_TASK_SUBMISSION_GRADIENT}"
+                            >{STUDENT_UNIT_TASK_SUBMISSION_MARK}</a>
+                        <!-- END student_unit_task_submission_box_mark -->
+                        <!-- BEGIN student_unit_task_submission_box_no_mark -->
+                            &nbsp;
+                        <!-- END student_unit_task_submission_box_no_mark -->
+                    <!-- END student_unit_task_submission_box -->
 
-                <!-- BEGIN student_unit_task_online_assess -->
-                    <!-- BEGIN student_unit_task_online_assess_mark -->
-                        <a href="/assess/review/{STUDENT_UNIT_TASK_ASSESS_ID}/{STUDENT_UNIT_TASK_ASSESS_FIRST_SECTION_ID}/{STUDENT_UNIT_TASK_ASSESS_ATTEMPT_ID}/"
-                           class="gradient-{STUDENT_UNIT_TASK_ASSESS_GRADIENT}"
-                           title="Review assessment for this student"
-                        >{STUDENT_UNIT_TASK_ASSESS_TOTAL_MARKS} / {STUDENT_UNIT_TASK_ASSESS_TOTAL_AVAILABLE_MARKS}</a>
-                    <!-- END student_unit_task_online_assess_mark -->
-                    <!-- BEGIN student_unit_task_online_assess_no_mark -->
-                        &nbsp;
-                    <!-- END student_unit_task_online_assess_no_mark -->
-                <!-- END student_unit_task_online_assess -->
-            </td>
-            <!-- END student_unit_task -->
-            <!-- END student_unit -->
-        </tr>
-        <!-- END student -->
-    </tbody>
-</table>
+                    <!-- BEGIN student_unit_task_online_assess -->
+                        <!-- BEGIN student_unit_task_online_assess_mark -->
+                            <a href="/assess/review/{STUDENT_UNIT_TASK_ASSESS_ID}/{STUDENT_UNIT_TASK_ASSESS_FIRST_SECTION_ID}/{STUDENT_UNIT_TASK_ASSESS_ATTEMPT_ID}/"
+                               class="gradient-{STUDENT_UNIT_TASK_ASSESS_GRADIENT}"
+                               title="Review assessment for this student"
+                            >{STUDENT_UNIT_TASK_ASSESS_TOTAL_MARKS} / {STUDENT_UNIT_TASK_ASSESS_TOTAL_AVAILABLE_MARKS}</a>
+                        <!-- END student_unit_task_online_assess_mark -->
+                        <!-- BEGIN student_unit_task_online_assess_no_mark -->
+                            &nbsp;
+                        <!-- END student_unit_task_online_assess_no_mark -->
+                    <!-- END student_unit_task_online_assess -->
+                </td>
+                <!-- END student_unit_task -->
+                <!-- END student_unit -->
+            </tr>
+            <!-- END student -->
+        </tbody>
+    </table>
+<!--[if gte IE 9]> </div><![endif]-->
