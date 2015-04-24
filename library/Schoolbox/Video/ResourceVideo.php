@@ -11,16 +11,31 @@ namespace Schoolbox\Video;
 
 use Schoolbox\ConfigLoader;
 
+use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\File;
+use Schoolbox\Resource\Storage;
 
 class ResourceVideo
 {
+    /** @var int */
     protected $id;
+
+    /** @var string */
     protected $hash;
+
+    /** @var string */
     protected $status;
+
+    /** @var int */
     protected $duration;
+
+    /** @var File\IFile */
     protected $file;
+
+    /** @var Storage\Model */
     protected $storage;
+
+    /** @var IConfigLoader */
     protected $config;
 
     /**
@@ -32,6 +47,10 @@ class ResourceVideo
     }
 
 
+    /**
+     * @deprecated this needs to switch to the Flysystem paradigm
+     * @return string
+     */
     public function getFileLocation()
     {
         if (is_readable($this->getVideoLocation())) {
@@ -39,72 +58,101 @@ class ResourceVideo
         } elseif (is_readable($this->getAudioLocation())) {
             return $this->getAudioLocation();
         }
+        return '';
     }
 
+
+    /**
+     * @deprecated this needs to switch to the Flysystem paradigm
+     * @return string
+     */
     public function getVideoLocation()
     {
         return $this->config->get('video_dir').'/'.$this->getHash() . '.mp4';
     }
 
+
+    /**
+     * @deprecated this needs to switch to the Flysystem paradigm
+     * @return string
+     */
     public function getAudioLocation()
     {
         return $this->config->get('video_dir').'/'.$this->getHash() . '.mp3';
     }
 
+
+    /**
+     * @deprecated this needs to switch to the Flysystem paradigm
+     * @return string
+     */
     public function getThumbnailLocation()
     {
         return $this->config->get('video_dir').'/'.$this->getHash() . '-64.jpg';
     }
 
+
+    /**
+     * @deprecated this needs to switch to the Flysystem paradigm
+     * @return string
+     */
     public function getPosterLocation()
     {
         return $this->config->get('video_dir').'/'.$this->getHash() . '-poster.jpg';
     }
 
 
+    /**
+     * @param IConfigLoader $config
+     */
     private function setConfig($config)
     {
         $this->config = $config;
     }
 
+
+    /**
+     * @param int $duration
+     */
     public function setDuration($duration)
     {
         $this->duration = $duration;
     }
 
+
+    /**
+     * @return int
+     */
     public function getDuration()
     {
         return $this->duration;
     }
 
-    public function setMessage($message)
-    {
-        $this->message = $message;
-    }
 
-    public function getMessage()
-    {
-        return $this->message;
-    }
-
+    /**
+     * @param string $status
+     */
     public function setStatus($status)
     {
         $this->status = $status;
     }
 
+
+    /**
+     * @return string
+     */
     public function getStatus()
     {
         return $this->status;
     }
 
     /**
-    * Get the full path to the image used in statuses
-    *
-    * @param string $type Defaults to "video", but you could pass "audio" for
-    *                     an audio thumbnail.
-    *
-    * @return string
-    */
+     * Get the full path to the image used in statuses
+     *
+     * @param string $type Defaults to "video", but you could pass "audio" for an audio thumbnail.
+     *
+     * @return string
+     */
     public function getStatusImage($type = 'video')
     {
         return "/images/core/component/$type-thumbnail-".strtolower($this->getStatus()).".gif";
@@ -124,18 +172,26 @@ class ResourceVideo
         }
     }
 
+
+    /**
+     * @param File\IFile $file
+     */
     public function setFile($file)
     {
         $this->file = $file;
     }
 
+
+    /**
+     * @return File\IFile
+     */
     public function getFile()
     {
         return $this->file;
     }
 
     /**
-     * @return mixed
+     * @return Storage\Model
      */
     public function getStorage()
     {
@@ -143,7 +199,7 @@ class ResourceVideo
     }
 
     /**
-     * @param mixed $storage
+     * @param Storage\Model $storage
      */
     public function setStorage($storage)
     {
@@ -153,8 +209,8 @@ class ResourceVideo
 
 
     /**
-    * @param  mixed $id
-    * @return $this
+    * @param  int $id
+    * @return self
     */
     public function setId($id)
     {
@@ -163,7 +219,7 @@ class ResourceVideo
     }
 
     /**
-    * @return mixed
+    * @return int
     */
     public function getId()
     {
