@@ -64,12 +64,12 @@ if (is_array($allAttempts) && count($allAttempts)) {
     foreach ($allAttempts as $currentAttempt) {
         $i++;
 
-        $startDate = new Alaress_Date_Format($currentAttempt['start'], 'Y-m-d H:i:s');
+        $startDate = new Alaress_Date_Format($currentAttempt['start'], Alaress_Date_Format::DATABASE_FORMAT);
 
         /* For attempts that are still in progress
            */
-        if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
-            $finishDate = new Alaress_Date_Format($currentAttempt['finish'], 'Y-m-d H:i:s');
+        if ($currentAttempt['finish']) {
+            $finishDate = new Alaress_Date_Format($currentAttempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
             $finishDateValue = $finishDate->getShort();
         } else {
             $finishDateValue = 'Unfinished';
