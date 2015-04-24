@@ -1,0 +1,8 @@
+{% if qualifications.data|length > 0 %}
+<h2>Qualifications:</h2>
+<ul>
+    {% for qualification in qualifications.data %}
+    <li>{{ qualification }}</li>
+    {% endfor %}
+</ul>
+{% endif %}

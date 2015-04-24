@@ -131,7 +131,8 @@ class Controller extends Base {
      */
     public function ncea($db, $user, $externalUser, $year) {
         $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($externalUser, $db, $year);
-        $creditSummary = new NCEA\CreditSummary($externalUser, $db, false);
+        $qualifications = new NCEA\Qualifications($externalUser, $db, null);
+        $creditSummary = new NCEA\CreditSummary($externalUser, $db, null);
 
         $output = array(
             'template' => '@ncea/index.twig',
@@ -150,6 +151,13 @@ class Controller extends Base {
                 'literacyNumeracyCheckbox' => array(
                     'heading' => $literacyNumeracyCheckbox->getHeading(),
                     'data' => $literacyNumeracyCheckbox->findData()
+                ),
+
+                /* Qualifications rating
+                 */
+                'qualifications' => array(
+                    'heading' => $qualifications->getHeading(),
+                    'data' => $qualifications->findData(),
                 ),
 
                 /* Credit Summary graphs for all years combined
