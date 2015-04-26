@@ -75,9 +75,6 @@ class Loader
         } else {
             $postFields = '';
         }
-        else {
-            return false;
-        }
 
         /* Bicep curl
          */
