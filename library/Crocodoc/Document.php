@@ -110,7 +110,7 @@ class Document
 
         return array(
             'result' => $result,
-            'errors' => isset($result->error) ? $result->error : $curl->getErrors(),
+            'errors' => isset($result->error) ? $result->error : implode(', ',$curl->getErrors()),
         );
     }
 
