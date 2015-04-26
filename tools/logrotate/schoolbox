@@ -20,6 +20,13 @@
 	compress
 }
 
+/var/log/schoolbox/crocodoc*.log {
+	monthly
+	missingok
+	rotate 2
+	compress
+}
+
 /var/log/schoolbox/upgrade.log {
 	monthly
 	missingok
