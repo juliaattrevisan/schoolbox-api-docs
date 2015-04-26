@@ -9,15 +9,18 @@
 
 namespace Schoolbox\Video;
 
+use Alaress_Date_Format;
+use Exception_Schoolbox;
+
 class Queue extends ResourceVideo
 {
-
-    protected $id;
-    protected $hash;
-    protected $status;
+    /** @var string */
     protected $message;
-    protected $duration;
+
+    /** @var Alaress_Date_Format */
     protected $created;
+
+    /** @var Alaress_Date_Format */
     protected $modified;
 
 
@@ -61,14 +64,15 @@ class Queue extends ResourceVideo
         else if($sourceFile->getMimeType()->isVideo()){
             return $this->processVideo($this->getSourceLocation($sourceFile));
         }
-
+        return false;
     }
 
 
     /**
      * Takes audio file and transcodes into mp3 for playback via <audio>
+     *
+     * @param $sourceFile
      * @returns boolean
-     * @throws Exception_Schoolbox
      */
     public function processAudio($sourceFile)
     {
@@ -102,8 +106,8 @@ class Queue extends ResourceVideo
     /**
      * Takes existing file and transcodes into web format and creates thumbnail
      *
+     * @param $sourceFile
      * @returns boolean
-     * @throws Exception_Schoolbox
      */
 
     public function processVideo($sourceFile)
@@ -315,42 +319,59 @@ class Queue extends ResourceVideo
         }
     }
 
+
+    /**
+     * @param Alaress_Date_Format $created
+     */
     public function setCreated($created)
     {
         $this->created = $created;
     }
 
+
+    /**
+     * @return Alaress_Date_Format
+     */
     public function getCreated()
     {
         return $this->created;
     }
 
+
+    /**
+     * @param Alaress_Date_Format $modified
+     */
     public function setModified($modified)
     {
         $this->modified = $modified;
     }
 
+
+    /**
+     * @return Alaress_Date_Format
+     */
     public function getModified()
     {
         return $this->modified;
     }
 
+
+    /**
+     * @param string $message
+     */
+    public function setMessage($message)
+    {
+        $this->message = $message;
+    }
+
+
     /**
      * @return string
      */
-    public function getHash()
+    public function getMessage()
     {
-        return $this->hash;
+        return $this->message;
     }
-
-    /**
-     * @param string $hash
-     */
-    public function setHash($hash)
-    {
-        $this->hash = $hash;
-    }
-
 
 
     /**

@@ -9,10 +9,11 @@
 
 namespace Schoolbox\Video;
 
+use Component\Eportfolio\FileListMapper;
 use Schoolbox;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
-use Schoolbox\Resource\FileMapper;
+use Schoolbox\Resource;
 
 class ResourceVideoMapper extends Mapper
 {
@@ -56,7 +57,7 @@ class ResourceVideoMapper extends Mapper
         );
         $this->hasJoin(
             'file', array(
-                'mapper'    => '\\Schoolbox\\Resource\\FileMapper',
+                'mapper'    => '\\Schoolbox\\Resource\\File\\Mapper',
                 'this_key'  => 'hash',
                 'other_key' => 'hash',
             )
@@ -103,8 +104,8 @@ class ResourceVideoMapper extends Mapper
      */
     public function findByCategory($category, $options, $limit = false)
     {
-        $videoList  = new Collection(array());
-        $fileMapper = new FileMapper;
+        $videoList  = new Collection();
+        $fileMapper = Resource\File\Mapper::getInstance();
 
         $query = "
             SELECT {$this->getJoinMapper('file')->getColumnString('f')}, {$this->getColumnString('vq')}, {$fileMapper->getJoinMapper('owner')->getColumnString('u')}
@@ -180,9 +181,9 @@ class ResourceVideoMapper extends Mapper
      */
     public function findByEportfolioPage($pageId, $options, $limit = false)
     {
-        $videoList      = new Collection(array());
-        $myFileMapper   = new \Schoolbox\Resource\My\File\Mapper();
-        $fileListMapper = new \Component\Eportfolio\FileListMapper();
+        $videoList      = new Collection();
+        $myFileMapper   = Resource\My\File\Mapper::getInstance();
+        $fileListMapper = FileListMapper::getInstance();
 
         $query = "
             SELECT
@@ -252,7 +253,7 @@ class ResourceVideoMapper extends Mapper
      */
     public function findByFileId($id)
     {
-        $fileMapper = new \Schoolbox\Resource\FileMapper;
+        $fileMapper = Resource\File\Mapper::getInstance();
 
         $statement = $this->database->prepare(
             "
@@ -289,7 +290,7 @@ class ResourceVideoMapper extends Mapper
      */
     public function findByMyFileId($id)
     {
-        $fileMapper = new \Schoolbox\Resource\My\File\Mapper();
+        $fileMapper = Resource\My\File\Mapper::getInstance();
 
         $statement = $this->database->prepare(
             "
