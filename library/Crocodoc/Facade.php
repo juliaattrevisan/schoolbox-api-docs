@@ -66,8 +66,14 @@ class Facade
             }
         }
 
-        $loader = new Loader($submission->getUuid(), $this->getUser());
-        echo $loader->render();
+        try {
+            $loader = new Loader($submission->getUuid(), $this->getUser());
+            header('Location: '.$loader->render());
+            exit;
+        }
+        catch (Expception $e) {
+            echo "Error encountered: ".$e->getMessage();
+        }
     }
 
     /* Getters/Setters

@@ -1,6 +1,6 @@
 <?php
 /**
- * Session
+ * Creates a session with crocodoc and returns the URL for the document in that session
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -59,7 +59,7 @@ class Loader
     }
 
     /**
-     * Spawn an iframe
+     * Setups up session with crocodoc and returns the URL to access the crocodoc document for that iframe
      */
     public function render()
     {
@@ -71,7 +71,7 @@ class Loader
         }
         else if ($this->getUser()->getRole()->isStaff() || $this->getUser()->isSuperuser()) {
             $userTuple = "{$this->getUser()->getId()},{$this->getUser()->getUsername()}";
-            $postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid}&editable=true&user={$userTuple}";
+            $postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&editable=true&user={$userTuple}";
         } else {
             $postFields = '';
         }
@@ -89,16 +89,15 @@ class Loader
 
         $result = json_decode($this->getCurl()->getResult());
 
-        return json_encode(
-            array(
-                'url' => "https://crocodoc.com/view/{$result->session}",
-                'errors' => $this->getCurl()->getErrors(),
-                /* Pass this so that crocodoc uuid gets phplibbed upon
-                 * first load in Inline Grader, for student view
-                 */
-                'uuid' => $this->getUuid()
-            )
-        );
+        if($this->getCurl()->getErrors()) {
+            throw Exception($this->getCurl()->getErrors());
+        }
+        else if(isset($result->error)) {
+            throw Exception($result->error);
+        }
+        else {
+            return "https://crocodoc.com/view/{$result->session}";
+        }
     }
 
     /* Getters/Setters
