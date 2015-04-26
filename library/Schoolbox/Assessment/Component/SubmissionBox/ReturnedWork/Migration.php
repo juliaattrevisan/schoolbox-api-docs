@@ -52,7 +52,7 @@ class Migration implements MigrationPattern
      */
     public function getFetchStatement()
     {
-        return $this->db->query("SELECT id, filename FROM submission_return WHERE hash = ''");
+        return $this->db->query("SELECT id, filename FROM submission_return WHERE hash = '' AND filename != ''");
     }
 
     /**
