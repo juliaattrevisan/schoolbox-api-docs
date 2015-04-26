@@ -269,7 +269,7 @@ abstract class Base {
 	 *
 	 * @param ReturnedWork $returnedWork
 	 */
-	protected function setReturnedWork(ReturnedWork $returnedWork) {
+	protected function setReturnedWork($returnedWork) {
 		$this->returnedWork = $returnedWork;
 	}
 

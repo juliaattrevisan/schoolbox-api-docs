@@ -255,32 +255,6 @@ class SubmissionMapper extends Schoolbox\Mapper implements Schoolbox\StorageMapp
 		return $collection;
 	}
 
-    /**
-     * Get list of submissions that should be submitted to crocodoc
-     *
-     * @return Collection
-     */
-    public function getCrocodoc() {
-        $query = "
-            SELECT
-                  {$this->getColumnString('ss')}
-            FROM {$this->getTable()} ss
-            WHERE ss.uuid is null AND ( realname like '%.docx' OR
-                                        realname like '%.doc' OR
-                                        realname like '%.xls' OR
-                                        realname like '%.xlsx' OR
-                                        realname like '%.ppt' OR
-                                        realname like '%.pptx' OR
-                                        realname like '%.pdf')
-                 AND YEAR(submitted) = YEAR(NOW())
-
-            ";
-
-        $statement = $this->database->prepare($query);
-        $statement->execute();
-        return $this->hydrateList($statement, 'ss');
-    }
-
 	/**
 	 * Custom hydration method used by methods that get an activity list.
 	 *

@@ -57,13 +57,16 @@ class Document
 
         /** @var Model $storage */
         $storage     = $submission->getStorage();
-        $destination = \Cfg::get('submission_upload_tmp_dir') . '/' . $this->getSubmission()->getId() . '_' . $this->getSubmission()->getFilename();
+        $destination = \Cfg::get('submission_upload_tmp_dir') . '/' . $this->getSubmission()->getId() . '_' . $this->getSubmission()->getStorage()->getBasename();
 
         // copy the file contents to the temp directory
-        if ($fp = fopen($destination, 'w')) {
-            if (fwrite($fp, $storage->readStream())) {
-                $this->setUrl($destination);
+        if ($storage->exists() && $fp = fopen($destination, 'w')) {
+            $input = $storage->readStream();
+            while($chunk = fgets($input, 1024)) {
+                fwrite($fp, $chunk);
             }
+
+            $this->setUrl($destination);
             fclose($fp);
         }
     }
@@ -94,7 +97,7 @@ class Document
 
         /* Unlink copied file after uploading
          */
-        unlink($this->getUrl());
+        //unlink($this->getUrl());
 
         // Crocodoc-related errors, when a file dies in crocodoc
         $result = json_decode($curl->getResult());
@@ -102,7 +105,7 @@ class Document
         if (isset($result->uuid)) {
             /* Save reference to uploaded file */
             $this->getSubmission()->setUuid($result->uuid);
-            SubmissionMapper::getInstance()->save($this->getSubmission());
+            Submission\FileMapper::getInstance()->save($this->getSubmission());
         }
 
         return array(
@@ -179,7 +182,7 @@ class Document
      *
      * @param Submission\File $submission
      */
-    private function setSubmission(Submission $submission)
+    private function setSubmission(Submission\File $submission)
     {
         $this->submission = $submission;
     }

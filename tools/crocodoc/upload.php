@@ -9,20 +9,23 @@
 require_once __DIR__ . '/../../include/Bootstrap.php';
 
 
-use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper;
 use Crocodoc\Document;
+use Alaress\Lumberjack\Logger;
 
-$pendingUpload = SubmissionMapper::getInstance()->getCrocodoc();
+$pendingUpload = FileMapper::getInstance()->getCrocodoc();
+
+$logger = new Logger;
 
 
 foreach($pendingUpload as $submission) {
-    echo "Uploading ".$submission->getFileName();
+    $logger->notice("Uploading ".$submission->getFileName()."(".$submission->getId().")");
     $document = new Document($submission);
     $result = $document->upload();
     if($result['errors']) {
-        echo " Failed - ({$result['errors']})\n";
+        $logger->error($result['errors']);
     }
     else {
-        echo " Success\n";
+        $logger->notice("Upload completed successfully");
     }
 }
