@@ -37,6 +37,11 @@ abstract class Mapper implements IMapper, Serializable
     const TYPE_BOOL_ENUM = 6;
 
     /**
+     * Represents the SQL SET data type.
+     */
+    const TYPE_SET = 7;
+
+    /**
      * Represents the SQL NULL data type.
      */
     const TYPE_NULL = 0;

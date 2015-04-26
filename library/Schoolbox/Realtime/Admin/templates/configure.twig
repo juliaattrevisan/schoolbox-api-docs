@@ -1,0 +1,219 @@
+<script type="text/javascript" src="/javascript/jquery.msgConfig.js"></script>
+<script type="text/javascript" src="/javascript/jquery.svgInline.js"></script>
+<!--suppress NonShortCircuitBooleanExpressionJS -->
+<script type="text/javascript">
+
+    var levelOff     = 0,
+        levelInstant = 1,
+        levelPush    = 2,
+        levelEmail   = 4,
+        levelDigest  = 8,
+        desc         = {};
+
+    desc[levelOff]      = 'off';
+    desc[levelDigest]   = 'digest';
+    desc[levelInstant]  = 'instant';
+    desc[levelPush]     = 'mobile';
+    desc[levelEmail]    = 'email';
+
+    $(function () {
+
+        var ii;
+
+        // inlineify all SVGs
+        $('body').svgInline();
+
+        $('#configurator').msgconfig({
+            sourceSelector: 'li.source',
+            tableSelector:  '.digest-settings',
+            roleSelector:   'tr',
+            toggleSelector: '.toggle',
+            customSelector: 'td.custom',
+            permSelector:   '.perm',
+            persist: function () {
+                var form = this.children('form[method=post]');
+
+                // clear any previous cache-timeout
+                if (ii) {
+                    clearTimeout(ii);
+                }
+
+                ii = setTimeout(function () {
+                    $.post(form.attr('action'), form.serialize(), customiserCallback);
+                }, 1000);
+
+            },
+            describe: function () {
+
+                var summary = this.find('h4 em.summary'),
+                    table   = this.find('table.roles'),
+                    rows    = table.find('tr.role'),
+                    text    = 'Sent to ',
+                    count   = 0;
+
+                rows.each(function () {
+                    var row  = $(this),
+                            ins  = row.find('input[data-perm]:checked'),
+                            role = row.children('th').text(),
+                            sum  = 0;
+
+                    if (!role) {
+                        --count;
+                        return;
+
+                    } else if (ins.length == 0) {
+                        return;
+
+                    } else if (ins.eq(0).data('perm') == 0) {
+                        row.data('sum', 0);
+                        return;
+                    }
+
+                    text += role + ' via ';
+
+                    ins.each(function () {
+                        var i   = $(this),
+                                lbl = desc[i.data('perm')];
+
+                        if (typeof lbl === 'undefined' || lbl === 'off') {
+                            return;
+                        }
+
+                        text += lbl + ' + ';
+                        sum  += i.data('perm');
+                    });
+
+                    text = text.slice(0, text.length - 3);
+
+                    text += '; ';
+                    ++count;
+                });
+
+                if (count < 0) {
+                    return;
+                } else if (count == 0) {
+                    text += 'nobody';
+                } else {
+                    text = text.slice(0, text.length - 2);
+                }
+
+                summary.text(text + '.');
+
+            },
+            advanced: function () {
+                var row    = this.closest('tr'),
+                    dialog = $('#slider-modal'),
+                    query  = [
+                        'source='+row.closest('[data-source]').data('source'),
+                        'slug='+row.closest('[data-namespace]').data('namespace'),
+                        {% if filters.options[filters.selected] != 'all' %}'roletype={{ filters.options[filters.selected] }}',{% endif %}{# twig inside js... what could possibly go wrong... #}
+                        'role='+row.data('role')
+                    ].join('&');
+
+                dialog.load('/adminv2/messages/configure/custom', query, function () {
+                    dialog.dialog({
+                        modal: true,
+                        resizable: false,
+                        width: 640,
+                        title: 'Advanced Settings'
+                    });
+                });
+            }
+        });
+    });
+
+    function customiserCallback(data) {
+
+        console.log(data);
+
+        $.each(data, function (slug, sources) {
+
+            var $ns = $('#configurator').find('li[data-namespace='+slug+']');
+
+            $.each(sources, function (source, roles) {
+
+                var $src = $ns.find('li[data-source='+source+']');
+
+                $.each(roles, function (role, config) {
+
+                    var $role = $src.find('tr[data-role='+role+']'),
+                        options,
+                        inDefault = function () {
+                            var p = $(this).data('perm');
+                            // bitwise! single &
+                            return !!(config.default & p || (config.default == 0 && p == 0));
+                        },
+                        inMask    = function () {
+                            var p = $(this).data('perm');
+                            // bitwise! single &
+                            return !!(config.mask[1] & p || (config.mask[0] && p == 0));
+                        };
+
+                    // turned off
+                    if (config == false) {
+                        // ensure off selected
+                        $role.find('td.toggle input[value=0]').prop('checked', true);
+
+                        return true; // jq:continue
+                    }
+
+                    // ensure on selected
+                    $role.find('td.toggle input[value=1]').prop('checked', true).trigger('change.force');
+
+                    // reset all
+                    options = $role.find('td[data-perm]');
+                    options.find('input').prop('checked', false).attr('disabled', 'disabled');
+
+                    options.filter(inMask).find('input').removeAttr('disabled');
+                    options.filter(inDefault).find('input').prop('checked', true);
+
+                    options.eq(0).trigger('change.force');
+                });
+            });
+        });
+    }
+
+
+</script>
+<div class="admin-contents clearfix">
+    <h2>Global Message Settings</h2>
+    <p class="clearfix">
+        <a class="btn go-back float-left" href="{{ '/adminv2/messages' }}"><span></span>Back to Messages</a>
+    </p>
+    <div class="level clearfix">
+        <p>Use this page to configure the messages the system will send to users.</p>
+        <h3>Settings</h3>
+        <ul>
+            <li><strong>Enabled</strong>: Whether the given role can receive this message at all.</li>
+            <li><strong>Default</strong>: The <em>default</em> way this message should be received (remembering users can personalise their settings).</li>
+        </ul>
+        <p>
+            <br/><em>For more control, the modify button allows you to restrict users' delivery options.</em>
+        </p>
+        {% include '@messages/legend.twig' with { digest: true, mobile: 'plural', who: 'users' } %}
+        <ul class="filter admin-nav clearfix">
+            <li>
+                <span>Filter messages relevant to:</span>
+            </li>
+            {% for i, filter in filters.options %}
+            <li>
+                <a href="/adminv2/messages/configure{{ filter == 'all' ? '' : ('/' ~ filter) }}" class="{% if filters.selected == i %}current{% endif %}">{{ filter | capitalize }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+        <div class="clearfix pad-it"></div>
+        <ul id="configurator" class="namespaces">
+            {% for namespace in config %}
+            <li class="namespace" data-namespace="{{ ns[namespace.id].slug }}">
+                <h3>{{ ns[namespace.id].label }}</h3>
+                <ul class="sources">
+                {% for source in namespace.sources %}
+                    {% include '@messages/source.twig' with { source: source } %}
+                {% endfor %}
+                </ul>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+<div id="slider-modal" class="namespaces" style="display:none;"></div>

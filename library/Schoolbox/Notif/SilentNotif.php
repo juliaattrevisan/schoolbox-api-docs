@@ -10,8 +10,22 @@
 namespace Schoolbox\Notif;
 
 
+use Alaress\Lumberjack\Logger;
+
 class SilentNotif implements NotifInterface
 {
+    /** @var Logger */
+    protected $log;
+
+
+    /**
+     * @param Logger $log
+     */
+    function __construct(Logger $log)
+    {
+        $this->log = $log;
+    }
+
 
     /**
      * System is unusable.
@@ -22,6 +36,7 @@ class SilentNotif implements NotifInterface
      */
     public function emergency($message, array $context = array())
     {
+        $this->log->emergency($message, $context);
     }
 
 
@@ -37,6 +52,7 @@ class SilentNotif implements NotifInterface
      */
     public function alert($message, array $context = array())
     {
+        $this->log->alert($message, $context);
     }
 
 
@@ -51,6 +67,7 @@ class SilentNotif implements NotifInterface
      */
     public function critical($message, array $context = array())
     {
+        $this->log->critical($message, $context);
     }
 
 
@@ -64,6 +81,7 @@ class SilentNotif implements NotifInterface
      */
     public function error($message, array $context = array())
     {
+        $this->log->error($message, $context);
     }
 
 
@@ -79,6 +97,7 @@ class SilentNotif implements NotifInterface
      */
     public function warning($message, array $context = array())
     {
+        $this->log->warning($message, $context);
     }
 
 
@@ -91,6 +110,7 @@ class SilentNotif implements NotifInterface
      */
     public function notice($message, array $context = array())
     {
+        $this->log->notice($message, $context);
     }
 
 
@@ -105,6 +125,7 @@ class SilentNotif implements NotifInterface
      */
     public function info($message, array $context = array())
     {
+        $this->log->info($message, $context);
     }
 
 
@@ -117,6 +138,7 @@ class SilentNotif implements NotifInterface
      */
     public function debug($message, array $context = array())
     {
+        $this->log->debug($message, $context);
     }
 
 
@@ -130,6 +152,7 @@ class SilentNotif implements NotifInterface
      */
     public function log($level, $message, array $context = array())
     {
+        $this->log->log($level, $message, $context);
     }
 
 
@@ -138,6 +161,7 @@ class SilentNotif implements NotifInterface
      */
     public function getTopic()
     {
+        return 'SILENT';
     }
 
 
@@ -150,4 +174,20 @@ class SilentNotif implements NotifInterface
         return $this;
     }
 
-} 
+
+    /**
+     * Logs the given message to the specified channel.
+     * Convenience method equivalent to setChannel()->log();
+     *
+     * @param string $topic
+     * @param int    $level
+     * @param string $message
+     * @param array  $context
+     * @return bool
+     */
+    public function logTo($topic, $level, $message, array $context = array())
+    {
+        return $this->log($level, $message, $context);
+    }
+
+}

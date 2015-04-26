@@ -1,0 +1,103 @@
+<style type="text/css">
+    table.ruler tr th {
+        background-color: #f0f0f0;
+    }
+</style>
+<script type="text/javascript" src="/javascript/jquery.svgInline.js"></script>
+<script type="text/javascript" src="/javascript/jquery.msgConfig.js"></script>
+<script type="text/javascript">
+    $(function () {
+
+        var iiCache = {};
+
+        $('#msg-settings')
+            .svgInline()
+            .msgconfig({
+
+                sourceSelector: 'tr',
+                tableSelector:  'table.digest-settings',
+    //            roleSelector:   '',
+
+                customSelector: null,
+                muteSelector:   null,
+                toggleSelector: null,
+                expand:         null,
+
+                persist: function () {
+                    var action   = this.closest('form[method=post]').attr('action'),
+                        formdata = $('<form/>').append(this.clone()).serialize(),
+                        sourceId = this.data('source');
+
+                    if (iiCache[sourceId]) {
+                        clearTimeout(iiCache[sourceId]);
+                    }
+
+                    iiCache[sourceId] = setTimeout(function () {
+                        $.post(action, formdata, function (data) {
+                            console.log(data);
+                        });
+                    }, 500);
+                }
+            }
+        );
+    });
+</script>
+
+<h1>Message Settings</h1>
+<form method="post" action="{{ routeLookup('messages.saveConfig') }}" class="namespaces">
+    {% if groups %}
+    <h2>Homepages</h2>
+    <p>
+        <br/>If you unfollow a homepage, you will receive <em>no</em> messages that come from it.
+    </p>
+    <table class="ruler table">
+        <thead>
+        <tr>
+            <th scope="col">Homepage</th>
+            <th scope="col">Following</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for groupId, group in groups %}
+        <tr>
+            <td>
+                <label for="follow-{{ groupId }}">{{ group.name }}</label>
+            </td>
+            <td>
+                <input type="hidden" name="follow[{{ groupId }}]" value="{{ group.force ? 1 : 0 }}">
+                <input id="follow-{{ groupId }}"
+                       type="checkbox"
+                       name="follow[{{ groupId }}]"
+                       value="1"
+                       {% if group.follow %}checked="checked"{% endif %}
+                       {% if group.force %}disabled="disabled"{% endif %}
+                />
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+    <h2>Messages</h2>
+    <p>
+        <br/>Customise when and how you receive messages.
+        <br/><em>Options that are unavailable have been disabled by your system administrator.</em>
+    </p>
+    {% include '@messages/legend.twig' with { who: 'you' } %}
+    <table id="msg-settings" class="digest-settings roles">
+        {% for namespace in config %}
+        <tr class="ns">
+            <th colspan="2">Receive {{ namespace.label }} messages when&hellip;</th>
+            <th colspan="6"></th>
+        </tr>
+        {% for source in namespace.sources %}
+        <tr data-source="{{ source.id }}">
+            <th>&nbsp;</th>
+            <td width="100%">&hellip;{{ source.description }}.</td>
+            {% include '@messages/options.twig' with { mode: 'p', role: source } %}
+            <td width="32"></td>
+        </tr>
+        {% endfor %}
+        {% endfor %}
+    </table>
+</form>

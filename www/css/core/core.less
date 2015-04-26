@@ -3634,6 +3634,9 @@ ADMIN NAV
 			line-height: 22px;
 		}
     }
+    &.filter {
+        margin-top: 2em;
+    }
 }
 
 /*-------------------------------------------------------------
@@ -4239,14 +4242,16 @@ fieldset.calendarOptions fieldset {
 /*--------------------------------------------------------------
 ADMINV2/MESSAGES
 --------------------------------------------------------------*/
-#digest-settings {
+.digest-settings {
 	border-collapse: collapse;
-	&:hover {
+	&:hover tr:not(.thead) {
 		td, th {
 			opacity: 0.3;
 		}
 	}
-	tr {
+	tr:not(.thead) {
+        height: 32px;
+        line-height: 32px;
 		&:hover {
 			td, th {
 				opacity: 1;
@@ -4266,15 +4271,25 @@ ADMINV2/MESSAGES
 		}
 	}
 	td, th {
-		transition: opacity 0.1s linear;
+        overflow: hidden;
+        border: none;
+        transition: opacity 0.1s linear;
 		position: relative;
+        .actions {
+            float: right;
+            padding-top: 4px;
+        }
+        label {
+            text-align: center;
+        }
 	}
 	th {
 		padding: 4px 32px 4px 8px;
 		white-space: nowrap;
 	}
-	td {
-		padding: 4px 0;
+	td.perm {
+        min-width: 32px;
+        padding: 0 2px !important; // sorry!! :(
 		width: 2em;
 		&:last-child {
 			width: 100%;
@@ -4283,8 +4298,22 @@ ADMINV2/MESSAGES
 		input:checked + label {
 			background: @submit-btn;
 			color: #fff;
+            svg {
+                fill: #fff;
+            }
 		}
+        label {
+            display: block;
+        }
 	}
+    td.toggle {
+        white-space: nowrap;
+    }
+    td.custom {
+        > div {
+            display: none;
+        }
+    }
 	label {
 		margin: 0 4px;
 		width: 2em;
@@ -4292,19 +4321,38 @@ ADMINV2/MESSAGES
 		line-height: 2em;
 		text-align: center;
 		transition: background-color 0.1s linear;
+        cursor: pointer;
 	}
-	input[type=checkbox] {
-		position: absolute;
-		top: 2px;
-		left: 2px;
-		z-index: -1;
-		opacity: 0;
+    input[disabled] {
+        + label {
+            opacity: 0.2;
+        }
+    }
+    svg, img[src^=".svg"] {
+        width: 16px;
+        margin-top: 5px;
+    }
+	.perm input {
+        &[type=checkbox],
+        &[type=radio] {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            z-index: -1;
+            opacity: 0;
+        }
 	}
 	.timeselect {
 		margin-left: 16px;
 		width: auto;
 		text-align: left;
 	}
+    .custom-descrip {
+        display: none;
+    }
+    .expanded .custom-descrip {
+        display: inline;
+    }
 }
 
 /*--------------------------------------------------------------
@@ -4459,6 +4507,14 @@ ADMINV2/MESSAGES
 
 }
 
+tr.ns {
+    th {
+        background-color: #fafafa;
+        &:not(:first-child) {
+            text-align: center;
+        }
+    }
+}
 
 
 

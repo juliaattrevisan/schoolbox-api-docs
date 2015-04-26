@@ -15,13 +15,22 @@ use Schoolbox\User;
 class Reroute {
 
 	/** @var User */
-	protected $userId;
+	protected $user;
+
 	/** @var Source */
 	protected $source;
-	/** @var int */
+
+    /**
+     * @deprecated
+     * @var int
+     */
 	protected $outgoingLevel;
 
+    /** @var array */
+    protected $delivery;
+
 	/**
+     * @deprecated use setDelivery()
 	 * @param int $outgoingLevel
 	 */
 	public function setOutgoingLevel($outgoingLevel) {
@@ -29,6 +38,7 @@ class Reroute {
 	}
 
 	/**
+     * @deprecated use getDelivery()
 	 * @return int
 	 */
 	public function getOutgoingLevel() {
@@ -50,17 +60,37 @@ class Reroute {
 	}
 
 	/**
-	 * @param \Schoolbox\User $userId
+	 * @param \Schoolbox\User $user
 	 */
-	public function setUserId($userId) {
-		$this->userId = $userId;
+	public function setUser($user) {
+		$this->user = $user;
 	}
 
 	/**
 	 * @return \Schoolbox\User
 	 */
-	public function getUserId() {
-		return $this->userId;
+	public function getUser() {
+		return $this->user;
 	}
 
-} 
+
+    /**
+     * @return array
+     */
+    public function getDelivery()
+    {
+        return $this->delivery;
+    }
+
+
+    /**
+     * @param array $delivery
+     * @return static
+     */
+    public function setDelivery($delivery)
+    {
+        $this->delivery = $delivery;
+        return $this;
+    }
+
+}

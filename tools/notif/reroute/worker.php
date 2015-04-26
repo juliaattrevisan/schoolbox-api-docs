@@ -11,7 +11,7 @@ use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Rerouter\QueueSorter;
 use Schoolbox\Realtime\Rerouter\RerouterDispatchStrategy;
 use Schoolbox\Realtime\Worker\RerouteWorker;
-use \Schoolbox\Realtime\Rerouter\Filter;
+use Schoolbox\Realtime\Rerouter\Filter;
 
 /**
  *

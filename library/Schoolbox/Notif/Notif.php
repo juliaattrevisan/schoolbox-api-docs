@@ -26,6 +26,7 @@ use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\Handler\AMQPHandler;
 use Schoolbox\Notif\Handler\InstamailHandler;
 use Schoolbox\Notif\Handler\MySQLHandler;
+use Schoolbox\Notif\Handler\PushHandler;
 use Schoolbox\Notif\MQ\Connector as MQConnector;
 use Schoolbox\Realtime\Schedule\Persistence\QueueItem;
 use Schoolbox\Realtime\Schedule\Persistence\QueueItemMapper;
@@ -240,11 +241,15 @@ class Notif implements NotifInterface {
 			}
 			array_push($stack, $this->handlers['instant']);
 
-			// [3e] instant user email (warning)
-			if(!isset($this->handlers['plusmail'])) {
-				$this->handlers['plusmail'] = new InstamailHandler(Logger::WARNING, false);
+            if(!isset($this->handlers['push'])) {
+                $this->handlers['push'] = new PushHandler(Logger::WARNING, true);
+            }
+
+			// [3f] instant user email (warning)
+			if(!isset($this->handlers['mail'])) {
+				$this->handlers['mail'] = new InstamailHandler(Logger::ERROR, true);
 			}
-			array_push($stack, $this->handlers['plusmail']);
+			array_push($stack, $this->handlers['mail']);
 		}
 
 		// [4a] suppress anything above debug that's not yet been dealt with

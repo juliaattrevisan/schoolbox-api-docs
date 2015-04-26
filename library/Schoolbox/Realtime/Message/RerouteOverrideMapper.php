@@ -42,6 +42,8 @@ class RerouteOverrideMapper extends Mapper {
 			'type'       => self::TYPE_INTEGER,
 		));
 
+        $this->uses('delivery', self::TYPE_SET);
+
 		$this->hasJoin('user', array(
 			'mapper'     => '\\Schoolbox\\UserMapper',
 			'this_key'   => 'user_id',

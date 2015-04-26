@@ -1,0 +1,70 @@
+<?php
+/**
+ * 
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2015, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Schoolbox\Realtime;
+
+use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Rule;
+use Alaress\Module\Module as BaseModule;
+use Aura\Di\ContainerInterface;
+use Aura\Router\Router;
+use Twig_Error_Loader;
+use Twig_Loader_Chain;
+use Twig_Loader_Filesystem;
+
+class Module extends BaseModule
+{
+
+    /**
+     * @param Router $router
+     * @param string $basePath
+     */
+    public function initRoutes(Router $router, $basePath)
+    {
+        $routes = $router->getRoutes();
+
+        $routes->addGet('messages.configure', $basePath);
+        $routes->addPost('messages.saveConfig', $basePath);
+    }
+
+
+    /**
+     * @param Authorizer $authorizer
+     */
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
+        $authorizer->addRule('/^messages\\..*/', new Rule\IsLoggedIn());
+    }
+
+
+    /**
+     * @param Twig_Loader_Chain $templateLoader
+     * @throws Twig_Error_Loader
+     */
+    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    {
+        // TODO inherit from an Admin baseclass to setup subnav
+        $loader = new Twig_Loader_Filesystem(array());
+        $loader->addPath(__DIR__ . '/templates', 'messages');
+        $templateLoader->addLoader($loader);
+    }
+
+
+    /**
+     * @param ContainerInterface $injector
+     */
+    public function initControllers(ContainerInterface $injector)
+    {
+        $injector->set(
+            'controller:messages',
+            $injector->lazyNew(Controller::class)
+        );
+    }
+
+}

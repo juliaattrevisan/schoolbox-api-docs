@@ -27,4 +27,16 @@ interface NotifInterface extends LoggerInterface
      */
     public function setTopic($topic);
 
+    /**
+     * Logs the given message to the specified channel.
+     * Convenience method equivalent to setChannel()->log();
+     *
+     * @param string $topic
+     * @param int    $level
+     * @param string $message
+     * @param array  $context
+     * @return bool
+     */
+    public function logTo($topic, $level, $message, array $context = array());
+
 }

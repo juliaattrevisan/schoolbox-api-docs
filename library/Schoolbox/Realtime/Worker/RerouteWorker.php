@@ -10,7 +10,6 @@
 namespace Schoolbox\Realtime\Worker;
 
 
-use Alaress\Cli\Debug;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\Worker\AbstractProcess;
 use Alaress\WorkerCrew\Worker\PipeWriter;
