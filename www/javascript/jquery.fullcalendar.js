@@ -743,7 +743,7 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
 
     // Fill in resauce borking separately
     $('ul.relatedBookings').empty();
-    if ('relatedBookings' in eventData) {
+    if (eventData.relatedBookings.length > 0) {
         $('ul.relatedBookings').prepend('<br /><h3>Related Bookings</h3>');
         eventData.relatedBookings.forEach(function(v) {
             var row = $('<li />').html('('+v.status.name+') <a href="'+v.href+'">'+v.title+'</a>');
