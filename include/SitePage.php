@@ -733,7 +733,7 @@ class SitePage extends Page
 
         /* Output webdav client tab if enabled */
         $this->setBlock('tabTpl', 'network_tab', 'network_tab_block');
-        if (Cfg::get('webdav_enable') && !$this->groupHandler->isParent()) {
+        if (Cfg::get('webdav_enable') && !$this->groupHandler->isParent() && !$this->groupHandler->isGuest()) {
             $this->parse('network_tab_block', 'network_tab');
         } else {
             $this->setVar('network_tab_block', '');
