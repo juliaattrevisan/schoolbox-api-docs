@@ -19,7 +19,8 @@ class Report_Login extends Report_Abstract implements Report_IReport
         'date'  => 'date',
         'login' => 'action',
         'user'  => 'user',
-        'ip'    => 'ip'
+        'role'  => 'role',
+        'ip'    => 'ip',
     );
 
     // csv mappings
@@ -29,11 +30,13 @@ class Report_Login extends Report_Abstract implements Report_IReport
         'user'      => 'user id',
         'firstname' => 'firstname',
         'lastname'  => 'lastname',
-        'ip'        => 'originating ip address'
+        'role'      => 'role',
+        'roletype'  => 'roletype',
+        'ip'        => 'originating ip address',
     );
 
     // fields that we will permit sorting on
-    private $sortable = array('date', 'user', 'ip');
+    private $sortable = array('date', 'user', 'ip', 'role');
 
     // default sorting if none provided
     private $defaultOrderBy = 'date';
@@ -41,6 +44,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
     // fields we permit filtering by
     private $filterable = array(
         'user'   => 'username, realname or partial',
+        'role'   => '',
         'ip'     => 'x.x.x.x',
         'after'  => 'eg. 2012-01-06, yesterday',
         'before' => 'eg. July 1, 3 days ago'
@@ -156,6 +160,11 @@ class Report_Login extends Report_Abstract implements Report_IReport
         $params    = array();
         foreach ($resultFilter as $key => $value) {
             if (in_array($key, $this->getFilterFields())) {
+
+                if ($key == 'role') {
+                    $key = 'name'; //convert role to group name
+                }
+
                 // custom filter by user
                 if ($key == 'user') {
                     $sqlFilter[]     = "user.username LIKE :value
@@ -170,8 +179,8 @@ class Report_Login extends Report_Abstract implements Report_IReport
                     }
                 } elseif ($key == 'before') {
                     if ($date = strtotime($value)) {
-                        $date             = date('Y-m-d H:i:s', $date);
-                        $sqlFilter[]      = "`date` >= :before";
+                        $date = date('Y-m-d H:i:s', $date);
+                        $sqlFilter[] = "`date` >= :before";
                         $params['before'] = $date;
                     }
                 } else {
@@ -185,7 +194,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
             sprintf(" WHERE (%s)", implode(') AND (', $sqlFilter)) :
             '';
 
-        $joins = "LEFT JOIN `user` ON `user`.`username` = login_log.username";
+        $joins = "LEFT JOIN `user` ON `user`.`username` = login_log.username LEFT JOIN `groups` ON `user`.`group_id` = groups.id";
 
         // Get count separately from data
         $countStatement = $this->db->prepare("SELECT COUNT(*) FROM login_log $joins $sqlFilterString");
@@ -198,7 +207,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
             return 0;
         }
 
-        $dataQuery = "SELECT `date`, login, ip, user.id AS user, title, firstname, lastname
+        $dataQuery = "SELECT `date`, login, ip, user.id AS user, title, firstname, lastname, groups.name as role, groups.group_type as roletype
                       FROM login_log
                       $joins
                       $sqlFilterString
@@ -265,7 +274,8 @@ class Report_Login extends Report_Abstract implements Report_IReport
                     'DATE'      => $log['date'],
                     'USERNAME'  => $displayName,
                     'ACTION'    => $action,
-                    'IP'        => $log['ip']
+                    'IP'        => $log['ip'],
+                    'ROLE'  => $log['role']
                 ));
 
                 $page->parse('activity_block', 'activity', true);
