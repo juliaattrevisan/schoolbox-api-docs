@@ -126,6 +126,10 @@ class EntriesAndResults extends Base {
 
         $result = $this->getDb()->getAll($query);
 
-        return $result;
+        if (is_array($result)) {
+            return $result;
+        }
+
+        return array();
     }
 }

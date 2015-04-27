@@ -115,6 +115,12 @@ class GradeSummary extends Base {
             ORDER BY StudentYearLevel DESC, StrippedResult DESC
         ";
 
-        return $this->getDb()->getAll($query);
+        $result = $this->getDb()->getAll($query);
+
+        if (is_array($result)) {
+            return $result;
+        }
+
+        return array();
     }
 }

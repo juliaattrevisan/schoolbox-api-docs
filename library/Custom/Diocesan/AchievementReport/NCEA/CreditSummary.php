@@ -80,9 +80,13 @@ class CreditSummary extends Base {
             ";
         }
 
-        $allResults = $this->getDb()->getAll($query);
+        $result = $this->getDb()->getAll($query);
 
-        return $allResults;
+        if (is_array($result)) {
+            return $result;
+        }
+
+        return array();
     }
 
     /**
