@@ -19,6 +19,8 @@ use Alaress\Web\Router\PathMatcher;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 
+use Schoolbox\UserMapper;
+
 class Module extends BaseModule {
 
     /**
@@ -85,42 +87,39 @@ class Module extends BaseModule {
         $externalUserHandler = new \External_User();
         $externalUser = $externalUserHandler->getStudent($params['externalUserId']);
 
-        /* TODO: When selected user doesn't exist in external db
+        /* When selected user doesn't exist in external db
          */
         if (!$externalUser) {
-            error(2);
+            error(31);
         }
 
-        /* TODO: When selected user doesn't exist in schoolbox
+        /* When selected user doesn't exist in schoolbox
          */
         try {
-            $userMapper = new \Schoolbox\UserMapper();
+            $userMapper = new UserMapper();
             $user = $userMapper->findOneByColumn('synergy_id', $params['externalUserId']);
-
-            /* Teachers and parents of children have access to a report
-             * Everyone else does not
-             */
-            $groupHandler = new \Group();
-
-            $isSuperuser = $_SESSION['user']->isSuperuser();
-            $isStaff = $_SESSION['user']->getRole()->isStaff();
-            $isParentOfChild = $groupHandler->isParentOfChild($user->getId());
-
-            /* If you're none of the above, get out
-             */
-            if (!$isSuperuser && !$isStaff && !$isParentOfChild) {
-                error(19);
-            }
-
         }
         catch (\Exception $e) {
-            error(2);
+            error(31);
         }
 
-        $db = new \MSSQL();
+        /* Teachers and parents of children have access to a report
+         * Everyone else does not
+         */
+        $groupHandler = new \Group();
+
+        $isSuperuser = $_SESSION['user']->isSuperuser();
+        $isStaff = $_SESSION['user']->getRole()->isStaff();
+        $isParentOfChild = $groupHandler->isParentOfChild($user->getId());
+
+        /* If you're none of the above, get out
+         */
+        if (!$isSuperuser && !$isStaff && !$isParentOfChild) {
+            error(19);
+        }
 
         return array(
-            'db' => $db,
+            'db' => new \MSSQL(),
             'externalUser' => $externalUser,
             'user' => $user
         );
