@@ -46,6 +46,9 @@ mkdir /var/lib/vagrant -p > /dev/null;
 rm -f /vagrant/updates/*/scripts_list > /dev/null;
 rm -vR /var/lib/vagrant > /dev/null;
 
+echo "$vag Applying UTF8 schema patch";
+/vagrant/tools/schema/collation.sh schoolbox;
+
 # Need to re-enable modules too, because they're off by default
 echo "$vag Enabling modules";
 /vagrant/tools/module.sh enable mobile;
