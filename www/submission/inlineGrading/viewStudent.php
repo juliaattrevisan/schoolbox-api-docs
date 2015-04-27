@@ -9,31 +9,30 @@
  */
 
 use Schoolbox\Assessment\Component;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 
-/* /submission/inline/viewStudent/<box_id>/<user_id>
+/* /submission/inline/viewStudent/<submission_id>
  */
-$submissionBoxId = $this->arg[0];
-$currentUid = $this->arg[1];
+$submissionId = $this->arg[0];
 
-/* This is an optional argument
- */
-$submissionId = $this->arg[2];
+try {
+    $submission = Submission\FileMapper::getInstance()->findById($this->arg[0]);
+} catch (Schoolbox\Mapper\Exception $e) {
+    error(41);
+    exit;
+}
 
 $submissionBoxMapper = new Component\SubmissionBoxMapper();
-$submissionBox = $submissionBoxMapper->findById($submissionBoxId);
+$submissionBox = $submissionBoxMapper->findById($submission->getSubmissionBox()->getId());
+
+$currentStudent = $submission->getOwner();
+$currentUid = $currentStudent->getId();
 
 /* Add category codes
  */
 $categoryCodeMapper = new \Schoolbox\Resource\CategoryCodeMapper();
 $categoryCode = $categoryCodeMapper->findForCategory($submissionBox->getCategory()->getId());
 $submissionBox->getCategory()->setCodes($categoryCode);
-
-/* Crappy handler
- */
-$submissionHandler = new Submission();
-
-$userMapper = new \Schoolbox\UserMapper();
-$currentStudent = $userMapper->findById($currentUid);
 
 // Permission check
 $groupHandler  = new Group();
@@ -60,63 +59,22 @@ if (!$hasPermission) {
 }
 unset($groupHandler);
 
-/* Augment navigation data
- */
-$currentAugmented = array(
-    'currentStudent' => $currentStudent,
-    'submission' => null,
-    'navigation' => array(
-        'id' => $currentStudent->getId(),
-        'label' => $currentStudent->getLastname() . ', ' . $currentStudent->getFirstname(),
-        'value' => '/submission/inlineGrading/view/' . $submissionBoxId . '/' . $currentStudent->getId()
-    ),
-);
-
-/* Trim out only this student
- */
-$submissionMapper = new Component\SubmissionBox\SubmissionMapper();
-
-/* Load a specific submission for this box/person
- */
-if (is_numeric($this->arg[2])) {
-    $submission = $submissionMapper->findById($this->arg[2]);
-
-    if ($submission) {
-
-        /* Apply mime type
-         */
-        $mimetypeMapper = new \Schoolbox\File\MimetypeMapper();
-        $mime = $mimetypeMapper->findOneByColumn('mime', $submission->getMimeType()->getMime());
-        $submission->setMimetype($mime);
-
-        /* Stack it
-         */
-        $currentAugmented['submission'] = $submission;
-    }
-}
-
 /* Rendering things out
  */
-$user = $userMapper->findById($submission->getOwner()->getId());
-
-if ($currentAugmented['submission'] != null) {
-    $submissionId = $currentAugmented['submission']->getId();
-}
-
 $this->setFile(TEMPLATE_content, 'submission/inlineGrading/viewStudent.html');
 
 /* Render injectable views
  */
-$templateFactory = new \Crocodoc\Renderer\Factory($this, $currentAugmented['submission'], null, array());
+$templateFactory = new \Crocodoc\Renderer\Factory($this, $submission, null, array());
 $renderer = $templateFactory->produce();
 $renderer->render();
 
 $this->setVar(
     array(
-        'INLINE_GRADING_SUBMISSION_ID' => $submissionId,
+        'INLINE_GRADING_SUBMISSION_ID' => $submission->getId(),
         'INLINE_GRADING_SUBMISSION_BOX_ID' => $submissionBox->getId(),
         'INLINE_GRADING_SUBMISSION_BOX_NAME' => $submissionBox->getName(),
-        'INLINE_GRADING_STUDENT_FULL_NAME' => $user->getFullName(),
-        'INLINE_GRADING_STUDENT_ID' => $user->getId(),
+        'INLINE_GRADING_STUDENT_FULL_NAME' => $currentStudent->getFullName(),
+        'INLINE_GRADING_STUDENT_ID' => $currentStudent->getId(),
     )
 );
