@@ -97,7 +97,7 @@ class Document
 
         /* Unlink copied file after uploading
          */
-        //unlink($this->getUrl());
+        unlink($this->getUrl());
 
         // Crocodoc-related errors, when a file dies in crocodoc
         $result = json_decode($curl->getResult());
