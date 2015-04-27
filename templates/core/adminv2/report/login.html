@@ -4,9 +4,9 @@
         <tr>
             <th class="{SORT_DATE}"><a href="/adminv2/reports/{SORT_BASE}/date/{SORT_DATE_DIR}">Date</a></th>
             <th class="{SORT_USER}"><a href="/adminv2/reports/{SORT_BASE}/user/{SORT_USER_DIR}">User</a></th>
+            <th class="{SORT_ROLE}"><a href="/adminv2/reports/{SORT_BASE}/role/{SORT_ROLE_DIR}">Role</a></th>
             <th class="{SORT_LOGIN}"><a href="/adminv2/reports/{SORT_BASE}/login/{SORT_LOGIN_DIR}">Action</a></th>
             <th class="{SORT_IP}"><a href="/adminv2/reports/{SORT_BASE}/ip/{SORT_IP_DIR}">Originating IP</a></th>
-            <th class="{SORT_ROLETYPE}"><a href="/adminv2/reports/{SORT_BASE}/roletype/{SORT_ROLETYPE_DIR}">Role Type</a></th>
         </tr>
         </thead>
         <tbody>
@@ -14,9 +14,9 @@
         <tr>
             <td>{DATE}</td>
             <td><a href="/search/user/{UID}">{USERNAME}</a></td>
+            <td>{ROLE}</td>
             <td>{ACTION}</td>
             <td>{IP}</td>
-            <td>{ROLETYPE}</td>
         </tr>
         <!-- END activity -->
         </tbody>
