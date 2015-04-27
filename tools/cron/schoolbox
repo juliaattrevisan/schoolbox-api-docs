@@ -22,5 +22,8 @@ MAILTO="support@schoolbox.com.au"
 # Plagscan callback - every hour
 0 * * * *	root	php /usr/share/schoolbox/tools/plagscan/scan.php >> /var/log/schoolbox/plagscan.log 2>&1
 
+# Upload student submissions to crocodoc - every hour
+30 * * * *	root	php /usr/share/schoolbox/tools/crocodoc/upload.php >> /var/log/schoolbox/crocodoc.log 2>&1
+
 # Etherpad - sync back to MySQL - every hour
 0 * * * *	root	php /usr/share/schoolbox/tools/etherpad-sync.php >> /dev/null 2>&1

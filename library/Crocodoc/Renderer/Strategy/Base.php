@@ -161,7 +161,7 @@ abstract class Base {
 	 *
 	 * @param SitePage $page
 	 */
-	protected function setPage($page) {
+	protected function setPage(SitePage $page) {
 		$this->page = $page;
 	}
 

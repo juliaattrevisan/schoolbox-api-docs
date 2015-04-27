@@ -1,6 +1,6 @@
 <?php
 /**
- * Session
+ * Creates a session with crocodoc and returns the URL for the document in that session
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -11,6 +11,7 @@ namespace Crocodoc;
 
 use Alaress_Curl_Url;
 use Schoolbox\User;
+
 
 class Loader
 {
@@ -37,13 +38,6 @@ class Loader
     private $uuid = '';
 
     /**
-     * A group handler
-     *
-     * @var \Group
-     */
-    private $groupHandler = null;
-
-    /**
      * Curl object
      *
      * @var Alaress_Curl_Url
@@ -61,28 +55,23 @@ class Loader
         $this->setAuthenticator(new Authenticator());
         $this->setUuid($uuid);
         $this->setUser($user);
-        $this->setGroupHandler(new \Group());
         $this->setCurl(new Alaress_Curl_Url('https://crocodoc.com/api/v2/session/create'));
     }
 
     /**
-     * Spawn an iframe
+     * Setups up session with crocodoc and returns the URL to access the crocodoc document for that iframe
      */
     public function render()
     {
 
         /* Handle postfields different from student viewers and teacher/superuser viewers
          */
-        if ($this->getGroupHandler()->isStudent($this->getUser()->getId())) {
-            $postFields = "token={$this->getAuthenticator()
-                                       ->getApiToken()}&uuid={$this->getUuid()}&editable=false";
-
-        } elseif ($this->getGroupHandler()->isStaff($this->getUser()->getId())
-            || $this->getGroupHandler()->isSuperuser($this->getUser()->getId())) {
-
-            $userTuple  = "{$this->getUser()->getId()},{$this->getUser()->getUsername()}";
+        if($this->getUser()->getRole()->isStudent()) {
+            $postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&editable=false";
+        }
+        else if ($this->getUser()->getRole()->isStaff() || $this->getUser()->isSuperuser()) {
+            $userTuple = "{$this->getUser()->getId()},{$this->getUser()->getUsername()}";
             $postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&editable=true&user={$userTuple}";
-
         } else {
             $postFields = '';
         }
@@ -100,16 +89,15 @@ class Loader
 
         $result = json_decode($this->getCurl()->getResult());
 
-        return json_encode(
-            array(
-                'url' => "https://crocodoc.com/view/{$result->session}",
-                'errors' => $this->getCurl()->getErrors(),
-                /* Pass this so that crocodoc uuid gets phplibbed upon
-                 * first load in Inline Grader, for student view
-                 */
-                'uuid' => $this->getUuid()
-            )
-        );
+        if($this->getCurl()->getErrors()) {
+            throw Exception($this->getCurl()->getErrors());
+        }
+        else if(isset($result->error)) {
+            throw Exception($result->error);
+        }
+        else {
+            return "https://crocodoc.com/view/{$result->session}";
+        }
     }
 
     /* Getters/Setters
@@ -120,7 +108,7 @@ class Loader
      *
      * @param User $user
      */
-    private function setUser($user)
+    private function setUser(User $user)
     {
         $this->user = $user;
     }
@@ -160,7 +148,7 @@ class Loader
      *
      * @param Authenticator $authenticator
      */
-    private function setAuthenticator($authenticator)
+    private function setAuthenticator(Authenticator $authenticator)
     {
         $this->authenticator = $authenticator;
     }
@@ -176,31 +164,11 @@ class Loader
     }
 
     /**
-     * Set group handler
-     *
-     * @param \Group $groupHandler
-     */
-    private function setGroupHandler($groupHandler)
-    {
-        $this->groupHandler = $groupHandler;
-    }
-
-    /**
-     * Get group handler
-     *
-     * @return \Group
-     */
-    private function getGroupHandler()
-    {
-        return $this->groupHandler;
-    }
-
-    /**
      * Set curl
      *
      * @param Alaress_Curl_Url $curl
      */
-    private function setCurl($curl)
+    private function setCurl(Alaress_Curl_Url $curl)
     {
         $this->curl = $curl;
     }

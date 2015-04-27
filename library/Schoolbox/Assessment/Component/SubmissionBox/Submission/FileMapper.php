@@ -354,4 +354,29 @@ class FileMapper extends Mapper
 
     }
 
+    /**
+     * Get list of submissions that should be submitted to crocodoc
+     *
+     * @return Collection|File[]
+     */
+    public function getCrocodoc() {
+
+        $query = $this->getSelectString();
+        $query .= "
+            WHERE uuid is null AND ( ext like 'docx' OR
+                                        ext like 'doc' OR
+                                        ext like 'xls' OR
+                                        ext like 'xlsx' OR
+                                        ext like 'ppt' OR
+                                        ext like 'pptx' OR
+                                        ext like 'pdf')
+                 AND YEAR(submitted) = YEAR(NOW())
+
+            ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute();
+        return $this->hydrateSelect($statement);
+    }
+
 } 

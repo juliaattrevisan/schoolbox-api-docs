@@ -31,7 +31,7 @@ class Document
     private $url = '';
 
     /**
-     * An instance of Schoolbox\Assessment\Component\SubmissionBox\Submission
+     * The student submission containing the file we wish to preview
      *
      * @var Submission\File
      */
@@ -56,13 +56,16 @@ class Document
 
         /** @var Model $storage */
         $storage     = $submission->getStorage();
-        $destination = \Cfg::get('submission_upload_tmp_dir') . '/' . $this->getSubmission()->getId() . '_' . $this->getSubmission()->getFilename();
+        $destination = \Cfg::get('submission_upload_tmp_dir') . '/' . $this->getSubmission()->getId() . '_' . $this->getSubmission()->getStorage()->getBasename();
 
         // copy the file contents to the temp directory
-        if ($fp = fopen($destination, 'w')) {
-            if (fwrite($fp, $storage->readStream())) {
-                $this->setUrl($destination);
+        if ($storage->exists() && $fp = fopen($destination, 'w')) {
+            $input = $storage->readStream();
+            while($chunk = fgets($input, 1024)) {
+                fwrite($fp, $chunk);
             }
+
+            $this->setUrl($destination);
             fclose($fp);
         }
     }
@@ -85,7 +88,7 @@ class Document
                 CURLOPT_POST => 1,
                 CURLOPT_POSTFIELDS => $postfields,
                 CURLOPT_FOLLOWLOCATION => 1,
-                CURLOPT_TIMEOUT_MS => 15000,
+                CURLOPT_TIMEOUT_MS => 240000,
             )
         );
 
@@ -95,9 +98,18 @@ class Document
          */
         unlink($this->getUrl());
 
+        // Crocodoc-related errors, when a file dies in crocodoc
+        $result = json_decode($curl->getResult());
+
+        if (isset($result->uuid)) {
+            /* Save reference to uploaded file */
+            $this->getSubmission()->setUuid($result->uuid);
+            Submission\FileMapper::getInstance()->save($this->getSubmission());
+        }
+
         return array(
-            'result' => json_decode($curl->getResult()),
-            'errors' => $curl->getErrors()
+            'result' => $result,
+            'errors' => isset($result->error) ? $result->error : implode(', ',$curl->getErrors()),
         );
     }
 
@@ -109,7 +121,7 @@ class Document
      *
      * @param Authenticator $authenticator
      */
-    private function setAuthenticator($authenticator)
+    private function setAuthenticator(Authenticator $authenticator)
     {
         $this->authenticator = $authenticator;
     }
@@ -169,7 +181,7 @@ class Document
      *
      * @param Submission\File $submission
      */
-    private function setSubmission($submission)
+    private function setSubmission(Submission\File $submission)
     {
         $this->submission = $submission;
     }

@@ -5,42 +5,43 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 namespace Crocodoc\Renderer\Strategy;
 
 use Schoolbox\Video\QueueMapper;
 use Schoolbox\Video\Factory\Video as VideoFactory;
 
-class Video extends Base {
+class Video extends Base 
+{
 
-	/**
-	 * The template file to inject
-	 *
-	 * @var string
-	 */
-	protected $templateFile = 'submission/inlineGrading/injectables/views/video.html';
+    /**
+     * The template file to inject
+     *
+     * @var string
+     */
+    protected $templateFile = 'submission/inlineGrading/injectables/views/video.html';
 
-	/**
-	 * Control file, to determine how to return work
-	 *
-	 * @var string
-	 */
-	protected $controlFile = 'submission/inlineGrading/injectables/controls/redirect-return-control.html';
+    /**
+     * Control file, to determine how to return work
+     *
+     * @var string
+     */
+    protected $controlFile = 'submission/inlineGrading/injectables/controls/redirect-return-control.html';
 
-	/**
-	 * Render injectable
-	 *
-	 * @return mixed|void
-	 */
-	public function render() {
-		$this->getPage()->setFile('injectable', $this->getTemplateFile());
-		$this->getPage()->parse('INJECTED_INTERFACE_TEMPLATE', 'injectable');
+    /**
+     * Render injectable
+     *
+     * @return mixed|void
+     */
+    public function render()
+    {
+        $this->getPage()->setFile('injectable', $this->getTemplateFile());
+        $this->getPage()->parse('INJECTED_INTERFACE_TEMPLATE', 'injectable');
 
-		/* Set up blocks and stuff
-		 */
-		$this->getPage()->setBlock('INJECTED_INTERFACE_TEMPLATE', 'injectable_video_player', 'injectable_video_player_block');
-		$this->getPage()->setBlock('INJECTED_INTERFACE_TEMPLATE', 'injectable_video_status', 'injectable_video_status_block');
+        /* Set up blocks and stuff
+         */
+        $this->getPage()->setBlock('INJECTED_INTERFACE_TEMPLATE', 'injectable_video_player', 'injectable_video_player_block');
+        $this->getPage()->setBlock('INJECTED_INTERFACE_TEMPLATE', 'injectable_video_status', 'injectable_video_status_block');
 
         /* Upload file
         */
@@ -49,9 +50,11 @@ class Video extends Base {
 
         /* Control how Return Work is done
          */
-        $this->getPage()->setVar(array(
-            'INJECTED_INTERFACE_CONTROL' => ''
-        ));
+        $this->getPage()->setVar(
+            array(
+                'INJECTED_INTERFACE_CONTROL' => ''
+            )
+        );
 
 		try {
 			$videoMapper = new VideoFactory($this->getSubmission()->getHash(), QueueMapper::FILE_TYPE_STORAGE);
@@ -87,11 +90,11 @@ class Video extends Base {
 				'injectable_video_player_block' => ''
 			));
 
-			$this->getPage()->parse('injectable_video_status_block', 'injectable_video_status');
-		}
+            $this->getPage()->parse('injectable_video_status_block', 'injectable_video_status');
+        }
 
-		/* Upload File
-		 */
-		$this->parseInjectableUpload();
-	}
+        /* Upload File
+         */
+        $this->parseInjectableUpload();
+    }
 }
