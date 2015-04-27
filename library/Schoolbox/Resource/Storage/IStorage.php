@@ -21,17 +21,23 @@ use Schoolbox\File\Mimetype;
  */
 interface IStorage
 {
-
     /**
-     * Returns the real filename of the file
+     * Returns the first part of the filename
      * @return string
      */
     public function getFilename();
 
     /**
+     * Returns just the extension of the file
      * @return string
      */
     public function getExtension();
+
+    /**
+     * Returns the real filename of the file
+     * @return string
+     */
+    public function getBasename();
 
     /**
      * Returns the full mime string for the file
