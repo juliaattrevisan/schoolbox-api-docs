@@ -96,6 +96,22 @@ class Module extends BaseModule {
         try {
             $userMapper = new \Schoolbox\UserMapper();
             $user = $userMapper->findOneByColumn('synergy_id', $params['externalUserId']);
+
+            /* Teachers and parents of children have access to a report
+             * Everyone else does not
+             */
+            $groupHandler = new \Group();
+
+            $isSuperuser = $_SESSION['user']->isSuperuser();
+            $isStaff = $_SESSION['user']->getRole()->isStaff();
+            $isParentOfChild = $groupHandler->isParentOfChild($user->getId());
+
+            /* If you're none of the above, get out
+             */
+            if (!$isSuperuser && !$isStaff && !$isParentOfChild) {
+                error(19);
+            }
+
         }
         catch (\Exception $e) {
             error(2);
