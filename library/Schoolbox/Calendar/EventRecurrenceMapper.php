@@ -18,6 +18,7 @@ use Schoolbox\Collection;
 use Schoolbox\Notif\NotifInterface;
 use Schoolbox\Notif\SilentNotif;
 use Traversable;
+use Alaress\Lumberjack\Logger;
 
 class EventRecurrenceMapper
 {
@@ -48,7 +49,7 @@ class EventRecurrenceMapper
 
         // silence!! but srsly, in this context, the event mapper needs to not raise notifications
         $this->getEventMapper()
-             ->setNotifier(new SilentNotif());
+             ->setNotifier(new SilentNotif(new Logger(null)));
 
         $this->setup();
     }
