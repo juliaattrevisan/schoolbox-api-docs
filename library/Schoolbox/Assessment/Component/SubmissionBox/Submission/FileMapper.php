@@ -357,7 +357,7 @@ class FileMapper extends Mapper
     /**
      * Get list of submissions that should be submitted to crocodoc
      *
-     * @return Collection
+     * @return Collection|File[]
      */
     public function getCrocodoc() {
 

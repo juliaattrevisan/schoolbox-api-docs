@@ -11,7 +11,6 @@
 namespace Crocodoc;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
-use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
 use Schoolbox\Resource\Storage\Model;
 
 class Document
