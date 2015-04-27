@@ -13,9 +13,8 @@
 namespace Schoolbox\Resource\Test;
 use Schoolbox\Resource\Exception;
 use Schoolbox\Resource\File;
-use Schoolbox\Resource\FileMapper;
 use Schoolbox\Test\TestCase;
-use Schoolbox\Storage;
+use Schoolbox\Resource\Storage;
 
 class FileMapperTest extends TestCase {
 
@@ -31,7 +30,7 @@ class FileMapperTest extends TestCase {
 
 	public function setUp() {
 		parent::setUp();
-		$this->object = new FileMapper();
+		$this->object = new File\Mapper();
 	}
 
 	public function testHydrate() {
@@ -48,11 +47,11 @@ class FileMapperTest extends TestCase {
 	public function testCopyToStorage() {
 		//
 		// Storage items - mock their mimetype and config loaders.
-		$new_storage = new Storage();
+		$new_storage = new Storage\Model();
 		$new_storage
 			->setConfigLoader($this->mock_config)
 		;
-		$saved_storage = new Storage();
+		$saved_storage = new Storage\Model();
 		$saved_storage
 			->setConfigLoader($this->mock_config)
 			->setFilename('dumb.txt')
@@ -64,7 +63,7 @@ class FileMapperTest extends TestCase {
 		// createModel(): returns a new (mocked) storage item.
 		// findByColumn(): First call throws an exception, others return the
 		// saved storage item.
-		$storage_mapper = $this->getMock('\\Schoolbox\\FileMapper', array('createModel', 'findByHash'));
+		$storage_mapper = $this->getMock('\\Schoolbox\\Resource\\File\\Mapper', array('createModel', 'findByHash'));
 		$storage_mapper
 			->expects($this->any())
 			->method('createModel')
