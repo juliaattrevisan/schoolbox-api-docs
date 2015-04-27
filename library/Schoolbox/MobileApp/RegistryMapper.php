@@ -67,7 +67,7 @@ class RegistryMapper extends Mapper
      * @return Registry
      * @throws Mapper\Exception
      */
-    public function findById($userId, $token, $provider)
+    public function findById($userId, $token = null, $provider = null)
     {
         return $this->findOneByColumnList(array(
             'user_id'   => $userId,
