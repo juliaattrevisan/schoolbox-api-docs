@@ -15,6 +15,16 @@ if ($_POST['heading']) {
     $publishedDate = Alaress_Date_Format::newLocalShort($_POST['item_datetime_published']);
     $expiryDate = Alaress_Date_Format::newLocalShort($_POST['item_datetime_expires']);
 
+    if($_POST['publish_hour'] && $_POST['publish_minute']) {
+        $publishedDate->set12Hour($_POST['publish_hour'], $_POST['publish_period']);
+        $publishedDate->setMinute($_POST['publish_minute']);
+    }
+
+    if($_POST['expires_hour'] && $_POST['expires_minute']) {
+        $expiryDate->set12Hour($_POST['expires_hour'], $_POST['expires_period']);
+        $expiryDate->setMinute($_POST['expires_minute']);
+    }
+
     // Error out if there's campi that this user can't post to in $_POST[campus]
     $campusList = array();
     foreach ($newsHandler->getCampusList() as $campus) {
@@ -93,10 +103,10 @@ if ($_POST['heading']) {
 	// if this is a new article, add some extra bits
 	if(!$article->getId()) {
 		$article->setOwner($_SESSION['user']);
-		$article->setPostDate(new Alaress_Date_Format(time(), 'U'));
+		$article->setPostDate(Alaress_Date_Format::now());
 	}
 	else {
-		$article->setModifiedDate(new Alaress_Date_Format(time(), 'U'));
+		$article->setModifiedDate(Alaress_Date_Format::now());
 	}
 
     if (count($_POST['attachment']) && is_array($_POST['attachment'])) {

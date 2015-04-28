@@ -1,0 +1,1 @@
+ALTER TABLE `news_items` CHANGE `item_datetime_published` `item_datetime_published` DATETIME NOT NULL, CHANGE `item_datetime_expires` `item_datetime_expires` DATETIME DEFAULT '0000-00-00' NOT NULL;

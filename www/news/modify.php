@@ -37,8 +37,8 @@ if (is_numeric($this->arg[0])) {
 		error(23);
 	}
 
-	$publishedDate = new Alaress_Date_Format($news['item_datetime_published'], 'Y-m-d');
-	$expiryDate = new Alaress_Date_Format($news['item_datetime_expires'], 'Y-m-d');
+	$publishedDate = new Alaress_Date_Format($news['item_datetime_published'], Alaress_Date_Format::DATABASE_FORMAT);
+	$expiryDate = new Alaress_Date_Format($news['item_datetime_expires'], Alaress_Date_Format::DATABASE_FORMAT);
 
 	$output = array(
 		'ACTION' => 'Modify',
@@ -47,7 +47,13 @@ if (is_numeric($this->arg[0])) {
         'NEWS_IMAGE' => $news['item_image'],
 		'BODY' => Scrub::text($news['item_body']),
 		'ITEM_DATETIME_PUBLISHED' => $publishedDate->getLocalShort(),
+        'PUBLISH_HOUR'          => $publishedDate->isAtStartOfDay() ? '' : $publishedDate->get12Hour(),
+        'PUBLISH_MIN'        => $publishedDate->isAtStartOfDay() ? '' : $publishedDate->getMinute(true),
+        'PUBLISH_PM'            => $publishedDate->getMeridiem() == 'pm' ? 'selected="selected"' : '',
 		'ITEM_DATETIME_EXPIRES' => $expiryDate->getLocalShort(),
+        'EXPIRES_HOUR'          => $expiryDate->isAtStartOfDay() ? '' : $expiryDate->get12Hour(),
+        'EXPIRES_MIN'        => $expiryDate->isAtStartOfDay() ? '' : $expiryDate->getMinute(true),
+        'EXPIRES_PM'            => $expiryDate->getMeridiem() == 'pm' ? 'selected="selected"' : '',
 	);
 
 	$this->setVar($output);
@@ -120,7 +126,13 @@ else {
 		'BODY' => '',
         'current_users_block' => '',
 		'ITEM_DATETIME_PUBLISHED' => $publishedDate->getLocalShort(),
+        'PUBLISH_HOUR'          => '',
+        'PUBLISH_MIN'           => '',
+        'PUBLISH_PM'            => '',
 		'ITEM_DATETIME_EXPIRES' => $expiryDate->getLocalShort(),
+        'EXPIRES_HOUR'          => '',
+        'EXPIRES_MIN'           => '',
+        'EXPIRES_PM'            =>'',
 	);
 
 	$this->setVar($output);

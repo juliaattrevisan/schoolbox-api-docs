@@ -68,7 +68,7 @@ class ArticleMapper extends Mapper implements Searchable
             array(
                 'column'   => 'item_datetime_published',
                 'property' => 'publishDate',
-                'type'     => Mapper::TYPE_DATE,
+                'type'     => Mapper::TYPE_DATETIME,
             )
         );
 
@@ -76,7 +76,7 @@ class ArticleMapper extends Mapper implements Searchable
             array(
                 'column'   => 'item_datetime_expires',
                 'property' => 'expiryDate',
-                'type'     => Mapper::TYPE_DATE,
+                'type'     => Mapper::TYPE_DATETIME,
             )
         );
 
@@ -84,7 +84,7 @@ class ArticleMapper extends Mapper implements Searchable
             array(
                 'column'   => 'item_datetime_modified',
                 'property' => 'modifiedDate',
-                'type'     => Mapper::TYPE_DATE,
+                'type'     => Mapper::TYPE_DATETIME,
             )
         );
 
@@ -551,8 +551,8 @@ class ArticleMapper extends Mapper implements Searchable
                 LEFT JOIN {$this->getJoinSql('campuses', 'a', 'c')}
                 LEFT JOIN {$this->getJoinSql('roles', 'a', 'r')}
                 WHERE a.item_deleted = 0
-                    AND a.item_datetime_published <= CURDATE()
-                    AND a.item_datetime_expires > CURDATE()
+                    AND a.item_datetime_published <= NOW()
+                    AND a.item_datetime_expires > NOW()
                     AND (
                         u.id = :userId
                         OR a.item_owner = :userId
@@ -647,8 +647,8 @@ class ArticleMapper extends Mapper implements Searchable
             LEFT JOIN `newsGroup` AS `v_r` ON `a`.`item_id` = `v_r`.`id`
             WHERE a.item_deleted = 0
                 $topicQuery
-                AND a.item_datetime_published <= CURDATE()
-                AND a.item_datetime_expires > CURDATE()
+                AND a.item_datetime_published <= NOW()
+                AND a.item_datetime_expires > NOW()
                 AND (
                     u.id = :userId
                     OR a.item_owner = :userId
@@ -714,9 +714,9 @@ class ArticleMapper extends Mapper implements Searchable
 				LEFT JOIN {$this->getJoinSql('image', 'n', 'i')}
 			WHERE
 				`n`.`item_deleted` = FALSE
-				AND `n`.`item_datetime_published` <= CURDATE()
+				AND `n`.`item_datetime_published` <= NOW()
 				AND `n`.`item_topic_id` = :topicId
-				AND `n`.`item_datetime_expires` > CURDATE()
+				AND `n`.`item_datetime_expires` > NOW()
 			ORDER BY `n`.`item_datetime_posted` DESC
 			LIMIT $offset, $limit
 		";

@@ -269,7 +269,7 @@ if (is_array($items)) {
             /* Show publish date to administrators if it's in the future
              */
             if ($hasAdminAccess) {
-                $publishDate = new Alaress_Date_Format($article['item_datetime_published'], 'Y-m-d H:i:s');
+                $publishDate = new Alaress_Date_Format($article['item_datetime_published'], Alaress_Date_Format::DATABASE_FORMAT);
 
                 if ($publishDate->getUnixTimestamp() > time()) {
                     $this->setVar(
@@ -300,7 +300,7 @@ if (is_array($items)) {
                 $this->setVar(
                     array(
                         'EXPIRY_VERB' => $expiryVerb,
-                        'EXPIRY_DATE' => $expireDate->getLong(),
+                        'EXPIRY_DATE' => $expireDate->getLongDateOnly(),
                     )
                 );
 
@@ -331,6 +331,7 @@ if (is_array($items)) {
                 'TOPIC_CLEAN' => $filter['archive'] . $url->getSlug(),
                 'ON_OFF' => ++$j % 2 ? 'dark' : ''
             );
+
 
             $this->setVar($output);
             $topicList[$article['topicName']] = 1;
