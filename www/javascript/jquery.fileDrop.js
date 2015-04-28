@@ -21,6 +21,7 @@
             acceptedFiles: null,
             fallback: noop,
             forceFallback: false,
+            maxFilesize: 2048,
 
             // custom handling for dropzone
             navWarning: "You still have files uploading, which will be cancelled if you leave this page.",
@@ -129,6 +130,7 @@
             acceptedFiles: acceptedMime,
             fallback: this.options.fallback,
             forceFallback: this.options.forceFallback,
+            maxFilesize: this.options.maxFilesize,
 
             dictDefaultMessage: this.options.dictDefaultMessage,
             dictFallbackMessage: this.options.dictFallbackMessage,

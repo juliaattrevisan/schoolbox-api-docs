@@ -61,6 +61,7 @@ if(typeof window.location.origin == 'undefined') {
             previewsContainerSelector: 'ul.az-list',
             thumbnailSize: 64,
             tplOverride: null,
+            maxFilesize: 2048,
 
             // pass through to various implementations
             allowedFiles: null,
@@ -105,6 +106,7 @@ if(typeof window.location.origin == 'undefined') {
             paramName: opt.paramName,
             clickable: false,
             maxFiles: opt.multi ? null : 1,
+            maxFilesize: opt.maxFilesize,
             acceptedFiles: opt.allowedFiles === '*/*' ? null : opt.allowedFiles,
             thumbnailWidth: opt.thumbnailSize,
             thumbnailHeight: opt.thumbnailSize,
