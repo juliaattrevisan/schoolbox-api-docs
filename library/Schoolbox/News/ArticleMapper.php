@@ -327,7 +327,11 @@ class ArticleMapper extends Mapper implements Searchable
             }
         }
 
-        return $mainModel;
+        if ($mainModel instanceof Article) {
+            return $mainModel;
+        }
+
+        throw new \Schoolbox\Mapper\Exception("Instance of object not found");
     }
 
 
