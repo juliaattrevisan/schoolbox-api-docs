@@ -328,17 +328,18 @@
 
         // AJAX update attendance when the attendance toggle-button is clicked
         c.getForm('editEvent').on('click', '.attendanceRequestButton', function(e) {
+            e.preventDefault()
             var postData = {
                 event: {id: c.getForm('editEvent').find('input[name="eventId"]').val()}
             };
             c.post('/service/attendance/processToggleAttendance', postData, function (data) {
                 var btn = c.getForm('editEvent').find('.attendanceRequestButton a')
                 if (data.error == undefined) {
-                    if (btn.text() == 'Attend') {
+                    if (btn.text() == 'RSVP') {
                         btn.html('<span></span>Unattend')
                     }
                     else {
-                        btn.html('<span></span>Attend')
+                        btn.html('<span></span>RSVP')
                     }
                 }
             })
