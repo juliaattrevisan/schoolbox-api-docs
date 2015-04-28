@@ -184,17 +184,22 @@ class External_Denbigh2_Debug {
      * Test all the things
      */
     private function test() {
+        $allResults = new Collection();
+
         foreach ($this->getAllApi() as $currentApi) {
-            echo "<strong>{$currentApi['label']} <em>{$currentApi['method']}</em></strong>";
+
+            /* Check for missing fields
+             */
+            $missingProperties = array();
+
+            $result = array();
+            $result['label'] = $currentApi['label'];
+            $result['method'] = $currentApi['method'];
 
             /* Any generic errors: curl errors, 500 Filemaker Error, etc
              */
             if (!$currentApi['api']->hasErrors()) {
                 $row = $currentApi['api']->getResult()->data[0];
-
-                /* Check for missing fields
-                 */
-                $missingProperties = array();
 
                 foreach ($currentApi['expectedKeys'] as $currentKey) {
                     if (!property_exists($row, $currentKey)) {
@@ -202,29 +207,72 @@ class External_Denbigh2_Debug {
                     }
                 }
 
-                if (count($missingProperties)) {
-                    echo "<br />Missing properties: " . implode('<br />', $missingProperties);
-                }
-                else {
+                $result['missingProperties'] = $missingProperties;
+                $result['output'] = $row;
+
+                if (!count($missingProperties)) {
                     $this->success();
                 }
-
-                new Probe($row);
             }
             else {
-                new Probe($currentApi['api']->getErrors());
+                $result['output'] = $currentApi['api']->getErrors();
             }
 
-            echo '<hr>';
+            $allResults->add($result);
         }
+
+        /* Output outcome outside
+         */
+        echo "<style type='text/css'>code { white-space: pre-line; } table { border-collapse: collapse; } td { vertical-align: top; border:1px solid #000; padding: 16px; }</style>";
+        echo "<table><thead>";
+        echo "<tr>";
+        echo "<th>Api Call</th>";
+        echo "<th>Missing Properties</th>";
+        echo "<th>Api Output</th>";
+        echo "</tr></thead>";
+        echo "<tbody>";
+
+        foreach($allResults as $currentResult) {
+
+            ob_start();
+            echo '<code>';
+            print_r($currentResult['output']);
+            echo '</code>';
+            $shiaLeBuff = ob_get_contents();
+
+            $row = "<tr>";
+            $row .= "<td style='width:200px'>{$currentResult['label']}<br />";
+            $row .= "({$currentResult['method']})</td>";
+            $row .= "<td style='width:400px'>";
+
+            if (count($currentResult['missingProperties'])) {
+                $row .= '<ul><li>' . implode('</li><li>', $currentResult['missingProperties']) . '</li></ul>';
+            }
+
+            $row .= "</td>";
+            $row .= "<td style='width:auto;overflow:auto'>";
+
+            $row .= "$shiaLeBuff";
+
+            $row .= "</td>";
+            $row .= "</tr>";
+
+            ob_end_clean();
+
+            echo $row;
+        }
+
+        echo "</tbody></table>";
 
         /* Number of things that failed
          */
         if ($this->getSuccessful() < $this->getAllApi()->count()) {
             $failed = $this->getAllApi()->count() - $this->getSuccessful();
 
-            echo "{$failed} failed.";
+            echo "<h1>{$failed} failed, out of {$this->getAllApi()->count()} things</h1>";
         }
+
+        die();
     }
 
     /* Getters/Setters
