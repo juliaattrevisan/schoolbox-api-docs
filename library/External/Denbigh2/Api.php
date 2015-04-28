@@ -188,7 +188,7 @@ class External_Denbigh2_Api {
      * @return mixed
      */
     public function getErrors() {
-        $allErrors = array();
+        $allErrors = $this->getCurl()->getErrors();
 
         if ($this->hasFilemakerError()) {
             $allErrors = array_merge(
