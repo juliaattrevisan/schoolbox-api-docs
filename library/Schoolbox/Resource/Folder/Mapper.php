@@ -17,7 +17,7 @@ use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\FileMapper;
+use Schoolbox\Resource\File;
 use Schoolbox\Resource\Folder\Search\Result;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\User;
@@ -92,7 +92,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         $this->hasJoin(
             'files', array(
                 'multiple'  => true,
-                'mapper'    => '\\Schoolbox\\Resource\\FileMapper',
+                'mapper'    => '\\Schoolbox\\Resource\\File\\Mapper',
                 'this_key'  => 'id',
                 'other_key' => 'category',
             )
@@ -179,7 +179,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      * @param Model $category
      * @param int $limit
      * @param bool $excludeWork
-     * @return mixed
+     * @return File\Model[]|Collection
      */
     public function findImages(Model $category, $limit = 0, $excludeWork = false)
     {
@@ -187,14 +187,20 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
         $limit = (int)$limit;
 
-        $query = "SELECT
-					{$fileMapper->getColumnString('f')}
-				  FROM file f
-				  WHERE category = :categoryId
-				  AND INSTR(mime_type, 'image/')
-				  AND deleted = '0'
-				  AND hidden = '0'
-				  ORDER BY submitted";
+        // 3 joins just to check a mimetype...and yet, better than caching on the target table
+        // not to mention...this query exists ONLY because of the use of INSTR() on the mime string
+        $query = "
+          SELECT {$fileMapper->getColumnString('f')}
+          FROM file f
+          LEFT JOIN `storage` s ON f.hash = s.hash
+          LEFT JOIN `allowedFileExtension` afe ON s.ext = afe.extension
+          LEFT JOIN `allowedFileTypes` aft ON afe.fileTypeID = aft.fileTypeID
+          WHERE f.category = :categoryId
+          AND INSTR(aft.mime, 'image/')
+          AND f.deleted = '0'
+          AND f.hidden = '0'
+          ORDER BY f.submitted
+        ";
 
         if ($limit > 0) {
             $query .= " LIMIT 0, {$limit}";
@@ -802,7 +808,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
         /* Soft delete all files
          */
-        $fileMapper = new FileMapper();
+        $fileMapper = new File\Mapper();
         $allFiles = $fileMapper->findByColumn('category', $category->getId());
 
         foreach ($allFiles as $currentFile) {
