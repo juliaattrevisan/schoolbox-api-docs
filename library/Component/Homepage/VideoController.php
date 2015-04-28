@@ -88,7 +88,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         if ($this->getConfig('video')) {
             try {
                 $video = $videoResourceMapper->findByFileId($this->getConfig('video'));
-                if ($video->isComplete()) {
+                if ($video->isComplete() && $video->getFile()->getFolder()->getId() == $source) {
                     $this->defaultVideo = $video;
                 }
             } catch (\Schoolbox\Mapper\Exception $e) {
