@@ -13,6 +13,7 @@ namespace Schoolbox\Resource\Search\Renderer;
 use Schoolbox\Resource\Search\MapperResult\Base as MapperResult;
 use Schoolbox\Resource\Folder\Model as CategoryModel;
 use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
+use SitePage;
 
 abstract class Base
 {
@@ -20,7 +21,7 @@ abstract class Base
     /**
      * A sitepage
      *
-     * @var null
+     * @var SitePage
      */
     protected $page = null;
 
@@ -41,9 +42,9 @@ abstract class Base
     /**
      * Constructor
      *
-     * @param $page
+     * @param SitePage $page
      */
-    public function __construct($page)
+    public function __construct(SitePage $page)
     {
         $this->setPage($page);
     }
@@ -196,7 +197,7 @@ abstract class Base
     /**
      * Set page
      *
-     * @param null $page
+     * @param SitePage $page
      */
     protected function setPage($page)
     {
@@ -206,7 +207,7 @@ abstract class Base
     /**
      * Get page
      *
-     * @return null
+     * @return SitePage
      */
     protected function getPage()
     {

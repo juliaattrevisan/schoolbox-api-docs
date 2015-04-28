@@ -16,6 +16,7 @@
 namespace Schoolbox\Resource\Search;
 
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Searchable;
 
 class Definition
 {
@@ -29,21 +30,24 @@ class Definition
     /**
      * Mapper instance
      *
-     * @var null
+     * @var Mapper
      */
     private $mapper = null;
 
     /**
      * Renderer instance
      *
-     * @var null
+     * @var Renderer\Base
      */
     private $renderer = null;
 
+
     /**
-     * Constructor
+     * @param string        $type
+     * @param Searchable    $mapper
+     * @param Renderer\Base $renderer
      */
-    public function __construct($type, Mapper $mapper, Renderer\Base $renderer)
+    public function __construct($type, Searchable $mapper, Renderer\Base $renderer)
     {
         $this->setType($type);
         $this->setMapper($mapper);
@@ -56,7 +60,7 @@ class Definition
     /**
      * Set mapper
      *
-     * @param null $mapper
+     * @param Searchable $mapper
      */
     private function setMapper($mapper)
     {
@@ -66,7 +70,7 @@ class Definition
     /**
      * Get mapper
      *
-     * @return null
+     * @return Searchable
      */
     public function getMapper()
     {
@@ -76,7 +80,7 @@ class Definition
     /**
      * Set renderer
      *
-     * @param null $renderer
+     * @param Renderer\Base $renderer
      */
     private function setRenderer($renderer)
     {
@@ -86,7 +90,7 @@ class Definition
     /**
      * Get renderer
      *
-     * @return null
+     * @return Renderer\Base
      */
     public function getRenderer()
     {
@@ -96,7 +100,7 @@ class Definition
     /**
      * Set type
      *
-     * @param mixed $type
+     * @param string $type
      */
     private function setType($type)
     {
@@ -106,7 +110,7 @@ class Definition
     /**
      * Get type
      *
-     * @return mixed
+     * @return string
      */
     public function getType()
     {
