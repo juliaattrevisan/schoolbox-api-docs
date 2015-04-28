@@ -75,18 +75,11 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
         // do a storage upload, then wrap it in the SBFS file from earlier
         $storage = Schoolbox\Resource\Storage\Mapper::getInstance()->accept($_FILES['file']['name'], $_FILES['file']['tmp_name'], false);
         $file->setStorage($storage);
-
-    // TODO not sure if this needs to remain or not
-    // } elseif (!$modifyExisting) {
-    //     $originalLocation = $file->getFileLocation();
-    //     if ($originalLocation) {
-    //         $file->setTempFileLocation($originalLocation);
-    //     }
     }
 
     // set attributes
-    if (is_null($file->getFilename()) || preg_match('`^[0-9a-f]{40}`', $file->getFilename())) {
-        $file->setFilename($file->getHash() . '.' . $file->getStorage()->getExtension());
+    if (is_null($file->getFilename())) {
+        $file->setFilename($file->getStorage()->getBasename());
     }
 
     $file->setOwner($_SESSION['user']);

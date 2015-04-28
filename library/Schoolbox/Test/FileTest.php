@@ -10,7 +10,7 @@
  */
 
 namespace Schoolbox\Test;
-use Schoolbox\Storage;
+use Schoolbox\Resource\Storage;
 use Schoolbox\Test\TestCase;
 
 class FileTest extends TestCase {
@@ -28,7 +28,7 @@ class FileTest extends TestCase {
 
 	public function setUp() {
 		parent::setUp();
-		$this->object = new Storage();
+		$this->object = new Storage\Model();
 		$this->object->setConfigLoader($this->mock_config);
 	}
 
