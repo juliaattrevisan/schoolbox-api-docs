@@ -10,8 +10,9 @@
 namespace Schoolbox\Resource\File;
 
 use Schoolbox\Collection;
+use Schoolbox\Mapper\Searchable;
 use Schoolbox\Resource;
-use Schoolbox\Video\ResourceVideoMapper;
+use Schoolbox\User;
 
 /**
  * Class Mapper
@@ -23,7 +24,7 @@ use Schoolbox\Video\ResourceVideoMapper;
  * @method Model findById($id)
  * @method Model createModel()
  */
-class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMapper
+class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMapper, Searchable
 {
 
     /**
@@ -189,4 +190,29 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
         $statement->execute();
         return $this->hydrateSelect($statement);
     }
+
+
+    /**
+     * Performs a search with the given parameters, and returns a Collection of the resultant set.
+     *
+     * @param User   $user
+     * @param string $keyword
+     * @param int    $offset
+     * @param int    $limit
+     * @param string $sortProperty
+     * @param string $sortDirection
+     * @return Collection
+     */
+    public function search($user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC')
+    {
+        if ($limit == 0) {
+            $limit = self::DEFAULT_LIMIT;
+        }
+
+        $searcher = new Resource\File\Search\Result();
+        $searcher->search($user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
+
+        return $searcher;
+    }
+
 }
