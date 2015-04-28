@@ -1,4 +1,5 @@
 <?php
+use Schoolbox\Resource\Folder;
 
 /**
  *
@@ -9,17 +10,6 @@
  */
 class Component_Homepage_ScrollerController extends Component_Homepage_ControllerAbstract
 {
-
-    /**
-     * @var Group
-     */
-    private $groupHandler;
-
-    /**
-     * @var File
-     */
-    private $fileHandler;
-
     /**
      * An instance of Category
      *
@@ -30,9 +20,9 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
     /**
      * Category Mapper
      *
-     * @var \Schoolbox\Resource\CategoryMapper
+     * @var Folder\Mapper
      */
-    private $categoryMapper = null;
+    private $folderMapper = null;
 
     /**
      * Prepares data for the render function. Business logic.
@@ -41,16 +31,14 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
      */
     public function execute()
     {
-        $this->groupHandler = new Group();
-        $this->fileHandler  = new File();
-        $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
+        $this->setFolderMapper(new Folder\Mapper());
 
         $this->source = $this->getContext();
 
         if (is_numeric($this->getConfig('src'))) {
             try {
                 // remove any non-numeric values from the source config
-                $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
+                $this->source = $this->getFolderMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
             } catch (\Exception $e) {
             }
         }
@@ -102,7 +90,7 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         $this->setVar('image_scroller_block', '');
 
         // Load images for the current homepage
-        $allFiles = $this->getCategoryMapper()->findImages($this->source, 0, true);
+        $allFiles = $this->getFolderMapper()->findImages($this->source, 0, true);
 
         // Have update form to back to this homepage, not the gallery's homepage
         $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->source->getId());
@@ -143,20 +131,20 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
     /**
      * Set category mapper
      *
-     * @param null $categoryMapper
+     * @param Folder\Mapper $folderMapper
      */
-    private function setCategoryMapper($categoryMapper)
+    private function setFolderMapper($folderMapper)
     {
-        $this->categoryMapper = $categoryMapper;
+        $this->folderMapper = $folderMapper;
     }
 
     /**
      * Get category mapper
      *
-     * @return null
+     * @return Folder\Mapper
      */
-    private function getCategoryMapper()
+    private function getFolderMapper()
     {
-        return $this->categoryMapper;
+        return $this->folderMapper;
     }
 }
