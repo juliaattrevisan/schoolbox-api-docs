@@ -74,23 +74,81 @@ class External_Denbigh2_Debug {
 
         /* Timetable
          */
-        $this->addTest('Timetable Definition', 'PeriodTimes', new External_Denbigh2_Api('PeriodTimes', array()));
-        $this->addTest('Current Day', 'CurrentDay', new External_Denbigh2_Api('CurrentDay', array()));
-        $this->addTest("Student Timetable for {$this->studentId}", 'StudentTimetable', new External_Denbigh2_Api('StudentTimetable', array('Student ID' => $this->studentId)));
-        $this->addTest("Staff Timetable for {$this->teacherCode}", 'TimetableLessons', new External_Denbigh2_Api('TimetableLessons',array('Teacher Code' => $this->teacherCode),array('RFMmax' => 0)));
-        $this->addTest("Subject Name for {$this->classCode}", 'Classes', new External_Denbigh2_Api('Classes', array('Class' => $this->classCode)));
+        $this->addTest(
+            'Timetable Definition', 'PeriodTimes',
+            array('Period', 'Period Start Time', 'Period End Time'),
+            new External_Denbigh2_Api('PeriodTimes', array())
+        );
+
+        $this->addTest(
+            'Current Day', 'CurrentDay',
+            array('Current Day of Cycle'),
+            new External_Denbigh2_Api('CurrentDay', array())
+        );
+
+        $this->addTest(
+            "Student Timetable for {$this->studentId}", 'StudentTimetable',
+            array('Day Number', 'Teacher', 'TT Description', 'Period', 'Period Name', 'ClassCode', 'Room', 'TeacherCode'),
+            new External_Denbigh2_Api('StudentTimetable', array('Student ID' => $this->studentId))
+        );
+
+        $this->addTest(
+            "Staff Timetable for {$this->teacherCode}", 'TimetableLessons',
+            array('Day', 'Period', 'Description for Staff TT', 'Class', 'Room', 'Teacher Code', 'Teacher'),
+            new External_Denbigh2_Api('TimetableLessons',array('Teacher Code' => $this->teacherCode),array('RFMmax' => 0))
+        );
+
+        $this->addTest(
+            "Subject Name for {$this->classCode}", 'Classes',
+            array('Subject Name'),
+            new External_Denbigh2_Api('Classes', array('Class' => $this->classCode))
+        );
 
         /* Class
          */
-        $this->addTest("List of Students in {$this->classCode}", 'Enrolments', new External_Denbigh2_Api('Enrolments', array('Class' => $this->classCode)));
-        $this->addTest("Teacher of {$this->classCode}", 'Classes', new External_Denbigh2_Api('Classes', array('Class' => $this->classCode)));
+        $this->addTest(
+            "List of Students in {$this->classCode}", 'Enrolments',
+            array('Surname', 'Preferred Name', 'Academic Year', 'House', 'Medical Alert Label', 'Special Needs', 'Student ID'),
+            new External_Denbigh2_Api('Enrolments', array('Class' => $this->classCode))
+        );
+
+        $this->addTest(
+            "Teacher of {$this->classCode}", 'Classes',
+            array('Class', 'Teacher Code'),
+            new External_Denbigh2_Api('Classes', array('Class' => $this->classCode))
+        );
 
         /* User
          */
-        $this->addTest("Student info for {$this->studentId}", 'Students', new External_Denbigh2_Api('Students', array('Student ID' => $this->studentId)));
-        $this->addTest("Contact List for {$this->familyCode}", 'Family', new External_Denbigh2_Api('Family', array('Family Code' => $this->familyCode)));
-        $this->addTest("Staff info for {$this->teacherCode}", 'Staff', new External_Denbigh2_Api('Staff', array('Staff Code' => $this->teacherCode)));
-        $this->addTest("Subject List for {$this->studentId}", 'Enrolments', $api = new External_Denbigh2_Api('Enrolments', array('Student ID' => $this->studentId)));
+        $this->addTest(
+            "Student info for {$this->studentId}", 'Students',
+            array('Date of Birth', 'Student ID', 'Given Names', 'Surname', 'House', 'Academic Year', 'Father', 'Father Surname', 'Father Phone', 'Mother', 'Mother Surname', 'Mother Phone', 'Medical Alert Label', 'Special Needs', 'Campus', 'Preferred Name', 'Gender', 'Email Address', 'email Father', 'email Mother'),
+            new External_Denbigh2_Api('Students', array('Student ID' => $this->studentId))
+        );
+
+        $this->addTest(
+            "Contact List for {$this->familyCode}", 'Family',
+            array('Father Title', 'Father Preferred Name', 'Father Surname', 'Father email', 'Residential Address Street', 'Residential Address Suburb', 'Residential Address PostCode', 'Residential Address State', 'Father Mobile', 'Father Phone', 'Mother Title', 'Mother Preferred Name', 'Mother Surname', 'Mother Mobile', 'Mother Phone', 'Mother Email'),
+            new External_Denbigh2_Api('Family', array('Family Code' => $this->familyCode))
+        );
+
+        $this->addTest(
+            "Parent info for {$this->familyCode}", 'Family',
+            array('Father Community ID', 'Father Title', 'Father Preferred Name', 'Father Surname', 'Father email', 'Father Email Work', 'Father Phone', 'Father Mobile', 'Mother Community ID', 'Mother Title', 'Mother Preferred Name', 'Mother Surname', 'Mother Email', 'Mother Email Work', 'Mother Mobile'),
+            new External_Denbigh2_Api('Staff', array('Staff Code' => $this->teacherCode))
+        );
+
+        $this->addTest(
+            "Staff info for {$this->teacherCode}", 'Staff',
+            array('Staff Code', 'Title', 'First Name', 'Surname', 'Email Address', 'Campus', 'Telephone', 'Telephone Extension'),
+            new External_Denbigh2_Api('Staff', array('Staff Code' => $this->teacherCode))
+        );
+
+        $this->addTest(
+            "Subject List for {$this->studentId}", 'Enrolments',
+            array('Class', 'Subject Name'),
+            $api = new External_Denbigh2_Api('Enrolments', array('Student ID' => $this->studentId))
+        );
     }
 
     /**
@@ -98,12 +156,26 @@ class External_Denbigh2_Debug {
      *
      * @param $label
      * @param $method
+     * @param $expectedKeys
      * @param $api
      */
-    private function addTest($label, $method, $api) {
+    private function addTest($label, $method, $expectedKeys, $api) {
         $this->getAllApi()->add(array(
+
+            /* Human friendly label, for display purposes
+             */
             'label' => $label,
+
+            /* Method name, for display purposes
+             */
             'method' => $method,
+
+            /* These keys need to exist in the result of $api's method call
+             */
+            'expectedKeys' => $expectedKeys,
+
+            /* The api to execute
+             */
             'api' => $api,
         ));
     }
@@ -115,9 +187,29 @@ class External_Denbigh2_Debug {
         foreach ($this->getAllApi() as $currentApi) {
             echo "<strong>{$currentApi['label']} <em>{$currentApi['method']}</em></strong>";
 
+            /* Any generic errors: curl errors, 500 Filemaker Error, etc
+             */
             if (!$currentApi['api']->hasErrors()) {
-                new Probe($currentApi['api']->getResult()->data[0]);
-                $this->success();
+                $row = $currentApi['api']->getResult()->data[0];
+
+                /* Check for missing fields
+                 */
+                $missingProperties = array();
+
+                foreach ($currentApi['expectedKeys'] as $currentKey) {
+                    if (!property_exists($row, $currentKey)) {
+                        $missingProperties[] = $currentKey;
+                    }
+                }
+
+                if (count($missingProperties)) {
+                    echo "<br />Missing properties: " . implode('<br />', $missingProperties);
+                }
+                else {
+                    $this->success();
+                }
+
+                new Probe($row);
             }
             else {
                 new Probe($currentApi['api']->getErrors());
