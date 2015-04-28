@@ -12,7 +12,6 @@ namespace Schoolbox\News;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
-use Html2Text\Html2Text;
 use Monolog\Logger;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -97,9 +96,9 @@ class ArticleNotifier extends AbstractModuleNotifier {
 		/** @var Article $article */
 		$article = $this->mapper->findById($article->getId());
 
-		if($article->getImage()->getId()) {
-			$icon = "/storage/image.php?hash={$article->getImage()->getHash()}&size=square64";
-            $thumb = '/storage/image.php?size=square200&hash=' . $article->getImage()->getHash();
+		if($hash = $article->getImage()->getHash()) {
+			$icon = "/storage/image.php?hash=$hash&size=square64";
+            $thumb = "/storage/image.php?hash=$hash&size=square200";
 		}
 		else {
 			$icon = "/portrait.php?userId={$user->getExternalId()}&size=square32";
