@@ -32,7 +32,7 @@ class Component_Config_Video extends Component_Config_Abstract
         if (count($vidList)) {
             foreach ($vidList as $video) {
                 $page->setVar(array(
-                    'COMPONENT_CONFIG_VIDSELECT_NAME'       => Scrub::text($video->getFile()->getDescription()),
+                    'COMPONENT_CONFIG_VIDSELECT_NAME'       => Scrub::text($video->getFile()->getTitle()),
                     'COMPONENT_CONFIG_VIDSELECT_VALUE' 	    => $video->getFile()->getId(),
                     'COMPONENT_CONFIG_VIDSELECT_SELECTED'   => $video->getFile()->getId() == $configValue ? 'selected="selected"' : '',
                 ));
