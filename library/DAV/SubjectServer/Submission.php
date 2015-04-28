@@ -63,6 +63,33 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
     }
 
     /**
+     * Returns the size of the file
+     * @return int
+     */
+    public function getSize()
+    {
+        return $this->getSubmission()->getStorage()->getSize();
+    }
+
+    /**
+     * Returns the unique file key
+     * @return string
+     */
+    public function getETag()
+    {
+        return $this->getSubmission()->getStorage()->getHash();
+    }
+
+    /**
+     * Returns the mimetype
+     * @return string
+     */
+    public function getContentType()
+    {
+        return $this->getSubmission()->getStorage()->getMime();
+    }
+
+    /**
      * Gets the time which this file was uploaded.
      *
      * @return int
