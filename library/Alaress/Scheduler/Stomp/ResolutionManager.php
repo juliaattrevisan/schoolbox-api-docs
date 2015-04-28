@@ -130,4 +130,13 @@ class ResolutionManager {
 		return -1;
 	}
 
+
+    /**
+     * @return \React\Stomp\AckResolver[]|SplObjectStorage
+     */
+    public function getAllResolvers()
+    {
+        return $this->resolvers;
+    }
+
 } 
