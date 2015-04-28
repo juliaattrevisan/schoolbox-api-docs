@@ -176,6 +176,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
     /**
      * Find all images for a category
      *
+     * @deprecated use File\Mapper::findForFolders() directly
      * @param Model $category
      * @param int $limit
      * @param bool $excludeWork
@@ -186,40 +187,14 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         $fileMapper = $this->getJoinMapper('files');
 
         $limit = (int)$limit;
-
-        // 3 joins just to check a mimetype...and yet, better than caching on the target table
-        // not to mention...this query exists ONLY because of the use of INSTR() on the mime string
-        $query = "
-          SELECT {$fileMapper->getColumnString('f')}
-          FROM file f
-          LEFT JOIN `storage` s ON f.hash = s.hash
-          LEFT JOIN `allowedFileExtension` afe ON s.ext = afe.extension
-          LEFT JOIN `allowedFileTypes` aft ON afe.fileTypeID = aft.fileTypeID
-          WHERE f.category = :categoryId
-          AND INSTR(aft.mime, 'image/')
-          AND f.deleted = '0'
-          AND f.hidden = '0'
-          ORDER BY f.submitted
-        ";
-
-        if ($limit > 0) {
-            $query .= " LIMIT 0, {$limit}";
+        
+        $opts = [ 'filter' => 'image' ];
+        
+        if ($limit) {
+            $opts['size'] = $limit;
         }
 
-        $params = array(
-            'categoryId' => $category->getId(),
-        );
-
-        $statement = $this->database->prepare($query);
-        $statement->execute($params);
-
-        $collection = new Collection();
-
-        foreach ($statement as $row) {
-            $collection->add($fileMapper->hydrate($row, 'f'));
-        }
-
-        return $collection;
+        return $fileMapper->findForFolders([ $category->getId() ], $opts);
     }
 
     /**
