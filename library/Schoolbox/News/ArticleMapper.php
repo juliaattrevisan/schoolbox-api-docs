@@ -669,7 +669,7 @@ class ArticleMapper extends Mapper implements Searchable
             $article = $this->hydrate($currentRecord, 'a');
             $image   = $imageMapper->hydrate($currentRecord, 'i');
 
-            if (is_numeric($image->getId())) {
+            if ($image->getHash()) {
                 $article->setImage($image);
             }
 
@@ -694,7 +694,7 @@ class ArticleMapper extends Mapper implements Searchable
     public function findForTopic(Topic $topic, $limit, $offset = 0, $time = 0)
     {
         $time = date('Y-m-d H:i:s', $time ? : time());
-        $now  = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+        $now  = Alaress_Date_Format::now();
 
         $limit  = (int)$limit;
         $offset = (int)$offset;
