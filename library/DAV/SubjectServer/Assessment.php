@@ -93,7 +93,7 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
                         $this,
                         $nameGenerator->sanitiseName($file->getFilename())
                     ),
-                    $storage->read()
+                    $storage->readSteam()
                 );
                 $child
                     ->setUser($this->getUser())
