@@ -510,11 +510,11 @@ class StudentReportCard
 
             /* Get rubrics output for this return
              */
-            $rubric = $rubricHandler->getStudentMarks($this->targetUserId, $box->getId());
+            $rubrics = $rubricHandler->getStudentMarksWithDescription($this->targetUserId, $box->getId());
 
             $struct = array(
                 'box' => $box,
-                'rubrics' => $rubric
+                'rubrics' => $rubrics
             );
 
             $allSubmissionBoxes->add($struct);
@@ -539,9 +539,17 @@ class StudentReportCard
                         /* TODO: Foreach return, get the result for this criterion
                          */
                         foreach ($allSubmissionBoxes as $currentSubmission) {
-                            $values = $currentSubmission['rubrics'];
+                            $allValues = $currentSubmission['rubrics'];
 
-                            $allStructures[$group][$currentCriterion->getId()]['results'][] = $values[$currentCriterion->getId()];
+                            $string = $allValues[$currentCriterion->getId()]['description'];
+
+                            /* Do you want to show the rubric int as well?
+                             */
+//                            if ($allValues[$currentCriterion->getId()]['mark']) {
+//                                $string .= " ({$allValues[$currentCriterion->getId()]['mark']})";
+//                            }
+
+                            $allStructures[$group][$currentCriterion->getId()]['results'][] = $string;
                         }
                     }
                 }
