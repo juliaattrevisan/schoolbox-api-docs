@@ -62,6 +62,16 @@ class External_Denbigh2_Debug {
     public function __construct() {
         $this->setAllApi(new Collection());
 
+        $this->setup();
+
+        $this->test();
+    }
+
+    /**
+     * Set up all the methods to test
+     */
+    protected function setup() {
+
         /* Timetable
          */
         $this->addTest('Timetable Definition', 'PeriodTimes', new External_Denbigh2_Api('PeriodTimes', array()));
@@ -81,8 +91,6 @@ class External_Denbigh2_Debug {
         $this->addTest("Contact List for {$this->familyCode}", 'Family', new External_Denbigh2_Api('Family', array('Family Code' => $this->familyCode)));
         $this->addTest("Staff info for {$this->teacherCode}", 'Staff', new External_Denbigh2_Api('Staff', array('Staff Code' => $this->teacherCode)));
         $this->addTest("Subject List for {$this->studentId}", 'Enrolments', $api = new External_Denbigh2_Api('Enrolments', array('Student ID' => $this->studentId)));
-
-        $this->test();
     }
 
     /**
