@@ -19,10 +19,10 @@ $handle = array(
         'handler' => new User(),
         'renderer' => new \Schoolbox\User\Search\Renderer($this, '', '', 0, $keyword),
     ),
-    'file' => array(
-        'handler' => new File(),
-        'renderer' => new \Schoolbox\File\Search\Renderer($this, '', '', 0, $keyword),
-    ),
+//    'file' => array(
+//        'handler' => new File(),
+//        'renderer' => new \Schoolbox\File\Search\Renderer($this, '', '', 0, $keyword),
+//    ),
     'sitenews' => array(
         'handler' => new News(),
         'renderer' => new \Schoolbox\News\Search\Renderer($this, '', '', 0, $keyword),
@@ -66,5 +66,5 @@ $type_list = array(
  * old search.php contexts
  */
 $omaha = array(
-    'link', 'folder'
+    'link', 'folder', 'file'
 );
