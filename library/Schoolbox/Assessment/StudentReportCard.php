@@ -487,6 +487,40 @@ class StudentReportCard
         $page->setBlock('subject_rubric_group', 'subject_rubric_criterion', 'subject_rubric_criterion_block');
         $page->setBlock('subject_rubric_criterion', 'subject_rubric_criterion_mark', 'subject_rubric_criterion_mark_block');
 
+        $submissionBoxMapper = $this->submissionMapper;
+        $rubricHandler = new \DueWork_Rubric_Handler();
+
+        $allDueWork = $submissionBoxMapper->getAllDueWork($this->targetUserId, array($this->targetCategoryId), $this->targetYear, $this->targetSemester);
+
+        /* Oh. My. GOD.
+         *
+         * Get all the submission boxes for this particular year and semester,
+         * for this user and category. lol.
+         */
+        $allSubmissionBoxes = new \Schoolbox\Collection();
+
+        foreach ($allDueWork as $currentDueWork) {
+
+            /* Submission box info
+             */
+            $box = new \Schoolbox\Assessment\Component\SubmissionBox();
+            $box->setId($currentDueWork['bid']);
+            $box->setName($currentDueWork['name']);
+
+            /* Get rubrics output for this return
+             */
+            $rubric = $rubricHandler->getStudentMarks($this->targetUserId, $box->getId());
+
+            $struct = array(
+                'box' => $box,
+                'rubrics' => $rubric
+            );
+
+            $allSubmissionBoxes->add($struct);
+        }
+
+        new \Alaress_Probe($allSubmissionBoxes);
+
         /* If enabled
          */
         if (\Cfg::get('enable_grades_criteria')) {
@@ -505,9 +539,11 @@ class StudentReportCard
 
                         /* TODO: Foreach return, get the result for this criterion
                          */
-                        $allStructures[$group][$currentCriterion->getId()]['results'][] = 1;
-                        $allStructures[$group][$currentCriterion->getId()]['results'][] = 22;
-                        $allStructures[$group][$currentCriterion->getId()]['results'][] = 333;
+                        foreach ($allSubmissionBoxes as $currentSubmission) {
+                            $values = $currentSubmission['rubrics'];
+
+                            $allStructures[$group][$currentCriterion->getId()]['results'][] = $values[$currentCriterion->getId()];
+                        }
                     }
                 }
 
