@@ -1,4 +1,4 @@
-Feature: admin-user
+Feature: admin-user-bulk-modify
   As a logged-in superuser
   I need to be able to bulk modify users
 
