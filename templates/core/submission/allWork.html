@@ -216,11 +216,23 @@
 
         <!-- BEGIN subject_rubric -->
         <h2>That rubric stuff</h2>
+        <style type="text/css">
+            table {
+                border-collapse: collapse
+            }
+
+            td, th {
+                padding: 8px;
+                border: 1px solid #ccc;
+            }
+        </style>
         <table>
             <thead>
                 <tr>
                     <th></th>
-                    <th>Assignment 1</th>
+                    <!-- BEGIN subject_rubric_submissionbox -->
+                    <th>{SUBJECT_RUBRIC_SUBMISSIONBOX_NAME}</th>
+                    <!-- END subject_rubric_submissionbox -->
                 </tr>
             </thead>
             <tbody>
