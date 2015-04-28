@@ -482,46 +482,124 @@ class StudentReportCard
 
     protected function renderCriteria(\SitePage $page)
     {
-        // output rubric criteria
-        $page->setBlock('subject', 'subject_crit', 'subject_crit_block');
-        $page->setBlock('subject_crit', 'subject_crit_group', 'subject_crit_group_block');
-        $page->setBlock('subject_crit_group', 'subject_crit_item', 'subject_crit_item_block');
+        $page->setBlock('subject', 'subject_rubric', 'subject_rubric_block');
+        $page->setBlock('subject_rubric', 'subject_rubric_group', 'subject_rubric_group_block');
+        $page->setBlock('subject_rubric_group', 'subject_rubric_criterion', 'subject_rubric_criterion_block');
+        $page->setBlock('subject_rubric_criterion', 'subject_rubric_criterion_mark', 'subject_rubric_criterion_mark_block');
+
+        /* If enabled
+         */
         if (\Cfg::get('enable_grades_criteria')) {
-            // list of criteria in this category
-            $criteria = $this->subjectData->getCriteria();
-            if (count($criteria)) {
-                // there are criteria, retrieve the criterion-grouped scores for the student, map, and output
-                $rubricHandler = new \DueWork_Rubric_Handler();
-                $returnHandler = new \SubmissionReturn();
-                $results       = $rubricHandler->getStudentMarksByCriteriaInCategory(
-                    $this->targetUserId,
-                    $this->targetCategoryId
-                );
-                $page->setVar('subject_crit_group_block', '');
-                foreach ($criteria as $group => $items) {
-                    $page->setVar('subject_crit_item_block', '');
-                    $page->setVar('CRIT_GROUP_NAME', \Scrub::text($group));
-                    foreach ($items as $item) {
-                        $score = isset($results[$item->getId()]['value'])
-                            ? $returnHandler->percent2letter($results[$item->getId()]['value'])
-                            : 'Not Assessed';
-                        $page->setVar(
-                            array(
-                                'CRIT_ITEM_NAME'  => \Scrub::text($item->getName()),
-                                'CRIT_ITEM_SCORE' => $score
-                            )
-                        );
-                        $page->parse('subject_crit_item_block', 'subject_crit_item', true);
+
+            /* Get a list of criteria in this category
+            */
+            $allCriteria = $this->subjectData->getCriteria();
+
+            // there are criteria, retrieve the criterion-grouped scores for the student, map, and output
+            if (count($allCriteria)) {
+                $allStructures = array();
+
+                foreach ($allCriteria as $group => $currentCriteria) {
+                    foreach ($currentCriteria as $currentCriterion) {
+                        $allStructures[$group][$currentCriterion->getId()]['criterion'] = $currentCriterion;
+
+                        /* TODO: Foreach return, get the result for this criterion
+                         */
+                        $allStructures[$group][$currentCriterion->getId()]['results'][] = 1;
+                        $allStructures[$group][$currentCriterion->getId()]['results'][] = 22;
+                        $allStructures[$group][$currentCriterion->getId()]['results'][] = 333;
                     }
-                    $page->parse('subject_crit_group_block', 'subject_crit_group', true);
                 }
-                $page->parse('subject_crit_block', 'subject_crit', false);
-            } else {
-                $page->setVar('subject_crit_block', '');
+
+                /* Render that all out in the land of phpliberty
+                 */
+                foreach ($allStructures as $group => $currentStructure) {
+                    $page->setVar(array(
+                        'SUBJECT_RUBRIC_GROUP_NAME' => $group
+                    ));
+
+                    foreach ($currentStructure as $criterionId => $data) {
+                        $page->setVar(array(
+                            'SUBJECT_RUBRIC_CRITERION_NAME' => $data['criterion']->getName()
+                        ));
+
+                        foreach ($data['results'] as $currentResult) {
+                            $page->setVar(array(
+                                'SUBJECT_RUBRIC_CRITERION_MARK' => $currentResult
+                            ));
+
+                            $page->parse('subject_rubric_criterion_mark_block', 'subject_rubric_criterion_mark', true);
+                        }
+
+                        $page->parse('subject_rubric_criterion_block', 'subject_rubric_criterion', true);
+
+                        /* Clear children after parsing out the parent
+                         */
+                        $page->setVar(array(
+                            'subject_rubric_criterion_mark_block' => ''
+                        ));
+                    }
+
+                    $page->parse('subject_rubric_group_block', 'subject_rubric_group', true);
+
+                    /* Clear children after parsing out the parent
+                     */
+                    $page->setVar(array(
+                        'subject_rubric_criterion_block' => ''
+                    ));
+                }
+
+                $page->parse('subject_rubric_block', 'subject_rubric');
             }
-        } else {
-            $page->setVar('subject_crit_block', '');
         }
+        else {
+            $page->setVar(array(
+                'subject_rubric_block' => ''
+            ));
+        }
+
+//        // output rubric criteria
+//        $page->setBlock('subject', 'subject_crit', 'subject_crit_block');
+//        $page->setBlock('subject_crit', 'subject_crit_group', 'subject_crit_group_block');
+//        $page->setBlock('subject_crit_group', 'subject_crit_item', 'subject_crit_item_block');
+//        if (\Cfg::get('enable_grades_criteria')) {
+//            // list of criteria in this category
+//            $criteria = $this->subjectData->getCriteria();
+//            if (count($criteria)) {
+//                // there are criteria, retrieve the criterion-grouped scores for the student, map, and output
+//                $rubricHandler = new \DueWork_Rubric_Handler();
+//                $returnHandler = new \SubmissionReturn();
+//                $results       = $rubricHandler->getStudentMarksByCriteriaInCategory(
+//                    $this->targetUserId,
+//                    $this->targetCategoryId
+//                );
+//
+//                new \Alaress_Probe($criteria);
+//                $page->setVar('subject_crit_group_block', '');
+//                foreach ($criteria as $group => $items) {
+//                    $page->setVar('subject_crit_item_block', '');
+//                    $page->setVar('CRIT_GROUP_NAME', \Scrub::text($group));
+//                    foreach ($items as $item) {
+//                        $score = isset($results[$item->getId()]['value'])
+//                            ? $returnHandler->percent2letter($results[$item->getId()]['value'])
+//                            : 'Not Assessed';
+//                        $page->setVar(
+//                            array(
+//                                'CRIT_ITEM_NAME'  => \Scrub::text($item->getName()),
+//                                'CRIT_ITEM_SCORE' => $score
+//                            )
+//                        );
+//                        $page->parse('subject_crit_item_block', 'subject_crit_item', true);
+//                    }
+//                    $page->parse('subject_crit_group_block', 'subject_crit_group', true);
+//                }
+//                $page->parse('subject_crit_block', 'subject_crit', false);
+//            } else {
+//                $page->setVar('subject_crit_block', '');
+//            }
+//        } else {
+//            $page->setVar('subject_crit_block', '');
+//        }
     }
 
     protected function renderAssessments(\SitePage $page)

@@ -213,8 +213,42 @@
 
 		<div id="subject-graph">&nbsp;</div>
 
+
+        <!-- BEGIN subject_rubric -->
+        <h2>That rubric stuff</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Assignment 1</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- BEGIN subject_rubric_group -->
+                <tr>
+                    <!-- extend all the way across -->
+                    <td colspan="2000"><strong>{SUBJECT_RUBRIC_GROUP_NAME}</strong></td>
+                </tr>
+                <!-- BEGIN subject_rubric_criterion -->
+                <tr>
+                    <td>{SUBJECT_RUBRIC_CRITERION_NAME}</td>
+                    <!-- BEGIN subject_rubric_criterion_mark -->
+                    <td>{SUBJECT_RUBRIC_CRITERION_MARK}</td>
+                    <!-- END subject_rubric_criterion_mark -->
+                </tr>
+                <!-- END subject_rubric_criterion -->
+                <!-- END subject_rubric_group -->
+            </tbody>
+        </table>
+        <!-- END subject_rubric -->
+
+
+
+
+
+
 		<!-- BEGIN subject_crit -->
-		<div class="subject-criteria">
+		<div class="subject-criteria hide">
 			<h2>Criteria</h2>
 			<ul>
 				<!-- BEGIN subject_crit_group -->
