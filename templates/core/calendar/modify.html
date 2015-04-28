@@ -37,7 +37,7 @@
 				</td>
 				<td>
 					<label>
-						<input name="title" class="required" type="text" size="50" maxlength="100" value="{EVENT_TITLE}" />
+						<input name="title" class="required" type="text" maxlength="100" value="{EVENT_TITLE}" />
 					</label>
 				</td>
 			</tr>
@@ -131,8 +131,10 @@
 					<h4>Location</h4>
 				</td>
 				<td>
-					<input name="location" type="text" size="50" value="{EVENT_LOCATION}"/>
-				</td>
+                    <label>
+					    <input name="location" type="text" value="{EVENT_LOCATION}"/>
+                    </label>
+                </td>
 			</tr>
 			<tr>
 				<td>
@@ -216,9 +218,11 @@
 			<tr id="attendance">
 				<td>
 					<h4>Attendance</h4>
+                    <em>Allow people to RSVP to this event</em>
 				</td>
-				<td>
-					<input name="attendance" type="checkbox" value="1" {ATTENDANCE} />
+				<td><label>
+					<input name="attendance" type="checkbox" value="1" {EVENT_ATTENDANCE} />Enabled
+                </label>
 				</td>
 			</tr>
 			<tr>
