@@ -195,6 +195,7 @@ class External_Denbigh2_Debug {
             $result = array();
             $result['label'] = $currentApi['label'];
             $result['method'] = $currentApi['method'];
+            $result['state'] = 0;
 
             /* Any generic errors: curl errors, 500 Filemaker Error, etc
              */
@@ -211,6 +212,8 @@ class External_Denbigh2_Debug {
                 $result['output'] = $row;
 
                 if (!count($missingProperties)) {
+                    $result['state'] = 1;
+
                     $this->success();
                 }
             }
@@ -223,7 +226,7 @@ class External_Denbigh2_Debug {
 
         /* Output outcome outside
          */
-        echo "<style type='text/css'>code { white-space: pre-line; } table { border-collapse: collapse; } td { vertical-align: top; border:1px solid #000; padding: 16px; }</style>";
+        echo "<style type='text/css'>.success { background-color: #eaffea } .failure { background-color: #ffecec } code { white-space: pre-line; } table { border-collapse: collapse; } td { vertical-align: top; border:1px solid #000; padding: 16px; }</style>";
         echo "<table><thead>";
         echo "<tr>";
         echo "<th>Api Call</th>";
@@ -240,7 +243,14 @@ class External_Denbigh2_Debug {
             echo '</code>';
             $shiaLeBuff = ob_get_contents();
 
-            $row = "<tr>";
+            if ($currentResult['state']) {
+                $class = 'success';
+            }
+            else {
+                $class = 'failure';
+            }
+
+            $row = "<tr class='{$class}'>";
             $row .= "<td style='width:200px'>{$currentResult['label']}<br />";
             $row .= "({$currentResult['method']})</td>";
             $row .= "<td style='width:400px'>";
@@ -269,7 +279,7 @@ class External_Denbigh2_Debug {
         if ($this->getSuccessful() < $this->getAllApi()->count()) {
             $failed = $this->getAllApi()->count() - $this->getSuccessful();
 
-            echo "<h1>{$failed} failed, out of {$this->getAllApi()->count()} things</h1>";
+            echo "<h1>{$failed} failed, out of {$this->getAllApi()->count()} things tested</h1>";
         }
 
         die();
