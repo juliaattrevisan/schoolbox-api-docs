@@ -37,9 +37,11 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             ORDER BY td.start_time ASC
         ');
 
+        $campusCode = explode(',',$campus->getExtTimetableCode());
+
         $stmt->execute(array(
             'day'    => $day ?: 1, // there is no day 0 in this definition
-            'campus' => $campus->getExtTimetableCode()
+            'campus' => $campusCode[0]
         ));
 
         while ($r = $stmt->fetch(DB2::FETCH_ASSOC)) {
@@ -88,7 +90,8 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             FETCH FIRST 1 ROW ONLY
         ');
 
-        $stmt->execute(array('campus' => $campus->getExtTimetableCode()));
+        $campusCode = explode(',',$campus->getExtTimetableCode());
+        $stmt->execute(array('campus' => $campusCode[0]));
 
         return $stmt->fetchColumn();
     }
@@ -117,9 +120,10 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             $date = $time;
         }
 
+        $campusCode = explode(',',$campus->getExtTimetableCode());
         $params = array(
             'date'   => date('Y-m-d', $date),
-            'campus' => $campus->getExtTimetableCode(),
+            'campus' => $campusCode[0],
         );
 
         $stmt->execute($params);
@@ -226,13 +230,20 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             return false;
         }
 
+        $campusCode = explode(',',$campus->getExtTimetableCode());
+        if (count($campusCode) > 1){
+            $campus = "( campus = :campus OR campus = :campus2 )";
+        } else {
+            $campus = "campus = :campus";
+        }
+
         $stmt = $this->getDatabase()->prepare(
             "
             SELECT period_number, t.class_code AS code, c.{$type}_number AS staffID, room, cl.class
             FROM db2inst1.schoolbox_timetable t
             LEFT JOIN db2inst1.schoolbox_classes cl ON t.class_code = cl.class_code
             $join
-            AND day_number = :d AND campus = :campus
+            AND day_number = :d AND $campus
         "
         );
 
@@ -240,7 +251,8 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             array(
                 'sn' => $externalUserId,
                 'd'  => $dayNumber,
-                'campus' =>  $this->getCampusCode($campusId),
+                'campus' =>  $campusCode[0],
+                'campus2' => $campusCode[1],
             )
         );
 
@@ -310,13 +322,20 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             return false;
         }
 
+        $campusCode = explode(',',$campus->getExtTimetableCode());
+	if (count($campusCode) > 1){
+            $campus = "( campus = :campus OR campus = :campus2 )";
+        } else {
+            $campus = "campus = :campus";
+        }
+
         $stmt = $this->getDatabase()->prepare(
             "
             SELECT period_number, t.day_number, t.class_code AS code, t.staff_number AS staffID, room, cl.class
             FROM db2inst1.schoolbox_timetable t
             LEFT JOIN db2inst1.schoolbox_classes cl ON t.class_code = cl.class_code
             $join
-            AND campus = :campus
+            AND $campus
             AND day_number <= :d
         "
         );
@@ -324,7 +343,8 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         $stmt->execute(
             array(
                 'sn' => $externalUserId,
-                'campus' => $this->getCampusCode($campusId),
+                'campus' => $campusCode[0],
+                'campus2' => $campusCode[1],
                 'd' => $this->getCycleLength($campusId),
             )
         );
