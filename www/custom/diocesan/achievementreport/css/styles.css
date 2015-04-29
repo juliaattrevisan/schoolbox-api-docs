@@ -1,8 +1,21 @@
 /**
  * Global styles
  */
-.achievement-report section.avatar {
-    margin-bottom: 40px;
+section.avatar {
+    margin-bottom: 8px;
+}
+section.avatar a {
+    display: block;
+    height: 32px;
+    line-height: 32px;
+    margin-left: 40px;
+}
+section.avatar img {
+    position: absolute;
+    left: 0;
+}
+.achievement-report h1 {
+    margin: 24px 0 12px 0;
 }
 
 .achievement-report table {
