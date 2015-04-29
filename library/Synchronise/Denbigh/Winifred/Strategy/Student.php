@@ -47,7 +47,7 @@ class Synchronise_Denbigh_Winifred_Strategy_Student extends Synchronise_Denbigh_
         $newUser['lastname']             = $currentUser['surname'];
         $newUser['synergy_id']           = $currentUser['denbighID'];
         $newUser['campus']               = array($this->getCampusFromYearLevel($currentUser['academicYear']));
-        $newUser['year']                 = $currentUser['academicYear'];
+        $newUser['year']                 = $this->getYearFromYearLevel($currentUser['academicYear']);
         $newUser['house']                = $this->getHouse($currentUser['house']);
         $newUser['residential_house_id'] = $this->getResidentialHouse($currentUser['cateringHouse']);
         $newUser['alt_email']            = $currentUser['username'] . ($newUser['campus'][0] == self::GIBGATE_CAMPUS_ID ? '@gibgate.nsw.edu.au':'@frensham.nsw.edu.au');
@@ -56,6 +56,8 @@ class Synchronise_Denbigh_Winifred_Strategy_Student extends Synchronise_Denbigh_
         $newUser['defaultCampus']        = $newUser['campus'][0];
         $newUser['eportfolio_enabled']   = self::EPORTFOLIO_STUDENT_ENABLED ? 1 : 0;
 
+        // Disable email for ELC and K students
+        if ($currentUser['academicYear'] <= 0) { $newUser['alt_email'] = ''; }
 
         return $newUser;
     }
