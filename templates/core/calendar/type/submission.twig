@@ -7,8 +7,8 @@
     <div class="hidden-fields clearfix">
         <h3>{{ event.title }}</h3>
         <h4>Due {{ event.getFullDate()|raw }}</h4>
-        <p class="wysiwyg meta">{{ event.detail|purify}}</p>
-        <div class="created">
+        <p class="wysiwyg">{{ event.detail|purify}}</p>
+        <div class="created meta">
             {% if event.authorName %}
                 Posted by <a href="/search/user/{{ event.authorId }}">{{ event.authorName }}</a>
             {% endif %}
@@ -21,7 +21,7 @@
         <a class="btn up-arrow float-left" href="/assess/intro/{{ event.submissionBoxId }}"><span></span>Start Quiz</a>
         {% else %}
             {%  if renderer.isEditable()  %}
-                <a class="btn go-to float-left" href="/submission/viewSubmission/{{ event.eventID }}"><span></span>View Submissions</a>
+                <a class="btn eyeball float-left" href="/submission/viewSubmission/{{ event.eventID }}"><span></span>View Submissions</a>
                 <a class="btn modify float-left" href="/submission/createSubmission/modify/{{ event.eventID }}"><span></span>Modify</a>
             {% else %}
                 <a class="btn eyeball float-left" href="/submission/submissionHistory/{{ event.eventID }}/{{ renderer.viewer.id }}"><span></span>View Details</a>

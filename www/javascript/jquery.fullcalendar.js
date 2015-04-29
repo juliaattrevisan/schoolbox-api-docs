@@ -130,10 +130,10 @@ function Calendar(id, bubbleId, opts) {
                     else {
                         url = '/calendar/modify.php?eventID=' + calEvent.data.meta.eventId + '&returnTo=calendar';
                         deleteUrl = '/calendar/modifyForm.php?action=Delete&id=' + calEvent.data.meta.eventId + '&returnTo=calendar';
-                        data.deleteLink = '<a class="btn delete float-right" href="' + deleteUrl + '"><span></span>Delete</a>';
+                        data.deleteLink = '<a class="btn delete float-left" href="' + deleteUrl + '"><span></span>Delete</a>';
                     }
 
-                    data.modifyLink = '<a class="btn modify float-right" href="' + url + '"><span></span>Modify</a>';
+                    data.modifyLink = '<a class="btn modify float-left" href="' + url + '"><span></span>Modify</a>';
                 }
                 else {
                     data.modifyLink = '';
@@ -145,7 +145,7 @@ function Calendar(id, bubbleId, opts) {
                 try {
                     if (calEvent.data.links.category.id > 0) {
                         data.homepageLink =
-                            $('<a class="btn float-right"><span></span>Go to homepage</a>')
+                            $('<a class="btn house float-left"><span></span>Go To Homepage</a>')
                                 .attr('href', '/homepage/' + String(calEvent.data.links.category.id));
                     }
                 }
@@ -158,12 +158,12 @@ function Calendar(id, bubbleId, opts) {
                 // Attendance List butonye
                 if (data.attendanceListButton.toString() == 'true') {
                     data.attendanceIcon = ''
-                    data.attendanceListButton = '<a class="btn float-right" href="/calendar/attendance/list/'
+                    data.attendanceListButton = '<a class="btn groups float-left" href="/calendar/attendance/list/'
                         + calEvent.data.meta.eventId + '"><span></span>Attendees</a>'
                 }
                 // Attend/Unattend butonye
                 if (data.attendanceRequestButton.toString() != 'false') {
-                    data.attendanceRequestButton = '<a class="btn reply float-right" href="#"><span></span>' + data.attendanceRequestButton.toString() + '</a>'
+                    data.attendanceRequestButton = '<a class="btn reply float-left" href="#"><span></span>' + data.attendanceRequestButton.toString() + '</a>'
 
                 }
 
@@ -175,7 +175,7 @@ function Calendar(id, bubbleId, opts) {
                         $.each(calEvent.data.booking.buttons, function() {
                             if (this.href) {
                                 data.bookingActions.push(
-                                    $('<a class="btn float-right" />')
+                                    $('<a class="btn float-left" />')
                                         .data('seriesId', calEvent.data.meta.seriesId)
                                         .addClass(this.class)
                                         .attr('href', this.href)

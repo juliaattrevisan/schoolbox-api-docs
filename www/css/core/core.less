@@ -6440,10 +6440,13 @@ ul.js_happening {
     &.wysiwyg {
         padding: 0;
         overflow: visible;
+        h3{
+        	margin-bottom: 4px;
+        }
     }
     h3{
-        margin-bottom: 16px;
-        font-size: 16px;
+        margin-bottom: 4px;
+        font-size: 1.2em;
         color: @black;
         font-weight: bold;
         width: 330px;
@@ -6454,7 +6457,7 @@ ul.js_happening {
     }
     .middle{
         min-height: 20px;
-        padding: 17px 24px 17px 16px;
+        padding: 17px 24px 17px 17px;
         position: relative;
         .box-shadow(10px, 10px, 0px, rgba(0, 0, 0, 0.1));
         line-height: 16px;
@@ -6465,13 +6468,9 @@ ul.js_happening {
         background-clip: padding-box;
         h4{
             font-size: 12px;
-            margin: 0 0 16px 0;
+            margin: 0 0 4px 0;
             width: 326px;
             word-break: break-word;
-            span{
-                margin: 0 0 5px 0;
-                padding: 2px;
-            }
         }
         p{
             font-size: 12px;
@@ -6493,6 +6492,15 @@ ul.js_happening {
             cursor: pointer;
             font-size: 16px;
         }
+    }
+    .created,
+    .location{
+    	font-style: italic;
+    }
+    /* To prevent another house icon appearing?
+    */
+    .btn.house{
+    	background-image: none;
     }
     .bottom{
         width: 0px;
@@ -10764,26 +10772,18 @@ table img { max-width: none; }
         display: none;
         visibility: hidden;
     }
-    h3 {
-        margin-bottom: 4px;
-    }
     h3, h4, dt {
         text-align: left;
     }
     dt, dd {
-        font-size: 13px;
-        padding: 0 10px;
         &.rm {
             display: none;
             visibility: hidden;
         }
     }
-    dd {
-        margin-bottom: 4px;
-    }
-    .post-by, .reviewed-by {
+    .post-by,
+    .reviewed-by{
         font-style: italic;
-        text-align: left;
     }
     div.close {
         width: 20px;
@@ -10855,13 +10855,6 @@ table img { max-width: none; }
             margin: 0;
         }
     }
-    .actions {
-        position: relative;
-        top: -3px;
-        dd {
-            float: right;
-        }
-    }
     .attendance {
         height: 18px;
         dd {
@@ -10878,6 +10871,9 @@ table img { max-width: none; }
     }
     dd {
         float: none;
+        font-size: inherit;
+        padding: 0;
+        margin: 0;
     }
     .createSwitch {
         height: 30px;

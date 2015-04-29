@@ -15,10 +15,10 @@
             {{ event.eventType }}:
             {% endif %}
             {{ event.getFullDate()|raw }}</h4>
-        <em>{{ event.location }}</em>
+        <p class="location">{{ event.location }}</p>
         <div>
             {% if event.categoryId > 0 %}
-            <a class="btn float-right" href="/homepage/{{ event.categoryId }}"><span></span>Go to homepage</a>
+            <a class="btn house float-left" href="/homepage/{{ event.categoryId }}"><span></span>Go To Homepage</a>
             {% endif %}
         </div>
     </div>

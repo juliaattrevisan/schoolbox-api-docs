@@ -21,12 +21,12 @@
                 {{ event.eventType }}:
             {% endif %}
             {{ event.startTime.getLong() }}</h4>
-        <em>{{ event.location }}</em>
+        <p class="location">{{ event.location }}</p>
 
-        <p class="wysiwyg meta">
+        <p class="wysiwyg">
             {{ event.detail|purify}}
 
-        <div class="created">
+        <div class="created meta">
             {% if event.author %}
                 Posted by <a href="/search/user/{{ event.authorId }}">{{ event.author }}</a>
             {% endif %}
