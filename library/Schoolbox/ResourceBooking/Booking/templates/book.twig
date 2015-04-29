@@ -57,7 +57,7 @@ $(document).ready(function() {
             campusList: {{ campusList|json_encode|raw }},
             getChangeDateAjax: function(campus, day, date, previous) {
                 return {
-                    url:      {{ routeLookup('resourceBooking.dateForTimetableDay')|json_encode|raw }},
+                    url:      {{ routeLookup('timetable.dateForTimetableDay')|json_encode|raw }},
                     dataType: 'json',
                     data:     {
                         campus:   campus,
