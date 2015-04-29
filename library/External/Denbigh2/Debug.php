@@ -147,7 +147,19 @@ class External_Denbigh2_Debug {
         $this->addTest(
             "Subject List for {$this->studentId}", 'Enrolments',
             array('Class', 'Subject Name'),
-            $api = new External_Denbigh2_Api('Enrolments', array('Student ID' => $this->studentId))
+            new External_Denbigh2_Api('Enrolments', array('Student ID' => $this->studentId))
+        );
+
+        $this->addTest(
+            "Portrait for {$this->studentId}", 'Photos',
+            array('PhotoBase64Encoded'),
+            new External_Denbigh2_Api('Photos', array('Community ID' => $this->studentId))
+        );
+
+        $this->addTest(
+            "Portrait for {$this->teacherCode}", 'Photos',
+            array('PhotoBase64Encoded'),
+            new External_Denbigh2_Api('Photos', array('z_StaffCode ID' => $this->teacherCode))
         );
     }
 
