@@ -651,55 +651,67 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
     // get filetype details
     $return = $recent_return->getReturnedWork();
 
-
-    $storage = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($return->getStorage()->getHash());
-
     $this->setVar(
         array(
             'RETURNED_WORK_OWNER_ID'   => $return->getOwner()->getId(),
             'RETURNED_WORK_COMMENT'    => Scrub::Text($return->getComment()),
             'RETURNED_WORK_MARK'       => Scrub::Text($return->getMark()),
-            'RETURNED_WORK_FILE_ID'    => $return->getId(),
             'RETURNED_WORK_GRADIENT'   => $return->getGradientFromNormalizedMark(),
-            'RETURNED_WORK_FILE_SIZE'  => Alaress_Byte_Format::bytesToString($storage->getSize()),
-            'RETURNED_WORK_FILE_NAME'  => Scrub::Text($storage->getFilename()),
-            'RETURNED_WORK_FILE_DATE'  => $return->getReturned()->getRelativeTime(),
-            'RETURNED_WORK_FILE_THUMB' => $storage->getMimetype()->getIconFile() ?: 'txt.png',
+        ));
+
+    // Just zero these so they don't appear
+    $this->setVar(
+        array(
+            'RETURNED_WORK_SUBMISSION_ID' => '',
+            'return_file_uuid_block'      => '',
         )
     );
 
-    /* If there's a crocodoc document, display a link to it
-     */
-    if ($return->getUuid()) {
-        try {
-            $associatedSubmission = $submissionMapper->findOneByColumn('uuid', $return->getUuid());
+    if($return->getStorage()->getHash() && !$parentOnly) {
+        try{
+
+            $storage = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($return->getStorage()->getHash());
 
             $this->setVar(
                 array(
-                    'RETURNED_WORK_SUBMISSION_ID' => $associatedSubmission->getId(),
+                    'RETURNED_WORK_FILE_ID'    => $return->getId(),
+                    'RETURNED_WORK_FILE_SIZE'  => Alaress_Byte_Format::bytesToString($storage->getSize()),
+                    'RETURNED_WORK_FILE_NAME'  => Scrub::Text($storage->getFilename()),
+                    'RETURNED_WORK_FILE_DATE'  => $return->getReturned()->getRelativeTime(),
+                    'RETURNED_WORK_FILE_THUMB' => $storage->getMimetype()->getIconFile() ?: 'txt.png',
                 )
             );
-        } catch (\Exception $e) {
-            error(44);
+
+            /* If there's a crocodoc document, display a link to it
+             */
+            if ($return->getUuid()) {
+                try {
+                    $associatedSubmission = $submissionMapper->findOneByColumn('uuid', $return->getUuid());
+
+                    $this->setVar(
+                        array(
+                            'RETURNED_WORK_SUBMISSION_ID' => $associatedSubmission->getId(),
+                        )
+                    );
+                } catch (\Exception $e) {
+                    error(44);
+                }
+
+                $this->parse('return_file_uuid_block', 'return_file_uuid');
+            }
+
+            $this->parse('return_file_block', 'return_file');
+
+        } catch (Schoolbox\Mapper\Exception $e) {
+            $this->setVar('return_file_block', '');
         }
-
-        $this->parse('return_file_uuid_block', 'return_file_uuid');
-    } else {
-        $this->setVar(
-            array(
-                'RETURNED_WORK_SUBMISSION_ID' => '',
-                'return_file_uuid_block'      => '',
-            )
-        );
     }
-
-    if ($return->getStorage()->getHash() && !$parentOnly) {
-        $this->parse('return_file_block', 'return_file');
-    } else {
+    else {
         $this->setVar('return_file_block', '');
     }
 
     $this->parse('returned_work_block', 'returned_work');
+
 } else {
     $this->setVar('returned_work_block', '');
 }
