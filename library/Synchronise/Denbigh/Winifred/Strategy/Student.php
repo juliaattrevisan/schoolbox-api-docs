@@ -56,6 +56,9 @@ class Synchronise_Denbigh_Winifred_Strategy_Student extends Synchronise_Denbigh_
         $newUser['defaultCampus']        = $newUser['campus'][0];
         $newUser['eportfolio_enabled']   = self::EPORTFOLIO_STUDENT_ENABLED ? 1 : 0;
 
+        // Disable email for ELC and K students
+        if ($currentUser['academicYear'] <= 0) { $newUser['alt_email'] = ''; }
+
         return $newUser;
     }
 
