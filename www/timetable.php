@@ -53,7 +53,12 @@ if ($groupHandler->isParent()) {
     if ($child_id && empty($outputList)) {
         error(19);
     }
-
+    // Inject campus ID into child list
+    foreach ($outputList as &$user) {
+        $campusObj      = Schoolbox\CampusMapper::getInstance()->findById($user);
+        $user['campus'] = $campusObj;
+    }
+    unset($user);
 } else {
     if ($child_id) {
         if ($groupHandler->isStaff() || $child_id == $_SESSION['id']) {
