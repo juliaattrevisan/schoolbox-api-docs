@@ -127,16 +127,16 @@ class Leave_Core_Report_House_Web
 			 */
             $data = $this->getData();
 
-            $morningStart = $data['reportStart'];
+            $morningStart = clone $data['reportStart'];
             $morningStart->addHours(10);
 
-            $dayStart = $data['reportStart'];
+            $dayStart = clone $data['reportStart'];
             $dayStart->addHours(19);
 
-            $nightStart = $data['reportStart'];
+            $nightStart = clone $data['reportStart'];
             $nightStart->addHours(22);
 
-            $nightEnd = $data['reportStart'];
+            $nightEnd = clone $data['reportStart'];
             $nightEnd->addHours(34);
 
             $showStartTime = true;
