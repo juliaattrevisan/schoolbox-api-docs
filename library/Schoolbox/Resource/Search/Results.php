@@ -34,13 +34,16 @@ use Schoolbox\Resource\Folder\Search\Renderer as FolderRenderer;
 use Schoolbox\Resource\TextboxMapper;
 use Schoolbox\Resource\Textbox\Search\Renderer as TextboxRenderer;
 
+use Schoolbox\Resource\File;
+use Schoolbox\Resource\File\Search\Renderer as FileRenderer;
+
 class Results implements Searchable
 {
 
     /**
      * Registry of mappers
      *
-     * @var \Schoolbox\Collection
+     * @var Collection
      */
     private $registry = null;
 
@@ -86,6 +89,7 @@ class Results implements Searchable
         $this->getRegistry()->add(new Definition('link', new LinkMapper(), new LinkRenderer($page)));
         $this->getRegistry()->add(new Definition('folder', new FolderMapper(), new FolderRenderer($page)));
         $this->getRegistry()->add(new Definition('textbox', new TextboxMapper(), new TextboxRenderer($page)));
+        $this->getRegistry()->add(new Definition('file', new File\Mapper(), new FileRenderer($page)));
     }
 
     /**
@@ -190,7 +194,7 @@ class Results implements Searchable
     /**
      * Set registry
      *
-     * @param null $registry
+     * @param Collection|Definition[] $registry
      */
     private function setRegistry($registry)
     {
@@ -200,7 +204,7 @@ class Results implements Searchable
     /**
      * Get registry
      *
-     * @return null
+     * @return Collection|Definition[]
      */
     private function getRegistry()
     {
@@ -230,7 +234,7 @@ class Results implements Searchable
     /**
      * Set result
      *
-     * @param null $result
+     * @param Collection $result
      */
     private function setResult($result)
     {
@@ -240,7 +244,7 @@ class Results implements Searchable
     /**
      * Get result
      *
-     * @return null
+     * @return Collection
      */
     private function getResult()
     {

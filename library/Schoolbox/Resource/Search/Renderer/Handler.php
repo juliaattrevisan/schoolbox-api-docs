@@ -10,13 +10,15 @@
 
 namespace Schoolbox\Resource\Search\Renderer;
 
+use SitePage;
+
 abstract class Handler
 {
 
     /**
      * A sitepage
      *
-     * @var null
+     * @var SitePage
      */
     protected $page = null;
 
@@ -272,7 +274,7 @@ abstract class Handler
     /**
      * Set page
      *
-     * @param null $page
+     * @param SitePage $page
      */
     protected function setPage($page)
     {
@@ -282,7 +284,7 @@ abstract class Handler
     /**
      * Get page
      *
-     * @return null
+     * @return SitePage
      */
     protected function getPage()
     {
