@@ -124,6 +124,9 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
         }
 
         // Put together mimetype filters
+        if (!is_array($fileTypes)) {
+            $fileTypes = [$fileTypes];
+        }
         if (!in_array('all', $fileTypes)) {
             $mimetypes = [];
             foreach ($fileTypes as $fileType) {
