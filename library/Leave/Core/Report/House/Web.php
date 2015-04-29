@@ -4,10 +4,10 @@
  *
  * Online house report as found in the Schoolbox
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author    Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version  SVN: $Id$
  */
 class Leave_Core_Report_House_Web
 {
@@ -38,12 +38,12 @@ class Leave_Core_Report_House_Web
     const RETURNING = 3;
 
     /**
-	 * Constructor
-	 *
-	 * @param $page
-	 * @param $data
-	 * @param $range
-	 */
+     * Constructor
+     *
+     * @param $page
+     * @param $data
+     * @param $range
+     */
     public function __construct($page, $data, $range)
     {
         $this->setPage($page);
@@ -62,16 +62,16 @@ class Leave_Core_Report_House_Web
     }
 
     /**
-	 * "...with multiple leave entries amalgamated into one"
-	 *
-	 * Combine multiple leave requests for the same person into one row.
-	 * We do this by preprocessing each request and collating the information.
-	 */
+     * "...with multiple leave entries amalgamated into one"
+     *
+     * Combine multiple leave requests for the same person into one row.
+     * We do this by preprocessing each request and collating the information.
+     */
     protected function recombination()
     {
         $combined = array();
 
-        foreach($this->getRequestList() as $request) {
+        foreach ($this->getRequestList() as $request) {
             /** @var Leave_Request $request */
             $key = $request->getUser()->getId();
 
@@ -93,8 +93,7 @@ class Leave_Core_Report_House_Web
 			 */
             if ($request->isPending()) {
                 $combined[$key]['row_css_class'][] = 'leave-pending';
-            }
-            /* Non-pending requests (authorised requests)
+            } /* Non-pending requests (authorised requests)
 			 */
             else {
                 if ($request->getId()) {
@@ -142,15 +141,12 @@ class Leave_Core_Report_House_Web
             $showStartTime = true;
 
             for ($j = 0; $j < $this->getRange(); $j++) {
-
                 /* If this person is on leave during the morning
 				 */
                 if ($request->getOccupancy($morningStart, $dayStart)) {
-
                     /* Check whether next segment is occupied; if not, also show the time
 					 */
                     if ($showStartTime) {
-
                         /* If $showStartTime == true and he's not on leave in the next period
 						 * then he left and returned in the same period
 						 */
@@ -159,7 +155,6 @@ class Leave_Core_Report_House_Web
                             ) . ' ' . $request->getFinish()->getTimeOnly();
                             $requestPeriodMorningDirection = self::LEAVING;
                         } else {
-
                             /* Specifically check for this day, to account for multi-week leave
 							 */
                             if ($request->getStart()->getDatabaseDate() == $morningStart->getDatabaseDate()) {
@@ -216,7 +211,6 @@ class Leave_Core_Report_House_Web
                 /* If this person is on leave during the night
 				 */
                 if ($request->getOccupancy($nightStart, $nightEnd)) {
-
                     /* Check whether the next morning is occupied
 					 */
                     $nextMorning = $dayStart;
@@ -284,10 +278,10 @@ class Leave_Core_Report_House_Web
     }
 
     /**
-	 * Facade method
-	 *
-	 * Render house report
-	 */
+     * Facade method
+     *
+     * Render house report
+     */
     public function render()
     {
         $this->renderHouseList();
@@ -297,8 +291,8 @@ class Leave_Core_Report_House_Web
     }
 
     /**
-	 * Set up blocks and stuff
-	 */
+     * Set up blocks and stuff
+     */
     protected function setup()
     {
         $this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
@@ -337,8 +331,8 @@ class Leave_Core_Report_House_Web
     }
 
     /**
-	 * Render leave requests
-	 */
+     * Render leave requests
+     */
     protected function renderRequests()
     {
         if (count($this->getRequestList())) {
@@ -351,10 +345,10 @@ class Leave_Core_Report_House_Web
             }
 
             if (is_array($allPeople) && $totalPeople) {
-                foreach($allPeople as $currentPerson) {
+                foreach ($allPeople as $currentPerson) {
                     $hostTypes = array();
 
-                    foreach($currentPerson['request_host_type'] as $currentHostType) {
+                    foreach ($currentPerson['request_host_type'] as $currentHostType) {
                         if (!empty($currentHostType)) {
                             $hostTypes[] = $currentHostType;
                         }
@@ -374,7 +368,7 @@ class Leave_Core_Report_House_Web
                     /* Render out each authorisation user -_-
 					 */
                     if (is_array($currentPerson['request_authorisation_user_id']) && count($currentPerson['request_authorisation_user_id'])) {
-                        foreach($currentPerson['request_authorisation_user_id'] as $id => $name) {
+                        foreach ($currentPerson['request_authorisation_user_id'] as $id => $name) {
                             $this->getPage()->setVar(array(
                                 'REQUEST_AUTHORISATION_USER_ID' => $id,
                                 'REQUEST_AUTHORISATION_USER_NAME' => $name,
@@ -390,10 +384,8 @@ class Leave_Core_Report_House_Web
 					 */
                     $i = 0;
 
-                    foreach($currentPerson['periods'] as $currentPeriod) {
-
+                    foreach ($currentPerson['periods'] as $currentPeriod) {
                         foreach ($this->rangePeriods as $section) {
-
                             $requestOutput = '';
                             $removeFromTotal = false;
 
@@ -460,8 +452,7 @@ class Leave_Core_Report_House_Web
                     $this->getPage()->setVar('request_authorisation_block', '');
                 }
             }
-        }
-        /* This condition never occurs because of left join on users.
+        } /* This condition never occurs because of left join on users.
 		 */
         else {
             $this->getPage()->parse('no_requests_block', 'no_requests');
@@ -480,14 +471,13 @@ class Leave_Core_Report_House_Web
     }
 
     /**
-	 * Render headings for each day in the specified range
-	 */
+     * Render headings for each day in the specified range
+     */
     protected function renderHeadings()
     {
         $data = $this->getData();
 
         if (count($this->getRequestList())) {
-
             /* Parse out the headings
 			 */
             for ($i = 0; $i < $this->getRange(); $i++) {
@@ -533,8 +523,8 @@ class Leave_Core_Report_House_Web
     }
 
     /**
-	 * Render the house list dropdown selector
-	 */
+     * Render the house list dropdown selector
+     */
     protected function renderHouseList()
     {
         if (count($this->getHouseList())) {
@@ -542,7 +532,7 @@ class Leave_Core_Report_House_Web
                 $this->getPage()->setVar(array(
                     'HOUSE_ID' => $house->getId(),
                     'HOUSE_NAME' => Scrub::text($house->getHouse())
-                ) );
+                ));
 
                 if ($house->getId() == $this->getCurrentHouse()->getId()) {
                     $this->getPage()->setVar('HOUSE_SELECTED', 'selected="selected"');
@@ -556,8 +546,8 @@ class Leave_Core_Report_House_Web
     }
 
     /**
-	 * Render extra information about the report
-	 */
+     * Render extra information about the report
+     */
     protected function renderMetaDetails()
     {
         $currentTime = new Alaress_Date_Format(time(), 'U');
@@ -574,210 +564,210 @@ class Leave_Core_Report_House_Web
 	 */
 
     /**
-	 * Get report date
-	 *
-	 * @return mixed
-	 */
+     * Get report date
+     *
+     * @return mixed
+     */
     protected function getReportDate()
     {
         return $this->data['date'];
     }
 
     /**
-	 * Get report start date
-	 *
-	 * @return mixed
-	 */
+     * Get report start date
+     *
+     * @return mixed
+     */
     protected function getReportStart()
     {
         return $this->data['reportStart'];
     }
 
     /**
-	 * Set page
-	 *
-	 * @param $page
-	 */
+     * Set page
+     *
+     * @param $page
+     */
     protected function setPage($page)
     {
         $this->page = $page;
     }
 
     /**
-	 * Get page
-	 *
-	 * @return null
-	 */
+     * Get page
+     *
+     * @return null
+     */
     protected function getPage()
     {
         return $this->page;
     }
 
     /**
-	 * Set data
-	 *
-	 * @param $data
-	 */
+     * Set data
+     *
+     * @param $data
+     */
     protected function setData($data)
     {
         $this->data = $data;
     }
 
     /**
-	 * Get data
-	 *
-	 * @return mixed
-	 */
+     * Get data
+     *
+     * @return mixed
+     */
     protected function getData()
     {
         return $this->data;
     }
 
     /**
-	 * Set range
-	 *
-	 * @param $range
-	 */
+     * Set range
+     *
+     * @param $range
+     */
     protected function setRange($range)
     {
         $this->range = $range;
     }
 
     /**
-	 * Get range
-	 *
-	 * @return mixed
-	 */
+     * Get range
+     *
+     * @return mixed
+     */
     protected function getRange()
     {
         return $this->range;
     }
 
     /**
-	 * Set request list
-	 *
-	 * @param $requestList
-	 */
+     * Set request list
+     *
+     * @param $requestList
+     */
     protected function setRequestList($requestList)
     {
         $this->requestList = $requestList;
     }
 
     /**
-	 * Get request list
-	 *
-	 * @return mixed
-	 */
+     * Get request list
+     *
+     * @return mixed
+     */
     protected function getRequestList()
     {
         return $this->requestList;
     }
 
     /**
-	 * Set combined result
-	 *
-	 * @param $combined
-	 */
+     * Set combined result
+     *
+     * @param $combined
+     */
     protected function setCombined($combined)
     {
         $this->combined = $combined;
     }
 
     /**
-	 * Get combined result
-	 *
-	 * @return array
-	 */
+     * Get combined result
+     *
+     * @return array
+     */
     protected function getCombined()
     {
         return $this->combined;
     }
 
     /**
-	 * Set house list
-	 *
-	 * @param $houseList
-	 */
+     * Set house list
+     *
+     * @param $houseList
+     */
     protected function setHouseList($houseList)
     {
         $this->houseList = $houseList;
     }
 
     /**
-	 * Get house list
-	 *
-	 * @return array
-	 */
+     * Get house list
+     *
+     * @return array
+     */
     protected function getHouseList()
     {
         return $this->houseList;
     }
 
     /**
-	 * Set current house
-	 *
-	 * @param $currentHouse
-	 */
+     * Set current house
+     *
+     * @param $currentHouse
+     */
     protected function setCurrentHouse($currentHouse)
     {
         $this->currentHouse = $currentHouse;
     }
 
     /**
-	 * Get current house
-	 *
-	 * @return null
-	 */
+     * Get current house
+     *
+     * @return null
+     */
     protected function getCurrentHouse()
     {
         return $this->currentHouse;
     }
 
     /**
-	 * Get start of pending decoration
-	 *
-	 * @return mixed
-	 */
+     * Get start of pending decoration
+     *
+     * @return mixed
+     */
     protected function getDecorationPendingStart()
     {
         return $this->decoration['pendingStart'];
     }
 
     /**
-	 * Get end of pending decoration
-	 *
-	 * @return mixed
-	 */
+     * Get end of pending decoration
+     *
+     * @return mixed
+     */
     protected function getDecorationPendingEnd()
     {
         return $this->decoration['pendingEnd'];
     }
 
     /**
-	 * Get start of approved decoration
-	 *
-	 * @return mixed
-	 */
+     * Get start of approved decoration
+     *
+     * @return mixed
+     */
     protected function getDecorationApprovedStart()
     {
         return $this->decoration['approvedStart'];
     }
 
     /**
-	 * Get end of approved decoration
-	 *
-	 * @return mixed
-	 */
+     * Get end of approved decoration
+     *
+     * @return mixed
+     */
     protected function getDecorationApprovedEnd()
     {
         return $this->decoration['approvedEnd'];
     }
 
     /**
-	 * Get template file
-	 *
-	 * @return string
-	 */
+     * Get template file
+     *
+     * @return string
+     */
     protected function getTemplateFile()
     {
         return $this->templateFile;
