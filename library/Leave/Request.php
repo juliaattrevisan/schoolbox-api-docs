@@ -71,7 +71,15 @@ class Leave_Request {
 	 * @return Boolean
 	 */
 	public function getOccupancy($datetimeStart, $datetimeFinish) {
-		if ($this->getStart()->getUnixTimestamp() < $datetimeFinish->getUnixTimestamp() && $this->getFinish()->getUnixTimestamp() > $datetimeStart->getUnixTimestamp()) {
+        if ($this->getStart()->isNull()) {
+            return false;
+        }
+        if ($this->getFinish()->isNull()) {
+            return false;
+        }
+		if ($this->getStart()->getUnixTimestamp() < $datetimeFinish->getUnixTimestamp()
+            && $this->getFinish()->getUnixTimestamp() > $datetimeStart->getUnixTimestamp()
+        ) {
 			return true;
 		}
 
