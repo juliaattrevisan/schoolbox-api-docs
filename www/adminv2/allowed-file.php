@@ -30,7 +30,13 @@ if ($mimes->count()) {
     foreach ($mimes as $mime) {
 
         $extensions   = ExtensionMapper::getInstance()->findByColumn('fileTypeID', $mime->getId());
-        $extensions   = implode(',', $extensions->getColumnValues('extension'));
+        $extensions   = $extensions->getColumnValues('extension');
+        $extensionCSV = implode(',', $extensions);
+        if (count($extensions)) {
+            $extensions = '<li>' . implode('</li><li>', $extensions) . '</li>';
+        } else {
+            $extensions = '(none)';
+        }
 
         $max_size_output = Alaress_Byte_Format::bytesToString($mime->getMaxFileSize());
         $output = array(
@@ -40,6 +46,7 @@ if ($mimes->count()) {
             'FILE_DESC'                => Scrub::text($mime->getDescription()),
             'FILE_MIME'                => $mime->getMime(),
             'FILE_EXTENSION'           => $extensions,
+            'FILE_EXTENSION_CSV'       => $extensionCSV,
             'FILE_ICON'                => $mime->getIconFile(),
             'FILE_MAXSIZE'             => $mime->getMaxFileSize() ? $max_size_output : "<em>$placeholder</em>",
             'FILE_MAXSIZE_INPUT'       => $mime->getMaxFileSize() ? $max_size_output : '',
