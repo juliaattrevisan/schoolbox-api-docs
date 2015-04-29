@@ -45,13 +45,29 @@ abstract class Synchronise_Denbigh_Winifred_Strategy_Abstract extends Synchronis
         if($yearLevel > 6) {
             return $this::FRENSHAM_CAMPUS_ID;
         }
-        else if($yearLevel <= 6 && $yearLevel > 0) {
+        else if($yearLevel <= 6 && $yearLevel >= -2) {
             return $this::GIBGATE_CAMPUS_ID;
         }
         else {
             return $this::DEFAULT_CAMPUS_ID;
         }
 
+    }
+
+    protected function getYearFromYearLevel($yearLevel) {
+        switch ($yearLevel) {
+            case '-2':
+                return 'ELC';
+                break;
+            case '-1':
+                return 'ELC';
+                break;
+            case '0':
+                return 'K';
+                break;
+            default:
+                return $yearLevel;
+        }
     }
 
     protected function getHouse($house) {
