@@ -485,6 +485,7 @@ class StudentReportCard
         $page->setBlock('subject', 'subject_rubric', 'subject_rubric_block');
         $page->setBlock('subject_rubric', 'subject_rubric_group', 'subject_rubric_group_block');
         $page->setBlock('subject_rubric', 'subject_rubric_submissionbox', 'subject_rubric_submissionbox_block');
+        $page->setBlock('subject_rubric', 'subject_rubric_box_checklist', 'subject_rubric_box_checklist_block');
         $page->setBlock('subject_rubric_group', 'subject_rubric_criterion', 'subject_rubric_criterion_block');
         $page->setBlock('subject_rubric_criterion', 'subject_rubric_criterion_mark', 'subject_rubric_criterion_mark_block');
 
@@ -549,7 +550,7 @@ class StudentReportCard
 //                                $string .= " ({$allValues[$currentCriterion->getId()]['mark']})";
 //                            }
 
-                            $allStructures[$group][$currentCriterion->getId()]['results'][] = $string;
+                            $allStructures[$group][$currentCriterion->getId()]['results'][$currentSubmission['box']->getId()] = $string;
                         }
                     }
                 }
@@ -558,10 +559,12 @@ class StudentReportCard
                  */
                 foreach($allSubmissionBoxes as $currentSubmissionBox) {
                     $page->setVar(array(
-                        'SUBJECT_RUBRIC_SUBMISSIONBOX_NAME' => $currentSubmissionBox['box']->getName()
+                        'SUBJECT_RUBRIC_SUBMISSIONBOX_NAME' => $currentSubmissionBox['box']->getName(),
+                        'SUBJECT_RUBRIC_SUBMISSIONBOX_ID' => $currentSubmissionBox['box']->getId(),
                     ));
 
                     $page->parse('subject_rubric_submissionbox_block', 'subject_rubric_submissionbox', true);
+                    $page->parse('subject_rubric_box_checklist_block', 'subject_rubric_box_checklist', true);
                 }
 
                 /* Render that all out in the land of phpliberty
@@ -576,9 +579,10 @@ class StudentReportCard
                             'SUBJECT_RUBRIC_CRITERION_NAME' => $data['criterion']->getName()
                         ));
 
-                        foreach ($data['results'] as $currentResult) {
+                        foreach ($data['results'] as $boxId => $currentResult) {
                             $page->setVar(array(
-                                'SUBJECT_RUBRIC_CRITERION_MARK' => $currentResult
+                                'SUBJECT_RUBRIC_CRITERION_MARK'   => $currentResult,
+                                'SUBJECT_RUBRIC_SUBMISSIONBOX_ID' => $boxId
                             ));
 
                             $page->parse('subject_rubric_criterion_mark_block', 'subject_rubric_criterion_mark', true);
