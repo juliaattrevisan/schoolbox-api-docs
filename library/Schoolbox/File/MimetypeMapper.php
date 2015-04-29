@@ -60,6 +60,8 @@ class MimetypeMapper extends Schoolbox\Mapper {
             'property'   => 'maxFileSize',
             'type'       => self::TYPE_INTEGER,
         ));
+
+        $this->uses('deleted', self::TYPE_BOOLEAN, self::COLUMN_SOFTDELETE);
 	}
 
 	/**
