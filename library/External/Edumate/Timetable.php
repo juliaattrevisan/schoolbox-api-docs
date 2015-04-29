@@ -82,10 +82,9 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     protected function getCycleLength(\Schoolbox\Campus $campus)
     {
         $stmt = $this->getDatabase()->prepare('
-            SELECT day_number
-            FROM db2inst1.schoolbox_timetable_definition
-            WHERE campus = :campus
-            ORDER BY day_number DESC
+            SELECT days_in_cycle
+            FROM db2inst1.schoolbox_timetable_days
+            WHERE timetable_id = :campus
             FETCH FIRST 1 ROW ONLY
         ');
 
@@ -103,22 +102,55 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
     {
         $stmt = $this->getDatabase()->prepare('
-            SELECT "DAY"
+            SELECT start_date, cycle_start_day, days_in_cycle
             FROM db2inst1.schoolbox_timetable_days
-            WHERE "DATE" = :date
-            AND "CAMPUS" = :campus
+            WHERE start_date <= :date
+            AND end_date >= :date
+            AND timetable_id = :campus
+            ORDER BY start_date
             FETCH FIRST 1 ROW ONLY
         ');
 
+        if ($time == 0) {
+            $date = time();
+        } else {
+            $date = $time;
+        }
+
         $params = array(
-            'date'   => date('Y-m-d', $date ?: time()),
+            'date'   => date('Y-m-d', $date),
             'campus' => $campus->getExtTimetableCode(),
         );
 
         $stmt->execute($params);
 
         if ($row = $stmt->fetch(DB2::FETCH_ASSOC)) {
-            return $row['DAY'];
+            $start = strtotime($row['START_DATE']);
+
+            $days = ceil(($date - $start) / (60 * 60 * 24));
+
+            /* Calculate the business days from the even weeks */
+            $businessDays = 5 * floor($days / 7);
+
+            /* Handle the excess days */
+            $excessDays = $days % 7;
+
+            for ($i = 0; $i < $excessDays; $i++) {
+                $currentExcessDay = $date - (60 * 60 * 24 * $i);
+
+                /* If its not Saturday or Sunday then increment the business days */
+                if (date('N', $currentExcessDay) < 6) {
+                    $businessDays++;
+                }
+            }
+
+            if (is_numeric($row['CYCLE_START_DAY'])) {
+                $businessDays += ($row['CYCLE_START_DAY'] - 1);
+            }
+
+            $currentDay = $businessDays % $row['DAYS_IN_CYCLE'];
+
+            return $currentDay;
         }
 
         return false;
@@ -222,7 +254,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             $timetable[$x]['periodSequence'] = $definition['sequence'][$x];
             $timetable[$x]['class']          = array();
         }
-
+  
         // Add classes for each day into it
         while ($desc = $stmt->fetch(PDO::FETCH_ASSOC)) {
             foreach ($timetable as $x => $timetablePeriod) {
@@ -285,6 +317,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             LEFT JOIN db2inst1.schoolbox_classes cl ON t.class_code = cl.class_code
             $join
             AND campus = :campus
+            AND day_number <= :d
         "
         );
 
@@ -292,6 +325,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             array(
                 'sn' => $externalUserId,
                 'campus' => $this->getCampusCode($campusId),
+                'd' => $this->getCycleLength($campusId),
             )
         );
 
