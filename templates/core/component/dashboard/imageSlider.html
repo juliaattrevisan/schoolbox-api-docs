@@ -1,7 +1,9 @@
 <script type="text/javascript" src="/javascript/components/anyslider/dist/jquery.anyslider.min.js"></script>
 <script type="text/javascript">
     $(function(){
-        $("#imageSlider").AnySlider();
+        $("#imageSlider").AnySlider({
+            interval: {COMPONENT_CONFIG_TIMING_VALUE_MS}
+        });
     });
 </script>
 
