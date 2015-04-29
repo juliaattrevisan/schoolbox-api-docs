@@ -16,10 +16,10 @@ if (!Cfg::get('external_enable')) {
     error(19);
 }
 
-$groupHandler = new Group;
-$userHandler = new User;
+$groupHandler     = new Group;
+$userHandler      = new User;
 $timetableHandler = new External_Timetable;
-$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+$categoryMapper   = new \Schoolbox\Resource\CategoryMapper();
 
 $this->setFile(TEMPLATE_content, 'class/timetable.html');
 $this->setTitle('Timetable');
@@ -53,12 +53,17 @@ if ($groupHandler->isParent()) {
     if ($child_id && empty($outputList)) {
         error(19);
     }
-
+    // Inject campus ID into child list
+    foreach ($outputList as &$user) {
+        $campusObj      = Schoolbox\CampusMapper::getInstance()->findById($user);
+        $user['campus'] = $campusObj;
+    }
+    unset($user);
 } else {
     if ($child_id) {
         if ($groupHandler->isStaff() || $child_id == $_SESSION['id']) {
             //Output a timetable for each campus user is involved in
-            $user = $userHandler->getByID($child_id);
+            $user       = $userHandler->getByID($child_id);
             $campusList = $userHandler->getUserCampus($child_id);
 
             /* Don't output if multiple timetables if external campus code is the same */
@@ -70,9 +75,9 @@ if ($groupHandler->isParent()) {
                     if (!isset($checked_campus_list[$campus_code])) {
                         $checked_campus_list[$campus_code] = true;
 
-                        $user['campus'] = $campusObj;
+                        $user['campus']     = $campusObj;
                         $user['campusName'] = $campusObj->getName();
-                        $outputList[] = $user;
+                        $outputList[]       = $user;
 
                     }
                 }
@@ -83,7 +88,7 @@ if ($groupHandler->isParent()) {
     } else {
         //Output a timetable for each campus a staff is involved in
         if ($groupHandler->isStaff()) {
-            $user = $userHandler->getByID($_SESSION['id']);
+            $user       = $userHandler->getByID($_SESSION['id']);
             $campusList = $userHandler->getUserCampus($_SESSION['id']);
 
             /* Don't output if multiple timetables if external campus code is the same */
@@ -94,9 +99,9 @@ if ($groupHandler->isParent()) {
                     $campus_code = $campusObj->getExtTimetableCode();
                     if (!isset($checked_campus_list[$campus_code])) {
                         $checked_campus_list[$campus_code] = true;
-                        $user['campus'] = $campusObj;
-                        $user['campusName'] = $campusObj->getName();
-                        $outputList[] = $user;
+                        $user['campus']                    = $campusObj;
+                        $user['campusName']                = $campusObj->getName();
+                        $outputList[]                      = $user;
                     }
                 }
             }
@@ -109,9 +114,9 @@ if ($groupHandler->isParent()) {
 
 if (is_array($outputList)) {
     foreach ($outputList as $user) {
-/* Setup colour map */
+        /* Setup colour map */
         $subjectColourMap = array();
-        $colourIndex = 0;
+        $colourIndex      = 0;
 
         $outputUser = array(
             'PERSON' => $userHandler->formatName($user),
@@ -122,7 +127,7 @@ if (is_array($outputList)) {
         $staffFlag = $groupHandler->isStaff($user['uid']);
 
         $periodCurrent = $timetableHandler->getPeriodNumber($user['campus']);
-        $dayCurrent = $timetableHandler->getDayNumber($user['campus']);
+        $dayCurrent    = $timetableHandler->getDayNumber($user['campus']);
 
         try {
             $timetable = $timetableHandler->getFullTimetable($user['synergy_id'], $user['uid'], $user['campus']);
@@ -157,7 +162,7 @@ if (is_array($outputList)) {
             //for each period
             foreach ($timetable as $row) {
                 if ($row['periodSequence'] == 1) {
-                    $is_current_period =
+                    $is_current_period      =
                         $row['periodNumber'] == $periodCurrent['PeriodNumber']
                         && $row['periodSequence'] == $periodCurrent['PeriodNumberSeq'];
                     $outputPeriodDefinition = array(
@@ -171,7 +176,7 @@ if (is_array($outputList)) {
                     $dayCount = 1;
                     //for each day
                     foreach ($row['day'] as $period) {
-// only output header on first run through
+                        // only output header on first run through
                         if ($periodCount == 1) {
                             //output day header
                             if ($dayCount == $dayCurrent) {
@@ -247,7 +252,7 @@ if (is_array($outputList)) {
                                 /* Lookup subject code and check permissions, if read access provide a link to the user */
                                 if (!isset($catCache[$class['code']])) {
                                     try {
-                                        $cat = $categoryMapper->findByCode($class['code']);
+                                        $cat                      = $categoryMapper->findByCode($class['code']);
                                         $catCache[$class['code']] = $cat->getId();
 
                                     } catch (\Schoolbox\Mapper\Exception $e) {
