@@ -15,10 +15,10 @@
             {{ event.eventType }}:
             {% endif %}
             {{ event.getFullDate()|raw }}</h4>
-        <em>{{ event.location }}</em>
+        <p class="location">{{ event.location }}</p>
 
-        <p class="wysiwyg meta">{{ event.detail|purify}}</p>
-        <div class="created">
+        <p class="wysiwyg">{{ event.detail|purify}}</p>
+        <div class="created meta">
             {% if event.authorName %}
             Posted by <a href="/search/user/{{ event.authorId }}">{{ event.authorName }}</a>
             {% endif %}

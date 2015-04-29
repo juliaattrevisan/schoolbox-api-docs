@@ -13,9 +13,9 @@
         <h4>{{ event.getFullDate()|raw }}</h4>
         <em>{{ event.getCategory() }}</em>
 
-        <p class="wysiwyg meta">{{ event.detail|purify}}</p>
+        <p class="wysiwyg">{{ event.detail|purify}}</p>
 
-        <div class="created">
+        <div class="created meta">
             {% if event.authorName %}
                 Requested by <a href="/search/user/{{ event.authorId }}">{{ event.authorName }}</a>
             {% endif %}
@@ -34,16 +34,16 @@
         <div>
 
             {% if renderer.getEditURL() != '' %}
-            <a class="btn float-right modify booking-modify" href="{{ renderer.getEditURL() }}"><span></span>Modify</a>
+            <a class="btn float-left modify booking-modify" href="{{ renderer.getEditURL() }}"><span></span>Modify</a>
             {% endif %}
             {% if renderer.getCancelURL() != '' %}
-            <a class="btn float-right delete booking-cancel" href="{{ renderer.getCancelURL() }}"><span></span>Delete</a>
+            <a class="btn float-left delete booking-cancel" href="{{ renderer.getCancelURL() }}"><span></span>Delete</a>
             {% endif %}
             {% if renderer.getApproveURL() != '' %}
-            <a class="btn float-right tick booking-approve" href="{{ renderer.getApproveURL() }}"><span></span>Approve</a>
+            <a class="btn float-left tick booking-approve" href="{{ renderer.getApproveURL() }}"><span></span>Approve</a>
             {% endif %}
             {% if renderer.getRejectURL() != '' %}
-            <a class="btn float-right tick booking-reject" href="{{ renderer.getRejectURL() }}"><span></span>Reject</a>
+            <a class="btn float-left tick booking-reject" href="{{ renderer.getRejectURL() }}"><span></span>Reject</a>
             {% endif %}
 
         </div>
