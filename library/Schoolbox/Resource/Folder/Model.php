@@ -161,8 +161,10 @@ class Model extends AbstractFolder implements ISoftDeletable
             if ($codeCollection->count()) {
                 $externalIdArray = $DEPRECATED_EXTERNAL_CLASS->getTeacherName($codeCollection->first()->getCode());
 
-                foreach ($externalIdArray as $extId) {
-                    $this->teacher_collection->merge(UserMapper::getInstance()->findByColumn('synergy_id', $extId));
+                if(is_array($externalIdArray)) {
+                    foreach ($externalIdArray as $extId) {
+                        $this->teacher_collection->merge(UserMapper::getInstance()->findByColumn('synergy_id', $extId));
+                    }
                 }
             }
         }
