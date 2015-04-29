@@ -118,61 +118,6 @@ class Controller extends Base
     }
 
     /**
-     * Outputs a response for getting the next or previous occurence of a
-     * timetable day.
-     *
-     * Query parameters:
-     * * campus:   the ID of the campus to get timetable day for
-     * * day:      the day number to get
-     * * date:     Date to get next or previous occurence in relation to.
-     *             Defaults to current date.
-     * * previous: If true, gets previous date - otherwise, gets next date.
-     *
-     */
-    public function dateForTimetableDay()
-    {
-        $campus    = $this->request->query['campus'];
-        $dayNumber = $this->request->query['day'];
-        $date      = strtotime($this->request->query['date']);
-        $previous  = $this->request->query['previous'];
-        $code      = 200;
-        $error     = '';
-        if ($date === false) {
-            $date = null;
-        }
-        try {
-            $campusObj = \Schoolbox\CampusMapper::getInstance()->findById($campus);
-
-            $nearestDate = $previous ?
-                $this->externalTimetableHandler->getPreviousDateForDayNumber($campusObj, $dayNumber, $date) :
-                $this->externalTimetableHandler->getNextDateForDayNumber($campusObj, $dayNumber, $date);
-        } catch (\InvalidArgumentException $e) {
-            $code  = 400;
-            $error = $e->getMessage();
-        } catch (\RangeException $e) {
-            $code  = 400;
-            $error = $e->getMessage();
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            $code  = 400;
-            $error = $e->getMessage();
-        }
-
-        $data = array();
-        if ($error) {
-            $data['error'] = $error;
-        } elseif (isset($nearestDate) && $nearestDate instanceof DateTime) {
-            $data['date'] = $nearestDate->format('Y-m-d');
-        }
-        $this->response->status->setCode($code);
-        $this->response->content->set(
-            array(
-                'format' => 'json',
-                'data'   => $data,
-            )
-        );
-    }
-
-    /**
      * Creates a booking for this resource.
      *
      * @param Item\Model $item The resource to create a booking for.
