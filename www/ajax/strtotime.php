@@ -7,6 +7,8 @@
  * To change this template use File | Settings | File Templates.
  */
 
+require_once __DIR__ . '/../../include/Bootstrap.php';
+
 $string = $_REQUEST['string'];
 $format = $_REQUEST['format'];
 
