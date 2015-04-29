@@ -100,9 +100,9 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
             array(
                 'COMPONENT_ALIGN'                  => $this->getConfig('align'),
                 'COMPONENT_PIXEL'                  => $pixel,
-                'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getConfig('timing') ? $this->getConfig(
-                    'timing'
-                ) * 1000 : '2000',
+                'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getConfig('timing')
+                    ? $this->getConfig('timing') * 1000
+                    : '2000',
             )
         );
 
