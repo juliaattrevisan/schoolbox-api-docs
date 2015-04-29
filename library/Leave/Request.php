@@ -90,7 +90,7 @@ class Leave_Request
     }
 
     /* Getters/Setters
-	 */
+     */
 
     /**
      * @param $created
@@ -447,6 +447,7 @@ class Leave_Request
 
     /**
      * Get authorisation user id
+     *
      * @return mixed
      */
     public function getAuthorisationUserId()
@@ -508,6 +509,7 @@ class Leave_Request
      * Get confirmed by label for a type id
      *
      * @param $index
+     *
      * @return array
      */
     public function getConfirmedByMapIndex($index)
@@ -517,6 +519,7 @@ class Leave_Request
 
     /**
      * @param  \Leave_Request_TravelType $travelType
+     *
      * @return $this
      */
     public function setTravelType($travelType)
