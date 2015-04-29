@@ -148,7 +148,7 @@
             event.preventDefault();
             if (confirm("Are you sure you want to delete?")) {
                 var nearestAction = $(this).closest('form').attr('action');
-                var nearestFID = $(this).closest('form').find('input[name=fileTypeID]').val();
+                var nearestFID = $(this).closest('form').find('input[name=fileTypeId]').val();
                 $(this).closest('form').attr('action', nearestAction + "?delete=" + nearestFID);
                 $(this).closest('form').submit();
             }
@@ -172,7 +172,7 @@
     <h2>Allowed Files</h2>
 
     <form id="newAllowedFile" method="post" action="/adminv2/allowed-fileForm.php">
-        <input type="hidden" readonly="readonly" name="fileTypeID" value=""/>
+        <input type="hidden" readonly="readonly" name="fileTypeId" value=""/>
         <table cellpadding="0" cellspacing="0" class="allowed-files table">
             <colgroup>
                 <col class="enabled" />
@@ -240,7 +240,7 @@
 
                 <!--/adminv2/allowed-fileForm.php-->
                 <form id="allowed-file{FILE_ID}" method="post" class="clearfix" action="/adminv2/allowed-fileForm.php">
-                    <input type="hidden" readonly="readonly" name="fileTypeID" value="{FILE_ID}"/>
+                    <input type="hidden" readonly="readonly" name="fileTypeId" value="{FILE_ID}"/>
                     <fieldset class="enabled">
                         <fieldset>
                             <input type="checkbox" name="enable" value="true" {FILE_ENABLED_CHECKED} />
