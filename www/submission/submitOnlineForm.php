@@ -26,7 +26,12 @@ if (!empty($_POST['submission_id'])) {
 } else {
     // Find a draft submission for this box and user - override it if possible.
     try {
-        $submission = $submission_mapper->getDrafts($user->getId(), $boxId, 1)->first();
+        $submissionList = $submission_mapper->getDrafts($user->getId(), $boxId, 1);
+        if (count($submissionList)) {
+            $submission = $submissionList->first();
+        } else {
+            $submission = $submission_mapper->createModel();
+        }
     } catch (Schoolbox\Mapper\Exception $e) {
         $submission = $submission_mapper->createModel();
     }
