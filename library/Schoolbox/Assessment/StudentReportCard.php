@@ -16,7 +16,7 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\StudentReportCard\Comment;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -53,6 +53,9 @@ class StudentReportCard
     protected $currentSemester;
 
     // populated data
+    /**
+     * @var Folder\Model[]
+     */
     protected $categoriesInSemester = array();
 
     /**
@@ -64,6 +67,11 @@ class StudentReportCard
     protected $submissionMapper;
     protected $showcaseMapper;
     protected $assessMapper;
+
+    /**
+     * @var Folder\Mapper
+     */
+    protected $folderMapper;
 
     // 'andlers
     protected $groupHandler;
@@ -78,6 +86,7 @@ class StudentReportCard
         $this->showcaseMapper   = new ShowcaseMapper();
         $this->assessMapper     = new OnlineAssessmentMapper();
         $this->groupHandler     = new \Group();
+        $this->folderMapper     = new Folder\Mapper();
         // build permissions set
         $this->establishPermissions();
         // setup helper vars
@@ -296,14 +305,17 @@ class StudentReportCard
             $page->setVar('subject_selector_block', "No subjects");
             return;
         }
-        foreach ($this->categoriesInSemester as $catId => $cat) {
+        foreach ($this->categoriesInSemester as $folder) {
             // <li data-id="{ENR_SUBJ_ID}" class="{ENR_SUBJ_SELECTED}" title="{ENR_SUBJ_CODE}">{ENR_SUBJ_NAME}</li>
+            $catId = $folder->getId();
+            $code  = $folder->getCodeString();
+            $name  = $folder->getName();
             $page->setVar(
                 array(
                     'ENR_SUBJ_ID'       => $catId,
                     'ENR_SUBJ_SELECTED' => $catId == $this->targetCategoryId ? ' selected="selected"' : '',
-                    'ENR_SUBJ_CODE'     => $cat['code'] ? $cat['code'] : $cat['name'],
-                    'ENR_SUBJ_NAME'     => $cat['name'],
+                    'ENR_SUBJ_CODE'     => $code ?: $name,
+                    'ENR_SUBJ_NAME'     => $name,
                 )
             );
             $page->parse('subject_selector_block', 'subject_selector', true);
@@ -902,18 +914,15 @@ class StudentReportCard
             $visibilities[] = SubmissionBox::MARK_VISIBILITY_STUDENT;
         }
         foreach ($this->categoriesInSemester as $category) {
-            $categoryID   = $category['id'];
-            $categoryCode = $category['code'] ? '(' . $category['code'] . ')' : '';
+            $categoryID   = $category->getId();
+            $categoryCode = $category->getCodeString();
             /* yes it actually requires THIS MUCH code to get a teachers name. */
             if (\Cfg::get('external_enable')) {
                 $teacherOutput = array();
                 $teacherList   = array();
-                $codeList      = explode(',', $category['code']);
-                if (is_array($codeList)) {
-                    foreach ($codeList as $code) {
-                        if (is_array($temp = $synClass->getTeacherName($code))) {
-                            $teacherList = array_merge($teacherList, $temp);
-                        }
+                foreach ($category->getCodes() as $code) {
+                    if (is_array($temp = $synClass->getTeacherName($code->getCode()))) {
+                        $teacherList = array_merge($teacherList, $temp);
                     }
                 }
                 if (is_array($teacherList)) {
@@ -965,7 +974,7 @@ class StudentReportCard
             $trendAmt    = '';
             if ($show_grades) {
                 $card  = new SubjectReportCard(
-                    $category['id'],
+                    $categoryID,
                     $this->targetUserId,
                     $this->targetYear,
                     $this->targetSemester,
@@ -988,7 +997,7 @@ class StudentReportCard
             // calculate grade averages and trending
             $output = array(
                 'SUBJ_CAT_ID'       => $categoryID,
-                'SUBJ_SUBJECT_NAME' => \Scrub::Text($category['name']),
+                'SUBJ_SUBJECT_NAME' => \Scrub::Text($category->getName()),
                 'SUBJ_SUBJECT_ICON' => '/images/mime/60x60/man.png',
                 'SUBJ_SUBJECT_CODE' => $categoryCode,
                 'SUBJ_SUBJECT_URL'  => "/submission/allWork/{$this->targetUserId}/{$this->targetYear}/{$this->targetSemester}/$categoryID",
@@ -1084,12 +1093,13 @@ class StudentReportCard
         /* Combine lists alphabetically
             */
         $categoryList = array_merge($categoryList, $submittedList);
-        usort($categoryList, array($this, 'sort'));
-        if (is_array($categoryList)) {
-            foreach ($categoryList as $category) {
-                $this->categoriesInSemester[$category['id']] = $category;
-            }
-        }
+        $this->categoriesInSemester = $this->folderMapper->findByColumn(
+            'id',
+            array_map(
+                function($v) { return $v['id']; },
+                $categoryList
+            )
+        );
     }
 
     /**
@@ -1127,7 +1137,7 @@ class StudentReportCard
 
     public function getTargetCategory()
     {
-        return CategoryMapper::getInstance()->findById($this->targetCategoryId);
+        return $this->folderMapper->findById($this->targetCategoryId);
     }
 
     public function getTargetYear()
