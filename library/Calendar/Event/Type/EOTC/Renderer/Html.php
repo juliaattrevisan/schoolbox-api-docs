@@ -10,10 +10,10 @@
 namespace Calendar\Event\Type\EOTC\Renderer;
 
 use Calendar\Event\Type\RendererBase;
+use Scrub;
+use Calendar;
 
 class Html extends RendererBase {
-
-
 
     /**
      * Render this event
@@ -21,7 +21,6 @@ class Html extends RendererBase {
      */
     public function render()
     {
-
         if ($this->isVisible()) {
             return $this->getTemplate()->render('calendar/type/EOTC.twig',
                 array('event' => $this->getEvent())
@@ -29,7 +28,6 @@ class Html extends RendererBase {
         } else {
             return '';
         }
-
     }
 
     /**
@@ -155,13 +153,11 @@ class Html extends RendererBase {
      * in a different way so they can still edit/click them. Otherwise, they don't appear
      * at all for everyone else
      *
-     * @param $currentEvent
      * @return bool
      */
-    private function isVisible($currentEvent) {
-
-        $isFutureEvent = ($currentEvent->getPublishDate()->getUnixTimestamp() >= time());
-        $isVisibleToUser = ($this->getGroupHandler()->isSuperuser() || $currentEvent->isOwner() || (is_numeric($currentEvent->getCategoryId()) && ($this->getGroupHandler()->getPermission($currentEvent->getCategoryId())) > READ_ACCESS));
+    public function isVisible() {
+        $isFutureEvent = ($this->getEvent()->getPublishDate()->getUnixTimestamp() >= time());
+        $isVisibleToUser = ($this->getGroupHandler()->isSuperuser() || $this->getEvent()->isOwner() || (is_numeric($this->getEvent()->getCategoryId()) && ($this->getGroupHandler()->getPermission($this->getEvent()->getCategoryId())) > READ_ACCESS));
 
         if ($isFutureEvent && !($isVisibleToUser)) {
             return false;
