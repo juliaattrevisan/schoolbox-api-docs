@@ -9,7 +9,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_Notice {
+abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_Notice
+{
     /**
      * @var Mailer
      */
@@ -21,7 +22,8 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
     /**
      * Setup
      */
-    public function setup() {
+    public function setup()
+    {
 
         /* For getting all the parents of a child
          */
@@ -33,7 +35,8 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
          */
         $email = new Mailer(
             Mailer::translateTemplatePathToMailPath($this->getEmailTemplateFile()),
-            $subject, ''
+            $subject,
+            ''
         );
 
         $email->setBlock($email->t_label, 'submitted_by', 'submitted_by_block');
@@ -42,20 +45,20 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
 
         $email->setVar(
             array(
-                'LEAVE_USER_NAME' => $this->getRequest()->getUser()->formatName(),
-				'LEAVE_AUTHOR_NAME' => $this->getRequest()->getAuthor()->formatName(),
-                'LEAVE_STATUS' => $this->getRequest()->getStatus(true),
-                'LEAVE_START' => $this->getRequest()->getStart()->getLong(),
-                'LEAVE_FINISH' => $this->getRequest()->getFinish()->getLong(),
-                'LEAVE_DESCRIPTION' => $this->getRequest()->getDescription(),
-                'LEAVE_HOST_NAME' => $this->getRequest()->getHostName(),
-                'LEAVE_HOST_PHONE' => $this->getRequest()->getHostPhone(),
-                'LEAVE_STUDENT_PHONE' => $this->getRequest()->getUserPhone(),
-				'LEAVE_HOST_MOBILE' => $this->getRequest()->getHostMobile(),
-				'LEAVE_HOST_ADDRESS' => $this->getRequest()->getHostAddress(),
-				'LEAVE_COLLECTOR_NAME' => $this->getRequest()->getCollectorName(),
-				'LEAVE_RETURNER_NAME' => $this->getRequest()->getReturnerName(),
-				'LEAVE_REASON' => $this->getRequest()->getReason(),
+                'LEAVE_USER_NAME'      => $this->getRequest()->getUser()->formatName(),
+                'LEAVE_AUTHOR_NAME'    => $this->getRequest()->getAuthor()->formatName(),
+                'LEAVE_STATUS'         => $this->getRequest()->getStatus(true),
+                'LEAVE_START'          => $this->getRequest()->getStart()->getLong(),
+                'LEAVE_FINISH'         => $this->getRequest()->getFinish()->getLong(),
+                'LEAVE_DESCRIPTION'    => $this->getRequest()->getDescription(),
+                'LEAVE_HOST_NAME'      => $this->getRequest()->getHostName(),
+                'LEAVE_HOST_PHONE'     => $this->getRequest()->getHostPhone(),
+                'LEAVE_STUDENT_PHONE'  => $this->getRequest()->getUserPhone(),
+                'LEAVE_HOST_MOBILE'    => $this->getRequest()->getHostMobile(),
+                'LEAVE_HOST_ADDRESS'   => $this->getRequest()->getHostAddress(),
+                'LEAVE_COLLECTOR_NAME' => $this->getRequest()->getCollectorName(),
+                'LEAVE_RETURNER_NAME'  => $this->getRequest()->getReturnerName(),
+                'LEAVE_REASON'         => $this->getRequest()->getReason(),
                 'TERMS_AND_CONDITIONS' => Cfg::get('terms_and_conditions'),
             )
         );
@@ -66,29 +69,29 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
     /**
      * Send a notification to all parents of the child
      */
-    public function send() {
+    public function send()
+    {
         $allParents = $this->getExternalUser()->getStudentContactList($this->getRequest()->getUser()->getExternalId());
 
         if (is_array($allParents)) {
             foreach ($allParents as $parent) {
                 if (Cfg::get('debug_email_address') != '') {
-					$email = new \Email(Cfg::get('debug_email_address'));
-                }
-				else {
-					$email =  new \Email($parent['StudentContactDefaultEmail']);
+                    $email = new \Email(Cfg::get('debug_email_address'));
+                } else {
+                    $email = new \Email($parent['StudentContactDefaultEmail']);
                 }
 
-				/* Only send if the email is valid
-				 */
-				if ($email->isValid()) {
+                /* Only send if the email is valid
+                 */
+                if ($email->isValid()) {
                     // Ensure the current user has a valid email too
                     try {
                         $this->getEmail()->setFromAsCurrentUser();
                     } catch (Swift_SwiftException $e) {
                         // noop - falls back to whatever the default address is
                     }
-					$this->getEmail()->send($email->getEmail());
-				}
+                    $this->getEmail()->send($email->getEmail());
+                }
             }
         }
     }
@@ -101,7 +104,8 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
      *
      * @param Mailer $email
      */
-    protected function setEmail($email) {
+    protected function setEmail($email)
+    {
         $this->email = $email;
     }
 
@@ -110,21 +114,24 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
      *
      * @return Mailer
      */
-    protected function getEmail() {
+    protected function getEmail()
+    {
         return $this->email;
     }
 
     /**
      * @param $externalUser
      */
-    private function setExternalUser($externalUser) {
+    private function setExternalUser($externalUser)
+    {
         $this->externalUser = $externalUser;
     }
 
     /**
      * @return null
      */
-    private function getExternalUser() {
+    private function getExternalUser()
+    {
         return $this->externalUser;
     }
 }
