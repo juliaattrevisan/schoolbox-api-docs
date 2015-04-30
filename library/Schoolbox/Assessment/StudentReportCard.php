@@ -1101,6 +1101,8 @@ class StudentReportCard
             ),
             ['order' => ['name' => 'asc']]
         );
+        // Ensure folder codes are populated
+        Folder\Code\Mapper::getInstance()->applyCodesToCategories($this->categoriesInSemester);
     }
 
     /**
