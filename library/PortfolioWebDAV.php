@@ -288,8 +288,6 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 $paths = array(
                     '/H-DRIVE/USERS/STUDENTS/YEAR%20' . str_pad($_SESSION['year'], 2, '0', STR_PAD_LEFT) . '/' . $_SESSION['username'] . '/',
                 );
-            } else {
-                return false;
             }
         } else if ($site_location=='stmichaels') {
             $settings = array(
@@ -307,8 +305,6 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 $paths = array(
                     $settings['baseUri'] . $_SESSION['username'] . '/',
                 );
-            } else {
-                return false;
             }
 
         }
@@ -354,8 +350,6 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 $paths = array(
                     '/STUDENTS/'.(12 - $_SESSION['year'] + date('Y')) .'/' . $_SESSION['username'] . '/',
                 );
-            } else {
-                return false;
             }
 
         }
@@ -433,8 +427,6 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                   );
                 }
 
-            } else {
-                return false;
             }
 
         }
@@ -456,8 +448,6 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                     $settings['baseUri'].'/webdav/student/' . $_SESSION['username'] . '/',
                     $settings['baseUri'].'/webdav/shared/'
                 );
-            } else {
-                return false;
             }
 
         }
@@ -479,8 +469,6 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                     $settings['baseUri'].'student/',
                     $settings['baseUri'].'public/',
                 );
-            } else {
-                return false;
             }
 
         }
@@ -498,8 +486,6 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 $paths = array(
                     $settings['baseUri'].'Student%20Home/' . (12 - $_SESSION['year'] + date('Y')) . '/' . $_SESSION['username'] . '/',
                 );
-            } else {
-                return false;
             }
         }
         else if ($site_location=='sheldon') {
@@ -526,8 +512,6 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                     $settings['baseUri'].'StudentHomesC/' . $_SESSION['username'] . '/',
                     $settings['baseUri'].'StudentShareC/',
                 );
-            } else {
-                return false;
             }
 
         }
@@ -547,8 +531,6 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 $paths = array(
                     $settings['baseUri'].(12 - $_SESSION['year'] + date('Y')) . '/' . $_SESSION['username'] . '/',
                 );
-            } else {
-                return false;
             }
 
         }
@@ -562,10 +544,11 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             $paths = array('/');
         }
 
-        if (empty($settings)) {
+
+        if (empty($settings) || empty($paths)) {
             // the next invocation would actually cause a fatal error if $settings is undefined anyway,
             // so this is no worse (but is now catchable)
-            throw new DomainException("WebDAV is not configured");
+            throw new DomainException("Drives is not configured");
         }
 
         $client = new Sabre_DAV_Client_Extended($settings);
