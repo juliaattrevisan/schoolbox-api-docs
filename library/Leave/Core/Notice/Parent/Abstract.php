@@ -10,6 +10,9 @@
  * @version     SVN: $Id$
  */
 abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_Notice {
+    /**
+     * @var Mailer
+     */
     protected $email = null;
     protected $emailTemplateFile = 'modules/leave/parentNoticeEmail.html';
 
@@ -32,7 +35,6 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
             Mailer::translateTemplatePathToMailPath($this->getEmailTemplateFile()),
             $subject, ''
         );
-        $email->setFromAsCurrentUser();
 
         $email->setBlock($email->t_label, 'submitted_by', 'submitted_by_block');
         $email->setBlock($email->t_label, 'authorised_by', 'authorised_by_block');
@@ -79,6 +81,12 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
 				/* Only send if the email is valid
 				 */
 				if ($email->isValid()) {
+                    // Ensure the current user has a valid email too
+                    try {
+                        $this->getEmail()->setFromAsCurrentUser();
+                    } catch (Swift_SwiftException $e) {
+                        // noop - falls back to whatever the default address is
+                    }
 					$this->getEmail()->send($email->getEmail());
 				}
             }
@@ -91,7 +99,7 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
     /**
      * Set email
      *
-     * @param $email
+     * @param Mailer $email
      */
     protected function setEmail($email) {
         $this->email = $email;
@@ -100,7 +108,7 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
     /**
      * Get email
      *
-     * @return null
+     * @return Mailer
      */
     protected function getEmail() {
         return $this->email;
