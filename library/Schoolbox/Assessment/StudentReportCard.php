@@ -1098,7 +1098,8 @@ class StudentReportCard
             array_map(
                 function($v) { return $v['id']; },
                 $categoryList
-            )
+            ),
+            ['order' => ['name' => 'asc']]
         );
     }
 
