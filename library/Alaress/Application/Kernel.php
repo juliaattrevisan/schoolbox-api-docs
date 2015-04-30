@@ -41,22 +41,16 @@ abstract class Kernel {
 			return false;
 		}
 
-		try {
-			// attempt to run the launch sequence
-			$this->boot->loadConfiguration();
-			$this->boot->setIncludePath();
-			$this->boot->registerAutoLoading();
-			$this->boot->initialiseDebugging();
-			$this->boot->registerErrorHandling();
-			$this->boot->registerExceptionHandling();
-			$this->boot->registerShutdownHandling();
-			$this->boot->initialiseExternalConnections();
-			$this->boot->installDependencies($this);
-		}
-		catch(Exception $e) {
-			// if anything goes wrong, bail out
-			return false;
-		}
+        // run the launch sequence
+        $this->boot->loadConfiguration();
+        $this->boot->setIncludePath();
+        $this->boot->registerAutoLoading();
+        $this->boot->initialiseDebugging();
+        $this->boot->registerErrorHandling();
+        $this->boot->registerExceptionHandling();
+        $this->boot->registerShutdownHandling();
+        $this->boot->initialiseExternalConnections();
+        $this->boot->installDependencies($this);
 
 		return true;
 	}
