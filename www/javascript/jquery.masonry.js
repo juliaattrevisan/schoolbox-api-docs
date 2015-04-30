@@ -646,6 +646,11 @@
                                         masonry.spectrum.masonrySpectrum('resetColours', leftColumn);
                                     }
                                 });
+
+                            /* Collapse content on components
+                             * Really...I have to do it like this?
+                             */
+                            $('#' + $(response).attr('id')).find('[data-collapser=true]').collapsable();
                         })
                         .fail(function() {
                             masonry.refreshColumns();
