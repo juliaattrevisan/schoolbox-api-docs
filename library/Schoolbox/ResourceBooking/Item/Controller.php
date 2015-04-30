@@ -293,7 +293,16 @@ class Controller extends Base
             );
             $model->setImage($image);
         } else {
-            $model->setImage($post['image'] ?: null);
+            // Get the file out of the rectum, and put it in the resource
+            if ($post['image']) {
+                try {
+                    $model->setImage(Storage\Mapper::getInstance()->findByHash($post['image']));
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $model->setImage(null);
+                }
+            } else {
+                $model->setImage(null);
+            }
         }
 
         // Clear and create the moderator list
