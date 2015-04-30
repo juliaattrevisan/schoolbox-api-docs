@@ -282,13 +282,24 @@ $page->localRedir($is_task ? "/homepage/$categoryID" : '/submission/listSubmissi
 function generateDate($field, $placeholderHour, $placeholderMinute, $placeholderSecond)
 {
     $adf = Alaress_Date_Format::newLocalShort($_POST[$field . '_date']);
+
     if (empty($_POST[$field . '_hour'])) {
         $adf->setTime($placeholderHour, $placeholderMinute, $placeholderSecond);
-    } else {
-        $adf
-            ->set12Hour($_POST[$field . '_hour'], $_POST[$field . '_period'])
-            ->setMinute($_POST[$field . '_minute'])
-        ;
     }
+    else {
+        $minute = $_POST[$field . '_minute'];
+        $period = $_POST[$field . '_period'];
+
+        if (empty($minute)) {
+            $minute = 0;
+        }
+
+        if (empty($period)) {
+            $period = 'am';
+        }
+
+        $adf->set12Hour($_POST[$field . '_hour'], $period)->setMinute($minute);
+    }
+
     return $adf;
 }
