@@ -47,7 +47,7 @@ class Download extends Base
         $work = $this->getSubmission();
 
 		try {
-			$plagMapper = new Plagscan_DocumentMapper();
+			$plagMapper = Plagscan_DocumentMapper::getInstance();
 			$plagDocument = $plagMapper->findOneByColumn('file_id', $work->getId());
 
             $plagHref = sprintf(

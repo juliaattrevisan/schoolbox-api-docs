@@ -66,7 +66,7 @@ class Plagscan_Gateway
      */
     public function submit(Submission\File $submission)
     {
-        $documentName = $submission->getFilename();
+        $documentName = $submission->getBasename();
 
         /** @var Schoolbox\Resource\Storage\Model $file */
         $file = $submission->getStorage();
@@ -88,29 +88,23 @@ class Plagscan_Gateway
             'METHOD' => self::METHOD_SUBMIT
         ]);
 
-        $documentParameter = '';
-
-        $fileInfo = new finfo(FILEINFO_MIME);
-
-        $documentType = $fileInfo->buffer($documentData);
-
         $documentExtension = pathinfo($documentName, PATHINFO_EXTENSION);
 
         $validDocumentExtensionList = array(
-            'docx',
-            'doc',
-            'pdf',
-            'txt',
-            'rtf',
-            'html',
+            'docx'=>'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'doc'=>'application/msword',
+            'pdf'=>'application/pdf',
+            'txt'=>'text/plain',
+            'rtf'=>'text/richtext',
+            'html'=>'text/html',
         );
 
-        if (!in_array($documentExtension, $validDocumentExtensionList)) {
+        if (!isset($validDocumentExtensionList[$documentExtension])) {
             return null;
         }
 
-        $documentParameter .= "Content-Disposition: form-data; name=\"DATA\"; filename=\"$documentName\"\n";
-        $documentParameter .= "Content-Type: $documentType\n";
+        $documentParameter = "Content-Disposition: form-data; name=\"DATA\"; filename=\"$documentName\"\n";
+        $documentParameter .= "Content-Type: {$validDocumentExtensionList[$documentExtension]}\n";
         $documentParameter .= "Content-Transfer-Encoding: binary\n\n";
         $documentParameter .= "$documentData\n";
 

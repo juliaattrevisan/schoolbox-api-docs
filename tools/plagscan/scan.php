@@ -46,8 +46,6 @@ foreach ($docs as $doc) {
      * than zero. I can't think of why zero would be valid.
      */
     if ($doc_id > 0) {
-        $log->info("Scanning $doc_id");
-        
         $stats  = $gateway->retrieve($doc_id, Plagscan_Gateway::MODE_RETRIEVE_STATISTICS_ONLY);
         if (!$stats) {
             $log->error("Plagscan scan failed - check API key and username?");
@@ -73,6 +71,13 @@ foreach ($docs as $doc) {
             Plagscan_DocumentMapper::getInstance()->save($doc);
             $updated_docs++;
             $log->info("Retrieved scan status for $doc_id");
+        }
+        else {
+
+            $response = $gateway->check($doc_id);
+
+            $log->warning("Bad level for document, still pending result: ".print_r($stats,true).print_r($response,true));
+
         }
     }
 }
