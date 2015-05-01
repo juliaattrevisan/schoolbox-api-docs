@@ -56,16 +56,15 @@ class Renderer extends Handler
                     $news['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
                 }
 
-                $now = new DateTime();
-                $expiryDate = new DateTime($news['datetime_expires']);
+                $now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], Alaress_Date_Format::TIMESTAMP);
+                $expiryDate = new Alaress_Date_Format($news['datetime_expires'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
+                $createdTime = new Alaress_Date_Format($news['datetime_posted'], Alaress_Date_Format::DATABASE_FORMAT);
 
-                if ($now->getTimestamp() > $expiryDate->getTimestamp()) {
+                if ($now->getUnixTimeStamp() > $expiryDate->getUnixTimeStamp()) {
                     $news['link'] = "/homepage/newsArchive/{$news['code']}#{$news['id']}";
                 } else {
                     $news['link'] = "/homepage/{$news['code']}#news-{$news['id']}";
                 }
-
-                $createdTime = new Alaress_Date_Format($news['datetime_posted']);
 
                 $this->getPage()->setVar(array(
                     'HOMEPAGENEWS_ID' => $news['id'],
