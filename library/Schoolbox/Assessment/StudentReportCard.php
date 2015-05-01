@@ -555,6 +555,8 @@ class StudentReportCard
                     }
                 }
 
+                $page->setVar([ 'SUBJECT_RUBRIC_COLSPAN'    => count($allSubmissionBoxes) + 1 ]);
+
                 /* Render out all the submission box headings
                  */
                 foreach($allSubmissionBoxes as $currentSubmissionBox) {
