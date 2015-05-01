@@ -69,6 +69,12 @@ $kernel->run(function($di, $loop, $log, $opts) {
 		new Filter\DuplicateFilter($uqf)
 	);
 
+    // Add the messaging enabled filter
+    $config = $di->get('config');
+    if ($config instanceof \Schoolbox\IConfigLoader) {
+        array_unshift($rerouteFilters, new Filter\MessagingEnabledFilter($config));
+    }
+
     $sorter = new QueueSorter($rerouteFilters, $log, new Notif(), $qf, RoutePermissionMapper::getInstance());
 
     // use the reroute strat
