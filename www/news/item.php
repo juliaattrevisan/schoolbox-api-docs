@@ -47,8 +47,8 @@ $url = new Url($topic['name'], false);
 $user = $userHandler->getByID($article['item_owner']);
 $fullname = $userHandler->formatName($user);
 
-$d = new Alaress_Date_Format($article['item_datetime_posted'], 'Y-m-d H:i:s');
-$e = new Alaress_Date_Format($article['item_datetime_expires'], 'Y-m-d');
+$d = new Alaress_Date_Format($article['item_datetime_posted'], Alaress_Date_Format::DATABASE_FORMAT);
+$e = new Alaress_Date_Format($article['item_datetime_expires'], Alaress_Date_Format::DATABASE_FORMAT);
 
 $output = array(
     'NEWS_ID' => $article['item_id'],

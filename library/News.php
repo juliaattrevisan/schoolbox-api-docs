@@ -256,8 +256,8 @@ class News extends DeprecatedModel
          JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
          WHERE news_items.item_owner != '" . $_SESSION['id'] . "'
             AND news_items.item_deleted = 0
-            AND item_datetime_published <= CURDATE()
-            AND news_items.item_datetime_expires $beforeOrAfter CURDATE()
+            AND item_datetime_published <= NOW()
+            AND news_items.item_datetime_expires $beforeOrAfter NOW()
             $topicFilter $yearFilter $monthFilter
          GROUP BY news_items.item_id
          ORDER BY newsTopic.sequence ASC, news_items.item_datetime_posted DESC";
@@ -284,7 +284,7 @@ class News extends DeprecatedModel
         if (!$userHandler->isSuperuser()) {
             $parts = array(
                 "news_items.item_owner = '" . $_SESSION['id'] ."'",
-                "(newsUser.userID = '" . $_SESSION['id'] . "' AND item_datetime_published <= CURDATE())",
+                "(newsUser.userID = '" . $_SESSION['id'] . "' AND item_datetime_published <= NOW())",
             );
             //
             // Check if this user can moderate any groups, add them to this list
@@ -305,7 +305,7 @@ class News extends DeprecatedModel
             $query .= ' AND ('.implode(' OR ', $parts).')';
         }
 
-        $query .= " AND news_items.item_datetime_expires $beforeOrAfter CURDATE()
+        $query .= " AND news_items.item_datetime_expires $beforeOrAfter NOW()
                     $topicFilter $yearFilter $monthFilter
                     ORDER BY newsTopic.sequence ASC, news_items.item_datetime_posted DESC;";
 
@@ -385,9 +385,9 @@ class News extends DeprecatedModel
                 $query .= " AND news_items.item_id = '$id'";
             } else {
                 if ($archive) {
-                    $query .= " AND item_datetime_published <= CURDATE() AND news_items.item_datetime_expires <  CURDATE() ";
+                    $query .= " AND item_datetime_published <= NOW() AND news_items.item_datetime_expires <  NOW() ";
                 } else {
-                    $query .= " AND item_datetime_published <= CURDATE() AND news_items.item_datetime_expires >= CURDATE() ";
+                    $query .= " AND item_datetime_published <= NOW() AND news_items.item_datetime_expires >= NOW() ";
                 }
             }
 
@@ -412,16 +412,16 @@ class News extends DeprecatedModel
         * Otherwise, restrict news post selection by ownership.
         */
         if (!$userHandler->isSuperuser($userID)) {
-            $query .= " AND (news_items.item_owner = '" . $userID . "' OR (newsUser.userID = '" . $userID . "' AND item_datetime_published <= CURDATE() )) ";
+            $query .= " AND (news_items.item_owner = '" . $userID . "' OR (newsUser.userID = '" . $userID . "' AND item_datetime_published <= NOW() )) ";
         }
 
         if ($id) {
             $query .= " AND news_items.item_id = '$id'";
         } else {
             if ($archive) {
-                $query .= " AND news_items.item_datetime_expires <  CURDATE() ";
+                $query .= " AND news_items.item_datetime_expires <  NOW() ";
             } else {
-                $query .= " AND news_items.item_datetime_expires >= CURDATE() ";
+                $query .= " AND news_items.item_datetime_expires >= NOW() ";
             }
         }
 
@@ -493,8 +493,8 @@ class News extends DeprecatedModel
 				  JOIN newsGroup ON newsGroup.id = news_items.item_id
 					AND newsGroup.gid IN (" . implode(',', $groupList) . ")
 				  JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
-				  WHERE item_datetime_expires   >= CURDATE()
-				    AND item_datetime_published <= CURDATE()
+				  WHERE item_datetime_expires   >= NOW()
+				    AND item_datetime_published <= NOW()
 					AND item_deleted = 0
 				  GROUP BY `" . $this->_index . "`
 				  ORDER BY item_datetime_posted DESC";
@@ -683,7 +683,7 @@ class News extends DeprecatedModel
             AND newsGroup.gid = '" . $_SESSION['gid'] . "'
         JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
         WHERE news_items.item_owner != '" . $_SESSION['id'] . "' AND news_items.item_deleted = 0
-            AND item_datetime_published <= CURDATE()
+            AND item_datetime_published <= NOW()
             AND MATCH(`item_heading`,`item_body`) AGAINST ('$keyword')
         GROUP BY news_items.item_id
         ORDER BY newsTopic.newsTopicID, news_items.item_datetime_posted DESC";
@@ -708,7 +708,7 @@ class News extends DeprecatedModel
         * Otherwise, restrict news post selection by ownership.
         */
         if (!$userHandler->isSuperuser()) {
-            $query .= " AND (news_items.item_owner = '" . $_SESSION['id'] . "' OR (newsUser.userID = '" . $_SESSION['id'] . "' AND item_datetime_published <= CURDATE() )) ";
+            $query .= " AND (news_items.item_owner = '" . $_SESSION['id'] . "' OR (newsUser.userID = '" . $_SESSION['id'] . "' AND item_datetime_published <= NOW() )) ";
         }
 
         $query .= " AND MATCH(`item_heading`,`item_body`) AGAINST ('$keyword')

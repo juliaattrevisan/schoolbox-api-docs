@@ -220,8 +220,15 @@
                 <em>Select a date for when this news item will become available.</em>
             </td>
             <td {OPAC_ADVANCED}>
-            <input type="text" class="required" name="item_datetime_published" id="item_datetime_published" size="12"
-                   maxlength="50" value="{ITEM_DATETIME_PUBLISHED}"/>
+            <input type="text" class="required" name="item_datetime_published" id="item_datetime_published" size="12" maxlength="50" value="{ITEM_DATETIME_PUBLISHED}"/>
+            <input name="publish_hour" type="text" maxlength="2" value="{PUBLISH_HOUR}" class="timeField"/>
+            <span>:</span>
+            <input name="publish_minute" type="text" maxlength="2" value="{PUBLISH_MIN}" class="timeField"/>
+            <select name="publish_period" class="short">
+                <option value="am">AM</option>
+                <option value="pm"
+                {PUBLISH_PM}>PM</option>
+            </select>
             </td>
         </tr>
         <tr>
@@ -230,6 +237,14 @@
             <td>
                 <input type="text" class="required" name="item_datetime_expires" id="item_datetime_expires" size="12"
                        maxlength="50" value="{ITEM_DATETIME_EXPIRES}"/>
+                <input name="expires_hour" type="text" maxlength="2" value="{EXPIRES_HOUR}" class="timeField"/>
+                <span>:</span>
+                <input name="expires_minute" type="text" maxlength="2" value="{EXPIRES_MIN}" class="timeField"/>
+                <select name="expires_period" class="short">
+                    <option value="am">AM</option>
+                    <option value="pm"
+                    {EXPIRES_PM}>PM</option>
+                </select>
             </td>
         </tr>
     </table>
