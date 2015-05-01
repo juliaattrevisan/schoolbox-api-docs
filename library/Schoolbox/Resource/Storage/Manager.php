@@ -65,7 +65,7 @@ class Manager
         }
 
         // assert: mime allowed
-        if (!$mime->isEnabled()) {
+        if (!$mime->isEnabled() || $mime->isDeleted()) {
             throw new File\Exception("Your file is not a valid file type", File\Exception::CODE_MIMETYPE_NOT_ALLOWED);
         }
 
