@@ -62,7 +62,10 @@ $mime = $mimeMapper->hydrate($_POST);
 // verify data integritae (no duplicate mimes)
 try {
     /** @var Mimetype $existing */
-    $existing = $mimeMapper->findOneByColumn('mime', $mime->getMime());
+    $existing = $mimeMapper->findOneByColumnList([
+        'mime'    => $mime->getMime(),
+        'deleted' => 0
+    ]);
 
     if ($existing->getId() != $mime->getId()) {
         error(105, 'The mime type you have chosen for this file type is already in use.');
