@@ -747,13 +747,6 @@ class Marksheet
                 $subheader[] = 'Grade';
                 $subheader[] = 'Total';
                 $subheader[] = 'Comment';
-            } else {
-                $header[] = '';
-                $header[] = '';
-                $header[] = '';
-                $subheader[] = '';
-                $subheader[] = '';
-                $subheader[] = '';
             }
         }
         fputcsv($fp, $header);
@@ -799,10 +792,6 @@ class Marksheet
                     $output[] = $actualMark;
                     $output[] = $totalMark;
                     $output[] = $mark['comment'];
-                } else {
-                    $output[] = '';
-                    $output[] = '';
-                    $output[] = '';
                 }
             }
             fputcsv($fp, $output);
