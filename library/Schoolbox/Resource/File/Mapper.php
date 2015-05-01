@@ -144,20 +144,27 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
             $fileTypes = [$fileTypes];
         }
         if (!in_array('all', $fileTypes)) {
-            $mimetypes = [];
+            $mimeParts      = [];
+            $otherMimeParts = [];
             foreach ($fileTypes as $fileType) {
                 if (!empty($fileTypeMimes[$fileType])) {
-                    $mimetypes = array_merge($mimetypes, $fileTypeMimes[$fileType]);
+                    foreach ($fileTypeMimes[$fileType] as $mime) {
+                        $mimeParts[] = "m.mime LIKE '$mime'";
+                    }
+                } elseif ($fileType == 'other') {
+                    // Other: any not in document, image, audio or video
+                    foreach ($fileTypeMimes as $fileType => $mimesForFileType) {
+                        foreach ($mimesForFileType as $mime) {
+                            $otherMimeParts[] = "m.mime LIKE '$mime'";
+                        }
+                    }
                 }
             }
-            if (!empty($mimetypes)) {
-                $whereParts[] = implode(
-                    ' OR ',
-                    array_map(
-                        function($m) { return "m.mime LIKE '$m'"; },
-                        $mimetypes
-                    )
-                );
+            if (!empty($otherMimeParts)) {
+                $mimeParts[] = 'NOT('.implode(' OR ', $otherMimeParts).')';
+            }
+            if (!empty($mimeParts)) {
+                $whereParts[] = implode(' OR ', $mimeParts);
             }
         }
         $baseQuery .= ' WHERE '.$table.'.deleted_at IS NULL AND ('.implode(') AND (', $whereParts).')';
