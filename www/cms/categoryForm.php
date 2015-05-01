@@ -63,7 +63,7 @@ if ($_POST['name']) {
                 ->findByColumn('id', $_POST['curriculumCodes'])
         );
     } elseif ($model->getId()) {
-        $existingModel = $categoryMapper->findById($model);
+        $existingModel = $categoryMapper->findById($model->getId());
         $model->setCurriculumNodes($existingModel->getCurriculumNodes());
     }
     foreach (explode(',', $_POST['code']) as $code) {
