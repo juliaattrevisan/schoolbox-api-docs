@@ -83,31 +83,31 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_ID'             => $event->getId(),
             'EVENT_USER_ID'        => $selectedUser->getId(),
             'EVENT_AUTHOR_ID'      => $_SESSION['user']->getId(),
-            'EVENT_TITLE'          => $event->getTitle(),
+            'EVENT_TITLE'          => Scrub::text($event->getTitle()),
             'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? 'checked="checked"' : '',
             'EVENT_TIMEINPUTS'     => $event->getAllDay() ? 'hide' : '',
             'EVENT_ATTENDANCE'     => $event->getAttendance() ? 'checked="checked"' : '',
-            'EVENT_START_DATE'     => $event->getStartDateTime()->getLocalShort(),
-            'EVENT_START_HOUR'     => $event->getStartDateTime()->get12Hour(),
-            'EVENT_START_MIN'      => $event->getStartDateTime()->getMinute(true),
+            'EVENT_START_DATE'     => Scrub::text($event->getStartDateTime()->getLocalShort()),
+            'EVENT_START_HOUR'     => Scrub::text($event->getStartDateTime()->get12Hour()),
+            'EVENT_START_MIN'      => Scrub::text($event->getStartDateTime()->getMinute(true)),
             'EVENT_START_AM'       => $event->getStartDateTime()->isAM()
                     ? 'selected="selected"'
                     : '',
             'EVENT_START_PM'       => $event->getStartDateTime()->isPM()
                     ? 'selected="selected"'
                     : '',
-            'EVENT_END_DATE'       => $event->getEndDateTime()->getLocalShort(),
-            'EVENT_END_HOUR'       => $event->getEndDateTime()->get12Hour(),
-            'EVENT_END_MIN'        => $event->getEndDateTime()->getMinute(true),
+            'EVENT_END_DATE'       => Scrub::text($event->getEndDateTime()->getLocalShort()),
+            'EVENT_END_HOUR'       => Scrub::text($event->getEndDateTime()->get12Hour()),
+            'EVENT_END_MIN'        => Scrub::text($event->getEndDateTime()->getMinute(true)),
             'EVENT_END_AM'         => $event->getEndDateTime()->isAM()
                     ? 'selected="selected"'
                     : '',
             'EVENT_END_PM'         => $event->getEndDateTime()->isPM()
                     ? 'selected="selected"'
                     : '',
-            'EVENT_PUBLISH_DATE'   => $publishDate,
-            'EVENT_LOCATION'       => $event->getLocation(),
-            'EVENT_DETAIL'         => $event->getDetail(),
+            'EVENT_PUBLISH_DATE'   => Scrub::text($publishDate),
+            'EVENT_LOCATION'       => Scrub::text($event->getLocation()),
+            'EVENT_DETAIL'         => Scrub::text($event->getDetail()),
             'EVENT_REDIRECT'       => $event->setupRedirect(
                 $_GET['returnTo'],
                 $event->getStartDateTime()->getURLDate(),
