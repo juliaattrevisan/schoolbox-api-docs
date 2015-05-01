@@ -50,6 +50,8 @@ if (!is_numeric(preg_replace('/[^0-9]+/', '', $this->arg[3]))) {
  * (You cannot edit anything older than the previous week)
  */
 $attendanceDate = new Alaress_Date_Format($this->arg[2], 'Y-m-d');
+$attendanceDate->startOfDay();
+
 $now = Alaress_Date_Format::now();
 
 if ($attendanceDate->getUsingFormat('W') < ($now->getUsingFormat('W') - 1)) {
