@@ -754,7 +754,6 @@ class Marksheet
                 $subheader[] = '';
                 $subheader[] = '';
                 $subheader[] = '';
-                $subheader[] = '';
             }
         }
         fputcsv($fp, $header);
@@ -769,42 +768,42 @@ class Marksheet
                 $student->getFirstname(),
             );
             foreach ($this->displayOrder as $item) {
-                $mark = $row['marks'][$item['isOA']][$item['id']];
-
-                if (!($item['object'] instanceof OnlineAssessment)) {
-                    $output[] = $mark['norm_mark'];
-                }
+                $mark       = $row['marks'][$item['isOA']][$item['id']];
+                $actualMark = '';
+                $totalMark  = '';
 
                 /* Total available marks in achieved/available format
 				 */
                 if (strstr($mark['mark'], ' / ')) {
-                    list($actual, $available) = explode(' / ', $mark['mark']);
-
-                    $output[] = $actual;
-                    $output[] = $available;
+                    list($actualMark, $totalMark) = explode(' / ', $mark['mark']);
                 } else {
                     /* A mark value is provided
 					 */
                     if ($mark['mark'] != '') {
-                        $output[] = $mark['mark'];
+                        $actualMark = $mark['mark'];
 
                         /* Quiz doesn't have getMaxMark() and are represented as
 						 * achieved/available anyway
 						 */
-                        if ($item['object'] instanceof OnlineAssessment) {
-                            $output[] = '';
-                        } else {
-                            $output[] = $item['object']->getMaxMark();
+                        if ($item['object'] instanceof SubmissionBox) {
+                            $totalMark = $item['object']->getMaxMark();
                         }
-                    } /* No mark provided
-					 */
-                    else {
-                        $output[] = '';
-                        $output[] = '';
                     }
                 }
 
-                $output[] = $mark['comment'];
+                if ($item['object'] instanceof OnlineAssessment) {
+                    $output[] = $actualMark;
+                    $output[] = $totalMark;
+                } elseif ($item['object'] instanceof SubmissionBox) {
+                    $output[] = $mark['norm_mark'];
+                    $output[] = $actualMark;
+                    $output[] = $totalMark;
+                    $output[] = $mark['comment'];
+                } else {
+                    $output[] = '';
+                    $output[] = '';
+                    $output[] = '';
+                }
             }
             fputcsv($fp, $output);
         }
