@@ -56,11 +56,11 @@ class Renderer extends Handler
                     $news['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
                 }
 
-                $now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], Alaress_Date_Format::TIMESTAMP);
+                $now = Alaress_Date_Format::now();
                 $expiryDate = new Alaress_Date_Format($news['datetime_expires'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
                 $createdTime = new Alaress_Date_Format($news['datetime_posted'], Alaress_Date_Format::DATABASE_FORMAT);
 
-                if ($now->getUnixTimeStamp() > $expiryDate->getUnixTimeStamp()) {
+                if ($now->gt($expiryDate)) {
                     $news['link'] = "/homepage/newsArchive/{$news['code']}#{$news['id']}";
                 } else {
                     $news['link'] = "/homepage/{$news['code']}#news-{$news['id']}";
