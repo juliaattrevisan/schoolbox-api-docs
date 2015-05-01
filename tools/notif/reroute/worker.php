@@ -25,8 +25,8 @@ $fields = array('porcelain', 'mem', 'truemem', 'pid');
 
 $opts = getopt('v', $fields);
 
-foreach($fields as $k => $name) {
-    if(!isset($opts[$name])) {
+foreach ($fields as $k => $name) {
+    if (!isset($opts[$name])) {
         unset($fields[$k]);
     }
 }
@@ -35,13 +35,13 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Reroute Worker', array(
-	'errors' => E_ALL,
+    'errors' => E_ALL,
     'verbose' => isset($opts['v']) ? $opts['v'] : null,
     'fields'  => array_values($fields),
 
 ));
 
-$kernel->run(function($di, $loop, $log, $opts) {
+$kernel->run(function ($di, $loop, $log, $opts) {
     /**
      * @var Di\Container $di
      * @var LoopInterface $loop
@@ -61,8 +61,8 @@ $kernel->run(function($di, $loop, $log, $opts) {
 
 	$rerouteFilters = array(
 		new Filter\AlreadyReroutedFilter(),
-		new Filter\UserEnabledFilter(),
-		new Filter\SelfSendFilter(),
+        new Filter\UserEnabledFilter(),
+        new Filter\SelfSendFilter(),
 		new Filter\CampusMembershipFilter(),
 		new Filter\RoleMembershipFilter(),
 		new Filter\RoletypeFilter(),
