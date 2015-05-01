@@ -125,35 +125,29 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
         }
 
         // Put together mimetype filters
+        $fileTypeMimes = [
+            'document' => [
+                "%pdf%",
+                "%msword%",
+                "%officedoc%",
+                "%rtf",
+                "text%",
+                "%document%",
+                "%powerpoint%",
+            ],
+            'image' => ["%image%",],
+            'audio' => ["%image%",],
+            'video' => ["%video%", "%flash%", "%realmedia%",],
+        ];
+
         if (!is_array($fileTypes)) {
             $fileTypes = [$fileTypes];
         }
         if (!in_array('all', $fileTypes)) {
             $mimetypes = [];
             foreach ($fileTypes as $fileType) {
-                switch ($fileType) {
-                    case 'document':
-                        $mimetypes[] = "%pdf%";
-                        $mimetypes[] = "%msword%";
-                        $mimetypes[] = "%officedoc%";
-                        $mimetypes[] = "%rtf";
-                        $mimetypes[] = "text%";
-                        $mimetypes[] = "%document%";
-                        $mimetypes[] = "%powerpoint%";
-                        break;
-                    case 'image':
-                        $mimetypes[] = "%image%";
-                        break;
-                    case 'audio':
-                        $mimetypes[] = "%audio%";
-                        break;
-                    case 'video':
-                        $mimetypes[] = "%video%";
-                        $mimetypes[] = "%flash%";
-                        $mimetypes[] = "%realmedia%";
-                        break;
-                    default:
-                        break;
+                if (!empty($fileTypeMimes[$fileType])) {
+                    $mimetypes = array_merge($mimetypes, $fileTypeMimes[$fileType]);
                 }
             }
             if (!empty($mimetypes)) {
