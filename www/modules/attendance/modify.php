@@ -50,7 +50,9 @@ if (!is_numeric(preg_replace('/[^0-9]+/', '', $this->arg[3]))) {
  * (You cannot edit anything older than the previous week)
  */
 $attendanceDate = new Alaress_Date_Format($this->arg[2], 'Y-m-d');
-$now = new Alaress_Date_Format(time(), 'U');
+$attendanceDate->startOfDay();
+
+$now = Alaress_Date_Format::now();
 
 if ($attendanceDate->getUsingFormat('W') < ($now->getUsingFormat('W') - 1)) {
     error(151);
@@ -73,12 +75,13 @@ if (!in_array($_SESSION['sid'], $externalClass->getTeacherName($class['ClassCode
 $attendancePeriod = $this->arg[3];
 
 /* Get Period Definition */
-$externalTimetable = new External_Synergetic_Timetable();
+$externalTimetable = new External_Timetable();
+$timetableDay = $externalTimetable->getDayNumber($_SESSION['user']->getCampusCollection()->first(), $attendanceDate->getUnixTimestamp());
 
 $definition = $externalTimetable->getTimetableDefinition(
     null,
     $_SESSION['user']->getCampusCollection()->first(),
-    $externalTimetable->getDayNumber($_SESSION['user']->getCampusCollection()->first(), $attendanceDate->getUnixTimestamp())
+    $timetableDay
 );
 $periods = array_keys($definition['number'], $attendancePeriod);
 $startTime = $definition['start'][$periods[0]];
@@ -87,8 +90,6 @@ $periodName = $definition['desc'][$periods[0]];
 /* Let's do it
  */
 if ($class) {
-
-
     /* Cosmetic makeup for the masses
     */
     $this->setVar(
@@ -97,6 +98,7 @@ if ($class) {
             'ATTENDANCE_START'          => $startTime,
             'ATTENDANCE_END'            => $endTime,
             'ATTENDANCE_DATE'           => $attendanceDate->getDatabaseDate(),
+            'ATTENDANCE_DAY'            => $timetableDay,
             'ATTENDANCE_DATE_FORMATTED' => $attendanceDate->getLongDateOnly(),
             'ATTENDANCE_PERIOD'         => $attendancePeriod,
             'ATTENDANCE_PERIOD_LONG'    => Scrub::text($periodName),
@@ -106,15 +108,21 @@ if ($class) {
     /* Get the attendance record for this class
      */
     $externalUserHandler = new External_User();
-    $attendanceHandler   = new External_Synergetic_Attendance(
-        $class,
-        $attendanceDate,
-        $attendancePeriod,
-        $externalUserHandler->getCurrentYear(),
-        $externalUserHandler->getCurrentSemester(),
-        MSSQL::getInstance()
-    );
-    $allStudents = $attendanceHandler->findAttendanceRecords();
+    try {
+        $attendanceHandler   = new External_Synergetic_Attendance(
+            $class,
+            $attendanceDate,
+            $timetableDay,
+            $attendancePeriod,
+            $externalUserHandler->getCurrentYear(),
+            $externalUserHandler->getCurrentSemester(),
+            MSSQL::getInstance()
+        );
+        $allStudents = $attendanceHandler->findAttendanceRecords();
+    } catch (Exception $e) {
+        error(148); //Class does not exist
+    }
+
     /* Dish out each row
      */
     if (is_array($allStudents) && count($allStudents)) {
@@ -123,6 +131,8 @@ if ($class) {
         /* Dropdown options
          */
         $absenceDropdownOptions = $attendanceHandler->findAbsenceDropdownOptions();
+        $reasonDropdownOptions = $attendanceHandler->findReasonDropdownOptions();
+
 
         /* Iterate each guy
          */
@@ -154,8 +164,14 @@ if ($class) {
 
             $this->dropDown(
                 'absence_options', $absenceDropdownOptions, $currentStudent['PossibleAbsenceCode'], 'student',
+                array('Code' => 'ABSENCE_OPTIONS_VALUE', 'Description' => 'ABSENCE_OPTIONS_DESCRIPTION')
+            );
+
+            $this->dropDown(
+                'reason_options', $reasonDropdownOptions, $currentStudent['PossibleReasonCode'], 'student',
                 array('Code' => 'REASON_OPTIONS_VALUE', 'Description' => 'REASON_OPTIONS_DESCRIPTION')
             );
+
 
 
             $this->parse('student_block', 'student', true);

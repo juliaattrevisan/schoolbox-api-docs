@@ -31,6 +31,8 @@ if (!is_numeric(preg_replace('/[^0-9]+/', '', $_POST['attendancePeriod']))) {
  * (You cannot edit anything older than the previous week)
  */
 $attendanceDate = new Alaress_Date_Format($_POST['attendanceDate'], 'Y-m-d');
+$attendanceDate->startOfDay();
+
 $now = new Alaress_Date_Format(time(), 'U');
 
 if ($attendanceDate->getUsingFormat('W')  < ($now->getUsingFormat('W')-1)) {
@@ -55,18 +57,24 @@ if (!in_array($_SESSION['sid'], $externalClass->getTeacherName($_POST['classCode
 /* Attendance Period
  */
 $attendancePeriod = $_POST['attendancePeriod'];
+$attendanceDay = $_POST['attendanceDay'];
 
 /* Deal with it all
  */
-$externalUserHandler = new External_User();
-$attendanceHandler   = new External_Synergetic_Attendance(
-    $class,
-    $attendanceDate,
-    $attendancePeriod,
-    $externalUserHandler->getCurrentYear(),
-    $externalUserHandler->getCurrentSemester(),
-    MSSQL::getInstance()
-);
+try {
+    $externalUserHandler = new External_User();
+    $attendanceHandler   = new External_Synergetic_Attendance(
+        $class,
+        $attendanceDate,
+        $attendanceDay,
+        $attendancePeriod,
+        $externalUserHandler->getCurrentYear(),
+        $externalUserHandler->getCurrentSemester(),
+        MSSQL::getInstance()
+    );
+} catch(Exception $e) {
+    error(148); //Class does not exist
+}
 
 /* Create everyone's attendance initially
  */
@@ -114,6 +122,10 @@ if (is_array($_POST['studentID'])) {
 
     }
 
-    $attendanceHandler->getAttendanceMaster()->save();
+
+    if(! $attendanceHandler->getAttendanceMaster()->save()) {
+        error(148);
+    }
 }
+
 $this->backToTheFuture(-1);
