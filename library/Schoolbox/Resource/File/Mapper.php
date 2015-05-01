@@ -136,7 +136,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
                 "%powerpoint%",
             ],
             'image' => ["%image%",],
-            'audio' => ["%image%",],
+            'audio' => ["%audio%",],
             'video' => ["%video%", "%flash%", "%realmedia%",],
         ];
 
