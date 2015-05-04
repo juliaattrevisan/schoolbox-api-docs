@@ -32,7 +32,7 @@ class SignalEmitter extends EventEmitter {
 	 * @param int $event
 	 * @param callable $listener
 	 */
-	public function on($event, $listener) {
+	public function on($event, callable $listener) {
 		pcntl_signal($event, array($this, 'emit'));
 		parent::on($event, $listener);
 	}
