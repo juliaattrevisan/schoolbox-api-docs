@@ -143,6 +143,48 @@ class DueWork_Rubric_Handler
         return array();
     }
 
+    /**
+     * Gets an array representing the marks given by the rubric marking in question
+     * Includes description
+     *
+     * @param     $studentID
+     * @param     $boxID
+     * @param int $set
+     *
+     * @return array
+     */
+    public function getStudentMarksWithDescription($studentID, $boxID, $set = 0)
+    {
+        $stmt = Database::getInstance()->prepare("
+            SELECT rubric_mark.criterion_id, mark, description, UNIX_TIMESTAMP(tstamp) AS tstamp
+            FROM rubric_mark
+            LEFT JOIN rubric_descriptor ON rubric_mark.criterion_id = rubric_descriptor.criterion_id AND mark = value
+            WHERE student_id = :sid
+            AND rubric_mark.submission_box_id = :sbid
+            AND rubric_mark.valid = 1
+            ORDER BY tstamp DESC, rubric_mark.criterion_id ASC
+        ");
+
+        $stmt->execute(
+            array(
+                'sid'  => $studentID,
+                'sbid' => $boxID
+            )
+        );
+
+        $marks = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $marks[$row['tstamp']][$row['criterion_id']]['mark'] = $row['mark'];
+            $marks[$row['tstamp']][$row['criterion_id']]['description'] = $row['description'];
+        }
+
+        if (count($marks)) {
+            $marks = array_pop(array_values($marks));
+        }
+
+        return $marks;
+    }
 
     /**
      * This function should be renamed to something sensible
