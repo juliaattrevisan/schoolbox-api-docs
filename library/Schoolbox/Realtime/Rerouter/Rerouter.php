@@ -164,6 +164,9 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 
 			$this->log->notice("Dropped $count subscriptions", array('char' => '-'));
 
+            $this->log->notice("Releasing workers");
+            $this->getDispatcher()->releaseWorkerPool(false);
+
 			// set state to pause
 			$this->running = false;
 		}
