@@ -1,6 +1,7 @@
 <?php
 
-class Leave_Request {
+class Leave_Request
+{
 
     /* Leave Requests confirmation types and their presentation labels
       */
@@ -27,11 +28,11 @@ class Leave_Request {
     protected $hostType;
     protected $hostName;
     protected $hostPhone;
-	protected $hostMobile;
-	protected $hostAddress;
-	protected $collectorName;
-	protected $returnerName;
-	protected $reason;
+    protected $hostMobile;
+    protected $hostAddress;
+    protected $collectorName;
+    protected $returnerName;
+    protected $reason;
     protected $userPhone;
     protected $description;
     protected $created;
@@ -43,48 +44,59 @@ class Leave_Request {
     protected $confirmedBy;
 
     /**
-	 * The type of travel
-	 *
+     * The type of travel
+     *
      * @var Leave_Request_TravelType
      */
     protected $travelType;
 
-	/**
-	 * Get duration
-	 *
-	 * @return float
-	 */
-	public function getDuration() {
-		$duration = floor(
-			($this->getFinish()->getUnixTimestamp() - $this->getStart()->getUnixTimestamp()) / (60 * 60 * 24)
-		);
+    /**
+     * Get duration
+     *
+     * @return float
+     */
+    public function getDuration()
+    {
+        $duration = floor(
+            ($this->getFinish()->getUnixTimestamp() - $this->getStart()->getUnixTimestamp()) / (60 * 60 * 24)
+        );
 
-		return $duration;
-	}
+        return $duration;
+    }
 
-	/**
-	 * Checks to see whether a particular date range falls within the date range of the request
-	 *
-	 * @param Alaress_Date_Format $datetimeStart
-	 * @param Alaress_Date_Format $datetimeFinish
-	 *
-	 * @return Boolean
-	 */
-	public function getOccupancy($datetimeStart, $datetimeFinish) {
-		if ($this->getStart()->getUnixTimestamp() < $datetimeFinish->getUnixTimestamp() && $this->getFinish()->getUnixTimestamp() > $datetimeStart->getUnixTimestamp()) {
-			return true;
-		}
+    /**
+     * Checks to see whether a particular date range falls within the date range of the request
+     *
+     * @param Alaress_Date_Format $datetimeStart
+     * @param Alaress_Date_Format $datetimeFinish
+     *
+     * @return Boolean
+     */
+    public function getOccupancy($datetimeStart, $datetimeFinish)
+    {
+        if ($this->getStart()->isNull()) {
+            return false;
+        }
+        if ($this->getFinish()->isNull()) {
+            return false;
+        }
+        if ($this->getStart()->getUnixTimestamp() < $datetimeFinish->getUnixTimestamp()
+            && $this->getFinish()->getUnixTimestamp() > $datetimeStart->getUnixTimestamp()
+        ) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+     */
 
-	/**
+    /**
      * @param $created
      */
-    public function setCreated($created) {
+    public function setCreated($created)
+    {
         $this->created = $created;
     }
 
@@ -93,7 +105,8 @@ class Leave_Request {
      *
      * @return Alaress_Date_Format
      */
-    public function getCreated($datetime = false) {
+    public function getCreated($datetime = false)
+    {
         if ($datetime) {
             return new Alaress_Date_Format($this->created, 'Y-m-d');
         } else {
@@ -106,7 +119,8 @@ class Leave_Request {
      *
      * @param $description
      */
-    public function setDescription($description) {
+    public function setDescription($description)
+    {
         $this->description = $description;
     }
 
@@ -115,7 +129,8 @@ class Leave_Request {
      *
      * @return mixed
      */
-    public function getDescription() {
+    public function getDescription()
+    {
         return $this->description;
     }
 
@@ -124,7 +139,8 @@ class Leave_Request {
      *
      * @param $finish
      */
-    public function setFinish($finish) {
+    public function setFinish($finish)
+    {
         $this->finish = $finish;
     }
 
@@ -133,8 +149,9 @@ class Leave_Request {
      *
      * @return Alaress_Date_Format
      */
-    public function getFinish() {
-        return new Alaress_Date_Format($this->finish, 'Y-m-d H:i:s');
+    public function getFinish()
+    {
+        return $this->finish;
     }
 
     /**
@@ -142,7 +159,8 @@ class Leave_Request {
      *
      * @param $hostName
      */
-    public function setHostName($hostName) {
+    public function setHostName($hostName)
+    {
         $this->hostName = $hostName;
     }
 
@@ -151,7 +169,8 @@ class Leave_Request {
      *
      * @return mixed
      */
-    public function getHostName() {
+    public function getHostName()
+    {
         return $this->hostName;
     }
 
@@ -160,7 +179,8 @@ class Leave_Request {
      *
      * @param $hostPhone
      */
-    public function setHostPhone($hostPhone) {
+    public function setHostPhone($hostPhone)
+    {
         $this->hostPhone = $hostPhone;
     }
 
@@ -169,7 +189,8 @@ class Leave_Request {
      *
      * @return mixed
      */
-    public function getHostPhone() {
+    public function getHostPhone()
+    {
         return $this->hostPhone;
     }
 
@@ -178,7 +199,8 @@ class Leave_Request {
      *
      * @param $hostType
      */
-    public function setHostType($hostType) {
+    public function setHostType($hostType)
+    {
 
         $this->hostType = $hostType;
     }
@@ -188,7 +210,8 @@ class Leave_Request {
      *
      * @return string
      */
-    public function getHostType() {
+    public function getHostType()
+    {
         return $this->hostType;
     }
 
@@ -197,7 +220,8 @@ class Leave_Request {
      *
      * @param $id
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
     }
 
@@ -206,7 +230,8 @@ class Leave_Request {
      *
      * @return mixed
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -215,7 +240,8 @@ class Leave_Request {
      *
      * @param $start
      */
-    public function setStart($start) {
+    public function setStart($start)
+    {
         $this->start = $start;
     }
 
@@ -224,8 +250,9 @@ class Leave_Request {
      *
      * @return Alaress_Date_Format
      */
-    public function getStart() {
-        return new Alaress_Date_Format($this->start, 'Y-m-d H:i:s');
+    public function getStart()
+    {
+        return $this->start;
     }
 
     /**
@@ -233,7 +260,8 @@ class Leave_Request {
      *
      * @param $status
      */
-    public function setStatus($status) {
+    public function setStatus($status)
+    {
         $this->status = $status;
     }
 
@@ -242,7 +270,8 @@ class Leave_Request {
      *
      * @return bool
      */
-    public function isPending() {
+    public function isPending()
+    {
         if ($this->status == Leave_Request::STATUS_PENDING) {
             return true;
         }
@@ -255,7 +284,8 @@ class Leave_Request {
      *
      * @return bool
      */
-    public function isApproved() {
+    public function isApproved()
+    {
         if ($this->status == Leave_Request::STATUS_APPROVED) {
             return true;
         }
@@ -268,7 +298,8 @@ class Leave_Request {
      *
      * @return bool
      */
-    public function isRejected() {
+    public function isRejected()
+    {
         if ($this->status == Leave_Request::STATUS_REJECTED) {
             return true;
         }
@@ -282,7 +313,8 @@ class Leave_Request {
      *
      * @return bool
      */
-    public function isDeleted() {
+    public function isDeleted()
+    {
         if ($this->status == Leave_Request::STATUS_DELETED) {
             return true;
         }
@@ -297,7 +329,8 @@ class Leave_Request {
      *
      * @return string
      */
-    public function getStatus($string = false) {
+    public function getStatus($string = false)
+    {
         if ($string) {
             if ($this->isPending()) {
                 return 'Pending';
@@ -319,7 +352,8 @@ class Leave_Request {
      *
      * @return mixed
      */
-    public function getUserId() {
+    public function getUserId()
+    {
         return $this->getUser()->getId();
     }
 
@@ -328,7 +362,8 @@ class Leave_Request {
      *
      * @param $userPhone
      */
-    public function setUserPhone($userPhone) {
+    public function setUserPhone($userPhone)
+    {
         $this->userPhone = $userPhone;
     }
 
@@ -337,7 +372,8 @@ class Leave_Request {
      *
      * @return mixed
      */
-    public function getUserPhone() {
+    public function getUserPhone()
+    {
         return $this->userPhone;
     }
 
@@ -348,7 +384,8 @@ class Leave_Request {
      *
      * @return void
      */
-    public function setUser($user) {
+    public function setUser($user)
+    {
         $this->user = $user;
     }
 
@@ -357,7 +394,8 @@ class Leave_Request {
      *
      * @return \Schoolbox\User
      */
-    public function getUser() {
+    public function getUser()
+    {
         return $this->user;
     }
 
@@ -366,7 +404,8 @@ class Leave_Request {
      *
      * @param $authorisationDatetime
      */
-    public function setAuthorisationDatetime($authorisationDatetime) {
+    public function setAuthorisationDatetime($authorisationDatetime)
+    {
         $this->authorisationDatetime = $authorisationDatetime;
     }
 
@@ -377,7 +416,8 @@ class Leave_Request {
      *
      * @return Alaress_Date_Format
      */
-    public function getAuthorisationDatetime($datetime = false) {
+    public function getAuthorisationDatetime($datetime = false)
+    {
         if ($datetime) {
             return new Alaress_Date_Format($this->authorisationDatetime, 'Y-m-d');
         } else {
@@ -390,7 +430,8 @@ class Leave_Request {
      *
      * @param Schoolbox\User $authorisationUser
      */
-    public function setAuthorisationUser($authorisationUser) {
+    public function setAuthorisationUser($authorisationUser)
+    {
         $this->authorisationUser = $authorisationUser;
     }
 
@@ -399,15 +440,18 @@ class Leave_Request {
      *
      * @return Schoolbox\User
      */
-    public function getAuthorisationUser() {
+    public function getAuthorisationUser()
+    {
         return $this->authorisationUser;
     }
 
     /**
      * Get authorisation user id
+     *
      * @return mixed
      */
-    public function getAuthorisationUserId() {
+    public function getAuthorisationUserId()
+    {
         return $this->getAuthorisationUser()->getId();
     }
 
@@ -416,7 +460,8 @@ class Leave_Request {
      *
      * @param $notes
      */
-    public function setNotes($notes) {
+    public function setNotes($notes)
+    {
         $this->notes = $notes;
     }
 
@@ -425,7 +470,8 @@ class Leave_Request {
      *
      * @return mixed
      */
-    public function getNotes() {
+    public function getNotes()
+    {
         return $this->notes;
     }
 
@@ -434,7 +480,8 @@ class Leave_Request {
      *
      * @return mixed
      */
-    public function getConfirmedBy() {
+    public function getConfirmedBy()
+    {
         return $this->confirmedBy;
     }
 
@@ -443,7 +490,8 @@ class Leave_Request {
      *
      * @param $confirmedBy
      */
-    public function setConfirmedBy($confirmedBy) {
+    public function setConfirmedBy($confirmedBy)
+    {
         $this->confirmedBy = $confirmedBy;
     }
 
@@ -452,7 +500,8 @@ class Leave_Request {
      *
      * @return mixed
      */
-    public function getConfirmedByMap() {
+    public function getConfirmedByMap()
+    {
         return $this->confirmedByMap;
     }
 
@@ -460,17 +509,21 @@ class Leave_Request {
      * Get confirmed by label for a type id
      *
      * @param $index
+     *
      * @return array
      */
-    public function getConfirmedByMapIndex($index) {
+    public function getConfirmedByMapIndex($index)
+    {
         return $this->confirmedByMap[$index];
     }
 
     /**
      * @param  \Leave_Request_TravelType $travelType
+     *
      * @return $this
      */
-    public function setTravelType($travelType) {
+    public function setTravelType($travelType)
+    {
         $this->travelType = $travelType;
         return $this;
     }
@@ -478,115 +531,128 @@ class Leave_Request {
     /**
      * @return \Leave_Request_TravelType
      */
-    public function getTravelType() {
+    public function getTravelType()
+    {
         return $this->travelType;
     }
 
-	/**
-	 * Set author id
-	 *
-	 * @param mixed $authorId
-	 */
-	public function setAuthor($authorId) {
-		$this->author = $authorId;
-	}
+    /**
+     * Set author id
+     *
+     * @param mixed $authorId
+     */
+    public function setAuthor($authorId)
+    {
+        $this->author = $authorId;
+    }
 
-	/**
-	 * Get author id
-	 *
-	 * @return mixed
-	 */
-	public function getAuthor() {
-		return $this->author;
-	}
+    /**
+     * Get author id
+     *
+     * @return mixed
+     */
+    public function getAuthor()
+    {
+        return $this->author;
+    }
 
-	/**
-	 * Set collector name
-	 *
-	 * @param mixed $collectorName
-	 */
-	public function setCollectorName($collectorName) {
-		$this->collectorName = $collectorName;
-	}
+    /**
+     * Set collector name
+     *
+     * @param mixed $collectorName
+     */
+    public function setCollectorName($collectorName)
+    {
+        $this->collectorName = $collectorName;
+    }
 
-	/**
-	 * Get collector name
-	 *
-	 * @return mixed
-	 */
-	public function getCollectorName() {
-		return $this->collectorName;
-	}
+    /**
+     * Get collector name
+     *
+     * @return mixed
+     */
+    public function getCollectorName()
+    {
+        return $this->collectorName;
+    }
 
-	/**
-	 * Set host address
-	 *
-	 * @param mixed $hostAddress
-	 */
-	public function setHostAddress($hostAddress) {
-		$this->hostAddress = $hostAddress;
-	}
+    /**
+     * Set host address
+     *
+     * @param mixed $hostAddress
+     */
+    public function setHostAddress($hostAddress)
+    {
+        $this->hostAddress = $hostAddress;
+    }
 
-	/**
-	 * Get host address
-	 *
-	 * @return mixed
-	 */
-	public function getHostAddress() {
-		return $this->hostAddress;
-	}
+    /**
+     * Get host address
+     *
+     * @return mixed
+     */
+    public function getHostAddress()
+    {
+        return $this->hostAddress;
+    }
 
-	/**
-	 * Set host mobile
-	 *
-	 * @param mixed $hostMobile
-	 */
-	public function setHostMobile($hostMobile) {
-		$this->hostMobile = $hostMobile;
-	}
+    /**
+     * Set host mobile
+     *
+     * @param mixed $hostMobile
+     */
+    public function setHostMobile($hostMobile)
+    {
+        $this->hostMobile = $hostMobile;
+    }
 
-	/**
-	 * Get host mobile
-	 *
-	 * @return mixed
-	 */
-	public function getHostMobile() {
-		return $this->hostMobile;
-	}
+    /**
+     * Get host mobile
+     *
+     * @return mixed
+     */
+    public function getHostMobile()
+    {
+        return $this->hostMobile;
+    }
 
-	/**
-	 * Set reason
-	 *
-	 * @param mixed $reason
-	 */
-	public function setReason($reason) {
-		$this->reason = $reason;
-	}
+    /**
+     * Set reason
+     *
+     * @param mixed $reason
+     */
+    public function setReason($reason)
+    {
+        $this->reason = $reason;
+    }
 
-	/**
-	 * Get reason
-	 *
-	 * @return mixed
-	 */
-	public function getReason() {
-		return $this->reason;
-	}
+    /**
+     * Get reason
+     *
+     * @return mixed
+     */
+    public function getReason()
+    {
+        return $this->reason;
+    }
 
-	/**
-	 * Set returner name
-	 *
-	 * @param mixed $returnerName
-	 */
-	public function setReturnerName($returnerName) {
-		$this->returnerName = $returnerName;
-	}
+    /**
+     * Set returner name
+     *
+     * @param mixed $returnerName
+     */
+    public function setReturnerName($returnerName)
+    {
+        $this->returnerName = $returnerName;
+    }
 
-	/**
-	 * Get returner name
-	 *
-	 * @return mixed
-	 */
-	public function getReturnerName() {
-		return $this->returnerName;
-	}
+    /**
+     * Get returner name
+     *
+     * @return mixed
+     */
+    public function getReturnerName()
+    {
+        return $this->returnerName;
+    }
 }
