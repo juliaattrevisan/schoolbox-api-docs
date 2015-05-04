@@ -85,7 +85,7 @@
                 },
                 plotOptions: {
                     series: {
-                        stacking: 'normal'
+                        stacking: 'percent'
                     }
                 },
                 series: config.series
