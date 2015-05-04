@@ -120,16 +120,16 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
         //
         // If a resource is supplied, its file could be deleted before it can
         // be copied to its destination.
+        $temp_file = tempnam(sys_get_temp_dir(), 'sb');
         if (is_resource($data)) {
-            $storage = Storage\Mapper::getInstance()->createModel();
-            $storage->writeStream($data);
-
+            $fp = fopen($temp_file, 'wb');
+            stream_copy_to_stream($data, $fp);
+            fclose($fp);
         } elseif ($data) {
             // Copy it to a temp file before this happens.
-            $temp_file = tempnam(sys_get_temp_dir(), 'sb');
             file_put_contents($temp_file, $data);
-            $storage = Storage\Mapper::getInstance()->accept($name, $temp_file, false);
         }
+        $storage = Storage\Mapper::getInstance()->accept($name, $temp_file, false);
 
         $late_timestamp = $this->getAssessment()->getDueDate()->getUnixTimestamp();
         $submit_date    = new DateTime('now');
