@@ -93,7 +93,12 @@ abstract class BaseFiletype implements FiletypeInterface
      */
     public function stream($image)
     {
-        $output = $image->get($this->getFormat());
+        // Assume anything layered is animated
+        if ($image->layers()->count() > 1) {
+            $output = $image->get($this->getFormat(), ['animated' => true]);
+        } else {
+            $output = $image->get($this->getFormat());
+        }
         header('Content-length: ' . strlen($output));
         $this->outputHeaders();
         die($output);

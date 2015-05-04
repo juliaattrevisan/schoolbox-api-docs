@@ -16,7 +16,6 @@
 
 namespace Alaress\Image\Implementation\Imagine\Processor\Strategy;
 
-use Imagine\Filter\Advanced\Canvas;
 use Imagine\Image\Box;
 use Imagine\Image\ImageInterface;
 
@@ -68,15 +67,7 @@ class Placement extends BaseStrategy
                 $cropBox
             );
         }
-
-        // Then place the image inside the new canvas
-        $filter = new Canvas(
-            $this->getImageManager(),
-            $canvasBox,
-            $this->getImageBoxPoint($canvasBox, $image->getSize(), $this->getPosition()),
-            $image->palette()->color($this->translateColorArray($this->getBgColors()))
-        );
-        return $filter->apply($image);
+        return $image;
     }
 
     protected function translatePositioning()

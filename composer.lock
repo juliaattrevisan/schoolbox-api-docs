@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ddd2b7d6dbb405d3d5faa7cc7ab87706",
+    "hash": "504163bcf4f6fe486338b02458afa71f",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -808,16 +808,16 @@
         },
         {
             "name": "imagine/imagine",
-            "version": "dev-0.6.2+resize-animated-gif+image-convolution",
+            "version": "dev-0.6.2+resize-animated-gif+image-convolution+crop-animated-gif",
             "source": {
                 "type": "git",
                 "url": "https://github.com/armatronic/Imagine.git",
-                "reference": "f28b68435200bd8d299129aca59d5491246b0e22"
+                "reference": "e58b92c8207bba9e84b9e1404e5adca58d86926c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/armatronic/Imagine/zipball/f28b68435200bd8d299129aca59d5491246b0e22",
-                "reference": "f28b68435200bd8d299129aca59d5491246b0e22",
+                "url": "https://api.github.com/repos/armatronic/Imagine/zipball/e58b92c8207bba9e84b9e1404e5adca58d86926c",
+                "reference": "e58b92c8207bba9e84b9e1404e5adca58d86926c",
                 "shasum": ""
             },
             "require": {
@@ -861,9 +861,9 @@
                 "image processing"
             ],
             "support": {
-                "source": "https://github.com/armatronic/Imagine/tree/0.6.2+resize-animated-gif+image-convolution"
+                "source": "https://github.com/armatronic/Imagine/tree/0.6.2+resize-animated-gif+image-convolution+crop-animated-gif"
             },
-            "time": "2015-02-10 02:46:02"
+            "time": "2015-05-04 02:32:44"
         },
         {
             "name": "jenssegers/date",
@@ -4768,7 +4768,7 @@
         {
             "alias": "0.6.2",
             "alias_normalized": "0.6.2.0",
-            "version": "dev-0.6.2+resize-animated-gif+image-convolution",
+            "version": "dev-0.6.2+resize-animated-gif+image-convolution+crop-animated-gif",
             "package": "imagine/imagine"
         }
     ],
