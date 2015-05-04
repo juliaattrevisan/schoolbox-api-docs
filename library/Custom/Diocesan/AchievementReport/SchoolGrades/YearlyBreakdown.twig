@@ -99,41 +99,6 @@
         </tfoot>
     </table>
 
-    <table>
-        <thead class="generic-heading-highlight">
-            <tr>
-                <th colspan="3">{{ entriesAndResults.heading }} {{ year }}</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for courseName, areaData in entriesAndResults.data[year] %}
-            <tr>
-                <td class="subheading">
-                    {{ courseName }}
-
-                    <ul class="teacher-list">
-                        {% for currentTeacher in areaData.allTeachers %}
-                        <li><a href='#'>{{ currentTeacher }}</a>{% if not loop.last %}, {% endif %}</li>
-                        {% endfor %}
-                    </ul>
-                </td>
-                <td class="subheading">Term 2</td>
-                <td class="subheading">Term 4</td>
-            </tr>
-            {% for currentArea, values in areaData.allAreas %}
-            <tr>
-                <td>{{ currentArea }}</td>
-                <td>{{ values.letters.term2 }}</td>
-                <td>{{ values.letters.term4 }}</td>
-            </tr>
-            {% endfor %}
-            {% if not loop.last %}
-            <tr class="spacer">
-                <td colspan="3"></td>
-            </tr>
-            {% endif %}
-            {% endfor %}
-        </tbody>
-    </table>
+    {% include '@schoolgrades/EntriesAndResults.twig' %}
 </div>
 {% endfor %}
