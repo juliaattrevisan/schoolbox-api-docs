@@ -239,7 +239,7 @@
             <td class="formLabelWidth"><h4>Image</h4></td>
             <td>
                 {% if item.image.hash %}
-                    <input type="hidden" name="image" value="{{ item.image.id }}">
+                    <input type="hidden" name="image" value="{{ item.image.hash }}">
                     <img src="/storage/image.php?size=constrain200&hash={{ item.image.hash|e('url') }}" />
                     <label><input type="checkbox" name="image" value="" /> Delete Image</label>
                     <input type="file" name="image" class="prettify">

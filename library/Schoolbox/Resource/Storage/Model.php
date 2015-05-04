@@ -97,6 +97,10 @@ class Model extends File implements IStorage
     {
         // calculate hash if not known
         if (!$this->hash) {
+            // Don't calc it if no path
+            if (!$this->path) {
+                return null;
+            }
             $stream = $this->readStream();
             $hp     = hash_init('sha1');
             hash_update_stream($hp, $stream);
