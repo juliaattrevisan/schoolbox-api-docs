@@ -75,8 +75,18 @@ class Controller extends Base {
                 $this->ncea($db, $user, $externalUser, $year);
                 break;
 
+            /* Error state - render an error page and leave it
+             * at that, I guess
+             */
             default:
-                die();
+                $this->getResponse()->content->set(array(
+                    'template' => '@templates/Error.twig',
+                    'data' => array(
+                        'errorMessage' => $report['error']
+                    )
+                ));
+
+                break;
         }
     }
 

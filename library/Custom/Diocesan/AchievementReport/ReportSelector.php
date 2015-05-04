@@ -58,9 +58,7 @@ class ReportSelector {
     public function determine() {
         if ($this->getUser()->getDefaultCampus()->getExtTimetableCode() == 'JNR') {
             if (($this->getUser()->getYear() >= 1) && ($this->getUser()->getYear() <= 6)) {
-                /* TODO: Standardised Test Scores
-                 */
-                die('Standardised Test Scores not available.');
+                return array('error' => 'Standardised Test Scores not available.');
             }
         }
         elseif ($this->getUser()->getDefaultCampus()->getExtTimetableCode() == 'SNR') {
@@ -77,9 +75,7 @@ class ReportSelector {
                     return 'ncea';
                 }
                 else {
-                    /* TODO: Year 11 student not enrolled in NCEA
-                     */
-                    die('Year 11 student not in NCEA.');
+                    return array('error' => 'Year 11 student not in NCEA.');
                 }
             }
             /* Need to decide whether this is an IB or an NCEA student
@@ -92,9 +88,7 @@ class ReportSelector {
                     return 'ncea';
                 }
                 else {
-                    /* TODO: Year 12/13 student not in either IB or NCEA
-                     */
-                    die('Year 12/13 student not enrolled in either.');
+                    return array('error' => 'Year 12/13 student not in NCEA or IB.');
                 }
             }
         }
