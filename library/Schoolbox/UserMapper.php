@@ -239,6 +239,8 @@ class UserMapper extends Mapper
 
         $statement->execute(array($id));
 
+        $linkedUserList = [];
+
         /** @var User $user */
         foreach ($statement as $row) {
             if (!($user instanceof User)) {
@@ -267,12 +269,12 @@ class UserMapper extends Mapper
             }
 
             $linkedUser = $this->hydrate($row,'lu');
-            if($linkedUser->getId()) {
+            if ($linkedUser->getId()) {
                 $linkedUserList[$linkedUser->getId()] = $linkedUser;
             }
         }
 
-        if(is_array($linkedUserList) && count($linkedUserList) > 0) {
+        if (count($linkedUserList)) {
             $linkedCollection = new Collection($linkedUserList);
             $user->setLinkedUser($linkedCollection);
         }
