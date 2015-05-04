@@ -12,6 +12,7 @@ namespace Schoolbox\Application\Daemon;
 
 use Alaress\Application\Boot\BootstrapInterface;
 use Alaress\Redis;
+use Alaress\Web\Router\RouterFactory;
 use Aura\Di;
 use Autoloader;
 use Database;
@@ -136,21 +137,24 @@ class Bootstrap implements BootstrapInterface {
         // Set correct timezone
         date_default_timezone_set($di->get('config')->get('date_timezone'));
 
-		require_once 'conf/modules/ModuleConfigInterface.php';
+        // All modules relate to web requests, not daemons.
+        // Therefore, no modules need to be set up.
 
-		// Initialise module configuration
-		foreach(glob(SITE_root . '/conf/modules/*.php') as $routePath) {
-			require_once $routePath;
-			$start = strrpos($routePath, '/') + 1;
-			$length = strrpos($routePath, '.php') - $start;
-			$class = 'Config\\Modules\\' . substr($routePath, $start, $length);
-
-			if(class_exists($class, false)) {
-				/** @var ModuleConfigInterface $obj */
-				$obj = new $class();
-				$obj->configure($this->kernel);
-			}
-		}
+//		require_once 'conf/modules/ModuleConfigInterface.php';
+//
+//		// Initialise module configuration
+//		foreach(glob(SITE_root . '/conf/modules/*.php') as $routePath) {
+//			require_once $routePath;
+//			$start = strrpos($routePath, '/') + 1;
+//			$length = strrpos($routePath, '.php') - $start;
+//			$class = 'Config\\Modules\\' . substr($routePath, $start, $length);
+//
+//			if(class_exists($class, false)) {
+//				/** @var ModuleConfigInterface $obj */
+//				$obj = new $class();
+//				$obj->configure($this->kernel);
+//			}
+//		}
 
 	}
 
