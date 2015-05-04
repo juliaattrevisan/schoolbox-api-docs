@@ -578,6 +578,11 @@
             css.height = response.height;
         }
         replacement.animate(css, 550, function () {
+
+            /* Collapse content on components
+             */
+            $(response).find('[data-collapser=true]').collapsable();
+
             replacement.empty().replaceWith(response.removeAttr('style'));
             masonry.saveSorting();
             masonry.refreshPalette();
@@ -641,6 +646,11 @@
                                         masonry.spectrum.masonrySpectrum('resetColours', leftColumn);
                                     }
                                 });
+
+                            /* Collapse content on components
+                             * Really...I have to do it like this?
+                             */
+                            $('#' + $(response).attr('id')).find('[data-collapser=true]').collapsable();
                         })
                         .fail(function() {
                             masonry.refreshColumns();
