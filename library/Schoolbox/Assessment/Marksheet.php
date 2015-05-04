@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -13,22 +12,22 @@ use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Exception as AssessmentException;
 use Schoolbox\Assessment\StudentReportCard\ContextSelector;
 use Schoolbox\Collection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Assessment\Exception as AssessmentException;
-use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
  * This class relies on handlers, because there isn't time to
  * implement the necessary functionality into mappers at this point.
- *
  * Class Marksheet
+ *
  * @package Schoolbox\Assessment
  */
 class Marksheet
@@ -99,14 +98,15 @@ class Marksheet
 
 
     /**
-    * @param int $categoryId
-    * @param int $sessionUserId
-    * @param array $handlerDependencies
-    * @param array $mapperDependencies
-    * @param $conf
-    * @throws AssessmentException
-    * @throws ResourceException
-    */
+     * @param int   $categoryId
+     * @param int   $sessionUserId
+     * @param array $handlerDependencies
+     * @param array $mapperDependencies
+     * @param       $conf
+     *
+     * @throws AssessmentException
+     * @throws ResourceException
+     */
     public function __construct($categoryId, $sessionUserId, $handlerDependencies, $mapperDependencies, $conf)
     {
 
@@ -114,14 +114,14 @@ class Marksheet
 
         // ultimately, this class should be refactored to replace handler dependencies with mapper dependencies
         foreach ($handlerDependencies as $key => $handler) {
-            $prop = $key.'Handler';
+            $prop = $key . 'Handler';
             if (property_exists($this, $prop)) {
                 $this->$prop = $handler;
             }
         }
 
         foreach ($mapperDependencies as $key => $mapper) {
-            $prop = $key.'Mapper';
+            $prop = $key . 'Mapper';
             if (property_exists($this, $prop)) {
                 $this->$prop = $mapper;
             }
@@ -131,20 +131,20 @@ class Marksheet
             throw new AssessmentException('Permission Denied', 19);
         }
 
-        $this->category = $this->categoryMapper->findById($categoryId);
+        $this->category    = $this->categoryMapper->findById($categoryId);
         $this->sessionUser = $this->userMapper->findById($sessionUserId);
 
         $this->errorList = $this->errorMapper->findAll();
     }
 
     /**
-    * Generate the data from the given category and session user
-    */
+     * Generate the data from the given category and session user
+     */
     public function generateData($year, $semester)
     {
 
-        $catId = $this->category->getId();
-        $this->year = $year;
+        $catId          = $this->category->getId();
+        $this->year     = $year;
         $this->semester = $semester;
 
         /** @var Collection|User[] $studentCollection */
@@ -211,7 +211,7 @@ class Marksheet
 
         if (is_array($workList)) {
             $statData = array();
-            $order = array();
+            $order    = array();
 
             foreach ($workList as $work) {
                 $isOA = $work['type_id'] == \Assess_Main::ONLINE_ASSESSMENT_TYPE_ID ? 1 : 0;
@@ -226,9 +226,9 @@ class Marksheet
                     $mtSlug = $work['slug'];
                 }
 
-                $stats = $mapper->getStatistics($work['id']);
-                $object = $mapper->findById($work['id']);
-                $weight = $object->getWeight();
+                $stats      = $mapper->getStatistics($work['id']);
+                $object     = $mapper->findById($work['id']);
+                $weight     = $object->getWeight();
                 $visibility = $object->getMarkVisibility();
 
                 $progress = $mapper->getProgress($work['id']);
@@ -268,8 +268,8 @@ class Marksheet
 
                 $statData[$isOA][$work['id']] = array_merge(
                     array(
-                        'avg' => $classAvg,
-                        'weight' => $weight,
+                        'avg'        => $classAvg,
+                        'weight'     => $weight,
                         'visibility' => $visibility,
                     ),
                     $stats,
@@ -277,7 +277,7 @@ class Marksheet
                 );
 
                 /** @var $end \Alaress_Date_Format */
-                $end = $isOA ? $object->getFinish() : $object->getDueDate();
+                $end   = $isOA ? $object->getFinish() : $object->getDueDate();
                 $stamp = $end->getUnixTimestamp();
 
                 // effectively, this sets the order of the columns by chronology, then order created if collisions
@@ -285,8 +285,8 @@ class Marksheet
                     ++$stamp;
                 }
                 $order[$stamp] = array(
-                    'isOA' => $isOA,
-                    'id' => $work['id'],
+                    'isOA'   => $isOA,
+                    'id'     => $work['id'],
                     'object' => $object
                 );
                 ksort($order);
@@ -295,20 +295,22 @@ class Marksheet
             unset($work);
 
             $this->statisticDataSet = $statData;
-            $this->displayOrder = $order;
+            $this->displayOrder     = $order;
         }
 
         if ($studentCollection->count()) {
             // Students are always sorted by surname, then first name
-            $studentCollection->sortByCallback(function($a, $b) {
-                /** @var User $a */
-                /** @var User $b */
-                $cmp = strcmp($a->getLastname(), $b->getLastname());
-                if ($cmp === 0) {
-                    $cmp = strcmp($a->getFirstname(), $b->getFirstname());
+            $studentCollection->sortByCallback(
+                function ($a, $b) {
+                    /** @var User $a */
+                    /** @var User $b */
+                    $cmp = strcmp($a->getLastname(), $b->getLastname());
+                    if ($cmp === 0) {
+                        $cmp = strcmp($a->getFirstname(), $b->getFirstname());
+                    }
+                    return $cmp;
                 }
-                return $cmp;
-            });
+            );
 
             $studentGrades = Grades::getInstance()->getStudentGradesForSubject(
                 $studentCollection,
@@ -338,7 +340,7 @@ class Marksheet
                             $mark = $this->getSubmissionBoxMarkForStudent($work['id'], $userId);
                         }
                         $row['marks'][$isOA][$work['id']] = $mark;
-                        $row['avg'] = count($studentGrades[$userId]['grades']) ? $studentGrades[$userId]['avg'] : null;
+                        $row['avg']                       = count($studentGrades[$userId]['grades']) ? $studentGrades[$userId]['avg'] : null;
                     }
                     unset($work);
                 }
@@ -351,10 +353,10 @@ class Marksheet
 
 
     /**
-    * Automatically marks the given OA.
-    *
-    * @param $assessId
-    */
+     * Automatically marks the given OA.
+     *
+     * @param $assessId
+     */
     protected function automarkOnlineAssessment($assessId)
     {
         $allAttempts = $this->attemptHandler->getList($assessId);
@@ -380,18 +382,19 @@ class Marksheet
 
 
     /**
-    * Calculate the mark for the most recent attempt of the given OA by the given student
-    *
-    * @param int $assessId
-    * @param int $studentId
-    * @return array
-    */
+     * Calculate the mark for the most recent attempt of the given OA by the given student
+     *
+     * @param int $assessId
+     * @param int $studentId
+     *
+     * @return array
+     */
     protected function getOnlineAssessMarkForStudent($assessId, $studentId)
     {
         $mostRecentAttempt = $this->attemptHandler->getLatestForUser($assessId, $studentId);
         if (!$mostRecentAttempt) {
             return array(
-                'mark' => '',
+                'mark'      => '',
                 'norm_mark' => null
             );
         }
@@ -421,15 +424,15 @@ class Marksheet
 
         if (isset($rtn[0]['mark'])) {
             $mark = array(
-                'mark' => $rtn[0]['mark'],
+                'mark'      => $rtn[0]['mark'],
                 'norm_mark' => $rtn[0]['norm_mark'],
-                'comment' => $rtn[0]['comment'],
+                'comment'   => $rtn[0]['comment'],
             );
         } else {
             $mark = array(
-                'mark' => null,
+                'mark'      => null,
                 'norm_mark' => null,
-                'comment' => ($rtn[0]['comment'] ?: ''),
+                'comment'   => ($rtn[0]['comment'] ?: ''),
             );
         }
 
@@ -447,10 +450,10 @@ class Marksheet
 
 
     /**
-    * Render the table in the given sitepage
-    *
-    * @param \SitePage $page
-    */
+     * Render the table in the given sitepage
+     *
+     * @param \SitePage $page
+     */
     public function renderSitepage($page)
     {
 
@@ -479,24 +482,28 @@ class Marksheet
 
         $contextSelector->setCategories($this->categoryMapper->findByColumn('id', $catIdList));
 
-        $contextSelector->render($page, 'CONTEXT_SELECTOR', array(
-            'year' => $this->year,
+        $contextSelector->render(
+            $page, 'CONTEXT_SELECTOR', array(
+            'year'     => $this->year,
             'semester' => $this->semester,
             'category' => $this->category->getId()
-        ));
+        )
+        );
 
         $page->setFile(TEMPLATE_content, 'submission/markSheet.html');
-        $page->setTitle('Marksheet for '.$this->category->getName());
+        $page->setTitle('Marksheet for ' . $this->category->getName());
         $page->setTab('submission');
 
         // set global vars
-        $page->setVar(array(
-            'CATEGORY' => $this->category->getName(),
-            'CID' => $this->category->getId(),
-            'CATEGORY_CODE' => $this->category->getCodeString(),
-            'WORK_YEAR' => $this->year,
-            'WORK_SEMESTER' => $this->semester
-        ));
+        $page->setVar(
+            array(
+                'CATEGORY'      => $this->category->getName(),
+                'CID'           => $this->category->getId(),
+                'CATEGORY_CODE' => $this->category->getCodeString(),
+                'WORK_YEAR'     => $this->year,
+                'WORK_SEMESTER' => $this->semester
+            )
+        );
 
         // define blocks
         $page->setBlock(TEMPLATE_content, 'semester_option', 'semester_option_block');
@@ -517,12 +524,13 @@ class Marksheet
 
         // if mapping not defined here, uses ucfirst(:field)
         $statLabelLookup = array(
-            'avg'               => 'Class Average',     // this is different to mean: same input value, but formatted according to the work marktype
-            'stdev'             => 'Standard Deviation',
-            'min'               => 'Minimum',
-            'max'               => 'Maximum',
-            'submission_count'  => 'Submitted',
-            'return_count'      => 'Returned',
+            'avg'              => 'Class Average',
+            // this is different to mean: same input value, but formatted according to the work marktype
+            'stdev'            => 'Standard Deviation',
+            'min'              => 'Minimum',
+            'max'              => 'Maximum',
+            'submission_count' => 'Submitted',
+            'return_count'     => 'Returned',
         );
 
         $page->setVar('work_header_block', '');
@@ -550,15 +558,17 @@ class Marksheet
                     $value  = $boxes[$workId];
 
                     if (is_numeric($transposed['mean'][$workId])) {
-                        $gradient = (int) ($transposed['mean'][$workId] / 10);
+                        $gradient = (int)($transposed['mean'][$workId] / 10);
                     } else {
                         $gradient = 'off';
                     }
 
-                    $page->setVar(array(
-                        'WORK_CLASSAVG_GRADIENT' => $gradient,
-                        'WORK_CLASSAVG_CLEAN' => $value
-                    ));
+                    $page->setVar(
+                        array(
+                            'WORK_CLASSAVG_GRADIENT' => $gradient,
+                            'WORK_CLASSAVG_CLEAN'    => $value
+                        )
+                    );
                     $page->parse('class_average_block', 'class_average', true);
                 }
 
@@ -568,20 +578,26 @@ class Marksheet
 
             // not a special case, just process as normal
 
-            $page->setVar(array(
-                'WORK_STAT_CLASS' => $name,
-                'WORK_STAT_TITLE' => isset($statLabelLookup[$name]) ? $statLabelLookup[$name] : ucfirst($name),
-            ));
+            $page->setVar(
+                array(
+                    'WORK_STAT_CLASS' => $name,
+                    'WORK_STAT_TITLE' => isset($statLabelLookup[$name]) ? $statLabelLookup[$name] : ucfirst($name),
+                )
+            );
 
             foreach ($this->displayOrder as $item) {
                 $workId = "{$item['isOA']}-{$item['id']}";
                 $value  = $boxes[$workId];
-                $page->setVar(array(
-                    'WORK_NS_ID' => str_replace('-', '][', $workId), // so it appears as the name attribute properly
-                    'WORK_ID' => $item['id'],
-                    'WORK_STAT_VALUE' => is_numeric($value) ? (float) round($value, 3) : $value, // truncate to 3 decimals, then strip extraneous 0s
-                    'ASSESS_MODIFY_URL' => $item['object'] instanceof OnlineAssessment ? '/assess/modify/'.$item['id'] :  '/submission/submissionForm.php?id='.$item['id'],
-                ));
+                $page->setVar(
+                    array(
+                        'WORK_NS_ID'        => str_replace('-', '][', $workId),
+                        // so it appears as the name attribute properly
+                        'WORK_ID'           => $item['id'],
+                        'WORK_STAT_VALUE'   => is_numeric($value) ? (float)round($value, 3) : $value,
+                        // truncate to 3 decimals, then strip extraneous 0s
+                        'ASSESS_MODIFY_URL' => $item['object'] instanceof OnlineAssessment ? '/assess/modify/' . $item['id'] : '/submission/submissionForm.php?id=' . $item['id'],
+                    )
+                );
 
                 if ($name == 'weight') {
                     $page->parse('stat_editable_block', 'stat_editable');
@@ -622,7 +638,7 @@ class Marksheet
 
             if (is_null($row['avg'])) {
                 $gradient = 'off';
-                $average = '&ndash;';
+                $average  = '&ndash;';
             } else {
                 $gradient = (int)($row['avg'] / 10);
                 // This letter grade is an average of grades for this class,
@@ -634,16 +650,18 @@ class Marksheet
             }
 
 
-            $page->setVar(array(
-                'STUDENT_NAME_FORMAL' => $student->formatName('{lastname}, {firstname}'),
-                'STUDENT_NAME' => $student->formatName(),
-                'STUDENT_EXTID' => $student->getExternalId(),
-                'STUDENT_ID' => $userId,
-                'DARK' => ++$i%2 ? 'dark' : '',
-                'STUDENT_AVG_GRADIENT' => $gradient,
-                'STUDENT_AVG_CLEAN' => $average
+            $page->setVar(
+                array(
+                    'STUDENT_NAME_FORMAL'  => $student->formatName('{lastname}, {firstname}'),
+                    'STUDENT_NAME'         => $student->formatName(),
+                    'STUDENT_EXTID'        => $student->getExternalId(),
+                    'STUDENT_ID'           => $userId,
+                    'DARK'                 => ++$i % 2 ? 'dark' : '',
+                    'STUDENT_AVG_GRADIENT' => $gradient,
+                    'STUDENT_AVG_CLEAN'    => $average
 
-            ));
+                )
+            );
 
             $page->setVar('student_work_block', '');
 
@@ -652,39 +670,45 @@ class Marksheet
                 // also, if this is the first pass, render the column headers as well
                 if ($i == 1) {
                     if ($item['object'] instanceof OnlineAssessment) {
-                        $page->setVar(array(
-                            'WORK_TITLE' => $item['object']->getTitle(),
-                            'WORK_ID'    => $item['object']->getId(),
-                            'WORK_PATH'  => '/assess/results',
-                            'WORK_TYPE'  => 'Quiz'
-                        ));
+                        $page->setVar(
+                            array(
+                                'WORK_TITLE' => $item['object']->getTitle(),
+                                'WORK_ID'    => $item['object']->getId(),
+                                'WORK_PATH'  => '/assess/results',
+                                'WORK_TYPE'  => 'Quiz'
+                            )
+                        );
                     } elseif ($item['object'] instanceof SubmissionBox) {
-                        $page->setVar(array(
-                            'WORK_TITLE' => $item['object']->getName(),
-                            'WORK_ID'    => $item['object']->getId(),
-                            'WORK_PATH'  => '/submission/viewSubmission',
-                            'WORK_TYPE'  => $item['object']->getWorkType()->getName()
-                        ));
+                        $page->setVar(
+                            array(
+                                'WORK_TITLE' => $item['object']->getName(),
+                                'WORK_ID'    => $item['object']->getId(),
+                                'WORK_PATH'  => '/submission/viewSubmission',
+                                'WORK_TYPE'  => $item['object']->getWorkType()->getName()
+                            )
+                        );
                     }
                     $page->parse('work_header_block', 'work_header', true);
                 }
-                $mark = $row['marks'][$item['isOA']][$item['id']];
+                $mark   = $row['marks'][$item['isOA']][$item['id']];
                 $workId = $item['id'];
 
-                $page->setVar(array(
-                    'WORK_TYPE' => $item['isOA'] ? 'assess' : 'submission',
-                    'WORK_ID' => $item['id'],
-                    'STUDENT_WORK_NORM_MARK' => $mark['norm_mark'],
-                    'STUDENT_WORK_MARK' => strlen($mark['mark']) ? $mark['mark'] : '&ndash;',
-                    'STUDENT_WORK_COMMENT' => isset($mark['comment']) ? $mark['comment'] : '',
-                ));
+                $page->setVar(
+                    array(
+                        'WORK_TYPE'              => $item['isOA'] ? 'assess' : 'submission',
+                        'WORK_ID'                => $item['id'],
+                        'STUDENT_WORK_NORM_MARK' => $mark['norm_mark'],
+                        'STUDENT_WORK_MARK'      => strlen($mark['mark']) ? $mark['mark'] : '&ndash;',
+                        'STUDENT_WORK_COMMENT'   => isset($mark['comment']) ? $mark['comment'] : '',
+                    )
+                );
 
                 if ($item['isOA']) {
                     // yes, you actually have to do this...
-                    $section = $this->sectionHandler->getByField('assess_id', $workId);
+                    $section        = $this->sectionHandler->getByField('assess_id', $workId);
                     $firstSectionId = $section['section_id'];
-                    $attempt = $this->attemptHandler->getLatestForUser($workId, $student->getId());
-                    $attemptId = $attempt['attempt_id'];
+                    $attempt        = $this->attemptHandler->getLatestForUser($workId, $student->getId());
+                    $attemptId      = $attempt['attempt_id'];
                     if ($firstSectionId && $attemptId) {
                         $page->setVar('STUDENT_WORK_PATH', "/assess/review/$workId/$firstSectionId/$attemptId");
                     } else {
@@ -712,13 +736,13 @@ class Marksheet
     }
 
     /**
-    * Render a CSV and force download
-    */
+     * Render a CSV and force download
+     */
     public function renderCsv()
     {
 
         /* Open an output stream so we can use fputcsv
-		  */
+          */
         $filename = preg_replace('/[^0-9a-zA-Z()_-]/', '_', $this->category->getName());
 
         header("Pragma: ");
@@ -734,27 +758,19 @@ class Marksheet
         foreach ($this->displayOrder as $item) {
             if ($item['object'] instanceof OnlineAssessment) {
                 // Online assess has only two columns
-                $header[] = $item['object']->getTitle();
-                $header[] = '';
+                $header[]    = $item['object']->getTitle();
+                $header[]    = '';
                 $subheader[] = 'Grade';
                 $subheader[] = 'Total';
             } elseif ($item['object'] instanceof SubmissionBox) {
-                $header[] = $item['object']->getName();
-                $header[] = '';
-                $header[] = '';
-                $header[] = '';
+                $header[]    = $item['object']->getName();
+                $header[]    = '';
+                $header[]    = '';
+                $header[]    = '';
                 $subheader[] = 'Normalised Grade';
                 $subheader[] = 'Grade';
                 $subheader[] = 'Total';
                 $subheader[] = 'Comment';
-            } else {
-                $header[] = '';
-                $header[] = '';
-                $header[] = '';
-                $subheader[] = '';
-                $subheader[] = '';
-                $subheader[] = '';
-                $subheader[] = '';
             }
         }
         fputcsv($fp, $header);
@@ -769,42 +785,38 @@ class Marksheet
                 $student->getFirstname(),
             );
             foreach ($this->displayOrder as $item) {
-                $mark = $row['marks'][$item['isOA']][$item['id']];
-
-                if (!($item['object'] instanceof OnlineAssessment)) {
-                    $output[] = $mark['norm_mark'];
-                }
+                $mark       = $row['marks'][$item['isOA']][$item['id']];
+                $actualMark = '';
+                $totalMark  = '';
 
                 /* Total available marks in achieved/available format
-				 */
+                 */
                 if (strstr($mark['mark'], ' / ')) {
-                    list($actual, $available) = explode(' / ', $mark['mark']);
-
-                    $output[] = $actual;
-                    $output[] = $available;
+                    list($actualMark, $totalMark) = explode(' / ', $mark['mark']);
                 } else {
                     /* A mark value is provided
-					 */
+                     */
                     if ($mark['mark'] != '') {
-                        $output[] = $mark['mark'];
+                        $actualMark = $mark['mark'];
 
                         /* Quiz doesn't have getMaxMark() and are represented as
-						 * achieved/available anyway
-						 */
-                        if ($item['object'] instanceof OnlineAssessment) {
-                            $output[] = '';
-                        } else {
-                            $output[] = $item['object']->getMaxMark();
+                         * achieved/available anyway
+                         */
+                        if ($item['object'] instanceof SubmissionBox) {
+                            $totalMark = $item['object']->getMaxMark();
                         }
-                    } /* No mark provided
-					 */
-                    else {
-                        $output[] = '';
-                        $output[] = '';
                     }
                 }
 
-                $output[] = $mark['comment'];
+                if ($item['object'] instanceof OnlineAssessment) {
+                    $output[] = $actualMark;
+                    $output[] = $totalMark;
+                } elseif ($item['object'] instanceof SubmissionBox) {
+                    $output[] = $mark['norm_mark'];
+                    $output[] = $actualMark;
+                    $output[] = $totalMark;
+                    $output[] = $mark['comment'];
+                }
             }
             fputcsv($fp, $output);
         }
