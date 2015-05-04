@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "260909d660ea799e8c160ec8f7049721",
+    "hash": "ddd2b7d6dbb405d3d5faa7cc7ab87706",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -655,7 +655,8 @@
                 {
                     "name": "Edward Z. Yang",
                     "email": "admin@htmlpurifier.org",
-                    "homepage": "http://ezyang.com"
+                    "homepage": "http://ezyang.com",
+                    "role": "Developer"
                 }
             ],
             "description": "Standards compliant HTML filter written in PHP",
@@ -2276,12 +2277,12 @@
             "version": "v1.0.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/twigphp/Twig-extensions.git",
+                "url": "https://github.com/fabpot/Twig-extensions.git",
                 "reference": "f91a82ec225e5bb108e01a0f93c9be04f84dcfa0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig-extensions/zipball/f91a82ec225e5bb108e01a0f93c9be04f84dcfa0",
+                "url": "https://api.github.com/repos/fabpot/Twig-extensions/zipball/f91a82ec225e5bb108e01a0f93c9be04f84dcfa0",
                 "reference": "f91a82ec225e5bb108e01a0f93c9be04f84dcfa0",
                 "shasum": ""
             },
@@ -2306,7 +2307,9 @@
             "authors": [
                 {
                     "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
+                    "email": "fabien@symfony.com",
+                    "homepage": "http://fabien.potencier.org",
+                    "role": "Lead Developer"
                 }
             ],
             "description": "Common additional features for Twig that do not directly belong in core",
@@ -2323,12 +2326,12 @@
             "version": "v1.15.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/twigphp/Twig.git",
+                "url": "https://github.com/fabpot/Twig.git",
                 "reference": "1fb5784662f438d7d96a541e305e28b812e2eeed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/1fb5784662f438d7d96a541e305e28b812e2eeed",
+                "url": "https://api.github.com/repos/fabpot/Twig/zipball/1fb5784662f438d7d96a541e305e28b812e2eeed",
                 "reference": "1fb5784662f438d7d96a541e305e28b812e2eeed",
                 "shasum": ""
             },
@@ -3004,12 +3007,12 @@
             "version": "v1.5.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/minkphp/Mink.git",
+                "url": "https://github.com/Behat/Mink.git",
                 "reference": "0769e6d9726c140a54dbf827a438c0f9912749fe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/minkphp/Mink/zipball/0769e6d9726c140a54dbf827a438c0f9912749fe",
+                "url": "https://api.github.com/repos/Behat/Mink/zipball/0769e6d9726c140a54dbf827a438c0f9912749fe",
                 "reference": "0769e6d9726c140a54dbf827a438c0f9912749fe",
                 "shasum": ""
             },
@@ -3110,12 +3113,12 @@
             "version": "v1.1.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/minkphp/MinkSelenium2Driver.git",
+                "url": "https://github.com/Behat/MinkSelenium2Driver.git",
                 "reference": "bcf1b537de37db6db0822d9e7bd97e600fd7a476"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/minkphp/MinkSelenium2Driver/zipball/bcf1b537de37db6db0822d9e7bd97e600fd7a476",
+                "url": "https://api.github.com/repos/Behat/MinkSelenium2Driver/zipball/bcf1b537de37db6db0822d9e7bd97e600fd7a476",
                 "reference": "bcf1b537de37db6db0822d9e7bd97e600fd7a476",
                 "shasum": ""
             },
@@ -4773,9 +4776,6 @@
     "stability-flags": {
         "shareworks/xml-security": 20,
         "react/stomp": 20,
-        "aura/di": 10,
-        "aura/web": 10,
-        "aura/session": 10,
         "0x46616c6b/etherpad-lite-client": 20,
         "caxy/php-htmldiff": 20,
         "imagine/imagine": 20,
