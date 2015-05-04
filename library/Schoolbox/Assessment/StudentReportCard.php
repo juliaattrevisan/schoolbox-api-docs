@@ -523,7 +523,14 @@ class StudentReportCard
 
         /* If enabled
          */
-        if (\Cfg::get('enable_grades_criteria')) {
+        if (!\Cfg::get('enable_grades_criteria')) {
+            $page->setVar(array(
+                'subject_rubric_block' => ''
+            ));
+            return;
+        }
+
+
 
             /* Get a list of criteria in this category
             */
@@ -550,24 +557,34 @@ class StudentReportCard
 //                                $string .= " ({$allValues[$currentCriterion->getId()]['mark']})";
 //                            }
 
-                            $allStructures[$group][$currentCriterion->getId()]['results'][$currentSubmission['box']->getId()] = $string;
+                            if ($string) {
+                                $allStructures[$group][$currentCriterion->getId()]['results'][$currentSubmission['box']->getName()] = $string;
+                            }
                         }
+
+                        if (!count($allStructures[$group][$currentCriterion->getId()]['results'])) {
+                            unset($allStructures[$group][$currentCriterion->getId()]);
+                        }
+                    }
+
+                    if (!count($allStructures[$group])) {
+                        unset($allStructures[$group]);
                     }
                 }
 
-                $page->setVar([ 'SUBJECT_RUBRIC_COLSPAN'    => count($allSubmissionBoxes) + 1 ]);
+//                $page->setVar([ 'SUBJECT_RUBRIC_COLSPAN'    => count($allSubmissionBoxes) + 1 ]);
 
                 /* Render out all the submission box headings
                  */
-                foreach($allSubmissionBoxes as $currentSubmissionBox) {
-                    $page->setVar(array(
-                        'SUBJECT_RUBRIC_SUBMISSIONBOX_NAME' => $currentSubmissionBox['box']->getName(),
-                        'SUBJECT_RUBRIC_SUBMISSIONBOX_ID' => $currentSubmissionBox['box']->getId(),
-                    ));
-
-                    $page->parse('subject_rubric_submissionbox_block', 'subject_rubric_submissionbox', true);
-                    $page->parse('subject_rubric_box_checklist_block', 'subject_rubric_box_checklist', true);
-                }
+//                foreach($allSubmissionBoxes as $currentSubmissionBox) {
+//                    $page->setVar(array(
+//                        'SUBJECT_RUBRIC_SUBMISSIONBOX_NAME' => $currentSubmissionBox['box']->getName(),
+//                        'SUBJECT_RUBRIC_SUBMISSIONBOX_ID' => $currentSubmissionBox['box']->getId(),
+//                    ));
+//
+//                    $page->parse('subject_rubric_submissionbox_block', 'subject_rubric_submissionbox', true);
+//                    $page->parse('subject_rubric_box_checklist_block', 'subject_rubric_box_checklist', true);
+//                }
 
                 /* Render that all out in the land of phpliberty
                  */
@@ -581,10 +598,10 @@ class StudentReportCard
                             'SUBJECT_RUBRIC_CRITERION_NAME' => $data['criterion']->getName()
                         ));
 
-                        foreach ($data['results'] as $boxId => $currentResult) {
+                        foreach ($data['results'] as $boxName => $currentResult) {
                             $page->setVar(array(
-                                'SUBJECT_RUBRIC_CRITERION_MARK'   => $currentResult,
-                                'SUBJECT_RUBRIC_SUBMISSIONBOX_ID' => $boxId
+                                'SUBJECT_RUBRIC_CRITERION_MARK'     => $currentResult,
+                                'SUBJECT_RUBRIC_SUBMISSIONBOX_NAME' => $boxName
                             ));
 
                             $page->parse('subject_rubric_criterion_mark_block', 'subject_rubric_criterion_mark', true);
@@ -610,12 +627,6 @@ class StudentReportCard
 
                 $page->parse('subject_rubric_block', 'subject_rubric');
             }
-        }
-        else {
-            $page->setVar(array(
-                'subject_rubric_block' => ''
-            ));
-        }
     }
 
     protected function renderAssessments(\SitePage $page)

@@ -166,6 +166,27 @@
   .actions a.btn {
       margin-left: 0;
   }
+  .rubric li {
+      padding: 4px 0;
+  }
+  .rubric li li {
+      list-style-type: disc;
+      margin-left: 12px;
+  }
+  .rubric tr td.criterion-value {
+      border: none;
+  }
+  .rubric {
+      margin-bottom: 16px;
+  }
+  .rubric .actions a {
+      font-size: 2em;
+      padding: 0;
+      width: 24px;
+      height: 24px;
+      line-height: 24px;
+      text-align: center;
+  }
 </style>
 <script type="text/javascript" src="/javascript/components/flot/jquery.flot.js"></script>
 <script type="text/javascript" src="/javascript/components/flot/jquery.flot.time.js"></script>
@@ -256,27 +277,28 @@
                     $('#rubric-tbody').find('td[colspan]').attr('colspan', $('#rubric-showhide-opts').find('input:checked').length + 1);
                 });
 
-                $tbl.on('click', 'div.actions a', function (e) {
+                $tbl.on('click', 'td[data-interaction="collapse"]', function (e) {
                     e.preventDefault();
 
-                    var $a    = $(this),
-                        group = $a.data('group'),
+                    var $td   = $(this),
+                        $a    = $td.find('a.btn'),
+                        group = $td.data('group'),
                         $rows = $tbl.find('tr[data-group="'+group+'"]');
 
-                    if ($a.hasClass('cross')) {
+                    if ($a.hasClass('minus')) {
                         // has cross: hide things
                         $rows.addClass('hide');
-                        $a.removeClass('cross').addClass('add');
+                        $a.removeClass('minus').addClass('plus').text('+');
                     } else {
                         // has plus: show things
                         $rows.removeClass('hide');
-                        $a.removeClass('add').addClass('cross');
+                        $a.removeClass('plus').addClass('minus').html('&minus;');
                     }
                 });
             });
         </script>
 
-        <div id="rubric-showhide-opts">
+        <div id="rubric-showhide-opts" style="display:none;">
             <!-- BEGIN subject_rubric_box_checklist -->
             <label>
                 <input type="checkbox" value="{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}" checked="checked" /> {SUBJECT_RUBRIC_SUBMISSIONBOX_NAME}
@@ -285,31 +307,32 @@
         </div>
 
         <table id="rubric-table" class="rubric table">
-            <thead>
-                <tr>
-                    <th width="40%"></th>
-                    <!-- BEGIN subject_rubric_submissionbox -->
-                    <th width="60%" data-box="{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}">{SUBJECT_RUBRIC_SUBMISSIONBOX_NAME}</th>
-                    <!-- END subject_rubric_submissionbox -->
-                </tr>
-            </thead>
             <tbody id="rubric-tbody">
                 <!-- BEGIN subject_rubric_group -->
                 <tr>
-                    <!-- extend all the way across -->
-                    <td colspan="{SUBJECT_RUBRIC_COLSPAN}" class="criterion-label pad span">
+                    <td data-interaction="collapse" data-group="{SUBJECT_RUBRIC_GROUP_NAME}" class="criterion-label pad span">
                         <strong>{SUBJECT_RUBRIC_GROUP_NAME}</strong>
                         <div class="actions">
-                            <a class="btn no-text cross" title="Hide {SUBJECT_RUBRIC_GROUP_NAME}" data-group="{SUBJECT_RUBRIC_GROUP_NAME}"><span></span></a>
+                            <a class="btn no-icon minus" title="Hide {SUBJECT_RUBRIC_GROUP_NAME}" data-group="{SUBJECT_RUBRIC_GROUP_NAME}">&minus;</a>
                         </div>
                     </td>
                 </tr>
                 <!-- BEGIN subject_rubric_criterion -->
                 <tr data-group="{SUBJECT_RUBRIC_GROUP_NAME}">
-                    <td class="criterion-label pad">{SUBJECT_RUBRIC_CRITERION_NAME}</td>
-                    <!-- BEGIN subject_rubric_criterion_mark -->
-                    <td data-box="{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}" class="criterion-value pad">{SUBJECT_RUBRIC_CRITERION_MARK}</td>
-                    <!-- END subject_rubric_criterion_mark -->
+                    <td class="criterion-value pad">
+                        <ul>
+                            <li>
+                                <strong>{SUBJECT_RUBRIC_CRITERION_NAME}</strong>
+                            </li>
+                            <li>
+                                <ul>
+                                    <!-- BEGIN subject_rubric_criterion_mark -->
+                                    <li>{SUBJECT_RUBRIC_SUBMISSIONBOX_NAME}: <em>{SUBJECT_RUBRIC_CRITERION_MARK}</em></li>
+                                    <!-- END subject_rubric_criterion_mark -->
+                                </ul>
+                            </li>
+                        </ul>
+                    </td>
                 </tr>
                 <!-- END subject_rubric_criterion -->
                 <!-- END subject_rubric_group -->
