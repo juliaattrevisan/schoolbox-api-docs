@@ -13,6 +13,7 @@ namespace Custom\Diocesan\AchievementReport;
 use Alaress\Web\Controller\Base;
 use MSSQL;
 use Alaress_Probe as Probe;
+use Schoolbox\User;
 
 class Controller extends Base {
 
@@ -46,6 +47,38 @@ class Controller extends Base {
             'css' => 'type-blue'
         )
     );
+
+
+    /**
+     * Selects which report to redirect towards, based on certain
+     * conditions particular to a student
+     *
+     * @param $db
+     * @param $user
+     * @param $externalUser
+     * @param $year
+     */
+    public function selector($db, User $user, $externalUser, $year) {
+        $selector = new ReportSelector($db, $user, $externalUser);
+        $report = $selector->determine();
+
+        switch ($report) {
+            case 'schoolGrades':
+                $this->schoolGrades($db, $user, $externalUser, $year);
+                break;
+
+            case 'ib':
+                $this->ib($db, $user, $externalUser, $year);
+                break;
+
+            case 'ncea':
+                $this->ncea($db, $user, $externalUser, $year);
+                break;
+
+            default:
+                die();
+        }
+    }
 
     /**
      * School Grades page

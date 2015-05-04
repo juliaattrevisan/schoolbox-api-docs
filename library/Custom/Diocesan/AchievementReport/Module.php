@@ -28,6 +28,8 @@ class Module extends BaseModule {
      */
     public function initRoutes(Router $router, $basePath)
     {
+        $router->addGet('achievementreport.selector', $basePath . '/{externalUserId}');
+
         $router->addGet('achievementreport.schoolGrades', $basePath . '/schoolgrades/{externalUserId}{/year}')
             ->addTokens(array(
                 'year' => '\d{4}'
@@ -52,6 +54,13 @@ class Module extends BaseModule {
         /* For php < 5.4
          */
         $self = $this;
+
+        $matcher->add(
+            '/^achievementreport\.selector/',
+            function($params) use ($self) {
+                return $self->getEverything($params);
+            }
+        );
 
         $matcher->add(
             '/^achievementreport\.schoolGrades/',
@@ -98,6 +107,7 @@ class Module extends BaseModule {
         try {
             $userMapper = new UserMapper();
             $user = $userMapper->findOneByColumn('synergy_id', $params['externalUserId']);
+            $user = $userMapper->findById($user->getId());
         }
         catch (\Exception $e) {
             error(31);
