@@ -1,0 +1,107 @@
+<?php
+/**
+ * Controller for timetable related stuff. Currently only contains the AJAX
+ * target for getting the date for a timetable day.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2014, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Timetable;
+
+use Alaress\Web\Controller\Base;
+use DateTime;
+use External_Timetable;
+
+class Controller extends Base
+{
+    /**
+     * @var External_Timetable
+     */
+    protected $externalTimetableHandler;
+
+    /**
+     * Constructor
+     *
+     * @param External_Timetable $externalTimetable
+     */
+    public function __construct(External_Timetable $externalTimetable)
+    {
+        $this->setExternalTimetableHandler($externalTimetable);
+    }
+
+    /**
+     * Outputs a response for getting the next or previous occurence of a
+     * timetable day.
+     *
+     * Query parameters:
+     * * campus:   the ID of the campus to get timetable day for
+     * * day:      the day number to get
+     * * date:     Date to get next or previous occurence in relation to.
+     *             Defaults to current date.
+     * * previous: If true, gets previous date - otherwise, gets next date.
+     *
+     */
+    public function dateForTimetableDay()
+    {
+        $campus    = $this->request->query['campus'];
+        $dayNumber = $this->request->query['day'];
+        $date      = strtotime($this->request->query['date']);
+        $previous  = $this->request->query['previous'];
+        $code      = 200;
+        $error     = '';
+        if ($date === false) {
+            $date = null;
+        }
+        try {
+            $campusObj = \Schoolbox\CampusMapper::getInstance()->findById($campus);
+
+            $nearestDate = $previous ?
+                $this->getExternalTimetableHandler()->getPreviousDateForDayNumber($campusObj, $dayNumber, $date) :
+                $this->getExternalTimetableHandler()->getNextDateForDayNumber($campusObj, $dayNumber, $date);
+        } catch (\InvalidArgumentException $e) {
+            $code  = 400;
+            $error = $e->getMessage();
+        } catch (\RangeException $e) {
+            $code  = 400;
+            $error = $e->getMessage();
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $code  = 400;
+            $error = $e->getMessage();
+        }
+
+        $data = array();
+        if ($error) {
+            $data['error'] = $error;
+        } elseif (isset($nearestDate) && $nearestDate instanceof DateTime) {
+            $data['date'] = $nearestDate->format('Y-m-d');
+        }
+        $this->response->status->setCode($code);
+        $this->response->content->set(
+            array(
+                'format' => 'json',
+                'data'   => $data,
+            )
+        );
+    }
+
+    /**
+     * @return External_Timetable
+     */
+    protected function getExternalTimetableHandler()
+    {
+        return $this->externalTimetableHandler;
+    }
+
+    /**
+     * @param  External_Timetable $externalTimetableHandler
+     *
+     * @return $this
+     */
+    protected function setExternalTimetableHandler($externalTimetableHandler)
+    {
+        $this->externalTimetableHandler = $externalTimetableHandler;
+        return $this;
+    }
+}

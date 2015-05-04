@@ -436,8 +436,7 @@
                 campusList: {USER_CAMPUS_LIST},
                 getChangeDateAjax: function(campus, day, date, previous) {
                     return {
-                        // TODO change this to non RB
-                        url:      '/resource-booking/booking/dateForTimetableDay',
+                        url:      '/timetable/dateForTimetableDay',
                         dataType: 'json',
                         data:     {
                             campus:   campus,
