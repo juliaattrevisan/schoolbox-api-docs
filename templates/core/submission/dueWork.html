@@ -38,6 +38,7 @@ $(function () {
         $.post('/ajax/submission.php', { id : ev , uid : {WORK_USER_ID}, is_assess: is_assess}, function (data) {
 
             if (data !== null) {
+                data.buttonClass = data.action == 'Submit' ? 'up-arrow' : 'eyeball';
                 var template = is_assess ? templateAssess : templateDueWork;
                 var output   = $(template(data));
                 output.appendTo('body');
@@ -141,7 +142,7 @@ $(function () {
                 {{?}}
                 {{? (it.action||'').length}}
                 <p class="details clearfix">
-                <a class="btn eyeball float-left" href="/submission/submissionHistory/{{=it.id}}/{{=it.uid}}"><span></span>{{=it.action}}</a>
+                <a class="btn {{=it.buttonClass}} float-left" href="/submission/submissionHistory/{{=it.id}}/{{=it.uid}}"><span></span>{{=it.action}}</a>
                 </p>
                 {{?}}
             </div>
