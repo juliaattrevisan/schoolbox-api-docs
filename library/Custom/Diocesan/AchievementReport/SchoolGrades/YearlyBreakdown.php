@@ -98,6 +98,12 @@ class YearlyBreakdown extends Base {
                  */
                 if (in_array($current['StrippedResult'], $this->getLetterRegistry())) {
                     $yearStack[$current['Fileyear']][$current['CourseName']]['letters'][$current['StrippedResult']]++;
+
+                    if (in_array($current['StrippedResult'], array('A', 'M', 'E'))) {
+                        $yearStack[$current['Fileyear']][$current['CourseName']]['achievedGrades']++;
+                        $totals[$current['Fileyear']]['achievedGrades']++;
+                    }
+
                     $totals[$current['Fileyear']]['letters'][$current['StrippedResult']]++;
                 }
             }

@@ -67,7 +67,7 @@
                 <th class="letter">A</th>
                 <th class="letter">M</th>
                 <th class="letter">E</th>
-                <th class="numeric">Achieved?</th>
+                <th class="numeric">Achieved</th>
                 <th class="numeric">Available</th>
             </tr>
         </thead>
@@ -80,7 +80,7 @@
                 <td class="letter">{{ yearlyValues.letters.A }}</td>
                 <td class="letter">{{ yearlyValues.letters.M }}</td>
                 <td class="letter">{{ yearlyValues.letters.E }}</td>
-                <td class="numeric">?</td>
+                <td class="numeric">{{ yearlyValues.achievedGrades }}</td>
                 <td class="numeric">{{ yearlyValues.availableGrades }}</td>
             </tr>
             {% endfor %}
@@ -93,7 +93,7 @@
                 <td class="letter">{{ yearlyBreakdown.data.totals[year].letters.A }}</td>
                 <td class="letter">{{ yearlyBreakdown.data.totals[year].letters.M }}</td>
                 <td class="letter">{{ yearlyBreakdown.data.totals[year].letters.E }}</td>
-                <td class="numeric">?</td>
+                <td class="numeric">{{ yearlyBreakdown.data.totals[year].achievedGrades }}</td>
                 <td class="numeric">{{ yearlyBreakdown.data.totals[year].availableGrades }}</td>
             </tr>
         </tfoot>
