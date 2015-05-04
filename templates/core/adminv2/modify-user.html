@@ -484,7 +484,7 @@ $(function() {
 							<input type="hidden" value="1" name="type">
 							<label class="clearfix ">
 								<select class="formfield required" name="sid" id="groupSelect">
-									<option value="">&lt;- Please Select a Group -&gt;</option>
+									<option value="">Please Select a Group</option>
 									<!-- BEGIN all_group -->
 									<option value="{ALL_GROUP_ID}">{ALL_GROUP_NAME}</option>
 									<!-- END all_group -->
@@ -639,65 +639,62 @@ $(function() {
                 </td>
             </tr>
             <!-- END user_curriculum -->
-			</tbody>
-            </table>
-					<form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" class="clearfix">
-							<input type="hidden" name="addService" />
-							<input type="hidden" value="{USERID}" name="uid">
-						<table cellpadding="0" cellspacing="0" >
-						<colgroup>
-							<col width="10%" />
-							<col width="20%" />
-							<col width="70%" />
-						</colgroup>
-						<tr>
-							<th>Service</th>
-							<th>Campus</th>
-							<th>Access</th>
-						</tr>
-						<tr>
-						<td>
-						<label>
-							<select class="formfield" name="service" id="serviceSelect">
-								<option value="">&lt;-Select service -&gt;</option>
-								<option value="2">Calendar</option>
-								<option value="3">News</option>
-								<option value="5">CMS</option>
-                                <option value="6">Housemaster</option>
-                                <option value="7">Resource Booking</option>
-                                <option value="8">Curriculum</option>
-							</select>
-						</label>
-						</td>
-						<td>
-						<label>
-							<select name="sid" id="campusSelect">
-							<option value="">&lt;-Select campus -&gt;</option>
-							<!-- BEGIN campusPermsList -->
-								<!-- BEGIN perm_campus -->
-								<option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_SELECTED}>{PERM_CAMPUS_NAME}</option>
-								<!-- END perm_campus -->
-							<!-- END campusPermsList -->
-							</select>
-						</label>
-						</td>
-						<td>
-							<label><input type="radio" name="type" value="1" checked="checked" />Read</label>
-							<label><input type="radio" name="type" value="2" />Write</label>
-							<label><input type="radio" name="type" value="3" />Moderate</label>
-						</td>
-						</tr>
-						<tr>
-						<td colspan="3">
-				
-						<label class="clearfix float-left">
-						
-						<input type="submit" class="submit-btn-plain" value="Add" name="serviceSubmit">
-						</label>
-						</td>
-						</tr>
-						</table>
-					</form>
+		</tbody>
+    </table>
+	<form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" class="clearfix">
+		<input type="hidden" name="addService" />
+		<input type="hidden" value="{USERID}" name="uid">
+		<table>
+			<colgroup>
+				<col width="10%" />
+				<col width="20%" />
+				<col width="70%" />
+			</colgroup>
+			<tr>
+				<th>Service</th>
+				<th>Campus</th>
+				<th>Access</th>
+			</tr>
+			<tr>
+				<td>
+					<label>
+						<select class="formfield" name="service" id="serviceSelect">
+							<option value="">Select Service</option>
+							<option value="2">Calendar</option>
+							<option value="3">News</option>
+							<option value="5">CMS</option>
+				            <option value="6">Housemaster</option>
+				            <option value="7">Resource Booking</option>
+				            <option value="8">Curriculum</option>
+						</select>
+					</label>
+				</td>
+				<td>
+					<label>
+						<select name="sid" id="campusSelect">
+						<option value="">Select Campus</option>
+						<!-- BEGIN campusPermsList -->
+							<!-- BEGIN perm_campus -->
+							<option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_SELECTED}>{PERM_CAMPUS_NAME}</option>
+							<!-- END perm_campus -->
+						<!-- END campusPermsList -->
+						</select>
+					</label>
+				</td>
+				<td>
+					<label><input type="radio" name="type" value="1" checked="checked" />Read</label>
+					<label><input type="radio" name="type" value="2" />Write</label>
+					<label><input type="radio" name="type" value="3" />Moderate</label>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3">
+					<label class="clearfix float-left">	
+					<input type="submit" class="submit-btn-plain" value="Add" name="serviceSubmit"></label>
+				</td>
+			</tr>
+		</table>
+	</form>
 </div>
 <h2><a name="linked"></a>Linked Accounts</h2>
 <div class="level clearfix">
