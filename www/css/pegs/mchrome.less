@@ -41,7 +41,7 @@
 @skin:              'pegs';             // skin name
 @banner-color:      @background;            // top banner background
 @navigation-color:  @banner-color;      // th and h3 foreground
-@link-color: 	    #003a63;            // item link foreground
+@link-color: 	   	#003a63;            // item link foreground
 @header-color:      #c7d7e4;            // article header background
 @background:        #002946;            // body background
 @login-color:       @background;      			// login background base-colour
@@ -50,6 +50,12 @@
 
 // OPTIONAL
 // any definitions in variables.less can be overridden by re-specifying here
+
+#nav li:before,
+header{
+	color: @header-color !important;
+	opacity: 1 !important;
+}
 
 // =============================================================================
 // Includes
