@@ -18,17 +18,6 @@ use Schoolbox\User;
 class Controller extends Base {
 
     /**
-     * Urls you can visit
-     *
-     * @var string
-     */
-    private $navigation = array(
-        'schoolgrades' => 'School Grades',
-        'ib' => 'IB',
-        'ncea' => 'NCEA'
-    );
-
-    /**
      * Internal/External types
      *
      * Maps to css classes
@@ -48,7 +37,6 @@ class Controller extends Base {
         )
     );
 
-
     /**
      * Selects which report to redirect towards, based on certain
      * conditions particular to a student
@@ -59,8 +47,10 @@ class Controller extends Base {
      * @param $year
      */
     public function selector($db, User $user, $externalUser, $year) {
-        $selector = new ReportSelector($db, $user, $externalUser);
-        $report = $selector->determine();
+        $selector = new NavigationSelector($db, $user, $externalUser);
+        $selector->determineDefaultReport();
+
+        $report = $selector->getDefaultReport();
 
         switch ($report) {
             case 'schoolGrades':
@@ -94,6 +84,8 @@ class Controller extends Base {
      * School Grades page
      */
     public function schoolGrades($db, $user, $externalUser, $year) {
+        $selector = new NavigationSelector($db, $user, $externalUser);
+
         $gradeSummaryTable = new SchoolGrades\GradeSummary($externalUser, $db, $year);
         $yearlyBreakdownTable = new SchoolGrades\YearlyBreakdown($externalUser, $db, $year);
         $entriesAndResultsTable = new SchoolGrades\EntriesAndResults($externalUser, $db, $year);
@@ -102,7 +94,7 @@ class Controller extends Base {
             'template' => '@schoolgrades/index.twig',
             'data' => array(
                 'navigation' => array(
-                    'all' => $this->getNavigation(),
+                    'all' => $selector->getAvailableNavigation(),
                     'selected' => 'schoolgrades'
                 ),
                 'preselectedYear' => $year,
@@ -137,6 +129,8 @@ class Controller extends Base {
      * @param $year
      */
     public function ib($db, $user, $externalUser, $year) {
+        $selector = new NavigationSelector($db, $user, $externalUser);
+
         $progressGradeSummary = new IB\ProgressGradeSummary($externalUser, $db, $year);
         $yearlyBreakdown = new IB\YearlyBreakdown($externalUser, $db, $year);
 
@@ -144,7 +138,7 @@ class Controller extends Base {
             'template' => '@ib/index.twig',
             'data' => array(
                 'navigation' => array(
-                    'all' => $this->getNavigation(),
+                    'all' => $selector->getAvailableNavigation(),
                     'selected' => 'ib'
                 ),
                 'preselectedYear' => $year,
@@ -173,6 +167,8 @@ class Controller extends Base {
      * @param $year
      */
     public function ncea($db, $user, $externalUser, $year) {
+        $selector = new NavigationSelector($db, $user, $externalUser);
+
         $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($externalUser, $db, $year);
         $qualifications = new NCEA\Qualifications($externalUser, $db, null);
         $creditSummary = new NCEA\CreditSummary($externalUser, $db, null);
@@ -182,7 +178,7 @@ class Controller extends Base {
             'template' => '@ncea/index.twig',
             'data' => array(
                 'navigation' => array(
-                    'all' => $this->getNavigation(),
+                    'all' => $selector->getAvailableNavigation(),
                     'selected' => 'ncea'
                 ),
                 'footer' => array(
@@ -281,26 +277,6 @@ class Controller extends Base {
 
     /* Getters/Setters
      */
-
-    /**
-     * Set navigation
-     *
-     * @param string $navigation
-     */
-    private function setNavigation($navigation)
-    {
-        $this->navigation = $navigation;
-    }
-
-    /**
-     * Get navigation
-     *
-     * @return string
-     */
-    private function getNavigation()
-    {
-        return $this->navigation;
-    }
 
     /**
      * Set types

@@ -14,7 +14,7 @@ use Alaress_Probe as Probe;
 use Schoolbox\User;
 use MSSQL;
 
-class ReportSelector {
+class NavigationSelector {
 
     /**
      * MSSQL db handler
@@ -38,6 +38,34 @@ class ReportSelector {
     private $user = null;
 
     /**
+     * Has NCEA records
+     *
+     * @var bool
+     */
+    private $hasNcea = false;
+
+    /**
+     * Has IB records
+     *
+     * @var bool
+     */
+    private $hasIb = false;
+
+    /**
+     * Available navigation options
+     *
+     * @var array
+     */
+    private $availableNavigation = array();
+
+    /**
+     * Default report information
+     *
+     * @var null
+     */
+    private $defaultReport = null;
+
+    /**
      * Constructor
      *
      * @param $db
@@ -48,6 +76,10 @@ class ReportSelector {
         $this->setExternalUser($externalUser);
         $this->setDb($db);
         $this->setUser($user);
+
+        /* Determine navigation options
+         */
+        $this->navigationData();
     }
 
     /**
@@ -55,10 +87,10 @@ class ReportSelector {
      *
      * @return string
      */
-    public function determine() {
+    public function determineDefaultReport() {
         if ($this->getUser()->getDefaultCampus()->getExtTimetableCode() == 'JNR') {
             if (($this->getUser()->getYear() >= 1) && ($this->getUser()->getYear() <= 6)) {
-                return array('error' => 'Standardised Test Scores not available.');
+                $this->setDefaultReport(array('error' => 'Standardised Test Scores not available.'));
             }
         }
         elseif ($this->getUser()->getDefaultCampus()->getExtTimetableCode() == 'SNR') {
@@ -66,44 +98,76 @@ class ReportSelector {
             /* School Grades by default
              */
             if (($this->getUser()->getYear() >= 7) && ($this->getUser()->getYear() <= 10)) {
-                return 'schoolGrades';
+                $this->setDefaultReport('schoolGrades');
             }
             /* NCEA for year 11 specifically
              */
             elseif ($this->getUser()->getYear() == 11) {
-                if ($this->isNcea()) {
-                    return 'ncea';
+                if ($this->getHasNcea()) {
+                    $this->setDefaultReport('ncea');
                 }
                 else {
-                    return array('error' => 'Year 11 student not in NCEA.');
+                    $this->setDefaultReport(array('error' => 'Year 11 student not in NCEA.'));
                 }
             }
             /* Need to decide whether this is an IB or an NCEA student
              */
             elseif (($this->getUser()->getYear() >= 12) && ($this->getUser()->getYear() <= 13)) {
-                if ($this->isIb()) {
-                    return 'ib';
+                if ($this->getHasIb()) {
+                    $this->setDefaultReport('ib');
                 }
-                elseif ($this->isNcea()) {
-                    return 'ncea';
+                elseif ($this->getHasNcea()) {
+                    $this->setDefaultReport('ncea');
                 }
                 else {
-                    return array('error' => 'Year 12/13 student not in NCEA or IB.');
+                    $this->setDefaultReport(array('error' => 'Year 12/13 student not in NCEA or IB.'));
                 }
             }
         }
     }
 
     /**
+     * Checks to see how many IB records exist for a person
+     * Checks to see how many NCEA records exist for a person
+     *
+     * Remembers in a boolean format
+     *
+     * Facade method
+     */
+    private function navigationData() {
+        $availableNavigation = array();
+
+        /* School Grades always available
+         */
+        $availableNavigation['schoolgrades'] = 'School Grades';
+
+        /* Conditionally add NCEA option
+         */
+        if ($this->hasNcea()) {
+            $this->setHasNcea(true);
+            $availableNavigation['ncea'] = 'NCEA';
+        }
+
+        /* Conditionally add IB option
+         */
+        if ($this->hasIb()) {
+            $this->setHasIb(true);
+            $availableNavigation['ib'] = 'IB';
+        }
+
+        $this->setAvailableNavigation($availableNavigation);
+    }
+
+    /**
      * Find out if they are in the NCEA table
      */
-    private function isNcea() {
+    private function hasNcea() {
         $externalUser = $this->getExternalUser();
         $externalUserId = $externalUser['StudentID'];
 
         $query = "
             SELECT
-                COUNT(*)
+                TOP 1 COUNT(*)
             FROM
                 SynergyOne.dbo.uvSchoolBoxNCEAResults
             WHERE
@@ -118,13 +182,13 @@ class ReportSelector {
     /**
      * Find out if they are in the IB table
      */
-    private function isIb() {
+    private function hasIb() {
         $externalUser = $this->getExternalUser();
         $externalUserId = $externalUser['StudentID'];
 
         $query = "
             SELECT
-                COUNT(*)
+                TOP 1 COUNT(*)
             FROM
                 SynergyOne.dbo.uvSchoolBoxIBResults
             WHERE
@@ -197,5 +261,85 @@ class ReportSelector {
     private function getUser()
     {
         return $this->user;
+    }
+
+    /**
+     * Set hasIb
+     *
+     * @param boolean $hasIb
+     */
+    private function setHasIb($hasIb)
+    {
+        $this->hasIb = $hasIb;
+    }
+
+    /**
+     * Get hasIb
+     *
+     * @return boolean
+     */
+    private function getHasIb()
+    {
+        return $this->hasIb;
+    }
+
+    /**
+     * Set hasNcea
+     *
+     * @param boolean $hasNcea
+     */
+    private function setHasNcea($hasNcea)
+    {
+        $this->hasNcea = $hasNcea;
+    }
+
+    /**
+     * Get hasNcea
+     *
+     * @return boolean
+     */
+    private function getHasNcea()
+    {
+        return $this->hasNcea;
+    }
+
+    /**
+     * Set default report
+     *
+     * @param null $defaultReport
+     */
+    private function setDefaultReport($defaultReport)
+    {
+        $this->defaultReport = $defaultReport;
+    }
+
+    /**
+     * Get default report
+     *
+     * @return null
+     */
+    public function getDefaultReport()
+    {
+        return $this->defaultReport;
+    }
+
+    /**
+     * Set available navigation
+     *
+     * @param array $availableNavigation
+     */
+    private function setAvailableNavigation($availableNavigation)
+    {
+        $this->availableNavigation = $availableNavigation;
+    }
+
+    /**
+     * Get available navigation
+     *
+     * @return array
+     */
+    public function getAvailableNavigation()
+    {
+        return $this->availableNavigation;
     }
 }
