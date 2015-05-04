@@ -129,7 +129,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
             'document' => [
                 "%pdf%",
                 "%msword%",
-                "%officedoc%",
+                "%vnd.ms%",
                 "%rtf",
                 "text%",
                 "%document%",
