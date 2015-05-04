@@ -125,45 +125,46 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
         }
 
         // Put together mimetype filters
+        $fileTypeMimes = [
+            'document' => [
+                "%pdf%",
+                "%msword%",
+                "%vnd.ms%",
+                "%rtf",
+                "text%",
+                "%document%",
+                "%powerpoint%",
+            ],
+            'image' => ["%image%",],
+            'audio' => ["%audio%",],
+            'video' => ["%video%", "%flash%", "%realmedia%",],
+        ];
+
         if (!is_array($fileTypes)) {
             $fileTypes = [$fileTypes];
         }
         if (!in_array('all', $fileTypes)) {
-            $mimetypes = [];
+            $mimeParts      = [];
+            $otherMimeParts = [];
             foreach ($fileTypes as $fileType) {
-                switch ($fileType) {
-                    case 'document':
-                        $mimetypes[] = "%pdf%";
-                        $mimetypes[] = "%msword%";
-                        $mimetypes[] = "%officedoc%";
-                        $mimetypes[] = "%rtf";
-                        $mimetypes[] = "text%";
-                        $mimetypes[] = "%document%";
-                        $mimetypes[] = "%powerpoint%";
-                        break;
-                    case 'image':
-                        $mimetypes[] = "%image%";
-                        break;
-                    case 'audio':
-                        $mimetypes[] = "%audio%";
-                        break;
-                    case 'video':
-                        $mimetypes[] = "%video%";
-                        $mimetypes[] = "%flash%";
-                        $mimetypes[] = "%realmedia%";
-                        break;
-                    default:
-                        break;
+                if (!empty($fileTypeMimes[$fileType])) {
+                    foreach ($fileTypeMimes[$fileType] as $mime) {
+                        $mimeParts[] = "m.mime LIKE '$mime'";
+                    }
+                } elseif ($fileType == 'other') {
+                    // Other: any not in document, image, audio or video
+                    foreach ($fileTypeMimes as $fileType => $mimesForFileType) {
+                        foreach ($mimesForFileType as $mime) {
+                            $otherMimeParts[] = "m.mime LIKE '$mime'";
+                        }
+                    }
                 }
             }
-            if (!empty($mimetypes)) {
-                $whereParts[] = implode(
-                    ' OR ',
-                    array_map(
-                        function($m) { return "m.mime LIKE '$m'"; },
-                        $mimetypes
-                    )
-                );
+            if (!empty($otherMimeParts)) {
+                $mimeParts[] = 'NOT('.implode(' OR ', $otherMimeParts).')';
+            }
+            if (!empty($mimeParts)) {
+                $whereParts[] = implode(' OR ', $mimeParts);
             }
         }
         $baseQuery .= ' WHERE '.$table.'.deleted_at IS NULL AND ('.implode(') AND (', $whereParts).')';
