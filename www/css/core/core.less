@@ -9381,10 +9381,10 @@ ul.submission-list {
                 top: 0;
                 right: 0;
                 height: 100%;
-                width: 50px;
+                width: 40px;
                 padding: 5px;
-                font-size: 0.8em;
                 border-left: 1px solid @border-color;
+                text-align: center;
                 span {
                     display: block;
                     font-size: 1.6em;
@@ -9530,24 +9530,10 @@ ul.submission-list {
         margin-top: 2em;
         margin-bottom: 1em;
     }
-    .one-third {
-        width: 32%;
-        float: left;
-        margin-left: 2%;
-    }
-    .two-thirds {
-        width: 66%;
-        float: left;
-        > div {
-            width: 49%;
-            float: left;
-            &:first-of-type {
-                margin-right: 2%;
-            }
-        }
-    }
     .returned-mark {
-        font-size: 1.5em;
+        background-color: @white;
+        padding: 2px 4px;
+        margin: 0 4px;
     }
     .rubric-display {
         #rubric-chart {
@@ -9557,7 +9543,6 @@ ul.submission-list {
         .rubric-grade {
             display: none;
         }
-
     }
     #rubric-chart {
         position: absolute;
