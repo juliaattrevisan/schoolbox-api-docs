@@ -85,6 +85,7 @@ class Controller extends Base {
      */
     public function schoolGrades($db, $user, $externalUser, $year) {
         $selector = new NavigationSelector($db, $user, $externalUser);
+        $footer = new SchoolGrades\Footer($externalUser, $db, null);
 
         $gradeSummaryTable = new SchoolGrades\GradeSummary($externalUser, $db, $year);
         $yearlyBreakdownTable = new SchoolGrades\YearlyBreakdown($externalUser, $db, $year);
@@ -96,6 +97,9 @@ class Controller extends Base {
                 'navigation' => array(
                     'all' => $selector->getAvailableNavigation(),
                     'selected' => 'schoolgrades'
+                ),
+                'footer' => array(
+                    'data' => $footer->findData(),
                 ),
                 'preselectedYear' => $year,
                 'externalUser' => $externalUser,
@@ -130,6 +134,7 @@ class Controller extends Base {
      */
     public function ib($db, $user, $externalUser, $year) {
         $selector = new NavigationSelector($db, $user, $externalUser);
+        $footer = new IB\Footer($externalUser, $db, null);
 
         $progressGradeSummary = new IB\ProgressGradeSummary($externalUser, $db, $year);
         $yearlyBreakdown = new IB\YearlyBreakdown($externalUser, $db, $year);
@@ -140,6 +145,9 @@ class Controller extends Base {
                 'navigation' => array(
                     'all' => $selector->getAvailableNavigation(),
                     'selected' => 'ib'
+                ),
+                'footer' => array(
+                    'data' => $footer->findData(),
                 ),
                 'preselectedYear' => $year,
                 'externalUser' => $externalUser,
@@ -168,11 +176,11 @@ class Controller extends Base {
      */
     public function ncea($db, $user, $externalUser, $year) {
         $selector = new NavigationSelector($db, $user, $externalUser);
+        $footer = new NCEA\Footer($externalUser, $db, null);
 
         $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($externalUser, $db, $year);
         $qualifications = new NCEA\Qualifications($externalUser, $db, null);
         $creditSummary = new NCEA\CreditSummary($externalUser, $db, null);
-        $footer = new NCEA\Footer($externalUser, $db, null);
 
         $output = array(
             'template' => '@ncea/index.twig',
