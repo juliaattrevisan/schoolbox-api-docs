@@ -31,4 +31,14 @@ interface Receiver
      */
     public function accept($filename, $tempLocation, $public = false);
 
-} 
+    /**
+     * Accept a datastream upload
+     *
+     * @param string   $filename
+     * @param resource $fp
+     * @param bool     $public
+     * @return Model
+     */
+    public function acceptStream($filename, $fp, $public = false);
+
+}

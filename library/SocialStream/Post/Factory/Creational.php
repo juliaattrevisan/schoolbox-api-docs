@@ -381,7 +381,7 @@ class Creational extends AbstractFactory {
 			 */
 			if (!preg_match('/^icon:/', $chain->getResult())) {
 				$cache = new \SocialStream\Cache\Original();
-				$cache->init($this->getProduct()->getThumbnail());
+				$cache->initPost($this->getProduct());
 
 				/* Thumbnail metadata was found, but thumbnail itself
 				 * isn't there (broken link)
@@ -429,7 +429,7 @@ class Creational extends AbstractFactory {
 			/* Save the original in the cache location
 			 */
 			$cache = new \SocialStream\Cache\Original();
-			$cache->init($url);
+			$cache->initPost($this->getProduct());
 		}
 		/* Set up storage stream location and its icon thumbnails
 		 */
@@ -470,6 +470,7 @@ class Creational extends AbstractFactory {
 		/* Set up video thumbnails
 		 */
 		if ($file->getMimeType()->isVideo()) {
+
 		}
 		/* Set up image thumbnails
 		 */
@@ -482,7 +483,7 @@ class Creational extends AbstractFactory {
 			/* Save the original in the cache location
 			 */
 			$cache = new \SocialStream\Cache\Original();
-			$cache->init($url);
+			$cache->initPost($this->getProduct());
 		}
 		/* Set up icon thumbnails
 		 */

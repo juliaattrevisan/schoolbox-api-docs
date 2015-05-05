@@ -68,6 +68,12 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
         ));
 
         $this->hasMap(array(
+            'column'   => 'cache_hash',
+            'property' => 'cacheHash',
+            'type'     => self::TYPE_STRING,
+        ));
+
+        $this->hasMap(array(
             'column'   => 'type',
             'property' => 'type',
             'type'     => self::TYPE_STRING,
@@ -136,7 +142,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
      * Custom findById
      *
      * @param mixed $identifier
-     * @return object|Model
+     * @return SocialStream_Post_Abstract
      * @throws Schoolbox\Mapper\Exception
      */
     public function findById($identifier)

@@ -11,8 +11,9 @@ namespace SocialStream;
 
 use Alaress\Image;
 use Alaress\Image\Implementation\Imagine;
+use Schoolbox\Resource\Storage;
 
-require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
+require_once __DIR__ . '/../../include/Bootstrap.php';
 
 $postId = $_GET['id'];
 $size = $_GET['size'];
@@ -24,12 +25,19 @@ try {
 }
 
 $cache = new Cache\Original();
-$cache->init($post->getThumbnail());
+$cache->initPost($post);
 
-/* Transform it to some arbitrary dimension for now
- * and borrow the Storage transformation definitions
- */
-$cache = new Cache\Filesystem($cache->getCachedFile(), $size);
+$urlDetect = new UrlDetection($post->getUrl());
+
+if ($urlDetect->isStorageUrl()) {
+    $hash = $urlDetect->getHash();
+    $storage = Storage\Mapper::getInstance()->findByHash($hash);
+
+} else {
+    $storage = $cache->getCachedFile();
+}
+
+$cache = new Image\Cache\Storage($storage, $size);
 
 try {
     $processor = new Image\Processor\Standard(

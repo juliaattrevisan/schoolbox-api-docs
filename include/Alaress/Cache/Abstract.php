@@ -112,8 +112,8 @@ abstract class Alaress_Cache_Abstract {
 	/**
 	 * Setup method
 	 *
-	 * @param $url
-	 * @return \Alaress_Cache_Locker_Abstract
+	 * @param string $url
+	 * @return self
 	 */
 	public function init($url) {
 		$this->setUrl($url);
@@ -424,7 +424,7 @@ abstract class Alaress_Cache_Abstract {
 	 *
 	 * @param string $lockFile
 	 */
-	private function setLockFile($lockFile) {
+	protected function setLockFile($lockFile) {
 		$this->lockFile = $lockFile;
 	}
 
@@ -433,7 +433,7 @@ abstract class Alaress_Cache_Abstract {
 	 *
 	 * @return string
 	 */
-	private function getLockFile() {
+    protected function getLockFile() {
 		return $this->lockFile;
 	}
 
@@ -451,7 +451,7 @@ abstract class Alaress_Cache_Abstract {
 	 *
 	 * @param  $url
 	 */
-	private function setUrl($url) {
+	protected function setUrl($url) {
 		$this->url = $url;
 	}
 
