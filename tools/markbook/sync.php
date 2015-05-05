@@ -13,6 +13,9 @@
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
+
 use Alaress\Lumberjack\Logger;
 
 require_once __DIR__ . '/../../include/Bootstrap.php';
@@ -38,6 +41,9 @@ HELP;
 }
 $folderMapper = new FolderMapper();
 $submissionMapper = new SubmissionBoxMapper();
+$onlineAssessmentMapper = new OnlineAssessmentMapper();
+$attemptMapper = new AttemptMapper();
+
 $resultMapper = new ReturnedWorkMapper();
 $markbookHandler = new SubmissionReturn();
 
@@ -98,6 +104,52 @@ foreach($categoryList as $category) {
             $return->setOwner(new \Schoolbox\User);
             $return->getOwner()->setId($result[0]['owner']);
             $return->setComment($result[0]['comment']);
+
+            if(!$dryRun) {
+                $markbookExternal->setMark($return);
+            }
+        }
+    }
+
+    // Process quizzes
+    $log->notice("Processing quizzes from: {$category->getName()} ({$category->getCodeString()})");
+    $quizList = $onlineAssessmentMapper->getDueActivities(array($category->getId()),$startTime->getUnixTimestamp(), $endTime->getUnixTimestamp());
+    foreach($quizList as $activity) {
+
+        $quiz = $activity->getAssessment();
+
+
+        $markbook = $markbookExternal->getAssessment($activity);
+
+        if(is_array($markbook)) {
+            $log->info("Updating existing assessment: {$activity->getName()}");
+            if(!$dryRun) {
+                $markbookExternal->updateAssessment($activity);
+            }
+        }
+        elseif( !$updateOnly) {
+            $log->info("Creating new assessment: {$activity->getName()}");
+            if(!$dryRun) {
+                $markbookExternal->createAssessment($activity);
+            }
+        }
+        else {
+            $log->warning("Skipping creation in update only mode: {$activity->getName()}");
+            continue;
+        }
+
+        $classList = $attemptMapper->getAllAttempts($quiz->getId(), array('most_recent'=>true));
+        var_dump($classList);
+        $log->notice("Setting marks for ".count($classList)." students");
+        foreach($classList as $studentID => $result) {
+
+            // Pretending to be a mapper, even though I dont have one yet.
+            $return = new Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork();
+            $return->setSubmissionBox($quiz);
+            $return->setNormalizedMark($result[0]['mark']);
+            $return->setMarker($quiz->getUser());
+            $return->setOwner(new \Schoolbox\User);
+            $return->getOwner()->setId($studentID);
 
             if(!$dryRun) {
                 $markbookExternal->setMark($return);

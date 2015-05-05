@@ -228,29 +228,32 @@ class AttemptMapper extends Mapper
         $count = 0;
 
         foreach ($stmt as $row) {
-            // only include the most recent attempt for each user (ie. first seen)
-            if (!empty($extra_params['most_recent']) && $extra_params['most_recent'] == true) {
-                // if the user is already in the array (ie already seen), just increment the attempt count
-                if (array_key_exists($row['user_id'], $attempts) || $row['max_mark'] == 0) {
-                    $attempts[$row['user_id']][0]['attempts']++;
-                    continue;
+
+            if($row['user_id']) {
+                // only include the most recent attempt for each user (ie. first seen)
+                if (!empty($extra_params['most_recent']) && $extra_params['most_recent'] == true) {
+                    // if the user is already in the array (ie already seen), just increment the attempt count
+                    if (array_key_exists($row['user_id'], $attempts) || $row['max_mark'] == 0) {
+                        $attempts[$row['user_id']][0]['attempts']++;
+                        continue;
+                    }
                 }
+
+                // include
+                $mark = ($row['mark'] / $row['max_mark']) * 100;
+                $attempts[$row['user_id']][] = array(
+                    'section_id'   => $row['section_id'],
+                    'attempt_id'   => $row['attempt_id'],
+                    'mark'         => $mark,
+                    'display_mark' => sprintf("%d / %d", $row['mark'], $row['max_mark']),
+                    'comment'      => '',
+                    'attempts'     => 1
+                );
+
+                // add to averages vars
+                ++$count;
+                $sum += $mark;
             }
-
-            // include
-            $mark = ($row['mark'] / $row['max_mark']) * 100;
-            $attempts[$row['user_id']][] = array(
-                'section_id'   => $row['section_id'],
-                'attempt_id'   => $row['attempt_id'],
-                'mark'         => $mark,
-                'display_mark' => sprintf("%d / %d", $row['mark'], $row['max_mark']),
-                'comment'      => '',
-                'attempts'     => 1
-            );
-
-            // add to averages vars
-            ++$count;
-            $sum += $mark;
         }
         if (!empty($extra_params['calc_average']) && $extra_params['calc_average'] == true) {
             $attempts['avg'] = $count ? $sum / $count : 0;
