@@ -120,7 +120,9 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
 
         $storagePath = $ad->applyPathPrefix($mgr->calcPath($file->getStorage()));
 
-        symlink($storagePath, "$deprecatedDir/{$file->getId()}.dat");
+        if(!is_link("$deprecatedDir/{$file->getId()}.dat")) {
+            symlink($storagePath, "$deprecatedDir/{$file->getId()}.dat");
+        }
 
         return true;
     }
