@@ -58,21 +58,23 @@ class Manager
     {
         // safety checks!
         $mime = $storage->getMimetype();
+        $base = $storage->getBasename();
+        $suff = "Try a different file or contact your IT administrator.";
 
         // assert: mime set
         if (!$mime instanceof File\Mimetype) {
-            throw new File\Exception("No mimetype set");
+            throw new File\Exception("Your file, '$base', has no detectable type. $suff", File\Exception::CODE_MIMETYPE_NOT_FOUND);
         }
 
         // assert: mime allowed
         if (!$mime->isEnabled() || $mime->isDeleted()) {
-            throw new File\Exception("Your file is not a valid file type", File\Exception::CODE_MIMETYPE_NOT_ALLOWED);
+            throw new File\Exception("Your file, '$base', is not a valid file type. $suff", File\Exception::CODE_MIMETYPE_NOT_ALLOWED);
         }
 
         // assert: acceptable size
         if ($mime->getMaxFileSize() < $storage->getSize()) {
             $humanSize = $this->abf->bytesToString($mime->getMaxFileSize());
-            throw new File\Exception("The size of the uploaded file exceeds the file size restrictions of $humanSize.", File\Exception::CODE_FILE_TOO_LARGE);
+            throw new File\Exception("The size of the uploaded file, '$base', exceeds the file size restriction of $humanSize. $suff", File\Exception::CODE_FILE_TOO_LARGE);
         }
 
     }
@@ -114,7 +116,7 @@ class Manager
             // attempt to copy the file
             if (!$this->copy($tempPath, $storage)) {
                 // copy failed, let's get out of here
-                throw new File\Exception("Failed to copy uploaded file to storage");
+                throw new File\Exception("Failed to copy uploaded file, '{$storage->getBasename()}', to storage");
             }
 
             $this->reverseSymlink($storage);
