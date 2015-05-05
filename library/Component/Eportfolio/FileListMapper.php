@@ -157,7 +157,7 @@ class FileListMapper extends Schoolbox\Mapper
             FROM `{$this->table}`
             LEFT JOIN {$this->getJoinSql($this->myFileJoin, $this->table, $this->myFileAlias)}
             LEFT JOIN {$myFileMapper->getJoinSql($this->storageJoin, $this->myFileAlias, $this->storageAlias)}
-            LEFT JOIN {$storageMapper->getJoinSql($this->mimeJoin, $this->storageAlias, $this->mimeAlias)}
+            LEFT JOIN {$storageMapper->getJoinSql($this->mimeJoin, $this->storageAlias, $this->mimeAlias, true)}
         ";
     }
 

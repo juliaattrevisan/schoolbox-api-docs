@@ -42,7 +42,7 @@ class Result extends Base
 			FROM
 				`{$mapper->getTable()}` `f`
 				LEFT JOIN {$mapper->getJoinSql('hash', 'f', 's')}
-				LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e')}
+				LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e', true)}
 				LEFT JOIN {$mapper->getJoinSql('owner', 'f', 'o')}
 				LEFT JOIN {$mapper->getJoinSql('category', 'f', 'c')}
 				LEFT JOIN `perms` p ON `f`.category = `p`.cid
@@ -103,7 +103,7 @@ class Result extends Base
 			FROM
 				`{$mapper->getTable()}` `f`
 				LEFT JOIN {$mapper->getJoinSql('hash', 'f', 's')}
-				LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e')}
+				LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e', true)}
 				LEFT JOIN {$mapper->getJoinSql('owner', 'f', 'o')}
 				LEFT JOIN {$mapper->getJoinSql('category', 'f', 'c')}
 				LEFT JOIN `perms` p ON `f`.category = `p`.cid

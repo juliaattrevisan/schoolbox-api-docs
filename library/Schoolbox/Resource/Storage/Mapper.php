@@ -128,7 +128,7 @@ class Mapper extends Schoolbox\Mapper implements Receiver
           SELECT {$this->getColumnString()},
                  {$this->getJoinColumnString('allowedFileExtension')}
           FROM $table
-          LEFT JOIN {$this->getJoinSql('allowedFileExtension')}
+          LEFT JOIN {$this->getJoinSql('allowedFileExtension', '', '', true)}
         ";
     }
 
