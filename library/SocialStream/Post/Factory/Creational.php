@@ -400,7 +400,7 @@ class Creational extends AbstractFactory {
 	 * @param Storage\Model $uploadedFile
 	 */
 	private function spawnMetadataFromUpload(Storage\Model $uploadedFile) {
-		$this->getProduct()->setExternalTitle($uploadedFile->getHash() . '.' . $uploadedFile->getExtension());
+		$this->getProduct()->setExternalTitle($uploadedFile->getFilename() . '.' . $uploadedFile->getExtension());
 		$this->getProduct()->setExternalBody('');
 	}
 
