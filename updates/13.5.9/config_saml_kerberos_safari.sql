@@ -1,1 +1,0 @@
-INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`) VALUES ('saml_krb_safari', '0', 'Single Sign-On Kerberos Safari', 'Enable Safari browser on desktop for using kerberos authentication with SAML.', '3', '2', 'true');

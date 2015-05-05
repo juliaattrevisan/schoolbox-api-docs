@@ -1,5 +1,0 @@
-CREATE TABLE `dailyquote_data`( `id` INT(11) NOT NULL AUTO_INCREMENT, `description` TEXT, `author` VARCHAR(255), `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, PRIMARY KEY (`id`) );
-CREATE TABLE `dailyquote_config`( `id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR(255), `value` VARCHAR(255), PRIMARY KEY (`id`) );
-
-INSERT INTO `dailyquote_config` (`name`, `value`) VALUES ('last_selected_date', '2014-03-12');
-INSERT INTO `dailyquote_config` (`name`, `value`) VALUES ('last_selected_index', '1');

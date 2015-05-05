@@ -1,1 +1,0 @@
-INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`) VALUES ('saml_krb_firefox', '0', 'Single Sign-On Kerberos Firefox', 'Enable Firefox browser on desktop for using kerberos authentication with SAML.', '3', '2', 'true');

@@ -1,2 +1,0 @@
-Each user profile column is added individually and in order, so that any
-database that has some but not all of them can be updated incrementally.
