@@ -13,21 +13,24 @@
 
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
+use Alaress\Lumberjack\Logger;
 
+$log = new Logger;
 $mapper = Plagscan_DocumentMapper::getInstance();
 $docs   = $mapper->findByColumn('status', Plagscan_Document::STATUS_QUEUED);
+
 
 //
 // Hit the Plagscan API for each document.
 $key      = Config::get('plagscan_api_key');
 $username = Config::get('plagscan_username');
 if (empty($username) || empty($key)) {
-	echo strftime("[%F %T] Plagscan scan not run, as Plagscan is not configured\n");
+	$log->warning("Plagscan scan not run, as Plagscan is not configured");
 	exit;
 }
 
 
-echo strftime("[%F %T] Plagscan scan started\n");
+$log->info("Plagscan scan started");
 $gateway      = new Plagscan_Gateway($username, $key);
 $updated_docs = 0;
 foreach ($docs as $doc) {
@@ -43,11 +46,9 @@ foreach ($docs as $doc) {
      * than zero. I can't think of why zero would be valid.
      */
     if ($doc_id > 0) {
-        echo "Scanning $doc_id\n";
-        
         $stats  = $gateway->retrieve($doc_id, Plagscan_Gateway::MODE_RETRIEVE_STATISTICS_ONLY);
         if (!$stats) {
-            echo strftime("[%F %T] Plagscan scan failed - check API key and username?\n");
+            $log->error("Plagscan scan failed - check API key and username?");
             exit(2);
         }
 
@@ -56,6 +57,7 @@ foreach ($docs as $doc) {
         if ((string)$stats->MSG === 'ERR') {
             $doc->setStatus(Plagscan_Document::STATUS_UNSCANNABLE);
             Plagscan_DocumentMapper::getInstance()->save($doc);
+            $log->error("Document unscannable: ". print_r( $stats, true ));
             continue;
         }
 
@@ -68,9 +70,16 @@ foreach ($docs as $doc) {
                 ->setHtml($gateway->retrieve($doc_id, Plagscan_Gateway::MODE_RETRIEVE_HTML_INTERACTIVE));
             Plagscan_DocumentMapper::getInstance()->save($doc);
             $updated_docs++;
+            $log->info("Retrieved scan status for $doc_id");
+        }
+        else {
+
+            $response = $gateway->check($doc_id);
+
+            $log->warning("Bad level for document, still pending result: ".print_r($stats,true).print_r($response,true));
+
         }
     }
 }
 
-echo strftime("[%F %T] Plagscan scan completed: ");
-printf("%d documents marked as scanned.\n", $updated_docs);
+$log->info("Plagscan scan completed ".$updated_docs." scanned");

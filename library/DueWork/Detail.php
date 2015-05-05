@@ -5,8 +5,11 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission;
+
 class DueWork_Detail
 {
 
@@ -29,31 +32,33 @@ class DueWork_Detail
     const CLASS_PLAG_60 = 'plag-score critical';
 
     protected $submissionHandler;
-    protected $submissionStudentHandler;
     protected $submissionReturnHandler;
-    protected $userHandler;
     protected $groupHandler;
 
     protected $dueWork;
     protected $marksheet;
     protected $sitepageData;
 
+    /**
+     * @var SubmissionBox
+     */
+    protected $submissionBox;
+
 
     /**
-     * @param Schoolbox\Assessment\Component\SubmissionBox $submissionBox
+     * @param SubmissionBox $submissionBox
      */
-    public function __construct(Schoolbox\Assessment\Component\SubmissionBox $submissionBox)
+    public function __construct(SubmissionBox $submissionBox)
     {
-        $this->userHandler              = new User();
-        $this->submissionHandler        = new Submission();
-        $this->submissionStudentHandler = new SubmissionStudent();
+        $this->submissionHandler        = new \Submission();
         $this->submissionReturnHandler  = new SubmissionReturn();
         $this->groupHandler             = new Group();
 
         // set things we're interested in
-        $this->dueWork                    = $this->submissionHandler->getByID($submissionBox->getId()); // -_-'
+        $this->submissionBox              = $submissionBox;
+
         $this->dueWork['submissionCount'] = 0;
-        $this->marksheet                  = Marksheet_Factory::build($this->dueWork['mark_type_slug'], $submissionBox);
+        $this->marksheet                  = Marksheet_Factory::build($this->submissionBox->getMarkType()->getSlug(), $submissionBox);
     }
 
     /**
@@ -81,7 +86,7 @@ class DueWork_Detail
             // accepts submissions
             if ($this->getSubmissionType() != self::ACCEPT_NONE) {
                 $insertion['user']['instance'] = $user;
-                $submissions = Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper::getInstance()->findByColumnList(array('owner'=>$user->getId(), 'box_id'=>$this->dueWork['id']));
+                $submissions = Submission\FileMapper::getInstance()->findByColumnList(array('owner'=>$user->getId(), 'box_id'=>$this->submissionBox->getId()));
 
                 // an empty array is preferred to false
                 if ($submissions->count() < 1) {
@@ -101,7 +106,7 @@ class DueWork_Detail
 
                     // determine whether to give the ontime or late class
                     $submitTime                = $submissions->first()->getCreatedAt();
-                    $dueTime                   = new Alaress_Date_Format($this->dueWork['date'], 'Y-m-d');
+                    $dueTime                   = $this->submissionBox->getDueDate();
                     $insertion['user']['time'] = $submitTime;
 
 
@@ -126,7 +131,7 @@ class DueWork_Detail
             // get student's mark, if there is one
             $insertion['mark'] = $this->marksheet->retrieveMark($user->getId());
 
-            $returns             = $this->submissionReturnHandler->getByUser($user->getId(), $this->dueWork['id']);
+            $returns             = $this->submissionReturnHandler->getByUser($user->getId(), $this->submissionBox->getId());
             $insertion['return'] = is_array($returns) ? $returns[0] : array();
 
             $this->sitepageData[$user->getId()] = $insertion;
@@ -146,7 +151,7 @@ class DueWork_Detail
         // setup blocks, etc
         $page->setTab('submission');
         $page->setFile(TEMPLATE_content, 'submission/viewSubmission.html');
-        $page->setTitle(Scrub::text($this->dueWork['categoryName']) . ': ' . Scrub::text($this->dueWork['name']));
+        $page->setTitle(Scrub::text($this->submissionBox->getCategory()->getName() . ': ' . $this->submissionBox->getName()));
 
         $page->setBlock(TEMPLATE_content, 'student_row', 'student_row_block');
         $page->setBlock('student_row', 'submission_row', 'submission_row_block');
@@ -161,7 +166,7 @@ class DueWork_Detail
 
         $page->setVar('plag_deleted_block', '');
 
-        $closeADF       = $this->getDueDate();
+        $closeADF       = $this->submissionBox->getDueDate();
 
         if ($closeADF->isAtEndOfDay()) {
             $closeString = $closeADF->getLongDateOnly();
@@ -171,14 +176,14 @@ class DueWork_Detail
 
         $page->setVar(
             array(
-                'DUEWORK_DESCRIPTION' => Scrub::text($this->dueWork['name']),
-                'DUEWORK_YEAR'        => date('Y', strtotime($this->dueWork['date'])),
-                'DUEWORK_SEMESTER'    => DueWork_All::getSemester(strtotime($this->dueWork['date'])),
-                'CATEGORY_NAME'       => Scrub::text($this->dueWork['categoryName']),
-                'DUEWORK_TYPE'        => $this->dueWork['typeName'],
+                'DUEWORK_DESCRIPTION' => Scrub::text($this->submissionBox->getName()),
+                'DUEWORK_YEAR'        => $this->submissionBox->getDueDate()->getYear(),
+                'DUEWORK_SEMESTER'    => $this->submissionBox->getDueDate()->getYearHalf(),
+                'CATEGORY_NAME'       => Scrub::text($this->submissionBox->getCategory()->getName()),
+                'DUEWORK_TYPE'        => $this->submissionBox->getWorkType()->getName(),
                 'DUEWORK_DUEDATE'     => $closeString,
-                'CATEGORY_ID'         => $this->dueWork['cid'],
-                'BOX_ID'              => $this->dueWork['id'],
+                'CATEGORY_ID'         => $this->submissionBox->getCategory()->getId(),
+                'BOX_ID'              => $this->submissionBox->getId(),
                 'SITE_ROOT'           => $page->conType() . $_SERVER['HTTP_HOST'],
             )
         );
@@ -213,7 +218,7 @@ class DueWork_Detail
                 )
             );
 
-            $this->renderMarking($page, 'OWNER_MARKING', $record['user']['instance']->getId() . $this->dueWork['id'], $record['mark']);
+            $this->renderMarking($page, 'OWNER_MARKING', $record['user']['instance']->getId() . $this->submissionBox->getId(), $record['mark']);
 
             //
             // Reset the contents of the submission row block, so that each student starts with a fresh row
@@ -226,7 +231,7 @@ class DueWork_Detail
                 foreach ($record['submissions'] as $submission) {
                     $submitTime = $submission->getCreatedAt();
 
-                    if ($submitTime->getUnixTimestamp() > $returnTime->getUnixTimestamp() && $returnTime->getUnixTimestamp() > 0) {
+                    if ($record['return']['returned'] && $submitTime->gt($returnTime)) {
                         $page->parse('submission_after_mark_block', 'submission_after_mark');
                     } else {
                         $page->setVar(
@@ -236,7 +241,7 @@ class DueWork_Detail
                         );
                     }
 
-                    if ($submitTime->getUnixTimestamp() > $this->getDueDate()->getUnixTimestamp()) {
+                    if ($submitTime->gt($this->submissionBox->getDueDate())) {
                         $class                     = self::CLASS_LATE;
                         $submissionTimeDescription = 'Submitted Late';
                     } else {
@@ -279,7 +284,6 @@ class DueWork_Detail
                             'SUBMISSION_FILENAME'         => $submission->getStorage()->getBaseName(),
                             'SUBMISSION_CLASS'            => $class,
                             'SUBMISSION_TIME_DESCRIPTION' => $submissionTimeDescription,
-                            'SUBMISSION_AFTER_MARK'       => $afterMark,
                             'SUBMISSION_PLAG_SCORE'       => sprintf("%d%%", $plagScan->getScore()),
                             'SUBMISSION_PLAG_CLASS'       => $plagClass,
                             'SUBMISSION_PLAG_HREF'        => base64_encode($plagHref),
@@ -308,14 +312,15 @@ class DueWork_Detail
                         elseif ($plagScan->getStatus() == Plagscan_Document::STATUS_COMPLETE) {
                             $page->parse('plag_enabled_block', 'plag_enabled');
                         } // not complete? is this even a plagiarism document?
-                        elseif (!$plagScan->getPlagscanId()) {
-                            $page->setVar('plag_enabled_block', '');
-                        } // it's a plag doc, but is being checked and still pending, so tell the user
-                        else {
+                        elseif ($plagScan->getPlagscanId()) {
+                            // it's a plag doc, but is being checked and still pending, so tell the user
                             $page->setVar(
                                 'plag_enabled_block',
                                 '<span title="Plagiarism results pending" class="plag-score regular">(pending)</span>'
                             );
+                        }
+                        else {
+                            $page->setVar('plag_enabled_block', '');
                         }
                     } // plagscan disabled, clear the indicator
                     else {
@@ -398,7 +403,7 @@ class DueWork_Detail
      */
     public function isArchived()
     {
-        return $this->getDueDate()->getYear() < date('Y');
+        return $this->submissionBox->getDueDate()->getYear() < date('Y');
     }
 
 
@@ -417,21 +422,12 @@ class DueWork_Detail
      */
     public function getSubmissionType()
     {
-        if ($this->dueWork['multi_submission']) {
+        if ($this->submissionBox->getAcceptMultiple()) {
             return self::ACCEPT_MULTI;
-        } elseif ($this->dueWork['accept_submission']) {
+        } elseif ($this->submissionBox->getAcceptOnline()) {
             return self::ACCEPT_SINGLE;
         } else {
             return self::ACCEPT_NONE;
         }
-    }
-
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getDueDate()
-    {
-        return new Alaress_Date_Format($this->dueWork['date'], 'Y-m-d');
     }
 }
