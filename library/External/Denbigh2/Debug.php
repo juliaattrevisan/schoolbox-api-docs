@@ -46,7 +46,7 @@ class External_Denbigh2_Debug {
      *
      * @var string
      */
-    private $teacherCode = 'Akka23';
+    private $teacherCode = 'JTB';
 
     /**
      * Class Code
@@ -63,8 +63,6 @@ class External_Denbigh2_Debug {
         $this->setAllApi(new Collection());
 
         $this->setup();
-
-        $this->test();
     }
 
     /**
@@ -95,7 +93,7 @@ class External_Denbigh2_Debug {
         $this->addTest(
             "Staff Timetable for {$this->teacherCode}", 'TimetableLessons',
             array('Day', 'Period', 'Description for Staff TT', 'Class', 'Room', 'Teacher Code', 'Teacher'),
-            new External_Denbigh2_Api('TimetableLessons',array('Teacher Code' => $this->teacherCode),array('RFMmax' => 0))
+            new External_Denbigh2_Api('TimetableLessons', array('Teacher Code' => $this->teacherCode), array('RFMmax' => 0))
         );
 
         $this->addTest(
@@ -135,7 +133,7 @@ class External_Denbigh2_Debug {
         $this->addTest(
             "Parent info for {$this->familyCode}", 'Family',
             array('Father Community ID', 'Father Title', 'Father Preferred Name', 'Father Surname', 'Father email', 'Father Email Work', 'Father Phone', 'Father Mobile', 'Mother Community ID', 'Mother Title', 'Mother Preferred Name', 'Mother Surname', 'Mother Email', 'Mother Email Work', 'Mother Mobile'),
-            new External_Denbigh2_Api('Staff', array('Staff Code' => $this->teacherCode))
+            new External_Denbigh2_Api('Family', array('Family Code' => $this->familyCode))
         );
 
         $this->addTest(
@@ -159,7 +157,13 @@ class External_Denbigh2_Debug {
         $this->addTest(
             "Portrait for {$this->teacherCode}", 'Photos',
             array('PhotoBase64Encoded'),
-            new External_Denbigh2_Api('Photos', array('z_StaffCode ID' => $this->teacherCode))
+            new External_Denbigh2_Api('Photos', array('z_StaffCode' => $this->teacherCode))
+        );
+
+        $this->addTest(
+            "Portrait with empty parameters", 'Photos',
+            array('PhotoBase64Encoded'),
+            new External_Denbigh2_Api('Photos', array())
         );
     }
 
@@ -195,7 +199,7 @@ class External_Denbigh2_Debug {
     /**
      * Test all the things
      */
-    private function test() {
+    public function test() {
         $allResults = new Collection();
 
         foreach ($this->getAllApi() as $currentApi) {
@@ -221,7 +225,15 @@ class External_Denbigh2_Debug {
                 }
 
                 $result['missingProperties'] = $missingProperties;
-                $result['output'] = $row;
+
+                /* Dump an object as text
+                 */
+                ob_start();
+                print_r($row);
+                $shiaLeBuff = ob_get_contents();
+                ob_end_clean();
+
+                $result['output'] = $shiaLeBuff;
 
                 if (!count($missingProperties)) {
                     $result['state'] = 1;
@@ -236,65 +248,14 @@ class External_Denbigh2_Debug {
             $allResults->add($result);
         }
 
-        /* Output outcome outside
-         */
-        echo "<style type='text/css'>.success { background-color: #eaffea } .failure { background-color: #ffecec } code { white-space: pre-line; } table { border-collapse: collapse; } td { vertical-align: top; border:1px solid #000; padding: 16px; }</style>";
-        echo "<table><thead>";
-        echo "<tr>";
-        echo "<th>Api Call</th>";
-        echo "<th>Missing Properties</th>";
-        echo "<th>Api Output</th>";
-        echo "</tr></thead>";
-        echo "<tbody>";
+        $result = array(
+            'total' => $this->getAllApi()->count(),
+            'success' => $this->getSuccessful(),
+            'fail' => $this->getSuccessful() - $this->getAllApi()->count(),
+            'allResults' => $allResults
+        );
 
-        foreach($allResults as $currentResult) {
-
-            ob_start();
-            echo '<code>';
-            print_r($currentResult['output']);
-            echo '</code>';
-            $shiaLeBuff = ob_get_contents();
-
-            if ($currentResult['state']) {
-                $class = 'success';
-            }
-            else {
-                $class = 'failure';
-            }
-
-            $row = "<tr class='{$class}'>";
-            $row .= "<td style='width:200px'>{$currentResult['label']}<br />";
-            $row .= "({$currentResult['method']})</td>";
-            $row .= "<td style='width:400px'>";
-
-            if (count($currentResult['missingProperties'])) {
-                $row .= '<ul><li>' . implode('</li><li>', $currentResult['missingProperties']) . '</li></ul>';
-            }
-
-            $row .= "</td>";
-            $row .= "<td style='width:auto;overflow:auto'>";
-
-            $row .= "$shiaLeBuff";
-
-            $row .= "</td>";
-            $row .= "</tr>";
-
-            ob_end_clean();
-
-            echo $row;
-        }
-
-        echo "</tbody></table>";
-
-        /* Number of things that failed
-         */
-        if ($this->getSuccessful() < $this->getAllApi()->count()) {
-            $failed = $this->getAllApi()->count() - $this->getSuccessful();
-
-            echo "<h1>{$failed} failed, out of {$this->getAllApi()->count()} things tested</h1>";
-        }
-
-        die();
+        return $result;
     }
 
     /* Getters/Setters
