@@ -68,7 +68,7 @@
                     data: [parseFloat(options.mostAdvancedStudent.toFixed(1))]
                 },
                 {
-                    name: 'Entire Class',
+                    name: 'Class Completions',
                     data: [parseFloat(options.classCompletions.toFixed(1))]
                 }
             ],
