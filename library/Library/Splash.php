@@ -9,9 +9,11 @@
 class Library_Splash {
 
     private $templateFile;
-    private $fileHandler;
     private $categoryID;
     private $vars = array();
+
+    /** @var Schoolbox\Resource\File\Mapper */
+    private $fileMapper;
 
     /**
      * A textbox mapper
@@ -23,7 +25,7 @@ class Library_Splash {
     public function __construct($templateFile, $categoryID) {
         $this->setTemplateFile($templateFile);
         $this->setCategoryID($categoryID);
-        $this->setFileHandler(new File());
+        $this->setFileMapper(Schoolbox\Resource\File\Mapper::getInstance());
         $this->setTextboxMapper(new \Schoolbox\Textbox\Mapper());
     }
 
@@ -44,7 +46,7 @@ class Library_Splash {
             $page->setVar($token, Scrub::html($box->getBody()));
         }
 
-        $allFiles = $this->getFileHandler()->getAllInCategory($this->getCategoryID(), array('filter' => array('image')));
+        $allFiles = $this->getFileMapper()->findForFolders([ $this->getCategoryID() ], array('filter' => array('image')));
         if(is_array($allFiles)) {
             foreach ($allFiles as $currentFile) {
                 $page->setVar(array(
@@ -77,16 +79,26 @@ class Library_Splash {
         return $this->categoryID;
     }
 
-    private function setFileHandler($handler) {
-        $this->fileHandler = $handler;
-    }
 
     /**
-     * @return File
+     * @return \Schoolbox\Resource\File\Mapper
      */
-    public function getFileHandler() {
-        return $this->fileHandler;
+    public function getFileMapper()
+    {
+        return $this->fileMapper;
     }
+
+
+    /**
+     * @param \Schoolbox\Resource\File\Mapper $fileMapper
+     * @return static
+     */
+    public function setFileMapper($fileMapper)
+    {
+        $this->fileMapper = $fileMapper;
+        return $this;
+    }
+
 
     /**
      * Set textbox mapper

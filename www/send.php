@@ -14,6 +14,8 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 if (is_numeric($_GET['id'])) {
     $page = new SitePage;
     $groupHandler = new Group;
+    $fileHandler = false;
+    $fileMapper = Schoolbox\Resource\File\Mapper::getInstance();
 
     if (isset($_GET['folder'])) {
 
@@ -26,8 +28,7 @@ if (is_numeric($_GET['id'])) {
             'size' => 1,
         );
 
-        $fileHandler = new File;
-        $file = $fileHandler->getAllInCategory($_GET['id'], $config);
+        $file = $fileMapper->findForFolders([ $_GET['id'] ], $config);
         $file = $file[0];
 
         if (!is_array($file))
@@ -37,8 +38,7 @@ if (is_numeric($_GET['id'])) {
     }
     else {
 
-        $fileHandler = new File;
-        $file = $fileHandler->getByID($_GET['id']);
+        $file = $fileMapper->findById($_GET['id']);
         if (!is_array($file))
             error(41);
 
@@ -46,6 +46,8 @@ if (is_numeric($_GET['id'])) {
             error(5);
 
         $filename = Cfg::get('file_dir') . "/" . $_GET['id'] . ".dat";
+
+
 
         $fileHandler->logAction($_GET['id'], 'access');
 

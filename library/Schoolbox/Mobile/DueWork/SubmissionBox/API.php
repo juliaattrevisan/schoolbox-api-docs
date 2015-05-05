@@ -9,15 +9,15 @@
 
 namespace Schoolbox\Mobile\DueWork\SubmissionBox;
 
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Category;
+use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 use Response_HTTP;
 use Cfg;
+use Schoolbox\Resource\File;
 use Submission;
 use Alaress_Date_Format;
 use User;
 use Group;
-use File;
 use ClientDevice;
 use External_Class;
 use Scrub;
@@ -81,8 +81,8 @@ class API extends Generic\API {
         );
 
         if($box['fid']) {
-            $fileHandler = new File();
-            $catDetailsContent['file'] = $fileHandler->getByID($box['fid']);
+            $fileMapper = File\Mapper::getInstance();
+            $catDetailsContent['file'] = $fileMapper->dehydrate($fileMapper->findById($box['fid'])); // ugly hack #882.
             $catDetailsContent['canDownload'] = (in_array(
                 $_SESSION['env']['device'],
                 array(ClientDevice::DEV_IPAD, ClientDevice::DEV_IPHONE),

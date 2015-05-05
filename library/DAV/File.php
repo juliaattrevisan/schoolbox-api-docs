@@ -10,180 +10,210 @@
 class DAV_File extends Sabre\DAV\File
 {
 
-    private $folderID;
-    private $fileName;
-    private $fileHandler;
+    /** @var Schoolbox\Resource\File\Model */
     private $file;
+
+    /**
+     * @var Schoolbox\Resource\File\Mapper
+     */
+    private $fileMapper;
 
     /**
      * A category mapper
      *
-     * @var \Schoolbox\Resource\CategoryMapper
+     * @var Schoolbox\Resource\Folder\Mapper
      */
-    private $folderMapper = null;
+    private $folderMapper;
 
-    function __construct($path)
+
+    /**
+     * @param string $path
+     */
+    public function __construct($path)
     {
-        $this->setFileHandler();
-        $this->setFolderMapper(new \Schoolbox\Resource\CategoryMapper());
-        $this->setPath($path);
-        $this->setFile();
+        $this->setFileMapper(Schoolbox\Resource\File\Mapper::getInstance());
+        $this->setFolderMapper(Schoolbox\Resource\Folder\Mapper::getInstance());
+        $this->setFileFromPath($path);
     }
 
+
+    /**
+     * @return string
+     */
     public function getName()
     {
-
-        return $this->getFileName();
+        return $this->getFile()->getBasename();
     }
 
+
+    /**
+     * @param string $newName
+     */
     public function setName($newName)
     {
+        $this->getFile()->setFilename(pathinfo($newName, PATHINFO_FILENAME));
 
-        $file = array('id' => $this->getFileID(),
-                        'name' => $newName
-                        );
-
-        $this->getFileHandler()->update($file);
+        $this->getFileMapper()->save($this->getFile());
     }
 
+
+    /**
+     * @return resource
+     */
     public function get()
     {
-
-        /*		if($groupHandler->getPermission($file['category']) < READ_ACCESS)
-        			error(5);
-        */
-
-        return fopen($this->getRealFilePath(), 'r');
-
+        return $this->getFile()->readStream();
     }
 
+
+    /**
+     * @param resource $data
+     */
     public function put($data)
     {
-        file_put_contents($this->getRealFilePath(), $data);
-        $this->getFileHandler()->update(
-            array(
-                'id'        => $this->getFileID(),
-                'file_size' => filesize($this->getRealFilePath()),
-            )
-        );
+        try {
+            // accept the data as a new storage
+            $storage = Schoolbox\Resource\Storage\Mapper::getInstance()->acceptStream(
+                $this->getFile()->getFilename(), $data, false
+            );
+
+            // point this file to the new content
+            $this->getFile()->setStorage($storage);
+
+            $this->getFileMapper()->save($this->getFile());
+
+        } catch (Schoolbox\File\Exception $e) {
+            // ...? noop? throw?
+        }
     }
 
-    function getSize()
+
+    /**
+     * @return int
+     */
+    public function getSize()
     {
-
-        return filesize($this->getRealFilePath());
-
+        return $this->file->getSize();
     }
 
-    function getETag()
+
+    /**
+     * @return string
+     */
+    public function getETag()
     {
-
-        return '"' . md5_file($this->getRealFilePath()) . '"';
-
+        return '"' . md5($this->file->read()) . '"';
     }
 
-    function delete()
+
+    /**
+     * @return void
+     */
+    public function delete()
     {
-        $this->getFileHandler()->delete($this->getFileID());
+        $this->getFileMapper()->delete($this->getFile());
     }
 
-    function getLastModified()
+
+    /**
+     * @return int
+     */
+    public function getLastModified()
     {
-        return strtotime($this->file['modified']);
+        return $this->getFile()->getModifiedAt()->getUnixTimeStamp();
     }
 
+
+    /**
+     * @return string
+     */
     public function getContentType()
     {
-
-        return $this->file['mime_type'];
-
+        return $this->getFile()->getMime();
     }
 
-    function setPath($path)
+
+    /**
+     * @param string $path
+     */
+    private function setFileFromPath($path)
     {
-        //
         // Path list - strip any blank parts
         $folderList = array_filter(explode('/', $path), 'strlen');
-        $this->fileName = array_pop($folderList);
+        $filename = pathinfo(array_pop($folderList), PATHINFO_FILENAME);
 
-        $parent = 0;
+        $folderId = 0;
 
         foreach ($folderList as $folderName) {
             $allFolders = $this->getFolderMapper()->findByColumnList(array(
                 'name' => $folderName,
-                'parent' => $parent
+                'parent' => $folderId
             ));
 
             if ($allFolders->count()) {
-                $parent = $allFolders->first()->getId();
+                $folderId = $allFolders->first()->getId();
             }
         }
 
-        $this->folderID = $parent;
-
-    }
-
-    function getFileName()
-    {
-        return $this->fileName;
-    }
-
-    function getParentFolder()
-    {
-        return $this->folderID;
-    }
-
-    function setFileHandler()
-    {
-        $this->fileHandler = new File;
-    }
-
-    /**
-     * @return File
-     */
-    function getFileHandler()
-    {
-        return $this->fileHandler;
-    }
-
-    function setFile()
-    {
-        $result = $this->getFileHandler()->getByArray(
+        $result = $this->getFileMapper()->findByColumnList(
             array(
-                'realname' => $this->getFileName(),
-                'category' => $this->getParentFolder(),
+                'realname' => $filename,
+                'category' => $folderId,
             )
         );
-        $this->file = $result[0];
+
+        if ($result->count()) {
+            $this->file = $result->first();
+        } else {
+            // ...? noop? throw?
+        }
     }
 
-    function getFileID()
-    {
-        return $this->file['id'];
-    }
 
-    function getRealFilePath()
-    {
-        return  Cfg::get('file_dir') .'/'. $this->getFileID() . '.dat';
-    }
-
-    /* Getters/Setters
+    /**
+     * @return \Schoolbox\Resource\File\Model
      */
+    private function getFile()
+    {
+        return $this->file;
+    }
+
+
+    /**
+     * @param Schoolbox\Resource\File\Mapper $fileMapper
+     * @return $this
+     */
+    private function setFileMapper($fileMapper)
+    {
+        $this->fileMapper = $fileMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return Schoolbox\Resource\File\Mapper
+     */
+    private function getFileMapper()
+    {
+        return $this->fileMapper;
+    }
+
 
     /**
      * Set folder mapper
      *
-     * @param \Schoolbox\Resource\CategoryMapper $folderMapper
+     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
      */
     private function setFolderMapper($folderMapper)
     {
         $this->folderMapper = $folderMapper;
     }
 
+
     /**
      * Get folder mapper
      *
-     * @return \Schoolbox\Resource\CategoryMapper
+     * @return \Schoolbox\Resource\Folder\Mapper
      */
     private function getFolderMapper()
     {

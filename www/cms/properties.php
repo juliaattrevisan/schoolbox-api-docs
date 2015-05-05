@@ -3,7 +3,7 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
 $page         = new SitePage;
-$fileHandler  = new File;
+$fileMapper   = Schoolbox\Resource\File\Mapper::getInstance();
 $groupHandler = new Group;
 
 $page->setFile(TEMPLATE_body, 'cms/properties.html');
@@ -12,30 +12,33 @@ $page->setBlock(TEMPLATE_body, 'link', 'link_block');
 $page->setBlock(TEMPLATE_body, 'file', 'file_block');
 
 if (is_numeric($_GET['fileID'])) {
-    $file = $fileHandler->getByID($_GET['fileID']);
+    $file = $fileMapper->findById($_GET['fileID']);
 
-    if ($groupHandler->getPermission($file['category']) < READ_ACCESS) {
+    $folder = $file->getFolder();
+    $folderId = $folder->getId();
+
+    if ($groupHandler->getPermission($folderId) < READ_ACCESS) {
         error(19);
     }
 
-    if ($groupHandler->getPermission($file['category']) < WRITE_ACCESS && $file['hidden'] > 0) {
+    if ($groupHandler->getPermission($folderId) < WRITE_ACCESS && $file->isHidden() > 0) {
         error(19);
     }
 
     $output = array(
-        'FILE_ID'     => $file['id'],
-        'CATEGORY'    => $file['categoryName'],
-        'OWNER'       => $file['ownerName'],
-        'OWNER_ID'    => $file['owner'],
-        'REALNAME'    => $file['realname'],
-        'CREATED'     => date(Cfg::get('date_short'), $file['submitted']),
-        'DESCRIPTION' => Scrub::text($file['description']),
-        'COMMENT'     => Scrub::text($file['comment']),
-        'SIZE'        => number_format($file['file_size'] / 1024, 1),
-        'LINK'        => '/send.php?id=' . $file['id'],
+        'FILE_ID'     => $file->getId(),
+        'CATEGORY'    => $folder->getName(),
+        'OWNER'       => $file->getOwner()->formatName(),
+        'OWNER_ID'    => $file->getOwner()->getId(),
+        'REALNAME'    => $file->getBasename(),
+        'CREATED'     => $file->getCreatedAt()->getLocalShort(),
+        'DESCRIPTION' => Scrub::text($file->getTitle()),
+        'COMMENT'     => Scrub::text($file->getDescription()),
+        'SIZE'        => Alaress_Byte_Format::bytesToString($file->getSize()),
+        'LINK'        => '/send.php?id=' . $file->getId(),
         'HOST'        => SitePage::conType() . $_SERVER['HTTP_HOST'],
-        'MIME_TYPE'   => $file['mime_type'],
-        'HIDDEN'      => $file['hidden'] > 0 ? 'Yes' : 'No',
+        'MIME_TYPE'   => $file->getMime(),
+        'HIDDEN'      => $file->isHidden() ? 'Yes' : 'No',
     );
     $page->setVar($output);
     $page->parse('realname_block', 'realname');

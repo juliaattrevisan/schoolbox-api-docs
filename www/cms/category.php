@@ -253,12 +253,10 @@ if (is_numeric($this->arg[0])) {
 //			$categoryHandler->recursiveDelete($category['id'], false);
 
             /* Delete all files */
-            $fileHandler = new File;
-            $fileList = $fileHandler->getAllInCategory($folder->getId());
-            if (is_array($fileList)) {
-                foreach ($fileList as $file) {
-                    $fileHandler->delete($file['id']);
-                }
+            $fileMapper = Schoolbox\Resource\File\Mapper::getInstance();
+            $fileList = $fileMapper->findForFolders([ $folder->getId() ]);
+            foreach ($fileList as $file) {
+                $fileMapper->delete($file);
             }
 
             /* Delete all links

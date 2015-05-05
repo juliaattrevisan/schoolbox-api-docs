@@ -16,9 +16,9 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
     private $groupHandler;
 
     /**
-     * @var File
+     * @var Schoolbox\Resource\File\Mapper
      */
-    private $fileHandler;
+    private $fileMapper;
 
     /**
      * @var AllowedFile
@@ -26,21 +26,21 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
     private $allowedFileHandler;
 
     /**
-     * @var User
+     * @var Schoolbox\UserMapper
      */
-    private $userHandler;
+    private $userMapper;
 
     /**
      * An instance of Category
      *
-     * @var \Schoolbox\Resource\Category
+     * @var \Schoolbox\Resource\Folder\Model
      */
     private $source;
 
     /**
      * Category Mapper
      *
-     * @var \Schoolbox\Resource\CategoryMapper
+     * @var \Schoolbox\Resource\Folder\Mapper
      */
     private $categoryMapper = null;
 
@@ -67,10 +67,10 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
     public function execute()
     {
         $this->groupHandler       = new Group();
-        $this->fileHandler        = new File();
-        $this->userHandler        = new User();
+        $this->fileMapper         = Schoolbox\Resource\File\Mapper::getInstance();
+        $this->userMapper         = Schoolbox\UserMapper::getInstance();
         $this->allowedFileHandler = new AllowedFile();
-        $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
+        $this->setCategoryMapper(Schoolbox\Resource\Folder\Mapper::getInstance());
 
         $this->source = $this->getContext();
 
@@ -133,8 +133,8 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         $this->setBlock('files', 'file_no_url', 'file_no_url_block');
         $this->setBlock('files', 'modify_file', 'modify_file_block');
 
-        $fileList = Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
-            [$this->source->getId()],
+        $fileList = $this->fileMapper->findForFolders(
+            [ $this->source->getId() ],
             array(
                 'size'      => $this->getConfig('size'),
                 'filter'    => $filter,
@@ -216,7 +216,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
     /**
      * Set category mapper
      *
-     * @param null $categoryMapper
+     * @param Schoolbox\Resource\Folder\Mapper $categoryMapper
      */
     private function setCategoryMapper($categoryMapper)
     {
@@ -226,7 +226,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
     /**
      * Get category mapper
      *
-     * @return null
+     * @return Schoolbox\Resource\Folder\Mapper
      */
     private function getCategoryMapper()
     {
