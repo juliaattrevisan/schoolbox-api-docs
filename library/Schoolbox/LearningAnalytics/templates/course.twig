@@ -316,12 +316,24 @@
         {% if metadata.route == 'course' %}
             <option value="/learningAnalytics/course/{{ metadata.folder.course.getId() }}">All</option>
             {% for currentTaskType in results.tasks.types.all %}
-                <option value="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/task/{{ currentTaskType.getId() }}">{{ currentTaskType.getName() }}</option>
+            {% set selected = '' %}
+
+            {% if results.tasks.types.selected.getId() == currentTaskType.getId() %}
+            {% set selected = 'selected="selected"' %}
+            {% endif %}
+
+            <option value="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/task/{{ currentTaskType.getId() }}" {{ selected }}>{{ currentTaskType.getName() }}</option>
             {% endfor %}
         {% elseif metadata.route == 'folder' %}
             <option value="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}">All</option>
             {% for currentTaskType in results.tasks.types.all %}
-                <option value="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}/task/{{ currentTaskType.getId() }}">{{ currentTaskType.getName() }}</option>
+            {% set selected = '' %}
+
+            {% if results.tasks.types.selected.getId() == currentTaskType.getId() %}
+            {% set selected = 'selected="selected"' %}
+            {% endif %}
+
+            <option value="/learningAnalytics/course/{{ metadata.folder.course.getId() }}/folder/{{ metadata.folder.selected.getId() }}/task/{{ currentTaskType.getId() }}" {{ selected }}>{{ currentTaskType.getName() }}</option>
             {% endfor %}
         {% endif %}
     </select>
