@@ -15,21 +15,21 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
     private $groupHandler;
 
     /**
-     * @var File
+     * @var Schoolbox\Resource\File\Mapper
      */
-    private $fileHandler;
+    private $fileMapper;
 
     /**
      * Category Mapper
      *
-     * @var \Schoolbox\Resource\CategoryMapper
+     * @var Schoolbox\Resource\Folder\Mapper
      */
     private $categoryMapper = null;
 
     /**
      * A category
      *
-     * @var \Schoolbox\Resource\Category
+     * @var Schoolbox\Resource\Folder\Model
      */
     private $source;
 
@@ -48,16 +48,17 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
     public function execute()
     {
         $this->groupHandler = new Group();
-        $this->fileHandler  = new File();
-        $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
+        $this->setFileMapper(Schoolbox\Resource\File\Mapper::getInstance());
+        $this->setCategoryMapper(Schoolbox\Resource\Folder\Mapper::getInstance());
 
-        $this->source = new \Schoolbox\Resource\Category();
+        $this->source = $this->getCategoryMapper()->createModel();
 
         if (is_numeric($this->getConfig('src'))) {
             try {
                 // remove any non-numeric values from the source config
                 $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
             } catch (\Exception $e) {
+                // noop
             }
         }
     }
@@ -118,8 +119,8 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
         $this->setVar('image_scroller_block', '');
 
         // Load images for the current homepage
-        $allFiles = $this->fileHandler->getAllInCategory(
-            $this->source->getId(), array(
+        $allFiles = $this->getFileMapper()->findForFolders(
+            [ $this->source->getId() ], array(
                 'filter'  => array('image'),
                 'sort'    => $this->getConfig('sort'),
                 'sortdir' => $this->getConfig('sortdir'),
@@ -164,7 +165,7 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
     /**
      * Set category mapper
      *
-     * @param null $categoryMapper
+     * @param Schoolbox\Resource\Folder\Mapper $categoryMapper
      */
     private function setCategoryMapper($categoryMapper)
     {
@@ -174,10 +175,31 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
     /**
      * Get category mapper
      *
-     * @return null
+     * @return Schoolbox\Resource\Folder\Mapper
      */
     private function getCategoryMapper()
     {
         return $this->categoryMapper;
     }
+
+
+    /**
+     * @return \Schoolbox\Resource\File\Mapper
+     */
+    public function getFileMapper()
+    {
+        return $this->fileMapper;
+    }
+
+
+    /**
+     * @param \Schoolbox\Resource\File\Mapper $fileMapper
+     * @return static
+     */
+    public function setFileMapper($fileMapper)
+    {
+        $this->fileMapper = $fileMapper;
+        return $this;
+    }
+
 }

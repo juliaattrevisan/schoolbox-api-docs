@@ -1,4 +1,6 @@
 <?php
+use Schoolbox\UserMapper;
+
 /**
  * ZipFileUpload
  *
@@ -112,104 +114,95 @@ class ZipFileUpload extends DeprecatedModel
             return;
         }
 
-        $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
-        $roleAccessMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
+        $storageMapper    = \Schoolbox\Resource\Storage\Mapper::getInstance();
+        $fileMapper       = \Schoolbox\Resource\File\Mapper::getInstance();
+        $folderMapper     = \Schoolbox\Resource\Folder\Mapper::getInstance();
+        $roleMapper       = \Schoolbox\RoleMapper::getInstance();
+        $userMapper       = UserMapper::getInstance();
+        $roleAccessMapper = \Schoolbox\Permission\Access\RoleAccessMapper::getInstance();
 
         /* Begin traversal
 		 */
         while (false !== ($obj = readdir($dh))) {
-            if (($obj != '.') && ($obj != '..')) {
-                $currentPath = $dir . '/' . $obj;
+            if (($obj == '.') || ($obj == '..')) {
+                continue;
+            }
 
-                /* Create category for the current folder, with POSTed
-				 * permissions
-				 */
-                if (is_dir($currentPath)) {
-                    $parent = new \Schoolbox\Resource\Category();
-                    $parent->setId($parentID);
+            $currentPath = $dir . '/' . $obj;
 
-                    $category = new \Schoolbox\Resource\Category();
-                    $category->setName($obj);
-                    $category->setParent($parent);
-                    $categoryMapper->save($category);
+            $parent = $folderMapper->createModel();
+            $parent->setId($parentID);
 
-                    foreach ($_POST['group'] as $id => $perm) {
-                        try {
-                            $roleMapper = new \Schoolbox\RoleMapper();
-                            $role = $roleMapper->findById($id);
+            /* Create category for the current folder, with POSTed
+             * permissions
+             */
+            if (is_dir($currentPath)) {
 
-                            $roleAccess = new \Schoolbox\Permission\Access\RoleAccess();
-                            $roleAccess->setCategory($category);
-                            $roleAccess->setRole($role);
-                            $roleAccess->setType($perm);
-                            $roleAccessMapper->save($roleAccess);
-                        } catch (\Exception $e) {
-                        }
-                    }
+                $category = $folderMapper->createModel();
+                $category->setName($obj);
+                $category->setParent($parent);
+                $folderMapper->save($category);
 
-                    if ($this->verbose) {
-                        echo "Creating $currentPath with {$category->getId()}, corresponding to $obj, with parent {$this->dirMap[$dir]}<br>";
+                foreach ($_POST['group'] as $id => $perm) {
+                    try {
+                        $roleAccess = $roleAccessMapper->createModel();
+                        $roleAccess->setCategory($category);
+                        $roleAccess->setRole($roleMapper->findById($id));
+                        $roleAccess->setType($perm);
+                        $roleAccessMapper->save($roleAccess);
+
+                    } catch (\Exception $e) {
+                        // noop
                     }
                 }
 
+                if ($this->verbose) {
+                    echo "Creating $currentPath with {$category->getId()}, corresponding to $obj, with parent {$this->dirMap[$dir]}<br>";
+                }
+
                 /* If it's a directory, create a Category for it and remember
-				 * the new id corresponding to the path. Enter it and deal with
-				 * any stuff inside
-				 *
-				 * Otherwise, it's a file, and we add it to the parent Category
-				 */
-                if (is_dir($currentPath)) {
-                    $this->traverse($currentPath, $category->getId());
-                } else {
-                    // Ignore filenames starting with a . (these are usually
-                    // hidden or system files, and should be ignored)
-                    if (substr($obj, 0, 1) === '.') {
-                        continue;
-                    }
+                 * the new id corresponding to the path. Enter it and deal with
+                 * any stuff inside
+                 *
+                 * Otherwise, it's a file, and we add it to the parent Category
+                 */
+                $this->traverse($currentPath, $category->getId());
+
+            } else {
+                // Ignore filenames starting with a . (these are usually
+                // hidden or system files, and should be ignored)
+                if (substr($obj, 0, 1) === '.') {
+                    continue;
+                }
+
+                try {
+                    // accept file, with perms checking
+                    $storage = $storageMapper->accept($obj, $currentPath, false);
 
                     /* For the File table
-					 */
-                    $data = array(
-                        'category' => $parentID,
-                        'owner' => $_SESSION['id'],
-                        'realname' => $obj,
-                        'description' => $obj,
+                     */
+                    $file = $fileMapper->createModel()
+                        ->setFolder($parent)
+                        ->setOwner($userMapper->createModel()->setId($_SESSION['id'])) // we dun need full hydr8
+                        ->setTitle($obj)
+                        ->setFilename(pathinfo($obj, PATHINFO_FILENAME))
+                        ->setStorage($storage);
+
+                    if ($this->verbose) {
+                        echo "Creating <strong>$obj</strong> in $parentID<br>";
+                    }
+
+                    $fileMapper->save($file);
+
+                } catch (\Schoolbox\Resource\Exception $e) {
+                    $this->errorFiles[] = array(
+                        'file'    => $obj,
+                        'code'    => $e->getCode(),
+                        'message' => $e->getMessage()
                     );
 
-                    /* Since we've already uploaded the file and extracted it,
-					 * create a pseudo-$_FILES array containing the tmp_name
-					 * which is simply where the file ended up after extraction
-					 *
-					 * Allows us to use the fileHandler->create() method without
-					 * modifying it.
-					 */
-                    $pseudoFileArray = array(
-                        'name' => $obj,
-                        'tmp_name' => $currentPath,
-                    );
-
-                    /* Erorr checking. If something couldn't be processed,
-					 * remember it, and print it out later
-					 */
-                    $result = $this->allowedFileHandler->isAllowed($obj);
-
-                    if (is_array($result)) {
-                        $this->errorFiles[] = array(
-                            'file' => $obj,
-                            'code' => $result['code'],
-                            'message' => $result['message']
-                        );
-
-                        if ($this->verbose) {
-                            echo "Error: could not make <strong>$obj</strong> in $parentID<br>";
-                        }
-                    } else {
-                        $fileHandler = new File();
-                        $fileHandler->create($data, $pseudoFileArray);
-
-                        if ($this->verbose) {
-                            echo "Creating <strong>$obj</strong> in $parentID<br>";
-                        }
+                    if ($this->verbose) {
+                        echo "Error: could not make <strong>$obj</strong> in $parentID<br>";
                     }
                 }
             }

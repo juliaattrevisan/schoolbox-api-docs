@@ -2,7 +2,7 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 use Schoolbox\Assessment\Course\TaskMapper;
 
 $this->setFile(TEMPLATE_content, 'resources.html');
@@ -45,7 +45,6 @@ $this->parse('folder_detail_perms_block', 'folder_detail_perms', false);
 $this->parse('file_detail_block', 'file_detail', false);
 $this->parse('multi_file_detail_block', 'multi_file_detail', false);
 
-$fileHandler = new File;
 $groupHandler = new Group;
 $allowedFiles = new AllowedFile;
 

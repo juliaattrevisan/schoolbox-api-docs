@@ -13,16 +13,16 @@ if (!is_numeric($_GET['categoryID'])) {
 }
 
 $groupHandler = new Group;
-$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
-$fileHandler = new File;
+$categoryMapper = Schoolbox\Resource\Folder\Mapper::getInstance();
+$fileMapper = Schoolbox\Resource\File\Mapper::getInstance();
 
 $output = array('FILE_CATEGORY_ID'	=> $_GET['categoryID'],
                 'REQUEST_URI'		=> $_SERVER['REQUEST_URI'],
                 );
 $page->setVar($output);
 
-$treeBuilder = new Schoolbox\Resource\CategoryTreeBuilder(
-    Schoolbox\Resource\CategoryMapper::getInstance(),
+$treeBuilder = new Schoolbox\Resource\Folder\TreeBuilder(
+    $categoryMapper,
     Schoolbox\Assessment\Course\TaskMapper::getInstance(),
     $groupHandler
 );
@@ -39,7 +39,7 @@ if (in_array($_GET['filter'], array('image', 'video'))) {
     $output = array('FILTER'    => '');
 }
 
-$fileList = $fileHandler->getAllInCategory($_GET['categoryID'], $filter);
+$fileList = $fileMapper->findForFolders([ $_GET['categoryID'] ], $filter);
 
 
 $page->setVar($output);

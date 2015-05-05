@@ -79,12 +79,12 @@ class Log {
 
 
 	/**
-	 * @param Link|File|Category $object
+	 * @param Link|File\Model|Folder\Model|Textbox $object
 	 * @return self
 	 */
 	public function setObject($object) {
 		// splice this out to be kind and ID
-		if($object instanceof File) {
+		if($object instanceof File\Model) {
 			$this->objectId = $object->getId();
 			$this->objectKind = LogMapper::KIND_FILE;
 		}

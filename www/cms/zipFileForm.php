@@ -2,7 +2,6 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
 $page = new SitePage();
-$fileHandler = new File();
 $groupHandler = new Group();
 
 $isSuperuser = $groupHandler->isSuperuser();

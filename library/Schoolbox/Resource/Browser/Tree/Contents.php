@@ -325,7 +325,7 @@ class Contents
     /**
      * Get all nodes
      *
-     * @return \Schoolbox\Collection
+     * @return \Schoolbox\Collection|Node[]
      */
     public function getAllNodes()
     {

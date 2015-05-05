@@ -9,20 +9,17 @@
 namespace Schoolbox\Mobile\File;
 
 use Schoolbox\Mobile\Generic;
-use Schoolbox\Resource\CategoryMapper;
 use Response_HTTP;
 use Config;
 use Group;
-use File;
-use ClientDevice;
-use Scrub;
+use Schoolbox\Resource\File;
 
-class API extends Generic\API {
+class API extends Generic\API
+{
 
-    public function View($fileID, $save = false) {
-
-        $fh = new File();
-        $file = $fh->getByID($fileID);
+    public function View($fileID, $save = false)
+    {
+        $file = File\Mapper::getInstance()->findById($fileID);
 
         if(!$file) {
             return new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND);
@@ -30,7 +27,7 @@ class API extends Generic\API {
 
 
         $gh = new Group();
-        if($gh->getPermission($file['category']) < READ_ACCESS) {
+        if ($gh->getPermission($file->getFolder()->getId()) < READ_ACCESS) {
             return new Response_HTTP(Response_HTTP::HTTP_FORBIDDEN);
         }
 
@@ -47,7 +44,7 @@ class API extends Generic\API {
 
         // if not using iDevice
         //if($_SESSION['env']['device'] != ClientDevice::DEV_IPAD && $_SESSION['env']['device'] != ClientDevice::DEV_IPHONE) {
-            $response->addHeader('Content-Disposition', $asAttachment . "filename=\"{$file['realname']}\"");
+            $response->addHeader('Content-Disposition', $asAttachment . "filename=\"{$file->getBasename()}\"");
             $response->addHeader('Content-Length', $filesize);
             $response->addHeader('Pragma', '');
             $response->addHeader('Cache-Control', '');
@@ -58,7 +55,7 @@ class API extends Generic\API {
         //    $response->addHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0, private');
         //}
 
-        $response->addHeader('Content-Type', $file['mime_type']);
+        $response->addHeader('Content-Type', $file->getMime());
 
         ob_start();
         readfile($filename);

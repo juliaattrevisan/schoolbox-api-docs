@@ -19,11 +19,6 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
     private $groupHandler;
 
     /**
-     * @var File
-     */
-    private $fileHandler;
-
-    /**
      * Category Mapper
      *
      * @var \Schoolbox\Resource\CategoryMapper
@@ -45,17 +40,16 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
     public function execute()
     {
         $this->groupHandler = new Group();
-        $this->fileHandler  = new File();
-        $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
+        $this->setCategoryMapper(Schoolbox\Resource\Folder\Mapper::getInstance());
 
-        $this->source = new \Schoolbox\Resource\Category();
+        $this->source = $this->getCategoryMapper()->createModel();
 
         if (is_numeric($this->getConfig('src'))) {
             try {
                 // remove any non-numeric values from the source config
                 $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
             } catch (\Exception $e) {
-                $this->source = new \Schoolbox\Resource\Category();
+                // noop
             }
         }
     }
@@ -153,7 +147,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
     /**
      * Set category mapper
      *
-     * @param null $categoryMapper
+     * @param Schoolbox\Resource\Folder\Mapper $categoryMapper
      */
     private function setCategoryMapper($categoryMapper)
     {
@@ -163,7 +157,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
     /**
      * Get category mapper
      *
-     * @return null
+     * @return Schoolbox\Resource\Folder\Mapper
      */
     private function getCategoryMapper()
     {

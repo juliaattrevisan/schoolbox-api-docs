@@ -9,40 +9,29 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-require_once('../include/Bootstrap.php');
+require_once(__DIR__ . '/../../../include/Bootstrap.php');
 
 /* Old handler junk
  */
-require_once('./resource/searchConfig.php');
+require_once(__DIR__ . '/../../resource/searchConfig.php');
 
 /* Clean params
  */
-require_once('./resource/searchClean.php');
+require_once(__DIR__ . '/../../resource/searchClean.php');
 
-/**
- * Execute searches for all handlers and mappers
- */
-$fileHandler = new File();
 $type = 'file';
 
-/* search() calls access a global counter array, $count
+/* Omaha Beach!
+ *
+ * These have landed
+ * When you add more, remove them from the searchConfig pseudo-registry
+ *
+ * Everything here is self-contained
  */
-$result[$type] = $fileHandler->search($keyword, 0, Cfg::get('search_all_limit'), $count[$type]);
+$mapper = new \Schoolbox\Resource\Search\Results($page, $type, $keyword);
+$mapper->search($_SESSION['user'], $keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'));
+$mapper->render();
+$mapper->renderPagination($current_page);
 
-$count['all'] = array_sum($count);
-
-/* You can save a db request by using the first $result[$type] and
- * traversing to $currentPage-1 manually in php, manually constructing
- * the page's contents
- */
-$result[$type] = $fileHandler->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type]);
-
-$renderer = new \Schoolbox\File\Search\Renderer($page, $result, $count, 0, $keyword);
-$renderer->render();
-$renderer->renderPagination();
-
-// render final output
-$page->parse(TEMPLATE_body, 'RESULT', true);
 $page->outputPage(true);
-
 exit();

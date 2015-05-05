@@ -7,6 +7,8 @@
  * @link        http://www.alaress.com.au/
  */
 
+use Schoolbox\Resource\LogMapper;
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
 $type = $_GET['type'];
@@ -23,7 +25,7 @@ if (isset($_GET['hash'])) {
 if (isset($type) && isset($id)) {
     $page             = new SitePage;
     $groupHandler     = new Group;
-    $fileHandler      = new File;
+    $fileMapper       = Schoolbox\Resource\File\Mapper::getInstance();
     $videoQueueMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
     try {
@@ -62,8 +64,10 @@ if (isset($type) && isset($id)) {
             break;
     }
 
-    if($type = \Schoolbox\Video\QueueMapper::FILE_TYPE_SBFS) {
-        $fileHandler->logAction($id, 'access');
+    if ($type == \Schoolbox\Video\QueueMapper::FILE_TYPE_SBFS) {
+        if ($video->getFile() instanceof Schoolbox\Resource\File\Model) {
+            LogMapper::getInstance()->logRead($video->getFile(), $_SESSION['user']);
+        }
     }
 
     if (is_readable($filename)) {
