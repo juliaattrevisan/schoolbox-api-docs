@@ -197,11 +197,32 @@ class Mapper extends Schoolbox\Mapper implements Receiver
 
 
     /**
+     * Accept a datastream upload
+     *
+     * @param string   $filename
+     * @param resource $fp
+     * @param bool     $public
+     * @return Model
+     */
+    public function acceptStream($filename, $fp, $public = false)
+    {
+        // this might seem hacky, but to ensure all the safety checks pass, this data needs to be a tempfile (just like an upload)
+        $tempLocation = tempnam(sys_get_temp_dir(), 'sb');
+
+        // dump the stream into our tempfile
+        file_put_contents($tempLocation, $fp);
+
+        return $this->accept($filename, $fp, $public);
+    }
+
+
+    /**
      * Accept a new file upload
      *
      * @param string $filename
      * @param string $tempLocation
      * @param bool   $public
+     * @throws File\Exception
      * @return Model
      */
     public function accept($filename, $tempLocation, $public = true)
