@@ -63,8 +63,6 @@ class External_Denbigh2_Debug {
         $this->setAllApi(new Collection());
 
         $this->setup();
-
-        $this->render($this->test());
     }
 
     /**
@@ -201,7 +199,7 @@ class External_Denbigh2_Debug {
     /**
      * Test all the things
      */
-    private function test() {
+    public function test() {
         $allResults = new Collection();
 
         foreach ($this->getAllApi() as $currentApi) {
@@ -227,7 +225,15 @@ class External_Denbigh2_Debug {
                 }
 
                 $result['missingProperties'] = $missingProperties;
-                $result['output'] = $row;
+
+                /* Dump an object as text
+                 */
+                ob_start();
+                print_r($row);
+                $shiaLeBuff = ob_get_contents();
+                ob_end_clean();
+
+                $result['output'] = $shiaLeBuff;
 
                 if (!count($missingProperties)) {
                     $result['state'] = 1;
@@ -250,68 +256,6 @@ class External_Denbigh2_Debug {
         );
 
         return $result;
-    }
-
-    /**
-     * Render results
-     *
-     * @param $data
-     * @internal param $allResults
-     */
-    private function render($data) {
-        echo "<style type='text/css'>.success { background-color: #eaffea } .failure { background-color: #ffecec } code { white-space: pre-line; } table { border-collapse: collapse; } td { vertical-align: top; border:1px solid #000; padding: 16px; }</style>";
-        echo "<table><thead>";
-        echo "<tr>";
-        echo "<th>Api Call</th>";
-        echo "<th>Missing Properties</th>";
-        echo "<th>Api Output</th>";
-        echo "</tr></thead>";
-        echo "<tbody>";
-
-        foreach($data['allResults'] as $currentResult) {
-
-            ob_start();
-            echo '<code>';
-            print_r($currentResult['output']);
-            echo '</code>';
-            $shiaLeBuff = ob_get_contents();
-
-            if ($currentResult['state']) {
-                $class = 'success';
-            }
-            else {
-                $class = 'failure';
-            }
-
-            $row = "<tr class='{$class}'>";
-            $row .= "<td style='width:200px'>{$currentResult['label']}<br />";
-            $row .= "({$currentResult['method']})</td>";
-            $row .= "<td style='width:400px'>";
-
-            if (count($currentResult['missingProperties'])) {
-                $row .= '<ul><li>' . implode('</li><li>', $currentResult['missingProperties']) . '</li></ul>';
-            }
-
-            $row .= "</td>";
-            $row .= "<td style='width:auto;overflow:auto'>";
-
-            $row .= "$shiaLeBuff";
-
-            $row .= "</td>";
-            $row .= "</tr>";
-
-            ob_end_clean();
-
-            echo $row;
-        }
-
-        echo "</tbody></table>";
-
-        /* Number of things that failed
-         */
-        echo "<h1>{$data['fail']} failed, out of {$data['total']} things tested</h1>";
-
-        die();
     }
 
     /* Getters/Setters
