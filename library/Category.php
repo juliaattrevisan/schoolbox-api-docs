@@ -729,56 +729,6 @@ class Category extends DeprecatedModel
         parent::delete($categoryID);
     }
 
-    function recursiveDelete($categoryID, $deleteSelf = true)
-    {
-
-        $groupHandler = new Group;
-
-        if ($groupHandler->getPermission($categoryID) < WRITE_ACCESS) {
-            error(6);
-        }
-
-        $childList = $this->getCategoryList($categoryID);
-
-        if (is_array($childList)) {
-            /* Recurse into child folders */
-            foreach ($childList as $child) {
-                $this->recursiveDelete($child['id']);
-            }
-        }
-
-        /* Delete all files */
-        $fileHandler = new File;
-        $fileList = $fileHandler->getAllInCategory($categoryID);
-        if (is_array($fileList)) {
-            foreach ($fileList as $file) {
-                $fileHandler->delete($file['id']);
-            }
-        }
-
-        /* Delete all links
-         */
-        try {
-            $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
-            $category = $categoryMapper->findById($categoryID);
-        } catch (\Exception $e) {
-            error(13);
-        }
-
-        $linkMapper = new \Schoolbox\Resource\LinkMapper();
-        $allLinks = $linkMapper->findAllInCategory($category, array());
-
-        foreach ($allLinks as $currentLink) {
-            $currentLink->delete();
-        }
-
-
-        /* Delete folder */
-        if ($deleteSelf) {
-            $this->delete($categoryID);
-        }
-    }
-
     /**
      * Search for a category. Now uses the normalised categoryCode table
      *
