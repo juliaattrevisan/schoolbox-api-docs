@@ -7,7 +7,6 @@
  * @link        http://www.alaress.com.au/
  */
 
-use Schoolbox\Resource\Log;
 use Schoolbox\Resource\LogMapper;
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
@@ -65,8 +64,10 @@ if (isset($type) && isset($id)) {
             break;
     }
 
-    if($type = \Schoolbox\Video\QueueMapper::FILE_TYPE_SBFS) {
-        LogMapper::getInstance()->logRead($video->getFile(), $_SESSION['user']);
+    if ($type == \Schoolbox\Video\QueueMapper::FILE_TYPE_SBFS) {
+        if ($video->getFile() instanceof Schoolbox\Resource\File\Model) {
+            LogMapper::getInstance()->logRead($video->getFile(), $_SESSION['user']);
+        }
     }
 
     if (is_readable($filename)) {
