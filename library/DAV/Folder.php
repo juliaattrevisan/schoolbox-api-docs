@@ -139,9 +139,12 @@ class DAV_Folder extends Sabre\DAV\Collection
         } else {
 
             /** @var Schoolbox\Collection|Schoolbox\Resource\File\Model[] $result */
+
+            $realname = pathinfo($name,PATHINFO_FILENAME);
+
             $result = $this->getFileMapper()->findByColumnList([
-                'realname' => $name,
-                'category' => $this->getFolderID()
+                'realname'  => $realname,
+                'category'  => $this->getFolderID()
             ]);
 
             if ($result->count()) {
@@ -167,8 +170,12 @@ class DAV_Folder extends Sabre\DAV\Collection
         if ($this->isFolder($name, $this->getFolderID())) {
             return true;
 
-        } elseif ($this->getFileMapper()->findByColumnList([ 'realname' => $name, 'category' => $this->getFolderID() ])->count()) {
-            return true;
+        } else {
+            $realname = pathinfo($name,PATHINFO_FILENAME);
+
+            if ($this->getFileMapper()->findByColumnList([ 'realname' => $realname, 'category' => $this->getFolderID() ])->count()) {
+                return true;
+            }
         }
 
         return false;
@@ -197,6 +204,7 @@ class DAV_Folder extends Sabre\DAV\Collection
             $file = $this->fileMapper->createModel()
                 ->setStorage($storage)
                 ->setTitle($name)
+                ->setFilename(pathinfo($name,PATHINFO_FILENAME))
                 ->setFolder($this->folder)
                 ->setOwner($_SESSION['user']);
 

@@ -78,8 +78,8 @@ class DAV_File extends Sabre\DAV\File
             );
 
             // point this file to the new content
-            $this->getFile()->setStorage($storage);
 
+            $this->getFile()->setStorage($storage);
             $this->getFileMapper()->save($this->getFile());
 
         } catch (Schoolbox\File\Exception $e) {
@@ -102,7 +102,7 @@ class DAV_File extends Sabre\DAV\File
      */
     public function getETag()
     {
-        return '"' . md5($this->file->read()) . '"';
+        return $this->file->getHash();
     }
 
 
