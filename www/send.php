@@ -9,6 +9,8 @@
 //rather than just octet stream
 
 //includes
+use Schoolbox\Resource\LogMapper;
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
 if (is_numeric($_GET['id'])) {
@@ -19,8 +21,9 @@ if (is_numeric($_GET['id'])) {
 
     if (isset($_GET['folder'])) {
 
-        if ($groupHandler->getPermission($_GET['id']) < READ_ACCESS)
+        if ($groupHandler->getPermission($_GET['id']) < READ_ACCESS) {
             error(5);
+        }
 
         $config = array(
             'sort' => 'date',
@@ -28,29 +31,16 @@ if (is_numeric($_GET['id'])) {
             'size' => 1,
         );
 
-        $file = $fileMapper->findForFolders([ $_GET['id'] ], $config);
-        $file = $file[0];
+        $file = $fileMapper->findForFolders([ $_GET['id'] ], $config)->first();
 
-        if (!is_array($file))
-            error(41);
-
-        $filename = Cfg::get('file_dir') . "/" . $file['id'] . ".dat";
-    }
-    else {
-
+    } else {
         $file = $fileMapper->findById($_GET['id']);
-        if (!is_array($file))
-            error(41);
 
-        if ($groupHandler->getPermission($file['category']) < READ_ACCESS)
+        if ($groupHandler->getPermission($file->getFolder()->getId()) < READ_ACCESS) {
             error(5);
+        }
 
-        $filename = Cfg::get('file_dir') . "/" . $_GET['id'] . ".dat";
-
-
-
-        $fileHandler->logAction($_GET['id'], 'access');
-
+        LogMapper::getInstance()->logRead($file, $_SESSION['user']);
     }
 
     if ($_GET['save'])
@@ -58,21 +48,14 @@ if (is_numeric($_GET['id'])) {
     else
         $attach = "";
 
-    $filesize = @filesize($filename);
-    if ($filesize == FALSE) //if we cannot find the file (something is wrong dont link to it)
-        error(41);
-
     //send headers
-    if ($file['mime_type'])
-        header("Content-Type: {$file['mime_type']}");
-    else
-        header("Content-Type: application/octet-stream");
-
+    header("Content-Type: {$file->getMime()}");
     header("Pragma: ");
     header("Cache-control: ");
-    header("Content-Disposition: $attach filename=\"" . $file['realname'] . "\"");
-    header("Content-Length: $filesize");
-    readfile($filename);
+    header("Content-Disposition: $attach filename=\"" . $file->getBasename() . "\"");
+    header("Content-Length: {$file->getSize()}");
+    fpassthru($file->readStream());
+    exit;
 } else
     error(2);
 
