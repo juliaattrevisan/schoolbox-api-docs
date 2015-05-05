@@ -10,6 +10,7 @@
 namespace SocialStream\Cache;
 
 use Schoolbox\Resource\Storage;
+use SocialStream\PostMapper;
 use SocialStream_Post_Abstract;
 
 class Original extends \Alaress_Cache_Abstract {
@@ -88,11 +89,11 @@ class Original extends \Alaress_Cache_Abstract {
     protected function retrieveStreamContents()
     {
         // run cache detection
-        $cached = false;
+        if ($this->post->getMimetype()) {
+            $file = Storage\Mapper::getInstance()->findByHash($this->post->getMimetype());
+            $this->setCachedFile($file);
 
-        // if ($this->post->get)
-
-        if (!$cached) {
+        } else {
             $this->newCacheUpdate();
         }
     }
@@ -129,6 +130,13 @@ class Original extends \Alaress_Cache_Abstract {
 
         $smapper = Storage\Mapper::getInstance();
         $storage = $smapper->acceptStream(pathinfo($url, PATHINFO_BASENAME), $streamHandle, true);
+
+        $this->post->setMimetype($storage->getHash());
+
+        // only save it if it actually already exists
+        if ($this->post->getPostId()) {
+            PostMapper::getInstance()->save($this->post);
+        }
 
         $this->setCachedFile($storage);
 
