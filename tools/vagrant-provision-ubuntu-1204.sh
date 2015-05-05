@@ -116,7 +116,7 @@ echo "$vag Applying vagrant SQL fixes";
 mysql -u root -ptnp879 schoolbox < /tmp/schoolboxdemo-vagrant-latest.sql
 
 echo "$vag Applying UTF8 schema patch";
-/vagrant/tools/schema/collation.sh schoolbox;
+/vagrant/tools/schema/collation.sh;
 
 echo "$vag Removing existing apache vhosts";
 rm -f /etc/apache2/sites-enabled/10*;
