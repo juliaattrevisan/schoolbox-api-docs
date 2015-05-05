@@ -35,35 +35,32 @@ class LiteracyNumeracyCheckbox extends Base {
      */
     public function findData()
     {
-        $externalUser = $this->getExternalUser();
-        $externalUserId = $externalUser['StudentID'];
-
         $query = "
             SELECT
                 (SELECT TOP 1 COUNT(*)
                  FROM SynergyOne.dbo.uvSchoolBoxNCEAResults
-                 WHERE id = '{$externalUserId}'
+                 WHERE id = '{$this->getExternalUserId()}'
                  GROUP BY UELiteracyMet
                 )/COUNT(*) AS 'UE Literacy',
                 (SELECT TOP 1 COUNT(*)
                  FROM SynergyOne.dbo.uvSchoolBoxNCEAResults
-                 WHERE id = '{$externalUserId}'
+                 WHERE id = '{$this->getExternalUserId()}'
                  GROUP BY UENumeracyMet
                 )/COUNT(*) AS 'UE Numeracy',
                 (SELECT TOP 1 COUNT(*)
                  FROM SynergyOne.dbo.uvSchoolBoxNCEAResults
-                 WHERE id = '{$externalUserId}'
+                 WHERE id = '{$this->getExternalUserId()}'
                  GROUP BY Level1LiteracyMet
                 )/COUNT(*) AS 'Level 1 Literacy',
                 (SELECT TOP 1 COUNT(*)
                  FROM SynergyOne.dbo.uvSchoolBoxNCEAResults
-                 WHERE id = '{$externalUserId}'
+                 WHERE id = '{$this->getExternalUserId()}'
                  GROUP BY Level1NumeracyMet
                 )/COUNT(*) AS 'Level 1 Numeracy'
             FROM
                 SynergyOne.dbo.uvSchoolBoxNCEAResults
             WHERE
-                id = '{$externalUserId}'
+                id = '{$this->getExternalUserId()}'
         ";
 
         $result = $this->getDb()->getRow($query);

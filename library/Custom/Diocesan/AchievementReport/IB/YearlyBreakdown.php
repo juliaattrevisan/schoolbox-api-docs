@@ -62,9 +62,6 @@ class YearlyBreakdown extends Base {
      * @return array
      */
     private function findAllProgressGrades() {
-        $externalUser = $this->getExternalUser();
-        $externalUserId = $externalUser['StudentID'];
-
         $query = "
             SELECT
                 classyear,
@@ -76,7 +73,7 @@ class YearlyBreakdown extends Base {
             FROM
                 SynergyOne.dbo.uvSchoolBoxIBResults
             WHERE
-                ID = '{$externalUserId}'
+                ID = '{$this->getExternalUserId()}'
             ORDER BY
                 classyear DESC,
                 classcode DESC,

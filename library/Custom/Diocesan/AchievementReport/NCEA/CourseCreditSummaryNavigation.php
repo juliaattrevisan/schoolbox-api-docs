@@ -40,16 +40,13 @@ class CourseCreditSummaryNavigation extends Base {
      */
     public function findData()
     {
-        $externalUser = $this->getExternalUser();
-        $externalUserId = $externalUser['StudentID'];
-
         $query = "
             SELECT
                 StudentYear
             FROM
                 SynergyOne.dbo.uvSchoolBoxNCEAResults
             WHERE
-                id = '{$externalUserId}' AND
+                id = '{$this->getExternalUserId()}' AND
                 WithdrawnFlag = 0 AND
                 NOT (StudentYear = '{$this->getCurrentYear()}' AND InternalorExternalAssessment = 'EX')
             GROUP BY StudentYear

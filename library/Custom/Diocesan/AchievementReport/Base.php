@@ -109,6 +109,15 @@ abstract class Base {
      */
     abstract public function findData();
 
+    /**
+     * Get the primary key out of $externalUser array
+     *
+     * @return mixed
+     */
+    protected function getExternalUserId() {
+        return $this->externalUser['StudentID'];
+    }
+
     /* Getters/Setters
      */
 

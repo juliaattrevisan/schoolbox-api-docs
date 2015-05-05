@@ -32,20 +32,18 @@ class GradeSummary extends Base {
      * Obtain data
      */
     public function findData() {
-        $externalUser = $this->getExternalUser();
-        $externalUserId = $externalUser['StudentID'];
 
         /* Entered Grades
          */
-        $allEnteredGradesCurrentYear = $this->findEnteredGradesCurrentYear($externalUserId);
-        $allEnteredGradesPreviousYear = $this->findEnteredGradesPreviousYear($externalUserId);
+        $allEnteredGradesCurrentYear = $this->findEnteredGradesCurrentYear($this->getExternalUserId());
+        $allEnteredGradesPreviousYear = $this->findEnteredGradesPreviousYear($this->getExternalUserId());
 
         /* All the counts for the letters
          */
         $allLetters = array();
 
         foreach ($this->getLetterRegistry() as $currentLetter) {
-            $allLetters[] = $this->findLetter($externalUserId, $currentLetter);
+            $allLetters[] = $this->findLetter($currentLetter);
         }
 
         /**
@@ -95,11 +93,10 @@ class GradeSummary extends Base {
      *
      * N/A/M/E all have definitions, but what is D and S?
      *
-     * @param $externalUserId
      * @param $letter
      * @return array|bool
      */
-    private function findLetter($externalUserId, $letter) {
+    private function findLetter($letter) {
         $letter = strtoupper($letter);
 
         $query = "
@@ -109,7 +106,7 @@ class GradeSummary extends Base {
                 COUNT(StrippedResult) AS num
             FROM
                 SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
-            WHERE ID = '{$externalUserId}'
+            WHERE ID = '{$this->getExternalUserId()}'
             AND StrippedResult = '{$letter}'
             GROUP BY (classcode + ' ' + AssessAreaHeading), StudentYearLevel, StrippedResult
             ORDER BY StudentYearLevel DESC, StrippedResult DESC

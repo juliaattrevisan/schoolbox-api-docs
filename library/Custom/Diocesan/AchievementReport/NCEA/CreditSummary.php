@@ -53,9 +53,6 @@ class CreditSummary extends Base {
      * @return array|bool
      */
     private function findValues() {
-        $externalUser = $this->getExternalUser();
-        $externalUserId = $externalUser['StudentID'];
-
         $query = "
             SELECT
                 id,
@@ -69,7 +66,7 @@ class CreditSummary extends Base {
             FROM
                 SynergyOne.dbo.uvSchoolBoxNCEAResults
             WHERE
-                id = '{$externalUserId}' AND
+                id = '{$this->getExternalUserId()}' AND
                 WithdrawnFlag = 0 AND
                 NOT (StudentYear = '{$this->getCurrentYear()}' AND InternalorExternalAssessment = 'EX')
         ";

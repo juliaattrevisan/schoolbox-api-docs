@@ -35,13 +35,10 @@ class YearlyBreakdown extends Base {
      */
     public function findData()
     {
-        $externalUser = $this->getExternalUser();
-        $externalUserId = $externalUser['StudentID'];
-
         /* Entered Grades
          */
-        $allEnteredGradesCurrentYear = $this->findEnteredGradesCurrentYear($externalUserId);
-        $allEnteredGradesPreviousYear = $this->findEnteredGradesPreviousYear($externalUserId);
+        $allEnteredGradesCurrentYear = $this->findEnteredGradesCurrentYear($this->getExternalUserId());
+        $allEnteredGradesPreviousYear = $this->findEnteredGradesPreviousYear($this->getExternalUserId());
 
         /**
          * Rearrange everything into a nice order

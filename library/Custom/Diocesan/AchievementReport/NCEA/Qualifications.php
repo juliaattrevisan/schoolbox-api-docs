@@ -32,9 +32,6 @@ class Qualifications extends Base {
      */
     public function findData()
     {
-        $externalUser = $this->getExternalUser();
-        $externalUserId = $externalUser['StudentID'];
-
         $query = "
             SELECT
                 NCEALevel3Description AS 'NCEA Level 3 Description',
@@ -43,7 +40,7 @@ class Qualifications extends Base {
             FROM
                 SynergyOne.dbo.uvSchoolBoxNCEAResults
             WHERE
-                id = '{$externalUserId}'
+                id = '{$this->getExternalUserId()}'
         ";
 
         $result = $this->getDb()->getRow($query);

@@ -103,9 +103,6 @@ class EntriesAndResults extends Base {
      * @return array
      */
     private function findEntries() {
-        $externalUser = $this->getExternalUser();
-        $externalUserId = $externalUser['StudentID'];
-
         $query = "
             SELECT
                 CourseDescription,
@@ -123,7 +120,7 @@ class EntriesAndResults extends Base {
             FROM
                 SynergyOne.dbo.uvSchoolBoxNCEAResults
             WHERE
-                id = '{$externalUserId}' AND
+                id = '{$this->getExternalUserId()}' AND
                 WithdrawnFlag = 0
                 AND StudentYear = '{$this->getYear()}'
         ";

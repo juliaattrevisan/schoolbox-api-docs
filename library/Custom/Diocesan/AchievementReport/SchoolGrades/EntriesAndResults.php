@@ -35,10 +35,7 @@ class EntriesAndResults extends Base {
      */
     public function findData()
     {
-        $externalUser = $this->getExternalUser();
-        $externalUserId = $externalUser['StudentID'];
-
-        $allEntries = $this->findEntries($externalUserId);
+        $allEntries = $this->findEntries();
 
         /**
          * Rearrange everything into a nice order
@@ -90,10 +87,9 @@ class EntriesAndResults extends Base {
      * Spec suggests there is only one grade, but this doesn't seem
      * to be the case
      *
-     * @param $externalUserId
-     * @return array|bool
+     * @return array
      */
-    private function findEntries($externalUserId) {
+    private function findEntries() {
         $query = "
             SELECT
                 Fileyear,
@@ -108,7 +104,7 @@ class EntriesAndResults extends Base {
             FROM
                 SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
             WHERE
-                ID = '{$externalUserId}'
+                ID = '{$this->getExternalUserId()}'
             GROUP BY
                 FileYear,
                 CourseName,
