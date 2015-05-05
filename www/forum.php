@@ -167,10 +167,6 @@ if (is_array($threadList)) {
             'ON_OFF'          => ++$j % 2 ? 'dark' : ''
         ));
 
-        if ($perm >= WRITE_ACCESS) {
-            $this->parse('modify_thread_block', 'modify_thread', true);
-        }
-
         /* Delete checkbox
          * last post block
          */
@@ -178,6 +174,10 @@ if (is_array($threadList)) {
             'modify_thread_block' => '',
             'last_post_block' => ''
         ));
+
+        if ($perm >= WRITE_ACCESS) {
+            $this->parse('modify_thread_block', 'modify_thread', true);
+        }
 
         if ($thread['replies'] > 0) {
             $this->parse('last_post_block', 'last_post', true);
