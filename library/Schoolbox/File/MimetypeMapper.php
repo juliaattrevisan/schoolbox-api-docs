@@ -73,7 +73,7 @@ class MimetypeMapper extends Schoolbox\Mapper {
 	public function isFilenameMimetypeAllowed($filename) {
 		try {
 			$mimetype = $this->getByFilename($filename);
-			return ($mimetype instanceof Mimetype && $mimetype->getEnable());
+			return ($mimetype instanceof Mimetype && $mimetype->getEnable() && !$mimetype->isDeleted());
 		}
 		catch (Exception $ex) {
 			return false;
@@ -106,7 +106,7 @@ class MimetypeMapper extends Schoolbox\Mapper {
 			return $this->hydrate($row, 'aft');
 		}
 
-		throw new Exception('Mimetype not found', Exception::CODE_MIMETYPE_NOT_FOUND);
+		throw new Exception("No mime found for extension '$extension'.", Exception::CODE_MIMETYPE_NOT_FOUND);
 	}
 
 	/**
