@@ -205,7 +205,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
      * @param int    $limit
      * @param string $sortProperty
      * @param string $sortDirection
-     * @return Collection
+     * @return Resource\File\Search\Result
      */
     public function search($user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC')
     {

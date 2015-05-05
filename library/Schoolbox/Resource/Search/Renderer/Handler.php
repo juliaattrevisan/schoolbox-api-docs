@@ -32,9 +32,7 @@ abstract class Handler
     /**
      * The even-more-nightmarish global count array
      *
-     * @param $page
-     * @param $result
-     * @param $count
+     * @var array
      */
     protected $count = array();
 
@@ -71,7 +69,7 @@ abstract class Handler
      * Constructor
      *
      * @param \SitePage $page
-     * @param array $result Equivalent of $result['blog'] etc.
+     * @param Base[] $result Equivalent of $result['blog'] etc.
      * @param array $count Equivalent of $count['blog'] etc.
      * @param $currentPage
      */
@@ -124,8 +122,8 @@ abstract class Handler
      *
      * Augmented getter
      *
-     * @param null $type
-     * @return mixed
+     * @param string $type
+     * @return int|array
      */
     public function getCount($type = null)
     {
@@ -141,8 +139,8 @@ abstract class Handler
      *
      * Augmented getter
      *
-     * @param null $type
-     * @return array
+     * @param string $type
+     * @return Base|Base[]
      */
     protected function getResult($type = null)
     {
@@ -264,7 +262,7 @@ abstract class Handler
     /**
      * Set count
      *
-     * @param mixed $count
+     * @param array $count
      */
     protected function setCount($count)
     {
