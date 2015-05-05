@@ -49,10 +49,11 @@ class TextFormatter {
 	 *
 	 * @param  string $content  String to cut
 	 * @param  int    $chars    Number of chars to cut to
+     * @param  bool   $addEllipsis
 	 * @param  string $encoding Encoding of $content
 	 * @return string
 	 */
-	public static function cutSentence($content, $chars, $encoding = 'UTF-8') {
+	public static function cutSentence($content, $chars, $addEllipsis = false, $encoding = 'UTF-8') {
 
         $content = strip_tags($content);
 
@@ -78,15 +79,14 @@ class TextFormatter {
 			$position = mb_strrpos($summary, ' ', null, $encoding);
 			$output   = mb_substr($summary, 0, $position, $encoding);
 
-			if ($output) {
-				$output .= '...';
-			}
-			else {
-				$output = '';
-			}
+            $addEllipsis = true;
 		}
 
-		return $output;
+        if ($output && $addEllipsis) {
+            $output .= '...';
+        }
+
+        return $output;
 	}
 
 	/**

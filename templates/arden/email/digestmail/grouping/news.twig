@@ -25,7 +25,7 @@
         </td>
     </tr>
     <tr>
-        <td><p>{{ msg.meta.body | cutSentence(300) }}</p></td>
+        <td><p>{{ msg.meta.body | cutSentence(300, true) }}</p></td>
     </tr>
     {% endif %}
 {% endblock %}
