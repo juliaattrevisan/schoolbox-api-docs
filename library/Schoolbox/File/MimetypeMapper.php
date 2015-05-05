@@ -125,4 +125,27 @@ class MimetypeMapper extends Schoolbox\Mapper {
 
 		return $mimeType;
 	}
+
+
+    /**
+     * @param array    $row
+     * @param string   $alias
+     * @param callable $callback
+     * @return object|void
+     * @throws Schoolbox\Mapper\Exception
+     */
+    public function hydrate(array $row, $alias = '', $callback = null)
+    {
+        /** @var Mimetype $mime */
+        $mime = parent::hydrate($row, $alias, $callback);
+
+        // if it correctly hydrated an entity, return it
+        if ($mime->getFileTypeID()) {
+            return $mime;
+        }
+
+        // otherwise return MimeUnknown: never return a Mime[null,null,null,null,...] object
+        return $this->getUnknownMime();
+    }
+
 }
