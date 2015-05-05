@@ -421,6 +421,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      * * Copies file from temp location into a location accessible by this model
      * * Saves a task completion for this student, if there's a task related to
      *   the submission box.
+     * * Saves the data to the remote data connector
      *
      * @param ReturnedWork $object
      * @param ReturnedWork $previous
@@ -462,7 +463,13 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
                     Task\InstanceCompletionMapper::getInstance()->save($completion);
                 }
             }
+
+            //Copy data to remote system
+            $externalMarkbook = new \External_Markbook();
+            $externalMarkbook->setMark($object);
         }
     }
+
+
 
 }

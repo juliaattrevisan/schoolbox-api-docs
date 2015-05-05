@@ -7,8 +7,6 @@
  * @version     SVN: $Id$
  */
 
-use Alaress\DebugBar\Instance as DebugBar;
-
 class External_Offline_Timetable implements External_TimetableInterface
 {
     public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)

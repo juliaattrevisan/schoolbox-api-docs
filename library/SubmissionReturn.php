@@ -14,7 +14,8 @@ class SubmissionReturn extends DeprecatedModel
 
     function getByBoxID($box_id)
     {
-        $query = "SELECT r.*,user.title, user.firstname, user.lastname, user.id AS uid, username,
+        $query = "SELECT r.*,user.title, user.firstname, user.lastname, user.id AS uid, username, user.synergy_id,
+                         user.group_id,
                          local_email, alt_email
                          FROM ( `" . $this->_table . "` r,  user)
                   WHERE r.deleted = 0 AND user.id = r.owner AND box_id = " . $this->db->smartQuote($box_id) . "
@@ -42,7 +43,6 @@ class SubmissionReturn extends DeprecatedModel
                     'lastname'   => $return['lastname'],
                     'uid'        => $return['uid'],
                     'synergy_id' => $return['synergy_id'],
-                    'type'       => $return['type'],
                     'group_id'   => $return['group_id'],
                 );
             }

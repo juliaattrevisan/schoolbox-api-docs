@@ -24,7 +24,8 @@ class External_DatabaseFactory
      *
      * @return External_ClassInterface|External_AttendanceInterface|
      *         External_PingInterface|External_TimetableInterface|
-     *         External_UserInterface|External_UserDetentionInterface
+     *         External_UserInterface|External_UserDetentionInterface|
+     *         External_MarkbookInterface
      *         (depends on value of $databaseType)
      * @throws LogicException if even the offline class could be created.
      *                        (This probably means you passed an invalid value
@@ -128,4 +129,21 @@ class External_DatabaseFactory
     {
         return $this->buildConnector('UserDetention', $databaseName);
     }
+
+    /**
+     * Builds a markbook connector. If its enabled
+     *
+     * @param  string $databaseName
+     * @return External_MarkbookInterface
+     */
+    public function buildMarkbookConnector($databaseName = '')
+    {
+        if(Config::get('external_markbook')) {
+            return $this->buildConnector('Markbook', $databaseName);
+        }
+        else {
+            return $this->buildConnector('Markbook', 'Offline');
+        }
+    }
+
 }

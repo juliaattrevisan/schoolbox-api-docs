@@ -220,6 +220,7 @@ class UserMapper extends Mapper
         $user = false;
         $roleMapper = new RoleMapper;
         $campusMapper = new CampusMapper;
+        $linkedUserList = array();
 
         $statement = $this->database->prepare(
             "

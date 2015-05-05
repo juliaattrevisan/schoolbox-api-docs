@@ -44,7 +44,7 @@ catch(\Schoolbox\Mapper\Exception $e) {
 	exit;
 }
 
-if($assess->getUser()->getId() != $_SESSION['user']->getId() || $groupHandler->getPermission($assess->getCategory()->getId()) < WRITE_ACCESS) {
+if($assess->getUser()->getId() != $_SESSION['user']->getId() && $groupHandler->getPermission($assess->getCategory()->getId()) < WRITE_ACCESS) {
 	error(127);
 }
 

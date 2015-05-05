@@ -184,6 +184,7 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
 		$this->hasSoftDeleteDateField('deleted_at');
 
 		$this->registerCallback('preSave', array($this, 'preSave'));
+        $this->registerCallback('postSave', array($this, 'postSave'));
 	}
 
 	/**
@@ -206,6 +207,29 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
 			}
 		}
 	}
+
+    /**
+     * Post-save callback.
+     * Creates record in external markbook system
+     *
+     * @param  OnlineAssessment $object
+     * @param  OnlineAssessment|null $previous
+     * @return bool             Always returns true
+     */
+    public function postSave(OnlineAssessment $object, $previous = null) {
+        /**
+         * This saves the assessment to the remote system
+         */
+        $externalMarkbook = new \External_Markbook();
+        $activityFactory = new \Schoolbox\Assessment\ActivityFactory();
+        if(is_null($previous)) {
+            $externalMarkbook->createAssessment($activityFactory->buildFromOnlineAssessment($object,'upcoming'));
+        }
+        else {
+            $externalMarkbook->updateAssessment($activityFactory->buildFromOnlineAssessment($object,'upcoming'));
+        }
+    }
+
 
 	/**
 	 * Gets the list of activities related to online assessments.
