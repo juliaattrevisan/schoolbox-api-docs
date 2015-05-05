@@ -66,8 +66,6 @@ override_dh_install:
 	rm -fR library/Schoolbox/ResourceBooking
 	cp -a --parents library/Calendar/Api/EventType/ResourceBooking $(CURDIR)/resource
 	rm -fR library/Calendar/Api/EventType/ResourceBooking
-	cp -a --parents library/Calendar/Event/Type/ResourceBooking.php $(CURDIR)/resource
-	rm -fR library/Calendar/Event/Type/ResourceBooking.php
 	cp -a --parents library/Calendar/Event/Type/ResourceBooking $(CURDIR)/resource
 	rm -fR library/Calendar/Event/Type/ResourceBooking
 	## End Resource Module
@@ -79,8 +77,6 @@ override_dh_install:
 	rm -fR library/Calendar/Api/EventType/Custom/EOTC
 	cp -a --parents library/Calendar/Event/Type/EOTC $(CURDIR)/eotc
 	rm -fR library/Calendar/Event/Type/EOTC
-	cp -a --parents library/Calendar/Event/Type/EOTC.php $(CURDIR)/eotc
-	rm -fR library/Calendar/Event/Type/EOTC.php
 	cp -a --parents library/EOTC $(CURDIR)/eotc
 	rm -fR library/EOTC
 	cp -a --parents templates/core/modules/eotc $(CURDIR)/eotc

@@ -51,7 +51,37 @@ then
 		# Download and include the cache file for browsercap
 		mkdir -p tools/browscap;
 		touch tools/browscap/browscap.ini;
-		curl http://vagrant.alaress-dev.com.au/cache.txt > tools/browscap/cache.php;
+		cachedir='/home/vagrant/buildcache';
+		mkdir -p $cachedir;
+		cd $cachedir;
+		curl http://vagrant.alaress-dev.com.au/buildcache-sha1.txt > buildcache-sha1.txt 2>/dev/null;
+		if [ $? -eq 0 ];
+		then
+			mv -f buildcache-sha1.txt buildcache-sha1-cached.txt;
+			rm -f buildcache-sha1.txt;
+		else
+			echo "Unable to retrive latest buildcache sha1 list, continuing with current";
+		fi
+		if [ ! -f buildcache-sha1-cached.txt ];
+		then
+			echo "Unable to retrieve demo data. Halting build.";
+			exit 1;
+		fi
+		while read line;
+		do
+			buildfile=`echo "$line" | awk {'print $2'}`;
+			buildsha1=`echo "$line" | awk {'print $1'}`;
+			currentsha1=`sha1sum $buildfile 2>/dev/null || echo 'false'`;
+			if [ "$line" == "$currentsha1" ];
+			then
+				echo "No change to $buildfile";
+			else
+				echo "Downloading $buildfile";
+				curl -L http://vagrant.alaress-dev.com.au/$buildfile > $buildfile;
+			fi
+		done < buildcache-sha1-cached.txt;
+		cd ~/schoolbox;
+		cp -vf $cachedir/cache.txt tools/browscap/cache.php;
 		git add -f tools/browscap;
 		git commit -a -m "update changelog for building";
 		git branch -D upstream;

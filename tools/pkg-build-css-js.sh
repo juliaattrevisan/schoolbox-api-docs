@@ -22,7 +22,7 @@ PATH="$PATH:$instdir/node_modules/.bin";
 npm install;
 
 # Install SASS
-gem install sass --no-rdoc --no-ri --version "3.4.13"
+#gem install sass --no-rdoc --no-ri --version "3.4.13"
 # Don't install from bundle for now, as that process runs out of memory
 #apt-get -y install ruby-bundler;
 #bundle install;
@@ -37,4 +37,4 @@ grunt build.js;
 grunt build.css;
 
 # Build SASS files
-grunt sass;
+#grunt sass;
