@@ -79,7 +79,7 @@ class Renderer extends Base
 
                 /* Is this a homepage or just a folder
                  */
-                if (is_numeric($currentFolder->getHomepage()->getTemplate())) {
+                if (is_numeric($currentFolder->getHomepage()->getTemplate()->getId())) {
                     $folderType = 'home';
                 } else {
                     $folderType = 'folder';
