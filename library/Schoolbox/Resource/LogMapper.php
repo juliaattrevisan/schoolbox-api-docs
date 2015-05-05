@@ -13,6 +13,7 @@ namespace Schoolbox\Resource;
 use PDO;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\User;
 
 class LogMapper extends Mapper {
 
@@ -193,5 +194,56 @@ class LogMapper extends Mapper {
 
 		return $collection;
 	}
+
+
+    /**
+     * @param Link|File\Model|Folder\Model|Textbox $object
+     * @param User                                 $user
+     */
+    public function logCreate($object, $user)
+    {
+        $this->putLog(self::ACTION_CREATE, $object, $user);
+    }
+
+    /**
+     * @param Link|File\Model|Folder\Model|Textbox $object
+     * @param User                                 $user
+     */
+    public function logRead($object, $user)
+    {
+        $this->putLog(self::ACTION_READ, $object, $user);
+    }
+
+    /**
+     * @param Link|File\Model|Folder\Model|Textbox $object
+     * @param User                                 $user
+     */
+    public function logUpdate($object, $user)
+    {
+        $this->putLog(self::ACTION_UPDATE, $object, $user);
+    }
+
+    /**
+     * @param Link|File\Model|Folder\Model|Textbox $object
+     * @param User                                 $user
+     */
+    public function logDelete($object, $user)
+    {
+        $this->putLog(self::ACTION_DELETE, $object, $user);
+    }
+
+    /**
+     * @param string                               $action
+     * @param Link|File\Model|Folder\Model|Textbox $object
+     * @param User                                 $user
+     * @throws Mapper\Exception
+     */
+    protected function putLog($action, $object, $user)
+    {
+        /** @var Log $log */
+        $log = $this->createModel();
+        $log->setAction($action)->setObject($object)->setUser($user);
+        $this->create($log);
+    }
 
 } 
