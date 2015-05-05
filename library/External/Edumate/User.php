@@ -453,11 +453,21 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     public function getParentSync($externalUserId) { }
 
     /**
-     * Duplicate method, use getStudentContactList() instead
-     * @deprecated
+     * Returns a list of email parent email addresseses for students.
+     *
+     * @param array $externalUserIds
+     *
+     * @return array
      */
-    public function getParentEmails($externalUserId) {
-        return $this->getStudentContactList($externalUserId);
+    public function getParentEmails($externalUserIds) {
+        $emails = array();
+        foreach ($externalUserIds as $externalUserId) {
+            foreach ($this->getStudentContactList($externalUserId) as $contact) {
+                $emails[] = $contact['StudentContactDefaultEmail'];
+                $emails[] = $contact['StudentContactSpouseDefaultEmail'];
+            }
+        }
+        return array_filter(array_unique($emails));
     }
 
     /**
