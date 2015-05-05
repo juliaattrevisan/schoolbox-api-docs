@@ -61,6 +61,7 @@ $kernel->run(function($di, $loop, $log, $opts) {
 
 	$rerouteFilters = array(
 		new Filter\AlreadyReroutedFilter(),
+		new Filter\UserEnabledFilter(),
 		new Filter\SelfSendFilter(),
 		new Filter\CampusMembershipFilter(),
 		new Filter\RoleMembershipFilter(),
