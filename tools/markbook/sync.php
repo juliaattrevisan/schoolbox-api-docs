@@ -139,7 +139,6 @@ foreach($categoryList as $category) {
         }
 
         $classList = $attemptMapper->getAllAttempts($quiz->getId(), array('most_recent'=>true));
-        var_dump($classList);
         $log->notice("Setting marks for ".count($classList)." students");
         foreach($classList as $studentID => $result) {
 
