@@ -45,6 +45,7 @@ class Original extends \Alaress_Cache_Abstract {
 
     /**
      * @param SocialStream_Post_Abstract $post
+     * @return self
      */
     public function initPost(SocialStream_Post_Abstract $post)
     {
@@ -89,8 +90,8 @@ class Original extends \Alaress_Cache_Abstract {
     protected function retrieveStreamContents()
     {
         // run cache detection
-        if ($this->post->getMimetype()) {
-            $file = Storage\Mapper::getInstance()->findByHash($this->post->getMimetype());
+        if ($this->post->getCacheHash()) {
+            $file = Storage\Mapper::getInstance()->findByHash($this->post->getCacheHash());
             $this->setCachedFile($file);
 
         } else {
@@ -131,7 +132,7 @@ class Original extends \Alaress_Cache_Abstract {
         $smapper = Storage\Mapper::getInstance();
         $storage = $smapper->acceptStream(pathinfo($url, PATHINFO_BASENAME), $streamHandle, true);
 
-        $this->post->setMimetype($storage->getHash());
+        $this->post->setCacheHash($storage->getHash());
 
         // only save it if it actually already exists
         if ($this->post->getPostId()) {

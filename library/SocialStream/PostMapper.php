@@ -68,6 +68,12 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
         ));
 
         $this->hasMap(array(
+            'column'   => 'cache_hash',
+            'property' => 'cacheHash',
+            'type'     => self::TYPE_STRING,
+        ));
+
+        $this->hasMap(array(
             'column'   => 'type',
             'property' => 'type',
             'type'     => self::TYPE_STRING,

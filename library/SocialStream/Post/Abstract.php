@@ -55,6 +55,9 @@ abstract class SocialStream_Post_Abstract implements ISoftDeletable {
 	 */
 	protected $thumbnail = '';
 
+    /** @var string */
+    protected $cacheHash;
+
 	/**
 	 * One of Website, Video, Image, File or String
 	 *
@@ -377,6 +380,24 @@ abstract class SocialStream_Post_Abstract implements ISoftDeletable {
 	public function getRootId() {
 		return $this->rootId;
 	}
+
+    /**
+     * @return string
+     */
+    public function getCacheHash()
+    {
+        return $this->cacheHash;
+    }
+
+    /**
+     * @param string $cacheHash
+     * @return static
+     */
+    public function setCacheHash($cacheHash)
+    {
+        $this->cacheHash = $cacheHash;
+        return $this;
+    }
 
 	/**
 	 * Set thumbnail
