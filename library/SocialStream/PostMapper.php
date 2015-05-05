@@ -136,7 +136,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
      * Custom findById
      *
      * @param mixed $identifier
-     * @return object|Model
+     * @return SocialStream_Post_Abstract
      * @throws Schoolbox\Mapper\Exception
      */
     public function findById($identifier)
