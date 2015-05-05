@@ -2,6 +2,8 @@
 
 /* This script controls homepage layout functions.  It is used for setting up templates and customising homepage */
 
+use Schoolbox\Resource;
+
 class Homepage
 {
 
@@ -182,21 +184,35 @@ class Homepage
     public function emptyHomepage()
     {
         // TODO for 13.0.0: refactor this to call iterate across Component_Homepage_*Controllers instead, and call deleteData() if available
+        //      ^ well...that clearly didn't happen: we're up to 15.0.0 now...
+
         // soft delete the data using handlers
-        $allComponents = array(
-            'Assess_Main', 'Blog', 'Calendar', 'CategoryNews', 'Chat', 'Dropbox', 'File', 'Forum',
+        $allHandlers = array(
+            'Assess_Main', 'Blog', 'Calendar', 'CategoryNews', 'Chat', 'Dropbox', 'Forum',
             'Poll', 'Submission', 'Survey_Main', 'TextBox', 'Wiki'
         );
 
-        if (is_array($allComponents) && count($allComponents)) {
-            foreach ($allComponents as $currentComponent) {
+        if (is_array($allHandlers) && count($allHandlers)) {
+            foreach ($allHandlers as $currentComponent) {
                 $handler = new $currentComponent();
                 $handler->homepageClean($this->cid);
             }
         }
 
+
+        // soft delete the data using mappers
+        $mappers = [
+            [ Resource\File\Mapper::getInstance(), 'category' ]
+        ];
+
+        foreach ($mappers as $array) {
+            /** @var Schoolbox\Mapper $mapper */
+            list ($mapper, $folderField) = $array;
+            $mapper->deleteByColumn($folderField, $this->cid);
+        }
+
         // reset the homepage
-        $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+        $categoryMapper = Resource\Folder\Mapper::getInstance();
 
         try {
             $category = $categoryMapper->findById($this->cid);
