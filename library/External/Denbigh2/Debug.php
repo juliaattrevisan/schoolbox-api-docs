@@ -46,7 +46,7 @@ class External_Denbigh2_Debug {
      *
      * @var string
      */
-    private $teacherCode = 'Akka23';
+    private $teacherCode = 'JTB';
 
     /**
      * Class Code
@@ -95,7 +95,7 @@ class External_Denbigh2_Debug {
         $this->addTest(
             "Staff Timetable for {$this->teacherCode}", 'TimetableLessons',
             array('Day', 'Period', 'Description for Staff TT', 'Class', 'Room', 'Teacher Code', 'Teacher'),
-            new External_Denbigh2_Api('TimetableLessons',array('Teacher Code' => $this->teacherCode),array('RFMmax' => 0))
+            new External_Denbigh2_Api('TimetableLessons', array('Teacher Code' => $this->teacherCode), array('RFMmax' => 0))
         );
 
         $this->addTest(
@@ -135,7 +135,7 @@ class External_Denbigh2_Debug {
         $this->addTest(
             "Parent info for {$this->familyCode}", 'Family',
             array('Father Community ID', 'Father Title', 'Father Preferred Name', 'Father Surname', 'Father email', 'Father Email Work', 'Father Phone', 'Father Mobile', 'Mother Community ID', 'Mother Title', 'Mother Preferred Name', 'Mother Surname', 'Mother Email', 'Mother Email Work', 'Mother Mobile'),
-            new External_Denbigh2_Api('Staff', array('Staff Code' => $this->teacherCode))
+            new External_Denbigh2_Api('Family', array('Family Code' => $this->familyCode))
         );
 
         $this->addTest(
@@ -159,7 +159,13 @@ class External_Denbigh2_Debug {
         $this->addTest(
             "Portrait for {$this->teacherCode}", 'Photos',
             array('PhotoBase64Encoded'),
-            new External_Denbigh2_Api('Photos', array('z_StaffCode ID' => $this->teacherCode))
+            new External_Denbigh2_Api('Photos', array('z_StaffCode' => $this->teacherCode))
+        );
+
+        $this->addTest(
+            "Portrait with empty parameters", 'Photos',
+            array('PhotoBase64Encoded'),
+            new External_Denbigh2_Api('Photos', array())
         );
     }
 
