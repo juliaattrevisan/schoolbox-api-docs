@@ -51,7 +51,7 @@ then
 		# Download and include the cache file for browsercap
 		mkdir -p tools/browscap;
 		touch tools/browscap/browscap.ini;
-		cachedir='~/buildcache';
+		cachedir='/home/vagrant/buildcache';
 		mkdir -p $cachedir;
 		cd $cachedir;
 		curl http://vagrant.alaress-dev.com.au/buildcache-sha1.txt > buildcache-sha1.txt 2>/dev/null;
