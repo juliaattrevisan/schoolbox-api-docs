@@ -74,7 +74,7 @@ foreach($categoryList as $category) {
     foreach($submissionBoxList as $submissionBox) {
         $markbook = $markbookExternal->getAssessment($submissionBox);
 
-        if(is_array($markbook)) {
+        if(is_array($markbook) && count($markbook) >= 1) {
             $log->info("Updating existing assessment: {$submissionBox->getName()}");
             if(!$dryRun) {
                 $markbookExternal->updateAssessment($submissionBox);
@@ -121,7 +121,7 @@ foreach($categoryList as $category) {
 
         $markbook = $markbookExternal->getAssessment($activity);
 
-        if(is_array($markbook)) {
+        if(is_array($markbook) && count($markbook) >= 1) {
             $log->info("Updating existing assessment: {$activity->getName()}");
             if(!$dryRun) {
                 $markbookExternal->updateAssessment($activity);
@@ -143,12 +143,11 @@ foreach($categoryList as $category) {
         foreach($classList as $studentID => $result) {
 
             // Pretending to be a mapper, even though I dont have one yet.
-            $return = new Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork();
-            $return->setSubmissionBox($quiz);
-            $return->setNormalizedMark($result[0]['mark']);
-            $return->setMarker($quiz->getUser());
-            $return->setOwner(new \Schoolbox\User);
-            $return->getOwner()->setId($studentID);
+            $return = new Schoolbox\Assessment\Component\OnlineAssessment\Attempt();
+            $return->setAssessment($quiz);
+            $return->setId($result[0]['attempt_id']);
+            $return->setUser(new \Schoolbox\User);
+            $return->getUser()->setId($studentID);
 
             if(!$dryRun) {
                 $markbookExternal->setMark($return);
