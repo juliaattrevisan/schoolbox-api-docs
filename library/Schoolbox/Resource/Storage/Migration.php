@@ -48,9 +48,10 @@ class Migration implements MigrationPattern
     /**
      * @param int    $fileId
      * @param string $hash
+     * @param string $newFilename
      * @return void
      */
-    public function injectHash($fileId, $hash)
+    public function injectHash($fileId, $hash, $newFilename)
     {
         // noop
     }

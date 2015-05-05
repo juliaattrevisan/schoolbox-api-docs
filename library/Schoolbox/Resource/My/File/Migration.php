@@ -39,7 +39,7 @@ class Migration implements MigrationPattern
         $this->db = Database::getInstance();
         $this->conf = new Loader();
 
-        $this->stmtHash = $this->db->prepare("UPDATE myFile SET hash = :hash WHERE id = :id");
+        $this->stmtHash = $this->db->prepare("UPDATE myFile SET hash = :hash, realname = :name WHERE id = :id");
         $this->stmtFlag = $this->db->prepare("UPDATE myFile SET deleted = 1 AND deleted_at = '1999-12-31 23:59:59' WHERE id = ?");
     }
 
@@ -66,13 +66,15 @@ class Migration implements MigrationPattern
     /**
      * @param int    $fileId
      * @param string $hash
+     * @param string $newFilename
      * @return void
      */
-    public function injectHash($fileId, $hash)
+    public function injectHash($fileId, $hash, $newFilename)
     {
         $this->stmtHash->execute([
             'id'   => $fileId,
-            'hash' => $hash
+            'hash' => $hash,
+            'name' => $newFilename
         ]);
     }
 

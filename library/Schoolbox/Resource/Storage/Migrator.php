@@ -157,7 +157,7 @@ class Migrator
             }
 
             // inject the hash into the given table
-            $pattern->injectHash($fileId, $file->getHash());
+            $pattern->injectHash($fileId, $file->getHash(), $filename);
 
 
             $this->log->info("Attached hash {$file->getHash()} to $type.$fileId");
