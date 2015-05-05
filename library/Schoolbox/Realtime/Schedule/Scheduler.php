@@ -12,6 +12,7 @@ namespace Schoolbox\Realtime\Schedule;
 
 use Alaress\Async\Notification\Instance\InstanceBundle;
 use Alaress\Async\Notification\Postman;
+use Alaress\Scheduler\Cache\ICache;
 use Alaress\Scheduler\Stomp\ResolutionManager;
 use Alaress\Scheduler\StompScheduler;
 use Alaress\Scheduler\Trigger\TriggerInterface;
@@ -59,6 +60,13 @@ class Scheduler extends StompScheduler
     /** @var ResolutionManager */
     protected $resolvers;
 
+    /**
+     * JIT handler to take care of unexpected shutdown
+     *
+     * @var ICache
+     */
+    protected $jit;
+
 
     /**
      * @param LoopInterface             $loop
@@ -81,6 +89,17 @@ class Scheduler extends StompScheduler
         $this->on(SIGHUP, array($this, 'onHangup'));
         $this->on(SIGINT, array($this, 'onInterrupt'));
         $this->on(SIGTERM, array($this, 'onTerminate'));
+    }
+
+
+    /**
+     * @param ICache $jit
+     * @return static
+     */
+    public function setJitCache($jit)
+    {
+        $this->jit = $jit;
+        return $this;
     }
 
 
@@ -202,6 +221,20 @@ class Scheduler extends StompScheduler
         $this->log->error("Cleaning up and terminating");
         // die safely
         $this->dispatcher->releaseWorkerPool(false);
+
+        // if possible, rescue the schedule queue from certain destruction
+        $this->log->debug("Attempting save of queue");
+
+        // if we have a just-in-time handler, use it
+        if ($this->jit) {
+            if ($this->jit->saveSchedule($this->resolvers)) {
+                $this->log->debug("Queue save successful");
+
+            } else {
+                $this->log->alert("Failed to save queue!");
+            }
+        }
+
         $this->loop->stop();
     }
 

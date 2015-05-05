@@ -1,6 +1,8 @@
 #!/usr/bin/php
 <?php
 
+use Alaress\Redis;
+use Alaress\Scheduler\Cache\RedisCache;
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
@@ -73,6 +75,8 @@ $kernel->run(function($di, $loop, $log, $opts) use (&$sched) {
 	try {
 		$strat = new SchedulerDispatchStrategy(new Notif(), new QueueItemMapper(), $opts['flags']);
 		$sched = new Scheduler($loop, $strat, $log, $q);
+
+        $sched->setJitCache(new RedisCache(Redis::getClientInstance(), $log, INSTANCE_ID));
 
 		// read STDIN in the stream loop so we can communicate with it in dev mode
 		$stdin = new \React\Stream\Stream(STDIN, $loop);
