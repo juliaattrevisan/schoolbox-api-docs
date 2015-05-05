@@ -25,14 +25,6 @@ class Javascript extends Base
      */
     public function render()
     {
-        /* Modify link. Should be templated...
-         */
-        if ($this->getEvent()->isEditable() && ($this->getEvent()->getEventId() > -1)) {
-            $editable = true;
-        } else {
-            $editable = false;
-        }
-
         /* Show a homepage if appropriate
          */
         $categoryId   = $this->getEvent()->getCategory()->getId();
@@ -52,7 +44,7 @@ class Javascript extends Base
             'end'       => "",
             /* Whether you can edit this event or not
              */
-            'editable'  => $editable,
+            'editable'  => $this->isEditable(),
             /* Whether it's an all-day event or not
              * If allDay is true, then you can't resize it
              *
