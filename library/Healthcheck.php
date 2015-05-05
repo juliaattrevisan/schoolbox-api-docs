@@ -257,6 +257,29 @@ class Healthcheck
         }
     }
 
+    private function SynergeticCheckMarkbook()
+    {
+        // Attendance Specifc (Optional)
+        echo "\nSynergetic Permission Check - Markbook - Tables (Optional)\n";
+        $list[] = 'StaffAssessmentMarkBook';
+        $list[] = 'StudentAssessmentMarkBook';
+        sort($list);
+
+        foreach ($list as $table) {
+            echo "  $table : ";
+            $db = new MSSQL();
+            $db->debug = true;
+            $result = $db->query("SELECT TOP 1 * FROM $table");
+            if ($result) {
+                echo "OK\n";
+            } else {
+                echo "\n    Failed - ".mssql_get_last_message()."\n";
+            }
+            unset($db,$result);
+        }
+        unset($list);
+    }
+
     private function SynergeticCheckAttendance()
     {
         // Attendance Specifc (Optional)
