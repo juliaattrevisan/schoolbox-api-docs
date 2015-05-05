@@ -1,4 +1,4 @@
-Feature: admin-user0
+Feature: admin-user
   As a logged-in superuser
   I need to be able to create users
   I need to be able to enabled specific options for users
@@ -13,7 +13,7 @@ Scenario: Create, login and modify a new user
   And	I follow "Users"
   Then	I should see "Add User"
   When	I follow "Add User"
-  Then	I should see "Create a user"
+  Then	I should see "User Details"
   When	I select "Prof" from "title"
   And	I fill in "firstname" with "Steve"
   And	I fill in "lastname" with "Test"
@@ -33,39 +33,43 @@ Scenario: Create, login and modify a new user
   And	I check "webmail"
   And	I uncheck "superuser"
   And	I press "Add User"
-  And	I check "account_enabled"
-  Then	I should see "Modify user: Prof Steve Test"
-  # need to enable account again due to SB-3743
-  When	I check "account_enabled"
+  Then	I should see "Prof Steve Test"
   And	I fill in "password" with "password2"
   And	I press "Update User"
-  Then	I follow "Logout"
-  And	log in as "stevetest" with password "password2"
-  Then	I should see ", Prof Steve Test"
-  And	I should see "Webmail"
-  When	I follow "Prof Steve Test"
+  When  I fill in "search-field" with "Prof Steve Test"
+  And   I press "search-button"
+  And   I wait 2000ms for AJAX to finish
+  And   I follow "Prof Steve Test"
   Then	I should see "webmaster@alaress.com.au"
-  And	I should not see "mailto:"
   And	I should not see "Student ID"
   And	I should not see "Grades"
   And	I should not see "Due Work"
   And	I should see "ePortfolio"
+  When	I follow "View Profile"
+  And   I follow "Logout"
+  Then  I should see "Remember Me"
+  When	log in as "stevetest" with password "password2"
+  Then	I should see ", Prof Steve Test"
+  And	I should see "Webmail"
 
 Scenario: Disable a user
-  When	I follow "Logout"
+  When  I go to "/logout.php"
   And	log in as "alaress" with password "alaress"
   And	I go to homepage
   And	I fill in "search-field" with "Prof Steve Test"
   And	I press "search-button"
-  Then	I should see "webmaster@alaress.com.au"
+  And   I wait 2000ms for AJAX to finish
+  Then	I should see "Prof Steve Test"
   When	I follow "Modify User"
-  Then	I should see "Modify user: Prof Steve Test"
+  Then	I should see "Prof Steve Test"
+  And   I should see "User Details"
   When	I uncheck "account_enabled"
   And	I press "Update User"
   Then	I should see "Account disabled"
-  When	I follow "Logout"
-  Then	I should see "You are currently not logged in"
-  And	try to log in as "stevetest" with password "password2"
+  When  I follow "View Profile"
+  And	I follow "Logout"
+  Then	I should see "Remember Me"
+  When	try to log in as "stevetest" with password "password2"
   # This below is failing - but I can see it in the browser - javascript related?
   Then	I should see "This account is currently disabled."
 
@@ -74,17 +78,20 @@ Scenario: Delete a user
   And	I go to homepage
   And	I fill in "search-field" with "Prof Steve Test"
   And	I press "search-button"
-  Then	I should see "webmaster@alaress.com.au"
+  Then  I should see "Prof Steve Test"
   When	I follow "Modify User"
-  Then	I should see "Modify user: Prof Steve Test"
+  Then	I should see "Prof Steve Test"
+  And   I should see "User Details"
   When	I press "Delete User"
+  # Popup confirm not working
   And   I confirm the popup
-  Then  I wait for "Modify User"
+  And   I wait for "Modify User"
   Then  I should see "Modify User"
   And	I should see "Add User"
   When	I fill in "search-field" with "Prof Steve Test"
   And   I press "search-button"
-  Then  I should not see "webmaster@alaress.com.au"
-  When	I follow "Logout"
+  And   I wait 2000ms for AJAX to finish
+  Then  I should not see "Prof Steve Test"
+  When	I go to "/logout.php"
   And	try to log in as "stevetest" with password "password2"
   Then	I should see "The username or password you typed is incorrect, please try again"

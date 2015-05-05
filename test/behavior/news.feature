@@ -157,7 +157,7 @@ Scenario: Check news items are in correct categories
 Scenario: Check teacher visibility permission on news items
   When  I go to "logout.php"
   Then  I go to homepage
-  And   log in as "wwhite" with password "password"
+  And   log in as "zsmith" with password "password"
   When  I go to "/news/"
   Then  I should see "Show to all users on every campus"
   Then  I should see "Show to teacher users on every campus"
