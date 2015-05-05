@@ -52,6 +52,13 @@ class NavigationSelector {
     private $hasIb = false;
 
     /**
+     * Has School Grades
+     *
+     * @var bool
+     */
+    private $hasSchoolGrades = false;
+
+    /**
      * Available navigation options
      *
      * @var array
@@ -139,7 +146,10 @@ class NavigationSelector {
 
         /* School Grades always available
          */
-        $availableNavigation['schoolgrades'] = 'School Grades';
+        if ($this->hasSchoolGrades()) {
+            $this->setHasSchoolGrades(true);
+            $availableNavigation['schoolgrades'] = 'School Grades';
+        }
 
         /* Conditionally add NCEA option
          */
@@ -156,6 +166,27 @@ class NavigationSelector {
         }
 
         $this->setAvailableNavigation($availableNavigation);
+    }
+
+    /**
+     * Find out if they are in the NCEA table
+     */
+    private function hasSchoolGrades() {
+        $externalUser = $this->getExternalUser();
+        $externalUserId = $externalUser['StudentID'];
+
+        $query = "
+            SELECT
+                TOP 1 COUNT(*)
+            FROM
+                SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
+            WHERE
+                ID = '{$externalUserId}'
+        ";
+
+        $count = $this->getDb()->getRow($query);
+
+        return $count['computed'];
     }
 
     /**
@@ -341,5 +372,25 @@ class NavigationSelector {
     public function getAvailableNavigation()
     {
         return $this->availableNavigation;
+    }
+
+    /**
+     * Set has school grades
+     *
+     * @param boolean $hasSchoolGrades
+     */
+    private function setHasSchoolGrades($hasSchoolGrades)
+    {
+        $this->hasSchoolGrades = $hasSchoolGrades;
+    }
+
+    /**
+     * Get has school grades
+     *
+     * @return boolean
+     */
+    private function getHasSchoolGrades()
+    {
+        return $this->hasSchoolGrades;
     }
 }
