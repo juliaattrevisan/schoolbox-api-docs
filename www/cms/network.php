@@ -3,7 +3,7 @@
 use Schoolbox\File\MimetypeMapper;
 
 if (!Cfg::get('webdav_enable')) {
-    error(2);
+    error(141, "Drives service not enabled");
 }
 
 /* Check if password is set; if not, the user was authenticated via saml
@@ -30,7 +30,12 @@ if (isset($this->arg[0])) {
     $openFolder = $_SESSION['portfolioID'];
 }
 
-$folderHandler = PortfolioWebDAV::factory();
+try {
+    $folderHandler = PortfolioWebDAV::factory();
+} catch (DomainException $e) {
+    error(141, $e->getMessage());
+}
+
 $fileHandler =& $folderHandler;
 
 $openFolder = (int)$openFolder;
