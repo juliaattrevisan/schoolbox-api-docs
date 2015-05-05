@@ -64,7 +64,7 @@ class External_Denbigh2_Debug {
 
         $this->setup();
 
-        $this->test();
+        $this->render($this->test());
     }
 
     /**
@@ -242,8 +242,23 @@ class External_Denbigh2_Debug {
             $allResults->add($result);
         }
 
-        /* Output outcome outside
-         */
+        $result = array(
+            'total' => $this->getAllApi()->count(),
+            'success' => $this->getSuccessful(),
+            'fail' => $this->getSuccessful() - $this->getAllApi()->count(),
+            'allResults' => $allResults
+        );
+
+        return $result;
+    }
+
+    /**
+     * Render results
+     *
+     * @param $data
+     * @internal param $allResults
+     */
+    private function render($data) {
         echo "<style type='text/css'>.success { background-color: #eaffea } .failure { background-color: #ffecec } code { white-space: pre-line; } table { border-collapse: collapse; } td { vertical-align: top; border:1px solid #000; padding: 16px; }</style>";
         echo "<table><thead>";
         echo "<tr>";
@@ -253,7 +268,7 @@ class External_Denbigh2_Debug {
         echo "</tr></thead>";
         echo "<tbody>";
 
-        foreach($allResults as $currentResult) {
+        foreach($data['allResults'] as $currentResult) {
 
             ob_start();
             echo '<code>';
@@ -294,11 +309,7 @@ class External_Denbigh2_Debug {
 
         /* Number of things that failed
          */
-        if ($this->getSuccessful() < $this->getAllApi()->count()) {
-            $failed = $this->getAllApi()->count() - $this->getSuccessful();
-
-            echo "<h1>{$failed} failed, out of {$this->getAllApi()->count()} things tested</h1>";
-        }
+        echo "<h1>{$data['fail']} failed, out of {$data['total']} things tested</h1>";
 
         die();
     }
