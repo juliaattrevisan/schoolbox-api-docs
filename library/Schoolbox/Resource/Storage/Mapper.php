@@ -212,7 +212,7 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         // dump the stream into our tempfile
         file_put_contents($tempLocation, $fp);
 
-        return $this->accept($filename, $fp, $public);
+        return $this->accept($filename, $tempLocation, $public);
     }
 
 
