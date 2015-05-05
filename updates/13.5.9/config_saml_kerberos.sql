@@ -1,1 +1,0 @@
-INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`) VALUES ('saml_krb_whitelist', '', 'Single Sign-On Kerberos Whitelist', 'Comma separated list of individual IPs and CIDR ranges for forcing kerberos authentication with SAML. E.g. 192.168.1.0/24,10.0.5.1,172.0.0.0/8', '2', '2', 'true');
