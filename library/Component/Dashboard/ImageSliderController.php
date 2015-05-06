@@ -131,29 +131,28 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
         $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->source->getId());
 
         // Iterate
-        if (is_array($allFiles)) {
-            foreach ($allFiles as $currentFile) {
-                $url = '#';
+        foreach ($allFiles as $currentFile) {
+            $url = '#';
 
-                // sanitise url
-                if (filter_var($currentFile['comment'], FILTER_VALIDATE_URL)) {
-                    $url = $currentFile['comment'];
-                } // it might be referencing inside schoolbox, so simulate that to the validator
-                elseif (filter_var('http://localhost/' . $currentFile['comment'], FILTER_VALIDATE_URL)) {
-                    $url = $currentFile['comment'];
-                }
-
-                $this->setVar(
-                    array(
-                        'IMAGE_ID'        => $currentFile['id'],
-                        'IMAGE_NAME'      => $currentFile['description'],
-                        'IMAGE_URL'       => $url,
-                        'IMAGE_DIMENSION' => $pixel
-                    )
-                );
-
-                $this->parse('image_scroller_block', 'image_scroller', true);
+            // sanitise url
+            $description = $currentFile->getDescription();
+            if (filter_var($description, FILTER_VALIDATE_URL)) {
+                $url = $description;
+            } // it might be referencing inside schoolbox, so simulate that to the validator
+            elseif (filter_var('http://localhost/' . $description, FILTER_VALIDATE_URL)) {
+                $url = $description;
             }
+
+            $this->setVar(
+                array(
+                    'IMAGE_ID'        => $currentFile->getId(),
+                    'IMAGE_NAME'      => $currentFile->getTitle(),
+                    'IMAGE_URL'       => $url,
+                    'IMAGE_DIMENSION' => $pixel
+                )
+            );
+
+            $this->parse('image_scroller_block', 'image_scroller', true);
         }
 
         return true; // everything went according to plan
