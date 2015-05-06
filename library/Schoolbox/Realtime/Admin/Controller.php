@@ -13,6 +13,7 @@ use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Realtime\Config;
 use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Message\Source;
 use Schoolbox\Realtime\Message\SourceMapper;
@@ -32,6 +33,9 @@ class Controller extends BaseController
 
     /** @var RoutePermissionMapper */
     protected $routePermissionMapper;
+
+    /** @var RerouteOverrideMapper */
+    protected $rerouteOverrideMapper;
 
     /** @var Config */
     protected $config;
@@ -118,13 +122,33 @@ class Controller extends BaseController
 
 
     /**
+     * @return RerouteOverrideMapper
+     */
+    public function getRerouteOverrideMapper()
+    {
+        return $this->rerouteOverrideMapper ?: RerouteOverrideMapper::getInstance(); // TODO remove dingleton
+    }
+
+
+    /**
+     * @param RerouteOverrideMapper $rerouteOverrideMapper
+     * @return static
+     */
+    public function setRerouteOverrideMapper($rerouteOverrideMapper)
+    {
+        $this->rerouteOverrideMapper = $rerouteOverrideMapper;
+        return $this;
+    }
+
+
+    /**
      * @return Config
      */
     protected function getConfig()
     {
         // lazyload
         if (empty($this->config)) {
-            $this->config = new Config($this->getRoleMapper(), $this->getSourceMapper(), $this->getRoutePermissionMapper());
+            $this->config = new Config($this->getRoleMapper(), $this->getSourceMapper(), $this->getRoutePermissionMapper(), $this->getRerouteOverrideMapper());
         }
 
         return $this->config;
