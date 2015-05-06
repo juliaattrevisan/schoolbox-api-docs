@@ -139,7 +139,7 @@ class Bulk_Category extends Bulk_Abstract
                             $role = $roleMapper->findById($id);
 
                             $roleAccess = new \Schoolbox\Permission\Access\RoleAccess();
-                            $roleAccess->setCategory($category);
+                            $roleAccess->setCategory($newFolder);
                             $roleAccess->setRole($role);
                             $roleAccess->setType($perm);
                             $roleAccessMapper->save($roleAccess);
