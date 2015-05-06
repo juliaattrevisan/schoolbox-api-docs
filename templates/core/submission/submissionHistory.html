@@ -191,19 +191,24 @@
     <div class="right">
         <!-- BEGIN action_submit -->
         <h2>Submit Work</h2>
-
         <form method="post" action="/submission/submitWorkForm.php" class="clearfix" enctype="multipart/form-data">
-            <p>You may submit your work either by attaching files, or by editing online.</p>
-            <p>If you edit online, you may save a draft before submitting the final version of your work.</p>
+            <div class="wysiwyg">
+                <p>You may submit your work either by attaching files, or by editing online.</p>
+            </div>
+            <strong>Attach work</strong>
+            <p class="no-marg">Step 1</p>
             {ATTACH_ZONE}
             <label class="clearfix">
                 <input type="hidden" name="box_id" value="{BOX_ID}"/>
             </label>
+            <p class="no-marg">Step 2</p>
             <label>
                 <input type="submit" name="Submit2" value="Submit" class="submit-btn-plain"/>
             </label>
         </form>
-        <h2>Online Editor</h2>
+        <hr>
+        <strong>Or create and edit your work online</strong>
+        <p class="no-marg">If you create and edit online, you may save a draft before submitting the final version of your work.</p>
         <!-- BEGIN action_submit_online_create -->
         <a href="/submission/submitOnline/{BOX_ID}" class="submit-btn-plain edit-online">Create document</a>
         <!-- END action_submit_online_create -->
@@ -215,7 +220,6 @@
 
         <!-- BEGIN action_resubmit -->
         <h2>Resubmit work</h2>
-
         <form method="post" action="/submission/submitWorkForm.php" class="clearfix" enctype="multipart/form-data">
             <div class="wysiwyg">
                 <p>You may resubmit your work either by attaching files, or by editing online.</p>
