@@ -136,16 +136,20 @@ class MimetypeMapper extends Schoolbox\Mapper {
      */
     public function hydrate(array $row, $alias = '', $callback = null)
     {
-        /** @var Mimetype $mime */
-        $mime = parent::hydrate($row, $alias, $callback);
+        if (!is_callable($callback)) {
+            // unless a callback is defined, the default behaviour is to ensure that SOME kind of valid mime is returned
+            $callback = function ($self, $model, $row) {
+                // if it correctly hydrated an entity, return it
+                if ($model->getFileTypeID()) {
+                    return $model;
+                }
 
-        // if it correctly hydrated an entity, return it
-        if ($mime->getFileTypeID()) {
-            return $mime;
+                // otherwise return MimeUnknown: never return a Mime[null,null,null,null,...] object
+                return $self->getUnknownMime();
+            };
         }
 
-        // otherwise return MimeUnknown: never return a Mime[null,null,null,null,...] object
-        return $this->getUnknownMime();
+        return parent::hydrate($row, $alias, $callback);
     }
 
 }

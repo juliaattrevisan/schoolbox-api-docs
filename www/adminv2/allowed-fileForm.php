@@ -57,7 +57,7 @@ if (isset($_POST['max_file_size'])) {
 
 // sure... because this can't go badly.....
 /** @var Mimetype $mime */
-$mime = $mimeMapper->hydrate($_POST);
+$mime = $mimeMapper->hydrate($_POST, '', function ($self, $model, $row) { return $model; });
 
 // verify data integritae (no duplicate mimes)
 try {
