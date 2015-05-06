@@ -4,8 +4,8 @@ INSERT INTO `submission_errors` (
     `normalise_as`,
     `is_default_for_new_submissions`
 ) VALUES (
-    'NEW',
-    'Newly Submitted',
+    'PE',
+    'Pending',
     null,
     true
 );
