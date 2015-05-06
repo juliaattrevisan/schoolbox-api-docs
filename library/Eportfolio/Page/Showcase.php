@@ -150,9 +150,9 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                                 array(
                                     'SHOWCASED_WORK_SUBMISSION_ID' => $currentItem['latestSubmission']->getId(),
                                     'SHOWCASED_WORK_SUBMISSION_FILESIZE' => Alaress_Byte_Format::bytesToString(
-                                            $currentItem['latestSubmission']->getFilesize()
+                                            $currentItem['latestSubmission']->getSize()
                                         ),
-                                    'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $currentItem['latestSubmission']->getSubmitted(
+                                    'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $currentItem['latestSubmission']->getCreatedAt(
                                         )->getShort(),
                                     'SHOWCASED_WORK_MIMETYPE_ICONFILE' => $currentItem['latestSubmission']->getMimetype(
                                         )->getClass(),

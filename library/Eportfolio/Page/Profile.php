@@ -195,8 +195,8 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 				if ($latestSubmission) {
 					$this->getPage()->setVar(array(
 						'SHOWCASED_WORK_SUBMISSION_ID' => $latestSubmission->getId(),
-						'SHOWCASED_WORK_SUBMISSION_FILESIZE' => Alaress_Byte_Format::bytesToString($latestSubmission->getFilesize()),
-						'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $latestSubmission->getSubmitted()->getShort(),
+						'SHOWCASED_WORK_SUBMISSION_FILESIZE' => Alaress_Byte_Format::bytesToString($latestSubmission->getSize()),
+						'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $latestSubmission->getCreatedAt()->getShort(),
 						'SHOWCASED_WORK_MIMETYPE_ICONFILE' => $latestSubmission->getMimetype()->getClass(),
 					));
 
