@@ -122,13 +122,15 @@ class RoleCloner
             // retrieve the new instanceId we just created
             $newInstId = $this->db->lastInsertId();
 
-            foreach ($inst['conf'] as $defnId => $value) {
-                // if there was a config for the instance, copy that across
-                $insertConfStmt->execute([
-                    'ccd' => $defnId,
-                    'ci'  => $newInstId,
-                    'val' => $value
-                ]);
+            if (!empty($inst['conf'])) {
+                foreach ($inst['conf'] as $defnId => $value) {
+                    // if there was a config for the instance, copy that across
+                    $insertConfStmt->execute([
+                        'ccd' => $defnId,
+                        'ci'  => $newInstId,
+                        'val' => $value
+                    ]);
+                }
             }
         }
 
