@@ -29,9 +29,10 @@ $base = '\\Schoolbox\\Resource\\Attachment';
 // register our known defaults
 $factory = new \Schoolbox\Resource\Attachment\Factory(array(
     'internal' => array(
-        'upload' => "$base\\Internal\\UploadController",
-        'browse' => "$base\\Internal\\BrowseController",
-        'myfile' => "$base\\Internal\\MyfileController",
+        'upload'    => "$base\\Internal\\UploadController",
+        'usermedia' => "$base\\Internal\\UsermediaController",
+        'browse'    => "$base\\Internal\\BrowseController",
+        'myfile'    => "$base\\Internal\\MyfileController",
     ),
     'external' => array(
         'webdav' => "$base\\External\\WebdavController",

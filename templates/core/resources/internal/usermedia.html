@@ -1,0 +1,237 @@
+<script type="text/javascript" src="/javascript/recorder/getusermedia-shim/getUserMedia.js"></script>
+<script type="text/javascript" src="/javascript/recorder/webrtc/recorder.js"></script>
+<script type="text/javascript" src="/javascript/recorder/flash/recorder.js"></script>
+<script type="text/javascript" src="/javascript/components/swfobject/swfobject/swfobject.js"></script>
+<script type="text/javascript" src="/javascript/recorder/jquery.recorder.js"></script>
+<script type="text/javascript">
+    $(function() {
+        var recorderContainer      = $('#ab-usermedia'),
+            recorderControls       = $('#recorderButtons'),
+            recorderNameDialog     = $('#recorderNameDialog'),
+            recorderDisabledDialog = $('#recorderDisabledDialog'),
+            recorderNameInput      = recorderNameDialog.find('input[data-role="recording-name"]'),
+            recorderInterface; // Recording plugin
+
+        // Call this when I want to actually upload recorded sounds
+        var uploadRecorded = function() {
+            recorderNameInput.blur();
+            recorderInterface.uploadRecorded(recorderNameInput.val() + '.wav');
+            recorderNameDialog.dialog('close');
+        };
+
+        // Set up the recorder's dialogs
+        recorderNameDialog.dialog({
+            modal: true,
+            autoOpen: false,
+            buttons: [
+                {
+                    text:  'Upload',
+                    click: function() {
+                        uploadRecorded();
+                    }
+                },
+                {
+                    text:  'Cancel',
+                    click: function() {
+                        $(this).dialog('close');
+                    }
+                }
+            ]
+        }).on('open', function() {
+            recorderNameInput.focus();
+        });
+        recorderDisabledDialog.dialog({
+            modal: true,
+            autoOpen: false,
+            buttons: [
+                {
+                    text:  'Try to upload a file',
+                    click: function() {
+                        $('#attachment-browser').find('a[href="#internal/upload"]').click();
+                        $(this).dialog('close');
+                    }
+                },
+                {
+                    text:  'Cancel',
+                    click: function() {
+                        $(this).dialog('close');
+                    }
+                }
+            ]
+        });
+
+        // Did I press enter on the recorder name? treat that as a form submit
+        recorderNameInput.on('keypress', function(event) {
+            if (event.which == 13) {
+                uploadRecorded();
+            }
+        });
+
+        // Set up the recorder
+        var recorderButtons = {
+            start:     recorderControls.find('a[data-interaction="audio-record-start"]'),
+            recording: recorderControls.find('a[data-interaction="audio-record-recording"]'),
+            play:      recorderControls.find('a[data-interaction="audio-record-play"]'),
+            stop:      recorderControls.find('a[data-interaction="audio-record-stop"]'),
+            upload:    recorderControls.find('a[data-interaction="audio-record-upload"]'),
+            uploading: recorderControls.find('a[data-interaction="audio-record-uploading"]'),
+            disabled:  recorderControls.find('a[data-interaction="audio-record-disabled"]')
+        };
+
+        // Switch off buttons by default
+        recorderButtons.start.show().prop('disabled', false);
+        recorderButtons.recording.hide().prop('disabled', true);
+        recorderButtons.play.hide().prop('disabled', true);
+        recorderButtons.stop.hide().prop('disabled', true);
+        recorderButtons.upload.hide().prop('disabled', true);
+        recorderButtons.disabled.hide();
+        recorderButtons.uploading.hide();
+
+        recorderContainer.recorder({
+            upload: {
+                url: '/storage/asyncUpload'
+            },
+            flash: {
+                flashContainer: $('#flashContainer')[0],
+                onFlashSecurity: function() {
+                    $('#flashContainer').show();
+                },
+                session: {
+                    name: '{SESSION_NAME}',
+                    id:   '{SESSION_ID}'
+                }
+            }
+        });
+        recorderInterface = recorderContainer.data('recorder');
+
+        // Set up button events
+        recorderContainer.on('setupFailed.recorder', function() {
+            // Disable all buttons
+            recorderButtons.start.hide().prop('disabled', true);
+            recorderButtons.recording.hide().prop('disabled', true);
+            recorderButtons.play.hide().prop('disabled', true);
+            recorderButtons.stop.hide().prop('disabled', true);
+            recorderButtons.upload.hide().prop('disabled', true);
+            recorderButtons.disabled.show();
+            recorderDisabledDialog.dialog('open');
+        });
+        recorderContainer.on('recordingReady.recorder', function() {
+            // Allow record button to show
+            recorderButtons.start.show().prop('disabled', false);
+        });
+        recorderContainer.on('recordingStart.recorder', function() {
+            // Show stop button only
+            recorderButtons.start.hide().prop('disabled', true);
+            recorderButtons.recording.show().prop('disabled', true);
+            recorderButtons.play.hide().prop('disabled', true);
+            recorderButtons.stop.show().prop('disabled', false);
+            recorderButtons.upload.hide().prop('disabled', true);
+        });
+        recorderContainer.on('recordingStop.recorder', function() {
+            recorderButtons.start.show().prop('disabled', false);
+            recorderButtons.recording.hide().prop('disabled', true);
+            recorderButtons.play.show().prop('disabled', false);
+            recorderButtons.stop.hide().prop('disabled', true);
+            recorderButtons.upload.show().prop('disabled', false);
+        });
+        recorderContainer.on('playbackStart.recorder', function() {
+            recorderButtons.start.show().prop('disabled', true);
+            recorderButtons.play.hide().prop('disabled', true);
+            recorderButtons.stop.show().prop('disabled', false);
+            recorderButtons.upload.show().prop('disabled', false);
+        });
+        recorderContainer.on('playbackStop.recorder', function() {
+            recorderButtons.start.show().prop('disabled', false);
+            recorderButtons.play.show().prop('disabled', false);
+            recorderButtons.stop.hide().prop('disabled', true);
+            recorderButtons.upload.show().prop('disabled', false);
+        });
+        recorderContainer.on('uploadStart.recorder', function() {
+            recorderButtons.start.hide().prop('disabled', true);
+            recorderButtons.recording.hide().prop('disabled', true);
+            recorderButtons.play.hide().prop('disabled', true);
+            recorderButtons.stop.hide().prop('disabled', true);
+            recorderButtons.upload.hide().prop('disabled', true);
+            recorderButtons.uploading.show();
+        });
+        recorderContainer.on('uploadComplete.recorder', function(event, recorder, filename, response) {
+            // inform any listeners that a file was uploaded.
+            // put it in the dropzone, and inform the dropzone opener
+            // that a file was posted to it.
+            var data = {
+                title:    filename,
+                mimeType: response.meta.type,
+                filesize: response.meta.size,
+                hash:     response.hash
+            };
+            window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
+
+            // Go back to recordingReady state
+            recorderButtons.start.show().prop('disabled', false);
+            recorderButtons.recording.hide().prop('disabled', true);
+            recorderButtons.play.hide().prop('disabled', true);
+            recorderButtons.stop.hide().prop('disabled', true);
+            recorderButtons.upload.show().prop('disabled', false);
+            recorderButtons.uploading.hide();
+        });
+        recorderContainer.on('uploadFailed.recorder', function(event, recorder) {
+            // Show some sort of failed message?
+            recorderButtons.start.hide().prop('disabled', true);
+            recorderButtons.recording.hide().prop('disabled', true);
+            recorderButtons.play.hide().prop('disabled', true);
+            recorderButtons.stop.hide().prop('disabled', true);
+            recorderButtons.upload.hide().prop('disabled', true);
+            recorderButtons.uploading.show();
+        });
+
+        // Button events
+        recorderButtons.start.click(function(event) {
+            event.preventDefault();
+            recorderInterface.startRecording();
+        });
+        recorderButtons.play.click(function(event) {
+            event.preventDefault();
+            recorderInterface.startPlaying();
+        });
+        recorderButtons.stop.click(function(event) {
+            event.preventDefault();
+            if (recorderInterface.isRecording()) {
+                recorderInterface.stopRecording();
+            } else if (recorderInterface.isPlaying()) {
+                recorderInterface.stopPlaying();
+            }
+        });
+        recorderButtons.upload.click(function(event) {
+            event.preventDefault();
+            // prompt for a name
+            recorderNameDialog.dialog('open');
+        });
+    });
+</script>
+
+<div id="ab-usermedia" class="ab-pane">
+    <!--
+        Usermedia uploader
+        * Audio for now, designed to be extendable to video
+        * Should fall back to simple file upload for iPads
+          (this supports usermedia natively)
+    -->
+    <div class="dz-default"><span>Start recording audio</span></div>
+    <div id="flashContainer" class="hide"></div>
+</div>
+<div id="recorderButtons">
+    <a role="button" class="submit-btn-plain record" data-interaction="audio-record-start" href="#">Record Audio</a>
+    <a role="button" class="submit-btn-plain recording hide" data-interaction="audio-record-recording" disabled href="#">Recording...</a>
+    <a role="button" class="submit-btn-plain disabled" data-interaction="audio-record-disabled" disabled href="#">No recording devices available</a>
+    <a role="button" class="submit-btn-plain play hide" data-interaction="audio-record-play" href="#">Play</a>
+    <a role="button" class="submit-btn-plain stop hide" data-interaction="audio-record-stop" href="#">Stop</a>
+    <a role="button" class="submit-btn-plain upload hide" data-interaction="audio-record-upload" href="#">Upload Audio</a>
+    <a role="button" class="submit-btn-plain uploading hide" data-interaction="audio-record-uploading" disabled href="#">Uploading...</a>
+    <a role="button" class="btn no-icon float-left cancel" href="#">Cancel</a>
+</div>
+<div id="recorderNameDialog" title="Please enter a name for this recording" class="hide">
+    <input data-role="recording-name" type="text" value="recording" />
+</div>
+<div id="recorderDisabledDialog" title="Recording is not directly supported in your browser" class="hide">
+    Selecting a file to upload in the "Upload file" selector might work.
+</div>
