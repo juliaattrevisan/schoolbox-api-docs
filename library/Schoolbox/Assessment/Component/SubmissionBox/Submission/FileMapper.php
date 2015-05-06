@@ -14,6 +14,8 @@ use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
@@ -80,6 +82,7 @@ class FileMapper extends Mapper
         $this->joins('hash', Storage\Mapper::class, 'hash', null, null, 'storage', 'storage');
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'postSave' ]);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'createDefaultReturn' ]);
     }
 
 
@@ -112,6 +115,46 @@ class FileMapper extends Mapper
         }
     }
 
+    /**
+     * Post-save callback.
+     *
+     * Attaches a default return to this submission for this student, if there
+     * is no return for them already.
+     *
+     * @param File $object
+     * @param File $previous
+     */
+    public function createDefaultReturn(File $object, $previous = null)
+    {
+        if (!($object->getDraft())) {
+            $boxId = $object->getSubmissionBox()->getId();
+            /** @var ReturnedWorkMapper $returnMapper */
+            $returnMapper = $this->getJoinMapper('box_id.return');
+            if ($returnMapper->countByColumn('box_id', $boxId) === 0) {
+                try {
+                    // Get default state
+                    $submissionStateMapper = new \DueWork_ErrorMapper();
+                    $defaultState          = $submissionStateMapper->findDefaultForNewSubmissions();
+                } catch (Mapper\Exception $e) {
+                    // No default state: do nothing
+                    return;
+                }
+                /** @var ReturnedWork $defaultReturn */
+                $defaultReturn = $returnMapper->createModel();
+                $defaultReturn
+                    ->setIsConfirmationOfSubmission(true)
+                    ->setSubmissionBox($object->getSubmissionBox())
+                    ->setOwner($object->getOwner())
+                    // No real marker
+                    ->setMarker($object->getSubmissionBox()->getOwner())
+                    ->setMark($defaultState->getDisplayAs())
+                    ->setReturned($object->getCreatedAt())
+                    ->setNormalizedMark($defaultState->getNormaliseAs())
+                ;
+                $returnMapper->save($defaultReturn);
+            }
+        }
+    }
 
     /**
      * @return string
