@@ -278,6 +278,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
 			 */
             $context['uid'] = $this->getUser()->getId();
             $context['permission'] = $this->getPermission();
+            $context['page']       = $this;
 
             $component->setup($context, $component->getInstance()->getConfigArray());
 
