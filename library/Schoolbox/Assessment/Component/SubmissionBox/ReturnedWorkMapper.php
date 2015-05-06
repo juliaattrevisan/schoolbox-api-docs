@@ -96,6 +96,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
                 'column' => 'returned',
                 'property' => 'returned',
                 'type' => self::TYPE_DATETIME,
+                'updated_timestamp' => true,
             )
         );
         $this->hasMap(
