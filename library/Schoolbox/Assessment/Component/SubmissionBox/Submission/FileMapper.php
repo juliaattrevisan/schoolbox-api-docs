@@ -130,7 +130,11 @@ class FileMapper extends Mapper
             $boxId = $object->getSubmissionBox()->getId();
             /** @var ReturnedWorkMapper $returnMapper */
             $returnMapper = $this->getJoinMapper('box_id.return');
-            if ($returnMapper->countByColumn('box_id', $boxId) === 0) {
+            $returnCount  = $returnMapper->countByColumnList([
+                'box_id' => $boxId,
+                'owner'  => $object->getOwner()->getId()
+            ]);
+            if ($returnCount === 0) {
                 try {
                     // Get default state
                     $submissionStateMapper = new \DueWork_ErrorMapper();
