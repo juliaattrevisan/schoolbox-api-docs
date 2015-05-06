@@ -19,6 +19,7 @@ use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\Folder\Search\Result;
+use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\User;
 
@@ -289,9 +290,12 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
     public function saveHomepageConfig($model, $previous = null)
     {
         if (!isset($previous)) {
-            $model->getHomepage()->setCategory($model);
-            $homepageConfigMapper = $this->getJoinMapper('homepages');
-            $homepageConfigMapper->save($model->getHomepage());
+            $homepage = $model->getHomepage();
+            if ($homepage instanceof HomepageConfig) {
+                $model->getHomepage()->setCategory($model);
+                $homepageConfigMapper = $this->getJoinMapper('homepages');
+                $homepageConfigMapper->save($model->getHomepage());
+            }
         }
     }
 
