@@ -219,7 +219,7 @@ abstract class Eportfolio_Page_Abstract {
 	 * @return mixed
 	 */
 	protected function getLatestSubmission($userId, $boxId) {
-		$mapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
+		$mapper = new \Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper();
 
 		$history = $mapper->getHistory($userId, $boxId);
 
