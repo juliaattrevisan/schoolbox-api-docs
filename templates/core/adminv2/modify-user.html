@@ -11,11 +11,12 @@ $(function() {
 	/* Ajax Update group access permissions
 	 */
 	$('.updateGroupsForm').find('input[name=type]').change(function() {
+		var form = $(this).closest('form');
 		var data = {
 			type: $(this).val(),
-			uid: $(this).siblings('input[name=uid]').val(),
-			sid: $(this).siblings('input[name=sid]').val(),
-			service: $(this).siblings('input[name=service]').val(),
+			uid: form.find('input[name=uid]').val(),
+			sid: form.find('input[name=sid]').val(),
+			service: form.find('input[name=service]').val(),
 			updateGroups: true
 		}
 
@@ -25,11 +26,12 @@ $(function() {
 	/* Ajax Update service access permissions
 	 */
 	$('.updateServicesForm').find('input[name=type]').change(function() {
+		var form = $(this).closest('form');
 		var data = {
 			type: $(this).val(),
-			uid: $(this).siblings('input[name=uid]').val(),
-			sid: $(this).siblings('input[name=sid]').val(),
-			service: $(this).siblings('input[name=service]').val(),
+			uid: form.find('input[name=uid]').val(),
+			sid: form.find('input[name=sid]').val(),
+			service: form.find('input[name=service]').val(),
 			updateServices: true
 		}
 
@@ -39,12 +41,13 @@ $(function() {
 	/* Ajax Update SID values
 	 */
 	$('.updateSIDForm').find('select[name=sid]').change(function() {
+		var form = $(this).closest('form');
 		var data = {
 			type: $(this).val(),
-			uid: $(this).siblings('input[name=uid]').val(),
+			uid: form.find('input[name=uid]').val(),
 			sid: $(this).val(),
-			previousSid: $(this).siblings('input[name=previousSid]').val(),
-			service: $(this).siblings('input[name=service]').val(),
+			previousSid: form.find('input[name=previousSid]').val(),
+			service: form.find('input[name=service]').val(),
 			updateSID: true
 		}
 
