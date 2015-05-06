@@ -12,6 +12,7 @@ namespace Schoolbox\Realtime;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Message\Reroute;
 use Schoolbox\Realtime\Message\RerouteMapper;
+use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Message\Source;
@@ -31,20 +32,26 @@ class Config
     /** @var RoutePermissionMapper */
     protected $routePermissionMapper;
 
+    /** @var RerouteOverrideMapper */
+    protected $rerouteOverrideMapper;
+
 
     /**
      * @param RoleMapper            $roleMapper
      * @param SourceMapper          $sourceMapper
-     * @param RoutePermissionMapper $permMapper
+     * @param RoutePermissionMapper $permMapper ,
+     * @param RerouteOverrideMapper $rerouteOverrideMapper
      */
     public function __construct(
         RoleMapper $roleMapper,
         SourceMapper $sourceMapper,
-        RoutePermissionMapper $permMapper
+        RoutePermissionMapper $permMapper,
+        RerouteOverrideMapper $rerouteOverrideMapper
     ) {
         $this->setRoleMapper($roleMapper)
              ->setSourceMapper($sourceMapper)
-             ->setRoutePermissionMapper($permMapper);
+             ->setRoutePermissionMapper($permMapper)
+             ->setRerouteOverrideMapper($rerouteOverrideMapper);
     }
 
 
@@ -104,6 +111,26 @@ class Config
     public function setRoutePermissionMapper($routePermissionMapper)
     {
         $this->routePermissionMapper = $routePermissionMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return RerouteOverrideMapper
+     */
+    public function getRerouteOverrideMapper()
+    {
+        return $this->rerouteOverrideMapper;
+    }
+
+
+    /**
+     * @param RerouteOverrideMapper $rerouteOverrideMapper
+     * @return static
+     */
+    public function setRerouteOverrideMapper($rerouteOverrideMapper)
+    {
+        $this->rerouteOverrideMapper = $rerouteOverrideMapper;
         return $this;
     }
 

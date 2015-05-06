@@ -200,7 +200,7 @@ class Controller extends BaseController
     {
         // lazyload
         if (empty($this->config)) {
-            $this->config = new Config($this->getRoleMapper(), $this->getSourceMapper(), $this->getRoutePermissionMapper());
+            $this->config = new Config($this->getRoleMapper(), $this->getSourceMapper(), $this->getRoutePermissionMapper(), $this->getRerouteOverrideMapper());
         }
 
         return $this->config;
