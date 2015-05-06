@@ -291,7 +291,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
     {
         if (!isset($previous)) {
             $homepage = $model->getHomepage();
-            if ($homepage instanceof HomepageConfig) {
+            if ($homepage instanceof HomepageConfig && $homepage->getTemplate()->getId()) {
                 $model->getHomepage()->setCategory($model);
                 $homepageConfigMapper = $this->getJoinMapper('homepages');
                 $homepageConfigMapper->save($model->getHomepage());
