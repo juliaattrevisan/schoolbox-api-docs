@@ -81,7 +81,7 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
         if (!in_array($key, $exclusions)) {
             $templateFile = "component/config/$key.html";
             $page->setFile($key, $templateFile);
-            $conf->parse($page, $key, $key, Scrub::text($params['value']));
+            $conf->parse($page, $key, $key, Scrub::text($params['value']), $this);
 
             if ($key == 'componentname') {
 
