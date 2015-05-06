@@ -60,6 +60,8 @@ class MimetypeMapper extends Schoolbox\Mapper {
             'property'   => 'maxFileSize',
             'type'       => self::TYPE_INTEGER,
         ));
+
+        $this->uses('deleted', self::TYPE_BOOLEAN, self::COLUMN_SOFTDELETE);
 	}
 
 	/**
@@ -71,7 +73,7 @@ class MimetypeMapper extends Schoolbox\Mapper {
 	public function isFilenameMimetypeAllowed($filename) {
 		try {
 			$mimetype = $this->getByFilename($filename);
-			return ($mimetype instanceof Mimetype && $mimetype->getEnable());
+			return ($mimetype instanceof Mimetype && $mimetype->getEnable() && !$mimetype->isDeleted());
 		}
 		catch (Exception $ex) {
 			return false;
@@ -104,7 +106,7 @@ class MimetypeMapper extends Schoolbox\Mapper {
 			return $this->hydrate($row, 'aft');
 		}
 
-		throw new Exception('Mimetype not found', Exception::CODE_MIMETYPE_NOT_FOUND);
+		throw new Exception("No mime found for extension '$extension'.", Exception::CODE_MIMETYPE_NOT_FOUND);
 	}
 
 	/**
@@ -123,4 +125,31 @@ class MimetypeMapper extends Schoolbox\Mapper {
 
 		return $mimeType;
 	}
+
+
+    /**
+     * @param array    $row
+     * @param string   $alias
+     * @param callable $callback
+     * @return object|void
+     * @throws Schoolbox\Mapper\Exception
+     */
+    public function hydrate(array $row, $alias = '', $callback = null)
+    {
+        if (!is_callable($callback)) {
+            // unless a callback is defined, the default behaviour is to ensure that SOME kind of valid mime is returned
+            $callback = function ($self, $model, $row) {
+                // if it correctly hydrated an entity, return it
+                if ($model->getFileTypeID()) {
+                    return $model;
+                }
+
+                // otherwise return MimeUnknown: never return a Mime[null,null,null,null,...] object
+                return $self->getUnknownMime();
+            };
+        }
+
+        return parent::hydrate($row, $alias, $callback);
+    }
+
 }

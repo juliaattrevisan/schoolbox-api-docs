@@ -134,7 +134,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 			LEFT JOIN {$this->getJoinSql('mark_type', 'sb', 'mt')}
 			LEFT JOIN {$this->getJoinSql('category',  'sb', 'cat')}
 			LEFT JOIN {$this->getJoinSql('submission_box_file', 'sb', 'at')}
-			LEFT JOIN {$attach_mapper->getJoinSql('allowedFileExtension', 'at', 'mime')}
+			LEFT JOIN {$attach_mapper->getJoinSql('allowedFileExtension', 'at', 'mime', true)}
             LEFT JOIN {$this->getJoinSql('curriculum_node_for_submission_box', 'sb', 'cn')}
             LEFT JOIN {$this->getJoinSql('curriculum_node_for_submission_box.level', 'cn', 'cnl')}
             LEFT JOIN {$this->getJoinSql('curriculum_node_for_submission_box.level.source', 'cnl', 'cnls')}

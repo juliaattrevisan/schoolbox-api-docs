@@ -39,9 +39,8 @@
             content:'Determines if file will be opened in the browser or by a third party application'});
 
         $(document).on('click', '.modify', function () {
-            var trigger = 0;
-
-            level = $(this).parent().parent().parent()
+            var trigger = 0,
+                level   = $(this).closest('div.row');
 
             $('.form-holder').each(function () {
                 if ($(this).is(':visible')) {
@@ -53,10 +52,8 @@
                     $(this).siblings().slideDown();
                     $(this).slideUp();
                     trigger = 1;
-
                 }
-
-            })
+            });
 
             if (trigger == 0) {
                 level.slideUp(function () {
@@ -148,7 +145,7 @@
             event.preventDefault();
             if (confirm("Are you sure you want to delete?")) {
                 var nearestAction = $(this).closest('form').attr('action');
-                var nearestFID = $(this).closest('form').find('input[name=fileTypeID]').val();
+                var nearestFID = $(this).closest('form').find('input[name=fileTypeId]').val();
                 $(this).closest('form').attr('action', nearestAction + "?delete=" + nearestFID);
                 $(this).closest('form').submit();
             }
@@ -172,7 +169,7 @@
     <h2>Allowed Files</h2>
 
     <form id="newAllowedFile" method="post" action="/adminv2/allowed-fileForm.php">
-        <input type="hidden" readonly="readonly" name="fileTypeID" value=""/>
+        <input type="hidden" readonly="readonly" name="fileTypeId" value=""/>
         <table cellpadding="0" cellspacing="0" class="allowed-files table">
             <colgroup>
                 <col class="enabled" />
@@ -224,7 +221,7 @@
                     <p>{FILE_MIME}</p>
                 </div>
                 <div class="extensions">
-                    <p>{FILE_EXTENSION}</p>
+                    <ul>{FILE_EXTENSION}</ul>
                 </div>
                 <div class="max_size">
                     <p>{FILE_MAXSIZE}</p>
@@ -240,7 +237,7 @@
 
                 <!--/adminv2/allowed-fileForm.php-->
                 <form id="allowed-file{FILE_ID}" method="post" class="clearfix" action="/adminv2/allowed-fileForm.php">
-                    <input type="hidden" readonly="readonly" name="fileTypeID" value="{FILE_ID}"/>
+                    <input type="hidden" readonly="readonly" name="fileTypeId" value="{FILE_ID}"/>
                     <fieldset class="enabled">
                         <fieldset>
                             <input type="checkbox" name="enable" value="true" {FILE_ENABLED_CHECKED} />
@@ -262,7 +259,7 @@
                     </fieldset>
                     <fieldset class="extensions">
                         <fieldset>
-                            <input type="text" class="text-input" name="extension" value="{FILE_EXTENSION}"/>
+                            <input type="text" class="text-input" name="extension" value="{FILE_EXTENSION_CSV}"/>
                         </fieldset>
                     </fieldset>
                     <fieldset class="max_size">

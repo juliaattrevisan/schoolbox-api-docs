@@ -178,7 +178,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
 			LEFT JOIN {$this->getJoinSql('submission_box', 'sr', 'sb')}
 			LEFT JOIN {$box_join->getJoinSql('category', 'sb', 'c')}
 			LEFT JOIN {$this->getJoinSql('storage', 'sr', 'file')}
-			LEFT JOIN {$storage_join->getJoinSql('allowedFileExtension', 'file', 'mime')}
+			LEFT JOIN {$storage_join->getJoinSql('allowedFileExtension', 'file', 'mime', true)}
 			WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 			AND sb.mark_visibility IN {$this->getArrayPlaceholders($visibilities, 'vis')}
 			AND sr.owner = :user_id

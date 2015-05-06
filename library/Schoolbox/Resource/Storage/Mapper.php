@@ -128,7 +128,7 @@ class Mapper extends Schoolbox\Mapper implements Receiver
           SELECT {$this->getColumnString()},
                  {$this->getJoinColumnString('allowedFileExtension')}
           FROM $table
-          LEFT JOIN {$this->getJoinSql('allowedFileExtension')}
+          LEFT JOIN {$this->getJoinSql('allowedFileExtension', '', '', true)}
         ";
     }
 
@@ -243,7 +243,11 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         // set filetype metadata
         $storage->setFilename(pathinfo($filename, PATHINFO_FILENAME));
         $storage->setExtension(pathinfo($filename, PATHINFO_EXTENSION));
-        $storage->setMimetype($mtm->getByFilename($filename));
+        try {
+            $storage->setMimetype($mtm->getByFilename($filename));
+        } catch (File\Exception $e) {
+            // noop. we are going to allow the mime to remain NULL, which will shortly be caught in the safetyCheck
+        }
 
         // by default, files uploaded this way are public
         $storage->setPublic($public);

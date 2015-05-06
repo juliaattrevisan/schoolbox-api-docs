@@ -212,7 +212,7 @@ class FileMapper extends Mapper
             FROM {$this->getTable()} ss
             LEFT JOIN {$this->getJoinSql('box_id', 'ss', 'sb')}
             LEFT JOIN {$this->getJoinSql('storage', 'ss', 'h')}
-            LEFT JOIN {$storageJoin->getJoinSql('allowedFileExtension', 'h', 'afe')}
+            LEFT JOIN {$storageJoin->getJoinSql('allowedFileExtension', 'h', 'afe', true)}
             LEFT JOIN {$boxJoin->getJoinSql('category', 'sb', 'c')}
             WHERE sb.category IN {$boxJoin->getArrayPlaceholders($categories, 'category')}
             AND ss.owner = :user_id
@@ -251,7 +251,7 @@ class FileMapper extends Mapper
             FROM {$this->getTable()} ss
             LEFT JOIN {$this->getJoinSql('box_id', 'ss', 'sb')}
             LEFT JOIN {$this->getJoinSql('storage', 'ss', 'h')}
-            LEFT JOIN {$storageJoin->getJoinSql('allowedFileExtension', 'h', 'afe')}
+            LEFT JOIN {$storageJoin->getJoinSql('allowedFileExtension', 'h', 'afe', true)}
             LEFT JOIN {$boxJoin->getJoinSql('category', 'sb', 'c')}
             WHERE sb.id = :box_id
             AND ss.owner = :user_id

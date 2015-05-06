@@ -68,6 +68,9 @@ class Mimetype {
      */
     protected $maxFileSize;
 
+    /** @var bool */
+    protected $deleted;
+
     /**
 	 * Get icon class by deriving it from the iconFile
 	 *
@@ -252,6 +255,37 @@ class Mimetype {
     public function isEnabled() {
         return $this->getEnable();
     }
+
+
+    /**
+     * @deprecated mapper compat method
+     * @return bool
+     */
+    public function getDeleted()
+    {
+        return $this->isDeleted();
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isDeleted()
+    {
+        return $this->deleted;
+    }
+
+
+    /**
+     * @param boolean $deleted
+     * @return static
+     */
+    public function setDeleted($deleted)
+    {
+        $this->deleted = $deleted;
+        return $this;
+    }
+
+
 
     /**
      * Determine if a file is audio
