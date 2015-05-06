@@ -23,6 +23,8 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
      * @param array $context Actually an array in this context. Has these keys:
      *                       uid: the component owner's ID
      *                       permission: the permission level (READ_ACCESS, etc)
+     *                       page: the Eportfolio_Page_Instance object this component is on
+     *                       TODO make $context the Eportfolio_Page_Instance object only
      * @param array $config
      */
     public function setup($context = null, array $config = array())
