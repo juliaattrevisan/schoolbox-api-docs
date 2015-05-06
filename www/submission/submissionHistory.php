@@ -16,7 +16,6 @@ $this->setTab('submission');
 $this->setBlock(TEMPLATE_content, 'subject', 'subject_block');
 $this->setBlock(TEMPLATE_content, 'download', 'download_block');
 $this->setBlock(TEMPLATE_content, 'legacy_download', 'legacy_download_block');
-$this->setBlock(TEMPLATE_content, 'action_submit', 'action_submit_block');
 $this->setBlock(TEMPLATE_content, 'action_publish', 'action_publish_block');
 $this->setBlock(TEMPLATE_content, 'recent_submission', 'recent_submission_block');
 $this->setBlock(TEMPLATE_content, 'confirm_terms', 'confirm_terms_block');
@@ -28,9 +27,10 @@ $this->setBlock('returned_work', 'return_file', 'return_file_block');
 $this->setBlock('returned_work', 'return_file_uuid', 'return_file_uuid_block');
 $this->setBlock('recent_submission', 'plag_score', 'plag_score_block');
 $this->setBlock('recent_submission', 'overdue', 'overdue_block');
-$this->setBlock('recent_submission', 'action_resubmit', 'action_resubmit_block');
+$this->setBlock('subject', 'action_resubmit', 'action_resubmit_block');
 $this->setBlock('recent_submission', 'recent_submission_download', 'recent_submission_download_block');
 $this->setBlock('subject', 'work', 'work_block');
+$this->setBlock('subject', 'action_submit', 'action_submit_block');
 
 // Blocks for online editor buttons
 $this->setBlock('action_submit', 'action_submit_online_create', 'action_submit_online_create_block');
