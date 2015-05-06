@@ -9,14 +9,18 @@
 
 namespace Schoolbox\Realtime;
 
+use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\Reroute;
 use Schoolbox\Realtime\Message\RerouteMapper;
+use Schoolbox\Realtime\Message\RerouteOverride;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Message\Source;
 use Schoolbox\Realtime\Message\SourceMapper;
+use Schoolbox\Resource\Folder;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 
@@ -306,6 +310,62 @@ class Config
 
         return array_sum($settings['perm']);
     }
+
+
+    /**
+     * @param User  $user
+     * @param array $follow
+     * @return array
+     */
+    public function persistFollow(User $user, $follow)
+    {
+        $involvements = $user->getAccessList()->getColumnValues('serviceIdentifier');
+
+        $follow = array_keys(array_filter($follow));
+
+        asort($follow);
+        asort($involvements);
+
+        $unfollow = array_values(array_diff($involvements, $follow));
+
+        // delete any overrides for homepages the user is RE-following
+        RerouteOverrideMapper::getInstance()->deleteByColumnList(array(
+            'user_id'        => $user->getId(),
+            'msg_route_key'  => array_map([ $this, 'castToRoutingKey' ], $follow),
+            'outgoing_level' => 0
+        ));
+
+        // insert new entries for homepages the user is UN-following
+        $overrides = new Collection();
+
+        foreach ($unfollow as $id) {
+            /** @var RerouteOverride $override */
+            $override = $this->getRerouteOverrideMapper()->createModel();
+
+            $override->setUser($user);
+            $override->setRouteKey($this->castToRoutingKey($id));
+            $override->setOutgoingLevel(0);
+            $override->setDelivery([ 'MU' ]);
+
+            $overrides->add($override);
+        }
+
+        RerouteOverrideMapper::getInstance()->save($overrides);
+
+        return $follow;
+    }
+
+
+    /**
+     * Wrap an int into a routing-key string
+     *
+     * @param int $v
+     * @return string
+     */
+    protected function castToRoutingKey($v) {
+        return 'service.' . UserAccess::SERVICE_HOMEPAGE . ".$v";
+    }
+
 
     /**
      * @param  array $mask

@@ -391,7 +391,8 @@ class Controller extends BaseController
     {
         $post = $this->getRequest()->post;
 
-        $postData = $post['data'];
+        $postData   = isset($post['data']) ? $post['data'] : [];
+        $postFollow = isset($post['follow']) ? $post['follow'] : [];
 
         $conf = [];
 
@@ -402,6 +403,11 @@ class Controller extends BaseController
                     $conf[$slug][$key][$sourceId] = $this->getConfig()->persistUser($this->getUser(), $slug, $key, $settings);
                 }
             }
+        }
+
+        // update following if it was sent
+        if (count($postFollow)) {
+            $conf['follow'] = $this->getConfig()->persistFollow($this->getUser(), $postFollow);
         }
 
         $this->getResponse()->content->set([

@@ -24,22 +24,34 @@
                 expand:         null,
 
                 persist: function () {
-                    var action   = this.closest('form[method=post]').attr('action'),
-                        formdata = $('<form/>').append(this.clone()).serialize(),
-                        sourceId = this.data('source');
-
-                    if (iiCache[sourceId]) {
-                        clearTimeout(iiCache[sourceId]);
-                    }
-
-                    iiCache[sourceId] = setTimeout(function () {
-                        $.post(action, formdata, function (data) {
-                            console.log(data);
-                        });
-                    }, 500);
+                    sendAjax(this, 'source');
                 }
             }
         );
+
+        $('#follow-settings').on('change', 'input[type=checkbox]', function (e) {
+            sendAjax($('#follow-settings'), 'follow');
+        });
+
+        /**
+         *
+         * @param {jQuery} $input
+         * @param {string} dataField
+         */
+        function sendAjax($input, dataField) {
+            var action   = $input.closest('form[method=post]').attr('action'),
+                formdata = $('<form/>').append($input.clone()).serialize(),
+                sourceId = $input.data(dataField) || dataField;
+
+            if (iiCache[sourceId]) {
+                clearTimeout(iiCache[sourceId]);
+            }
+
+            iiCache[sourceId] = setTimeout(function () {
+                $.post(action, formdata);
+            }, 500);
+
+        }
     });
 </script>
 
@@ -50,7 +62,7 @@
     <p>
         <br/>If you unfollow a homepage, you will receive <em>no</em> messages that come from it.
     </p>
-    <table class="ruler table">
+    <table class="ruler table" id="follow-settings">
         <thead>
         <tr>
             <th scope="col">Homepage</th>
