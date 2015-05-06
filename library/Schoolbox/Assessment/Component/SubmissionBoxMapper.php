@@ -101,6 +101,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $this
             ->registerCallback('preSave', array($this, 'preSave'))
         ;
+        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'postSave'));
     }
 
     /**
