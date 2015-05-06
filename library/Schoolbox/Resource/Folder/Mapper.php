@@ -19,6 +19,7 @@ use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\Folder\Search\Result;
+use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\User;
 
@@ -141,6 +142,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
         $this->registerCallback(self::CALLBACK_PRESAVE, array($this, self::CALLBACK_PRESAVE));
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, self::CALLBACK_POSTSAVE));
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'saveHomepageConfig']);
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'hardDeleteCategoryCodes'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteCategoryCodes'));
 
@@ -276,6 +278,25 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         Code\Mapper::getInstance()->save($model->getCodes());
 
         return true;
+    }
+
+    /**
+     * Postsave callback - saves a homepage config for newly created folders.
+     *
+     * @param Model $model
+     * @param Model $previous
+     * @return bool
+     */
+    public function saveHomepageConfig($model, $previous = null)
+    {
+        if (!isset($previous)) {
+            $homepage = $model->getHomepage();
+            if ($homepage instanceof HomepageConfig && $homepage->getTemplate()->getId()) {
+                $model->getHomepage()->setCategory($model);
+                $homepageConfigMapper = $this->getJoinMapper('homepages');
+                $homepageConfigMapper->save($model->getHomepage());
+            }
+        }
     }
 
     /**
