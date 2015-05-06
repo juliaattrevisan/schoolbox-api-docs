@@ -20,6 +20,7 @@ use \Schoolbox\CampusMapper;
 use \Alaress_Date_Format;
 use Schoolbox\Notif\SilentNotif;
 use \Schoolbox\Calendar\EventTypeMapper;
+use Alaress\Lumberjack\Logger;
 
 class Csv extends Base {
 
@@ -35,7 +36,7 @@ class Csv extends Base {
 		$roleRelationMapper = new RoleMapper();
 
         // silence notifications
-        $silence = new SilentNotif();
+        $silence = new SilentNotif(new Logger(null));
 
         $campusMapper->setNotifier($silence);
         $eventMapper->setNotifier($silence);
