@@ -64,6 +64,7 @@ class Component_Renderer
         $context               = [];
         $context['uid']        = $eportfolioHandler->getSettingsPageOwner();
         $context['permission'] = \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE;
+        $context['page']       = $eportfolioHandler->getPageInstance();
 
         $component->setup($context, $component->getInstance()->getConfigArray());
 
