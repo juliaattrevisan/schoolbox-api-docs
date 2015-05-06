@@ -40,14 +40,14 @@ class Bulk_Category extends Bulk_Abstract
     */
     public function addCategories()
     {
-        $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+        $categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
 
         /* List of outcomes
 		 */
         $output = array();
 
         if (is_file($this->getFile())) {
-            $groups = array_map(array(Scrub, 'text'), $_POST['groupPerm']);
+            $groups = array_map(array('Scrub', 'text'), $_POST['groupPerm']);
 
             /* Process rows
 			 */
@@ -98,7 +98,7 @@ class Bulk_Category extends Bulk_Abstract
 
                     /* Parent folder
                      */
-                    $parent = new \Schoolbox\Resource\Category();
+                    $parent = new \Schoolbox\Resource\Folder\Model();
                     $parent->setId($row[0]);
 
                     /* Homepage config template
@@ -113,7 +113,7 @@ class Bulk_Category extends Bulk_Abstract
 
                     /* Set up new folder
                      */
-                    $newFolder = new \Schoolbox\Resource\Category();
+                    $newFolder = new \Schoolbox\Resource\Folder\Model();
                     $newFolder->setName($row[1]);
                     $newFolder->setParent($parent);
                     $newFolder->setHomepage($homepageConfig);
@@ -121,7 +121,7 @@ class Bulk_Category extends Bulk_Abstract
                     /* Accumulate all folder codes
                      */
                     foreach ($code as $currentCode) {
-                        $folderCode = new \Schoolbox\Resource\CategoryCode();
+                        $folderCode = new \Schoolbox\Resource\Folder\Code\Model();
                         $folderCode->setCode($currentCode);
 
                         $newFolder->getCodes()->add($folderCode);
