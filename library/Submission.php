@@ -638,7 +638,7 @@ class Submission extends DeprecatedModel
                     submission_box.category catid,
                     submission_box.mark_visibility
                 FROM submission_box
-                JOIN category ON submission_box.category = category.id AND category.deleted_at IS NOT NULL
+                JOIN category ON submission_box.category = category.id AND category.deleted_at IS NULL
                 WHERE submission_box.owner = '$userID'
                 AND submission_box.deleted = '0'
                 AND submission_box.task_id IS NULL
@@ -654,7 +654,7 @@ class Submission extends DeprecatedModel
                     assess.category_id AS catid,
                     assess.mark_visibility
                 FROM assess
-                JOIN category ON assess.category_id = category.id AND  category.deleted_at IS NOT NULL
+                JOIN category ON assess.category_id = category.id AND  category.deleted_at IS NULL
                 WHERE assess.deleted_at IS NULL
                 AND assess.task_id IS NULL
                 AND assess.availability = 'assess'
