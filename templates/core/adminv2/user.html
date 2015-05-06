@@ -45,6 +45,50 @@ $(function() {
             }
         });
     });
+
+  $.validator.addMethod('roles_different', function (value, element) {
+    return $('#cl_dest').val() != $('#cl_src').val();
+  }, "Roles cannot be the same");
+
+  $('#clone').validate({
+    submitHandler: function (form) {
+      var src  = $('#cl_src').children('option[value=' + $('#cl_src').val() + ']').text(),
+          dest = $('#cl_dest').children('option[value=' + $('#cl_dest').val() + ']').text(),
+          newc = $('#cl_new input').val(),
+          msg  = "WARNING! This will clone '"+src+"' onto ";
+
+      if ($('#cl_dest').val() > 0) {
+        msg += "'" + dest + "', making it an exact copy. '" + dest + "' will lose its dashboard, all permissions and role-specific data. ";
+      } else {
+        msg += "a newly created role '" + newc + "'! "
+      }
+
+      msg += "This action CANNOT be reversed. Are you sure you wish to proceed?";
+
+      if (confirm(msg)) {
+        form.submit();
+      }
+    },
+    rules: {
+      'clone[dest]': {
+        'roles_different': true
+      },
+      'clone[new]': {
+        required: function (element) {
+          return $('#cl_dest').val() == 0
+        }
+      }
+    }
+  });
+
+  $('#cl_dest').on('change', function () {
+    if ($(this).val() > 0) {
+      $('#cl_new').addClass('hide');
+    } else {
+      $('#cl_new').removeClass('hide');
+    }
+  });
+
 });
 
 </script>
@@ -139,5 +183,31 @@ $(function() {
                 <a class="submit-btn-plain delete float-right submit-this" href="#"><span></span>Remove Users</a>
             </form>
         </div>
+        <form id="clone" action="/adminv2/user/cloneForm.php" method="post" class="level clearfix">
+            <h3>Clone Role</h3>
+          <p>
+            This cloning process will be destructive: any existing permissions will first be deleted from the destination role before new permissions are added.
+            It should only be carried out on new roles, or roles you no longer require.
+          </p>
+          <!-- BEGIN select_clone -->
+          <label>{CLONE_LABEL} Role
+            <select id="cl_{CLONE_KEY}" name="clone[{CLONE_KEY}]" required>
+              <option disabled="disabled" selected="selected">(Choose Role)</option>
+              <!-- BEGIN select_new -->
+              <option value="0">(New Role...)</option>
+              <!-- END select_new -->
+              <!-- BEGIN select_clone_opt -->
+              <option value="{CLONE_OPT_VALUE}" {CLONE_OPT_VALUE_SELECTED}>{CLONE_OPT_NAME}</option>
+              <!-- END select_clone_opt -->
+            </select>
+          </label>
+          <!-- BEGIN new_role -->
+          <label id="cl_new" class="hide"> New Role name
+            <input name="clone[new]" type="text" value="" />
+          </label>
+          <!-- END new_role -->
+          <!-- END select_clone -->
+          <input class="submit-btn-plain" type="submit" value="Clone" />
+        </form>
 	</div>
 </div>
