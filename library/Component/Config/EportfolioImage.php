@@ -19,7 +19,7 @@ class Component_Config_EportfolioImage extends Component_Config_Abstract
         $page->setVar('config_images_block', '');
 
         $allImages    = [];
-        $pageInstance = $component->getContext()['page'];
+        $pageInstance = $component->getContext();
         if ($pageInstance instanceof Eportfolio_Page_Instance) {
             $fileMapper = new \Schoolbox\MyFileMapper();
             $allImages  = $fileMapper->findAllImagesByUser($pageInstance->getUserId());
