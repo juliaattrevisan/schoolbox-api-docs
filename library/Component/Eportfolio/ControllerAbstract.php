@@ -39,7 +39,7 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
 
         /* Check primary key is being used correctly!
          */
-        $this->sitepage->setVar('ID', $context->getUserId());
+        $this->sitepage->setVar('ID', isset($context) ? $context->getUserId() : -1);
 
         $this->postConstruct();
     }
