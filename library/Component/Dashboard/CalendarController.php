@@ -90,7 +90,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
         $this->setVar(
             array(
                 'DATE'           => $this->start->getLongDateOnly(),
-                'CALENDAR_DATE'  => $this->start->getLocalShort(),
+                'CALENDAR_DATE'  => $this->start->getURLDate(),
             )
         );
 
