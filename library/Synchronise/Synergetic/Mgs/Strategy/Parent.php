@@ -39,7 +39,7 @@ class Synchronise_Synergetic_Mgs_Strategy_Parent extends Synchronise_Synergetic_
         $newUser['alt_email'] = $currentUser['StudentContactDefaultEmail'];
         // get campuses of attached children
         $newUser['campus'] = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
-        $newUser['defaultCampus'] =$newUser['campus'][0];
+        $newUser['defaultCampus'] = $newUser['campus'][0];
         $newUser['group_id'] = self::PARENT_GROUP_ID;
 
         // parents are not superusers
@@ -65,11 +65,10 @@ class Synchronise_Synergetic_Mgs_Strategy_Parent extends Synchronise_Synergetic_
         $spouse['firstname'] = $currentUser['StudentContactSpousePreferred'];
         $spouse['lastname'] = $currentUser['StudentContactSpouseSurname'];
         $spouse['alt_email'] = $currentUser['StudentContactSpouseDefaultEmail'];
-        $spouse['defaultCampus'] = self::PARENT_DEFAULT_CAMPUS;
         // get campuses of kids
         $spouse['campus'] = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
+        $spouse['defaultCampus'] = $spouse['campus'][0];
         $spouse['group_id'] = self::PARENT_GROUP_ID;
-
         // parents are not superusers
         //$spouse['su'] = false;
 

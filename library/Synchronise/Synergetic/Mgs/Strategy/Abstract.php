@@ -211,9 +211,16 @@ abstract class Synchronise_Synergetic_Mgs_Strategy_Abstract extends Synchronise_
                     unset($newUser['defaultCampus']);
                 }
 
-	            /* Use parents existing username */
-	            if($newUser['group_id'] == self::PARENT_GROUP_ID)
-		            $newUser['username'] = $existing['username'];
+                /* Use parents existing username */
+                if($newUser['group_id'] == self::PARENT_GROUP_ID) {
+                    $newUser['username'] = $existing['username'];
+
+                    /* ensure parents campus is the most senior of their children (sen = 1, wad = 2, grim = 3) */
+                    if (is_array($newUser['campus'])) {
+                        sort($newUser['campus']);
+                        $newUser['defaultCampus'] = $newUser['campus'][0];
+                    }
+                }
 
                 /* Perform action; report what happened
                      */
