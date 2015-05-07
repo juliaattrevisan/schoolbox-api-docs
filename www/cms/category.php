@@ -218,7 +218,18 @@ if (is_numeric($this->arg[0])) {
                 $this->parse('perm_table_block', 'perm_table', true);
             }
         } else {
-            $this->setVar('perm_table_block', '');
+            // Show all roles
+            $roleMapper = new \Schoolbox\RoleMapper();
+            foreach ($roleMapper->findAll(['order' => ['id' => 'asc']]) as $role) {
+                $this->setVar([
+                    'GROUP_ID'        => $role->getId(),
+                    'GROUP_NAME'      => Scrub::text($role->getName()),
+                    'PERM_0_SELECTED' => '',
+                    'PERM_1_SELECTED' => '',
+                    'PERM_2_SELECTED' => '',
+                ]);
+                $this->parse('perm_table_block', 'perm_table', true);
+            }
         }
 
         $this->parse('indiv_perms_block', 'indiv_perms');
