@@ -75,6 +75,7 @@ class Mapper extends Schoolbox\Mapper implements Receiver
      */
     public function dePostSave() {
         unset($this->callback_queue[self::CALLBACK_POSTSAVE]);
+        unset($this->callback_queue[self::CALLBACK_PRESAVE]);
     }
 
     /**
