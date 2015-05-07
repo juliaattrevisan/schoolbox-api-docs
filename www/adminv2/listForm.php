@@ -21,7 +21,7 @@ if ($groupHandler->isSuperuser()) {
 
     /* Update each row
 	 */
-    for ($i=0; $i<count($_POST[$tableIndex]); $i++) {
+    foreach (array_keys($_POST[$tableIndex]) as $i) {
         $data = array();
 
         /* Accumulate a set of data from the relevant data columns

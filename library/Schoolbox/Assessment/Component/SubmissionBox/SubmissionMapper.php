@@ -115,7 +115,8 @@ class SubmissionMapper extends Schoolbox\Mapper implements Schoolbox\StorageMapp
 			'other_key' => 'mime',
 		));
 
-		$this->registerCallback('postSave', array($this, 'postSave'));
+        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'postSave'));
+        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'createDefaultReturn'));
 	}
 
 	/**
@@ -310,6 +311,47 @@ class SubmissionMapper extends Schoolbox\Mapper implements Schoolbox\StorageMapp
 			}
 		}
 	}
+
+    /**
+     * Post-save callback.
+     *
+     * Attaches a default return to this submission for this student, if there
+     * is no return for them already.
+     *
+     * @param Submission $object
+     * @param Submission $previous
+     */
+    public function createDefaultReturn(Submission $object, $previous = null)
+    {
+        if (!($object->getDraft())) {
+            $boxId = $object->getSubmissionBox()->getId();
+            /** @var ReturnedWorkMapper $returnMapper */
+            $returnMapper = $this->getJoinMapper('submission_box.return');
+            if ($returnMapper->countByColumn('box_id', $boxId) === 0) {
+                try {
+                    // Get default state
+                    $submissionStateMapper = new \DueWork_ErrorMapper();
+                    $defaultState          = $submissionStateMapper->findDefaultForNewSubmissions();
+                } catch (Schoolbox\Mapper\Exception $e) {
+                    // No default state: do nothing
+                    return;
+                }
+                /** @var ReturnedWork $defaultReturn */
+                $defaultReturn = $returnMapper->createModel();
+                $defaultReturn
+                    ->setIsConfirmationOfSubmission(true)
+                    ->setSubmissionBox($object->getSubmissionBox())
+                    ->setOwner($object->getOwner())
+                    // No real marker
+                    ->setMarker($object->getSubmissionBox()->getOwner())
+                    ->setMark($defaultState->getDisplayAs())
+                    ->setReturned($object->getSubmitted())
+                    ->setNormalizedMark($defaultState->getNormaliseAs())
+                ;
+                $returnMapper->save($defaultReturn);
+            }
+        }
+    }
 
 	/**
 	 * Port of SubmissionStudent handler's securityCheck() method.

@@ -72,6 +72,11 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 		/** @var ReturnedWork $mark */
 		$mark = $bundle->getEvent()->getObject();
 
+        // Confirmation of submission? Do nothing
+        if ($mark->getIsConfirmationOfSubmission()) {
+            return;
+        }
+
 		/** @var SubmissionBox $box */
 		$box = $this->boxMapper->findById($mark->getSubmissionBox()->getId());
 

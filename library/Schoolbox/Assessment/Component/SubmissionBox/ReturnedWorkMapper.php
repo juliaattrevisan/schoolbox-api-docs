@@ -96,6 +96,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
                 'column' => 'returned',
                 'property' => 'returned',
                 'type' => self::TYPE_DATETIME,
+                'updated_timestamp' => true,
             )
         );
         $this->hasMap(
@@ -105,6 +106,8 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
                 'type' => self::TYPE_STRING,
             )
         );
+
+        $this->uses('is_confirmation_of_submission', self::TYPE_BOOLEAN);
 
         $this->hasSoftDeleteBooleanField('deleted');
 
@@ -183,6 +186,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
 			AND sb.mark_visibility IN {$this->getArrayPlaceholders($visibilities, 'vis')}
 			AND sr.owner = :user_id
 			AND sr.deleted IS FALSE
+			AND sr.is_confirmation_of_submission IS FALSE
 			ORDER BY sr.returned DESC
 			LIMIT :limit
 		";
@@ -322,6 +326,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
 			WHERE sr.owner = :user_id
 			AND sb.id = :box_id
 			AND sr.deleted IS FALSE
+			AND sr.is_confirmation_of_submission IS FALSE
 			ORDER BY sr.returned DESC
 		";
         $statement = $this->database->prepare($query);

@@ -4087,6 +4087,17 @@ ADMIN BODY
 
 .admin-contents .settings input[type=text] {
     width: 100%;
+    // Nullable fields - leave a space for the null
+    &.nullable {
+        width: 60%;
+    }
+}
+.admin-contents .settings .null-control {
+    input[type=checkbox], label {
+        display: inline-block;
+        width: auto;
+        float: none;
+    }
 }
 
 .admin-form {
