@@ -26,6 +26,8 @@ class Alaress_Date_Format_Converter
             array(
                 // day formats
                 'j' => 'd',
+                // datepicker doesn't support ordinal suffixes
+                'S' => '',
                 'd' => 'dd',
                 'D' => 'D',
                 'l' => 'DD',
@@ -57,6 +59,7 @@ class Alaress_Date_Format_Converter
             array(
                 // day formats
                 'j' => 'D',
+                'S' => 'o',
                 'd' => 'DD',
                 'D' => 'ddd',
                 'l' => 'dddd',
