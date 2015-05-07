@@ -295,7 +295,7 @@ abstract class Eportfolio_Page_Abstract {
 	 *
 	 * @return int
 	 */
-	protected function getPageId() {
+	public function getPageId() {
 		return $this->pageId;
 	}
 
@@ -304,7 +304,7 @@ abstract class Eportfolio_Page_Abstract {
 	 *
 	 * @return mixed
 	 */
-	protected function getUserId() {
+	public function getUserId() {
 		return $this->user->getId();
 	}
 

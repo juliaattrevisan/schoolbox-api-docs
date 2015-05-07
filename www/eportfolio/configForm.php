@@ -153,7 +153,15 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
             }
 
             $renderer = new Component_Renderer();
-            $renderer->renderEportfolioComponent($eportfolioHandler, $component);
+            $renderer->renderEportfolioComponent(
+                new Eportfolio_Page_Instance(
+                    $page,
+                    $eportfolioHandler->getPageInstance()->getUid(),
+                    $eportfolioHandler->getPageId(),
+                    FULL_ACCESS
+                ),
+                $component
+            );
         } /* AJAX new column widths
 		 */
         elseif (is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
@@ -242,7 +250,15 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                 $cList         = array_values($componentList);
                 $component     = $factory->buildComponent($cList[0]);
                 $renderer      = new Component_Renderer();
-                $renderer->renderEportfolioComponent($eportfolioHandler, $component);
+                $renderer->renderEportfolioComponent(
+                    new Eportfolio_Page_Instance(
+                        $page,
+                        $eportfolioHandler->getPageInstance()->getUid(),
+                        $eportfolioHandler->getPageId(),
+                        FULL_ACCESS
+                    ),
+                    $component
+                );
                 exit;
             } else {
                 SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getUid()}/{$eportfolioHandler->getPageId()}");

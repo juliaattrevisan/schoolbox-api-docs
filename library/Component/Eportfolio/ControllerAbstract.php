@@ -20,21 +20,26 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
     /**
      * Apply permissions here
      *
-     * @param array $context Actually an array in this context. Has these keys:
-     *                       uid: the component owner's ID
-     *                       permission: the permission level (READ_ACCESS, etc)
-     * @param array $config
+     * @param Eportfolio_Page_Instance $context the Eportfolio_Page_Instance object this component is on
+     * @param array                    $config
      */
-    public function setup($context = null, array $config = array())
+    public function setup(Eportfolio_Page_Instance $context = null, array $config = array())
     {
         parent::setup($context, $config);
 
-        $this->permission        = $_SESSION['su'] ? FULL_ACCESS : $context['permission'];
+        /** @var Schoolbox\User $_SESSION['user'] */
+        if ($_SESSION['user']->isSuperuser()) {
+            $this->permission = \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL;
+        } elseif (!isset($context)) {
+            $this->permission = \Schoolbox\Permission\Access\UserAccess::ACCESS_DENY;
+        } else {
+            $this->permission = $context->getPermission();
+        }
         $this->controlPermission = $this->permission;
 
         /* Check primary key is being used correctly!
          */
-        $this->sitepage->setVar('ID', $context['uid']);
+        $this->sitepage->setVar('ID', isset($context) ? $context->getUserId() : -1);
 
         $this->postConstruct();
     }
@@ -79,7 +84,7 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
         if (!in_array($key, $exclusions)) {
             $templateFile = "component/config/$key.html";
             $page->setFile($key, $templateFile);
-            $conf->parse($page, $key, $key, Scrub::text($params['value']));
+            $conf->parse($page, $key, $key, Scrub::text($params['value']), $this);
 
             if ($key == 'componentname') {
 

@@ -18,12 +18,16 @@ class Component_Config_EportfolioImage extends Component_Config_Abstract
         $page->setBlock($keyblock, 'config_images', 'config_images_block');
         $page->setVar('config_images_block', '');
 
-        $fileMapper = new \Schoolbox\MyFileMapper();
-        $allImages = $fileMapper->findAllImagesByUser($this->cat['uid']);
+        $allImages    = [];
+        $pageInstance = $component->getContext();
+        if ($pageInstance instanceof Eportfolio_Page_Instance) {
+            $fileMapper = new \Schoolbox\MyFileMapper();
+            $allImages  = $fileMapper->findAllImagesByUser($pageInstance->getUserId());
+        }
 
         $page->setVar('IMAGE_TITLE', 'Image');
 
-        if ($allImages->count()) {
+        if (count($allImages)) {
             foreach ($allImages as $currentImage) {
                 $page->setVar(array(
                     'COMPONENT_CONFIG_FILE_ID' => $currentImage->getId(),

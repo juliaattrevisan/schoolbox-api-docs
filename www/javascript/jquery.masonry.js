@@ -579,9 +579,12 @@
         }
         replacement.animate(css, 550, function () {
 
-            /* Collapse content on components
+            /* Collapse content on components (if it exists)
              */
-            $(response).find('[data-collapser=true]').collapsable();
+            var collapser = $(response).find('[data-collapser=true]');
+            if (collapser.length) {
+                collapser.collapsable();
+            }
 
             replacement.empty().replaceWith(response.removeAttr('style'));
             masonry.saveSorting();

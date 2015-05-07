@@ -89,7 +89,7 @@ foreach ($componentCollection as $component) {
         $this->setFile($position, 'adminv2/component/placeholder.html');
     }
 
-    $component->setup(array('id' => '-1', 'code' => '', 'name' => ''), array());
+    $component->setup(null, array());
 
     $this->setVar(array(
         'COMPONENT_INSTANCE_ID'     => $instance_id,
