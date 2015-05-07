@@ -31,7 +31,7 @@ function shutdown_safely(Exception $e = null) {
     if ($e instanceof Exception) {
         $error = array(
             'file'    => $e->getFile(),
-            'message' => "<pre>$e</pre>",
+            'message' => $e->getMessage(),
             'line'    => $e->getLine(),
         );
     }
