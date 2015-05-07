@@ -12,6 +12,7 @@ namespace Eportfolio;
 use Eportfolio;
 use Schoolbox;
 use Schoolbox\Collection;
+use Schoolbox\User;
 
 class ShowcaseMapper extends Schoolbox\Mapper {
 
@@ -65,14 +66,14 @@ class ShowcaseMapper extends Schoolbox\Mapper {
         ));
 	}
 
-	/**
-	 * Get all the showcased submission boxes for a particular user,
-	 * ordered alphabetically by their parent category name
-	 *
-	 * @param  $userId
-	 * @return Schoolbox\Collection
-	 */
-	public function getShowcasedSubmissionBoxes($userId) {
+    /**
+     * Get all the showcased submission boxes for a particular user,
+     * ordered alphabetically by their parent category name
+     *
+     * @param User $user
+     * @return Collection
+     */
+	public function getShowcasedSubmissionBoxes(User $user) {
         $submissionBoxMapper = $this->getJoinMapper('submissionBox');
         $folderMapper = $submissionBoxMapper->getJoinMapper('category');
         $workTypeMapper = $submissionBoxMapper->getJoinMapper('work_type');
@@ -106,7 +107,7 @@ class ShowcaseMapper extends Schoolbox\Mapper {
 
 		$statement = $this->database->prepare($query);
 
-		$statement->bindParam(":userId", $userId);
+		$statement->bindParam(":userId", $user->getId());
 		$statement->execute();
 
         $allItems = new Collection();

@@ -74,7 +74,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
         /* Gather around the loop, everyone
          */
-        $allShowcasedItems = $showcaseMapper->getShowcasedSubmissionBoxes($this->getUserId());
+        $allShowcasedItems = $showcaseMapper->getShowcasedSubmissionBoxes($this->getUser());
 
         /* Avoid that iterative silliness by pre-processing a bit
          */
