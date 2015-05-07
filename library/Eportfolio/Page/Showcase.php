@@ -71,7 +71,6 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
     protected function render()
     {
         $showcaseMapper = new \Eportfolio\ShowcaseMapper();
-        $boxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
 
         /* Gather around the loop, everyone
          */
@@ -79,22 +78,24 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
         /* Avoid that iterative silliness by pre-processing a bit
          */
+        $allSubjects = array();
+
         if ($allShowcasedItems->count()) {
             $previousCategory = null;
             $j = 0;
 
-            $allSubjects = array();
-
             foreach ($allShowcasedItems as $currentShowcasedItem) {
                 try {
-                    $currentBox = $boxMapper->findById($currentShowcasedItem->getSubmissionBoxId());
+                    $currentBox = $currentShowcasedItem->getSubmissionBoxId();
+
                     $latestSubmission = $this->getLatestSubmission(
                         $this->getUserId(),
-                        $currentShowcasedItem->getSubmissionBoxId()
+                        $currentShowcasedItem->getSubmissionBoxId()->getId()
                     );
+
                     $latestReturn = $this->getLatestReturn(
                         $this->getUserId(),
-                        $currentShowcasedItem->getSubmissionBoxId()
+                        $currentShowcasedItem->getSubmissionBoxId()->getId()
                     );
 
                     /* Set up subject info

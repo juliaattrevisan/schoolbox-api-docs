@@ -11,6 +11,7 @@
 namespace Eportfolio;
 use Eportfolio;
 use Schoolbox;
+use Schoolbox\Collection;
 
 class ShowcaseMapper extends Schoolbox\Mapper {
 
@@ -54,6 +55,13 @@ class ShowcaseMapper extends Schoolbox\Mapper {
 			'property'   => 'deletedAt',
 			'type'       => self::TYPE_DATETIME,
 		));
+
+        $this->hasJoin('submission', array(
+            'multiple'  => true,
+            'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBoxMapper',
+            'this_key'  => 'submission_box_id',
+            'other_key' => 'id',
+        ));
 	}
 
 	/**
@@ -64,21 +72,53 @@ class ShowcaseMapper extends Schoolbox\Mapper {
 	 * @return Schoolbox\Collection
 	 */
 	public function getShowcasedSubmissionBoxes($userId) {
-		$statement = $this->database->prepare("
-            SELECT {$this->getColumnString()}
-            FROM `{$this->table}`
-            LEFT JOIN submission_box ON `{$this->table}`.submission_box_id = submission_box.id
-            LEFT JOIN category ON submission_box.category = category.id
-            WHERE eportfolio_showcase_item.uid = :userId
-            ORDER BY category.name
-        ");
+        $submissionBoxMapper = $this->getJoinMapper('submission');
+        $folderMapper = $submissionBoxMapper->getJoinMapper('category');
+
+        /* When you make a Showcased Work item, but then later the Folder gets deleted,
+         * the Folder object doesn't get hydrated due to softdelete field. It just comes
+         * out as an empty Folder instance, which isn't helpful, as this allows the
+         * Showcased Work item to display without a parent heading
+         *
+         * Doing this joins a whole bunch of Folders that aren't correct:
+         *
+         * LEFT JOIN `category` AS `c` ON `sb`.`category` = `c`.`id` AND
+         * `c`.`deleted_at` IS NULL OR `c`.`deleted_at` IS NOT NULL
+         *
+         * So until we decide what we do for this use case, I'm just going to override the
+         * soft-delete thing and make the Folder instances spawn properly anyway
+         */
+        $query = "
+            SELECT
+                {$this->getColumnString('si')},
+                {$submissionBoxMapper->getColumnString('sb')},
+                {$folderMapper->getColumnString('f')}
+            FROM `{$this->table}` si
+            LEFT JOIN {$this->getJoinSql('submission', 'si', 'sb')}
+            LEFT JOIN `category` AS `f` ON `sb`.`category` = `f`.`id`
+            WHERE si.uid = :userId
+            ORDER BY f.name
+        ";
+
+		$statement = $this->database->prepare($query);
 
 		$statement->bindParam(":userId", $userId);
 		$statement->execute();
 
-		$rowset = $statement->fetchAll();
+        $allItems = new Collection();
 
-		return $this->hydrateList($rowset);
+        foreach ($statement as $row) {
+            $showcasedWorkItem = $this->hydrate($row, 'si');
+            $submissionBox = $submissionBoxMapper->hydrate($row, 'sb');
+            $folder = $folderMapper->hydrate($row, 'f');
+
+            $submissionBox->setCategory($folder);
+            $showcasedWorkItem->setSubmissionBoxId($submissionBox);
+
+            $allItems->add($showcasedWorkItem);
+        }
+
+		return $allItems;
 	}
 
 	/**
