@@ -274,14 +274,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
             $templateTarget = "component_position_{$component->getInstance()->getPosition()}";
             $templateHandle = "component_{$component->getInstance()->getId()}";
 
-            /* Assign permissions
-			 */
-            $context['uid'] = $this->getUser()->getId();
-            $context['permission'] = $this->getPermission();
-            $context['page']       = $this;
-
-            $component->setup($context, $component->getInstance()->getConfigArray());
-
+            $component->setup($this, $component->getInstance()->getConfigArray());
             if ($component->execute() !== false) {
                 if ($component->renderTemplate($templateHandle) !== false) {
                     if (!in_array($component->getInstance()->getPosition(), $occupiedPositionList)) {

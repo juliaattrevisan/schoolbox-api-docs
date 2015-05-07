@@ -60,14 +60,7 @@ class Component_Renderer
         $templateTarget = "component_position_{$component->getInstance()->getPosition()}";
         $templateHandle = TEMPLATE_content;
 
-        //Setup permissions for component
-        $context               = [];
-        $context['uid']        = $eportfolioPage->getUserId();
-        $context['permission'] = \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE;
-        $context['page']       = $eportfolioPage;
-
-        $component->setup($context, $component->getInstance()->getConfigArray());
-
+        $component->setup($eportfolioPage, $component->getInstance()->getConfigArray());
         if ($component->execute() !== false) {
             $component->parseConfig();
             if ($component->renderTemplate($templateHandle) !== false) {
