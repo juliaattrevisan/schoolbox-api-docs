@@ -79,10 +79,10 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
         /* Avoid that iterative silliness by pre-processing a bit
          */
         $allSubjects = array();
+        $j = 0;
 
         if ($allShowcasedItems->count()) {
             $previousCategory = null;
-            $j = 0;
 
             foreach ($allShowcasedItems as $currentShowcasedItem) {
                 try {
