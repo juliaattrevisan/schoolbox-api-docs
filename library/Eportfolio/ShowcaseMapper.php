@@ -138,14 +138,22 @@ class ShowcaseMapper extends Schoolbox\Mapper {
 	 * @return Schoolbox\Collection
 	 */
 	public function getRecentShowcasedSubmissionBoxes($userId, $limit = 5) {
-		$statement = $this->database->prepare("
-            SELECT {$this->getColumnString()}
-            FROM `{$this->table}`
-            LEFT JOIN submission_box ON `{$this->table}`.submission_box_id = submission_box.id
-            LEFT JOIN category ON submission_box.category = category.id
-            WHERE eportfolio_showcase_item.uid = :userId
-            AND submission_box.deleted IS FALSE
-            ORDER BY eportfolio_showcase_item.created_at DESC
+        $submissionBoxMapper = $this->getJoinMapper('submissionBox');
+        $folderMapper = $submissionBoxMapper->getJoinMapper('category');
+        $workTypeMapper = $submissionBoxMapper->getJoinMapper('work_type');
+
+        $statement = $this->database->prepare("
+            SELECT
+                {$this->getColumnString('si')},
+                {$submissionBoxMapper->getColumnString('sb')},
+                {$folderMapper->getColumnString('f')},
+                {$workTypeMapper->getColumnString('t')}
+            FROM `{$this->table}` si
+            LEFT JOIN {$this->getJoinSql('submissionBox', 'si', 'sb')}
+            LEFT JOIN {$submissionBoxMapper->getJoinSql('work_type', 'sb', 't')}
+            LEFT JOIN `category` AS `f` ON `sb`.`category` = `f`.`id`
+            WHERE si.uid = :userId
+            ORDER BY si.created_at DESC
             LIMIT :limit
         ");
 
@@ -157,8 +165,21 @@ class ShowcaseMapper extends Schoolbox\Mapper {
 		$statement->bindParam(":limit", $limit, \PDO::PARAM_INT);
 		$statement->execute();
 
-		$rowset = $statement->fetchAll();
+        $allItems = new Collection();
 
-		return $this->hydrateList($rowset);
+        foreach ($statement as $row) {
+            $showcasedWorkItem = $this->hydrate($row, 'si');
+            $submissionBox = $submissionBoxMapper->hydrate($row, 'sb');
+            $workType = $workTypeMapper->hydrate($row, 't');
+            $folder = $folderMapper->hydrate($row, 'f');
+
+            $submissionBox->setCategory($folder);
+            $submissionBox->setWorkType($workType);
+            $showcasedWorkItem->setSubmissionBox($submissionBox);
+
+            $allItems->add($showcasedWorkItem);
+        }
+
+        return $allItems;
 	}
 }
