@@ -166,7 +166,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 
 		/* Gather around the loop, everyone
 		 */
-		$allShowcasedItems = $showcaseMapper->getRecentShowcasedSubmissionBoxes($this->getUserId(), $this->getNumShowcasedItems());
+		$allShowcasedItems = $showcaseMapper->getRecentShowcasedSubmissionBoxes($this->getUser(), $this->getNumShowcasedItems());
 
 		if ($allShowcasedItems->count()) {
 			$previousCategory = null;

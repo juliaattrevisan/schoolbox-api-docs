@@ -128,17 +128,17 @@ class ShowcaseMapper extends Schoolbox\Mapper {
 		return $allItems;
 	}
 
-	/**
-	 * Get all the showcased submission boxes for a particular user,
-	 * ordered alphabetically by the time they were showcased.
-	 *
-	 * This is used on the profile screen
-	 *
-	 * @param $userId
-	 * @param int $limit
-	 * @return Schoolbox\Collection
-	 */
-	public function getRecentShowcasedSubmissionBoxes($userId, $limit = 5) {
+    /**
+     * Get all the showcased submission boxes for a particular user,
+     * ordered alphabetically by the time they were showcased.
+     *
+     * This is used on the profile screen
+     *
+     * @param \Schoolbox\User $user
+     * @param int $limit
+     * @return Schoolbox\Collection
+     */
+	public function getRecentShowcasedSubmissionBoxes(User $user, $limit = 5) {
         $submissionBoxMapper = $this->getJoinMapper('submissionBox');
         $folderMapper = $submissionBoxMapper->getJoinMapper('category');
         $workTypeMapper = $submissionBoxMapper->getJoinMapper('work_type');
@@ -158,7 +158,7 @@ class ShowcaseMapper extends Schoolbox\Mapper {
             LIMIT :limit
         ");
 
-		$statement->bindParam(":userId", $userId);
+		$statement->bindParam(":userId", $user->getId());
 
 		/* Have to do this in a special way, apparently:
 		 * http://stackoverflow.com/questions/2269840/php-pdo-bindvalue-in-limit
