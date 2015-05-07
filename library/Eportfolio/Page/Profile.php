@@ -163,7 +163,6 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 */
 	private function renderShowcasedWork() {
 		$showcaseMapper = new \Eportfolio\ShowcaseMapper();
-		$boxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
 
 		/* Gather around the loop, everyone
 		 */
@@ -174,9 +173,10 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 			$j = 0;
 
 			foreach($allShowcasedItems as $currentShowcasedItem) {
-				$latestSubmission = $this->getLatestSubmission($this->getUserId(), $currentShowcasedItem->getSubmissionBoxId());
-				$latestReturn = $this->getLatestReturn($this->getUserId(), $currentShowcasedItem->getSubmissionBoxId());
-				$currentBox = $boxMapper->findById($currentShowcasedItem->getSubmissionBoxId());
+				$latestSubmission = $this->getLatestSubmission($this->getUserId(), $currentShowcasedItem->getSubmissionBox()->getId());
+				$latestReturn = $this->getLatestReturn($this->getUserId(), $currentShowcasedItem->getSubmissionBox()->getId());
+				$currentBox = $currentShowcasedItem->getSubmissionBox()->getId();
+
 				if (!($currentBox instanceof Schoolbox\Assessment\Component\SubmissionBox)) {
 					continue;
 				}

@@ -28,8 +28,9 @@ class ShowcaseMapper extends Schoolbox\Mapper {
 
 		$this->hasMap(array(
 			'column'     => 'submission_box_id',
-			'property'   => 'submissionBoxId',
-			'type'       => self::TYPE_INTEGER,
+			'property'   => 'submissionBox',
+			'type'       => self::TYPE_MODEL,
+            'join'       => 'submissionBox'
 		));
 
 		$this->hasMap(array(
@@ -56,7 +57,7 @@ class ShowcaseMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_DATETIME,
 		));
 
-        $this->hasJoin('submission', array(
+        $this->hasJoin('submissionBox', array(
             'multiple'  => true,
             'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBoxMapper',
             'this_key'  => 'submission_box_id',
@@ -72,8 +73,9 @@ class ShowcaseMapper extends Schoolbox\Mapper {
 	 * @return Schoolbox\Collection
 	 */
 	public function getShowcasedSubmissionBoxes($userId) {
-        $submissionBoxMapper = $this->getJoinMapper('submission');
+        $submissionBoxMapper = $this->getJoinMapper('submissionBox');
         $folderMapper = $submissionBoxMapper->getJoinMapper('category');
+        $workTypeMapper = $submissionBoxMapper->getJoinMapper('work_type');
 
         /* When you make a Showcased Work item, but then later the Folder gets deleted,
          * the Folder object doesn't get hydrated due to softdelete field. It just comes
@@ -92,9 +94,11 @@ class ShowcaseMapper extends Schoolbox\Mapper {
             SELECT
                 {$this->getColumnString('si')},
                 {$submissionBoxMapper->getColumnString('sb')},
-                {$folderMapper->getColumnString('f')}
+                {$folderMapper->getColumnString('f')},
+                {$workTypeMapper->getColumnString('t')}
             FROM `{$this->table}` si
-            LEFT JOIN {$this->getJoinSql('submission', 'si', 'sb')}
+            LEFT JOIN {$this->getJoinSql('submissionBox', 'si', 'sb')}
+            LEFT JOIN {$submissionBoxMapper->getJoinSql('work_type', 'sb', 't')}
             LEFT JOIN `category` AS `f` ON `sb`.`category` = `f`.`id`
             WHERE si.uid = :userId
             ORDER BY f.name
@@ -110,10 +114,12 @@ class ShowcaseMapper extends Schoolbox\Mapper {
         foreach ($statement as $row) {
             $showcasedWorkItem = $this->hydrate($row, 'si');
             $submissionBox = $submissionBoxMapper->hydrate($row, 'sb');
+            $workType = $workTypeMapper->hydrate($row, 't');
             $folder = $folderMapper->hydrate($row, 'f');
 
             $submissionBox->setCategory($folder);
-            $showcasedWorkItem->setSubmissionBoxId($submissionBox);
+            $submissionBox->setWorkType($workType);
+            $showcasedWorkItem->setSubmissionBox($submissionBox);
 
             $allItems->add($showcasedWorkItem);
         }

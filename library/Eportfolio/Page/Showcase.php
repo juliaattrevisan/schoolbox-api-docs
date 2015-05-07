@@ -86,16 +86,16 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
             foreach ($allShowcasedItems as $currentShowcasedItem) {
                 try {
-                    $currentBox = $currentShowcasedItem->getSubmissionBoxId();
+                    $currentBox = $currentShowcasedItem->getSubmissionBox();
 
                     $latestSubmission = $this->getLatestSubmission(
                         $this->getUserId(),
-                        $currentShowcasedItem->getSubmissionBoxId()->getId()
+                        $currentBox->getId()
                     );
 
                     $latestReturn = $this->getLatestReturn(
                         $this->getUserId(),
-                        $currentShowcasedItem->getSubmissionBoxId()->getId()
+                        $currentBox->getId()
                     );
 
                     /* Set up subject info

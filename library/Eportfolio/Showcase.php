@@ -22,33 +22,35 @@ class Showcase {
 	/**
 	 * The showcased submission box
 	 *
-	 * @var
+	 * @var \Schoolbox\Assessment\Component\SubmissionBox
 	 */
-	private $submissionBoxId;
+	private $submissionBox;
 
 	/**
 	 * The showcasing user
 	 *
-	 * @var
+	 * @var int
 	 */
 	private $uid;
 
 	/**
 	 * When the Showcased Work item was created
 	 *
-	 * @var
+	 * @var \Alaress_Date_Format
 	 */
 	private $created_at;
 
 	/**
 	 * When the Showcased Work item was updated
-	 * @var
+     *
+	 * @var \Alaress_Date_Format
 	 */
 	private $updated_at;
 
 	/**
 	 * When the Showcased Work item was softdeleted
-	 * @var
+     *
+	 * @var \Alaress_Date_Format
 	 */
 	private $deleted_at;
 
@@ -76,19 +78,19 @@ class Showcase {
 	/**
 	 * Set submission box id
 	 *
-	 * @param  $submissionBoxId
+	 * @param  \Schoolbox\Assessment\Component\SubmissionBox
 	 */
-	public function setSubmissionBoxId($submissionBoxId) {
-		$this->submissionBoxId = $submissionBoxId;
+	public function setSubmissionBox($submissionBox) {
+		$this->submissionBox = $submissionBox;
 	}
 
 	/**
-	 * Get submission box id
+	 * Get submission box
 	 *
-	 * @return
+	 * @return \Schoolbox\Assessment\Component\SubmissionBox
 	 */
-	public function getSubmissionBoxId() {
-		return $this->submissionBoxId;
+	public function getSubmissionBox() {
+		return $this->submissionBox;
 	}
 
 	/**
@@ -100,11 +102,11 @@ class Showcase {
 		$this->uid = $uid;
 	}
 
-	/**
-	 * Get uid
-	 *
-	 * @return
-	 */
+    /**
+     * Get uid
+     *
+     * @return int
+     */
 	public function getUid() {
 		return $this->uid;
 	}
@@ -112,17 +114,17 @@ class Showcase {
 	/**
 	 * Set created at
 	 *
-	 * @param  $created_at
+	 * @param \Alaress_Date_Format
 	 */
 	public function setCreatedAt($created_at) {
 		$this->created_at = $created_at;
 	}
 
-	/**
-	 * Get created at
-	 *
-	 * @return
-	 */
+    /**
+     * Get created at
+     *
+     * @return \Alaress_Date_Format
+     */
 	public function getCreatedAt() {
 		return $this->created_at;
 	}
@@ -130,17 +132,17 @@ class Showcase {
 	/**
 	 * Set deleted at
 	 *
-	 * @param  $deleted_at
+	 * @param \Alaress_Date_Format
 	 */
 	public function setDeletedAt($deleted_at) {
 		$this->deleted_at = $deleted_at;
 	}
 
-	/**
-	 * Get deleted at
-	 *
-	 * @return
-	 */
+    /**
+     * Get deleted at
+     *
+     * @return \Alaress_Date_Format
+     */
 	public function getDeletedAt() {
 		return $this->deleted_at;
 	}
@@ -148,17 +150,17 @@ class Showcase {
 	/**
 	 * Set updated at
 	 *
-	 * @param  $updated_at
+	 * @param \Alaress_Date_Format
 	 */
 	public function setUpdatedAt($updated_at) {
 		$this->updated_at = $updated_at;
 	}
 
-	/**
-	 * Get updated at
-	 *
-	 * @return
-	 */
+    /**
+     * Get updated at
+     *
+     * @return \Alaress_Date_Format
+     */
 	public function getUpdatedAt() {
 		return $this->updated_at;
 	}
