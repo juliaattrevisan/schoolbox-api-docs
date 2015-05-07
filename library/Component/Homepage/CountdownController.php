@@ -42,12 +42,12 @@ class Component_Homepage_CountdownController extends Component_Homepage_Controll
             $time = '00:00:00';
         }
         try {
-            $deadline = new Alaress_Date_Format(new DateTime($date . ' ' . $time));
+            $deadline = new Alaress_Date_Format("$date $time", Alaress_Date_Format::DATABASE_FORMAT);
         } catch (Exception $e) {
             // Couldn't create a date, so default to now.
             // Use +1 seconds to offset some js rendering weirdness
             // This way it initialises at 00/00/00/00/00
-            $deadline = new Alaress_Date_Format(time() + 1, 'U');
+            $deadline = Alaress_Date_Format::now()->addSeconds(1);
         }
 
         $this->setVar(
