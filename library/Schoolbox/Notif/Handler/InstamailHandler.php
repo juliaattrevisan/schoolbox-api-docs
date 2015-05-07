@@ -10,8 +10,10 @@
 namespace Schoolbox\Notif\Handler;
 
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Lumberjack;
 use Monolog\Handler\MailHandler;
 use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mail\CoreContext;
@@ -41,17 +43,22 @@ class InstamailHandler extends MailHandler {
     /** @var TwigEmail */
     protected $email;
 
+    /** @var LoggerInterface */
+    protected $log;
+
 	/**
 	 * We don't accept a Swift_Message in this constructor, the entire message will be generated on the fly.
 	 *
-	 * @param int $level
-	 * @param bool $bubble
+     * @param LoggerInterface $logger
+	 * @param int             $level
+	 * @param bool            $bubble
 	 */
-	public function __construct($level = Logger::ERROR, $bubble = true) {
+	public function __construct(LoggerInterface $logger, $level = Logger::ERROR, $bubble = true) {
 		parent::__construct($level, $bubble);
 		$this->conf = ConfigMapper::getInstance();
 		$this->userMapper = UserMapper::getInstance();
         $this->core = new CoreContext($this->conf);
+        $this->log = $logger;
 	}
 
 
@@ -82,7 +89,7 @@ class InstamailHandler extends MailHandler {
             }
 
             $this->email = new TwigEmail('instantmail.twig');
-            $this->email->setCoreContext($this->core->getContext());
+            $this->email->setLogger($this->log)->setCoreContext($this->core->getContext());
 
             $decorator = new Decorator();
 

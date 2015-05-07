@@ -11,6 +11,7 @@ namespace Schoolbox\Notif;
 
 
 use Alaress\Async\AMQP\AMQPInterface;
+use Alaress\Lumberjack;
 use ConfigFallback;
 use Mailer;
 use Monolog\Handler\HandlerInterface;
@@ -20,6 +21,7 @@ use Monolog\Handler\SwiftMailerHandler;
 use Monolog\Logger;
 use PDOException;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
@@ -68,6 +70,8 @@ class Notif implements NotifInterface {
 	/** @var HandlerInterface[] */
 	protected $handlers;
 
+    /** @var LoggerInterface */
+    protected $log;
 
 	/**
 	 * @param string $topic
@@ -105,7 +109,19 @@ class Notif implements NotifInterface {
 			$this->mqc = false;
 		}
 
+        $this->log = new Lumberjack\Logger(null);
 	}
+
+
+    /**
+     * @param LoggerInterface $log
+     * @return static
+     */
+    public function setLogger(LoggerInterface $log)
+    {
+        $this->log = $log;
+        return $this;
+    }
 
 
 	/**
@@ -247,7 +263,7 @@ class Notif implements NotifInterface {
 
 			// [3f] instant user email (warning)
 			if(!isset($this->handlers['mail'])) {
-				$this->handlers['mail'] = new InstamailHandler(Logger::ERROR, true);
+				$this->handlers['mail'] = new InstamailHandler($this->log, Logger::ERROR, true);
 			}
 			array_push($stack, $this->handlers['mail']);
 		}

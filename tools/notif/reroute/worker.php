@@ -75,7 +75,10 @@ $kernel->run(function ($di, $loop, $log, $opts) {
         array_unshift($rerouteFilters, new Filter\MessagingEnabledFilter($config));
     }
 
-    $sorter = new QueueSorter($rerouteFilters, $log, new Notif(), $qf, RoutePermissionMapper::getInstance());
+    $notif = new Notif();
+    $notif->setLogger($log);
+
+    $sorter = new QueueSorter($rerouteFilters, $log, $notif, $qf, RoutePermissionMapper::getInstance());
 
     // use the reroute strat
     $strat = new RerouterDispatchStrategy();
