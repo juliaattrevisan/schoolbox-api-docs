@@ -390,37 +390,37 @@ abstract class Component_ControllerAbstract
          * If you didn't need to display it, don't iterate through every
          * element and set it up, to save some processing
          */
-        if ($processConfig) {
-            // every config key has a corresponding controller and template to be called
-            foreach ($this->instance->getConfigArray() as $key => $params) {
-                $this->sitepage->setVar(
-                    array(
-                        'CONFIG_ELEMENT_LABEL' => $params['label'],
-                        'CONFIG_ELEMENT_CLASS' => str_replace(' ', '', strtolower($params['label']))
-                    )
-                );
+        // every config key has a corresponding controller and template to be called
+        foreach ($this->instance->getConfigArray() as $key => $params) {
+            $this->sitepage->setVar(
+                array(
+                    'CONFIG_ELEMENT_LABEL' => $params['label'],
+                    'CONFIG_ELEMENT_CLASS' => str_replace(' ', '', strtolower($params['label']))
+                )
+            );
 
-                $fields = array();
+            $fields = array();
 
-                if ($this->sortFields) {
-                    $fields['sort'] = $this->sortFields;
-                }
-
-                if ($this->filterFields) {
-                    $fields['filter'] = $this->filterFields;
-                }
-
-                // attempt to build a configuration instance from the key provided
-                if ($conf = Component_Config_Factory::build($key, $this->context, $fields)) {
-                    if (!($is_for_template && !$conf->isShownOnTemplate())) {
-                        $this->parseConfigInstance($conf, $key, $this->sitepage, $params, $this->instance->getConfigArray());
-                        ++$configCount;
-                    }
-                }
-
-                $this->sitepage->setVar('CONFIG_ELEMENT_CONTENT', '');
+            if ($this->sortFields) {
+                $fields['sort'] = $this->sortFields;
             }
 
+            if ($this->filterFields) {
+                $fields['filter'] = $this->filterFields;
+            }
+
+            // attempt to build a configuration instance from the key provided
+            if ($conf = Component_Config_Factory::build($key, $this->context, $fields)) {
+                if (!($is_for_template && !$conf->isShownOnTemplate())) {
+                    $this->parseConfigInstance($conf, $key, $this->sitepage, $params, $this->instance->getConfigArray());
+                    ++$configCount;
+                }
+            }
+
+            $this->sitepage->setVar('CONFIG_ELEMENT_CONTENT', '');
+        }
+
+        if ($processConfig) {
             $this->sitepage->parse('settings_panel_block', 'settings_panel', false);
         }
     }
@@ -451,6 +451,7 @@ abstract class Component_ControllerAbstract
          * config element rendering and stuff
          */
         if (!$hasWriteAccess) {
+            $this->renderConfigElements(false, $is_for_template);
             return false;
         }
         else {

@@ -56,19 +56,13 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
         /* If you don't have write access, just render the collapse and go away
          */
         if (!$hasWriteAccess) {
+            $this->renderConfigElements(false, $is_for_template);
 
             /* Detroit
              */
             $this->applyCollapsedState();
 
             $this->sitepage->parse('settings_collapse_block', 'settings_collapse');
-
-            // Parse component name if it's there.
-            // usually this is done in config, but we aren't parsing config.
-            $componentName = $this->getConfig('componentname');
-            if (is_string($componentName)) {
-                $this->sitepage->setVar('COMPONENT_NAME', trim($componentName));
-            }
         }
         else {
             /* If you want to process the config, then do so and display it
