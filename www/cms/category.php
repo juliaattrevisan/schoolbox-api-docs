@@ -156,6 +156,13 @@ if (is_numeric($this->arg[0])) {
         // don't add recursion option for a new folder, it's empty, makes no sense
         $this->setVar('recursive_block', '');
 
+        // -_-
+        if (Config::get('curriculum_tagging_enabled')) {
+            $this->parse('curriculum_code_input_block', 'curriculum_code_input');
+        } else {
+            $this->setVar('curriculum_code_input_block', '');
+        }
+
         $this->setTitle('Add Category');
         $this->setTab('resources');
 
@@ -170,6 +177,10 @@ if (is_numeric($this->arg[0])) {
             'REQUIRED_PERMS' => $_SESSION['gid'],
             'GROUP_NAME' => '',
             'DATABASE_TYPE' => ucfirst(Cfg::get('database_type')),
+            'CURRICULUM_CODE_INPUT' => $this->getTwig()->render(
+                'sub/curriculumCodeSelector.twig',
+                ['codeList' => []]
+            ),
         ));
 
         $homepageTemplateMapper = new \Schoolbox\Resource\HomepageTemplateMapper();
