@@ -295,7 +295,7 @@ abstract class Eportfolio_Page_Abstract {
 	 *
 	 * @return int
 	 */
-	protected function getPageId() {
+	public function getPageId() {
 		return $this->pageId;
 	}
 

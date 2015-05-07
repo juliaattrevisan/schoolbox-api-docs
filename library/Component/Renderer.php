@@ -50,11 +50,11 @@ class Component_Renderer
     /**
      * Renders an ePortfolio template into the Sitepage within $component.
      *
-     * @param Eportfolio                              $eportfolioHandler
+     * @param Eportfolio_Page_Instance                $eportfolioPage
      * @param Component_Eportfolio_ControllerAbstract $component
      */
     public function renderEportfolioComponent(
-        Eportfolio $eportfolioHandler,
+        Eportfolio_Page_Instance $eportfolioPage,
         Component_Eportfolio_ControllerAbstract $component
     ) {
         $templateTarget = "component_position_{$component->getInstance()->getPosition()}";
@@ -62,9 +62,9 @@ class Component_Renderer
 
         //Setup permissions for component
         $context               = [];
-        $context['uid']        = $eportfolioHandler->getSettingsPageOwner();
+        $context['uid']        = $eportfolioPage->getUserId();
         $context['permission'] = \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE;
-        $context['page']       = $eportfolioHandler->getPageInstance();
+        $context['page']       = $eportfolioPage;
 
         $component->setup($context, $component->getInstance()->getConfigArray());
 
@@ -79,8 +79,8 @@ class Component_Renderer
         /* These aren't normally parsed so have to do it explicitly
          */
         $component->getPageTemplate()->setVar(array(
-            'USER_ID' => $eportfolioHandler->getUserId(),
-            'PAGE_ID' => $eportfolioHandler->getPageId(),
+            'USER_ID' => $eportfolioPage->getUserId(),
+            'PAGE_ID' => $eportfolioPage->getPageId(),
         ));
         $component->getPageTemplate()->pparse($templateTarget, $templateHandle);
     }
