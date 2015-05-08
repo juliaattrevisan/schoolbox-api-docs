@@ -31,7 +31,7 @@ $(function() {
 
         /* Seymour
          */
-        $('#content div.results').on('click', 'a.more', function() {
+        $('#content div.results').on('click', 'a.more', function(event) {
             event.preventDefault();
 
             var type = $(this).attr('rel');
