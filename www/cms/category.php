@@ -152,6 +152,7 @@ if (is_numeric($this->arg[0])) {
         $this->setBlock(TEMPLATE_content, 'reset_content', 'reset_content_block');
         $this->setBlock(TEMPLATE_content, 'synergy_input', 'synergy_input_block');
         $this->setBlock(TEMPLATE_content, 'recursive', 'recursive_block');
+        $this->setBlock(TEMPLATE_content, 'curriculum_code_input', 'curriculum_code_input_block');
 
         // don't add recursion option for a new folder, it's empty, makes no sense
         $this->setVar('recursive_block', '');
