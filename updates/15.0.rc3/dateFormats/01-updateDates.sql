@@ -1,5 +1,5 @@
-UPDATE `config` SET `description` = 'The date format used in emails, notifications and due dates, as well as other places where the day name of an event could be relevant. Do not include a time format here.' WHERE `name` = 'date_long';
-UPDATE `config` SET `description` = 'The default date format used throughout the system. By default, it outputs the day, month and year in a readable format. Do not include a time format here.' WHERE `name` = 'date_short';
+UPDATE `config` SET `description` = 'The date format used in emails, notifications and due dates, as well as other places where the day name of an event may be relevant. Do not include a time format here.' WHERE `name` = 'date_long';
+UPDATE `config` SET `description` = 'The default date format used throughout the system. Do not include a time format here.' WHERE `name` = 'date_short';
 UPDATE `config` SET `description` = 'The date format used in calendar popups, and other places where the year is either implied or irrelevant. Do not include a time format here".' WHERE `name` = 'date_only';
-UPDATE `config` SET `description` = 'The date format used in form inputs. Note that changing this format will change the format that form inputs use! Do not include a time format here.' WHERE `name` = 'date_local';
+UPDATE `config` SET `description` = 'The short date format used in form inputs. Changing this format will change the format that date form inputs use! Do not include a time format here.' WHERE `name` = 'date_local';
 UPDATE `config` SET `description` = 'The time format used throughout the system.' WHERE `name` = 'date_time';
