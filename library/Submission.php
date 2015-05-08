@@ -3,6 +3,8 @@
 /* Due Work: Recent work. Should be a multiple of 3 because there are three
 * types: Due, Awaiting and Marked.
 */
+use Schoolbox\Role;
+
 define('UPCOMING_WORK_TYPE', 1);
 define('AWAITING_WORK_TYPE', 2);
 define('RETURNED_WORK_TYPE', 3);
@@ -1477,18 +1479,32 @@ class Submission extends DeprecatedModel
 
         $allStudents = new \Schoolbox\Collection();
 
+        // let's dedupe this list, shall we?
+        $seen = [];
+
         /* External sources won't provide a uid value, so find a user by
          * using the external id instead
          */
         foreach ($studentList as $currentStudent) {
             try {
                 if (isset($currentStudent['uid'])) {
-                    $user = $userMapper->findById($currentStudent['uid']);
+                    $userId = $currentStudent['uid'];
                 } else {
-                    $user = $userMapper->findOneByColumn('synergy_id', $currentStudent['synergy_id']);
+                    $userId = $userMapper->findOneByColumn('synergy_id', $currentStudent['synergy_id'])->getId();
                 }
 
-                $allStudents->add($user);
+                if (empty($seen[$userId])) {
+                    // don't run the findById query more times than you have to...
+
+                    $user = $userMapper->findById($userId);
+
+                    // filter for STUUUUDEEEENTS! -_-
+                    if ($user->getRole()->getType() == Role::STUDENT) {
+                        $allStudents->add($user);
+                        $seen[$userId] = true;
+                    }
+                }
+
             } /* Ignore unfound users
              */
             catch (\Exception $e) {
