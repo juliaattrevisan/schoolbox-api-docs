@@ -89,13 +89,13 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                     $currentBox = $currentShowcasedItem->getSubmissionBox();
 
                     $latestSubmission = $this->getLatestSubmission(
-                        $this->getUserId(),
-                        $currentBox->getId()
+                        $this->getUser(),
+                        $currentBox
                     );
 
                     $latestReturn = $this->getLatestReturn(
-                        $this->getUserId(),
-                        $currentBox->getId()
+                        $this->getUser(),
+                        $currentBox
                     );
 
                     /* Set up subject info

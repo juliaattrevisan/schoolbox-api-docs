@@ -175,8 +175,8 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 			foreach($allShowcasedItems as $currentShowcasedItem) {
                 $currentBox = $currentShowcasedItem->getSubmissionBox();
 
-				$latestSubmission = $this->getLatestSubmission($this->getUserId(), $currentBox->getId());
-				$latestReturn = $this->getLatestReturn($this->getUserId(), $currentBox->getId());
+				$latestSubmission = $this->getLatestSubmission($this->getUser(), $currentBox);
+				$latestReturn = $this->getLatestReturn($this->getUser(), $currentBox);
 
 				if (!($currentBox instanceof Schoolbox\Assessment\Component\SubmissionBox)) {
 					continue;

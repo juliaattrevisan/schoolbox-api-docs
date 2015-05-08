@@ -8,6 +8,9 @@
  * @version     SVN: $Id$
  */
 
+use \Schoolbox\User;
+use \Schoolbox\Assessment\Component\SubmissionBox;
+
 abstract class Eportfolio_Page_Abstract {
 
 	/**
@@ -211,34 +214,34 @@ abstract class Eportfolio_Page_Abstract {
 		$this->render();
 	}
 
-	/**
-	 * Get the latest entry for a Submission History
-	 *
-	 * @param $userId
-	 * @param $boxId
-	 * @return mixed
-	 */
-	protected function getLatestSubmission($userId, $boxId) {
+    /**
+     * Get the latest entry for a Submission History
+     *
+     * @param User $user
+     * @param SubmissionBox $box
+     * @return mixed
+     */
+	protected function getLatestSubmission(User $user, SubmissionBox $box) {
 		$mapper = new \Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper();
 
-		$history = $mapper->getHistory($userId, $boxId);
+		$history = $mapper->getHistory($user->getId(), $box->getId());
 
 		if ($history->count()) {
 			return $history->first()->getSubmission();
 		}
 	}
 
-	/**
-	 * Get the latest entry for a Returned Work history
-	 *
-	 * @param $userId
-	 * @param $boxId
-	 * @return mixed
-	 */
-	protected function getLatestReturn($userId, $boxId) {
+    /**
+     * Get the latest entry for a Returned Work history
+     *
+     * @param User $user
+     * @param SubmissionBox $box
+     * @return mixed
+     */
+	protected function getLatestReturn(User $user, SubmissionBox $box) {
 		$mapper = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
 
-		$history = $mapper->getHistory($userId, $boxId);
+		$history = $mapper->getHistory($user->getId(), $box->getId());
 
 		if ($history->count()) {
 			return $history->first()->getReturnedWork();
