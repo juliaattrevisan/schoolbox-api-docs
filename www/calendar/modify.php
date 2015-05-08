@@ -196,7 +196,7 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_END_PM'         => $event->getEndDateTime()->isPM()
                     ? 'selected="selected"'
                     : '',
-            'EVENT_PUBLISH_DATE'   => '',
+            'EVENT_PUBLISH_DATE'   => Alaress_Date_Format::now()->getLocalShort(),
             'EVENT_LOCATION'       => '',
             'EVENT_DETAIL'         => '',
             'EVENT_REDIRECT'       => $event->setupRedirect(
