@@ -56,30 +56,32 @@
             }
         }
 
-        return getDateFromString(date, hour, minute, 0)
+        return getDateFromString(dateDisplayFormats.momentJs, date, hour, minute, 0)
     }
 
-    var getDateFromString = function(date, hour, minute, second) {
-        var date_parts = date.match(/^(\d+)\/(\d+)\/(\d+)$/);
-        if (!date_parts) {
-            return false;
-        }
-        return new Date(
-            date_parts[3],
-            date_parts[2]-1,
-            date_parts[1],
-            hour,
-            minute,
-            second
-        );
+    /**
+     * Gets a momentJS date given a format and date.
+     *
+     * @param format the MomentJS format to get this date in.
+     * @param date   the date string
+     * @param hour   the hour to set
+     * @param minute the minute to set
+     * @param second the second to set
+     * @returns {moment}
+     */
+    var getDateFromString = function(format, date, hour, minute, second) {
+        return moment(date, format)
+            .hour(hour)
+            .minute(minute)
+            .second(second)
+        ;
     }
 
     /**
      * Validator for a datepicker (format: dd/mm/yyyy)
      */
     $.validator.addMethod('datepickerDate', function(value, element) {
-        var date = getDateFromString(value, 0, 0, 0);
-        return (date !== false);
+        return getDateFromString(dateDisplayFormats.momentJs, value, 0, 0, 0).isValid();
     }, 'Please enter a valid date');
 
     /**
@@ -87,9 +89,12 @@
      * than another element's date.
      */
     $.validator.addMethod('datepickerDateNotBefore', function(value, element, other_element_selector) {
-        var date       = getDateFromString(value, 0, 0, 0);
-        var other_date = getDateFromString(other_element_selector.val(), 0, 0, 0);
-        return (date !== false && other_date !== false && date.getTime() >= other_date.getTime());
+        var date       = getDateFromString(dateDisplayFormats.momentJs, value, 0, 0, 0);
+        var other_date = getDateFromString(dateDisplayFormats.momentJs, other_element_selector.val(), 0, 0, 0);
+        return date.isValid()
+            && other_date.isValid()
+            && date.valueOf() >= other_date.valueOf()
+        ;
     }, 'Please enter a valid date');
 
     /**
@@ -99,8 +104,7 @@
      * It's used on the submission create field.
      */
     $.validator.addMethod('dateValid', function(value, element) {
-        var date = getNormalizedDate(element);
-        return date && date.getTime && !isNaN(date.getTime());
+        return getNormalizedDate(element).isValid();
     }, 'Please enter a valid date');
 
     /**
@@ -110,7 +114,7 @@
     $.validator.addMethod('dateNotBefore', function(value, element, other_date_field) {
         var item = $(element);
         var form = item.closest('form');
-        return (getNormalizedDate(element) >= getNormalizedDate(other_date_field, form));
+        return getNormalizedDate(element).valueOf() >= getNormalizedDate(other_date_field, form).valueOf();
     }, 'Please enter a date that is after');
 
     /**
