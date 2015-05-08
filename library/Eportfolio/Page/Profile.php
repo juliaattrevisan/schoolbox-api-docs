@@ -163,20 +163,21 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 */
 	private function renderShowcasedWork() {
 		$showcaseMapper = new \Eportfolio\ShowcaseMapper();
-		$boxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
 
 		/* Gather around the loop, everyone
 		 */
-		$allShowcasedItems = $showcaseMapper->getRecentShowcasedSubmissionBoxes($this->getUserId(), $this->getNumShowcasedItems());
+		$allShowcasedItems = $showcaseMapper->getRecentShowcasedSubmissionBoxes($this->getUser(), $this->getNumShowcasedItems());
 
 		if ($allShowcasedItems->count()) {
 			$previousCategory = null;
 			$j = 0;
 
 			foreach($allShowcasedItems as $currentShowcasedItem) {
-				$latestSubmission = $this->getLatestSubmission($this->getUserId(), $currentShowcasedItem->getSubmissionBoxId());
-				$latestReturn = $this->getLatestReturn($this->getUserId(), $currentShowcasedItem->getSubmissionBoxId());
-				$currentBox = $boxMapper->findById($currentShowcasedItem->getSubmissionBoxId());
+                $currentBox = $currentShowcasedItem->getSubmissionBox();
+
+				$latestSubmission = $this->getLatestSubmission($this->getUser(), $currentBox);
+				$latestReturn = $this->getLatestReturn($this->getUser(), $currentBox);
+
 				if (!($currentBox instanceof Schoolbox\Assessment\Component\SubmissionBox)) {
 					continue;
 				}
