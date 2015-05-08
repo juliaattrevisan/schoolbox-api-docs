@@ -43,6 +43,14 @@
                 {column: '', label: 'Delete'}
 			]
 		});
+
+        $('#user-usage').on('click', '[data-action="delete"]', function(event) {
+            event.preventDefault();
+            // raise a delete notification
+            // * Storage: will actually delete
+            // * Anything not storage backended: will actually delete
+            // * Anything storage backended: won't delete storage. Maybe allow full delete?
+        });
 	});
 </script>
 

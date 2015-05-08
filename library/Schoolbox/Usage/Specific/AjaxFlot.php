@@ -170,6 +170,7 @@ class AjaxFlot {
 
                 $page->setVar(array(
                     'FILE_HASH' => $hash,
+                    'FILE_LOCATION' => 'storage',
                 ));
 
                 $page->parse('file_storage_block', 'file_storage');
@@ -180,7 +181,8 @@ class AjaxFlot {
             else if ($currentData['groupName'] == 'File') {
                 $page->setVar(array(
                     'FILE_CATEGORY_ID' => $currentData['categoryId'],
-                    'FILE_CATEGORY_NAME' => $currentData['categoryName']
+                    'FILE_CATEGORY_NAME' => $currentData['categoryName'],
+                    'FILE_LOCATION' => 'sbfs',
                 ));
 
                 $page->parse('file_sbfs_block', 'file_sbfs');
@@ -191,12 +193,18 @@ class AjaxFlot {
             else if ($currentData['groupName'] == 'My File') {
                 $page->parse('file_myfile_block', 'file_myfile');
                 $page->parse('no_category_block', 'no_category');
+                $page->setVar(array(
+                    'FILE_LOCATION' => 'myfile',
+                ));
             }
             /* None of the above
              */
             else {
                 $page->parse('file_unlinked_block', 'file_unlinked');
                 $page->parse('no_category_block', 'no_category');
+                $page->setVar(array(
+                    'FILE_LOCATION' => 'unlinked',
+                ));
             }
 
 			$page->parse('file_block', 'file', true);
