@@ -106,7 +106,13 @@ if ($groupHandler->isParent()) {
                 }
             }
         } else {
-            $outputList[] = $userHandler->getByID($_SESSION['id']);
+            // Output only the student's default campus timetable
+            /** @var Schoolbox\User $userObject **/
+            $userObject         = $_SESSION['user'];
+            $user               = $userHandler->getByID($userObject->getId());
+            $user['campus']     = $userObject->getDefaultCampus();
+            $user['campusName'] = $userObject->getDefaultCampus()->getName();
+            $outputList[]       = $user;
         }
     }
 }
