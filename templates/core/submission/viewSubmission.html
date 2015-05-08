@@ -19,8 +19,11 @@
 
 <h1>{CATEGORY_NAME}: {DUEWORK_DESCRIPTION}</h1>
 <span class="header_option">
+    <!-- BEGIN report_btn -->
+    <a href="/submission/overview/{BOX_ID}" class="btn report"><span></span>View Report</a>
+    <!-- END report_btn -->
     <!-- BEGIN download_btn -->
-    <a href="/submission/downloadAll.php?id={BOX_ID}" class="btn download"><span></span>Download All</a>
+    <a href="/submission/downloadAll.php?id={BOX_ID}" class="btn download"><span></span>Download All Submissions</a>
     <!-- END download_btn -->
     <!-- BEGIN modify_btn -->
     <a href="/submission/createSubmission/modify/{BOX_ID}" class="btn modify"><span></span>Modify</a>
