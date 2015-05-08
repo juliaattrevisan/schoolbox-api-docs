@@ -85,6 +85,52 @@
     <div class="settings">
         <!-- BEGIN setting_group -->
         <form id="settings" class="admin-form level clearfix" method="post" action="/adminv2/settingForm.php">
+            <!-- BEGIN setting_group_localisation -->
+            <h3>Date Format Characters</h3>
+            <dl class="clearfix">
+                <dt>d</dt>
+                <dd>Day of month, leading zero (01 to 31)</dd>
+                <dt>j</dt>
+                <dd>Day of month, no leading zero (1 to 31)</dd>
+                <dt>S</dt>
+                <dd>Suffix for day of month ("st" in "1st")</dd>
+                <dt>D</dt>
+                <dd>Day name, 3 letters (Mon to Sun)</dd>
+                <dt>l</dt>
+                <dd>Day name in full (Monday to Sunday)</dd>
+                <dt>M</dt>
+                <dd>Month name, 3 letters (Jan to Dec)</dd>
+                <dt>F</dt>
+                <dd>Month name in full (January to December)</dd>
+                <dt>m</dt>
+                <dd>Month number, leading zero (01 to 12)</dd>
+                <dt>n</dt>
+                <dd>Month number, no leading zero (1 to 12)</dd>
+                <dt>y</dt>
+                <dd>Year, 2 digits</dd>
+                <dt>Y</dt>
+                <dd>Year, 4 digits</dd>
+            </dl>
+            <h3>Time format characters</h3>
+            <dl class="clearfix">
+                <dt>h</dt>
+                <dd>12 hour time, leading zero (01 to 12)</dd>
+                <dt>g</dt>
+                <dd>12 hour time, no leading zero (1 to 12)</dd>
+                <dt>a</dt>
+                <dd>am/pm of time, lower case</dd>
+                <dt>A</dt>
+                <dd>AM/PM of time, upper case</dd>
+                <dt>H</dt>
+                <dd>24 hour time, leading zero (00 to 23)</dd>
+                <dt>G</dt>
+                <dd>24 hour time, no leading zero (0 to 23)</dd>
+                <dt>i</dt>
+                <dd>Minutes, leading zero (00 to 59)</dd>
+                <dt>s</dt>
+                <dd>Seconds, leading zero (00 to 59)</dd>
+            </dl>
+            <!-- END setting_group_localisation -->
 
             <!-- BEGIN setting -->
             <label for="{SETTING_NAME}">{SETTING_TITLE}<span class="question">?</span> <em>{SETTING_DESC}</em>
