@@ -76,6 +76,7 @@ class Cloner
     {
         $assess_id = $this->task_instance->getTask()->getAssessment()->getId();
         if ($assess_id) {
+            $mapper   = OnlineAssessmentMapper::getInstance();
             $handler  = new Assess_Main();
             $section  = new Assess_Section();
             $factory  = new Assess_Factory();
@@ -103,21 +104,26 @@ class Cloner
                 $output,
                 new \SitePage(false)
             );
-            $assess_id = $import->import();
+            $newAssessId = $import->import();
 
+            // Get curriculum codes out of old assess
+            // (yes, I currently need both the mapper and the handler version!)
+            /** @var OnlineAssessment $oldAssess */
+            $oldAssess = $mapper->findById($assess_id);
             // And update the mapper version
-            /** @var OnlineAssessment $assess_object */
-            $assess_object = OnlineAssessmentMapper::getInstance()->findById($assess_id);
-            $assess_object
+            /** @var OnlineAssessment $newAssess */
+            $newAssess = $mapper->findById($newAssessId);
+            $newAssess
                 ->setTask(null)
                 ->setTaskInstance($this->task_instance)
                 ->setUser($_SESSION['id'])
                 ->setStart($this->getOpenTimeFromTask())
                 ->setFinish($this->getAssessmentCloseTimeFromTask())
+                ->setCurriculumNodes($oldAssess->getCurriculumNodes())
             ;
-            OnlineAssessmentMapper::getInstance()->save($assess_object);
+            $mapper->save($newAssess);
 
-            return $assess_object;
+            return $newAssess;
         }
         throw new ClonerException('No assessment is attached to this task');
     }
