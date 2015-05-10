@@ -230,27 +230,31 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 			INNER JOIN `groups` ON `user`.group_id = `groups`.id
 			LEFT JOIN
 			(
-				(SELECT owner AS userId, SUM(file_size) AS bytes
-				FROM `file`
-				WHERE deleted = 0
-				GROUP BY owner)
+				(SELECT owner AS userId, SUM(`s`.`filesize`) AS bytes
+				FROM `file` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`deleted` = 0
+				GROUP BY `f`.`owner`)
 				UNION
-				(SELECT owner AS userId, SUM(file_size) AS bytes
-				FROM `myFile`
-				WHERE deleted = 0
-				GROUP BY owner)
+				(SELECT owner AS userId, SUM(`s`.`filesize`) AS bytes
+				FROM `myFile` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`deleted` = 0
+				GROUP BY `f`.`owner`)
 				UNION
 				(SELECT uploaded_by AS userId, SUM(filesize) AS bytes
 				FROM `storage`
 				GROUP BY uploaded_by)
 				UNION
-				(SELECT owner AS userId, SUM(filesize) AS bytes
-				FROM `student_submission`
-				GROUP BY owner)
+				(SELECT owner AS userId, SUM(`s`.`filesize`) AS bytes
+				FROM `student_submission` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				GROUP BY `f`.`owner`)
 				UNION
-				(SELECT owner AS userId, SUM(filesize) AS bytes
-				FROM `submission_return`
-				GROUP BY owner)
+				(SELECT owner AS userId, SUM(`s`.`filesize`) AS bytes
+				FROM `submission_return` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				GROUP BY `f`.`owner`)
 			) allTotals ON `user`.id = allTotals.userId
 			GROUP BY `user`.id
 		";
