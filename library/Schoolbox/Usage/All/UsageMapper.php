@@ -62,16 +62,18 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 			FROM groups
 			LEFT JOIN
 			(
-				(SELECT `groups`.id, `groups`.name, SUM(file_size) AS bytes
+				(SELECT `groups`.id, `groups`.name, SUM(`storage`.`filesize`) AS bytes
 				FROM `file`
 				INNER JOIN `user` ON `user`.id = `file`.owner
 				INNER JOIN `groups` ON `user`.group_id = `groups`.id
+				INNER JOIN `storage` ON `file`.`hash` = `storage`.`hash`
 				GROUP BY `groups`.id)
 				UNION
-				(SELECT `groups`.id, `groups`.name, SUM(file_size) AS bytes
+				(SELECT `groups`.id, `groups`.name, SUM(`storage`.`filesize`) AS bytes
 				FROM `myFile`
 				INNER JOIN `user` ON `user`.id = `myFile`.owner
 				INNER JOIN `groups` ON `user`.group_id = `groups`.id
+				INNER JOIN `storage` ON `myFile`.`hash` = `storage`.`hash`
 				GROUP BY `groups`.id)
 				UNION
 				(SELECT `groups`.id, `groups`.name, SUM(filesize) AS bytes
@@ -80,16 +82,18 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 				INNER JOIN `groups` ON `user`.group_id = `groups`.id
 				GROUP BY `groups`.id)
 				UNION
-				(SELECT `groups`.id, `groups`.name, SUM(filesize) AS bytes
+				(SELECT `groups`.id, `groups`.name, SUM(`storage`.`filesize`) AS bytes
 				FROM `student_submission`
 				INNER JOIN `user` ON `user`.id = `student_submission`.owner
 				INNER JOIN `groups` ON `user`.group_id = `groups`.id
+				INNER JOIN `storage` ON `student_submission`.`hash` = `storage`.`hash`
 				GROUP BY `groups`.id)
 				UNION
-				(SELECT `groups`.id, `groups`.name, SUM(filesize) AS bytes
+				(SELECT `groups`.id, `groups`.name, SUM(`storage`.`filesize`) AS bytes
 				FROM `submission_return`
 				INNER JOIN `user` ON `user`.id = `submission_return`.owner
 				INNER JOIN `groups` ON `user`.group_id = `groups`.id
+				INNER JOIN `storage` ON `submission_return`.`hash` = `storage`.`hash`
 				GROUP BY `groups`.id)
 			) allTotals ON `groups`.id = allTotals.id
 			GROUP BY `groups`.name
