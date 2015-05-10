@@ -55,32 +55,36 @@ class UsageMapper
 			SELECT COALESCE(SUM(bytes), 0) AS bytes
 			FROM
 			(
-				(SELECT SUM(file_size) AS bytes
-				FROM `file`
-				WHERE `owner` = {$userId}
-				AND deleted = 0
-				GROUP BY `owner`)
+				(SELECT SUM(`s`.`filesize`) AS bytes
+				FROM `file` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = {$userId}
+				AND `f`.`deleted` = 0
+				GROUP BY `f`.`owner`)
 				UNION
-				(SELECT SUM(file_size) AS bytes
-				FROM `myFile`
-				WHERE `owner` = {$userId}
-				AND deleted = 0
-				GROUP BY `owner`)
+				(SELECT SUM(`s`.`filesize`) AS bytes
+				FROM `myFile` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = {$userId}
+				AND `f`.`deleted` = 0
+				GROUP BY `f`.`owner`)
 				UNION
 				(SELECT SUM(filesize) AS bytes
 				FROM `storage`
 				WHERE `uploaded_by` = {$userId}
 				GROUP BY `uploaded_by`)
 				UNION
-				(SELECT SUM(filesize) AS bytes
-				FROM `student_submission`
-				WHERE `owner` = {$userId}
-				GROUP BY `owner`)
+				(SELECT SUM(`s`.`filesize`) AS bytes
+				FROM `student_submission` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = {$userId}
+				GROUP BY `f`.`owner`)
 				UNION
-				(SELECT SUM(filesize) AS bytes
-				FROM `submission_return`
-				WHERE `owner` = {$userId}
-				GROUP BY `owner`)
+				(SELECT SUM(`s`.`filesize`) AS bytes
+				FROM `submission_return` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = {$userId}
+				GROUP BY `f`.`owner`)
 			) AS allTotals
 		";
 
