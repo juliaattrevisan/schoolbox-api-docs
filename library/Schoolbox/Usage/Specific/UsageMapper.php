@@ -333,6 +333,11 @@ class UsageMapper
 	 * @return array
 	 */
 	public function findFileUsage($orderBy, $order, $index, $numPerPage) {
+        $storageJoin = "INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`";
+        $mimeJoin = "
+            LEFT JOIN `allowedFileExtension` `e` ON `s`.`ext` = `e`.`extension`
+            LEFT JOIN `allowedFileTypes` `t` ON `e`.`fileTypeId` = `t`.`fileTypeId`
+        ";
 		$query = "
 			SELECT *
 			FROM
@@ -342,13 +347,14 @@ class UsageMapper
                     `f`.`realname` AS `name`,
                     'File' AS groupName,
                     `s`.`filesize` AS bytes,
-                    `s`.`mime` AS mime_type,
+                    `t`.`mime` AS mime_type,
                     '' AS hash,
                     `c`.`id` AS categoryId,
                     `c`.`name` AS categoryName
 				FROM `file` `f`
 				LEFT JOIN category `c` ON `f`.`category` = `c`.`id`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				$storageJoin
+				$mimeJoin
 				WHERE `f`.`owner` = :userId
 				AND `f`.`deleted` = 0)
 				UNION
@@ -357,38 +363,41 @@ class UsageMapper
                     `f`.`realname` AS `name`,
                     'File' AS groupName,
                     `s`.`filesize` AS bytes,
-                    `s`.`mime` AS mime_type,
+                    `t`.`mime` AS mime_type,
                     '' AS hash,
                     '' AS categoryId,
                     '' AS categoryName
 				FROM `myFile` `f`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				$storageJoin
+				$mimeJoin
 				WHERE `f`.`owner` = :userId
 				AND `f`.`deleted` = 0)
 				UNION
 				(SELECT
 				    '' AS id,
-                    filename AS `name`,
+                    `s`.`filename` AS `name`,
                     'Storage' AS groupName,
-                    filesize AS bytes,
-                    mime AS mime_type,
-                    hash,
+                    `s`.`filesize` AS bytes,
+                    `t`.`mime` AS mime_type,
+                    `s`.`hash`,
                     '' AS categoryId,
                     '' AS categoryName
-				FROM `storage`
-				WHERE `uploaded_by` = :userId)
+				FROM `storage` `s`
+				$mimeJoin
+				WHERE `s`.`uploaded_by` = :userId)
 				UNION
 				(SELECT
 				    '' AS id,
                     `f`.`realname` AS `name`,
                     'Submission' AS groupName,
                     `s`.`filesize` AS bytes,
-                    `s`.`mime` AS mime_type,
+                    `t`.`mime` AS mime_type,
                     '' AS hash,
                     '' AS categoryId,
                     '' AS categoryName
 				FROM `student_submission` `f`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				$storageJoin
+				$mimeJoin
 				WHERE `f`.`owner` = :userId)
 				UNION
 				(SELECT
@@ -396,12 +405,13 @@ class UsageMapper
                     `f`.`filename` AS `name`,
                     'Return' AS groupName,
                     `s`.`filesize` AS bytes,
-                    `s`.`mime` AS mime_type,
+                    `t`.`mime` AS mime_type,
                     '' AS hash,
                     '' AS categoryId,
                     '' AS categoryName
 				FROM `submission_return` `f`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				$storageJoin
+				$mimeJoin
 				WHERE `f`.`owner` = :userId
 				AND `f`.`deleted` = 0)
 			) AS allTotals
