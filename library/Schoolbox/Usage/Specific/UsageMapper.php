@@ -119,109 +119,119 @@ class UsageMapper
 	 * @return array
 	 */
 	public function findGroupUsage() {
-		$userId = $this->getUserId();
-
 		/* Just Like Voltron
 		 */
 		$query = "
 			SELECT `name`, SUM(bytes) AS bytes
 			FROM
 			(
-				(SELECT 'Images' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
-				FROM `file`
-				WHERE `owner` = {$userId}
-				AND deleted = 0
-				AND mime_type LIKE 'image/%')
+				(SELECT 'Images' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+				FROM `file` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId
+				AND `f`.`deleted` = 0
+				AND `s`.`mime` LIKE 'image/%')
 				UNION
-				(SELECT 'Video' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
-				FROM `file`
-				WHERE `owner` = {$userId}
-				AND deleted = 0
-				AND mime_type LIKE 'video/%')
+				(SELECT 'Video' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+				FROM `file` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId
+				AND `f`.`deleted` = 0
+				AND `s`.`mime` LIKE 'video/%')
 				UNION
-				(SELECT 'Audio' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
-				FROM `file`
-				WHERE `owner` = {$userId}
-				AND deleted = 0
-				AND mime_type LIKE 'audio/%')
+				(SELECT 'Audio' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+				FROM `file` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId
+				AND `f`.`deleted` = 0
+				AND `s`.`mime` LIKE 'audio/%')
 
 				UNION
 
-				(SELECT 'Images' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
-				FROM `myFile`
-				WHERE `owner` = {$userId}
-				AND deleted = 0
-				AND mime_type LIKE 'image/%')
+				(SELECT 'Images' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+				FROM `myFile` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId
+				AND `f`.`deleted` = 0
+				AND `s`.`mime` LIKE 'image/%')
 				UNION
-				(SELECT 'Video' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
-				FROM `myFile`
-				WHERE `owner` = {$userId}
-				AND deleted = 0
-				AND mime_type LIKE 'video/%')
+				(SELECT 'Video' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+				FROM `myFile` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId
+				AND `f`.`deleted` = 0
+				AND `s`.`mime` LIKE 'video/%')
 				UNION
-				(SELECT 'Audio' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
-				FROM `myFile`
-				WHERE `owner` = {$userId}
-				AND deleted = 0
-				AND mime_type LIKE 'audio/%')
+				(SELECT 'Audio' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+				FROM `myFile` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId
+				AND `f`.`deleted` = 0
+				AND `s`.`mime` LIKE 'audio/%')
 
 				UNION
 
 				(SELECT 'Images' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
 				FROM `storage`
-				WHERE `uploaded_by` = {$userId}
+				WHERE `uploaded_by` = :userId
 				AND mime LIKE 'image/%')
 				UNION
 				(SELECT 'Video' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
 				FROM `storage`
-				WHERE `uploaded_by` = {$userId}
+				WHERE `uploaded_by` = :userId
 				AND mime LIKE 'video/%')
 				UNION
 				(SELECT 'Audio' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
 				FROM `storage`
-				WHERE `uploaded_by` = {$userId}
+				WHERE `uploaded_by` = :userId
 				AND mime LIKE 'audio/%')
 
 				UNION
 
-				(SELECT 'Images' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
-				FROM `student_submission`
-				WHERE `owner` = {$userId}
-				AND mime_type LIKE 'image/%')
+				(SELECT 'Images' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+				FROM `student_submission` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId
+				AND `s`.`mime` LIKE 'image/%')
 				UNION
-				(SELECT 'Video' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
-				FROM `student_submission`
-				WHERE `owner` = {$userId}
-				AND mime_type LIKE 'video/%')
+				(SELECT 'Video' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+				FROM `student_submission` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId
+				AND `s`.`mime` LIKE 'video/%')
 				UNION
-				(SELECT 'Audio' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
-				FROM `student_submission`
-				WHERE `owner` = {$userId}
-				AND mime_type LIKE 'audio/%')
+				(SELECT 'Audio' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+				FROM `student_submission` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId
+				AND `s`.`mime` LIKE 'audio/%')
 
 				UNION
 
-				(SELECT 'Images' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
-				FROM `submission_return`
-				WHERE `owner` = {$userId}
-				AND mime_type LIKE 'image/%')
+				(SELECT 'Images' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+				FROM `submission_return` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId
+				AND `s`.`mime` LIKE 'image/%')
 				UNION
-				(SELECT 'Video' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
-				FROM `submission_return`
-				WHERE `owner` = {$userId}
-				AND mime_type LIKE 'video/%')
+				(SELECT 'Video' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+				FROM `submission_return` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId
+				AND `s`.`mime` LIKE 'video/%')
 				UNION
-				(SELECT 'Audio' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
-				FROM `submission_return`
-				WHERE `owner` = {$userId}
-				AND mime_type LIKE 'audio/%')
+				(SELECT 'Audio' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+				FROM `submission_return` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId
+				AND `s`.`mime` LIKE 'audio/%')
 			) AS allTotals
 			GROUP BY `name`
 			ORDER BY bytes DESC
 		";
 
 		$statement = $this->database->prepare($query);
-		$statement->execute();
+		$statement->execute(['userId' => $this->getUserId()]);
 
 		$result = array();
 		$mediaBytes = 0;
