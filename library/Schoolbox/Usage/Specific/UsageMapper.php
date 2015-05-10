@@ -109,16 +109,18 @@ class UsageMapper
 			FROM
 			(
 				(SELECT COUNT(*) AS num
-				FROM `file`
-				WHERE `owner` = {$userId}
-				AND deleted = 0
-				GROUP BY `owner`)
+				FROM `file` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = {$userId}
+				AND `f`.`deleted` = 0
+				GROUP BY `f`.`owner`)
 				UNION
 				(SELECT COUNT(*) AS num
-				FROM `myFile`
-				WHERE `owner` = {$userId}
-				AND deleted = 0
-				GROUP BY `owner`)
+				FROM `myFile` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = {$userId}
+				AND `f`.`deleted` = 0
+				GROUP BY `f`.`owner`)
 				UNION
 				(SELECT COUNT(*) AS num
 				FROM `storage`
@@ -126,14 +128,16 @@ class UsageMapper
 				GROUP BY `uploaded_by`)
 				UNION
 				(SELECT COUNT(*) AS num
-				FROM `student_submission`
-				WHERE `owner` = {$userId}
-				GROUP BY `owner`)
+				FROM `student_submission` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = {$userId}
+				GROUP BY `f`.`owner`)
 				UNION
 				(SELECT COUNT(*) AS num
-				FROM `submission_return`
-				WHERE `owner` = {$userId}
-				GROUP BY `owner`)
+				FROM `submission_return` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = {$userId}
+				GROUP BY `f`.`owner`)
 			) AS allTotals
 		";
 
