@@ -42,6 +42,56 @@ class UsageMapper
 		$this->setUserId($userId);
 	}
 
+    /**
+     * Gets usage bytes and total files as part of a single query.
+     *
+     * @return array bytes: bytes used, num: total files
+     */
+    protected function getUsage()
+    {
+        $query = "
+			SELECT
+			    COALESCE(SUM(bytes), 0) AS bytes,
+			    COALESCE(SUM(num), 0) AS num
+			FROM
+			(
+				(SELECT SUM(`s`.`filesize`) AS bytes, COUNT(*) AS num
+				FROM `file` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId
+				AND `f`.`deleted` = 0
+				GROUP BY `f`.`owner`)
+				UNION
+				(SELECT SUM(`s`.`filesize`) AS bytes, COUNT(*) AS num
+				FROM `myFile` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId
+				AND `f`.`deleted` = 0
+				GROUP BY `f`.`owner`)
+				UNION
+				(SELECT SUM(filesize) AS bytes, COUNT(*) AS num
+				FROM `storage`
+				WHERE `uploaded_by` = :userId
+				GROUP BY `uploaded_by`)
+				UNION
+				(SELECT SUM(`s`.`filesize`) AS bytes, COUNT(*) AS num
+				FROM `student_submission` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId
+				GROUP BY `f`.`owner`)
+				UNION
+				(SELECT SUM(`s`.`filesize`) AS bytes, COUNT(*) AS num
+				FROM `submission_return` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId
+				GROUP BY `f`.`owner`)
+			) AS allTotals
+		";
+        $statement = $this->database->prepare($query);
+        $statement->execute(['userId' => $this->getUserId()]);
+        return $statement->fetch(\PDO::FETCH_ASSOC);
+    }
+
 	/**
 	 * Find total usage
 	 *
@@ -49,51 +99,7 @@ class UsageMapper
 	 * This includes files which may have been marked as softdeleted in the db
 	 */
 	public function findTotalUsage() {
-		$userId = $this->getUserId();
-
-		$query = "
-			SELECT COALESCE(SUM(bytes), 0) AS bytes
-			FROM
-			(
-				(SELECT SUM(`s`.`filesize`) AS bytes
-				FROM `file` `f`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
-				WHERE `f`.`owner` = {$userId}
-				AND `f`.`deleted` = 0
-				GROUP BY `f`.`owner`)
-				UNION
-				(SELECT SUM(`s`.`filesize`) AS bytes
-				FROM `myFile` `f`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
-				WHERE `f`.`owner` = {$userId}
-				AND `f`.`deleted` = 0
-				GROUP BY `f`.`owner`)
-				UNION
-				(SELECT SUM(filesize) AS bytes
-				FROM `storage`
-				WHERE `uploaded_by` = {$userId}
-				GROUP BY `uploaded_by`)
-				UNION
-				(SELECT SUM(`s`.`filesize`) AS bytes
-				FROM `student_submission` `f`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
-				WHERE `f`.`owner` = {$userId}
-				GROUP BY `f`.`owner`)
-				UNION
-				(SELECT SUM(`s`.`filesize`) AS bytes
-				FROM `submission_return` `f`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
-				WHERE `f`.`owner` = {$userId}
-				GROUP BY `f`.`owner`)
-			) AS allTotals
-		";
-
-		$statement = $this->database->prepare($query);
-		$statement->execute();
-
-		$result = $statement->fetch(\PDO::FETCH_ASSOC);
-
-		return $result['bytes'];
+        return $this->getUsage()['bytes'];
 	}
 
 	/**
@@ -102,51 +108,7 @@ class UsageMapper
 	 * @return mixed
 	 */
 	public function numFiles() {
-		$userId = $this->getUserId();
-
-		$query = "
-			SELECT COALESCE(SUM(num), 0) AS num
-			FROM
-			(
-				(SELECT COUNT(*) AS num
-				FROM `file` `f`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
-				WHERE `f`.`owner` = {$userId}
-				AND `f`.`deleted` = 0
-				GROUP BY `f`.`owner`)
-				UNION
-				(SELECT COUNT(*) AS num
-				FROM `myFile` `f`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
-				WHERE `f`.`owner` = {$userId}
-				AND `f`.`deleted` = 0
-				GROUP BY `f`.`owner`)
-				UNION
-				(SELECT COUNT(*) AS num
-				FROM `storage`
-				WHERE `uploaded_by` = {$userId}
-				GROUP BY `uploaded_by`)
-				UNION
-				(SELECT COUNT(*) AS num
-				FROM `student_submission` `f`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
-				WHERE `f`.`owner` = {$userId}
-				GROUP BY `f`.`owner`)
-				UNION
-				(SELECT COUNT(*) AS num
-				FROM `submission_return` `f`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
-				WHERE `f`.`owner` = {$userId}
-				GROUP BY `f`.`owner`)
-			) AS allTotals
-		";
-
-		$statement = $this->database->prepare($query);
-		$statement->execute();
-
-		$result = $statement->fetch(\PDO::FETCH_ASSOC);
-
-		return $result['num'];
+        return $this->getUsage()['num'];
 	}
 
 	/**
