@@ -14,7 +14,7 @@ class AjaxFlot {
 	/**
 	 * An instance of UsageMapper
 	 *
-	 * @var null
+	 * @var UsageMapper
 	 */
 	private $mapper = null;
 
@@ -133,7 +133,7 @@ class AjaxFlot {
 		$page->setFile('file_list', '/adminv2/usage/file.html');
 		$page->setBlock('file_list', 'file', 'file_block');
         $page->setBlock('file', 'file_storage', 'file_storage_block');
-
+        $page->setBlock('file', 'file_submission', 'file_submission_block');
         $page->setBlock('file', 'file_sbfs', 'file_sbfs_block');
         $page->setBlock('file', 'has_category', 'has_category_block');
         $page->setBlock('file', 'no_category', 'no_category_block');
@@ -143,6 +143,7 @@ class AjaxFlot {
 
         $page->setVar(array(
             'file_storage_block' => '',
+            'file_submission_block' => '',
             'file_sbfs_block' => '',
             'file_myfile_block' => '',
             'file_unlinked_block' => '',
@@ -154,6 +155,7 @@ class AjaxFlot {
 		 */
 		$bytes = new \Alaress_Byte_Format();
 
+//        var_dump($allData);
 		foreach ($allData as $currentData) {
 			$page->setVar(array(
                 'FILE_ID' => $currentData['id'],
@@ -197,6 +199,22 @@ class AjaxFlot {
                     'FILE_LOCATION' => 'myfile',
                 ));
             }
+            /* Student Submissions
+             */
+            else if ($currentData['groupName'] == 'Submission') {
+                $page->parse('file_submission_block', 'file_submission');
+                $page->parse('has_category_block', 'has_category');
+                $page->setVar(array(
+                    'FILE_LOCATION' => 'submission',
+                ));
+            }
+//            else if ($currentData['groupName'] == 'Return') {
+//                $page->parse('file_unlinked_block', 'file_unlinked');
+//                $page->parse('no_category_block', 'no_category');
+//                $page->setVar(array(
+//                    'FILE_LOCATION' => 'return',
+//                ));
+//            }
             /* None of the above
              */
             else {
@@ -213,6 +231,7 @@ class AjaxFlot {
              */
             $page->setVar(array(
                 'file_storage_block' => '',
+                'file_submission_block' => '',
                 'file_sbfs_block' => '',
                 'file_myfile_block' => '',
                 'file_unlinked_block' => '',
@@ -230,7 +249,7 @@ class AjaxFlot {
 	/**
 	 * Set mapper
 	 *
-	 * @param null $mapper
+	 * @param UsageMapper $mapper
 	 */
 	private function setMapper($mapper) {
 		$this->mapper = $mapper;
@@ -239,7 +258,7 @@ class AjaxFlot {
 	/**
 	 * Get mapper
 	 *
-	 * @return null
+	 * @return UsageMapper
 	 */
 	public function getMapper() {
 		return $this->mapper;
