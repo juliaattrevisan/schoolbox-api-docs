@@ -333,38 +333,38 @@ class UsageMapper
 	 * @return array
 	 */
 	public function findFileUsage($orderBy, $order, $index, $numPerPage) {
-		$userId = $this->getUserId();
-
 		$query = "
 			SELECT *
 			FROM
 			(
 				(SELECT
-				    file.id,
-                    realname AS `name`,
+				    `f`.`id`,
+                    `f`.`realname` AS `name`,
                     'File' AS groupName,
-                    file_size AS bytes,
-                    mime_type,
+                    `s`.`filesize` AS bytes,
+                    `s`.`mime` AS mime_type,
                     '' AS hash,
-                    category.id AS categoryId,
-                    category.name AS categoryName
-				FROM `file`
-				LEFT JOIN category ON file.category = category.id
-				WHERE `owner` = {$userId}
-				AND deleted = 0)
+                    `c`.`id` AS categoryId,
+                    `c`.`name` AS categoryName
+				FROM `file` `f`
+				LEFT JOIN category `c` ON `f`.`category` = `c`.`id`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId
+				AND `f`.`deleted` = 0)
 				UNION
 				(SELECT
-				    id,
-                    realname AS `name`,
-                    'My File' AS groupName,
-                    file_size AS bytes,
-                    mime_type,
+				    `f`.`id`,
+                    `f`.`realname` AS `name`,
+                    'File' AS groupName,
+                    `s`.`filesize` AS bytes,
+                    `s`.`mime` AS mime_type,
                     '' AS hash,
                     '' AS categoryId,
                     '' AS categoryName
-				FROM `myFile`
-				WHERE `owner` = {$userId}
-				AND deleted = 0)
+				FROM `myFile` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId
+				AND `f`.`deleted` = 0)
 				UNION
 				(SELECT
 				    '' AS id,
@@ -376,32 +376,34 @@ class UsageMapper
                     '' AS categoryId,
                     '' AS categoryName
 				FROM `storage`
-				WHERE `uploaded_by` = {$userId})
+				WHERE `uploaded_by` = :userId)
 				UNION
 				(SELECT
 				    '' AS id,
-                    realname AS `name`,
+                    `f`.`realname` AS `name`,
                     'Submission' AS groupName,
-                    filesize AS bytes,
-                    mime_type,
+                    `s`.`filesize` AS bytes,
+                    `s`.`mime` AS mime_type,
                     '' AS hash,
                     '' AS categoryId,
                     '' AS categoryName
-				FROM `student_submission`
-				WHERE `owner` = {$userId})
+				FROM `student_submission` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId)
 				UNION
 				(SELECT
 				    '' AS id,
-                    filename AS `name`,
+                    `f`.`filename` AS `name`,
                     'Return' AS groupName,
-                    filesize AS bytes,
-                    mime_type,
+                    `s`.`filesize` AS bytes,
+                    `s`.`mime` AS mime_type,
                     '' AS hash,
                     '' AS categoryId,
                     '' AS categoryName
-				FROM `submission_return`
-				WHERE `owner` = {$userId}
-				AND deleted = 0)
+				FROM `submission_return` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId
+				AND `f`.`deleted` = 0)
 			) AS allTotals
 		";
 
@@ -432,7 +434,7 @@ class UsageMapper
 		/* Spit it out
 		 */
 		$statement = $this->database->prepare($query);
-		$statement->execute();
+        $statement->execute(['userId' => $this->getUserId()]);
 
 		$result = array();
 
