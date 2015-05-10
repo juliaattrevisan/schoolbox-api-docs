@@ -272,43 +272,45 @@ class UsageMapper
 	 * @return array
 	 */
 	public function findTypeUsage() {
-		$userId = $this->getUserId();
-
 		$query = "
 			SELECT *
 			FROM
-				((SELECT 'Files' AS `name`, SUM(file_size) AS `bytes`
-				FROM `file`
-				WHERE `owner`= {$userId}
-				AND deleted = 0
-				GROUP BY `owner`)
+				((SELECT 'Files' AS `name`, SUM(`s`.`filesize`) AS `bytes`
+				FROM `file` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId
+				AND `f`.`deleted` = 0
+				GROUP BY `f`.`owner`)
 				UNION
-				(SELECT 'My Files' AS `name`, SUM(file_size) AS `bytes`
-				FROM `myFile`
-				WHERE `owner`= {$userId}
-				AND deleted = 0
-				GROUP BY `owner`)
+				(SELECT 'My Files' AS `name`, SUM(`s`.`filesize`) AS `bytes`
+				FROM `myFile` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId
+				AND `f`.`deleted` = 0
+				GROUP BY `f`.`owner`)
 				UNION
 				(SELECT 'Storage' AS `name`, SUM(filesize) AS `bytes`
 				FROM `storage`
-				WHERE `uploaded_by` = {$userId}
+				WHERE `uploaded_by` = :userId
 				GROUP BY `uploaded_by`)
 				UNION
-				(SELECT 'Submission'  AS `name`, SUM(filesize) AS `bytes`
-				FROM `student_submission`
-				WHERE `owner` = {$userId}
-				GROUP BY `owner`)
+				(SELECT 'Submission'  AS `name`, SUM(`s`.`filesize`) AS `bytes`
+				FROM `student_submission` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId
+				GROUP BY `f`.`owner`)
 				UNION
-				(SELECT 'Returns'  AS `name`, SUM(filesize) AS `bytes`
-				FROM `submission_return`
-				WHERE `owner` = {$userId}
-				AND deleted = 0
-				GROUP BY `owner`)) AS allTotals
+				(SELECT 'Returns'  AS `name`, SUM(`s`.`filesize`) AS `bytes`
+				FROM `submission_return` `f`
+				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				WHERE `f`.`owner` = :userId
+				AND `f`.`deleted` = 0
+				GROUP BY `f`.`owner`)) AS allTotals
 			ORDER BY `bytes` ASC
 		";
 
 		$statement = $this->database->prepare($query);
-		$statement->execute();
+        $statement->execute(['userId' => $this->getUserId()]);
 
 		$result = array();
 
