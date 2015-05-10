@@ -10,14 +10,21 @@
 
 namespace Schoolbox\Usage\Specific;
 
+use Database;
 
-class UsageMapper extends \Schoolbox\Resource\FileMapper {
+class UsageMapper
+{
 
 	/**
 	 * The user to generate stats for
 	 * * @var int
 	 */
 	private $userId = 0;
+
+    /**
+     * @var Database
+     */
+    protected $database;
 
 	/**
 	 * Constructor
@@ -28,7 +35,9 @@ class UsageMapper extends \Schoolbox\Resource\FileMapper {
 
 		/* Urgh.
 		 */
-		parent::__construct();
+//		parent::__construct();
+
+        $this->database = Database::getInstance();
 
 		$this->setUserId($userId);
 	}
