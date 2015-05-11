@@ -20,8 +20,12 @@ $lockBackend = new Sabre\DAV\Locks\Backend\File(sys_get_temp_dir() . '/webdavloc
 $lockPlugin = new Sabre\DAV\Locks\Plugin($lockBackend);
 $server->addPlugin($lockPlugin);
 
-$authBackend = new DAV_Digest();
-$authPlugin = new Sabre\DAV\Auth\Plugin($authBackend, Cfg::get('site_location'));
+$config = new \Schoolbox\Config\ConfigMapper();
+$authBackendFactory = new DAV_Auth_Factory($config);
+$authPlugin = new Sabre\DAV\Auth\Plugin(
+    $authBackendFactory->build(),
+    $config->get('site_location')
+);
 $server->addPlugin($authPlugin);
 
 //$server->addPlugin(new DAV_ExceptionPlugin());
