@@ -288,7 +288,7 @@ if (is_numeric($this->arg[0])) {
             $allLinks = $linkMapper->findAllInCategory($folder, array());
 
             foreach ($allLinks as $currentLink) {
-                $currentLink->delete();
+                $linkMapper->delete($currentLink);
             }
 
             SitePage::localRedir("/homepage/{$folder->getId()}");
