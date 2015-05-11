@@ -556,7 +556,7 @@ class StudentReportCard
                     foreach ($currentCriteria as $currentCriterion) {
                         $allStructures[$group][$currentCriterion->getId()]['criterion'] = $currentCriterion;
 
-                        /* TODO: Foreach return, get the result for this criterion
+                        /* Foreach return, get the result for this criterion
                          */
                         foreach ($allSubmissionBoxes as $currentSubmission) {
                             $allValues = $currentSubmission['rubrics'];
@@ -570,7 +570,10 @@ class StudentReportCard
 //                            }
 
                             if ($string) {
-                                $allStructures[$group][$currentCriterion->getId()]['results'][$currentSubmission['box']->getName()] = $string;
+                                $allStructures[$group][$currentCriterion->getId()]['results'][$currentSubmission['box']->getName()] = array(
+                                    'id' => $currentSubmission['box']->getId(),
+                                    'descriptor' => $string
+                                );
                             }
                         }
 
@@ -612,8 +615,9 @@ class StudentReportCard
 
                         foreach ($data['results'] as $boxName => $currentResult) {
                             $page->setVar(array(
-                                'SUBJECT_RUBRIC_CRITERION_MARK'     => $currentResult,
-                                'SUBJECT_RUBRIC_SUBMISSIONBOX_NAME' => $boxName
+                                'SUBJECT_RUBRIC_SUBMISSIONBOX_ID'   => $currentResult['id'],
+                                'SUBJECT_RUBRIC_SUBMISSIONBOX_NAME' => $boxName,
+                                'SUBJECT_RUBRIC_CRITERION_MARK'     => $currentResult['descriptor'],
                             ));
 
                             $page->parse('subject_rubric_criterion_mark_block', 'subject_rubric_criterion_mark', true);
