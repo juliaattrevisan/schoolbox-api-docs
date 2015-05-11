@@ -345,6 +345,25 @@
             })
         })
 
+        /**
+         * Change event for create task and event title.
+         * Prevent creation of a calendar event if the input is empty.
+         * @param event
+         */
+        var toggleCreateButtonState = function(event) {
+            var trimmedValue = this.value.replace(/^\s+|\s+$/g, '');
+            var submit = $(this).closest('form').find(':submit');
+            submit.prop('disabled', trimmedValue === '');
+        };
+        c.getForm('createEvent').find('input[name="title"]')
+            .on('change', toggleCreateButtonState)
+            .on('keyup', toggleCreateButtonState)
+        ;
+        c.getForm('createTask').find('input[name="title"]')
+            .on('change', toggleCreateButtonState)
+            .on('keyup', toggleCreateButtonState)
+        ;
+
         // if a checkbox on the editTask form is interacted, update the appropriate event on the calendar
         c.getForm('editTask').on('change', 'input[name=completed]', function(e) {
             var self = $(this)
