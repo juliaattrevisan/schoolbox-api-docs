@@ -13,6 +13,31 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
  */
 $page = new SitePage();
 
+if (is_numeric($_GET['delete'])) {
+    // Delete a previously returned work
+    $mapper = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
+    try {
+        $return = $mapper->findById($_GET['delete']);
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        error(44);
+        exit;
+    }
+
+    // Security check
+    $boxId  = $return->getSubmissionBox()->getId();
+    $userId = $return->getOwner()->getId();
+    $studentRetHandler = new SubmissionReturn();
+    $studentRetHandler->securityCheck($return->getSubmissionBox()->getId());
+    unset($studentRetHandler);
+
+    // Delete and redir somewhere
+    $mapper->delete($return);
+    SitePage::localRedir("/submission/inlineGrading/view/{$boxId}/{$userId}");
+    exit;
+}
+
+// Resume normal service
+
 /* Get the owner object
  */
 $userMapper = new \Schoolbox\UserMapper();
