@@ -49,14 +49,13 @@
             event.preventDefault();
             var location     = $(this).closest('[data-location]');
             var locationData = location.data();
-
-            // file: /cms/fileForm.php?delete=$id
-            // myfile: /cms/myFileForm.php?delete=$id
-            // submission: doesn't exist yet
-            // return: doesn't exist yet
-
-
             if (locationData.fileid) {
+                if (confirm('Are you sure you wish to delete this file?')) {
+                    $.get(this.href)
+                        .done(function() {
+                            window.location.reload();
+                        });
+                }
                 // offer to delete file reference.
                 // Storage isn't directly deleted, it can be deleted by GC when that's added
             } else {
