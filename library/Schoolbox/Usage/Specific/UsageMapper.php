@@ -1,6 +1,9 @@
 <?php
 /**
- * Mapper
+ * Usage report mapper for the filesystem.
+ *
+ * Currently, files that are related to deleted fields (i.e. deleted files)
+ * are NOT included in report totals.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -96,6 +99,7 @@ class UsageMapper
 				FROM `submission_return` `f`
 				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
 				WHERE `f`.`owner` = :userId
+				AND `f`.`deleted` = 0
 				GROUP BY `f`.`owner`)
 			) AS allTotals
 		";
@@ -107,8 +111,7 @@ class UsageMapper
 	/**
 	 * Find total usage
 	 *
-	 * This summates the filesizes of all files in the specified location.
-	 * This includes files which may have been marked as softdeleted in the db
+	 * @return mixed
 	 */
 	public function findTotalUsage() {
         return $this->getUsage()['bytes'];
@@ -125,8 +128,6 @@ class UsageMapper
 
 	/**
 	 * Find total category usage
-	 *
-	 * This does NOT summate files which have been marked as softdeleted in the db
 	 *
 	 * @return array
 	 */
@@ -298,9 +299,6 @@ class UsageMapper
 	/**
 	 * Find total type usage
 	 *
-	 * This summates the filesizes of all files in the specified location.
-	 * This includes files which may have been marked as softdeleted in the db
-	 *
 	 * @return array
 	 */
 	public function findTypeUsage() {
@@ -355,8 +353,6 @@ class UsageMapper
 
 	/**
 	 * Find total file usage
-	 *
-	 * This does NOT summate files which have been marked as softdeleted in the db
 	 *
 	 * @param string $orderBy
 	 * @param string $order
