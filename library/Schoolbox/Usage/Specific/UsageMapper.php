@@ -239,6 +239,7 @@ class UsageMapper
 				$storageJoin
 				$mimeJoin
 				WHERE `f`.`owner` = :userId
+				AND `f`.`deleted` = 0
 				AND `t`.`mime` LIKE 'image/%')
 				UNION
 				(SELECT 'Video' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
@@ -246,6 +247,7 @@ class UsageMapper
 				$storageJoin
 				$mimeJoin
 				WHERE `f`.`owner` = :userId
+				AND `f`.`deleted` = 0
 				AND `t`.`mime` LIKE 'video/%')
 				UNION
 				(SELECT 'Audio' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
@@ -253,6 +255,7 @@ class UsageMapper
 				$storageJoin
 				$mimeJoin
 				WHERE `f`.`owner` = :userId
+				AND `f`.`deleted` = 0
 				AND `t`.`mime` LIKE 'audio/%')
 			) AS allTotals
 			GROUP BY `name`
