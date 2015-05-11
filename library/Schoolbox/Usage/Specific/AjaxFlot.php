@@ -211,7 +211,7 @@ class AjaxFlot {
             else if ($currentData['groupName'] == 'Submission') {
                 $page->setVar(array(
                     'FILE_LOCATION' => 'submission',
-                    'FILE_DELETE_URL' => '/submission/submitWorkForm.php?delete='.$currentData['id'],
+                    'FILE_DELETE_URL' => '/submission/viewSubmissionForm.php?delete='.$currentData['id'],
                 ));
                 $page->parse('file_submission_block', 'file_submission');
                 $page->parse('has_category_block', 'has_category');
