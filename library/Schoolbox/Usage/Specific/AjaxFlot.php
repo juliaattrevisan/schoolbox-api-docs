@@ -134,6 +134,7 @@ class AjaxFlot {
 		$page->setBlock('file_list', 'file', 'file_block');
         $page->setBlock('file', 'file_storage', 'file_storage_block');
         $page->setBlock('file', 'file_submission', 'file_submission_block');
+        $page->setBlock('file', 'file_return', 'file_return_block');
         $page->setBlock('file', 'file_sbfs', 'file_sbfs_block');
         $page->setBlock('file', 'has_category', 'has_category_block');
         $page->setBlock('file', 'no_category', 'no_category_block');
@@ -144,6 +145,7 @@ class AjaxFlot {
         $page->setVar(array(
             'file_storage_block' => '',
             'file_submission_block' => '',
+            'file_return_block' => '',
             'file_sbfs_block' => '',
             'file_myfile_block' => '',
             'file_unlinked_block' => '',
@@ -159,19 +161,19 @@ class AjaxFlot {
 		foreach ($allData as $currentData) {
 			$page->setVar(array(
                 'FILE_ID' => $currentData['id'],
+                'FILE_HASH' => $currentData['hash'],
 				'FILE_FILENAME' => $currentData['name'],
 				'FILE_BYTES' => $bytes->bytesToString($currentData['bytes']),
 				'FILE_GROUPNAME' => $currentData['groupName'],
 				'FILE_MIMETYPE' => $currentData['mime_type'],
+                'FILE_CATEGORY_ID' => $currentData['categoryId'],
+                'FILE_CATEGORY_NAME' => $currentData['categoryName'],
 			));
 
             /* Link Storage files
              */
             if ($currentData['groupName'] == 'Storage') {
-                $hash = $currentData['hash'];
-
                 $page->setVar(array(
-                    'FILE_HASH' => $hash,
                     'FILE_LOCATION' => 'storage',
                 ));
 
@@ -182,8 +184,6 @@ class AjaxFlot {
              */
             else if ($currentData['groupName'] == 'File') {
                 $page->setVar(array(
-                    'FILE_CATEGORY_ID' => $currentData['categoryId'],
-                    'FILE_CATEGORY_NAME' => $currentData['categoryName'],
                     'FILE_LOCATION' => 'sbfs',
                 ));
 
@@ -208,13 +208,13 @@ class AjaxFlot {
                     'FILE_LOCATION' => 'submission',
                 ));
             }
-//            else if ($currentData['groupName'] == 'Return') {
-//                $page->parse('file_unlinked_block', 'file_unlinked');
-//                $page->parse('no_category_block', 'no_category');
-//                $page->setVar(array(
-//                    'FILE_LOCATION' => 'return',
-//                ));
-//            }
+            else if ($currentData['groupName'] == 'Return') {
+                $page->parse('file_return_block', 'file_return');
+                $page->parse('has_category_block', 'has_category');
+                $page->setVar(array(
+                    'FILE_LOCATION' => 'return',
+                ));
+            }
             /* None of the above
              */
             else {
@@ -232,6 +232,7 @@ class AjaxFlot {
             $page->setVar(array(
                 'file_storage_block' => '',
                 'file_submission_block' => '',
+                'file_return_block' => '',
                 'file_sbfs_block' => '',
                 'file_myfile_block' => '',
                 'file_unlinked_block' => '',
