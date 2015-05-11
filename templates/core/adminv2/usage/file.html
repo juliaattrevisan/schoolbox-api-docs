@@ -1,5 +1,5 @@
 <!-- BEGIN file -->
-<tr data-location="{FILE_LOCATION}">
+<tr data-location="{FILE_LOCATION}" data-filehash="{FILE_HASH}" data-fileid="{FILE_ID}">
     <!-- BEGIN file_storage -->
 	<td><a href="/storage/fetch.php?hash={FILE_HASH}">{FILE_FILENAME}</a></td>
     <!-- END file_storage -->
@@ -37,6 +37,10 @@
 
 	<td>{FILE_MIMETYPE}</td>
 
-    <td><a href="#" data-action="delete">x</a></td>
+    <td>
+        <!-- BEGIN is_deletable -->
+        <a href="{FILE_DELETE_URL}" data-action="delete">x</a>
+        <!-- END is_deletable -->
+    </td>
 </tr>
 <!-- END file -->

@@ -26,7 +26,8 @@
 			title: 'Category'
 		});
 
-		$('#user-usage').usageTabulator({
+        var usageTable = $('#user-usage');
+		usageTable.usageTabulator({
 			url: '/adminv2/usage/ajax/specificAjax?type=files&userId={USAGE_USER_ID}',
 			title: 'Files',
 			orderBy: 'bytes',
@@ -44,12 +45,23 @@
 			]
 		});
 
-        $('#user-usage').on('click', '[data-action="delete"]', function(event) {
+        usageTable.on('click', '[data-action="delete"]', function(event) {
             event.preventDefault();
-            // raise a delete notification
-            // * Storage: will actually delete
-            // * Anything not storage backended: will actually delete
-            // * Anything storage backended: won't delete storage. Maybe allow full delete?
+            var location     = $(this).closest('[data-location]');
+            var locationData = location.data();
+
+            // file: /cms/fileForm.php?delete=$id
+            // myfile: /cms/myFileForm.php?delete=$id
+            // submission: doesn't exist yet
+            // return: doesn't exist yet
+
+
+            if (locationData.fileid) {
+                // offer to delete file reference.
+                // Storage isn't directly deleted, it can be deleted by GC when that's added
+            } else {
+                // do nothing
+            }
         });
 	});
 </script>

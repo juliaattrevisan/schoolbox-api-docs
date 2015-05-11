@@ -138,6 +138,7 @@ class AjaxFlot {
         $page->setBlock('file', 'file_sbfs', 'file_sbfs_block');
         $page->setBlock('file', 'has_category', 'has_category_block');
         $page->setBlock('file', 'no_category', 'no_category_block');
+        $page->setBlock('file', 'is_deletable', 'is_deletable_block');
 
         $page->setBlock('file', 'file_myfile', 'file_myfile_block');
         $page->setBlock('file', 'file_unlinked', 'file_unlinked_block');
@@ -151,6 +152,7 @@ class AjaxFlot {
             'file_unlinked_block' => '',
             'has_category_block' => '',
             'no_category_block' => '',
+            'is_deletable_block' => '',
         ));
 
 		/* Really? You should be passing the bytes as constructor arg
@@ -179,50 +181,60 @@ class AjaxFlot {
 
                 $page->parse('file_storage_block', 'file_storage');
                 $page->parse('no_category_block', 'no_category');
+                // Not deletable
             }
             /* Link SBFS files
              */
             else if ($currentData['groupName'] == 'File') {
                 $page->setVar(array(
                     'FILE_LOCATION' => 'sbfs',
+                    'FILE_DELETE_URL' => '/cms/fileForm.php?delete='.$currentData['id'],
                 ));
 
                 $page->parse('file_sbfs_block', 'file_sbfs');
                 $page->parse('has_category_block', 'has_category');
+                $page->parse('is_deletable_block', 'is_deletable');
             }
             /* Link MyFile
              */
             else if ($currentData['groupName'] == 'My File') {
-                $page->parse('file_myfile_block', 'file_myfile');
-                $page->parse('no_category_block', 'no_category');
                 $page->setVar(array(
                     'FILE_LOCATION' => 'myfile',
+                    'FILE_DELETE_URL' => '/cms/myFileForm.php?delete='.$currentData['id'],
                 ));
+                $page->parse('file_myfile_block', 'file_myfile');
+                $page->parse('no_category_block', 'no_category');
+                $page->parse('is_deletable_block', 'is_deletable');
             }
             /* Student Submissions
              */
             else if ($currentData['groupName'] == 'Submission') {
-                $page->parse('file_submission_block', 'file_submission');
-                $page->parse('has_category_block', 'has_category');
                 $page->setVar(array(
                     'FILE_LOCATION' => 'submission',
+                    'FILE_DELETE_URL' => '/submission/submitWorkForm.php?delete='.$currentData['id'],
                 ));
+                $page->parse('file_submission_block', 'file_submission');
+                $page->parse('has_category_block', 'has_category');
+                $page->parse('is_deletable_block', 'is_deletable');
             }
             else if ($currentData['groupName'] == 'Return') {
-                $page->parse('file_return_block', 'file_return');
-                $page->parse('has_category_block', 'has_category');
                 $page->setVar(array(
                     'FILE_LOCATION' => 'return',
+                    'FILE_DELETE_URL' => '/submission/returnWorkForm.php?delete='.$currentData['id'],
                 ));
+                $page->parse('file_return_block', 'file_return');
+                $page->parse('has_category_block', 'has_category');
+                $page->parse('is_deletable_block', 'is_deletable');
             }
             /* None of the above
              */
             else {
-                $page->parse('file_unlinked_block', 'file_unlinked');
-                $page->parse('no_category_block', 'no_category');
                 $page->setVar(array(
                     'FILE_LOCATION' => 'unlinked',
                 ));
+                $page->parse('file_unlinked_block', 'file_unlinked');
+                $page->parse('no_category_block', 'no_category');
+                // I can't very well delete something whose location I don't know
             }
 
 			$page->parse('file_block', 'file', true);
@@ -238,6 +250,7 @@ class AjaxFlot {
                 'file_unlinked_block' => '',
                 'has_category_block' => '',
                 'no_category_block' => '',
+                'is_deletable_block' => '',
             ));
 		}
 
