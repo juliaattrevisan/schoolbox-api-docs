@@ -203,6 +203,9 @@
                     }
 
                     c.bubble.display('create', eventData, jsEvent, this)
+
+                    // Apply whether the submit button is enabled or not
+                    toggleFormState(c.getForm('createEvent'));
                 },
 
                 /**
@@ -293,25 +296,54 @@
 
 
         /* LISTENERS */
+
+        /**
+         * Change event for create task and event title.
+         * Prevent creation of a calendar event if the input is empty.
+         *
+         * @param form  jQuery wrapped form element
+         */
+        var toggleFormState = function(form) {
+            var trimmedTitle = form.find('input[name="title"]').val().replace(/^\s+|\s+$/g, '');
+            var submit       = form.find(':submit');
+            submit.prop('disabled', trimmedTitle === '');
+        };
+        var toggleCreateButtonState = function(event) {
+            toggleFormState($(this).closest('form'));
+        };
+        c.getForm('createEvent').find('input[name="title"]')
+            .on('change', toggleCreateButtonState)
+            .on('keyup', toggleCreateButtonState)
+        ;
+        c.getForm('createTask').find('input[name="title"]')
+            .on('change', toggleCreateButtonState)
+            .on('keyup', toggleCreateButtonState)
+        ;
+
         // toggle onto the create task form
         $('#showCreateTaskForm').click(function(e) {
             e.preventDefault()
             c.getForm('createEvent').hide()
-            c.getForm('createTask').show()
+            var form = c.getForm('createTask').show()
 
             // copy details from event to task
             cp('event', 'task', ['date', 'displayDate', 'title', 'allDay'])
 
+            // Apply whether the submit button is enabled or not
+            toggleFormState(form);
         });
 
         // toggle onto the create event form
         $('#showCreateEventForm').click(function(e) {
             e.preventDefault()
-            c.getForm('createEvent').show()
             c.getForm('createTask').hide()
+            var form = c.getForm('createEvent').show()
 
             // copy details from event to task
             cp('task', 'event', ['date', 'displayDate', 'title', 'allDay'])
+
+            // Apply whether the submit button is enabled or not
+            toggleFormState(form);
 
         })
 
@@ -344,25 +376,6 @@
                 }
             })
         })
-
-        /**
-         * Change event for create task and event title.
-         * Prevent creation of a calendar event if the input is empty.
-         * @param event
-         */
-        var toggleCreateButtonState = function(event) {
-            var trimmedValue = this.value.replace(/^\s+|\s+$/g, '');
-            var submit = $(this).closest('form').find(':submit');
-            submit.prop('disabled', trimmedValue === '');
-        };
-        c.getForm('createEvent').find('input[name="title"]')
-            .on('change', toggleCreateButtonState)
-            .on('keyup', toggleCreateButtonState)
-        ;
-        c.getForm('createTask').find('input[name="title"]')
-            .on('change', toggleCreateButtonState)
-            .on('keyup', toggleCreateButtonState)
-        ;
 
         // if a checkbox on the editTask form is interacted, update the appropriate event on the calendar
         c.getForm('editTask').on('change', 'input[name=completed]', function(e) {
