@@ -35,7 +35,7 @@ class ZipFolder
 
     function getResources($folder)
     {
-        $query = "SELECT id, realname, file_size FROM file WHERE category = {$folder} AND deleted = 0";
+        $query = "SELECT f.id, CONCAT_WS('.', f.realname, s.ext) realname, s.filesize FROM `file` f LEFT JOIN `storage` s ON f.hash = s.hash WHERE category = {$folder} AND deleted = 0";
         return $this->db->getAll($query);
     }
 
