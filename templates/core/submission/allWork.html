@@ -327,7 +327,8 @@
                             <li>
                                 <ul>
                                     <!-- BEGIN subject_rubric_criterion_mark -->
-                                    <li>{SUBJECT_RUBRIC_SUBMISSIONBOX_NAME}: <em>{SUBJECT_RUBRIC_CRITERION_MARK}</em></li>
+                                    <li>
+                                        <a href="/submission/submissionHistory/{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}/{WORK_USER_ID}">{SUBJECT_RUBRIC_SUBMISSIONBOX_NAME}</a>: <em>{SUBJECT_RUBRIC_CRITERION_MARK}</em></li>
                                     <!-- END subject_rubric_criterion_mark -->
                                 </ul>
                             </li>
@@ -419,8 +420,7 @@
 							<span class="group">{SESSION_USER_BYLINE}</span>
 						</td>
 						<td colspan="2">
-							<form id="create-comment" class="comment-form" action="/ajax/comment.php"
-								  method="post">
+							<form id="create-comment" class="comment-form" action="/ajax/comment.php" method="post">
 								<input type="hidden" name="year" value="{WORK_YEAR}"/>
 								<input type="hidden" name="semester" value="{WORK_SEMESTER}"/>
 								<input type="hidden" name="studentId" value="{WORK_USER_ID}"/>
