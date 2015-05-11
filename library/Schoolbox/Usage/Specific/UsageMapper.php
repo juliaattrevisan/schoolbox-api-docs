@@ -14,6 +14,18 @@ use Database;
 
 class UsageMapper
 {
+    /**
+     * Constant: join onto storage table
+     */
+    const STORAGE_JOIN =  "INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`";
+
+    /**
+     * Constant: join from storage table onto mimetype table
+     */
+    const MIMETYPE_JOIN = "
+        LEFT JOIN `allowedFileExtension` `e` ON `s`.`ext` = `e`.`extension`
+        LEFT JOIN `allowedFileTypes` `t` ON `e`.`fileTypeId` = `t`.`fileTypeId`
+    ";
 
 	/**
 	 * The user to generate stats for
@@ -121,110 +133,127 @@ class UsageMapper
 	public function findGroupUsage() {
 		/* Just Like Voltron
 		 */
+        $storageJoin = self::STORAGE_JOIN;
+        $mimeJoin    = self::MIMETYPE_JOIN;
 		$query = "
 			SELECT `name`, SUM(bytes) AS bytes
 			FROM
 			(
 				(SELECT 'Images' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
 				FROM `file` `f`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				$storageJoin
+				$mimeJoin
 				WHERE `f`.`owner` = :userId
 				AND `f`.`deleted` = 0
-				AND `s`.`mime` LIKE 'image/%')
+				AND `t`.`mime` LIKE 'image/%')
 				UNION
 				(SELECT 'Video' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
 				FROM `file` `f`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				$storageJoin
+				$mimeJoin
 				WHERE `f`.`owner` = :userId
 				AND `f`.`deleted` = 0
-				AND `s`.`mime` LIKE 'video/%')
+				AND `t`.`mime` LIKE 'video/%')
 				UNION
 				(SELECT 'Audio' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
 				FROM `file` `f`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				$storageJoin
+				$mimeJoin
 				WHERE `f`.`owner` = :userId
 				AND `f`.`deleted` = 0
-				AND `s`.`mime` LIKE 'audio/%')
+				AND `t`.`mime` LIKE 'audio/%')
 
 				UNION
 
 				(SELECT 'Images' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
 				FROM `myFile` `f`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				$storageJoin
+				$mimeJoin
 				WHERE `f`.`owner` = :userId
 				AND `f`.`deleted` = 0
-				AND `s`.`mime` LIKE 'image/%')
+				AND `t`.`mime` LIKE 'image/%')
 				UNION
 				(SELECT 'Video' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
 				FROM `myFile` `f`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				$storageJoin
+				$mimeJoin
 				WHERE `f`.`owner` = :userId
 				AND `f`.`deleted` = 0
-				AND `s`.`mime` LIKE 'video/%')
+				AND `t`.`mime` LIKE 'video/%')
 				UNION
 				(SELECT 'Audio' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
 				FROM `myFile` `f`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				$storageJoin
+				$mimeJoin
 				WHERE `f`.`owner` = :userId
 				AND `f`.`deleted` = 0
-				AND `s`.`mime` LIKE 'audio/%')
+				AND `t`.`mime` LIKE 'audio/%')
 
 				UNION
 
-				(SELECT 'Images' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
-				FROM `storage`
-				WHERE `uploaded_by` = :userId
-				AND mime LIKE 'image/%')
+				(SELECT 'Images' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+				FROM `storage` `s`
+				$mimeJoin
+				WHERE `s`.`uploaded_by` = :userId
+				AND `t`.`mime` LIKE 'image/%')
 				UNION
-				(SELECT 'Video' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
-				FROM `storage`
-				WHERE `uploaded_by` = :userId
-				AND mime LIKE 'video/%')
+				(SELECT 'Video' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+				FROM `storage` `s`
+				$mimeJoin
+				WHERE `s`.`uploaded_by` = :userId
+				AND `t`.`mime` LIKE 'video/%')
 				UNION
-				(SELECT 'Audio' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
-				FROM `storage`
-				WHERE `uploaded_by` = :userId
-				AND mime LIKE 'audio/%')
+				(SELECT 'Audio' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+				FROM `storage` `s`
+				$mimeJoin
+				WHERE `s`.`uploaded_by` = :userId
+				AND `t`.`mime` LIKE 'audio/%')
 
 				UNION
 
 				(SELECT 'Images' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
 				FROM `student_submission` `f`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				$storageJoin
+				$mimeJoin
 				WHERE `f`.`owner` = :userId
-				AND `s`.`mime` LIKE 'image/%')
+				AND `t`.`mime` LIKE 'image/%')
 				UNION
 				(SELECT 'Video' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
 				FROM `student_submission` `f`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				$storageJoin
+				$mimeJoin
 				WHERE `f`.`owner` = :userId
-				AND `s`.`mime` LIKE 'video/%')
+				AND `t`.`mime` LIKE 'video/%')
 				UNION
 				(SELECT 'Audio' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
 				FROM `student_submission` `f`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				$storageJoin
+				$mimeJoin
 				WHERE `f`.`owner` = :userId
-				AND `s`.`mime` LIKE 'audio/%')
+				AND `t`.`mime` LIKE 'audio/%')
 
 				UNION
 
 				(SELECT 'Images' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
 				FROM `submission_return` `f`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				$storageJoin
+				$mimeJoin
 				WHERE `f`.`owner` = :userId
-				AND `s`.`mime` LIKE 'image/%')
+				AND `t`.`mime` LIKE 'image/%')
 				UNION
 				(SELECT 'Video' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
 				FROM `submission_return` `f`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				$storageJoin
+				$mimeJoin
 				WHERE `f`.`owner` = :userId
-				AND `s`.`mime` LIKE 'video/%')
+				AND `t`.`mime` LIKE 'video/%')
 				UNION
 				(SELECT 'Audio' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
 				FROM `submission_return` `f`
-				INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+				$storageJoin
+				$mimeJoin
 				WHERE `f`.`owner` = :userId
-				AND `s`.`mime` LIKE 'audio/%')
+				AND `t`.`mime` LIKE 'audio/%')
 			) AS allTotals
 			GROUP BY `name`
 			ORDER BY bytes DESC
@@ -333,11 +362,8 @@ class UsageMapper
 	 * @return array
 	 */
 	public function findFileUsage($orderBy, $order, $index, $numPerPage) {
-        $storageJoin = "INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`";
-        $mimeJoin = "
-            LEFT JOIN `allowedFileExtension` `e` ON `s`.`ext` = `e`.`extension`
-            LEFT JOIN `allowedFileTypes` `t` ON `e`.`fileTypeId` = `t`.`fileTypeId`
-        ";
+        $storageJoin = self::STORAGE_JOIN;
+        $mimeJoin    = self::MIMETYPE_JOIN;
 		$query = "
 			SELECT *
 			FROM
