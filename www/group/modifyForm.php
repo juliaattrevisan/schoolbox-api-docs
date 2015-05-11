@@ -32,12 +32,20 @@ if($groupHandler->getPermission($_REQUEST['categoryID']) < FULL_ACCESS) {
 }
 
 if (is_numeric($_POST['type']) || is_array($_POST['msg'])) {
+    /** @var \Schoolbox\Resource\Group $group */
     try {
-        /** @var \Schoolbox\Resource\Group $group */
-        $group = GroupMapper::getInstance()->findOneByColumn('cid', $_REQUEST['categoryID']);
+        $group = $groupMapper->findOneByColumn('cid', $_REQUEST['categoryID']);
     } catch (\Schoolbox\Mapper\Exception $e) {
-        header(':', true, 404);
-        exit;
+        $group = $groupMapper->createModel();
+        // yes, group category doesn't map to an actual category.
+        // no, I'm not fixing it right now, but will at least check it exists.
+        try {
+            $catMapper->findById($_REQUEST['categoryID']);
+            $group->setCategory($_REQUEST['categoryID']);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            header(':', true, 404);
+            exit;
+        }
     }
 
     if (isset($_POST['type'])) {
