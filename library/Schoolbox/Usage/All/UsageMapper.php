@@ -10,8 +10,22 @@
 
 namespace Schoolbox\Usage\All;
 
+use Database;
 
-class UsageMapper extends \Schoolbox\Resource\FileMapper {
+class UsageMapper
+{
+    /**
+     * @var Database
+     */
+    protected $database;
+
+    /**
+     * Constructor - sets up database
+     */
+    public function __construct()
+    {
+        $this->database = Database::getInstance();
+    }
 
 	/**
 	 * The total number of users
