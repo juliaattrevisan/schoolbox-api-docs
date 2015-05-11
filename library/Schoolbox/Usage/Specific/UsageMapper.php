@@ -48,10 +48,6 @@ class UsageMapper
 	 */
 	public function __construct($userId) {
 
-		/* Urgh.
-		 */
-//		parent::__construct();
-
         $this->database = Database::getInstance();
 
 		$this->setUserId($userId);
