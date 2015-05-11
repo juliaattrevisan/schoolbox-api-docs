@@ -364,17 +364,21 @@ class UsageMapper
 	public function findFileUsage($orderBy, $order, $index, $numPerPage) {
         $storageJoin = self::STORAGE_JOIN;
         $mimeJoin    = self::MIMETYPE_JOIN;
+        $boxJoin     = "
+            INNER JOIN `submission_box` `b` ON `f`.`box_id` = `b`.`id`
+            INNER JOIN `category` `c` ON `b`.`category` = `c`.`id`
+        ";
 		$query = "
 			SELECT *
 			FROM
 			(
 				(SELECT
 				    `f`.`id`,
-                    `f`.`realname` AS `name`,
+                    COALESCE(`f`.`realname`, `s`.`filename`) AS `name`,
                     'File' AS groupName,
                     `s`.`filesize` AS bytes,
                     `t`.`mime` AS mime_type,
-                    '' AS hash,
+                    `s`.`hash`,
                     `c`.`id` AS categoryId,
                     `c`.`name` AS categoryName
 				FROM `file` `f`
@@ -386,11 +390,11 @@ class UsageMapper
 				UNION
 				(SELECT
 				    `f`.`id`,
-                    `f`.`realname` AS `name`,
+                    COALESCE(`f`.`realname`, `s`.`filename`) AS `name`,
                     'My File' AS groupName,
                     `s`.`filesize` AS bytes,
                     `t`.`mime` AS mime_type,
-                    '' AS hash,
+                    `s`.`hash`,
                     '' AS categoryId,
                     '' AS categoryName
 				FROM `myFile` `f`
@@ -413,31 +417,33 @@ class UsageMapper
 				WHERE `s`.`uploaded_by` = :userId)
 				UNION
 				(SELECT
-				    '' AS id,
-                    `f`.`realname` AS `name`,
+				    `f`.`id` AS id,
+                    COALESCE(`f`.`realname`, `s`.`filename`) AS `name`,
                     'Submission' AS groupName,
                     `s`.`filesize` AS bytes,
                     `t`.`mime` AS mime_type,
-                    '' AS hash,
-                    '' AS categoryId,
-                    '' AS categoryName
+                    `s`.`hash`,
+                    `c`.`id` AS categoryId,
+                    `c`.`name` AS categoryName
 				FROM `student_submission` `f`
 				$storageJoin
 				$mimeJoin
+				$boxJoin
 				WHERE `f`.`owner` = :userId)
 				UNION
 				(SELECT
-				    '' AS id,
-                    `f`.`filename` AS `name`,
+				    `f`.`id` AS id,
+                    COALESCE(`f`.`filename`, `s`.`filename`) AS `name`,
                     'Return' AS groupName,
                     `s`.`filesize` AS bytes,
                     `t`.`mime` AS mime_type,
-                    '' AS hash,
-                    '' AS categoryId,
-                    '' AS categoryName
+                    `s`.`hash`,
+                    `c`.`id` AS categoryId,
+                    `c`.`name` AS categoryName
 				FROM `submission_return` `f`
 				$storageJoin
 				$mimeJoin
+				$boxJoin
 				WHERE `f`.`owner` = :userId
 				AND `f`.`deleted` = 0)
 			) AS allTotals
