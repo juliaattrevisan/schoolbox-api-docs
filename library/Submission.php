@@ -3,6 +3,7 @@
 /* Due Work: Recent work. Should be a multiple of 3 because there are three
 * types: Due, Awaiting and Marked.
 */
+use Schoolbox\Collection;
 use Schoolbox\Role;
 
 define('UPCOMING_WORK_TYPE', 1);
@@ -1427,7 +1428,7 @@ class Submission extends DeprecatedModel
      *
      * @return \Schoolbox\Collection|\Schoolbox\User[]
      */
-    public function getAllStudentsForSubmission(\Schoolbox\Assessment\Component\SubmissionBox $box)
+    public function getAllParticipantsForSubmission(\Schoolbox\Assessment\Component\SubmissionBox $box)
     {
         $studentList = array();
 
@@ -1477,8 +1478,6 @@ class Submission extends DeprecatedModel
          */
         $userMapper = new \Schoolbox\UserMapper();
 
-        $allStudents = new \Schoolbox\Collection();
-
         // let's dedupe this list, shall we?
         $seen = [];
 
@@ -1488,29 +1487,29 @@ class Submission extends DeprecatedModel
         foreach ($studentList as $currentStudent) {
             try {
                 if (isset($currentStudent['uid'])) {
+
                     $userId = $currentStudent['uid'];
+
+                    if (empty($seen[$userId])) {
+                        $user = $userMapper->findById($userId);
+                        $seen[$userId] = $user;
+                    }
+
                 } else {
-                    $userId = $userMapper->findOneByColumn('synergy_id', $currentStudent['synergy_id'])->getId();
-                }
+                    // we don't have a user ID, so we can't check for duplicate before running this query :(
+                    $user = $userMapper->findOneByColumn('synergy_id', $currentStudent['synergy_id']);
 
-                if (empty($seen[$userId])) {
-                    // don't run the findById query more times than you have to...
+                    $userId = $user->getId();
 
-                    $user = $userMapper->findById($userId);
-
-                    // filter for STUUUUDEEEENTS! -_-
-                    if ($user->getRole()->getType() == Role::STUDENT) {
-                        $allStudents->add($user);
-                        $seen[$userId] = true;
+                    if (empty($seen[$userId])) {
+                        $seen[$userId] = $user;
                     }
                 }
-
-            } /* Ignore unfound users
-             */
-            catch (\Exception $e) {
+            } catch (Schoolbox\Mapper\Exception $e) {
+                // noop - ignore unfound users
             }
         }
 
-        return $allStudents;
+        return new Collection(array_values($seen));
     }
 }

@@ -72,7 +72,7 @@ class Controller extends BaseController
         $_DEPRECATED_SUBMISSION_HANDLER = new \Submission();
 
         // a handler...that accepts and returns mapped objects...
-        return $_DEPRECATED_SUBMISSION_HANDLER->getAllStudentsForSubmission($box);
+        return $_DEPRECATED_SUBMISSION_HANDLER->getAllParticipantsForSubmission($box);
     }
 
 
