@@ -387,7 +387,7 @@ class UsageMapper
 				(SELECT
 				    `f`.`id`,
                     `f`.`realname` AS `name`,
-                    'File' AS groupName,
+                    'My File' AS groupName,
                     `s`.`filesize` AS bytes,
                     `t`.`mime` AS mime_type,
                     '' AS hash,
