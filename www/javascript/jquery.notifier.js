@@ -20,9 +20,12 @@
             debug:     false,
             domwait:   1000,
             transport: 'socket',
-            timeout:   5000,
+            timeout:   500,
+            maxRetry:  10,
             alertTtl:  30
         }, options);
+
+        var backoff = 0;
 
         // cast boolean from potential string
         settings.secure = (settings.secure === 'true' || settings.secure === true);
@@ -53,9 +56,18 @@
             }
 
             function pollReconnect() {
-                if(attemptReconnect) {
-                    if(settings.debug) { console.log('Polling for connection'); }
-                    setTimeout(establishConnection, settings.timeout);
+                var jitter;
+
+                if(attemptReconnect && backoff < settings.maxRetry) {
+                    jitter = parseInt(Math.random() * Math.min(settings.timeout * settings.maxRetry, Math.pow(2, backoff++) * settings.timeout));
+
+                    if(settings.debug) { console.log('Polling for connection, attempt #'+backoff+', waiting '+jitter+'ms'); }
+
+                    setTimeout(establishConnection, jitter);
+
+                } else {
+                    if(settings.debug) { console.log('Poll timeout exceeded. Giving up.'); }
+                    $(settings.list).children('.footer').children('a').html('Could not connect');
                 }
             }
 
@@ -242,7 +254,14 @@
              */
             var onOpen = function() {
                 if(settings.debug) { console.log('onOpen() triggered'); }
+
+                // reset backoff counter
+                backoff = 0;
+
+                // initiate handshake
                 send({subscribe : true});
+
+                // update UI to reflect connection success
                 $(self).addClass('socket connected').data('connected', true);
                 $(settings.counter).attr('title', 'View Messages');
             }
