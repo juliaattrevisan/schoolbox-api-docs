@@ -185,6 +185,8 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
 
 		$this->registerCallback('preSave', array($this, 'preSave'));
         $this->registerCallback('postSave', array($this, 'postSave'));
+        $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'hardDeleteTask'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteTask'));
 	}
 
 	/**
@@ -230,6 +232,47 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
         }
     }
 
+    /**
+     * Post-softdelete hook - softdeletes all tasks associated with this quiz.
+     *
+     * @param OnlineAssessment $object
+     */
+    public function softDeleteTask(OnlineAssessment $object)
+    {
+        $taskId = $object->getTask()->getId();
+        if ($taskId) {
+            $this->getJoinMapper('task')->softDelete(
+                $this->getJoinMapper('task')->findByColumn('id', $taskId)
+            );
+        }
+        $taskInstanceId = $object->getTaskInstance()->getId();
+        if ($taskInstanceId) {
+            $this->getJoinMapper('task_instance')->softDelete(
+                $this->getJoinMapper('task_instance')->findByColumn('id', $taskInstanceId)
+            );
+        }
+    }
+
+    /**
+     * Post-delete hook - deletes all tasks associated with this quiz.
+     *
+     * @param OnlineAssessment $object
+     */
+    public function hardDeleteTask(OnlineAssessment $object)
+    {
+        $taskId = $object->getTask()->getId();
+        if ($taskId) {
+            $this->getJoinMapper('task')->hardDelete(
+                $this->getJoinMapper('task')->findByColumn('id', $taskId)
+            );
+        }
+        $taskInstanceId = $object->getTaskInstance()->getId();
+        if ($taskInstanceId) {
+            $this->getJoinMapper('task_instance')->hardDelete(
+                $this->getJoinMapper('task_instance')->findByColumn('id', $taskInstanceId)
+            );
+        }
+    }
 
 	/**
 	 * Gets the list of activities related to online assessments.
