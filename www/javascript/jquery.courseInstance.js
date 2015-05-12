@@ -77,6 +77,16 @@
             }
         );
 
+        // Task editor - prevent empty inputs
+        component.on(
+            'change.courseInstance, keyup.courseInstance',
+            'input[name="title"]',
+            function (event) {
+                var title = this.value.replace(/^\s+|\s+$/g, '');
+                $(this).closest('form').find(':submit').prop('disabled', title.length === 0);
+            }
+        );
+
         // Delete unit - "are you sure?"
         // (write the expand/collapse stuff into its own plugin)
         component.on(
