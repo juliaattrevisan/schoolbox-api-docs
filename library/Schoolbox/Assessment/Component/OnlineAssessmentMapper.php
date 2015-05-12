@@ -239,17 +239,21 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
      */
     public function softDeleteTask(OnlineAssessment $object)
     {
-        $taskId = $object->getTask()->getId();
-        if ($taskId) {
-            $this->getJoinMapper('task')->softDelete(
-                $this->getJoinMapper('task')->findByColumn('id', $taskId)
-            );
+        if ($object->getTaskInstance()) {
+            $taskInstanceId = $object->getTaskInstance()->getId();
+            if ($taskInstanceId) {
+                $this->getJoinMapper('task_instance')->softDelete(
+                    $this->getJoinMapper('task_instance')->findByColumn('id', $taskInstanceId)
+                );
+            }
         }
-        $taskInstanceId = $object->getTaskInstance()->getId();
-        if ($taskInstanceId) {
-            $this->getJoinMapper('task_instance')->softDelete(
-                $this->getJoinMapper('task_instance')->findByColumn('id', $taskInstanceId)
-            );
+        if ($object->getTask()) {
+            $taskId = $object->getTask()->getId();
+            if ($taskId) {
+                $this->getJoinMapper('task')->softDelete(
+                    $this->getJoinMapper('task')->findByColumn('id', $taskId)
+                );
+            }
         }
     }
 
@@ -260,17 +264,21 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
      */
     public function hardDeleteTask(OnlineAssessment $object)
     {
-        $taskId = $object->getTask()->getId();
-        if ($taskId) {
-            $this->getJoinMapper('task')->hardDelete(
-                $this->getJoinMapper('task')->findByColumn('id', $taskId)
-            );
+        if ($object->getTaskInstance()) {
+            $taskInstanceId = $object->getTaskInstance()->getId();
+            if ($taskInstanceId) {
+                $this->getJoinMapper('task_instance')->hardDelete(
+                    $this->getJoinMapper('task_instance')->findByColumn('id', $taskInstanceId)
+                );
+            }
         }
-        $taskInstanceId = $object->getTaskInstance()->getId();
-        if ($taskInstanceId) {
-            $this->getJoinMapper('task_instance')->hardDelete(
-                $this->getJoinMapper('task_instance')->findByColumn('id', $taskInstanceId)
-            );
+        if ($object->getTask()) {
+            $taskId = $object->getTask()->getId();
+            if ($taskId) {
+                $this->getJoinMapper('task')->hardDelete(
+                    $this->getJoinMapper('task')->findByColumn('id', $taskId)
+                );
+            }
         }
     }
 
