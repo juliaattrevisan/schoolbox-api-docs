@@ -1,4 +1,14 @@
 <!-- BEGIN custom_head -->
+<style type="text/css">
+    .save-draft {
+        width: 100px;
+        text-align: center;
+        float: left;
+        height: 24px;
+        line-height: 24px;
+        margin-top: 8px;
+    }
+</style>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
@@ -36,10 +46,10 @@
 
         // Change button's text, but keep its width the same.
         // Change it back once done.
-        var formSaveButton = form.find('input[type="submit"][name="save_draft"]')
-        var oldText        = formSaveButton.val()
-        var buttonWidth    = formSaveButton.width()
-        formSaveButton.prop('disabled', true).val('Autosaving').width(buttonWidth)
+        var formSaveLabel = form.find('label.save-draft')
+        var oldText        = formSaveLabel.text() || 'Draft Saved'
+
+        formSaveLabel.text('(Autosaving)')
 
         // Submit form via AJAX
         var formContents = form.serializeArray()
@@ -53,15 +63,15 @@
                 // Re-init the autosave
                 initAutosave()
                 setTimeout(
-                    function() { formSaveButton.prop('disabled', false).val(oldText) },
+                    function() { formSaveLabel.text(oldText) },
                     2000
                 )
             },
             success: function() {
-                formSaveButton.val(oldText)
+                formSaveLabel.text(oldText)
             },
             error: function() {
-                formSaveButton.val('Error!')
+                formSaveLabel.text('Error!')
             },
             dataType: 'json'
         });
@@ -105,10 +115,6 @@
             }
         });
 
-        $('form#textBoxForm input[name="save_draft"]').click(function(event) {
-            event.preventDefault()
-            autosaveAjaxSubmit()
-        })
     });
 </script>
 <!-- END custom_head -->
@@ -123,8 +129,13 @@
             <a href="/submission/submissionHistory/{BOX_ID}/{USER_ID}" class="btn go-back"><span></span>Return to {BOX_NAME}</a>
         </span>
         <div class="wysiwyg">
-            <span class="gradient-{BOX_DUEDATE_GRADIENT}"><strong>Due {BOX_DUEDATE}</strong></span> on <strong>{BOX_DUETIME}</strong>
-            <p>You can submit your work by attaching files and/or by editing online.</p>
+            <p>
+                <span class="gradient-{BOX_DUEDATE_GRADIENT}"><strong>Due {BOX_DUEDATE}</strong></span> on <strong>{BOX_DUETIME}</strong>
+            </p>
+            <p>
+                You can attach files and/or edit online for your submission.<br/>
+                Content you edit online will automatically save drafts, but your work will <strong>not be submitted</strong> until you Submit for Assessment.
+            </p>
 
             <!-- BEGIN confirm_terms -->
             <div id="confirmDialog" title="Submit Work Terms">
@@ -146,8 +157,9 @@
 
         <div class="clearfix"></div>
         <p></p>
-        <p>You may save this submission as a draft, and come back to work on it later.</p>
-        <input class="submit-btn-plain" type="submit" name="save_draft" value="Save Draft" />
-        <input class="submit-btn-plain" type="submit" name="save" value="Submit for Assessment" />
+        <p>
+            <input class="submit-btn-plain" type="submit" name="save" value="Submit for Assessment" />
+            <label class="save-draft"></label>
+        </p>
     </form>
 </div>
