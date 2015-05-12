@@ -368,7 +368,109 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         );
     }
 
-    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
+    public function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date) {
+
+        $dayNumber = $this->getDayNumber($campus,$date->getUnixTimeStamp());
+
+        if (empty($externalUserId)) {
+            return array();
+        }
+        $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber);
+
+        if (!is_array($timetabledef)) {
+            return false;
+        }
+
+        $campusString = $campus->getExtTimetableCode();
+
+        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
+        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
+
+        $result = $this->getDatabase()->executeProcedure('dbo.spsTimetable',
+            array(
+                array('@FileYear', $fileYear, SQLINT4),
+                array('@FileSemester', $fileSemester, SQLINT4),
+                array('@ID', $externalUserId, SQLINT4),
+                array('@Date', $date->getDatabaseDate(), SQLVARCHAR),
+                array('@IncludeStaffScheduleFlag',1, SQLINT4),
+                array('@CheckAttendancesExistFlag',1, SQLINT4),
+                array('@IncludeSparesFlag', 0, SQLINT4),
+                array('@IncludeRecessFlag', 0, SQLINT4),
+            )
+        );
+
+        $periodList = array();
+
+        if($result['success']) {
+            foreach($result['result'] as $spRow) {
+                if($spRow['TimetableGroup'] == $campusString) {
+                    $periodList[] = array(
+                        'Room'              => $spRow['Room'],
+                        'Description'       => $spRow['ClassDescription'],
+                        'PeriodNumber'      => $spRow['Period'],
+                        'ClassCampus'       => $spRow['ClassCampus'],
+                        'ClassCode'         => $spRow['ClassCode'],
+                        'SubstituteFlag'    => $spRow['SubstituteFlag'],
+                        'SubstitutedFlag'   => $spRow['SubstitutedFlag'],
+                        'AttendanceMarked'  => $spRow['IsMarkedFlag'],
+                        'AttendanceEnabled' => $spRow['AttendanceEntryEnabledFlag'],
+
+                    );
+
+                }
+
+            }
+        }
+        else {
+            return false;
+        }
+
+        //for each period
+        $timetable = array();
+
+        // Build the timetable
+        foreach ($timetabledef['desc'] as $x => $name) {
+            $timetable[$x]['periodName']     = $timetabledef['desc'][$x];
+            $timetable[$x]['periodStart']    = $timetabledef['start'][$x];
+            $timetable[$x]['periodEnd']      = $timetabledef['end'][$x];
+            $timetable[$x]['periodNumber']   = $timetabledef['number'][$x];
+            $timetable[$x]['periodSequence'] = $timetabledef['sequence'][$x];
+            $timetable[$x]['class']          = array();
+        }
+
+        // Add classes into it
+        foreach ($periodList as $desc) {
+            foreach ($timetable as $x => $timetablePeriod) {
+                if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber']
+                    && $timetablePeriod['periodSequence'] != 2
+                    && !isset($timetable[$x]['class'][$desc['ClassCode']])
+                ) {
+                    $timetable[$x]['class'][$desc['ClassCode']] = array(
+                        'description'       => $desc['Description'],
+                        'code'              => $desc['ClassCode'],
+                        'campus'            => $desc['ClassCampus'],
+                        'room'              => $desc['Room'],
+                        'staffID'           => $desc['StaffID'],
+                        'SubstituteFlag'    => $desc['SubstituteFlag'],
+                        'SubstitutedFlag'   => $desc['SubstitutedFlag'],
+                        'AttendanceMarked'  => $desc['AttendanceMarked'],
+                        'AttendanceEnabled' => $desc['AttendanceEnabled'],
+                    );
+                    break;
+                }
+            }
+        }
+
+        if (is_array($timetable)) {
+            usort($timetable, array($this, 'sortTimetable'));
+        }
+
+        return $timetable;
+
+    }
+
+
+     public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
     {
         if (empty($externalUserId)) {
             return array();
