@@ -41,7 +41,51 @@ $createdDate    = new Alaress_Date_Format($submission_box->getCreated(), 'Y-m-d'
 $gradient       = $submission_box->getGradientIndex();
 
 
-// TODO YOU NEED TO CHECK IF THIS STUDENT IS ALLOWED TO MAKE ANOTHER SUBMISSION, AND IF NOT, BUG OUT
+// <PERMS>
+
+// has to allow submissions
+if (!$submission_box->getAcceptOnline()) {
+    error(19);
+}
+
+// if not multi, check there isn't already a (non-draft) submission
+if (!$submission_box->getAcceptMultiple()) {
+    $submitCount = $submission_mapper->findByColumnList([
+        'draft'  => 0,
+        'owner'  => $user_id,
+        'box_id' => $submission_box->getId()
+
+    ])->count();
+
+    if ($submitCount) {
+        error(19);
+    }
+}
+
+// get a list of folders the user has perms to (yes... handlers... -_-)
+$groupHandler = new Group;
+$userHandler  = new User;
+$user         = $userHandler->getByID($user_id);
+
+if ($user['synergy_id'] || $user['synergy_id'] === 0) {
+    $categoryList = $groupHandler->involvedInCategoryList($user['uid']);
+} else {
+    $categoryList = [];
+}
+
+$categoryIDList = [];
+
+foreach ($categoryList as $category) {
+    $categoryIDList[] = $category['id'];
+}
+
+// if the user doesn't have folder perm, ignore everything we just calculated above and smother the block
+if (!in_array($submission_box->getCategory()->getId(), $categoryIDList)) {
+    error(19);
+}
+
+// </PERMS>
+
 
 //
 // Find most recent submissions for this user - later, consider showing drafts
@@ -52,14 +96,8 @@ if ($drafts->count()) {
     /** @var Submission\File $draft */
     $draft = $drafts->first();
     $body  = $draft->getStorage()->read();
-}
-
-$body   = '';
-if (count($drafts)) {
-	foreach ($drafts as $draft) {
-		$body = $draft->getStorage()->read();
-		break;
-	}
+} else {
+    $body  = '';
 }
 
 $this->setBlock(TEMPLATE_content, 'confirm_terms', 'confirm_terms_block');
