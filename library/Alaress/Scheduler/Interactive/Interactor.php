@@ -55,7 +55,7 @@ class Interactor {
 			case self::CMD_HELP:
 				$this->log->notice(<<<EOL
 HELP
-    status => valid options: stomp
+    status => valid options: pool, schedule
 EOL
 );
 				break;
