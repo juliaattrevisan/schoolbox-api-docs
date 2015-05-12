@@ -3,6 +3,7 @@
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
+use Schoolbox\Config\ConfigMapper;
 
 // not in sitepage context, redirect
 if(!isset($this)) {
@@ -24,6 +25,7 @@ $this->setTab('submission');
 
 $box_mapper        = new SubmissionBoxMapper();
 $submission_mapper = Submission\FileMapper::getInstance();
+$conf              = ConfigMapper::getInstance();
 
 //
 // Submission mapper - will get the most recent submission for this student.
@@ -37,6 +39,9 @@ $submission_box = $box_mapper->findById($this->arg[0]);
 $dueDate        = new Alaress_Date_Format($submission_box->getDueDate(), 'Y-m-d');
 $createdDate    = new Alaress_Date_Format($submission_box->getCreated(), 'Y-m-d');
 $gradient       = $submission_box->getGradientIndex();
+
+
+// TODO YOU NEED TO CHECK IF THIS STUDENT IS ALLOWED TO MAKE ANOTHER SUBMISSION, AND IF NOT, BUG OUT
 
 //
 // Find most recent submissions for this user - later, consider showing drafts
@@ -57,11 +62,35 @@ if (count($drafts)) {
 	}
 }
 
+$this->setBlock(TEMPLATE_content, 'confirm_terms', 'confirm_terms_block');
+$policy    = $conf->get('lms_student_policy');
+$html2text = new \Html2Text\Html2Text($policy);
+// Ensure that a policy that contains ONLY an image still displays,
+// by allowing img tags through unmolested
+$html2text->set_allowed_tags('<img>');
+if (strlen(trim($html2text->get_text())) > 0) {
+    $this->setVar('STUDENT_SUBMIT_TERMS', Scrub::html($policy));
+    $this->parse('confirm_terms_block', 'confirm_terms');
+} else {
+    $this->setVar('confirm_terms_block', '');
+}
+unset($html2text, $policy);
+
+$zone = new \Schoolbox\Resource\Attachment\Zone('submission-file');
+$zone->setAttachPrompt('Attach files')
+     ->setAttachmentsLabel('')
+     ->setMulti(true)
+     ->setMimeFilter('*/*')
+     ->setModalTitle('Select file');
+
+$zone->renderIntoSitePage($this, 'ATTACH_ZONE');
+
+
 $this->setVar(array(
     'CATEGORY_NAME' => Scrub::text($submission_box->getCategory()->getName()),
 
     'BOX_DUEDATE'          => $dueDate->getRelativeTime(),
-    'BOX_DUEDATE_GRADIENT' => $gradient,
+    'BOX_DUETIME'          => $dueDate->isAtEndOfDay() ? $dueDate->getDateOnly() : $dueDate->getShort(),    'BOX_DUEDATE_GRADIENT' => $gradient,
 
     'BOX_ID'        => $submission_box->getId(),
     'SUBMISSION_ID' => null,

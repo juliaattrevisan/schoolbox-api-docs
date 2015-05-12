@@ -10,41 +10,31 @@ if (!isset($this)) {
     SitePage::localRedir('/submission/submissionHistory');
 }
 
+/** @var SitePage $this */
+
 $this->setFile(TEMPLATE_content, 'submission/submissionHistory.html');
 $this->setTab('submission');
 
 $this->setBlock(TEMPLATE_content, 'subject', 'subject_block');
-$this->setBlock(TEMPLATE_content, 'download', 'download_block');
-$this->setBlock(TEMPLATE_content, 'legacy_download', 'legacy_download_block');
 $this->setBlock(TEMPLATE_content, 'action_publish', 'action_publish_block');
 $this->setBlock(TEMPLATE_content, 'recent_submission', 'recent_submission_block');
 $this->setBlock(TEMPLATE_content, 'confirm_terms', 'confirm_terms_block');
 $this->setBlock(TEMPLATE_content, 'show_owner', 'show_owner_block');
 $this->setBlock(TEMPLATE_content, 'returned_work', 'returned_work_block');
-$this->setBlock(TEMPLATE_content, 'teacher', 'teacher_block');
 $this->setBlock(TEMPLATE_content, 'rubric', 'rubric_block');
+$this->setBlock(TEMPLATE_content, 'action_submit', 'action_submit_block');
+$this->setBlock(TEMPLATE_content, 'attachments', 'attachments_block');
 $this->setBlock('returned_work', 'return_file', 'return_file_block');
 $this->setBlock('returned_work', 'return_file_uuid', 'return_file_uuid_block');
 $this->setBlock('recent_submission', 'plag_score', 'plag_score_block');
 $this->setBlock('recent_submission', 'overdue', 'overdue_block');
-$this->setBlock('subject', 'action_resubmit', 'action_resubmit_block');
 $this->setBlock('recent_submission', 'recent_submission_download', 'recent_submission_download_block');
 $this->setBlock('subject', 'work', 'work_block');
-$this->setBlock('subject', 'action_submit', 'action_submit_block');
+$this->setBlock('subject', 'teacher', 'teacher_block');
+$this->setBlock('attachments', 'download', 'download_block');
+$this->setBlock('attachments', 'legacy_download', 'legacy_download_block');
 
 // Blocks for online editor buttons
-$this->setBlock('action_submit', 'action_submit_online_create', 'action_submit_online_create_block');
-$this->setBlock('action_submit', 'action_submit_online_update', 'action_submit_online_update_block');
-$this->setBlock('action_resubmit', 'action_resubmit_online_create', 'action_resubmit_online_create_block');
-$this->setBlock('action_resubmit', 'action_resubmit_online_update', 'action_resubmit_online_update_block');
-$this->setVar(
-    array(
-        'action_submit_online_create_block'   => '',
-        'action_submit_online_update_block'   => '',
-        'action_resubmit_online_create_block' => '',
-        'action_resubmit_online_update_block' => '',
-    )
-);
 
 // the whole manual block setting idea is entirely overrated...
 $historyActivityTypes = array('submitted', 'returned', 'marked', 'extended');
@@ -55,7 +45,13 @@ foreach ($historyActivityTypes as $historyType) {
 
 $this->setBlock('work', 'work_grade', 'work_grade_block');
 $this->setBlock('history_marked', 'history_marked_hascomment', 'history_marked_hascomment_block');
-$this->setVar('teacher_block', '');
+
+$this->setVar([
+    'teacher_block'       => '',
+    'action_submit_block' => '',
+    'STATUS_HEALTH'       => 'none',
+    'STATUS_LABEL'        => '',
+]);
 
 if ($this->arg[0] == false) {
     error(2);
@@ -252,10 +248,9 @@ if ($attachments->count() > 0) {
         );
         $this->parse('download_block', 'download', true);
     }
-    $this->setVar('legacy_download_block', '');
+    $this->parse('attachments_block', 'attachments');
 } else {
-    $this->setVar('legacy_download_block', '');
-    $this->setVar('download_block', '');
+    $this->setVar('attachments_block', '');
 }
 
 // set the teacher details
@@ -269,44 +264,14 @@ $teacher_details = array(
 $this->setVar($teacher_details);
 
 
-/* Output student submission terms, only if they actually have them.
- */
-$policy    = $conf->get('lms_student_policy');
-$html2text = new \Html2Text\Html2Text($policy);
-// Ensure that a policy that contains ONLY an image still displays,
-// by allowing img tags through unmolested
-$html2text->set_allowed_tags('<img>');
-if (strlen(trim($html2text->get_text())) > 0) {
-    $this->setVar('STUDENT_SUBMIT_TERMS', Scrub::html($policy));
-    $this->parse('confirm_terms_block', 'confirm_terms');
-} else {
-    $this->setVar('confirm_terms_block', '');
-}
-unset($html2text, $policy);
-
 $usersList = array();
-
-$zone = new \Schoolbox\Resource\Attachment\Zone('submission-file');
-$zone->setAttachPrompt('Attach submission')
-    ->setAttachmentsLabel('')
-    ->setMulti(true)
-    ->setMimeFilter('*/*')
-    ->setModalTitle('Select file');
-
-$zone->renderIntoSitePage($this, 'ATTACH_ZONE');
+$dem    = DueWork_ErrorMapper::getInstance();
+$errors = $dem->listDisplayValues();
 
 $recent_activity = null;
 $recent_return     = null;
 if (count($submission_history)) {
     $j = 0;
-
-    /* Make submit button available/unavailable depending on submissions and
-     * returns from $allWork
-     */
-    $this->setVar('action_submit_block', '');
-
-    $dem    = DueWork_ErrorMapper::getInstance();
-    $errors = $dem->listDisplayValues();
 
     foreach ($submission_history as $activity_item) {
         /** @var Activity $activity_item */
@@ -488,7 +453,11 @@ if (count($submission_history)) {
 
     $this->parse('subject_block', 'subject');
 } else {
-    $this->setVar('work_block', '');
+    $this->setVar([
+        'work_block'    => '',
+        'STATUS_HEALTH' => 'regular',
+        'STATUS_LABEL'  => 'Not Submitted'
+    ]);
     $this->parse('subject_block', 'subject');
 }
 
@@ -503,10 +472,20 @@ if (isset($recent_activity)) {
     $this->setVar('BOX_DUEDATE_GRADIENT', 'black');
 
     if ($recent_activity->getDate()->getUnixTimestamp() > $box->getDueDate()->getUnixTimestamp()) {
-        $this->setVar('OVERDUE', 'overdue');
+        $this->setVar([
+            'STATUS_HEALTH' => 'critical',
+            'STATUS_LABEL'  => 'Submitted Late',
+            'OVERDUE'       => 'overdue'
+        ]);
+
         $this->parse('overdue_block', 'overdue');
     } else {
-        $this->setVar('OVERDUE', '');
+
+        $this->setVar([
+            'STATUS_HEALTH' => 'ok',
+            'STATUS_LABEL'  => 'Submitted on Time',
+            'OVERDUE'       => ''
+        ]);
         $this->setVar('overdue_block', '');
     }
 
@@ -569,36 +548,18 @@ if (isset($recent_activity)) {
         $this->setVar('plag_score_block', '');
     }
 
-    $box->getOpenDate();
-    $box->getAcceptMultiple();
     // only allow a resubmission:
     // if the current user is the owner
     // if the submission box is accepting submissions
     // and if the current time is between open and late
     if (
-        $userID == $currentUserId &&
-        (time() > $box->getOpenDate()->getUnixTimestamp()) &&
-        (time() < $box->getLateDate()->getUnixTimestamp()) &&
-        $box->getAcceptOnline() &&
-        $box->getAcceptMultiple()
+        $userID == $currentUserId
+        && $box->isOpen()
+        && $box->getAcceptOnline()
+        && $box->getAcceptMultiple()
     ) {
-        // Which edit button gets shown?
-        $drafts = $submissionMapper->getDrafts($userID, $box->getId(), 1);
-        if ($drafts->count() === 0) {
-            $this->parse('action_resubmit_online_create_block', 'action_resubmit_online_create');
-        } else {
-            /** @var Component\SubmissionBox\Submission\File $draft */
-            $draft = $drafts->first();
-            // Is draft before most recent submission? show create new draft
-            if ($draft->getCreatedAt()->getUnixTimestamp() < $recentSubmissionDate->getUnixTimestamp()) {
-                $this->parse('action_resubmit_online_create_block', 'action_resubmit_online_create');
-            } else {
-                $this->parse('action_resubmit_online_update_block', 'action_resubmit_online_update');
-            }
-        }
-        $this->parse('action_resubmit_block', 'action_resubmit');
-    } else {
-        $this->setVar('action_resubmit_block', '');
+        $this->setVar('SUBMIT_LABEL', 'Resubmit');
+        $this->parse('action_submit_block', 'action_submit');
     }
 
     // if parent, hide the "view submitted work" button
@@ -614,33 +575,33 @@ if (isset($recent_activity)) {
      * Show Submit form
      * Hide the Resubmit form
      */
-    if ($userID == $currentUserId
-        && time() > $box->getOpenDate()->getUnixTimestamp()
-        && time() < $box->getLateDate()->getUnixTimestamp()
-        && $box->getAcceptOnline()
-    ) {
+    if ($userID == $currentUserId && $box->isOpen() && $box->getAcceptOnline()) {
         // Which edit button gets shown (is there already a draft?)
         $drafts = $submissionMapper->getDrafts($userID, $box->getId(), 1);
-        if ($drafts->count() === 0) {
-            $this->parse('action_submit_online_create_block', 'action_submit_online_create');
-        } else {
-            $this->parse('action_submit_online_update_block', 'action_submit_online_update');
+
+        if ($drafts->count()) {
+            $this->setVar([
+                'DRAFT_MODIFIED' => $drafts->first()->getCreatedAt()->getLocalShort(),
+                'STATUS_HEALTH'  => 'regular',
+                'STATUS_LABEL'   => 'Draft Saved'
+            ]);
         }
+
+        $this->setVar('SUBMIT_LABEL', 'Submit');
         $this->parse('action_submit_block', 'action_submit');
     } else {
         $this->setVar('action_submit_block', '');
     }
 
     $this->setVar('recent_submission_block', '');
-    $this->setVar('action_resubmit_block', '');
 
 }
 
+// if the user doesn't have folder perm, ignore everything we just calculated above and smother the block
 if (!in_array($box->getCategory()->getId(), $categoryIDList)) {
     $this->setVar(
         array(
             'action_submit_block'   => '',
-            'action_resubmit_block' => ''
         )
     );
 }
@@ -651,12 +612,25 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
     // get filetype details
     $return = $recent_return->getReturnedWork();
 
+    $mark = $return->getMark();
+
+    if ($box->getMarkType()->getId() == Component\SubmissionBox\MarkType::TYPE_LETTER
+        || in_array($mark, $errors)
+    ) {
+        $mark = $returnHandler->shortenGrade($mark);
+    } else {
+        $mark = Scrub::Text($mark);
+    }
+
     $this->setVar(
         array(
             'RETURNED_WORK_OWNER_ID'   => $return->getOwner()->getId(),
             'RETURNED_WORK_COMMENT'    => Scrub::Text($return->getComment()),
-            'RETURNED_WORK_MARK'       => Scrub::Text($return->getMark()),
+            'RETURNED_WORK_MARK'       => $mark,
+            'RETURNED_WORK_MARK_TIP'   => $mark == $return->getMark() ? '' : $return->getMark(),
             'RETURNED_WORK_GRADIENT'   => $return->getGradientFromNormalizedMark(),
+            'STATUS_HEALTH'            => 'ok',
+            'STATUS_LABEL'             => 'Marked'
         ));
 
     // Just zero these so they don't appear
