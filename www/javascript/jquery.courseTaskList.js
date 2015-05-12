@@ -145,6 +145,16 @@
             });
         }
 
+        // Task editor - prevent empty inputs
+        component.on(
+            'change.courseTaskList, keyup.courseTaskList',
+            'input[name="title"]',
+            function (event) {
+                var title = this.value.replace(/^\s+|\s+$/g, '');
+                $(this).closest('form').find(':submit').prop('disabled', title.length === 0);
+            }
+        );
+
         // AJAX form submissions
         // Only show the dialog if there's a class using this unit.
         component.on('submit.courseTaskList', 'form.edit_task_form, form.create_task_form', {}, function(event) {
