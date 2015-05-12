@@ -47,8 +47,8 @@ class Renderer extends Handler
             $this->getPage()->setFile('homepagenews_t', 'resource/homepagenews/search/results.html');
             $this->getPage()->setBlock('homepagenews_t', 'homepagenews', 'homepagenews_block');
             $this->getPage()->setVar(array(
-                'HOMEPAGE_NEWS_DISP_COUNT' => count($this->getResult($this->getType())),
-                'HOMEPAGE_NEWS_COUNT' => $this->getCount($this->getType()),
+                'HOMEPAGENEWS_DISP_COUNT' => count($this->getResult($this->getType())),
+                'HOMEPAGENEWS_COUNT' => $this->getCount($this->getType()),
             ));
 
             foreach ($result as $news) {
