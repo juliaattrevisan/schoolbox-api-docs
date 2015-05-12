@@ -82,9 +82,11 @@ if (count($affectedIds) == 1) {
     $connector = new Calendar_Api_EventType_Event_Schoolbox_Default($owner, null);
 
     foreach ($connector->getEvent($event->getId()) as $calendarEvent) {
-        $renderer  = new Javascript(new SitePage(), $calendarEvent, $_SESSION['user'], new \Group, new \Calendar);
-        $output = $renderer->render();
+        // Only one event should ever be gotten here, so render that one only
+        $renderer = new Javascript(new SitePage(), $calendarEvent, $_SESSION['user'], new \Group, new \Calendar);
+        $output   = $renderer->render();
+        echo substr($output,0,-1);
+        break;
     }
-    echo substr($output,0,-1);
 }
 exit(1);

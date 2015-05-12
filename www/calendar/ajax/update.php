@@ -94,10 +94,11 @@ if ($eventId = $calendarHandler->update($updatedEvent)) {
     $connector = new Calendar_Api_EventType_Event_Schoolbox_Default($owner, null);
 
     foreach ($connector->getEvent($eventId) as $calendarEvent) {
-        $renderer  = new Javascript(new SitePage(), $calendarEvent);
-        $output = $renderer->render();
+        // Only one event should ever be gotten here, so render that one only
+        $renderer = new Javascript(new SitePage(), $calendarEvent, $_SESSION['user'], new \Group, new \Calendar);
+        $output   = $renderer->render();
+        echo substr($output, 0, -1);
+        break;
     }
-    echo $output;
-
 }
 exit(1);
