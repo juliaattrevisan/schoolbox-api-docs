@@ -36,7 +36,10 @@ class CurrentPeriod extends Generic {
             /* REFACTOR */
             $timetableHandler = new External_Timetable();
 
-            $campus = $user->getCampusCollection()->first();
+            // Show the default campus timetable -_-
+            // I guess this means we won't be able to get rid of it after all
+            // (or at least until mobile gets deprecated!)
+            $campus = $user->getDefaultCampus();
 
             /*
             $dayNum = 4;
