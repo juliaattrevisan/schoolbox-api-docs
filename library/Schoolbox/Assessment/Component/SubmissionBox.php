@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Assessment\Component;
 
+use Alaress_Date_Format;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -83,22 +84,22 @@ class SubmissionBox implements ISoftDeletable
      * If this isn't null, the submission box won't be shown on student's
      * calendars until this date.
      *
-     * @var \Alaress_Date_Format
+     * @var Alaress_Date_Format
      */
     protected $publish_date;
 
     /**
-     * @var \Alaress_Date_Format
+     * @var Alaress_Date_Format
      */
     protected $open_date;
 
     /**
-     * @var \Alaress_Date_Format
+     * @var Alaress_Date_Format
      */
     protected $due_date;
 
     /**
-     * @var \Alaress_Date_Format
+     * @var Alaress_Date_Format
      */
     protected $late_date;
 
@@ -113,7 +114,7 @@ class SubmissionBox implements ISoftDeletable
     protected $accept_multiple;
 
     /**
-     * @var \Alaress_Date_Format
+     * @var Alaress_Date_Format
      */
     protected $created;
 
@@ -428,7 +429,7 @@ class SubmissionBox implements ISoftDeletable
     }
 
     /**
-     * @param  \Alaress_Date_Format $created
+     * @param  Alaress_Date_Format $created
      * @return $this
      */
     public function setCreated($created)
@@ -438,7 +439,7 @@ class SubmissionBox implements ISoftDeletable
     }
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format
      */
     public function getCreated()
     {
@@ -446,7 +447,7 @@ class SubmissionBox implements ISoftDeletable
     }
 
     /**
-     * @param  \Alaress_Date_Format $due_date
+     * @param  Alaress_Date_Format $due_date
      * @return $this
      */
     public function setDueDate($due_date)
@@ -456,7 +457,7 @@ class SubmissionBox implements ISoftDeletable
     }
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format
      */
     public function getDueDate()
     {
@@ -464,7 +465,7 @@ class SubmissionBox implements ISoftDeletable
     }
 
     /**
-     * @param  \Alaress_Date_Format $late_date
+     * @param  Alaress_Date_Format $late_date
      * @return $this
      */
     public function setLateDate($late_date)
@@ -474,7 +475,7 @@ class SubmissionBox implements ISoftDeletable
     }
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format
      */
     public function getLateDate()
     {
@@ -518,7 +519,7 @@ class SubmissionBox implements ISoftDeletable
     }
 
     /**
-     * @param  \Alaress_Date_Format $open_date
+     * @param  Alaress_Date_Format $open_date
      * @return $this
      */
     public function setOpenDate($open_date)
@@ -528,7 +529,7 @@ class SubmissionBox implements ISoftDeletable
     }
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format
      */
     public function getOpenDate()
     {
@@ -673,7 +674,7 @@ class SubmissionBox implements ISoftDeletable
     }
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format
      */
     public function getPublishDate()
     {
@@ -681,7 +682,7 @@ class SubmissionBox implements ISoftDeletable
     }
 
     /**
-     * @param  \Alaress_Date_Format $publish_date
+     * @param  Alaress_Date_Format $publish_date
      * @return $this
      */
     public function setPublishDate($publish_date)
@@ -689,4 +690,16 @@ class SubmissionBox implements ISoftDeletable
         $this->publish_date = $publish_date;
         return $this;
     }
+
+
+    /**
+     * Returns true if the current time is between the open and late dates of this box
+     *
+     * @return bool
+     */
+    public function isOpen()
+    {
+        return Alaress_Date_Format::now()->between($this->getOpenDate(), $this->getLateDate());
+    }
+
 }
