@@ -66,20 +66,9 @@ if (is_array($sectionList) && count($sectionList)) {
     }
 }
 
-/* Remove assess
- */
-$assessHandler->update(array(
-    'assess_id'  => $assessId,
-    'deleted_at' => 'NOW()'
-));
-
-// Are there any attached tasks or task instances?
-// Delete them, no questions asked.
-// TODO move to the assess mapper's postSave callback once that's mapperized
-$taskMapper         = new \Schoolbox\Assessment\Course\TaskMapper();
-$taskInstanceMapper = new \Schoolbox\Assessment\Course\Task\InstanceMapper();
-$taskMapper->delete($taskMapper->findByColumn('id', $assessId));
-$taskInstanceMapper->delete($taskMapper->findByColumn('id', $assessId));
+// Delete thru the mapper so that callbacks apply
+$mapper = new \Schoolbox\Assessment\Component\OnlineAssessmentMapper();
+$mapper->delete($mapper->findById($assessId));
 
 $this->setFile(TEMPLATE_content, 'assess/deleted.html');
 
