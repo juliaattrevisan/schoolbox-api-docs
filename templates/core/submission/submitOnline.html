@@ -39,7 +39,7 @@
         var formSaveButton = form.find('input[type="submit"][name="save_draft"]')
         var oldText        = formSaveButton.val()
         var buttonWidth    = formSaveButton.width()
-        formSaveButton.prop('disabled', true).val('Saving...').width(buttonWidth)
+        formSaveButton.prop('disabled', true).val('Autosaving').width(buttonWidth)
 
         // Submit form via AJAX
         var formContents = form.serializeArray()
@@ -47,7 +47,7 @@
         formContents.push({name: 'body',       value: tinyMCE.get('textBoxBody').getContent()})
         $.ajax({
             type: "POST",
-            url:  form.attr('action'),
+            url:  '/submission/submitOnlineForm.php',
             data: formContents,
             complete: function() {
                 // Re-init the autosave
@@ -58,7 +58,7 @@
                 )
             },
             success: function() {
-                formSaveButton.val('Saved!')
+                formSaveButton.val(oldText)
             },
             error: function() {
                 formSaveButton.val('Error!')
@@ -114,7 +114,7 @@
 <!-- END custom_head -->
 
 <div id="submission-history">
-    <form method="post" action="/submission/submitWorkForm.php" enctype="multipart/form-data">
+    <form method="post" action="/submission/submitWorkForm.php" id="textBoxForm" enctype="multipart/form-data">
         <input type="hidden" name="box_id" value="{BOX_ID}" />
         <input type="hidden" name="submission_id" value="{SUBMISSION_ID}" />
 
