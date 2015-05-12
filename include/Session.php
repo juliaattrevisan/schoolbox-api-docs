@@ -455,23 +455,27 @@ class Session
                     }
                 }
             } else {
-//user is not parent so get timetable information
+                //user is not parent so get timetable information
                 $subjectList = $synUser->getSubjectList($synergy_id, $_SESSION['id']);
                 $catList = array();
                 if (is_array($subjectList)) {
                     foreach ($subjectList as $subject) {
                         //check subject exists.. we cant link to subjects that dont exist its ugly
                         $result = false;
-
+                        // Ensure the link goes to an actual homepage, too
+                        $homepageCode = '';
                         if ($subject['campusCode']) {
-//Check for subject with campus code
+                            //Check for subject with campus code
                             try {
-                                $result = $folderMapper->findByCode($subject['campusCode'].'/'.$subject['code']);
+                                $homepageCode = $subject['campusCode'].'/'.$subject['code'];
+                                $result = $folderMapper->findByCode($homepageCode);
                             } catch (\Exception $e) {
-//Try to fetch witout campus code
+                                //Try to fetch without campus code
                                 try {
+                                    $homepageCode = $subject['code'];
                                     $result = $folderMapper->findByCode($subject['code']);
                                 } catch (\Exception $e) {
+                                    // noop
                                 }
                             }
                         }
@@ -480,7 +484,7 @@ class Session
                             if (!in_array($result->getId(), $catList)) {
                                 $subject['id'] = $result->getId();
                                 $subject['name'] = $result->getName();
-                                $subject['code'] = $result->getCodeString();
+                                $subject['code'] = $homepageCode;
                                 $_SESSION['subjects'][] = $subject;
 
                                 $catList[] = $result->getId(); //check for dupes
