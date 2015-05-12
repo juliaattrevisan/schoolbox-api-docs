@@ -233,12 +233,16 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
     }
 
     /**
-     * Post-softdelete hook - softdeletes all tasks associated with this quiz.
+     * Post-softdelete hook.
+     *
+     * * If this quiz belongs to a task in a course instance, delete that task
+     * * Otherwise if it belongs to a task in a course builder, delete that task
      *
      * @param OnlineAssessment $object
      */
     public function softDeleteTask(OnlineAssessment $object)
     {
+        $taskInstanceId = null;
         if ($object->getTaskInstance()) {
             $taskInstanceId = $object->getTaskInstance()->getId();
             if ($taskInstanceId) {
@@ -247,7 +251,7 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
                 );
             }
         }
-        if ($object->getTask()) {
+        if (!$taskInstanceId && $object->getTask()) {
             $taskId = $object->getTask()->getId();
             if ($taskId) {
                 $this->getJoinMapper('task')->softDelete(
@@ -258,12 +262,16 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
     }
 
     /**
-     * Post-delete hook - deletes all tasks associated with this quiz.
+     * Post-delete hook.
+     *
+     * * If this quiz belongs to a task in a course instance, delete that task
+     * * Otherwise if it belongs to a task in a course builder, delete that task
      *
      * @param OnlineAssessment $object
      */
     public function hardDeleteTask(OnlineAssessment $object)
     {
+        $taskInstanceId = null;
         if ($object->getTaskInstance()) {
             $taskInstanceId = $object->getTaskInstance()->getId();
             if ($taskInstanceId) {
@@ -272,7 +280,7 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
                 );
             }
         }
-        if ($object->getTask()) {
+        if (!$taskInstanceId && $object->getTask()) {
             $taskId = $object->getTask()->getId();
             if ($taskId) {
                 $this->getJoinMapper('task')->hardDelete(

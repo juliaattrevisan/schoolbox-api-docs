@@ -234,12 +234,16 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
     }
 
     /**
-     * Post-softdelete hook - softdeletes all tasks associated with this box.
+     * Post-softdelete hook.
+     *
+     * * If this work belongs to a task in a course instance, delete that task
+     * * Otherwise if it belongs to a task in a course builder, delete that task
      *
      * @param SubmissionBox $object
      */
     public function softDeleteTask(SubmissionBox $object)
     {
+        $taskInstanceId = null;
         if ($object->getTaskInstance()) {
             $taskInstanceId = $object->getTaskInstance()->getId();
             if ($taskInstanceId) {
@@ -248,7 +252,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
                 );
             }
         }
-        if ($object->getTask()) {
+        if (!$taskInstanceId && $object->getTask()) {
             $taskId = $object->getTask()->getId();
             if ($taskId) {
                 $this->getJoinMapper('task')->softDelete(
@@ -259,12 +263,16 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
     }
 
     /**
-     * Post-delete hook - deletes all tasks associated with this box.
+     * Post-delete hook.
+     *
+     * * If this work belongs to a task in a course instance, delete that task
+     * * Otherwise if it belongs to a task in a course builder, delete that task
      *
      * @param SubmissionBox $object
      */
     public function hardDeleteTask(SubmissionBox $object)
     {
+        $taskInstanceId = null;
         if ($object->getTaskInstance()) {
             $taskInstanceId = $object->getTaskInstance()->getId();
             if ($taskInstanceId) {
@@ -273,7 +281,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
                 );
             }
         }
-        if ($object->getTask()) {
+        if (!$taskInstanceId && $object->getTask()) {
             $taskId = $object->getTask()->getId();
             if ($taskId) {
                 $this->getJoinMapper('task')->hardDelete(
