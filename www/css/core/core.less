@@ -8792,7 +8792,20 @@ dd {
           background: none;
           text-shadow: none;
           margin-bottom: 6px;
+          font-weight: bold;
         }
+        .marked {
+          font-weight: normal;
+          span {
+            .btn-icon(14);
+          }
+        }
+        .marked:hover {
+          span {
+            .btn-icon(15);
+          }
+        }
+
         a { color: @body-text; }
     }
 
