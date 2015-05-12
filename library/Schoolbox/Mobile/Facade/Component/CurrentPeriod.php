@@ -136,6 +136,9 @@ class CurrentPeriod extends Generic {
                 catch (\Exception $e) {
                     $cell['err'][] = 'Failed to read category details';
                 }
+
+                // remove dedupe index from class array
+                $period['class'] = array_values($period['class']);
             }
 
 
