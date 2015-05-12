@@ -50,7 +50,6 @@ class VObjectBase extends RendererBase
             $vevent = $this->vcalendar->create('VEVENT');
             // Generate a UID based on $this->getEvent()->getEventId()
             $vevent->add('UID', $this->getEvent()->getEventId() . '/' . $this->getEvent()->getConnectorId());
-            $vevent->add('DTSTAMP', DateTime::createFromFormat('U', $_SERVER['REQUEST_TIME']));
             $vevent->add('CATEGORIES', $this->getEvent()->getEventType());
             $vevent->add('LOCATION', $this->getEvent()->getLocation());
 
