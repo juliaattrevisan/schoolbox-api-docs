@@ -33,6 +33,14 @@ class EventRecurrenceMapper
     /** @var NotifInterface */
     protected $notif;
 
+    /**
+     * eventId corresponding to the first instance in a series
+     * Typically used to redirect back to the first instance of
+     * an event series rather than the last instance
+     *
+     * @var int
+     */
+    protected $firstEventIdInSeries = 0;
 
     /**
      * Constructor
@@ -54,36 +62,12 @@ class EventRecurrenceMapper
         $this->setup();
     }
 
-
-    /**
-     * Get event mapper
-     *
-     * @return EventMapper
-     */
-    protected function getEventMapper()
-    {
-        return $this->eventMapper;
-    }
-
-
-    /**
-     * Set event mapper
-     *
-     * @param EventMapper $eventMapper
-     */
-    protected function setEventMapper($eventMapper)
-    {
-        $this->eventMapper = $eventMapper;
-    }
-
-
     /**
      * Hook method
      */
     protected function setup()
     {
     }
-
 
     /**
      * Get the series recurrence settings
@@ -159,6 +143,10 @@ class EventRecurrenceMapper
         /* Modify an existing event
          */
         if (is_numeric($event->getId())) {
+
+            /* Remember first event id in a series
+             */
+            $this->setFirstEventIdInSeries($event->getId());
 
             $previous = $this->getEventMapper()->findById($event->getId());
 
@@ -239,14 +227,12 @@ class EventRecurrenceMapper
         }
     }
 
-
     /**
      * @param Event $seriesEvent
      * @param Event $coreEvent
      */
     protected function setSeriesEventData($seriesEvent, $coreEvent)
     {
-
         /* Copy date from $event to each thingy in the series
          * to preserve other series -related data
          */
@@ -259,7 +245,6 @@ class EventRecurrenceMapper
         $seriesEvent->setAccess($coreEvent->getAccess());
         $seriesEvent->setType($coreEvent->getType());
     }
-
 
     /**
      * Match signature of Schoolbox\Mapper and emulate an Event notification
@@ -288,7 +273,6 @@ class EventRecurrenceMapper
         return true;
     }
 
-
     /**
      * @param Event          $event
      * @param Traversable    $dates
@@ -311,16 +295,18 @@ class EventRecurrenceMapper
 
             $this->getEventMapper()->save($event);
 
+            /* Remember first event id in a series
+             */
+            if (!$this->getFirstEventIdInSeries()) {
+                $this->setFirstEventIdInSeries($event->getId());
+            }
+
             // Assign relations
             $eventRelations->resetRelations($event);
         }
 
         $this->raiseNotification($event, $method, $previous);
     }
-
-    /* Getters/Setters
-     */
-
 
     /**
      * Another totally custom recurrence save method - this one uses an iterable
@@ -345,7 +331,6 @@ class EventRecurrenceMapper
         }
         return $sequence;
     }
-
 
     /**
      * Gets an event sequence from a base event and an iterable date source.
@@ -393,7 +378,6 @@ class EventRecurrenceMapper
         return $collection;
     }
 
-
     /**
      * Post-event save hook, for augmentation by subclasses
      *
@@ -401,5 +385,48 @@ class EventRecurrenceMapper
      */
     protected function saveHook(Event $event)
     {
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Get event mapper
+     *
+     * @return EventMapper
+     */
+    protected function getEventMapper()
+    {
+        return $this->eventMapper;
+    }
+
+    /**
+     * Set event mapper
+     *
+     * @param EventMapper $eventMapper
+     */
+    protected function setEventMapper($eventMapper)
+    {
+        $this->eventMapper = $eventMapper;
+    }
+
+    /**
+     * Set first event id in series
+     *
+     * @param int $firstEventIdInSeries
+     */
+    protected function setFirstEventIdInSeries($firstEventIdInSeries)
+    {
+        $this->firstEventIdInSeries = $firstEventIdInSeries;
+    }
+
+    /**
+     * Get first event id in series
+     *
+     * @return int
+     */
+    public function getFirstEventIdInSeries()
+    {
+        return $this->firstEventIdInSeries;
     }
 }
