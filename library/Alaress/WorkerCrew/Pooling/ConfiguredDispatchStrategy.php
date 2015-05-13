@@ -55,6 +55,8 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
         $this->queueMaxSize  = $queueMaxSize;
         $this->maxFlywheel   = $maxFlywheel;
         $this->idleTimeout   = $idleTimeout;
+        $this->workerTimeoutSoft = $workerTimeoutSoft;
+        $this->workerTimeoutHard = $workerTimeoutHard;
         $this->protocol      = new AlaressIPCProtocol();
     }
 
