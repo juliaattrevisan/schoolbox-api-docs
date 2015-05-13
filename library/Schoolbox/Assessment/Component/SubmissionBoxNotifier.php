@@ -253,7 +253,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      */
     protected function getStudentsUnsubmittedList($submissionBox)
     {
-        $userCollection = UserAccessMapper::getInstance()->findStudentsInCategory($submissionBox->getCategory());
+        $folder = $this->categoryMapper->findById($submissionBox->getCategory()->getId());
+
+        $userCollection = UserAccessMapper::getInstance()->findStudentsInCategory($folder);
 
         $submissionCollection = $this->submissionMapper->findByColumnList(array(
             'box_id' => $submissionBox->getId()
@@ -467,7 +469,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             ->setParams(array(
                 'author'  => new UserParam($author),
                 'boxname' => new Param($box->getName(), "/submission/submissionHistory/" . $box->getId()),
-                'date'    => new Param(date($dateformat, $relative->getUnixTimestamp())),
+                'date'    => new Param($dateformat),
                 'catname' => new CategoryParam($box->getCategory())
             ));
 
