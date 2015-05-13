@@ -232,6 +232,16 @@ class External_User implements External_UserInterface {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
+    /**
+     * Retrieves a list of forms that a student may be in.
+     *
+     * @return array [['Code' => string, 'Description' => string], ...]
+     */
+    public function retrieveLuForm()
+    {
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
+    }
+
 
     public function __call ($methodName, $argumentList) {
 		$database = $this->getDatabase();

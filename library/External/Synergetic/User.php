@@ -991,9 +991,7 @@ class External_Synergetic_User implements External_UserInterface
     }
 
     /**
-     * Retrieve all the options from luForm table
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function retrieveLuForm()
     {
