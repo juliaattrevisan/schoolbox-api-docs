@@ -214,9 +214,10 @@
                                             </div>
 
                                         </li>
-                                        <li><label for="self_assess-{UNIT_TASK_ID}">Allow self-assessment
+                                        <li><label for="self_assess-{UNIT_TASK_ID}">
                                             <input name="self_assess" value="0" type="hidden" />
                                             <input name="self_assess" value="1" type="checkbox" id="self_assess-{UNIT_TASK_ID}" {UNIT_TASK_SELF_ASSESS} />
+                                            Allow self-assessment
                                         </label></li>
 
                                         <li>
@@ -284,13 +285,14 @@
                                     </div>
                                 </li>
 
-                                <li><label for="self_assess-new_task">Allow self-assessment
+                                <li><label for="self_assess-new_task">
                                     <input name="self_assess" value="0" type="hidden" />
                                     <input name="self_assess" value="1" type="checkbox" id="self_assess-new_task" />
+                                    Allow self-assessment
                                 </label></li>
 
                                 <li>
-                                    <input type="submit" name="Submit" value="Create" class="submit-btn-plain" />
+                                    <input type="submit" name="Submit" value="Create" disabled class="submit-btn-plain" />
                                 </li>
 
                             </ul>
