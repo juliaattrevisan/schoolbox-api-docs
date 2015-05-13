@@ -9,7 +9,7 @@
 
 namespace Alaress\Image\Cache;
 
-use League\Flysystem;
+use League\Flysystem as Fly;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Resource;
 
@@ -30,7 +30,7 @@ class BrokenFS extends Storage
      */
     public function __construct($dir, $filename, $key)
     {
-        $fs = new Flysystem\Filesystem(new Flysystem\Adapter\Local($dir));
+        $fs = new Fly\Filesystem(new Fly\Adapter\Local($dir));
 
         // setup an object to work with so it can get into cache
         $file = Resource\Storage\Mapper::getInstance()->createModel();
