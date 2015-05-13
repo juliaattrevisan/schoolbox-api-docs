@@ -11,6 +11,8 @@ namespace Alaress\Mail;
 
 
 use Alaress\Exception\IO\IOException;
+use Alaress\Lumberjack\Logger;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
@@ -52,6 +54,9 @@ abstract class AbstractMailer implements IMailer {
 	 */
 	protected $headers;
 
+    /** @var LoggerInterface */
+    protected $log;
+
 
 	/**
 	 * Construct the basics of a new Mailer
@@ -71,7 +76,21 @@ abstract class AbstractMailer implements IMailer {
 		$this->setTo($to);
 		$this->setSubject($subject);
 
+        // default logger does nothing
+        $this->log = new Logger(null);
 	}
+
+
+    /**
+     * @param LoggerInterface $logger
+     * @return static
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->log = $logger;
+        return $this;
+    }
+
 
 	public function setTo ($to) {
 		if ( is_array($to) ) {
@@ -219,6 +238,12 @@ abstract class AbstractMailer implements IMailer {
         }
         catch (\Exception $e) {
             // this means "mail server went away"
+            $errMsg = sprintf("Internal Mailing %s occurred (%d %s): %s",
+                get_class($e), $retries, $retries == 1 ? 'retry remains' : 'retries remain', $e->getMessage()
+            );
+
+            $this->log->error($errMsg, [ $e ]);
+
             if ($retries <= 0) {
                 throw $e;
             }

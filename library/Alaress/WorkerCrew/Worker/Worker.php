@@ -11,6 +11,7 @@ namespace Alaress\WorkerCrew\Worker;
 
 
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
+use Exception;
 use Psr\Log\LoggerInterface;
 use RangeException;
 
@@ -66,13 +67,13 @@ class Worker extends PipeWriter
         foreach ($this->pipes as &$p) {
             try {
                 fclose($p);
-            } catch(RangeException $e) {
+            } catch(Exception $e) {
                 // ignore
             }
         }
         try {
             pclose($this->pp);
-        } catch(RangeException $e) {
+        } catch(Exception $e) {
             // ignore
         }
     }

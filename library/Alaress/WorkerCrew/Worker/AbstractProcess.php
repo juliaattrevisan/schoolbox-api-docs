@@ -16,11 +16,13 @@ use Alaress\WorkerCrew\Worker\IO\Listener\InputStreamListener;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use React\EventLoop\Timer\TimerInterface;
 use React\Stream\Stream;
 use RuntimeException;
 
 abstract class AbstractProcess implements WorkerInterface
 {
+    const IDLE_TIMEOUT = 120; // max 2 minutes of idleness
 
     /** @var LoopInterface */
     protected $loop;
@@ -33,6 +35,13 @@ abstract class AbstractProcess implements WorkerInterface
 
     /** @var DispatchStrategyInterface */
     protected $strat;
+
+    /**
+     * Timer for ensuring a worker doesn't sit idle for too long
+     *
+     * @var TimerInterface
+     */
+    protected $timeout;
 
 
     /**
@@ -58,6 +67,8 @@ abstract class AbstractProcess implements WorkerInterface
                                           ->chunkLength();
 
         $this->loop->addPeriodicTimer(0.1, array($this, 'signalDispatch'));
+
+        $this->idle();
 
         pcntl_signal(SIGTERM, array($this, 'onTerminate'));
     }
@@ -99,6 +110,9 @@ abstract class AbstractProcess implements WorkerInterface
      */
     public function parse($buffer)
     {
+        // we've stopped idling! cancel the timeout
+        $this->active();
+
         try {
             // split the datastring supplied
             list($cmd, $args) = $this->strat->decomposeTaskString($buffer);
@@ -119,8 +133,37 @@ abstract class AbstractProcess implements WorkerInterface
         $size = strlen($flat);
         $this->log->debug("Flattened response is $size bytes");
 
+        // resume idling
+        $this->idle();
+
         return $flat;
     }
+
+
+    /**
+     * Set the idle timeout. Idempotent method.
+     */
+    private function idle()
+    {
+        if (!$this->timeout instanceof TimerInterface) {
+            $this->log->debug("Worker idling");
+            $this->timeout = $this->loop->addTimer(self::IDLE_TIMEOUT, [ $this, 'onTerminate' ]);
+        }
+    }
+
+
+    /**
+     * Clear the idle timeout. Idempotent method.
+     */
+    private function active()
+    {
+        if ($this->timeout instanceof TimerInterface) {
+            $this->log->debug("Worker active");
+            $this->loop->cancelTimer($this->timeout);
+            $this->timeout = null;
+        }
+    }
+
 
 
     /**
