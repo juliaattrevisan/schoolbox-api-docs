@@ -11,7 +11,8 @@ namespace Config\Modules;
 
 use Alaress\Application\Kernel;
 
-class TassPortal implements ModuleConfigInterface {
+class TassPortal implements ModuleConfigInterface
+{
 
     /**
      * Run configuration for the given module

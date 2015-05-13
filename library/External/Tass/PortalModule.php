@@ -15,7 +15,8 @@ class External_Tass_PortalModule extends \Alaress\Module\Module
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath) {
+    public function initRoutes(Router $router, $basePath)
+    {
         $router->add('tassportal.parentLounge', $basePath.'/parentlounge');
         $router->add('tassportal.tassWeb', $basePath.'/tassweb');
         $router->add('tassportal.teacherKiosk', $basePath.'/teacherkiosk');
