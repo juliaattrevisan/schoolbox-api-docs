@@ -109,11 +109,13 @@
                             <input type="hidden" name="category"  value="{ID}"/>
                             <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
 
-                            <dl>
-                                <dt><label for="title-{TASK_ID}">Task:</label></dt>
-                                <dd><input id="title-{TASK_ID}" name="title" type="text" value="{TASK_TITLE}" /></dd>
+                            <ul>
+                                <li><label for="title-{TASK_ID}">Task:
+                                <input id="title-{TASK_ID}" name="title" type="text" value="{TASK_TITLE}" />
+                                </label>
+                                </li>
 
-                                <dd class="clearfix dz-wrap">
+                                <li class="clearfix dz-wrap">
                                     <div class="post-attachment attach" style="{TASK_ATTACH_DISPLAY}">
                                         {ATTACH_ZONE}
                                         <p class="alt-src">
@@ -129,14 +131,14 @@
                                             or <a class='btn attach sstream-attachment' data-value="attach"><span></span>Attach</a>
                                         </p>
                                     </div>
-                                </dd>
+                                </li>
 
-                                <dt><label for="self_assess-{TASK_ID}">Self-assessed?</label></dt>
-                                <dd>
+                                <li><label for="self_assess-{TASK_ID}">Allow self-assessment
                                     <input name="self_assess" value="0" type="hidden" />
                                     <input name="self_assess" value="1" type="checkbox" id="self_assess-{TASK_ID}" {TASK_SELF_ASSESS} />
-                                </dd>
-                            </dl>
+                                </label>
+                                </li>
+                            </ul>
 
                             <input type="submit" name="Submit" value="Update" class="submit-btn-plain" />
                             <div class="clearfix"></div>
@@ -161,11 +163,13 @@
                 <input type="hidden" name="category"  value="{ID}"/>
                 <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
 
-                <dl>
-                    <dt><label for="title-new_task">Task:</label></dt>
-                    <dd><input id="title-new_task" name="title" type="text" value="" /></dd>
+                <ul>
+                    <li><label for="title-new_task">Task:
+                    <input id="title-new_task" name="title" type="text" value="" />
+                    </label>
+                    </li>
 
-                    <dd class="clearfix dz-wrap">
+                    <li class="clearfix dz-wrap">
                         <div class="post-attachment attach" style="{TASK_ATTACH_DISPLAY}">
                             {ATTACH_ZONE}
                             <p class="alt-src">
@@ -181,14 +185,14 @@
                                 or <a class='btn attach sstream-attachment' data-value="attach"><span></span>Attach</a>
                             </p>
                         </div>
-                    </dd>
+                    </li>
 
-                    <dt><label for="self_assess-new_task">Self-assessed?</label></dt>
-                    <dd>
+                    <li><label for="self_assess-new_task">
                         <input name="self_assess" value="0" type="hidden" />
                         <input name="self_assess" value="1" type="checkbox" id="self_assess-new_task" {TASK_SELF_ASSESS} />
-                    </dd>
-                </dl>
+                        Allow self-assessment</label>
+                    </li>
+                </ul>
 
                 <input type="submit" name="Submit" value="Create" disabled class="submit-btn-plain" />
 
