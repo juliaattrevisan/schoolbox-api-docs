@@ -9,6 +9,32 @@
 class External_Tass_PortalController extends Alaress\Web\Controller\Base
 {
     /**
+     * Connection to SSO server
+     *
+     * @var External_Tass_SSO
+     */
+    protected $sso;
+
+    /**
+     * The URL on which TASS services are hosted
+     *
+     * @var string
+     */
+    protected $portalHost;
+
+    /**
+     * Constructor
+     *
+     * @param External_Tass_SSO $sso
+     * @param string            $portalHost The URL on which TASS services are hosted
+     */
+    public function __construct(External_Tass_SSO $sso, $portalHost)
+    {
+        $this->sso        = $sso;
+        $this->portalHost = $portalHost;
+    }
+
+    /**
      * SSO to parent lounge
      */
     public function parentLounge()
@@ -16,7 +42,7 @@ class External_Tass_PortalController extends Alaress\Web\Controller\Base
         $token = $this->getToken(['prod_code' => 'PL', 'app_code' => 'pl']);
         if ($token) {
             $this->getResponse()->redirect->to(
-                $this->getTassPortalHost()."/ParentLounge/PIALogin.cfm?sso_token=$token"
+                $this->portalHost."/ParentLounge/PIALogin.cfm?sso_token=$token"
             );
         } else {
             $this->getResponse()->status->setCode(404);
@@ -31,7 +57,7 @@ class External_Tass_PortalController extends Alaress\Web\Controller\Base
         $token = $this->getToken(['prod_code' => 'TASSWEB', 'app_code' => 'ec']);
         if ($token) {
             $this->getResponse()->redirect->to(
-                $this->getTassPortalHost()."/tassweb/login.cfm?sso_token=$token"
+                $this->portalHost."/tassweb/login.cfm?sso_token=$token"
             );
         } else {
             $this->getResponse()->status->setCode(404);
@@ -46,7 +72,7 @@ class External_Tass_PortalController extends Alaress\Web\Controller\Base
         $token = $this->getToken(['prod_code' => 'TIA', 'app_code' => 'ec']);
         if ($token) {
             $this->getResponse()->redirect->to(
-                $this->getTassPortalHost()."/kiosk/TIALogin.cfm?sso_token=$token"
+                $this->portalHost."/kiosk/TIALogin.cfm?sso_token=$token"
             );
         } else {
             $this->getResponse()->status->setCode(404);
@@ -61,7 +87,7 @@ class External_Tass_PortalController extends Alaress\Web\Controller\Base
         $token = $this->getToken(['prod_code' => 'WB', 'app_code' => 'ec']);
         if ($token) {
             $this->getResponse()->redirect->to(
-                $this->getTassPortalHost()."/webbook/WBLogin.cfm?sso_token=$token"
+                $this->portalHost."/webbook/WBLogin.cfm?sso_token=$token"
             );
         } else {
             $this->getResponse()->status->setCode(404);
@@ -77,20 +103,8 @@ class External_Tass_PortalController extends Alaress\Web\Controller\Base
      */
     protected function getToken($config = [])
     {
-        $sso = new External_Tass_SSO();
         // remove any non-numeric characters so it's the proper TASS id
         $config['sso_code'] = preg_replace('/[^0-9]/s', '', $_SESSION['sid']);
-        return $sso->getUserToken($config);
+        return $this->sso->getUserToken($config);
     }
-
-    /**
-     * Gets the TASS portal host, will eventually be configurable
-     *
-     * @return string
-     */
-    protected function getTassPortalHost()
-    {
-        return "https://tassportal.cathedral.qld.edu.au/";
-    }
-
 }
