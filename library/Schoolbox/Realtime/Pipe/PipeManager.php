@@ -48,7 +48,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 
 	const REDIS_SESSION_PREFIX = 'PHPREDIS_SESSION:';
 	const PHP_SESSION_PREFIX   = 'PHPSESSID';
-    const INACTIVE_TIMEOUT     = 20; // 10 minutes
+    const INACTIVE_TIMEOUT     = 300; // 5 minutes
 
 	/** @var PipeCollection */
 	protected $pipes;
