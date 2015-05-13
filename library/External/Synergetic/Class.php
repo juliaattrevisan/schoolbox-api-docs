@@ -48,6 +48,8 @@ class External_Synergetic_Class implements External_ClassInterface
     {
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
+        $classQuery = '';
+
         if (strpos($classCode, '/') !== false) {
             $codeArray = explode('/', $classCode);
             $classQuery .= "( ClassCode = '{$codeArray[1]}' AND ClassCampus = '{$codeArray[0]}' ) ";
