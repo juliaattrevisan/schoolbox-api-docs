@@ -77,10 +77,10 @@ class External_Tass_PortalController extends Alaress\Web\Controller\Base
      */
     protected function getToken($config = [])
     {
-        $sso = new External_Tass_SSO($config);
+        $sso = new External_Tass_SSO();
         // remove any non-numeric characters so it's the proper TASS id
-        $tassID = preg_replace('/[^0-9]/s', '', $_SESSION['sid']);
-        return $sso->getUserToken(array('sso_code' => $tassID));
+        $config['sso_code'] = preg_replace('/[^0-9]/s', '', $_SESSION['sid']);
+        return $sso->getUserToken($config);
     }
 
     /**
