@@ -111,7 +111,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
                 ->setMinute($_POST['startMinute'])
             ;
             $endDate = Alaress_Date_Format::newLocalShort($_POST['endDate'])
-                ->set12Hour($_POST['startHour'], $_POST['endPeriod'])
+                ->set12Hour($_POST['endHour'], $_POST['endPeriod'])
                 ->setMinute($_POST['endMinute'])
             ;
 
@@ -263,7 +263,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 			/* Superuser modifying some arbitrary event
 			 */
-			$page->localRedir('/modules/eotc/manage/modify.php?eventID=' . $event->getId());
+			$page->localRedir('/modules/eotc/manage/modify.php?eventID=' . $eventRecurrenceMapper->getFirstEventIdInSeries());
 
 			break;
 
