@@ -501,6 +501,10 @@ class StudentReportCard
         $page->setBlock('subject_rubric_group', 'subject_rubric_criterion', 'subject_rubric_criterion_block');
         $page->setBlock('subject_rubric_criterion', 'subject_rubric_criterion_mark', 'subject_rubric_criterion_mark_block');
 
+        $page->setVar(array(
+            'subject_rubric_block' => ''
+        ));
+
         $submissionBoxMapper = $this->submissionMapper;
         $rubricHandler = new \DueWork_Rubric_Handler();
 
@@ -536,61 +540,56 @@ class StudentReportCard
         /* If enabled
          */
         if (!\Cfg::get('enable_grades_criteria')) {
-            $page->setVar(array(
-                'subject_rubric_block' => ''
-            ));
             return;
         }
 
+        /* Get a list of criteria in this category
+        */
+        $allCriteria = $this->subjectData->getCriteria();
 
+        // there are criteria, retrieve the criterion-grouped scores for the student, map, and output
+        if (count($allCriteria)) {
+            $allStructures = array();
 
-            /* Get a list of criteria in this category
-            */
-            $allCriteria = $this->subjectData->getCriteria();
+            foreach ($allCriteria as $group => $currentCriteria) {
+                foreach ($currentCriteria as $currentCriterion) {
+                    $allStructures[$group][$currentCriterion->getId()]['criterion'] = $currentCriterion;
 
-            // there are criteria, retrieve the criterion-grouped scores for the student, map, and output
-            if (count($allCriteria)) {
-                $allStructures = array();
+                    /* Foreach return, get the result for this criterion
+                     */
+                    foreach ($allSubmissionBoxes as $currentSubmission) {
+                        $allValues = $currentSubmission['rubrics'];
 
-                foreach ($allCriteria as $group => $currentCriteria) {
-                    foreach ($currentCriteria as $currentCriterion) {
-                        $allStructures[$group][$currentCriterion->getId()]['criterion'] = $currentCriterion;
+                        $string = $allValues[$currentCriterion->getId()]['description'];
 
-                        /* Foreach return, get the result for this criterion
+                        /* Do you want to show the rubric int as well?
                          */
-                        foreach ($allSubmissionBoxes as $currentSubmission) {
-                            $allValues = $currentSubmission['rubrics'];
-
-                            $string = $allValues[$currentCriterion->getId()]['description'];
-
-                            /* Do you want to show the rubric int as well?
-                             */
 //                            if ($allValues[$currentCriterion->getId()]['mark']) {
 //                                $string .= " ({$allValues[$currentCriterion->getId()]['mark']})";
 //                            }
 
-                            if ($string) {
-                                $allStructures[$group][$currentCriterion->getId()]['results'][$currentSubmission['box']->getName()] = array(
-                                    'id' => $currentSubmission['box']->getId(),
-                                    'descriptor' => $string
-                                );
-                            }
-                        }
-
-                        if (!count($allStructures[$group][$currentCriterion->getId()]['results'])) {
-                            unset($allStructures[$group][$currentCriterion->getId()]);
+                        if ($string) {
+                            $allStructures[$group][$currentCriterion->getId()]['results'][$currentSubmission['box']->getName()] = array(
+                                'id' => $currentSubmission['box']->getId(),
+                                'descriptor' => $string
+                            );
                         }
                     }
 
-                    if (!count($allStructures[$group])) {
-                        unset($allStructures[$group]);
+                    if (!count($allStructures[$group][$currentCriterion->getId()]['results'])) {
+                        unset($allStructures[$group][$currentCriterion->getId()]);
                     }
                 }
 
+                if (!count($allStructures[$group])) {
+                    unset($allStructures[$group]);
+                }
+            }
+
 //                $page->setVar([ 'SUBJECT_RUBRIC_COLSPAN'    => count($allSubmissionBoxes) + 1 ]);
 
-                /* Render out all the submission box headings
-                 */
+            /* Render out all the submission box headings
+             */
 //                foreach($allSubmissionBoxes as $currentSubmissionBox) {
 //                    $page->setVar(array(
 //                        'SUBJECT_RUBRIC_SUBMISSIONBOX_NAME' => $currentSubmissionBox['box']->getName(),
@@ -601,48 +600,48 @@ class StudentReportCard
 //                    $page->parse('subject_rubric_box_checklist_block', 'subject_rubric_box_checklist', true);
 //                }
 
-                /* Render that all out in the land of phpliberty
-                 */
-                foreach ($allStructures as $group => $currentStructure) {
+            /* Render that all out in the land of phpliberty
+             */
+            foreach ($allStructures as $group => $currentStructure) {
+                $page->setVar(array(
+                    'SUBJECT_RUBRIC_GROUP_NAME' => $group
+                ));
+
+                foreach ($currentStructure as $criterionId => $data) {
                     $page->setVar(array(
-                        'SUBJECT_RUBRIC_GROUP_NAME' => $group
+                        'SUBJECT_RUBRIC_CRITERION_NAME' => $data['criterion']->getName()
                     ));
 
-                    foreach ($currentStructure as $criterionId => $data) {
+                    foreach ($data['results'] as $boxName => $currentResult) {
                         $page->setVar(array(
-                            'SUBJECT_RUBRIC_CRITERION_NAME' => $data['criterion']->getName()
+                            'SUBJECT_RUBRIC_SUBMISSIONBOX_ID'   => $currentResult['id'],
+                            'SUBJECT_RUBRIC_SUBMISSIONBOX_NAME' => $boxName,
+                            'SUBJECT_RUBRIC_CRITERION_MARK'     => $currentResult['descriptor'],
                         ));
 
-                        foreach ($data['results'] as $boxName => $currentResult) {
-                            $page->setVar(array(
-                                'SUBJECT_RUBRIC_SUBMISSIONBOX_ID'   => $currentResult['id'],
-                                'SUBJECT_RUBRIC_SUBMISSIONBOX_NAME' => $boxName,
-                                'SUBJECT_RUBRIC_CRITERION_MARK'     => $currentResult['descriptor'],
-                            ));
-
-                            $page->parse('subject_rubric_criterion_mark_block', 'subject_rubric_criterion_mark', true);
-                        }
-
-                        $page->parse('subject_rubric_criterion_block', 'subject_rubric_criterion', true);
-
-                        /* Clear children after parsing out the parent
-                         */
-                        $page->setVar(array(
-                            'subject_rubric_criterion_mark_block' => ''
-                        ));
+                        $page->parse('subject_rubric_criterion_mark_block', 'subject_rubric_criterion_mark', true);
                     }
 
-                    $page->parse('subject_rubric_group_block', 'subject_rubric_group', true);
+                    $page->parse('subject_rubric_criterion_block', 'subject_rubric_criterion', true);
 
                     /* Clear children after parsing out the parent
                      */
                     $page->setVar(array(
-                        'subject_rubric_criterion_block' => ''
+                        'subject_rubric_criterion_mark_block' => ''
                     ));
                 }
 
-                $page->parse('subject_rubric_block', 'subject_rubric');
+                $page->parse('subject_rubric_group_block', 'subject_rubric_group', true);
+
+                /* Clear children after parsing out the parent
+                 */
+                $page->setVar(array(
+                    'subject_rubric_criterion_block' => ''
+                ));
             }
+
+            $page->parse('subject_rubric_block', 'subject_rubric');
+        }
     }
 
     protected function renderAssessments(\SitePage $page)
