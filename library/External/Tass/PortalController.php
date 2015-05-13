@@ -13,7 +13,7 @@ class External_Tass_PortalController extends Alaress\Web\Controller\Base
      */
     public function parentLounge()
     {
-        $token = $this->getToken();
+        $token = $this->getToken(['prod_code' => 'PL', 'app_code' => 'pl']);
         if ($token) {
             $this->getResponse()->redirect->to(
                 $this->getTassPortalHost()."/ParentLounge/PIALogin.cfm?sso_token=$token"
