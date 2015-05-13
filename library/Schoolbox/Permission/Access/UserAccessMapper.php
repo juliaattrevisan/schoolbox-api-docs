@@ -124,8 +124,8 @@ class UserAccessMapper extends Mapper
     {
         $access = new Collection();
 
-        // start with the userAccess table
-        $internal = $this->findByColumn('uid', $user->getId())->map(function ($ua) use ($user) {
+        // start with the userAccess table (filtering away access level 0)
+        $internal = $this->findByColumnList(['uid' => $user->getId(), 'type' => [ 1, 2, 3 ] ])->map(function ($ua) use ($user) {
             /** @var UserAccess $ua */
             // don't needlessly hold stub replicas of the user in memory
             return $ua->setUser($user);
