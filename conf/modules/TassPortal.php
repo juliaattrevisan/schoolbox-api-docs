@@ -21,9 +21,9 @@ class TassPortal implements ModuleConfigInterface {
      */
     public function configure($kernel)
     {
-//        if ($kernel->getDependencyInjector()->get('config')->get('external_type') == 'tass') {
+        if ($kernel->getDependencyInjector()->get('config')->get('external_type') == 'tass') {
             $module = new \External_Tass_PortalModule($kernel->getDependencyInjector());
             $module->init('/modules/tassportal');
-//        }
+        }
     }
 }
