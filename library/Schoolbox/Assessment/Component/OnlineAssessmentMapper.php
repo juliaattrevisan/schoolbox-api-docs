@@ -185,6 +185,8 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
 
 		$this->registerCallback('preSave', array($this, 'preSave'));
         $this->registerCallback('postSave', array($this, 'postSave'));
+        $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'hardDeleteTask'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteTask'));
 	}
 
 	/**
@@ -230,6 +232,63 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
         }
     }
 
+    /**
+     * Post-softdelete hook.
+     *
+     * * If this quiz belongs to a task in a course instance, delete that task
+     * * Otherwise if it belongs to a task in a course builder, delete that task
+     *
+     * @param OnlineAssessment $object
+     */
+    public function softDeleteTask(OnlineAssessment $object)
+    {
+        $taskInstanceId = null;
+        if ($object->getTaskInstance()) {
+            $taskInstanceId = $object->getTaskInstance()->getId();
+            if ($taskInstanceId) {
+                $this->getJoinMapper('task_instance')->softDelete(
+                    $this->getJoinMapper('task_instance')->findByColumn('id', $taskInstanceId)
+                );
+            }
+        }
+        if (!$taskInstanceId && $object->getTask()) {
+            $taskId = $object->getTask()->getId();
+            if ($taskId) {
+                $this->getJoinMapper('task')->softDelete(
+                    $this->getJoinMapper('task')->findByColumn('id', $taskId)
+                );
+            }
+        }
+    }
+
+    /**
+     * Post-delete hook.
+     *
+     * * If this quiz belongs to a task in a course instance, delete that task
+     * * Otherwise if it belongs to a task in a course builder, delete that task
+     *
+     * @param OnlineAssessment $object
+     */
+    public function hardDeleteTask(OnlineAssessment $object)
+    {
+        $taskInstanceId = null;
+        if ($object->getTaskInstance()) {
+            $taskInstanceId = $object->getTaskInstance()->getId();
+            if ($taskInstanceId) {
+                $this->getJoinMapper('task_instance')->hardDelete(
+                    $this->getJoinMapper('task_instance')->findByColumn('id', $taskInstanceId)
+                );
+            }
+        }
+        if (!$taskInstanceId && $object->getTask()) {
+            $taskId = $object->getTask()->getId();
+            if ($taskId) {
+                $this->getJoinMapper('task')->hardDelete(
+                    $this->getJoinMapper('task')->findByColumn('id', $taskId)
+                );
+            }
+        }
+    }
 
 	/**
 	 * Gets the list of activities related to online assessments.

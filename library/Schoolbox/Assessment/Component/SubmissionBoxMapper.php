@@ -102,6 +102,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
             ->registerCallback('preSave', array($this, 'preSave'))
         ;
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'postSave'));
+        $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'hardDeleteTask'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteTask'));
     }
 
     /**
@@ -228,6 +230,64 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         }
         else {
             $externalMarkbook->updateAssessment($activityFactory->buildFromSubmissionBox($object,'upcoming'));
+        }
+    }
+
+    /**
+     * Post-softdelete hook.
+     *
+     * * If this work belongs to a task in a course instance, delete that task
+     * * Otherwise if it belongs to a task in a course builder, delete that task
+     *
+     * @param SubmissionBox $object
+     */
+    public function softDeleteTask(SubmissionBox $object)
+    {
+        $taskInstanceId = null;
+        if ($object->getTaskInstance()) {
+            $taskInstanceId = $object->getTaskInstance()->getId();
+            if ($taskInstanceId) {
+                $this->getJoinMapper('task_instance')->softDelete(
+                    $this->getJoinMapper('task_instance')->findByColumn('id', $taskInstanceId)
+                );
+            }
+        }
+        if (!$taskInstanceId && $object->getTask()) {
+            $taskId = $object->getTask()->getId();
+            if ($taskId) {
+                $this->getJoinMapper('task')->softDelete(
+                    $this->getJoinMapper('task')->findByColumn('id', $taskId)
+                );
+            }
+        }
+    }
+
+    /**
+     * Post-delete hook.
+     *
+     * * If this work belongs to a task in a course instance, delete that task
+     * * Otherwise if it belongs to a task in a course builder, delete that task
+     *
+     * @param SubmissionBox $object
+     */
+    public function hardDeleteTask(SubmissionBox $object)
+    {
+        $taskInstanceId = null;
+        if ($object->getTaskInstance()) {
+            $taskInstanceId = $object->getTaskInstance()->getId();
+            if ($taskInstanceId) {
+                $this->getJoinMapper('task_instance')->hardDelete(
+                    $this->getJoinMapper('task_instance')->findByColumn('id', $taskInstanceId)
+                );
+            }
+        }
+        if (!$taskInstanceId && $object->getTask()) {
+            $taskId = $object->getTask()->getId();
+            if ($taskId) {
+                $this->getJoinMapper('task')->hardDelete(
+                    $this->getJoinMapper('task')->findByColumn('id', $taskId)
+                );
+            }
         }
     }
 

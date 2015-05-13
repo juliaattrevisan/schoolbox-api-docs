@@ -17,23 +17,24 @@ $answerHandler = new Assess_Answer();
 $sectionHandler = new Assess_Section();
 $groupHandler = new Group();
 
-$assess = $assessHandler->getByID($this->arg[0]);
+$assessId = $this->arg[0];
+$assess   = $assessHandler->getByID($assessId);
 
-if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+if (!$assessHandler->isOwner($assessId) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
 	error(126);
 }
 
 /* Proceed regardless of whether the section has been previously erased or not
  *
 
-if ($assessHandler->isDeleted($this->arg[0])) {
+if ($assessHandler->isDeleted($assessId)) {
 	error(112);
 }
 
  *
  */
 
-$sectionList = $sectionHandler->getList($this->arg[0]);
+$sectionList = $sectionHandler->getList($assessId);
 
 if (is_array($sectionList) && count($sectionList)) {
     foreach($sectionList as $currentSection) {
@@ -65,12 +66,9 @@ if (is_array($sectionList) && count($sectionList)) {
     }
 }
 
-/* Remove assess
- */
-$assessHandler->update(array(
-    'assess_id' => $this->arg[0],
-    'deleted_at' => 'NOW()'
-));
+// Delete thru the mapper so that callbacks apply
+$mapper = new \Schoolbox\Assessment\Component\OnlineAssessmentMapper();
+$mapper->delete($mapper->findById($assessId));
 
 $this->setFile(TEMPLATE_content, 'assess/deleted.html');
 
