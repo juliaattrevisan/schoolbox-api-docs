@@ -212,7 +212,7 @@ abstract class Base {
      *
      * @return string
      */
-    protected function getCurrentYear()
+    public function getCurrentYear()
     {
         return $this->currentYear;
     }

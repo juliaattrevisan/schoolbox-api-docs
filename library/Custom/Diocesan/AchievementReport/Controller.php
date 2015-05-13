@@ -119,6 +119,7 @@ class Controller extends Base {
                 'entriesAndResults' => array(
                     'heading' => $entriesAndResultsTable->getHeading(),
                     'data' => $entriesAndResultsTable->findData(),
+                    'currentYear' => $entriesAndResultsTable->getCurrentYear()
                 )
             )
         ));
