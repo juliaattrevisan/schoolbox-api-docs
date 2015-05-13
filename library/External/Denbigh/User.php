@@ -496,6 +496,16 @@ class External_Denbigh_User implements External_UserInterface {
         return array();
     }
 
+    /**
+     * Not yet implemented for this connector
+     *
+     * @return array
+     */
+    public function getStudentForms()
+    {
+        return [];
+    }
+
 
     /* Getters/Setters
       */

@@ -1077,6 +1077,16 @@ class External_Denbigh2_User implements External_UserInterface
     public function getCampusFromTimetable($staffID) {
     }
 
+    /**
+     * Not yet implemented for this connector
+     *
+     * @return array
+     */
+    public function getStudentForms()
+    {
+        return [];
+    }
+
     /* Getters/Setters
      */
 

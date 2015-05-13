@@ -445,4 +445,10 @@ interface External_UserInterface {
      */
     public function getCampusFromTimetable($staffID);
 
+    /**
+     * Retrieves a list of forms that a student may be in.
+     *
+     * @return array [['Code' => string, 'Description' => string], ...]
+     */
+    public function getStudentForms();
 }

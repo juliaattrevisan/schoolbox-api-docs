@@ -112,6 +112,16 @@ class External_Offline_User implements External_UserInterface
     }
 
     /**
+     * Not yet implemented for this connector
+     *
+     * @return array
+     */
+    public function getStudentForms()
+    {
+        return [];
+    }
+
+    /**
      * List of campuses a staff member is involved in based on timetable
      *
      * @param int $staffID

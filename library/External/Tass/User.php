@@ -504,4 +504,14 @@ class External_Tass_User implements External_UserInterface
     public function getHousemasterByHouseId($houseID)
     {
     }
+
+    /**
+     * Not yet implemented for this connector
+     *
+     * @return array
+     */
+    public function getStudentForms()
+    {
+        return [];
+    }
 }
