@@ -21,7 +21,7 @@ use Schoolbox\File\Exception;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use League\Flysystem;
+use League\Flysystem as Fly;
 
 class Portrait extends BrokenFS
 {
@@ -89,7 +89,7 @@ class Portrait extends BrokenFS
         $cacheDir  = pathinfo($cachePath, PATHINFO_DIRNAME);
 
         try {
-            /** @var Flysystem\Directory $dir */
+            /** @var Fly\Directory $dir */
             $dir = $this->cacheFs->get($cacheDir);
 
             foreach ($dir->getContents() as $meta) {
@@ -98,7 +98,7 @@ class Portrait extends BrokenFS
                     $this->cacheFs->delete($meta['path']);
                 }
             }
-        } catch (Flysystem\FileNotFoundException $e) {
+        } catch (Fly\FileNotFoundException $e) {
             // this simply means the cache directory doesn't exist
         }
     }
