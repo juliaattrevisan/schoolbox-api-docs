@@ -11,11 +11,14 @@ namespace Alaress\Scheduler;
 
 
 use Alaress\Scheduler\Interactive\Interactor;
+use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
+use Alaress_Date_Format;
 use Exception;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use React\EventLoop\Timer\TimerInterface;
 use React\Stomp\AckResolver;
 use React\Stomp\Client;
 use React\Stomp\Exception\ConnectionException;
@@ -134,6 +137,46 @@ abstract class StompScheduler extends AbstractScheduler {
 		if(in_array('pool', $fields)) {
 			$status['pool'] = $this->getDispatcher()->getPoolStatus();
 		}
+
+        if (in_array('schedule', $fields)) {
+            $schedule = [];
+
+            $now = Alaress_Date_Format::now();
+
+            foreach ($this->timers as $class => $labels) {
+                foreach ($labels as $label => $hashes) {
+                    foreach ($hashes as $hash => $timer) {
+                        /** @var TimerInterface $timer */
+
+                        /** @var TriggerInterface $trigger */
+                        $trigger = $timer->getData();
+
+                        $object = $trigger->getEvent()->getObject();
+
+                        if (method_exists($object, 'getId')) {
+                            $objectString = $hash = "$class ({$object->getId()})";
+                        } else {
+                            $objectString = $class;
+                        }
+
+                        $hash = substr(sha1($hash), 0, 8);
+                        $time = Alaress_Date_Format::now()->setTimestamp($trigger->getTimestamp());
+                        $when = $time->getDatabase();
+                        $diff = $time->diffInMinutes($now);
+
+                        if ($diff < 60 && $diff >= 0) {
+                            $when .= " ({$time->getRelativeTime()})";
+                        }
+
+                        $schedule[$hash]['__obj'] = $objectString;
+                        $schedule[$hash][$label]  = $when;
+                    }
+                }
+            }
+
+
+            $status['schedule'] = $schedule;
+        }
 
 		return $status;
 	}
