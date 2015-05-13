@@ -1044,7 +1044,7 @@ class External_Maze_User implements External_UserInterface {
      *
      * @return array
      */
-    public function retrieveLuForm()
+    public function getStudentForms()
     {
         return [];
     }

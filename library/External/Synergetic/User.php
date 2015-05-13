@@ -993,7 +993,7 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * {@inheritdoc}
      */
-    public function retrieveLuForm()
+    public function getStudentForms()
     {
         $query = "
             SELECT Code, Description

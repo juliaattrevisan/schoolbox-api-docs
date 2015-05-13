@@ -450,5 +450,5 @@ interface External_UserInterface {
      *
      * @return array [['Code' => string, 'Description' => string], ...]
      */
-    public function retrieveLuForm();
+    public function getStudentForms();
 }

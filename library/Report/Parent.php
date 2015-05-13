@@ -176,7 +176,7 @@ class Report_Parent extends Report_Abstract {
 
 		/* Search Form dropdown preselection
 		 */
-		$allForms = $this->getExternalUserHandler()->retrieveLuForm();
+		$allForms = $this->getExternalUserHandler()->getStudentForms();
 
 		if (is_array($allForms) && count($allForms)) {
 			foreach($allForms as $currentForm) {

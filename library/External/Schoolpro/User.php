@@ -527,7 +527,7 @@ class External_Schoolpro_User implements External_UserInterface {
      *
      * @return array
      */
-    public function retrieveLuForm()
+    public function getStudentForms()
     {
         return [];
     }
