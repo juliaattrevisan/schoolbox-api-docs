@@ -27,16 +27,16 @@ class External_Tass_PortalModule extends \Alaress\Module\Module
      */
     public function initControllers(ContainerInterface $injector)
     {
-        // Add a External_Tass_SSO object
+        $config = $injector->get('config');
         $injector->set(
             'tassportal:sso',
             $injector->lazyNew(
                 External_Tass_SSO::class,
                 [
                     'configuration' => [
-                        'token_key' => 'L@g00n1917',
+                        'token_key' => $config->get('external_tass_sso_token_key'),
                     ],
-                    'server' => 'https://tassportal.cathedral.qld.edu.au/tassweb/external/sso_gateway.cfm',
+                    'server' => $config->get('external_tass_sso_server'),
                 ]
             )
         );
@@ -46,7 +46,7 @@ class External_Tass_PortalModule extends \Alaress\Module\Module
                 External_Tass_PortalController::class,
                 [
                     'sso'        => $injector->lazyGet('tassportal:sso'),
-                    'portalHost' => 'https://tassportal.cathedral.qld.edu.au/',
+                    'portalHost' => $config->get('external_staff_portal'),
                 ]
             )
         );
