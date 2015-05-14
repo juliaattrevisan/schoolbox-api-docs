@@ -150,10 +150,6 @@ class DueWork_Detail
      */
     public function renderDetails(SitePage $page)
     {
-
-        $allowedHandler  = new AllowedFile();
-        $fileTypeHandler = new FileType('');
-
         // setup blocks, etc
         $page->setTab('submission');
         $page->setFile(TEMPLATE_content, 'submission/viewSubmission.html');
@@ -164,6 +160,7 @@ class DueWork_Detail
         $page->setBlock('student_row', 'submission_after_mark', 'submission_after_mark_block');
         $page->setBlock(TEMPLATE_content, 'download_btn', 'download_btn_block');
         $page->setBlock(TEMPLATE_content, 'modify_btn', 'modify_btn_block');
+        $page->setBlock(TEMPLATE_content, 'report_btn', 'report_btn_block');
 
         $page->setBlock('submission_row', 'download_action', 'download_action_block');
         $page->setBlock('submission_row', 'delete_action', 'delete_action_block');
@@ -203,6 +200,7 @@ class DueWork_Detail
             $page->setVar('student_row_block', 'This subject has no students in it.');
             $page->setVar('download_btn_block', '');
             $page->setVar('modify_btn_block', '');
+            $page->setVar('report_btn_block', '');
             $page->setVar('DUEWORK_ARCHIVED', '');
             return;
         }
@@ -368,6 +366,13 @@ class DueWork_Detail
             $page->setVar('modify_btn_block', '');
         } else {
             $page->parse('modify_btn_block', 'modify_btn');
+        }
+
+        // show or hide the report button, based on rubricality
+        if ($this->marksheet->getSlug() == 'rubric') {
+            $page->parse('report_btn_block', 'report_btn');
+        } else {
+            $page->setVar('report_btn_block', '');
         }
 
         // show or hide the archived warning, based on end date

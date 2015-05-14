@@ -9,9 +9,19 @@
 
 namespace Schoolbox;
 
+use PDOStatement;
 use Schoolbox;
 use Schoolbox\Permission\Access\UserAccessMapper;
 
+/**
+ * Class UserMapper
+ *
+ * @package Schoolbox
+ * @method User findById($id)
+ * @method User findOneByColumn($columnName, $columnValue, $order = [])
+ * @method User findOneByColumnList($columnList, $order = [])
+ * @method User hydrate($row, $alias = '', $callback = null)
+ */
 class UserMapper extends Mapper
 {
 
@@ -212,47 +222,54 @@ class UserMapper extends Mapper
         );
 
         $this->joinsVia('user_link', UserMapper::class, 'id', 'linked_user_id', 'user_id', null, null, null, 'linkedUser');
+
+        $this->joinsVia('userCampus', CampusMapper::class, 'id', 'campus', 'uid', 'id', null, null, 'campusCollection');
     }
 
-    public function findById($id)
+
+    /**
+     * @return string
+     */
+    protected function getSelectString()
     {
+        return "
+            SELECT {$this->getColumnString('user')}, IF(su.id, 1, 0) as `user.superuser`,
+                    {$this->getJoinColumnString('role', 'g')},
+                    {$this->getJoinColumnString('userCampus', 'c')}, v_c.defaultCampus as `uc.defaultCampus`,
+                    {$this->getColumnString('lu')}
+            FROM `user`
+            LEFT JOIN superusers su ON su.id = user.id
+            LEFT JOIN {$this->getJoinSql('role', 'user', 'g')}
+            LEFT JOIN {$this->getJoinSql('userCampus', 'user', 'c')}
+            LEFT JOIN {$this->getJoinSql('user_link', 'user', 'lu')}
+        ";
+    }
 
-        $user = false;
-        $roleMapper = new RoleMapper;
-        $campusMapper = new CampusMapper;
-        $linkedUserList = array();
 
-        $statement = $this->database->prepare(
-            "
-			SELECT {$this->getColumnString('u')}, IF(su.id, 1, 0) as `u.superuser`,
-					{$roleMapper->getColumnString('g')},
-					{$campusMapper->getColumnString('c')}, uc.defaultCampus as `uc.defaultCampus`,
-					{$this->getColumnString('lu')}
-					FROM `user` u
-			LEFT JOIN `groups` g ON group_id = g.`id`
-			LEFT JOIN userCampus uc ON uc.`uid`=u.id
-			LEFT JOIN superusers su ON su.id = u.id
-			LEFT JOIN luCampus c ON c.id = uc.`campus`
-			LEFT JOIN {$this->getJoinSql('user_link', 'u', 'lu')}
-			WHERE u.id = ?
-			"
-        );
+    /**
+     * @param PDOStatement $statement
+     * @return Collection
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        /** @var User[] $users */
+        $users = [];
 
-        $statement->execute(array($id));
-
-        /** @var User $user */
         foreach ($statement as $row) {
-            if (!($user instanceof User)) {
-                $user = $this->hydrate($row, 'u');
-                $user->setSuperUser($row['u.superuser'] == 1);
-                $user->setRole($roleMapper->hydrate($row, 'g'));
+
+            $userId = $row['user.id'];
+
+            if (empty($users[$userId])) {
+                $users[$userId] = $this->hydrate($row, 'user');
+                $users[$userId]->setSuperUser($row['user.superuser'] == 1);
+                $users[$userId]->setRole($this->hydrateJoin($row, 'role', 'g'));
 
                 /** @var UserAccessMapper $uaMapper */
                 $uaMapper = $this->getJoinMapper('userAccess');
-                $user->setAccessList($uaMapper->findAllForUser($user));
+                $users[$userId]->setAccessList($uaMapper->findAllForUser($users[$userId]));
             }
 
-            $campus = $campusMapper->hydrate($row, 'c');
+            $campus = $this->hydrateJoin($row, 'userCampus', 'c');
 
             /* If the campus object has no id, then it spawned a campus
              * object from nonexistent data (e.g. a user with no campus)
@@ -260,28 +277,21 @@ class UserMapper extends Mapper
              * still occupy slots in the user's campus collection stack
              */
             if ($campus->getId()) {
-                $user->getCampusCollection()->add($campus);
+                $users[$userId]->getCampusCollection()->add($campus);
 
                 if ($row['uc.defaultCampus'] == 1) {
-                    $user->setDefaultCampus($campus);
+                    $users[$userId]->setDefaultCampus($campus);
                 }
             }
 
-            $linkedUser = $this->hydrate($row,'lu');
+            $linkedUser = $this->hydrate($row, 'lu');
+
             if ($linkedUser->getId()) {
-                $linkedUserList[$linkedUser->getId()] = $linkedUser;
+                $users[$userId]->getLinkedUser()->add($linkedUser);
             }
         }
 
-        if (count($linkedUserList)) {
-            $linkedCollection = new Collection($linkedUserList);
-            $user->setLinkedUser($linkedCollection);
-        }
-
-        if (!($user instanceof User)) {
-            throw new Schoolbox\Mapper\Exception('Instance of object not found');
-        }
-        return $user;
+        return $this->createCollection(array_values($users));
     }
 
     /**
@@ -398,13 +408,13 @@ class UserMapper extends Mapper
         $permittedValuesSql = implode(',', $permittedValues);
 
         $query = "
-			SELECT
-				{$this->getColumnString('u')},
-				{$roleMapper->getColumnString('g')}
-			FROM `{$this->table}` u
-			LEFT JOIN `groups` g ON group_id = g.`id`
-			WHERE (firstname LIKE ? OR lastname LIKE ?)
-			AND group_id IN ({$permittedValuesSql})
+            SELECT
+                {$this->getColumnString('u')},
+                {$roleMapper->getColumnString('g')}
+            FROM `{$this->table}` u
+            LEFT JOIN `groups` g ON group_id = g.`id`
+            WHERE (firstname LIKE ? OR lastname LIKE ?)
+            AND group_id IN ({$permittedValuesSql})
         ";
 
         $statement = $this->database->prepare($query);

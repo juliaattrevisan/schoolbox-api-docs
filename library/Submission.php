@@ -3,6 +3,9 @@
 /* Due Work: Recent work. Should be a multiple of 3 because there are three
 * types: Due, Awaiting and Marked.
 */
+use Schoolbox\Collection;
+use Schoolbox\Role;
+
 define('UPCOMING_WORK_TYPE', 1);
 define('AWAITING_WORK_TYPE', 2);
 define('RETURNED_WORK_TYPE', 3);
@@ -1425,7 +1428,7 @@ class Submission extends DeprecatedModel
      *
      * @return \Schoolbox\Collection|\Schoolbox\User[]
      */
-    public function getAllStudentsForSubmission(\Schoolbox\Assessment\Component\SubmissionBox $box)
+    public function getAllParticipantsForSubmission(\Schoolbox\Assessment\Component\SubmissionBox $box)
     {
         $studentList = array();
 
@@ -1475,7 +1478,8 @@ class Submission extends DeprecatedModel
          */
         $userMapper = new \Schoolbox\UserMapper();
 
-        $allStudents = new \Schoolbox\Collection();
+        // let's dedupe this list, shall we?
+        $seen = [];
 
         /* External sources won't provide a uid value, so find a user by
          * using the external id instead
@@ -1483,18 +1487,29 @@ class Submission extends DeprecatedModel
         foreach ($studentList as $currentStudent) {
             try {
                 if (isset($currentStudent['uid'])) {
-                    $user = $userMapper->findById($currentStudent['uid']);
-                } else {
-                    $user = $userMapper->findOneByColumn('synergy_id', $currentStudent['synergy_id']);
-                }
 
-                $allStudents->add($user);
-            } /* Ignore unfound users
-             */
-            catch (\Exception $e) {
+                    $userId = $currentStudent['uid'];
+
+                    if (empty($seen[$userId])) {
+                        $user = $userMapper->findById($userId);
+                        $seen[$userId] = $user;
+                    }
+
+                } else {
+                    // we don't have a user ID, so we can't check for duplicate before running this query :(
+                    $user = $userMapper->findOneByColumn('synergy_id', $currentStudent['synergy_id']);
+
+                    $userId = $user->getId();
+
+                    if (empty($seen[$userId])) {
+                        $seen[$userId] = $user;
+                    }
+                }
+            } catch (Schoolbox\Mapper\Exception $e) {
+                // noop - ignore unfound users
             }
         }
 
-        return $allStudents;
+        return new Collection(array_values($seen));
     }
 }

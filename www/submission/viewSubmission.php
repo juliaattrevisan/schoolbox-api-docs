@@ -34,7 +34,7 @@ $categoryCodeMapper = new \Schoolbox\Resource\CategoryCodeMapper();
 $categoryCode = $categoryCodeMapper->findForCategory($submissionBox->getCategory()->getId());
 $submissionBox->getCategory()->setCodes($categoryCode);
 
-$studentList = $submissionHandler->getAllStudentsForSubmission($submissionBox);
+$studentList = $submissionHandler->getAllParticipantsForSubmission($submissionBox);
 
 $dueWorkDetail = new DueWork_Detail($submissionBox);
 $dueWorkDetail->processStudents($studentList);

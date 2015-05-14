@@ -52,7 +52,7 @@ $submissionBox->getCategory()->setCodes($categoryCode);
 /* Crappy handler
  */
 $submissionHandler = new Submission();
-$studentList = $submissionHandler->getAllStudentsForSubmission($submissionBox);
+$studentList = $submissionHandler->getAllParticipantsForSubmission($submissionBox);
 
 /* Uniqueify list (why this returns dupes, I'm not entirely sure)
  */
