@@ -87,7 +87,6 @@ $(document).ready(function() {
                         var clone = template.clone();
                         clone.attr('id', 'file-' + row.id);
                         clone.find('span.file').text(row.name).addClass(row.icon);
-                        clone.find('td:eq(1)').text(row.modified);
                         clone.addClass('category-' + categoryId);
 
                         if (row.url) {
@@ -259,7 +258,6 @@ $(document).ready(function() {
 							<td>
 								<span class="file"></span>
 							</td>
-            <td></td>
           </tr>
          </tfoot>
       </table>
