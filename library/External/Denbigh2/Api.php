@@ -106,7 +106,7 @@ class External_Denbigh2_Api {
              * Advised by Gort
              */
             $mungedValues[$keystring] = $keys[$i];
-            $mungedValues[$valuestring] = "%3D%3D{$values[$i]}";
+            $mungedValues[$valuestring] = "=={$values[$i]}";
         }
 
         $dataset = array_merge($authentication, $mungedValues, $options);
@@ -294,7 +294,7 @@ class External_Denbigh2_Api {
      *
      * @return string
      */
-    private function getGeneratedRequestUrl()
+    public function getGeneratedRequestUrl()
     {
         return $this->generatedRequestUrl;
     }

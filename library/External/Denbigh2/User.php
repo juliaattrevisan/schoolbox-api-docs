@@ -1006,26 +1006,28 @@ class External_Denbigh2_User implements External_UserInterface
     public function getPortrait($externalUserId)
     {
         $photoPath = Config::get('portrait_dir') . '/' . $externalUserId . '.jpg';
+
         if(is_readable($photoPath)) {
             return $photoPath;
         }
         else {
-
             $userMapper = new \Schoolbox\UserMapper();
+            $roleMapper = new \Schoolbox\RoleMapper();
 
             try {
                 $user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
+                $role = $roleMapper->findById($user->getRole()->getId());
             }
             catch (\Exception $e) {
                 return false;
             }
 
-            if ($user->getRole()->isStudent()) {
+            if ($role->isStudent()) {
                 $api = new External_Denbigh2_Api('Photos', array(
                     'Community ID' => $externalUserId
                 ));
             }
-            elseif ($user->getRole()->isStaff()) {
+            elseif ($role->isStaff()) {
                 $api = new External_Denbigh2_Api('Photos', array(
                     'z_StaffCode' => $externalUserId
                 ));
@@ -1044,7 +1046,6 @@ class External_Denbigh2_User implements External_UserInterface
 
         return false;
     }
-
 
     /**
      * Determine whether someone is a day boarder or not
@@ -1084,7 +1085,7 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStudentForms()
     {
-        return [];
+        return array();
     }
 
     /* Getters/Setters
