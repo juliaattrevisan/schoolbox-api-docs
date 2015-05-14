@@ -58,7 +58,8 @@
         {% endif %}
             <td class="api-call">
                 {{ currentResult.label }}
-                <span>{{ currentResult.method }}</span>
+                <span>{{ currentResult.method }}</span><br />
+                <span>{{ currentResult.url }}</span>
             </td>
             <td class="missing-properties">
                 {% if currentResult.missingProperties|length %}
@@ -71,6 +72,10 @@
             </td>
             <td>
                 <code>{{ currentResult.output }}</code>
+
+                {% if currentResult.method == 'Photos' %}
+                <img alt="Embedded Image" src="data:image/png;base64,{{ currentResult.outputStructure.PhotoBase64Encoded }}" />
+                {% endif %}
             </td>
         </tr>
         {% endfor %}

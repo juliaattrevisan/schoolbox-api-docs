@@ -290,7 +290,7 @@ class External_Denbigh2_Api {
      *
      * @return string
      */
-    private function getGeneratedRequestUrl()
+    public function getGeneratedRequestUrl()
     {
         return $this->generatedRequestUrl;
     }

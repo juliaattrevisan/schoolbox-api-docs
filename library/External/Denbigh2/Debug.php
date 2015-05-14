@@ -212,6 +212,7 @@ class External_Denbigh2_Debug {
             $result['label'] = $currentApi['label'];
             $result['method'] = $currentApi['method'];
             $result['state'] = 0;
+            $result['url'] = $currentApi['api']->getGeneratedRequestUrl();
 
             /* Any generic errors: curl errors, 500 Filemaker Error, etc
              */
@@ -233,6 +234,7 @@ class External_Denbigh2_Debug {
                 $shiaLeBuff = ob_get_contents();
                 ob_end_clean();
 
+                $result['outputStructure'] = $row;
                 $result['output'] = $shiaLeBuff;
 
                 if (!count($missingProperties)) {
