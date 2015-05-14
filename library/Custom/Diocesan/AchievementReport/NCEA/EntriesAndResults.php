@@ -49,16 +49,16 @@ class EntriesAndResults extends Base {
             /* Teachers
              * Trim empty teachers out for course teachers
              */
-            if (strlen($current['ClassTeacher1'])) {
-                $finalStack[$courseName]['allTeachers'][$current['ClassTeacher1']] = $current['ClassTeacher1Email'];
-            }
+            foreach(array(1, 2, 3) as $currentTeacherIndex) {
+                $key = "ClassTeacher{$currentTeacherIndex}";
+                $emailKey = "ClassTeacher{$currentTeacherIndex}Email";
 
-            if (strlen($current['ClassTeacher2'])) {
-                $finalStack[$courseName]['allTeachers'][$current['ClassTeacher2']] = $current['ClassTeacher2Email'];
-            }
+                $currentTeacher = $current[$key];
+                $currentTeacherEmail = $current[$emailKey];
 
-            if (strlen($current['ClassTeacher3'])) {
-                $finalStack[$courseName]['allTeachers'][$current['ClassTeacher3']] = $current['ClassTeacher3Email'];
+                if (strlen($currentTeacher)) {
+                    $finalStack[$courseName]['allTeachers'][$currentTeacher] = $currentTeacherEmail;
+                }
             }
 
             /* Entries

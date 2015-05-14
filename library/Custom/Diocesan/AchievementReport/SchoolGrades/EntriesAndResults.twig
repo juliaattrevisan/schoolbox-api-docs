@@ -11,19 +11,10 @@
                 {{ courseName }}
 
                 <ul class="teacher-list">
-                    {% for currentTeacher in areaData.allTeachers %}
-                    {% for currentTeacherName, currentTeacherEmail in currentTeacher %}
+                    {% for currentTeacherName, currentTeacherEmail in areaData.allTeachers %}
                     <li>
-                        <em>
-                        {% if currentTeacherEmail != '' %}
-                            <a href='mailto:{{ currentTeacherEmail }}'>{{ currentTeacherName }}</a></em>
-                        {% else %}
-                            {{ currentTeacherName }}
-                        {% endif %}
-                        </em>
-                        {% if not loop.last %}, {% endif %}
+                        <em>{% if currentTeacherEmail != '' %}<a href='mailto:{{ currentTeacherEmail }}'>{{ currentTeacherName }}</a></em>{% else %}{{ currentTeacherName }}{% endif %}</em>{% if not loop.last %}, {% endif %}
                     </li>
-                    {% endfor %}
                     {% endfor %}
                 </ul>
             </td>

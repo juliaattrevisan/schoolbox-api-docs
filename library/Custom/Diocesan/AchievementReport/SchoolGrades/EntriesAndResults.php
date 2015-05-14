@@ -66,10 +66,8 @@ class EntriesAndResults extends Base {
                 $currentTeacher = $currentEntry[$key];
                 $currentTeacherEmail = $currentEntry[$emailKey];
 
-                if (strlen($currentTeacher) && !in_array($currentTeacher, $finalStack[$year][$courseName]['allTeachers'])) {
-                    $finalStack[$year][$courseName]['allTeachers'][] = array(
-                        $currentTeacher => $currentTeacherEmail
-                    );
+                if (strlen($currentTeacher)) {
+                    $finalStack[$year][$courseName]['allTeachers'][$currentTeacher] = $currentTeacherEmail;
                 }
             }
 
