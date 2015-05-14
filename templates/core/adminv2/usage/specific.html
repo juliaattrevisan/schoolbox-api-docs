@@ -26,7 +26,8 @@
 			title: 'Category'
 		});
 
-		$('#user-usage').usageTabulator({
+        var usageTable = $('#user-usage');
+		usageTable.usageTabulator({
 			url: '/adminv2/usage/ajax/specificAjax?type=files&userId={USAGE_USER_ID}',
 			title: 'Files',
 			orderBy: 'bytes',
@@ -39,9 +40,20 @@
 				{column: 'bytes', label: 'Size'},
 				{column: 'groupName', label: 'Location'},
                 {column: 'categoryName', label: 'Category'},
-				{column: 'mime_type', label: 'Type'}
+				{column: 'mime_type', label: 'Type'},
+                {column: '', label: 'Delete'}
 			]
 		});
+
+        usageTable.on('click', '[data-action="delete"]', function(event) {
+            event.preventDefault();
+            if (confirm('Are you sure you wish to delete this file?')) {
+                $.get(this.href)
+                    .done(function() {
+                        window.location.reload();
+                    });
+            }
+        });
 	});
 </script>
 

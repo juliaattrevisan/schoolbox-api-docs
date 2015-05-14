@@ -9,231 +9,276 @@
  */
 namespace Schoolbox\Usage\Specific;
 
-class AjaxFlot {
+class AjaxFlot
+{
 
-	/**
-	 * An instance of UsageMapper
-	 *
-	 * @var null
-	 */
-	private $mapper = null;
+    /**
+     * An instance of UsageMapper
+     *
+     * @var UsageMapper
+     */
+    private $mapper = null;
 
-	/**
-	 * Constructor
-	 *
-	 * @param $userId
-	 */
-	public function __construct($userId) {
-		$this->setMapper(new UsageMapper($userId));
-	}
+    /**
+     * Constructor
+     *
+     * @param $userId
+     */
+    public function __construct($userId)
+    {
+        $this->setMapper(new UsageMapper($userId));
+    }
 
-	/**
-	 * Delegation method
-	 *
-	 * Find total usage
-	 *
-	 * @return bool|float|int|string
-	 */
-	public function findTotalUsage() {
-		$used = $this->getMapper()->findTotalUsage();
+    /**
+     * Delegation method
+     *
+     * Find total usage
+     *
+     * @return bool|float|int|string
+     */
+    public function findTotalUsage()
+    {
+        $used = $this->getMapper()->findTotalUsage();
 
-		$result = array(
-			'label' => 'Used',
-			'data' => (int)$used,
-		);
+        $result = array(
+            'label' => 'Used',
+            'data' => (int)$used,
+        );
 
-		return json_encode($result);
-	}
+        return json_encode($result);
+    }
 
-	/**
-	 * Delegation method
-	 *
-	 * Find total group usage
-	 *
-	 * @return bool|float|int|string
-	 */
-	public function findGroupUsage() {
-		$allData = $this->getMapper()->findGroupUsage();
-		$allResults = array();
+    /**
+     * Delegation method
+     *
+     * Find total group usage
+     *
+     * @return bool|float|int|string
+     */
+    public function findGroupUsage()
+    {
+        $allData = $this->getMapper()->findGroupUsage();
+        $allResults = array();
 
-		for ($i = 0; $i < count($allData); $i++) {
-			$currentData = $allData[$i];
+        for ($i = 0; $i < count($allData); $i++) {
+            $currentData = $allData[$i];
 
-			$result = array();
-			$result['label'] = $currentData['name'];
-			$result['data'] = (int)$currentData['bytes'];
+            $result = array();
+            $result['label'] = $currentData['name'];
+            $result['data'] = (int)$currentData['bytes'];
 
-			$allResults[] = $result;
-		}
+            $allResults[] = $result;
+        }
 
-		return json_encode($allResults);
-	}
+        return json_encode($allResults);
+    }
 
-	/**
-	 * Calculate percentage
-	 *
-	 * @param $top
-	 * @param $bottom
-	 * @return float|int
-	 */
-	private function percentage($top, $bottom) {
-		if (!$bottom) {
-			return 0;
-		}
+    /**
+     * Calculate percentage
+     *
+     * @param $top
+     * @param $bottom
+     * @return float|int
+     */
+    private function percentage($top, $bottom)
+    {
+        if (!$bottom) {
+            return 0;
+        }
 
-		return 100*$top/$bottom;
-	}
+        return 100*$top/$bottom;
+    }
 
-	/**
-	 * Delegation method
-	 *
-	 * Find total type usage and pie it out, which uses a percentage
-	 *
-	 * @return bool|float|int|string
-	 */
-	public function findTypeUsage() {
-		$allData = $this->getMapper()->findTypeUsage();
+    /**
+     * Delegation method
+     *
+     * Find total type usage and pie it out, which uses a percentage
+     *
+     * @return bool|float|int|string
+     */
+    public function findTypeUsage()
+    {
+        $allData = $this->getMapper()->findTypeUsage();
 
-		$allResults = array();
-		$totalBytes = 0;
+        $allResults = array();
+        $totalBytes = 0;
 
-		/* Find the total
+        /* Find the total
 		 */
-		foreach ($allData as $currentData) {
-			$totalBytes += $currentData['bytes'];
-		}
+        foreach ($allData as $currentData) {
+            $totalBytes += $currentData['bytes'];
+        }
 
-		/* Find each segment
+        /* Find each segment
 		 */
-		foreach ($allData as $currentData) {
-			$result = array();
-			$result['label'] = $currentData['name'];
-			$result['data'] = $this->percentage($currentData['bytes'], $totalBytes);
+        foreach ($allData as $currentData) {
+            $result = array();
+            $result['label'] = $currentData['name'];
+            $result['data'] = $this->percentage($currentData['bytes'], $totalBytes);
 
-			$allResults[] = $result;
-		}
+            $allResults[] = $result;
+        }
 
-		return json_encode($allResults);
-	}
+        return json_encode($allResults);
+    }
 
-	/**
-	 * Delegation method
-	 *
-	 * Find total file usage
-	 *
-	 * @param $orderBy
-	 * @param $order
-	 * @param $index
-	 * @param $numPerPage
-	 */
-	public function findFileUsage($orderBy, $order, $index, $numPerPage) {
-		$allData = $this->getMapper()->findFileUsage($orderBy, $order, $index, $numPerPage);
+    /**
+     * Delegation method
+     *
+     * Find total file usage
+     *
+     * @param $orderBy
+     * @param $order
+     * @param $index
+     * @param $numPerPage
+     */
+    public function findFileUsage($orderBy, $order, $index, $numPerPage)
+    {
+        $allData = $this->getMapper()->findFileUsage($orderBy, $order, $index, $numPerPage);
 
-		$page = new \SitePage();
-		$page->setFile('file_list', '/adminv2/usage/file.html');
-		$page->setBlock('file_list', 'file', 'file_block');
+        $page = new \SitePage();
+        $page->setFile('file_list', '/adminv2/usage/file.html');
+        $page->setBlock('file_list', 'file', 'file_block');
         $page->setBlock('file', 'file_storage', 'file_storage_block');
-
+        $page->setBlock('file', 'file_submission', 'file_submission_block');
+        $page->setBlock('file', 'file_return', 'file_return_block');
         $page->setBlock('file', 'file_sbfs', 'file_sbfs_block');
         $page->setBlock('file', 'has_category', 'has_category_block');
         $page->setBlock('file', 'no_category', 'no_category_block');
+        $page->setBlock('file', 'is_deletable', 'is_deletable_block');
 
         $page->setBlock('file', 'file_myfile', 'file_myfile_block');
         $page->setBlock('file', 'file_unlinked', 'file_unlinked_block');
 
         $page->setVar(array(
             'file_storage_block' => '',
+            'file_submission_block' => '',
+            'file_return_block' => '',
             'file_sbfs_block' => '',
             'file_myfile_block' => '',
             'file_unlinked_block' => '',
             'has_category_block' => '',
             'no_category_block' => '',
+            'is_deletable_block' => '',
         ));
 
-		/* Really? You should be passing the bytes as constructor arg
+        /* Really? You should be passing the bytes as constructor arg
 		 */
-		$bytes = new \Alaress_Byte_Format();
+        $bytes = new \Alaress_Byte_Format();
 
-		foreach ($allData as $currentData) {
-			$page->setVar(array(
+//        var_dump($allData);
+        foreach ($allData as $currentData) {
+            $page->setVar(array(
                 'FILE_ID' => $currentData['id'],
-				'FILE_FILENAME' => $currentData['name'],
-				'FILE_BYTES' => $bytes->bytesToString($currentData['bytes']),
-				'FILE_GROUPNAME' => $currentData['groupName'],
-				'FILE_MIMETYPE' => $currentData['mime_type'],
-			));
+                'FILE_HASH' => $currentData['hash'],
+                'FILE_FILENAME' => $currentData['name'],
+                'FILE_BYTES' => $bytes->bytesToString($currentData['bytes']),
+                'FILE_GROUPNAME' => $currentData['groupName'],
+                'FILE_MIMETYPE' => $currentData['mime_type'],
+                'FILE_CATEGORY_ID' => $currentData['categoryId'],
+                'FILE_CATEGORY_NAME' => $currentData['categoryName'],
+            ));
 
             /* Link Storage files
              */
             if ($currentData['groupName'] == 'Storage') {
-                $hash = $currentData['hash'];
-
                 $page->setVar(array(
-                    'FILE_HASH' => $hash,
+                    'FILE_LOCATION' => 'storage',
                 ));
 
                 $page->parse('file_storage_block', 'file_storage');
                 $page->parse('no_category_block', 'no_category');
-            }
-            /* Link SBFS files
+                // Not deletable
+            } /* Link SBFS files
              */
-            else if ($currentData['groupName'] == 'File') {
+            elseif ($currentData['groupName'] == 'File') {
                 $page->setVar(array(
-                    'FILE_CATEGORY_ID' => $currentData['categoryId'],
-                    'FILE_CATEGORY_NAME' => $currentData['categoryName']
+                    'FILE_LOCATION' => 'sbfs',
+                    'FILE_DELETE_URL' => '/cms/fileForm.php?delete='.$currentData['id'],
                 ));
 
                 $page->parse('file_sbfs_block', 'file_sbfs');
                 $page->parse('has_category_block', 'has_category');
-            }
-            /* Link MyFile
+                $page->parse('is_deletable_block', 'is_deletable');
+            } /* Link MyFile
              */
-            else if ($currentData['groupName'] == 'My File') {
+            elseif ($currentData['groupName'] == 'My File') {
+                $page->setVar(array(
+                    'FILE_LOCATION' => 'myfile',
+                    'FILE_DELETE_URL' => '/cms/myFileForm.php?delete='.$currentData['id'],
+                ));
                 $page->parse('file_myfile_block', 'file_myfile');
                 $page->parse('no_category_block', 'no_category');
-            }
-            /* None of the above
+                $page->parse('is_deletable_block', 'is_deletable');
+            } /* Student Submissions
+             */
+            elseif ($currentData['groupName'] == 'Submission') {
+                $page->setVar(array(
+                    'FILE_LOCATION' => 'submission',
+                    'FILE_DELETE_URL' => '/submission/viewSubmissionForm.php?delete='.$currentData['id'],
+                ));
+                $page->parse('file_submission_block', 'file_submission');
+                $page->parse('has_category_block', 'has_category');
+                $page->parse('is_deletable_block', 'is_deletable');
+            } elseif ($currentData['groupName'] == 'Return') {
+                $page->setVar(array(
+                    'FILE_LOCATION' => 'return',
+                    'FILE_DELETE_URL' => '/submission/returnWorkForm.php?delete='.$currentData['id'],
+                ));
+                $page->parse('file_return_block', 'file_return');
+                $page->parse('has_category_block', 'has_category');
+                $page->parse('is_deletable_block', 'is_deletable');
+            } /* None of the above
              */
             else {
+                $page->setVar(array(
+                    'FILE_LOCATION' => 'unlinked',
+                ));
                 $page->parse('file_unlinked_block', 'file_unlinked');
                 $page->parse('no_category_block', 'no_category');
+                // I can't very well delete something whose location I don't know
             }
 
-			$page->parse('file_block', 'file', true);
+            $page->parse('file_block', 'file', true);
 
             /* Clear children after parsing out the parent
              */
             $page->setVar(array(
                 'file_storage_block' => '',
+                'file_submission_block' => '',
+                'file_return_block' => '',
                 'file_sbfs_block' => '',
                 'file_myfile_block' => '',
                 'file_unlinked_block' => '',
                 'has_category_block' => '',
                 'no_category_block' => '',
+                'is_deletable_block' => '',
             ));
-		}
+        }
 
-		echo $page->template->_varVals['file_block'];
-	}
+        echo $page->template->_varVals['file_block'];
+    }
 
-	/* Getters/Setters
+    /* Getters/Setters
 	 */
 
-	/**
-	 * Set mapper
-	 *
-	 * @param null $mapper
-	 */
-	private function setMapper($mapper) {
-		$this->mapper = $mapper;
-	}
+    /**
+     * Set mapper
+     *
+     * @param UsageMapper $mapper
+     */
+    private function setMapper($mapper)
+    {
+        $this->mapper = $mapper;
+    }
 
-	/**
-	 * Get mapper
-	 *
-	 * @return null
-	 */
-	public function getMapper() {
-		return $this->mapper;
-	}
+    /**
+     * Get mapper
+     *
+     * @return UsageMapper
+     */
+    public function getMapper()
+    {
+        return $this->mapper;
+    }
 }

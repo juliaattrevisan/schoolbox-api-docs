@@ -1,6 +1,9 @@
 <?php
 /**
- * Mapper
+ * Usage report mapper for the filesystem.
+ *
+ * Currently, files that are related to deleted fields (i.e. deleted files)
+ * are NOT included in report totals.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -10,466 +13,501 @@
 
 namespace Schoolbox\Usage\Specific;
 
+use Database;
 
-class UsageMapper extends \Schoolbox\Resource\FileMapper {
+class UsageMapper
+{
+    /**
+     * Constant: join onto storage table
+     */
+    const STORAGE_JOIN =  "INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`";
 
-	/**
-	 * The user to generate stats for
-	 * * @var int
-	 */
-	private $userId = 0;
+    /**
+     * Constant: join from storage table onto mimetype table
+     */
+    const MIMETYPE_JOIN = "
+        LEFT JOIN `allowedFileExtension` `e` ON `s`.`ext` = `e`.`extension`
+        LEFT JOIN `allowedFileTypes` `t` ON `e`.`fileTypeId` = `t`.`fileTypeId`
+    ";
 
-	/**
-	 * Constructor
-	 *
-	 * @param $userId
-	 */
-	public function __construct($userId) {
+    /**
+     * The user to generate stats for
+     * * @var int
+     */
+    private $userId = 0;
 
-		/* Urgh.
-		 */
-		parent::__construct();
+    /**
+     * @var Database
+     */
+    protected $database;
 
-		$this->setUserId($userId);
-	}
+    /**
+     * Constructor
+     *
+     * @param $userId
+     */
+    public function __construct($userId)
+    {
 
-	/**
-	 * Find total usage
-	 *
-	 * This summates the filesizes of all files in the specified location.
-	 * This includes files which may have been marked as softdeleted in the db
-	 */
-	public function findTotalUsage() {
-		$userId = $this->getUserId();
+        $this->database = Database::getInstance();
 
-		$query = "
-			SELECT COALESCE(SUM(bytes), 0) AS bytes
-			FROM
-			(
-				(SELECT SUM(file_size) AS bytes
-				FROM `file`
-				WHERE `owner` = {$userId}
-				AND deleted = 0
-				GROUP BY `owner`)
-				UNION
-				(SELECT SUM(file_size) AS bytes
-				FROM `myFile`
-				WHERE `owner` = {$userId}
-				AND deleted = 0
-				GROUP BY `owner`)
-				UNION
-				(SELECT SUM(filesize) AS bytes
-				FROM `storage`
-				WHERE `uploaded_by` = {$userId}
-				GROUP BY `uploaded_by`)
-				UNION
-				(SELECT SUM(filesize) AS bytes
-				FROM `student_submission`
-				WHERE `owner` = {$userId}
-				GROUP BY `owner`)
-				UNION
-				(SELECT SUM(filesize) AS bytes
-				FROM `submission_return`
-				WHERE `owner` = {$userId}
-				GROUP BY `owner`)
-			) AS allTotals
-		";
+        $this->setUserId($userId);
+    }
 
-		$statement = $this->database->prepare($query);
-		$statement->execute();
+    /**
+     * Gets usage bytes and total files as part of a single query.
+     *
+     * @return array bytes: bytes used, num: total files
+     */
+    protected function getUsage()
+    {
+        $query = "
+            SELECT
+                COALESCE(SUM(bytes), 0) AS bytes,
+                COALESCE(SUM(num), 0) AS num
+            FROM
+            (
+                (SELECT SUM(`s`.`filesize`) AS bytes, COUNT(*) AS num
+                FROM `file` `f`
+                INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+                WHERE `f`.`owner` = :userId
+                AND `f`.`deleted` = 0
+                GROUP BY `f`.`owner`)
+                UNION
+                (SELECT SUM(`s`.`filesize`) AS bytes, COUNT(*) AS num
+                FROM `myFile` `f`
+                INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+                WHERE `f`.`owner` = :userId
+                AND `f`.`deleted` = 0
+                GROUP BY `f`.`owner`)
+                UNION
+                (SELECT SUM(filesize) AS bytes, COUNT(*) AS num
+                FROM `storage`
+                WHERE `uploaded_by` = :userId
+                GROUP BY `uploaded_by`)
+                UNION
+                (SELECT SUM(`s`.`filesize`) AS bytes, COUNT(*) AS num
+                FROM `student_submission` `f`
+                INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+                WHERE `f`.`owner` = :userId
+                GROUP BY `f`.`owner`)
+                UNION
+                (SELECT SUM(`s`.`filesize`) AS bytes, COUNT(*) AS num
+                FROM `submission_return` `f`
+                INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+                WHERE `f`.`owner` = :userId
+                AND `f`.`deleted` = 0
+                GROUP BY `f`.`owner`)
+            ) AS allTotals
+        ";
+        $statement = $this->database->prepare($query);
+        $statement->execute(['userId' => $this->getUserId()]);
+        return $statement->fetch(\PDO::FETCH_ASSOC);
+    }
 
-		$result = $statement->fetch(\PDO::FETCH_ASSOC);
+    /**
+     * Find total usage
+     *
+     * @return mixed
+     */
+    public function findTotalUsage()
+    {
+        return $this->getUsage()['bytes'];
+    }
 
-		return $result['bytes'];
-	}
+    /**
+     * The total number of files
+     *
+     * @return mixed
+     */
+    public function numFiles()
+    {
+        return $this->getUsage()['num'];
+    }
 
-	/**
-	 * The total number of files
-	 *
-	 * @return mixed
-	 */
-	public function numFiles() {
-		$userId = $this->getUserId();
+    /**
+     * Find total category usage
+     *
+     * @return array
+     */
+    public function findGroupUsage()
+    {
+        /* Just Like Voltron
+         */
+        $storageJoin = self::STORAGE_JOIN;
+        $mimeJoin    = self::MIMETYPE_JOIN;
+        $query = "
+            SELECT `name`, SUM(bytes) AS bytes
+            FROM
+            (
+                (SELECT 'Images' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+                FROM `file` `f`
+                $storageJoin
+                $mimeJoin
+                WHERE `f`.`owner` = :userId
+                AND `f`.`deleted` = 0
+                AND `t`.`mime` LIKE 'image/%')
+                UNION
+                (SELECT 'Video' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+                FROM `file` `f`
+                $storageJoin
+                $mimeJoin
+                WHERE `f`.`owner` = :userId
+                AND `f`.`deleted` = 0
+                AND `t`.`mime` LIKE 'video/%')
+                UNION
+                (SELECT 'Audio' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+                FROM `file` `f`
+                $storageJoin
+                $mimeJoin
+                WHERE `f`.`owner` = :userId
+                AND `f`.`deleted` = 0
+                AND `t`.`mime` LIKE 'audio/%')
 
-		$query = "
-			SELECT COALESCE(SUM(num), 0) AS num
-			FROM
-			(
-				(SELECT COUNT(*) AS num
-				FROM `file`
-				WHERE `owner` = {$userId}
-				AND deleted = 0
-				GROUP BY `owner`)
-				UNION
-				(SELECT COUNT(*) AS num
-				FROM `myFile`
-				WHERE `owner` = {$userId}
-				AND deleted = 0
-				GROUP BY `owner`)
-				UNION
-				(SELECT COUNT(*) AS num
-				FROM `storage`
-				WHERE `uploaded_by` = {$userId}
-				GROUP BY `uploaded_by`)
-				UNION
-				(SELECT COUNT(*) AS num
-				FROM `student_submission`
-				WHERE `owner` = {$userId}
-				GROUP BY `owner`)
-				UNION
-				(SELECT COUNT(*) AS num
-				FROM `submission_return`
-				WHERE `owner` = {$userId}
-				GROUP BY `owner`)
-			) AS allTotals
-		";
+                UNION
 
-		$statement = $this->database->prepare($query);
-		$statement->execute();
+                (SELECT 'Images' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+                FROM `myFile` `f`
+                $storageJoin
+                $mimeJoin
+                WHERE `f`.`owner` = :userId
+                AND `f`.`deleted` = 0
+                AND `t`.`mime` LIKE 'image/%')
+                UNION
+                (SELECT 'Video' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+                FROM `myFile` `f`
+                $storageJoin
+                $mimeJoin
+                WHERE `f`.`owner` = :userId
+                AND `f`.`deleted` = 0
+                AND `t`.`mime` LIKE 'video/%')
+                UNION
+                (SELECT 'Audio' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+                FROM `myFile` `f`
+                $storageJoin
+                $mimeJoin
+                WHERE `f`.`owner` = :userId
+                AND `f`.`deleted` = 0
+                AND `t`.`mime` LIKE 'audio/%')
 
-		$result = $statement->fetch(\PDO::FETCH_ASSOC);
+                UNION
 
-		return $result['num'];
-	}
+                (SELECT 'Images' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+                FROM `storage` `s`
+                $mimeJoin
+                WHERE `s`.`uploaded_by` = :userId
+                AND `t`.`mime` LIKE 'image/%')
+                UNION
+                (SELECT 'Video' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+                FROM `storage` `s`
+                $mimeJoin
+                WHERE `s`.`uploaded_by` = :userId
+                AND `t`.`mime` LIKE 'video/%')
+                UNION
+                (SELECT 'Audio' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+                FROM `storage` `s`
+                $mimeJoin
+                WHERE `s`.`uploaded_by` = :userId
+                AND `t`.`mime` LIKE 'audio/%')
 
-	/**
-	 * Find total category usage
-	 *
-	 * This does NOT summate files which have been marked as softdeleted in the db
-	 *
-	 * @return array
-	 */
-	public function findGroupUsage() {
-		$userId = $this->getUserId();
+                UNION
 
-		/* Just Like Voltron
-		 */
-		$query = "
-			SELECT `name`, SUM(bytes) AS bytes
-			FROM
-			(
-				(SELECT 'Images' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
-				FROM `file`
-				WHERE `owner` = {$userId}
-				AND deleted = 0
-				AND mime_type LIKE 'image/%')
-				UNION
-				(SELECT 'Video' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
-				FROM `file`
-				WHERE `owner` = {$userId}
-				AND deleted = 0
-				AND mime_type LIKE 'video/%')
-				UNION
-				(SELECT 'Audio' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
-				FROM `file`
-				WHERE `owner` = {$userId}
-				AND deleted = 0
-				AND mime_type LIKE 'audio/%')
+                (SELECT 'Images' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+                FROM `student_submission` `f`
+                $storageJoin
+                $mimeJoin
+                WHERE `f`.`owner` = :userId
+                AND `t`.`mime` LIKE 'image/%')
+                UNION
+                (SELECT 'Video' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+                FROM `student_submission` `f`
+                $storageJoin
+                $mimeJoin
+                WHERE `f`.`owner` = :userId
+                AND `t`.`mime` LIKE 'video/%')
+                UNION
+                (SELECT 'Audio' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+                FROM `student_submission` `f`
+                $storageJoin
+                $mimeJoin
+                WHERE `f`.`owner` = :userId
+                AND `t`.`mime` LIKE 'audio/%')
 
-				UNION
+                UNION
 
-				(SELECT 'Images' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
-				FROM `myFile`
-				WHERE `owner` = {$userId}
-				AND deleted = 0
-				AND mime_type LIKE 'image/%')
-				UNION
-				(SELECT 'Video' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
-				FROM `myFile`
-				WHERE `owner` = {$userId}
-				AND deleted = 0
-				AND mime_type LIKE 'video/%')
-				UNION
-				(SELECT 'Audio' AS `name`, COALESCE(SUM(file_size), 0) AS bytes
-				FROM `myFile`
-				WHERE `owner` = {$userId}
-				AND deleted = 0
-				AND mime_type LIKE 'audio/%')
+                (SELECT 'Images' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+                FROM `submission_return` `f`
+                $storageJoin
+                $mimeJoin
+                WHERE `f`.`owner` = :userId
+                AND `f`.`deleted` = 0
+                AND `t`.`mime` LIKE 'image/%')
+                UNION
+                (SELECT 'Video' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+                FROM `submission_return` `f`
+                $storageJoin
+                $mimeJoin
+                WHERE `f`.`owner` = :userId
+                AND `f`.`deleted` = 0
+                AND `t`.`mime` LIKE 'video/%')
+                UNION
+                (SELECT 'Audio' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
+                FROM `submission_return` `f`
+                $storageJoin
+                $mimeJoin
+                WHERE `f`.`owner` = :userId
+                AND `f`.`deleted` = 0
+                AND `t`.`mime` LIKE 'audio/%')
+            ) AS allTotals
+            GROUP BY `name`
+            ORDER BY bytes DESC
+        ";
 
-				UNION
+        $statement = $this->database->prepare($query);
+        $statement->execute(['userId' => $this->getUserId()]);
 
-				(SELECT 'Images' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
-				FROM `storage`
-				WHERE `uploaded_by` = {$userId}
-				AND mime LIKE 'image/%')
-				UNION
-				(SELECT 'Video' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
-				FROM `storage`
-				WHERE `uploaded_by` = {$userId}
-				AND mime LIKE 'video/%')
-				UNION
-				(SELECT 'Audio' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
-				FROM `storage`
-				WHERE `uploaded_by` = {$userId}
-				AND mime LIKE 'audio/%')
+        $result = array();
+        $mediaBytes = 0;
 
-				UNION
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $mediaBytes += $row['bytes'];
+            $result[] = $row;
+        }
 
-				(SELECT 'Images' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
-				FROM `student_submission`
-				WHERE `owner` = {$userId}
-				AND mime_type LIKE 'image/%')
-				UNION
-				(SELECT 'Video' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
-				FROM `student_submission`
-				WHERE `owner` = {$userId}
-				AND mime_type LIKE 'video/%')
-				UNION
-				(SELECT 'Audio' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
-				FROM `student_submission`
-				WHERE `owner` = {$userId}
-				AND mime_type LIKE 'audio/%')
+        /* Find all the documents this User has everywhere, and subtract
+         * the megaquery's result to find out non-media counts
+         */
+        $allData = $this->findTypeUsage();
+        $totalBytes = 0;
 
-				UNION
+        foreach ($allData as $currentData) {
+            $totalBytes += $currentData['bytes'];
+        }
 
-				(SELECT 'Images' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
-				FROM `submission_return`
-				WHERE `owner` = {$userId}
-				AND mime_type LIKE 'image/%')
-				UNION
-				(SELECT 'Video' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
-				FROM `submission_return`
-				WHERE `owner` = {$userId}
-				AND mime_type LIKE 'video/%')
-				UNION
-				(SELECT 'Audio' AS `name`, COALESCE(SUM(filesize), 0) AS bytes
-				FROM `submission_return`
-				WHERE `owner` = {$userId}
-				AND mime_type LIKE 'audio/%')
-			) AS allTotals
-			GROUP BY `name`
-			ORDER BY bytes DESC
-		";
+        /* Append extra doc row
+         */
+        $docBytes = array(
+            'name' => 'Documents',
+            'bytes' => $totalBytes - $mediaBytes
+        );
 
-		$statement = $this->database->prepare($query);
-		$statement->execute();
+        array_unshift($result, $docBytes);
 
-		$result = array();
-		$mediaBytes = 0;
+        return $result;
+    }
 
-		while($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-			$mediaBytes += $row['bytes'];
-			$result[] = $row;
-		}
+    /**
+     * Find total type usage
+     *
+     * @return array
+     */
+    public function findTypeUsage()
+    {
+        $query = "
+            SELECT *
+            FROM
+                ((SELECT 'Files' AS `name`, SUM(`s`.`filesize`) AS `bytes`
+                FROM `file` `f`
+                INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+                WHERE `f`.`owner` = :userId
+                AND `f`.`deleted` = 0
+                GROUP BY `f`.`owner`)
+                UNION
+                (SELECT 'My Files' AS `name`, SUM(`s`.`filesize`) AS `bytes`
+                FROM `myFile` `f`
+                INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+                WHERE `f`.`owner` = :userId
+                AND `f`.`deleted` = 0
+                GROUP BY `f`.`owner`)
+                UNION
+                (SELECT 'Storage' AS `name`, SUM(filesize) AS `bytes`
+                FROM `storage`
+                WHERE `uploaded_by` = :userId
+                GROUP BY `uploaded_by`)
+                UNION
+                (SELECT 'Submission'  AS `name`, SUM(`s`.`filesize`) AS `bytes`
+                FROM `student_submission` `f`
+                INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+                WHERE `f`.`owner` = :userId
+                GROUP BY `f`.`owner`)
+                UNION
+                (SELECT 'Returns'  AS `name`, SUM(`s`.`filesize`) AS `bytes`
+                FROM `submission_return` `f`
+                INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
+                WHERE `f`.`owner` = :userId
+                AND `f`.`deleted` = 0
+                GROUP BY `f`.`owner`)) AS allTotals
+            ORDER BY `bytes` ASC
+        ";
 
-		/* Find all the documents this User has everywhere, and subtract
-		 * the megaquery's result to find out non-media counts
-		 */
-		$allData = $this->findTypeUsage();
-		$totalBytes = 0;
+        $statement = $this->database->prepare($query);
+        $statement->execute(['userId' => $this->getUserId()]);
 
-		foreach($allData as $currentData) {
-			$totalBytes += $currentData['bytes'];
-		}
+        $result = array();
 
-		/* Append extra doc row
-		 */
-		$docBytes = array(
-			'name' => 'Documents',
-			'bytes' => $totalBytes - $mediaBytes
-		);
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $result[] = $row;
+        }
 
-		array_unshift($result, $docBytes);
+        return $result;
+    }
 
-		return $result;
-	}
-
-	/**
-	 * Find total type usage
-	 *
-	 * This summates the filesizes of all files in the specified location.
-	 * This includes files which may have been marked as softdeleted in the db
-	 *
-	 * @return array
-	 */
-	public function findTypeUsage() {
-		$userId = $this->getUserId();
-
-		$query = "
-			SELECT *
-			FROM
-				((SELECT 'Files' AS `name`, SUM(file_size) AS `bytes`
-				FROM `file`
-				WHERE `owner`= {$userId}
-				AND deleted = 0
-				GROUP BY `owner`)
-				UNION
-				(SELECT 'My Files' AS `name`, SUM(file_size) AS `bytes`
-				FROM `myFile`
-				WHERE `owner`= {$userId}
-				AND deleted = 0
-				GROUP BY `owner`)
-				UNION
-				(SELECT 'Storage' AS `name`, SUM(filesize) AS `bytes`
-				FROM `storage`
-				WHERE `uploaded_by` = {$userId}
-				GROUP BY `uploaded_by`)
-				UNION
-				(SELECT 'Submission'  AS `name`, SUM(filesize) AS `bytes`
-				FROM `student_submission`
-				WHERE `owner` = {$userId}
-				GROUP BY `owner`)
-				UNION
-				(SELECT 'Returns'  AS `name`, SUM(filesize) AS `bytes`
-				FROM `submission_return`
-				WHERE `owner` = {$userId}
-				AND deleted = 0
-				GROUP BY `owner`)) AS allTotals
-			ORDER BY `bytes` ASC
-		";
-
-		$statement = $this->database->prepare($query);
-		$statement->execute();
-
-		$result = array();
-
-		while($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-			$result[] = $row;
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Find total file usage
-	 *
-	 * This does NOT summate files which have been marked as softdeleted in the db
-	 *
-	 * @param string $orderBy
-	 * @param string $order
-	 * @param int $index
-	 * @param $numPerPage
-	 * @return array
-	 */
-	public function findFileUsage($orderBy, $order, $index, $numPerPage) {
-		$userId = $this->getUserId();
-
-		$query = "
-			SELECT *
-			FROM
-			(
-				(SELECT
-				    file.id,
-                    realname AS `name`,
+    /**
+     * Find total file usage
+     *
+     * @param string $orderBy
+     * @param string $order
+     * @param int $index
+     * @param $numPerPage
+     * @return array
+     */
+    public function findFileUsage($orderBy, $order, $index, $numPerPage)
+    {
+        $storageJoin = self::STORAGE_JOIN;
+        $mimeJoin    = self::MIMETYPE_JOIN;
+        $boxJoin     = "
+            INNER JOIN `submission_box` `b` ON `f`.`box_id` = `b`.`id`
+            INNER JOIN `category` `c` ON `b`.`category` = `c`.`id`
+        ";
+        $query = "
+            SELECT *
+            FROM
+            (
+                (SELECT
+                    `f`.`id`,
+                    COALESCE(`f`.`realname`, `s`.`filename`) AS `name`,
                     'File' AS groupName,
-                    file_size AS bytes,
-                    mime_type,
-                    '' AS hash,
-                    category.id AS categoryId,
-                    category.name AS categoryName
-				FROM `file`
-				LEFT JOIN category ON file.category = category.id
-				WHERE `owner` = {$userId}
-				AND deleted = 0)
-				UNION
-				(SELECT
-				    id,
-                    realname AS `name`,
+                    `s`.`filesize` AS bytes,
+                    `t`.`mime` AS mime_type,
+                    `s`.`hash`,
+                    `c`.`id` AS categoryId,
+                    `c`.`name` AS categoryName
+                FROM `file` `f`
+                LEFT JOIN category `c` ON `f`.`category` = `c`.`id`
+                $storageJoin
+                $mimeJoin
+                WHERE `f`.`owner` = :userId
+                AND `f`.`deleted` = 0)
+                UNION
+                (SELECT
+                    `f`.`id`,
+                    COALESCE(`f`.`realname`, `s`.`filename`) AS `name`,
                     'My File' AS groupName,
-                    file_size AS bytes,
-                    mime_type,
-                    '' AS hash,
+                    `s`.`filesize` AS bytes,
+                    `t`.`mime` AS mime_type,
+                    `s`.`hash`,
                     '' AS categoryId,
                     '' AS categoryName
-				FROM `myFile`
-				WHERE `owner` = {$userId}
-				AND deleted = 0)
-				UNION
-				(SELECT
-				    '' AS id,
-                    filename AS `name`,
+                FROM `myFile` `f`
+                $storageJoin
+                $mimeJoin
+                WHERE `f`.`owner` = :userId
+                AND `f`.`deleted` = 0)
+                UNION
+                (SELECT
+                    '' AS id,
+                    `s`.`filename` AS `name`,
                     'Storage' AS groupName,
-                    filesize AS bytes,
-                    mime AS mime_type,
-                    hash,
+                    `s`.`filesize` AS bytes,
+                    `t`.`mime` AS mime_type,
+                    `s`.`hash`,
                     '' AS categoryId,
                     '' AS categoryName
-				FROM `storage`
-				WHERE `uploaded_by` = {$userId})
-				UNION
-				(SELECT
-				    '' AS id,
-                    realname AS `name`,
+                FROM `storage` `s`
+                $mimeJoin
+                WHERE `s`.`uploaded_by` = :userId)
+                UNION
+                (SELECT
+                    `f`.`id` AS id,
+                    COALESCE(`f`.`realname`, `s`.`filename`) AS `name`,
                     'Submission' AS groupName,
-                    filesize AS bytes,
-                    mime_type,
-                    '' AS hash,
-                    '' AS categoryId,
-                    '' AS categoryName
-				FROM `student_submission`
-				WHERE `owner` = {$userId})
-				UNION
-				(SELECT
-				    '' AS id,
-                    filename AS `name`,
+                    `s`.`filesize` AS bytes,
+                    `t`.`mime` AS mime_type,
+                    `s`.`hash`,
+                    `c`.`id` AS categoryId,
+                    `c`.`name` AS categoryName
+                FROM `student_submission` `f`
+                $storageJoin
+                $mimeJoin
+                $boxJoin
+                WHERE `f`.`owner` = :userId)
+                UNION
+                (SELECT
+                    `f`.`id` AS id,
+                    COALESCE(`f`.`filename`, `s`.`filename`) AS `name`,
                     'Return' AS groupName,
-                    filesize AS bytes,
-                    mime_type,
-                    '' AS hash,
-                    '' AS categoryId,
-                    '' AS categoryName
-				FROM `submission_return`
-				WHERE `owner` = {$userId}
-				AND deleted = 0)
-			) AS allTotals
-		";
+                    `s`.`filesize` AS bytes,
+                    `t`.`mime` AS mime_type,
+                    `s`.`hash`,
+                    `c`.`id` AS categoryId,
+                    `c`.`name` AS categoryName
+                FROM `submission_return` `f`
+                $storageJoin
+                $mimeJoin
+                $boxJoin
+                WHERE `f`.`owner` = :userId
+                AND `f`.`deleted` = 0)
+            ) AS allTotals
+        ";
 
-		/* Select order by
-		 */
-		if (!in_array($orderBy, array('name', 'groupName', 'bytes', 'mime_type', 'categoryName'))) {
-			$orderBy = 'name';
-		}
+        /* Select order by
+         */
+        if (!in_array($orderBy, array('name', 'groupName', 'bytes', 'mime_type', 'categoryName'))) {
+            $orderBy = 'name';
+        }
 
-		if (!in_array($order, array('DESC', 'ASC'))) {
-			$order = 'ASC';
-		}
+        if (!in_array($order, array('DESC', 'ASC'))) {
+            $order = 'ASC';
+        }
 
-		/* Cast Away
-		 */
-		$index = (int)$index;
-		$numPerPage = (int)$numPerPage;
+        /* Cast Away
+         */
+        $index = (int)$index;
+        $numPerPage = (int)$numPerPage;
 
-		/* Pagination
-		 */
-		$start = $index * $numPerPage;
+        /* Pagination
+         */
+        $start = $index * $numPerPage;
 
-		$query .= "
-			ORDER BY $orderBy $order
-			LIMIT $start, $numPerPage
-		";
+        $query .= "
+            ORDER BY $orderBy $order
+            LIMIT $start, $numPerPage
+        ";
 
-		/* Spit it out
-		 */
-		$statement = $this->database->prepare($query);
-		$statement->execute();
+        /* Spit it out
+         */
+        $statement = $this->database->prepare($query);
+        $statement->execute(['userId' => $this->getUserId()]);
 
-		$result = array();
+        $result = array();
 
-		while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-			$result[] = $row;
-		}
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $result[] = $row;
+        }
 
-		return $result;
-	}
+        return $result;
+    }
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set user id
-	 *
-	 * @param int $userId
-	 */
-	public function setUserId($userId) {
-		$this->userId = $userId;
-	}
+    /**
+     * Set user id
+     *
+     * @param int $userId
+     */
+    public function setUserId($userId)
+    {
+        $this->userId = $userId;
+    }
 
-	/**
-	 * Get user id
-	 *
-	 * @return int
-	 */
-	public function getUserId() {
-		return $this->userId;
-	}
+    /**
+     * Get user id
+     *
+     * @return int
+     */
+    public function getUserId()
+    {
+        return $this->userId;
+    }
 }

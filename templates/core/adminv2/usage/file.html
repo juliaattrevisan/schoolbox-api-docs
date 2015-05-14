@@ -1,5 +1,5 @@
 <!-- BEGIN file -->
-<tr>
+<tr data-location="{FILE_LOCATION}" data-filehash="{FILE_HASH}" data-fileid="{FILE_ID}">
     <!-- BEGIN file_storage -->
 	<td><a href="/storage/fetch.php?hash={FILE_HASH}">{FILE_FILENAME}</a></td>
     <!-- END file_storage -->
@@ -11,6 +11,14 @@
     <!-- BEGIN file_myfile -->
     <td><a href="/cms/sendMyFile.php?id={FILE_ID}">{FILE_FILENAME}</a></td>
     <!-- END file_myfile -->
+
+    <!-- BEGIN file_submission -->
+    <td><a href="/submission/send.php?id={FILE_ID}&amp;save=1">{FILE_FILENAME}</a></td>
+    <!-- END file_submission -->
+
+    <!-- BEGIN file_return -->
+    <td><a href="/submission/send.php?id={FILE_ID}&amp;save=1&amp;return=1">{FILE_FILENAME}</a></td>
+    <!-- END file_return -->
 
     <!-- BEGIN file_unlinked -->
     <td>{FILE_FILENAME}</td>
@@ -28,5 +36,11 @@
     <!-- END no_category -->
 
 	<td>{FILE_MIMETYPE}</td>
+
+    <td>
+        <!-- BEGIN is_deletable -->
+        <a href="{FILE_DELETE_URL}" data-action="delete">x</a>
+        <!-- END is_deletable -->
+    </td>
 </tr>
 <!-- END file -->
