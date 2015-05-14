@@ -20,7 +20,7 @@
 // 2. And then variables can be overridden here
 // =============================================================================
 // Dimensions
-@logo-width: 					280px;
+@logo-width: 					235px;
 @logo-height: 					80px;
 @infopanel-height:				14px;
 @search-width:					253px;
@@ -46,7 +46,7 @@
 
 // Modules
 @module-heading: 				#FFFFFF;
-@module-background: 			#00529C;
+@module-background: 			#002349;
 @admin-nav:                     @tab-background;
 @notify-color:					@negative-color;
 
@@ -89,12 +89,12 @@
   border: 1px solid @border-color;
 }
 
-body{ background: #ffffff url(/images/mggs/body-top.jpg) top left repeat-x; }
+body{ background: #ffffff url("/images/mggs/body-top.jpg") top left repeat-x; }
 #wrap {
-	background: url(/images/mggs/body-bottom.jpg) bottom left repeat-x;
+	background: url("/images/mggs/body-bottom.jpg") bottom left repeat-x;
 	min-height: 100%;
 	#wrap-inner {
-		background: url(/images/mggs/body-cross.png) -31px 100% no-repeat;
+		background: url("/images/mggs/body-cross.png") -31px 100% no-repeat;
 		padding-bottom: 13px;
 	}
 }
@@ -114,10 +114,10 @@ h2{ .border-radius(5px); }
 }
 
 #header {
-    background: url(/images/mggs/header-cross.png) 303px 12px no-repeat;
+    background: url("/images/mggs/header-cross.png") 303px 12px no-repeat;
 
 	.logo{
-		top: 6px;
+		top: 12px;
 		left: 21px;
 	}
 
@@ -147,16 +147,16 @@ h2{ .border-radius(5px); }
 	    	margin-right: 0;
 
 	    	a {
-	    		.gradient(#137fc8,#053a68);
-			    border-right: 1px solid #003a6c; 
-	    		border-left: 1px solid #1088d9;
+	    		background: @module-background;
+			    border-right: 1px solid #164870; 
+	    		border-left: 1px solid #00172f;
 			    height: 30px;
 				padding: 0 12px;
 				font-size:12px;
 				line-height:31px;
-				&:hover{ .gradient(#1590e3,#055da9); }	
+				&:hover{ background: lighten(@module-background, 10%); }	
 			}
-			&.navthis a{ .gradient(#1590e3,#055da9); }
+			&.navthis a{ background: lighten(@module-background, 10%); }
 		}
 		li:last-child a{
 			-moz-top-left-border-radius: 8px;
@@ -171,7 +171,7 @@ h2{ .border-radius(5px); }
     .box-shadow(-2px, 0px, 5px, #e6e9ea);
     .border-radius(7px 0px 0px 0px);
 	padding: 15px;
-	margin: 0 16px 0 182px;
+	margin: 0 0 0 182px;
 }
 
 #footer{ background: #e6f7fd; margin: 0; }
