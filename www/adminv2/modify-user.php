@@ -254,7 +254,7 @@ if(is_numeric($this->arg[0])) {
         $this->setVar('user_linked_block', '');
         foreach($userObj->getLinkedUser() as $linkedUser){
             /** @param \Schoolbox\User $linkedUser */
-            $this->setVar(array('USER_LINKED_ID'  => $linkedUser->getId(),
+            $this->setVar(array('LINKED_USER_ID'  => $linkedUser->getId(),
                             'LINKED_USER'   => $linkedUser->getFullName(),
                             'LINKED_USER_DATE' => '',));
             $this->parse('user_linked_block', 'user_linked',true);
