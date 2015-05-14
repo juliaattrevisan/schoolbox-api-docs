@@ -6,7 +6,7 @@
 <script type="text/javascript">
     $(function() {
         var recorderContainer      = $('#ab-usermedia'),
-            recorderControls       = $('#recorderButtons'),
+            recorderControls       = $('.recorderButtons'),
             recorderNameDialog     = $('#recorderNameDialog'),
             recorderDisabledDialog = $('#recorderDisabledDialog'),
             recorderNameInput      = recorderNameDialog.find('input[data-role="recording-name"]'),
@@ -79,7 +79,7 @@
         };
 
         // Switch off buttons by default
-        recorderButtons.start.show().prop('disabled', false);
+        recorderButtons.start.css('display','inline-block').prop('disabled', false);
         recorderButtons.recording.hide().prop('disabled', true);
         recorderButtons.play.hide().prop('disabled', true);
         recorderButtons.stop.hide().prop('disabled', true);
@@ -94,7 +94,7 @@
             flash: {
                 flashContainer: $('#flashContainer')[0],
                 onFlashSecurity: function() {
-                    $('#flashContainer').show();
+                    $('#flashContainer').css('display','inline-block');
                 },
                 session: {
                     name: '{SESSION_NAME}',
@@ -112,39 +112,39 @@
             recorderButtons.play.hide().prop('disabled', true);
             recorderButtons.stop.hide().prop('disabled', true);
             recorderButtons.upload.hide().prop('disabled', true);
-            recorderButtons.disabled.show();
+            recorderButtons.disabled.css('display','inline-block');
             recorderDisabledDialog.dialog('open');
         });
         recorderContainer.on('recordingReady.recorder', function() {
             // Allow record button to show
-            recorderButtons.start.show().prop('disabled', false);
+            recorderButtons.start.css('display','inline-block').prop('disabled', false);
         });
         recorderContainer.on('recordingStart.recorder', function() {
             // Show stop button only
             recorderButtons.start.hide().prop('disabled', true);
-            recorderButtons.recording.show().prop('disabled', true);
+            recorderButtons.recording.css('display','inline-block').prop('disabled', true);
             recorderButtons.play.hide().prop('disabled', true);
-            recorderButtons.stop.show().prop('disabled', false);
+            recorderButtons.stop.css('display','inline-block').prop('disabled', false);
             recorderButtons.upload.hide().prop('disabled', true);
         });
         recorderContainer.on('recordingStop.recorder', function() {
-            recorderButtons.start.show().prop('disabled', false);
+            recorderButtons.start.css('display','inline-block').prop('disabled', false);
             recorderButtons.recording.hide().prop('disabled', true);
-            recorderButtons.play.show().prop('disabled', false);
+            recorderButtons.play.css('display','inline-block').prop('disabled', false);
             recorderButtons.stop.hide().prop('disabled', true);
-            recorderButtons.upload.show().prop('disabled', false);
+            recorderButtons.upload.css('display','inline-block').prop('disabled', false);
         });
         recorderContainer.on('playbackStart.recorder', function() {
-            recorderButtons.start.show().prop('disabled', true);
+            recorderButtons.start.css('display','inline-block').prop('disabled', true);
             recorderButtons.play.hide().prop('disabled', true);
-            recorderButtons.stop.show().prop('disabled', false);
-            recorderButtons.upload.show().prop('disabled', false);
+            recorderButtons.stop.css('display','inline-block').prop('disabled', false);
+            recorderButtons.upload.css('display','inline-block').prop('disabled', false);
         });
         recorderContainer.on('playbackStop.recorder', function() {
-            recorderButtons.start.show().prop('disabled', false);
-            recorderButtons.play.show().prop('disabled', false);
+            recorderButtons.start.css('display','inline-block').prop('disabled', false);
+            recorderButtons.play.css('display','inline-block').prop('disabled', false);
             recorderButtons.stop.hide().prop('disabled', true);
-            recorderButtons.upload.show().prop('disabled', false);
+            recorderButtons.upload.css('display','inline-block').prop('disabled', false);
         });
         recorderContainer.on('uploadStart.recorder', function() {
             recorderButtons.start.hide().prop('disabled', true);
@@ -152,7 +152,7 @@
             recorderButtons.play.hide().prop('disabled', true);
             recorderButtons.stop.hide().prop('disabled', true);
             recorderButtons.upload.hide().prop('disabled', true);
-            recorderButtons.uploading.show();
+            recorderButtons.uploading.css('display','inline-block');
         });
         recorderContainer.on('uploadComplete.recorder', function(event, recorder, filename, response) {
             // inform any listeners that a file was uploaded.
@@ -167,11 +167,11 @@
             window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
 
             // Go back to recordingReady state
-            recorderButtons.start.show().prop('disabled', false);
+            recorderButtons.start.css('display','inline-block').prop('disabled', false);
             recorderButtons.recording.hide().prop('disabled', true);
             recorderButtons.play.hide().prop('disabled', true);
             recorderButtons.stop.hide().prop('disabled', true);
-            recorderButtons.upload.show().prop('disabled', false);
+            recorderButtons.upload.css('display','inline-block').prop('disabled', false);
             recorderButtons.uploading.hide();
         });
         recorderContainer.on('uploadFailed.recorder', function(event, recorder) {
@@ -181,7 +181,7 @@
             recorderButtons.play.hide().prop('disabled', true);
             recorderButtons.stop.hide().prop('disabled', true);
             recorderButtons.upload.hide().prop('disabled', true);
-            recorderButtons.uploading.show();
+            recorderButtons.uploading.css('display','inline-block');
         });
 
         // Button events
@@ -217,14 +217,16 @@
           (this supports usermedia natively)
     -->
     <div class="dz-default"><span>Start recording audio</span></div>
+    <div class="recorderButtons">
+        <a role="button" class="submit-btn-plain record" data-interaction="audio-record-start" href="#">Start Recording</a>
+        <a role="button" class="submit-btn-plain recording hide" data-interaction="audio-record-recording" disabled href="#">Recording...</a>
+        <a role="button" class="submit-btn-plain disabled" data-interaction="audio-record-disabled" disabled href="#">No recording devices available</a>
+        <a role="button" class="submit-btn-plain play hide" data-interaction="audio-record-play" href="#">Play</a>
+        <a role="button" class="submit-btn-plain stop hide" data-interaction="audio-record-stop" href="#">Stop</a>
+    </div>
     <div id="flashContainer" class="hide"></div>
 </div>
-<div id="recorderButtons">
-    <a role="button" class="submit-btn-plain record" data-interaction="audio-record-start" href="#">Record Audio</a>
-    <a role="button" class="submit-btn-plain recording hide" data-interaction="audio-record-recording" disabled href="#">Recording...</a>
-    <a role="button" class="submit-btn-plain disabled" data-interaction="audio-record-disabled" disabled href="#">No recording devices available</a>
-    <a role="button" class="submit-btn-plain play hide" data-interaction="audio-record-play" href="#">Play</a>
-    <a role="button" class="submit-btn-plain stop hide" data-interaction="audio-record-stop" href="#">Stop</a>
+<div class="recorderButtons">
     <a role="button" class="submit-btn-plain upload hide" data-interaction="audio-record-upload" href="#">Upload Audio</a>
     <a role="button" class="submit-btn-plain uploading hide" data-interaction="audio-record-uploading" disabled href="#">Uploading...</a>
     <a role="button" class="btn no-icon float-left cancel" href="#">Cancel</a>
