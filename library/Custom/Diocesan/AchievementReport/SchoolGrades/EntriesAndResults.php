@@ -48,6 +48,7 @@ class EntriesAndResults extends Base {
             $assessArea = $currentEntry['AssessAreaHeading'];
             $term = $currentEntry['Term'];
 
+
             /* Strip all the numbers out
              */
             $result = preg_replace('/[0-9]*/', '', $currentEntry['Result']);
@@ -58,9 +59,17 @@ class EntriesAndResults extends Base {
                 $finalStack[$year][$courseName]['allTeachers'] = array();
             }
 
-            foreach(array($currentEntry['ClassTeacher1'], $currentEntry['ClassTeacher2'], $currentEntry['ClassTeacher3']) as $currentTeacher) {
+            foreach(array(1, 2, 3) as $currentTeacherIndex) {
+                $key = "ClassTeacher{$currentTeacherIndex}";
+                $emailKey = "ClassTeacher{$currentTeacherIndex}Email";
+
+                $currentTeacher = $currentEntry[$key];
+                $currentTeacherEmail = $currentEntry[$emailKey];
+
                 if (strlen($currentTeacher) && !in_array($currentTeacher, $finalStack[$year][$courseName]['allTeachers'])) {
-                    $finalStack[$year][$courseName]['allTeachers'][] = $currentTeacher;
+                    $finalStack[$year][$courseName]['allTeachers'][] = array(
+                        $currentTeacher => $currentTeacherEmail
+                    );
                 }
             }
 
@@ -102,8 +111,11 @@ class EntriesAndResults extends Base {
                 Result,
                 AreaSeq,
                 ClassTeacher1,
+                ClassTeacher1Email,
                 ClassTeacher2,
-                ClassTeacher3
+                ClassTeacher2Email,
+                ClassTeacher3,
+                ClassTeacher3Email
             FROM
                 SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
             WHERE
@@ -116,8 +128,11 @@ class EntriesAndResults extends Base {
                 Term,
                 AreaSeq,
                 ClassTeacher1,
+                ClassTeacher1Email,
                 ClassTeacher2,
-                ClassTeacher3
+                ClassTeacher2Email,
+                ClassTeacher3,
+                ClassTeacher3Email
             ORDER BY
                 Fileyear DESC,
                 AreaSeq
