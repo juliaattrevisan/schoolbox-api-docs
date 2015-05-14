@@ -47,7 +47,10 @@ class EntriesAndResults extends Base {
             $courseName = $currentEntry['CourseName'];
             $assessArea = $currentEntry['AssessAreaHeading'];
             $term = $currentEntry['Term'];
-            $result = $currentEntry['Result'];
+
+            /* Strip all the numbers out
+             */
+            $result = preg_replace('/[0-9]*/', '', $currentEntry['Result']);
 
             /* List of teachers - uniquify and exclude empties
              */
