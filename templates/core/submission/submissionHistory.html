@@ -1,163 +1,188 @@
 <!-- BEGIN custom_head -->
+<style type="text/css">
+    .view-submission .student-status {
+        font-size: 0.8em;
+        font-weight: bold;
+        text-transform: uppercase;
+        text-align: center;
+        display: block;
+        padding: 2px 6px;
+        margin: 4px 0;
+        clear: right;
+    }
+    .file-list {
+        padding-bottom: 16px;
+    }
+/*
+    .right {
+        background-color: #fafafa;
+        padding: 12px;
+        border: solid 1px #ddd;
+        border-radius: 2px;
+        width: calc(29.5% - 26px);
+    }
+    .left {
+        width: 67.5%;
+    }
+*/
+    .return-comment {
+        font-style: italic;
+    }
+    .return-comment:before, .return-comment:after {
+        content: "\"";
+    }
+    .no-borders .grade {
+        border: none !important;
+    }
+    .no-borders li.grade {
+        padding-left: 0 !important;
+        padding-right: 56px !important;
+    }
+    #history-wrap.ui-dialog-content {
+        padding: 16px 64px;
+    }
+    #history-wrap.ui-dialog-content h3 {
+        display: none;
+    }
+</style>
 <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
 <script type="text/javascript" src="/javascript/components/flot/jquery.flot.js"></script>
 <script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.highlighter.js"></script>
 <script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.spider.js"></script>
 <script type="text/javascript" src="/javascript/flot-plugins/jquery.flot.rubric.js"></script>
-<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script language="JavaScript" type="text/javascript">
     $(function () {
-        var x = 5, i = x - 1;
-        $('#history li:gt(' + i + ')').hide();
-        if ($('#history li:hidden').length) {
-            $('#history-more').show();
+        var x = 5, i = x - 1,
+            $historyMore = $('#history-more'),
+            $viewHistory = $('#view-history'),
+            $history     = $('#history');
+
+        $history.find('li:gt(' + i + ')').hide();
+
+        if ($history.find('li:hidden').length) {
+            $historyMore.show();
         }
-        $('#history-more').click(function (e) {
+
+        $historyMore.click(function (e) {
             e.preventDefault();
             i += 2 * x + 1;
-            $('#history li:lt(' + i + ')').slideDown(100);
-            if (!$('#history li:hidden').length) {
-                $('#history-more').hide();
+            $history.find('li:lt(' + i + ')').slideDown(100);
+            if (!$history.find('li:hidden').length) {
+                $historyMore.hide();
             }
         });
-        $('#closebox').remove();
 
-
-
-        $( "#confirmDialog" ).dialog({
-            autoOpen: false,
-            modal: true,
-            dialogClass: "no-close"
-        });
-
-
-        $("input[type='submit']").click(function(e) {
-            if($( "#confirmDialog" ).length) {
-                e.preventDefault();
-                var form = $(this).closest('form');
-                $("#confirmDialog").dialog({
-                    buttons: {
-                        "Yes, I agree": function() {
-                            form.submit();
-                        },
-                        Cancel: function() {
-                            $( this ).dialog( "close" );
+        $viewHistory.on('click', function (e) {
+            e.preventDefault();
+            $('#history-wrap')
+                .removeClass('hide')
+                .dialog({
+                    modal: true,
+                    resizable: false,
+                    width: 450,
+                    maxHeight: 600,
+                    title: "Submission History",
+                    buttons: [
+                        {
+                            text: "Close",
+                            click: function () {
+                                $(this).dialog("close");
+                            }
                         }
-                    }
+                    ]
                 });
-
-                $("#confirmDialog").dialog("open");
+            if (!$history.find('li:hidden').length) {
+                $historyMore.hide();
             }
         });
 
-        // Disable re-submission on pressing the submit button
-        $('#submission-history form').submit(function() {
-            $(this).find(':submit').prop('disabled', true);
-        })
+        $('#closebox').remove();
     });
 </script>
 <!-- END custom_head -->
 <div id="submission-history">
-	<h1>{BOX_NAME} <span>({BOX_TYPE})</span>
-		<!-- BEGIN show_owner -->
-		<span class="owner"> - {BOX_OWNER}</span>
-		<!-- END show_owner -->
-	</h1>
-	<div class="left">
+    <h1>{BOX_NAME} <span>({BOX_TYPE})</span>
+        <!-- BEGIN show_owner -->
+        <span class="owner"> - {BOX_OWNER}</span>
+        <!-- END show_owner -->
+    </h1>
+    <div class="left">
+        <div class="wysiwyg">{BOX_DESCRIPTION}</div>
+
+        <!-- BEGIN attachments -->
+        <h3>Attachments</h3>
+        <ul class="file-list">
+            <!-- BEGIN download -->
+            <li>
+                <a href="/storage/fetch.php?hash={FILE_HASH}&save=1">
+                    <img width="32" height="32" src="/images/mime/60x60/{FILE_THUMB}"/>
+                    <span class="name">{FILE_NAME}</span> ({FILE_SIZE})
+                    <span class="time">{FILE_DATE}</span>
+                    <span class="icon"></span>
+                </a>
+            </li>
+            <!-- END download -->
+        </ul>
+        <!-- END attachments -->
 
         <div>
-            <h2>Overview</h2>
-            <div class="wysiwyg">
-                <p><span class="gradient-{BOX_DUEDATE_GRADIENT}"><b>Due {BOX_DUEDATE}</b></span> on <b>{BOX_DUETIME}</b></p>
-                {BOX_DESCRIPTION}
-            </div>
-            <ul class="file-list">
-				<!-- BEGIN legacy_download -->
-				<li>
-					<a href="/send.php?id={FILE_ID}&save=1">
-						<img width="32" height="32" src="/images/mime/60x60/{FILE_THUMB}"/>
-						<span class="name">{FILE_NAME}</span> ({FILE_SIZE})
-						<span class="time">{FILE_DATE}</span>
-						<span class="icon"></span>
-					</a>
-				</li>
-				<!-- END legacy_download -->
-				<!-- BEGIN download -->
-				<li>
-					<a href="/storage/fetch.php?hash={FILE_HASH}&save=1">
-						<img width="32" height="32" src="/images/mime/60x60/{FILE_THUMB}"/>
-						<span class="name">{FILE_NAME}</span> ({FILE_SIZE})
-						<span class="time">{FILE_DATE}</span>
-						<span class="icon"></span>
-					</a>
-				</li>
-				<!-- END download -->
-            </ul>
+            <!-- BEGIN rubric -->
+            <p><em>No rubric data available</em></p>
+            <!-- END rubric -->
+        </div>
+    </div>
 
-            <h2>Subject</h2>
-            <div class="directory listing">
-                <ul class="subject-list clearfix">
-                  <li>
-                    <a class="listlink subject to-subject left-bar" href="/homepage/{CATEGORY_ID}">
-                      {CATEGORY_NAME}
-                      <span class="icon"></span>
-                    </a>
-                    <!-- BEGIN teacher -->
-                    <div class="profile teacher left-bar">
-                      <a href="/search/user/{TEACHER_ID}" class="listlink teacher-profile">
-                        <img src="{TEACHER_AVATAR}" title="{TEACHER_AVATAR_TITLE}" alt="{TEACHER_AVATAR_TITLE}" />
-                        <span class="name">{TEACHER_NAME}</span>
-                        <span class="role">Teacher</span>
-                      </a>
-                      <a class="listlink mail-teacher" href="{TEACHER_URL}">Mail</a>
-                    </div>
-                    <!-- END teacher -->
-                  </li>
-                </ul>
-              </div>
+    <div class="right">
+        <div class="wysiwyg">
+            <span class="gradient-{BOX_DUEDATE_GRADIENT}"><strong>Due {BOX_DUEDATE}</strong></span> on <strong>{BOX_DUETIME}</strong>
+        </div>
+        <div class="view-submission">
+            <div class="student-status submit-{STATUS_HEALTH}">
+                <span>{STATUS_LABEL}</span><br>
+            </div>
         </div>
 
-        <div>
-            <!-- BEGIN returned_work -->
-            <h2>Returned Mark <span class="returned-mark gradient-{RETURNED_WORK_GRADIENT}">{RETURNED_WORK_MARK}</span>
-            </h2>
+        <!-- BEGIN returned_work -->
 
-            <p class="wysiwyg"> {RETURNED_WORK_COMMENT}</p>
-            <ul class="file-list">
-                <!-- BEGIN return_file -->
-                <li>
-                    <a class="" data-icon="download" href="/submission/send.php?id={RETURNED_WORK_FILE_ID}&return=1">
-                        <img width="32" height="32" alt="{RETURNED_WORK_FILE_NAME}" src="/images/mime/60x60/{RETURNED_WORK_FILE_THUMB}"/>
-                        <span class="name">{RETURNED_WORK_FILE_NAME}</span> ({RETURNED_WORK_FILE_SIZE})
-                        <span class="time">{RETURNED_WORK_FILE_DATE}</span>
-                        <span class="icon"></span>
-                    </a>
-                </li>
-                <!-- END return_file -->
-				<!-- BEGIN return_file_uuid -->
-				<li>
-					<a data-icon='download' href="/submission/inlineGrading/viewStudent/{RETURNED_WORK_SUBMISSION_ID}">
-						<img width="32" height="32" alt="{RETURNED_WORK_FILE_NAME}" src="/images/mime/60x60/notepaper_homework.png"/>
-						<span>View Online</span>
-						<span class="icon"></span>
-					</a>
-				</li>
-				<!-- END return_file_uuid -->
-            </ul>
-            <!-- END returned_work -->
+        <ul class="activity-list no-borders">
+            <li class="grade">
+                <p class="return-comment">{RETURNED_WORK_COMMENT}</p>
+                <span class="grade">
+                    <span class="gradient-{RETURNED_WORK_GRADIENT}" title="{RETURNED_WORK_MARK_TIP}">{RETURNED_WORK_MARK}</span>
+                </span>
+            </li>
+        </ul>
 
-            <!-- BEGIN confirm_terms -->
-            <div id="confirmDialog" title="Submit Work Terms">
-                <p>{STUDENT_SUBMIT_TERMS}</p>
-            </div>
-            <!-- END confirm_terms -->
-            <!-- BEGIN recent_submission -->
-            <h2>Your most recent submission</h2>
-            <ul class="file-list">
-                <!-- BEGIN recent_submission_download -->
-                <li>
-                    <a href="/submission/send.php?id={MOST_RECENT_SUBMISSION_FILE_ID}&save=1">
-                        <img width="32" height="32" src="/images/mime/60x60/{MOST_RECENT_SUBMISSION_FILE_THUMB}"/>
+        <ul class="file-list">
+            <!-- BEGIN return_file -->
+            <li>
+                <a class="" data-icon="download" href="/submission/send.php?id={RETURNED_WORK_FILE_ID}&return=1">
+                    <img width="32" height="32" alt="{RETURNED_WORK_FILE_NAME}" src="/images/mime/60x60/{RETURNED_WORK_FILE_THUMB}"/>
+                    <span class="name">{RETURNED_WORK_FILE_NAME}</span> ({RETURNED_WORK_FILE_SIZE})
+                    <span class="time">{RETURNED_WORK_FILE_DATE}</span>
+                    <span class="icon"></span>
+                </a>
+            </li>
+            <!-- END return_file -->
+            <!-- BEGIN return_file_uuid -->
+            <li>
+                <a data-icon='download' href="/submission/inlineGrading/viewStudent/{RETURNED_WORK_SUBMISSION_ID}">
+                    <img width="32" height="32" alt="{RETURNED_WORK_FILE_NAME}" src="/images/mime/60x60/notepaper_homework.png"/>
+                    <span>View Online</span>
+                    <span class="icon"></span>
+                </a>
+            </li>
+            <!-- END return_file_uuid -->
+        </ul>
+        <!-- END returned_work -->
+
+        <!-- BEGIN recent_submission -->
+        <h3>Most recent submission</h3>
+        <ul class="file-list">
+            <!-- BEGIN recent_submission_download -->
+            <li>
+                <a href="/submission/send.php?id={MOST_RECENT_SUBMISSION_FILE_ID}&save=1">
+                    <img width="32" height="32" src="/images/mime/60x60/{MOST_RECENT_SUBMISSION_FILE_THUMB}"/>
                         <span class="name">{MOST_RECENT_SUBMISSION_FILE_NAME}
                             <em>({MOST_RECENT_SUBMISSION_FILE_SIZE})</em>
                             <!-- BEGIN plag_score -->
@@ -167,77 +192,51 @@
                         <span class="time {OVERDUE}">{MOST_RECENT_SUBMISSION_FILE_DATE}
                             <!-- BEGIN overdue -->(Overdue)<!-- END overdue -->
                         </span>
+                    <span class="icon"></span>
+                </a>
+            </li>
+            <!-- END recent_submission_download -->
+        </ul>
+        <!-- BEGIN action_publish -->
+        <form action='/eportfolio/showcase/modifyForm.php' method='post' class="clearfix">
+            <input type='hidden' name='action' value='{PUBLISH_ACTION}' />
+            <input type='hidden' name='userId' value='{PUBLISH_USER_ID}' />
+            <input type='hidden' name='{PUBLISH_TYPE}' value='{PUBLISH_ID}' />
+
+            <p><input type='submit' value='{PUBLISH_BUTTON}' class="submit-btn-plain" /></p>
+        </form>
+        <!-- END action_publish -->
+        <!-- END recent_submission -->
+
+        <!-- BEGIN action_submit -->
+        <a href="/submission/submitOnline/{BOX_ID}" class="clearfix submit-btn-plain">{SUBMIT_LABEL}</a>
+        <!-- END action_submit -->
+
+        <a href="#" class="submit-btn-plain float-right" id="view-history">View History</a>
+
+        <!-- BEGIN subject -->
+        <div class="directory listing">
+            <ul class="subject-list clearfix">
+                <li>
+                    <a class="listlink subject to-subject left-bar" href="/homepage/{CATEGORY_ID}">
+                        {CATEGORY_NAME}
                         <span class="icon"></span>
                     </a>
+                    <!-- BEGIN teacher -->
+                    <div class="profile teacher left-bar">
+                        <a href="/search/user/{TEACHER_ID}" class="listlink teacher-profile">
+                            <img src="{TEACHER_AVATAR}" title="{TEACHER_AVATAR_TITLE}" alt="{TEACHER_AVATAR_TITLE}" />
+                            <span class="name">{TEACHER_NAME}</span>
+                            <span class="role">Teacher</span>
+                        </a>
+                        <a class="listlink mail-teacher" href="{TEACHER_URL}">Mail</a>
+                    </div>
+                    <!-- END teacher -->
                 </li>
-                <!-- END recent_submission_download -->
             </ul>
-			<!-- BEGIN action_publish -->
-			<form action='/eportfolio/showcase/modifyForm.php' method='post' class="clearfix">
-				<input type='hidden' name='action' value='{PUBLISH_ACTION}' />
-				<input type='hidden' name='userId' value='{PUBLISH_USER_ID}' />
-				<input type='hidden' name='{PUBLISH_TYPE}' value='{PUBLISH_ID}' />
-
-				<p><input type='submit' value='{PUBLISH_BUTTON}' class="submit-btn-plain" /></p>
-			</form>
-			<!-- END action_publish -->
-
-            <!-- BEGIN action_resubmit -->
-            <h2>Resubmit work</h2>
-
-            <form method="post" action="/submission/submitWorkForm.php" class="clearfix" enctype="multipart/form-data">
-				<div class="wysiwyg">
-                    <p>You may resubmit your work either by attaching files, or by editing online.</p>
-                    <p>If you edit online, you may save a draft before resubmitting the final version of your work.</p>
-				</div>
-                {ATTACH_ZONE}
-                <label class="clearfix">
-                    <input type="hidden" name="box_id" value="{BOX_ID}"/>
-                </label>
-                <label>
-                    <input type="submit" name="Submit2" value="Submit" class="submit-btn-plain"/>
-                </label>
-            </form>
-			<h2>Online Editor</h2>
-            <!-- BEGIN action_resubmit_online_create -->
-            <a href="/submission/submitOnline/{BOX_ID}" class="submit-btn-plain edit-online">Create a new document</a>
-            <!-- END action_resubmit_online_create -->
-            <!-- BEGIN action_resubmit_online_update -->
-            <p>You have a saved draft.</p>
-            <a href="/submission/submitOnline/{BOX_ID}" class="submit-btn-plain edit-online">Continue editing your draft</a>
-            <!-- END action_resubmit_online_update -->
-            <!-- END action_resubmit -->
-            <!-- END recent_submission -->
-            <!-- BEGIN action_submit -->
-            <h2>Submit Work</h2>
-
-            <form method="post" action="/submission/submitWorkForm.php" class="clearfix" enctype="multipart/form-data">
-                <p>You may submit your work either by attaching files, or by editing online.</p>
-                <p>If you edit online, you may save a draft before submitting the final version of your work.</p>
-                {ATTACH_ZONE}
-                <label class="clearfix">
-                    <input type="hidden" name="box_id" value="{BOX_ID}"/>
-                </label>
-                <label>
-                    <input type="submit" name="Submit2" value="Submit" class="submit-btn-plain"/>
-                </label>
-            </form>
-			<h2>Online Editor</h2>
-            <!-- BEGIN action_submit_online_create -->
-            <a href="/submission/submitOnline/{BOX_ID}" class="submit-btn-plain edit-online">Create document</a>
-            <!-- END action_submit_online_create -->
-            <!-- BEGIN action_submit_online_update -->
-            <p>You have a saved draft.</p>
-            <a href="/submission/submitOnline/{BOX_ID}" class="submit-btn-plain edit-online">Continue editing your draft</a>
-            <!-- END action_submit_online_update -->
-            <!-- END action_submit -->
-
         </div>
-    </div>
-    <!-- BEGIN subject -->
-    <div class="right">
-        <h2>History</h2>
-
+        <div class="hide" id="history-wrap">
+        <h3 class="clear">History</h3>
         <ul id="history" class="activity-list">
             <!-- BEGIN work -->
             <li class="{HISTORY_CLASS} {ROW_COLOR} {HAS_GRADE}">
@@ -254,7 +253,7 @@
                     <a href="/submission/send.php?id={HISTORY_RETURN_FILE_ID}&return=1">{HISTORY_RETURN_FILE_NAME}</a>
                     <!-- END history_returned -->
                     <!-- BEGIN history_marked -->
-                    graded your work<!-- BEGIN history_marked_hascomment -->: <span class="return-comment">"{HISTORY_COMMENT}"</span><!-- END history_marked_hascomment -->
+                    graded your work<!-- BEGIN history_marked_hascomment -->: <span class="return-comment">{HISTORY_COMMENT}</span><!-- END history_marked_hascomment -->
                     <!-- END history_marked -->
                     <!-- BEGIN history_extended -->
                     extended the due date to {HISTORY_EXTENSION}
@@ -279,10 +278,8 @@
             </li>
         </ul>
         <a href="#" class="btn no-icon" id="history-more" style="display: none;">Show more</a>
+        </div>
+        <!-- END subject -->
     </div>
-    <!-- END subject -->
     <div class="clearfix" style="margin-bottom: 8px;"></div>
-    <!-- BEGIN rubric -->
-    <p><em>No rubric data available</em></p>
-    <!-- END rubric -->
 </div>

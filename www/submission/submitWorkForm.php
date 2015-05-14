@@ -20,6 +20,15 @@ if (is_numeric($_POST['box_id'])) {
     /** @var Collection|Submission\File[] $submissions */
     $submissions = new Collection();
 
+    // if there's a post body, we need to undraft the draftl; otherwise we ignore that
+    if (trim($_POST['body'])) {
+        $drafts = $subMap->getDrafts($_SESSION['id'], $_POST['box_id'], 1);
+        if ($drafts->count()) {
+            $drafts->first()->setDraft(false)->setCreatedAt(Alaress_Date_Format::now());
+            $subMap->save($drafts->first());
+        }
+    }
+
     if (is_array($_POST['attachment'])) {
         try {
 

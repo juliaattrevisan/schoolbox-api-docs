@@ -1,111 +1,165 @@
 <!-- BEGIN custom_head -->
+<style type="text/css">
+    .save-draft {
+        width: 100px;
+        text-align: center;
+        float: left;
+        height: 24px;
+        line-height: 24px;
+        margin-top: 8px;
+    }
+</style>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script type="text/javascript">
 
-	// Autosave
-	// On type, ensure that change gets saved.
-	var autosaveTimeout = null
-	var textBoxContent  = ''
+    // Autosave
+    // On type, ensure that change gets saved.
+    var autosaveTimeout = null
+    var textBoxContent  = ''
 
-	// Method for setting up autosave - clears existing event, and creates new one.
-	var initAutosave = function() {
-		clearTimeout(autosaveTimeout)
-		autosaveTimeout = setTimeout(autosavePresubmit, 5*1000)
-	}
+    // Method for setting up autosave - clears existing event, and creates new one.
+    var initAutosave = function() {
+        clearTimeout(autosaveTimeout)
+        autosaveTimeout = setTimeout(autosavePresubmit, 5*1000)
+    }
 
-	// The autosave pre-submit method - called by the autosave method.
-	// Calls the actual submit method if the textbox has changed.
-	var autosavePresubmit = function() {
-		// Has the text box changed? If not check again later
-		// (re-init the autosave counter)
-		var currentContent = tinyMCE.get('textBoxBody').getContent()
-		if (currentContent === textBoxContent) {
-			initAutosave()
-		}
-		else {
-			textBoxContent = currentContent
-			autosaveAjaxSubmit()
-		}
-	}
+    // The autosave pre-submit method - called by the autosave method.
+    // Calls the actual submit method if the textbox has changed.
+    var autosavePresubmit = function() {
+        // Has the text box changed? If not check again later
+        // (re-init the autosave counter)
+        var currentContent = tinyMCE.get('textBoxBody').getContent()
+        if (currentContent === textBoxContent) {
+            initAutosave()
+        }
+        else {
+            textBoxContent = currentContent
+            autosaveAjaxSubmit()
+        }
+    }
 
-	// The autosave submit method
-	var autosaveAjaxSubmit = function() {
-		var form = $('form#textBoxForm')
+    // The autosave submit method
+    var autosaveAjaxSubmit = function() {
+        var form = $('form#textBoxForm')
 
-		// Change button's text, but keep its width the same.
-		// Change it back once done.
-		var formSaveButton = form.find('input[type="submit"][name="save_draft"]')
-		var oldText        = formSaveButton.val()
-		var buttonWidth    = formSaveButton.width()
-		formSaveButton.prop('disabled', true).val('Saving...').width(buttonWidth)
+        // Change button's text, but keep its width the same.
+        // Change it back once done.
+        var formSaveLabel = form.find('label.save-draft')
+        var oldText        = formSaveLabel.text() || 'Draft Saved'
 
-		// Submit form via AJAX
-		var formContents = form.serializeArray()
-		formContents.push({name: 'save_draft', value: '1'})
-		formContents.push({name: 'body',       value: tinyMCE.get('textBoxBody').getContent()})
-		$.ajax({
-			type: "POST",
-			url:  form.attr('action'),
-			data: formContents,
-			complete: function() {
-				// Re-init the autosave
-				initAutosave()
-				setTimeout(
-					function() { formSaveButton.prop('disabled', false).val(oldText) },
-					2000
-				)
-			},
-			success: function() {
-				formSaveButton.val('Saved!')
-			},
-			error: function() {
-				formSaveButton.val('Error!')
-			},
-			dataType: 'json'
-		});
-	}
+        formSaveLabel.text('(Autosaving)')
 
-	$(function() {
-		$.fn.alaressTiny({
-			mode : "exact",
-			elements: "textBoxBody",
-			setup: function(ed) {
-				initAutosave()
-				ed.onChange.add(function() {
-					autosavePresubmit()
-				})
-			}
-		});
+        // Submit form via AJAX
+        var formContents = form.serializeArray()
+        formContents.push({name: 'save_draft', value: '1'})
+        formContents.push({name: 'body',       value: tinyMCE.get('textBoxBody').getContent()})
+        $.ajax({
+            type: "POST",
+            url:  '/submission/submitOnlineForm.php',
+            data: formContents,
+            complete: function() {
+                // Re-init the autosave
+                initAutosave()
+                setTimeout(
+                    function() { formSaveLabel.text(oldText) },
+                    2000
+                )
+            },
+            success: function() {
+                formSaveLabel.text(oldText)
+            },
+            error: function() {
+                formSaveLabel.text('Error!')
+            },
+            dataType: 'json'
+        });
+    }
 
-		$('form#textBoxForm input[name="save_draft"]').click(function(event) {
-			event.preventDefault()
-			autosaveAjaxSubmit()
-		})
-		$('form#textBoxForm input[name="save"]').click(function(event) {
-			if (!confirm('Are you sure you are ready to send this submission for assessment?')) {
-				event.preventDefault()
-			}
-		})
-	});
+    $(function() {
+        $.fn.alaressTiny({
+            mode : "exact",
+            elements: "textBoxBody",
+            setup: function(ed) {
+                initAutosave()
+                ed.onChange.add(function() {
+                    autosavePresubmit()
+                })
+            }
+        });
+
+        $( "#confirmDialog" ).dialog({
+            autoOpen: false,
+            modal: true,
+            dialogClass: "no-close"
+        });
+
+        $("input[name='save']").click(function(e) {
+            if($( "#confirmDialog" ).length) {
+                e.preventDefault();
+                var form = $(this).closest('form');
+                $("#confirmDialog").dialog({
+                    buttons: {
+                        "Yes, I agree": function() {
+                            form.find(':submit').prop('disabled', true);
+                            form.submit();
+                        },
+                        Cancel: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    }
+                });
+
+                $("#confirmDialog").dialog("open");
+            }
+        });
+
+    });
 </script>
 <!-- END custom_head -->
 
 <div id="submission-history">
-	<div class="clearfix">
-		<h2>{CATEGORY_NAME} - {BOX_NAME} <span>({BOX_TYPE})</span></h2>
-		<h3>Due <span class="gradient-{BOX_DUEDATE_GRADIENT}">{BOX_DUEDATE}</span></h3>
-		<div class="wysiwig">
-			<form action="/submission/submitOnlineForm.php" method="post" id="textBoxForm">
-				<input type="hidden" name="box_id" value="{BOX_ID}" />
-				<input type="hidden" name="submission_id" value="{SUBMISSION_ID}" />
-				<textarea rows="20" style="width: 100%;" name="body" id="textBoxBody">{TEXTBOX_BODY}</textarea>
-				<br/>
-				<p>You may save this submission as a draft, and come back to work on it later.</p>
-				<input class="submit-btn-plain" type="submit" name="save_draft" value="Save as draft" />
-				<input class="submit-btn-plain" type="submit" name="save" value="Submit for assessment" />
-				<a href="/submission/submissionHistory/{BOX_ID}/{USER_ID}" class="submit-btn-plain">Return to submission</a>
-			</form>
-		</div>
-	</div>
+    <form method="post" action="/submission/submitWorkForm.php" id="textBoxForm" enctype="multipart/form-data">
+        <input type="hidden" name="box_id" value="{BOX_ID}" />
+        <input type="hidden" name="submission_id" value="{SUBMISSION_ID}" />
+
+        <h1>{CATEGORY_NAME} - {BOX_NAME} <span>({BOX_TYPE})</span></h1>
+        <span class="header_option">
+            <a href="/submission/submissionHistory/{BOX_ID}/{USER_ID}" class="btn go-back"><span></span>Return to {BOX_NAME}</a>
+        </span>
+        <div class="wysiwyg">
+            <p>
+                <span class="gradient-{BOX_DUEDATE_GRADIENT}"><strong>Due {BOX_DUEDATE}</strong></span> on <strong>{BOX_DUETIME}</strong>
+            </p>
+            <p>
+                You can attach files and/or edit online for your submission.<br/>
+                Content you edit online will automatically save drafts, but your work will <strong>not be submitted</strong> until you Submit for Assessment.
+            </p>
+
+            <!-- BEGIN confirm_terms -->
+            <div id="confirmDialog" title="Submit Work Terms">
+                <p>{STUDENT_SUBMIT_TERMS}</p>
+            </div>
+            <!-- END confirm_terms -->
+        </div>
+
+        <div class="left">
+            <div class="wysiwig">
+                <textarea rows="20" style="width: 100%;" name="body" id="textBoxBody">{TEXTBOX_BODY}</textarea>
+            </div>
+        </div>
+        <div class="right">
+            <h2>Attachments</h2>
+            <p></p>
+            {ATTACH_ZONE}
+        </div>
+
+        <div class="clearfix"></div>
+        <p></p>
+        <p>
+            <input class="submit-btn-plain" type="submit" name="save" value="Submit for Assessment" />
+            <label class="save-draft"></label>
+        </p>
+    </form>
 </div>
