@@ -240,8 +240,6 @@ class UserMapper extends Mapper
 
         $statement->execute(array($id));
 
-        $linkedUserList = [];
-
         /** @var User $user */
         foreach ($statement as $row) {
             if (!($user instanceof User)) {
@@ -286,6 +284,79 @@ class UserMapper extends Mapper
         return $user;
     }
 
+    /**
+     * Find a user by their external id and come with roles, campus, etc
+     *
+     * @param $id
+     * @return bool|User
+     * @throws Mapper\Exception
+     */
+    public function findByExternalId($id) {
+        $user = false;
+        $roleMapper = new RoleMapper;
+        $campusMapper = new CampusMapper;
+        $linkedUserList = array();
+
+        $statement = $this->database->prepare("
+            SELECT
+                {$this->getColumnString('u')}, IF(su.id, 1, 0) as `u.superuser`,
+                {$roleMapper->getColumnString('g')},
+                {$campusMapper->getColumnString('c')}, uc.defaultCampus as `uc.defaultCampus`,
+                {$this->getColumnString('lu')}
+            FROM `user` u
+            LEFT JOIN `groups` g ON group_id = g.`id`
+            LEFT JOIN userCampus uc ON uc.`uid`=u.id
+            LEFT JOIN superusers su ON su.id = u.id
+            LEFT JOIN luCampus c ON c.id = uc.`campus`
+            LEFT JOIN {$this->getJoinSql('user_link', 'u', 'lu')}
+            WHERE u.synergy_id = ?
+        ");
+
+        $statement->execute(array($id));
+
+        /** @var User $user */
+        foreach ($statement as $row) {
+            if (!($user instanceof User)) {
+                $user = $this->hydrate($row, 'u');
+                $user->setSuperUser($row['u.superuser'] == 1);
+                $user->setRole($roleMapper->hydrate($row, 'g'));
+
+                /** @var UserAccessMapper $uaMapper */
+                $uaMapper = $this->getJoinMapper('userAccess');
+                $user->setAccessList($uaMapper->findAllForUser($user));
+            }
+
+            $campus = $campusMapper->hydrate($row, 'c');
+
+            /* If the campus object has no id, then it spawned a campus
+             * object from nonexistent data (e.g. a user with no campus)
+             * In this case, the campus object will be totally empty but
+             * still occupy slots in the user's campus collection stack
+             */
+            if ($campus->getId()) {
+                $user->getCampusCollection()->add($campus);
+
+                if ($row['uc.defaultCampus'] == 1) {
+                    $user->setDefaultCampus($campus);
+                }
+            }
+
+            $linkedUser = $this->hydrate($row,'lu');
+            if ($linkedUser->getId()) {
+                $linkedUserList[$linkedUser->getId()] = $linkedUser;
+            }
+        }
+
+        if (count($linkedUserList)) {
+            $linkedCollection = new Collection($linkedUserList);
+            $user->setLinkedUser($linkedCollection);
+        }
+
+        if (!($user instanceof User)) {
+            throw new Schoolbox\Mapper\Exception('Instance of object not found');
+        }
+        return $user;
+    }
 
     /**
      * Fetches the user, and all of the user's subjects.

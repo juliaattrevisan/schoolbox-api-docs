@@ -101,8 +101,12 @@ class External_Denbigh2_Api {
             $keystring = "RFMsF{$index}";
             $valuestring = "RFMsV{$index}";
 
+            /* Note that Filemaker performs a LIKE statement by default
+             * Use double-encoded equals sign to force exact matching
+             * Advised by Gort
+             */
             $mungedValues[$keystring] = $keys[$i];
-            $mungedValues[$valuestring] = $values[$i];
+            $mungedValues[$valuestring] = "=={$values[$i]}";
         }
 
         $dataset = array_merge($authentication, $mungedValues, $options);
