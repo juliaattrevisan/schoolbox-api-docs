@@ -49,10 +49,17 @@ class EntriesAndResults extends Base {
             /* Teachers
              * Trim empty teachers out for course teachers
              */
-            $finalStack[$courseName]['allTeachers'][] = $current['ClassTeacher1'];
-            $finalStack[$courseName]['allTeachers'][] = $current['ClassTeacher2'];
-            $finalStack[$courseName]['allTeachers'][] = $current['ClassTeacher3'];
-            $finalStack[$courseName]['allTeachers'] = array_values(array_unique(array_filter($finalStack[$courseName]['allTeachers'])));
+            if (strlen($current['ClassTeacher1'])) {
+                $finalStack[$courseName]['allTeachers'][$current['ClassTeacher1']] = $current['ClassTeacher1Email'];
+            }
+
+            if (strlen($current['ClassTeacher2'])) {
+                $finalStack[$courseName]['allTeachers'][$current['ClassTeacher2']] = $current['ClassTeacher2Email'];
+            }
+
+            if (strlen($current['ClassTeacher3'])) {
+                $finalStack[$courseName]['allTeachers'][$current['ClassTeacher3']] = $current['ClassTeacher3Email'];
+            }
 
             /* Entries
              */
@@ -93,7 +100,7 @@ class EntriesAndResults extends Base {
             $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
             $finalStack[$courseName]['summary']['type'][$internalExternal]['availableCredits'] += ($current['EnteredCredits'] - $current['ResultCredits']);
         }
-
+new \Alaress_Probe($finalStack);
         return $finalStack;
     }
 
@@ -107,8 +114,11 @@ class EntriesAndResults extends Base {
             SELECT
                 CourseDescription,
                 ClassTeacher1,
+                ClassTeacher1Email,
                 ClassTeacher2,
+                ClassTeacher2Email,
                 ClassTeacher3,
+                ClassTeacher3Email
                 NCEAStandardNumber,
                 InternalorExternalAssessment,
                 StandardTitle,

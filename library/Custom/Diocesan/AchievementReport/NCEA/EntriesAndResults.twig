@@ -14,8 +14,17 @@
                 {{ courseName }}
 
                 <ul class="teacher-list">
-                    {% for currentTeacher in allData.allTeachers %}
-                    <li><a href='#'>{{ currentTeacher }}</a>{% if not loop.last %}, {% endif %}</li>
+                    {% for currentTeacherName, currentTeacherEmail in allData.allTeachers %}
+                    <li>
+                        <em>
+                            {% if currentTeacherEmail != '' %}
+                            <a href='mailto:{{ currentTeacherEmail }}'>{{ currentTeacherName }}</a>
+                            {% else %}
+                            {{ currentTeacherName }}
+                            {% endif %}
+                            {% if not loop.last %}, {% endif %}
+                        </em>
+                    </li>
                     {% endfor %}
                 </ul>
             </td>
