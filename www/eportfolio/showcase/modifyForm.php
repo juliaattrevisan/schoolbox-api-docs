@@ -29,6 +29,15 @@ if ($authenticator->canModify()) {
 		$boxId = $_POST['boxId'];
 		$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
+        // Find the submission box
+        try {
+            $box = \Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance()->findById($boxId);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // "submission box does not exist"
+            error(17);
+            exit;
+        }
+
 		/* Check if the submission box is already being showcased; if so, ignore request
 		 */
 		$existing = \Eportfolio\ShowcaseMapper::getInstance()->findByColumnList(
@@ -40,7 +49,7 @@ if ($authenticator->canModify()) {
 
 		if (!$existing->count()) {
 			$showcasedItem = new \Eportfolio\Showcase();
-			$showcasedItem->setSubmissionBoxId($boxId);
+			$showcasedItem->setSubmissionBox($box);
 			$showcasedItem->setUid($ownerId);
 			$showcasedItem->setCreatedAt($now);
 			$showcasedItem->setUpdatedAt($now);
