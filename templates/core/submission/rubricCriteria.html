@@ -104,16 +104,12 @@ $(function() {
 });
 </script>
 <!-- END custom_head -->
-<h1>{PAGE_TITLE}</h1>
+<h1>{PAGE_TITLE}<a class="btn go-back" href="/homepage/{CATEGORY_ID}"><span></span>Return to Homepage</a></h1>
 <form action="/submission/rubricCriteriaForm.php" method="POST" id="folderForm" class="rubric-settings clearfix">
     <table class="standardForm table">
-        <tr>
-            <td class="formLabelWidth"><h4>Folder</h4></td>
-            <td>{CATEGORY_NAME}</td>
-        </tr>
         <!-- BEGIN allow_cascade -->
         <tr>
-            <td>
+            <td class="formLabelWidth">
                 <h4>Subfolders</h4>
                 <em></em>
             </td>
@@ -127,9 +123,9 @@ $(function() {
         </tr>
         <!-- END allow_cascade -->
         <tr>
-            <td>
+            <td class="formLabelWidth">
                 <h4>Criteria</h4>
-                <em>Add and remove criteria.<br/><br/>
+                <em>Criteria are used as rows in a rubric.  You must first add criteria before you can build a rubric.<br><br>
                     If you want to delete a criterion that has already been used on an assessment, you need to first
                     remove it from the assessment, then you can delete it.<br/><br/>
                     If you remove all the criteria from a group, the group will automatically be deleted.<br/><br/>
