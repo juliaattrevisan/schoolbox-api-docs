@@ -69,8 +69,8 @@ if (isset($_POST['description'])) {
     }
 
     // set attributes
-    if (is_null($file->getFilename()) || preg_match('`^[0-9a-f]{40}`', $file->getFilename())) {
-        $file->setFilename($file->getHash() . '.' . $file->getStorage()->getExtension());
+    if (is_null($file->getFilename())) {
+        $file->setFilename($file->getStorage()->getBasename());
     }
 
     $file->setCreatedAt(Alaress_Date_Format::now());
