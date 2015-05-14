@@ -185,6 +185,8 @@ class DueWork_Detail
                 'CATEGORY_NAME'       => Scrub::text($this->submissionBox->getCategory()->getName()),
                 'DUEWORK_TYPE'        => $this->submissionBox->getWorkType()->getName(),
                 'DUEWORK_DUEDATE'     => $closeString,
+                'GRADE_VISIBILITY'      => $this->submissionBox->getMarkVisibilityDescription(),
+                'GRADE_VISIBILITY_CODE' => $this->submissionBox->getMarkVisibility(),
                 'CATEGORY_ID'         => $this->submissionBox->getCategory()->getId(),
                 'BOX_ID'              => $this->submissionBox->getId(),
                 'SITE_ROOT'           => $page->conType() . $_SERVER['HTTP_HOST'],

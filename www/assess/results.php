@@ -164,14 +164,33 @@ $this->setTitle('Results for: ' . $assess['title']);
 
 $category = \Schoolbox\Resource\CategoryMapper::getInstance()->findById($assess['category_id']);
 
+$dueDate = new Alaress_Date_Format($assess['finish'],Alaress_Date_Format::DATABASE_DATE_FORMAT);
+
+$visibility = '';
+switch($assess['mark_visibility']) {
+    case 0:
+        $visibility = 'Staff Only';
+        break;
+    case 1:
+        $visibility = 'Staff and Students';
+        break;
+    case 2:
+        $visibility = 'Staff, Students and Parents';
+        break;
+}
+
+
 $this->setVar(
     array(
         'ASSESS_ASSESS_ID' => $assess['assess_id'],
         'ASSESS_TITLE' => Scrub::text($assess['title']),
+        'ASSESS_DUEDATE' => $dueDate->getLongDateOnly(),
+        'GRADE_VISIBILITY'      => $visibility,
+        'GRADE_VISIBILITY_CODE' => $assess['mark_visibility'],
         'CID' => $assess['category_id'],
         'CATEGORY_NAME' => Scrub::text($category->getName()),
-        'DUEWORK_YEAR'     => date('Y', strtotime($assess['finish'])),
-        'DUEWORK_SEMESTER' => DueWork_All::getSemester(strtotime($assess['finish'])),
+        'DUEWORK_YEAR'     => $dueDate->getYear(),
+        'DUEWORK_SEMESTER' => $dueDate->getYearHalf(),
     )
 );
 

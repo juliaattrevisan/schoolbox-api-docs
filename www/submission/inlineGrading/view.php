@@ -91,6 +91,8 @@ foreach ($dueWorkDetail->getSitepageData() as $studentId => $studentData) {
 
         $this->setVar(array(
             'BOX_ID'                => $submissionBox->getId(),
+            'GRADE_VISIBILITY'      => $submissionBox->getMarkVisibilityDescription(),
+            'GRADE_VISIBILITY_CODE' => $submissionBox->getMarkVisibility(),
             'USER_ID'               => $currentStudent->getId(),
             'USER_EXT_ID'           => $currentStudent->getExternalId(),
             'USER_FULLNAME'         => $currentStudent->formatName('{lastname}, {firstname}'),
