@@ -62,8 +62,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                         $this->dayNumber[$campus_id] = $day_number;
                         $this->dayName[$campus_id] = $timetableHandler->getDayName($day_number);
                         $this->currentPeriod[$campus_id] = $timetableHandler->getPeriodNumber($campus);
-                        $this->timetable[$campus_id] = $timetableHandler->getDayTimetable(
-                            $_SESSION['sid'], $_SESSION['id'], $campus, $day_number
+                        $this->timetable[$campus_id] = $timetableHandler->getTimetableForDate(
+                            $_SESSION['sid'], $_SESSION['id'], $campus, Alaress_Date_Format::now()
                         );
                     }
                 }
@@ -212,12 +212,14 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                     && Cfg::get('external_type') == 'synergetic'
                                     && Cfg::get('external_attendance')
                                     && $this->group->isStaff()
+                                    && $class['AttendanceEnabled']
                                 ) {
                                     $this->setVar(
                                         array(
                                             'ATTENDANCE_CLASS_CODE'        => $class['campus'] ? $class['campus'] . '/' . $class['code'] : '0/' . $class['code'],
                                             'ATTENDANCE_ATTENDANCE_DATE'   => $attendance_date,
                                             'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
+                                            'ATTENDANCE_MARKED'            => $class['AttendanceMarked'] ? 'marked' : '',
                                         )
                                     );
 

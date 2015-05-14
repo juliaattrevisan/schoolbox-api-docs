@@ -87,10 +87,43 @@ interface External_TimetableInterface
      * @param $userId
      * @param Schoolbox\Campus $campus
      * @param $dayNumber
-     * @internal param $campusId
      * @return mixed
      */
 	public function getDayTimetable ($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber);
+
+
+    /**
+     * Return a user's timetable for a specific date
+     *
+     * This was developed as synergetic has substitutions and attendance data available in a stored proc which
+     * is date dependent
+     *
+     * Depending on the role for $userId (staff or student) this summons the respective
+     * method to spawn associated timetable
+     *
+     * Has the structure for each period
+     *
+     * periodName
+     * periodStart
+     * periodEnd
+     * periodNumber
+     * periodSequence
+     * description
+     * code
+     * room
+     * staffID
+     * staffTitle
+     * staffFirstname
+     * staffSurname
+     *
+     * @param $externalUserId
+     * @param $userId
+     * @param Schoolbox\Campus $campus
+     * @param Alaress_Date_Format $date
+     * @return mixed
+     */
+    public function getTimetableForDate ($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date);
+
 
     /**
      * Return the ENTIRE timetable for a user and campus

@@ -175,7 +175,10 @@ class External_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Returns a user's timetable for a particular day
+     * Returns a user's timetable for a particular day,
+     * this can probably be retired and superseeded by the date version
+     * @deprecated
+     *
      *
      * The structure of this data is as follows
      * Array[]['periodName']
@@ -202,6 +205,36 @@ class External_Timetable implements External_TimetableInterface
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
+
+    /**
+     * Returns a user's timetable for a particular date
+     *
+     * The structure of this data is as follows
+     * Array[]['periodName']
+     * Array[]['periodStart']
+     * Array[]['periodEnd']
+     * Array[]['periodNumber']
+     * Array[]['periodSequence']
+     * Array[]['class'][]['description']
+     * Array[]['class'][]['code']
+     * Array[]['class'][]['room']
+     * Array[]['class'][]['campus']
+     * Array[]['class'][]['staffID']
+     *
+     * Note that you can have multiple classes per period.
+     *
+     *
+     * @param Integer $externalUserId
+     * @param Integer $userId
+     * @param int|\Schoolbox\Campus $campus
+     * @param Alaress_Date_Format $date
+     * @return Array
+     */
+    function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date)
+    {
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
+    }
+
 
     /**
      * Gets the timetable for the given room.

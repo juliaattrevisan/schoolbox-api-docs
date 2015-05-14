@@ -35,6 +35,13 @@ class External_Offline_Timetable implements External_TimetableInterface
         // Noop
     }
 
+
+    public function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date)
+    {
+        // noop
+    }
+
+
     public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
     {
         // Throw exception to let the user know we cannot fetch it for them
