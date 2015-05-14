@@ -210,7 +210,7 @@ class Leave_Core_Report_House_Web
                 if ($request->getOccupancy($nightStart, $nightEnd)) {
                     /* Check whether the next morning is occupied
                      */
-                    $nextMorning = $dayStart;
+                    $nextMorning = clone $dayStart;
                     $nextMorning->addDays(1);
 
                     if ($showStartTime) {
@@ -478,7 +478,7 @@ class Leave_Core_Report_House_Web
             /* Parse out the headings
              */
             for ($i = 0; $i < $this->getRange(); $i++) {
-                $headerDate = $data['reportStart'];
+                $headerDate = clone $data['reportStart'];
                 $headerDate->addDays($i);
 
                 $this->getPage()->setVar(

@@ -124,16 +124,16 @@ class Leave_Kings_Report_House_Web
                 * Night: 21:00:00 to 6:59:59
                 */
             $data = $this->getData();
-            $morningStart = $data['reportStart'];
+            $morningStart = clone $data['reportStart'];
             $morningStart->addHours(7);
 
-            $dayStart = $data['reportStart'];
+            $dayStart = clone $data['reportStart'];
             $dayStart->addHours(11);
 
-            $nightStart = $data['reportStart'];
+            $nightStart = clone $data['reportStart'];
             $nightStart->addHours(21);
 
-            $nightEnd = $data['reportStart'];
+            $nightEnd = clone $data['reportStart'];
             $nightEnd->addHours(31);
 
 
@@ -217,7 +217,7 @@ class Leave_Kings_Report_House_Web
 
                     /* Check whether the next morning is occupied
                           */
-                    $nextMorning = $dayStart->getDatabase();
+                    $nextMorning = clone $dayStart;
                     $nextMorning->addDays(1);
 
                     if ($showStartTime) {
@@ -505,7 +505,7 @@ class Leave_Kings_Report_House_Web
             /* Parse out the headings
                 */
             for ($i = 0; $i < $this->getRange(); $i++) {
-                $headerDate = $data['reportStart'];
+                $headerDate = clone $data['reportStart'];
                 $headerDate->addDays($i);
 
                 $this->getPage()->setVar(
