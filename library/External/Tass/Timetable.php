@@ -248,6 +248,25 @@ class External_Tass_Timetable implements External_TimetableInterface
 
     }
 
+    /**
+     * Return a user's timetable for a specific date
+     *
+     * Depending on the role for $userId (staff or student) this summons the respective
+     * method to spawn associated timetable
+     *
+     *
+     * @param $externalUserId
+     * @param $userId
+     * @param Schoolbox\Campus $campus
+     * @param Alaress_Date_Format $date
+     * @return mixed
+     */
+    public function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date)
+    {
+        return $this->getDayTimetable($externalUserId, $userId, $campus, $this->getDayNumber($campus, $date->getUnixTimeStamp()));
+    }
+
+
     function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
     {
         if (empty($externalUserId)) {
