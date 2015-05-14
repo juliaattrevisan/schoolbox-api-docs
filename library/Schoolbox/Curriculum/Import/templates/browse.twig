@@ -242,9 +242,9 @@
         <li><a href="#step-3">Outcomes</a></li>
     </ul>
     <section id="step-1">
-        <em>Select a source to import your curriculum from.</em>
+        <em>Curriculum Source:</em>
         <select name="source">
-            <option value="">-- select a source --</option>
+            <option value="">Select a source</option>
             {% for item in sourceList %}
                 <option value="{{ item.id|e('html_attr') }}"
                         label="{{ item.name|e('html_attr') }}"
@@ -260,12 +260,13 @@
                 />
     </section>
     <section id="step-2">
-        <em>Select a learning level and learning area to import outcomes from.</em>
+        <em>Level:</em>
         <select name="learningLevel" disabled>
-            <option value="">-- select a level --</option>
+            <option value="">Select a level</option>
         </select>
+        <em>Learning Area:</em>
         <select name="learningArea" disabled>
-            <option value="">-- select an area --</option>
+            <option value="">Select an area</option>
         </select>
         <input type="submit"
                value="Search"
@@ -277,10 +278,10 @@
     <section id="step-3">
         <h4>Name of curriculum</h4>
         <input type="text" name="curriculumName" value="" />
-        <h4>Preview</h4>
+        <h2>Preview</h2>
 
         <ul class="wysiwyg curriculum-import-widget-outcomes" id="outcomes"></ul>
-        After saving the curriculum, you may customise individual steps.
+        You can make changes after saving your curriculum.
         <input type="submit"
                value="Save Curriculum"
                class="submit-btn-plain inline"
