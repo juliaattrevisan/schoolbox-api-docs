@@ -43,7 +43,7 @@ class Module extends BaseModule
     {
         $authorizer->addRule('/^submission\\..*/', new Rule\IsLoggedIn());
         $authorizer->addRule(
-            '/^submission\\.(?:viewOverview)/',
+            '/^submission\\..+(?:Overview)/',
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRole(Role::STAFF)
