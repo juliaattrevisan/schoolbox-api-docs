@@ -267,6 +267,12 @@
             $(this).rules(
                 'add',
                 {
+                    required: {
+                        depends: isRubricValueChecked
+                    },
+                    digits: {
+                        depends: isRubricValueChecked
+                    },
                     markTypeRubricValuesCheck: {
                         depends: isRubricValueChecked
                     }
