@@ -478,9 +478,14 @@ Notifications
 }
 
 .error-notification {
-    .information-notification;
-    background-image: url(/images/famicons/exclamation.png);
-    background-color: @negative-color;
+    background: lighten(@highlight-color,@lighten-value) url(/images/core/icons/label-error.png) no-repeat 6px 2px;
+    width: 100%;
+    padding: 4px;
+    text-indent: 36px;
+    padding: 3px 0;
+    border: 1px solid @highlight-color;
+    color: @negative-color !important;
+    display: block;
 }
 
 /*--------------------------------------------------------------
@@ -2798,18 +2803,7 @@ label {
     }
 
     &.error {
-        background: lighten(@highlight-color,@lighten-value) url(/images/core/icons/label-error.png) no-repeat 6px 2px;
-        width: 100%;
-        padding: 4px;
-        text-indent: 36px;
-        padding: 3px 0;
-        border: 1px solid @highlight-color;
-        color: @negative-color !important;
-        display: block;
-
-        -moz-background-clip: padding;
-        -webkit-background-clip: padding-box;
-        background-clip: padding-box;
+        .error-notification
     }
 }
 
