@@ -9608,6 +9608,39 @@ ul.submission-list {
     .directory li {
         border-right-width: 0;
     }
+    // overrides .view-submission .student-status
+    .student-status {
+        max-width: none;
+        padding: 2px 6px;
+        margin: 4px 0;
+    }
+    .file-list {
+        padding-bottom: 16px;
+    }
+    .return-comment {
+        font-style: italic;
+        &:empty {
+            display: none;
+        }
+        &:before, &:after {
+            content: "\"";
+        }
+    }
+    .no-borders {
+        .grade {
+            border: none !important;
+        }
+        li.grade {
+            padding-left: 0 !important;
+            padding-right: 56px !important;
+        }
+    }
+}
+#history-wrap.ui-dialog-content {
+    padding: 16px 64px;
+    h3 {
+        display: none;
+    }
 }
 
 td.name {
