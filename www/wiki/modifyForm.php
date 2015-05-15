@@ -12,10 +12,15 @@ $now = new Alaress_Date_Format(time(), 'U');
 
 // posting a revision - wiki may or may not exist
 if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
+    $heading = trim($_POST['heading']);
+    if (strlen($heading) === 0) {
+        error(2);
+        exit;
+    }
     // generate the revision object regardless of whether or not the wiki exists
     $revision = new \Schoolbox\Wiki\Revision();
     $revision
-        ->setHeading($_POST['heading'])
+        ->setHeading($heading)
         ->setCreated($now)
         ->setBody($revisionMapper->createStubLinks($_POST['body'], $_POST['categoryID']))
         ->setUser($_SESSION['user']);
@@ -42,7 +47,7 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
         // request to create new wiki
         $cat = new \Schoolbox\Resource\Category();
         $cat->setId($_POST['categoryID']);
-        $url  = new Url($_POST['heading']);
+        $url  = new Url($heading);
         $wiki = new \Schoolbox\Wiki\Wiki();
         $wiki
             ->setCategory($cat)
