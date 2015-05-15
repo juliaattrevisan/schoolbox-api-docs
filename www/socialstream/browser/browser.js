@@ -64,6 +64,11 @@ try {
 				 */
 				submitCallback: function(url, filename, metadata) { },
 
+                /* A callback method. When a content ajax-load is successful,
+                 * this method will be fired.
+                 */
+                loadedCallback: function() { },
+
 				/* The element containing the browser
 				 */
 				element: element,
@@ -150,6 +155,7 @@ try {
 			/* Load data into the node container
 			 */
 			config.element.load(config.url, args, function () {
+                config.loadedCallback.call($j(this));
 
 				/* These allow new nodes to be loaded
 				 */
