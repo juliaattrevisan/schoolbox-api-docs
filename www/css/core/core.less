@@ -8420,6 +8420,17 @@ form.context {
             margin-left: 1em;
         }
     }
+    .student-status {
+        font-size: 0.8em;
+        font-weight: bold;
+        text-transform: uppercase;
+        text-align: center;
+        display: block;
+        padding: 0px 6px;
+        max-width: 120px;
+        margin-left: 39px;
+        clear: right;
+    }
     .table {
         margin-top: 16px;
         table-layout: fixed;
@@ -8428,17 +8439,6 @@ form.context {
             &.user {
                 .student {
                     padding: 10px 0;
-                    .student-status {
-                        font-size: 0.8em;
-                        font-weight: bold;
-                        text-transform: uppercase;
-                        text-align: center;
-                        display: block;
-                        padding: 0px 6px;
-                		max-width: 120px;
-						margin-left: 39px;
-						clear: right;
-                    }
                 }
                 .marking {
                     padding: 8px 8px 8px 0;
@@ -9601,6 +9601,39 @@ ul.submission-list {
     }
     .directory li {
         border-right-width: 0;
+    }
+    // overrides .view-submission .student-status
+    .student-status {
+        max-width: none;
+        padding: 2px 6px;
+        margin: 4px 0;
+    }
+    .file-list {
+        padding-bottom: 16px;
+    }
+    .return-comment {
+        font-style: italic;
+        &:empty {
+            display: none;
+        }
+        &:before, &:after {
+            content: "\"";
+        }
+    }
+    .no-borders {
+        .grade {
+            border: none !important;
+        }
+        li.grade {
+            padding-left: 0 !important;
+            padding-right: 56px !important;
+        }
+    }
+}
+#history-wrap.ui-dialog-content {
+    padding: 16px 64px;
+    h3 {
+        display: none;
     }
 }
 
