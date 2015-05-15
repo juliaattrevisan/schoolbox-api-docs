@@ -38,12 +38,12 @@
     var w = window.open(this.href,'1396330261396','width=720,height=500,toolbar=0,menubar=0,location=0,status=1,scrollbars=1,resizable=1,left=0,top=0');
 
     $(w).on('unload', function (e) {
-      console.log(e, this);
-
       var ab = $('#attachment-browser'),
           li = ab.children('li.browsing');
 
       ab.data(li.data('source'), false);
+
+      li.children('div.explorer').addClass('preload');
 
       li.find('a.src-select').trigger('click');
 
