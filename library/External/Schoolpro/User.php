@@ -524,6 +524,17 @@ class External_Schoolpro_User implements External_UserInterface
      */
     public function getStudentUserAccountInfo()
     {
+        $vars = array(
+            'sbGetStudentAccounts',
+            array(
+                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+            )
+        );
+
+        $result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+
+        new \Alaress_Probe($result);
     }
 
     /**
@@ -531,6 +542,17 @@ class External_Schoolpro_User implements External_UserInterface
      */
     public function getParentUserAccountInfo()
     {
+        $vars = array(
+            'sbGetGuardianAccounts',
+            array(
+                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+            )
+        );
+
+        $result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+
+        new \Alaress_Probe($result);
     }
 
     /**
@@ -538,6 +560,17 @@ class External_Schoolpro_User implements External_UserInterface
      */
     public function getStaffUserAccountInfo()
     {
+        $vars = array(
+            'sbGetStaffAccounts',
+            array(
+                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+            )
+        );
+
+        $result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+
+        new \Alaress_Probe($result);
     }
 
     /**
