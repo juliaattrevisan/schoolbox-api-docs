@@ -1,4 +1,5 @@
 <?php
+use Alaress\Authorizer\Failure\AuthenticationTimedOut;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\Loader;
@@ -73,6 +74,8 @@ try {
     $this->error(6);
 } catch (OutOfBoundsException $e) {
     $this->error(2);
+} catch (AuthenticationTimedOut $e) {
+    $this->error(null, "Office 365 error: {$e->getMessage()}");
 } catch (RuntimeException $e) {
     die('<span class="auth-required">Click <a data-gettoken href="/ajax/oauth/microsoft">here</a> to connect your Office 365 account.</span>');
 }

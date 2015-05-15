@@ -10,6 +10,7 @@
 namespace Schoolbox\Resource\Browser\Office365;
 
 
+use Alaress\Authorizer\Failure\AuthenticationTimedOut;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\File\Remote\FetcherInterface;
 use Alaress_Date_Format;
@@ -208,6 +209,11 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
         $rs = curl_exec($ch);
 
         $data = json_decode($rs, true);
+
+        if (empty($data)) {
+            // timed out
+            throw new AuthenticationTimedOut('Connecting to Office 365 timed out, please try again later.');
+        }
 
         // interpret errors
         if (isset($data['error'])) {
