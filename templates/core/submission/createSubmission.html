@@ -81,6 +81,7 @@
 
 
         // cache lookups
+        var submission_form = $('#createSubmissionForm');
         var acceptSubmit = $('input:checkbox[name=accept_submission]');
         var acceptHide = $('.accept-hide');
 
@@ -132,8 +133,34 @@
             }
         }, 'Please select a result set');
 
+        // Are rubric values checked?
+        var isRubricValueChecked = function(element) {
+            if (!marktype.rubric.is(':visible')) {
+                return false;
+            }
+            // Is this rubric selected? Validate if so
+            return $(element).closest('.crit')
+                .find(':checkbox[name^="crit"]')
+                .prop('checked') === true;
+        };
+        // Validator for rubric values - they cannot be the same
+        $.validator.addMethod(
+            'markTypeRubricValuesCheck',
+            function (value, element) {
+                // All value inputs that aren't the currently validated one
+                var duplicateValues = submission_form.find('input[name^="value"]').not(element).filter(
+                    function() {
+                        // Filter out inputs that aren't in the same criterion,
+                        // and don't have the same value
+                        return this.name === element.name && this.value === element.value;
+                    }
+                );
+                return duplicateValues.length === 0;
+            },
+            'Rubric values cannot be the same'
+        );
+
         var isAcceptSubmit  = function() { return acceptSubmit.is(':checked'); }
-        var submission_form = $('#createSubmissionForm');
         var publish_date_valid = { dateValid: true };
         var open_date_valid = {
             dateValid: true,
@@ -222,6 +249,18 @@
                     label.insertAfter(element);
                 }
             }
+        });
+
+        // Rubric values validation
+        submission_form.find('input[name^="value"]').each(function() {
+            $(this).rules(
+                'add',
+                {
+                    markTypeRubricValuesCheck: {
+                        depends: isRubricValueChecked
+                    }
+                }
+            );
         });
 
         //
