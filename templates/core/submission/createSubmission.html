@@ -256,7 +256,10 @@
                 else {
                     label.insertAfter(element);
                 }
-            }
+            },
+            // By default all hidden fields are ignored.
+            // I don't want to ignore rubric values
+            ignore: ':hidden:not(input[name^="value"])'
         });
 
         // Rubric values validation
