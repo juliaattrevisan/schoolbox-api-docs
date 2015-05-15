@@ -224,6 +224,22 @@ class SubmissionBox implements ISoftDeletable
     }
 
     /**
+     * What is the plaintext visibility of this submission box
+     *
+     * @return string
+     */
+    public function getMarkVisibilityDescription() {
+        switch($this->getMarkVisibility()) {
+            case self::MARK_VISIBILITY_PRIVATE:
+                return 'Staff Only';
+            case self::MARK_VISIBILITY_STUDENT:
+                return 'Staff and Students';
+            case self::MARK_VISIBILITY_PARENT_STUDENT:
+                return 'Staff, Students and Parents';
+        }
+    }
+
+    /**
      * Get index of gradient
      *
      * @return int

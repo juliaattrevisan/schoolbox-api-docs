@@ -36,6 +36,8 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1])) {
             'DUEWORK_SEMESTER' => DueWork_All::getSemester(strtotime($submissionBox->getDueDate())),
             'DUEWORK_TYPE'     => $submissionBox->getWorkType()->getName(),
             'DUEWORK_DUEDATE'  => $submissionBox->getDueDate()->getLongDateOnly(),
+            'GRADE_VISIBILITY'      => $submissionBox->getMarkVisibilityDescription(),
+            'GRADE_VISIBILITY_CODE' => $submissionBox->getMarkVisibility(),
             'NAME'             => Scrub::text($user->formatName()),
             'SYN_ID'           => $user->getExternalId(),
             'ROLE'             => Scrub::text($user->getRole()->getName()),

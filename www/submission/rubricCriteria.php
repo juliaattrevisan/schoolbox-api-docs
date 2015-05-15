@@ -34,12 +34,10 @@ if(!($groupHandler->isSuperuser() || $groupHandler->getPermission($catID) >= WRI
     error(6);
 }
 
-$title = 'Manage Rubric Criteria';
+
 
 $this->setFile(TEMPLATE_content, 'submission/rubricCriteria.html');
 $this->setTab('submission');
-$this->setTitle($title);
-$this->setVar('PAGE_TITLE', $title);
 $this->setBlock(TEMPLATE_content, 'allow_cascade', 'allow_cascade_block');
 $this->setBlock(TEMPLATE_content, 'criterion_group', 'criterion_group_block');
 $this->setBlock('criterion_group', 'criterion', 'criterion_block');
@@ -54,6 +52,10 @@ $this->setVar(array(
     'CATEGORY_ID' => $category->getId(),
     'CATEGORY_NAME' => Scrub::text($category->getName()),
 ));
+
+$title = 'Manage Criteria for '.Scrub::text($category->getName());
+$this->setTitle($title);
+$this->setVar('PAGE_TITLE', $title);
 
 // get rubric details
 $criterionCollection = CriterionMapper::getInstance()->findByColumnList(
