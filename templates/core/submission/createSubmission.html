@@ -67,7 +67,12 @@
 
         showHideMarktype(0);
 
-        if (document.getElementById('rs-0').checked) {
+        // Do assessment-specific descriptors get shown?
+        var isRubricAssessmentSpecificDescriptors = function() {
+            return document.getElementById('rs-0').checked;
+        };
+
+        if (isRubricAssessmentSpecificDescriptors()) {
             $('#rubric-criteria').find('.crit').each(function () {
                 if ($(this).find(':checked').length) {
                     descriptor('show', this, 0);
@@ -136,6 +141,9 @@
         // Are rubric values checked?
         var isRubricValueChecked = function(element) {
             if (!marktype.rubric.is(':visible')) {
+                return false;
+            }
+            if (!isRubricAssessmentSpecificDescriptors()) {
                 return false;
             }
             // Is this rubric selected? Validate if so
