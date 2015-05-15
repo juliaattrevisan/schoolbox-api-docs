@@ -294,10 +294,8 @@
 
         // trigger show or hide of descriptors when radio off
         $('#rubric-results input').change(function () {
-            var v = document.getElementById('rs-0').checked;
-
             // hide the descriptors
-            if (!v) {
+            if (!isRubricAssessmentSpecificDescriptors()) {
                 descriptor('hide', $('#rubric-criteria div'), 100);
             }
             // show them if checked
@@ -313,10 +311,7 @@
             var act = 'hide';
 
             // show if and only if both the descriptors radio and myself are checked
-            var x = $('#rs-0').prop('checked'),
-                    y = this.checked;
-
-            if (x && y) {
+            if (isRubricAssessmentSpecificDescriptors() && this.checked) {
                 act = 'show';
             }
             descriptor(act, $(this).parent('div'), 100);
