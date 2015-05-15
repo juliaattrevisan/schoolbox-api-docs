@@ -5,6 +5,9 @@
       modal: false,
       isolate: true,
       mimeFilter: {MIME_FILTER},
+      loadedCallback: function () {
+          this.removeClass('preload');
+      },
       submitCallback: function (url, filename, meta) {
         var i, hash, data;
 
@@ -43,17 +46,14 @@
 
       ab.data(li.data('source'), false);
 
-      li.children('div.explorer').addClass('preload');
-
       li.find('a.src-select').trigger('click');
-
     });
 
     return false;
 
   });
 </script>
-<div id="ab-{SOURCE_SLUG}" class="ab-pane"><!-- CONTENT AJAX-LOADED --></div>
+<div id="ab-{SOURCE_SLUG}" class="ab-pane preload"><!-- CONTENT AJAX-LOADED --></div>
 <div class="ctrl">
   <a role="button" class="btn no-icon float-left cancel" href="#">Cancel</a>
 </div>
