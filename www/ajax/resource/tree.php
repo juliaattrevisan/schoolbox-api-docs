@@ -74,5 +74,5 @@ try {
 } catch (OutOfBoundsException $e) {
     $this->error(2);
 } catch (RuntimeException $e) {
-    die('<span>Click <a data-gettoken href="/ajax/oauth/microsoft">here</a> to connect your Office 365 account.</span>');
+    die('<span class="auth-required">Click <a data-gettoken href="/ajax/oauth/microsoft">here</a> to connect your Office 365 account.</span>');
 }
