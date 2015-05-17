@@ -215,7 +215,14 @@ switch ($_REQUEST['action']) {
         } else {
             $eventMapper->delete($event);
         }
-        $page->backToTheFuture(2);
+        // GET: from full calendar
+        // POST: from calendar event modify page
+        // TODO figure out a global method for redirecting!
+        if (isset($_GET['id'])) {
+            $page->backToTheFuture(1);
+        } else {
+            $page->backToTheFuture(2);
+        }
         break;
 
     default:
