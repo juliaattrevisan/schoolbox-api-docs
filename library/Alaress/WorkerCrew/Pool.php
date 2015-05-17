@@ -111,6 +111,8 @@ class Pool extends EventEmitter implements PoolInterface
                 $finish  = $task->getFinish();
                 $start   = $task->getStart();
                 $elapsed = (microtime(true) - $start) * 1000;
+                $hardLim = $this->strat->getWorkerExecutionTimeout(self::RELEASE_HARD) ?: 0;
+                $softLim = $this->strat->getWorkerExecutionTimeout(self::RELEASE_SOFT) ?: 0;
 
                 $this->log->debug(sprintf('Worker {%d} (%d) `%s` started %s(%s) %0.2fms ago', $pid, $status, $process, $cmd, $this->parseArgs($args), $elapsed));
 
@@ -118,14 +120,17 @@ class Pool extends EventEmitter implements PoolInterface
                     // check for an unexpected finish state
                     $this->log->notice("Worker {{$pid}} has completed task, but not in READY state");
                     $worker->setStatus(Worker::READY);
-                } elseif ($elapsed >= $this->strat->getWorkerExecutionTimeout(self::RELEASE_HARD)) {
+
+                } elseif ($elapsed >= $hardLim) {
                     // if it's over the hard limit, terminate it
-                    $this->log->error("Worker {{$pid}} has exceeded hard execution timeout");
+                    $this->log->error("Worker {{$pid}} has exceeded hard execution timeout of {$hardLim}ms");
                     $this->releaseWorker($pid, self::RELEASE_HARD);
-                } elseif ($elapsed >= $this->strat->getWorkerExecutionTimeout(self::RELEASE_SOFT)) {
+
+                } elseif ($elapsed >= $softLim) {
                     // if it's over the soft limit, let it down gently
-                    $this->log->warning("Worker {{$pid}} has exceeded soft execution timeout");
+                    $this->log->warning("Worker {{$pid}} has exceeded soft execution timeout of {$softLim}ms");
                     $this->releaseWorker($pid, self::RELEASE_SOFT);
+
                 } else {
                     $this->log->debug("Worker {{$pid}} fine");
                 }
