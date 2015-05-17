@@ -62,6 +62,12 @@ $this->setBlock(TEMPLATE_content, 'view_attempt', 'view_attempt_block');
 
 $this->setTitle('Assessment: ' . $assess['title']);
 
+$this->setVar(array(
+    'ASSESS_TITLE' => Scrub::text($assess['title']),
+    'ASSESS_CATEGORY_ID' => $assess['category_id'],
+    'ASSESS_COMPLETION_MESSAGE' => Scrub::html($assess['completion_message']),
+));
+
 if (!$attempt['finish']) {
     $attemptFinishDate = Alaress_Date_Format::now();
 
@@ -72,12 +78,7 @@ if (!$attempt['finish']) {
 
     AttemptMapper::getInstance()->save($attempt);
 
-    $this->setVar(array(
-        'ASSESS_TITLE' => Scrub::text($assess['title']),
-        'ASSESS_CATEGORY_ID' => $assess['category_id'],
-        'ATTEMPT_END' => $attemptFinishDate->getShort(),
-        'ASSESS_COMPLETION_MESSAGE' => Scrub::html($assess['completion_message']),
-    ));
+    $this->setVar('ATTEMPT_END', $attemptFinishDate->getShort());
 
     // Does this item have a task instance associated? if so, set it as
     // completed (pending, instead of completed?)
@@ -92,15 +93,7 @@ if (!$attempt['finish']) {
     $this->parse('endAssess_block', 'endAssess');
 } else {
     $attemptFinishDate = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
-
-    $this->setVar(
-        array(
-            'ASSESS_TITLE'       => Scrub::text($assess['title']),
-            'ASSESS_CATEGORY_ID' => $assess['category_id'],
-            'ATTEMPT_END'        => $attemptFinishDate->getShort(),
-        )
-    );
-
+    $this->setVar('ATTEMPT_END', $attemptFinishDate->getShort());
     $this->parse('alreadyEnded_block', 'alreadyEnded');
     $this->setVar('endAssess_block', '');
 }

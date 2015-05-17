@@ -51,9 +51,17 @@ if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['c
 $this->setFile(TEMPLATE_content, 'survey/end.html');
 $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
 $this->setBlock(TEMPLATE_content, 'alreadyEnded', 'alreadyEnded_block');
-$this->setTitle('Assessment: ' . $survey['title']);
+$this->setTitle('Survey: ' . $survey['title']);
 
-if ($attempt['finish']) {
+$this->setVar(
+    array(
+        'ASSESS_TITLE'              => Scrub::text($survey['title']),
+        'ASSESS_COMPLETION_MESSAGE' => Scrub::html($survey['completion_message']),
+        'ASSESS_CATEGORY_ID'        => $survey['category_id'],
+    )
+);
+
+if (!$attempt['finish']) {
     $finishDate = Alaress_Date_Format::now();
 
     $attemptHandler->update(
@@ -63,16 +71,7 @@ if ($attempt['finish']) {
         )
     );
 
-    $attemptEndDate = Alaress_Date_Format::now();
-
-    $this->setVar(
-        array(
-            'ASSESS_TITLE'              => Scrub::text($survey['title']),
-            'ASSESS_COMPLETION_MESSAGE' => Scrub::html($survey['completion_message']),
-            'ASSESS_CATEGORY_ID'        => $survey['category_id'],
-            'ATTEMPT_END'               => $attemptEndDate->getShort()
-        )
-    );
+    $this->setVar( 'ATTEMPT_END',$finishDate->getShort());
 
     $this->setVar('alreadyEnded_block', '');
     $this->parse('endAssess_block', 'endAssess');
@@ -85,15 +84,9 @@ if ($attempt['finish']) {
     }
 
 } else {
-    $attemptEndDate = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
+    $finishDate = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 
-    $this->setVar(
-        array(
-            'ASSESS_TITLE'       => Scrub::text($survey['title']),
-            'ASSESS_CATEGORY_ID' => $survey['category_id'],
-            'ATTEMPT_END'        => $attemptEndDate->getShort()
-        )
-    );
+    $this->setVar( 'ATTEMPT_END',$finishDate->getShort());
 
     $this->parse('alreadyEnded_block', 'alreadyEnded');
     $this->setVar('endAssess_block', '');
