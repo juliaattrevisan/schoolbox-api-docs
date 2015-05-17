@@ -18,6 +18,55 @@ use Schoolbox\ISoftDeletable;
 class Model implements ISoftDeletable, \JsonSerializable
 {
     /**
+     * Value of $titlePosition for when it's at the top left.
+     *
+     * @var int
+     */
+    const TITLE_POSITION_TOPLEFT = 7;
+
+    /**
+     * Value of $titlePosition for when it's at the top.
+     *
+     * @var int
+     */
+    const TITLE_POSITION_TOP = 8;
+
+    /**
+     * Value of $titlePosition for when it's at the top right.
+     *
+     * @var int
+     */
+    const TITLE_POSITION_TOPRIGHT = 9;
+
+    /**
+     * Value of $titlePosition for when it's at the left.
+     *
+     * @var int
+     */
+    const TITLE_POSITION_LEFT = 4;
+
+    /**
+     * Value of $titlePosition for when it's at the center.
+     *
+     * @var int
+     */
+    const TITLE_POSITION_CENTER = 5;
+
+    /**
+     * Value of $titlePosition for when it's at the right.
+     *
+     * @var int
+     */
+    const TITLE_POSITION_RIGHT = 6;
+
+    /**
+     * Value of $titlePosition for when it's at the bottom left.
+     *
+     * @var int
+     */
+    const TITLE_POSITION_BOTTOMLEFT = 1;
+
+    /**
      * Value of $titlePosition for when it's at the bottom.
      *
      * @var int
@@ -25,11 +74,11 @@ class Model implements ISoftDeletable, \JsonSerializable
     const TITLE_POSITION_BOTTOM = 2;
 
     /**
-     * Value of $titlePosition for when it's at the top.
+     * Value of $titlePosition for when it's at the bottom right.
      *
      * @var int
      */
-    const TITLE_POSITION_TOP = 1;
+    const TITLE_POSITION_BOTTOMRIGHT = 3;
 
     /**
      * The primary key of this tile
