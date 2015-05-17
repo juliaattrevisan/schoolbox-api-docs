@@ -232,7 +232,10 @@ if(is_array($recentLog) ) {
         }
 
         if($action != '') {
-            $output = array('LOG_DATE'      => date(Cfg::get('date_short'), strtotime($log['occurred'])),
+
+            $date = new Alaress_Date_Format($log['occurred'], Alaress_Date_Format::DATABASE_FORMAT);
+
+            $output = array('LOG_DATE'      => $date->getShort(),
                             'LOG_ACTION'    => $action,
                             'LOG_NAME'      => $userHandler->formatName($log));
             $this->setVar($output);
