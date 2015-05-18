@@ -38,6 +38,20 @@
     box-shadow: none;
 }
 
+.fc .fc-button-group > * {
+    float: left;
+    margin: 4px;
+}
+
+.fc .fc-button-group > :first-child {
+    margin-left: 0;
+}
+
+.fc .fc-toolbar > * > * { /* extra precedence to override button border margins */
+    float: left;
+    margin-left: 4px;
+}
+
 /**
  * Booking-related CSS
  */
