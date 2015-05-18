@@ -93,7 +93,6 @@
              *
              * Pass it in from the course taskList plugin instantiation
              */
-            console.log(settings.previewSelector);
             component.find(settings.previewSelector).preview();
         };
         initTaskList();
