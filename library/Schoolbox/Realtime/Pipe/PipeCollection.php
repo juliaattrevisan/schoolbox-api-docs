@@ -84,10 +84,16 @@ class PipeCollection {
 
 			if($userId = $pipe->getUserId()) {
 				unset($this->pipesByUserId[$userId][$socketKey]);
+                if (empty($this->pipesByUserId[$userId])) {
+                    unset($this->pipesByUserId[$userId]);
+                }
 			}
 
 			if($sessionId = $pipe->getSession()) {
 				unset($this->pipesBySessionId[$sessionId][$socketKey]);
+                if (empty($this->pipesBySessionId[$sessionId])) {
+                    unset($this->pipesBySessionId[$sessionId]);
+                }
 			}
 
 			unset($this->pipesBySocketKey[$socketKey]);

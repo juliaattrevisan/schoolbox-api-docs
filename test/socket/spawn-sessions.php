@@ -23,7 +23,8 @@ foreach($allusers as $user) {
 		'username' => $user->getUsername(),
 		'password' => 'password',
 		'page'     => '/',
-		'Submit'   => 'Sign in'
+		'Submit'   => 'Sign in',
+        'rememberme' => 1
 	);
 
 	$c = curl_init($url);

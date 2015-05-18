@@ -48,7 +48,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 
 	const REDIS_SESSION_PREFIX = 'PHPREDIS_SESSION:';
 	const PHP_SESSION_PREFIX   = 'PHPSESSID';
-    const INACTIVE_TIMEOUT     = 600; // 10 minutes
+    const INACTIVE_TIMEOUT     = 300; // 5 minutes
 
 	/** @var PipeCollection */
 	protected $pipes;
@@ -149,7 +149,9 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	public function onClose(ConnectionInterface $conn) {
         /** @noinspection PhpUndefinedFieldInspection - explicitly close the descriptor to the temporary-file associated with the request that initiated this conn */
 		$conn->WebSocket->request->getBody()->close();
-		$this->pipes->unregisterPipe(Pipe::getSocketKeyForConnection($conn));
+        $key = Pipe::getSocketKeyForConnection($conn);
+		$this->pipes->unregisterPipe($key);
+        unset($this->activeCommands[$key]);
 	}
 
 
@@ -309,6 +311,9 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
             $this->sendHeader($pipe, 401);
             $pipe->close();
         }
+
+        unset($this->userTimeouts[$userId]);
+        unset($this->pushTransactions[$userId]);
     }
 
 
