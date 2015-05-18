@@ -61,6 +61,11 @@ $mark = $_POST['mark'][$_POST['uid']];
 /* Optional rubric
  */
 $rubric = $_POST['rubric'];
+// If the mark gets passed at the same time as rubrics,
+// then rubrics get clobbered. We don't want that.
+if ($rubric) {
+    $mark = null;
+}
 
 /* The usual comment
  */
