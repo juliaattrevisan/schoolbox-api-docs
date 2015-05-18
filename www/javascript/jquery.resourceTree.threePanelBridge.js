@@ -154,7 +154,7 @@
 
         // select_node doesn't trigger on initial tree load.
         // The best I can do is init files when I hover over the list.
-        if (self.options.selected) {
+        if ('selected' in self.options) {
             $('#file-window').on(
                 'hover.resourceTree.threePanelBridge',
                 'tr.category-' + self.options.selected + ':not(.empty)',
