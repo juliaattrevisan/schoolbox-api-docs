@@ -17,7 +17,8 @@
                     session_id:      '{SESSION_ID}',
                     course_homepage: '{COURSE_HOMEPAGE}',
                     import_base_url: '/course/import/{ID}/{COMPONENT_INSTANCE_ID}/',
-                    readonly:        {UNIT_READONLY}
+                    readonly:        {UNIT_READONLY},
+                    previewSelector: '[data-plugin=preview]'
                 });
 
                 // Url attachment options
@@ -49,8 +50,6 @@
                 component.on('click', 'a[data-dz-remove]', function() {
                     $(this).closest('form').find('input[name=url]').val('').prop('readonly', false);
                 });
-
-                $('[data-plugin="preview"]').preview();
             });
         })(jQuery);
     </script>
