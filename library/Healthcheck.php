@@ -229,20 +229,34 @@ class Healthcheck
     private function SynergeticCheckStoredProcedures()
     {
         echo "\nSynergetic Permission Check - Stored Procedures\n";
+        $date = new Alaress_Date_Format();
         $db = new MSSQL();
         $db->debug = true;
         $splist[] = array(
             'spgTimetableDay',
             array(
-                array('@TimeTableGroup', 'SEN',         SQLVARCHAR, false, false, -1),
-                array('@Date',           date('Y-m-d'), SQLVARCHAR, false, false, -1),
-                array('@CurrentDay',     'day',         SQLINT4,    true,  false, -1),
+                array('@TimeTableGroup', 'SEN',                SQLVARCHAR, false, false, -1),
+                array('@Date',           $date->getDatabase(), SQLVARCHAR, false, false, -1),
+                array('@CurrentDay',     'day',                SQLINT4,    true,  false, -1),
             )
         );
         $splist[] = array(
             'spsConfigUserDefaultYearSemester',
             array(
                 array('@ID','1',SQLINT4,false,false, -1),
+            )
+        );
+        $splist[] = array(
+            'spsTimetable',
+            array(
+                array('@FileYear', $date->getYear(), SQLINT4),
+                array('@FileSemester', $date->getYearHalf(), SQLINT4),
+                array('@ID', '1', SQLINT4),
+                array('@Date', $date->getDatabaseDate(), SQLVARCHAR),
+                array('@IncludeStaffScheduleFlag',1, SQLINT4),
+                array('@CheckAttendancesExistFlag',1, SQLINT4),
+                array('@IncludeSparesFlag', 0, SQLINT4),
+                array('@IncludeRecessFlag', 0, SQLINT4),
             )
         );
 
