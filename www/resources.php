@@ -110,7 +110,7 @@ if ($contents->getAllNodes()->count()) {
             'TYPE' => $currentNode->getType(),
             'FILE_NAME' => $currentNode->getName(),
             'FILE_SIZE' => $currentNode->getSize(),
-            'CATEGORY_ID' => $currentNode->getCategory()->getId(),
+            'CATEGORY_ID' => intval($currentNode->getCategory()->getId()),
             'CLASS' => $currentNode->getCss(),
             'FILE_LIST_TYPE' => $currentNode->getIcon()->getCss()
         );

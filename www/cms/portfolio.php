@@ -57,7 +57,7 @@ if ($fileList->count()) {
             'FILE_NAME' => Scrub::text($file->getTitle()),
             'FILE_MODIFIED' => $file->getCreatedAt()->getShort(),
             'FILE_SIZE' => Alaress_Byte_Format::bytesToString($file->getSize()),
-            'FOLDER_ID' => $file->getFolder()->getId(),
+            'FOLDER_ID' => intval($file->getFolder()->getId()),
             'CLASS' => implode(" ", $class),
             'PUBLISHED' => $file->isPublished() ? $file->getPublishedAt()->getShort() : '',
         );
