@@ -248,6 +248,12 @@
                                class="layout-width"
                                data-function="update-layout" />
                         <label for="layout_type_grid">px</label>
+
+                        <input name="grid_padding"
+                               value="{{ item.gridPadding|e('html_attr') }}"
+                               class="layout-width"
+                               data-function="update-layout" />
+                        <label for="layout_type_grid">px padding</label>
                     </div>
                 </div>
 
@@ -267,6 +273,12 @@
                                class="layout-width"
                                data-function="update-layout" />
                         <label for="layout_type_column">tiles/row</label>
+
+                        <input name="column_padding"
+                               value="{{ item.columnPadding|e('html_attr') }}"
+                               class="layout-width"
+                               data-function="update-layout" />
+                        <label for="layout_type_column">% padding</label>
                     </div>
                 </div>
             </td>
