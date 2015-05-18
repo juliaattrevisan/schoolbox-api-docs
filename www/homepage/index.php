@@ -307,8 +307,9 @@ $this->parse('page_controls_block', 'page_controls');
 $codeString = '';
 if ($_SESSION['user']->getRole()->isStaff()) {
     if ($category->getCodes()->count() > 4) {
-        //Get first 4 codes
-        $subCodes = $category->getCodes()->slice(0, 4);
+        //Get first 4 codes, clone cause its a mutable collection
+        $subCodes = clone $category->getCodes();
+        $subCodes = $subCodes->slice(0, 4);
         foreach ($subCodes as $subCode) {
             $subCodeString[] = $subCode->getCode();
         }
@@ -319,7 +320,6 @@ if ($_SESSION['user']->getRole()->isStaff()) {
 }
 
 $allWidths = $homepageHandler->getColumnWidths();
-
 $this->setVar(array(
     'HEADING' => Scrub::text($category->getName()) . ($codeString ? ' (' . $codeString . ')' : ''),
     'CODE' => urlencode(urlencode($category->getCodeString())),
