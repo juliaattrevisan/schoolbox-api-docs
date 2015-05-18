@@ -420,9 +420,14 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                 }
 
             }
-        }
-        else {
-            return false;
+        } else {
+            // Fall back to getDayTimetable()
+            return $this->getDayTimetable(
+                $externalUserId,
+                $userId,
+                $campus,
+                $dayNumber
+            );
         }
 
         //for each period

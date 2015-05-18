@@ -93,12 +93,19 @@ class Redis
      *                           if there is no value already in the cache.
      * @param mixed    $params   A parameter to pass to $callback. This is also
      *                           used to generate the cache key.
-     * @param int      $timeout  Cache timeout in seconds (null for none)
+     * @param int      $timeout  Timeout to set on a stored result.
+     *                           A null value stores result without a timeout.
+     *                           A value of 0 bypasses the cache entirely.
      *
      * @return mixed
      */
     public function cacheFunctionCall($base_key, $callback, $params, $timeout = null)
     {
+        // Timeout = 0: bypass cache completely
+        if (isset($timeout) && intval($timeout) === 0) {
+            return call_user_func($callback, $params);
+        }
+
         $redis = $this->getClient();
         $key   = $base_key . ':' . hash('sha256', serialize($params));
 
