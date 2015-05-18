@@ -131,7 +131,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
         }
 
         return array(
-            'icon' => '-',
+            'icon' => '&ndash;',
             'class' => '',
             'data'  => 'uncollapsed'
         );
