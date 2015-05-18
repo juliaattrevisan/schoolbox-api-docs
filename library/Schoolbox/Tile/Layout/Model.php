@@ -280,6 +280,44 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
+     * @return float
+     */
+    public function getColumnPadding()
+    {
+        return $this->columnPadding;
+    }
+
+    /**
+     * @param  float $columnPadding
+     *
+     * @return $this
+     */
+    public function setColumnPadding($columnPadding)
+    {
+        $this->columnPadding = $columnPadding;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getGridPadding()
+    {
+        return $this->gridPadding;
+    }
+
+    /**
+     * @param  int $gridPadding
+     *
+     * @return $this
+     */
+    public function setGridPadding($gridPadding)
+    {
+        $this->gridPadding = $gridPadding;
+        return $this;
+    }
+
+    /**
      * @param  Collection|TileModel[] $tileList
      * @return $this
      */
