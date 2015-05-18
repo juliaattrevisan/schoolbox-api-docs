@@ -43,7 +43,7 @@
 
 </style>
 <li class="tile {% if tile.backgroundImageContained %}contained{% endif %}" id="tile-{{ tile.id|e('html_attr') }}">
-    <span class="title {% if tile.isTitlePositionTop() %}position-top{% elseif tile.isTitlePositionBottom() %}position-bottom{% endif %}">{{ tile.titleText }}</span>
+    <span class="title {{ tile.getTitlePositionStyle() }}">{{ tile.titleText }}</span>
 
     {% if tile.link %}
     <a href="{{ tile.link|e('html_attr') }}" class="tile-link"></a>

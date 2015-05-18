@@ -454,9 +454,57 @@ class Model implements ISoftDeletable, \JsonSerializable
     /**
      * @return bool
      */
+    public function isTitlePositionTopLeft()
+    {
+        return $this->getTitlePosition() == self::TITLE_POSITION_TOPLEFT;
+    }
+
+    /**
+     * @return bool
+     */
     public function isTitlePositionTop()
     {
         return $this->getTitlePosition() == self::TITLE_POSITION_TOP;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTitlePositionTopRight()
+    {
+        return $this->getTitlePosition() == self::TITLE_POSITION_TOPRIGHT;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTitlePositionLeft()
+    {
+        return $this->getTitlePosition() == self::TITLE_POSITION_LEFT;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTitlePositionCenter()
+    {
+        return $this->getTitlePosition() == self::TITLE_POSITION_CENTER;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTitlePositionRight()
+    {
+        return $this->getTitlePosition() == self::TITLE_POSITION_RIGHT;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTitlePositionBottomLeft()
+    {
+        return $this->getTitlePosition() == self::TITLE_POSITION_BOTTOMLEFT;
     }
 
     /**
@@ -467,6 +515,45 @@ class Model implements ISoftDeletable, \JsonSerializable
         return $this->getTitlePosition() == self::TITLE_POSITION_BOTTOM;
     }
 
+    /**
+     * @return bool
+     */
+    public function isTitlePositionBottomRight()
+    {
+        return $this->getTitlePosition() == self::TITLE_POSITION_BOTTOMRIGHT;
+    }
+
+    /**
+     * What's the style for this element's title's position?
+     *
+     * @return string
+     */
+    public function getTitlePositionStyle()
+    {
+        switch ($this->getTitlePosition()) {
+            case self::TITLE_POSITION_TOPLEFT:
+                return 'position-top align-left';
+            case self::TITLE_POSITION_TOP:
+                return 'position-top align-center';
+            case self::TITLE_POSITION_TOPRIGHT:
+                return 'position-top align-right';
+            case self::TITLE_POSITION_LEFT:
+                return 'position-middle align-left';
+            case self::TITLE_POSITION_CENTER:
+                return 'position-middle align-center';
+            case self::TITLE_POSITION_RIGHT:
+                return 'position-middle align-right';
+            case self::TITLE_POSITION_BOTTOMLEFT:
+                return 'position-bottom align-left';
+            case self::TITLE_POSITION_BOTTOM:
+                return 'position-bottom align-center';
+            case self::TITLE_POSITION_BOTTOMRIGHT:
+                return 'position-bottom align-right';
+            default:
+                // Top
+                return 'position-top align-center';
+        }
+    }
 
     /**
      * Is this object deleted?
