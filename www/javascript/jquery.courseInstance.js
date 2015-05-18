@@ -8,7 +8,8 @@
             session_name:    '',
             session_id:      '',
             import_base_url: '',
-            readonly:        false
+            readonly:        false,
+            previewSelector: '[data-plugin=preview]'
         };
         var settings  = $.extend({}, defaults, options);
         var component = $(this);
@@ -314,7 +315,9 @@
          * this component. This is used when a new task is dynamically
          * added via ajax - this applies the preview plugin when
          * the ajax occurs
+         *
+         * Pass it in from the course instance plugin instantiation
          */
-        component.find('[data-plugin=preview]').preview();
+        component.find(settings.previewSelector).preview();
     }
 })(jQuery);

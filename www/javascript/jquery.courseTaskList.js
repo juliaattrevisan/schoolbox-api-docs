@@ -6,7 +6,8 @@
         var defaults = {
             session_name: '',
             session_id:   '',
-            units:        []
+            units:        [],
+            previewSelector: '[data-plugin=preview]'
         };
         var settings  = $.extend({}, defaults, options);
         var component = $(this);
@@ -89,8 +90,11 @@
              * this component. This is used when a new task is dynamically
              * added via ajax - this applies the preview plugin when
              * the ajax occurs
+             *
+             * Pass it in from the course taskList plugin instantiation
              */
-            component.find('[data-plugin=preview]').preview();
+            console.log(settings.previewSelector);
+            component.find(settings.previewSelector).preview();
         };
         initTaskList();
 
