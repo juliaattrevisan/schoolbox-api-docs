@@ -85,6 +85,12 @@
                 $.post(form.attr('action'), params, reloadTaskList, 'json');
             })
 
+            /* Apply Preview to all anchor links in the task-list for
+             * this component. This is used when a new task is dynamically
+             * added via ajax - this applies the preview plugin when
+             * the ajax occurs
+             */
+            component.find('[data-plugin=preview]').preview();
         };
         initTaskList();
 
