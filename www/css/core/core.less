@@ -12409,6 +12409,9 @@ textarea.event-detail {
 			border-radius: 4px;
 		}
 	}
+    .preload {
+        background: transparent url("/images/loading-bar.gif") no-repeat 50%;
+    }
 	.explorer {
 		position: absolute;
 		top: 0;
@@ -12420,9 +12423,6 @@ textarea.event-detail {
 		padding: 4px;
 		box-sizing: border-box;
         font-size: 0.91em; // undo parent .ui-widget 1.1em nonsense
-		&.preload {
-			background: transparent url("/images/loading-bar.gif") no-repeat 50%;
-		}
 		iframe {
 			width: 100%;
 			height: 100%;
@@ -12880,8 +12880,9 @@ ul.az-error-list {
 	}
 }
 /* Office 365 */
-#ab-office365{
-	background: url("/images/core/files/office365.png") center 150px no-repeat;
+#ab-office365 .auth-required {
+    background: url("/images/core/files/office365.png") center no-repeat;
+    padding-top: 100px;
 }
 
 .message-list {
