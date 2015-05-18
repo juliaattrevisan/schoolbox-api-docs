@@ -46,6 +46,9 @@ class Mapper extends BaseMapper
             )
         );
 
+        // Column padding: a % of the total width of the tile
+        $this->uses('column_padding', self::TYPE_DECIMAL);
+
         // Grid width: always px as far as i know
         $this->hasMap(
             array(
@@ -54,6 +57,9 @@ class Mapper extends BaseMapper
                 'type'     => self::TYPE_INTEGER,
             )
         );
+
+        // Grid padding: a number of pixels
+        $this->uses('grid_padding', self::TYPE_INTEGER);
 
         // Aspect ratio for grid items
         $this->hasMap(

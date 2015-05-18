@@ -59,11 +59,25 @@ class Model implements ISoftDeletable, \JsonSerializable
     protected $columnCount = 3;
 
     /**
+     * The padding for columns, as a % of the width of a column.
+     *
+     * @var float
+     */
+    protected $columnPadding = 0.0;
+
+    /**
      * The number of pixels wide each tile in layout is (if using grid layout)
      *
      * @var int
      */
     protected $gridWidth = 100;
+
+    /**
+     * The number of pixels padding for grid layout
+     *
+     * @var int
+     */
+    protected $gridPadding = 0;
 
     /**
      * The width ratio of the items within this grid.
