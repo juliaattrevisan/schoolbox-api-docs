@@ -65,11 +65,14 @@
                             Number(form.find('input[name="grid_width"]').val())
                         )
                     );
+                    // Grid padding: a set pixel count
+                    var gridPadding = Number(form.find('input[name="grid_padding"]').val());
                     if (gridWidth > 0) {
                         tileList.find('.tile').css({
                             "width":          String(gridWidth)+"px",
-                            "padding-bottom": String(gridWidth * aspect)+"px",
-                        })
+                            "margin":         String(gridPadding)+"px",
+                            "padding-bottom": String(gridWidth * aspect)+"px"
+                        });
                     }
                 } else if (form.find('input#layout_type_column').is(':checked')) {
                     // column layout - keep within min and max
