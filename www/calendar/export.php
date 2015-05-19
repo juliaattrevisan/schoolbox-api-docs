@@ -94,10 +94,7 @@ try {
 
             // All day events, but exclude other sources
             $api = new Calendar_Api_Composite();
-            $api->add(new Calendar_Api_EventType_Event_Schoolbox_Campus($user, array()));
-            $api->add(new Calendar_Api_EventType_Event_Schoolbox_Group($user, array()));
-            $api->add(new Calendar_Api_EventType_Event_Schoolbox_Personal($user, array()));
-
+            $api->add(new Calendar_Api_EventType_Event_Schoolbox_Default($user, array()));
             break;
 
         case '':
