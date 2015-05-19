@@ -143,6 +143,10 @@ class FileMapper extends Mapper
                     // No default state: do nothing
                     return;
                 }
+
+                // eurgh... manual hydration
+                $box = $this->getJoinMapper('box_id')->findById($object->getSubmissionBox()->getId());
+
                 /** @var ReturnedWork $defaultReturn */
                 $defaultReturn = $returnMapper->createModel();
                 $defaultReturn
@@ -150,7 +154,7 @@ class FileMapper extends Mapper
                     ->setSubmissionBox($object->getSubmissionBox())
                     ->setOwner($object->getOwner())
                     // No real marker
-                    ->setMarker($object->getSubmissionBox()->getOwner())
+                    ->setMarker($box->getOwner())
                     ->setMark($defaultState->getDisplayAs())
                     ->setReturned($object->getCreatedAt())
                     ->setNormalizedMark($defaultState->getNormaliseAs())
