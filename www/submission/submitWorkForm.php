@@ -16,6 +16,11 @@ if (!is_numeric($_POST['box_id'])) {
     error(2);
 }
 
+if (!strlen(trim($_POST['body'])) && !count($_POST['attachment'])) {
+    // no body && no files == no dice
+    error(2);
+}
+
 $subMap = Submission\FileMapper::getInstance();
 $boxMap = SubmissionBoxMapper::getInstance();
 
@@ -66,14 +71,6 @@ if (is_array($_POST['attachment'])) {
         // something wasn't allowed to exist
         error(9, $e->getMessage());
     }
-}
-
-/* Exceeded PHP max file size */
-elseif (upload_failed()) {
-    error(10);
-}
-else {
-    error(2);
 }
 
 $subMap->save($submissions);
