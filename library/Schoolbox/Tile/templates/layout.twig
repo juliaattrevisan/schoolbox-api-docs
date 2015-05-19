@@ -83,11 +83,17 @@
                             Number(form.find('input[name="column_count"]').val())
                         )
                     );
+                    // Column padding: a % of the width of the tile is taken up with padding
+                    var columnPadding = Number(form.find('input[name="column_padding"]').val());
                     if (colCount > 0) {
-                        var width = (100/colCount);
+                        var baseColumnWidth   = (100/colCount);
+                        var paddingProportion = columnPadding / 100;
+                        var tilePadding       = baseColumnWidth * paddingProportion;
+                        var tileWidth         = baseColumnWidth - tilePadding;
                         tileList.find('.tile').css({
-                            "width":          String(width)+"%",
-                            "padding-bottom": String(width * (yAspect / xAspect))+"%",
+                            "width":          String(tileWidth)+"%",
+                            "margin":         String(tilePadding / 2)+"%",
+                            "padding-bottom": String(tileWidth * (yAspect / xAspect))+"%"
                         });
                     }
                 }
