@@ -48,6 +48,12 @@ class External_Tass_PortalModule extends \Alaress\Module\Module
                 [
                     'sso'        => $injector->lazyGet('tassportal:sso'),
                     'portalHost' => $config->get('external_staff_portal'),
+                    'appCodes'   => [
+                        'parentLounge' => $config->get('external_tass_app_code_parent_lounge'),
+                        'tassWeb'      => $config->get('external_tass_app_code_tassweb'),
+                        'teacherKiosk' => $config->get('external_tass_app_code_teacherkiosk'),
+                        'webBook'      => $config->get('external_tass_app_code_webbook'),
+                    ]
                 ]
             )
         );

@@ -23,15 +23,29 @@ class External_Tass_PortalController extends Alaress\Web\Controller\Base
     protected $portalHost;
 
     /**
+     * Application codes
+     *
+     * @var array|string[]
+     */
+    protected $appCodes = [
+        'parentLounge' => '',
+        'tassWeb'      => '',
+        'teacherKiosk' => '',
+        'webBook'      => '',
+    ];
+
+    /**
      * Constructor
      *
      * @param External_Tass_SSO $sso
      * @param string            $portalHost The URL on which TASS services are hosted
+     * @param array|string[]    $appCodes
      */
-    public function __construct(External_Tass_SSO $sso, $portalHost)
+    public function __construct(External_Tass_SSO $sso, $portalHost, $appCodes)
     {
         $this->sso        = $sso;
         $this->portalHost = $portalHost;
+        $this->appCodes   = array_merge($this->appCodes, $appCodes);
     }
 
     /**
@@ -39,7 +53,10 @@ class External_Tass_PortalController extends Alaress\Web\Controller\Base
      */
     public function parentLounge()
     {
-        $token = $this->getToken(['prod_code' => 'PL', 'app_code' => 'pl']);
+        $token = $this->getToken([
+            'prod_code' => 'PL',
+            'app_code'  => $this->appCodes['parentLounge'],
+        ]);
         if ($token) {
             $this->getResponse()->redirect->to(
                 $this->portalHost."/ParentLounge/PIALogin.cfm?sso_token=$token"
@@ -54,7 +71,10 @@ class External_Tass_PortalController extends Alaress\Web\Controller\Base
      */
     public function tassWeb()
     {
-        $token = $this->getToken(['prod_code' => 'TASSWEB', 'app_code' => 'ec']);
+        $token = $this->getToken([
+            'prod_code' => 'TASSWEB',
+            'app_code'  => $this->appCodes['tassWeb'],
+        ]);
         if ($token) {
             $this->getResponse()->redirect->to(
                 $this->portalHost."/tassweb/login.cfm?sso_token=$token"
@@ -69,7 +89,10 @@ class External_Tass_PortalController extends Alaress\Web\Controller\Base
      */
     public function teacherKiosk()
     {
-        $token = $this->getToken(['prod_code' => 'TIA', 'app_code' => 'ec']);
+        $token = $this->getToken([
+            'prod_code' => 'TIA',
+            'app_code'  => $this->appCodes['teacherKiosk'],
+        ]);
         if ($token) {
             $this->getResponse()->redirect->to(
                 $this->portalHost."/kiosk/TIALogin.cfm?sso_token=$token"
@@ -84,7 +107,10 @@ class External_Tass_PortalController extends Alaress\Web\Controller\Base
      */
     public function webBook()
     {
-        $token = $this->getToken(['prod_code' => 'WB', 'app_code' => 'ec']);
+        $token = $this->getToken([
+            'prod_code' => 'WB',
+            'app_code'  => $this->appCodes['webBook'],
+        ]);
         if ($token) {
             $this->getResponse()->redirect->to(
                 $this->portalHost."/webbook/WBLogin.cfm?sso_token=$token"
