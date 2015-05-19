@@ -9,7 +9,8 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-class Assess_Answer_Radio extends Assess_Answer_Multi {
+class Assess_Answer_Radio extends Assess_Answer_Multi
+{
     protected $plugin = 'evaluationRadio';
 
     /**
@@ -19,7 +20,8 @@ class Assess_Answer_Radio extends Assess_Answer_Multi {
      * @param  $currentResponse
      * @return void
      */
-    public function mark($currentResponse) {
+    public function mark($currentResponse)
+    {
         $response = unserialize($currentResponse['response']);
         $answer = unserialize($currentResponse['answer']);
 
@@ -34,7 +36,6 @@ class Assess_Answer_Radio extends Assess_Answer_Multi {
         if (is_array($answer)) {
             foreach ($answer as $currentAnswer) {
                 if ($currentAnswer->correct) {
-
                     /* If the user responded with a correct answer, accumulate
                      */
                     if ($currentAnswer->value == $response) {
