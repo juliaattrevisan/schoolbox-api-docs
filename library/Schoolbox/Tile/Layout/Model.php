@@ -61,9 +61,9 @@ class Model implements ISoftDeletable, \JsonSerializable
     /**
      * The padding for columns, as a % of the width of a column.
      *
-     * @var float
+     * @var int
      */
-    protected $columnPadding = 0.0;
+    protected $columnPadding = 0;
 
     /**
      * The number of pixels wide each tile in layout is (if using grid layout)
@@ -280,7 +280,7 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
-     * @return float
+     * @return int
      */
     public function getColumnPadding()
     {
@@ -288,7 +288,7 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
-     * @param  float $columnPadding
+     * @param  int $columnPadding
      *
      * @return $this
      */

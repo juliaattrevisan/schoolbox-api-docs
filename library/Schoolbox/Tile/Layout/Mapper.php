@@ -47,7 +47,7 @@ class Mapper extends BaseMapper
         );
 
         // Column padding: a % of the total width of the tile
-        $this->uses('column_padding', self::TYPE_DECIMAL);
+        $this->uses('column_padding', self::TYPE_INTEGER);
 
         // Grid width: always px as far as i know
         $this->hasMap(
