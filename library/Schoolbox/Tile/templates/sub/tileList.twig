@@ -11,6 +11,7 @@
 #tileList-{{ layout.id }}.tileList .tile {
     {% if layout.isGridLayoutType and layout.gridWidth > 0 %}
     width: {{ layout.gridWidth|e('css') }}px;
+    margin: {{ layout.getGridPadding|e('css') }}px;
     padding-bottom: {{ layout.gridWidth * (layout.aspectRatioY/layout.aspectRatioX) }}px;
     {% endif %}
 
