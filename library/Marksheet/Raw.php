@@ -41,9 +41,12 @@ class Marksheet_Raw extends Marksheet_Abstract
 
         if (in_array($subReturn['mark'], $errs)) {
             $rawMark = $subReturn['mark'];
+        } elseif (isset($subReturn['mark'])) {
+            // Raw marks get stored as "$mark / $totalMark"
+            // Conveniently floatval() strips out everything after $mark
+            $rawMark = $asText ? $subReturn['mark'] : floatval($subReturn['mark']);
         } else {
-            $mark = $this->cleanNumber(($subReturn['norm_mark'] / 100) * $subbox['max_mark'], 0, $blankZero);
-            $rawMark = $asText ? "$mark / {$subbox['max_mark']}" : $mark;
+            $rawMark = null;
         }
 
         return array(
