@@ -200,6 +200,14 @@ then
 	apt-get -y install schoolbox-epl;
 fi
 
+echo "$vag Ensure schoolbox-ffmpeg is of the required version";
+ffmpegver='2.6.3-1';
+if [ "`dpkg -l schoolbox-ffmpeg | tail -n1 | awk {'print $3'}`" != "$ffmpegver" ];
+then
+	apt-get update >/dev/null 2>&1;
+	apt-get -y install schoolbox-ffmpeg;
+fi
+
 echo "$vag Installing all required packages";
 apt-get -y install imagemagick php5-imagick;
 
