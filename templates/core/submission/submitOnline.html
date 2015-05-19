@@ -96,22 +96,28 @@
         });
 
         $("input[name='save']").click(function(e) {
-            if($( "#confirmDialog" ).length) {
+            var form   = $(this).closest('form'),
+                dialog = $("#confirmDialog"),
+                submit = form.find(':submit');
+
+            if (dialog.length) {
                 e.preventDefault();
-                var form = $(this).closest('form');
-                $("#confirmDialog").dialog({
+
+                dialog.dialog({
                     buttons: {
                         "Yes, I agree": function() {
-                            form.find(':submit').prop('disabled', true);
+                            submit.prop('disabled', true);
                             form.submit();
                         },
                         Cancel: function() {
-                            $( this ).dialog( "close" );
+                            $(this).dialog( "close" );
                         }
                     }
                 });
+                dialog.dialog("open");
 
-                $("#confirmDialog").dialog("open");
+            } else {
+                submit.prop('disabled', true);
             }
         });
 
