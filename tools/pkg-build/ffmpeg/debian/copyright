@@ -1,0 +1,8 @@
+Format: http://dep.debian.net/deps/dep5
+Upstream-Name: ffmpeg
+Source: http://ffmpeg.org
+
+Files: *
+Copyright: FFMPEG
+License: LGPL 2.1+
+ Contact Alaress on support@alaress.com.au for more info.

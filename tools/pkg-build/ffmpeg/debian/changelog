@@ -1,0 +1,5 @@
+schoolbox-ffmpeg (2.6.3-1) stable; urgency=low
+
+  * FFmpeg for schoolbox, built from static build
+
+ -- vagrant <vagrant@ubuntubuild-schoolbox>  Fri, 28 Mar 2014 14:58:46 +1100

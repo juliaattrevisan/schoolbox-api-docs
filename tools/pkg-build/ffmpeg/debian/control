@@ -1,0 +1,16 @@
+Source: schoolbox-ffmpeg
+Section: non-free/web
+Priority: optional
+Maintainer: Alaress Support <support@schoolbox.com.au>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.3
+Homepage: http://ffmpeg.org
+
+Package: schoolbox-ffmpeg
+Architecture: amd64
+Depends: ${misc:Depends}
+Provides: libav-tools
+Conflicts: libav-tools
+Replaces: libav-tools
+Description: FFmpeg for Schoolbox
+ Linux 64bit static builds from http://johnvansickle.com/ffmpeg/releases/ for use with Schoolbox
