@@ -89,6 +89,8 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
         $this->setVar(
             array(
+                'day_block'      => '',
+                'LIST_DATE'      => $this->start->getLongDateOnly(),
                 'DATE'           => $this->start->getLongDateOnly(),
                 'CALENDAR_DATE'  => $this->start->getURLDate(),
             )
