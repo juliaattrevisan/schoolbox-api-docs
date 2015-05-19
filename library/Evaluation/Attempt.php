@@ -305,7 +305,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
 			WHERE {$this->_table}.assess_id = " . $this->db->smartQuote($assess_id) . "
 			AND {$this->_table}.user_id = '$user_id'
 			AND {$this->_table}.deleted_at IS NULL
-			AND ({$this->_table}.finish = '0000-00-00 00:00:00' OR {$this->_table}.finish IS NULL)
+			AND {$this->_table}.finish IS NULL
 			ORDER BY {$this->_table}.start DESC
 		";
 
