@@ -236,7 +236,7 @@ abstract class AbstractNode implements NodeInterface
               * could accumulate in the schoolbox
               */
             try {
-                $mimetype = $mimetypeMapper->getByFilename($currentFile->getFilename());
+                $mimetype = $currentFile->getMimetype();
             } catch (\Exception $e) {
                 $mimetype = $mimetypeMapper->getUnknownMime();
             }
