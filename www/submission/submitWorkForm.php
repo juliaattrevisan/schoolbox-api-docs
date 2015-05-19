@@ -32,7 +32,7 @@ if (trim($_POST['body'])) {
     $drafts = $subMap->getDrafts($_SESSION['id'], $_POST['box_id'], 1);
     if ($drafts->count()) {
         $drafts->first()->setDraft(false)->setCreatedAt(Alaress_Date_Format::now());
-        $subMap->save($drafts->first());
+        $submissions->add($drafts->first());
     }
 }
 
@@ -66,9 +66,16 @@ if (is_array($_POST['attachment'])) {
 
     } catch (Schoolbox\Mapper\Exception $e) {
         // something didn't exist
+
+        // make sure we save whatever we got so far
+        $subMap->save($submissions);
         error(9, $e->getMessage());
+
     } catch (Schoolbox\Resource\Exception $e) {
         // something wasn't allowed to exist
+
+        // make sure we save whatever we got so far
+        $subMap->save($submissions);
         error(9, $e->getMessage());
     }
 }
