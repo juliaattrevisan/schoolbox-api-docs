@@ -1,0 +1,4 @@
+opt/ffmpeg/ffmpeg usr/bin/ffmpeg
+opt/ffmpeg/ffmpeg-10bit usr/bin/ffmpeg-10bit
+opt/ffmpeg/ffprobe usr/bin/ffprobe
+opt/ffmpeg/ffserver usr/bin/ffserver
