@@ -255,7 +255,8 @@ class Controller extends Base
      * @param Model $model
      * @return array
      */
-    protected function getAttachZoneData(Model $model) {
+    protected function getAttachZoneData(Model $model)
+    {
         $zone = new Zone('tile');
         $zone
             ->setThumbnailSize(64)
