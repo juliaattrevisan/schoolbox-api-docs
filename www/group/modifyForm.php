@@ -44,7 +44,7 @@ if (is_numeric($_POST['type']) || is_array($_POST['msg'])) {
             $group->setCategory($_REQUEST['categoryID']);
         } catch (\Schoolbox\Mapper\Exception $e) {
             header(':', true, 404);
-            exit;
+            die("The specified folder ({$_REQUEST['categoryID']}) does not exist.");
         }
     }
 
