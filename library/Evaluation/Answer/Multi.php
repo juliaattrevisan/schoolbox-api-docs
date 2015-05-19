@@ -189,6 +189,19 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
     }
 
     /**
+     * Has the student selected the given answer value in their response?
+     *
+     * @param string $answerValue
+     * @param array  $existingResponse The response that the student gave for the question
+     *
+     * @return bool
+     */
+    protected function isAnswerSelected($answerValue, $existingResponse)
+    {
+        return is_array($existingResponse) && in_array($answerValue, $existingResponse);
+    }
+
+    /**
      * Resets answer tokens so a user can fill them in while actually taking
      * the test.
      *
@@ -224,9 +237,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
                 ));
 
                 if ($existing['response']) {
-                    $existingAnswer = unserialize($existing['response']);
-
-                    if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
+                    if ($this->isAnswerSelected($currentAnswer->value, unserialize($existing['response']))) {
                         $page->setVar(array(
                             'ANSWER_CHECKED' => 'checked=\'checked\'',
                         ));

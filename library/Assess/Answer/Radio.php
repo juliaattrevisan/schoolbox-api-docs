@@ -68,4 +68,18 @@ class Assess_Answer_Radio extends Assess_Answer_Multi {
 
         $this->getResponseHandler()->update($marks);
     }
+
+    /**
+     * Overridden as $existingResponse is a single answer, instead of an array
+     * of answers.
+     *
+     * @param string $answerValue
+     * @param string $existingResponse The response that the student gave for the question
+     *
+     * @return bool
+     */
+    protected function isAnswerSelected($answerValue, $existingResponse)
+    {
+        return $answerValue == $existingResponse;
+    }
 }
