@@ -72,7 +72,9 @@ class Controller extends Base
         $layout
             ->setLayoutType(intval($this->getRequest()->post['layout_type']))
             ->setGridWidth(intval($this->getRequest()->post['grid_width']))
+            ->setGridPadding(intval($this->getRequest()->post['grid_padding']))
             ->setColumnCount(intval($this->getRequest()->post['column_count']))
+            ->setColumnPadding(intval($this->getRequest()->post['column_padding']))
             ->setAspectRatioX(intval($this->getRequest()->post['aspect_ratio_x']))
             ->setAspectRatioY(intval($this->getRequest()->post['aspect_ratio_y']))
         ;
