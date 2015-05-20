@@ -104,35 +104,6 @@
                     self.daySelector.prop('disabled', true)
                 }
                 self.daySelector.trigger('change')
-
-                // Repopulate campus period list, attempting to preserve last selected
-                var periodSelected = self.periodSelector.val()
-                self.periodSelector.find('option[value]').remove()
-                var campusPeriods = null
-                if (campusId in self.options.campusList) {
-                    campusPeriods = self.options.campusList[campusId].periodList
-                }
-                if (campusPeriods) {
-                    self.periodSelector.prop('disabled', false)
-                    campusPeriods.forEach(function(period, index) {
-                        self.periodSelector
-                            .append(
-                                $('<option />')
-                                    .attr('label', period.desc)
-                                    .attr('value', index)
-                                    .data('start', period.start)
-                                    .data('end',   period.end)
-                                    .text(period.desc)
-                            )
-                    })
-                    if (periodSelected !== null) {
-                        self.periodSelector.val(periodSelected)
-                    }
-                }
-                else {
-                    self.periodSelector.prop('disabled', true)
-                }
-                self.periodSelector.trigger('change')
             })
             .trigger('change')
 
@@ -272,6 +243,31 @@
                 .text(date.format(self.options.dateFormat))
             self.buttons.prop('disabled', false).removeClass('disabled').show()
             self.triggerSelectDateEvent()
+
+            // Populate periods if they're provided.
+            if (data.periods) {
+                var periodSelected = self.periodSelector.val()
+                self.periodSelector.find('option[value]').remove()
+                self.periodSelector.prop('disabled', false)
+                data.periods.forEach(function(period, index) {
+                    self.periodSelector
+                        .append(
+                        $('<option />')
+                            .attr('label', period.desc)
+                            .attr('value', index)
+                            .data('start', period.start)
+                            .data('end',   period.end)
+                            .text(period.desc)
+                    )
+                })
+                if (periodSelected !== null) {
+                    self.periodSelector.val(periodSelected)
+                }
+                self.periodSelector.trigger('change')
+            }
+            else {
+                self.periodSelector.prop('disabled', true)
+            }
         })
         .fail(function(data) {
             self.dateDisplay
