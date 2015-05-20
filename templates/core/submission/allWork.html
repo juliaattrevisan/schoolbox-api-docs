@@ -364,7 +364,12 @@
 					<!-- BEGIN work -->
 					<tr class="{ON_OFF}">
 						<td>
+                            <!-- BEGIN work_clickable -->
 							<a class="title" href="/{WORK_HREF}{WORK_ID}/{WORK_USER_ID}">{WORK_TITLE}</a>
+                            <!-- END work_clickable -->
+                            <!-- BEGIN work_unclickable -->
+                            <span class="title">{WORK_TITLE}</span>
+                            <!-- END work_unclickable -->
 							<br/>
 							<a href="/homepage/{SUBJ_ID}">{SUBJ_NAME}</a> {WORK_TYPE}
 						</td>
