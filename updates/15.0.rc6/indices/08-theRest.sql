@@ -36,8 +36,6 @@ ALTER TABLE `leave_request`
     ADD INDEX `start` (`start`),
     ADD INDEX `finish` (`finish`),
     ADD INDEX `confirmed_by` (`confirmed_by`);
-ALTER TABLE `lu_leave_request_travel_type`
-    ADD INDEX `sequence` (`sequence`);
 ALTER TABLE `msg_reroute`
     ADD INDEX `delivery` (`delivery`);
 ALTER TABLE `msg_reroute_override`
@@ -59,8 +57,7 @@ ALTER TABLE `reportcard_comment`
     ADD INDEX `student_visibility` (`student_visibility`),
     ADD INDEX `parent_visibility` (`parent_visibility`);
 ALTER TABLE `sideMenu`
-    ADD INDEX `parent` (`parent`),
-    ADD INDEX `sequence` (`sequence`);
+    ADD INDEX `parent` (`parent`);
 ALTER TABLE `sideMenuCampus`
     ADD INDEX `id` (`id`),
     ADD INDEX `campus` (`campus`);

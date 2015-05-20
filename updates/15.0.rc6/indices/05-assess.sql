@@ -1,8 +1,6 @@
 ALTER TABLE `assess` ADD INDEX `availability` (`availability`);
-ALTER TABLE `assess_answer` ADD INDEX `sequence` (`sequence`);
 ALTER TABLE `assess_luQuestionType` ADD INDEX `availability` (`availability`);
 ALTER TABLE `assess_question`
-    ADD INDEX `sequence` (`sequence`),
     ADD INDEX `deleted_at` (`deleted_at`)
 ;
 ALTER TABLE `assess_question_bank`
@@ -17,6 +15,5 @@ ALTER TABLE `assess_question_category`
 ALTER TABLE `assess_response` ADD INDEX `deleted_at` (`deleted_at`);
 ALTER TABLE `assess_section`
     ADD INDEX `assess_id` (`assess_id`),
-    ADD INDEX `sequence` (`sequence`),
     ADD INDEX `deleted_at` (`deleted_at`)
 ;

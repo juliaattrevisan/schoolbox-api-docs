@@ -4,8 +4,7 @@ ALTER TABLE `component_definition`
     ADD INDEX `module` (`module`);
 ALTER TABLE `component_instance`
     ADD INDEX `module` (`module`),
-    ADD INDEX `position` (`position`),
-    ADD INDEX `sequence` (`sequence`);
+    ADD INDEX `position` (`position`);
 ALTER TABLE `dropbox`
     ADD INDEX `deleted` (`deleted`),
     ADD INDEX `deleted_at` (`deleted_at`);
@@ -16,8 +15,6 @@ ALTER TABLE `forumPost`
     ADD INDEX `parentID` (`parentID`);
 ALTER TABLE `link`
     ADD INDEX `owner` (`owner`);
-ALTER TABLE `newsTopic`
-    ADD INDEX `sequence` (`sequence`);
 ALTER TABLE `poll`
     ADD INDEX `created_by` (`created_by`),
     ADD INDEX `close` (`close`);

@@ -3,12 +3,10 @@ ALTER TABLE `eportfolio_blog` ADD INDEX `deleted` (`deleted`);
 ALTER TABLE `eportfolio_blogComment` ADD INDEX `deleted` (`deleted`);
 ALTER TABLE `eportfolio_component_advancedlist_item`
     ADD INDEX `component_instance_id` (`component_instance_id`),
-    ADD INDEX `sequence` (`sequence`),
     ADD INDEX `imagehash` (`imagehash`)
 ;
 ALTER TABLE `eportfolio_component_basiclist_item`
-    ADD INDEX `component_instance_id` (`component_instance_id`),
-    ADD INDEX `sequence` (`sequence`)
+    ADD INDEX `component_instance_id` (`component_instance_id`)
 ;
 ALTER TABLE `eportfolio_component_blog`
     ADD INDEX `page_id` (`page_id`),
@@ -26,12 +24,10 @@ ALTER TABLE `eportfolio_component_filelist_item`
     ADD INDEX `deleted_at` (`deleted_at`)
 ;
 ALTER TABLE `eportfolio_component_linklist_item`
-    ADD INDEX `component_instance_id` (`component_instance_id`),
-    ADD INDEX `sequence` (`sequence`)
+    ADD INDEX `component_instance_id` (`component_instance_id`)
 ;
 ALTER TABLE `eportfolio_component_textbox_item`
-    ADD INDEX `component_instance_id` (`component_instance_id`),
-    ADD INDEX `sequence` (`sequence`)
+    ADD INDEX `component_instance_id` (`component_instance_id`)
 ;
 ALTER TABLE `eportfolio_coverphoto`
     ADD INDEX `uid` (`uid`),
