@@ -94,7 +94,7 @@ NameVirtualHost *:443
         php_flag session.cookie_httponly On
         php_value session.save_handler redis
         php_value session.save_path "tcp://127.0.0.1:6379"
-        php_value newrelic.appname "Schoolbox 14.5"
+        php_value newrelic.appname "Schoolbox 15.0"
 
         # Assess uses JSON arrays to transfer data in multi-choice/matching pairs
         # JSON arrays don't like being escaped!!
@@ -133,7 +133,7 @@ NameVirtualHost *:443
         #RewriteCond %{REQUEST_URI} !^/account/modify
         #RewriteCond %{REQUEST_URI} !^/account/modify/.*
         #RewriteCond %{REQUEST_URI} !^/ajax/.*
-        #RewriteCond %{REQUEST_URI} !\.[A-Za-z]{2,4}$
+        #RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-f
         #RewriteRule ^(.*)$ http://%{HTTP_HOST}%{REQUEST_URI} [R,NE,L]
 
         RewriteCond %{SCRIPT_FILENAME}/ -d
@@ -154,7 +154,7 @@ NameVirtualHost *:443
 
         RewriteCond %{REQUEST_URI} !/dav/.*
         RewriteCond %{REQUEST_URI} !/m/.*
-        RewriteCond %{REQUEST_URI} !\.[A-Za-z]{2,4}$
+        RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-f
         RewriteRule ^(.*)$ /index.php?page=$1 [L,QSA]
 
 </VirtualHost>
