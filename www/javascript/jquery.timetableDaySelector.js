@@ -86,17 +86,16 @@
                     campusDays = self.options.campusList[campusId].days
                 }
                 if (campusDays) {
-                    self.daySelector.prop('disabled', false)
-                    for (var i = 1; i <= campusDays; i++) {
-                        var label = 'Day '+String(i)
+                    self.daySelector.prop('disabled', false);
+                    campusDays.forEach(function(day) {
                         self.daySelector
                             .append(
-                                $('<option />')
-                                    .attr('label', label)
-                                    .attr('value', i)
-                                    .text(label)
-                            )
-                    }
+                            $('<option />')
+                                .attr('label', day.name)
+                                .attr('value', day.number)
+                                .text(day.name)
+                        )
+                    });
                     if (daySelected !== null) {
                         self.daySelector.val(daySelected)
                     }
