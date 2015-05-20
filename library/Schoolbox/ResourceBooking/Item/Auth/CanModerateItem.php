@@ -2,6 +2,8 @@
 /**
  * Authorization class: verifies that the user can moderate an item.
  *
+ * Doesn't check if user is a moderator of the resource booking service.
+ *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
@@ -17,12 +19,6 @@ use Schoolbox\ResourceBooking\Item\Mapper;
 
 class CanModerateItem implements Rule\IAuthorizationRule
 {
-
-    /**
-     * @var Mapper
-     */
-    protected $mapper;
-
     /**
      * Authorizes that this user is a moderator for this item.
      *
@@ -44,27 +40,6 @@ class CanModerateItem implements Rule\IAuthorizationRule
                 }
             }
         }
-        if ($this->getMapper()->isUserModerator($params['id'], $user->getId())) {
-            return;
-        }
         throw new Failure\Unauthorized();
-    }
-
-    /**
-     * @param  Mapper $mapper
-     * @return $this
-     */
-    public function setMapper($mapper)
-    {
-        $this->mapper = $mapper;
-        return $this;
-    }
-
-    /**
-     * @return Mapper
-     */
-    public function getMapper()
-    {
-        return $this->mapper;
     }
 }
