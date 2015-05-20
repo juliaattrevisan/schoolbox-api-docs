@@ -11,6 +11,7 @@ namespace Schoolbox\ResourceBooking\Item;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Authorizer\Failure;
 use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
@@ -54,7 +55,19 @@ class Module extends BaseModule {
     public function initRoutePermissions(Authorizer $authorizer) {
         $resourceManageRule = new Rule\Any(
             new Rule\IsSuperuser(),
-            new Rule\HasServicePermission(UserAccess::SERVICE_RESOURCE_BOOKING, UserAccess::ACCESS_FULL)
+            new Rule\HasServicePermission(UserAccess::SERVICE_RESOURCE_BOOKING, UserAccess::ACCESS_FULL),
+            new Rule\Callback(
+                function($params, \Schoolbox\User $user = null, $target = null) {
+                    if ($params['item'] instanceof Model && $user instanceof \Schoolbox\User) {
+                        foreach ($params['item']->getModeratorList() as $moderator) {
+                            if ($moderator->getId() == $user->getId()) {
+                                return true;
+                            }
+                        }
+                    }
+                    throw new Failure\Unauthorized();
+                }
+            )
         );
         $authorizer
             ->addRule('/^resourceItem(?:$|\.)/',              new Rule\IsLoggedIn())
