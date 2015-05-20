@@ -79,7 +79,7 @@ if (!$attempt['finish']) {
     /* Notify the survey author when someone completes this
      */
     if ($survey['notify_author']) {
-        $notification = new Survey_Notification($survey);
+        $notification = new Survey_Notification($survey, $attempt);
         $notification->send();
     }
 

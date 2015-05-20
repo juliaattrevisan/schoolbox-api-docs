@@ -20,17 +20,22 @@ class Survey_Notification
     /** @var array */
     private $survey = array();
 
+    /** @var array */
+    private $attempt = array();
+
     /** @var UserMapper */
     private $userMapper = null;
 
     /**
      * Constructor
      *
-     * @param $survey
+     * @param array $survey
+     * @param array $attempt
      */
-    public function __construct($survey)
+    public function __construct($survey, $attempt)
     {
         $this->setSurvey($survey);
+        $this->setAttempt($attempt);
         $this->setUserMapper(UserMapper::getInstance());
 
         $this->setup();
@@ -41,7 +46,11 @@ class Survey_Notification
      */
     public function setup()
     {
-        $survey = $this->getSurvey();
+        $survey  = $this->getSurvey();
+        $attempt = $this->getAttempt();
+        // Load first section for link to review page
+        $sectionHandler = new Assess_Section();
+        $firstSection = $sectionHandler->getFirst($survey['assess_id']);
 
         $author = $this->getUserMapper()->findById($this->getAuthorId());
         $subject = "A response for {$this->getSurveyTitle()} was submitted";
@@ -49,8 +58,10 @@ class Survey_Notification
         $email = new Mailer($this->getEmailTemplateFile(), $subject, $author->getEmail());
 
         $email->setVar(array(
-            'SURVEY_SURVEY_ID' => $survey['assess_id'],
-            'SURVEY_TITLE' => Scrub::text($survey['title']),
+            'SURVEY_SURVEY_ID'   => $survey['assess_id'],
+            'SURVEY_TITLE'       => Scrub::text($survey['title']),
+            'ATTEMPT_SECTION_ID' => $firstSection['section_id'],
+            'ATTEMPT_ATTEMPT_ID' => $attempt['attempt_id'],
         ));
 
         $this->setEmail($email);
@@ -135,6 +146,25 @@ class Survey_Notification
     private function getSurvey()
     {
         return $this->survey;
+    }
+
+    /**
+     * @return array
+     */
+    private function getAttempt()
+    {
+        return $this->attempt;
+    }
+
+    /**
+     * @param  array $attempt
+     *
+     * @return $this
+     */
+    private function setAttempt($attempt)
+    {
+        $this->attempt = $attempt;
+        return $this;
     }
 
     /**
