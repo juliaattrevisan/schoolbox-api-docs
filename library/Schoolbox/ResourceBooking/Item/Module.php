@@ -56,18 +56,7 @@ class Module extends BaseModule {
         $resourceManageRule = new Rule\Any(
             new Rule\IsSuperuser(),
             new Rule\HasServicePermission(UserAccess::SERVICE_RESOURCE_BOOKING, UserAccess::ACCESS_FULL),
-            new Rule\Callback(
-                function($params, \Schoolbox\User $user = null, $target = null) {
-                    if ($params['item'] instanceof Model && $user instanceof \Schoolbox\User) {
-                        foreach ($params['item']->getModeratorList() as $moderator) {
-                            if ($moderator->getId() == $user->getId()) {
-                                return true;
-                            }
-                        }
-                    }
-                    throw new Failure\Unauthorized();
-                }
-            )
+            new Auth\CanModerateItem()
         );
         $authorizer
             ->addRule('/^resourceItem(?:$|\.)/',              new Rule\IsLoggedIn())
