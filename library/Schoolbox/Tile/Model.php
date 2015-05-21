@@ -22,63 +22,63 @@ class Model implements ISoftDeletable, \JsonSerializable
      *
      * @var int
      */
-    const TITLE_POSITION_TOPLEFT = 7;
+    const POSITION_TOPLEFT = 7;
 
     /**
      * Value of $titlePosition for when it's at the top.
      *
      * @var int
      */
-    const TITLE_POSITION_TOP = 8;
+    const POSITION_TOP = 8;
 
     /**
      * Value of $titlePosition for when it's at the top right.
      *
      * @var int
      */
-    const TITLE_POSITION_TOPRIGHT = 9;
+    const POSITION_TOPRIGHT = 9;
 
     /**
      * Value of $titlePosition for when it's at the left.
      *
      * @var int
      */
-    const TITLE_POSITION_LEFT = 4;
+    const POSITION_LEFT = 4;
 
     /**
      * Value of $titlePosition for when it's at the center.
      *
      * @var int
      */
-    const TITLE_POSITION_CENTER = 5;
+    const POSITION_CENTER = 5;
 
     /**
      * Value of $titlePosition for when it's at the right.
      *
      * @var int
      */
-    const TITLE_POSITION_RIGHT = 6;
+    const POSITION_RIGHT = 6;
 
     /**
      * Value of $titlePosition for when it's at the bottom left.
      *
      * @var int
      */
-    const TITLE_POSITION_BOTTOMLEFT = 1;
+    const POSITION_BOTTOMLEFT = 1;
 
     /**
      * Value of $titlePosition for when it's at the bottom.
      *
      * @var int
      */
-    const TITLE_POSITION_BOTTOM = 2;
+    const POSITION_BOTTOM = 2;
 
     /**
      * Value of $titlePosition for when it's at the bottom right.
      *
      * @var int
      */
-    const TITLE_POSITION_BOTTOMRIGHT = 3;
+    const POSITION_BOTTOMRIGHT = 3;
 
     /**
      * The primary key of this tile
@@ -112,12 +112,12 @@ class Model implements ISoftDeletable, \JsonSerializable
     /**
      * @var int
      */
-    protected $titlePosition = self::TITLE_POSITION_TOP;
+    protected $titlePosition = self::POSITION_TOP;
 
     /**
      * @var int
      */
-    protected $backgroundPosition = self::TITLE_POSITION_CENTER;
+    protected $backgroundPosition = self::POSITION_CENTER;
 
     /**
      * @var string
@@ -480,7 +480,7 @@ class Model implements ISoftDeletable, \JsonSerializable
      */
     public function isTitlePositionTopLeft()
     {
-        return $this->getTitlePosition() == self::TITLE_POSITION_TOPLEFT;
+        return $this->getTitlePosition() == self::POSITION_TOPLEFT;
     }
 
     /**
@@ -488,7 +488,7 @@ class Model implements ISoftDeletable, \JsonSerializable
      */
     public function isTitlePositionTop()
     {
-        return $this->getTitlePosition() == self::TITLE_POSITION_TOP;
+        return $this->getTitlePosition() == self::POSITION_TOP;
     }
 
     /**
@@ -496,7 +496,7 @@ class Model implements ISoftDeletable, \JsonSerializable
      */
     public function isTitlePositionTopRight()
     {
-        return $this->getTitlePosition() == self::TITLE_POSITION_TOPRIGHT;
+        return $this->getTitlePosition() == self::POSITION_TOPRIGHT;
     }
 
     /**
@@ -504,7 +504,7 @@ class Model implements ISoftDeletable, \JsonSerializable
      */
     public function isTitlePositionLeft()
     {
-        return $this->getTitlePosition() == self::TITLE_POSITION_LEFT;
+        return $this->getTitlePosition() == self::POSITION_LEFT;
     }
 
     /**
@@ -512,7 +512,7 @@ class Model implements ISoftDeletable, \JsonSerializable
      */
     public function isTitlePositionCenter()
     {
-        return $this->getTitlePosition() == self::TITLE_POSITION_CENTER;
+        return $this->getTitlePosition() == self::POSITION_CENTER;
     }
 
     /**
@@ -520,7 +520,7 @@ class Model implements ISoftDeletable, \JsonSerializable
      */
     public function isTitlePositionRight()
     {
-        return $this->getTitlePosition() == self::TITLE_POSITION_RIGHT;
+        return $this->getTitlePosition() == self::POSITION_RIGHT;
     }
 
     /**
@@ -528,7 +528,7 @@ class Model implements ISoftDeletable, \JsonSerializable
      */
     public function isTitlePositionBottomLeft()
     {
-        return $this->getTitlePosition() == self::TITLE_POSITION_BOTTOMLEFT;
+        return $this->getTitlePosition() == self::POSITION_BOTTOMLEFT;
     }
 
     /**
@@ -536,7 +536,7 @@ class Model implements ISoftDeletable, \JsonSerializable
      */
     public function isTitlePositionBottom()
     {
-        return $this->getTitlePosition() == self::TITLE_POSITION_BOTTOM;
+        return $this->getTitlePosition() == self::POSITION_BOTTOM;
     }
 
     /**
@@ -544,7 +544,7 @@ class Model implements ISoftDeletable, \JsonSerializable
      */
     public function isTitlePositionBottomRight()
     {
-        return $this->getTitlePosition() == self::TITLE_POSITION_BOTTOMRIGHT;
+        return $this->getTitlePosition() == self::POSITION_BOTTOMRIGHT;
     }
 
     /**
@@ -555,23 +555,23 @@ class Model implements ISoftDeletable, \JsonSerializable
     public function getTitlePositionStyle()
     {
         switch ($this->getTitlePosition()) {
-            case self::TITLE_POSITION_TOPLEFT:
+            case self::POSITION_TOPLEFT:
                 return 'text-top text-left';
-            case self::TITLE_POSITION_TOP:
+            case self::POSITION_TOP:
                 return 'text-top text-center';
-            case self::TITLE_POSITION_TOPRIGHT:
+            case self::POSITION_TOPRIGHT:
                 return 'text-top text-right';
-            case self::TITLE_POSITION_LEFT:
+            case self::POSITION_LEFT:
                 return 'text-middle text-left';
-            case self::TITLE_POSITION_CENTER:
+            case self::POSITION_CENTER:
                 return 'text-middle text-center';
-            case self::TITLE_POSITION_RIGHT:
+            case self::POSITION_RIGHT:
                 return 'text-middle text-right';
-            case self::TITLE_POSITION_BOTTOMLEFT:
+            case self::POSITION_BOTTOMLEFT:
                 return 'text-bottom text-left';
-            case self::TITLE_POSITION_BOTTOM:
+            case self::POSITION_BOTTOM:
                 return 'text-bottom text-center';
-            case self::TITLE_POSITION_BOTTOMRIGHT:
+            case self::POSITION_BOTTOMRIGHT:
                 return 'text-bottom text-right';
             default:
                 // Top
@@ -587,23 +587,23 @@ class Model implements ISoftDeletable, \JsonSerializable
     public function getBackgroundPositionStyle()
     {
         switch ($this->getTitlePosition()) {
-            case self::TITLE_POSITION_TOPLEFT:
+            case self::POSITION_TOPLEFT:
                 return 'background-top background-left';
-            case self::TITLE_POSITION_TOP:
+            case self::POSITION_TOP:
                 return 'background-top background-center';
-            case self::TITLE_POSITION_TOPRIGHT:
+            case self::POSITION_TOPRIGHT:
                 return 'background-top background-right';
-            case self::TITLE_POSITION_LEFT:
+            case self::POSITION_LEFT:
                 return 'background-middle background-left';
-            case self::TITLE_POSITION_CENTER:
+            case self::POSITION_CENTER:
                 return 'background-middle background-center';
-            case self::TITLE_POSITION_RIGHT:
+            case self::POSITION_RIGHT:
                 return 'background-middle background-right';
-            case self::TITLE_POSITION_BOTTOMLEFT:
+            case self::POSITION_BOTTOMLEFT:
                 return 'background-bottom background-left';
-            case self::TITLE_POSITION_BOTTOM:
+            case self::POSITION_BOTTOM:
                 return 'background-bottom background-center';
-            case self::TITLE_POSITION_BOTTOMRIGHT:
+            case self::POSITION_BOTTOMRIGHT:
                 return 'background-bottom background-right';
             default:
                 // Center
