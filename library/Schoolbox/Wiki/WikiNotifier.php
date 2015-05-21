@@ -23,11 +23,17 @@ use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Role;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
 
 	const TRIGGER_CREATED = 'created';
 
+    /** @var RevisionMapper */
+    protected $revisionMapper;
+
+    /** @var UserMapper */
+    protected $userMapper;
 
 	/**
 	 * @return string
@@ -37,7 +43,45 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
 	}
 
 
-	/**
+    /**
+     * @param array $dependencies
+     */
+    public function loadDependencies($dependencies = null)
+    {
+        if (empty($dependencies['revisionMapper'])) {
+            $dependencies['revisionMapper'] = RevisionMapper::getInstance();
+        }
+        if (empty($dependencies['userMapper'])) {
+            $dependencies['userMapper'] = UserMapper::getInstance();
+        }
+
+        parent::loadDependencies($dependencies);
+    }
+
+
+    /**
+     * @param RevisionMapper $revisionMapper
+     * @return static
+     */
+    protected function setRevisionMapper($revisionMapper)
+    {
+        $this->revisionMapper = $revisionMapper;
+        return $this;
+    }
+
+
+    /**
+     * @param UserMapper $userMapper
+     * @return static
+     */
+    protected function setUserMapper($userMapper)
+    {
+        $this->userMapper = $userMapper;
+        return $this;
+    }
+
+
+    /**
 	 * @param TriggerBundle $bundle
 	 * @return void
 	 */
@@ -71,8 +115,10 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
 		$wikis = $this->mapper->findForFeed($context, $limit, $offset);
 
 		foreach($wikis as $wiki) {
+            $first = $this->revisionMapper->findOneByColumn('wikiID', $wiki->getId(), [ 'created' => 'asc' ]);
+            $user  = $this->userMapper->findById($first->getUser()->getId());
 			$c->merge(
-				new Collection($this->notifyCreated($roletype, $wiki, $wiki->getLatestRevision()->getUser())->getAll($wiki->getCreated()->getUnixTimestamp()))
+				new Collection($this->notifyCreated($roletype, $wiki, $user)->getAll($wiki->getCreated()->getUnixTimestamp()))
 			);
 		}
 
