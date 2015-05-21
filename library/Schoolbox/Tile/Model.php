@@ -476,75 +476,15 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
+     * Is this tile's title in the given position?
+     *
+     * @param int $position One of the self::POSITION_* constants
+     *
      * @return bool
      */
-    public function isTitlePositionTopLeft()
+    public function isTitlePosition($position)
     {
-        return $this->getTitlePosition() == self::POSITION_TOPLEFT;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isTitlePositionTop()
-    {
-        return $this->getTitlePosition() == self::POSITION_TOP;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isTitlePositionTopRight()
-    {
-        return $this->getTitlePosition() == self::POSITION_TOPRIGHT;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isTitlePositionLeft()
-    {
-        return $this->getTitlePosition() == self::POSITION_LEFT;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isTitlePositionCenter()
-    {
-        return $this->getTitlePosition() == self::POSITION_CENTER;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isTitlePositionRight()
-    {
-        return $this->getTitlePosition() == self::POSITION_RIGHT;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isTitlePositionBottomLeft()
-    {
-        return $this->getTitlePosition() == self::POSITION_BOTTOMLEFT;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isTitlePositionBottom()
-    {
-        return $this->getTitlePosition() == self::POSITION_BOTTOM;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isTitlePositionBottomRight()
-    {
-        return $this->getTitlePosition() == self::POSITION_BOTTOMRIGHT;
+        return $this->getBackgroundPosition() == $position;
     }
 
     /**
@@ -580,75 +520,15 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
+     * Is this tile's background in the given position?
+     *
+     * @param int $position One of the self::POSITION_* constants
+     *
      * @return bool
      */
-    public function isBackgroundPositionTopLeft()
+    public function isBackgroundPosition($position)
     {
-        return $this->getBackgroundPosition() == self::POSITION_TOPLEFT;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isBackgroundPositionTop()
-    {
-        return $this->getBackgroundPosition() == self::POSITION_TOP;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isBackgroundPositionTopRight()
-    {
-        return $this->getBackgroundPosition() == self::POSITION_TOPRIGHT;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isBackgroundPositionLeft()
-    {
-        return $this->getBackgroundPosition() == self::POSITION_LEFT;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isBackgroundPositionCenter()
-    {
-        return $this->getBackgroundPosition() == self::POSITION_CENTER;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isBackgroundPositionRight()
-    {
-        return $this->getBackgroundPosition() == self::POSITION_RIGHT;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isBackgroundPositionBottomLeft()
-    {
-        return $this->getBackgroundPosition() == self::POSITION_BOTTOMLEFT;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isBackgroundPositionBottom()
-    {
-        return $this->getBackgroundPosition() == self::POSITION_BOTTOM;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isBackgroundPositionBottomRight()
-    {
-        return $this->getBackgroundPosition() == self::POSITION_BOTTOMRIGHT;
+        return $this->getBackgroundPosition() == $position;
     }
 
     /**
