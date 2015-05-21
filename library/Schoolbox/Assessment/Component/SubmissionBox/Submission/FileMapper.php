@@ -426,4 +426,39 @@ class FileMapper extends Mapper
         return $this->hydrateSelect($statement);
     }
 
-} 
+
+    /**
+     * Retrieves the number of submissions that have been made on each box in a
+     * list.
+     *
+     * @param array $box_ids
+     * @param int   $user_id
+     *
+     * @return array The submission box ID as the key, the count as the value.
+     */
+    public function findCountsForSubmissionBoxes($box_ids, $user_id) {
+        // Retrieve count of submission IDs from a list of IDs for a user
+        if (empty($box_ids)) {
+            return array();
+        }
+        $query = "
+            SELECT ss.box_id, COUNT(*) as submission_count
+            FROM {$this->getTable()} ss
+            WHERE ss.owner = :user_id
+            AND ss.box_id IN {$this->getArrayPlaceholders($box_ids, 'sb')}
+            AND ss.draft IS FALSE
+            GROUP BY ss.box_id
+        ";
+        $statement = $this->database->prepare($query);
+        $params = $this->getArrayParameters($box_ids, 'sb');
+        $params['user_id'] = $user_id;
+        $statement->execute($params);
+
+        $return = array();
+        foreach ($statement as $row) {
+            $return[$row['box_id']] = $row['submission_count'];
+        }
+        return $return;
+    }
+
+}
