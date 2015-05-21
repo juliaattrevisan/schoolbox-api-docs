@@ -105,6 +105,7 @@ class Mapper extends BaseMapper
                 'type'     => self::TYPE_COLOR,
             )
         );
+        $this->uses('background_position', self::TYPE_INTEGER);
 
         // Hover color
         $this->hasMap(

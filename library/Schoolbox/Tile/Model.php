@@ -115,6 +115,11 @@ class Model implements ISoftDeletable, \JsonSerializable
     protected $titlePosition = self::TITLE_POSITION_TOP;
 
     /**
+     * @var int
+     */
+    protected $backgroundPosition = self::TITLE_POSITION_CENTER;
+
+    /**
      * @var string
      */
     protected $link;
@@ -341,6 +346,25 @@ class Model implements ISoftDeletable, \JsonSerializable
     public function getTitlePosition()
     {
         return $this->titlePosition;
+    }
+
+    /**
+     * @return int
+     */
+    public function getBackgroundPosition()
+    {
+        return $this->backgroundPosition;
+    }
+
+    /**
+     * @param  int $backgroundPosition
+     *
+     * @return $this
+     */
+    public function setBackgroundPosition($backgroundPosition)
+    {
+        $this->backgroundPosition = $backgroundPosition;
+        return $this;
     }
 
     /**
