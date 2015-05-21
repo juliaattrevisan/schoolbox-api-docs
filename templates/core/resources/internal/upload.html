@@ -41,7 +41,9 @@
 
                     ff.find(fi).prettyFileInput(cf);
 
-                    abUploadSubmitBtn.one('click', function () {
+                    abUploadSubmitBtn.one('click', function (e) {
+                        e.preventDefault();
+
                         // cleanup any empty inputs
                         ff.find(fi).filter(function () {
                             return !$(this).val();
@@ -212,6 +214,8 @@
                     .html('Upload (' + ql + ')')
                     .removeAttr('disabled')
                     .one('click', function (e) {
+                        e.preventDefault();
+
                         abUploadSubmitBtn
                             .data('uploading', dz.getQueuedFiles())
                             .html('Uploading')
