@@ -1,0 +1,3 @@
+UPDATE `config` SET `description` = 'The class average is shown as a blue line on the students\' grade report. This option allows you to hide that line from students and parents.' WHERE `name` = 'display_grade_average';
+UPDATE `config` SET `description` = 'This will control the maximum grade visibility teachers can use when creating submission boxes' WHERE `name` = 'submission_visibility_max';
+UPDATE `config` SET `description` = 'Allow Due Work, Folders and Quizzes to be associated with Curriculum Codes. (This setting should not be enabled before curricula have been set up.)' WHERE `name` = 'curriculum_tagging_enabled';
