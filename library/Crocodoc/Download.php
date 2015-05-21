@@ -9,9 +9,10 @@
  */
 
 namespace Crocodoc;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Resource\Storage;
 use Alaress_Curl_Url;
 
 class Download
