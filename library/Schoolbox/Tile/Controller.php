@@ -287,6 +287,7 @@ class Controller extends Base
             ->setLink($post['link'])
             ->setBackgroundColor($post['background_color'] ?: '00000000')
             ->setBackgroundImageContained(!empty($post['background_image_contained']))
+            ->setBackgroundPosition($post['background_position'])
             ->setHoverColor($post['hover_color'] ?: '00000000');
 
         if (is_array($post['attachment'])) {
