@@ -32,6 +32,7 @@ if(typeof window.location.origin == 'undefined') {
 
     var pluginName     = 'resourceAttach',
         singletonModal = null,
+        modalCache     = {},
         noop           = function () {},
         listening      = false,
         defaults       = {
@@ -253,8 +254,13 @@ if(typeof window.location.origin == 'undefined') {
             this.fallbackMaxFilesReached();
         }
 
-        // prepare the dialog in the background
-        this.build();
+        // cache the content for this dialog
+        this.cacheModal();
+
+        $(this.element).on('click', this.options.trigger, function (e) {
+            e.preventDefault();
+            self.open();
+        });
     }
 
 
@@ -291,28 +297,58 @@ if(typeof window.location.origin == 'undefined') {
     };
 
 
-    ResourceAttach.prototype.build = function () {
-        var self = this,
-            body = $('body'),
-            qString;
-
-        // if my modal already exists, destroy it
-        this.destroy();
-
-        singletonModal = $('<div/>');
-        singletonModal.data('rtn', this);
-
-        body.append(singletonModal);
-
-        qString = 'multi=' + (this.options.multi ? '1' : '0');
+    ResourceAttach.prototype.getQueryString = function () {
+        var qString = 'multi=' + (this.options.multi ? '1' : '0');
 
         if (this.options.allowedFiles) {
-           qString += '&mime=' + this.options.allowedFiles;
+            qString += '&mime=' + this.options.allowedFiles;
         }
 
-        singletonModal.load(this.options.source, qString, function () {
-            // anything you need to do upon completion of loading
+        return qString;
+    };
+
+
+    ResourceAttach.prototype.getCacheKey = function () {
+
+        return this.options.source + '?' + this.getQueryString();
+    };
+
+
+    ResourceAttach.prototype.cacheModal = function (callback) {
+
+        var key  = this.getCacheKey(),
+            self = this;
+
+        if ('undefined' == typeof modalCache[key]) {
+            modalCache[key] = $.get(this.options.source, this.getQueryString()).promise();
+        }
+
+        modalCache[key].done(function (data) {
+            // ensure we retain ResourceAttache context
+            self.build.call(self, data);
         });
+
+        if (callback) {
+            modalCache[key].done(function (data) {
+                // ensure we retain ResourceAttache context
+                callback.call(self, data);
+            });
+        }
+    };
+
+
+    ResourceAttach.prototype.build = function (data) {
+        var self = this,
+            body = $('body');
+
+        // if the modal already exists, destroy it
+        this.destroy();
+
+        singletonModal = $('<div/>')
+            .data('content', $.parseHTML(data, document, true))
+            .data('rtn', this);
+
+        body.append(singletonModal);
 
         singletonModal.dialog({
             width:     this.options.width,
@@ -322,30 +358,29 @@ if(typeof window.location.origin == 'undefined') {
             resizable: this.options.resizable,
             autoOpen:  false,
             close: function (e) {
-                self.build();
+                self.build(data);
             }
         });
 
         singletonModal.on('click', '.cancel[role=button]', function (e) {
             window.top.postMessage(JSON.stringify({ data: [] }), location.origin);
         });
-
-        $(this.element).on('click', this.options.trigger, function (e) {
-            e.preventDefault();
-            self.open();
-        });
     };
 
 
     ResourceAttach.prototype.open = function () {
         if (singletonModal == null) {
-            this.build();
+            // this will construct a modal VIA the cache
+            this.cacheModal(function () {
+                singletonModal.html(singletonModal.data('content'))
+                    .dialog('open');
+            });
         } else {
             // ensure the return points to the right element
-            singletonModal.data('rtn', this);
+            singletonModal.data('rtn', this)
+                .html(singletonModal.data('content'))
+                .dialog('open');
         }
-
-        singletonModal.dialog('open');
     };
 
 
