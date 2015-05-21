@@ -156,23 +156,27 @@
                 self.startTimeDisplay
                     .attr('datetime', startTime.format('HH:mm'))
                     .text(startTime.format('h:mm A'))
+                    .siblings('input[type=radio]').removeAttr('disabled')
                 self.triggerSelectDateEvent()
             }
             else {
                 self.startTimeDisplay
                     .removeAttr('datetime')
                     .text('')
+                    .siblings('input[type=radio]').attr('disabled', 'disabled')
             }
             if (endTime.isValid()) {
                 self.endTimeDisplay
                     .attr('datetime', endTime.format('HH:mm'))
                     .text(endTime.format('h:mm A'))
+                    .siblings('input[type=radio]').removeAttr('disabled')
                 self.triggerSelectDateEvent()
             }
             else {
                 self.endTimeDisplay
                     .removeAttr('datetime')
                     .text('')
+                    .siblings('input[type=radio]').attr('disabled', 'disabled')
             }
         })
 

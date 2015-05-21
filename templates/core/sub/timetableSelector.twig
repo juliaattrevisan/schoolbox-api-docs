@@ -35,7 +35,7 @@
     <dd>
         <label>
             {% if select == 'radio' %}
-            <input type="radio" name="pickTime" value="start" />
+            <input type="radio" name="pickTime" value="start" disabled="disabled" />
             {% endif %}
             <time data-role="selectedTimeStart">Please select a period.</time>
             {% if select == 'button' %}
@@ -49,7 +49,7 @@
     <dd>
         <label>
             {% if select == 'radio' %}
-            <input type="radio" name="pickTime" value="end" />
+            <input type="radio" name="pickTime" value="end" disabled="disabled" />
             {% endif %}
             <time data-role="selectedTimeEnd">Please select a period.</time>
             {% if select == 'button' %}
