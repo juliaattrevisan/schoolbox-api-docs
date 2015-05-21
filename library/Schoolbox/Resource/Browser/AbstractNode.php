@@ -238,19 +238,15 @@ abstract class AbstractNode implements NodeInterface
               */
             try {
                 $mimetype = $currentFile->getMimetype();
+
+                // no mime on current file? derive from filename
+                if (!$mimetype instanceof Mimetype) {
+                    $mimetype = MimetypeMapper::getInstance()->getByFilename($currentFile->getBasename());
+                }
+
             } catch (\Exception $e) {
                 $mimetype = $mimetypeMapper->getUnknownMime();
             }
-
-            // no mime on current file? derive from filename
-            if (!$mimetype instanceof Mimetype) {
-                try {
-                    $mimetype = MimetypeMapper::getInstance()->getByFilename($currentFile->getBasename());
-                } catch (\Exception $e) {
-                    $mimetype = $mimetypeMapper->getUnknownMime();
-                }
-            }
-
             /* If the mimetype table is empty, it'll spawn with a dunce object
              * SB-3911
              */
