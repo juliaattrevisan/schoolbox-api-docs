@@ -81,7 +81,7 @@ trait External_CacheTrait
     {
         $database = $this->getDatabase();
         return $this->getCache()->cacheFunctionCall(
-            get_class($database).':'.INSTANCE_ID.'.'.$method,
+            get_class($database).'.'.$method,
             function ($params) use ($database, $method) {
                 return call_user_func_array(
                     array($database, $method),
