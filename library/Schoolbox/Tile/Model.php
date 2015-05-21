@@ -580,6 +580,38 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
+     * What's the style for this element's background position?
+     *
+     * @return string
+     */
+    public function getBackgroundPositionStyle()
+    {
+        switch ($this->getTitlePosition()) {
+            case self::TITLE_POSITION_TOPLEFT:
+                return 'background-top background-left';
+            case self::TITLE_POSITION_TOP:
+                return 'background-top background-center';
+            case self::TITLE_POSITION_TOPRIGHT:
+                return 'background-top background-right';
+            case self::TITLE_POSITION_LEFT:
+                return 'background-middle background-left';
+            case self::TITLE_POSITION_CENTER:
+                return 'background-middle background-center';
+            case self::TITLE_POSITION_RIGHT:
+                return 'background-middle background-right';
+            case self::TITLE_POSITION_BOTTOMLEFT:
+                return 'background-bottom background-left';
+            case self::TITLE_POSITION_BOTTOM:
+                return 'background-bottom background-center';
+            case self::TITLE_POSITION_BOTTOMRIGHT:
+                return 'background-bottom background-right';
+            default:
+                // Center
+                return 'background-middle background-center';
+        }
+    }
+
+    /**
      * Is this object deleted?
      *
      * @return bool
