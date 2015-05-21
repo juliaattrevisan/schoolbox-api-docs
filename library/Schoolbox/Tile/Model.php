@@ -532,26 +532,26 @@ class Model implements ISoftDeletable, \JsonSerializable
     {
         switch ($this->getTitlePosition()) {
             case self::TITLE_POSITION_TOPLEFT:
-                return 'position-top align-left';
+                return 'text-top text-left';
             case self::TITLE_POSITION_TOP:
-                return 'position-top align-center';
+                return 'text-top text-center';
             case self::TITLE_POSITION_TOPRIGHT:
-                return 'position-top align-right';
+                return 'text-top text-right';
             case self::TITLE_POSITION_LEFT:
-                return 'position-middle align-left';
+                return 'text-middle text-left';
             case self::TITLE_POSITION_CENTER:
-                return 'position-middle align-center';
+                return 'text-middle text-center';
             case self::TITLE_POSITION_RIGHT:
-                return 'position-middle align-right';
+                return 'text-middle text-right';
             case self::TITLE_POSITION_BOTTOMLEFT:
-                return 'position-bottom align-left';
+                return 'text-bottom text-left';
             case self::TITLE_POSITION_BOTTOM:
-                return 'position-bottom align-center';
+                return 'text-bottom text-center';
             case self::TITLE_POSITION_BOTTOMRIGHT:
-                return 'position-bottom align-right';
+                return 'text-bottom text-right';
             default:
                 // Top
-                return 'position-top align-center';
+                return 'text-top text-center';
         }
     }
 
