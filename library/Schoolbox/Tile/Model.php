@@ -658,7 +658,7 @@ class Model implements ISoftDeletable, \JsonSerializable
      */
     public function getBackgroundPositionStyle()
     {
-        switch ($this->getTitlePosition()) {
+        switch ($this->getBackgroundPosition()) {
             case self::POSITION_TOPLEFT:
                 return 'background-top background-left';
             case self::POSITION_TOP:
