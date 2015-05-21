@@ -10,8 +10,6 @@
 namespace Crocodoc;
 
 use Exception;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;

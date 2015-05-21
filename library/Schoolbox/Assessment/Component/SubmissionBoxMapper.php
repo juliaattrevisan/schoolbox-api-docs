@@ -73,7 +73,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         // joins that have no column definition
         $this->hasJoin('submission', array(
             'multiple'  => true,
-            'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\SubmissionMapper',
+            'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\Submission\\FileMapper',
             'this_key'  => 'id',
             'other_key' => 'box_id',
         ));

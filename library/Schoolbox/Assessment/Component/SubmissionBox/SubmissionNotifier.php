@@ -131,7 +131,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
         $studentId = $submission->getOwner()->getId();
         $boxId     = $submission->getSubmissionBox()->getId();
 
-        /** @var SubmissionMapper $mapper */
+        /** @var Submission\FileMapper $mapper */
         $mapper = $this->mapper;
 
         switch ($method) {

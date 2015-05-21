@@ -19,7 +19,7 @@ use Monolog\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
@@ -36,11 +36,9 @@ use Schoolbox\Realtime\Schedule\Event;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 use Schoolbox\Role;
-use Schoolbox\RoleMapper;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInterface
 {
