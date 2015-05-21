@@ -580,6 +580,78 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
+     * @return bool
+     */
+    public function isBackgroundPositionTopLeft()
+    {
+        return $this->getBackgroundPosition() == self::POSITION_TOPLEFT;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBackgroundPositionTop()
+    {
+        return $this->getBackgroundPosition() == self::POSITION_TOP;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBackgroundPositionTopRight()
+    {
+        return $this->getBackgroundPosition() == self::POSITION_TOPRIGHT;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBackgroundPositionLeft()
+    {
+        return $this->getBackgroundPosition() == self::POSITION_LEFT;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBackgroundPositionCenter()
+    {
+        return $this->getBackgroundPosition() == self::POSITION_CENTER;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBackgroundPositionRight()
+    {
+        return $this->getBackgroundPosition() == self::POSITION_RIGHT;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBackgroundPositionBottomLeft()
+    {
+        return $this->getBackgroundPosition() == self::POSITION_BOTTOMLEFT;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBackgroundPositionBottom()
+    {
+        return $this->getBackgroundPosition() == self::POSITION_BOTTOM;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBackgroundPositionBottomRight()
+    {
+        return $this->getBackgroundPosition() == self::POSITION_BOTTOMRIGHT;
+    }
+
+    /**
      * What's the style for this element's background position?
      *
      * @return string
