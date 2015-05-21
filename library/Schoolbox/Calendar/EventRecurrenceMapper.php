@@ -57,7 +57,7 @@ class EventRecurrenceMapper
 
         // silence!! but srsly, in this context, the event mapper needs to not raise notifications
         $this->getEventMapper()
-             ->setNotifier(new SilentNotif(new Logger(null)));
+             ->setNotifier(new SilentNotif());
 
         $this->setup();
     }

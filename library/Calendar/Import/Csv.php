@@ -36,7 +36,7 @@ class Csv extends Base {
 		$roleRelationMapper = new RoleMapper();
 
         // silence notifications
-        $silence = new SilentNotif(new Logger(null));
+        $silence = new SilentNotif();
 
         $campusMapper->setNotifier($silence);
         $eventMapper->setNotifier($silence);

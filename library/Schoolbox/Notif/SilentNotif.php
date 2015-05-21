@@ -10,20 +10,22 @@
 namespace Schoolbox\Notif;
 
 
+
 use Alaress\Lumberjack\Logger;
+use Psr\Log\LoggerInterface;
 
 class SilentNotif implements NotifInterface
 {
-    /** @var Logger */
+    /** @var LoggerInterface */
     protected $log;
 
 
     /**
-     * @param Logger $log
+     * @param LoggerInterface $log
      */
-    function __construct(Logger $log)
+    function __construct(LoggerInterface $log = null)
     {
-        $this->log = $log;
+        $this->log = $log ?: new Logger(null);
     }
 
 
