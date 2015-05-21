@@ -10,7 +10,9 @@
 namespace Schoolbox\Wiki;
 
 
+use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
@@ -18,7 +20,11 @@ use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
+use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Category;
@@ -118,7 +124,6 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 	 * @return Messenger
 	 */
 	public function notifyRevised($roleType, $revision, $author) {
-		$msgr = new Messenger();
 
 		// Hydrate revision because it might not have been when passed -_-
 		$revision     = $this->mapper->findById($revision->getId());
@@ -133,28 +138,31 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 
 		$revisionSlug = $wiki->getSlug();
 
-		$authorId     = $author->getId();
-		$authorName   = $author->formatName();
 		$authorExtId  = $author->getExternalId();
 
 		$categoryId   = $cat->getId();
-		$categoryName = $cat->getName();
 
-		$msg = new Message(
-			':author revised the wiki :title in :catname',
-			"/portrait.php?userId=$authorExtId&size=square32",
-			"/wiki/$categoryId/$revisionSlug"
-		);
+        $envelope = new Envelope();
+        $bob = new Builder();
 
-		$msgr->broadcastToCategory($categoryId, $msg, "wiki.$revisionId.created", Logger::INFO, array(
-			'author'  => array($authorName, "/search/user/$authorId"),
-			'title'   => array($revisionName, "/wiki/$categoryId/$revisionSlug"),
-			'catname' => array($categoryName, "/homepage/$categoryId")
-		), array(
-			'roletype' => $roleType
-		));
+        $bob->setTitle(':author revised the wiki :title in :folder')
+            ->setHref("/wiki/$categoryId/$revisionSlug")
+            ->setIcon("/portrait.php?userId=$authorExtId&size=square32")
+            ->addTopic("wiki.$revisionId.created")
+            ->setSeverity(Logger::INFO)
+            ->setNamespace(self::getNamespace())
+            ->setParams([
+                'author' => new UserParam($author),
+                'title'  => new Param($revisionName, "/wiki/$categoryId/$revisionSlug"),
+                'folder' => new CategoryParam($cat)
+            ])
+            ->setFilter([
+                'roletype' => $roleType
+            ]);
 
-		return $msgr;
+        $envelope->broadcastToCategory($categoryId, UserAccess::ACCESS_READ, $bob->build());
+
+		return $envelope;
 	}
 
 	/**
