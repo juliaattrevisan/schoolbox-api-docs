@@ -62,4 +62,12 @@ class NS {
 	}
 
 
-} 
+    /**
+     * @return string
+     */
+    function __toString()
+    {
+        return $this->getSlug();
+    }
+
+}
