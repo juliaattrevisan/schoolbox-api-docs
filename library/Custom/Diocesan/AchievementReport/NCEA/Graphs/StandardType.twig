@@ -21,7 +21,7 @@
                     ]
                 },
                 {
-                    name: 'Achieved',
+                    name: 'Achievement',
                     data: [
                         {% for currentLevel, allLevelValues in dataset.data.graph.standardType %}
                         {{ allLevelValues.achievement }}{% if not loop.last %}, {% endif %}
