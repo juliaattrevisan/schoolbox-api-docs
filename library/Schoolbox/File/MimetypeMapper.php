@@ -95,7 +95,7 @@ class MimetypeMapper extends Schoolbox\Mapper {
 			SELECT {$this->getColumnString('aft')}
 			FROM allowedFileExtension afe
 			LEFT JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID
-			WHERE extension = ?
+			WHERE extension LIKE ?
 		";
 		$statement = $this->database->prepare($query);
 		$statement->execute(array($extension));
