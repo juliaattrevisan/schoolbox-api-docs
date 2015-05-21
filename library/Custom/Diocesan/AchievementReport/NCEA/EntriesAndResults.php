@@ -100,7 +100,7 @@ class EntriesAndResults extends Base {
             $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
             $finalStack[$courseName]['summary']['type'][$internalExternal]['availableCredits'] += ($current['EnteredCredits'] - $current['ResultCredits']);
         }
-new \Alaress_Probe($finalStack);
+
         return $finalStack;
     }
 
