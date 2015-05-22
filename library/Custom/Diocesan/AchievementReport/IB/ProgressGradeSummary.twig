@@ -18,7 +18,7 @@
                         {% for year, allTermValues in allYearValues %}
                         {% for currentTerm, value in allTermValues %}
 
-                        {% if progressGradeSummary.data.existenceStack[year][currentTerm] == true%}
+                        {% if progressGradeSummary.data.existenceStack[year][currentTerm] == true %}
                         {{ value }}
                         {% if not loop.last %}, {% endif %}
                         {% endif %}

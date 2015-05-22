@@ -50,13 +50,21 @@ class ProgressGradeSummary extends Base {
          */
         $existenceStack = array();
 
-        /* Only accumulate non-empty progressgrade values
-         */
         foreach ($allProgressGrades as $current) {
-            if (strlen($current['ProgressGrade'])) {
-                $year = $current['StudentYearlevel'];
-                $term = $current['Term'];
-                $progressGrade = $current['ProgressGrade'];
+            $year = $current['StudentYearlevel'];
+            $term = $current['Term'];
+            $progressGrade = $current['ProgressGrade'];
+
+            /* Current Year always shows both Terms
+             */
+            if ($current['Fileyear'] == $this->getCurrentYear()) {
+                $existenceStack[$year][4] = true;
+                $existenceStack[$year][2] = true;
+            }
+
+            /* Only accumulate non-empty progressgrade values
+             */
+            if (strlen($progressGrade)) {
 
                 /* Initialise
                  */
