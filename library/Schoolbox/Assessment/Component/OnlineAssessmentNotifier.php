@@ -569,7 +569,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 			$msgr->broadcastToCategory($catId, $msg, "assess.$quizId.updated", Logger::NOTICE,
 				array(
 					'author' => array($ownerName, "/search/user/$ownerId"),
-					'quizname' => array($quizName, "/submission/submissionHistory/$quizId"),
+					'quizname' => array($quizName, "/assess/intro/$quizId"),
 					'catname' => array($cat->getName(), "/homepage/$catId")
 				),
 				array(
@@ -617,9 +617,6 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
         $cat     = $quiz->getCategory();
         $catId   = $cat->getId();
         $catName = $cat->getName();
-
-        $ownerId    = $owner->getId();
-        $ownerName  = $owner->formatName();
 
         $icon = '/images/icon.php?size=32&icon=work';
         $href = "/assess/intro/$quizId";
@@ -691,7 +688,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
                     Logger::NOTICE,
                     array(
                         'child'    => array($student->formatName(), "/search/user/".$student->getId()),
-                        'quizname' => array($quizName, "/submission/submissionHistory/$quizId"),
+                        'quizname' => array($quizName, "/assess/intro/$quizId"),
                         'catname'  => array($cat->getName(), "/homepage/$catId"),
                     )
                 );
