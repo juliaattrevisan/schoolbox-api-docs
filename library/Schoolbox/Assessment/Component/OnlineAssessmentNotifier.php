@@ -682,25 +682,24 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
             unset($diff['finish']);
         }
 
-        // Currently there's no notifier for generic updates for parents
-//        // if none of the above apply, but there are changes, just be generic
-//        if (count($diff) && $msgr->isEmpty()) {
-//            $msg = new Message(":author updated :child's $quizType :quizname in :catname", $icon, $href);
-//            foreach ($students as $student) {
-//                $msgr->targetToParent(
-//                    $student->getId(),
-//                    $msg,
-//                    "assess.$quizId.updated",
-//                    Logger::NOTICE,
-//                    array(
-//                        'child'    => array($student->formatName(), "/search/user/".$student->getId()),
-//                        'author'   => array($ownerName, "/search/user/$ownerId"),
-//                        'quizname' => array($quizName, "/submission/submissionHistory/$quizId"),
-//                        'catname'  => array($cat->getName(), "/homepage/$catId"),
-//                    )
-//                );
-//            }
-//        }
+        // if none of the above apply, but there are changes, just be generic
+        if (count($diff) && $msgr->isEmpty()) {
+            $msg = new Message(":author updated :child's $quizType :quizname in :catname", $icon, $href);
+            foreach ($students as $student) {
+                $msgr->targetToParent(
+                    $student->getId(),
+                    $msg,
+                    "assess.$quizId.updated",
+                    Logger::NOTICE,
+                    array(
+                        'child'    => array($student->formatName(), "/search/user/".$student->getId()),
+                        'author'   => array($ownerName, "/search/user/$ownerId"),
+                        'quizname' => array($quizName, "/submission/submissionHistory/$quizId"),
+                        'catname'  => array($cat->getName(), "/homepage/$catId"),
+                    )
+                );
+            }
+        }
 
         return $msgr;
     }
