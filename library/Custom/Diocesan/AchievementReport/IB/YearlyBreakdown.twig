@@ -64,14 +64,15 @@
                 var tempData = [];
                 var tempCategories = [];
 
-                /* Hardcode term 4 and 2
+                /* Always display both terms for current year
+                 * Hardcode term 4 and 2
                  */
-                {% if values.allTerms[4].progressGrade|length  %}
+                {% if values.allTerms[4].progressGrade is defined  %}
                 tempData.push({y: {{ values.allTerms[4].progressGrade }}, color: '#fd9800'});
                 tempCategories.push('Term 4');
                 {% endif %}
 
-                {% if values.allTerms[2].progressGrade|length  %}
+                {% if values.allTerms[2].progressGrade is defined  %}
                 tempData.push({y: {{ values.allTerms[2].progressGrade }}, color: '#7fc9fc'});
                 tempCategories.push('Term 2');
                 {% endif %}

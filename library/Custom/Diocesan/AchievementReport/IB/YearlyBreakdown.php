@@ -48,6 +48,17 @@ class YearlyBreakdown extends Base {
             $year = $current['classyear'];
             $term = $current['Term'];
 
+            /* Always display both terms for current year regardless of content
+             */
+            if ($year == $this->getCurrentYear()) {
+                foreach(array(4, 2) as $currentTerm) {
+                    if (!isset($finalStack[$year][$courseName]['allTerms'][$currentTerm])) {
+                        $finalStack[$year][$courseName]['allTerms'][$currentTerm]['level'] = '';
+                        $finalStack[$year][$courseName]['allTerms'][$currentTerm]['progressGrade'] = '';
+                    }
+                }
+            }
+
             $finalStack[$year][$courseName]['classcode'] = $classcode;
             $finalStack[$year][$courseName]['allTerms'][$term]['level'] = $current['Level'];
             $finalStack[$year][$courseName]['allTerms'][$term]['progressGrade'] = $current['ProgressGrade'];
