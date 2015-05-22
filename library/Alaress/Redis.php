@@ -26,6 +26,16 @@ class Redis
     protected $client;
 
     /**
+     * An identifier for the application that is accessing the Redis cache.
+     *
+     * Currently only used by `$this->cacheFunctionCall()` so that different
+     * applications generate unique keys for the same input.
+     *
+     * @var string
+     */
+    protected $instanceId = '';
+
+    /**
      * Gets singleton instance of this wrapper.
      *
      * @return static
@@ -33,7 +43,7 @@ class Redis
     public static function getInstance()
     {
         if (!(static::$instance instanceof static)) {
-            static::$instance = new static();
+            static::$instance = new static(null, null, INSTANCE_ID);
         }
         return static::$instance;
     }
@@ -53,14 +63,16 @@ class Redis
      *
      * @see Predis\Client::__construct() for parameter documentation.
      *
-     * @param  mixed $parameters
-     * @param  mixed $options
+     * @param  mixed  $parameters
+     * @param  mixed  $options
+     * @param  string $instanceId
      *
      * @return $this
      */
-    public function connect($parameters = null, $options = null)
+    public function connect($parameters = null, $options = null, $instanceId = '')
     {
         $this->setClient(new AutoRefreshClient($parameters, $options));
+        $this->instanceId = $instanceId;
         return $this;
     }
 
@@ -107,7 +119,7 @@ class Redis
         }
 
         $redis = $this->getClient();
-        $key   = $base_key . ':' . hash('sha256', serialize($params));
+        $key   = $base_key . ':' . $this->instanceId . ':' . hash('sha256', serialize($params));
 
         // Would use Redis hashes, but individual keys don't have expiry.
         $is_result_called = false;
