@@ -553,7 +553,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $boxName = $submissionBox->getName();
         $cat     = $this->categoryMapper->findById($submissionBox->getCategory()->getId());
         $href    = "/submission/submissionHistory/$boxId";
-        $when    = self::UPCOMING_WINDOW . " hour" . self::UPCOMING_WINDOW == 1 ? '' : 's';
+        $when    = self::UPCOMING_WINDOW . " hour" . (self::UPCOMING_WINDOW == 1 ? '' : 's');
 
         $bob->setTitle(":boxname is due in $when in :catname")
             ->setParams(array(
