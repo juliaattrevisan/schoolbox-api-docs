@@ -54,7 +54,7 @@ class YearlyBreakdown extends Base {
                 foreach(array(4, 2) as $currentTerm) {
                     if (!isset($finalStack[$year][$courseName]['allTerms'][$currentTerm])) {
                         $finalStack[$year][$courseName]['allTerms'][$currentTerm]['level'] = '';
-                        $finalStack[$year][$courseName]['allTerms'][$currentTerm]['progressGrade'] = '';
+                        $finalStack[$year][$courseName]['allTerms'][$currentTerm]['progressGrade'] = '0';
                     }
                 }
             }
