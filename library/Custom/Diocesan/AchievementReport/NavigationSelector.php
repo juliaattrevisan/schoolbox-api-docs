@@ -144,13 +144,6 @@ class NavigationSelector {
     private function navigationData() {
         $availableNavigation = array();
 
-        /* School Grades always available
-         */
-        if ($this->hasSchoolGrades()) {
-            $this->setHasSchoolGrades(true);
-            $availableNavigation['schoolgrades'] = 'School Grades';
-        }
-
         /* Conditionally add NCEA option
          */
         if ($this->hasNcea()) {
@@ -163,6 +156,13 @@ class NavigationSelector {
         if ($this->hasIb()) {
             $this->setHasIb(true);
             $availableNavigation['ib'] = 'IB';
+        }
+
+        /* School Grades always available
+         */
+        if ($this->hasSchoolGrades()) {
+            $this->setHasSchoolGrades(true);
+            $availableNavigation['schoolgrades'] = 'School Grades';
         }
 
         $this->setAvailableNavigation($availableNavigation);
