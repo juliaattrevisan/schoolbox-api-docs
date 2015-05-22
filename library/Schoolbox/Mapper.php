@@ -1750,7 +1750,7 @@ abstract class Mapper implements IMapper, Serializable
                     // step 2: insert new relations in join table
                     $insertRelationStatement = $this->database->prepare(
                         "
-						INSERT INTO `{$joinMulti['via_table']}`
+						INSERT IGNORE INTO `{$joinMulti['via_table']}`
 							(`{$joinMulti['this_key']}`,`{$joinMulti['other_key']}`)
 						VALUES
 							(:this_key, :other_key)
