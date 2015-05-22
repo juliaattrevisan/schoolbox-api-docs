@@ -173,6 +173,8 @@ class CreditSummary extends Base {
             $finalStack[$level]['available'] = $totalEnteredCredits[$level] - $totals['achieved'];
         }
 
+        krsort($finalStack);
+
         return $finalStack;
     }
 
@@ -210,6 +212,8 @@ class CreditSummary extends Base {
             }
         }
 
+        krsort($finalStack);
+
         return $finalStack;
     }
 
@@ -245,6 +249,8 @@ class CreditSummary extends Base {
             }
         }
 
+        krsort($finalStack);
+
         return $finalStack;
     }
 
@@ -275,6 +281,8 @@ class CreditSummary extends Base {
             }
         }
 
+        krsort($finalStack);
+        
         return $finalStack;
     }
 }
