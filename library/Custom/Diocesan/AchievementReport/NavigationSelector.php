@@ -95,21 +95,21 @@ class NavigationSelector {
      * @return string
      */
     public function determineDefaultReport() {
-        if ($this->getUser()->getDefaultCampus()->getExtTimetableCode() == 'JNR') {
+        if (in_array($this->getUser()->getDefaultCampus()->getExtTimetableCode(), array('JNR', 'JS'))) {
             if (($this->getUser()->getYear() >= 1) && ($this->getUser()->getYear() <= 6)) {
                 $this->setDefaultReport(array('error' => 'Standardised Test Scores not available.'));
             }
         }
-        elseif ($this->getUser()->getDefaultCampus()->getExtTimetableCode() == 'SNR') {
-
-            /* School Grades by default
-             */
+        elseif ($this->getUser()->getDefaultCampus()->getExtTimetableCode() == 'JH') {
             if (($this->getUser()->getYear() >= 7) && ($this->getUser()->getYear() <= 10)) {
                 $this->setDefaultReport('schoolGrades');
             }
+        }
+        elseif ($this->getUser()->getDefaultCampus()->getExtTimetableCode() == 'SNR') {
+
             /* NCEA for year 11 specifically
              */
-            elseif ($this->getUser()->getYear() == 11) {
+            if ($this->getUser()->getYear() == 11) {
                 if ($this->getHasNcea()) {
                     $this->setDefaultReport('ncea');
                 }
