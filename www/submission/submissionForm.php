@@ -179,6 +179,9 @@ if (isset($_POST['attachment'])) {
     $factory = new CollectorFactory();
     $attachments = $factory->build($_POST['attachment'])->getAll();
     $submission->setAttachments(new Collection($attachments));
+} else {
+    // no attachments passed? ensure any already-attached files are detached
+    $submission->setAttachments(new Collection());
 }
 
 // create new
