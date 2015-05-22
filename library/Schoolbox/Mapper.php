@@ -1277,7 +1277,6 @@ abstract class Mapper implements IMapper, Serializable
             $columnList,
             array(
                 'deleted' => true,
-                'limit'   => 1,
                 'order'   => $order,
             )
         );
