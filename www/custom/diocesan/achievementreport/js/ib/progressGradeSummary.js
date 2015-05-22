@@ -100,6 +100,9 @@
 
                         return tooltipContent;
                     }
+                },
+                credits: {
+                    enabled: false
                 }
             });
         }

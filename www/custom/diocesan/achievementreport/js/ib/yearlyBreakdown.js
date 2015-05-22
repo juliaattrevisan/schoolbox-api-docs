@@ -70,7 +70,10 @@
                 legend: {
                     enabled: false
                 },
-                series: config.series
+                series: config.series,
+                credits: {
+                    enabled: false
+                }
             });
         }
     }
