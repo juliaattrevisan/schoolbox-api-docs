@@ -651,7 +651,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
             $oldDate = strtotime($diff['finish'][1]);
             $newDate = strtotime($diff['finish'][0]);
 
-            $verb = $newDate > $oldDate ? 'extended' : 'changed to';
+            $verb = $newDate > $oldDate ? 'extended' : 'changed';
             $relative = new Alaress_Date_Format($newDate. 'U');
 
             $dateformat = $relative->getLongDateOnly();
@@ -659,7 +659,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
                 $dateformat = $relative->getTimeOnly() .' on '.$dateformat;
             }
 
-            $msg = new Message(":child's $quizType :boxname closing date was $verb :date in :catname", $icon, $href);
+            $msg = new Message(":child's $quizType :boxname closing date was $verb to :date in :catname", $icon, $href);
             foreach ($students as $student) {
                 $msgr->targetToParent(
                     $student->getId(),
