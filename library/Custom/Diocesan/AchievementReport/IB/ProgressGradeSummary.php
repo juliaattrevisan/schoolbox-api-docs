@@ -106,7 +106,7 @@ class ProgressGradeSummary extends Base {
         $finalStack['tableStack'] = $tableStack;
         $finalStack['graphStack'] = $graphStack;
         $finalStack['existenceStack'] = $existenceStack;
-new \Alaress_Probe($graphStack);
+
         return $finalStack;
     }
 
