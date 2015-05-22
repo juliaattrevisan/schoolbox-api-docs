@@ -69,10 +69,10 @@ class FileNotifier extends AbstractModuleNotifier
      */
     public function loadDependencies($dependencies = null)
     {
-        $dependencies['submissionBoxMapper'] = $dependencies['submissionBoxMapper'] ?: SubmissionBoxMapper::getInstance();
-        $dependencies['userMapper']          = $dependencies['userMapper'] ?: UserMapper::getInstance();
-        $dependencies['folderMapper']        = $dependencies['folderMapper'] ?: Folder\Mapper::getInstance();
-        $dependencies['mapper']              = $dependencies['mapper'] ?: FileMapper::getInstance();
+        $dependencies['submissionBoxMapper'] = isset($dependencies['submissionBoxMapper']) ? $dependencies['submissionBoxMapper'] : SubmissionBoxMapper::getInstance();
+        $dependencies['userMapper']          = isset($dependencies['userMapper']) ? $dependencies['userMapper'] : UserMapper::getInstance();
+        $dependencies['folderMapper']        = isset($dependencies['folderMapper']) ? $dependencies['folderMapper'] : Folder\Mapper::getInstance();
+        $dependencies['mapper']              = isset($dependencies['mapper']) ? $dependencies['mapper'] : FileMapper::getInstance();
 
         parent::loadDependencies($dependencies);
     }
