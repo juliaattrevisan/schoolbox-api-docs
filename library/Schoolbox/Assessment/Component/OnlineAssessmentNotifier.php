@@ -624,54 +624,33 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
         $icon = '/images/icon.php?size=32&icon=work';
         $href = "/assess/intro/$quizId";
 
-
-//        $unattemptedStudents = $this->getStudentsUnattemptedList($quiz);
-//
-//        foreach($unattemptedStudents as $student) {
-//            $childName = $student->getFirstname();
-//            $childId = $student->getId();
-//            $childExtId = $student->getExternalId();
-//
-//            $icon = "/portrait?userId=$childExtId&size=square32";
-//
-//            $msg = new Message(":child has not yet attempted :quizname in :catname", $icon, $href);
-//
-//            // don't provide a link for parents to click on if it's just going to give the a 403
-//            $quizdata = $this->conf->get('restrict_student_submissions')
-//                ? $quizName
-//                : array($quizName, "/submission/submissionHistory/$quizId");
-//
-//            $msgr->targetToParent($childId, $msg, "assess.$quizId.upcoming", Logger::WARNING, array(
-//                'child'     => array($childName, "/search/user/$childId"),
-//                'quizname'  => $quizdata,
-//                'catname'   => array($catName, "/homepage/$catId")
-//            ));
-//        }
-
+        // notify all student's parents
+        $students = UserAccessMapper::getInstance()->findStudentsInCategory($quiz->getCategory());
 
         // renamed
-        if(isset($diff['title'])) {
-
+        if (isset($diff['title'])) {
             $msg = new Message(":author renamed :child's $quizType :oldname to :newname in :catname", $icon, $href);
-
-            // params for this instance - oldname doesn't have an associated href
-            $params = array(
-                'author'  => array($ownerName, "/search/user/$ownerId"),
-                'oldname' => $diff['name'][1],
-                'newname' => array($diff['name'][0], "/assess/intro/$quizId"),
-                'catname' => array($catName, "/homepage/$catId"),
-            );
-
-            $msgr->broadcastToCategory($catId, $msg, "assess.$quizId.renamed", Logger::NOTICE, $params,
-                array('roletype' => Role::STUDENT)
-            );
-
+            foreach ($students as $student) {
+                $msgr->targetToParent(
+                    $student->getId(),
+                    $msg,
+                    "assess.$quizId.renamed",
+                    Logger::NOTICE,
+                    array(
+                        'child'   => array($student->formatName(), "/search/user/".$student->getId()),
+                        'author'  => array($ownerName, "/search/user/$ownerId"),
+                        'oldname' => $diff['name'][1],
+                        'newname' => array($diff['name'][0], "/assess/intro/$quizId"),
+                        'catname' => array($catName, "/homepage/$catId"),
+                    )
+                );
+            }
             unset($diff['title']);
         }
 
 
         // extended or brought forward
-        if(isset($diff['finish'])) {
+        if (isset($diff['finish'])) {
             // strtotime is safe here because dates are in 'YYYY-MM-DD H:i:s' format
             $oldDate = strtotime($diff['finish'][1]);
             $newDate = strtotime($diff['finish'][0]);
@@ -679,42 +658,47 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
             $verb = $newDate > $oldDate ? 'extended' : 'changed the closing date of';
             $relative = new Alaress_Date_Format($newDate. 'U');
 
-
             $dateformat = $relative->getLongDateOnly();
-            if(!$relative->isAtEndOfDay()) {
+            if (!$relative->isAtEndOfDay()) {
                 $dateformat = $relative->getTimeOnly() .' on '.$dateformat;
             }
 
             $msg = new Message(":author $verb :child's $quizType :boxname to :date in :catname", $icon, $href);
-
-            $msgr->broadcastToCategory($catId, $msg, "assess.$quizId.datechanged", Logger::NOTICE, array(
-                'author' => array($ownerName, "/search/user/$ownerId"),
-                'boxname' => array($quizName, "/assess/intro/$quizId"),
-                'date' => date($dateformat, $relative->getUnixTimestamp()),
-                'catname' => array($cat->getName(), "/homepage/$catId"),
-            ),
-                array(
-                    'roletype' => Role::STUDENT
-                )
-            );
-
+            foreach ($students as $student) {
+                $msgr->targetToParent(
+                    $student->getId(),
+                    $msg,
+                    "assess.$quizId.datechanged",
+                    Logger::NOTICE,
+                    array(
+                        'child'   => array($student->formatName(), "/search/user/".$student->getId()),
+                        'author'  => array($ownerName, "/search/user/$ownerId"),
+                        'boxname' => array($quizName, "/assess/intro/$quizId"),
+                        'date'    => date($dateformat, $relative->getUnixTimestamp()),
+                        'catname' => array($cat->getName(), "/homepage/$catId"),
+                    )
+                );
+            }
             unset($diff['finish']);
         }
 
         // if none of the above apply, but there are changes, just be generic
-        if(count($diff) && $msgr->isEmpty()) {
+        if (count($diff) && $msgr->isEmpty()) {
             $msg = new Message(":author updated :child's $quizType :quizname in :catname", $icon, $href);
-
-            $msgr->broadcastToCategory($catId, $msg, "assess.$quizId.updated", Logger::NOTICE,
-                array(
-                    'author' => array($ownerName, "/search/user/$ownerId"),
-                    'quizname' => array($quizName, "/submission/submissionHistory/$quizId"),
-                    'catname' => array($cat->getName(), "/homepage/$catId"),
-                ),
-                array(
-                    'roletype' => Role::STUDENT
-                )
-            );
+            foreach ($students as $student) {
+                $msgr->targetToParent(
+                    $student->getId(),
+                    $msg,
+                    "assess.$quizId.updated",
+                    Logger::NOTICE,
+                    array(
+                        'child'    => array($student->formatName(), "/search/user/".$student->getId()),
+                        'author'   => array($ownerName, "/search/user/$ownerId"),
+                        'quizname' => array($quizName, "/submission/submissionHistory/$quizId"),
+                        'catname'  => array($cat->getName(), "/homepage/$catId"),
+                    )
+                );
+            }
         }
 
         return $msgr;
