@@ -161,7 +161,8 @@ class Controller extends Base {
 
                 'yearlyBreakdown' => array(
                     'heading' => $yearlyBreakdown->getHeading(),
-                    'data' => $yearlyBreakdown->findData()
+                    'data' => $yearlyBreakdown->findData(),
+                    'currentYear' => $yearlyBreakdown->getCurrentYear()
                 )
             )
         ));
