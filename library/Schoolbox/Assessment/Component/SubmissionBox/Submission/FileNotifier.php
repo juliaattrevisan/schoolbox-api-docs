@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Assessment\Component\SubmissionBox;
+namespace Schoolbox\Assessment\Component\SubmissionBox\Submission;
 
 
 use Alaress\Async\Notification\Instance\Builder;
@@ -35,7 +35,7 @@ use Schoolbox\UserMapper;
  * Class SubmissionNotifier
  * @package Schoolbox\Assessment\Component\SubmissionBox
  */
-class SubmissionNotifier extends AbstractModuleNotifier
+class FileNotifier extends AbstractModuleNotifier
 {
 
     const TRIGGER_SUBMITTED   = 'submitted';
@@ -72,7 +72,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
         $dependencies['submissionBoxMapper'] = $dependencies['submissionBoxMapper'] ?: SubmissionBoxMapper::getInstance();
         $dependencies['userMapper']          = $dependencies['userMapper'] ?: UserMapper::getInstance();
         $dependencies['folderMapper']        = $dependencies['folderMapper'] ?: Folder\Mapper::getInstance();
-        $dependencies['mapper']              = $dependencies['mapper'] ?: Submission\FileMapper::getInstance();
+        $dependencies['mapper']              = $dependencies['mapper'] ?: FileMapper::getInstance();
 
         parent::loadDependencies($dependencies);
     }
@@ -131,7 +131,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
         $studentId = $submission->getOwner()->getId();
         $boxId     = $submission->getSubmissionBox()->getId();
 
-        /** @var Submission\FileMapper $mapper */
+        /** @var FileMapper $mapper */
         $mapper = $this->mapper;
 
         switch ($method) {
@@ -190,7 +190,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
 
     /**
      * @param string $type
-     * @param Submission\File $submission
+     * @param File $submission
      * @param User $user
      * @param array|null $diff
      * @return Messenger
@@ -236,7 +236,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
     /**
      * Notify a teacher that students have submitted to their submission box
      *
-     * @param Submission\File $submission
+     * @param File $submission
      * @param User $user
      * @param array|null $diff
      * @return Messenger
@@ -250,7 +250,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
     /**
      * Notify a teacher that a student has submitted to their submission box...again
      *
-     * @param Submission\File $submission
+     * @param File $submission
      * @param User $user
      * @param array|null $diff
      * @return Messenger
@@ -264,7 +264,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
     /**
      * Notify a student that their (only) submission has been deleted, so they can resubmit.
      *
-     * @param Submission\File $submission
+     * @param File $submission
      * @param User $user
      * @param array|null $diff
      * @return Messenger
