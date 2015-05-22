@@ -394,7 +394,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             $envelope->broadcastToCategory(
                 $submissionBox->getCategory(),
                 UserAccess::ACCESS_READ,
-                $this->setForNotifyRenamed($diff, $bob, $user, $submissionBox)->build()
+                $this->setForNotifyRenamed($bob, $submissionBox, $diff, $user)->build()
             );
         }
         unset($diff['name']);
@@ -404,7 +404,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             $envelope->broadcastToCategory(
                 $submissionBox->getCategory(),
                 UserAccess::ACCESS_READ,
-                $this->setForNotifyDueDateChanged($diff, $bob, $user, $submissionBox)->build()
+                $this->setForNotifyDueDateChanged($bob, $submissionBox, $diff, $user)->build()
             );
         }
         unset($diff['dueDate']);
@@ -424,7 +424,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             $envelope->broadcastToCategory(
                 $submissionBox->getCategory(),
                 UserAccess::ACCESS_READ,
-                $this->setForNotifyUpdated($bob, $user, $submissionBox)->build()
+                $this->setForNotifyUpdated($bob, $submissionBox, $user)->build()
             );
         }
 
@@ -434,14 +434,14 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
     /**
      * Sets up Bob with the required params for notifying about a rename.
      *
-     * @param array         $diff
      * @param Builder       $bob
-     * @param User          $author
      * @param SubmissionBox $box
+     * @param array         $diff
+     * @param User          $author
      *
      * @return Builder
      */
-    protected function setForNotifyRenamed($diff, $bob, $author, $box)
+    protected function setForNotifyRenamed($bob, $box, $diff, $author)
     {
         return $bob->setTitle(":author renamed :oldname to :newname in :catname")
             // params for this instance - oldname doesn't have an associated href
@@ -457,14 +457,14 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
     /**
      * Sets up Bob with the required params for notifying about a due date change.
      *
-     * @param array         $diff
      * @param Builder       $bob
-     * @param User          $author
      * @param SubmissionBox $box
+     * @param array         $diff
+     * @param User          $author
      *
      * @return Builder
      */
-    protected function setForNotifyDueDateChanged($diff, $bob, $author, $box)
+    protected function setForNotifyDueDateChanged($bob, $box, $diff, $author)
     {
         // strtotime is safe here because dates are in 'YYYY-MM-DD H:i:s' format
         $oldDate    = strtotime($diff['dueDate'][1]);
@@ -515,12 +515,12 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * Sets up Bob with the required params for generic update notify.
      *
      * @param Builder       $bob
-     * @param User          $author
      * @param SubmissionBox $box
+     * @param User          $author
      *
      * @return Builder
      */
-    protected function setForNotifyUpdated($bob, $author, $box)
+    protected function setForNotifyUpdated($bob, $box, $author)
     {
         return $bob->setTitle(":author updated :boxname in :catname")
             ->setParams(array(
