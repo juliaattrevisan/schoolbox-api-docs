@@ -209,7 +209,7 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
             'answer_id' => '',
             'question_id' => $question_id,
             'sequence' => 1,
-            'answer' => trim((string)$xmlObj->answer->text),
+            'answer' => html_entity_decode(trim((string)$xmlObj->answer->text), ENT_IGNORE | ENT_QUOTES),
         );
 
         return $this->create($object, $question_id);
