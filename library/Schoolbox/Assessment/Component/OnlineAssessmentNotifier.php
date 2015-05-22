@@ -652,7 +652,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
             $newDate = strtotime($diff['finish'][0]);
 
             $verb = $newDate > $oldDate ? 'extended' : 'changed';
-            $relative = new Alaress_Date_Format($newDate. 'U');
+            $relative = new Alaress_Date_Format($newDate, 'U');
 
             $dateformat = $relative->getLongDateOnly();
             if (!$relative->isAtEndOfDay()) {
