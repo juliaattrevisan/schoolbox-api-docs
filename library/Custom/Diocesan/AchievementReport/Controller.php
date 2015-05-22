@@ -50,19 +50,37 @@ class Controller extends Base {
         $selector = new NavigationSelector($db, $user, $externalUser);
         $selector->determineDefaultReport();
 
+        /* Do it the old-fashioned way, for report selector
+         * Can't find the base url in the request object etc
+         *
+         * Surely there's a way to get this from Module, but
+         * I haven't found it
+         */
+        $baseUrl = '/modules/custom/diocesan/achievementreport';
+        $externalUserId = $externalUser['StudentID'];
+
         $report = $selector->getDefaultReport();
 
+        /* Redirect based on default report selection
+         *
+         * Needs to happen so that the /ib, /schoolgrades and /ncea
+         * prefixes exist, otherwise you end up at 404 from the
+         * default report when you open a year div
+         */
         switch ($report) {
             case 'schoolGrades':
-                $this->schoolGrades($db, $user, $externalUser, $year);
+                header("Location: {$baseUrl}/schoolgrades/{$externalUserId}");
+                die();
                 break;
 
             case 'ib':
-                $this->ib($db, $user, $externalUser, $year);
+                header("Location: {$baseUrl}/ib/{$externalUserId}");
+                die();
                 break;
 
             case 'ncea':
-                $this->ncea($db, $user, $externalUser, $year);
+                header("Location: {$baseUrl}/ncea/{$externalUserId}");
+                die();
                 break;
 
             /* Error state - render an error page and leave it
