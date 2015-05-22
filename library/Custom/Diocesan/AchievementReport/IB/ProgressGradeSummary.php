@@ -42,6 +42,14 @@ class ProgressGradeSummary extends Base {
          */
         $tableStack = array();
 
+        /* A quick accumulation of year/term combinations which
+         * contained a ProgressGrade value. This is to hide years
+         * which contained nothing without having to do serious
+         * twig iterations, which became way more complicated than
+         * they should have been
+         */
+        $existenceStack = array();
+
         /* Only accumulate non-empty progressgrade values
          */
         foreach ($allProgressGrades as $current) {
@@ -69,6 +77,10 @@ class ProgressGradeSummary extends Base {
                  */
                 $tableStack[$year][$term]['enteredGrades']++;
                 $tableStack[$year][$term]['progressGrades'][$progressGrade]++;
+
+                /* Remember that this year/term had values
+                 */
+                $existenceStack[$year][$term] = true;
             }
         }
 
@@ -93,7 +105,8 @@ class ProgressGradeSummary extends Base {
 
         $finalStack['tableStack'] = $tableStack;
         $finalStack['graphStack'] = $graphStack;
-
+        $finalStack['existenceStack'] = $existenceStack;
+new \Alaress_Probe($graphStack);
         return $finalStack;
     }
 

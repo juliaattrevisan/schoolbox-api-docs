@@ -3,7 +3,7 @@
         $('#element').ib_progressGradeSummary({
             colors: ['#5f0466', '#6399fd', '#2e9c2f', '#fe07fe', '#7fc9fc', '#fd9800', '#fe3299'],
             categories: [
-                {% for year, allTerms in progressGradeSummary.data.tableStack %}
+                {% for year, allTerms in progressGradeSummary.data.existenceStack %}
                 {% for currentTerm, values in allTerms %}
                 'Year {{ year }}, Term {{ currentTerm }}'{% if not loop.last %}, {% endif %}
                 {% endfor %}
@@ -15,7 +15,16 @@
                 {
                     name: 'Progress Grade {{ progressGrade }}',
                     data: [
-                        {% for year, allTermValues in allYearValues %}{% for currentTerm, value in allTermValues %}{{ value }}{% if not loop.last %}, {% endif %}{% endfor %}{% if not loop.last %}, {% endif %}{% endfor %}
+                        {% for year, allTermValues in allYearValues %}
+                        {% for currentTerm, value in allTermValues %}
+
+                        {% if progressGradeSummary.data.existenceStack[year][currentTerm] == true%}
+                        {{ value }}
+                        {% if not loop.last %}, {% endif %}
+                        {% endif %}
+                        {% endfor %}
+                        {% if not loop.last %}, {% endif %}
+                        {% endfor %}
                     ]
                 }{% if not loop.last %},
                 {% endif %}
@@ -25,6 +34,9 @@
     });
 </script>
 
+<pre>
+
+</pre>
 <h1>{{ progressGradeSummary.heading }}</h1>
 
 <div id="element"></div>
