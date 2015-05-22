@@ -28,11 +28,6 @@ class AjaxChat {
     private $config = array();
 
     /**
-     * @var Component_Instance
-     */
-    private $instance;
-
-    /**
      * Creates the AJAX chat class.
      *
      * @param int   $user_id   The user that is using the chat
@@ -61,11 +56,12 @@ class AjaxChat {
         if($this->componentID) {
             /** @var Component_Instance[] $inst */
             $inst = Component_InstanceMapper::getInstance()->findByInstanceId($this->componentID);
-            $this->instance = $inst[$this->componentID];
-
-            foreach($this->instance->getConfig() as $conf) {
-                /** @var Component_ConfigDefinition $conf */
-                $this->config[$conf->getKey()] = $conf;
+            $instance = $inst[$this->componentID];
+            if ($instance instanceof Component_Instance) {
+                foreach ($instance->getConfig() as $conf) {
+                    /** @var Component_ConfigDefinition $conf */
+                    $this->config[$conf->getKey()] = $conf;
+                }
             }
         }
     }
@@ -247,13 +243,13 @@ class AjaxChat {
             /** @var Component_Config $confI */
             $confI = Component_ConfigMapper::getInstance()->findByColumnList(array(
                     'component_config_definition_id' => $definition->getId(),
-                    'component_instance_id'          => $this->instance->getId()
+                    'component_instance_id'          => $this->componentID
                 ))->first();
 
             if (!($confI instanceof Component_Config && $confI->getId())) {
                 $confI = new Component_Config();
                 $confI->setConfigDefinitionId($definition->getId());
-                $confI->setInstanceId($this->instance->getId());
+                $confI->setInstanceId($this->componentID);
             }
             $confI->setValue($definition->getValue());
 
