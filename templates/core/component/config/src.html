@@ -9,7 +9,7 @@
 
       $('#resource-browser').socialstreamBrowser({
         title: 'Choose a source',
-        categoryId: '{COMPONENT_CONFIG_SRC_CID}',
+        categoryId: Number('{COMPONENT_CONFIG_SRC_CID}') || Number('{ID}'),
         mimeFilter: false,
         submitCallback: function(url, filename) {
 
