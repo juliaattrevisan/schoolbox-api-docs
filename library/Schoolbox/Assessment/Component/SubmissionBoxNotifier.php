@@ -627,6 +627,114 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         return $envelope;
     }
 
+    /**
+     * Parent notified when a SubmissionBox is updated
+     *
+     * @param SubmissionBox $submissionBox
+     * @param User          $user
+     * @param array         $diff
+     * @return Envelope
+     */
+    public function notifyParentUpdated($submissionBox, $user, $diff = null)
+    {
+        $envelope = new Envelope();
+        $bob = new Builder();
+
+        $boxId = $submissionBox->getId();
+
+        /** @var SubmissionBox $submissionBox */
+        $submissionBox = $this->mapper->findById($boxId);
+
+        // don't raise notifications if this box doesn't accept online submissions or is blocked from parents
+        if (!$submissionBox->getAcceptOnline() || $this->conf->get('restrict_student_submissions')) {
+            return $envelope;
+        }
+
+        // discard all update notifications if the submissionbox isn't open (EXCEPT work returns opening up)
+        $openStamp  = $submissionBox->getOpenDate()->getUnixTimestamp();
+        $closeStamp = $submissionBox->getDueDate()->getUnixTimestamp();
+        $now        = time();
+
+        // if the box hasn't even opened yet, we don't want to know about it at all
+        if ($openStamp > $now) {
+            return $envelope;
+        }
+
+        // Don't need to do the mark visibility dance
+        // because it was done in notifyStudentUpdated
+
+        // if the box is closed, or there's no remaining diff, we're done here
+        if ($closeStamp < $now || !count($diff)) {
+            return $envelope;
+        }
+
+        $bob->setIcon("/portrait?userId={$user->getExternalId()}&size=square32")
+            ->setHref("/submission/submissionHistory/$boxId")
+            ->setNamespace($this->getSlug())
+            ->setSeverity(Logger::NOTICE)
+            ->addFilter('roletype', Role::STUDENT);
+
+        $students = UserAccessMapper::getInstance()->findStudentsInCategory(
+            $this->categoryMapper->findById($submissionBox->getCategory()->getId())
+        );
+
+        // renamed
+        if (!empty($diff['name'])) {
+            foreach ($students as $student) {
+                $bob = $this
+                    ->setForNotifyRenamed($bob, $submissionBox, $diff, $user)
+                    ->setTitle(":child's quiz was renamed from :oldname to :newname in :catname")
+                ;
+                $envelope->targetToParent($student->getId(), $bob->build());
+            }
+        }
+        unset($diff['name']);
+
+        // extended or shortened
+        if (!empty($diff['dueDate'])) {
+            foreach ($students as $student) {
+                $oldDate = strtotime($diff['finish'][1]);
+                $newDate = strtotime($diff['finish'][0]);
+                $verb = $newDate > $oldDate ? 'extended' : 'changed';
+                $bob = $this
+                    ->setForNotifyDueDateChanged($bob, $submissionBox, $diff, $user)
+                    ->setTitle(":child's quiz :boxname closing date was $verb to :date in :catname")
+                ;
+                $envelope->targetToParent($student->getId(), $bob->build());
+            }
+        }
+        unset($diff['dueDate']);
+
+        // changed accepting online submissions
+        if (!empty($diff['acceptOnline'])) {
+            foreach ($students as $student) {
+                if ($submissionBox->getAcceptOnline()) {
+                    $m = ":child needs to submit online for :boxname in :catname";
+                } else {
+                    $m = ":child no longer need to submit online for :boxname in :catname";
+                }
+                $bob = $this
+                    ->setForNotifyAcceptOnlineChanged($bob, $submissionBox)
+                    ->setTitle($m)
+                ;
+                $envelope->targetToParent($student->getId(), $bob->build());
+            }
+        }
+        unset($diff['acceptOnline']);
+
+        // if none of the above apply, but there are changes, just be generic
+        if ($envelope->count() == 0 && count($diff)) {
+            foreach ($students as $student) {
+                $bob = $this
+                    ->setForNotifyUpdated($bob, $submissionBox, $user)
+                    ->setTitle(":child's quiz :quizname was updated in :catname")
+                ;
+                $envelope->targetToParent($student->getId(), $bob->build());
+            }
+        }
+
+        return $envelope;
+    }
 
     /**
      * Notify the feed of box closures
