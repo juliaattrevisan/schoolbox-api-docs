@@ -612,6 +612,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
         }
 
         $quizName = $quiz->getTitle();
+        $quizType = $quiz->getWorkType()->getName();
 
         $cat     = $quiz->getCategory();
         $catId   = $cat->getId();
@@ -647,10 +648,11 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 //            ));
 //        }
 
+
         // renamed
         if(isset($diff['title'])) {
 
-            $msg = new Message(":author renamed :child's :quiztype :oldname to :newname in :catname", $icon, $href);
+            $msg = new Message(":author renamed :child's $quizType :oldname to :newname in :catname", $icon, $href);
 
             // params for this instance - oldname doesn't have an associated href
             $params = array(
@@ -658,7 +660,6 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
                 'oldname' => $diff['name'][1],
                 'newname' => array($diff['name'][0], "/assess/intro/$quizId"),
                 'catname' => array($catName, "/homepage/$catId"),
-                'quiztype' => $quiz->getWorkType()->getName(),
             );
 
             $msgr->broadcastToCategory($catId, $msg, "assess.$quizId.renamed", Logger::NOTICE, $params,
@@ -684,13 +685,13 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
                 $dateformat = $relative->getTimeOnly() .' on '.$dateformat;
             }
 
-            $msg = new Message(":author $verb :boxname to :date in :catname", $icon, $href);
+            $msg = new Message(":author $verb :child's $quizType :boxname to :date in :catname", $icon, $href);
 
             $msgr->broadcastToCategory($catId, $msg, "assess.$quizId.datechanged", Logger::NOTICE, array(
                 'author' => array($ownerName, "/search/user/$ownerId"),
                 'boxname' => array($quizName, "/assess/intro/$quizId"),
                 'date' => date($dateformat, $relative->getUnixTimestamp()),
-                'catname' => array($cat->getName(), "/homepage/$catId")
+                'catname' => array($cat->getName(), "/homepage/$catId"),
             ),
                 array(
                     'roletype' => Role::STUDENT
@@ -702,13 +703,13 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
         // if none of the above apply, but there are changes, just be generic
         if(count($diff) && $msgr->isEmpty()) {
-            $msg = new Message(":author updated :quizname in :catname", $icon, $href);
+            $msg = new Message(":author updated :child's $quizType :quizname in :catname", $icon, $href);
 
             $msgr->broadcastToCategory($catId, $msg, "assess.$quizId.updated", Logger::NOTICE,
                 array(
                     'author' => array($ownerName, "/search/user/$ownerId"),
                     'quizname' => array($quizName, "/submission/submissionHistory/$quizId"),
-                    'catname' => array($cat->getName(), "/homepage/$catId")
+                    'catname' => array($cat->getName(), "/homepage/$catId"),
                 ),
                 array(
                     'roletype' => Role::STUDENT
