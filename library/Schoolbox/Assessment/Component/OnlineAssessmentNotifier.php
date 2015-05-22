@@ -629,7 +629,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
         // renamed
         if (isset($diff['title'])) {
-            $msg = new Message(":author renamed :child's $quizType :oldname to :newname in :catname", $icon, $href);
+            $msg = new Message(":child's $quizType was renamed from :oldname to :newname in :catname", $icon, $href);
             foreach ($students as $student) {
                 $msgr->targetToParent(
                     $student->getId(),
@@ -638,7 +638,6 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
                     Logger::NOTICE,
                     array(
                         'child'   => array($student->formatName(), "/search/user/".$student->getId()),
-                        'author'  => array($ownerName, "/search/user/$ownerId"),
                         'oldname' => $diff['name'][1],
                         'newname' => array($diff['name'][0], "/assess/intro/$quizId"),
                         'catname' => array($catName, "/homepage/$catId"),
@@ -655,7 +654,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
             $oldDate = strtotime($diff['finish'][1]);
             $newDate = strtotime($diff['finish'][0]);
 
-            $verb = $newDate > $oldDate ? 'extended' : 'changed the closing date of';
+            $verb = $newDate > $oldDate ? 'extended' : 'changed to';
             $relative = new Alaress_Date_Format($newDate. 'U');
 
             $dateformat = $relative->getLongDateOnly();
@@ -663,7 +662,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
                 $dateformat = $relative->getTimeOnly() .' on '.$dateformat;
             }
 
-            $msg = new Message(":author $verb :child's $quizType :boxname to :date in :catname", $icon, $href);
+            $msg = new Message(":child's $quizType :boxname closing date was $verb :date in :catname", $icon, $href);
             foreach ($students as $student) {
                 $msgr->targetToParent(
                     $student->getId(),
@@ -672,7 +671,6 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
                     Logger::NOTICE,
                     array(
                         'child'   => array($student->formatName(), "/search/user/".$student->getId()),
-                        'author'  => array($ownerName, "/search/user/$ownerId"),
                         'boxname' => array($quizName, "/assess/intro/$quizId"),
                         'date'    => date($dateformat, $relative->getUnixTimestamp()),
                         'catname' => array($cat->getName(), "/homepage/$catId"),
@@ -684,7 +682,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
         // if none of the above apply, but there are changes, just be generic
         if (count($diff) && $msgr->isEmpty()) {
-            $msg = new Message(":author updated :child's $quizType :quizname in :catname", $icon, $href);
+            $msg = new Message(":child's $quizType :quizname was updated in :catname", $icon, $href);
             foreach ($students as $student) {
                 $msgr->targetToParent(
                     $student->getId(),
@@ -693,7 +691,6 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
                     Logger::NOTICE,
                     array(
                         'child'    => array($student->formatName(), "/search/user/".$student->getId()),
-                        'author'   => array($ownerName, "/search/user/$ownerId"),
                         'quizname' => array($quizName, "/submission/submissionHistory/$quizId"),
                         'catname'  => array($cat->getName(), "/homepage/$catId"),
                     )
