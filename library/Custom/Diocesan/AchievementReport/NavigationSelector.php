@@ -95,6 +95,8 @@ class NavigationSelector {
      * @return string
      */
     public function determineDefaultReport() {
+        $this->setDefaultReport(array('error' => 'Unknown default report.'));
+
         if (in_array($this->getUser()->getDefaultCampus()->getExtTimetableCode(), array('JNR', 'JS'))) {
             if (($this->getUser()->getYear() >= 1) && ($this->getUser()->getYear() <= 6)) {
                 $this->setDefaultReport(array('error' => 'Standardised Test Scores not available.'));
