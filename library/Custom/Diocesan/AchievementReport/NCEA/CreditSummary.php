@@ -127,6 +127,8 @@ class CreditSummary extends Base {
             $finalStack[$level]['totalEnteredCredits'] += $current['EnteredCredits'];
         }
 
+        krsort($finalStack);
+
         return $finalStack;
     }
 
