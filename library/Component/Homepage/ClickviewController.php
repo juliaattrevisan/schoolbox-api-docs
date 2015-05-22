@@ -41,6 +41,7 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
         $this->setVar('has_clickview_block', '');
         $this->setVar('online_clickview_block', '');
         $this->setVar('iframe_clickview_block', '');
+        $this->setVar('CLICKVIEW_SCHOOL_ID', Config::get('clickview_school_id'));
 
         /* If no url is specified it might time out -_-
          * So just hide all this instead
