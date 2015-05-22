@@ -7,6 +7,7 @@
                 {% for currentTerm, values in allTerms %}
                 'Year {{ year }}, Term {{ currentTerm }}'{% if not loop.last %}, {% endif %}
                 {% endfor %}
+                {% if not loop.last %}, {% endif %}
                 {% endfor %}
             ],
             series: [
@@ -14,10 +15,7 @@
                 {
                     name: 'Progress Grade {{ progressGrade }}',
                     data: [
-                        {% for year, allTermValues in allYearValues %}
-                        {% for currentTerm, value in allTermValues %}{{ value }}{% if not loop.last %}, {% endif %}{% endfor %}
-
-                        {% endfor %}
+                        {% for year, allTermValues in allYearValues %}{% for currentTerm, value in allTermValues %}{{ value }}{% if not loop.last %}, {% endif %}{% endfor %}{% if not loop.last %}, {% endif %}{% endfor %}
                     ]
                 }{% if not loop.last %},
                 {% endif %}
