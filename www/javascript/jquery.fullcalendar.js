@@ -333,26 +333,36 @@ function Calendar(id, bubbleId, opts) {
             $.each(events, function(event_no, event) {
                 var is_rendered = true;
 
-                //
+                // Collate the list of classes into a list grouped by type
+                // (type is the string prefix of the class: for "group14"
+                //  it will be "group".)
+                var groupedClasses = {};
+                if (event.className.forEach) {
+                    event.className.forEach(function(className) {
+                        var prefix = className.replace(/^([a-z]+).*/i, '$1');
+                        if (!groupedClasses[prefix]) {
+                            groupedClasses[prefix] = []
+                        }
+                        groupedClasses[prefix].push(className);
+                    });
+                }
+
                 // Is this event rendered?
                 // It must match at least one selected filter in each group
                 // (filters are in event.className) to be rendered.
-                $.each(event.className, function(class_no, classes) {
+                $.each(groupedClasses, function(prefix, classes) {
                     var is_filter_selected = false;
-                    if (!classes.trim().length) {
-                        //
+                    if (!classes.length) {
                         // No classes in this filter? Let's say this filter is
                         // selected.
                         is_filter_selected = true;
                     }
                     else {
-                        var this_classes = classes.trim().split(/\s+/);
-                        //
                         // Check that at least one class in this_classes is in
                         // selected_classes.
                         $.each(selected_classes, function(selected_class_no, selected_class) {
-                            for (var i in this_classes) {
-                                if (this_classes[i] == selected_class) {
+                            for (var i in classes) {
+                                if (classes[i] == selected_class) {
                                     is_filter_selected = true;
                                     return false;
                                 }
