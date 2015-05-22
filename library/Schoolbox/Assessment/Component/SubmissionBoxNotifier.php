@@ -390,41 +390,60 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             ->addFilter('roletype', Role::STUDENT);
 
         // renamed
-        $this->notifyRenamed($diff, $envelope, $bob, $user, $submissionBox);
+        if (!empty($diff['name'])) {
+            $envelope->broadcastToCategory(
+                $submissionBox->getCategory(),
+                UserAccess::ACCESS_READ,
+                $this->setForNotifyRenamed($diff, $bob, $user, $submissionBox)->build()
+            );
+        }
         unset($diff['name']);
 
         // extended or shortened
-        $this->notifyDueDateChanged($diff, $envelope, $bob, $user, $submissionBox);
+        if (!empty($diff['dueDate'])) {
+            $envelope->broadcastToCategory(
+                $submissionBox->getCategory(),
+                UserAccess::ACCESS_READ,
+                $this->setForNotifyDueDateChanged($diff, $bob, $user, $submissionBox)->build()
+            );
+        }
         unset($diff['dueDate']);
 
         // changed accepting online submissions
-        $this->notifyAcceptOnlineChanged($diff, $envelope, $bob, $submissionBox);
+        if (!empty($diff['acceptOnline'])) {
+            $envelope->broadcastToCategory(
+                $submissionBox->getCategory(),
+                UserAccess::ACCESS_READ,
+                $this->setForNotifyAcceptOnlineChanged($bob, $submissionBox)->build()
+            );
+        }
         unset($diff['acceptOnline']);
 
         // if none of the above apply, but there are changes, just be generic
-        if ($envelope->count() == 0) {
-            $this->notifyUpdated($diff, $envelope, $bob, $user, $submissionBox);
+        if ($envelope->count() == 0 && count($diff)) {
+            $envelope->broadcastToCategory(
+                $submissionBox->getCategory(),
+                UserAccess::ACCESS_READ,
+                $this->setForNotifyUpdated($bob, $user, $submissionBox)->build()
+            );
         }
 
         return $envelope;
     }
 
-
     /**
+     * Sets up Bob with the required params for notifying about a rename.
+     *
      * @param array         $diff
-     * @param Envelope      $envelope
      * @param Builder       $bob
      * @param User          $author
      * @param SubmissionBox $box
+     *
+     * @return Builder
      */
-    protected function notifyRenamed($diff, $envelope, $bob, $author, $box)
+    protected function setForNotifyRenamed($diff, $bob, $author, $box)
     {
-        if (empty($diff['name'])) {
-            return;
-        }
-
-        // parameterised text, link and icon
-        $bob->setTitle(":author renamed :oldname to :newname in :catname")
+        return $bob->setTitle(":author renamed :oldname to :newname in :catname")
             // params for this instance - oldname doesn't have an associated href
             ->setParams(array(
                 'author'  => new UserParam($author),
@@ -433,24 +452,20 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                 'catname' => new CategoryParam($box->getCategory())
             ))
             ->setTopics(array("duework.{$box->getId()}.renamed"));
-
-        $envelope->broadcastToCategory($box->getCategory(), UserAccess::ACCESS_READ, $bob->build());
     }
 
-
     /**
+     * Sets up Bob with the required params for notifying about a due date change.
+     *
      * @param array         $diff
-     * @param Envelope      $envelope
      * @param Builder       $bob
      * @param User          $author
      * @param SubmissionBox $box
+     *
+     * @return Builder
      */
-    protected function notifyDueDateChanged($diff, $envelope, $bob, $author, $box)
+    protected function setForNotifyDueDateChanged($diff, $bob, $author, $box)
     {
-        if (empty($diff['dueDate'])) {
-            return;
-        }
-
         // strtotime is safe here because dates are in 'YYYY-MM-DD H:i:s' format
         $oldDate    = strtotime($diff['dueDate'][1]);
         $newDate    = strtotime($diff['dueDate'][0]);
@@ -458,11 +473,11 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $relative   = new Alaress_Date_Format($newDate, 'U');
 
         $dateformat = $relative->getLongDateOnly();
-        if(!$relative->isAtEndOfDay()) {
+        if (!$relative->isAtEndOfDay()) {
             $dateformat = $relative->getTimeOnly() .' on '. $dateformat;
         }
 
-        $bob->setTitle(":author $verb :boxname to :date in :catname")
+        return $bob->setTitle(":author $verb :boxname to :date in :catname")
             ->setTopics(array("duework.{$box->getId()}.datechanged"))
             ->setParams(array(
                 'author'  => new UserParam($author),
@@ -470,61 +485,50 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                 'date'    => new Param($dateformat),
                 'catname' => new CategoryParam($box->getCategory())
             ));
-
-        $envelope->broadcastToCategory($box->getCategory(), UserAccess::ACCESS_READ, $bob->build());
     }
 
-
     /**
-     * @param array         $diff
-     * @param Envelope      $envelope
+     * Sets up Bob with the required params for notifying about accept online change.
+     *
      * @param Builder       $bob
      * @param SubmissionBox $box
+     *
+     * @return Builder
      */
-    protected function notifyAcceptOnlineChanged($diff, $envelope, $bob, $box)
+    protected function setForNotifyAcceptOnlineChanged($bob, $box)
     {
-        if (empty($diff['acceptOnline'])) {
-            return;
-        }
         if ($box->getAcceptOnline()) {
             $m = "You now need to submit online for :boxname in :catname";
         } else {
             $m = "You no longer need to submit online for :boxname in :catname";
         }
 
-        $bob->setTitle($m)
+        return $bob->setTitle($m)
             ->setParams(array(
                 'boxname' => new Param($box->getName(), "/submission/submissionHistory/{$box->getId()}"),
                 'catname' => new CategoryParam($box->getCategory())
             ))
             ->setTopics(array("duework.{$box->getId()}.updated"));
-
-        $envelope->broadcastToCategory($box->getCategory(), UserAccess::ACCESS_READ, $bob->build());
     }
 
-
     /**
-     * @param array         $diff
-     * @param Envelope      $envelope
+     * Sets up Bob with the required params for generic update notify.
+     *
      * @param Builder       $bob
      * @param User          $author
      * @param SubmissionBox $box
+     *
+     * @return Builder
      */
-    protected function notifyUpdated($diff, $envelope, $bob, $author, $box)
+    protected function setForNotifyUpdated($bob, $author, $box)
     {
-        if (!count($diff)) {
-            return;
-        }
-
-        $bob->setTitle(":author updated :boxname in :catname")
+        return $bob->setTitle(":author updated :boxname in :catname")
             ->setParams(array(
                 'author'  => new UserParam($author),
                 'boxname' => new Param($box->getName(), "/submission/submissionHistory/" . $box->getId()),
                 'catname' => new CategoryParam($box->getCategory())
             ))
             ->setTopics(array("duework.{$box->getId()}.updated"));
-
-        $envelope->broadcastToCategory($box->getCategory(), UserAccess::ACCESS_READ, $bob->build());
     }
 
 
