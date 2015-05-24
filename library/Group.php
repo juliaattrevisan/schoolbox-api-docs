@@ -468,7 +468,10 @@ class Group extends DeprecatedModel
 
             /* Check subjects, allow users directly involved in a subject access regardless */
             if ($permission < READ_ACCESS) {
-                if ($this->involvedInSubject($relationID, $userID)) {
+                // Allow read access to folder 0 for all users?
+                if ($relationID == 0) {
+                    $permission = READ_ACCESS;
+                } elseif ($this->involvedInSubject($relationID, $userID)) {
                     if ($this->isStaff($userID)) {
                         $permission = WRITE_ACCESS;
                     } else {
