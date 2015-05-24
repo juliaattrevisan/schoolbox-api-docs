@@ -113,4 +113,14 @@ class EventType
     {
         return $this->type;
     }
+
+    /**
+     * Is this the "Task" event type?
+     *
+     * @return bool
+     */
+    public function isTaskType()
+    {
+        return $this->getType() == 'Task';
+    }
 }
