@@ -123,7 +123,6 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
         $currentUser = $_SESSION['user'];
         if (count($allSubjects)) {
             foreach ($allSubjects as $currentSubject) {
-
                 /* Subject name
                  */
                 $this->getPage()->setVar(
