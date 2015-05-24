@@ -68,8 +68,8 @@ class Kernel extends \Alaress\Application\Kernel
     */
     public function run()
     {
-        // Run router with requested path
-        $path  = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        // Run router with requested path (trim trailing /)
+        $path  = preg_replace('|/$|', '', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
         $route = $this->di->get('router')->match($path, $_SERVER);
         if ($route instanceof Route) {
             // The route name's format:
