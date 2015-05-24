@@ -585,6 +585,7 @@ class Marksheet
                 )
             );
 
+            $page->setVar('stat_item_block', '');
             foreach ($this->displayOrder as $item) {
                 $workId = "{$item['isOA']}-{$item['id']}";
                 $value  = $boxes[$workId];
@@ -604,13 +605,13 @@ class Marksheet
                     $page->setVar('stat_visible_block', '');
                     $page->setVar('stat_readonly_block', '');
                 } elseif ($name == 'visibility') {
-                    $page->parse('stat_visible_block', 'stat_visible');
                     $page->setVar('stat_visibility_drop_block', '');
                     foreach (Widgets::getAvailableOptions() as $option) {
                         $page->setVar('MARK_VISIBILITY_VALUE', \Scrub::text($option['id']));
                         $page->setVar('MARK_VISIBILITY_TEXT', \Scrub::text($option['name']));
                         $page->parse('stat_visibility_drop_block', 'stat_visibility_drop', true);
                     }
+                    $page->parse('stat_visible_block', 'stat_visible');
                     $page->setVar('stat_editable_block', '');
                     $page->setVar('stat_readonly_block', '');
                 } else {
