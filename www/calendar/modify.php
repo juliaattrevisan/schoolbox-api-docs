@@ -10,6 +10,8 @@ $page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 $page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
 $page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
 $page->setBlock(TEMPLATE_content, 'event_group_drop', 'event_group_drop_block');
+$page->setBlock(TEMPLATE_content, 'type_select', 'type_select_block');
+$page->setBlock(TEMPLATE_content, 'type_no_select', 'type_no_select_block');
 
 if (isset($_GET['userId']) && is_numeric($_GET['userId'])) {
     try {
@@ -220,21 +222,36 @@ if (is_numeric($_GET['eventID'])) {
     $page->parse('recurring_dates_block', 'recurring_dates');
 }
 
-/* Event Types
+/* Event Types (except tasks)
  */
 $calendarEventTypeMapper = new \Schoolbox\Calendar\EventTypeMapper();
-$allEventTypes           = $calendarEventTypeMapper->findAll();
-
+$allEventTypes           = $calendarEventTypeMapper->findAll()->filter(
+    function ($eventType) {
+        /** @var \Schoolbox\Calendar\EventType $eventType */
+        return !$eventType->isTaskType();
+    }
+);
+$page->setVar('type_select_block', '');
+$page->setVar('type_no_select_block', '');
 $page->dropDown(
     'type_drop',
     $allEventTypes,
     $defaultTypeId,
-    TEMPLATE_content,
+    'type_select',
     array(
         'id'   => 'EVENT_EVENTTYPE_ID',
         'type' => 'EVENT_EVENTTYPE_NAME'
     )
 );
+// Is this a task? Don't show the event type
+// (You shouldn't even be here if this is a task)
+if ($event->getType()->isTaskType()) {
+    $page->setVar('EVENT_EVENTTYPE_ID', $event->getType()->getId());
+    $page->setVar('EVENT_EVENTTYPE_NAME', $event->getType()->getType());
+    $page->parse('type_no_select_block', 'type_no_select');
+} else {
+    $page->parse('type_select_block', 'type_select');
+}
 
 /**
  * Group (Folder) selection
