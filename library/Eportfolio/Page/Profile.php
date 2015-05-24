@@ -172,6 +172,8 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 			$previousCategory = null;
 			$j = 0;
 
+            /** @var Schoolbox\User $currentUser */
+            $currentUser = $_SESSION['user'];
 			foreach($allShowcasedItems as $currentShowcasedItem) {
                 $currentBox = $currentShowcasedItem->getSubmissionBox();
 
@@ -216,7 +218,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 
 				/* Show returned work information (if available)
 				 */
-				if ($latestReturn) {
+				if ($latestReturn && $currentBox->isMarkShownToRole($currentUser->getRole())) {
 					$mark = $latestReturn->getMark();
 					$this->getPage()->setVar(array(
 						'SHOWCASED_WORK_RETURNED_MARK' => $mark,
