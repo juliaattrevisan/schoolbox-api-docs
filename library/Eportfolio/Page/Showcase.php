@@ -119,6 +119,8 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
         /* Post-process!
          */
+        /** @var Schoolbox\User $currentUser */
+        $currentUser = $_SESSION['user'];
         if (count($allSubjects)) {
             foreach ($allSubjects as $currentSubject) {
 
@@ -181,7 +183,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
                         /* Show returned work information (if available)
                          */
-                        if ($return) {
+                        if ($return && $box->isMarkShownToRole($currentUser->getRole())) {
                             $this->getPage()->setVar(
                                 array(
                                     'SHOWCASED_WORK_RETURNED_MARK' => $return->getMark(),
