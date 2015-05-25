@@ -278,8 +278,17 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
      */
     public function hashObject($object)
     {
-        // use json rather than serialize to avoid any side-effects
-        return spl_object_hash($object);
+        // use primary model identifier if possible.
+        // something like "instanceof {Trait}" would be amazing, buuuuut this is PHP...
+        if (method_exists($object, 'getId')) {
+            $string = get_class($object) . ':' . $object->getId();
+
+        } else {
+            // fall back to using the SPL hash if there's no available ID
+            $string = spl_object_hash($object);
+        }
+
+        return sha1($string);
     }
 
 
