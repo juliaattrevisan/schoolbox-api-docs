@@ -15,6 +15,7 @@ use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\Worker\AbstractProcess;
 use Alaress\WorkerCrew\Worker\PipeWriter;
+use ErrorException;
 use InvalidArgumentException;
 use PDOException;
 use Predis\PredisException;
@@ -51,7 +52,7 @@ class WorkerProcess extends AbstractProcess
     /**
      * @param string $command
      * @param array  $args
-     * @throws RuntimeException
+     * @throws ErrorException
      * @throws InvalidArgumentException
      * @return mixed
      */
@@ -86,7 +87,11 @@ class WorkerProcess extends AbstractProcess
                     return $this->sendTo($data[0], $data[1]);
             }
         } catch (Mapper\Exception $e) {
-            throw new RuntimeException(sprintf("Could not complete '%s': %s in %s:%s", $command, $e->getMessage(), $e->getFile(), $e->getLine()), 0, $e);
+            // non-fatal
+            throw new ErrorException(
+                sprintf("Could not complete '%s': %s", $command, $e->getMessage()),
+                $e->getCode(), E_NOTICE, $e->getFile(), $e->getLine(), $e
+            );
         }
 
         throw new InvalidArgumentException("Can't process '$command'.");
