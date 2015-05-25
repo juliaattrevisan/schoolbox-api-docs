@@ -101,6 +101,8 @@ class EntriesAndResults extends Base {
             $finalStack[$courseName]['summary']['type'][$internalExternal]['availableCredits'] += ($current['EnteredCredits'] - $current['ResultCredits']);
         }
 
+        ksort($finalStack);
+
         return $finalStack;
     }
 
