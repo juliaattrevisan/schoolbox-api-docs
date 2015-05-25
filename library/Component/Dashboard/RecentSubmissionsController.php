@@ -49,8 +49,9 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         if(is_array($this->submissions)) {
             foreach($this->submissions as $submit) {
                 // don't exceed the limit
-                if($count >= $limit)
+                if ($limit > 0 && $count >= $limit) {
                     break;
+                }
 
                 $date = new Alaress_Date_Format($submit['datestamp'], 'Y-m-d H:i');
 
