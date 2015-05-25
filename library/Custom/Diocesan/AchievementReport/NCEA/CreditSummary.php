@@ -162,7 +162,7 @@ class CreditSummary extends Base {
         }
 
         krsort($finalStack);
-        new \Alaress_Probe($finalStack);
+
         return $finalStack;
     }
 
