@@ -73,20 +73,21 @@ switch ($task->getType()) {
         // Mark this item as complete.
         // Redirect to the link if there is one, otherwise redirect back to the
         // homepage this is on.
+        $homepageLink = '/homepage/'.$component->getIdentifier().'/#component'.$component_id;
         if (!$task->getRequiresConfirmation()) {
             if ($isUndo) {
                 Task\InstanceCompletionMapper::getInstance()->unmarkAsCompleted(
                     $task->getId(),
                     $_SESSION['id']
                 );
-                SitePage::localRedir('/homepage/'.$component->getIdentifier().'/');
+                SitePage::localRedir($homepageLink);
                 exit;
             } elseif ($isComplete) {
                 Task\InstanceCompletionMapper::getInstance()->markAsCompleted(
                     $task->getId(),
                     $_SESSION['id']
                 );
-                SitePage::localRedir('/homepage/'.$component->getIdentifier().'/');
+                SitePage::localRedir($homepageLink);
                 exit;
             }
         }
@@ -96,7 +97,7 @@ switch ($task->getType()) {
             header('Location: '.$link);
             exit;
         } else {
-            SitePage::localRedir('/homepage/'.$component->getIdentifier().'/');
+            SitePage::localRedir($homepageLink);
         }
         break;
 }
