@@ -370,7 +370,14 @@ class SitePage extends Page
             $this->setVar('switch_user_block', '');
             $linkedUserList = array();
 
+            $previousUser = $_SESSION['previous']['user'];
             foreach($_SESSION['user']->getLinkedUser() as $linkedUser) {
+                // Don't link to this user if I was that user
+                if ($previousUser instanceof \Schoolbox\User) {
+                    if ($linkedUser->getId() == $previousUser->getId()) {
+                        continue;
+                    }
+                }
 
                 /* Fully hydrate, note this stores back in session so it only happens once */
                 if($linkedUser->getRole()->getName() == null) {
@@ -394,12 +401,12 @@ class SitePage extends Page
             $this->setBlock('banner_logged_in', 'recover_user', 'recover_user_block');
             $this->setVar('recover_user_block', '');
 
-            if($_SESSION['previous']['user'] instanceof \Schoolbox\User) {
+            if($previousUser instanceof \Schoolbox\User) {
                 $this->setVar(array(
-                                    'MENU_SWITCH_USERID'        => $_SESSION['previous']['user']->getId(),
-                                    'MENU_SWITCH_EXTERNAL_ID'   => $_SESSION['previous']['user']->getExternalId(),
-                                    'MENU_SWITCH_USER_FULLNAME' => $_SESSION['previous']['user']->getFullName(),
-                                    'MENU_SWITCH_USER_ROLE'     => $_SESSION['previous']['user']->getRole()->getName(),
+                                    'MENU_SWITCH_USERID'        => $previousUser->getId(),
+                                    'MENU_SWITCH_EXTERNAL_ID'   => $previousUser->getExternalId(),
+                                    'MENU_SWITCH_USER_FULLNAME' => $previousUser->getFullName(),
+                                    'MENU_SWITCH_USER_ROLE'     => $previousUser->getRole()->getName(),
                                     )
                 );
                 $this->parse('recover_user_block', 'recover_user', true);
