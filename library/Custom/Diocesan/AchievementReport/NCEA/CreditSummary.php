@@ -168,7 +168,6 @@ class CreditSummary extends Base {
      */
     private function findTotalAchievedCredits($allResults) {
         $finalStack = array();
-        $exclusions = array('N');
         $totalEnteredCredits = array();
 
         /* Accumulate "Achieved" values
@@ -180,6 +179,7 @@ class CreditSummary extends Base {
                 $finalStack[$level] = array(
                     'achieved' => 0,
                     'available' => 0,
+                    'exclusions' => 0,
                 );
 
                 $totalEnteredCredits[$level] = 0;
@@ -188,8 +188,13 @@ class CreditSummary extends Base {
             /* Sum of A, M, E values from both Internally Assessed
              * and Externally Assessed types
              */
-            if (!in_array($current['StrippedResult'], $exclusions)) {
+            if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
                 $finalStack[$level]['achieved'] += $current['ResultCredits'];
+            }
+            /* Special treatment
+             */
+            elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry()) || in_array($current['StrippedResult'], array('N'))) {
+                $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
             }
 
             $totalEnteredCredits[$level] += $current['EnteredCredits'];
@@ -198,7 +203,7 @@ class CreditSummary extends Base {
         /* Accumulate "Available" values
          */
         foreach ($finalStack as $level => $totals) {
-            $finalStack[$level]['available'] = $totalEnteredCredits[$level] - $totals['achieved'];
+            $finalStack[$level]['available'] = $totalEnteredCredits[$level] - $totals['achieved'] - $finalStack[$level]['exclusions'];
         }
 
         krsort($finalStack);
