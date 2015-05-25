@@ -9,14 +9,15 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
+abstract class Evaluation_Answer_Multi extends Evaluation_Answer
+{
 
-	/**
-	 * Javascript class to use when creating UI
-	 *
-	 * @var string
-	 */
-	protected $plugin = 'evaluationMultipleChoice';
+    /**
+     * Javascript class to use when creating UI
+     *
+     * @var string
+     */
+    protected $plugin = 'evaluationMultipleChoice';
 
     protected $correctClass = 'multiCorrect';
     protected $incorrectClass = 'multiIncorrect';
@@ -108,36 +109,35 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
         }
     }
 
-	/**
-	 * Render answers in the QuestionBank
-	 *
-	 * @param  $page
-	 * @param string $answerGroup
-	 * @return void
-	 */
-	public function modifyInQuestionBank($page, $answerGroup) {
-		if (strlen($answerGroup)) {
-			$allAnswers = unserialize($answerGroup);
+    /**
+     * Render answers in the QuestionBank
+     *
+     * @param  $page
+     * @param string $answerGroup
+     * @return void
+     */
+    public function modifyInQuestionBank($page, $answerGroup)
+    {
+        if (strlen($answerGroup)) {
+            $allAnswers = unserialize($answerGroup);
 
-			if (is_array($allAnswers) && count($allAnswers)) {
-				foreach ($allAnswers as $currentAnswer) {
-					$page->setVar(array(
-						'ANSWER_VALUE' => $currentAnswer->value,
-						'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
-						'ANSWER_CHECKED' => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
-					));
+            if (is_array($allAnswers) && count($allAnswers)) {
+                foreach ($allAnswers as $currentAnswer) {
+                    $page->setVar(array(
+                        'ANSWER_VALUE' => $currentAnswer->value,
+                        'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
+                        'ANSWER_CHECKED' => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
+                    ));
 
-					$page->parse('answerOption_block', 'answerOption', true);
-				}
-			}
-			else {
-				$page->setVar('answerOption_block', '');
-			}
-		}
-		else {
-			$page->setVar('answerOption_block', '');
-		}
-	}
+                    $page->parse('answerOption_block', 'answerOption', true);
+                }
+            } else {
+                $page->setVar('answerOption_block', '');
+            }
+        } else {
+            $page->setVar('answerOption_block', '');
+        }
+    }
 
     /**
      * Gets answers out of the answer group array.
@@ -145,19 +145,21 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
      * @param  array $answerGroup an answer group from $this->getByQuestionId()
      * @return array
      */
-    protected function getAnswersFromAnswerGroup($answerGroup) {
+    protected function getAnswersFromAnswerGroup($answerGroup)
+    {
         return unserialize($answerGroup['answer']);
     }
 
-	/**
-	 * Serialize for db storage (we shouldn't be using serialize anymore)
-	 *
-	 * @param $data
-	 * @return string
-	 */
-	public function encodeForQuestionBank($data) {
-		return serialize(json_decode($data));
-	}
+    /**
+     * Serialize for db storage (we shouldn't be using serialize anymore)
+     *
+     * @param $data
+     * @return string
+     */
+    public function encodeForQuestionBank($data)
+    {
+        return serialize(json_decode($data));
+    }
 
     /**
      * Translate an integer to letters
@@ -165,7 +167,8 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
      * @param $num
      * @return string
      */
-    protected function findLetterIndex($num) {
+    protected function findLetterIndex($num)
+    {
         $firstLetter = floor($num / 26);
         $lastLetter = $num % 26;
 
@@ -180,12 +183,24 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
          */
         if ($firstLetter) {
             $string = chr($firstLetter+64) . chr($lastLetter+64);
-        }
-        else {
+        } else {
             $string = chr($lastLetter+64);
         }
 
         return $string;
+    }
+
+    /**
+     * Has the student selected the given answer value in their response?
+     *
+     * @param string $answerValue
+     * @param array  $existingResponse The response that the student gave for the question
+     *
+     * @return bool
+     */
+    protected function isAnswerSelected($answerValue, $existingResponse)
+    {
+        return is_array($existingResponse) && in_array($answerValue, $existingResponse);
     }
 
     /**
@@ -196,48 +211,45 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
      * @param  $question_id
      * @return void
      */
-    public function prepareResponse($page, $question_id) {
+    public function prepareResponse($page, $question_id)
+    {
 
-		/* Optional configuration hook
+        /* Optional configuration hook
 		 */
-		$this->configureResponse($page, $question_id);
+        $this->configureResponse($page, $question_id);
 
-		$existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
+        $existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         $answerGroup = $this->getByQuestionID($question_id);
 
         if ($answerGroup) {
             $allAnswers = $this->getAnswersFromAnswerGroup($answerGroup);
 
-			$i = 1;
+            $i = 1;
 
             foreach ($allAnswers as $currentAnswer) {
-				$valueFacade = $this->findLetterIndex($i);
+                $valueFacade = $this->findLetterIndex($i);
 
                 $page->setVar(array(
-					'QUESTION_ID' => $question_id,
-					'QUESTION_PLUGIN' => $this->plugin,
+                    'QUESTION_ID' => $question_id,
+                    'QUESTION_PLUGIN' => $this->plugin,
                     'ANSWER_ID' => $answerGroup['answer_id'],
-					'ANSWER_VALUE_FACADE' => $valueFacade,
+                    'ANSWER_VALUE_FACADE' => $valueFacade,
                     'ANSWER_VALUE' => $currentAnswer->value,
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));
 
                 if ($existing['response']) {
-                    $existingAnswer = unserialize($existing['response']);
-
-                    if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
+                    if ($this->isAnswerSelected($currentAnswer->value, unserialize($existing['response']))) {
                         $page->setVar(array(
                             'ANSWER_CHECKED' => 'checked=\'checked\'',
                         ));
-                    }
-					else {
+                    } else {
                         $page->setVar(array(
                             'ANSWER_CHECKED' => '',
                         ));
                     }
-                }
-				else {
+                } else {
                     $page->setVar(array(
                         'ANSWER_CHECKED' => '',
                     ));
@@ -245,10 +257,9 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
 
                 $page->parse('answerOption_block', 'answerOption', true);
 
-				$i++;
+                $i++;
             }
-        }
-		else {
+        } else {
             $page->setVar('answerOption_block', '');
         }
     }
@@ -335,7 +346,6 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
     public function importMoodleAnswer($xmlObj, $question_id)
     {
         foreach ($xmlObj->answer as $currentAnswer) {
-
             /* Set up data object in accordance with $this->create();
              */
             $answer['description'] = html_entity_decode(trim((string)$currentAnswer->text), ENT_IGNORE|ENT_QUOTES);
@@ -375,7 +385,6 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
         $data = unserialize($response['response']);
 
         if (is_array($data)) {
-
             /* Answer text to appear in export
                 */
             if ($this->getUseLongAnswers()) {
@@ -503,7 +512,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
                             $page->setVar(array(
                                 'CORRECT' => $this->getCorrectClass(),
                             ));
-                        } else if (in_array($currentAnswer->value, $existingAnswer)) {
+                        } elseif (in_array($currentAnswer->value, $existingAnswer)) {
                             $page->setVar(array(
                                 'CORRECT' => $this->getIncorrectClass(),
                             ));
@@ -531,145 +540,139 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
         }
     }
 
-	/**
-	 * Show the response someone submitted and also show the correct answer.
-	 * Provide an option for the teacher to review the mark and adjust.
-	 *
-	 * @param $page
-	 * @param $attemptId
-	 * @param $currentQuestion
-	 */
-	public function reviewResponseHorizontal($page, $attemptId, $currentQuestion) {
-		$existing = $this->getResponseHandler()->isResponseExists($attemptId, $currentQuestion['question_id']);
+    /**
+     * Show the response someone submitted and also show the correct answer.
+     * Provide an option for the teacher to review the mark and adjust.
+     *
+     * @param $page
+     * @param $attemptId
+     * @param $currentQuestion
+     */
+    public function reviewResponseHorizontal($page, $attemptId, $currentQuestion)
+    {
+        $existing = $this->getResponseHandler()->isResponseExists($attemptId, $currentQuestion['question_id']);
 
-		if ($existing) {
-			$existingAnswer = unserialize($existing['response']);
-		}
+        if ($existing) {
+            $existingAnswer = unserialize($existing['response']);
+        }
 
-		$answerGroup = $this->getByQuestionID($currentQuestion['question_id']);
+        $answerGroup = $this->getByQuestionID($currentQuestion['question_id']);
 
-		if ($answerGroup) {
-			$allAnswers = unserialize($answerGroup['answer']);
+        if ($answerGroup) {
+            $allAnswers = unserialize($answerGroup['answer']);
 
-			$page->setVar(array(
-				'USER_EXTERNAL_ID' => $currentQuestion['synergy_id'],
-				'USER_FIRSTNAME' => $currentQuestion['firstname'],
-				'USER_LASTNAME' => $currentQuestion['lastname'],
-				'ANSWER_ID' => $answerGroup['answer_id'],
-				'RESPONSE_ID' => $existing['response_id'],
-				'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
-				'REVIEWED_MARKS' => $existing['mark'],
-			));
+            $page->setVar(array(
+                'USER_EXTERNAL_ID' => $currentQuestion['synergy_id'],
+                'USER_FIRSTNAME' => $currentQuestion['firstname'],
+                'USER_LASTNAME' => $currentQuestion['lastname'],
+                'ANSWER_ID' => $answerGroup['answer_id'],
+                'RESPONSE_ID' => $existing['response_id'],
+                'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
+                'REVIEWED_MARKS' => $existing['mark'],
+            ));
 
-			foreach ($allAnswers as $currentAnswer) {
-				if ($currentAnswer->correct) {
-					$page->setVar(array(
-						'ACTUAL_CORRECT_VALUE' => 'correct-answer'
-					));
-				}
-				else {
-					$page->setVar(array(
-						'ACTUAL_CORRECT_VALUE' => ''
-					));
-				}
+            foreach ($allAnswers as $currentAnswer) {
+                if ($currentAnswer->correct) {
+                    $page->setVar(array(
+                        'ACTUAL_CORRECT_VALUE' => 'correct-answer'
+                    ));
+                } else {
+                    $page->setVar(array(
+                        'ACTUAL_CORRECT_VALUE' => ''
+                    ));
+                }
 
-				$page->setVar(array(
-					'ANSWER_VALUE' => $currentAnswer->value,
-					'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
-				));
+                $page->setVar(array(
+                    'ANSWER_VALUE' => $currentAnswer->value,
+                    'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
+                ));
 
-				if ($existing['response']) {
-					if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
-						$page->setVar(array(
-							'ANSWER_CHECKED' => 'checked=\'checked\'',
-						));
+                if ($existing['response']) {
+                    if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
+                        $page->setVar(array(
+                            'ANSWER_CHECKED' => 'checked=\'checked\'',
+                        ));
 
-						/* Was this a correctly-selected response? If so apply a
-						 * special class to it. The three cases are:
-						 *
-						 * Correct response, selected
-						 * Incorrect response, selected
-						 * Unselected
+                        /* Was this a correctly-selected response? If so apply a
+                         * special class to it. The three cases are:
+                         *
+                         * Correct response, selected
+                         * Incorrect response, selected
+                         * Unselected
 						 */
-						if ($currentAnswer->correct && in_array($currentAnswer->value, $existingAnswer)) {
-							$page->setVar(array(
-								'CORRECT' => $this->getCorrectClass(),
-							));
-						}
-						else if (in_array($currentAnswer->value, $existingAnswer)) {
-							$page->setVar(array(
-								'CORRECT' => $this->getIncorrectClass(),
-							));
-						}
-						else {
-							$page->setVar(array(
-								'CORRECT' => ''
-							));
-						}
-					}
-					else {
-						$page->setVar(array(
-							'ANSWER_CHECKED' => '',
-							'CORRECT' => ''
-						));
-					}
-				}
-				else {
-					$page->setVar(array(
-						'CORRECT' => ''
-					));
-				}
+                        if ($currentAnswer->correct && in_array($currentAnswer->value, $existingAnswer)) {
+                            $page->setVar(array(
+                                'CORRECT' => $this->getCorrectClass(),
+                            ));
+                        } elseif (in_array($currentAnswer->value, $existingAnswer)) {
+                            $page->setVar(array(
+                                'CORRECT' => $this->getIncorrectClass(),
+                            ));
+                        } else {
+                            $page->setVar(array(
+                                'CORRECT' => ''
+                            ));
+                        }
+                    } else {
+                        $page->setVar(array(
+                            'ANSWER_CHECKED' => '',
+                            'CORRECT' => ''
+                        ));
+                    }
+                } else {
+                    $page->setVar(array(
+                        'CORRECT' => ''
+                    ));
+                }
 
-				$page->parse('answerOption_block', 'answerOption', true);
-			}
-		}
-		else {
-			$page->setVar('answerOption_block', '');
-		}
-	}
+                $page->parse('answerOption_block', 'answerOption', true);
+            }
+        } else {
+            $page->setVar('answerOption_block', '');
+        }
+    }
 
-	/**
-	 * The answer for a question during horizontal marking, so it appears at the
-	 * top under the question itself, and not repeated for each attempt
-	 *
-	 * @param $page
-	 * @param $currentQuestion
-	 * @return void
-	 */
-	public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion) {
-		$answerGroup = $this->getByQuestionID($currentQuestion['question_id']);
+    /**
+     * The answer for a question during horizontal marking, so it appears at the
+     * top under the question itself, and not repeated for each attempt
+     *
+     * @param $page
+     * @param $currentQuestion
+     * @return void
+     */
+    public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion)
+    {
+        $answerGroup = $this->getByQuestionID($currentQuestion['question_id']);
 
-		if ($answerGroup) {
-			$allAnswers = unserialize($answerGroup['answer']);
+        if ($answerGroup) {
+            $allAnswers = unserialize($answerGroup['answer']);
 
-			$page->setVar(array(
-				'ANSWER_ID' => $answerGroup['answer_id'],
-			));
+            $page->setVar(array(
+                'ANSWER_ID' => $answerGroup['answer_id'],
+            ));
 
-			foreach ($allAnswers as $currentAnswer) {
-				if ($currentAnswer->correct) {
-					$page->setVar(array(
-						'ACTUAL_CORRECT_VALUE' => 'correct-answer'
-					));
-				}
-				else {
-					$page->setVar(array(
-						'ACTUAL_CORRECT_VALUE' => ''
-					));
-				}
+            foreach ($allAnswers as $currentAnswer) {
+                if ($currentAnswer->correct) {
+                    $page->setVar(array(
+                        'ACTUAL_CORRECT_VALUE' => 'correct-answer'
+                    ));
+                } else {
+                    $page->setVar(array(
+                        'ACTUAL_CORRECT_VALUE' => ''
+                    ));
+                }
 
-				$page->setVar(array(
-					'ANSWER_VALUE' => $currentAnswer->value,
-					'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
-				));
+                $page->setVar(array(
+                    'ANSWER_VALUE' => $currentAnswer->value,
+                    'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
+                ));
 
-				$page->parse('answerTop_block', 'answerTop', true);
-			}
-		}
-		else {
-			$page->setVar('answerTop_block', '');
-		}
-	}
+                $page->parse('answerTop_block', 'answerTop', true);
+            }
+        } else {
+            $page->setVar('answerTop_block', '');
+        }
+    }
 
     /* Getters/Setters
      */
@@ -679,7 +682,8 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
      *
      * @return string
      */
-    protected function getCorrectClass() {
+    protected function getCorrectClass()
+    {
         return $this->correctClass;
     }
 
@@ -688,7 +692,8 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
      *
      * @return string
      */
-    protected function getIncorrectClass() {
+    protected function getIncorrectClass()
+    {
         return $this->incorrectClass;
     }
 }

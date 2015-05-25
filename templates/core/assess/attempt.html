@@ -35,7 +35,7 @@ $(function() {
 
 <h1>{ASSESS_TITLE}</h1>
 <div class="evaluation-content take-test">
-	<h2><span>Section {CURRENT_SECTION_SEQUENCE}</span> {SECTION_TITLE}</h2>
+	<h2>{SECTION_TITLE}</h2>
 	<div class="wysiwyg">{SECTION_DESCRIPTION}</div>
 	<!-- BEGIN question -->
 	<form id='questionForm-{QUESTION_QUESTION_ID}' data-plugin='{QUESTION_PLUGIN}' action="/assess/saveResponse/{QUESTION_QUESTION_ID}" method="post" class="questionForm">
@@ -80,7 +80,7 @@ $(function() {
 			
 		<!-- BEGIN sectionPercentageComplete -->
 		<div class="evaluation-section percentage-complete">
-			<h3>Section {SECTION_SEQUENCE} - <span>{SECTION_PERCENTAGE_COMPLETE_TITLE}</span></h3>
+			<h3>{SECTION_PERCENTAGE_COMPLETE_TITLE}</h3>
 			<div class="pad-it">
 
 				<div id='evaluation-percentage-bar-{SECTION_PERCENTAGE_COMPLETE_SECTION_ID}'>
