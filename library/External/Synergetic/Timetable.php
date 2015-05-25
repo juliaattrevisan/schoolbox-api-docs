@@ -403,7 +403,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         if($result['success']) {
             foreach($result['result'] as $spRow) {
-                if($spRow['TimetableGroup'] == $campusString) {
+                if (strcasecmp($spRow['TimetableGroup'], $campusString) === 0) {
                     $periodList[] = array(
                         'Room'              => $spRow['Room'],
                         'Description'       => $spRow['ClassDescription'],
