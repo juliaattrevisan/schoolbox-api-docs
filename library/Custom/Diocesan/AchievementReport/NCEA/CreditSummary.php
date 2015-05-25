@@ -67,8 +67,7 @@ class CreditSummary extends Base {
                 SynergyOne.dbo.uvSchoolBoxNCEAResults
             WHERE
                 id = '{$this->getExternalUserId()}' AND
-                WithdrawnFlag = 0 AND
-                NOT (StudentYear = '{$this->getCurrentYear()}' AND InternalorExternalAssessment = 'EX')
+                WithdrawnFlag = 0
         ";
 
         if ($this->getYear()) {
@@ -119,34 +118,41 @@ class CreditSummary extends Base {
 
             $finalStack[$level][$internalExternal]['enteredCredits'] += $current['EnteredCredits'];
 
-            /* Special case for N
-             *
-             * According to Sheeba,
-             * N = sum of enteredcredits where strippedresult=N  [when result is not achieved
-             * the resultscredit data is 0, hence use entered credits]
+            /* Exclude when Student Year = Current Year for Externally Assessed
+             * Can't do this in the query; this data is actually conditionally accumulated.
+             * Some places accumulate these values; other places don't.
              */
-            if (in_array($letter, array('N'))) {
-                $finalStack[$level][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
+            if (!(($internalExternal == 'EX') && ($current['StudentYear'] == $this->getCurrentYear()))) {
 
-                /* No net change for N ($current['EnteredCredits'] - $current['EnteredCredits'] = 0)
-                 * $finalStack[$level][$internalExternal]['availableCredits'] += 0;
+                /* Special case for N
+                 *
+                 * According to Sheeba,
+                 * N = sum of enteredcredits where strippedresult=N  [when result is not achieved
+                 * the resultscredit data is 0, hence use entered credits]
                  */
-            }
-            /* Regular summation for A, M, E
-             */
-            elseif (in_array($letter, $this->getAchievementLetterRegistry())) {
-                $finalStack[$level][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
-                $finalStack[$level][$internalExternal]['availableCredits'] += ($current['EnteredCredits'] - $current['ResultCredits']);
-            }
-            /* Other cases to exclude in Available Credits calculation
-             *
-             * According to Sheeba,
-             * Available = 1-2-(sum of enteredcredits where strippedresult=Y, V or Z)
-             * [when result of Y,V or Z is assigned due to absence or not attempting,
-             * it is no longer available for assessment]
-             */
-            elseif (in_array($letter, $this->getExclusionLetterRegistry())) {
-                $finalStack[$level][$internalExternal]['availableCredits'] -= $current['EnteredCredits'];
+                if (in_array($letter, array('N'))) {
+                    $finalStack[$level][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
+
+                    /* No net change for N ($current['EnteredCredits'] - $current['EnteredCredits'] = 0)
+                     * $finalStack[$level][$internalExternal]['availableCredits'] += 0;
+                     */
+                }
+                /* Regular summation for A, M, E
+                 */
+                elseif (in_array($letter, $this->getAchievementLetterRegistry())) {
+                    $finalStack[$level][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
+                    $finalStack[$level][$internalExternal]['availableCredits'] += ($current['EnteredCredits'] - $current['ResultCredits']);
+                }
+                /* Other cases to exclude in Available Credits calculation
+                 *
+                 * According to Sheeba,
+                 * Available = 1-2-(sum of enteredcredits where strippedresult=Y, V or Z)
+                 * [when result of Y,V or Z is assigned due to absence or not attempting,
+                 * it is no longer available for assessment]
+                 */
+                elseif (in_array($letter, $this->getExclusionLetterRegistry())) {
+                    $finalStack[$level][$internalExternal]['availableCredits'] -= $current['EnteredCredits'];
+                }
             }
 
             /* Total Entered Credits = Internally Assessed Entered Credits + Externally Assessed Entered Credits
