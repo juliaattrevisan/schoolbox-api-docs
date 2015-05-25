@@ -216,8 +216,8 @@
                             Due Work
                         </label>
                     </div>
-                    <input type="submit" id="open-calendar-export-dialog" value="Generate URL" class="btn submit-btn-plain" />
-                    <input type="submit" id="download-calendar-export" value="Download CSV" class="btn submit-btn-plain" />
+                    <input type="submit" id="open-calendar-export-dialog" value="Generate URL" class="submit-btn-plain" />
+                    <input type="submit" id="download-calendar-export" value="Download CSV" class="submit-btn-plain" />
                 </form>
             </div>
         </div>
@@ -287,7 +287,7 @@
 			</div>
 		</div>
         <div class="float-right">
-        <a href="#" class='btn list' data-filters="true"><span></span>Filters</a>
+        <a href="#" class="btn list" data-filters="true"><span></span>Filters</a>
         <a href="#" class='active'><span></span>List</a>
         <a href="/calendar/full/{CALENDAR_PARAMS}#month" class='btn small no-icon'><span></span>Month</a>
         <a href="/calendar/full/{CALENDAR_PARAMS}#agendaWeek" class='btn small no-icon'><span></span>Week</a>
@@ -300,11 +300,11 @@
             <input id="finish_date_alt" name='finish_date' type="hidden" value="{SELECTED_FORMATTED_FINISH}" />
 
             <div class="float-left dateSelector">
-                <input id='start_date' type="text" size="10" maxlength="10" value="{SELECTED_START}" />
-                to <input id='finish_date' type="text" size="10" maxlength="10" value="{SELECTED_FINISH}" />
+                <input id='start_date' type="text" size="9" maxlength="9" value="{SELECTED_START}" />
+                to <input id='finish_date' type="text" size="9" maxlength="9" value="{SELECTED_FINISH}" />
             </div>
 
-            <input type="submit" class="btn submit-btn-plain" value="Update" />
+            <input type="submit" class="submit-btn-plain" value="Update" />
         </form>
     </div>
 	<div class="clearfix"></div>
