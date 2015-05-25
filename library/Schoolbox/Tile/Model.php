@@ -484,7 +484,7 @@ class Model implements ISoftDeletable, \JsonSerializable
      */
     public function isTitlePosition($position)
     {
-        return $this->getBackgroundPosition() == $position;
+        return $this->getTitlePosition() == $position;
     }
 
     /**
