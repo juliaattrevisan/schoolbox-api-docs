@@ -80,7 +80,6 @@ class CourseCreditSummary extends Base {
         foreach ($allResults as $current) {
             $letter = $current['StrippedResult'];
             $courseName = $current['CourseDescription'];
-            $allLetters = array('A', 'M', 'E');
 
             if (!is_array($finalStack['courses'][$courseName])) {
                 $finalStack['courses'][$courseName] = array(
@@ -104,7 +103,7 @@ class CourseCreditSummary extends Base {
             /* Achieved Accumulator
              * Only accumulate A/M/E values
              */
-            if (in_array($current['StrippedResult'], $allLetters)) {
+            if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
                 $finalStack['courses'][$courseName]['achieved'] += $current['ResultCredits'];
                 $finalStack['totals']['achieved'] += $current['ResultCredits'];
             }
@@ -117,6 +116,8 @@ class CourseCreditSummary extends Base {
                 $finalStack['totals']['attempted'] += $current['ResultCredits'];
             }
         }
+
+        ksort($finalStack['courses']);
 
         return $finalStack;
     }
