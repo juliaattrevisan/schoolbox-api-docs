@@ -54,11 +54,30 @@ abstract class Base {
     protected $currentYear = 0;
 
     /**
+     * All Letter Grades
+     *
      * A bunch of letters to obtain
      *
      * @var array
      */
     protected $letterRegistry = array('N', 'A', 'M', 'E');
+
+    /**
+     * Achievement Letter Grades
+     *
+     * @var array
+     */
+    protected $achievementLetterRegistry = array('A', 'M', 'E');
+
+    /**
+     * Exclusion Letter Grades
+     *
+     * These letters mean that the work was not attempted due to
+     * absence; no longer available for assessment
+     *
+     * @var array
+     */
+    protected $exclusionLetterRegistry = array('Y', 'V', 'Z');
 
     /**
      * Constructor
@@ -235,5 +254,45 @@ abstract class Base {
     public function getLetterRegistry()
     {
         return $this->letterRegistry;
+    }
+
+    /**
+     * Set achievement letter registry
+     *
+     * @param array $achievementLetterRegistry
+     */
+    protected function setAchievementLetterRegistry($achievementLetterRegistry)
+    {
+        $this->achievementLetterRegistry = $achievementLetterRegistry;
+    }
+
+    /**
+     * Get achievement letter registry
+     *
+     * @return array
+     */
+    public function getAchievementLetterRegistry()
+    {
+        return $this->achievementLetterRegistry;
+    }
+
+    /**
+     * Get exclusion letter registry
+     *
+     * @param array $exclusionLetterRegistry
+     */
+    protected function setExclusionLetterRegistry($exclusionLetterRegistry)
+    {
+        $this->exclusionLetterRegistry = $exclusionLetterRegistry;
+    }
+
+    /**
+     * Set exclusion letter registry
+     *
+     * @return array
+     */
+    public function getExclusionLetterRegistry()
+    {
+        return $this->exclusionLetterRegistry;
     }
 }

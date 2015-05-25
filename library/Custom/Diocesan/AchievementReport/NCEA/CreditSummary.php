@@ -118,8 +118,36 @@ class CreditSummary extends Base {
             }
 
             $finalStack[$level][$internalExternal]['enteredCredits'] += $current['EnteredCredits'];
-            $finalStack[$level][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
-            $finalStack[$level][$internalExternal]['availableCredits'] += ($current['EnteredCredits'] - $current['ResultCredits']);
+
+            /* Special case for N
+             *
+             * According to Sheeba,
+             * N = sum of enteredcredits where strippedresult=N  [when result is not achieved
+             * the resultscredit data is 0, hence use entered credits]
+             */
+            if (in_array($letter, array('N'))) {
+                $finalStack[$level][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
+
+                /* No net change for N ($current['EnteredCredits'] - $current['EnteredCredits'] = 0)
+                 * $finalStack[$level][$internalExternal]['availableCredits'] += 0;
+                 */
+            }
+            /* Regular summation for A, M, E
+             */
+            elseif (in_array($letter, $this->getAchievementLetterRegistry())) {
+                $finalStack[$level][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
+                $finalStack[$level][$internalExternal]['availableCredits'] += ($current['EnteredCredits'] - $current['ResultCredits']);
+            }
+            /* Other cases to exclude in Available Credits calculation
+             *
+             * According to Sheeba,
+             * Available = 1-2-(sum of enteredcredits where strippedresult=Y, V or Z)
+             * [when result of Y,V or Z is assigned due to absence or not attempting,
+             * it is no longer available for assessment]
+             */
+            elseif (in_array($letter, $this->getExclusionLetterRegistry())) {
+                $finalStack[$level][$internalExternal]['availableCredits'] -= $current['EnteredCredits'];
+            }
 
             /* Total Entered Credits = Internally Assessed Entered Credits + Externally Assessed Entered Credits
              *                       = sum(EnteredCredits)
@@ -187,7 +215,6 @@ class CreditSummary extends Base {
     private function findStandardType($allResults) {
         $finalStack = array();
         $unitTypeList = array('U');
-        $unitResultList = array('A', 'M', 'E');
         $achievementTypeList = array('A');
 
         foreach ($allResults as $current) {
@@ -202,7 +229,7 @@ class CreditSummary extends Base {
 
             /* Only accumulate some values
              */
-            if (in_array($current['StrippedResult'], $unitResultList)) {
+            if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
                 if (in_array($current['StandardType'], $unitTypeList)) {
                     $finalStack[$level]['unit'] += $current['ResultCredits'];
                 }
@@ -225,7 +252,6 @@ class CreditSummary extends Base {
      */
     private function findAssessmentType($allResults) {
         $finalStack = array();
-        $allLetters = array('A', 'M', 'E');
 
         foreach ($allResults as $current) {
             $level = $current['Level'];
@@ -243,7 +269,7 @@ class CreditSummary extends Base {
 
             /* Only accumulate some values
              */
-            if (in_array($current['StrippedResult'], $allLetters)) {
+            if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
                 $finalStack[$level][$internalExternal] += $current['ResultCredits'];
                 $finalStack[$level]['available'] -= $current['ResultCredits'];
             }
@@ -262,20 +288,19 @@ class CreditSummary extends Base {
      */
     private function findResult($allResults) {
         $finalStack = array();
-        $allLetters = array('A', 'M', 'E');
 
         foreach ($allResults as $current) {
             $level = $current['Level'];
 
             if (!is_array($finalStack[$level])) {
-                $finalStack[$level] = array_fill_keys($allLetters, 0);
+                $finalStack[$level] = array_fill_keys($this->getAchievementLetterRegistry(), 0);
             }
 
             $finalStack[$level]['available'] += $current['ResultCredits'];
 
             /* Only accumulate some values
              */
-            if (in_array($current['StrippedResult'], $allLetters)) {
+            if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
                 $finalStack[$level][$current['StrippedResult']] += $current['ResultCredits'];
                 $finalStack[$level]['available'] -= $current['ResultCredits'];
             }
