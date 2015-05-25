@@ -40,6 +40,10 @@ $(function () {
             scatter: {
                 color: 'rgba(0,102,176, .5)'
             }
+        },
+
+        credits: {
+            enabled: false
         }
     };
 
