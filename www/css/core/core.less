@@ -4242,20 +4242,30 @@ fieldset.calendarOptions fieldset {
 /*--------------------------------------------------------------
 ADMINV2/MESSAGES
 --------------------------------------------------------------*/
+.digest-settings.fade {
+    &:hover tr:not(.thead) {
+        td, th {
+            opacity: 0.3;
+        }
+    }
+    tr:not(.thead):hover {
+        td, th {
+            opacity: 1;
+        }
+    }
+    td, th {
+        transition: opacity 0.1s linear;
+    }
+}
+
 .digest-settings {
 	border-collapse: collapse;
-	&:hover tr:not(.thead) {
-		td, th {
-			opacity: 0.3;
-		}
-	}
 	tr:not(.thead) {
         height: 32px;
         line-height: 32px;
 		&:hover {
 			td, th {
-				opacity: 1;
-				background-color: @dark;
+				background-color: darken(@dark, 1%);
 			}
 			input + label {
 				background: darken(@dark, 10%);
@@ -4273,7 +4283,6 @@ ADMINV2/MESSAGES
 	td, th {
         overflow: hidden;
         border: none;
-        transition: opacity 0.1s linear;
 		position: relative;
         .actions {
             float: right;
