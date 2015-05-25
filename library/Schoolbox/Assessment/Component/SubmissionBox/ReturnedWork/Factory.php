@@ -63,6 +63,16 @@ class Factory
     private $attachments = array();
 
     /**
+     * Are attachments that are not set in $this->attachments removed?
+     *
+     * This defaults to false, because this is most often called from a form
+     * which doesn't have a file upload, and therefore passes no attachments.
+     *
+     * @var bool
+     */
+    private $removeUnsetAttachments = false;
+
+    /**
      * An instance of ReturnedWorkMapper
      *
      * @var ReturnedWorkMapper
@@ -109,16 +119,26 @@ class Factory
      * @param string $comment
      * @param array $rubric
      * @param array $attachments
+     * @param bool $removeUnsetAttachments
      * @param string $uuid
      */
-    public function __construct(User $user, SubmissionBox $submissionBox, $mark, $comment, $rubric, $attachments, $uuid)
-    {
+    public function __construct(
+        User $user,
+        SubmissionBox $submissionBox,
+        $mark,
+        $comment,
+        $rubric,
+        $attachments,
+        $removeUnsetAttachments,
+        $uuid
+    ) {
         $this->setUser($user);
         $this->setSubmissionBox($submissionBox);
         $this->setMark($mark);
         $this->setComment($comment);
         $this->setRubric($rubric);
         $this->setAttachments($attachments);
+        $this->setRemoveUnsetAttachments($removeUnsetAttachments);
         $this->setUuid($uuid);
 
         /* Internally used instances
@@ -348,9 +368,12 @@ class Factory
 
         try {
             $returnedWork->setStorage($factory->build($this->getAttachments())->getFirst());
-
         } catch (\Schoolbox\Resource\Exception $e) {
-            // noop
+            // No attachments from form:
+            // Remove them completely if it would have been set from the form.
+            if ($this->isRemoveUnsetAttachments()) {
+                $returnedWork->setStorage(null);
+            }
         }
     }
 
@@ -455,6 +478,25 @@ class Factory
     private function getAttachments()
     {
         return $this->attachments;
+    }
+
+    /**
+     * @return boolean
+     */
+    private function isRemoveUnsetAttachments()
+    {
+        return $this->removeUnsetAttachments;
+    }
+
+    /**
+     * @param  boolean $removeUnsetAttachments
+     *
+     * @return $this
+     */
+    private function setRemoveUnsetAttachments($removeUnsetAttachments)
+    {
+        $this->removeUnsetAttachments = $removeUnsetAttachments;
+        return $this;
     }
 
     /**

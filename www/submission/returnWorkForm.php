@@ -67,8 +67,13 @@ $rubric = $_POST['rubric'];
 $comment = $_POST['comment'];
 
 /* Optional file attachment
+ * If there is none - save this work without an attachment!
+ * Clear attachment only if a particular field is set?
  */
 $attachments = isset($_POST['attachment']) ? $_POST['attachment'] : array();
+
+// Are attachments cleared if none are provided?
+$removeUnsetAttachments = !empty($_POST['clearAttachments']);
 
 /* Crocodoc uuid, to view return independently of submission
  */
@@ -84,7 +89,16 @@ $redirect = $_POST['redirect'];
 
 /* Process the return's comments, marks, rubrics and uploads
  */
-$returnedWorkFactory = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\Factory($user, $submissionBox, $mark, $comment, $rubric, $attachments, $crocodoc);
+$returnedWorkFactory = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\Factory(
+    $user,
+    $submissionBox,
+    $mark,
+    $comment,
+    $rubric,
+    $attachments,
+    $removeUnsetAttachments,
+    $crocodoc
+);
 $returnedWork = $returnedWorkFactory->start();
 
 /* Go to St. Albans when finished
