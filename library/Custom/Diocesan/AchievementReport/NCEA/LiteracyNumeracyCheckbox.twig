@@ -3,7 +3,7 @@
 <ul>
     {% for checkboxName, selected in literacyNumeracyCheckbox.data %}
     <li>
-        <input type="checkbox" disabled {% if selected == 1 %}checked="checked"{% endif %} /> {{ checkboxName }}
+        <input type="checkbox" disabled {% if selected > 0 %}checked="checked"{% endif %} /> {{ checkboxName }}
     </li>
     {% endfor %}
 </ul>

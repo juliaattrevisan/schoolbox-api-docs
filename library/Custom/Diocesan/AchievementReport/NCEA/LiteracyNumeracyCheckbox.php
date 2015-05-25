@@ -40,23 +40,27 @@ class LiteracyNumeracyCheckbox extends Base {
                 (SELECT TOP 1 COUNT(*)
                  FROM SynergyOne.dbo.uvSchoolBoxNCEAResults
                  WHERE id = '{$this->getExternalUserId()}'
+                 AND UELiteracyMet = 'Y'
                  GROUP BY UELiteracyMet
-                )/COUNT(*) AS 'UE Literacy',
+                ) AS 'UE Literacy',
                 (SELECT TOP 1 COUNT(*)
                  FROM SynergyOne.dbo.uvSchoolBoxNCEAResults
                  WHERE id = '{$this->getExternalUserId()}'
+                 AND UENumeracyMet = 'Y'
                  GROUP BY UENumeracyMet
-                )/COUNT(*) AS 'UE Numeracy',
+                ) AS 'UE Numeracy',
                 (SELECT TOP 1 COUNT(*)
                  FROM SynergyOne.dbo.uvSchoolBoxNCEAResults
                  WHERE id = '{$this->getExternalUserId()}'
+                 AND Level1LiteracyMet = 'Y'
                  GROUP BY Level1LiteracyMet
-                )/COUNT(*) AS 'Level 1 Literacy',
+                ) AS 'Level 1 Literacy',
                 (SELECT TOP 1 COUNT(*)
                  FROM SynergyOne.dbo.uvSchoolBoxNCEAResults
                  WHERE id = '{$this->getExternalUserId()}'
+                 AND Level1NumeracyMet = 'Y'
                  GROUP BY Level1NumeracyMet
-                )/COUNT(*) AS 'Level 1 Numeracy'
+                ) AS 'Level 1 Numeracy'
             FROM
                 SynergyOne.dbo.uvSchoolBoxNCEAResults
             WHERE
@@ -66,6 +70,18 @@ class LiteracyNumeracyCheckbox extends Base {
         $result = $this->getDb()->getRow($query);
 
         if (is_array($result)) {
+
+            /* Cast everything as an int - mssql can return empty
+             * count value, which is a shame
+             */
+            foreach ($result as $key => &$value) {
+                $value += 0;
+            }
+
+            /* That stupid php bug
+             */
+            unset($value);
+
             return $result;
         }
 
