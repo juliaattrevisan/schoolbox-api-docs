@@ -39,7 +39,7 @@ class RoleMapper extends Mapper {
         $this->hasMap(array(
                 'column'     => 'can_change_password',
                 'property'   => 'canChangePassword',
-                'type'       => Mapper::TYPE_BOOLEAN,
+                'type'       => Mapper::TYPE_BOOL_ENUM,
         ));
 
         $this->hasMap(array(
