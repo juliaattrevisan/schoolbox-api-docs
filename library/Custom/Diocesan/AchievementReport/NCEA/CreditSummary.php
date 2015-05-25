@@ -106,17 +106,25 @@ class CreditSummary extends Base {
                     'IN' => array(
                         'enteredCredits' => 0,
                         'letters' => array_fill_keys($this->getLetterRegistry(), 0),
-                        'availableCredits' => 0
+                        'availableCredits' => 0,
                     ),
                     'EX' => array(
                         'enteredCredits' => 0,
                         'letters' => array_fill_keys($this->getLetterRegistry(), 0),
-                        'availableCredits' => 0
+                        'availableCredits' => 0,
                     )
                 );
             }
 
+            /* Total Entered Credits = Internally Assessed Entered Credits + Externally Assessed Entered Credits
+             *                       = sum(EnteredCredits)
+             */
+            $finalStack[$level]['totalEnteredCredits'] += $current['EnteredCredits'];
+
+            /* Entered Credits for a particular level and internal/external assessed type
+             */
             $finalStack[$level][$internalExternal]['enteredCredits'] += $current['EnteredCredits'];
+            $finalStack[$level][$internalExternal]['availableCredits'] += $current['EnteredCredits'];
 
             /* Exclude when Student Year = Current Year for Externally Assessed
              * Can't do this in the query; this data is actually conditionally accumulated.
@@ -132,16 +140,13 @@ class CreditSummary extends Base {
                  */
                 if (in_array($letter, array('N'))) {
                     $finalStack[$level][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
-
-                    /* No net change for N ($current['EnteredCredits'] - $current['EnteredCredits'] = 0)
-                     * $finalStack[$level][$internalExternal]['availableCredits'] += 0;
-                     */
+                    $finalStack[$level][$internalExternal]['availableCredits'] -= $current['EnteredCredits'];
                 }
                 /* Regular summation for A, M, E
                  */
                 elseif (in_array($letter, $this->getAchievementLetterRegistry())) {
                     $finalStack[$level][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
-                    $finalStack[$level][$internalExternal]['availableCredits'] += ($current['EnteredCredits'] - $current['ResultCredits']);
+                    $finalStack[$level][$internalExternal]['availableCredits'] -= $current['ResultCredits'];
                 }
                 /* Other cases to exclude in Available Credits calculation
                  *
@@ -154,15 +159,10 @@ class CreditSummary extends Base {
                     $finalStack[$level][$internalExternal]['availableCredits'] -= $current['EnteredCredits'];
                 }
             }
-
-            /* Total Entered Credits = Internally Assessed Entered Credits + Externally Assessed Entered Credits
-             *                       = sum(EnteredCredits)
-             */
-            $finalStack[$level]['totalEnteredCredits'] += $current['EnteredCredits'];
         }
 
         krsort($finalStack);
-
+        new \Alaress_Probe($finalStack);
         return $finalStack;
     }
 
