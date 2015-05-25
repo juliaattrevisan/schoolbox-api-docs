@@ -88,12 +88,12 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                 try {
                     $currentBox = $currentShowcasedItem->getSubmissionBox();
 
-                    $latestSubmission = $this->getLatestSubmission(
+                    $submission = $this->getLatestSubmission(
                         $this->getUser(),
                         $currentBox
                     );
 
-                    $latestReturn = $this->getLatestReturn(
+                    $return = $this->getLatestReturn(
                         $this->getUser(),
                         $currentBox
                     );
@@ -107,8 +107,8 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                     $allSubjects[$currentBox->getCategory()->getId()]['items'][] = array(
                         'currentBox' => $currentBox,
                         'currentShowcasedItem' => $currentShowcasedItem,
-                        'latestSubmission' => $latestSubmission,
-                        'latestReturn' => $latestReturn,
+                        'latestSubmission' => $submission,
+                        'latestReturn' => $return,
                     );
                 } catch (\Exception $e) {
                     /* Skip showcased work that has been linked to nonexistent submission box
@@ -119,9 +119,10 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
         /* Post-process!
          */
+        /** @var Schoolbox\User $currentUser */
+        $currentUser = $_SESSION['user'];
         if (count($allSubjects)) {
             foreach ($allSubjects as $currentSubject) {
-
                 /* Subject name
                  */
                 $this->getPage()->setVar(
@@ -134,29 +135,34 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                  */
                 if (count($currentSubject['items'])) {
                     foreach ($currentSubject['items'] as $currentItem) {
+                        /** @var Eportfolio\Showcase $showcase */
+                        /** @var Schoolbox\Assessment\Component\SubmissionBox $box */
+                        /** @var Schoolbox\Assessment\Component\SubmissionBox\Submission\File $submission */
+                        /** @var Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $return */
+                        $showcase   = $currentItem['currentShowcasedItem'];
+                        $box        = $currentItem['currentBox'];
+                        $submission = $currentItem['latestSubmission'];
+                        $return     = $currentItem['latestReturn'];
                         $this->getPage()->setVar(
                             array(
-                                'SHOWCASED_WORK_ITEM_ID' => $currentItem['currentShowcasedItem']->getId(),
-                                'SHOWCASED_WORK_ITEM_USER_ID' => $currentItem['currentShowcasedItem']->getUid(),
-                                'SHOWCASED_WORK_BOX_NAME' => $currentItem['currentBox']->getName(),
-                                'SHOWCASED_WORK_BOX_TYPE' => $currentItem['currentBox']->getWorkType()->getName(),
+                                'SHOWCASED_WORK_ITEM_ID' => $showcase->getId(),
+                                'SHOWCASED_WORK_ITEM_USER_ID' => $showcase->getUid(),
+                                'SHOWCASED_WORK_BOX_NAME' => $box->getName(),
+                                'SHOWCASED_WORK_BOX_TYPE' => $box->getWorkType()->getName(),
                                 'ON_OFF' => ++$j % 2 ? '' : 'dark'
                             )
                         );
 
                         /* Show submitted work information (if available)
                          */
-                        if ($currentItem['latestSubmission']) {
+                        if ($submission) {
                             $this->getPage()->setVar(
                                 array(
-                                    'SHOWCASED_WORK_SUBMISSION_ID' => $currentItem['latestSubmission']->getId(),
-                                    'SHOWCASED_WORK_SUBMISSION_FILESIZE' => Alaress_Byte_Format::bytesToString(
-                                            $currentItem['latestSubmission']->getSize()
-                                        ),
-                                    'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $currentItem['latestSubmission']->getCreatedAt(
-                                        )->getShort(),
-                                    'SHOWCASED_WORK_MIMETYPE_ICONFILE' => $currentItem['latestSubmission']->getMimetype(
-                                        )->getClass(),
+                                    'SHOWCASED_WORK_SUBMISSION_ID' => $submission->getId(),
+                                    'SHOWCASED_WORK_SUBMISSION_FILESIZE' =>
+                                        Alaress_Byte_Format::bytesToString($submission->getSize()),
+                                    'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $submission->getCreatedAt()->getShort(),
+                                    'SHOWCASED_WORK_MIMETYPE_ICONFILE' => $submission->getMimetype()->getClass(),
                                 )
                             );
 
@@ -176,12 +182,11 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
                         /* Show returned work information (if available)
                          */
-                        if ($currentItem['latestReturn']) {
+                        if ($return && $box->isMarkShownToRole($currentUser->getRole())) {
                             $this->getPage()->setVar(
                                 array(
-                                    'SHOWCASED_WORK_RETURNED_MARK' => $currentItem['latestReturn']->getMark(),
-                                    'SHOWCASED_WORK_RETURNED_GRADIENT' => $currentItem['latestReturn']->getGradientFromNormalizedMark(
-                                        ),
+                                    'SHOWCASED_WORK_RETURNED_MARK' => $return->getMark(),
+                                    'SHOWCASED_WORK_RETURNED_GRADIENT' => $return->getGradientFromNormalizedMark(),
                                 )
                             );
                         } else {
