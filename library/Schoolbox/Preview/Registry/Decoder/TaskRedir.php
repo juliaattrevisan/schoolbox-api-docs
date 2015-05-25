@@ -70,12 +70,12 @@ class TaskRedir extends Base {
                             /** @var UnitInstance $unit_instance */
                             $unit_instance = UnitInstanceMapper::getInstance()->findById($task->getUnitInstance()->getId());
                             // * Ensure that user is in this class
-                            /** @var Component_Instance $component */
+                            /** @var \Component_Instance $component */
                             $component_id   = $unit_instance->getComponent()->getId();
                             $component_list = \Component_InstanceMapper::getInstance()->findByInstanceId($component_id);
                             $component      = $component_list[$component_id];
 
-                            return '/homepage/'.$component->getIdentifier().'/';
+                            return '/homepage/'.$component->getIdentifier().'/#component'.$component_id;
                         }
 
                         break;
