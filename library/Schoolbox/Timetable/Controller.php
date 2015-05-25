@@ -60,6 +60,12 @@ class Controller extends Base
             $nearestDate = $previous ?
                 $this->getExternalTimetableHandler()->getPreviousDateForDayNumber($campusObj, $dayNumber, $date) :
                 $this->getExternalTimetableHandler()->getNextDateForDayNumber($campusObj, $dayNumber, $date);
+
+            $definition = $this->getExternalTimetableHandler()->getTimetableDefinition(
+                null,
+                $campusObj,
+                $dayNumber
+            );
         } catch (\InvalidArgumentException $e) {
             $code  = 400;
             $error = $e->getMessage();
@@ -76,6 +82,18 @@ class Controller extends Base
             $data['error'] = $error;
         } elseif (isset($nearestDate) && $nearestDate instanceof DateTime) {
             $data['date'] = $nearestDate->format('Y-m-d');
+            // Collate the definition into a list of start and end times
+            if (!empty($definition['desc'])) {
+                foreach ($definition['desc'] as $i => $desc) {
+                    if (isset($definition['start'][$i], $definition['end'][$i])) {
+                        $data['periods'][] = [
+                            'desc'  => $desc,
+                            'start' => date('H:i', strtotime($definition['start'][$i])),
+                            'end'   => date('H:i', strtotime($definition['end'][$i])),
+                        ];
+                    }
+                }
+            }
         }
         $this->response->status->setCode($code);
         $this->response->content->set(
