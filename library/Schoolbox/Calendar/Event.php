@@ -203,7 +203,7 @@ class Event
         $this->setUserCollection(new Collection());
         $this->setCategoryCollection(new Collection());
         $this->setRoleCollection(new Collection());
-
+        $this->setType(new EventType());
         $this->setup();
     }
 
