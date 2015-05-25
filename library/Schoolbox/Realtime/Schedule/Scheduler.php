@@ -15,6 +15,7 @@ use Alaress\Async\Notification\Postman;
 use Alaress\Scheduler\Cache\ICache;
 use Alaress\Scheduler\Stomp\ResolutionManager;
 use Alaress\Scheduler\StompScheduler;
+use Alaress\Scheduler\Trigger\CancelTrigger;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Exception;
@@ -267,10 +268,17 @@ class Scheduler extends StompScheduler
      */
     public function scheduleNotification($trigger, $resolver = null)
     {
-        if ($resolver instanceof AckResolver) {
-            $this->attachResolverTrigger($resolver, $trigger);
-        } else {
-            $this->log->warning("No resolver supplied for attaching trigger");
+        // if this is a cancel trigger, we're not going to even attempt attaching a resolver for it
+        if (!$trigger instanceof CancelTrigger) {
+
+            // if we have a resolver, attach it
+            if ($resolver instanceof AckResolver) {
+                $this->attachResolverTrigger($resolver, $trigger);
+
+            } else {
+                // it's not the end of the world, but it might indicate a problem
+                $this->log->warning("No resolver supplied for attaching trigger");
+            }
         }
 
         parent::scheduleNotification($trigger);
