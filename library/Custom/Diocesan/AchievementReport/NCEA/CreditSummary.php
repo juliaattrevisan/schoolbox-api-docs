@@ -180,6 +180,7 @@ class CreditSummary extends Base {
          */
         foreach ($allResults as $current) {
             $level = $current['Level'];
+            $internalExternal = $current['InternalorExternalAssessment'];
 
             if (!is_array($finalStack[$level])) {
                 $finalStack[$level] = array(
@@ -191,16 +192,23 @@ class CreditSummary extends Base {
                 $totalEnteredCredits[$level] = 0;
             }
 
-            /* Sum of A, M, E values from both Internally Assessed
-             * and Externally Assessed types
+            /* Exclude when Student Year = Current Year for Externally Assessed
+             * Can't do this in the query; this data is actually conditionally accumulated.
+             * Some places accumulate these values; other places don't.
              */
-            if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
-                $finalStack[$level]['achieved'] += $current['ResultCredits'];
-            }
-            /* Special treatment
-             */
-            elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry()) || in_array($current['StrippedResult'], array('N'))) {
-                $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
+            if (!(($internalExternal == 'EX') && ($current['StudentYear'] == $this->getCurrentYear()))) {
+
+                /* Sum of A, M, E values from both Internally Assessed
+                 * and Externally Assessed types
+                 */
+                if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
+                    $finalStack[$level]['achieved'] += $current['ResultCredits'];
+                }
+                /* Special treatment
+                 */
+                elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry()) || in_array($current['StrippedResult'], array('N'))) {
+                    $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
+                }
             }
 
             $totalEnteredCredits[$level] += $current['EnteredCredits'];
