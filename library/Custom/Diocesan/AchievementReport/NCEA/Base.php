@@ -37,4 +37,26 @@ abstract class Base extends AchievementReportBase {
 
         return $explorer;
     }
+
+    /**
+     * Decide whether this record should be ignored
+     *
+     * Exclude when Student Year = Current Year for Externally Assessed
+     * Can't do this in the query; this data is actually conditionally accumulated.
+     * Some places accumulate these values; other places don't.
+     *
+     * @param $internalExternal
+     * @param $studentYear
+     * @return bool
+     */
+    protected function includeData($internalExternal, $studentYear) {
+        $currentYearSelected = ($studentYear == $this->getCurrentYear());
+        $externallyAssessed = ($internalExternal == 'EX');
+
+        if (!$externallyAssessed || !$currentYearSelected) {
+            return true;
+        }
+
+        return false;
+    }
 }
