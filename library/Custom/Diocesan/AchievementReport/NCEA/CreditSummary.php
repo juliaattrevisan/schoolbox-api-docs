@@ -245,6 +245,7 @@ class CreditSummary extends Base {
                 $finalStack[$level] = array(
                     'unit' => 0,
                     'achievement' => 0,
+                    'available' => 0,
                     'exclusions' => 0,
                 );
 
@@ -280,7 +281,7 @@ class CreditSummary extends Base {
         /* Accumulate "Available" values
          */
         foreach ($finalStack as $level => $totals) {
-            $finalStack[$level]['available'] = $totalEnteredCredits[$level] - $totals['achievement'] - $finalStack[$level]['exclusions'];
+            $finalStack[$level]['available'] = $totalEnteredCredits[$level] - $totals['unit'] - $totals['achievement'] - $finalStack[$level]['exclusions'];
         }
 
         krsort($finalStack);
