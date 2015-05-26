@@ -220,13 +220,13 @@ class Mapper extends Schoolbox\Mapper implements Receiver
     /**
      * Accept a new file upload
      *
-     * @param string $filename
+     * @param string $basename
      * @param string $tempLocation
      * @param bool   $public
      * @throws File\Exception
      * @return Model
      */
-    public function accept($filename, $tempLocation, $public = true)
+    public function accept($basename, $tempLocation, $public = true)
     {
         /** @var MimetypeMapper $mtm */
         $mtm = $this->getJoinMapper('allowedFileExtension');
@@ -242,10 +242,10 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         $storage->setPath($tempLocation);
 
         // set filetype metadata
-        $storage->setFilename(pathinfo($filename, PATHINFO_FILENAME));
-        $storage->setExtension(pathinfo($filename, PATHINFO_EXTENSION));
+        $storage->setFilename(pathinfo($basename, PATHINFO_FILENAME));
+        $storage->setExtension(pathinfo($basename, PATHINFO_EXTENSION));
         try {
-            $storage->setMimetype($mtm->getByFilename($filename));
+            $storage->setMimetype($mtm->getByFilename($basename));
         } catch (File\Exception $e) {
             // noop. we are going to allow the mime to remain NULL, which will shortly be caught in the safetyCheck
         }
