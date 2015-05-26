@@ -126,11 +126,7 @@ class CreditSummary extends Base {
             $finalStack[$level][$internalExternal]['enteredCredits'] += $current['EnteredCredits'];
             $finalStack[$level][$internalExternal]['availableCredits'] += $current['EnteredCredits'];
 
-            /* Exclude when Student Year = Current Year for Externally Assessed
-             * Can't do this in the query; this data is actually conditionally accumulated.
-             * Some places accumulate these values; other places don't.
-             */
-            if (!(($internalExternal == 'EX') && ($current['StudentYear'] == $this->getCurrentYear()))) {
+            if ($this->includeData($internalExternal, $current['StudentYear'])) {
 
                 /* Special case for N
                  *
@@ -192,11 +188,7 @@ class CreditSummary extends Base {
                 $totalEnteredCredits[$level] = 0;
             }
 
-            /* Exclude when Student Year = Current Year for Externally Assessed
-             * Can't do this in the query; this data is actually conditionally accumulated.
-             * Some places accumulate these values; other places don't.
-             */
-            if (!(($internalExternal == 'EX') && ($current['StudentYear'] == $this->getCurrentYear()))) {
+            if ($this->includeData($internalExternal, $current['StudentYear'])) {
 
                 /* Sum of A, M, E values from both Internally Assessed
                  * and Externally Assessed types
@@ -251,11 +243,7 @@ class CreditSummary extends Base {
                 $totalEnteredCredits[$level] = 0;
             }
 
-            /* Exclude when Student Year = Current Year for Externally Assessed
-             * Can't do this in the query; this data is actually conditionally accumulated.
-             * Some places accumulate these values; other places don't.
-             */
-            if (!(($internalExternal == 'EX') && ($current['StudentYear'] == $this->getCurrentYear()))) {
+            if ($this->includeData($internalExternal, $current['StudentYear'])) {
 
                 /* Only accumulate some values
                  */
@@ -313,11 +301,7 @@ class CreditSummary extends Base {
                 $totalEnteredCredits[$level] = 0;
             }
 
-            /* Exclude when Student Year = Current Year for Externally Assessed
-             * Can't do this in the query; this data is actually conditionally accumulated.
-             * Some places accumulate these values; other places don't.
-             */
-            if (!(($internalExternal == 'EX') && ($current['StudentYear'] == $this->getCurrentYear()))) {
+            if ($this->includeData($internalExternal, $current['StudentYear'])) {
 
                 /* Only accumulate some values
                  */
@@ -370,11 +354,7 @@ class CreditSummary extends Base {
 
             $totalEnteredCredits[$level] += $current['EnteredCredits'];
 
-            /* Exclude when Student Year = Current Year for Externally Assessed
-             * Can't do this in the query; this data is actually conditionally accumulated.
-             * Some places accumulate these values; other places don't.
-             */
-            if (!(($internalExternal == 'EX') && ($current['StudentYear'] == $this->getCurrentYear()))) {
+            if ($this->includeData($internalExternal, $current['StudentYear'])) {
 
                 /* Only accumulate some values
                  */
@@ -398,5 +378,27 @@ class CreditSummary extends Base {
         krsort($finalStack);
 
         return $finalStack;
+    }
+
+    /**
+     * Decide whether this record should be ignored
+     *
+     * Exclude when Student Year = Current Year for Externally Assessed
+     * Can't do this in the query; this data is actually conditionally accumulated.
+     * Some places accumulate these values; other places don't.
+     *
+     * @param $internalExternal
+     * @param $studentYear
+     * @return bool
+     */
+    private function includeData($internalExternal, $studentYear) {
+        $currentYearSelected = ($studentYear == $this->getCurrentYear());
+        $externallyAssessed = ($internalExternal == 'EX');
+
+        if (!$externallyAssessed || !$currentYearSelected) {
+            return true;
+        }
+
+        return false;
     }
 }
