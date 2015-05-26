@@ -55,9 +55,9 @@ class ExternalFileSystemHandler extends FileSystemHandler {
         }
 
         $tempFilename = $this->fetcher->fetchToFile($file->getId());
-        $filename     = $file->getFilename();
+        $basename     = $file->getBasename();
 
-        $storage = $this->receiver->accept($filename, $tempFilename, false);
+        $storage = $this->receiver->accept($basename, $tempFilename, false);
 
         if ($this->wrapper) {
             return $this->wrapper->wrap($storage);
