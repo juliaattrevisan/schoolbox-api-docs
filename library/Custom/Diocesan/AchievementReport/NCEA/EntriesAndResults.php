@@ -162,8 +162,7 @@ class EntriesAndResults extends Base {
                 Result,
                 StrippedResult,
                 ResultCredits,
-                StudentYear,
-                CAST(CASE WHEN StudentYear = '{$this->getCurrentYear()}' AND InternalorExternalAssessment = 'EX' THEN 1 ELSE 0 END AS bit) AS ResultBrackets
+                StudentYear
             FROM
                 SynergyOne.dbo.uvSchoolBoxNCEAResults
             WHERE
