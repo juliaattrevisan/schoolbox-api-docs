@@ -143,11 +143,14 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
             throw new InvalidArgumentException('Not a file');
         }
 
+        $filename  = pathinfo($item['name'], PATHINFO_FILENAME);
+        $extension = pathinfo($item['name'], PATHINFO_EXTENSION);
+
         $file = Resource\File\Mapper::getInstance()->createModel();
         $file->setId($item['id']);
-        $file->setFilename(pathinfo($item['name'],PATHINFO_FILENAME));
-        $file->getStorage()->setExtension(pathinfo($item['name'],PATHINFO_EXTENSION));
-        $file->setTitle($item['name']);
+        $file->setFilename($filename);
+        $file->getStorage()->setExtension($extension);
+        $file->setTitle($filename);
         $file->setSize($item['size']);
 
         // TODO @armatronic why is this exploding?
