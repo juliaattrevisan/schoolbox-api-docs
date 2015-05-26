@@ -13,7 +13,6 @@ use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\File;
 
 class ActivityFactory {
 
@@ -75,10 +74,10 @@ class ActivityFactory {
 	}
 
 	/**
-	 * @param File $submission
+	 * @param Submission\File $submission
 	 * @return Activity
 	 */
-	public function buildFromStudentSubmission(File $submission) {
+	public function buildFromStudentSubmission(Submission\File $submission) {
 		$activity = new Activity();
 		$activity
 			->setEvent('submitted')

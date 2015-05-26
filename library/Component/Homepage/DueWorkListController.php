@@ -94,7 +94,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
         $userId            = $_SESSION['id'];
         if ($isStudent) {
             $box_id_list       = $this->submissionList->getColumnValues('id');
-            $submission_counts = SubmissionBox\SubmissionMapper::getInstance()->findCountsForSubmissionBoxes(
+            $submission_counts = SubmissionBox\Submission\FileMapper::getInstance()->findCountsForSubmissionBoxes(
                 $box_id_list,
                 $userId
             );
