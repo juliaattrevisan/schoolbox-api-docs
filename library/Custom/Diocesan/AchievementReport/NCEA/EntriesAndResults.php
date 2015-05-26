@@ -135,7 +135,6 @@ class EntriesAndResults extends Base {
 
         ksort($finalStack);
 
-        new \Alaress_Probe($finalStack);
         return $finalStack;
     }
 
