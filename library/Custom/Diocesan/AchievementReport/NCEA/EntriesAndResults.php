@@ -38,6 +38,7 @@ class EntriesAndResults extends Base {
     public function findData()
     {
         $finalStack = array();
+        $totalEnteredCredits = array();
 
         $allResults = $this->findEntries();
 
@@ -45,6 +46,7 @@ class EntriesAndResults extends Base {
             $courseName = $current['CourseDescription'];
             $internalExternal = $current['InternalorExternalAssessment'];
             $letter = $current['StrippedResult'];
+            $level = $current['Level'];
 
             /* Teachers
              * Trim empty teachers out for course teachers
@@ -93,24 +95,47 @@ class EntriesAndResults extends Base {
                         )
                     )
                 );
+
+                $totalEnteredCredits[$level] = array(
+                    'IN' => 0,
+                    'EX' => 0
+                );
             }
+
+            $totalEnteredCredits[$level][$internalExternal] += $current['EnteredCredits'];
 
             $finalStack[$courseName]['summary']['level'] = $current['Level'];
             $finalStack[$courseName]['summary']['totalEnteredCredits'] += $current['EnteredCredits'];
             $finalStack[$courseName]['summary']['type'][$internalExternal]['enteredCredits'] += $current['EnteredCredits'];
 
-            if (in_array($letter, array('N'))) {
-                $finalStack[$courseName]['summary']['type'][$internalExternal]['availableCredits'] += ($current['EnteredCredits'] - $current['ResultCredits']);
-                $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
+            /* Special treatment for the little table corresponding
+             * to each subject
+             */
+            if ($current['StudentYear'] == $this->getCurrentYear()) {
+                if (!$this->isProgressive($current['Result'])) {
+                    if (in_array($letter, array('N'))) {
+                        $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
+                    }
+                    else {
+                        $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
+                        $finalStack[$courseName]['summary']['type'][$internalExternal]['availableCredits'] += $current['EnteredCredits'] - $current['ResultCredits'];
+                    }
+                }
             }
             else {
-                $finalStack[$courseName]['summary']['type'][$internalExternal]['availableCredits'] += ($current['EnteredCredits'] - $current['ResultCredits']);
-                $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
+                if (in_array($letter, array('N'))) {
+                    $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
+                }
+                else {
+                    $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
+                    $finalStack[$courseName]['summary']['type'][$internalExternal]['availableCredits'] += $current['EnteredCredits'] - $current['ResultCredits'];
+                }
             }
         }
 
         ksort($finalStack);
 
+        new \Alaress_Probe($finalStack);
         return $finalStack;
     }
 
@@ -137,6 +162,7 @@ class EntriesAndResults extends Base {
                 Result,
                 StrippedResult,
                 ResultCredits,
+                StudentYear,
                 CAST(CASE WHEN StudentYear = '{$this->getCurrentYear()}' AND InternalorExternalAssessment = 'EX' THEN 1 ELSE 0 END AS bit) AS ResultBrackets
             FROM
                 SynergyOne.dbo.uvSchoolBoxNCEAResults
