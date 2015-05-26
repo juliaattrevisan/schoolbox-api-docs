@@ -69,6 +69,7 @@ class EntriesAndResults extends Base {
                 'StandardTitle' => $current['StandardTitle'],
                 'Level' => $current['Level'],
                 'EnteredCredits' => $current['EnteredCredits'],
+                'Result' => $current['Result'],
                 'StrippedResult' => $current['StrippedResult'],
                 'ResultBrackets' => $current['ResultBrackets']
             );
@@ -97,8 +98,15 @@ class EntriesAndResults extends Base {
             $finalStack[$courseName]['summary']['level'] = $current['Level'];
             $finalStack[$courseName]['summary']['totalEnteredCredits'] += $current['EnteredCredits'];
             $finalStack[$courseName]['summary']['type'][$internalExternal]['enteredCredits'] += $current['EnteredCredits'];
-            $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
-            $finalStack[$courseName]['summary']['type'][$internalExternal]['availableCredits'] += ($current['EnteredCredits'] - $current['ResultCredits']);
+
+            if (in_array($letter, array('N'))) {
+                $finalStack[$courseName]['summary']['type'][$internalExternal]['availableCredits'] += ($current['EnteredCredits'] - $current['ResultCredits']);
+                $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
+            }
+            else {
+                $finalStack[$courseName]['summary']['type'][$internalExternal]['availableCredits'] += ($current['EnteredCredits'] - $current['ResultCredits']);
+                $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
+            }
         }
 
         ksort($finalStack);
@@ -126,6 +134,7 @@ class EntriesAndResults extends Base {
                 StandardTitle,
                 Level,
                 EnteredCredits,
+                Result,
                 StrippedResult,
                 ResultCredits,
                 CAST(CASE WHEN StudentYear = '{$this->getCurrentYear()}' AND InternalorExternalAssessment = 'EX' THEN 1 ELSE 0 END AS bit) AS ResultBrackets

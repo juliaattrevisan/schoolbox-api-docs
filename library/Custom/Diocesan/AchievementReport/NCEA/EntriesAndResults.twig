@@ -37,13 +37,7 @@
             <td>{{ currentEntry.StandardTitle }}</td>
             <td class="centered numeric">{{ currentEntry.Level }}</td>
             <td class="centered numeric">{{ currentEntry.EnteredCredits }}</td>
-            <td class="centered numeric">
-                {% if (currentEntry.ResultBrackets == 1) and (currentEntry.StrippedResult|length > 0) %}
-                [{{ currentEntry.StrippedResult }}]
-                {% else %}
-                {{ currentEntry.StrippedResult }}
-                {% endif %}
-            </td>
+            <td class="centered numeric">{{ currentEntry.Result }}</td>
         </tr>
         {% endfor %}
     </tbody>
