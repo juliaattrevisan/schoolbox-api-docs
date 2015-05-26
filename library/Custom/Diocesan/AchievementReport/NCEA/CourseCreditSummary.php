@@ -98,7 +98,7 @@ class CourseCreditSummary extends Base {
 
             /* Only accumulate nonprogressive results
              */
-            if (!preg_match('/\[['.implode('', $this->getLetterRegistry()).']\]/', $current['Result'])) {
+            if (!$this->isProgressive($current['Result'])) {
 
                 /* Letter accumulator
                  */
@@ -126,5 +126,16 @@ class CourseCreditSummary extends Base {
         ksort($finalStack['courses']);
 
         return $finalStack;
+    }
+
+    /**
+     * Determine if this result is progressive
+     * (has square brackets around Result value)
+     *
+     * @param $result
+     * @return bool
+     */
+    private function isProgressive($result) {
+        return preg_match('/\[['.implode('', $this->getLetterRegistry()).']\]/', $result);
     }
 }
