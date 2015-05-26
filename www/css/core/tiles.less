@@ -28,6 +28,24 @@ ul.tileList {
     &.contained {
       background-size: contain;
     }
+    &.background-top {
+      background-position-y: top;
+    }
+    &.background-middle {
+      background-position-y: center;
+    }
+    &.background-bottom {
+      background-position-y: bottom;
+    }
+    &.background-left {
+      background-position-x: left;
+    }
+    &.background-center {
+      background-position-x: center;
+    }
+    &.background-right {
+      background-position-x: right;
+    }
     &.marked-for-delete {
       // Fade out tiles marked for delete
       filter: grayscale(1);
@@ -58,25 +76,25 @@ ul.tileList {
       font-size: 2em;
       padding: 1em;
       box-sizing: border-box;
-      &.position-top {
+      &.text-top {
         top: 0;
       }
-      &.position-middle {
+      &.text-middle {
         // Yes, this works in IE9!
         top: 50%;
         left: 50%;
         .transform(translateX(-50%) translateY(-50%));
       }
-      &.position-bottom {
+      &.text-bottom {
         bottom: 0;
       }
-      &.align-left {
+      &.text-left {
         text-align: left;
       }
-      &.align-center {
+      &.text-center {
         text-align: center;
       }
-      &.align-right {
+      &.text-right {
         text-align: right;
       }
     }
@@ -132,7 +150,7 @@ ul.tileList {
 }
 
 #tile-modify-form {
-  .title-position/*, .title-color, .background-color*/ {
+  .title-position, .background-position {
     label {
       display: inline;
       &.error {
@@ -144,6 +162,9 @@ ul.tileList {
     label {
       min-width: 7em;
     }
+  }
+  .position-selector {
+    width: auto;
   }
 }
 #tile-layout-form {

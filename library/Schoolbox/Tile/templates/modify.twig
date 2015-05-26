@@ -54,6 +54,16 @@
                         });
                     });
         }
+
+        // Show/hide background position
+        var backgroundPositioner = form.find('[data-background-position]');
+        form.find('input[name="background_image_contained"]').change(function(event) {
+            if (Number(this.value)) {
+                backgroundPositioner.slideDown('fast');
+            } else {
+                backgroundPositioner.slideUp('fast');
+            }
+        });
     })
 })(jQuery);
 </script>
@@ -105,18 +115,90 @@
                     </dd>
                     <dt>Position</dt>
                     <dd class="title-position">
-                        <input type="radio"
-                               id="title_position_top"
-                               name="title_position"
-                               value="{{ constant('TITLE_POSITION_TOP', item) }}"
-                               {% if item.isTitlePositionTop() %}checked{% endif %} />
-                        <label for="title_position_top">Top</label>
-                        <input type="radio"
-                               id="title_position_bottom"
-                               name="title_position"
-                               value="{{ constant('TITLE_POSITION_BOTTOM', item) }}"
-                               {% if item.isTitlePositionBottom() %}checked{% endif %} />
-                        <label for="title_position_bottom">Bottom</label>
+                        <table class="table position-selector">
+                            <thead>
+                            <tr>
+                                <th>&nbsp;</th>
+                                <th>Left</th>
+                                <th>Center</th>
+                                <th>Right</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <th>Top</th>
+                                <td>
+                                    <input type="radio"
+                                           id="title_position_topleft"
+                                           name="title_position"
+                                           value="{{ constant('POSITION_TOPLEFT', item) }}"
+                                           {% if item.isTitlePosition(constant('POSITION_TOPLEFT', item)) %}checked{% endif %} />
+                                </td>
+                                <td>
+                                    <input type="radio"
+                                           id="title_position_top"
+                                           name="title_position"
+                                           value="{{ constant('POSITION_TOP', item) }}"
+                                           {% if item.isTitlePosition(constant('POSITION_TOP', item)) %}checked{% endif %} />
+                                </td>
+                                <td>
+                                    <input type="radio"
+                                           id="title_position_topright"
+                                           name="title_position"
+                                           value="{{ constant('POSITION_TOPRIGHT', item) }}"
+                                           {% if item.isTitlePosition(constant('POSITION_TOPRIGHT', item)) %}checked{% endif %} />
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Middle</th>
+                                <td>
+                                    <input type="radio"
+                                           id="title_position_left"
+                                           name="title_position"
+                                           value="{{ constant('POSITION_LEFT', item) }}"
+                                           {% if item.isTitlePosition(constant('POSITION_LEFT', item)) %}checked{% endif %} />
+                                </td>
+                                <td>
+                                    <input type="radio"
+                                           id="title_position_center"
+                                           name="title_position"
+                                           value="{{ constant('POSITION_CENTER', item) }}"
+                                           {% if item.isTitlePosition(constant('POSITION_CENTER', item)) %}checked{% endif %} />
+                                </td>
+                                <td>
+                                    <input type="radio"
+                                           id="title_position_right"
+                                           name="title_position"
+                                           value="{{ constant('POSITION_RIGHT', item) }}"
+                                           {% if item.isTitlePosition(constant('POSITION_RIGHT', item)) %}checked{% endif %} />
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Bottom</th>
+                                <td>
+                                    <input type="radio"
+                                           id="title_position_bottomleft"
+                                           name="title_position"
+                                           value="{{ constant('POSITION_BOTTOMLEFT', item) }}"
+                                           {% if item.isTitlePosition(constant('POSITION_BOTTOMLEFT', item)) %}checked{% endif %} />
+                                </td>
+                                <td>
+                                    <input type="radio"
+                                           id="title_position_bottom"
+                                           name="title_position"
+                                           value="{{ constant('POSITION_BOTTOM', item) }}"
+                                           {% if item.isTitlePosition(constant('POSITION_BOTTOM', item)) %}checked{% endif %} />
+                                </td>
+                                <td>
+                                    <input type="radio"
+                                           id="title_position_bottomright"
+                                           name="title_position"
+                                           value="{{ constant('POSITION_BOTTOMRIGHT', item) }}"
+                                           {% if item.isTitlePosition(constant('POSITION_BOTTOMRIGHT', item)) %}checked{% endif %} />
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </dd>
                 </dl>
             </td>
@@ -174,7 +256,94 @@
                                name="background_image_contained"
                                value="1"
                                {% if item.backgroundImageContained %}checked{% endif %} />
-                        <label for="background_image_contained_1">Shrink to fit within tile</label>
+                        <label for="background_image_contained_1">Resize to fit within tile</label>
+                    </dd>
+                    <dt {% if not item.backgroundImageContained %}class="hide"{% endif %} data-background-position>Position</dt>
+                    <dd class="{% if not item.backgroundImageContained %}hide{% endif %} background-position" data-background-position>
+                        <table class="table position-selector">
+                            <thead>
+                            <tr>
+                                <th>&nbsp;</th>
+                                <th>Left</th>
+                                <th>Center</th>
+                                <th>Right</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <th>Top</th>
+                                <td>
+                                    <input type="radio"
+                                           id="background_position_topleft"
+                                           name="background_position"
+                                           value="{{ constant('POSITION_TOPLEFT', item) }}"
+                                           {% if item.isBackgroundPosition(constant('POSITION_TOPLEFT', item)) %}checked{% endif %} />
+                                </td>
+                                <td>
+                                    <input type="radio"
+                                           id="background_position_top"
+                                           name="background_position"
+                                           value="{{ constant('POSITION_TOP', item) }}"
+                                           {% if item.isBackgroundPosition(constant('POSITION_TOP', item)) %}checked{% endif %} />
+                                </td>
+                                <td>
+                                    <input type="radio"
+                                           id="background_position_topright"
+                                           name="background_position"
+                                           value="{{ constant('POSITION_TOPRIGHT', item) }}"
+                                           {% if item.isBackgroundPosition(constant('POSITION_TOPRIGHT', item)) %}checked{% endif %} />
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Middle</th>
+                                <td>
+                                    <input type="radio"
+                                           id="background_position_left"
+                                           name="background_position"
+                                           value="{{ constant('POSITION_LEFT', item) }}"
+                                           {% if item.isBackgroundPosition(constant('POSITION_LEFT', item)) %}checked{% endif %} />
+                                </td>
+                                <td>
+                                    <input type="radio"
+                                           id="background_position_center"
+                                           name="background_position"
+                                           value="{{ constant('POSITION_CENTER', item) }}"
+                                           {% if item.isBackgroundPosition(constant('POSITION_CENTER', item)) %}checked{% endif %} />
+                                </td>
+                                <td>
+                                    <input type="radio"
+                                           id="background_position_right"
+                                           name="background_position"
+                                           value="{{ constant('POSITION_RIGHT', item) }}"
+                                           {% if item.isBackgroundPosition(constant('POSITION_RIGHT', item)) %}checked{% endif %} />
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Bottom</th>
+                                <td>
+                                    <input type="radio"
+                                           id="background_position_bottomleft"
+                                           name="background_position"
+                                           value="{{ constant('POSITION_BOTTOMLEFT', item) }}"
+                                           {% if item.isBackgroundPosition(constant('POSITION_BOTTOMLEFT', item)) %}checked{% endif %} />
+                                </td>
+                                <td>
+                                    <input type="radio"
+                                           id="background_position_bottom"
+                                           name="background_position"
+                                           value="{{ constant('POSITION_BOTTOM', item) }}"
+                                           {% if item.isBackgroundPosition(constant('POSITION_BOTTOM', item)) %}checked{% endif %} />
+                                </td>
+                                <td>
+                                    <input type="radio"
+                                           id="background_position_bottomright"
+                                           name="background_position"
+                                           value="{{ constant('POSITION_BOTTOMRIGHT', item) }}"
+                                           {% if item.isBackgroundPosition(constant('POSITION_BOTTOMRIGHT', item)) %}checked{% endif %} />
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </dd>
                 </dl>
             </td>

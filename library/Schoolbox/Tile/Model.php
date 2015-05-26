@@ -18,18 +18,67 @@ use Schoolbox\ISoftDeletable;
 class Model implements ISoftDeletable, \JsonSerializable
 {
     /**
-     * Value of $titlePosition for when it's at the bottom.
+     * Value of $titlePosition for when it's at the top left.
      *
      * @var int
      */
-    const TITLE_POSITION_BOTTOM = 2;
+    const POSITION_TOPLEFT = 7;
 
     /**
      * Value of $titlePosition for when it's at the top.
      *
      * @var int
      */
-    const TITLE_POSITION_TOP = 1;
+    const POSITION_TOP = 8;
+
+    /**
+     * Value of $titlePosition for when it's at the top right.
+     *
+     * @var int
+     */
+    const POSITION_TOPRIGHT = 9;
+
+    /**
+     * Value of $titlePosition for when it's at the left.
+     *
+     * @var int
+     */
+    const POSITION_LEFT = 4;
+
+    /**
+     * Value of $titlePosition for when it's at the center.
+     *
+     * @var int
+     */
+    const POSITION_CENTER = 5;
+
+    /**
+     * Value of $titlePosition for when it's at the right.
+     *
+     * @var int
+     */
+    const POSITION_RIGHT = 6;
+
+    /**
+     * Value of $titlePosition for when it's at the bottom left.
+     *
+     * @var int
+     */
+    const POSITION_BOTTOMLEFT = 1;
+
+    /**
+     * Value of $titlePosition for when it's at the bottom.
+     *
+     * @var int
+     */
+    const POSITION_BOTTOM = 2;
+
+    /**
+     * Value of $titlePosition for when it's at the bottom right.
+     *
+     * @var int
+     */
+    const POSITION_BOTTOMRIGHT = 3;
 
     /**
      * The primary key of this tile
@@ -63,7 +112,12 @@ class Model implements ISoftDeletable, \JsonSerializable
     /**
      * @var int
      */
-    protected $titlePosition = self::TITLE_POSITION_TOP;
+    protected $titlePosition = self::POSITION_TOP;
+
+    /**
+     * @var int
+     */
+    protected $backgroundPosition = self::POSITION_CENTER;
 
     /**
      * @var string
@@ -295,6 +349,25 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
+     * @return int
+     */
+    public function getBackgroundPosition()
+    {
+        return $this->backgroundPosition;
+    }
+
+    /**
+     * @param  int $backgroundPosition
+     *
+     * @return $this
+     */
+    public function setBackgroundPosition($backgroundPosition)
+    {
+        $this->backgroundPosition = $backgroundPosition;
+        return $this;
+    }
+
+    /**
      * @param  string $titleText
      * @return $this
      */
@@ -403,21 +476,92 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
+     * Is this tile's title in the given position?
+     *
+     * @param int $position One of the self::POSITION_* constants
+     *
      * @return bool
      */
-    public function isTitlePositionTop()
+    public function isTitlePosition($position)
     {
-        return $this->getTitlePosition() == self::TITLE_POSITION_TOP;
+        return $this->getTitlePosition() == $position;
     }
 
     /**
-     * @return bool
+     * What's the style for this element's title's position?
+     *
+     * @return string
      */
-    public function isTitlePositionBottom()
+    public function getTitlePositionStyle()
     {
-        return $this->getTitlePosition() == self::TITLE_POSITION_BOTTOM;
+        switch ($this->getTitlePosition()) {
+            case self::POSITION_TOPLEFT:
+                return 'text-top text-left';
+            case self::POSITION_TOP:
+                return 'text-top text-center';
+            case self::POSITION_TOPRIGHT:
+                return 'text-top text-right';
+            case self::POSITION_LEFT:
+                return 'text-middle text-left';
+            case self::POSITION_CENTER:
+                return 'text-middle text-center';
+            case self::POSITION_RIGHT:
+                return 'text-middle text-right';
+            case self::POSITION_BOTTOMLEFT:
+                return 'text-bottom text-left';
+            case self::POSITION_BOTTOM:
+                return 'text-bottom text-center';
+            case self::POSITION_BOTTOMRIGHT:
+                return 'text-bottom text-right';
+            default:
+                // Top
+                return 'text-top text-center';
+        }
     }
 
+    /**
+     * Is this tile's background in the given position?
+     *
+     * @param int $position One of the self::POSITION_* constants
+     *
+     * @return bool
+     */
+    public function isBackgroundPosition($position)
+    {
+        return $this->getBackgroundPosition() == $position;
+    }
+
+    /**
+     * What's the style for this element's background position?
+     *
+     * @return string
+     */
+    public function getBackgroundPositionStyle()
+    {
+        switch ($this->getBackgroundPosition()) {
+            case self::POSITION_TOPLEFT:
+                return 'background-top background-left';
+            case self::POSITION_TOP:
+                return 'background-top background-center';
+            case self::POSITION_TOPRIGHT:
+                return 'background-top background-right';
+            case self::POSITION_LEFT:
+                return 'background-middle background-left';
+            case self::POSITION_CENTER:
+                return 'background-middle background-center';
+            case self::POSITION_RIGHT:
+                return 'background-middle background-right';
+            case self::POSITION_BOTTOMLEFT:
+                return 'background-bottom background-left';
+            case self::POSITION_BOTTOM:
+                return 'background-bottom background-center';
+            case self::POSITION_BOTTOMRIGHT:
+                return 'background-bottom background-right';
+            default:
+                // Center
+                return 'background-middle background-center';
+        }
+    }
 
     /**
      * Is this object deleted?
