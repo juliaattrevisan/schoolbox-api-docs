@@ -37,6 +37,7 @@ class CourseCreditSummary extends Base {
         $query = "
             SELECT
                 CourseDescription,
+                Result,
                 StrippedResult,
                 EnteredCredits,
                 ResultCredits
@@ -95,25 +96,30 @@ class CourseCreditSummary extends Base {
             $finalStack['courses'][$courseName]['enteredCredits'] += $current['EnteredCredits'];
             $finalStack['totals']['enteredCredits'] += $current['EnteredCredits'];
 
-            /* Letter accumulator
+            /* Only accumulate nonprogressive results
              */
-            $finalStack['courses'][$courseName]['letters'][$letter] += $current['ResultCredits'];
-            $finalStack['totals']['letters'][$letter] += $current['ResultCredits'];
+            if (!preg_match('/\[[NAME]\]/', $current['Result'])) {
 
-            /* Achieved Accumulator
-             * Only accumulate A/M/E values
-             */
-            if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
-                $finalStack['courses'][$courseName]['achieved'] += $current['ResultCredits'];
-                $finalStack['totals']['achieved'] += $current['ResultCredits'];
-            }
+                /* Letter accumulator
+                 */
+                $finalStack['courses'][$courseName]['letters'][$letter] += $current['ResultCredits'];
+                $finalStack['totals']['letters'][$letter] += $current['ResultCredits'];
 
-            /* Attempted accumulator
-             * Only accumulate N/A/M/E values
-             */
-            if (in_array($current['StrippedResult'], $this->getLetterRegistry())) {
-                $finalStack['courses'][$courseName]['attempted'] += $current['ResultCredits'];
-                $finalStack['totals']['attempted'] += $current['ResultCredits'];
+                /* Achieved Accumulator
+                 * Only accumulate A/M/E values
+                 */
+                if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
+                    $finalStack['courses'][$courseName]['achieved'] += $current['ResultCredits'];
+                    $finalStack['totals']['achieved'] += $current['ResultCredits'];
+                }
+
+                /* Attempted accumulator
+                 * Only accumulate N/A/M/E values
+                 */
+                if (in_array($current['StrippedResult'], $this->getLetterRegistry())) {
+                    $finalStack['courses'][$courseName]['attempted'] += $current['ResultCredits'];
+                    $finalStack['totals']['attempted'] += $current['ResultCredits'];
+                }
             }
         }
 
