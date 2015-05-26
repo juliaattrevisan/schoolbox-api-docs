@@ -115,7 +115,7 @@ class Notifier extends ResourceNotifier
      */
     protected function getResourceNameProperty()
     {
-        return 'description';
+        return 'title';
     }
 
 
