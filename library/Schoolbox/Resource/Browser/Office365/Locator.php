@@ -208,6 +208,7 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
         curl_setopt_array($ch, [
             CURLOPT_HTTPHEADER     => [ 'Authorization: Bearer ' . $this->oAuthToken ],
             CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_SSL_CIPHER_LIST => 'AES256-SHA',
             CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1
         ]);
 
@@ -274,6 +275,7 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
         curl_setopt_array($ch, [
             CURLOPT_FILE       => $fp,
             CURLOPT_HTTPHEADER => [ 'Authorization: Bearer ' . $this->oAuthToken ],
+            CURLOPT_SSL_CIPHER_LIST => 'AES256-SHA',
             CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1
         ]);
         curl_exec($ch);
