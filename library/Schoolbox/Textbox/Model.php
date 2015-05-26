@@ -10,6 +10,7 @@
 namespace Schoolbox\Textbox;
 
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Resource\Category;
 
 class Model implements ISoftDeletable
 {
@@ -24,7 +25,7 @@ class Model implements ISoftDeletable
     /**
      * Category
      *
-     * @var
+     * @var Category
      */
     private $category;
 
@@ -64,6 +65,7 @@ class Model implements ISoftDeletable
      */
     public function __construct()
     {
+        $this->setCategory(new Category());
     }
 
     /* Getters/Setters
@@ -94,7 +96,7 @@ class Model implements ISoftDeletable
     /**
      * Set category
      *
-     * @param mixed $category
+     * @param Category $category
      * @return $this
      */
     public function setCategory($category)
@@ -106,7 +108,7 @@ class Model implements ISoftDeletable
     /**
      * Get category
      *
-     * @return mixed
+     * @return Category
      */
     public function getCategory()
     {
