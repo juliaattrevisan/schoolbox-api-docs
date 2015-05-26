@@ -139,11 +139,17 @@
 					<em>Select the type of event. This will be represented via different colours</em>
 				</td>
 				<td>
+                    <!-- BEGIN type_select -->
 					<select name="type">
 						<!-- BEGIN type_drop -->
 						<option value="{EVENT_EVENTTYPE_ID}" {EVENT_EVENTTYPE_ID_SELECTED}>{EVENT_EVENTTYPE_NAME}</option>
 						<!-- END type_drop -->
 					</select>
+                    <!-- END type_select -->
+                    <!-- BEGIN type_no_select -->
+                    <input type="hidden" name="type" value="{EVENT_EVENTTYPE_ID}" />
+                   {EVENT_EVENTTYPE_NAME}
+                    <!-- END type_no_select -->
 				</td>
 			</tr>
 			<tr>
