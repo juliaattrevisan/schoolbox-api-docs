@@ -96,25 +96,48 @@
         });
 
         $("input[name='save']").click(function(e) {
-            if($( "#confirmDialog" ).length) {
+            var form      = $(this).closest('form'),
+                dialog    = $("#confirmDialog"),
+                submit    = form.find(':submit'),
+                inlineLen = tinyMCE.get('textBoxBody').getContent().length,
+                filesLen  = $('#submission-file-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length;
+
+            if (!inlineLen && !filesLen) {
+                // prevent submission without SOMETHING to submit
                 e.preventDefault();
-                var form = $(this).closest('form');
-                $("#confirmDialog").dialog({
+                $('<div/>').html("You haven't supplied any content for your submission. Provide files and/or edit online and try again.").dialog({
+                    modal: true,
+                    title: 'Nothing to submit',
                     buttons: {
-                        "Yes, I agree": function() {
-                            form.find(':submit').prop('disabled', true);
-                            form.submit();
-                        },
-                        Cancel: function() {
-                            $( this ).dialog( "close" );
+                        Ok: function () {
+                            $(this).dialog("close");
                         }
                     }
                 });
 
-                $("#confirmDialog").dialog("open");
+            } else if (dialog.length) {
+                // wait! display confirm modal
+                e.preventDefault();
+
+                dialog.dialog({
+                    buttons: {
+                        "Yes, I agree": function () {
+                            submit.prop('disabled', true);
+                            form.submit();
+                        },
+                        Cancel: function () {
+                            $(this).dialog("close");
+                        }
+                    }
+                });
+                dialog.dialog("open");
+
+            } else {
+                // checks pass: go for broke
+                submit.prop('disabled', true);
+                form.submit();
             }
         });
-
     });
 </script>
 <!-- END custom_head -->
