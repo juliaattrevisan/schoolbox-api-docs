@@ -54,6 +54,16 @@
                         });
                     });
         }
+
+        // Show/hide background position
+        var backgroundPositioner = form.find('[data-background-position]');
+        form.find('input[name="background_image_contained"]').change(function(event) {
+            if (Number(this.value)) {
+                backgroundPositioner.slideDown('fast');
+            } else {
+                backgroundPositioner.slideUp('fast');
+            }
+        });
     })
 })(jQuery);
 </script>
@@ -245,11 +255,10 @@
                                name="background_image_contained"
                                value="1"
                                {% if item.backgroundImageContained %}checked{% endif %} />
-                        <label for="background_image_contained_1">Shrink to fit within tile</label>
+                        <label for="background_image_contained_1">Resize to fit within tile</label>
                     </dd>
-                    <dt>Position</dt>
-                    <dd class="background-position">
-                        <p>Only applies when background image is shrunk to fit within tile.</p>
+                    <dt {% if not item.backgroundImageContained %}class="hide"{% endif %} data-background-position>Position</dt>
+                    <dd class="{% if not item.backgroundImageContained %}hide{% endif %} background-position" data-background-position>
                         <table class="table position-selector">
                             <thead>
                             <tr>
