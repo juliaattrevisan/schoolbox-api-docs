@@ -296,6 +296,7 @@ class CreditSummary extends Base {
      */
     private function findAssessmentType($allResults) {
         $finalStack = array();
+        $totalEnteredCredits = array();
 
         foreach ($allResults as $current) {
             $level = $current['Level'];
@@ -306,10 +307,11 @@ class CreditSummary extends Base {
                     'IN' => 0,
                     'EX' => 0,
                     'available' => 0,
+                    'exclusions' => 0,
                 );
-            }
 
-            $finalStack[$level]['available'] += $current['ResultCredits'];
+                $totalEnteredCredits[$level] = 0;
+            }
 
             /* Exclude when Student Year = Current Year for Externally Assessed
              * Can't do this in the query; this data is actually conditionally accumulated.
@@ -321,9 +323,21 @@ class CreditSummary extends Base {
                  */
                 if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
                     $finalStack[$level][$internalExternal] += $current['ResultCredits'];
-                    $finalStack[$level]['available'] -= $current['ResultCredits'];
+                }
+                /* Special treatment
+                 */
+                elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry()) || in_array($current['StrippedResult'], array('N'))) {
+                    $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
                 }
             }
+
+            $totalEnteredCredits[$level] += $current['EnteredCredits'];
+        }
+
+        /* Accumulate "Available" values
+         */
+        foreach ($finalStack as $level => $totals) {
+            $finalStack[$level]['available'] = $totalEnteredCredits[$level] - $totals['IN'] - $totals['EX'] - $finalStack[$level]['exclusions'];
         }
 
         krsort($finalStack);
