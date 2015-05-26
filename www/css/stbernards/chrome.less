@@ -99,7 +99,11 @@
 
 h2,
 .status-buttons .status-header{
-	.gradient(#104d8f,#0e447e);
+	// So they can change the BG with the gradient
+	background-image: url("/images/stbernards/h2-bg.png");
+	background-color: #104d8f;
+	background-repeat: repeat-x;
+	background-position: bottom left;
 	.border-radius(3px);
 }
 .admin-nav li a{
@@ -117,14 +121,14 @@ h2,
 }
 
 #header{
-		background: #04182e;
-		background: -moz-linear-gradient(left,  #04182e 0%, #0b3e75 100%);
-		background: -webkit-gradient(linear, left top, right top, color-stop(0%,#04182e), color-stop(100%,#0b3e75));
-		background: -webkit-linear-gradient(left,  #04182e 0%,#0b3e75 100%);
-		background: -o-linear-gradient(left,  #04182e 0%,#0b3e75 100%);
-		background: -ms-linear-gradient(left,  #04182e 0%,#0b3e75 100%);
-		background: linear-gradient(to right,  #04182e 0%,#0b3e75 100%);
-		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#04182e', endColorstr='#0b3e75',GradientType=1 );
+	background: #04182e;
+	background: -moz-linear-gradient(left,  #04182e 0%, #0b3e75 100%);
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%,#04182e), color-stop(100%,#0b3e75));
+	background: -webkit-linear-gradient(left,  #04182e 0%,#0b3e75 100%);
+	background: -o-linear-gradient(left,  #04182e 0%,#0b3e75 100%);
+	background: -ms-linear-gradient(left,  #04182e 0%,#0b3e75 100%);
+	background: linear-gradient(to right,  #04182e 0%,#0b3e75 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#04182e', endColorstr='#0b3e75',GradientType=1 );
 	.header-inner{
 		background: url("/images/stbernards/head-bg.png") top right no-repeat;
 		height: @banner-height;
@@ -233,15 +237,11 @@ body.login{
 		}
 	}
 	#footer{
-		right: 0;
+		left: 0;
 		bottom: 0;
-		left: auto;
+		right: auto;
 		width: 47%;
 		position: fixed;
-		ul li,
-		ul li a{
-			color: @link;
-		}
 	}
 }
 
@@ -254,7 +254,13 @@ body.login{
 			top: 15px;
 			#login-logo{ margin-bottom: 15px; }
 	  	}
-	  	#footer{ width: 98%; }
+	  	#footer{
+	  		width: 90%;
+	  		ul li,
+	  		ul li a{
+	  			color: @link;
+	  		}
+	  	}
 		#login-bg{ display: none; }
 	}
 }
