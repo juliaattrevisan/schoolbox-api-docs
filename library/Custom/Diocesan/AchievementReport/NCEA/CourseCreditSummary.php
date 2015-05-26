@@ -98,7 +98,7 @@ class CourseCreditSummary extends Base {
 
             /* Only accumulate nonprogressive results
              */
-            if (!preg_match('/\[[NAME]\]/', $current['Result'])) {
+            if (!preg_match('/\[['.implode('', $this->getLetterRegistry()).']\]/', $current['Result'])) {
 
                 /* Letter accumulator
                  */
