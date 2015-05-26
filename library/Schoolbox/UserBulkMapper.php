@@ -308,40 +308,6 @@ class UserBulkMapper extends UserMapper
         $enabled
     ) {
 
-        /* If a default campus AND a set of campuses were chosen,
-         * apply campus updates and then assign the default.
-         */
-        if (($defaultCampusId != $this->getUnchanged()) && is_array($allCampusIds) && count($allCampusIds)) {
-            $campusInvolvementUnchanged = in_array($this->getUnchanged(), array_values($allCampusIds));
-
-            /* Only update the defaultCampus
-             */
-            if ($campusInvolvementUnchanged) {
-                $this->updateDefaultCampusOnly($user, $defaultCampusId);
-            }
-            /* Update defaultCampus and campus involvement
-             */
-            else {
-                $this->updateAllCampusOptions($user, $defaultCampusId, $allCampusIds);
-            }
-        }
-        /* Only update the defaultCampus
-         */
-        else {
-            if ($defaultCampusId != $this->getUnchanged()) {
-                $this->updateDefaultCampusOnly($user, $defaultCampusId);
-            }
-            /* Otherwise if a set of campuses were chosen, apply campus updates
-             * defaultCampus, if unchanged, will always persist in campus choices.
-             * This results in the defaultCampus + any other new campuses chosen
-             */
-            else {
-                if (count($allCampusIds)) {
-                    $this->updateCampusInvolvementOnly($user, $allCampusIds);
-                }
-            }
-        }
-
         /* Update group settings
          */
         if ($roleId != $this->getUnchanged()) {
@@ -387,6 +353,45 @@ class UserBulkMapper extends UserMapper
         }
 
         $this->save($user);
+
+        /* Override the joined model persist, in $this->save()
+         * There isn't a convenient way to set the defaultCampus value
+         * using the mappers in their current form
+         */
+
+        /* If a default campus AND a set of campuses were chosen,
+         * apply campus updates and then assign the default.
+         */
+        if (($defaultCampusId != $this->getUnchanged()) && is_array($allCampusIds) && count($allCampusIds)) {
+            $campusInvolvementUnchanged = in_array($this->getUnchanged(), array_values($allCampusIds));
+
+            /* Only update the defaultCampus
+             */
+            if ($campusInvolvementUnchanged) {
+                $this->updateDefaultCampusOnly($user, $defaultCampusId);
+            }
+            /* Update defaultCampus and campus involvement
+             */
+            else {
+                $this->updateAllCampusOptions($user, $defaultCampusId, $allCampusIds);
+            }
+        }
+        /* Only update the defaultCampus
+         */
+        else {
+            if ($defaultCampusId != $this->getUnchanged()) {
+                $this->updateDefaultCampusOnly($user, $defaultCampusId);
+            }
+            /* Otherwise if a set of campuses were chosen, apply campus updates
+             * defaultCampus, if unchanged, will always persist in campus choices.
+             * This results in the defaultCampus + any other new campuses chosen
+             */
+            else {
+                if (count($allCampusIds)) {
+                    $this->updateCampusInvolvementOnly($user, $allCampusIds);
+                }
+            }
+        }
 
         /* Logging for Samuel
          */
