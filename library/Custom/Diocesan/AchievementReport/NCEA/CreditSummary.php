@@ -126,33 +126,37 @@ class CreditSummary extends Base {
             $finalStack[$level][$internalExternal]['enteredCredits'] += $current['EnteredCredits'];
             $finalStack[$level][$internalExternal]['availableCredits'] += $current['EnteredCredits'];
 
-            if ($this->includeData($internalExternal, $current['StudentYear'])) {
+            /* Ignore progressive results for current year
+             */
+            if (!$this->isProgressive($current['Result'])) {
+                if ($this->includeData($internalExternal, $current['StudentYear'])) {
 
-                /* Special case for N
-                 *
-                 * According to Sheeba,
-                 * N = sum of enteredcredits where strippedresult=N  [when result is not achieved
-                 * the resultscredit data is 0, hence use entered credits]
-                 */
-                if (in_array($letter, array('N'))) {
-                    $finalStack[$level][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
-                    $finalStack[$level][$internalExternal]['availableCredits'] -= $current['EnteredCredits'];
-                }
-                /* Regular summation for A, M, E
-                 */
-                elseif (in_array($letter, $this->getAchievementLetterRegistry())) {
-                    $finalStack[$level][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
-                    $finalStack[$level][$internalExternal]['availableCredits'] -= $current['ResultCredits'];
-                }
-                /* Other cases to exclude in Available Credits calculation
-                 *
-                 * According to Sheeba,
-                 * Available = 1-2-(sum of enteredcredits where strippedresult=Y, V or Z)
-                 * [when result of Y,V or Z is assigned due to absence or not attempting,
-                 * it is no longer available for assessment]
-                 */
-                elseif (in_array($letter, $this->getExclusionLetterRegistry())) {
-                    $finalStack[$level][$internalExternal]['availableCredits'] -= $current['EnteredCredits'];
+                    /* Special case for N
+                     *
+                     * According to Sheeba,
+                     * N = sum of enteredcredits where strippedresult=N  [when result is not achieved
+                     * the resultscredit data is 0, hence use entered credits]
+                     */
+                    if (in_array($letter, array('N'))) {
+                        $finalStack[$level][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
+                        $finalStack[$level][$internalExternal]['availableCredits'] -= $current['EnteredCredits'];
+                    }
+                    /* Regular summation for A, M, E
+                     */
+                    elseif (in_array($letter, $this->getAchievementLetterRegistry())) {
+                        $finalStack[$level][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
+                        $finalStack[$level][$internalExternal]['availableCredits'] -= $current['ResultCredits'];
+                    }
+                    /* Other cases to exclude in Available Credits calculation
+                     *
+                     * According to Sheeba,
+                     * Available = 1-2-(sum of enteredcredits where strippedresult=Y, V or Z)
+                     * [when result of Y,V or Z is assigned due to absence or not attempting,
+                     * it is no longer available for assessment]
+                     */
+                    elseif (in_array($letter, $this->getExclusionLetterRegistry())) {
+                        $finalStack[$level][$internalExternal]['availableCredits'] -= $current['EnteredCredits'];
+                    }
                 }
             }
         }
