@@ -1,47 +1,76 @@
 <?php
 /**
+ * TASSWeb SSO token retriever
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class External_Tass_SSO {
+class External_Tass_SSO
+{
 
+    /**
+     * Is the response from the SSO server output? If not, getUserToken()
+     * returns its token.
+     *
+     * @var bool
+     */
     private $output = false;
 
-    private $server = 'https://tassportal.cathedral.qld.edu.au/tassweb/external/sso_gateway.cfm';
+    /**
+     * The server from which to retrieve a SSO token
+     *
+     * @var string
+     */
+    private $server;
 
+    /**
+     * Default configuration, can be overridden in __construct() or getUserToken()
+     *
+     * @var array
+     */
     private $configuration = array(
         'method' => 'createSSOToken',
         'cmpy_code' => '01',
         'prod_code' => 'PL',
         'app_code' => 'pl',
         // 'sso_code' => $tassID,
-        'token_key' => 'L@g00n1917',
+        // 'token_key' => '',
         'returntype' => 'URLPARAM'
     );
 
     /**
      * Borrowed this default+override configuration idea from the js idiom
-     * @param array $configuration
+     *
+     * @param array $configuration Overrides for $this->configuration (if any)
+     *                             Should contain at least 'token_key'.
+     *
+     * @param string $server
      */
-    public function __construct($configuration = array(), $server = '') {
-        if(count($configuration)) {
-            foreach($configuration as $key => $value) {
+    public function __construct($configuration = array(), $server = '')
+    {
+        if (count($configuration)) {
+            foreach ($configuration as $key => $value) {
                 $this->configuration[$key] = $value;
             }
         }
-        if($server) {
+        if ($server) {
             $this->server = $server;
         }
     }
 
     /**
-     * @param array $userConf array('sso_code' => $tassID)
-     * @return string
+     * Gets a user token.
+     *
+     * @param array $userConf Overrides for $this->configuration (if any)
+     *                        Should contain at least ['sso_code' => $tassID]
+     *
+     * @return string If $this->output is true, this will output a string to
+     *                stdout, and then exit.
      */
-    public function getUserToken(array $userConf) {
+    public function getUserToken(array $userConf)
+    {
         $conf = array_merge($this->configuration, $userConf);
         $cString = $this->array2qstring($conf);
 
@@ -52,12 +81,12 @@ class External_Tass_SSO {
 
         $response = $this->qstring2array($responseString);
 
-        if($this->output) {
+        if ($this->output) {
             header('Content-Type: text/plain');
             die("SEND : $target\nRECV : $responseString\n");
         }
 
-        if(isset($response['sso_token'])) {
+        if (isset($response['sso_token'])) {
             return $response['sso_token'];
         }
         return '';
@@ -70,9 +99,10 @@ class External_Tass_SSO {
      * @param $array
      * @return string
      */
-    public function array2qstring($array) {
+    public function array2qstring($array)
+    {
         $cPairs = array();
-        while($i = each($array)) {
+        while ($i = each($array)) {
             $cPairs[] = $i['key'] . '=' . $i['value'];
         }
         return implode('&', $cPairs);
@@ -83,17 +113,17 @@ class External_Tass_SSO {
      * @param $qstring
      * @return array
      */
-    public function qstring2array($qstring) {
+    public function qstring2array($qstring)
+    {
         $array = array();
         $parts = explode('&', $qstring);
 
-        foreach($parts as $part) {
+        foreach ($parts as $part) {
             $bits = explode('=', $part);
-            if(count($bits == 2)) {
+            if (count($bits == 2)) {
                 $array[$bits[0]] = $bits[1];
             }
         }
         return $array;
     }
-
 }
