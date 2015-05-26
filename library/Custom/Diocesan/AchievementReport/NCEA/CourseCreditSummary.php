@@ -99,11 +99,11 @@ class CourseCreditSummary extends Base {
             $finalStack['totals']['enteredCredits'] += $current['EnteredCredits'];
 
             /* Only accumulate non-progressive results
+             *
+             * Only accumulate data in certain conditions based on
+             * Internal/External and StudentYear
              */
             if (!$this->isProgressive($current['Result'])) {
-
-                /* Letter accumulator
-                 */
                 if ($this->includeData($internalExternal, $current['StudentYear'])) {
 
                     /* Only accumulate A/M/E values
@@ -134,16 +134,5 @@ class CourseCreditSummary extends Base {
         ksort($finalStack['courses']);
 
         return $finalStack;
-    }
-
-    /**
-     * Determine if this result is progressive
-     * (has square brackets around Result value)
-     *
-     * @param $result
-     * @return bool
-     */
-    private function isProgressive($result) {
-        return preg_match('/\[['.implode('', $this->getLetterRegistry()).']\]/', $result);
     }
 }

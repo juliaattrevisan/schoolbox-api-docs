@@ -59,4 +59,15 @@ abstract class Base extends AchievementReportBase {
 
         return false;
     }
+
+    /**
+     * Determine if this result is progressive
+     * (has square brackets around Result value)
+     *
+     * @param $result
+     * @return bool
+     */
+    protected function isProgressive($result) {
+        return preg_match('/\[['.implode('', $this->getLetterRegistry()).']\]/', $result);
+    }
 }
