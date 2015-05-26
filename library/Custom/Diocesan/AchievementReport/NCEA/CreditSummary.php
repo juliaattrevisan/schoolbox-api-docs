@@ -353,26 +353,50 @@ class CreditSummary extends Base {
      */
     private function findResult($allResults) {
         $finalStack = array();
+        $totalEnteredCredits = array();
 
         foreach ($allResults as $current) {
             $level = $current['Level'];
+            $internalExternal = $current['InternalorExternalAssessment'];
 
             if (!is_array($finalStack[$level])) {
                 $finalStack[$level] = array_fill_keys($this->getAchievementLetterRegistry(), 0);
+
+                $finalStack[$level]['available'] = 0;
+                $finalStack[$level]['exclusions'] = 0;
+
+                $totalEnteredCredits[$level] = 0;
             }
 
-            $finalStack[$level]['available'] += $current['ResultCredits'];
+            $totalEnteredCredits[$level] += $current['EnteredCredits'];
 
-            /* Only accumulate some values
+            /* Exclude when Student Year = Current Year for Externally Assessed
+             * Can't do this in the query; this data is actually conditionally accumulated.
+             * Some places accumulate these values; other places don't.
              */
-            if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
-                $finalStack[$level][$current['StrippedResult']] += $current['ResultCredits'];
-                $finalStack[$level]['available'] -= $current['ResultCredits'];
+            if (!(($internalExternal == 'EX') && ($current['StudentYear'] == $this->getCurrentYear()))) {
+
+                /* Only accumulate some values
+                 */
+                if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
+                    $finalStack[$level][$current['StrippedResult']] += $current['ResultCredits'];
+                }
+                /* Special treatment
+                 */
+                elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry()) || in_array($current['StrippedResult'], array('N'))) {
+                    $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
+                }
             }
         }
 
+        /* Accumulate "Available" values
+         */
+        foreach ($finalStack as $level => $totals) {
+            $finalStack[$level]['available'] = $totalEnteredCredits[$level] - $totals['A'] - $totals['M'] - $totals['E'] - $finalStack[$level]['exclusions'];
+        }
+
         krsort($finalStack);
-        
+
         return $finalStack;
     }
 }
