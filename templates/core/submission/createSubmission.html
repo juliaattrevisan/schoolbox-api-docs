@@ -253,6 +253,9 @@
                 else if (element.is('[name^="late_"]')) {
                     label.insertAfter(submission_form.find(':input[name="late_period"]'));
                 }
+                else if (element.is('[name^="value"]')) {
+                    label.insertAfter(element.closest('.crit'));
+                }
                 else {
                     label.insertAfter(element);
                 }
