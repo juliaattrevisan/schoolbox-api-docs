@@ -1,0 +1,314 @@
+@charset "utf-8";
+// =============================================================================
+// Default v2 Schoolbox skin
+// =============================================================================
+//*
+//*   Ride The Whale                         ~777IIIIIIIIIII7~_
+//*                            7I       =%#%%%%7 @ %# /========
+//*                         ]7II7I###########%%%%%%%%777777
+//*                                ~I7###########777=
+//*                                     ##7      ]/
+//*                                     #/
+//*/
+// =============================================================================
+// 1. Load dependencies
+// =============================================================================
+@import "../core/mixins.less";
+@import "../core/variables.less";
+
+// =============================================================================
+// 2. And then variables can be overridden here
+// =============================================================================
+// Dimensions
+@search-width: 					242px;
+@logo-width: 					126px;
+@logo-height: 					113px;
+@infopanel-bellsprite:			'/images/stbernards/bell.png';
+@infopanel-height:				32px;
+
+// Generic colors
+@dark-blue:                     #013A63; // Dark Schoolbox Blue
+@body-background: 				#EEEEEE; // Body, but not the content area
+@content-background: 			#FFFFFF; // Used for forms
+@dark: 							#FAFAFA; // Alternate tigerstriping color
+@border-color: 					#EEEEEE; // Bordering @dark
+@alternate-background: 			#FFFFFF; // Sections such as admin
+
+// Basic type
+@body-text: 					@black;
+@secondary-text: 				#797979;
+@link: 							#0055a5;
+@link-hover: 					lighten(@link, 10%);
+
+// Main banner & Search
+@banner-background: 			#04182f;
+@banner-color:      			#FFFFFF;
+@banner-links:      			@banner-color;
+@search-color:                  @link;
+@banner-height:     			133px;
+
+// Modules
+@module-heading: 				@white;
+@module-background: 			#E5EFF7;
+@admin-nav:                     @link;
+
+// Refers to the left navigation
+@navigation-width:				200px;
+@navigation-padding:			16px;
+@navigation-background:  		transparent;
+@navigation-color:  			#000000;
+@navigation-links:  			@link;
+@navigation-hover-background: 	@link;
+@navigation-hover-color:  		#FFFFFF;
+@navigation-sub-background:  	@body-background;
+@submit-btn:                    @banner-background;
+
+// Flyout Menus and Messages
+@notify-color:					@negative-color;
+@notify-text-color:				@banner-color;
+@notify-open-text-color:		@banner-background;
+@flyout-color:					@navigation-links;
+@flyout-header-color:			@navigation-color;
+@flyout-background:				@content-background;
+@flyout-hover-color:			@navigation-hover-color;
+@flyout-hover-background:		@navigation-hover-background;
+@flyout-pad-height:				2px;
+@flyout-highlight:				@dark;
+
+// Main "Tab" Navigation
+@tab-background:				transparent;
+@tab-color:						@link;
+@tab-hover-background:		    @white;
+@tab-hover-color:				@tab-color;
+
+// Footer text
+@footer-color:					#797979;
+@footer-links:					@footer-color;
+
+// Optional features
+//@header-version: 				2;
+
+// =============================================================================
+// 3. Load core
+// =============================================================================
+@import "../core/core.less";
+
+// =============================================================================
+// 4. Any overrides for styles can be specified below
+// =============================================================================
+
+h2,
+.status-buttons .status-header{
+	// So they can change the BG with the gradient
+	background-image: url("/images/stbernards/h2-bg.png");
+	background-color: #104d8f;
+	background-repeat: repeat-x;
+	background-position: bottom left;
+	.border-radius(3px);
+}
+.admin-nav li a{
+	background: @lgrey;
+	border: 0;
+}
+.admin-nav a,
+.btn,
+.submit-btn-plain{
+	.border-radius(3px);
+}
+
+#infoPanel .bell{
+	.border-radius(3px);
+}
+
+#header{
+	background: #04182e;
+	background: -moz-linear-gradient(left,  #04182e 0%, #0b3e75 100%);
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%,#04182e), color-stop(100%,#0b3e75));
+	background: -webkit-linear-gradient(left,  #04182e 0%,#0b3e75 100%);
+	background: -o-linear-gradient(left,  #04182e 0%,#0b3e75 100%);
+	background: -ms-linear-gradient(left,  #04182e 0%,#0b3e75 100%);
+	background: linear-gradient(to right,  #04182e 0%,#0b3e75 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#04182e', endColorstr='#0b3e75',GradientType=1 );
+	.header-inner{
+		background: url("/images/stbernards/head-bg.png") top right no-repeat;
+		height: @banner-height;
+	}
+	.logo{
+		top: 12px;
+		left: 35px;
+	}
+	#search-field{
+		background: #ced8e2;
+		.border-radius(3px);
+	}
+	#search-button{
+		background: url("/images/stbernards/search-button.png") no-repeat 0px 8px;
+	}
+	#tabs{
+		width: 100%;
+		background: #ced8e2;
+		box-sizing: border-box;
+		height: 42px;
+		margin: 0;
+		padding-left: 200px;
+		bottom: 0;
+  		position: absolute;
+		z-index: 1;
+		li a{
+			height: 22px;
+			padding: 10px;
+			&:hover{
+				background: rgba(255, 255, 255, 0.7);
+			}
+		}
+	}
+}
+
+.admin-nav li a.current{
+	color: @white;
+}
+
+body.login{
+	background: @white;
+	#container{
+		background: transparent;
+		width: 100% !important;
+		padding: 0;
+		color: @link;
+		#login-bg{
+			background: url('/images/stbernards/login-bg.jpg') center center no-repeat;
+			background-size: cover;
+			float: left;
+			width: 50%;
+			text-align: center;
+			height: 100%;
+			position: fixed;
+			left: 0px;
+			top: 0px;
+			z-index: -1;
+			height:100%;
+		}
+
+		#content{
+			float: left;
+			width: 50%;
+			height: 100%;
+			position: fixed;
+			right: 0;
+			left: auto;
+			top: 45px;
+			padding: 0 10%;
+			box-sizing: border-box;
+			.error, .forgotten a{
+				color: @link;
+				margin: 35px 0;
+			}
+		}
+		#loginForm{
+			::-webkit-input-placeholder { color: @black; font-size: 16px; }
+			:-moz-placeholder { color: @black; font-size: 16px; }
+			::-moz-placeholder { color: @black; font-size: 16px; }
+			:-ms-input-placeholder { color: @black; font-size: 16px; }
+				input[type="text"],
+				input[type="password"]{
+				background: #eee;
+				color: @black;
+				font-size: 17px;
+				width: 100%;
+				height: 45px;
+				margin: 0 0 16px 0;
+				padding: 10px 12px;
+				.border-radius(3px);
+			}
+			input[type="submit"]{
+				background: @link url('/images/stbernards/chevron.png') 97% 50% no-repeat;
+				color: @white;
+				width: 100%;
+				font-weight: bold;
+				font-size: 16px;
+				height: 45px;
+				&:hover{
+					background: lighten(@link, 10%) url('/images/stbernards/chevron.png') 97% 50% no-repeat;
+				}
+			}
+		}
+		fieldset{
+			padding: 0;
+		}
+	}
+	#footer{
+		left: 0;
+		bottom: 0;
+		right: auto;
+		width: 47%;
+		position: fixed;
+	}
+}
+
+/* ---- Mobile ---- */
+@media screen and (max-width: 760px) {
+	body.login{
+	  	#container #content{
+			width: 100%;
+			box-sizing: border-box;
+			top: 15px;
+			#login-logo{ margin-bottom: 15px; }
+	  	}
+	  	#footer{
+	  		width: 90%;
+	  		ul li,
+	  		ul li a{
+	  			color: @link;
+	  		}
+	  	}
+		#login-bg{ display: none; }
+	}
+}
+
+
+/*
+ * Demo Dashboards
+ */
+
+.demo-dash{
+	ul{
+		margin: 0 !important;
+		li{
+			float: left;
+			padding: 7px 4px !important;
+			margin: 0 !important;
+			height: 135px;
+			list-style: none;
+		}
+		a{ 
+			display: block;
+			float: left;
+			text-align: center;
+			padding: 92px 0 0 0;
+			font-weight: bold;
+			width: 88px;
+			.transition (opacity 0.5s);
+			&:hover{
+				cursor: pointer;
+				opacity: 0.8;
+			}
+		}
+		.admin{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
+		.calendar-dash{ background: url('/images/demo/dashboard-icons.png') -88px 0px no-repeat; }
+		.due-work{ background: url('/images/demo/dashboard-icons.png') -176px 0px no-repeat; }
+		.eportfolio{ background: url('/images/demo/dashboard-icons.png') -264px 0px no-repeat; }
+		.online-forms{ background: url('/images/demo/dashboard-icons.png') -352px 0px no-repeat; }
+		.leave{ background: url('/images/demo/dashboard-icons.png') -440px 0px no-repeat; }
+		.manage-users{ background: url('/images/demo/dashboard-icons.png') -528px 0px no-repeat; }
+		.network{ background: url('/images/demo/dashboard-icons.png') -616px 0px no-repeat; }
+		.news{ background: url('/images/demo/dashboard-icons.png') -704px 0px no-repeat; }
+		.parents-friends{ background: url('/images/demo/dashboard-icons.png') -792px 0px no-repeat; }
+		.parent-dir{ background: url('/images/demo/dashboard-icons.png') -880px 0px no-repeat; }
+		.payments{ background: url('/images/demo/dashboard-icons.png') -968px 0px no-repeat; }
+		.resource-booking{ background: url('/images/demo/dashboard-icons.png') -1056px 0px no-repeat; }
+		.sport{ background: url('/images/demo/dashboard-icons.png') -1144px 0px no-repeat; }
+		.staff-dir{ background: url('/images/demo/dashboard-icons.png') -1232px 0px no-repeat; }
+		.synergetic{ background: url('/images/demo/dashboard-icons.png') -1320px 0px no-repeat; }
+		.timetable{ background: url('/images/demo/dashboard-icons.png') -1408px 0px no-repeat; }
+	}
+}
