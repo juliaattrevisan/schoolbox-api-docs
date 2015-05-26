@@ -24,21 +24,21 @@ interface Receiver
     /**
      * Accept a new file upload
      *
-     * @param string $filename
+     * @param string $basename
      * @param string $tempLocation
      * @param bool   $public
      * @return Model
      */
-    public function accept($filename, $tempLocation, $public = false);
+    public function accept($basename, $tempLocation, $public = false);
 
     /**
      * Accept a datastream upload
      *
-     * @param string   $filename
+     * @param string   $basename
      * @param resource $fp
      * @param bool     $public
      * @return Model
      */
-    public function acceptStream($filename, $fp, $public = false);
+    public function acceptStream($basename, $fp, $public = false);
 
 }
