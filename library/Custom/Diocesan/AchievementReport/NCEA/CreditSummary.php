@@ -192,18 +192,22 @@ class CreditSummary extends Base {
                 $totalEnteredCredits[$level] = 0;
             }
 
-            if ($this->includeData($internalExternal, $current['StudentYear'])) {
+            /* Ignore progressive results for current year
+             */
+            if (!$this->isProgressive($current['Result'])) {
+                if ($this->includeData($internalExternal, $current['StudentYear'])) {
 
-                /* Sum of A, M, E values from both Internally Assessed
-                 * and Externally Assessed types
-                 */
-                if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
-                    $finalStack[$level]['achieved'] += $current['ResultCredits'];
-                }
-                /* Special treatment
-                 */
-                elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry()) || in_array($current['StrippedResult'], array('N'))) {
-                    $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
+                    /* Sum of A, M, E values from both Internally Assessed
+                     * and Externally Assessed types
+                     */
+                    if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
+                        $finalStack[$level]['achieved'] += $current['ResultCredits'];
+                    }
+                    /* Special treatment
+                     */
+                    elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry()) || in_array($current['StrippedResult'], array('N'))) {
+                        $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
+                    }
                 }
             }
 
@@ -247,22 +251,26 @@ class CreditSummary extends Base {
                 $totalEnteredCredits[$level] = 0;
             }
 
-            if ($this->includeData($internalExternal, $current['StudentYear'])) {
+            /* Ignore progressive results for current year
+             */
+            if (!$this->isProgressive($current['Result'])) {
+                if ($this->includeData($internalExternal, $current['StudentYear'])) {
 
-                /* Only accumulate some values
-                 */
-                if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
-                    if (in_array($current['StandardType'], $unitTypeList)) {
-                        $finalStack[$level]['unit'] += $current['ResultCredits'];
+                    /* Only accumulate some values
+                     */
+                    if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
+                        if (in_array($current['StandardType'], $unitTypeList)) {
+                            $finalStack[$level]['unit'] += $current['ResultCredits'];
+                        }
+                        elseif (in_array($current['StandardType'], $achievementTypeList)) {
+                            $finalStack[$level]['achievement'] += $current['ResultCredits'];
+                        }
                     }
-                    elseif (in_array($current['StandardType'], $achievementTypeList)) {
-                        $finalStack[$level]['achievement'] += $current['ResultCredits'];
+                    /* Special treatment
+                     */
+                    elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry()) || in_array($current['StrippedResult'], array('N'))) {
+                        $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
                     }
-                }
-                /* Special treatment
-                 */
-                elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry()) || in_array($current['StrippedResult'], array('N'))) {
-                    $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
                 }
             }
 
@@ -305,17 +313,21 @@ class CreditSummary extends Base {
                 $totalEnteredCredits[$level] = 0;
             }
 
-            if ($this->includeData($internalExternal, $current['StudentYear'])) {
+            /* Ignore progressive results for current year
+             */
+            if (!$this->isProgressive($current['Result'])) {
+                if ($this->includeData($internalExternal, $current['StudentYear'])) {
 
-                /* Only accumulate some values
-                 */
-                if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
-                    $finalStack[$level][$internalExternal] += $current['ResultCredits'];
-                }
-                /* Special treatment
-                 */
-                elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry()) || in_array($current['StrippedResult'], array('N'))) {
-                    $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
+                    /* Only accumulate some values
+                     */
+                    if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
+                        $finalStack[$level][$internalExternal] += $current['ResultCredits'];
+                    }
+                    /* Special treatment
+                     */
+                    elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry()) || in_array($current['StrippedResult'], array('N'))) {
+                        $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
+                    }
                 }
             }
 
@@ -358,17 +370,21 @@ class CreditSummary extends Base {
 
             $totalEnteredCredits[$level] += $current['EnteredCredits'];
 
-            if ($this->includeData($internalExternal, $current['StudentYear'])) {
+            /* Ignore progressive results for current year
+             */
+            if (!$this->isProgressive($current['Result'])) {
+                if ($this->includeData($internalExternal, $current['StudentYear'])) {
 
-                /* Only accumulate some values
-                 */
-                if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
-                    $finalStack[$level][$current['StrippedResult']] += $current['ResultCredits'];
-                }
-                /* Special treatment
-                 */
-                elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry()) || in_array($current['StrippedResult'], array('N'))) {
-                    $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
+                    /* Only accumulate some values
+                     */
+                    if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
+                        $finalStack[$level][$current['StrippedResult']] += $current['ResultCredits'];
+                    }
+                    /* Special treatment
+                     */
+                    elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry()) || in_array($current['StrippedResult'], array('N'))) {
+                        $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
+                    }
                 }
             }
         }
