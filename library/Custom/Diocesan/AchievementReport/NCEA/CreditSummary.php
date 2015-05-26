@@ -54,7 +54,7 @@ class CreditSummary extends Base {
      */
     private function findValues() {
         $query = "
-            SELECT
+            SELECT *,
                 id,
                 Level,
                 InternalorExternalAssessment,
@@ -238,6 +238,7 @@ class CreditSummary extends Base {
 
         foreach ($allResults as $current) {
             $level = $current['Level'];
+            $internalExternal = $current['InternalorExternalAssessment'];
 
             if (!is_array($finalStack[$level])) {
                 $finalStack[$level] = array(
@@ -246,14 +247,21 @@ class CreditSummary extends Base {
                 );
             }
 
-            /* Only accumulate some values
+            /* Exclude when Student Year = Current Year for Externally Assessed
+             * Can't do this in the query; this data is actually conditionally accumulated.
+             * Some places accumulate these values; other places don't.
              */
-            if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
-                if (in_array($current['StandardType'], $unitTypeList)) {
-                    $finalStack[$level]['unit'] += $current['ResultCredits'];
-                }
-                elseif (in_array($current['StandardType'], $achievementTypeList)) {
-                    $finalStack[$level]['achievement'] += $current['ResultCredits'];
+            if (!(($internalExternal == 'EX') && ($current['StudentYear'] == $this->getCurrentYear()))) {
+
+                /* Only accumulate some values
+                 */
+                if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
+                    if (in_array($current['StandardType'], $unitTypeList)) {
+                        $finalStack[$level]['unit'] += $current['ResultCredits'];
+                    }
+                    elseif (in_array($current['StandardType'], $achievementTypeList)) {
+                        $finalStack[$level]['achievement'] += $current['ResultCredits'];
+                    }
                 }
             }
         }
