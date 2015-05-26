@@ -36,7 +36,9 @@ class CourseCreditSummary extends Base {
     private function findCourseCreditSummary() {
         $query = "
             SELECT
+                StudentYear,
                 CourseDescription,
+                InternalorExternalAssessment,
                 Result,
                 StrippedResult,
                 EnteredCredits,
@@ -46,7 +48,6 @@ class CourseCreditSummary extends Base {
             WHERE
                 id = '{$this->getExternalUserId()}' AND
                 WithdrawnFlag = 0 AND
-                NOT (StudentYear = '{$this->getCurrentYear()}' AND InternalorExternalAssessment = 'EX') AND
                 StudentYear = '{$this->getYear()}'
         ";
 
@@ -81,6 +82,7 @@ class CourseCreditSummary extends Base {
         foreach ($allResults as $current) {
             $letter = $current['StrippedResult'];
             $courseName = $current['CourseDescription'];
+            $internalExternal = $current['InternalorExternalAssessment'];
 
             if (!is_array($finalStack['courses'][$courseName])) {
                 $finalStack['courses'][$courseName] = array(
@@ -102,23 +104,25 @@ class CourseCreditSummary extends Base {
 
                 /* Letter accumulator
                  */
-                $finalStack['courses'][$courseName]['letters'][$letter] += $current['ResultCredits'];
-                $finalStack['totals']['letters'][$letter] += $current['ResultCredits'];
+                if ($this->includeData($internalExternal, $current['StudentYear'])) {
+                    $finalStack['courses'][$courseName]['letters'][$letter] += $current['ResultCredits'];
+                    $finalStack['totals']['letters'][$letter] += $current['ResultCredits'];
 
-                /* Achieved Accumulator
-                 * Only accumulate A/M/E values
-                 */
-                if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
-                    $finalStack['courses'][$courseName]['achieved'] += $current['ResultCredits'];
-                    $finalStack['totals']['achieved'] += $current['ResultCredits'];
-                }
+                    /* Achieved Accumulator
+                     * Only accumulate A/M/E values
+                     */
+                    if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
+                        $finalStack['courses'][$courseName]['achieved'] += $current['ResultCredits'];
+                        $finalStack['totals']['achieved'] += $current['ResultCredits'];
+                    }
 
-                /* Attempted accumulator
-                 * Only accumulate N/A/M/E values
-                 */
-                if (in_array($current['StrippedResult'], $this->getLetterRegistry())) {
-                    $finalStack['courses'][$courseName]['attempted'] += $current['ResultCredits'];
-                    $finalStack['totals']['attempted'] += $current['ResultCredits'];
+                    /* Attempted accumulator
+                     * Only accumulate N/A/M/E values
+                     */
+                    if (in_array($current['StrippedResult'], $this->getLetterRegistry())) {
+                        $finalStack['courses'][$courseName]['attempted'] += $current['ResultCredits'];
+                        $finalStack['totals']['attempted'] += $current['ResultCredits'];
+                    }
                 }
             }
         }
