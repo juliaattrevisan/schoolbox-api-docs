@@ -65,11 +65,14 @@
                             Number(form.find('input[name="grid_width"]').val())
                         )
                     );
+                    // Grid padding: a set pixel count
+                    var gridPadding = Number(form.find('input[name="grid_padding"]').val());
                     if (gridWidth > 0) {
                         tileList.find('.tile').css({
                             "width":          String(gridWidth)+"px",
-                            "padding-bottom": String(gridWidth * aspect)+"px",
-                        })
+                            "margin":         String(gridPadding)+"px",
+                            "padding-bottom": String(gridWidth * aspect)+"px"
+                        });
                     }
                 } else if (form.find('input#layout_type_column').is(':checked')) {
                     // column layout - keep within min and max
@@ -80,11 +83,17 @@
                             Number(form.find('input[name="column_count"]').val())
                         )
                     );
+                    // Column padding: a % of the width of the tile is taken up with padding
+                    var columnPadding = Number(form.find('input[name="column_padding"]').val());
                     if (colCount > 0) {
-                        var width = (100/colCount);
+                        var baseColumnWidth   = (100/colCount);
+                        var paddingProportion = columnPadding / 100;
+                        var tilePadding       = baseColumnWidth * paddingProportion;
+                        var tileWidth         = baseColumnWidth - tilePadding;
                         tileList.find('.tile').css({
-                            "width":          String(width)+"%",
-                            "padding-bottom": String(width * (yAspect / xAspect))+"%",
+                            "width":          String(tileWidth)+"%",
+                            "margin":         String(tilePadding / 2)+"%",
+                            "padding-bottom": String(tileWidth * (yAspect / xAspect))+"%"
                         });
                     }
                 }
@@ -248,6 +257,12 @@
                                class="layout-width"
                                data-function="update-layout" />
                         <label for="layout_type_grid">px</label>
+
+                        <input name="grid_padding"
+                               value="{{ item.gridPadding|e('html_attr') }}"
+                               class="layout-width"
+                               data-function="update-layout" />
+                        <label for="layout_type_grid">px padding</label>
                     </div>
                 </div>
 
@@ -267,6 +282,12 @@
                                class="layout-width"
                                data-function="update-layout" />
                         <label for="layout_type_column">tiles/row</label>
+
+                        <input name="column_padding"
+                               value="{{ item.columnPadding|e('html_attr') }}"
+                               class="layout-width"
+                               data-function="update-layout" />
+                        <label for="layout_type_column">% padding</label>
                     </div>
                 </div>
             </td>

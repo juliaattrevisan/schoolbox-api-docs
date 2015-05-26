@@ -11,12 +11,18 @@
 #tileList-{{ layout.id }}.tileList .tile {
     {% if layout.isGridLayoutType and layout.gridWidth > 0 %}
     width: {{ layout.gridWidth|e('css') }}px;
+    margin: {{ layout.getGridPadding|e('css') }}px;
     padding-bottom: {{ layout.gridWidth * (layout.aspectRatioY/layout.aspectRatioX) }}px;
     {% endif %}
 
     {% if layout.isColumnLayoutType and layout.columnCount > 0 %}
-    width: {{ 100 / layout.columnCount }}%;
-    padding-bottom: {{ 100 / layout.columnCount * (layout.aspectRatioY/layout.aspectRatioX) }}%;
+    {% set baseColumnWidth   = (100 / layout.columnCount) %}
+    {% set paddingProportion = (layout.columnPadding / 100) %}
+    {% set tilePadding       = baseColumnWidth * paddingProportion %}
+    {% set tileWidth         = baseColumnWidth - tilePadding %}
+    width: {{ tileWidth }}%;
+    margin: {{ tilePadding / 2 }}%;
+    padding-bottom: {{ tileWidth * (layout.aspectRatioY/layout.aspectRatioX) }}%;
     {% endif %}
 }
 </style>
