@@ -98,30 +98,34 @@ class CourseCreditSummary extends Base {
             $finalStack['courses'][$courseName]['enteredCredits'] += $current['EnteredCredits'];
             $finalStack['totals']['enteredCredits'] += $current['EnteredCredits'];
 
-            /* Only accumulate nonprogressive results
+            /* Only accumulate non-progressive results
              */
             if (!$this->isProgressive($current['Result'])) {
 
                 /* Letter accumulator
                  */
                 if ($this->includeData($internalExternal, $current['StudentYear'])) {
-                    $finalStack['courses'][$courseName]['letters'][$letter] += $current['ResultCredits'];
-                    $finalStack['totals']['letters'][$letter] += $current['ResultCredits'];
 
-                    /* Achieved Accumulator
-                     * Only accumulate A/M/E values
+                    /* Only accumulate A/M/E values
                      */
                     if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
-                        $finalStack['courses'][$courseName]['achieved'] += $current['ResultCredits'];
-                        $finalStack['totals']['achieved'] += $current['ResultCredits'];
-                    }
-
-                    /* Attempted accumulator
-                     * Only accumulate N/A/M/E values
-                     */
-                    if (in_array($current['StrippedResult'], $this->getLetterRegistry())) {
+                        $finalStack['courses'][$courseName]['letters'][$letter] += $current['ResultCredits'];
                         $finalStack['courses'][$courseName]['attempted'] += $current['ResultCredits'];
+                        $finalStack['courses'][$courseName]['achieved'] += $current['ResultCredits'];
+
                         $finalStack['totals']['attempted'] += $current['ResultCredits'];
+                        $finalStack['totals']['achieved'] += $current['ResultCredits'];
+                        $finalStack['totals']['letters'][$letter] += $current['ResultCredits'];
+                    }
+                    /* Special treatment
+                     * No achievements for N
+                     */
+                    elseif (in_array($letter, array('N'))) {
+                        $finalStack['courses'][$courseName]['letters'][$letter] += $current['EnteredCredits'];
+                        $finalStack['courses'][$courseName]['attempted'] += $current['EnteredCredits'];
+
+                        $finalStack['totals']['attempted'] += $current['EnteredCredits'];
+                        $finalStack['totals']['letters'][$letter] += $current['EnteredCredits'];
                     }
                 }
             }
