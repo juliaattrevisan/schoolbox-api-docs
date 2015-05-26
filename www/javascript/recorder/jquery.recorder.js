@@ -611,6 +611,31 @@
         return this.flash.supported;
     };
 
+    /**
+     * Gets the file extension to use for an audio recording
+     *
+     * @returns {string}
+     */
+    RecorderPlugin.prototype.getFileExtension = function() {
+        // Media or WebRTC: get from blob
+        // Flash: assume it's wav
+        var type = '';
+        if (this.media.blob && this.media.blob.type) {
+            type = this.media.blob.type;
+        } else if (this.webrtc.blob && this.webrtc.blob.type) {
+            type = this.webrtc.blob.type;
+        }
+        switch (type) {
+            case 'audio/ogg':
+                return 'ogg';
+            case 'audio/mpeg':
+                return 'mp3';
+            case 'audio/wav':
+            default:
+                return 'wav';
+        }
+    };
+
     $.fn[PLUGIN_NAME] = function(options) {
         this.each(function(i, element) {
             var $element = $(element);

@@ -15,7 +15,7 @@
         // Call this when I want to actually upload recorded sounds
         var uploadRecorded = function() {
             recorderNameInput.blur();
-            recorderInterface.uploadRecorded(recorderNameInput.val() + '.wav');
+            recorderInterface.uploadRecorded(recorderNameInput.val() + '.' + recorderInterface.getFileExtension());
             recorderNameDialog.dialog('close');
         };
 
