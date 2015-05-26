@@ -3,7 +3,7 @@
         $('[data-graph="standard-type-{{ dataset.suffix }}"]').ncea_stackedBar({
             title: 'Standard Type',
 
-            colors: ['#32cd32', '#4169e1'],
+            colors: ['#32cd32', '#4169e1', '#001933'],
 
             categories: [
                 {% for currentLevel, allLevelValues in dataset.data.graph.standardType %}
@@ -25,6 +25,14 @@
                     data: [
                         {% for currentLevel, allLevelValues in dataset.data.graph.standardType %}
                         {{ allLevelValues.achievement }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    ]
+                },
+                {
+                    name: 'Available',
+                    data: [
+                        {% for currentLevel, allLevelValues in dataset.data.graph.standardType %}
+                        {{ allLevelValues.available }}{% if not loop.last %}, {% endif %}
                         {% endfor %}
                     ]
                 }

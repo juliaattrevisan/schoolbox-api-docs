@@ -235,6 +235,7 @@ class CreditSummary extends Base {
         $finalStack = array();
         $unitTypeList = array('U');
         $achievementTypeList = array('A');
+        $totalEnteredCredits = array();
 
         foreach ($allResults as $current) {
             $level = $current['Level'];
@@ -244,7 +245,10 @@ class CreditSummary extends Base {
                 $finalStack[$level] = array(
                     'unit' => 0,
                     'achievement' => 0,
+                    'exclusions' => 0,
                 );
+
+                $totalEnteredCredits[$level] = 0;
             }
 
             /* Exclude when Student Year = Current Year for Externally Assessed
@@ -263,7 +267,20 @@ class CreditSummary extends Base {
                         $finalStack[$level]['achievement'] += $current['ResultCredits'];
                     }
                 }
+                /* Special treatment
+                 */
+                elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry()) || in_array($current['StrippedResult'], array('N'))) {
+                    $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
+                }
             }
+
+            $totalEnteredCredits[$level] += $current['EnteredCredits'];
+        }
+
+        /* Accumulate "Available" values
+         */
+        foreach ($finalStack as $level => $totals) {
+            $finalStack[$level]['available'] = $totalEnteredCredits[$level] - $totals['achievement'] - $finalStack[$level]['exclusions'];
         }
 
         krsort($finalStack);
@@ -294,11 +311,18 @@ class CreditSummary extends Base {
 
             $finalStack[$level]['available'] += $current['ResultCredits'];
 
-            /* Only accumulate some values
+            /* Exclude when Student Year = Current Year for Externally Assessed
+             * Can't do this in the query; this data is actually conditionally accumulated.
+             * Some places accumulate these values; other places don't.
              */
-            if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
-                $finalStack[$level][$internalExternal] += $current['ResultCredits'];
-                $finalStack[$level]['available'] -= $current['ResultCredits'];
+            if (!(($internalExternal == 'EX') && ($current['StudentYear'] == $this->getCurrentYear()))) {
+
+                /* Only accumulate some values
+                 */
+                if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
+                    $finalStack[$level][$internalExternal] += $current['ResultCredits'];
+                    $finalStack[$level]['available'] -= $current['ResultCredits'];
+                }
             }
         }
 
