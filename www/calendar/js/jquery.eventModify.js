@@ -246,10 +246,7 @@
 
 			/* Defaults, I guess
 			 */
-			if ($('select[name="level"]').val() == '1') {
-				$('#attendance input').prop('checked', false);
-			}
-			else if ($('select[name="level"]').val() == "2") {
+			if ($('select[name="level"]').val() == "2") {
 				$('#groupDrop, #attendance').show()
 			}
 			else if ($('select[name="level"]').val() == "3") {
