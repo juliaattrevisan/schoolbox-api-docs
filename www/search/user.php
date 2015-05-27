@@ -415,10 +415,12 @@ if (is_numeric($this->arg[0])) {
                             ) {
                                 $j++;
 
+                                $contactEmail = '';
                                 if ($studentContact['StudentContactDefaultEmail']) {
                                     $contactEmail = $_SESSION['mailhandle'] . $studentContact['StudentContactDefaultEmail'];
                                 }
 
+                                $spouseEmail = '';
                                 if ($studentContact['StudentContactSpouseDefaultEmail']) {
                                     $spouseEmail = $_SESSION['mailhandle'] . $studentContact['StudentContactSpouseDefaultEmail'];
                                 }
