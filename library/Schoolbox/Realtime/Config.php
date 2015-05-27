@@ -187,7 +187,8 @@ class Config
 
         // TODO move this to a mapper
         $stmt = \Database::getInstance()->query("
-            SELECT n.id namespace_id, s.id source_id, s.description source_description, r.id role_id, rp.mask, rp.role_default def
+            SELECT n.id namespace_id, s.id source_id, s.description source_description,
+              r.id role_id, COALESCE(rp.mask, 'MU') mask, COALESCE(rp.role_default, 'MU') def
             FROM msg_namespace n
             LEFT JOIN msg_source s ON n.id = s.namespace
             LEFT JOIN groups r ON r.group_type = s.role_type
@@ -210,7 +211,6 @@ class Config
 
             $config[$namespaceId]['sources'][$sDescription]['roles'][$roleId] = [
                 'id'      => $roleId,
-                'enabled' => $mask != null,
                 'mask'    => explode(',', $mask),
                 'default' => explode(',', $default)
             ];

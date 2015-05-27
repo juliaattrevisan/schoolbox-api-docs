@@ -74,7 +74,7 @@
             $.post('/adminv2/messages/configure', $(this).serialize(), function (data) {
                 console.log(data);
                 customiserCallback(data);
-                $('#slider-modal').dialog('destroy');
+                $('#slider-modal').dialog('close').dialog('destroy');
             });
         });
 
