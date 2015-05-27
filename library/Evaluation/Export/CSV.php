@@ -222,7 +222,7 @@ abstract class Evaluation_Export_CSV {
 
 				$start = new Alaress_Date_Format($currentAttempt['start'], 'Y-m-d H:i:s');
 
-				if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
+				if ($currentAttempt['finish']) {
 					$finish = new Alaress_Date_Format($currentAttempt['finish'], 'Y-m-d H:i:s');
 					$finishTime = $finish->getShort();
 				}

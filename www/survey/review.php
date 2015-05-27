@@ -119,7 +119,7 @@ $this->setVar(
 // Finished: $attempt.finish is set to something other that 0000-00-etc
 // Otherwise:
 // not yet finished if survey is open, unfinished if closed
-if (!isset($attempt['finish']) || $attempt['finish'] === '0000-00-00 00:00:00') {
+if (!isset($attempt['finish'])) {
     $close = new DateTime($assess['finish']);
     if ($close->getTimestamp() < $_SERVER['REQUEST_TIME']) {
         $this->parse('attemptUnfinished_block', 'attemptUnfinished');

@@ -112,7 +112,7 @@ class Evaluation_Prototype_Permission extends DeprecatedModel {
                   FROM assess
                   WHERE assess_id = '{$this->getEvaluationId()}'
                   AND user_id = '{$this->getUserId()}'
-                  AND finish != '0000-00-00 00:00:00'
+                  AND finish IS NOT NULL
 				  AND deleted_at IS NULL";
 
         return $this->db->getRow($query);

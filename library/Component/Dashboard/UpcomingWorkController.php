@@ -219,10 +219,8 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
                 $resumeAttempt = false;
 
                 if (is_array($attempt)) {
-                    if ($attempt['finish'] == '0000-00-00 00:00:00'
-                        && ($attemptTimeRemaining < 0
-                            || $assess->getDuration() == Assess_Main::UNLIMITED_DURATION
-                        )
+                    if (!$attempt['finish']
+                        && ($attemptTimeRemaining < 0 || $assess->getDuration() == Assess_Main::UNLIMITED_DURATION)
                     ) {
                         $resumeAttempt = true;
                     }
