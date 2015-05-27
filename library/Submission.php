@@ -106,17 +106,16 @@ class Submission extends DeprecatedModel
         $query = "
             SELECT
               s.*, GROUP_CONCAT(cc.code) `code`, c.name AS categoryName, c.id AS cid, file.comment, ft.name typeName,
-              smt.slug mark_type_slug, sn.type notif_type, sn.enabled notif_enabled, sn.sent notif_sent
+              smt.slug mark_type_slug
             FROM submission_box s
             JOIN category c ON s.category = c.id
             LEFT JOIN categoryCode cc ON cc.categoryID = c.id AND cc.deleted_at IS NULL
             LEFT JOIN file ON s.fid = file.id
             LEFT JOIN lu_submission_type ft ON s.type = ft.id
             LEFT JOIN submission_mark_type smt ON s.mark_type = smt.mark_type_id
-            LEFT JOIN submission_notification sn ON s.id = sn.`box_id`
             WHERE $field $conditional
             AND s.task_id IS NULL
-            GROUP BY s.id, c.id, sn.type
+            GROUP BY s.id, c.id
         ";
 
         $this->db->query($query);
@@ -127,14 +126,7 @@ class Submission extends DeprecatedModel
             // if we haven't seen this box yet, create it
             if (!isset($boxes[$row['id']])) {
                 $boxes[$row['id']] = $row;
-                unset($boxes[$row['id']]['notif_type']);
-                unset($boxes[$row['id']]['notif_notif_enabled']);
-                unset($boxes[$row['id']]['notif_notif_sent']);
             }
-            $boxes[$row['id']]['notifications'][$row['notif_type']] = array(
-                'enabled' => $row['notif_enabled'],
-                'sent'    => $row['notif_sent']
-            );
         }
 
         $output = array_values($boxes);
@@ -1002,198 +994,6 @@ class Submission extends DeprecatedModel
         ";
 
         return $this->db->getRow($query);
-    }
-
-    public function getSubmissionReminderList($status)
-    {
-
-        //
-        // Don't get users, just submission boxes.
-        // Need to get users as part of another query, becuase they may be in
-        // Synergetic.
-        // For overdue work - only send the notice if the submission box allows
-        // online submissions, because only they allow late submissions.
-        $where = "sb.deleted = 0
-            AND sb.task_id IS NULL
-            AND sn.type = :notif_type
-            AND sn.enabled = :notif_enabled
-            AND sn.sent = :notif_sent
-            AND sb.`date` BETWEEN :range_start AND :range_end";
-        if ($status == OVERDUE_WORK_TYPE) {
-            $where .= ' AND sb.accept_submission IS TRUE';
-        }
-        $stmt = Database::getInstance()->prepare(
-            "
-            SELECT
-              sb.category c_id,
-              c.name c_name,
-              GROUP_CONCAT(cc.code) c_code,
-              sb.id sb_id,
-              sb.name sb_name,
-              sb.date sb_date,
-              teacher.firstname, teacher.lastname, teacher.title, teacher.alt_email, teacher.local_email, teacher.username
-            FROM submission_box sb
-            LEFT JOIN category c ON sb.category = c.id
-            LEFT JOIN categoryCode cc ON cc.categoryID = c.id AND cc.deleted_at IS NULL
-            LEFT JOIN `user` teacher ON sb.owner = teacher.id
-            INNER JOIN submission_notification sn ON sb.id = sn.box_id
-            WHERE $where
-            GROUP BY sb.id, c.id
-            ORDER BY c.id ASC, sb.date ASC
-        "
-        );
-
-        $now = date('Y-m-d H:i:s');
-
-        // setup the parameters based on the context of the notification
-        if ($status == UPCOMING_WORK_TYPE) {
-            // closing dates between now and this time tomorrow
-            $params = array(
-                'notif_type'    => 'upcoming',
-                'notif_enabled' => 1,
-                'notif_sent'    => 0,
-                'range_start'   => $now,
-                'range_end'     => date('Y-m-d H:i:s', time() + 24 * 3600)
-            );
-        } elseif ($status == OVERDUE_WORK_TYPE) {
-            // closing dates between an hour ago and now
-            $params = array(
-                'notif_type'    => 'overdue',
-                'notif_enabled' => 1,
-                'notif_sent'    => 0,
-                'range_start'   => date('Y-m-d H:i:s', time() - 3600),
-                'range_end'     => $now
-            );
-        } elseif ($status == RETURNED_WORK_TYPE) {
-            // not yet implemented
-            return array();
-        } else {
-            return array();
-        }
-
-        $stmt->execute($params);
-
-        $output   = array();
-        $emailObj = new Email();
-
-        $synHandler        = new External_Class();
-        $groupHandler      = new Group();
-        $userHandler       = new User();
-        $studentSubHandler = new SubmissionStudent();
-
-        $students      = array();
-        $group_members = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            //
-            // Get the list of users here.
-            $members      = array();
-            $subject_code = $row['c_code'];
-            $subject_id   = $row['c_id'];
-
-            //
-            // Retrieve students from external DB - if that fails, retrieve
-            // students from group list.
-            if ($subject_code && Cfg::get('external_enable')) {
-                if (!array_key_exists($subject_code, $students)) {
-                    $students[$subject_code] = $synHandler->getStudents($subject_code);
-                    if (!is_array($students[$subject_code])) {
-                        continue;
-                    }
-                    //
-                    // Has only synergy ID. Need Schoolbox ID and alt and local
-                    // email.
-                    foreach ($students[$subject_code] as &$student) {
-                        $student_info             = $userHandler->getBySynergy($student['synergy_id']);
-                        $student['uid']           = $student_info['uid'];
-                        $student['u_username']    = $student_info['username'];
-                        $student['u_local_email'] = $student_info['local_email'];
-                        $student['u_alt_email']   = $student_info['alt_email'];
-                    }
-                    unset($student);
-                }
-                $members = $students[$subject_code];
-            } else {
-                if (!array_key_exists($subject_id, $group_members)) {
-                    $group_members[$subject_id] = $groupHandler->getMemberList($subject_id);
-                    //
-                    // Need local and alt email.
-                    if (!is_array($group_members[$subject_id])) {
-                        continue;
-                    }
-                    foreach ($group_members[$subject_id] as &$member) {
-                        $member_info             = $userHandler->getByID($member['uid']);
-                        $member['u_username']    = $member_info['username'];
-                        $member['u_local_email'] = $member_info['local_email'];
-                        $member['u_alt_email']   = $member_info['alt_email'];
-                    }
-                    unset($member);
-                }
-                $members = $group_members[$subject_id];
-            }
-
-            $submission_id = $row['sb_id'];
-            $submissions   = $studentSubHandler->getByBoxID($submission_id);
-            if (!is_array($members)) {
-                continue;
-            }
-            foreach ($members as $member) {
-                //
-                // Add this user into the output, if they aren't already there.
-                $member_id = $member['uid'];
-                if (!array_key_exists($member_id, $output)) {
-                    $output[$member_id] = array(
-                        'id'         => $member_id,
-                        'firstname'  => $member['firstname'],
-                        'lastname'   => $member['lastname'],
-                        'alt_email'  => $emailObj->formatEmailFromArray(
-                                array(
-                                    'username'    => $member['u_username'],
-                                    'alt_email'   => $member['u_alt_email'],
-                                    'local_email' => $member['u_local_email']
-                                )
-                            ),
-                        'categories' => array()
-                    );
-                }
-
-                //
-                // Has student submitted at all for this box?
-                // If not, then add them to the list of students who have to.
-                $student_submissions = array();
-                if (is_array($submissions)) {
-                    $student_submissions = array_filter(
-                        $submissions, function ($sub) use ($member_id) {
-                            return $sub['uid'] == $member_id;
-                        }
-                    );
-                }
-                if (empty($student_submissions)) {
-                    if (!array_key_exists($subject_id, $output[$member_id])) {
-                        $output[$member_id]['categories'][$subject_id] = array(
-                            'id'   => $subject_id,
-                            'name' => $row['c_name'],
-                            'work' => array(),
-                        );
-                    }
-                    $output[$member_id]['categories'][$subject_id]['work'][$submission_id] = array(
-                        'id'      => $submission_id,
-                        'name'    => $row['sb_name'],
-                        'date'    => $row['sb_date'],
-                        'teacher' => $userHandler->formatName($row),
-                        'email'   => $emailObj->formatEmailFromArray($row),
-                    );
-                }
-            }
-        }
-
-        //
-        // Not interested in output rows without any categories.
-        return array_filter(
-            $output, function ($row) {
-                return !empty($row['categories']);
-            }
-        );
     }
 
     public function getAllYearsByUser($userID = 0)
