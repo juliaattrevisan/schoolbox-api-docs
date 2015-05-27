@@ -55,6 +55,9 @@
             flashContainer: null,
             onFlashSecurity: $.noop
         },
+        media: {
+            audioElement: null
+        },
         webrtc: {
             preview: '',
             channels: 1,
@@ -70,15 +73,17 @@
     var RecorderPlugin = function(element, options) {
         this.element   = element;
         this.options   = $.extend(true, {}, defaultOptions, options);
+        this.media     = {};
         this.flash     = {};
         this.webrtc    = {};
         this.recording = false;
         this.playing   = false;
         this.recordingStartTime = null;
         this.intervalMethod     = null;
+        this._attemptMediaRecorderSetup();
         this._attemptWebRtcSetup();
         this._attemptFlashSetup();
-        if (this.isWebRtcSupported() || this.isFlashSupported()) {
+        if (this.isMediaRecorderSupported() || this.isWebRtcSupported() || this.isFlashSupported()) {
             this.triggerEvent('setup', []);
             this.triggerEvent('recordingReady', []);
             this._bindInternalEvents();
@@ -107,6 +112,34 @@
         this.bindEvent('playbackStop', function(event, recorder) {
             recorder.playing = false;
         });
+        return this;
+    };
+
+    /**
+     * Try to set up MediaRecorder recording.
+     *
+     * @private
+     *
+     * @returns {RecorderPlugin}
+     */
+    RecorderPlugin.prototype._attemptMediaRecorderSetup = function() {
+        // If audio context doesn't exist, there's no way we can use WebRTC
+        var self = this;
+        if ('MediaRecorder' in window) {
+            self.media.supported    = true;
+            self.media.audioElement = self.options.media.audioElement || $('<audio />');
+            self.media.audioElement.on('timeupdate.recorder', function() {
+                self.triggerEvent('playbackProgress', [this.currentTime]);
+            });
+            self.media.audioElement.on('playing.recorder', function() {
+                self.triggerEvent('playbackStart', []);
+            });
+            self.media.audioElement.on('ended.recorder', function() {
+                self.triggerEvent('playbackStop', []);
+            });
+        } else {
+            self.webrtc.supported = false;
+        }
         return this;
     };
 
@@ -178,6 +211,29 @@
     };
 
     /**
+     * Start recording in MediaRecorder mode
+     *
+     * @private
+     *
+     * @returns {RecorderPlugin}
+     */
+    RecorderPlugin.prototype._startRecordingMediaRecorder = function(stream) {
+        var self            = this;
+        self.mode           = 'media';
+        self.media.stream   = stream;
+        self.media.recorder = new MediaRecorder(stream);
+
+        // There's no mediarecorder event for recording progress,
+        // so fake it with setInterval.
+        self.recordingStartTime = Date.now();
+        self.intervalMethod     = setInterval(self._pollRecordingTime.bind(self), 1000);
+
+        self.media.recorder.start();
+        self.triggerEvent('recordingStart', []);
+        return this;
+    };
+
+    /**
      * Start recording in WebRTC mode
      *
      * @private
@@ -242,7 +298,22 @@
         if (self.isPlaying()) {
             self.stopPlaying();
         }
-        if (self.isWebRtcSupported()) {
+        if (self.isMediaRecorderSupported()) {
+            getUserMedia(
+                self.options.userMedia,
+                function(stream) {
+                    self._startRecordingMediaRecorder(stream);
+                },
+                function(error) {
+                    // Try to fall back to Flash.
+                    if (self.isFlashSupported()) {
+                        self._startRecordingFlash();
+                    } else {
+                        self.triggerEvent('recordingStartFailed', [error]);
+                    }
+                }
+            );
+        } else if (self.isWebRtcSupported()) {
             getUserMedia(
                 self.options.userMedia,
                 function(stream) {
@@ -277,7 +348,10 @@
         if (self.isPlaying()) {
             self.stopPlaying();
         }
-        if (self.isWebRtcUsed()) {
+        if (self.isMediaRecorderUsed()) {
+            self.media.audioElement[0].currentTime = 0;
+            self.media.audioElement[0].play();
+        } else if (self.isWebRtcUsed()) {
             self.webrtc.audioElement[0].currentTime = 0;
             self.webrtc.audioElement[0].play();
         } else if (self.isFlashUsed()) {
@@ -300,7 +374,9 @@
      */
     RecorderPlugin.prototype.stopPlaying = function() {
         this.triggerEvent('playbackStop', []);
-        if (this.isWebRtcUsed()) {
+        if (self.isMediaRecorderUsed()) {
+            this.media.audioElement[0].pause();
+        } else if (this.isWebRtcUsed()) {
             this.webrtc.audioElement[0].pause();
         } else if (this.isFlashUsed()) {
             this.flash.recorder.stop();
@@ -314,7 +390,25 @@
      */
     RecorderPlugin.prototype.stopRecording = function() {
         var self = this;
-        if (self.isWebRtcUsed()) {
+        if (self.isMediaRecorderUsed()) {
+            clearInterval(self.intervalMethod);
+            self.media.stream.stop();
+            self.media.recorder.stop();
+            // At this point I have a blob. Put it in the audio element.
+            self.media.recorder.ondataavailable =
+                function(e) {
+                    // Overrides any previous blob
+                    self.media.blob = e.data;
+                    self.media.audioElement
+                        .attr('src', window.URL.createObjectURL(e.data))
+                    ;
+                    // Trigger an event saying I'm ready for play and upload.
+                    self.triggerEvent('playbackReady', []);
+                    self.triggerEvent('uploadReady', []);
+                }
+            ;
+            self.triggerEvent('recordingStop', []);
+        } else if (self.isWebRtcUsed()) {
             clearInterval(self.intervalMethod);
             self.webrtc.stream.stop();
             self.webrtc.recorder.stop();
@@ -365,11 +459,11 @@
     RecorderPlugin.prototype.uploadRecorded = function(filename) {
         var self = this;
 
-        // Is this WebRTC? Post via AJAX if so
-        if (self.isWebRtcUsed()) {
+        // Blob handling for WebRTC and MediaElement
+        var uploadBlob = function(blob) {
             self.triggerEvent('uploadStart', []);
             var formData = new FormData();
-            formData.append('upload', self.webrtc.blob, filename);
+            formData.append('upload', blob, filename);
             $.ajax(
                 {
                     url: self.options.upload.url,
@@ -379,12 +473,19 @@
                     processData: false
                 }
             )
-            .done(function(response) {
-                self.triggerEvent('uploadComplete', [filename, response]);
-            })
-            .fail(function(jqXHR, textStatus, errorThrown) {
-                self.triggerEvent('uploadFailed', [jqXHR, textStatus, errorThrown]);
-            });
+                .done(function(response) {
+                    self.triggerEvent('uploadComplete', [filename, response]);
+                })
+                .fail(function(jqXHR, textStatus, errorThrown) {
+                    self.triggerEvent('uploadFailed', [jqXHR, textStatus, errorThrown]);
+                });
+        };
+
+        // Is this WebRTC? Post via AJAX if so
+        if (self.isMediaRecorderUsed()) {
+            uploadBlob(self.media.blob);
+        } else if (self.isWebRtcUsed()) {
+            uploadBlob(self.webrtc.blob);
         } else if (self.isFlashUsed()) {
             var params = {
                 filename: filename
@@ -457,6 +558,15 @@
     };
 
     /**
+     * Is the MediaRecorder recorder being used?
+     *
+     * @returns {boolean}
+     */
+    RecorderPlugin.prototype.isMediaRecorderUsed = function() {
+        return this.mode == 'media';
+    };
+
+    /**
      * Is the WebRTC recorder being used?
      *
      * @returns {boolean}
@@ -475,6 +585,15 @@
     };
 
     /**
+     * Is the MediaRecorder recorder supported?
+     *
+     * @returns {boolean}
+     */
+    RecorderPlugin.prototype.isMediaRecorderSupported = function() {
+        return this.media.supported;
+    };
+
+    /**
      * Is the WebRTC recorder supported?
      *
      * @returns {boolean}
@@ -490,6 +609,31 @@
      */
     RecorderPlugin.prototype.isFlashSupported = function() {
         return this.flash.supported;
+    };
+
+    /**
+     * Gets the file extension to use for an audio recording
+     *
+     * @returns {string}
+     */
+    RecorderPlugin.prototype.getFileExtension = function() {
+        // Media or WebRTC: get from blob
+        // Flash: assume it's wav
+        var type = '';
+        if (this.media.blob && this.media.blob.type) {
+            type = this.media.blob.type;
+        } else if (this.webrtc.blob && this.webrtc.blob.type) {
+            type = this.webrtc.blob.type;
+        }
+        switch (type) {
+            case 'audio/ogg':
+                return 'ogg';
+            case 'audio/mpeg':
+                return 'mp3';
+            case 'audio/wav':
+            default:
+                return 'wav';
+        }
     };
 
     $.fn[PLUGIN_NAME] = function(options) {

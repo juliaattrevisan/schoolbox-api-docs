@@ -15,7 +15,7 @@
         // Call this when I want to actually upload recorded sounds
         var uploadRecorded = function() {
             recorderNameInput.blur();
-            recorderInterface.uploadRecorded(recorderNameInput.val() + '.wav');
+            recorderInterface.uploadRecorded(recorderNameInput.val() + '.' + recorderInterface.getFileExtension());
             recorderNameDialog.dialog('close');
         };
 
@@ -45,7 +45,7 @@
             autoOpen: false,
             buttons: [
                 {
-                    text:  'Try to upload a file',
+                    text:  'Try it',
                     click: function() {
                         $('#attachment-browser').find('a[href="#internal/upload"]').click();
                         $(this).dialog('close');
@@ -105,7 +105,7 @@
         recorderInterface = recorderContainer.data('recorder');
 
         // Set up button events
-        recorderContainer.on('setupFailed.recorder', function() {
+        recorderContainer.on('setupFailed.recorder, recordingStartFailed.recorder', function() {
             // Disable all buttons
             recorderButtons.start.hide().prop('disabled', true);
             recorderButtons.recording.hide().prop('disabled', true);
@@ -234,6 +234,7 @@
 <div id="recorderNameDialog" title="Please enter a name for this recording" class="hide">
     <input data-role="recording-name" type="text" value="recording" />
 </div>
-<div id="recorderDisabledDialog" title="Recording is not directly supported in your browser" class="hide">
-    Selecting a file to upload in the "Upload file" selector might work.
+<div id="recorderDisabledDialog" title="Recording is not directly supported" class="hide">
+    Recording is not directly supported in your browser,
+    but creating and uploading a recording through the "Upload file" form might work.
 </div>
