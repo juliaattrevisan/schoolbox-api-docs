@@ -8,3 +8,6 @@ INNER JOIN submission_notification sn
     ON sn.`box_id` = REPLACE(REPLACE(REPLACE(REPLACE(msg_route_key, 'duework.', ''), '.returned', ''), '.upcoming', ''), '.overdue', '')
 WHERE mr.msg_route_key RLIKE '^duework\.[[:digit:]]+\.(returned|upcoming|overdue)'
 AND mr.user_id = 0;
+
+-- Do it, I know you want to
+-- DROP TABLE `submission_notification`;
