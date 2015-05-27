@@ -1054,66 +1054,6 @@ class Submission extends DeprecatedModel
     }
 
     /**
-     * Create a new submission box record and associated data
-     *
-     * @param $object
-     *
-     * @return bool|int
-     */
-    function create($object)
-    {
-        // extract notification array
-        $notifs = $object['notifications'];
-        unset($object['notifications']);
-
-        // insert the new object
-        $id = parent::create($object);
-
-        if ($id && count($notifs)) {
-            // insert notification records
-            $sql = array();
-            foreach ($notifs as $type => $settings) {
-                $sql[] = "($id, '$type', {$settings['enabled']}, 0)";
-            }
-            $query = "INSERT INTO submission_notification VALUES " . implode(', ', $sql);
-            $this->db->query($query);
-
-            return $id;
-        }
-        return false;
-    }
-
-    /**
-     * Update a submission box record and associated data
-     *
-     * @param $object
-     *
-     * @return bool
-     */
-    function update($object)
-    {
-        // extract notification array
-        $id     = $object[$this->_index];
-        $notifs = $object['notifications'];
-        unset($object['notifications']);
-
-        if (parent::update($object)) {
-            // update notification records
-            foreach ($notifs as $type => $settings) {
-                $query = "
-                    INSERT INTO submission_notification (`box_id`, `type`, `enabled`)
-                    VALUES ($id, '$type', {$settings['enabled']})
-                    ON DUPLICATE KEY UPDATE `enabled` = {$settings['enabled']}
-                ";
-                $this->db->query($query);
-            }
-            return true;
-        }
-        return false;
-    }
-
-
-    /**
      * Retreieve all the upcoming or expired-but-relevant due work for a student
      *
      * @param $studentID
