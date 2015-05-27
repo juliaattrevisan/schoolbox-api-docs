@@ -217,8 +217,6 @@ class Marksheet
                 $isOA = $work['type_id'] == \Assess_Main::ONLINE_ASSESSMENT_TYPE_ID ? 1 : 0;
 
                 if ($isOA) {
-                    // automark if OA
-                    $this->automarkOnlineAssessment($work['id']);
                     $mapper = $this->oaMapper;
                     $mtSlug = 'percent';
                 } else {
