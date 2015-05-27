@@ -137,23 +137,6 @@ $this->setVar(array(
 	'CURRENT_SECTION_SEQUENCE' => $section['sequence'],
 ));
 
-/* Load all the questions for this section. This saves stubs for each response
- * and also the questions that were attempted, allowing an overview of which
- * questions were available during the attempt, even the randomly selected ones
- */
-if (!$responseHandler->numStubResponsesInSection($_SESSION['attempt_id'], $section['section_id'])) {
-    if ($section['random'] == 1) {
-        $pool = $section['pool'];
-        $randomise = Survey_Response::RANDOMISE_QUESTIONS;
-    }
-	else {
-        $pool = 0;
-        $randomise = Survey_Response::ORDERED_QUESTIONS;
-    }
-
-    $responseHandler->assignQuestions($_SESSION['attempt_id'], $section['section_id'], $pool, $randomise);
-}
-
 /* Load questions
  */
 $allQuestions = $sectionHandler->getQuestions($_SESSION['attempt_id'], $section['section_id']);
