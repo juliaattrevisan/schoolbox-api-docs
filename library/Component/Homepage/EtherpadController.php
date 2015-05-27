@@ -16,7 +16,7 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
      *
      * @var array
      */
-    protected $sortFields = array();
+    protected $sortFields = array('Name', 'Created', 'Last Updated');
 
     /**
      * Map human-friendly versions to db-friendly versions
@@ -51,8 +51,6 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
      */
     public function execute()
     {
-        $this->setSortFields(array('Name', 'Created', 'Last Updated'));
-
         return true;
     }
 
