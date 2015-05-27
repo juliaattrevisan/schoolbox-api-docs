@@ -94,6 +94,18 @@ else {
 	}
 	else {
 		$_SESSION['attempt_id'] = $attemptHandler->start($_SESSION['id'], $this->arg[0]);
+        // Assign all questions on init, not starting a section.
+        $responseHandler = new Survey_Response();
+        $sectionHandler  = new Survey_Section();
+        foreach ($sectionHandler->getList($assess['assess_id']) as $section) {
+            // Randomized questions aren't available for surveys
+            $responseHandler->assignQuestions(
+                $_SESSION['attempt_id'],
+                $section['section_id'],
+                0,
+                false
+            );
+        }
 	}
 }
 
