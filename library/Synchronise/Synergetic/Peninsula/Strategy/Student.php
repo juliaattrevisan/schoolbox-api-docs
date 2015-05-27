@@ -85,7 +85,7 @@ class Synchronise_Synergetic_Peninsula_Strategy_Student extends Synchronise_Base
      * Groups for students:
      *
      * * 6  (ELC)
-     * * 19 (Prep)
+     * * 21 (Prep)
      * * Otherwise, Year+6
      *
      * @param  array $currentUser
