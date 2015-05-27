@@ -187,10 +187,22 @@
     <div class="level clearfix">
         <p>Use this page to configure the messages the system will send to users.</p>
         <h3>Settings</h3>
-        <p>
-            The <em>default</em> way this message should be received (remembering users can personalise their settings).
-            <br/>For more control, the modify button allows you to restrict users' delivery options.
-        </p>
+        <div class="wysiwyg">
+            <ul>
+                <li>
+                    <em>Selected options</em> are way this message should be received (remembering users can personalise their settings).
+                </li>
+                <li>
+                    <em>Disabled options</em> will not be selectable by users of the given role
+                </li>
+                <li>
+                    You can customise and restrict users' delivery options by using the modify button
+                </li>
+                <li>
+                    To hide a message source from members of a role, lock that source to Muted
+                </li>
+            </ul>
+        </div>
         {% include '@messages/legend.twig' with { digest: true, mobile: 'plural', who: 'users' } %}
         <ul class="filter admin-nav clearfix">
             <li>
