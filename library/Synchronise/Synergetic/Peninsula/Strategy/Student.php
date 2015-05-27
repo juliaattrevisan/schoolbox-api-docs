@@ -95,7 +95,7 @@ class Synchronise_Synergetic_Peninsula_Strategy_Student extends Synchronise_Base
         $year = $this->getYearFromUser($currentUser);
         switch ($year) {
             case 'ELC':
-                return 19;
+                return 21;
             case 'P':
                 return 6;
             default:
