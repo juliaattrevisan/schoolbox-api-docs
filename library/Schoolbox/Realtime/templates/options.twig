@@ -1,5 +1,5 @@
 {% for level, perm in perms %}
-    <td data-perm="{{ level }}" class="simple perm{% if role.enabled == false %} disable{% endif %}">
+    <td data-perm="{{ level }}" class="simple perm">
         <input id="{{ mode }}-{{ ns[namespace.id].slug ?: 0 }}-{{ source.id ?: 0 }}{%if role %}-{{ role.id }}{% endif %}-{{ level }}"
                name="data[{{ ns[namespace.id].slug ?: 0 }}][{{ sources[source.id].key ?: 0 }}]{% if role %}[{{ role.id }}]{% endif %}[perm][]"
                value="{{ level }}" data-perm="{{ level }}" type="{{ level <= 1 or level > 4 ? 'radio' : 'checkbox' }}"
@@ -16,5 +16,5 @@
             </span>
         </label>
     </td>
-    {% if level == 1 %}<td class="simple{% if role.enabled == false %} disable{% endif %}">+</td>{% endif %}
+    {% if level == 1 %}<td class="simple">+</td>{% endif %}
 {% endfor %}

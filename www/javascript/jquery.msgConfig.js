@@ -15,7 +15,6 @@
         sourceSelector: 'li[data-source]',
         tableSelector:  'table[data-settings]',
         roleSelector:   'tr',
-        toggleSelector: 'td[data-toggle]',
         customSelector: 'td[data-custom]',
         permSelector:   '[data-perm]',
 
@@ -79,35 +78,6 @@
         this.tables  = $(this.element).find(this.sel('table'));
         this.sources = $(this.element).find(this.sel('source'));
 
-        // when a role is turned on/off
-        if (self.options.toggleSelector) {
-            $(this.element).on(change, this.sel('toggle', 'input'), function (e) {
-                var val = parseInt($(this).val()),
-                    src = $(this).closest(self.sel('source')),
-                    chk = $(this).is(':checked'),
-                    tds = $(this).closest(self.sel('role')).find([
-                        self.sel('perm'), self.sel('custom')
-                    ].join(', '));
-
-                if (chk) {
-                    if (val) {
-                        tds.removeClass(self.options.disabledClass);
-
-                    } else {
-                        tds.addClass(self.options.disabledClass);
-                    }
-                }
-
-                // execute description callback
-                self.options.describe.call(src);
-
-                // do not persist if this is a forced change
-                if (e.namespace != 'force') {
-                    self.options.persist.call(src);
-                }
-            });
-        }
-
         if (self.options.customSelector) {
             $(this.element).on('click', this.sel('custom', 'a'), function (e) {
                 var link = $(this);
@@ -151,9 +121,7 @@
                 chk   = input.is(':checked'),
                 role  = input.closest(self.sel('role')),
                 src   = input.closest(self.sel('source')),
-                off   = '[data-perm=' + lvl.off + ']',
-                inst  = '[data-perm=' + lvl.instant + ']',
-                fallback;
+                inst  = '[data-perm=' + lvl.instant + ']';
 
 
             // TODO find out why this is double-tapping and remove this
@@ -202,9 +170,29 @@
     }
 
     $.fn[pluginName] = function (options) {
+
+        var args = arguments;
+
         return this.each(function () {
-            if (!$.data(this, 'plugin_' + pluginName)) {
-                $.data(this, 'plugin_' + pluginName, new MsgConfig(this, options));
+
+            // parse object into construction (if no instance yet exists)
+            if (typeof options == 'object') {
+                if (!$.data(this, 'plugin_' + pluginName)) {
+                    $.data(this, 'plugin_' + pluginName, new MsgConfig(this, options));
+                }
+
+            } else if (typeof options == 'string') {
+                if (!$.data(this, 'plugin_' + pluginName)) {
+                    throw "Cannot call functions, " + pluginName + " not instantiated";
+                }
+
+                if (options == 'describe') {
+                    if (args.length < 2) {
+                        throw "Cannot describe without a target element";
+                    }
+
+                    $.data(this, 'plugin_' + pluginName).options.describe.call(args[1]);
+                }
             }
         });
     };

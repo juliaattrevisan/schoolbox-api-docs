@@ -210,7 +210,6 @@ class Config
 
             $config[$namespaceId]['sources'][$sDescription]['roles'][$roleId] = [
                 'id'      => $roleId,
-                'enabled' => $mask != null,
                 'mask'    => explode(',', $mask),
                 'default' => explode(',', $default)
             ];
