@@ -217,8 +217,6 @@ class Marksheet
                 $isOA = $work['type_id'] == \Assess_Main::ONLINE_ASSESSMENT_TYPE_ID ? 1 : 0;
 
                 if ($isOA) {
-                    // automark if OA
-                    $this->automarkOnlineAssessment($work['id']);
                     $mapper = $this->oaMapper;
                     $mtSlug = 'percent';
                 } else {
@@ -351,36 +349,6 @@ class Marksheet
         }
     }
 
-
-    /**
-     * Automatically marks the given OA.
-     *
-     * @param $assessId
-     */
-    protected function automarkOnlineAssessment($assessId)
-    {
-        $allAttempts = $this->attemptHandler->getList($assessId);
-
-        if (is_array($allAttempts)) {
-            foreach ($allAttempts as $currentAttempt) {
-                $allResponses = $this->responseHandler->getAutomarkableResponses($currentAttempt['attempt_id']);
-
-                if (is_array($allResponses)) {
-                    foreach ($allResponses as $currentResponse) {
-                        $answerHandler = $this->assessFactoryHandler->createAnswerModel($currentResponse['type_id']);
-
-                        $answerHandler->mark($currentResponse);
-
-                        $markedResponseIDs[] = $currentResponse['response_id'];
-                    }
-                }
-            }
-
-            $this->responseHandler->updatedAutomatedMarks($markedResponseIDs);
-        }
-    }
-
-
     /**
      * Calculate the mark for the most recent attempt of the given OA by the given student
      *
@@ -396,6 +364,13 @@ class Marksheet
             return array(
                 'mark'      => '',
                 'norm_mark' => null
+            );
+        }
+        if (!$mostRecentAttempt['finish']) {
+            return array(
+                'mark'        => '',
+                'norm_mark'   => null,
+                'in_progress' => true,
             );
         }
         $marks = $this->attemptHandler->getMarksForAttempt($mostRecentAttempt['attempt_id']);
@@ -694,12 +669,20 @@ class Marksheet
                 $mark   = $row['marks'][$item['isOA']][$item['id']];
                 $workId = $item['id'];
 
+                $markLabel = '';
+                if ($mark['in_progress']) {
+                    $markLabel = 'In Progress';
+                } elseif (strlen($mark['mark'])) {
+                    $markLabel = $mark['mark'];
+                } else {
+                    $markLabel = '&ndash;';
+                }
                 $page->setVar(
                     array(
                         'WORK_TYPE'              => $item['isOA'] ? 'assess' : 'submission',
                         'WORK_ID'                => $item['id'],
                         'STUDENT_WORK_NORM_MARK' => $mark['norm_mark'],
-                        'STUDENT_WORK_MARK'      => strlen($mark['mark']) ? $mark['mark'] : '&ndash;',
+                        'STUDENT_WORK_MARK'      => $markLabel,
                         'STUDENT_WORK_COMMENT'   => isset($mark['comment']) ? $mark['comment'] : '',
                     )
                 );
