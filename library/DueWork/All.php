@@ -337,7 +337,7 @@ class DueWork_All {
 
                 foreach($allAttempts as $currentAttempt) {
                     // Finish time
-                    if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
+                    if ($currentAttempt['finish']) {
                         $finish = date('jS F Y, g:i:sa', strtotime($currentAttempt['finish']));
                         $timeTaken = $this->assessHandler->sec2hms($currentAttempt['timeTaken']);
                     }

@@ -130,7 +130,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
                   FROM {$this->_table}
                   WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
                   AND user_id = '{$_SESSION['id']}'
-                  AND finish != '0000-00-00 00:00:00'
+                  AND finish IS NOT NULL
 				  AND deleted_at IS NULL";
 
         return $this->db->getOne($query);
