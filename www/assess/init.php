@@ -75,6 +75,26 @@ else {
 	}
 	else {
 		$_SESSION['attempt_id'] = $attemptHandler->start($_SESSION['id'], $this->arg[0]);
+        // Assign all questions on quiz init, not starting a section.
+        // This ensures that a response is created for all answers,
+        // so they contribute to total mark. (SB-7928)
+        $responseHandler = new Assess_Response();
+        $sectionHandler  = new Assess_Section();
+        foreach ($sectionHandler->getList($assess['assess_id']) as $section) {
+            if ($section['random']) {
+                $pool = $section['pool'];
+                $randomise = Assess_Response::RANDOMISE_QUESTIONS;
+            } else {
+                $pool = 0;
+                $randomise = Assess_Response::ORDERED_QUESTIONS;
+            }
+            $responseHandler->assignQuestions(
+                $_SESSION['attempt_id'],
+                $section['section_id'],
+                $pool,
+                $randomise
+            );
+        }
 	}
 }
 
