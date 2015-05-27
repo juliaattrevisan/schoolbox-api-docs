@@ -517,8 +517,8 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 			// params for this instance - oldname doesn't have an associated href
 			$params = array(
 				'author'  => array($ownerName, "/search/user/$ownerId"),
-				'oldname' => $diff['name'][1],
-				'newname' => array($diff['name'][0], "/assess/intro/$quizId"),
+				'oldname' => $diff['title'][1],
+				'newname' => array($diff['title'][0], "/assess/intro/$quizId"),
 				'catname' => array($catName, "/homepage/$catId")
 			);
 
@@ -635,8 +635,8 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
                     Logger::NOTICE,
                     array(
                         'child'   => array($student->formatName(), "/search/user/".$student->getId()),
-                        'oldname' => $diff['name'][1],
-                        'newname' => array($diff['name'][0], "/assess/intro/$quizId"),
+                        'oldname' => $diff['title'][1],
+                        'newname' => array($diff['title'][0], "/assess/intro/$quizId"),
                         'catname' => array($catName, "/homepage/$catId"),
                     )
                 );
