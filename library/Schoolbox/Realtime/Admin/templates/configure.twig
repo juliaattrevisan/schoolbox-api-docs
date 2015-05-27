@@ -18,16 +18,15 @@
 
     $(function () {
 
-        var ii;
+        var ii, configurator;
 
         // inlineify all SVGs
         $('body').svgInline();
 
-        $('#configurator').msgconfig({
+        configurator = $('#configurator').msgconfig({
             sourceSelector: 'li.source',
             tableSelector:  '.digest-settings',
             roleSelector:   'tr',
-            toggleSelector: '.toggle',
             customSelector: 'td.custom',
             permSelector:   '.perm',
             persist: function () {
@@ -53,9 +52,9 @@
 
                 rows.each(function () {
                     var row  = $(this),
-                            ins  = row.find('input[data-perm]:checked'),
-                            role = row.children('th').text(),
-                            sum  = 0;
+                        ins  = row.find('input[data-perm]:checked'),
+                        role = row.children('th').text(),
+                        sum  = 0;
 
                     if (!role) {
                         --count;
@@ -73,7 +72,7 @@
 
                     ins.each(function () {
                         var i   = $(this),
-                                lbl = desc[i.data('perm')];
+                            lbl = desc[i.data('perm')];
 
                         if (typeof lbl === 'undefined' || lbl === 'off') {
                             return;
@@ -111,11 +110,16 @@
                     ].join('&');
 
                 dialog.load('/adminv2/messages/configure/custom', query, function () {
+                    var src = row.closest('.source');
+
                     dialog.dialog({
                         modal: true,
                         resizable: false,
                         width: 640,
-                        title: 'Advanced Settings'
+                        title: 'Advanced Settings',
+                        close: function () {
+                            configurator.msgconfig('describe', src);
+                        }
                     });
                 });
             }
@@ -183,12 +187,9 @@
     <div class="level clearfix">
         <p>Use this page to configure the messages the system will send to users.</p>
         <h3>Settings</h3>
-        <ul>
-            <li><strong>Enabled</strong>: Whether the given role can receive this message at all.</li>
-            <li><strong>Default</strong>: The <em>default</em> way this message should be received (remembering users can personalise their settings).</li>
-        </ul>
         <p>
-            <br/><em>For more control, the modify button allows you to restrict users' delivery options.</em>
+            The <em>default</em> way this message should be received (remembering users can personalise their settings).
+            <br/>For more control, the modify button allows you to restrict users' delivery options.
         </p>
         {% include '@messages/legend.twig' with { digest: true, mobile: 'plural', who: 'users' } %}
         <ul class="filter admin-nav clearfix">
