@@ -396,6 +396,13 @@ class Marksheet
                 'norm_mark' => null
             );
         }
+        if (!$mostRecentAttempt['finish']) {
+            return array(
+                'mark'        => '',
+                'norm_mark'   => null,
+                'in_progress' => true,
+            );
+        }
         $marks = $this->attemptHandler->getMarksForAttempt($mostRecentAttempt['attempt_id']);
         $total = $this->attemptHandler->getTotalMarks($assessId, $mostRecentAttempt['attempt_id']);
 
@@ -692,12 +699,20 @@ class Marksheet
                 $mark   = $row['marks'][$item['isOA']][$item['id']];
                 $workId = $item['id'];
 
+                $markLabel = '';
+                if ($mark['in_progress']) {
+                    $markLabel = 'In Progress';
+                } elseif (strlen($mark['mark'])) {
+                    $markLabel = $mark['mark'];
+                } else {
+                    $markLabel = '&ndash;';
+                }
                 $page->setVar(
                     array(
                         'WORK_TYPE'              => $item['isOA'] ? 'assess' : 'submission',
                         'WORK_ID'                => $item['id'],
                         'STUDENT_WORK_NORM_MARK' => $mark['norm_mark'],
-                        'STUDENT_WORK_MARK'      => strlen($mark['mark']) ? $mark['mark'] : '&ndash;',
+                        'STUDENT_WORK_MARK'      => $markLabel,
                         'STUDENT_WORK_COMMENT'   => isset($mark['comment']) ? $mark['comment'] : '',
                     )
                 );
