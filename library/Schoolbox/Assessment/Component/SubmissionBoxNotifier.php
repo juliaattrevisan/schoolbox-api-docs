@@ -684,6 +684,8 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                 $bob = $this
                     ->setForNotifyRenamed($bob, $submissionBox, $diff, $user)
                     ->setTitle(":child's quiz was renamed from :oldname to :newname in :catname")
+                    ->unsetParam('author')
+                    ->setParam('child', new UserParam($student))
                 ;
                 $envelope->targetToParent($student->getId(), $bob->build());
             }
@@ -699,6 +701,8 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                 $bob = $this
                     ->setForNotifyDueDateChanged($bob, $submissionBox, $diff, $user)
                     ->setTitle(":child's quiz :boxname closing date was $verb to :date in :catname")
+                    ->unsetParam('author')
+                    ->setParam('child', new UserParam($student))
                 ;
                 $envelope->targetToParent($student->getId(), $bob->build());
             }
@@ -716,6 +720,8 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                 $bob = $this
                     ->setForNotifyAcceptOnlineChanged($bob, $submissionBox)
                     ->setTitle($m)
+                    ->unsetParam('author')
+                    ->setParam('child', new UserParam($student))
                 ;
                 $envelope->targetToParent($student->getId(), $bob->build());
             }
@@ -728,6 +734,8 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                 $bob = $this
                     ->setForNotifyUpdated($bob, $submissionBox, $user)
                     ->setTitle(":child's quiz :quizname was updated in :catname")
+                    ->unsetParam('author')
+                    ->setParam('child', new UserParam($student))
                 ;
                 $envelope->targetToParent($student->getId(), $bob->build());
             }
