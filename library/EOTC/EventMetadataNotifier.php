@@ -178,17 +178,15 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         $relEventStart = (int)$relEvent->getStartDateTime()->getUnixTimestamp();
         $currentStatus = $eventMetadata->getStatus();
 
-        $userIds = $this->getInterestedUsers(
-            $relEvent,
-            $currentStatus instanceof EventStatus ? $currentStatus->getId() : (int)$currentStatus
-        );
+        // TODO KNOWN ISSUE IN [EOTC-120]: THIS IS CURRENTLY JUST ALERTS ALL MODERATORS
+        $userIds = EventPermissionMapper::getInstance()->findByColumn('campus_id', $relEvent->getCampusCollection()->getColumnValues('campusId'));
 
         // TODO make this use Carbon-based ADF once it's merged into 15.0
         $days = (int)round(($relEventStart - time()) / self::REMINDER_INTERVAL);
 
         $href = "/modules/eotc/status/modify/$relEventId";
 
-        $bob->setTitle(":event starts in $days days, but has not been given final approval")
+        $bob->setTitle("Warning: :event starts in $days days, but has not been given final approval")
             ->setHref($href)
             ->setParams(array(
                 'event' => new Param($relEvent->getTitle(), $href)
@@ -196,7 +194,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
             ->setSeverity(Logger::WARNING)
             ->setNamespace($this->getSlug())
             ->addTopic("eotc.$relEventId.".self::TRIGGER_UPCOMING)
-            ->setIcon("/images/icon.php?icon=clock&size=32");
+            ->setIcon("/images/icon.php?icon=alert&size=32");
 
         $msg = $bob->build();
 
