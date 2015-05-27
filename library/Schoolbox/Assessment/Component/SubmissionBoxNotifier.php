@@ -672,7 +672,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             ->setHref("/submission/submissionHistory/$boxId")
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
-            ->addFilter('roletype', Role::STUDENT);
+            ->addFilter('roletype', Role::PARENT);
 
         $students = UserAccessMapper::getInstance()->findStudentsInCategory(
             $this->categoryMapper->findById($submissionBox->getCategory()->getId())
