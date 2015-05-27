@@ -349,36 +349,6 @@ class Marksheet
         }
     }
 
-
-    /**
-     * Automatically marks the given OA.
-     *
-     * @param $assessId
-     */
-    protected function automarkOnlineAssessment($assessId)
-    {
-        $allAttempts = $this->attemptHandler->getList($assessId);
-
-        if (is_array($allAttempts)) {
-            foreach ($allAttempts as $currentAttempt) {
-                $allResponses = $this->responseHandler->getAutomarkableResponses($currentAttempt['attempt_id']);
-
-                if (is_array($allResponses)) {
-                    foreach ($allResponses as $currentResponse) {
-                        $answerHandler = $this->assessFactoryHandler->createAnswerModel($currentResponse['type_id']);
-
-                        $answerHandler->mark($currentResponse);
-
-                        $markedResponseIDs[] = $currentResponse['response_id'];
-                    }
-                }
-            }
-
-            $this->responseHandler->updatedAutomatedMarks($markedResponseIDs);
-        }
-    }
-
-
     /**
      * Calculate the mark for the most recent attempt of the given OA by the given student
      *
