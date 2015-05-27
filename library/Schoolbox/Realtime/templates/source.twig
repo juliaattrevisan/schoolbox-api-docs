@@ -11,7 +11,6 @@
             <tr class="thead">
                 <th width="300">Role</th>
                 <th width="150">Enabled</th>
-                {#<th width="100">Mutable</th>#}
                 <th colspan="7">Default</th>
             </tr>
             {% for role in source.roles %}
@@ -31,13 +30,6 @@
                             </label>
                         {% endfor %}
                     </td>
-{#                    <td class="simple mutable {% if role.enabled == false %}disable{% endif %}">
-                        <input {% if 'MU' in role.mask %}checked="checked"{% endif %}
-                               type="checkbox"
-                               name="data[{{ ns[namespace.id].slug }}][{{ sources[source.id].key }}][{{ role.id }}][mutable]"
-                               value="1"
-                        />
-                    </td>#}
                     {% include '@messages/options.twig' with { mode: 'p' } %}
                     <td class="custom{% if role.enabled == false %} disable{% endif %}">
                         <span class="actions">
