@@ -1,7 +1,7 @@
 <?php
 /**
  * Most basic column type - doesn't perform any translation on hydration or
- * dehydration.
+ * dehydration, besides ensuring that values are stored in valid UTF-8.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
