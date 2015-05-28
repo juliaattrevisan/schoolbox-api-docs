@@ -61,12 +61,10 @@ class CanBookItem implements Rule\IAuthorizationRule
         } else {
             $item = $this->getMapper()->findById($params['id']);
         }
-        $moderateRule = new Item\Auth\CanModerateItem();
-        $moderateRule->setMapper($this->getMapper());
         $auth = new Rule\Any(
             new Rule\IsSuperuser(),
             new Rule\HasServicePermission(UserAccess::SERVICE_RESOURCE_BOOKING, UserAccess::ACCESS_FULL),
-            $moderateRule
+            new Item\Auth\CanModerateItem()
         );
         if (!($item->getModerationType()->getId() == Item\ModerationType\Model::TYPE_MANAGED)) {
             // Add a callback rule:
