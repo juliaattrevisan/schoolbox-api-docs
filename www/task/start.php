@@ -27,7 +27,8 @@ try {
 
 // Am I a student undoing their task completion?
 // I can only undo self-assessable items, all others will have no effect.
-$isUndo = isset($this->arg[1]) && $this->arg[1] == 'undo';
+$isUndo     = isset($this->arg[1]) && $this->arg[1] == 'undo';
+$isComplete = isset($this->arg[1]) && $this->arg[1] == 'complete';
 
 // Check permissions
 /** @var UnitInstance $unit_instance */
@@ -72,19 +73,23 @@ switch ($task->getType()) {
         // Mark this item as complete.
         // Redirect to the link if there is one, otherwise redirect back to the
         // homepage this is on.
+        $homepageLink = '/homepage/'.$component->getIdentifier().'/#component'.$component_id;
         if (!$task->getRequiresConfirmation()) {
             if ($isUndo) {
                 Task\InstanceCompletionMapper::getInstance()->unmarkAsCompleted(
                     $task->getId(),
                     $_SESSION['id']
                 );
-                SitePage::localRedir('/homepage/'.$component->getIdentifier().'/');
+                SitePage::localRedir($homepageLink);
+                exit;
+            } elseif ($isComplete) {
+                Task\InstanceCompletionMapper::getInstance()->markAsCompleted(
+                    $task->getId(),
+                    $_SESSION['id']
+                );
+                SitePage::localRedir($homepageLink);
                 exit;
             }
-            Task\InstanceCompletionMapper::getInstance()->markAsCompleted(
-                $task->getId(),
-                $_SESSION['id']
-            );
         }
 
         $link = $task->getLink();
@@ -92,7 +97,7 @@ switch ($task->getType()) {
             header('Location: '.$link);
             exit;
         } else {
-            SitePage::localRedir('/homepage/'.$component->getIdentifier().'/');
+            SitePage::localRedir($homepageLink);
         }
         break;
 }
