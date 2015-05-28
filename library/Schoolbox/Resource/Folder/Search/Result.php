@@ -42,16 +42,15 @@ class Result extends Base
             FROM {$mapper->getTable()} c
             LEFT JOIN {$mapper->getJoinSql('codes', 'c', 'cc')}
             LEFT JOIN {$mapper->getJoinSql('homepages', 'c', 'hp')}
-            WHERE (
-                MATCH(`c`.`name`) AGAINST (\"*{$sanitiser->getKeyword()}*\" IN BOOLEAN MODE) OR
-                MATCH(`cc`.`code`) AGAINST (\"*{$sanitiser->getKeyword()}*\" IN BOOLEAN MODE)
-            )
+            WHERE (`c`.`name` LIKE :likeKeyword OR `cc`.`code` LIKE :likeKeyword)
 			ORDER BY c.{$sanitiser->getSortBy()} {$sanitiser->getSortDir()}
 			LIMIT {$sanitiser->getOffset()}, {$sanitiser->getLimit()}
         ";
 
         $statement = $mapper->getDatabase()->prepare($query);
-        $statement->execute();
+        $statement->execute([
+            'likeKeyword' => '%'.$mapper->getDatabase()->quoteForLike($sanitiser->getUnquotedKeyword()).'%',
+        ]);
 
         $results = new Collection();
 
@@ -103,14 +102,13 @@ class Result extends Base
             FROM {$mapper->getTable()} c
             LEFT JOIN {$mapper->getJoinSql('codes', 'c', 'cc')}
             LEFT JOIN {$mapper->getJoinSql('homepages', 'c', 'hp')}
-            WHERE (
-                MATCH(`c`.`name`) AGAINST (\"*{$sanitiser->getKeyword()}*\" IN BOOLEAN MODE) OR
-                MATCH(`cc`.`code`) AGAINST (\"*{$sanitiser->getKeyword()}*\" IN BOOLEAN MODE)
-            )
+            WHERE (`c`.`name` LIKE :likeKeyword OR `cc`.`code` LIKE :likeKeyword)
 		";
 
         $stmt = $mapper->getDatabase()->prepare($query);
-        $stmt->execute();
+        $stmt->execute([
+            'likeKeyword' => '%'.$mapper->getDatabase()->quoteForLike($sanitiser->getUnquotedKeyword()).'%',
+        ]);
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
