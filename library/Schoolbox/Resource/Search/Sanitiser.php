@@ -62,6 +62,13 @@ class Sanitiser
     private $keyword = '';
 
     /**
+     * Keyword (unquoted)
+     *
+     * @var string
+     */
+    private $unquotedKeyword = '';
+
+    /**
      * Sanitise search params
      *
      * Immutable
@@ -99,6 +106,7 @@ class Sanitiser
         /* PDO
          */
         $this->setKeyword($mapper->getDatabase()->quote($keyword));
+        $this->setUnquotedKeyword($keyword);
     }
 
     /* Getters/Setters
@@ -202,5 +210,24 @@ class Sanitiser
     public function getKeyword()
     {
         return $this->keyword;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUnquotedKeyword()
+    {
+        return $this->unquotedKeyword;
+    }
+
+    /**
+     * @param  string $unquotedKeyword
+     *
+     * @return $this
+     */
+    private function setUnquotedKeyword($unquotedKeyword)
+    {
+        $this->unquotedKeyword = $unquotedKeyword;
+        return $this;
     }
 }
