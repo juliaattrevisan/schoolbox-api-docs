@@ -183,6 +183,7 @@ class Healthcheck
         $list[] = 'Timetable';
         $list[] = 'TimetableDefinition';
         $list[] = 'luTimetableGroup';
+        $list[] = 'luDays';
         sort($list);
 
         foreach ($list as $table) {
