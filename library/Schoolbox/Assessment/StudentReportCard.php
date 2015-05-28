@@ -840,14 +840,9 @@ class StudentReportCard
         $buttonSeePreviousAttempts = array(
             'WORK_BTN_HREF'  => 'assess/attempts/' . $oa->getId() . '/' . $this->targetUserId,
             'WORK_BTN_ICON'  => 'list',
-            'WORK_BTN_LABEL' => 'See previous attempts'
+            'WORK_BTN_LABEL' => 'View all attempts'
         );
-        $buttonStudentReview       = array(
-            'WORK_BTN_HREF'  => "assess/studentReview/" . $oa->getId() . '/' .
-                $marks['section_id'] . '/' . $marks['attempt_id'] . '/' . $this->targetUserId,
-            'WORK_BTN_ICON'  => 'eyeball',
-            'WORK_BTN_LABEL' => 'Review'
-        );
+
         if ($marks['attempts'] > 0) {
             $output['WORK_URGENCY'] = 'none';
         }
