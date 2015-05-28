@@ -19,7 +19,55 @@ class Synchronise_Base_Verbose {
 	protected $numUpdated = 0;
 	protected $numSkipped = 0;
 
-	/**
+    /**
+     * A list of all the create and update actions that took place
+     *
+     * @var array
+     */
+    protected $allResults = array();
+
+    /**
+     * A list of all the skip actions
+     *
+     * @var array
+     */
+    protected $allSkipped = array();
+
+    /**
+     * Column widths for the icon/mode/action prefix for each row
+     *
+     * @var array
+     */
+    protected $prefixSpecification = array(
+        'I' => 2,
+        'Mode' => 12,
+        'Action' => 15
+    );
+
+    /**
+     * Column widths for the rest of the row which contains user data
+     * These are the default lengths which get overridden if the data
+     * exceeds their current values
+     *
+     * @var array
+     */
+    protected $rowSpecification = array(
+        'Username' => 10,
+        'Title' => 7,
+        'Firstname' => 20,
+        'Lastname' => 20,
+        'SynergyID' => 12,
+        'AltEmail' => 40,
+        'Campus' => 10,
+        'GroupID' => 9,
+        'Year' => 5,
+        'ePort.' => 8,
+        'Webm.' => 7,
+        'LocalEmail' => 12,
+        'MailHandler' => 13
+    );
+
+    /**
 	 * Create an intro
 	 *
 	 * @return void
@@ -52,15 +100,29 @@ class Synchronise_Base_Verbose {
 	 * in subclasses to make your own verbose strings.
 	 */
 
-	/**
-	 * Echo message about skipping all actions
-	 *
-	 * @return void
-	 */
-	public function skip() {
+    /**
+     * Echo message about skipping all actions
+     * Optionally pass in your own reason
+     *
+     * @param string $reason
+     * @return void
+     */
+	public function skip($reason = null) {
 		if ($this->getVerbose() === true) {
-			echo "o  Skipping create/update of " . $this->verboseUserSummary($this->getNewUser()) . " because they have no username.\n";
-		}
+
+            /* Default reason
+             */
+            if ($reason === null) {
+                $newUser = $this->getNewUser();
+
+                $this->allSkipped[] = "o Skipping create/update of {$newUser['firstname']} {$newUser['lastname']} {$newUser['synergy_id']} because they have no username.";
+            }
+            /* Custom reason
+             */
+            else {
+                $this->allSkipped[] = "o Skipping create/update {$reason}";
+            }
+        }
 	}
 
 	/**
@@ -70,7 +132,14 @@ class Synchronise_Base_Verbose {
 	 */
 	public function planCreation() {
 		if ($this->getVerbose() === true) {
-			echo "+  Planning create of " . $this->verboseUserSummary($this->getNewUser()) . "\n";
+            $this->allResults[] = array_merge(
+                array(
+                    'I' => '+',
+                    'Mode' => 'Planning',
+                    'Action' => 'create'
+                ),
+                $this->verboseUserSummary($this->getNewUser())
+            );
 		}
 	}
 
@@ -81,7 +150,14 @@ class Synchronise_Base_Verbose {
 	 */
 	public function performCreation() {
 		if ($this->getVerbose() === true) {
-			echo "+  Performing create of " . $this->verboseUserSummary($this->getNewUser()) . "\n";
+            $this->allResults[] = array_merge(
+                array(
+                    'I' => '+',
+                    'Mode' => 'Performing',
+                    'Action' => 'create'
+                ),
+                $this->verboseUserSummary($this->getNewUser())
+            );
 		}
 	}
 
@@ -92,8 +168,15 @@ class Synchronise_Base_Verbose {
 	 */
 	public function planUpdate() {
 		if ($this->getVerbose() === true) {
-			echo "^  Planning update of " . $this->verboseUserSummary($this->getNewUser()) . "\n";
-		}
+            $this->allResults[] = array_merge(
+                array(
+                    'I' => '^',
+                    'Mode' => 'Planning',
+                    'Action' => 'update'
+                ),
+                $this->verboseUserSummary($this->getNewUser())
+            );
+   		}
 	}
 
 	/**
@@ -103,98 +186,16 @@ class Synchronise_Base_Verbose {
 	 */
 	public function performUpdate() {
 		if ($this->getVerbose() === true) {
-			echo "^  Performing update of " . $this->verboseUserSummary($this->getNewUser()) . "\n";
+            $this->allResults[] = array_merge(
+                array(
+                    'I' => '^',
+                    'Mode' => 'Performing',
+                    'Action' => 'update'
+                ),
+                $this->verboseUserSummary($this->getNewUser())
+            );
 		}
 	}
-
-    /**
-     * Outputs $message as a skip message
-     *
-     * @param $message
-     */
-    public function outputSkipMessage($message) {
-        if ($this->getVerbose() === true) {
-            echo 'o  Skipping create/update of '.$message."\n";
-        }
-    }
-
-    /**
-     * Outputs a plan create message
-     *
-     * @param $message
-     */
-    public function outputPlanCreateMessage($message) {
-        if ($this->getVerbose() === true) {
-            echo '+  Planning create of '.$message."\n";
-        }
-    }
-
-    /**
-     * Outputs a perform create message
-     *
-     * @param $message
-     */
-    public function outputPerformCreateMessage($message) {
-        if ($this->getVerbose() === true) {
-            echo '+  Performing create of '.$message."\n";
-        }
-    }
-
-    /**
-     * Outputs a plan update message
-     *
-     * @param $message
-     */
-    public function outputPlanUpdateMessage($message) {
-        if ($this->getVerbose() === true) {
-            echo '^  Planning update of '.$message."\n";
-        }
-    }
-
-    /**
-     * Outputs a perform update message
-     *
-     * @param $message
-     */
-    public function outputPerformUpdateMessage($message) {
-        if ($this->getVerbose() === true) {
-            echo '^  Performing update of '.$message."\n";
-        }
-    }
-
-    /**
-     * Outputs a plan linking message (example: linking of teachers or students to class)
-     *
-     * @param $message
-     */
-    public function outputPlanLinkMessage($message) {
-        if ($this->getVerbose() === true) {
-            echo '   Planning link of '.$message."\n";
-        }
-    }
-
-    /**
-     * Outputs a perform linking message (example: linking of teachers or students to class)
-     *
-     * @param $message
-     */
-    public function outputPerformLinkMessage($message) {
-        if ($this->getVerbose() === true) {
-            echo '   Performing link of '.$message."\n";
-        }
-    }
-
-    /**
-     * Outputs a message
-     *
-     * @param $message
-     * @param $prefix
-     */
-    public function outputMessage($message, $prefix = '') {
-        if ($this->getVerbose() === true) {
-            printf("% -2s %s\n", $prefix, $message);
-        }
-    }
 
 	/**
 	 * Create a verbose summary string containing data about the
@@ -204,32 +205,140 @@ class Synchronise_Base_Verbose {
 	 * @return string
 	 */
 	protected function verboseUserSummary($newUser) {
-		if(is_array($newUser)){
+		if (is_array($newUser)) {
 			$data = array();
-			$data[] = "username: {$newUser['username']}";
-			$data[] = "synergy_id: " .$newUser['synergy_id'];
-			$data[] = "title: {$newUser['title']}";
-			$data[] = "firstname: {$newUser['firstname']}";
-			$data[] = "lastname: {$newUser['lastname']}";
-			$data[] = "alt_email: {$newUser['alt_email']}";
-			$data[] = "campus: " . '[' . implode(',', $newUser['campus']) . ']';
-			$data[] = "groupIDs: " . $newUser['group_id'];
+
+            /* Username, title, firstname, lastname
+             */
+            $data['Username'] = $newUser['username'];
+            $data['Title'] = $newUser['title'];
+            $data['Firstname'] = $newUser['firstname'];
+            $data['Lastname'] = $newUser['lastname'];
+
+            /* Other fields
+             */
+			$data['SynergyID'] = $newUser['synergy_id'];
+			$data['AltEmail'] = $newUser['alt_email'];
+			$data['Campus'] = '[' . implode(',', $newUser['campus']) . ']';
+			$data['GroupID'] = $newUser['group_id'];
+            $data['Year'] = '';
 
 			if (array_key_exists('year', $newUser)) {
-				$data[] = 'year: ' . $newUser['year'];
+				$data['Year'] = $newUser['year'];
 			}
 
-			return '(' . implode(', ', $data) . ')';
+            /* Default settings
+             */
+            $data['ePort.'] = $newUser['eportfolio_enabled'];
+            $data['Webm.'] = $newUser['webmail'];
+            $data['LocalEmail'] = $newUser['local_email'];
+            $data['MailHandler'] = $newUser['mail_handler'];
+
+			return $data;
 		}
 	}
 
-	/**
+    /**
+     * Find maximum lengths of columns, and adjust specification
+     * to accommodate longest data
+     *
+     * sometimes numerous emails exist in alt email field
+     * sometimes names are really long
+     * arden campus value
+     * etc
+     */
+    protected function adjustColumnWidths() {
+        foreach ($this->rowSpecification as $title => &$padding) {
+            foreach($this->getAllResults() as $currentRow) {
+                $datalength = strlen($currentRow[$title]);
+
+                if ($datalength > $padding) {
+                    $padding = $datalength+2;
+                }
+            }
+        }
+    }
+
+    /**
+     * Format output row in verbose mode
+     *
+     * @param $row
+     * @internal param $prefix
+     * @internal param $data
+     * @return mixed
+     */
+    private function formatRow($row) {
+        $formattedRow = $row;
+
+        foreach ($this->getPrefixSpecification() as $title => $padding) {
+            $formattedRow[$title] = str_pad($row[$title], $padding);
+        }
+
+        foreach ($this->getRowSpecification() as $title => $padding) {
+            $formattedRow[$title] = str_pad($row[$title], $padding);
+        }
+
+        return implode('', $formattedRow);
+    }
+
+    /**
+     * Echo headings
+     */
+    protected function dumpHeadings() {
+        /* Formatted output
+         */
+        $heading = array();
+
+        /* Prefix column widths
+         */
+        foreach($this->getPrefixSpecification() as $title => $padding) {
+            $heading[$title] = str_pad($title, $padding);
+        }
+
+        /* Data column widths
+         */
+        foreach($this->getRowSpecification() as $title => $padding) {
+            $heading[$title] = str_pad($title, $padding);
+        }
+
+        echo implode('', $heading);
+        echo "\n\n";
+    }
+
+    /**
+     * Echo create/update results
+     */
+    protected function dumpResults() {
+        foreach ($this->getAllResults() as $currentRow) {
+            echo $this->formatRow($currentRow);
+            echo "\n";
+        }
+
+        echo "\n\n";
+    }
+
+    /**
+     * Echo skipped results
+     */
+    protected function dumpSkipped() {
+        foreach ($this->getAllSkipped() as $currentRow) {
+            echo $currentRow . "\n";
+        }
+
+        echo "\n\n";
+    }
+
+    /**
 	 * A summary count of changes
 	 *
 	 * @return void
 	 */
 	public function summary() {
-		echo "\n";
+        $this->adjustColumnWidths();
+        $this->dumpHeadings();
+        $this->dumpResults();
+        $this->dumpSkipped();
+
 		echo "Created: {$this->getNumCreated()}, ";
 		echo "Updated: {$this->getNumUpdated()}, ";
 		echo "Skipped: {$this->getNumSkipped()}";
@@ -330,4 +439,84 @@ class Synchronise_Base_Verbose {
 	protected function getNewUser() {
 		return $this->newUser;
 	}
+
+    /**
+     * Set all results
+     *
+     * @param array $allResults
+     */
+    protected function setAllResults($allResults)
+    {
+        $this->allResults = $allResults;
+    }
+
+    /**
+     * Get all results
+     *
+     * @return array
+     */
+    protected function getAllResults()
+    {
+        return $this->allResults;
+    }
+
+    /**
+     * Set all skipped
+     *
+     * @param array $allSkipped
+     */
+    protected function setAllSkipped($allSkipped)
+    {
+        $this->allSkipped = $allSkipped;
+    }
+
+    /**
+     * Get all skipped
+     *
+     * @return array
+     */
+    protected function getAllSkipped()
+    {
+        return $this->allSkipped;
+    }
+
+    /**
+     * Set prefix specification
+     *
+     * @param array $prefixSpecification
+     */
+    protected function setPrefixSpecification($prefixSpecification)
+    {
+        $this->prefixSpecification = $prefixSpecification;
+    }
+
+    /**
+     * Get prefix specification
+     *
+     * @return array
+     */
+    protected function getPrefixSpecification()
+    {
+        return $this->prefixSpecification;
+    }
+
+    /**
+     * Set row specification
+     *
+     * @param array $rowSpecification
+     */
+    protected function setRowSpecification($rowSpecification)
+    {
+        $this->rowSpecification = $rowSpecification;
+    }
+
+    /**
+     * Get row specification
+     *
+     * @return array
+     */
+    protected function getRowSpecification()
+    {
+        return $this->rowSpecification;
+    }
 }
