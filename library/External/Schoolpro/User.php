@@ -155,14 +155,12 @@ class External_Schoolpro_User implements External_UserInterface
                 foreach ($medicalResult['result'] as $currentCondition) {
 
                     /* Only include medical issues that are Applicable == 1
-                     * Implode them into one big str
+                     * Just use a basic message to hide the sensitive data,
+                     * and bust out of the loop after the first positive result
                      */
                     if ($currentCondition['Applicable']) {
-                        $medicalNoteStr[] = "
-                            <strong>{$currentCondition['Condition']}</strong><br />
-                            Medication: {$currentCondition['Medication']}<br />
-                            Special Instructions: {$currentCondition['SpecialInstructions']}
-                        ";
+                        $medicalNoteStr = 'This student has medical conditions.';
+                        break;
                     }
                 }
             }
@@ -180,7 +178,7 @@ class External_Schoolpro_User implements External_UserInterface
                 'StudentEmergencyName'    => $currentStudent['EmergencyContactName'],
                 'StudentEmergencyPhone'   => $currentStudent['EmergencyContactPhone'],
                 'StudentStudiesCode'      => '',
-                'StudentMedicalAlert'     => implode('<hr />', $medicalNoteStr),
+                'StudentMedicalAlert'     => $medicalNoteStr,
                 'StudentSpecialNeedsFlag' => '',
                 'AlertMessage'            => '',
             );
