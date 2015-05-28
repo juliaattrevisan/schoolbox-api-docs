@@ -29,8 +29,10 @@ class Factory implements IFactory
                 $column = new BoolEnum();
                 break;
             case Mapper::TYPE_STRING:
-            case Mapper::TYPE_LOB:
                 $column = new Base();
+                break;
+            case Mapper::TYPE_LOB:
+                $column = new Binary();
                 break;
             case Mapper::TYPE_INTEGER:
                 $column = new Integer();
