@@ -39,7 +39,7 @@ abstract class TestCase extends PHPUnit_Framework_TestCase {
 
 		//
 		// Set up a mock configuration.
-		$mock_config = $this->getMock('\\Schoolbox\\ConfigLoader');
+		$mock_config = $this->getMock(\Schoolbox\Config\Loader::class);
 		$mock_config
 			->expects($this->any())
 			->method('get')
