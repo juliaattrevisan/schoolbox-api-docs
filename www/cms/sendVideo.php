@@ -53,7 +53,7 @@ if (isset($type) && isset($id)) {
 //    unset($fileinfo);
     switch (pathinfo($filename, PATHINFO_EXTENSION)) {
         case 'mp3':
-            $mimetype = 'audio/mp3';
+            $mimetype = 'audio/mpeg';
             break;
         case 'mp4':
             $mimetype = 'video/mp4';
