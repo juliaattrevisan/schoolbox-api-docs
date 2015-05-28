@@ -35,7 +35,7 @@ class CsvBase extends RendererBase
             $this->getEvent()->getAllday() ? '' : $this->getEvent()->getStartTime()->getUsingFormat('H:i'),
             $this->getEvent()->getEndTime()->getLocalShort(),
             $this->getEvent()->getAllday() ? '' : $this->getEvent()->getEndTime()->getUsingFormat('H:i'),
-            $this->getEvent()->getAllday(),
+            $this->getEvent()->getAllday() ? 1 : 0,
             $this->getEvent()->getTitle(),
             $this->getEvent()->getDetail(),
             $this->getEvent()->getLocation(),
