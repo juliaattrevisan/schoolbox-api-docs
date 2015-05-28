@@ -27,7 +27,7 @@ class ConfigMapper extends Mapper implements IConfigLoader {
 	 * Build the Mapper
 	 */
 	public function __construct() {
-		$this->database = \Database::getInstance();
+		// Load database only on request, so this can be tested
 		$this->map = new MappingCollection();
 		$this->setup();
 		$this->setConfigLoader($this); // this line will possibly blow up in my face
@@ -87,6 +87,10 @@ class ConfigMapper extends Mapper implements IConfigLoader {
 			return constant($var);
 		}
 		elseif(!isset($this->cache[$var])) {
+			// Load database on request only
+			if (!($this->database instanceof \Database)) {
+				$this->database = \Database::getInstance();
+			}
 			$coll = $this->findByColumn('name', $var);
 			if($coll->count()) {
 				$this->cache[$var] = $coll->first()->getValue();
