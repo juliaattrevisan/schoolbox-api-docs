@@ -27,7 +27,7 @@ class FactoryTest extends BaseTestCase {
 	public function getTestBuild() {
 		return array(
 			array('\\Schoolbox\\Column\\Base',       Mapper::TYPE_STRING),
-			array('\\Schoolbox\\Column\\Base',       Mapper::TYPE_LOB),
+			array('\\Schoolbox\\Column\\Binary',     Mapper::TYPE_LOB),
 			array('\\Schoolbox\\Column\\Date',       Mapper::TYPE_DATE),
 			array('\\Schoolbox\\Column\\DateTime',   Mapper::TYPE_DATETIME),
 			array('\\Schoolbox\\Column\\Timestamp',  Mapper::TYPE_TIMESTAMP),
