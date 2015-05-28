@@ -313,12 +313,12 @@
                     <td data-interaction="collapse" data-group="{SUBJECT_RUBRIC_GROUP_NAME}" class="criterion-label pad span">
                         <strong>{SUBJECT_RUBRIC_GROUP_NAME}</strong>
                         <div class="actions">
-                            <a class="btn no-icon minus" title="Hide {SUBJECT_RUBRIC_GROUP_NAME}" data-group="{SUBJECT_RUBRIC_GROUP_NAME}">&minus;</a>
+                            <a class="btn no-icon plus hide" title="Hide {SUBJECT_RUBRIC_GROUP_NAME}" data-group="{SUBJECT_RUBRIC_GROUP_NAME}">+</a>
                         </div>
                     </td>
                 </tr>
                 <!-- BEGIN subject_rubric_criterion -->
-                <tr data-group="{SUBJECT_RUBRIC_GROUP_NAME}">
+                <tr data-group="{SUBJECT_RUBRIC_GROUP_NAME}" class="hide">
                     <td class="criterion-value pad">
                         <ul>
                             <li>
@@ -364,7 +364,12 @@
 					<!-- BEGIN work -->
 					<tr class="{ON_OFF}">
 						<td>
+                            <!-- BEGIN work_clickable -->
 							<a class="title" href="/{WORK_HREF}{WORK_ID}/{WORK_USER_ID}">{WORK_TITLE}</a>
+                            <!-- END work_clickable -->
+                            <!-- BEGIN work_unclickable -->
+                            <span class="title">{WORK_TITLE}</span>
+                            <!-- END work_unclickable -->
 							<br/>
 							<a href="/homepage/{SUBJ_ID}">{SUBJ_NAME}</a> {WORK_TYPE}
 						</td>

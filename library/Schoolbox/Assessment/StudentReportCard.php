@@ -650,6 +650,8 @@ class StudentReportCard
         $page->setBlock('subject', 'work', 'work_block');
         $page->setBlock('work', 'work_actionable', 'work_actionable_block');
         $page->setBlock('work', 'work_publishable', 'work_publishable_block');
+        $page->setBlock('work', 'work_clickable', 'work_clickable_block');
+        $page->setBlock('work', 'work_unclickable', 'work_unclickable_block');
         $work = $this->subjectData->getAssessments();
         if (count($work)) {
             $userMapper = new \Schoolbox\UserMapper();
@@ -677,7 +679,9 @@ class StudentReportCard
                         'WORK_PUBLISH_BTN_ICON'  => '',
                         'WORK_PUBLISH_BTN_LABEL' => '',
                         'work_actionable_block'  => '',
-                        'work_publishable_block' => ''
+                        'work_publishable_block' => '',
+                        'work_clickable_block'   => '',
+                        'work_unclickable_block' => '',
                     )
                 );
                 $existingShowcasedItem = null;
@@ -737,10 +741,10 @@ class StudentReportCard
                         // not allowed: do not offer actions
                         $page->setVar('action_publish_block', '');
                     }
+                    $page->parse('work_clickable_block', 'work_clickable', true);
                 } elseif ($object instanceof OnlineAssessment) {
                     // Quizzes that aren't open shouldn't show here either?
-                    $rowData = $this->outputOnlineAssessRow($object, $marks);
-                    $page->setVar($rowData);
+                    $rowData = $this->outputOnlineAssessRow($object, $marks, $page);
                     // OA's cannot be published at the moment, refactor DueWork publish code if they become publishable
                     $page->setVar('action_publish_block', '');
                 } else {
@@ -812,10 +816,11 @@ class StudentReportCard
     /**
      * @param OnlineAssessment $oa
      * @param                  $marks
+     * @param \SitePage        $page  The page unto which to parse blocks
      *
      * @return array
      */
-    protected function outputOnlineAssessRow(OnlineAssessment $oa, $marks)
+    protected function outputOnlineAssessRow(OnlineAssessment $oa, $marks, \SitePage $page)
     {
         $workTypeMapper = new \Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper();
         $workType       = $workTypeMapper->findById($oa->getWorkType()->getId());
@@ -835,29 +840,9 @@ class StudentReportCard
         $buttonSeePreviousAttempts = array(
             'WORK_BTN_HREF'  => 'assess/attempts/' . $oa->getId() . '/' . $this->targetUserId,
             'WORK_BTN_ICON'  => 'list',
-            'WORK_BTN_LABEL' => 'See previous attempts'
+            'WORK_BTN_LABEL' => 'View all attempts'
         );
-        $buttonStudentReview       = array(
-            'WORK_BTN_HREF'  => "assess/studentReview/" . $oa->getId(
-                ) . '/' . $marks['section_id'] . '/' . $marks['attempt_id'] . '/' . $this->targetUserId,
-            'WORK_BTN_ICON'  => 'eyeball',
-            'WORK_BTN_LABEL' => 'Review'
-        );
-        // if the viewing user does not have permission to submit, blank out the actions
-        if (!$this->checkPermission(self::CAN_SUBMIT)) {
-        } // is the OA still open?
-        elseif ($oa->getFinish()->getUnixTimestamp() > time()) {
-            // still open
-            // has the student attempted?
-            if ($marks['attempts'] > 0) {
-                $output['buttons'][] = $buttonSeePreviousAttempts;
-            }
-        } else {
-            // is closed: offer no action
-            if ($marks['attempts'] > 0) {
-                $output['buttons'][] = $buttonSeePreviousAttempts;
-            }
-        }
+
         if ($marks['attempts'] > 0) {
             $output['WORK_URGENCY'] = 'none';
         }
@@ -865,6 +850,38 @@ class StudentReportCard
             $output['WORK_GRADIENT'] = (isset($marks['mark']) ? (int)($marks['mark'] / 10) : '');
             $output['WORK_GRADE']    = $marks['display_mark'];
             $output['WORK_COMMENT']  = $marks['comment'];
+        }
+        $page->setVar($output);
+
+        $clickable = false;
+        // if the viewing user does not have permission to submit, blank out the actions
+        if (!$this->checkPermission(self::CAN_SUBMIT)) {
+        } // is the OA still open?
+        elseif ($oa->getFinish()->gt(\Alaress_Date_Format::now())) {
+            // still open
+            // has the student attempted?
+            if ($marks['attempts'] > 0) {
+                $output['buttons'][] = $buttonSeePreviousAttempts;
+                // Do I still have attempts left?
+                $maxAttempts = $oa->getMaxAttempts();
+                if ($maxAttempts == 0) {
+                    $clickable = true;
+                } elseif ($marks['attempts'] < $maxAttempts) {
+                    $clickable = true;
+                }
+            } else {
+                $clickable = true;
+            }
+        } else {
+            // is closed: offer no action
+            if ($marks['attempts'] > 0) {
+                $output['buttons'][] = $buttonSeePreviousAttempts;
+            }
+        }
+        if ($clickable) {
+            $page->parse('work_clickable_block', 'work_clickable', true);
+        } else {
+            $page->parse('work_unclickable_block', 'work_unclickable', true);
         }
         return $output;
     }
