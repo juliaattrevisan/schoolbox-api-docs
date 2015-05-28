@@ -210,11 +210,19 @@ class EventRecurrenceMapper
                     return;
                 }
 
-                /* Skip the first element, spawn new event records
+                /* Skip the first element because we just processed it.
+                 * Spawn new event records for the rest.
+                 * ($eventRecurrence is mutable, but not used outside this
+                 *  method, so that's tolerable.)
                  */
-                $eventRecurrence->getDateCollection()->next();
-
-                $this->persist($event, $eventRecurrence->getDateCollection(), $eventRecurrence->getSeriesId(), $eventRelations, $access, $previous);
+                $this->persist(
+                    $event,
+                    $eventRecurrence->getDateCollection()->slice(1),
+                    $eventRecurrence->getSeriesId(),
+                    $eventRelations,
+                    $access,
+                    $previous
+                );
             }
         } /* Create N recurring events which are wholly new
 		 *
