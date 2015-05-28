@@ -14,8 +14,7 @@ namespace Schoolbox\Resource;
 use Schoolbox;
 use Schoolbox\FileInterface;
 use Schoolbox\Resource\File\Mapper;
-use Schoolbox\Resource\File\Model as File;
-use Schoolbox\Storage;
+use Schoolbox\Resource\Storage\Model as Storage;
 
 /**
  * Class FileMapper
