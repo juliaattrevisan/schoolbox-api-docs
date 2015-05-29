@@ -249,10 +249,10 @@ class External_Maze_Timetable implements External_TimetableInterface
             return array();
         }
         if ($this->getGroupHandler()->isStudent($userId)) {
-            return $this->getStudentTimetable($externalUserId, $dayNumber);
+            return $this->getStudentTimetable($externalUserId, $campus, $dayNumber);
         } else {
             if ($this->getGroupHandler()->isStaff($userId)) {
-                return $this->getStaffTimetable($externalUserId, $dayNumber);
+                return $this->getStaffTimetable($externalUserId, $campus, $dayNumber);
             }
         }
     }
@@ -314,16 +314,13 @@ class External_Maze_Timetable implements External_TimetableInterface
      * Spawn a staff timetable for a particular user and day number
      *
      * @param $externalUserId
+     * @param \Schoolbox\Campus $campus
      * @param $dayNumber
      * @return array
      */
-    public function getStaffTimetable($externalUserId, $dayNumber)
+    public function getStaffTimetable($externalUserId, \Schoolbox\Campus $campus, $dayNumber)
     {
-        $userMapper = new \Schoolbox\UserMapper();
-        $user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
-        $user = $userMapper->findById($user->getId());
-
-        $definition = $this->getTimetableDefinition($externalUserId, $user->getCampusCollection()->first()->getId());
+        $definition = $this->getTimetableDefinition($externalUserId, $campus);
 
         $finalTimetable = array();
 
@@ -412,16 +409,13 @@ class External_Maze_Timetable implements External_TimetableInterface
      * Return a student's timetable for a specific day
      *
      * @param $externalUserId
+     * @param \Schoolbox\Campus $campus
      * @param $dayNumber
      * @return mixed
      */
-    public function getStudentTimetable($externalUserId, $dayNumber)
+    public function getStudentTimetable($externalUserId, \Schoolbox\Campus $campus, $dayNumber)
     {
-        $userMapper = new \Schoolbox\UserMapper();
-        $user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
-        $user = $userMapper->findById($user->getId());
-
-        $definition = $this->getTimetableDefinition($externalUserId, $user->getCampusCollection()->first()->getId());
+        $definition = $this->getTimetableDefinition($externalUserId, $campus);
 
         $finalTimetable = array();
 
