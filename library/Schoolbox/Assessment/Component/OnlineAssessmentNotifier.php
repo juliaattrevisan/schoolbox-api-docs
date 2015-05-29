@@ -631,7 +631,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
                 $msgr->targetToParent(
                     $student->getId(),
                     $msg,
-                    "assess.$quizId.renamed",
+                    "assess.$quizId.updated",
                     Logger::NOTICE,
                     array(
                         'child'   => array($student->formatName(), "/search/user/".$student->getId()),
@@ -664,7 +664,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
                 $msgr->targetToParent(
                     $student->getId(),
                     $msg,
-                    "assess.$quizId.datechanged",
+                    "assess.$quizId.updated",
                     Logger::NOTICE,
                     array(
                         'child'   => array($student->formatName(), "/search/user/".$student->getId()),
