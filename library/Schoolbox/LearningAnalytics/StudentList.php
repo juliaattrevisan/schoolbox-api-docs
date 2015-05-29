@@ -120,9 +120,7 @@ class StudentList {
                 /* With those externalIds, get a list of Schoolbox
                  * user ids
                  */
-                $classStudentIdList = $this->getUserMapper()->getInstance()
-                    ->findByColumn('synergy_id', $externalIdList)
-                    ->getColumnValues('id');
+                $classStudentIdList = $this->getUserMapper()->findIdsByColumn('synergy_id', $externalIdList);
             }
         }
 
