@@ -35,6 +35,13 @@ class Base extends RendererBase
      * @return mixed
      */
     public function isTranslucent() {
+
+        /* TODO: This is a temporary fix and should be repaired when ADN merges into ADF
+         */
+        if ($this->getEvent()->getPublishDate() instanceof \Alaress_Date_NullDate) {
+            return false;
+        }
+
         return $this->getEvent()->getPublishDate()->gt(\Alaress_Date_Format::now());
     }
 
