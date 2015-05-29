@@ -19,6 +19,7 @@ use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\External\TimetableArrayExporter;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\ResourceBooking\Item;
 use Calendar\Event\Type\Timetable\Renderer\Javascript;
 use Calendar\Event\Collection\Renderer;
@@ -409,12 +410,20 @@ class Controller extends Base
                 );
                 break;
             case 'timetable':
-                $period = new \External_TimetableDatePeriod(
-                    $startTime,
-                    $repeatUntil->modify('+1 day'),
-                    $this->getExternalTimetableHandler(),
-                    $campus
-                );
+                try {
+                    /** @var Campus $campus */
+                    $campus = $this->getCampusMapper()->findById(
+                        $this->getRequest()->post['timetable']['campus']
+                    );
+                    $period = new \External_TimetableDatePeriod(
+                        $startTime,
+                        $repeatUntil->modify('+1 day'),
+                        $this->getExternalTimetableHandler(),
+                        $campus
+                    );
+                } catch (MapperException $e) {
+                    $period = array();
+                }
                 break;
             default:
                 $period = array();
