@@ -18,7 +18,13 @@
 <!-- BEGIN mark_type_none -->
 <!-- END mark_type_none -->
 <!-- BEGIN mark_type_rubric -->
-<a class="view" title="View Rubric" href="#">{MARK}&nbsp;/&nbsp;{MAX_MARK}</a>
+    <!-- BEGIN rubric_marked -->
+    <a class="mark-input view" title="View Rubric" href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}">{MARK}&nbsp;/&nbsp;{MAX_MARK}</a>
+    <!-- END rubric_marked -->
+    <!-- BEGIN rubric_unmarked -->
+    <!-- END rubric_unmarked -->
+    <!-- BEGIN rubric_grade_drop -->
+    <!-- END rubric_grade_drop -->
 <!-- END mark_type_rubric -->
 <span class="mark-comment">{COMMENT}</span>
 </div>
