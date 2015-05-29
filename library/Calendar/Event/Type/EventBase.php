@@ -217,9 +217,12 @@ abstract class EventBase implements EventInterface
     public function getEventClasses()
     {
         $selectors = array(
-            'type' . $this->getType(),
             'source' . $this->getConnectorId(),
         );
+        $type = $this->getType();
+        if ($type > 0) {
+            $selectors[] = 'type'.$type;
+        }
 
         /* Merge levels
          */
