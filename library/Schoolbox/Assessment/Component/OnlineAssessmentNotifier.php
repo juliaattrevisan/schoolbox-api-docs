@@ -634,7 +634,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
                     "assess.$quizId.updated",
                     Logger::NOTICE,
                     array(
-                        'child'   => array($student->formatName(), "/search/user/".$student->getId()),
+                        'child'   => array($student->formatName('{firstname}'), "/search/user/".$student->getId()),
                         'oldname' => $diff['title'][1],
                         'newname' => array($diff['title'][0], "/assess/intro/$quizId"),
                         'catname' => array($catName, "/homepage/$catId"),
@@ -667,7 +667,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
                     "assess.$quizId.updated",
                     Logger::NOTICE,
                     array(
-                        'child'   => array($student->formatName(), "/search/user/".$student->getId()),
+                        'child'   => array($student->formatName('{firstname}'), "/search/user/".$student->getId()),
                         'boxname' => array($quizName, "/assess/intro/$quizId"),
                         'date'    => $date,
                         'catname' => array($cat->getName(), "/homepage/$catId"),
