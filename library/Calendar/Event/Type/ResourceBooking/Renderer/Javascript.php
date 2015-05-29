@@ -30,9 +30,7 @@ class Javascript extends Base
 
         // Putting any class other than "personal", "group" or "type{whatever}"
         // prevents this object from rendering, so add classes later.
-        $classes = array(
-            $this->getEvent()->getEventClasses(),
-        );
+        $classes = $this->getEvent()->getEventClasses();
 
         // Bookings might have a campus one day, currently they do not.
 //        $campus_list = array_filter(array_map('trim', explode(',', $this->getEvent()->getCampusList())));
