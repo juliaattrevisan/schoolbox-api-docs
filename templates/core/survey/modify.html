@@ -34,7 +34,23 @@ $(document).ready(function() {
 			title: {
 				required: true,
 				minlength: 2
-			}
+            },
+            "finish[hour]": {
+                required: true,
+                '12hour': true
+            },
+            "finish[minute]": {
+                required: true,
+                minute: true
+            },
+            "start[hour]": {
+                required: true,
+                '12hour': true
+            },
+            "start[minute]": {
+                required: true,
+                minute: true
+            }
 		},
 		messages: {
 			title: "Please enter a title",
