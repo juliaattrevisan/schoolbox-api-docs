@@ -16,6 +16,7 @@ use DateTime;
 use External_Timetable;
 use Schoolbox\Calendar;
 use Schoolbox\Campus;
+use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\External\TimetableArrayExporter;
 use Schoolbox\ResourceBooking\Item;
@@ -34,6 +35,11 @@ class Controller extends Base
      * @var Item\Mapper
      */
     protected $resourceMapper;
+
+    /**
+     * @var CampusMapper
+     */
+    protected $campusMapper;
 
     /**
      * @var Calendar\EventMapper
@@ -1237,6 +1243,25 @@ class Controller extends Base
     public function getExternalTimetableHandler()
     {
         return $this->externalTimetableHandler;
+    }
+
+    /**
+     * @return CampusMapper
+     */
+    public function getCampusMapper()
+    {
+        return $this->campusMapper;
+    }
+
+    /**
+     * @param  CampusMapper $campusMapper
+     *
+     * @return $this
+     */
+    public function setCampusMapper($campusMapper)
+    {
+        $this->campusMapper = $campusMapper;
+        return $this;
     }
 
     /**
