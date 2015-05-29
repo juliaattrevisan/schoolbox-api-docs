@@ -540,9 +540,9 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 			$relative = new Alaress_Date_Format($newDate, 'U');
 
 
-            $dateformat = $relative->getLongDateOnly();
+            $date = $relative->getLongDateOnly();
             if(!$relative->isAtEndOfDay()) {
-                $dateformat = $relative->getTimeOnly() .' on '.$dateformat;
+                $date = $relative->getTimeOnly() .' on '.$date;
             }
 
 			$msg = new Message(":author $verb :boxname to :date in :catname", $icon, $href);
@@ -550,7 +550,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 			$msgr->broadcastToCategory($catId, $msg, "assess.$quizId.datechanged", Logger::NOTICE, array(
 					'author' => array($ownerName, "/search/user/$ownerId"),
 					'boxname' => array($quizName, "/assess/intro/$quizId"),
-					'date' => date($dateformat, $relative->getUnixTimestamp()),
+					'date' => $date,
 					'catname' => array($cat->getName(), "/homepage/$catId")
 				),
 				array(
@@ -654,9 +654,9 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
             $verb = $newDate > $oldDate ? 'extended' : 'changed';
             $relative = new Alaress_Date_Format($newDate, 'U');
 
-            $dateformat = $relative->getLongDateOnly();
+            $date = $relative->getLongDateOnly();
             if (!$relative->isAtEndOfDay()) {
-                $dateformat = $relative->getTimeOnly() .' on '.$dateformat;
+                $date = $relative->getTimeOnly() .' on '.$date;
             }
 
             $msg = new Message(":child's $quizType :boxname closing date was $verb to :date in :catname", $icon, $href);
@@ -669,7 +669,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
                     array(
                         'child'   => array($student->formatName(), "/search/user/".$student->getId()),
                         'boxname' => array($quizName, "/assess/intro/$quizId"),
-                        'date'    => date($dateformat, $relative->getUnixTimestamp()),
+                        'date'    => $date,
                         'catname' => array($cat->getName(), "/homepage/$catId"),
                     )
                 );
