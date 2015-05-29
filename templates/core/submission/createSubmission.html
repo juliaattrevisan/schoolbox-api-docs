@@ -194,6 +194,8 @@
                 depends: isAcceptSubmit
             }
         };
+        var hourValid = { '12hour': true };
+        var minuteValid = { minute: true };
         submission_form.validate({
             rules: {
                 markvalue: {
@@ -208,20 +210,20 @@
                     markTypeRubricCriteriaCheck: true
                 },
                 publish_date:   publish_date_valid,
-                publish_hour:   publish_date_valid,
-                publish_minute: publish_date_valid,
+                publish_hour:   $.extend({}, hourValid, publish_date_valid),
+                publish_minute: $.extend({}, minuteValid, publish_date_valid),
                 publish_period: publish_date_valid,
                 open_date:   open_date_valid,
-                open_hour:   open_date_valid,
-                open_minute: open_date_valid,
+                open_hour:   $.extend({}, hourValid, open_date_valid),
+                open_minute: $.extend({}, minuteValid, open_date_valid),
                 open_period: open_date_valid,
                 due_date:    due_date_valid,
-                due_hour:    due_date_valid,
-                due_minute:  due_date_valid,
+                due_hour:    $.extend({}, hourValid, due_date_valid),
+                due_minute:  $.extend({}, minuteValid, due_date_valid),
                 due_period:  due_date_valid,
                 late_date:   late_date_valid,
-                late_hour:   late_date_valid,
-                late_minute: late_date_valid,
+                late_hour:   $.extend({}, hourValid, late_date_valid),
+                late_minute: $.extend({}, minuteValid, late_date_valid),
                 late_period: late_date_valid
             },
             messages: {
