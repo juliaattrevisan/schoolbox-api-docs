@@ -504,16 +504,28 @@ abstract class Component_ControllerAbstract
      * @param string $twigTemplate   The path to a Twig template.
      * @param array  $twigData       Data to pass into the Twig template.
      * @param bool   $renderHeader   Set to false if you don't want the PHPLib
-     *                               controlled header and configuration to show.
+     *                               controlled header to show.
+     * @param bool   $renderConfig   Set to false if you don't want the PHPLib
+     *                               controlled configuration to show.
+     *                               (Dashboard components show the collapse
+     *                                controls if this is true.)
      *
      * @return bool Was the template renderable?
      */
-    protected function renderTwigTemplate($templateHandle, $twigTemplate, $twigData = [], $renderHeader = true)
-    {
+    protected function renderTwigTemplate(
+        $templateHandle,
+        $twigTemplate,
+        $twigData = [],
+        $renderHeader = true,
+        $renderConfig = true
+    ) {
         if (!$this->loadTemplate($templateHandle, 'twig', 'component/')) {
             return false;
         }
         $this->parseConfig();
+        if (!$renderConfig) {
+            $this->setVar('CONFIGURATION', '');
+        }
 
         // Residual blockage
         $this->setBlock($templateHandle, 'header', 'header_block');
