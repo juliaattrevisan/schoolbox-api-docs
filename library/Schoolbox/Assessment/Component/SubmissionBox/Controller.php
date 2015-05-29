@@ -130,7 +130,7 @@ class Controller extends BaseController
         $students = $this->getStudents($box);
 
         // array inside an array that's *nearly* empty...
-        $data = [['']];
+        $data = [['Name', 'External ID']];
 
         // put header row in array
         foreach ($this->getRubricHeaders($rubric) as $grouping => $criteria) {
@@ -147,9 +147,12 @@ class Controller extends BaseController
         $studentsGrouped = $students->groupBy('id')->getAll();
 
         foreach ($this->getMarks($rubric, $students) as $studentId => $marks) {
-            $studentName = $studentsGrouped[$studentId]->first()->formatName('{lastname}, {firstname}');
+            /** @var User $student */
+            $student     = $studentsGrouped[$studentId]->first();
+            $studentName = $student->formatName('{lastname}, {firstname}');
 
-            $data[] = [ $studentName ] + (count($marks) ? $marks : array_pad([], count($data[0]) - 1, ''));
+            $data[] = [ $studentName, $student->getExternalId() ]
+                + (count($marks) ? $marks : array_pad([], count($data[0]) - 1, ''));
         }
 
         return $data;
