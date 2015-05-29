@@ -517,8 +517,8 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 			// params for this instance - oldname doesn't have an associated href
 			$params = array(
 				'author'  => array($ownerName, "/search/user/$ownerId"),
-				'oldname' => $diff['name'][1],
-				'newname' => array($diff['name'][0], "/assess/intro/$quizId"),
+				'oldname' => $diff['title'][1],
+				'newname' => array($diff['title'][0], "/assess/intro/$quizId"),
 				'catname' => array($catName, "/homepage/$catId")
 			);
 
@@ -540,9 +540,9 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 			$relative = new Alaress_Date_Format($newDate, 'U');
 
 
-            $dateformat = $relative->getLongDateOnly();
+            $date = $relative->getLongDateOnly();
             if(!$relative->isAtEndOfDay()) {
-                $dateformat = $relative->getTimeOnly() .' on '.$dateformat;
+                $date = $relative->getTimeOnly() .' on '.$date;
             }
 
 			$msg = new Message(":author $verb :boxname to :date in :catname", $icon, $href);
@@ -550,7 +550,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 			$msgr->broadcastToCategory($catId, $msg, "assess.$quizId.datechanged", Logger::NOTICE, array(
 					'author' => array($ownerName, "/search/user/$ownerId"),
 					'boxname' => array($quizName, "/assess/intro/$quizId"),
-					'date' => date($dateformat, $relative->getUnixTimestamp()),
+					'date' => $date,
 					'catname' => array($cat->getName(), "/homepage/$catId")
 				),
 				array(
@@ -569,7 +569,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 			$msgr->broadcastToCategory($catId, $msg, "assess.$quizId.updated", Logger::NOTICE,
 				array(
 					'author' => array($ownerName, "/search/user/$ownerId"),
-					'quizname' => array($quizName, "/submission/submissionHistory/$quizId"),
+					'quizname' => array($quizName, "/assess/intro/$quizId"),
 					'catname' => array($cat->getName(), "/homepage/$catId")
 				),
 				array(
@@ -581,6 +581,122 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		return $msgr;
 	}
 
+    /**
+     * @param OnlineAssessment $quiz
+     * @param User $owner
+     * @param array $diff
+     * @return Messenger
+     */
+    public function notifyParentUpdated($quiz, $owner, $diff = null) {
+        $msgr = new Messenger();
+
+        if ($this->conf->get('restrict_parent_duework_access')) {
+            return $msgr;
+        }
+
+        $quizId = $quiz->getId();
+        $quiz   = $this->fullyHydrateQuiz($quiz);
+
+        // discard all update notifications if the submissionbox isn't open
+        $openStamp = $quiz->getStart()->getUnixTimestamp();
+        $closeStamp = $quiz->getFinish()->getUnixTimestamp();
+        $now = time();
+
+        if($openStamp > $now || $closeStamp < $now) {
+            return $msgr;
+        }
+
+        // if there's no actual difference
+        if(!count($diff)) {
+            return $msgr;
+        }
+
+        $quizName = $quiz->getTitle();
+        $quizType = $quiz->getWorkType()->getName();
+
+        $cat     = $quiz->getCategory();
+        $catId   = $cat->getId();
+        $catName = $cat->getName();
+
+        $icon = '/images/icon.php?size=32&icon=work';
+        $href = "/assess/intro/$quizId";
+
+        // notify all student's parents
+        $students = UserAccessMapper::getInstance()->findStudentsInCategory($quiz->getCategory());
+
+        // renamed
+        if (isset($diff['title'])) {
+            $msg = new Message(":child's $quizType was renamed from :oldname to :newname in :catname", $icon, $href);
+            foreach ($students as $student) {
+                $msgr->targetToParent(
+                    $student->getId(),
+                    $msg,
+                    "assess.$quizId.updated",
+                    Logger::NOTICE,
+                    array(
+                        'child'   => array($student->formatName('{firstname}'), "/search/user/".$student->getId()),
+                        'oldname' => $diff['title'][1],
+                        'newname' => array($diff['title'][0], "/assess/intro/$quizId"),
+                        'catname' => array($catName, "/homepage/$catId"),
+                    )
+                );
+            }
+            unset($diff['title']);
+        }
+
+
+        // extended or brought forward
+        if (isset($diff['finish'])) {
+            // strtotime is safe here because dates are in 'YYYY-MM-DD H:i:s' format
+            $oldDate = strtotime($diff['finish'][1]);
+            $newDate = strtotime($diff['finish'][0]);
+
+            $verb = $newDate > $oldDate ? 'extended' : 'changed';
+            $relative = new Alaress_Date_Format($newDate, 'U');
+
+            $date = $relative->getLongDateOnly();
+            if (!$relative->isAtEndOfDay()) {
+                $date = $relative->getTimeOnly() .' on '.$date;
+            }
+
+            $msg = new Message(":child's $quizType :boxname closing date was $verb to :date in :catname", $icon, $href);
+            foreach ($students as $student) {
+                $msgr->targetToParent(
+                    $student->getId(),
+                    $msg,
+                    "assess.$quizId.updated",
+                    Logger::NOTICE,
+                    array(
+                        'child'   => array($student->formatName('{firstname}'), "/search/user/".$student->getId()),
+                        'boxname' => array($quizName, "/assess/intro/$quizId"),
+                        'date'    => $date,
+                        'catname' => array($cat->getName(), "/homepage/$catId"),
+                    )
+                );
+            }
+            unset($diff['finish']);
+        }
+
+        // if none of the above apply, but there are changes, just be generic
+        if (count($diff) && $msgr->isEmpty()) {
+            $msg = new Message(":child's $quizType :quizname was updated in :catname", $icon, $href);
+            foreach ($students as $student) {
+                $msgr->targetToParent(
+                    $student->getId(),
+                    $msg,
+                    "assess.$quizId.updated",
+                    Logger::NOTICE,
+                    array(
+                        'child'    => array($student->formatName(), "/search/user/".$student->getId()),
+                        'quizname' => array($quizName, "/assess/intro/$quizId"),
+                        'catname'  => array($cat->getName(), "/homepage/$catId"),
+                    )
+                );
+            }
+        }
+
+        return $msgr;
+    }
 
 	/**
 	 * Notify the feed of box closures

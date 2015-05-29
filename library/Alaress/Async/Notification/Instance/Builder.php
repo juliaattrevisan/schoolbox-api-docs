@@ -213,6 +213,19 @@ class Builder {
 		return $this;
 	}
 
+    /**
+     * The opposite of setParam()
+     *
+     * @param string $token
+     *
+     * @return self
+     */
+    public function unsetParam($token)
+    {
+        unset($this->params[$token]);
+        return $this;
+    }
+
 	/**
 	 * @param ParameterInterface[] $params
 	 * @return self
