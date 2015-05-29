@@ -80,6 +80,7 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
                 'showButtons'                => false,
                 'tile_component_instance_id' => $this->getConfig('tileSource') ?: $this->getInstance()->getId(),
             ),
+            !$this->getConfig('compactMode'),
             false
         );
     }
