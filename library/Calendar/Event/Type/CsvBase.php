@@ -40,7 +40,7 @@ class CsvBase extends RendererBase
             $this->getEvent()->getDetail(),
             $this->getEvent()->getLocation(),
             $this->getEvent()->getType(),
-            $this->getEVent()->getPublishDate()->getLocalShort(),
+            $this->getEvent()->getPublishDate()->getLocalShort(),
             $this->getEvent()->canAttend() ? 1 : 0,
         );
 
