@@ -41,6 +41,7 @@ class CsvBase extends RendererBase
             $this->getEvent()->getLocation(),
             $this->getEvent()->getType(),
             $this->getEVent()->getPublishDate()->getLocalShort(),
+            $this->getEvent()->canAttend() ? 1 : 0,
         );
 
         fputcsv($fd, $data);
