@@ -497,6 +497,8 @@ mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "CREATE DATABASE $sqldb;";
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < /tmp/$sqldb-config-`date -I`.sql;
 ## Restore specified database
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < $sourcedb;
+## Fix Collation
+$instdir/tools/schema/collation.sh;
 
 # Move data files to correct location if restoring from backup
 if [ "$sourceloc" = '[B]' ];
