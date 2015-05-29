@@ -30,23 +30,24 @@ class CsvBase extends RendererBase
     {
         $fd = fopen('php://temp/maxmemory:10000', 'rw');
 
-
-        $data = array($this->getEvent()->getStartTime()->getLocalShort(),
-            $this->getEvent()->getAllday() ? '' : $this->getEvent()->getStartTime()->getTimeOnly(),
+        $data = array(
+            $this->getEvent()->getStartTime()->getLocalShort(),
+            $this->getEvent()->getAllday() ? '' : $this->getEvent()->getStartTime()->getUsingFormat('H:i'),
             $this->getEvent()->getEndTime()->getLocalShort(),
-            $this->getEvent()->getAllday() ? '' : $this->getEvent()->getEndTime()->getTimeOnly(),
-            $this->getEvent()->getAllday(),
+            $this->getEvent()->getAllday() ? '' : $this->getEvent()->getEndTime()->getUsingFormat('H:i'),
+            $this->getEvent()->getAllday() ? 1 : 0,
             $this->getEvent()->getTitle(),
             $this->getEvent()->getDetail(),
             $this->getEvent()->getLocation(),
-            $this->getEvent()->getEventType(),
-            $this->getEVent()->getPublishDate()->getLocalShort(),);
+            $this->getEvent()->getType(),
+            $this->getEvent()->getPublishDate()->getLocalShort(),
+            $this->getEvent()->canAttend() ? 1 : 0,
+        );
 
         fputcsv($fd, $data);
         rewind($fd);
         $row = fread($fd, 10000);
 
         return $row;
-
     }
 }
