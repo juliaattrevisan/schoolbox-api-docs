@@ -1466,7 +1466,7 @@ abstract class Mapper implements IMapper, Serializable
      * @throws UnderflowException YOU MUST CATCH THIS. Thrown if the query could not possibly return any results.
      * @return PDOStatement
      */
-    protected function selectScalarByColumnList($selection, $columnList, $options = [])
+    protected function selectScalarByColumnList($selection, array $columnList, array $options = [])
     {
         // set options (deleted is the only relevant one)
         if (!is_array($options)) {
@@ -1502,6 +1502,46 @@ abstract class Mapper implements IMapper, Serializable
 
         return $statement;
     }
+
+
+    /**
+     * @see $this->findAll()
+     *
+     * @param  array $options
+     * @return array
+     */
+    public function findAllIds(array $options = [])
+    {
+        return $this->findIdsByColumnList([], $options);
+    }
+
+
+    /**
+     * @see $this->findByColumn()
+     *
+     * @param string $columnName
+     * @param mixed  $columnValue
+     * @param array  $options
+     * @return array
+     */
+    public function findIdsByColumn($columnName, $columnValue, array $options = [])
+    {
+        return $this->findIdsByColumnList([ $columnName => $columnValue ], $options);
+    }
+
+
+    /**
+     * @param array $columnList
+     * @param array $options
+     * @return array
+     */
+    public function findIdsByColumnList(array $columnList, array $options = [])
+    {
+        $stmt = $this->selectScalarByColumnList($this->identifier['column'], $columnList, $options);
+
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
 
     /**
      * Builds a where part and params for this query out of a column list
