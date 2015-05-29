@@ -67,7 +67,12 @@
 
         showHideMarktype(0);
 
-        if (document.getElementById('rs-0').checked) {
+        // Do assessment-specific descriptors get shown?
+        var isRubricAssessmentSpecificDescriptors = function() {
+            return document.getElementById('rs-0').checked;
+        };
+
+        if (isRubricAssessmentSpecificDescriptors()) {
             $('#rubric-criteria').find('.crit').each(function () {
                 if ($(this).find(':checked').length) {
                     descriptor('show', this, 0);
@@ -81,6 +86,7 @@
 
 
         // cache lookups
+        var submission_form = $('#createSubmissionForm');
         var acceptSubmit = $('input:checkbox[name=accept_submission]');
         var acceptHide = $('.accept-hide');
 
@@ -132,8 +138,37 @@
             }
         }, 'Please select a result set');
 
+        // Are rubric values checked?
+        var isRubricValueChecked = function(element) {
+            if (!marktype.rubric.is(':visible')) {
+                return false;
+            }
+            if (!isRubricAssessmentSpecificDescriptors()) {
+                return false;
+            }
+            // Is this rubric selected? Validate if so
+            return $(element).closest('.crit')
+                .find(':checkbox[name^="crit"]')
+                .prop('checked') === true;
+        };
+        // Validator for rubric values - they cannot be the same
+        $.validator.addMethod(
+            'markTypeRubricValuesCheck',
+            function (value, element) {
+                // All value inputs that aren't the currently validated one
+                var duplicateValues = submission_form.find('input[name^="value"]').not(element).filter(
+                    function() {
+                        // Filter out inputs that aren't in the same criterion,
+                        // and don't have the same value
+                        return this.name === element.name && this.value === element.value;
+                    }
+                );
+                return duplicateValues.length === 0;
+            },
+            'Rubric values cannot be the same'
+        );
+
         var isAcceptSubmit  = function() { return acceptSubmit.is(':checked'); }
-        var submission_form = $('#createSubmissionForm');
         var publish_date_valid = { dateValid: true };
         var open_date_valid = {
             dateValid: true,
@@ -218,10 +253,34 @@
                 else if (element.is('[name^="late_"]')) {
                     label.insertAfter(submission_form.find(':input[name="late_period"]'));
                 }
+                else if (element.is('[name^="value"]')) {
+                    label.insertAfter(element.closest('.crit'));
+                }
                 else {
                     label.insertAfter(element);
                 }
-            }
+            },
+            // By default all hidden fields are ignored.
+            // I don't want to ignore rubric values
+            ignore: ':hidden:not(input[name^="value"])'
+        });
+
+        // Rubric values validation
+        submission_form.find('input[name^="value"]').each(function() {
+            $(this).rules(
+                'add',
+                {
+                    required: {
+                        depends: isRubricValueChecked
+                    },
+                    digits: {
+                        depends: isRubricValueChecked
+                    },
+                    markTypeRubricValuesCheck: {
+                        depends: isRubricValueChecked
+                    }
+                }
+            );
         });
 
         //
@@ -238,10 +297,8 @@
 
         // trigger show or hide of descriptors when radio off
         $('#rubric-results input').change(function () {
-            var v = document.getElementById('rs-0').checked;
-
             // hide the descriptors
-            if (!v) {
+            if (!isRubricAssessmentSpecificDescriptors()) {
                 descriptor('hide', $('#rubric-criteria div'), 100);
             }
             // show them if checked
@@ -257,10 +314,7 @@
             var act = 'hide';
 
             // show if and only if both the descriptors radio and myself are checked
-            var x = $('#rs-0').prop('checked'),
-                    y = this.checked;
-
-            if (x && y) {
+            if (isRubricAssessmentSpecificDescriptors() && this.checked) {
                 act = 'show';
             }
             descriptor(act, $(this).parent('div'), 100);

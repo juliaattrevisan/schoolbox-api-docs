@@ -45,6 +45,19 @@ class DueWork_Rubric_Factory {
                 $rubric = new DueWork_Rubric_ResultSetRubric($submissionBoxID, new DueWork_Rubric_ResultSet());
             }
             elseif($specification[$keys[0]][0] instanceof DueWork_Rubric_Descriptor) {
+                // A specification can't contain two descriptors with the same value
+                // (yet - this will be added in a later version)
+                foreach ($specification as $key => $descriptors) {
+                    /** @var DueWork_Rubric_Descriptor[] $descriptors */
+                    $descriptorValues = [];
+                    foreach ($descriptors as $descriptor) {
+                        $value = $descriptor->getValue();
+                        if (isset($descriptorValues[$value])) {
+                            throw new Exception("Specification contains two descriptors with the same value");
+                        }
+                        $descriptorValues[$value] = true;
+                    }
+                }
                 $rubric = new DueWork_Rubric_DescriptorRubric($submissionBoxID);
             }
             else {
