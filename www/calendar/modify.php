@@ -148,7 +148,7 @@ if (is_numeric($_GET['eventID'])) {
         $event->getEndDateTime()->addHours(1);
     }
 
-    $defaultTypeId      = '';
+    $defaultTypeId      = isset($_GET['type']) && is_numeric($_GET['type']) ? $_GET['type'] : '';
     $defaultAccessLevel = isset($_GET['level']) && is_numeric($_GET['level']) ? $_GET['level'] : '';
 
     /* Preselected campus

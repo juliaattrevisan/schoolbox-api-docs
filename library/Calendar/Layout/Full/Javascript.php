@@ -92,7 +92,13 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
         /* Render event types to choose from
          */
         /** @var \Schoolbox\Calendar\EventType[] $allTypes */
-        $allTypes = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findAll();
+        $allTypes = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findAll()
+            ->filter(
+                function ($eventType) {
+                    /** @var \Schoolbox\Calendar\EventType $eventType */
+                    return !$eventType->isTaskType();
+                }
+            );
 
         if ($allTypes->count()) {
             foreach ($allTypes as $currentType) {
