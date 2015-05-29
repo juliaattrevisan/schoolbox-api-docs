@@ -118,6 +118,37 @@
     }, 'Please enter a date that is after');
 
     /**
+     * Hour and minute validation rules
+     */
+    //$.validator.addClassRules('12hour', { range: [1, 12] });
+    //$.validator.addClassRules('24hour', { range: [0, 23] });
+    //$.validator.addClassRules('minute', { range: [0, 59] });
+    $.validator.addMethod(
+        '12hour',
+        function(value, element) {
+            return $.validator.methods.digits.call(this, value, element)
+                && $.validator.methods.range.call(this, value, element, [1, 12]);
+        },
+        'Please enter a valid hour'
+    );
+    $.validator.addMethod(
+        '24hour',
+        function(value, element) {
+            return $.validator.methods.digits.call(this, value, element)
+                && $.validator.methods.range.call(this, value, element, [0, 23]);
+        },
+        'Please enter a valid hour'
+    );
+    $.validator.addMethod(
+        'minute',
+        function(value, element) {
+            return $.validator.methods.digits.call(this, value, element)
+                && $.validator.methods.range.call(this, value, element, [0, 59]);
+        },
+        'Please enter a valid minute'
+    );
+
+    /**
      * selected extension - checks that you've selected something.
      */
     $.validator.addMethod('selected', function(value, element, other_date_field) {
