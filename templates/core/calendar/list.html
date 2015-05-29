@@ -84,8 +84,12 @@
 		$('#calendar-export form').submit(function(event) {
 			event.preventDefault();
 
-            //Copy and paste button
-            var client = new ZeroClipboard($('#copy-button'));
+            // Copy and paste button - show only when ready
+            var button = $('#copy-button').hide();
+            var client = new ZeroClipboard(button);
+            client.on('ready', function() {
+                button.show();
+            });
 
             var form = $(this);
 			$('#calendar-export-dialog').dialog({
