@@ -79,7 +79,7 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
                 'showButtons'                => $this->hasWriteAccess(),
                 'tile_component_instance_id' => $this->getConfig('tileSource') ?: $this->getInstance()->getId(),
             ),
-            $this->hasWriteAccess()
+            $this->hasWriteAccess() || $this->getConfig('compactMode')
         );
     }
 
