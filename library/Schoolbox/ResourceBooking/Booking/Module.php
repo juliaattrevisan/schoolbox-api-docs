@@ -17,6 +17,8 @@ use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
+use Schoolbox\Calendar;
+use Schoolbox\CampusMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
 
@@ -132,24 +134,24 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->setters['Schoolbox\\ResourceBooking\\Booking\\Controller']['setEventMapper']
-            = $injector->lazyNew('Schoolbox\\Calendar\\EventMapper');
-        $injector->params['Schoolbox\\Calendar\\EventRecurrenceMapper'] = array(
-            'eventMapper' => $injector->lazyNew('Schoolbox\\Calendar\\EventMapper')
+        $injector->setters[Controller::class]['setEventMapper']
+            = $injector->lazyNew(Calendar\EventMapper::class);
+        $injector->params[Calendar\EventRecurrenceMapper::class] = array(
+            'eventMapper' => $injector->lazyNew(Calendar\EventMapper::class)
         );
-        $injector->setters['Schoolbox\\ResourceBooking\\Booking\\Controller']['setEventRecurrenceMapper']
-            = $injector->lazyNew('Schoolbox\\Calendar\\EventRecurrenceMapper');
-        $injector->setters['Schoolbox\\ResourceBooking\\Booking\\Controller']['setBookingMapper']
-            = $injector->lazyNew('Schoolbox\\ResourceBooking\\Booking\\Mapper');
-        $injector->setters['Schoolbox\\ResourceBooking\\Booking\\Controller']['setResourceMapper']
-            = $injector->lazyNew('Schoolbox\\ResourceBooking\\Item\\Mapper');
-        $injector->setters['Schoolbox\\ResourceBooking\\Booking\\Controller']['setExternalTimetableHandler']
+        $injector->setters[Controller::class]['setEventRecurrenceMapper']
+            = $injector->lazyNew(Calendar\EventRecurrenceMapper::class);
+        $injector->setters[Controller::class]['setBookingMapper']
+            = $injector->lazyNew(Mapper::class);
+        $injector->setters[Controller::class]['setResourceMapper']
+            = $injector->lazyNew(ItemMapper::class);
+        $injector->setters[Controller::class]['setExternalTimetableHandler']
             = $injector->lazyNew('External_Timetable');
-        $injector->setters['Schoolbox\\ResourceBooking\\Booking\\Controller']['setCampusMapper']
-            = $injector->lazyNew(\Schoolbox\CampusMapper::class);
+        $injector->setters[Controller::class]['setCampusMapper']
+            = $injector->lazyNew(CampusMapper::class);
         $injector->set(
             'controller:resourceBooking',
-            $injector->lazyNew('Schoolbox\\ResourceBooking\\Booking\\Controller')
+            $injector->lazyNew(Controller::class)
         );
     }
 }
