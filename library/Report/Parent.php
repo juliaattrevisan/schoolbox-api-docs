@@ -141,7 +141,8 @@ class Report_Parent extends Report_Abstract {
 		$this->getPage()->setBlock(TEMPLATE_content, 'has_year_input', 'has_year_input_block');
 		$this->getPage()->setBlock(TEMPLATE_content, 'search_form_option', 'search_form_option_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'show_filter_options', 'show_filter_options_block');
-		$this->getPage()->setTitle('Parent Directory');
+        $this->getPage()->setBlock(TEMPLATE_content, 'email_all_parents', 'email_all_parents_block');
+        $this->getPage()->setTitle('Parent Directory');
 		$this->getPage()->setBlock('student', 'contact', 'contact_block');
 		$this->getPage()->setBlock('contact', 'spouse', 'spouse_block');
 		$this->getPage()->setBlock('contact', 'primary', 'primary_block');
@@ -150,7 +151,13 @@ class Report_Parent extends Report_Abstract {
 			'student_block' => '',
 			'contact_block' => '',
             'show_filter_options_block' => '',
+            'email_all_parents_block' => '',
 		));
+
+        if(Config::get('modules_parentdirectory_emailall')) {
+            $this->getPage()->parse('email_all_parents_block','email_all_parents');
+
+        }
 
         if(strlen($this->getYearLevel())) {
             $heading = 'Year '.$this->getYearLevel();
