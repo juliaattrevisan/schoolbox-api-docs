@@ -106,16 +106,24 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $owner = UserMapper::getInstance()->findById($assessment->getOwner());
         }
 
-
-
         $fileYear = $this->getExternalUser()->getCurrentYear($owner->getExternalId());
         $fileSemester = $this->getExternalUser()->getCurrentSemester($owner->getExternalId());
         $multipleCodes = $folder->getCodes()->count();
 
+        if($assessment->getSubmissionBox() instanceof Schoolbox\Assessment\Component\SubmissionBox) {
+            $weighting = $assessment->getSubmissionBox()->getWeight();
+        }
+        else if($assessment->getAssessment() instanceof Schoolbox\Assessment\Component\OnlineAssessment) {
+            $weighting = $assessment->getAssessment()->getWeight();
+        }
+        else {
+            $weighting = 0;
+        }
+
         foreach($folder->getCodes() as $classCode) {
 
             $class = $externalClass->getClass($classCode->getCode());
-            $staffID = $multipleCodes > 1 ? $owner->getExternalId() : 0;
+            $staffID = $multipleCodes > 1 || $class['MultipleStaffMarkbookFlag'] > 0 ? $owner->getExternalId() : 0;
 
             $query = "INSERT INTO StaffAssessmentMarkBook (
                         FileType,
@@ -144,7 +152,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                       '".$this->getPrefix($assessment).$assessment->getId()."',
                       'OGRaw',
                       '100',
-                      '0'
+                      '{$weighting}',
                     )";
             $result = $this->getDatabase()->query($query);
         }
