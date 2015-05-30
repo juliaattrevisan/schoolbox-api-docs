@@ -140,7 +140,8 @@ class Report_Parent extends Report_Abstract {
 		$this->getPage()->setBlock('has_year_selector', 'year_selector_option', 'year_selector_option_block');
 		$this->getPage()->setBlock(TEMPLATE_content, 'has_year_input', 'has_year_input_block');
 		$this->getPage()->setBlock(TEMPLATE_content, 'search_form_option', 'search_form_option_block');
-		$this->getPage()->setTitle('Parent Contact info');
+        $this->getPage()->setBlock(TEMPLATE_content, 'show_filter_options', 'show_filter_options_block');
+		$this->getPage()->setTitle('Parent Directory');
 		$this->getPage()->setBlock('student', 'contact', 'contact_block');
 		$this->getPage()->setBlock('contact', 'spouse', 'spouse_block');
 		$this->getPage()->setBlock('contact', 'primary', 'primary_block');
@@ -148,14 +149,32 @@ class Report_Parent extends Report_Abstract {
 		$this->getPage()->setVar(array(
 			'student_block' => '',
 			'contact_block' => '',
+            'show_filter_options_block' => '',
 		));
+
+        if(strlen($this->getYearLevel())) {
+            $heading = 'Year '.$this->getYearLevel();
+        }
+        else if(strlen($this->getSearchForm())) {
+            $heading = 'Form '.$this->getSearchForm();
+        }
+        else {
+            $heading = '';
+        }
 
 		$this->getPage()->setVar(array(
 			'YEAR' => strlen($this->getYearLevel()) ? $this->getYearLevel() : 'not selected',
 			'SEARCH_NAME' => $this->getSearchName(),
 			'SEARCH_FORM' => $this->getSearchForm(),
 			'SEARCH_YEAR' => $this->getYearLevel(),
+            'HEADING' => $heading,
+            'REPLY_TO'=> $_SESSION['user']->getEmail(),
 		));
+
+        // Show search options
+        if(!$this->getYearLevel() && !$this->getSearchName() && !$this->getSearchForm() && !$this->getSearchBoardingStatus()) {
+            $this->getPage()->parse('show_filter_options_block','show_filter_options');
+        }
 
 		/* Search boarding status dropdown preselection
 		 */
@@ -264,6 +283,7 @@ class Report_Parent extends Report_Abstract {
 	 */
 	public function render() {
 		$allContacts = $this->getAllRecords();
+        $allEmails = array();
 
 		$showContact = false;
 
@@ -395,6 +415,10 @@ class Report_Parent extends Report_Abstract {
 
 					$showContact = true;
 
+                    if($currentContact['StudentContactDefaultEmail']) {
+                        $allEmails[] = $currentContact['StudentContactDefaultEmail'];
+                    }
+
 					$this->getPage()->parse('primary_block','primary');
 				}
 				else {
@@ -443,6 +467,10 @@ class Report_Parent extends Report_Abstract {
 
 					$showContact = true;
 
+                    if($currentContact['StudentContactDefaultEmail']) {
+                        $allEmails[] = $currentContact['StudentContactSpouseDefaultEmail'];
+                    }
+
 					$this->getPage()->parse('spouse_block', 'spouse');
 				}
 				else {
@@ -473,6 +501,7 @@ class Report_Parent extends Report_Abstract {
 			}
 
 			$this->getPage()->parse('student_block', 'student', true);
+            $this->getPage()->setVar('EMAIL_ALL_PARENTS', implode(',',$allEmails));
 		}
 	}
 
