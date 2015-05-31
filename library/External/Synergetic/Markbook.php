@@ -68,18 +68,19 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                         MarkOutOf,
                         WeightingFactor
                   FROM StaffAssessmentMarkBook
-                  WHERE HdgAbbrev2 = '".  $this->getPrefix($assessment) . $assessment->getId()."'";
+                  WHERE HdgAbbrev2 = '".$this->getMarkbookIdentifier($assessment)."'";
         return $this->getDatabase()->getAll($query);
     }
 
     /**
-     * Returns the prefix string used to differentiate assessment IDs from submission box IDs
+     * Returns the string used to identify this assessment in the markbook.
      *
      * @param Activity $assessment
      * @return string
      */
-    private function getPrefix(Activity $assessment) {
-        return $assessment->isAssessment() ? self::ASSESSMENT_PREFIX : self::SUBMISSION_PREFIX;
+    private function getMarkbookIdentifier(Activity $assessment)
+    {
+        return ($assessment->isAssessment() ? self::ASSESSMENT_PREFIX : self::SUBMISSION_PREFIX) . $assessment->getId();
     }
 
     /**
@@ -106,8 +107,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $owner = UserMapper::getInstance()->findById($assessment->getOwner());
         }
 
-
-
         $fileYear = $this->getExternalUser()->getCurrentYear($owner->getExternalId());
         $fileSemester = $this->getExternalUser()->getCurrentSemester($owner->getExternalId());
         $multipleCodes = $folder->getCodes()->count();
@@ -115,8 +114,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         foreach($folder->getCodes() as $classCode) {
 
             $class = $externalClass->getClass($classCode->getCode());
-            $staffID = $multipleCodes > 1 ? $owner->getExternalId() : 0;
+            $staffID = $multipleCodes > 1 || $class['MultipleStaffMarkbookFlag'] > 0 ? $owner->getExternalId() : 0;
 
+            $assessmentFieldValues = $this->getAssessmentFieldValues($assessment);
             $query = "INSERT INTO StaffAssessmentMarkBook (
                         FileType,
                         FileYear,
@@ -139,12 +139,12 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                       '{$class['ClassCampus']}',
                       '{$class['ClassCode']}',
                       '',
-                      '".$this->getDatabase()->quote($assessment->getName())."',
-                      '".$this->getDatabase()->quote(TextFormatter::cutString($assessment->getName(),10))."',
-                      '".$this->getPrefix($assessment).$assessment->getId()."',
+                      '{$assessmentFieldValues["Heading"]}',
+                      '{$assessmentFieldValues["HdgAbbrev1"]}',
+                      '{$assessmentFieldValues["HdgAbbrev2"]}',
                       'OGRaw',
                       '100',
-                      '0'
+                      '{$assessmentFieldValues["WeightingFactor"]}'
                     )";
             $result = $this->getDatabase()->query($query);
         }
@@ -161,13 +161,42 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function updateAssessment(Activity $assessment)
     {
+        $assessmentFieldValues = $this->getAssessmentFieldValues($assessment);
         $query = "UPDATE StaffAssessmentMarkBook SET
-                        Heading = '".$this->getDatabase()->quote($assessment->getName())."',
-                        HdgAbbrev1 = '".$this->getDatabase()->quote(TextFormatter::cutString($assessment->getName(),10))."'
+                        Heading = '{$assessmentFieldValues["Heading"]}',
+                        HdgAbbrev1 = '{$assessmentFieldValues["HdgAbbrev1"]}',
+                        WeightingFactor = '{$assessmentFieldValues["WeightingFactor"]}'
                   WHERE
-                        HdgAbbrev2 = '".$this->getPrefix($assessment).$assessment->getId()."'
+                        HdgAbbrev2 = '{$assessmentFieldValues["HdgAbbrev2"]}'
                     ";
         $this->getDatabase()->query($query);
+    }
+
+    /**
+     * Gets database field values out of an assessment. Gets the following fields:
+     * * Heading
+     * * HdgAbbrev1
+     * * HdgAbbrev2 (used as the identifier for this row)
+     * * WeightingFactor
+     *
+     * @param Activity $assessment
+     *
+     * @return array
+     */
+    protected function getAssessmentFieldValues(Activity $assessment)
+    {
+        $weight = 0;
+        if ($assessment->getSubmissionBox() instanceof Schoolbox\Assessment\Component\SubmissionBox) {
+            $weight = $assessment->getSubmissionBox()->getWeight();
+        } elseif($assessment->getAssessment() instanceof Schoolbox\Assessment\Component\OnlineAssessment) {
+            $weight = $assessment->getAssessment()->getWeight();
+        }
+        return [
+            'Heading'         => $this->getDatabase()->quote($assessment->getName()),
+            'HdgAbbrev1'      => $this->getDatabase()->quote(TextFormatter::cutString($assessment->getName(),10)),
+            'HdgAbbrev2'      => $this->getMarkbookIdentifier($assessment),
+            'WeightingFactor' => $weight,
+        ];
     }
 
     /**
