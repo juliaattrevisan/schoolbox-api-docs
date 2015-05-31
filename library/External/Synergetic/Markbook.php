@@ -68,18 +68,19 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                         MarkOutOf,
                         WeightingFactor
                   FROM StaffAssessmentMarkBook
-                  WHERE HdgAbbrev2 = '".  $this->getPrefix($assessment) . $assessment->getId()."'";
+                  WHERE HdgAbbrev2 = '".$this->getMarkbookIdentifier($assessment)."'";
         return $this->getDatabase()->getAll($query);
     }
 
     /**
-     * Returns the prefix string used to differentiate assessment IDs from submission box IDs
+     * Returns the string used to identify this assessment in the markbook.
      *
      * @param Activity $assessment
      * @return string
      */
-    private function getPrefix(Activity $assessment) {
-        return $assessment->isAssessment() ? self::ASSESSMENT_PREFIX : self::SUBMISSION_PREFIX;
+    private function getMarkbookIdentifier(Activity $assessment)
+    {
+        return ($assessment->isAssessment() ? self::ASSESSMENT_PREFIX : self::SUBMISSION_PREFIX) . $assessment->getId();
     }
 
     /**
@@ -193,7 +194,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         return [
             'Heading'         => $this->getDatabase()->quote($assessment->getName()),
             'HdgAbbrev1'      => $this->getDatabase()->quote(TextFormatter::cutString($assessment->getName(),10)),
-            'HdgAbbrev2'      => $this->getPrefix($assessment).$assessment->getId(),
+            'HdgAbbrev2'      => $this->getMarkbookIdentifier($assessment),
             'WeightingFactor' => $weight,
         ];
     }
