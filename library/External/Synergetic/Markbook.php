@@ -144,7 +144,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                       '{$assessmentFieldValues["HdgAbbrev2"]}',
                       'OGRaw',
                       '100',
-                      '{$assessmentFieldValues["WeightingFactor"]}',
+                      '{$assessmentFieldValues["WeightingFactor"]}'
                     )";
             $result = $this->getDatabase()->query($query);
         }
@@ -167,7 +167,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                         HdgAbbrev1 = '{$assessmentFieldValues["HdgAbbrev1"]}',
                         WeightingFactor = '{$assessmentFieldValues["WeightingFactor"]}'
                   WHERE
-                        HdgAbbrev2 = '{$assessmentFieldValues["HdgAbbrev2"]}',
+                        HdgAbbrev2 = '{$assessmentFieldValues["HdgAbbrev2"]}'
                     ";
         $this->getDatabase()->query($query);
     }
