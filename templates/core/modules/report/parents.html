@@ -30,13 +30,22 @@ $(function(){
 
 	/* Default visibility of search panel
 	 */
+    <!-- BEGIN show_filter_options -->
 	$('#searchFilterOptions').show();
+    <!-- END show_filter_options -->
 });
 </script>
 
 <div class="directory parents">
-	<h1>Year List - Year {YEAR}</h1>
+	<h1>Parent Directory {HEADING}</h1>
 	<span class="header_option">
+        <!-- BEGIN email_all_parents -->
+        <form action="/mail/createMail.php" method="post" style="float:right;">
+            <input type="hidden" name="replyto" value="&quot;{HEADING} Parents&quot; &lt;{REPLY_TO}&gt;"/>
+            <input type="hidden" name="bcc" value="{EMAIL_ALL_PARENTS}"/>
+            <a href="#" class="btn submit-this email"><span></span>Email All</a>
+        </form>
+        <!-- END email_all_parents -->
 		<a class="btn print" href="#"><span></span>Print</a>
 		<a class="btn search" href="#"><span></span>Search</a>
 	</span>
