@@ -2,8 +2,8 @@ INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `type
  VALUES (
  'modules_parentdirectory_emailall',
  '0',
- 'Allow Parents to Email All Parents',
- 'This will allow parents to access the email all function of the parent directory.  Thus allowing parents to bulk email other parents.',
+ 'Allow Email All Parents from Parent Directory',
+ 'If enabled, staff and parents may bulk email parents from the parent directory. (This setting respects the parent\'s directory privacy setting.)',
  '3',
  (SELECT `id` FROM lu_config_type WHERE `type` like 'Policy'),
  'true',
