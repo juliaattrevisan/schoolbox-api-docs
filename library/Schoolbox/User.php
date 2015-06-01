@@ -12,6 +12,7 @@ namespace Schoolbox;
 
 use JsonSerializable;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 
 class User implements JsonSerializable
 {
@@ -526,6 +527,11 @@ class User implements JsonSerializable
      */
     public function getAccessList()
     {
+        /** @var UserAccessMapper $uaMapper */
+        if(!isset($this->accessList)) {
+            $uaMapper = UserAccessMapper::getInstance();
+            $this->setAccessList($uaMapper->findAllForUser($this));
+        }
         return $this->accessList;
     }
 

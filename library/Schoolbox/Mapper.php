@@ -23,6 +23,7 @@ use Schoolbox\Notif\NotifInterface;
 use Schoolbox\Realtime\Schedule\Event;
 use Serializable;
 use Traversable;
+use UnderflowException;
 
 abstract class Mapper implements IMapper, Serializable
 {
@@ -1446,6 +1447,27 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function countByColumnList($columnList, $options = array())
     {
+        try {
+            $stmt = $this->selectScalarByColumnList('COUNT(*)', $columnList, $options);
+            return intval($stmt->fetchColumn());
+        } catch (UnderflowException $e) {
+            return 0;
+        }
+    }
+
+
+    /**
+     * Returns a statement that attempts to select the scalar given by $selection
+     *
+     * @param  string $selection
+     * @param  array  $columnList
+     * @param  array  $options
+     *
+     * @throws UnderflowException YOU MUST CATCH THIS. Thrown if the query could not possibly return any results.
+     * @return PDOStatement
+     */
+    protected function selectScalarByColumnList($selection, array $columnList, array $options = [])
+    {
         // set options (deleted is the only relevant one)
         if (!is_array($options)) {
             $options = array('deleted' => $options,);
@@ -1455,17 +1477,13 @@ abstract class Mapper implements IMapper, Serializable
         );
         $options     = array_merge($defaults, $options);
         $quotedTable = $this->database->quoteIdentifier($this->table);
-        $query       = "SELECT COUNT(*) FROM $quotedTable";
+        $query       = "SELECT $selection FROM $quotedTable";
         $params      = array();
         // Build WHERE part
         // If it underflows, someone passed an empty column value - return an
         // empty set.
         if (!empty($columnList)) {
-            try {
-                $where = $this->buildWherePart($columnList, $options);
-            } catch (\UnderflowException $e) {
-                return 0;
-            }
+            $where = $this->buildWherePart($columnList, $options);
             $whereParts = $where['where'];
             $params     = $where['params'];
             $query .= ' WHERE ';
@@ -1481,8 +1499,52 @@ abstract class Mapper implements IMapper, Serializable
             $statement->bindValue($name, $value);
         }
         $statement->execute();
-        return intval($statement->fetchColumn());
+
+        return $statement;
     }
+
+
+    /**
+     * @see $this->findAll()
+     *
+     * @param  array $options
+     * @return array
+     */
+    public function findAllIds(array $options = [])
+    {
+        return $this->findIdsByColumnList([], $options);
+    }
+
+
+    /**
+     * @see $this->findByColumn()
+     *
+     * @param string $columnName
+     * @param mixed  $columnValue
+     * @param array  $options
+     * @return array
+     */
+    public function findIdsByColumn($columnName, $columnValue, array $options = [])
+    {
+        return $this->findIdsByColumnList([ $columnName => $columnValue ], $options);
+    }
+
+
+    /**
+     * @param array $columnList
+     * @param array $options
+     * @return array
+     */
+    public function findIdsByColumnList(array $columnList, array $options = [])
+    {
+        try {
+            $stmt = $this->selectScalarByColumnList($this->identifier['column'], $columnList, $options);
+        } catch (UnderflowException $e) {
+            return [];
+        }
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
 
     /**
      * Builds a where part and params for this query out of a column list

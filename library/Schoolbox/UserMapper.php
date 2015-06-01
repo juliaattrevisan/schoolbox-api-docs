@@ -263,10 +263,6 @@ class UserMapper extends Mapper
                 $users[$userId] = $this->hydrate($row, 'user');
                 $users[$userId]->setSuperUser($row['user.superuser'] == 1);
                 $users[$userId]->setRole($this->hydrateJoin($row, 'role', 'g'));
-
-                /** @var UserAccessMapper $uaMapper */
-                $uaMapper = $this->getJoinMapper('userAccess');
-                $users[$userId]->setAccessList($uaMapper->findAllForUser($users[$userId]));
             }
 
             $campus = $this->hydrateJoin($row, 'userCampus', 'c');
