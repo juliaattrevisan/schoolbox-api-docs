@@ -92,25 +92,9 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
         /* Render event types to choose from
          */
         /** @var \Schoolbox\Calendar\EventType[] $allTypes */
-        $allTypes = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findAll()
-            ->filter(
-                function ($eventType) {
-                    /** @var \Schoolbox\Calendar\EventType $eventType */
-                    return !$eventType->isTaskType();
-                }
-            );
-
+        $allTypes = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findAll();
         if ($allTypes->count()) {
             foreach ($allTypes as $currentType) {
-                $this->getPage()->setVar(
-                    array(
-                        'EVENT_TYPE_ID'   => $currentType->getId(),
-                        'EVENT_TYPE_NAME' => Scrub::text($currentType->getType()),
-                    )
-                );
-
-                $this->getPage()->parse('event_type_block', 'event_type', true);
-
                 /* Event Task id
                  */
                 if ($currentType->isTaskType()) {
@@ -119,6 +103,14 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
                             'TASK_TYPE_ID' => $currentType->getId(),
                         )
                     );
+                } else {
+                    $this->getPage()->setVar(
+                        array(
+                            'EVENT_TYPE_ID'   => $currentType->getId(),
+                            'EVENT_TYPE_NAME' => Scrub::text($currentType->getType()),
+                        )
+                    );
+                    $this->getPage()->parse('event_type_block', 'event_type', true);
                 }
             }
         } else {
