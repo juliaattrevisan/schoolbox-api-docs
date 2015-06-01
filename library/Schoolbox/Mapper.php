@@ -1537,8 +1537,11 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function findIdsByColumnList(array $columnList, array $options = [])
     {
-        $stmt = $this->selectScalarByColumnList($this->identifier['column'], $columnList, $options);
-
+        try {
+            $stmt = $this->selectScalarByColumnList($this->identifier['column'], $columnList, $options);
+        } catch (UnderflowException $e) {
+            return [];
+        }
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 
