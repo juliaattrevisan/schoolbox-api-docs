@@ -176,8 +176,8 @@ abstract class Synchronise_Base_Strategy
                         $this->verbose_filter->performUpdate();
                         $this->verbose_filter->incrementUpdated();
                     } else {
-                        $this->verbose_filter->outputSkipMessage(
-                            'user - failed because user exists with different username.'
+                        $this->verbose_filter->skip(
+                            'because user exists with different username.'
                         );
                         $this->verbose_filter->incrementSkipped();
                     }
@@ -195,8 +195,8 @@ abstract class Synchronise_Base_Strategy
                         $this->verbose_filter->incrementCreated();
                     } else {
                         // User wasn't created - output a fail message
-                        $this->verbose_filter->outputSkipMessage(
-                            'user - failed because user either already exists or campus is not set.'
+                        $this->verbose_filter->skip(
+                            'because user either already exists or campus is not set.'
                         );
                         $this->verbose_filter->incrementSkipped();
                     }
