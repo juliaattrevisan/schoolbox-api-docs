@@ -87,4 +87,19 @@ class ConstructionTest extends PHPUnit_Framework_TestCase
         );
         $this->assertEquals('2015-03-25T00:00:00+11:00', $date->toIso8601String());
     }
+
+    public function testClone()
+    {
+        $date  = Alaress_Date_Format::newLocalShort(
+            '25/03/2015',
+            new DateTimeZone('UTC'),
+            new Alaress_Date_Locale_Static()
+        );
+        $clone = clone $date;
+        $clone = $clone->addDays(1);
+        // Ensure clone doesn't affect original date
+        $this->assertEquals('2015-03-25', $date->getDatabaseDate());
+        $this->assertEquals('2015-03-26', $clone->getDatabaseDate());
+    }
+
 }
