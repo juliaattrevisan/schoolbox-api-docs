@@ -20,7 +20,7 @@
 // 2. And then variables can be overridden here
 // =============================================================================
 // Dimensions
-@search-width: 					143px;
+@search-width: 					192px;
 @logo-width: 					86px;
 @logo-height: 					25px;
 @infopanel-bellsprite:			'/images/kags/bell.png';
@@ -98,8 +98,9 @@
 // =============================================================================
 h2{ border-bottom: 1px solid #cacaca; }
 #wrap-inner{ padding: 0; }
-#container{ background: @content-background url("/images/kags/ribbonv2.png") 0% 100% no-repeat; padding: 40px 16px 200px 16px; }
+#container{ background: @content-background url("/images/kags/ribbonv2.png") 0% 100% no-repeat; padding: 34px 16px 200px 16px; }
 #footer{ background: @content-background; }
+.homepage-controls { top: -18px; }
 
 #header{
     #search-field{
@@ -107,12 +108,13 @@ h2{ border-bottom: 1px solid #cacaca; }
     }
     #search-button{
         width: 34px;
-        background: @link url("/images/core/search-button.png") no-repeat center center;
+        background: url("/images/kags/search-button.png") center center no-repeat;
     }
     #tabs{
         position: absolute;
         bottom: 0;
         z-index: 1;
+        margin-left: 216px;
         li{
             a{
                 color: @body-background;
@@ -130,7 +132,7 @@ h2{ border-bottom: 1px solid #cacaca; }
     background: @body-background;
     top: 0;
     margin: 0;
-    padding-top: 115px;
+    padding-top: 133px;
     h3, h4{
         padding: 0 0 8px 22px;
     }
