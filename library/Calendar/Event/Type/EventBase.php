@@ -572,10 +572,15 @@ abstract class EventBase implements EventInterface
      * Cloning magic, when expanding multiday events we use clone, this ensures they have independent dates
      */
     public function __clone() {
-        $this->startTime =  clone $this->startTime;
-        $this->endTime = clone $this->endTime;
-        $this->publishDate = clone $this->publishDate;
-
+        if (is_object($this->startTime)) {
+            $this->startTime = clone $this->startTime;
+        }
+        if (is_object($this->endTime)) {
+            $this->endTime = clone $this->endTime;
+        }
+        if (is_object($this->publishDate)) {
+            $this->publishDate = clone $this->publishDate;
+        }
     }
 
 }
