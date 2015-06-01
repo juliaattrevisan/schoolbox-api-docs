@@ -5,7 +5,7 @@ $page = new SitePage();
 $output = array();
 $allowFilter = array('image', 'video');
 
-if (is_numeric($_POST['categoryID']) && $_POST['categoryID']) {
+if (is_numeric($_POST['categoryID'])) {
 /* Output a list of nodes (which are comprised of both files and links)
      * in the second column of Old Resource Browser
      *
@@ -16,11 +16,13 @@ if (is_numeric($_POST['categoryID']) && $_POST['categoryID']) {
     $category = new \Schoolbox\Resource\Category();
     $category->setId(0);
 
-    try {
-        $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
-        $category = $categoryMapper->findById($_POST['categoryID']);
-    } catch (\Exception $e) {
-        error(13);
+    if ($_POST['categoryId']) {
+        try {
+            $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+            $category = $categoryMapper->findById($_POST['categoryID']);
+        } catch (\Exception $e) {
+            error(13);
+        }
     }
 
     /* Also used in tinyMCE resource browser
