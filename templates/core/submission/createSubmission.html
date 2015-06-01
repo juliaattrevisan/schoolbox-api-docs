@@ -246,19 +246,10 @@
                 late_date: 'late_date late_hour late_minute late_period'
             },
             errorPlacement: function(label, element) {
-                if (element.is('[name^="open_"]')) {
-                    label.insertAfter(submission_form.find(':input[name="open_period"]'));
-                }
-                else if (element.is('[name^="due_"]')) {
-                    label.insertAfter(submission_form.find(':input[name="due_period"]'));
-                }
-                else if (element.is('[name^="late_"]')) {
-                    label.insertAfter(submission_form.find(':input[name="late_period"]'));
-                }
-                else if (element.is('[name^="value"]')) {
-                    label.insertAfter(element.closest('.crit'));
-                }
-                else {
+                var cell = element.closest('td');
+                if (cell.length > 0) {
+                    label.appendTo(cell);
+                } else {
                     label.insertAfter(element);
                 }
             },
