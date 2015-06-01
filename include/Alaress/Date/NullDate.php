@@ -71,4 +71,11 @@ class Alaress_Date_NullDate extends Alaress_Date_Format
     {
         return '';
     }
+
+    /**
+     * Overrides parent's clone - this contains no date, so clone nothing.
+     */
+    public function __clone()
+    {
+    }
 }

@@ -84,4 +84,14 @@ class NullDateTest extends PHPUnit_Framework_TestCase
         $nullDate = new Alaress_Date_NullDate();
         $nullDate->eq($this->buildDateObject('2014-03-13', Alaress_Date_NullDate::DATABASE_DATE_FORMAT));
     }
+
+    /**
+     * Test that cloning of a null datetime works
+     */
+    public function testClone()
+    {
+        $nullDate = new Alaress_Date_NullDate();
+        $clone    = clone $nullDate;
+        $this->assertEquals($nullDate, $clone);
+    }
 }
