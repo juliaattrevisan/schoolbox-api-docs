@@ -1421,6 +1421,16 @@ class Adapter  implements \External_UserInterface {
         return $this->getHandler()->getCampusFromTimetable($staffID);
     }
 
+    /**
+     *
+     * Get student forms
+     *
+     * @return array
+     */
+    public function getStudentForms() {
+        return $this->getHandler()->getStudentForms();
+    }
+
     /* Getters/Setters
      */
 
