@@ -57,13 +57,8 @@ class Storage extends Player {
 				/** @var Store\Model $storage */
 				/** @var ResourceVideo      $video */
 				$storage = Store\Mapper::getInstance()->findOneByColumn('hash', $hash);
-				$video   = ResourceVideoMapper::getInstance()->findOneByColumnList(
-					array(
-						'hash' => $storage->getHash(),
-						'type' => 'storage',
-					)
-				);
-				$status = $video->getStatus();
+				$video   = ResourceVideoMapper::getInstance()->findByStorageHash($storage->getHash());
+				$status  = $video->getStatus();
 			}
 			catch (Mapper\Exception $e) {}
 			return array(
