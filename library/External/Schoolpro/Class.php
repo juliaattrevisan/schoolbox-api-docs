@@ -52,13 +52,44 @@ class External_Schoolpro_Class implements External_ClassInterface {
 
 			if ($result['success'] && count($result['result'])) {
 				foreach($result['result'] as $currentStudent) {
+                    $medicalNoteStr = '';
+                    
+                    /* Get the medical data for him too
+                     */
+                    $medicalVars = array(
+                        'sbGetStudentMedicalConditions',
+                        array(
+                            array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
+                            array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
+                            array('@pSchoolNum', $currentStudent['ID'], SQLINT4, false, false, -1),
+                        )
+                    );
+
+                    $medicalResult = $this->getDb()->executeProcedure($medicalVars[0], $medicalVars[1]);
+
+                    /* These arrive in a variety of formats
+                     */
+                    if ($medicalResult['success'] && count($medicalResult['result'])) {
+                        foreach ($medicalResult['result'] as $currentCondition) {
+
+                            /* Only include medical issues that are Applicable == 1
+                             * Just use a basic message to hide the sensitive data,
+                             * and bust out of the loop after the first positive result
+                             */
+                            if ($currentCondition['Applicable']) {
+                                $medicalNoteStr = 'This student has medical conditions.';
+                                break;
+                            }
+                        }
+                    }
+
 					$student = array(
 						'synergy_id' => $currentStudent['ID'],
 						'firstname' => $currentStudent['Firstname'],
 						'lastname' => $currentStudent['Surname'],
 						'yearlevel '=> $currentStudent['YearLevel'],
 						'house' => $currentStudent['House'],
-						'StudentMedicalAlert' => '',
+						'StudentMedicalAlert' => $medicalNoteStr,
 						'StudentSpecialNeedsFlag' => '',
 						'ClassCampus' => '',
 					);

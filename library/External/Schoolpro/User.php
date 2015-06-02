@@ -120,7 +120,7 @@ class External_Schoolpro_User implements External_UserInterface
      */
     public function getStudent($synId)
     {
-        $medicalNoteStr = array();
+        $medicalNoteStr = '';
 
         $vars = array(
             'sbGetStudent',
