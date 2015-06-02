@@ -464,19 +464,24 @@ class Session
                         $result = false;
                         // Ensure the link goes to an actual homepage, too
                         $homepageCode = '';
+                        
                         if ($subject['campusCode']) {
                             //Check for subject with campus code
                             try {
                                 $homepageCode = $subject['campusCode'].'/'.$subject['code'];
                                 $result = $folderMapper->findByCode($homepageCode);
                             } catch (\Exception $e) {
-                                //Try to fetch without campus code
-                                try {
-                                    $homepageCode = $subject['code'];
-                                    $result = $folderMapper->findByCode($subject['code']);
-                                } catch (\Exception $e) {
-                                    // noop
-                                }
+                                // noop
+                            }
+                        }
+
+                        //Try to fetch without campus code
+                        if (!($result instanceof \Schoolbox\Resource\Folder\Model)) {
+                            try {
+                                $homepageCode = $subject['code'];
+                                $result = $folderMapper->findByCode($subject['code']);
+                            } catch (\Exception $e) {
+                                // noop
                             }
                         }
 
