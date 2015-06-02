@@ -36,6 +36,10 @@
   .wd-token {
     margin-bottom: 4px;
   }
+    span[title] {
+        border-bottom: dashed 1px;
+        cursor: help;
+    }
 
 </style>
 <!-- END custom_head -->
@@ -55,9 +59,11 @@
     Campus simultaneously.
   </p>
   <p>
-    If multiple rules match a user, each will be applied in ascending order of precedence (defined
-    as the number of conditions, and then rule order). In the case of <code>paths</code>, values will
-    be appended; in the case of <code>URI</code>, <code>username</code> and <code>password</code>, values will be overwritten.
+    If multiple rules match a user, each will be applied in
+    <span title="ie. the fewer conditions a rule has, the earlier it will be applied">ascending
+    order of precedence (defined as the number of conditions, and then rule order)</span>. In the
+    case of <code>paths</code>, values will be appended; in the case of <code>URI</code>,
+    <code>username</code> and <code>password</code>, values will be overwritten.
   </p>
   <div class="two-thirds">
     <div class="level clearfix">

@@ -92,6 +92,11 @@ $set->newRule(array(
 
 
 
+$settings = $set->applyTo($_SESSION['user']);
+$paths = $settings['paths'];
+unset($settings['paths']);
+
+$dav = new PortfolioWebDAV(new Sabre_DAV_Client_Extended($settings), $paths);
 
 
 /** @var SitePage $this */
