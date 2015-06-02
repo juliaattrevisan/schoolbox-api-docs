@@ -113,6 +113,7 @@ class Evaluation_Import_Xml {
 			'duration' => $xml->duration,
 			'max_attempts' => $max_attempts,
 			'availability' => $xml->availability,
+            'mark_visibility' => $xml->markvisibility,
 			'created_at' => 'NOW()',
 		));
 
