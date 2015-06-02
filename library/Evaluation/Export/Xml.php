@@ -76,6 +76,7 @@ abstract class Evaluation_Export_Xml {
 			'ASSESS_DURATION' => $assess['duration'],
 			'ASSESS_MAX_ATTEMPTS' => $assess['max_attempts'],
 			'ASSESS_AVAILABILITY' => $assess['availability'],
+            'ASSESS_MARK_VISIBILITY' => $assess['mark_visibility'],
 		));
 
 		if (is_array($this->getAllSections()) && count($this->getAllSections())) {
