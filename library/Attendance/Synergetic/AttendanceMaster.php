@@ -35,6 +35,13 @@ class Attendance_Synergetic_AttendanceMaster
     protected $classCampus = '';
 
     /**
+     * File type of class - usually "A" for "Academic" but provided in class data.
+     *
+     * @var string
+     */
+    protected $classFileType = 'A';
+
+    /**
      * The date in Y-m-d of the class
      *
      * @var string
@@ -108,6 +115,7 @@ class Attendance_Synergetic_AttendanceMaster
         $this->setClass($class);
         $this->setClassCampus($class['ClassCampus']);
         $this->setClassCode($class['ClassCode']);
+        $this->setClassFileType($class['FileType']);
         $this->setAttendanceDate($attendanceDate->getDatabaseDate());
         $this->setAttendanceDay($attendanceDay);
         $this->setAttendancePeriod($attendancePeriod);
@@ -129,7 +137,7 @@ class Attendance_Synergetic_AttendanceMaster
             'CreatedByID'               => $_SESSION['sid'],
             'ModifiedDate'              => 'GETDATE()',
             'ModifiedByID'              => $_SESSION['sid'],
-            'FileType'                  => 'A',
+            'FileType'                  => $this->getClassFileType(),
             'FileYear'                  => $this->getFileYear(),
             'FileSemester'              => $this->getFileSemester(),
             'ClassCampus'               => $class['ClassCampus'],
@@ -178,7 +186,7 @@ class Attendance_Synergetic_AttendanceMaster
         $query = "
 			SELECT *
 			FROM SynergyOne.dbo.Timetable
-			WHERE FileType = 'A'
+			WHERE FileType = '{$this->getClassFileType()}'
 			AND FileYear = '{$this->getFileYear()}'
 			AND FileSemester = '{$this->getFileSemester()}'
 			AND PeriodNumber = '{$this->getAttendancePeriod()}'
@@ -475,4 +483,22 @@ class Attendance_Synergetic_AttendanceMaster
         return $this->classCampus;
     }
 
+    /**
+     * @return string
+     */
+    public function getClassFileType()
+    {
+        return $this->classFileType;
+    }
+
+    /**
+     * @param  string $classFileType
+     *
+     * @return $this
+     */
+    public function setClassFileType($classFileType)
+    {
+        $this->classFileType = $classFileType;
+        return $this;
+    }
 }
