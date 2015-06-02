@@ -29,7 +29,7 @@ class UserCondition extends Condition\In {
      * @param User $user
      * @return bool
      */
-    function assertIn($user)
+    public function assertIn($user)
     {
 //        printf("ASSERT: %s.%s IN (%s)\n", $user->getUsername(), $this->field, implode(', ', $this->validValues));
 
@@ -44,13 +44,23 @@ class UserCondition extends Condition\In {
         $value  = $user;
         $string = 'User';
 
-        foreach ($path as $get) {
-            $string .= '->get'.ucfirst($get).'()';
-            $method = array($value, "get$get"); // methods aren't case sensitive......
-            if (!is_callable($method)) {
-                throw new \DomainException("Failed to call $string, method does not exist");
+        try {
+            foreach ($path as $get) {
+
+                if (is_object($value)) {
+                    $string .= '->get'.ucfirst($get).'()';
+                    $value = $this->readObjectProperty($value, $get);
+
+                } elseif (is_array($value)) {
+                    $string .= "[$get]";
+                    $value = $this->readArrayProperty($value, $get);
+
+                } else {
+                    throw new \DomainException("Property $value is not readable");
+                }
             }
-            $value = call_user_func($method);
+        } catch (\DomainException $e) {
+            throw new \DomainException("Failed to retrieve $string, does not exist", 0, $e);
         }
 
         return in_array($value, $this->validValues);

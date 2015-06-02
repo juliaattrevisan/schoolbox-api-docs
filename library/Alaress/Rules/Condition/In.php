@@ -73,4 +73,38 @@ abstract class In extends Super
         return sprintf("IF :input.%s %sIN (%s)", $this->field, $this->isNegated() ? 'NOT ' : '', implode(', ', $this->getValidValues()));
     }
 
+
+    /**
+     * @param object $object
+     * @param string $get
+     * @throws \DomainException
+     * @return mixed
+     */
+    protected function readObjectProperty($object, $get)
+    {
+        $method = array($object, "get$get"); // methods aren't case sensitive......
+
+        if (is_callable($method)) {
+            return call_user_func($method);
+        }
+
+        throw new \DomainException(sprintf("Method %s::%s() is not callable", get_class($object), $method[1]));
+    }
+
+
+    /**
+     * @param array  $array
+     * @param string $get
+     * @throws \DomainException
+     * @return mixed
+     */
+    protected function readArrayProperty($array, $get)
+    {
+        if (array_key_exists($get, $array)) {
+            return $array[$get];
+        }
+
+        throw new \DomainException("Key '$get' not found on array");
+    }
+
 }
