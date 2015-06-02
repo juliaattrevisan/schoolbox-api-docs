@@ -145,16 +145,14 @@ class External_Tass_User implements External_UserInterface
 
     function getCurrentSemester($exteralUserId = null)
     {
-        $query = "SELECT curr_year, curr_sem FROM ttparms WHERE cmpy_code = 01";
-        $current = $this->getDatabase()->getRow($query);
-        return $current['curr_sem'];
+        $query = "SELECT curr_sem FROM ttparms WHERE cmpy_code = 01";
+        return $this->getDatabase()->getOne($query);
     }
 
     public function getCurrentYear($externalUserId = null)
     {
         $query = "SELECT curr_year FROM ttparms WHERE cmpy_code = 01";
-        $current = $this->getDatabase()->getOne($query);
-        return $current['curr_year'];
+        return $this->getDatabase()->getOne($query);
     }
 
     function getSubjectList($tassCode, $userID)
