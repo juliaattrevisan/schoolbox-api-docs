@@ -10,6 +10,7 @@
 namespace Alaress\Rules;
 
 
+use Alaress\Rules\Token\Filter;
 use Alaress\Rules\Token\Token;
 use Alaress\Rules\Token\Tokenizer;
 
@@ -36,6 +37,15 @@ abstract class TokenizedRuleset extends Ruleset
     public function getTokens()
     {
         return $this->tokenizer->getTokens();
+    }
+
+
+    /**
+     * @return Filter[]
+     */
+    public function getFilters()
+    {
+        return $this->tokenizer->getFilters();
     }
 
 } 
