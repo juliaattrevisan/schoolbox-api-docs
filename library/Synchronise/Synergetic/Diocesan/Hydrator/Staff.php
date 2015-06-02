@@ -47,6 +47,16 @@ class Staff extends Synchronise_Base_Hydrator_Staff
 
         $newUser['group_id'] = self::ROLE_STAFF;
 
+        /*
+         * IF externalUser.StaffCategoryType NOT = TEACHER
+         * AND user NOT EXISTS
+         * THEN campusCollection = [
+         *   Senior School (3),
+         *   Junior High (2)
+         *   Junior School (1)
+         * ]
+         * AND defaultCampus = Senior School (3)
+         */
         // non teachers go in all campus
         if ($externalUser['StaffCategory'] != 'TEACH') {
             $newUser['campus'] = array(self::CAMPUS_SENIOR, self::CAMPUS_JUNHIGH,self::CAMPUS_JUNIOR);
@@ -58,11 +68,49 @@ class Staff extends Synchronise_Base_Hydrator_Staff
         // loosey goosey
         $synCampi = $this->euHandler->getCampusFromTimetable($externalUser['StaffID']) ?: array();
 
+
+        /*
+         * TODO put some smarts in here: if default campus is set, that campus must also be auto-set in the campusCollection
+         *
+         * IF externalUser.StaffCategoryType = TEACHER
+         * THEN defaultCampus MAPS externalUser.StaffCampus AS [
+         *   "S" => [
+         *     Senior School (3),
+         *     Junior High (2)
+         *   ],
+         *   "J" => [
+         *     Junior School (1)
+         *   ],
+         *   "F" => [
+         *     Junior School (1)
+         *   ]
+         * ]
+         */
         // append their 'default' campus
         if ($externalUser['StaffCampus']) {
             array_unshift($synCampi, array('campus' => $externalUser['StaffCampus']));
         }
 
+        $u = new \Schoolbox\User();
+        $u->getEportfolioEnable();
+
+        /*
+         * TODO somehow pull the campus codes through as defined by External_User::getCampusFromTimetable()
+         *
+         * IF externalUser.StaffCategoryType = TEACHER
+         * THEN campusCollection MAPS COLLATE({External_User::getCampusFromTimetable(externalUser.StaffID)}) AS [
+         *   "S" => [
+         *     Senior School (3),
+         *     Junior High (2)
+         *   ],
+         *   "J" => [
+         *     Junior School (1)
+         *   ],
+         *   "F" => [
+         *     Junior School (1)
+         *   ]
+         * ]
+         */
         $map = array(
             'S' => array(self::CAMPUS_SENIOR, self::CAMPUS_JUNHIGH),
             'J' => array(self::CAMPUS_JUNIOR),

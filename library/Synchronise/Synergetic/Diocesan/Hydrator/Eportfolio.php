@@ -31,6 +31,18 @@ class Eportfolio implements Synchronise_Base_IHydrator
      */
     public function hydrate($externalUser, $newUser)
     {
+        /*
+         * IF user.role.id IN (4, 5, 6, 7)
+         * THEN user.eportfolioEnable = TRUE
+         *
+         *
+         * IF user.role.id NOT IN (4, 5, 6, 7)
+         * THEN user.eportfolioEnable = FALSE
+         *
+         *
+         * TODO smarts: could the above be condensed into?
+         * ALWAYS user.eportfolioEnable = user.role.id IN (4, 5, 6, 7)
+         */
         $enable = array(
             Student::ROLE_YR_3,
             Student::ROLE_YR_4,
