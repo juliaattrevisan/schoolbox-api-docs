@@ -216,7 +216,7 @@ class Homepage
 
         try {
             $category = $categoryMapper->findById($this->cid);
-            $this->resetHomepageToTemplate($category->getHomepage()->getTemplate());
+            $this->resetHomepageToTemplate($category->getHomepage()->getTemplate()->getId());
         } catch (\Exception $e) {
         }
     }
