@@ -49,21 +49,13 @@ class Ruleset extends Super {
 
 
     /**
-     * @param Condition[] $conditions
-     * @param mixed       $response
-     * @param bool        $negate
+     * @param callable $effect
+     * @param bool     $negate
+     * @return Rule
      */
-    public function newRule(array $conditions, $response, $negate = false)
+    protected function createRule($effect, $negate = false)
     {
-        $rule = new Rule(function () use ($response) {
-            return $response;
-        }, $negate);
-
-        foreach ($conditions as $condition) {
-            $rule->addCondition($condition);
-        }
-
-        $this->attach($rule);
+        return new Rule($effect, $negate);
     }
 
 

@@ -50,9 +50,36 @@ abstract class Ruleset
 
 
     /**
+     * @param Condition[] $conditions
+     * @param mixed       $response
+     * @param bool        $negate
+     */
+    public function newRule(array $conditions, $response, $negate = false)
+    {
+        $rule = $this->createRule(function () use ($response) {
+            return $response;
+        }, $negate);
+
+        foreach ($conditions as $condition) {
+            $rule->addCondition($condition);
+        }
+
+        $this->attach($rule);
+    }
+
+
+    /**
      * @param mixed $input
      * @return mixed
      */
     public abstract function applyTo($input);
+
+
+    /**
+     * @param callable $effect
+     * @param bool     $negate
+     * @return Rule
+     */
+    protected abstract function createRule($effect, $negate = false);
 
 }
