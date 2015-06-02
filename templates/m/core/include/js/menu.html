@@ -65,7 +65,10 @@
             ni = elem.parent().index();
 
             // Build menu HTML
-            var menuWrapper = $('<div />').attr('id', 'menu_wrapper').css({ max_height: $(window).height() - 70 });
+            var menuWrapper = $('<div />').attr('id', 'menu_wrapper').css({
+                height: $(window).height() - 70,
+                max_height: $(window).height() - 70
+            });
 
             // this could probably be done during startup rather than on-demand
             if(menuCache[elem.attr('title')] === undefined) {
@@ -99,7 +102,7 @@
             }
 
             // apply scrollability to the menu
-            scrollMenu = new iScroll('menu_wrapper', { bounce: true, vScroll: true });
+            scrollMenu = new iScroll('menu_wrapper', { vScroll: true });
 
             // aaaand scene.
             elem.parent().addClass('active');
