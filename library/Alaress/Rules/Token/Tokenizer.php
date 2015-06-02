@@ -17,11 +17,16 @@ abstract class Tokenizer {
     /** @var Token[] */
     protected $tokens;
 
+    /** @var Filter[] */
+    protected $filters;
+
+
     /**
      */
     public function __construct()
     {
         $this->tokens = array();
+        $this->filters = array();
     }
 
 
@@ -32,6 +37,16 @@ abstract class Tokenizer {
     {
         return array_values($this->tokens);
     }
+
+
+    /**
+     * @return Filter[]
+     */
+    public function getFilters()
+    {
+        return array_values($this->filters);
+    }
+
 
     /**
      * @param array $settings
@@ -60,6 +75,18 @@ abstract class Tokenizer {
         return $this;
     }
 
+
+    /**
+     * @param Filter $filter
+     * @return self
+     */
+    protected function addFilter($filter)
+    {
+        $this->filters[strtolower($filter->getFilter())] = $filter;
+        return $this;
+    }
+
+
     /**
      * @param array  $settings
      * @param string $field
@@ -85,10 +112,29 @@ abstract class Tokenizer {
 
         if (is_string($fieldValue)) {
             $settings[$field] = $fieldValue;
-            if (preg_match_all('`{:([a-z_][a-z0-9_]*)}`i', $fieldValue, $matches)) {
-                foreach ($matches[1] as $match) {
+            if (preg_match_all('`{:([a-z_][a-z_0-9]*)((?:\s*\|\s*[a-z]+)*)?}`i', $fieldValue, $matches)) {
+
+                $len = count($matches[0]);
+
+                for ($i = 0; $i < $len; ++$i) {
+
+                    $match  = $matches[0][$i];
+                    $token  = $matches[1][$i];
+                    $filter = $matches[2][$i];
+
                     // iterative replacement of tokens
-                    $settings[$field] = str_replace("{:$match}", $this->renderToken($match, $input, $settings), $settings[$field]);
+                    $replacement = $this->renderToken($token, $input, $settings);
+
+                    // apply any filters by mutating $replacement
+                    if ($filter) {
+                        $filters = array_filter(explode('|', $filter));
+
+                        foreach ($filters as $filterName) {
+                            $replacement = $this->applyFilter($filterName, $replacement);
+                        }
+                    }
+
+                    $settings[$field] = str_replace($match, $replacement, $settings[$field]);
                 }
             }
         } else {
@@ -119,6 +165,21 @@ abstract class Tokenizer {
             return '';
         }
         return $this->tokens[$token]->apply($input, $settings);
+    }
+
+
+    /**
+     * @param string $filter
+     * @param string $input
+     * @return string
+     */
+    protected function applyFilter($filter, $input)
+    {
+        $filter = strtolower($filter);
+        if (empty($this->filters[$filter])) {
+            return $input;
+        }
+        return $this->filters[$filter]->apply($input);
     }
 
 }
