@@ -10,6 +10,8 @@
 namespace Alaress\Rules\Token;
 
 
+use Alaress\Rules\Lang\Construct;
+
 abstract class Tokenizer {
 
     /** @var Token[] */
@@ -65,14 +67,23 @@ abstract class Tokenizer {
      * @param mixed  $input
      * @return mixed
      */
-    protected function parseTokens($settings, $field, $fieldValue, $input)
+    public function parseTokens($settings, $field, $fieldValue, $input)
     {
         if (is_array($fieldValue)) {
+            // recurse
             foreach ($fieldValue as $subField => $subFieldValue) {
                 $settings[$field][$subField] = $this->parseTokens($settings, $subField, $subFieldValue, $input);
             }
+            return $settings[$field];
+        }
 
-        } else {
+        if ($fieldValue instanceof Construct) {
+            // rescue the construct before we lose it
+            $construct  = $fieldValue;
+            $fieldValue = $fieldValue->getField();
+        }
+
+        if (is_string($fieldValue)) {
             $settings[$field] = $fieldValue;
             if (preg_match_all('`{:([a-z_][a-z0-9_]*)}`i', $fieldValue, $matches)) {
                 foreach ($matches[1] as $match) {
@@ -80,6 +91,14 @@ abstract class Tokenizer {
                     $settings[$field] = str_replace("{:$match}", $this->renderToken($match, $input, $settings), $settings[$field]);
                 }
             }
+        } else {
+            // just assign the value
+            $settings[$field] = $fieldValue;
+        }
+
+        // apply the construct we rescued above
+        if (isset($construct)) {
+            $settings[$field] = $construct->apply($settings[$field]);
         }
 
         return $settings[$field];
