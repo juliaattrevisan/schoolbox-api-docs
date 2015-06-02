@@ -10,11 +10,10 @@
 namespace Schoolbox\WebDav\Rules;
 
 use Alaress\Rules\Condition;
-use Alaress\Rules\Ruleset as Super;
-use Alaress\Rules\Token\Token;
+use Alaress\Rules\TokenizedRuleset;
 use Schoolbox\User;
 
-class Ruleset extends Super {
+class Ruleset extends TokenizedRuleset {
 
     /** @var \Alaress\Rules\Token\Tokenizer */
     protected $tokenizer;
@@ -28,9 +27,7 @@ class Ruleset extends Super {
      */
     public function __construct($uri, $username = '{:username}', $password = '{:password}', $paths = array())
     {
-        parent::__construct();
-
-        $this->tokenizer = new Tokenizer();
+        parent::__construct(new Tokenizer());
 
         // default rule to set base vars
         $this->newRule(array(), array(
@@ -109,13 +106,4 @@ class Ruleset extends Super {
         return $all;
     }
 
-
-    /**
-     * @return Token[]
-     */
-    public function getTokens()
-    {
-        return $this->tokenizer->getTokens();
-    }
-
-} 
+}
