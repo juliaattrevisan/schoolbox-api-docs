@@ -48,6 +48,13 @@ class Message {
 		$this->ackResolver->nack($headers);
 	}
 
+    /**
+     * @return string
+     */
+    public function getAmqpId()
+    {
+        return $this->frame->getHeader('amqp-message-id');
+    }
 
 
 } 

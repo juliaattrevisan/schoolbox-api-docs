@@ -123,17 +123,22 @@ class Subscription {
 	}
 
 
-	/**
-	 * Register a message that we can acknowledge later
-	 *
-	 * @param Frame $frame
-	 * @param AckResolver $ackResolver
-	 */
-	public function addMessage($frame, $ackResolver) {
-		$amqpMessageId = $frame->getHeader('amqp-message-id');
-		$this->messages[$amqpMessageId] = new Message($frame, $ackResolver);
-		$this->log->debug("Attached resolver for $amqpMessageId");
-	}
+    /**
+     * Register a message that we can acknowledge later
+     *
+     * @param Frame $frame
+     * @param AckResolver $ackResolver
+     */
+    public function addMessage($frame, $ackResolver)
+    {
+        $msg = new Message($frame, $ackResolver);
+
+        $amqpMessageId = $msg->getAmqpId();
+
+        $this->messages[$amqpMessageId] = $msg;
+
+        $this->log->debug("Attached resolver for $amqpMessageId");
+    }
 
 
 	/**
@@ -165,17 +170,17 @@ class Subscription {
 			$amqpMessageIds = array($amqpMessageIds);
 		}
 
-		foreach($this->messages as $msgId => $stompMessage) {
+		foreach($this->messages as $amqpMessageId => $stompMessage) {
 			try {
-				if(in_array($msgId, $amqpMessageIds)) {
-					$this->log->debug("Attempting ACK of $msgId");
+				if(in_array($amqpMessageId, $amqpMessageIds)) {
+					$this->log->debug("Attempting ACK of $amqpMessageId");
 					$stompMessage->ack();
-					$success[$msgId] = true;
+					$success[$amqpMessageId] = true;
 				}
 			}
 			catch(RuntimeException $e) {
 				// the message in question has already been [N]ACK'd
-				$this->log->error("Caught Runtime Exception, message '$msgId' already N/ACK'd");
+				$this->log->error("Caught Runtime Exception, message '$amqpMessageId' already N/ACK'd");
 			}
 		}
 
