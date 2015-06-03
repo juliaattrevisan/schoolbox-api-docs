@@ -249,25 +249,30 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	}
 
 
-	/**
-	 * This is the method called from within a Subscription object for notifying attached sockets of a new message.
-	 *
-	 * @param AMQPMessage $message
-	 * @param int $userId
-	 * @return bool
-	 * @throws ProcessException
-	 */
-	public function onAMQP($message, $userId) {
+    /**
+     * This is the method called from within a Subscription object for notifying attached sockets of a new message.
+     *
+     * @param AMQPMessage $message
+     * @param int         $userId
+     * @return bool
+     * @throws ProcessException
+     */
+    public function onAMQP($message, $userId)
+    {
 
-		if(!$this->pipes->userPipeCount($userId)) {
-			return false;
-		}
+        if (!$this->pipes->userPipeCount($userId)) {
+            return false;
+        }
 
-		// just get *a* pipe for the user, it doesn't matter which
-		$pipe = reset($this->pipes->getPipesByUserId($userId));
+        /*
+         * When the initiator is AMQP (ie. something new in Rabbit), the pipe method is going to be an alert or a push.
+         * As such, it doesn't matter *which* pipe is used, because it will only be used as a basis for broadcasting to
+         * all the pipes that belong to the same user.
+         */
+        $pipe = reset($this->pipes->getPipesByUserId($userId));
 
         $formatted = json_decode($message->body, true);
-        $instance = Instance::jsonUnserialize($formatted['message']);
+        $instance  = Instance::jsonUnserialize($formatted['message']);
 
         // if this is an alert, bypass transactionality
         if ($instance->getNamespace() == 'ALERT') {
@@ -281,8 +286,8 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 
         $this->getTransaction($pipe)->put($hash, $instance);
 
-		return true;
-	}
+        return true;
+    }
 
 
     /**
