@@ -1,8 +1,10 @@
-{% if qualifications.data|length > 0 %}
+{% if qualifications.data.num > 0 %}
 <h2>Qualifications:</h2>
 <ul>
-    {% for qualification in qualifications.data %}
-    <li>{{ qualification }}</li>
+    {% for level, displayText in qualifications.data.qualifications %}
+    {% if displayText|length > 0 %}
+    <li>{{ displayText }}</li>
+    {% endif %}
     {% endfor %}
 </ul>
 {% endif %}
