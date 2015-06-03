@@ -107,6 +107,35 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
     }
 
     /**
+     * Find all the years containing a submission box
+     *
+     * @return Collection
+     */
+    public function findYears() {
+        $query = "
+            SELECT
+				{$this->getColumnString('sb')}
+            FROM {$this->getTable()} sb
+            ORDER BY date DESC
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute();
+
+        $years = array();
+
+        foreach ($statement as $row) {
+            $box = $this->hydrate($row, 'sb');
+
+            $years[$box->getDueDate()->getYear()] = '';
+        }
+
+        $collection = new Collection(array_keys($years));
+
+        return $collection;
+    }
+
+    /**
     * @throws Schoolbox\Mapper\Exception if submission box is not found
     * @param  int  $id
     * @return SubmissionBox
