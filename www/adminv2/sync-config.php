@@ -35,17 +35,6 @@ if (!$_SESSION['user']->isSuperUser()) {
 $studentSet = new Ruleset(UserMapper::getInstance(), 'Student');
 
 $studentSet->newRule([
-    // IF :input.StudentYearLevel = 0
-    new ExternalUserCondition('StudentYearLevel', 0),
-    // AND :input.StudentCampus = 'F'
-    new ExternalUserCondition('StudentCampus', 'F')
-    // THEN
-], [
-    'role'          => RoleMapper::getInstance()->findById(5),
-    'defaultCampus' => CampusMapper::getInstance()->findById(2)
-]);
-
-$studentSet->newRule([
     // IF :input.StudentBoardingHouse NOT BLANK
     new ExternalUserCondition('StudentBoarder', null, true)
 ], [
