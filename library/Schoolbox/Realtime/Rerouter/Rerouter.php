@@ -228,10 +228,11 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 
 
     /**
-     * @param int $userId
+     * @param int  $userId
+     * @param bool $refreshCache
      * @return bool
      */
-    public function subscribeUser($userId)
+    public function subscribeUser($userId, $refreshCache = true)
     {
         $this->log->debug("Subscribing user $userId");
 
@@ -239,7 +240,9 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
         $subscriber = $this->subscriber;
         $subList    = $subscriber->getSubscriptionList();
 
-        $subList->importFromSource($this->userMapper, false);
+        if ($refreshCache) {
+            $subList->importFromSource($this->userMapper, false);
+        }
 
         return $subscriber->subscribe($subList->createQueueName($userId), function ($frame, $data) use ($tx) {
             /**
