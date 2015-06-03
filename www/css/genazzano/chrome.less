@@ -312,9 +312,26 @@ body.login{
   }
 }
 
-
-
-
+/* ---- Mobile ---- */
+@media screen and (max-width: 768px) {
+  body.login{
+      #container #content{
+      width: 100%;
+      box-sizing: border-box;
+      top: 40px;
+        #login-logo{ margin-bottom: 15px; }
+      }
+      #footer{
+        width: 90%;
+        left: 0;
+        ul li,
+        ul li a{
+          color: @white;
+        }
+      }
+    #login-bg{ display: none; }
+  }
+}
 
 /*
  * Demo Dashboards
