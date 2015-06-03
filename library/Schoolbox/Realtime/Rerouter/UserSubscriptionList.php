@@ -57,18 +57,15 @@ class UserSubscriptionList extends SubscriptionList {
             $this->queues = array();
         }
 
-        $db = $source->getDatabase();
+        $userIds = $source->findAllIds();
 
-        $count = $db->query("SELECT COUNT(`id`) FROM `user`")->fetchColumn();
+        $count = count($userIds);
 
         if ($count == 0) {
             return;
         }
 
         $this->log->notice("Loading $count users");
-
-        // this isn't exactly kosher, but it sure beats dummy-hydrating every user in the db
-        $stmt = $source->getDatabase()->query("SELECT `id` FROM `user`");
 
         // temporal sample: 10, or 2%, whichever is larger
         $n = max(10, (int)($count / 50));
@@ -91,13 +88,13 @@ class UserSubscriptionList extends SubscriptionList {
                 $this->log->debug(($i * 10 / $dec)."% loaded");
             }
 
-            $id = $stmt->fetchColumn();
-
             // result is explicitly false? we somehow miscounted - we're done here
-            if ($id === false) {
+            if (empty($userIds[$i])) {
                 $this->log->debug("Was expecting to load $count users, but only got " . ($i + 1));
                 return;
             }
+
+            $id = $userIds[$i];
 
             $name = $this->createQueueName($id);
 
