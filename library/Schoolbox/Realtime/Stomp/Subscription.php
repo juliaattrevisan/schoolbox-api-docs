@@ -150,12 +150,11 @@ class Subscription {
 	/**
 	 * ACK messages
 	 *
-	 * To acknowledge a message, you have to nacknowledge every other message that is sitting unacknowledged.
 	 * As often as possible, an array of message IDs should be passed to this method rather than a single message.
 	 *
 	 * Returns the array of IDs that were SUCCESSFULLY acknowledged
 	 *
-	 * @param array $amqpMessageIds
+	 * @param string|array $amqpMessageIds
 	 * @return array
 	 */
 	public function acceptMessages($amqpMessageIds) {
@@ -180,12 +179,14 @@ class Subscription {
 			}
 		}
 
-		if(count($success)) {
-			foreach(array_keys($success) as $amqpMessageId) {
+        $accepted = array_keys($success);
+
+		if(count($accepted)) {
+			foreach($accepted as $amqpMessageId) {
 				unset($this->messages[$amqpMessageId]);
 				$this->log->info("Accepted $amqpMessageId");
 			}
-			return array_keys($success);
+			return $accepted;
 		}
 		else {
 			$this->log->critical("Did not find any matching messages");
