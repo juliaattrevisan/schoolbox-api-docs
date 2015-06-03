@@ -211,20 +211,4 @@ class Subscription {
 		return new AMQPMessage($stompFrame->body, $properties);
 	}
 
-
-	/**
-	 * Returns the list of messages currently UNACK'd in this subscription.
-	 *
-	 * @return AMQPMessage[]
-	 */
-	public function getMessages() {
-		$messages = array();
-
-		foreach($this->messages as $amqpMessageId => $stompMessage) {
-			$messages[$amqpMessageId] = $this->frame2amqp($stompMessage->frame);
-		}
-
-		return $messages;
-	}
-
 } 
