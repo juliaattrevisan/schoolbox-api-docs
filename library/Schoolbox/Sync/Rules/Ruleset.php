@@ -12,22 +12,22 @@ namespace Schoolbox\Sync\Rules;
 use Alaress\Rules\TokenizedRuleset;
 use Schoolbox\Collection;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
+use Schoolbox\Mapper;
 
 class Ruleset extends TokenizedRuleset
 {
 
-    /** @var UserMapper */
-    protected $userMapper;
+    /** @var Mapper */
+    protected $mapper;
 
     /**
-     * @param UserMapper $userMapper
-     * @param string     $context
+     * @param Mapper $userMapper
+     * @param string $context
      */
-    public function __construct(UserMapper $userMapper, $context)
+    public function __construct(Mapper $userMapper, $context)
     {
         parent::__construct(new Tokenizer($context));
-        $this->userMapper = $userMapper;
+        $this->mapper = $userMapper;
     }
 
 
@@ -40,7 +40,7 @@ class Ruleset extends TokenizedRuleset
      */
     public function applyTo($externalUser, $previous = null)
     {
-        $user = $previous ?: $this->userMapper->createModel();
+        $user = $previous ?: $this->mapper->createModel();
 
         foreach ($this->rules as $rule) {
             $data = $rule->apply($externalUser);
