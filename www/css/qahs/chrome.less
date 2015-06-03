@@ -1,0 +1,288 @@
+@charset "utf-8";
+// =============================================================================
+// Default v2 Schoolbox skin
+// =============================================================================
+//*
+//*   Ride The Whale                         ~777IIIIIIIIIII7~_
+//*                            7I       =%#%%%%7 @ %# /========
+//*                         ]7II7I###########%%%%%%%%777777
+//*                                ~I7###########777=
+//*                                     ##7      ]/
+//*                                     #/
+//*/
+// =============================================================================
+// 1. Load dependencies
+// =============================================================================
+@import "../core/mixins.less";
+@import "../core/variables.less";
+
+// =============================================================================
+// 2. And then variables can be overridden here
+// =============================================================================
+// Dimensions
+@search-width: 					250px;
+@logo-width: 					125px;
+@logo-height: 					73px;
+@infopanel-bellsprite:			'/images/demo/bell.png';
+@infopanel-height:				32px;
+
+// Generic colors
+@dark-blue:                     #013A63; // Dark Schoolbox Blue
+@body-background: 				#EEEEEE; // Body, but not the content area
+@content-background: 			#FFFFFF; // Used for forms
+@dark: 							#FAFAFA; // Alternate tigerstriping color
+@border-color: 					#EEEEEE; // Bordering @dark
+@alternate-background: 			#FFFFFF; // Sections such as admin
+
+// Basic type
+@body-text: 					@black;
+@secondary-text: 				#797979;
+@link: 							#289dcc;
+@link-hover: 					darken(@link, 10%);
+
+// Main banner & Search
+@banner-background: 			transparent;
+@banner-color:      			#FFFFFF;
+@banner-links:      			@banner-color;
+@search-color:                  @banner-color;
+@banner-height:     			105px;
+
+// Modules
+@module-heading: 				@white;
+@module-background: 			#a5a5a5;
+@admin-nav:                     @link;
+
+// Refers to the left navigation
+@navigation-width:				200px;
+@navigation-padding:			16px;
+@navigation-background:  		transparent;
+@navigation-color:  			@white;
+@navigation-links:  			@navigation-color;
+@navigation-hover-background: 	@link;
+@navigation-hover-color:  		#FFFFFF;
+@navigation-sub-background:  	@link;
+@submit-btn:                    @link;
+
+// Flyout Menus and Messages
+@notify-color:					@negative-color;
+@notify-text-color:				@black;
+@notify-open-text-color:		@notify-text-color;
+@flyout-color:					@link;
+@flyout-header-color:			@black;
+@flyout-background:				@content-background;
+@flyout-hover-color:			@navigation-hover-color;
+@flyout-hover-background:		@navigation-hover-background;
+@flyout-pad-height:				2px;
+@flyout-highlight:				@dark;
+
+// Main "Tab" Navigation
+@tab-background:				transparent;
+@tab-color:						#FFFFFF;
+@tab-hover-background:		    @tab-color;
+@tab-hover-color:				@link;
+
+// Footer text
+@footer-color:					@white;
+@footer-links:					@footer-color;
+
+// Optional features
+//@header-version: 				2;
+
+// =============================================================================
+// 3. Load core
+// =============================================================================
+@import "../core/core.less";
+
+// =============================================================================
+// 4. Any overrides for styles can be specified below
+// =============================================================================
+
+body{
+	background: #007297;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwNzI5NyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAyMjgiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(left,  #007297 0%, #000228 100%);
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%,#007297), color-stop(100%,#000228));
+	background: -webkit-linear-gradient(left,  #007297 0%,#000228 100%);
+	background: -o-linear-gradient(left,  #007297 0%,#000228 100%);
+	background: -ms-linear-gradient(left,  #007297 0%,#000228 100%);
+	background: linear-gradient(to right,  #007297 0%,#000228 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#007297', endColorstr='#000228',GradientType=1 );
+}
+
+#header{
+	background: url('/images/qahs/header.png') 200px 0px no-repeat;
+	.logo{
+		left: 35px;
+		top: 20px;
+	}
+
+	#search-field{
+		background: url('/images/qahs/search.png') bottom left no-repeat;
+		padding: 6px 28px 6px 6px;
+	}
+
+	#tabs{
+		position: relative;
+	  	top: 21px;
+	  	li{ margin: 0; }
+		li a{
+			background-color: #000228;
+			padding: 6px 11px;
+
+			&:hover{ background-color: lighten(#000228, 5%); }
+		}
+		.navthis a{
+			background-color: @white;
+			&:hover{ background-color: @white; }
+		}
+	}
+}
+
+#nav{
+	margin: 11px 0 0 0;
+	h3, h4{
+		font-size: 16px;
+	}
+	ul ul li a:hover{
+		background: @white !important;
+		color: @link !important;
+	}
+}
+
+body.login{
+	#container{
+		background: transparent;
+	}
+	#login-bg{
+		background: url('/images/qahs/login-bg.jpg') center center no-repeat;
+		background-size: cover;
+		float: left;
+		width: 100%;
+		text-align: center;
+		height: 100%;
+		position: fixed;
+		left: 0px;
+		top: 0px;
+		z-index: -1;
+		height:100%;
+	}
+
+	#content{
+		background: rgba(0, 2, 40, 0.8);
+		float: left;
+		width: 400px;
+		height: 100%;
+		position: fixed;
+		right: 0;
+		left: auto;
+		top: 0;
+		padding: 120px 45px 0 45px;
+		box-sizing: border-box;
+		z-index: 1;
+		.error, .forgotten a{
+			margin: 30px 0;
+		}
+	}
+	#loginForm{
+		::-webkit-input-placeholder { color: #777; font-size: 16px; }
+		:-moz-placeholder { color: #777; font-size: 16px; }
+		::-moz-placeholder { color: #777; font-size: 16px; }
+		:-ms-input-placeholder { color: #777; font-size: 16px; }
+			input[type="text"],
+			input[type="password"]{
+			background: @white;
+			color: @black;
+			font-size: 17px;
+			width: 100%;
+			height: 40px;
+			margin: 0 0 3px 0;
+			padding: 10px 12px;
+		}
+		input[type="submit"]{
+			background: @link url('/images/qahs/chevron.png') 97% 50% no-repeat;
+			color: @white;
+			width: 100%;
+			font-weight: bold;
+			font-size: 16px;
+			height: 40px;
+			&:hover{
+				background: lighten(@link, 10%) url('/images/qahs/chevron.png') 97% 50% no-repeat;
+			}
+		}
+	}
+	fieldset{
+		padding: 0;
+	}
+	#footer{
+		padding-left: 15px;
+		right: auto;
+		width: 60%;
+		z-index: 2;
+	}
+}
+
+/* ---- Mobile ---- */
+@media screen and (max-width: 760px) {
+	body.login{
+	  	#container #content{
+			width: 100%;
+			box-sizing: border-box;
+			#login-logo{ margin-bottom: 15px; }
+	  	}
+	  	#footer{
+	  		width: 90%;
+	  		ul li,
+	  		ul li a{
+	  			color: @white;
+	  		}
+	  	}
+	}
+}
+
+
+/*
+ * Demo Dashboards
+ */
+
+.demo-dash{
+	ul{
+		margin: 0 !important;
+		li{
+			float: left;
+			padding: 7px 4px !important;
+			margin: 0 !important;
+			height: 135px;
+			list-style: none;
+		}
+		a{ 
+			display: block;
+			float: left;
+			text-align: center;
+			padding: 92px 0 0 0;
+			font-weight: bold;
+			width: 88px;
+			.transition (opacity 0.5s);
+			&:hover{
+				cursor: pointer;
+				opacity: 0.8;
+			}
+		}
+		.admin{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
+		.calendar-dash{ background: url('/images/demo/dashboard-icons.png') -88px 0px no-repeat; }
+		.due-work{ background: url('/images/demo/dashboard-icons.png') -176px 0px no-repeat; }
+		.eportfolio{ background: url('/images/demo/dashboard-icons.png') -264px 0px no-repeat; }
+		.online-forms{ background: url('/images/demo/dashboard-icons.png') -352px 0px no-repeat; }
+		.leave{ background: url('/images/demo/dashboard-icons.png') -440px 0px no-repeat; }
+		.manage-users{ background: url('/images/demo/dashboard-icons.png') -528px 0px no-repeat; }
+		.network{ background: url('/images/demo/dashboard-icons.png') -616px 0px no-repeat; }
+		.news{ background: url('/images/demo/dashboard-icons.png') -704px 0px no-repeat; }
+		.parents-friends{ background: url('/images/demo/dashboard-icons.png') -792px 0px no-repeat; }
+		.parent-dir{ background: url('/images/demo/dashboard-icons.png') -880px 0px no-repeat; }
+		.payments{ background: url('/images/demo/dashboard-icons.png') -968px 0px no-repeat; }
+		.resource-booking{ background: url('/images/demo/dashboard-icons.png') -1056px 0px no-repeat; }
+		.sport{ background: url('/images/demo/dashboard-icons.png') -1144px 0px no-repeat; }
+		.staff-dir{ background: url('/images/demo/dashboard-icons.png') -1232px 0px no-repeat; }
+		.synergetic{ background: url('/images/demo/dashboard-icons.png') -1320px 0px no-repeat; }
+		.timetable{ background: url('/images/demo/dashboard-icons.png') -1408px 0px no-repeat; }
+	}
+}
