@@ -257,8 +257,6 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 
 		// just get *a* pipe for the user, it doesn't matter which
 		$pipe = reset($this->pipes->getPipesByUserId($userId));
-		$self = $this;
-        $log  = $this->log;
 
         $formatted = json_decode($message->body, true);
         $instance = Instance::jsonUnserialize($formatted['message']);
@@ -271,32 +269,47 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
             return true;
         }
 
-		if(empty($this->pushTransactions[$userId])) {
-			$this->pushTransactions[$userId] = new Transaction($this->reactLoop,
-				function($timer) use ($self, $pipe, $userId, $log) {
-					/** @var Timer $timer */
-					// the timer contains the data to be processed
-					$log->info("Pushing cached messages to user $userId", array('char' => '>'));
-					// run the instances through a decorator
-					$decorator = new Decorator();
-					$decorator->appendInstances($timer->getData());
-					// enqueue to be dispatched
-                    try {
-                        $self->taskDispatcher->enqueue($pipe, 'push', $decorator->renderAsSocketArray(true));
-                    }
-                    catch(QueueingException $e) {
-                        $log->critical('Failed to enqueue, task lost: '.$e->getMessage());
-                    }
-				}
-			);
-		}
+        $hash = sha1($formatted['message']);
 
-		$hash = sha1($formatted['message']);
-
-		$this->pushTransactions[$userId]->put($hash, $instance);
+        $this->getTransaction($pipe)->put($hash, $instance);
 
 		return true;
 	}
+
+
+    /**
+     * @param  Pipe $pipe
+     * @return Transaction
+     */
+    protected function getTransaction($pipe)
+    {
+        $userId = $pipe->getUserId();
+
+        if (empty($this->pushTransactions[$userId])) {
+            $this->pushTransactions[$userId] = new Transaction($this->reactLoop,
+                function($timer) use ($pipe, $userId) {
+                    /** @var Timer $timer */
+
+                    // the timer contains the data to be processed
+                    $this->log->info("Pushing cached messages to user $userId", array('char' => '>'));
+
+                    // run the instances through a decorator
+                    $decorator = new Decorator();
+                    $decorator->appendInstances($timer->getData());
+
+                    // enqueue to be dispatched
+                    try {
+                        $this->taskDispatcher->enqueue($pipe, 'push', $decorator->renderAsSocketArray(true));
+
+                    } catch(QueueingException $e) {
+                        $this->log->critical('Failed to enqueue, task lost: '.$e->getMessage());
+                    }
+                }
+            );
+        }
+
+        return $this->pushTransactions[$userId];
+    }
 
 
     /**
