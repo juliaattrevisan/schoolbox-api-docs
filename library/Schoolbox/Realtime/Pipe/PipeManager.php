@@ -292,9 +292,10 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
     protected function getTransaction($pipe)
     {
         $userId = $pipe->getUserId();
+        $pipeId = $pipe->getSocketKey();
 
-        if (empty($this->pushTransactions[$userId])) {
-            $this->pushTransactions[$userId] = new Transaction($this->reactLoop,
+        if (empty($this->pushTransactions[$userId][$pipeId])) {
+            $this->pushTransactions[$userId][$pipeId] = new Transaction($this->reactLoop,
                 function($timer) use ($pipe, $userId) {
                     /** @var Timer $timer */
 
@@ -316,7 +317,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
             );
         }
 
-        return $this->pushTransactions[$userId];
+        return $this->pushTransactions[$userId][$pipeId];
     }
 
 
