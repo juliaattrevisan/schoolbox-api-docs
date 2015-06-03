@@ -709,12 +709,15 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
                 $curriculumNodes[$curriculumNode->getId()] = $curriculumNode;
             }
         }
-        $quiz->setCurriculumNodes(new Collection(array_values($curriculumNodes)));
 
         if (!($quiz instanceof OnlineAssessment)) {
             throw new Mapper\Exception("Instance of object not found");
         }
+
         $this->throwIfDeleted($quiz);
+
+        $quiz->setCurriculumNodes(new Collection(array_values($curriculumNodes)));
+
         return $quiz;
     }
 
