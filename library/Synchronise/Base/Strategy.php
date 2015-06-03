@@ -550,9 +550,9 @@ abstract class Synchronise_Base_Strategy
                 try {
                     $newUser = $hydrator->hydrate($external_user, $newUser);
                 } catch (Exception $e) {
-        // Skip user as something is not good.
-        // Raise a skip message, though.
-                    $this->verbose_filter->outputSkipMessage('user because: ' .$e->getMessage() ?: 'exception thrown');
+                    // Skip user as something is not good.
+                    // Raise a skip message, though.
+                    $this->verbose_filter->skip('user because: ' .$e->getMessage() ?: 'exception thrown');
                     $this->verbose_filter->incrementSkipped();
                     return false;
                 }
