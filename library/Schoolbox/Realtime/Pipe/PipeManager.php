@@ -50,6 +50,14 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	const PHP_SESSION_PREFIX   = 'PHPSESSID';
     const INACTIVE_TIMEOUT     = 300; // 5 minutes
 
+    const PIPE_METHOD_ACKNOWLEDGE = 'ack';
+    const PIPE_METHOD_ALERT       = 'alert';
+    const PIPE_METHOD_FETCH       = 'fetch';
+    const PIPE_METHOD_PUSH        = 'push';
+    const PIPE_METHOD_SUBSCRIBE   = 'subscribe';
+    const PIPE_METHOD_WAIT        = 'wait';
+
+
 	/** @var PipeCollection */
 	protected $pipes;
 
@@ -212,7 +220,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
         if(isset($this->activeCommands[$socketKey])) {
             // pipe has a command active: don't permit another until this one is finished
             $this->sendToPipe($pipe, json_encode(array(
-                $command => 'wait'
+                $command => self::PIPE_METHOD_WAIT
             )));
             return;
         }
@@ -265,7 +273,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
         if ($instance->getNamespace() == 'ALERT') {
             $decorator = new Decorator();
             $decorator->appendInstance($instance);
-            $this->taskDispatcher->enqueue($pipe, 'alert', $decorator->renderAsSocketArray(true));
+            $this->taskDispatcher->enqueue($pipe, self::PIPE_METHOD_ALERT, $decorator->renderAsSocketArray(true));
             return true;
         }
 
@@ -299,7 +307,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 
                     // enqueue to be dispatched
                     try {
-                        $this->taskDispatcher->enqueue($pipe, 'push', $decorator->renderAsSocketArray(true));
+                        $this->taskDispatcher->enqueue($pipe, self::PIPE_METHOD_PUSH, $decorator->renderAsSocketArray(true));
 
                     } catch(QueueingException $e) {
                         $this->log->critical('Failed to enqueue, task lost: '.$e->getMessage());
@@ -372,10 +380,10 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 
 		switch(strtolower($command)) {
 			// deal with this yourself
-			case 'subscribe':
+            case self::PIPE_METHOD_SUBSCRIBE:
 				try {
 					if ($this->subscriptionManager->subscribe($userId)) {
-                        $this->sendToPipe($pipe, array('subscribe' => true));
+                        $this->sendToPipe($pipe, array(self::PIPE_METHOD_SUBSCRIBE => true));
                         $this->subscriptionManager->getUserSubscription($userId)->push();
 					}
 				}
@@ -386,18 +394,18 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 				break;
 
 			// this was dealt with by a worker, just push the result
-			case 'fetch':
+            case self::PIPE_METHOD_FETCH:
 				$data = $data[0];
 				$this->sendToPipe($pipe, array($command => $data));
 				break;
 
-			case 'push':
+            case self::PIPE_METHOD_PUSH:
 				$this->sendToUser($userId, array($command => $data));
                 $release = false;
 				break;
 
 			// deal with this yourself
-			case 'ack':
+            case self::PIPE_METHOD_ACKNOWLEDGE:
 				if($subscription = $this->subscriptionManager->getUserSubscription($userId, true)) {
 					$markAsRead = $subscription->acceptMessages($data[1]);
 					$this->sendToUser($userId, array($command => $markAsRead));
@@ -405,7 +413,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 				break;
 
             // alert behaves like push + ack
-            case 'alert':
+            case self::PIPE_METHOD_ALERT:
                 $this->sendToUser($userId, array($command => $data));
                 $release = false;
                 if($subscription = $this->subscriptionManager->getUserSubscription($userId, true)) {
