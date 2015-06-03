@@ -316,9 +316,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
         $this->log->debug("Full rebind complete; cleaning up stale queues");
 
         // get all current user IDs
-        $userIds = $this->userMapper->getDatabase()
-                        ->query('SELECT id FROM `user`')
-                        ->fetchAll(PDO::FETCH_COLUMN);
+        $userIds = $this->userMapper->findAllIds();
 
         $this->binder->destroyStaleBindings($userIds);
 
