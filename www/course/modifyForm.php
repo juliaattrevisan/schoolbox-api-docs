@@ -30,6 +30,7 @@ if (empty($component_id)) {
 
 /** @var Component_Instance $component */
 $component = Component_InstanceMapper::getInstance()->findById($component_id);
+$homepage  = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($component->getIdentifier());
 
 // Test permissions:
 // Write on $homepage_id
@@ -94,7 +95,7 @@ if (!$permission_denied) {
                     $course_instance
                         ->setComponent($component)
                         ->setTitle($unit_homepage->getName())
-                        ->setCategory($component->getIdentifier())
+                        ->setCategory($homepage)
                         ->setUnitCategory($unit_homepage)
                         ->setOpenDate($open_date)
                         ->setDueDate($due_date)
