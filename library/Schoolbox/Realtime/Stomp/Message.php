@@ -48,6 +48,16 @@ class Message {
 		$this->ackResolver->nack($headers);
 	}
 
+
+    /**
+     * @return string
+     */
+    public function getStompId()
+    {
+        return $this->frame->getHeader('message-id');
+    }
+
+
     /**
      * @return string
      */

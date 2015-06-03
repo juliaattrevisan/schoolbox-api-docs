@@ -34,7 +34,7 @@ class Subscription {
 	/** @var Client */
 	protected $client;
 
-	/** @var Message[] */
+	/** @var array */
 	protected $messages;
 
 	/** @var string */
@@ -131,13 +131,13 @@ class Subscription {
      */
     public function addMessage($frame, $ackResolver)
     {
-        $msg = new Message($frame, $ackResolver);
+        $msg     = new Message($frame, $ackResolver);
+        $amqpId  = $msg->getAmqpId();
+        $stompId = $msg->getStompId();
 
-        $amqpMessageId = $msg->getAmqpId();
+        $this->messages[$amqpId][$stompId] = $msg;
 
-        $this->messages[$amqpMessageId] = $msg;
-
-        $this->log->debug("Attached resolver for $amqpMessageId");
+        $this->log->debug("Attached resolver for $amqpId ($stompId)");
     }
 
 
@@ -145,9 +145,11 @@ class Subscription {
 	 * Push all the notifications currently UNACK'd by this subscription to the user
 	 */
 	public function push() {
-		foreach($this->messages as $stompMsg) {
-			// these will be buffered and forwarded to all clients for this user
-			$this->handler->onAMQP($this->frame2amqp($stompMsg->frame), $this->userId);
+        foreach($this->messages as $amqpId => $messages) {
+            foreach ($messages as $stompId => $msg) {
+                // these will be buffered and forwarded to all clients for this user
+                $this->handler->onAMQP($this->frame2amqp($msg->frame), $this->userId);
+            }
 		}
 	}
 
@@ -170,26 +172,31 @@ class Subscription {
 			$amqpMessageIds = array($amqpMessageIds);
 		}
 
-		foreach($this->messages as $amqpMessageId => $stompMessage) {
+		foreach($this->messages as $amqpId => $messages) {
+            /** @var Message[] $messages */
 			try {
-				if(in_array($amqpMessageId, $amqpMessageIds)) {
-					$this->log->debug("Attempting ACK of $amqpMessageId");
-					$stompMessage->ack();
-					$success[$amqpMessageId] = true;
+				if(in_array($amqpId, $amqpMessageIds)) {
+					$this->log->debug("Attempting ACK of $amqpId");
+
+                    foreach ($messages as $stompId => $msg) {
+                        // this should be throwing a RuntimeException if it doesn't work
+                        $msg->ack();
+                    }
+					$success[$amqpId] = true;
 				}
 			}
 			catch(RuntimeException $e) {
 				// the message in question has already been [N]ACK'd
-				$this->log->error("Caught Runtime Exception, message '$amqpMessageId' already N/ACK'd");
+				$this->log->error("Caught Runtime Exception, message '$amqpId' already N/ACK'd");
 			}
 		}
 
         $accepted = array_keys($success);
 
 		if(count($accepted)) {
-			foreach($accepted as $amqpMessageId) {
-				unset($this->messages[$amqpMessageId]);
-				$this->log->info("Accepted $amqpMessageId");
+			foreach($accepted as $amqpId) {
+				unset($this->messages[$amqpId]);
+				$this->log->info("Accepted $amqpId");
 			}
 			return $accepted;
 		}
