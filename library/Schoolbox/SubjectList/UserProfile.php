@@ -11,6 +11,7 @@
 namespace Schoolbox\SubjectList;
 
 use \Schoolbox\Resource\Folder\Code\Model as CategoryCode;
+use \Schoolbox\Resource\Folder\Code\Mapper as CategoryCodeMapper;
 
 class UserProfile extends SubjectListAbstract
 {
@@ -89,7 +90,7 @@ class UserProfile extends SubjectListAbstract
                     try {
                         $category = $this->getCategoryMapper()->findByCode($currentSubject['subject']['code']);
                         $currentSubject['category']['id'] = $category->getId();
-                        $currentSubject['category']['code'] = $category->getCodes()->first();
+                        $currentSubject['category']['code'] = CategoryCodeMapper::getInstance()->createModel()->setCode($currentSubject['subject']['code']);
                         $finalSubjectList[] = $currentSubject;
                     } catch (\Exception $e) {
                         if (\Config::get('show_all_subjects') == 1) {
