@@ -338,7 +338,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 
         $this->log->debug(sprintf("BIND %4s %4d  %s", "-{$removed}", "+{$added}", $user->getUsername()));
 
-        $this->subscribeUser($user->getId());
+        $this->subscribeUser($user->getId(), false);
     }
 
 

@@ -131,6 +131,7 @@ class RerouterCommander extends AbstractCommander {
 	 */
 	protected function subscribeUser($rerouter, $id) {
 		$rerouter->log->info("Subscribing user $id");
+        // there will be an implicit subscription list cache refresh in doing this: the user may not have a subscription
 		return $rerouter->subscribeUser($id);
 	}
 
