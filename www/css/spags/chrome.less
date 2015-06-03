@@ -200,6 +200,25 @@ body.login{
     }
 }
 
+/* ---- Mobile ---- */
+@media screen and (max-width: 768px) {
+    body.login{
+        #container #content{
+            width: 100%;
+            box-sizing: border-box;
+            #login-logo{ margin-bottom: 15px; }
+        }
+        #login-bg{ display: none; }
+        #footer{
+            width: 90%;
+            ul li,
+            ul li a{
+                color: @white;
+            }
+        }
+    }
+}
+
 
 /*
  * Demo Dashboards
