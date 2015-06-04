@@ -11,7 +11,7 @@
 use Alaress\Rules\Condition;
 use Alaress\Rules\Lang\Map;
 use Schoolbox\Sync\Rules\ExternalUserCondition;
-use Schoolbox\Sync\Rules\Ruleset;
+use Schoolbox\Sync\Rules\UserRuleset;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -30,7 +30,7 @@ if (!$_SESSION['user']->isSuperUser()) {
 /* DATA SETUP */
 
 /* Mirroring the Schoolbox Sync */
-$studentSet = new Ruleset(UserMapper::getInstance(), 'Student');
+$studentSet = new UserRuleset(UserMapper::getInstance(), 'Student');
 
 $studentSet->newRule([
     // IF :input.StudentBoardingHouse NOT BLANK
