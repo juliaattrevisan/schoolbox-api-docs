@@ -31,7 +31,7 @@ class Ruleset extends TokenizedRuleset
     /**
      * The $input array for this method should be an External_User record
      *
-     * @param array  $input    - the incoming record to manipulate
+     * @param mixed  $input    - the incoming record to manipulate
      * @param object $previous - an instance of the object mapped by the mapper
      * @return object          - an instance of the object mapped by the mapper
      */
@@ -46,7 +46,7 @@ class Ruleset extends TokenizedRuleset
      * The $input array for this method should be an External_User record
      *
      * @param array  $precs    - the precedence keys of the rules to be applied
-     * @param array  $input    - the incoming record to manipulate
+     * @param mixed  $input    - the incoming record to manipulate
      * @param object $previous - an instance of the object mapped by the mapper
      * @return object          - an instance of the object mapped by the mapper
      */
