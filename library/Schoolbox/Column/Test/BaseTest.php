@@ -1,7 +1,7 @@
 <?php
 /**
  * Tests for base column type - its hydrator and dehydrator don't change
- * anything.
+ * anything, besides coercing all values to UTF-8 on dehydrate.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
@@ -34,10 +34,12 @@ class BaseTest extends TestCase {
 
 	public function getTestDehydrate() {
 		return array(
-			array(true, true),
-			array(false, false),
+			array(true, '1'),
+			array(false, ''),
 			array(null, null),
 			array('Dumb', 'Dumb'),
+			// invalid UTF8 sequence - gets replaced with placeholder
+			array('12'.chr(243).'34', '12?34'),
 		);
 	}
 }

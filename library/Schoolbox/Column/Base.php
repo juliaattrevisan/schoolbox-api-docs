@@ -22,6 +22,10 @@ class Base implements IColumnType
     public function dehydrate($value, $mapper = null)
     {
         // ensure data going into the database (or rabbit, or redis) is UTF-8 friendly
+        // explicit NULL values stay null, though.
+        if (!isset($value)) {
+            return $value;
+        }
         return mb_convert_encoding($value, 'UTF-8', 'UTF-8');
     }
 }

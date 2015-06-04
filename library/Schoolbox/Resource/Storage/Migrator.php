@@ -18,7 +18,7 @@ use PDO;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\Loader;
 use Schoolbox\File;
-use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Storage;
 use League\Flysystem;
@@ -263,7 +263,7 @@ class Migrator
                 }
             }
 
-        } catch (Mapper\Exception $e) {
+        } catch (MapperException $e) {
             // No queue exists, that's okay
 
         } catch (Flysystem\Exception $e) {
