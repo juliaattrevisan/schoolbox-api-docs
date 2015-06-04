@@ -52,6 +52,7 @@ $studentSet->newRule([
     'year'             => '{:StudentYearLevel}',
     'externalId'       => '{:StudentID}',
     'superuser'        => false,
+    'enabled'          => true,
     'password'         => 'password',
     'defaultCampus'    => new Map('{:StudentCampus}', [
         'S' => 1,
