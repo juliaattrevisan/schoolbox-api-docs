@@ -577,7 +577,7 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @return mixed
      */
-    protected function getModelProperty($model, $property)
+    public function getModelProperty($model, $property)
     {
         $get_method  = $this->getGetMethodName($property);
         $value       = $model->$get_method();
@@ -613,7 +613,7 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @return $this
      */
-    protected function setModelProperty($model, $property, $value)
+    public function setModelProperty($model, $property, $value)
     {
         $set_method  = $this->getSetMethodName($property);
         $map         = $this->map->getOffset($property);
