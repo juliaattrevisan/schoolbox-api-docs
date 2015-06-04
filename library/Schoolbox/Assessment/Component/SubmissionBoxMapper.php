@@ -113,8 +113,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
      */
     public function findYears() {
         $query = "
-            SELECT
-				{$this->getColumnString('sb')}
+            SELECT DISTINCT YEAR(date) AS year
             FROM {$this->getTable()} sb
             ORDER BY date DESC
         ";
@@ -122,15 +121,11 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $statement = $this->database->prepare($query);
         $statement->execute();
 
-        $years = array();
+        $collection = new Collection();
 
         foreach ($statement as $row) {
-            $box = $this->hydrate($row, 'sb');
-
-            $years[$box->getDueDate()->getYear()] = '';
+            $collection->add($row['year']);
         }
-
-        $collection = new Collection(array_keys($years));
 
         return $collection;
     }
