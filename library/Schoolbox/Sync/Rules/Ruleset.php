@@ -64,6 +64,9 @@ class Ruleset extends TokenizedRuleset
                         if (!in_array($value, $array)) {
                             $array[] = $value;
                         }
+
+                        // reassign the value to the now (maybe) changed array
+                        $value = $array;
                     }
 
                     $this->applyModelPropertyValue($object, $property, $value);
