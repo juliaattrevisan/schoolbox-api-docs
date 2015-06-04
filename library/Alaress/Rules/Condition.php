@@ -32,13 +32,15 @@ abstract class Condition
 
 
     /**
-     * @param mixed $input
+     * Accepts an arbitrary number of arguments
+     *
+     * @param mixed $_
      * @return bool
      */
-    public function test($input)
+    public function test($_ = null)
     {
         try {
-            return $this->negate ^ call_user_func($this->test, $input);
+            return $this->negate ^ call_user_func_array($this->test, func_get_args());
         } catch (\DomainException $e) {
             return false;
         }

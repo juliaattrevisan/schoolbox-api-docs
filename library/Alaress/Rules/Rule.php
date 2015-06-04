@@ -39,10 +39,12 @@ class Rule
 
 
     /**
-     * @param mixed $input
+     * Accepts an arbitrary number of arguments
+     *
+     * @param mixed $_
      * @return mixed
      */
-    public function apply($input)
+    public function apply($_ = null)
     {
         // no conditions means always fire
         if (!$this->conditions->count()) {
@@ -53,7 +55,7 @@ class Rule
             // iterate conditions and ensure all match
             foreach ($this->conditions as $condition) {
                 // failfast
-                if (!$condition->test($input)) {
+                if (!call_user_func_array([ $condition, 'test' ], func_get_args())) {
                     $fire = false;
                     // we don't need to keep testing other conditions if one has failed
                     break;
