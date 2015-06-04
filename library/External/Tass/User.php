@@ -215,9 +215,9 @@ class External_Tass_User implements External_UserInterface
 
         // remove the P prefix
         $id = substr($tassID, 1);
-        if (strlen($id) == self::SPLIT_PARENT_TASSID_LENGTH) {
-            $parentCode = substr($id, 0, 7);
-            $parentNum = $id[self::SPLIT_PARENT_TASSID_LENGTH-1];
+        if (strlen($id) == static::SPLIT_PARENT_TASSID_LENGTH) {
+            $parentCode = substr($id, 0, static::SPLIT_PARENT_TASSID_LENGTH-1);
+            $parentNum = $id[static::SPLIT_PARENT_TASSID_LENGTH-1];
 
             $query = "
                 SELECT stud_codes AS RelatedID
