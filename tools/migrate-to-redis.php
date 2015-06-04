@@ -13,6 +13,7 @@ use Alaress\Async\Queue\AMQPQueue;
 use Alaress\Async\Queue\RedisQueue;
 use Alaress\Async\UserQueue\UserQueue;
 use Alaress\Redis;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\UserQueue\UserQueueFactory;
 
@@ -34,9 +35,15 @@ function migrateToRedis() {
 
     $amqp      = Connector::getInstance();
     $redis     = Redis::getClientInstance();
-
+    $conf      = ConfigMapper::getInstance();
     $cache     = array();
-    $bunny     = new BunnyControl();
+    $bunny     = new BunnyControl([
+        'host'     => $conf->get('amqp_host'),
+        'port'     => $conf->get('amqp_port'),
+        'username' => $conf->get('amqp_user'),
+        'password' => $conf->get('amqp_pass'),
+        'vhost'    => $conf->get('amqp_vhost')
+    ]);
 
     $pattern   = INSTANCE_ID . '\.u\.(\d+)\.([a-z]+)';
     $qFactory  = new \Schoolbox\Notif\Queue\QueueFactory();
