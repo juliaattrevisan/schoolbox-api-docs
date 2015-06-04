@@ -10,8 +10,6 @@
 namespace Schoolbox\Sync\Rules;
 
 use Alaress\Rules\TokenizedRuleset;
-use Schoolbox\Collection;
-use Schoolbox\User;
 use Schoolbox\Mapper;
 
 class Ruleset extends TokenizedRuleset
@@ -21,38 +19,38 @@ class Ruleset extends TokenizedRuleset
     protected $mapper;
 
     /**
-     * @param Mapper $userMapper
+     * @param Mapper $mapper
      * @param string $context
      */
-    public function __construct(Mapper $userMapper, $context)
+    public function __construct(Mapper $mapper, $context)
     {
         parent::__construct(new Tokenizer($context));
-        $this->mapper = $userMapper;
+        $this->mapper = $mapper;
     }
 
 
     /**
      * The $input array for this method should be an External_User record
      *
-     * @param array $externalUser
-     * @param User  $previous
-     * @return User
+     * @param array  $input    - the incoming record to manipulate
+     * @param object $previous - an instance of the object mapped by the mapper
+     * @return object          - an instance of the object mapped by the mapper
      */
-    public function applyTo($externalUser, $previous = null)
+    public function applyTo($input, $previous = null)
     {
-        $user = $previous ?: $this->mapper->createModel();
+        $object = $previous ?: $this->mapper->createModel();
 
         $map = $this->mapper->getMap();
 
         foreach ($this->rules as $rule) {
-            $data = $rule->apply($externalUser);
+            $data = $rule->apply($input);
 
             if (is_array($data)) {
                 foreach ($data as $property => $value) {
 
                     // Apply tokenization to returned value. The value returned should be a primitive,
                     // which will then by hydrated into the model by the mapper
-                    $value   = $this->tokenizer->parseTokens([], $property, $value, $externalUser);
+                    $value   = $this->tokenizer->parseTokens([], $property, $value, $input);
                     $value   = trim($value);
                     $mapping = $map->getOffset($property);
 
@@ -60,7 +58,7 @@ class Ruleset extends TokenizedRuleset
                     if ($mapping['type'] == Mapper::TYPE_COLLECTION) {
 
                         // first, read the value out of the object
-                        $array = $this->mapper->getModelProperty($user, $property);
+                        $array = $this->mapper->getModelProperty($object, $property);
 
                         // if the value we got isn't in this array, append it
                         if (!in_array($value, $array)) {
@@ -68,12 +66,23 @@ class Ruleset extends TokenizedRuleset
                         }
                     }
 
-                    $this->mapper->setModelProperty($user, $property, $value);
+                    $this->applyModelPropertyValue($object, $property, $value);
                 }
             }
         }
 
-        return $user;
+        return $object;
+    }
+
+
+    /**
+     * @param object $object   - the object to update with the new value
+     * @param string $property - the property of the object to change
+     * @param mixed  $value    - the PRIMITIVE value to apply, as derived by the tokenizer
+     */
+    protected function applyModelPropertyValue($object, $property, $value)
+    {
+        $this->mapper->setModelProperty($object, $property, $value);
     }
 
 
