@@ -276,15 +276,19 @@ class UnitInstanceMapper extends Mapper {
             );
             foreach ($task_iterator as $task) {
                 // Load the list of related due work and quiz items too.
-                if (($boxId = $task->getSubmissionBox()->getId())) {
-                    $task->setSubmissionBox(
-                        $this->getJoinMapper('task.submission_box')->findById($boxId)
-                    );
-                }
-                if (($quizId = $task->getAssessment()->getId())) {
-                    $task->setAssessment(
-                        $this->getJoinMapper('task.assessment')->findById($quizId)
-                    );
+                try {
+                    if (($boxId = $task->getSubmissionBox()->getId())) {
+                        $task->setSubmissionBox(
+                            $this->getJoinMapper('task.submission_box')->findById($boxId)
+                        );
+                    }
+                    if (($quizId = $task->getAssessment()->getId())) {
+                        $task->setAssessment(
+                            $this->getJoinMapper('task.assessment')->findById($quizId)
+                        );
+                    }
+                } catch (Mapper\Exception $e) {
+                    // Object was deleted or something: noop
                 }
                 $unit->getTasks()->add($task);
             }
