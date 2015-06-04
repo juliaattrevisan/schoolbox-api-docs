@@ -42,24 +42,33 @@ class Ruleset extends TokenizedRuleset
     {
         $user = $previous ?: $this->mapper->createModel();
 
+        $map = $this->mapper->getMap();
+
         foreach ($this->rules as $rule) {
             $data = $rule->apply($externalUser);
 
             if (is_array($data)) {
-                foreach ($data as $key => $value) {
+                foreach ($data as $property => $value) {
 
-                    // apply tokenization to returned value
-                    $value = $this->tokenizer->parseTokens([], $key, $value, $externalUser);
+                    // Apply tokenization to returned value. The value returned should be a primitive,
+                    // which will then by hydrated into the model by the mapper
+                    $value   = $this->tokenizer->parseTokens([], $property, $value, $externalUser);
+                    $value   = trim($value);
+                    $mapping = $map->getOffset($property);
 
-                    // and push the value into the object
-                    $setValue = "set$key";
+                    // treat collections special-like
+                    if ($mapping['type'] == Mapper::TYPE_COLLECTION) {
 
-                    if (is_array($value)) {
-                        $value = new Collection($value);
+                        // first, read the value out of the object
+                        $array = $this->mapper->getModelProperty($user, $property);
+
+                        // if the value we got isn't in this array, append it
+                        if (!in_array($value, $array)) {
+                            $array[] = $value;
+                        }
                     }
 
-                    // blegh. TODO a better approach, anyone?
-                    call_user_func([ $user, $setValue ], $value);
+                    $this->mapper->setModelProperty($user, $property, $value);
                 }
             }
         }
