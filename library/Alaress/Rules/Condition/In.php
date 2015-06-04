@@ -70,7 +70,7 @@ abstract class In extends Super
      */
     public function getSummary()
     {
-        return sprintf("IF :input.%s %sIN (%s)", $this->field, $this->isNegated() ? 'NOT ' : '', implode(', ', $this->getValidValues()));
+        return sprintf(":input.%s %sIN (%s)", $this->field, $this->isNegated() ? 'NOT ' : '', implode(', ', $this->getValidValues()));
     }
 
 

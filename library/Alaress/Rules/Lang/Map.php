@@ -35,11 +35,11 @@ class Map implements Construct
      */
     public function getSummary()
     {
-        $str = " MAPS $this->field AS [\n  ";
+        $str = " MAPS '$this->field' AS [\n  ";
 
         $str .= implode("\n  ", array_map(function ($key, $value) {
 
-            return "$key => ".$this->getObjectOutput($value);
+            return "'$key' => $value";
 
         }, array_keys($this->map), $this->map));
 
@@ -69,35 +69,6 @@ class Map implements Construct
         }
 
         return null;
-    }
-
-
-    /**
-     * @param mixed $obj
-     * @return string
-     */
-    protected function getObjectOutput($obj)
-    {
-        if (is_object($obj) && !$obj instanceof \Traversable) {
-            if (is_callable([ $obj, '__toString' ])) {
-                // just use toString if available
-                $obj = "$obj";
-            } elseif (is_callable([ $obj, 'getId' ])) {
-                // not available? ok, try for Name and Id
-
-                $id   = $obj->getId();
-                $name = is_callable([ $obj, 'getName' ]) ? $obj->getName() : get_class($obj);
-
-                $obj = "$name ($id)";
-            } else {
-                $obj = get_class($obj);
-            }
-
-            // give a visual indication that this is an object
-            $obj = "<cite>$obj</cite>";
-        }
-
-        return $obj;
     }
 
 } 

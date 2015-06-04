@@ -34,7 +34,7 @@ class Rule extends Super
         $conditions = $this->getConditions();
 
         if (count($conditions)) {
-            $pattern   = $this->negate ? "IF NOT (%s)\nTHEN %s" : "IF %s\nTHEN %s ";
+            $pattern   = $this->negate ? "IF NOT (%s)\nTHEN %s" : "IF %s\nTHEN %s";
             $condition = implode("\nAND ", array_map(function ($condition) {
                 /** @var Condition $condition */
                 return $condition->getSummary();
@@ -80,9 +80,12 @@ class Rule extends Super
      */
     public function getHtmlSummary()
     {
-        $summary = preg_replace('`(=|[A-Z][A-Z]+)(\s)`','<span class="ctrl $1">$1</span>$2', $this->getSummary());
+        $formatting = [
+            '`(=|[A-Z][A-Z]+)(\s|$)`'                    => '<span class="ctrl $1">$1</span>$2',
+            '`({:[a-z][a-z_0-9]*(?:\s*\|\s*[a-z]+)*})`i' => '<span class="tok">$1</span>'
+        ];
 
-        $summary = preg_replace('`({:[a-z][a-z_0-9]*(?:\s*\|\s*[a-z]+)*})`i', '<span class="tok">$1</span>', $summary);
+        $summary = preg_replace(array_keys($formatting), array_values($formatting), $this->getSummary());
 
         return $summary;
     }
@@ -110,7 +113,10 @@ class Rule extends Super
             }
 
             // give a visual indication that this is an object
-            $obj = "<cite>$obj</cite>";
+            return "<cite>$obj</cite>";
+
+        } elseif (is_string($obj)) {
+            return "'$obj'";
         }
 
         return $obj;
