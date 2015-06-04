@@ -10,8 +10,6 @@
 
 use Alaress\Rules\Condition;
 use Alaress\Rules\Lang\Map;
-use Schoolbox\RoleMapper;
-use Schoolbox\CampusMapper;
 use Schoolbox\Sync\Rules\ExternalUserCondition;
 use Schoolbox\Sync\Rules\Ruleset;
 use Schoolbox\User;
@@ -38,7 +36,7 @@ $studentSet->newRule([
     // IF :input.StudentBoardingHouse NOT BLANK
     new ExternalUserCondition('StudentBoarder', null, true)
 ], [
-    'residentialHouse' => HouseResidentialMapper::getInstance()->findById(1)
+    'residentialHouse' => 1
 ]);
 
 $studentSet->newRule([
@@ -56,14 +54,14 @@ $studentSet->newRule([
     'superuser'        => false,
     'password'         => 'password',
     'defaultCampus'    => new Map('{:StudentCampus}', [
-        'S' => CampusMapper::getInstance()->findById(1),
-        'J' => CampusMapper::getInstance()->findById(2),
+        'S' => 1,
+        'J' => 2,
     ]),
     'schoolHouse'      => new Map('{:StudentHouse}', [
-        'Da' => HouseMapper::getInstance()->findOneByColumn('house', 'Dalton'),
-        'Fo' => HouseMapper::getInstance()->findOneByColumn('house', 'Fox'),
-        'Oa' => HouseMapper::getInstance()->findOneByColumn('house', 'Oak'),
-        'Th' => HouseMapper::getInstance()->findOneByColumn('house', 'Thistle'),
+        'Da' => 1,
+        'Fo' => 2,
+        'Oa' => 3,
+        'Th' => 4,
     ]),
 ]);
 
@@ -71,14 +69,14 @@ $studentSet->newRule([
     // IF :input.StudentYearLevel IN (0, 1, 2, 3, 4, 5, 6)
     new ExternalUserCondition('StudentYearLevel', [0,1,2,3,4,5,6])
 ], [
-    'role' => RoleMapper::getInstance()->findById(5)
+    'role' => 5
 ]);
 
 $studentSet->newRule([
     // IF :input.StudentYearLevel IN (7, 8, 9, 10, 11, 12)
     new ExternalUserCondition('StudentYearLevel', [7,8,9,10,11,12])
 ],[
-    'role' => RoleMapper::getInstance()->findById(3)
+    'role' => 3
 ]);
 
 $studentSet->newRule([
@@ -134,8 +132,10 @@ foreach ($studentData as $externalStudent) {
 
     $result = $studentSet->applyTo($externalStudent, $internalStudent);
 
-    new Alaress_Probe($externalStudent, $result);
+    $output = [ $externalStudent, $result ];
 }
+
+new Alaress_Probe($output[0], $output[1]);
 new Alaress_Probe(count($studentData), (microtime(true) - $x));
 
 /** @var SitePage $this */
