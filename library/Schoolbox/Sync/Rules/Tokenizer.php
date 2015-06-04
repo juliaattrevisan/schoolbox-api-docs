@@ -65,7 +65,7 @@ class Tokenizer extends Super {
         $this->addFilter(new Filter('lc',    'Converts to lowercase', function ($input) { return strtolower($input); }));
         $this->addFilter(new Filter('uc',    'Converts to uppercase', function ($input) { return strtoupper($input); }));
         $this->addFilter(new Filter('first', 'Returns only the first character', function ($input) { return $input[0]; }));
-
+        $this->addFilter(new Filter('alpha', 'Strips all non-alpha characters', function ($input) { return preg_replace('`[^a-z]`i', '', $input); }));
 
     }
 

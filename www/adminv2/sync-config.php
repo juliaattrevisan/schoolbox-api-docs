@@ -84,7 +84,7 @@ $studentSet->newRule([
     // IF :input.NetworkLogin IS BLANK
     new ExternalUserCondition('NetworkLogin', null)
 ], [
-    'username' => '{:StudentPreferred|lc|first}{:StudentSurname|lc}' // TODO filters: strtolower, alpha, substr
+    'username' => '{:StudentPreferred|lc|first}{:StudentSurname|alpha|lc}'
 ]);
 
 $euh = new External_User();
