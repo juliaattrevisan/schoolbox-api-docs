@@ -43,12 +43,7 @@ class Resource extends Player {
 			$status = 'failed';
 			try {
 				/** @var ResourceVideo $video */
-				$video = ResourceVideoMapper::getInstance()->findOneByColumnList(
-					array(
-						'file_id' => $bits['id'],
-						'type'    => 'sbfs',
-					)
-				);
+				$video = ResourceVideoMapper::getInstance()->findByFileId($bits['id']);
 				$status = $video->getStatus();
 			}
 			catch (Mapper\Exception $e) {}
