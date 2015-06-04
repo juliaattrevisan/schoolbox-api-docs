@@ -153,10 +153,10 @@ $nav->parse($this, 'synchronise');
 $this->setTitle('Admin - External Database Sync Configuration');
 
 $this->setVar('rule_block', '');
-foreach ($studentSet->getRules() as $i => $rule) {
+foreach ($studentSet->getRules() as $precedence => $rule) {
 
     $this->setVar(array(
-        'SYNC_RULE_N'       => $i + 1,
+        'SYNC_RULE_N'       => $precedence,
         'SYNC_RULE_SUMMARY' => $rule->getHtmlSummary()
     ));
 
