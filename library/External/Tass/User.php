@@ -9,10 +9,8 @@
 
 class External_Tass_User implements External_UserInterface
 {
-    const SPLIT_PARENT_TASSID_LENGTH = 8;
-
     /**
-    * @var MSSQL
+     * @var MSSQL
     */
     private $database;
 
