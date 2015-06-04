@@ -270,7 +270,7 @@ if (isset($rubric)) {
     );
 }
 
-$page->localRedir($is_task ? "/homepage/$categoryID" : '/submission/listSubmission/');
+$page->localRedir($is_task ? "/homepage/$categoryID" : "/submission/listSubmission/{$submission->getDueDate()->getYear()}/{$submission->getDueDate()->getYearHalf()}");
 
 /**
  * Uses POST variables to create dates
