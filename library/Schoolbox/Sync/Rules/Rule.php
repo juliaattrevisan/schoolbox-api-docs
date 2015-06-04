@@ -34,7 +34,7 @@ class Rule extends Super
         $conditions = $this->getConditions();
 
         if (count($conditions)) {
-            $pattern   = $this->negate ? "IF NOT (%s)\nTHEN %s" : "IF %s\nTHEN %s";
+            $pattern   = $this->negate ? "IF NOT (%s)\nTHEN %s" : "IF %s\nTHEN %s ";
             $condition = implode("\nAND ", array_map(function ($condition) {
                 /** @var Condition $condition */
                 return $condition->getSummary();
