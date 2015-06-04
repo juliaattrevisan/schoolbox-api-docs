@@ -28,7 +28,6 @@ class Ruleset extends TokenizedRuleset
         $this->mapper = $mapper;
     }
 
-
     /**
      * The $input array for this method should be an External_User record
      *
@@ -38,11 +37,33 @@ class Ruleset extends TokenizedRuleset
      */
     public function applyTo($input, $previous = null)
     {
+        $precedences = array_keys($this->getRules());
+
+        return $this->applyPartial($precedences, $input, $previous);
+    }
+
+    /**
+     * The $input array for this method should be an External_User record
+     *
+     * @param array  $precs    - the precedence keys of the rules to be applied
+     * @param array  $input    - the incoming record to manipulate
+     * @param object $previous - an instance of the object mapped by the mapper
+     * @return object          - an instance of the object mapped by the mapper
+     */
+    public function applyPartial(array $precs, $input, $previous = null)
+    {
         $object = $previous ?: $this->mapper->createModel();
 
         $map = $this->mapper->getMap();
 
-        foreach ($this->rules as $rule) {
+        $rules = $this->getRules();
+
+        foreach ($rules as $precedence => $rule) {
+
+            if (!in_array($precedence, $precs)) {
+                continue;
+            }
+
             $data = $rule->apply($input);
 
             if (is_array($data)) {
