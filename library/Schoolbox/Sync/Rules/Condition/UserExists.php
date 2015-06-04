@@ -10,9 +10,9 @@
 namespace Schoolbox\Sync\Rules\Condition;
 
 use Alaress\Rules\Condition;
-use Schoolbox\Mapper;
+use Schoolbox\User;
 
-class OnCreate extends Condition
+class UserExists extends Condition
 {
 
     /**
@@ -21,8 +21,8 @@ class OnCreate extends Condition
     public function __construct($negate = false)
     {
         parent::__construct(
-            function ($input, $mode) {
-                return $mode == Mapper::METHOD_CREATE;
+            function ($input, $previous) {
+                return $previous instanceof User;
             },
             $negate
         );
@@ -36,7 +36,7 @@ class OnCreate extends Condition
     {
         $not = $this->isNegated() ? 'NOT ' : '';
 
-        return "mode $not= CREATE";
+        return "user {$not}EXISTS";
     }
 
 } 

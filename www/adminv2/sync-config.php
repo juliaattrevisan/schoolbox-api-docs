@@ -32,7 +32,8 @@ if (!$_SESSION['user']->isSuperUser()) {
 $studentSet = new UserRuleset(UserMapper::getInstance(), 'Student');
 
 $studentSet->newRule([
-    new Condition\OnCreate()
+    // IF user NOT EXISTS
+    new Condition\UserExists(true)
 ], [
     'enabled' => true
 ]);
