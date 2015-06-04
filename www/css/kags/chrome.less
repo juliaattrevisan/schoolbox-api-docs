@@ -157,33 +157,121 @@ h2{ border-bottom: 1px solid #cacaca; }
 .btn.submit:hover,
 .submit-btn-plain,
 .submit-btn-plain:hover{
-	color: @link !important;
+	color: @link;
 }
 
 body.login{
-    #container {
-        background: @content-background;
-        .logo img {
-            margin: 17px 0 24px 0;
+    #container{
+        background: transparent;
+    }
+    #login-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 70%;
+        height: 100%;
+        z-index: -1;
+    }
+    #content{
+        background: @white url("/images/kags/login-bg.png") 0% 90% no-repeat;
+        float: left;
+        width: 30%;
+        height: 100%;
+        position: fixed;
+        right: 0;
+        left: auto;
+        top: 0;
+        padding: 120px 45px 0 45px;
+        box-sizing: border-box;
+        z-index: 1;
+        .error, .forgotten a{
+            margin: 30px 0;
         }
-        input[type=text],
-        input[type=password]{
+    }
+    #loginForm{
+        ::-webkit-input-placeholder { color: #b8a9a9; font-size: 14px; }
+        :-moz-placeholder { color: #b8a9a9; font-size: 14px; }
+        ::-moz-placeholder { color: #b8a9a9; font-size: 14px; }
+        :-ms-input-placeholder { color: #b8a9a9; font-size: 14px; }
+            input[type="text"],
+            input[type="password"]{
             background: @border-color;
+            color: @black;
+            font-size: 14px;
+            width: 100%;
+            height: 40px;
+            margin: 0 0 3px 0;
+            padding: 10px 12px;
         }
-        input.login{
-            background-color: @link; color: @white !important;
-            &:hover{ background-color: @link-hover; color: @white !important; }
+        input[type="submit"]{
+            background: @link url('/images/qahs/chevron.png') 97% 50% no-repeat;
+            color: @white;
+            width: 100%;
+            font-size: 14px;
+            height: 40px;
+            &:hover{
+                background: lighten(@link, 10%) url('/images/qahs/chevron.png') 97% 50% no-repeat;
+            }
         }
+    }
+    fieldset{
+        padding: 0;
     }
     #footer{
         background: transparent;
-        ul li{
+        padding-left: 50px;
+        right: auto;
+        width: 60%;
+        z-index: 2;
+        ul li,
+        ul li a{
             color: @white;
-            a{ color: @white; }
         }
-
     }
 }
+
+/* ---- Mobile ---- */
+@media screen and (max-width: 768px) {
+    body.login{
+        #container #content{
+            width: 100%;
+            box-sizing: border-box;
+            #login-logo{ margin-bottom: 15px; }
+        }
+        #footer{
+            width: 90%;
+            ul li,
+            ul li a{
+                color: @link;
+            }
+        }
+    }
+}
+
+// body.login{
+//     #container {
+//         background: @content-background;
+//         .logo img {
+//             margin: 17px 0 24px 0;
+//         }
+//         input[type=text],
+//         input[type=password]{
+//             background: @border-color;
+//         }
+//         input.login{
+//             background-color: @link; color: @white !important;
+//             &:hover{ background-color: @link-hover; color: @white !important; }
+//         }
+//     }
+//     #footer{
+//         background: transparent;
+//         ul li{
+//             color: @white;
+//             a{ color: @white; }
+//         }
+
+//     }
+// }
 
 /*
  * Demo Dashboards

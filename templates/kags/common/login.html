@@ -34,6 +34,10 @@ function init(){
 </head>
 <body class="login">
 <div id="container" class=" login">
+	<div id="login-bg">
+    	<!-- <img src="/images/{SITE_LOCATION}/login-bg.jpg" alt=""> -->
+    	<div id="login-bg-inner" style="position:absolute;top:0;left:0;right:0;bottom:0;margin:auto;min-width:50%;min-height:50%;background-position:center center;background-size:cover;"></div>
+	</div>
 	<div id="content" class="clearfix">
         <a href="/" class="logo"><img src="/images/{SITE_LOCATION}/login-logo.png" alt="{SITE_NAME}" /></a>
 		<p class="error">{ERROR}</p>
@@ -67,8 +71,21 @@ function init(){
 		<li class="last"><a href="/feedback.php" title="Web Designers">Feedback and Support</a></li>
 	</ul>
 </div>
-<div id="login-bg">
-    <img src="/images/{SITE_LOCATION}/login-bg.jpg" alt="">
-</div>
+<script type="text/javascript" src="/javascript/components/jquery/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var images = ['login-1.jpg',
+            'login-2.jpg',
+            'login-3.jpg',
+            'login-4.jpg',
+            'login-5.jpg',
+            'login-6.jpg'];
+
+        $('#login-bg-inner')
+            .css({
+                'background-image': 'url(/images/{SITE_LOCATION}/' + images[Math.floor(Math.random() * images.length)] + ')'
+            });
+    });
+</script>
 </body>
 </html>
