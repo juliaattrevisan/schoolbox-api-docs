@@ -141,13 +141,21 @@ foreach ($studentData as $externalStudent) {
 //        continue; // for testing, only interested in existing users
 //    }
 
-    $result = $studentSet->applyTo($externalStudent, $internalStudent);
-
-    $output = [ $externalStudent, $result ];
+    $results[] = $studentSet->applyTo($externalStudent, $internalStudent);
 }
 
+$duration = microtime(true) - $x;
+
+$a = array('s', 'ms', '&mu;s');
+
+for ($i = 0; $duration < 1 && $i < count($a); $i++) {
+    $duration *= 1000;
+}
+
+$duration = round($duration, 2) . $a[$i];
+
 //new Alaress_Probe($output[0], $output[1]);
-new Alaress_Probe(count($studentData), (microtime(true) - $x));
+printf("<pre>%d users processed in %s</pre>", count($results), $duration);
 
 
 $this->setFile(TEMPLATE_content, 'adminv2/sync-config.html');
