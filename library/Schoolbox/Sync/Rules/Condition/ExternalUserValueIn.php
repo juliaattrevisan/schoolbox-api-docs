@@ -7,12 +7,12 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Sync\Rules;
+namespace Schoolbox\Sync\Rules\Condition;
 
 use Alaress\Rules\Condition;
 use Schoolbox\User;
 
-class ExternalUserCondition extends Condition\In
+class ExternalUserValueIn extends Condition\In
 {
 
     /** @var string */

@@ -8,10 +8,9 @@
  */
 
 
-use Alaress\Rules\Condition;
 use Alaress\Rules\Lang\Map;
-use Schoolbox\Sync\Rules\ExternalUserCondition;
 use Schoolbox\Sync\Rules\UserRuleset;
+use Schoolbox\Sync\Rules\Condition;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -33,8 +32,14 @@ if (!$_SESSION['user']->isSuperUser()) {
 $studentSet = new UserRuleset(UserMapper::getInstance(), 'Student');
 
 $studentSet->newRule([
+    new Condition\OnCreate()
+], [
+    'enabled' => true
+]);
+
+$studentSet->newRule([
     // IF :input.StudentBoardingHouse NOT BLANK
-    new ExternalUserCondition('StudentBoarder', null, true)
+    new Condition\ExternalUserValueIn('StudentBoarder', null, true)
 ], [
     'residentialHouse' => 1
 ]);
@@ -52,7 +57,6 @@ $studentSet->newRule([
     'year'             => '{:StudentYearLevel}',
     'externalId'       => '{:StudentID}',
     'superuser'        => false,
-    'enabled'          => true,
     'password'         => 'password',
     'defaultCampus'    => new Map('{:StudentCampus}', [
         'S' => 1,
@@ -68,21 +72,21 @@ $studentSet->newRule([
 
 $studentSet->newRule([
     // IF :input.StudentYearLevel IN (0, 1, 2, 3, 4, 5, 6)
-    new ExternalUserCondition('StudentYearLevel', [0,1,2,3,4,5,6])
+    new Condition\ExternalUserValueIn('StudentYearLevel', [0,1,2,3,4,5,6])
 ], [
     'role' => 5
 ]);
 
 $studentSet->newRule([
     // IF :input.StudentYearLevel IN (7, 8, 9, 10, 11, 12)
-    new ExternalUserCondition('StudentYearLevel', [7,8,9,10,11,12])
+    new Condition\ExternalUserValueIn('StudentYearLevel', [7,8,9,10,11,12])
 ],[
     'role' => 3
 ]);
 
 $studentSet->newRule([
     // IF :input.NetworkLogin IS BLANK
-    new ExternalUserCondition('NetworkLogin', null)
+    new Condition\ExternalUserValueIn('NetworkLogin', null)
 ], [
     'username' => '{:StudentPreferred|lc|first}{:StudentSurname|alpha|lc}'
 ]);
