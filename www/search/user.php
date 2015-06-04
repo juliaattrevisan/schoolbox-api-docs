@@ -332,6 +332,7 @@ if (is_numeric($this->arg[0])) {
                             Scrub::text($synInfo['AlertMessage'])
                         ),
                         'STUDENT_TYPE'          => $synUserHandler->determineBoarderType($synInfo['StudentBoarder']),
+                        'STUDIES_CODE'          => Scrub::text($synInfo['StudentStudiesCode']),
                     );
                     if ($synInfo['StudentBirthDate']) {
                         $output['BIRTHDATE'] = date('j F Y', $synInfo['StudentBirthDate']);
