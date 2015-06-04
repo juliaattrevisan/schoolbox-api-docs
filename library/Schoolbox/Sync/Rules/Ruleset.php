@@ -64,7 +64,7 @@ class Ruleset extends TokenizedRuleset
                 continue;
             }
 
-            $data = $rule->apply($input);
+            $data = $rule->apply($input, $previous);
 
             if (is_array($data)) {
                 foreach ($data as $property => $value) {
