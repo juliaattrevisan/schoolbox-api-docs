@@ -112,6 +112,7 @@ class External_Denbigh2_User implements External_UserInterface
                 'StudentEmergency3PhoneAlt' => '',
                 'StudentMedicalAlert' => $result->{'Medical Alert Label'},
                 'StudentSpecialNeedsFlag' => $result->{'Special Needs'},
+                'StudentStudiesCode' => '',
                 'AlertMessage' => '',
             );
         }
