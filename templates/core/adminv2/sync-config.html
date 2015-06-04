@@ -45,6 +45,25 @@
   }
 
 </style>
+<script type="text/javascript">
+    $(function () {
+
+        $('#ruleset').on('click', 'a.btn', function (e) {
+            e.preventDefault();
+
+            $('<div/>').load(this.href, {}, function () {
+                $(this).dialog({
+                    modal: true,
+                    title: 'Rule Example',
+                    width: 768,
+                    height: 768
+                });
+            });
+
+        });
+
+    });
+</script>
 <!-- END custom_head -->
 <h1>Schoolbox Administration</h1>
 <ul class="admin-nav">
@@ -69,7 +88,7 @@
   <div class="two-thirds">
     <div class="level clearfix">
       <h3>Mapping Rules</h3>
-      <ul class="sync-rules">
+      <ul class="sync-rules" id="ruleset">
       <!-- BEGIN rule -->
         <li class="sync-rule">
           <hr/>

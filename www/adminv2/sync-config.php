@@ -87,19 +87,6 @@ $studentSet->newRule([
     'username' => '{:StudentPreferred|lc|first}{:StudentSurname|lc}' // TODO filters: strtolower, alpha, substr
 ]);
 
-
-
-
-
-
-
-
-
-//$summaries = array_map(function ($rule) { return $rule->getHtmlSummary(); }, $studentSet->getRules());
-//
-//$rc = new ReflectionClass('Alaress_Probe');
-//$rc->newInstanceArgs($summaries);
-
 $euh = new External_User();
 
 // students
@@ -109,6 +96,24 @@ $studentData = [];
 // collate the student data, because there be lotsa dupes
 foreach ($studentUserAccountInfo as $datum) {
     $studentData[$datum['StudentID']] = $datum;
+}
+
+
+/** @var SitePage $this */
+
+if ($this->arg[0] == 'example' && $this->arg[1] == 'rule') {
+
+    if (!isset($this->arg[2])) {
+        error(2);
+    }
+
+    $input  = $studentData[array_rand($studentData)];
+
+    $result = $studentSet->applyPartial([ $this->arg[2] ], $input);
+
+    new Alaress_Probe($input, $result);
+
+    exit;
 }
 
 
@@ -136,10 +141,9 @@ foreach ($studentData as $externalStudent) {
     $output = [ $externalStudent, $result ];
 }
 
-new Alaress_Probe($output[0], $output[1]);
+//new Alaress_Probe($output[0], $output[1]);
 new Alaress_Probe(count($studentData), (microtime(true) - $x));
 
-/** @var SitePage $this */
 
 $this->setFile(TEMPLATE_content, 'adminv2/sync-config.html');
 
