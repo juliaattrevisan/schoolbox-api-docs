@@ -116,7 +116,7 @@ class Ruleset extends TokenizedRuleset
         // sort the result
         ksort($all);
 
-        return array_values($all);
+        return $all;
     }
 
 
