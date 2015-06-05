@@ -122,7 +122,7 @@ class EntriesAndResults extends Base {
             /* Special treatment for the little table corresponding
              * to each subject
              */
-            if ($current['StudentYear'] == $this->getCurrentYear()) {
+            if ($studentYear == $this->getCurrentYear()) {
                 if (!$this->isProgressive($current['Result'])) {
                     if (in_array($letter, array('N'))) {
                         $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
