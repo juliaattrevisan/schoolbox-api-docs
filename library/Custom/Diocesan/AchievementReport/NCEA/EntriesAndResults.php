@@ -124,12 +124,17 @@ class EntriesAndResults extends Base {
              */
             if ($studentYear == $this->getCurrentYear()) {
                 if (!$this->isProgressive($current['Result'])) {
-                    if (in_array($letter, array('N'))) {
-                        $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
-                    }
-                    else {
-                        $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
-                        $finalStack[$courseName]['summary']['type'][$internalExternal]['availableCredits'] += $current['EnteredCredits'] - $current['ResultCredits'];
+
+                    /* Exclude N/A/M/E values for current year/external items
+                     */
+                    if ($internalExternal != 'EX') {
+                        if (in_array($letter, array('N'))) {
+                            $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
+                        }
+                        else {
+                            $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
+                            $finalStack[$courseName]['summary']['type'][$internalExternal]['availableCredits'] += $current['EnteredCredits'] - $current['ResultCredits'];
+                        }
                     }
                 }
             }
