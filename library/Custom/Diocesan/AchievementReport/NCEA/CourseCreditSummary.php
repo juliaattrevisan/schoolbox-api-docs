@@ -120,7 +120,7 @@ class CourseCreditSummary extends Base {
                     /* Special treatment
                      * No achievements for N
                      */
-                    elseif (in_array($letter, array('N'))) {
+                    elseif (in_array($letter, array('N', 'V', 'Y', 'Z'))) {
                         $finalStack['courses'][$courseName]['letters'][$letter] += $current['EnteredCredits'];
                         $finalStack['courses'][$courseName]['attempted'] += $current['EnteredCredits'];
 
