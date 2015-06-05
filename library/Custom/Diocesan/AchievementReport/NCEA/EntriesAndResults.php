@@ -47,6 +47,7 @@ class EntriesAndResults extends Base {
             $internalExternal = $current['InternalorExternalAssessment'];
             $letter = $current['StrippedResult'];
             $level = $current['Level'];
+            $studentYear = $current['StudentYear'];
 
             /* Teachers
              * Trim empty teachers out for course teachers
@@ -63,6 +64,16 @@ class EntriesAndResults extends Base {
                 }
             }
 
+            /* Externally-assessed items in the CurrentYear are always enclosed
+             * with square brackets. This indicates that it is a progressive grade,
+             * used specifically for Dio
+             */
+            $result = $current['Result'];
+
+            if (strlen($result) && ($internalExternal == 'EX') && ($studentYear == $this->getCurrentYear())) {
+                $result = "[{$result}]";
+            }
+
             /* Entries
              */
             $finalStack[$courseName]['allEntries'][] = array(
@@ -71,7 +82,7 @@ class EntriesAndResults extends Base {
                 'StandardTitle' => $current['StandardTitle'],
                 'Level' => $current['Level'],
                 'EnteredCredits' => $current['EnteredCredits'],
-                'Result' => $current['Result'],
+                'Result' => $result,
                 'StrippedResult' => $current['StrippedResult'],
                 'ResultBrackets' => $current['ResultBrackets']
             );
