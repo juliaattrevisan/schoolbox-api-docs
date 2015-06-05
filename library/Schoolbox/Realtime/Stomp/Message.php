@@ -49,5 +49,22 @@ class Message {
 	}
 
 
+    /**
+     * @return string
+     */
+    public function getStompId()
+    {
+        return $this->frame->getHeader('message-id');
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getAmqpId()
+    {
+        return $this->frame->getHeader('amqp-message-id');
+    }
+
 
 } 

@@ -34,7 +34,7 @@ class Subscription {
 	/** @var Client */
 	protected $client;
 
-	/** @var Message[] */
+	/** @var array */
 	protected $messages;
 
 	/** @var string */
@@ -123,26 +123,33 @@ class Subscription {
 	}
 
 
-	/**
-	 * Register a message that we can acknowledge later
-	 *
-	 * @param Frame $frame
-	 * @param AckResolver $ackResolver
-	 */
-	public function addMessage($frame, $ackResolver) {
-		$amqpMessageId = $frame->getHeader('amqp-message-id');
-		$this->messages[$amqpMessageId] = new Message($frame, $ackResolver);
-		$this->log->debug("Attached resolver for $amqpMessageId");
-	}
+    /**
+     * Register a message that we can acknowledge later
+     *
+     * @param Frame $frame
+     * @param AckResolver $ackResolver
+     */
+    public function addMessage($frame, $ackResolver)
+    {
+        $msg     = new Message($frame, $ackResolver);
+        $amqpId  = $msg->getAmqpId();
+        $stompId = $msg->getStompId();
+
+        $this->messages[$amqpId][$stompId] = $msg;
+
+        $this->log->debug("Attached resolver for $amqpId ($stompId)");
+    }
 
 
 	/**
 	 * Push all the notifications currently UNACK'd by this subscription to the user
 	 */
 	public function push() {
-		foreach($this->messages as $stompMsg) {
-			// these will be buffered and forwarded to all clients for this user
-			$this->handler->onAMQP($this->frame2amqp($stompMsg->frame), $this->userId);
+        foreach($this->messages as $amqpId => $messages) {
+            foreach ($messages as $stompId => $msg) {
+                // these will be buffered and forwarded to all clients for this user
+                $this->handler->onAMQP($this->frame2amqp($msg->frame), $this->userId);
+            }
 		}
 	}
 
@@ -150,12 +157,11 @@ class Subscription {
 	/**
 	 * ACK messages
 	 *
-	 * To acknowledge a message, you have to nacknowledge every other message that is sitting unacknowledged.
 	 * As often as possible, an array of message IDs should be passed to this method rather than a single message.
 	 *
 	 * Returns the array of IDs that were SUCCESSFULLY acknowledged
 	 *
-	 * @param array $amqpMessageIds
+	 * @param string|array $amqpMessageIds
 	 * @return array
 	 */
 	public function acceptMessages($amqpMessageIds) {
@@ -166,26 +172,33 @@ class Subscription {
 			$amqpMessageIds = array($amqpMessageIds);
 		}
 
-		foreach($this->messages as $msgId => $stompMessage) {
+		foreach($this->messages as $amqpId => $messages) {
+            /** @var Message[] $messages */
 			try {
-				if(in_array($msgId, $amqpMessageIds)) {
-					$this->log->debug("Attempting ACK of $msgId");
-					$stompMessage->ack();
-					$success[$msgId] = true;
+				if(in_array($amqpId, $amqpMessageIds)) {
+					$this->log->debug("Attempting ACK of $amqpId");
+
+                    foreach ($messages as $stompId => $msg) {
+                        // this should be throwing a RuntimeException if it doesn't work
+                        $msg->ack();
+                    }
+					$success[$amqpId] = true;
 				}
 			}
 			catch(RuntimeException $e) {
 				// the message in question has already been [N]ACK'd
-				$this->log->error("Caught Runtime Exception, message '$msgId' already N/ACK'd");
+				$this->log->error("Caught Runtime Exception, message '$amqpId' already N/ACK'd");
 			}
 		}
 
-		if(count($success)) {
-			foreach(array_keys($success) as $amqpMessageId) {
-				unset($this->messages[$amqpMessageId]);
-				$this->log->info("Accepted $amqpMessageId");
+        $accepted = array_keys($success);
+
+		if(count($accepted)) {
+			foreach($accepted as $amqpId) {
+				unset($this->messages[$amqpId]);
+				$this->log->info("Accepted $amqpId");
 			}
-			return array_keys($success);
+			return $accepted;
 		}
 		else {
 			$this->log->critical("Did not find any matching messages");
@@ -203,22 +216,6 @@ class Subscription {
 		// STOMP likes to do things its own way...
 		$properties['message_id'] = $properties['amqp-message-id'];
 		return new AMQPMessage($stompFrame->body, $properties);
-	}
-
-
-	/**
-	 * Returns the list of messages currently UNACK'd in this subscription.
-	 *
-	 * @return AMQPMessage[]
-	 */
-	public function getMessages() {
-		$messages = array();
-
-		foreach($this->messages as $amqpMessageId => $stompMessage) {
-			$messages[$amqpMessageId] = $this->frame2amqp($stompMessage->frame);
-		}
-
-		return $messages;
 	}
 
 } 
