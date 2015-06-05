@@ -275,10 +275,14 @@ foreach ($task_list as $task) {
         )
     );
     if (!empty($box_id)) {
-        $detail = new DueWork_Detail($task->getSubmissionBox());
-        $detail->processStudents($userCollection);
-        $student_submission_list[$box_id] = $detail->getSitepageData();
-        $this->parse('subheader_unit_task_submission_link_block', 'subheader_unit_task_submission_link');
+        try {
+            $detail = new DueWork_Detail($task->getSubmissionBox());
+            $detail->processStudents($userCollection);
+            $student_submission_list[$box_id] = $detail->getSitepageData();
+            $this->parse('subheader_unit_task_submission_link_block', 'subheader_unit_task_submission_link');
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $this->parse('subheader_unit_task_no_link_block', 'subheader_unit_task_no_link');
+        }
     } elseif (!empty($assess_id)) {
         // attempt_list is a list of all valid attempts, ordered chronologically.
         // Filter to most recent submission only.
@@ -293,8 +297,10 @@ foreach ($task_list as $task) {
                 $attempt['firstSection'] = $section_handler->getFirst($assess_id);
             }
             unset($attempt);
+            $this->parse('subheader_unit_task_assess_link_block', 'subheader_unit_task_assess_link');
+        } else {
+            $this->parse('subheader_unit_task_no_link_block', 'subheader_unit_task_no_link');
         }
-        $this->parse('subheader_unit_task_assess_link_block', 'subheader_unit_task_assess_link');
     } else {
         $this->parse('subheader_unit_task_no_link_block', 'subheader_unit_task_no_link');
     }
