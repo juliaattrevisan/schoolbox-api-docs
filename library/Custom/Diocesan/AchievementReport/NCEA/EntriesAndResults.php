@@ -48,6 +48,8 @@ class EntriesAndResults extends Base {
             $letter = $current['StrippedResult'];
             $level = $current['Level'];
             $studentYear = $current['StudentYear'];
+            $result = $current['Result'];
+            $strippedResult = $current['StrippedResult'];
 
             /* Teachers
              * Trim empty teachers out for course teachers
@@ -64,14 +66,19 @@ class EntriesAndResults extends Base {
                 }
             }
 
-            /* Externally-assessed items in the CurrentYear are always enclosed
+            /* Exclude certain items from the Entries And Results tables
+             * Externally-assessed items in the CurrentYear are always enclosed
              * with square brackets. This indicates that it is a progressive grade,
              * used specifically for Dio
              */
-            $result = $current['Result'];
-
-            if (strlen($result) && ($internalExternal == 'EX') && ($studentYear == $this->getCurrentYear())) {
-                $result = "[{$result}]";
+            if (!in_array($result, $this->getExclusionLetterRegistry())) {
+                if (strlen($result) && ($internalExternal == 'EX') && ($studentYear == $this->getCurrentYear())) {
+                    $result = "[{$result}]";
+                }
+            }
+            else {
+                $result = '';
+                $strippedResult = '';
             }
 
             /* Entries
@@ -83,7 +90,7 @@ class EntriesAndResults extends Base {
                 'Level' => $current['Level'],
                 'EnteredCredits' => $current['EnteredCredits'],
                 'Result' => $result,
-                'StrippedResult' => $current['StrippedResult'],
+                'StrippedResult' => $strippedResult,
                 'ResultBrackets' => $current['ResultBrackets']
             );
 
@@ -131,7 +138,7 @@ class EntriesAndResults extends Base {
                         if (in_array($letter, array('N'))) {
                             $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
                         }
-                        else {
+                        elseif (in_array($letter, $this->getAchievementLetterRegistry())) {
                             $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
                             $finalStack[$courseName]['summary']['type'][$internalExternal]['availableCredits'] += $current['EnteredCredits'] - $current['ResultCredits'];
                         }
@@ -142,7 +149,7 @@ class EntriesAndResults extends Base {
                 if (in_array($letter, array('N'))) {
                     $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
                 }
-                else {
+                elseif (in_array($letter, $this->getAchievementLetterRegistry())) {
                     $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
                     $finalStack[$courseName]['summary']['type'][$internalExternal]['availableCredits'] += $current['EnteredCredits'] - $current['ResultCredits'];
                 }
