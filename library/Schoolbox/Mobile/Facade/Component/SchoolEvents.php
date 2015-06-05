@@ -28,26 +28,12 @@ class SchoolEvents extends Generic {
 
         $calFactory = new Calendar_Api_Factory($user);
         $calendarHandler = $calFactory->produce();
-
-        $now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
-        $start = $now->startOfDay();
-        $end = $start;
-        $end->addDays(1);
-
         $cList = array(
-            'events' => $calendarHandler->getEvents($start->getUnixTimestamp(), $end->getUnixTimestamp())->getStack()
+            'events' => $calendarHandler->getEvents(
+                Alaress_Date_Format::now()->startOfDay()->getUnixTimeStamp(),
+                Alaress_Date_Format::now()->addDays(1)->startOfDay()->getUnixTimeStamp()
+            )->getStack()
         );
-
-        // check that there aren't events with Alaress_Date_Formats as their date fields (which is a 50:50)
-        foreach($cList['events'] as &$e) {
-            /** @var Calendar_Event_Type_Abstract $e */
-            if($e->getEndTime() instanceof Alaress_Date_Format) {
-                $e->setEndTime($e->getEndTime()->getTimeOnly());
-            }
-            if($e->getStartTime() instanceof Alaress_Date_Format) {
-                $e->setStartTime($e->getStartTime()->getTimeOnly());
-            }
-        }
 
         return array(
             'title'   => "Today's Events",
