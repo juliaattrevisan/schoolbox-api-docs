@@ -16,7 +16,7 @@ if (is_numeric($_POST['categoryID'])) {
     $category = new \Schoolbox\Resource\Category();
     $category->setId(0);
 
-    if ($_POST['categoryId']) {
+    if ($_POST['categoryID']) {
         try {
             $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
             $category = $categoryMapper->findById($_POST['categoryID']);
