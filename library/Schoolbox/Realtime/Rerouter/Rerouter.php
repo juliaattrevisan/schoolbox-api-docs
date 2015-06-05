@@ -228,10 +228,11 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 
 
     /**
-     * @param int $userId
+     * @param int  $userId
+     * @param bool $refreshCache
      * @return bool
      */
-    public function subscribeUser($userId)
+    public function subscribeUser($userId, $refreshCache = true)
     {
         $this->log->debug("Subscribing user $userId");
 
@@ -239,7 +240,9 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
         $subscriber = $this->subscriber;
         $subList    = $subscriber->getSubscriptionList();
 
-        $subList->importFromSource($this->userMapper, false);
+        if ($refreshCache) {
+            $subList->importFromSource($this->userMapper, false);
+        }
 
         return $subscriber->subscribe($subList->createQueueName($userId), function ($frame, $data) use ($tx) {
             /**
@@ -313,9 +316,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
         $this->log->debug("Full rebind complete; cleaning up stale queues");
 
         // get all current user IDs
-        $userIds = $this->userMapper->getDatabase()
-                        ->query('SELECT id FROM `user`')
-                        ->fetchAll(PDO::FETCH_COLUMN);
+        $userIds = $this->userMapper->findAllIds();
 
         $this->binder->destroyStaleBindings($userIds);
 
@@ -335,7 +336,7 @@ class Rerouter extends SignalEmitter implements TaskResponseHandlerInterface {
 
         $this->log->debug(sprintf("BIND %4s %4d  %s", "-{$removed}", "+{$added}", $user->getUsername()));
 
-        $this->subscribeUser($user->getId());
+        $this->subscribeUser($user->getId(), false);
     }
 
 
