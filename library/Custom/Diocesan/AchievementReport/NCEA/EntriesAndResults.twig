@@ -31,6 +31,7 @@
             <td class="subheading centered numeric">Result</td>
         </tr>
         {% for currentEntry in allData.allEntries %}
+        {% if (currentEntry.Result|length > 0) and (entriesAndResults.year == entriesAndResults.currentYear) %}
         <tr>
             <td class="centered numeric">{{ currentEntry.NCEAStandardNumber }}</td>
             <td class="centered numeric">{{ currentEntry.InternalorExternalAssessment }}</td>
@@ -39,6 +40,7 @@
             <td class="centered numeric">{{ currentEntry.EnteredCredits }}</td>
             <td class="centered numeric">{{ currentEntry.Result }}</td>
         </tr>
+        {% endif %}
         {% endfor %}
     </tbody>
     <tfoot>

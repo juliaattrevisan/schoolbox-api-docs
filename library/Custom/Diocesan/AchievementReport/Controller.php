@@ -296,6 +296,8 @@ class Controller extends Base {
                     'data' => $entriesAndResults->findData(),
                     'allLetters' => $entriesAndResults->getLetterRegistry(),
                     'allTypes' => $this->getTypes(),
+                    'year' => $year,
+                    'currentYear' => $entriesAndResults->getCurrentYear()
                 );
             }
         }
