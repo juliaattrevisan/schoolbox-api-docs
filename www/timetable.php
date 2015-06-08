@@ -55,7 +55,7 @@ if ($groupHandler->isParent()) {
     }
     // Inject campus ID into child list
     foreach ($outputList as &$user) {
-        $campusObj      = Schoolbox\CampusMapper::getInstance()->findById($user);
+        $campusObj      = Schoolbox\CampusMapper::getInstance()->findById($user['campus']);
         $user['campus'] = $campusObj;
     }
     unset($user);
