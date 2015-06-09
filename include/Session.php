@@ -418,15 +418,21 @@ class Session
                                     $cat = false;
 
                                     if ($subject['campusCode']) {
-//Check for subject with campus code
+                                        //Check for subject with campus code
                                         try {
                                             $cat = $folderMapper->findByCode($subject['campusCode'].'/'.$subject['code']);
                                         } catch (\Exception $e) {
-//Try to fetch witout campus code
+                                            //Try to fetch witout campus code
                                             try {
                                                 $cat = $folderMapper->findByCode($subject['code']);
                                             } catch (\Exception $e) {
                                             }
+                                        }
+                                    }
+                                    else {
+                                        try {
+                                            $cat = $folderMapper->findByCode($subject['code']);
+                                        } catch (\Exception $e) {
                                         }
                                     }
 
