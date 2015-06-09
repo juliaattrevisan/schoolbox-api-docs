@@ -12,7 +12,7 @@ INSERT INTO `config`(
 )
 VALUES (
     'debug_show_stack_trace',
-    '0', -- off by default
+    (IF ((SELECT COUNT(*) FROM `config` `c` WHERE `c`.`name` = 'site_location' AND `c`.`value` = 'demo'), '1', '0')),
     'Show Stack Trace on Error',
     'If this is on, full stack traces will be shown on error. This can expose internal details of Schoolbox, so should be switched off unless testing.',
     3, -- checkbox
