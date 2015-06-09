@@ -162,7 +162,13 @@
                 this.on('queuecomplete',  function() {
                     if (self.options.refreshSelector) {
                         self._tt = window.setTimeout(function () {
-                            $(self.options.refreshSelector).load(self.options.refreshUrl, self.options.refreshData);
+                            $.post(
+                                self.options.refreshUrl,
+                                self.options.refreshData
+                            )
+                                .done(function(data) {
+                                    $(self.options.refreshSelector).empty().append($(data).children());
+                                });
                         }, self.options.refreshTimeout);
                     }
 
