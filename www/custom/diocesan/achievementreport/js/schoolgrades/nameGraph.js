@@ -78,7 +78,21 @@
                 },
                 plotOptions: {
                     series: {
-                        stacking: 'normal'
+                        stacking: 'percent',
+                        dataLabels: {
+                            enabled: true,
+                            align: 'center',
+                            inside: true,
+                            formatter: function() {
+                                var str = '';
+
+                                if (this.y > 0) {
+                                    str = this.y;
+                                }
+
+                                return str;
+                            }
+                        }
                     }
                 },
                 series: config.series,
