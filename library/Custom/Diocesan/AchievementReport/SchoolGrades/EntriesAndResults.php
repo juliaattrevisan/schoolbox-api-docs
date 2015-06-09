@@ -84,7 +84,7 @@ class EntriesAndResults extends Base {
              */
             $finalStack[$year][$courseName]['allAreas'][$assessArea]['letters']['term' . $term] = $result;
         }
-
+new \Alaress_Probe($finalStack);
         return $finalStack;
     }
 
