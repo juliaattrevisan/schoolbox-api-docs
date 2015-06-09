@@ -107,7 +107,6 @@ class EntriesAndResults extends Base {
                 AssessAreaHeading,
                 Term,
                 Result,
-                AreaSeq,
                 ClassTeacher1,
                 ClassTeacher1Email,
                 ClassTeacher2,
@@ -133,7 +132,8 @@ class EntriesAndResults extends Base {
                 ClassTeacher3Email
             ORDER BY
                 Fileyear DESC,
-                AreaSeq
+                CourseName,
+                AssessAreaHeading
         ";
 
         $result = $this->getDb()->getAll($query);
