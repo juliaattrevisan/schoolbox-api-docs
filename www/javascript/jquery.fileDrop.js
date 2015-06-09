@@ -111,7 +111,14 @@
         // add THIS detect to the window listener
         $(window).on(
             'dragenter dragend drop dragleave mouseenter',
-            this.detect.bind(this)
+            function (e) {
+                // Add a delay to ensure that dragleave event has processed
+                // before drop event
+                setTimeout(
+                    function() { self.detect(e); },
+                    100
+                )
+            }
         );
 
         if (this.options.acceptedFiles) {
