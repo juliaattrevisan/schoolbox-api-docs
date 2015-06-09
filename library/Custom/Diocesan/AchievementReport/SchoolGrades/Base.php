@@ -31,7 +31,6 @@ abstract class Base extends AchievementReportBase {
                 StudentYearLevel,
                 StrippedResult,
                 Fileyear,
-                CourseName,
                 COUNT(StrippedResult) AS num
             FROM
                 SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
@@ -47,7 +46,11 @@ abstract class Base extends AchievementReportBase {
                 StudentYearLevel,
                 StrippedResult,
                 Fileyear
-            ORDER BY StudentYearLevel DESC, StrippedResult DESC
+            ORDER BY
+                StudentYearLevel DESC,
+                CourseName,
+                AssessAreaHeading,
+                StrippedResult DESC
         ";
 
         $result = $this->getDb()->getAll($query);
@@ -96,7 +99,11 @@ abstract class Base extends AchievementReportBase {
                 StudentYearLevel,
                 StrippedResult,
                 Fileyear
-            ORDER BY StudentYearLevel DESC, StrippedResult DESC
+            ORDER BY
+                StudentYearLevel DESC,
+                CourseName,
+                AssessAreaHeading,
+                StrippedResult DESC
         ";
 
         $result = $this->getDb()->getAll($query);
