@@ -109,7 +109,10 @@
         }
 
         // add THIS detect to the window listener
-        $(window).on('dragenter dragend drop dragleave mouseenter', null, this, this.detect);
+        $(window).on(
+            'dragenter dragend drop dragleave mouseenter',
+            this.detect.bind(this)
+        );
 
         if (this.options.acceptedFiles) {
             acceptedMime = this.options.acceptedFiles;
@@ -198,7 +201,7 @@
         event.preventDefault();
 
         var i,
-            self     = event.data,
+            self     = this,
             dragging = [],
             native   = event.originalEvent;
 
