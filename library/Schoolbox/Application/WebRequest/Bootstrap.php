@@ -534,7 +534,7 @@ class Bootstrap implements BootstrapInterface {
                 if ($outputStackTrace) {
                     $output .= "<li>Error: {$error['message']} in {$error['file']} on line {$error['line']}.</li>";
                 } else {
-                    $output .= "<li>Error: {$error['message']}. (Further details have been recorded.)</li>";
+                    $output .= "<li>Error: {$error['message']}. (Further details have been logged.)</li>";
                 }
                 $output .= '</ul>';
 
