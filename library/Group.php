@@ -666,7 +666,7 @@ class Group extends DeprecatedModel
                         try {
                             $folder = $folderMapper->findByCode($currentSubject['code']);
 
-                            $allFolders[] = array(
+                            $allFolders[$folder->getId()] = array(
                                 'id' => $folder->getId(),
                                 'name' => $folder->getName(),
                                 'parent' => $folder->getParent()->getId(),
