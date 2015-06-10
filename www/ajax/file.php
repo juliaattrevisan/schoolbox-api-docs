@@ -66,12 +66,11 @@ if (is_numeric($_POST['categoryID'])) {
     /* Mash it out
      */
     foreach ($allNodes as $currentNode) {
-        $adr = new \Alaress_Date_Format($currentNode->getModifiedAt()->getUnixTimestamp(), 'U');
         $output[] = array(
             'id' => $currentNode->getNodeId(),
             'user' => $currentNode->getUser()->formatName(),
-            'relative' => $adr->getRelativeTime(),
-            'mimeClass' => $currentNode->getIcon()->getCss(),
+            'relative' => $currentNode->getModifiedAt()->getRelativeTime(),
+            'mimeClass' => $currentNode->getCss(),
             'iconFile' => $currentNode->getIcon()->getFile(),
             'description' => $currentNode->getName(),
         );
