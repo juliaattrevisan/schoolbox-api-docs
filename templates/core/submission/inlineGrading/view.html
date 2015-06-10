@@ -14,17 +14,7 @@
 
     var tgt = $('select[name=student-select]'), ize,
         skipUnsubmitted = $('#skipUnsubmitted'),
-        students = [
-          <!-- BEGIN studentnav -->
-          {
-            text: "{USER_FULLNAME}",
-            value: "/submission/inlineGrading/view/{BOX_ID}/{USER_ID}",
-            html: '{USER_HTML}',
-            unsubmitted: {USER_UNSUBMITTED}
-          },
-          <!-- END studentnav -->
-          {}
-        ],
+        students = {STUDENTNAV_JSON},
         selectizeOptions = {
           preload: true,
           closeAfterSelect: false,
@@ -97,6 +87,8 @@
 
 <span class="header_option">
 	<a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="btn clock"><span></span>View History</a>
+    <!-- BEGIN report_btn -->
+    <!-- END report_btn -->
 </span>
 <p class="sub-heading"><span class="visibility-subheader visibility_{GRADE_VISIBILITY_CODE}" title="{GRADE_VISIBILITY}"></span>{DUEWORK_TYPE} - Due: {DUEWORK_DUEDATE}</p>
 <div class="listing">
