@@ -15,13 +15,80 @@ use Custom\Diocesan\AchievementReport\Base as AchievementReportBase;
 abstract class Base extends AchievementReportBase {
 
     /**
+     * Rearrange into a meaningful structure
+     *
+     * @return array
+     */
+    protected function recombination() {
+
+        /**
+         * Rearrange everything into a nice order
+         *
+         * $yearStack is the table data
+         */
+        $yearStack = array();
+
+        /* Entered Grades
+         */
+        $allEnteredGradesCurrentYear = $this->findEnteredGradesCurrentYear($this->getExternalUserId());
+        $allEnteredGradesPreviousYear = $this->findEnteredGradesPreviousYear($this->getExternalUserId());
+
+        /* Preprocess Current Year
+         */
+        foreach ($allEnteredGradesCurrentYear as $current) {
+            $studentYear = $current['Fileyear'];
+            $courseName = $current['CourseName'];
+            $assessArea = $current['AssessAreaHeading'];
+            $term = "term{$current['Term']}";
+
+            /* Initialise
+             */
+            if (!is_array($yearStack[$studentYear][$courseName][$assessArea])) {
+                $yearStack[$studentYear]['allCourses'][$courseName][$assessArea] = array(
+                    'term2' => '',
+                    'term4' => '',
+                );
+            }
+
+            /* Assign values
+             */
+            $yearStack[$studentYear]['allCourses'][$courseName][$assessArea][$term] = $current;
+        }
+
+        /* Preprocess Previous Years
+         */
+        foreach ($allEnteredGradesPreviousYear as $current) {
+            $studentYear = $current['Fileyear'];
+            $courseName = $current['CourseName'];
+            $assessArea = $current['AssessAreaHeading'];
+            $term = "term{$current['Term']}";
+
+            /* Initialise
+             */
+            if (!is_array($yearStack[$studentYear][$courseName][$assessArea])) {
+                $yearStack[$studentYear]['allCourses'][$courseName][$assessArea] = array(
+                    'term2' => '',
+                    'term4' => '',
+                );
+            }
+
+            /* Assign values
+             */
+            $yearStack[$studentYear]['allCourses'][$courseName][$assessArea][$term] = $current;
+        }
+
+        return $yearStack;
+    }
+
+
+    /**
      * Get counts for Entered Grades for the current year
      * for a particular student
      *
      * @param $externalUserId
      * @return array
      */
-    protected function findEnteredGradesCurrentYear($externalUserId) {
+    private function findEnteredGradesCurrentYear($externalUserId) {
         $query = "
             SELECT
                 classcode,
@@ -66,7 +133,7 @@ abstract class Base extends AchievementReportBase {
      * @param $externalUserId
      * @return array
      */
-    protected function findEnteredGradesPreviousYear($externalUserId) {
+    private function findEnteredGradesPreviousYear($externalUserId) {
         $query = "
             SELECT
                 classcode,
