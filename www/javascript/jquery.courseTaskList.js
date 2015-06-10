@@ -66,6 +66,14 @@
 
         // Initialises the task list, setting up drag/drop as well.
         var initTaskList = function() {
+            /* Apply Preview to all anchor links in the task-list for
+             * this component. This is used when a new task is dynamically
+             * added via ajax - this applies the preview plugin when
+             * the ajax occurs
+             *
+             * Pass it in from the course taskList plugin instantiation
+             */
+            component.find(settings.previewSelector).preview();
             var task_list = component.find('.task-list');
             task_list.sortable({
 				placeholder: "sortable-placeholder",
@@ -85,15 +93,6 @@
                 });
                 $.post(form.attr('action'), params, reloadTaskList, 'json');
             })
-
-            /* Apply Preview to all anchor links in the task-list for
-             * this component. This is used when a new task is dynamically
-             * added via ajax - this applies the preview plugin when
-             * the ajax occurs
-             *
-             * Pass it in from the course taskList plugin instantiation
-             */
-            component.find(settings.previewSelector).preview();
         };
         initTaskList();
 

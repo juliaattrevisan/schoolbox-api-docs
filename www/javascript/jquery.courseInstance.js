@@ -288,6 +288,14 @@
         };
 
         var initTaskList = function() {
+            /* Apply Preview to all anchor links in the task-list for
+             * this component. This is used when a new task is dynamically
+             * added via ajax - this applies the preview plugin when
+             * the ajax occurs
+             *
+             * Pass it in from the course instance plugin instantiation
+             */
+            component.find(settings.previewSelector).preview();
             if (settings.readonly) {
                 return;
             }
@@ -308,15 +316,6 @@
                 });
                 $.post(form.attr('action'), params, reloadTaskList, 'json');
             })
-
-            /* Apply Preview to all anchor links in the task-list for
-             * this component. This is used when a new task is dynamically
-             * added via ajax - this applies the preview plugin when
-             * the ajax occurs
-             *
-             * Pass it in from the course instance plugin instantiation
-             */
-            component.find(settings.previewSelector).preview();
         };
         initTaskList();
     }
