@@ -84,8 +84,30 @@ class EntriesAndResults extends Base {
              */
             $finalStack[$year][$courseName]['allAreas'][$assessArea]['letters']['term' . $term] = $result;
         }
-new \Alaress_Probe($finalStack);
-        return $finalStack;
+
+        /* Sort naturally, because mssql can't
+         */
+        $processed = array();
+
+        foreach ($finalStack as $year => $allCourses) {
+            $processed[$year] = $allCourses;
+
+            foreach ($allCourses as $name => $data) {
+                $subjects = $data['allAreas'];
+
+                uksort($subjects, function($a, $b) {
+                    preg_match('/^\d+\.(\d+)/', $a, $matchesA);
+                    preg_match('/^\d+\.(\d+)/', $b, $matchesB);
+
+                    return $matchesA[1] > $matchesB[1];
+                });
+
+                $processed[$year][$name] = $data;
+                $processed[$year][$name]['allAreas'] = $subjects;
+            }
+        }
+
+        return $processed;
     }
 
     /**
