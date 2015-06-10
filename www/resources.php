@@ -112,7 +112,7 @@ if ($contents->getAllNodes()->count()) {
             'FILE_SIZE' => $currentNode->getSize(),
             'CATEGORY_ID' => intval($currentNode->getCategory()->getId()),
             'CLASS' => $currentNode->getCss(),
-            'FILE_LIST_TYPE' => $currentNode->getIcon()->getCss()
+            'FILE_LIST_TYPE' => $currentNode->getCss()
         );
 
         $this->setVar($output);
