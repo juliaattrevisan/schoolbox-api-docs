@@ -33,48 +33,41 @@ class GradeSummary extends Base {
      */
     public function findData() {
 
-        /* Entered Grades
-         */
-        $allEnteredGradesCurrentYear = $this->findEnteredGradesCurrentYear($this->getExternalUserId());
-        $allEnteredGradesPreviousYear = $this->findEnteredGradesPreviousYear($this->getExternalUserId());
-
-        /* All the counts for the letters
-         */
-        $allLetters = array();
-
-        foreach ($this->getLetterRegistry() as $currentLetter) {
-            $allLetters[] = $this->findLetter($currentLetter);
-        }
-
         /**
          * Rearrange everything into a nice order
          */
         $finalStack = array();
 
-        /* Do it for the current year
-         * Initialise The Letters
+        /* Entered Grades
          */
-        foreach ($allEnteredGradesCurrentYear as $current) {
-            $finalStack[$current['StudentYearLevel']]['fileYear'] = $current['Fileyear'];
-            $finalStack[$current['StudentYearLevel']]['enteredGrades'] += $current['num'];
-            $finalStack[$current['StudentYearLevel']]['letters'] = array_fill_keys($this->getLetterRegistry(), 0);
-        }
+        $preprocessed = $this->recombination();
 
-        /* And I suppose do it for all the previous years too
-         * Initialise The Letters
-         */
-        foreach ($allEnteredGradesPreviousYear as $current) {
-            $finalStack[$current['StudentYearLevel']]['fileYear'] = $current['Fileyear'];
-            $finalStack[$current['StudentYearLevel']]['enteredGrades'] += $current['num'];
-            $finalStack[$current['StudentYearLevel']]['letters'] = array_fill_keys($this->getLetterRegistry(), 0);
-        }
+        foreach ($preprocessed as $year => $allCourses) {
+            foreach ($allCourses['allCourses'] as $courseName => $allAreas) {
+                foreach ($allAreas as $currentArea => $allTerms) {
+                    foreach (array('term4', 'term2') as $term) {
+                        if ($allTerms[$term] != '') {
+                            $data = $allTerms[$term];
 
-        /* And for all the letters
-         */
-        foreach ($allLetters as $currentLetter) {
-            if (is_array($currentLetter) && count($currentLetter)) {
-                foreach ($currentLetter as $current) {
-                    $finalStack[$current['StudentYearLevel']]['letters'][$current['StrippedResult']] += $current['num'];
+                            $studentYearLevel = $data['StudentYearLevel'];
+                            $letter = $data['StrippedResult'];
+
+                            $finalStack[$studentYearLevel]['fileYear'] = $data['Fileyear'];
+                            $finalStack[$studentYearLevel]['enteredGrades']++;
+
+                            /* Initialise totals for letters
+                             */
+                            if (!is_array($finalStack[$studentYearLevel]['letters'])) {
+                                $finalStack[$studentYearLevel]['letters'] = array_fill_keys($this->getLetterRegistry(), 0);
+                            }
+
+                            if (in_array($letter, $this->getLetterRegistry())) {
+                                $finalStack[$studentYearLevel]['letters'][$letter]++;
+                            }
+
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -86,38 +79,5 @@ class GradeSummary extends Base {
         }
 
         return $finalStack;
-    }
-
-    /**
-     * Find letters.
-     *
-     * N/A/M/E all have definitions, but what is D and S?
-     *
-     * @param $letter
-     * @return array|bool
-     */
-    private function findLetter($letter) {
-        $letter = strtoupper($letter);
-
-        $query = "
-            SELECT DISTINCT (classcode + ' ' + AssessAreaHeading),
-                StudentYearLevel,
-                StrippedResult,
-                COUNT(StrippedResult) AS num
-            FROM
-                SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
-            WHERE ID = '{$this->getExternalUserId()}'
-            AND StrippedResult = '{$letter}'
-            GROUP BY (classcode + ' ' + AssessAreaHeading), StudentYearLevel, StrippedResult
-            ORDER BY StudentYearLevel DESC, StrippedResult DESC
-        ";
-
-        $result = $this->getDb()->getAll($query);
-
-        if (is_array($result)) {
-            return $result;
-        }
-
-        return array();
     }
 }
