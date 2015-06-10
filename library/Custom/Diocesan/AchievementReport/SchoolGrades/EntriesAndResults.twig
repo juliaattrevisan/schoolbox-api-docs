@@ -31,7 +31,11 @@
             <tr>
                 <td>{{ currentArea }}</td>
                 <td>
-
+                    {% if values.letters.term4 != '' %}
+                        {{ values.letters.term4 }}
+                    {% else %}
+                        {{ values.letters.term2 }}
+                    {% endif %}
                 </td>
             </tr>
             {% elseif (values.letters.term4 != '' or values.letters.term2 != '') %}
