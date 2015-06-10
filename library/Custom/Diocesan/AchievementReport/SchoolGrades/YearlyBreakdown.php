@@ -58,7 +58,7 @@ class YearlyBreakdown extends Base {
             /* Initialise
              */
             if (!is_array($yearStack[$studentYear][$courseName][$assessArea])) {
-                $yearStack[$studentYear][$courseName][$assessArea] = array(
+                $yearStack[$studentYear]['allCourses'][$courseName][$assessArea] = array(
                     'term2' => '',
                     'term4' => '',
                 );
@@ -66,7 +66,7 @@ class YearlyBreakdown extends Base {
 
             /* Assign values
              */
-            $yearStack[$studentYear][$courseName][$assessArea][$term] = $current;
+            $yearStack[$studentYear]['allCourses'][$courseName][$assessArea][$term] = $current;
         }
 
         /* Preprocess Previous Years
@@ -80,7 +80,7 @@ class YearlyBreakdown extends Base {
             /* Initialise
              */
             if (!is_array($yearStack[$studentYear][$courseName][$assessArea])) {
-                $yearStack[$studentYear][$courseName][$assessArea] = array(
+                $yearStack[$studentYear]['allCourses'][$courseName][$assessArea] = array(
                     'term2' => '',
                     'term4' => '',
                 );
@@ -88,7 +88,7 @@ class YearlyBreakdown extends Base {
 
             /* Assign values
              */
-            $yearStack[$studentYear][$courseName][$assessArea][$term] = $current;
+            $yearStack[$studentYear]['allCourses'][$courseName][$assessArea][$term] = $current;
         }
 
         return $yearStack;
@@ -112,116 +112,76 @@ class YearlyBreakdown extends Base {
 
         $preprocessed = $this->recombination();
 
-        new \Alaress_Probe($preprocessed);
-
         /* Try to accumulate values for term4; when term4 values
          * don't exist, use term2 values. This is what is meant by
          * "duplicate records" (misleading definition in specification)
          */
-        foreach ($preprocessed as $year => $courseName) {
-            foreach ($courseName as $subject => $data) {
-                if ($data['term4'] != '') {
-                    $letter = $data['term4'];
-                }
-                elseif ($data['term2'] != '') {
-                    $letter = $data['term2'];
+        foreach ($preprocessed as $year => $allCourses) {
+
+            /* Initialise totals for letters
+             */
+            if (!is_array($totals[$year]['letters'])) {
+                $totals[$year]['letters'] = array_fill_keys($this->getLetterRegistry(), 0);
+            }
+
+            $totals[$year]['achievedGrades'] = 0;
+
+            /* Choose which values to accumulate, from either
+             * term4 or term2 (depending on which is available)
+             *
+             * We don't gather stats for Areas, just Courses
+             */
+            foreach ($allCourses['allCourses'] as $courseName => $allAreas) {
+
+                /* Initialise totals for letters
+                 */
+                if (!is_array($yearStack[$year][$courseName]['letters'])) {
+                    $yearStack[$year][$courseName]['letters'] = array_fill_keys($this->getLetterRegistry(), 0);
                 }
 
-//                $yearStack[$year][$courseName]['enteredGrades']
+                $yearStack[$year][$courseName]['achievedGrades'] = 0;
 
+                /* Explore all the areas
+                 */
+                foreach ($allAreas as $currentArea => $allTerms) {
+                    foreach (array('term4', 'term2') as $term) {
+                        if ($allTerms[$term] != '') {
+                            $data = $allTerms[$term];
+                            $letter = $data['StrippedResult'];
+
+                            $yearStack[$year][$courseName]['enteredGrades']++;
+                            $totals[$year]['enteredGrades']++;
+
+                            /* Ignore anything outside of the letter registry
+                             */
+                            if (in_array($letter, $this->getLetterRegistry())) {
+                                $yearStack[$year][$courseName]['letters'][$letter]++;
+                                $totals[$year]['letters'][$letter]++;
+
+                                /* Achieved Grades only accumulate when student got an
+                                 * achievement letter
+                                 */
+                                if (in_array($letter, $this->getAchievementLetterRegistry())) {
+                                    $yearStack[$year][$courseName]['achievedGrades']++;
+                                    $totals[$year]['achievedGrades']++;
+                                }
+                            }
+
+                            break;
+                        }
+                    }
+                }
             }
         }
 
-
-
-
-
-
-
-
-
-
-
-
-//
-//        /* Current year
-//         */
-//        foreach ($allEnteredGradesCurrentYear as $current) {
-//            $yearStack[$current['Fileyear']][$current['CourseName']]['enteredGrades'] += $current['num'];
-//            $totals[$current['Fileyear']]['enteredGrades'] += $current['num'];
-//
-
-//            /* Initialise totals for letters
-//             */
-//            if (!is_array($totals[$current['Fileyear']]['letters'])) {
-//                $totals[$current['Fileyear']]['letters'] = array_fill_keys($this->getLetterRegistry(), 0);
-//            }
-//
-//            /* Summate
-//             */
-//            if (!is_array($yearStack[$current['Fileyear']][$current['CourseName']]['letters'])) {
-//                $yearStack[$current['Fileyear']][$current['CourseName']]['letters'] = array_fill_keys($this->getLetterRegistry(), 0);
-//            }
-//            else {
-//                /* Ignore anything outside of the letter registry
-//                 */
-//                if (in_array($current['StrippedResult'], $this->getLetterRegistry())) {
-//                    $yearStack[$current['Fileyear']][$current['CourseName']]['letters'][$current['StrippedResult']]++;
-//                    $totals[$current['Fileyear']]['letters'][$current['StrippedResult']]++;
-//                }
-//            }
-//        }
-
-
-
-
-
-
-//
-//
-//
-//
-//
-//
-//        foreach ($allEnteredGradesPreviousYear as $current) {
-//            $yearStack[$current['Fileyear']][$current['CourseName']]['enteredGrades'] += $current['num'];
-//            $totals[$current['Fileyear']]['enteredGrades'] += $current['num'];
-//
-//            /* Initialise totals for letters
-//             */
-//            if (!is_array($totals[$current['Fileyear']]['letters'])) {
-//                $totals[$current['Fileyear']]['letters'] = array_fill_keys($this->getLetterRegistry(), 0);
-//            }
-//
-//            /* Summate
-//             */
-//            if (!is_array($yearStack[$current['Fileyear']][$current['CourseName']]['letters'])) {
-//                $yearStack[$current['Fileyear']][$current['CourseName']]['letters'] = array_fill_keys($this->getLetterRegistry(), 0);
-//            }
-//            else {
-//                /* Ignore anything outside of the letter registry
-//                 */
-//                if (in_array($current['StrippedResult'], $this->getLetterRegistry())) {
-//                    $yearStack[$current['Fileyear']][$current['CourseName']]['letters'][$current['StrippedResult']]++;
-//
-//                    if (in_array($current['StrippedResult'], array('A', 'M', 'E'))) {
-//                        $yearStack[$current['Fileyear']][$current['CourseName']]['achievedGrades']++;
-//                        $totals[$current['Fileyear']]['achievedGrades']++;
-//                    }
-//
-//                    $totals[$current['Fileyear']]['letters'][$current['StrippedResult']]++;
-//                }
-//            }
-//        }
-//
-//        /* Available Grades
-//         */
-//        foreach ($yearStack as $currentYear => $allCourses) {
-//            foreach ($allCourses as $courseName => $data) {
-//                $yearStack[$currentYear][$courseName]['availableGrades'] = $yearStack[$currentYear][$courseName]['enteredGrades'] - array_sum($yearStack[$currentYear][$courseName]['letters']);
-//                $totals[$currentYear]['availableGrades'] += $yearStack[$currentYear][$courseName]['availableGrades'];
-//            }
-//        }
+        /* Available Grades
+         */
+        foreach ($yearStack as $currentYear => $allCourses) {
+            foreach ($allCourses as $courseName => $data) {
+                $yearStack[$currentYear][$courseName]['availableGrades'] = $yearStack[$currentYear][$courseName]['enteredGrades'] - array_sum($yearStack[$currentYear][$courseName]['letters']);
+                $totals[$currentYear]['availableGrades'] += $yearStack[$currentYear][$courseName]['availableGrades'];
+            }
+        }
 
         $finalStack = array(
             'yearStack' => $yearStack,

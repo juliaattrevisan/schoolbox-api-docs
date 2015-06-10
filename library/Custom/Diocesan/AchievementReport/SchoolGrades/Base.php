@@ -106,7 +106,7 @@ abstract class Base extends AchievementReportBase {
      */
     protected function explorerReporting() {
         $explorer = $this->getDb()->getAll("
-            SELECT TOP 10 *
+            SELECT TOP 5 *
             FROM SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
         ");
 
