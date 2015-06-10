@@ -457,8 +457,9 @@ class UnitInstanceMapper extends Mapper {
     }
 
     /**
-     * Post-save callback:
-     * * if a new item, save a new task instance for each task in this unit.
+     * Post-creation callback:
+     * * save rubrics that belong to either the unit or course homepage
+     * * save a new task instance for each task in this unit.
      *
      * Existing task instances for this course are no longer updated here,
      * because users generally didn't want to clobber the open or due date of
@@ -471,6 +472,15 @@ class UnitInstanceMapper extends Mapper {
     protected function postSave(UnitInstance $object, $previous = null) {
         // Create tasks for this item (if this item was only just saved)
         if (!$previous) {
+            $criterionMapper = SubmissionBox\Rubric\CriterionMapper::getInstance();
+            $criterionMapper->copyFromCategory(
+                $object->getUnitCategory()->getParent()->getId(),
+                $object->getCategory()->getId()
+            );
+            $criterionMapper->copyFromCategory(
+                $object->getUnitCategory()->getId(),
+                $object->getCategory()->getId()
+            );
             $task_list = TaskMapper::getInstance()->findByColumn(
                 'category_id',
                 $object->getUnitCategory()->getId()

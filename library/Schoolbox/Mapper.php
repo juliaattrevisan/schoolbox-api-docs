@@ -1755,7 +1755,7 @@ abstract class Mapper implements IMapper, Serializable
             foreach ($collection as $object) {
                 $collectionIds[] = $this->getModelProperty($object, $id_property);
             }
-            foreach ($this->findByColumn($identifier['column'], $collectionIds) as $obj) {
+            foreach ($this->findByColumn($identifier['column'], $collectionIds, ['deleted' => true]) as $obj) {
                 // index by ID
                 $existingObjects[$this->getModelProperty($obj, $id_property)] = $obj;
             }

@@ -14,7 +14,6 @@ use Schoolbox\Collection;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 
 $site_page = new SitePage();
 
@@ -37,9 +36,7 @@ if ($group->getPermission($homepage_id) < WRITE_ACCESS
 
 /** @var Component_Instance $component */
 $component = Component_InstanceMapper::getInstance()->findById($component_id);
-
-// Merge rubrics from course into this homepage.
-CriterionMapper::getInstance()->copyFromCategory($course_homepage_id, $homepage_id);
+$homepage  = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($component->getIdentifier());
 
 // And create a new unit instance for each option.
 $unit_instance_list = new Collection();
@@ -47,16 +44,13 @@ foreach ($_POST['unit'] as $unit_data) {
     $unit_id = $unit_data['unit_id'];
     $import  = !empty($unit_data['import']);
     if ($import) {
-        // Merge rubrics from first, because they need to exist before the due work is added.
-        CriterionMapper::getInstance()->copyFromCategory($unit_id, $homepage_id);
-
-        // and save the unit into the course.
+        // save the unit into the course.
         $unit_homepage = CategoryMapper::getInstance()->findById($unit_id);
         $unit_instance = new UnitInstance();
         $unit_instance
             ->setComponent($component)
             ->setTitle($unit_homepage->getName())
-            ->setCategory($component->getIdentifier())
+            ->setCategory($homepage)
             ->setUnitCategory($unit_homepage)
             ->setOpenDate(Alaress_Date_Format::newLocalShort($unit_data['open_date']))
             ->setDueDate(Alaress_Date_Format::newLocalShort($unit_data['due_date']))
