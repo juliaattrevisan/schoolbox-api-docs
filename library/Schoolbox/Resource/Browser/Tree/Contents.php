@@ -179,7 +179,12 @@ class Contents
      */
     private function buildFiles()
     {
-        $allFileNodes = $this->getFileMapper()->findForFolders(array($this->getCategory()->getId()), $this->getFilterOptions());
+        $filterOptions  = $this->getFilterOptions();
+        $hasWriteAccess = $this->getPermission() >= WRITE_ACCESS;
+        if (!isset($filterOptions['getHidden'])) {
+            $filterOptions['getHidden'] = $hasWriteAccess;
+        }
+        $allFileNodes = $this->getFileMapper()->findForFolders(array($this->getCategory()->getId()), $filterOptions);
 
         /* Process files
          */
@@ -190,7 +195,7 @@ class Contents
             $class = array();
 
             // write access
-            if ($this->getPermission() >= WRITE_ACCESS) {
+            if ($hasWriteAccess) {
                 $class[] = "write";
             }
 
