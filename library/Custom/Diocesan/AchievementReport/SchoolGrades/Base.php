@@ -19,37 +19,30 @@ abstract class Base extends AchievementReportBase {
      * for a particular student
      *
      * @param $externalUserId
-     * @return array|bool
+     * @return array
      */
     protected function findEnteredGradesCurrentYear($externalUserId) {
         $query = "
-            SELECT DISTINCT
-                (classcode + ' ' + AssessAreaHeading),
+            SELECT
                 classcode,
-                AssessAreaHeading,
-                CourseName,
                 StudentYearLevel,
-                StrippedResult,
                 Fileyear,
-                COUNT(StrippedResult) AS num
+                CourseName,
+                AssessAreaHeading,
+                Term,
+                Result,
+                StrippedResult
             FROM
                 SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
             WHERE
                 ID = '{$externalUserId}'
                 AND classyear = '{$this->getCurrentYear()}'
                 AND Result != 'SNA'
-            GROUP BY
-                (classcode + ' ' + AssessAreaHeading),
-                classcode,
-                AssessAreaHeading,
-                CourseName,
-                StudentYearLevel,
-                StrippedResult,
-                Fileyear
             ORDER BY
                 StudentYearLevel DESC,
                 CourseName,
                 AssessAreaHeading,
+                Term DESC,
                 StrippedResult DESC
         ";
 
@@ -71,19 +64,19 @@ abstract class Base extends AchievementReportBase {
      * word because who knows
      *
      * @param $externalUserId
-     * @return array|bool
+     * @return array
      */
     protected function findEnteredGradesPreviousYear($externalUserId) {
         $query = "
-            SELECT DISTINCT
-                (classcode + ' ' + AssessAreaHeading),
+            SELECT
                 classcode,
-                AssessAreaHeading,
-                CourseName,
                 StudentYearLevel,
-                StrippedResult,
                 Fileyear,
-                COUNT(StrippedResult) AS num
+                CourseName,
+                AssessAreaHeading,
+                Term,
+                Result,
+                StrippedResult
             FROM
                 SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
             WHERE
@@ -91,18 +84,11 @@ abstract class Base extends AchievementReportBase {
                 AND classyear < '{$this->getCurrentYear()}'
                 AND Result != ''
                 AND Result != 'SNA'
-            GROUP BY
-                (classcode + ' ' + AssessAreaHeading),
-                classcode,
-                AssessAreaHeading,
-                CourseName,
-                StudentYearLevel,
-                StrippedResult,
-                Fileyear
             ORDER BY
                 StudentYearLevel DESC,
                 CourseName,
                 AssessAreaHeading,
+                Term DESC,
                 StrippedResult DESC
         ";
 
