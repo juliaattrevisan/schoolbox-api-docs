@@ -62,7 +62,7 @@ $stack = array();
 $this->setFile(TEMPLATE_content, 'submission/inlineGrading/view.html');
 
 $this->setFile('studentNavTpl', 'submission/inlineGrading/injectables/controls/navigation-option.html');
-$this->setBlock('custom_head', 'studentnav', 'studentnav_block');
+$studentNav = [];
 
 $dueWorkDetail = new DueWork_Detail($submissionBox);
 $dueWorkDetail->processStudents($studentList);
@@ -110,7 +110,11 @@ foreach ($dueWorkDetail->getSitepageData() as $studentId => $studentData) {
         // force the subtemplate onto a single line so the JS doesn't snap
         $this->setVar('USER_HTML', preg_replace('`\s+`', ' ', $this->getVar('USER_HTML')));
 
-        $this->parse('studentnav_block', 'studentnav', true);
+        $studentNav[] = [
+            'text' => $currentStudent->formatName('{lastname}, {firstname}'),
+            'value' => "/submission/inlineGrading/view/{$submissionBox->getId()}/{$currentStudent->getId()}",
+            'html' => $this->getVar('USER_HTML'),
+        ];
 
 		/* Augment navigation data
 		 */
@@ -127,6 +131,7 @@ foreach ($dueWorkDetail->getSitepageData() as $studentId => $studentData) {
 		$stack[] = $augmented;
 	}
 }
+$this->setVar('STUDENTNAV_JSON', json_encode($studentNav));
 
 /* Trim out only this student
  */

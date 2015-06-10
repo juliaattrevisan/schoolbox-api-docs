@@ -14,17 +14,7 @@
 
     var tgt = $('select[name=student-select]'), ize,
         skipUnsubmitted = $('#skipUnsubmitted'),
-        students = [
-          <!-- BEGIN studentnav -->
-          {
-            text: "{USER_FULLNAME}",
-            value: "/submission/inlineGrading/view/{BOX_ID}/{USER_ID}",
-            html: '{USER_HTML}',
-            unsubmitted: {USER_UNSUBMITTED}
-          },
-          <!-- END studentnav -->
-          {}
-        ],
+        students = {STUDENTNAV_JSON},
         selectizeOptions = {
           preload: true,
           closeAfterSelect: false,
