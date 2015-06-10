@@ -106,14 +106,12 @@ foreach ($dueWorkDetail->getSitepageData() as $studentId => $studentData) {
 
         ));
 
+        // parse template with PHPLib, shuck it out then put it into JSON? Whoa
         $this->parse('USER_HTML', 'studentNavTpl');
-        // force the subtemplate onto a single line so the JS doesn't snap
-        $this->setVar('USER_HTML', preg_replace('`\s+`', ' ', $this->getVar('USER_HTML')));
-
         $studentNav[] = [
-            'text' => $currentStudent->formatName('{lastname}, {firstname}'),
+            'text'  => $currentStudent->formatName('{lastname}, {firstname}'),
             'value' => "/submission/inlineGrading/view/{$submissionBox->getId()}/{$currentStudent->getId()}",
-            'html' => $this->getVar('USER_HTML'),
+            'html'  => $this->getVar('USER_HTML'),
         ];
 
 		/* Augment navigation data
