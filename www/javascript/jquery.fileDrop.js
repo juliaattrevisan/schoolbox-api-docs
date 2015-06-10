@@ -330,17 +330,13 @@
      * @returns {boolean}
      */
     function containsFiles(event) {
-        try {
-            // event.dataTransfer.types should be an array, but in IE seems to not be set
-            if (event.dataTransfer.types) {
-                for (var i = 0; i < event.dataTransfer.types.length; i++) {
-                    if (event.dataTransfer.types[i] == "Files") {
-                        return true;
-                    }
+        // event.dataTransfer.types should be an array, but in IE seems to be something else
+        if (event.dataTransfer.types && event.dataTransfer.types.length) {
+            for (var i = 0; i < event.dataTransfer.types.length; i++) {
+                if (event.dataTransfer.types[i] == "Files") {
+                    return true;
                 }
             }
-        } catch (e) {
-            return false;
         }
         return false;
     }
