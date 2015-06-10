@@ -48,7 +48,6 @@ class EntriesAndResults extends Base {
             $assessArea = $currentEntry['AssessAreaHeading'];
             $term = $currentEntry['Term'];
 
-
             /* Strip all the numbers out
              */
             $result = preg_replace('/[0-9]*/', '', $currentEntry['Result']);
@@ -73,7 +72,7 @@ class EntriesAndResults extends Base {
 
             /* Initialise Term 2 and Term 4 marks
              */
-            if (!is_array($finalStack[$year][$courseName][$assessArea]['letters'])) {
+            if (!is_array($finalStack[$year][$courseName]['allAreas'][$assessArea]['letters'])) {
                 $finalStack[$year][$courseName]['allAreas'][$assessArea]['letters'] = array(
                     'term2' => '',
                     'term4' => ''
