@@ -34,12 +34,36 @@ $(document).ready(function() {
 			title: {
 				required: true,
 				minlength: 2
-			}
+            },
+            "finish[hour]": {
+                required: true,
+                '12hour': true
+            },
+            "finish[minute]": {
+                required: true,
+                minute: true
+            },
+            "start[hour]": {
+                required: true,
+                '12hour': true
+            },
+            "start[minute]": {
+                required: true,
+                minute: true
+            }
 		},
 		messages: {
 			title: "Please enter a title",
 			description: "Please enter a description"
-		}
+		},
+        errorPlacement: function(error, element) {
+            var fieldset = element.closest('fieldset');
+            if (fieldset.length) {
+                error.appendTo(fieldset);
+            } else {
+                error.insertAfter(element);
+            }
+        }
     });
 
     /* Create dialog for importing XML survey */

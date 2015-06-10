@@ -321,6 +321,15 @@
 				return false;
 			}
 
+            var validateNotAllDaySelected = function() {
+                var allDaySelector = $(':checkbox[name="allday"]');
+                if (allDaySelector.length && !allDaySelector.prop('checked')) {
+                    return true;
+                }
+                // No all day selector (EOTC)? Don't apply this rule
+                return false;
+            };
+
 			$(config.element).validate({
 				rules: {
 					'campus[]': {
@@ -352,8 +361,48 @@
 						required: {
 							depends: validateGroupSelected
 						}
-					}
+					},
+                    startHour: {
+                        required: {
+                            depends: validateNotAllDaySelected
+                        },
+                        '12hour': {
+                            depends: validateNotAllDaySelected
+                        }
+                    },
+                    startMinute: {
+                        required: {
+                            depends: validateNotAllDaySelected
+                        },
+                        minute: {
+                            depends: validateNotAllDaySelected
+                        }
+                    },
+                    endHour: {
+                        required: {
+                            depends: validateNotAllDaySelected
+                        },
+                        '12hour': {
+                            depends: validateNotAllDaySelected
+                        }
+                    },
+                    endMinute: {
+                        required: {
+                            depends: validateNotAllDaySelected
+                        },
+                        minute: {
+                            depends: validateNotAllDaySelected
+                        }
+                    }
 				},
+                errorPlacement: function(error, element) {
+                    var cell = element.closest('td');
+                    if (cell.length) {
+                        error.appendTo(cell);
+                    } else {
+                        error.insertAfter(element);
+                    }
+                },
 				submitHandler: function(form) {
 
 					// the desired action, and if this is a series event or not
