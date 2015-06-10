@@ -50,9 +50,10 @@ class GradeSummary extends Base {
                             $data = $allTerms[$term];
 
                             $studentYearLevel = $data['StudentYearLevel'];
+                            $fileyear = $data['Fileyear'];
                             $letter = $data['StrippedResult'];
 
-                            $finalStack[$studentYearLevel]['fileYear'] = $data['Fileyear'];
+                            $finalStack[$studentYearLevel]['fileYear'] = $fileyear;
                             $finalStack[$studentYearLevel]['enteredGrades']++;
 
                             /* Initialise totals for letters
@@ -61,6 +62,19 @@ class GradeSummary extends Base {
                                 $finalStack[$studentYearLevel]['letters'] = array_fill_keys($this->getLetterRegistry(), 0);
                             }
 
+                            /* Exclude progressive grades for current year
+                             */
+                            if ($fileyear == $this->getCurrentYear()) {
+                                if (!$this->isProgressive($data['Result'])) {
+                                    $letter = $data['StrippedResult'];
+                                }
+                                else {
+                                    $letter = '';
+                                }
+                            }
+
+                            /* Accumulate letter totals
+                             */
                             if (in_array($letter, $this->getLetterRegistry())) {
                                 $finalStack[$studentYearLevel]['letters'][$letter]++;
                             }

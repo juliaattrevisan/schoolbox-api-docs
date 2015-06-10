@@ -137,6 +137,17 @@ abstract class Base {
         return $this->externalUser['StudentID'];
     }
 
+    /**
+     * Determine if this result is progressive
+     * (has square brackets around Result value)
+     *
+     * @param $result
+     * @return bool
+     */
+    protected function isProgressive($result) {
+        return preg_match('/\[['.implode('', $this->getLetterRegistry()).'\d*]\]/', $result);
+    }
+
     /* Getters/Setters
      */
 
