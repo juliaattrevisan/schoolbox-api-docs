@@ -9,10 +9,8 @@
 
 class External_Tass_User implements External_UserInterface
 {
-    const SPLIT_PARENT_TASSID_LENGTH = 8;
-
     /**
-    * @var MSSQL
+     * @var MSSQL
     */
     private $database;
 
@@ -215,9 +213,11 @@ class External_Tass_User implements External_UserInterface
 
         // remove the P prefix
         $id = substr($tassID, 1);
-        if (strlen($id) == self::SPLIT_PARENT_TASSID_LENGTH) {
-            $parentCode = substr($id, 0, 7);
-            $parentNum = $id[self::SPLIT_PARENT_TASSID_LENGTH-1];
+        $splitParentLength = Config::get('external_tass_parent_id_length') + 1;
+        if (strlen($id) == $splitParentLength) {
+            // This is a split family parent, deal with them differently
+            $parentCode = substr($id, 0, $splitParentLength-1);
+            $parentNum = $id[$splitParentLength-1];
 
             $query = "
                 SELECT stud_codes AS RelatedID
