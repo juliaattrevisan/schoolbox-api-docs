@@ -43,7 +43,7 @@ class GradeSummary extends Base {
         $preprocessed = $this->recombination();
 
         foreach ($preprocessed as $year => $allCourses) {
-            foreach ($allCourses['allCourses'] as $courseName => $allAreas) {
+            foreach ($allCourses as $courseName => $allAreas) {
                 foreach ($allAreas as $currentArea => $allTerms) {
                     foreach (array('term4', 'term2') as $term) {
                         if ($allTerms[$term] != '') {

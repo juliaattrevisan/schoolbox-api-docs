@@ -44,7 +44,7 @@ abstract class Base extends AchievementReportBase {
             /* Initialise
              */
             if (!is_array($yearStack[$studentYear][$courseName][$assessArea])) {
-                $yearStack[$studentYear]['allCourses'][$courseName][$assessArea] = array(
+                $yearStack[$studentYear][$courseName][$assessArea] = array(
                     'term2' => '',
                     'term4' => '',
                 );
@@ -52,7 +52,7 @@ abstract class Base extends AchievementReportBase {
 
             /* Assign values
              */
-            $yearStack[$studentYear]['allCourses'][$courseName][$assessArea][$term] = $current;
+            $yearStack[$studentYear][$courseName][$assessArea][$term] = $current;
         }
 
         /* Preprocess Previous Years
@@ -66,7 +66,7 @@ abstract class Base extends AchievementReportBase {
             /* Initialise
              */
             if (!is_array($yearStack[$studentYear][$courseName][$assessArea])) {
-                $yearStack[$studentYear]['allCourses'][$courseName][$assessArea] = array(
+                $yearStack[$studentYear][$courseName][$assessArea] = array(
                     'term2' => '',
                     'term4' => '',
                 );
@@ -74,12 +74,11 @@ abstract class Base extends AchievementReportBase {
 
             /* Assign values
              */
-            $yearStack[$studentYear]['allCourses'][$courseName][$assessArea][$term] = $current;
+            $yearStack[$studentYear][$courseName][$assessArea][$term] = $current;
         }
 
         return $yearStack;
     }
-
 
     /**
      * Get counts for Entered Grades for the current year

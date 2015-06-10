@@ -65,7 +65,7 @@ class YearlyBreakdown extends Base {
              *
              * We don't gather stats for Areas, just Courses
              */
-            foreach ($allCourses['allCourses'] as $courseName => $allAreas) {
+            foreach ($allCourses as $courseName => $allAreas) {
 
                 /* Initialise totals for letters
                  */
