@@ -85,7 +85,7 @@ class SitePage extends Page
      *
      * @return string
      */
-    public function conType()
+    public static function conType()
     {
         $contype = "http://";
         if (getenv("SERVER_PORT") == 443) {
