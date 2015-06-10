@@ -109,7 +109,17 @@
         }
 
         // add THIS detect to the window listener
-        $(window).on('dragenter dragend drop dragleave mouseenter', null, this, this.detect);
+        $(window).on(
+            'dragenter dragend drop dragleave mouseenter',
+            function (e) {
+                // Add a delay to ensure that dragleave event has processed
+                // before drop event
+                setTimeout(
+                    function() { self.detect(e); },
+                    100
+                )
+            }
+        );
 
         if (this.options.acceptedFiles) {
             acceptedMime = this.options.acceptedFiles;
@@ -162,7 +172,13 @@
                 this.on('queuecomplete',  function() {
                     if (self.options.refreshSelector) {
                         self._tt = window.setTimeout(function () {
-                            $(self.options.refreshSelector).load(self.options.refreshUrl, self.options.refreshData);
+                            $.post(
+                                self.options.refreshUrl,
+                                self.options.refreshData
+                            )
+                                .done(function(data) {
+                                    $(self.options.refreshSelector).empty().append($(data).children());
+                                });
                         }, self.options.refreshTimeout);
                     }
 
@@ -192,7 +208,7 @@
         event.preventDefault();
 
         var i,
-            self     = event.data,
+            self     = this,
             dragging = [],
             native   = event.originalEvent;
 
@@ -314,7 +330,8 @@
      * @returns {boolean}
      */
     function containsFiles(event) {
-        if (event.dataTransfer.types) {
+        // event.dataTransfer.types should be an array, but in IE seems to be something else
+        if (event.dataTransfer.types && event.dataTransfer.types.length) {
             for (var i = 0; i < event.dataTransfer.types.length; i++) {
                 if (event.dataTransfer.types[i] == "Files") {
                     return true;
