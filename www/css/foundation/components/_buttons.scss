@@ -313,6 +313,11 @@ input[type=submit] 				{ @include button-style; }
 	margin: 0;
 }
 
+// Tabs
+.tabs .current a{
+	background-color: $tabs-navigation-active-bg-color;
+}
+
 // Actions
 .actions{
 	height: 100%;

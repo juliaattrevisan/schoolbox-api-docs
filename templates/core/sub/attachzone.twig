@@ -25,7 +25,7 @@ $data = {
         <li class="dz-success">
             {% if not attachzone.readonly %}
             <p class="actions">
-                <a href="#" data-dz-remove title="Detach" class="btn no-text delete"><span></span></a>
+                <a href="#" data-dz-remove title="Detach" class="button no-text icon-delete"></a>
             </p>
             <input type="hidden" name="attachment[]" value="{{ attachment.hash }}" data-az-attachment />
             {% endif %}
@@ -41,7 +41,7 @@ $data = {
             <li>
                 <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
                 <p class="actions">
-                    <a title="Detach" data-dz-remove class="btn no-text delete"><span></span></a>
+                    <a title="Detach" data-dz-remove class="button no-text icon-delete"></a>
                 </p>
                 <img data-dz-thumbnail src="/images/emails/spacer.gif" />
                 <p class="filename" data-dz-name></p>

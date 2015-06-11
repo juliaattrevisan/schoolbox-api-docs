@@ -525,7 +525,7 @@ $tooltip-font-color: $white;
 		$bg:transparent
 	);
 	&.icon-help:before{
-		color: $charcoal;
+		color: $monsoon;
 	}
 }
 
@@ -574,6 +574,25 @@ $tooltip-font-color: $white;
 	}
 }
 
+// Tables
+.mceEditor table{
+	background: transparent;
+	margin: 0;
+	tr{
+		background: $white;
+	}
+	td{
+		padding: 0;
+	}
+}
+.cirkuitSkin .mceButton {
+	height: auto;
+	width: auto;
+}
+.mceLayout{
+	border: 1px solid #ccc;
+}
+
 .table-actions{
 	[class^="icon-"]:before,
 	[class*=" icon-"]:before{
@@ -590,4 +609,10 @@ tr:hover{
 			opacity: 1;
 		}
 	}
+}
+
+// Reveal
+// Fix stupid foundation bug
+.reveal-modal-bg{
+	position: fixed;
 }

@@ -1,0 +1,54 @@
+@charset "UTF-8";
+
+$selectize-font-size: 14px;
+$selectize-line-height: 18px !default;
+
+$selectize-color-text: $black;
+$selectize-color-border: tint($tertiary, 66%);
+$selectize-color-highlight: $ocean-sunset;
+$selectize-color-input: $white !default;
+$selectize-color-input-full: $selectize-color-input !default;
+$selectize-color-disabled: $snow;
+$selectize-color-item: $snow;
+$selectize-color-item-text: $selectize-color-text !default;
+$selectize-color-item-border: $white-smoke;
+$selectize-color-item-active: $vapor;
+$selectize-color-item-active-text: $selectize-color-text !default;
+$selectize-color-item-active-border: $selectize-color-border;
+$selectize-color-dropdown: $white;
+$selectize-color-dropdown-border: $selectize-color-border !default;
+$selectize-color-dropdown-border-top: $selectize-color-border;
+$selectize-color-dropdown-item-active: tint($tertiary, 87%);
+$selectize-color-dropdown-item-active-text: $selectize-color-text;
+$selectize-color-dropdown-item-create-text: rgba(red($selectize-color-text), green($selectize-color-text), blue($selectize-color-text), .5) !default;
+$selectize-color-dropdown-item-create-active-text: $selectize-color-dropdown-item-active-text !default;
+$selectize-color-optgroup: $selectize-color-dropdown !default;
+$selectize-color-optgroup-text: $selectize-color-text !default;
+
+$selectize-shadow-input: none;
+$selectize-shadow-input-focus: none;
+$selectize-border: 2px solid $selectize-color-border;
+$selectize-border-radius: 0px;
+
+$selectize-width-item-border: 0 !default;
+$selectize-max-height-dropdown: 200px !default;
+
+$selectize-padding-x: 7px;
+$selectize-padding-y: 7px;
+$selectize-padding-item-x: 7px;
+$selectize-padding-item-y: 7px;
+
+@import "../core/selectize/src/selectize.scss";
+
+.selectize-input > input {
+	padding: 0.5rem !important;
+}
+
+.selectize-control.multi .selectize-input > div{
+	background: $white-smoke;
+	border: 1px solid $gainsboro;
+	padding: 0.5rem !important;
+	a{
+		padding: 0.5rem !important;
+	}
+}
