@@ -13,6 +13,17 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
+.file:before{
+	font-size: 1rem;
+}
+
+.icon [class^="icon-"]:before,
+.icon [class*=" icon-"]:before{
+	text-align: center;
+  	width: 100%;
+	font-size: 20px;
+}
+
 .no-text:before{
 	padding-right: 0 !important;
 	float: right;

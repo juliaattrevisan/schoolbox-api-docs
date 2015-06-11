@@ -92,11 +92,11 @@ $topbar-bg-color: $primary-color;
 $topbar-bg: $topbar-bg-color;
 
 // Height and margin
-$topbar-height: rem-calc(($base-font-size * 3));
+$topbar-height: rem-calc(($base-font-size + 17));
 // $topbar-margin-bottom: 0;
 
 // Controlling the styles for the title in the top bar
-$topbar-title-weight: 700;
+$topbar-title-weight: $font-weight-normal;
 $topbar-title-font-size: $base-font-size - 2;
 
 // Style the top bar dropdown elements
@@ -128,7 +128,7 @@ $topbar-link-bg-hover: tint($primary-color, 32%);
 // $topbar-back-link-size: $h5-font-size;
 // $topbar-link-dropdown-padding: rem-calc(20px);
 
-$topbar-button-font-size: 0.75rem;
+$topbar-button-font-size: rem-calc(($base-font-size - 2));
 $topbar-button-top: rem-calc(0px);
 
 $topbar-dropdown-label-color: $white;
@@ -240,8 +240,10 @@ $menu-slide: "transform 500ms ease";
 // Custom overrides
 //
 
-.side-nav					{
-	li a 					{ background: $side-nav-link-bg; }
+.side-nav{
+	li a{
+		background: $side-nav-link-bg;
+	}
 }
 
 // Spawning my own sub-nav
@@ -270,6 +272,13 @@ $menu-slide: "transform 500ms ease";
 // 	}
 // }
 
-.top-bar-section 			{ 
-	.dropdown label 		{ font-style: $topbar-dropdown-label-font-style; }
+.top-bar-section{
+	.button{
+		padding: rem-calc(($base-font-size / 2));
+		height: $topbar-height;
+		top: 0;
+	}
+	.dropdown label{
+		font-style: $topbar-dropdown-label-font-style;
+	}
 }

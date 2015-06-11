@@ -1,861 +1,1352 @@
-<!-- BEGIN custom_head -->
-<link rel="stylesheet" type="text/css" media="screen" href="/css/foundation/chrome.css?v={SITE_VERSION}" />
-<script type="text/javascript">
-    $(function() {
-        $('#container').addClass('foundation').foundation();
-    });
-</script>
-<!-- END custom_head -->
 <div class="scroll-container" role="main">
-    <div class="large-12 columns">
-
-        <h1 id="buttons">Buttons</h1>
-        <div class="row">
-            <div class="small-12 large-12 columns">
-                <!--<a href="#" class="tiny button">.tiny.button</a>-->
-                <!--<a href="#" class="small button">.small.button</a>-->
-                <a href="#" class="button">Primary</a>
-                <a href="#" class="button secondary">Secondary</a>
-                <a href="#" class="button success">Success</a>
-                <a href="#" class="button warning">Warning</a>
-                <a href="#" class="button alert">Delete</a><br>
-                <a href="#" class="button expand">Expand Full</a>
-                <!--<a href="#" class="tiny button secondary">.tiny.secondary</a><br>-->
-                <!--<a href="#" class="small button success radius">.small.success.radius</a><br>-->
-                <!--<a href="#" class="button alert round disabled">.round.disabled</a><br>-->
-            </div>
-        </div>
-        <div class="row">
-            <div class="small-12 large-12 columns">
-                <a href="#" class="button icon-approve">Primary</a>
-                <a href="#" class="button secondary icon-calendar">Secondary</a>
-                <a href="#" class="button success icon-chat">Success</a>
-                <a href="#" class="button warning">Warning</a>
-                <a href="#" class="button alert">Delete</a><br>
-            </div>
-        </div>
-        <hr>
-        <h1 id="button-groups">Button Groups / Horizontal Tabs</h1>
-        <!--<ul class="button-group">-->
-            <!--<li><a href="#" class="button">Button 1</a></li>-->
-            <!--<li><a href="#" class="button">Button 2</a></li>-->
-            <!--<li><a href="#" class="button">Button 3</a></li>-->
-        <!--</ul>-->
-        <ul class="button-group">
-            <li><a href="#" class="button secondary">Button 1</a></li>
-            <li><a href="#" class="button secondary">Button 2</a></li>
-            <li><a href="#" class="button secondary">Button 3</a></li>
-            <li><a href="#" class="button secondary">Button 4</a></li>
-        </ul>
-        <!--<ul class="button-group round even-3">-->
-            <!--<li><a href="#" class="button alert">Button 1</a></li>-->
-            <!--<li><a href="#" class="button alert">Button 2</a></li>-->
-            <!--<li><a href="#" class="button alert">Button 3</a></li>-->
-        <!--</ul>-->
-        <!--<ul class="button-group round even-3">-->
-            <!--<li><input type="submit" class="button success" value="Button 1"></li>-->
-            <!--<li><input type="submit" class="button success" value="Button 2"></li>-->
-            <!--<li><input type="submit" class="button success" value="Button 3"></li>-->
-        <!--</ul>-->
-        <hr>
-        <h1 id="breadcrumbs">Breadcrumbs</h1>
-        <!--<ul class="breadcrumbs">-->
-            <!--<li><a href="#">Home</a></li>-->
-            <!--<li><a href="#">Features</a></li>-->
-            <!--<li class="unavailable"><a href="#">Gene Splicing</a></li>-->
-            <!--<li class="current"><a href="#">Cloning</a></li>-->
-        <!--</ul>-->
-        <ul class="breadcrumb">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Features</a></li>
-            <li class="unavailable"><a href="#">Gene Splicing</a></li>
-            <li class="current"><a href="#">Cloning</a></li>
-        </ul>
-
-        <hr>
-        <h1 id="dropdown-buttons">Dropdown Buttons</h1>
-        <ul id="drop" class="f-dropdown" data-dropdown-content>
-            <li><a href="#">This is a link</a></li>
-            <li><a href="#">This is another</a></li>
-            <li><a href="#">Yet another</a></li>
-        </ul>
-
-        <!--<a href="#" data-dropdown="drop" class="tiny button dropdown">Dropdown Button</a><br>-->
-        <!--<a href="#" data-dropdown="drop" class="small secondary radius button dropdown">Dropdown Button</a><br>-->
-        <a href="#" data-dropdown="drop" class="button primary dropdown">Dropdown Button</a>
-        <a href="#" data-dropdown="drop" class="button secondary dropdown">Dropdown Button</a>
-        <!--<a href="#" data-dropdown="drop" class="button success dropdown">Dropdown Button</a>-->
-        <!--<a href="#" data-dropdown="drop" class="button warning dropdown">Dropdown Button</a>-->
-        <!--<a href="#" data-dropdown="drop" class="button alert dropdown">Dropdown Button</a>-->
-        <!--<a href="#" data-dropdown="drop" class="large success button dropdown">Dropdown Button</a><br>-->
-        <!--<a href="#" data-dropdown="drop" class="large button dropdown expand">Dropdown Button</a>-->
-        <hr>
-        <h1 id="split-buttons">Split Buttons</h1>
-        <!--<p> <a href="#" class="tiny button split">Split Button <span data-dropdown="drop"></span></a><br>-->
-            <!--<a href="#" class="small secondary radius button split">Split Button <span data-dropdown="drop"></span></a><br>-->
-            <a href="#" class="button split">Split Button <span data-dropdown="drop"></span></a>
-            <!--<a href="#" class="large success button split">Split Button <span data-dropdown="drop"></span></a></p>-->
-        <hr>
-        <h1 id="dropdowns">Dropdowns</h1>
-        <a class="button" data-dropdown="tinyDrop" href="#">Link Dropdown &raquo;</a>
-        <a class="button" data-dropdown="contentDrop" href="#">Content Dropdown &raquo;</a>
-        <!-- Dropdowns -->
-        <ul class="f-dropdown" data-dropdown-content="" id="tinyDrop">
-            <li><a href="#">This is a link</a></li>
-
-            <li><a href="#">This is another</a></li>
-
-            <li><a href="#">Yet another</a></li>
-        </ul>
-        <hr>
-        <div class="f-dropdown content medium" data-dropdown-content="" id=
-                "contentDrop">
-            <h1>Title</h1>
-            <p>Some text that people will think is awesome! Some text that people will
-               think is awesome! Some text that people will think is awesome!</p><img src="http://foundation.zurb.com/docs/assets/img/examples/launch.jpg" alt="">
-            <p>Launching a Discovery Mission</p><a class="button" href="#">Button</a>
-        </div>
-
-        <h1 id="pagination">Pagination</h1>
-        <ul class="pagination">
-            <li class="arrow unavailable"><a href="">&lsaquo;</a></li>
-            <li class="current"><a href="">1</a></li>
-            <li><a href="">2</a></li>
-            <li><a href="">3</a></li>
-            <li><a href="">4</a></li>
-            <li class="unavailable"><a href="">&hellip;</a></li>
-            <li><a href="">12</a></li>
-            <li><a href="">13</a></li>
-            <li class="arrow"><a href="">&rsaquo;</a></li>
-        </ul>
-        <hr>
-        <h1 id="switches">Switches</h1>
-        <!--<div class="small-2 switch tiny">-->
-            <!--<input id="a" name="switch-a" type="radio" checked>-->
-            <!--<label for="a" onclick="">Off</label>-->
-
-            <!--<input id="a1" name="switch-a" type="radio">-->
-            <!--<label for="a1" onclick="">On</label>-->
-
-            <!--<span></span>-->
-        <!--</div>-->
-
-        <!--<div class="small-3 switch small">-->
-            <!--<input id="b" name="switch-b" type="radio" checked>-->
-            <!--<label for="b" onclick="">Off</label>-->
-
-            <!--<input id="b1" name="switch-b" type="radio">-->
-            <!--<label for="b1" onclick="">On</label>-->
-
-            <!--<span></span>-->
-        <!--</div>-->
-
-
-        <div class="switch">
-        <p>Checkbox</p>
-          <input id="exampleCheckboxSwitch" type="checkbox">
-          <label for="exampleCheckboxSwitch"></label>
-        </div>
-
-        <!-- Using radio buttons – each switch turns off the other two -->
-        <div class="switch round">
-        <p>Radio</p>
-          <input id="exampleRadioSwitch1" type="radio" checked name="testGroup">
-          <label for="exampleRadioSwitch1"></label>
-        </div> 
-
-        <div class="switch round">
-          <input id="exampleRadioSwitch2" type="radio" name="testGroup">
-          <label for="exampleRadioSwitch2"></label>
-        </div>
-
-        <hr>
-        <h1 id="alert-boxes">Alert Boxes</h1>
-        <div data-alert class="alert-box">
-            This is a standard alert (div.alert-box).
-            <a href="" class="close">&times;</a>
-        </div>
-
-        <div data-alert class="alert-box secondary">
-            This is a secondary alert (div.alert-box.secondary).
-            <a href="" class="close">&times;</a>
-        </div>
-
-        <div data-alert class="alert-box success">
-            This is a success alert (div.alert-box.success).
-            <a href="" class="close">&times;</a>
-        </div>
-
-        <div data-alert class="alert-box warning">
-            This is a warning alert (div.alert-box.alert.round).
-            <a href="" class="close">&times;</a>
-        </div>
-
-        <div data-alert class="alert-box alert">
-            This is a danger alert (div.alert-box.alert.round).
-            <a href="" class="close">&times;</a>
-        </div>
-
-        <hr>
-        <h1 id="forms">Forms</h1>
-        <form data-abide>
-            <div class="row">
-                <div class="large-12 columns">
-                    <label>Input Label
-                        <input type="text" placeholder="large-12.columns" />
-                    </label>
-                </div>
-            </div>
-            <div class="row">
-                <div class="large-4 columns">
-                    <label>Input Label
-                        <input type="text" placeholder="large-4.columns" />
-                    </label>
-                </div>
-                <div class="large-4 columns">
-                    <label>Input Label
-                        <input type="text" placeholder="large-4.columns" aria-describedby="nameHelpText" required />
-                        <small class="error">Please provide your name</small>
-                    </label>
-                </div>
-                <div class="large-4 columns">
-                    <div class="row collapse">
-                        <label>Input Label</label>
-                        <div class="small-9 columns">
-                            <input type="text" placeholder="small-9.columns" />
-                        </div>
-                        <div class="small-3 columns">
-                            <span class="postfix">.com</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="large-12 columns">
-                    <label>Select Box
-                        <select>
-                            <option value="husker">Husker</option>
-                            <option value="starbuck">Starbuck</option>
-                            <option value="hotdog">Hot Dog</option>
-                            <option value="apollo">Apollo</option>
-                        </select>
-                    </label>
-                </div>
-            </div>
-            <div class="row">
-                <div class="large-6 columns">
-                    <label>Choose Your Favorite</label>
-                    <input type="radio" name="pokemon" value="Red" id="pokemonRed"><label class="radio-label"for="pokemonRed">Red</label>
-                    <input type="radio" name="pokemon" value="Blue" id="pokemonBlue"><label class="radio-label" for="pokemonBlue">Blue</label>
-                </div>
-                <div class="large-6 columns">
-                    <label>Check these out</label>
-                    <input id="checkbox1" type="checkbox"><label for="checkbox1" class="checkbox-label">Checkbox 1</label>
-                    <input id="checkbox2" type="checkbox"><label for="checkbox2" class="checkbox-label">Checkbox 2</label>
-                </div>
-            </div>
-            <div class="row">
-                <div class="large-12 columns">
-                    <label>Textarea Label
-                        <textarea placeholder="small-12.columns"></textarea>
-                    </label>
-                </div>
-            </div>
-            <div class="row">
-                <div class="large-12 columns">
-                    <input type="submit" name='submit' value="Send" />
-                </div>
-            </div>
-        </form>
-        <hr>
-
-        <h3>Dropzone</h3>
-        <form class="dropzone" id="myAwesomeDropzone" action="/cms/myFileForm.php?ajax=1"></form>
-
-        <hr>
-
-        <h3>Datepicker</h3>
-        <p>Date: <input type="text" id="datepicker"></p>
-
-        <hr>
-
-        <h3>AutoSuggest</h3>
-        <p><input type="text" autocomplete="off" id="selectize-me"></p>
-
-        <!--<h1 id="block-grid">Block Grid</h1>-->
-        <!--<ul class="small-block-grid-2 large-block-grid-4">-->
-            <!--<li><img class="th" src="http://foundation.zurb.com/docs/assets/img/examples/comet-th.jpg" alt=""></li>-->
-            <!--<li><img class="th" src="http://foundation.zurb.com/docs/assets/img/examples/launch-th.jpg" alt=""></li>-->
-            <!--<li><img class="th" src="http://foundation.zurb.com/docs/assets/img/examples/space-th.jpg" alt=""></li>-->
-            <!--<li><img class="th" src="http://foundation.zurb.com/docs/assets/img/examples/spacewalk-th.jpg" alt=""></li>-->
-        <!--</ul>--> 
-        <hr>
-
-        <h1 id="clearing">Clearing</h1>
-        <div>
-            <ul class="clearing-thumbs" data-clearing>
-                <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/comet.jpg"><img data-caption="Nulla vitae elit libero, a pharetra augue. Cras mattis consectetur purus sit amet fermentum." src="http://foundation.zurb.com/docs/assets/img/examples/comet-th-sm.jpg" alt=""></a></li>
-                <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/earth.jpg"><img src="http://foundation.zurb.com/docs/assets/img/examples/earth-th-sm.jpg" alt=""></a></li>
-                <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/launch.jpg"><img data-caption="Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus." src="http://foundation.zurb.com/docs/assets/img/examples/launch-th-sm.jpg" alt=""></a></li>
-                <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/satelite.jpg"><img src="http://foundation.zurb.com/docs/assets/img/examples/satelite-th-sm.jpg" alt=""></a></li>
-                <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/space.jpg"><img data-caption="Integer posuere erat a ante venenatis dapibus posuere velit aliquet." src="http://foundation.zurb.com/docs/assets/img/examples/space-th-sm.jpg" alt=""></a></li>
-            </ul>
-        </div>
-        <hr>
-
-
-        <hr>
-        <h1 id="flex-video">Flex Video</h1>
-        <div class="flex-video">
-            <iframe width="420" height="315" src="http://www.youtube.com/embed/0_EW8aNgKlA" frameborder="0" allowfullscreen></iframe>
-        </div>
-
-        <hr>
-        <h1 id="inline-lists">Inline Lists</h1>
-        <ul class="inline-list">
-            <li><a href="#">Link 1</a></li>
-            <li><a href="#">Link 2</a></li>
-            <li><a href="#">Link 3</a></li>
-            <li><a href="#">Link 4</a></li>
-            <li><a href="#">Link 5</a></li>
-        </ul>
-
-        <hr>
-        <h1 id="joyride">Joyride</h1>
-        <!-- At the bottom of your page but inside of the body tag -->
-        <ol class="joyride-list" data-joyride>
-            <li data-id="firstStop" data-text="Next" data-options="tip_location: top; prev_button: false">
-                <p>Hello and welcome to the Joyride documentation page.</p>
-            </li>
-            <li data-id="numero1" data-class="custom so-awesome" data-text="Next" data-prev-text="Prev">
-                <h1>Stop #1</h1>
-                <p>You can control all the details for you tour stop. Any valid HTML will work inside of Joyride.</p>
-            </li>
-            <li data-id="numero2" data-button="Next" data-prev-text="Prev" data-options="tip_location:top;tip_animation:fade">
-                <h1>Stop #2</h1>
-                <p>Get the details right by styling Joyride with a custom stylesheet!</p>
-            </li>
-            <li data-button="End" data-prev-text="Prev">
-                <h1>Stop #3</h1>
-                <p>It works as a modal too!</p>
-            </li>
-        </ol>
-        <!--<div id="firstStop" class="panel"><p>Ride the whale.</p></div>-->
-        <!--<p id="numero1" class="panel">Megalodon<p>-->
-        <!--<p id="numero2" class="panel">Kraken</p>-->
-        <!--<p id="End" class="panel">Whale</p>-->
-        <!--&lt;!&ndash; At the bottom of your page but inside of the body tag &ndash;&gt;-->
-        <!--<div id="joyride-go">-->
-            <!--<ol class="joyride-list" data-joyride>-->
-                <!--<li data-id="firstStop" data-text="Next" data-options="tip_location: top; prev_button: false">-->
-                    <!--<p>Welcome to Rapture, the home of Schoolbox.</p>-->
-                    <!--<p><img src="http://www.twinfinite.net/wp-content/uploads/2014/07/bioshock-rapture-city1.jpg" /></p>-->
-                <!--</li>-->
-                <!--<li data-id="numero1" data-class="custom so-awesome" data-text="Next" data-prev-text="Prev">-->
-                    <!--<h1>Stop #1</h1>-->
-                    <!--<p>You can control all the details for you tour stop. Any valid HTML will work inside of Joyride.</p>-->
-                <!--</li>-->
-                <!--<li data-id="numero2" data-button="Next" data-prev-text="Prev" data-options="tip_location:top;tip_animation:fade">-->
-                    <!--<h1>Stop #2</h1>-->
-                    <!--<p>Get the details right by styling Joyride with a custom stylesheet!</p>-->
-                <!--</li>-->
-                <!--<li data-button="End" data-prev-text="Prev">-->
-                    <!--<h1>Stop #3</h1>-->
-                    <!--<p>It works as a modal too!</p>-->
-                    <!--<p><img src="http://www.emeraldene.com.au/blog/wp-content/uploads/2013/05/Whale-Watching-2013.jpg" /></p>-->
-                <!--</li>-->
-            <!--</ol>-->
-        <!--</div>-->
-        <!--<p>To make something pretty, press and hold <kbd>cmd + alt + shift + w + a + !</kbd></p>-->
-        <hr>
-        <h1 id="labels">Labels</h1>
-        <p>
-            <span class="submitted label">Submitted</span>
-            <span class="submitted-late label">Submitted Late</span>
-            <span class="unsubmitted label">Unsubmitted</span>
-        </p>
-        <p>
-            <span class="primary label">Primary Label</span>
-            <span class="secondary label">Secondary Label</span>
-            <span class="alert label">Alert Label</span>
-            <span class="success label">Success Label</span>
-        </p>
-
-        <hr>
-        <h1 id="magellan">Magellan (Sticky Nav)</h1>
-        <div class="magellan-container" data-magellan-expedition="fixed">
-            <ul class="sub-nav inline-list">
-                <li data-magellan-arrival="build"><a href="#build">Build with HTML</a></li>
-                <li data-magellan-arrival="js"><a href="#js">Using Javascript</a></li>
-            </ul>
-        </div>
-
-        <a name="build"></a>
-        <h5 data-magellan-destination="build">Build With Predefined HTML Structure</h5>
-
-        <a name="js"></a>
-        <h5 data-magellan-destination="js">Awesome JS Goodness</h5>
-
-        <hr>
-        <h1 id="orbit">Orbit</h1>
-        <div class="row">
-            <div class="large-12 columns">
-                <ul id="featured1" data-orbit data-options="timer_speed:5000;">
-                    <li>
-                        <img src="http://foundation.zurb.com/docs/assets/img/examples/satelite-orbit.jpg" alt=""/>
-                        <div class="orbit-caption">
-                            Caption One. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                        </div>
-                    </li>
-                    <li>
-                        <img src="http://foundation.zurb.com/docs/assets/img/examples/andromeda-orbit.jpg" alt=""/>
-                        <div class="orbit-caption">
-                            Caption Two. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                        </div>
-                    </li>
-                    <li>
-                        <img src="http://foundation.zurb.com/docs/assets/img/examples/launch-orbit.jpg" alt=""/>
-                        <div class="orbit-caption">
-                            Caption Three. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <hr>
-        <h1 id="panels">Panels</h1>
-        <div class="row">
-            <div class="large-6 columns">
-                <div class="panel">
-                    <h5>This is a regular panel.</h5>
-                    <p>It has an easy to override visual style, and is appropriately subdued.</p>
-                </div>
-            </div>
-            <div class="large-6 columns">
-                <div class="panel callout radius">
-                    <h5>This is a callout panel with radiused edges.</h5>
-                    <p>It&#39;s a little ostentatious, but useful for important content.</p>
-                </div>
-            </div>
-            <div class="large-6 columns">
-                <div class="highlight-panel">
-                    <h5>This is a callout panel with radiused edges.</h5>
-                    <p>It&#39;s a little ostentatious, but useful for important content.</p>
-                </div>
-            </div>
-            <div class="large-6 columns">
-                <div class="alert-panel">
-                    <h5>This is a callout panel with radiused edges.</h5>
-                    <p>It&#39;s a little ostentatious, but useful for important content.</p>
-                </div>
-            </div>
-        </div>
-
-        <hr>
-        <h1 id="progress-bars">Progress Bars</h1>
-        <div class="progress large-6"><span class="meter" style="width: 40%"></span></div>
-        <div class="radius progress success large-8"><span class="meter" style="width: 80%"></span></div>
-        <div class="nice round progress alert large-10"><span class="meter" style="width: 30%"></span></div>
-        <div class="nice secondary progress"><span class="meter" style="width: 50%"></span></div>
-
-        <hr>
-        <h1 id="reveal">Reveal</h1>
-        <a href="#" data-reveal-id="firstModal" class="button">Example Modal&hellip;</a>
-        <a href="#" data-reveal-id="videoModal" class="secondary button">Example Modal w/Video&hellip;</a>
-        <!-- Reveal Modals begin -->
-        <div id="firstModal" class="reveal-modal" data-reveal>
-            <h2>This is a modal.</h2>
-            <p>Reveal makes these very easy to summon and dismiss. The close button is simply an anchor with a unicode character icon and a class of <code>close-reveal-modal</code>. Clicking anywhere outside the modal will also dismiss it.</p>
-            <p>Finally, if your modal summons another Reveal modal, the plugin will handle that for you gracefully.</p>
-            <a href="#" data-reveal-id="secondModal" class="secondary button">Second Modal...</a>
-            <a class="close-reveal-modal">&#215;</a>
-        </div>
-
-        <div id="secondModal" class="reveal-modal" data-reveal>
-            <h2>This is a second modal.</h2>
-            <p>See? It just slides into place after the other first modal. Very handy when you need subsequent dialogs, or when a modal option impacts or requires another decision.</p>
-            <a class="close-reveal-modal">&#215;</a>
-        </div>
-
-        <div id="videoModal" class="reveal-modal large" data-reveal>
-            <h2>This modal has video</h2>
-            <div class="flex-video">
-                <iframe width="420" height="315" src="//www.youtube.com/embed/aiBt44rrslw" frameborder="0" allowfullscreen></iframe>
-            </div>
-
-            <a class="close-reveal-modal">&#215;</a>
-        </div>
-        <!-- Reveal Modals end -->
-
-        <hr>
-        <h1 id="accordion">Accordion</h1>
-        <dl class="accordion" data-accordion>
-            <dd>
-                <a href="#panel1">Accordion 1</a>
-                <div id="panel1" class="content active">
-                    <dl class="tabs" data-tab>
-                        <dd class="active"><a href="#panel1-1">Tab 1</a></dd>
-                        <dd><a href="#panel1-2">Tab 2</a></dd>
-                        <dd><a href="#panel1-3">Tab 3</a></dd>
-                        <dd><a href="#panel1-4">Tab 4</a></dd>
-                    </dl>
-                    <div class="tabs-content">
-                        <div class="content active" id="panel1-1">
-                            <p>First panel content goes here...</p>
-                        </div>
-                        <div class="content" id="panel1-2">
-                            <p>Second panel content goes here...</p>
-                        </div>
-                        <div class="content" id="panel1-3">
-                            <p>Third panel content goes here...</p>
-                        </div>
-                        <div class="content" id="panel1-4">
-                            <p>Fourth panel content goes here...</p>
-                        </div>
-                    </div>
-                </div>
-            </dd>
-            <dd>
-                <a href="#panel2">Accordion 2</a>
-                <div id="panel2" class="content">
-                    Panel 2. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                </div>
-            </dd>
-            <dd>
-                <a href="#panel3">Accordion 3</a>
-                <div id="panel3" class="content">
-                    Panel 3. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                </div>
-            </dd>
-        </dl>
-
-        <hr>
-        <h1 id="tabs">Tabs</h1>
-        <dl class="tabs" data-tab>
-            <dd class="active"><a href="#panel2-1">Tab 1</a></dd>
-            <dd><a href="#panel2-2">Tab 2</a></dd>
-            <dd><a href="#panel2-3">Tab 3</a></dd>
-            <dd><a href="#panel2-4">Tab 4</a></dd>
-        </dl>
-        <div class="tabs-content">
-            <div class="content active" id="panel2-1">
-                <p>First panel content goes here...</p>
-            </div>
-            <div class="content" id="panel2-2">
-                <p>Second panel content goes here...</p>
-            </div>
-            <div class="content" id="panel2-3">
-                <p>Third panel content goes here...</p>
-            </div>
-            <div class="content" id="panel2-4">
-                <p>Fourth panel content goes here...</p>
-            </div>
-        </div>
-
-        <dl class="tabs vertical" data-tab="">
-            <dd class="active"><a href="#panel1a">Tab 1</a></dd>
-
-            <dd><a href="#panel2a">Tab 2</a></dd>
-
-            <dd><a href="#panel3a">Tab 3</a></dd>
-
-            <dd><a href="#panel4a">Tab 4</a></dd>
-        </dl>
-
-        <div class="tabs-content vertical">
-            <div class="content active" id="panel1a">
-                <p>Panel 1 content goes here.</p>
-            </div>
-
-            <div class="content" id="panel2a">
-                <p>Panel 2 content goes here.</p>
-            </div>
-
-            <div class="content" id="panel3a">
-                <p>Panel 3 content goes here.</p>
-            </div>
-
-            <div class="content" id="panel4a">
-                <p>Panel 4 content goes here.</p>
-            </div>
-        </div>
-
-
-
-        <hr>
-        <h1 id="side-nav">Side Nav</h1>
-        <div class="row">
-            <div class="large-4 columns end">
-                <ul class="side-nav">
-                    <li class="active"><a href="#">Link 1</a></li>
-                    <li><a href="#">Link 2</a></li>
-                    <li class="divider"></li>
-                    <li><a href="#">Link 3</a></li>
-                    <li><a href="#">Link 4</a></li>
-                </ul>
-            </div>
-        </div>
-
-        <hr>
-        <!--<h1 id="sub-nav">Sub Nav</h1>-->
-        <!--<dl class="sub-nav">-->
-            <!--<dt>Filter:</dt>-->
-            <!--<dd class="active"><a href="#">All</a></dd>-->
-            <!--<dd><a href="#">Active</a></dd>-->
-            <!--<dd><a href="#">Pending</a></dd>-->
-            <!--<dd><a href="#">Suspended</a></dd>-->
-        <!--</dl>-->
-
-        <hr>
-        <h1 id="tables">Tables</h1>
-        <table>
-            <thead>
-            <tr>
-                <th width="200">Table Header</th>
-                <th>Table Header</th>
-                <th width="150">Table Header</th>
-                <th width="150">Table Header</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>Mank</td>
-                <td>This is longer content Donec id elit non mi porta gravida at eget metus.</td>
-                <td>Content Goes Here</td>
-                <td>Content Goes Here</td>
-            </tr>
-            <tr>
-                <td>Twonk</td>
-                <td>This is longer Content Goes Here Donec id elit non mi porta gravida at eget metus.</td>
-                <td>Content Goes Here</td>
-                <td>Content Goes Here</td>
-            </tr>
-            <tr>
-                <td>Faffing</td>
-                <td>This is longer Content Goes Here Donec id elit non mi porta gravida at eget metus.</td>
-                <td>Content Goes Here</td>
-                <td>Content Goes Here</td>
-            </tr>
-            </tbody>
-        </table>
-        <table id="sortable">
-            <thead>
-            <tr>
-                <th width="200">Table Header</th>
-                <th>Table Header</th>
-                <th width="150">Table Header</th>
-                <th width="150">Table Header</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>Mank</td>
-                <td>This is longer content Donec id elit non mi porta gravida at eget metus.</td>
-                <td>Content Goes Here</td>
-                <td>Content Goes Here</td>
-            </tr>
-            <tr>
-                <td>Twonk</td>
-                <td>This is longer Content Goes Here Donec id elit non mi porta gravida at eget metus.</td>
-                <td>Content Goes Here</td>
-                <td>Content Goes Here</td>
-            </tr>
-            <tr>
-                <td>Faffing</td>
-                <td>This is longer Content Goes Here Donec id elit non mi porta gravida at eget metus.</td>
-                <td>Content Goes Here</td>
-                <td>Content Goes Here</td>
-            </tr>
-            </tbody>
-        </table>
-
-        <hr>
-        <h1 id="thumbnails">Thumbnails</h1>
-        <p><img class="th" src="http://foundation.zurb.com/docs/assets/img/examples/earth-th-sm.jpg" alt=""><img class="th" src="http://foundation.zurb.com/docs/assets/img/examples/space-th-sm.jpg" alt=""></p>
-        <hr>
-        <h1 id="tooltips">Tooltips</h1>
-        <p>The tooltips can be positioned on the <span data-tooltip class="has-tip" data-width="400" title="I'm on bottom and the default position.">&quot;tip-bottom&quot;</span>, which is the default position, <span data-tooltip class="has-tip tip-top noradius" data-width="210" title="I'm on the top and I'm not rounded!">&quot;tip-top&quot; (hehe)</span>, <span data-tooltip="left" class="has-tip tip-left" data-width="90" title="I'm on the left!">&quot;tip-left&quot;</span>, or <span data-tooltip="right" class="has-tip tip-right" data-width="520" title="I'm on the right!">&quot;tip-right&quot;</span> of the target element by adding the appropriate class to them. You can even add your own custom class to style each tip differently. On a small device, the tooltips are full width and bottom aligned.</p>
-
-        <hr>
-        <h1 id="top-bar">Top Bar</h1>
+    <h1>Files Component - information-list</h1>
+    <div class="row full-width">
         <nav class="top-bar" data-topbar>
             <ul class="title-area">
                 <!-- Title Area -->
                 <li class="name">
-                    <h1>
-                        <a href="#">
-                            Top Bar Title
-                        </a>
-                    </h1>
+                    <h1><a href="#">Files</a></h1>
                 </li>
-                <li class="toggle-topbar menu-icon"><a href="#"><span>menu</span></a></li>
             </ul>
-
             <section class="top-bar-section">
                 <!-- Right Nav Section -->
                 <ul class="right">
                     <li class="divider"></li>
-                    <li class="has-dropdown">
-                        <a href="#">Main Item 1</a>
-                        <ul class="dropdown">
-                            <li><label>Section Name</label></li>
-                            <li class="has-dropdown">
-                                <a href="#" class="">Has Dropdown, Level 1</a>
-                                <ul class="dropdown">
-                                    <li><a href="#">Dropdown Options</a></li>
-                                    <li><a href="#">Dropdown Options</a></li>
-                                    <li><a href="#">Level 2</a></li>
-                                    <li><a href="#">Subdropdown Option</a></li>
-                                    <li><a href="#">Subdropdown Option</a></li>
-                                    <li><a href="#">Subdropdown Option</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="#">Dropdown Option</a></li>
-                            <li><a href="#">Dropdown Option</a></li>
-                            <li class="divider"></li>
-                            <li><label>Section Name</label></li>
-                            <li><a href="#">Dropdown Option</a></li>
-                            <li><a href="#">Dropdown Option</a></li>
-                            <li><a href="#">Dropdown Option</a></li>
-                            <li class="divider"></li>
-                            <li><a href="#">See all &rarr;</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="#" data-reveal-id="setModal" class="button icon-settings" title="File Settings">Settings</a></li>
                     <li class="divider"></li>
-                    <li class="has-dropdown">
-                        <a href="#">Main Item 2</a>
-                        <ul class="dropdown">
-                            <li><a href="#">Dropdown Option</a></li>
-                            <li><a href="#">Dropdown Option</a></li>
-                            <li><a href="#">Dropdown Option</a></li>
-                            <li class="divider"></li>
-                            <li><a href="#">See all &rarr;</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="#" class="button no-text icon-close" data-target="delete-it" title="Close"></a></li>
+                    <!-- Settings Modal -->
+                </ul>
+                <div id="setModal" class="reveal-modal" data-reveal>
+                    <h2>File Settings</h2>
+                    <form action="/homepage/configForm.php" method="GET">
+                        <label>
+                            Heading
+                            <input id="componentname" type="text" name="componentname" value="Files">
+                        </label>
+                        Filter
+                        <input id="119_document" type="checkbox" name="componentname" value="Files">
+                        <label for="119_document" class="checkbox-label">Document</label>
+
+                        <input id="119_audio" type="checkbox" name="componentname" value="Files">
+                        <label for="119_audio" class="checkbox-label">Audio</label>
+
+                        <input id="119_video" type="checkbox" name="componentname" value="Files">
+                        <label for="119_video" class="checkbox-label">Video</label>
+
+                        <input id="119_image" type="checkbox" name="componentname" value="Files">
+                        <label for="119_image" class="checkbox-label">Image</label>
+
+                        <input id="119_other" type="checkbox" name="componentname" value="Files">
+                        <label for="119_other" class="checkbox-label">Other</label>
+                        
+                        <label for="size">
+                            Limit
+                            <select id="size" name="size">
+                                <option value="0">All</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                            </select>
+                        </label>
+
+                        <label for="sort">
+                            Sort by
+                            <select id="sort" name="sort">
+                                <option value="name">Name</option>
+                                <option value="date">Date</option>
+                            </select>
+                        </label>
+
+                        <label for="sortdir">
+                            Direction
+                            <select id="sortdir" name="sortdir">
+                                <option value="asc">Ascending</option>
+                                <option value="desc">Descending</option>
+                            </select>
+                        </label>
+                        
+                        <label for="src-component_23_119">
+                            Source
+                            <a href="#" id="text-component_23_119" title="Local">Local</a>
+                            <a href="#" id="launch-browser-component_23_119" class="button icon-folder">Select Source</a>
+                            <input type="hidden" value="#" name="src" id="src-component_23_119">
+                        </label>
+                        
+                        <label for="submit">
+                            <input id="submit" type="submit" value="Update" class="button success">
+                        </label>
+                        
+                    </form>
+                    <a class="close-reveal-modal">&#215;</a>
+                </div>
+            </section>
+        </nav>
+        <div class="delete-it">
+            <p>Are you sure you want to remove this component? <a href="#" class="success button">Yes</a> <a href="#" class="button">No</a></p>
+        </div>
+        <div class="island">
+            <ul class="action-list">
+                <li>
+                    <div class="row collapse full-width">
+                        <div class="content small-12 medium-11 columns">
+                            <h3><a href="#" class="file icon-document">Absolute Twaddle</a></h3>
+                        </div>
+                        <div class="actions one">
+                            <a href="#" class="no-text icon-modify"></a>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="row collapse full-width">
+                        <div class="small-12 medium-10 columns">
+                            <h3><a href="#" class="file icon-document">Mank</a></h3>
+                        </div>
+                        <div class="actions two">
+                            <a href="#" class="no-text icon-modify"></a>
+                            <a href="#" class="no-text icon-calendar"></a>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="row collapse full-width">
+                        <div class="small-12 medium-9 columns">
+                            <h3><a href="#" class="file icon-document">Shakespear Assignment IV</a></h3>
+                        </div>
+                        <div class="actions three">
+                            <a href="#" class="no-text icon-modify"></a>
+                            <a href="#" class="no-text icon-chat"></a>
+                            <a href="#" class="no-text icon-calendar"></a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <hr>
+
+    <h1>Due Work History - activity-list</h1>
+    <div class="row full-width">
+        <nav class="top-bar" data-topbar>
+            <ul class="title-area">
+                <!-- Title Area -->
+                <li class="name">
+                    <h1><a href="#">Due Work History</a></h1>
+                </li>
+            </ul>
+            <section class="top-bar-section">
+                <!-- Right Nav Section -->
+                <ul class="right">
+                    <li class="divider"></li>
+                    <li><a href="#" class="button no-text icon-close" data-target="delete-it" title="Close"></a></li>
+                    <!-- Settings Modal -->
                 </ul>
             </section>
         </nav>
-
-        <!-- End Top Bar -->
-
-        <hr>
-        <h1 id="type">Type</h1>
-        <h1>h1. This is a very large header.</h1>
-        <h2>h2. This is a large header.</h2>
-        <h3>h3. This is a medium header.</h3>
-        <h1>h1. This is a moderate header.</h1>
-        <h5>h5. This is a small header.</h5>
-        <h6>h6. This is a tiny header.</h6>
-
-        <h1 class="subheader">h1.subheader</h1>
-        <h2 class="subheader">h2.subheader</h2>
-        <h3 class="subheader">h3.subheader</h3>
-        <h1 class="subheader">h1.subheader</h1>
-        <h5 class="subheader">h5.subheader</h5>
-        <h6 class="subheader">h6.subheader</h6>
-
-        <p><br></p>
-        <ul class="disc">
-            <li>List item with a much longer description or more content.</li>
-            <li>List item</li>
-            <li>List item
-                <ul>
-                    <li>Nested List Item</li>
-                    <li>Nested List Item</li>
-                    <li>Nested List Item</li>
-                </ul>
-            </li>
-            <li>List item</li>
-            <li>List item</li>
-            <li>List item</li>
-        </ul>
-
-        <h5>Ordered lists are great for lists that need order, duh.</h5>
-        <ol>
-            <li>List Item 1</li>
-            <li>List Item 2</li>
-            <li>List Item 3</li>
-        </ol>
-
-        <h5>Definition lists are great for small block of copy that describe the header</h5>
-        <dl>
-            <dt>Definition List</dt>
-            <dd>Definition Cras justo odio, dapibus ac facilisis in, egestas eget quam. Nullam id dolor id nibh ultricies vehicula ut id elit.</dd>
-        </dl>
-
-        <h5>Blockquote</h5>
-        <blockquote>I do not fear computers. I fear the lack of them. Maecenas faucibus mollis interdum. Aenean lacinia bibendum nulla sed consectetur.<cite>Isaac Asimov</cite></blockquote>
-
-        <h5>Vcard</h5>
-        <ul class="vcard">
-            <li class="fn">Gaius Baltar</li>
-            <li class="street-address">123 Colonial Ave.</li>
-            <li class="locality">Caprica City</li>
-            <li><span class="state">Caprica</span>, <span class="zip">12345</span></li>
-            <li class="email"><a href="#">g.baltar@example.com</a></li>
-        </ul>
-
-        <hr>
-        <h1 id="visibility-classes">Visibility Classes</h1>
-        <h5 id="screen-size-visibility-control-show-">Screen Size Visibility Control (Show)</h5>
-        <p>The following text should describe the screen size you&#39;re using:</p>
-        <p class="panel">
-            <strong class="show-for-small">You are on a small screen.</strong>
-            <strong class="show-for-medium">You are on a medium screen.</strong>
-            <strong class="show-for-medium-up">You are on a medium, large or xlarge screen.</strong>
-            <strong class="show-for-medium-down">You are on a medium or small screen.</strong>
-            <strong class="show-for-large">You are on a large screen.</strong>
-            <strong class="show-for-large-up">You are on a large or xlarge screen.</strong>
-            <strong class="show-for-large-down">You are on a large, medium or small screen.</strong>
-            <strong class="show-for-xlarge">You are on a xlarge screen.</strong>
-        </p>
-
-        <h5 id="screen-size-visibility-control-hide-">Screen Size Visibility Control (Hide)</h5>
-        <p>The following text should describe the screen size you aren&#39;t using:</p>
-        <p class="panel">
-            <strong class="hide-for-small">You are <em>not</em> on a small screen.</strong>
-            <strong class="hide-for-medium">You are <em>not</em> on a medium screen.</strong>
-            <strong class="hide-for-medium-up">You are <em>not</em> on a medium, large or xlarge screen.</strong>
-            <strong class="hide-for-medium-down">You are <em>not</em> on a medium or small screen.</strong>
-            <strong class="hide-for-large">You are <em>not</em> on a large screen.</strong>
-            <strong class="hide-for-large-up">You are <em>not</em> on a large or xlarge screen.</strong>
-            <strong class="hide-for-large-down">You are <em>not</em> on a large, medium or small screen.</strong>
-            <strong class="hide-for-xlarge">You are <em>not</em> on a xlarge screen.</strong>
-        </p>
-
-        <h5 id="orientation-detection">Orientation Detection</h5>
-        <p>The following text should describe the device orientation you&#39;re using:</p>
-        <p class="panel">
-            <strong class="show-for-landscape">You are in landscape orientation.</strong>
-            <strong class="show-for-portrait">You are in portrait orientation.</strong>
-        </p>
-
-        <h5 id="touch-detection">Touch Detection</h5>
-        <p>The following text should describe if you&#39;re using a touch device:</p>
-        <p class="panel">
-            <strong class="show-for-touch">You are on a touch-enabled device.</strong>
-            <strong class="hide-for-touch">You are not on a touch-enabled device.</strong>
-        </p>
-
+        <div class="island">
+            <ul class="activity-list">
+                <li>
+                    <div class="row collapse full-width">
+                        <div class="icon columns">
+                            <span class="no-text icon-news"></span>
+                        </div>
+                        <div class="thumbnail columns">
+                            <a href="#">
+                                <img src="https://placekitten.com/g/50/50" alt="Moggy">
+                            </a>
+                        </div>
+                        <div class="content columns">
+                            <p class="meta"><a href="#">Ms Celia Glenn</a> posted <a href="#">Shakespeare Assignment 1</a></p>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="row collapse full-width">
+                        <div class="thumbnail columns">
+                            <a href="#">
+                                <img src="https://placekitten.com/g/50/50" alt="Moggy">
+                            </a>
+                        </div>
+                        <div class="content columns">
+                            <p class="meta"><a href="#">Ms Celia Glenn</a> posted <a href="#">Shakespeare Assignment 1</a></p>
+                        </div>
+                        <div class="icon columns">
+                            <span class="no-text icon-download"></span>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="row collapse full-width">
+                        <div class="icon columns">
+                            <span class="no-text icon-showcase"></span>
+                        </div>
+                        <div class="thumbnail columns">
+                            <a href="#">
+                                <img src="https://placekitten.com/g/50/50" alt="Moggy">
+                            </a>
+                        </div>
+                        <div class="content columns">
+                            <p class="meta"><a href="#">Ms Celia Glenn</a> posted <a href="#">Shakespeare Assignment 1</a></p>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
     </div>
+    <hr>
+    
+    <h1>Course Outline - action-list</h1>
+    <div class="row full-width">
+        <nav class="top-bar" data-topbar>
+            <ul class="title-area">
+                <!-- Title Area -->
+                <li class="name">
+                    <h1><a href="#">Files</a></h1>
+                </li>
+            </ul>
+            <section class="top-bar-section">
+                <!-- Right Nav Section -->
+                <ul class="right">
+                    <li class="divider"></li>
+                    <li><a href="#" data-reveal-id="courseModal" class="button icon-settings" title="File Settings">Settings</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#" class="button no-text icon-close" data-target="delete-it" title="Close"></a></li>
+                    <!-- Settings Modal -->
+                </ul>
+                <div id="courseModal" class="reveal-modal" data-reveal>
+                    <h2>Course Outline Settings</h2>
+                    <form action="/homepage/configForm.php" method="GET">
+                        <label>
+                            Heading
+                            <input id="componentname" type="text" name="componentname" value="Files">
+                        </label>
+                        
+                        <label for="submit">
+                            <input id="submit" type="submit" value="Update" class="button success">
+                        </label>
+                        
+                    </form>
+                    <a class="close-reveal-modal">&#215;</a>
+                </div>
+            </section>
+        </nav>
+        <div class="island">
+            <ul class="action-list">
+                <li class="unit interact">
+                    <div class="row collapse full-width">
+                        <div class="small-12 medium-10 columns">
+                            <h3>
+                                <a href="#" class="expand-link button no-text icon-add" data-interaction="toggle-expanded"></a>
+                                <a href="#">Unit 666: Atomic destruction</a>
+                            </h3>
+                            <span class="warning label">Due in 2 weeks</span>
+                        </div>
+                        <div class="actions two">
+                            <a href="#" class="no-text icon-delete"></a>
+                            <a href="#" class="no-text icon-modify"></a>
+                        </div>
+                    </div>
+                    <ul class="action-list task-list">
+                        <li>
+                            <div class="row collapse full-width">
+                                <div class="small-12 medium-10 columns">
+                                    <h3><a href="#" class="file icon-document">Mank</a></h3>
+                                </div>
+                                <div class="actions two">
+                                    <a href="#" class="no-text icon-modify"></a>
+                                    <a href="#" class="no-text icon-calendar"></a>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="row collapse full-width">
+                                <div class="small-12 medium-9 columns">
+                                    <h3><a href="#" class="file icon-document">Shakespear Assignment IV</a></h3>
+                                </div>
+                                <div class="actions three">
+                                    <a href="#" class="no-text icon-modify"></a>
+                                    <a href="#" class="no-text icon-chat"></a>
+                                    <a href="#" class="no-text icon-calendar"></a>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <a href="#" class="button icon-approve">Add Task</a>
+            <a href="#" class="button icon-quiz">Create Quiz</a>
+            <a href="#" class="button icon-due-work">Post Due Work</a>
+            <a href="#" class="button icon-progress">Progress Report</a>
+        </div>
+    </div>
+    <hr>
+
+    <h1>Members Component - Grid Layout</h1>
+    <div class="row full-width">
+        <nav class="top-bar" data-topbar>
+            <ul class="title-area">
+                <!-- Title Area -->
+                <li class="name">
+                    <h1><a href="#">Group Members</a></h1>
+                </li>
+            </ul>
+            <section class="top-bar-section">
+                <!-- Right Nav Section -->
+                <ul class="right">
+                    <li class="divider"></li>
+                    <li><a href="#" data-reveal-id="memberModal" class="button icon-settings" title="File Settings">Settings</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#" class="button no-text icon-close" data-target="delete-it" title="Close"></a></li>
+                    <!-- Settings Modal -->
+                </ul>
+                <div id="memberModal" class="reveal-modal" data-reveal>
+                    <h2>Members Settings</h2>
+                    <form action="/homepage/configForm.php" method="GET">
+                        <label>
+                            Heading
+                            <input id="componentname" type="text" name="componentname" value="Members">
+                        </label>
+                        
+                        <label for="size">
+                            Limit
+                            <select id="size" name="size">
+                                <option value="list">List</option>
+                                <option value="grid">Grid</option>
+                            </select>
+                        </label>
+
+                        <label for="submit">
+                            <input id="submit" type="submit" value="Update" class="button success">
+                        </label>
+                    </form>
+                    <a class="close-reveal-modal">&#215;</a>
+                </div>
+            </section>
+        </nav>
+        <div class="island">
+            <ul class="grid small-block-grid-2 large-block-grid-4">
+                <li>
+                    <div class="row collapse full-width">
+                        <a href="#">
+                        <div class="thumbnail columns">
+                            <a href="#">
+                                <img src="https://placekitten.com/g/70/70" alt="Moggy">
+                            </a>
+                        </div>
+                        <div class="content">
+                            <h3><a href="#">Steve "Mort" Chan</a></h3>
+                            <p class="meta">Teachers</p>
+                        </div>
+                        </a>
+                    </div>
+                </li>
+                <li>
+                    <div class="row collapse full-width">
+                        <div class="thumbnail columns">
+                            <a href="#">
+                                <img src="https://placekitten.com/g/70/70" alt="Moggy">
+                            </a>
+                        </div>
+                        <div class="content">
+                            <h3><a href="#">Steve "Mort" Chan</a></h3>
+                            <p class="meta">Teachers</p>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="row collapse full-width">
+                        <div class="thumbnail columns">
+                            <a href="#">
+                                <img src="https://placekitten.com/g/70/70" alt="Moggy">
+                            </a>
+                        </div>
+                        <div class="content">
+                            <h3><a href="#">Steve "Mort" Chan</a></h3>
+                            <p class="meta">Teachers</p>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="row collapse full-width">
+                        <div class="thumbnail columns">
+                            <a href="#">
+                                <img src="https://placekitten.com/g/70/70" alt="Moggy">
+                            </a>
+                        </div>
+                        <div class="content">
+                            <h3><a href="#">Steve "Mort" Chan</a></h3>
+                            <p class="meta">Teachers</p>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <a href="#" class="button icon-email">Email all</a>
+        </div>
+    </div>
+
+    <hr>
+    <h1 id="buttons">Buttons</h1>
+    <div class="row full-width">
+        <div class="small-12 large-12 columns">
+            <!--<a href="#" class="tiny button">.tiny.button</a>-->
+            <!--<a href="#" class="small button">.small.button</a>-->
+            <!--<a href="#" class="tiny button secondary">.tiny.secondary</a><br>-->
+            <!--<a href="#" class="small button success radius">.small.success.radius</a><br>-->
+            <!--<a href="#" class="button alert round disabled">.round.disabled</a><br>-->
+            <a href="#" class="button">Primary</a>
+            <a href="#" class="button secondary">Secondary</a>
+            <a href="#" class="button success">Success</a>
+            <a href="#" class="button warning">Warning</a>
+            <a href="#" class="button alert">Delete</a><br>
+            <a href="#" class="button expand">Expand Full</a>
+        </div>
+        <hr>
+        <h1 id="buttons">Icons</h1>
+        <div class="small-12 large-12 columns">
+            <a href="#" class="button icon-add">icon-add</a>
+            <a href="#" class="button icon-advanced-list">icon-advanced-list</a>
+            <a href="#" class="button icon-alert">icon-alert</a>
+            <a href="#" class="button icon-anchor">icon-anchor</a>
+            <a href="#" class="button icon-approve">icon-approve</a>
+            <a href="#" class="button icon-audio">icon-audio</a>
+            <a href="#" class="button icon-breadcrumbs">icon-breadcrumbs</a>
+            <a href="#" class="button icon-calendar">icon-calendar</a>
+            <a href="#" class="button icon-chat">icon-chat</a>
+            <a href="#" class="button icon-class-list">icon-class-list</a>
+            <a href="#" class="button icon-click-view">icon-click-view</a>
+            <a href="#" class="button icon-close">icon-close</a>
+            <a href="#" class="button icon-collab-docs">icon-collab-docs</a>
+            <a href="#" class="button icon-collapse">icon-collapse</a>
+            <a href="#" class="button icon-comment">icon-comment</a>
+            <a href="#" class="button icon-components">icon-components</a>
+            <a href="#" class="button icon-copy">icon-copy</a>
+            <a href="#" class="button icon-countdown">icon-countdown</a>
+            <a href="#" class="button icon-course-builder">icon-course-builder</a>
+            <a href="#" class="button icon-course-outline">icon-course-outline</a>
+            <a href="#" class="button icon-curriculum">icon-curriculum</a>
+            <a href="#" class="button icon-delete">icon-delete</a>
+            <a href="#" class="button icon-directory">icon-directory</a>
+            <a href="#" class="button icon-document">icon-document</a>
+            <a href="#" class="button icon-download">icon-download</a>
+            <a href="#" class="button icon-drag-drop">icon-drag-drop</a>
+            <a href="#" class="button icon-drop-box">icon-drop-box</a>
+            <a href="#" class="button icon-due-work">icon-due-work</a>
+            <a href="#" class="button icon-edit-columns">icon-edit-columns</a>
+            <a href="#" class="button icon-email">icon-email</a>
+            <a href="#" class="button icon-eportfolio">icon-eportfolio</a>
+            <a href="#" class="button icon-export">icon-export</a>
+            <a href="#" class="button icon-favourite">icon-favourite</a>
+            <a href="#" class="button icon-files">icon-files</a>
+            <a href="#" class="button icon-filter">icon-filter</a>
+            <a href="#" class="button icon-folder">icon-folder</a>
+            <a href="#" class="button icon-forms">icon-forms</a>
+            <a href="#" class="button icon-forum">icon-forum</a>
+            <a href="#" class="button icon-grip">icon-grip</a>
+            <a href="#" class="button icon-group">icon-group</a>
+            <a href="#" class="button icon-group-managers">icon-group-managers</a>
+            <a href="#" class="button icon-help">icon-help</a>
+            <a href="#" class="button icon-history">icon-history</a>
+            <a href="#" class="button icon-homepagefeed">icon-homepagefeed</a>
+            <a href="#" class="button icon-image">icon-image</a>
+            <a href="#" class="button icon-image-gallery">icon-image-gallery</a>
+            <a href="#" class="button icon-image-slideshow">icon-image-slideshow</a>
+            <a href="#" class="button icon-link">icon-link</a>
+            <a href="#" class="button icon-list">icon-list</a>
+            <a href="#" class="button icon-locked">icon-locked</a>
+            <a href="#" class="button icon-logout">icon-logout</a>
+            <a href="#" class="button icon-menu">icon-menu</a>
+            <a href="#" class="button icon-mobile">icon-mobile</a>
+            <a href="#" class="button icon-modify">icon-modify</a>
+            <a href="#" class="button icon-more">icon-more</a>
+            <a href="#" class="button icon-network">icon-network</a>
+            <a href="#" class="button icon-news">icon-news</a>
+            <a href="#" class="button icon-next">icon-next</a>
+            <a href="#" class="button icon-notifications">icon-notifications</a>
+            <a href="#" class="button icon-open">icon-open</a>
+            <a href="#" class="button icon-pinterest">icon-pinterest</a>
+            <a href="#" class="button icon-podcast">icon-podcast</a>
+            <a href="#" class="button icon-poll">icon-poll</a>
+            <a href="#" class="button icon-previous">icon-previous</a>
+            <a href="#" class="button icon-print">icon-print</a>
+            <a href="#" class="button icon-progress">icon-progress</a>
+            <a href="#" class="button icon-quiz">icon-quiz</a>
+            <a href="#" class="button icon-random-image">icon-random-image</a>
+            <a href="#" class="button icon-refresh">icon-refresh</a>
+            <a href="#" class="button icon-reply">icon-reply</a>
+            <a href="#" class="button icon-resource-booking">icon-resource-booking</a>
+            <a href="#" class="button icon-rss">icon-rss</a>
+            <a href="#" class="button icon-rubrics">icon-rubrics</a>
+            <a href="#" class="button icon-schoolbox">icon-schoolbox</a>
+            <a href="#" class="button icon-search">icon-search</a>
+            <a href="#" class="button icon-settings">icon-settings</a>
+            <a href="#" class="button icon-showcase">icon-showcase</a>
+            <a href="#" class="button icon-shuffle">icon-shuffle</a>
+            <a href="#" class="button icon-social-stream">icon-social-stream</a>
+            <a href="#" class="button icon-sport">icon-sport</a>
+            <a href="#" class="button icon-staff">icon-staff</a>
+            <a href="#" class="button icon-staff-students">icon-staff-students</a>
+            <a href="#" class="button icon-surveys">icon-surveys</a>
+            <a href="#" class="button icon-synergetic">icon-synergetic</a>
+            <a href="#" class="button icon-task">icon-task</a>
+            <a href="#" class="button icon-teacher">icon-teacher</a>
+            <a href="#" class="button icon-textbox">icon-textbox</a>
+            <a href="#" class="button icon-tiles">icon-tiles</a>
+            <a href="#" class="button icon-timetable">icon-timetable</a>
+            <a href="#" class="button icon-time-value">icon-time-value</a>
+            <a href="#" class="button icon-twitte">icon-twitter</a>
+            <a href="#" class="button icon-undo">icon-undo</a>
+            <a href="#" class="button icon-upload">icon-upload</a>
+            <a href="#" class="button icon-video">icon-video</a>
+            <a href="#" class="button icon-view">icon-view</a>
+            <a href="#" class="button icon-weather">icon-weather</a>
+            <a href="#" class="button icon-wiki">icon-wiki</a>
+            <a href="#" class="button icon-wolfram-alpha">icon-wolfram-alpha</a>
+        </div>
+    </div>
+    <hr>
+    <h1 id="button-groups">Button Groups / Horizontal Tabs</h1>
+    <!--<ul class="button-group">-->
+        <!--<li><a href="#" class="button">Button 1</a></li>-->
+        <!--<li><a href="#" class="button">Button 2</a></li>-->
+        <!--<li><a href="#" class="button">Button 3</a></li>-->
+    <!--</ul>-->
+    <ul class="button-group">
+        <li><a href="#" class="button secondary">Button 1</a></li>
+        <li><a href="#" class="button secondary">Button 2</a></li>
+        <li><a href="#" class="button secondary">Button 3</a></li>
+        <li><a href="#" class="button secondary">Button 4</a></li>
+    </ul>
+    <!--<ul class="button-group round even-3">-->
+        <!--<li><a href="#" class="button alert">Button 1</a></li>-->
+        <!--<li><a href="#" class="button alert">Button 2</a></li>-->
+        <!--<li><a href="#" class="button alert">Button 3</a></li>-->
+    <!--</ul>-->
+    <!--<ul class="button-group round even-3">-->
+        <!--<li><input type="submit" class="button success" value="Button 1"></li>-->
+        <!--<li><input type="submit" class="button success" value="Button 2"></li>-->
+        <!--<li><input type="submit" class="button success" value="Button 3"></li>-->
+    <!--</ul>-->
+    <hr>
+    <h1 id="breadcrumbs">Breadcrumbs</h1>
+    <!--<ul class="breadcrumbs">-->
+        <!--<li><a href="#">Home</a></li>-->
+        <!--<li><a href="#">Features</a></li>-->
+        <!--<li class="unavailable"><a href="#">Gene Splicing</a></li>-->
+        <!--<li class="current"><a href="#">Cloning</a></li>-->
+    <!--</ul>-->
+    <ul class="breadcrumb">
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Features</a></li>
+        <li class="unavailable"><a href="#">Gene Splicing</a></li>
+        <li class="current"><a href="#">Cloning</a></li>
+    </ul>
+
+    <hr>
+    <h1 id="dropdown-buttons">Dropdown Buttons</h1>
+    <ul id="drop" class="f-dropdown" data-dropdown-content>
+        <li><a href="#">This is a link</a></li>
+        <li><a href="#">This is another</a></li>
+        <li><a href="#">Yet another</a></li>
+    </ul>
+
+    <!--<a href="#" data-dropdown="drop" class="tiny button dropdown">Dropdown Button</a><br>-->
+    <!--<a href="#" data-dropdown="drop" class="small secondary radius button dropdown">Dropdown Button</a><br>-->
+    <a href="#" data-dropdown="drop" class="button primary dropdown">Dropdown Button</a>
+    <a href="#" data-dropdown="drop" class="button secondary dropdown">Dropdown Button</a>
+    <!--<a href="#" data-dropdown="drop" class="button success dropdown">Dropdown Button</a>-->
+    <!--<a href="#" data-dropdown="drop" class="button warning dropdown">Dropdown Button</a>-->
+    <!--<a href="#" data-dropdown="drop" class="button alert dropdown">Dropdown Button</a>-->
+    <!--<a href="#" data-dropdown="drop" class="large success button dropdown">Dropdown Button</a><br>-->
+    <!--<a href="#" data-dropdown="drop" class="large button dropdown expand">Dropdown Button</a>-->
+    <hr>
+    <h1 id="split-buttons">Split Buttons</h1>
+    <!--<p> <a href="#" class="tiny button split">Split Button <span data-dropdown="drop"></span></a><br>-->
+        <!--<a href="#" class="small secondary radius button split">Split Button <span data-dropdown="drop"></span></a><br>-->
+        <a href="#" class="button split">Split Button <span data-dropdown="drop"></span></a>
+        <!--<a href="#" class="large success button split">Split Button <span data-dropdown="drop"></span></a></p>-->
+    <hr>
+    <h1 id="dropdowns">Dropdowns</h1>
+    <a class="button" data-dropdown="tinyDrop" href="#">Link Dropdown &raquo;</a>
+    <a class="button" data-dropdown="contentDrop" href="#">Content Dropdown &raquo;</a>
+    <!-- Dropdowns -->
+    <ul class="f-dropdown" data-dropdown-content="" id="tinyDrop">
+        <li><a href="#">This is a link</a></li>
+
+        <li><a href="#">This is another</a></li>
+
+        <li><a href="#">Yet another</a></li>
+    </ul>
+    <hr>
+    <div class="f-dropdown content medium" data-dropdown-content="" id=
+            "contentDrop">
+        <h1>Title</h1>
+        <p>Some text that people will think is awesome! Some text that people will
+           think is awesome! Some text that people will think is awesome!</p><img src="http://foundation.zurb.com/docs/assets/img/examples/launch.jpg" alt="">
+        <p>Launching a Discovery Mission</p><a class="button" href="#">Button</a>
+    </div>
+
+    <h1 id="pagination">Pagination</h1>
+    <ul class="pagination">
+        <li class="arrow unavailable"><a href="">&lsaquo;</a></li>
+        <li class="current"><a href="">1</a></li>
+        <li><a href="">2</a></li>
+        <li><a href="">3</a></li>
+        <li><a href="">4</a></li>
+        <li class="unavailable"><a href="">&hellip;</a></li>
+        <li><a href="">12</a></li>
+        <li><a href="">13</a></li>
+        <li class="arrow"><a href="">&rsaquo;</a></li>
+    </ul>
+    <hr>
+    <h1 id="switches">Switches</h1>
+    <!--<div class="small-2 switch tiny">-->
+        <!--<input id="a" name="switch-a" type="radio" checked>-->
+        <!--<label for="a" onclick="">Off</label>-->
+
+        <!--<input id="a1" name="switch-a" type="radio">-->
+        <!--<label for="a1" onclick="">On</label>-->
+
+        <!--<span></span>-->
+    <!--</div>-->
+
+    <!--<div class="small-3 switch small">-->
+        <!--<input id="b" name="switch-b" type="radio" checked>-->
+        <!--<label for="b" onclick="">Off</label>-->
+
+        <!--<input id="b1" name="switch-b" type="radio">-->
+        <!--<label for="b1" onclick="">On</label>-->
+
+        <!--<span></span>-->
+    <!--</div>-->
+
+
+    <div class="switch">
+    <p>Checkbox</p>
+      <input id="exampleCheckboxSwitch" type="checkbox">
+      <label for="exampleCheckboxSwitch"></label>
+    </div>
+
+    <!-- Using radio buttons – each switch turns off the other two -->
+    <div class="switch round">
+    <p>Radio</p>
+      <input id="exampleRadioSwitch1" type="radio" checked name="testGroup">
+      <label for="exampleRadioSwitch1"></label>
+    </div> 
+
+    <div class="switch round">
+      <input id="exampleRadioSwitch2" type="radio" name="testGroup">
+      <label for="exampleRadioSwitch2"></label>
+    </div>
+
+    <hr>
+    <h1 id="alert-boxes">Alert Boxes</h1>
+    <div data-alert class="alert-box">
+        This is a standard alert (div.alert-box).
+        <a href="" class="close">&times;</a>
+    </div>
+
+    <div data-alert class="alert-box secondary">
+        This is a secondary alert (div.alert-box.secondary).
+        <a href="" class="close">&times;</a>
+    </div>
+
+    <div data-alert class="alert-box success">
+        This is a success alert (div.alert-box.success).
+        <a href="" class="close">&times;</a>
+    </div>
+
+    <div data-alert class="alert-box warning">
+        This is a warning alert (div.alert-box.alert.round).
+        <a href="" class="close">&times;</a>
+    </div>
+
+    <div data-alert class="alert-box alert">
+        This is a danger alert (div.alert-box.alert.round).
+        <a href="" class="close">&times;</a>
+    </div>
+
+    <hr>
+    <h1 id="forms">Forms</h1>
+    <form data-abide>
+        <div class="row">
+            <div class="large-12 columns">
+                <label>Input Label
+                    <input type="text" placeholder="large-12.columns" />
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="large-4 columns">
+                <label>Input Label
+                    <input type="text" placeholder="large-4.columns" />
+                </label>
+            </div>
+            <div class="large-4 columns">
+                <label>Input Label
+                    <input type="text" placeholder="large-4.columns" aria-describedby="nameHelpText" required />
+                    <small class="error">Please provide your name</small>
+                </label>
+            </div>
+            <div class="large-4 columns">
+                <div class="row collapse">
+                    <label>Input Label</label>
+                    <div class="small-9 columns">
+                        <input type="text" placeholder="small-9.columns" />
+                    </div>
+                    <div class="small-3 columns">
+                        <span class="postfix">.com</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+                <label>Select Box
+                    <select>
+                        <option value="husker">Husker</option>
+                        <option value="starbuck">Starbuck</option>
+                        <option value="hotdog">Hot Dog</option>
+                        <option value="apollo">Apollo</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="large-6 columns">
+                <label>Choose Your Favorite</label>
+                <input type="radio" name="pokemon" value="Red" id="pokemonRed"><label class="radio-label"for="pokemonRed">Red</label>
+                <input type="radio" name="pokemon" value="Blue" id="pokemonBlue"><label class="radio-label" for="pokemonBlue">Blue</label>
+            </div>
+            <div class="large-6 columns">
+                <label>Check these out</label>
+                <input id="checkbox1" type="checkbox"><label for="checkbox1" class="checkbox-label">Checkbox 1</label>
+                <input id="checkbox2" type="checkbox"><label for="checkbox2" class="checkbox-label">Checkbox 2</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+                <label>Textarea Label
+                    <textarea placeholder="small-12.columns"></textarea>
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+                <input type="submit" name='submit' value="Send" />
+            </div>
+        </div>
+    </form>
+    <hr>
+
+    <h3>Dropzone</h3>
+    <form class="dropzone" id="myAwesomeDropzone" action="/cms/myFileForm.php?ajax=1"></form>
+
+    <hr>
+
+    <h3>Datepicker</h3>
+    <p>Date: <input type="text" id="datepicker"></p>
+
+    <hr>
+
+    <h3>AutoSuggest</h3>
+    <p><input type="text" autocomplete="off" id="selectize-me"></p>
+
+    <!--<h1 id="block-grid">Block Grid</h1>-->
+    <!--<ul class="small-block-grid-2 large-block-grid-4">-->
+        <!--<li><img class="th" src="http://foundation.zurb.com/docs/assets/img/examples/comet-th.jpg" alt=""></li>-->
+        <!--<li><img class="th" src="http://foundation.zurb.com/docs/assets/img/examples/launch-th.jpg" alt=""></li>-->
+        <!--<li><img class="th" src="http://foundation.zurb.com/docs/assets/img/examples/space-th.jpg" alt=""></li>-->
+        <!--<li><img class="th" src="http://foundation.zurb.com/docs/assets/img/examples/spacewalk-th.jpg" alt=""></li>-->
+    <!--</ul>--> 
+    <hr>
+
+    <h1 id="clearing">Clearing</h1>
+    <div>
+        <ul class="clearing-thumbs" data-clearing>
+            <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/comet.jpg"><img data-caption="Nulla vitae elit libero, a pharetra augue. Cras mattis consectetur purus sit amet fermentum." src="http://foundation.zurb.com/docs/assets/img/examples/comet-th-sm.jpg" alt=""></a></li>
+            <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/earth.jpg"><img src="http://foundation.zurb.com/docs/assets/img/examples/earth-th-sm.jpg" alt=""></a></li>
+            <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/launch.jpg"><img data-caption="Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus." src="http://foundation.zurb.com/docs/assets/img/examples/launch-th-sm.jpg" alt=""></a></li>
+            <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/satelite.jpg"><img src="http://foundation.zurb.com/docs/assets/img/examples/satelite-th-sm.jpg" alt=""></a></li>
+            <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/space.jpg"><img data-caption="Integer posuere erat a ante venenatis dapibus posuere velit aliquet." src="http://foundation.zurb.com/docs/assets/img/examples/space-th-sm.jpg" alt=""></a></li>
+        </ul>
+    </div>
+    <hr>
+
+
+    <hr>
+    <h1 id="flex-video">Flex Video</h1>
+    <div class="flex-video">
+        <iframe width="420" height="315" src="http://www.youtube.com/embed/0_EW8aNgKlA" frameborder="0" allowfullscreen></iframe>
+    </div>
+
+    <hr>
+    <h1 id="inline-lists">Inline Lists</h1>
+    <ul class="inline-list">
+        <li><a href="#">Link 1</a></li>
+        <li><a href="#">Link 2</a></li>
+        <li><a href="#">Link 3</a></li>
+        <li><a href="#">Link 4</a></li>
+        <li><a href="#">Link 5</a></li>
+    </ul>
+
+    <hr>
+    <h1 id="joyride">Joyride</h1>
+    <!-- At the bottom of your page but inside of the body tag -->
+    <ol class="joyride-list" data-joyride>
+        <li data-id="firstStop" data-text="Next" data-options="tip_location: top; prev_button: false">
+            <p>Hello and welcome to the Joyride documentation page.</p>
+        </li>
+        <li data-id="numero1" data-class="custom so-awesome" data-text="Next" data-prev-text="Prev">
+            <h1>Stop #1</h1>
+            <p>You can control all the details for you tour stop. Any valid HTML will work inside of Joyride.</p>
+        </li>
+        <li data-id="numero2" data-button="Next" data-prev-text="Prev" data-options="tip_location:top;tip_animation:fade">
+            <h1>Stop #2</h1>
+            <p>Get the details right by styling Joyride with a custom stylesheet!</p>
+        </li>
+        <li data-button="End" data-prev-text="Prev">
+            <h1>Stop #3</h1>
+            <p>It works as a modal too!</p>
+        </li>
+    </ol>
+    <!--<div id="firstStop" class="panel"><p>Ride the whale.</p></div>-->
+    <!--<p id="numero1" class="panel">Megalodon<p>-->
+    <!--<p id="numero2" class="panel">Kraken</p>-->
+    <!--<p id="End" class="panel">Whale</p>-->
+    <!--&lt;!&ndash; At the bottom of your page but inside of the body tag &ndash;&gt;-->
+    <!--<div id="joyride-go">-->
+        <!--<ol class="joyride-list" data-joyride>-->
+            <!--<li data-id="firstStop" data-text="Next" data-options="tip_location: top; prev_button: false">-->
+                <!--<p>Welcome to Rapture, the home of Schoolbox.</p>-->
+                <!--<p><img src="http://www.twinfinite.net/wp-content/uploads/2014/07/bioshock-rapture-city1.jpg" /></p>-->
+            <!--</li>-->
+            <!--<li data-id="numero1" data-class="custom so-awesome" data-text="Next" data-prev-text="Prev">-->
+                <!--<h1>Stop #1</h1>-->
+                <!--<p>You can control all the details for you tour stop. Any valid HTML will work inside of Joyride.</p>-->
+            <!--</li>-->
+            <!--<li data-id="numero2" data-button="Next" data-prev-text="Prev" data-options="tip_location:top;tip_animation:fade">-->
+                <!--<h1>Stop #2</h1>-->
+                <!--<p>Get the details right by styling Joyride with a custom stylesheet!</p>-->
+            <!--</li>-->
+            <!--<li data-button="End" data-prev-text="Prev">-->
+                <!--<h1>Stop #3</h1>-->
+                <!--<p>It works as a modal too!</p>-->
+                <!--<p><img src="http://www.emeraldene.com.au/blog/wp-content/uploads/2013/05/Whale-Watching-2013.jpg" /></p>-->
+            <!--</li>-->
+        <!--</ol>-->
+    <!--</div>-->
+    <!--<p>To make something pretty, press and hold <kbd>cmd + alt + shift + w + a + !</kbd></p>-->
+    <hr>
+    <h1 id="labels">Labels</h1>
+    <p>
+        <span class="submitted label">Submitted</span>
+        <span class="submitted-late label">Submitted Late</span>
+        <span class="unsubmitted label">Unsubmitted</span>
+    </p>
+    <p>
+        <span class="primary label">Primary Label</span>
+        <span class="secondary label">Secondary Label</span>
+        <span class="alert label">Alert Label</span>
+        <span class="success label">Success Label</span>
+    </p>
+
+    <hr>
+    <h1 id="magellan">Magellan (Sticky Nav)</h1>
+    <div class="magellan-container" data-magellan-expedition="fixed">
+        <ul class="sub-nav inline-list">
+            <li data-magellan-arrival="build"><a href="#build">Build with HTML</a></li>
+            <li data-magellan-arrival="js"><a href="#js">Using Javascript</a></li>
+        </ul>
+    </div>
+
+    <a name="build"></a>
+    <h5 data-magellan-destination="build">Build With Predefined HTML Structure</h5>
+
+    <a name="js"></a>
+    <h5 data-magellan-destination="js">Awesome JS Goodness</h5>
+
+    <hr>
+    <h1 id="orbit">Orbit</h1>
+    <div class="row">
+        <div class="large-12 columns">
+            <ul id="featured1" data-orbit data-options="timer_speed:5000;">
+                <li>
+                    <img src="http://foundation.zurb.com/docs/assets/img/examples/satelite-orbit.jpg" alt=""/>
+                    <div class="orbit-caption">
+                        Caption One. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+                    </div>
+                </li>
+                <li>
+                    <img src="http://foundation.zurb.com/docs/assets/img/examples/andromeda-orbit.jpg" alt=""/>
+                    <div class="orbit-caption">
+                        Caption Two. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+                    </div>
+                </li>
+                <li>
+                    <img src="http://foundation.zurb.com/docs/assets/img/examples/launch-orbit.jpg" alt=""/>
+                    <div class="orbit-caption">
+                        Caption Three. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <hr>
+    <h1 id="panels">Panels</h1>
+    <div class="row">
+        <div class="large-6 columns">
+            <div class="panel">
+                <h5>This is a regular panel.</h5>
+                <p>It has an easy to override visual style, and is appropriately subdued.</p>
+            </div>
+        </div>
+        <div class="large-6 columns">
+            <div class="panel callout radius">
+                <h5>This is a callout panel with radiused edges.</h5>
+                <p>It&#39;s a little ostentatious, but useful for important content.</p>
+            </div>
+        </div>
+        <div class="large-6 columns">
+            <div class="highlight-panel">
+                <h5>This is a callout panel with radiused edges.</h5>
+                <p>It&#39;s a little ostentatious, but useful for important content.</p>
+            </div>
+        </div>
+        <div class="large-6 columns">
+            <div class="alert-panel">
+                <h5>This is a callout panel with radiused edges.</h5>
+                <p>It&#39;s a little ostentatious, but useful for important content.</p>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+    <h1 id="progress-bars">Progress Bars</h1>
+    <div class="progress large-6"><span class="meter" style="width: 40%"></span></div>
+    <div class="radius progress success large-8"><span class="meter" style="width: 80%"></span></div>
+    <div class="nice round progress alert large-10"><span class="meter" style="width: 30%"></span></div>
+    <div class="nice secondary progress"><span class="meter" style="width: 50%"></span></div>
+
+    <hr>
+    <h1 id="reveal">Reveal</h1>
+    <a href="#" data-reveal-id="firstModal" class="button">Example Modal&hellip;</a>
+    <a href="#" data-reveal-id="videoModal" class="secondary button">Example Modal w/Video&hellip;</a>
+    <!-- Reveal Modals begin -->
+    <div id="firstModal" class="reveal-modal" data-reveal>
+        <h2>This is a modal.</h2>
+        <p>Reveal makes these very easy to summon and dismiss. The close button is simply an anchor with a unicode character icon and a class of <code>close-reveal-modal</code>. Clicking anywhere outside the modal will also dismiss it.</p>
+        <p>Finally, if your modal summons another Reveal modal, the plugin will handle that for you gracefully.</p>
+        <a href="#" data-reveal-id="secondModal" class="secondary button">Second Modal...</a>
+        <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <div id="secondModal" class="reveal-modal" data-reveal>
+        <h2>This is a second modal.</h2>
+        <p>See? It just slides into place after the other first modal. Very handy when you need subsequent dialogs, or when a modal option impacts or requires another decision.</p>
+        <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    <div id="videoModal" class="reveal-modal large" data-reveal>
+        <h2>This modal has video</h2>
+        <div class="flex-video">
+            <iframe width="420" height="315" src="//www.youtube.com/embed/aiBt44rrslw" frameborder="0" allowfullscreen></iframe>
+        </div>
+
+        <a class="close-reveal-modal">&#215;</a>
+    </div>
+    <!-- Reveal Modals end -->
+
+    <hr>
+    <h1 id="accordion">Accordion</h1>
+    <dl class="accordion" data-accordion>
+        <dd>
+            <a href="#panel1">Accordion 1</a>
+            <div id="panel1" class="content active">
+                <dl class="tabs" data-tab>
+                    <dd class="active"><a href="#panel1-1">Tab 1</a></dd>
+                    <dd><a href="#panel1-2">Tab 2</a></dd>
+                    <dd><a href="#panel1-3">Tab 3</a></dd>
+                    <dd><a href="#panel1-4">Tab 4</a></dd>
+                </dl>
+                <div class="tabs-content">
+                    <div class="content active" id="panel1-1">
+                        <p>First panel content goes here...</p>
+                    </div>
+                    <div class="content" id="panel1-2">
+                        <p>Second panel content goes here...</p>
+                    </div>
+                    <div class="content" id="panel1-3">
+                        <p>Third panel content goes here...</p>
+                    </div>
+                    <div class="content" id="panel1-4">
+                        <p>Fourth panel content goes here...</p>
+                    </div>
+                </div>
+            </div>
+        </dd>
+        <dd>
+            <a href="#panel2">Accordion 2</a>
+            <div id="panel2" class="content">
+                Panel 2. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            </div>
+        </dd>
+        <dd>
+            <a href="#panel3">Accordion 3</a>
+            <div id="panel3" class="content">
+                Panel 3. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            </div>
+        </dd>
+    </dl>
+
+    <hr>
+    <h1 id="tabs">Tabs</h1>
+    <dl class="tabs" data-tab>
+        <dd class="active"><a href="#panel2-1">Tab 1</a></dd>
+        <dd><a href="#panel2-2">Tab 2</a></dd>
+        <dd><a href="#panel2-3">Tab 3</a></dd>
+        <dd><a href="#panel2-4">Tab 4</a></dd>
+    </dl>
+    <div class="tabs-content">
+        <div class="content active" id="panel2-1">
+            <p>First panel content goes here...</p>
+        </div>
+        <div class="content" id="panel2-2">
+            <p>Second panel content goes here...</p>
+        </div>
+        <div class="content" id="panel2-3">
+            <p>Third panel content goes here...</p>
+        </div>
+        <div class="content" id="panel2-4">
+            <p>Fourth panel content goes here...</p>
+        </div>
+    </div>
+
+    <dl class="tabs vertical" data-tab="">
+        <dd class="active"><a href="#panel1a">Tab 1</a></dd>
+
+        <dd><a href="#panel2a">Tab 2</a></dd>
+
+        <dd><a href="#panel3a">Tab 3</a></dd>
+
+        <dd><a href="#panel4a">Tab 4</a></dd>
+    </dl>
+
+    <div class="tabs-content vertical">
+        <div class="content active" id="panel1a">
+            <p>Panel 1 content goes here.</p>
+        </div>
+
+        <div class="content" id="panel2a">
+            <p>Panel 2 content goes here.</p>
+        </div>
+
+        <div class="content" id="panel3a">
+            <p>Panel 3 content goes here.</p>
+        </div>
+
+        <div class="content" id="panel4a">
+            <p>Panel 4 content goes here.</p>
+        </div>
+    </div>
+
+
+
+    <hr>
+    <h1 id="side-nav">Side Nav</h1>
+    <div class="row">
+        <div class="large-4 columns end">
+            <ul class="side-nav">
+                <li class="active"><a href="#">Link 1</a></li>
+                <li><a href="#">Link 2</a></li>
+                <li class="divider"></li>
+                <li><a href="#">Link 3</a></li>
+                <li><a href="#">Link 4</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <hr>
+    <!--<h1 id="sub-nav">Sub Nav</h1>-->
+    <!--<dl class="sub-nav">-->
+        <!--<dt>Filter:</dt>-->
+        <!--<dd class="active"><a href="#">All</a></dd>-->
+        <!--<dd><a href="#">Active</a></dd>-->
+        <!--<dd><a href="#">Pending</a></dd>-->
+        <!--<dd><a href="#">Suspended</a></dd>-->
+    <!--</dl>-->
+
+    <hr>
+    <h1 id="tables">Tables</h1>
+    <table>
+        <thead>
+        <tr>
+            <th width="200">Table Header</th>
+            <th>Table Header</th>
+            <th width="150">Table Header</th>
+            <th width="150">Table Header</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Mank</td>
+            <td>This is longer content Donec id elit non mi porta gravida at eget metus.</td>
+            <td>Content Goes Here</td>
+            <td>Content Goes Here</td>
+        </tr>
+        <tr>
+            <td>Twonk</td>
+            <td>This is longer Content Goes Here Donec id elit non mi porta gravida at eget metus.</td>
+            <td>Content Goes Here</td>
+            <td>Content Goes Here</td>
+        </tr>
+        <tr>
+            <td>Faffing</td>
+            <td>This is longer Content Goes Here Donec id elit non mi porta gravida at eget metus.</td>
+            <td>Content Goes Here</td>
+            <td>Content Goes Here</td>
+        </tr>
+        </tbody>
+    </table>
+    <table id="sortable">
+        <thead>
+        <tr>
+            <th width="200">Table Header</th>
+            <th>Table Header</th>
+            <th width="150">Table Header</th>
+            <th width="150">Table Header</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Mank</td>
+            <td>This is longer content Donec id elit non mi porta gravida at eget metus.</td>
+            <td>Content Goes Here</td>
+            <td>Content Goes Here</td>
+        </tr>
+        <tr>
+            <td>Twonk</td>
+            <td>This is longer Content Goes Here Donec id elit non mi porta gravida at eget metus.</td>
+            <td>Content Goes Here</td>
+            <td>Content Goes Here</td>
+        </tr>
+        <tr>
+            <td>Faffing</td>
+            <td>This is longer Content Goes Here Donec id elit non mi porta gravida at eget metus.</td>
+            <td>Content Goes Here</td>
+            <td>Content Goes Here</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <hr>
+    <h1 id="thumbnails">Thumbnails</h1>
+    <p><img class="th" src="http://foundation.zurb.com/docs/assets/img/examples/earth-th-sm.jpg" alt=""><img class="th" src="http://foundation.zurb.com/docs/assets/img/examples/space-th-sm.jpg" alt=""></p>
+    <hr>
+    <h1 id="tooltips">Tooltips</h1>
+    <p>The tooltips can be positioned on the <span data-tooltip class="has-tip" data-width="400" title="I'm on bottom and the default position.">&quot;tip-bottom&quot;</span>, which is the default position, <span data-tooltip class="has-tip tip-top noradius" data-width="210" title="I'm on the top and I'm not rounded!">&quot;tip-top&quot; (hehe)</span>, <span data-tooltip="left" class="has-tip tip-left" data-width="90" title="I'm on the left!">&quot;tip-left&quot;</span>, or <span data-tooltip="right" class="has-tip tip-right" data-width="520" title="I'm on the right!">&quot;tip-right&quot;</span> of the target element by adding the appropriate class to them. You can even add your own custom class to style each tip differently. On a small device, the tooltips are full width and bottom aligned.</p>
+
+    <hr>
+    <h1 id="top-bar">Top Bar</h1>
+    <nav class="top-bar" data-topbar>
+        <ul class="title-area">
+            <!-- Title Area -->
+            <li class="name">
+                <h1>
+                    <a href="#">
+                        Top Bar Title
+                    </a>
+                </h1>
+            </li>
+            <li class="toggle-topbar menu-icon"><a href="#"><span>menu</span></a></li>
+        </ul>
+
+        <section class="top-bar-section">
+            <!-- Right Nav Section -->
+            <ul class="right">
+                <li class="divider"></li>
+                <li class="has-dropdown">
+                    <a href="#">Main Item 1</a>
+                    <ul class="dropdown">
+                        <li><label>Section Name</label></li>
+                        <li class="has-dropdown">
+                            <a href="#" class="">Has Dropdown, Level 1</a>
+                            <ul class="dropdown">
+                                <li><a href="#">Dropdown Options</a></li>
+                                <li><a href="#">Dropdown Options</a></li>
+                                <li><a href="#">Level 2</a></li>
+                                <li><a href="#">Subdropdown Option</a></li>
+                                <li><a href="#">Subdropdown Option</a></li>
+                                <li><a href="#">Subdropdown Option</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#">Dropdown Option</a></li>
+                        <li><a href="#">Dropdown Option</a></li>
+                        <li class="divider"></li>
+                        <li><label>Section Name</label></li>
+                        <li><a href="#">Dropdown Option</a></li>
+                        <li><a href="#">Dropdown Option</a></li>
+                        <li><a href="#">Dropdown Option</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#">See all &rarr;</a></li>
+                    </ul>
+                </li>
+                <li class="divider"></li>
+                <li class="has-dropdown">
+                    <a href="#">Main Item 2</a>
+                    <ul class="dropdown">
+                        <li><a href="#">Dropdown Option</a></li>
+                        <li><a href="#">Dropdown Option</a></li>
+                        <li><a href="#">Dropdown Option</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#">See all &rarr;</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+    </nav>
+
+    <!-- End Top Bar -->
+
+    <hr>
+    <h1 id="type">Type</h1>
+    <h1>h1. This is a very large header.</h1>
+    <h2>h2. This is a large header.</h2>
+    <h3>h3. This is a medium header.</h3>
+    <h1>h1. This is a moderate header.</h1>
+    <h5>h5. This is a small header.</h5>
+    <h6>h6. This is a tiny header.</h6>
+
+    <h1 class="subheader">h1.subheader</h1>
+    <h2 class="subheader">h2.subheader</h2>
+    <h3 class="subheader">h3.subheader</h3>
+    <h1 class="subheader">h1.subheader</h1>
+    <h5 class="subheader">h5.subheader</h5>
+    <h6 class="subheader">h6.subheader</h6>
+
+    <p><br></p>
+    <ul class="disc">
+        <li>List item with a much longer description or more content.</li>
+        <li>List item</li>
+        <li>List item
+            <ul>
+                <li>Nested List Item</li>
+                <li>Nested List Item</li>
+                <li>Nested List Item</li>
+            </ul>
+        </li>
+        <li>List item</li>
+        <li>List item</li>
+        <li>List item</li>
+    </ul>
+
+    <h5>Ordered lists are great for lists that need order, duh.</h5>
+    <ol>
+        <li>List Item 1</li>
+        <li>List Item 2</li>
+        <li>List Item 3</li>
+    </ol>
+
+    <h5>Definition lists are great for small block of copy that describe the header</h5>
+    <dl>
+        <dt>Definition List</dt>
+        <dd>Definition Cras justo odio, dapibus ac facilisis in, egestas eget quam. Nullam id dolor id nibh ultricies vehicula ut id elit.</dd>
+    </dl>
+
+    <h5>Blockquote</h5>
+    <blockquote>I do not fear computers. I fear the lack of them. Maecenas faucibus mollis interdum. Aenean lacinia bibendum nulla sed consectetur.<cite>Isaac Asimov</cite></blockquote>
+
+    <h5>Vcard</h5>
+    <ul class="vcard">
+        <li class="fn">Gaius Baltar</li>
+        <li class="street-address">123 Colonial Ave.</li>
+        <li class="locality">Caprica City</li>
+        <li><span class="state">Caprica</span>, <span class="zip">12345</span></li>
+        <li class="email"><a href="#">g.baltar@example.com</a></li>
+    </ul>
+
+    <hr>
+    <h1 id="visibility-classes">Visibility Classes</h1>
+    <h5 id="screen-size-visibility-control-show-">Screen Size Visibility Control (Show)</h5>
+    <p>The following text should describe the screen size you&#39;re using:</p>
+    <p class="panel">
+        <strong class="show-for-small">You are on a small screen.</strong>
+        <strong class="show-for-medium">You are on a medium screen.</strong>
+        <strong class="show-for-medium-up">You are on a medium, large or xlarge screen.</strong>
+        <strong class="show-for-medium-down">You are on a medium or small screen.</strong>
+        <strong class="show-for-large">You are on a large screen.</strong>
+        <strong class="show-for-large-up">You are on a large or xlarge screen.</strong>
+        <strong class="show-for-large-down">You are on a large, medium or small screen.</strong>
+        <strong class="show-for-xlarge">You are on a xlarge screen.</strong>
+    </p>
+
+    <h5 id="screen-size-visibility-control-hide-">Screen Size Visibility Control (Hide)</h5>
+    <p>The following text should describe the screen size you aren&#39;t using:</p>
+    <p class="panel">
+        <strong class="hide-for-small">You are <em>not</em> on a small screen.</strong>
+        <strong class="hide-for-medium">You are <em>not</em> on a medium screen.</strong>
+        <strong class="hide-for-medium-up">You are <em>not</em> on a medium, large or xlarge screen.</strong>
+        <strong class="hide-for-medium-down">You are <em>not</em> on a medium or small screen.</strong>
+        <strong class="hide-for-large">You are <em>not</em> on a large screen.</strong>
+        <strong class="hide-for-large-up">You are <em>not</em> on a large or xlarge screen.</strong>
+        <strong class="hide-for-large-down">You are <em>not</em> on a large, medium or small screen.</strong>
+        <strong class="hide-for-xlarge">You are <em>not</em> on a xlarge screen.</strong>
+    </p>
+
+    <h5 id="orientation-detection">Orientation Detection</h5>
+    <p>The following text should describe the device orientation you&#39;re using:</p>
+    <p class="panel">
+        <strong class="show-for-landscape">You are in landscape orientation.</strong>
+        <strong class="show-for-portrait">You are in portrait orientation.</strong>
+    </p>
+
+    <h5 id="touch-detection">Touch Detection</h5>
+    <p>The following text should describe if you&#39;re using a touch device:</p>
+    <p class="panel">
+        <strong class="show-for-touch">You are on a touch-enabled device.</strong>
+        <strong class="hide-for-touch">You are not on a touch-enabled device.</strong>
+    </p>
 </div>
 
 <!-- DataTables CSS -->
 <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.5/css/jquery.dataTables.css">
-
 <!-- DataTables -->
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.js"></script>
 
 <script>
     $(document).ready( function () {
+
+        $("#joyride-go").foundation('joyride', 'start');
+
         $('#sortable').DataTable({
             paging: false,
             searching: false
         });
-    });
-</script>
 
-<script>
-    $("#joyride-go").foundation('joyride', 'start');
+        $(function() {
+            $("#datepicker").datepicker();
+        });
+
+        Dropzone.options.myAwesomeDropzone = {
+            addRemoveLinks: true,
+        };
+
+        $('[data-target="delete-it"]').on('click', function(){
+            $('.delete-it').addClass('show');
+        });
+
+        $('a[data-interaction="toggle-expanded"]').on('click', function(){
+            $(this).toggleClass('icon-add icon-collapse');
+            $(this).closest('li').toggleClass('expanded');
+            event.preventDefault();
+        });
+
+    });
 </script>

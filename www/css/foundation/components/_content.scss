@@ -443,7 +443,7 @@ $tooltip-font-color: $white;
 @import "../../../javascript/components/foundation/scss/foundation/components/labels";
 @import "../../../javascript/components/foundation/scss/foundation/components/pricing-tables";
 @import "../../../javascript/components/foundation/scss/foundation/components/progress-bars";
-@import "../../../javascript/components/foundation/scss/foundation/components/reveal";
+//@import "../../../javascript/components/foundation/scss/foundation/components/reveal";
 @import "../../../javascript/components/foundation/scss/foundation/components/accordion";
 @import "../../../javascript/components/foundation/scss/foundation/components/tables";
 @import "../../../javascript/components/foundation/scss/foundation/components/thumbs";
@@ -462,11 +462,6 @@ $tooltip-font-color: $white;
 .label { text-transform: uppercase; }
 
 // Panels
-.panel,
- .island-panel{
-	overflow: auto;
-}
-
 .island-panel {
   @include panel(
     // Sets the panel background color. Default: $panel-pg
@@ -478,12 +473,8 @@ $tooltip-font-color: $white;
 .island{
 	@extend .island-panel;
 	border: 0;
-	padding: rem-calc(($base-font-size));
+	padding: rem-calc(($base-font-size - 2));
 }
-
-// .columns.island:not(:first-child){
-// 	margin: 0 0 0 1.5rem;
-// }
 
 // Labels
 .submitted {
@@ -503,6 +494,12 @@ $tooltip-font-color: $white;
 		$bg: tint($primary-color, 74%)
 	);
 	color: $primary-color;
+}
+.warning.label {
+	@include label(
+		$bg: tint($warning-color, 74%)
+	);
+	color: $warning-color;
 }
 
 .highlight-panel {
@@ -529,48 +526,130 @@ $tooltip-font-color: $white;
 	}
 }
 
+// Deleting Components
+.delete-it{
+	background-color: tint($warning-color, 74%);
+	padding: 0;
+	max-height: 0;
+	overflow: hidden;
+	@include single-transition(max-height, 0.3s, ease-out);
+	&.show{
+		max-height: 700px;
+		padding: rem-calc(($base-font-size - 2));
+		@include single-transition(max-height, 0.3s, ease-in);
+	}
+}
+
 .accordion a 				{ @include single-transition(all, 0.15s, linear); }
 
 
-// Information lists
+// Lists with thumnails and content
 .information-list{
 	list-style: none;
 	margin: 0;
 	padding: 0;
-	> li{
+	li{
 		border-bottom: 1px solid $silver;
 		position: relative;
-		padding: 1.125em 0;
+		padding: rem-calc(($base-font-size - 2)) 0;
 		overflow: auto;
-
+		&:last-child{
+			border: 0;
+		}
 		.thumbnail{
 			@media #{$small-up} { @include grid-column(1); }
 			@extend .no-pad;
-
-			img{
-				max-width: 100%;
-			}
 		}
 		.content{
-			@media #{$small-up} { @include grid-column(11); }
+			@media #{$medium-up} { @include grid-column(11); }
 		}
 	}
-	> li:last-child{
-		border: 0;
+}
+
+
+// Activity list
+.activity-list{
+	@extend .information-list;
+	li{
+		.icon{
+			@media #{$small-up} { @include grid-column(1); }
+		}
+		.thumbnail{
+			@media #{$small-up} { @include grid-column(1); }
+			@extend .no-pad;
+		}
+		.content{
+			@media #{$medium-up} { @include grid-column(10); }
+		}
+	}
+}
+
+// Show & Hide Task List
+.task-list{
+	max-height: 0;
+	overflow: hidden;
+	margin: 0 0 0 rem-calc(($base-font-size * 2));
+	@include single-transition(max-height, 0.3s, ease-out);
+}
+
+// Lists with action buttons
+.action-list{
+	@extend .information-list;
+	> li:hover .actions a{
+		opacity: 1;
+	}
+	.expanded .task-list{
+		max-height: 700px;
+		@include single-transition(max-height, 0.3s, ease-in);
+	}
+}
+
+// Block Grid
+.grid{
+	li{
+		border-right: 1px solid $silver;
+		&:last-child{
+			border: 0;
+		}
+	}
+	.thumbnail{
+		@media #{$small-up} { @include grid-column(2); }
+	}
+	.content{
+		@media #{$medium-up} { @include grid-column(10); }
 	}
 }
 
 // Actions in lists & tables
-.action-list{
+.actions{
 	list-style: none;
 	margin: 0;
 	padding: 0;
-	> li{
-		&:hover{
-			.actions{
-				opacity: 1;
-			}
+
+	//Grid for 1 action
+	&.one{
+		@media #{$medium-up} { @include grid-column(1); }
+		a{
+			@media #{$small-up} { @include grid-column(12); }
 		}
+	}
+	//Grid for 2 actions
+	&.two{
+		@media #{$medium-up} { @include grid-column(2); }
+		a{
+			@media #{$small-up} { @include grid-column(6); }
+		}
+	}
+	//Grid for 3 actions
+	&.three{
+		@media #{$medium-up} { @include grid-column(3); }
+		a{
+			@media #{$small-up} { @include grid-column(4); }
+		}
+	}
+	a{
+		display: inline-block;
+		opacity: 0.3;
 	}
 }
 

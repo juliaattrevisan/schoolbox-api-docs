@@ -10,8 +10,10 @@
 // Settings
 @import "settings";
 
-#container.foundation {
-  background: $silver;
+//#container.foundation {
+  #container{
+    background: $silver;
+  }
   // Base
   //@import "base/reset";
   
@@ -32,8 +34,9 @@
   @import "layout/grid";
   @import "layout/header";
   @import "layout/sidebar";
-}
+//}
 
 // Tooltips need to be included outside of container in order to work
 @import "../../javascript/components/foundation/scss/foundation/components/tooltips";
+@import "../../javascript/components/foundation/scss/foundation/components/reveal";
 @import "selectize.customisation";
