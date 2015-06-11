@@ -22,7 +22,16 @@ try {
     $post = PostMapper::getInstance()->findById($postId);
 } catch (\Schoolbox\Mapper\Exception $e) {
     \SitePage::redirectToBrokenImageWithTransform('storage', $size);
+    exit;
 }
+
+// No thumbnail: show nothing.
+// This is a bad request by the client.
+if (!strlen($post->getThumbnail())) {
+    \SitePage::redirectToBrokenImageWithTransform('storage', $size, 400);
+    exit;
+}
+
 
 $cache = new Cache\Original();
 $cache->initPost($post);
