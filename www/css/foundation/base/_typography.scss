@@ -132,9 +132,10 @@ a{
 	color: $steel !important;
 	margin: 0 0 rem-calc(($base-font-size - 10)) 0;
 	font-size: rem-calc(($base-font-size - 3));
+	font-style: italic;
 }
 
-// Typically descriptive text
+// Typically descriptive text1
 .desc{
 	font-size: rem-calc(($base-font-size - 3));
 	margin-bottom: rem-calc(($base-font-size - 3));

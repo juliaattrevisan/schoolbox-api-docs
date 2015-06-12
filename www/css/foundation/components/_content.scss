@@ -542,7 +542,6 @@ $tooltip-font-color: $white;
 
 .accordion a 				{ @include single-transition(all, 0.15s, linear); }
 
-
 // Lists with thumnails and content
 .information-list{
 	list-style: none;
@@ -566,7 +565,6 @@ $tooltip-font-color: $white;
 	}
 }
 
-
 // Activity list
 .activity-list{
 	@extend .information-list;
@@ -576,7 +574,31 @@ $tooltip-font-color: $white;
 		}
 		.thumbnail{
 			@media #{$small-up} { @include grid-column(1); }
+			//@extend .no-pad;
+		}
+		.content{
+			@media #{$medium-up} { @include grid-column(10); }
+		}
+		.grade{
+			@media #{$medium-up} { @include grid-column(1); }
 			@extend .no-pad;
+			text-align: center;
+			font-weight: $font-weight-bold;
+			font-size: rem-calc(($base-font-size + 2));
+		}
+	}
+}
+
+// Subject list
+.subject-list{
+	@extend .information-list;
+	li{
+		.icon{
+			@media #{$small-up} { @include grid-column(1); }
+			@extend .no-pad;
+		}
+		.thumbnail{
+			@media #{$small-up} { @include grid-column(1); }
 		}
 		.content{
 			@media #{$medium-up} { @include grid-column(10); }
