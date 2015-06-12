@@ -25,6 +25,7 @@ class SubmissionZipFolder
     }
 
     function createZip() {
+        // TODO make this use http://flysystem.thephpleague.com/adapter/zip-archive/
         $archive = new ZipArchive();
         $archive->open($this->tmpZip, ZipArchive::CREATE);
         mkdir($this->tmpFolder);
