@@ -31,7 +31,7 @@ if (is_numeric($_GET['id'])) {
             $newList = [];
             foreach ($submissionList as $submission) {
                 if (!isset($newList[$submission->getOwner()->getId()])) {
-                    $newList[$newList[$submission->getOwner()->getId()]] = $submission;
+                    $newList[$submission->getOwner()->getId()] = $submission;
                 }
             }
             $submissionList = new \Schoolbox\Collection(array_values($newList));
