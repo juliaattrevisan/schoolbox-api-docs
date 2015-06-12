@@ -109,12 +109,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         $fileYear = $this->getExternalUser()->getCurrentYear($owner->getExternalId());
         $fileSemester = $this->getExternalUser()->getCurrentSemester($owner->getExternalId());
-        $multipleCodes = $folder->getCodes()->count();
 
         foreach($folder->getCodes() as $classCode) {
 
             $class = $externalClass->getClass($classCode->getCode());
-            $staffID = $multipleCodes > 1 || $class['MultipleStaffMarkbookFlag'] > 0 ? $owner->getExternalId() : 0;
+            $staffID = $class['MultipleStaffMarkbookFlag'] > 0 ? $owner->getExternalId() : 0;
 
             $assessmentFieldValues = $this->getAssessmentFieldValues($assessment);
             $query = "INSERT INTO StaffAssessmentMarkBook (
