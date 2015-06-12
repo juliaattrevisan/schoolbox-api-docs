@@ -14,14 +14,28 @@ if (is_numeric($_GET['id'])) {
         error(9, "the requested submissions could not be read.<br />Please try again, and if the problem persists contact your system administrator.");
     }
 
-    $subBoxHandler = new Submission();
+    $boxMapper        = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
+    $submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper();
 
-    $submissionBox = $subBoxHandler->getByID($box_id);
-    $zipName = Scrub::text($submissionBox['name']);
+    $submissionBox = $boxMapper->findById($box_id);
+    $zipName = Scrub::text($submissionBox->getName());
 
     $group = new Group();
-    if ($group->getPermission($submissionBox['category']) >= WRITE_ACCESS) {
-        $submissionList = $subBoxHandler->getAllForBox($box_id);
+    if ($group->getPermission($submissionBox->getCategory()->getId()) >= WRITE_ACCESS) {
+        /** @var \Schoolbox\Assessment\Component\SubmissionBox\Submission\File[] $submissionList */
+        $submissionList = \Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper::getInstance()
+            ->findByColumn('box_id', $box_id, ['order' => ['submitted' => 'desc']]);
+        // Does this box support multiple files?
+        // If not, only allow most recent submission for each student.
+        if (!$submissionBox->getAcceptMultiple()) {
+            $newList = [];
+            foreach ($submissionList as $submission) {
+                if (!isset($newList[$submission->getOwner()->getId()])) {
+                    $newList[$newList[$submission->getOwner()->getId()]] = $submission;
+                }
+            }
+            $submissionList = new \Schoolbox\Collection(array_values($newList));
+        }
 
         $zip = new SubmissionZipFolder($zipName, $submissionList);
         $zip->sendZip();
