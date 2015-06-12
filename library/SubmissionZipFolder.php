@@ -3,7 +3,15 @@
  * Zips a list of file submissions.
  * Moved out of /www/downloadAll.php
  */
-class SubmissionZipFolder {
+
+use Schoolbox\Assessment\Component\SubmissionBox\Submission;
+
+class SubmissionZipFolder
+{
+    /**
+     * @param string $folder The name of the zip to create
+     * @param Submission\File[] $fileList A list of files to zip
+     */
     function __construct($folder, $fileList) {
         $this->tmpName = tempnam(Cfg::get('zip_dir'), 'zip');
         $this->tmpZip = $this->tmpName.'.zip';
@@ -47,40 +55,25 @@ class SubmissionZipFolder {
         return true;
     }
 
+    /**
+     *
+     * @param string $currentDir The temp location to create the zip in
+     * @param int $folderID Unused
+     * @param Submission\File[] $fileList A list of files to zip
+     * @param int $depth Unused
+     */
     function createDirectory($currentDir, $folderID, $fileList, $depth = 0) {
-        $wrapper = new Alaress\Html\Wrapper();
-        if(is_array($fileList)) {
-            foreach($fileList as $file) {
-                $dataFile = $file['id'].'.dat';
-
-                $fileLocation = Cfg::get('submission_dir') . '/' . $dataFile;
-                $fileName = sprintf("%s-%s_%s_%s",
-                    $file['lastname'], $file['firstname'],          // student name
-                    date("md-Hi", strtotime($file['submitted'])),   // datetime
-                    $file['realname']                               // filename
-                );
-                if (is_file($fileLocation)) {
-                    $this->size = $this->size + filesize($fileLocation);
-                    copy(
-                        Cfg::get('submission_dir') .'/'. $dataFile,
-                        $this->uniqueFileName($currentDir . '/' . $fileName)
-                    );
-                }
-                elseif (strlen($file['body']) > 0) {
-                    // This might be an online submission.
-                    // Copy the file's contents to the filename.
-                    $wrapper
-                        ->setTitle($fileName)
-                        ->setBody($file['body'])
-                        ->loadBaseHrefFromServerVars($_SERVER);
-                    $content = $wrapper->render();
-                    $this->size = $this->size + strlen($content);
-                    file_put_contents(
-                        $this->uniqueFileName($currentDir . '/' . $fileName . '.html'),
-                        $content
-                    );
-                }
-            }
+        foreach ($fileList as $file) {
+            $fileName = sprintf("%s-%s_%s_%s.%s",
+                $file->getOwner()->getLastname(), $file->getOwner()->getFirstname(),          // student name
+                $file->getCreatedAt()->getUsingFormat('md-Hi'),   // datetime
+                $file->getBasename(),                               // filename
+                $file->getStorage()->getExtension()                 // extension
+            );
+            $this->size = $this->size + $file->getStorage()->getSize();
+            $fp = fopen($this->uniqueFileName($currentDir . '/' . $fileName), 'wb');
+            stream_copy_to_stream($file->getStorage()->readStream(), $fp);
+            fclose($fp);
         }
     }
 
