@@ -51,7 +51,7 @@ trait StorableTrait
      */
     public function getBasename()
     {
-        return $this->getFilename() . '.' . $this->getStorage()->getExtension();
+        return $this->getFilename() . '.' . $this->getExtension();
     }
 
 
