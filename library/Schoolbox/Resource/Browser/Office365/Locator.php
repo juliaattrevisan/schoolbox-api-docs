@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -8,7 +8,6 @@
  */
 
 namespace Schoolbox\Resource\Browser\Office365;
-
 
 use Alaress\Authorizer\Failure\AuthenticationTimedOut;
 use Alaress\Authorizer\Failure\Unauthorized;
@@ -282,5 +281,4 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
 
         return $destination;
     }
-
 }

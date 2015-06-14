@@ -89,8 +89,7 @@ class Sabre_DAV_Client_Extended extends Sabre\DAV\Client
     public function move($path, $destination)
     {
         return $this->request('MOVE', $path, null, array(
-                'Destination' => $this->getAbsoluteUrl($destination))
-        );
+                'Destination' => $this->getAbsoluteUrl($destination)));
     }
 }
 
@@ -161,7 +160,6 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
         $i = 0;
         foreach ($this->rootPaths as $path) {
-
             $i++;
 
             $_SESSION['portfolioIdPathMap'][$i] = $path;
@@ -211,7 +209,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                     '/StudentData/',
                 );
             }
-        } else if ($site_location == 'jpc') {
+        } elseif ($site_location == 'jpc') {
             $settings = array(
                 'baseUri' => 'https://malastare/',
                 'userName' => "jpc/" . strtolower($_SESSION['username']),
@@ -228,8 +226,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                     '/Students/' . (date('Y') - ($_SESSION['year'] - 7)) . '/' . strtolower($_SESSION['username']) . '/',
                 );
             }
-        } else if ($site_location == 'cathedral') {
-
+        } elseif ($site_location == 'cathedral') {
             $settings = array(
                 'baseUri' => 'http://senior-server.school.cathedral.qld.edu.au/',
                 'userName' => "cathedral/" . $_SESSION['username'],
@@ -238,7 +235,6 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
             if ($groupHandler->isStaff()) {
                 if ($_SESSION['campus'][0] == 4 || $_SESSION['campus'][0] == 5) {
-
                     $settings['baseUri'] = 'http://junior-server.school.cathedral.qld.edu.au/';
 
                     $paths = array(
@@ -246,7 +242,6 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                         '/ydrive/',
                     );
                 } else {
-
                     $paths = array(
                         '/staffhome/' . $_SESSION['username'] . '/',
                         '/xdrive/',
@@ -254,7 +249,6 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 }
 
             } else {
-
                 $paths = array(
                     '/studenthome/' . $_SESSION['username'] . '/',
                 );
@@ -264,8 +258,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 }
             }
 
-        } else if ($site_location == 'bialik') {
-
+        } elseif ($site_location == 'bialik') {
             $settings = array(
                 'baseUri' => 'https://webdav.bialik.vic.edu.au/',
                 'userName' => "bialik/" . $_SESSION['username'],
@@ -274,7 +267,6 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
             if ($groupHandler->isStaff()) {
                 if ($_SESSION['campus'][0] == 2) {
-
                     $paths = array(
                         '/H-DRIVE/USERS/STAFF/TEACHERS/ELC/' . $_SESSION['username'] . '/',
                     );
@@ -284,12 +276,12 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                     );
                 }
 
-            } else if ($groupHandler->isStudent()) {
+            } elseif ($groupHandler->isStudent()) {
                 $paths = array(
                     '/H-DRIVE/USERS/STUDENTS/YEAR%20' . str_pad($_SESSION['year'], 2, '0', STR_PAD_LEFT) . '/' . $_SESSION['username'] . '/',
                 );
             }
-        } else if ($site_location=='stmichaels') {
+        } elseif ($site_location=='stmichaels') {
             $settings = array(
                 'baseUri' => 'https://smgs-data.stmichaels.vic.edu.au/',
                 'userName' => "smgs/" . $_SESSION['username'],
@@ -301,14 +293,13 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 $paths = array(
                     $settings['baseUri'].'staff/' . $_SESSION['username'] . '/',
                 );
-            } else if ($groupHandler->isStudent()) {
+            } elseif ($groupHandler->isStudent()) {
                 $paths = array(
                     $settings['baseUri'] . $_SESSION['username'] . '/',
                 );
             }
 
-        }
-        else if ($site_location=='seymour') {
+        } elseif ($site_location=='seymour') {
             $settings = array(
                 'baseUri' => 'https://webdav.seymour.sa.edu.au/',
                 'userName' => "sccampus/" . $_SESSION['username'],
@@ -320,16 +311,14 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 $paths = array(
                     $settings['baseUri'] . 'staffhome/' . ucwords($_SESSION['username']) . '/',
                 );
-            } else if ($groupHandler->isStudent()) {
+            } elseif ($groupHandler->isStudent()) {
                 $paths = array(
                     $settings['baseUri'] .'studenthome/' . (12 - $_SESSION['year'] + date('Y')) . '/' . $_SESSION['username'] . '/',
                 );
             } else {
                 return false;
             }
-        }
-        else if ($site_location == 'mggs'){
-
+        } elseif ($site_location == 'mggs') {
             $settings = array(
 
                 'userName' =>  'mggs/'.$_SESSION['username'],
@@ -345,16 +334,14 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                     '/EXCHANGE/',
                 );
 
-            } else if ($groupHandler->isStudent()) {
+            } elseif ($groupHandler->isStudent()) {
                 $settings['baseUri'] = 'http://mggs-fs02/';
                 $paths = array(
                     '/STUDENTS/'.(12 - $_SESSION['year'] + date('Y')) .'/' . $_SESSION['username'] . '/',
                 );
             }
 
-        }
-        else if ($site_location == 'tintern'){
-        
+        } elseif ($site_location == 'tintern') {
             $settings = array(
                 'userName' =>  'tintern/'.$_SESSION['username'],
                 'password' => $_SESSION['password'],
@@ -365,7 +352,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 $paths = array(
                     '/Staff/' . $_SESSION['username'] . '/'
                 );
-            } else if ($groupHandler->isStudent()) {
+            } elseif ($groupHandler->isStudent()) {
                 $paths = array(
                     '/Student/'.(12 - $_SESSION['year'] + date('Y')) .'/' . $_SESSION['username'] . '/',
                 );
@@ -373,8 +360,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 return false;
             }
 
-        }
-        else if ($site_location=='oakburn') {
+        } elseif ($site_location=='oakburn') {
             $settings = array(
                 'baseUri' => 'http://davusers.soc.tas.edu.au/',
                 'userName' => "soc/" . $_SESSION['username'],
@@ -382,14 +368,14 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             );
 
             if ($groupHandler->isStaff()) {
-                if ($_SESSION['campus'][0] == '1'){
-                  $paths = array(
+                if ($_SESSION['campus'][0] == '1') {
+                    $paths = array(
                       $settings['baseUri'].'penquitestaff/' . $_SESSION['username'] . '/Documents/',
-                  );
+                    );
                 } else {
-                  $paths = array(
+                    $paths = array(
                       $settings['baseUri'].'elphinstaff/' . $_SESSION['username'] . '/Documents/',
-                  );
+                    );
                 }
 
                 $fileShares = array(
@@ -412,26 +398,24 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                     'AdminDocs'
                 );
 
-                foreach($fileShares as $share) {
+                foreach ($fileShares as $share) {
                     $paths[] = $settings['baseUri'].'/'.$share.'/';
                 }
 
-            } else if ($groupHandler->isStudent()) {
-                if($_SESSION['year']>='6') {
-                  $paths = array(
+            } elseif ($groupHandler->isStudent()) {
+                if ($_SESSION['year']>='6') {
+                    $paths = array(
                       $settings['baseUri'].'penquitestudents/Year12in' . (12 - $_SESSION['year'] + date('Y')) . '/' . $_SESSION['username'] . '/Documents/',
-                  );
+                    );
                 } else {
-                  $paths = array(
+                    $paths = array(
                       $settings['baseUri'].'elphinstudents/Year12in' . (12 - $_SESSION['year'] + date('Y')) . '/' . $_SESSION['username'] . '/Documents/',
-                  );
+                    );
                 }
 
             }
 
-        }
-        else if ($site_location == 'iggs'){
-
+        } elseif ($site_location == 'iggs') {
             $settings = array(
                 'userName' =>  $_SESSION['username'],
                 'password' => $_SESSION['password'],
@@ -443,15 +427,14 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                     $settings['baseUri'].'/webdav/staff/' . $_SESSION['username'] . '/',
                     $settings['baseUri'].'/webdav/shared/'
                 );
-            } else if ($groupHandler->isStudent()) {
+            } elseif ($groupHandler->isStudent()) {
                 $paths = array(
                     $settings['baseUri'].'/webdav/student/' . $_SESSION['username'] . '/',
                     $settings['baseUri'].'/webdav/shared/'
                 );
             }
 
-        }
-        else if ($site_location=='fintona') {
+        } elseif ($site_location=='fintona') {
             $settings = array(
                 'baseUri' => 'https://files.fintona.vic.edu.au/',
                 'userName' => "fintona/" . $_SESSION['username'],
@@ -464,15 +447,14 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                     $settings['baseUri'].'student/',
                     $settings['baseUri'].'public/',
                 );
-            } else if ($groupHandler->isStudent()) {
+            } elseif ($groupHandler->isStudent()) {
                 $paths = array(
                     $settings['baseUri'].'student/',
                     $settings['baseUri'].'public/',
                 );
             }
 
-        }
-        else if ($site_location=='loyola') {
+        } elseif ($site_location=='loyola') {
             $settings = array(
                 'baseUri' => 'http://lcapache.loyola.local:8080/',
                 'userName' => "loyola/" . $_SESSION['username'],
@@ -482,13 +464,12 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 $paths = array(
                     $settings['baseUri'].'Staff%20Home/' . $_SESSION['username'] . '/',
                 );
-            } else if ($groupHandler->isStudent()) {
+            } elseif ($groupHandler->isStudent()) {
                 $paths = array(
                     $settings['baseUri'].'Student%20Home/' . (12 - $_SESSION['year'] + date('Y')) . '/' . $_SESSION['username'] . '/',
                 );
             }
-        }
-        else if ($site_location=='sheldon') {
+        } elseif ($site_location=='sheldon') {
             $settings = array(
                 'baseUri' => 'https://sviisdev01.sheldoncollege.com/',
                 'userName' => $_SESSION['username'] . "@sheldoncollege.com",
@@ -501,21 +482,20 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                     $settings['baseUri'].'CollegeShareC/',
                 );
                 $roleid = $_SESSION['user']->getRole()->getId();
-                if ($roleid != '3' AND $roleid != '4') {
+                if ($roleid != '3' and $roleid != '4') {
                     $paths = array_merge($paths, array(
                         $settings['baseUri'].'AcademicShareC/',
                         $settings['baseUri'].'StudentShareC/',
                     ));
                 }
-            } else if ($groupHandler->isStudent()) {
+            } elseif ($groupHandler->isStudent()) {
                 $paths = array(
                     $settings['baseUri'].'StudentHomesC/' . $_SESSION['username'] . '/',
                     $settings['baseUri'].'StudentShareC/',
                 );
             }
 
-        }
-        else if ($site_location=='meriden') {
+        } elseif ($site_location=='meriden') {
             $settings = array(
                 'baseUri' => 'http://webdav.meriden.nsw.edu.au/',
                 'userName' => "meriden/" . $_SESSION['username'],
@@ -527,14 +507,13 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                     $settings['baseUri'].'staff/' . $_SESSION['username'] .'/',
                     $settings['baseUri'].'staffgroup/',
                 );
-            } else if ($groupHandler->isStudent()) {
+            } elseif ($groupHandler->isStudent()) {
                 $paths = array(
                     $settings['baseUri'].(12 - $_SESSION['year'] + date('Y')) . '/' . $_SESSION['username'] . '/',
                 );
             }
 
-        }
-        else if (in_array($site_location, array('core', 'demo'))) {
+        } elseif (in_array($site_location, array('core', 'demo'))) {
             $settings = array(
                 'baseUri' => 'http://webdave.alaress-dev.com.au/',
                 'userName' => 'webdave',
@@ -589,12 +568,15 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         $this->cache[$md5Path]['file'] = array();
 
         try {
-            $response = $this->client->propFind($path, array(
+            $response = $this->client->propFind(
+                $path,
+                array(
                     '{DAV:}getcontentlength',
                     '{DAV:}resourcetype',
                     '{DAV:}getlastmodified',
                     '{DAV:}creationdate',),
-                1);
+                1
+            );
         } /* Handle Sabre_DAV_Exception specifically
          */
         catch (Sabre\DAV\Exception\NotAuthenticated $e) {
@@ -606,7 +588,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             return false;
         }
         catch (Sabre\DAV\Exception $e) {
-            error(141, $e->getMessage() );
+            error(141, $e->getMessage());
         }
 
         // remove parent
@@ -616,18 +598,17 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         $parentID = $temp[$path];
 
         foreach ($response as $filepath => $info) {
-
             $filename = basename($filepath);
 
-            if(!is_object($info['{DAV:}resourcetype']))
+            if (!is_object($info['{DAV:}resourcetype'])) {
                 continue;
+            }
 
             $type = $info['{DAV:}resourcetype']->is('{DAV:}collection') ? 'dir' : 'file';
 
             $index = null;
 
             if (!in_array($filepath, $_SESSION['portfolioIdPathMap'])) {
-
                 $_SESSION['portfolioIdPathMap'][] = $filepath;
                 end($_SESSION['portfolioIdPathMap']);
                 $index = key($_SESSION['portfolioIdPathMap']);
@@ -754,8 +735,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         if ($file_size <= $chunk_size) {
             $response = $this->client->request('GET', $_SESSION['portfolioIdPathMap'][$id]);
             file_put_contents($temp, $response['body'], LOCK_EX);
-        }
-        else {
+        } else {
             //
             // Request each chunk and append to the response
             for ($i = 0; $i < $file_size; $i += $chunk_size) {
@@ -849,7 +829,6 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
             $_SESSION['portfolioIdPathMap'][$data['id']] = $destination;
         } else {
-
             if ($this->isRoot($data['id']) || $data['parent'] == 0) {
                 return false;
             }
@@ -1021,4 +1000,3 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         return $this->getFile($fileId);
     }
 }
-
