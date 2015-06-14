@@ -91,6 +91,18 @@ class Model extends File implements IStorage
     }
 
     /**
+     * @param string $basename
+     * @return $this
+     */
+    public function setBasename($basename)
+    {
+        return $this
+            ->setFilename(pathinfo($basename, PATHINFO_FILENAME))
+            ->setExtension(pathinfo($basename, PATHINFO_EXTENSION))
+        ;
+    }
+
+    /**
      * @return string
      */
     public function getHash()

@@ -22,10 +22,17 @@ use Schoolbox\File\Mimetype;
 interface IStorage
 {
     /**
-     * Returns the first part of the filename
+     * Returns the filename (without extension)
      * @return string
      */
     public function getFilename();
+
+    /**
+     * Sets the filename (without extension)
+     * @param string $filename
+     * @return $this
+     */
+    public function setFilename($filename);
 
     /**
      * Returns just the extension of the file
@@ -34,10 +41,24 @@ interface IStorage
     public function getExtension();
 
     /**
+     * Sets the extension
+     * @param string $extension
+     * @return $this
+     */
+    public function setExtension($extension);
+
+    /**
      * Returns the real filename of the file
      * @return string
      */
     public function getBasename();
+
+    /**
+     * Sets the real filename of the file (filename + extension)
+     * @param string $basename
+     * @return $this
+     */
+    public function setBasename($basename);
 
     /**
      * Returns the full mime string for the file

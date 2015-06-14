@@ -54,6 +54,17 @@ trait StorableTrait
         return $this->getFilename() . '.' . $this->getExtension();
     }
 
+    /**
+     * @param string $basename
+     * @return $this
+     */
+    public function setBasename($basename)
+    {
+        return $this
+            ->setFilename(pathinfo($basename, PATHINFO_FILENAME))
+            ->setExtension(pathinfo($basename, PATHINFO_EXTENSION))
+        ;
+    }
 
     /**
      * @return string
