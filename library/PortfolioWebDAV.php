@@ -947,7 +947,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         $file->setId($data['id']);
         $file->setFolder($cat);
         $file->setFilename($filename);
-        $file->getStorage()->setExtension($extension);
+        $file->setExtension($extension);
         $file->setTitle($data['description']);
         $file->setSize($data['file_size']);
         $file->setOwner($owner);

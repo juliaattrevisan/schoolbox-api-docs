@@ -149,7 +149,7 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
         $file = Resource\File\Mapper::getInstance()->createModel();
         $file->setId($item['id']);
         $file->setFilename($filename);
-        $file->getStorage()->setExtension($extension);
+        $file->setExtension($extension);
         $file->setTitle($filename);
         $file->setSize($item['size']);
 
