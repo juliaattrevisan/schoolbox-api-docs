@@ -63,6 +63,15 @@ trait StorableTrait
         return $this->getStorage()->getExtension();
     }
 
+    /**
+     * @param string $extension
+     * @return $this
+     */
+    public function setExtension($extension)
+    {
+        $this->getStorage()->setExtension($extension);
+        return $this;
+    }
 
     /**
      * @return string
