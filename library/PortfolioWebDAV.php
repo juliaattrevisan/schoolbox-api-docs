@@ -942,12 +942,9 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         $cat = $this->folderMapper->createModel();
         $cat->setId($data['parent']);
 
-        $filename  = pathinfo($data['name'], PATHINFO_FILENAME);
-        $extension = pathinfo($data['name'], PATHINFO_EXTENSION);
         $file->setId($data['id']);
         $file->setFolder($cat);
-        $file->setFilename($filename);
-        $file->setExtension($extension);
+        $file->setBasename($data['name']);
         $file->setTitle($data['description']);
         $file->setSize($data['file_size']);
         $file->setOwner($owner);
