@@ -25,6 +25,10 @@ use Schoolbox\Mapper;
 
 class Sanitiser
 {
+    /**
+     * Alias for the name to search by.
+     */
+    const SCORE_COLUMN = 'score';
 
     /**
      * Sort by this column name
@@ -69,6 +73,13 @@ class Sanitiser
     private $unquotedKeyword = '';
 
     /**
+     * Is this sort on an actual table column?
+     *
+     * @var bool
+     */
+    private $sortOnTableColumn = false;
+
+    /**
      * Sanitise search params
      *
      * Immutable
@@ -82,17 +93,22 @@ class Sanitiser
      */
     public function __construct(Mapper $mapper, $keyword, $sortProperty, $sortDirection, $offset, $limit)
     {
-
         /* Check whether the field you're sorting on exists
          * in mapping definition before trying to sort on it
          */
         if (strlen($sortProperty) && $mapper->getMap()->offsetExists($sortProperty)) {
             $mappingDefinition = $mapper->getMap()->getOffset($sortProperty);
+            $this->setSortBy($mappingDefinition['column']);
+            $this->setSortOnTableColumn(true);
+        } elseif ($sortProperty == self::SCORE_COLUMN) {
+            // self::SCORE_COLUMN is a column in the search query, not in any table
+            $this->setSortBy(self::SCORE_COLUMN);
+            $this->setSortOnTableColumn(false);
         } else {
             $mappingDefinition = $mapper->getIdentifier();
+            $this->setSortBy($mappingDefinition['column']);
+            $this->setSortOnTableColumn(true);
         }
-
-        $this->setSortBy($mappingDefinition['column']);
 
         /* Sort direction
          */
@@ -173,6 +189,25 @@ class Sanitiser
     }
 
     /**
+     * Gets sort by, with alias if applicable.
+     *
+     * Alias is applicable if the sort is on an actual table column, not on a
+     * column in a result set.
+     *
+     * @param  string $alias
+     * @return string
+     */
+    public function getSortByWithAlias($alias)
+    {
+        $sortBy = $this->getSortBy();
+        if ($this->getSortOnTableColumn()) {
+            return $alias.'.'.$sortBy;
+        } else {
+            return $sortBy;
+        }
+    }
+
+    /**
      * Set sort dir
      *
      * @param string $sortDir
@@ -228,6 +263,24 @@ class Sanitiser
     private function setUnquotedKeyword($unquotedKeyword)
     {
         $this->unquotedKeyword = $unquotedKeyword;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getSortOnTableColumn()
+    {
+        return $this->sortOnTableColumn;
+    }
+
+    /**
+     * @param  bool  $sortOnTableColumn
+     * @return $this
+     */
+    private function setSortOnTableColumn($sortOnTableColumn)
+    {
+        $this->sortOnTableColumn = $sortOnTableColumn;
         return $this;
     }
 }
