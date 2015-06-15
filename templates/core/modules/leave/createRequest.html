@@ -53,80 +53,80 @@
 
 		//<!-- END student_autocomplete_javascript -->
 
-		/**
-		 * LeaveRequest
-		 */
-		leaveRequest = {
-
-			/* Object literal for description field
-			 */
-			description: {
-				maxLength: 100,
-				warningLength: 67,
-				element: $('#description'),
-				warning: $('#descriptionWarning'),
-
-				/**
-				 * Remove excess content from the description field
-				 */
-				trim: function() {
-					var length = this.element.val().length;
-					var count = this.warning.find('span');
-
-					if (length <= this.maxLength) {
-						if (length > this.warningLength) {
-							count.html(length);
-							this.fadeIn(this.warning);
-						}
-						else {
-							this.fadeOut(this.warning);
-						}
-					}
-					/* Trim out excess
-					 */
-					else {
-						this.fadeIn(this.warning);
-						this.element.val(this.element.val().substring(0, this.maxLength));
-					}
-				},
-
-				/**
-				 * Fade in
-				 *
-				 * @param element
-				 */
-				fadeIn: function(element) {
-					element.stop().animate({opacity:1}, 200);
-				},
-
-				/**
-				 * Fade out
-				 *
-				 * @param element
-				 */
-				fadeOut: function(element) {
-					element.stop().animate({opacity:0}, 200);
-				},
-
-				initWarning: function() {
-					this.warning.css({'opacity':0}).show();
-				},
-
-				/**
-				 * Observe character count
-				 */
-				observe: function() {
-					this.element.keyup(function() {
-						leaveRequest.description.trim();
-					});
-				}
-			}
-		}
-
-		/* Initialise character count
-		 */
-		leaveRequest.description.initWarning();
-		leaveRequest.description.observe();
+//		/**
+//		 * LeaveRequest
+//		 */
+//		leaveRequest = {
+//
+//			/* Object literal for description field
+//			 */
+//			description: {
+//				maxLength: 100,
+//				warningLength: 67,
+//				element: $('#description'),
+//				warning: $('#descriptionWarning'),
+//
+//				/**
+//				 * Remove excess content from the description field
+//				 */
+//				trim: function() {
+//					var length = this.element.val().length;
+//					var count = this.warning.find('span');
+//
+//					if (length <= this.maxLength) {
+//						if (length > this.warningLength) {
+//							count.html(length);
+//							this.fadeIn(this.warning);
+//						}
+//						else {
+//							this.fadeOut(this.warning);
+//						}
+//					}
+//					/* Trim out excess
+//					 */
+//					else {
+//						this.fadeIn(this.warning);
+//						this.element.val(this.element.val().substring(0, this.maxLength));
+//					}
+//				},
+//
+//				/**
+//				 * Fade in
+//				 *
+//				 * @param element
+//				 */
+//				fadeIn: function(element) {
+//					element.stop().animate({opacity:1}, 200);
+//				},
+//
+//				/**
+//				 * Fade out
+//				 *
+//				 * @param element
+//				 */
+//				fadeOut: function(element) {
+//					element.stop().animate({opacity:0}, 200);
+//				},
+//
+//				initWarning: function() {
+//					this.warning.css({'opacity':0}).show();
+//				},
+//
+//				/**
+//				 * Observe character count
+//				 */
+//				observe: function() {
+//					this.element.keyup(function() {
+//						leaveRequest.description.trim();
+//					});
+//				}
+//			}
+//		}
+//
+//		/* Initialise character count
+//		 */
+//		leaveRequest.description.initWarning();
+//		leaveRequest.description.observe();
 	});
 </script>
 <!-- END custom_head -->
@@ -202,8 +202,7 @@
     <fieldset>
         <legend>Description</legend>
         <em>Only complete for special leave information or travel arrangements</em>
-        <textarea id='description' rows="4" cols="60" name="request[description]"></textarea>
-        <div id='descriptionWarning' class='hide'>You are reaching the maximum length for your description (<span>0</span>/100 characters)</div>
+        <textarea id='description' name="request[description]" maxlength="100"></textarea>
     </fieldset>
 
     <fieldset>
