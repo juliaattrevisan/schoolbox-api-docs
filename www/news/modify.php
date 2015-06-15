@@ -41,19 +41,19 @@ if (is_numeric($this->arg[0])) {
 	$expiryDate = new Alaress_Date_Format($news['item_datetime_expires'], Alaress_Date_Format::DATABASE_FORMAT);
 
 	$output = array(
-		'ACTION' => 'Modify',
-		'NEWS_ID' => $news['item_id'],
-		'HEADING' => Scrub::text($news['item_heading']),
-        'NEWS_IMAGE' => $news['item_image'],
-		'BODY' => Scrub::text($news['item_body']),
+		'ACTION'                  => 'Modify',
+		'NEWS_ID'                 => $news['item_id'],
+		'HEADING'                 => Scrub::text($news['item_heading']),
+        'NEWS_IMAGE'              => $news['item_image'],
+		'BODY'                    => Scrub::text($news['item_body']),
 		'ITEM_DATETIME_PUBLISHED' => $publishedDate->getLocalShort(),
-        'PUBLISH_HOUR'          => $publishedDate->isAtStartOfDay() ? '' : $publishedDate->get12Hour(),
-        'PUBLISH_MIN'        => $publishedDate->isAtStartOfDay() ? '' : $publishedDate->getMinute(true),
-        'PUBLISH_PM'            => $publishedDate->getMeridiem() == 'pm' ? 'selected="selected"' : '',
-		'ITEM_DATETIME_EXPIRES' => $expiryDate->getLocalShort(),
-        'EXPIRES_HOUR'          => $expiryDate->isAtStartOfDay() ? '' : $expiryDate->get12Hour(),
-        'EXPIRES_MIN'        => $expiryDate->isAtStartOfDay() ? '' : $expiryDate->getMinute(true),
-        'EXPIRES_PM'            => $expiryDate->getMeridiem() == 'pm' ? 'selected="selected"' : '',
+        'PUBLISH_HOUR'            => $publishedDate->isAtStartOfDay() ? '' : $publishedDate->get12Hour(),
+        'PUBLISH_MIN'             => $publishedDate->isAtStartOfDay() ? '' : $publishedDate->getMinute(true),
+        'PUBLISH_PM'              => !$publishedDate->isAtStartOfDay() && $publishedDate->isPM() ? 'selected="selected"' : '',
+		'ITEM_DATETIME_EXPIRES'   => $expiryDate->getLocalShort(),
+        'EXPIRES_HOUR'            => $expiryDate->isAtEndOfDay() ? '' : $expiryDate->get12Hour(),
+        'EXPIRES_MIN'             => $expiryDate->isAtEndOfDay() ? '' : $expiryDate->getMinute(true),
+        'EXPIRES_PM'              => !$expiryDate->isAtEndOfDay() && $expiryDate->isPM() ? 'selected="selected"' : '',
 	);
 
 	$this->setVar($output);
