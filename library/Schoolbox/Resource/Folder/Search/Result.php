@@ -51,7 +51,7 @@ class Result extends Base
                 AND ca.service = 1
                 AND ca.uid = :uid
             WHERE (`c`.`name` LIKE :likeKeyword OR `cc`.`code` LIKE :likeKeyword)
-            AND   (cp.cid OR ca.sid)
+            AND   (:superuser OR cp.cid OR ca.sid)
 			ORDER BY {$sanitiser->getSortByWithAlias('c')} {$sanitiser->getSortDir()}
 			LIMIT {$sanitiser->getOffset()}, {$sanitiser->getLimit()}
         ";
@@ -61,6 +61,7 @@ class Result extends Base
             'likeKeyword' => '%'.$mapper->getDatabase()->quoteForLike($sanitiser->getUnquotedKeyword()).'%',
             'gid'         => $user->getRole()->getId(),
             'uid'         => $user->getId(),
+            'superuser'   => $user->isSuperuser(),
         ]);
 
         $results = new Collection();
@@ -120,7 +121,7 @@ class Result extends Base
                 AND ca.service = 1
                 AND ca.uid = :uid
             WHERE (`c`.`name` LIKE :likeKeyword OR `cc`.`code` LIKE :likeKeyword)
-            AND   (cp.cid OR ca.sid)
+            AND   (:superuser OR cp.cid OR ca.sid)
 		";
 
         $stmt = $mapper->getDatabase()->prepare($query);
@@ -128,6 +129,7 @@ class Result extends Base
             'likeKeyword' => '%'.$mapper->getDatabase()->quoteForLike($sanitiser->getUnquotedKeyword()).'%',
             'gid'         => $user->getRole()->getId(),
             'uid'         => $user->getId(),
+            'superuser'   => $user->isSuperuser(),
         ]);
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
