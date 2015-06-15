@@ -43,7 +43,7 @@ class Result extends Base
             LEFT JOIN {$mapper->getJoinSql('codes', 'c', 'cc')}
             LEFT JOIN {$mapper->getJoinSql('homepages', 'c', 'hp')}
             WHERE (`c`.`name` LIKE :likeKeyword OR `cc`.`code` LIKE :likeKeyword)
-			ORDER BY c.{$sanitiser->getSortBy()} {$sanitiser->getSortDir()}
+			ORDER BY {$sanitiser->getSortByWithAlias('c')} {$sanitiser->getSortDir()}
 			LIMIT {$sanitiser->getOffset()}, {$sanitiser->getLimit()}
         ";
 

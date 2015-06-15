@@ -56,7 +56,7 @@ class Result extends Base
 				AND f.deleted_at IS NULL
 				AND f.hidden IS FALSE
 				AND MATCH(f.realname, f.description, f.comment) AGAINST ({$sanitiser->getKeyword()})
-			ORDER BY f.{$sanitiser->getSortBy()} {$sanitiser->getSortDir()}
+			ORDER BY {$sanitiser->getSortByWithAlias('f')} {$sanitiser->getSortDir()}
 			LIMIT {$sanitiser->getOffset()}, {$sanitiser->getLimit()}
 		";
 

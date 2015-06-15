@@ -51,7 +51,7 @@ class Result extends Base
 				(p.cid OR a.sid)
 				AND l.deleted_at IS NULL
 				AND MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()})
-			ORDER BY l.{$sanitiser->getSortBy()} {$sanitiser->getSortDir()}
+			ORDER BY {$sanitiser->getSortByWithAlias('l')} {$sanitiser->getSortDir()}
 			LIMIT {$sanitiser->getOffset()}, {$sanitiser->getLimit()}
 		";
 
