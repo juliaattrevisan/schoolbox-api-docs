@@ -34,11 +34,13 @@ class Result extends Base
         $code_mapper = $mapper->getJoinMapper('codes');
         $homepageConfig_mapper = $mapper->getJoinMapper('homepages');
 
+        // Score search: no scoring, just sort by ID
         $query = "
             SELECT
                 {$mapper->getColumnString('c')},
                 {$code_mapper->getColumnString('cc')},
-                {$homepageConfig_mapper->getColumnString('hp')}
+                {$homepageConfig_mapper->getColumnString('hp')},
+                c.id AS `score`
             FROM {$mapper->getTable()} c
             LEFT JOIN {$mapper->getJoinSql('codes', 'c', 'cc')}
             LEFT JOIN {$mapper->getJoinSql('homepages', 'c', 'hp')}
