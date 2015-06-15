@@ -131,20 +131,25 @@
 
     <fieldset>
         <legend>Student</legend>
+        <div class="large-8 columns">
         <!-- BEGIN student_autocomplete -->
+        <label for="userId">Name</label>
         <input id='userId' name="userId" type='text' value='' placeholder="Search Students" data-selectizeuser required />
         <!-- END student_autocomplete -->
         <!-- BEGIN student_selector -->
-        <select name="userId" class="formfield">
+        <label for="userIdSelect">Name</label>
+        <select id="userIdSelect" name="userId" class="formfield">
             <option disabled>select a child</option>
             <!-- BEGIN student_drop -->
             <option value="{STUDENT_DROP_VALUE}" label="{STUDENT_DROP_NAME}" {STUDENT_DROP_VALUE_SELECTED}>{STUDENT_DROP_NAME}</option>
             <!-- END student_drop -->
         </select>
         <!-- END student_selector -->
-
-        <label for="requestuserPhone">Phone</label>
-        <input type="text" name="request[userPhone]" id="requestuserPhone" required />
+        </div>
+        <div class="large-4 columns">
+            <label for="requestuserPhone">Phone</label>
+            <input type="text" name="request[userPhone]" id="requestuserPhone" required />
+        </div>
     </fieldset>
 
     <fieldset class="large-6 columns">
@@ -176,20 +181,23 @@
     </fieldset>
 
     <fieldset>
-        <legend>Host Information</legend>
-
+        <legend>Host</legend>
+        <div class="large-4 columns">
         <label for="requesthostName">Name</label>
-        <input type="text" name="request[hostName]" id="requesthostName" required />
-
-        <label for="requesthostType">Type</label>
-        <select name="request[hostType]" id="requesthostType">
-            <!-- BEGIN host_type -->
-            <option value="{HOST_TYPE_VALUE}" {HOST_TYPE_VALUE_SELECTED}>{HOST_TYPE_LABEL}</option>
-            <!-- END host_type -->
-        </select>
-
-        <label for="requesthostPhone">Phone</label>
-        <input type="text" name="request[hostPhone]" id="requesthostPhone" required />
+            <input type="text" name="request[hostName]" id="requesthostName" required />
+        </div>
+        <div class="large-4 columns">
+            <label for="requesthostType">Type</label>
+            <select name="request[hostType]" id="requesthostType">
+                <!-- BEGIN host_type -->
+                <option value="{HOST_TYPE_VALUE}" {HOST_TYPE_VALUE_SELECTED}>{HOST_TYPE_LABEL}</option>
+                <!-- END host_type -->
+            </select>
+        </div>
+        <div class="large-4 columns">
+            <label for="requesthostPhone">Phone</label>
+            <input type="text" name="request[hostPhone]" id="requesthostPhone" required />
+        </div>
     </fieldset>
 
     <fieldset>
