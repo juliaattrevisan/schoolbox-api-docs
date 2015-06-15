@@ -47,7 +47,7 @@ class Result extends Base
 				LEFT JOIN {$mapper->getJoinSql('category', 'f', 'c')}
 				LEFT JOIN `perms` p ON `f`.category = `p`.cid
 					AND p.gid = :role_id
-					AND p.type > :min_access
+					AND p.type >= :min_access
 				LEFT JOIN `userAccess` a ON `f`.category = `a`.sid
 					AND a.service = :service
 					AND a.uid = :user_id
@@ -108,7 +108,7 @@ class Result extends Base
 				LEFT JOIN {$mapper->getJoinSql('category', 'f', 'c')}
 				LEFT JOIN `perms` p ON `f`.category = `p`.cid
 					AND p.gid = :role_id
-					AND p.type > :min_access
+					AND p.type >= :min_access
 				LEFT JOIN `userAccess` a ON `f`.category = `a`.sid
 					AND a.service = :service
 					AND a.uid = :user_id
