@@ -14,27 +14,9 @@
 <iframe data-collabdoc src='{ETHERPAD_URL}'></iframe>
 </div>
 
+<script type="text/javascript" src="/javascript/etherpad/jquery.etherpad.js"></script>
 <script type="text/javascript">
     $(function() {
-
-        $(window).resize(function() {
-            $('[data-collabdoc]').css({
-                width: '100%',
-                height: $(window).height()-200
-            });
-        });
-
-        $('[data-collabdoc]').css({
-            width: '100%',
-            height: $(window).height()-200
-        });
-
-        $('[data-deleteButton="1"]').click(function(event) {
-            event.preventDefault();
-
-            if (confirm('Are you sure you want to delete this Collab Doc?')) {
-                window.location.href = $(this).attr('href');
-            }
-        });
+        $('[data-collabdoc]').collabDoc();
     });
 </script>
