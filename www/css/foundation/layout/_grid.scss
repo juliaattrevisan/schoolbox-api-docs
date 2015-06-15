@@ -33,6 +33,11 @@ $row-width: rem-calc(1000);
 // CUSTOM OVERRIDES
 //
 
+// Set unlimited width on rows
+.row{
+	max-width: none;
+}
+
 .full-width {
    width: 100%;
    margin-left: auto;
@@ -40,6 +45,7 @@ $row-width: rem-calc(1000);
    max-width: initial;
 }
 
+// For when you dont want padding
 .no-pad{
 	padding: 0;
 }

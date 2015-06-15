@@ -560,7 +560,7 @@ $tooltip-font-color: $white;
 			@extend .no-pad;
 		}
 		.content{
-			@media #{$medium-up} { @include grid-column(11); }
+			@media #{$small-up} { @include grid-column(11); }
 		}
 	}
 }
@@ -577,10 +577,10 @@ $tooltip-font-color: $white;
 			//@extend .no-pad;
 		}
 		.content{
-			@media #{$medium-up} { @include grid-column(10); }
+			@media #{$small-up} { @include grid-column(10); }
 		}
 		.grade{
-			@media #{$medium-up} { @include grid-column(1); }
+			@media #{$small-up} { @include grid-column(1); }
 			@extend .no-pad;
 			text-align: center;
 			font-weight: $font-weight-bold;
@@ -593,21 +593,22 @@ $tooltip-font-color: $white;
 .subject-list{
 	@extend .information-list;
 	li{
-		.icon{
-			@media #{$small-up} { @include grid-column(1); }
-			@extend .no-pad;
-		}
 		.thumbnail{
 			@media #{$small-up} { @include grid-column(1); }
 		}
 		.content{
-			@media #{$medium-up} { @include grid-column(10); }
+			@media #{$small-up} { @include grid-column(10); }
+		}
+		.icon{
+			@media #{$small-up} { @include grid-column(1); }
+			@extend .no-pad;
 		}
 	}
 }
 
 // Show & Hide Task List
 .task-list{
+	clear: both;
 	max-height: 0;
 	overflow: hidden;
 	margin: 0 0 0 rem-calc(($base-font-size * 2));
@@ -628,6 +629,10 @@ $tooltip-font-color: $white;
 
 // Block Grid
 .grid{
+	// TODO: find block grid mixin
+	//@media #{$large-up} { @include block-grid(4); }
+	//@media #{$medium-up} { @include block-grid(2); }
+	//@media #{$small-up} { @include block-grid(2); }
 	li{
 		border-right: 1px solid $silver;
 		&:last-child{
@@ -636,9 +641,10 @@ $tooltip-font-color: $white;
 	}
 	.thumbnail{
 		@media #{$small-up} { @include grid-column(2); }
+		@extend .no-pad;
 	}
 	.content{
-		@media #{$medium-up} { @include grid-column(10); }
+		@media #{$small-up} { @include grid-column(10); }
 	}
 }
 
@@ -650,21 +656,21 @@ $tooltip-font-color: $white;
 
 	//Grid for 1 action
 	&.one{
-		@media #{$medium-up} { @include grid-column(1); }
+		@media #{$small-up} { @include grid-column(1); }
 		a{
 			@media #{$small-up} { @include grid-column(12); }
 		}
 	}
 	//Grid for 2 actions
 	&.two{
-		@media #{$medium-up} { @include grid-column(2); }
+		@media #{$small-up} { @include grid-column(2); }
 		a{
 			@media #{$small-up} { @include grid-column(6); }
 		}
 	}
 	//Grid for 3 actions
 	&.three{
-		@media #{$medium-up} { @include grid-column(3); }
+		@media #{$small-up} { @include grid-column(3); }
 		a{
 			@media #{$small-up} { @include grid-column(4); }
 		}
