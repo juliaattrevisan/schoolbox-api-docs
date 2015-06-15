@@ -4,7 +4,8 @@
 <script type="text/javascript">
 	$(function() {
 
-		$('#startDate, #finishDate').datepicker({
+        // TODO make datepickery generic
+		$('input[data-datepicker]').datepicker({
 			showOn: 'both',
 			buttonImage: '/images/core/calendar/calendar-click.png',
 			buttonImageOnly: true,
@@ -20,7 +21,7 @@
 			}
 		});
 
-		$('#requestForm').validate();
+		$('form[data-validate]').validate();
 
 		$('#requesthostType').change(function(){
 			if(($(this).val() == '4') && $('#hostDetails').is(':visible')){
@@ -34,21 +35,21 @@
 
 		//<!-- BEGIN student_autocomplete_javascript -->
 
-		$('#user')
-				.selectizeSelector({
-					ajax: {
-						url:      '/ajax/user.php',
-						type:     'GET',
-						data:     {groupID: "{STUDENT_GROUP_IDS}", showCampus: true},
-						dataType: 'json'
-					}
-				})
-				.on('selectize.item_add', function(event, value) {
-					$('#userId').val(value)
-				})
-				.on('selectize.item_remove', function() {
-					$('#userId').val('')
-				})
+		$('[data-selectizeuser]')
+            .selectizeSelector({
+                ajax: {
+                    url:      '/ajax/user.php',
+                    type:     'GET',
+                    data:     {groupID: "{STUDENT_GROUP_IDS}", showCampus: true},
+                    dataType: 'json'
+                }
+            })
+            .on('selectize.item_add', function(event, value) {
+                $('#userId').val(value)
+            })
+            .on('selectize.item_remove', function() {
+                $('#userId').val('')
+            });
 
 		//<!-- END student_autocomplete_javascript -->
 
@@ -132,12 +133,12 @@
 
 <h1>Create Leave Request</h1>
 
-<form method="post" action="/modules/leave/processCreate">
+<form method="post" action="/modules/leave/processCreate" data-validate>
 
     <fieldset>
         <legend>Student</legend>
         <!-- BEGIN student_autocomplete -->
-        <input id='user' type='text' value='' placeholder="Search Students" />
+        <input id='user' type='text' value='' placeholder="Search Students" data-selectizeuser />
         <input id='userId' name='userId' type='hidden' value='' />
         <!-- END student_autocomplete -->
         <!-- BEGIN student_selector -->
@@ -155,7 +156,7 @@
 
     <fieldset>
         <legend>Leave Duration</legend>
-        <input name="request[start][date]" id="startDate" type="text" size="16" maxlength="30" class="required" />
+        <input name="request[start][date]" id="startDate" type="text" required data-datepicker />
         <select name='request[start][time]'>
             <!-- BEGIN request_start_time -->
             <option value='{REQUEST_START_TIME_VALUE}' {REQUEST_START_TIME_SELECTED}>{REQUEST_START_TIME_LABEL}</option>
@@ -164,7 +165,7 @@
 
         to
 
-        <input name="request[finish][date]" id="finishDate" type="text" size="16" maxlength="30" class="required" />
+        <input name="request[finish][date]" id="finishDate" type="text" required data-datepicker />
         <select name='request[finish][time]'>
             <!-- BEGIN request_finish_time -->
             <option value='{REQUEST_FINISH_TIME_VALUE}' {REQUEST_FINISH_TIME_SELECTED}>{REQUEST_FINISH_TIME_LABEL}</option>
