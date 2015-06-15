@@ -34,6 +34,7 @@
 		});
 
 		//<!-- BEGIN student_autocomplete_javascript -->
+        //<!-- END student_autocomplete_javascript -->
 
 		$('[data-selectizeuser]')
             .selectizeSelector({
@@ -44,14 +45,7 @@
                     dataType: 'json'
                 }
             })
-            .on('selectize.item_add', function(event, value) {
-                $('#userId').val(value)
-            })
-            .on('selectize.item_remove', function() {
-                $('#userId').val('')
-            });
-
-		//<!-- END student_autocomplete_javascript -->
+        ;
 
 //		/**
 //		 * LeaveRequest
@@ -138,8 +132,7 @@
     <fieldset>
         <legend>Student</legend>
         <!-- BEGIN student_autocomplete -->
-        <input id='user' type='text' value='' placeholder="Search Students" data-selectizeuser />
-        <input id='userId' name='userId' type='hidden' value='' />
+        <input id='userId' name="userId" type='text' value='' placeholder="Search Students" data-selectizeuser required />
         <!-- END student_autocomplete -->
         <!-- BEGIN student_selector -->
         <select name="userId" class="formfield">
