@@ -1,36 +1,40 @@
-<style type='text/css'>
-	html, body, #wrap, #wrap-inner, #container, #content {
-		min-height: 100% !important;
-		height: 100% !important;
-	}
-</style>
-
-<script type="text/javascript">
-	$(function() {
-		$('[data-deleteButton="1"]').click(function(event) {
-			event.preventDefault();
-
-			if (confirm('Are you sure you want to delete this Collab Doc?')) {
-				window.location.href = $(this).attr('href');
-			}
-		});
-	});
-</script>
-
 <h1>{ETHERPAD_NAME}</h1>
 
-<span class='header_option'>
-	<a href='/homepage/{HOMEPAGE_ID}' class='btn go-back'><span></span>Return to Homepage</a>
+<!-- BEGIN etherpad_lock -->
+<a href='/collabdoc/lock/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' class='button icon-locked'>Lock</a>
+<!-- END etherpad_lock -->
 
-	<!-- BEGIN etherpad_lock -->
-	<a href='/collabdoc/lock/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' class='btn go-back'><span></span>Lock</a>
-	<!-- END etherpad_lock -->
+<!-- BEGIN etherpad_unlock -->
+<a href='/collabdoc/lock/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' class='button icon-locked'>Unlock</a>
+<!-- END etherpad_unlock -->
 
-	<!-- BEGIN etherpad_unlock -->
-	<a href='/collabdoc/lock/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' class='btn go-back'><span></span>Unlock</a>
-	<!-- END etherpad_unlock -->
-</span>
+<a href='/homepage/{HOMEPAGE_ID}' class='button icon-folder'>Return to Homepage</a>
 
-<div class='etherpad-container'>
-	<iframe src='{ETHERPAD_URL}' class='etherpad-iframe'></iframe>
+<div>
+<iframe data-collabdoc src='{ETHERPAD_URL}'></iframe>
 </div>
+
+<script type="text/javascript">
+    $(function() {
+
+        $(window).resize(function() {
+            $('[data-collabdoc]').css({
+                width: '100%',
+                height: $(window).height()-200
+            });
+        });
+
+        $('[data-collabdoc]').css({
+            width: '100%',
+            height: $(window).height()-200
+        });
+
+        $('[data-deleteButton="1"]').click(function(event) {
+            event.preventDefault();
+
+            if (confirm('Are you sure you want to delete this Collab Doc?')) {
+                window.location.href = $(this).attr('href');
+            }
+        });
+    });
+</script>
