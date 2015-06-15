@@ -44,7 +44,14 @@ class Result extends Base
             FROM {$mapper->getTable()} c
             LEFT JOIN {$mapper->getJoinSql('codes', 'c', 'cc')}
             LEFT JOIN {$mapper->getJoinSql('homepages', 'c', 'hp')}
+            LEFT JOIN `perms` cp ON c.id = cp.cid
+                AND `perms`.gid = :gid
+                AND `perms`.type > 0
+            LEFT JOIN `userAccess` ca ON c.id = ca.sid
+                AND `userAccess`.service = 1
+                AND `userAccess`.uid = :uid
             WHERE (`c`.`name` LIKE :likeKeyword OR `cc`.`code` LIKE :likeKeyword)
+            AND   (cp.cid OR ca.sid)
 			ORDER BY {$sanitiser->getSortByWithAlias('c')} {$sanitiser->getSortDir()}
 			LIMIT {$sanitiser->getOffset()}, {$sanitiser->getLimit()}
         ";
@@ -52,6 +59,8 @@ class Result extends Base
         $statement = $mapper->getDatabase()->prepare($query);
         $statement->execute([
             'likeKeyword' => '%'.$mapper->getDatabase()->quoteForLike($sanitiser->getUnquotedKeyword()).'%',
+            'gid'         => $user->getRole()->getId(),
+            'uid'         => $user->getId(),
         ]);
 
         $results = new Collection();
@@ -104,12 +113,21 @@ class Result extends Base
             FROM {$mapper->getTable()} c
             LEFT JOIN {$mapper->getJoinSql('codes', 'c', 'cc')}
             LEFT JOIN {$mapper->getJoinSql('homepages', 'c', 'hp')}
+            LEFT JOIN `perms` cp ON c.id = cp.cid
+                AND `perms`.gid = :gid
+                AND `perms`.type > 0
+            LEFT JOIN `userAccess` ca ON c.id = ca.sid
+                AND `userAccess`.service = 1
+                AND `userAccess`.uid = :uid
             WHERE (`c`.`name` LIKE :likeKeyword OR `cc`.`code` LIKE :likeKeyword)
+            AND   (cp.cid OR ca.sid)
 		";
 
         $stmt = $mapper->getDatabase()->prepare($query);
         $stmt->execute([
             'likeKeyword' => '%'.$mapper->getDatabase()->quoteForLike($sanitiser->getUnquotedKeyword()).'%',
+            'gid'         => $user->getRole()->getId(),
+            'uid'         => $user->getId(),
         ]);
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
