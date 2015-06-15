@@ -59,7 +59,7 @@ class CanBookItem implements Rule\IAuthorizationRule
         if ($params['item'] instanceof Item\Model) {
             $item = $params['item'];
         } else {
-            $item = $this->getMapper()->findById($params['id']);
+            $item = $params['item'] = $this->getMapper()->findById($params['id']);
         }
         $auth = new Rule\Any(
             new Rule\IsSuperuser(),
