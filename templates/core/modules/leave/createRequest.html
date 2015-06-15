@@ -6,18 +6,13 @@
 
         // TODO make datepickery generic
 		$('input[data-datepicker]').datepicker({
-			showOn: 'both',
-			buttonImage: '/images/core/calendar/calendar-click.png',
-			buttonImageOnly: true,
 			constrainInput: false,
 			minDate: new Date(),
 			onClose: function (string) {
 				var input = $(this);
-
 				$.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
 					input.val(data.time);
 				})
-
 			}
 		});
 
