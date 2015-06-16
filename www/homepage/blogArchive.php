@@ -10,6 +10,7 @@ $this->setBlock(TEMPLATE_content, "submit_blog", "submit_blog_block");
 
 $this->setBlock(TEMPLATE_content, 'blog', 'blog_block');
 $this->setBlock('blog', 'comment', 'comment_block');
+$this->setBLock('blog', 'can_modify', 'can_modify_block');
 
 $this->setBlock(TEMPLATE_content, "year", "year_block");
 $this->setBlock('year', 'month', 'month_block');
@@ -101,11 +102,11 @@ if ($blogList = $blogHandler->getByYearAndMonth($category->getId(), $yearNumber,
 
         /* Modify Action */
         if ($blog['owner'] == $_SESSION['id'] || $groupHandler->getPermission($blog['id']) >= WRITE_ACCESS) {
-            $this->setVar(
-                "MOD_BLOG", '<a class="btn modify" href="/blog/modify/' . $blog['id'] . '"><span></span>Modify</a>'
-            );
+            $this->parse('can_modify_block', 'can_modify');
         } else {
-            $this->setVar("MOD_BLOG", '');
+            $this->setVar(array(
+                'can_modify_block' => ''
+            ));
         }
 
         /* Post */
@@ -124,9 +125,9 @@ if ($blogList = $blogHandler->getByYearAndMonth($category->getId(), $yearNumber,
                 'BLOG_HEADING' => Scrub::text($blog['heading']),
                 'BLOG_BODY' => Scrub::html($blog['body']),
                 'BLOG_AUTHOR_ID' => $blog['owner'],
+                'BLOG_AUTHOR_EXTERNAL_ID' => $synID,
                 'BLOG_AUTHOR_NAME' => $poster,
-                'BLOG_AUTHOR_THUMB' => "/portrait.php?userId=$synID&size=square32",
-                'BLOG_AUTHOR_GROUP' => $postedDate->getShort(),
+                'BLOG_POSTED_DATE' => $postedDate->getShort(),
                 'BLOG_COMMENTS' => '',
                 'BLOG_SHADING' => ++$i % 2 ? 'dark' : ''
             )
@@ -178,5 +179,11 @@ if ($blogList = $blogHandler->getByYearAndMonth($category->getId(), $yearNumber,
         }
 
         $this->parse('blog_block', 'blog', true);
+
+        /* Clear children after parsing out the parent
+         */
+        $this->setVar(array(
+            'can_modify_block' => ''
+        ));
     }
 }
