@@ -113,12 +113,20 @@
             <!-- END host_type -->
         </select>
         <div class="large-6 columns" data-relation="host_type_field">
-        <label for="requesthostName">Name</label>
+            <label for="requesthostName">Name</label>
             <input type="text" name="request[hostName]" id="requesthostName" required />
+        </div>
+        <div class="large-6 columns" data-relation="host_type_field">
+            <label for="requesthostAddress">Address</label>
+            <textarea name="request[hostAddress]" id="requesthostAddress"></textarea>
         </div>
         <div class="large-6 columns" data-relation="host_type_field">
             <label for="requesthostPhone">Phone</label>
             <input type="text" name="request[hostPhone]" id="requesthostPhone" required />
+        </div>
+        <div class="large-6 columns" data-relation="host_type_field">
+            <label for="requesthostMobile">Mobile</label>
+            <input type="text" name="request[hostMobile]" id="requesthostMobile" required />
         </div>
     </fieldset>
 
@@ -143,6 +151,11 @@
         <legend>Description</legend>
         <em>Only complete for special leave information or travel arrangements</em>
         <textarea id='description' name="request[description]" maxlength="100" data-warninglength="67"></textarea>
+    </fieldset>
+
+    <fieldset>
+        <legend>Reason For Leave</legend>
+        <textarea name="request[reason]"></textarea>
     </fieldset>
 
     <fieldset>
