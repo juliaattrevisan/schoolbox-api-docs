@@ -18,7 +18,7 @@
             }
         });
 
-        $('#reportDate').datepicker({
+        $('input[data-datepicker]').datepicker({
 //            showOn:'both',
 //            buttonImage:'/images/core/calendar/calendar-click.png',
 //            buttonImageOnly:true,
@@ -31,28 +31,24 @@
             }
         });
 
-        $('form[data-action="search"]').submit(function (event) {
+        var searchForm = $('form[data-form_type="search"]');
+        searchForm.on('click', 'button[data-action="search"]', function (event) {
             event.preventDefault();
-            var form    = $(this);
-            var houseId = form.find(':input[name="reportHouse"]').val();
-            var date    = form.find(':input[name="reportDate"]').val().replace(/\//g, '-');
+            var houseId = searchForm.find(':input[name="reportHouse"]').val();
+            var date    = searchForm.find(':input[name="reportDate"]').val().replace(/\//g, '-');
             window.location.href = '/modules/leave/report/house/' + houseId + '/' + date;
         });
-
-        $('#reportFilterSubmit').click(function () {
-            $('#reportFilter').submit();
+        searchForm.on('click', 'button[data-action="export"]', function (event) {
+            event.preventDefault();
+            var houseId = searchForm.find(':input[name="reportHouse"]').val();
+            var date    = searchForm.find(':input[name="reportDate"]').val().replace(/\//g, '-');
+            window.location.href = '/modules/leave/report/house/' + houseId + '/' + date + '/export';
         });
 
-        $('#reportExportButton').click(function (e) {
-            var date = $('#reportDate').val().toString().replace(/\//g, "-");
-            window.location = $(this).attr('href') + "/" + date + '/export';
-            e.preventDefault();
-        });
-
-        $('.print').click(function (e) {
-            window.print();
-            e.preventDefault();
-        });
+//        $('.print').click(function (e) {
+//            window.print();
+//            e.preventDefault();
+//        });
 
         /*
          * Hack for the hidden column next to the BS.
@@ -67,7 +63,6 @@
     <a class="button icon-menu"href="#" data-dropdown="options">Options</a>
 </span>
 <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="options">
-    <li><a class="icon-export" href="/modules/leave/report/house/{HOUSE_ID}">Export History</a></li>
     <li><a class="" href="/modules/leave/house/{HOUSE_ID}">Return to {HOUSE_NAME}</a></li>
     <li><a class="icon-print" href="javascript:window.print()">Print</a></li>
 </ul>
