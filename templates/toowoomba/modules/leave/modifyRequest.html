@@ -1,5 +1,6 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.warninglength.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
     $(function () {
         $('input[data-datepicker]').datepicker({
@@ -28,6 +29,24 @@
         $('[data-warninglength]').warninglength({
             messagePrototype: $('<label class="warning" />')
         });
+
+        // Confirmation of delete button
+        $('[data-action="delete"]').click(function(event) {
+            event.preventDefault();
+            var element = $(this);
+            $(this).confirmDialog({
+                confirmEvent: function() {
+                    // Build a hidden input with the delete button's name/val,
+                    // then submit
+                    var form = element.closest('form');
+                    form.append(
+                            $('<input type="hidden" />')
+                                    .attr('name', element.attr('name'))
+                                    .val(element.val())
+                    ).submit()
+                }
+            });
+        })
     });
 </script>
 <!-- END custom_head -->
@@ -178,7 +197,7 @@
 
     <input type="hidden" name="request[id]" value="{REQUEST_ID}">
     <button type="submit" name="modify" value="Modify" class="button icon-modify">Modify</button>
-    <button type="submit" name="delete" value="Delete" class="button alert icon-delete">Delete</button>
+    <button type="submit" name="delete" value="Delete" data-action="delete" class="button alert icon-delete">Delete</button>
     <button type="submit" name="reject" value="Reject" class="button warning icon-close">Reject</button>
     <button type="submit" name="approve" value="Approve" class="button success icon-approve">Approve</button>
 </form>
