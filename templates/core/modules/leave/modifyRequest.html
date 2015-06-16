@@ -1,4 +1,5 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.warninglength.js"></script>
 <script type="text/javascript">
 	$(function () {
         $('input[data-datepicker]').datepicker({
@@ -12,20 +13,24 @@
             }
         });
 
-		$('#requesthostType').change(function () {
-			if (($(this).val() == '4') && $('#hostDetails').is(':visible')) {
-				$('#hostDetails').slideUp();
-				$('#hostDetails input').removeClass('required');
-			} else {
-				$('#hostDetails').slideDown();
-				$('#hostDetails input').addClass('required');
-			}
-		});
+        $('form[data-validate]').validate();
+
+        // Hide host details if "self" is selected
+        $('[data-relation="host_type_selector"]').change(function(){
+            var details = $('[data-relation="host_type_field"]');
+            if(($(this).val() == '4')){
+                details.slideUp();
+            } else {
+                details.slideDown();
+            }
+        });
+
+        $('[data-warninglength]').warninglength({
+            messagePrototype: $('<label class="warning" />')
+        });
 	});
 </script>
 <!-- END custom_head -->
-
-<h1>Leave Request: {USER_NAME}, Year {USER_YEAR}, {USER_HOUSE}</h1>
 
 <span class="header-actions">
     <a class="button icon-menu" href="#" data-dropdown="newsOptions">Options</a>
@@ -40,7 +45,9 @@
     <li><a class="icon-up" href='/modules/leave/house/{USER_HOUSE_ID}'><span></span>Back to list</a></li>
 </ul>
 
-<form method="post" action="/modules/leave/processModify" id="requestForm">
+<h1>Leave Request: {USER_NAME}, Year {USER_YEAR}, {USER_HOUSE}</h1>
+
+<form method="post" action="/modules/leave/processModify" data-validate>
     <fieldset>
         <legend>Student</legend>
         <div class="large-8 columns">
@@ -55,16 +62,15 @@
         </div>
     </fieldset>
 
-    <section class="large-6 columns">
-        <h1>Status</h1>
+    <fieldset class="large-6 columns">
+        <legend>Status</legend>
         {REQUEST_STATUS}
-    </section>
+    </fieldset>
 
-    <section class="large-6 columns">
-        <h1>Requested By</h1>
+    <fieldset class="large-6 columns">
+        <legend>Requested By</legend>
         {AUTHOR_NAME}
-    </section>
-
+    </fieldset>
 
     <fieldset class="large-6 columns">
         <legend>Leave Date</legend>
@@ -133,7 +139,7 @@
 
     <fieldset>
         <legend>Notes</legend>
-        <textarea name="request[notes]" maxlength="100" data-warninglength="67">{REQUEST_NOTES}</textarea>
+        <textarea name="request[notes]">{REQUEST_NOTES}</textarea>
     </fieldset>
 
     <!-- BEGIN has_confirmed_by -->
