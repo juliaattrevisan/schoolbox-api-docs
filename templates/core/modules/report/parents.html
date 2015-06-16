@@ -105,78 +105,72 @@
 <div>
     <!-- BEGIN private -->
     <span title="Details have not been made available">
-    {STUDENT_FIRSTNAME} {STUDENT_SURNAME} {STUDENT_HOUSE} - {STUDENT_BOARDER}
+    {STUDENT_FIRSTNAME} {STUDENT_SURNAME} {STUDENT_HOUSE} {STUDENT_BOARDER}
     </span>
     <!-- END private -->
     <!-- BEGIN public -->
-    {STUDENT_FIRSTNAME} {STUDENT_SURNAME} {STUDENT_HOUSE} - {STUDENT_BOARDER}
+    {STUDENT_FIRSTNAME} {STUDENT_SURNAME} {STUDENT_HOUSE} {STUDENT_BOARDER}
     <!-- END public -->
 
     <!-- BEGIN contact -->
-    <!-- BEGIN primary -->
-    <div class="primary">
-        <table padding="0" border="0" width="100%" class="table">
-            <colgroup>
-                <col class="fields" />
-                <col class="values" />
-            </colgroup>
-            <tbody>
-                <tr>
-                    <td valign="top"><b>Name</b></td>
-                    <td> {CONTACT_TITLE} {CONTACT_FIRSTNAME} {CONTACT_SURNAME}</td>
-                </tr>
-                <tr class="dark">
-                    <td valign="top"><b>Home Phone</b></td>
-                    <td>{CONTACT_PHONE}</td>
-                </tr>
-                <tr>
-                    <td valign="top"><b>Mobile</b></td>
-                    <td>{CONTACT_MOBILE}</td>
-                </tr>
-                <tr class="dark">
-                    <td valign="top"><b>Email</b></td>
-                    <td><a href="mailto:{CONTACT_EMAIL}"> {CONTACT_EMAIL}</a></td>
-                </tr>
-                <tr>
-                    <td valign="top"><b>Address</b></td>
-                    <td>{CONTACT_HOME_STREET} {CONTACT_HOME_SUBURB} {CONTACT_HOME_STATE} {CONTACT_HOME_POSTCODE} {CONTACT_HOME_COUNTRY}</td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="row full-width">
+        <!-- BEGIN primary -->
+        <div class="large-6 columns">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Name</td>
+                        <td>{CONTACT_TITLE} {CONTACT_FIRSTNAME} {CONTACT_SURNAME}</td>
+                    </tr>
+                    <tr>
+                        <td>Home Phone</td>
+                        <td>{CONTACT_PHONE}</td>
+                    </tr>
+                    <tr>
+                        <td>Mobile</td>
+                        <td>{CONTACT_MOBILE}</td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td><a href="mailto:{CONTACT_EMAIL}"> {CONTACT_EMAIL}</a></td>
+                    </tr>
+                    <tr>
+                        <td>Address</td>
+                        <td>{CONTACT_HOME_STREET} {CONTACT_HOME_SUBURB} {CONTACT_HOME_STATE} {CONTACT_HOME_POSTCODE} {CONTACT_HOME_COUNTRY}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- END primary -->
+        <!-- BEGIN spouse -->
+        <div class="large-6 columns">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Name</td>
+                        <td>{SPOUSE_TITLE} {SPOUSE_FIRSTNAME} {SPOUSE_SURNAME}</td>
+                    </tr>
+                    <tr>
+                        <td>Home Phone</td>
+                        <td>{CONTACT_PHONE}</td>
+                    </tr>
+                    <tr>
+                        <td>Mobile</td>
+                        <td>{SPOUSE_CONTACT_MOBILE}</td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td><a href="mailto:{SPOUSE_CONTACT_EMAIL}">{SPOUSE_CONTACT_EMAIL}</a></td>
+                    </tr>
+                    <tr>
+                        <td>Address</td>
+                        <td>{CONTACT_HOME_STREET} {CONTACT_HOME_SUBURB} {CONTACT_HOME_STATE} {CONTACT_HOME_POSTCODE} {CONTACT_HOME_COUNTRY}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- END spouse -->
     </div>
-    <!-- END primary -->
-    <!-- BEGIN spouse -->
-    <div class="spouse">
-        <table padding="0" border="0" width="100%" class="table">
-            <colgroup>
-                <col class="fields" />
-                <col class="values" />
-            </colgroup>
-            <tbody>
-                <tr>
-                    <td><b>Name</b></td>
-                    <td> {SPOUSE_TITLE} {SPOUSE_FIRSTNAME} {SPOUSE_SURNAME}</td>
-                </tr>
-                <tr class="dark">
-                    <td valign="top"><b>Home Phone</b></td>
-                    <td>{CONTACT_PHONE}</td>
-                </tr>
-                <tr>
-                    <td><b>Mobile</b></td>
-                    <td>{SPOUSE_CONTACT_MOBILE}</td>
-                </tr>
-                <tr class="dark">
-                    <td><b>Email</b></td>
-                    <td><a href="mailto:{SPOUSE_CONTACT_EMAIL}">{SPOUSE_CONTACT_EMAIL}</a></td>
-                </tr>
-                <tr>
-                    <td valign="top"><b>Address</b></td>
-                    <td>{CONTACT_HOME_STREET} {CONTACT_HOME_SUBURB} {CONTACT_HOME_STATE} {CONTACT_HOME_POSTCODE} {CONTACT_HOME_COUNTRY}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <!-- END spouse -->
     <!-- END contact -->
 </div>
 <!-- END student -->
