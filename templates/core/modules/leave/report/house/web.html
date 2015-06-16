@@ -3,8 +3,6 @@
 <script type="text/javascript">
     $(function () {
 
-//        $('#container').css('width', $('.ruler').outerWidth());
-
         $(".sortable-table").tablesorter({
             cssHeader:'sortable',
             cssAsc:'ascending',
@@ -76,7 +74,7 @@
     <li><a class="icon-print" href="javascript:window.print()">Print</a></li>
 </ul>
 
-<h1>Leave Report for {HOUSE_NAME} (Core)</h1>
+<h1>Leave Report for {HOUSE_NAME}</h1>
 
 <!-- BEGIN no_requests -->
 {HOUSE_NAME} has no pending or previous requests.
@@ -103,7 +101,7 @@
     </fieldset>
 </form>
 
-<p class='leaveReportGeneratedAt'>Generated on {GENERATED_AT}</p>
+<!--<p class='leaveReportGeneratedAt'>Generated on {GENERATED_AT}</p>-->
 
 <table id="requestList" class="ruler table sortable-table" width="100%" style="table-layout:fixed;">
     <!--
