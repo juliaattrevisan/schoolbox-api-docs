@@ -1,28 +1,46 @@
+<span class="header-actions">
+    <!-- BEGIN submit_news -->
+    <a href="/news/homepage/new/{ID}" class="button icon-news">Post News</a>
+    <!-- END submit_news -->
+    <a href="/homepage/{ID}" class="button icon-folder">Return to Homepage</a>
+</span>
+
 <h1>News Archive for {CATEGORY_NAME}</h1>
 
-<!-- BEGIN submit_news -->
-<a href="/news/homepage/new/{ID}" class="btn up-arrow"><span></span>Post News</a>
-<!-- END submit_news -->
-<a href="/homepage/{ID}" class="btn go-back"><span></span>Return to Homepage</a>
-<div class="blog listing">
+<div class="row full-width">
+    <ul>
+        <!-- BEGIN news -->
+        <li>
+            <span class="header-actions">
+                <!-- BEGIN can_modify -->
+                <a class="button icon-modify" href="/news/homepage/{NEWS_ID}">Modify</a>
+                <!-- END can_modify -->
+            </span>
 
-<ul>
-    <!-- BEGIN news -->
-    <li class="{ON_OFF} clearfix">
-        <h3 class="clearfix">{NEWS_HEADING}</h3>
-        <div class="small-right">
-            <p class="interact">{MOD_NEWS}</p>
-        </div>
-        <p class="author">
-            <a href="/search/user/{AUTHOR_ID}" class="author">
-                <img width="32" height="32" src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square32"/>
-                <span class="name">{AUTHOR}</span>
-            </a>
-                    <span class="subtitle">Posted {POSTED_DATE}</span>
-        </p>
-        <div class="blog-body">{NEWS_BODY}</div>
-    </li>
-    <!-- END news -->
-</ul>
+            <h2>{NEWS_HEADING}</h2>
 
+            <ul class="grid small-block-grid-2 large-block-grid-4">
+                <li>
+                    <div class="row collapse full-width">
+                        <div class="thumbnail columns">
+                            <a href="/search/user/{AUTHOR_ID}" class="author">
+                                <img src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square64"/>
+                            </a>
+                        </div>
+                        <div class="content">
+                            {AUTHOR}
+                            <p class="meta">
+                                Posted {POSTED_DATE}
+                            </p>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+
+            <div>
+                {NEWS_BODY}
+            </div>
+        </li>
+        <!-- END news -->
+    </ul>
 </div>

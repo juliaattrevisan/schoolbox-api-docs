@@ -9,6 +9,11 @@ $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
 $this->setFile(TEMPLATE_content, "homepage/newsArchive.html");
 $this->setBlock(TEMPLATE_content, "submit_news", "submit_news_block");
 $this->setBlock(TEMPLATE_content, "news", "news_block");
+$this->setBlock('news', "can_modify", "can_modify_block");
+
+$this->setVar(array(
+    'can_modify_block' => ''
+));
 
 try {
     $category = $categoryMapper->findById($this->arg[0]);
@@ -36,9 +41,11 @@ if (is_array($newsList)) {
     $j = 0;
     foreach ($newsList as $news) {
         if ($article['owner'] == $_SESSION['id'] || $groupHandler->getPermission($category->getId()) >= WRITE_ACCESS) {
-            $this->setVar("MOD_NEWS", "<a class=\"btn modify\" href=\"/news/homepage/".$news['id']."\"><span></span>Modify</a>");
+            $this->parse('can_modify_block', 'can_modify');
         } else {
-            $this->setVar("MOD_NEWS", "");
+            $this->setVar(array(
+                'can_modify_block' => ''
+            ));
         }
 
         $userHandler = new User();
@@ -62,6 +69,12 @@ if (is_array($newsList)) {
         $this->setVar($output);
 
         $this->parse("news_block", "news", true);
+
+        /* Clear children after parsing out the parent
+         */
+        $this->setVar(array(
+            'can_modify_block' => ''
+        ));
     }
 } else {
     $this->setVar("news_block", "");
