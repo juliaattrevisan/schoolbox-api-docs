@@ -184,10 +184,9 @@
 	</table>
 
 	<input type="hidden" name="request[id]" value="{REQUEST_ID}">
-	<input type="submit" name="modify" value="Modify" class="submit-btn-plain">
-	<input type="submit" name="delete" value="Delete" class="submit-btn-plain"
-		   onclick="return confirm('Are you sure you wish to delete all record of this request?')">
-	<input type="submit" name="reject" value="Reject" class="submit-btn-plain">
-	<input type="submit" name="approve" value="Approve" class="submit-btn-plain">
+    <button type="submit" name="modify" value="Modify" class="button icon-modify">Modify</button>
+    <button type="submit" name="delete" value="Delete" class="button alert icon-delete">Delete</button>
+    <button type="submit" name="reject" value="Reject" class="button warning icon-close">Reject</button>
+    <button type="submit" name="approve" value="Approve" class="button success icon-approve">Approve</button>
 </form>
 
