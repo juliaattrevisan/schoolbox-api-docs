@@ -1,38 +1,3 @@
-<!-- BEGIN custom_head -->
-<!--
-<script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
-<script type="text/javascript">
-//    $(function () {
-//        $("#pendingRequestList").tablesorter({
-//            cssHeader:'sortable',
-//            cssAsc:'ascending',
-//            cssDesc:'descending',
-//            headers:{
-//                0:{ sorter:false},
-//                5:{ sorter:false}
-//            }
-//        });
-//
-//        $("#previousRequestList").tablesorter({
-//            cssHeader:'sortable',
-//            cssAsc:'ascending',
-//            cssDesc:'descending',
-//            headers:{
-//                8:{ sorter:false}
-//            }
-//        });
-//
-//        $("#pendingRequestList, #previousRequestList").bind('sortEnd', function () {
-//            var requestList = $(this);
-//
-//            requestList.find('tbody tr').removeClass('dark');
-//            requestList.find('tbody tr:even').addClass('dark');
-//        });
-//    });
-</script>
--->
-<!-- END custom_head -->
-
 <span class="header-actions">
     <a class="button icon-menu"href="#" data-dropdown="options">Options</a>
 </span>
@@ -51,38 +16,33 @@
 
 <!-- BEGIN request_list -->
 <!-- BEGIN pending_request_list -->
-<form name="modifyListForm" action="/modules/leave/processModifyList" method="post">
-    <h2>Pending Requests</h2>
-    <table id="pendingRequestList" class="ruler table">
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Year</th>
-            <th>Leave Date</th>
-            <th>Days</th>
-            <th>Host</th>
-            <th class="center">View</th>
-        </tr>
-        </thead>
-        <tbody>
-        <!-- BEGIN pending_request -->
-        <tr>
-            <td><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
-            <td>{USER_YEAR}</td>
-            <td>{REQUEST_START}</td>
-            <td>{REQUEST_DURATION}</td>
-            <td>{REQUEST_HOST_TYPE}</td>
-            <td class="center"><a href="/modules/leave/{ALLOWED_ACTION}/{REQUEST_ID}">View</a></td>
-        </tr>
-        <!-- END pending_request -->
-        </tbody>
-    </table>
-
-    <div class="clearfix">
-        <input type="hidden" name="user[id]" value="{USER_ID}">
-    </div>
-</form>
+<h2>Pending Requests</h2>
+<table id="pendingRequestList" class="ruler table">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Year</th>
+        <th>Leave Date</th>
+        <th>Days</th>
+        <th>Host</th>
+        <th class="center">View</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- BEGIN pending_request -->
+    <tr>
+        <td><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
+        <td>{USER_YEAR}</td>
+        <td>{REQUEST_START}</td>
+        <td>{REQUEST_DURATION}</td>
+        <td>{REQUEST_HOST_TYPE}</td>
+        <td class="center"><a href="/modules/leave/{ALLOWED_ACTION}/{REQUEST_ID}">View</a></td>
+    </tr>
+    <!-- END pending_request -->
+    </tbody>
+</table>
 <!-- END pending_request_list -->
+
 <!-- BEGIN previous_request_list -->
 <h2>Request History</h2>
 <!-- BEGIN export -->
