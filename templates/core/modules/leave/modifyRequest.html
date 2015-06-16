@@ -1,20 +1,16 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
 	$(function () {
-		$('#startDate, #finishDate').datepicker({
-			showOn:'both',
-			buttonImage:'/images/core/calendar/calendar-click.png',
-			buttonImageOnly:true,
-			constrainInput:false,
-			minDate:new Date(),
-			onClose:function (string) {
-				var input = $(this);
-
-				$.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
-					input.val(data.time);
-				})
-			}
-		});
+        $('input[data-datepicker]').datepicker({
+            constrainInput: false,
+            minDate: new Date(),
+            onClose: function (string) {
+                var input = $(this);
+                $.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                    input.val(data.time);
+                })
+            }
+        });
 
 		$('#requesthostType').change(function () {
 			if (($(this).val() == '4') && $('#hostDetails').is(':visible')) {
@@ -29,159 +25,131 @@
 </script>
 <!-- END custom_head -->
 
-<h1><span>Leave Request: {USER_NAME}, Year {USER_YEAR}, {USER_HOUSE}</span></h1>
-<span class="header_option">
-    <!-- BEGIN next_pending -->
-    <a class="btn go-to" href='/modules/leave/modify/{NEXT_PENDING_ID}'><span></span>Next Pending</a>
-    <!-- END next_pending -->
-    <a class="btn up-arrow" href='/modules/leave/house/{USER_HOUSE_ID}'><span></span>Back to list</a>
-    <!-- BEGIN prev_pending -->
-    <a class="btn go-back" href='/modules/leave/modify/{PREV_PENDING_ID}'><span></span>Previous Pending</a>
-    <!-- END prev_pending -->
+<h1>Leave Request: {USER_NAME}, Year {USER_YEAR}, {USER_HOUSE}</h1>
+
+<span class="header-actions">
+    <a class="button icon-menu" href="#" data-dropdown="newsOptions">Options</a>
 </span>
+<ul class="f-dropdown fadeInDown" data-dropdown-content="" id="newsOptions">
+    <!-- BEGIN next_pending -->
+    <li/><a class="icon-next" href='/modules/leave/modify/{NEXT_PENDING_ID}'><span></span>Next Pending</a></li>
+    <!-- END next_pending -->
+    <!-- BEGIN prev_pending -->
+    <li><a class="icon-previous" href='/modules/leave/modify/{PREV_PENDING_ID}'><span></span>Previous Pending</a></li>
+    <!-- END prev_pending -->
+    <li><a class="icon-up" href='/modules/leave/house/{USER_HOUSE_ID}'><span></span>Back to list</a></li>
+</ul>
 
 <form method="post" action="/modules/leave/processModify" id="requestForm">
-	<table class="standardForm table">
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Status</h4>
-				<em></em>
-			</td>
-			<td>
-				{REQUEST_STATUS}
-			</td>
-			<td class="formLabelWidth">
-				<h4>Requested By</h4>
-				<em></em>
-			</td>
-			<td>
-				{AUTHOR_NAME}
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Leave Date</h4>
-				<em></em>
-			</td>
-			<td>
-				<input name="request[start][date]" id="startDate" type="text" size="16" maxlength="30"
-					   value="{REQUEST_START_DATE}"/>
-			</td>
-			<td class="formLabelWidth">
-				<h4>Leave Time</h4>
-				<em>AM&nbsp;=&nbsp;Morning, PM&nbsp;=&nbsp;Afternoon/Evening</em>
-			</td>
-			<td>
-				<select name='request[start][time]'>
-					<!-- BEGIN request_start_time -->
-					<option value='{REQUEST_START_TIME_VALUE}'
-					{REQUEST_START_TIME_SELECTED}>{REQUEST_START_TIME_LABEL}</option>
-					<!-- END request_start_time -->
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Return Date</h4>
-				<em></em>
-			</td>
-			<td>
-				<input name="request[finish][date]" id="finishDate" type="text" size="16" maxlength="30"
-					   value="{REQUEST_FINISH_DATE}"/>
-			</td>
-			<td class="formLabelWidth">
-				<h4>Return Time</h4>
-				<em>AM&nbsp;=&nbsp;Morning, PM&nbsp;=&nbsp;Afternoon/Evening</em>
-			</td>
-			<td>
-				<select name='request[finish][time]'>
-					<!-- BEGIN request_finish_time -->
-					<option value='{REQUEST_FINISH_TIME_VALUE}'
-					{REQUEST_FINISH_TIME_SELECTED}>{REQUEST_FINISH_TIME_LABEL}</option>
-					<!-- END request_finish_time -->
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Host</h4>
-				<em></em>
-			</td>
-			<td>
-				<select name="request[hostType]" id="requesthostType">
-					<!-- BEGIN host_type -->
-					<option value="{HOST_TYPE_VALUE}"
-					{HOST_TYPE_SELECTED}>{HOST_TYPE_LABEL}</option>
-					<!-- END host_type -->
-				</select>
-			</td>
-			<td class="formLabelWidth">
-				<h4>Student Phone</h4>
-				<em></em>
-			</td>
-			<td>
-				<input type="text" name="request[userPhone]" size="16" value="{REQUEST_USER_PHONE}"/>
-			</td>
-		</tr>
-		<tr id="hostDetails">
-			<td class="formLabelWidth">
-				<h4>Host Name</h4>
-				<em>The host will need to confirm your leave arrangements; you can forward them the email you
-					receive.</em>
-			</td>
-			<td>
-				<input type="text" name="request[hostName]" size="24" class="required" value="{REQUEST_HOST_NAME}"/>
-			</td>
-			<td class="formLabelWidth">
-				<h4>Host Phone</h4>
-				<em></em>
-			</td>
-			<td>
-				<input type="text" name="request[hostPhone]" size="16" class="required" value="{REQUEST_HOST_PHONE}"/>
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Travel Method</h4>
-			</td>
-			<td colspan="3">
-				<select name="request[travelType]">
-					<!-- BEGIN travel_drop -->
-					<option value="{TRAVEL_DROP_VALUE}" label="{TRAVEL_DROP_NAME}"  {TRAVEL_DROP_VALUE_SELECTED}>{TRAVEL_DROP_NAME}</option>
-					<!-- END travel_drop -->
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Description</h4>
-				<em>Only complete for special leave information or travel arrangements</em>
-			</td>
-			<td>
-				<textarea rows="4" cols="40" name="request[description]">{REQUEST_DESCRIPTION}</textarea>
-			</td>
-			<td class="formLabelWidth">
-				<h4>Notes</h4>
-				<em></em>
-			</td>
-			<td>
-				<textarea rows="4" cols="40" name="request[notes]">{REQUEST_NOTES}</textarea>
-			</td>
-		</tr>
-		<!-- BEGIN has_confirmed_by -->
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Confirmed by</h4><em></em>
-			</td>
-			<td colspan="3">
-				<!-- BEGIN confirmed_by -->
-				<input type='radio' name='request[confirmedBy]' value='{CONFIRMED_BY_VALUE}' {CONFIRMED_BY_SELECTED}
-				/>{CONFIRMED_BY_LABEL}<br/>
-				<!-- END confirmed_by -->
-			</td>
-		</tr>
-		<!-- END has_confirmed_by -->
-	</table>
+    <fieldset>
+        <legend>Student</legend>
+        <div class="large-8 columns">
+            <dl>
+                <dt>Name</dt>
+                <dd>{USER_NAME}</dd>
+            </dl>
+        </div>
+        <div class="large-4 columns">
+            <label for="requestuserPhone">Phone</label>
+            <input type="text" name="request[userPhone]" value="{REQUEST_USER_PHONE}" id="requestuserPhone" required />
+        </div>
+    </fieldset>
+
+    <section class="large-6 columns">
+        <h1>Status</h1>
+        {REQUEST_STATUS}
+    </section>
+
+    <section class="large-6 columns">
+        <h1>Requested By</h1>
+        {AUTHOR_NAME}
+    </section>
+
+
+    <fieldset class="large-6 columns">
+        <legend>Leave Date</legend>
+        <div class="large-8 columns">
+            <input name="request[start][date]" id="startDate" type="text" required data-datepicker value="{REQUEST_START_DATE}" />
+        </div>
+        <div class="large-4 columns">
+            <select name='request[start][time]'>
+                <!-- BEGIN request_start_time -->
+                <option value='{REQUEST_START_TIME_VALUE}' {REQUEST_START_TIME_SELECTED}>{REQUEST_START_TIME_LABEL}</option>
+                <!-- END request_start_time -->
+            </select>
+        </div>
+    </fieldset>
+
+    <fieldset class="large-6 columns">
+        <legend>Return Date</legend>
+        <div class="large-8 columns">
+            <input name="request[finish][date]" id="finishDate" type="text" required data-datepicker value="{REQUEST_FINISH_DATE}" />
+        </div>
+        <div class="large-4 columns">
+            <select name='request[finish][time]'>
+                <!-- BEGIN request_finish_time -->
+                <option value='{REQUEST_FINISH_TIME_VALUE}' {REQUEST_FINISH_TIME_SELECTED}>{REQUEST_FINISH_TIME_LABEL}</option>
+                <!-- END request_finish_time -->
+            </select>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Host</legend>
+        <select name="request[hostType]" id="requesthostType" data-relation="host_type_selector">
+            <!-- BEGIN host_type -->
+                <option value="{HOST_TYPE_VALUE}" {HOST_TYPE_SELECTED}>{HOST_TYPE_LABEL}</option>
+            <!-- END host_type -->
+        </select>
+        <div class="large-6 columns" data-relation="host_type_field">
+            <label for="requesthostName">
+                <span data-tooltip aria-haspopup="true" class="has-tip"
+                      title="The host will need to confirm your leave arrangements; you can forward them the email you receive.">
+                    Name
+                </span>
+            </label>
+            <input type="text" name="request[hostName]" value="{REQUEST_HOST_NAME}" id="requesthostName" required />
+        </div>
+        <div class="large-6 columns" data-relation="host_type_field">
+            <label for="requesthostPhone">Phone</label>
+            <input type="text" name="request[hostPhone]"value="{REQUEST_HOST_PHONE}" id="requesthostPhone" required />
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Travel Method</legend>
+        <select name="request[travelType]">
+            <!-- BEGIN travel_drop -->
+            <option value="{TRAVEL_DROP_VALUE}" label="{TRAVEL_DROP_NAME}"  {TRAVEL_DROP_VALUE_SELECTED}>{TRAVEL_DROP_NAME}</option>
+            <!-- END travel_drop -->
+        </select>
+    </fieldset>
+
+    <fieldset>
+        <legend>Description</legend>
+        <em>Only complete for special leave information or travel arrangements</em>
+        <textarea id='description' name="request[description]" maxlength="100" data-warninglength="67">{REQUEST_DESCRIPTION}</textarea>
+    </fieldset>
+
+    <fieldset>
+        <legend>Notes</legend>
+        <textarea name="request[notes]" maxlength="100" data-warninglength="67">{REQUEST_NOTES}</textarea>
+    </fieldset>
+
+    <!-- BEGIN has_confirmed_by -->
+    <fieldset>
+        <legend>Confirmed by</legend>
+
+            <!-- BEGIN confirmed_by -->
+                <input type='radio'
+                       id="requestConfirmedBy{CONFIRMED_BY_VALUE}"
+                       name='request[confirmedBy]'
+                       value='{CONFIRMED_BY_VALUE}' {CONFIRMED_BY_SELECTED}
+                        />
+                <label for="requestConfirmedBy{CONFIRMED_BY_VALUE}" class="radio-label">{CONFIRMED_BY_LABEL}</label>
+            <!-- END confirmed_by -->
+    </fieldset>
+    <!-- END has_confirmed_by -->
 
 	<input type="hidden" name="request[id]" value="{REQUEST_ID}">
     <button type="submit" name="modify" value="Modify" class="button icon-modify">Modify</button>
