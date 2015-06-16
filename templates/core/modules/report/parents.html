@@ -1,41 +1,15 @@
-<script type="text/javascript" src="/javascript/shared/jquery.artificial-print.js"></script>
-<script type="text/javascript">
-    $(function() {
-        $('[data-action="print"]').artificialPrint();
-
-        /* Make search filter options panel appear either by
-         * clicking the button or by default, if any search
-         * parameters were used
-         */
-        $('[data-action="search"]').click(function() {
-            $('[data-searchfilteroptions]').show();
-        });
-
-        /* Default visibility of search panel
-         */
-        $('[data-searchfilteroptions]').hide();
-
-        <!-- BEGIN show_filter_options -->
-        $('[data-searchfilteroptions]').show();
-        <!-- END show_filter_options -->
-    });
-</script>
 
 <span class="header-actions">
     <a class="button icon-menu" href="#" data-dropdown="header-options">Options</a>
 </span>
 <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options">
+    <!-- BEGIN email_all_parents_link -->
     <li>
-        <!-- BEGIN email_all_parents -->
-        <form action="/mail/createMail.php" method="post" style="float:right;">
-            <input type="hidden" name="replyto" value="&quot;{HEADING} Parents&quot; &lt;{REPLY_TO}&gt;"/>
-            <input type="hidden" name="bcc" value="{EMAIL_ALL_PARENTS}"/>
-            <a href="#" class="icon-email">Email All</a>
-        </form>
-        <!-- END email_all_parents -->
+        <a data-action='email-all-parents' class="icon-email" href="#">Email All Parents</a>
     </li>
+    <!-- END email_all_parents_link -->
     <li>
-        <a data-action='search' class="icon-search" href="#"><span></span>Search</a>
+        <a data-action='search' class="icon-search" href="#">Search</a>
     </li>
     <li>
         <a data-action='print' class="icon-print" href="#">Print</a>
@@ -175,3 +149,41 @@
 </div>
 <!-- END student -->
 
+<script type="text/javascript" src="/javascript/shared/jquery.artificial-print.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('[data-action="print"]').artificialPrint();
+
+        /* Make search filter options panel appear either by
+         * clicking the button or by default, if any search
+         * parameters were used
+         */
+        $('[data-action="search"]').click(function() {
+            $('[data-searchfilteroptions]').show();
+        });
+
+        /* Default visibility of search panel
+         */
+        $('[data-searchfilteroptions]').hide();
+
+        <!-- BEGIN show_filter_options -->
+        $('[data-searchfilteroptions]').show();
+        <!-- END show_filter_options -->
+    });
+</script>
+
+<!-- BEGIN email_all_parents -->
+<script type="text/javascript">
+    $(function() {
+        $('[data-action="email-all-parents"]').click(function(event) {
+            event.preventDefault();
+
+            $('[data-emailallparents]').submit();
+        });
+    });
+</script>
+<form data-emailallparents action="/mail/createMail.php" method="post">
+    <input type="hidden" name="replyto" value="&quot;{HEADING} Parents&quot; &lt;{REPLY_TO}&gt;"/>
+    <input type="hidden" name="bcc" value="{EMAIL_ALL_PARENTS}"/>
+</form>
+<!-- END email_all_parents -->
