@@ -31,15 +31,12 @@
             }
         });
 
-        $('#reportFilter').submit(function (event) {
+        $('form[data-action="search"]').submit(function (event) {
             event.preventDefault();
-
-            var form = $(this);
-
-            var houseId = $('#reportHouse').val();
-            var date = $('#reportDate').val().replace(/\//g, '-');
-
-            window.location = location.protocol + '//' + location.host + '/modules/leave/report/house/' + houseId + '/' + date;
+            var form    = $(this);
+            var houseId = form.find(':input[name="reportHouse"]').val();
+            var date    = form.find(':input[name="reportDate"]').val().replace(/\//g, '-');
+            window.location.href = '/modules/leave/report/house/' + houseId + '/' + date;
         });
 
         $('#reportFilterSubmit').click(function () {
@@ -86,14 +83,14 @@
     <fieldset>
         <legend>Search</legend>
         <div class="large-5 columns">
-            <select id="reportHouse">
+            <select name="reportHouse" id="reportHouse">
                 <!-- BEGIN house -->
                 <option value="{HOUSE_ID}" {HOUSE_SELECTED}>{HOUSE_NAME}</option>
                 <!-- END house -->
             </select>
         </div>
         <div class="large-5 columns">
-            <input id="reportDate" type="text" value="{REPORT_DATE}">
+            <input name="reportDate" id="reportDate" type="text" value="{REPORT_DATE}">
         </div>
 
         <div class="large-2 columns">
