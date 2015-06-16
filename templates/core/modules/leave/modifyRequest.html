@@ -83,12 +83,16 @@
 
     <fieldset class="large-6 columns">
         <legend>Status</legend>
-        {REQUEST_STATUS}
+        <div class="large-12 columns">
+            {REQUEST_STATUS}
+        </div>
     </fieldset>
 
     <fieldset class="large-6 columns">
         <legend>Requested By</legend>
-        {AUTHOR_NAME}
+        <div class="large-12 columns">
+            {AUTHOR_NAME}
+        </div>
     </fieldset>
 
     <fieldset class="large-6 columns">
@@ -121,11 +125,13 @@
 
     <fieldset>
         <legend>Host</legend>
-        <select name="request[hostType]" id="requesthostType" data-relation="host_type_selector">
-            <!-- BEGIN host_type -->
-                <option value="{HOST_TYPE_VALUE}" {HOST_TYPE_SELECTED}>{HOST_TYPE_LABEL}</option>
-            <!-- END host_type -->
-        </select>
+        <div class="large-12 columns">
+            <select name="request[hostType]" id="requesthostType" data-relation="host_type_selector">
+                <!-- BEGIN host_type -->
+                    <option value="{HOST_TYPE_VALUE}" {HOST_TYPE_SELECTED}>{HOST_TYPE_LABEL}</option>
+                <!-- END host_type -->
+            </select>
+        </div>
         <div class="large-6 columns" data-relation="host_type_field">
             <label for="requesthostName">
                 <span data-tooltip aria-haspopup="true" class="has-tip"
@@ -143,36 +149,44 @@
 
     <fieldset>
         <legend>Travel Method</legend>
-        <select name="request[travelType]">
-            <!-- BEGIN travel_drop -->
-            <option value="{TRAVEL_DROP_VALUE}" label="{TRAVEL_DROP_NAME}"  {TRAVEL_DROP_VALUE_SELECTED}>{TRAVEL_DROP_NAME}</option>
-            <!-- END travel_drop -->
-        </select>
+        <div class="large-12 columns">
+            <select name="request[travelType]">
+                <!-- BEGIN travel_drop -->
+                <option value="{TRAVEL_DROP_VALUE}" label="{TRAVEL_DROP_NAME}"  {TRAVEL_DROP_VALUE_SELECTED}>{TRAVEL_DROP_NAME}</option>
+                <!-- END travel_drop -->
+            </select>
+        </div>
     </fieldset>
 
     <fieldset>
         <legend>Description</legend>
-        <em>Only complete for special leave information or travel arrangements</em>
-        <textarea id='description' name="request[description]" maxlength="100" data-warninglength="67">{REQUEST_DESCRIPTION}</textarea>
+        <div class="large-12 columns">
+            <em>Only complete for special leave information or travel arrangements</em>
+            <textarea id='description' name="request[description]" maxlength="100" data-warninglength="67">{REQUEST_DESCRIPTION}</textarea>
+        </div>
     </fieldset>
 
     <fieldset>
         <legend>Notes</legend>
-        <textarea name="request[notes]">{REQUEST_NOTES}</textarea>
+        <div class="large-12 columns">
+            <textarea name="request[notes]">{REQUEST_NOTES}</textarea>
+        </div>
     </fieldset>
 
     <!-- BEGIN has_confirmed_by -->
     <fieldset>
         <legend>Confirmed by</legend>
 
+        <div class="large-12 columns">
             <!-- BEGIN confirmed_by -->
-                <input type='radio'
-                       id="requestConfirmedBy{CONFIRMED_BY_VALUE}"
-                       name='request[confirmedBy]'
-                       value='{CONFIRMED_BY_VALUE}' {CONFIRMED_BY_SELECTED}
-                        />
-                <label for="requestConfirmedBy{CONFIRMED_BY_VALUE}" class="radio-label">{CONFIRMED_BY_LABEL}</label>
+            <input type='radio'
+                   id="requestConfirmedBy{CONFIRMED_BY_VALUE}"
+                   name='request[confirmedBy]'
+                   value='{CONFIRMED_BY_VALUE}' {CONFIRMED_BY_SELECTED}
+                    />
+            <label for="requestConfirmedBy{CONFIRMED_BY_VALUE}" class="radio-label">{CONFIRMED_BY_LABEL}</label>
             <!-- END confirmed_by -->
+        </div>
     </fieldset>
     <!-- END has_confirmed_by -->
 

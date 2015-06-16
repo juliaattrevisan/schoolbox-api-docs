@@ -57,19 +57,19 @@
     <fieldset>
         <legend>Student</legend>
         <div class="large-8 columns">
-        <!-- BEGIN student_autocomplete -->
-        <label for="userId">Name</label>
-        <input id='userId' name="userId" type='text' value='' placeholder="Search Students" data-selectizeuser required />
-        <!-- END student_autocomplete -->
-        <!-- BEGIN student_selector -->
-        <label for="userIdSelect">Name</label>
-        <select id="userIdSelect" name="userId" class="formfield">
-            <option disabled>select a child</option>
-            <!-- BEGIN student_drop -->
-            <option value="{STUDENT_DROP_VALUE}" label="{STUDENT_DROP_NAME}" {STUDENT_DROP_VALUE_SELECTED}>{STUDENT_DROP_NAME}</option>
-            <!-- END student_drop -->
-        </select>
-        <!-- END student_selector -->
+            <!-- BEGIN student_autocomplete -->
+            <label for="userId">Name</label>
+            <input id='userId' name="userId" type='text' value='' placeholder="Search Students" data-selectizeuser required />
+            <!-- END student_autocomplete -->
+            <!-- BEGIN student_selector -->
+            <label for="userIdSelect">Name</label>
+            <select id="userIdSelect" name="userId" class="formfield">
+                <option disabled>select a child</option>
+                <!-- BEGIN student_drop -->
+                <option value="{STUDENT_DROP_VALUE}" label="{STUDENT_DROP_NAME}" {STUDENT_DROP_VALUE_SELECTED}>{STUDENT_DROP_NAME}</option>
+                <!-- END student_drop -->
+            </select>
+            <!-- END student_selector -->
         </div>
         <div class="large-4 columns">
             <label for="requestuserPhone">Phone</label>
@@ -107,11 +107,13 @@
 
     <fieldset>
         <legend>Host</legend>
-        <select name="request[hostType]" id="requesthostType" data-relation="host_type_selector">
-            <!-- BEGIN host_type -->
-            <option value="{HOST_TYPE_VALUE}" {HOST_TYPE_VALUE_SELECTED}>{HOST_TYPE_LABEL}</option>
-            <!-- END host_type -->
-        </select>
+        <div class="large-12 columns">
+            <select name="request[hostType]" id="requesthostType" data-relation="host_type_selector">
+                <!-- BEGIN host_type -->
+                <option value="{HOST_TYPE_VALUE}" {HOST_TYPE_VALUE_SELECTED}>{HOST_TYPE_LABEL}</option>
+                <!-- END host_type -->
+            </select>
+        </div>
         <div class="large-6 columns" data-relation="host_type_field">
             <label for="requesthostName">
                 <span data-tooltip aria-haspopup="true" class="has-tip"
@@ -129,28 +131,34 @@
 
     <fieldset>
         <legend>Travel Method</legend>
-        <select name="request[travelType]">
-            <!-- BEGIN travel_drop -->
-            <option value="{TRAVEL_DROP_VALUE}" label="{TRAVEL_DROP_NAME}"  {TRAVEL_DROP_VALUE_SELECTED}>{TRAVEL_DROP_NAME}</option>
-            <!-- END travel_drop -->
-        </select>
+        <div class="large-12 columns">
+            <select name="request[travelType]">
+                <!-- BEGIN travel_drop -->
+                <option value="{TRAVEL_DROP_VALUE}" label="{TRAVEL_DROP_NAME}"  {TRAVEL_DROP_VALUE_SELECTED}>{TRAVEL_DROP_NAME}</option>
+                <!-- END travel_drop -->
+            </select>
+        </div>
     </fieldset>
 
     <fieldset>
         <legend>Description</legend>
-        <em>Only complete for special leave information or travel arrangements</em>
-        <textarea id='description' name="request[description]" maxlength="100" data-warninglength="67"></textarea>
+        <div class="large-12 columns">
+            <em>Only complete for special leave information or travel arrangements</em>
+            <textarea id='description' name="request[description]" maxlength="100" data-warninglength="67"></textarea>
+        </div>
     </fieldset>
 
     <fieldset>
         <legend>Terms and Conditions</legend>
 
-        <div class="wysiwyg">{TERMS_AND_CONDITIONS}</div>
+        <div class="large-12 columns">
+            <div class="wysiwyg">{TERMS_AND_CONDITIONS}</div>
 
-        <input type="checkbox" id="requestTerms" name="request[terms]" required />
-        <label for="requestTerms" class="checkbox-label">
-            I Accept Terms &amp; Conditions and that this application is true and correct
-        </label>
+            <input type="checkbox" id="requestTerms" name="request[terms]" required />
+            <label for="requestTerms" class="checkbox-label">
+                I Accept Terms &amp; Conditions and that this application is true and correct
+            </label>
+        </div>
     </fieldset>
 
 	<button type="submit" class="button icon-add">Submit Leave Application</button>
