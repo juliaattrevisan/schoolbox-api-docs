@@ -113,11 +113,15 @@
             <!-- END host_type -->
         </select>
         <div class="large-6 columns" data-relation="host_type_field">
-            <label for="requesthostName">Name</label>
+            <label for="requesthostName"
+                   data-tooltip aria-haspopup="true" class="has-tip"
+                   title="The host will need to confirm your leave arrangements; you can forward them the email you receive.">Name</label>
             <input type="text" name="request[hostName]" id="requesthostName" required />
         </div>
         <div class="large-6 columns" data-relation="host_type_field">
-            <label for="requesthostAddress">Address</label>
+            <label for="requesthostAddress"
+                   data-tooltip aria-haspopup="true" class="has-tip"
+                   title="The host's address during the leave period">Address</label>
             <textarea name="request[hostAddress]" id="requesthostAddress"></textarea>
         </div>
         <div class="large-6 columns" data-relation="host_type_field">
