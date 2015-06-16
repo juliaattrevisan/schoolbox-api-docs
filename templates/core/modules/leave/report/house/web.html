@@ -20,20 +20,10 @@
             }
         });
 
-//        $("#requestList").find('tbody tr').removeClass('dark');
-//
-//        $("#requestList").find('tbody tr:even').addClass('dark');
-//
-//        $("#requestList").bind('sortEnd', function () {
-//            var requestList = $(this);
-//            requestList.find('tbody tr').removeClass('dark');
-//            requestList.find('tbody tr:even').addClass('dark');
-//        });
-
         $('#reportDate').datepicker({
-            showOn:'both',
-            buttonImage:'/images/core/calendar/calendar-click.png',
-            buttonImageOnly:true,
+//            showOn:'both',
+//            buttonImage:'/images/core/calendar/calendar-click.png',
+//            buttonImageOnly:true,
             constrainInput:false,
             onClose:function (string) {
                 var input = $(this);
@@ -93,19 +83,25 @@
 <!-- END no_requests -->
 
 <!-- BEGIN request_list -->
-<div class="report-options">
-    <a id="reportExportButton" href="/modules/leave/report/house/{HOUSE_ID}" class="btn export"><span></span>Export History</a>
-    <form id="reportFilter">
-        <a id="reportFilterSubmit" href="javascript:void(0);" class="btn search"><span></span>Search</a>
-        <select id="reportHouse">
-            <!-- BEGIN house -->
-            <option value="{HOUSE_ID}"
-            {HOUSE_SELECTED}>{HOUSE_NAME}</option>
-            <!-- END house -->
-        </select>
-        <input id="reportDate" type="text" value="{REPORT_DATE}">
-    </form>
-</div>
+<form data-action="search">
+    <fieldset>
+        <legend>Search</legend>
+        <div class="large-5 columns">
+            <select id="reportHouse">
+                <!-- BEGIN house -->
+                <option value="{HOUSE_ID}" {HOUSE_SELECTED}>{HOUSE_NAME}</option>
+                <!-- END house -->
+            </select>
+        </div>
+        <div class="large-5 columns">
+            <input id="reportDate" type="text" value="{REPORT_DATE}">
+        </div>
+
+        <div class="large-2 columns">
+            <button type="submit" class="icon-search">Search</button>
+        </div>
+    </fieldset>
+</form>
 
 <p class='leaveReportGeneratedAt'>Generated on {GENERATED_AT}</p>
 
