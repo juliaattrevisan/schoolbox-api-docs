@@ -1,81 +1,59 @@
 <!-- BEGIN custom_head -->
+<!--
 <script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
 <script type="text/javascript">
-    $(function () {
-        $("#pendingRequestList").tablesorter({
-            cssHeader:'sortable',
-            cssAsc:'ascending',
-            cssDesc:'descending',
-            headers:{
-                0:{ sorter:false},
-                5:{ sorter:false}
-            }
-        });
-
-        $("#previousRequestList").tablesorter({
-            cssHeader:'sortable',
-            cssAsc:'ascending',
-            cssDesc:'descending',
-            headers:{
-                8:{ sorter:false}
-            }
-        });
-
-        $("#pendingRequestList, #previousRequestList").bind('sortEnd', function () {
-            var requestList = $(this);
-
-            requestList.find('tbody tr').removeClass('dark');
-            requestList.find('tbody tr:even').addClass('dark');
-        });
-    });
+//    $(function () {
+//        $("#pendingRequestList").tablesorter({
+//            cssHeader:'sortable',
+//            cssAsc:'ascending',
+//            cssDesc:'descending',
+//            headers:{
+//                0:{ sorter:false},
+//                5:{ sorter:false}
+//            }
+//        });
+//
+//        $("#previousRequestList").tablesorter({
+//            cssHeader:'sortable',
+//            cssAsc:'ascending',
+//            cssDesc:'descending',
+//            headers:{
+//                8:{ sorter:false}
+//            }
+//        });
+//
+//        $("#pendingRequestList, #previousRequestList").bind('sortEnd', function () {
+//            var requestList = $(this);
+//
+//            requestList.find('tbody tr').removeClass('dark');
+//            requestList.find('tbody tr:even').addClass('dark');
+//        });
+//    });
 </script>
+-->
 <!-- END custom_head -->
 
-<h1>Boarder Leave Requests for {USER_NAME}</h1>
-<div class="indent">
-    <!-- BEGIN no_requests -->
-    {USER_NAME} has no pending or previous requests.
-    <!-- END no_requests -->
-    <!-- BEGIN request_list -->
-    <!-- BEGIN pending_request_list -->
-    <form name="modifyListForm" action="/modules/leave/processModifyList" method="post">
-        <h2>Pending Requests</h2>
-        <table id="pendingRequestList" class="ruler table">
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th>Year</th>
-                <th>Leave Date</th>
-                <th>Days</th>
-                <th>Host</th>
-                <th class="center">View</th>
-            </tr>
-            </thead>
-            <tbody>
-            <!-- BEGIN pending_request -->
-            <tr>
-                <td><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
-                <td>{USER_YEAR}</td>
-                <td>{REQUEST_START}</td>
-                <td>{REQUEST_DURATION}</td>
-                <td>{REQUEST_HOST_TYPE}</td>
-                <td class="center"><a href="/modules/leave/{ALLOWED_ACTION}/{REQUEST_ID}">View</a></td>
-            </tr>
-            <!-- END pending_request -->
-            </tbody>
-        </table>
+<span class="header-actions">
+    <a class="button icon-menu"href="#" data-dropdown="options">Options</a>
+</span>
+<ul class="f-dropdown fadeInDown" data-dropdown-content="" id="options">
+    <li><a class="" href="/modules/leave/report/catering/">Catering Report</a></li>
+    <li><a class="" href="/modules/leave/report/house/{HOUSE_ID}">House Report</a></li>
+    <li><a class="icon-export" href="/modules/leave/student/export/{USER_ID}">Export History</a></li>
+    <li><a class="icon-print" href="javascript:window.print()">Print</a></li>
+</ul>
 
-        <div class="clearfix">
-            <input type="hidden" name="user[id]" value="{USER_ID}">
-        </div>
-    </form>
-    <!-- END pending_request_list -->
-    <!-- BEGIN previous_request_list -->
-    <h2>Request History</h2>
-    <!-- BEGIN export -->
-    <span class="header_option in-h2"><a href="/modules/leave/student/export/{USER_ID}"
-                                         class="btn download"><span></span>Export History</a></span> <!-- END export -->
-    <table id="previousRequestList" class="ruler table">
+<h1>Boarder Leave Requests for {USER_NAME}</h1>
+
+<!-- BEGIN no_requests -->
+{USER_NAME} has no pending or previous requests.
+<!-- END no_requests -->
+
+<!-- BEGIN request_list -->
+<!-- BEGIN pending_request_list -->
+<form name="modifyListForm" action="/modules/leave/processModifyList" method="post">
+    <h2>Pending Requests</h2>
+    <table id="pendingRequestList" class="ruler table">
         <thead>
         <tr>
             <th>Name</th>
@@ -83,28 +61,62 @@
             <th>Leave Date</th>
             <th>Days</th>
             <th>Host</th>
-            <th>Status</th>
-            <th>Approval Date</th>
-            <th>Approved By</th>
             <th class="center">View</th>
         </tr>
         </thead>
         <tbody>
-        <!-- BEGIN previous_request -->
-        <tr class="{CLASS}">
+        <!-- BEGIN pending_request -->
+        <tr>
             <td><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
             <td>{USER_YEAR}</td>
             <td>{REQUEST_START}</td>
             <td>{REQUEST_DURATION}</td>
             <td>{REQUEST_HOST_TYPE}</td>
-            <td>{REQUEST_STATUS}</td>
-            <td>{REQUEST_AUTHORISATION_DATETIME}</td>
-            <td><a href="/search/user/{REQUEST_AUTHORISATION_USER_ID}">{REQUEST_AUTHORISATION_USER_NAME}</a></td>
             <td class="center"><a href="/modules/leave/{ALLOWED_ACTION}/{REQUEST_ID}">View</a></td>
         </tr>
-        <!-- END previous_request -->
+        <!-- END pending_request -->
         </tbody>
     </table>
-    <!-- END previous_request_list -->
-    <!-- END request_list -->
-</div>
+
+    <div class="clearfix">
+        <input type="hidden" name="user[id]" value="{USER_ID}">
+    </div>
+</form>
+<!-- END pending_request_list -->
+<!-- BEGIN previous_request_list -->
+<h2>Request History</h2>
+<!-- BEGIN export -->
+<!-- now in options menu -->
+<!-- END export -->
+<table id="previousRequestList" class="ruler table">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Year</th>
+        <th>Leave Date</th>
+        <th>Days</th>
+        <th>Host</th>
+        <th>Status</th>
+        <th>Approval Date</th>
+        <th>Approved By</th>
+        <th class="center">View</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- BEGIN previous_request -->
+    <tr class="{CLASS}">
+        <td><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
+        <td>{USER_YEAR}</td>
+        <td>{REQUEST_START}</td>
+        <td>{REQUEST_DURATION}</td>
+        <td>{REQUEST_HOST_TYPE}</td>
+        <td>{REQUEST_STATUS}</td>
+        <td>{REQUEST_AUTHORISATION_DATETIME}</td>
+        <td><a href="/search/user/{REQUEST_AUTHORISATION_USER_ID}">{REQUEST_AUTHORISATION_USER_NAME}</a></td>
+        <td class="center"><a href="/modules/leave/{ALLOWED_ACTION}/{REQUEST_ID}">View</a></td>
+    </tr>
+    <!-- END previous_request -->
+    </tbody>
+</table>
+<!-- END previous_request_list -->
+<!-- END request_list -->
