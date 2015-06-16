@@ -42,9 +42,14 @@ class Report_Boarder extends Report_Parent {
 		$this->getPage()->setBlock('contact', 'spouse', 'spouse_block');
 		$this->getPage()->setBlock('contact', 'primary', 'primary_block');
 
+        $this->getPage()->setBlock('student', 'public', 'public_block');
+        $this->getPage()->setBlock('student', 'private', 'private_block');
+
 		$this->getPage()->setVar(array(
 			'student_block' => '',
 			'contact_block' => '',
+            'public_block' => '',
+            'private_block' => '',
 		));
 	}
 

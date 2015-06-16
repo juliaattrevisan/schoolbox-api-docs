@@ -310,20 +310,27 @@ class Report_Parent extends Report_Abstract
                 if ($lastID != $currentContact['StudentID']) {
                     if ($i) {
                         if ($showContact == false) {
-                            $this->getPage()->setVar(
-                                array(
-                                    'PRIVATE' => 'private'
-                                )
-                            );
+                            $this->getPage()->setVar(array(
+                                'public_block' => ''
+                            ));
+
+                            $this->getPage()->parse('private_block', 'private');
                         } else {
-                            $this->getPage()->setVar(
-                                array(
-                                    'PRIVATE' => ''
-                                )
-                            );
+                            $this->getPage()->setVar(array(
+                                'private_block' => ''
+                            ));
+
+                            $this->getPage()->parse('public_block', 'public');
                         }
 
                         $this->getPage()->parse('student_block', 'student', true);
+
+                        /* Clear children after parsing out the parent
+                         */
+                        $this->getPage()->setVar(array(
+                            'public_block' => '',
+                            'private_block' => '',
+                        ));
                     }
 
                     /* Clear children blocks after parsing out the parent
