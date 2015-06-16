@@ -306,16 +306,11 @@ input[type=submit]				{ border: none;
 	}
 }
 
-input[type=submit] 				{ @include button-style; }
+input[type="submit"] 			{ @extend .button; }
 
 .expand-link{
 	margin: 0 rem-calc(($base-font-size / 2)) 0 0;
 	padding: rem-calc(($base-font-size - 13));
-}
-
-// Button Group
-.button-group > li {
-	margin: 0;
 }
 
 // Tabs
@@ -326,9 +321,6 @@ input[type=submit] 				{ @include button-style; }
 // Header Actions - for when you need buttons inline with the heading
 .header-actions {
   	float: right;
-	a{
-		//margin: 0;
-	}
 }
 
 // Dropdown

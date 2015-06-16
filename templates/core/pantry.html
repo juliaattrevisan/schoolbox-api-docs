@@ -78,17 +78,43 @@
             <ul class="subject-list">
                 <li>
                     <a href="#">
-                        <div class="icon">
-                            <span class="no-text icon-news"></span>
+                        <div class="grade">
+                            <span>C+</span> -14.3% ▼
                         </div>
                         <div class="content">
-                            Mrs Jenifer Shadbolt
-                            <p class="meta">Teacher</p>
-                        </div>
-                        <div class="icon">
-                            <a href="#"><span class="no-text icon-email"></span></a>
+                            <a href="#"><h3>9AH French FREA1 &rsaquo;</h3></a>
                         </div>
                     </a>
+                    <ul>
+                        <li>
+                            <a href="#">
+                                <div class="thumbnail">
+                                    <img src="https://placekitten.com/g/120/120" alt="Moggy">
+                                </div>
+                                <div class="content">
+                                    <a href="#">Ms Celia Glenn</a>
+                                    <p class="meta">Teacher</p>
+                                </div>
+                                <div class="icon">
+                                    <span class="no-text icon-email"></span>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <div class="thumbnail">
+                                    <img src="https://placekitten.com/g/120/120" alt="Moggy">
+                                </div>
+                                <div class="content">
+                                    <a href="#">Ms Celia Glenn</a>
+                                    <p class="meta">Teacher</p>
+                                </div>
+                                <div class="icon">
+                                    <span class="no-text icon-email"></span>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
                 <li>
                     <div class="thumbnail">
@@ -473,7 +499,7 @@
         </div>
     </div>
     <hr>
-    <h1 id="button-groups">Button Groups / Horizontal Tabs</h1>
+    <h1 id="button-groups">Button Groups</h1>
     <!--<ul class="button-group">-->
         <!--<li><a href="#" class="button">Button 1</a></li>-->
         <!--<li><a href="#" class="button">Button 2</a></li>-->
@@ -484,6 +510,11 @@
         <li><a href="#" class="button secondary">Button 2</a></li>
         <li><a href="#" class="button secondary">Button 3</a></li>
         <li><a href="#" class="button secondary">Button 4</a></li>
+    </ul>
+    <ul class="button-group even-3">
+        <li><a href="#" class="button primary">Button 1</a></li>
+        <li><a href="#" class="button primary">Button 2</a></li>
+        <li><a href="#" class="button primary">Button 3</a></li>
     </ul>
     <!--<ul class="button-group round even-3">-->
         <!--<li><a href="#" class="button alert">Button 1</a></li>-->
@@ -638,25 +669,16 @@
     <h1 id="forms">Forms</h1>
     <form data-abide>
         <div class="row">
-            <div class="large-12 columns">
+            <fieldset>
+                <legend>Legend</legend>
                 <label>Input Label
                     <input type="text" placeholder="large-12.columns" />
                 </label>
-            </div>
+            </fieldset>
         </div>
         <div class="row">
-            <div class="large-4 columns">
-                <label>Input Label
-                    <input type="text" placeholder="large-4.columns" />
-                </label>
-            </div>
-            <div class="large-4 columns">
-                <label>Input Label
-                    <input type="text" placeholder="large-4.columns" aria-describedby="nameHelpText" required />
-                    <small class="error">Please provide your name</small>
-                </label>
-            </div>
-            <div class="large-4 columns">
+            <fieldset>
+                <legend>Legend</legend>
                 <div class="row collapse">
                     <label>Input Label</label>
                     <div class="small-9 columns">
@@ -666,59 +688,85 @@
                         <span class="postfix">.com</span>
                     </div>
                 </div>
-            </div>
+            </fieldset>
+        </div>
+        <fieldset>
+            <legend>Legend</legend>
+            <label>Select Box
+                <select>
+                    <option value="husker">Husker</option>
+                    <option value="starbuck">Starbuck</option>
+                    <option value="hotdog">Hot Dog</option>
+                    <option value="apollo">Apollo</option>
+                </select>
+            </label>
+        </fieldset>
+        <div class="row">
+            <fieldset>
+                <legend>Fancy</legend>
+                <div class="large-6 columns">
+                    <label>Choose Your Favorite</label>
+                    <input type="radio" name="pokemon" value="Red" id="pokemonRed"><label class="radio-label"for="pokemonRed">Red</label>
+                    <input type="radio" name="pokemon" value="Blue" id="pokemonBlue"><label class="radio-label" for="pokemonBlue">Blue</label>
+                </div>
+                <div class="large-6 columns">
+                    <label>Check these out</label>
+                    <input id="checkbox1" type="checkbox"><label for="checkbox1" class="checkbox-label">Checkbox 1</label>
+                    <input id="checkbox2" type="checkbox"><label for="checkbox2" class="checkbox-label">Checkbox 2</label>
+                </div>
+            </fieldset>
         </div>
         <div class="row">
-            <div class="large-12 columns">
-                <label>Select Box
-                    <select>
-                        <option value="husker">Husker</option>
-                        <option value="starbuck">Starbuck</option>
-                        <option value="hotdog">Hot Dog</option>
-                        <option value="apollo">Apollo</option>
-                    </select>
-                </label>
-            </div>
-        </div>
-        <div class="row">
-            <div class="large-6 columns">
-                <label>Choose Your Favorite</label>
-                <input type="radio" name="pokemon" value="Red" id="pokemonRed"><label class="radio-label"for="pokemonRed">Red</label>
-                <input type="radio" name="pokemon" value="Blue" id="pokemonBlue"><label class="radio-label" for="pokemonBlue">Blue</label>
-            </div>
-            <div class="large-6 columns">
-                <label>Check these out</label>
-                <input id="checkbox1" type="checkbox"><label for="checkbox1" class="checkbox-label">Checkbox 1</label>
-                <input id="checkbox2" type="checkbox"><label for="checkbox2" class="checkbox-label">Checkbox 2</label>
-            </div>
-        </div>
-        <div class="row">
-            <div class="large-12 columns">
+            <fieldset>
+                <legend>Legend</legend>
                 <label>Textarea Label
+                    <span data-tooltip="demo" class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
                     <textarea placeholder="small-12.columns"></textarea>
                 </label>
-            </div>
+            </fieldset>
         </div>
-        <div class="row">
-            <div class="large-12 columns">
-                <input type="submit" name='submit' value="Send" />
-            </div>
-        </div>
+        <input type="submit" name='submit' value="Send" />
     </form>
     <hr>
 
     <h3>Dropzone</h3>
     <form class="dropzone" id="myAwesomeDropzone" action="/cms/myFileForm.php?ajax=1"></form>
+    <hr>
 
+    <h3>WYSIWYG</h3>
+    <ol>
+        <li>An email will automatically be sent to the email address your parents/guardian have supplied the school. Your parents/guardian then need to contact your Housemaster (e.g. phone/fax/email) to confirm they are aware of your leave request and approve of it.</li>
+        <li>If you are staying at a host other than family, then the host parent/guardian will need to contact your Housemaster (e.g. phone/fax/email) to confirm they are aware of your leave request and approve of it.  You can forward your email copy of your leave request to them.</li>
+        <li>You and your parents/guardian will receive notification by email of the status of your leave - approved, modified or rejected.</li>
+        <li>Confirmation from your parents/guardian and/or hosts must be received by your Housemaster by 8:00pm on the Thursday prior to your leave request.</li>
+        <li>You should advise your Housemaster as soon as possible if your leave arrangements change.</li>
+        <li>This application is a request for leave and the School reserves the right to approve/deny leave.</li>
+    </ol>
     <hr>
 
     <h3>Datepicker</h3>
     <p>Date: <input type="text" id="datepicker"></p>
-
     <hr>
 
-    <h3>AutoSuggest</h3>
-    <p><input type="text" autocomplete="off" id="selectize-me"></p>
+    <h3>AutoSuggest / Selectize</h3>
+    <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+    <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            $('[data-selectizeuser]')
+                .selectizeSelector({
+                    ajax: {
+                        url:      '/ajax/user.php',
+                        type:     'GET',
+                        data:     {showCampus: true},
+                        dataType: 'json'
+                    }
+                })
+            ;
+        });
+    </script>
+    <input id='userId' name="userId" type='text' value='' placeholder="Search Students" data-selectizeuser required />
+    <hr>
 
     <!--<h1 id="block-grid">Block Grid</h1>-->
     <!--<ul class="small-block-grid-2 large-block-grid-4">-->
@@ -727,7 +775,7 @@
         <!--<li><img class="th" src="http://foundation.zurb.com/docs/assets/img/examples/space-th.jpg" alt=""></li>-->
         <!--<li><img class="th" src="http://foundation.zurb.com/docs/assets/img/examples/spacewalk-th.jpg" alt=""></li>-->
     <!--</ul>--> 
-    <hr>
+    
 
     <h1 id="clearing">Clearing</h1>
     <div>
