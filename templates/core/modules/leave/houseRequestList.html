@@ -1,3 +1,29 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('table[data-topic="pendingRequests"]').tablesorter({
+            cssHeader: 'sortable',
+            cssAsc: 'ascending',
+            cssDesc: 'descending',
+            headers: {
+                0: { sorter: false},
+                6: { sorter: false}
+            }
+        });
+
+        $('table[data-topic="previousRequests"]').tablesorter({
+            cssHeader: 'sortable',
+            cssAsc: 'ascending',
+            cssDesc: 'descending',
+            headers: {
+                8: { sorter: false}
+            }
+        });
+    });
+</script>
+<!-- END custom_head -->
+
 <span class="header-actions">
     <a class="button icon-menu"href="#" data-dropdown="options">Options</a>
 </span>
@@ -18,7 +44,7 @@
 <!-- BEGIN pending_request_list -->
 <section>
     <h1>Pending Requests</h1>
-    <table>
+    <table data-topic="pendingRequests">
         <thead>
             <tr>
                 <th>Name</th>
@@ -50,7 +76,7 @@
 <!-- BEGIN previous_request_list -->
 <section>
     <h1>Request History</h1>
-    <table>
+    <table data-topic="previousRequests">
         <thead>
             <tr>
                 <th>Name</th>
