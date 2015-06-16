@@ -148,10 +148,15 @@ class Report_Parent extends Report_Abstract
         $this->getPage()->setBlock('contact', 'spouse', 'spouse_block');
         $this->getPage()->setBlock('contact', 'primary', 'primary_block');
 
+        $this->getPage()->setBlock('student', 'public', 'public_block');
+        $this->getPage()->setBlock('student', 'private', 'private_block');
+
         $this->getPage()->setVar(
             array(
                 'student_block'             => '',
                 'contact_block'             => '',
+                'public_block'              => '',
+                'private_block'             => '',
                 'show_filter_options_block' => '',
                 'email_all_parents_block'   => '',
             )
