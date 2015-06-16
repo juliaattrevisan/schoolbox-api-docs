@@ -3,7 +3,7 @@
 <script type="text/javascript">
     $(function () {
 
-        $(".sortable-table").tablesorter({
+        $('table[data-topic="requestList"]').tablesorter({
             cssHeader:'sortable',
             cssAsc:'ascending',
             cssDesc:'descending',
@@ -79,29 +79,29 @@
 <!-- END no_requests -->
 
 <!-- BEGIN request_list -->
-<form data-action="search">
+<form data-form_type="search">
     <fieldset>
         <legend>Search</legend>
         <div class="large-5 columns">
-            <select name="reportHouse" id="reportHouse">
+            <select name="reportHouse">
                 <!-- BEGIN house -->
                 <option value="{HOUSE_ID}" {HOUSE_SELECTED}>{HOUSE_NAME}</option>
                 <!-- END house -->
             </select>
         </div>
         <div class="large-5 columns">
-            <input name="reportDate" id="reportDate" type="text" value="{REPORT_DATE}">
+            <input data-datepicker name="reportDate" type="text" value="{REPORT_DATE}">
         </div>
-
         <div class="large-2 columns">
-            <button type="submit" class="icon-search">Search</button>
+            <button data-action="search" data-tooltip aria-haspopup="true" title="Search" class="icon-search"></button>
+            <button data-action="export" data-tooltip aria-haspopup="true" title="Export" class="icon-export"></button>
         </div>
     </fieldset>
 </form>
 
 <!--<p class='leaveReportGeneratedAt'>Generated on {GENERATED_AT}</p>-->
 
-<table id="requestList" class="ruler table sortable-table" width="100%" style="table-layout:fixed;">
+<table data-topic="requestList" id="requestList" class="ruler table sortable-table" width="100%" style="table-layout:fixed;">
     <!--
     <colgroup>
         <col width="15%">
