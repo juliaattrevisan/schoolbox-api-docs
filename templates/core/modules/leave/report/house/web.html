@@ -19,9 +19,6 @@
         });
 
         $('input[data-datepicker]').datepicker({
-//            showOn:'both',
-//            buttonImage:'/images/core/calendar/calendar-click.png',
-//            buttonImageOnly:true,
             constrainInput:false,
             onClose:function (string) {
                 var input = $(this);
@@ -44,17 +41,6 @@
             var date    = searchForm.find(':input[name="reportDate"]').val().replace(/\//g, '-');
             window.location.href = '/modules/leave/report/house/' + houseId + '/' + date + '/export';
         });
-
-//        $('.print').click(function (e) {
-//            window.print();
-//            e.preventDefault();
-//        });
-
-        /*
-         * Hack for the hidden column next to the BS.
-         * */
-//        $('.leaveReportHeaderDate:first').attr('colspan', 2)
-
     });
 </script>
 <!-- END custom_head -->
