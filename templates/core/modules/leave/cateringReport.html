@@ -1,10 +1,7 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
     $(function() {
-        $('#reportDate').datepicker({
-            showOn: 'both',
-            buttonImage: '/images/core/calendar/calendar-click.png',
-            buttonImageOnly: true,
+        $('input[data-datepicker]').datepicker({
             constrainInput: false,
             onClose: function (string) {
                 var input = $(this);
@@ -15,88 +12,90 @@
             }
         });
 
-        $('#reportFilter').submit( function (event) {
+        var searchForm = $('form[data-form_type="search"]');
+        searchForm.on('click', 'button[data-action]', function (event) {
             event.preventDefault();
-
-            var form = $(this);
-
-            var date = $('#reportDate').val().replace(/\//g, '-');
-
-            window.location = location.protocol+'//'+ location.host + '/modules/leave/report/catering/' + date;
-        } );
-
-        $('#reportFilterSubmit').click( function () {
-            $('#reportFilter').submit();
-        } );
-
-        $('#reportExportButton').click( function () {
-            window.location = window.location + '/export';
-        } );
-        $('#container').css('width', $('.ruler').outerWidth());
+            var houseId  = searchForm.find(':input[name="reportHouse"]').val();
+            var date     = searchForm.find(':input[name="reportDate"]').val().replace(/\//g, '-');
+            var action   = $(this).data('action');
+            var location = '/modules/leave/report/house/' + houseId + '/' + date;
+            if (action == 'export') {
+                location += '/export';
+            }
+            window.location.href = location;
+        });
     });
 </script>
 <!-- END custom_head -->
 
-<h1>Catering Report</h1>
-<span class="header_option">
-    <a class="btn print" href="javascript:window.print()"><span></span>Print</a>
+<span class="header-actions">
+    <a class="button icon-menu"href="#" data-dropdown="options">Options</a>
 </span>
-<div class="indent">
-    <!-- BEGIN no_houses -->
-    No houses found.
-    <!-- END no_houses -->
-    <!-- BEGIN house_list -->
-    <h2>Report</h2>
-    <span class="header_option in-h2">
-        <a id="reportExportButton" href="javascript:void(0);" class="btn modify"><span></span>Export</a>
-        <form id="reportFilter">
-            <a id="reportFilterSubmit" href="javascript:void(0);" class="btn search"><span></span>Search</a>
-            <input id="reportDate" type="text" value="{REPORT_DATE}">
-        </form>
-    </span>
+<ul class="f-dropdown fadeInDown" data-dropdown-content="" id="options">
+    <li><a class="icon-print" href="javascript:window.print()">Print</a></li>
+</ul>
 
-	<p>The following shows the number of people in each House who require food.</p>
+<h1>Catering Report</h1>
 
-    <table id="requestList" class="ruler table">
-        <thead>
-            <tr>
-				<th></th>
-				<!-- BEGIN request_date_header -->
-				<th colspan='3' align='center'>{REQUEST_DATE_HEADER_DATE}</th>
-				<!-- END request_date_header -->
-			</tr>
-			<tr>
-                <th>House</th>
-				<th>Breakfast</th>
-				<th>Lunch</th>
-				<th>Dinner</th>
-				<th>Breakfast</th>
-				<th>Lunch</th>
-				<th>Dinner</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- BEGIN house -->
-            <tr>
-                <td><a href="/modules/leave/house/{HOUSE_ID}">{HOUSE_NAME}</a></td>
-				<!-- BEGIN request_period -->
-				<td>{REQUEST_PERIOD_MORNING}</td>
-				<td>{REQUEST_PERIOD_DAY}</td>
-				<td>{REQUEST_PERIOD_NIGHT}</td>
-				<!-- END request_period -->
-            </tr>
-            <!-- END house -->
-        </tbody>
-        <tfoot>
-            <tr>
-                <td>Total</td>
-				<!-- BEGIN request_period_total -->
-                <td>{REQUEST_PERIOD_TOTAL_MORNING}</td>
-                <td>{REQUEST_PERIOD_TOTAL_DAY}</td>
-                <td>{REQUEST_PERIOD_TOTAL_NIGHT}</td>
-				<!-- END request_period_total -->
-            </tr>
-        </tfoot>
-    </table>
-    <!-- END house_list -->
-</div>
+<!-- BEGIN no_houses -->
+No houses found.
+<!-- END no_houses -->
+<!-- BEGIN house_list -->
+
+<form data-form_type="search">
+    <fieldset>
+        <legend>Search</legend>
+        <div class="large-10 columns">
+            <input data-datepicker id="reportDate" type="text" value="{REPORT_DATE}">
+        </div>
+        <div class="large-2 columns">
+            <button data-action="search" data-tooltip aria-haspopup="true" title="Search" class="icon-search"></button>
+            <button data-action="export" data-tooltip aria-haspopup="true" title="Export" class="icon-export"></button>
+        </div>
+    </fieldset>
+</form>
+
+<p>The following shows the number of people in each House who require food.</p>
+
+<table class="full-width">
+    <thead>
+        <tr>
+            <th></th>
+            <!-- BEGIN request_date_header -->
+            <th colspan='3' align='center'>{REQUEST_DATE_HEADER_DATE}</th>
+            <!-- END request_date_header -->
+        </tr>
+        <tr>
+            <th>House</th>
+            <th>Breakfast</th>
+            <th>Lunch</th>
+            <th>Dinner</th>
+            <th>Breakfast</th>
+            <th>Lunch</th>
+            <th>Dinner</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- BEGIN house -->
+        <tr>
+            <td><a href="/modules/leave/house/{HOUSE_ID}">{HOUSE_NAME}</a></td>
+            <!-- BEGIN request_period -->
+            <td>{REQUEST_PERIOD_MORNING}</td>
+            <td>{REQUEST_PERIOD_DAY}</td>
+            <td>{REQUEST_PERIOD_NIGHT}</td>
+            <!-- END request_period -->
+        </tr>
+        <!-- END house -->
+    </tbody>
+    <tfoot>
+        <tr>
+            <td>Total</td>
+            <!-- BEGIN request_period_total -->
+            <td>{REQUEST_PERIOD_TOTAL_MORNING}</td>
+            <td>{REQUEST_PERIOD_TOTAL_DAY}</td>
+            <td>{REQUEST_PERIOD_TOTAL_NIGHT}</td>
+            <!-- END request_period_total -->
+        </tr>
+    </tfoot>
+</table>
+<!-- END house_list -->
