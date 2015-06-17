@@ -478,7 +478,7 @@ table{
 .island{
 	@extend .island-panel;
 	border: 0;
-	padding: rem-calc(($base-font-size - 2));
+	padding: 0;
 }
 
 // Labels
@@ -549,7 +549,9 @@ table{
 
 .accordion a 				{ @include single-transition(all, 0.15s, linear); }
 
-// Lists with thumnails and content
+// The original list
+// This list can use up to 3 columns
+// All other lists include (@extend) these styles
 .information-list{
 	list-style: none;
 	margin: 0;
@@ -557,17 +559,34 @@ table{
 	li{
 		border-bottom: 1px solid $silver;
 		position: relative;
-		padding: rem-calc(($base-font-size - 2)) 0;
 		overflow: auto;
+		list-style: none;
+		> &:first-child{
+			padding-top: 0;
+		}
 		&:last-child{
 			border: 0;
 		}
-		.thumbnail{
-			@media #{$small-up} { @include grid-column(1); }
-			@extend .no-pad;
+		[class^="icon-"]:before,
+		[class*=" icon-"]:before{
+			font-size: rem-calc(($base-font-size - 2));
+			float: none;
 		}
-		.content{
+		.one-column{
+			@media #{$small-up} { @include grid-column(1); }
+			padding: rem-calc(($base-font-size));
+		}
+		.two-column{
+			@media #{$small-up} { @include grid-column(2); }
+			padding: rem-calc(($base-font-size));
+		}
+		.ten-column{
+			@media #{$small-up} { @include grid-column(10); }
+			padding: rem-calc(($base-font-size));
+		}
+		.eleven-column{
 			@media #{$small-up} { @include grid-column(11); }
+			padding: rem-calc(($base-font-size));
 		}
 	}
 }
@@ -576,19 +595,9 @@ table{
 .activity-list{
 	@extend .information-list;
 	li{
-		.icon{
-			@media #{$small-up} { @include grid-column(1); }
-		}
-		.thumbnail{
-			@media #{$small-up} { @include grid-column(1); }
-			//@extend .no-pad;
-		}
-		.content{
-			@media #{$small-up} { @include grid-column(10); }
-		}
 		.grade{
 			@media #{$small-up} { @include grid-column(1); }
-			@extend .no-pad;
+			padding: rem-calc(($base-font-size));
 			text-align: center;
 			font-weight: $font-weight-bold;
 			font-size: rem-calc(($base-font-size + 2));
@@ -599,25 +608,32 @@ table{
 // Subject list
 .subject-list{
 	@extend .information-list;
+	.subject-group{
+		border-bottom: 16px solid $silver;
+	}
 	li{
-		.thumbnail{
-			@media #{$small-up} { @include grid-column(1); }
-		}
-		.content{
-			@media #{$small-up} { @include grid-column(10); }
-		}
-		.icon{
-			@media #{$small-up} { @include grid-column(1); }
-			@extend .no-pad;
-		}
 		.grade{
 			@media #{$small-up} { @include grid-column(1); }
-			@extend .no-pad;
+			padding: rem-calc(($base-font-size));
+			// TODO: eventually fix colours
 			background: $success-color;
+			color: $white;
 			min-height: 64px;
 			text-align: center;
 			font-weight: $font-weight-bold;
-			font-size: rem-calc(($base-font-size + 2));
+			font-size: rem-calc(($base-font-size - 4));
+			a{
+				color: $white;
+			}
+			span{
+				font-size: rem-calc(($base-font-size + 8));
+			}
+		}
+		div{
+			@include single-transition(all, 0.15s, linear);
+			&:hover{
+				background-color: $ocean-sunset;
+			}
 		}
 		ul{
 			clear: both;
@@ -656,18 +672,13 @@ table{
 	//@media #{$large-up} { @include block-grid(4); }
 	//@media #{$medium-up} { @include block-grid(2); }
 	//@media #{$small-up} { @include block-grid(2); }
+	@extend .information-list;
 	li{
 		border-right: 1px solid $silver;
+		border-bottom: 0;
 		&:last-child{
 			border: 0;
 		}
-	}
-	.thumbnail{
-		@media #{$small-up} { @include grid-column(2); }
-		@extend .no-pad;
-	}
-	.content{
-		@media #{$small-up} { @include grid-column(10); }
 	}
 }
 
@@ -675,7 +686,7 @@ table{
 .actions{
 	list-style: none;
 	margin: 0;
-	padding: 0;
+	padding: 0 !important;
 
 	//Grid for 1 action
 	&.one{
@@ -699,8 +710,10 @@ table{
 		}
 	}
 	a{
+		padding: rem-calc(($base-font-size));
 		display: inline-block;
 		opacity: 0.3;
+		text-align: center;
 	}
 }
 
