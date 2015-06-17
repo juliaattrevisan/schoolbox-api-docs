@@ -23,7 +23,9 @@
     });
 </script>
 <!-- END custom_head -->
+
 <h1>{CATEGORY} - {THREAD_TITLE} {LOCKED}</h1>
+
 <ul class="breadcrumb">
     <li><a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a></li>
     <li><a href="/forum/{CATEGORY_ID}/">Forum</a></li>
@@ -32,14 +34,14 @@
 
 <p class="clearfix">
     <!-- BEGIN reply -->
-    <a class="btn reply float-left" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}"><span></span>Post Reply</a>
+    <a class="button icon-add" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}">Post Reply</a>
     <!-- END reply -->
     <!-- BEGIN modify_thread -->
-
-    <a href="/forum/modifyForm.php?toggleLock={THREAD_ID}" class="btn padlock float-left"><span></span>{LOCK_UNLOCK} Thread</a>
-    <a href="/forum/modifyForm.php?deleteThread={THREAD_ID}" class="btn delete float-left"><span></span>Delete Thread</a>
+    <a class="button icon-locked warning" href="/forum/modifyForm.php?toggleLock={THREAD_ID}">{LOCK_UNLOCK} Thread</a>
+    <a class="button icon-delete alert" href="/forum/modifyForm.php?deleteThread={THREAD_ID}">Delete Thread</a>
     <!-- END modify_thread -->
 </p>
+
 <div class="forum listing">
     <ul class="comments">
         <!-- BEGIN post -->
@@ -72,22 +74,22 @@
 </div>
 <p class="clearfix"><a name="bottom"></a>
     <!-- BEGIN reply -->
-    <a class="btn reply float-left" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}"><span></span>Post Reply</a>
+    <a class="button icon-add" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}">Post Reply</a>
     <!-- END reply -->
     <!-- BEGIN modify_thread -->
-    <button class="lock submit-btn-plain">{LOCK_UNLOCK} Thread</button>
-    <button class="delete submit-btn-plain">Delete Thread</button>
+    <a class="button icon-locked warning" href="/forum/modifyForm.php?toggleLock={THREAD_ID}">{LOCK_UNLOCK} Thread</a>
+    <a class="button icon-delete alert" href="/forum/modifyForm.php?deleteThread={THREAD_ID}">Delete Thread</a>
     <!-- END modify_thread -->
 </p>
 
-<ul class="admin-nav foot">
+<ul class="pagination">
     <!-- BEGIN previous_button -->
-	<li><a href="/forum/thread/{THREAD_ID}/{PREVIOUS_PAGE}">&lsaquo; Prev</a></li>
+    <li><a href="/forum/thread/{THREAD_ID}/{PREVIOUS_PAGE}">&lsaquo;</a></li>
     <!-- END previous_button -->
     <!-- BEGIN page_number -->
-	<li><a class="{CURRENT}" href="/forum/thread/{THREAD_ID}/{PAGE_INDEX}">{PAGE_INDEX}</a></li>
+    <li class="{CURRENT}"><a href="/forum/thread/{THREAD_ID}/{PAGE_INDEX}">{PAGE_INDEX}</a></li>
     <!-- END page_number -->
     <!-- BEGIN next_button -->
-	<li><a href="/forum/thread/{THREAD_ID}/{NEXT_PAGE}">Next &rsaquo;</a></li>
+    <li><a href="/forum/thread/{THREAD_ID}/{NEXT_PAGE}">&rsaquo;</a></li>
     <!-- END next_button -->
 </ul>
