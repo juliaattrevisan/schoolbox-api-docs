@@ -30,6 +30,18 @@ class Leave_Core_Report_House_Web
         'approvedEnd'   => "</span><br />",
     );
 
+    /**
+     * Offsets from the start time of a day as shown on the report.
+     *
+     * @var array|int[]
+     */
+    protected $offsets = [
+        'morningStart' => 10,
+        'dayStart'     => 19,
+        'nightStart'   => 22,
+        'nightEnd'     => 34,
+    ];
+
     protected $rangePeriods = array('morning', 'day', 'night');
 
     // Types of leave directions
@@ -126,16 +138,16 @@ class Leave_Core_Report_House_Web
             $data = $this->getData();
 
             $morningStart = clone $data['reportStart'];
-            $morningStart->addHours(10);
+            $morningStart->addHours($this->offsets['morningStart']);
 
             $dayStart = clone $data['reportStart'];
-            $dayStart->addHours(19);
+            $dayStart->addHours($this->offsets['dayStart']);
 
             $nightStart = clone $data['reportStart'];
-            $nightStart->addHours(22);
+            $nightStart->addHours($this->offsets['nightStart']);
 
             $nightEnd = clone $data['reportStart'];
-            $nightEnd->addHours(34);
+            $nightEnd->addHours($this->offsets['nightEnd']);
 
             $showStartTime = true;
 
