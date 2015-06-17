@@ -29,17 +29,16 @@
         });
 
         var searchForm = $('form[data-form_type="search"]');
-        searchForm.on('click', 'button[data-action="search"]', function (event) {
+        searchForm.on('click', 'button[data-action]', function (event) {
             event.preventDefault();
-            var houseId = searchForm.find(':input[name="reportHouse"]').val();
-            var date    = searchForm.find(':input[name="reportDate"]').val().replace(/\//g, '-');
-            window.location.href = '/modules/leave/report/house/' + houseId + '/' + date;
-        });
-        searchForm.on('click', 'button[data-action="export"]', function (event) {
-            event.preventDefault();
-            var houseId = searchForm.find(':input[name="reportHouse"]').val();
-            var date    = searchForm.find(':input[name="reportDate"]').val().replace(/\//g, '-');
-            window.location.href = '/modules/leave/report/house/' + houseId + '/' + date + '/export';
+            var houseId  = searchForm.find(':input[name="reportHouse"]').val();
+            var date     = searchForm.find(':input[name="reportDate"]').val().replace(/\//g, '-');
+            var action   = $(this).data('action');
+            var location = '/modules/leave/report/house/' + houseId + '/' + date;
+            if (action == 'export') {
+                location += '/export';
+            }
+            window.location.href = location;
         });
     });
 </script>
