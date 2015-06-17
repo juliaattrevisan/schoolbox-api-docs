@@ -1,25 +1,15 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
     $(function () {
-
-        $('#forum-topic tbody tr:even td').css('background-color', '#f4f4f4');
-
-        $('a.delete.float-left').click(function () {
-            if (confirm('Are you sure you want to delete this thread?'))
-                window.open($(this).attr('href'), '_self', '');
-            return false;
+        $('a[data-action="delete"][data-relation="post"]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({text:'Are you sure you want to delete this post?'});
         });
-
-        $('a.delete.no-text').click(function () {
-            if (confirm('Are you sure you want to delete this post?'))
-                window.open($(this).attr('href'), '_self', '');
-            return false;
+        $('a[data-action="delete"][data-relation="thread"]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({text:'Are you sure you want to delete this thread?'});
         });
-
-        if ($('.post').length !== 1) {
-            $('.post:last').css("border", "0")
-        }
-
     });
 </script>
 <!-- END custom_head -->
@@ -38,7 +28,7 @@
     <!-- END reply -->
     <!-- BEGIN modify_thread -->
     <a class="button icon-locked warning" href="/forum/modifyForm.php?toggleLock={THREAD_ID}">{LOCK_UNLOCK} Thread</a>
-    <a class="button icon-delete alert" href="/forum/modifyForm.php?deleteThread={THREAD_ID}">Delete Thread</a>
+    <a class="button icon-delete alert" href="/forum/modifyForm.php?deleteThread={THREAD_ID}" data-action="delete" data-relation="thread">Delete Thread</a>
     <!-- END modify_thread -->
 </p>
 
@@ -47,25 +37,32 @@
         <!-- BEGIN post -->
         <li id="{POST_ID}" class="{ON_OFF}">
             <!-- BEGIN modify -->
-            <a class="btn delete no-text" title="Delete post" href="/forum/modifyForm.php?deletePost={POST_ID}" class="delete"><span></span></a>
-            <a class="btn modify no-text" title="Modify post" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/{POST_ID}"><span></span></a>
+            <span class="header-actions">
+                <a class="button icon-menu" href="#" data-dropdown="postOptions{POST_ID}"></a>
+            </span>
+            <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="postOptions{POST_ID}">
+                <li><a class="button icon-modify warning" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/{POST_ID}">Modify Post</a></li>
+                <li><a class="button icon-delete alert" href="/forum/modifyForm.php?deletePost={POST_ID}" data-action="delete" data-relation="post">Delete Post</a></li>
+            </ul>
             <!-- END modify -->
+
             <a href="/search/user/{POST_USER_ID}" class="author">
                 <img width="32" height="32" src="/portrait.php?userId={POST_AUTHOR_EXTERNAL_ID}&size=square32"/>
                 <span class="name">{POST_AUTHOR}</span>
             </a>
-            <span class="subtitle">Posted {POST_TIME}</span>
+            <span class="meta">Posted {POST_TIME}</span>
 
-            <div class="post-content wysiwyg">
+            <div class="wysiwyg">
                 {POST_BODY}
             </div>
             <p>
                 <!-- BEGIN reply_post -->
-                <a class=" btn reply" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}"><span></span>Reply</a>
+                <a class="button icon-reply" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}">Reply</a>
                 <!-- END reply_post -->
 
                 <!-- BEGIN modified -->
-                <br/> edited {POST_MODIFIED} {POST_CENSORED}
+                <br/>
+                <span class="meta">edited {POST_MODIFIED} {POST_CENSORED}</span>
                 <!-- END modified -->
             </p>
         </li>
@@ -78,7 +75,7 @@
     <!-- END reply -->
     <!-- BEGIN modify_thread -->
     <a class="button icon-locked warning" href="/forum/modifyForm.php?toggleLock={THREAD_ID}">{LOCK_UNLOCK} Thread</a>
-    <a class="button icon-delete alert" href="/forum/modifyForm.php?deleteThread={THREAD_ID}">Delete Thread</a>
+    <a class="button icon-delete alert" href="/forum/modifyForm.php?deleteThread={THREAD_ID}" data-action="delete" data-relation="thread">Delete Thread</a>
     <!-- END modify_thread -->
 </p>
 
