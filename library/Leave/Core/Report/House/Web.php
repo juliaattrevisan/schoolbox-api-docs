@@ -150,7 +150,7 @@ class Leave_Core_Report_House_Web
                          * then he left and returned in the same period
                          */
                         if (!$request->getOccupancy($dayStart, $nightStart)) {
-                            $requestPeriodMorning          = $requestDateStart->getTimeOnly() . ' ' . $request->getFinish()->getTimeOnly();
+                            $requestPeriodMorning          = $request->getStart()->getTimeOnly() . ' ' . $request->getFinish()->getTimeOnly();
                             $requestPeriodMorningDirection = self::LEAVING;
                         } else {
                             /* Specifically check for this day, to account for multi-week leave
