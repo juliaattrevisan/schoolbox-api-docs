@@ -30,6 +30,18 @@ class Leave_Kings_Report_House_Web
         'approvedEnd' => "</span><br />",
     );
 
+    /**
+     * Offsets from the start time of a day as shown on the report.
+     *
+     * @var array|int[]
+     */
+    protected $offsets = [
+        'morningStart' => 7,
+        'dayStart'     => 11,
+        'nightStart'   => 21,
+        'nightEnd'     => 31,
+    ];
+
     protected $rangePeriods = array('morning', 'day', 'night');
 
     // Types of leave directions
