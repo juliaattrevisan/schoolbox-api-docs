@@ -42,8 +42,9 @@
 
                 <h3><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE} {THREAD_LOCKED}</a></h3>
 
-                <span class="subtitle">Posted {THREAD_TIME} by </span>
+                <span class="meta">Posted {THREAD_TIME} by
                 <a href="/search/user/{THREAD_AUTHOR_ID}" class="author">{THREAD_AUTHOR}</a>
+                </span>
             </td>
             <td class="avatar">
                 <!-- BEGIN last_post -->
@@ -51,7 +52,7 @@
                     <img height="32" width="32" src="/portrait.php?userId={THREAD_LAST_POST_USER_EXTERNAL_ID}&size=square32"/>
                     <a href="/search/user/{THREAD_LAST_POST_USER_ID}">{THREAD_LAST_POST_USER}</a>
                 </a><br/>
-                <span class="subtitle">{THREAD_LAST_POST_TIME}</span>
+                <span class="meta">{THREAD_LAST_POST_TIME}</span>
                 <!-- END last_post -->
             </td>
             <td>{THREAD_REPLIES}</td>
