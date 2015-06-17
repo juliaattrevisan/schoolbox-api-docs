@@ -40,6 +40,14 @@
             }
             window.location.href = location;
         });
+
+        $('a[data-action="print"]').click(function(e) {
+            e.preventDefault();
+            var houseId  = searchForm.find(':input[name="reportHouse"]').val();
+            var date     = searchForm.find(':input[name="reportDate"]').val().replace(/\//g, '-');
+            var location = '/modules/leave/report/house/' + houseId + '/' + date + '/print';
+            window.location.href = location;
+        })
     });
 </script>
 <!-- END custom_head -->
@@ -49,7 +57,7 @@
 </span>
 <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="options">
     <li><a class="" href="/modules/leave/house/{HOUSE_ID}">Return to {HOUSE_NAME}</a></li>
-    <li><a class="icon-print" href="javascript:window.print()">Print</a></li>
+    <li><a class="icon-print" href="#" data-action="print">Print</a></li>
 </ul>
 
 <h1>Leave Report for {HOUSE_NAME}</h1>

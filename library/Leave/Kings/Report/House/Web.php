@@ -518,11 +518,13 @@ class Leave_Kings_Report_House_Web
                 /* Hide the first two columns of the first group
                      */
                 if (!$i) {
+                    $this->getPage()->setVar('REPORT_HEADER_COLSPAN', 2);
                     $this->getPage()->setVar('report_header_subtitle_show_am_block', '');
                     $this->getPage()->parse('report_header_subtitle_show_day_block', 'report_header_subtitle_show_day');
                     $this->getPage()->parse('report_header_subtitle_hide_am_block', 'report_header_subtitle_hide_am');
                     $this->getPage()->setVar('report_header_subtitle_hide_day_block', '');
                 } else {
+                    $this->getPage()->setVar('REPORT_HEADER_COLSPAN', 3);
                     $this->getPage()->parse('report_header_subtitle_show_am_block', 'report_header_subtitle_show_am');
                     $this->getPage()->parse('report_header_subtitle_show_day_block', 'report_header_subtitle_show_day');
                     $this->getPage()->setVar('report_header_subtitle_hide_am_block', '');
