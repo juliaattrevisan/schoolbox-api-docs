@@ -11,7 +11,7 @@
  */
 class Leave_Kings_Report_House_Web
 {
-    protected $templateFile = '../kings/modules/leave/report/house/web.html';
+    protected $templateFile = 'modules/leave/report/house/web.html';
     protected $page = null;
     protected $data = array();
     protected $requestList = array();
