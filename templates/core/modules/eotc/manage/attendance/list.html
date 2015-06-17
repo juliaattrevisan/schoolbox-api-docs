@@ -1,103 +1,130 @@
+<span class="header-actions">
+    <a href="/modules/eotc/manage/modify.php?eventID={EVENT_ID}" class="button icon-previous">Back</a>
+</span>
+
+<h1>People attending {EVENT_NAME}</h1>
+
+<div class="large-6 columns">
+    <form action="/modules/eotc/manage/attendance/add" method="post">
+        <input type="hidden" name="eventId" value="{EVENT_ID}" />
+        <fieldset>
+            <legend>Add Individual Student</legend>
+            
+            <label>
+                <select data-studentsuggest name="selected[]" multiple placeholder="Search Students"></select>
+            </label>
+
+            <input type="submit" value="Add Students" />
+        </fieldset>
+    </form>
+</div>
+
+<div class="large-6 columns">
+    <form action="/modules/eotc/manage/attendance/addByCourseCode" method="post">
+        <input type="hidden" name="eventId" value="{EVENT_ID}" />
+
+        <fieldset>
+            <legend>Add By Course Code</legend>
+
+            <label>Category
+                <select data-selector name="filetype">
+                    <option value="">Please select</option>
+                    <!-- BEGIN filetype -->
+                    <option value="{FILETYPE_ID}">{FILETYPE_NAME}</option>
+                    <!-- END filetype -->
+                </select>
+            </label>
+            <label>Class Code
+                <select name="courseCode" disabled>
+                    <option value="">Please select</option>
+                </select>
+            </label>
+        </fieldset>
+        <input type="submit" value="Add Students" />
+    </form>
+</div>
+
+<div class="full-width">
+    <h2>Current Attendees</h2>
+
+    <form action="/modules/eotc/manage/attendance/remove" method="post">
+        <input type="hidden" name="eventId" value="{EVENT_ID}" />
+
+        <table data-attendees class="full-width">
+            <colgroup>
+                <col width="1" />
+                <col width="100"/>
+                <col />
+                <col />
+                <col />
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>
+                        <input id='selectall' data-selectall="true" type="checkbox" />
+                        <label for="selectall" class="checkbox-label"></label>
+                    </th>
+                    <th>ID</th>
+                    <th>Lastname</th>
+                    <th>Firstname</th>
+                    <th>Group</th>
+                </tr>
+            </thead>
+            <tbody>
+            <!-- BEGIN student_attendee -->
+            <tr>
+                <td>
+                    <input id='student{STUDENT_ATTENDEE_ID}' name="selected[]" type="checkbox" value="{STUDENT_ATTENDEE_ID}" />
+                    <label for="student{STUDENT_ATTENDEE_ID}" class="checkbox-label"></label>
+                </td>
+                <td>{STUDENT_ATTENDEE_ID}</td>
+                <td>{STUDENT_ATTENDEE_LASTNAME}</td>
+                <td>{STUDENT_ATTENDEE_FIRSTNAME}</td>
+                <td>{STUDENT_ATTENDEE_ROLE_NAME}</td>
+            </tr>
+            <!-- END student_attendee -->
+            </tbody>
+        </table>
+
+        <input type="submit" value="Remove Selected" />
+    </form>
+</div>
+
 <script type="text/javascript" src="/javascript/jquery.selectAll.js"></script>
 <script type="text/javascript">
-	$(function() {
-		$('.table').selectAll({
-			key: 'selectall',
-			checkboxName: 'selected[]'
-		});
-	});
+    $(function() {
+        $('[data-attendees]').selectAll({
+            key: 'selectall',
+            checkboxName: 'selected[]'
+        });
+    });
 </script>
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript">
-	$(function() {
-		$('#student-suggest').selectizeSelector({
-			ajax: {
-				url:      '/ajax/user.php',
-				type:     'GET',
-				data:     {groupID: '{STUDENT_GROUP_TYPE_IDS}', showCampus: true},
-				dataType: 'json'
-			},
-			multiple: true
-		})
-	});
+    $(function() {
+        $('[data-studentsuggest]').selectizeSelector({
+            ajax: {
+                url:      '/ajax/user.php',
+                type:     'GET',
+                data:     {groupID: '{STUDENT_GROUP_TYPE_IDS}', showCampus: true},
+                dataType: 'json'
+            },
+            multiple: true
+        })
+    });
 </script>
 <script type="text/javascript" src="/modules/eotc/js/jquery.courseCodes.js"></script>
 <script type="text/javascript">
-	$(function() {
-		$('select[name=filetype]').externalClassCodes({
-			output: $('select[name=courseCode]'),
-			campus: {EVENT_CAMPUS_CODES}
-		});
-	});
+    $(function() {
+        $('select[name=filetype]').externalClassCodes({
+            output: $('select[name=courseCode]'),
+            campus: {EVENT_CAMPUS_CODES}
+        });
+    });
 </script>
-<h1>People attending {EVENT_NAME}</h1>
-<div class="left clearfix" style="width: 49%;">
-    <h2>Add Individual Student</h2>
-    <form action="/modules/eotc/manage/attendance/add" method="post">
-        <input type="hidden" name="eventId" value="{EVENT_ID}" />
-        <select id="student-suggest" name="selected[]" multiple placeholder="Search Students"></select>
-        <input type="submit" class='submit-btn-plain' value="Add" />
-    </form>
-</div>
-<div class="right clearfix" style="width: 49%">
-<h2>Add By Course Code</h2>
-<form action="/modules/eotc/manage/attendance/addByCourseCode" method="post">
-	<input type="hidden" name="eventId" value="{EVENT_ID}" />
 
-	<fieldset>
-		<label>Category
-			<select data-selector name="filetype">
-				<option value="">Please select</option>
-				<!-- BEGIN filetype -->
-				<option value="{FILETYPE_ID}">{FILETYPE_NAME}</option>
-				<!-- END filetype -->
-			</select>
-		</label>
-	</fieldset>
-	<fieldset>
-		<label>Class Code
-			<select name="courseCode" disabled>
-				<option value="">Please select</option>
-			</select>
-		</label>
-	</fieldset>
-	<input type="submit" class='submit-btn-plain' value="Add" />
-</form>
-</div>
 
-<div class="clearfix"></div>
 
-<h2>Current Attendees</h2>
-<form action="/modules/eotc/manage/attendance/remove" method="post">
-	<input type="hidden" name="eventId" value="{EVENT_ID}" />
-	<table class="table ruler">
-		<thead>
-			<tr>
-                <th width="30px"><input data-selectall="true" type="checkbox" /></th>
-				<th>ID</th>
-				<th>Lastname</th>
-				<th>Firstname</th>
-				<th>Group</th>
-			</tr>
-		</thead>
-		<tbody>
-			<!-- BEGIN student_attendee -->
-			<tr>
-                <td><input name="selected[]" type="checkbox" value="{STUDENT_ATTENDEE_ID}" /></td>
-				<td>{STUDENT_ATTENDEE_ID}</td>
-				<td>{STUDENT_ATTENDEE_LASTNAME}</td>
-				<td>{STUDENT_ATTENDEE_FIRSTNAME}</td>
-				<td>{STUDENT_ATTENDEE_ROLE_NAME}</td>
-			</tr>
-			<!-- END student_attendee -->
-		</tbody>
-	</table>
 
-	<input type="submit" class='submit-btn-plain' value="Remove Selected" />
-</form>
-
-<div class="clearfix"></div>
-
-<a href="/modules/eotc/manage/modify.php?eventID={EVENT_ID}" class="btn goto"><span></span>Back</a>
 
