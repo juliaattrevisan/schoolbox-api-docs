@@ -1,43 +1,45 @@
-<div class="eotc">
-    <h1>My EOTC Events</h1>
-    <a href="/modules/eotc/manage/modify.php" class="btn modify"><span></span>Create Event</a>
-    <h2>My Events</h2>
-    <table class="standardForm">
-        <colgroup>
-            <col width="180" />
-            <col />
-            <col width="200" />
-            <col width="180" />
-            <col width="30" />
-            <col width="120" />
-            <col width="130" />
-            <col width="30" />
-        </colgroup>
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Title</th>
-                <th>Teacher In Charge</th>
-                <th>Created</th>
-                <th align="center">Students</th>
-                <th align="center">RAMS Required</th>
-                <th>Status</th>
-                <th>View</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- BEGIN event -->
-            <tr>
-                <td>{EVENT_START_DATETIME}</td>
-                <td>{EVENT_TITLE}</td>
-                <td><a href="/search/user/{EVENT_TEACHER_IN_CHARGE_ID}">{EVENT_TEACHER_IN_CHARGE_FULLNAME}</a></td>
-                <td>{EVENT_CREATED_AT}</td>
-                <td align="center">{EVENT_STUDENTS}</td>
-                <td align="center">{EVENT_RAMS_REQUIRED}</td>
-                <td>{EVENT_STATUS_NAME}</td>
-                <td><a href="/modules/eotc/manage/modify.php?eventID={EVENT_ID}">Edit</a></td>
-            </tr>
-            <!-- END event -->
-        </tbody>
-    </table>
-</div>
+<span class="header-actions">
+    <a href="/modules/eotc/manage/modify.php" class="button icon-modify">Create Event</a>
+</span>
+
+<h1>My EOTC Events</h1>
+
+<h2>My Events</h2>
+<table class="full-width">
+    <colgroup>
+        <col width="180" />
+        <col />
+        <col width="200" />
+        <col width="180" />
+        <col width="30" />
+        <col width="120" />
+        <col width="130" />
+        <col width="30" />
+    </colgroup>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Title</th>
+            <th>Teacher In Charge</th>
+            <th>Created</th>
+            <th>Students</th>
+            <th>RAMS Required</th>
+            <th>Status</th>
+            <th>View</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- BEGIN event -->
+        <tr>
+            <td>{EVENT_START_DATETIME}</td>
+            <td>{EVENT_TITLE}</td>
+            <td><a href="/search/user/{EVENT_TEACHER_IN_CHARGE_ID}">{EVENT_TEACHER_IN_CHARGE_FULLNAME}</a></td>
+            <td>{EVENT_CREATED_AT}</td>
+            <td>{EVENT_STUDENTS}</td>
+            <td>{EVENT_RAMS_REQUIRED}</td>
+            <td>{EVENT_STATUS_NAME}</td>
+            <td><a href="/modules/eotc/manage/modify.php?eventID={EVENT_ID}">Edit</a></td>
+        </tr>
+        <!-- END event -->
+    </tbody>
+</table>
