@@ -1,16 +1,15 @@
 <h1>{CATEGORY} Forum</h1>
+
 <ul class="breadcrumb">
     <li><a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a></li>
     <li class="last"><a href="#">Forum</a></li>
 </ul>
-<form action="/forum/modifyForm.php" method="POST">
-    <p class="clearfix">
 
-        <!-- BEGIN forum_post -->
-        <a class="btn add float-left" href="/forum/modify/{CATEGORY_ID}"><span></span>Post Thread</a>
-        <!-- END forum_post -->
-    </p>
-    <table class="standardForm forum table">
+<form action="/forum/modifyForm.php" method="POST">
+    <!-- BEGIN forum_post -->
+    <a class="button icon-add" href="/forum/modify/{CATEGORY_ID}">Post Thread</a>
+    <!-- END forum_post -->
+    <table>
         <thead>
         <tr>
             <!-- BEGIN modify_heading -->
@@ -25,11 +24,15 @@
         </thead>
         <tbody>
         <!-- BEGIN thread -->
-        <tr class="{ON_OFF}">
+        <tr>
             <!-- BEGIN modify_thread -->
             <td>
-                <input type="checkbox" name="deleteThreads[]"
-                       value="{THREAD_ID}"/>
+                <input id="deleteThreads{THREAD_ID}"
+                       type="checkbox"
+                       name="deleteThreads[]"
+                       value="{THREAD_ID}"
+                />
+                <label for="deleteThreads{THREAD_ID}" class="checkbox-label"></label>
             </td>
             <!-- END modify_thread -->
             <td class="avatar">
@@ -41,34 +44,38 @@
 
                 <span class="subtitle">Posted {THREAD_TIME} by </span>
                 <a href="/search/user/{THREAD_AUTHOR_ID}" class="author">{THREAD_AUTHOR}</a>
-            <td class="avatar"><!-- BEGIN last_post -->
+            </td>
+            <td class="avatar">
+                <!-- BEGIN last_post -->
                 <a href="/search/user/{THREAD_LAST_POST_USER_ID}" class="author">
                     <img height="32" width="32" src="/portrait.php?userId={THREAD_LAST_POST_USER_EXTERNAL_ID}&size=square32"/>
                     <a href="/search/user/{THREAD_LAST_POST_USER_ID}">{THREAD_LAST_POST_USER}</a>
                 </a><br/>
                 <span class="subtitle">{THREAD_LAST_POST_TIME}</span>
-
-                <!-- END last_post --></td>
-            <td> {THREAD_REPLIES}</td>
-            <td> {THREAD_VIEWS}</td>
-            <td><a href="/forum/thread/{THREAD_ID}/{THREAD_LAST_PAGE}/#bottom" class="btn go-to"><span></span>View
-                Thread</a></td>
+                <!-- END last_post -->
+            </td>
+            <td>{THREAD_REPLIES}</td>
+            <td>{THREAD_VIEWS}</td>
+            <td><a href="/forum/thread/{THREAD_ID}/{THREAD_LAST_PAGE}/#bottom" class="button icon-view">View Thread</a></td>
         </tr>
         <!-- END thread -->
         </tbody>
     </table>
     <p class="clearfix">
         <!-- BEGIN forum_post -->
-        <a class="btn add float-left" href="/forum/modify/{CATEGORY_ID}"><span></span>Post Thread</a>
+        <a class="button icon-add" href="/forum/modify/{CATEGORY_ID}">Post Thread</a>
         <!-- END forum_post -->
 
         <!-- BEGIN delete_button -->
-        <input type="submit" name="submit" class="submit-btn-plain"
-               value="Delete Selected"
-               onclick="return(confirm('Are you sure you wish to delete these forum threads?'))"/>
+        <button type="submit"
+                class="icon-delete alert"
+                data-action="delete"
+                name="submit"
+                value="Delete Selected">Delete Selected</button>
         <!-- END delete_button -->
     </p>
 </form>
+
 <ul class="admin-nav foot">
     <!-- BEGIN previous_button -->
 	<li><a href="/forum/{CATEGORY_ID}/{PREVIOUS_PAGE}">&lsaquo; Prev</a></li>
