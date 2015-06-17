@@ -1,96 +1,73 @@
-<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
-<script type="text/javascript">
-$(function() {
-	$('#resourcebooking-suggest').selectizeSelector({
-		ajax: {
-			url: '/resource-booking/item/search',
-			type: 'GET',
-			dataType: 'json'
-		},
-		multiple: false
-	});
-
-	$('#bookitem-form').find('input[type=submit]').click(function(event) {
-		event.preventDefault();
-
-		var id = $('#resourcebooking-suggest').val().pop();
-		var url = $('#bookitem-form').attr('action') + id + '?startDate={EVENT_START_DATE}&startTime={EVENT_START_TIME}&endDate={EVENT_END_DATE}&endTime={EVENT_END_TIME}&name={EVENT_NAME_ENCODED}&callbackUrl=/modules/eotc/manage/resources/bookingForm/{EVENT_ID}';
-
-		window.location.href = url;
-
-		return false;
-	});
-});
-</script>
-
-<h1>Allocate Resources to {EVENT_NAME}</h1>
-<span class="header_option">
-	<a href="/modules/eotc/manage/modify.php?eventID={EVENT_ID}" class="btn goto"><span></span>Back</a>
+<span class="header-actions">
+	<a href="/modules/eotc/manage/modify.php?eventID={EVENT_ID}" class="button icon-previous">Back</a>
 </span>
 
-<form id='bookitem-form' action='/resource-booking/booking/bookItem/' method="get">
-	<table class="standardForm">
-		<tbody>
-			<tr>
-				<td class="formLabelWidth">
-					<h4>Resources</h4>
-					<em>Search for a resource</em>
-				</td>
-				<td>
-					<select id="resourcebooking-suggest" name="resourcebooking[]" multiple placeholder="Start typing the name of a resource"></select>
-				</td>
-			</tr>
-		</tbody>
-	</table>
+<h1>Allocate Resources to {EVENT_NAME}</h1>
 
-	<input type="submit" value="Submit" class="submit-btn-plain"/>
+<form data-bookitemform action='/resource-booking/booking/bookItem/' method="get">
+     <fieldset>
+         <label>
+             Search for a resource
+             <select data-resourcebookingsuggest name="resourcebooking[]" multiple placeholder="Start typing the name of a resource"></select>
+         </label>
+
+         <input type="submit" value="Submit" />
+     </fieldset>
 </form>
 
-<div class="clearfix"></div>
-
 <h2>Current Resource Bookings</h2>
-<table class="table ruler">
+<table class="full-width">
+    <colgroup>
+        <col />
+        <col />
+        <col />
+        <col />
+        <col width="32" />
+    </colgroup>
 	<thead>
 		<tr>
-			<th>
-				Resource Name
-			</th>
-			<th>
-				Booking Name
-			</th>
-			<th>
-				Start
-			</th>
-			<th>
-				End
-			</th>
-			<th>
-				Action
-			</th>
+			<th>Resource Name</th>
+			<th>Booking Name</th>
+			<th>Start</th>
+			<th>End</th>
+			<th>Action</th>
 		</tr>
 	</thead>
 	<tbody>
 		<!-- BEGIN resourcebooking -->
 		<tr>
-			<td>
-				<a href="/resource-booking/item/{RESOURCE_ID}">{RESOURCE_NAME}</a>
-			</td>
-			<td>
-				<a href="/resource-booking/booking/{RESOURCEBOOKING_ID}/edit">{RESOURCEBOOKING_NAME}</a>
-			</td>
-			<td>
-				{RESOURCEBOOKING_START}
-			</td>
-			<td>
-				{RESOURCEBOOKING_END}
-			</td>
-			<td>
-				<span class="actions one-button">
-					<a href="/modules/eotc/manage/resources/bookingForm/delete/{RESOURCEBOOKING_ID}" class="btn no-text delete" alt="Remove Booking" title="Remove Booking"><span></span></a>
-				</span>
-			</td>
+			<td><a href="/resource-booking/item/{RESOURCE_ID}">{RESOURCE_NAME}</a></td>
+			<td><a href="/resource-booking/booking/{RESOURCEBOOKING_ID}/edit">{RESOURCEBOOKING_NAME}</a></td>
+			<td>{RESOURCEBOOKING_START}</td>
+			<td>{RESOURCEBOOKING_END}</td>
+			<td><a href="/modules/eotc/manage/resources/bookingForm/delete/{RESOURCEBOOKING_ID}" class="no-text icon-delete" alt="Remove Booking" title="Remove Booking"></a></td>
 		</tr>
 		<!-- END resourcebooking -->
 	</tbody>
 </table>
+
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('[data-resourcebookingsuggest]').selectizeSelector({
+            ajax: {
+                url: '/resource-booking/item/search',
+                type: 'GET',
+                dataType: 'json'
+            },
+            multiple: false
+        });
+
+        $('[data-bookitemform]').find('input[type=submit]').click(function(event) {
+            event.preventDefault();
+
+            var id = $('[data-resourcebookingsuggest]').val().pop();
+            var url = $('[data-bookitemform]').attr('action') + id + '?startDate={EVENT_START_DATE}&startTime={EVENT_START_TIME}&endDate={EVENT_END_DATE}&endTime={EVENT_END_TIME}&name={EVENT_NAME_ENCODED}&callbackUrl=/modules/eotc/manage/resources/bookingForm/{EVENT_ID}';
+
+            window.location.href = url;
+
+            return false;
+        });
+    });
+</script>
