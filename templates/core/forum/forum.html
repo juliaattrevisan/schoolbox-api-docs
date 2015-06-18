@@ -13,6 +13,12 @@
 </script>
 <!-- END custom_head -->
 
+<!-- BEGIN forum_post -->
+<span class="header-actions">
+    <a class="button icon-add" href="/forum/modify/{CATEGORY_ID}">Post Thread</a>
+</span>
+<!-- END forum_post -->
+
 <h1>{CATEGORY} Forum</h1>
 
 <ul class="breadcrumb">
@@ -21,9 +27,6 @@
 </ul>
 
 <form action="/forum/modifyForm.php" method="POST">
-    <!-- BEGIN forum_post -->
-    <a class="button icon-add" href="/forum/modify/{CATEGORY_ID}">Post Thread</a>
-    <!-- END forum_post -->
     <table>
         <thead>
         <tr>
@@ -78,10 +81,6 @@
         </tbody>
     </table>
     <p class="clearfix">
-        <!-- BEGIN forum_post -->
-        <a class="button icon-add" href="/forum/modify/{CATEGORY_ID}">Post Thread</a>
-        <!-- END forum_post -->
-
         <!-- BEGIN delete_button -->
         <button type="submit"
                 class="icon-delete alert"
