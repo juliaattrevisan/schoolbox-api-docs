@@ -549,55 +549,12 @@ table{
 
 .accordion a 				{ @include single-transition(all, 0.15s, linear); }
 
-// The original list
-// This list can use up to 3 columns
-// All other lists include (@extend) these styles
-.information-list{
-	list-style: none;
-	margin: 0;
-	padding: 0;
-	li{
-		border-bottom: 1px solid $silver;
-		position: relative;
-		overflow: auto;
-		list-style: none;
-		> &:first-child{
-			padding-top: 0;
-		}
-		&:last-child{
-			border: 0;
-		}
-		[class^="icon-"]:before,
-		[class*=" icon-"]:before{
-			font-size: rem-calc(($base-font-size - 2));
-			float: none;
-		}
-		.one-column{
-			@media #{$small-up} { @include grid-column(1); }
-			padding: rem-calc(($base-font-size));
-		}
-		.two-column{
-			@media #{$small-up} { @include grid-column(2); }
-			padding: rem-calc(($base-font-size));
-		}
-		.ten-column{
-			@media #{$small-up} { @include grid-column(10); }
-			padding: rem-calc(($base-font-size));
-		}
-		.eleven-column{
-			@media #{$small-up} { @include grid-column(11); }
-			padding: rem-calc(($base-font-size));
-		}
-	}
-}
-
 // Activity list
 .activity-list{
 	@extend .information-list;
 	li{
 		.grade{
 			@media #{$small-up} { @include grid-column(1); }
-			padding: rem-calc(($base-font-size));
 			text-align: center;
 			font-weight: $font-weight-bold;
 			font-size: rem-calc(($base-font-size + 2));
@@ -614,7 +571,6 @@ table{
 	li{
 		.grade{
 			@media #{$small-up} { @include grid-column(1); }
-			padding: rem-calc(($base-font-size));
 			// TODO: eventually fix colours
 			background: $success-color;
 			color: $white;
@@ -640,6 +596,59 @@ table{
 			margin: 0;
 			li:last-child{
 				padding-bottom: 0;
+			}
+		}
+	}
+}
+
+// The original list
+// This list can use up to 3 columns
+// All other lists include (@extend) these styles
+.information-list{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	li{
+		border-bottom: 1px solid $silver;
+		position: relative;
+		overflow: auto;
+		list-style: none;
+		> &:first-child{
+			padding-top: 0;
+		}
+		&:last-child{
+			border: 0;
+		}
+		[class^="icon-"]:before,
+		[class*=" icon-"]:before{
+			font-size: rem-calc(($base-font-size - 2));
+			float: none;
+		}
+		.one-column{	
+			@media #{$small-up} { @include grid-column(1); }
+		}
+		.two-column{
+			@media #{$small-up} { @include grid-column(2); }
+		}
+		.ten-column{
+			@media #{$small-up} { @include grid-column(10); }
+		}
+		.eleven-column{
+			@media #{$small-up} { @include grid-column(11); }	
+		}
+		// Responsive Column Padding
+		.one-column,
+		.two-column,
+		.ten-column,
+		.eleven-column{
+			@media #{$small-up} {
+				padding: rem-calc(($base-font-size - 8));
+			}
+			@media #{$medium-up} {
+				padding: rem-calc(($base-font-size - 4));
+			}
+			@media #{$large-up} {
+				padding: rem-calc(($base-font-size));
 			}
 		}
 	}
