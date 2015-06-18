@@ -1,33 +1,3 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript">
-    $(function() {
-        $('input[data-datepicker]').datepicker({
-            constrainInput: false,
-            onClose: function (string) {
-                var input = $(this);
-
-                $.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
-                    input.val(data.time);
-                })
-            }
-        });
-
-        var searchForm = $('form[data-form_type="search"]');
-        searchForm.on('click', 'button[data-action]', function (event) {
-            event.preventDefault();
-            var houseId  = searchForm.find(':input[name="reportHouse"]').val();
-            var date     = searchForm.find(':input[name="reportDate"]').val().replace(/\//g, '-');
-            var action   = $(this).data('action');
-            var location = '/modules/leave/report/house/' + houseId + '/' + date;
-            if (action == 'export') {
-                location += '/export';
-            }
-            window.location.href = location;
-        });
-    });
-</script>
-<!-- END custom_head -->
-
 <span class="header-actions">
     <a class="button icon-more" href="#" data-dropdown="options">Options</a>
 </span>
@@ -49,20 +19,20 @@ No houses found.
             <input data-datepicker id="reportDate" type="text" value="{REPORT_DATE}">
         </div>
         <div class="large-2 columns">
-            <button data-action="search" data-tooltip aria-haspopup="true" title="Search" class="icon-search"></button>
-            <button data-action="export" data-tooltip aria-haspopup="true" title="Export" class="icon-export"></button>
+            <button data-action="search" data-tooltip aria-haspopup="true" title="Search" class="icon-search no-text"></button>
+            <button data-action="export" data-tooltip aria-haspopup="true" title="Export" class="icon-export no-text"></button>
         </div>
     </fieldset>
 </form>
 
 <p>The following shows the number of people in each House who require food.</p>
 
-<table class="full-width">
+<table>
     <thead>
         <tr>
             <th></th>
             <!-- BEGIN request_date_header -->
-            <th colspan='3' align='center'>{REQUEST_DATE_HEADER_DATE}</th>
+            <th colspan='3'>{REQUEST_DATE_HEADER_DATE}</th>
             <!-- END request_date_header -->
         </tr>
         <tr>
@@ -99,3 +69,31 @@ No houses found.
     </tfoot>
 </table>
 <!-- END house_list -->
+
+<script type="text/javascript">
+    $(function() {
+        $('input[data-datepicker]').datepicker({
+            constrainInput: false,
+            onClose: function (string) {
+                var input = $(this);
+
+                $.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                    input.val(data.time);
+                })
+            }
+        });
+
+        var searchForm = $('form[data-form_type="search"]');
+        searchForm.on('click', 'button[data-action]', function (event) {
+            event.preventDefault();
+            var houseId  = searchForm.find(':input[name="reportHouse"]').val();
+            var date     = searchForm.find(':input[name="reportDate"]').val().replace(/\//g, '-');
+            var action   = $(this).data('action');
+            var location = '/modules/leave/report/house/' + houseId + '/' + date;
+            if (action == 'export') {
+                location += '/export';
+            }
+            window.location.href = location;
+        });
+    });
+</script>
