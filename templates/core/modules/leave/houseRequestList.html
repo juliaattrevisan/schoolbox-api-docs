@@ -27,7 +27,7 @@
                 <th>Leave Date</th>
                 <th>Days</th>
                 <th>Host</th>
-                <th class="center">View</th>
+                <th>View</th>
             </tr>
         </thead>
         <tbody>
@@ -39,7 +39,7 @@
                 <td>{REQUEST_START}</td>
                 <td>{REQUEST_DURATION}</td>
                 <td>{REQUEST_HOST_TYPE}</td>
-                <td class="center"><a href="/modules/leave/modify/{REQUEST_ID}">View</a></td>
+                <td><a href="/modules/leave/modify/{REQUEST_ID}">View</a></td>
             </tr>
             <!-- END pending_request -->
         </tbody>
@@ -61,12 +61,12 @@
                 <th>Status</th>
                 <th>Status Updated On</th>
                 <th>Status Updated by</th>
-                <th class="center">View</th>
+                <th>View</th>
             </tr>
         </thead>
         <tbody>
             <!-- BEGIN previous_request -->
-            <tr class="{CLASS}">
+            <tr>
                 <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
                 <td>{USER_YEAR}</td>
                 <td>{REQUEST_START}</td>
@@ -75,7 +75,7 @@
                 <td>{REQUEST_STATUS}</td>
                 <td>{REQUEST_AUTHORISATION_DATETIME}</td>
                 <td><a href="/search/user/{REQUEST_AUTHORISATION_USER_ID}">{REQUEST_AUTHORISATION_USER_NAME}</a></td>
-                <td class="center"><a href="/modules/leave/modify/{REQUEST_ID}">View</a></td>
+                <td><a href="/modules/leave/modify/{REQUEST_ID}">View</a></td>
             </tr>
             <!-- END previous_request -->
         </tbody>
