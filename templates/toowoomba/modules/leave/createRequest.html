@@ -78,12 +78,14 @@
     </fieldset>
 
     <fieldset class="large-6 columns">
-        <legend>Leave Date</legend>
+        <legend>Leaving</legend>
         <div class="large-8 columns">
+            <label for="startDate">Date</label>
             <input name="request[start][date]" id="startDate" type="text" required data-datepicker />
         </div>
         <div class="large-4 columns">
-            <select name='request[start][time]'>
+            <label for="startTime">Time</label>
+            <select name='request[start][time]' id="startTime">
                 <!-- BEGIN request_start_time -->
                 <option value='{REQUEST_START_TIME_VALUE}' {REQUEST_START_TIME_SELECTED}>{REQUEST_START_TIME_LABEL}</option>
                 <!-- END request_start_time -->
@@ -92,12 +94,14 @@
     </fieldset>
 
     <fieldset class="large-6 columns">
-        <legend>Return Date</legend>
+        <legend>Returning</legend>
         <div class="large-8 columns">
+            <label for="finishDate">Date</label>
             <input name="request[finish][date]" id="finishDate" type="text" required data-datepicker />
         </div>
         <div class="large-4 columns">
-            <select name='request[finish][time]'>
+            <label for="finishTime">Time</label>
+            <select name='request[finish][time]' id="finishTime">
                 <!-- BEGIN request_finish_time -->
                 <option value='{REQUEST_FINISH_TIME_VALUE}' {REQUEST_FINISH_TIME_SELECTED}>{REQUEST_FINISH_TIME_LABEL}</option>
                 <!-- END request_finish_time -->
@@ -107,14 +111,15 @@
 
     <fieldset>
         <legend>Host</legend>
-        <div class="large-12 columns">
+        <div class="large-6 columns">
+            <label for="requesthostType">Type</label>
             <select name="request[hostType]" id="requesthostType" data-relation="host_type_selector">
                 <!-- BEGIN host_type -->
                 <option value="{HOST_TYPE_VALUE}" {HOST_TYPE_VALUE_SELECTED}>{HOST_TYPE_LABEL}</option>
                 <!-- END host_type -->
             </select>
         </div>
-        <div class="large-6 columns" data-relation="host_type_field">
+        <div class="large-3 columns" data-relation="host_type_field">
             <label for="requesthostName">
                 <span data-tooltip aria-haspopup="true" class="has-tip"
                       title="The host will need to confirm your leave arrangements; you can forward them the email you receive.">
@@ -123,7 +128,7 @@
             </label>
             <input type="text" name="request[hostName]" id="requesthostName" required />
         </div>
-        <div class="large-6 columns" data-relation="host_type_field">
+        <div class="large-3 columns" data-relation="host_type_field">
             <label for="requesthostAddress">
                 <span data-tooltip aria-haspopup="true" class="has-tip"
                       title="The host's address during the leave period">
@@ -143,13 +148,23 @@
     </fieldset>
 
     <fieldset>
-        <legend>Travel Method</legend>
-        <div class="large-12 columns">
-            <select name="request[travelType]">
+        <legend>Other Information</legend>
+        <div class="large-6 columns">
+            <label for="requestTravelType">Travel Method</label>
+            <select name="request[travelType]" id="requestTravelType">
                 <!-- BEGIN travel_drop -->
                 <option value="{TRAVEL_DROP_VALUE}" label="{TRAVEL_DROP_NAME}"  {TRAVEL_DROP_VALUE_SELECTED}>{TRAVEL_DROP_NAME}</option>
                 <!-- END travel_drop -->
             </select>
+        </div>
+        <div class="large-6 columns">
+            <label for="requestTravelType">
+                <span data-tooltip aria-haspopup="true" class="has-tip"
+                      title="Only complete for special leave information or travel arrangements">
+                    Description
+                </span>
+            </label>
+            <textarea id='description' name="request[description]" maxlength="100" data-warninglength="67"></textarea>
         </div>
         <div class="large-6 columns">
             <label for="requestCollectorName">Collector's Name</label>
@@ -159,21 +174,11 @@
             <label for="requestreturnerName">Returner's Name</label>
             <input type="text" name="request[returnerName]" id="requestreturnerName" required />
         </div>
-    </fieldset>
-
-    <fieldset>
-        <legend>Description</legend>
-        <div class="large-12 columns">
-            <em>Only complete for special leave information or travel arrangements</em>
-            <textarea id='description' name="request[description]" maxlength="100" data-warninglength="67"></textarea>
+        <div class="large-6 columns">
+            <label for="requestReason">Reason For Leave</label>
+            <textarea id="requestReason" name="request[reason]"></textarea>
         </div>
-    </fieldset>
-
-    <fieldset>
-        <legend>Reason For Leave</legend>
-        <div class="large-12 columns">
-            <textarea name="request[reason]"></textarea>
-        </div>
+        <div class="large-6 columns"></div>
     </fieldset>
 
     <fieldset>
