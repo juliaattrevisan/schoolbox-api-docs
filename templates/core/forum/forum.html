@@ -19,10 +19,9 @@
                 <th></th>
                 <!-- END modify_heading -->
                 <th>Forum</th>
-                <th>Last Post</th>
                 <th>Replies</th>
                 <th>Views</th>
-                <th></th>
+                <th colspan="2">Last Post</th>
             </tr>
         </thead>
         <tbody>
@@ -45,25 +44,28 @@
                     <a href="/search/user/{THREAD_AUTHOR_ID}" class="author">{THREAD_AUTHOR}</a>
                 </span>
             </td>
+
+            <td>{THREAD_REPLIES}</td>
+            <td>{THREAD_VIEWS}</td>
             <td>
                 <!-- BEGIN last_post -->
                 <a href="/search/user/{THREAD_LAST_POST_USER_ID}">
-                    <img height="32" width="32" src="/portrait.php?userId={THREAD_LAST_POST_USER_EXTERNAL_ID}&size=square32"/>
+                    <img src="/portrait.php?userId={THREAD_LAST_POST_USER_EXTERNAL_ID}&size=square32"/>
                     <a href="/search/user/{THREAD_LAST_POST_USER_ID}">{THREAD_LAST_POST_USER}</a>
                 </a><br/>
-                <span class="meta">{THREAD_LAST_POST_TIME}</span>
+                <span class="meta">
+                    {THREAD_LAST_POST_TIME}
+                </span>
                 <!-- END last_post -->
             </td>
-            <td>{THREAD_REPLIES}</td>
-            <td>{THREAD_VIEWS}</td>
-            <td><a href="/forum/thread/{THREAD_ID}/{THREAD_LAST_PAGE}/#bottom" class="button icon-view">View Thread</a></td>
+            <td><a href="/forum/thread/{THREAD_ID}/{THREAD_LAST_PAGE}/#bottom">View</a></td>
         </tr>
         <!-- END thread -->
         </tbody>
     </table>
     <p>
         <!-- BEGIN delete_button -->
-        <button type="submit" class="icon-delete alert" data-action="delete" name="submit" value="Delete Selected">Delete Selected</button>
+        <button type="submit" class="icon-delete" data-action="delete" name="submit" value="Delete Selected">Delete Selected</button>
         <!-- END delete_button -->
     </p>
 </form>
