@@ -1,15 +1,16 @@
-<span class="header-actions">
+<span class='header-actions'>
+    <a href='/homepage/{HOMEPAGE_ID}' class='button icon-folder'>Return to Homepage</a>
+    <a href='#' class='button icon-more' data-dropdown='header-options'>Options</a>
+</span>
+<ul class='f-dropdown fadeInDown' data-dropdown-content='' id='header-options'>
     <!-- BEGIN etherpad_lock -->
-    <a href='/collabdoc/lock/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' class='button icon-locked'>Lock</a>
+    <li><a href='/collabdoc/lock/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' class='icon-locked'>Lock</a>
     <!-- END etherpad_lock -->
 
     <!-- BEGIN etherpad_unlock -->
-    <a href='/collabdoc/lock/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' class='button icon-locked'>Unlock</a>
+    <li><a href='/collabdoc/lock/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' class='icon-locked'>Unlock</a>
     <!-- END etherpad_unlock -->
-
-    <a href='/homepage/{HOMEPAGE_ID}' class='button icon-folder'>Return to Homepage</a>
-</span>
-
+</ul>
 <h1>{ETHERPAD_NAME}</h1>
 
 <div>
