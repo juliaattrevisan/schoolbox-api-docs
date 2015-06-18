@@ -1,26 +1,18 @@
-<script type="text/javascript">
-$(function() {
-	$('#collabdoc-form').validate();
-});
-</script>
-<h1><span>Create Collab Doc</span></h1>
+<h1>Create Collab Doc</h1>
 
-<form id='collabdoc-form' action="/collabdoc/editForm" method="post">
+<form data-form='edit' action="/collabdoc/editForm" method="post">
     <input type="hidden" name='homepageId' value="{HOMEPAGE_ID}" />
 
-	<table class="standardForm table">
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Name</h4>
-                <!--[if lt IE 10]><em>The name of the Collab Doc<em><![endif]-->
-			</td>
-			<td>
-				<label>
-					<input type="text" maxlength='255' name='name' class='required' value="" placeholder="The name of the Collab Doc" />
-				</label>
-			</td>
-		</tr>
-	</table>
+    <label>
+        Name
+        <input type="text" maxlength='255' name='name' class='required' value="" placeholder="The name of the Collab Doc" />
+    </label>
 
-    <input type="submit" value="Create Collab Doc" class="submit-btn-plain no-marg" />
+    <input type="submit" name='submit' value="Create Collab Doc" />
 </form>
+
+<script type="text/javascript">
+    $(function() {
+        $('[data-form="edit"]').validate();
+    });
+</script>

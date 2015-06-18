@@ -1,50 +1,38 @@
-<script type="text/javascript">
-$(function() {
-	var form = $('#collabdoc-form');
-	form.find('input[name="type"]').val('update');
-	form.validate();
+<h1>Modify Collab Doc</h1>
 
-	form.find('input[name="delete"]').click(function(event) {
-		event.preventDefault();
-
-		var confirmation = confirm('Are you sure you want to delete this Collab Doc?');
-
-		if (confirmation) {
-			form.find('input[name="type"]').val('delete');
-
-			$('#collabdoc-form').submit();
-		}
-	});
-});
-</script>
-<h1><span>Modify Collab Doc</span></h1>
-
-<form id='collabdoc-form' action="/collabdoc/modifyForm" method="post">
+<form data-form='modify' action="/collabdoc/modifyForm" method="post">
     <input type="hidden" name='padId' value="{ETHERPAD_PAD_ID}" />
 	<input type="hidden" name="homepageId" value="{HOMEPAGE_ID}"  />
 	<input type="hidden" name="type" value="update" />
 
-	<table class="standardForm table">
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Name</h4>
-                <!--[if lt IE 10]><em>The name of the Collab Doc<em><![endif]-->
-			</td>
-			<td>
-				<label>
-					<input type="text" maxlength='255' name='name' class='required' value="{ETHERPAD_PAD_NAME}" placeholder="The name of the Collab Doc" />
-				</label>
-			</td>
-		</tr>
-	</table>
+    <label>
+        Name
+        <input type="text" maxlength='255' name='name' class='required' value="{ETHERPAD_PAD_NAME}" placeholder="The name of the Collab Doc" />
+    </label>
 
-    <input type="submit" name='update' value="Update Collab Doc" class="submit-btn-plain no-marg" />
+    <input type="submit" name='update' value="Update Collab Doc" />
 
-	<!-- BEGIN etherpad_delete -->
-	<input type="submit" name='delete' value="Delete Collab Doc" class="submit-btn-plain no-marg" />
-	<!-- END etherpad_delete -->
+    <!-- BEGIN etherpad_delete -->
+    <input type="submit" name='delete' value="Delete Collab Doc" />
+    <!-- END etherpad_delete -->
 </form>
 
+<script type="text/javascript">
+    $(function() {
+        var form = $('[data-form="modify"]');
+        form.find('input[name="type"]').val('update');
+        form.validate();
 
+        form.find('input[name="delete"]').click(function(event) {
+            event.preventDefault();
 
+            var confirmation = confirm('Are you sure you want to delete this Collab Doc?');
 
+            if (confirmation) {
+                form.find('input[name="type"]').val('delete');
+
+                form.submit();
+            }
+        });
+    });
+</script>
