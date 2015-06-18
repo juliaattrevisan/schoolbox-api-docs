@@ -307,6 +307,7 @@ class Leave_Core_Report_House_Web
         $this->getPage()->setBlock(TEMPLATE_content, 'no_requests', 'no_requests_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'row', 'row_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'request_period_total', 'request_period_total_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'request_period_initial', 'request_period_initial_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'report_header', 'report_header_block');
 
         $this->getPage()->setBlock(TEMPLATE_content, 'report_header_subtitle', 'report_header_subtitle_block');
@@ -469,14 +470,18 @@ class Leave_Core_Report_House_Web
         }
 
         /* Output totals */
+        $periodCount = 0;
         for ($j = 0; $j < $this->getRange(); $j++) {
             foreach ($this->rangePeriods as $period) {
                 if (!($j == 0 && $period == 'morning')) {
+                    $periodCount++;
                     $this->getPage()->setVar('PERIOD_TOTAL', $totals[$j][$period]);
                     $this->getPage()->parse('request_period_total_block', 'request_period_total', true);
+                    $this->getPage()->parse('request_period_initial_block', 'request_period_initial', true);
                 }
             }
         }
+        $this->getPage()->setVar('PERIOD_COUNT', $periodCount);
     }
 
     /**

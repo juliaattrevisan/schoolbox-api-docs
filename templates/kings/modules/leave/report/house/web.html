@@ -53,10 +53,10 @@
 <!-- END custom_head -->
 
 <span class="header-actions">
+    <a class="button icon-previous" href="/modules/leave/house/{HOUSE_ID}">Return to {HOUSE_NAME}</a>
     <a class="button icon-more" href="#" data-dropdown="options">Options</a>
 </span>
 <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="options">
-    <li><a class="" href="/modules/leave/house/{HOUSE_ID}">Return to {HOUSE_NAME}</a></li>
     <li><a class="icon-print" href="#" data-action="print">Print</a></li>
 </ul>
 
@@ -81,8 +81,8 @@
             <input data-datepicker name="reportDate" type="text" value="{REPORT_DATE}">
         </div>
         <div class="large-2 columns">
-            <button data-action="search" data-tooltip aria-haspopup="true" title="Search" class="icon-search"></button>
-            <button data-action="export" data-tooltip aria-haspopup="true" title="Export" class="icon-export"></button>
+            <button data-action="search" data-tooltip aria-haspopup="true" title="Search" class="icon-search no-text"></button>
+            <button data-action="export" data-tooltip aria-haspopup="true" title="Export" class="icon-export no-text"></button>
         </div>
     </fieldset>
 </form>
@@ -183,7 +183,7 @@
         <td>{USER_YEAR}</td>
         <td></td>
         <td colspan="1" class="leaveReportHide"></td>
-        <td colspan="8"></td>
+        <td colspan="{PERIOD_COUNT}"></td>
         <td></td>
         <td></td>
     </tr>
@@ -198,30 +198,13 @@
         <!-- END request_period_total -->
         <td colspan="3"></td>
     </tr>
-    </tfoot>
-</table>
-
-<table class="full-width">
-    <colgroup>
-        <col width="15%">
-        <col width="3%">
-        <col width="7%">
-        <col span="10" class="multi-cell" width="6%">
-        <col width="15%">
-    </colgroup>
-    <tbody>
     <!-- Signatures and initials -->
     <tr class="signatures">
         <td colspan='3'><strong>Duty Master Initial</strong><br><br></td>
         <td class="leaveReportHide"></td>
+        <!-- BEGIN request_period_initial -->
         <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <!-- END request_period_initial -->
         <td class="leaveReportNoPrint right-border"></td>
         <td class="leaveReportNoPrint"></td>
         <td></td>
@@ -229,11 +212,11 @@
     <tr class="signatures">
         <td colspan='3'><strong>Housemaster Signature</strong><br><br></td>
         <td class="leaveReportHide"></td>
-        <td colspan="8" class="no-right-border"></td>
+        <td colspan="{PERIOD_COUNT}" class="no-right-border"></td>
         <td class="leaveReportNoPrint"></td>
         <td class="leaveReportNoPrint"></td>
         <td></td>
     </tr>
-    </tbody>
+    </tfoot>
 </table>
 <!-- END request_list -->
