@@ -1,35 +1,9 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
-<script type="text/javascript">
-    $(function() {
-        $('table[data-topic="pendingRequests"]').tablesorter({
-            cssHeader: 'sortable',
-            cssAsc: 'ascending',
-            cssDesc: 'descending',
-            headers: {
-                0: { sorter: false},
-                6: { sorter: false}
-            }
-        });
-
-        $('table[data-topic="previousRequests"]').tablesorter({
-            cssHeader: 'sortable',
-            cssAsc: 'ascending',
-            cssDesc: 'descending',
-            headers: {
-                8: { sorter: false}
-            }
-        });
-    });
-</script>
-<!-- END custom_head -->
-
 <span class="header-actions">
-    <a class="button icon-menu"href="#" data-dropdown="options">Options</a>
+    <a class="button icon-more" href="#" data-dropdown="options">Options</a>
 </span>
 <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="options">
-    <li><a class="" href="/modules/leave/report/catering/">Catering Report</a></li>
-    <li><a class="" href="/modules/leave/report/house/{HOUSE_ID}">House Report</a></li>
+    <li><a class="icon-list" href="/modules/leave/report/catering/">Catering Report</a></li>
+    <li><a class="icon-list" href="/modules/leave/report/house/{HOUSE_ID}">House Report</a></li>
     <li><a class="icon-export" href="/modules/leave/house/export/{HOUSE_ID}">Export History</a></li>
     <li><a class="icon-print" href="javascript:window.print()">Print</a></li>
 </ul>
@@ -109,3 +83,27 @@
 </section>
 <!-- END previous_request_list -->
 <!-- END request_list -->
+
+<script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('table[data-topic="pendingRequests"]').tablesorter({
+            cssHeader: 'sortable',
+            cssAsc: 'ascending',
+            cssDesc: 'descending',
+            headers: {
+                0: { sorter: false},
+                6: { sorter: false}
+            }
+        });
+
+        $('table[data-topic="previousRequests"]').tablesorter({
+            cssHeader: 'sortable',
+            cssAsc: 'ascending',
+            cssDesc: 'descending',
+            headers: {
+                8: { sorter: false}
+            }
+        });
+    });
+</script>
