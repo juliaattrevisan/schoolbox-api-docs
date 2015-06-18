@@ -1,24 +1,20 @@
-<h1><span>Modify Collab Doc</span></h1>
+<h1>Modify Collab Doc</h1>
 
 <form data-form='modify' action="/collabdoc/modifyForm" method="post">
     <input type="hidden" name='padId' value="{ETHERPAD_PAD_ID}" />
 	<input type="hidden" name="homepageId" value="{HOMEPAGE_ID}"  />
 	<input type="hidden" name="type" value="update" />
 
-    <fieldset>
-        <label>
-            Name
-            <input type="text" maxlength='255' name='name' class='required' value="{ETHERPAD_PAD_NAME}" placeholder="The name of the Collab Doc" />
-        </label>
-    </fieldset>
+    <label>
+        Name
+        <input type="text" maxlength='255' name='name' class='required' value="{ETHERPAD_PAD_NAME}" placeholder="The name of the Collab Doc" />
+    </label>
 
-    <fieldset>
-        <input type="submit" name='update' value="Update Collab Doc" />
+    <input type="submit" name='update' value="Update Collab Doc" />
 
-        <!-- BEGIN etherpad_delete -->
-        <input type="submit" name='delete' value="Delete Collab Doc" />
-        <!-- END etherpad_delete -->
-    </fieldset>
+    <!-- BEGIN etherpad_delete -->
+    <input type="submit" name='delete' value="Delete Collab Doc" />
+    <!-- END etherpad_delete -->
 </form>
 
 <script type="text/javascript">
