@@ -129,11 +129,7 @@
 
         <div class="large-12 columns">
             <!-- BEGIN confirmed_by -->
-            <input type='radio'
-                   id="requestConfirmedBy{CONFIRMED_BY_VALUE}"
-                   name='request[confirmedBy]'
-                   value='{CONFIRMED_BY_VALUE}' {CONFIRMED_BY_SELECTED}
-                    />
+            <input type='radio' id="requestConfirmedBy{CONFIRMED_BY_VALUE}" name='request[confirmedBy]' value='{CONFIRMED_BY_VALUE}' {CONFIRMED_BY_SELECTED} />
             <label for="requestConfirmedBy{CONFIRMED_BY_VALUE}" class="radio-label">{CONFIRMED_BY_LABEL}</label>
             <!-- END confirmed_by -->
         </div>
@@ -146,7 +142,6 @@
     <button type="submit" name="reject" value="Reject">Reject</button>
     <button type="submit" name="approve" value="Approve">Approve</button>
 </form>
-
 
 <script type="text/javascript" src="/javascript/jquery.warninglength.js"></script>
 <script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
@@ -190,8 +185,8 @@
                     var form = element.closest('form');
                     form.append(
                             $('<input type="hidden" />')
-                                    .attr('name', element.attr('name'))
-                                    .val(element.val())
+                                .attr('name', element.attr('name'))
+                                .val(element.val())
                     ).submit()
                 }
             });
