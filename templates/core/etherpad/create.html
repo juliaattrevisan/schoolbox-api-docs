@@ -1,18 +1,14 @@
-<h1><span>Create Collab Doc</span></h1>
+<h1>Create Collab Doc</h1>
 
 <form data-form='edit' action="/collabdoc/editForm" method="post">
     <input type="hidden" name='homepageId' value="{HOMEPAGE_ID}" />
 
-    <fieldset>
-        <label>
-            Name
-            <input type="text" maxlength='255' name='name' class='required' value="" placeholder="The name of the Collab Doc" />
-        </label>
-    </fieldset>
+    <label>
+        Name
+        <input type="text" maxlength='255' name='name' class='required' value="" placeholder="The name of the Collab Doc" />
+    </label>
 
-    <fieldset>
-        <input type="submit" name='submit' value="Create Collab Doc" />
-    </fieldset>
+    <input type="submit" name='submit' value="Create Collab Doc" />
 </form>
 
 <script type="text/javascript">
