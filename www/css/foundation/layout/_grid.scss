@@ -18,7 +18,7 @@ $row-width: rem-calc(1000);
 
 // We use this to control the maximum number of block grid elements per row
 // $block-grid-elements: 12;
-// $block-grid-default-spacing: rem-calc(20);
+$block-grid-default-spacing: rem-calc(16);
 // $align-block-grid-to-grid: false;
 
 
@@ -33,6 +33,25 @@ $row-width: rem-calc(1000);
 // CUSTOM OVERRIDES
 //
 
+// Set unlimited width on rows
+.row{
+	max-width: none;
+}
+
+// Responsive Column Padding
+.column,
+.columns{
+	@media #{$small-up} {
+		padding: rem-calc(($base-font-size - 8));
+	}
+	@media #{$medium-up} {
+		padding: rem-calc(($base-font-size - 4));
+	}
+	@media #{$large-up} {
+		padding: rem-calc(($base-font-size));
+	}
+}
+
 .full-width {
    width: 100%;
    margin-left: auto;
@@ -40,6 +59,7 @@ $row-width: rem-calc(1000);
    max-width: initial;
 }
 
+// For when you dont want padding
 .no-pad{
 	padding: 0;
 }

@@ -40,15 +40,14 @@ $selectize-padding-item-y: 7px;
 
 @import "../core/selectize/src/selectize.scss";
 
-.selectize-input > input {
-	padding: 0.5rem !important;
-}
-
 .selectize-control.multi .selectize-input > div{
 	background: $white-smoke;
 	border: 1px solid $gainsboro;
-	padding: 0.5rem !important;
 	a{
 		padding: 0.5rem !important;
 	}
+}
+
+.selectize-input input{
+	height: auto;
 }

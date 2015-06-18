@@ -14,7 +14,7 @@ $form-label-font-weight: $font-weight-bold;
 $form-label-line-height: 1.4rem;
 $form-label-font-color: $black;
 // $form-label-small-transform: capitalize;
-$form-label-bottom-margin: rem-calc(($base-font-size - 2));
+$form-label-bottom-margin: 0;
 // $input-font-family: inherit;
 $input-font-color: $black;
 $input-font-size: rem-calc(($base-font-size - 2));
@@ -36,11 +36,11 @@ $input-box-shadow: none;
 // $fieldset-border-style: solid;
 // $fieldset-border-width: 1px;
 // $fieldset-border-color: $gainsboro;
-$fieldset-padding: rem-calc(($base-font-size - 2));
-$fieldset-margin: rem-calc(($base-font-size - 2, 0));
+$fieldset-padding: rem-calc(($base-font-size - 8));
+$fieldset-margin: rem-calc(($base-font-size - 8, 0));
 
 // We use these to style the legends when you use them
-// $legend-bg: $white;
+$legend-bg: transparent;
 // $legend-font-weight: $font-weight-bold;
 // $legend-padding: rem-calc(0 3);
 
