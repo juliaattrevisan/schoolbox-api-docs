@@ -1,14 +1,16 @@
+<span class="header-actions">
+    <!-- BEGIN etherpad_lock -->
+    <a href='/collabdoc/lock/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' class='button icon-locked'>Lock</a>
+    <!-- END etherpad_lock -->
+
+    <!-- BEGIN etherpad_unlock -->
+    <a href='/collabdoc/lock/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' class='button icon-locked'>Unlock</a>
+    <!-- END etherpad_unlock -->
+
+    <a href='/homepage/{HOMEPAGE_ID}' class='button icon-folder'>Return to Homepage</a>
+</span>
+
 <h1>{ETHERPAD_NAME}</h1>
-
-<!-- BEGIN etherpad_lock -->
-<a href='/collabdoc/lock/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' class='button icon-locked'>Lock</a>
-<!-- END etherpad_lock -->
-
-<!-- BEGIN etherpad_unlock -->
-<a href='/collabdoc/lock/{ETHERPAD_PAD_ID}/{HOMEPAGE_ID}' class='button icon-locked'>Unlock</a>
-<!-- END etherpad_unlock -->
-
-<a href='/homepage/{HOMEPAGE_ID}' class='button icon-folder'>Return to Homepage</a>
 
 <div>
     <iframe data-collabdoc src='{ETHERPAD_URL}'></iframe>
