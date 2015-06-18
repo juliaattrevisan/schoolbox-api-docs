@@ -645,7 +645,8 @@ table{
 		.one-column,
 		.two-column,
 		.ten-column,
-		.eleven-column{
+		.eleven-column,
+		.grade{
 			@media #{$small-up} {
 				padding: rem-calc(($base-font-size - 8));
 			}

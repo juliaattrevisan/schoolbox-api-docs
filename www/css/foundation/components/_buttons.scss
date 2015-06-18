@@ -345,15 +345,15 @@ input[type="submit"] 			{ @extend .button; }
 
 // Custom breadcrumbs
 .breadcrumb{
-	margin: 0;
+	margin: 0 0 rem-calc(($base-font-size)) 0;
 	list-style: none;
 	overflow: hidden;
 	li{
 		a{
 			color: $primary-color;
 			text-decoration: none;
-			padding: rem-calc(($base-font-size - 2));
-			padding-left: 50px;
+			padding: rem-calc(($base-font-size - 8));
+			padding-left: 45px;
 			background-color: tint($tertiary, 74%);
 			position: relative;
 			display: block;
@@ -379,10 +379,10 @@ input[type="submit"] 			{ @extend .button; }
 				z-index: 2;
 			}
 			&:before{
-				margin-left: 1px; border-left: 30px solid $white;
+				margin-left: 1px; border-left: 20px solid $white;
 			}
 			&:after{
-				border-left: 30px solid tint($tertiary, 74%);
+				border-left: 20px solid tint($tertiary, 74%);
 			}
 			&:hover{
 				background-color: tint($tertiary, 87%);
@@ -393,7 +393,7 @@ input[type="submit"] 			{ @extend .button; }
 		}
 	}
 	li:first-child a{
-		padding-left: 22px;
+		padding-left: rem-calc(($base-font-size));
 	}
 }
 
