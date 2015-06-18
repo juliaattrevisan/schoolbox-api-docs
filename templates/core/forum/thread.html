@@ -14,6 +14,19 @@
 </script>
 <!-- END custom_head -->
 
+<span class="header-actions">
+    <!-- BEGIN reply -->
+    <a class="button icon-reply" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}">Post Reply</a>
+    <!-- END reply -->
+    <a href="#" class='button icon-more' data-dropdown='header-options'>Options</a>
+</span>
+<ul class='f-dropdown fadeInDown' data-dropdown-content='' id='header-options'>
+    <!-- BEGIN modify_thread -->
+    <li><a class="button icon-locked warning" href="/forum/modifyForm.php?toggleLock={THREAD_ID}">{LOCK_UNLOCK} Thread</a></li>
+    <li><a class="button icon-delete alert" href="/forum/modifyForm.php?deleteThread={THREAD_ID}" data-action="delete" data-relation="thread">Delete Thread</a></li>
+    <!-- END modify_thread -->
+</ul>
+
 <h1>{CATEGORY} - {THREAD_TITLE} {LOCKED}</h1>
 
 <ul class="breadcrumb">
@@ -22,29 +35,22 @@
     <li class="last"><a href="#">{THREAD_TITLE}</a></li>
 </ul>
 
-<p class="clearfix">
-    <!-- BEGIN reply -->
-    <a class="button icon-add" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}">Post Reply</a>
-    <!-- END reply -->
-    <!-- BEGIN modify_thread -->
-    <a class="button icon-locked warning" href="/forum/modifyForm.php?toggleLock={THREAD_ID}">{LOCK_UNLOCK} Thread</a>
-    <a class="button icon-delete alert" href="/forum/modifyForm.php?deleteThread={THREAD_ID}" data-action="delete" data-relation="thread">Delete Thread</a>
-    <!-- END modify_thread -->
-</p>
-
 <div class="forum listing">
     <ul class="comments">
         <!-- BEGIN post -->
         <li id="{POST_ID}" class="{ON_OFF}">
-            <!-- BEGIN modify -->
             <span class="header-actions">
-                <a class="button icon-menu" href="#" data-dropdown="postOptions{POST_ID}"></a>
+                <!-- BEGIN reply_post -->
+                <a class="button icon-reply no-text" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}" data-tooltip title="Reply to this post" aria-haspopup="true"></a>
+                <!-- END reply_post -->
+                <a class="button icon-more no-text" href="#" data-dropdown="postOptions{POST_ID}"></a>
             </span>
             <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="postOptions{POST_ID}">
+                <!-- BEGIN modify -->
                 <li><a class="button icon-modify warning" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/{POST_ID}">Modify Post</a></li>
                 <li><a class="button icon-delete alert" href="/forum/modifyForm.php?deletePost={POST_ID}" data-action="delete" data-relation="post">Delete Post</a></li>
+                <!-- END modify -->
             </ul>
-            <!-- END modify -->
 
             <a href="/search/user/{POST_USER_ID}" class="author">
                 <img width="32" height="32" src="/portrait.php?userId={POST_AUTHOR_EXTERNAL_ID}&size=square32"/>
@@ -56,9 +62,6 @@
                 {POST_BODY}
             </div>
             <p>
-                <!-- BEGIN reply_post -->
-                <a class="button icon-reply" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}">Reply</a>
-                <!-- END reply_post -->
 
                 <!-- BEGIN modified -->
                 <br/>
@@ -69,15 +72,6 @@
         <!-- END post -->
     </ul>
 </div>
-<p class="clearfix"><a name="bottom"></a>
-    <!-- BEGIN reply -->
-    <a class="button icon-add" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}">Post Reply</a>
-    <!-- END reply -->
-    <!-- BEGIN modify_thread -->
-    <a class="button icon-locked warning" href="/forum/modifyForm.php?toggleLock={THREAD_ID}">{LOCK_UNLOCK} Thread</a>
-    <a class="button icon-delete alert" href="/forum/modifyForm.php?deleteThread={THREAD_ID}" data-action="delete" data-relation="thread">Delete Thread</a>
-    <!-- END modify_thread -->
-</p>
 
 <ul class="pagination">
     <!-- BEGIN previous_button -->
