@@ -1,6 +1,6 @@
 <div class="eotc-status {EVENT_STATUS_CLASS}">{EVENT_STATUS}</div>
 
-<div class="row full-width">
+<div class="row">
     <div class="large-8 columns">
         <h1>{EVENT_TITLE}</h1>
         <time>{EVENT_START} &ndash; {EVENT_END}</time>
@@ -58,7 +58,7 @@
     </div>
 </div>
 
-<div class="row full-width">
+<div class="row">
     <div class="large-12 columns">
         <h2>People</h2>
         <ul>
@@ -79,10 +79,10 @@
     </div>
 </div>
 
-<div class="row full-width">
+<div class="row">
     <h2>Resources ({EVENT_RESOURCE_COUNT})</h2>
 
-    <table class="full-width">
+    <table>
         <thead>
             <tr>
                 <th>Resource Name</th>
@@ -105,9 +105,9 @@
 </div>
 
 <!-- BEGIN has_event_activity_log -->
-<div class="row full-width">
+<div class="row">
     <h2>Activity Log</h2>
-    <table class="full-width">
+    <table>
         <tbody>
             <!-- BEGIN event_activity_log -->
             <tr>
@@ -121,7 +121,7 @@
 <!-- END has_event_activity_log -->
 
 <!-- BEGIN has_change_event_status -->
-<div class="row full-width">
+<div class="row">
     <h2>Change Event Status</h2>
     <form action="/modules/eotc/status/modifyForm.php" method="post">
         <input name='eventId' type="hidden" value="{EVENT_ID}">
