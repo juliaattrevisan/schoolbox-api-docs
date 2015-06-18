@@ -36,10 +36,12 @@ $button-font-weight: $font-weight-normal;
 // We use these to control button border and hover styles.
 // $button-border-width: 0px;
 // $button-border-style: solid;
-$button-bg-color: $primary-color;
+$button-bg-color: $button-color;
 $button-bg-hover: tint($button-bg-color, 20%);
+$submit-button-color: $primary-color;
+$submit-button-bg-hover: tint($submit-button-color, 20%);
 $button-border-color: transparent;
-$secondary-button-bg-hover: tint($secondary-color, 20%);
+$secondary-button-bg-hover: tint($submit-button-color, 20%);
 $secondary-button-border-color: transparent;
 $success-button-bg-hover: tint($success-color, 20%);
 $success-button-border-color: transparent;
@@ -144,7 +146,7 @@ $split-button-pip-color-alt: $white;
 // $include-html-button-classes: $include-html-classes;
 
 // We use these to set the color of the pip in dropdown buttons
-$dropdown-button-pip-color: $white;
+$dropdown-button-pip-color: $primary-color;
 $dropdown-button-pip-color-alt: $primary-color;
 
 // $button-pip-tny: rem-calc(6);
@@ -200,8 +202,8 @@ $f-dropdown-margin-top: 0px;
 // $f-dropdown-margin-bottom: $f-dropdown-margin-top;
 
 // We use this to control the background color
-$f-dropdown-bg: $primary-color;
-$f-dropdown-content-bg: tint($secondary-color, 11%);
+$f-dropdown-bg: $button-color;
+$f-dropdown-content-bg: tint($white, 11%);
 
 // We use this to set the border styles for dropdowns.
 // $f-dropdown-border-style: solid;
@@ -215,11 +217,11 @@ $f-dropdown-triangle-size: 0px;
 
 // We use these to control styles for the list elements.
 // $f-dropdown-list-style: none;
-$f-dropdown-font-color: $white;
+$f-dropdown-font-color: $primary-color;
 $f-dropdown-font-size: rem-calc(($base-font-size - 2));
 $f-dropdown-list-padding: rem-calc(($base-font-size - 8));
 // $f-dropdown-line-height: rem-calc(18);
-$f-dropdown-list-hover-bg: tint($primary-color, 32%);
+$f-dropdown-list-hover-bg: tint($button-color, 32%);
 // $dropdown-mobile-default-float: 0;
 
 // We use this to control the styles for when the dropdown has custom content.
@@ -295,8 +297,8 @@ $tabs-content-padding: rem-calc(($base-font-size - 8));
 //
 .button,
 input[type=submit]				{ border: none;
-	&.secondary 				{ color: $primary-color;
-		&:hover 				{ color: $primary-color; }
+	&.secondary 				{ background-color: $primary-color; color: $white;
+		//&:hover 				{ color: $primary-color; }
 	}
 	&.alert 					{ 
 		&:hover 				{ color: $white !important; }
@@ -321,11 +323,20 @@ input[type="submit"] 			{ @extend .button; }
 // Header Actions - for when you need buttons inline with the heading
 .header-actions {
   	float: right;
+  	.button{
+  		margin-bottom: 0;
+  	}
 }
 
 // Dropdown
 .f-dropdown{
 	@include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));
+}
+
+// Dropdown Buttons - Is this a joke?
+.dropdown.button::after,
+.split.button span:after{
+	border-color: $primary-color transparent transparent transparent;
 }
 
 #contentDrop{ 
@@ -339,7 +350,7 @@ input[type="submit"] 			{ @extend .button; }
 	overflow: hidden;
 	li{
 		a{
-			color: $black;
+			color: $primary-color;
 			text-decoration: none;
 			padding: rem-calc(($base-font-size - 2));
 			padding-left: 50px;

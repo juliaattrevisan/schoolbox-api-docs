@@ -461,6 +461,11 @@ $tooltip-font-color: $white;
 
 .label { text-transform: uppercase; }
 
+// Disabled elements
+:disabled{
+	opacity: 0.5;
+}
+
 // Tables
 table{
 	width: 100%;
@@ -474,7 +479,7 @@ table{
   );
 }
 
-// Used inside .columns to create space between islands
+// White islands for things like components
 .island{
 	@extend .island-panel;
 	border: 0;
@@ -723,6 +728,17 @@ table{
 		display: inline-block;
 		opacity: 0.3;
 		text-align: center;
+	}
+}
+
+// Avatar Card
+.avatar-card{
+	img{
+	  	float: left;
+  		margin: 0 rem-calc(($base-font-size - 8)) rem-calc(($base-font-size - 8)) 0;
+	}
+	p{
+		margin: 0;
 	}
 }
 
