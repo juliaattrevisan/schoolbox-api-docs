@@ -1,56 +1,3 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.warninglength.js"></script>
-<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
-<script type="text/javascript">
-	$(function () {
-        $('input[data-datepicker]').datepicker({
-            constrainInput: false,
-            minDate: new Date(),
-            onClose: function (string) {
-                var input = $(this);
-                $.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
-                    input.val(data.time);
-                })
-            }
-        });
-
-        $('form[data-validate]').validate();
-
-        // Hide host details if "self" is selected
-        $('[data-relation="host_type_selector"]').change(function(){
-            var details = $('[data-relation="host_type_field"]');
-            if(($(this).val() == '4')){
-                details.slideUp();
-            } else {
-                details.slideDown();
-            }
-        });
-
-        $('[data-warninglength]').warninglength({
-            messagePrototype: $('<label class="warning" />')
-        });
-
-        // Confirmation of delete button
-        $('[data-action="delete"]').click(function(event) {
-            event.preventDefault();
-            var element = $(this);
-            $(this).confirmDialog({
-                confirmEvent: function() {
-                    // Build a hidden input with the delete button's name/val,
-                    // then submit
-                    var form = element.closest('form');
-                    form.append(
-                        $('<input type="hidden" />')
-                            .attr('name', element.attr('name'))
-                            .val(element.val())
-                    ).submit()
-                }
-            });
-        })
-	});
-</script>
-<!-- END custom_head -->
-
 <span class="header-actions">
     <a class="button icon-menu" href="#" data-dropdown="newsOptions">Options</a>
 </span>
@@ -201,3 +148,54 @@
     <button type="submit" name="approve" value="Approve">Approve</button>
 </form>
 
+
+<script type="text/javascript" src="/javascript/jquery.warninglength.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $('input[data-datepicker]').datepicker({
+            constrainInput: false,
+            minDate: new Date(),
+            onClose: function (string) {
+                var input = $(this);
+                $.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                    input.val(data.time);
+                })
+            }
+        });
+
+        $('form[data-validate]').validate();
+
+        // Hide host details if "self" is selected
+        $('[data-relation="host_type_selector"]').change(function(){
+            var details = $('[data-relation="host_type_field"]');
+            if(($(this).val() == '4')){
+                details.slideUp();
+            } else {
+                details.slideDown();
+            }
+        });
+
+        $('[data-warninglength]').warninglength({
+            messagePrototype: $('<label class="warning" />')
+        });
+
+        // Confirmation of delete button
+        $('[data-action="delete"]').click(function(event) {
+            event.preventDefault();
+            var element = $(this);
+            $(this).confirmDialog({
+                confirmEvent: function() {
+                    // Build a hidden input with the delete button's name/val,
+                    // then submit
+                    var form = element.closest('form');
+                    form.append(
+                            $('<input type="hidden" />')
+                                    .attr('name', element.attr('name'))
+                                    .val(element.val())
+                    ).submit()
+                }
+            });
+        })
+    });
+</script>
