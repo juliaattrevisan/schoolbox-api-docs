@@ -28,16 +28,19 @@
             }
         });
 
-        var searchForm = $('form[data-form_type="search"]');
-        searchForm.on('click', 'button[data-action]', function (event) {
+        $(document).on('click', '[data-action]', function (event) {
             event.preventDefault();
+
+            var searchForm = $('form[data-form_type="search"]');
             var houseId  = searchForm.find(':input[name="reportHouse"]').val();
             var date     = searchForm.find(':input[name="reportDate"]').val().replace(/\//g, '-');
             var action   = $(this).data('action');
             var location = '/modules/leave/report/house/' + houseId + '/' + date;
+
             if (action == 'export') {
                 location += '/export';
             }
+
             window.location.href = location;
         });
     });
@@ -46,11 +49,9 @@
 
 <span class="header-actions">
     <a class="button icon-previous" href="/modules/leave/house/{HOUSE_ID}">Return to {HOUSE_NAME}</a>
-    <a class="button icon-more" href="#" data-dropdown="options">Options</a>
+    <a class="button icon-print" href="javascript:window.print()">Print</a>
+    <a class="button icon-export" data-action="export" title="Export">Export</a>
 </span>
-<ul class="f-dropdown fadeInDown" data-dropdown-content="" id="options">
-    <li><a class="icon-print" href="javascript:window.print()">Print</a></li>
-</ul>
 
 <h1>Leave Report for {HOUSE_NAME}</h1>
 
@@ -73,8 +74,7 @@
             <input data-datepicker name="reportDate" type="text" value="{REPORT_DATE}">
         </div>
         <div class="large-2 columns">
-            <button data-action="search" data-tooltip aria-haspopup="true" title="Search" class="icon-search no-text"></button>
-            <button data-action="export" data-tooltip aria-haspopup="true" title="Export" class="icon-export no-text"></button>
+            <button data-action="search" data-tooltip aria-haspopup="true" title="Search" class="icon-search">Search</button>
         </div>
     </fieldset>
 </form>
