@@ -17,6 +17,7 @@
     <!-- END etherpad_delete -->
 </form>
 
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
     $(function() {
         var form = $('[data-form="modify"]');
@@ -26,13 +27,19 @@
         form.find('input[name="delete"]').click(function(event) {
             event.preventDefault();
 
-            var confirmation = confirm('Are you sure you want to delete this Collab Doc?');
-
-            if (confirmation) {
-                form.find('input[name="type"]').val('delete');
-
-                form.submit();
-            }
+            var element = $(this);
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this Collab Doc?',
+                confirmEvent: function() {
+                    // Build a hidden input with the delete button's name/val,
+                    // then submit
+                    var form = element.closest('form');
+                    form.find('input[name="type"]').val('delete');
+                    form.submit();
+                }
+            });
         });
     });
 </script>
+
+
