@@ -24,26 +24,23 @@
 <div class="large-10 columns">
     <!-- BEGIN chat_date -->
     <h2>{CHAT_DATE}</h2>
-    <ul>
+    <ul class="information-list">
         <!-- BEGIN chat -->
-        <ul class="grid small-block-grid-2 large-block-grid-4">
-            <li>
-                <div class="row collapse full-width">
-                    <div class="thumbnail columns">
-                        <img src="/portrait.php?userId={CHAT_USER_SYNERGY_ID}&size=square32"/>
-                    </div>
-                    <div class="content">
-                        {POSTER}
-                        <p class="meta">
-                            Posted {DATETIME}
-                        </p>
-
-                        {CHAT_BODY}
+        <li>
+            <div class="large-12 columns">
+                <div class="row">
+                    <div class="avatar-card">
+                        <a href="/search/user/{BLOG_AUTHOR_ID}" title="View Profile">
+                            <img src="/portrait.php?userId={CHAT_USER_SYNERGY_ID}&size=square32" alt="View Profile">
+                            <p>{POSTER}</p>
+                        </a>
+                        <p class="meta">Posted {DATETIME}</p>
                     </div>
                 </div>
-            </li>
-        </ul>
 
+                {CHAT_BODY}
+            </div>
+        </li>
         <!-- END chat -->
     </ul>
     <!-- END chat_date -->
