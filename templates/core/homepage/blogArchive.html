@@ -2,7 +2,7 @@
     <!-- BEGIN submit_blog -->
     <a href="/blog/modify/new/{ID}" class="button icon-add">Post Blog</a>
     <!-- END submit_blog -->
-    <a href="/homepage/{ID}" class="button icon-folder">Return to Homepage</a>
+    <a href="/homepage/{ID}" class="button icon-previous">Return to Homepage</a>
 </span>
 
 <h1>Blog Archive for {CATEGORY_NAME}</h1>
@@ -32,7 +32,7 @@
 
             <span class="header-actions">
                 <!-- BEGIN can_modify -->
-                <a class="button icon-modify" href="/blog/modify/{BLOG_ID}">Modify</a>
+                <a class="button icon-modify no-text" href="/blog/modify/{BLOG_ID}"></a>
                 <!-- END can_modify -->
             </span>
 
@@ -52,24 +52,26 @@
                 {BLOG_BODY}
             </div>
 
-            <ul>
+            <ul class="information-list">
                 <!-- BEGIN comment -->
                 <li>
-                    {DELETE_COMMENT}
+                    <div class="large-12 columns">
+                        {DELETE_COMMENT}
 
-                    <div class="clearfix">
-                        <div class="avatar-card">
-                            <a href="/search/user/{COMMENT_AUTHOR_ID}" title="View Profile">
-                                <img src="/portrait.php?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square32" alt="View Profile">
-                                <p>{COMMENT_AUTHOR_NAME}</p>
-                            </a>
-                            <p class="meta">Commented {COMMENT_CREATED}</p>
+                        <div class="clearfix">
+                            <div class="avatar-card">
+                                <a href="/search/user/{COMMENT_AUTHOR_ID}" title="View Profile">
+                                    <img src="/portrait.php?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square32" alt="View Profile">
+                                    <p>{COMMENT_AUTHOR_NAME}</p>
+                                </a>
+                                <p class="meta">Commented {COMMENT_CREATED}</p>
+                            </div>
                         </div>
-                    </div>
 
-                    <p>
-                        {COMMENT_BODY}
-                    </p>
+                        <p>
+                            {COMMENT_BODY}
+                        </p>
+                    </div>
                 </li>
                 <!-- END comment -->
             </ul>
