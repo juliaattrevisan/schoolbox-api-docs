@@ -22,7 +22,7 @@
         <col />
         <col />
         <col />
-        <col width="32" />
+        <col />
     </colgroup>
 	<thead>
 		<tr>
@@ -30,7 +30,7 @@
 			<th>Booking Name</th>
 			<th>Start</th>
 			<th>End</th>
-			<th>Action</th>
+			<th>Actions</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -40,7 +40,10 @@
 			<td><a href="/resource-booking/booking/{RESOURCEBOOKING_ID}/edit">{RESOURCEBOOKING_NAME}</a></td>
 			<td>{RESOURCEBOOKING_START}</td>
 			<td>{RESOURCEBOOKING_END}</td>
-			<td><a href="/modules/eotc/manage/resources/bookingForm/delete/{RESOURCEBOOKING_ID}" class="no-text icon-delete" alt="Remove Booking" title="Remove Booking"></a></td>
+			<td>
+                <a data-tooltip aria-haspopup="true" href="/resource-booking/booking/{RESOURCEBOOKING_ID}/edit" class="button no-text icon-modify" alt="Remove Booking" title="Update Booking"></a>
+                <a data-tooltip data-action="delete" aria-haspopup="true" href="/modules/eotc/manage/resources/bookingForm/delete/{RESOURCEBOOKING_ID}" class="button no-text icon-delete" alt="Remove Booking" title="Remove Booking"></a>
+            </td>
 		</tr>
 		<!-- END resourcebooking -->
 	</tbody>
@@ -48,6 +51,7 @@
 
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
     $(function() {
         $('[data-resourcebookingsuggest]').selectizeSelector({
@@ -69,5 +73,12 @@
 
             return false;
         });
+
+        $('a[data-action="delete"]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text: 'Are you sure you wish to delete this booking?'
+            });
+        })
     });
 </script>
