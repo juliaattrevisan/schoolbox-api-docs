@@ -38,23 +38,15 @@
 
             <h2>{BLOG_HEADING}</h2>
 
-            <ul class="grid small-block-grid-2 large-block-grid-4">
-                <li>
-                    <div class="row collapse full-width">
-                        <div class="thumbnail columns">
-                            <a href="/search/user/{BLOG_AUTHOR_ID}">
-                                <img src="/portrait.php?userId={BLOG_AUTHOR_EXTERNAL_ID}&size=square64"/>
-                            </a>
-                        </div>
-                        <div class="content">
-                            {BLOG_AUTHOR_NAME}
-                            <p class="meta">
-                                Posted {BLOG_POSTED_DATE}
-                            </p>
-                        </div>
-                    </div>
-                </li>
-            </ul>
+            <div class="row">
+                <div class="avatar-card">
+                    <a href="/search/user/{BLOG_AUTHOR_ID}" title="View Profile">
+                        <img src="/portrait.php?userId={BLOG_AUTHOR_EXTERNAL_ID}&size=square64" alt="View Profile">
+                        <p>{BLOG_AUTHOR_NAME}</p>
+                    </a>
+                    <p class="meta">Posted {BLOG_POSTED_DATE}</p>
+                </div>
+            </div>
 
             <div>
                 {BLOG_BODY}
@@ -64,11 +56,17 @@
                 <!-- BEGIN comment -->
                 <li>
                     {DELETE_COMMENT}
-                    <a href="/search/user/{COMMENT_AUTHOR_ID}">
-                        <img src="/portrait.php?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square32"/>
-                        {COMMENT_AUTHOR_NAME}
-                    </a>
-                    Commented {COMMENT_CREATED}
+
+                    <div class="row">
+                        <div class="avatar-card">
+                            <a href="/search/user/{COMMENT_AUTHOR_ID}" title="View Profile">
+                                <img src="/portrait.php?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square32" alt="View Profile">
+                                <p>{COMMENT_AUTHOR_NAME}</p>
+                            </a>
+                            <p class="meta">Commented {COMMENT_CREATED}</p>
+                        </div>
+                    </div>
+
                     <p>
                         {COMMENT_BODY}
                     </p>
