@@ -1,9 +1,9 @@
 <span class="header-actions">
+    <a class="button icon-list" href="/modules/leave/report/catering/">Catering Report</a>
+    <a class="button icon-list" href="/modules/leave/report/house/{HOUSE_ID}">House Report</a>
     <a class="button icon-more" href="#" data-dropdown="options">Options</a>
 </span>
 <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="options">
-    <li><a class="icon-list" href="/modules/leave/report/catering/">Catering Report</a></li>
-    <li><a class="icon-list" href="/modules/leave/report/house/{HOUSE_ID}">House Report</a></li>
     <li><a class="icon-export" href="/modules/leave/house/export/{HOUSE_ID}">Export History</a></li>
     <li><a class="icon-print" href="javascript:window.print()">Print</a></li>
 </ul>
@@ -39,7 +39,7 @@
                 <td>{REQUEST_START}</td>
                 <td>{REQUEST_DURATION}</td>
                 <td>{REQUEST_HOST_TYPE}</td>
-                <td><a href="/modules/leave/modify/{REQUEST_ID}">View</a></td>
+                <td><a class="icon-view no-text" href="/modules/leave/modify/{REQUEST_ID}"></a></td>
             </tr>
             <!-- END pending_request -->
         </tbody>
@@ -75,7 +75,7 @@
                 <td>{REQUEST_STATUS}</td>
                 <td>{REQUEST_AUTHORISATION_DATETIME}</td>
                 <td><a href="/search/user/{REQUEST_AUTHORISATION_USER_ID}">{REQUEST_AUTHORISATION_USER_NAME}</a></td>
-                <td><a href="/modules/leave/modify/{REQUEST_ID}">View</a></td>
+                <td><a href="/modules/leave/modify/{REQUEST_ID}"></a></td>
             </tr>
             <!-- END previous_request -->
         </tbody>

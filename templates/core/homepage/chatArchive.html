@@ -1,5 +1,5 @@
 <span class="header-actions">
-    <a href="/homepage/{CATEGORY_ID}" class="button icon-folder">Return to Homepage</a>
+    <a href="/homepage/{CATEGORY_ID}" class="button icon-previous">Return to Homepage</a>
 </span>
 
 <h1>Chat Archive for {CATEGORY_TITLE}</h1>
@@ -52,8 +52,8 @@
         </li>
         <!-- END previous_button -->
         <!-- BEGIN page_number -->
-        <li>
-            <a class="{CURRENT}" href="/homepage/chatArchive/{PAGE_INDEX_REF}">{PAGE_INDEX}</a>
+        <li class="{CURRENT}" >
+            <a href="/homepage/chatArchive/{PAGE_INDEX_REF}">{PAGE_INDEX}</a>
         </li>
         <!-- END page_number -->
         <!-- BEGIN next_button -->
