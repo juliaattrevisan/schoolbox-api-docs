@@ -188,7 +188,7 @@ $reveal-border-width: 9;
 
 // $include-html-accordion-classes: $include-html-classes;
 
-$accordion-navigation-padding: rem-calc(($base-font-size - 2));
+$accordion-navigation-padding: rem-calc(($base-font-size - 4));
 $accordion-navigation-bg-color: tint($tertiary, 74%);
 $accordion-navigation-hover-bg-color: tint($tertiary, 87%);
 // $accordion-navigation-active-bg-color: scale-color($accordion-navigation-bg-color, $lightness: -3%);
@@ -196,7 +196,7 @@ $accordion-navigation-hover-bg-color: tint($tertiary, 87%);
 $accordion-navigation-font-size: rem-calc(($base-font-size));
 // $accordion-navigation-font-family: $body-font-family;
 
-$accordion-content-padding: rem-calc(($base-font-size - 2));
+$accordion-content-padding: rem-calc(($base-font-size - 4));
 // $accordion-content-active-bg-color: $white;
 
 //
@@ -443,7 +443,7 @@ $tooltip-font-color: $white;
 @import "../../../javascript/components/foundation/scss/foundation/components/labels";
 @import "../../../javascript/components/foundation/scss/foundation/components/pricing-tables";
 @import "../../../javascript/components/foundation/scss/foundation/components/progress-bars";
-//@import "../../../javascript/components/foundation/scss/foundation/components/reveal";
+@import "../../../javascript/components/foundation/scss/foundation/components/reveal";
 @import "../../../javascript/components/foundation/scss/foundation/components/accordion";
 @import "../../../javascript/components/foundation/scss/foundation/components/tables";
 @import "../../../javascript/components/foundation/scss/foundation/components/thumbs";
@@ -458,8 +458,6 @@ $tooltip-font-color: $white;
 //
 // CUSTOM OVERRIDES
 //
-
-.label { text-transform: uppercase; }
 
 // Disabled elements
 :disabled{
@@ -487,6 +485,10 @@ table{
 }
 
 // Labels
+.label{
+	text-transform: uppercase;
+}
+
 .submitted {
 	@include label(
 		$bg: tint($success-color, 74%)

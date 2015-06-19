@@ -702,6 +702,7 @@
             <fieldset>
                 <legend>Legend</legend>
                 <label>Input Label
+                    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
                     <input type="text" placeholder="large-12.columns" />
                 </label>
             </fieldset>
@@ -750,7 +751,7 @@
             <fieldset>
                 <legend>Legend</legend>
                 <label>Textarea Label
-                    <span data-tooltip="demo" class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
+                    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
                     <textarea placeholder="small-12.columns"></textarea>
                 </label>
             </fieldset>
@@ -1024,7 +1025,7 @@
     </dl>
 
     <hr>
-    <h1 id="tabs">Tabs</h1>
+    <h1>Tabs</h1>
     <dl class="tabs" data-tab>
         <dd class="active"><a href="#panel2-1">Tab 1</a></dd>
         <dd><a href="#panel2-2">Tab 2</a></dd>
@@ -1078,19 +1079,15 @@
 
     <hr>
     <h1 id="side-nav">Side Nav</h1>
-    <div class="row">
-        <div class="large-4 columns end">
-            <ul class="side-nav">
-                <li class="active"><a href="#">Link 1</a></li>
-                <li><a href="#">Link 2</a></li>
-                <li class="divider"></li>
-                <li><a href="#">Link 3</a></li>
-                <li><a href="#">Link 4</a></li>
-            </ul>
-        </div>
-    </div>
+    <ul class="side-nav">
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Staff Services</a></li>
+        <li class="active"><a href="#">Student Services - Active link</a></li>
+        <li class="divider"></li>
+        <li><a href="#">Schoolbox Support</a></li>
+        <li><a href="#">Change Password</a></li>
+    </ul>
 
-    <hr>
     <!--<h1 id="sub-nav">Sub Nav</h1>-->
     <!--<dl class="sub-nav">-->
         <!--<dt>Filter:</dt>-->
