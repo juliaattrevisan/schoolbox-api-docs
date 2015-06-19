@@ -8,7 +8,7 @@
 <h1>News Archive for {CATEGORY_NAME}</h1>
 
 <div class="row">
-    <ul>
+    <ul class="information-list">
         <!-- BEGIN news -->
         <li>
             <span class="header-actions">
@@ -19,23 +19,15 @@
 
             <h2>{NEWS_HEADING}</h2>
 
-            <ul class="grid small-block-grid-2 large-block-grid-4">
-                <li>
-                    <div class="row collapse full-width">
-                        <div class="thumbnail columns">
-                            <a href="/search/user/{AUTHOR_ID}" class="author">
-                                <img src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square64"/>
-                            </a>
-                        </div>
-                        <div class="content">
-                            {AUTHOR}
-                            <p class="meta">
-                                Posted {POSTED_DATE}
-                            </p>
-                        </div>
-                    </div>
-                </li>
-            </ul>
+            <div class="clearfix">
+                <div class="avatar-card">
+                    <a href="/search/user/{AUTHOR_ID}" title="View Profile">
+                        <img src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square64" alt="View Profile">
+                        <p>{AUTHOR}</p>
+                    </a>
+                    <p class="meta">Posted {POSTED_DATE}</p>
+                </div>
+            </div>
 
             <div>
                 {NEWS_BODY}
