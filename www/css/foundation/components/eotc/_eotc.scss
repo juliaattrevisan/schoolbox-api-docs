@@ -1,0 +1,42 @@
+.eotc-status {
+    padding: 16px;
+    margin-bottom: 16px;
+
+    &.status-draft {
+        border: 1px solid #8A8A8A;
+        background-color: #D6D6D6;
+    }
+
+    &.status-in-principle {
+        border: 1px solid #B8C42B;
+        background-color: #F2FF5E;
+    }
+
+    &.status-rams-approved {
+        border: 1px solid #6BA0CF;
+        background-color: #A7CFF2;
+    }
+
+    &.status-rams-confirmed {
+        border: 1px solid #8F8FB2;
+        background-color: #CCCCFF;
+    }
+
+    &.status-approved {
+        border: 1px solid #42B83E;
+        background-color: #8FF58C;
+    }
+
+    &.status-rejected {
+        border: 1px solid #C73232;
+        background-color: #FF7575;
+    }
+}
+
+
+
+
+
+
+
+
