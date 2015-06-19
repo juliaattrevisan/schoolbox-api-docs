@@ -1,82 +1,97 @@
+<!-- BEGIN forum_post -->
+<span class="header-actions">
+    <a class="button icon-add" href="/forum/modify/{CATEGORY_ID}">Post Thread</a>
+</span>
+<!-- END forum_post -->
+
 <h1>{CATEGORY} Forum</h1>
+
 <ul class="breadcrumb">
     <li><a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a></li>
-    <li class="last"><a href="#">Forum</a></li>
+    <li><a href="#">Forum</a></li>
 </ul>
-<form action="/forum/modifyForm.php" method="POST">
-    <p class="clearfix">
 
-        <!-- BEGIN forum_post -->
-        <a class="btn add float-left" href="/forum/modify/{CATEGORY_ID}"><span></span>Post Thread</a>
-        <!-- END forum_post -->
-    </p>
-    <table class="standardForm forum table">
+<form action="/forum/modifyForm.php" method="post">
+    <table>
         <thead>
-        <tr>
-            <!-- BEGIN modify_heading -->
-            <th width="4%">&nbsp;</th>
-            <!-- END modify_heading -->
-            <th width="40%">Forum</th>
-            <th width="20%">Last Post</th>
-            <th>Replies</th>
-            <th>Views</th>
-            <th width="30%">&nbsp;</th>
-        </tr>
+            <tr>
+                <!-- BEGIN modify_heading -->
+                <th></th>
+                <!-- END modify_heading -->
+                <th>Forum</th>
+                <th>Author</th>
+                <th>Replies</th>
+                <th>Views</th>
+                <th colspan="2">Last Post</th>
+            </tr>
         </thead>
         <tbody>
         <!-- BEGIN thread -->
-        <tr class="{ON_OFF}">
+        <tr>
             <!-- BEGIN modify_thread -->
             <td>
-                <input type="checkbox" name="deleteThreads[]"
-                       value="{THREAD_ID}"/>
+                <input id="deleteThreads{THREAD_ID}" type="checkbox" name="deleteThreads[]" value="{THREAD_ID}" />
+                <label for="deleteThreads{THREAD_ID}" class="checkbox-label"></label>
             </td>
             <!-- END modify_thread -->
-            <td class="avatar">
-                <a href="/search/user/{THREAD_AUTHOR_ID}" class="author">
-                    <img height="32" width="32" src="/portrait.php?userId={THREAD_AUTHOR_EXTERNAL_ID}&size=square32"/>
-                </a>
-
-                <h3><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE} {THREAD_LOCKED}</a></h3>
-
-                <span class="subtitle">Posted {THREAD_TIME} by </span>
-                <a href="/search/user/{THREAD_AUTHOR_ID}" class="author">{THREAD_AUTHOR}</a>
-            <td class="avatar"><!-- BEGIN last_post -->
-                <a href="/search/user/{THREAD_LAST_POST_USER_ID}" class="author">
-                    <img height="32" width="32" src="/portrait.php?userId={THREAD_LAST_POST_USER_EXTERNAL_ID}&size=square32"/>
+            <td>
+                <h2><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE} {THREAD_LOCKED}</a></h2>
+            </td>
+            <td>
+                <div class="avatar-card">
+                    <a href="/search/user/{THREAD_AUTHOR_ID}" title="View Profile">
+                        <img src="/portrait.php?userId={THREAD_AUTHOR_EXTERNAL_ID}&size=square32"/>
+                        <p>{THREAD_AUTHOR}</p>
+                    </a>
+                    <p class="meta">Posted {THREAD_TIME}</p>
+                </div>
+            </td>
+            <td>{THREAD_REPLIES}</td>
+            <td>{THREAD_VIEWS}</td>
+            <td>
+                <!-- BEGIN last_post -->
+                <a href="/search/user/{THREAD_LAST_POST_USER_ID}">
+                    <img src="/portrait.php?userId={THREAD_LAST_POST_USER_EXTERNAL_ID}&size=square32"/>
                     <a href="/search/user/{THREAD_LAST_POST_USER_ID}">{THREAD_LAST_POST_USER}</a>
                 </a><br/>
-                <span class="subtitle">{THREAD_LAST_POST_TIME}</span>
-
-                <!-- END last_post --></td>
-            <td> {THREAD_REPLIES}</td>
-            <td> {THREAD_VIEWS}</td>
-            <td><a href="/forum/thread/{THREAD_ID}/{THREAD_LAST_PAGE}/#bottom" class="btn go-to"><span></span>View
-                Thread</a></td>
+                <span class="meta">
+                    {THREAD_LAST_POST_TIME}
+                </span>
+                <!-- END last_post -->
+            </td>
+            <td><a href="/forum/thread/{THREAD_ID}/{THREAD_LAST_PAGE}/#bottom">View</a></td>
         </tr>
         <!-- END thread -->
         </tbody>
     </table>
-    <p class="clearfix">
-        <!-- BEGIN forum_post -->
-        <a class="btn add float-left" href="/forum/modify/{CATEGORY_ID}"><span></span>Post Thread</a>
-        <!-- END forum_post -->
-
+    <p>
         <!-- BEGIN delete_button -->
-        <input type="submit" name="submit" class="submit-btn-plain"
-               value="Delete Selected"
-               onclick="return(confirm('Are you sure you wish to delete these forum threads?'))"/>
+        <button type="submit" class="icon-delete" data-action="delete" name="submit" value="Delete Selected">Delete Selected</button>
         <!-- END delete_button -->
     </p>
 </form>
-<ul class="admin-nav foot">
+
+<ul class="pagination">
     <!-- BEGIN previous_button -->
-	<li><a href="/forum/{CATEGORY_ID}/{PREVIOUS_PAGE}">&lsaquo; Prev</a></li>
+    <li class="arrow"><a href="/forum/{CATEGORY_ID}/{PREVIOUS_PAGE}">&lsaquo;</a></li>
     <!-- END previous_button -->
     <!-- BEGIN page_number -->
-	<li><a class="{CURRENT}" href="/forum/{CATEGORY_ID}/{PAGE_INDEX}">{PAGE_INDEX}</a></li>
+    <li class="{CURRENT}"><a href="/forum/{CATEGORY_ID}/{PAGE_INDEX}">{PAGE_INDEX}</a></li>
     <!-- END page_number -->
     <!-- BEGIN next_button -->
-    <li><a href="/forum/{CATEGORY_ID}/{NEXT_PAGE}">Next &rsaquo;</a></li>
+    <li class="arrow"><a href="/forum/{CATEGORY_ID}/{NEXT_PAGE}">&rsaquo;</a></li>
     <!-- END next_button -->
 </ul>
+
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
+<script type="text/javascript">
+    $(function() {
+        // Confirmation of delete button
+        $('[data-action="delete"]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                confirmEvent: $.confirmDialog.submitForm
+            });
+        });
+    });
+</script>

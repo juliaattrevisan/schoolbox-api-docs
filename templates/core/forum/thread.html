@@ -1,93 +1,82 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript">
-    $(function () {
-
-        $('#forum-topic tbody tr:even td').css('background-color', '#f4f4f4');
-
-        $('a.delete.float-left').click(function () {
-            if (confirm('Are you sure you want to delete this thread?'))
-                window.open($(this).attr('href'), '_self', '');
-            return false;
-        });
-
-        $('a.delete.no-text').click(function () {
-            if (confirm('Are you sure you want to delete this post?'))
-                window.open($(this).attr('href'), '_self', '');
-            return false;
-        });
-
-        if ($('.post').length !== 1) {
-            $('.post:last').css("border", "0")
-        }
-
-    });
-</script>
-<!-- END custom_head -->
-<h1>{CATEGORY} - {THREAD_TITLE} {LOCKED}</h1>
-<ul class="breadcrumb">
-    <li><a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a></li>
-    <li><a href="/forum/{CATEGORY_ID}/">Forum</a></li>
-    <li class="last"><a href="#">{THREAD_TITLE}</a></li>
-</ul>
-
-<p class="clearfix">
+<span class="header-actions">
     <!-- BEGIN reply -->
-    <a class="btn reply float-left" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}"><span></span>Post Reply</a>
+    <a class="button icon-reply" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}">Post Reply</a>
     <!-- END reply -->
     <!-- BEGIN modify_thread -->
-
-    <a href="/forum/modifyForm.php?toggleLock={THREAD_ID}" class="btn padlock float-left"><span></span>{LOCK_UNLOCK} Thread</a>
-    <a href="/forum/modifyForm.php?deleteThread={THREAD_ID}" class="btn delete float-left"><span></span>Delete Thread</a>
+    <a class="button icon-locked" href="/forum/modifyForm.php?toggleLock={THREAD_ID}">{LOCK_UNLOCK} Thread</a>
+    <a class="button icon-delete" href="/forum/modifyForm.php?deleteThread={THREAD_ID}" data-action="delete" data-relation="thread">Delete Thread</a>
     <!-- END modify_thread -->
-</p>
-<div class="forum listing">
-    <ul class="comments">
-        <!-- BEGIN post -->
-        <li id="{POST_ID}" class="{ON_OFF}">
-            <!-- BEGIN modify -->
-            <a class="btn delete no-text" title="Delete post" href="/forum/modifyForm.php?deletePost={POST_ID}" class="delete"><span></span></a>
-            <a class="btn modify no-text" title="Modify post" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/{POST_ID}"><span></span></a>
-            <!-- END modify -->
-            <a href="/search/user/{POST_USER_ID}" class="author">
-                <img width="32" height="32" src="/portrait.php?userId={POST_AUTHOR_EXTERNAL_ID}&size=square32"/>
-                <span class="name">{POST_AUTHOR}</span>
-            </a>
-            <span class="subtitle">Posted {POST_TIME}</span>
+</span>
 
-            <div class="post-content wysiwyg">
+<h1>{CATEGORY} - {THREAD_TITLE} {LOCKED}</h1>
+
+<div class="row">
+    <ul class="breadcrumb">
+        <li><a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a></li>
+        <li><a href="/forum/{CATEGORY_ID}/">Forum</a></li>
+        <li><a href="#">{THREAD_TITLE}</a></li>
+    </ul>
+</div>
+
+<div class="row">
+    <ul>
+        <!-- BEGIN post -->
+        <li id="{POST_ID}">
+            <span class="header-actions">
+                <!-- BEGIN reply_post -->
+                <a class="button icon-reply no-text" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}" data-tooltip title="Reply" aria-haspopup="true"></a>
+                <!-- END reply_post -->
+                <!-- BEGIN modify -->
+                <a class="button icon-modify no-text" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/{POST_ID}" title="Modify Post"></a>
+                <a class="button icon-delete no-text" href="/forum/modifyForm.php?deletePost={POST_ID}" data-action="delete" data-relation="post" title="Delete Post"></a>
+                <!-- END modify -->
+            </span>
+
+            <div class="row">
+                <div class="avatar-card">
+                    <a href="/search/user/{POST_USER_ID}" title="View Profile">
+                        <img src="/portrait.php?userId={POST_AUTHOR_EXTERNAL_ID}&size=square64"/>
+                        <p>{POST_AUTHOR}</p>
+                    </a>
+                    <p class="meta">Posted {POST_TIME}</p>
+                    <!-- BEGIN modified -->
+                    <p class="meta">
+                        Edited {POST_MODIFIED} {POST_CENSORED}
+                    </p>
+                    <!-- END modified -->
+                </div>
+            </div>
+
+            <div class="row">
                 {POST_BODY}
             </div>
-            <p>
-                <!-- BEGIN reply_post -->
-                <a class=" btn reply" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}"><span></span>Reply</a>
-                <!-- END reply_post -->
-
-                <!-- BEGIN modified -->
-                <br/> edited {POST_MODIFIED} {POST_CENSORED}
-                <!-- END modified -->
-            </p>
         </li>
         <!-- END post -->
     </ul>
 </div>
-<p class="clearfix"><a name="bottom"></a>
-    <!-- BEGIN reply -->
-    <a class="btn reply float-left" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}"><span></span>Post Reply</a>
-    <!-- END reply -->
-    <!-- BEGIN modify_thread -->
-    <button class="lock submit-btn-plain">{LOCK_UNLOCK} Thread</button>
-    <button class="delete submit-btn-plain">Delete Thread</button>
-    <!-- END modify_thread -->
-</p>
 
-<ul class="admin-nav foot">
+<ul class="pagination">
     <!-- BEGIN previous_button -->
-	<li><a href="/forum/thread/{THREAD_ID}/{PREVIOUS_PAGE}">&lsaquo; Prev</a></li>
+    <li><a href="/forum/thread/{THREAD_ID}/{PREVIOUS_PAGE}">&lsaquo;</a></li>
     <!-- END previous_button -->
     <!-- BEGIN page_number -->
-	<li><a class="{CURRENT}" href="/forum/thread/{THREAD_ID}/{PAGE_INDEX}">{PAGE_INDEX}</a></li>
+    <li class="{CURRENT}"><a href="/forum/thread/{THREAD_ID}/{PAGE_INDEX}">{PAGE_INDEX}</a></li>
     <!-- END page_number -->
     <!-- BEGIN next_button -->
-	<li><a href="/forum/thread/{THREAD_ID}/{NEXT_PAGE}">Next &rsaquo;</a></li>
+    <li><a href="/forum/thread/{THREAD_ID}/{NEXT_PAGE}">&rsaquo;</a></li>
     <!-- END next_button -->
 </ul>
+
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $('a[data-action="delete"][data-relation="post"]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({text:'Are you sure you want to delete this post?'});
+        });
+        $('a[data-action="delete"][data-relation="thread"]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({text:'Are you sure you want to delete this thread?'});
+        });
+    });
+</script>

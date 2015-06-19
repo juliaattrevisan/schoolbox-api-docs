@@ -90,11 +90,12 @@ if (is_numeric($this->arg[0])) {
             $this->parse('title_block', 'title');
         }
 
-        $output['ACTION']      = 'Modify';
-        $output['THREAD_POST'] = 'Post';
-        $output['THREAD_ID']   = $thread->getId();
-        $output['POST_ID']     = $post->getId();
-        $output['BODY']        = Scrub::text($post->getBody());
+        $output['ACTION']       = 'Modify';
+        $output['ACTION_CLASS'] = 'icon-modify';
+        $output['THREAD_POST']  = 'Post';
+        $output['THREAD_ID']    = $thread->getId();
+        $output['POST_ID']      = $post->getId();
+        $output['BODY']         = Scrub::text($post->getBody());
 
 
         $this->parse('thread_link_block', 'thread_link');
@@ -118,6 +119,7 @@ if (is_numeric($this->arg[0])) {
 
 
         $output['ACTION']       = 'Post';
+        $output['ACTION_CLASS'] = 'icon-add';
         $output['THREAD_POST']  = 'Reply';
         $output['THREAD_ID']    = $thread->getId();
         $output['THREAD_TITLE'] = Scrub::text($thread->getTitle());
@@ -125,8 +127,9 @@ if (is_numeric($this->arg[0])) {
 
         $this->parse('thread_link_block', 'thread_link');
     } else {
-        $output['ACTION']      = 'Post';
-        $output['THREAD_POST'] = 'Thread';
+        $output['ACTION']       = 'Post';
+        $output['ACTION_CLASS'] = 'icon-add';
+        $output['THREAD_POST']  = 'Thread';
 
         $this->parse('title_block', 'title');
         $this->setVar('thread_link_block', '');
