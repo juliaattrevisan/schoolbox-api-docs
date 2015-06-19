@@ -8,5 +8,5 @@
  * @version	 SVN: $Id$
  */
 class Leave_Core_Report_House_Print extends Leave_Core_Report_House_Web {
-	protected $templateFile = 'modules/leave/report/house/print.html';
+	protected $templateFile = 'modules/leave/report/house/web.html';
 }

@@ -1,282 +1,172 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+<script type="text/javascript" src="/javascript/jquery.warninglength.js"></script>
 <script type="text/javascript">
 	$(function() {
 
-		$('#startDate, #finishDate').datepicker({
-			showOn: 'both',
-			buttonImage: '/images/core/calendar/calendar-click.png',
-			buttonImageOnly: true,
+        // TODO make datepickery generic
+		$('input[data-datepicker]').datepicker({
 			constrainInput: false,
 			minDate: new Date(),
 			onClose: function (string) {
 				var input = $(this);
-
 				$.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
 					input.val(data.time);
 				})
-
 			}
 		});
 
-		$('#requestForm').validate();
+		$('form[data-validate]').validate();
 
-		$('#requesthostType').change(function(){
-			if(($(this).val() == '4') && $('#hostDetails').is(':visible')){
-				$('#hostDetails').slideUp();
-				$('#hostDetails input').removeClass('required');
+        // Hide host details if "self" is selected
+		$('[data-relation="host_type_selector"]').change(function(){
+            var details = $('[data-relation="host_type_field"]');
+			if(($(this).val() == '4')){
+                details.slideUp();
 			} else {
-				$('#hostDetails').slideDown();
-				$('#hostDetails input').addClass('required');
+                details.slideDown();
 			}
 		});
 
 		//<!-- BEGIN student_autocomplete_javascript -->
+        //<!-- END student_autocomplete_javascript -->
 
-		$('#user')
-				.selectizeSelector({
-					ajax: {
-						url:      '/ajax/user.php',
-						type:     'GET',
-						data:     {groupID: "{STUDENT_GROUP_IDS}", showCampus: true},
-						dataType: 'json'
-					}
-				})
-				.on('selectize.item_add', function(event, value) {
-					$('#userId').val(value)
-				})
-				.on('selectize.item_remove', function() {
-					$('#userId').val('')
-				})
+		$('[data-selectizeuser]')
+            .selectizeSelector({
+                ajax: {
+                    url:      '/ajax/user.php',
+                    type:     'GET',
+                    data:     {groupID: "{STUDENT_GROUP_IDS}", showCampus: true},
+                    dataType: 'json'
+                }
+            })
+        ;
 
-		//<!-- END student_autocomplete_javascript -->
-
-		/**
-		 * LeaveRequest
-		 */
-		leaveRequest = {
-
-			/* Object literal for description field
-			 */
-			description: {
-				maxLength: 100,
-				warningLength: 67,
-				element: $('#description'),
-				warning: $('#descriptionWarning'),
-
-				/**
-				 * Remove excess content from the description field
-				 */
-				trim: function() {
-					var length = this.element.val().length;
-					var count = this.warning.find('span');
-
-					if (length <= this.maxLength) {
-						if (length > this.warningLength) {
-							count.html(length);
-							this.fadeIn(this.warning);
-						}
-						else {
-							this.fadeOut(this.warning);
-						}
-					}
-					/* Trim out excess
-					 */
-					else {
-						this.fadeIn(this.warning);
-						this.element.val(this.element.val().substring(0, this.maxLength));
-					}
-				},
-
-				/**
-				 * Fade in
-				 *
-				 * @param element
-				 */
-				fadeIn: function(element) {
-					element.stop().animate({opacity:1}, 200);
-				},
-
-				/**
-				 * Fade out
-				 *
-				 * @param element
-				 */
-				fadeOut: function(element) {
-					element.stop().animate({opacity:0}, 200);
-				},
-
-				initWarning: function() {
-					this.warning.css({'opacity':0}).show();
-				},
-
-				/**
-				 * Observe character count
-				 */
-				observe: function() {
-					this.element.keyup(function() {
-						leaveRequest.description.trim();
-					});
-				}
-			}
-		}
-
-		/* Initialise character count
-		 */
-		leaveRequest.description.initWarning();
-		leaveRequest.description.observe();
+        $('[data-warninglength]').warninglength({
+            messagePrototype: $('<label class="warning" />')
+        });
 	});
 </script>
 <!-- END custom_head -->
 
-<h1><span>Create Leave Request</span></h1>
+<h1>Create Leave Request</h1>
 
-<form  method="post" action="/modules/leave/processCreate" id="requestForm">
-	<table class="standardForm table">
+<form method="post" action="/modules/leave/processCreate" data-validate>
 
-		<!-- BEGIN student_autocomplete -->
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Student</h4>
-				<em></em>
-			</td>
-			<td colspan="3">
-				<input id='user' type='text' value='' placeholder="Search Students" />
-				<input id='userId' name='userId' type='hidden' value='' />
-			</td>
-		</tr>
-		<!-- END student_autocomplete -->
-		<!-- BEGIN student_selector -->
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Student</h4>
-				<em></em>
-			</td>
-			<td>
-				<select name="userId" class="formfield">
-					<option disabled>select a child</option>
-					<!-- BEGIN student_drop -->
-					<option value="{STUDENT_DROP_VALUE}" label="{STUDENT_DROP_NAME}" {STUDENT_DROP_VALUE_SELECTED}>{STUDENT_DROP_NAME}</option>
-					<!-- END student_drop -->
-				</select>
-			</td>
-			<td class="formLabelWidth">
-			</td>
-			<td>
-			</td>
-		</tr>
-		<!-- END student_selector -->
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Leave Date</h4>
-				<em></em>
-			</td>
-			<td>
-				<input name="request[start][date]" id="startDate" type="text" size="16" maxlength="30" class="required" />
-			</td>
-			<td class="formLabelWidth">
-				<h4>Leave Time</h4>
-				<em>AM&nbsp;=&nbsp;Morning, PM&nbsp;=&nbsp;Afternoon/Evening</em>
-			</td>
-			<td>
-				<select name='request[start][time]'>
-					<!-- BEGIN request_start_time -->
-					<option value='{REQUEST_START_TIME_VALUE}' {REQUEST_START_TIME_SELECTED}>{REQUEST_START_TIME_LABEL}</option>
-					<!-- END request_start_time -->
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Return Date</h4>
-				<em></em>
-			</td>
-			<td>
-				<input name="request[finish][date]" id="finishDate" type="text" size="16" maxlength="30" class="required" />
-			</td>
-			<td class="formLabelWidth">
-				<h4>Return Time</h4>
-				<em>AM&nbsp;=&nbsp;Morning, PM&nbsp;=&nbsp;Afternoon/Evening</em>
-			</td>
-			<td>
-				<select name='request[finish][time]'>
-					<!-- BEGIN request_finish_time -->
-					<option value='{REQUEST_FINISH_TIME_VALUE}' {REQUEST_FINISH_TIME_SELECTED}>{REQUEST_FINISH_TIME_LABEL}</option>
-					<!-- END request_finish_time -->
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Host</h4>
-				<em></em>
-			</td>
-			<td>
-				<select name="request[hostType]" id="requesthostType">
-					<!-- BEGIN host_type -->
-					<option value="{HOST_TYPE_VALUE}" {HOST_TYPE_VALUE_SELECTED}>{HOST_TYPE_LABEL}</option>
-					<!-- END host_type -->
-				</select>
-			</td>
-			<td class="formLabelWidth">
-				<h4>Student Phone</h4>
-				<em></em>
-			</td>
-			<td>
-				<input type="text" name="request[userPhone]" size="16" class="required" />
-			</td>
-		</tr>
-		<tr id="hostDetails">
-			<td class="formLabelWidth">
-				<h4>Host Name</h4>
-				<em>The host will need to confirm your leave arrangements; you can forward them the email you receive.</em>
-			</td>
-			<td>
-				<input type="text" name="request[hostName]" size="24" class="required" />
-			</td>
-			<td class="formLabelWidth">
-				<h4>Host Phone</h4>
-			</td>
-			<td>
-				<input type="text" name="request[hostPhone]" size="16" class="required" />
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Travel Method</h4>
-			</td>
-			<td colspan="3">
-				<select name="request[travelType]">
-					<!-- BEGIN travel_drop -->
-					<option value="{TRAVEL_DROP_VALUE}" label="{TRAVEL_DROP_NAME}"  {TRAVEL_DROP_VALUE_SELECTED}>{TRAVEL_DROP_NAME}</option>
-					<!-- END travel_drop -->
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Description</h4>
-				<em>Only complete for special leave information or travel arrangements</em>
-			</td>
-			<td colspan="3">
-				<textarea id='description' rows="4" cols="60" name="request[description]"></textarea>
-				<div id='descriptionWarning' class='hide'>You are reaching the maximum length for your description (<span>0</span>/100 characters)</div>
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Terms and Conditions</h4>
-			</td>
-			<td colspan="3">
-				{TERMS_AND_CONDITIONS}
-				<label for="requestTerms">
-					<input type="checkbox" id="requestTerms" name="request[terms]" class="required" />
-					I Accept Terms &amp; Conditions and that this application is true and correct
-				</label>
-			</td>
-		</tr>
-	</table>
+    <fieldset>
+        <legend>Student</legend>
+        <div class="large-6 columns">
+            <!-- BEGIN student_autocomplete -->
+            <label for="userId">Name</label>
+            <input id='userId' name="userId" type='text' value='' placeholder="Search Students" data-selectizeuser required />
+            <!-- END student_autocomplete -->
+            <!-- BEGIN student_selector -->
+            <label for="userIdSelect">Name</label>
+            <select id="userIdSelect" name="userId" class="formfield">
+                <option disabled>select a child</option>
+                <!-- BEGIN student_drop -->
+                <option value="{STUDENT_DROP_VALUE}" label="{STUDENT_DROP_NAME}" {STUDENT_DROP_VALUE_SELECTED}>{STUDENT_DROP_NAME}</option>
+                <!-- END student_drop -->
+            </select>
+            <!-- END student_selector -->
+        </div>
+        <div class="large-6 columns">
+            <label for="requestuserPhone">Phone</label>
+            <input type="text" name="request[userPhone]" id="requestuserPhone" required />
+        </div>
+    </fieldset>
 
-	<input type="submit" name="Submit" value="Submit Leave Application" class="submit-btn-plain">
+    <fieldset class="large-6 columns">
+        <legend>Leaving</legend>
+        <div class="large-8 columns">
+            <label for="startDate">Date</label>
+            <input name="request[start][date]" id="startDate" type="text" required data-datepicker />
+        </div>
+        <div class="large-4 columns">
+            <label for="startTime">Time</label>
+            <select name='request[start][time]' id="startTime">
+                <!-- BEGIN request_start_time -->
+                <option value='{REQUEST_START_TIME_VALUE}' {REQUEST_START_TIME_SELECTED}>{REQUEST_START_TIME_LABEL}</option>
+                <!-- END request_start_time -->
+            </select>
+        </div>
+    </fieldset>
+
+    <fieldset class="large-6 columns">
+        <legend>Returning</legend>
+        <div class="large-8 columns">
+            <label for="finishDate">Date</label>
+            <input name="request[finish][date]" id="finishDate" type="text" required data-datepicker />
+        </div>
+        <div class="large-4 columns">
+            <label for="finishTime">Time</label>
+            <select name='request[finish][time]' id="finishTime">
+                <!-- BEGIN request_finish_time -->
+                <option value='{REQUEST_FINISH_TIME_VALUE}' {REQUEST_FINISH_TIME_SELECTED}>{REQUEST_FINISH_TIME_LABEL}</option>
+                <!-- END request_finish_time -->
+            </select>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Host</legend>
+        <div class="large-6 columns">
+            <label for="requesthostType">Type</label>
+            <select name="request[hostType]" id="requesthostType" data-relation="host_type_selector">
+                <!-- BEGIN host_type -->
+                <option value="{HOST_TYPE_VALUE}" {HOST_TYPE_VALUE_SELECTED}>{HOST_TYPE_LABEL}</option>
+                <!-- END host_type -->
+            </select>
+        </div>
+        <div class="large-3 columns" data-relation="host_type_field">
+            <label for="requesthostName">
+                <span data-tooltip aria-haspopup="true" class="has-tip"
+                      title="The host will need to confirm your leave arrangements; you can forward them the email you receive.">
+                    Name
+                </span>
+            </label>
+            <input type="text" name="request[hostName]" id="requesthostName" required />
+        </div>
+        <div class="large-3 columns" data-relation="host_type_field">
+            <label for="requesthostPhone">Phone</label>
+            <input type="text" name="request[hostPhone]" id="requesthostPhone" required />
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Other Information</legend>
+        <div class="large-6 columns">
+            <label for="requestTravelType">Travel Method</label>
+            <select name="request[travelType]" id="requestTravelType">
+                <!-- BEGIN travel_drop -->
+                <option value="{TRAVEL_DROP_VALUE}" label="{TRAVEL_DROP_NAME}"  {TRAVEL_DROP_VALUE_SELECTED}>{TRAVEL_DROP_NAME}</option>
+                <!-- END travel_drop -->
+            </select>
+        </div>
+        <div class="large-6 columns">
+            <label for="requestTravelType">
+                <span data-tooltip aria-haspopup="true" class="has-tip"
+                      title="Only complete for special leave information or travel arrangements">
+                    Description
+                </span>
+            </label>
+            <textarea id='description' name="request[description]" maxlength="100" data-warninglength="67"></textarea>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Terms and Conditions</legend>
+
+        <div class="large-12 columns">
+            <div class="wysiwyg">{TERMS_AND_CONDITIONS}</div>
+
+            <input type="checkbox" id="requestTerms" name="request[terms]" required />
+            <label for="requestTerms" class="checkbox-label">
+                I Accept Terms &amp; Conditions and that this application is true and correct
+            </label>
+        </div>
+    </fieldset>
+
+	<button type="submit">Submit Leave Application</button>
 </form>

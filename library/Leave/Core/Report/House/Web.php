@@ -30,6 +30,18 @@ class Leave_Core_Report_House_Web
         'approvedEnd'   => "</span><br />",
     );
 
+    /**
+     * Offsets from the start time of a day as shown on the report.
+     *
+     * @var array|int[]
+     */
+    protected $offsets = [
+        'morningStart' => 10,
+        'dayStart'     => 19,
+        'nightStart'   => 22,
+        'nightEnd'     => 34,
+    ];
+
     protected $rangePeriods = array('morning', 'day', 'night');
 
     // Types of leave directions
@@ -126,16 +138,16 @@ class Leave_Core_Report_House_Web
             $data = $this->getData();
 
             $morningStart = clone $data['reportStart'];
-            $morningStart->addHours(10);
+            $morningStart->addHours($this->offsets['morningStart']);
 
             $dayStart = clone $data['reportStart'];
-            $dayStart->addHours(19);
+            $dayStart->addHours($this->offsets['dayStart']);
 
             $nightStart = clone $data['reportStart'];
-            $nightStart->addHours(22);
+            $nightStart->addHours($this->offsets['nightStart']);
 
             $nightEnd = clone $data['reportStart'];
-            $nightEnd->addHours(34);
+            $nightEnd->addHours($this->offsets['nightEnd']);
 
             $showStartTime = true;
 
@@ -150,7 +162,7 @@ class Leave_Core_Report_House_Web
                          * then he left and returned in the same period
                          */
                         if (!$request->getOccupancy($dayStart, $nightStart)) {
-                            $requestPeriodMorning          = $requestDateStart->getTimeOnly() . ' ' . $request->getFinish()->getTimeOnly();
+                            $requestPeriodMorning          = $request->getStart()->getTimeOnly() . ' ' . $request->getFinish()->getTimeOnly();
                             $requestPeriodMorningDirection = self::LEAVING;
                         } else {
                             /* Specifically check for this day, to account for multi-week leave
@@ -295,6 +307,7 @@ class Leave_Core_Report_House_Web
         $this->getPage()->setBlock(TEMPLATE_content, 'no_requests', 'no_requests_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'row', 'row_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'request_period_total', 'request_period_total_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'request_period_initial', 'request_period_initial_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'report_header', 'report_header_block');
 
         $this->getPage()->setBlock(TEMPLATE_content, 'report_header_subtitle', 'report_header_subtitle_block');
@@ -457,14 +470,18 @@ class Leave_Core_Report_House_Web
         }
 
         /* Output totals */
+        $periodCount = 0;
         for ($j = 0; $j < $this->getRange(); $j++) {
             foreach ($this->rangePeriods as $period) {
                 if (!($j == 0 && $period == 'morning')) {
+                    $periodCount++;
                     $this->getPage()->setVar('PERIOD_TOTAL', $totals[$j][$period]);
                     $this->getPage()->parse('request_period_total_block', 'request_period_total', true);
+                    $this->getPage()->parse('request_period_initial_block', 'request_period_initial', true);
                 }
             }
         }
+        $this->getPage()->setVar('PERIOD_COUNT', $periodCount);
     }
 
     /**
@@ -491,11 +508,13 @@ class Leave_Core_Report_House_Web
                 /* Hide the first two columns of the first group
                  */
                 if (!$i) {
+                    $this->getPage()->setVar('REPORT_HEADER_COLSPAN', 2);
                     $this->getPage()->setVar('report_header_subtitle_show_am_block', '');
                     $this->getPage()->parse('report_header_subtitle_show_day_block', 'report_header_subtitle_show_day');
                     $this->getPage()->parse('report_header_subtitle_hide_am_block', 'report_header_subtitle_hide_am');
                     $this->getPage()->setVar('report_header_subtitle_hide_day_block', '');
                 } else {
+                    $this->getPage()->setVar('REPORT_HEADER_COLSPAN', 3);
                     $this->getPage()->parse('report_header_subtitle_show_am_block', 'report_header_subtitle_show_am');
                     $this->getPage()->parse('report_header_subtitle_show_day_block', 'report_header_subtitle_show_day');
                     $this->getPage()->setVar('report_header_subtitle_hide_am_block', '');

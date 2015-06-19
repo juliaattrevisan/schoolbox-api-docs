@@ -1,133 +1,72 @@
-<h1><span>Leave Request: {USER_NAME}, Year {USER_YEAR}, {USER_HOUSE}</span></h1>
-<table class="standardForm table">
-    <tr>
-        <td class="formLabelWidth">
-            <h4>Status</h4>
-            <em></em>
-        </td>
-        <td>
-            {REQUEST_STATUS}
-        </td>
-        <td class="formLabelWidth">
-            <h4>Requested By</h4>
-            <em></em>
-        </td>
-        <td>
-            {USER_NAME}
-        </td>
-    </tr>
-    <tr>
-        <td class="formLabelWidth">
-            <h4>Leave Date</h4>
-            <em></em>
-        </td>
-        <td>
-            {REQUEST_START_DATE}
-        </td>
-        <td class="formLabelWidth">
-            <h4>Leave Time</h4>
-        </td>
-        <td>
-            {REQUEST_START_TIME}
-        </td>
-    </tr>
-    <tr>
-        <td class="formLabelWidth">
-            <h4>Return Date</h4>
-            <em></em>
-        </td>
-        <td>
-            {REQUEST_FINISH_DATE}
-        </td>
-        <td class="formLabelWidth">
-            <h4>Return Time</h4>
-        </td>
-        <td> {REQUEST_FINISH_TIME}
-        </td>
-    </tr>
-    <tr>
-        <td class="formLabelWidth">
-            <h4>Host</h4>
-            <em></em>
-        </td>
-        <td>
-            {HOST_TYPE}
-        </td>
-        <td class="formLabelWidth">
-            <h4>Student Phone</h4>
-            <em></em>
-        </td>
-        <td>
-            {REQUEST_USER_PHONE}
-        </td>
-    </tr>
-    <tr id="hostDetails">
-        <td class="formLabelWidth">
-            <h4>Host Name</h4>
-            <em>The host will need to confirm your leave arrangements; you can forward them the email you receive.</em>
-        </td>
-		<td>
-			{REQUEST_HOST_NAME}
-		</td>
-		<td class="formLabelWidth">
-			<h4>Host Address</h4>
-			<em>The host's address during the leave period</em>
-		</td>
-		<td>
-			{REQUEST_HOST_ADDRESS}
-		</td>
-	</tr>
-	<tr>
-        <td class="formLabelWidth">
-            <h4>Host Phone</h4>
-            <em></em>
-        </td>
-        <td>
-            {REQUEST_HOST_PHONE}
-        </td>
-		<td class="formLabelWidth">
-			<h4>Host Mobile</h4>
-		</td>
-		<td>
-			{REQUEST_HOST_MOBILE}
-		</td>
-    </tr>
-	<tr>
-		<td class="formLabelWidth">
-			<h4>Collector's Name</h4>
-		</td>
-		<td>
-			{REQUEST_COLLECTOR_NAME}
-		</td>
+<h1>Leave Request: {USER_NAME}, Year {USER_YEAR}, {USER_HOUSE}</h1>
 
-		<td class="formLabelWidth">
-			<h4>Returner's Name</h4>
-		</td>
-		<td>
-			{REQUEST_RETURNER_NAME}
-		</td>
-	</tr>
-    <tr>
-        <td class="formLabelWidth">
-            <h4>Travel Method</h4>
-        </td>
-        <td colspan="3">
-            {REQUEST_TRAVEL_TYPE}
-        </td>
-    </tr>
-    <tr>
-        <td class="formLabelWidth">
-            <h4>Description</h4>
-            <em>Only complete for special leave information or travel arrangements</em>
-        </td>
-        <td>
-            {REQUEST_DESCRIPTION}
-        </td>
-		<td class="formLabelWidth">
-			<h4>Reason For Leave</h4>
-		</td>
-		<td>
-			{REQUEST_REASON}
-		</td>
-    </tr>
-</table>
+<section class="large-12 columns">
+    <h1>Student</h1>
+    <dl>
+        <dt>Name</dt>
+        <dd>{USER_NAME}</dd>
+        <dt>Phone</dt>
+        <dd>{REQUEST_USER_PHONE}</dd>
+    </dl>
+</section>
+
+<section class="large-6 columns">
+    <h1>Status</h1>
+    {REQUEST_STATUS}
+</section>
+
+<section class="large-6 columns">
+    <h1>Requested By</h1>
+    {AUTHOR_NAME}
+</section>
+
+<section class="large-6 columns">
+    <h1>Leave Date</h1>
+    {REQUEST_START_DATE} {REQUEST_START_TIME}
+</section>
+
+<section class="large-6 columns">
+    <h1>Return Date</h1>
+    {REQUEST_FINISH_DATE} {REQUEST_FINISH_TIME}
+</section>
+
+<section class="large-6 columns">
+    <h1>Host</h1>
+    <dl>
+        <dt>Type</dt>
+        <dd>{HOST_TYPE}</dd>
+        <dt>
+            <span data-tooltip aria-haspopup="true" class="has-tip"
+                  title="The host will need to confirm your leave arrangements; you can forward them the email you receive.">
+                Name
+            </span>
+        </dt>
+        <dd>{REQUEST_HOST_NAME}</dd>
+        <dt>
+            <span data-tooltip aria-haspopup="true" class="has-tip"
+                  title="The host's address during the leave period">
+                Address
+            </span>
+        </dt>
+        <dd>{REQUEST_HOST_ADDRESS}</dd>
+        <dt>Phone</dt>
+        <dd>{REQUEST_HOST_PHONE}</dd>
+        <dt>Mobile</dt>
+        <dd>{REQUEST_HOST_MOBILE}</dd>
+    </dl>
+</section>
+
+<section class="large-6 columns">
+    <h1>Travel Method</h1>
+    {REQUEST_TRAVEL_TYPE}
+    <dl>
+        <dt>Collector's Name</dt>
+        <dd>{REQUEST_COLLECTOR_NAME}</dd>
+        <dt>Returner's Name</dt>
+        <dd>{REQUEST_RETURNER_NAME}</dd>
+    </dl>
+    <h1>Description</h1>
+    {REQUEST_DESCRIPTION}
+    <h1>Reason For Leave</h1>
+    {REQUEST_REASON}
+</section>
