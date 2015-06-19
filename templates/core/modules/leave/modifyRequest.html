@@ -13,128 +13,138 @@
 <h1>Leave Request: {USER_NAME}, Year {USER_YEAR}, {USER_HOUSE}</h1>
 
 <form method="post" action="/modules/leave/processModify" data-validate>
-    <fieldset>
-        <legend>Student</legend>
+    <div class="large-12 columns">
+        <fieldset>
+            <legend>Student</legend>
+            <div class="large-6 columns">
+                <dl>
+                    <dt>Name</dt>
+                    <dd>{USER_NAME}</dd>
+                </dl>
+            </div>
+            <div class="large-6 columns">
+                <label for="requestuserPhone">Phone</label>
+                <input type="text" name="request[userPhone]" value="{REQUEST_USER_PHONE}" id="requestuserPhone" required />
+            </div>
+        </fieldset>
+    </div>
+
+    <div class="row">
         <div class="large-6 columns">
-            <dl>
-                <dt>Name</dt>
-                <dd>{USER_NAME}</dd>
-            </dl>
+            <fieldset>
+                <legend>Status</legend>
+                <div class="large-12 columns">
+                    {REQUEST_STATUS}
+                </div>
+            </fieldset>
         </div>
+
         <div class="large-6 columns">
-            <label for="requestuserPhone">Phone</label>
-            <input type="text" name="request[userPhone]" value="{REQUEST_USER_PHONE}" id="requestuserPhone" required />
+            <fieldset>
+                <legend>Requested By</legend>
+                <div class="large-12 columns">
+                    {AUTHOR_NAME}
+                </div>
+            </fieldset>
         </div>
-    </fieldset>
+    </div>
 
-    <fieldset class="large-6 columns">
-        <legend>Status</legend>
-        <div class="large-12 columns">
-            {REQUEST_STATUS}
-        </div>
-    </fieldset>
+    <div class="large-6 columns">
+        <fieldset>
+            <legend>Leaving</legend>
+            <div class="large-8 columns">
+                <label for="startDate">Date</label>
+                <input name="request[start][date]" id="startDate" type="text" required data-datepicker value="{REQUEST_START_DATE}" />
+            </div>
+            <div class="large-4 columns">
+                <label for="startTime">Time</label>
+                <select name='request[start][time]' id="startTime">
+                    <!-- BEGIN request_start_time -->
+                    <option value='{REQUEST_START_TIME_VALUE}' {REQUEST_START_TIME_SELECTED}>{REQUEST_START_TIME_LABEL}</option>
+                    <!-- END request_start_time -->
+                </select>
+            </div>
+        </fieldset>
+    </div>
 
-    <fieldset class="large-6 columns">
-        <legend>Requested By</legend>
-        <div class="large-12 columns">
-            {AUTHOR_NAME}
-        </div>
-    </fieldset>
+    <div class="large-6 columns">
+        <fieldset>
+            <legend>Returning</legend>
+            <div class="large-8 columns">
+                <label for="finishDate">Date</label>
+                <input name="request[finish][date]" id="finishDate" type="text" required data-datepicker value="{REQUEST_FINISH_DATE}" />
+            </div>
+            <div class="large-4 columns">
+                <label for="finishTime">Time</label>
+                <select name='request[finish][time]' id="finishTime">
+                    <!-- BEGIN request_finish_time -->
+                    <option value='{REQUEST_FINISH_TIME_VALUE}' {REQUEST_FINISH_TIME_SELECTED}>{REQUEST_FINISH_TIME_LABEL}</option>
+                    <!-- END request_finish_time -->
+                </select>
+            </div>
+        </fieldset>
+    </div>
 
-    <fieldset class="large-6 columns">
-        <legend>Leaving</legend>
-        <div class="large-8 columns">
-            <label for="startDate">Date</label>
-            <input name="request[start][date]" id="startDate" type="text" required data-datepicker value="{REQUEST_START_DATE}" />
-        </div>
-        <div class="large-4 columns">
-            <label for="startTime">Time</label>
-            <select name='request[start][time]' id="startTime">
-                <!-- BEGIN request_start_time -->
-                <option value='{REQUEST_START_TIME_VALUE}' {REQUEST_START_TIME_SELECTED}>{REQUEST_START_TIME_LABEL}</option>
-                <!-- END request_start_time -->
-            </select>
-        </div>
-    </fieldset>
-
-    <fieldset class="large-6 columns">
-        <legend>Returning</legend>
-        <div class="large-8 columns">
-            <label for="finishDate">Date</label>
-            <input name="request[finish][date]" id="finishDate" type="text" required data-datepicker value="{REQUEST_FINISH_DATE}" />
-        </div>
-        <div class="large-4 columns">
-            <label for="finishTime">Time</label>
-            <select name='request[finish][time]' id="finishTime">
-                <!-- BEGIN request_finish_time -->
-                <option value='{REQUEST_FINISH_TIME_VALUE}' {REQUEST_FINISH_TIME_SELECTED}>{REQUEST_FINISH_TIME_LABEL}</option>
-                <!-- END request_finish_time -->
-            </select>
-        </div>
-    </fieldset>
-
-    <fieldset>
-        <legend>Host</legend>
-        <div class="large-6 columns">
-            <label for="requesthostType">Type</label>
-            <select name="request[hostType]" id="requesthostType" data-relation="host_type_selector">
-                <!-- BEGIN host_type -->
-                    <option value="{HOST_TYPE_VALUE}" {HOST_TYPE_SELECTED}>{HOST_TYPE_LABEL}</option>
-                <!-- END host_type -->
-            </select>
-        </div>
-        <div class="large-3 columns" data-relation="host_type_field">
-            <label for="requesthostName">
-                <span data-tooltip aria-haspopup="true" class="has-tip"
-                      title="The host will need to confirm your leave arrangements; you can forward them the email you receive.">
+    <div class="large-12 columns">
+        <fieldset>
+            <legend>Host</legend>
+            <div class="large-6 columns">
+                <label for="requesthostType">Type</label>
+                <select name="request[hostType]" id="requesthostType" data-relation="host_type_selector">
+                    <!-- BEGIN host_type -->
+                        <option value="{HOST_TYPE_VALUE}" {HOST_TYPE_SELECTED}>{HOST_TYPE_LABEL}</option>
+                    <!-- END host_type -->
+                </select>
+            </div>
+            <div class="large-3 columns" data-relation="host_type_field">
+                <label for="requesthostName">
                     Name
-                </span>
-            </label>
-            <input type="text" name="request[hostName]" value="{REQUEST_HOST_NAME}" id="requesthostName" required />
-        </div>
-        <div class="large-3 columns" data-relation="host_type_field">
-            <label for="requesthostPhone">Phone</label>
-            <input type="text" name="request[hostPhone]"value="{REQUEST_HOST_PHONE}" id="requesthostPhone" required />
-        </div>
-    </fieldset>
+                    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="The host will need to confirm your leave arrangements; you can forward them the email you receive.">?</span>
+                </label>
+                <input type="text" name="request[hostName]" value="{REQUEST_HOST_NAME}" id="requesthostName" required />
+            </div>
+            <div class="large-3 columns" data-relation="host_type_field">
+                <label for="requesthostPhone">Phone</label>
+                <input type="text" name="request[hostPhone]"value="{REQUEST_HOST_PHONE}" id="requesthostPhone" required />
+            </div>
+        </fieldset>
 
-    <fieldset>
-        <legend>Other Information</legend>
-        <div class="large-6 columns">
-            <label for="requestTravelType">Travel Method</label>
-            <select name="request[travelType]" id="requestTravelType">
-                <!-- BEGIN travel_drop -->
-                <option value="{TRAVEL_DROP_VALUE}" label="{TRAVEL_DROP_NAME}"  {TRAVEL_DROP_VALUE_SELECTED}>{TRAVEL_DROP_NAME}</option>
-                <!-- END travel_drop -->
-            </select>
-        </div>
-        <div class="large-6 columns">
-            <label for="requestTravelType">
-                <span data-tooltip aria-haspopup="true" class="has-tip"
-                      title="Only complete for special leave information or travel arrangements">
+        <fieldset>
+            <legend>Other Information</legend>
+            <div class="large-6 columns">
+                <label for="requestTravelType">Travel Method</label>
+                <select name="request[travelType]" id="requestTravelType">
+                    <!-- BEGIN travel_drop -->
+                    <option value="{TRAVEL_DROP_VALUE}" label="{TRAVEL_DROP_NAME}"  {TRAVEL_DROP_VALUE_SELECTED}>{TRAVEL_DROP_NAME}</option>
+                    <!-- END travel_drop -->
+                </select>
+            </div>
+            <div class="large-6 columns">
+                <label for="requestTravelType">
                     Description
-                </span>
-            </label>
-            <textarea id='description' name="request[description]" maxlength="100" data-warninglength="67">{REQUEST_DESCRIPTION}</textarea>
-        </div>
-        <div class="large-6 columns">
-            <label for="requestNotes">Notes</label>
-            <textarea id="requestNotes" name="request[notes]">{REQUEST_NOTES}</textarea>
-        </div>
-    </fieldset>
+                    <span data-tooltip aria-haspopup="true" class="hint has-tip tip-top" title="Only complete for special leave information or travel arrangements">?</span>
+                </label>
+                <textarea id='description' name="request[description]" maxlength="100" data-warninglength="67">{REQUEST_DESCRIPTION}</textarea>
+            </div>
+            <div class="large-6 columns">
+                <label for="requestNotes">Notes</label>
+                <textarea id="requestNotes" name="request[notes]">{REQUEST_NOTES}</textarea>
+            </div>
+        </fieldset>
 
-    <!-- BEGIN has_confirmed_by -->
-    <fieldset>
-        <legend>Confirmed by</legend>
+        <!-- BEGIN has_confirmed_by -->
+        <fieldset>
+            <legend>Confirmed by</legend>
 
-        <div class="large-12 columns">
-            <!-- BEGIN confirmed_by -->
-            <input type='radio' id="requestConfirmedBy{CONFIRMED_BY_VALUE}" name='request[confirmedBy]' value='{CONFIRMED_BY_VALUE}' {CONFIRMED_BY_SELECTED} />
-            <label for="requestConfirmedBy{CONFIRMED_BY_VALUE}" class="radio-label">{CONFIRMED_BY_LABEL}</label>
-            <!-- END confirmed_by -->
-        </div>
-    </fieldset>
-    <!-- END has_confirmed_by -->
+            <div class="large-12 columns">
+                <!-- BEGIN confirmed_by -->
+                <input type='radio' id="requestConfirmedBy{CONFIRMED_BY_VALUE}" name='request[confirmedBy]' value='{CONFIRMED_BY_VALUE}' {CONFIRMED_BY_SELECTED} />
+                <label for="requestConfirmedBy{CONFIRMED_BY_VALUE}" class="radio-label">{CONFIRMED_BY_LABEL}</label>
+                <!-- END confirmed_by -->
+            </div>
+        </fieldset>
+        <!-- END has_confirmed_by -->
+    </div>
 
     <input type="hidden" name="request[id]" value="{REQUEST_ID}">
     <button type="submit" name="modify" value="Modify">Modify</button>
