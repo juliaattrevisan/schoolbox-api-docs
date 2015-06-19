@@ -2,7 +2,7 @@
 
 <!-- BEGIN event_list_group -->
 <h2>{EVENT_LIST_GROUP_NAME}</h2>
-<table class="standardForm">
+<table>
 	<colgroup>
 		<col width="180" />
 		<col />
@@ -19,8 +19,8 @@
 			<th>Title</th>
 			<th>Teacher In Charge</th>
 			<th>Created</th>
-			<th align="center">Students</th>
-			<th align="center">RAMS Required</th>
+			<th>Students</th>
+			<th>RAMS Required</th>
 			<th>Status</th>
 			<th>View</th>
 		</tr>
@@ -32,8 +32,8 @@
 			<td>{EVENT_TITLE}</td>
 			<td><a href="/search/user/{EVENT_TEACHER_IN_CHARGE_ID}">{EVENT_TEACHER_IN_CHARGE_FULLNAME}</a></td>
 			<td>{EVENT_CREATED_AT}</td>
-			<td align="center">{EVENT_STUDENTS}</td>
-			<td align="center">{EVENT_RAMS_REQUIRED}</td>
+			<td>{EVENT_STUDENTS}</td>
+			<td>{EVENT_RAMS_REQUIRED}</td>
 			<td>{EVENT_STATUS_NAME}</td>
 			<td><a href="/modules/eotc/status/modify/{EVENT_ID}">View</a></td>
 		</tr>
