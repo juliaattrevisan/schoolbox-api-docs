@@ -10,7 +10,7 @@
 // Settings
 @import "settings";
 
-//#container.foundation {
+#container.foundation {
   #container{
     background: $white;
   }
@@ -34,6 +34,7 @@
   @import "layout/grid";
   @import "layout/header";
   @import "layout/sidebar";
+}
 
   // EOTC
   @import "components/eotc/eotc";
