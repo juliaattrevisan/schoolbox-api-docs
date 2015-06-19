@@ -32,15 +32,22 @@
                 <!-- END modify -->
             </span>
 
-            <a href="/search/user/{POST_USER_ID}" class="author">
-                <img src="/portrait.php?userId={POST_AUTHOR_EXTERNAL_ID}&size=square32"/>
-                {POST_AUTHOR}
-            </a>
-            <span class="meta"><br />
-                Posted {POST_TIME}<!-- BEGIN modified --><br />Edited {POST_MODIFIED} {POST_CENSORED}<!-- END modified -->
-            </span>
+            <div class="row">
+                <div class="avatar-card">
+                    <a href="/search/user/{POST_USER_ID}" title="View Profile">
+                        <img src="/portrait.php?userId={POST_AUTHOR_EXTERNAL_ID}&size=square64"/>
+                        <p>{POST_AUTHOR}</p>
+                    </a>
+                    <p class="meta">Posted {POST_TIME}</p>
+                    <!-- BEGIN modified -->
+                    <p class="meta">
+                        Edited {POST_MODIFIED} {POST_CENSORED}
+                    </p>
+                    <!-- END modified -->
+                </div>
+            </div>
 
-            <div class="wysiwyg">
+            <div class="row">
                 {POST_BODY}
             </div>
         </li>
