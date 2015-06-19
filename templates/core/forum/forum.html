@@ -19,6 +19,7 @@
                 <th></th>
                 <!-- END modify_heading -->
                 <th>Forum</th>
+                <th>Author</th>
                 <th>Replies</th>
                 <th>Views</th>
                 <th colspan="2">Last Post</th>
@@ -34,17 +35,17 @@
             </td>
             <!-- END modify_thread -->
             <td>
-                <a href="/search/user/{THREAD_AUTHOR_ID}">
-                    <img src="/portrait.php?userId={THREAD_AUTHOR_EXTERNAL_ID}&size=square32"/>
-                </a>
-
-                <a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE} {THREAD_LOCKED}</a>
-
-                <span class="meta">Posted {THREAD_TIME} by
-                    <a href="/search/user/{THREAD_AUTHOR_ID}" class="author">{THREAD_AUTHOR}</a>
-                </span>
+                <h2><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE} {THREAD_LOCKED}</a></h2>
             </td>
-
+            <td>
+                <div class="avatar-card">
+                    <a href="/search/user/{THREAD_AUTHOR_ID}" title="View Profile">
+                        <img src="/portrait.php?userId={THREAD_AUTHOR_EXTERNAL_ID}&size=square32"/>
+                        <p>{THREAD_AUTHOR}</p>
+                    </a>
+                    <p class="meta">Posted {THREAD_TIME}</p>
+                </div>
+            </td>
             <td>{THREAD_REPLIES}</td>
             <td>{THREAD_VIEWS}</td>
             <td>
