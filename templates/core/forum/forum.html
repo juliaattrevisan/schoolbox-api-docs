@@ -50,13 +50,13 @@
             <td>{THREAD_VIEWS}</td>
             <td>
                 <!-- BEGIN last_post -->
-                <a href="/search/user/{THREAD_LAST_POST_USER_ID}">
-                    <img src="/portrait.php?userId={THREAD_LAST_POST_USER_EXTERNAL_ID}&size=square32"/>
-                    <a href="/search/user/{THREAD_LAST_POST_USER_ID}">{THREAD_LAST_POST_USER}</a>
-                </a><br/>
-                <span class="meta">
-                    {THREAD_LAST_POST_TIME}
-                </span>
+                <div class="avatar-card">
+                    <a href="/search/user/{THREAD_LAST_POST_USER_ID}" title="View Profile">
+                        <img src="/portrait.php?userId={THREAD_LAST_POST_USER_EXTERNAL_ID}&size=square32"/>
+                        <p>{THREAD_LAST_POST_USER}</p>
+                    </a>
+                    <p class="meta">Posted {THREAD_LAST_POST_TIME}</p>
+                </div>
                 <!-- END last_post -->
             </td>
             <td><a href="/forum/thread/{THREAD_ID}/{THREAD_LAST_PAGE}/#bottom">View</a></td>
