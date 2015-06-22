@@ -97,13 +97,13 @@ $(function() {
 </ul>
 <div class="admin-contents clearfix">
 	<h2>Calendar</h2>
-	<div class="settings-nav-holder">
-		<ul class="admin-nav vertical">
-			<!-- BEGIN setting_tab -->
-			<li><a href="/adminv2/calendar/{SETTING_TAB_URL}" class="{SETTING_TAB_CURRENT}">{SETTING_TAB_NAME}<span></span></a></li>
-			<!-- END setting_tab -->
-		</ul>
-	</div>
+    <dl class="sub-nav">
+        <!-- BEGIN setting_tab -->
+        <dd class="{SETTING_TAB_CURRENT}">
+            <a href="/adminv2/calendar/{SETTING_TAB_URL}">{SETTING_TAB_NAME}</a>
+        </dd>
+        <!-- END setting_tab -->
+    </dl>
     <!-- BEGIN import -->
     <div class="settings">
 		<div class="level clearfix">
