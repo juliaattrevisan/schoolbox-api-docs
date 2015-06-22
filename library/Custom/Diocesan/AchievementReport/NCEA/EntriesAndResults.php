@@ -156,6 +156,14 @@ class EntriesAndResults extends Base {
             }
         }
 
+        /* Accumulate "Available" values
+         */
+        foreach ($finalStack as $level => $data) {
+            foreach ($data['summary']['type'] as $type => $values) {
+                $finalStack[$level]['summary']['type'][$type]['availableCredits'] = $values['enteredCredits'] - array_sum($values['letters']);
+            }
+        }
+
         ksort($finalStack);
 
         return $finalStack;
