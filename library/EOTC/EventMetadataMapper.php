@@ -11,6 +11,12 @@
 namespace EOTC;
 
 
+use Schoolbox\Collection;
+use Schoolbox\Resource\Storage;
+use Schoolbox\ResourceBooking\Booking;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+
 class EventMetadataMapper extends \Schoolbox\Mapper {
 
 	/**
@@ -73,8 +79,8 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	 *
 	 * @param Event $event
 	 * @throws \Exception
-	 * @return \Schoolbox\Collection
-	 */
+	 * @return EventMetadata
+     */
 	public function findByEvent(Event $event) {
 		$query = "
 			SELECT metadata_id
@@ -114,7 +120,6 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	 * Only save relations if one doesn't already exist
 	 *
 	 * @param Event $event
-	 * @return array|void
 	 */
 	public function saveRelation(Event $event) {
 		$query = "
@@ -131,19 +136,21 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	/**
 	 * Assign files to an event
 	 *
-	 * @param $metadata
+	 * @param EventMetadata $metadata
 	 */
 	public function createFiles($metadata) {
-		$query = "
+        $statement = $this->database->prepare("
 			INSERT IGNORE INTO `eotc_metadata_file` (metadata_id, storage_id)
-			VALUES (:metadataId, :storageId)
-		";
+            SELECT :metadataId, `storage_id`
+            FROM `storage`
+            WHERE `hash` = :storageHash
+		");
 
 		foreach ($metadata->getRamsFiles() as $currentFile) {
-			$statement = $this->database->prepare($query);
-			$statement->bindParam(":metadataId", $metadata->getId());
-			$statement->bindParam(":storageId", $currentFile->getId());
-			$statement->execute();
+            $statement->execute([
+                'metadataId'  => $metadata->getId(),
+                'storageHash' => $currentFile->getHash()
+            ]);
 		}
 	}
 
@@ -151,8 +158,8 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	/**
 	 * Find files for a particular event
 	 *
-	 * @param $identifier
-	 * @return \Schoolbox\Collection
+	 * @param int $identifier
+	 * @return Collection|Storage\Model[]
 	 */
 	public function findFiles($identifier) {
 		$manyManyRelation = new ManyManyRelation();
@@ -183,8 +190,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	 * Deletes file relations if there are no remaining
 	 * events in the series
 	 *
-	 * @param $metadata
-	 * @return bool|void
+	 * @param EventMetadata $metadata
 	 */
 	public function deleteFilesRelations($metadata) {
 		$query = "
@@ -200,7 +206,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	/**
 	 * Assign staff to an event
 	 *
-	 * @param $metadata
+	 * @param EventMetadata $metadata
 	 */
 	public function createStaffAttendees($metadata) {
 		$query = "
@@ -219,8 +225,8 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	/**
 	 * Find staff for a particular event
 	 *
-	 * @param $identifier
-	 * @return \Schoolbox\Collection
+	 * @param int $identifier
+	 * @return Collection|User[]
 	 */
 	public function findStaffAttendees($identifier) {
 		$manyManyRelation = new ManyManyRelation();
@@ -239,7 +245,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 				'relation' => array(
 					'column' => 'user_id',
 					'key' => 'id',
-					'mapper' => new \Schoolbox\UserMapper()
+					'mapper' => new UserMapper()
 				),
 			)
 		);
@@ -251,8 +257,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	 * Deletes staff attendee relations if there are no remaining
 	 * events in the series
 	 *
-	 * @param $metadata
-	 * @return bool|void
+	 * @param EventMetadata $metadata
 	 */
 	public function deleteStaffAttendeesRelations($metadata) {
 		$query = "
@@ -268,7 +273,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	/**
 	 * Assign students to an event
 	 *
-	 * @param $metadata
+	 * @param EventMetadata $metadata
 	 */
 	public function createStudentAttendees($metadata) {
 		$query = "
@@ -287,8 +292,8 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	/**
 	 * Add specific relations for a particular event
 	 *
-	 * @param $metadata
-	 * @param $ids
+	 * @param EventMetadata $metadata
+	 * @param array $ids
 	 */
 	public function addStudentAttendeesRelationsSpecific($metadata, $ids) {
 		if (is_array($ids) && count($ids)) {
@@ -311,8 +316,8 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	/**
 	 * Find students for a particular event
 	 *
-	 * @param $identifier
-	 * @return \Schoolbox\Collection
+	 * @param int $identifier
+	 * @return Collection|User[]
 	 */
 	public function findStudentAttendees($identifier) {
 		$manyManyRelation = new ManyManyRelation();
@@ -331,7 +336,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 				'relation' => array(
 					'column' => 'user_id',
 					'key' => 'id',
-					'mapper' => new \Schoolbox\UserMapper(),
+					'mapper' => new UserMapper(),
 					'options' => array(
 						'order' => array(
 							'lastname' => 'ASC'
@@ -348,8 +353,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	 * Deletes student attendee relations if there are no remaining
 	 * events in the series
 	 *
-	 * @param $metadata
-	 * @return bool|void
+	 * @param EventMetadata $metadata
 	 */
 	public function deleteStudentAttendeesRelations($metadata) {
 		$query = "
@@ -365,8 +369,8 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	/**
 	 * Delete specific relations for a particular event
 	 *
-	 * @param $metadata
-	 * @param $ids
+	 * @param EventMetadata $metadata
+	 * @param array $ids
 	 */
 	public function deleteStudentAttendeesRelationsSpecific($metadata, $ids) {
 		if (is_array($ids) && count($ids)) {
@@ -395,7 +399,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	/**
 	 * Assign resource bookings to an event
 	 *
-	 * @param $metadata
+	 * @param EventMetadata $metadata
 	 */
 	public function createResourceBookings($metadata) {
 		$query = "
@@ -414,8 +418,8 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	/**
 	 * Find resource bookings for a particular event
 	 *
-	 * @param $identifier
-	 * @return \Schoolbox\Collection
+	 * @param int $identifier
+	 * @return Collection|\Schoolbox\ResourceBooking\Booking\Model[]
 	 */
 	public function findResourceBookings($identifier) {
 		$manyManyRelation = new ManyManyRelation();
@@ -446,8 +450,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	 * Deletes resource booking relations if there are no remaining
 	 * events in the series
 	 *
-	 * @param $metadata
-	 * @return bool|void
+	 * @param EventMetadata $metadata
 	 */
 	public function deleteResourceBookingsRelations($metadata) {
 		$query = "
@@ -464,8 +467,8 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	 * Find all the events belonging to this metadata
 	 * There should be only one
 	 *
-	 * @param $metadata
-	 * @return mixed
+	 * @param EventMetadata $metadata
+	 * @return Collection|Event[]
 	 */
 	public function findEventsForMetadata($metadata) {
 		$manyManyRelation = new ManyManyRelation();
