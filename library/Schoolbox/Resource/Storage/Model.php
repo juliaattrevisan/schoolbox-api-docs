@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -8,7 +8,6 @@
  */
 
 namespace Schoolbox\Resource\Storage;
-
 
 use Alaress_Date_Format;
 use League\Flysystem\File;
@@ -88,6 +87,18 @@ class Model extends File implements IStorage
     public function getBasename()
     {
         return $this->getFilename() . '.' . $this->getExtension();
+    }
+
+    /**
+     * @param string $basename
+     * @return $this
+     */
+    public function setBasename($basename)
+    {
+        return $this
+            ->setFilename(pathinfo($basename, PATHINFO_FILENAME))
+            ->setExtension(pathinfo($basename, PATHINFO_EXTENSION))
+        ;
     }
 
     /**
@@ -268,5 +279,4 @@ class Model extends File implements IStorage
         $this->extension = $extension;
         return $this;
     }
-
 }

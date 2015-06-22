@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -8,7 +8,6 @@
  */
 
 namespace Schoolbox\Resource\Browser\Office365;
-
 
 use Alaress\Authorizer\Failure\AuthenticationTimedOut;
 use Alaress\Authorizer\Failure\Unauthorized;
@@ -143,13 +142,11 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
             throw new InvalidArgumentException('Not a file');
         }
 
-        $filename  = pathinfo($item['name'], PATHINFO_FILENAME);
-        $extension = pathinfo($item['name'], PATHINFO_EXTENSION);
+        $filename = pathinfo($item['name'], PATHINFO_FILENAME);
 
         $file = Resource\File\Mapper::getInstance()->createModel();
         $file->setId($item['id']);
-        $file->setFilename($filename);
-        $file->getStorage()->setExtension($extension);
+        $file->setBasename($item['name']);
         $file->setTitle($filename);
         $file->setSize($item['size']);
 
@@ -284,5 +281,4 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
 
         return $destination;
     }
-
 }

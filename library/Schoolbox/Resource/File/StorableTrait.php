@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -8,8 +8,6 @@
  */
 
 namespace Schoolbox\Resource\File;
-
-
 
 use Schoolbox\Resource\Storage\IStorage;
 
@@ -51,9 +49,20 @@ trait StorableTrait
      */
     public function getBasename()
     {
-        return $this->getFilename() . '.' . $this->getStorage()->getExtension();
+        return $this->getFilename() . '.' . $this->getExtension();
     }
 
+    /**
+     * @param string $basename
+     * @return $this
+     */
+    public function setBasename($basename)
+    {
+        return $this
+            ->setFilename(pathinfo($basename, PATHINFO_FILENAME))
+            ->setExtension(pathinfo($basename, PATHINFO_EXTENSION))
+        ;
+    }
 
     /**
      * @return string
@@ -63,6 +72,15 @@ trait StorableTrait
         return $this->getStorage()->getExtension();
     }
 
+    /**
+     * @param string $extension
+     * @return $this
+     */
+    public function setExtension($extension)
+    {
+        $this->getStorage()->setExtension($extension);
+        return $this;
+    }
 
     /**
      * @return string
@@ -134,5 +152,4 @@ trait StorableTrait
     {
         return $this->storage->readStream();
     }
-
 }
