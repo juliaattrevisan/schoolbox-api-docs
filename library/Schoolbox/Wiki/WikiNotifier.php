@@ -116,7 +116,11 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
 
 		foreach($wikis as $wiki) {
             $first = $this->revisionMapper->findOneByColumn('wikiID', $wiki->getId(), [ 'created' => 'asc' ]);
-            $user  = $this->userMapper->findById($first->getUser()->getId());
+            try {
+                $user = $this->userMapper->findById($first->getUser()->getId());
+            } catch (Mapper\Exception $e) {
+                $user = $this->userMapper->createModel();
+            }
 			$c->merge(
 				new Collection($this->notifyCreated($roletype, $wiki, $user)->getAll($wiki->getCreated()->getUnixTimestamp()))
 			);
