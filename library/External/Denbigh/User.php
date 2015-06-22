@@ -208,7 +208,8 @@ class External_Denbigh_User implements External_UserInterface {
             'StudentMedicalAlert' => '',
             'StudentSpecialNeedsFlag' => 0,
             'AlertMessage' => '',
-            'StudentBoarder' => ''
+            'StudentBoarder' => '',
+            'StudentStudiesCode' => '',
         );
 
         if (!empty($student)) {

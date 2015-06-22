@@ -101,6 +101,7 @@ class External_Schoolbox_User implements External_UserInterface
                             '' AS StudentEmergencyPhoneAlt,
                             '' AS StudentMedicalAlert,
                             '' AS StudentSpecialNeedsFlag,
+                            '' AS StudentStudiesCode,
                             '' AS AlertMessage,
                             '' AS StudentBoarder
                         FROM `user`

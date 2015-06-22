@@ -299,6 +299,7 @@ class External_Synergetic_User implements External_UserInterface
                     vStudents.StudentEmergency3PhoneAlt,
                     vStudents.StudentMedicalAlert,
                     vStudents.StudentSpecialNeedsFlag,
+                    vStudents.StudentStudiesCode,
                     AlertMessage,
                     vStudents.StudentBoarder
                 FROM SynergyOne.dbo.vStudents vStudents

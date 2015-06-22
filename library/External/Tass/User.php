@@ -89,6 +89,7 @@ class External_Tass_User implements External_UserInterface
 				'' AS StudentEmergency3PhoneAlt,
 				'' AS StudentMedicalAlert,
 				'' AS StudentSpecialNeedsFlag,
+				'' AS StudentStudiesCode,
 				'' AS AlertMessage,
 				boarder AS StudentBoarder
 			FROM student AS s

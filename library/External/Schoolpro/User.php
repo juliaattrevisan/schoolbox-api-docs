@@ -142,6 +142,7 @@ class External_Schoolpro_User implements External_UserInterface {
 				'StudentFormStaffName' => $currentStudent['FormStaffName'],
 				'StudentEmergencyName' => $currentStudent['EmergencyContactName'],
 				'StudentEmergencyPhone' => $currentStudent['EmergencyContactPhone'],
+                'StudentStudiesCode' => '',
 			);
 
 			return $student;

@@ -47,6 +47,7 @@ interface External_UserInterface {
      * StudentEmergency3PhoneAlt,
      * StudentMedicalAlert,
      * StudentSpecialNeedsFlag,
+     * StudentStudiesCode,
      * AlertMessage,
      *
      * @param $externalUserId
