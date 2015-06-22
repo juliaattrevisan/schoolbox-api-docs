@@ -437,6 +437,7 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
 			AND a.finish BETWEEN :from_date AND :to_date
 			AND a.deleted_at IS NULL
 			AND a.task_id IS NULL
+			AND a.availability = 'assess'
 			ORDER BY a.finish ASC
 		";
 
