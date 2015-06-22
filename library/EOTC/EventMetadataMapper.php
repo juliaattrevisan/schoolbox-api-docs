@@ -139,16 +139,18 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 	 * @param EventMetadata $metadata
 	 */
 	public function createFiles($metadata) {
-		$query = "
+        $statement = $this->database->prepare("
 			INSERT IGNORE INTO `eotc_metadata_file` (metadata_id, storage_id)
-			VALUES (:metadataId, :storageId)
-		";
+            SELECT :metadataId, `storage_id`
+            FROM `storage`
+            WHERE `hash` = :storageHash
+		");
 
 		foreach ($metadata->getRamsFiles() as $currentFile) {
-			$statement = $this->database->prepare($query);
-			$statement->bindParam(":metadataId", $metadata->getId());
-			$statement->bindParam(":storageId", $currentFile->getId());
-			$statement->execute();
+            $statement->execute([
+                'metadataId'  => $metadata->getId(),
+                'storageHash' => $currentFile->getHash()
+            ]);
 		}
 	}
 
