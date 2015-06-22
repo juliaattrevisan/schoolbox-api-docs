@@ -1,93 +1,85 @@
-<style type="text/css">@page{size:portrait}</style>
-<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
-<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
-<script type="text/javascript">
-$(function(){
-    $('.private h2').qtip({
-        content: 'Details have not been made available',
-        style: {
-            classes: 'qtip-green qtip-shadow qtip-rounded',
-            tip: {corner: false}
-        },
-        position: {
-            my: 'bottom left',
-            at: 'top left'
-        }
-    });
+<span class="header-actions">
+    <a data-action='print' class="button icon-print" href="#">Print</a>
+</span>
 
-	$('.print').click(function() {
-		window.print();
-		return false;
-	});
-});
-</script>
+<h1>Boarders List</h1>
 
+<!-- BEGIN student -->
+<div class="row">
+    <h2>
+        <!-- BEGIN private -->
+        {STUDENT_FIRSTNAME} {STUDENT_SURNAME} {STUDENT_HOUSE} - Year {STUDENT_YEAR}
+        <span data-tooltip="demo" class="hint has-tip tip-top" data-width="200" title="Details have not been made available">?</span>
+        <!-- END private -->
+        <!-- BEGIN public -->
+        {STUDENT_FIRSTNAME} {STUDENT_SURNAME} {STUDENT_HOUSE} - Year {STUDENT_YEAR}
+        <!-- END public -->
+    </h2>
 
-<div class="directory parents">
-	<h1>Boarders List</h1>
-	<span class="header_option"><a class="btn print" href="#"><span></span>Print</a></span>
-	<!-- BEGIN student -->
-	<div class="contact clearfix {PRIVATE}">
-		<h2>{STUDENT_FIRSTNAME} {STUDENT_SURNAME} {STUDENT_HOUSE} - Year {STUDENT_YEAR}</h2>
-    	<!-- BEGIN contact -->
-		<!-- BEGIN primary -->
-		<div class="primary">
-			<table padding="0" border="0" width="100%" class="table">
-				<tbody>
-				<tr>
-					<td valign="top"><b>Name</b></td>
-					<td> {CONTACT_TITLE} {CONTACT_FIRSTNAME} {CONTACT_SURNAME}</td>
-				</tr>
-				<tr class="dark">
-					<td valign="top"><b>Home Phone</b></td>
-					<td>{CONTACT_PHONE}</td>
-				</tr>
-				<tr>
-					<td valign="top"><b>Mobile</b></td>
-					<td>{CONTACT_MOBILE}</td>
-				</tr>
-				<tr class="dark">
-					<td valign="top"><b>Email</b></td>
-					<td><a href="mailto:{CONTACT_EMAIL}"> {CONTACT_EMAIL}</a></td>
-				</tr>
-				<tr>
-					<td valign="top"><b>Address</b></td>
-					<td>{CONTACT_POSTAL_STREET} {CONTACT_POSTAL_SUBURB} {CONTACT_POSTAL_STATE} {CONTACT_POSTAL_POSTCODE} {CONTACT_POSTAL_COUNTRY}</td>
-				</tr>
-				</tbody>
-			</table>
-		</div>
-		<!-- END primary -->
-		<!-- BEGIN spouse -->
-		<div class="spouse">
-			<table padding="0" border="0" width="100%" class="table">
-				<tbody>
-				<tr>
-					<td><b>Name</b></td>
-					<td> {SPOUSE_TITLE} {SPOUSE_FIRSTNAME} {SPOUSE_SURNAME}</td>
-				</tr>
-				<tr class="dark">
-					<td valign="top"><b>Home Phone</b></td>
-					<td>{CONTACT_PHONE}</td>
-				</tr>
-				<tr>
-					<td><b>Mobile</b></td>
-					<td>{SPOUSE_CONTACT_MOBILE}</td>
-				</tr>
-				<tr class="dark">
-					<td><b>Email</b></td>
-					<td><a href="mailto:{SPOUSE_CONTACT_EMAIL}">{SPOUSE_CONTACT_EMAIL}</a></td>
-				</tr>
-				<TR>
-					<TD><B>Address</b></td>
-					<td>{CONTACT_POSTAL_STREET} {CONTACT_POSTAL_SUBURB} {CONTACT_POSTAL_STATE} {CONTACT_POSTAL_POSTCODE} {CONTACT_POSTAL_COUNTRY}</td>
-				</tr>
-				</tbody>
-			</table>
-		</div>
-		<!-- END spouse -->
-   		<!-- END contact -->
-	</div>
-<!-- END student -->
+    <!-- BEGIN contact -->
+    <!-- BEGIN primary -->
+    <div class="large-6 columns">
+        <table>
+            <tbody>
+                <tr>
+                    <td>Name</td>
+                    <td>{CONTACT_TITLE} {CONTACT_FIRSTNAME} {CONTACT_SURNAME}</td>
+                </tr>
+                <tr>
+                    <td>Home Phone</td>
+                    <td>{CONTACT_PHONE}</td>
+                </tr>
+                <tr>
+                    <td>Mobile</td>
+                    <td>{CONTACT_MOBILE}</td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td><a href="mailto:{CONTACT_EMAIL}">{CONTACT_EMAIL}</a></td>
+                </tr>
+                <tr>
+                    <td>Address</td>
+                    <td>{CONTACT_POSTAL_STREET} {CONTACT_POSTAL_SUBURB} {CONTACT_POSTAL_STATE} {CONTACT_POSTAL_POSTCODE} {CONTACT_POSTAL_COUNTRY}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- END primary -->
+    <!-- BEGIN spouse -->
+    <div class="large-6 columns">
+        <table>
+            <tbody>
+            <tr>
+                <td>Name</td>
+                <td>{SPOUSE_TITLE} {SPOUSE_FIRSTNAME} {SPOUSE_SURNAME}</td>
+            </tr>
+            <tr>
+                <td>Home Phone</td>
+                <td>{CONTACT_PHONE}</td>
+            </tr>
+            <tr>
+                <td>Mobile</td>
+                <td>{SPOUSE_CONTACT_MOBILE}</td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td><a href="mailto:{SPOUSE_CONTACT_EMAIL}"> {SPOUSE_CONTACT_EMAIL}</a></td>
+            </tr>
+            <tr>
+                <td>Address</td>
+                <td>{CONTACT_POSTAL_STREET} {CONTACT_POSTAL_SUBURB} {CONTACT_POSTAL_STATE} {CONTACT_POSTAL_POSTCODE} {CONTACT_POSTAL_COUNTRY}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- END spouse -->
+    <!-- END contact -->
 </div>
+<!-- END student -->
 
+<script type="text/javascript" src="/javascript/shared/jquery.artificial-print.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('[data-action="print"]').artificialPrint();
+    });
+</script>

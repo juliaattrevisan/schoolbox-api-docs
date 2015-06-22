@@ -1,192 +1,188 @@
-<style type="text/css">@page{size:portrait}</style>
-<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
-<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
-<script type="text/javascript">
-$(function(){
-    $('.private h2').qtip({
-        content: 'Details have not been made available',
-        style: {
-            classes: 'qtip-green qtip-shadow qtip-rounded',
-            tip: {corner: false}
-        },
-        position: {
-            my: 'bottom left',
-            at: 'top left'
-        }
-    });
+<span class="header-actions">
+    <a class="button icon-more" href="#" data-dropdown="header-options">Options</a>
+</span>
+<ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options">
+    <!-- BEGIN email_all_parents_link -->
+    <li>
+        <a data-action='email-all-parents' class="icon-email" href="#">Email All Parents</a>
+    </li>
+    <!-- END email_all_parents_link -->
+    <li>
+        <a data-action='search' class="icon-search" href="#">Search</a>
+    </li>
+    <li>
+        <a data-action='print' class="icon-print" href="#">Print</a>
+    </li>
+</ul>
 
-	$('.print').click(function() {
-		window.print();
-		return false;
-	});
+<h1>Parent Directory {HEADING}</h1>
 
-	/* Make search filter options panel appear either by
-	 * clicking the button or by default, if any search
-	 * parameters were used
-	 */
-	$('.search').click(function() {
-		$('#searchFilterOptions').toggle();
-	});
+<div data-searchfilteroptions class="noprint">
+    <h2>Search Filter Options</h2>
 
-	/* Default visibility of search panel
-	 */
-    <!-- BEGIN show_filter_options -->
-	$('#searchFilterOptions').show();
-    <!-- END show_filter_options -->
-});
-</script>
+    <form method='get' action='?'>
+        <div class="row">
+            <div class="large-6 columns">
+                <label>
+                    Name
+                    <input type='text' name='searchName' value="{SEARCH_NAME}"/>
+                </label>
+            </div>
+            <div class="large-2 columns">
+                <label>
+                    Boarder
+                    <select name='searchBoardingStatus'>
+                        <option value='' {SEARCH_BOARDINGSTATUS_NONE} /></option>
+                        <option value='yes' {SEARCH_BOARDINGSTATUS_YES} />Yes</option>
+                        <option value='no' {SEARCH_BOARDINGSTATUS_NO} />No</option>
+                    </select>
+                </label>
+            </div>
+            <div class="large-2 columns">
+                <label>
+                    Form
+                    <select name="searchForm">
+                        <!-- BEGIN search_form_option -->
+                        <option value='{SEARCHFORM_VALUE}' {SEARCHFORM_SELECTED}>{SEARCHFORM_DESCRIPTION}</option>
+                        <!-- END search_form_option -->
+                    </select>
+                </label>
+            </div>
+            <div class="large-2 columns">
+                <label>
+                    Year
+                    <!-- BEGIN has_year_selector -->
+                    <select name='searchYear'>
+                        <!-- BEGIN year_selector_option -->
+                        <option value="{YEAR_SELECTOR_VALUE}" {YEAR_SELECTOR_SELECTED}>{YEAR_SELECTOR_DESCRIPTION}</option>
+                        <!-- END year_selector_option -->
+                    </select>
+                    <!-- END has_year_selector -->
 
-<div class="directory parents">
-	<h1>Parent Directory {HEADING}</h1>
-	<span class="header_option">
-        <!-- BEGIN email_all_parents -->
-        <form action="/mail/createMail.php" method="post" style="float:right;">
-            <input type="hidden" name="replyto" value="&quot;{HEADING} Parents&quot; &lt;{REPLY_TO}&gt;"/>
-            <input type="hidden" name="bcc" value="{EMAIL_ALL_PARENTS}"/>
-            <a href="#" class="btn submit-this email"><span></span>Email All</a>
-        </form>
-        <!-- END email_all_parents -->
-		<a class="btn print" href="#"><span></span>Print</a>
-		<a class="btn search" href="#"><span></span>Search</a>
-	</span>
-
-	<div id='searchFilterOptions' class="noprint" style='display:none;'>
-		<form method='get' action='?' />
-			<h2>Search Filter Options</h2>
-			<table class="standardForm table">
-				<colgroup>
-					<col width="250"/>
-				</colgroup>
-				<tr>
-					<td>
-						<h4>Name</h4>
-					</td>
-					<td>
-						<input type='text' name='searchName' value="{SEARCH_NAME}"/>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<h4>Boarder</h4>
-					</td>
-					<td>
-						<select name='searchBoardingStatus'>
-							<option value='' {SEARCH_BOARDINGSTATUS_NONE} /></option>
-							<option value='yes' {SEARCH_BOARDINGSTATUS_YES} />Yes</option>
-							<option value='no' {SEARCH_BOARDINGSTATUS_NO} />No</option>
-						</select>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<h4>Form</h4>
-					</td>
-					<td>
-						<select name="searchForm">
-							<!-- BEGIN search_form_option -->
-							<option value='{SEARCHFORM_VALUE}' {SEARCHFORM_SELECTED}>{SEARCHFORM_DESCRIPTION}</option>
-							<!-- END search_form_option -->
-						</select>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<h4>Year</h4>
-					</td>
-					<td>
-						<!-- BEGIN has_year_selector -->
-						<select name='searchYear'>
-							<!-- BEGIN year_selector_option -->
-							<option value="{YEAR_SELECTOR_VALUE}" {YEAR_SELECTOR_SELECTED}>{YEAR_SELECTOR_DESCRIPTION}</option>
-							<!-- END year_selector_option -->
-						</select>
-						<!-- END has_year_selector -->
-
-						<!-- BEGIN has_year_input -->
-						<input type='text' name='searchYear' value="{SEARCH_YEAR}"/>
-						<!-- END has_year_input -->
-					</td>
-				</tr>
-                <tr>
-                    <td></td>
-                    <td><label>
-                        <input class='submit-btn-plain' type='submit' value='Search' />
-                    </label>
-                    </td>
-                </tr>
-			</table>
-		</form>
-	</div>
-	<!-- BEGIN student -->
-	<div class="contact clearfix {PRIVATE}">
-		<h2>{STUDENT_FIRSTNAME} {STUDENT_SURNAME} {STUDENT_HOUSE} {STUDENT_BOARDER}</h2>
-    	<!-- BEGIN contact -->
-		<!-- BEGIN primary -->
-		<div class="primary">
-			<table padding="0" border="0" width="100%" class="table">
-                <colgroup>
-                    <col class="fields" />
-                    <col class="values" />
-                </colgroup>
-				<tbody>
-					<tr>
-						<td valign="top"><b>Name</b></td>
-						<td> {CONTACT_TITLE} {CONTACT_FIRSTNAME} {CONTACT_SURNAME}</td>
-					</tr>
-					<tr class="dark">
-						<td valign="top"><b>Home Phone</b></td>
-						<td>{CONTACT_PHONE}</td>
-					</tr>
-					<tr>
-						<td valign="top"><b>Mobile</b></td>
-						<td>{CONTACT_MOBILE}</td>
-					</tr>
-					<tr class="dark">
-						<td valign="top"><b>Email</b></td>
-						<td><a href="mailto:{CONTACT_EMAIL}"> {CONTACT_EMAIL}</a></td>
-					</tr>
-					<tr>
-						<td valign="top"><b>Address</b></td>
-						<td>{CONTACT_HOME_STREET} {CONTACT_HOME_SUBURB} {CONTACT_HOME_STATE} {CONTACT_HOME_POSTCODE} {CONTACT_HOME_COUNTRY}</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-		<!-- END primary -->
-		<!-- BEGIN spouse -->
-		<div class="spouse">
-			<table padding="0" border="0" width="100%" class="table">
-                <colgroup>
-                    <col class="fields" />
-                    <col class="values" />
-                </colgroup>
-				<tbody>
-					<tr>
-						<td><b>Name</b></td>
-						<td> {SPOUSE_TITLE} {SPOUSE_FIRSTNAME} {SPOUSE_SURNAME}</td>
-					</tr>
-					<tr class="dark">
-						<td valign="top"><b>Home Phone</b></td>
-						<td>{CONTACT_PHONE}</td>
-					</tr>
-					<tr>
-						<td><b>Mobile</b></td>
-						<td>{SPOUSE_CONTACT_MOBILE}</td>
-					</tr>
-					<tr class="dark">
-						<td><b>Email</b></td>
-						<td><a href="mailto:{SPOUSE_CONTACT_EMAIL}">{SPOUSE_CONTACT_EMAIL}</a></td>
-					</tr>
-					<tr>
-						<td valign="top"><b>Address</b></td>
-						<td>{CONTACT_HOME_STREET} {CONTACT_HOME_SUBURB} {CONTACT_HOME_STATE} {CONTACT_HOME_POSTCODE} {CONTACT_HOME_COUNTRY}</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-		<!-- END spouse -->
-   		<!-- END contact -->
-	</div>
-<!-- END student -->
+                    <!-- BEGIN has_year_input -->
+                    <input type='text' name='searchYear' value="{SEARCH_YEAR}"/>
+                    <!-- END has_year_input -->
+                </label>
+            </div>
+            <div class="large-12 columns">
+                <label>
+                    <input type='submit' value='Search' />
+                </label>
+            </div>
+        </div>
+    </form>
 </div>
 
+<!-- BEGIN student -->
+<div>
+    <h2>
+        <!-- BEGIN private -->
+        {STUDENT_FIRSTNAME} {STUDENT_SURNAME} {STUDENT_HOUSE} {STUDENT_BOARDER}
+        <span data-tooltip="demo" class="hint has-tip tip-top" data-width="200" title="Details have not been made available">?</span>
+        <!-- END private -->
+        <!-- BEGIN public -->
+        {STUDENT_FIRSTNAME} {STUDENT_SURNAME} {STUDENT_HOUSE} {STUDENT_BOARDER}
+        <!-- END public -->
+    </h2>
+
+    <!-- BEGIN contact -->
+    <div class="row">
+        <!-- BEGIN primary -->
+        <div class="large-6 columns">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Name</td>
+                        <td>{CONTACT_TITLE} {CONTACT_FIRSTNAME} {CONTACT_SURNAME}</td>
+                    </tr>
+                    <tr>
+                        <td>Home Phone</td>
+                        <td>{CONTACT_PHONE}</td>
+                    </tr>
+                    <tr>
+                        <td>Mobile</td>
+                        <td>{CONTACT_MOBILE}</td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td><a href="mailto:{CONTACT_EMAIL}">{CONTACT_EMAIL}</a></td>
+                    </tr>
+                    <tr>
+                        <td>Address</td>
+                        <td>{CONTACT_HOME_STREET} {CONTACT_HOME_SUBURB} {CONTACT_HOME_STATE} {CONTACT_HOME_POSTCODE} {CONTACT_HOME_COUNTRY}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- END primary -->
+        <!-- BEGIN spouse -->
+        <div class="large-6 columns">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Name</td>
+                        <td>{SPOUSE_TITLE} {SPOUSE_FIRSTNAME} {SPOUSE_SURNAME}</td>
+                    </tr>
+                    <tr>
+                        <td>Home Phone</td>
+                        <td>{CONTACT_PHONE}</td>
+                    </tr>
+                    <tr>
+                        <td>Mobile</td>
+                        <td>{SPOUSE_CONTACT_MOBILE}</td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td><a href="mailto:{SPOUSE_CONTACT_EMAIL}">{SPOUSE_CONTACT_EMAIL}</a></td>
+                    </tr>
+                    <tr>
+                        <td>Address</td>
+                        <td>{CONTACT_HOME_STREET} {CONTACT_HOME_SUBURB} {CONTACT_HOME_STATE} {CONTACT_HOME_POSTCODE} {CONTACT_HOME_COUNTRY}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- END spouse -->
+    </div>
+    <!-- END contact -->
+</div>
+<!-- END student -->
+
+<script type="text/javascript" src="/javascript/shared/jquery.artificial-print.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('[data-action="print"]').artificialPrint();
+
+        /* Make search filter options panel appear either by
+         * clicking the button or by default, if any search
+         * parameters were used
+         */
+        $('[data-action="search"]').click(function() {
+            $('[data-searchfilteroptions]').show();
+        });
+
+        /* Default visibility of search panel
+         */
+        $('[data-searchfilteroptions]').hide();
+
+        <!-- BEGIN show_filter_options -->
+        $('[data-searchfilteroptions]').show();
+        <!-- END show_filter_options -->
+    });
+</script>
+
+<!-- BEGIN email_all_parents -->
+<script type="text/javascript">
+    $(function() {
+        $('[data-action="email-all-parents"]').click(function(event) {
+            event.preventDefault();
+
+            $('[data-emailallparents]').submit();
+        });
+    });
+</script>
+<form data-emailallparents action="/mail/createMail.php" method="post">
+    <input type="hidden" name="replyto" value="&quot;{HEADING} Parents&quot; &lt;{REPLY_TO}&gt;"/>
+    <input type="hidden" name="bcc" value="{EMAIL_ALL_PARENTS}"/>
+</form>
+<!-- END email_all_parents -->

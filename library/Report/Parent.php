@@ -143,23 +143,30 @@ class Report_Parent extends Report_Abstract
         $this->getPage()->setBlock(TEMPLATE_content, 'search_form_option', 'search_form_option_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'show_filter_options', 'show_filter_options_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'email_all_parents', 'email_all_parents_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'email_all_parents_link', 'email_all_parents_link_block');
         $this->getPage()->setTitle('Parent Directory');
         $this->getPage()->setBlock('student', 'contact', 'contact_block');
         $this->getPage()->setBlock('contact', 'spouse', 'spouse_block');
         $this->getPage()->setBlock('contact', 'primary', 'primary_block');
 
+        $this->getPage()->setBlock('student', 'public', 'public_block');
+        $this->getPage()->setBlock('student', 'private', 'private_block');
+
         $this->getPage()->setVar(
             array(
-                'student_block'             => '',
-                'contact_block'             => '',
-                'show_filter_options_block' => '',
-                'email_all_parents_block'   => '',
+                'student_block'                => '',
+                'contact_block'                => '',
+                'public_block'                 => '',
+                'private_block'                => '',
+                'show_filter_options_block'    => '',
+                'email_all_parents_block'      => '',
+                'email_all_parents_link_block' => '',
             )
         );
 
         if (Config::get('modules_parentdirectory_emailall')) {
             $this->getPage()->parse('email_all_parents_block', 'email_all_parents');
-
+            $this->getPage()->parse('email_all_parents_link_block', 'email_all_parents_link');
         }
 
         if (strlen($this->getYearLevel())) {
@@ -310,20 +317,27 @@ class Report_Parent extends Report_Abstract
                 if ($lastID != $currentContact['StudentID']) {
                     if ($i) {
                         if ($showContact == false) {
-                            $this->getPage()->setVar(
-                                array(
-                                    'PRIVATE' => 'private'
-                                )
-                            );
+                            $this->getPage()->setVar(array(
+                                'public_block' => ''
+                            ));
+
+                            $this->getPage()->parse('private_block', 'private');
                         } else {
-                            $this->getPage()->setVar(
-                                array(
-                                    'PRIVATE' => ''
-                                )
-                            );
+                            $this->getPage()->setVar(array(
+                                'private_block' => ''
+                            ));
+
+                            $this->getPage()->parse('public_block', 'public');
                         }
 
                         $this->getPage()->parse('student_block', 'student', true);
+
+                        /* Clear children after parsing out the parent
+                         */
+                        $this->getPage()->setVar(array(
+                            'public_block' => '',
+                            'private_block' => '',
+                        ));
                     }
 
                     /* Clear children blocks after parsing out the parent
