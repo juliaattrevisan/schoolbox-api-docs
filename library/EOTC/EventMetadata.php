@@ -11,6 +11,9 @@
 namespace EOTC;
 
 
+use Schoolbox\Collection;
+use Schoolbox\Resource\Storage;
+
 class EventMetadata {
 
 	/**
@@ -318,7 +321,7 @@ class EventMetadata {
 	/**
 	 * Set rams files
 	 *
-	 * @param null $ramsFiles
+	 * @param Collection $ramsFiles
 	 */
 	public function setRamsFiles($ramsFiles) {
 		$this->ramsFiles = $ramsFiles;
@@ -327,7 +330,7 @@ class EventMetadata {
 	/**
 	 * Get rams files
 	 *
-	 * @return null
+	 * @return Collection|Storage\Model[]
 	 */
 	public function getRamsFiles() {
 		return $this->ramsFiles;
