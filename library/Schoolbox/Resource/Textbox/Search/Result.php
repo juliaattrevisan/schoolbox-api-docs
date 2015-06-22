@@ -49,7 +49,7 @@ class Result extends Base
 				(p.cid OR a.sid)
 				AND t.deleted IS NULL
 				AND MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()})
-			ORDER BY t.{$sanitiser->getSortBy()} {$sanitiser->getSortDir()}
+			ORDER BY {$sanitiser->getSortByWithAlias('t')} {$sanitiser->getSortDir()}
 			LIMIT {$sanitiser->getOffset()}, {$sanitiser->getLimit()}
 		";
 
