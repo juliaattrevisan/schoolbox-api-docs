@@ -132,6 +132,7 @@ if (is_array($typeList)) {
                     $this->setVar(
                         array(
                             'CONNECTOR_NAME' => $currentConnector,
+                            'CONNECTOR_ICON' => $currentConnector == 'Schoolbox' ? 'schoolbox' : 'calendar'
                         )
                     );
 

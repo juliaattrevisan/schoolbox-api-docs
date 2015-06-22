@@ -174,34 +174,36 @@ $(function() {
     </div>
     <!-- END import -->
     <!-- BEGIN subscribe -->
-    <div class="settings heading">
+    <div class="row">
         <form method='post' action='/adminv2/calendar/modifyForm'>
 			<!-- BEGIN eventType -->
 			<div class='eventList'>
 				<h3>{EVENTTYPE_LABEL}</h3>
-				<div class="level clearfix">
 					<!-- BEGIN connector -->
-					<div id='configOptions_{EVENTTYPE_NAME}_{CONNECTOR_NAME}' class='configList {CONNECTOR_ACTIVE}'>
-						<label class="calendar-connector {CONNECTOR_NAME}" for="{EVENTTYPE_NAME}_{CONNECTOR_NAME}">
-							<input type="checkbox" name="active[]" id="{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='connectorActive' value='{EVENTTYPE_NAME}_{CONNECTOR_NAME}' {CONNECTOR_CHECKED} />
-							{CONNECTOR_NAME}
-						</label>
-
-						<div class="clearfix"></div>
-
-						<!-- BEGIN connectorConfig -->
-						<!-- END connectorConfig -->
-					</div>
-					<!-- BEGIN has_multiple_options -->
-					<a id="add_{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='addConfig btn add' /><span></span>Add another source</a>
-					<!-- END has_multiple_options -->
+					<fieldset id='configOptions_{EVENTTYPE_NAME}_{CONNECTOR_NAME}' class='configList {CONNECTOR_ACTIVE}'>
+                        <legend>{CONNECTOR_NAME}</legend>
+                        <div class="column small-2 medium-1">
+                            <div class="icon-{CONNECTOR_ICON}"></div>
+                        </div>
+                        <div class="column small-10 medium-11">
+                            <div class="switch">
+                                <input type="checkbox" name="active[]" id="{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='connectorActive' value='{EVENTTYPE_NAME}_{CONNECTOR_NAME}' {CONNECTOR_CHECKED} />
+                                <label for="{EVENTTYPE_NAME}_{CONNECTOR_NAME}"></label>
+                            </div>
+                            <hr />
+                            <!-- BEGIN connectorConfig -->
+                            <!-- END connectorConfig -->
+                        </div>
+                        <!-- BEGIN has_multiple_options -->
+                        <a id="add_{EVENTTYPE_NAME}_{CONNECTOR_NAME}" data-addsource class='button icon-add'>Add another {CONNECTOR_NAME} source</a>
+                        <!-- END has_multiple_options -->
+                    </fieldset>
 					<!-- END connector -->
-				</div>
 			</div>
 			<!-- END eventType -->
 
 			<input type="hidden" name='action' value='subscribe' />
-            <input type="submit" class="submit-btn-plain" value='Update' />
+            <input type="submit" class="button" value='Save changes' />
 		</form>
 	</div>
     <!-- END subscribe -->
@@ -290,7 +292,10 @@ $(function() {
 <script type='text/javascript' src='/javascript/admin/calendar.js'></script>
 <script type='text/javascript'>
 	$(function() {
-		calendar.init();
+		calendar.init({
+            addConfig:    '[data-addsource]',
+            removeConfig: '[data-removesource]'
+        });
 	});
 </script>
 <!-- END custom_javascript -->
