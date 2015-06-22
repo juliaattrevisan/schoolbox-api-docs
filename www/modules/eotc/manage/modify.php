@@ -9,6 +9,8 @@
  */
 
 // scopecheck!
+use Schoolbox\File\MimetypeMapper;
+
 if (isset($this)) {
     $page   = $this;
     $render = false;
@@ -107,17 +109,16 @@ if (is_numeric($_GET['eventID'])) {
         // RAM in the RAMS
         $page->setVar('rams_list_block', '');
         if ($event->getMetadata()->getRamsRequired()) {
-            $mimetypeMapper = new \Schoolbox\File\MimetypeMapper();
             foreach ($event->getMetadata()->getRamsFiles() as $ramsFile) {
                 try {
-                    $mimetype = $mimetypeMapper->getByFilename($ramsFile->getFilename());
+                    $mimetype = $ramsFile->getMimetype();
                 } catch (\Schoolbox\Mapper\Exception $e) {
-                    $mimetype = new \Schoolbox\File\Mimetype();
+                    $mimetype = MimetypeMapper::getInstance()->getUnknownMime();
                 }
                 $page->setVar(
                     array(
                         'EVENT_RAMS_HASH'              => $ramsFile->getHash(),
-                        'EVENT_RAMS_FILESIZE'          => $ramsFile->getFilesize(),
+                        'EVENT_RAMS_FILESIZE'          => $ramsFile->getSize(),
                         'EVENT_RAMS_FILE'              => $ramsFile->getFilename(),
                         'EVENT_RAMS_MIMETYPE_ICONFILE' => $mimetype->getIconFile(),
                     )
