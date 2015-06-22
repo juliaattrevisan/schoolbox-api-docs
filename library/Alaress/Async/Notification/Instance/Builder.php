@@ -296,6 +296,11 @@ class Builder {
 			if(!count($this->topics)) {
 				throw new InvalidArgumentException("Topic has not been set");
 			}
+
+            // if no time was specified, set the time to now
+            if (!$this->time) {
+                $this->time = time();
+            }
 		}
 
 		return new Instance(
