@@ -36,7 +36,7 @@ $(function() {
 
             var type = $(this).attr('rel');
 
-            window.location.href = '/search?keyword=' + keyword + '#' + type + ',1';
+            window.location.hash = '#' + type + ',1';
             window.location.reload(true);
         });
 
