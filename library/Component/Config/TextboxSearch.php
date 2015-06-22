@@ -26,14 +26,14 @@ class Component_Config_TextboxSearch extends Component_Config_Abstract
         $mapper = new Mapper();
 
         try {
-            $textbox = $mapper->findById($configValue);
-
+            $textbox   = $mapper->findById($configValue);
             $allUsages = $mapper->findComponentUsage($textbox);
         } catch (\Exception $e) {
-            $textbox = new Model();
-
             $allUsages = new Collection();
-            $allUsages->add(new \Component_instance());
+        }
+        if (count($allUsages) === 0) {
+            $textbox = new Model();
+            $allUsages->add(new \Component_Instance());
         }
 
         /* Because you can have multiple textbox components displaying the
