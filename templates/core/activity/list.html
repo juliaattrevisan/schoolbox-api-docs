@@ -1,28 +1,23 @@
 <li>
-    <div class="row collapse full-width">
-        <!-- BEGIN icon -->
-        <div class="icon columns">
-            <span class="no-text icon-{ACTLIST_ICON}"></span>
-        </div>
-        <!-- END icon -->
-
-        <div class="thumbnail columns">
+    <div class="avatar-card">
+        <a href="#" title="View Profile">
             <!-- BEGIN avatar -->
-            <img src="{ACTLIST_AVATAR}" title="{ACTLIST_AVATAR_TITLE}" alt="{ACTLIST_AVATAR_TITLE}" />
+            <img src="{ACTLIST_AVATAR}" alt="{ACTLIST_AVATAR_TITLE}" title="{ACTLIST_AVATAR_TITLE}" />
+            <p>{ACTLIST_CONTENT}</p>
             <!-- END avatar -->
-        </div>
-        <div class="content columns">
-            {ACTLIST_CONTENT}
+        </a>
 
-            <p class="meta">
-                <!-- BEGIN time -->
-                <time>{ACTLIST_TIME}</time>
-                <!-- END time -->
+        <p>
+            <!-- BEGIN icon -->
+            <span class="no-text icon-{ACTLIST_ICON}"></span>
+            <!-- END icon -->
+            <!-- BEGIN time -->
+            {ACTLIST_TIME}
+            <!-- END time -->
+        </p>
 
-                <span class="grade">
-                    <span class="gradient-{ACTLIST_GRADEIANT}">{ACTLIST_GRADE}</span>
-                </span>
-            </p>
-        </div>
+        <span class="grade">
+            <span class="gradient-{ACTLIST_GRADEIANT}">{ACTLIST_GRADE}</span>
+        </span>
     </div>
 </li>
