@@ -22,13 +22,17 @@
 
     <form method='get' action='?'>
         <div class="row">
-            <div class="large-5 columns">
+            <div class="large-6 columns">
                 <label>
                     Name
                     <input type='text' name='searchName' value="{SEARCH_NAME}"/>
                 </label>
+
+                <label>
+                    <input type='submit' value='Search' />
+                </label>
             </div>
-            <div class="large-1 columns">
+            <div class="large-2 columns">
                 <label>
                     Boarder
                     <select name='searchBoardingStatus'>
@@ -38,7 +42,7 @@
                     </select>
                 </label>
             </div>
-            <div class="large-3 columns">
+            <div class="large-2 columns">
                 <label>
                     Form
                     <select name="searchForm">
@@ -48,7 +52,7 @@
                     </select>
                 </label>
             </div>
-            <div class="large-1 columns">
+            <div class="large-2 columns">
                 <label>
                     Year
                     <!-- BEGIN has_year_selector -->
@@ -62,12 +66,6 @@
                     <!-- BEGIN has_year_input -->
                     <input type='text' name='searchYear' value="{SEARCH_YEAR}"/>
                     <!-- END has_year_input -->
-                </label>
-            </div>
-
-            <div class="large-2 columns">
-                <label>
-                    <input type='submit' value='Search' />
                 </label>
             </div>
         </div>
