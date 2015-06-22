@@ -1,26 +1,24 @@
 <input type="hidden" name="record[{CONNECTOR_ID}][eventType]" value='{EVENTTYPE_NAME}' />
 <input type="hidden" name="record[{CONNECTOR_ID}][connectorClass]" value='{CONNECTOR_CLASS}' />
 
-<fieldset class='calendarOptions'>
-    <fieldset>
-        <h3>Label</h3>
-        <p><input type='text' name="record[{CONNECTOR_ID}][label]" value='{CONNECTOR_LABEL}' /></p>
-    </fieldset>
-
+<div class="row">
+    <div class="columns medium-6">
+        <label>Label
+            <input type='text' name="record[{CONNECTOR_ID}][label]" value='{CONNECTOR_LABEL}' />
+        </label>
+    </div>
     <!-- BEGIN event_type_list -->
-    <fieldset>
-        <h3>Event Type</h3>
-        <p>
+    <div class="columns medium-6">
+        <label>Event Type
             <select name="record[{CONNECTOR_ID}][luEventType]">
                 <!-- BEGIN luEventType -->
                 <option value='{LUEVENTTYPE_VALUE}' {LUEVENTTYPE_SELECTED}>{LUEVENTTYPE_NAME}</option>
                 <!-- END luEventType -->
             </select>
-        </p>
-    </fieldset>
+        </label>
+    </div>
     <!-- END event_type_list -->
-</fieldset>
-
+</div>
 <!-- BEGIN campus_list -->
 <!-- empty to prevent weird templating stuff from happening -->
 <!-- END campus_list -->
