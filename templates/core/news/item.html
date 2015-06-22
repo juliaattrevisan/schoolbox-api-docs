@@ -1,63 +1,43 @@
-<div class="row full-width">
-    <div class="large-12 columns no-pad">
-        <h1>
-            {NEWS_TITLE}
-            <span class="header-actions">
-                <a class="button icon-menu" href="#" data-dropdown="newsitemOptions">Options</a>
-            </span>
+<span class="header-actions">
+    <!-- BEGIN previous_article -->
+    <a class="button icon-previous" data-tooltip href="/news/item/{PREVIOUS_ARTICLE_ID}" title="{PREVIOUS_ARTICLE_TITLE}">Previous</a>
+    <!-- END previous_article -->
+    <!-- BEGIN next_article -->
+    <a class="button icon-next" data-tooltip href="/news/item/{NEXT_ARTICLE_ID}" title="{NEXT_ARTICLE_TITLE}">Next</a>
+    <!-- END next_article -->
+    <!-- BEGIN modify_news -->
+    <a class="button icon-modify" href="/news/modify/{NEWS_ID}">Modify Article</a>
+    <!-- END modify_news -->
+</span>
 
-            <ul class="f-dropdown" data-dropdown-content="" id="newsitemOptions">
-                <!-- BEGIN modify_news -->
-                <li><a class="icon-modify" href="/news/modify/{NEWS_ID}">Modify Article</a></li>
-                <!-- END modify_news -->
-                <!-- BEGIN previous_article -->
-                <li><a class="icon-previous" href="/news/item/{PREVIOUS_ARTICLE_ID}">{PREVIOUS_ARTICLE_TITLE}</a></li>
-                <!-- END previous_article -->
-                <!-- BEGIN next_article -->
-                <li><a class="icon-next" href="/news/item/{NEXT_ARTICLE_ID}">{NEXT_ARTICLE_TITLE}</a></li>
-                <!-- END next_article -->
-            </ul>
-        </h1>
-        <!-- BEGIN add_news -->
-        <!-- END add_news -->
-        <!-- <dl class="tabs" data-tab> -->
-            <!-- BEGIN topic_list -->
-            
-            <!-- <dd class="active {LIST_TOPIC_SELECTED}"><a href="#panel2-1">{LIST_TOPIC_NAME}</a></dd> -->
-            
-            <!-- END topic_list -->
+<h1>{NEWS_TITLE}</h1>
 
-            <!--<dd><a href="#panel2-2">General</a></dd>
-            <dd><a href="#panel2-3">Music</a></dd>
-            <dd><a href="#panel2-4">Sport</a></dd>
-            <dd><a href="#panel2-4">Academic</a></dd>
-            
-        </dl> -->
-        <!-- BEGIN allnews_button -->
-        <!-- END allnews_button -->
-
+<div class="clearfix">
+    <div class="avatar-card">
+        <a href="/search/user/{POSTER_ID}" title="View Profile">
+            <img src="/portrait.php?userId={POSTER_EXTERNAL_ID}&size=square32" alt="View Profile">
+            <p>{POSTER}</p>
+        </a>
+        <p class="meta">{DATETIME}</p>
     </div>
 </div>
-<div class="row full-width">
-    <div class="large-12 columns island">
-        <div class="large-2 columns no-pad">
-            <!-- BEGIN featured_image -->
-            <img class="featured_image" width="200" height="200" src="/storage/image.php?hash={NEWS_IMAGE}&size=constrain200"/>
-            <!-- END featured_image -->
-        </div>
-        <div class="large-10 columns">
-        	<div class="wysiwyg">
-        		{NEWS_BODY}
-        	</div>
-            <p class="meta">
-                <a href="/search/user/{POSTER_ID}" class="author">
-                    <img width="32" height="32" src="/portrait.php?userId={POSTER_EXTERNAL_ID}&size=square32"/>
-                    <span class="name">{POSTER}</span>
-                </a>
-                <span class="subtitle">{DATETIME}</span>
-            </p>
-        </div>
-    </div>
 
+    <!-- BEGIN add_news -->
+    <!-- END add_news -->
+    <!-- BEGIN topic_list -->
+    <!-- END topic_list -->
+    <!-- BEGIN allnews_button -->
+    <!-- END allnews_button -->
+
+<div class="row">
+    <div class="large-2 columns">
+        <!-- BEGIN featured_image -->
+        <img src="/storage/image.php?hash={NEWS_IMAGE}&size=constrain200"/>
+        <!-- END featured_image -->
+    </div>
+    <div class="large-10 columns">
+        <div class="wysiwyg">
+            {NEWS_BODY}
+        </div>
     </div>
 </div>
