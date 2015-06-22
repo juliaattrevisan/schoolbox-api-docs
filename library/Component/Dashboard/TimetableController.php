@@ -183,10 +183,9 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                         if (count($period['class']) > 0) {
                             foreach($period['class'] as $class) {
                                 $this->setVar('PERIOD_DESC', $class['description']);
-                                $this->setVar('PERIOD_URL', '/homepage/' . urlencode($class['code']));
                                 $this->setVar('PERIOD_CODE', '(' . $class['code'] . ')');
                                 $this->setVar('PERIOD_ROOM', $class['room']);
-                                $this->setVar('PERIOD_URL', '/homepage/' . urlencode($class['code']));
+                                $this->setVar('PERIOD_URL', '/homepage/code/' . urlencode($class['code']));
 
 
                                 /* Handle colour array */
