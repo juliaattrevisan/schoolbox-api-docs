@@ -93,7 +93,7 @@ if (is_array($typeList)) {
         );
 
         if ($selectedType == $type['type']) {
-            $this->setVar('SETTING_TAB_CURRENT', 'current');
+            $this->setVar('SETTING_TAB_CURRENT', 'active');
         }
 
         $this->parse('setting_tab_block', 'setting_tab', true);
