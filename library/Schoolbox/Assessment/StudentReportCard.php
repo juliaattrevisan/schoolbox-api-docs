@@ -502,7 +502,10 @@ class StudentReportCard
         $page->setBlock('subject_rubric_criterion', 'subject_rubric_criterion_mark', 'subject_rubric_criterion_mark_block');
 
         $page->setVar(array(
-            'subject_rubric_block' => ''
+            'subject_rubric_block' => '',
+            'subject_rubric_group_block' => '',
+            'subject_rubric_criterion_block' => '',
+            'subject_rubric_criterion_mark_block' => ''
         ));
 
         $submissionBoxMapper = $this->submissionMapper;
