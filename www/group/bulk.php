@@ -20,7 +20,7 @@ if (is_numeric($this->arg[0])) {
     $isFolderOwner = $userAccessMapper->isFolderOwner($_SESSION['user'], $folder);
 
     // check access
-    if (!$_SESSION['su'] && !$isFolderOwner) {
+    if (!$isFolderOwner && !($_SESSION['user']->isSuperuser())) {
         error(19);
     }
 

@@ -107,7 +107,7 @@ if (is_numeric($this->arg[0])) {
 
     $userAccessMapper = new \Schoolbox\Permission\Access\UserAccessMapper();
 
-    if ($userAccessMapper->isFolderOwner($_SESSION['user'], $folder)) {
+    if ($_SESSION['user']->isSuperuser() || $userAccessMapper->isFolderOwner($_SESSION['user'], $folder)) {
         $this->setVar('indiv_perms_block', '');
         $this->parse('indiv_modify_block', 'indiv_modify');
     } else {
