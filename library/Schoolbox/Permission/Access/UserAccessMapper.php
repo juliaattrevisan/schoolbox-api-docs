@@ -89,25 +89,23 @@ class UserAccessMapper extends Mapper
     /**
      * Determine whether $user owns $folder
      *
+     * note: superusers aren't necessarily owners of all folders.
+     *
      * @param User $user
      * @param CategoryModel $folder
      * @return bool
      */
     public function isFolderOwner(User $user, CategoryModel $folder)
     {
-        if ($user->isSuperuser()) {
-            return true;
-        } else {
-            $userAccess = $this->findByColumnList(array(
-                'sid' => $folder->getId(),
-                'service' => HOMEPAGE_SERVICE,
-                'type' => UserAccess::ACCESS_FULL,
-                'uid' => $user->getId()
-            ));
+        $userAccess = $this->findByColumnList(array(
+            'sid' => $folder->getId(),
+            'service' => HOMEPAGE_SERVICE,
+            'type' => UserAccess::ACCESS_FULL,
+            'uid' => $user->getId()
+        ));
 
-            if ($userAccess->count()) {
-                return true;
-            }
+        if ($userAccess->count()) {
+            return true;
         }
 
         return false;
