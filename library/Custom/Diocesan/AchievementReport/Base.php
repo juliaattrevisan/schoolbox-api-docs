@@ -145,7 +145,7 @@ abstract class Base {
      * @return bool
      */
     protected function isProgressive($result) {
-        return preg_match('/\[['.implode('', $this->getLetterRegistry()).'\d*]\]/', $result);
+        return preg_match('/\[['.implode('', $this->getLetterRegistry()).']\d*\]/', $result);
     }
 
     /* Getters/Setters

@@ -82,6 +82,7 @@ class YearlyBreakdown extends Base {
                         if ($allTerms[$term] != '') {
                             $data = $allTerms[$term];
                             $letter = $data['StrippedResult'];
+                            $result = $allTerms[$term]['Result'];
 
                             $yearStack[$year][$courseName]['enteredGrades']++;
                             $totals[$year]['enteredGrades']++;
@@ -89,15 +90,17 @@ class YearlyBreakdown extends Base {
                             /* Ignore anything outside of the letter registry
                              */
                             if (in_array($letter, $this->getLetterRegistry())) {
-                                $yearStack[$year][$courseName]['letters'][$letter]++;
-                                $totals[$year]['letters'][$letter]++;
+                                if (!$this->isProgressive($result)) {
+                                    $yearStack[$year][$courseName]['letters'][$letter]++;
+                                    $totals[$year]['letters'][$letter]++;
 
-                                /* Achieved Grades only accumulate when student got an
-                                 * achievement letter
-                                 */
-                                if (in_array($letter, $this->getAchievementLetterRegistry())) {
-                                    $yearStack[$year][$courseName]['achievedGrades']++;
-                                    $totals[$year]['achievedGrades']++;
+                                    /* Achieved Grades only accumulate when student got an
+                                     * achievement letter
+                                     */
+                                    if (in_array($letter, $this->getAchievementLetterRegistry())) {
+                                        $yearStack[$year][$courseName]['achievedGrades']++;
+                                        $totals[$year]['achievedGrades']++;
+                                    }
                                 }
                             }
 
