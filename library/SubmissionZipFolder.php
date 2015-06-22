@@ -29,7 +29,7 @@ class SubmissionZipFolder
         $archive = new ZipArchive();
         $archive->open($this->tmpZip, ZipArchive::CREATE);
         mkdir($this->tmpFolder);
-        $this->createDirectory($this->tmpFolder, $this->folder, $this->fileList);
+        $this->createDirectory($this->tmpFolder, $this->fileList);
         $dir = new RecursiveDirectoryIterator($this->tmpFolder, FilesystemIterator::SKIP_DOTS);
 
         $i      = 0;
@@ -59,17 +59,15 @@ class SubmissionZipFolder
     /**
      *
      * @param string $currentDir The temp location to create the zip in
-     * @param int $folderID Unused
      * @param Submission\File[] $fileList A list of files to zip
      * @param int $depth Unused
      */
-    function createDirectory($currentDir, $folderID, $fileList, $depth = 0) {
+    function createDirectory($currentDir, $fileList, $depth = 0) {
         foreach ($fileList as $file) {
-            $fileName = sprintf("%s-%s_%s_%s.%s",
-                $file->getOwner()->getLastname(), $file->getOwner()->getFirstname(),          // student name
+            $fileName = sprintf("%s-%s_%s_%s",
+                $file->getOwner()->getLastname(), $file->getOwner()->getFirstname(), // student name
                 $file->getCreatedAt()->getUsingFormat('md-Hi'),   // datetime
-                $file->getBasename(),                               // filename
-                $file->getStorage()->getExtension()                 // extension
+                $file->getBasename()                               // filename
             );
             $this->size = $this->size + $file->getStorage()->getSize();
             $fp = fopen($this->uniqueFileName($currentDir . '/' . $fileName), 'wb');
