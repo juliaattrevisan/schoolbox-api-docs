@@ -1,12 +1,13 @@
 <input type="hidden" name="record[{CONNECTOR_ID}][eventType]" value='{EVENTTYPE_NAME}' />
 <input type="hidden" name="record[{CONNECTOR_ID}][connectorClass]" value='{CONNECTOR_CLASS}' />
 
-<fieldset class='calendarOptions'>
-    <fieldset>
-        <h3>Label</h3>
-        <p><input type='text' name="record[{CONNECTOR_ID}][label]" value='{CONNECTOR_LABEL}' /></p>
-    </fieldset>
-</fieldset>
+<div class="row">
+    <div class="columns medium-6">
+        <label>Label
+            <input type='text' name="record[{CONNECTOR_ID}][label]" value='{CONNECTOR_LABEL}' />
+        </label>
+    </div>
+</div>
 
 <!-- BEGIN event_type_list -->
 <!-- BEGIN luEventType -->
