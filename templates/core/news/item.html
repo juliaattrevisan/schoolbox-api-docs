@@ -1,18 +1,14 @@
 <span class="header-actions">
-    <a class="button icon-menu" href="#" data-dropdown="newsitemOptions">Options</a>
-
-</span>
-<ul class="f-dropdown" data-dropdown-content="" id="newsitemOptions">
-    <!-- BEGIN modify_news -->
-    <li><a class="icon-modify" href="/news/modify/{NEWS_ID}">Modify Article</a></li>
-    <!-- END modify_news -->
     <!-- BEGIN previous_article -->
-    <li><a class="icon-previous" href="/news/item/{PREVIOUS_ARTICLE_ID}">{PREVIOUS_ARTICLE_TITLE}</a></li>
+    <a class="button icon-previous" href="/news/item/{PREVIOUS_ARTICLE_ID}">{PREVIOUS_ARTICLE_TITLE}</a>
     <!-- END previous_article -->
     <!-- BEGIN next_article -->
-    <li><a class="icon-next" href="/news/item/{NEXT_ARTICLE_ID}">{NEXT_ARTICLE_TITLE}</a></li>
+    <a class="button icon-next" href="/news/item/{NEXT_ARTICLE_ID}">{NEXT_ARTICLE_TITLE}</a>
     <!-- END next_article -->
-</ul>
+    <!-- BEGIN modify_news -->
+    <a class="button icon-modify" href="/news/modify/{NEWS_ID}">Modify Article</a>
+    <!-- END modify_news -->
+</span>
 
 <h1>{NEWS_TITLE}</h1>
 
