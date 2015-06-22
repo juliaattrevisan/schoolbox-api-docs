@@ -15,14 +15,20 @@ if ($_POST['heading']) {
     $publishedDate = Alaress_Date_Format::newLocalShort($_POST['item_datetime_published']);
     $expiryDate = Alaress_Date_Format::newLocalShort($_POST['item_datetime_expires']);
 
-    if($_POST['publish_hour'] && $_POST['publish_minute']) {
+    // Publish: start of day
+    if ($_POST['publish_hour'] && $_POST['publish_minute']) {
         $publishedDate->set12Hour($_POST['publish_hour'], $_POST['publish_period']);
         $publishedDate->setMinute($_POST['publish_minute']);
+    } else {
+        $publishedDate->startOfDay();
     }
 
-    if($_POST['expires_hour'] && $_POST['expires_minute']) {
+    // Expiry: end of day
+    if ($_POST['expires_hour'] && $_POST['expires_minute']) {
         $expiryDate->set12Hour($_POST['expires_hour'], $_POST['expires_period']);
         $expiryDate->setMinute($_POST['expires_minute']);
+    } else {
+        $expiryDate->endOfDay();
     }
 
     // Error out if there's campi that this user can't post to in $_POST[campus]

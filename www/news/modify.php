@@ -41,19 +41,24 @@ if (is_numeric($this->arg[0])) {
 	$expiryDate = new Alaress_Date_Format($news['item_datetime_expires'], Alaress_Date_Format::DATABASE_FORMAT);
 
 	$output = array(
-		'ACTION' => 'Modify',
-		'NEWS_ID' => $news['item_id'],
-		'HEADING' => Scrub::text($news['item_heading']),
-        'NEWS_IMAGE' => $news['item_image'],
-		'BODY' => Scrub::text($news['item_body']),
+		'ACTION'                  => 'Modify',
+		'NEWS_ID'                 => $news['item_id'],
+		'HEADING'                 => Scrub::text($news['item_heading']),
+        'NEWS_IMAGE'              => $news['item_image'],
+		'BODY'                    => Scrub::text($news['item_body']),
 		'ITEM_DATETIME_PUBLISHED' => $publishedDate->getLocalShort(),
-        'PUBLISH_HOUR'          => $publishedDate->isAtStartOfDay() ? '' : $publishedDate->get12Hour(),
-        'PUBLISH_MIN'        => $publishedDate->isAtStartOfDay() ? '' : $publishedDate->getMinute(true),
-        'PUBLISH_PM'            => $publishedDate->getMeridiem() == 'pm' ? 'selected="selected"' : '',
-		'ITEM_DATETIME_EXPIRES' => $expiryDate->getLocalShort(),
-        'EXPIRES_HOUR'          => $expiryDate->isAtStartOfDay() ? '' : $expiryDate->get12Hour(),
-        'EXPIRES_MIN'        => $expiryDate->isAtStartOfDay() ? '' : $expiryDate->getMinute(true),
-        'EXPIRES_PM'            => $expiryDate->getMeridiem() == 'pm' ? 'selected="selected"' : '',
+        'PUBLISH_HOUR'            => $publishedDate->isAtStartOfDay() ? '' : $publishedDate->get12Hour(),
+        'PUBLISH_MIN'             => $publishedDate->isAtStartOfDay() ? '' : $publishedDate->getMinute(true),
+        'PUBLISH_PM'              => !$publishedDate->isAtStartOfDay() && $publishedDate->isPM() ? 'selected="selected"' : '',
+		'ITEM_DATETIME_EXPIRES'   => $expiryDate->getLocalShort(),
+        'EXPIRES_HOUR'            => $expiryDate->isAtEndOfDay() ? '' : $expiryDate->get12Hour(),
+        'EXPIRES_MIN'             => $expiryDate->isAtEndOfDay() ? '' : $expiryDate->getMinute(true),
+        'EXPIRES_PM'              => !$expiryDate->isAtEndOfDay() && $expiryDate->isPM() ? 'selected="selected"' : '',
+        'SHOW_ADVANCED'           => '',
+        'OPAC_ADVANCED'           => '',
+        'ADV_OFF'                 => '',
+        'ADV_ON'                  => ' style="display:none"',
+        'USER_LIST'               => '[]',
 	);
 
 	$this->setVar($output);
@@ -68,16 +73,18 @@ if (is_numeric($this->arg[0])) {
 	$this->checkList('campus_selection', $campusList, $news['campusList'], 'campus_row');
 
 	$userList = $newsHandler->getUserList($news['item_id']);
-
-	if (is_array($userList)) {
+	if (is_array($userList) || !$expiryDate->isAtEndOfDay()) {
         // set the advanced options to be shown by default since there is information in there
-        $this->setVar(array(
-            'SHOW_ADVANCED' => ' style="display: block;"',
-            'OPAC_ADVANCED' => ' style="opacity: 1;"',
-            'ADV_OFF'       => ' style="display:none"',
-            'ADV_ON'        => '',
-        ));
-
+        $this->setVar(
+            array(
+                'SHOW_ADVANCED' => ' style="display: table-row;"',
+                'OPAC_ADVANCED' => ' style="opacity: 1;"',
+                'ADV_OFF'       => ' style="display:none"',
+                'ADV_ON'        => '',
+            )
+        );
+    }
+    if (is_array($userList)) {
         $userOut = array();
 		foreach ($userList as $user) {
             $userOut[] = array(
@@ -86,17 +93,6 @@ if (is_numeric($this->arg[0])) {
             );
 		}
         $this->setVar('USER_LIST', json_encode($userOut));
-	}
-	else
-	{
-        // no data in advanced options, hide them by default
-        $this->setVar(array(
-            'SHOW_ADVANCED' => '',
-            'OPAC_ADVANCED' => '',
-            'ADV_OFF'       => '',
-            'ADV_ON'        => ' style="display:none"',
-            'USER_LIST'     => '[]',
-        ));
 	}
 
 	$this->dropDown('topic_list', $newsHandler->getTopicList(), $news['item_topic_id'], TEMPLATE_content, array(
