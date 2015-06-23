@@ -1,3 +1,4 @@
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectAll.js"></script>
 <script type="text/javascript">
 	$(function() {
@@ -14,15 +15,16 @@
 			$('span[data-selected="true"]').text(num);
 		});
 
-		$('input[name=deleteUsers]').click(function(event) {
+		$('input[data-action="delete"]').click(function(event) {
 			event.preventDefault();
-
-			if (confirm('Are you sure you want to delete the selected users?')) {
-				var theForm = $(this).closest('form');
-
-				theForm.append('<input name="deleteUsers" type="hidden" value="1" />');
-				theForm.submit();
-			}
+            var theForm = $(this).closest('form');
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete the selected users?',
+                confirmEvent: function() {
+                    theForm.append('<input name="deleteUsers" type="hidden" value="1" />');
+                    theForm.submit();
+                }
+            });
 		});
 
 		/* Special validation conditionals for campus selections
@@ -286,6 +288,6 @@
     </div>
 
     <input name='updateUsers' type="submit" value="Apply To Selected" />
-    <input name='deleteUsers' type="submit" value="Delete Selected Users" />
+    <input data-action="delete" name='deleteUsers' type="submit" value="Delete Selected Users" />
 </form>
 <!-- END has_results -->
