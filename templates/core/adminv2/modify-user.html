@@ -425,61 +425,66 @@ $(function() {
 </form>
 
 <h2>Groups</h2>
-<div class="level clearfix">
-	<table class="table ruler">
-		<colgroup>
-			<col width="10%" />
-			<col width="50%" />
-			<col width="40%" />
-		</colgroup>
-		<thead>
-			<tr>
-				<th>Remove</th>
-				<th>Group Name</th>
-				<th>Access</th>
-			</tr>
-		</thead>
-		<tbody>
-			<!-- BEGIN user_group -->
-			<tr>
-				<td><a href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}" ><img title="remove" src="/images/famicons/delete.png" /></a></td>
-				<td><a href="/homepage/{USER_GROUP_ID}">{USER_GROUP_NAME}</a></td>
-				<td>
-					<form action="/adminv2/userForm.php" method="post" class="updateGroupsForm">
-						<input type="hidden" name="uid" value="{USERID}" />
-						<input type="hidden" name="sid" value="{USER_GROUP_ID}" />
-						<input type="hidden" name="service" value="1" />
 
-						<input type="radio" name="type" value="1" {READ_CHECKED} />Read
-						<input type="radio" name="type" value="2" {WRITE_CHECKED} />Write
-						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />Group Admin
-					</form>
-				</td>
-			</tr>
-			<!-- END user_group -->
-            </tbody>
-        </table>
-					<form action="/adminv2/userForm.php" method="post" class="clearfix" id="groupAdd">
-						<fieldset>
-							<input type="hidden" name="groupSubmit" />
-							<input type="hidden" value="{USERID}" name="uid">
-							<input type="hidden" value="1" name="service">
-							<input type="hidden" value="1" name="type">
-							<label class="clearfix ">
-								<select class="formfield required" name="sid" id="groupSelect">
-									<option value="">Please Select a Group</option>
-									<!-- BEGIN all_group -->
-									<option value="{ALL_GROUP_ID}">{ALL_GROUP_NAME}</option>
-									<!-- END all_group -->
-								</select>
-							</label>
-						</fieldset>
-						<label class="clearfix float-left">
-							<input type="submit" class="submit-btn-plain" value="Add">
-						</label>
-					</form>
+<table>
+    <thead>
+    <tr>
+        <th>Group Name</th>
+        <th>Access</th>
+        <th>&nbsp;</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- BEGIN user_group -->
+    <tr>
+        <td><a href="/homepage/{USER_GROUP_ID}">{USER_GROUP_NAME}</a></td>
+        <td>
+            <form action="/adminv2/userForm.php" method="post" class="updateGroupsForm">
+                <input type="hidden" name="uid" value="{USERID}" />
+                <input type="hidden" name="sid" value="{USER_GROUP_ID}" />
+                <input type="hidden" name="service" value="1" />
 
-</div>
+                <select name="type">
+                    <option value="1" {READ_SELECTED}>Read</option>
+                    <option value="2" {WRITE_SELECTED}>Write</option>
+                    <option value="3" {ADMIN_SELECTED}>Group Admin</option>
+                </select>
+            </form>
+        </td>
+        <td>
+            <a class="no-text icon-delete" title="Remove" href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}" ></a>
+        </td>
+    </tr>
+    <!-- END user_group -->
+    <!-- Have the add form as a row at the bottom of the group list -->
+    <tr>
+        <td>
+            <form action="/adminv2/userForm.php" method="post" id="groupAdd">
+            <input type="hidden" name="groupSubmit" />
+            <input type="hidden" value="{USERID}" name="uid">
+            <input type="hidden" value="1" name="service">
+            <select class="formfield required" name="sid" id="groupSelect">
+                <option value="">Please Select a Group</option>
+                <!-- BEGIN all_group -->
+                <option value="{ALL_GROUP_ID}">{ALL_GROUP_NAME}</option>
+                <!-- END all_group -->
+            </select>
+            </form>
+        </td>
+        <td>
+            <select name="type" form="groupAdd">
+                <option value="1" {READ_SELECTED}>Read</option>
+                <option value="2" {WRITE_SELECTED}>Write</option>
+                <option value="3" {ADMIN_SELECTED}>Group Admin</option>
+            </select>
+        </td>
+        <td>
+            <input form="groupAdd" type="submit" value="Add" />
+        </td>
+    </tr>
+    </tbody>
+</table>
+
 <h2 id="permissions">Permissions</h2>
 <div class="level clearfix">
 	<table class="table ruler" id="permissions-list">

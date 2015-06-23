@@ -127,12 +127,16 @@ if(is_numeric($this->arg[0])) {
 
          if(count($groupList)) {
              foreach($groupList as $group) {
-                 $outputGroup = array(  'USER_GROUP_ID'     => $group['id'],
-                                        'USER_GROUP_NAME'  => $group['name'],
-                                        'READ_CHECKED'      => $group['type']==1?'checked="checked"':'',
-                                        'WRITE_CHECKED'      => $group['type']==2?'checked="checked"':'',
-                                        'ADMIN_CHECKED'      => $group['type']==3?'checked="checked"':'',
-                                      );
+                 $outputGroup = array(
+                     'USER_GROUP_ID'   => $group['id'],
+                     'USER_GROUP_NAME' => $group['name'],
+                     'READ_CHECKED'    => $group['type']==1?'checked="checked"':'',
+                     'WRITE_CHECKED'   => $group['type']==2?'checked="checked"':'',
+                     'ADMIN_CHECKED'   => $group['type']==3?'checked="checked"':'',
+                     'READ_SELECTED'   => $group['type']==1?'selected':'',
+                     'WRITE_SELECTED'  => $group['type']==2?'selected':'',
+                     'ADMIN_SELECTED'  => $group['type']==3?'selected':'',
+                 );
 
                  $this->setVar($outputGroup);
                  $this->parse('user_group_block','user_group',true);
