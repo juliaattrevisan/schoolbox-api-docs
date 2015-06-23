@@ -58,7 +58,7 @@ $side-nav-heading-text-transform: normal;
 
 // We use these to control margin and padding
 $sub-nav-list-margin: 0;
-// $sub-nav-list-padding-top: rem-calc(4);
+$sub-nav-list-padding-top: rem-calc(0);
 
 // We use this to control the definition
 // $sub-nav-font-family: $body-font-family;
@@ -263,6 +263,10 @@ $menu-slide: "transform 500ms ease";
 
 // Sub Navigation
 .sub-nav{
+	li,
+	dd{
+		margin-left: 1px;
+	}
 	a{
 		background-color: $sub-nav-bg-color;
 		display: inline-block;
