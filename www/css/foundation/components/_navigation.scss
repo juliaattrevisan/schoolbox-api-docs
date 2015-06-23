@@ -247,6 +247,7 @@ $menu-slide: "transform 500ms ease";
 
 // Side Navigation
 .side-nav{
+	margin: 0 0 rem-calc(($base-font-size)) 0;
 	a{
 		background-color: tint($tertiary, 74%); 
 		padding: $side-nav-link-padding;
@@ -265,7 +266,7 @@ $menu-slide: "transform 500ms ease";
 .sub-nav{
 	li,
 	dd{
-		margin-left: 1px;
+		margin: 0 1px 1px 0;
 	}
 	a{
 		background-color: $sub-nav-bg-color;
