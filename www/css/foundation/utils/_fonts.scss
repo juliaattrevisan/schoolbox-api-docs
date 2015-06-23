@@ -1,7 +1,7 @@
 [class^="icon-"]:before,
 [class*=" icon-"]:before {
 	font-family: 'schoolbox';
-	font-size: 0.875rem;
+	font-size: 1rem;
 	speak: none;
 	font-style: normal;
 	font-variant: normal;
@@ -11,10 +11,6 @@
 	/* Better Font Rendering =========== */
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-}
-
-.file:before{
-	font-size: 1rem;
 }
 
 .icon [class^="icon-"]:before,
