@@ -214,7 +214,8 @@ if (is_numeric($this->arg[0])) {
             }
         } else {
             if ($groupHandler->isStudent($user['uid'])) {
-//If student photo protected don't show other students
+
+                //If student photo protected don't show other students
                 $this->parse("portrait_block", "portrait");
 
 
@@ -494,7 +495,7 @@ if (is_numeric($this->arg[0])) {
 
                                 /* Has spouse, output spouse */
                                 if (trim($studentContact['StudentContactSpouseTitle']) || trim($studentContact['StudentContactSpousePreferred'])) {
-/* Output each of the block for contact details */
+                                    /* Output each of the block for contact details */
                                     if ($spouseEmail) {
                                         $this->parse('spouse_email_block', 'spouse_email');
                                     } else {
