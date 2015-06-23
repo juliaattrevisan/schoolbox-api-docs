@@ -1,80 +1,72 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
-
 $(function() {
-	///this function for the access ticks need to be recondigured.
-	$('.accessGranted').each(function () {
-		$(this).click(function () {
-			if ($(this).attr('src').indexOf('greentick') != -1) {
-				$(this).attr('src', '/images/emptybox.gif');
-				$.get('/group/modifyForm.php', {categoryID: $(this).attr('rel'), userID: '{ID}', write: 1});
-			} else {
-				$(this).attr('src', '/images/greentick.gif');
-				$.get('/group/modifyForm.php', {categoryID: $(this).attr('rel'), userID: '{ID}', write: 2});
-			}		
-		});
-		$(this).css('cursor','pointer');
-	});
-	
-	
-	$('.admin-form').validate({
-		rules: {
-			year: {
-			  	customValid : true
-			},
-			alt_email: {
-				email:true	
-			}
-		},
-		messages: {
-			defaultCampus: "Please select a default campus",
-			alt_email: "If you are entering an alternative email, please ensure it's a valid address"
-		},
-		errorPlacement: function(error, element) {
-      
-			if (element.hasClass("campus-radio")) {
-				error.css('margin', 0);
-				error.insertAfter(element.closest('table'));
-			} else {
-							
-			error.insertAfter(element)
-			}
-		 }
-		
-	});
-	
-	$.validator.addMethod("customValid", function(value, element) {
-		inputValue = (parseInt(value));
-		if (isNaN(inputValue)) {
+    $('form[data-validatable]').validate({
+        rules: {
+            year: {
+                customValid : true
+            },
+            alt_email: {
+                email: true
+            }
+        },
+        messages: {
+            defaultCampus: "Please select a default campus",
+            alt_email: "If you are entering an alternative email, please ensure it's a valid address"
+        },
+        errorPlacement: function(error, element) {
+            if (element.is('[data-role="defaultCampus"]')) {
+                error.css('margin', 0);
+                error.insertAfter(element.closest('[data-role="campusList"]'));
+            } else {
+                error.insertAfter(element)
+            }
+         }
+    });
 
-			value = String(value);
+    /**
+     * Confirm update of superuser field
+     */
+    $('input[data-role="superuser"]').click(function(event) {
+        event.preventDefault();
+        $(this).confirmDialog({
+            text: 'Change superuser status?',
+            confirmEvent: function(element) {
+                element.prop('checked', !(element.prop('checked')));
+            }
+        });
+    });
 
-			if ((value == '') || (value == 'k') || (value == 'elc') || (value == 'ELC') || (value == 'K')) {
-				console.log(value);
-				return true
-			} else {
-				return false;
-			}
-		} else {
-			if ((inputValue > 13) || (inputValue < 0)) {
-				return false
-			}
-			return true;
-		} 
+    /**
+     * Validator for year level
+     */
+    $.validator.addMethod("customValid", function(value, element) {
+        var inputValue = (parseInt(value));
+        if (isNaN(inputValue)) {
+            value = String(value);
+            if ((value == '') || (value == 'k') || (value == 'elc') || (value == 'ELC') || (value == 'K')) {
+                return true
+            } else {
+                return false;
+            }
+        } else {
+            if ((inputValue > 13) || (inputValue < 0)) {
+                return false
+            }
+            return true;
+        }
 
-	}, "Please enter one a number in between 0 and 13 OR the letter 'K' OR the the phrase 'ELC'");
-
-})
-
+    }, "Please enter one a number in between 0 and 13 OR the letter 'K' OR the the phrase 'ELC'");
+});
 </script>
-
 <!-- END custom_head-->
 
 {ADMIN_NAV}
 
 <h2>Create New User</h2>
 
-<form method="POST" action="/adminv2/userForm.php" >
+<form method="POST" action="/adminv2/userForm.php" data-validatable>
     <fieldset>
         <legend>User Detail</legend>
         <div class="row">
@@ -102,11 +94,11 @@ $(function() {
                 </select>
 
                 <label>Campus</label>
-                <dl>
+                <dl data-role="campusList">
                     <!-- BEGIN campus -->
                     <dt>{CAMPUS_NAME}</dt>
                     <dd>
-                        <input id="defaultCampus-{CAMPUS_ID}" type="radio" name="defaultCampus" value="{CAMPUS_ID}" {CAMPUS_DEFAULT_CHECKED} class="campus-radio required" />
+                        <input id="defaultCampus-{CAMPUS_ID}" data-role="defaultCampus" type="radio" name="defaultCampus" value="{CAMPUS_ID}" {CAMPUS_DEFAULT_CHECKED} required />
                         <label for="defaultCampus-{CAMPUS_ID}" class="radio-label">Default?</label>
 
                         <input id="campus-{CAMPUS_ID}" type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_CHECKED} />
@@ -157,7 +149,7 @@ $(function() {
                 <input id="webmail" type="checkbox" name="webmail" value="1" />
                 <label for="webmail" class="checkbox-label">Enable Webmail Tab</label>
 
-                <input id="superuser" type="checkbox" name="superuser" value="1" onclick="return(confirm('Change superuser status?'));" />
+                <input id="superuser" type="checkbox" name="superuser" data-role="superuser" value="1" />
                 <label for="superuser" class="checkbox-label">Superuser</label>
             </div>
         </div>
