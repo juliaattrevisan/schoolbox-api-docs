@@ -78,57 +78,39 @@
             <ul class="subject-list">
                 <li class="subject-group">
                     <div  data-equalizer>
-                        <div class="grade current-grade-avg gradient-{SUBJ_GRADEIENT} gradient-{SUBJ_GRADEIENT}-bg" data-equalizer-watch>
-                            <a href="#">
-                                <span>C+</span> -14.3% ▼
-                            </a>
-                        </div>
-                        <a href="#" title="View Subject">
-                            <div class="ten-column" data-equalizer-watch>
-                                <h3>9AH French FREA1</h3>
-                            </div>
+                        <a class="grade current-grade-avg gradient-{SUBJ_GRADEIENT} gradient-{SUBJ_GRADEIENT}-bg" data-equalizer-watch>
+                            <span>C+</span><br /> -14.3% ▼
                         </a>
-                        <a href="#" title="View Subject">
-                            <div class="one-column text-center" data-equalizer-watch>
-                                <i class="icon-next"></i>
-                            </div>
+                        <a href="#" title="View Subject" class="ten-column" data-equalizer-watch>
+                            <h3>9AH French FREA1</h3>
+                        </a>
+                        <a href="#" title="View Subject" class="text-center one-column" data-equalizer-watch>
+                            <i class="icon-next"></i>
                         </a>
                     </div>
                     <ul>
                         <li data-equalizer>
-                            <a href="#" title="View Profile">
-                                <div class="one-column text-center" data-equalizer-watch>
-                                    <img src="https://placekitten.com/g/64/64" alt="Moggy">
-                                </div>
+                            <a href="#" class="one-column" title="View Profile" data-equalizer-watch>
+                                <img src="https://placekitten.com/g/64/64" alt="Moggy">
                             </a>
-                            <a href="#" title="View Profile">
-                                <div class="ten-column" data-equalizer-watch>
-                                    Ms Celia Glenn
-                                    <p class="meta">Teacher</p>
-                                </div>
+                            <a href="#" class="ten-column" title="View Profile" data-equalizer-watch>
+                                Ms Celia Glenn
+                                <p class="meta">Teacher</p>
                             </a>
-                            <a href="#" title="Email Teacher">
-                                <div class="one-column text-center" data-equalizer-watch>
-                                    <i class="icon-email"></i>
-                                </div>
+                            <a href="#" class="one-column text-center"title="Email Teacher" data-equalizer-watch>
+                                <i class="icon-email"></i>
                             </a>
                         </li>
                         <li data-equalizer>
-                            <a href="#" title="View Profile">
-                                <div class="one-column text-center" data-equalizer-watch>
-                                    <img src="https://placekitten.com/g/64/64" alt="Moggy">
-                                </div>
+                            <a href="#" class="one-column" title="View Profile" data-equalizer-watch>
+                                <img src="https://placekitten.com/g/64/64" alt="Moggy">
                             </a>
-                            <a href="#" title="View Profile">
-                                <div class="ten-column" data-equalizer-watch>
-                                    Ms Celia Glenn
-                                    <p class="meta">Teacher</p>
-                                </div>
+                            <a href="#" class="ten-column" title="View Profile" data-equalizer-watch>
+                                Ms Celia Glenn
+                                <p class="meta">Teacher</p>
                             </a>
-                            <a href="#" title="Email Teacher">
-                                <div class="one-column text-center" data-equalizer-watch>
-                                    <i class="icon-email"></i>
-                                </div>
+                            <a href="#" class="one-column text-center"title="Email Teacher" data-equalizer-watch>
+                                <i class="icon-email"></i>
                             </a>
                         </li>
                     </ul>
@@ -208,6 +190,75 @@
         </div>
     </div>
     <hr>
+
+    <h1>Actions List - action-list</h1>
+    <div class="row">
+        <nav class="top-bar" data-topbar>
+            <ul class="title-area">
+                <!-- Title Area -->
+                <li class="name">
+                    <h1><a href="#">Actions</a></h1>
+                </li>
+            </ul>
+            <section class="top-bar-section">
+                <!-- Right Nav Section -->
+                <ul class="right">
+                    <li class="divider"></li>
+                    <li><a href="#" data-reveal-id="courseModal" class="button icon-settings" title="File Settings">Settings</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#" class="button no-text icon-close" data-target="delete-it" title="Close"></a></li>
+                    <!-- Settings Modal -->
+                </ul>
+                <div id="courseModal" class="reveal-modal" data-reveal>
+                    <h2>Course Outline Settings</h2>
+                    <form action="/homepage/configForm.php" method="GET">
+                        <label>
+                            Heading
+                            <input id="componentname" type="text" name="componentname" value="Files">
+                        </label>
+                        
+                        <label for="submit">
+                            <input id="submit" type="submit" value="Update" class="button success">
+                        </label>
+                        
+                    </form>
+                    <a class="close-reveal-modal">&#215;</a>
+                </div>
+            </section>
+        </nav>
+        <div class="island">
+            <ul class="action-list">
+                <li data-equalizer>
+                    <div class="eleven-column" data-equalizer-watch>
+                        <h3><a href="#">Manc</a></h3>
+                    </div>
+                    <div class="actions one">
+                        <a href="#" class="no-text icon-modify" data-equalizer-watch></a>
+                    </div>
+                </li>
+                <li data-equalizer>
+                    <div class="ten-column" data-equalizer-watch>
+                        <h3><a href="#">Manc</a></h3>
+                    </div>
+                    <div class="actions two">
+                        <a href="#" class="no-text icon-modify" data-equalizer-watch></a>
+                        <a href="#" class="no-text icon-calendar" data-equalizer-watch></a>
+                    </div>
+                </li>
+                <li data-equalizer>
+                    <div class="nine-column" data-equalizer-watch>
+                        <h3><a href="#">Shakespear Assignment IV</a></h3>
+                    </div>
+                    <div class="actions three">
+                        <a href="#" class="no-text icon-modify" data-equalizer-watch></a>
+                        <a href="#" class="no-text icon-chat" data-equalizer-watch></a>
+                        <a href="#" class="no-text icon-calendar" data-equalizer-watch></a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <hr>
     
     <h1>Course Outline - action-list</h1>
     <div class="row">
@@ -215,7 +266,7 @@
             <ul class="title-area">
                 <!-- Title Area -->
                 <li class="name">
-                    <h1><a href="#">Files</a></h1>
+                    <h1><a href="#">Course Outline</a></h1>
                 </li>
             </ul>
             <section class="top-bar-section">
@@ -247,35 +298,73 @@
         <div class="island">
             <ul class="action-list">
                 <li class="unit interact">
-                    <div class="small-10 columns">
-                        <h3>
-                            <a href="#" class="expand-link button no-text icon-add" data-interaction="toggle-expanded"></a>
-                            <a href="#">Unit 666: Atomic destruction</a>
-                        </h3>
-                        <span class="warning label">Due in 2 weeks</span>
-                    </div>
-                    <div class="actions two">
-                        <a href="#" class="no-text icon-delete"></a>
-                        <a href="#" class="no-text icon-modify"></a>
+                    <div data-equalizer>
+                        <div class="ten-column" data-equalizer-watch="foo">
+                            <h3>
+                                <a href="#" class="expand-link icon-add" data-interaction="toggle-expanded"></a>
+                                <a href="#">Unit 1: At the beginning</a>
+                            </h3>
+                            <span class="warning label">Due in 2 weeks</span>
+                        </div>
+                        <div class="actions two" data-equalizer-watch="foo">
+                            <a href="#" class="no-text icon-delete" data-equalizer-watch="actions"></a>
+                            <a href="#" class="no-text icon-modify" data-equalizer-watch="actions"></a>
+                        </div>
                     </div>
                     <ul class="action-list task-list">
-                        <li>
-                            <div class="small-10 columns">
-                                <h3><a href="#" class="file icon-document">Manc</a></h3>
+                        <li data-equalizer>
+                            <div class="ten-column" data-equalizer-watch="foo">
+                                <h3><a href="#" class="icon-document">Manc</a></h3>
                             </div>
-                            <div class="actions two">
-                                <a href="#" class="no-text icon-modify"></a>
-                                <a href="#" class="no-text icon-calendar"></a>
+                            <div class="actions two" data-equalizer-watch="bar">
+                                <a href="#" class="no-text icon-modify" data-equalizer-watch="actions"></a>
+                                <a href="#" class="no-text icon-calendar" data-equalizer-watch="actions"></a>
                             </div>
                         </li>
-                        <li>
-                            <div class="small-9 columns">
-                                <h3><a href="#" class="file icon-document">Shakespear Assignment IV</a></h3>
+                        <li data-equalizer>
+                            <div class="nine-column" data-equalizer-watch="foo">
+                                <h3><a href="#" class="icon-document">Shakespear Assignment IV</a></h3>
                             </div>
-                            <div class="actions three">
-                                <a href="#" class="no-text icon-modify"></a>
-                                <a href="#" class="no-text icon-chat"></a>
-                                <a href="#" class="no-text icon-calendar"></a>
+                            <div class="actions three" data-equalizer-watch="bar">
+                                <a href="#" class="no-text icon-modify" data-equalizer-watch="actions"></a>
+                                <a href="#" class="no-text icon-chat" data-equalizer-watch="actions"></a>
+                                <a href="#" class="no-text icon-calendar" data-equalizer-watch="actions"></a>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+                <li class="unit interact">
+                    <div data-equalizer>
+                        <div class="ten-column" data-equalizer-watch="foo">
+                            <h3>
+                                <a href="#" class="expand-link icon-add" data-interaction="toggle-expanded"></a>
+                                <a href="#">Unit 666: Atomic destruction</a>
+                            </h3>
+                            <span class="alert label">Failed</span>
+                        </div>
+                        <div class="actions two" data-equalizer-watch="foo">
+                            <a href="#" class="no-text icon-delete" data-equalizer-watch="actions"></a>
+                            <a href="#" class="no-text icon-modify" data-equalizer-watch="actions"></a>
+                        </div>
+                    </div>
+                    <ul class="action-list task-list">
+                        <li data-equalizer>
+                            <div class="ten-column" data-equalizer-watch="foo">
+                                <h3><a href="#" class="icon-document">Manc</a></h3>
+                            </div>
+                            <div class="actions two" data-equalizer-watch="bar">
+                                <a href="#" class="no-text icon-modify" data-equalizer-watch="actions"></a>
+                                <a href="#" class="no-text icon-calendar" data-equalizer-watch="actions"></a>
+                            </div>
+                        </li>
+                        <li data-equalizer>
+                            <div class="nine-column" data-equalizer-watch="foo">
+                                <h3><a href="#" class="icon-document">Shakespear Assignment IV</a></h3>
+                            </div>
+                            <div class="actions three" data-equalizer-watch="bar">
+                                <a href="#" class="no-text icon-modify" data-equalizer-watch="actions"></a>
+                                <a href="#" class="no-text icon-chat" data-equalizer-watch="actions"></a>
+                                <a href="#" class="no-text icon-calendar" data-equalizer-watch="actions"></a>
                             </div>
                         </li>
                     </ul>
@@ -334,45 +423,45 @@
         <div class="island">
             <ul class="grid medium-block-grid-2 large-block-grid-4">
                 <li>
-                    <div class="two-column centered">
+                    <div class="one-column thumbnail">
                         <a href="#">
                             <img src="https://placekitten.com/g/64/64" alt="Moggy">
                         </a>
                     </div>
-                    <div class="ten-column">
+                    <div class="eleven-column">
                         <a href="#">Steve "Mort" Chan</a>
                         <p class="meta">Teachers</p>
                     </div>
                 </li>
                 <li>
-                    <div class="two-column">
+                    <div class="one-column thumbnail">
                         <a href="#">
                             <img src="https://placekitten.com/g/64/64" alt="Moggy">
                         </a>
                     </div>
-                    <div class="ten-column">
+                    <div class="eleven-column">
                         <a href="#">Steve "Mort" Chan</a>
                         <p class="meta">Teachers</p>
                     </div>
                 </li>
                 <li>
-                    <div class="two-column">
+                    <div class="one-column thumbnail">
                         <a href="#">
                             <img src="https://placekitten.com/g/64/64" alt="Moggy">
                         </a>
                     </div>
-                    <div class="ten-column">
+                    <div class="eleven-column">
                         <a href="#">Steve "Mort" Chan</a>
                         <p class="meta">Teachers</p>
                     </div>
                 </li>
                 <li>
-                    <div class="two-column">
+                    <div class="one-column thumbnail">
                         <a href="#">
                             <img src="https://placekitten.com/g/64/64" alt="Moggy">
                         </a>
                     </div>
-                    <div class="ten-column">
+                    <div class="eleven-column">
                         <a href="#">Steve "Mort" Chan</a>
                         <p class="meta">Teachers</p>
                     </div>
@@ -514,7 +603,7 @@
     <a href="#" class="button icon-tiles">icon-tiles</a>
     <a href="#" class="button icon-timetable">icon-timetable</a>
     <a href="#" class="button icon-time-value">icon-time-value</a>
-    <a href="#" class="button icon-twitte">icon-twitter</a>
+    <a href="#" class="button icon-twitter">icon-twitter</a>
     <a href="#" class="button icon-undo">icon-undo</a>
     <a href="#" class="button icon-upload">icon-upload</a>
     <a href="#" class="button icon-video">icon-video</a>
@@ -749,7 +838,7 @@
                 <legend>Fancy</legend>
                 <div class="large-6 columns">
                     <label>Choose Your Favorite</label>
-                    <input type="radio" name="pokemon" value="Red" id="pokemonRed"><label class="radio-label"for="pokemonRed">Red</label>
+                    <input type="radio" name="pokemon" value="Red" id="pokemonRed" checked><label class="radio-label"for="pokemonRed">Red</label>
                     <input type="radio" name="pokemon" value="Blue" id="pokemonBlue"><label class="radio-label" for="pokemonBlue">Blue</label>
                 </div>
                 <div class="large-6 columns">
@@ -938,19 +1027,19 @@
         </div>
         <div class="large-6 columns">
             <div class="panel callout radius">
-                <h5>This is a callout panel with radiused edges.</h5>
+                <h5>This is a callout panel.</h5>
                 <p>It&#39;s a little ostentatious, but useful for important content.</p>
             </div>
         </div>
         <div class="large-6 columns">
             <div class="highlight-panel">
-                <h5>This is a callout panel with radiused edges.</h5>
+                <h5>This is a callout panel.</h5>
                 <p>It&#39;s a little ostentatious, but useful for important content.</p>
             </div>
         </div>
         <div class="large-6 columns">
             <div class="alert-panel">
-                <h5>This is a callout panel with radiused edges.</h5>
+                <h5>This is a callout panel.</h5>
                 <p>It&#39;s a little ostentatious, but useful for important content.</p>
             </div>
         </div>
@@ -965,37 +1054,39 @@
 
     <hr>
     <h1 id="reveal">Modal / Reveal</h1>
-    <a href="#" data-reveal-id="firstModal" class="button">Example Modal&hellip;</a>
-    <a href="#" data-reveal-id="videoModal" class="secondary button">Example Modal w/Video&hellip;</a>
+    <!-- Triggers the modals -->
+    <a href="#" data-reveal-id="firstModal" class="radius button">Modal in a modal&hellip;</a>
+    <a href="#" data-reveal-id="videoModal" class="radius button">Example Modal with Video&hellip;</a>
+
     <!-- Reveal Modals begin -->
-    <div id="firstModal" class="reveal-modal" data-reveal>
-        <h2>This is a modal.</h2>
-        <p>Reveal makes these very easy to summon and dismiss. The close button is simply an anchor with a unicode character icon and a class of <code>close-reveal-modal</code>. Clicking anywhere outside the modal will also dismiss it.</p>
-        <p>Finally, if your modal summons another Reveal modal, the plugin will handle that for you gracefully.</p>
-        <a href="#" data-reveal-id="secondModal" class="secondary button">Second Modal...</a>
-        <a class="close-reveal-modal">&#215;</a>
+    <div id="firstModal" class="reveal-modal" data-reveal aria-labelledby="firstModalTitle" aria-hidden="true" role="dialog">
+      <h2 id="firstModalTitle">This is a modal.</h2>
+      <p>Reveal makes these very easy to summon and dismiss. The close button is simply an anchor with a unicode character icon and a class of <code>close-reveal-modal</code>. Clicking anywhere outside the modal will also dismiss it.</p>
+      <p>Finally, if your modal summons another Reveal modal, the plugin will handle that for you gracefully.</p>
+      <p><a href="#" data-reveal-id="secondModal" class="secondary button">Second Modal...</a></p>
+      <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
 
-    <div id="secondModal" class="reveal-modal" data-reveal>
-        <h2>This is a second modal.</h2>
-        <p>See? It just slides into place after the other first modal. Very handy when you need subsequent dialogs, or when a modal option impacts or requires another decision.</p>
-        <a class="close-reveal-modal">&#215;</a>
+    <div id="secondModal" class="reveal-modal" data-reveal aria-labelledby="secondModalTitle" aria-hidden="true" role="dialog">
+      <h2 id="secondModalTitle">This is a second modal.</h2>
+      <p>See? It just slides into place after the other first modal. Very handy when you need subsequent dialogs, or when a modal option impacts or requires another decision.</p>
+      <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
 
-    <div id="videoModal" class="reveal-modal large" data-reveal>
-        <h2>This modal has video</h2>
-        <div class="flex-video">
-            <iframe width="420" height="315" src="//www.youtube.com/embed/aiBt44rrslw" frameborder="0" allowfullscreen></iframe>
-        </div>
+    <div id="videoModal" class="reveal-modal large" data-reveal aria-labelledby="videoModalTitle" aria-hidden="true" role="dialog">
+      <h2 id="videoModalTitle">This modal has video</h2>
+      <div class="flex-video widescreen vimeo">
+        <iframe width="1280" height="720" src="//www.youtube-nocookie.com/embed/wnXCopXXblE?rel=0" frameborder="0" allowfullscreen></iframe>
+      </div>
 
-        <a class="close-reveal-modal">&#215;</a>
+      <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
     <!-- Reveal Modals end -->
 
     <hr>
     <h1 id="accordion">Accordion</h1>
     <dl class="accordion" data-accordion>
-        <dd>
+        <dd class="accordion-navigation">
             <a href="#panel1">Accordion 1</a>
             <div id="panel1" class="content active">
                 <dl class="tabs" data-tab>
@@ -1020,13 +1111,13 @@
                 </div>
             </div>
         </dd>
-        <dd>
+        <dd class="accordion-navigation">
             <a href="#panel2">Accordion 2</a>
             <div id="panel2" class="content">
                 Panel 2. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
             </div>
         </dd>
-        <dd>
+        <dd class="accordion-navigation">
             <a href="#panel3">Accordion 3</a>
             <div id="panel3" class="content">
                 Panel 3. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
@@ -1101,8 +1192,8 @@
     <h1 id="sub-nav">Sub Nav</h1>
     <dl class="sub-nav">
         <dt>Filter:</dt>
-        <dd class="active"><a href="#">All</a></dd>
-        <dd><a href="#">Active</a></dd>
+        <dd><a href="#">All</a></dd>
+        <dd class="active"><a href="#">Active</a></dd>
         <dd><a href="#">Pending</a></dd>
         <dd><a href="#">Suspended</a></dd>
     </dl>

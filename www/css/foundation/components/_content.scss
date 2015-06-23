@@ -191,7 +191,7 @@ $reveal-border-width: 9;
 $accordion-navigation-padding: rem-calc(($base-font-size - 4));
 $accordion-navigation-bg-color: tint($tertiary, 74%);
 $accordion-navigation-hover-bg-color: tint($tertiary, 87%);
-// $accordion-navigation-active-bg-color: scale-color($accordion-navigation-bg-color, $lightness: -3%);
+$accordion-navigation-active-bg-color: $white;
 // $accordion-navigation-font-color: $jet;
 $accordion-navigation-font-size: rem-calc(($base-font-size));
 // $accordion-navigation-font-family: $body-font-family;
@@ -263,7 +263,7 @@ $has-tip-border-bottom-hover: dotted 1px $has-tip-font-color;
 // $has-tip-cursor-type: help;
 
 $tooltip-padding: rem-calc(($base-font-size - 2));
-$tooltip-bg: $tuatara;
+$tooltip-bg: $black;
 $tooltip-font-size: rem-calc(($base-font-size - 2));
 // $tooltip-font-weight: $font-weight-normal;
 $tooltip-font-color: $white;
@@ -566,7 +566,7 @@ table{
 }
 
 // The original list
-// This list can use up to 3 columns
+// This list can use up to 4 columns
 // All other lists include (@extend) these styles
 .information-list{
 	list-style: none;
@@ -577,6 +577,7 @@ table{
 		position: relative;
 		overflow: auto;
 		list-style: none;
+		@include single-transition(background-color, 0.3s, ease-in);
 		> &:first-child{
 			padding-top: 0;
 		}
@@ -593,15 +594,28 @@ table{
 		.two-column{
 			@media #{$small-up} { @include grid-column(2); }
 		}
+		.three-column{
+			@media #{$small-up} { @include grid-column(3); }
+		}
+		.nine-column{
+			@media #{$small-up} { @include grid-column(9); }
+		}
 		.ten-column{
 			@media #{$small-up} { @include grid-column(10); }
 		}
 		.eleven-column{
 			@media #{$small-up} { @include grid-column(11); }	
 		}
+		// Column with thumbnail - No Padding
+		.one-column.thumbnail{
+			padding: 0;
+			text-align: center;
+		}
 		// Responsive Column Padding
 		.one-column,
 		.two-column,
+		.three-column,
+		.nine-column,
 		.ten-column,
 		.eleven-column,
 		.grade{
@@ -654,7 +668,7 @@ table{
 				font-size: rem-calc(($base-font-size + 8));
 			}
 		}
-		div{
+		a{
 			@include single-transition(all, 0.15s, linear);
 			&:hover{
 				background-color: $ocean-sunset;
@@ -682,6 +696,11 @@ table{
 // Lists with action buttons
 .action-list{
 	@extend .information-list;
+	> li{
+		&:hover{
+			background-color: $ocean-sunset;
+		}
+	}
 	> li:hover .actions a{
 		opacity: 1;
 	}
@@ -739,6 +758,9 @@ table{
 		display: inline-block;
 		opacity: 0.3;
 		text-align: center;
+		&:hover{
+			background-color: darken($ocean-sunset, 7%);
+		}
 	}
 }
 
