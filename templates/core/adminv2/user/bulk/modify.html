@@ -81,61 +81,56 @@
 </p>
 
 <h2>Search</h2>
-<form action="/adminv2/user/bulk/modify" method="post">
-	<table class="standardForm">
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Campus</h4>
-			</td>
-			<td>
-				<select name="search_campus">
-					<option value="-1">Any</option>
-					<!-- BEGIN search_campus -->
-					<option value="{SEARCH_CAMPUS_ID}" {SEARCH_CAMPUS_SELECTED}>{SEARCH_CAMPUS_NAME}</option>
-					<!-- END search_campus -->
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Role</h4>
-			</td>
-			<td>
-				<select name="search_role">
-					<option value="-1">Any</option>
-					<!-- BEGIN search_role -->
-					<option value="{SEARCH_ROLE_ID}" {SEARCH_ROLE_SELECTED}>{SEARCH_ROLE_NAME}</option>
-					<!-- END search_role -->
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>ePortfolio</h4>
-			</td>
-			<td>
-				<select name="search_eportfolio">
-					<option value="-1">Any</option>
-					<!-- BEGIN search_eportfolio -->
-					<option value="{SEARCH_EPORTFOLIO_ID}" {SEARCH_EPORTFOLIO_SELECTED}>{SEARCH_EPORTFOLIO_NAME}</option>
-					<!-- END search_eportfolio -->
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Year</h4>
-			</td>
-			<td>
-				<input name='search_year' type="text" value="{SEARCH_YEAR_SELECTED}" />
-			</td>
-		</tr>
-	</table>
+<div class="row">
+    <form action="/adminv2/user/bulk/modify" method="post">
+        <div class="small-12 medium-6 large-3 columns">
+            <label>
+                Campus
+                <select name="search_campus">
+                    <option value="-1">Any</option>
+                    <!-- BEGIN search_campus -->
+                    <option value="{SEARCH_CAMPUS_ID}" {SEARCH_CAMPUS_SELECTED}>{SEARCH_CAMPUS_NAME}</option>
+                    <!-- END search_campus -->
+                </select>
+            </label>
+        </div>
 
-	<input type="submit" class="submit-btn-plain" value="Search Users" />
-</form>
+        <div class="small-12 medium-6 large-3 columns">
+            <label>
+                Role
+                <select name="search_role">
+                    <option value="-1">Any</option>
+                    <!-- BEGIN search_role -->
+                    <option value="{SEARCH_ROLE_ID}" {SEARCH_ROLE_SELECTED}>{SEARCH_ROLE_NAME}</option>
+                    <!-- END search_role -->
+                </select>
+            </label>
+        </div>
 
-<div class="clearfix"></div>
+        <div class="small-12 medium-6 large-2 columns">
+            <label>
+                ePortfolio
+                <select name="search_eportfolio">
+                    <option value="-1">Any</option>
+                    <!-- BEGIN search_eportfolio -->
+                    <option value="{SEARCH_EPORTFOLIO_ID}" {SEARCH_EPORTFOLIO_SELECTED}>{SEARCH_EPORTFOLIO_NAME}</option>
+                    <!-- END search_eportfolio -->
+                </select>
+            </label>
+        </div>
+
+        <div class="small-12 medium-6 large-2 columns">
+            <label>
+                Year
+                <input name='search_year' type="text" value="{SEARCH_YEAR_SELECTED}" />
+            </label>
+        </div>
+
+        <div class="small-6 medium-2 large-2 end columns">
+            <input type="submit" value="Search" />
+        </div>
+    </form>
+</div>
 
 <!-- BEGIN has_results -->
 <h1>Search Results</h1>
@@ -147,7 +142,7 @@
 <form id="updateForm" action="/adminv2/user/bulk/modifyForm" method="post">
 	<h2>Users</h2>
 
-	<table data-users="true" class="table ruler">
+	<table data-users="true">
 		<colgroup>
 			<col width="50" />
 			<col />
@@ -155,7 +150,10 @@
 		</colgroup>
 		<thead>
 			<tr>
-				<th><input type="checkbox" data-selectall="true"></th>
+				<th>
+                    <input type="checkbox" data-selectall="true" id="selectAll">
+                    <label for="selectAll" class="checkbox-label"></label>
+                </th>
 				<th>Firstname</th>
 				<th>Lastname</th>
 				<th>External ID</th>
@@ -167,7 +165,10 @@
 		<tbody>
 			<!-- BEGIN user -->
 			<tr>
-				<td><input name='userId[]' type="checkbox" value="{USER_ID}" /></td>
+				<td>
+                    <input name='userId[]' type="checkbox" value="{USER_ID}" id="user-{USER_ID}" />
+                    <label for="user-{USER_ID}" class="checkbox-label"></label>
+                </td>
 				<td>{USER_FIRSTNAME}</td>
 				<td>{USER_LASTNAME}</td>
 				<td>{USER_EXTERNAL_ID}</td>
@@ -179,11 +180,8 @@
 		</tbody>
 	</table>
 
-	<div class="clearfix"></div>
-
 	<h2>New Values</h2>
-
-	<table class="standardForm">
+	<table>
 		<tr>
 			<td class="formLabelWidth">
 				<h4>Default Campus</h4>
