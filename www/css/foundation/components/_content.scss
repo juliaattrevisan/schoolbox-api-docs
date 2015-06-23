@@ -39,7 +39,7 @@
 
 // We use these to set default inner padding and bottom margin
 // $panel-margin-bottom: rem-calc(20);
-// $panel-padding: rem-calc(20);
+$panel-padding: rem-calc(16);
 
 // We use these to set default font colors
 // $panel-font-color: $oil;
@@ -554,58 +554,8 @@ table{
 	}
 }
 
-.accordion a 				{ @include single-transition(all, 0.15s, linear); }
-
-// Activity list
-.activity-list{
-	@extend .information-list;
-	li{
-		.grade{
-			@media #{$small-up} { @include grid-column(1); }
-			text-align: center;
-			font-weight: $font-weight-bold;
-			font-size: rem-calc(($base-font-size + 2));
-		}
-	}
-}
-
-// Subject list
-.subject-list{
-	@extend .information-list;
-	.subject-group{
-		border-bottom: 16px solid $silver;
-	}
-	li{
-		.grade{
-			@media #{$small-up} { @include grid-column(1); }
-			// TODO: eventually fix colours
-			background: $success-color;
-			color: $white;
-			min-height: 64px;
-			text-align: center;
-			font-weight: $font-weight-bold;
-			font-size: rem-calc(($base-font-size - 4));
-			a{
-				color: $white;
-			}
-			span{
-				font-size: rem-calc(($base-font-size + 8));
-			}
-		}
-		div{
-			@include single-transition(all, 0.15s, linear);
-			&:hover{
-				background-color: $ocean-sunset;
-			}
-		}
-		ul{
-			clear: both;
-			margin: 0;
-			li:last-child{
-				padding-bottom: 0;
-			}
-		}
-	}
+.accordion a{
+	@include single-transition(all, 0.15s, linear);
 }
 
 // The original list
@@ -656,6 +606,58 @@ table{
 			}
 			@media #{$large-up} {
 				padding: rem-calc(($base-font-size));
+			}
+		}
+	}
+}
+
+// Activity list
+.activity-list{
+	@extend .information-list;
+	li{
+		.grade{
+			@media #{$small-up} { @include grid-column(1); }
+			text-align: center;
+			font-weight: $font-weight-bold;
+			font-size: rem-calc(($base-font-size + 2));
+		}
+	}
+}
+
+// Subject list
+.subject-list{
+	@extend .information-list;
+	.subject-group{
+		border-bottom: 16px solid $silver;
+	}
+	li{
+		.grade{
+			@media #{$small-up} { @include grid-column(1); }
+			// TODO: eventually fix colours
+			background: $success-color;
+			color: $white;
+			min-height: 64px;
+			text-align: center;
+			font-weight: $font-weight-bold;
+			font-size: rem-calc(($base-font-size - 4));
+			a{
+				color: $white;
+			}
+			span{
+				font-size: rem-calc(($base-font-size + 8));
+			}
+		}
+		div{
+			@include single-transition(all, 0.15s, linear);
+			&:hover{
+				background-color: $ocean-sunset;
+			}
+		}
+		ul{
+			clear: both;
+			margin: 0;
+			li:last-child{
+				padding-bottom: 0;
 			}
 		}
 	}

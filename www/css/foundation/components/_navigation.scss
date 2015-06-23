@@ -130,7 +130,7 @@ $topbar-link-bg-hover: tint($primary-color, 32%);
 // $topbar-link-text-transform: none;
 $topbar-link-padding: rem-calc(($base-font-size - 2));
 // $topbar-back-link-size: $h5-font-size;
-$topbar-link-dropdown-padding: rem-calc(($base-font-size - 6));
+$topbar-link-dropdown-padding: rem-calc(($base-font-size));
 
 $topbar-button-font-size: rem-calc(($base-font-size - 2));
 $topbar-button-top: rem-calc(0px);
