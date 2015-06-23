@@ -420,12 +420,8 @@ $(function() {
         </div>
     </fieldset>
 
-    <input type="submit" name="submit" value="Add User" />
-</form>
-
-<form method="POST" action="/adminv2/userForm.php" class="modify-form" clear="clearfix">
-	<input type="hidden" name="login" value="{USERNAME}" />
-	<a href="#" class="btn no-icon user {ASSUME_CLASS}">{ASSUME_PROMPT}</a>
+    <input type="submit" name="submit" value="Update User" />
+    <input type="submit" name="delete" data-action="delete" value="Delete User" />
 </form>
 
 <h2>Groups</h2>
