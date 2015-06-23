@@ -54,8 +54,33 @@ $(function() {
     <h2>Home</h2>
     <div class="large-4">
         <h3>Server Usage</h3>
-
         <div data-graph="usage"></div>
+
+        <h3>Status of Services</h3>
+        <table>
+            <tbody>
+                <tr>
+                    <td>{EXTERNAL_DB}</td>
+                    <td><span class="{EXTERNAL_DB_LIGHT} label">{EXTERNAL_DB_STATUS}</span></td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td><span class="{EMAIL_LIGHT} label">{EMAIL_STATUS}</span></td>
+                </tr>
+                <tr>
+                    <td>LDAP Primary</td>
+                    <td><span class="{LDAP_LIGHT} label">{LDAP_STATUS}</span></td>
+                </tr>
+                <tr>
+                    <td>LDAP Secondary</td>
+                    <td><span class="{LDAP_ALT_LIGHT} label">{LDAP_ALT_STATUS}</span></td>
+                </tr>
+                <tr>
+                    <td>WWW</td>
+                    <td><span class="{WWW_LIGHT} label">{WWW_STATUS}</span></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
     <div class="large-8">
 
@@ -72,14 +97,6 @@ $(function() {
 	<div class="one-third clearfix">
 		<div class="level">
 
-			<h3>Status of services</h3>
-			<ul class="server-statuses" >
-				<li id="db-light" class="{EXTERNAL_DB_LIGHT} clearfix"><strong>{EXTERNAL_DB}</strong><em><span></span></em><span>{EXTERNAL_DB_STATUS}</span></li>
-				<li id="email-light" class="{EMAIL_LIGHT} clearfix"><strong>Email </strong><em><span></span></em><span>{EMAIL_STATUS}</span></li>
-				<li id="ldap-light" class="{LDAP_LIGHT} clearfix"><strong>LDAP Primary</strong><em><span></span></em><span>{LDAP_STATUS}</span></li>
-				<li id="ldap-alt-light" class="{LDAP_ALT_LIGHT} clearfix"><strong>LDAP Secondary</strong><em><span></span></em><span>{LDAP_ALT_STATUS}</span></li>
-				<li id="www-light" class="{WWW_LIGHT} clearfix"><strong>WWW </strong><em><span></span></em><span>{WWW_STATUS}</span></li>
-			</ul>
             <div class="loading"></div>
             <h3>Role statistics</h3>
 			    <table class="logged-in table ruler" id="group-summary">
