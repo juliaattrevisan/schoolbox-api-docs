@@ -310,6 +310,11 @@ $(function() {
 
 <h2>{FULLNAME}</h2>
 
+<form method="POST" action="/adminv2/userForm.php" class="modify-form" clear="clearfix">
+    <input type="hidden" name="login" value="{USERNAME}" />
+    <input type="submit" class="{ASSUME_CLASS}" value="{ASSUME_PROMPT}" />
+</form>
+
 <form method="POST" action="/adminv2/userForm.php" data-validatable>
     <fieldset>
         <legend>User Detail</legend>
