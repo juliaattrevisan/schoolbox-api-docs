@@ -64,7 +64,43 @@
 
             var merged = $.extend(defaults, derived, options);
 
+            /* Work out colour transitions
+             */
+            for (var i = 0; i < merged.series[0].data.length; i++) {
+                merged.colors.push(getHexColor(merged.series[0].data[i]));
+            }
+
             return merged;
+        }
+
+        /**
+         * Colour transition
+         *
+         * @param percent
+         */
+        function getHexColor(percent){
+            var max = 230;
+
+            var r = percent<50 ? max : Math.floor(max-(percent*2-100)*max/100);
+            var g = percent>50 ? max : Math.floor((percent*2)*max/100);
+
+            return '#' + hexColorComponent(r) + hexColorComponent(g) + '00';
+        }
+
+        /**
+         * With prefixed 0
+         *
+         * @param percentage
+         * @returns {*}
+         */
+        function hexColorComponent(percentage) {
+            var hexValue = percentage.toString(16);
+
+            if (hexValue.length < 2) {
+                return '0' + hexValue;
+            }
+
+            return hexValue;
         }
 
         /**
