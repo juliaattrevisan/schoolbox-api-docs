@@ -1,13 +1,16 @@
 <!-- BEGIN custom_head -->
+<style type="text/css">
+    #container, #content {
+        min-width: 0;
+    }
+</style>had
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
-<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
-<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectAll.js"></script>
 <script type="text/javascript">
 $(function() {
-	$('.table').selectAll({
+	$('table').selectAll({
 		key: 'selectall',
 		checkboxName: 'cleanupEventId[]'
 	});
@@ -208,39 +211,49 @@ $(function() {
 			<p>Display a list of events between two dates.</p>
 
 			<form action="/adminv2/calendar/Cleanup" method="get">
+
+                <div class="row">
+
+                    <div class="column medium-4">
+                        From <input type="text" id='start_date' name="cleanupFrom" value="{CLEANUP_HAS_DATES_FROM}" />
+                    </div>
+                    <div class="column medium-4">
+                        Until <input type="text" id='finish_date' name="cleanupTo" size="15" maxlength="30" value="{CLEANUP_HAS_DATES_TO}" />
+                    </div>
+                    <div class="column medium-4">
+                        <input type="hidden" name='action' value='cleanup' />
+                        <input type="submit" class='submit-btn-plain float-left' value="Change Dates" />
+                    </div>
+
+                </div>
+
+
 				<label class="float-left">
-					From
-					<input type="text" id='start_date' name="cleanupFrom" style="width:100px" value="{CLEANUP_HAS_DATES_FROM}" />
+
 				</label>
 				<label class="float-left">
-					until
-					<input type="text" id='finish_date' name="cleanupTo" size="15" maxlength="30" style="width:100px" value="{CLEANUP_HAS_DATES_TO}" />
+
 				</label>
 
-				<input type="hidden" name='action' value='cleanup' />
-				<input type="submit" class='submit-btn-plain float-left' value="Change Dates" />
 			</form>
 
-			<div class="clearfix"></div>
-
 			<div>
-				<label>
-					<input type="checkbox" data-modifier-control="true" value="personal" />Select Personal Events<br />
-				</label>
-				<label>
-					<input type="checkbox" data-modifier-control="true" value="group" />Select Group Events<br />
-				</label>
+                <input id="check-personal" type="checkbox" data-modifier-control="true" value="personal" />
+				<label for="check-personal" class="checkbox-label">Select Personal Events</label>
+                <input id="check-group" type="checkbox" data-modifier-control="true" value="group" />
+				<label for="check-group" class="checkbox-label">Select Group Events</label>
 			</div>
-
-			<div class="clearfix"></div>
 
 			<!-- BEGIN cleanup_has_events -->
 			<h3>Events</h3>
 			<form action="/adminv2/calendar/modifyForm" method="post">
-				<table class="table ruler">
+				<table>
 					<thead>
 						<tr>
-							<th><input type="checkbox" data-selectall="true" value="" /></th>
+							<th>
+                                <input id="check-all" type="checkbox" data-selectall="true" value="" />
+                                <label for="check-all" class="checkbox-label"></label>
+							</th>
 							<th>Title</th>
 							<th>Type</th>
 							<th>Author</th>
@@ -252,7 +265,10 @@ $(function() {
 					<tbody>
 						<!-- BEGIN cleanup_event -->
 						<tr>
-							<td><input type="checkbox" name="cleanupEventId[]" data-modifier='{CLEANUP_EVENT_MODIFIER}' value="{CLEANUP_EVENT_ID}" /></td>
+							<td>
+                                <input id="check-{CLEANUP_EVENT_ID}" type="checkbox" name="cleanupEventId[]" data-modifier='{CLEANUP_EVENT_MODIFIER}' value="{CLEANUP_EVENT_ID}" />
+                                <label for="check-{CLEANUP_EVENT_ID}" class="checkbox-label"></label>
+                            </td>
 							<td><a href='/calendar/modify.php?eventID={CLEANUP_EVENT_ID}'>{CLEANUP_EVENT_TITLE}</a></td>
 							<td>{CLEANUP_EVENT_EVENTTYPE}</td>
 							<td><a href="/search/user/{CLEANUP_EVENT_AUTHOR_ID}">{CLEANUP_EVENT_AUTHOR}</a></td>
