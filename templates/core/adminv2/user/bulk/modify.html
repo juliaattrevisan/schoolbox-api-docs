@@ -181,131 +181,84 @@
 	</table>
 
 	<h2>New Values</h2>
-	<table>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Default Campus</h4>
-				<em>If selected, users will be involved in this campus, regardless of the options chosen under Campus Involvement.</em>
-			</td>
-			<td>
-				<select name="apply_defaultcampus">
-					<option value="-1">Unchanged</option>
-					<!-- BEGIN apply_defaultcampus -->
-					<option value="{APPLY_DEFAULTCAMPUS_ID}" />{APPLY_DEFAULTCAMPUS_NAME}</option>
-					<!-- END apply_defaultcampus -->
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Campus Involvement</h4>
-				<em>One or more campuses that the users will be involved in.</em>
-			</td>
-			<td>
-				<ul data-applycampus="true">
-					<li>
-                        <input id="campus-unchanged" name='apply_campus[]' type="checkbox" value="-1" checked="checked" />
-                        <label class="checkbox-label" for="campus-unchanged">Unchanged</label>
-                    </li>
-					<!-- BEGIN apply_campus -->
-					<li>
-                        <input id="campus-{APPLY_CAMPUS_ID}" name='apply_campus[]' type="checkbox" value="{APPLY_CAMPUS_ID}" />
-                        <label class="checkbox-label" for="campus-{APPLY_CAMPUS_ID}">{APPLY_CAMPUS_NAME}</label>
-                    </li>
-					<!-- END apply_campus -->
-				</ul>
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Role</h4>
-			</td>
-			<td>
-				<select name="apply_role">
-					<option value="-1">Unchanged</option>
-					<!-- BEGIN apply_role -->
-					<option value="{APPLY_ROLE_ID}">{APPLY_ROLE_NAME}</option>
-					<!-- END apply_role -->
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Year</h4>
-				<em>Leave blank if you don't want to update their year.</em>
-			</td>
-			<td>
-				<input name='apply_year' type="text" value="" />
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>ePortfolio</h4>
-			</td>
-			<td>
-				<select name="apply_eportfolio">
-					<option value="-1">Unchanged</option>
-					<!-- BEGIN apply_eportfolio -->
-					<option value="{APPLY_EPORTFOLIO_ID}">{APPLY_EPORTFOLIO_NAME}</option>
-					<!-- END apply_eportfolio -->
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Email Address From Username</h4>
-			</td>
-			<td>
-				<select name="apply_emailfromusername">
-					<option value="-1">Unchanged</option>
-					<!-- BEGIN apply_emailfromusername -->
-					<option value="{APPLY_EMAILFROMUSERNAME_ID}">{APPLY_EMAILFROMUSERNAME_NAME}</option>
-					<!-- END apply_emailfromusername -->
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Use External Mail Client</h4>
-			</td>
-			<td>
-				<select name="apply_externalmailclient">
-					<option value="-1">Unchanged</option>
-					<!-- BEGIN apply_externalmailclient -->
-					<option value="{APPLY_EXTERNALMAILCLIENT_ID}">{APPLY_EXTERNALMAILCLIENT_NAME}</option>
-					<!-- END apply_externalmailclient -->
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Enable Webmail Tab</h4>
-			</td>
-			<td>
-				<select name="apply_webmail">
-					<option value="-1">Unchanged</option>
-					<!-- BEGIN apply_webmail -->
-					<option value="{APPLY_WEBMAIL_ID}">{APPLY_WEBMAIL_NAME}</option>
-					<!-- END apply_webmail -->
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth">
-				<h4>Account Enabled</h4>
-			</td>
-			<td>
-				<select name="apply_accountenabled">
-					<option value="-1">Unchanged</option>
-					<!-- BEGIN apply_accountenabled -->
-					<option value="{APPLY_ACCOUNTENABLED_ID}">{APPLY_ACCOUNTENABLED_NAME}</option>
-					<!-- END apply_accountenabled -->
-				</select>
-			</td>
-		</tr>
-	</table>
 
-	<input name='updateUsers' type="submit" class="submit-btn-plain" value="Apply To Selected" />
-	<input name='deleteUsers' type="button" class="submit-btn-plain" value="Delete Selected Users" />
+    <label for="apply_defaultcampus">
+        Default Campus
+        <span data-tooltip class="hint has-tip" title="If selected, users will be involved in this campus, regardless of the options chosen under Campus Involvement.">?</span>
+    </label>
+    <select id="apply_defaultcampus" name="apply_defaultcampus">
+        <option value="-1">Unchanged</option>
+        <!-- BEGIN apply_defaultcampus -->
+        <option value="{APPLY_DEFAULTCAMPUS_ID}" />{APPLY_DEFAULTCAMPUS_NAME}</option>
+        <!-- END apply_defaultcampus -->
+    </select>
+
+    <label>
+        Campus Involvement
+        <span data-tooltip class="hint has-tip" title="One or more campuses that the users will be involved in.">?</span>
+    </label>
+    <ul data-applycampus="true">
+        <li>
+            <input id="apply_campus-unchanged" name='apply_campus[]' type="checkbox" value="-1" checked="checked" />
+            <label class="checkbox-label" for="apply_campus-unchanged">Unchanged</label>
+        </li>
+        <!-- BEGIN apply_campus -->
+        <li>
+            <input id="apply_campus-{APPLY_CAMPUS_ID}" name='apply_campus[]' type="checkbox" value="{APPLY_CAMPUS_ID}" />
+            <label class="checkbox-label" for="apply_campus-{APPLY_CAMPUS_ID}">{APPLY_CAMPUS_NAME}</label>
+        </li>
+        <!-- END apply_campus -->
+    </ul>
+
+    <label for="apply_role">Role</label>
+    <select id="apply_role" name="apply_role">
+        <option value="-1">Unchanged</option>
+        <!-- BEGIN apply_role -->
+        <option value="{APPLY_ROLE_ID}">{APPLY_ROLE_NAME}</option>
+        <!-- END apply_role -->
+    </select>
+
+    <label for="apply_eportfolio">ePortfolio</label>
+    <select id="apply_eportfolio" name="apply_eportfolio">
+        <option value="-1">Unchanged</option>
+        <!-- BEGIN apply_eportfolio -->
+        <option value="{APPLY_EPORTFOLIO_ID}">{APPLY_EPORTFOLIO_NAME}</option>
+        <!-- END apply_eportfolio -->
+    </select>
+
+    <label for="apply_emailfromusername">Email Address From Username</label>
+    <select id="apply_emailfromusername" name="apply_emailfromusername">
+        <option value="-1">Unchanged</option>
+        <!-- BEGIN apply_emailfromusername -->
+        <option value="{APPLY_EMAILFROMUSERNAME_ID}">{APPLY_EMAILFROMUSERNAME_NAME}</option>
+        <!-- END apply_emailfromusername -->
+    </select>
+
+    <label for="apply_externalmailclient">Use External Mail Client</label>
+    <select id="apply_externalmailclient" name="apply_externalmailclient">
+        <option value="-1">Unchanged</option>
+        <!-- BEGIN apply_externalmailclient -->
+        <option value="{APPLY_EXTERNALMAILCLIENT_ID}">{APPLY_EXTERNALMAILCLIENT_NAME}</option>
+        <!-- END apply_externalmailclient -->
+    </select>
+
+    <label for="apply_webmail">Enable Webmail Tab</label>
+    <select id="apply_webmail" name="apply_webmail">
+        <option value="-1">Unchanged</option>
+        <!-- BEGIN apply_webmail -->
+        <option value="{APPLY_WEBMAIL_ID}">{APPLY_WEBMAIL_NAME}</option>
+        <!-- END apply_webmail -->
+    </select>
+
+    <label for="apply_accountenabled">Account Enabled</label>
+    <select id="apply_accountenabled" name="apply_accountenabled">
+        <option value="-1">Unchanged</option>
+        <!-- BEGIN apply_accountenabled -->
+        <option value="{APPLY_ACCOUNTENABLED_ID}">{APPLY_ACCOUNTENABLED_NAME}</option>
+        <!-- END apply_accountenabled -->
+    </select>
+
+    <input name='updateUsers' type="submit" value="Apply To Selected" />
+    <input name='deleteUsers' type="submit" value="Delete Selected Users" />
 </form>
 <!-- END has_results -->
