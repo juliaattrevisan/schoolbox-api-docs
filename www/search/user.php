@@ -326,7 +326,7 @@ if (is_numeric($this->arg[0])) {
                         'YCOORD'                => $coordTeacher,
                         'LOCKER'                => Scrub::text($synInfo['StudentLockerBook']),
                         'BIRTHDATE'             => '',
-                        'MEDICAL_NOTE'          => Scrub::html($synInfo['StudentMedicalAlert']),
+                        'MEDICAL_NOTE'          => Scrub::text($synInfo['StudentMedicalAlert']),
                         'CONTACT_ALERT_MESSAGE' => preg_replace(
                             '/[\\n\\r]+/',
                             '<hr/>',
