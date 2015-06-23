@@ -57,7 +57,7 @@ $side-nav-heading-text-transform: normal;
 // $include-html-nav-classes: $include-html-classes;
 
 // We use these to control margin and padding
-$sub-nav-list-margin: 0;
+$sub-nav-list-margin: 0 0 rem-calc(($base-font-size)) 0;
 $sub-nav-list-padding-top: rem-calc(0);
 
 // We use this to control the definition
