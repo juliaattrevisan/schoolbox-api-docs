@@ -141,5 +141,25 @@ a{
 	margin-bottom: rem-calc(($base-font-size - 3));
 }
 
+// Add colours
+.primary{
+	color: $primary-color;
+}
+
+.secondary{
+	color: $secondary-color;
+}
+
+.success{
+	color: $success-color;
+}
+
+.warning{
+	color: $warning-color;
+}
+
+.alert{
+	color: $alert-color;
+}
 
 
