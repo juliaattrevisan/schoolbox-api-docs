@@ -467,6 +467,14 @@ $tooltip-font-color: $white;
 // Tables
 table{
 	width: 100%;
+	td{
+		input[type=radio] +
+		label.radio-label,
+		input[type=checkbox] +
+		label.checkbox-label{
+			margin: 0 rem-calc(($base-font-size)) 0 0;
+		}
+	}
 }
 
 // Panels

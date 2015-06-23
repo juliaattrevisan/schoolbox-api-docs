@@ -145,7 +145,7 @@ label.radio-label,
 input[type=checkbox] +
 label.checkbox-label		{ padding-left: 29px; height: 24px; display: inline-block; line-height: 24px;
 							background-repeat: no-repeat; background-position: 0 0; font-weight: $font-weight-normal;
-							vertical-align: middle; cursor: pointer; margin: 16px 1.375rem 16px 0;
+							vertical-align: middle; cursor: pointer; margin: rem-calc(($base-font-size - 2));
 }
 input[type=checkbox] +
 label.checkbox-label		{ background-position: 0 -72px; }
