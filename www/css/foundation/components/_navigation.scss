@@ -58,7 +58,7 @@ $side-nav-heading-text-transform: normal;
 
 // We use these to control margin and padding
 $sub-nav-list-margin: 0;
-// $sub-nav-list-padding-top: rem-calc(4);
+$sub-nav-list-padding-top: rem-calc(0);
 
 // We use this to control the definition
 // $sub-nav-font-family: $body-font-family;
@@ -130,7 +130,7 @@ $topbar-link-bg-hover: tint($primary-color, 32%);
 // $topbar-link-text-transform: none;
 $topbar-link-padding: rem-calc(($base-font-size - 2));
 // $topbar-back-link-size: $h5-font-size;
-$topbar-link-dropdown-padding: rem-calc(($base-font-size - 6));
+$topbar-link-dropdown-padding: rem-calc(($base-font-size));
 
 $topbar-button-font-size: rem-calc(($base-font-size - 2));
 $topbar-button-top: rem-calc(0px);
@@ -263,6 +263,10 @@ $menu-slide: "transform 500ms ease";
 
 // Sub Navigation
 .sub-nav{
+	li,
+	dd{
+		margin-left: 1px;
+	}
 	a{
 		background-color: $sub-nav-bg-color;
 		display: inline-block;

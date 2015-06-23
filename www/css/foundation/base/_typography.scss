@@ -141,5 +141,43 @@ a{
 	margin-bottom: rem-calc(($base-font-size - 3));
 }
 
+// Add colours
+.primary{
+	color: $primary-color;
+}
+
+.secondary{
+	color: $secondary-color;
+}
+
+.tertiary{
+	color: $tertiary;
+}
+
+.success{
+	color: $success-color;
+}
+
+.warning{
+	color: $warning-color;
+}
+
+.info{
+	color: $info-color;
+}
+
+.alert{
+	color: $alert-color;
+}
+
+.ocean-sunset{
+	color: $ocean-sunset;
+}
+
+.neutral{
+	color: $steel;
+}
+
+
 
 
