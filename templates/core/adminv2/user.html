@@ -33,19 +33,6 @@ $(function() {
     $('#modify-user-button').click(openModifyScreen);
     $('#modify-user').submit(openModifyScreen);
 
-    $('h2 span').each(function() {
-        $(this).qtip({
-            content: 'If you are wanting to deal with large lists at once, use this section.',
-            style: {
-                classes: 'qtip-green qtip-shadow'
-            },
-            position: {
-                my: 'bottom left',
-                at: 'top left'
-            }
-        });
-    });
-
   $.validator.addMethod('roles_different', function (value, element) {
     return $('#cl_dest').val() != $('#cl_src').val();
   }, "Roles cannot be the same");
@@ -124,7 +111,7 @@ $(function() {
         <tr>
             <th scope="col">Name</th>
             <th scope="col">Last Login</th>
-            <th scope="col">Modify</th>
+            <th scope="col">&nbsp;</th>
         </tr>
         </thead>
         <tbody>
@@ -132,7 +119,7 @@ $(function() {
         <tr>
             <td>{SUPERUSER_NAME}</td>
             <td>{SUPERUSER_LOGIN}</td>
-            <td><a href="/adminv2/modify-user/{SUPERUSER_ID}">Modify</a></td>
+            <td><a class="no-text icon-modify" title="Modify" href="/adminv2/modify-user/{SUPERUSER_ID}"></a></td>
         </tr>
         <!-- END superusers -->
         </tbody>
@@ -140,40 +127,34 @@ $(function() {
 </div>
 
 <div class="large-6 columns">
-    <h2>Bulk Options<span class="question">?</span></h2>
+    <h2>Bulk Options <span data-tooltip class="has-tip" title="If you are wanting to deal with large lists at once, use this section.">?</span></h2>
     <div class="level clearfix">
         <h3>Modify Users</h3>
         <p>Search for users based on a set of criteria, and apply settings en masse.</p>
-        <p class="clearfix">
-            <a href="/adminv2/user/bulk/modify" class="btn download float-left" ><span></span>Bulk Modify</a>
-        </p>
+        <a href="/adminv2/user/bulk/modify" class="button icon-modify">Bulk Modify</a>
     </div>
 
     <div class="level clearfix">
         <h3>Add Users</h3>
         <p>Provide a file containing a list of users in the following CSV format. (username, title, firstname, lastname, synergetic, role, campus, campus secondary, campus tertiary, campus quaternary, year, password, webmail, alt. email) </p>
-        <p class="clearfix">
-            <a href="/adminv2/csv/userBulkAdd.csv" class="btn download float-left" ><span></span>Download Template</a>
-        </p>
+        <a href="/adminv2/csv/userBulkAdd.csv" class="button icon-download" >Download Template</a>
 
         <h3>Upload bulk users CSV</h3>
-        <form id="add-users" action="/adminv2/bulkAdd" method="post" enctype="multipart/form-data">
+        <form action="/adminv2/bulkAdd" method="post" enctype="multipart/form-data">
             <input name="bulkadd" type="file">
-            <a class="submit-btn-plain float-right submit-this" href="#"><span></span>Add users</a>
+            <button type="submit" class="icon-add">Add Users</button>
         </form>
     </div>
 
     <div class="level clearfix">
         <h3>Remove Users</h3>
         <p>Provide a file containing a list of usernames or School DB IDs.</p>
-        <p class="clearfix">
-            <a href="/adminv2/csv/userBulkRemove.csv" class="btn download float-left" ><span></span>Download Template</a>
-        </p>
+        <a href="/adminv2/csv/userBulkRemove.csv" class="button icon-download">Download Template</a>
 
         <h3>Upload bulk remove users CSV</h3>
-        <form id="add-users" action="/adminv2/bulkRemove" method="post" enctype="multipart/form-data">
+        <form action="/adminv2/bulkRemove" method="post" enctype="multipart/form-data">
             <input name="bulkremove" type="file">
-            <a class="submit-btn-plain delete float-right submit-this" href="#"><span></span>Remove Users</a>
+            <button type="submit" class="icon-delete">Remove Users</button>
         </form>
     </div>
     <form id="clone" action="/adminv2/user/cloneForm.php" method="post" class="level clearfix">
@@ -200,6 +181,6 @@ $(function() {
       </label>
       <!-- END new_role -->
       <!-- END select_clone -->
-      <input class="submit-btn-plain" type="submit" value="Clone" />
+      <button type="submit" class="icon-copy">Clone</button>
     </form>
 </div>
