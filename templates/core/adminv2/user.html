@@ -1,12 +1,10 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
-<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
-<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript">
 $(function() {
-
-    $('#modify')
+    var modifyForm = $('form[data-action="modify-user"]');
+    modifyForm.find('input[data-selectizeuser]')
         .selectizeSelector({
             ajax: {
                 url:      '/ajax/user.php',
@@ -15,66 +13,61 @@ $(function() {
                 dataType: 'json'
             }
         })
-        .on('selectize.item_add', function(event, value) {
-            $('#user-to-mod').val(value)
-            $('#modify-user-button').removeClass('disabled').focus();
+        .on('selectize.item_add', function() {
+            modifyForm.find(':submit').prop('disabled', false).focus();
         })
         .on('selectize.item_remove', function() {
-            $('#user-to-mod').val('')
-            $('#modify-user-button').addClass('disabled');
-        })
+            modifyForm.find(':submit').prop('disabled', true);
+        });
 
     var openModifyScreen = function(event) {
         event.preventDefault();
-        if (!$('#modify-user-button').hasClass('disabled')) {
-            window.open('/adminv2/modify-user/'+$('#user-to-mod').val(), '_self');
-        }
-    }
-    $('#modify-user-button').click(openModifyScreen);
-    $('#modify-user').submit(openModifyScreen);
+        window.location.href = '/adminv2/modify-user/'+modifyForm.find(':input[name="userId"]').val();
+    };
+    modifyForm.submit(openModifyScreen);
 
-  $.validator.addMethod('roles_different', function (value, element) {
-    return $('#cl_dest').val() != $('#cl_src').val();
-  }, "Roles cannot be the same");
-
-  $('#clone').validate({
-    submitHandler: function (form) {
-      var src  = $('#cl_src').children('option[value=' + $('#cl_src').val() + ']').text(),
-          dest = $('#cl_dest').children('option[value=' + $('#cl_dest').val() + ']').text(),
-          newc = $('#cl_new input').val(),
-          msg  = "WARNING! This will clone '"+src+"' onto ";
-
-      if ($('#cl_dest').val() > 0) {
-        msg += "'" + dest + "', making it an exact copy. '" + dest + "' will lose its dashboard, all permissions and role-specific data. ";
-      } else {
-        msg += "a newly created role '" + newc + "'! "
-      }
-
-      msg += "This action CANNOT be reversed. Are you sure you wish to proceed?";
-
-      if (confirm(msg)) {
-        form.submit();
-      }
-    },
-    rules: {
-      'clone[dest]': {
-        'roles_different': true
-      },
-      'clone[new]': {
-        required: function (element) {
-          return $('#cl_dest').val() == 0
-        }
-      }
-    }
-  });
-
-  $('#cl_dest').on('change', function () {
-    if ($(this).val() > 0) {
-      $('#cl_new').addClass('hide');
-    } else {
-      $('#cl_new').removeClass('hide');
-    }
-  });
+//  $.validator.addMethod('roles_different', function (value, element) {
+//    return $('#cl_dest').val() != $('#cl_src').val();
+//  }, "Roles cannot be the same");
+//
+//  $('#clone').validate({
+//    submitHandler: function (form) {
+//      var src  = $('#cl_src').children('option[value=' + $('#cl_src').val() + ']').text(),
+//          dest = $('#cl_dest').children('option[value=' + $('#cl_dest').val() + ']').text(),
+//          newc = $('#cl_new input').val(),
+//          msg  = "WARNING! This will clone '"+src+"' onto ";
+//
+//      if ($('#cl_dest').val() > 0) {
+//        msg += "'" + dest + "', making it an exact copy. '" + dest + "' will lose its dashboard, all permissions and role-specific data. ";
+//      } else {
+//        msg += "a newly created role '" + newc + "'! "
+//      }
+//
+//      msg += "This action CANNOT be reversed. Are you sure you wish to proceed?";
+//
+//      if (confirm(msg)) {
+//        form.submit();
+//      }
+//    },
+//    rules: {
+//      'clone[dest]': {
+//        'roles_different': true
+//      },
+//      'clone[new]': {
+//        required: function (element) {
+//          return $('#cl_dest').val() == 0
+//        }
+//      }
+//    }
+//  });
+//
+//  $('#cl_dest').on('change', function () {
+//    if ($(this).val() > 0) {
+//      $('#cl_new').addClass('hide');
+//    } else {
+//      $('#cl_new').removeClass('hide');
+//    }
+//  });
 
 });
 
@@ -92,11 +85,11 @@ $(function() {
 <div class="large-6 columns">
     <h2>Users</h2>
 
-    <form id="modify-user" action="" method="post" class="clearfix">
+    <form data-action="modify-user" action="" method="post" class="clearfix">
         <h3>Modify User</h3>
-        <input type="text" id="modify" placeholder="Search Users">
-        <input type="hidden" id="user-to-mod">
-        <button id="modify-user-button" class="icon-modify" disabled>Modify</button>
+        <input data-selectizeuser type="text" name="userId" placeholder="Search Users">
+        <!--<input type="hidden" id="user-to-mod">-->
+        <button type="submit" class="icon-modify" disabled>Modify</button>
         <a class="button icon-add" href="/adminv2/modify-user/">Add User</a>
     </form>
 
