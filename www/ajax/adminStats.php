@@ -40,11 +40,11 @@ if(isset($_POST['module'])) {
         case 'service_www':
             $context = \Proxy\Server::getInstance()->getContext();
             if(@file_get_contents('http://deb.alaress.com.au/testfile.txt', null, $context)) {
-                $output[] = array('WWW_LIGHT'  => 'on',
+                $output[] = array('WWW_LIGHT'  => 'success',
                                   'WWW_STATUS' => 'Available'
                 );
             } else {
-                $output[] = array('WWW_LIGHT'  => '',
+                $output[] = array('WWW_LIGHT'  => 'alert',
                                   'WWW_STATUS' => 'Inaccessible');
             }
 

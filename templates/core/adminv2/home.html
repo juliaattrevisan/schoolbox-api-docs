@@ -1,47 +1,3 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript">
-$(function() {
-    $(window).load( function() {
-        // test that the non-js page has not been requested
-        if(window.location.pathname.indexOf("nojscript") == -1) {
-            // replace the default www status 'untested' with 'testing'
-            $('#www-light > span').html('Testing...');
-
-            // load the user statistics via ajax
-            $.post('/ajax/adminStats.php', { module : 'users' }, function(data) {
-                for (i in data) {
-                    var row = data[i];
-
-                    if(row.GROUP_ID > 0) {
-                        $('<tr><td nowrap="nowrap"><a href="/adminv2/reports/group/' + row.GROUP_ID + '">' + row.GROUP_NAME +
-                           '</a></td><td>' + row.GROUP_USER +
-                           '</td><td>' + row.GROUP_LOGGED_IN + '</td></tr>').appendTo($('#group-summary'));
-                    } else {
-                        $('<tr><td nowrap="nowrap"><strong>' + row.GROUP_NAME +
-                                '</strong></td><td>' + row.GROUP_USER +
-                                '</td><td>' + row.GROUP_LOGGED_IN + '</td></tr>').appendTo($('#group-summary'));
-                    }
-                }
-            });
-
-            // load service statuses via ajax
-            $.post('/ajax/adminStats.php', { module : 'service_www' }, function(data) {
-                for(i in data) {
-                    var light = data[i].WWW_LIGHT;
-                    var status = data[i].WWW_STATUS;
-                }
-                $('#www-light > span').html(status);
-                $('#www-light').addClass(light);
-            });
-        }
-    });
-
-
-
-});
-</script>
-<!-- END custom_head-->
-
 <h1>Schoolbox Administration</h1>
 
 <dl class="sub-nav">
@@ -81,7 +37,7 @@ $(function() {
                 </tr>
                 <tr>
                     <td>WWW</td>
-                    <td><span class="full-width {WWW_LIGHT} label">{WWW_STATUS}</span></td>
+                    <td><span class="full-width {WWW_LIGHT} label" data-light="www">{WWW_STATUS}</span></td>
                 </tr>
             </tbody>
         </table>
@@ -197,5 +153,40 @@ $(function() {
                 return str;
             }
         });
+    });
+
+    $(window).load( function() {
+        // test that the non-js page has not been requested
+        if(window.location.pathname.indexOf("nojscript") == -1) {
+            // replace the default www status 'untested' with 'testing'
+            $('[data-light="www"]').html('Testing...');
+
+            // load the user statistics via ajax
+            $.post('/ajax/adminStats.php', { module : 'users' }, function(data) {
+                for (i in data) {
+                    var row = data[i];
+
+                    if(row.GROUP_ID > 0) {
+                        $('<tr><td><a href="/adminv2/reports/group/' + row.GROUP_ID + '">' + row.GROUP_NAME +
+                                '</a></td><td>' + row.GROUP_USER +
+                                '</td><td>' + row.GROUP_LOGGED_IN + '</td></tr>').appendTo($('#group-summary'));
+                    } else {
+                        $('<tr><td>' + row.GROUP_NAME +
+                                '</td><td>' + row.GROUP_USER +
+                                '</td><td>' + row.GROUP_LOGGED_IN + '</td></tr>').appendTo($('#group-summary'));
+                    }
+                }
+            });
+
+            // load service statuses via ajax
+            $.post('/ajax/adminStats.php', { module : 'service_www' }, function(data) {
+                for(i in data) {
+                    var light = data[i].WWW_LIGHT;
+                    var status = data[i].WWW_STATUS;
+                }
+                $('[data-light="www"]').html(status);
+                $('[data-light="www"]').addClass(light);
+            });
+        }
     });
 </script>
