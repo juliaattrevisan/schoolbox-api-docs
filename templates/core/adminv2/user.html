@@ -29,9 +29,9 @@ $(function() {
 
     // The clone form
     var cloneForm = $('form[data-action="clone"]');
-    var cloneSrc  = cloneForm.find(':input[name="clone[src]"]');
-    var cloneDest = cloneForm.find(':input[name="clone[dest]"]');
-    var cloneNew  = cloneForm.find(':input[name="clone[new]"]');
+    var cloneSrc  = cloneForm.find(':input[data-role="clone-src"]');
+    var cloneDest = cloneForm.find(':input[data-role="clone-dest"]');
+    var cloneNew  = cloneForm.find(':input[data-role="clone-new"]');
     $.validator.addMethod('roles_different', function (value, element) {
         return cloneDest.val() != cloneSrc.val();
     }, "Roles cannot be the same");
@@ -70,13 +70,14 @@ $(function() {
         }
     });
 
-//  cloneDest.on('change', function () {
-//    if ($(this).val() > 0) {
-//      $('#cl_new').addClass('hide');
-//    } else {
-//      $('#cl_new').removeClass('hide');
-//    }
-//  });
+    var cloneContainer = cloneForm.find('[data-container="clone-new"]');
+    cloneDest.on('change', function () {
+        if ($(this).val() > 0) {
+            cloneContainer.addClass('hide');
+        } else {
+            cloneContainer.removeClass('hide');
+        }
+    });
 
 });
 
@@ -168,7 +169,7 @@ $(function() {
         </p>
         <!-- BEGIN select_clone -->
         <label>{CLONE_LABEL} Role
-            <select id="cl_{CLONE_KEY}" name="clone[{CLONE_KEY}]" required>
+            <select data-role="clone-{CLONE_KEY}" name="clone[{CLONE_KEY}]" required>
                 <option disabled="disabled" selected="selected">(Choose Role)</option>
                 <!-- BEGIN select_new -->
                 <option value="0">(New Role...)</option>
@@ -179,8 +180,8 @@ $(function() {
             </select>
         </label>
         <!-- BEGIN new_role -->
-        <label id="cl_new" class="hide"> New Role name
-            <input name="clone[new]" type="text" value="" />
+        <label class="hide" data-container="clone-new"> New Role name
+            <input data-role="clone-new" name="clone[new]" type="text" value="" />
         </label>
         <!-- END new_role -->
         <!-- END select_clone -->
