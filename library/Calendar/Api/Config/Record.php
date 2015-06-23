@@ -43,7 +43,7 @@ class Calendar_Api_Config_Record
 
     /**
      * Class name of the API which will use this config
-     * e.g. 'Schoolbox', 'Sharepoint'
+     * e.g. 'Schoolbox', 'Vcal'
      *
      * Public because of Mapper
      *

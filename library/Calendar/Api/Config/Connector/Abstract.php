@@ -36,7 +36,7 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
 
     /**
      * Class name of the API which will use this config
-     * e.g. 'Schoolbox', 'Sharepoint'
+     * e.g. 'Schoolbox', 'Vcal'
      *
      * Public because of Mapper
      *

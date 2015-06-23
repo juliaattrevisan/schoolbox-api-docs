@@ -282,17 +282,5 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
         $configRecord->updateConfig($config);
 
         $this->save(array($configRecord));
-
-        $config = new Calendar_Api_Config_Connector_Sharepoint();
-        $config->setId($start++);
-        $config->setEventType('StudentBirthday');
-        $config->setConnectorClass('Sharepoint');
-
-        $configRecord = new Calendar_Api_Config_Record();
-        $configRecord->setEventType('StudentBirthday');
-        $configRecord->setConnectorClass('Sharepoint');
-        $configRecord->updateConfig($config);
-
-        $this->save(array($configRecord));
     }
 }

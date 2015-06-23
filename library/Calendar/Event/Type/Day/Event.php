@@ -3,7 +3,7 @@
  * Implementation of our standard day event in Schoolbox.
  * Note this events can be campus, group or personal events.
  *
- * Other event systems also use psuedo versions of this event timetable, sharepoint and Vcal
+ * Other event systems also use psuedo versions of this event timetable.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
