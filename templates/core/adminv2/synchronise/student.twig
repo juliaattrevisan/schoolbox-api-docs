@@ -1,115 +1,108 @@
 {% extends 'adminv2/synchronise/view.twig' %}
 
 {% block body %}
-    <div class="synchronise-container">
-        <table class="table ruler data">
-            <thead>
-            <tr class="colspans">
-                <th colspan="6">Personal</th>
-                <th colspan="2">Account</th>
-                <th colspan="6">Contact</th>
-                <th colspan="5">Meta</th>
-            </tr>
-            <tr>
-                <th>External ID</th>
-                <th>Title</th>
-                <th>Preferred</th>
-                <th>Given</th>
-                <th>Lastname</th>
-                <th>Gender</th>
-                <th>Login</th>
-                <th>Active</th>
-                <th>Postal Address</th>
-                <th>Home Address</th>
-                <th>Email</th>
-                <th>Phone (Home)</th>
-                <th>Phone (Work)</th>
-                <th>Phone (Mobile)</th>
-                <th>Campus</th>
-                <th>Form Level</th>
-                <th>Form Description</th>
-                <th>Year Level</th>
-                <th>Year Description</th>
-            </tr>
-            </thead>
-            <tbody>
-                {% for i in data.allPeople|slice(0, 13) %}
-                <tr>
-                    <td>{{ i.getId() }}</td>
-                    <td>{{ i.getTitle() }}</td>
-                    <td>{{ i.getPreferredName() }}</td>
-                    <td>{{ i.getGivenName() }}</td>
-                    <td>{{ i.getLastname() }}</td>
-                    <td>{{ i.getGender() }}</td>
-                    <td>{{ i.getAccount().getLogin() }}</td>
-                    <td>{{ i.getAccount().getActive() }}</td>
-                    <td>{{ i.getPostalAddress().getAsString() }}</td>
-                    <td>{{ i.getHomeAddress().getAsString() }}</td>
-                    <td>{{ i.getAllEmails("\n") }}</td>
-                    <td>{{ i.getPhoneHome().getNumber() }}</td>
-                    <td>{{ i.getPhoneWork().getNumber() }}</td>
-                    <td>{{ i.getPhoneMobile().getNumber() }}</td>
-                    <td>{{ i.getAllCampuses("\n") }}</td>
-                    <td>{{ i.getForm().getLevel() }}</td>
-                    <td>{{ i.getForm().getDescription() }}</td>
-                    <td>{{ i.getYear().getLevel() }}</td>
-                    <td>{{ i.getYear().getDescription() }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+<table>
+    <thead>
+    <tr class="colspans">
+        <th colspan="6">Personal</th>
+        <th colspan="2">Account</th>
+        <th colspan="6">Contact</th>
+        <th colspan="5">Meta</th>
+    </tr>
+    <tr>
+        <th>External ID</th>
+        <th>Title</th>
+        <th>Preferred</th>
+        <th>Given</th>
+        <th>Lastname</th>
+        <th>Gender</th>
+        <th>Login</th>
+        <th>Active</th>
+        <th>Postal Address</th>
+        <th>Home Address</th>
+        <th>Email</th>
+        <th>Phone (Home)</th>
+        <th>Phone (Work)</th>
+        <th>Phone (Mobile)</th>
+        <th>Campus</th>
+        <th>Form Level</th>
+        <th>Form Description</th>
+        <th>Year Level</th>
+        <th>Year Description</th>
+    </tr>
+    </thead>
+    <tbody>
+        {% for i in data.allPeople|slice(0, 13) %}
+        <tr>
+            <td>{{ i.getId() }}</td>
+            <td>{{ i.getTitle() }}</td>
+            <td>{{ i.getPreferredName() }}</td>
+            <td>{{ i.getGivenName() }}</td>
+            <td>{{ i.getLastname() }}</td>
+            <td>{{ i.getGender() }}</td>
+            <td>{{ i.getAccount().getLogin() }}</td>
+            <td>{{ i.getAccount().getActive() }}</td>
+            <td>{{ i.getPostalAddress().getAsString() }}</td>
+            <td>{{ i.getHomeAddress().getAsString() }}</td>
+            <td>{{ i.getAllEmails("\n") }}</td>
+            <td>{{ i.getPhoneHome().getNumber() }}</td>
+            <td>{{ i.getPhoneWork().getNumber() }}</td>
+            <td>{{ i.getPhoneMobile().getNumber() }}</td>
+            <td>{{ i.getAllCampuses("\n") }}</td>
+            <td>{{ i.getForm().getLevel() }}</td>
+            <td>{{ i.getForm().getDescription() }}</td>
+            <td>{{ i.getYear().getLevel() }}</td>
+            <td>{{ i.getYear().getDescription() }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
-    <div class="synchronise-match-container">
-        <h3>Campus Mapping</h3>
-        <div class="third-column">
-            {% include 'adminv2/synchronise/sub/campus/external.twig' %}
-        </div>
-        <div class="icon plus"></div>
-        <div class="third-column">
-            {% include 'adminv2/synchronise/sub/year/external.twig' %}
-        </div>
-        <div class="icon equals"></div>
-        <div class="third-column">
-            {% include 'adminv2/synchronise/sub/campus/schoolbox.twig' %}
-        </div>
+<div class="row">
+    <h3>Campus Mapping</h3>
+    <div class="large-4 columns">
+        {% include 'adminv2/synchronise/sub/campus/external.twig' %}
     </div>
+    <div class="large-4 columns">
+        {% include 'adminv2/synchronise/sub/year/external.twig' %}
+    </div>
+    <div class="large-4 columns">
+        {% include 'adminv2/synchronise/sub/campus/schoolbox.twig' %}
+    </div>
+</div>
 
-    <div class="synchronise-match-container">
-        <h3>Role Mapping</h3>
-        <div class="third-column">
-            {% include 'adminv2/synchronise/sub/campus/external.twig' %}
-        </div>
-        <div class="icon plus"></div>
-        <div class="third-column">
-            {% include 'adminv2/synchronise/sub/year/external.twig' %}
-        </div>
-        <div class="icon equals"></div>
-        <div class="third-column">
-            {% include 'adminv2/synchronise/sub/role/schoolbox.twig' %}
-        </div>
+<div class="row">
+    <h3>Role Mapping</h3>
+    <div class="large-4 columns">
+        {% include 'adminv2/synchronise/sub/campus/external.twig' %}
     </div>
+    <div class="large-4 columns">
+        {% include 'adminv2/synchronise/sub/year/external.twig' %}
+    </div>
+    <div class="large-4 columns">
+        {% include 'adminv2/synchronise/sub/role/schoolbox.twig' %}
+    </div>
+</div>
 
-    <div class="synchronise-match-container">
-        <h3>House Mapping</h3>
-        <div class="half-column">
-            {% include 'adminv2/synchronise/sub/house/external.twig' %}
-        </div>
-        <div class="icon equals"></div>
-        <div class="half-column">
-            {% include 'adminv2/synchronise/sub/house/schoolbox.twig' %}
-        </div>
+<div class="row">
+    <h3>House Mapping</h3>
+    <div class="large-6 columns">
+        {% include 'adminv2/synchronise/sub/house/external.twig' %}
     </div>
+    <div class="large-6 columns">
+        {% include 'adminv2/synchronise/sub/house/schoolbox.twig' %}
+    </div>
+</div>
 
-    <div class="synchronise-match-container">
-        <h3>Default User Options</h3>
-        <div class="half-column">
-            {% include 'adminv2/synchronise/sub/eportfolio.twig' %}
-            {% include 'adminv2/synchronise/sub/webmail.twig' %}
-        </div>
-        <div class="half-column">
-            {% include 'adminv2/synchronise/sub/localEmail.twig' %}
-            {% include 'adminv2/synchronise/sub/externalMail.twig' %}
-        </div>
+<div class="row">
+    <h3>Default User Options</h3>
+    <div class="large-6 columns">
+        {% include 'adminv2/synchronise/sub/eportfolio.twig' %}
+        {% include 'adminv2/synchronise/sub/webmail.twig' %}
     </div>
+    <div class="large-6 columns">
+        {% include 'adminv2/synchronise/sub/localEmail.twig' %}
+        {% include 'adminv2/synchronise/sub/externalMail.twig' %}
+    </div>
+</div>
 {% endblock %}
