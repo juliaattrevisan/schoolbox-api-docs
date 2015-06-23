@@ -53,7 +53,9 @@ $(function() {
 
             cloneForm.confirmDialog({
                 text: msg,
-                confirmEvent: form.submit
+                confirmEvent: function() {
+                    form.submit();
+                }
             });
         },
         rules: {
