@@ -60,7 +60,7 @@ $(function() {
         <table>
             <colgroup>
                 <col />
-                <col width="130" />
+                <col width="20%" />
             </colgroup>
             <tbody>
                 <tr>
@@ -85,6 +85,40 @@ $(function() {
                 </tr>
             </tbody>
         </table>
+
+        <h3>Role statistics</h3>
+        <div class="loading"></div>
+        <table id="group-summary">
+            <colgroup>
+                <col width="50%" />
+                <col width="20%" />
+                <col width="30%" />
+            </colgroup>
+            <thead>
+            <tr>
+                <th>Role</th>
+                <th>Total</th>
+                <th>Logged In</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- BEGIN group_summary -->
+            <tr>
+                <td><a href="/adminv2/reports/group/{GROUP_ID}">{GROUP_NAME}</a></td>
+                <td>{GROUP_USER}</td>
+                <td>{GROUP_LOGGED_IN}</td>
+            </tr>
+            <!-- END group_summary -->
+            </tbody>
+        </table>
+        <!-- BEGIN no_js_warning -->
+        <noscript>
+            <p>
+                It seems your browser either has Javascript disabled, or doesn't support it.</br>
+                You can <a href="/adminv2/home/nojscript">reload the page</a> to see these statistics, but please be patient while they load.
+            </p>
+        </noscript>
+        <!-- END no_js_warning -->
     </div>
     <div class="large-8 columns">
         <span class="header-actions">
@@ -113,57 +147,6 @@ $(function() {
             </tbody>
         </table>
     </div>
-</div>
-
-
-
-
-
-
-<div class="admin-contents clearfix">
-	<h2>Home</h2>
-	<div class="one-third clearfix">
-		<div class="level">
-
-            <div class="loading"></div>
-            <h3>Role statistics</h3>
-			    <table class="logged-in table ruler" id="group-summary">
-                    <colgroup>
-                        <col width="50%" />
-                        <col width="20%" />
-                        <col width="30%" />
-                    </colgroup>
-                    <thead>
-                    <tr>
-                        <th scope="col">Role</th>
-                        <th scope="col">Total</th>
-                        <th scope="col">Logged In</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                        <!-- BEGIN group_summary -->
-                        <tr>
-                            <td nowrap="nowrap"><a href="/adminv2/reports/group/{GROUP_ID}">{GROUP_NAME}</a></td>
-                            <td>{GROUP_USER}</td>
-                            <td>{GROUP_LOGGED_IN}</td>
-                        </tr>
-                        <!-- END group_summary -->
-                    </tbody>
-                </table>
-            <!-- BEGIN no_js_warning -->
-            <noscript>
-                <p>It seems your browser either has Javascript disabled, or doesn't support it.</br>
-                   You can <a href="/adminv2/home/nojscript">reload the page</a> to see these statistics, but please be patient while they load.</p>
-            </noscript>
-            <!-- END no_js_warning -->
-		</div>
-	</div>
-	<div class="two-thirds">
-		<div class="level">
-
-		</div>
-	</div>
-
 </div>
 
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
