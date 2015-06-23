@@ -171,10 +171,13 @@ if(is_numeric($this->arg[0])) {
                 /* Radio boxes
 				 */
                 $this->setVar(array(
-                    'SERVICE_ID'    => $perm['service'],
-                    'READ_CHECKED'  => $perm['type'] == READ_ACCESS ? 'checked="checked"' : '',
-                    'WRITE_CHECKED' => $perm['type'] == WRITE_ACCESS ? 'checked="checked"' : '',
-                    'ADMIN_CHECKED' => $perm['type'] == FULL_ACCESS ? 'checked="checked"' : '',
+                    'SERVICE_ID'     => $perm['service'],
+                    'READ_CHECKED'   => $perm['type'] == READ_ACCESS ? 'checked="checked"' : '',
+                    'WRITE_CHECKED'  => $perm['type'] == WRITE_ACCESS ? 'checked="checked"' : '',
+                    'ADMIN_CHECKED'  => $perm['type'] == FULL_ACCESS ? 'checked="checked"' : '',
+                    'READ_SELECTED'  => $perm['type'] == READ_ACCESS ? 'selected' : '',
+                    'WRITE_SELECTED' => $perm['type'] == WRITE_ACCESS ? 'selected' : '',
+                    'ADMIN_SELECTED' => $perm['type'] == FULL_ACCESS ? 'selected' : '',
                     'SID'            => $perm['sid']
                 ));
 
