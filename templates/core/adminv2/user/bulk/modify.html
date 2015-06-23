@@ -203,9 +203,15 @@
 			</td>
 			<td>
 				<ul data-applycampus="true">
-					<li><input name='apply_campus[]' type="checkbox" value="-1" checked="checked" />Unchanged</li>
+					<li>
+                        <input id="campus-unchanged" name='apply_campus[]' type="checkbox" value="-1" checked="checked" />
+                        <label class="checkbox-label" for="campus-unchanged">Unchanged</label>
+                    </li>
 					<!-- BEGIN apply_campus -->
-					<li><input name='apply_campus[]' type="checkbox" value="{APPLY_CAMPUS_ID}" />{APPLY_CAMPUS_NAME}</li>
+					<li>
+                        <input id="campus-{APPLY_CAMPUS_ID}" name='apply_campus[]' type="checkbox" value="{APPLY_CAMPUS_ID}" />
+                        <label class="checkbox-label" for="campus-{APPLY_CAMPUS_ID}">{APPLY_CAMPUS_NAME}</label>
+                    </li>
 					<!-- END apply_campus -->
 				</ul>
 			</td>
