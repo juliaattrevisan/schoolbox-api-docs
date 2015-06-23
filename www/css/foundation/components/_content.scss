@@ -668,7 +668,7 @@ table{
 				font-size: rem-calc(($base-font-size + 8));
 			}
 		}
-		div{
+		a{
 			@include single-transition(all, 0.15s, linear);
 			&:hover{
 				background-color: $ocean-sunset;
