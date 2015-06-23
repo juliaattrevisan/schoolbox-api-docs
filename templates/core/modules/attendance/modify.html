@@ -65,14 +65,15 @@
                 <option value='{ABSENCE_OPTIONS_VALUE}' {ABSENCE_OPTIONS_VALUE_SELECTED}>{ABSENCE_OPTIONS_DESCRIPTION}</option>
                 <!-- END absence_options -->
             </select>
-            <input type='text' maxlength='100' name='PossibleReasonDescription[]' value="{STUDENT_REASON_DESCRIPTION}" />\
         </td>
         <td>
+
             <select name='PossibleReasonCode[]'>
                 <!-- BEGIN reason_options -->
                 <option value='{REASON_OPTIONS_VALUE}' {REASON_OPTIONS_VALUE_SELECTED}>{REASON_OPTIONS_DESCRIPTION}</option>
                 <!-- END reason_options -->
             </select>
+            <input type='text' maxlength='100' name='PossibleReasonDescription[]' value="{STUDENT_REASON_DESCRIPTION}" />
         </td>
         <td>
             <input type="hidden" name="studentID[]" value="{STUDENT_SYNERGY_ID}" />

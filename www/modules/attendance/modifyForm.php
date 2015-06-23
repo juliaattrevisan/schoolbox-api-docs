@@ -43,12 +43,12 @@ if ($attendanceDate->getUnixTimestamp() > $now->getUnixTimestamp()) {
 	error(152);
 }
 
-/* Only teachers of this class (and superusers) can edit attendance records
+/* Only teachers can mark attendance (we allow all staff, but synergetic may restrict this later aswell)
  */
 $groupHandler = new Group();
 
-if (!in_array($_SESSION['sid'], $externalClass->getTeacherName($_POST['classCode'])) && !$groupHandler->isSuperuser()) {
-	error(19);
+if (!$_SESSION['user']->getRole()->isStaff()) {
+    error(19);
 }
 
 /* Validation check ends here
