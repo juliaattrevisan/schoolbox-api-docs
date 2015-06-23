@@ -106,71 +106,66 @@ $(function() {
 	</div>
     <!-- BEGIN import -->
     <div class="settings">
-		<div class="level clearfix">
-			<form action="/adminv2/bulkAddCalendar" method="post" enctype="multipart/form-data" name="form" id="importForm" class="clearfix">
-				<div class="clearfix">
-					<div class="one-third">
-						<h3>Bulk<span class="question">?</span><em>The file that contains the calendar information can either be a CSV file
-                            matching the format in the template below,
-                            <strong>or</strong> a Microsoft Outlook ICS file</em></h3>
-                        <h3>CSV template</h3>
-						<p class="clearfix">
-							<a href="/adminv2/csv/calendarBulkAdd.csv" class="btn report float-left" ><span></span>Download</a>
-						</p>
-						<ol>
-							<li>Download the template file using the above button</li>
-							<li>Edit the file in Microsoft Excel or equivalent editor</li>
-							<li>Save the file</li>
-							<li>Upload by clicking 'choose file' under "Upload new calendar entries"</li>
-						</ol>
-						<br />
+        <form action="/adminv2/bulkAddCalendar" method="post" enctype="multipart/form-data" name="form" id="importForm">
+            <h3>
+                <span class="has-tip tip-right"
+                      data-tooltip
+                      title="The file that contains the calendar information can either be a CSV file
+                             matching the format in the template below, or a Microsoft Outlook ICS file">Source</span>
+            </h3>
+            <div class="row">
+                <div class="column medium-6">
+                    <h4>CSV</h4>
+                    <p>
+                        <a href="/adminv2/csv/calendarBulkAdd.csv" class="button icon-download">Download Template</a>
+                    </p>
+                    <ol>
+                        <li>Download the template file using the above button</li>
+                        <li>Edit the file in Microsoft Excel or equivalent editor</li>
+                        <li>Save the file</li>
+                        <li>Upload by clicking 'choose file' under "Upload new calendar entries"</li>
+                    </ol>
+                </div>
+                <div class="column medium-6">
+                    <h4>Microsoft Outlook ICS</h4>
+                    <ol>
+                        <li>In Outlook, click calendar in the bottom left</li>
+                        <li>Go to File, Save As</li>
+                        <li>Choose iCalendar format (*.ics)</li>
+                        <li>Click 'More Options'</li>
+                        <li>Change Detail from Availability Only to Full Details</li>
+                        <li>Click OK</li>
+                        <li>Save it</li>
+                        <li>Upload by clicking 'choose file' under "Upload new calendar entries"</li>
+                    </ol>
+                </div>
+            </div>
+            <h3>Select file (CSV or ICS)</h3>
+            <input type="file" name="bulkadd" />
+            <h3>
+                <span class="has-tip tip-right" data-tooltip title="Select the campuses that will be able to view these events">Campus</span>
+            </h3>
+            <!-- BEGIN campus_check_list -->
+            <input id="campus-{CAMPUSID}" type="checkbox" name="campusList[]" value="{CAMPUSID}" />
+            <label for="campus-{CAMPUSID}" class="checkbox-label">{CAMPUSNAME}</label>
+            <!-- END campus_check_list -->
+            <h3>
+                <span class="has-tip tip-right" data-tooltip title="Select the roles that will be able to view these events">Roles</span>
+            </h3>
+            <!-- BEGIN user_group_check_list -->
+            <input id="role-{USERGROUPID}" type="checkbox" name="userGroup[]" value="{USERGROUPID}" />
+            <label for="role-{USERGROUPID}" class="checkbox-label">{USERGROUPNAME}</label>
+            <!-- END user_group_check_list -->
+            <h3>
+                <span class="has-tip tip-right" data-tooltip title="Type in the name of the owner of the calendar. This field is optional: if empty, the current user will be used.">Calendar Owner</span>
+            </h3>
+            <label>
+                <input name="name" id="name" type="text" placeholder="Search Users" />
+            </label>
+            <input name="userid" type="hidden" id="userid" size="6" maxlength="6" />
 
-						<h3>Microsoft Outlook ICS</h3>
-						<ol>
-							<li>In Outlook, click calendar in the bottom left</li>
-							<li>Go to File, Save As</li>
-							<li>Choose iCalendar format (*.ics)</li>
-							<li>Click 'More Options'</li>
-							<li>Change Detail from Availability Only to Full Details</li>
-							<li>Click OK</li>
-							<li>Save it</li>
-							<li>Upload by clicking 'choose file' under "Upload new calendar entries"</li>
-						</ol>
-						<br />
-
-						<h3>Upload new calendar entries (CSV or ICS)</h3>
-						<input type="file" name="bulkadd" />
-					</div>
-					<div class="one-third">
-						<h3>Campus<span class="question">?</span><em>Select the campus' which will be able to view these events</em></h3>
-						<!-- BEGIN campus_check_list -->
-						<label>
-							<input type="checkbox" name="campusList[]" value="{CAMPUSID}" />
-							{CAMPUSNAME}</label>
-						<br />
-						<!-- END campus_check_list -->
-					</div>
-					<div class="one-third last clearfix">
-						<h3>Roles<span class="question">?</span><em>Select the roles which will be able to view these events</em></h3>
-						<!-- BEGIN user_group_check_list -->
-						<label>
-							<input type="checkbox" name="userGroup[]" value="{USERGROUPID}" />
-							{USERGROUPNAME}</label>
-						<br />
-						<!-- END user_group_check_list -->
-					</div>
-				</div>
-				
-				<div class="one-third clearfix"><br />
-					<br />
-					<h3>Calendar Owner<span class="question">?</span><em>Type in the name of the owner of the calendar. The field is optional, if empty the current user will be used. </em></h3>
-					<label><input name="name" id="name" type="text" placeholder="Search Users" /></label>
-					<input name="userid" type="hidden" id="userid" size="6" maxlength="6" />
-
-					<a class="submit-btn-plain float-left submit" href="#"><span></span>Save</a>
-				</div>
-			</form>
-		</div>
+            <a class="button submit" href="#">Import</a>
+        </form>
     </div>
     <!-- END import -->
     <!-- BEGIN subscribe -->
