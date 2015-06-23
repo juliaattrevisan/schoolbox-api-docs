@@ -632,64 +632,47 @@ $(function() {
             <td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="no-text icon-delete" title="Remove"></a></td>
         </tr>
         <!-- END user_curriculum -->
+    <tr>
+        <td>
+            <label>
+                <select class="formfield" name="service" id="serviceSelect" form="serviceCloneForm">
+                    <option value="">Select Service</option>
+                    <option value="2">Calendar</option>
+                    <option value="3">News</option>
+                    <option value="5">CMS</option>
+                    <option value="6">Housemaster</option>
+                    <option value="7">Resource Booking</option>
+                    <option value="8">Curriculum</option>
+                </select>
+            </label>
+        </td>
+        <td>
+            <select name="sid" id="campusSelect" form="serviceCloneForm">
+                <option value="">Select Campus</option>
+                <!-- BEGIN campusPermsList -->
+                <!-- BEGIN perm_campus -->
+                <option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_SELECTED}>{PERM_CAMPUS_NAME}</option>
+                <!-- END perm_campus -->
+                <!-- END campusPermsList -->
+            </select>
+        </td>
+        <td>
+            <select name="type" form="serviceCloneForm">
+                <option value="1">Read</option>
+                <option value="2">Write</option>
+                <option value="3">Moderate</option>
+            </select>
+        </td>
+        <td>
+            <form id="serviceCloneForm" action="/adminv2/userForm.php" method="post">
+                <input type="hidden" name="addService" />
+                <input type="hidden" value="{USERID}" name="uid">
+                <input type="submit" class="submit-btn-plain" value="Add" name="serviceSubmit">
+            </form>
+        </td>
+    </tr>
     </tbody>
 </table>
-<form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" class="clearfix">
-    <input type="hidden" name="addService" />
-    <input type="hidden" value="{USERID}" name="uid">
-    <table>
-        <colgroup>
-            <col width="10%" />
-            <col width="20%" />
-            <col width="70%" />
-        </colgroup>
-        <tr>
-            <th>Service</th>
-            <th>Campus</th>
-            <th>Access</th>
-        </tr>
-        <tr>
-            <td>
-                <label>
-                    <select class="formfield" name="service" id="serviceSelect">
-                        <option value="">Select Service</option>
-                        <option value="2">Calendar</option>
-                        <option value="3">News</option>
-                        <option value="5">CMS</option>
-                        <option value="6">Housemaster</option>
-                        <option value="7">Resource Booking</option>
-                        <option value="8">Curriculum</option>
-                    </select>
-                </label>
-            </td>
-            <td>
-                <label>
-                    <select name="sid" id="campusSelect">
-                    <option value="">Select Campus</option>
-                    <!-- BEGIN campusPermsList -->
-                        <!-- BEGIN perm_campus -->
-                        <option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_SELECTED}>{PERM_CAMPUS_NAME}</option>
-                        <!-- END perm_campus -->
-                    <!-- END campusPermsList -->
-                    </select>
-                </label>
-            </td>
-            <td>
-                <select name="type">
-                    <option value="1">Read</option>
-                    <option value="2">Write</option>
-                    <option value="3">Moderate</option>
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="3">
-                <label class="clearfix float-left">
-                <input type="submit" class="submit-btn-plain" value="Add" name="serviceSubmit"></label>
-            </td>
-        </tr>
-    </table>
-</form>
 
 <h2><a name="linked"></a>Linked Accounts</h2>
 <div class="level clearfix">
