@@ -703,63 +703,54 @@ $(function() {
 </table>
 
 <h2>Recent Activity Logs</h2>
-<div class="level clearfix">
-    <div class="split-container forty">
-        <div class="split">
-            <h3>Logins <a class="btn in-heading-absolute" href="/adminv2/reports/login/user={USERNAME}"><span></span>See All</a></h3>
-            <table class="ruler table">
-                <thead>
-					<tr>
-						<th>Date</th>
-						<th>IP</th>
-						<th>Result</th>
-					</tr>
-                </thead>
-                <tbody>
-					<!-- BEGIN login_log -->
-					<tr>
-						<td>{LOGIN_DATE}</td>
-						<td>{LOGIN_IP}</td>
-						<td>{LOGIN_RESULT}</td>
-					</tr>
-					<!-- END login_log -->
-				</tbody>
-			</table>
-		</div>
-	</div>
-	<div class="split-container sixty">
-		<div class="split last">
-			<h3>Activity <a class="btn in-heading-absolute" href="/adminv2/reports/activity/user={USERNAME}"><span></span>See All</a></h3>
-			<table class="ruler table">
-				<thead>
-					<tr>
-						<th>Date</th>
-						<th>Action</th>
-					</tr>
-                </thead>
-                <tbody>
-					<!-- BEGIN action_log -->
-					<tr>
-						<td nowrap="nowrap">{ACTION_DATE}</td>
-						<td>{ACTION_ACTION}</td>
-					</tr>
-					<!-- END action_log -->
-				</tbody>
-			</table>
-		</div>
-	</div>
-</div>
+
+<h3>Logins</h3>
+<a class="button" href="/adminv2/reports/login/user={USERNAME}">See All</a>
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>IP</th>
+            <th>Result</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- BEGIN login_log -->
+        <tr>
+            <td>{LOGIN_DATE}</td>
+            <td>{LOGIN_IP}</td>
+            <td>{LOGIN_RESULT}</td>
+        </tr>
+        <!-- END login_log -->
+    </tbody>
+</table>
+
+<h3>Activity</h3>
+<a class="button" href="/adminv2/reports/activity/user={USERNAME}">See All</a>
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- BEGIN action_log -->
+        <tr>
+            <td nowrap="nowrap">{ACTION_DATE}</td>
+            <td>{ACTION_ACTION}</td>
+        </tr>
+        <!-- END action_log -->
+    </tbody>
+</table>
+
 <h2>Send Message to {FULLNAME}</h2>
-<div class="level clearfix last">
-  <p>
-    <em>{FIRSTNAME} must be signed in to receive a popup alert</em>
-  </p>
-  <form action="/adminv2/sendAlert" method="POST">
-    <label><strong>Message from {SITE_LOGINNAME}:</strong>
-      <input type="hidden" name="user" value="{USERID}" />
-      <input type="text" value="" name="body" />
+<p><em>{FIRSTNAME} must be signed in to receive a popup alert</em></p>
+<form action="/adminv2/sendAlert" method="POST">
+    <input type="hidden" name="user" value="{USERID}" />
+    <label>
+        <strong>Message from {SITE_LOGINNAME}:</strong>
+        <input type="text" value="" name="body" />
     </label>
-    <input class="submit-btn-plain" type="submit" value="Send" />
-  </form>
-</div>
-</div>
+    <input type="submit" value="Send" />
+</form>
