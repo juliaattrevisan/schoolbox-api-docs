@@ -233,8 +233,8 @@ $(function() {
 //  })
 
     // Handles autosuggest for linking users to other user accounts
-    var addUserSelector = $('#linkUser');
-    var addUserButton   = $(addUserSelector.prop('form')).find(':submit');
+    var addUserSelector = $(':input[data-selectizeuser="addUser"]');
+    var addUserButton   = $(addUserSelector.form).find(':submit');
     addUserSelector
         .selectizeSelector({
             multiple: true,
@@ -627,7 +627,7 @@ $(function() {
     </tr>
     <!-- END user_linked -->
     <tr>
-        <td><select id="linkUser" name="linkUser[]" multiple placeholder="Search Users" form="linkedUserAdd"></select></td>
+        <td><select data-selectizeuser="addUser" name="linkUser[]" multiple placeholder="Search Users" form="linkedUserAdd"></select></td>
         <td>
             <form action="/adminv2/userForm.php" method="post" id="linkedUserAdd">
                 <input type="hidden" name="userID" value="{USERID}" />
