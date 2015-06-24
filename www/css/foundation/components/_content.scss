@@ -652,26 +652,20 @@ table{
 		border-bottom: 16px solid $silver;
 	}
 	li{
+		a:hover{
+			background-color: $ocean-sunset;
+		}
 		.grade{
 			@media #{$small-up} { @include grid-column(1); }
-			// TODO: eventually fix colours
-			background: $success-color;
-			color: $white;
 			min-height: 64px;
 			text-align: center;
 			font-weight: $font-weight-bold;
 			font-size: rem-calc(($base-font-size - 4));
-			a{
-				color: $white;
-			}
 			span{
 				font-size: rem-calc(($base-font-size + 8));
 			}
-		}
-		a{
-			@include single-transition(all, 0.15s, linear);
-			&:hover{
-				background-color: $ocean-sunset;
+			a:hover{
+				background-color: transparent;
 			}
 		}
 		ul{
