@@ -6,51 +6,13 @@
 
 $(function() {
 
-	/* Ajax Update group access permissions
-	 */
-	$('.updateGroupsForm').find('input[name=type]').change(function() {
-		var form = $(this).closest('form');
-		var data = {
-			type: $(this).val(),
-			uid: form.find('input[name=uid]').val(),
-			sid: form.find('input[name=sid]').val(),
-			service: form.find('input[name=service]').val(),
-			updateGroups: true
-		}
-
-		$.post('/adminv2/userForm.php', data);
-	});
-
-	/* Ajax Update service access permissions
-	 */
-	$('.updateServicesForm').find('input[name=type]').change(function() {
-		var form = $(this).closest('form');
-		var data = {
-			type: $(this).val(),
-			uid: form.find('input[name=uid]').val(),
-			sid: form.find('input[name=sid]').val(),
-			service: form.find('input[name=service]').val(),
-			updateServices: true
-		}
-
-		$.post('/adminv2/userForm.php', data);
-	}); 
-
-	/* Ajax Update SID values
-	 */
-	$('.updateSIDForm').find('select[name=sid]').change(function() {
-		var form = $(this).closest('form');
-		var data = {
-			type: $(this).val(),
-			uid: form.find('input[name=uid]').val(),
-			sid: $(this).val(),
-			previousSid: form.find('input[name=previousSid]').val(),
-			service: form.find('input[name=service]').val(),
-			updateSID: true
-		}
-
-		$.post('/adminv2/userForm.php', data);
-	});
+    /**
+     * AJAX submit of forms (used by groups and services)
+     */
+    $(':input[data-autosubmit]').change(function() {
+        var form = $(this.form);
+        $.post('/adminv2/userForm.php', form.serializeArray());
+    });
 
 	$('a.show-pass').click(function() {
 
@@ -251,41 +213,41 @@ $(function() {
 		$(this).closest('form').validate().element($(this));
 	})
 
-  // locate the assume button and add a listener if it's disabled
-  $('#content')
-      .children('.admin-contents')
-      .children('form.modify-form')
-      .children('a.user.disabled')
-      .click(function()
-  {
-      var con = confirm("This account is deactivated. Are you sure you want to log in as this user?");
-      if(con) {
-        $(this).closest('form').submit();
-      }
-  })
+//  // locate the assume button and add a listener if it's disabled
+//  $('#content')
+//      .children('.admin-contents')
+//      .children('form.modify-form')
+//      .children('a.user.disabled')
+//      .click(function()
+//  {
+//      var con = confirm("This account is deactivated. Are you sure you want to log in as this user?");
+//      if(con) {
+//        $(this).closest('form').submit();
+//      }
+//  })
 
     // Handles autosuggest for linking users to other user accounts
     var addUserSelector = $('#linkUser');
     var addUserButton   = $(addUserSelector.prop('form')).find(':submit');
-    addUserSelector.selectizeSelector({
-                multiple: true,
-                ajax: {
-                    url:      '/ajax/user.php',
-                    type:     'GET',
-                    data:     {groupID: 0},
-                    dataType: 'json'
-                }
-            })
-            .on('selectize.item_add', function(event, value) {
-                addUserButton.prop('disabled', false);//.removeClass('disabled');
-            })
-            .on('selectize.item_remove', function() {
-                // Disable only if empty
-                if ($(this).data('selectize').items.length === 0) {
-                    addUserButton.prop('disabled', true);//.addClass('disabled');
-                }
-            });
-
+    addUserSelector
+        .selectizeSelector({
+            multiple: true,
+            ajax: {
+                url:      '/ajax/user.php',
+                type:     'GET',
+                data:     {groupID: 0},
+                dataType: 'json'
+            }
+        })
+        .on('selectize.item_add', function() {
+            addUserButton.prop('disabled', false);
+        })
+        .on('selectize.item_remove', function() {
+            // Disable only if empty
+            if ($(this).data('selectize').items.length === 0) {
+                addUserButton.prop('disabled', true);
+            }
+        });
 });
 </script>
 
@@ -424,12 +386,13 @@ $(function() {
     <tr>
         <td><a href="/homepage/{USER_GROUP_ID}">{USER_GROUP_NAME}</a></td>
         <td>
-            <form action="/adminv2/userForm.php" method="post" class="updateGroupsForm">
+            <form action="/adminv2/userForm.php" method="post">
                 <input type="hidden" name="uid" value="{USERID}" />
                 <input type="hidden" name="sid" value="{USER_GROUP_ID}" />
                 <input type="hidden" name="service" value="1" />
+                <input type="hidden" name="updateGroups" value="1" />
 
-                <select name="type">
+                <select name="type" data-autosubmit>
                     <option value="1" {READ_SELECTED}>Read</option>
                     <option value="2" {WRITE_SELECTED}>Write</option>
                     <option value="3" {ADMIN_SELECTED}>Group Admin</option>
@@ -485,21 +448,13 @@ $(function() {
         <!-- BEGIN user_calendar -->
         <tr class="permissions-calendar">
             <td>Calendar</td>
+            <td>{PERM_CAMPUS_NAME}</td>
             <td>
-                <form action="/adminv2/userForm.php" method="post" class="updateSIDForm">
+                <form action="/adminv2/userForm.php" method="post">
                     <input type="hidden" name="uid" value="{USERID}" />
                     <input type="hidden" name="sid" value="{SID}" />
                     <input type="hidden" name="service" value="{SERVICE_ID}" />
-
-                    {PERM_CAMPUS_NAME}
-                </form>
-            </td>
-            <td>
-                <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
-                    <input type="hidden" name="uid" value="{USERID}" />
-                    <input type="hidden" name="sid" value="{SID}" />
-                    <input type="hidden" name="service" value="{SERVICE_ID}" />
-                    <select name="type">
+                    <select name="type" data-autosubmit>
                         <option value="1" {READ_SELECTED}>Read</option>
                         <option value="2" {WRITE_SELECTED}>Write</option>
                         <option value="3" {ADMIN_SELECTED}>Moderate</option>
@@ -512,21 +467,13 @@ $(function() {
         <!-- BEGIN user_news -->
         <tr class="permissions-news">
             <td>News</td>
-            <td>
-                <form action="/adminv2/userForm.php" method="post" class="updateSIDForm">
-                    <input type="hidden" name="uid" value="{USERID}" />
-                    <input type="hidden" name="sid" value="{SID}" />
-                    <input type="hidden" name="service" value="{SERVICE_ID}" />
-
-                    {PERM_CAMPUS_NAME}
-                </form>
-            </td>
+            <td>{PERM_CAMPUS_NAME}</td>
             <td>
                 <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
                     <input type="hidden" name="uid" value="{USERID}" />
                     <input type="hidden" name="sid" value="{SID}" />
                     <input type="hidden" name="service" value="{SERVICE_ID}" />
-
+                    <input type="hidden" name="updateServices" value="1" />
                     <select name="type">
                         <option value="1" {READ_SELECTED}>Read</option>
                         <option value="2" {WRITE_SELECTED}>Write</option>
@@ -546,7 +493,7 @@ $(function() {
                     <input type="hidden" name="uid" value="{USERID}" />
                     <input type="hidden" name="sid" value="0" />
                     <input type="hidden" name="service" value="{SERVICE_ID}" />
-
+                    <input type="hidden" name="updateServices" value="1" />
                     <select name="type">
                         <option value="1" {READ_SELECTED}>Read</option>
                         <option value="2" {WRITE_SELECTED}>Write</option>
@@ -566,7 +513,7 @@ $(function() {
                         <input type="hidden" name="uid" value="{USERID}" />
                         <input type="hidden" name="sid" value="0" />
                         <input type="hidden" name="service" value="{SERVICE_ID}" />
-
+                        <input type="hidden" name="updateServices" value="1" />
                         <select name="type">
                             <option value="1" {READ_SELECTED}>Read</option>
                             <option value="2" {WRITE_SELECTED}>Write</option>
@@ -586,7 +533,7 @@ $(function() {
                     <input type="hidden" name="uid" value="{USERID}" />
                     <input type="hidden" name="sid" value="0" />
                     <input type="hidden" name="service" value="{SERVICE_ID}" />
-
+                    <input type="hidden" name="updateServices" value="1" />
                     <select name="type">
                         <option value="1" {READ_SELECTED}>Read</option>
                         <option value="2" {WRITE_SELECTED}>Write</option>
@@ -606,7 +553,7 @@ $(function() {
                     <input type="hidden" name="uid" value="{USERID}" />
                     <input type="hidden" name="sid" value="0" />
                     <input type="hidden" name="service" value="{SERVICE_ID}" />
-
+                    <input type="hidden" name="updateServices" value="1" />
                     <select name="type">
                         <option value="1" {READ_SELECTED}>Read</option>
                         <option value="2" {WRITE_SELECTED}>Write</option>
