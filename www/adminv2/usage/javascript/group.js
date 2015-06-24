@@ -6,7 +6,7 @@
 	$.fn.usageGroup = function(options) {
 		var config = init(this, options);
 
-		plot();
+        graph();
 
 		/**
 		 * Init
@@ -33,7 +33,7 @@
 		/**
 		 * Plot graph
 		 */
-		function plot() {
+		function graph() {
 			$.ajax({
 				url: config.url,
 				method: 'GET',
