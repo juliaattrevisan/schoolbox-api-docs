@@ -1,16 +1,8 @@
 <!-- BEGIN custom_head -->
-<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
 <link type="text/css" rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
-<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
-<script type="text/javascript" src="/javascript/admin/jquery.component.js"></script>
-<script type="text/javascript" src="/javascript/admin/jquery.configurator.js"></script>
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript">
 $(function () {
-
-    $(function() {
-        $('#definition-palette').configurator().start();
-    });
 
     $("#side-menu")
         .on('ready.jstree', function(event, jstree) {
