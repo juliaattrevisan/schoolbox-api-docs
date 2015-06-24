@@ -18,6 +18,10 @@ $.fn.configurator = function(opts) {
      */
     options.contextSelector = '[data-'+options.context+'-layout]';
 
+    /* Component holder
+     */
+    options.componentHolder = '[data-component-holder]';
+
     /* METHODS */
     this.start = function() {
         this.help();
@@ -47,9 +51,9 @@ $.fn.configurator = function(opts) {
         var instID;
         var templID;
 
-        $(options.contextSelector + ' .component-holder').sortable({
+        $(options.componentHolder).sortable({
             helper: 'clone',
-            connectWith: options.contextSelector + ' .component-holder',
+            connectWith: options.componentHolder,
             update: function (event, ui) {
 
                 var instanceID;
@@ -124,10 +128,10 @@ $.fn.configurator = function(opts) {
 
         $('#definition-palette .component').draggable({
             helper: 'clone',
-            connectToSortable: options.contextSelector + ' .component-holder'
+            connectToSortable: options.componentHolder
         });
 
-        $(options.contextSelector + ' .component-holder').sortable('refresh');
+        $(options.componentHolder).sortable('refresh');
 
         this.refreshPalette();
     };
