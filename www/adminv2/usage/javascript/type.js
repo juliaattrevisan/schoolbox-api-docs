@@ -6,7 +6,7 @@
 	$.fn.usageType= function(options) {
 		var config = init(this, options);
 
-		plot();
+		graph();
 
 		/**
 		 * Init
@@ -33,7 +33,7 @@
 		/**
 		 * Plot graph
 		 */
-		function plot() {
+		function graph() {
 			$.ajax({
 				url: config.url,
 				method: 'GET',
@@ -42,7 +42,7 @@
 
 					/* Remove loader
 					 */
-					config.element.html('<div style="height:450px"></div>');
+					config.element.html('<div data-type-graph></div>');
                     config.element.removeClass('loader');
 
 					/* Only manufacture a pie if there is data
@@ -63,28 +63,33 @@
 		 * @param datasets
 		 */
 		function makePie(datasets) {
-			$.plot(config.element.find('div'), datasets, {
-				series: {
-					pie: {
-						show: true,
-                        innerRadius: 0.4,
-						label: {
-							show: true,
-							radius: 0.55,
-							formatter: function(label, series) {
-								return '<div style="font-size:11px; text-align:center; padding:2px; color:white;">'+label+'<br/>'+Math.round(series.percent)+'%</div>';
-							},
-                            threshold: 0.05
-
-						}
-					}
-				},
-				legend: {
-					show: true
-				}
-			});
-
-			config.element.prepend('<h3>' + config.title + '</h3>');
+            $(config.element).find('[data-type-graph]').highcharts({
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false
+                },
+                title: {
+                    text: config.title
+                },
+                tooltip: {
+                    pointFormat: '<strong>{point.percentage:.1f}%</strong>'
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            format: '<strong>{point.name}</strong>: {point.percentage:.1f} %'
+                        }
+                    }
+                },
+                series: [{
+                    type: 'pie',
+                    data: datasets
+                }]
+            });
 		}
 
 		/**
