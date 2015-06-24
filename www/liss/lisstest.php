@@ -1,4 +1,4 @@
-<?
+<?php
 require_once(dirname(__FILE__) . '/../include/Bootstrap.php');
 
 include dirname(__FILE__) . "/../vendor/phpxmlrpc/phpxmlrpc/lib/xmlrpc.inc";     // from http://phpxmlrpc.sourceforge.net/

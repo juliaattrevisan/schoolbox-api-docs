@@ -1,4 +1,4 @@
-<?
+<?php
 
 //A Semi-Smart Autologon Script 
 //It remains to be seen who falls for it
@@ -291,7 +291,7 @@ break;
 
 </head>
 
-<?
+<?php
 echo "<body>";
 
 echo"<form method='{$method}' name='{$form}' action='{$action}'>";
@@ -311,13 +311,13 @@ if(is_array($formArray)) {
 ?>
 </form>
 <script>
-<?
+<?php
 if (!($nojs))
 	echo "document.{$form}.submit();";
 ?>
 </script>
 </body>
 </html>
-<?
+<?php
 }
 ?>
