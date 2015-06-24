@@ -38,7 +38,7 @@ $button-font-weight: $font-weight-normal;
 // $button-border-style: solid;
 $button-bg-color: $button-color;
 $button-bg-hover: tint($button-bg-color, 20%);
-$submit-button-color: $primary-color;
+$submit-button-bg-color: $submit-button-color;
 $submit-button-bg-hover: tint($submit-button-color, 20%);
 $button-border-color: transparent;
 $secondary-button-bg-hover: tint($submit-button-color, 20%);
@@ -295,20 +295,34 @@ $tabs-content-padding: rem-calc(($base-font-size - 8));
 //
 // CUSTOM OVERRIDES
 //
-.button,
-input[type=submit]				{ border: none;
-	&.secondary 				{ background-color: $primary-color; color: $white;
-		//&:hover 				{ color: $primary-color; }
+.button{
+	&.secondary{
+		background-color: $primary-color;
+		color: $white;
 	}
-	&.alert 					{ 
-		&:hover 				{ color: $white !important; }
+	&.alert{ 
+		&:hover{
+			color: $white !important;
+		}
 	}
-	&.warning 					{ background-color: $warning-color;
-		&:hover 				{ background-color: tint($warning-color, 11%); }
+	&.warning{
+		background-color: $warning-color;
+		&:hover{
+			background-color: tint($warning-color, 20%);
+		}
 	}
 }
 
-input[type="submit"] 			{ @extend .button; }
+input[type="submit"]{
+	@extend .button;
+	border: none;
+	background-color: $submit-button-color;
+	color: $white;
+	&:hover{
+		background-color: tint($submit-button-color, 20%);
+		color: $white;
+	}
+}
 
 .expand-link{
 	margin: 0 rem-calc(($base-font-size / 2)) 0 0;
