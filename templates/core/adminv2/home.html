@@ -1,10 +1,6 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
-
 $(function() {
-
-
-
     $(window).load( function() {
         // test that the non-js page has not been requested
         if(window.location.pathname.indexOf("nojscript") == -1) {
@@ -39,43 +35,43 @@ $(function() {
             });
         }
     });
+
+
+
 });
-
 </script>
-
 <!-- END custom_head-->
 
 <h1>Schoolbox Administration</h1>
+
 <dl class="sub-nav">
     <!-- BEGIN admin_nav_item -->
     <dd class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></dd>
     <!-- END admin_nav_item -->
 </dl>
+
+<div class="row">
+    <h2>Home</h2>
+    <div class="large-4">
+        <h3>Server stats</h3>
+
+        <div data-graph="usage"></div>
+    </div>
+    <div class="large-8">
+
+    </div>
+</div>
+
+
+
+
+
+
 <div class="admin-contents clearfix">
 	<h2>Home</h2>
 	<div class="one-third clearfix">
 		<div class="level">
-			<h3 class="iconify stats">Server stats</h3>
-			<h3>Storage <span class="no-bg">{DISK_USED}/{DISK_TOTAL}</span></h3>
-			<div class="clearfix">
-				<div class="bar-container">
-					<div class="bar">
-						<span class="filled" style="width:{DISK_PERC}%"></span>
-					</div>
-					<span class="amount gradient-{DISK_GRADIENT}">{DISK_PERC}%</span>
-				</div>
-			</div>
-			<!-- BEGIN memory -->
-			<h3>Memory <span class="no-bg">{MEMORY_USED}/{MEMORY_TOTAL}</span></h3>
-			<div class="clearfix">
-				<div class="bar-container">
-					<div class="bar">
-						<span class="filled" style="width:{MEMORY_PERC}%"></span>
-					</div>
-					<span class="amount gradient-{MEMORY_GRADIENT}">{MEMORY_PERC}%</span>
-				</div>
-			</div>
-			<!-- END memory -->
+
 			<h3>Status of services</h3>
 			<ul class="server-statuses" >
 				<li id="db-light" class="{EXTERNAL_DB_LIGHT} clearfix"><strong>{EXTERNAL_DB}</strong><em><span></span></em><span>{EXTERNAL_DB_STATUS}</span></li>
@@ -151,3 +147,59 @@ $(function() {
 	</div>
 
 </div>
+
+<script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
+<script type="text/javascript" src="/javascript/adminv2/jquery.barchart.js"></script>
+<script type="text/javascript">
+    $(function() {
+        var allCategories = [];
+        var allSeriesData = [];
+        var allData = [];
+
+        var diskUsage = {
+            label: 'Storage<br />{DISK_USED}/{DISK_TOTAL}',
+            value: parseFloat('{DISK_PERC}')
+        }
+
+        allData.push(diskUsage);
+
+        <!-- BEGIN memory -->
+        var memoryUsage = {
+            label: 'Memory<br />{MEMORY_USED}/{MEMORY_TOTAL}',
+            value: parseFloat('{MEMORY_PERC}')
+        }
+
+        allData.push(memoryUsage);
+        <!-- END memory -->
+
+        for (var i = 0; i < allData.length; i++) {
+            allCategories.push(allData[i].label);
+            allSeriesData.push(allData[i].value);
+        }
+
+        /* Render it out
+         */
+        $('[data-graph="usage"]').barchart({
+            title: '',
+            colors: ['#bdd7ea', '#bdd7ea'],
+            categories: allCategories,
+            tooltip: {
+                enabled: false
+            },
+            series: [
+                {
+                    data: allSeriesData
+                }
+            ],
+            formatter: function() {
+                var str = '';
+
+                if (this.y > 0) {
+                    str = this.y + '%';
+                }
+
+                return str;
+            }
+        });
+    });
+</script>
