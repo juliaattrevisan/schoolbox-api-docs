@@ -125,7 +125,7 @@ $.fn.configurator = function(opts) {
             cancel: '.nodrag,:input,option'
         });
 
-        $('#definition-palette .component').draggable({
+        $('[data-definition-palette] .component').draggable({
             helper: 'clone',
             connectToSortable: options.componentHolder
         });
@@ -137,7 +137,7 @@ $.fn.configurator = function(opts) {
 
     this.refreshPalette = function() {
 
-        $('#definition-palette .component').each( function () {
+        $('[data-definition-palette] .component').each( function () {
             var definitionElement = $(this);
             var definitionIDClass = definitionElement.attr('class').match(/(definition\-id\-\d+)/)[1];
 
