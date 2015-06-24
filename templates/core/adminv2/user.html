@@ -1,12 +1,11 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
-<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
-<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript">
 $(function() {
-
-    $('#modify')
+    var modifyForm = $('form[data-action="modify-user"]');
+    modifyForm.find('input[data-selectizeuser]')
         .selectizeSelector({
             ajax: {
                 url:      '/ajax/user.php',
@@ -15,79 +14,70 @@ $(function() {
                 dataType: 'json'
             }
         })
-        .on('selectize.item_add', function(event, value) {
-            $('#user-to-mod').val(value)
-            $('#modify-user-button').removeClass('disabled').focus();
+        .on('selectize.item_add', function() {
+            modifyForm.find(':submit').prop('disabled', false).focus();
         })
         .on('selectize.item_remove', function() {
-            $('#user-to-mod').val('')
-            $('#modify-user-button').addClass('disabled');
-        })
+            modifyForm.find(':submit').prop('disabled', true);
+        });
 
     var openModifyScreen = function(event) {
         event.preventDefault();
-        if (!$('#modify-user-button').hasClass('disabled')) {
-            window.open('/adminv2/modify-user/'+$('#user-to-mod').val(), '_self');
-        }
-    }
-    $('#modify-user-button').click(openModifyScreen);
-    $('#modify-user').submit(openModifyScreen);
+        window.location.href = '/adminv2/modify-user/'+modifyForm.find(':input[name="userId"]').val();
+    };
+    modifyForm.submit(openModifyScreen);
 
-    $('h2 span').each(function() {
-        $(this).qtip({
-            content: 'If you are wanting to deal with large lists at once, use this section.',
-            style: {
-                classes: 'qtip-green qtip-shadow'
-            },
-            position: {
-                my: 'bottom left',
-                at: 'top left'
+    // The clone form
+    var cloneForm = $('form[data-action="clone"]');
+    var cloneSrc  = cloneForm.find(':input[data-role="clone-src"]');
+    var cloneDest = cloneForm.find(':input[data-role="clone-dest"]');
+    var cloneNew  = cloneForm.find(':input[data-role="clone-new"]');
+    $.validator.addMethod('roles_different', function (value, element) {
+        return cloneDest.val() != cloneSrc.val();
+    }, "Roles cannot be the same");
+
+    cloneForm.validate({
+        submitHandler: function (form) {
+            var src  = cloneSrc.children('option[value=' + cloneSrc.val() + ']').text(),
+                dest = cloneDest.children('option[value=' + cloneDest.val() + ']').text(),
+                newc = cloneNew.val(),
+                msg  = "WARNING! This will clone '"+src+"' onto ";
+
+            if (cloneDest.val() > 0) {
+                msg += "'" + dest + "', making it an exact copy. '" + dest + "' will lose its dashboard, all permissions and role-specific data. ";
+            } else {
+                msg += "a newly created role '" + newc + "'! "
             }
-        });
+
+            msg += "This action CANNOT be reversed. Are you sure you wish to proceed?";
+
+            cloneForm.confirmDialog({
+                text: msg,
+                confirmEvent: function() {
+                    form.submit();
+                }
+            });
+        },
+        rules: {
+            'clone[dest]': {
+                'roles_different': true
+            },
+            'clone[new]': {
+                required: function (element) {
+                    return cloneDest.val() == 0
+                }
+            }
+        }
     });
 
-  $.validator.addMethod('roles_different', function (value, element) {
-    return $('#cl_dest').val() != $('#cl_src').val();
-  }, "Roles cannot be the same");
-
-  $('#clone').validate({
-    submitHandler: function (form) {
-      var src  = $('#cl_src').children('option[value=' + $('#cl_src').val() + ']').text(),
-          dest = $('#cl_dest').children('option[value=' + $('#cl_dest').val() + ']').text(),
-          newc = $('#cl_new input').val(),
-          msg  = "WARNING! This will clone '"+src+"' onto ";
-
-      if ($('#cl_dest').val() > 0) {
-        msg += "'" + dest + "', making it an exact copy. '" + dest + "' will lose its dashboard, all permissions and role-specific data. ";
-      } else {
-        msg += "a newly created role '" + newc + "'! "
-      }
-
-      msg += "This action CANNOT be reversed. Are you sure you wish to proceed?";
-
-      if (confirm(msg)) {
-        form.submit();
-      }
-    },
-    rules: {
-      'clone[dest]': {
-        'roles_different': true
-      },
-      'clone[new]': {
-        required: function (element) {
-          return $('#cl_dest').val() == 0
+    var cloneContainer = cloneForm.find('[data-container="clone-new"]');
+    cloneDest.on('change', function () {
+        if ($(this).val() > 0) {
+            cloneContainer.addClass('hide');
+        } else {
+            cloneContainer.removeClass('hide');
         }
-      }
-    }
-  });
-
-  $('#cl_dest').on('change', function () {
-    if ($(this).val() > 0) {
-      $('#cl_new').addClass('hide');
-    } else {
-      $('#cl_new').removeClass('hide');
-    }
-  });
+    });
 
 });
 
@@ -101,113 +91,100 @@ $(function() {
     <li><a href="/adminv2/{ADMNAV_HREF}" class="{ADMNAV_CURRENT}">{ADMNAV_LABEL}</a></li>
     <!-- END admin_nav_item -->
 </ul>
-<div class="admin-contents clearfix">
-	<div class="half clearfix">
-        <h2>Users</h2>
-			<div class="level green clearfix">
-				<h3>Modify User</h3>
-				<form id="modify-user" action="" method="post" class="clearfix">
-					<input type="text" id="modify" placeholder="Search Users">
-					<input type="hidden" id="user-to-mod">
-					<a id="modify-user-button" class="btn modify float-left next-to-input disabled" href="#"><span></span>Modify</a>
-				</form>
-			</div>
 
-            <div class="level green clearfix">
-                <h3>Add User</h3>
-                <a class="btn add center-it float-left" href="/adminv2/modify-user/"><span></span>Add User</a>
-            </div>
+<div class="large-6 columns">
+    <h2>Users</h2>
 
-            <div class="level">
-                <h3>Superusers</h3>
-                <table class="table ruler">
-                    <colgroup>
-                        <col width="40%" />
-                        <col width="40%" />
-                        <col width="20%" />
-                    </colgroup>
-                    <thead>
-                    <tr>
-                        <th scope="col">Name</th>
-                        <th scope="col">Last Login</th>
-                        <th scope="col">Modify</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!-- BEGIN superusers -->
-                    <tr>
-                        <td>{SUPERUSER_NAME}</td>
-                        <td>{SUPERUSER_LOGIN}</td>
-                        <td><a href="/adminv2/modify-user/{SUPERUSER_ID}">Modify</a></td>
-                    </tr>
-                    <!-- END superusers -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    <form data-action="modify-user" action="" method="post" class="clearfix">
+        <h3>Modify User</h3>
+        <input data-selectizeuser type="text" name="userId" placeholder="Search Users">
+        <!--<input type="hidden" id="user-to-mod">-->
+        <button type="submit" class="icon-modify" disabled>Modify</button>
+        <a class="button icon-add" href="/adminv2/modify-user/">Add User</a>
+    </form>
 
-	<div class="half last">
-        <h2>Bulk Options<span class="question">?</span></h2>
-		<div class="level clearfix">
-			<h3>Modify Users</h3>
-			<p>Search for users based on a set of criteria, and apply settings en masse.</p>
-			<p class="clearfix">
-				<a href="/adminv2/user/bulk/modify" class="btn download float-left" ><span></span>Bulk Modify</a>
-			</p>
-		</div>
+    <h3>Superusers</h3>
+    <table>
+        <colgroup>
+            <col width="40%" />
+            <col width="40%" />
+            <col width="20%" />
+        </colgroup>
+        <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Last Login</th>
+            <th scope="col">&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- BEGIN superusers -->
+        <tr>
+            <td>{SUPERUSER_NAME}</td>
+            <td>{SUPERUSER_LOGIN}</td>
+            <td><a class="no-text icon-modify" title="Modify" href="/adminv2/modify-user/{SUPERUSER_ID}"></a></td>
+        </tr>
+        <!-- END superusers -->
+        </tbody>
+    </table>
+</div>
 
-        <div class="level clearfix">
-            <h3>Add Users</h3>
-            <p>Provide a file containing a list of users in the following CSV format. (username, title, firstname, lastname, synergetic, role, campus, campus secondary, campus tertiary, campus quaternary, year, password, webmail, alt. email) </p>
-            <p class="clearfix">
-                <a href="/adminv2/csv/userBulkAdd.csv" class="btn download float-left" ><span></span>Download Template</a>
-            </p>
+<div class="large-6 columns">
+    <h2>Bulk Options <span data-tooltip class="has-tip" title="If you are wanting to deal with large lists at once, use this section.">?</span></h2>
+    <div class="level clearfix">
+        <h3>Modify Users</h3>
+        <p>Search for users based on a set of criteria, and apply settings en masse.</p>
+        <a href="/adminv2/user/bulk/modify" class="button icon-modify">Bulk Modify</a>
+    </div>
 
-            <h3>Upload bulk users CSV</h3>
-            <form id="add-users" action="/adminv2/bulkAdd" method="post" enctype="multipart/form-data">
-                <input name="bulkadd" type="file">
-                <a class="submit-btn-plain float-right submit-this" href="#"><span></span>Add users</a>
-            </form>
-        </div>
+    <div class="level clearfix">
+        <h3>Add Users</h3>
+        <p>Provide a file containing a list of users in the following CSV format. (username, title, firstname, lastname, synergetic, role, campus, campus secondary, campus tertiary, campus quaternary, year, password, webmail, alt. email) </p>
+        <a href="/adminv2/csv/userBulkAdd.csv" class="button icon-download" >Download Template</a>
 
-        <div class="level clearfix">
-            <h3>Remove Users</h3>
-            <p>Provide a file containing a list of usernames or School DB IDs.</p>
-            <p class="clearfix">
-                <a href="/adminv2/csv/userBulkRemove.csv" class="btn download float-left" ><span></span>Download Template</a>
-            </p>
+        <h3>Upload bulk users CSV</h3>
+        <form action="/adminv2/bulkAdd" method="post" enctype="multipart/form-data">
+            <input name="bulkadd" type="file">
+            <button type="submit" class="icon-add">Add Users</button>
+        </form>
+    </div>
 
-            <h3>Upload bulk remove users CSV</h3>
-            <form id="add-users" action="/adminv2/bulkRemove" method="post" enctype="multipart/form-data">
-                <input name="bulkremove" type="file">
-                <a class="submit-btn-plain delete float-right submit-this" href="#"><span></span>Remove Users</a>
-            </form>
-        </div>
-        <form id="clone" action="/adminv2/user/cloneForm.php" method="post" class="level clearfix">
-            <h3>Clone Role</h3>
-          <p>
+    <div class="level clearfix">
+        <h3>Remove Users</h3>
+        <p>Provide a file containing a list of usernames or School DB IDs.</p>
+        <a href="/adminv2/csv/userBulkRemove.csv" class="button icon-download">Download Template</a>
+
+        <h3>Upload bulk remove users CSV</h3>
+        <form action="/adminv2/bulkRemove" method="post" enctype="multipart/form-data">
+            <input name="bulkremove" type="file">
+            <button type="submit" class="icon-delete">Remove Users</button>
+        </form>
+    </div>
+
+    <form data-action="clone" action="/adminv2/user/cloneForm.php" method="post" class="level clearfix">
+        <h3>Clone Role</h3>
+        <p>
             This cloning process will be destructive: any existing permissions will first be deleted from the destination role before new permissions are added.
             It should only be carried out on new roles, or roles you no longer require.
-          </p>
-          <!-- BEGIN select_clone -->
-          <label>{CLONE_LABEL} Role
-            <select id="cl_{CLONE_KEY}" name="clone[{CLONE_KEY}]" required>
-              <option disabled="disabled" selected="selected">(Choose Role)</option>
-              <!-- BEGIN select_new -->
-              <option value="0">(New Role...)</option>
-              <!-- END select_new -->
-              <!-- BEGIN select_clone_opt -->
-              <option value="{CLONE_OPT_VALUE}" {CLONE_OPT_VALUE_SELECTED}>{CLONE_OPT_NAME}</option>
-              <!-- END select_clone_opt -->
+        </p>
+        <!-- BEGIN select_clone -->
+        <label>{CLONE_LABEL} Role
+            <select data-role="clone-{CLONE_KEY}" name="clone[{CLONE_KEY}]" required>
+                <option disabled="disabled" selected="selected">(Choose Role)</option>
+                <!-- BEGIN select_new -->
+                <option value="0">(New Role...)</option>
+                <!-- END select_new -->
+                <!-- BEGIN select_clone_opt -->
+                <option value="{CLONE_OPT_VALUE}" {CLONE_OPT_VALUE_SELECTED}>{CLONE_OPT_NAME}</option>
+                <!-- END select_clone_opt -->
             </select>
-          </label>
-          <!-- BEGIN new_role -->
-          <label id="cl_new" class="hide"> New Role name
-            <input name="clone[new]" type="text" value="" />
-          </label>
-          <!-- END new_role -->
-          <!-- END select_clone -->
-          <input class="submit-btn-plain" type="submit" value="Clone" />
-        </form>
-	</div>
+        </label>
+        <!-- BEGIN new_role -->
+        <label class="hide" data-container="clone-new"> New Role name
+            <input data-role="clone-new" name="clone[new]" type="text" value="" />
+        </label>
+        <!-- END new_role -->
+        <!-- END select_clone -->
+        <button type="submit" class="icon-copy">Clone</button>
+    </form>
 </div>
