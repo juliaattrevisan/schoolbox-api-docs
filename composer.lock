@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "504163bcf4f6fe486338b02458afa71f",
+    "hash": "5e6b0d8c8f268ef0f34adb9ed280c04d",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -808,16 +808,16 @@
         },
         {
             "name": "imagine/imagine",
-            "version": "dev-0.6.2+resize-animated-gif+image-convolution+crop-animated-gif",
+            "version": "dev-0.6.2-patches",
             "source": {
                 "type": "git",
                 "url": "https://github.com/armatronic/Imagine.git",
-                "reference": "e58b92c8207bba9e84b9e1404e5adca58d86926c"
+                "reference": "a5e3d12de2d7bba9afa50a9d9383e49bec126f3a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/armatronic/Imagine/zipball/e58b92c8207bba9e84b9e1404e5adca58d86926c",
-                "reference": "e58b92c8207bba9e84b9e1404e5adca58d86926c",
+                "url": "https://api.github.com/repos/armatronic/Imagine/zipball/a5e3d12de2d7bba9afa50a9d9383e49bec126f3a",
+                "reference": "a5e3d12de2d7bba9afa50a9d9383e49bec126f3a",
                 "shasum": ""
             },
             "require": {
@@ -861,9 +861,9 @@
                 "image processing"
             ],
             "support": {
-                "source": "https://github.com/armatronic/Imagine/tree/0.6.2+resize-animated-gif+image-convolution+crop-animated-gif"
+                "source": "https://github.com/armatronic/Imagine/tree/0.6.2+patches"
             },
-            "time": "2015-05-04 02:32:44"
+            "time": "2015-06-24 06:51:42"
         },
         {
             "name": "jenssegers/date",
@@ -4812,12 +4812,6 @@
             "alias_normalized": "9999999-dev",
             "version": "dev-schoolbox-14.0-dep",
             "package": "0x46616c6b/etherpad-lite-client"
-        },
-        {
-            "alias": "0.6.2",
-            "alias_normalized": "0.6.2.0",
-            "version": "dev-0.6.2",
-            "package": "imagine/imagine"
         }
     ],
     "minimum-stability": "stable",
