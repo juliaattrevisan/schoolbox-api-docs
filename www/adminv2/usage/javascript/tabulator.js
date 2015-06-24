@@ -51,14 +51,12 @@
 			$.each(config.element.find('[data-control]'), function(index, element) {
 				$(element).click(function(event) {
 					event.preventDefault();
+                    var order = 'ASC';
 
 					/* Toggle ordering upon click
 					 */
 					if (config.order == 'ASC') {
-						var order = 'DESC';
-					}
-					else {
-						var order = 'ASC';
+						order = 'DESC';
 					}
 
 					config.element.usageTabulator({
@@ -134,7 +132,7 @@
 			/* Asc/desc indicator arrows
 			 */
 			if (currentColumn == config.orderBy) {
-				var indicator = config.ascendingHtml;
+				indicator = config.ascendingHtml;
 
 				if (config.order == 'DESC') {
 					indicator = config.descendingHtml;
@@ -184,7 +182,7 @@
 					var active = 'active';
 				}
 
-				pagination += '<li><a href="#" class="' + active + '" rel="' + i +'">' + (i+1) + '</a></li>';
+				pagination += '<li class="' + active + '" ><a href="#" rel="' + i +'">' + (i+1) + '</a></li>';
 			}
 
 			/* Next Navigator
@@ -212,10 +210,9 @@
 					{CONTENTS}\
 					</tbody>\
 				</table>\
-				<ul class="foot admin-nav">\
+				<ul class="pagination">\
 					{PAGINATION}\
 				</ul>\
-				<div class="clearfix"></div>\
 			';
 
 			/* Table, table heading and paginator
