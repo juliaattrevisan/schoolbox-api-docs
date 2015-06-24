@@ -4,7 +4,7 @@
 <script type="text/javascript">
 $(function () {
 
-    $("#side-menu")
+    $('section[data-role="sideMenuEditor"]')
         .on('ready.jstree', function(event, jstree) {
             jstree.instance.open_node(jstree.instance.get_node('node_0'));
         })
@@ -55,6 +55,6 @@ $(function () {
     <span data-tooltip class="hit has-tip" title="Drag and drop the menu items to reorder the core left navigation side menu.">?</span>
 </h2>
 <a class="button" href="/adminv2/modify-side-menu/">Add New</a>
-<div id="side-menu">
-{MENU_TREE}
-</div>
+<section data-role="sideMenuEditor">
+    {MENU_TREE}
+</section>
