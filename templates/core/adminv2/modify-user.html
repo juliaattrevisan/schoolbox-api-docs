@@ -14,25 +14,30 @@ $(function() {
         $.post('/adminv2/userForm.php', form.serializeArray());
     });
 
-	$('a.show-pass').click(function() {
-
-        $(this).siblings('em').show().css('display', 'block');
-		$(this).siblings('a.hide-pass').show().css('display', 'block');
-		$(this).hide();
-
-		return false;
-
-	});
-	
-	$('a.hide-pass').click(function() {
-
-        $(this).siblings('em').hide();
-		$(this).siblings('a.show-pass').show();
-		$(this).hide();
-		
-		return false;
-
-	});
+    /**
+     * Show/hide password
+     */
+    var passwordDisplayer = $('[data-role="passwordDisplay"]');
+    if (passwordDisplayer.length) {
+        var passwordShow = passwordDisplayer.find('[data-action="show"]');
+        var passwordHide = passwordDisplayer.find('[data-action="hide"]');
+        var passwordView = passwordDisplayer.find('[data-relation="password"]');
+        passwordShow.show();
+        passwordHide.hide();
+        passwordView.hide();
+        passwordShow.click(function(e) {
+            e.preventDefault();
+            passwordShow.hide();
+            passwordHide.show();
+            passwordView.show();
+        });
+        passwordHide.click(function(e) {
+            e.preventDefault();
+            passwordShow.show();
+            passwordHide.hide();
+            passwordView.hide();
+        });
+    }
 
 	/* Reset availability options for campuses and services
 	 * 0: please select
@@ -108,7 +113,7 @@ $(function() {
 				}
 			}
 		}
-		
+
 	});
 	
 	/**********
@@ -315,13 +320,11 @@ $(function() {
                 <input id="password" type="password" name="modpassword" class="password" value="{PASSWORD}" />
 
                 <!-- BEGIN reveal_password -->
-                <label class="password-container">
-                    <div class="reveal-password">
-                        <a href="#" class="show-pass">Reveal Password</a>
-                        <em>{CLEAR_PASSWORD}</em>
-                        <a href="#" class="hide-pass">hide</a>
-                    </div>
-                </label>
+                <div data-role="passwordDisplay">
+                    <a href="#" data-action="show">Reveal Password</a>
+                    <span data-relation="password">{CLEAR_PASSWORD}</span>
+                    <a href="#" data-action="hide">Hide Password</a>
+                </div>
                 <!-- END reveal_password -->
 
                 <label for="alt_email">Alternate Email</label>
