@@ -77,133 +77,108 @@
 
 </script>
 <!-- END custom_head -->
+
 <h1>Schoolbox Administration</h1>
+
 <dl class="sub-nav">
     <!-- BEGIN admin_nav_item -->
     <dd class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></dd>
     <!-- END admin_nav_item -->
 </dl>
-<div class="admin-contents clearfix">
-    <h2>{ACTION} Side Menu Item</h2>
 
-    <div class="level">
-    <form action="/adminv2/side-menuForm.php" method="post" name="form" id="form">
-        <table class="table">
-            <tbody>
-            <tr>
-                <td class="formLabelWidth" width="250">
+<h2>{ACTION} Side Menu Item</h2>
 
-                    <h3>Name</h3>
-                    <em>This is the text that will be displayed on the menu</em>
-                </td>
-                <td>
-                    <label>
-                        <input type="text" name="txt" class="required" maxlength="100" size="40" value="{TEXT}"/>
-                    </label>
-                </td>
-            </tr>
-            <tr>
-                <td width="250">
-                    <h3>URL</h3>
-
-                    <em>Either enter in a URL or use the browse button to link to folders created in the resource
-                        system</em>
-                </td>
-                <td>
-
-                    <label>
-
-                        <input type="text" name="url" id="url" size="40" class="required" maxlength="250"
-                               value="{URL}"/>
-                    </label>
-
-                    <p class="clearfix"><a href="#" class="btn float-left open-modal"><span></span>Browse Resources</a>
-                    </p>
-
-                    <div id="resource-browser" class="hide"></div>
-
-                </td>
-            </tr>
-            <tr>
-                <td width="250">
-                    <h3>Windows</h3>
-                    <em>Generally links to offsite resources would be set to a new window, while local resources would
-                        stay in the existing window.</em>
-                </td>
-                <td>
-                    <select name="target">
-                        <option value="">Same Window</option>
-                        <option value="_blank"
-                        {BLANK_SELECTED}>New Window</option>
-                    </select>
-                </td>
-            </tr>
-            <!-- BEGIN parent_select -->
-            <tr>
-                <td width="250">
-                    <h3>Parent</h3>
-                    <em>This is where in the menu the new item will be inserted. Simply click on a menu item to allow it
-                        to be the parent.</em>
-                </td>
-                <td class="parent-level">
-                    <div id="side-menu">
-                        {MENU_TREE}
-                    </div>
-                </td>
-            </tr>
-            <!-- END parent_select -->
-            <tr>
-                <td width="250">
-                    <h3>Campus Access</h3>
-                    <em>Select the campuses that should be able to view
-                        this link. Note that this link will only be viewable
-                        by people in both the campuses and roles selected</em>
-                </td>
-                <td>
-					<div class="clearfix checkboxes">
-						<label class="float-left clear">
-							<input type="checkbox" class="select_all" />Select all
-						</label>
-						<!-- BEGIN campus -->
-						<label class="float-left clear">
-							<input type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED}/>{CAMPUS_NAME}
-						</label>
-	                    <!-- END campus -->
-					</div>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <h3>Role Access</h3>
-                </td>
-                <td>
-					<div class="clearfix checkboxes">
-						<label class="float-left clear">
-							<input type="checkbox" class="select_all" />Select all
-						</label>
-						<!-- BEGIN group -->
-						<label class="float-left clear">
-							<input type="checkbox" name="group[]" value="{GROUP_ID}" {GROUP_ID_SELECTED}/>{GROUP_NAME}
-						</label>
-						<!-- END group -->
-					</div>
-                </td>
-            </tr>
-            <tr>
-                <td>&nbsp;
-
-                </td>
-                <td>
-                    <input type="hidden" name="id" value="{ID}"/>
-                    <input id="prent" name="parent" type="hidden" value="{PARENT_ID}"/>
-                    <input type="submit" name="Submit" value="{ACTION}" class="submit-btn-plain"/>
-                    <!-- BEGIN delete -->
-                    <input type="submit" name="delete" value="Delete" class="submit-btn-plain"/>
-                    <!-- END delete -->
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </form>
+<form action="/adminv2/side-menuForm.php" method="post" name="form" id="form">
+    <div class="small-12 medium-6 columns">
+        <label>
+            Name
+            <span data-tooltip class="has-tip"
+                  title="This is the text that will be displayed on the menu">?</span>
+            <input type="text" name="txt" class="required" maxlength="100" size="40" value="{TEXT}"/>
+        </label>
     </div>
-</div>
+
+    <div class="small-12 medium-6 columns">
+        <label>
+            URL
+            <span data-tooltip class="has-tip"
+                  title="Either enter in a URL or use the browse button to link to folders created in the resource system">?</span>
+            <input type="text" name="url" id="url" size="40" class="required" maxlength="250" value="{URL}"/>
+        </label>
+        <a href="#" class="button open-modal">Browse Resources</a>
+        <div id="resource-browser" class="hide"></div>
+    </div>
+
+    <div class="small-12 medium-6 columns end">
+        <label>
+            Link Target
+            <span data-tooltip class="has-tip"
+                  title="Where does this link open? (Generally, links to offsite resources open in a new tab/window, while local resources open in the existing one.)">?</span>
+            <select name="target">
+                <option value="">Open in existing tab/window</option>
+                <option value="_blank" {BLANK_SELECTED}>Open in new tab/window</option>
+            </select>
+        </label>
+    </div>
+
+    <div class="small-12 medium-6 columns">
+        <label>
+            Campus
+            <span data-tooltip class="has-tip"
+                  title="Select the campuses that should be able to view
+                    this link. Note that this link will only be viewable
+                    by people in both the campuses and roles selected">?</span>
+        </label>
+        <div class="clearfix checkboxes">
+            <label class="float-left clear">
+                <input type="checkbox" class="select_all" />Select all
+            </label>
+            <!-- BEGIN campus -->
+            <label class="float-left clear">
+                <input type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED}/>{CAMPUS_NAME}
+            </label>
+            <!-- END campus -->
+        </div>
+    </div>
+
+    <div class="small-12 medium-6 columns">
+        <label>
+            Roles
+            <span data-tooltip class="has-tip"
+                  title="Select the campuses that should be able to view
+                    this link. Note that this link will only be viewable
+                    by people in both the campuses and roles selected">?</span>
+        </label>
+        <div class="clearfix checkboxes">
+            <label class="float-left clear">
+                <input type="checkbox" class="select_all" />Select all
+            </label>
+            <!-- BEGIN group -->
+            <label class="float-left clear">
+                <input type="checkbox" name="group[]" value="{GROUP_ID}" {GROUP_ID_SELECTED}/>{GROUP_NAME}
+            </label>
+            <!-- END group -->
+        </div>
+    </div>
+
+    <!-- BEGIN parent_select -->
+    <div class="small-12 medium-6 columns">
+        <label>
+            Parent
+            <span data-tooltip class="has-tip"
+                  title="This is where in the menu the new item will be inserted. Simply click on a menu item to allow it
+                    to be the parent.">?</span>
+        </label>
+        <div id="side-menu">
+            {MENU_TREE}
+        </div>
+    </div>
+    <!-- END parent_select -->
+
+    <input type="hidden" name="id" value="{ID}"/>
+    <input id="prent" name="parent" type="hidden" value="{PARENT_ID}"/>
+    <input type="submit" name="Submit" value="{ACTION}" />
+    <!-- BEGIN delete -->
+    <input type="submit" name="delete" value="Delete" />
+    <!-- END delete -->
+</form>
