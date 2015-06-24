@@ -24,7 +24,6 @@ $.fn.configurator = function(opts) {
 
     /* METHODS */
     this.start = function() {
-        this.help();
         this.checkForPreselection();
         this.roleSelect();
         this.dragAndDrop();
