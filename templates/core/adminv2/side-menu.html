@@ -49,14 +49,12 @@ $(function () {
     <dd class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></dd>
     <!-- END admin_nav_item -->
 </dl>
-<div class="admin-contents clearfix">
-	<h2>Side Menu<span class="question">?</span>
-    <em>Drag and drop the menu items to reorder the core left navigation side menu.</em>
-    </h2>
-    <div class="level clearfix">
-        <p class="clearfix"><a class="btn add float-left" href="/adminv2/modify-side-menu/"><span></span>Add New</a></p>
-        <div id="side-menu">
-        {MENU_TREE}
-        </div>
-    </div>
+
+<h2>
+    Side Menu
+    <span data-tooltip class="hit has-tip" title="Drag and drop the menu items to reorder the core left navigation side menu.">?</span>
+</h2>
+<a class="button" href="/adminv2/modify-side-menu/">Add New</a>
+<div id="side-menu">
+{MENU_TREE}
 </div>
