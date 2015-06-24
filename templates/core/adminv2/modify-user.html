@@ -162,19 +162,6 @@ $(function() {
 
     $('form[data-validatable-as="addGroup"]').validate();
 
-//  // locate the assume button and add a listener if it's disabled
-//  $('#content')
-//      .children('.admin-contents')
-//      .children('form.modify-form')
-//      .children('a.user.disabled')
-//      .click(function()
-//  {
-//      var con = confirm("This account is deactivated. Are you sure you want to log in as this user?");
-//      if(con) {
-//        $(this).closest('form').submit();
-//      }
-//  })
-
     // Handles autosuggest for linking users to other user accounts
     var addUserSelector = $(':input[data-selectizeuser="addUser"]');
     var addUserButton   = $(addUserSelector.prop('form')).find(':submit');
@@ -234,7 +221,7 @@ $(function() {
 
 <form method="POST" action="/adminv2/userForm.php">
     <input type="hidden" name="login" value="{USERNAME}" />
-    <input type="submit" class="{ASSUME_CLASS}" value="{ASSUME_PROMPT}" />
+    <input type="submit" {ASSUME_CLASS} value="{ASSUME_PROMPT}" />
 </form>
 
 <form method="POST" action="/adminv2/userForm.php" data-validatable-as="userDetails">
