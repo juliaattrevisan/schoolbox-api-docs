@@ -10,11 +10,11 @@
 
 <div class="row">
     <div class="large-4 columns">
-		<div data-panel='global-usage' class='loader'>Loading data...</div>
-		<div data-panel='group-usage' class='loader'>Loading data...</div>
+		<div data-panel='global' class='loader'>Loading data...</div>
+		<div data-panel='group' class='loader'>Loading data...</div>
 	</div>
     <div class="large-8 columns">
-		<div data-panel='type-usage' class='loader'>Loading data...</div>
+		<div data-panel='type' class='loader'>Loading data...</div>
 	</div>
 	<div class="large-12 columns">
 	    <div data-panel='user' class='loader'>Loading data...</div>
@@ -31,17 +31,17 @@
 
 <script type='text/javascript'>
     $(function() {
-        $('[data-panel=global-usage]').usageTotal({
+        $('[data-panel=global]').usageTotal({
             url: '/adminv2/usage/ajax/allAjax?type=total',
             title: 'Total'
         });
 
-        $('[data-panel=group-usage]').usageGroup({
+        $('[data-panel=group]').usageGroup({
             url: '/adminv2/usage/ajax/allAjax?type=group',
             title: 'Roles'
         });
 
-        $('[data-panel=type-usage]').usageType({
+        $('[data-panel=type]').usageType({
             url: '/adminv2/usage/ajax/allAjax?type=type',
             title: 'Category'
         });
