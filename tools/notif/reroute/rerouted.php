@@ -112,7 +112,7 @@ $kernel->run(function($di, $loop, $log, $opts) use (&$rerouter) {
             // setup dependencies
             $bunnyCtrl  = new BunnyControl([
                 'host'     => $conf->get('amqp_host'),
-                'port'     => $conf->get('amqp_port'),
+                'port'     => $conf->get('amqp_admin_port'),
                 'username' => $conf->get('amqp_user'),
                 'password' => $conf->get('amqp_pass'),
                 'vhost'    => $conf->get('amqp_vhost')

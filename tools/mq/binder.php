@@ -75,7 +75,7 @@ EOL;
     $conn = $opts['dry-run'] ? new MockAMQPConnector() : Connector::getInstance();
     $ctrl = $opts['dry-run'] ? new MockBunnyControl() : new BunnyControl([
         'host'     => $conf->get('amqp_host'),
-        'port'     => $conf->get('amqp_port'),
+        'port'     => $conf->get('amqp_admin_port'),
         'username' => $conf->get('amqp_user'),
         'password' => $conf->get('amqp_pass'),
         'vhost'    => $conf->get('amqp_vhost')
