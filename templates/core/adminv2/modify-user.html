@@ -115,10 +115,7 @@ $(function() {
 //		}
 //
 //	});
-	
-	/**********
-	Custom Validation
-	**********/
+
     /**
      * User details validation
      */
@@ -156,43 +153,36 @@ $(function() {
             }
         }
 	});
-	
-	$('#serviceCloneForm').validate({
-		rules: {
-			sid: {
-				customCampus: true	
-			},
-			service: {
-				customService: true
-			}
-		}
-		
-	});
-	
-	$('#groupAdd').validate();
-	
-	$.validator.addMethod("customCampus", function(value, element) {
-		if ($(element).is(':visible')) {
-			if (value !== "") {
-				return true;	
-			} else {
-				return false;	
-			}
-		} else {
-			return true;	
-		}
 
-	}, "Please select an option");
+    /**
+     * Service validation
+     */
+    $('form[data-validatable-as="addService"]').validate();
 
-	$.validator.addMethod("customService", function(value, element) {
-		
-		if (value !== "") {
-			return true;	
-		} else {
-			return false;	
-		}
+    $('form[data-validatable-as="addGroup"]').validate();
 
-	}, "Please select an option");
+//	$.validator.addMethod("customCampus", function(value, element) {
+//		if ($(element).is(':visible')) {
+//			if (value !== "") {
+//				return true;
+//			} else {
+//				return false;
+//			}
+//		} else {
+//			return true;
+//		}
+//
+//	}, "Please select an option");
+//
+//	$.validator.addMethod("customService", function(value, element) {
+//
+//		if (value !== "") {
+//			return true;
+//		} else {
+//			return false;
+//		}
+//
+//	}, "Please select an option");
 
 //	// Auto-validate: should not be needed
 //	$('#groupSelect, #campusSelect,#serviceSelect').change(function() {
@@ -393,22 +383,22 @@ $(function() {
     <!-- Have the add form as a row at the bottom of the group list -->
     <tr>
         <td>
-            <select class="formfield required" name="sid" id="groupSelect" form="groupAdd">
-                <option value="">Please Select a Group</option>
+            <select required name="sid" id="groupSelect" form="groupAdd">
+                <option>Please Select a Group</option>
                 <!-- BEGIN all_group -->
                 <option value="{ALL_GROUP_ID}">{ALL_GROUP_NAME}</option>
                 <!-- END all_group -->
             </select>
         </td>
         <td>
-            <select name="type" form="groupAdd">
+            <select required name="type" form="groupAdd">
                 <option value="1">Read</option>
                 <option value="2">Write</option>
                 <option value="3">Group Admin</option>
             </select>
         </td>
         <td>
-            <form action="/adminv2/userForm.php" method="post" id="groupAdd">
+            <form action="/adminv2/userForm.php" method="post" id="groupAdd" data-validatable-as="addGroup">
                 <input type="hidden" name="groupSubmit" />
                 <input type="hidden" value="{USERID}" name="uid" />
                 <input type="hidden" value="1" name="service" />
@@ -552,20 +542,18 @@ $(function() {
         <!-- END user_curriculum -->
     <tr>
         <td>
-            <label>
-                <select class="formfield" name="service" id="serviceSelect" form="serviceCloneForm">
-                    <option value="">Select Service</option>
-                    <option value="2">Calendar</option>
-                    <option value="3">News</option>
-                    <option value="5">CMS</option>
-                    <option value="6">Housemaster</option>
-                    <option value="7">Resource Booking</option>
-                    <option value="8">Curriculum</option>
-                </select>
-            </label>
+            <select name="service" id="serviceSelect" form="serviceCloneForm" required>
+                <option value="">Select Service</option>
+                <option value="2">Calendar</option>
+                <option value="3">News</option>
+                <option value="5">CMS</option>
+                <option value="6">Housemaster</option>
+                <option value="7">Resource Booking</option>
+                <option value="8">Curriculum</option>
+            </select>
         </td>
         <td>
-            <select name="sid" id="campusSelect" form="serviceCloneForm">
+            <select name="sid" id="campusSelect" form="serviceCloneForm" required>
                 <option value="">Select Campus</option>
                 <!-- BEGIN campusPermsList -->
                 <!-- BEGIN perm_campus -->
@@ -575,14 +563,14 @@ $(function() {
             </select>
         </td>
         <td>
-            <select name="type" form="serviceCloneForm">
+            <select name="type" form="serviceCloneForm" required>
                 <option value="1">Read</option>
                 <option value="2">Write</option>
                 <option value="3">Moderate</option>
             </select>
         </td>
         <td>
-            <form id="serviceCloneForm" action="/adminv2/userForm.php" method="post">
+            <form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" data-validatable-as="addService">
                 <input type="hidden" name="addService" />
                 <input type="hidden" value="{USERID}" name="uid">
                 <input type="submit" class="submit-btn-plain" value="Add" name="serviceSubmit">
