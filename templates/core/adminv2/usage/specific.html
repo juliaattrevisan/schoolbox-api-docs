@@ -24,6 +24,7 @@
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
 <script type='text/javascript' src='/javascript/shared/jquery.number-format.js'></script>
 <script type='text/javascript' src='/javascript/shared/bargraph/bargraph.js'></script>
+<script type='text/javascript' src='/javascript/jquery.confirmDialog.js'></script>
 <script type='text/javascript' src='/adminv2/usage/javascript/total.js'></script>
 <script type='text/javascript' src='/adminv2/usage/javascript/group.js'></script>
 <script type='text/javascript' src='/adminv2/usage/javascript/type.js'></script>
@@ -65,14 +66,18 @@
             ]
         });
 
-        usageTable.on('click', '[data-action="delete"]', function(event) {
+        usageTable.on('click', '[data-action=delete]', function(event) {
             event.preventDefault();
-            if (confirm('Are you sure you wish to delete this file?')) {
-                $.get(this.href)
-                        .done(function() {
-                            window.location.reload();
-                        });
-            }
+
+            var element = $(this);
+            $(this).confirmDialog({
+                text: 'Are you sure you wish to delete this file?',
+                confirmEvent: function() {
+                    $.get(element.attr('href')).done(function() {
+                        window.location.reload();
+                    });
+                }
+            });
         });
     });
 </script>
