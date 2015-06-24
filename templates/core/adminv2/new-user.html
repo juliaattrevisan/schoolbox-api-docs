@@ -5,7 +5,7 @@ $(function() {
     $('form[data-validatable]').validate({
         rules: {
             year: {
-                customValid : true
+                yearLevel : true
             },
             alt_email: {
                 email: true
@@ -37,27 +37,6 @@ $(function() {
             }
         });
     });
-
-    /**
-     * Validator for year level
-     */
-    $.validator.addMethod("customValid", function(value, element) {
-        var inputValue = (parseInt(value));
-        if (isNaN(inputValue)) {
-            value = String(value);
-            if ((value == '') || (value == 'k') || (value == 'elc') || (value == 'ELC') || (value == 'K')) {
-                return true
-            } else {
-                return false;
-            }
-        } else {
-            if ((inputValue > 13) || (inputValue < 0)) {
-                return false
-            }
-            return true;
-        }
-
-    }, "Please enter one a number in between 0 and 13 OR the letter 'K' OR the the phrase 'ELC'");
 });
 </script>
 <!-- END custom_head-->

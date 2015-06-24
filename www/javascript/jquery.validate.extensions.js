@@ -179,4 +179,23 @@
         return false;
     }, "Please enter a URL beginning with http://, https://, ftp://, or a relative URL (beginning with /)");
 
+    /**
+     * Validator for year level (1-12, K, ELC, empty)
+     */
+    $.validator.addMethod("yearLevel", function(value) {
+        var inputValue = (parseInt(value));
+        if (isNaN(inputValue)) {
+            value = String(value);
+            if ((value == '') || (value == 'k') || (value == 'elc') || (value == 'ELC') || (value == 'K')) {
+                return true
+            } else {
+                return false;
+            }
+        } else {
+            if ((inputValue > 13) || (inputValue < 0)) {
+                return false
+            }
+            return true;
+        }
+    }, "Please enter one a number in between 0 and 13 OR the letter 'K' OR the the phrase 'ELC'");
 }(jQuery));
