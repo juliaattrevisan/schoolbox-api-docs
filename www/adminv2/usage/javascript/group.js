@@ -73,10 +73,6 @@
 		 */
 		function makeBars(datasets) {
 
-			/* Bar graph everything
-			 */
-			var output = '<h3>{TITLE}</h3>';
-
 			/* Find the total amount
 			 */
 			var total = 0;
@@ -90,12 +86,13 @@
 			var html = $('<h3></h3>').text(config.title);
 			for (var i = 0; i < datasets.length; i++) {
 				var used = parseInt(datasets[i].data);
+                var percentage = 0;
 
 				if (total > 0) {
-					var percentage = Math.round(100*used/total).toString();
+					percentage = Math.round(100*used/total).toString();
 				}
 				else {
-					var percentage = 0;
+					percentage = 0;
 				}
 
 				var line = $('<div><h4></h4></div>');

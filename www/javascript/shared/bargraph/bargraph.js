@@ -41,19 +41,14 @@
 		 * @returns {string}
 		 */
 		function generateBar(percentage) {
-			var html = '\
-				<div class="bar-container">\
-					<div class="bar">\
-						<span class="filled" style="width:{WIDTH}%"></span>\
-					</div>\
-					<div class="amount {GRADIENT}">\
-						{USED}\
-					</div>\
-				</div>\
-			';
-
-			var html = html.replace(/\{WIDTH\}/g, percentage);
-			var html = html.replace(/\{USED\}/g, $.fn.formatBytes(used));
+            var html = '<div class="row">\
+                <div class="large-10 columns">\
+                    <div class="progress">\
+                        <span class="meter" style="width: '+percentage+'%"></span>\
+                    </div>\
+                </div>\
+                <div class="large-2 columns">'+$.fn.formatBytes(used)+'</div>\
+            ';
 
 			return html;
 		}
