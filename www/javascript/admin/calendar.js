@@ -12,7 +12,16 @@ var calendar = {
 	/**
 	 * Init
 	 */
-	init: function() {
+	init: function(options) {
+
+        var defaults = {
+            addConfig:    'a.addConfig',
+            addUri:       '/adminv2/calendar/addOption',
+            removeConfig: 'a.removeConfig',
+            removeUri:    '/adminv2/calendar/removeOption'
+        };
+
+        this.options = $.extend({}, defaults, options);
 
 		/* Config actions - add, update and remove individual configs
 		 */
@@ -33,7 +42,7 @@ var calendar = {
 	initAdd: function() {
 		var self = this;
 
-		$('a.addConfig').click(function() {
+		$(this.options.addConfig).click(function() {
 
 			/* Only add if all inputs are filled
 			 * Jump to latest input field when trying to add while you have an empty input
@@ -50,7 +59,7 @@ var calendar = {
 					id: id
 				};
 
-				$.post('/adminv2/calendar/addOption', data, function(responseText) {
+				$.post(self.options.addUri, data, function(responseText) {
 					self.refresh();
 				});
 			}
@@ -66,7 +75,7 @@ var calendar = {
 	initRemove: function() {
 		var self = this;
 
-		$('a.removeConfig').click(function() {
+		$(self.options.removeConfig).click(function() {
 			var id = $(this).attr('id').toString().replace(/remove_/, '');
 
 			if (confirm('Are you sure you want to remove this configuration option?')) {
@@ -77,7 +86,7 @@ var calendar = {
 					id: id
 				};
 
-				$.post('/adminv2/calendar/removeOption', data, function(responseText) {
+				$.post(self.options.removeUri, data, function(responseText) {
 					self.refresh();
 				});
 			}
