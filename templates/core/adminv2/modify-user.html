@@ -204,7 +204,7 @@ $(function() {
 
     // Handles autosuggest for linking users to other user accounts
     var addUserSelector = $(':input[data-selectizeuser="addUser"]');
-    var addUserButton   = $(addUserSelector.form).find(':submit');
+    var addUserButton   = $(addUserSelector.prop('form')).find(':submit');
     addUserSelector
         .selectizeSelector({
             multiple: true,
