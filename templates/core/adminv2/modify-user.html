@@ -2,6 +2,7 @@
 <script type="text/javascript" src="/javascript/components/jquery-validation/additional-methods.js"></script>
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
 
 $(function() {
@@ -161,34 +162,6 @@ $(function() {
 
     $('form[data-validatable-as="addGroup"]').validate();
 
-//	$.validator.addMethod("customCampus", function(value, element) {
-//		if ($(element).is(':visible')) {
-//			if (value !== "") {
-//				return true;
-//			} else {
-//				return false;
-//			}
-//		} else {
-//			return true;
-//		}
-//
-//	}, "Please select an option");
-//
-//	$.validator.addMethod("customService", function(value, element) {
-//
-//		if (value !== "") {
-//			return true;
-//		} else {
-//			return false;
-//		}
-//
-//	}, "Please select an option");
-
-//	// Auto-validate: should not be needed
-//	$('#groupSelect, #campusSelect,#serviceSelect').change(function() {
-//		$(this.form).validate().element($(this));
-//	})
-
 //  // locate the assume button and add a listener if it's disabled
 //  $('#content')
 //      .children('.admin-contents')
@@ -224,6 +197,32 @@ $(function() {
                 addUserButton.prop('disabled', true);
             }
         });
+
+    /**
+     * Confirm update of superuser field
+     */
+    $('input[data-role="superuser"]').click(function(event) {
+        event.preventDefault();
+        $(this).confirmDialog({
+            text: 'Change this user\'s superuser status?',
+            confirmEvent: function(element) {
+                element.prop('checked', !(element.prop('checked')));
+            }
+        });
+    });
+
+    /**
+     * Confirm update of account enabled field
+     */
+    $('input[data-role="enabled"]').click(function(event) {
+        event.preventDefault();
+        $(this).confirmDialog({
+            text: 'Change this user\'s account status?',
+            confirmEvent: function(element) {
+                element.prop('checked', !(element.prop('checked')));
+            }
+        });
+    });
 });
 </script>
 
@@ -337,7 +336,7 @@ $(function() {
                 <input id="superuser" type="checkbox" name="superuser" data-role="superuser" value="1" {SUPERUSER_CHECKED} />
                 <label for="superuser" class="checkbox-label">Superuser</label>
 
-                <input id="account_enabled" type="checkbox" name="account_enabled" value="1" {ACCOUNT_ENABLED_CHECKED} />
+                <input id="account_enabled" type="checkbox" name="account_enabled" data-role="enabled" value="1" {ACCOUNT_ENABLED_CHECKED} />
                 <label for="account_enabled" class="checkbox-label">Account Enabled</label>
             </div>
         </div>
