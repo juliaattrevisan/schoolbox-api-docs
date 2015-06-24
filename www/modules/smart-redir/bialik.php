@@ -1,4 +1,4 @@
-<?
+<?php
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 $page = new SitePage;
@@ -186,7 +186,7 @@ break;
 
 </head>
 
-<?
+<?php
 echo "<body>";
 
 echo"<form method='{$method}' name='{$form}' action='{$action}'>";
@@ -206,13 +206,13 @@ if(is_array($formArray)) {
 ?>
 </form>
 <script>
-<?
+<?php
 if (!($nojs))
 	echo "document.{$form}.submit();";
 ?>
 </script>
 </body>
 </html>
-<?
+<?php
 }
 ?>
