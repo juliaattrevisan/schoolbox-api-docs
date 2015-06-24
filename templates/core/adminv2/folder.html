@@ -1,53 +1,30 @@
-<!-- BEGIN custom_head -->
-<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
-<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
-<script type="text/javascript">
-$(function() {
-    $('h3 span').each(function() {
-        var activeContent = $(this).siblings('em').html();
-        $(this).qtip({
-            content: activeContent,
-            style: {
-                classes: 'qtip-green qtip-shadow'
-            },
-            position: {
-                my: 'bottom left',
-                at: 'top left'
-            }
-        });
-    });
-    $('#form').validate({
-        errorPlacement: function(error, element) {
-            error.insertAfter(element.parent().parent().children(':last-child').children('span'));
-        }
-    });
-})
-</script>
-
-<!-- END custom_head-->
-
 <h1>Schoolbox Administration</h1>
 <dl class="sub-nav">
     <!-- BEGIN admin_nav_item -->
     <dd class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></dd>
     <!-- END admin_nav_item -->
 </dl>
-<div class="admin-contents clearfix">
+<div>
 	<h2>Bulk Add Folders</h2>
-	<form action="/adminv2/bulkAddFolders" method="post" enctype="multipart/form-data" name="form" id="form" class="clearfix">
-		<div class="level clearfix">
-			<div class="one-third">
-				<h3>Bulk<span class="question">?</span><em>The File that contains the folder information must be a comma seperated (CSV) text file.  Use the template provided below as a guide.</em></h3>
-					<p>In order to update folders in bulk first download the template then fill it out and upload using the provided tool, finalising the process by pressing the "save" button.</p>
-				<p class="clearfix">
-				<a href="/adminv2/csv/folderBulkAdd.csv" class="btn download float-left" ><span></span>Download Template</a>
-				</p>
-
+	<form action="/adminv2/bulkAddFolders" method="post" enctype="multipart/form-data" name="form" id="form">
+		<div class="row">
+			<div class="column medium-4">
+				<h3>Bulk
+                    <span data-tooltip class="hint has-tip tip-right" title="The File that contains the folder information must be a comma seperated (CSV) text file.  Use the template provided below as a guide.">?</span>
+                </h3>
+                <p>In order to update folders in bulk first download the template then fill it out and upload using the provided tool, finalising the process by pressing the "save" button.</p>
+				<p>
+                    <a href="/adminv2/csv/folderBulkAdd.csv" class="button icon-download">Download Template</a>
+                </p>
 				<h3>Upload Bulk Folder CSV</h3>
-				<label><input name="bulkadd" type="file" /></label>
+				<label>
+                    <input name="bulkadd" type="file" />
+                </label>
 			</div>
-			<div class="two-thirds last">
-				<h3>Roles<span class="question">?</span><em>Select the roles permissions</em></h3>
+			<div class="column medium-8">
+				<h3>Roles
+                    <span data-tooltip class="hint has-tip tip-right" title="Select the roles permissions">?</span>
+                </h3>
 				<table class="table">
 					<thead>
 						<tr>
@@ -55,23 +32,32 @@ $(function() {
 							<th>None</th>
 							<th>Read</th>
 							<th>Write</th>
-							<td style="border:0;">&nbsp;</td>
 						</tr>
 					</thead>
 					<tbody>
 						<!-- BEGIN group -->
 						<tr>
 							<td>{GROUP_NAME}</td>
-							<td><input type="radio" class="no_permission required" name="groupPerm[{GROUP_ID}]" value="0" /></td>
-							<td><input type="radio" name="groupPerm[{GROUP_ID}]" value="1" /></td>
-							<td><input type="radio" name="groupPerm[{GROUP_ID}]" value="2"  /></td>
-							<td><span></span></td>
+							<td>
+                                <input id="sel-{GROUP_ID}-0" type="radio" class="no_permission required" name="groupPerm[{GROUP_ID}]" value="0" />
+                                <label for="sel-{GROUP_ID}-0" class="radio-label"></label>
+                            </td>
+							<td>
+                                <input id="sel-{GROUP_ID}-1" type="radio" name="groupPerm[{GROUP_ID}]" value="1" />
+                                <label for="sel-{GROUP_ID}-1" class="radio-label"></label>
+                            </td>
+							<td>
+                                <input id="sel-{GROUP_ID}-2" type="radio" name="groupPerm[{GROUP_ID}]" value="2" />
+                                <label for="sel-{GROUP_ID}-2" class="radio-label"></label>
+                            </td>
 						</tr>
 						<!-- END group -->
 					</tbody>
 				</table>
 
-				<h3>Homepage Template<span class="question">?</span><em>Select the Homepage Template that will be applied to each uploaded Folder</em></h3>
+				<h3>Homepage Template
+                    <span data-tooltip class="hint has-tip tip-right" title="Select the Homepage Template that will be applied to each uploaded Folder">?</span>
+                </h3>
 				<select name='template'>
 					<option value='0'>No template</option>
 					<!-- BEGIN homepage_template -->
@@ -80,6 +66,6 @@ $(function() {
 				</select>
 			</div>
 		</div>
-		<a class="submit-btn-plain float-left submit" href="#"><span></span>Save</a>
+		<a class="button submit" href="#">Import</a>
 	</form>
 </div>

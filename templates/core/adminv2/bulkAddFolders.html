@@ -1,42 +1,25 @@
-<!-- BEGIN custom_head -->
-<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
-<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
-<script type="text/javascript">
-$(function() {
-    $('thead td').each(function() {
-        var activeContent = $(this).find('em').html();
-        $(this).qtip({
-            content: activeContent,
-            style: {
-                classes: 'qtip-green qtip-shadow qtip-rounded',
-                tip: { corner: false }
-            },
-            position: {
-                my: 'bottom left',
-                at: 'top left'
-            }
-        });
-    });
-});
-</script>
-<!-- END custom_head -->
-
 <h1>Schoolbox Administration</h1>
 <dl class="sub-nav">
     <!-- BEGIN admin_nav_item -->
     <dd class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></dd>
     <!-- END admin_nav_item -->
 </dl>
-<div class="admin-contents clearfix">
+<div>
 	<h3>Bulk Add Folders</h3>
 
-	<div class="level">
-		<table class="bulk-users table">
+	<div>
+		<table>
 			<thead>
 				<tr>
-					<td><h3>Folder<em>The name of the folder, indicated from reading the rows in the CSV file.</em><span class="question">?</span></h3></td>
-					<td><h3>Action<em>The function schoolbox has attempted to complete.</em><span class="question">?</span></h3></td>
-					<td><h3>Response<em>Schoolbox's feedback after attempting to complete the requested function.</em><span class="question">?</span></h3></td>
+					<th>Folder<em></em>
+                        <span data-tooltip class="hint has-tip tip-right" title="The name of the folder, indicated from reading the rows in the CSV file.">?</span>
+                    </th>
+					<th>Action
+                        <span data-tooltip class="hint has-tip tip-right" title="The function schoolbox has attempted to complete.">?</span>
+                    </th>
+					<th>Response
+                        <span data-tooltip class="hint has-tip tip-right" title="Schoolbox's feedback after attempting to complete the requested function.">?</span>
+                    </th>
 					
 				</tr>
 			</thead>
@@ -51,8 +34,5 @@ $(function() {
 			</tbody>
 		</table>
 	</div>
-	
-	<a href="/adminv2/folder" class="btn go-back float-left"><span></span>Back to folders</a>
-
-	<div class="float-fix"></div>
+	<a href="/adminv2/folder" class="button icon-previous"><span></span>Back to folders</a>
 </div>
