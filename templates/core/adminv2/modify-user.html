@@ -59,31 +59,31 @@ $(function() {
     /**
      * User details validation
      */
-	$('form[data-validatable-as="userDetails"]').validate({
-		rules: {
-			year: {
+    $('form[data-validatable-as="userDetails"]').validate({
+        rules: {
+            year: {
                 yearLevel : true
-			},
-			alt_email: {
-				email:true
-			},
-			firstname: {
-				require_from_group: [1, '[data-relation="name"]']
-			},
-			lastname: {
-				require_from_group: [1, '[data-relation="name"]']
-			}
-		},
-		messages: {
-			firstname: {
-				require_from_group: "Please enter either a first name or surname"
-			},
-			lastname: {
-				require_from_group: "Please enter either a first name or surname"
-			},
-			defaultCampus: "Please select a default campus",
-			alt_email: "If you are entering an alternative email, please ensure it's a valid address"
-		},
+            },
+            alt_email: {
+                email:true
+            },
+            firstname: {
+                require_from_group: [1, '[data-relation="name"]']
+            },
+            lastname: {
+                require_from_group: [1, '[data-relation="name"]']
+            }
+        },
+        messages: {
+            firstname: {
+                require_from_group: "Please enter either a first name or surname"
+            },
+            lastname: {
+                require_from_group: "Please enter either a first name or surname"
+            },
+            defaultCampus: "Please select a default campus",
+            alt_email: "If you are entering an alternative email, please ensure it's a valid address"
+        },
         errorPlacement: function(error, element) {
             if (element.is('[data-role="defaultCampus"]')) {
                 error.css('margin', 0);
@@ -92,7 +92,7 @@ $(function() {
                 error.insertAfter(element)
             }
         }
-	});
+    });
 
     /**
      * Service validation
