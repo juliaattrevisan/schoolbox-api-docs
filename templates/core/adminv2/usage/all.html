@@ -1,40 +1,3 @@
-<script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
-<script type='text/javascript' src='/javascript/shared/jquery.number-format.js'></script>
-<script type='text/javascript' src='/javascript/shared/bargraph/bargraph.js'></script>
-<script type='text/javascript' src='/adminv2/usage/javascript/total.js'></script>
-<script type='text/javascript' src='/adminv2/usage/javascript/group.js'></script>
-<script type='text/javascript' src='/adminv2/usage/javascript/type.js'></script>
-<script type='text/javascript' src='/adminv2/usage/javascript/tabulator.js'></script>
-
-<script type='text/javascript'>
-	$(function() {
-		$('[data-panel=global-usage]').usageTotal({
-			url: '/adminv2/usage/ajax/allAjax?type=total',
-			title: 'Total'
-		});
-
-		$('[data-panel=group-usage]').usageGroup({
-			url: '/adminv2/usage/ajax/allAjax?type=group',
-			title: 'Roles'
-		});
-
-		$('[data-panel=type-usage]').usageType({
-			url: '/adminv2/usage/ajax/allAjax?type=type',
-			title: 'Category'
-		});
-
-		$('[data-panel=user]').usageTabulator({
-			url: '/adminv2/usage/ajax/allAjax?type=user',
-			title: 'Users',
-			orderBy: 'bytes',
-			order: 'DESC',
-			index: 0,
-			numPerPage: 25,
-			numTotal: {USAGE_NUM_TOTAL}
-		});
-	});
-</script>
-
 <h1>Schoolbox Administration</h1>
 
 <dl class="sub-nav">
@@ -57,3 +20,40 @@
 	    <div data-panel='user' class='loader'>Loading data...</div>
     </div>
 </div>
+
+<script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
+<script type='text/javascript' src='/javascript/shared/jquery.number-format.js'></script>
+<script type='text/javascript' src='/javascript/shared/bargraph/bargraph.js'></script>
+<script type='text/javascript' src='/adminv2/usage/javascript/total.js'></script>
+<script type='text/javascript' src='/adminv2/usage/javascript/group.js'></script>
+<script type='text/javascript' src='/adminv2/usage/javascript/type.js'></script>
+<script type='text/javascript' src='/adminv2/usage/javascript/tabulator.js'></script>
+
+<script type='text/javascript'>
+    $(function() {
+        $('[data-panel=global-usage]').usageTotal({
+            url: '/adminv2/usage/ajax/allAjax?type=total',
+            title: 'Total'
+        });
+
+        $('[data-panel=group-usage]').usageGroup({
+            url: '/adminv2/usage/ajax/allAjax?type=group',
+            title: 'Roles'
+        });
+
+        $('[data-panel=type-usage]').usageType({
+            url: '/adminv2/usage/ajax/allAjax?type=type',
+            title: 'Category'
+        });
+
+        $('[data-panel=user]').usageTabulator({
+            url: '/adminv2/usage/ajax/allAjax?type=user',
+            title: 'Users',
+            orderBy: 'bytes',
+            order: 'DESC',
+            index: 0,
+            numPerPage: 25,
+            numTotal: {USAGE_NUM_TOTAL}
+        });
+    });
+</script>
