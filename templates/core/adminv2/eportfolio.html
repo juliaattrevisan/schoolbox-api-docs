@@ -72,17 +72,17 @@
             </form>
 
             <div data-form="new" title="Add new ePortfolio template">
-                <form id="template-action" action="/adminv2/eportfolio/eportfolioForm.php" method="POST" class="standard-form">
+                <form id="template-action" action="/adminv2/eportfolio/eportfolioForm.php" method="POST">
                     <label>
                         Template name
                         <input type="text" name="name" />
                     </label>
-                    <input type="submit" class="submit-btn-plain" name="action" value="Create" />
+                    <input type="submit" name="action" value="Create" />
                 </form>
             </div>
 
             <div data-form="rename" title="Rename existing ePortfolio template">
-                <form id="template-action" action="/adminv2/eportfolio/eportfolioForm.php" method="POST" class="standard-form">
+                <form id="template-action" action="/adminv2/eportfolio/eportfolioForm.php" method="POST">
                     <label>
                         Existing Template
                         <select id="template-select" name="template" >
@@ -95,7 +95,7 @@
                         New name
                         <input type="text" name="name"/>
                     </label>
-                    <input type="submit" class="submit-btn-plain" name="action" value="Rename" />
+                    <input type="submit" name="action" value="Rename" />
                 </form>
             </div>
 
