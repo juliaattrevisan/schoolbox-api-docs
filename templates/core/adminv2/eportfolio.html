@@ -71,34 +71,6 @@
                 <a data-button="delete" class="button icon-delete" href="#" >Delete</a>
             </form>
 
-            <div data-form="new" title="Add new ePortfolio template">
-                <form id="template-action" action="/adminv2/eportfolio/eportfolioForm.php" method="POST">
-                    <label>
-                        Template name
-                        <input type="text" name="name" />
-                    </label>
-                    <input type="submit" name="action" value="Create" />
-                </form>
-            </div>
-
-            <div data-form="rename" title="Rename existing ePortfolio template">
-                <form id="template-action" action="/adminv2/eportfolio/eportfolioForm.php" method="POST">
-                    <label>
-                        Existing Template
-                        <select id="template-select" name="template" >
-                            <!-- BEGIN template -->
-                            <option value="{template.id}">{template.name}</option>
-                            <!-- END template -->
-                        </select>
-                    </label>
-                    <label>
-                        New name
-                        <input type="text" name="name"/>
-                    </label>
-                    <input type="submit" name="action" value="Rename" />
-                </form>
-            </div>
-
             <!-- BEGIN definition -->
             <div class="component definition-id-{definition.id} {definition.singleton}">{definition.name}</div>
             <!-- END definition -->
@@ -110,4 +82,32 @@
             <!-- BEGIN layout --><!-- END layout -->
         </div>
     </div>
+</div>
+
+<div data-form="new" title="Add new ePortfolio template">
+    <form id="template-action" action="/adminv2/eportfolio/eportfolioForm.php" method="POST">
+        <label>
+            Template name
+            <input type="text" name="name" />
+        </label>
+        <input type="submit" name="action" value="Create" />
+    </form>
+</div>
+
+<div data-form="rename" title="Rename existing ePortfolio template">
+    <form id="template-action" action="/adminv2/eportfolio/eportfolioForm.php" method="POST">
+        <label>
+            Existing Template
+            <select id="template-select" name="template" >
+                <!-- BEGIN template -->
+                <option value="{template.id}">{template.name}</option>
+                <!-- END template -->
+            </select>
+        </label>
+        <label>
+            New name
+            <input type="text" name="name"/>
+        </label>
+        <input type="submit" name="action" value="Rename" />
+    </form>
 </div>
