@@ -40,6 +40,21 @@ $(function() {
         });
     }
 
+    /**
+     * Hide campus selector if I selected a service that doesn't use them
+     */
+    var addServiceForm = $('form[data-action="addService"]');
+    addServiceForm.on(
+        'change',
+        ':input[data-role="serviceSelector"]',
+        function() {
+            // Search for this item, disable others
+            var currentService = $(this).find(':selected').data('identifier');
+            var selectors      = addServiceForm.find(':input[data-service-type]');
+            selectors.hide();
+            selectors.filter('[data-service-type="'+currentService+'"]').show();
+        }
+    );
 //	/* Reset availability options for campuses and services
 //	 * 0: please select
 //	 * 2: calendar
@@ -116,6 +131,10 @@ $(function() {
 //		}
 //
 //	});
+
+    /**
+     * Not all services allow selection of campus.
+     */
 
     /**
      * User details validation
@@ -531,12 +550,12 @@ $(function() {
 </div>
 <!-- END user_curriculum -->
 <div class="row">
-    <form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" data-validatable-as="addService">
+    <form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" data-validatable-as="addService" data-action="addService">
     <div class="small-4 columns">
-        <select name="service" id="serviceSelect" form="serviceCloneForm" required>
+        <select data-role="serviceSelector" name="service" id="serviceSelect" form="serviceCloneForm" required>
             <option value="">Select Service</option>
-            <option value="2">Calendar</option>
-            <option value="3">News</option>
+            <option value="2" data-identifier="campus">Calendar</option>
+            <option value="3" data-identifier="campus">News</option>
             <option value="5">CMS</option>
             <option value="6">Housemaster</option>
             <option value="7">Resource Booking</option>
@@ -544,7 +563,7 @@ $(function() {
         </select>
     </div>
     <div class="small-4 columns">
-        <select name="sid" id="campusSelect" form="serviceCloneForm" required>
+        <select data-service-type="campus" name="sid" id="campusSelect" form="serviceCloneForm" required>
             <option value="">Select Campus</option>
             <!-- BEGIN campusPermsList -->
             <!-- BEGIN perm_campus -->
