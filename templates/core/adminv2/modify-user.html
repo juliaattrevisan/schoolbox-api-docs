@@ -119,19 +119,22 @@ $(function() {
 	/**********
 	Custom Validation
 	**********/
-	$('.admin-form').validate({
+    /**
+     * User details validation
+     */
+	$('form[data-validatable-as="userDetails"]').validate({
 		rules: {
 			year: {
                 yearLevel : true
 			},
 			alt_email: {
-				email:true	
+				email:true
 			},
 			firstname: {
-				require_from_group: [1, '.name-required']
+				require_from_group: [1, '[data-relation="name"]']
 			},
 			lastname: {
-				require_from_group: [1, '.name-required']
+				require_from_group: [1, '[data-relation="name"]']
 			}
 		},
 		messages: {
@@ -144,16 +147,14 @@ $(function() {
 			defaultCampus: "Please select a default campus",
 			alt_email: "If you are entering an alternative email, please ensure it's a valid address"
 		},
-		errorPlacement: function(error, element) {
-			if (element.hasClass("campus-radio")) {
-				error.css('margin', 0);
-				error.insertAfter(element.closest('table'));
-			} else {
-							
-			error.insertAfter(element)
-			}
-		 }
-		
+        errorPlacement: function(error, element) {
+            if (element.is('[data-role="defaultCampus"]')) {
+                error.css('margin', 0);
+                error.insertAfter(element.closest('[data-role="campusList"]'));
+            } else {
+                error.insertAfter(element)
+            }
+        }
 	});
 	
 	$('#serviceCloneForm').validate({
@@ -242,12 +243,12 @@ $(function() {
 
 <h2>{FULLNAME}</h2>
 
-<form method="POST" action="/adminv2/userForm.php" class="modify-form" clear="clearfix">
+<form method="POST" action="/adminv2/userForm.php">
     <input type="hidden" name="login" value="{USERNAME}" />
     <input type="submit" class="{ASSUME_CLASS}" value="{ASSUME_PROMPT}" />
 </form>
 
-<form method="POST" action="/adminv2/userForm.php" data-validatable>
+<form method="POST" action="/adminv2/userForm.php" data-validatable-as="userDetails">
     <fieldset>
         <legend>User Detail</legend>
         <div class="row">
@@ -259,10 +260,10 @@ $(function() {
                     <!-- END title -->
                 </select>
                 <label for="firstname">First Name</label>
-                <input id="firstname" type="text" name="firstname" class="required" value="{FIRSTNAME}" />
+                <input id="firstname" type="text" name="firstname" value="{FIRSTNAME}" data-relation="name" />
 
                 <label for="lastname">Surname</label>
-                <input id="lastname" type="text" name="lastname" value="{LASTNAME}" class="name-required"/>
+                <input id="lastname" type="text" name="lastname" value="{LASTNAME}" data-relation="name" />
 
                 <label for="database" class="">{DATABASE_TYPE} ID</label>
                 <input id="database" type="text" name="database_id" value="{DATABASE_ID}"/>
