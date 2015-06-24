@@ -70,7 +70,7 @@ $.fn.configurator = function(opts) {
                 var groupID = dropDownSelector.val();
                 templID = groupID;
 
-                var position = $(ui.item).parent().parent().attr('id').match(/position\-(\w+)/)[1];
+                var position = $(ui.item).parents('[data-column]').data('position');
 
                 var sequence = $(ui.item).index() + 1;
 
