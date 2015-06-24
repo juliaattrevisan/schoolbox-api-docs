@@ -1,27 +1,31 @@
-<!--<script type='text/javascript' src='/javascript/bargraph/bargraph.js'></script>-->
+<script type='text/javascript' src='/javascript/shared/jquery.number-format.js'></script>
+<script type='text/javascript' src='/javascript/shared/bargraph/bargraph.js'></script>
+<script type='text/javascript' src='/adminv2/usage/javascript/total.js'></script>
+<!--<script type='text/javascript' src='/adminv2/usage/javascript/group.js'></script>-->
+<!--<script type='text/javascript' src='/adminv2/usage/javascript/type.js'></script>-->
+<script type='text/javascript' src='/adminv2/usage/javascript/tabulator.js'></script>
+
 <!--<script type='text/javascript' src='/javascript/components/flot/jquery.flot.js'></script>-->
 <!--<script type='text/javascript' src='/javascript/components/flot/jquery.flot.stack.js'></script>-->
 <!--<script type='text/javascript' src='/javascript/components/flot/jquery.flot.pie.js'></script>-->
-<!--<script type='text/javascript' src='/adminv2/usage/javascript/total.js'></script>-->
-<!--<script type='text/javascript' src='/adminv2/usage/javascript/group.js'></script>-->
-<!--<script type='text/javascript' src='/adminv2/usage/javascript/type.js'></script>-->
-<!--<script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>-->
-<!--<script type="text/javascript" src="/javascript/adminv2/jquery.barchart.js"></script>-->
 
-<script type='text/javascript' src='/adminv2/usage/javascript/tabulator.js'></script>
+
+
+
+
+
 
 <script type='text/javascript'>
 	$(function() {
-//		$('#global-usage').usageTotal({
-//			url: '/adminv2/usage/ajax/allAjax?type=total',
-//			title: 'Total'
-//		});
-//
-//		$('#group-usage').usageGroup({
-//			url: '/adminv2/usage/ajax/allAjax?type=group',
-//			title: 'Roles'
-//
-//		});
+		$('[data-panel=global-usage]').usageTotal({
+			url: '/adminv2/usage/ajax/allAjax?type=total',
+			title: 'Total'
+		});
+
+		$('#group-usage').usageGroup({
+			url: '/adminv2/usage/ajax/allAjax?type=group',
+			title: 'Roles'
+		});
 //
 //		$('#type-usage').usageType({
 //			url: '/adminv2/usage/ajax/allAjax?type=type',
@@ -52,7 +56,7 @@
 
 <div class="row">
     <div class="large-4 columns">
-		<div id='global-usage' class='level loader'>Loading data...</div>
+		<div style='border:1px solid #f00;' data-panel='global-usage' class='level loader'>Loading data...</div>
 		<div id='group-usage' class='level loader'>Loading data...</div>
 	</div>
     <div class="large-8 columns">
