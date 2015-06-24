@@ -138,10 +138,9 @@ class External_Maze_Helper
             for ($i = 1; $i < 5; $i++) {
                 $key = "CALENDAR_START0{$i}";
 
-                $currentDate = new \Alaress_Date_Format(strtotime($currentRow[$key]), 'U');
-                $currentTime = $currentDate->getUnixTimestamp();
-
                 if ($currentRow[$key] != '') {
+                    $currentTime = strtotime($currentRow[$key]);
+
                     if ($currentTime < $_SERVER['REQUEST_TIME']) {
                         $afterSemesterStart = true;
                         break;
@@ -156,10 +155,9 @@ class External_Maze_Helper
             for ($i = 1; $i < 5; $i++) {
                 $key = "CALENDAR_END0{$i}";
 
-                $currentDate = new \Alaress_Date_Format(strtotime($currentRow[$key]), 'U');
-                $currentTime = $currentDate->getUnixTimestamp();
-
                 if ($currentRow[$key] != '') {
+                    $currentTime = strtotime($currentRow[$key]);
+
                     if ($currentTime >= $_SERVER['REQUEST_TIME']) {
                         $beforeSemesterEnd = true;
                         break;
