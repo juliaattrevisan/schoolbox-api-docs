@@ -217,10 +217,10 @@
 
 			/* Table, table heading and paginator
 			 */
-			var html = html.replace('{TITLE}', config.title);
-			var html = html.replace('{CONTENTS}', datasets);
-			var html = html.replace('{THEAD}', makeTableHeadings());
-			var html = html.replace('{PAGINATION}', makePagination());
+			html = html.replace('{TITLE}', config.title);
+			html = html.replace('{CONTENTS}', datasets);
+			html = html.replace('{THEAD}', makeTableHeadings());
+			html = html.replace('{PAGINATION}', makePagination());
 
 			config.element.html(html);
 
