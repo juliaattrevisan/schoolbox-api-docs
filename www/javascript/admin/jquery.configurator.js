@@ -14,6 +14,10 @@ $.fn.configurator = function(opts) {
     var configurator = this;
     var dropDownSelector = $(options.dropDownSelector);
 
+    /* Context selector
+     */
+    options.contextSelector = '[data-'+options.context+'-layout]';
+
     /* METHODS */
     this.start = function() {
         this.help();
@@ -30,7 +34,7 @@ $.fn.configurator = function(opts) {
         if (hashStripped) {
             dropDownSelector.val(hashStripped);
             $.get('/adminv2/component/get/'+options.context+'/'+hashStripped, function ($layout) {
-                $('[data-'+options.context+'-layout]').fadeOut(function() {
+                $(options.contextSelector).fadeOut(function() {
                     $(this).empty().append($layout);
                     $(this).fadeIn();
                     configurator.dragAndDrop();
@@ -43,9 +47,9 @@ $.fn.configurator = function(opts) {
         var instID;
         var templID;
 
-        $('[data-'+options.context+'-layout] .component-holder').sortable({
+        $(options.contextSelector + ' .component-holder').sortable({
             helper: 'clone',
-            connectWith: '[data-'+options.context+'-layout] .component-holder',
+            connectWith: options.contextSelector + ' .component-holder',
             update: function (event, ui) {
 
                 var instanceID;
@@ -120,10 +124,10 @@ $.fn.configurator = function(opts) {
 
         $('#definition-palette .component').draggable({
             helper: 'clone',
-            connectToSortable: '[data-'+options.context+'-layout] .component-holder'
+            connectToSortable: options.contextSelector + ' .component-holder'
         });
 
-        $('[data-'+options.context+'-layout] .component-holder').sortable('refresh');
+        $(options.contextSelector + ' .component-holder').sortable('refresh');
 
         this.refreshPalette();
     };
@@ -134,7 +138,7 @@ $.fn.configurator = function(opts) {
             var definitionElement = $(this);
             var definitionIDClass = definitionElement.attr('class').match(/(definition\-id\-\d+)/)[1];
 
-            var search = '[data'+options.context+'-layout] .component.' + definitionIDClass;
+            var search = options.contextSelector + ' .component.' + definitionIDClass;
 
             var singleton = definitionElement.hasClass('single-instance');
             var instantiated = $(search).length > 0;
@@ -171,7 +175,7 @@ $.fn.configurator = function(opts) {
             location.hash = groupID;
 
             $.get('/adminv2/component/get/'+options.context+'/'+groupID, function ($layout) {
-                $('[data-'+options.context+'-layout]').fadeOut(function() {
+                $(options.contextSelector).fadeOut(function() {
                     var self = $(this);
                     self.empty().append($layout);
                     self.fadeIn();
@@ -209,7 +213,7 @@ $.fn.configurator = function(opts) {
         // The controls for the individual components ie. edit, delete
         setupCustomise.activeComponents();
 
-        $(document).on('submit', '[data-'+options.context+'-layout] form', function(event) {
+        $(document).on('submit', options.contextSelector + ' form', function(event) {
             var self = $(this);
             var panel = self.parent('.editPanel');
             var component = panel.parent('.component');
