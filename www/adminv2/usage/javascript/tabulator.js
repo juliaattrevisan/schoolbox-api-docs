@@ -48,7 +48,7 @@
 		 * Apply sortorder controls
 		 */
 		function applySortorder() {
-			$.each(config.element.find('a.control'), function(index, element) {
+			$.each(config.element.find('[data-control]'), function(index, element) {
 				$(element).click(function(event) {
 					event.preventDefault();
 
@@ -156,7 +156,7 @@
 				var current = config.columns[i];
 				var indicator = makeIndicatorArrows(current.column);
 
-				thead += "<th><a href='#' class='control' rel='"+ current.column +"'>"+ current.label + indicator + "</a></th>"
+				thead += "<th><a href='#' data-control rel='"+ current.column +"'>"+ current.label + indicator + "</a></th>"
 			}
 
 			return thead;
@@ -178,13 +178,13 @@
 			/* Page Navigator
 			 */
 			for (var i = 0; i < numPages; i++) {
-				var current = '';
+				var active = '';
 
 				if (i == config.index) {
-					var current = 'current';
+					var active = 'active';
 				}
 
-				pagination += '<li><a href="#" class="' + current + '" rel="' + i +'">' + (i+1) + '</a></li>';
+				pagination += '<li><a href="#" class="' + active + '" rel="' + i +'">' + (i+1) + '</a></li>';
 			}
 
 			/* Next Navigator
@@ -204,7 +204,7 @@
 		function makeTable(datasets) {
 			var html = '\
 				<h3>{TITLE}</h3>\
-				<table class="table ruler">\
+				<table>\
 					<thead>\
 						{THEAD}\
 					</thead>\
