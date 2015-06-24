@@ -1,6 +1,4 @@
 <!-- BEGIN custom_head -->
-<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
-<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
 <script type="text/javascript" src="/javascript/components/jquery-validation/additional-methods.js"></script>
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
@@ -21,7 +19,7 @@ $(function() {
 		}
 
 		$.post('/adminv2/userForm.php', data);
-	});		
+	});
 
 	/* Ajax Update service access permissions
 	 */
@@ -53,19 +51,6 @@ $(function() {
 
 		$.post('/adminv2/userForm.php', data);
 	});
-
-    $('h3 span.question').each(function() {
-        $(this).qtip({
-            content: 'Edit the user\'s details.',
-            style: {
-                classes: 'qtip-green qtip-shadow'
-            },
-            position: {
-                my: 'bottom left',
-                at: 'top left'
-            }
-        });
-    });
 
 	$('a.show-pass').click(function() {
 
