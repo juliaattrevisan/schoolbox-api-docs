@@ -281,7 +281,7 @@ $(function() {
 
     // Handles autosuggest for linking users to other user accounts
     var addUserSelector = $('#linkUser');
-    var addUserButton   = addUserSelector.closest('form').find(':submit');
+    var addUserButton   = $(addUserSelector.prop('form')).find(':submit');
     addUserSelector.selectizeSelector({
                 multiple: true,
                 ajax: {
@@ -292,12 +292,12 @@ $(function() {
                 }
             })
             .on('selectize.item_add', function(event, value) {
-                addUserButton.prop('disabled', false).removeClass('disabled');
+                addUserButton.prop('disabled', false);//.removeClass('disabled');
             })
             .on('selectize.item_remove', function() {
                 // Disable only if empty
                 if ($(this).data('selectize').items.length === 0) {
-                    addUserButton.prop('disabled', true).addClass('disabled');
+                    addUserButton.prop('disabled', true);//.addClass('disabled');
                 }
             });
 
@@ -674,35 +674,34 @@ $(function() {
     </tbody>
 </table>
 
-<h2><a name="linked"></a>Linked Accounts</h2>
-<div class="level clearfix">
-    <table class="table ruler">
-        <colgroup>
-            <col width="10%" />
-            <col width="60%" />
-            <col width="30%" />
-        </colgroup>
-        <thead>
-        <tr>
-            <th>Remove</th>
-            <th>User Account</th>
-        </tr>
-        </thead>
-        <tbody>
-        <!-- BEGIN user_linked -->
-        <tr>
-            <td><a href="/adminv2/userForm.php?deleteUserLink={USERID}&amp;linkedUser={LINKED_USER_ID}" ><img title="remove" src="/images/famicons/delete.png" /></a></td>
-            <td><a href="/adminv2/modify-user/{LINKED_USER_ID}">{LINKED_USER}</a></td>
-        </tr>
-        <!-- END user_linked -->
-        </tbody>
-    </table>
-    <form action="/adminv2/userForm.php" method="post">
-        <input type="hidden" name="userID" value="{USERID}" />
-        <select id="linkUser" name="linkUser[]" multiple placeholder="Search Users"></select>
-        <input type="submit" value="Add Users" class="submit-btn-plain disabled" disabled />
-    </form>
-</div>
+<h2 id="linked">Linked Accounts</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th>User Account</th>
+        <th>&nbsp;</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- BEGIN user_linked -->
+    <tr>
+        <td><a href="/adminv2/modify-user/{LINKED_USER_ID}">{LINKED_USER}</a></td>
+        <td><a href="/adminv2/userForm.php?deleteUserLink={USERID}&amp;linkedUser={LINKED_USER_ID}" class="no-text icon-delete" title="Remove"></a></td>
+    </tr>
+    <!-- END user_linked -->
+    <tr>
+        <td><select id="linkUser" name="linkUser[]" multiple placeholder="Search Users" form="linkedUserAdd"></select></td>
+        <td>
+            <form action="/adminv2/userForm.php" method="post" id="linkedUserAdd">
+                <input type="hidden" name="userID" value="{USERID}" />
+                <input type="submit" value="Add Users" disabled />
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
 <h2>Recent Activity Logs</h2>
 <div class="level clearfix">
     <div class="split-container forty">
