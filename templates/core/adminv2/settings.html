@@ -27,19 +27,19 @@
 
     settings.validate();
 
-    /* Force submission of checkboxes regardless of whether they are ticked
-     * or not.
-     */
-    $('input[type=checkbox]').change(function() {
-        var name = 'input[name=' + $(this).attr('name') + ']';
-
-        if ($(this).val() == 0) {
-            $(name).val(1);
-        }
-        else {
-            $(name).val(0);
-        }
-    });
+//    /* Force submission of checkboxes regardless of whether they are ticked
+//     * or not.
+//     */
+//    $('input[type=checkbox]').change(function() {
+//        var name = 'input[name=' + $(this).attr('name') + ']';
+//
+//        if ($(this).val() == 0) {
+//            $(name).val(1);
+//        }
+//        else {
+//            $(name).val(0);
+//        }
+//    });
 
   });
 </script>
@@ -138,9 +138,10 @@
             <!-- END setting_type_resource -->
 
             <!-- BEGIN setting_type_boolean -->
-            <br />
-            <input name="{SETTING_NAME}" type="checkbox" value="{SETTING_VALUE}" {SETTING_CHECKED} />
-            <input name="{SETTING_NAME}" type="hidden" value="{SETTING_VALUE}" />
+            <fieldset class="switch" tabindex="0">
+                <input id="setting-{SETTING_NAME}" name="{SETTING_NAME}" {SETTING_CHECKED} value="{SETTING_VALUE}" type="checkbox">
+                <label for="setting-{SETTING_NAME}"></label>
+            </fieldset>
             <!-- END setting_type_boolean -->
 
             <!-- BEGIN setting_type_select -->
