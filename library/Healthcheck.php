@@ -266,13 +266,7 @@ class Healthcheck
         );
 
         foreach ($splist as $sp) {
-            $result = $db->executeProcedure($sp[0], $sp[1]);
-            echo "  ".$sp[0]." : ";
-            if ($result['success']) {
-                echo "OK\n";
-            } else {
-                echo "\n    Failed - ".mssql_get_last_message()."\n";
-            }
+            $this->executeProcedure($db, $sp[0], $sp[1]);
         }
     }
 
@@ -400,13 +394,7 @@ class Healthcheck
         );
 
         foreach ($list as $sp) {
-            $result = $db->executeProcedure($sp[0], $sp[1]);
-            echo "  ".$sp[0]." : ";
-            if ($result['success']) {
-                echo "OK\n";
-            } else {
-                echo "\n    Failed - ".mssql_get_last_message()."\n";
-            }
+            $this->executeProcedure($db, $sp[0], $sp[1]);
         }
         unset($list);
     }
@@ -434,13 +422,7 @@ class Healthcheck
          )
         );
         foreach ($splist as $sp) {
-            $result = $db->executeProcedure($sp[0], $sp[1]);
-            echo "  ".$sp[0]." : ";
-            if ($result['success']) {
-                echo "OK\n";
-            } else {
-                echo "\n    Failed - ".mssql_get_last_message()."\n";
-            }
+            $this->executeProcedure($db, $sp[0], $sp[1]);
         }
     }
 
@@ -586,13 +568,7 @@ class Healthcheck
          )
         );
         foreach ($splist as $sp) {
-            $result = $db->executeProcedure($sp[0], $sp[1]);
-            echo "  ".$sp[0]." : ";
-            if ($result['success']) {
-                echo "OK\n";
-            } else {
-                echo "\n    Failed - ".mssql_get_last_message()."\n";
-            }
+            $this->executeProcedure($db, $sp[0], $sp[1]);
         }
     }
 
@@ -625,5 +601,29 @@ class Healthcheck
             }
         }
 
+    }
+
+    /**
+     * Runs a stored proc, outputting relevant output
+     *
+     * @param MSSQL $db
+     * @param       $proc
+     * @param       $params
+     *
+     * @return void
+     */
+    private function executeProcedure(MSSQL $db, $proc, $params)
+    {
+        $result = $db->executeProcedure($proc, $params);
+        echo "  ".$proc." : ";
+        if ($result['success']) {
+            if ($result['message']) {
+                echo "OK - {$result['message']}";
+            } else {
+                echo "OK\n";
+            }
+        } else {
+            echo "\n    Failed - ".mssql_get_last_message()."\n";
+        }
     }
 }
