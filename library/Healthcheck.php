@@ -182,6 +182,7 @@ class Healthcheck
         $list[] = 'SubjectClassStaff';
         $list[] = 'Timetable';
         $list[] = 'TimetableDefinition';
+        $list[] = 'TimetableSubstitutes';
         $list[] = 'luTimetableGroup';
         $list[] = 'luDays';
         $list[] = 'StaffSchedule';
