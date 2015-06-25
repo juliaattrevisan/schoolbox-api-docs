@@ -533,6 +533,11 @@ table{
 		$adjust:true
 	);
 }
+.transparent-panel {
+	@include panel();
+	background-color: transparent;
+	border: 1px solid $gainsboro;
+}
 
 // Hints
 .hint {
