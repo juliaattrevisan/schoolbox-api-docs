@@ -151,7 +151,7 @@
 <h2>Submission Grades and Groupings</h2>
 
 <form id="gradesForm" method="POST" action="/adminv2/gradesForm.php">
-    <div class="half listing">
+    <div class="small-12 medium-6 columns">
         <h3>Guide</h3>
         <dl>
             <dt class="gradeTerm">Creating Grades</dt>
@@ -184,7 +184,7 @@
             </dd>
         </dl>
     </div>
-    <div class="half last">
+    <div class="small-12 medium-6 columns">
         <ul id="gradeGroupList">
             <!-- BEGIN submission_grade_group -->
             <li class="gradeGroup" data-groupid="{SUBMISSION_GRADE_GROUP_ID}">
@@ -240,7 +240,7 @@
             </li>
             <!-- END submission_grade_group -->
         </ul>
+        <input type="submit" class="submit-btn-plain" value="Save changes" />
+        <span class="hide" id="err-expl">Ensure all pre-existing results are not blank.</span>
     </div>
-    <input type="submit" class="submit-btn-plain" value="Save changes" />
-    <span class="hide" id="err-expl">Ensure all pre-existing results are not blank.</span>
 </form>
