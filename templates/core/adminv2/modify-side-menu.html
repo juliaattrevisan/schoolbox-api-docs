@@ -56,36 +56,24 @@
                             this link. Note that this link will only be viewable
                             by people in both the campuses and roles selected">?</span>
                 </legend>
-                <div class="small-12 medium-6 columns">
+                <div data-role="campusSelector" class="small-12 medium-6 columns">
                     <label>Campus</label>
-                    <ul data-role="campusSelector">
-                        <li>
-                            <input id="campusSelectAll" type="checkbox" class="select_all" data-selectall="true" />
-                            <label for="campusSelectAll" class="checkbox-label">Select all</label>
-                        </li>
-                        <!-- BEGIN campus -->
-                        <li>
-                            <input id="campusSelect-{CAMPUS_ID}" type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED}/>
-                            <label for="campusSelect-{CAMPUS_ID}" class="checkbox-label">{CAMPUS_NAME}</label>
-                        </li>
-                        <!-- END campus -->
-                    </ul>
+                    <input id="campusSelectAll" type="checkbox" class="select_all" data-selectall="true" />
+                    <label for="campusSelectAll" class="checkbox-label">Select all</label>
+                    <!-- BEGIN campus -->
+                    <input id="campusSelect-{CAMPUS_ID}" type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED}/>
+                    <label for="campusSelect-{CAMPUS_ID}" class="checkbox-label">{CAMPUS_NAME}</label>
+                    <!-- END campus -->
                 </div>
 
-                <div class="small-12 medium-6 columns">
+                <div data-role="roleSelector" class="small-12 medium-6 columns">
                     <label>Roles</label>
-                    <ul data-role="roleSelector">
-                        <li>
-                            <input id="roleSelectAll" type="checkbox" class="select_all" data-selectall="true" />
-                            <label for="roleSelectAll" class="checkbox-label">Select all</label>
-                        </li>
-                        <!-- BEGIN group -->
-                        <li>
-                            <input id="roleSelect-{GROUP_ID}" type="checkbox" name="group[]" value="{GROUP_ID}" {GROUP_ID_SELECTED}/>
-                            <label for="roleSelect-{GROUP_ID}" class="checkbox-label">{GROUP_NAME}</label>
-                        </li>
-                        <!-- END group -->
-                    </ul>
+                    <input id="roleSelectAll" type="checkbox" class="select_all" data-selectall="true" />
+                    <label for="roleSelectAll" class="checkbox-label">Select all</label>
+                    <!-- BEGIN group -->
+                    <input id="roleSelect-{GROUP_ID}" type="checkbox" name="group[]" value="{GROUP_ID}" {GROUP_ID_SELECTED}/>
+                    <label for="roleSelect-{GROUP_ID}" class="checkbox-label">{GROUP_NAME}</label>
+                    <!-- END group -->
                 </div>
             </fieldset>
 

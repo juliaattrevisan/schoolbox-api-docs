@@ -5,7 +5,31 @@
 <!-- BEGIN header_css -->
 <link rel="stylesheet" type="text/css" media="{HEADER_CSS_TYPE}" href="{HEADER_CSS_LOCATION}" />
 <!-- END header_css -->
-
+<style type="text/css">
+    body #container, body #content, body #header, body #tabs {
+        min-width: 0;
+    }
+    @media (max-width: 64em) {
+        body #tabs {
+            margin-left: 32px;
+        }
+        body #infoPanel {
+            margin-bottom: 20px;
+        }
+        body .core #tabs li a {
+            font-size: 10px;
+            height: 16px;
+            line-height: 16px;
+            padding: 0 6px;
+        }
+        body #nav {
+            left: -168px;
+        }
+        body #container {
+            margin-left: 32px;
+        }
+    }
+</style>
 <!--[if lt IE 9]>
 <script type="text/javascript">
     // Upgrade your browser
