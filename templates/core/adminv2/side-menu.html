@@ -1,48 +1,3 @@
-<!-- BEGIN custom_head -->
-<link type="text/css" rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
-<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
-<script type="text/javascript">
-$(function () {
-
-    $('section[data-role="sideMenuTree"]')
-        .on('ready.jstree', function(event, jstree) {
-            jstree.instance.open_node(jstree.instance.get_node('node_0'));
-        })
-        .on('click', 'a[href]', function() {
-            // Listen on click, instead of select_node, because select_node
-            // fires on initial page load.
-            window.location.href = this.href;
-        })
-        .jstree({
-            "animation": 50,
-            "core" : {
-                force_text: true,
-                check_callback: true,
-                "themes" : {
-                    "variant" : "schoolbox",
-                    "dots" : true,
-                    "icons" : false
-                }
-            },
-            "plugins" : ["dnd", 'state'],
-            dnd: {
-                copy: false
-            }
-        })
-        .on('move_node.jstree', function(e, data) {
-            var pos = data.position;
-            var tid = data.parent.split('_').pop();
-            var oid = data.node.id.split('_').pop();
-            $.ajax({
-                url: '/adminv2/side-menuForm.php',
-                data: {pos:pos, tid:tid, oid:oid}
-            });
-        });
-});
-
-</script>
-<!-- END custom_head -->
-
 <div class="row">
     <div class="large-12 columns">
         <h1>Schoolbox Administration</h1>
@@ -66,3 +21,46 @@ $(function () {
         </section>
     </div>
 </div>
+
+<link type="text/css" rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
+<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
+<script type="text/javascript">
+    $(function () {
+
+        $('section[data-role="sideMenuTree"]')
+                .on('ready.jstree', function(event, jstree) {
+                    jstree.instance.open_node(jstree.instance.get_node('node_0'));
+                })
+                .on('click', 'a[href]', function() {
+                    // Listen on click, instead of select_node, because select_node
+                    // fires on initial page load.
+                    window.location.href = this.href;
+                })
+                .jstree({
+                    "animation": 50,
+                    "core" : {
+                        force_text: true,
+                        check_callback: true,
+                        "themes" : {
+                            "variant" : "schoolbox",
+                            "dots" : true,
+                            "icons" : false
+                        }
+                    },
+                    "plugins" : ["dnd", 'state'],
+                    dnd: {
+                        copy: false
+                    }
+                })
+                .on('move_node.jstree', function(e, data) {
+                    var pos = data.position;
+                    var tid = data.parent.split('_').pop();
+                    var oid = data.node.id.split('_').pop();
+                    $.ajax({
+                        url: '/adminv2/side-menuForm.php',
+                        data: {pos:pos, tid:tid, oid:oid}
+                    });
+                });
+    });
+
+</script>
