@@ -2,46 +2,30 @@
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript">
-	$(function() {
-    var settings = $('#settings');
-
-		$.fn.alaressTiny({
-			mode: "specific_textareas",
-			editor_selector: "mceEditor"
-		});
-
-		settings.validate();
-
-		// Homepage selector and its event
-        settings.on('click', ':button[data-interaction="homepage_selector"]', function() {
-
-        $('#resource-browser').socialstreamBrowser({
-            title: 'Choose a folder',
-            mimeFilter: false,
-            categoryId: 0,
-            submitCallback: function(url, filename) {
-                settings.find('input[name=course_homepage]').val(url);
-            }
+    $(function() {
+        $.fn.alaressTiny({
+            mode: "specific_textareas",
+            editor_selector: "mceEditor"
         });
+
+        /**
+         * Homepage selector
+         */
+        var settings = $('form[data-action="saveSettings"]');
+        settings.on('click', 'a[data-interaction="homepage_selector"]', function(e) {
+            e.preventDefault();
+            var inputName = $(this).data('input_name');
+            $('#resource-browser').socialstreamBrowser({
+                title: 'Choose a folder',
+                mimeFilter: false,
+                categoryId: 0,
+                submitCallback: function(url) {
+                    settings.find('input[name="'+inputName+'"]').val(url);
+                }
+            });
+        });
+        settings.validate();
     });
-
-    settings.validate();
-
-//    /* Force submission of checkboxes regardless of whether they are ticked
-//     * or not.
-//     */
-//    $('input[type=checkbox]').change(function() {
-//        var name = 'input[name=' + $(this).attr('name') + ']';
-//
-//        if ($(this).val() == 0) {
-//            $(name).val(1);
-//        }
-//        else {
-//            $(name).val(0);
-//        }
-//    });
-
-  });
 </script>
 
 <!-- END custom_head -->
@@ -66,7 +50,7 @@
 
 <div class="small-12 medium-9 columns">
     <!-- BEGIN setting_group -->
-    <form id="settings" class="admin-form level clearfix" method="post" action="/adminv2/settingForm.php">
+    <form data-action="saveSettings" id="settings" class="admin-form level clearfix" method="post" action="/adminv2/settingForm.php">
         <!-- BEGIN setting_group_localisation -->
         <h3>Date Format special characters</h3>
         <dl class="clearfix">
@@ -125,20 +109,20 @@
         <!-- END setting_type_noneditable -->
 
         <!-- BEGIN setting_type_input -->
-        <input id="{SETTING_NAME}" class="{OPTION_REQUIRED}" type="text" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
+        <input id="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} type="text" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
         <!-- END setting_type_input -->
 
         <!-- BEGIN setting_type_textarea -->
-        <textarea id="{SETTING_NAME}" class="{OPTION_REQUIRED}" name="{SETTING_NAME}">{SETTING_VALUE}</textarea>
+        <textarea id="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} name="{SETTING_NAME}">{SETTING_VALUE}</textarea>
         <!-- END setting_type_textarea -->
 
         <!-- BEGIN setting_type_html -->
-        <textarea id="{SETTING_NAME}" class="mceEditor {OPTION_REQUIRED}" name="{SETTING_NAME}">{SETTING_VALUE}</textarea>
+        <textarea id="{SETTING_NAME}" class="mceEditor {OPTION_REQUIRED}" {OPTION_REQUIRED} name="{SETTING_NAME}">{SETTING_VALUE}</textarea>
         <!-- END setting_type_html -->
 
         <!-- BEGIN setting_type_resource -->
-        <input id="{SETTING_NAME}" type="text" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
-        <input type="button" value="Select Source" data-interaction="homepage_selector" data-input_name="{SETTING_NAME}" />
+        <input id="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} type="text" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
+        <a href="#" class="button" data-interaction="homepage_selector" data-input_name="{SETTING_NAME}">Select Source</a>
         <!-- END setting_type_resource -->
 
         <!-- BEGIN setting_type_boolean -->
