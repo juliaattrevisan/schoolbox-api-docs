@@ -1,70 +1,66 @@
-<!-- BEGIN custom_head -->
-<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
-<link type="text/css" rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
-<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
-<script type="text/javascript" src="/javascript/admin/jquery.component.js"></script>
-<script type="text/javascript" src="/javascript/admin/jquery.configurator.js"></script>
-<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
-<script type="text/javascript">
-$(function () {
-
-    $(function() {
-        $('#definition-palette').configurator().start();
-    });
-
-    $("#side-menu")
-        .on('ready.jstree', function(event, jstree) {
-            jstree.instance.open_node(jstree.instance.get_node('node_0'));
-        })
-        .on('click', 'a[href]', function() {
-            // Listen on click, instead of select_node, because select_node
-            // fires on initial page load.
-            window.location.href = this.href;
-        })
-        .jstree({
-            "animation": 50,
-            "core" : {
-                force_text: true,
-                check_callback: true,
-                "themes" : {
-                    "variant" : "schoolbox",
-                    "dots" : true,
-                    "icons" : false
-                }
-            },
-            "plugins" : ["dnd", 'state'],
-            dnd: {
-                copy: false
-            }
-        })
-        .on('move_node.jstree', function(e, data) {
-            var pos = data.position;
-            var tid = data.parent.split('_').pop();
-            var oid = data.node.id.split('_').pop();
-            $.ajax({
-                url: '/adminv2/side-menuForm.php',
-                data: {pos:pos, tid:tid, oid:oid}
-            });
-        });
-});
-
-</script>
-<!-- END custom_head -->
-
-<h1>Schoolbox Administration</h1>
-<dl class="sub-nav">
-    <!-- BEGIN admin_nav_item -->
-    <dd class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></dd>
-    <!-- END admin_nav_item -->
-</dl>
-<div class="admin-contents clearfix">
-	<h2>Side Menu<span class="question">?</span>
-    <em>Drag and drop the menu items to reorder the core left navigation side menu.</em>
-    </h2>
-    <div class="level clearfix">
-        <p class="clearfix"><a class="btn add float-left" href="/adminv2/modify-side-menu/"><span></span>Add New</a></p>
-        <div id="side-menu">
-        {MENU_TREE}
-        </div>
+<div class="row">
+    <div class="large-12 columns">
+        <h1>Schoolbox Administration</h1>
+        <dl class="sub-nav">
+            <!-- BEGIN admin_nav_item -->
+            <dd class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></dd>
+            <!-- END admin_nav_item -->
+        </dl>
     </div>
 </div>
+
+<div class="row">
+    <div class="large-12 columns">
+        <h2>
+            Side Menu
+            <span data-tooltip class="hint has-tip tip-top" data-width="200"  title="Drag and drop the menu items to reorder the core left navigation side menu.">?</span>
+        </h2>
+        <a class="button" href="/adminv2/modify-side-menu/">Add New</a>
+        <section data-role="sideMenuTree">
+            {MENU_TREE}
+        </section>
+    </div>
+</div>
+
+<link type="text/css" rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
+<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
+<script type="text/javascript">
+    $(function () {
+
+        $('section[data-role="sideMenuTree"]')
+                .on('ready.jstree', function(event, jstree) {
+                    jstree.instance.open_node(jstree.instance.get_node('node_0'));
+                })
+                .on('click', 'a[href]', function() {
+                    // Listen on click, instead of select_node, because select_node
+                    // fires on initial page load.
+                    window.location.href = this.href;
+                })
+                .jstree({
+                    "animation": 50,
+                    "core" : {
+                        force_text: true,
+                        check_callback: true,
+                        "themes" : {
+                            "variant" : "schoolbox",
+                            "dots" : true,
+                            "icons" : false
+                        }
+                    },
+                    "plugins" : ["dnd", 'state'],
+                    dnd: {
+                        copy: false
+                    }
+                })
+                .on('move_node.jstree', function(e, data) {
+                    var pos = data.position;
+                    var tid = data.parent.split('_').pop();
+                    var oid = data.node.id.split('_').pop();
+                    $.ajax({
+                        url: '/adminv2/side-menuForm.php',
+                        data: {pos:pos, tid:tid, oid:oid}
+                    });
+                });
+    });
+
+</script>

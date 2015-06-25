@@ -1,209 +1,166 @@
-<!-- BEGIN custom_head -->
+<div class="row">
+    <div class="large-12 columns">
+        <h1>Schoolbox Administration</h1>
+        <dl class="sub-nav">
+            <!-- BEGIN admin_nav_item -->
+            <dd class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></dd>
+            <!-- END admin_nav_item -->
+        </dl>
+    </div>
+</div>
+
+<div class="row">
+    <div class="large-12 columns">
+        <h2>{ACTION} Side Menu Item</h2>
+
+        <form action="/adminv2/side-menuForm.php" method="post" name="form" id="form">
+            <fieldset>
+                <legend>Link</legend>
+                <div class="small-12 medium-6 columns">
+                    <label>
+                        Name
+                        <span data-tooltip class="hint has-tip tip-top" data-width="200"
+                              title="This is the text that will be displayed on the menu">?</span>
+                        <input type="text" name="txt" class="required" maxlength="100" size="40" value="{TEXT}"/>
+                    </label>
+                </div>
+
+                <div class="small-8 medium-4 columns">
+                    <label>
+                        URL
+                        <span data-tooltip class="hint has-tip tip-top" data-width="200"
+                              title="Either enter in a URL or use the browse button to link to folders created in the resource system">?</span>
+                        <input type="text" name="url" id="url" size="40" class="required" maxlength="250" value="{URL}"/>
+                    </label>
+                    <a href="#" class="button" data-role="openResourceBrowser">Browse Resources</a>
+                </div>
+
+                <div class="small-4 medium-2 columns">
+                    <label>
+                        Link Target
+                        <span data-tooltip class="hint has-tip tip-top" data-width="200"
+                          title="Where does this link open? (Generally, links to offsite resources open in a new tab/window, while local resources open in the existing one.)">?</span>
+                        <select name="target">
+                            <option value="">Existing tab/window</option>
+                            <option value="_blank" {BLANK_SELECTED}>New tab/window</option>
+                        </select>
+                    </label>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>
+                    Permissions
+                    <span data-tooltip class="hint has-tip tip-top" data-width="200"
+                          title="Select the campuses that should be able to view
+                            this link. Note that this link will only be viewable
+                            by people in both the campuses and roles selected">?</span>
+                </legend>
+                <div data-role="campusSelector" class="small-12 medium-6 columns">
+                    <label>Campus</label>
+                    <input id="campusSelectAll" type="checkbox" class="select_all" data-selectall="true" />
+                    <label for="campusSelectAll" class="checkbox-label">Select all</label>
+                    <!-- BEGIN campus -->
+                    <input id="campusSelect-{CAMPUS_ID}" type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED}/>
+                    <label for="campusSelect-{CAMPUS_ID}" class="checkbox-label">{CAMPUS_NAME}</label>
+                    <!-- END campus -->
+                </div>
+
+                <div data-role="roleSelector" class="small-12 medium-6 columns">
+                    <label>Roles</label>
+                    <input id="roleSelectAll" type="checkbox" class="select_all" data-selectall="true" />
+                    <label for="roleSelectAll" class="checkbox-label">Select all</label>
+                    <!-- BEGIN group -->
+                    <input id="roleSelect-{GROUP_ID}" type="checkbox" name="group[]" value="{GROUP_ID}" {GROUP_ID_SELECTED}/>
+                    <label for="roleSelect-{GROUP_ID}" class="checkbox-label">{GROUP_NAME}</label>
+                    <!-- END group -->
+                </div>
+            </fieldset>
+
+            <!-- BEGIN parent_select -->
+            <fieldset>
+                <legend>Location</legend>
+                <div class="small-12 columns">
+                    <label>
+                        Parent
+                        <span data-tooltip class="hint has-tip tip-top" data-width="200"
+                              title="This is where in the menu the new item will be inserted. Simply click on a menu item to allow it
+                                to be the parent.">?</span>
+                    </label>
+                    <section data-role="sideMenuTree">
+                        {MENU_TREE}
+                    </section>
+                </div>
+            </fieldset>
+            <!-- END parent_select -->
+
+            <input type="hidden" name="id" value="{ID}"/>
+            <input data-relation="selectedParent" name="parent" type="hidden" value="{PARENT_ID}"/>
+            <input type="submit" name="Submit" value="{ACTION}" />
+            <!-- BEGIN delete -->
+            <input type="submit" name="delete" value="Delete" />
+            <!-- END delete -->
+        </form>
+    </div>
+</div>
+
+<div data-role="resourceBrowser" class="hide"></div>
+
 <link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectAll.js"></script>
 <script type="text/javascript">
-
     $(function () {
 
-        // setup tree structure
-        $("#side-menu")
-            .on('ready.jstree', function(event, jstree) {
-                jstree.instance.open_node(jstree.instance.get_node('node_0'));
-            })
-            .on('select_node.jstree', function(event, jstree) {
-                $('#prent').val(jstree.selected[0].replace(/^node_/, ''));
-            })
-            .on('deselect_node.jstree', function() {
-                $('#prent').val('');
-            })
-            .jstree({
-                "animation":50,
-                "core":{
-                    force_text: true,
-                    multiple:false,
-                    "themes": {
-                        "variant" : "schoolbox",
-                        "dots" : true,
-                        "icons" : false
+        /**
+         * setup tree browser
+         */
+        $('section[data-role="sideMenuTree"]')
+                .on('ready.jstree', function(event, jstree) {
+                    jstree.instance.open_node(jstree.instance.get_node('node_0'));
+                })
+                .on('select_node.jstree', function(event, jstree) {
+                    $('input[data-relation="selectedParent"]').val(jstree.selected[0].replace(/^node_/, ''));
+                })
+                .on('deselect_node.jstree', function() {
+                    $('input[data-relation="selectedParent"]').val('');
+                })
+                .jstree({
+                    "animation":50,
+                    "core":{
+                        force_text: true,
+                        multiple:false,
+                        "themes": {
+                            "variant" : "schoolbox",
+                            "dots" : true,
+                            "icons" : false
+                        }
                     }
+                });
+
+        /**
+         * Modal for URL homepage selection
+         */
+        $('[data-role="openResourceBrowser"]').click(function(e) {
+            e.preventDefault();
+            $('[data-role="resourceBrowser"]').socialstreamBrowser({
+                title: 'Choose a folder',
+                categoryId: 0,
+                mimeFilter: false,
+                submitCallback: function(url, filename) {
+                    $('input[name="url"]').val(url);
                 }
             });
-
-        /*
-         * Modal for URL homepage selection
-         * */
-
-      $('#form').on('click', '.open-modal', function() {
-
-        $('#resource-browser').socialstreamBrowser({
-          title: 'Choose a folder',
-          categoryId: 0,
-          mimeFilter: false,
-          submitCallback: function(url, filename) {
-            $('#url').val(url);
-          }
         });
-      });
 
-
-		//greenerising the checkboxes if they're ticked.
-		$(':checkbox').each(function () {
-			if ($(this).is(':checked')) {
-				$(this).parent().addClass('active-checkbox');
-			}
-		});
-
-		$(':checkbox').click(function () {
-			if ($(this).parent().hasClass('active-checkbox')) {
-				$(this).parent().removeClass('active-checkbox')
-				if($(this).closest('.checkboxes').find('.select_all').is(':checked')){
-					$(this).closest('.checkboxes').find('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
-				}
-			}
-			else {
-				$(this).parent().addClass('active-checkbox');
-			}
-		});
-
-		$('.select_all').change(function(){
-			if($(this).is(':checked')){
-				$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', true).parent().addClass('active-checkbox');
-			} else {
-				$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
-			}
-		});
-
+        $('[data-role="campusSelector"]').selectAll({
+            key: 'selectall',
+            checkboxName: 'campus[]'
+        });
+        $('[data-role="roleSelector"]').selectAll({
+            key: 'selectall',
+            checkboxName: 'group[]'
+        });
     });
 
 </script>
-<!-- END custom_head -->
-<h1>Schoolbox Administration</h1>
-<dl class="sub-nav">
-    <!-- BEGIN admin_nav_item -->
-    <dd class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></dd>
-    <!-- END admin_nav_item -->
-</dl>
-<div class="admin-contents clearfix">
-    <h2>{ACTION} Side Menu Item</h2>
-
-    <div class="level">
-    <form action="/adminv2/side-menuForm.php" method="post" name="form" id="form">
-        <table class="table">
-            <tbody>
-            <tr>
-                <td class="formLabelWidth" width="250">
-
-                    <h3>Name</h3>
-                    <em>This is the text that will be displayed on the menu</em>
-                </td>
-                <td>
-                    <label>
-                        <input type="text" name="txt" class="required" maxlength="100" size="40" value="{TEXT}"/>
-                    </label>
-                </td>
-            </tr>
-            <tr>
-                <td width="250">
-                    <h3>URL</h3>
-
-                    <em>Either enter in a URL or use the browse button to link to folders created in the resource
-                        system</em>
-                </td>
-                <td>
-
-                    <label>
-
-                        <input type="text" name="url" id="url" size="40" class="required" maxlength="250"
-                               value="{URL}"/>
-                    </label>
-
-                    <p class="clearfix"><a href="#" class="btn float-left open-modal"><span></span>Browse Resources</a>
-                    </p>
-
-                    <div id="resource-browser" class="hide"></div>
-
-                </td>
-            </tr>
-            <tr>
-                <td width="250">
-                    <h3>Windows</h3>
-                    <em>Generally links to offsite resources would be set to a new window, while local resources would
-                        stay in the existing window.</em>
-                </td>
-                <td>
-                    <select name="target">
-                        <option value="">Same Window</option>
-                        <option value="_blank"
-                        {BLANK_SELECTED}>New Window</option>
-                    </select>
-                </td>
-            </tr>
-            <!-- BEGIN parent_select -->
-            <tr>
-                <td width="250">
-                    <h3>Parent</h3>
-                    <em>This is where in the menu the new item will be inserted. Simply click on a menu item to allow it
-                        to be the parent.</em>
-                </td>
-                <td class="parent-level">
-                    <div id="side-menu">
-                        {MENU_TREE}
-                    </div>
-                </td>
-            </tr>
-            <!-- END parent_select -->
-            <tr>
-                <td width="250">
-                    <h3>Campus Access</h3>
-                    <em>Select the campuses that should be able to view
-                        this link. Note that this link will only be viewable
-                        by people in both the campuses and roles selected</em>
-                </td>
-                <td>
-					<div class="clearfix checkboxes">
-						<label class="float-left clear">
-							<input type="checkbox" class="select_all" />Select all
-						</label>
-						<!-- BEGIN campus -->
-						<label class="float-left clear">
-							<input type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED}/>{CAMPUS_NAME}
-						</label>
-	                    <!-- END campus -->
-					</div>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <h3>Role Access</h3>
-                </td>
-                <td>
-					<div class="clearfix checkboxes">
-						<label class="float-left clear">
-							<input type="checkbox" class="select_all" />Select all
-						</label>
-						<!-- BEGIN group -->
-						<label class="float-left clear">
-							<input type="checkbox" name="group[]" value="{GROUP_ID}" {GROUP_ID_SELECTED}/>{GROUP_NAME}
-						</label>
-						<!-- END group -->
-					</div>
-                </td>
-            </tr>
-            <tr>
-                <td>&nbsp;
-
-                </td>
-                <td>
-                    <input type="hidden" name="id" value="{ID}"/>
-                    <input id="prent" name="parent" type="hidden" value="{PARENT_ID}"/>
-                    <input type="submit" name="Submit" value="{ACTION}" class="submit-btn-plain"/>
-                    <!-- BEGIN delete -->
-                    <input type="submit" name="delete" value="Delete" class="submit-btn-plain"/>
-                    <!-- END delete -->
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </form>
-    </div>
-</div>
