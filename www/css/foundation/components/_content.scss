@@ -812,3 +812,10 @@ tr:hover{
 .reveal-modal-bg{
 	position: fixed;
 }
+
+// Loader .gif
+.loader{
+	background: url('/images/foundation/preloader.gif') center center no-repeat;
+  	min-height: 68px;
+  	min-width: 68px;
+}
