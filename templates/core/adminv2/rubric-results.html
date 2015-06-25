@@ -1,7 +1,9 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
     $(function() {
-        $(document).on('change', '#rubric-results input', function(e) {
+        var form = $('form[data-action="saveRubricResults"]');
+
+        form.on('change', '[data-role="rubricList"] input', function(e) {
             var self = $(this);
             var anchor = self.siblings('a').first();
             if(self.val() == anchor.data('label')) {
@@ -15,7 +17,7 @@
                 self.parent('li').removeClass('err');
             }
         });
-        $(document).on('click', '#rubric-results li a:not(.btn)', function(e) {
+        form.on('click', '[data-role="rubricList"] li a:not(.btn)', function(e) {
             var self = $(this);
             var input = self.siblings('input').first();
             input.val(self.data('label'));
@@ -23,7 +25,7 @@
             self.addClass('hidden');
             e.preventDefault();
         });
-        $(document).on('change', '#rubric-results li.new-item input', function(e) {
+        form.on('change', '[data-role="rubricList"] li.new-item input', function(e) {
             var self = $(this);
             var li = self.parent('li');
             var newli = li.clone();
@@ -36,19 +38,18 @@
             li.parent('ul').append(newli);
             newli.find(':input:visible:first').focus();
         });
-        $(document).on('click', '#add-set', function(e) {
+        form.on('click', '#add-set', function(e) {
             e.preventDefault();
         });
-        $(document).on('click', '#save-changes', function(e) {
+        form.on('click', '#save-changes', function(e) {
             var valid = true;
-            var frm = $('#rubricForm');
-            var method = frm.attr('method');
-            var action = frm.attr('action');
+            var method = form.attr('method');
+            var action = form.attr('action');
 
             var frmdata = {};
             var ii = 0;
             var j = 0;
-            frm.find('input').each(function() {
+            form.find('input').each(function() {
                 var self = $(this);
 
                 if(!self.hasClass('nullable')) {
@@ -105,7 +106,7 @@
 
 <h2>Rubric ResultSets</h2>
 
-<form id="rubricForm" method="POST" action="/adminv2/rubricForm.php">
+<form data-action="saveRubricResults" method="POST" action="/adminv2/rubricForm.php">
     <div class="small-12 medium-6 columns">
         <ul>
             <li>Edit the rubric resultsets here: these are the pre-populated default values that will appear on every rubric.</li>
@@ -119,7 +120,7 @@
         </ul>
     </div>
     <div class="small-12 medium-6 columns">
-        <ul id="rubric-results">
+        <ul data-role="rubricList">
             <!-- BEGIN list -->
             <li>
                 <ul>
