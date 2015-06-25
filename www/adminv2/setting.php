@@ -118,6 +118,7 @@ if(is_array($optionList)) {
                     $this->parse('setting_type_resource_block', 'setting_type_resource', true);
                     break;
 
+                case 'checkbox':
                 case 'boolean' :
                     if ($option['value'] == 1) {
                         $checked = 'checked="checked"';
@@ -173,10 +174,6 @@ if(is_array($optionList)) {
                         $this->parse('setting_select_block', 'setting_select', true);
                     }
                     $this->parse('setting_type_input_block', 'setting_type_select', true);
-                    break;
-
-                case 'checkbox':
-                    $this->parse('setting_type_input_block', 'setting_type_checkbox', true);
                     break;
 
                 case 'bytes':
