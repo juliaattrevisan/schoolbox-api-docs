@@ -89,88 +89,94 @@
 <h2>{ACTION} Side Menu Item</h2>
 
 <form action="/adminv2/side-menuForm.php" method="post" name="form" id="form">
-    <div class="small-12 medium-6 columns">
-        <label>
-            Name
-            <span data-tooltip class="has-tip"
-                  title="This is the text that will be displayed on the menu">?</span>
-            <input type="text" name="txt" class="required" maxlength="100" size="40" value="{TEXT}"/>
-        </label>
-    </div>
+    <div class="row">
+        <div class="small-12 medium-6 columns">
+            <label>
+                Name
+                <span data-tooltip class="has-tip"
+                      title="This is the text that will be displayed on the menu">?</span>
+                <input type="text" name="txt" class="required" maxlength="100" size="40" value="{TEXT}"/>
+            </label>
+        </div>
 
-    <div class="small-12 medium-6 columns">
-        <label>
-            URL
-            <span data-tooltip class="has-tip"
-                  title="Either enter in a URL or use the browse button to link to folders created in the resource system">?</span>
-            <input type="text" name="url" id="url" size="40" class="required" maxlength="250" value="{URL}"/>
-        </label>
-        <a href="#" class="button open-modal">Browse Resources</a>
-        <div id="resource-browser" class="hide"></div>
-    </div>
+        <div class="small-8 medium-4 columns">
+            <label>
+                URL
+                <span data-tooltip class="has-tip"
+                      title="Either enter in a URL or use the browse button to link to folders created in the resource system">?</span>
+                <input type="text" name="url" id="url" size="40" class="required" maxlength="250" value="{URL}"/>
+            </label>
+            <a href="#" class="button open-modal">Browse Resources</a>
+            <div id="resource-browser" class="hide"></div>
+        </div>
 
-    <div class="small-12 medium-6 columns end">
-        <label>
-            Link Target
+        <div class="small-4 medium-2 columns">
+            <label>
+                Link Target
             <span data-tooltip class="has-tip"
                   title="Where does this link open? (Generally, links to offsite resources open in a new tab/window, while local resources open in the existing one.)">?</span>
-            <select name="target">
-                <option value="">Open in existing tab/window</option>
-                <option value="_blank" {BLANK_SELECTED}>Open in new tab/window</option>
-            </select>
-        </label>
-    </div>
-
-    <div class="small-12 medium-6 columns">
-        <label>
-            Campus
-            <span data-tooltip class="has-tip"
-                  title="Select the campuses that should be able to view
-                    this link. Note that this link will only be viewable
-                    by people in both the campuses and roles selected">?</span>
-        </label>
-        <div class="clearfix checkboxes">
-            <label class="float-left clear">
-                <input type="checkbox" class="select_all" />Select all
+                <select name="target">
+                    <option value="">Existing tab/window</option>
+                    <option value="_blank" {BLANK_SELECTED}>New tab/window</option>
+                </select>
             </label>
-            <!-- BEGIN campus -->
-            <label class="float-left clear">
-                <input type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED}/>{CAMPUS_NAME}
-            </label>
-            <!-- END campus -->
         </div>
     </div>
 
-    <div class="small-12 medium-6 columns">
-        <label>
-            Roles
-            <span data-tooltip class="has-tip"
-                  title="Select the campuses that should be able to view
-                    this link. Note that this link will only be viewable
-                    by people in both the campuses and roles selected">?</span>
-        </label>
-        <div class="clearfix checkboxes">
-            <label class="float-left clear">
-                <input type="checkbox" class="select_all" />Select all
+    <div class="row">
+        <div class="small-12 medium-6 columns">
+            <label>
+                Campus
+                <span data-tooltip class="has-tip"
+                      title="Select the campuses that should be able to view
+                        this link. Note that this link will only be viewable
+                        by people in both the campuses and roles selected">?</span>
             </label>
-            <!-- BEGIN group -->
-            <label class="float-left clear">
-                <input type="checkbox" name="group[]" value="{GROUP_ID}" {GROUP_ID_SELECTED}/>{GROUP_NAME}
+            <div class="clearfix checkboxes">
+                <label class="float-left clear">
+                    <input type="checkbox" class="select_all" />Select all
+                </label>
+                <!-- BEGIN campus -->
+                <label class="float-left clear">
+                    <input type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED}/>{CAMPUS_NAME}
+                </label>
+                <!-- END campus -->
+            </div>
+        </div>
+
+        <div class="small-12 medium-6 columns">
+            <label>
+                Roles
+                <span data-tooltip class="has-tip"
+                      title="Select the campuses that should be able to view
+                        this link. Note that this link will only be viewable
+                        by people in both the campuses and roles selected">?</span>
             </label>
-            <!-- END group -->
+            <div class="clearfix checkboxes">
+                <label class="float-left clear">
+                    <input type="checkbox" class="select_all" />Select all
+                </label>
+                <!-- BEGIN group -->
+                <label class="float-left clear">
+                    <input type="checkbox" name="group[]" value="{GROUP_ID}" {GROUP_ID_SELECTED}/>{GROUP_NAME}
+                </label>
+                <!-- END group -->
+            </div>
         </div>
     </div>
 
     <!-- BEGIN parent_select -->
-    <div class="small-12 medium-6 columns">
-        <label>
-            Parent
-            <span data-tooltip class="has-tip"
-                  title="This is where in the menu the new item will be inserted. Simply click on a menu item to allow it
-                    to be the parent.">?</span>
-        </label>
-        <div id="side-menu">
-            {MENU_TREE}
+    <div class="row">
+        <div class="small-12 columns">
+            <label>
+                Parent
+                <span data-tooltip class="has-tip"
+                      title="This is where in the menu the new item will be inserted. Simply click on a menu item to allow it
+                        to be the parent.">?</span>
+            </label>
+            <div id="side-menu">
+                {MENU_TREE}
+            </div>
         </div>
     </div>
     <!-- END parent_select -->
