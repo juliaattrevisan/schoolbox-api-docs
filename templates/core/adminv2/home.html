@@ -193,6 +193,7 @@
                     var status = data[i].WWW_STATUS;
                 }
                 $('[data-light="www"]').html(status);
+                $('[data-light="www"]').removeClass('warning');
                 $('[data-light="www"]').addClass(light);
             });
         }
