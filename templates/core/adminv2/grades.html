@@ -76,7 +76,7 @@
 
 <!-- Template for grade groups -->
 <script type="x-dot-template" id="submission-grade-group-template">
-    <li class="new" data-groupid="{{! it.id }}" data-role="gradeGroup">
+    <div class="new" data-groupid="{{! it.id }}" data-role="gradeGroup">
         <input type="hidden"
                name="group[{{! it.id }}][id]"
                value="{{! it.id }}"
@@ -102,7 +102,7 @@
                 {{~}}
             </tbody>
         </table>
-    </li>
+    </div>
 </script>
 
 <!-- Template for grades -->
@@ -185,9 +185,9 @@
         </dl>
     </div>
     <div class="small-12 medium-6 columns">
-        <ul data-role="gradeGroupList">
+        <div data-role="gradeGroupList">
             <!-- BEGIN submission_grade_group -->
-            <li data-role="gradeGroup" data-groupid="{SUBMISSION_GRADE_GROUP_ID}">
+            <div data-role="gradeGroup" data-groupid="{SUBMISSION_GRADE_GROUP_ID}">
                 <input type="hidden"
                        name="group[{SUBMISSION_GRADE_GROUP_ID}][id]"
                        value="{SUBMISSION_GRADE_GROUP_ID}"
@@ -237,9 +237,9 @@
                     <!-- END submission_grade -->
                     </tbody>
                 </table>
-            </li>
+            </div>
             <!-- END submission_grade_group -->
-        </ul>
+        </div>
         <input type="submit" class="submit-btn-plain" value="Save changes" />
         <span class="hide" id="err-expl">Ensure all pre-existing results are not blank.</span>
     </div>
