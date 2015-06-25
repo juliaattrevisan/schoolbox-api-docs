@@ -44,14 +44,18 @@ class Renderer
      */
     public function renderTree(Collection $tree, $level = 0)
     {
-        $text = "<ul>\n";
+        if ($level >= 1) {
+            $text = "<ul class='left-submenu'>\n<li class=\"back\"><a href=\"#\">Back</a></li>\n";
+        } else {
+            $text = "<ul class='off-canvas-list'>\n";
+        }
 
         foreach ($tree as $menuItem) {
             $aTag = $this->generateMenuAnchor($menuItem);
             $children = $menuItem->getChildren();
 
             if (count($children)) {
-                $text .= '<li class="parent">' . $aTag;
+                $text .= '<li class="has-submenu">' . $aTag;
                 $text .= $this->renderTree($children, ($level + 1));
             } else {
                 $text .= "<li>$aTag";

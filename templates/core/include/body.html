@@ -27,25 +27,66 @@
 {CUSTOM_HEADER_REGION}
 </head>
 <body>
-<div id="wrap">
-	<div id="wrap-inner">
-		<div id="header" class="core"> {MAIN_BANNER_REGION}
-			{MAIN_TAB_REGION} </div>
-		{MAIN_NAV_REGION}
-		<div id="container" class="clearfix">
-			<div id="content" class="clearfix"> {MAIN_CONTENT_REGION} </div>
-		</div>
+	<div class="off-canvas-wrap" data-offcanvas>
+	  <div class="inner-wrap">
+
+		<!-- The Schoolbox Hybrid Bar -->
+		<div class="hybrid-bar">
+		    <nav class="tab-bar">
+				<section class="left-small">
+					<a class="left-off-canvas-toggle menu-icon" href="#"><span></span></a>
+				</section>
+
+				<section class="middle tab-bar-section">
+					<h1 class="title">Schoolbox</h1>
+				</section>
+
+				<section class="right-small">
+					<a class="right-off-canvas-toggle menu-icon" href="#"><span></span></a>
+				</section>
+		    </nav>
+	    </div>
+
+	    <aside class="left-off-canvas-menu">
+	    	{MAIN_NAV_REGION}
+	    </aside>
+
+	    <aside class="right-off-canvas-menu">
+	      <ul class="off-canvas-list">
+	        <li><label>Users</label></li>
+	        <li><a href="#">Hari Seldon</a></li>
+	        <li><a href="#">...</a></li>
+	      </ul>
+	    </aside>
+
+		<!-- START CONTAINER -->
+	    <section class="main-section">
+
+			<div id="header" class="core">
+				{MAIN_BANNER_REGION}
+				{MAIN_TAB_REGION}
+			</div>
+
+			<div id="container" class="clearfix">
+				<div id="content" class="clearfix"> {MAIN_CONTENT_REGION} </div>
+			</div>
+
+			<div class="cal-bubble wysiwyg">
+				<div class="middle">
+					<div class="close">x</div>
+					<div class="js-data clearfix"></div>
+					<div class="bottom"><strong></strong></div>
+				</div>
+			</div>
+			{MAIN_FOOTER_REGION}
+			{DEBUGBAR_HEAD}
+			{DEBUGBAR}
+	    </section>
+		<!-- END CONTAINER -->
+		
+		<a class="exit-off-canvas"></a>
+
+	  </div>
 	</div>
-</div>
-<div class="cal-bubble wysiwyg">
-	<div class="middle">
-		<div class="close">x</div>
-		<div class="js-data clearfix"></div>
-		<div class="bottom"><strong></strong></div>
-	</div>
-</div>
-{MAIN_FOOTER_REGION}
-{DEBUGBAR_HEAD}
-{DEBUGBAR}
 </body>
 </html>
