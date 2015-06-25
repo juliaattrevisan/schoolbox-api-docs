@@ -43,13 +43,13 @@ if (is_array($typeList)) {
 		$output = array(
 			'SETTING_TAB_NAME' => $type['type'],
 			'SETTING_TAB_URL' => urlencode($type['type']),
-			'SETTING_TAB_CURRENT' => '',
+			'SETTING_TAB_ACTIVE' => '',
 		);
 
 		$this->setVar($output);
 
 		if ($selectedType == $type['type']) {
-			$this->setVar('SETTING_TAB_CURRENT', 'current');
+			$this->setVar('SETTING_TAB_ACTIVE', 'active');
 		}
 
 		$this->parse('setting_tab_block', 'setting_tab', true);
