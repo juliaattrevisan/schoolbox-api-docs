@@ -67,22 +67,58 @@
             /* Work out colour transitions
              */
             for (var i = 0; i < merged.series[0].data.length; i++) {
-                merged.colors.push(getGradientHexColor(merged.series[0].data[i]));
+                merged.colors.push(getSteppedHexColor(merged.series[0].data[i]));
             }
 
             return merged;
         }
 
         /**
+         * Stepped transition
+         *
+         * Blue until 90%, then red
+         *
+         * @param percent
+         * @returns {string}
+         */
+        function getSteppedHexColor(percent) {
+            if (percent < 90) {
+                return '#0066b0';
+            }
+
+            return '#ff5757';
+        }
+
+        /**
          * Colour transition
+         *
+         * Green is 100%
+         * Red is 0%
          *
          * @param percent
          */
-        function getGradientHexColor(percent){
+        function getGradientHexColor(percent) {
             var max = 230;
 
             var r = percent<50 ? max : Math.floor(max-(percent*2-100)*max/100);
             var g = percent>50 ? max : Math.floor((percent*2)*max/100);
+
+            return '#' + hexColorComponent(r) + hexColorComponent(g) + '00';
+        }
+
+        /**
+         * Colour transition
+         *
+         * Green is 0%
+         * Red is 100%
+         *
+         * @param percent
+         */
+        function getReversedGradientHexColor(percent) {
+            var max = 230;
+
+            var r = percent>50 ? max : Math.floor((percent*2)*max/100);
+            var g = percent<50 ? max : Math.floor(max-(percent*2-100)*max/100);
 
             return '#' + hexColorComponent(r) + hexColorComponent(g) + '00';
         }
