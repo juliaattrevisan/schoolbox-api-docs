@@ -132,36 +132,34 @@
                         this link. Note that this link will only be viewable
                         by people in both the campuses and roles selected">?</span>
             </label>
-            <div class="clearfix checkboxes">
-                <label class="float-left clear">
-                    <input type="checkbox" class="select_all" />Select all
-                </label>
+            <ul>
+                <li>
+                    <input id="campusSelectAll" type="checkbox" class="select_all" />
+                    <label for="campusSelectAll" class="checkbox-label">Select all</label>
+                </li>
                 <!-- BEGIN campus -->
-                <label class="float-left clear">
-                    <input type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED}/>{CAMPUS_NAME}
-                </label>
+                <li>
+                    <input id="campusSelect-{CAMPUS_ID}" type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED}/>
+                    <label for="campusSelect-{CAMPUS_ID}" class="checkbox-label">{CAMPUS_NAME}</label>
+                </li>
                 <!-- END campus -->
-            </div>
+            </ul>
         </div>
 
         <div class="small-12 medium-6 columns">
-            <label>
-                Roles
-                <span data-tooltip class="has-tip"
-                      title="Select the campuses that should be able to view
-                        this link. Note that this link will only be viewable
-                        by people in both the campuses and roles selected">?</span>
-            </label>
-            <div class="clearfix checkboxes">
-                <label class="float-left clear">
-                    <input type="checkbox" class="select_all" />Select all
-                </label>
+            <label>Roles</label>
+            <ul>
+                <li>
+                    <input id="roleSelectAll" type="checkbox" class="select_all" />
+                    <label for="roleSelectAll" class="checkbox-label">Select all</label>
+                </li>
                 <!-- BEGIN group -->
-                <label class="float-left clear">
-                    <input type="checkbox" name="group[]" value="{GROUP_ID}" {GROUP_ID_SELECTED}/>{GROUP_NAME}
-                </label>
+                <li>
+                    <input id="roleSelect-{CAMPUS_ID}" type="checkbox" name="group[]" value="{GROUP_ID}" {GROUP_ID_SELECTED}/>
+                    <label for="roleSelect-{CAMPUS_ID}" class="checkbox-label">{GROUP_NAME}</label>
+                </li>
                 <!-- END group -->
-            </div>
+            </ul>
         </div>
     </div>
 
