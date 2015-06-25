@@ -1,6 +1,7 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectAll.js"></script>
 <script type="text/javascript">
     $(function () {
 
@@ -42,33 +43,14 @@
 //            });
 //        });
 
-//		//greenerising the checkboxes if they're ticked.
-//		$(':checkbox').each(function () {
-//			if ($(this).is(':checked')) {
-//				$(this).parent().addClass('active-checkbox');
-//			}
-//		});
-//
-//		$(':checkbox').click(function () {
-//			if ($(this).parent().hasClass('active-checkbox')) {
-//				$(this).parent().removeClass('active-checkbox')
-//				if($(this).closest('.checkboxes').find('.select_all').is(':checked')){
-//					$(this).closest('.checkboxes').find('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
-//				}
-//			}
-//			else {
-//				$(this).parent().addClass('active-checkbox');
-//			}
-//		});
-//
-//		$('.select_all').change(function(){
-//			if($(this).is(':checked')){
-//				$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', true).parent().addClass('active-checkbox');
-//			} else {
-//				$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
-//			}
-//		});
-
+        $('[data-role="campusSelector"]').selectAll({
+            key: 'selectall',
+            checkboxName: 'campus[]'
+        });
+        $('[data-role="roleSelector"]').selectAll({
+            key: 'selectall',
+            checkboxName: 'group[]'
+        });
     });
 
 </script>
@@ -130,9 +112,9 @@
         </legend>
         <div class="small-12 medium-6 columns">
             <label>Campus</label>
-            <ul>
+            <ul data-role="campusSelector">
                 <li>
-                    <input id="campusSelectAll" type="checkbox" class="select_all" />
+                    <input id="campusSelectAll" type="checkbox" class="select_all" data-selectall="true" />
                     <label for="campusSelectAll" class="checkbox-label">Select all</label>
                 </li>
                 <!-- BEGIN campus -->
@@ -146,9 +128,9 @@
 
         <div class="small-12 medium-6 columns">
             <label>Roles</label>
-            <ul>
+            <ul data-role="roleSelector">
                 <li>
-                    <input id="roleSelectAll" type="checkbox" class="select_all" />
+                    <input id="roleSelectAll" type="checkbox" class="select_all" data-selectall="true" />
                     <label for="roleSelectAll" class="checkbox-label">Select all</label>
                 </li>
                 <!-- BEGIN group -->
