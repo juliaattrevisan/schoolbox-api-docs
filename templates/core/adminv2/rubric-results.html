@@ -1,4 +1,3 @@
-
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
     $(function() {
@@ -104,54 +103,51 @@
 <!-- END custom_head -->
 {ADMIN_NAV}
 
-<div class="admin-contents clearfix">
-    <h2>Rubric ResultSets</h2>
-<div class="level clearfix">
-    <form id="rubricForm" method="POST" action="/adminv2/rubricForm.php">
-        <div class="half listing">
-            <ul>
-                <li>Edit the rubric resultsets here: these are the pre-populated default values that will appear on every rubric.</li>
-                <li>Note that once results have been created, they cannot be removed; they can be renamed, but ensure that if you do
-                    that you rename them to something semantically equivalent, since it will affect all marks already given.</li>
-                <li>Each set should be a discrete list of items of a single measurement;
-                    for example, 'Very Good' and 'Yes' should not be in the same set.</li>
-                <li>The first element is always valued zero, and sets must contain at least two elements.</li>
-                <li>Type into empty fields to add result elements; if you wish to remove a newly created element, just leave it blank.</li>
-                <li>New sets cannot be deleted once created.</li>
-            </ul>
-        </div>
-        <div class="half last">
-            <ul id="rubric-results">
-                <!-- BEGIN list -->
-                <li class="{ON_OFF}">
-                    <ul>
-                        <!-- BEGIN list_item -->
-                        <li>
-                            <code>{RR_VALUE}</code> &rsaquo;
-                            <input type="text" value="{RR_SANE_LABEL}" />
-                            <a class="hidden" data-label="{RR_SANE_LABEL}" href="#">revert to '{RR_LABEL}'</a>
-                        </li>
-                        <!-- END list_item -->
-                        <li class="new-item">
-                            <code class="prompt">&nbsp;</code> &rsaquo;
-                            <input class="nullable" type="text" value="" />
-                        </li>
-                    </ul>
-                </li>
-                <!-- END list -->
-                <li class="{ON_OFF}">
-                    <p>New set...</p>
-                    <ul>
-                        <li class="new-item">
-                            <code class="prompt">&nbsp;</code> &rsaquo;
-                            <input class="nullable" type="text" value="" />
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-        <a href="/adminv2/rubric-results" id="save-changes" class="submit-btn-plain">Save changes</a>
-        <span id="err-expl">Ensure all pre-existing results are not blank.</span>
-    </form>
-</div>
-</div>
+<h2>Rubric ResultSets</h2>
+
+<form id="rubricForm" method="POST" action="/adminv2/rubricForm.php">
+    <div class="small-12 medium-6 columns">
+        <ul>
+            <li>Edit the rubric resultsets here: these are the pre-populated default values that will appear on every rubric.</li>
+            <li>Note that once results have been created, they cannot be removed; they can be renamed, but ensure that if you do
+                that you rename them to something semantically equivalent, since it will affect all marks already given.</li>
+            <li>Each set should be a discrete list of items of a single measurement;
+                for example, 'Very Good' and 'Yes' should not be in the same set.</li>
+            <li>The first element is always valued zero, and sets must contain at least two elements.</li>
+            <li>Type into empty fields to add result elements; if you wish to remove a newly created element, just leave it blank.</li>
+            <li>New sets cannot be deleted once created.</li>
+        </ul>
+    </div>
+    <div class="small-12 medium-6 columns">
+        <ul id="rubric-results">
+            <!-- BEGIN list -->
+            <li>
+                <ul>
+                    <!-- BEGIN list_item -->
+                    <li>
+                        <code>{RR_VALUE}</code> &rsaquo;
+                        <input type="text" value="{RR_SANE_LABEL}" />
+                        <a class="hidden" data-label="{RR_SANE_LABEL}" href="#">revert to '{RR_LABEL}'</a>
+                    </li>
+                    <!-- END list_item -->
+                    <li class="new-item">
+                        <code class="prompt">&nbsp;</code> &rsaquo;
+                        <input class="nullable" type="text" value="" />
+                    </li>
+                </ul>
+            </li>
+            <!-- END list -->
+            <li>
+                <p>New set...</p>
+                <ul>
+                    <li class="new-item">
+                        <code class="prompt">&nbsp;</code> &rsaquo;
+                        <input class="nullable" type="text" value="" />
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <input type="submit" value="Save Changes" />
+    <span id="err-expl">Ensure all pre-existing results are not blank.</span>
+</form>
