@@ -111,18 +111,23 @@
     $(function() {
         var allCategories = [];
         var allSeriesData = [];
+        var allTooltips = [];
         var allData = [];
 
         allData.push({
-            label: 'Storage<br />{DISK_USED}/{DISK_TOTAL}',
+            label: 'Storage',
             value: parseFloat('{DISK_PERC}')
         });
 
+        allTooltips.push('{DISK_USED} / {DISK_TOTAL}');
+
         <!-- BEGIN memory -->
         allData.push({
-            label: 'Memory<br />{MEMORY_USED}/{MEMORY_TOTAL}',
+            label: 'Memory',
             value: parseFloat('{MEMORY_PERC}')
         });
+
+        allTooltips.push('{MEMORY_USED} / {MEMORY_TOTAL}');
         <!-- END memory -->
 
         for (var i = 0; i < allData.length; i++) {
@@ -132,11 +137,14 @@
 
         /* Render it out
          */
-        $('[data-graph="usage"]').barchart({
+        $('[data-graph="usage"]').serverUsage({
             title: '',
             categories: allCategories,
             tooltip: {
-                enabled: false
+                enabled: true,
+                formatter: function() {
+                    return allTooltips[this.point.x];
+                }
             },
             series: [
                 {
