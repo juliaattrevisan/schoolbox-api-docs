@@ -49,13 +49,13 @@
 
     <div class="large-6 columns">
         <h2>Bulk Options <span data-tooltip class="hint has-tip tip-top" title="If you are wanting to deal with large lists at once, use this section.">?</span></h2>
-        <div>
+        <div class="transparent-panel">
             <h3>Modify Users</h3>
             <p>Search for users based on a set of criteria, and apply settings en masse.</p>
             <a href="/adminv2/user/bulk/modify" class="button icon-modify">Bulk Modify</a>
         </div>
 
-        <div>
+        <div class="transparent-panel">
             <h3>Add Users</h3>
             <p>Provide a file containing a list of users in the following CSV format. (username, title, firstname, lastname, synergetic, role, campus, campus secondary, campus tertiary, campus quaternary, year, password, webmail, alt. email) </p>
             <a href="/adminv2/csv/userBulkAdd.csv" class="button icon-download" >Download Template</a>
@@ -67,7 +67,7 @@
             </form>
         </div>
 
-        <div>
+        <div class="transparent-panel">
             <h3>Remove Users</h3>
             <p>Provide a file containing a list of usernames or School DB IDs.</p>
             <a href="/adminv2/csv/userBulkRemove.csv" class="button icon-download">Download Template</a>
@@ -79,33 +79,35 @@
             </form>
         </div>
 
-        <form data-action="clone" action="/adminv2/user/cloneForm.php" method="post" class="level clearfix">
-            <h3>Clone Role</h3>
-            <p>
-                This cloning process will be destructive: any existing permissions will first be deleted from the destination role before new permissions are added.
-                It should only be carried out on new roles, or roles you no longer require.
-            </p>
-            <!-- BEGIN select_clone -->
-            <label>{CLONE_LABEL} Role
-                <select data-role="clone-{CLONE_KEY}" name="clone[{CLONE_KEY}]" required>
-                    <option disabled="disabled" selected="selected">(Choose Role)</option>
-                    <!-- BEGIN select_new -->
-                    <option value="0">(New Role...)</option>
-                    <!-- END select_new -->
-                    <!-- BEGIN select_clone_opt -->
-                    <option value="{CLONE_OPT_VALUE}" {CLONE_OPT_VALUE_SELECTED}>{CLONE_OPT_NAME}</option>
-                    <!-- END select_clone_opt -->
-                </select>
-            </label>
-            <!-- BEGIN new_role -->
-            <label class="hide" data-container="clone-new">
-                New Role name
-                <input data-role="clone-new" name="clone[new]" type="text" value="" />
-            </label>
-            <!-- END new_role -->
-            <!-- END select_clone -->
-            <button type="submit" class="icon-copy">Clone</button>
-        </form>
+        <div class="transparent-panel">
+            <form data-action="clone" action="/adminv2/user/cloneForm.php" method="post" class="level clearfix">
+                <h3>Clone Role</h3>
+                <p>
+                    This cloning process will be destructive: any existing permissions will first be deleted from the destination role before new permissions are added.
+                    It should only be carried out on new roles, or roles you no longer require.
+                </p>
+                <!-- BEGIN select_clone -->
+                <label>{CLONE_LABEL} Role
+                    <select data-role="clone-{CLONE_KEY}" name="clone[{CLONE_KEY}]" required>
+                        <option disabled="disabled" selected="selected">(Choose Role)</option>
+                        <!-- BEGIN select_new -->
+                        <option value="0">(New Role...)</option>
+                        <!-- END select_new -->
+                        <!-- BEGIN select_clone_opt -->
+                        <option value="{CLONE_OPT_VALUE}" {CLONE_OPT_VALUE_SELECTED}>{CLONE_OPT_NAME}</option>
+                        <!-- END select_clone_opt -->
+                    </select>
+                </label>
+                <!-- BEGIN new_role -->
+                <label class="hide" data-container="clone-new">
+                    New Role name
+                    <input data-role="clone-new" name="clone[new]" type="text" value="" />
+                </label>
+                <!-- END new_role -->
+                <!-- END select_clone -->
+                <button type="submit" class="icon-copy">Clone</button>
+            </form>
+        </div>
     </div>
 </div>
 
