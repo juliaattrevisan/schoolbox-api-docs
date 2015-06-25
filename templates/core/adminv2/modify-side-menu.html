@@ -5,7 +5,9 @@
 <script type="text/javascript">
     $(function () {
 
-        // setup tree structure
+        /**
+         * setup tree browser
+         */
         $('section[data-role="sideMenuTree"]')
             .on('ready.jstree', function(event, jstree) {
                 jstree.instance.open_node(jstree.instance.get_node('node_0'));
@@ -29,19 +31,20 @@
                 }
             });
 
-//        /*
-//         * Modal for URL homepage selection
-//         * */
-//        $('#form').on('click', '.open-modal', function() {
-//            $('#resource-browser').socialstreamBrowser({
-//                title: 'Choose a folder',
-//                categoryId: 0,
-//                mimeFilter: false,
-//                submitCallback: function(url, filename) {
-//                    $('#url').val(url);
-//                }
-//            });
-//        });
+        /**
+         * Modal for URL homepage selection
+         */
+        $('[data-role="openResourceBrowser"]').click(function(e) {
+            e.preventDefault();
+            $('[data-role="resourceBrowser"]').socialstreamBrowser({
+                title: 'Choose a folder',
+                categoryId: 0,
+                mimeFilter: false,
+                submitCallback: function(url, filename) {
+                    $('input[name="url"]').val(url);
+                }
+            });
+        });
 
         $('[data-role="campusSelector"]').selectAll({
             key: 'selectall',
@@ -85,8 +88,7 @@
                       title="Either enter in a URL or use the browse button to link to folders created in the resource system">?</span>
                 <input type="text" name="url" id="url" size="40" class="required" maxlength="250" value="{URL}"/>
             </label>
-            <a href="#" class="button open-modal">Browse Resources</a>
-            <div id="resource-browser" class="hide"></div>
+            <a href="#" class="button" data-role="openResourceBrowser">Browse Resources</a>
         </div>
 
         <div class="small-4 medium-2 columns">
@@ -167,3 +169,5 @@
     <input type="submit" name="delete" value="Delete" />
     <!-- END delete -->
 </form>
+
+<div data-role="resourceBrowser" class="hide"></div>
