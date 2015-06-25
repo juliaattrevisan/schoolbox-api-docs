@@ -8,7 +8,7 @@
      * @link        http://www.alaress.com.au/
      * @version     SVN: $Id$
      */
-    $.fn.barchart = function(options) {
+    $.fn.serverUsage = function(options) {
         options = options || {};
 
         var config = init(options, this);
