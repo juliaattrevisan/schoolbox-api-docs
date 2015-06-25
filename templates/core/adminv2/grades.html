@@ -10,7 +10,7 @@
             var groupTemplate = doT.template($('script#submission-grade-group-template').html().trim());
             var gradeTemplate = doT.template($('script#submission-grade-template').html().trim());
 
-            var form = $('form#gradesForm');
+            var form = $('form[data-action="saveGradeLevels"]');
 
             /**
              * Adds a new grade to the given group.
@@ -25,7 +25,7 @@
                         id: groupId
                     }
                 }));
-                gradeGroup.find('.gradeList').append(newGrade);
+                gradeGroup.find('[data-role="gradeList"]').append(newGrade);
                 return newGrade;
             };
 
@@ -37,12 +37,12 @@
                     id: 'new-'+String(newGroupId++)
                 }));
                 addGrade(newGroup);
-                form.find('#gradeGroupList').append(newGroup);
+                form.find('[data-role="gradeGroupList"]').append(newGroup);
                 return newGroup;
             };
 
             // Add a new grade entry to each group, and a new empty group.
-            form.find('.gradeGroup').each(function() {
+            form.find('[data-role="gradeGroup"]').each(function() {
                 addGrade($(this));
             });
             addGroup();
@@ -60,7 +60,7 @@
             form.on('blur', 'input[name$="[caption]"]', function(event) {
                 if (this.value.length > 0) {
                     var element     = $(this);
-                    var group       = element.closest('.gradeGroup');
+                    var group       = element.closest('[data-role="gradeGroup"]');
                     var lastCaption = group
                         .find('input[name$="[caption]"]')
                         .filter(':last');
@@ -76,7 +76,7 @@
 
 <!-- Template for grade groups -->
 <script type="x-dot-template" id="submission-grade-group-template">
-    <li class="new gradeGroup" data-groupid="{{! it.id }}">
+    <li class="new" data-groupid="{{! it.id }}" data-role="gradeGroup">
         <input type="hidden"
                name="group[{{! it.id }}][id]"
                value="{{! it.id }}"
@@ -95,7 +95,7 @@
                     <th>Caption</th>
                 </tr>
             </thead>
-            <tbody class="gradeList">
+            <tbody data-role="gradeList">
                 <!-- include templates for all grades, and add another for blanks -->
                 {{~ it.gradeLevels :level }}
                     {{= it.gradeTemplate(level) }}
@@ -150,7 +150,7 @@
 
 <h2>Submission Grades and Groupings</h2>
 
-<form id="gradesForm" method="POST" action="/adminv2/gradesForm.php">
+<form method="POST" action="/adminv2/gradesForm.php" data-action="saveGradeLevels">
     <div class="small-12 medium-6 columns">
         <h3>Guide</h3>
         <dl>
@@ -185,9 +185,9 @@
         </dl>
     </div>
     <div class="small-12 medium-6 columns">
-        <ul id="gradeGroupList">
+        <ul data-role="gradeGroupList">
             <!-- BEGIN submission_grade_group -->
-            <li class="gradeGroup" data-groupid="{SUBMISSION_GRADE_GROUP_ID}">
+            <li data-role="gradeGroup" data-groupid="{SUBMISSION_GRADE_GROUP_ID}">
                 <input type="hidden"
                        name="group[{SUBMISSION_GRADE_GROUP_ID}][id]"
                        value="{SUBMISSION_GRADE_GROUP_ID}"
@@ -206,7 +206,7 @@
                         <th>Caption</th>
                     </tr>
                     </thead>
-                    <tbody class="gradeList">
+                    <tbody data-role="gradeList">
                     <!-- BEGIN submission_grade -->
                     <tr class="grade" data-gradeid="{SUBMISSION_GRADE_ID}">
                         <td>
