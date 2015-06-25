@@ -19,7 +19,6 @@ $this->setBlock('setting', 'setting_type_html', 'setting_type_html_block');
 $this->setBlock('setting', 'setting_type_boolean', 'setting_type_boolean_block');
 $this->setBlock('setting', 'setting_type_select', 'setting_type_select_block');
 $this->setBlock('setting_type_select', 'setting_select', 'setting_select_block');
-$this->setBlock('setting', 'setting_type_check', 'setting_type_check_block');
 $this->setBlock('setting', 'setting_type_list', 'setting_type_list_block');
 $this->setBlock('setting', 'setting_type_resource', 'setting_type_resource_block');
 $this->setBlock(TEMPLATE_content, 'setting_save', 'setting_save_block');
@@ -44,13 +43,13 @@ if (is_array($typeList)) {
 		$output = array(
 			'SETTING_TAB_NAME' => $type['type'],
 			'SETTING_TAB_URL' => urlencode($type['type']),
-			'SETTING_TAB_CURRENT' => '',
+			'SETTING_TAB_ACTIVE' => '',
 		);
 
 		$this->setVar($output);
 
 		if ($selectedType == $type['type']) {
-			$this->setVar('SETTING_TAB_CURRENT', 'current');
+			$this->setVar('SETTING_TAB_ACTIVE', 'active');
 		}
 
 		$this->parse('setting_tab_block', 'setting_tab', true);
@@ -73,7 +72,6 @@ if(is_array($optionList)) {
             'setting_type_html_block'        => '',
             'setting_type_boolean_block'     => '',
             'setting_type_select_block'      => '',
-            'setting_type_check_block'       => '',
             'setting_type_list_block'        => '',
             'setting_type_resource_block'    => '',
             'setting_group_localisation_block' => '',
@@ -120,6 +118,7 @@ if(is_array($optionList)) {
                     $this->parse('setting_type_resource_block', 'setting_type_resource', true);
                     break;
 
+                case 'checkbox':
                 case 'boolean' :
                     if ($option['value'] == 1) {
                         $checked = 'checked="checked"';
@@ -175,10 +174,6 @@ if(is_array($optionList)) {
                         $this->parse('setting_select_block', 'setting_select', true);
                     }
                     $this->parse('setting_type_input_block', 'setting_type_select', true);
-                    break;
-
-                case 'checkbox':
-                    $this->parse('setting_type_input_block', 'setting_type_checkbox', true);
                     break;
 
                 case 'bytes':
