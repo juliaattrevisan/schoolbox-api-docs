@@ -89,7 +89,8 @@
 <h2>{ACTION} Side Menu Item</h2>
 
 <form action="/adminv2/side-menuForm.php" method="post" name="form" id="form">
-    <div class="row">
+    <fieldset>
+        <legend>Link</legend>
         <div class="small-12 medium-6 columns">
             <label>
                 Name
@@ -121,17 +122,18 @@
                 </select>
             </label>
         </div>
-    </div>
+    </fieldset>
 
-    <div class="row">
+    <fieldset>
+        <legend>
+            Permissions
+            <span data-tooltip class="has-tip"
+                  title="Select the campuses that should be able to view
+                    this link. Note that this link will only be viewable
+                    by people in both the campuses and roles selected">?</span>
+        </legend>
         <div class="small-12 medium-6 columns">
-            <label>
-                Campus
-                <span data-tooltip class="has-tip"
-                      title="Select the campuses that should be able to view
-                        this link. Note that this link will only be viewable
-                        by people in both the campuses and roles selected">?</span>
-            </label>
+            <label>Campus</label>
             <ul>
                 <li>
                     <input id="campusSelectAll" type="checkbox" class="select_all" />
@@ -161,10 +163,11 @@
                 <!-- END group -->
             </ul>
         </div>
-    </div>
+    </fieldset>
 
     <!-- BEGIN parent_select -->
-    <div class="row">
+    <fieldset>
+        <legend>Location</legend>
         <div class="small-12 columns">
             <label>
                 Parent
@@ -176,7 +179,7 @@
                 {MENU_TREE}
             </div>
         </div>
-    </div>
+    </fieldset>
     <!-- END parent_select -->
 
     <input type="hidden" name="id" value="{ID}"/>
