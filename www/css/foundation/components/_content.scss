@@ -55,7 +55,7 @@ $panel-padding: rem-calc(16);
 // $include-html-label-classes: $include-html-classes;
 
 // We use these to style the labels
-$label-padding: rem-calc(($base-font-size - 8));
+$label-padding: rem-calc(($base-font-size - 10)) rem-calc(($base-font-size - 2));
 // $label-radius: $global-radius;
 
 // We use these to style the label text
@@ -510,9 +510,9 @@ table{
 }
 .unsubmitted {
 	@include label(
-		$bg: tint($primary-color, 74%)
+		$bg: $gainsboro
 	);
-	color: $primary-color;
+	color: $charcoal;
 }
 .warning.label {
 	@include label(
@@ -537,6 +537,7 @@ table{
 // Hints
 .hint {
 	top: -3px;
+	margin-left: 4px;
 	@include label(
 		$padding: rem-calc(($base-font-size - 12)) rem-calc(($base-font-size - 10)),
 		$bg: $iron
@@ -652,26 +653,20 @@ table{
 		border-bottom: 16px solid $silver;
 	}
 	li{
+		a:hover{
+			background-color: $ocean-sunset;
+		}
 		.grade{
 			@media #{$small-up} { @include grid-column(1); }
-			// TODO: eventually fix colours
-			background: $success-color;
-			color: $white;
 			min-height: 64px;
 			text-align: center;
 			font-weight: $font-weight-bold;
 			font-size: rem-calc(($base-font-size - 4));
-			a{
-				color: $white;
-			}
 			span{
 				font-size: rem-calc(($base-font-size + 8));
 			}
-		}
-		a{
-			@include single-transition(all, 0.15s, linear);
-			&:hover{
-				background-color: $ocean-sunset;
+			a:hover{
+				background-color: transparent;
 			}
 		}
 		ul{
@@ -816,4 +811,11 @@ tr:hover{
 // Fix stupid foundation bug
 .reveal-modal-bg{
 	position: fixed;
+}
+
+// Loader .gif
+.loader{
+	background: url('/images/foundation/preloader.gif') center center no-repeat;
+  	min-height: 68px;
+  	min-width: 68px;
 }
