@@ -56,15 +56,15 @@
 
 <h2>Settings</h2>
 
-<div class="settings-nav-holder">
-    <ul class="admin-nav vertical">
+<div class="small-12 medium-3 columns">
+    <ul>
         <!-- BEGIN setting_tab -->
-        <li><a href="/adminv2/setting/{SETTING_TAB_URL}" class="{SETTING_TAB_CURRENT}">{SETTING_TAB_NAME}<span></span></a></li>
+        <li><a href="/adminv2/setting/{SETTING_TAB_URL}" class="{SETTING_TAB_CURRENT}">{SETTING_TAB_NAME}</a></li>
         <!-- END setting_tab -->
     </ul>
 </div>
 
-<div class="settings">
+<div class="small-12 medium-9 columns">
     <!-- BEGIN setting_group -->
     <form id="settings" class="admin-form level clearfix" method="post" action="/adminv2/settingForm.php">
         <!-- BEGIN setting_group_localisation -->
@@ -115,54 +115,57 @@
         <!-- END setting_group_localisation -->
 
         <!-- BEGIN setting -->
-        <label for="{SETTING_NAME}">{SETTING_TITLE}<span class="question">?</span> <em>{SETTING_DESC}</em>
-            <!-- BEGIN setting_type_noneditable -->
-            <p>{SETTING_VALUE}</p>
-            <!-- END setting_type_noneditable -->
-
-            <!-- BEGIN setting_type_input -->
-            <input class="{OPTION_REQUIRED}" type="text" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
-            <!-- END setting_type_input -->
-
-            <!-- BEGIN setting_type_textarea -->
-            <textarea id="{SETTING_NAME}" class="{OPTION_REQUIRED}" name="{SETTING_NAME}">{SETTING_VALUE}</textarea>
-            <!-- END setting_type_textarea -->
-
-            <!-- BEGIN setting_type_html -->
-            <textarea id="{SETTING_NAME}" class="mceEditor {OPTION_REQUIRED}" name="{SETTING_NAME}">{SETTING_VALUE}</textarea>
-            <!-- END setting_type_html -->
-
-            <!-- BEGIN setting_type_resource -->
-            <input type="text" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
-            <input type="button" value="Select Source" data-interaction="homepage_selector" data-input_name="{SETTING_NAME}" />
-            <!-- END setting_type_resource -->
-
-            <!-- BEGIN setting_type_boolean -->
-            <fieldset class="switch" tabindex="0">
-                <input id="setting-{SETTING_NAME}" name="{SETTING_NAME}" {SETTING_CHECKED} value="{SETTING_VALUE}" type="checkbox">
-                <label for="setting-{SETTING_NAME}"></label>
-            </fieldset>
-            <!-- END setting_type_boolean -->
-
-            <!-- BEGIN setting_type_select -->
-            <br />
-            <select name="{SETTING_NAME}">
-                <!-- BEGIN setting_select -->
-                <option value="{SELECT_VALUE}" {SETTING_OPTION_SELECTED}>{SELECT_OPTION}</option>
-                <!-- END setting_select -->
-            </select>
-            <!-- END setting_type_select -->
-
-            <!-- BEGIN setting_type_check -->
-            <fieldset>
-                <!-- BEGIN setting_checkbox -->
-                <label>
-                    <input type="checkbox" name="check[]" value="one" />
-                    One </label>
-                <!-- END setting_checkbox -->
-            </fieldset>
-            <!-- END setting_type_check -->
+        <label for="{SETTING_NAME}">
+            {SETTING_TITLE}
+            <span data-tooltip class="has-tip" title="{SETTING_DESC}">?</span>
         </label>
+
+        <!-- BEGIN setting_type_noneditable -->
+        <p>{SETTING_VALUE}</p>
+        <!-- END setting_type_noneditable -->
+
+        <!-- BEGIN setting_type_input -->
+        <input id="{SETTING_NAME}" class="{OPTION_REQUIRED}" type="text" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
+        <!-- END setting_type_input -->
+
+        <!-- BEGIN setting_type_textarea -->
+        <textarea id="{SETTING_NAME}" class="{OPTION_REQUIRED}" name="{SETTING_NAME}">{SETTING_VALUE}</textarea>
+        <!-- END setting_type_textarea -->
+
+        <!-- BEGIN setting_type_html -->
+        <textarea id="{SETTING_NAME}" class="mceEditor {OPTION_REQUIRED}" name="{SETTING_NAME}">{SETTING_VALUE}</textarea>
+        <!-- END setting_type_html -->
+
+        <!-- BEGIN setting_type_resource -->
+        <input id="{SETTING_NAME}" type="text" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
+        <input type="button" value="Select Source" data-interaction="homepage_selector" data-input_name="{SETTING_NAME}" />
+        <!-- END setting_type_resource -->
+
+        <!-- BEGIN setting_type_boolean -->
+        <fieldset class="switch" tabindex="0">
+            <input id="{SETTING_NAME}" name="{SETTING_NAME}" {SETTING_CHECKED} value="{SETTING_VALUE}" type="checkbox">
+            <label for="{SETTING_NAME}"></label>
+        </fieldset>
+        <!-- END setting_type_boolean -->
+
+        <!-- BEGIN setting_type_select -->
+        <br />
+        <select name="{SETTING_NAME}">
+            <!-- BEGIN setting_select -->
+            <option value="{SELECT_VALUE}" {SETTING_OPTION_SELECTED}>{SELECT_OPTION}</option>
+            <!-- END setting_select -->
+        </select>
+        <!-- END setting_type_select -->
+
+        <!-- BEGIN setting_type_check -->
+        <fieldset>
+            <!-- BEGIN setting_checkbox -->
+            <label>
+                <input type="checkbox" name="check[]" value="one" />
+                One </label>
+            <!-- END setting_checkbox -->
+        </fieldset>
+        <!-- END setting_type_check -->
         <!-- END setting -->
 
         <!-- BEGIN setting_save -->
