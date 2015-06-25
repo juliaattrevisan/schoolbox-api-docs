@@ -173,7 +173,7 @@ $topbar-divider-border-top: solid 1px tint($topbar-bg, 20%);
 // Off Canvas Tab Bar Variables
 $include-html-off-canvas-classes: $include-html-classes !default;
 
-$tabbar-bg: #333;
+$tabbar-bg: $smoke;
 $tabbar-height: rem-calc(200);
 $tabbar-icon-width: $tabbar-height;
 $tabbar-line-height: $tabbar-height;
@@ -193,7 +193,7 @@ $tabbar-header-margin: 0;
 
 // Off Canvas Menu Variables
 $off-canvas-width: rem-calc(250);
-$off-canvas-bg: #333;
+$off-canvas-bg: $smoke;
 
 // Off Canvas Menu List Variables
 $off-canvas-label-padding: rem-calc(($base-font-size - 2));
