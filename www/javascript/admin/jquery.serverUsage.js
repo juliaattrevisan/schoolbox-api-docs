@@ -67,7 +67,7 @@
             /* Work out colour transitions
              */
             for (var i = 0; i < merged.series[0].data.length; i++) {
-                merged.colors.push(getHexColor(merged.series[0].data[i]));
+                merged.colors.push(getGradientHexColor(merged.series[0].data[i]));
             }
 
             return merged;
@@ -78,7 +78,7 @@
          *
          * @param percent
          */
-        function getHexColor(percent){
+        function getGradientHexColor(percent){
             var max = 230;
 
             var r = percent<50 ? max : Math.floor(max-(percent*2-100)*max/100);
