@@ -2,19 +2,18 @@
 <link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript">
-
     $(function () {
 
         // setup tree structure
-        $("#side-menu")
+        $('section[data-role="sideMenuTree"]')
             .on('ready.jstree', function(event, jstree) {
                 jstree.instance.open_node(jstree.instance.get_node('node_0'));
             })
             .on('select_node.jstree', function(event, jstree) {
-                $('#prent').val(jstree.selected[0].replace(/^node_/, ''));
+                $('input[data-relation="selectedParent"]').val(jstree.selected[0].replace(/^node_/, ''));
             })
             .on('deselect_node.jstree', function() {
-                $('#prent').val('');
+                $('input[data-relation="selectedParent"]').val('');
             })
             .jstree({
                 "animation":50,
@@ -29,49 +28,46 @@
                 }
             });
 
-        /*
-         * Modal for URL homepage selection
-         * */
+//        /*
+//         * Modal for URL homepage selection
+//         * */
+//        $('#form').on('click', '.open-modal', function() {
+//            $('#resource-browser').socialstreamBrowser({
+//                title: 'Choose a folder',
+//                categoryId: 0,
+//                mimeFilter: false,
+//                submitCallback: function(url, filename) {
+//                    $('#url').val(url);
+//                }
+//            });
+//        });
 
-      $('#form').on('click', '.open-modal', function() {
-
-        $('#resource-browser').socialstreamBrowser({
-          title: 'Choose a folder',
-          categoryId: 0,
-          mimeFilter: false,
-          submitCallback: function(url, filename) {
-            $('#url').val(url);
-          }
-        });
-      });
-
-
-		//greenerising the checkboxes if they're ticked.
-		$(':checkbox').each(function () {
-			if ($(this).is(':checked')) {
-				$(this).parent().addClass('active-checkbox');
-			}
-		});
-
-		$(':checkbox').click(function () {
-			if ($(this).parent().hasClass('active-checkbox')) {
-				$(this).parent().removeClass('active-checkbox')
-				if($(this).closest('.checkboxes').find('.select_all').is(':checked')){
-					$(this).closest('.checkboxes').find('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
-				}
-			}
-			else {
-				$(this).parent().addClass('active-checkbox');
-			}
-		});
-
-		$('.select_all').change(function(){
-			if($(this).is(':checked')){
-				$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', true).parent().addClass('active-checkbox');
-			} else {
-				$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
-			}
-		});
+//		//greenerising the checkboxes if they're ticked.
+//		$(':checkbox').each(function () {
+//			if ($(this).is(':checked')) {
+//				$(this).parent().addClass('active-checkbox');
+//			}
+//		});
+//
+//		$(':checkbox').click(function () {
+//			if ($(this).parent().hasClass('active-checkbox')) {
+//				$(this).parent().removeClass('active-checkbox')
+//				if($(this).closest('.checkboxes').find('.select_all').is(':checked')){
+//					$(this).closest('.checkboxes').find('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
+//				}
+//			}
+//			else {
+//				$(this).parent().addClass('active-checkbox');
+//			}
+//		});
+//
+//		$('.select_all').change(function(){
+//			if($(this).is(':checked')){
+//				$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', true).parent().addClass('active-checkbox');
+//			} else {
+//				$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
+//			}
+//		});
 
     });
 
@@ -175,15 +171,15 @@
                       title="This is where in the menu the new item will be inserted. Simply click on a menu item to allow it
                         to be the parent.">?</span>
             </label>
-            <div id="side-menu">
+            <section data-role="sideMenuTree">
                 {MENU_TREE}
-            </div>
+            </section>
         </div>
     </fieldset>
     <!-- END parent_select -->
 
     <input type="hidden" name="id" value="{ID}"/>
-    <input id="prent" name="parent" type="hidden" value="{PARENT_ID}"/>
+    <input data-relation="selectedParent" name="parent" type="hidden" value="{PARENT_ID}"/>
     <input type="submit" name="Submit" value="{ACTION}" />
     <!-- BEGIN delete -->
     <input type="submit" name="delete" value="Delete" />
