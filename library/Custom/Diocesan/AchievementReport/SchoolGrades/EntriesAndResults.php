@@ -138,6 +138,7 @@ class EntriesAndResults extends Base {
                 SynergyOne.dbo.uvSchoolBoxSchoolGradeResults
             WHERE
                 ID = '{$this->getExternalUserId()}'
+                AND Result != 'SNA'
             GROUP BY
                 FileYear,
                 CourseName,
