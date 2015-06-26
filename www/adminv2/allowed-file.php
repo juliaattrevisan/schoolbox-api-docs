@@ -54,7 +54,10 @@ if ($mimes->count()) {
         $max_size_output = Alaress_Byte_Format::bytesToString($mime->getMaxFileSize());
         $output = array(
             'FILE_ID'                  => $mime->getId(),
-            'FILE_ENABLED_CHECKED'     => $mime->isEnabled() ? 'checked="checked"' : '',
+            'FILE_ENABLED'             => $mime->isEnabled() ? 'true'    : 'false',
+            'FILE_ENABLED_ACTION'      => $mime->isEnabled() ? 'disable' : 'enable',
+            'FILE_ENABLED_ICON'        => $mime->isEnabled() ? 'close'   : 'approve',
+            'FILE_ENABLED_TITLE'       => $mime->isEnabled() ? 'Disable' : 'Enable',
             'FILE_DESC'                => Scrub::text($mime->getDescription()),
             'FILE_MIME'                => $mime->getMime(),
             'FILE_EXTENSION_CSV'       => $extensionCSV,
