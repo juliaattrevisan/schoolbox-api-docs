@@ -70,9 +70,6 @@ $(function() {
 
 	/* date picker */
 	$('#start_date, #finish_date').datepicker({
-		showOn: 'both',
-		buttonImage: '/images/core/calendar/calendar-click.png',
-		buttonImageOnly: true,
 		constrainInput: false,
 		onClose: function (string) {
 			var input = $(this);
@@ -202,94 +199,90 @@ $(function() {
     <!-- END subscribe -->
 
 	<!-- BEGIN cleanup -->
-	<div class="settings heading">
-		<div class="level clearfix">
+	<div class="row">
+		<div class="large-12 columns">
 			<h3>Mass Cleanup</h3>
 			<p>Display a list of events between two dates.</p>
+        </div>
 
-			<form action="/adminv2/calendar/Cleanup" method="get">
+        <form action="/adminv2/calendar/Cleanup" method="get">
+            <input type="hidden" name='action' value='cleanup' />
 
-                <div class="row">
+            <div class="medium-6 columns">
+                <label>
+                    From
+                    <input type="text" id='start_date' name="cleanupFrom" value="{CLEANUP_HAS_DATES_FROM}" />
+                </label>
+            </div>
+            <div class="medium-6 columns">
+                <label>
+                    Until
+                    <input type="text" id='finish_date' name="cleanupTo" size="15" maxlength="30" value="{CLEANUP_HAS_DATES_TO}" />
+                </label>
+            </div>
+            <div class="large-12 columns">
+                <input type="submit" value="Search" />
+            </div>
+        </form>
 
-                    <div class="column medium-4">
-                        From <input type="text" id='start_date' name="cleanupFrom" value="{CLEANUP_HAS_DATES_FROM}" />
-                    </div>
-                    <div class="column medium-4">
-                        Until <input type="text" id='finish_date' name="cleanupTo" size="15" maxlength="30" value="{CLEANUP_HAS_DATES_TO}" />
-                    </div>
-                    <div class="column medium-4">
-                        <input type="hidden" name='action' value='cleanup' />
-                        <input type="submit" class='submit-btn-plain float-left' value="Change Dates" />
-                    </div>
+        <div class="large-12 columns">
+            <input id="check-personal" type="checkbox" data-modifier-control="true" value="personal" />
+            <label for="check-personal" class="checkbox-label">Select Personal Events</label>
+            <input id="check-group" type="checkbox" data-modifier-control="true" value="group" />
+            <label for="check-group" class="checkbox-label">Select Group Events</label>
+        </div>
 
-                </div>
+        <div class="large-12 columns">
+            <!-- BEGIN cleanup_has_events -->
+            <h3>Events</h3>
+            <form action="/adminv2/calendar/modifyForm" method="post">
+                <input type="hidden" name='action' value='cleanup' />
 
-
-				<label class="float-left">
-
-				</label>
-				<label class="float-left">
-
-				</label>
-
-			</form>
-
-			<div>
-                <input id="check-personal" type="checkbox" data-modifier-control="true" value="personal" />
-				<label for="check-personal" class="checkbox-label">Select Personal Events</label>
-                <input id="check-group" type="checkbox" data-modifier-control="true" value="group" />
-				<label for="check-group" class="checkbox-label">Select Group Events</label>
-			</div>
-
-			<!-- BEGIN cleanup_has_events -->
-			<h3>Events</h3>
-			<form action="/adminv2/calendar/modifyForm" method="post">
-				<table>
-					<thead>
-						<tr>
-							<th>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>
                                 <input id="check-all" type="checkbox" data-selectall="true" value="" />
                                 <label for="check-all" class="checkbox-label"></label>
-							</th>
-							<th>Title</th>
-							<th>Type</th>
-							<th>Author</th>
-							<th>Start</th>
-							<th>End</th>
-							<th>Applies to</th>
-						</tr>
-					</thead>
-					<tbody>
-						<!-- BEGIN cleanup_event -->
-						<tr>
-							<td>
+                            </th>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Author</th>
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Applies to</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- BEGIN cleanup_event -->
+                        <tr>
+                            <td>
                                 <input id="check-{CLEANUP_EVENT_ID}" type="checkbox" name="cleanupEventId[]" data-modifier='{CLEANUP_EVENT_MODIFIER}' value="{CLEANUP_EVENT_ID}" />
                                 <label for="check-{CLEANUP_EVENT_ID}" class="checkbox-label"></label>
                             </td>
-							<td><a href='/calendar/modify.php?eventID={CLEANUP_EVENT_ID}'>{CLEANUP_EVENT_TITLE}</a></td>
-							<td>{CLEANUP_EVENT_EVENTTYPE}</td>
-							<td><a href="/search/user/{CLEANUP_EVENT_AUTHOR_ID}">{CLEANUP_EVENT_AUTHOR}</a></td>
-							<td>{CLEANUP_EVENT_START}</td>
-							<td>{CLEANUP_EVENT_END}</td>
-							<td>
-								{CLEANUP_EVENT_USERS}
-								{CLEANUP_EVENT_CATEGORIES}
-								{CLEANUP_EVENT_CAMPUSES}
-							</td>
-						</tr>
-						<!-- END cleanup_event -->
-					</tbody>
-				</table>
+                            <td><a href='/calendar/modify.php?eventID={CLEANUP_EVENT_ID}'>{CLEANUP_EVENT_TITLE}</a></td>
+                            <td>{CLEANUP_EVENT_EVENTTYPE}</td>
+                            <td><a href="/search/user/{CLEANUP_EVENT_AUTHOR_ID}">{CLEANUP_EVENT_AUTHOR}</a></td>
+                            <td>{CLEANUP_EVENT_START}</td>
+                            <td>{CLEANUP_EVENT_END}</td>
+                            <td>
+                                {CLEANUP_EVENT_USERS}
+                                {CLEANUP_EVENT_CATEGORIES}
+                                {CLEANUP_EVENT_CAMPUSES}
+                            </td>
+                        </tr>
+                        <!-- END cleanup_event -->
+                    </tbody>
+                </table>
 
-				<input type="hidden" name='action' value='cleanup' />
-				<input type="submit" class='submit-btn-plain' value="Remove Selected Events" />
-			</form>
-			<!-- END cleanup_has_events -->
+                <input type="submit" value="Remove Selected Events" />
+            </form>
+            <!-- END cleanup_has_events -->
 
-			<!-- BEGIN cleanup_has_no_events -->
-			<p>No events found within the selected date range.</p>
-			<!-- END cleanup_has_no_events -->
-		</div>
+            <!-- BEGIN cleanup_has_no_events -->
+            <p>No events found within the selected date range.</p>
+            <!-- END cleanup_has_no_events -->
+        </div>
 	</div>
 	<!-- END cleanup -->
 </div>
