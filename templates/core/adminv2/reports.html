@@ -1,70 +1,86 @@
-<!-- BEGIN custom_head -->
-<style type="text/css">
-    .orderby:after {
-        content: ' {DIR}';
-    }
-</style>
-<!-- END custom_head-->
-<h1>Schoolbox Administration</h1>
-<dl class="sub-nav">
-    <!-- BEGIN admin_nav_item -->
-    <dd class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></dd>
-    <!-- END admin_nav_item -->
-</dl>
-<div class="admin-contents reporting clearfix">
-    <h2>Reports</h2>
-    <div class="clearfix">
+<div class="row">
+    <div class="large-12 columns">
+        <h1>Schoolbox Administration</h1>
+        <dl class="sub-nav">
+            <!-- BEGIN admin_nav_item -->
+            <dd class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></dd>
+            <!-- END admin_nav_item -->
+        </dl>
+    </div>
+</div>
+<div class="row">
+    <div class="large-12 columns">
+        <h2>Reports</h2>
+
         <!-- BEGIN filter -->
-        <div class="level green clearfix">
+        <div class="panel">
             <h3>Filter</h3>
-            <form class="filter" action="/adminv2/reportsForm.php" method="POST">
-                <ul>
-                <!-- BEGIN search_options -->
-                    <li><label for="{FILTER_ID}">{FILTER_NAME}<input id="{FILTER_ID}" name="{FILTER_ID}" type="text" value="{FILTER_VALUE}" placeholder="{FILTER_PLACEHOLDER}" /></label></li>
-                <!-- END search_options -->
+
+            <form action="/adminv2/reportsForm.php" method="POST">
                 <input type="hidden" readonly="readonly" name="bounce" value="{RETURN}" />
-                <input class="submit-btn-plain" id="filtersubmit" type="submit" value="Filter" />
-                </ul>
+
+                <dl class="row">
+                    <!-- BEGIN search_options -->
+                    <dd class="column medium-4 end">
+                        <label for="{FILTER_ID}">
+                            {FILTER_NAME}
+                            <input id="{FILTER_ID}" name="{FILTER_ID}" type="text" value="{FILTER_VALUE}" placeholder="{FILTER_PLACEHOLDER}" />
+                        </label>
+                    </dd>
+                    <!-- END search_options -->
+                </dl>
+
+                <input id="filtersubmit" type="submit" value="Filter" />
             </form>
         </div>
         <!-- END filter -->
         <!-- BEGIN result_table -->
-        <div class="level last clearfix">
-            <h3>{REPORT_TITLE}<!-- BEGIN count -->: {COUNTABLE_COUNT} {COUNTABLE}<!-- END count --></h3>
+        <div>
             <!-- BEGIN download_report -->
-            <span class="header_option">
-                <a href="/adminv2/reports/{REPORT_FILTER}exportToCSV" class="btn download"><span></span>Download Report</a>
+            <span class="header-actions">
+                <a href="/adminv2/reports/{REPORT_FILTER}exportToCSV" class="button icon-download">Download Report</a>
             </span>
             <!-- END download_report -->
+
+            <h3>{REPORT_TITLE}<!-- BEGIN count -->: {COUNTABLE_COUNT} {COUNTABLE}<!-- END count --></h3>
+
             <!-- BEGIN result -->
-            <div class="{RESULT_CLASS}" id="report-result">
-                {RESULT}
-            </div>
+            {RESULT}
             <!-- END result -->
 
-			<ul class="admin-nav foot">
-				<!-- BEGIN previous_button -->
-				<li><a class="prev" href="/adminv2/reports/{PREVIOUS_PAGE}">&lsaquo; Prev</a></li>
-				<!-- END previous_button -->
+            <ul class="pagination">
+                <!-- BEGIN previous_button -->
+                <li class="arrow">
+                    <a href="/adminv2/reports/{PREVIOUS_PAGE}">&lsaquo;</a>
+                </li>
+                <!-- END previous_button -->
 
-				<!-- BEGIN first_page -->
-				<li><a href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a></li>
-				<li>&hellip;</li>
-				<!-- END first_page -->
+                <!-- BEGIN first_page -->
+                <li>
+                    <a href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a>
+                </li>
+                <li class="unavailable"><a>&hellip;</a></li>
+                <!-- END first_page -->
 
-				<!-- BEGIN page_number -->
-				<li><a class="{CURRENT}" href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a></li>
-				<!-- END page_number -->
+                <!-- BEGIN page_number -->
+                <li class="{CURRENT}">
+                    <a href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a>
+                </li>
+                <!-- END page_number -->
 
-				<!-- BEGIN last_page -->
-				<li>&hellip;</li>
-				<li><a href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a></li>
-				<!-- END last_page -->
+                <!-- BEGIN last_page -->
+                <li class="unavailable"><a>&hellip;</a></li>
+                <li>
+                    <a href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a>
+                </li>
+                <!-- END last_page -->
 
-				<!-- BEGIN next_button -->
-				<li><a class="next" href="/adminv2/reports/{NEXT_PAGE}">Next &rsaquo;</a></li>
-				<!-- END next_button -->
-			</ul>
+                <!-- BEGIN next_button -->
+                <li class="arrow">
+                    <a href="/adminv2/reports/{NEXT_PAGE}">&rsaquo;</a>
+                </li>
+                <!-- END next_button -->
+            </ul>
         </div>
         <!-- END result_table -->
     </div>
