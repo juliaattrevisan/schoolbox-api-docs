@@ -136,102 +136,109 @@
 </script>
 <!-- END custom_head -->
 
-<h1>Schoolbox Administration</h1>
+<div class="row">
+    <div class="large-12 columns">
+        <h1>Schoolbox Administration</h1>
 
-<dl class="sub-nav">
-    <!-- BEGIN admin_nav_item -->
-    <dd class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></dd>
-    <!-- END admin_nav_item -->
-</dl>
-
-<h2>Submission Grades and Groupings</h2>
-
-<form method="POST" action="/adminv2/gradesForm.php" data-action="saveGradeLevels">
-    <div class="small-12 medium-6 columns">
-        <h3>Guide</h3>
-        <dl>
-            <dt>Creating Grades</dt>
-            <dd>
-                Type into empty fields to create a new grade grouping,
-                or a new grade level for an existing grouping.
-            </dd>
-            <dd>
-                Once grades or groupings have been created, they cannot be removed;
-                they can be renamed, but ensure that if you do that you rename them to something semantically
-                equivalent, since it will affect all marks already given.
-            </dd>
-        </dl>
-
-        <h3>Glossary</h3>
-        <dl>
-            <dt>Lower Bound</dt>
-            <dd>
-                This value is used for the purpose of displaying a grade average for a student or assessment.
-                The caption with the highest lower bound above the average grade will be displayed.
-            </dd>
-            <dt>Normalised Grade</dt>
-            <dd>
-                The value (out of 100) that will be used for grade average calculations
-                for an assessment that you give this grade.
-            </dd>
-            <dd>
-                This value should be greater than (not equal to) the lower bound, and less than
-                (not equal to) the next highest lower bound.
-            </dd>
+        <dl class="sub-nav">
+            <!-- BEGIN admin_nav_item -->
+            <dd class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></dd>
+            <!-- END admin_nav_item -->
         </dl>
     </div>
-    <div class="small-12 medium-6 columns">
-        <div data-role="gradeGroupList">
-            <!-- BEGIN submission_grade_group -->
-            <div data-role="gradeGroup" data-groupid="{SUBMISSION_GRADE_GROUP_ID}">
-                <input type="hidden"
-                       name="group[{SUBMISSION_GRADE_GROUP_ID}][id]"
-                       value="{SUBMISSION_GRADE_GROUP_ID}"
-                />
-                <input type="text"
-                       name="group[{SUBMISSION_GRADE_GROUP_ID}][name]"
-                       value="{SUBMISSION_GRADE_GROUP_NAME}"
-                       placeholder="Grouping Name"
-                />
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Lower Bound</th>
-                        <th>Normalised Grade</th>
-                        <th>Caption</th>
-                    </tr>
-                    </thead>
-                    <tbody data-role="gradeList">
-                    <!-- BEGIN submission_grade -->
-                    <tr data-gradeid="{SUBMISSION_GRADE_ID}">
-                        <td>
-                            <input type="text"
-                                   name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][lower_bound]"
-                                   value="{SUBMISSION_GRADE_LOWER_BOUND}"
-                                   placeholder="Lower Bound"
-                                    />
-                        </td>
-                        <td>
-                            <input type="text"
-                                   name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][raw_grade]"
-                                   value="{SUBMISSION_GRADE_RAW_GRADE}"
-                                   placeholder="Normalised Grade"
-                                    />
-                        </td>
-                        <td>
-                            <input type="text"
-                                   name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][caption]"
-                                   value="{SUBMISSION_GRADE_CAPTION}"
-                                   placeholder="Caption"
-                                    />
-                        </td>
-                    </tr>
-                    <!-- END submission_grade -->
-                    </tbody>
-                </table>
-            </div>
-            <!-- END submission_grade_group -->
+</div>
+
+<div class="row">
+    <div class="large-12 columns">
+        <h2>Submission Grades and Groupings</h2>
+    </div>
+    <form method="POST" action="/adminv2/gradesForm.php" data-action="saveGradeLevels">
+        <div class="small-12 medium-6 columns">
+            <h3>Guide</h3>
+            <dl>
+                <dt>Creating Grades</dt>
+                <dd>
+                    Type into empty fields to create a new grade grouping,
+                    or a new grade level for an existing grouping.
+                </dd>
+                <dd>
+                    Once grades or groupings have been created, they cannot be removed;
+                    they can be renamed, but ensure that if you do that you rename them to something semantically
+                    equivalent, since it will affect all marks already given.
+                </dd>
+            </dl>
+
+            <h3>Glossary</h3>
+            <dl>
+                <dt>Lower Bound</dt>
+                <dd>
+                    This value is used for the purpose of displaying a grade average for a student or assessment.
+                    The caption with the highest lower bound above the average grade will be displayed.
+                </dd>
+                <dt>Normalised Grade</dt>
+                <dd>
+                    The value (out of 100) that will be used for grade average calculations
+                    for an assessment that you give this grade.
+                </dd>
+                <dd>
+                    This value should be greater than (not equal to) the lower bound, and less than
+                    (not equal to) the next highest lower bound.
+                </dd>
+            </dl>
         </div>
-        <input type="submit" value="Save changes" />
-    </div>
-</form>
+        <div class="small-12 medium-6 columns">
+            <div data-role="gradeGroupList">
+                <!-- BEGIN submission_grade_group -->
+                <div data-role="gradeGroup" data-groupid="{SUBMISSION_GRADE_GROUP_ID}">
+                    <input type="hidden"
+                           name="group[{SUBMISSION_GRADE_GROUP_ID}][id]"
+                           value="{SUBMISSION_GRADE_GROUP_ID}"
+                    />
+                    <input type="text"
+                           name="group[{SUBMISSION_GRADE_GROUP_ID}][name]"
+                           value="{SUBMISSION_GRADE_GROUP_NAME}"
+                           placeholder="Grouping Name"
+                    />
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Lower Bound</th>
+                            <th>Normalised Grade</th>
+                            <th>Caption</th>
+                        </tr>
+                        </thead>
+                        <tbody data-role="gradeList">
+                        <!-- BEGIN submission_grade -->
+                        <tr data-gradeid="{SUBMISSION_GRADE_ID}">
+                            <td>
+                                <input type="text"
+                                       name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][lower_bound]"
+                                       value="{SUBMISSION_GRADE_LOWER_BOUND}"
+                                       placeholder="Lower Bound"
+                                        />
+                            </td>
+                            <td>
+                                <input type="text"
+                                       name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][raw_grade]"
+                                       value="{SUBMISSION_GRADE_RAW_GRADE}"
+                                       placeholder="Normalised Grade"
+                                        />
+                            </td>
+                            <td>
+                                <input type="text"
+                                       name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][caption]"
+                                       value="{SUBMISSION_GRADE_CAPTION}"
+                                       placeholder="Caption"
+                                        />
+                            </td>
+                        </tr>
+                        <!-- END submission_grade -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- END submission_grade_group -->
+            </div>
+            <input type="submit" value="Save changes" />
+        </div>
+    </form>
+</div>
