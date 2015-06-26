@@ -41,6 +41,7 @@ class Bulk_Category extends Bulk_Abstract
     public function addCategories()
     {
         $categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
+        $homepageConfigMapper = new \Schoolbox\Resource\HomepageConfigMapper();
 
         /* List of outcomes
 		 */
@@ -128,6 +129,12 @@ class Bulk_Category extends Bulk_Abstract
                     }
 
                     $categoryMapper->save($newFolder);
+
+                    // Save the homepage contents
+                    if ($this->getTemplateID()) {
+                        $homepageConfigMapper->save($homepageConfig);
+                        $homepageConfigMapper->resetToTemplate($homepageConfig);
+                    }
 
                     /* Save roles
                      */
