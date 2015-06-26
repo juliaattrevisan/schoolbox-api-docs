@@ -69,7 +69,7 @@ class Facade
             header('Location: '.$loader->render());
             exit;
         }
-        catch (Expception $e) {
+        catch (Exception $e) {
             echo "Error encountered: ".$e->getMessage();
         }
     }
