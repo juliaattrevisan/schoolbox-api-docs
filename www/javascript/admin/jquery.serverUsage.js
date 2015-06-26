@@ -66,9 +66,19 @@
 
             /* Work out colour transitions
              */
+            var allTemp = [];
+
             for (var i = 0; i < merged.series[0].data.length; i++) {
-                merged.colors.push(getSteppedHexColor(merged.series[0].data[i]));
+                var temp = {
+                    color: getSteppedHexColor(merged.series[0].data[i]),
+                    y: merged.series[0].data[i]
+                }
+
+                allTemp.push(temp);
+
             }
+
+            merged.series[0].data = allTemp;
 
             return merged;
         }
