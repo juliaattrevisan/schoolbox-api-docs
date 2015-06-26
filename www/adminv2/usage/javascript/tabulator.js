@@ -170,7 +170,7 @@
 			/* Previous Navigator
 			 */
 			if (config.index > 0) {
-				pagination += '<li><a href="#" rel="' + (config.index-1) +'">Previous</a></li>';
+				pagination += '<li><a href="#" rel="' + (config.index-1) +'">&lsaqo;</a></li>';
 			}
 
 			/* Page Navigator
@@ -188,7 +188,7 @@
 			/* Next Navigator
 			 */
 			if (config.index+1 < numPages) {
-				pagination += '<li><a href="#" rel="' + (config.index+1) +'">Next</a></li>';
+				pagination += '<li><a href="#" rel="' + (config.index+1) +'">&rsaquo;</a></li>';
 			}
 
 			return pagination;
