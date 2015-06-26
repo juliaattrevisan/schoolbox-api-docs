@@ -1,19 +1,18 @@
-<div class="directory staff">
-    <table class="sort-it table ruler" width="100%">
-        <thead>
+<table>
+    <thead>
         <tr>
-            <th width="45px">Title</th>
-            <th width="" class="{SORT_FIRSTNAME}"><a href="/adminv2/reports/{SORT_BASE}/firstname/{SORT_FIRSTNAME_DIR}">First name</a></th>
-            <th width="" class="{SORT_LASTNAME}"><a href="/adminv2/reports/{SORT_BASE}/lastname/{SORT_LASTNAME_DIR}">Surname</a></th>
-            <th width="" class="{SORT_USERNAME}"><a href="/adminv2/reports/{SORT_BASE}/username/{SORT_USERNAME_DIR}">Username</a></th>
-            <th width="" class="{SORT_SYNERGY_ID}"><a href="/adminv2/reports/{SORT_BASE}/synergy_id/{SORT_SYNERGY_ID_DIR}">External ID</a></th>
-            <th width="" class="{SORT_CAMPUS}"><a href="/adminv2/reports/{SORT_BASE}/campus/{SORT_CAMPUS_DIR}">Campus</a></th>
-            <th width="" class="{SORT_YEAR}"><a href="/adminv2/reports/{SORT_BASE}/year/{SORT_YEAR_DIR}">Year</a></th>
-            <th width="" class="{SORT_ALT_EMAIL}"><a href="/adminv2/reports/{SORT_BASE}/alt_email/{SORT_ALT_EMAIL_DIR}">Email</a></th>
-            <th width="27px"></th>
+            <th>Title</th>
+            <th><a href="/adminv2/reports/{SORT_BASE}/firstname/{SORT_FIRSTNAME_DIR}">First name</a></th>
+            <th><a href="/adminv2/reports/{SORT_BASE}/lastname/{SORT_LASTNAME_DIR}">Surname</a></th>
+            <th><a href="/adminv2/reports/{SORT_BASE}/username/{SORT_USERNAME_DIR}">Username</a></th>
+            <th><a href="/adminv2/reports/{SORT_BASE}/synergy_id/{SORT_SYNERGY_ID_DIR}">External ID</a></th>
+            <th><a href="/adminv2/reports/{SORT_BASE}/campus/{SORT_CAMPUS_DIR}">Campus</a></th>
+            <th><a href="/adminv2/reports/{SORT_BASE}/year/{SORT_YEAR_DIR}">Year</a></th>
+            <th><a href="/adminv2/reports/{SORT_BASE}/alt_email/{SORT_ALT_EMAIL_DIR}">Email</a></th>
+            <th></th>
         </tr>
-        </thead>
-        <tbody>
+    </thead>
+    <tbody>
         <!-- BEGIN user -->
         <tr>
             <td>{USER_TITLE}</td>
@@ -25,14 +24,11 @@
             <td>{USER_YEAR}</td>
             <td>{USER_EMAIL}</td>
             <td>
-                <div class="actions search-functions clearfix">
-                    <!-- BEGIN modify -->
-                    <a href="/adminv2/modify-user/{UID}" class="button icon-modify no-text" title="Modify User"><span></span></a>
-                    <!-- END modify -->
-                </div>
+                <!-- BEGIN modify -->
+                <a href="/adminv2/modify-user/{UID}" class="icon-modify no-text" title="Modify User"></a>
+                <!-- END modify -->
             </td>
         </tr>
         <!-- END user -->
-        </tbody>
-    </table>
-</div>
+    </tbody>
+</table>
