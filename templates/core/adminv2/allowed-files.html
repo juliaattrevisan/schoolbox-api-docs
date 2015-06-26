@@ -188,46 +188,46 @@
     <ul class="allowed-files information-list">
         <!-- BEGIN file -->
         <li class="row-holder">
-            <div class="row">
-                <div class="column small-1 one-column">
-                    <img src="/images/mime/60x60/{FILE_ICON}"/>
-                </div>
-                <div class="column small-9 medium-10 nine-column">
-                    <div class="row">
-                        <div class="column medium-5">
-                            <h3>{FILE_DESC}
-                                <!-- BEGIN enabled -->
-                                <span class="label alert">Disabled</span>
-                                <!-- END enabled -->
-                            </h3>
+            <form id="allowed-file{FILE_ID}" method="post" action="/adminv2/allowed-fileForm.php">
+                <div class="row">
+                    <div class="column small-1 one-column">
+                        <img src="/images/mime/60x60/{FILE_ICON}"/>
+                    </div>
+                    <div class="column small-9 medium-10 nine-column">
+                        <div class="row">
+                            <div class="column medium-5">
+                                <h3>{FILE_DESC}
+                                    <!-- BEGIN enabled -->
+                                    <span class="label alert">Disabled</span>
+                                    <!-- END enabled -->
+                                </h3>
+                            </div>
+                            <div class="column small-12 medium-3">
+                                <p>{FILE_MIME}</p>
+                            </div>
+                            <div class="column small-6 medium-2">
+                                <p>{FILE_MAXSIZE}</p>
+                            </div>
+                            <div class="column small-6 medium-2">
+                                <p>{FILE_INLINE}</p>
+                            </div>
                         </div>
-                        <div class="column small-12 medium-3">
-                            <p>{FILE_MIME}</p>
-                        </div>
-                        <div class="column small-6 medium-2">
-                            <p>{FILE_MAXSIZE}</p>
-                        </div>
-                        <div class="column small-6 medium-2">
-                            <p>{FILE_INLINE}</p>
+                        <div class="row">
+                            <div class="column twelve">
+                                <dl>
+                                    <!-- BEGIN file_extension -->
+                                    <dd class="label">{FILE_EXTENSION}</dd>
+                                    <!-- END file_extension -->
+                                </dl>
+                            </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="column twelve">
-                            <dl>
-                                <!-- BEGIN file_extension -->
-                                <dd class="label">{FILE_EXTENSION}</dd>
-                                <!-- END file_extension -->
-                            </dl>
-                        </div>
+                    <div class="column small-2 medium-1 two-column actions">
+                        <a href="#" data-interaction-modify class="no-text icon-modify" title="Modify"></a>
                     </div>
                 </div>
-                <div class="column small-2 medium-1 two-column actions">
-                    <a href="#" data-interaction-modify class="no-text icon-modify" title="Modify"></a>
-                </div>
-            </div>
-            <div style="display:none;" class="panel no-pad" data-interaction-inline-form>
+                <div style="display:none;" class="panel no-pad" data-interaction-inline-form>
                 <!--/adminv2/allowed-fileForm.php-->
-                <form id="allowed-file{FILE_ID}" method="post" action="/adminv2/allowed-fileForm.php">
                     <h3>Modify file type</h3>
                     <input type="hidden" readonly="readonly" name="fileTypeId" value="{FILE_ID}"/>
                     <div class="row">
@@ -292,8 +292,8 @@
                             <a href="#" class="button delete no-text icon-delete" title="Delete"></a>
                         </div>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </li>
         <!-- END file -->
     </ul>
