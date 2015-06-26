@@ -3,6 +3,12 @@
     $(function() {
         var form = $('form[data-action="saveRubricResults"]');
 
+        /**
+         * Validator and revert link
+         *
+         * Validator should be handled by validate plugin, if at all
+         * Revert link should be removed
+         */
         form.on('change', '[data-role="rubricList"] input', function(e) {
             var self = $(this);
             var anchor = self.siblings('a').first();
@@ -17,6 +23,12 @@
                 self.parent('li').removeClass('err');
             }
         });
+
+        /**
+         * Revert rubric back to what it was
+         *
+         * Remove: no other form does this
+         */
         form.on('click', '[data-role="rubricList"] li a:not(.btn)', function(e) {
             var self = $(this);
             var input = self.siblings('input').first();
@@ -25,6 +37,8 @@
             self.addClass('hidden');
             e.preventDefault();
         });
+
+
         form.on('change', '[data-role="rubricList"] li.new-item input', function(e) {
             var self = $(this);
             var li = self.parent('li');
@@ -38,67 +52,67 @@
             li.parent('ul').append(newli);
             newli.find(':input:visible:first').focus();
         });
-        form.on('click', '#add-set', function(e) {
-            e.preventDefault();
-        });
-        form.on('click', '#save-changes', function(e) {
-            var valid = true;
-            var method = form.attr('method');
-            var action = form.attr('action');
-
-            var frmdata = {};
-            var ii = 0;
-            var j = 0;
-            form.find('input').each(function() {
-                var self = $(this);
-
-                if(!self.hasClass('nullable')) {
-                    if(self.val() == '') {
-                        valid = false;
-                        return valid;
-                    }
-                }
-
-                var i = self.parents('ul').first().parent('li').index();
-                if(i != ii) {
-                    j = 0;
-                }
-                ii = i;
-
-                // if blank, just leave it
-                if(self.val() != '') {
-                    if(frmdata[i] === undefined) {
-                        frmdata[i] = {};
-                    }
-                    frmdata[i][j] = self.val();
-                    ++j;
-                }
-            });
-
-            if(valid) {
-                // console.log(frmdata);
-                $.ajax({
-                    async: false,
-                    url: action,
-                    type: method,
-                    data: {
-                        'action': 'set',
-                        'items': frmdata
-                    },
-                    success: function(data) {
-                        // console.log('success '+data);
-                    },
-                    failure: function(data) {
-                        // console.log('le fail '+data);
-                        e.preventDefault();
-                    }
-                });
-            }
-            else {
-                e.preventDefault();
-                $('#err-expl').css('display', 'block');
-            }
-        });
+//        form.on('click', '#add-set', function(e) {
+//            e.preventDefault();
+//        });
+//        form.on('click', '#save-changes', function(e) {
+//            var valid = true;
+//            var method = form.attr('method');
+//            var action = form.attr('action');
+//
+//            var frmdata = {};
+//            var ii = 0;
+//            var j = 0;
+//            form.find('input').each(function() {
+//                var self = $(this);
+//
+//                if(!self.hasClass('nullable')) {
+//                    if(self.val() == '') {
+//                        valid = false;
+//                        return valid;
+//                    }
+//                }
+//
+//                var i = self.parents('ul').first().parent('li').index();
+//                if(i != ii) {
+//                    j = 0;
+//                }
+//                ii = i;
+//
+//                // if blank, just leave it
+//                if(self.val() != '') {
+//                    if(frmdata[i] === undefined) {
+//                        frmdata[i] = {};
+//                    }
+//                    frmdata[i][j] = self.val();
+//                    ++j;
+//                }
+//            });
+//
+//            if(valid) {
+//                // console.log(frmdata);
+//                $.ajax({
+//                    async: false,
+//                    url: action,
+//                    type: method,
+//                    data: {
+//                        'action': 'set',
+//                        'items': frmdata
+//                    },
+//                    success: function(data) {
+//                        // console.log('success '+data);
+//                    },
+//                    failure: function(data) {
+//                        // console.log('le fail '+data);
+//                        e.preventDefault();
+//                    }
+//                });
+//            }
+//            else {
+//                e.preventDefault();
+//                $('#err-expl').css('display', 'block');
+//            }
+//        });
     });
 </script>
 <!-- END custom_head -->
@@ -128,20 +142,22 @@
                     <li>
                         <code>{RR_VALUE}</code> &rsaquo;
                         <input type="text" value="{RR_SANE_LABEL}" />
+                        <!--
                         <a class="hidden" data-label="{RR_SANE_LABEL}" href="#">revert to '{RR_LABEL}'</a>
+                        -->
                     </li>
                     <!-- END list_item -->
-                    <li class="new-item">
+                    <li class="new-item" data-role="newRubricResult">
                         <code class="prompt">&nbsp;</code> &rsaquo;
                         <input class="nullable" type="text" value="" />
                     </li>
                 </ul>
             </li>
             <!-- END list -->
-            <li>
+            <li data-role="newRubricSet">
                 <p>New set...</p>
                 <ul>
-                    <li class="new-item">
+                    <li class="new-item" data-role="newRubricResult">
                         <code class="prompt">&nbsp;</code> &rsaquo;
                         <input class="nullable" type="text" value="" />
                     </li>
