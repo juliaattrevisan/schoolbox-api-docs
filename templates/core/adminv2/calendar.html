@@ -69,7 +69,7 @@ $(function() {
     });
 
 	/* date picker */
-	$('#start_date, #finish_date').datepicker({
+	$('[data-date=start_date], [data-date=finish_date]').datepicker({
 		constrainInput: false,
 		onClose: function (string) {
 			var input = $(this);
@@ -79,7 +79,9 @@ $(function() {
 		}
 	});
 
-	$('#start_date').syncDates({endDate: $('#finish_date')});
+	$('[data-date=start_date]').syncDates({
+        endDate: $('[data-date=finish_date]')
+    });
 });
 </script>
 <!-- END custom_head-->
@@ -211,13 +213,13 @@ $(function() {
             <div class="medium-6 columns">
                 <label>
                     From
-                    <input type="text" id='start_date' name="cleanupFrom" value="{CLEANUP_HAS_DATES_FROM}" />
+                    <input type="text" data-date='start_date' name="cleanupFrom" value="{CLEANUP_HAS_DATES_FROM}" />
                 </label>
             </div>
             <div class="medium-6 columns">
                 <label>
                     Until
-                    <input type="text" id='finish_date' name="cleanupTo" size="15" maxlength="30" value="{CLEANUP_HAS_DATES_TO}" />
+                    <input type="text" data-date='finish_date' name="cleanupTo" size="15" maxlength="30" value="{CLEANUP_HAS_DATES_TO}" />
                 </label>
             </div>
             <div class="large-12 columns">
