@@ -97,7 +97,7 @@
         "0x46616c6b/etherpad-lite-client": "dev-schoolbox-14.0-dep as dev-master",
         "easyrdf/easyrdf": "~0.8.0",
         "caxy/php-htmldiff": "dev-master",
-        "imagine/imagine": "dev-0.6.2+resize-animated-gif+image-convolution+crop-animated-gif as 0.6.2",
+        "imagine/imagine": "dev-0.6.2-patches",
         "jenssegers/date": "~2.0.15",
         "mpratt/embera": "~1.8.6"
     },
