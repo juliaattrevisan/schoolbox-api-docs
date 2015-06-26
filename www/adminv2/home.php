@@ -60,16 +60,16 @@ if(Cfg::get('external_enable')) {
     $external_ping = new External_Ping();
     if ($external_ping->isResponsive()) {
         $db = array('EXTERNAL_DB'   => ucfirst(Cfg::get('external_type')),
-                    'EXTERNAL_DB_LIGHT' => 'on',
+                    'EXTERNAL_DB_LIGHT' => 'success',
                     'EXTERNAL_DB_STATUS' => 'Online',);
     } else {
         $db = array('EXTERNAL_DB'   => ucfirst(Cfg::get('external_type')),
-                    'EXTERNAL_DB_LIGHT' => '',
+                    'EXTERNAL_DB_LIGHT' => 'alert',
                     'EXTERNAL_DB_STATUS' => 'Offline',);
     }
 } else {
     $db = array('EXTERNAL_DB'   => ucfirst(Cfg::get('external_type')),
-            'EXTERNAL_DB_LIGHT' => '',
+            'EXTERNAL_DB_LIGHT' => 'alert',
             'EXTERNAL_DB_STATUS' => 'Disabled',);
 }
 $this->setVar($db);
@@ -79,23 +79,23 @@ if(Cfg::get('mail_enable') && Cfg::get('mail_smtp_host')) {
     $socket=socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
     socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, array('sec' => 1, 'usec' => 0));
     if(@socket_connect($socket, Cfg::get('mail_smtp_host'), Cfg::get('mail_smtp_port'))) {
-       $email = array('EMAIL_LIGHT'    => 'on',
+       $email = array('EMAIL_LIGHT'    => 'success',
                        'EMAIL_STATUS'    => 'Online');
     } else {
-       $email = array('EMAIL_LIGHT'    => '',
+       $email = array('EMAIL_LIGHT'    => 'alert',
                       'EMAIL_STATUS'    => 'Offline');
     }
     socket_close($socket);
 } else {
-       $email = array('EMAIL_LIGHT'    => '',
+       $email = array('EMAIL_LIGHT'    => 'alert',
                 'EMAIL_STATUS'    => 'Disabled');
 }
 $this->setVar($email);
 
 /* LDAP server check */
-$ldap1 = array('LDAP_LIGHT'     => '',
+$ldap1 = array('LDAP_LIGHT'     => 'alert',
                 'LDAP_STATUS'    => 'Disabled');
-$ldap2 = array('LDAP_ALT_LIGHT' => '',
+$ldap2 = array('LDAP_ALT_LIGHT' => 'alert',
                 'LDAP_ALT_STATUS'=> 'Disabled');
 if(Cfg::get('ldap_enable')) {
     $tempsession = new Session;
@@ -107,10 +107,10 @@ if(Cfg::get('ldap_enable')) {
         ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
         $ldapbind = @ldap_bind($ds, $tempsession->ldap_escape(Cfg::get('ldap_user')), utf8_encode(Cfg::get('ldap_pass')));
         if($ldapbind) {
-            $ldap1 = array('LDAP_LIGHT'    => 'on',
+            $ldap1 = array('LDAP_LIGHT'    => 'success',
                         'LDAP_STATUS'    => 'Online');
         } else {
-            $ldap1 = array('LDAP_LIGHT'    => '',
+            $ldap1 = array('LDAP_LIGHT'    => 'alert',
                         'LDAP_STATUS'    => 'Offline');
         }
         unset($ds,$ldapbind);
@@ -123,10 +123,10 @@ if(Cfg::get('ldap_enable')) {
         ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
         $ldapbind = @ldap_bind($ds, $tempsession->ldap_escape(Cfg::get('ldap_user_alt')), utf8_encode(Cfg::get('ldap_pass')));
         if($ldapbind) {
-            $ldap2 = array('LDAP_ALT_LIGHT'    => 'on',
+            $ldap2 = array('LDAP_ALT_LIGHT'    => 'success',
                         'LDAP_ALT_STATUS'    => 'Online');
         } else {
-            $ldap2 = array('LDAP_ALT_LIGHT'    => '',
+            $ldap2 = array('LDAP_ALT_LIGHT'    => 'alert',
                         'LDAP_ALT_STATUS'    => 'Offline');
         }
         unset($ds,$ldapbind);
@@ -143,16 +143,16 @@ if(in_array('nojscript', $this->arg)) {
 
     $context = \Proxy\Server::getInstance()->getContext();
     if(@file_get_contents('http://schoolbox.com.au/schoolboxinstaller/status.html', null, $context)) {
-        $www = array('WWW_LIGHT'  => 'on',
+        $www = array('WWW_LIGHT'  => 'success',
                     'WWW_STATUS' => 'Available'
         );
     } else {
-        $www = array('WWW_LIGHT'  => '',
+        $www = array('WWW_LIGHT'  => 'alert',
                     'WWW_STATUS' => 'Inaccessible');
     }
 
 } else {
-    $www = array('WWW_LIGHT'  => '',
+    $www = array('WWW_LIGHT'  => 'warning',
                  'WWW_STATUS' => 'Not Tested');
 }
 $this->setVar($www);

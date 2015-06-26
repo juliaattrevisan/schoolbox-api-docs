@@ -1,15 +1,173 @@
-<!-- BEGIN custom_head -->
+<h1>Schoolbox Administration</h1>
+
+<dl class="sub-nav">
+    <!-- BEGIN admin_nav_item -->
+    <dd class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></dd>
+    <!-- END admin_nav_item -->
+</dl>
+
+<div class="row">
+    <h2>Home</h2>
+    <div class="large-4 columns">
+        <h3>Server Usage</h3>
+        <div data-graph="usage"></div>
+
+        <h3>Status of Services</h3>
+        <table>
+            <colgroup>
+                <col />
+                <col width="20%" />
+            </colgroup>
+            <tbody>
+                <tr>
+                    <td>{EXTERNAL_DB}</td>
+                    <td><span class="full-width {EXTERNAL_DB_LIGHT} label">{EXTERNAL_DB_STATUS}</span></td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td><span class="full-width {EMAIL_LIGHT} label">{EMAIL_STATUS}</span></td>
+                </tr>
+                <tr>
+                    <td>LDAP Primary</td>
+                    <td><span class="full-width {LDAP_LIGHT} label">{LDAP_STATUS}</span></td>
+                </tr>
+                <tr>
+                    <td>LDAP Secondary</td>
+                    <td><span class="full-width {LDAP_ALT_LIGHT} label">{LDAP_ALT_STATUS}</span></td>
+                </tr>
+                <tr>
+                    <td>WWW</td>
+                    <td><span class="full-width {WWW_LIGHT} label" data-light="www">{WWW_STATUS}</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Role statistics</h3>
+        <div class="loading"></div>
+        <table id="group-summary">
+            <colgroup>
+                <col width="50%" />
+                <col width="20%" />
+                <col width="30%" />
+            </colgroup>
+            <thead>
+            <tr>
+                <th>Role</th>
+                <th>Total</th>
+                <th>Logged In</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- BEGIN group_summary -->
+            <tr>
+                <td><a href="/adminv2/reports/group/{GROUP_ID}">{GROUP_NAME}</a></td>
+                <td>{GROUP_USER}</td>
+                <td>{GROUP_LOGGED_IN}</td>
+            </tr>
+            <!-- END group_summary -->
+            </tbody>
+        </table>
+        <!-- BEGIN no_js_warning -->
+        <noscript>
+            <p>
+                It seems your browser either has Javascript disabled, or doesn't support it.</br>
+                You can <a href="/adminv2/home/nojscript">reload the page</a> to see these statistics, but please be patient while they load.
+            </p>
+        </noscript>
+        <!-- END no_js_warning -->
+    </div>
+    <div class="large-8 columns">
+        <span class="header-actions">
+            <a href="/adminv2/reports/login/all" class="button icon-progress">Login Report</a>
+            <a href="/adminv2/reports/activity/all" class="button icon-progress">Activity Report</a>
+        </span>
+
+        <h3>Recent activity</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Action</th>
+                    <th>User</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- BEGIN recent_log -->
+                <tr>
+                    <td>{LOG_DATE}</td>
+                    <td>{LOG_ACTION}</td>
+                    <td>{LOG_NAME}</td>
+                </tr>
+                <!-- END recent_log -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
+<script type="text/javascript" src="/javascript/admin/jquery.serverUsage.js"></script>
 <script type="text/javascript">
+    $(function() {
+        var allCategories = [];
+        var allSeriesData = [];
+        var allTooltips = [];
+        var allData = [];
 
-$(function() {
+        allData.push({
+            label: 'Storage',
+            value: parseFloat('{DISK_PERC}')
+        });
 
+        allTooltips.push('{DISK_USED} / {DISK_TOTAL}');
 
+        <!-- BEGIN memory -->
+        allData.push({
+            label: 'Memory',
+            value: parseFloat('{MEMORY_PERC}')
+        });
+
+        allTooltips.push('{MEMORY_USED} / {MEMORY_TOTAL}');
+        <!-- END memory -->
+
+        for (var i = 0; i < allData.length; i++) {
+            allCategories.push(allData[i].label);
+            allSeriesData.push(allData[i].value);
+        }
+
+        /* Render it out
+         */
+        $('[data-graph="usage"]').serverUsage({
+            title: '',
+            categories: allCategories,
+            tooltip: {
+                enabled: true,
+                formatter: function() {
+                    return allTooltips[this.point.x];
+                }
+            },
+            series: [
+                {
+                    data: allSeriesData
+                }
+            ],
+            formatter: function() {
+                var str = '';
+
+                if (this.y > 0) {
+                    str = this.y + '%';
+                }
+
+                return str;
+            }
+        });
+    });
 
     $(window).load( function() {
         // test that the non-js page has not been requested
         if(window.location.pathname.indexOf("nojscript") == -1) {
             // replace the default www status 'untested' with 'testing'
-            $('#www-light > span').html('Testing...');
+            $('[data-light="www"]').html('Testing...');
 
             // load the user statistics via ajax
             $.post('/ajax/adminStats.php', { module : 'users' }, function(data) {
@@ -17,12 +175,12 @@ $(function() {
                     var row = data[i];
 
                     if(row.GROUP_ID > 0) {
-                        $('<tr><td nowrap="nowrap"><a href="/adminv2/reports/group/' + row.GROUP_ID + '">' + row.GROUP_NAME +
-                           '</a></td><td>' + row.GROUP_USER +
-                           '</td><td>' + row.GROUP_LOGGED_IN + '</td></tr>').appendTo($('#group-summary'));
+                        $('<tr><td><a href="/adminv2/reports/group/' + row.GROUP_ID + '">' + row.GROUP_NAME +
+                                '</a></td><td>' + row.GROUP_USER +
+                                '</td><td>' + row.GROUP_LOGGED_IN + '</td></tr>').appendTo($('#group-summary'));
                     } else {
-                        $('<tr><td nowrap="nowrap"><strong>' + row.GROUP_NAME +
-                                '</strong></td><td>' + row.GROUP_USER +
+                        $('<tr><td>' + row.GROUP_NAME +
+                                '</td><td>' + row.GROUP_USER +
                                 '</td><td>' + row.GROUP_LOGGED_IN + '</td></tr>').appendTo($('#group-summary'));
                     }
                 }
@@ -34,120 +192,10 @@ $(function() {
                     var light = data[i].WWW_LIGHT;
                     var status = data[i].WWW_STATUS;
                 }
-                $('#www-light > span').html(status);
-                $('#www-light').addClass(light);
+                $('[data-light="www"]').html(status);
+                $('[data-light="www"]').removeClass('warning');
+                $('[data-light="www"]').addClass(light);
             });
         }
     });
-});
-
 </script>
-
-<!-- END custom_head-->
-
-<h1>Schoolbox Administration</h1>
-<dl class="sub-nav">
-    <!-- BEGIN admin_nav_item -->
-    <dd class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></dd>
-    <!-- END admin_nav_item -->
-</dl>
-<div class="admin-contents clearfix">
-	<h2>Home</h2>
-	<div class="one-third clearfix">
-		<div class="level">
-			<h3 class="iconify stats">Server stats</h3>
-			<h3>Storage <span class="no-bg">{DISK_USED}/{DISK_TOTAL}</span></h3>
-			<div class="clearfix">
-				<div class="bar-container">
-					<div class="bar">
-						<span class="filled" style="width:{DISK_PERC}%"></span>
-					</div>
-					<span class="amount gradient-{DISK_GRADIENT}">{DISK_PERC}%</span>
-				</div>
-			</div>
-			<!-- BEGIN memory -->
-			<h3>Memory <span class="no-bg">{MEMORY_USED}/{MEMORY_TOTAL}</span></h3>
-			<div class="clearfix">
-				<div class="bar-container">
-					<div class="bar">
-						<span class="filled" style="width:{MEMORY_PERC}%"></span>
-					</div>
-					<span class="amount gradient-{MEMORY_GRADIENT}">{MEMORY_PERC}%</span>
-				</div>
-			</div>
-			<!-- END memory -->
-			<h3>Status of services</h3>
-			<ul class="server-statuses" >
-				<li id="db-light" class="{EXTERNAL_DB_LIGHT} clearfix"><strong>{EXTERNAL_DB}</strong><em><span></span></em><span>{EXTERNAL_DB_STATUS}</span></li>
-				<li id="email-light" class="{EMAIL_LIGHT} clearfix"><strong>Email </strong><em><span></span></em><span>{EMAIL_STATUS}</span></li>
-				<li id="ldap-light" class="{LDAP_LIGHT} clearfix"><strong>LDAP Primary</strong><em><span></span></em><span>{LDAP_STATUS}</span></li>
-				<li id="ldap-alt-light" class="{LDAP_ALT_LIGHT} clearfix"><strong>LDAP Secondary</strong><em><span></span></em><span>{LDAP_ALT_STATUS}</span></li>
-				<li id="www-light" class="{WWW_LIGHT} clearfix"><strong>WWW </strong><em><span></span></em><span>{WWW_STATUS}</span></li>
-			</ul>
-            <div class="loading"></div>
-            <h3>Role statistics</h3>
-			    <table class="logged-in table ruler" id="group-summary">
-                    <colgroup>
-                        <col width="50%" />
-                        <col width="20%" />
-                        <col width="30%" />
-                    </colgroup>
-                    <thead>
-                    <tr>
-                        <th scope="col">Role</th>
-                        <th scope="col">Total</th>
-                        <th scope="col">Logged In</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                        <!-- BEGIN group_summary -->
-                        <tr>
-                            <td nowrap="nowrap"><a href="/adminv2/reports/group/{GROUP_ID}">{GROUP_NAME}</a></td>
-                            <td>{GROUP_USER}</td>
-                            <td>{GROUP_LOGGED_IN}</td>
-                        </tr>
-                        <!-- END group_summary -->
-                    </tbody>
-                </table>
-            <!-- BEGIN no_js_warning -->
-            <noscript>
-                <p>It seems your browser either has Javascript disabled, or doesn't support it.</br>
-                   You can <a href="/adminv2/home/nojscript">reload the page</a> to see these statistics, but please be patient while they load.</p>
-            </noscript>
-            <!-- END no_js_warning -->
-		</div>
-	</div>
-	<div class="two-thirds">
-		<div class="level">
-            <h3 class="iconify">Recent activity</h3>
-            <span class="header_option">
-            <a href="/adminv2/reports/login/all" class="btn"><span></span>Login Report</a>
-            <a href="/adminv2/reports/activity/all" class="btn"><span></span>Activity Report</a>
-            </span>
-            <table class="table ruler">
-				<colgroup>
-					<col width="35%" />
-					<col width="35%" />
-					<col width="30%" />
-				</colgroup>
-				<thead>
-					<tr>
-						<th scope="col">Date</th>
-						<th scope="col">Action</th>
-						<th scope="col">User</th>
-					</tr>
-				</thead>
-				<tbody>
-                                    <!-- BEGIN recent_log -->
-					<tr>
-						<td nowrap="nowrap">{LOG_DATE}</td>
-						<td>{LOG_ACTION}</td>
-						<td>{LOG_NAME}</td>
-					</tr>
-                                        <!-- END recent_log -->
-                </tbody>
-			</table>
-		</div>
-	</div>
-
-</div>
