@@ -112,9 +112,7 @@ class AjaxFlot
         /* Find each segment
 		 */
         foreach ($allData as $currentData) {
-            $result = array();
-            $result['label'] = $currentData['name'];
-            $result['data'] = $this->percentage($currentData['bytes'], $totalBytes);
+            $result = array($currentData['name'], $this->percentage($currentData['bytes'], $totalBytes));
 
             $allResults[] = $result;
         }

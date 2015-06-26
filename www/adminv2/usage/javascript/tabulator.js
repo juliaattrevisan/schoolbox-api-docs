@@ -48,17 +48,15 @@
 		 * Apply sortorder controls
 		 */
 		function applySortorder() {
-			$.each(config.element.find('a.control'), function(index, element) {
+			$.each(config.element.find('[data-control]'), function(index, element) {
 				$(element).click(function(event) {
 					event.preventDefault();
+                    var order = 'ASC';
 
 					/* Toggle ordering upon click
 					 */
 					if (config.order == 'ASC') {
-						var order = 'DESC';
-					}
-					else {
-						var order = 'ASC';
+						order = 'DESC';
 					}
 
 					config.element.usageTabulator({
@@ -134,7 +132,7 @@
 			/* Asc/desc indicator arrows
 			 */
 			if (currentColumn == config.orderBy) {
-				var indicator = config.ascendingHtml;
+				indicator = config.ascendingHtml;
 
 				if (config.order == 'DESC') {
 					indicator = config.descendingHtml;
@@ -156,7 +154,7 @@
 				var current = config.columns[i];
 				var indicator = makeIndicatorArrows(current.column);
 
-				thead += "<th><a href='#' class='control' rel='"+ current.column +"'>"+ current.label + indicator + "</a></th>"
+				thead += "<th><a href='#' data-control rel='"+ current.column +"'>"+ current.label + indicator + "</a></th>"
 			}
 
 			return thead;
@@ -172,25 +170,25 @@
 			/* Previous Navigator
 			 */
 			if (config.index > 0) {
-				pagination += '<li><a href="#" rel="' + (config.index-1) +'">Previous</a></li>';
+				pagination += '<li><a href="#" rel="' + (config.index-1) +'">&lsaqo;</a></li>';
 			}
 
 			/* Page Navigator
 			 */
 			for (var i = 0; i < numPages; i++) {
-				var current = '';
+				var active = '';
 
 				if (i == config.index) {
-					var current = 'current';
+					var active = 'active';
 				}
 
-				pagination += '<li><a href="#" class="' + current + '" rel="' + i +'">' + (i+1) + '</a></li>';
+				pagination += '<li class="' + active + '" ><a href="#" rel="' + i +'">' + (i+1) + '</a></li>';
 			}
 
 			/* Next Navigator
 			 */
 			if (config.index+1 < numPages) {
-				pagination += '<li><a href="#" rel="' + (config.index+1) +'">Next</a></li>';
+				pagination += '<li><a href="#" rel="' + (config.index+1) +'">&rsaquo;</a></li>';
 			}
 
 			return pagination;
@@ -204,7 +202,7 @@
 		function makeTable(datasets) {
 			var html = '\
 				<h3>{TITLE}</h3>\
-				<table class="table ruler">\
+				<table>\
 					<thead>\
 						{THEAD}\
 					</thead>\
@@ -212,18 +210,17 @@
 					{CONTENTS}\
 					</tbody>\
 				</table>\
-				<ul class="foot admin-nav">\
+				<ul class="pagination">\
 					{PAGINATION}\
 				</ul>\
-				<div class="clearfix"></div>\
 			';
 
 			/* Table, table heading and paginator
 			 */
-			var html = html.replace('{TITLE}', config.title);
-			var html = html.replace('{CONTENTS}', datasets);
-			var html = html.replace('{THEAD}', makeTableHeadings());
-			var html = html.replace('{PAGINATION}', makePagination());
+			html = html.replace('{TITLE}', config.title);
+			html = html.replace('{CONTENTS}', datasets);
+			html = html.replace('{THEAD}', makeTableHeadings());
+			html = html.replace('{PAGINATION}', makePagination());
 
 			config.element.html(html);
 

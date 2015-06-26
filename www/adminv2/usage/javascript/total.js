@@ -6,63 +6,68 @@
 	 * @param options
 	 */
 	$.fn.usageTotal = function(options) {
-		var config = init(this, options);
+		var config = init(options, this);
 
-		plot();
+		graph();
 
-		/**
-		 * Init
-		 *
-		 * @param element
-		 * @param options
-		 * @returns {*}
-		 */
-		function init(element, options) {
-			var defaults = {
-				url: '',
-				title: ''
-			}
+        /**
+         * Init
+         *
+         * @param options
+         * @param element
+         * @returns {*}
+         */
+        function init(options, element) {console.log(options);
+            var defaults = {
+                element: element,
 
-			var derived = {
-				element: element
-			}
+                /* Graph title
+                 */
+                title: '',
 
-			var merged = $.extend(defaults, derived, options);
+                /* The ajax url
+                 */
+                url: ''
+            }
 
-			return merged;
-		}
+            var derived = {
+            }
 
-		/**
-		 * Plot graph
-		 */
-		function plot() {
-			$.ajax({
-				url: config.url,
-				method: 'GET',
-				dataType: 'json',
-				success: function(datasets) {
+            var merged = $.extend(defaults, derived, options);
 
-					/* Remove loader
-					 */
-					config.element.removeClass('loader');
+            return merged;
+        }
 
-					/* Use flot format to generate different bar graph
-					 * after all
-					 */
-					var used = datasets[0].data;
-					var total = datasets[1].data + used;
-					var percentage = Math.round(100*used/total).toString();
+        /**
+         * Graph it
+         */
+        function graph() {
+            $.ajax({
+                url: config.url,
+                method: 'GET',
+                dataType: 'json',
+                success: function(datasets) {
 
-					var html = $('<div><h3></h3><p class="amount"></p></div>');
-					html.find('h3').text(config.title);
-					html.find('.amount')
-						.text($.fn.formatBytes(used) + ' / ' + $.fn.formatBytes(total))
-						.after($.fn.bargraph(percentage));
+                    /* Remove loader
+                     */
+                    config.element.removeClass('loader');
 
-					config.element.html(html);
-				}
-			});
-		}
+                    /* Progress bars
+                     */
+                    var used = datasets[0].data;
+                    var total = datasets[1].data + used;
+                    var percentage = Math.round(100*used/total).toString();
+
+                    var html = $('<div><h3></h3><p></p></div>');
+                    html.find('h3').text(config.title);
+                    html.find('p')
+                        .text($.fn.formatBytes(used) + ' / ' + $.fn.formatBytes(total))
+                        .after($.fn.bargraph(percentage));
+
+                    config.element.html(html);
+                }
+            });
+        }
 	}
 
 	/**
