@@ -41,9 +41,15 @@ class Library_Splash {
         $page->setFile(TEMPLATE_content, "modules/library/{$this->getTemplateFile()}.html");
         $page->setBlock(TEMPLATE_content, 'image', 'image_block');
 
-        foreach($this->vars as $token => $textID) {
-            $box = $this->getTextboxMapper()->findById($textID);
-            $page->setVar($token, Scrub::html($box->getBody()));
+        foreach ($this->vars as $token => $textID) {
+            try {
+                $box = $this->getTextboxMapper()->findById($textID);
+                $page->setVar($token, Scrub::html($box->getBody()));
+            } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+                $page->setVar($token, Scrub::html($e->getDeletedObject()->getBody()));
+            } catch (\Exception $e) {
+                $page->setVar($token, '');
+            }
         }
 
         $allFiles = $this->getFileMapper()->findForFolders([ $this->getCategoryID() ], array('filter' => array('image')));
