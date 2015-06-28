@@ -10,6 +10,9 @@
 namespace Calendar\Event\Type\ResourceBooking\Renderer;
 
 use Calendar\Event\Type\VObjectBase;
+use DateInterval;
+use DateTime;
+use DateTimeZone;
 
 class VObject extends VObjectBase
 {
