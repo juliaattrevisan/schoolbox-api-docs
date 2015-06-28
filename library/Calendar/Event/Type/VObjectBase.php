@@ -18,7 +18,7 @@ use Sabre\VObject\Property\ICalendar;
 use DateTimeZone;
 use DateInterval;
 use DateTime;
-
+use Sabre\VObject\Component\VEvent;
 
 class VObjectBase extends RendererBase
 {
@@ -46,7 +46,7 @@ class VObjectBase extends RendererBase
         /* Show visible events only, in export
          */
         if ($this->isVisible()) {
-            /** @var Sabre\VObject\Component\Vevent $vevent */
+            /** @var VEvent $vevent */
             $vevent = $this->vcalendar->create('VEVENT');
             // Generate a UID based on $this->getEvent()->getEventId()
             $vevent->add('UID', $this->getEvent()->getEventId() . '/' . $this->getEvent()->getConnectorId());
