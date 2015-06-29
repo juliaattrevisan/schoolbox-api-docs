@@ -774,22 +774,30 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $campusTimetableList = array();
         $result              = array();
         foreach ($this->database->getAll($query) ?: array() as $row) {
+            $timetableDay  = $row['TimetableDay'];
             $timetableCode = $row['TimetableGroup'];
-            if (!array_key_exists($timetableCode, $campusTimetableList)) {
+
+            // Load the campus for this code and day if I haven't tried already
+            if (!isset($campusTimetableList[$timetableCode][$timetableDay])) {
                 try {
-                    $campus                              = \Schoolbox\CampusMapper::getInstance()->findOneByColumn(
+                    $campus = \Schoolbox\CampusMapper::getInstance()->findOneByColumn(
                         'ext_timetable_code',
                         $timetableCode
                     );
-                    $campusTimetableList[$timetableCode] = $this->getTimetableDefinition(null, $campus);
+                    $campusTimetableList[$timetableCode][$timetableDay] = $this->getTimetableDefinition(
+                        null,
+                        $campus,
+                        $timetableDay
+                    );
                 } catch (\Schoolbox\Mapper\Exception $e) {
-                    // No campus found: error out
-                    // TODO: make getTimetableDefinition() accept campus code instead of SB ID
-                    $campusTimetableList[$timetableCode] = null;
+                    // No campus or timetable found: set a blank one
+                    $campusTimetableList[$timetableCode][$timetableDay] = array();
                 }
             }
-            $campusTimetable = $campusTimetableList[$timetableCode];
-            if (!isset($campusTimetable)) {
+
+            // Did I try and get nothing? error out if so
+            $campusTimetable = $campusTimetableList[$timetableCode][$timetableDay];
+            if (empty($campusTimetable)) {
                 continue;
             }
 
