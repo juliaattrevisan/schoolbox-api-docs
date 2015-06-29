@@ -136,41 +136,33 @@
     <div class="large-12 columns">
         <h2>Groups</h2>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Group Name</th>
-                    <th>Access</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- BEGIN user_group -->
-                <tr>
-                    <td>
-                        <a href="/homepage/{USER_GROUP_ID}">{USER_GROUP_NAME}</a>
-                    </td>
-                    <td>
-                        <form action="/adminv2/userForm.php" method="post">
-                            <input type="hidden" name="uid" value="{USERID}" />
-                            <input type="hidden" name="sid" value="{USER_GROUP_ID}" />
-                            <input type="hidden" name="service" value="1" />
-                            <input type="hidden" name="updateGroups" value="1" />
+        <div class="row">
+            <div class="small-7 columns">Group Name</div>
+            <div class="small-4 columns end">Access</div>
+        </div>
 
-                            <select name="type" data-autosubmit>
-                                <option value="1" {READ_SELECTED}>Read</option>
-                                <option value="2" {WRITE_SELECTED}>Write</option>
-                                <option value="3" {ADMIN_SELECTED}>Group Admin</option>
-                            </select>
-                        </form>
-                    </td>
-                    <td>
-                        <a class="no-text icon-delete" title="Remove" href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}" ></a>
-                    </td>
-                </tr>
-                <!-- END user_group -->
-            </tbody>
-        </table>
+        <!-- BEGIN user_group -->
+        <div class="row">
+            <div class="small-7 columns"><a href="/homepage/{USER_GROUP_ID}">{USER_GROUP_NAME}</a></div>
+            <div class="small-4 columns">
+                <form action="/adminv2/userForm.php" method="post">
+                    <input type="hidden" name="uid" value="{USERID}" />
+                    <input type="hidden" name="sid" value="{USER_GROUP_ID}" />
+                    <input type="hidden" name="service" value="1" />
+                    <input type="hidden" name="updateGroups" value="1" />
+
+                    <select name="type" data-autosubmit>
+                        <option value="1" {READ_SELECTED}>Read</option>
+                        <option value="2" {WRITE_SELECTED}>Write</option>
+                        <option value="3" {ADMIN_SELECTED}>Group Admin</option>
+                    </select>
+                </form>
+            </div>
+            <div class="small-1 columns">
+                <a class="no-text icon-delete" title="Remove" href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}" ></a>
+            </div>
+        </div>
+        <!-- END user_group -->
 
         <div class="row">
             <form action="/adminv2/userForm.php" method="post" id="groupAdd" data-validatable-as="addGroup">
