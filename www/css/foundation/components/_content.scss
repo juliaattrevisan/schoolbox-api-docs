@@ -589,7 +589,7 @@ section{
 	li{
 		border-bottom: 1px solid $silver;
 		position: relative;
-		overflow: auto;
+		overflow: visible;
 		list-style: none;
 		@include single-transition(background-color, 0.3s, ease-in);
 		> &:first-child{
@@ -740,15 +740,6 @@ section{
 	margin: 0;
 	padding: 0 !important;
 	a{
-		@media #{$small-up} {
-			padding: rem-calc(($base-font-size - 8));
-		}
-		@media #{$medium-up} {
-			padding: rem-calc(($base-font-size - 4));
-		}
-		@media #{$large-up} {
-			padding: rem-calc(($base-font-size));
-		}
 		display: inline-block;
 		opacity: 0.3;
 		text-align: center;
@@ -775,6 +766,20 @@ section{
 		@media #{$small-up} { @include grid-column(3); }
 		a{
 			@media #{$small-up} { @include grid-column(4); }
+		}
+	}
+	// Respsonsive Padding
+	&.one a,
+	&.two a,
+	&.three a{
+		@media #{$small-up} {
+			padding: rem-calc(($base-font-size - 8));
+		}
+		@media #{$medium-up} {
+			padding: rem-calc(($base-font-size - 4));
+		}
+		@media #{$large-up} {
+			padding: rem-calc(($base-font-size));
 		}
 	}
 }
