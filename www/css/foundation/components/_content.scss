@@ -495,6 +495,7 @@ table{
 // Labels
 .label{
 	text-transform: uppercase;
+	margin: 0 rem-calc(($base-font-size - 8)) rem-calc(($base-font-size - 8)) 0;
 }
 .submitted {
 	@include label(
