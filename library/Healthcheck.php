@@ -618,7 +618,7 @@ class Healthcheck
         echo "  ".$proc." : ";
         if ($result['success']) {
             if ($result['message']) {
-                echo "OK - {$result['message']}";
+                echo "OK - {$result['message']}\n";
             } else {
                 echo "OK\n";
             }
