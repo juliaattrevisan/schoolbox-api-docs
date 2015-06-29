@@ -5,6 +5,7 @@ use Alaress\Async\UserQueue\UserQueue;
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\MQ\Test\MockAMQPConnector;
 use Schoolbox\Notif\MQ\Test\MockBunnyControl;
@@ -68,9 +69,17 @@ $kernel->run(function ($di, $loop, $log, $opts) {
 EOL;
     }
 
+    $conf = ConfigMapper::getInstance();
+
     // setup dry-run dependencies
     $conn = $opts['dry-run'] ? new MockAMQPConnector() : Connector::getInstance();
-    $ctrl = $opts['dry-run'] ? new MockBunnyControl() : new BunnyControl();
+    $ctrl = $opts['dry-run'] ? new MockBunnyControl() : new BunnyControl([
+        'host'     => $conf->get('amqp_host'),
+        'port'     => $conf->get('amqp_admin_port'),
+        'username' => $conf->get('amqp_user'),
+        'password' => $conf->get('amqp_pass'),
+        'vhost'    => $conf->get('amqp_vhost')
+    ]);
 
     // setup database dependencies
     $uMap = UserMapper::getInstance();

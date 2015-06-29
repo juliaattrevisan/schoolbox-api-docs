@@ -14,24 +14,21 @@ interface ControlInterface {
 
 	/**
 	 * @param array $fields
-	 * @param string $vhost
 	 * @return array
 	 */
-	public function listQueues($fields, $vhost = '');
+	public function listQueues($fields);
 
 	/**
 	 * @param array $fields
-	 * @param string $vhost
 	 * @return array
 	 */
-	public function listExchanges($fields, $vhost = '');
+	public function listExchanges($fields);
 
 	/**
 	 * @param array $fields
-	 * @param string $vhost
 	 * @return array
 	 */
-	public function listBindings($fields, $vhost = '');
+	public function listBindings($fields);
 
 	/**
 	 * @param array $fields
@@ -46,9 +43,8 @@ interface ControlInterface {
 	public function listChannels($fields);
 
 	/**
-	 * @param string $vhost
 	 * @return array
 	 */
-	public function listConsumers($vhost = '');
+	public function listConsumers();
 
 }

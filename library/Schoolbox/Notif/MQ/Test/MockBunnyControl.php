@@ -61,30 +61,27 @@ class MockBunnyControl implements ControlInterface {
 
 	/**
 	 * @param array  $fields
-	 * @param string $vhost
 	 * @return array
 	 */
-	public function listQueues($fields, $vhost = '') {
+	public function listQueues($fields) {
 		return $this->retrieve('queues');
 	}
 
 
 	/**
 	 * @param array  $fields
-	 * @param string $vhost
 	 * @return array
 	 */
-	public function listExchanges($fields, $vhost = '') {
+	public function listExchanges($fields) {
 		return $this->retrieve('exchanges');
 	}
 
 
 	/**
 	 * @param array  $fields
-	 * @param string $vhost
 	 * @return array
 	 */
-	public function listBindings($fields, $vhost = '') {
+	public function listBindings($fields) {
 		return $this->retrieve('bindings');
 	}
 
@@ -108,10 +105,9 @@ class MockBunnyControl implements ControlInterface {
 
 
 	/**
-	 * @param string $vhost
 	 * @return array
 	 */
-	public function listConsumers($vhost = '') {
+	public function listConsumers() {
 		return $this->retrieve('consumers');
 	}
 

@@ -10,6 +10,8 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Config\ConfigMapper;
+
 if (posix_getuid() !== 0) {
     die("Make me a sandwich!\n");
 }
@@ -110,8 +112,16 @@ function checkAmqp($args, $regexMode)
     // stop the socket daemon
     `service schoolbox-socketd stop`;
 
+    $conf = ConfigMapper::getInstance();
+
     // get a list of all available amqp queues
-    $ctrl = new \Alaress\Async\AMQP\Bunny\BunnyControl();
+    $ctrl = new \Alaress\Async\AMQP\Bunny\BunnyControl([
+        'host'     => $conf->get('amqp_host'),
+        'port'     => $conf->get('amqp_admin_port'),
+        'username' => $conf->get('amqp_user'),
+        'password' => $conf->get('amqp_pass'),
+        'vhost'    => $conf->get('amqp_vhost')
+    ]);
     $amqp = \Schoolbox\Notif\MQ\Connector::getInstance();
 
     $queueList = $ctrl->listQueues(array('name'));
