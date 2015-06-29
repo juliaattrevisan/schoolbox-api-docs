@@ -55,7 +55,7 @@
                 /* Use color transitions?
                  * Must be one of ['default', 'stepped', 'continuous', 'reverseContinuous']
                  */
-                useColorTransitions: 'reversecontinuous',
+                useColorTransitions: 'stepped',
 
                 /* Custom callback formatter
                  */
@@ -69,8 +69,17 @@
 
             var merged = $.extend(defaults, derived, options);
 
-            /* Decide color transitions
+            /* Use color transitions
              */
+            merged.series[0].data = useColorTransition(merged);
+
+            return merged;
+        }
+
+        /**
+         * Use color transitions
+         */
+        function useColorTransition(merged) {
             var newData;
             var method = merged.useColorTransitions.toLowerCase();
 
@@ -86,9 +95,7 @@
                     break;
             }
 
-            merged.series[0].data = newData;
-
-            return merged;
+            return newData;
         }
 
         /**
