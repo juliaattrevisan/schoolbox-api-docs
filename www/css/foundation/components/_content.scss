@@ -494,9 +494,17 @@ table{
 }
 
 // White Islands
-section{
-	background-color: $white;
-	margin-bottom: rem-calc(($base-font-size));
+.columns{
+	section{
+		background-color: $white;
+		margin-bottom: rem-calc(($base-font-size));
+	}
+	&:first-child section{
+		padding-left: 0;
+	}
+	&:last-child section{
+		padding-right: 0;
+	}
 }
 
 // Labels
