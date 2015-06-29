@@ -32,7 +32,7 @@ class Factory implements FactoryInterface
             case 'image/x-png':
                 return new Png();
             default:
-                throw new \Exception_Schoolbox('Unknown image type.');
+                throw new \Exception_Schoolbox('Unknown image type "'.$imageArray['mime'].'"');
         }
     }
 }
