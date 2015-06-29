@@ -387,18 +387,20 @@
     <div class="small-11 columns end">
         User Account
     </div>
+</div>
 
-    <!-- BEGIN user_linked -->
-    <div class="row">
-        <div class="small-11 columns">
-            <a href="/adminv2/modify-user/{LINKED_USER_ID}">{LINKED_USER}</a>
-        </div>
-        <div class="small-1 columns">
-            <a href="/adminv2/userForm.php?deleteUserLink={USERID}&amp;linkedUser={LINKED_USER_ID}" class="no-text icon-delete" title="Remove"></a>
-        </div>
+<!-- BEGIN user_linked -->
+<div class="row">
+    <div class="small-11 columns">
+        <a href="/adminv2/modify-user/{LINKED_USER_ID}">{LINKED_USER}</a>
     </div>
-    <!-- END user_linked -->
+    <div class="small-1 columns">
+        <a href="/adminv2/userForm.php?deleteUserLink={USERID}&amp;linkedUser={LINKED_USER_ID}" class="no-text icon-delete" title="Remove"></a>
+    </div>
+</div>
+<!-- END user_linked -->
 
+<div class="row">
     <form action="/adminv2/userForm.php" method="post" id="linkedUserAdd">
         <div class="small-11 columns">
             <select data-selectizeuser="addUser" name="linkUser[]" multiple placeholder="Search Users" form="linkedUserAdd"></select>
