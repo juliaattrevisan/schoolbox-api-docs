@@ -71,7 +71,7 @@
 
             /* Decide color transitions
              */
-            switch(merged.useColorTransitions) {
+            switch(merged.useColorTransitions.toLowerCase()) {
                 case 'stepped':
                     merged.series[0].data = applySteppedColorTransitions(merged.series[0].data);
                     break;
