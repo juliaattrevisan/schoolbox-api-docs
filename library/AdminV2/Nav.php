@@ -32,7 +32,9 @@ class AdminV2_Nav
 
     public function parse(SitePage $page, $currentPage = 'home')
     {
-        $page->setBlock(TEMPLATE_content, 'admin_nav_item', 'admin_nav_item_block');
+        $page->setFile('nav', 'adminv2/nav.html');
+        $page->setBlock('nav', 'admin_nav_item', 'admin_nav_item_block');
+
         foreach ($this->nav as $href => $label) {
             $page->setVar(array(
                 'ADMNAV_HREF' => $href,
@@ -41,5 +43,7 @@ class AdminV2_Nav
             ));
             $page->parse('admin_nav_item_block', 'admin_nav_item', true);
         }
+
+        $page->parse('ADMIN_NAV', 'nav');
     }
 }
