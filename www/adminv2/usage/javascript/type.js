@@ -88,7 +88,10 @@
                 series: [{
                     type: 'pie',
                     data: datasets
-                }]
+                }],
+                credits: {
+                    enabled: false
+                }
             });
 		}
 
