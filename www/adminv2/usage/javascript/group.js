@@ -72,43 +72,69 @@
 		 * @param datasets
 		 */
 		function makeBars(datasets) {
+            var allTooltips = [];
+            var allCategories = [];
+            var allSeriesData = [];
+            var i
 
 			/* Find the total amount
 			 */
 			var total = 0;
 
-			for (var i = 0; i < datasets.length; i++) {
+			for (i = 0; i < datasets.length; i++) {
 				total += parseInt(datasets[i].data);
 			}
 
-			/* Make every bar relative to max
-			 */
-			var html = $('<h3></h3>').text(config.title);
-			for (var i = 0; i < datasets.length; i++) {
+            /* Make every bar relative to max
+             */
+			for (i = 0; i < datasets.length; i++) {
 				var used = parseInt(datasets[i].data);
                 var percentage = 0;
 
 				if (total > 0) {
-					percentage = Math.round(100*used/total).toString();
+					percentage = Math.round(100*used/total);
 				}
 				else {
 					percentage = 0;
 				}
 
-				var line = $('<div><h4></h4></div>');
-				line.find('h4')
-					.text(datasets[i].label)
-					.after($.fn.bargraphPlainAmount(used, percentage));
-				html.append(line);
+                allTooltips.push($.fn.formatBytes(used) + ' / ' + $.fn.formatBytes(total));
+                allCategories.push(datasets[i].label);
+                allSeriesData.push(percentage);
 			}
-			config.element.html(html);
+
+            $(config.element).serverUsage({
+                title: config.title,
+                height: 350,
+                categories: allCategories,
+                tooltip: {
+                    enabled: true,
+                    formatter: function() {
+                        return allTooltips[this.point.x];
+                    }
+                },
+                series: [
+                    {
+                        data: allSeriesData
+                    }
+                ],
+                formatter: function() {
+                    var str = '';
+
+                    if (this.y > 0) {
+                        str = this.y + '%';
+                    }
+
+                    return str;
+                }
+            });
 		}
 
 		/**
 		 * This is used when there is no data
 		 */
 		function noBars() {
-			config.element.html('<h3>' + config.title + '</h3><p><strong>This user has no files.</strong></p>');
+			config.element.html('<h3>' + config.title + '</h3><p>This user has no files.</p>');
 		}
 	}
 }(jQuery));
