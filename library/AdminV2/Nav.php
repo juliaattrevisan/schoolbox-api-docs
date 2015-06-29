@@ -36,7 +36,7 @@ class AdminV2_Nav
         foreach ($this->nav as $href => $label) {
             $page->setVar(array(
                 'ADMNAV_HREF' => $href,
-                'ADMNAV_CURRENT' => $currentPage == $href ? 'current' : '',
+                'ADMNAV_CURRENT' => $currentPage == $href ? 'active' : '',
                 'ADMNAV_LABEL' => $label
             ));
             $page->parse('admin_nav_item_block', 'admin_nav_item', true);
