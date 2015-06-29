@@ -55,7 +55,7 @@ $panel-padding: rem-calc(16);
 // $include-html-label-classes: $include-html-classes;
 
 // We use these to style the labels
-$label-padding: rem-calc(($base-font-size - 10)) rem-calc(($base-font-size - 2));
+$label-padding: rem-calc(($base-font-size - 9)) rem-calc(($base-font-size - 2));
 // $label-radius: $global-radius;
 
 // We use these to style the label text
@@ -206,8 +206,8 @@ $accordion-content-padding: rem-calc(($base-font-size - 4));
 // $include-html-table-classes: $include-html-classes;
 
 // These control the background color for the table and even rows
-// $table-bg: $white;
-$table-even-row-bg: tint($tertiary, 94%);
+$table-bg: $white;
+$table-even-row-bg: $table-bg;
 
 // These control the table cell border style
 // $table-border-style: solid;
@@ -215,7 +215,7 @@ $table-border-size: 0;
 // $table-border-color: $gainsboro;
 
 // These control the table head styles
-$table-head-bg: tint($tertiary, 87%);
+$table-head-bg: $table-bg;
 $table-head-font-size: rem-calc(($base-font-size - 2));
 $table-head-font-color: $black;
 $table-head-font-weight: $font-weight-bold;
@@ -466,8 +466,16 @@ $tooltip-font-color: $white;
 
 // Tables
 table{
+	border-collapse: collapse;
 	width: 100%;
+	thead tr th {
+	    border-bottom: 2px solid $white-smoke;
+	}
+	tr:hover td{
+		background-color: $ocean-sunset;
+	}
 	td{
+		border-bottom: 1px solid $white-smoke;
 		input[type=radio] +
 		label.radio-label,
 		input[type=checkbox] +
@@ -485,11 +493,10 @@ table{
   );
 }
 
-// White islands for things like components
-.island{
-	@extend .island-panel;
-	border: 0;
-	padding: 0;
+// White Islands
+section{
+	background-color: $white;
+	margin-bottom: rem-calc(($base-font-size));
 }
 
 // Labels
@@ -732,7 +739,23 @@ table{
 	list-style: none;
 	margin: 0;
 	padding: 0 !important;
-
+	a{
+		@media #{$small-up} {
+			padding: rem-calc(($base-font-size - 8));
+		}
+		@media #{$medium-up} {
+			padding: rem-calc(($base-font-size - 4));
+		}
+		@media #{$large-up} {
+			padding: rem-calc(($base-font-size));
+		}
+		display: inline-block;
+		opacity: 0.3;
+		text-align: center;
+		&:hover{
+			background-color: darken($ocean-sunset, 7%);
+		}
+	}
 	//Grid for 1 action
 	&.one{
 		@media #{$small-up} { @include grid-column(1); }
@@ -752,15 +775,6 @@ table{
 		@media #{$small-up} { @include grid-column(3); }
 		a{
 			@media #{$small-up} { @include grid-column(4); }
-		}
-	}
-	a{
-		padding: rem-calc(($base-font-size));
-		display: inline-block;
-		opacity: 0.3;
-		text-align: center;
-		&:hover{
-			background-color: darken($ocean-sunset, 7%);
 		}
 	}
 }
