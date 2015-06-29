@@ -3,18 +3,37 @@ vag="[schoolbox]";
 cachedir='/vagrant/vagrantcache';
 mkdir -p $cachedir;
 cd $cachedir;
+
+# Defaults
+download_url="vagrant.alaress-dev.com.au";
+demo_data_version="latest"
+external_db="synergetic";
+external_db_host="192.168.1.20";
+
+# Get options
+if [ ! -z $1 ]; then download_url=$1; fi;
+if [ ! -z $2 ]; then demo_data_version=$2; fi;
+if [ ! -z $3 ]; then external_db=$3; fi;
+if [ ! -z $4 ]; then external_db_host=$4; fi;
+
+echo "$vag Setting up vagrant with options:";
+echo "$vag Download URL: $download_url";
+echo "$vag Demo Data Version: $demo_data_version";
+echo "$vag External DB: $external_db";
+echo "$vag External DB Host: $external_db_host";
+
 echo "$vag Retrieving latest Demo Data files";
-curl http://vagrant.alaress-dev.com.au/schoolboxdemo-latest-sha1.txt > schoolboxdemo-latest-sha1.txt 2>/dev/null
+curl http://$download_url/schoolboxdemo-$demo_data_version-sha1.txt > schoolboxdemo-$demo_data_version-sha1.txt 2>/dev/null
 if [ $? -eq 0 ];
 then
-	mv -f schoolboxdemo-latest-sha1.txt schoolboxdemo-latest-sha1-cached.txt;
-	rm -f schoolboxdemo-latest-sha1.txt;
+	mv -f schoolboxdemo-$demo_data_version-sha1.txt schoolboxdemo-$demo_data_version-sha1-cached.txt;
+	rm -f schoolboxdemo-$demo_data_version-sha1.txt;
 else
-	echo "$vag Unable to retrive latest sha1 list, continuing with current";
+	echo "$vag Unable to retrive $demo_data_version sha1 list, continuing with current";
 fi
-if [ ! -f schoolboxdemo-latest-sha1-cached.txt ];
+if [ ! -f schoolboxdemo-$demo_data_version-sha1-cached.txt ];
 then
-	echo "$vag Unable to retrieve demo data. Halting provisioning.";
+	echo "$vag Unable to retrieve $demo_data_version demo data. Halting provisioning.";
 	exit 1;
 fi
 while read line;
@@ -29,7 +48,7 @@ do
 		echo "$vag Downloading $demofile";
 		curl -L http://vagrant.alaress-dev.com.au/$demofile > $demofile;
 	fi
-done < schoolboxdemo-latest-sha1-cached.txt;
+done < schoolboxdemo-$demo_data_version-sha1-cached.txt;
 
 echo "$vag Ensuring MySQL is running";
 #service mysql restart > /dev/null 2>&1;
@@ -63,21 +82,14 @@ cp -f $cachedir/cache.txt /vagrant/tools/browscap/cache.php;
 
 echo "$vag Loading Schoolbox MySQL Demo data";
 mysql -u root -ptnp879 -e "create database schoolbox";
-mysql -u root -ptnp879 schoolbox < $cachedir/schoolboxdemo-latest.sql;
+mysql -u root -ptnp879 schoolbox < $cachedir/schoolboxdemo-$demo_data_version.sql;
 
-# Check if flag provided to use a specific External DB
-if [ ! -z $1 ];
-then
-        if [ $1 == "schoolbox" -o $1 == "synergetic" ];
-        then
-		echo -e "$vag An External DB was specified - Setting to: $1";
-                mysql -u root -ptnp879 schoolbox -e "UPDATE config SET value='$1' where name='external_type'";
-        fi
-fi
+mysql -u root -ptnp879 schoolbox -e "UPDATE config SET value='$external_db' WHERE name='external_type'";
+mysql -u root -ptnp879 schoolbox -e "UPDATE config SET value='$external_db_host' WHERE name='external_db_host'";
 
 echo "$vag Creating Schoolbox data directories";
 cd /vagrant;
-tar -xzf $cachedir/schoolboxdemo-latest.tar.gz;
+tar -xzf $cachedir/schoolboxdemo-$demo_data_version.tar.gz;
 rm -rf /vagrant/data/cache;
 /vagrant/tools/create-data-dirs.sh /vagrant/data;
 
@@ -95,11 +107,11 @@ cd tools;
 cd /vagrant;
 
 echo "$vag Generating data dir sql fixes";
-cp -f $cachedir/schoolboxdemo-vagrant-latest.sql /tmp/schoolboxdemo-vagrant-latest.sql;
-/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /tmp/schoolboxdemo-vagrant-latest.sql;
+cp -f $cachedir/schoolboxdemo-vagrant-$demo_data_version.sql /tmp/schoolboxdemo-vagrant-$demo_data_version.sql;
+/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /tmp/schoolboxdemo-vagrant-$demo_data_version.sql;
 
 echo "$vag Applying vagrant SQL fixes";
-mysql -u root -ptnp879 schoolbox < /tmp/schoolboxdemo-vagrant-latest.sql
+mysql -u root -ptnp879 schoolbox < /tmp/schoolboxdemo-vagrant-$demo_data_version.sql
 
 echo "$vag Upgrading demo data with latest SQL updates";
 mkdir /var/lib/vagrant -p > /dev/null;
@@ -109,11 +121,11 @@ rm -R /var/lib/vagrant > /dev/null;
 rm -f /vagrant/www/conf/pre*conf.php;
 
 echo "$vag Generating data dir sql fixes";
-cp -f $cachedir/schoolboxdemo-vagrant-latest.sql /tmp/schoolboxdemo-vagrant-latest.sql;
-/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /tmp/schoolboxdemo-vagrant-latest.sql;
+cp -f $cachedir/schoolboxdemo-vagrant-$demo_data_version.sql /tmp/schoolboxdemo-vagrant-$demo_data_version.sql;
+/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /tmp/schoolboxdemo-vagrant-$demo_data_verison.sql;
 
 echo "$vag Applying vagrant SQL fixes";
-mysql -u root -ptnp879 schoolbox < /tmp/schoolboxdemo-vagrant-latest.sql
+mysql -u root -ptnp879 schoolbox < /tmp/schoolboxdemo-vagrant-$demo_data_version.sql
 
 echo "$vag Applying UTF8 schema patch";
 /vagrant/tools/schema/collation.sh;

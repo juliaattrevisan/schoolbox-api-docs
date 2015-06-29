@@ -1,0 +1,10 @@
+# default settings for vagrant box.
+# To modify, copy to vagrant.yaml and modify settings as needed.
+vagrant_box: "ubuntu-1204-gold-PHP55"
+download_url: "vagrant.alaress-dev.com.au"
+memory: 1024
+public_network: true
+private_network_ip: "192.168.36.10"
+external_db: "synergetic"
+external_db_host: "192.168.1.20"
+demo_data_version: "latest"
