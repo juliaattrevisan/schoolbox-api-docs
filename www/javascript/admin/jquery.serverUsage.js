@@ -180,6 +180,10 @@
                 plotOptions: {
                     series: {
                         dataLabels: {
+                            color: '#ffffff',
+                            style: {
+                                textShadow: ''
+                            },
                             enabled: true,
                             align: 'center',
                             inside: true,
