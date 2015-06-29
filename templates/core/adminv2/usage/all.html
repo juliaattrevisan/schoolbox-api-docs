@@ -24,11 +24,12 @@
 
 <script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
 <script type='text/javascript' src='/javascript/shared/jquery.number-format.js'></script>
-<script type='text/javascript' src='/javascript/shared/bargraph/bargraph.js'></script>
+<script type="text/javascript" src="/javascript/admin/jquery.serverUsage.js"></script>
+
 <script type='text/javascript' src='/adminv2/usage/javascript/total.js'></script>
-<script type='text/javascript' src='/adminv2/usage/javascript/group.js'></script>
-<script type='text/javascript' src='/adminv2/usage/javascript/type.js'></script>
-<script type='text/javascript' src='/adminv2/usage/javascript/tabulator.js'></script>
+<!--<script type='text/javascript' src='/adminv2/usage/javascript/group.js'></script>-->
+<!--<script type='text/javascript' src='/adminv2/usage/javascript/type.js'></script>-->
+<!--<script type='text/javascript' src='/adminv2/usage/javascript/tabulator.js'></script>-->
 
 <script type='text/javascript'>
     $(function() {
@@ -37,24 +38,24 @@
             title: 'Total'
         });
 
-        $('[data-panel=group]').usageGroup({
-            url: '/adminv2/usage/ajax/allAjax?type=group',
-            title: 'Roles'
-        });
-
-        $('[data-panel=type]').usageType({
-            url: '/adminv2/usage/ajax/allAjax?type=type',
-            title: 'Category'
-        });
-
-        $('[data-panel=user]').usageTabulator({
-            url: '/adminv2/usage/ajax/allAjax?type=user',
-            title: 'Users',
-            orderBy: 'bytes',
-            order: 'DESC',
-            index: 0,
-            numPerPage: 25,
-            numTotal: {USAGE_NUM_TOTAL}
-        });
+//        $('[data-panel=group]').usageGroup({
+//            url: '/adminv2/usage/ajax/allAjax?type=group',
+//            title: 'Roles'
+//        });
+//
+//        $('[data-panel=type]').usageType({
+//            url: '/adminv2/usage/ajax/allAjax?type=type',
+//            title: 'Category'
+//        });
+//
+//        $('[data-panel=user]').usageTabulator({
+//            url: '/adminv2/usage/ajax/allAjax?type=user',
+//            title: 'Users',
+//            orderBy: 'bytes',
+//            order: 'DESC',
+//            index: 0,
+//            numPerPage: 25,
+//            numTotal: {USAGE_NUM_TOTAL}
+//        });
     });
 </script>

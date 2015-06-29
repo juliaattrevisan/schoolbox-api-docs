@@ -56,15 +56,37 @@
                      */
                     var used = datasets[0].data;
                     var total = datasets[1].data + used;
-                    var percentage = Math.round(100*used/total).toString();
+                    var percentage = Math.round(100*used/total);
 
-                    var html = $('<div><h3></h3><p></p></div>');
-                    html.find('h3').text(config.title);
-                    html.find('p')
-                        .text($.fn.formatBytes(used) + ' / ' + $.fn.formatBytes(total))
-                        .after($.fn.bargraph(percentage));
+                    var allTooltips = [$.fn.formatBytes(used) + ' / ' + $.fn.formatBytes(total)];
+                    var allCategories = [''];
+                    var allSeriesData = [percentage];
 
-                    config.element.html(html);
+                    $(config.element).serverUsage({
+                        title: 'Total Usage',
+                        height: 150,
+                        categories: allCategories,
+                        tooltip: {
+                            enabled: true,
+                            formatter: function() {
+                                return allTooltips[this.point.x];
+                            }
+                        },
+                        series: [
+                            {
+                                data: allSeriesData
+                            }
+                        ],
+                        formatter: function() {
+                            var str = '';
+
+                            if (this.y > 0) {
+                                str = this.y + '%';
+                            }
+
+                            return str;
+                        }
+                    });
                 }
             });
         }
