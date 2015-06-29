@@ -52,6 +52,11 @@
                     enabled: true
                 },
 
+                /* Use color transitions?
+                 * Must be one of false, 'continuous', 'stepped'
+                 */
+                useColorTransitions: 'stepped',
+
                 /* Custom callback formatter
                  */
                 formatter: function() {
@@ -64,20 +69,40 @@
 
             var merged = $.extend(defaults, derived, options);
 
-            /* Work out colour transitions
+            /* Decide color transitions
              */
+            switch(merged.useColorTransitions) {
+                case 'stepped':
+                    merged.series[0].data = applySteppedColorTransitions(merged.series[0].data);
+                    break;
+
+                case 'continuous':
+                    merged.series[0].data = applyContinuousColorTransitions(merged.series[0].data);
+
+                default:
+                    break;
+            }
+
+            return merged;
+        }
+
+        /**
+         * Apply color transitions to set
+         *
+         * @param data
+         * @returns {Array}
+         */
+        function applySteppedColorTransitions(data) {
             var allTemp = [];
 
-            for (var i = 0; i < merged.series[0].data.length; i++) {
+            for (var i = 0; i < data.length; i++) {
                 allTemp.push({
-                    color: getSteppedHexColor(merged.series[0].data[i]),
-                    y: merged.series[0].data[i]
+                    color: getSteppedHexColor(data[i]),
+                    y: data[i]
                 });
             }
 
-            merged.series[0].data = allTemp;
-
-            return merged;
+            return allTemp;
         }
 
         /**
@@ -97,6 +122,25 @@
         }
 
         /**
+         * Apply color transitions to set
+         *
+         * @param data
+         * @returns {Array}
+         */
+        function applyContinuousColorTransitions(data) {
+            var allTemp = [];
+
+            for (var i = 0; i < data.length; i++) {
+                allTemp.push({
+                    color: getContinuousHexColor(data[i]),
+                    y: data[i]
+                });
+            }
+
+            return allTemp;
+        }
+
+        /**
          * Colour transition
          *
          * Green is 100%
@@ -104,7 +148,7 @@
          *
          * @param percent
          */
-        function getGradientHexColor(percent) {
+        function getContinuousHexColor(percent) {
             var max = 230;
 
             var r = percent<50 ? max : Math.floor(max-(percent*2-100)*max/100);
@@ -121,7 +165,7 @@
          *
          * @param percent
          */
-        function getReversedGradientHexColor(percent) {
+        function getReverseContinuousHexColor(percent) {
             var max = 230;
 
             var r = percent>50 ? max : Math.floor((percent*2)*max/100);
