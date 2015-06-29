@@ -78,6 +78,7 @@
 
                 case 'continuous':
                     merged.series[0].data = applyContinuousColorTransitions(merged.series[0].data);
+                    break;
 
                 default:
                     break;
