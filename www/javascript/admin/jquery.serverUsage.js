@@ -69,13 +69,10 @@
             var allTemp = [];
 
             for (var i = 0; i < merged.series[0].data.length; i++) {
-                var temp = {
+                allTemp.push({
                     color: getSteppedHexColor(merged.series[0].data[i]),
                     y: merged.series[0].data[i]
-                }
-
-                allTemp.push(temp);
-
+                });
             }
 
             merged.series[0].data = allTemp;
