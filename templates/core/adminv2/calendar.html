@@ -28,7 +28,7 @@ $(function() {
 	/* Customise selection modifiers
 	 */
 	$('[data-modifier-control]').change(function(event) {
-		var selectors = $('.table').find('input[data-modifier="' + $(this).val() + '"]');
+		var selectors = $('input[data-modifier="' + $(this).val() + '"]');
 
 		if ($(this).is(':checked')) {
 			selectors.prop('checked', true);
@@ -234,14 +234,12 @@ $(function() {
             </form>
 
             <div class="large-12 columns">
+                <!-- BEGIN cleanup_has_events -->
                 <input id="check-personal" type="checkbox" data-modifier-control="true" value="personal" />
                 <label for="check-personal" class="checkbox-label">Select Personal Events</label>
                 <input id="check-group" type="checkbox" data-modifier-control="true" value="group" />
                 <label for="check-group" class="checkbox-label">Select Group Events</label>
-            </div>
 
-            <div class="large-12 columns">
-                <!-- BEGIN cleanup_has_events -->
                 <h3>Events</h3>
                 <form action="/adminv2/calendar/modifyForm" method="post">
                     <input type="hidden" name='action' value='cleanup' />
