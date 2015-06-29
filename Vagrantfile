@@ -51,7 +51,7 @@ end
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.box = vagrant_box
-  config.vm.box_url = "http://#{download_url}/ubuntu-1204-gold-PHP55.box"
+  config.vm.box_url = "http://#{download_url}/#{vagrant_box}.box"
 
   config.vm.network :private_network, ip: private_network_ip
 
