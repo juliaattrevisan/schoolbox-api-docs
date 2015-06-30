@@ -92,9 +92,27 @@
         </div>
     </div>
 
-    <label>
+    <!-- BEGIN recurring_dates -->
+    <div data-advanced class="large-12 columns {SHOW_ADVANCED}">
+        <label>
+            Repeat
+            <span class='hint has-tip tip-top' data-tooltip title="The frequency with which this event recurs, if at all.">?</span>
+            <select name="repeat">
+                <option value="">Single Event</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="fortnightly">Fortnightly</option>
+                <option value="monthly">Monthly</option>
+            </select>
+        </label>
 
-    </label>
+        <label data-repeat-until class="hide">
+            Repeat Until
+            <span class='hint has-tip tip-top' data-tooltip title="The date at which recurrence should cease.">?</span>
+            <input name="repeat_until" data-datepicker='true' type="text" size="15" maxlength="30" value="" />
+        </label>
+    </div>
+    <!-- END recurring_dates -->
 
     <label>
     </label>
@@ -123,32 +141,11 @@
     <table>
 		<tbody>
 
-			<!-- BEGIN recurring_dates -->
-			<tr class="advanced {SHOW_ADVANCED}">
-				<td class="formLabelWidth">
-					<h4>Repeat</h4>
-					<em>The frequency with which this event recurs, if at all.</em>
-				</td>
-				<td>
-					<select name="repeat">
-						<option value="">Single Event</option>
-						<option value="daily">Daily</option>
-						<option value="weekly">Weekly</option>
-						<option value="fortnightly">Fortnightly</option>
-						<option value="monthly">Monthly</option>
-					</select>
-				</td>
-			</tr>
-			<tr id="repeatUntil" class="advanced hidden">
-				<td class="formLabelWidth">
-					<h4>Repeat Until</h4>
-					<em>The date at which recurrence should cease.</em>
-				</td>
-				<td>
-					<input name="repeat_until" data-datepicker='true' type="text" size="15" maxlength="30" value="" />
-				</td>
-			</tr>
-			<!-- END recurring_dates -->
+
+
+
+
+
 			<!-- BEGIN recurring_reminder -->
 			<tr id="repeat-reminder" class="advanced">
 				<td class="formLabelWidth">

@@ -151,6 +151,13 @@
 				/* Alternate between option visibility
 				 */
 				$('.advanced').toggle();
+
+                if ($('[data-advanced]').hasClass('hide')) {
+                    $('[data-advanced]').removeClass('hide');
+                }
+                else {
+                    $('[data-advanced]').addClass('hide');
+                }
 			});
 		}
 
@@ -161,10 +168,12 @@
 			config.element.find('select[name=repeat]').change(function(event) {
 				if ($(this).val() !== '') {
 					$('#repeatUntil').show();
+                    $('[data-repeat-until]').removeClass('hide');
 					config.element.find('input[name=repeat_until]').rules('add', 'required');
 				}
 				else {
-					$('#repeatUntil').hide();
+					$('#repeatUntil, [data-repeat-until]').hide();
+                    $('[data-repeat-until]').addClass('hide');
 					config.element.find('input[name=repeat_until]').rules('remove', 'required');
 				}
 			});

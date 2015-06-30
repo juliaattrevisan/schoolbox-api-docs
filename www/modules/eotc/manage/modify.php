@@ -101,7 +101,7 @@ if (is_numeric($_GET['eventID'])) {
         $page->setVar(array(
             'FUNCTION' => 'Update',
             'EOTC_FUNCTION' => 'Update Event',
-            'SHOW_ADVANCED' => '',
+            'SHOW_ADVANCED' => 'hide',
             'ADVANCED_SHOW' => '',
             'ADVANCED_CLOSE' => 'hidden',
         ));
@@ -290,7 +290,7 @@ elseif ($authenticator->isEOTCCreator($_SESSION['user'])) {
     $page->setVar(array(
         'FUNCTION' => 'Add',
         'EOTC_FUNCTION' => 'Submit for Initial Approval',
-        'SHOW_ADVANCED' => '',
+        'SHOW_ADVANCED' => 'hide',
         'ADVANCED_SHOW' => '',
         'ADVANCED_CLOSE' => 'hidden',
     ));
