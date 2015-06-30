@@ -771,31 +771,40 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         );
 
         // Jam the timetable definition in.
+        $campusList          = array();
         $campusTimetableList = array();
         $result              = array();
         foreach ($this->database->getAll($query) ?: array() as $row) {
             $timetableDay  = $row['TimetableDay'];
             $timetableCode = $row['TimetableGroup'];
 
-            // Load the campus for this code and day if I haven't tried already
-            if (!isset($campusTimetableList[$timetableCode][$timetableDay])) {
+            // Load the campus for this code if I haven't tried already
+            if (!isset($campusList[$timetableCode])) {
                 try {
-                    $campus = \Schoolbox\CampusMapper::getInstance()->findOneByColumn(
+                    $campusList[$timetableCode] = \Schoolbox\CampusMapper::getInstance()->findOneByColumn(
                         'ext_timetable_code',
                         $timetableCode
                     );
-                    $campusTimetableList[$timetableCode][$timetableDay] = $this->getTimetableDefinition(
-                        null,
-                        $campus,
-                        $timetableDay
-                    );
                 } catch (\Schoolbox\Mapper\Exception $e) {
                     // No campus or timetable found: set a blank one
-                    $campusTimetableList[$timetableCode][$timetableDay] = array();
+                    $campusList[$timetableCode] = false;
                 }
             }
 
-            // Did I try and get nothing? error out if so
+            // Load the timetable def for this campus and code if I haven't tried already
+            if ($campusList[$timetableCode] instanceof \Schoolbox\Campus) {
+                if (!isset($campusTimetableList[$timetableCode][$timetableDay])) {
+                    $campusTimetableList[$timetableCode][$timetableDay] = $this->getTimetableDefinition(
+                        null,
+                        $campusList[$timetableCode],
+                        $timetableDay
+                    );
+                }
+            } else {
+                $campusTimetableList[$timetableCode][$timetableDay] = false;
+            }
+
+            // Did I try and get nothing? skip if so
             $campusTimetable = $campusTimetableList[$timetableCode][$timetableDay];
             if (empty($campusTimetable)) {
                 continue;
