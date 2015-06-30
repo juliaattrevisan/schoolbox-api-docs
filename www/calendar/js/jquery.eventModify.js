@@ -417,8 +417,8 @@
 
 					// series
 					if (multi) {
-						$('.bulk-update').css('display', act === 'Update' ? 'inline' : 'none');
-						$('.bulk-delete').css('display', act === 'Delete' ? 'inline' : 'none');
+						$('.bulk-update, [data-message=bulk-update]').css('display', act === 'Update' ? 'inline' : 'none');
+						$('.bulk-delete, [data-message=bulk-delete]').css('display', act === 'Delete' ? 'inline' : 'none');
 						$("#dialog-bulk").dialog({
 							resizable: false,
 							height: 180,
