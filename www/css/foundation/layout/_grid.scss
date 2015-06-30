@@ -36,20 +36,19 @@ $block-grid-default-spacing: rem-calc(16);
 // Set unlimited width on rows
 .row{
 	max-width: none;
+    .row {
+        @include responsive-sides(-1, margin);
+    }
+}
+#content form .row .row {
+    // dear sass: I will choose my own margins THANKS VERY MUCH
+    @include responsive-sides(-1, margin);
 }
 
 // Responsive Column Padding
 .column,
 .columns{
-	@media #{$small-up} {
-		padding: 0 rem-calc(($base-font-size - 8)) 0;
-	}
-	@media #{$medium-up} {
-		padding: 0 rem-calc(($base-font-size - 4)) 0;
-	}
-	@media #{$large-up} {
-		padding: 0 rem-calc(($base-font-size));
-	}
+    @include responsive-sides(1, padding);
 }
 
 .full-width {
