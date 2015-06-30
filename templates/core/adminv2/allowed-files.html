@@ -156,6 +156,7 @@
             <div class="column">
                 <label>Enabled<span data-tooltip class="hint has-tip tip-bottom" title="Controls if files of this type can be uploaded">?</span></label>
                 <span class="switch">
+                    <input type="hidden" name="enable" value="false" />
                     <input id="enabled-new" type="checkbox" name="enable" checked="checked" value="true" />
                     <label for="enabled-new"></label>
                 </span>
@@ -329,23 +330,3 @@
     </button>
     <!-- END image -->
 </div>
-<script type="text/javascript">
-    $(function () {
-
-        /* Force submission of checkboxes regardless of whether they are ticked
-         * or not.
-         */
-        $('input[type=checkbox]').change(function () {
-            var name = 'input[name=' + $(this).attr('name') + ']';
-
-            if ($(this).prop('checked')) {
-                $(name).val('true');
-            }
-            else {
-                $(name).val('false');
-            }
-        });
-
-        $.each($('input[type=checkbox]').is(':checked'));
-    });
-</script>
