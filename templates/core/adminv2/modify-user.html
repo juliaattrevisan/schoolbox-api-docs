@@ -430,59 +430,65 @@
 </div>
 
 <div class="row">
-    <div class="large-12 columns">
-        <h2>Recent Activity Logs</h2>
+    <div class="small-12 columns">
+        <h2 class="subheader">Recent Activity Logs</h2>
     </div>
-    <div class="small-12 medium-6 columns">
+    <div class="small-12 medium-6 island">
         <span class="header-actions">
             <a class="button icon-view" href="/adminv2/reports/login/user={USERNAME}">See All</a>
         </span>
 
-        <h3>Logins</h3>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>IP</th>
-                    <th>Result</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- BEGIN login_log -->
-                <tr>
-                    <td>{LOGIN_DATE}</td>
-                    <td>{LOGIN_IP}</td>
-                    <td>{LOGIN_RESULT}</td>
-                </tr>
-                <!-- END login_log -->
-            </tbody>
-        </table>
+        <section>
+            <div class="content">
+                <h3 class="subheader">Logins</h3>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>IP</th>
+                        <th>Result</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- BEGIN login_log -->
+                    <tr>
+                        <td>{LOGIN_DATE}</td>
+                        <td>{LOGIN_IP}</td>
+                        <td>{LOGIN_RESULT}</td>
+                    </tr>
+                    <!-- END login_log -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </div>
 
-    <div class="small-12 medium-6 columns">
+    <div class="small-12 medium-6 island">
         <span class="header-actions">
             <a class="button icon-view" href="/adminv2/reports/activity/user={USERNAME}">See All</a>
         </span>
 
-        <h3>Activity</h3>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- BEGIN action_log -->
-                <tr>
-                    <td>{ACTION_DATE}</td>
-                    <td>{ACTION_ACTION}</td>
-                </tr>
-                <!-- END action_log -->
-            </tbody>
-        </table>
+        <section>
+            <div class="content">
+                <h3 class="subheader">Activity</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- BEGIN action_log -->
+                        <tr>
+                            <td>{ACTION_DATE}</td>
+                            <td>{ACTION_ACTION}</td>
+                        </tr>
+                        <!-- END action_log -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </div>
 </div>
 
