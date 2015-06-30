@@ -113,7 +113,15 @@
         </label>
     </div>
     <!-- END recurring_dates -->
-
+    <!-- BEGIN recurring_reminder -->
+    <div data-advanced data-repeat-reminder class="large-12 columns">
+        <label>
+            Repeat:
+            {EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong>.
+            <span class='hint has-tip tip-top' data-tooltip title="This event is part of a recurring series.">?</span>
+        </label>
+    </div>
+    <!-- END recurring_reminder -->
     <label>
     </label>
 
@@ -146,17 +154,7 @@
 
 
 
-			<!-- BEGIN recurring_reminder -->
-			<tr id="repeat-reminder" class="advanced">
-				<td class="formLabelWidth">
-					<h4>Repeat</h4>
-					<em>This event is part of a recurring series.</em>
-				</td>
-				<td>
-					{EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong>.
-				</td>
-			</tr>
-			<!-- END recurring_reminder -->
+
 			<tr>
 				<td>
 					<h4>Location</h4>

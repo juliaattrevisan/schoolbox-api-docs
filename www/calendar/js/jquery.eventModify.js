@@ -413,7 +413,7 @@
 
 					// the desired action, and if this is a series event or not
 					var act = $('#action').val();
-					var multi = $('#repeat-reminder').length != 0;
+					var multi = $('#repeat-reminder, [data-repeat-reminder]').length != 0;
 
 					// series
 					if (multi) {
