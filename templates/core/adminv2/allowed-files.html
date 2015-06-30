@@ -4,32 +4,14 @@
 
     $(function () {
 
-        $(document).on('click', '[data-interaction-modify]', function () {
-
-            var trigger = 0,
-                level   = $(this).closest('div.row'),
-                target  = '[data-interaction-inline-form]';
-
-            $('.form-holder').each(function () {
-                if ($(this).is(':visible')) {
-
-                    level.slideUp(function () {
-                        level.siblings(target).slideDown();
-                    });
-
-                    $(this).siblings().slideDown();
-                    $(this).slideUp();
-                    trigger = 1;
-                }
+        $(document).on('click', '[data-interaction-modify]', function (event) {
+            event.preventDefault();
+            var container = $(this).closest('[data-interaction-container]');
+            var display   = container.find('[data-interaction-display]');
+            var form      = container.find('[data-interaction-inline-form]');
+            display.slideUp(function() {
+                form.slideDown();
             });
-
-            if (trigger == 0) {
-                level.slideUp(function () {
-                    level.siblings(target).slideDown();
-                });
-            }
-
-            return false;
         });
 
         $('#dialog').dialog({
@@ -219,9 +201,9 @@
     <div class="island">
     <ul class="allowed-files action-list">
         <!-- BEGIN file -->
-        <li class="row-holder" data-equalizer>
+        <li class="row-holder" data-equalizer data-interaction-container>
             <form style="margin:0" id="allowed-file{FILE_ID}" method="post" action="/adminv2/allowed-fileForm.php">
-                <div class="row">
+                <div class="row" data-interaction-display>
                     <div class="column one-column">
                         <img src="/images/mime/60x60/{FILE_ICON}"/>
                     </div>
