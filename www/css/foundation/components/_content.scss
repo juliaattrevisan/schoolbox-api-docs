@@ -469,13 +469,13 @@ table{
 	border-collapse: collapse;
 	width: 100%;
 	thead tr th {
-	    border-bottom: 2px solid $white-smoke;
+	    border-bottom: 2px solid $body-bg;
 	}
 	tr:hover td{
 		background-color: $ocean-sunset;
 	}
-	td{
-		border-bottom: 1px solid $white-smoke;
+	td, th{
+		border-bottom: 1px solid $body-bg;
 		input[type=radio] +
 		label.radio-label,
 		input[type=checkbox] +
@@ -604,10 +604,6 @@ table{
 	@include single-transition(all, 0.15s, linear);
 }
 
-.row .island .row{
-	margin: 0;
-}
-
 // The original list
 // This list can use up to 4 columns
 // All other lists include (@extend) these styles
@@ -616,7 +612,7 @@ table{
 	margin: 0;
 	padding: 0;
 	li{
-		border-bottom: 1px solid $white-smoke;
+		border-bottom: 1px solid $body-bg;
 		position: relative;
 		overflow: visible;
 		list-style: none;
@@ -690,7 +686,7 @@ table{
 .subject-list{
 	@extend .information-list;
 	.subject-group{
-		border-bottom: 16px solid $white-smoke;
+		border-bottom: 16px solid $body-bg;
 	}
 	li{
 		a:hover{
@@ -752,7 +748,7 @@ table{
 	//@media #{$small-up} { @include block-grid(2); }
 	@extend .information-list;
 	li{
-		border-right: 1px solid $white-smoke;
+		border-right: 1px solid $body-bg;
 		border-bottom: 0;
 		&:last-child{
 			border: 0;
