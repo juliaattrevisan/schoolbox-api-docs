@@ -7,372 +7,377 @@
 
 <h1>{FUNCTION} Event</h1>
 
-<form data-form="event" method="post" action="/modules/eotc/manage/modifyForm.php" enctype="multipart/form-data">
-	<input name="id" type="hidden" value="{EVENT_ID}" />
-	<input name="authorId" type="hidden" value="{EVENT_AUTHOR_ID}" />
-	<input name="return" type="hidden" value="{EVENT_REDIRECT}" />
-	<input id="efficacy" name="efficacy" type="hidden" value="self" />
-	<input id="action" name="action" type="hidden" value="" />
-    <input type="hidden" name="allday" value="0" />
+<div class="eotc-status {EVENT_STATUS_CLASS}">{EVENT_STATUS}</div>
 
-	<div class="eotc-status {EVENT_STATUS_CLASS}">{EVENT_STATUS}</div>
+<div class="row">
+    <form data-form="event" method="post" action="/modules/eotc/manage/modifyForm.php" enctype="multipart/form-data">
+        <input name="id" type="hidden" value="{EVENT_ID}" />
+        <input name="authorId" type="hidden" value="{EVENT_AUTHOR_ID}" />
+        <input name="return" type="hidden" value="{EVENT_REDIRECT}" />
+        <input id="efficacy" name="efficacy" type="hidden" value="self" />
+        <input id="action" name="action" type="hidden" value="" />
+        <input type="hidden" name="allday" value="0" />
 
-	<h2>Details</h2>
+        <div class="large-12 columns">
+            <h2>Details</h2>
 
-    <div class="large-12 columns">
-        <label>
-            Title
-            <input name="note" class="required" type="text" size="50" maxlength="100" value="{EVENT_TITLE}" />
-        </label>
-    </div>
+            <label>
+                Title
+                <input name="note" class="required" type="text" size="50" maxlength="100" value="{EVENT_TITLE}" />
+            </label>
+        </div>
 
-    <div class="large-6 columns">
-        <label>
-            From
-            <input name="startDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
-        </label>
-    </div>
+        <div class="large-6 columns">
+            <label>
+                From
+                <input name="startDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
+            </label>
+        </div>
 
-    <div class="large-6 columns">
-        <div data-timeinputs>
-            <div class="large-4 columns">
-                <label>
-                    Hour
-                    <input name="startHour" data-timepicker="hour" class="timeField" type="text" maxlength="2" value="{EVENT_START_HOUR}" />
-                </label>
-            </div>
-            <div class="large-4 columns">
-                <label>
-                    Minute
-                    <input name="startMinute" data-timepicker="minute" class="timeField" type="text" maxlength="2" value="{EVENT_START_MIN}" />
-                </label>
-            </div>
-            <div class="large-4 columns">
-                <label>
-                    Period
-                    <select name="startPeriod">
-                        <option value="am" {EVENT_START_AM}>AM</option>
-                        <option value="pm" {EVENT_START_PM}>PM</option>
-                    </select>
-                </label>
+        <div class="large-6 columns">
+            <div data-timeinputs>
+                <div class="large-4 columns">
+                    <label>
+                        Hour
+                        <input name="startHour" data-timepicker="hour" class="timeField" type="text" maxlength="2" value="{EVENT_START_HOUR}" />
+                    </label>
+                </div>
+                <div class="large-4 columns">
+                    <label>
+                        Minute
+                        <input name="startMinute" data-timepicker="minute" class="timeField" type="text" maxlength="2" value="{EVENT_START_MIN}" />
+                    </label>
+                </div>
+                <div class="large-4 columns">
+                    <label>
+                        Period
+                        <select name="startPeriod">
+                            <option value="am" {EVENT_START_AM}>AM</option>
+                            <option value="pm" {EVENT_START_PM}>PM</option>
+                        </select>
+                    </label>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="large-6 columns">
-        <label>
-            To
-            <input name="endDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
-        </label>
-    </div>
+        <div class="large-6 columns">
+            <label>
+                To
+                <input name="endDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
+            </label>
+        </div>
 
-    <div class="large-6 columns">
-        <div data-timeinputs>
-            <div class="large-4 columns">
-                <label>
-                    Hour
-                    <input name="endHour" data-timepicker="hour" type="text" class="timeField" maxlength="2" value="{EVENT_END_HOUR}" />
-                </label>
-            </div>
-            <div class="large-4 columns">
-                <label>
-                    Minute
-                    <input name="endMinute" data-timepicker="minute" type="text" class="timeField" maxlength="2" value="{EVENT_END_MIN}" />
-                </label>
-            </div>
-            <div class="large-4 columns">
-                <label>
-                    Period
-                    <select name="endPeriod">
-                        <option value="am" {EVENT_END_AM}>AM</option>
-                        <option value="pm" {EVENT_END_PM}>PM</option>
-                    </select>
-                </label>
+        <div class="large-6 columns">
+            <div data-timeinputs>
+                <div class="large-4 columns">
+                    <label>
+                        Hour
+                        <input name="endHour" data-timepicker="hour" type="text" class="timeField" maxlength="2" value="{EVENT_END_HOUR}" />
+                    </label>
+                </div>
+                <div class="large-4 columns">
+                    <label>
+                        Minute
+                        <input name="endMinute" data-timepicker="minute" type="text" class="timeField" maxlength="2" value="{EVENT_END_MIN}" />
+                    </label>
+                </div>
+                <div class="large-4 columns">
+                    <label>
+                        Period
+                        <select name="endPeriod">
+                            <option value="am" {EVENT_END_AM}>AM</option>
+                            <option value="pm" {EVENT_END_PM}>PM</option>
+                        </select>
+                    </label>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- BEGIN recurring_dates -->
-    <div data-advanced class="large-12 columns {SHOW_ADVANCED}">
-        <label>
-            Repeat
-            <span class='hint has-tip tip-top' data-tooltip title="The frequency with which this event recurs, if at all.">?</span>
-            <select name="repeat">
-                <option value="">Single Event</option>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="fortnightly">Fortnightly</option>
-                <option value="monthly">Monthly</option>
-            </select>
-        </label>
+        <!-- BEGIN recurring_dates -->
+        <div data-advanced class="large-12 columns {SHOW_ADVANCED}">
+            <label>
+                Repeat
+                <span class='hint has-tip tip-top' data-tooltip title="The frequency with which this event recurs, if at all.">?</span>
+                <select name="repeat">
+                    <option value="">Single Event</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="fortnightly">Fortnightly</option>
+                    <option value="monthly">Monthly</option>
+                </select>
+            </label>
 
-        <label data-repeat-until class="hide">
-            Repeat Until
-            <span class='hint has-tip tip-top' data-tooltip title="The date at which recurrence should cease.">?</span>
-            <input name="repeat_until" data-datepicker='true' type="text" size="15" maxlength="30" value="" />
-        </label>
-    </div>
-    <!-- END recurring_dates -->
-    <!-- BEGIN recurring_reminder -->
-    <div data-advanced data-repeat-reminder class="large-12 columns">
-        <label>
-            Repeat
-            <span class='hint has-tip tip-top' data-tooltip title="This event is part of a recurring series.">?</span>
-            <br />
-            {EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong>.
-        </label>
-    </div>
-    <!-- END recurring_reminder -->
-
-    <div class="large-12 columns">
-        <label>
-            Location
-            <input name="location" class='required' type="text" size="50" value="{EVENT_LOCATION}"/>
-        </label>
-
-        <label>
-            Type
-            <span class='hint has-tip tip-top' data-tooltip title="Select the type of event. This will be represented via different colours.">?</span>
-            <select name="type">
-                <!-- BEGIN type_drop -->
-                <option value="{EVENT_EVENTTYPE_ID}" {EVENT_EVENTTYPE_ID_SELECTED}>{EVENT_EVENTTYPE_NAME}</option>
-                <!-- END type_drop -->
-            </select>
-        </label>
-    </div>
-
-    <div class="large-12 columns">
-        <label>
-            Campus
-            <span class='hint has-tip tip-top' data-tooltip title="Select the campuses which will be able to view this event.">?</span>
-        </label>
-        <!-- BEGIN event_campus_list -->
-        <input id="campusCheckbox{EVENT_CAMPUS_ID}" type="checkbox" name="campus[]" value="{EVENT_CAMPUS_ID}" {EVENT_CAMPUS_ID_SELECTED} />
-        <label for="campusCheckbox{EVENT_CAMPUS_ID}" class="checkbox-label">{EVENT_CAMPUS_NAME}</label>
-        <!-- END event_campus_list -->
-    </div>
-
-    <div class="large-12 columns">
-        <input type="hidden" name="ramsUploaded" data-ramsuploaded="{EVENT_RAMS_UPLOADED}" />
-        <input type="hidden" name="ramsRequired" value="0" />
-
-        <label>
-            RAMS Required?
-            <span class='hint has-tip tip-top' data-tooltip title="Please confirm if RAMS is required for this event to take place.">?</span>
-        </label>
-
-        <div class="large-4 columns">
-            <input id='ramsRequiredCheckbox' type="checkbox" data-ramscheckbox="true" name="ramsRequired" value="1" {EVENT_RAMSREQUIRED_SELECTED} />
-            <label for="ramsRequiredCheckbox" class="checkbox-label">RAMS is required</label>
+            <label data-repeat-until class="hide">
+                Repeat Until
+                <span class='hint has-tip tip-top' data-tooltip title="The date at which recurrence should cease.">?</span>
+                <input name="repeat_until" data-datepicker='true' type="text" size="15" maxlength="30" value="" />
+            </label>
         </div>
-        <div class="large-8 columns">
-            <ul class="information-list">
-                <!-- BEGIN rams_list -->
-                <li>
-                    <div class="one-column">
-                        <img src="/images/mime/22x22/{EVENT_RAMS_MIMETYPE_ICONFILE}" />
-                    </div>
-                    <div class="nine-column">
-                        <a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" alt="Download" title="Download">{EVENT_RAMS_FILE}</a>
-                    </div>
-                    <div class="two-column">
-                        <input type="checkbox" id="deleteRamsFile-{EVENT_RAMS_HASH}" name="deleteRamsFile[{EVENT_RAMS_HASH}]" value="1" />
-                        <label for="deleteRamsFile-{EVENT_RAMS_HASH}" class="checkbox-label">Delete?</label>
-                    </div>
-                </li>
-                <!-- END rams_list -->
-            </ul>
+        <!-- END recurring_dates -->
+        <!-- BEGIN recurring_reminder -->
+        <div data-advanced data-repeat-reminder class="large-12 columns">
+            <label>
+                Repeat
+                <span class='hint has-tip tip-top' data-tooltip title="This event is part of a recurring series.">?</span>
+                <br />
+                {EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong>.
+            </label>
+        </div>
+        <!-- END recurring_reminder -->
 
-            <div data-ramsfile="true">
+        <div class="large-12 columns">
+            <label>
+                Location
+                <input name="location" class='required' type="text" size="50" value="{EVENT_LOCATION}"/>
+            </label>
+
+            <label>
+                Type
+                <span class='hint has-tip tip-top' data-tooltip title="Select the type of event. This will be represented via different colours.">?</span>
+                <select name="type">
+                    <!-- BEGIN type_drop -->
+                    <option value="{EVENT_EVENTTYPE_ID}" {EVENT_EVENTTYPE_ID_SELECTED}>{EVENT_EVENTTYPE_NAME}</option>
+                    <!-- END type_drop -->
+                </select>
+            </label>
+        </div>
+
+        <div class="large-12 columns">
+            <label>
+                Campus
+                <span class='hint has-tip tip-top' data-tooltip title="Select the campuses which will be able to view this event.">?</span>
+            </label>
+            <!-- BEGIN event_campus_list -->
+            <input id="campusCheckbox{EVENT_CAMPUS_ID}" type="checkbox" name="campus[]" value="{EVENT_CAMPUS_ID}" {EVENT_CAMPUS_ID_SELECTED} />
+            <label for="campusCheckbox{EVENT_CAMPUS_ID}" class="checkbox-label">{EVENT_CAMPUS_NAME}</label>
+            <!-- END event_campus_list -->
+        </div>
+
+        <div class="large-12 columns">
+            <input type="hidden" name="ramsUploaded" data-ramsuploaded="{EVENT_RAMS_UPLOADED}" />
+            <input type="hidden" name="ramsRequired" value="0" />
+
+            <label>
+                RAMS Required?
+                <span class='hint has-tip tip-top' data-tooltip title="Please confirm if RAMS is required for this event to take place.">?</span>
+            </label>
+
+            <div class="large-4 columns">
+                <input id='ramsRequiredCheckbox' type="checkbox" data-ramscheckbox="true" name="ramsRequired" value="1" {EVENT_RAMSREQUIRED_SELECTED} />
+                <label for="ramsRequiredCheckbox" class="checkbox-label">RAMS is required</label>
+            </div>
+            <div class="large-8 columns">
                 <ul class="information-list">
+                    <!-- BEGIN rams_list -->
                     <li>
-                        <div class="eleven-column">
-                            <input type="file" name="ramsFile[]" multiple />
-                        </div>
                         <div class="one-column">
-                            <a href="#" data-action="delete" class="icon-delete no-text hide"></a>
+                            <img src="/images/mime/22x22/{EVENT_RAMS_MIMETYPE_ICONFILE}" />
+                        </div>
+                        <div class="nine-column">
+                            <a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" alt="Download" title="Download">{EVENT_RAMS_FILE}</a>
+                        </div>
+                        <div class="two-column">
+                            <input type="checkbox" id="deleteRamsFile-{EVENT_RAMS_HASH}" name="deleteRamsFile[{EVENT_RAMS_HASH}]" value="1" />
+                            <label for="deleteRamsFile-{EVENT_RAMS_HASH}" class="checkbox-label">Delete?</label>
                         </div>
                     </li>
+                    <!-- END rams_list -->
                 </ul>
+
+                <div data-ramsfile="true">
+                    <ul class="information-list">
+                        <li>
+                            <div class="eleven-column">
+                                <input type="file" name="ramsFile[]" multiple />
+                            </div>
+                            <div class="one-column">
+                                <a href="#" data-action="delete" class="icon-delete no-text hide"></a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="large-12 columns">
-        <label>
-            Details
-            <span class='hint has-tip tip-top' data-tooltip title="Include support comments required as part of your EOTC approval, e.g. Names of non-staff adults; How this trip supports the curriculum (For College SS EOTCs, state how trip relates to assessment) ">?</span>
+        <div class="large-12 columns">
+            <label>
+                Details
+                <span class='hint has-tip tip-top' data-tooltip title="Include support comments required as part of your EOTC approval, e.g. Names of non-staff adults; How this trip supports the curriculum (For College SS EOTCs, state how trip relates to assessment) ">?</span>
 
-            <textarea class='event-detail' name="detail">{EVENT_DETAIL}</textarea>
-        </label>
-    </div>
+                <textarea class='event-detail' name="detail">{EVENT_DETAIL}</textarea>
+            </label>
+        </div>
 
-    <label>
-    </label>
+        <div class="large-12 columns">
+            <h2>People</h2>
 
-    <label>
-    </label>
+            <label>
+                Teacher In Charge
+                <span class='hint has-tip tip-top' data-tooltip title="The teacher in charge of this event.">?</span>
+                <select id="teacher-in-charge-suggest" name="teacherInCharge" multiple  placeholder="Search Teachers"></select>
+            </label>
+        </div>
+        <div class="large-12 columns">
+            <label>
+            </label>
+        </div>
+        <div class="large-12 columns">
+            <label>
+            </label>
+        </div>
 
-    <label>
-    </label>
 
-	<h2>People</h2>
-	<table class="standardForm">
-		<tbody>
-			<tr>
-				<td class="formLabelWidth">
-					<h4>Teacher In Charge</h4>
-					<em>The teacher in charge of this event</em>
-				</td>
-				<td>
-					<select id="teacher-in-charge-suggest" name="teacherInCharge" multiple  placeholder="Search Teachers"></select>
-				</td>
-			</tr>
-			<tr>
-				<td class="formLabelWidth">
-					<h4>Staff Members</h4>
-					<em>Add staff members</em>
-				</td>
-				<td>
-					<select id="staff-suggest" name="staff[]" multiple placeholder="Search Staff"></select>
-				</td>
-			</tr>
-			<!-- BEGIN can_add_students -->
-			<tr>
-				<td class="formLabelWidth">
-					<h4>Students</h4>
-					<em>Add student attendees</em>
-				</td>
-				<td>
-					{EVENT_CURRENT_STUDENTS}
-					<a href="/modules/eotc/manage/attendance/list/{EVENT_ID}"
-						class="btn modify"
-						title="Manage student attendances for this event. This will open in a new tab/window."
-						target="_blank"
-					><span></span>Manage Attendances</a>
-				</td>
-			</tr>
-			<!-- END can_add_students -->
-		</tbody>
-	</table>
 
-	<!-- BEGIN can_add_resources -->
-	<h2>Resources</h2>
-	<table class="standardForm">
-		<tbody>
-			<tr>
-				<td class="formLabelWidth">
-					<h4>Resources</h4>
-					<em>Resources allocated to this event</em>
-				</td>
-				<td>
-					<ul>
-						<!-- BEGIN resource -->
-						<li>
-							<a href="/resource-booking/item/{RESOURCE_ID}" alt="{RESOURCE_NAME}" title="{RESOURCE_NAME}">{RESOURCE_NAME}</a>
-						</li>
-						<!-- END resource -->
-					</ul>
 
-					<a href="/modules/eotc/manage/resources/list/{EVENT_ID}"
-						class="btn modify"
-						title="Manage resource bookings for this event. This will open in a new tab/window."
-						target="_blank"
-					><span></span>Manage Resource Bookings</a>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-	<!-- END can_add_resources -->
 
-	<!-- BEGIN has_activity_log -->
-	<h2>Activity Log</h2>
-	<table class="standardForm">
-		<tbody>
-			<!-- BEGIN activity_log -->
-			<tr>
-				<td class="formLabelWidth">{ACTIVITY_LOG_CREATED_AT}</td>
-				<td>{ACTIVITY_LOG_MESSAGE}</td>
-			</tr>
-			<!-- END activity_log -->
-		</tbody>
-	</table>
-	<!-- END has_activity_log -->
 
-	<!-- BEGIN can_promote_in_principle -->
-	<h2>Complete Details</h2>
-	<table class="standardForm">
-		<tbody>
-			<tr>
-				<td class="formLabelWidth">
-					<h4>Event Details</h4>
-				</td>
-				<td>
-					<label>
-						<input type="hidden" name="promoteInPrinciple" value="0" />
-						<input type="checkbox" name="promoteInPrinciple" value="1" /> All the required information for this event has been provided
-					</label>
-				</td>
-			</tr>
-			<tr>
-				<td class="formLabelWidth">
-					<h4>Comment</h4>
-					<em>Add a comment</em>
-				</td>
-				<td>
-					<textarea class='selfPromotionalComment' name="comment" style="width:100%;height:80px;"></textarea>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-	<!-- END can_promote_in_principle -->
+        <table class="standardForm">
+            <tbody>
+                <tr>
+                    <td class="formLabelWidth">
+                        <h4>Staff Members</h4>
+                        <em>Add staff members</em>
+                    </td>
+                    <td>
+                        <select id="staff-suggest" name="staff[]" multiple placeholder="Search Staff"></select>
+                    </td>
+                </tr>
+                <!-- BEGIN can_add_students -->
+                <tr>
+                    <td class="formLabelWidth">
+                        <h4>Students</h4>
+                        <em>Add student attendees</em>
+                    </td>
+                    <td>
+                        {EVENT_CURRENT_STUDENTS}
+                        <a href="/modules/eotc/manage/attendance/list/{EVENT_ID}"
+                            class="btn modify"
+                            title="Manage student attendances for this event. This will open in a new tab/window."
+                            target="_blank"
+                        ><span></span>Manage Attendances</a>
+                    </td>
+                </tr>
+                <!-- END can_add_students -->
+            </tbody>
+        </table>
 
-	<input id="b{FUNCTION}" type="submit" name="{FUNCTION}" value="{EOTC_FUNCTION}" class="submit-btn-plain"/>
+        <!-- BEGIN can_add_resources -->
+        <h2>Resources</h2>
+        <table class="standardForm">
+            <tbody>
+                <tr>
+                    <td class="formLabelWidth">
+                        <h4>Resources</h4>
+                        <em>Resources allocated to this event</em>
+                    </td>
+                    <td>
+                        <ul>
+                            <!-- BEGIN resource -->
+                            <li>
+                                <a href="/resource-booking/item/{RESOURCE_ID}" alt="{RESOURCE_NAME}" title="{RESOURCE_NAME}">{RESOURCE_NAME}</a>
+                            </li>
+                            <!-- END resource -->
+                        </ul>
 
-	<div id="dialog-bulk" title="This event is part of a series">
-		<p>
-			<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-			<span class="bulk-update">Would you like to update only this event, or all in the series? If any events in the series have been modified, the changes will be overridden.</span>
-			<span class="bulk-delete">Would you like to delete only this event, or all in the series?</span>
-		</p>
-	</div>
-	<div id="dialog-delete" title="Delete Event">
-		<p>
-			<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-			Are you sure you want to delete this event?
-		</p>
-	</div>
-	<div id="dialog-rams" title="Remove RAMS Requirement">
-		<p>
-			<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-			Warning: please confirm RAMS is not required.
-		</p>
+                        <a href="/modules/eotc/manage/resources/list/{EVENT_ID}"
+                            class="btn modify"
+                            title="Manage resource bookings for this event. This will open in a new tab/window."
+                            target="_blank"
+                        ><span></span>Manage Resource Bookings</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- END can_add_resources -->
 
-		<div class="clearfix"></div>
+        <!-- BEGIN has_activity_log -->
+        <h2>Activity Log</h2>
+        <table class="standardForm">
+            <tbody>
+                <!-- BEGIN activity_log -->
+                <tr>
+                    <td class="formLabelWidth">{ACTIVITY_LOG_CREATED_AT}</td>
+                    <td>{ACTIVITY_LOG_MESSAGE}</td>
+                </tr>
+                <!-- END activity_log -->
+            </tbody>
+        </table>
+        <!-- END has_activity_log -->
 
-		<p>
-			The organiser is required to submit a completed <strong>RAMS</strong>
-			(Risk Analysis Management System) form if the EOTC is associated with
-			certain activities which are deemed to have significant associated risks.
-			These include: Activities close to or on <strong>WATER</strong>;
-			<strong>TRAMPS</strong>; <strong>TRIPS</strong> (overseas, outside of
-			Auckland, as well as requiring activities outdoors or fieldwork);
-			<strong>CAMPS</strong>; <strong>OUTDOOR EDUCATION</strong> and
-			<strong>PRESCHOOL</strong> (all excursions off-site).
-		</p>
+        <!-- BEGIN can_promote_in_principle -->
+        <h2>Complete Details</h2>
+        <table class="standardForm">
+            <tbody>
+                <tr>
+                    <td class="formLabelWidth">
+                        <h4>Event Details</h4>
+                    </td>
+                    <td>
+                        <label>
+                            <input type="hidden" name="promoteInPrinciple" value="0" />
+                            <input type="checkbox" name="promoteInPrinciple" value="1" /> All the required information for this event has been provided
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="formLabelWidth">
+                        <h4>Comment</h4>
+                        <em>Add a comment</em>
+                    </td>
+                    <td>
+                        <textarea class='selfPromotionalComment' name="comment" style="width:100%;height:80px;"></textarea>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- END can_promote_in_principle -->
 
-		<p>
-			<a href="/modules/eotc/policy">Read the full RAMS policy.</a>
-		</p>
+        <input id="b{FUNCTION}" type="submit" name="{FUNCTION}" value="{EOTC_FUNCTION}" class="submit-btn-plain"/>
 
-		<p>
-			Press OK to confirm that RAMS is not required.
-		</p>
-	</div>
-	
-	<a href="/modules/eotc/myReview" class="btn go-to"><span></span>Back to My EOTC Events</a>
-</form>
+        <div id="dialog-bulk" title="This event is part of a series">
+            <p>
+                <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+                <span class="bulk-update">Would you like to update only this event, or all in the series? If any events in the series have been modified, the changes will be overridden.</span>
+                <span class="bulk-delete">Would you like to delete only this event, or all in the series?</span>
+            </p>
+        </div>
+        <div id="dialog-delete" title="Delete Event">
+            <p>
+                <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+                Are you sure you want to delete this event?
+            </p>
+        </div>
+        <div id="dialog-rams" title="Remove RAMS Requirement">
+            <p>
+                <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+                Warning: please confirm RAMS is not required.
+            </p>
 
+            <div class="clearfix"></div>
+
+            <p>
+                The organiser is required to submit a completed <strong>RAMS</strong>
+                (Risk Analysis Management System) form if the EOTC is associated with
+                certain activities which are deemed to have significant associated risks.
+                These include: Activities close to or on <strong>WATER</strong>;
+                <strong>TRAMPS</strong>; <strong>TRIPS</strong> (overseas, outside of
+                Auckland, as well as requiring activities outdoors or fieldwork);
+                <strong>CAMPS</strong>; <strong>OUTDOOR EDUCATION</strong> and
+                <strong>PRESCHOOL</strong> (all excursions off-site).
+            </p>
+
+            <p>
+                <a href="/modules/eotc/policy">Read the full RAMS policy.</a>
+            </p>
+
+            <p>
+                Press OK to confirm that RAMS is not required.
+            </p>
+        </div>
+
+        <a href="/modules/eotc/myReview" class="btn go-to"><span></span>Back to My EOTC Events</a>
+    </form>
+</div>
 
 
 
