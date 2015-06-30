@@ -9,9 +9,8 @@
             var container = $(this).closest('[data-interaction-container]');
             var display   = container.find('[data-interaction-display]');
             var form      = container.find('[data-interaction-inline-form]');
-            display.slideUp(function() {
-                form.slideDown();
-            });
+            display.slideUp();
+            form.slideDown();
         });
 
         $('#dialog').dialog({
