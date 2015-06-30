@@ -52,6 +52,11 @@
                     enabled: true
                 },
 
+                /* Use color transitions?
+                 * Must be one of ['default', 'stepped', 'continuous', 'reverseContinuous']
+                 */
+                useColorTransitions: 'stepped',
+
                 /* Custom callback formatter
                  */
                 formatter: function() {
@@ -64,89 +69,53 @@
 
             var merged = $.extend(defaults, derived, options);
 
-            /* Work out colour transitions
+            /* Use color transitions
              */
-            var allTemp = [];
-
-            for (var i = 0; i < merged.series[0].data.length; i++) {
-                var temp = {
-                    color: getSteppedHexColor(merged.series[0].data[i]),
-                    y: merged.series[0].data[i]
-                }
-
-                allTemp.push(temp);
-
-            }
-
-            merged.series[0].data = allTemp;
+            merged.series[0].data = useColorTransition(merged);
 
             return merged;
         }
 
         /**
-         * Stepped transition
-         *
-         * Blue until 90%, then red
-         *
-         * @param percent
-         * @returns {string}
+         * Use color transitions
          */
-        function getSteppedHexColor(percent) {
-            if (percent < 90) {
-                return '#0066b0';
+        function useColorTransition(merged) {
+            var newData;
+            var method = merged.useColorTransitions.toLowerCase();
+
+            switch(method) {
+                case 'stepped':
+                case 'continuous':
+                case 'reversecontinuous':
+                    newData = applyColorTransitions(merged.series[0].data, method);
+                    break;
+
+                default:
+                    newData = applyColorTransitions(merged.series[0].data, 'default');
+                    break;
             }
 
-            return '#ff5757';
+            return newData;
         }
 
         /**
-         * Colour transition
+         * Apply color transitions
          *
-         * Green is 100%
-         * Red is 0%
-         *
-         * @param percent
+         * @param data
+         * @param method
+         * @returns {Array}
          */
-        function getGradientHexColor(percent) {
-            var max = 230;
+        function applyColorTransitions(data, method) {
+            var allTemp = [];
 
-            var r = percent<50 ? max : Math.floor(max-(percent*2-100)*max/100);
-            var g = percent>50 ? max : Math.floor((percent*2)*max/100);
-
-            return '#' + hexColorComponent(r) + hexColorComponent(g) + '00';
-        }
-
-        /**
-         * Colour transition
-         *
-         * Green is 0%
-         * Red is 100%
-         *
-         * @param percent
-         */
-        function getReversedGradientHexColor(percent) {
-            var max = 230;
-
-            var r = percent>50 ? max : Math.floor((percent*2)*max/100);
-            var g = percent<50 ? max : Math.floor(max-(percent*2-100)*max/100);
-
-            return '#' + hexColorComponent(r) + hexColorComponent(g) + '00';
-        }
-
-        /**
-         * With prefixed 0
-         *
-         * @param percentage
-         * @returns {*}
-         */
-        function hexColorComponent(percentage) {
-            var hexValue = percentage.toString(16);
-
-            if (hexValue.length < 2) {
-                return '0' + hexValue;
+            for (var i = 0; i < data.length; i++) {
+                allTemp.push({
+                    color: $.fn.serverUsage[method](data[i]),
+                    y: data[i]
+                });
             }
 
-            return hexValue;
+            return allTemp;
         }
 
         /**
@@ -180,6 +149,10 @@
                 plotOptions: {
                     series: {
                         dataLabels: {
+                            color: '#ffffff',
+                            style: {
+                                textShadow: ''
+                            },
                             enabled: true,
                             align: 'center',
                             inside: true,
@@ -193,5 +166,81 @@
                 }
             });
         }
+    }
+
+    /**
+     * Default bar color
+     *
+     * @param percent
+     * @returns {string}
+     */
+    $.fn.serverUsage.default = function(percent) {
+        return '#0066b0';
+    }
+
+    /**
+     * Stepped transition
+     *
+     * Blue until 90%, then red
+     *
+     * @param percent
+     * @returns {string}
+     */
+    $.fn.serverUsage.stepped = function(percent) {
+        if (percent < 90) {
+            return '#0066b0';
+        }
+
+        return '#ff5757';
+    }
+
+    /**
+     * Continuous transition
+     *
+     * Green is 100%
+     * Red is 0%
+     *
+     * @param percent
+     */
+    $.fn.serverUsage.continuous = function(percent) {
+        var max = 230;
+
+        var r = percent<50 ? max : Math.floor(max-(percent*2-100)*max/100);
+        var g = percent>50 ? max : Math.floor((percent*2)*max/100);
+
+        return '#' + $.fn.serverUsage.hexColorComponent(r) + $.fn.serverUsage.hexColorComponent(g) + '00';
+    }
+
+    /**
+     * Continuous transition
+     *
+     * Green is 0%
+     * Red is 100%
+     *
+     * @param percent
+     */
+    $.fn.serverUsage.reversecontinuous = function(percent) {
+        var max = 230;
+
+        var r = percent>50 ? max : Math.floor((percent*2)*max/100);
+        var g = percent<50 ? max : Math.floor(max-(percent*2-100)*max/100);
+
+        return '#' + $.fn.serverUsage.hexColorComponent(r) + $.fn.serverUsage.hexColorComponent(g) + '00';
+    }
+
+    /**
+     * With prefixed 0
+     *
+     * @param percentage
+     * @returns {*}
+     */
+    $.fn.serverUsage.hexColorComponent = function(percentage) {
+        var hexValue = percentage.toString(16);
+
+        if (hexValue.length < 2) {
+            return '0' + hexValue;
+        }
+
+        return hexValue;
     }
 }(jQuery));

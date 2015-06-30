@@ -1,54 +1,28 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
-<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
-<script type="text/javascript">
-    $(function() {
-        $.fn.alaressTiny({
-            mode: "specific_textareas",
-            editor_selector: "mceEditor"
-        });
+<div class="row">
+    <div class="large-12 columns">
+        <h1>Schoolbox Administration</h1>
 
-        /**
-         * Homepage selector
-         */
-        var settings = $('form[data-action="saveSettings"]');
-        settings.on('click', 'a[data-interaction="homepage_selector"]', function(e) {
-            e.preventDefault();
-            var inputName = $(this).data('input_name');
-            $('#resource-browser').socialstreamBrowser({
-                title: 'Choose a folder',
-                mimeFilter: false,
-                categoryId: 0,
-                submitCallback: function(url) {
-                    settings.find('input[name="'+inputName+'"]').val(url);
-                }
-            });
-        });
-        settings.validate();
-    });
-</script>
-
-<!-- END custom_head -->
-
-<h1>Schoolbox Administration</h1>
-
-<dl class="sub-nav">
-    <!-- BEGIN admin_nav_item -->
-    <dd class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></dd>
-    <!-- END admin_nav_item -->
-</dl>
-
-<h2>Settings</h2>
-
-<div class="small-12 medium-3 columns">
-    <ul class="side-nav">
-        <!-- BEGIN setting_tab -->
-        <li class="{SETTING_TAB_ACTIVE}"><a href="/adminv2/setting/{SETTING_TAB_URL}">{SETTING_TAB_NAME}</a></li>
-        <!-- END setting_tab -->
-    </ul>
+        <dl class="sub-nav">
+            <!-- BEGIN admin_nav_item -->
+            <dd class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></dd>
+            <!-- END admin_nav_item -->
+        </dl>
+    </div>
 </div>
 
-<div class="small-12 medium-9 columns">
+<div class="row">
+    <div class="large-12 columns">
+        <h2>Settings</h2>
+
+        <dl class="sub-nav">
+            <!-- BEGIN setting_tab -->
+            <dd class="{SETTING_TAB_ACTIVE}"><a href="/adminv2/setting/{SETTING_TAB_URL}">{SETTING_TAB_NAME}</a></dd>
+            <!-- END setting_tab -->
+        </dl>
+    </div>
+</div>
+
+<div class="large-12 columns">
     <!-- BEGIN setting_group -->
     <form data-action="saveSettings" id="settings" class="admin-form level clearfix" method="post" action="/adminv2/settingForm.php">
         <!-- BEGIN setting_group_localisation -->
@@ -150,3 +124,32 @@
 </div>
 
 <div id="resource-browser" class="hide"></div>
+
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $.fn.alaressTiny({
+            mode: "specific_textareas",
+            editor_selector: "mceEditor"
+        });
+
+        /**
+         * Homepage selector
+         */
+        var settings = $('form[data-action="saveSettings"]');
+        settings.on('click', 'a[data-interaction="homepage_selector"]', function(e) {
+            e.preventDefault();
+            var inputName = $(this).data('input_name');
+            $('#resource-browser').socialstreamBrowser({
+                title: 'Choose a folder',
+                mimeFilter: false,
+                categoryId: 0,
+                submitCallback: function(url) {
+                    settings.find('input[name="'+inputName+'"]').val(url);
+                }
+            });
+        });
+        settings.validate();
+    });
+</script>

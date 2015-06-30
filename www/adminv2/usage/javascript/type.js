@@ -88,7 +88,10 @@
                 series: [{
                     type: 'pie',
                     data: datasets
-                }]
+                }],
+                credits: {
+                    enabled: false
+                }
             });
 		}
 
@@ -96,7 +99,7 @@
 		 * This is used when there is no data
 		 */
 		function noPie() {
-			config.element.html('<h3>' + config.title + '</h3><p><strong>This user has no files.</strong></p>');
+			config.element.html('<h3>' + config.title + '</h3><p>This user has no files.</p>');
 		}
 	}
 }(jQuery));
