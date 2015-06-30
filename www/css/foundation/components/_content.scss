@@ -493,17 +493,34 @@ table{
   );
 }
 
-// White Islands
-.columns{
-	section{
+// White Islands - Custom 'Island' Columns
+.island {
+  	@include grid-column();
+  	@media #{$small-up} {
+		padding: 0 rem-calc(($base-font-size - 8));
+	}
+	@media #{$medium-up} {
+		padding: 0 rem-calc(($base-font-size - 4));
+	}
+	@media #{$large-up} {
+		padding: 0 rem-calc(($base-font-size));
+	}
+	
+	// Only sections inside islands have these styles
+  	section{
 		background-color: $white;
 		margin-bottom: rem-calc(($base-font-size));
 	}
-	&:first-child section{
-		padding-left: 0;
-	}
-	&:last-child section{
-		padding-right: 0;
+	.content{
+		@media #{$small-up} {
+			padding: rem-calc(($base-font-size - 8));
+		}
+		@media #{$medium-up} {
+			padding: rem-calc(($base-font-size - 4));
+		}
+		@media #{$large-up} {
+			padding: rem-calc(($base-font-size));
+		}
 	}
 }
 
@@ -587,6 +604,10 @@ table{
 	@include single-transition(all, 0.15s, linear);
 }
 
+.row .island .row{
+	margin: 0;
+}
+
 // The original list
 // This list can use up to 4 columns
 // All other lists include (@extend) these styles
@@ -595,7 +616,7 @@ table{
 	margin: 0;
 	padding: 0;
 	li{
-		border-bottom: 1px solid $silver;
+		border-bottom: 1px solid $white-smoke;
 		position: relative;
 		overflow: visible;
 		list-style: none;
@@ -639,8 +660,7 @@ table{
 		.three-column,
 		.nine-column,
 		.ten-column,
-		.eleven-column,
-		.grade{
+		.eleven-column{
 			@media #{$small-up} {
 				padding: rem-calc(($base-font-size - 8));
 			}
@@ -659,7 +679,6 @@ table{
 	@extend .information-list;
 	li{
 		.grade{
-			@media #{$small-up} { @include grid-column(1); }
 			text-align: center;
 			font-weight: $font-weight-bold;
 			font-size: rem-calc(($base-font-size + 2));
@@ -671,14 +690,13 @@ table{
 .subject-list{
 	@extend .information-list;
 	.subject-group{
-		border-bottom: 16px solid $silver;
+		border-bottom: 16px solid $white-smoke;
 	}
 	li{
 		a:hover{
 			background-color: $ocean-sunset;
 		}
 		.grade{
-			@media #{$small-up} { @include grid-column(1); }
 			min-height: 64px;
 			text-align: center;
 			font-weight: $font-weight-bold;
@@ -717,7 +735,7 @@ table{
 			background-color: $ocean-sunset;
 		}
 	}
-	> li:hover .actions a{
+	> li:hover .actions > a{
 		opacity: 1;
 	}
 	.expanded .task-list{
@@ -734,7 +752,7 @@ table{
 	//@media #{$small-up} { @include block-grid(2); }
 	@extend .information-list;
 	li{
-		border-right: 1px solid $silver;
+		border-right: 1px solid $white-smoke;
 		border-bottom: 0;
 		&:last-child{
 			border: 0;
@@ -747,7 +765,7 @@ table{
 	list-style: none;
 	margin: 0;
 	padding: 0 !important;
-	a{
+	> a{
 		display: inline-block;
 		opacity: 0.3;
 		text-align: center;
