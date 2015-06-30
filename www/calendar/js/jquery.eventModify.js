@@ -419,7 +419,7 @@
 					if (multi) {
 						$('.bulk-update, [data-message=bulk-update]').css('display', act === 'Update' ? 'inline' : 'none');
 						$('.bulk-delete, [data-message=bulk-delete]').css('display', act === 'Delete' ? 'inline' : 'none');
-						$("#dialog-bulk").dialog({
+						$("#dialog-bulk, [data-dialog=bulk]").dialog({
 							resizable: false,
 							height: 180,
 							width: 500,
@@ -449,7 +449,7 @@
 							form.submit();
 						} else if (act == 'Delete') {
 							// dialog time
-							$("#dialog-delete").dialog({
+							$("#dialog-delete, [data-dialog=bulk]").dialog({
 								resizable: false,
 									height: 180,
 									width: 500,
