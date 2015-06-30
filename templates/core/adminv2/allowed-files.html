@@ -1,9 +1,8 @@
 <!-- BEGIN custom_head -->
 <style type="text/css">
-    #container.foundation form {
-        margin: 0.5rem 0 0;
-    }
-    #container.foundation .information-list li {
+    #container.foundation .information-list li,
+    #container.foundation .action-list li
+    {
         overflow: visible;
     }
 </style>
@@ -168,11 +167,7 @@
 {ADMIN_NAV}
 
 <div>
-    <span class="header-actions">
-        <a href="/adminv2/allowed-file/new" data-interaction-new class="button icon-add">New file type</a>
-    </span>
-    <h2>Allowed Files</h2>
-
+    <a href="/adminv2/allowed-file/new" data-interaction-new class="button icon-add">New file type</a>
     <form id="newAllowedFile" method="post" action="/adminv2/allowed-fileForm.php" class="panel" style="display:none;">
         <input type="hidden" readonly="readonly" name="fileTypeId" value=""/>
         <h3>Create new file type</h3>
@@ -226,16 +221,16 @@
             </div>
         </div>
     </form>
-
-    <ul class="allowed-files information-list">
+    <div class="island">
+    <ul class="allowed-files action-list">
         <!-- BEGIN file -->
-        <li class="row-holder">
-            <form id="allowed-file{FILE_ID}" method="post" action="/adminv2/allowed-fileForm.php">
+        <li class="row-holder" data-equalizer>
+            <form style="margin:0" id="allowed-file{FILE_ID}" method="post" action="/adminv2/allowed-fileForm.php">
                 <div class="row">
-                    <div class="column small-1 one-column">
+                    <div class="column one-column">
                         <img src="/images/mime/60x60/{FILE_ICON}"/>
                     </div>
-                    <div class="column small-8 eight-column">
+                    <div class="column small-10 medium-8 content" data-equalizer-watch>
                         <h3>{FILE_DESC}
                             <!-- BEGIN enabled -->
                             <span class="label alert">Disabled</span>
@@ -252,21 +247,37 @@
                                 <p>{FILE_INLINE}</p>
                             </div>
                         </div>
-                    </div>
-                    <div class="actions three">
-                        <a href="/adminv2/allowed-file/{FILE_ID}/{FILE_ENABLED_ACTION}" data-interaction-{FILE_ENABLED_ACTION} class="no-text icon-{FILE_ENABLED_ICON}"  title="{FILE_ENABLED_TITLE}"></a>
-                        <a href="/adminv2/allowed-file/{FILE_ID}/modify"  data-interaction-modify  class="no-text icon-modify" title="Modify"></a>
-                        <a href="/adminv2/allowed-file/{FILE_ID}/delete"  data-interaction-delete  class="no-text delete icon-delete" title="Delete"></a>
-                    </div>
-                    <div class="column twelve">
                         <dl>
                             <!-- BEGIN file_extension -->
                             <dd class="label">{FILE_EXTENSION}</dd>
                             <!-- END file_extension -->
                         </dl>
                     </div>
+                    <div class="actions three show-for-medium-up">
+                        <a href="/adminv2/allowed-file/{FILE_ID}/{FILE_ENABLED_ACTION}" data-equalizer-watch data-interaction-{FILE_ENABLED_ACTION} class="no-text icon-{FILE_ENABLED_ICON}"  title="{FILE_ENABLED_TITLE}"></a>
+                        <a href="/adminv2/allowed-file/{FILE_ID}/modify" data-equalizer-watch data-interaction-modify  class="no-text icon-modify" title="Modify"></a>
+                        <a href="/adminv2/allowed-file/{FILE_ID}/delete" data-equalizer-watch data-interaction-delete  class="no-text delete icon-delete" title="Delete"></a>
+                    </div>
+                    <div class="actions one hide-for-medium-up">
+                        <a href="#" data-equalizer-watch data-dropdown="more-{FILE_ID}" class="no-text icon-more"></a>
+                    </div>
+                    <ul class="f-dropdown hide-for-medium-up" data-dropdown-content id="more-{FILE_ID}">
+                        <li>
+                            <a href="/adminv2/allowed-file/{FILE_ID}/{FILE_ENABLED_ACTION}" data-interaction-{FILE_ENABLED_ACTION} class="icon-{FILE_ENABLED_ICON}">{FILE_ENABLED_TITLE}</a>
+                        </li>
+                        <li>
+                            <a href="/adminv2/allowed-file/{FILE_ID}/modify"  data-interaction-modify  class="icon-modify">Modify</a>
+                        </li>
+                        <li>
+                            <a href="/adminv2/allowed-file/{FILE_ID}/delete"  data-interaction-delete  class="icon-delete">Delete</a>
+                        </li>
+                    </ul>
+
+
+
+
                 </div>
-                <div style="display:none;" class="row no-pad" data-interaction-inline-form>
+                <div style="display:none;" data-interaction-inline-form>
                 <!--/adminv2/allowed-fileForm.php-->
                     <input type="hidden" readonly="readonly" name="fileTypeId" value="{FILE_ID}"/>
                     <input id="enabled-{FILE_ID}" type="hidden" name="enable" value="{FILE_ENABLED}" />
@@ -278,7 +289,7 @@
                             </button>
                             <input type="hidden" name="iconFile" id="button{FILE_ID}" class="chosen-one" value="{FILE_ICON}"/>
                         </div>
-                        <div class="description column large-9 end">
+                        <div class="description column large-11">
                             <div>
                                 <label for="description-{FILE_ID}">Description</label>
                                 <input id="description-{FILE_ID}" type="text" class="text-input" name="description" value="{FILE_DESC}"/>
@@ -292,13 +303,13 @@
                                     <input id="mime-{FILE_ID}" type="text" class="text-input" name="mime" value="{FILE_MIME}"/>
                                 </div>
                             </div>
-                            <div class="max_size column large-2">
+                            <div class="max_size column large-3">
                                 <div>
                                     <label for="max_file_size-{FILE_ID}">Max Size</label>
                                     <input id="max_file_size-{FILE_ID}" type="text" class="text-input" name="max_file_size" placeholder="{FILE_MAXSIZE_PLACEHOLDER}" value="{FILE_MAXSIZE_INPUT}"/>
                                 </div>
                             </div>
-                            <div class="inline column large-2 end">
+                            <div class="inline column large-3">
                                 <div>
                                     <label for="inline-{FILE_ID}">Inline</label>
                                     <select name="inline" id="inline-{FILE_ID}">
@@ -309,7 +320,7 @@
                             </div>
                     </div>
                     <div class="row">
-                        <div class="extensions column large-9 large-offset-1">
+                        <div class="extensions column large-11 large-offset-1">
                             <div>
                                 <label for="extension-{FILE_ID}">Extensions</label>
                                 <input id="extension-{FILE_ID}" type="text" class="text-input" name="extension" value="{FILE_EXTENSION_CSV}"/>
@@ -327,9 +338,10 @@
         </li>
         <!-- END file -->
     </ul>
+    </div>
 </div>
 <div id="dialog" title="Select an Icon">
-    <div class="hide store-here"></div>
+    <div style="display:none;" class="store-here"></div>
     <!-- BEGIN image -->
     <button class="new-button">
         <img src="/images/mime/22x22/{IMAGE_FILE}" alt="{IMAGE_FILE}"/>
