@@ -176,7 +176,7 @@ foreach ($tableList as $table) {
     if ($this->arg[0] == $table['name']) {
         $selectedTable = $table;
 
-        $this->setVar('TABLE_CURRENT', 'current');
+        $this->setVar('TABLE_CURRENT', 'active');
 
         /* Remember the name of the table so we know which lookup table to
            * update lists.

@@ -86,16 +86,7 @@ $(function() {
 </script>
 <!-- END custom_head-->
 
-<div class="row">
-    <div class="large-12 columns">
-        <h1>Schoolbox Administration</h1>
-        <dl class="sub-nav">
-            <!-- BEGIN admin_nav_item -->
-            <dd class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></dd>
-            <!-- END admin_nav_item -->
-        </dl>
-    </div>
-</div>
+{ADMIN_NAV}
 
 <div class="row">
     <div class="large-12 columns">
@@ -171,7 +162,7 @@ $(function() {
                 </label>
                 <input name="userid" type="hidden" id="userid" size="6" maxlength="6" />
 
-                <a class="button submit" href="#">Import</a>
+                <a class="button icon-upload" href="#">Import</a>
             </form>
         </div>
         <!-- END import -->

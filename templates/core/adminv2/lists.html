@@ -1,106 +1,104 @@
-<h1>Schoolbox Administration</h1>
-<dl class="sub-nav">
-    <!-- BEGIN admin_nav_item -->
-    <dd class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></dd>
-    <!-- END admin_nav_item -->
-</dl>
-<div class="admin-contents clearfix">
-	<h2>Lists</h2>
-	
-	<div class="level green hide-it clearfix">	
-		You've successfully updated your settings.
-	</div>
-	
-	<div class="settings-nav-holder">
-		<ul class="admin-nav vertical">
+{ADMIN_NAV}
+
+<div class="row">
+    <div class="large-12 columns">
+        <h2>Lists</h2>
+
+        <dl class="sub-nav">
             <!-- BEGIN table_tab -->
-			<li><a href="/adminv2/list/{TABLE_NAME}" class="{TABLE_CURRENT}">{TABLE_TITLE}<span></span></a></li>
+            <dd class="{TABLE_CURRENT}"><a href="/adminv2/list/{TABLE_NAME}">{TABLE_TITLE}</a></dd>
             <!-- END table_tab -->
-		</ul>
-	</div>
-	<div class="settings">
-		<form id="settings" class="admin-form level clearfix" method="post" action="/adminv2/listForm.php">
-			<!-- BEGIN table_schema -->
-			<input name="tableName" type="hidden" value="{TABLE_CURRENT_NAME}" />
-			<input name="tableIndex" type="hidden" value="{TABLE_CURRENT_INDEX}" />
-			<!-- END table_schema -->
-			<table id="tableData" class="table ruler">
-				<colgroup>
-					<col width="10%" />
-				</colgroup>
-				<thead>
-					<tr>
-						<!-- BEGIN table_heading -->
-						<th scope="col">{TABLE_HEAD}</th>
-						<!-- END table_heading -->
-					</tr>
-				</thead>
-				<tbody>
-					<!-- BEGIN table_row -->
-					<tr>
-						<!-- BEGIN table_cell_static -->
-						<td>
-							{TABLE_DATA}
-							<input name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="hidden" value="{TABLE_DATA}" />
-						</td>
-						<!-- END table_cell_static -->
-						<!-- BEGIN table_cell -->
-						<td>
-                            <input class="required {NULLABLE_CLASS}" name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="text" value="{TABLE_DATA}" />
-                            <!-- BEGIN table_cell_null -->
-                            <span class="null-control">
-                                <input id="{TABLE_COLUMN}-{ROW_NUMBER}-null" type="checkbox" name="{TABLE_COLUMN}[{ROW_NUMBER}]" value="NULL" {TABLE_DATA_NULL_CHECKED} />
-                                <label for="{TABLE_COLUMN}-{ROW_NUMBER}-null">Null?</label>
-                            </span>
-                            <!-- END table_cell_null -->
-                        <!-- END table_cell -->
-                        </td>
-						<!-- END table_cell -->
-                        <!-- BEGIN table_cell_select -->
-                            <td><select name="{TABLE_COLUMN}[{ROW_NUMBER}]">
-                                <!-- BEGIN table_cell_select_option -->
+        </dl>
+
+        <div>
+            <form method="post" action="/adminv2/listForm.php">
+                <!-- BEGIN table_schema -->
+                <input name="tableName" type="hidden" value="{TABLE_CURRENT_NAME}" />
+                <input name="tableIndex" type="hidden" value="{TABLE_CURRENT_INDEX}" />
+                <!-- END table_schema -->
+                <table data-list>
+                    <colgroup>
+                        <col width="10%" />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <!-- BEGIN table_heading -->
+                            <th>{TABLE_HEAD}</th>
+                            <!-- END table_heading -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- BEGIN table_row -->
+                        <tr>
+                            <!-- BEGIN table_cell_static -->
+                            <td>
+                                {TABLE_DATA}
+                                <input name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="hidden" value="{TABLE_DATA}" />
+                            </td>
+                            <!-- END table_cell_static -->
+                            <!-- BEGIN table_cell -->
+                            <td>
+                                <div class="large-9 columns">
+                                    <input class="required {NULLABLE_CLASS}" name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="text" value="{TABLE_DATA}" />
+                                </div>
+                                <!-- BEGIN table_cell_null -->
+                                <div class="large-3 columns">
+                                    <input id="{TABLE_COLUMN}-{ROW_NUMBER}-null" type="checkbox" name="{TABLE_COLUMN}[{ROW_NUMBER}]" value="NULL" {TABLE_DATA_NULL_CHECKED} />
+                                    <label for="{TABLE_COLUMN}-{ROW_NUMBER}-null" class="checkbox-label">Null?</label>
+                                </div>
+                                <!-- END table_cell_null -->
+                            <!-- END table_cell -->
+                            </td>
+                            <!-- END table_cell -->
+                            <!-- BEGIN table_cell_select -->
+                            <td>
+                                <select name="{TABLE_COLUMN}[{ROW_NUMBER}]">
+                                    <!-- BEGIN table_cell_select_option -->
                                     <option value="{OPTION_VALUE}" {OPTION_VALUE_SELECTED}>{OPTION_LABEL}</option>
-                                <!-- END table_cell_select_option -->
-                            </select></td>
-                        <!-- END table_cell_select -->
-                        <!-- BEGIN table_cell_checkbox -->
-                        <td>
-                            <input name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="hidden" value="0" />
-                            <input name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="checkbox" value="1" {TABLE_DATA_CHECKED}/>
-                        </td>
-                        <!-- END table_cell_checkbox -->
-					</tr>
-					<!-- END table_row -->
-				</tbody>
-			</table>
-            <!-- BEGIN create_new -->
-			<a href="#" id="addNewRow" class="btn add float-left"><span></span>New Row</a>
-            <!-- END create_new -->
-			<input type="submit" class="submit-btn-plain" value="Save"/>
-		</form>
-	</div>
+                                    <!-- END table_cell_select_option -->
+                                </select>
+                            </td>
+                            <!-- END table_cell_select -->
+                            <!-- BEGIN table_cell_checkbox -->
+                            <td>
+                                <input name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="hidden" value="0" />
+                                <input id="{TABLE_COLUMN}-{ROW_NUMBER}-default" name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="checkbox" value="1" {TABLE_DATA_CHECKED}/>
+                                <label for="{TABLE_COLUMN}-{ROW_NUMBER}-default" class="checkbox-label"></label>
+                            </td>
+                            <!-- END table_cell_checkbox -->
+                        </tr>
+                        <!-- END table_row -->
+                    </tbody>
+                </table>
+                <!-- BEGIN create_new -->
+                <a href="#" data-button="add-row" class="button icon-add">New Row</a>
+                <!-- END create_new -->
+                <input type="submit" value="Save"/>
+            </form>
+        </div>
+    </div>
 </div>
 
-<table id="newData" class="hide-it table">
+<table data-clone class="hide">
 	<tbody>
 		<tr>
 			<!-- BEGIN newInput -->
 			<td>
                 <input class="{NULLABLE_CLASS}" name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="{TYPE}" {READONLY} value="{VALUE}" />
                 <!-- BEGIN newInput_null -->
-                <span class="null-control">
-                    <input id="{TABLE_COLUMN}-new-null" type="checkbox" name="{TABLE_COLUMN}[{ROW_NUMBER}]" value="NULL" />
-                    <label for="{TABLE_COLUMN}-new-null">Null?</label>
-                </span>
+                <input id="{TABLE_COLUMN}-new-null" type="checkbox" name="{TABLE_COLUMN}[{ROW_NUMBER}]" value="NULL" />
+                <label for="{TABLE_COLUMN}-new-null">Null?</label>
                 <!-- END newInput_null -->
             </td>
 			<!-- END newInput -->
             <!-- BEGIN newSelect -->
-                <td><select name="{TABLE_COLUMN}[{ROW_NUMBER}]">
+            <td>
+                <select name="{TABLE_COLUMN}[{ROW_NUMBER}]">
                     <!-- BEGIN newSelect_option -->
-                        <option value="{OPTION_VALUE}">{OPTION_LABEL}</option>
+                    <option value="{OPTION_VALUE}">{OPTION_LABEL}</option>
                     <!-- END newSelect_option -->
-                </select></td>
+                </select>
+            </td>
 			<!-- END newSelect -->
             <!-- BEGIN newCheckbox -->
             <td>
@@ -114,9 +112,13 @@
 
 <script type="text/javascript">
 $(function() {
-	$('#addNewRow').click(function() {
-		var newRow = $('#newData').find('tr').clone();
-		$('#tableData').find('tbody').append(newRow).find('input[name="name[{ROW_NUMBER}]"]').last().focus();
+	$('[data-button=add-row]').click(function(event) {
+        event.preventDefault();
+
+		var newRow = $('[data-clone]').find('tr').clone();
+
+		$('[data-list]').find('tbody').append(newRow).find('input[name="name[{ROW_NUMBER}]"]').last().focus();
+
 		return false;
 	});
 });

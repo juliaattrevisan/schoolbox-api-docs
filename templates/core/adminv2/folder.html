@@ -1,77 +1,67 @@
-<div class="row">
-    <div class="large-12 columns">
-        <h1>Schoolbox Administration</h1>
-        <dl class="sub-nav">
-            <!-- BEGIN admin_nav_item -->
-            <dd class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></dd>
-            <!-- END admin_nav_item -->
-        </dl>
-    </div>
-</div>
-<div class="row">
-    <div class="large-12 columns">
-        <h2>Bulk Add Folders</h2>
-        <form action="/adminv2/bulkAddFolders" method="post" enctype="multipart/form-data" name="form" id="form">
-            <div class="row">
-                <div class="column medium-4">
-                    <h3>Bulk
-                        <span data-tooltip class="hint has-tip tip-right" title="The File that contains the folder information must be a comma seperated (CSV) text file.  Use the template provided below as a guide.">?</span>
-                    </h3>
-                    <p>In order to update folders in bulk first download the template then fill it out and upload using the provided tool, finalising the process by pressing the "save" button.</p>
-                    <p>
-                        <a href="/adminv2/csv/folderBulkAdd.csv" class="button icon-download">Download Template</a>
-                    </p>
-                    <h3>Upload Bulk Folder CSV</h3>
-                    <label>
-                        <input name="bulkadd" type="file" />
-                    </label>
-                </div>
-                <div class="column medium-8">
-                    <h3>Roles
-                        <span data-tooltip class="hint has-tip tip-right" title="Select the roles permissions">?</span>
-                    </h3>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Role</th>
-                                <th>None</th>
-                                <th>Read</th>
-                                <th>Write</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- BEGIN group -->
-                            <tr>
-                                <td>{GROUP_NAME}</td>
-                                <td>
-                                    <input id="sel-{GROUP_ID}-0" type="radio" class="no_permission required" name="groupPerm[{GROUP_ID}]" value="0" />
-                                    <label for="sel-{GROUP_ID}-0" class="radio-label"></label>
-                                </td>
-                                <td>
-                                    <input id="sel-{GROUP_ID}-1" type="radio" name="groupPerm[{GROUP_ID}]" value="1" />
-                                    <label for="sel-{GROUP_ID}-1" class="radio-label"></label>
-                                </td>
-                                <td>
-                                    <input id="sel-{GROUP_ID}-2" type="radio" name="groupPerm[{GROUP_ID}]" value="2" />
-                                    <label for="sel-{GROUP_ID}-2" class="radio-label"></label>
-                                </td>
-                            </tr>
-                            <!-- END group -->
-                        </tbody>
-                    </table>
+{ADMIN_NAV}
+<div>
+	<h2>Bulk Add Folders</h2>
+	<form action="/adminv2/bulkAddFolders" method="post" enctype="multipart/form-data" name="form" id="form">
+		<div class="row">
+			<div class="column medium-4">
+				<h3>
+                    Bulk
+                    <span data-tooltip class="hint has-tip tip-right" title="The File that contains the folder information must be a comma seperated (CSV) text file.  Use the template provided below as a guide.">?</span>
+                </h3>
+                <p>In order to update folders in bulk first download the template then fill it out and upload using the provided tool, finalising the process by pressing the "save" button.</p>
+				<p>
+                    <a href="/adminv2/csv/folderBulkAdd.csv" class="button icon-download">Download Template</a>
+                </p>
+				<h3>Upload Bulk Folder CSV</h3>
+				<label>
+                    <input name="bulkadd" type="file" />
+                </label>
+			</div>
+			<div class="column medium-8">
+				<h3>Roles
+                    <span data-tooltip class="hint has-tip tip-right" title="Select the roles permissions">?</span>
+                </h3>
+				<table class="table">
+					<thead>
+						<tr>
+							<th>Role</th>
+							<th>None</th>
+							<th>Read</th>
+							<th>Write</th>
+						</tr>
+					</thead>
+					<tbody>
+						<!-- BEGIN group -->
+						<tr>
+							<td>{GROUP_NAME}</td>
+							<td>
+                                <input id="sel-{GROUP_ID}-0" type="radio" class="no_permission required" name="groupPerm[{GROUP_ID}]" value="0" />
+                                <label for="sel-{GROUP_ID}-0" class="radio-label"></label>
+                            </td>
+							<td>
+                                <input id="sel-{GROUP_ID}-1" type="radio" name="groupPerm[{GROUP_ID}]" value="1" />
+                                <label for="sel-{GROUP_ID}-1" class="radio-label"></label>
+                            </td>
+							<td>
+                                <input id="sel-{GROUP_ID}-2" type="radio" name="groupPerm[{GROUP_ID}]" value="2" />
+                                <label for="sel-{GROUP_ID}-2" class="radio-label"></label>
+                            </td>
+						</tr>
+						<!-- END group -->
+					</tbody>
+				</table>
 
-                    <h3>Homepage Template
-                        <span data-tooltip class="hint has-tip tip-right" title="Select the Homepage Template that will be applied to each uploaded Folder">?</span>
-                    </h3>
-                    <select name='template'>
-                        <option value='0'>No template</option>
-                        <!-- BEGIN homepage_template -->
-                        <option value="{HOMEPAGE_TEMPLATE_ID}">{HOMEPAGE_TEMPLATE_NAME}</option>
-                        <!-- END homepage_template -->
-                    </select>
-                </div>
-            </div>
-            <a class="button submit" href="#">Import</a>
-        </form>
-    </div>
+				<h3>Homepage Template
+                    <span data-tooltip class="hint has-tip tip-right" title="Select the Homepage Template that will be applied to each uploaded Folder">?</span>
+                </h3>
+				<select name='template'>
+					<option value='0'>No template</option>
+					<!-- BEGIN homepage_template -->
+					<option value="{HOMEPAGE_TEMPLATE_ID}">{HOMEPAGE_TEMPLATE_NAME}</option>
+					<!-- END homepage_template -->
+				</select>
+			</div>
+		</div>
+		<a class="button icon-upload" href="#">Import</a>
+	</form>
 </div>

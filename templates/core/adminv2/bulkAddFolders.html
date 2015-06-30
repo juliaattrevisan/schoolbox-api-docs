@@ -1,38 +1,34 @@
-<h1>Schoolbox Administration</h1>
-<dl class="sub-nav">
-    <!-- BEGIN admin_nav_item -->
-    <dd class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></dd>
-    <!-- END admin_nav_item -->
-</dl>
-<div>
-	<h3>Bulk Add Folders</h3>
+{ADMIN_NAV}
 
-	<div>
-		<table>
-			<thead>
-				<tr>
-					<th>Folder<em></em>
+<div class="row">
+    <div class="large-12 columns">
+        <h3>Bulk Add Folders</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Folder<em></em>
                         <span data-tooltip class="hint has-tip tip-right" title="The name of the folder, indicated from reading the rows in the CSV file.">?</span>
                     </th>
-					<th>Action
+                    <th>Action
                         <span data-tooltip class="hint has-tip tip-right" title="The function schoolbox has attempted to complete.">?</span>
                     </th>
-					<th>Response
+                    <th>Response
                         <span data-tooltip class="hint has-tip tip-right" title="Schoolbox's feedback after attempting to complete the requested function.">?</span>
                     </th>
-					
-				</tr>
-			</thead>
-			<tbody>
-				<!-- BEGIN folder -->
-				<tr>
-					<td>{FOLDER_FOLDER}</td>
-					<td>{FOLDER_STATUS}</td>
-					<td>{FOLDER_ERROR}</td>
-				</tr>
-				<!-- END folder -->
-			</tbody>
-		</table>
-	</div>
-	<a href="/adminv2/folder" class="button icon-previous"><span></span>Back to folders</a>
+
+                </tr>
+            </thead>
+            <tbody>
+                <!-- BEGIN folder -->
+                <tr>
+                    <td>{FOLDER_FOLDER}</td>
+                    <td>{FOLDER_STATUS}</td>
+                    <td>{FOLDER_ERROR}</td>
+                </tr>
+                <!-- END folder -->
+            </tbody>
+        </table>
+        <a href="/adminv2/folder" class="button icon-previous">Back to folders</a>
+    </div>
 </div>

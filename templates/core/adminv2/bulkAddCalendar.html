@@ -1,27 +1,28 @@
-<h1>Schoolbox Administration</h1>
-<dl class="sub-nav">
-    <!-- BEGIN admin_nav_item -->
-    <dd class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></dd>
-    <!-- END admin_nav_item -->
-</dl>
-<h2>Bulk Add Calendar Events</h2>
+{ADMIN_NAV}
 
-<table>
-    <thead>
-        <tr>
-            <th>Event Detail <span class="hint has-tip tip-top" data-tooltip title="The name of the category, indicated from reading the rows in the CSV file.">?</span></th>
-            <th>Action<span class="hint has-tip tip-top" data-tooltip title="The function Schoolbox has attempted to complete.">?</span></th>
-            <th>Response<span class="hint has-tip tip-top" data-tooltip title="Schoolbox's feedback after attempting to complete the requested function.">?</span></th>
-        </tr>
-    </thead>
-    <tbody>
-        <!-- BEGIN event -->
-        <tr>
-            <td>{EVENT_NAME}</td>
-            <td>{EVENT_STATUS}</td>
-            <td>{EVENT_ERROR}</td>
-        </tr>
-        <!-- END event -->
-    </tbody>
-</table>
-<a href="/adminv2/calendar" class="button icon-previous">Back to calendar</a>
+<div class="row">
+    <div class="large-12 columns">
+        <h2>Bulk Add Calendar Events</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Event Detail <span class="hint has-tip tip-top" data-tooltip title="The name of the category, indicated from reading the rows in the CSV file.">?</span></th>
+                    <th>Action<span class="hint has-tip tip-top" data-tooltip title="The function Schoolbox has attempted to complete.">?</span></th>
+                    <th>Response<span class="hint has-tip tip-top" data-tooltip title="Schoolbox's feedback after attempting to complete the requested function.">?</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- BEGIN event -->
+                <tr>
+                    <td>{EVENT_NAME}</td>
+                    <td>{EVENT_STATUS}</td>
+                    <td>{EVENT_ERROR}</td>
+                </tr>
+                <!-- END event -->
+            </tbody>
+        </table>
+
+        <a href="/adminv2/calendar" class="button icon-previous">Back to calendar</a>
+    </div>
+</div>
