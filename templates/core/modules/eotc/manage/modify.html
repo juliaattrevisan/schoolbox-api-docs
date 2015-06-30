@@ -303,80 +303,75 @@
     </div>
     <!-- END has_activity_log -->
 
-        <!-- BEGIN can_promote_in_principle -->
-        <h2>Complete Details</h2>
-        <table class="standardForm">
-            <tbody>
-                <tr>
-                    <td class="formLabelWidth">
-                        <h4>Event Details</h4>
-                    </td>
-                    <td>
-                        <label>
-                            <input type="hidden" name="promoteInPrinciple" value="0" />
-                            <input type="checkbox" name="promoteInPrinciple" value="1" /> All the required information for this event has been provided
-                        </label>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="formLabelWidth">
-                        <h4>Comment</h4>
-                        <em>Add a comment</em>
-                    </td>
-                    <td>
-                        <textarea class='selfPromotionalComment' name="comment" style="width:100%;height:80px;"></textarea>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <!-- END can_promote_in_principle -->
+    <!-- BEGIN can_promote_in_principle -->
+    <div class="row">
+        <div class="large-12 columns">
+            <h2>Complete Details</h2>
 
-        <input id="b{FUNCTION}" type="submit" name="{FUNCTION}" value="{EOTC_FUNCTION}" class="submit-btn-plain"/>
+            <label>
+                Event Details
+                <input type="hidden" name="promoteInPrinciple" value="0" />
+                <input id='promoteInPrinciple' type="checkbox" name="promoteInPrinciple" value="1" />
+                <label for="promoteInPrinciple" class="checkbox-label">All the required information for this event has been provided</label>
+            </label>
 
-        <div id="dialog-bulk" title="This event is part of a series">
-            <p>
-                <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-                <span class="bulk-update">Would you like to update only this event, or all in the series? If any events in the series have been modified, the changes will be overridden.</span>
-                <span class="bulk-delete">Would you like to delete only this event, or all in the series?</span>
-            </p>
+            <label>
+                Comment
+                <span class='hint has-tip tip-top' data-tooltip title="Add a comment.">?</span>
+                <textarea class='selfPromotionalComment' name="comment" style="width:100%;height:80px;"></textarea>
+            </label>
         </div>
-        <div id="dialog-delete" title="Delete Event">
-            <p>
-                <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-                Are you sure you want to delete this event?
-            </p>
-        </div>
-        <div id="dialog-rams" title="Remove RAMS Requirement">
-            <p>
-                <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-                Warning: please confirm RAMS is not required.
-            </p>
+    </div>
+    <!-- END can_promote_in_principle -->
 
-            <div class="clearfix"></div>
-
-            <p>
-                The organiser is required to submit a completed <strong>RAMS</strong>
-                (Risk Analysis Management System) form if the EOTC is associated with
-                certain activities which are deemed to have significant associated risks.
-                These include: Activities close to or on <strong>WATER</strong>;
-                <strong>TRAMPS</strong>; <strong>TRIPS</strong> (overseas, outside of
-                Auckland, as well as requiring activities outdoors or fieldwork);
-                <strong>CAMPS</strong>; <strong>OUTDOOR EDUCATION</strong> and
-                <strong>PRESCHOOL</strong> (all excursions off-site).
-            </p>
-
-            <p>
-                <a href="/modules/eotc/policy">Read the full RAMS policy.</a>
-            </p>
-
-            <p>
-                Press OK to confirm that RAMS is not required.
-            </p>
-        </div>
-
-        <a href="/modules/eotc/myReview" class="btn go-to"><span></span>Back to My EOTC Events</a>
+    <div class="large-12 columns">
+        <input id="b{FUNCTION}" type="submit" name="{FUNCTION}" value="{EOTC_FUNCTION}" />
+        <a href="/modules/eotc/myReview" class="button icon-previous">Back to My EOTC Events</a>
     </div>
 </form>
+
+
+
+<div id="dialog-bulk" title="This event is part of a series">
+    <p>
+        <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+        <span class="bulk-update">Would you like to update only this event, or all in the series? If any events in the series have been modified, the changes will be overridden.</span>
+        <span class="bulk-delete">Would you like to delete only this event, or all in the series?</span>
+    </p>
+</div>
+<div id="dialog-delete" title="Delete Event">
+    <p>
+        <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+        Are you sure you want to delete this event?
+    </p>
+</div>
+<div id="dialog-rams" title="Remove RAMS Requirement">
+    <p>
+        <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+        Warning: please confirm RAMS is not required.
+    </p>
+
+    <div class="clearfix"></div>
+
+    <p>
+        The organiser is required to submit a completed <strong>RAMS</strong>
+        (Risk Analysis Management System) form if the EOTC is associated with
+        certain activities which are deemed to have significant associated risks.
+        These include: Activities close to or on <strong>WATER</strong>;
+        <strong>TRAMPS</strong>; <strong>TRIPS</strong> (overseas, outside of
+        Auckland, as well as requiring activities outdoors or fieldwork);
+        <strong>CAMPS</strong>; <strong>OUTDOOR EDUCATION</strong> and
+        <strong>PRESCHOOL</strong> (all excursions off-site).
+    </p>
+
+    <p>
+        <a href="/modules/eotc/policy">Read the full RAMS policy.</a>
+    </p>
+
+    <p>
+        Press OK to confirm that RAMS is not required.
+    </p>
+</div>
 
 
 
