@@ -1,4 +1,5 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
 
     $(function () {
@@ -107,17 +108,18 @@
 		});
 
         // row action buttons
-
         $(document).on('click', '[data-interaction-delete]', function (event) {
-
             event.preventDefault();
-            if (confirm("Are you sure you want to delete?")) {
-                var nearestAction = $(this).closest('form').attr('action');
-                var nearestFID = $(this).closest('form').find('input[name=fileTypeId]').val();
-                $(this).closest('form').attr('action', nearestAction + "?delete=" + nearestFID);
-                $(this).closest('form').submit();
-            }
-
+            $(this).confirmDialog({
+                text: "Are you sure you want to delete?",
+                confirmEvent: function(element) {
+                    var form = element.closest('form');
+                    var nearestAction = form.attr('action');
+                    var nearestFID = form.find('input[name=fileTypeId]').val();
+                    form.attr('action', nearestAction + "?delete=" + nearestFID);
+                    form.submit();
+                }
+            });
             return false;
         });
 
