@@ -13,53 +13,116 @@
 	<input name="return" type="hidden" value="{EVENT_REDIRECT}" />
 	<input id="efficacy" name="efficacy" type="hidden" value="self" />
 	<input id="action" name="action" type="hidden" value="" />
+    <input type="hidden" name="allday" value="0" />
 
 	<div class="eotc-status {EVENT_STATUS_CLASS}">{EVENT_STATUS}</div>
 
 	<h2>Details</h2>
-	<table class="standardForm">
+
+    <div class="large-12 columns">
+        <label>
+            Title
+            <input name="note" class="required" type="text" size="50" maxlength="100" value="{EVENT_TITLE}" />
+        </label>
+    </div>
+
+    <div class="large-6 columns">
+        <label>
+            From
+            <input name="startDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
+        </label>
+    </div>
+
+    <div class="large-6 columns">
+        <div data-timeinputs>
+            <div class="large-4 columns">
+                <label>
+                    Hour
+                    <input name="startHour" data-timepicker="hour" class="timeField" type="text" maxlength="2" value="{EVENT_START_HOUR}" />
+                </label>
+            </div>
+            <div class="large-4 columns">
+                <label>
+                    Minute
+                    <input name="startMinute" data-timepicker="minute" class="timeField" type="text" maxlength="2" value="{EVENT_START_MIN}" />
+                </label>
+            </div>
+            <div class="large-4 columns">
+                <label>
+                    Period
+                    <select name="startPeriod">
+                        <option value="am" {EVENT_START_AM}>AM</option>
+                        <option value="pm" {EVENT_START_PM}>PM</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="large-6 columns">
+        <label>
+            To
+            <input name="endDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
+        </label>
+    </div>
+
+    <div class="large-6 columns">
+        <div data-timeinputs>
+            <div class="large-4 columns">
+                <label>
+                    Hour
+                    <input name="endHour" data-timepicker="hour" type="text" class="timeField" maxlength="2" value="{EVENT_END_HOUR}" />
+                </label>
+            </div>
+            <div class="large-4 columns">
+                <label>
+                    Minute
+                    <input name="endMinute" data-timepicker="minute" type="text" class="timeField" maxlength="2" value="{EVENT_END_MIN}" />
+                </label>
+            </div>
+            <div class="large-4 columns">
+                <label>
+                    Period
+                    <select name="endPeriod">
+                        <option value="am" {EVENT_END_AM}>AM</option>
+                        <option value="pm" {EVENT_END_PM}>PM</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <label>
+
+    </label>
+
+    <label>
+    </label>
+
+    <label>
+    </label>
+
+    <label>
+    </label>
+
+    <label>
+    </label>
+
+    <label>
+    </label>
+
+    <label>
+    </label>
+
+    <label>
+    </label>
+
+    <label>
+    </label>
+
+    <table>
 		<tbody>
-			<tr>
-				<td class="formLabelWidth">
-					<h4>Title</h4>
-				</td>
-				<td>
-					<label>
-						<input name="note" class="required" type="text" size="50" maxlength="100" value="{EVENT_TITLE}" />
-					</label>
-				</td>
-			</tr>
-			<tr>
-				<td class="formLabelWidth">
-					<h4>When</h4>
-				</td>
-				<td>
-					<input name="startDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
-					<span class="timeInputs">
-						<input name="startHour" data-timepicker="hour" class="timeField" type="text" maxlength="2" value="{EVENT_START_HOUR}" /> :
-						<input name="startMinute" data-timepicker="minute" class="timeField" type="text" maxlength="2" value="{EVENT_START_MIN}" />
-						<select name="startPeriod">
-							<option value="am" {EVENT_START_AM}>AM</option>
-							<option value="pm" {EVENT_START_PM}>PM</option>
-						</select>
-					</span>
 
-					to
-
-					<input name="endDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
-					<span class="timeInputs">
-						<input name="endHour" data-timepicker="hour" type="text" class="timeField" maxlength="2" value="{EVENT_END_HOUR}" /> :
-						<input name="endMinute" data-timepicker="minute" type="text" class="timeField" maxlength="2" value="{EVENT_END_MIN}" />
-
-						<select name="endPeriod">
-							<option value="am" {EVENT_END_AM}>AM</option>
-							<option value="pm" {EVENT_END_PM}>PM</option>
-						</select>
-					</span>
-
-					<input type="hidden" name="allday" value="0" />
-				</td>
-			</tr>
 			<!-- BEGIN recurring_dates -->
 			<tr class="advanced {SHOW_ADVANCED}">
 				<td class="formLabelWidth">

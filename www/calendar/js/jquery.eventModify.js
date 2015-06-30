@@ -78,9 +78,6 @@
 
 			$.each(allDatepickerElements, function(index, element) {
 				$(element).datepicker({
-					showOn: 'both',
-					buttonImage: '/images/core/calendar/calendar-click.png',
-					buttonImageOnly: true,
 					constrainInput: false,
 					onClose: function(string) {
 						$.getJSON('/ajax/strtotime.php', {string: string}, function(data) {
@@ -132,10 +129,10 @@
 		function setupAllDay() {
 			config.element.find('input[name=allday]').change(function() {
 				if ($(this).is(':checked')) {
-					config.element.find('.timeInputs').hide();
+					config.element.find('.timeInputs, [data-timeinputs]').hide();
 				}
 				else {
-					config.element.find('.timeInputs').show();
+					config.element.find('.timeInputs, [data-timeinputs]').show();
 				}
 			});
 		}
