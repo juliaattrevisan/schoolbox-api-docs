@@ -232,14 +232,14 @@
             <label>
                 Teacher In Charge
                 <span class='hint has-tip tip-top' data-tooltip title="The teacher in charge of this event.">?</span>
-                <select id="teacher-in-charge-suggest" name="teacherInCharge" placeholder="Search Teachers"></select>
+                <select data-suggest="teacher-in-charge" name="teacherInCharge" placeholder="Search Teachers"></select>
             </label>
         </div>
         <div class="large-12 columns">
             <label>
                 Staff Members
                 <span class='hint has-tip tip-top' data-tooltip title="Add staff members.">?</span>
-                <select id="staff-suggest" name="staff[]" multiple placeholder="Search Staff"></select>
+                <select data-suggest="staff" name="staff[]" multiple placeholder="Search Staff"></select>
             </label>
         </div>
 
@@ -385,7 +385,7 @@
             mode: 'textareas',
             editor_deselector: "selfPromotionalComment"
         });
-        $('#staff-suggest').selectizeSelector({
+        $('[data-suggest=staff]').selectizeSelector({
             ajax: {
                 url:      '/ajax/user.php',
                 type:     'GET',
@@ -396,7 +396,7 @@
             multiple: true
         })
 
-        $('#teacher-in-charge-suggest').selectizeSelector({
+        $('[data-suggest=teacher-in-charge]').selectizeSelector({
             ajax: {
                 url:      '/ajax/user.php',
                 type:     'GET',
