@@ -459,6 +459,22 @@ $tooltip-font-color: $white;
 // CUSTOM OVERRIDES
 //
 
+// Deleting Components
+.delete-it{
+	background-color: tint($warning-color, 74%);
+	padding: 0;
+	max-height: 0;
+	overflow: hidden;
+	@include single-transition(max-height, 0.3s, ease-out);
+	&.show{
+		max-height: 700px;
+		padding: rem-calc(($base-font-size - 2));
+		@include single-transition(max-height, 0.3s, ease-in);
+	}
+}
+
+// Hide things
+
 // Disabled elements
 :disabled{
 	opacity: 0.5;
@@ -578,20 +594,6 @@ table{
 
 	&.icon-help:before{
 		color: $monsoon;
-	}
-}
-
-// Deleting Components
-.delete-it{
-	background-color: tint($warning-color, 74%);
-	padding: 0;
-	max-height: 0;
-	overflow: hidden;
-	@include single-transition(max-height, 0.3s, ease-out);
-	&.show{
-		max-height: 700px;
-		padding: rem-calc(($base-font-size - 2));
-		@include single-transition(max-height, 0.3s, ease-in);
 	}
 }
 
