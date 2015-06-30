@@ -126,7 +126,11 @@
 
         $(document).on('click', '[data-interaction-cancel]', function (event) {
             event.preventDefault();
-            $(this).closest('[data-interaction-inline-form]').slideUp().siblings().slideDown();
+            var container = $(this).closest('[data-interaction-container]');
+            var display   = container.find('[data-interaction-display]');
+            var form      = container.find('[data-interaction-inline-form]');
+            form.slideUp();
+            display.slideDown();
 
         });
 
