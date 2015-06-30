@@ -15,38 +15,67 @@
             <div class="column medium-6">
                 <h3>Remove Deleted Files</h3>
                 <p>If a user has deleted a file or link this will clean up the soft deleted remnants. This should be completed yearly to keep disk usage down.</p>
-                <p><a href="/adminv2/cleanup/file" class="button icon-delete" onclick="return(confirm('This will permanently delete files that have been soft deleted by users.  Are you sure you want to proceed?'));"><span></span>Remove Files</a></p>
+                <p><a href="/adminv2/cleanup/file" class="button icon-delete" data-cleanup="file">Remove Files</a></p>
             </div>
             <div class="column medium-6">
                 <h3>Remove Expired News</h3>
                 <p>This function will delete any news that has expired and is no longer available.  You should only run this if your news system is running slow. We do not recommend doing this as it will remove all news from the archives.</p>
-                <p><a href="/adminv2/cleanup/news/subnews" class="button icon-delete" onclick="return(confirm('This will clean the database of all content no longer visible to users'));"><span></span>Remove Archives</a></p>
+                <p><a href="/adminv2/cleanup/news/subnews" class="button icon-delete" data-cleanup="subnews">Remove Archives</a></p>
             </div>
         </div>
         <div class="row">
-
             <div class="column medium-6">
                 <h3>Clean filesystem of stale files</h3>
                 <p>This function will scan the filesystem for files that are no longer in the database.  This can occur due to errors in processing or cleanup.  This should be completed once a year to minimise disk wastage.</p>
-                <p><a href="/adminv2/cleanup/fileclean" class="button icon-delete" onclick="return(confirm('This will delete all files that are no longer in the database'));"><span></span>Clean Filesystem</a>	</p>
+                <p><a href="/adminv2/cleanup/fileclean" class="button icon-delete" data-cleanup="fileclean">Clean Filesystem</a></p>
             </div>
             <div class="column medium-6">
                 <h3>Clean Log Files</h3>
                 <p>This will delete all content from the log tables and help speed up the system.  The log tables include the login log, submission box, homepage access and CMS log.  This should be completed once a year.</p>
-                <p><a href="/adminv2/cleanup/log" class="button icon-delete" onclick="return(confirm('This will delete all logs, it will impact only on the whats new feature'));"><span></span>Clean Log Files</a></p>
+                <p><a href="/adminv2/cleanup/log" class="button icon-delete" data-cleanup="log">Clean Log Files</a></p>
             </div>
         </div>
         <div class="row">
             <div class="column medium-6">
                 <h3>Clean Image Cache</h3>
                 <p>If you are having issues with image thumbnails or you would like to free up some diskspace.  Note his will increase server load and page load times while images are recreated.</p>
-                <p><a href="/adminv2/cleanup/image" class="button icon-delete" onclick="return(confirm('This will delete all image transformations that have been cached.'));"><span></span>Clean Image Cache</a></p>
+                <p><a href="/adminv2/cleanup/image" class="button icon-delete" data-cleanup="image">Clean Image Cache</a></p>
             </div>
             <div class="column medium-6">
                 <h3>Clean Stream Cache</h3>
                 <p>The stream cache is used to store items downloaded from remote systems and zip archives to be downloaded.  This can be safely deleted yearly or more frequently as all data is replaceable.  This will increase page load times while the cache items are refetched.</p>
-                <p><a href="/adminv2/cleanup/zip/stream" class="button icon-delete" onclick="return(confirm('This will delete all thumbnails.'));"><span></span>Clean Data Cache</a></p>
+                <p><a href="/adminv2/cleanup/zip/stream" class="button icon-delete" data-cleanup="stream">Clean Data Cache</a></p>
             </div>
         </div>
     </div>
 </div>
+
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
+<script type="text/javascript">
+    $(function() {
+
+        /* Confirm strings
+         */
+        var str = {
+            file: 'This will permanently delete files that have been soft deleted by users. Are you sure you want to proceed?',
+            subnews: 'This will clean the database of all content no longer visible to users.',
+            fileclean: 'This will delete all files that are no longer in the database.',
+            log: 'This will delete all logs, it will impact only on the whats new feature.',
+            image: 'This will delete all image transformations that have been cached.',
+            stream: 'This will delete all thumbnails.'
+        };
+
+        $('[data-cleanup]').click(function(event) {
+            event.preventDefault();
+
+            var element = $(this);
+
+            $(this).confirmDialog({
+                text: str[element.data('cleanup')],
+                confirmEvent: function() {
+                    window.location.href = element.attr('href');
+                }
+            });
+        });
+    });
+</script>
