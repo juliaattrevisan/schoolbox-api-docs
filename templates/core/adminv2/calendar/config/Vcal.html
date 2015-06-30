@@ -1,8 +1,8 @@
-<input type="hidden" name="record[{CONNECTOR_ID}][eventType]" value='{EVENTTYPE_NAME}' />
-<input type="hidden" name="record[{CONNECTOR_ID}][connectorClass]" value='{CONNECTOR_CLASS}' />
-
-<div class="row">
+<li class="row">
+    <input type="hidden" name="record[{CONNECTOR_ID}][eventType]" value='{EVENTTYPE_NAME}' />
+    <input type="hidden" name="record[{CONNECTOR_ID}][connectorClass]" value='{CONNECTOR_CLASS}' />
     <div class="column medium-6">
+        <div class="content">
         <label>Label
             <input type='text' name="record[{CONNECTOR_ID}][label]" value='{CONNECTOR_LABEL}' />
         </label>
@@ -20,8 +20,10 @@
             </select>
         </label>
         <!-- END event_type_list -->
+        </div>
     </div>
     <div class="column medium-6">
+        <div class="content">
         <label>Campus</label>
         <!-- BEGIN campus_list -->
         <input id="campus-{CAMPUS_ID}-{CONNECTOR_ID}" type="checkbox" class="campusCheck" name="record[{CONNECTOR_ID}][campus][]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} />
@@ -32,11 +34,11 @@
         <input id="role-{GROUP_ID}-{CONNECTOR_ID}" type="checkbox" name="record[{CONNECTOR_ID}][groupCheck][]" value="{GROUP_ID}" {GROUP_ID_SELECTED} />
         <label for="role-{GROUP_ID}-{CONNECTOR_ID}" class="checkbox-label">{GROUP_NAME}</label>
         <!-- END group_list -->
+        </div>
     </div>
-</div>
-<div class="row">
-    <span class="column">
-        <a id="remove_{CONNECTOR_ID}" data-removesource class='button icon-delete'>Remove source</a>
-    </span>
-</div>
-<hr />
+    <div class="column small-12">
+        <div class="content">
+            <a id="remove_{CONNECTOR_ID}" data-removesource class='button icon-delete'>Remove source</a>
+        </div>
+    </div>
+</li>

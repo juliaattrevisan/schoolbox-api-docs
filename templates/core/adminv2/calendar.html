@@ -1,4 +1,9 @@
 <!-- BEGIN custom_head -->
+<style>
+    #container.foundation form .row .row {
+        margin: 0 -1rem;
+    }
+</style>
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
 <script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
@@ -90,7 +95,6 @@ $(function() {
 
 <div class="row">
     <div class="large-12 columns">
-        <h2>Calendar</h2>
         <dl class="sub-nav">
             <!-- BEGIN setting_tab -->
             <dd class="{SETTING_TAB_CURRENT}">
@@ -101,188 +105,236 @@ $(function() {
         <!-- BEGIN import -->
         <div class="settings">
             <form action="/adminv2/bulkAddCalendar" method="post" enctype="multipart/form-data" name="form" id="importForm">
-                <h3>
+                <h2 class="subheader">
                     Source
                     <span class="hint has-tip tip-right"
                           data-tooltip
                           title="The file that contains the calendar information can either be a CSV file
                                  matching the format in the template below, or a Microsoft Outlook ICS file">?</span>
-                </h3>
-                <div class="row">
-                    <div class="column medium-6">
-                        <h4>CSV</h4>
-                        <p>
-                            <a href="/adminv2/csv/calendarBulkAdd.csv" class="button icon-download">Download Template</a>
-                        </p>
-                        <ol>
-                            <li>Download the template file using the above button</li>
-                            <li>Edit the file in Microsoft Excel or equivalent editor</li>
-                            <li>Save the file</li>
-                            <li>Upload by clicking 'choose file' under "Upload new calendar entries"</li>
-                        </ol>
+                </h2>
+                <div class="row" data-equalizer>
+                    <div class="island small-12 medium-6">
+                        <section>
+                            <div class="content" data-equalizer-watch>
+                                <h3>CSV</h3>
+                                <p>
+                                    <a href="/adminv2/csv/calendarBulkAdd.csv" class="button icon-download">Download Template</a>
+                                </p>
+                                <ol>
+                                    <li>Download the template file using the above button</li>
+                                    <li>Edit the file in Microsoft Excel or equivalent editor</li>
+                                    <li>Save the file</li>
+                                    <li>Upload by clicking 'choose file' under "Upload new calendar entries"</li>
+                                </ol>
+                            </div>
+                        </section>
                     </div>
-                    <div class="column medium-6">
-                        <h4>Microsoft Outlook ICS</h4>
-                        <ol>
-                            <li>In Outlook, click calendar in the bottom left</li>
-                            <li>Go to File, Save As</li>
-                            <li>Choose iCalendar format (*.ics)</li>
-                            <li>Click 'More Options'</li>
-                            <li>Change Detail from Availability Only to Full Details</li>
-                            <li>Click OK</li>
-                            <li>Save it</li>
-                            <li>Upload by clicking 'choose file' under "Upload new calendar entries"</li>
-                        </ol>
+                    <div class="island small-12 medium-6">
+                        <section>
+                            <div class="content" data-equalizer-watch>
+                                <h3>Microsoft Outlook ICS</h3>
+                                <ol>
+                                    <li>In Outlook, click calendar in the bottom left</li>
+                                    <li>Go to File, Save As</li>
+                                    <li>Choose iCalendar format (*.ics)</li>
+                                    <li>Click 'More Options'</li>
+                                    <li>Change Detail from Availability Only to Full Details</li>
+                                    <li>Click OK</li>
+                                    <li>Save it</li>
+                                    <li>Upload by clicking 'choose file' under "Upload new calendar entries"</li>
+                                </ol>
+                            </div>
+                        </section>
                     </div>
                 </div>
-                <h3>Select file (CSV or ICS)</h3>
-                <input type="file" name="bulkadd" />
-                <h3>
-                    Campus
-                    <span class="hint has-tip tip-right" data-tooltip title="Select the campuses that will be able to view these events">?</span>
-                </h3>
-                <!-- BEGIN campus_check_list -->
-                <input id="campus-{CAMPUSID}" type="checkbox" name="campusList[]" value="{CAMPUSID}" />
-                <label for="campus-{CAMPUSID}" class="checkbox-label">{CAMPUSNAME}</label>
-                <!-- END campus_check_list -->
-                <h3>
-                    Roles
-                    <span class="hint has-tip tip-right" data-tooltip title="Select the roles that will be able to view these events">?</span>
-                </h3>
-                <!-- BEGIN user_group_check_list -->
-                <input id="role-{USERGROUPID}" type="checkbox" name="userGroup[]" value="{USERGROUPID}" />
-                <label for="role-{USERGROUPID}" class="checkbox-label">{USERGROUPNAME}</label>
-                <!-- END user_group_check_list -->
-                <h3>
-                    Calendar Owner
-                    <span class="hint has-tip tip-right" data-tooltip title="Type in the name of the owner of the calendar. This field is optional: if empty, the current user will be used.">?</span>
-                </h3>
-                <label>
-                    <input name="name" id="name" type="text" placeholder="Search Users" />
-                </label>
-                <input name="userid" type="hidden" id="userid" size="6" maxlength="6" />
+                <div class="row">
+                    <div class="island small-12">
+                        <h2 class="subheader">Select file (CSV or ICS)</h2>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="island small-12">
+                        <section>
+                            <div class="content">
+                                <h3>Select File</h3>
+                                <input type="file" name="bulkadd" />
+                                <h3>
+                                    Campus
+                                    <span class="hint has-tip tip-right" data-tooltip title="Select the campuses that will be able to view these events">?</span>
+                                </h3>
+                                <!-- BEGIN campus_check_list -->
+                                <input id="campus-{CAMPUSID}" type="checkbox" name="campusList[]" value="{CAMPUSID}" />
+                                <label for="campus-{CAMPUSID}" class="checkbox-label">{CAMPUSNAME}</label>
+                                <!-- END campus_check_list -->
+                                <h3>
+                                    Roles
+                                    <span class="hint has-tip tip-right" data-tooltip title="Select the roles that will be able to view these events">?</span>
+                                </h3>
+                                <!-- BEGIN user_group_check_list -->
+                                <input id="role-{USERGROUPID}" type="checkbox" name="userGroup[]" value="{USERGROUPID}" />
+                                <label for="role-{USERGROUPID}" class="checkbox-label">{USERGROUPNAME}</label>
+                                <!-- END user_group_check_list -->
+                                <h3>
+                                    Calendar Owner
+                                    <span class="hint has-tip tip-right" data-tooltip title="Type in the name of the owner of the calendar. This field is optional: if empty, the current user will be used.">?</span>
+                                </h3>
+                                <label>
+                                    <input name="name" id="name" type="text" placeholder="Search Users" />
+                                </label>
+                                <input name="userid" type="hidden" id="userid" size="6" maxlength="6" />
 
-                <a class="button icon-upload" href="#">Import</a>
+                                <a class="button secondary" href="#">Import</a>
+                            </div>
+                        </section>
+                    </div>
+                </div>
             </form>
         </div>
         <!-- END import -->
         <!-- BEGIN subscribe -->
-        <div class="row">
-            <form method='post' action='/adminv2/calendar/modifyForm'>
-                <!-- BEGIN eventType -->
-                <div class='eventList'>
-                    <h3>{EVENTTYPE_LABEL}</h3>
+        <form method='post' action='/adminv2/calendar/modifyForm'>
+            <!-- BEGIN eventType -->
+            <div class='eventList'>
+                <h2 class="subheader">{EVENTTYPE_LABEL}</h2>
+                <div class="row">
+                    <div class="island small-12">
                         <!-- BEGIN connector -->
-                        <fieldset id='configOptions_{EVENTTYPE_NAME}_{CONNECTOR_NAME}' class='configList {CONNECTOR_ACTIVE}'>
-                            <legend>{CONNECTOR_NAME}</legend>
-                            <div class="column small-2 medium-1">
-                                <div class="icon-{CONNECTOR_ICON} icon-32 primary"></div>
+                        <section>
+                            <div id='configOptions_{EVENTTYPE_NAME}_{CONNECTOR_NAME}' class="configList {CONNECTOR_ACTIVE}">
+                                <ul class="information-list">
+                                    <li class="row">
+                                        <div class="column small-3 medium-2">
+                                            <div class="switch content">
+                                                <input type="checkbox" name="active[]" id="{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='connectorActive' value='{EVENTTYPE_NAME}_{CONNECTOR_NAME}' {CONNECTOR_CHECKED} />
+                                                <label for="{EVENTTYPE_NAME}_{CONNECTOR_NAME}"></label>
+                                            </div>
+                                        </div>
+                                        <div class="column small-9 medium-10">
+                                            <div class="content">
+                                                <h3>{CONNECTOR_NAME}</h3>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <!-- BEGIN connectorConfig -->
+                                    <!-- END connectorConfig -->
+                                    <!-- BEGIN has_multiple_options -->
+                                    <li class="row">
+                                        <div class="column small-12">
+                                            <div class="content">
+                                                <a id="add_{EVENTTYPE_NAME}_{CONNECTOR_NAME}" data-addsource class='button icon-add'>Add another {CONNECTOR_NAME} source</a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <!-- END has_multiple_options -->
+                                </ul>
                             </div>
-                            <div class="column small-10 medium-11">
-                                <div class="switch">
-                                    <input type="checkbox" name="active[]" id="{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='connectorActive' value='{EVENTTYPE_NAME}_{CONNECTOR_NAME}' {CONNECTOR_CHECKED} />
-                                    <label for="{EVENTTYPE_NAME}_{CONNECTOR_NAME}"></label>
-                                </div>
-                                <hr />
-                                <!-- BEGIN connectorConfig -->
-                                <!-- END connectorConfig -->
-                            </div>
-                            <!-- BEGIN has_multiple_options -->
-                            <a id="add_{EVENTTYPE_NAME}_{CONNECTOR_NAME}" data-addsource class='button icon-add'>Add another {CONNECTOR_NAME} source</a>
-                            <!-- END has_multiple_options -->
-                        </fieldset>
+                        </section>
                         <!-- END connector -->
+                    </div>
                 </div>
+            </div>
                 <!-- END eventType -->
 
-                <input type="hidden" name='action' value='subscribe' />
-                <input type="submit" class="button" value='Save changes' />
-            </form>
-        </div>
+            <input type="hidden" name='action' value='subscribe' />
+            <input type="submit" class="button" value='Save changes' />
+        </form>
         <!-- END subscribe -->
 
         <!-- BEGIN cleanup -->
         <div class="row">
-            <div class="large-12 columns">
-                <h3>Mass Cleanup</h3>
-                <p>Display a list of events between two dates.</p>
+            <div class="small-12 columns">
+                <h2 class="subheader">Select Dates</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="small-12 island">
+                <section>
+                    <div class="content">
+                        <p>Display a list of events between two dates.</p>
+                        <form action="/adminv2/calendar/Cleanup" method="get">
+                            <input type="hidden" name='action' value='cleanup' />
+                            <div class="row">
+                                <div class="medium-6 columns">
+                                    <label>
+                                        From
+                                        <input type="text" data-date='start_date' name="cleanupFrom" value="{CLEANUP_HAS_DATES_FROM}" />
+                                    </label>
+                                </div>
+                                <div class="medium-6 columns">
+                                    <label>
+                                        Until
+                                        <input type="text" data-date='finish_date' name="cleanupTo" size="15" maxlength="30" value="{CLEANUP_HAS_DATES_TO}" />
+                                    </label>
+                                </div>
+                                <div class="large-12 columns">
+                                    <input type="submit" value="Search" />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </section>
             </div>
 
-            <form action="/adminv2/calendar/Cleanup" method="get">
-                <input type="hidden" name='action' value='cleanup' />
+            <div class="small-12 island">
+                <h2 class="subheader">Events</h2>
+                <section>
+                    <div class="content">
+                        <!-- BEGIN cleanup_has_events -->
+                        <input id="check-personal" type="checkbox" data-modifier-control="true" value="personal" />
+                        <label for="check-personal" class="checkbox-label">Select Personal Events</label>
+                        <input id="check-group" type="checkbox" data-modifier-control="true" value="group" />
+                        <label for="check-group" class="checkbox-label">Select Group Events</label>
+                    </div>
+                    <form action="/adminv2/calendar/modifyForm" method="post">
+                        <input type="hidden" name='action' value='cleanup' />
 
-                <div class="medium-6 columns">
-                    <label>
-                        From
-                        <input type="text" data-date='start_date' name="cleanupFrom" value="{CLEANUP_HAS_DATES_FROM}" />
-                    </label>
-                </div>
-                <div class="medium-6 columns">
-                    <label>
-                        Until
-                        <input type="text" data-date='finish_date' name="cleanupTo" size="15" maxlength="30" value="{CLEANUP_HAS_DATES_TO}" />
-                    </label>
-                </div>
-                <div class="large-12 columns">
-                    <input type="submit" value="Search" />
-                </div>
-            </form>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <input id="check-all" type="checkbox" data-selectall="true" value="" />
+                                        <label for="check-all" class="checkbox-label"></label>
+                                    </th>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th>Author</th>
+                                    <th>Start</th>
+                                    <th>End</th>
+                                    <th>Applies to</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- BEGIN cleanup_event -->
+                                <tr>
+                                    <td>
+                                        <input id="check-{CLEANUP_EVENT_ID}" type="checkbox" name="cleanupEventId[]" data-modifier='{CLEANUP_EVENT_MODIFIER}' value="{CLEANUP_EVENT_ID}" />
+                                        <label for="check-{CLEANUP_EVENT_ID}" class="checkbox-label"></label>
+                                    </td>
+                                    <td><a href='/calendar/modify.php?eventID={CLEANUP_EVENT_ID}'>{CLEANUP_EVENT_TITLE}</a></td>
+                                    <td>{CLEANUP_EVENT_EVENTTYPE}</td>
+                                    <td><a href="/search/user/{CLEANUP_EVENT_AUTHOR_ID}">{CLEANUP_EVENT_AUTHOR}</a></td>
+                                    <td>{CLEANUP_EVENT_START}</td>
+                                    <td>{CLEANUP_EVENT_END}</td>
+                                    <td>
+                                        {CLEANUP_EVENT_USERS}
+                                        {CLEANUP_EVENT_CATEGORIES}
+                                        {CLEANUP_EVENT_CAMPUSES}
+                                    </td>
+                                </tr>
+                                <!-- END cleanup_event -->
+                            </tbody>
+                        </table>
 
-            <div class="large-12 columns">
-                <!-- BEGIN cleanup_has_events -->
-                <input id="check-personal" type="checkbox" data-modifier-control="true" value="personal" />
-                <label for="check-personal" class="checkbox-label">Select Personal Events</label>
-                <input id="check-group" type="checkbox" data-modifier-control="true" value="group" />
-                <label for="check-group" class="checkbox-label">Select Group Events</label>
+                        <div class="content">
+                            <input type="submit" value="Remove Selected Events" />
+                        </div>
+                    </form>
+                    <!-- END cleanup_has_events -->
 
-                <h3>Events</h3>
-                <form action="/adminv2/calendar/modifyForm" method="post">
-                    <input type="hidden" name='action' value='cleanup' />
-
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>
-                                    <input id="check-all" type="checkbox" data-selectall="true" value="" />
-                                    <label for="check-all" class="checkbox-label"></label>
-                                </th>
-                                <th>Title</th>
-                                <th>Type</th>
-                                <th>Author</th>
-                                <th>Start</th>
-                                <th>End</th>
-                                <th>Applies to</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- BEGIN cleanup_event -->
-                            <tr>
-                                <td>
-                                    <input id="check-{CLEANUP_EVENT_ID}" type="checkbox" name="cleanupEventId[]" data-modifier='{CLEANUP_EVENT_MODIFIER}' value="{CLEANUP_EVENT_ID}" />
-                                    <label for="check-{CLEANUP_EVENT_ID}" class="checkbox-label"></label>
-                                </td>
-                                <td><a href='/calendar/modify.php?eventID={CLEANUP_EVENT_ID}'>{CLEANUP_EVENT_TITLE}</a></td>
-                                <td>{CLEANUP_EVENT_EVENTTYPE}</td>
-                                <td><a href="/search/user/{CLEANUP_EVENT_AUTHOR_ID}">{CLEANUP_EVENT_AUTHOR}</a></td>
-                                <td>{CLEANUP_EVENT_START}</td>
-                                <td>{CLEANUP_EVENT_END}</td>
-                                <td>
-                                    {CLEANUP_EVENT_USERS}
-                                    {CLEANUP_EVENT_CATEGORIES}
-                                    {CLEANUP_EVENT_CAMPUSES}
-                                </td>
-                            </tr>
-                            <!-- END cleanup_event -->
-                        </tbody>
-                    </table>
-
-                    <input type="submit" value="Remove Selected Events" />
-                </form>
-                <!-- END cleanup_has_events -->
-
-                <!-- BEGIN cleanup_has_no_events -->
-                <p>No events found within the selected date range.</p>
-                <!-- END cleanup_has_no_events -->
+                    <!-- BEGIN cleanup_has_no_events -->
+                    <p>No events found within the selected date range.</p>
+                    <!-- END cleanup_has_no_events -->
+                </section>
             </div>
         </div>
         <!-- END cleanup -->
