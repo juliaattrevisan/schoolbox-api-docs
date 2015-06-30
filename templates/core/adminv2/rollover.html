@@ -1,44 +1,22 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/tree.css" />
-<style type="text/css">
-  #traversal-window, #confirmation-window {
-    padding: 20px;
-  }
-  #traversal-window.error {
-    background: #fff7f7;
-    color: #800;
-  }
-  #traversal-window.loading {
-    background: #f7f7f7;
-    color: #777;
-  }
-  #traversal-window li {
-    text-align: left;
-    list-style-type: disc;
-    margin: 4px 0;
-  }
-  #confirmation-window form {
-    text-align: center;
-  }
-</style>
 <link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
 <script type="text/javascript" src="/javascript/jquery.resourceTree.js"></script>
 <script type="text/javascript">
-
     $(function() {
-        var traversalWindow    = $('#traversal-window');
-        var confirmationWindow = $('#confirmation-window');
+        var traversalWindow    = $('[data-window=traversal]');
+        var confirmationWindow = $('[data-window=confirmation]');
 
         /* left tree navigation */
-        $('#tree')
+        $('[data-tree]')
             .resourceTree({
                 data: {
                     cache: {TREEDATA}
                 }
             })
             .on('select_node.jstree', function(event, jstree) {
-                traversalWindow.addClass('loading').html('Searching...');
+                traversalWindow.addClass('loader').html('');
                 confirmationWindow.html('');
 
                 var content = $('<div/>');
@@ -50,95 +28,86 @@
                     null,
                     'json'
                 )
-                    .always(function() {
-                        traversalWindow.removeClass('loading');
-                    })
-                    .done(function(data) {
-                        var len = Object.keys(data).length;
-                        if (len) {
-                            var list = $('<ul/>');
-                            $.each(data, function(k, v) {
-                                list.append(
-                                    $('<li/>').html(v.name + ' (' + v.code + ')')
-                                );
-                            });
-                            content
-                                .append($('<h3/>').html(len + ' classes found.'))
-                                .append(list);
+                .always(function() {
+                    traversalWindow.removeClass('loader');
+                })
+                .done(function(data) {
+                    var len = Object.keys(data).length;
 
-                            var confirmation = $('<form/>').attr('method', 'post').attr('action', '/adminv2/rolloverForm.php');
-                            confirmation.append($('<input type="hidden" />').attr('name', 'rollover').val(parent));
-                            confirmation.append($('<p/>').html('Rollover these ' + len + ' classes?<br/><em>You cannot undo this.</em>'));
-                            confirmation.append(
-                                $('<input type="submit" value="Rollover" class="submit-btn-plain" />')
+                    if (len) {
+                        var list = $('<ul/>');
+
+                        $.each(data, function(k, v) {
+                            list.append(
+                                $('<li/>').html(v.name + ' (' + v.code + ')')
                             );
-                            confirmationWindow.html(confirmation);
-                        }
-                        else {
-                            content.html('No classes found.');
-                        }
-                        traversalWindow.removeClass('error').html(content);
-                    })
-                    .fail(function(e) {
-                        var errString = '';
-                        try {
-                            errString = JSON.parse(e.responseText)
-                        }
-                        catch(e) {
-                            errString = 'Failed to retrieve class listing.';
-                        }
+                        });
 
-                        traversalWindow
-                            .addClass('error')
-                            .html(errString);
-                    });
-            })
-  });
+                        content
+                            .append($('<h3/>').html(len + ' classes found.'))
+                            .append(list);
+
+                        var confirmation = $('<form/>').attr('method', 'post').attr('action', '/adminv2/rolloverForm.php');
+                        confirmation.append($('<input type="hidden" />').attr('name', 'rollover').val(parent));
+                        confirmation.append($('<p/>').html('Rollover these ' + len + ' classes?<br/><em>You cannot undo this.</em>'));
+                        confirmation.append($('<input type="submit" value="Rollover" />'));
+                        confirmationWindow.html(confirmation);
+                    }
+                    else {
+                        content.html('<h3>No classes found.</h3>');
+                    }
+
+                    traversalWindow.html(content);
+                })
+                .fail(function(e) {
+                    var errString = '';
+                    try {
+                        errString = JSON.parse(e.responseText)
+                    }
+                    catch(e) {
+                        errString = 'Failed to retrieve class listing.';
+                    }
+
+                    traversalWindow
+                        .html('<div class="text-center"><span class="alert label">' + errString + '</span></div>');
+                });
+            });
+    });
 </script>
 <!-- END custom_head -->
 
 {ADMIN_NAV}
 
-<div class="admin-contents clearfix">
-  <h2>Rollover</h2>
+<div class="row">
+    <div class="large-12 columns">
+        <h2>Rollover</h2>
 
-  <p>
-    Rollover will look through all subfolders of the selected folder, and detach them from their class codes.
-    The codes will be appended to the folder title for ease of archiving.<br/>This function is irreversible, so only do
-    this if you are <strong>absolutely certain</strong> that you want to.
-  </p>
-  <p>Select a folder to rollover:</p>
-
-
-  <div class="template3">
-    <div class="left">
-      <div id="category-window">
-        <div class="loading"></div>
-        <table id="category-head" class="table">
-          <thead>
-          <th>Folders</th>
-          </thead>
-        </table>
-        <div class="scroller">
-          <div id="tree" class="table">
-          </div>
+        <p>
+            Rollover will look through all subfolders of the selected folder, and detach them from
+            their class codes. The codes will be appended to the folder title for ease of archiving.
+        </p>
+        <p>
+            This function is irreversible, so only do this if you are <strong>absolutely
+            certain</strong> that you want to.
+        </p>
+        <p>
+            Select a folder to rollover:
+        </p>
+    </div>
+    <div class="large-4 columns">
+        <div window="category">
+            <h3>Folders</h3>
+            <div data-tree></div>
         </div>
-      </div>
     </div>
 
-    <div class="center">
-      <div id="traversal-window">
-        <ul></ul>
-      </div>
+    <div class="large-4 columns">
+        <div data-window="traversal">
+            <ul></ul>
+        </div>
     </div>
 
-    <div class="right">
-      <div id="confirmation-window"></div>
+    <div class="large-4 columns">
+        <div data-window="confirmation"></div>
     </div>
-
-
-  </div>
-
-
-
 </div>
