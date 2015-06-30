@@ -434,86 +434,86 @@
         <h2 class="subheader">Recent Activity Logs</h2>
     </div>
     <div class="small-12 medium-6 island">
-        <span class="header-actions">
-            <a class="button icon-view" href="/adminv2/reports/login/user={USERNAME}">See All</a>
-        </span>
-
         <section>
-            <div class="content">
-                <h3 class="subheader">Logins</h3>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>IP</th>
-                        <th>Result</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!-- BEGIN login_log -->
-                    <tr>
-                        <td>{LOGIN_DATE}</td>
-                        <td>{LOGIN_IP}</td>
-                        <td>{LOGIN_RESULT}</td>
-                    </tr>
-                    <!-- END login_log -->
-                    </tbody>
-                </table>
-            </div>
+            <span class="header-actions">
+                <a class="button icon-view" href="/adminv2/reports/login/user={USERNAME}">See All</a>
+            </span>
+            <h3 class="content subheader">Logins</h3>
+            <table>
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>IP</th>
+                    <th>Result</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- BEGIN login_log -->
+                <tr>
+                    <td>{LOGIN_DATE}</td>
+                    <td>{LOGIN_IP}</td>
+                    <td>{LOGIN_RESULT}</td>
+                </tr>
+                <!-- END login_log -->
+                </tbody>
+            </table>
         </section>
     </div>
 
     <div class="small-12 medium-6 island">
-        <span class="header-actions">
-            <a class="button icon-view" href="/adminv2/reports/activity/user={USERNAME}">See All</a>
-        </span>
-
         <section>
-            <div class="content">
-                <h3 class="subheader">Activity</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- BEGIN action_log -->
-                        <tr>
-                            <td>{ACTION_DATE}</td>
-                            <td>{ACTION_ACTION}</td>
-                        </tr>
-                        <!-- END action_log -->
-                    </tbody>
-                </table>
-            </div>
+            <span class="header-actions">
+                <a class="button icon-view" href="/adminv2/reports/activity/user={USERNAME}">See All</a>
+            </span>
+            <h3 class="content subheader">Activity</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- BEGIN action_log -->
+                    <tr>
+                        <td>{ACTION_DATE}</td>
+                        <td>{ACTION_ACTION}</td>
+                    </tr>
+                    <!-- END action_log -->
+                </tbody>
+            </table>
         </section>
     </div>
 </div>
 
 <div class="row">
-    <div class="large-12 columns">
-        <h2>Send Message to {FULLNAME}</h2>
-        <p><em>{FIRSTNAME} must be signed in to receive a popup alert</em></p>
+    <div class="small-12 island">
+        <h2 class="subheader">
+            Send Message to {FULLNAME}
+        </h2>
 
-        <form action="/adminv2/sendAlert" method="POST">
-            <input type="hidden" name="user" value="{USERID}" />
-            <div class="row">
-                <div class="small-10 columns">
-                    <label>
-                        <strong>Message from {SITE_LOGINNAME}:</strong>
-                        <input type="text" value="" name="body" />
-                    </label>
-                </div>
-                <div class="small-2 columns">
-                    <label>
-                        <br/>
-                        <input type="submit" value="Send" />
-                    </label>
-                </div>
+        <section>
+            <div class="content">
+                <p><em>{FIRSTNAME} must be signed in to receive a popup alert.</em></p>
+                <form action="/adminv2/sendAlert" method="POST">
+                    <input type="hidden" name="user" value="{USERID}" />
+                    <div class="row">
+                        <div class="small-10 columns">
+                            <label>
+                                <strong>Message from {SITE_LOGINNAME}:</strong>
+                                <input type="text" value="" name="body" />
+                            </label>
+                        </div>
+                        <div class="small-2 columns">
+                            <label>
+                                <br/>
+                                <input type="submit" value="Send" />
+                            </label>
+                        </div>
+                    </div>
+                </form>
             </div>
-        </form>
+        </section>
     </div>
 </div>
 
