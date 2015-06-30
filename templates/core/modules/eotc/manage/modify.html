@@ -116,17 +116,30 @@
     <!-- BEGIN recurring_reminder -->
     <div data-advanced data-repeat-reminder class="large-12 columns">
         <label>
-            Repeat:
-            {EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong>.
+            Repeat
             <span class='hint has-tip tip-top' data-tooltip title="This event is part of a recurring series.">?</span>
+            <br />
+            {EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong>.
         </label>
     </div>
     <!-- END recurring_reminder -->
-    <label>
-    </label>
 
-    <label>
-    </label>
+    <div class="large-12 columns">
+        <label>
+            Location
+            <input name="location" class='required' type="text" size="50" value="{EVENT_LOCATION}"/>
+        </label>
+
+        <label>
+            Type
+            <span class='hint has-tip tip-top' data-tooltip title="Select the type of event. This will be represented via different colours.">?</span>
+            <select name="type">
+                <!-- BEGIN type_drop -->
+                <option value="{EVENT_EVENTTYPE_ID}" {EVENT_EVENTTYPE_ID_SELECTED}>{EVENT_EVENTTYPE_NAME}</option>
+                <!-- END type_drop -->
+            </select>
+        </label>
+    </div>
 
     <label>
     </label>
@@ -148,34 +161,6 @@
 
     <table>
 		<tbody>
-
-
-
-
-
-
-
-			<tr>
-				<td>
-					<h4>Location</h4>
-				</td>
-				<td>
-					<input name="location" class='required' type="text" size="50" value="{EVENT_LOCATION}"/>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<h4>Type</h4>
-					<em>Select the type of event. This will be represented via different colours</em>
-				</td>
-				<td>
-					<select name="type">
-						<!-- BEGIN type_drop -->
-						<option value="{EVENT_EVENTTYPE_ID}" {EVENT_EVENTTYPE_ID_SELECTED}>{EVENT_EVENTTYPE_NAME}</option>
-						<!-- END type_drop -->
-					</select>
-				</td>
-			</tr>
 			<tr id="campusList">
 				<td>
 					<h4>Campus</h4>
