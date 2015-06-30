@@ -141,8 +141,16 @@
         </label>
     </div>
 
-    <label>
-    </label>
+    <div class="large-12 columns">
+        <label>
+            Campus
+            <span class='hint has-tip tip-top' data-tooltip title="Select the campuses which will be able to view this event.">?</span>
+        </label>
+        <!-- BEGIN event_campus_list -->
+        <input id="campusCheckbox{EVENT_CAMPUS_ID}" type="checkbox" name="campus[]" value="{EVENT_CAMPUS_ID}" {EVENT_CAMPUS_ID_SELECTED} />
+        <label for="campusCheckbox{EVENT_CAMPUS_ID}" class="checkbox-label">{EVENT_CAMPUS_NAME}</label>
+        <!-- END event_campus_list -->
+    </div>
 
     <label>
     </label>
@@ -163,16 +171,8 @@
 		<tbody>
 			<tr id="campusList">
 				<td>
-					<h4>Campus</h4>
-					<em>Select the campuses which will be able to view this event</em>
-				</td>
-				<td>
 					<div class="clearfix checkboxes">
-						<!-- BEGIN event_campus_list -->
-						<label>
-							<input type="checkbox" class="campusCheck" name="campus[]" value="{EVENT_CAMPUS_ID}" {EVENT_CAMPUS_ID_SELECTED} /> {EVENT_CAMPUS_NAME}
-						</label>
-						<!-- END event_campus_list -->
+
 					</div>
 				</td>
 			</tr>

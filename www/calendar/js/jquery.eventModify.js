@@ -183,37 +183,37 @@
 		 * Add "select all" capability to checkboxes
 		 */
 		function setupSelectAll() {
-			config.element.find('[data-selectall="true"]').change(function(){
-				if ($(this).is(':checked')) {
-					$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', true).parent().addClass('active-checkbox');
-				}
-				else {
-					$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
-				}
-			});
+//			config.element.find('[data-selectall="true"]').change(function(){
+//				if ($(this).is(':checked')) {
+//					$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', true).parent().addClass('active-checkbox');
+//				}
+//				else {
+//					$(this).closest('.checkboxes').find(':checkbox').not('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
+//				}
+//			});
 		}
 
 		/**
 		 * Set up checkbox styles upon click
 		 */
 		function setupCheckboxStyles() {
-			$(':checkbox').each(function () {
-				if ($(this).is(':checked')) {
-					$(this).parent().addClass('active-checkbox');
-				}
-			});
-
-			$(':checkbox').click(function () {
-				if ($(this).parent().hasClass('active-checkbox')) {
-					$(this).parent().removeClass('active-checkbox')
-					if($(this).closest('.checkboxes').find('.select_all').is(':checked')){
-						$(this).closest('.checkboxes').find('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
-					}
-				}
-				else {
-					$(this).parent().addClass('active-checkbox');
-				}
-			});
+//			$(':checkbox').each(function () {
+//				if ($(this).is(':checked')) {
+//					$(this).parent().addClass('active-checkbox');
+//				}
+//			});
+//
+//			$(':checkbox').click(function () {
+//				if ($(this).parent().hasClass('active-checkbox')) {
+//					$(this).parent().removeClass('active-checkbox')
+//					if($(this).closest('.checkboxes').find('.select_all').is(':checked')){
+//						$(this).closest('.checkboxes').find('.select_all').prop('checked', false).parent().removeClass('active-checkbox');
+//					}
+//				}
+//				else {
+//					$(this).parent().addClass('active-checkbox');
+//				}
+//			});
 		}
 
 		/**
