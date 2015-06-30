@@ -7,7 +7,7 @@
 
 <h1>{FUNCTION} Event</h1>
 
-<form id="eventForm" method="post" action="/modules/eotc/manage/modifyForm.php" enctype="multipart/form-data">
+<form data-form="event" method="post" action="/modules/eotc/manage/modifyForm.php" enctype="multipart/form-data">
 	<input name="id" type="hidden" value="{EVENT_ID}" />
 	<input name="authorId" type="hidden" value="{EVENT_AUTHOR_ID}" />
 	<input name="return" type="hidden" value="{EVENT_REDIRECT}" />
@@ -414,9 +414,9 @@
         });
         // My polyfill for multiple file uploads is actually more usable than
         // HTML5 multifile uploads.
-        $('#eventForm').on('change', 'input[type="file"][multiple]', function(event) {
+        $('[data-form=event]').on('change', 'input[type="file"][multiple]', function(event) {
             var container     = $(this).closest('[data-ramsfile]');
-            var allContainers = $('#eventForm [data-ramsfile]').not(container);
+            var allContainers = $('[data-form=event] [data-ramsfile]').not(container);
             if (this.value.length > 0) {
                 // clone me
                 // Hide remove button from new one, show it in old.
@@ -431,12 +431,12 @@
                 }
             }
         });
-        $('#eventForm').on('click', 'a[data-action="delete"]', function(event) {
+        $('[data-form=event]').on('click', 'a[data-action="delete"]', function(event) {
             event.preventDefault();
             $(this).closest('[data-ramsfile]').remove();
         });
 
-        $('#eventForm').eventModify({
+        $('[data-form=event]').eventModify({
             functionLabel: "{FUNCTION}"
         });
     });
