@@ -20,13 +20,10 @@
 
         });
 
-        $(document).on('click', '.open-dialog', function () {
+        $(document).on('click', '.open-dialog', function (event) {
+            event.preventDefault();
             $('#dialog').dialog('open');
             $('#dialog').children('.store-here').html($(this).siblings('.chosen-one').attr('ID'));
-            // /images/mime/22x22/
-
-
-            return false;
         });
 
         $('.new-button').click(function () {
@@ -40,53 +37,57 @@
 
         });
 
-		$('form#newAllowedFile').validate({
-			rules: {
-				description: {
-					required: true,
-					minlength: 2
-				},
-				mime: {
-					required: true,
-					minlength: 2
-				},
-				extension: {
-					required: true,
-					minlength: 1
-				}
-			},
-			messages: {
-				title: "Please enter a title",
-				mime: "Please enter a mime type",
-				extension: "Please enter a file extension"
-			},
-			submitHandler: function (form) {
-				//
-				// Some sort of form validation - check for no duplicate mimetypes.
-				var create_form  = $('form#newAllowedFile');
-				var update_forms = $('form[id^="allowed-file"]');
+		$('form[data-action="createNewFileType"], form[data-action="updateFileType"]').each(function() {
+            $(this).validate({
+                rules: {
+                    description: {
+                        required: true,
+                        minlength: 2
+                    },
+                    mime: {
+                        required: true,
+                        minlength: 2
+                    },
+                    extension: {
+                        required: true,
+                        minlength: 1
+                    }
+                },
+                messages: {
+                    title: "Please enter a title",
+                    mime: "Please enter a mime type",
+                    extension: "Please enter a file extension"
+                },
+                submitHandler: function (form) {
+                    //
+                    // Some sort of form validation - check for no duplicate mimetypes.
+                    var create_form  = $('form[data-action="createNewFileType"]');
+                    var update_forms = $('form[data-action="updateFileType"]');
 
-				create_form.add(update_forms);
+                    if ($(form).is('form[data-action="createNewFileType"]')) {
+                        create_form.add(update_forms);
+                    }
 
-				var this_mimetype = $(this).find(':input[name="mime"]').val();
+                    var this_mimetype = $(form).find(':input[name="mime"]').val();
 
-				var mimetype_list = $.map(
-					update_forms.not(this).find(':input[name="mime"]'),
+                    var mimetype_list = $.map(
+                            update_forms.not(form).find(':input[name="mime"]'),
 
-						function(element) {
-						return $(element).val();
-					}
-				);
+                            function(element) {
+                                return $(element).val();
+                            }
+                    );
 
-				if ($.inArray(this_mimetype, mimetype_list) >= 0) {
-					alert('The mime type you have chosen for this file type is already in use.')
-					event.preventDefault();
-				}
-				else {
-					form.submit();
-				}
-			}
-		});
+                    if ($.inArray(this_mimetype, mimetype_list) >= 0) {
+                        alert('The mime type you have chosen for this file type is already in use.')
+                        event.preventDefault();
+                    }
+                    else {
+                        form.submit();
+                    }
+                }
+            });
+        });
 
         // row action buttons
         $(document).on('click', '[data-interaction-delete]', function (event) {
@@ -135,7 +136,7 @@
 
         $(document).on('click', '[data-interaction-new]', function (event) {
             event.preventDefault();
-            $('#newAllowedFile').slideDown();
+            $('[data-action="createNewFileType"]').slideDown();
         });
 
     });
@@ -148,7 +149,7 @@
 
 <div>
     <a href="/adminv2/allowed-file/new" data-interaction-new class="button icon-add">New file type</a>
-    <form id="newAllowedFile" method="post" action="/adminv2/allowed-fileForm.php" class="panel" style="display:none;">
+    <form id="newAllowedFile" method="post" data-action="createNewFileType" action="/adminv2/allowed-fileForm.php" class="panel" style="display:none;">
         <input type="hidden" readonly="readonly" name="fileTypeId" value=""/>
         <h3>Create new file type</h3>
         <div class="row">
@@ -205,7 +206,7 @@
     <ul class="allowed-files action-list">
         <!-- BEGIN file -->
         <li class="row-holder" data-equalizer data-interaction-container>
-            <form style="margin:0" id="allowed-file{FILE_ID}" method="post" action="/adminv2/allowed-fileForm.php">
+            <form data-action="updateFileType" style="margin:0" id="allowed-file{FILE_ID}" method="post" action="/adminv2/allowed-fileForm.php">
                 <div class="row" data-interaction-display>
                     <div class="column one-column">
                         <img src="/images/mime/60x60/{FILE_ICON}"/>
