@@ -11,18 +11,18 @@
 </div>
 
 <div class="row">
-    <div class="small-12 medium-3 large-12 columns">
+    <div class="large-12 columns">
         <h2>Settings</h2>
 
-        <ul class="side-nav">
+        <dl class="sub-nav">
             <!-- BEGIN setting_tab -->
-            <li class="{SETTING_TAB_ACTIVE}"><a href="/adminv2/setting/{SETTING_TAB_URL}">{SETTING_TAB_NAME}</a></li>
+            <dd class="{SETTING_TAB_ACTIVE}"><a href="/adminv2/setting/{SETTING_TAB_URL}">{SETTING_TAB_NAME}</a></dd>
             <!-- END setting_tab -->
-        </ul>
+        </dl>
     </div>
 </div>
 
-<div class="small-12 medium-9 columns">
+<div class="large-12 columns">
     <!-- BEGIN setting_group -->
     <form data-action="saveSettings" id="settings" class="admin-form level clearfix" method="post" action="/adminv2/settingForm.php">
         <!-- BEGIN setting_group_localisation -->
