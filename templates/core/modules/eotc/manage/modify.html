@@ -152,8 +152,51 @@
         <!-- END event_campus_list -->
     </div>
 
-    <label>
-    </label>
+    <div class="large-12 columns">
+        <input type="hidden" name="ramsUploaded" data-ramsuploaded="{EVENT_RAMS_UPLOADED}" />
+        <input type="hidden" name="ramsRequired" value="0" />
+
+        <label>
+            RAMS Required?
+            <span class='hint has-tip tip-top' data-tooltip title="Please confirm if RAMS is required for this event to take place.">?</span>
+        </label>
+
+        <div class="large-4 columns">
+            <input id='ramsRequiredCheckbox' type="checkbox" data-ramscheckbox="true" name="ramsRequired" value="1" {EVENT_RAMSREQUIRED_SELECTED} />
+            <label for="ramsRequiredCheckbox" class="checkbox-label">RAMS is required</label>
+        </div>
+        <div class="large-8 columns">
+            <ul class="information-list">
+                <!-- BEGIN rams_list -->
+                <li>
+                    <div class="one-column">
+                        <img src="/images/mime/22x22/{EVENT_RAMS_MIMETYPE_ICONFILE}" />
+                    </div>
+                    <div class="nine-column">
+                        <a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" alt="Download" title="Download">{EVENT_RAMS_FILE}</a>
+                    </div>
+                    <div class="two-column">
+                        <input type="checkbox" id="deleteRamsFile-{EVENT_RAMS_HASH}" name="deleteRamsFile[{EVENT_RAMS_HASH}]" value="1" />
+                        <label for="deleteRamsFile-{EVENT_RAMS_HASH}" class="checkbox-label">Delete?</label>
+                    </div>
+                </li>
+                <!-- END rams_list -->
+            </ul>
+
+            <div data-ramsfile="true">
+                <ul class="information-list">
+                    <li>
+                        <div class="eleven-column">
+                            <input type="file" name="ramsFile[]" multiple />
+                        </div>
+                        <div class="one-column">
+                            <a href="#" data-action="delete" class="icon-delete no-text hide"></a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
     <label>
     </label>
@@ -169,46 +212,11 @@
 
     <table>
 		<tbody>
-			<tr id="campusList">
-				<td>
-					<div class="clearfix checkboxes">
-
-					</div>
-				</td>
-			</tr>
 			<tr>
 				<td>
-					<h4>RAMS Required</h4>
-					<em>Please confirm if RAMS is required for this event to take place.</em>
-				</td>
-				<td>
-					<input type="hidden" name="ramsUploaded" data-ramsuploaded="{EVENT_RAMS_UPLOADED}" />
 
 
-						<input type="hidden" name="ramsRequired" value="0" />
-                    <label><input type="checkbox" data-ramscheckbox="true" name="ramsRequired" value="1" {EVENT_RAMSREQUIRED_SELECTED} />RAMS Required?</label>
 
-						<ul>
-							<!-- BEGIN rams_list -->
-							<li class="clearfix">
-								<a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" class="btn download no-text" alt="Download" title="Download"><span></span></a>
-								<label class="float-right">
-									<input type="checkbox"
-										   id="deleteRamsFile-{EVENT_RAMS_HASH}"
-										   name="deleteRamsFile[{EVENT_RAMS_HASH}]"
-										   value="1" />
-									Delete?
-								</label>
-								<img src="/images/mime/22x22/{EVENT_RAMS_MIMETYPE_ICONFILE}" width="22" height="22" />
-								{EVENT_RAMS_FILE}
-							</li>
-							<!-- END rams_list -->
-						</ul>
-
-						<div data-ramsfile="true">
-							<input type="file" name="ramsFile[]" multiple />
-							<a href="#" data-action="delete" class="hide">Remove</a>
-						</div>
 
 				</td>
 			</tr>
@@ -464,7 +472,7 @@
                 // clone me
                 // Hide remove button from new one, show it in old.
                 var newContainer = container.clone();
-                container.find('a[data-action="delete"]').show();
+                container.find('a[data-action="delete"]').removeClass('hide');
                 newContainer.find('a[data-action="delete"]').hide();
                 container.after(newContainer);
             } else {
