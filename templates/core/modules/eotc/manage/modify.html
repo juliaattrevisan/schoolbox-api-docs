@@ -1,109 +1,11 @@
-<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
-<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
-<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
-<script type="text/javascript" src="/calendar/js/jquery.eventModify.js"></script>
-<script type="text/javascript">
-	$(function() {
-		$.fn.alaressTiny({
-			mode: 'textareas',
-			editor_deselector: "selfPromotionalComment"
-		});
-		$('#staff-suggest').selectizeSelector({
-			ajax: {
-				url:      '/ajax/user.php',
-				type:     'GET',
-				data:     {groupID: '{STAFF_GROUP_TYPE_IDS}', showCampus: true},
-				dataType: 'json'
-			},
-			value: {EVENT_STAFF},
-			multiple: true
-		})
+<span class='header-actions'>
+	<a data-customise class="button icon-settings" href="#">
+        <span {ADVANCED_SHOW}>Show Advanced Options</span>
+        <span {ADVANCED_CLOSE}>Close Advanced Options</span>
+    </a>
+</span>
 
-		$('#teacher-in-charge-suggest').selectizeSelector({
-			ajax: {
-				url:      '/ajax/user.php',
-				type:     'GET',
-				data:     {groupID: '{STAFF_GROUP_TYPE_IDS}', showCampus: true},
-				dataType: 'json'
-			},
-			value: {EVENT_TEACHER_IN_CHARGE},
-			multiple: false
-		})
-
-		/* Confirmation when removing RAMS requirement
-		 */
-		$('[data-ramscheckbox="true"]').change(function(event) {
-			if (!$(this).is(':checked')) {
-				var self = $(this);
-
-				$("#dialog-rams").dialog({
-					resizable: false,
-					height: 340,
-					width: 400,
-					modal: true,
-					draggable: false,
-					buttons: {
-						"OK": function() {
-							$(self).prop('checked', false);
-							$(this).dialog('close');
-						},
-						"Cancel": function() {
-							$(self).prop('checked', true);
-							$(this).dialog('close');
-						}
-					},
-					close: function() {
-						$(this).dialog('close');
-					}
-				});
-			}
-		});
-		// My polyfill for multiple file uploads is actually more usable than
-		// HTML5 multifile uploads.
-		$('#eventForm').on('change', 'input[type="file"][multiple]', function(event) {
-			var container     = $(this).closest('[data-ramsfile]');
-			var allContainers = $('#eventForm [data-ramsfile]').not(container);
-			if (this.value.length > 0) {
-				// clone me
-				// Hide remove button from new one, show it in old.
-				var newContainer = container.clone();
-				container.find('a[data-action="delete"]').show();
-				newContainer.find('a[data-action="delete"]').hide();
-				container.after(newContainer);
-			} else {
-				// delete me (unless I'm the only one)
-				if (allContainers.length) {
-					container.remove();
-				}
-			}
-		});
-		$('#eventForm').on('click', 'a[data-action="delete"]', function(event) {
-			event.preventDefault();
-			$(this).closest('[data-ramsfile]').remove();
-		});
-
-		$('#eventForm').eventModify({
-			functionLabel: "{FUNCTION}"
-		});
-	});
-</script>
-<script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
-<script type="text/javascript" src="/javascript/jquery.hourpicker.js"></script>
-<script type="text/javascript" src="/javascript/jquery.minutepicker.js"></script>
-<script type="text/javascript">
-    $(function() {
-        $('input[data-timepicker="hour"]').hourpicker({ hours: 12 });
-        $('input[data-timepicker="minute"]').minutepicker();
-    });
-</script>
-<h1>
-	<span>{FUNCTION} Event</span>
-	<a class="customise" href="#">
-		<span {ADVANCED_SHOW}>Show Advanced Options</span>
-		<span {ADVANCED_CLOSE}>Close Advanced Options</span>
-	</a>
-</h1>
+<h1>{FUNCTION} Event</h1>
 
 <form id="eventForm" method="post" action="/modules/eotc/manage/modifyForm.php" enctype="multipart/form-data">
 	<input name="id" type="hidden" value="{EVENT_ID}" />
@@ -449,3 +351,102 @@
 
 
 
+<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+<script type="text/javascript" src="/calendar/js/jquery.eventModify.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $.fn.alaressTiny({
+            mode: 'textareas',
+            editor_deselector: "selfPromotionalComment"
+        });
+        $('#staff-suggest').selectizeSelector({
+            ajax: {
+                url:      '/ajax/user.php',
+                type:     'GET',
+                data:     {groupID: '{STAFF_GROUP_TYPE_IDS}', showCampus: true},
+                dataType: 'json'
+            },
+            value: {EVENT_STAFF},
+            multiple: true
+        })
+
+        $('#teacher-in-charge-suggest').selectizeSelector({
+            ajax: {
+                url:      '/ajax/user.php',
+                type:     'GET',
+                data:     {groupID: '{STAFF_GROUP_TYPE_IDS}', showCampus: true},
+                dataType: 'json'
+            },
+            value: {EVENT_TEACHER_IN_CHARGE},
+            multiple: false
+        })
+
+        /* Confirmation when removing RAMS requirement
+         */
+        $('[data-ramscheckbox="true"]').change(function(event) {
+            if (!$(this).is(':checked')) {
+                var self = $(this);
+
+                $("#dialog-rams").dialog({
+                    resizable: false,
+                    height: 340,
+                    width: 400,
+                    modal: true,
+                    draggable: false,
+                    buttons: {
+                        "OK": function() {
+                            $(self).prop('checked', false);
+                            $(this).dialog('close');
+                        },
+                        "Cancel": function() {
+                            $(self).prop('checked', true);
+                            $(this).dialog('close');
+                        }
+                    },
+                    close: function() {
+                        $(this).dialog('close');
+                    }
+                });
+            }
+        });
+        // My polyfill for multiple file uploads is actually more usable than
+        // HTML5 multifile uploads.
+        $('#eventForm').on('change', 'input[type="file"][multiple]', function(event) {
+            var container     = $(this).closest('[data-ramsfile]');
+            var allContainers = $('#eventForm [data-ramsfile]').not(container);
+            if (this.value.length > 0) {
+                // clone me
+                // Hide remove button from new one, show it in old.
+                var newContainer = container.clone();
+                container.find('a[data-action="delete"]').show();
+                newContainer.find('a[data-action="delete"]').hide();
+                container.after(newContainer);
+            } else {
+                // delete me (unless I'm the only one)
+                if (allContainers.length) {
+                    container.remove();
+                }
+            }
+        });
+        $('#eventForm').on('click', 'a[data-action="delete"]', function(event) {
+            event.preventDefault();
+            $(this).closest('[data-ramsfile]').remove();
+        });
+
+        $('#eventForm').eventModify({
+            functionLabel: "{FUNCTION}"
+        });
+    });
+</script>
+<script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.hourpicker.js"></script>
+<script type="text/javascript" src="/javascript/jquery.minutepicker.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('input[data-timepicker="hour"]').hourpicker({ hours: 12 });
+        $('input[data-timepicker="minute"]').minutepicker();
+    });
+</script>

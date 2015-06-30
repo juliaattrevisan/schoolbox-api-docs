@@ -144,7 +144,7 @@
 		 * Set up Advanced Option toggle
 		 */
 		function setupAdvancedOptions() {
-			$('.customise').click(function(event) {
+			$('.customise, [data-customise]').click(function(event) {
 				event.preventDefault();
 
 				/* Alternate between button texts
