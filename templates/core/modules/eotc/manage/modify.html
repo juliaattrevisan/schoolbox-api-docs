@@ -143,14 +143,16 @@
         </div>
 
         <div class="large-12 columns">
-            <label>
-                Campus
-                <span class='hint has-tip tip-top' data-tooltip title="Select the campuses which will be able to view this event.">?</span>
-            </label>
-            <!-- BEGIN event_campus_list -->
-            <input id="campusCheckbox{EVENT_CAMPUS_ID}" type="checkbox" name="campus[]" value="{EVENT_CAMPUS_ID}" {EVENT_CAMPUS_ID_SELECTED} />
-            <label for="campusCheckbox{EVENT_CAMPUS_ID}" class="checkbox-label">{EVENT_CAMPUS_NAME}</label>
-            <!-- END event_campus_list -->
+            <fieldset>
+                <legend>
+                    Campus
+                    <span class='hint has-tip tip-top' data-tooltip title="Select the campuses which will be able to view this event.">?</span>
+                </legend>
+                <!-- BEGIN event_campus_list -->
+                <input id="campusCheckbox{EVENT_CAMPUS_ID}" type="checkbox" name="campus[]" value="{EVENT_CAMPUS_ID}" {EVENT_CAMPUS_ID_SELECTED} />
+                <label for="campusCheckbox{EVENT_CAMPUS_ID}" class="checkbox-label">{EVENT_CAMPUS_NAME}</label>
+                <!-- END event_campus_list -->
+            </fieldset>
         </div>
 
         <div class="large-12 columns">
@@ -224,36 +226,23 @@
                 <select id="staff-suggest" name="staff[]" multiple placeholder="Search Staff"></select>
             </label>
         </div>
-        <div class="large-12 columns">
+
+        <!-- BEGIN can_add_students -->
+        <div class="large-6 columns">
             <label>
+                Students
+                <span class='hint has-tip tip-top' data-tooltip title="Add student attendees.">?</span>
             </label>
+            <p>
+                {EVENT_CURRENT_STUDENTS}
+            </p>
         </div>
+        <div class="large-6 columns">
+            <a href="/modules/eotc/manage/attendance/list/{EVENT_ID}" class="button icon-modify" title="Manage student attendances for this event. This will open in a new tab/window." target="_blank">Manage Attendances</a>
+        </div>
+        <!-- END can_add_students -->
 
 
-
-
-
-
-        <table class="standardForm">
-            <tbody>
-                <!-- BEGIN can_add_students -->
-                <tr>
-                    <td class="formLabelWidth">
-                        <h4>Students</h4>
-                        <em>Add student attendees</em>
-                    </td>
-                    <td>
-                        {EVENT_CURRENT_STUDENTS}
-                        <a href="/modules/eotc/manage/attendance/list/{EVENT_ID}"
-                            class="btn modify"
-                            title="Manage student attendances for this event. This will open in a new tab/window."
-                            target="_blank"
-                        ><span></span>Manage Attendances</a>
-                    </td>
-                </tr>
-                <!-- END can_add_students -->
-            </tbody>
-        </table>
 
         <!-- BEGIN can_add_resources -->
         <h2>Resources</h2>
