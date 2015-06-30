@@ -1,4 +1,38 @@
-<!-- BEGIN custom_head -->
+{ADMIN_NAV}
+
+<div class="row">
+    <div class="large-12 columns">
+        <h2>Rollover</h2>
+
+        <p>
+            Rollover will look through all subfolders of the selected folder, and detach them from
+            their class codes. The codes will be appended to the folder title for ease of archiving.
+        </p>
+        <p>
+            This function is irreversible, so only do this if you are <strong>absolutely
+            certain</strong> that you want to.
+        </p>
+        <p>
+            Select a folder to rollover:
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="large-4 columns">
+        <h3>Folders</h3>
+        <div data-tree></div>
+    </div>
+
+    <div class="large-4 columns">
+        <div data-window="traversal"></div>
+    </div>
+
+    <div class="large-4 columns">
+        <div data-window="confirmation"></div>
+    </div>
+</div>
+
 <link rel="stylesheet" type="text/css" media="screen" href="/css/tree.css" />
 <link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
@@ -38,14 +72,10 @@
                         var list = $('<ul/>');
 
                         $.each(data, function(k, v) {
-                            list.append(
-                                $('<li/>').html(v.name + ' (' + v.code + ')')
-                            );
+                            list.append($('<li/>').html(v.name + ' (' + v.code + ')'));
                         });
 
-                        content
-                            .append($('<h3/>').html(len + ' classes found.'))
-                            .append(list);
+                        content.append($('<h3/>').html(len + ' classes found.')).append(list);
 
                         var confirmation = $('<form/>').attr('method', 'post').attr('action', '/adminv2/rolloverForm.php');
                         confirmation.append($('<input type="hidden" />').attr('name', 'rollover').val(parent));
@@ -74,39 +104,3 @@
             });
     });
 </script>
-<!-- END custom_head -->
-
-{ADMIN_NAV}
-
-<div class="row">
-    <div class="large-12 columns">
-        <h2>Rollover</h2>
-
-        <p>
-            Rollover will look through all subfolders of the selected folder, and detach them from
-            their class codes. The codes will be appended to the folder title for ease of archiving.
-        </p>
-        <p>
-            This function is irreversible, so only do this if you are <strong>absolutely
-            certain</strong> that you want to.
-        </p>
-        <p>
-            Select a folder to rollover:
-        </p>
-    </div>
-</div>
-
-<div class="row">
-    <div class="large-4 columns">
-        <h3>Folders</h3>
-        <div data-tree></div>
-    </div>
-
-    <div class="large-4 columns">
-        <div data-window="traversal"></div>
-    </div>
-
-    <div class="large-4 columns">
-        <div data-window="confirmation"></div>
-    </div>
-</div>
