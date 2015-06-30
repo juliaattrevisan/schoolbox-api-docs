@@ -9,15 +9,15 @@
 
 <div class="eotc-status {EVENT_STATUS_CLASS}">{EVENT_STATUS}</div>
 
-<div class="row">
-    <form data-form="event" method="post" action="/modules/eotc/manage/modifyForm.php" enctype="multipart/form-data">
-        <input name="id" type="hidden" value="{EVENT_ID}" />
-        <input name="authorId" type="hidden" value="{EVENT_AUTHOR_ID}" />
-        <input name="return" type="hidden" value="{EVENT_REDIRECT}" />
-        <input id="efficacy" name="efficacy" type="hidden" value="self" />
-        <input id="action" name="action" type="hidden" value="" />
-        <input type="hidden" name="allday" value="0" />
+<form data-form="event" method="post" action="/modules/eotc/manage/modifyForm.php" enctype="multipart/form-data">
+    <input name="id" type="hidden" value="{EVENT_ID}" />
+    <input name="authorId" type="hidden" value="{EVENT_AUTHOR_ID}" />
+    <input name="return" type="hidden" value="{EVENT_REDIRECT}" />
+    <input id="efficacy" name="efficacy" type="hidden" value="self" />
+    <input id="action" name="action" type="hidden" value="" />
+    <input type="hidden" name="allday" value="0" />
 
+    <div class="row">
         <div class="large-12 columns">
             <h2>Details</h2>
 
@@ -33,7 +33,9 @@
                 <input name="startDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
             </label>
         </div>
+    </div>
 
+    <div class="row">
         <div class="large-6 columns">
             <div data-timeinputs>
                 <div class="large-4 columns">
@@ -92,8 +94,10 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- BEGIN recurring_dates -->
+    <!-- BEGIN recurring_dates -->
+    <div class="row">
         <div data-advanced class="large-12 columns {SHOW_ADVANCED}">
             <label>
                 Repeat
@@ -113,8 +117,10 @@
                 <input name="repeat_until" data-datepicker='true' type="text" size="15" maxlength="30" value="" />
             </label>
         </div>
-        <!-- END recurring_dates -->
-        <!-- BEGIN recurring_reminder -->
+    </div>
+    <!-- END recurring_dates -->
+    <!-- BEGIN recurring_reminder -->
+    <div class="row">
         <div data-advanced data-repeat-reminder class="large-12 columns">
             <label>
                 Repeat
@@ -123,8 +129,10 @@
                 {EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong>.
             </label>
         </div>
-        <!-- END recurring_reminder -->
+    </div>
+    <!-- END recurring_reminder -->
 
+    <div class="row">
         <div class="large-12 columns">
             <label>
                 Location
@@ -141,7 +149,9 @@
                 </select>
             </label>
         </div>
+    </div>
 
+    <div class="row">
         <div class="large-12 columns">
             <fieldset>
                 <legend>
@@ -154,7 +164,9 @@
                 <!-- END event_campus_list -->
             </fieldset>
         </div>
+    </div>
 
+    <div class="row">
         <div class="large-12 columns">
             <input type="hidden" name="ramsUploaded" data-ramsuploaded="{EVENT_RAMS_UPLOADED}" />
             <input type="hidden" name="ramsRequired" value="0" />
@@ -200,7 +212,9 @@
                 </div>
             </div>
         </div>
+    </div>
 
+    <div class="row">
         <div class="large-12 columns">
             <label>
                 Details
@@ -209,7 +223,9 @@
                 <textarea class='event-detail' name="detail">{EVENT_DETAIL}</textarea>
             </label>
         </div>
+    </div>
 
+    <div class="row">
         <div class="large-12 columns">
             <h2>People</h2>
 
@@ -241,39 +257,35 @@
             <a href="/modules/eotc/manage/attendance/list/{EVENT_ID}" class="button icon-modify" title="Manage student attendances for this event. This will open in a new tab/window." target="_blank">Manage Attendances</a>
         </div>
         <!-- END can_add_students -->
+    </div>
 
+    <!-- BEGIN can_add_resources -->
+    <div class="row">
+        <div class="large-12 columns">
+            <h2>Resources</h2>
+        </div>
+        <div class="large-6 columns">
+            <label>
+                Resources
+                <span class='hint has-tip tip-top' data-tooltip title="Resources allocated to this event.">?</span>
+            </label>
 
+            <ul>
+                <!-- BEGIN resource -->
+                <li>
+                    <a href="/resource-booking/item/{RESOURCE_ID}" alt="{RESOURCE_NAME}" title="{RESOURCE_NAME}">{RESOURCE_NAME}</a>
+                </li>
+                <!-- END resource -->
+            </ul>
+        </div>
+        <div class="large-6 columns">
+            <a href="/modules/eotc/manage/resources/list/{EVENT_ID}" class="button icon-modify" title="Manage resource bookings for this event. This will open in a new tab/window." target="_blank">Manage Resource Bookings</a>
+        </div>
+    </div>
+    <!-- END can_add_resources -->
 
-        <!-- BEGIN can_add_resources -->
-        <h2>Resources</h2>
-        <table class="standardForm">
-            <tbody>
-                <tr>
-                    <td class="formLabelWidth">
-                        <h4>Resources</h4>
-                        <em>Resources allocated to this event</em>
-                    </td>
-                    <td>
-                        <ul>
-                            <!-- BEGIN resource -->
-                            <li>
-                                <a href="/resource-booking/item/{RESOURCE_ID}" alt="{RESOURCE_NAME}" title="{RESOURCE_NAME}">{RESOURCE_NAME}</a>
-                            </li>
-                            <!-- END resource -->
-                        </ul>
-
-                        <a href="/modules/eotc/manage/resources/list/{EVENT_ID}"
-                            class="btn modify"
-                            title="Manage resource bookings for this event. This will open in a new tab/window."
-                            target="_blank"
-                        ><span></span>Manage Resource Bookings</a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <!-- END can_add_resources -->
-
-        <!-- BEGIN has_activity_log -->
+    <!-- BEGIN has_activity_log -->
+    <div class="row">
         <h2>Activity Log</h2>
         <table class="standardForm">
             <tbody>
@@ -285,7 +297,8 @@
                 <!-- END activity_log -->
             </tbody>
         </table>
-        <!-- END has_activity_log -->
+    </div>
+    <!-- END has_activity_log -->
 
         <!-- BEGIN can_promote_in_principle -->
         <h2>Complete Details</h2>
@@ -359,8 +372,9 @@
         </div>
 
         <a href="/modules/eotc/myReview" class="btn go-to"><span></span>Back to My EOTC Events</a>
-    </form>
-</div>
+    </div>
+</form>
+
 
 
 
