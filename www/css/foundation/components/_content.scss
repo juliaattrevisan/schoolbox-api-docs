@@ -515,7 +515,6 @@ table{
 // White Islands - Custom 'Island' Columns
 .island {
   	@include grid-column();
-
 	@include responsive-sides(1, padding);
 	
 	// Only sections inside islands have these styles
@@ -792,6 +791,9 @@ table{
 	&.two a,
 	&.three a{
 		@media #{$small-up} {
+			padding: rem-calc(($base-font-size - 8));
+		}
+		@media #{$medium-up} {
 			padding: rem-calc(($base-font-size - 4));
 		}
 		@media #{$large-up} {

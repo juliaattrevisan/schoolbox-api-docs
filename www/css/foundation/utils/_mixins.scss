@@ -146,6 +146,10 @@
 
 @mixin responsive-sides($multiplier: 1, $property: padding) {
   @media #{$small-up} {
+    #{$property}-left: rem-calc(($multiplier * ($base-font-size - 8)));
+    #{$property}-right: rem-calc(($multiplier * ($base-font-size - 8)));
+  }
+  @media #{$small-up} {
     #{$property}-left: rem-calc(($multiplier * ($base-font-size - 4)));
     #{$property}-right: rem-calc(($multiplier * ($base-font-size - 4)));
   }
