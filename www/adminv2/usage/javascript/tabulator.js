@@ -171,7 +171,7 @@
 			/* Previous Navigator
 			 */
 			if (config.index > 0) {
-				pagination += '<li><a href="#" rel="' + (config.index-1) +'">&lsaqo;</a></li>';
+				pagination += '<li><a href="#" rel="' + (config.index-1) +'">&lsaquo;</a></li>';
 			}
 
 			/* Page Navigator
