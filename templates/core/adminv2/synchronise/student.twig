@@ -101,58 +101,85 @@
     </div>
 </div>
 
-
 <div class="row">
     <div class="large-12 columns">
-        <h3>Role Mapping</h3>
+        <h2 class="subheader">Role Mapping</h2>
     </div>
-    <div class="large-3 columns">
-        {% include 'adminv2/synchronise/sub/campus/external.twig' %}
+    <div class="large-3 island">
+        <section>
+            <div class="content">
+                {% include 'adminv2/synchronise/sub/campus/external.twig' %}
+            </div>
+        </section>
     </div>
     <div class="large-1 columns text-center">
         +
     </div>
-    <div class="large-3 columns">
-        {% include 'adminv2/synchronise/sub/year/external.twig' %}
+    <div class="large-3 island">
+        <section>
+            <div class="content">
+                {% include 'adminv2/synchronise/sub/year/external.twig' %}
+            </div>
+        </section>
     </div>
     <div class="large-1 columns text-center">
         =
     </div>
-    <div class="large-4 columns">
-        {% include 'adminv2/synchronise/sub/role/schoolbox.twig' %}
+    <div class="large-4 island">
+        <section>
+            <div class="content">
+                {% include 'adminv2/synchronise/sub/role/schoolbox.twig' %}
+            </div>
+        </section>
     </div>
 </div>
 
 <div class="row">
     <div class="large-12 columns">
-        <h3>House Mapping</h3>
+        <h2 class="subheader">House Mapping</h2>
     </div>
-    <div class="large-5 columns">
-        {% include 'adminv2/synchronise/sub/house/external.twig' %}
+    <div class="large-5 island">
+        <section>
+            <div class="content">
+                {% include 'adminv2/synchronise/sub/house/external.twig' %}
+            </div>
+        </section>
     </div>
     <div class="large-2 columns text-center">
-        +
+        =
     </div>
-    <div class="large-5 columns">
-        {% include 'adminv2/synchronise/sub/house/schoolbox.twig' %}
+    <div class="large-5 island">
+        <section>
+            <div class="content">
+                {% include 'adminv2/synchronise/sub/house/schoolbox.twig' %}
+            </div>
+        </section>
     </div>
 </div>
 
 <div class="row">
     <div class="large-12 columns">
-        <h3>Default User Options</h3>
+        <h2 class="subheader">Default User Options</h2>
     </div>
-    <div class="large-3 columns">
-        {% include 'adminv2/synchronise/sub/eportfolio.twig' %}
-    </div>
-    <div class="large-3 columns">
-        {% include 'adminv2/synchronise/sub/webmail.twig' %}
-    </div>
-    <div class="large-3 columns">
-        {% include 'adminv2/synchronise/sub/localEmail.twig' %}
-    </div>
-    <div class="large-3 columns">
-        {% include 'adminv2/synchronise/sub/externalMail.twig' %}
+    <div class="large-12 island">
+        <section>
+            <div class="content">
+                <div class="row">
+                    <div class="large-3 columns">
+                        {% include 'adminv2/synchronise/sub/eportfolio.twig' %}
+                    </div>
+                    <div class="large-3 columns">
+                        {% include 'adminv2/synchronise/sub/webmail.twig' %}
+                    </div>
+                    <div class="large-3 columns">
+                        {% include 'adminv2/synchronise/sub/localEmail.twig' %}
+                    </div>
+                    <div class="large-3 columns">
+                        {% include 'adminv2/synchronise/sub/externalMail.twig' %}
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 </div>
 {% endblock %}
