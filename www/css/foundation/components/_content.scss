@@ -516,12 +516,7 @@ table{
 .island {
   	@include grid-column();
 
-	@media #{$small-up} {
-		padding: 0 rem-calc(($base-font-size - 4));
-	}
-	@media #{$large-up} {
-		padding: 0 rem-calc(($base-font-size));
-	}
+	@include responsive-sides(1, padding);
 	
 	// Only sections inside islands have these styles
   	section{
@@ -813,6 +808,31 @@ table{
 	}
 	p{
 		margin: 0;
+	}
+}
+
+// Social Stream
+ul{
+	@extend .information-list;
+	.body{
+		margin: rem-calc(($base-font-size - 8)) 0 rem-calc(($base-font-size - 8)) 74px;
+	}
+	.reply{
+		border-top: 1px solid $body-bg;
+		clear: both;
+		margin-left: 4.7rem;
+		li{
+			clear: both;
+		}
+	}
+
+	@media #{$small-up} {
+		.body{
+			margin: rem-calc(($base-font-size - 8)) 0;
+		}
+		.reply{
+			margin-left: 1rem;
+		}
 	}
 }
 
