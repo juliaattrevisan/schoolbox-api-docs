@@ -43,7 +43,7 @@
             var self = $(this);
             var thisRow = self.closest('[data-role="newRubricResult"]');
             var newRow = thisRow.clone();
-            var code = newRow.find('code');
+            var code = newRow.find('[data-role="value"]');
             newRow.find('input').val('');
             code.html(parseInt(code.html()) + 1);
             code.html('&nbsp;');
@@ -146,7 +146,7 @@
                         Existing set
                         <!-- BEGIN list_item -->
                         <div data-role="existingRubricResult">
-                            <code>{RR_VALUE}</code> &rsaquo;
+                            <code data-role="value">{RR_VALUE}</code>
                             <input type="text" value="{RR_SANE_LABEL}" />
                             <!--
                             <a class="hidden" data-label="{RR_SANE_LABEL}" href="#">revert to '{RR_LABEL}'</a>
@@ -154,7 +154,7 @@
                         </div>
                         <!-- END list_item -->
                         <div data-role="newRubricResult">
-                            <code class="prompt">&nbsp;</code> &rsaquo;
+                            <code data-role="value">&nbsp;</code>
                             <input class="nullable" type="text" value="" />
                         </div>
                     </div>
@@ -164,7 +164,7 @@
                     <div class="content" data-role="rubricSet">
                         New set
                         <div data-role="newRubricResult">
-                            <code class="prompt">&nbsp;</code> &rsaquo;
+                            <code data-role="value">&nbsp;</code>
                             <input class="nullable" type="text" value="" />
                         </div>
                     </div>
