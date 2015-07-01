@@ -88,22 +88,22 @@
                        value="{{! it.name }}"
                        placeholder="Grouping Name"
                 />
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Lower Bound</th>
-                            <th>Normalised Grade</th>
-                            <th>Caption</th>
-                        </tr>
-                    </thead>
-                    <tbody data-role="gradeList">
-                        <!-- include templates for all grades, and add another for blanks -->
-                        {{~ it.gradeLevels :level }}
-                            {{= it.gradeTemplate(level) }}
-                        {{~}}
-                    </tbody>
-                </table>
             </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Lower Bound</th>
+                        <th>Normalised Grade</th>
+                        <th>Caption</th>
+                    </tr>
+                </thead>
+                <tbody data-role="gradeList">
+                    <!-- include templates for all grades, and add another for blanks -->
+                    {{~ it.gradeLevels :level }}
+                        {{= it.gradeTemplate(level) }}
+                    {{~}}
+                </tbody>
+            </table>
         </section>
     </div>
 </script>
@@ -142,11 +142,11 @@
 
 {ADMIN_NAV}
 
-<div class="row">
+<div class="row" data-equalizer>
     <div class="small-12 medium-6 island">
+        <h2 class="subheader">Guide</h2>
         <section>
-            <div class="content">
-                <h2 class="subheader">Guide</h2>
+            <div class="content" data-equalizer-watch>
                 <dl>
                     <dt>Creating Grades</dt>
                     <dd>
@@ -163,9 +163,9 @@
         </section>
     </div>
     <div class="small-12 medium-6 island">
+        <h2 class="subheader">Glossary</h2>
         <section>
-            <div class="content">
-                <h2 class="subheader">Glossary</h2>
+            <div class="content" data-equalizer-watch>
                 <dl>
                     <dt>Lower Bound</dt>
                     <dd>
@@ -203,43 +203,43 @@
                                    value="{SUBMISSION_GRADE_GROUP_NAME}"
                                    placeholder="Grouping Name"
                             />
-                            <table>
-                                <thead>
-                                <tr>
-                                    <th>Lower Bound</th>
-                                    <th>Normalised Grade</th>
-                                    <th>Caption</th>
-                                </tr>
-                                </thead>
-                                <tbody data-role="gradeList">
-                                <!-- BEGIN submission_grade -->
-                                <tr data-gradeid="{SUBMISSION_GRADE_ID}">
-                                    <td>
-                                        <input type="text"
-                                               name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][lower_bound]"
-                                               value="{SUBMISSION_GRADE_LOWER_BOUND}"
-                                               placeholder="Lower Bound"
-                                                />
-                                    </td>
-                                    <td>
-                                        <input type="text"
-                                               name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][raw_grade]"
-                                               value="{SUBMISSION_GRADE_RAW_GRADE}"
-                                               placeholder="Normalised Grade"
-                                                />
-                                    </td>
-                                    <td>
-                                        <input type="text"
-                                               name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][caption]"
-                                               value="{SUBMISSION_GRADE_CAPTION}"
-                                               placeholder="Caption"
-                                                />
-                                    </td>
-                                </tr>
-                                <!-- END submission_grade -->
-                                </tbody>
-                            </table>
                         </div>
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Lower Bound</th>
+                                <th>Normalised Grade</th>
+                                <th>Caption</th>
+                            </tr>
+                            </thead>
+                            <tbody data-role="gradeList">
+                            <!-- BEGIN submission_grade -->
+                            <tr data-gradeid="{SUBMISSION_GRADE_ID}">
+                                <td>
+                                    <input type="text"
+                                           name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][lower_bound]"
+                                           value="{SUBMISSION_GRADE_LOWER_BOUND}"
+                                           placeholder="Lower Bound"
+                                            />
+                                </td>
+                                <td>
+                                    <input type="text"
+                                           name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][raw_grade]"
+                                           value="{SUBMISSION_GRADE_RAW_GRADE}"
+                                           placeholder="Normalised Grade"
+                                            />
+                                </td>
+                                <td>
+                                    <input type="text"
+                                           name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][caption]"
+                                           value="{SUBMISSION_GRADE_CAPTION}"
+                                           placeholder="Caption"
+                                            />
+                                </td>
+                            </tr>
+                            <!-- END submission_grade -->
+                            </tbody>
+                        </table>
                     </section>
                 </div>
                 <!-- END submission_grade_group -->
