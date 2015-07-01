@@ -340,33 +340,34 @@
     </div>
     <!-- END can_add_resources -->
 
-
-
-
-
-
-
-
-
-
     <!-- BEGIN has_activity_log -->
     <div class="row">
-        <div class="large-12 columns">
-            <h2>Activity Log</h2>
+        <div class="small-12 island">
+            <h2 class="subheader">Activity Log</h2>
 
-            <table>
-                <tbody>
-                    <!-- BEGIN activity_log -->
-                    <tr>
-                        <td>{ACTIVITY_LOG_CREATED_AT}</td>
-                        <td>{ACTIVITY_LOG_MESSAGE}</td>
-                    </tr>
-                    <!-- END activity_log -->
-                </tbody>
-            </table>
+            <section>
+                <div class="content">
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <table>
+                                <tbody>
+                                <!-- BEGIN activity_log -->
+                                <tr>
+                                    <td>{ACTIVITY_LOG_CREATED_AT}</td>
+                                    <td>{ACTIVITY_LOG_MESSAGE}</td>
+                                </tr>
+                                <!-- END activity_log -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
     <!-- END has_activity_log -->
+
+
 
     <!-- BEGIN can_promote_in_principle -->
     <div class="row">
