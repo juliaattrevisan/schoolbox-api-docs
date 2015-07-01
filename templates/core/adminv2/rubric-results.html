@@ -51,76 +51,71 @@
             newRow.find(':input:visible:first').focus();
         });
 
-//        form.on('submit', function(e) {
-//            form.find('input').each(function() {
-//                if (this.value.length === 0) {
-//                    // New? disable
-//                    // Old: error out
-//                }
-//            });
-//        });
-
 //        form.on('click', '#add-set', function(e) {
 //            e.preventDefault();
 //        });
-//        form.on('click', '#save-changes', function(e) {
-//            var valid = true;
-//            var method = form.attr('method');
-//            var action = form.attr('action');
-//
-//            var frmdata = {};
-//            var ii = 0;
-//            var j = 0;
-//            form.find('input').each(function() {
-//                var self = $(this);
-//
-//                if(!self.hasClass('nullable')) {
-//                    if(self.val() == '') {
-//                        valid = false;
-//                        return valid;
-//                    }
-//                }
-//
-//                var i = self.parents('ul').first().parent('li').index();
-//                if(i != ii) {
-//                    j = 0;
-//                }
-//                ii = i;
-//
-//                // if blank, just leave it
-//                if(self.val() != '') {
-//                    if(frmdata[i] === undefined) {
-//                        frmdata[i] = {};
-//                    }
-//                    frmdata[i][j] = self.val();
-//                    ++j;
-//                }
-//            });
-//
-//            if(valid) {
-//                // console.log(frmdata);
-//                $.ajax({
-//                    async: false,
-//                    url: action,
-//                    type: method,
-//                    data: {
-//                        'action': 'set',
-//                        'items': frmdata
-//                    },
-//                    success: function(data) {
-//                        // console.log('success '+data);
-//                    },
-//                    failure: function(data) {
-//                        // console.log('le fail '+data);
-//                        e.preventDefault();
-//                    }
-//                });
-//            }
-//            else {
-//                e.preventDefault();
-//                $('#err-expl').css('display', 'block');
-//            }
-//        });
+
+        form.on('click', ':submit', function(e) {
+            e.preventDefault();
+            var valid = true;
+            var method = form.attr('method');
+            var action = form.attr('action');
+
+            // Go through each set and result, add them to the form data.
+            var currentSet = 0;
+            var formData = {};
+            form.find('[data-role="rubricSet"]').each(function() {
+                var rubricSet = $(this);
+                var isSetUsed = false;
+                var currentResult = 0;
+                rubricSet.find('[data-role="existingRubricResult"], [data-role="newRubricResult"]').each(function() {
+                    var rubricResult = $(this);
+                    var isNew        = rubricResult.data('role') === 'newRubricResult';
+                    var value        = rubricResult.find('input').val();
+                    if (value.length === 0) {
+                        // New? disable
+                        // Old: error out
+                        if (!isNew) {
+                            valid = false;
+                        }
+                    } else {
+                        isSetUsed = true;
+                        if (!(currentSet in formData)) {
+                            formData[currentSet] = {};
+                        }
+                        formData[currentSet][currentResult] = value;
+                        currentResult++;
+                    }
+                });
+                if (isSetUsed) {
+                    currentSet++;
+                }
+            });
+
+            if(valid) {
+                $.ajax({
+                    async: false,
+                    url: action,
+                    type: method,
+                    data: {
+                        'action': 'set',
+                        'items': formData
+                    },
+                    success: function(data) {
+                        // console.log('success '+data);
+                    },
+                    failure: function(data) {
+                        // console.log('le fail '+data);
+                        e.preventDefault();
+                    }
+                });
+            }
+            else {
+                e.preventDefault();
+                // Show some dialog
+                $('#err-expl').css('display', 'block');
+            }
+        });
     });
 </script>
 <!-- END custom_head -->
@@ -186,7 +181,8 @@
                 </section>
             </div>
             <input type="submit" value="Save Changes" />
-            <span id="err-expl">Ensure all pre-existing results are not blank.</span>
         </form>
     </div>
 </div>
+
+<div id="err-expl">Ensure all pre-existing results are not blank.</div>
