@@ -1,9 +1,7 @@
 {ADMIN_NAV}
 
 <div class="row">
-    <div class="large-12 columns">
-        <h2>Reports</h2>
-
+    <div class="small-12 columns">
         <!-- BEGIN filter -->
         <div class="panel">
             <h3>Filter</h3>
@@ -26,54 +24,57 @@
             </form>
         </div>
         <!-- END filter -->
-        <!-- BEGIN result_table -->
-        <div>
-            <!-- BEGIN download_report -->
-            <span class="header-actions">
-                <a href="/adminv2/reports/{REPORT_FILTER}exportToCSV" class="button icon-download">Download Report</a>
-            </span>
-            <!-- END download_report -->
-
-            <h3>{REPORT_TITLE}<!-- BEGIN count -->: {COUNTABLE_COUNT} {COUNTABLE}<!-- END count --></h3>
-
-            <!-- BEGIN result -->
-            {RESULT}
-            <!-- END result -->
-
-            <ul class="pagination">
-                <!-- BEGIN previous_button -->
-                <li class="arrow">
-                    <a href="/adminv2/reports/{PREVIOUS_PAGE}">&lsaquo;</a>
-                </li>
-                <!-- END previous_button -->
-
-                <!-- BEGIN first_page -->
-                <li>
-                    <a href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a>
-                </li>
-                <li class="unavailable"><a>&hellip;</a></li>
-                <!-- END first_page -->
-
-                <!-- BEGIN page_number -->
-                <li class="{CURRENT}">
-                    <a href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a>
-                </li>
-                <!-- END page_number -->
-
-                <!-- BEGIN last_page -->
-                <li class="unavailable"><a>&hellip;</a></li>
-                <li>
-                    <a href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a>
-                </li>
-                <!-- END last_page -->
-
-                <!-- BEGIN next_button -->
-                <li class="arrow">
-                    <a href="/adminv2/reports/{NEXT_PAGE}">&rsaquo;</a>
-                </li>
-                <!-- END next_button -->
-            </ul>
-        </div>
-        <!-- END result_table -->
     </div>
 </div>
+
+<!-- BEGIN result_table -->
+<div class="row">
+    <div class="small-12 columns">
+        <!-- BEGIN download_report -->
+        <span class="header-actions">
+            <a href="/adminv2/reports/{REPORT_FILTER}exportToCSV" class="button icon-download">Download Report</a>
+        </span>
+        <!-- END download_report -->
+
+        <h2 class="subheader">{REPORT_TITLE}<!-- BEGIN count -->: {COUNTABLE_COUNT} {COUNTABLE}<!-- END count --></h2>
+
+        <!-- BEGIN result -->
+        {RESULT}
+        <!-- END result -->
+
+        <ul class="pagination">
+            <!-- BEGIN previous_button -->
+            <li class="arrow">
+                <a href="/adminv2/reports/{PREVIOUS_PAGE}">&lsaquo;</a>
+            </li>
+            <!-- END previous_button -->
+
+            <!-- BEGIN first_page -->
+            <li>
+                <a href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a>
+            </li>
+            <li class="unavailable"><a>&hellip;</a></li>
+            <!-- END first_page -->
+
+            <!-- BEGIN page_number -->
+            <li class="{CURRENT}">
+                <a href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a>
+            </li>
+            <!-- END page_number -->
+
+            <!-- BEGIN last_page -->
+            <li class="unavailable"><a>&hellip;</a></li>
+            <li>
+                <a href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a>
+            </li>
+            <!-- END last_page -->
+
+            <!-- BEGIN next_button -->
+            <li class="arrow">
+                <a href="/adminv2/reports/{NEXT_PAGE}">&rsaquo;</a>
+            </li>
+            <!-- END next_button -->
+        </ul>
+    </div>
+</div>
+<!-- END result_table -->
