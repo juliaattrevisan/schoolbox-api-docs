@@ -367,36 +367,42 @@
     </div>
     <!-- END has_activity_log -->
 
-
-
     <!-- BEGIN can_promote_in_principle -->
     <div class="row">
-        <div class="large-12 columns">
-            <h2>Complete Details</h2>
+        <div class="small-12 island">
+            <h2 class="subheader">Complete Details</h2>
 
-            <label>
-                Event Details
-                <input type="hidden" name="promoteInPrinciple" value="0" />
-                <input id='promoteInPrinciple' type="checkbox" name="promoteInPrinciple" value="1" />
-                <label for="promoteInPrinciple" class="checkbox-label">All the required information for this event has been provided</label>
-            </label>
+            <section>
+                <div class="content">
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <label>
+                                Event Details
+                                <input type="hidden" name="promoteInPrinciple" value="0" />
+                                <input id='promoteInPrinciple' type="checkbox" name="promoteInPrinciple" value="1" />
+                                <label for="promoteInPrinciple" class="checkbox-label">All the required information for this event has been provided</label>
+                            </label>
 
-            <label>
-                Comment
-                <span class='hint has-tip tip-top' data-tooltip title="Add a comment.">?</span>
-                <textarea class='selfPromotionalComment' name="comment" style="width:100%;height:80px;"></textarea>
-            </label>
+                            <label>
+                                Comment
+                                <span class='hint has-tip tip-top' data-tooltip title="Add a comment.">?</span>
+                                <textarea class='selfPromotionalComment' name="comment" style="width:100%;height:80px;"></textarea>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
     <!-- END can_promote_in_principle -->
 
-    <div class="large-12 columns">
-        <input id="b{FUNCTION}" type="submit" name="{FUNCTION}" value="{EOTC_FUNCTION}" />
-        <a href="/modules/eotc/myReview" class="button icon-previous">Back to My EOTC Events</a>
+    <div class="row">
+        <div class="small-12 column">
+            <input id="b{FUNCTION}" type="submit" name="{FUNCTION}" value="{EOTC_FUNCTION}" />
+            <a href="/modules/eotc/myReview" class="button icon-previous">Back to My EOTC Events</a>
+        </div>
     </div>
 </form>
-
-
 
 <div class='hide' data-dialog="bulk" title="This event is part of a series">
     <p>
