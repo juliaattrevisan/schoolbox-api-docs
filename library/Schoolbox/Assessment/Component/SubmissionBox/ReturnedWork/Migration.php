@@ -36,7 +36,7 @@ class Migration implements MigrationPattern
         $this->db       = Database::getInstance();
         $this->conf     = new Loader();
         $this->stmtHash = $this->db->prepare("UPDATE submission_return SET hash = :hash, filename = :name WHERE id = :id");
-        $this->stmtFlag = $this->db->prepare("UPDATE submission_return SET deleted = TRUE WHERE id = :id");
+        $this->stmtFlag = $this->db->prepare("UPDATE submission_return SET deleted = TRUE WHERE id = ?");
     }
 
     /**
