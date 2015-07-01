@@ -138,73 +138,40 @@
         </section>
     </div>
     <div class="small-12 island">
-        <section>
-            <div class="content">
-                <form data-action="saveRubricResults" method="POST" action="/adminv2/rubricForm.php">
-                    <div data-role="rubricList">
-                        <!-- BEGIN list -->
-                        <div data-role="rubricSet">
-                            Existing set
-                            <!-- BEGIN list_item -->
-                            <div data-role="existingRubricResult">
-                                <code>{RR_VALUE}</code> &rsaquo;
-                                <input type="text" value="{RR_SANE_LABEL}" />
-                                <!--
-                                <a class="hidden" data-label="{RR_SANE_LABEL}" href="#">revert to '{RR_LABEL}'</a>
-                                -->
-                            </div>
-                            <!-- END list_item -->
-                            <div data-role="newRubricResult">
-                                <code class="prompt">&nbsp;</code> &rsaquo;
-                                <input class="nullable" type="text" value="" />
-                            </div>
+        <form data-action="saveRubricResults" method="POST" action="/adminv2/rubricForm.php">
+            <div data-role="rubricList">
+                <!-- BEGIN list -->
+                <section>
+                    <div class="content" data-role="rubricSet">
+                        Existing set
+                        <!-- BEGIN list_item -->
+                        <div data-role="existingRubricResult">
+                            <code>{RR_VALUE}</code> &rsaquo;
+                            <input type="text" value="{RR_SANE_LABEL}" />
+                            <!--
+                            <a class="hidden" data-label="{RR_SANE_LABEL}" href="#">revert to '{RR_LABEL}'</a>
+                            -->
                         </div>
-                        <!-- END list -->
-                        <div data-role="rubricSet">
-                            New set
-                            <div data-role="newRubricResult">
-                                <code class="prompt">&nbsp;</code> &rsaquo;
-                                <input class="nullable" type="text" value="" />
-                            </div>
+                        <!-- END list_item -->
+                        <div data-role="newRubricResult">
+                            <code class="prompt">&nbsp;</code> &rsaquo;
+                            <input class="nullable" type="text" value="" />
                         </div>
                     </div>
-
-                    <!--
-                    <ul data-role="rubricList">
-                        &lt;!&ndash; BEGIN list &ndash;&gt;
-                        <li>
-                            <ul>
-                                &lt;!&ndash; BEGIN list_item &ndash;&gt;
-                                <li>
-                                    <code>{RR_VALUE}</code> &rsaquo;
-                                    <input type="text" value="{RR_SANE_LABEL}" />
-                                    &lt;!&ndash;
-                                    <a class="hidden" data-label="{RR_SANE_LABEL}" href="#">revert to '{RR_LABEL}'</a>
-                                    &ndash;&gt;
-                                </li>
-                                &lt;!&ndash; END list_item &ndash;&gt;
-                                <li class="new-item" data-role="newRubricResult">
-                                    <code class="prompt">&nbsp;</code> &rsaquo;
-                                    <input class="nullable" type="text" value="" />
-                                </li>
-                            </ul>
-                        </li>
-                        &lt;!&ndash; END list &ndash;&gt;
-                        <li data-role="newRubricSet">
-                            <p>New set...</p>
-                            <ul>
-                                <li class="new-item" data-role="newRubricResult">
-                                    <code class="prompt">&nbsp;</code> &rsaquo;
-                                    <input class="nullable" type="text" value="" />
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                    -->
-                    <input type="submit" value="Save Changes" />
-                    <span id="err-expl">Ensure all pre-existing results are not blank.</span>
-                </form>
+                </section>
+                <!-- END list -->
+                <section>
+                    <div class="content" data-role="rubricSet">
+                        New set
+                        <div data-role="newRubricResult">
+                            <code class="prompt">&nbsp;</code> &rsaquo;
+                            <input class="nullable" type="text" value="" />
+                        </div>
+                    </div>
+                </section>
             </div>
-        </section>
+            <input type="submit" value="Save Changes" />
+            <span id="err-expl">Ensure all pre-existing results are not blank.</span>
+        </form>
     </div>
 </div>
