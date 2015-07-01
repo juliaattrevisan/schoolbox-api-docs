@@ -1,100 +1,7 @@
-<!-- BEGIN custom_head -->
-<style>
-    #container.foundation form .row .row {
-        margin: 0 -1rem;
-    }
-</style>
-<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
-<script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
-<script type="text/javascript" src="/javascript/jquery.selectAll.js"></script>
-<script type="text/javascript">
-$(function() {
-	$('table').selectAll({
-		key: 'selectall',
-		checkboxName: 'cleanupEventId[]'
-	});
-
-	/* Special modifiers
-	 * Automatically activate these two checkboxes whenever
-	 * selectAll is triggered
-	 */
-	$('input[data-selectall="true"]').change(function(event) {
-		var selectors = $('[data-modifier-control]');
-
-		if ($(this).is(':checked')) {
-			selectors.prop('checked', true);
-		}
-		else {
-			selectors.prop('checked', false);
-		}
-	});
-
-	/* Customise selection modifiers
-	 */
-	$('[data-modifier-control]').change(function(event) {
-		var selectors = $('input[data-modifier="' + $(this).val() + '"]');
-
-		if ($(this).is(':checked')) {
-			selectors.prop('checked', true);
-		}
-		else {
-			selectors.prop('checked', false);
-		}
-	});
-
-    $('#name')
-        .selectizeSelector({
-            ajax: {
-                url:      '/ajax/user.php',
-                type:     'GET',
-                data:     {groupID: 0},
-                dataType: 'json'
-            }
-        })
-        .on('selectize.item_add', function(event, value) {
-            $('#userid').val(value)
-        })
-        .on('selectize.item_remove', function() {
-            $('#userid').val('')
-        })
-
-    $('h3 span').each(function() {
-        var activeContent = $(this).siblings('em').html();
-        $(this).qtip({
-            content: activeContent,
-            style: {
-                classes: 'qtip-green qtip-shadow'
-            },
-            position: {
-                my: 'bottom left',
-                at: 'top left'
-            }
-        });
-    });
-
-	/* date picker */
-	$('[data-date=start_date], [data-date=finish_date]').datepicker({
-		constrainInput: false,
-		onClose: function (string) {
-			var input = $(this);
-			$.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
-				input.val(data.time);
-			})
-		}
-	});
-
-	$('[data-date=start_date]').syncDates({
-        endDate: $('[data-date=finish_date]')
-    });
-});
-</script>
-<!-- END custom_head-->
-
 {ADMIN_NAV}
 
 <div class="row">
-    <div class="large-12 columns">
+    <div class="small-12 columns">
         <dl class="sub-nav">
             <!-- BEGIN setting_tab -->
             <dd class="{SETTING_TAB_CURRENT}">
@@ -103,7 +10,7 @@ $(function() {
             <!-- END setting_tab -->
         </dl>
         <!-- BEGIN import -->
-        <div class="settings">
+        <div>
             <form action="/adminv2/bulkAddCalendar" method="post" enctype="multipart/form-data" name="form" id="importForm">
                 <h2 class="subheader">
                     Source
@@ -341,7 +248,91 @@ $(function() {
     </div>
 </div>
 
-<!-- BEGIN custom_javascript -->
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+<script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectAll.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('table').selectAll({
+            key: 'selectall',
+            checkboxName: 'cleanupEventId[]'
+        });
+
+        /* Special modifiers
+         * Automatically activate these two checkboxes whenever
+         * selectAll is triggered
+         */
+        $('input[data-selectall="true"]').change(function(event) {
+            var selectors = $('[data-modifier-control]');
+
+            if ($(this).is(':checked')) {
+                selectors.prop('checked', true);
+            }
+            else {
+                selectors.prop('checked', false);
+            }
+        });
+
+        /* Customise selection modifiers
+         */
+        $('[data-modifier-control]').change(function(event) {
+            var selectors = $('input[data-modifier="' + $(this).val() + '"]');
+
+            if ($(this).is(':checked')) {
+                selectors.prop('checked', true);
+            }
+            else {
+                selectors.prop('checked', false);
+            }
+        });
+
+        $('#name')
+                .selectizeSelector({
+                    ajax: {
+                        url:      '/ajax/user.php',
+                        type:     'GET',
+                        data:     {groupID: 0},
+                        dataType: 'json'
+                    }
+                })
+                .on('selectize.item_add', function(event, value) {
+                    $('#userid').val(value)
+                })
+                .on('selectize.item_remove', function() {
+                    $('#userid').val('')
+                })
+
+        $('h3 span').each(function() {
+            var activeContent = $(this).siblings('em').html();
+            $(this).qtip({
+                content: activeContent,
+                style: {
+                    classes: 'qtip-green qtip-shadow'
+                },
+                position: {
+                    my: 'bottom left',
+                    at: 'top left'
+                }
+            });
+        });
+
+        /* date picker */
+        $('[data-date=start_date], [data-date=finish_date]').datepicker({
+            constrainInput: false,
+            onClose: function (string) {
+                var input = $(this);
+                $.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                    input.val(data.time);
+                })
+            }
+        });
+
+        $('[data-date=start_date]').syncDates({
+            endDate: $('[data-date=finish_date]')
+        });
+    });
+</script>
 <script type='text/javascript' src='/javascript/admin/calendar.js'></script>
 <script type='text/javascript'>
 	$(function() {
@@ -351,4 +342,3 @@ $(function() {
         });
 	});
 </script>
-<!-- END custom_javascript -->
