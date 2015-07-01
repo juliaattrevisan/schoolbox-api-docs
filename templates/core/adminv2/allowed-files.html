@@ -212,9 +212,9 @@
         <section>
             <ul class="allowed-files action-list">
                 <!-- BEGIN file -->
-                <li class="row-holder" data-equalizer data-interaction-container>
+                <li class="row" data-equalizer data-interaction-container>
                     <form data-action="updateFileType" style="margin:0" id="allowed-file{FILE_ID}" method="post" action="/adminv2/allowed-fileForm.php">
-                        <div class="row" data-interaction-display>
+                        <div data-interaction-display>
                             <div class="column one-column">
                                 <img src="/images/mime/60x60/{FILE_ICON}"/>
                             </div>
@@ -262,6 +262,7 @@
                             </ul>
                         </div>
                         <div style="display:none;" data-interaction-inline-form>
+                            <div class="content">
                         <!--/adminv2/allowed-fileForm.php-->
                             <input type="hidden" readonly="readonly" name="fileTypeId" value="{FILE_ID}"/>
                             <input id="enabled-{FILE_ID}" type="hidden" name="enable" value="{FILE_ENABLED}" />
@@ -317,6 +318,7 @@
                                     <button data-interaction-cancel >Cancel</button>
                                 </div>
                             </div>
+                        </div>
                         </div>
                     </form>
                 </li>
