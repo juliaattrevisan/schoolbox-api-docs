@@ -2,8 +2,6 @@
 
 <div class="row">
     <div class="large-12 columns">
-        <h2>Lists</h2>
-
         <dl class="sub-nav">
             <!-- BEGIN table_tab -->
             <dd class="{TABLE_CURRENT}"><a href="/adminv2/list/{TABLE_NAME}">{TABLE_TITLE}</a></dd>
@@ -38,14 +36,12 @@
                             <!-- END table_cell_static -->
                             <!-- BEGIN table_cell -->
                             <td>
-                                <div class="large-9 columns">
-                                    <input class="required {NULLABLE_CLASS}" name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="text" value="{TABLE_DATA}" />
-                                </div>
+                                <input class="required {NULLABLE_CLASS}" name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="text" value="{TABLE_DATA}" />
                                 <!-- BEGIN table_cell_null -->
-                                <div class="large-3 columns">
-                                    <input id="{TABLE_COLUMN}-{ROW_NUMBER}-null" type="checkbox" name="{TABLE_COLUMN}[{ROW_NUMBER}]" value="NULL" {TABLE_DATA_NULL_CHECKED} />
-                                    <label for="{TABLE_COLUMN}-{ROW_NUMBER}-null" class="checkbox-label">Null?</label>
-                                </div>
+                            </td>
+                            <td>
+                                <input id="{TABLE_COLUMN}-{ROW_NUMBER}-null" type="checkbox" name="{TABLE_COLUMN}[{ROW_NUMBER}]" value="NULL" {TABLE_DATA_NULL_CHECKED} />
+                                <label for="{TABLE_COLUMN}-{ROW_NUMBER}-null" class="checkbox-label">Null?</label>
                                 <!-- END table_cell_null -->
                             <!-- END table_cell -->
                             </td>

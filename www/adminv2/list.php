@@ -234,12 +234,23 @@ if ($table) {
             if (!$rowOne) {
                 // New row
                 $this->setVar('ROW_NUMBER', -1);
+
+                /* Shove "Default for new submissions?" over by one
+                 * due to presence of column containing "Null?"
+                 */
+                if ($keys == 'is_default_for_new_submissions') {
+                    $this->setVar(array(
+                            'TABLE_HEAD' => ''
+                        ));
+
+                    $this->parse('table_heading_block', 'table_heading', true);
+                }
+
                 if ((isset($currentColumn['caption']))) {
                     $this->setVar('TABLE_HEAD', $currentColumn['caption']);
                 } else {
                     $this->setVar('TABLE_HEAD', ucwords(str_replace('_', ' ', $keys)));
                 }
-
 
                 $this->parse('table_heading_block', 'table_heading', true);
 
