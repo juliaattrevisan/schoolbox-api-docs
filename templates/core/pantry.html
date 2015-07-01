@@ -314,7 +314,7 @@
     <hr>
 
     <div class="row">
-        <div class="small-12 island">
+        <div class="small-12 columns">
             <h1>Actions List - action-list</h1>
             <nav class="top-bar" data-topbar>
                 <ul class="title-area">
@@ -327,28 +327,81 @@
                     <!-- Right Nav Section -->
                     <ul class="right">
                         <li class="divider"></li>
-                        <li><a href="#" data-reveal-id="courseModal" class="button icon-settings" title="File Settings">Settings</a></li>
+                        <li><a href="#" class="component-control-button settings edit button icon-settings" title="File Settings">Settings</a></li>
                         <li class="divider"></li>
-                        <li><a href="#" class="button no-text icon-close" data-target="delete-it" title="Close"></a></li>
+                        <li><a href="#" class="component-control-button button no-text icon-close delete close-delete" data-target="delete-it" title="Close"></a></li>
                         <!-- Settings Modal -->
                     </ul>
-                    <div id="courseModal" class="reveal-modal" data-reveal>
-                        <h2>Course Outline Settings</h2>
-                        <form action="/homepage/configForm.php" method="GET">
-                            <label>
-                                Heading
-                                <input id="componentname" type="text" name="componentname" value="Files">
-                            </label>
-                            
-                            <label for="submit">
-                                <input id="submit" type="submit" value="Update" class="button success">
-                            </label>
-                            
-                        </form>
-                        <a class="close-reveal-modal">&#215;</a>
-                    </div>
                 </section>
             </nav>
+            <div class="editPanel settings hide">
+                <form>
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <label>Heading
+                                <input id="componentname" type="text" name="componentname" />
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <label>Filter</label>
+                            <input id="doucment" type="checkbox"><label for="doucment" class="checkbox-label">Doucment</label>
+                            <input id="audio" type="checkbox"><label for="audio" class="checkbox-label">Audio</label>
+                            <input id="video" type="checkbox"><label for="video" class="checkbox-label">Video</label>
+                            <input id="image" type="checkbox"><label for="image" class="checkbox-label">Image</label>
+                            <input id="other" type="checkbox"><label for="other" class="checkbox-label">Other</label>
+                        </div>
+                    </div> 
+                    <div class="row">
+                        <div class="small-6 columns">
+                            <label for="size">
+                                Limit
+                                <select id="size" name="size">
+                                    <option value="0">All</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="small-6 columns">
+                            <label for="sort-by">
+                                Sort by
+                                <select id="sort-by" name="sort-by">
+                                    <option value="0">Date</option>
+                                    <option value="1">Name</option>
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <label for="direction">
+                                Direction
+                                <select id="direction" name="direction">
+                                    <option value="0">Descending</option>
+                                    <option value="1">Ascending</option>
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <label>Source
+                                <a href="#" class="button icon-folder" title="Select Source">Select Source</a>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <label>
+                                <input type="submit" value="Update" />
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
     <div class="row">
@@ -417,26 +470,9 @@
                     <!-- Right Nav Section -->
                     <ul class="right">
                         <li class="divider"></li>
-                        <li><a href="#" data-reveal-id="courseModal" class="button icon-settings" title="File Settings">Settings</a></li>
-                        <li class="divider"></li>
                         <li><a href="#" class="button no-text icon-close" data-target="delete-it" title="Close"></a></li>
                         <!-- Settings Modal -->
                     </ul>
-                    <div id="courseModal" class="reveal-modal" data-reveal>
-                        <h2>Course Outline Settings</h2>
-                        <form action="/homepage/configForm.php" method="GET">
-                            <label>
-                                Heading
-                                <input id="componentname" type="text" name="componentname" value="Files">
-                            </label>
-                            
-                            <label for="submit">
-                                <input id="submit" type="submit" value="Update" class="button success">
-                            </label>
-                            
-                        </form>
-                        <a class="close-reveal-modal">&#215;</a>
-                    </div>
                 </section>
             </nav>
         </div>
@@ -544,33 +580,8 @@
                     <!-- Right Nav Section -->
                     <ul class="right">
                         <li class="divider"></li>
-                        <li><a href="#" data-reveal-id="memberModal" class="button icon-settings" title="File Settings">Settings</a></li>
-                        <li class="divider"></li>
                         <li><a href="#" class="button no-text icon-close" data-target="delete-it" title="Close"></a></li>
-                        <!-- Settings Modal -->
                     </ul>
-                    <div id="memberModal" class="reveal-modal" data-reveal>
-                        <h2>Members Settings</h2>
-                        <form action="/homepage/configForm.php" method="GET">
-                            <label>
-                                Heading
-                                <input id="componentname" type="text" name="componentname" value="Members">
-                            </label>
-                            
-                            <label for="size">
-                                Limit
-                                <select id="size" name="size">
-                                    <option value="list">List</option>
-                                    <option value="grid">Grid</option>
-                                </select>
-                            </label>
-
-                            <label for="submit">
-                                <input id="submit" type="submit" value="Update" class="button success">
-                            </label>
-                        </form>
-                        <a class="close-reveal-modal">&#215;</a>
-                    </div>
                 </section>
             </nav>
         </div>
@@ -1632,7 +1643,14 @@
         };
 
         $('[data-target="delete-it"]').on('click', function(){
-            $('.delete-it').addClass('show');
+            $('.delete-it').toggleClass('show');
+            event.preventDefault();
+        });
+
+        $('.settings').on('click', function(){
+            $('.editPanel').toggleClass('hide');
+            $(this).closest();
+            event.preventDefault();
         });
 
         $('a[data-interaction="toggle-expanded"]').on('click', function(){

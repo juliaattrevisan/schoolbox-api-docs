@@ -473,7 +473,10 @@ $tooltip-font-color: $white;
 	}
 }
 
-// Hide things
+// Hide/Show things
+.show{
+	display: block;
+}
 
 // Disabled elements
 :disabled{

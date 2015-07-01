@@ -159,6 +159,21 @@ label.radio-label			{ background-position: 0 -48px; }
 input[type=checkbox]:checked +
 label.checkbox-label		{ background-position: 0 -120px; }
 
+// Component Forms
+.editPanel{
+	background-color: $gainsboro;
+	display: block;
+	padding: rem-calc(($base-font-size));
+
+	input[type=radio] +
+	label.radio-label,
+	input[type=checkbox] +
+	label.checkbox-label{
+		display: inline-block;
+	}
+}
+
+
 //  Show/Hide Advanced form fields
 .form-advanced{
 	display: none;
