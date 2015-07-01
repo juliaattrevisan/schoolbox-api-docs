@@ -28,8 +28,6 @@ $treeBuilder = new Schoolbox\Resource\Folder\TreeBuilder(
 );
 $page->setVar('TREEDATA', json_encode($treeBuilder->buildPartialTree($_GET['categoryID'])));
 
-$category = $categoryMapper->findById($_GET['categoryID']);
-
 /* output files */
 if (in_array($_GET['filter'], array('image', 'video'))) {
     $filter = array('filter' => $_GET['filter']);
@@ -44,10 +42,17 @@ $fileList = $fileMapper->findForFolders([ $_GET['categoryID'] ], $filter);
 
 $page->setVar($output);
 
+// Is this in a homepage?
+try {
+    $category = $categoryMapper->findById($_GET['categoryID']);
+    $hasHomepage = $category->hasHomepage();
+} catch (\Schoolbox\Mapper\Exception $e) {
+    $hasHomepage = false;
+}
 if (is_array($fileList)) {
-// add homepage "file"
-    if ($category->getHomepage()->getTemplate()->getId() > 0 && !is_array($filter)) {
-        $homepage = array('id'          => $category->getId(),
+    // add homepage "file"
+    if ($hasHomepage && !is_array($filter)) {
+        $homepage = array('id'          => $_GET['categoryID'],
                           'description' => 'Homepage',
                           'size'        => 1,
                           'iconFile'    => 'vcard_fiquet.png',
