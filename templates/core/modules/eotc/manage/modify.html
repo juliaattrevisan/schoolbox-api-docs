@@ -261,50 +261,62 @@
         </div>
     </div>
 
-
-
-
-
-
-
-
-
-
-
-
     <div class="row">
-        <div class="large-12 columns">
-            <h2>People</h2>
+        <div class="small-12 island">
+            <h2 class="subheader">People</h2>
 
-            <label>
-                Teacher In Charge
-                <span class='hint has-tip tip-top' data-tooltip title="The teacher in charge of this event.">?</span>
-                <select data-suggest="teacher-in-charge" name="teacherInCharge" placeholder="Search Teachers"></select>
-            </label>
-        </div>
-        <div class="large-12 columns">
-            <label>
-                Staff Members
-                <span class='hint has-tip tip-top' data-tooltip title="Add staff members.">?</span>
-                <select data-suggest="staff" name="staff[]" multiple placeholder="Search Staff"></select>
-            </label>
-        </div>
+            <section>
+                <div class="content">
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <label>
+                                Teacher In Charge
+                                <span class='hint has-tip tip-top' data-tooltip title="The teacher in charge of this event.">?</span>
+                                <select data-suggest="teacher-in-charge" name="teacherInCharge" placeholder="Search Teachers"></select>
+                            </label>
+                        </div>
+                    </div>
 
-        <!-- BEGIN can_add_students -->
-        <div class="large-6 columns">
-            <label>
-                Students
-                <span class='hint has-tip tip-top' data-tooltip title="Add student attendees.">?</span>
-            </label>
-            <p>
-                {EVENT_CURRENT_STUDENTS}
-            </p>
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <label>
+                                Staff Members
+                                <span class='hint has-tip tip-top' data-tooltip title="Add staff members.">?</span>
+                                <select data-suggest="staff" name="staff[]" multiple placeholder="Search Staff"></select>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- BEGIN can_add_students -->
+                    <div class="row">
+                        <div class="small-6 large-6 columns">
+                            <label>
+                                Students
+                                <span class='hint has-tip tip-top' data-tooltip title="Add student attendees.">?</span>
+                            </label>
+                            <p>
+                                {EVENT_CURRENT_STUDENTS}
+                            </p>
+                        </div>
+                        <div class="small-6 large-6 columns">
+                            <a href="/modules/eotc/manage/attendance/list/{EVENT_ID}" class="button icon-modify" title="Manage student attendances for this event. This will open in a new tab/window." target="_blank">Manage Attendances</a>
+                        </div>
+                    </div>
+                    <!-- END can_add_students -->
+                </div>
+            </section>
         </div>
-        <div class="large-6 columns">
-            <a href="/modules/eotc/manage/attendance/list/{EVENT_ID}" class="button icon-modify" title="Manage student attendances for this event. This will open in a new tab/window." target="_blank">Manage Attendances</a>
-        </div>
-        <!-- END can_add_students -->
     </div>
+
+
+
+
+
+
+
+
+
+
 
     <!-- BEGIN can_add_resources -->
     <div class="row">
