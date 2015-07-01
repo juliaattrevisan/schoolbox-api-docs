@@ -51,48 +51,37 @@
             newRow.find(':input:visible:first').focus();
         });
 
-//        form.on('click', '#add-set', function(e) {
-//            e.preventDefault();
-//        });
+        form.validate({
+            submitHandler: function(htmlForm) {
+                var method = form.attr('method');
+                var action = form.attr('action');
 
-        form.on('click', ':submit', function(e) {
-            e.preventDefault();
-            var valid = true;
-            var method = form.attr('method');
-            var action = form.attr('action');
-
-            // Go through each set and result, add them to the form data.
-            var currentSet = 0;
-            var formData = {};
-            form.find('[data-role="rubricSet"]').each(function() {
-                var rubricSet = $(this);
-                var isSetUsed = false;
-                var currentResult = 0;
-                rubricSet.find('[data-role="existingRubricResult"], [data-role="newRubricResult"]').each(function() {
-                    var rubricResult = $(this);
-                    var isNew        = rubricResult.data('role') === 'newRubricResult';
-                    var value        = rubricResult.find('input').val();
-                    if (value.length === 0) {
-                        // New? disable
-                        // Old: error out
-                        if (!isNew) {
-                            valid = false;
+                // Mangle together a form.
+                // Go through each set and result, add them to the form data.
+                var currentSet = 0;
+                var formData = {};
+                form.find('[data-role="rubricSet"]').each(function() {
+                    var rubricSet = $(this);
+                    var isSetUsed = false;
+                    var currentResult = 0;
+                    rubricSet.find('[data-role="existingRubricResult"], [data-role="newRubricResult"]').each(function() {
+                        var rubricResult = $(this);
+                        var value        = rubricResult.find('input').val();
+                        if (value.length > 0) {
+                            isSetUsed = true;
+                            if (!(currentSet in formData)) {
+                                formData[currentSet] = {};
+                            }
+                            formData[currentSet][currentResult] = value;
+                            currentResult++;
                         }
-                    } else {
-                        isSetUsed = true;
-                        if (!(currentSet in formData)) {
-                            formData[currentSet] = {};
-                        }
-                        formData[currentSet][currentResult] = value;
-                        currentResult++;
+                    });
+                    if (isSetUsed) {
+                        currentSet++;
                     }
                 });
-                if (isSetUsed) {
-                    currentSet++;
-                }
-            });
 
-            if(valid) {
+                // And "submit" the form data.
                 $.ajax({
                     async: false,
                     url: action,
@@ -100,20 +89,9 @@
                     data: {
                         'action': 'set',
                         'items': formData
-                    },
-                    success: function(data) {
-                        // console.log('success '+data);
-                    },
-                    failure: function(data) {
-                        // console.log('le fail '+data);
-                        e.preventDefault();
                     }
                 });
-            }
-            else {
-                e.preventDefault();
-                // Show some dialog
-                $('#err-expl').css('display', 'block');
+                window.location.reload();
             }
         });
     });
@@ -152,7 +130,7 @@
                         <div data-role="existingRubricResult" data-resultNumber="{RR_RESULT_NUMBER}">
                             <label>
                                 <code data-role="value">{RR_VALUE}</code>
-                                <input type="text" name="items[{RR_SET_NUMBER}][]" value="{RR_SANE_LABEL}" />
+                                <input type="text" name="items[{RR_SET_NUMBER}][]" value="{RR_SANE_LABEL}" required />
                             </label>
                             <!--
                             <a class="hidden" data-label="{RR_SANE_LABEL}" href="#">revert to '{RR_LABEL}'</a>
@@ -184,5 +162,3 @@
         </form>
     </div>
 </div>
-
-<div id="err-expl">Ensure all pre-existing results are not blank.</div>
