@@ -104,45 +104,71 @@
                 </div>
             </section>
         </div>
-    </div>
 
+        <!-- BEGIN recurring_dates -->
+        <div class="small-12 island">
+            <section>
+                <div class="content">
+                    <div class="row">
+                        <div data-advanced class="large-12 columns {SHOW_ADVANCED}">
+                            <label>
+                                Repeat
+                                <span class='hint has-tip tip-top' data-tooltip title="The frequency with which this event recurs, if at all.">?</span>
+                                <select name="repeat">
+                                    <option value="">Single Event</option>
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="fortnightly">Fortnightly</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </label>
 
-
-    <!-- BEGIN recurring_dates -->
-    <div class="row">
-        <div data-advanced class="large-12 columns {SHOW_ADVANCED}">
-            <label>
-                Repeat
-                <span class='hint has-tip tip-top' data-tooltip title="The frequency with which this event recurs, if at all.">?</span>
-                <select name="repeat">
-                    <option value="">Single Event</option>
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="fortnightly">Fortnightly</option>
-                    <option value="monthly">Monthly</option>
-                </select>
-            </label>
-
-            <label data-repeat-until class="hide">
-                Repeat Until
-                <span class='hint has-tip tip-top' data-tooltip title="The date at which recurrence should cease.">?</span>
-                <input name="repeat_until" data-datepicker='true' type="text" size="15" maxlength="30" value="" />
-            </label>
+                            <label data-repeat-until class="hide">
+                                Repeat Until
+                                <span class='hint has-tip tip-top' data-tooltip title="The date at which recurrence should cease.">?</span>
+                                <input name="repeat_until" data-datepicker='true' type="text" size="15" maxlength="30" value="" />
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
-    </div>
-    <!-- END recurring_dates -->
-    <!-- BEGIN recurring_reminder -->
-    <div class="row">
-        <div data-advanced data-repeat-reminder class="large-12 columns">
-            <label>
-                Repeat
-                <span class='hint has-tip tip-top' data-tooltip title="This event is part of a recurring series.">?</span>
-                <br />
-                {EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong>.
-            </label>
+        <!-- END recurring_dates -->
+
+        <!-- BEGIN recurring_reminder -->
+        <div class="small-12 island">
+            <section>
+                <div class="content">
+                    <div class="row">
+                        <div data-advanced data-repeat-reminder class="large-12 columns">
+                            <label>
+                                Repeat
+                                <span class='hint has-tip tip-top' data-tooltip title="This event is part of a recurring series.">?</span>
+                                <br />
+                                {EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong>.
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
+        <!-- END recurring_reminder -->
+
+
+
+
+
+
+        
     </div>
-    <!-- END recurring_reminder -->
+
+
+
+
+
+
+
+
 
     <div class="row">
         <div class="large-12 columns">
