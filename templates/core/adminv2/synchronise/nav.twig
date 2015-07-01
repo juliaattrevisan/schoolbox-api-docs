@@ -6,9 +6,12 @@
     {% set parentselected ='active' %}
 {% endif %}
 
-<dl class="sub-nav">
-    <dd class="{{ staffselected }}"><a href="/adminv2/synchronise/staff" >Staff</a></dd>
-    <dd class="{{ studentselected }}"><a href="/adminv2/synchronise/student">Student</a></dd>
-    <dd class="{{ parentselected }}"><a href="/adminv2/synchronise/parent">Parent</a></dd>
-</dl>
-
+<div class="row">
+    <div class="large-12 columns">
+        <dl class="sub-nav">
+            <dd class="{{ staffselected }}"><a href="/adminv2/synchronise/staff" >Staff</a></dd>
+            <dd class="{{ studentselected }}"><a href="/adminv2/synchronise/student">Student</a></dd>
+            <dd class="{{ parentselected }}"><a href="/adminv2/synchronise/parent">Parent</a></dd>
+        </dl>
+    </div>
+</div>
