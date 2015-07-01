@@ -51,6 +51,15 @@
             newRow.find(':input:visible:first').focus();
         });
 
+//        form.on('submit', function(e) {
+//            form.find('input').each(function() {
+//                if (this.value.length === 0) {
+//                    // New? disable
+//                    // Old: error out
+//                }
+//            });
+//        });
+
 //        form.on('click', '#add-set', function(e) {
 //            e.preventDefault();
 //        });
@@ -138,16 +147,17 @@
     </div>
     <div class="small-12 island">
         <form data-action="saveRubricResults" method="POST" action="/adminv2/rubricForm.php">
+            <input type="hidden" name="action" value="set" />
             <div data-role="rubricList">
                 <!-- BEGIN list -->
                 <section>
-                    <div class="content" data-role="rubricSet">
+                    <div class="content" data-role="rubricSet" data-setNumber="{RR_SET_NUMBER}">
                         <h3>Existing set</h3>
                         <!-- BEGIN list_item -->
-                        <div data-role="existingRubricResult">
+                        <div data-role="existingRubricResult" data-resultNumber="{RR_RESULT_NUMBER}">
                             <label>
                                 <code data-role="value">{RR_VALUE}</code>
-                                <input type="text" value="{RR_SANE_LABEL}" />
+                                <input type="text" name="items[{RR_SET_NUMBER}][]" value="{RR_SANE_LABEL}" />
                             </label>
                             <!--
                             <a class="hidden" data-label="{RR_SANE_LABEL}" href="#">revert to '{RR_LABEL}'</a>
@@ -157,19 +167,19 @@
                         <div data-role="newRubricResult">
                             <label>
                                 <code data-role="value">&nbsp;</code>
-                                <input class="nullable" type="text" value="" />
+                                <input class="nullable"  type="text" name="items[{RR_SET_NUMBER}][]" value="" />
                             </label>
                         </div>
                     </div>
                 </section>
                 <!-- END list -->
                 <section>
-                    <div class="content" data-role="rubricSet">
+                    <div class="content" data-role="rubricSet" data-setNumber="{RR_SET_NUMBER}">
                         <h3>New set</h3>
-                        <div data-role="newRubricResult">
+                        <div data-role="newRubricResult" data-resultNumber="0">
                             <label>
                                 <code data-role="value">&nbsp;</code>
-                                <input class="nullable" type="text" value="" />
+                                <input class="nullable" type="text" name="items[{RR_SET_NUMBER}][]" value="" />
                             </label>
                         </div>
                     </div>

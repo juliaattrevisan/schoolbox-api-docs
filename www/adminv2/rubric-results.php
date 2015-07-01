@@ -35,14 +35,18 @@ while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $sets[$row['resultset_id']][$row['value']] = $row['label'];
 }
 
+$setNumber = 0;
 if(count($sets)) {
     foreach($sets as $setID => $items) {
         $this->setVar('list_item_block', '');
+        $this->setVar('RR_SET_NUMBER', $setNumber++);
+        $resultNumber = 0;
         foreach($items as $value => $label) {
             $this->setVar(array(
                 'RR_VALUE' => $value,
                 'RR_LABEL' => $label,
                 'RR_SANE_LABEL' => htmlentities($label),
+                'RR_RESULT_NUMBER' => $resultNumber++,
                 'ON_OFF' => $setID % 2 ? '' : 'dark'
             ));
             $this->parse('list_item_block', 'list_item', true);
@@ -58,3 +62,5 @@ else {
         'ON_OFF' => ''
     ));
 }
+// Last set: set set number
+$this->setVar('RR_SET_NUMBER', $setNumber);
