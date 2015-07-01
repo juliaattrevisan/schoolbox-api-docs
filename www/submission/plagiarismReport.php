@@ -26,17 +26,13 @@ $pdm = Plagscan_DocumentMapper::getInstance();
 /* @var $document Plagscan_Document */
 $document = $pdm->findOneByColumn('plagscan_id', $this->arg[0]);
 
+// Use below instead to retrieve Plagscan results in real time
+//$gateway = new Plagscan_Gateway(
+//    Config::get('plagscan_username'),
+//    Config::get('plagscan_api_key')
+//);
+//echo $gateway->retrieve($document->getPlagscanId(), Plagscan_Gateway::MODE_RETRIEVE_HTML_INTERACTIVE);
 
-// remove all '<a...>...highlight matches in source...</a>' instances from source
-$regex[] = "#<a[^>]*>((?:(?!</a>)[\s\S])*)highlight matches in source((?:(?!</a>)[\s\S])*)</a>#is";
-
-// remove any href='...plagscan.com/highlight?...' from source
-$regex[] = '$http://www.plagscan.com/highlight\?[^#\'"]*#jump$is';
-
-$html = $document->getHtml();
-
-foreach($regex as $r) {
-    $html = preg_replace($r, '', $html);
-}
+echo $document->getHtml();
 
 die($html);
