@@ -39,19 +39,18 @@
 //        });
 
 
-        form.on('change', '[data-role="newRubricResult"] input', function(e) {
+        form.on('change', '[data-role="rubricSet"] [data-role="newRubricResult"]:last-of-type input', function(e) {
             var self = $(this);
+            var thisSet = self.closest('[data-role="rubricSet"]');
             var thisRow = self.closest('[data-role="newRubricResult"]');
             var newRow = thisRow.clone();
-            var code = newRow.find('[data-role="value"]');
+            var code = thisRow.find('[data-role="value"]');
+            code.html(thisSet.find('[data-role="existingRubricResult"], [data-role="newRubricResult"]').length - 1);
             newRow.find('input').val('');
-            code.html(parseInt(code.html()) + 1);
-            code.html('&nbsp;');
-            thisRow.attr('data-role', 'existingRubricResult');
-            thisRow.find('code').removeClass('prompt');
-            self.closest('[data-role="rubricSet"]').append(newRow);
+            thisSet.append(newRow);
             newRow.find(':input:visible:first').focus();
         });
+
 //        form.on('click', '#add-set', function(e) {
 //            e.preventDefault();
 //        });
