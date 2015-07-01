@@ -201,7 +201,7 @@
 		 */
 		function makeTable(datasets) {
 			var html = '\
-				<h3>{TITLE}</h3>\
+				<h2 class="subheader">{TITLE}</h2>\
 				<table>\
 					<thead>\
 						{THEAD}\
