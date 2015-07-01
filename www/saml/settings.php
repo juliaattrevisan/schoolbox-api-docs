@@ -48,7 +48,6 @@ function ipInCIDR ($ip, $cidr) {
 
     // Allow checking of individual IP address, not just CIDR ranges
     if ($ip == $cidr) {
-        var_dump(true);
         return true;
     }
 
@@ -56,7 +55,6 @@ function ipInCIDR ($ip, $cidr) {
 
     // Fail out invalid addresses
     if (strlen($network) == 0 || is_null($mask)) {
-        var_dump(false);
         return false;
     }
 
