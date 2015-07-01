@@ -83,6 +83,7 @@
 
 					config.element.usageTabulator({
 						url: config.url,
+                        title: config.title,
 						columns: config.columns,
 						orderBy: config.orderBy,
 						order: config.order,
