@@ -144,9 +144,10 @@
                             <label>
                                 Repeat
                                 <span class='hint has-tip tip-top' data-tooltip title="This event is part of a recurring series.">?</span>
-                                <br />
-                                {EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong>.
                             </label>
+                            <p>
+                                {EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong>.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -154,114 +155,122 @@
         </div>
         <!-- END recurring_reminder -->
 
+        <div class="small-12 island">
+            <section>
+                <div class="content">
+                    <div class="row">
+                        <div class="small-12 column">
+                            <label>
+                                Location
+                                <input name="location" class='required' type="text" size="50" value="{EVENT_LOCATION}"/>
+                            </label>
 
-
-
-
-
-        
-    </div>
-
-
-
-
-
-
-
-
-
-    <div class="row">
-        <div class="large-12 columns">
-            <label>
-                Location
-                <input name="location" class='required' type="text" size="50" value="{EVENT_LOCATION}"/>
-            </label>
-
-            <label>
-                Type
-                <span class='hint has-tip tip-top' data-tooltip title="Select the type of event. This will be represented via different colours.">?</span>
-                <select name="type">
-                    <!-- BEGIN type_drop -->
-                    <option value="{EVENT_EVENTTYPE_ID}" {EVENT_EVENTTYPE_ID_SELECTED}>{EVENT_EVENTTYPE_NAME}</option>
-                    <!-- END type_drop -->
-                </select>
-            </label>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="large-12 columns">
-            <fieldset>
-                <legend>
-                    Campus
-                    <span class='hint has-tip tip-top' data-tooltip title="Select the campuses which will be able to view this event.">?</span>
-                </legend>
-                <!-- BEGIN event_campus_list -->
-                <input id="campusCheckbox{EVENT_CAMPUS_ID}" type="checkbox" name="campus[]" value="{EVENT_CAMPUS_ID}" {EVENT_CAMPUS_ID_SELECTED} />
-                <label for="campusCheckbox{EVENT_CAMPUS_ID}" class="checkbox-label">{EVENT_CAMPUS_NAME}</label>
-                <!-- END event_campus_list -->
-            </fieldset>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="large-12 columns">
-            <input type="hidden" name="ramsUploaded" data-ramsuploaded="{EVENT_RAMS_UPLOADED}" />
-            <input type="hidden" name="ramsRequired" value="0" />
-
-            <label>
-                RAMS Required?
-                <span class='hint has-tip tip-top' data-tooltip title="Please confirm if RAMS is required for this event to take place.">?</span>
-            </label>
-
-            <div class="large-4 columns">
-                <input id='ramsRequiredCheckbox' type="checkbox" data-ramscheckbox="true" name="ramsRequired" value="1" {EVENT_RAMSREQUIRED_SELECTED} />
-                <label for="ramsRequiredCheckbox" class="checkbox-label">RAMS is required</label>
-            </div>
-            <div class="large-8 columns">
-                <ul class="information-list">
-                    <!-- BEGIN rams_list -->
-                    <li>
-                        <div class="one-column">
-                            <img src="/images/mime/22x22/{EVENT_RAMS_MIMETYPE_ICONFILE}" />
+                            <label>
+                                Type
+                                <span class='hint has-tip tip-top' data-tooltip title="Select the type of event. This will be represented via different colours.">?</span>
+                                <select name="type">
+                                    <!-- BEGIN type_drop -->
+                                    <option value="{EVENT_EVENTTYPE_ID}" {EVENT_EVENTTYPE_ID_SELECTED}>{EVENT_EVENTTYPE_NAME}</option>
+                                    <!-- END type_drop -->
+                                </select>
+                            </label>
                         </div>
-                        <div class="nine-column">
-                            <a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" alt="Download" title="Download">{EVENT_RAMS_FILE}</a>
-                        </div>
-                        <div class="two-column">
-                            <input type="checkbox" id="deleteRamsFile-{EVENT_RAMS_HASH}" name="deleteRamsFile[{EVENT_RAMS_HASH}]" value="1" />
-                            <label for="deleteRamsFile-{EVENT_RAMS_HASH}" class="checkbox-label">Delete?</label>
-                        </div>
-                    </li>
-                    <!-- END rams_list -->
-                </ul>
+                    </div>
 
-                <div data-ramsfile="true">
-                    <ul class="information-list">
-                        <li>
-                            <div class="eleven-column">
-                                <input type="file" name="ramsFile[]" multiple />
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <fieldset>
+                                <legend>
+                                    Campus
+                                    <span class='hint has-tip tip-top' data-tooltip title="Select the campuses which will be able to view this event.">?</span>
+                                </legend>
+                                <!-- BEGIN event_campus_list -->
+                                <input id="campusCheckbox{EVENT_CAMPUS_ID}" type="checkbox" name="campus[]" value="{EVENT_CAMPUS_ID}" {EVENT_CAMPUS_ID_SELECTED} />
+                                <label for="campusCheckbox{EVENT_CAMPUS_ID}" class="checkbox-label">{EVENT_CAMPUS_NAME}</label>
+                                <!-- END event_campus_list -->
+                            </fieldset>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <input type="hidden" name="ramsUploaded" data-ramsuploaded="{EVENT_RAMS_UPLOADED}" />
+                            <input type="hidden" name="ramsRequired" value="0" />
+
+                            <label>
+                                RAMS Required?
+                                <span class='hint has-tip tip-top' data-tooltip title="Please confirm if RAMS is required for this event to take place.">?</span>
+                            </label>
+
+                            <div class="small-12 large-4 columns">
+                                <input id='ramsRequiredCheckbox' type="checkbox" data-ramscheckbox="true" name="ramsRequired" value="1" {EVENT_RAMSREQUIRED_SELECTED} />
+                                <label for="ramsRequiredCheckbox" class="checkbox-label">RAMS is required</label>
                             </div>
-                            <div class="one-column">
-                                <a href="#" data-action="delete" class="icon-delete no-text hide"></a>
+                            <div class="small-12 large-8 columns">
+                                <ul class="information-list">
+                                    <!-- BEGIN rams_list -->
+                                    <li>
+                                        <div class="one-column">
+                                            <img src="/images/mime/22x22/{EVENT_RAMS_MIMETYPE_ICONFILE}" />
+                                        </div>
+                                        <div class="nine-column">
+                                            <a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" alt="Download" title="Download">{EVENT_RAMS_FILE}</a>
+                                        </div>
+                                        <div class="two-column">
+                                            <input type="checkbox" id="deleteRamsFile-{EVENT_RAMS_HASH}" name="deleteRamsFile[{EVENT_RAMS_HASH}]" value="1" />
+                                            <label for="deleteRamsFile-{EVENT_RAMS_HASH}" class="checkbox-label">Delete?</label>
+                                        </div>
+                                    </li>
+                                    <!-- END rams_list -->
+                                </ul>
+
+                                <div data-ramsfile="true">
+                                    <ul class="information-list">
+                                        <li>
+                                            <div class="ten-column">
+                                                <input type="file" name="ramsFile[]" multiple />
+                                            </div>
+                                            <div class="two-column">
+                                                <a href="#" data-action="delete" class="icon-delete no-text hide"></a>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
-                        </li>
-                    </ul>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </section>
+        </div>
+
+        <div class="small-12 island">
+            <section>
+                <div class="content">
+                    <div class="row">
+                        <div class="small-12 column">
+                            <label>
+                                Details
+                                <span class='hint has-tip tip-top' data-tooltip title="Include support comments required as part of your EOTC approval, e.g. Names of non-staff adults; How this trip supports the curriculum (For College SS EOTCs, state how trip relates to assessment) ">?</span>
+
+                                <textarea class='event-detail' name="detail">{EVENT_DETAIL}</textarea>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
 
-    <div class="row">
-        <div class="large-12 columns">
-            <label>
-                Details
-                <span class='hint has-tip tip-top' data-tooltip title="Include support comments required as part of your EOTC approval, e.g. Names of non-staff adults; How this trip supports the curriculum (For College SS EOTCs, state how trip relates to assessment) ">?</span>
 
-                <textarea class='event-detail' name="detail">{EVENT_DETAIL}</textarea>
-            </label>
-        </div>
-    </div>
+
+
+
+
+
+
+
+
+
 
     <div class="row">
         <div class="large-12 columns">
