@@ -180,7 +180,7 @@
 				var active = '';
 
 				if (i == config.index) {
-					var active = 'active';
+					active = 'active';
 				}
 
 				pagination += '<li class="' + active + '" ><a href="#" rel="' + i +'">' + (i+1) + '</a></li>';
