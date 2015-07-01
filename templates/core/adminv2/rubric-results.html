@@ -142,29 +142,35 @@
                 <!-- BEGIN list -->
                 <section>
                     <div class="content" data-role="rubricSet">
-                        Existing set
+                        <h3>Existing set</h3>
                         <!-- BEGIN list_item -->
                         <div data-role="existingRubricResult">
-                            <code data-role="value">{RR_VALUE}</code>
-                            <input type="text" value="{RR_SANE_LABEL}" />
+                            <label>
+                                <code data-role="value">{RR_VALUE}</code>
+                                <input type="text" value="{RR_SANE_LABEL}" />
+                            </label>
                             <!--
                             <a class="hidden" data-label="{RR_SANE_LABEL}" href="#">revert to '{RR_LABEL}'</a>
                             -->
                         </div>
                         <!-- END list_item -->
                         <div data-role="newRubricResult">
-                            <code data-role="value">&nbsp;</code>
-                            <input class="nullable" type="text" value="" />
+                            <label>
+                                <code data-role="value">&nbsp;</code>
+                                <input class="nullable" type="text" value="" />
+                            </label>
                         </div>
                     </div>
                 </section>
                 <!-- END list -->
                 <section>
                     <div class="content" data-role="rubricSet">
-                        New set
+                        <h3>New set</h3>
                         <div data-role="newRubricResult">
-                            <code data-role="value">&nbsp;</code>
-                            <input class="nullable" type="text" value="" />
+                            <label>
+                                <code data-role="value">&nbsp;</code>
+                                <input class="nullable" type="text" value="" />
+                            </label>
                         </div>
                     </div>
                 </section>
