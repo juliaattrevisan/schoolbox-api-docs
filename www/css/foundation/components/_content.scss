@@ -619,6 +619,10 @@ table{
 		&:last-child{
 			border: 0;
 		}
+        &.row-header {
+          font-weight: 700;
+          border-bottom: 2px solid $body-bg;
+        }
 		[class^="icon-"]:before,
 		[class*=" icon-"]:before{
 			float: none;
