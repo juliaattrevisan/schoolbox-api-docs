@@ -1,15 +1,17 @@
 {% if nav.section == 'staff' %}
-    {% set staffselected = 'current' %}
+    {% set staffselected = 'active' %}
 {% elseif nav.section == 'student' %}
-    {% set studentselected = 'current' %}
+    {% set studentselected = 'active' %}
 {% elseif nav.section == 'parent' %}
-    {% set parentselected ='current' %}
+    {% set parentselected ='active' %}
 {% endif %}
 
-<ul class="admin-nav vertical">
-    <li><a href="/adminv2/synchronise/staff" class="{{ staffselected }}">Staff</a></li>
-    <li><a href="/adminv2/synchronise/student" class="{{ studentselected }}">Student</a></li>
-    <li><a href="/adminv2/synchronise/parent" class="{{ parentselected }}">Parent</a></li>
-</ul>
-
-
+<div class="row">
+    <div class="large-12 columns">
+        <dl class="sub-nav">
+            <dd class="{{ staffselected }}"><a href="/adminv2/synchronise/staff" >Staff</a></dd>
+            <dd class="{{ studentselected }}"><a href="/adminv2/synchronise/student">Student</a></dd>
+            <dd class="{{ parentselected }}"><a href="/adminv2/synchronise/parent">Parent</a></dd>
+        </dl>
+    </div>
+</div>

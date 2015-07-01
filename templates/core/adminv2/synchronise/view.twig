@@ -1,9 +1,8 @@
-<h2>Synchronise</h2>
+{% include 'adminv2/synchronise/nav.twig' %}
 
-<div class="settings-nav-holder">
-    {% include 'adminv2/synchronise/nav.twig' %}
-</div>
-<div class="settings">
-    {% block body %}
-    {% endblock %}
-</div>
+{% block body %}
+{% endblock %}
+
+{% if nav.section != 'intro' %}
+    {% include 'adminv2/synchronise/options.twig' %}
+{% endif %}

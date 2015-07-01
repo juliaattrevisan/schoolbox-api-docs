@@ -1,10 +1,11 @@
 {% extends 'adminv2/synchronise/view.twig' %}
 
 {% block body %}
-    <div class="synchronise-container">
-        <table class="table ruler data">
+<div class="row">
+    <div class="small-12 large-12 columns overflow">
+        <table>
             <thead>
-            <tr class="colspans">
+            <tr>
                 <th colspan="6">Personal</th>
                 <th colspan="2">Account</th>
                 <th colspan="6">Contact</th>
@@ -33,7 +34,7 @@
             </tr>
             </thead>
             <tbody>
-                {% for i in data.allPeople|slice(0, 13) %}
+            {% for i in data.allPeople|slice(0, 13) %}
                 <tr>
                     <td>{{ i.getId() }}</td>
                     <td>{{ i.getTitle() }}</td>
@@ -55,61 +56,98 @@
                     <td>{{ i.getYear().getLevel() }}</td>
                     <td>{{ i.getYear().getDescription() }}</td>
                 </tr>
-                {% endfor %}
+            {% endfor %}
             </tbody>
         </table>
     </div>
+</div>
 
-    <div class="synchronise-match-container">
-        <h3>Campus Mapping</h3>
-        <div class="third-column">
-            {% include 'adminv2/synchronise/sub/campus/external.twig' %}
-        </div>
-        <div class="icon plus"></div>
-        <div class="third-column">
-            {% include 'adminv2/synchronise/sub/year/external.twig' %}
-        </div>
-        <div class="icon equals"></div>
-        <div class="third-column">
-            {% include 'adminv2/synchronise/sub/campus/schoolbox.twig' %}
-        </div>
+<div class="row">
+    <div class="small-12 large-12 columns">
+        <h2 class="subheader">Campus Mapping</h2>
     </div>
+    <div class="small-12 large-3 island">
+        <section>
+            <div class="content">
+                {% include 'adminv2/synchronise/sub/campus/external.twig' %}
+            </div>
+        </section>
+    </div>
+    <div class="small-12 large-1 columns text-center">
+        +
+    </div>
+    <div class="small-12 large-3 island">
+        <section>
+            <div class="content">
+                {% include 'adminv2/synchronise/sub/year/external.twig' %}
+            </div>
+        </section>
+    </div>
+    <div class="small-12 large-1 columns text-center">
+        =
+    </div>
+    <div class="small-12 large-4 island">
+        <section>
+            <div class="content">
+                {% include 'adminv2/synchronise/sub/campus/schoolbox.twig' %}
+            </div>
+        </section>
+    </div>
+</div>
 
-    <div class="synchronise-match-container">
-        <h3>Role Mapping</h3>
-        <div class="third-column">
-            {% include 'adminv2/synchronise/sub/campus/external.twig' %}
-        </div>
-        <div class="icon plus"></div>
-        <div class="third-column">
-            {% include 'adminv2/synchronise/sub/year/external.twig' %}
-        </div>
-        <div class="icon equals"></div>
-        <div class="third-column">
-            {% include 'adminv2/synchronise/sub/role/schoolbox.twig' %}
-        </div>
+<div class="row">
+    <div class="small-12 large-12 columns">
+        <h2 class="subheader">Role Mapping</h2>
     </div>
+    <div class="small-12 large-3 island">
+        <section>
+            <div class="content">
+                {% include 'adminv2/synchronise/sub/campus/external.twig' %}
+            </div>
+        </section>
+    </div>
+    <div class="small-12 large-1 columns text-center">
+        +
+    </div>
+    <div class="small-12 large-3 island">
+        <section>
+            <div class="content">
+                {% include 'adminv2/synchronise/sub/year/external.twig' %}
+            </div>
+        </section>
+    </div>
+    <div class="small-12 large-1 columns text-center">
+        =
+    </div>
+    <div class="small-12 large-4 island">
+        <section>
+            <div class="content">
+                {% include 'adminv2/synchronise/sub/role/schoolbox.twig' %}
+            </div>
+        </section>
+    </div>
+</div>
 
-    <div class="synchronise-match-container">
-        <h3>House Mapping</h3>
-        <div class="half-column">
-            {% include 'adminv2/synchronise/sub/house/external.twig' %}
-        </div>
-        <div class="icon equals"></div>
-        <div class="half-column">
-            {% include 'adminv2/synchronise/sub/house/schoolbox.twig' %}
-        </div>
+<div class="row">
+    <div class="small-12 large-12 columns">
+        <h2 class="subheader">House Mapping</h2>
     </div>
-
-    <div class="synchronise-match-container">
-        <h3>Default User Options</h3>
-        <div class="half-column">
-            {% include 'adminv2/synchronise/sub/eportfolio.twig' %}
-            {% include 'adminv2/synchronise/sub/webmail.twig' %}
-        </div>
-        <div class="half-column">
-            {% include 'adminv2/synchronise/sub/localEmail.twig' %}
-            {% include 'adminv2/synchronise/sub/externalMail.twig' %}
-        </div>
+    <div class="small-12 large-5 island">
+        <section>
+            <div class="content">
+                {% include 'adminv2/synchronise/sub/house/external.twig' %}
+            </div>
+        </section>
     </div>
+    <div class="small-12 large-2 columns text-center">
+        =
+    </div>
+    <div class="small-12 large-5 island">
+        <section>
+            <div class="content">
+                {% include 'adminv2/synchronise/sub/house/schoolbox.twig' %}
+            </div>
+        </section>
+    </div>
+</div>
 {% endblock %}
