@@ -127,12 +127,16 @@ if(is_numeric($this->arg[0])) {
 
          if(count($groupList)) {
              foreach($groupList as $group) {
-                 $outputGroup = array(  'USER_GROUP_ID'     => $group['id'],
-                                        'USER_GROUP_NAME'  => $group['name'],
-                                        'READ_CHECKED'      => $group['type']==1?'checked="checked"':'',
-                                        'WRITE_CHECKED'      => $group['type']==2?'checked="checked"':'',
-                                        'ADMIN_CHECKED'      => $group['type']==3?'checked="checked"':'',
-                                      );
+                 $outputGroup = array(
+                     'USER_GROUP_ID'   => $group['id'],
+                     'USER_GROUP_NAME' => $group['name'],
+                     'READ_CHECKED'    => $group['type']==1?'checked="checked"':'',
+                     'WRITE_CHECKED'   => $group['type']==2?'checked="checked"':'',
+                     'ADMIN_CHECKED'   => $group['type']==3?'checked="checked"':'',
+                     'READ_SELECTED'   => $group['type']==1?'selected':'',
+                     'WRITE_SELECTED'  => $group['type']==2?'selected':'',
+                     'ADMIN_SELECTED'  => $group['type']==3?'selected':'',
+                 );
 
                  $this->setVar($outputGroup);
                  $this->parse('user_group_block','user_group',true);
@@ -167,10 +171,13 @@ if(is_numeric($this->arg[0])) {
                 /* Radio boxes
 				 */
                 $this->setVar(array(
-                    'SERVICE_ID'    => $perm['service'],
-                    'READ_CHECKED'  => $perm['type'] == READ_ACCESS ? 'checked="checked"' : '',
-                    'WRITE_CHECKED' => $perm['type'] == WRITE_ACCESS ? 'checked="checked"' : '',
-                    'ADMIN_CHECKED' => $perm['type'] == FULL_ACCESS ? 'checked="checked"' : '',
+                    'SERVICE_ID'     => $perm['service'],
+                    'READ_CHECKED'   => $perm['type'] == READ_ACCESS ? 'checked="checked"' : '',
+                    'WRITE_CHECKED'  => $perm['type'] == WRITE_ACCESS ? 'checked="checked"' : '',
+                    'ADMIN_CHECKED'  => $perm['type'] == FULL_ACCESS ? 'checked="checked"' : '',
+                    'READ_SELECTED'  => $perm['type'] == READ_ACCESS ? 'selected' : '',
+                    'WRITE_SELECTED' => $perm['type'] == WRITE_ACCESS ? 'selected' : '',
+                    'ADMIN_SELECTED' => $perm['type'] == FULL_ACCESS ? 'selected' : '',
                     'SID'            => $perm['sid']
                 ));
 

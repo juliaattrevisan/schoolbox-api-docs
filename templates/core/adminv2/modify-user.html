@@ -1,787 +1,661 @@
-<!-- BEGIN custom_head -->
-<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
-<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
+{ADMIN_NAV}
+
+<div class="row">
+    <div class="large-12 columns">
+        <span class="header-actions">
+            <form method="POST" action="/adminv2/userForm.php">
+                <input type="hidden" name="login" value="{USERNAME}" />
+                <input type="submit" {ASSUME_CLASS} value="{ASSUME_PROMPT}" />
+            </form>
+        </span>
+
+
+        <h2>{FULLNAME}</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">User Detail</h2>
+        <section>
+            <div class="content">
+                <div class="row">
+                    <form method="POST" action="/adminv2/userForm.php" data-validatable-as="userDetails">
+                        <div class="small-12 medium-6 island">
+                            <label for="title">Title</label>
+                            <select id="title" name="title">
+                                <!-- BEGIN title -->
+                                <option value="{NAME_TITLE}" {NAME_TITLE_SELECTED}>{NAME_TITLE}</option>
+                                <!-- END title -->
+                            </select>
+                            <label for="firstname">First Name</label>
+                            <input id="firstname" type="text" name="firstname" value="{FIRSTNAME}" data-relation="name" />
+
+                            <label for="lastname">Surname</label>
+                            <input id="lastname" type="text" name="lastname" value="{LASTNAME}" data-relation="name" />
+
+                            <label for="database" class="">{DATABASE_TYPE} ID</label>
+                            <input id="database" type="text" name="database_id" value="{DATABASE_ID}"/>
+
+                            <label for="userId">Schoolbox User ID</label>
+                            <input id="userId" type="text" disabled value="{USERID}"/>
+                            <!-- submit user ID anyway -->
+                            <input type="hidden" name="userID" value="{USERID}" />
+
+                            <label for="group">Role</label>
+                            <select id="group" name="group">
+                                <!-- BEGIN system_group -->
+                                <option value="{GROUP_ID}" {GROUP_ID_SELECTED}>{SYSTEM_GROUP_NAME}</option>
+                                <!-- END system_group -->
+                            </select>
+
+                            <label>Campus</label>
+                            <table data-role="campusList">
+                                <tbody>
+                                <!-- BEGIN campus -->
+                                <tr>
+                                    <td>{CAMPUS_NAME}</td>
+                                    <td>
+                                        <input id="defaultCampus-{CAMPUS_ID}" data-role="defaultCampus" type="radio" name="defaultCampus" value="{CAMPUS_ID}" {CAMPUS_DEFAULT_CHECKED} required />
+                                        <label for="defaultCampus-{CAMPUS_ID}" class="radio-label">Default?</label>
+                                    </td>
+                                    <td>
+                                        <input id="campus-{CAMPUS_ID}" type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_CHECKED} />
+                                        <label for="campus-{CAMPUS_ID}" class="checkbox-label">Involved?</label>
+                                    </td>
+                                </tr>
+                                <!-- END campus -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="small-12 medium-6 island">
+                            <label for ="username">Username</label>
+                            <input id="username" type="text" class="required" name="modusername" value="{USERNAME}" />
+
+                            <label for="password">Password</label>
+                            <input id="password" type="password" name="modpassword" class="password" value="{PASSWORD}" />
+
+                            <!-- BEGIN reveal_password -->
+                            <div data-role="passwordDisplay">
+                                <a href="#" data-action="show">Reveal Password</a>
+                                <span data-relation="password">{CLEAR_PASSWORD}</span>
+                                <a href="#" data-action="hide">Hide Password</a>
+                            </div>
+                            <!-- END reveal_password -->
+
+                            <label for="alt_email">Alternate Email</label>
+                            <input id="alt_email" type="text" name="alt_email" value="{ALT_EMAIL}" />
+
+                            <label for="year">Year</label>
+                            <input id="year" type="text" name="year" value="{YEAR}" />
+
+                            <label for="house">House</label>
+                            <select id="house" name="house">
+                                <option value="">Not Set</option>
+                                <!-- BEGIN house -->
+                                <option value="{HOUSE_ID}" {HOUSE_ID_SELECTED}>{HOUSE_NAME}</option>
+                                <!-- END house -->
+                            </select>
+
+                            <label for="residential_house">Residential House</label>
+                            <select id="residential_house" name="residential_house">
+                                <option value="">Not Set</option>
+                                <!-- BEGIN residential_house -->
+                                <option value="{RESIDENT_HOUSE_ID}" {RESIDENT_HOUSE_ID_SELECTED}>{RESIDENT_HOUSE_NAME}</option>
+                                <!-- END residential_house -->
+                            </select>
+
+                            <input id="eportfolio" type="checkbox" name="eportfolio" value="1" {EPORTFOLIO_CHECKED} />
+                            <label for="eportfolio" class="checkbox-label">E-Portfolio</label>
+
+                            <input id="local_email" type="checkbox" name="local_email" value="1" {LOCAL_EMAIL_CHECKED} />
+                            <label for="local_email" class="checkbox-label">Email Address from Username</label>
+
+                            <input id="mail_handler" type="checkbox" name="mail_handler" value="1" {MAILHANDLER_CHECKED}/>
+                            <label for="mail_handler" class="checkbox-label">Use External Mail Client</label>
+
+                            <input id="webmail" type="checkbox" name="webmail" value="1" {WEBMAIL_CHECKED} />
+                            <label for="webmail" class="checkbox-label">Enable Webmail Tab</label>
+
+                            <input id="superuser" type="checkbox" name="superuser" data-role="superuser" value="1" {SUPERUSER_CHECKED} />
+                            <label for="superuser" class="checkbox-label">Superuser</label>
+
+                            <input id="account_enabled" type="checkbox" name="account_enabled" data-role="enabled" value="1" {ACCOUNT_ENABLED_CHECKED} />
+                            <label for="account_enabled" class="checkbox-label">Account Enabled</label>
+                        </div>
+
+                        <div class="small-12 columns">
+                            <input type="submit" name="submit" value="Update User" />
+                            <input type="submit" name="delete" data-action="delete" value="Delete User" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Groups</h2>
+        <section>
+            <ul class="action-list">
+                <li class="row row-header">
+                    <div class="small-7 columns"><div class="content">Group Name</div></div>
+                    <div class="small-4 columns end"><div class="content">Access</div></div>
+                </li>
+                <!-- BEGIN user_group -->
+                <li class="row" data-equalizer>
+                    <div class="small-7 columns">
+                        <div class="content">
+                            <a href="/homepage/{USER_GROUP_ID}">{USER_GROUP_NAME}</a>
+                        </div>
+                    </div>
+                    <div class="small-4 columns" data-equalizer-watch>
+                        <form action="/adminv2/userForm.php" method="post">
+                            <input type="hidden" name="uid" value="{USERID}" />
+                            <input type="hidden" name="sid" value="{USER_GROUP_ID}" />
+                            <input type="hidden" name="service" value="1" />
+                            <input type="hidden" name="updateGroups" value="1" />
+
+                            <select name="type" data-autosubmit>
+                                <option value="1" {READ_SELECTED}>Read</option>
+                                <option value="2" {WRITE_SELECTED}>Write</option>
+                                <option value="3" {ADMIN_SELECTED}>Group Admin</option>
+                            </select>
+                        </form>
+                    </div>
+                    <div class="actions one">
+                        <a class="no-text icon-delete" data-equalizer-watch title="Remove" href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}" ></a>
+                    </div>
+                </li>
+                <!-- END user_group -->
+                <li class="row">
+                    <form action="/adminv2/userForm.php" method="post" id="groupAdd" data-validatable-as="addGroup">
+                        <div class="small-7 columns">
+                            <select required name="sid" id="groupSelect" form="groupAdd" class="required">
+                                <option value="">Select a Group</option>
+                                <!-- BEGIN all_group -->
+                                <option value="{ALL_GROUP_ID}">{ALL_GROUP_NAME}</option>
+                                <!-- END all_group -->
+                            </select>
+                        </div>
+                        <div class="small-4 columns end">
+                            <select required name="type" form="groupAdd">
+                                <option value="1">Read</option>
+                                <option value="2">Write</option>
+                                <option value="3">Group Admin</option>
+                            </select>
+                        </div>
+                        <div class="small-12 columns">
+                            <input type="hidden" name="groupSubmit" />
+                            <input type="hidden" value="{USERID}" name="uid" />
+                            <input type="hidden" value="1" name="service" />
+                            <p><input type="submit" value="Add" /></p>
+                        </div>
+                    </form>
+                </li>
+            </ul>
+        </section>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader" id="permissions">Permissions</h2>
+        <section>
+            <ul class="action-list">
+                <li class="row row-header">
+                    <div class="small-4 columns"><div class="content">Service</div></div>
+                    <div class="small-4 columns"><div class="content">Campus</div></div>
+                    <div class="small-3 columns end"><div class="content">Access</div></div>
+                </li>
+                <!-- BEGIN user_calendar -->
+                <li class="row" data-equalizer>
+                    <div class="small-4 columns"><div class="content">Calendar</div></div>
+                    <div class="small-4 columns"><div class="content">{PERM_CAMPUS_NAME}</div></div>
+                    <div class="small-3 columns" data-equalizer-watch>
+                        <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
+                            <input type="hidden" name="uid" value="{USERID}" />
+                            <input type="hidden" name="sid" value="{SID}" />
+                            <input type="hidden" name="service" value="{SERVICE_ID}" />
+                            <input type="hidden" name="updateServices" value="1" />
+                            <select name="type" data-autosubmit>
+                                <option value="1" {READ_SELECTED}>Read</option>
+                                <option value="2" {WRITE_SELECTED}>Write</option>
+                                <option value="3" {ADMIN_SELECTED}>Moderate</option>
+                            </select>
+                        </form>
+                    </div>
+                    <div class="actions one">
+                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="no-text icon-delete" title="Remove" data-equalizer-watch></a>
+                    </div>
+                </li>
+                <!-- END user_calendar -->
+
+                <!-- BEGIN user_news -->
+                <li class="row" data-equalizer>
+                    <div class="small-4 columns"><div class="content">News</div></div>
+                    <div class="small-4 columns"><div class="content">{PERM_CAMPUS_NAME}</div></div>
+                    <div class="small-3 columns" data-equalizer-watch>
+                        <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
+                            <input type="hidden" name="uid" value="{USERID}" />
+                            <input type="hidden" name="sid" value="{SID}" />
+                            <input type="hidden" name="service" value="{SERVICE_ID}" />
+                            <input type="hidden" name="updateServices" value="1" />
+                            <select name="type" data-autosubmit>
+                                <option value="1" {READ_SELECTED}>Read</option>
+                                <option value="2" {WRITE_SELECTED}>Write</option>
+                                <option value="3" {ADMIN_SELECTED}>Moderate</option>
+                            </select>
+                        </form>
+                    </div>
+                    <div class="actions one">
+                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="no-text icon-delete" title="Remove" data-equalizer-watch></a>
+                    </div>
+                </li>
+                <!-- END user_news -->
+
+                <!-- BEGIN user_cms -->
+                <li class="row" data-equalizer>
+                    <div class="small-4 columns"><div class="content">CMS</div></div>
+                    <div class="small-4 columns"><div class="content">{PERM_CAMPUS_NAME}</div></div>
+                    <div class="small-3 columns" data-equalizer-watch>
+                        <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
+                            <input type="hidden" name="uid" value="{USERID}" />
+                            <input type="hidden" name="sid" value="{SID}" />
+                            <input type="hidden" name="service" value="{SERVICE_ID}" />
+                            <input type="hidden" name="updateServices" value="1" />
+                            <select name="type" data-autosubmit>
+                                <option value="1" {READ_SELECTED}>Read</option>
+                                <option value="2" {WRITE_SELECTED}>Write</option>
+                                <option value="3" {ADMIN_SELECTED}>Moderate</option>
+                            </select>
+                        </form>
+                    </div>
+                    <div class="actions one">
+                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="no-text icon-delete" title="Remove" data-equalizer-watch></a>
+                    </div>
+                </li>
+                <!-- END user_cms -->
+
+                <!-- BEGIN user_housemaster -->
+                <li class="row" data-equalizer>
+                    <div class="small-8 columns"><div class="content">Housemaster</div></div>
+                    <div class="small-3 columns" data-equalizer-watch>
+                        <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
+                            <input type="hidden" name="uid" value="{USERID}" />
+                            <input type="hidden" name="sid" value="{SID}" />
+                            <input type="hidden" name="service" value="{SERVICE_ID}" />
+                            <input type="hidden" name="updateServices" value="1" />
+                            <select name="type" data-autosubmit>
+                                <option value="1" {READ_SELECTED}>Read</option>
+                                <option value="2" {WRITE_SELECTED}>Write</option>
+                                <option value="3" {ADMIN_SELECTED}>Moderate</option>
+                            </select>
+                        </form>
+                    </div>
+                    <div class="actions one">
+                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="no-text icon-delete" title="Remove" data-equalizer-watch></a>
+                    </div>
+                </li>
+                <!-- END user_housemaster -->
+
+                <!-- BEGIN user_resource_booking -->
+                <li class="row" data-equalizer>
+                    <div class="small-8 columns"><div class="content">Resource Booking</div></div>
+                    <div class="small-3 columns" data-equalizer-watch>
+                        <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
+                            <input type="hidden" name="uid" value="{USERID}" />
+                            <input type="hidden" name="sid" value="{SID}" />
+                            <input type="hidden" name="service" value="{SERVICE_ID}" />
+                            <input type="hidden" name="updateServices" value="1" />
+                            <select name="type" data-autosubmit>
+                                <option value="1" {READ_SELECTED}>Read</option>
+                                <option value="2" {WRITE_SELECTED}>Write</option>
+                                <option value="3" {ADMIN_SELECTED}>Moderate</option>
+                            </select>
+                        </form>
+                    </div>
+                    <div class="actions one">
+                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="no-text icon-delete" title="Remove" data-equalizer-watch></a>
+                    </div>
+                </li>
+                <!-- END user_resource_booking -->
+
+                <!-- BEGIN user_curriculum -->
+                <li class="row" data-equalizer>
+                    <div class="small-8 columns"><div class="content">Curriculum</div></div>
+                    <div class="small-3 columns" data-equalizer-watch>
+                        <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
+                            <input type="hidden" name="uid" value="{USERID}" />
+                            <input type="hidden" name="sid" value="{SID}" />
+                            <input type="hidden" name="service" value="{SERVICE_ID}" />
+                            <input type="hidden" name="updateServices" value="1" />
+                            <select name="type" data-autosubmit>
+                                <option value="1" {READ_SELECTED}>Read</option>
+                                <option value="2" {WRITE_SELECTED}>Write</option>
+                                <option value="3" {ADMIN_SELECTED}>Moderate</option>
+                            </select>
+                        </form>
+                    </div>
+                    <div class="actions one">
+                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="no-text icon-delete" title="Remove" data-equalizer-watch></a>
+                    </div>
+                </li>
+
+                <!-- END user_curriculum -->
+                <li class="row">
+                    <form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" data-validatable-as="addService" data-action="addService">
+                    <div class="small-4 columns">
+                        <select data-role="serviceSelector" name="service" id="serviceSelect" form="serviceCloneForm" required>
+                            <option value="">Select Service</option>
+                            <option value="2" data-identifier="campus">Calendar</option>
+                            <option value="3" data-identifier="campus">News</option>
+                            <option value="5">CMS</option>
+                            <option value="6">Housemaster</option>
+                            <option value="7">Resource Booking</option>
+                            <option value="8">Curriculum</option>
+                        </select>
+                    </div>
+                    <div class="small-4 columns">
+                        <select data-service-type="campus" name="sid" id="campusSelect" form="serviceCloneForm" required>
+                            <option value="">Select Campus</option>
+                            <!-- BEGIN campusPermsList -->
+                            <!-- BEGIN perm_campus -->
+                            <option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_SELECTED}>{PERM_CAMPUS_NAME}</option>
+                            <!-- END perm_campus -->
+                            <!-- END campusPermsList -->
+                        </select>
+                    </div>
+                    <div class="small-3 columns end">
+                        <select name="type" form="serviceCloneForm" required>
+                            <option value="1">Read</option>
+                            <option value="2">Write</option>
+                            <option value="3">Moderate</option>
+                        </select>
+                        <input type="hidden" name="addService" />
+                        <input type="hidden" value="{USERID}" name="uid">
+                    </div>
+                    <div class="small-12 columns">
+                        <input type="submit" class="submit-btn-plain" value="Add" name="serviceSubmit">
+                    </div>
+                    </form>
+                </li>
+            </ul>
+        </section>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader" id="linked">Linked Accounts</h2>
+        <section>
+            <ul class="action-list">
+                <!-- BEGIN user_linked -->
+                <li class="row">
+                    <div class="small-11 columns">
+                        <div class="content">
+                            <a href="/adminv2/modify-user/{LINKED_USER_ID}">{LINKED_USER}</a>
+                        </div>
+                    </div>
+                    <div class="actions one">
+                        <a href="/adminv2/userForm.php?deleteUserLink={USERID}&amp;linkedUser={LINKED_USER_ID}" class="no-text icon-delete" title="Remove"></a>
+                    </div>
+                </li>
+                <!-- END user_linked -->
+                <li class="row">
+                    <form action="/adminv2/userForm.php" method="post" id="linkedUserAdd">
+                        <div class="small-12 columns">
+                            <select data-selectizeuser="addUser" name="linkUser[]" multiple placeholder="Search Users" form="linkedUserAdd"></select>
+                        </div>
+                        <div class="small-12 columns">
+                            <input type="hidden" name="userID" value="{USERID}" />
+                            <input type="submit" value="Add" disabled />
+                        </div>
+                    </form>
+                </li>
+            </ul>
+        </section>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Recent Activity Logs</h2>
+    </div>
+    <div class="small-12 medium-6 island">
+        <section>
+            <span class="header-actions">
+                <a class="button icon-view" href="/adminv2/reports/login/user={USERNAME}">See All</a>
+            </span>
+            <h3 class="content subheader">Logins</h3>
+            <table>
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>IP</th>
+                    <th>Result</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- BEGIN login_log -->
+                <tr>
+                    <td>{LOGIN_DATE}</td>
+                    <td>{LOGIN_IP}</td>
+                    <td>{LOGIN_RESULT}</td>
+                </tr>
+                <!-- END login_log -->
+                </tbody>
+            </table>
+        </section>
+    </div>
+
+    <div class="small-12 medium-6 island">
+        <section>
+            <span class="header-actions">
+                <a class="button icon-view" href="/adminv2/reports/activity/user={USERNAME}">See All</a>
+            </span>
+            <h3 class="content subheader">Activity</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- BEGIN action_log -->
+                    <tr>
+                        <td>{ACTION_DATE}</td>
+                        <td>{ACTION_ACTION}</td>
+                    </tr>
+                    <!-- END action_log -->
+                </tbody>
+            </table>
+        </section>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">
+            Send Message to {FULLNAME}
+        </h2>
+        <section>
+            <div class="content">
+                <p><em>{FIRSTNAME} must be signed in to receive a popup alert.</em></p>
+                <form action="/adminv2/sendAlert" method="POST">
+                    <input type="hidden" name="user" value="{USERID}" />
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <label>
+                                <strong>Message from {SITE_LOGINNAME}:</strong>
+                                <input type="text" value="" name="body" />
+                            </label>
+                        </div>
+                        <div class="small-12 columns">
+                            <label>
+                                <input type="submit" value="Send" />
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+
 <script type="text/javascript" src="/javascript/components/jquery-validation/additional-methods.js"></script>
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.selectizeSelector.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
 <script type="text/javascript">
 
-$(function() {
+    $(function() {
 
-	/* Ajax Update group access permissions
-	 */
-	$('.updateGroupsForm').find('input[name=type]').change(function() {
-		var form = $(this).closest('form');
-		var data = {
-			type: $(this).val(),
-			uid: form.find('input[name=uid]').val(),
-			sid: form.find('input[name=sid]').val(),
-			service: form.find('input[name=service]').val(),
-			updateGroups: true
-		}
+        /**
+         * AJAX submit of forms (used by groups and services)
+         */
+        $(':input[data-autosubmit]').change(function() {
+            var form = $(this.form);
+            $.post('/adminv2/userForm.php', form.serializeArray());
+        });
 
-		$.post('/adminv2/userForm.php', data);
-	});		
+        /**
+         * Show/hide password
+         */
+        var passwordDisplayer = $('[data-role="passwordDisplay"]');
+        if (passwordDisplayer.length) {
+            var passwordShow = passwordDisplayer.find('[data-action="show"]');
+            var passwordHide = passwordDisplayer.find('[data-action="hide"]');
+            var passwordView = passwordDisplayer.find('[data-relation="password"]');
+            passwordShow.show();
+            passwordHide.hide();
+            passwordView.hide();
+            passwordShow.click(function(e) {
+                e.preventDefault();
+                passwordShow.hide();
+                passwordHide.show();
+                passwordView.show();
+            });
+            passwordHide.click(function(e) {
+                e.preventDefault();
+                passwordShow.show();
+                passwordHide.hide();
+                passwordView.hide();
+            });
+        }
 
-	/* Ajax Update service access permissions
-	 */
-	$('.updateServicesForm').find('input[name=type]').change(function() {
-		var form = $(this).closest('form');
-		var data = {
-			type: $(this).val(),
-			uid: form.find('input[name=uid]').val(),
-			sid: form.find('input[name=sid]').val(),
-			service: form.find('input[name=service]').val(),
-			updateServices: true
-		}
+        /**
+         * Hide campus selector if I selected a service that doesn't use them
+         */
+        var addServiceForm = $('form[data-action="addService"]');
+        addServiceForm.on(
+                'change',
+                ':input[data-role="serviceSelector"]',
+                function() {
+                    // Search for this item, disable others
+                    var currentService = $(this).find(':selected').data('identifier');
+                    var selectors      = addServiceForm.find(':input[data-service-type]');
+                    selectors.hide();
+                    selectors.filter('[data-service-type="'+currentService+'"]').show();
+                }
+        );
 
-		$.post('/adminv2/userForm.php', data);
-	}); 
-
-	/* Ajax Update SID values
-	 */
-	$('.updateSIDForm').find('select[name=sid]').change(function() {
-		var form = $(this).closest('form');
-		var data = {
-			type: $(this).val(),
-			uid: form.find('input[name=uid]').val(),
-			sid: $(this).val(),
-			previousSid: form.find('input[name=previousSid]').val(),
-			service: form.find('input[name=service]').val(),
-			updateSID: true
-		}
-
-		$.post('/adminv2/userForm.php', data);
-	});
-
-    $('h3 span.question').each(function() {
-        $(this).qtip({
-            content: 'Edit the user\'s details.',
-            style: {
-                classes: 'qtip-green qtip-shadow'
+        /**
+         * User details validation
+         */
+        $('form[data-validatable-as="userDetails"]').validate({
+            rules: {
+                year: {
+                    yearLevel : true
+                },
+                alt_email: {
+                    email:true
+                },
+                firstname: {
+                    require_from_group: [1, '[data-relation="name"]']
+                },
+                lastname: {
+                    require_from_group: [1, '[data-relation="name"]']
+                }
             },
-            position: {
-                my: 'bottom left',
-                at: 'top left'
+            messages: {
+                firstname: {
+                    require_from_group: "Please enter either a first name or surname"
+                },
+                lastname: {
+                    require_from_group: "Please enter either a first name or surname"
+                },
+                defaultCampus: "Please select a default campus",
+                alt_email: "If you are entering an alternative email, please ensure it's a valid address"
+            },
+            errorPlacement: function(error, element) {
+                if (element.is('[data-role="defaultCampus"]')) {
+                    error.css('margin', 0);
+                    error.insertAfter(element.closest('[data-role="campusList"]'));
+                } else {
+                    error.insertAfter(element)
+                }
             }
         });
-    });
 
-	$('a.show-pass').click(function() {
+        /**
+         * Service validation
+         */
+        $('form[data-validatable-as="addService"]').validate();
 
-        $(this).siblings('em').show().css('display', 'block');
-		$(this).siblings('a.hide-pass').show().css('display', 'block');
-		$(this).hide();
+        $('form[data-validatable-as="addGroup"]').validate();
 
-		return false;
+        // Handles autosuggest for linking users to other user accounts
+        var addUserSelector = $(':input[data-selectizeuser="addUser"]');
+        var addUserButton   = $(addUserSelector.prop('form')).find(':submit');
+        addUserSelector
+                .selectizeSelector({
+                    multiple: true,
+                    ajax: {
+                        url:      '/ajax/user.php',
+                        type:     'GET',
+                        data:     {groupID: 0},
+                        dataType: 'json'
+                    }
+                })
+                .on('selectize.item_add', function() {
+                    addUserButton.prop('disabled', false);
+                })
+                .on('selectize.item_remove', function() {
+                    // Disable only if empty
+                    if ($(this).data('selectize').items.length === 0) {
+                        addUserButton.prop('disabled', true);
+                    }
+                });
 
-	});
-	
-	$('a.hide-pass').click(function() {
-
-        $(this).siblings('em').hide();
-		$(this).siblings('a.show-pass').show();
-		$(this).hide();
-		
-		return false;
-
-	});
-
-	/* Reset availability options for campuses and services
-	 * 0: please select
-	 * 2: calendar
-	 * 3: news
-	 * 5: cms
-	 */
-	var registry = [{
-		service: 0,
-		sid: []
-	},
-	{
-		service: 2,
-		sid: []
-	},
-	{
-		service: 3,
-		sid: []
-	},
-	{
-		service: 5,
-		sid: []
-	}];
-
-	/* Remember which sids were used for each service
-	 */
-	$.each($('.updateSIDForm'), function(index, value) {
-		var service = $(value).find('input[name=service]').val();
-		var sid = $(value).find('input[name=sid]').val();
-
-		for (var i = 0; i < registry.length; i++) {
-			if (registry[i].service == service) {
-				registry[i].sid.push(sid);
-			}
-		}
-	});
-
-	/* Make unavailable options invisible
-	 */
-	$('#serviceCloneForm').find('select[name=service]').change(function() {
-		var service = $(this).val();
-
-		/* Default states
-		 */
-		$.each($('#serviceCloneForm').find('select[name=sid] option'), function (index, element) {
-			$(element).show();
-		});
-
-		/* Exclusions
-		 */
-		if ([5,6,7,8].indexOf(Number($(this).val())) >= 0) {
-			$('#serviceCloneForm').find('select[name=sid]').hide();
-		}
-		else {
-			$('#serviceCloneForm').find('select[name=sid]').show();
-
-			/* Find this service, and all the options that
-			 * are being used
-			 */
-			for (var i = 0; i < registry.length; i++) {
-
-				/* For this service, remove options that are
-				 * already in use
-				 */
-				if (registry[i].service == service) {
-					$.each($('#serviceCloneForm').find('select[name=sid] option[value!=0]'), function(index, element2) {
-						for (var j = 0; j < registry[i].sid.length; j++) {
-							if ($(element2).val() == registry[i].sid[j]) {
-								$(element2).hide();
-							}
-						}
-					});
-				}
-			}
-		}
-		
-	});
-	
-	/**********
-	Custom Validation
-	**********/
-	$('.admin-form').validate({
-		rules: {
-			year: {
-			  	customValid : true
-			},
-			alt_email: {
-				email:true	
-			},
-			firstname: {
-				require_from_group: [1, '.name-required']
-			},
-			lastname: {
-				require_from_group: [1, '.name-required']
-			}
-		},
-		messages: {
-			firstname: {
-				require_from_group: "Please enter either a first name or surname"
-			},
-			lastname: {
-				require_from_group: "Please enter either a first name or surname"
-			},
-			defaultCampus: "Please select a default campus",
-			alt_email: "If you are entering an alternative email, please ensure it's a valid address"
-		},
-		errorPlacement: function(error, element) {
-			if (element.hasClass("campus-radio")) {
-				error.css('margin', 0);
-				error.insertAfter(element.closest('table'));
-			} else {
-							
-			error.insertAfter(element)
-			}
-		 }
-		
-	});
-	
-	$.validator.addMethod("customValid", function(value, element) {
-		inputValue = (parseInt(value));
-		if (isNaN(inputValue)) {
-			
-			value = String(value);
-			
-            if ((value == '') || (value == 'k') || (value == 'elc') || (value == 'ELC') || (value == 'K')) {
-				console.log(value);
-				return true
-			} else {
-				return false;
-			}
-		} else {
-			if ((inputValue > 13) || (inputValue < 0)) {
-				return false
-			}
-			return true;
-		} 
-
-	}, "Please enter one a number in between 0 and 13 OR the letter 'K' OR the the phrase 'ELC'");
-
-	$('#serviceCloneForm').validate({
-		rules: {
-			sid: {
-				customCampus: true	
-			},
-			service: {
-				customService: true
-			}
-		}
-		
-	});
-	
-	$('#groupAdd').validate();
-	
-	$.validator.addMethod("customCampus", function(value, element) {
-		if ($(element).is(':visible')) {
-			if (value !== "") {
-				return true;	
-			} else {
-				return false;	
-			}
-		} else {
-			return true;	
-		}
-
-	}, "Please select an option");
-
-	$.validator.addMethod("customService", function(value, element) {
-		
-		if (value !== "") {
-			return true;	
-		} else {
-			return false;	
-		}
-
-	}, "Please select an option");
-	
-	$('#groupSelect, #campusSelect,#serviceSelect').change(function() {
-		$(this).closest('form').validate().element($(this));
-	})
-
-  // locate the assume button and add a listener if it's disabled
-  $('#content')
-      .children('.admin-contents')
-      .children('form.modify-form')
-      .children('a.user.disabled')
-      .click(function()
-  {
-      var con = confirm("This account is deactivated. Are you sure you want to log in as this user?");
-      if(con) {
-        $(this).closest('form').submit();
-      }
-  })
-
-    // Handles autosuggest for linking users to other user accounts
-    var addUserSelector = $('#linkUser');
-    var addUserButton   = addUserSelector.closest('form').find(':submit');
-    addUserSelector.selectizeSelector({
-                multiple: true,
-                ajax: {
-                    url:      '/ajax/user.php',
-                    type:     'GET',
-                    data:     {groupID: 0},
-                    dataType: 'json'
-                }
-            })
-            .on('selectize.item_add', function(event, value) {
-                addUserButton.prop('disabled', false).removeClass('disabled');
-            })
-            .on('selectize.item_remove', function() {
-                // Disable only if empty
-                if ($(this).data('selectize').items.length === 0) {
-                    addUserButton.prop('disabled', true).addClass('disabled');
+        /**
+         * Confirm update of superuser field
+         */
+        $('input[data-role="superuser"]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text: 'Change this user\'s superuser status?',
+                confirmEvent: function(element) {
+                    element.prop('checked', !(element.prop('checked')));
                 }
             });
+        });
 
-});
+        /**
+         * Confirm update of account enabled field
+         */
+        $('input[data-role="enabled"]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text: 'Change this user\'s account status?',
+                confirmEvent: function(element) {
+                    element.prop('checked', !(element.prop('checked')));
+                }
+            });
+        });
+    });
 </script>
-
-<!-- END custom_head-->
-
-{ADMIN_NAV}
-
-<div class="admin-contents clearfix">
-<h2>{FULLNAME}</h2>
-<form method="POST" action="/adminv2/userForm.php" class="modify-form" clear="clearfix">
-	<input type="hidden" name="login" value="{USERNAME}" />
-	<a href="#" class="btn no-icon user {ASSUME_CLASS}">{ASSUME_PROMPT}</a>
-</form>
-<div class="level clearfix">
-	<h3>User Details<span class="question">?</span></h3>
-	<form class="admin-form" method="POST" action="/adminv2/userForm.php">
-		<div class="split-container clearfix">
-			<div class="split">
-				<label for="title" class="width2 first">Title
-					<select id="title" name="title">
-						<!-- BEGIN title -->
-						<option value="{NAME_TITLE}" {NAME_TITLE_SELECTED}>{NAME_TITLE}</option>
-						<!-- END title -->
-					</select>
-				</label>
-				<label for="firstname" class="width2 first">First Name
-					<input id="firstname" type="text" name="firstname" value="{FIRSTNAME}" class="name-required" />
-				</label>
-				<label for="lastname">Surname
-					<input id="lastname" type="text" name="lastname" value="{LASTNAME}" class="name-required"/>
-				</label>
-				<label for="database" class="">{DATABASE_TYPE} ID
-					<input id="database" type="text" name="database_id" value="{DATABASE_ID}"/>
-				</label>
-				
-				<label>Schoolbox User ID
-					<input type="text" disabled="disabled" value="{USERID}"/>
-				</label>
-
-                <label for="group">Role
-                    <select id="group" name="group">
-                        <!-- BEGIN system_group -->
-                        <option value="{GROUP_ID}" {GROUP_ID_SELECTED}>{SYSTEM_GROUP_NAME}</option>
-                        <!-- END system_group -->
-                    </select>
-                </label>
-
-				<table class="table ruler">
-					<colgroup>
-						<col width="33%" />
-						<col width="33%" />
-						<col width="33%" />
-					</colgroup>
-					<thead>
-						<tr>
-							<th>Campus</th>
-							<th>Set default</th>
-							<th>Involved</th>
-						</tr>
-					</thead>
-					<tbody>
-						<!-- BEGIN campus -->
-						<tr>
-							<td>{CAMPUS_NAME}</td>
-							<td><input type="radio" name="defaultCampus" value="{CAMPUS_ID}" {CAMPUS_DEFAULT_CHECKED} /></td>
-							<td><input type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_CHECKED} /></td>
-						</tr>
-						<!-- END campus -->
-					</tbody>
-				</table>
-			</div>
-		</div>
-		<div class="split-container">
-			<div class="split last">
-                <label for ="username" class="width2">Username
-					<input id="username" type="text" name="modusername" value="{USERNAME}" class="required" />
-				</label>
-				<label for="password" class="password-container">
-					<div class="actual-password">Password<br />
-						<input id="password" type="password" name="modpassword" class="password" value="{PASSWORD}" />
-					</div>
-				</label>
-				<!-- BEGIN reveal_password -->
-				<label class="password-container">
-					<div class="reveal-password">
-						<a href="#" class="show-pass">Reveal Password</a>
-						<em>{CLEAR_PASSWORD}</em>
-						<a href="#" class="hide-pass">hide</a>
-					</div>
-				</label>
-				<!-- END reveal_password -->
-                <label for="alt_email">Alternate Email
-					<input id="alt_email" type="text" name="alt_email" value="{ALT_EMAIL}" />
-				</label>
-                <label for="year">Year
-                    <input id="year" type="text" name="year" value="{YEAR}" />
-                </label>
-                <label for="house">House
-                <select id="house" name="house">
-                    <option value="">Not Set</option>
-                    <!-- BEGIN house -->
-                    <option value="{HOUSE_ID}" {HOUSE_ID_SELECTED}>{HOUSE_NAME}</option>
-                    <!-- END house -->
-                </select></label>
-                <div class="clearfix"></div>
-                <label for="residential_house">Residential House
-                <select id="residential_house" name="residential_house">
-                    <option value="">Not Set</option>
-                    <!-- BEGIN residential_house -->
-                    <option value="{RESIDENT_HOUSE_ID}" {RESIDENT_HOUSE_ID_SELECTED}>{RESIDENT_HOUSE_NAME}</option>
-                    <!-- END residential_house -->
-                </select></label>
-                <label for="eportfolio">E-Portfolio
-                    <input id="eportfolio" type="checkbox" name="eportfolio" value="1" {EPORTFOLIO_CHECKED} />
-                </label>
-                <label for="local_email" class="width2 ">Email Address from Username
-                    <input id="local_email" type="checkbox" name="local_email" value="1" {LOCAL_EMAIL_CHECKED} />
-                </label>
-                <label for="mail_handler" class="width2 ">Use External Mail Client
-                    <input id="mail_handler" type="checkbox" name="mail_handler" value="1" {MAILHANDLER_CHECKED} />
-                </label>
-                <label for="webmail" class="width2 ">Enable Webmail Tab
-                    <input id="webmail" type="checkbox" name="webmail" value="1" {WEBMAIL_CHECKED} />
-                </label>
-                <label for="superuser" class="width2 ">Superuser
-                    <input  id="superuser" type="checkbox" name="superuser" value="1" onclick="return(confirm('Change {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME} superuser status?'));" {SUPERUSER_CHECKED} />
-                </label>
-                <label for="account_enabled" class="width2 ">Account Enabled
-                    <input id="account_enabled" type="checkbox" name="account_enabled" value="1" onclick="return(confirm('Change {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME}\'s account status?'));" {ACCOUNT_ENABLED_CHECKED} />
-                </label>
-
-			</div>
-		</div>
-
-		<input type="hidden" name="userID" value="{USERID}" />
-		<input type="submit" name="submit" class="submit-btn-plain" value="Update User" />
-		<input type="submit" name="delete" class="submit-btn-plain" value="Delete User" onclick="return(confirm('Are you sure you want to delete {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME}'));" />
-	</form>
-</div>
-<h2>Groups</h2>
-<div class="level clearfix">
-	<table class="table ruler">
-		<colgroup>
-			<col width="10%" />
-			<col width="50%" />
-			<col width="40%" />
-		</colgroup>
-		<thead>
-			<tr>
-				<th>Remove</th>
-				<th>Group Name</th>
-				<th>Access</th>
-			</tr>
-		</thead>
-		<tbody>
-			<!-- BEGIN user_group -->
-			<tr>
-				<td><a href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}" ><img title="remove" src="/images/famicons/delete.png" /></a></td>
-				<td><a href="/homepage/{USER_GROUP_ID}">{USER_GROUP_NAME}</a></td>
-				<td>
-					<form action="/adminv2/userForm.php" method="post" class="updateGroupsForm">
-						<input type="hidden" name="uid" value="{USERID}" />
-						<input type="hidden" name="sid" value="{USER_GROUP_ID}" />
-						<input type="hidden" name="service" value="1" />
-
-						<input type="radio" name="type" value="1" {READ_CHECKED} />Read
-						<input type="radio" name="type" value="2" {WRITE_CHECKED} />Write
-						<input type="radio" name="type" value="3" {ADMIN_CHECKED} />Group Admin
-					</form>
-				</td>
-			</tr>
-			<!-- END user_group -->
-            </tbody>
-        </table>
-					<form action="/adminv2/userForm.php" method="post" class="clearfix" id="groupAdd">
-						<fieldset>
-							<input type="hidden" name="groupSubmit" />
-							<input type="hidden" value="{USERID}" name="uid">
-							<input type="hidden" value="1" name="service">
-							<input type="hidden" value="1" name="type">
-							<label class="clearfix ">
-								<select class="formfield required" name="sid" id="groupSelect">
-									<option value="">Please Select a Group</option>
-									<!-- BEGIN all_group -->
-									<option value="{ALL_GROUP_ID}">{ALL_GROUP_NAME}</option>
-									<!-- END all_group -->
-								</select>
-							</label>
-						</fieldset>
-						<label class="clearfix float-left">
-							<input type="submit" class="submit-btn-plain" value="Add">
-						</label>
-					</form>
-
-</div>
-<h2 id="permissions">Permissions</h2>
-<div class="level clearfix">
-	<table class="table ruler" id="permissions-list">
-		<colgroup>
-			<col width="10%" />
-			<col width="20%" />
-			<col width="30%" />
-			<col width="40%" />
-		</colgroup>
-		<thead>
-			<tr>
-				<th>Remove</th>
-				<th>Service</th>
-				<th>Campus</th>
-				<th>Access</th>
-			</tr>
-		</thead>
-		<tbody>
-			<!-- BEGIN user_calendar -->
-			<tr class="permissions-calendar">
-				<td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
-				<td>Calendar</td>
-				<td>
-					<form action="/adminv2/userForm.php" method="post" class="updateSIDForm">
-						<input type="hidden" name="uid" value="{USERID}" />
-						<input type="hidden" name="sid" value="{SID}" />
-						<input type="hidden" name="service" value="{SERVICE_ID}" />
-
-						{PERM_CAMPUS_NAME}
-					</form>
-				</td>
-				<td>
-					<form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
-						<input type="hidden" name="uid" value="{USERID}" />
-						<input type="hidden" name="sid" value="{SID}" />
-						<input type="hidden" name="service" value="{SERVICE_ID}" />
-
-						<label><input type="radio" name="type" value="1" {READ_CHECKED} />Read</label>
-						<label><input type="radio" name="type" value="2" {WRITE_CHECKED} />Write</label>
-						<label><input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate</label>
-					</form>
-				</td>
-			</tr>
-			<!-- END user_calendar --> 
-			<!-- BEGIN user_news -->
-			<tr class="permissions-news">
-				<td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
-				<td>News</td>
-				<td>
-					<form action="/adminv2/userForm.php" method="post" class="updateSIDForm">
-						<input type="hidden" name="uid" value="{USERID}" />
-						<input type="hidden" name="sid" value="{SID}" />
-						<input type="hidden" name="service" value="{SERVICE_ID}" />
-
-						{PERM_CAMPUS_NAME}
-					</form>
-				</td>
-				<td>
-					<form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
-						<input type="hidden" name="uid" value="{USERID}" />
-						<input type="hidden" name="sid" value="{SID}" />
-						<input type="hidden" name="service" value="{SERVICE_ID}" />
-
-						<label><input type="radio" name="type" value="1" {READ_CHECKED} />Read</label>
-						<label><input type="radio" name="type" value="2" {WRITE_CHECKED} />Write</label>
-						<label><input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate</label>
-					</form>
-				</td>
-			</tr>
-			<!-- END user_news --> 
-			<!-- BEGIN user_cms -->
-			<tr class="permissions-cms">
-				<td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
-				<td>CMS</td>
-				<td></td>
-				<td>
-					<form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
-						<input type="hidden" name="uid" value="{USERID}" />
-						<input type="hidden" name="sid" value="0" />
-						<input type="hidden" name="service" value="{SERVICE_ID}" />
-
-						<label><input type="radio" name="type" value="1" {READ_CHECKED} />Read</label>
-						<label><input type="radio" name="type" value="2" {WRITE_CHECKED} />Write</label>
-						<label><input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate</label>
-					</form>
-				</td>
-			</tr>
-			<!-- END user_cms -->
-			<!-- BEGIN user_housemaster -->
-                <tr class="permissions-housemaster">
-                    <td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
-                    <td>Housemaster</td>
-                    <td></td>
-                    <td>
-                        <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
-                            <input type="hidden" name="uid" value="{USERID}" />
-                            <input type="hidden" name="sid" value="0" />
-                            <input type="hidden" name="service" value="{SERVICE_ID}" />
-
-                            <label><input type="radio" name="type" value="1" {READ_CHECKED} />No</label>
-                            <label><input type="radio" name="type" value="2" {WRITE_CHECKED} />Yes</label>
-                            <label><input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate</label>
-                        </form>
-                    </td>
-                </tr>
-            <!-- END user_housemaster -->
-            <!-- BEGIN user_resource_booking -->
-            <tr class="permissions-resource-booking">
-                <td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
-                <td>Resource Booking</td>
-                <td></td>
-                <td>
-                    <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
-                        <input type="hidden" name="uid" value="{USERID}" />
-                        <input type="hidden" name="sid" value="0" />
-                        <input type="hidden" name="service" value="{SERVICE_ID}" />
-
-                        <label><input type="radio" name="type" value="1" {READ_CHECKED} />No</label>
-                        <label><input type="radio" name="type" value="2" {WRITE_CHECKED} />Yes</label>
-                        <label><input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate</label>
-                    </form>
-                </td>
-            </tr>
-            <!-- END user_resource_booking -->
-            <!-- BEGIN user_curriculum -->
-            <tr class="permissions-curriculum">
-                <td><a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}"><img title="remove" src="/images/famicons/delete.png" /></a></td>
-                <td>Curriculum</td>
-                <td></td>
-                <td>
-                    <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
-                        <input type="hidden" name="uid" value="{USERID}" />
-                        <input type="hidden" name="sid" value="0" />
-                        <input type="hidden" name="service" value="{SERVICE_ID}" />
-
-                        <label><input type="radio" name="type" value="1" {READ_CHECKED} />No</label>
-                        <label><input type="radio" name="type" value="2" {WRITE_CHECKED} />Yes</label>
-                        <label><input type="radio" name="type" value="3" {ADMIN_CHECKED} />Moderate</label>
-                    </form>
-                </td>
-            </tr>
-            <!-- END user_curriculum -->
-		</tbody>
-    </table>
-	<form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" class="clearfix">
-		<input type="hidden" name="addService" />
-		<input type="hidden" value="{USERID}" name="uid">
-		<table>
-			<colgroup>
-				<col width="10%" />
-				<col width="20%" />
-				<col width="70%" />
-			</colgroup>
-			<tr>
-				<th>Service</th>
-				<th>Campus</th>
-				<th>Access</th>
-			</tr>
-			<tr>
-				<td>
-					<label>
-						<select class="formfield" name="service" id="serviceSelect">
-							<option value="">Select Service</option>
-							<option value="2">Calendar</option>
-							<option value="3">News</option>
-							<option value="5">CMS</option>
-				            <option value="6">Housemaster</option>
-				            <option value="7">Resource Booking</option>
-				            <option value="8">Curriculum</option>
-						</select>
-					</label>
-				</td>
-				<td>
-					<label>
-						<select name="sid" id="campusSelect">
-						<option value="">Select Campus</option>
-						<!-- BEGIN campusPermsList -->
-							<!-- BEGIN perm_campus -->
-							<option value="{PERM_CAMPUS_ID}" {PERM_CAMPUS_ID_SELECTED}>{PERM_CAMPUS_NAME}</option>
-							<!-- END perm_campus -->
-						<!-- END campusPermsList -->
-						</select>
-					</label>
-				</td>
-				<td>
-					<label><input type="radio" name="type" value="1" checked="checked" />Read</label>
-					<label><input type="radio" name="type" value="2" />Write</label>
-					<label><input type="radio" name="type" value="3" />Moderate</label>
-				</td>
-			</tr>
-			<tr>
-				<td colspan="3">
-					<label class="clearfix float-left">	
-					<input type="submit" class="submit-btn-plain" value="Add" name="serviceSubmit"></label>
-				</td>
-			</tr>
-		</table>
-	</form>
-</div>
-<h2><a name="linked"></a>Linked Accounts</h2>
-<div class="level clearfix">
-    <table class="table ruler">
-        <colgroup>
-            <col width="10%" />
-            <col width="60%" />
-            <col width="30%" />
-        </colgroup>
-        <thead>
-        <tr>
-            <th>Remove</th>
-            <th>User Account</th>
-        </tr>
-        </thead>
-        <tbody>
-        <!-- BEGIN user_linked -->
-        <tr>
-            <td><a href="/adminv2/userForm.php?deleteUserLink={USERID}&amp;linkedUser={LINKED_USER_ID}" ><img title="remove" src="/images/famicons/delete.png" /></a></td>
-            <td><a href="/adminv2/modify-user/{LINKED_USER_ID}">{LINKED_USER}</a></td>
-        </tr>
-        <!-- END user_linked -->
-        </tbody>
-    </table>
-    <form action="/adminv2/userForm.php" method="post">
-        <input type="hidden" name="userID" value="{USERID}" />
-        <select id="linkUser" name="linkUser[]" multiple placeholder="Search Users"></select>
-        <input type="submit" value="Add Users" class="submit-btn-plain disabled" disabled />
-    </form>
-</div>
-<h2>Recent Activity Logs</h2>
-<div class="level clearfix">
-    <div class="split-container forty">
-        <div class="split">
-            <h3>Logins <a class="btn in-heading-absolute" href="/adminv2/reports/login/user={USERNAME}"><span></span>See All</a></h3>
-            <table class="ruler table">
-                <thead>
-					<tr>
-						<th>Date</th>
-						<th>IP</th>
-						<th>Result</th>
-					</tr>
-                </thead>
-                <tbody>
-					<!-- BEGIN login_log -->
-					<tr>
-						<td>{LOGIN_DATE}</td>
-						<td>{LOGIN_IP}</td>
-						<td>{LOGIN_RESULT}</td>
-					</tr>
-					<!-- END login_log -->
-				</tbody>
-			</table>
-		</div>
-	</div>
-	<div class="split-container sixty">
-		<div class="split last">
-			<h3>Activity <a class="btn in-heading-absolute" href="/adminv2/reports/activity/user={USERNAME}"><span></span>See All</a></h3>
-			<table class="ruler table">
-				<thead>
-					<tr>
-						<th>Date</th>
-						<th>Action</th>
-					</tr>
-                </thead>
-                <tbody>
-					<!-- BEGIN action_log -->
-					<tr>
-						<td nowrap="nowrap">{ACTION_DATE}</td>
-						<td>{ACTION_ACTION}</td>
-					</tr>
-					<!-- END action_log -->
-				</tbody>
-			</table>
-		</div>
-	</div>
-</div>
-<h2>Send Message to {FULLNAME}</h2>
-<div class="level clearfix last">
-  <p>
-    <em>{FIRSTNAME} must be signed in to receive a popup alert</em>
-  </p>
-  <form action="/adminv2/sendAlert" method="POST">
-    <label><strong>Message from {SITE_LOGINNAME}:</strong>
-      <input type="hidden" name="user" value="{USERID}" />
-      <input type="text" value="" name="body" />
-    </label>
-    <input class="submit-btn-plain" type="submit" value="Send" />
-  </form>
-</div>
-</div>

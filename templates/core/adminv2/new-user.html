@@ -1,205 +1,162 @@
-<!-- BEGIN custom_head -->
-<link type="text/css" rel="stylesheet" href="/javascript/components/qtip2/jquery.qtip.css" />
-<script type="text/javascript" src="/javascript/components/qtip2/jquery.qtip.js"></script>
-<script type="text/javascript">
-
-$(function() {
-    $('h3 span').each(function() {
-        $(this).qtip({
-            content: 'Edit the user\'s details.',
-            style: {
-                classes: 'qtip-green qtip-shadow'
-            },
-            position: {
-                my: 'bottom left',
-                at: 'top left'
-            }
-        });
-    });
-	
-	///this function for the access ticks need to be recondigured.
-	$('.accessGranted').each(function () {
-		$(this).click(function () {
-			if ($(this).attr('src').indexOf('greentick') != -1) {
-				$(this).attr('src', '/images/emptybox.gif');
-				$.get('/group/modifyForm.php', {categoryID: $(this).attr('rel'), userID: '{ID}', write: 1});
-			} else {
-				$(this).attr('src', '/images/greentick.gif');
-				$.get('/group/modifyForm.php', {categoryID: $(this).attr('rel'), userID: '{ID}', write: 2});
-			}		
-		});
-		$(this).css('cursor','pointer');
-	});
-	
-	
-	$('.admin-form').validate({
-		rules: {
-			year: {
-			  	customValid : true
-			},
-			alt_email: {
-				email:true	
-			}
-		},
-		messages: {
-			defaultCampus: "Please select a default campus",
-			alt_email: "If you are entering an alternative email, please ensure it's a valid address"
-		},
-		errorPlacement: function(error, element) {
-      
-			if (element.hasClass("campus-radio")) {
-				error.css('margin', 0);
-				error.insertAfter(element.closest('table'));
-			} else {
-							
-			error.insertAfter(element)
-			}
-		 }
-		
-	});
-	
-	$.validator.addMethod("customValid", function(value, element) {
-		inputValue = (parseInt(value));
-		if (isNaN(inputValue)) {
-
-			value = String(value);
-
-			if ((value == '') || (value == 'k') || (value == 'elc') || (value == 'ELC') || (value == 'K')) {
-				console.log(value);
-				return true
-			} else {
-				return false;
-			}
-		} else {
-			if ((inputValue > 13) || (inputValue < 0)) {
-				return false
-			}
-			return true;
-		} 
-
-	}, "Please enter one a number in between 0 and 13 OR the letter 'K' OR the the phrase 'ELC'");
-
-})
-
-</script>
-
-<!-- END custom_head-->
-
 {ADMIN_NAV}
 
-<div class="admin-contents clearfix">
-	<h2>Create New User</h2>
-	<div class="level clearfix">
-		<h3>User Details<span class="question">?</span></h3>
-		<form class="admin-form" method="POST" action="/adminv2/userForm.php" >
-			<div class="split-container">
-				<div class="split">
-					<label for="title" class="title">
-					Title
-						<select id="title" name="title">
-							<!-- BEGIN title -->
-							<option value="{NAME_TITLE}" {TITLE_SELECTED}>{NAME_TITLE}</option>
-							<!-- END title -->
-						</select>
-                        </label>
-					<label for="firstname" class="first">First Name
-						<input id="firstname" type="text" name="firstname" class="required" value="" />
-					</label>
-					<label for="lastname">Surname
-						<input id="lastname" type="text" class="required"name="lastname" value=""/>
-					</label>
+<div class="row">
+    <div class="small-12 island">
+        <h2>Create New User</h2>
+        <h2 class="subheader">User Detail</h2>
+        <section>
+            <div class="content">
+                <div class="row">
+                    <form method="POST" action="/adminv2/userForm.php" data-validatable-as="userDetails">
+                        <div class="small-12 medium-6 columns">
+                            <label for="title">Title</label>
+                            <select id="title" name="title">
+                                <!-- BEGIN title -->
+                                <option value="{NAME_TITLE}" {TITLE_SELECTED}>{NAME_TITLE}</option>
+                                <!-- END title -->
+                            </select>
+                            <label for="firstname">First Name</label>
+                            <input id="firstname" type="text" name="firstname" value="" data-relation="name" />
 
-					<label for="database" class="">{DATABASE_TYPE} ID
-						<input id="database" type="text" name="database_id" value=""/>
-					</label>
-                    <label for="group">Role
-                        <select id="group" name="group">
-                            <!-- BEGIN system_group -->
-                            <option value="{GROUP_ID}" {GROUP_ID_SELECTED}>{SYSTEM_GROUP_NAME}</option>
-                            <!-- END system_group -->
-                        </select>
-                    </label>
-					
-					<table class="table ruler">
-						<colgroup>
-						<col width="33%" />
-						<col width="33%" />
-						<col width="33%" />
-						</colgroup>
-						<thead>
-							<tr>
-								<th>Campus</th>
-								<th>Set default</th>
-								<th>Involved</th>
-							</tr>
-						</thead>
-						<tbody>
-							<!-- BEGIN campus -->
-							<tr>
-								<td>{CAMPUS_NAME}</td>
-								<td><input type="radio" name="defaultCampus" value="{CAMPUS_ID}" {CAMPUS_DEFAULT_CHECKED} class="campus-radio required" /></td>
-								<td><input type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_CHECKED} /></td>
-							</tr>
-							<!-- END campus -->
-						</tbody>
-					</table>
+                            <label for="lastname">Surname</label>
+                            <input id="lastname" type="text" name="lastname" value="" data-relation="name" />
 
-				</div>
-			</div>
-			<div class="split-container">
-				<div class="split last">
-                    <label for ="username" class="width2">Username
-						<input id="username" type="text" class="required" name="modusername" value="" />
-					</label>
-					<label for="password">Password
-						<input id="password" type="password"  name="modpassword"/>
-					</label>
-                <label for="alt_email">Alternate Email
-					<input id="alt_email" type="text" name="alt_email" value="" class="email" />
-				</label>
-                    <label for="year">Year
-                        <input id="year" type="text" name="year" value="" />
-                    </label>
+                            <label for="database" class="">{DATABASE_TYPE} ID</label>
+                            <input id="database" type="text" name="database_id" value=""/>
 
-                    <label for="house">House
-                    <select id="house" name="house">
-                        <option value="">Not Set</option>
-                        <!-- BEGIN house -->
-                        <option value="{HOUSE_ID}" {HOUSE_ID_SELECTED}>{HOUSE_NAME}</option>
-                        <!-- END house -->
-                    </select>
-                    </label>
-                    <div class="clearfix"></div>
-                    <label for="residential_house">Residential House
-                    <select id="residential_house" name="residential_house">
-                        <option value="">Not Set</option>
-                        <!-- BEGIN residential_house -->
-                        <option value="{RESIDENT_HOUSE_ID}" {RESIDENT_HOUSE_ID_SELECTED}>{RESIDENT_HOUSE_NAME}</option>
-                        <!-- END residential_house -->
-                    </select>
-                    </label>
-                    <label for="eportfolio">E-Portfolio
-                        <input id="eportfolio" type="checkbox" name="eportfolio" value="1" />
-                    </label>
+                            <label for="group">Role</label>
+                            <select id="group" name="group">
+                                <!-- BEGIN system_group -->
+                                <option value="{GROUP_ID}" {GROUP_ID_SELECTED}>{SYSTEM_GROUP_NAME}</option>
+                                <!-- END system_group -->
+                            </select>
 
-                    <label for="local_email" class="width2 ">Email Address from Username
-                        <input id="local_email" type="checkbox" name="local_email" value="1" />
-                    </label>
-                    <label for="mail_handler" class="width2 ">Use External Mail Client
-                        <input id="mail_handler" type="checkbox" name="mail_handler" value="1"/>
-                    </label>
-                    <label for="webmail" class="width2 ">Enable Webmail Tab
-                        <input id="webmail" type="checkbox" name="webmail" value="1" />
-                    </label>
-                    <label for="superuser" class="width2 ">Superuser
-                        <input  id="superuser" type="checkbox" name="superuser" value="1" onclick="return(confirm('Change superuser status?'));" />
-                    </label>
+                            <label>Campus</label>
+                            <table data-role="campusList">
+                                <tbody>
+                                    <!-- BEGIN campus -->
+                                    <tr>
+                                        <td>{CAMPUS_NAME}</td>
+                                        <td>
+                                            <input id="defaultCampus-{CAMPUS_ID}" data-role="defaultCampus" type="radio" name="defaultCampus" value="{CAMPUS_ID}" {CAMPUS_DEFAULT_CHECKED} required />
+                                            <label for="defaultCampus-{CAMPUS_ID}" class="radio-label">Default?</label>
+                                        </td>
+                                        <td>
+                                            <input id="campus-{CAMPUS_ID}" type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_CHECKED} />
+                                            <label for="campus-{CAMPUS_ID}" class="checkbox-label">Involved?</label>
+                                        </td>
+                                    </tr>
+                                    <!-- END campus -->
+                                </tbody>
+                            </table>
+                        </div>
 
-				</div>
-			</div>
+                        <div class="small-12 medium-6 columns">
+                            <label for ="username">Username</label>
+                            <input id="username" type="text" class="required" name="modusername" value="" />
 
-			<input type="submit" class="submit-btn-plain" name="submit" value="Add User" />
-		</form>
+                            <label for="password">Password</label>
+                            <input id="password" type="password"  name="modpassword"/>
 
-	</div>
+                            <label for="alt_email">Alternate Email</label>
+                            <input id="alt_email" type="text" name="alt_email" value="" class="email" />
+
+                            <label for="year">Year</label>
+                            <input id="year" type="text" name="year" value="" />
+
+                            <label for="house">House</label>
+                            <select id="house" name="house">
+                                <option value="">Not Set</option>
+                                <!-- BEGIN house -->
+                                <option value="{HOUSE_ID}" {HOUSE_ID_SELECTED}>{HOUSE_NAME}</option>
+                                <!-- END house -->
+                            </select>
+
+                            <label for="residential_house">Residential House</label>
+                            <select id="residential_house" name="residential_house">
+                                <option value="">Not Set</option>
+                                <!-- BEGIN residential_house -->
+                                <option value="{RESIDENT_HOUSE_ID}" {RESIDENT_HOUSE_ID_SELECTED}>{RESIDENT_HOUSE_NAME}</option>
+                                <!-- END residential_house -->
+                            </select>
+
+                            <input id="eportfolio" type="checkbox" name="eportfolio" value="1" />
+                            <label for="eportfolio" class="checkbox-label">E-Portfolio</label>
+
+                            <input id="local_email" type="checkbox" name="local_email" value="1" />
+                            <label for="local_email" class="checkbox-label">Email Address from Username</label>
+
+                            <input id="mail_handler" type="checkbox" name="mail_handler" value="1"/>
+                            <label for="mail_handler" class="checkbox-label">Use External Mail Client</label>
+
+                            <input id="webmail" type="checkbox" name="webmail" value="1" />
+                            <label for="webmail" class="checkbox-label">Enable Webmail Tab</label>
+
+                            <input id="superuser" type="checkbox" name="superuser" data-role="superuser" value="1" />
+                            <label for="superuser" class="checkbox-label">Superuser</label>
+                        </div>
+                        <div class="small-12 columns">
+                            <input type="submit" name="submit" value="Add User" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
 </div>
+<script type="text/javascript" src="/javascript/components/jquery-validation/additional-methods.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirmDialog.js"></script>
+<script type="text/javascript">
+    $(function() {
+        /**
+         * User details validation
+         */
+        $('form[data-validatable-as="userDetails"]').validate({
+            rules: {
+                year: {
+                    yearLevel : true
+                },
+                alt_email: {
+                    email:true
+                },
+                firstname: {
+                    require_from_group: [1, '[data-relation="name"]']
+                },
+                lastname: {
+                    require_from_group: [1, '[data-relation="name"]']
+                }
+            },
+            messages: {
+                firstname: {
+                    require_from_group: "Please enter either a first name or surname"
+                },
+                lastname: {
+                    require_from_group: "Please enter either a first name or surname"
+                },
+                defaultCampus: "Please select a default campus",
+                alt_email: "If you are entering an alternative email, please ensure it's a valid address"
+            },
+            errorPlacement: function(error, element) {
+                if (element.is('[data-role="defaultCampus"]')) {
+                    error.css('margin', 0);
+                    error.insertAfter(element.closest('[data-role="campusList"]'));
+                } else {
+                    error.insertAfter(element)
+                }
+            }
+        });
+
+        /**
+         * Confirm update of superuser field
+         */
+        $('input[data-role="superuser"]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text: 'Change superuser status?',
+                confirmEvent: function(element) {
+                    element.prop('checked', !(element.prop('checked')));
+                }
+            });
+        });
+    });
+</script>
