@@ -44,6 +44,10 @@ class AdminV2_Nav
             $page->parse('admin_nav_item_block', 'admin_nav_item', true);
         }
 
+        $page->setVar(array(
+            'CURRENT_ADMIN_LOCATION' => $this->nav[$currentPage]
+        ));
+
         $page->parse('ADMIN_NAV', 'nav');
     }
 }
