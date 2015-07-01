@@ -83,6 +83,7 @@
 
 					config.element.usageTabulator({
 						url: config.url,
+                        title: config.title,
 						columns: config.columns,
 						orderBy: config.orderBy,
 						order: config.order,
@@ -170,7 +171,7 @@
 			/* Previous Navigator
 			 */
 			if (config.index > 0) {
-				pagination += '<li><a href="#" rel="' + (config.index-1) +'">&lsaqo;</a></li>';
+				pagination += '<li><a href="#" rel="' + (config.index-1) +'">&lsaquo;</a></li>';
 			}
 
 			/* Page Navigator
@@ -179,7 +180,7 @@
 				var active = '';
 
 				if (i == config.index) {
-					var active = 'active';
+					active = 'active';
 				}
 
 				pagination += '<li class="' + active + '" ><a href="#" rel="' + i +'">' + (i+1) + '</a></li>';
@@ -201,7 +202,7 @@
 		 */
 		function makeTable(datasets) {
 			var html = '\
-				<h3>{TITLE}</h3>\
+				<h2 class="subheader">{TITLE}</h2>\
 				<table>\
 					<thead>\
 						{THEAD}\
