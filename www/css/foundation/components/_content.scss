@@ -469,13 +469,13 @@ table{
 	border-collapse: collapse;
 	width: 100%;
 	thead tr th {
-	    border-bottom: 2px solid $white-smoke;
+	    border-bottom: 2px solid $body-bg;
 	}
 	tr:hover td{
 		background-color: $ocean-sunset;
 	}
-	td{
-		border-bottom: 1px solid $white-smoke;
+	td, th{
+		border-bottom: 1px solid $body-bg;
 		input[type=radio] +
 		label.radio-label,
 		input[type=checkbox] +
@@ -496,10 +496,8 @@ table{
 // White Islands - Custom 'Island' Columns
 .island {
   	@include grid-column();
-  	@media #{$small-up} {
-		padding: 0 rem-calc(($base-font-size - 8));
-	}
-	@media #{$medium-up} {
+
+	@media #{$small-up} {
 		padding: 0 rem-calc(($base-font-size - 4));
 	}
 	@media #{$large-up} {
@@ -513,9 +511,6 @@ table{
 	}
 	.content{
 		@media #{$small-up} {
-			padding: rem-calc(($base-font-size - 8));
-		}
-		@media #{$medium-up} {
 			padding: rem-calc(($base-font-size - 4));
 		}
 		@media #{$large-up} {
@@ -604,19 +599,16 @@ table{
 	@include single-transition(all, 0.15s, linear);
 }
 
-.row .island .row{
-	margin: 0;
-}
-
 // The original list
 // This list can use up to 4 columns
 // All other lists include (@extend) these styles
 .information-list{
+    @include responsive-sides(1, padding);
 	list-style: none;
 	margin: 0;
 	padding: 0;
 	li{
-		border-bottom: 1px solid $white-smoke;
+		border-bottom: 1px solid $body-bg;
 		position: relative;
 		overflow: visible;
 		list-style: none;
@@ -627,6 +619,10 @@ table{
 		&:last-child{
 			border: 0;
 		}
+        &.row-header {
+          font-weight: 700;
+          border-bottom: 2px solid $body-bg;
+        }
 		[class^="icon-"]:before,
 		[class*=" icon-"]:before{
 			float: none;
@@ -662,9 +658,6 @@ table{
 		.ten-column,
 		.eleven-column{
 			@media #{$small-up} {
-				padding: rem-calc(($base-font-size - 8));
-			}
-			@media #{$medium-up} {
 				padding: rem-calc(($base-font-size - 4));
 			}
 			@media #{$large-up} {
@@ -690,7 +683,7 @@ table{
 .subject-list{
 	@extend .information-list;
 	.subject-group{
-		border-bottom: 16px solid $white-smoke;
+		border-bottom: 16px solid $body-bg;
 	}
 	li{
 		a:hover{
@@ -752,7 +745,7 @@ table{
 	//@media #{$small-up} { @include block-grid(2); }
 	@extend .information-list;
 	li{
-		border-right: 1px solid $white-smoke;
+		border-right: 1px solid $body-bg;
 		border-bottom: 0;
 		&:last-child{
 			border: 0;
@@ -799,9 +792,6 @@ table{
 	&.two a,
 	&.three a{
 		@media #{$small-up} {
-			padding: rem-calc(($base-font-size - 8));
-		}
-		@media #{$medium-up} {
 			padding: rem-calc(($base-font-size - 4));
 		}
 		@media #{$large-up} {
