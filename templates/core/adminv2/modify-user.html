@@ -140,17 +140,19 @@
     <div class="small-12 island">
         <h2 class="subheader">Groups</h2>
         <section>
-            <div class="content">
-
-                <div class="row table-head">
-                    <div class="small-7 columns">Group Name</div>
-                    <div class="small-4 columns end">Access</div>
-                </div>
-
+            <ul class="action-list">
+                <li class="row row-header">
+                    <div class="small-7 columns"><div class="content">Group Name</div></div>
+                    <div class="small-4 columns end"><div class="content">Access</div></div>
+                </li>
                 <!-- BEGIN user_group -->
-                <div class="row table-row">
-                    <div class="small-7 columns"><a href="/homepage/{USER_GROUP_ID}">{USER_GROUP_NAME}</a></div>
-                    <div class="small-4 columns">
+                <li class="row" data-equalizer>
+                    <div class="small-7 columns">
+                        <div class="content">
+                            <a href="/homepage/{USER_GROUP_ID}">{USER_GROUP_NAME}</a>
+                        </div>
+                    </div>
+                    <div class="small-4 columns" data-equalizer-watch>
                         <form action="/adminv2/userForm.php" method="post">
                             <input type="hidden" name="uid" value="{USERID}" />
                             <input type="hidden" name="sid" value="{USER_GROUP_ID}" />
@@ -164,38 +166,37 @@
                             </select>
                         </form>
                     </div>
-                    <div class="small-1 columns">
-                        <a class="no-text icon-delete" title="Remove" href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}" ></a>
+                    <div class="actions one">
+                        <a class="no-text icon-delete" data-equalizer-watch title="Remove" href="/group/modifyForm.php?delete={USERID}&amp;categoryID={USER_GROUP_ID}" ></a>
                     </div>
-                </div>
+                </li>
                 <!-- END user_group -->
-
-                <div class="row table-row">
+                <li class="row">
                     <form action="/adminv2/userForm.php" method="post" id="groupAdd" data-validatable-as="addGroup">
-                    <div class="small-7 columns">
-                        <select required name="sid" id="groupSelect" form="groupAdd" class="required">
-                            <option value="">Please Select a Group</option>
-                            <!-- BEGIN all_group -->
-                            <option value="{ALL_GROUP_ID}">{ALL_GROUP_NAME}</option>
-                            <!-- END all_group -->
-                        </select>
-                    </div>
-                    <div class="small-4 columns">
-                        <select required name="type" form="groupAdd">
-                            <option value="1">Read</option>
-                            <option value="2">Write</option>
-                            <option value="3">Group Admin</option>
-                        </select>
-                    </div>
-                    <div class="small-1 columns">
-                        <input type="hidden" name="groupSubmit" />
-                        <input type="hidden" value="{USERID}" name="uid" />
-                        <input type="hidden" value="1" name="service" />
-                        <input type="submit" value="Add" />
-                    </div>
+                        <div class="small-7 columns">
+                            <select required name="sid" id="groupSelect" form="groupAdd" class="required">
+                                <option value="">Select a Group</option>
+                                <!-- BEGIN all_group -->
+                                <option value="{ALL_GROUP_ID}">{ALL_GROUP_NAME}</option>
+                                <!-- END all_group -->
+                            </select>
+                        </div>
+                        <div class="small-4 columns end">
+                            <select required name="type" form="groupAdd">
+                                <option value="1">Read</option>
+                                <option value="2">Write</option>
+                                <option value="3">Group Admin</option>
+                            </select>
+                        </div>
+                        <div class="small-12 columns">
+                            <input type="hidden" name="groupSubmit" />
+                            <input type="hidden" value="{USERID}" name="uid" />
+                            <input type="hidden" value="1" name="service" />
+                            <p><input type="submit" value="Add" /></p>
+                        </div>
                     </form>
-                </div>
-            </div>
+                </li>
+            </ul>
         </section>
     </div>
 </div>
@@ -204,19 +205,17 @@
     <div class="small-12 island">
         <h2 class="subheader" id="permissions">Permissions</h2>
         <section>
-            <div class="content">
-
-                <div class="row table-head">
-                    <div class="small-4 columns">Service</div>
-                    <div class="small-4 columns">Campus</div>
-                    <div class="small-3 columns end">Access</div>
-                </div>
-
+            <ul class="action-list">
+                <li class="row row-header">
+                    <div class="small-4 columns"><div class="content">Service</div></div>
+                    <div class="small-4 columns"><div class="content">Campus</div></div>
+                    <div class="small-3 columns end"><div class="content">Access</div></div>
+                </li>
                 <!-- BEGIN user_calendar -->
-                <div class="row table-row">
-                    <div class="small-4 columns">Calendar</div>
-                    <div class="small-4 columns">{PERM_CAMPUS_NAME}</div>
-                    <div class="small-3 columns">
+                <li class="row" data-equalizer>
+                    <div class="small-4 columns"><div class="content">Calendar</div></div>
+                    <div class="small-4 columns"><div class="content">{PERM_CAMPUS_NAME}</div></div>
+                    <div class="small-3 columns" data-equalizer-watch>
                         <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
                             <input type="hidden" name="uid" value="{USERID}" />
                             <input type="hidden" name="sid" value="{SID}" />
@@ -229,17 +228,17 @@
                             </select>
                         </form>
                     </div>
-                    <div class="small-1 columns">
-                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="no-text icon-delete" title="Remove"></a>
+                    <div class="actions one">
+                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="no-text icon-delete" title="Remove" data-equalizer-watch></a>
                     </div>
-                </div>
+                </li>
                 <!-- END user_calendar -->
 
                 <!-- BEGIN user_news -->
-                <div class="row table-row">
-                    <div class="small-4 columns">News</div>
-                    <div class="small-4 columns">{PERM_CAMPUS_NAME}</div>
-                    <div class="small-3 columns">
+                <li class="row" data-equalizer>
+                    <div class="small-4 columns"><div class="content">News</div></div>
+                    <div class="small-4 columns"><div class="content">{PERM_CAMPUS_NAME}</div></div>
+                    <div class="small-3 columns" data-equalizer-watch>
                         <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
                             <input type="hidden" name="uid" value="{USERID}" />
                             <input type="hidden" name="sid" value="{SID}" />
@@ -252,17 +251,17 @@
                             </select>
                         </form>
                     </div>
-                    <div class="small-1 columns">
-                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="no-text icon-delete" title="Remove"></a>
+                    <div class="actions one">
+                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="no-text icon-delete" title="Remove" data-equalizer-watch></a>
                     </div>
-                </div>
+                </li>
                 <!-- END user_news -->
 
                 <!-- BEGIN user_cms -->
-                <div class="row table-row">
-                    <div class="small-4 columns">CMS</div>
-                    <div class="small-4 columns">{PERM_CAMPUS_NAME}</div>
-                    <div class="small-3 columns">
+                <li class="row" data-equalizer>
+                    <div class="small-4 columns"><div class="content">CMS</div></div>
+                    <div class="small-4 columns"><div class="content">{PERM_CAMPUS_NAME}</div></div>
+                    <div class="small-3 columns" data-equalizer-watch>
                         <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
                             <input type="hidden" name="uid" value="{USERID}" />
                             <input type="hidden" name="sid" value="{SID}" />
@@ -275,17 +274,16 @@
                             </select>
                         </form>
                     </div>
-                    <div class="small-1 columns">
-                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="no-text icon-delete" title="Remove"></a>
+                    <div class="actions one">
+                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="no-text icon-delete" title="Remove" data-equalizer-watch></a>
                     </div>
-                </div>
+                </li>
                 <!-- END user_cms -->
 
                 <!-- BEGIN user_housemaster -->
-                <div class="row table-row">
-                    <div class="small-4 columns">Housemaster</div>
-                    <div class="small-4 columns"></div>
-                    <div class="small-3 columns">
+                <li class="row" data-equalizer>
+                    <div class="small-8 columns"><div class="content">Housemaster</div></div>
+                    <div class="small-3 columns" data-equalizer-watch>
                         <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
                             <input type="hidden" name="uid" value="{USERID}" />
                             <input type="hidden" name="sid" value="{SID}" />
@@ -298,17 +296,16 @@
                             </select>
                         </form>
                     </div>
-                    <div class="small-1 columns">
-                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="no-text icon-delete" title="Remove"></a>
+                    <div class="actions one">
+                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="no-text icon-delete" title="Remove" data-equalizer-watch></a>
                     </div>
-                </div>
+                </li>
                 <!-- END user_housemaster -->
 
                 <!-- BEGIN user_resource_booking -->
-                <div class="row table-row">
-                    <div class="small-4 columns">Resource Booking</div>
-                    <div class="small-4 columns"></div>
-                    <div class="small-3 columns">
+                <li class="row" data-equalizer>
+                    <div class="small-8 columns"><div class="content">Resource Booking</div></div>
+                    <div class="small-3 columns" data-equalizer-watch>
                         <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
                             <input type="hidden" name="uid" value="{USERID}" />
                             <input type="hidden" name="sid" value="{SID}" />
@@ -321,17 +318,16 @@
                             </select>
                         </form>
                     </div>
-                    <div class="small-1 columns">
-                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="no-text icon-delete" title="Remove"></a>
+                    <div class="actions one">
+                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="no-text icon-delete" title="Remove" data-equalizer-watch></a>
                     </div>
-                </div>
+                </li>
                 <!-- END user_resource_booking -->
 
                 <!-- BEGIN user_curriculum -->
-                <div class="row table-row">
-                    <div class="small-4 columns">Curriculum</div>
-                    <div class="small-4 columns"></div>
-                    <div class="small-3 columns">
+                <li class="row" data-equalizer>
+                    <div class="small-8 columns"><div class="content">Curriculum</div></div>
+                    <div class="small-3 columns" data-equalizer-watch>
                         <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
                             <input type="hidden" name="uid" value="{USERID}" />
                             <input type="hidden" name="sid" value="{SID}" />
@@ -344,13 +340,14 @@
                             </select>
                         </form>
                     </div>
-                    <div class="small-1 columns">
-                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="no-text icon-delete" title="Remove"></a>
+                    <div class="actions one">
+                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="no-text icon-delete" title="Remove" data-equalizer-watch></a>
                     </div>
-                </div>
+                </li>
+
                 <!-- END user_curriculum -->
-                <form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" data-validatable-as="addService" data-action="addService">
-                <div class="row table-row">
+                <li class="row">
+                    <form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" data-validatable-as="addService" data-action="addService">
                     <div class="small-4 columns">
                         <select data-role="serviceSelector" name="service" id="serviceSelect" form="serviceCloneForm" required>
                             <option value="">Select Service</option>
@@ -372,7 +369,7 @@
                             <!-- END campusPermsList -->
                         </select>
                     </div>
-                    <div class="small-3 columns">
+                    <div class="small-3 columns end">
                         <select name="type" form="serviceCloneForm" required>
                             <option value="1">Read</option>
                             <option value="2">Write</option>
@@ -381,12 +378,12 @@
                         <input type="hidden" name="addService" />
                         <input type="hidden" value="{USERID}" name="uid">
                     </div>
-                    <div class="small-1 columns">
+                    <div class="small-12 columns">
                         <input type="submit" class="submit-btn-plain" value="Add" name="serviceSubmit">
                     </div>
-                </div>
-                </form>
-            </div>
+                    </form>
+                </li>
+            </ul>
         </section>
     </div>
 </div>
@@ -395,36 +392,31 @@
     <div class="small-12 island">
         <h2 class="subheader" id="linked">Linked Accounts</h2>
         <section>
-            <div class="content">
-
-                <div class="row table-head">
-                    <div class="small-11 columns end">
-                        User Account
-                    </div>
-                </div>
+            <ul class="action-list">
                 <!-- BEGIN user_linked -->
-                <div class="row table-row">
+                <li class="row">
                     <div class="small-11 columns">
-                        <a href="/adminv2/modify-user/{LINKED_USER_ID}">{LINKED_USER}</a>
+                        <div class="content">
+                            <a href="/adminv2/modify-user/{LINKED_USER_ID}">{LINKED_USER}</a>
+                        </div>
                     </div>
-                    <div class="small-1 columns">
+                    <div class="actions one">
                         <a href="/adminv2/userForm.php?deleteUserLink={USERID}&amp;linkedUser={LINKED_USER_ID}" class="no-text icon-delete" title="Remove"></a>
                     </div>
-                </div>
+                </li>
                 <!-- END user_linked -->
-
-                <div class="row table-row">
+                <li class="row">
                     <form action="/adminv2/userForm.php" method="post" id="linkedUserAdd">
-                        <div class="small-11 columns">
+                        <div class="small-12 columns">
                             <select data-selectizeuser="addUser" name="linkUser[]" multiple placeholder="Search Users" form="linkedUserAdd"></select>
                         </div>
-                        <div class="small-1 columns">
+                        <div class="small-12 columns">
                             <input type="hidden" name="userID" value="{USERID}" />
                             <input type="submit" value="Add" disabled />
                         </div>
                     </form>
-                </div>
-            </div>
+                </li>
+            </ul>
         </section>
     </div>
 </div>
@@ -491,22 +483,20 @@
         <h2 class="subheader">
             Send Message to {FULLNAME}
         </h2>
-
         <section>
             <div class="content">
                 <p><em>{FIRSTNAME} must be signed in to receive a popup alert.</em></p>
                 <form action="/adminv2/sendAlert" method="POST">
                     <input type="hidden" name="user" value="{USERID}" />
                     <div class="row">
-                        <div class="small-10 columns">
+                        <div class="small-12 columns">
                             <label>
                                 <strong>Message from {SITE_LOGINNAME}:</strong>
                                 <input type="text" value="" name="body" />
                             </label>
                         </div>
-                        <div class="small-2 columns">
+                        <div class="small-12 columns">
                             <label>
-                                <br/>
                                 <input type="submit" value="Send" />
                             </label>
                         </div>
