@@ -57,6 +57,9 @@ class Portrait extends BrokenFS
         $this->setExternalUserId($externalId);
 
         $portraitPath = $this->getExternalHandler()->getPortrait($this->getExternalUserId());
+        if (!$portraitPath) {
+            throw new Exception_Schoolbox_NotFound('Portrait not found');
+        }
 
         // truncate the dir for Flysystem
         $portraitPath = str_replace($this->getConfig()->get('portrait_dir'), '', $portraitPath);
