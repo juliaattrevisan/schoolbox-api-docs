@@ -1,48 +1,48 @@
-<script type="text/javascript" src="/javascript/chat.js"></script>
-<script type="text/javascript">
-    $(function () {
-        $('#component{COMPONENT_INSTANCE_ID}').chat({
-            state: '{CHAT_STATE}',
-            category_id: '{ID}',
-            component_id: '{CHAT_COMPONENT_ID}',
-            user_id: '{CHAT_USER_ID}',
-            user_ext_id: '{CHAT_USER_EXT_ID}',
-            user_name: '{CHAT_USER_NAME}',
-            user_perm: '{CHAT_USER_PERM}',
-            log_el: 'ul.chat-messages',
-            send_el: 'a.btn.chat'
-        });
-
-        $('.show-users').click(function(event) {
-            event.preventDefault();
-            $('.chat-users').slideToggle();
-            $(this).toggleClass('active')
-        });
-
-        /* IE : defer focus to the chat message box */
-        $(document).on('focus', '#component{COMPONENT_INSTANCE_ID}', function() {
-            var msgbox = document.getElementById('component{COMPONENT_INSTANCE_ID}-chatmessage');
-            if(msgbox && msgbox.setActive) {
-                msgbox.setActive();
-            }
-        });
-    });
-</script>
-<!-- BEGIN chat_staff_js -->
-<script type="text/javascript">
-    window.check = true;
-    window.onbeforeunload = function (e) {
-        if(window.check) if($('#component{COMPONENT_INSTANCE_ID}').chat("get_state") == 'Active') {
-            var confirm = "If you leave this page, the chat will be disabled for any students still in it.";
-            var e = e || window.event;
-            if (e) { e.returnValue = confirm; }
-            return confirm;
-        }
-    };
-</script>
-<!-- END chat_staff_js -->
-
 <div class="box chat clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    <script type="text/javascript" src="/javascript/chat.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('#component{COMPONENT_INSTANCE_ID}').chat({
+                state: '{CHAT_STATE}',
+                category_id: '{ID}',
+                component_id: '{CHAT_COMPONENT_ID}',
+                user_id: '{CHAT_USER_ID}',
+                user_ext_id: '{CHAT_USER_EXT_ID}',
+                user_name: '{CHAT_USER_NAME}',
+                user_perm: '{CHAT_USER_PERM}',
+                log_el: 'ul.chat-messages',
+                send_el: 'a.btn.chat'
+            });
+
+            $('.show-users').click(function(event) {
+                event.preventDefault();
+                $('.chat-users').slideToggle();
+                $(this).toggleClass('active')
+            });
+
+            /* IE : defer focus to the chat message box */
+            $(document).on('focus', '#component{COMPONENT_INSTANCE_ID}', function() {
+                var msgbox = document.getElementById('component{COMPONENT_INSTANCE_ID}-chatmessage');
+                if(msgbox && msgbox.setActive) {
+                    msgbox.setActive();
+                }
+            });
+        });
+    </script>
+    <!-- BEGIN chat_staff_js -->
+    <script type="text/javascript">
+        window.check = true;
+        window.onbeforeunload = function (e) {
+            if(window.check) if($('#component{COMPONENT_INSTANCE_ID}').chat("get_state") == 'Active') {
+                var confirm = "If you leave this page, the chat will be disabled for any students still in it.";
+                var e = e || window.event;
+                if (e) { e.returnValue = confirm; }
+                return confirm;
+            }
+        };
+    </script>
+    <!-- END chat_staff_js -->
+
     {CONFIGURATION}
 
     <div data-collapsable='true' class="{CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
