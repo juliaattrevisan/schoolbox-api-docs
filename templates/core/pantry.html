@@ -132,7 +132,33 @@
     <div class="row">
         <div class="small-12 island">
             <section>
-                <ul class="action-list">
+                <div class="component-form editPanel">
+                    <!-- BEGIN socialstream_has_newpost -->
+                    <form action='/socialstream/modifyForm.php' method='post' id='socialstream-form-default-{COMPONENT_INSTANCE_ID}' class='addPostForm {FORM_CLASS}' enctype='multipart/form-data'>
+                        <input type='hidden' name='type' value='string' />
+                        <input type='hidden' name='instanceId' value='{COMPONENT_INSTANCE_ID}' />
+                        <input type='hidden' name='homepageId' value='{HOMEPAGE_ID}'/>
+                        <input type='hidden' name='parentId' value='0' />
+                        <input type='hidden' name='rootId' value='0' />
+
+                        <textarea rows="3" cols="50" name="body" placeholder="Share something"></textarea>
+
+                        <div class="dz-wrap">
+                            <div class="row post-attachment attach">
+                                <div class="small-12 medium-9 columns">
+                                    <div class="dropzone" id="socialZone" action="/cms/myFileForm.php?ajax=1"></div>
+                                </div>
+                                <p class="small-12 medium-1 columns"><strong>or</strong></p>
+                                <p class="small-12 medium-2 columns">
+                                    <a class='button icon-link stream-attachment' data-value='url'>Link</a>
+                                </p>
+                            </div>
+                        </div>
+                        <input class='submit-btn-plain' type='submit' value='Post' />
+                    </form>
+                    <!-- END socialstream_has_newpost -->
+                </div>
+                <ul class="action-list social-stream">
                     <li class="row" data-equalizer="no">
                         <div class="ten-column" data-equalizer-watch="no">
                             <div class="avatar-card">
@@ -168,7 +194,7 @@
                             <a href="#" class="no-text icon-comment" title="Comment" data-equalizer-watch></a>
                             <a href="#" class="no-text icon-delete" title="Delete" data-equalizer-watch></a>
                         </div>
-                        <ul class="reply">
+                        <ul class="action-list reply">
                             <li class="row" data-equalizer="two">
                                 <div class="ten-column" data-equalizer-watch="two">
                                     <div class="avatar-card">
@@ -186,7 +212,7 @@
                                     <a href="#" class="no-text icon-comment" title="Comment" data-equalizer-watch></a>
                                     <a href="#" class="no-text icon-delete" title="Delete" data-equalizer-watch></a>
                                 </div>
-                                <ul class="reply">
+                                <ul class="action-list reply">
                                     <li class="row" data-equalizer="three">
                                         <div class="ten-column" data-equalizer-watch="three">
                                             <div class="avatar-card">
@@ -203,6 +229,41 @@
                                         <div class="actions two" data-equalizer-watch="three">
                                             <a href="#" class="no-text icon-comment" title="Comment" data-equalizer-watch></a>
                                             <a href="#" class="no-text icon-delete" title="Delete" data-equalizer-watch></a>
+                                        </div>
+                                        <div class="component-form editPanel">
+                                            <!-- BEGIN socialstream_has_newpost -->
+                                            <form action='/socialstream/modifyForm.php' method='post' id='socialstream-form-default-{COMPONENT_INSTANCE_ID}' class='addPostForm {FORM_CLASS}' enctype='multipart/form-data'>
+                                                <input type='hidden' name='type' value='string' />
+                                                <input type='hidden' name='instanceId' value='{COMPONENT_INSTANCE_ID}' />
+                                                <input type='hidden' name='homepageId' value='{HOMEPAGE_ID}'/>
+                                                <input type='hidden' name='parentId' value='0' />
+                                                <input type='hidden' name='rootId' value='0' />
+
+                                                <textarea rows="3" cols="50" name="body" placeholder="This is the reply form"></textarea>
+
+                                                <div class="dz-wrap">
+                                                    <div class="row post-attachment attach">
+                                                        <div class="small-12s medium-9 columns">
+                                                            <div class="dropzone" id="socialZone2" action="/cms/myFileForm.php?ajax=1"></div>
+                                                        </div>
+                                                        <p class="small-12 medium-1 columns"><strong>or</strong></p>
+                                                        <p class="small-12 medium-2 columns">
+                                                            <a class='button icon-link stream-attachment' data-value='url'>Link</a>
+                                                        </p>
+                                                    </div>
+
+                                                    <div class="post-attachment url" style="display:none;">
+                                                        <label>
+                                                            <input type='text' class='url' name='url' maxlength='1024' placeholder="http://" />
+                                                        </label>
+                                                        <p class="alt-src">
+                                                            or <a class='button icon-image stream-attachment' data-value='attach'>Attach</a>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <input class='submit-btn-plain' type='submit' value='Post' />
+                                            </form>
+                                            <!-- END socialstream_has_newpost -->
                                         </div>
                                     </li>
                                 </ul>
@@ -1746,6 +1807,14 @@
         $(function() {
             $("#datepicker").datepicker();
         });
+
+        Dropzone.options.socialZone = {
+            addRemoveLinks: true,
+        };
+
+        Dropzone.options.socialZone2 = {
+            addRemoveLinks: true,
+        };
 
         Dropzone.options.myAwesomeDropzone = {
             addRemoveLinks: true,

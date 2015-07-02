@@ -706,7 +706,6 @@ table{
 		ul{
 			clear: both;
 			margin: 0;
-			padding: 0 !important;
 			li:last-child{
 				padding-bottom: 0;
 			}
@@ -818,7 +817,7 @@ table{
 }
 
 // Social Stream
-ul{
+.social-stream{
 	@extend .information-list;
 	.body{
 		margin: rem-calc(($base-font-size - 8)) 0 rem-calc(($base-font-size - 8)) 74px;
@@ -826,13 +825,14 @@ ul{
 	.reply{
 		border-top: 1px solid $body-bg;
 		clear: both;
-		margin-left: 4.7rem;
-		li{
+		margin-left: 4.3rem;
+		li,
+		.component-form{
 			clear: both;
 		}
 	}
 
-	@media #{$small-up} {
+	@media #{$small-only} {
 		.body{
 			margin: rem-calc(($base-font-size - 8)) 0;
 		}
