@@ -15,10 +15,10 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 use Alaress\Lumberjack\Logger;
 
-$log = new Logger;
-$mapper = Plagscan_DocumentMapper::getInstance();
-$docs   = $mapper->findByColumn('status', Plagscan_Document::STATUS_QUEUED);
+$opts = getopt('', ['re-retrieve']);
+$reRetrieveMode = isset($opts['re-retrieve']);
 
+$log = new Logger();
 
 //
 // Hit the Plagscan API for each document.
@@ -29,8 +29,18 @@ if (empty($username) || empty($key)) {
 	exit;
 }
 
-
 $log->info("Plagscan scan started");
+
+// Get documents
+$mapper = Plagscan_DocumentMapper::getInstance();
+if ($reRetrieveMode) {
+    $log->info("Scanner running in re-retrieve mode");
+    $docs = $mapper->findByColumn('status', Plagscan_Document::STATUS_COMPLETE);
+} else {
+    $log->info("Scanner running in scan mode");
+    $docs = $mapper->findByColumn('status', Plagscan_Document::STATUS_QUEUED);
+}
+
 $gateway      = new Plagscan_Gateway($username, $key);
 $updated_docs = 0;
 foreach ($docs as $doc) {
@@ -55,8 +65,10 @@ foreach ($docs as $doc) {
         //
         // Is this document scannable? If not, mark as such and don't scan again.
         if ((string)$stats->MSG === 'ERR') {
-            $doc->setStatus(Plagscan_Document::STATUS_UNSCANNABLE);
-            Plagscan_DocumentMapper::getInstance()->save($doc);
+            if (!$reRetrieveMode) {
+                $doc->setStatus(Plagscan_Document::STATUS_UNSCANNABLE);
+                Plagscan_DocumentMapper::getInstance()->save($doc);
+            }
             $log->error("Document unscannable: ". print_r( $stats, true ));
             continue;
         }
@@ -65,21 +77,24 @@ foreach ($docs as $doc) {
         // Has a level been retrieved yet? How can I tell?
         $level = (string)$stats->LEVEL;
         if (strlen($level) > 0) {
-            $doc->setScore($level / 10)
-                ->setStatus(Plagscan_Document::STATUS_COMPLETE)
-                ->setHtml($gateway->retrieve($doc_id, Plagscan_Gateway::MODE_RETRIEVE_HTML_INTERACTIVE));
+            if (!$reRetrieveMode) {
+                $doc->setScore($level / 10)
+                    ->setStatus(Plagscan_Document::STATUS_COMPLETE);
+            }
+            $doc->setHtml(
+                $gateway->retrieve(
+                    $doc_id,
+                    Plagscan_Gateway::MODE_RETRIEVE_HTML_INTERACTIVE
+                )
+            );
             Plagscan_DocumentMapper::getInstance()->save($doc);
             $updated_docs++;
             $log->info("Retrieved scan status for $doc_id");
-        }
-        else {
-
+        } else {
             $response = $gateway->check($doc_id);
-
             $log->warning("Bad level for document, still pending result: ".print_r($stats,true).print_r($response,true));
-
         }
     }
 }
 
-$log->info("Plagscan scan completed ".$updated_docs." scanned");
+$log->info("Plagscan scan completed - $updated_docs documents scanned");
