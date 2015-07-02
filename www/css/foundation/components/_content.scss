@@ -515,8 +515,13 @@ table{
 // White Islands - Custom 'Island' Columns
 .island {
   	@include grid-column();
-	@include responsive-sides(1, padding);
-	
+
+	@media #{$small-up} {
+		padding: 0 rem-calc(($base-font-size - 4));
+	}
+	@media #{$large-up} {
+		padding: 0 rem-calc(($base-font-size));
+	}
 	// Only sections inside islands have these styles
   	section{
 		background-color: $white;
@@ -602,7 +607,7 @@ table{
 // This list can use up to 4 columns
 // All other lists include (@extend) these styles
 .information-list{
-    @include responsive-sides(1, padding);
+	@include responsive-sides(1, padding);
 	list-style: none;
 	margin: 0;
 	padding: 0;

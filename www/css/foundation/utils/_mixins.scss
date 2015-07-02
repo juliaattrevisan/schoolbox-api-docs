@@ -149,7 +149,7 @@
     #{$property}-left: rem-calc(($multiplier * ($base-font-size - 8)));
     #{$property}-right: rem-calc(($multiplier * ($base-font-size - 8)));
   }
-  @media #{$small-up} {
+  @media #{$medium-up} {
     #{$property}-left: rem-calc(($multiplier * ($base-font-size - 4)));
     #{$property}-right: rem-calc(($multiplier * ($base-font-size - 4)));
   }
