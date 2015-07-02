@@ -516,12 +516,7 @@ table{
 .island {
   	@include grid-column();
 
-	@media #{$small-up} {
-		padding: 0 rem-calc(($base-font-size - 4));
-	}
-	@media #{$large-up} {
-		padding: 0 rem-calc(($base-font-size));
-	}
+	@include responsive-sides(1, padding);
 	// Only sections inside islands have these styles
   	section{
 		background-color: $white;
@@ -662,6 +657,9 @@ table{
 		.ten-column,
 		.eleven-column{
 			@media #{$small-up} {
+				padding: rem-calc(($base-font-size - 8));
+			}
+			@media #{$medium-up} {
 				padding: rem-calc(($base-font-size - 4));
 			}
 			@media #{$large-up} {
@@ -708,6 +706,7 @@ table{
 		ul{
 			clear: both;
 			margin: 0;
+			padding: 0 !important;
 			li:last-child{
 				padding-bottom: 0;
 			}
