@@ -18,7 +18,7 @@ use Alaress\Lumberjack\Logger;
 $opts = getopt('', ['re-retrieve']);
 $reRetrieveMode = isset($opts['re-retrieve']);
 
-$log = new Logger;
+$log = new Logger();
 
 //
 // Hit the Plagscan API for each document.
