@@ -1,8 +1,10 @@
 <script type="text/javascript">
 	$(function() {
-		$('#category li:first-child a').addClass('current');
-		$('ul.topic li:first-child').show();
+        // Show all news in first category
+        var firstCategory = $('#category li:first-child a').addClass('current');
+        $('ul.topic li').filter('.'+firstCategory.attr('title')).show();
 
+        // Switch titles
 		$('#category a').click(function(event) {
 			event.preventDefault();
 			if (!$(this).hasClass("current")) {
@@ -12,7 +14,6 @@
 				$('ul.topic > li').hide();
 				$('ul.topic > li.' + el).show();
 			}
-			return false;
 		});
 	});
 </script>
