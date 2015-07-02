@@ -63,8 +63,9 @@
         <div class="row">
             <div class="small-12 island">
                 <span class="header-actions">
-                    <a href="/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase" class="button icon-next">Showcased work</a>
+                    <a href="/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase" class="button icon-next">Showcased Work</a>
                 </span>
+
                 <h2 class="subheader">Recent Showcased Work</h2>
                 <section>
                     <table>
@@ -78,20 +79,27 @@
                             <!-- BEGIN showcased_work -->
                             <tr>
                                 <!-- BEGIN has_submission -->
-                                <td class="icon"><a class="icons {SHOWCASED_WORK_MIMETYPE_ICONFILE}" href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1"></a></td>
-                                <td><a class="title" href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1">
+                                <td>
+                                    {SHOWCASED_WORK_MIMETYPE_ICONFILE}
+                                    <a class="{SHOWCASED_WORK_MIMETYPE_ICONFILE}" href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1"></a>
+                                </td>
+                                <td>
+                                    <a href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1">
                                     {SHOWCASED_WORK_BOX_NAME}</a> ({SHOWCASED_WORK_SUBMISSION_FILESIZE})<br />
-                                    <a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></td>
+                                    <a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a>
+                                </td>
                                 <!-- END has_submission -->
 
                                 <!-- BEGIN no_submission -->
                                 <td></td>
-                                <td>{SHOWCASED_WORK_BOX_NAME} ({SHOWCASED_WORK_SUBMISSION_FILESIZE})<br />
-                                    <a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></td>
+                                <td>
+                                    {SHOWCASED_WORK_BOX_NAME} ({SHOWCASED_WORK_SUBMISSION_FILESIZE})<br />
+                                    <a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a>
+                                </td>
                                 <!-- END no_submission -->
 
                                 <td>{SHOWCASED_WORK_SUBMISSION_SUBMITTED}</td>
-                                <td class="grade"><span class="gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">{SHOWCASED_WORK_RETURNED_MARK}</span></td>
+                                <td><span class="gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">{SHOWCASED_WORK_RETURNED_MARK}</span></td>
                             </tr>
                             <!-- END showcased_work -->
                         </tbody>
