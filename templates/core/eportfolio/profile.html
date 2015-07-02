@@ -59,9 +59,98 @@
 
 <div class="row">
     <div class="small-8 island">
-        <section>
+        <!-- BEGIN has_showcased_work -->
+        <div class="row">
+            <div class="small-12 island">
+                <span class="header-actions">
+                    <a href="/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase" class="button icon-next">Showcased work</a>
+                </span>
+                <h2 class="subheader">Recent Showcased Work</h2>
+                <section>
+                    <table>
+                        <colgroup>
+                            <col width="10%" />
+                            <col />
+                            <col />
+                            <col width="10%" />
+                        </colgroup>
+                        <tbody>
+                            <!-- BEGIN showcased_work -->
+                            <tr>
+                                <!-- BEGIN has_submission -->
+                                <td class="icon"><a class="icons {SHOWCASED_WORK_MIMETYPE_ICONFILE}" href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1"></a></td>
+                                <td><a class="title" href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1">
+                                    {SHOWCASED_WORK_BOX_NAME}</a> ({SHOWCASED_WORK_SUBMISSION_FILESIZE})<br />
+                                    <a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></td>
+                                <!-- END has_submission -->
 
-        </section>
+                                <!-- BEGIN no_submission -->
+                                <td></td>
+                                <td>{SHOWCASED_WORK_BOX_NAME} ({SHOWCASED_WORK_SUBMISSION_FILESIZE})<br />
+                                    <a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></td>
+                                <!-- END no_submission -->
+
+                                <td>{SHOWCASED_WORK_SUBMISSION_SUBMITTED}</td>
+                                <td class="grade"><span class="gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">{SHOWCASED_WORK_RETURNED_MARK}</span></td>
+                            </tr>
+                            <!-- END showcased_work -->
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+        </div>
+        <!-- END has_showcased_work -->
+
+        <!-- BEGIN no_showcased_work -->
+        <!--<p>{USER_FIRSTNAME} {USER_LASTNAME} has no showcased work.</p>-->
+        <!-- END no_showcased_work -->
+
+        <!-- BEGIN has_recent_blog -->
+        <div class="row">
+            <div class="small-12 island">
+                <h2 class="subheader">Recent Journals</h2>
+                <section>
+                    <table>
+                        <colgroup>
+                            <col width="20%">
+                            <col />
+                        </colgroup>
+                        <tbody>
+                            <!-- BEGIN recent_blog -->
+                            <tr>
+                                <td>{RECENT_BLOG_CREATED_AT}</td>
+                                <td><a href="/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{RECENT_BLOG_PAGE_ID}#blog_{RECENT_BLOG_BLOG_ID}">{RECENT_BLOG_TITLE}</a></td>
+                            </tr>
+                            <!-- END recent_blog -->
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+        </div>
+        <!-- END has_recent_blog -->
+
+        <!-- BEGIN no_recent_blog -->
+        <!--<p>{USER_FIRSTNAME} {USER_LASTNAME} has no recent blogs.</p>-->
+        <!-- END no_recent_blog -->
+
+        <!-- BEGIN has_recent_photo -->
+        <div class="row">
+            <div class="small-12 island">
+                <h2 class="subheader">Recent Photos</h2>
+                <section>
+                    <!-- BEGIN recent_photo -->
+                    <a href="/cms/myImage.php?id={RECENT_PHOTO_FILE_ID}&amp;key=eportfolioImageGalleryLarge" title="{RECENT_PHOTO_FILE_DESC}" rel="lightbox-eportfolio">
+                        <img alt="{RECENT_PHOTO_FILE_DESC}" src='/cms/myImage.php?id={RECENT_PHOTO_FILE_ID}&amp;key=eportfolioRecentPhoto' />
+                    </a>
+                    <!-- END recent_photo -->
+                </section>
+            </div>
+        </div>
+        <!-- END has_recent_photo -->
+
+        <!-- BEGIN no_recent_photo -->
+        <!--<p>{USER_FIRSTNAME} {USER_LASTNAME} has no recent photos.</p>-->
+        <!-- END no_recent_photo -->
     </div>
     <div class="small-4 island">
         <!-- BEGIN has_subjects -->
@@ -108,95 +197,6 @@
         </div>
         <!-- END has_groups -->
     </div>
-</div>
-
-
-
-
-
-
-
-
-<div class="left clearfix" style="width: 69%">
-	<!-- BEGIN has_showcased_work -->
-    <div class="box component">
-        <h2>Recent Showcased Work
-            <a href="/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase" class="btn"><span></span>Showcased work</a>
-        </h2>
-        <div class="listing">
-            <table class="showcased-work table">
-                <colgroup>
-                    <col width="46" />
-                    <col />
-                    <col />
-                    <col width="142" />
-                </colgroup>
-                <tbody>
-                <!-- BEGIN showcased_work -->
-                <tr class="{ON_OFF}">
-                    <!-- BEGIN has_submission -->
-                    <td class="icon"><a class="icons {SHOWCASED_WORK_MIMETYPE_ICONFILE}" href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1"></a></td>
-                    <td><a class="title" href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1">
-                        {SHOWCASED_WORK_BOX_NAME}</a> ({SHOWCASED_WORK_SUBMISSION_FILESIZE})<br />
-                        <a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></td>
-                    <!-- END has_submission -->
-                    <!-- BEGIN no_submission -->
-                    <td></td>
-                    <td>{SHOWCASED_WORK_BOX_NAME} ({SHOWCASED_WORK_SUBMISSION_FILESIZE})<br />
-                        <a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></td>
-                    <!-- END no_submission -->
-                    <td>{SHOWCASED_WORK_SUBMISSION_SUBMITTED}</td>
-                    <td class="grade"><span class="gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">{SHOWCASED_WORK_RETURNED_MARK}</span></td>
-                </tr>
-                <!-- END showcased_work -->
-                </tbody>
-            </table>
-
-        </div>
-    </div>
-	<!-- END has_showcased_work -->
-	<!-- BEGIN no_showcased_work -->
-	<!--<p>{USER_FIRSTNAME} {USER_LASTNAME} has no showcased work.</p>-->
-	<!-- END no_showcased_work -->
-
-	<!-- BEGIN has_recent_blog -->
-    <div class="box component">
-        <h2>Recent Journals</h2>
-        <div class="listing">
-
-            <table class="upcoming-work table">
-                <tbody>
-					<!-- BEGIN recent_blog -->
-					<tr class="{ON_OFF}">
-						<td>{RECENT_BLOG_CREATED_AT}</td>
-						<td><a class="title" href="/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{RECENT_BLOG_PAGE_ID}#blog_{RECENT_BLOG_BLOG_ID}">{RECENT_BLOG_TITLE}</a></td>
-					</tr>
-					<!-- END recent_blog -->
-                </tbody>
-            </table>
-
-        </div>
-    </div>
-	<!-- END has_recent_blog -->
-	<!-- BEGIN no_recent_blog -->
-	<!--<p>{USER_FIRSTNAME} {USER_LASTNAME} has no recent blogs.</p>-->
-	<!-- END no_recent_blog -->
-
-	<!-- BEGIN has_recent_photo -->
-    <div class="box component">
-        <h2>Recent Photos</h2>
-        <div class="listing photos">
-			<!-- BEGIN recent_photo -->
-            <a href="/cms/myImage.php?id={RECENT_PHOTO_FILE_ID}&amp;key=eportfolioImageGalleryLarge" title="{RECENT_PHOTO_FILE_DESC}" rel="lightbox-eportfolio">
-				<img alt="{RECENT_PHOTO_FILE_DESC}" src='/cms/myImage.php?id={RECENT_PHOTO_FILE_ID}&amp;key=eportfolioRecentPhoto' />
-            </a>
-			<!-- END recent_photo -->
-        </div>
-    </div>
-	<!-- END has_recent_photo -->
-	<!-- BEGIN no_recent_photo -->
-	<!--<p>{USER_FIRSTNAME} {USER_LASTNAME} has no recent photos.</p>-->
-	<!-- END no_recent_photo -->
 </div>
 
 <form id="coverphoto-form" method='post' action='/eportfolio/coverphoto/modifyForm.php' enctype='multipart/form-data'>
