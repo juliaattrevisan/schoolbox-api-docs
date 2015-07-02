@@ -1,62 +1,59 @@
-<script>
-    $(document).ready(function(){
-        $('#add-coverphoto').click(function(event){
-            event.preventDefault();
-            $('#coverphoto-image').show().trigger('click').hide();
-        });
-        $('#coverphoto-image').change(function(){
-            $('#coverphoto-form').submit();
-        })
-    });
-</script>
-
 <style type='text/css'>
     <!-- BEGIN allowed_files -->
     a.{NAME}{background-image: url(/images/mime/22x22/{ICON});}
     <!-- END allowed_files -->
 </style>
 
-<ul class='admin-nav'>
-	<li><a class="current" href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/profile'>Home</a></li>
-    <!-- BEGIN showcase_page -->
-	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase'>Showcased Work</a></li>
-    <!-- END showcase_page -->
-	<!-- BEGIN eportfolio_page -->
-	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
-	<!-- END eportfolio_page -->
-	<!-- BEGIN can_add_page -->
-    <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/create' class="add" id="add-page"><span></span> Add page</a></li>
-	<!-- END can_add_page -->
-</ul>
+<div class="row">
+    <div class="small-12 columns">
+        <ul class='sub-nav'>
+            <li class="active"><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/profile'>Home</a></li>
+            <!-- BEGIN showcase_page -->
+            <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase'>Showcased Work</a></li>
+            <!-- END showcase_page -->
+            <!-- BEGIN eportfolio_page -->
+            <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
+            <!-- END eportfolio_page -->
+            <!-- BEGIN can_add_page -->
+            <li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/create' class="button icon-add" id="add-page">Add page</a></li>
+            <!-- END can_add_page -->
+        </ul>
+    </div>
+</div>
 
-<div class="profile-banner">
-    <div class="background">
-		<!-- BEGIN has_cover_photo_control -->
-		<label id="add-coverphoto" for="coverphoto-image" class="btn modify no-text" title="Edit your cover picture"><span></span></label>
-		<!-- END has_cover_photo_control -->
+<div class="row">
+    <div class="small-12 columns">
 		<!-- BEGIN has_cover_photo -->
         <img src="/storage/image.php?size=eportfolioCoverPhoto&hash={COVERPHOTO_IMAGEHASH}" />
         <!-- END has_cover_photo -->
-
-		<!-- BEGIN no_cover_photo_control -->
-		<label id="add-coverphoto" for="coverphoto-image" class="btn add" title="Add a cover photo"><span></span>Add a cover photo</label>
-		<!-- END no_cover_photo_control -->
 		<!-- BEGIN no_cover_photo -->
 		<img src="/images/core/eportfolio/coverphotoPlaceholder.jpg" />
 		<!-- END no_cover_photo -->
-
-        <form id="coverphoto-form" method='post' action='/eportfolio/coverphoto/modifyForm.php' enctype='multipart/form-data'>
-            <input type='hidden' name='action' value='addCoverPhoto' />
-            <input type='hidden' name='userId' value='{USER_ID}' />
-            <input id="coverphoto-image" type='file' name='imagehash' value='' />
-            <input id="coverphoto-submit" class="btn no-icon" type='submit' value='Add' />
-        </form>
     </div>
-    <div class="profile-name clearfix">
-        <img src='/portrait.php?userId={USER_EXTERNAL_ID}&size=constrain200' />
+    <div class="small-12 columns">
+        <!-- BEGIN no_cover_photo_control -->
+        <a class="button icon-add" id="add-coverphoto">Add a cover photo</a>
+        <!-- END no_cover_photo_control -->
+
+        <!-- BEGIN has_cover_photo_control -->
+        <a class="button icon-modify" id="add-coverphoto">Edit your cover picture</a>
+        <!-- END has_cover_photo_control -->
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-2 island">
+        <section>
+            <div class="content">
+                <img src='/portrait.php?userId={USER_EXTERNAL_ID}&size=constrain200' />
+            </div>
+        </section>
+    </div>
+    <div class="small-10 columns">
         <h1>{USER_FULLNAME}</h1>
-        <p>{USER_YEAR}{USER_CAMPUS}{USER_HOUSE}
-		</p>
+        <p>
+            {USER_YEAR}{USER_CAMPUS}{USER_HOUSE}
+        </p>
     </div>
 </div>
 
@@ -183,3 +180,22 @@
     </div>
     <!-- END has_groups -->
 </div>
+
+
+<form id="coverphoto-form" method='post' action='/eportfolio/coverphoto/modifyForm.php' enctype='multipart/form-data'>
+    <input type='hidden' name='action' value='addCoverPhoto' />
+    <input type='hidden' name='userId' value='{USER_ID}' />
+    <input id="coverphoto-image" type='file' name='imagehash' value='' />
+</form>
+
+<script type="text/javascript">
+    $(function() {
+        $('#add-coverphoto').click(function(event){
+            event.preventDefault();
+            $('#coverphoto-image').show().trigger('click').hide();
+        });
+        $('#coverphoto-image').change(function(){
+            $('#coverphoto-form').submit();
+        })
+    });
+</script>
