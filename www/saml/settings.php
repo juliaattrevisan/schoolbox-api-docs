@@ -38,6 +38,9 @@ $settings->spIssuer = 'https://'.Config::get('site_hostname').'.'.Config::get('s
 #$settings->requestedNameIdFormat = OneLogin_Saml_Settings::NAMEID_EMAIL_ADDRESS;
 $settings->requestedNameIdFormat = OneLogin_Saml_Settings::NAMEID_TRANSIENT;
 
+// Define the Authncontext comparison type
+$settings->authncontextComparison = Config::get('saml_auth_comparison');
+
 /**
 * Checks an if an IP address is in a CIDR range or matches an individual address
 *
@@ -148,8 +151,10 @@ function useSAMLKerberos() {
         if (substr($current_browser->Platform,0,3)=='Win' || $current_browser->Platform == 'MacOSX') {
             switch($current_browser->Browser) {
                 case 'IE':
-                case 'Chrome':
                     return true;
+
+                case 'Chrome':
+                    if (Config::get('saml_krb_chrome')) { return true; } else { return false; }
 
                 case 'Safari':
                     if (Config::get('saml_krb_safari')) { return true; } else { return false; }
