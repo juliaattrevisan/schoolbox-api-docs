@@ -105,7 +105,7 @@ try {
 		$transaction->put('_method', $data['key']);
 	});
 
-	$client->open(1)->then(
+	$client->open(1)->promise()->then(
 		function($transport) use ($client) {
 			if(isset($_POST['data'])) {
 				$data = json_decode($_POST['data'], true);
