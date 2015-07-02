@@ -10,6 +10,10 @@
 namespace Calendar\Event\Type\ResourceBooking\Renderer;
 
 use Calendar\Event\Type\VObjectBase;
+use DateInterval;
+use DateTime;
+use DateTimeZone;
+use Sabre\VObject\Component\VEvent;
 
 class VObject extends VObjectBase
 {
@@ -26,7 +30,7 @@ class VObject extends VObjectBase
         /* Show visible events only, in export
          */
         if ($this->isVisible()) {
-            /** @var Sabre\VObject\Component\Vevent $vevent */
+            /** @var VEvent $vevent */
             $vevent = $this->vcalendar->create('VEVENT');
             // Generate a UID based on $this->getEvent()->getEventId()
             $vevent->add('UID', $this->getEvent()->getEventId() . '/' . $this->getEvent()->getConnectorId());
