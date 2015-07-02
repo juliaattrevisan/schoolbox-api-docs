@@ -50,4 +50,9 @@ class OneLogin_Saml_Settings
     * @var bool
     */
     public $useKerberos = false;
+
+    /**
+    * Specify which AuthnContext comparison type to use (exact, minimum, maximum, better)
+     */
+    public $authncontextComparison = 'exact';
 }

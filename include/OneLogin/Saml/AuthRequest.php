@@ -87,7 +87,7 @@ $request = <<<AUTHNREQUEST
     ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
     AssertionConsumerServiceURL="{$this->_settings->spReturnUrl}">
     <saml:Issuer>{$this->_settings->spIssuer}</saml:Issuer>
-    <samlp:RequestedAuthnContext Comparison="exact">
+    <samlp:RequestedAuthnContext Comparison="{$this->_settings->authncontextComparison}">
         <saml:AuthnContextClassRef>{$authncontext}</saml:AuthnContextClassRef>
     </samlp:RequestedAuthnContext>
 </samlp:AuthnRequest>
