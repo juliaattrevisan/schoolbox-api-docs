@@ -90,6 +90,7 @@ class CourseCreditSummary extends Base {
                     'letters' => array_fill_keys($this->getLetterRegistry(), 0),
                     'achieved' => 0,
                     'attempted' => 0,
+                    'endorsement' => '',
                 );
             }
 
@@ -134,6 +135,58 @@ class CourseCreditSummary extends Base {
 
         ksort($finalStack['courses']);
 
+        /* Append endorsements
+         */
+        $allEndorsements = $this->findEndorsements();
+
+        foreach ($allEndorsements as $currentEndorsement) {
+            $courseName = $currentEndorsement['CourseDescription'];
+            $endorsement = $currentEndorsement['Endorsement'];
+
+            $finalStack['courses'][$courseName]['endorsement'] = $endorsement;
+        }
+
         return $finalStack;
+    }
+
+    /**
+     * Get subject endorsement results
+     *
+     * @return array
+     */
+    private function findEndorsements() {
+
+        /* Temporary test result, since the db table doesn't exist yet
+         */
+        return array(
+            array(
+                'CourseDescription' => 'NCEA Level 1 Business Enterprise',
+                'Endorsement' => 'Alaress Test Value: Merit 1'
+            ),
+            array(
+                'CourseDescription' => 'NCEA Level 1 Mathematics',
+                'Endorsement' => 'Alaress Test Value: Merit 3'
+            ),
+        );
+
+        $query = "
+            SELECT
+                CourseDescription,
+                Endorsement
+            FROM
+                SynergyOne.dbo.uvSchoolBoxNCEAResultsWithEndorsements
+            WHERE
+                id = '{$this->getExternalUserId()}' AND
+                StudentYear = '{$this->getYear()}'
+            GROUP BY CourseDescription
+        ";
+
+        $result = $this->getDb()->getAll($query);
+
+        if (is_array($result)) {
+            return $result;
+        }
+
+        return array();
     }
 }
