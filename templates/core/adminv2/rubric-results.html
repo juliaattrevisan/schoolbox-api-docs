@@ -104,17 +104,31 @@
         <h2 class="subheader">Guide</h2>
         <section>
             <div class="content">
-                <dl>
-                    <dt>Creating Rubric Results</dt>
-                    <dd>Edit the rubric resultsets here: these are the pre-populated default values that will appear on every rubric.</dd>
-                    <dd>Note that once results have been created, they cannot be removed; they can be renamed, but ensure that if you do
-                        that you rename them to something semantically equivalent, since it will affect all marks already given.</dd>
-                    <dd>Each set should be a discrete list of items of a single measurement;
-                        for example, 'Very Good' and 'Yes' should not be in the same set.</dd>
-                    <dd>The first element is always valued zero, and sets must contain at least two elements.</dd>
-                    <dd>Type into empty fields to add result elements; if you wish to remove a newly created element, just leave it blank.</dd>
-                    <dd>New sets cannot be deleted once created.</dd>
-                </dl>
+                <div class="row">
+                    <div class="small-12 columns">
+                        <h3>Creating Rubric Results</h3>
+                    </div>
+                    <div class="small-12 large-6 columns">
+                        <p>
+                            Edit the rubric resultsets here: these are the pre-populated default values that will appear on every rubric.
+                        </p>
+
+                        <p>
+                            Note that once results have been created, they cannot be removed; they can be renamed, but ensure that if you do
+                            that you rename them to something semantically equivalent, since it will affect all marks already given.
+                        </p>
+
+                        <p>
+                            Each set should be a discrete list of items of a single measurement;
+                            for example, 'Very Good' and 'Yes' should not be in the same set.
+                        </p>
+                    </div>
+                    <div class="small-12 large-6 columns">
+                        <p>The first element is always valued zero, and sets must contain at least two elements.</p>
+                        <p>Type into empty fields to add result elements; if you wish to remove a newly created element, just leave it blank.</p>
+                        <p>New sets cannot be deleted once created.</p>
+                    </div>
+                </div>
             </div>
         </section>
     </div>
@@ -125,7 +139,7 @@
                 <!-- BEGIN list -->
                 <section>
                     <div class="content" data-role="rubricSet" data-setNumber="{RR_SET_NUMBER}">
-                        <h3>Existing set</h3>
+                        <h3>Existing Set</h3>
                         <!-- BEGIN list_item -->
                         <div data-role="existingRubricResult" data-resultNumber="{RR_RESULT_NUMBER}">
                             <label>
@@ -148,7 +162,7 @@
                 <!-- END list -->
                 <section>
                     <div class="content" data-role="rubricSet" data-setNumber="{RR_SET_NUMBER}">
-                        <h3>New set</h3>
+                        <h3>New Set</h3>
                         <div data-role="newRubricResult" data-resultNumber="0">
                             <label>
                                 <code data-role="value">&nbsp;</code>
