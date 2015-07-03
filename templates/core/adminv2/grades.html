@@ -191,50 +191,46 @@
                 <div data-role="gradeGroup" data-groupid="{SUBMISSION_GRADE_GROUP_ID}">
                     <section>
                         <div class="content">
-                            <input type="hidden"
-                                   name="group[{SUBMISSION_GRADE_GROUP_ID}][id]"
-                                   value="{SUBMISSION_GRADE_GROUP_ID}"
-                            />
-                            <input type="text"
-                                   name="group[{SUBMISSION_GRADE_GROUP_ID}][name]"
-                                   value="{SUBMISSION_GRADE_GROUP_NAME}"
-                                   placeholder="Grouping Name"
-                            />
+                            <input type="hidden" name="group[{SUBMISSION_GRADE_GROUP_ID}][id]" value="{SUBMISSION_GRADE_GROUP_ID}" />
+                            <label for="groupName{SUBMISSION_GRADE_GROUP_ID}">
+                                Grade Group
+                                <input type="text" id="groupName{SUBMISSION_GRADE_GROUP_ID}" name="group[{SUBMISSION_GRADE_GROUP_ID}][name]" value="{SUBMISSION_GRADE_GROUP_NAME}" placeholder="Grade Group" />
+                            </label>
                         </div>
                         <table>
                             <thead>
-                            <tr>
-                                <th>Lower Bound</th>
-                                <th>Normalised Grade</th>
-                                <th>Caption</th>
-                            </tr>
+                                <tr>
+                                    <th>Lower Bound</th>
+                                    <th>Normalised Grade</th>
+                                    <th>Caption</th>
+                                </tr>
                             </thead>
                             <tbody data-role="gradeList">
-                            <!-- BEGIN submission_grade -->
-                            <tr data-gradeid="{SUBMISSION_GRADE_ID}">
-                                <td>
-                                    <input type="text"
-                                           name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][lower_bound]"
-                                           value="{SUBMISSION_GRADE_LOWER_BOUND}"
-                                           placeholder="Lower Bound"
-                                            />
-                                </td>
-                                <td>
-                                    <input type="text"
-                                           name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][raw_grade]"
-                                           value="{SUBMISSION_GRADE_RAW_GRADE}"
-                                           placeholder="Normalised Grade"
-                                            />
-                                </td>
-                                <td>
-                                    <input type="text"
-                                           name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][caption]"
-                                           value="{SUBMISSION_GRADE_CAPTION}"
-                                           placeholder="Caption"
-                                            />
-                                </td>
-                            </tr>
-                            <!-- END submission_grade -->
+                                <!-- BEGIN submission_grade -->
+                                <tr data-gradeid="{SUBMISSION_GRADE_ID}">
+                                    <td>
+                                        <input type="text"
+                                               name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][lower_bound]"
+                                               value="{SUBMISSION_GRADE_LOWER_BOUND}"
+                                               placeholder="Lower Bound"
+                                                />
+                                    </td>
+                                    <td>
+                                        <input type="text"
+                                               name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][raw_grade]"
+                                               value="{SUBMISSION_GRADE_RAW_GRADE}"
+                                               placeholder="Normalised Grade"
+                                                />
+                                    </td>
+                                    <td>
+                                        <input type="text"
+                                               name="group[{SUBMISSION_GRADE_GROUP_ID}][grade][{SUBMISSION_GRADE_ID}][caption]"
+                                               value="{SUBMISSION_GRADE_CAPTION}"
+                                               placeholder="Caption"
+                                                />
+                                    </td>
+                                </tr>
+                                <!-- END submission_grade -->
                             </tbody>
                         </table>
                     </section>
