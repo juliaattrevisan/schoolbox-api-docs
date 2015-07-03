@@ -264,6 +264,9 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
         // According to VCAL standard: end of all day event is 12am next day
         if ($allDay) {
             $eventEndTimestamp -= 1;
+            if ($eventEndTimestamp < $eventStartTimestamp) {
+                $eventEndTimestamp = $eventStartTimestamp;
+            }
         }
 
         // Get category list for this event.
