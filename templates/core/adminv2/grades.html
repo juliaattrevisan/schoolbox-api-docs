@@ -79,15 +79,12 @@
     <div class="new" data-groupid="{{! it.id }}" data-role="gradeGroup">
         <section>
             <div class="content">
-                <input type="hidden"
-                       name="group[{{! it.id }}][id]"
-                       value="{{! it.id }}"
-                />
-                <input type="text"
-                       name="group[{{! it.id }}][name]"
-                       value="{{! it.name }}"
-                       placeholder="Grouping Name"
-                />
+                <input type="hidden" name="group[{{! it.id }}][id]" value="{{! it.id }}" />
+
+                <label>
+                    Grade Group
+                    <input type="text" name="group[{{! it.id }}][name]" value="{{! it.name }}" placeholder="Grade Group" />
+                </label>
             </div>
             <table>
                 <thead>
