@@ -1,102 +1,97 @@
-
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
     $(function() {
-        $(document).on('change', '#rubric-results input', function(e) {
-            var self = $(this);
-            var anchor = self.siblings('a').first();
-            if(self.val() == anchor.data('label')) {
-                anchor.addClass('hidden');
-            } else {
-                anchor.removeClass('hidden');
-            }
-            if(!(self.hasClass('nullable')) && self.val() == '') {
-                self.parent('li').addClass('err');
-            } else {
-                self.parent('li').removeClass('err');
-            }
-        });
-        $(document).on('click', '#rubric-results li a:not(.btn)', function(e) {
-            var self = $(this);
-            var input = self.siblings('input').first();
-            input.val(self.data('label'));
-            input.trigger('change');
-            self.addClass('hidden');
-            e.preventDefault();
-        });
-        $(document).on('change', '#rubric-results li.new-item input', function(e) {
-            var self = $(this);
-            var li = self.parent('li');
-            var newli = li.clone();
-            var code = newli.find('code');
-            newli.find('input').val('');
-            // code.html(parseInt(code.html()) + 1);
-            code.html('&nbsp;');
-            li.removeClass('new-item');
-            li.find('code').removeClass('prompt');
-            li.parent('ul').append(newli);
-            newli.find(':input:visible:first').focus();
-        });
-        $(document).on('click', '#add-set', function(e) {
-            e.preventDefault();
-        });
-        $(document).on('click', '#save-changes', function(e) {
-            var valid = true;
-            var frm = $('#rubricForm');
-            var method = frm.attr('method');
-            var action = frm.attr('action');
+        var form = $('form[data-action="saveRubricResults"]');
 
-            var frmdata = {};
-            var ii = 0;
-            var j = 0;
-            frm.find('input').each(function() {
-                var self = $(this);
+//        /**
+//         * Validator and revert link
+//         *
+//         * Validator should be handled by validate plugin, if at all
+//         * Revert link should be removed
+//         */
+//        form.on('change', '[data-role="rubricList"] input', function(e) {
+//            var self = $(this);
+//            var anchor = self.siblings('a').first();
+//            if(self.val() == anchor.data('label')) {
+//                anchor.addClass('hidden');
+//            } else {
+//                anchor.removeClass('hidden');
+//            }
+//            if(!(self.hasClass('nullable')) && self.val() == '') {
+//                self.parent('li').addClass('err');
+//            } else {
+//                self.parent('li').removeClass('err');
+//            }
+//        });
 
-                if(!self.hasClass('nullable')) {
-                    if(self.val() == '') {
-                        valid = false;
-                        return valid;
+//        /**
+//         * Revert rubric back to what it was
+//         *
+//         * Remove: no other form does this
+//         */
+//        form.on('click', '[data-role="rubricList"] li a:not(.btn)', function(e) {
+//            var self = $(this);
+//            var input = self.siblings('input').first();
+//            input.val(self.data('label'));
+//            input.trigger('change');
+//            self.addClass('hidden');
+//            e.preventDefault();
+//        });
+
+
+        form.on('change', '[data-role="rubricSet"] [data-role="newRubricResult"]:last-of-type input', function(e) {
+            var self = $(this);
+            var thisSet = self.closest('[data-role="rubricSet"]');
+            var thisRow = self.closest('[data-role="newRubricResult"]');
+            var newRow = thisRow.clone();
+            var code = thisRow.find('[data-role="value"]');
+            code.html(thisSet.find('[data-role="existingRubricResult"], [data-role="newRubricResult"]').length - 1);
+            newRow.find('input').val('');
+            thisSet.append(newRow);
+            newRow.find(':input:visible:first').focus();
+        });
+
+        form.validate({
+            submitHandler: function(htmlForm) {
+                var method = form.attr('method');
+                var action = form.attr('action');
+
+                // Mangle together a form.
+                // Go through each set and result, add them to the form data.
+                var currentSet = 0;
+                var formData = {};
+                form.find('[data-role="rubricSet"]').each(function() {
+                    var rubricSet = $(this);
+                    var isSetUsed = false;
+                    var currentResult = 0;
+                    rubricSet.find('[data-role="existingRubricResult"], [data-role="newRubricResult"]').each(function() {
+                        var rubricResult = $(this);
+                        var value        = rubricResult.find('input').val();
+                        if (value.length > 0) {
+                            isSetUsed = true;
+                            if (!(currentSet in formData)) {
+                                formData[currentSet] = {};
+                            }
+                            formData[currentSet][currentResult] = value;
+                            currentResult++;
+                        }
+                    });
+                    if (isSetUsed) {
+                        currentSet++;
                     }
-                }
+                });
 
-                var i = self.parents('ul').first().parent('li').index();
-                if(i != ii) {
-                    j = 0;
-                }
-                ii = i;
-
-                // if blank, just leave it
-                if(self.val() != '') {
-                    if(frmdata[i] === undefined) {
-                        frmdata[i] = {};
-                    }
-                    frmdata[i][j] = self.val();
-                    ++j;
-                }
-            });
-
-            if(valid) {
-                // console.log(frmdata);
+                // And "submit" the form data.
                 $.ajax({
                     async: false,
                     url: action,
                     type: method,
                     data: {
                         'action': 'set',
-                        'items': frmdata
-                    },
-                    success: function(data) {
-                        // console.log('success '+data);
-                    },
-                    failure: function(data) {
-                        // console.log('le fail '+data);
-                        e.preventDefault();
+                        'items': formData
                     }
                 });
-            }
-            else {
-                e.preventDefault();
-                $('#err-expl').css('display', 'block');
+                window.location.reload();
             }
         });
     });
@@ -104,54 +99,80 @@
 <!-- END custom_head -->
 {ADMIN_NAV}
 
-<div class="admin-contents clearfix">
-    <h2>Rubric ResultSets</h2>
-<div class="level clearfix">
-    <form id="rubricForm" method="POST" action="/adminv2/rubricForm.php">
-        <div class="half listing">
-            <ul>
-                <li>Edit the rubric resultsets here: these are the pre-populated default values that will appear on every rubric.</li>
-                <li>Note that once results have been created, they cannot be removed; they can be renamed, but ensure that if you do
-                    that you rename them to something semantically equivalent, since it will affect all marks already given.</li>
-                <li>Each set should be a discrete list of items of a single measurement;
-                    for example, 'Very Good' and 'Yes' should not be in the same set.</li>
-                <li>The first element is always valued zero, and sets must contain at least two elements.</li>
-                <li>Type into empty fields to add result elements; if you wish to remove a newly created element, just leave it blank.</li>
-                <li>New sets cannot be deleted once created.</li>
-            </ul>
-        </div>
-        <div class="half last">
-            <ul id="rubric-results">
+<div class="row" data-equalizer>
+    <div class="small-12 island">
+        <h2 class="subheader">Guide</h2>
+        <section>
+            <div class="content">
+                <div class="row">
+                    <div class="small-12 columns">
+                        <h3>Creating Rubric Results</h3>
+                    </div>
+                    <div class="small-12 large-6 columns">
+                        <p>
+                            Edit the rubric resultsets here: these are the pre-populated default values that will appear on every rubric.
+                        </p>
+
+                        <p>
+                            Note that once results have been created, they cannot be removed; they can be renamed, but ensure that if you do
+                            that you rename them to something semantically equivalent, since it will affect all marks already given.
+                        </p>
+
+                        <p>
+                            Each set should be a discrete list of items of a single measurement;
+                            for example, 'Very Good' and 'Yes' should not be in the same set.
+                        </p>
+                    </div>
+                    <div class="small-12 large-6 columns">
+                        <p>The first element is always valued zero, and sets must contain at least two elements.</p>
+                        <p>Type into empty fields to add result elements; if you wish to remove a newly created element, just leave it blank.</p>
+                        <p>New sets cannot be deleted once created.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <div class="small-12 island">
+        <form data-action="saveRubricResults" method="POST" action="/adminv2/rubricForm.php">
+            <input type="hidden" name="action" value="set" />
+            <div data-role="rubricList">
                 <!-- BEGIN list -->
-                <li class="{ON_OFF}">
-                    <ul>
+                <section>
+                    <div class="content" data-role="rubricSet" data-setNumber="{RR_SET_NUMBER}">
+                        <h3>Existing Set</h3>
                         <!-- BEGIN list_item -->
-                        <li>
-                            <code>{RR_VALUE}</code> &rsaquo;
-                            <input type="text" value="{RR_SANE_LABEL}" />
+                        <div data-role="existingRubricResult" data-resultNumber="{RR_RESULT_NUMBER}">
+                            <label>
+                                <code data-role="value">{RR_VALUE}</code>
+                                <input type="text" name="items[{RR_SET_NUMBER}][{RR_RESULT_NUMBER}]" value="{RR_SANE_LABEL}" required />
+                            </label>
+                            <!--
                             <a class="hidden" data-label="{RR_SANE_LABEL}" href="#">revert to '{RR_LABEL}'</a>
-                        </li>
+                            -->
+                        </div>
                         <!-- END list_item -->
-                        <li class="new-item">
-                            <code class="prompt">&nbsp;</code> &rsaquo;
-                            <input class="nullable" type="text" value="" />
-                        </li>
-                    </ul>
-                </li>
+                        <div data-role="newRubricResult">
+                            <label>
+                                <code data-role="value">&nbsp;</code>
+                                <input class="nullable"  type="text" name="items[{RR_SET_NUMBER}][{RR_RESULT_NUMBER}]" value="" />
+                            </label>
+                        </div>
+                    </div>
+                </section>
                 <!-- END list -->
-                <li class="{ON_OFF}">
-                    <p>New set...</p>
-                    <ul>
-                        <li class="new-item">
-                            <code class="prompt">&nbsp;</code> &rsaquo;
-                            <input class="nullable" type="text" value="" />
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-        <a href="/adminv2/rubric-results" id="save-changes" class="submit-btn-plain">Save changes</a>
-        <span id="err-expl">Ensure all pre-existing results are not blank.</span>
-    </form>
-</div>
+                <section>
+                    <div class="content" data-role="rubricSet" data-setNumber="{RR_SET_NUMBER}">
+                        <h3>New Set</h3>
+                        <div data-role="newRubricResult" data-resultNumber="0">
+                            <label>
+                                <code data-role="value">&nbsp;</code>
+                                <input class="nullable" type="text" name="items[{RR_SET_NUMBER}][0]" value="" />
+                            </label>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <input type="submit" value="Save Changes" />
+        </form>
+    </div>
 </div>
