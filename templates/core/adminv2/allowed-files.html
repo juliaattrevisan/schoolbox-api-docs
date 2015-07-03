@@ -156,23 +156,21 @@
 <form id="newAllowedFile" method="post" data-action="createNewFileType" action="/adminv2/allowed-fileForm.php" class="panel" style="display:none;">
     <input type="hidden" readonly="readonly" name="fileTypeId" value=""/>
     <h3>Create new file type</h3>
-    <div class="row">
-        <div class="column">
+    <div class="row allowed-files add-new">
+        <div class="column small-6">
+            <label>Icon <span data-tooltip class="hint has-tip tip-bottom" title="The icon used to represent this type of file">?</span></label>
+            <a href="#" class="button no-text open-dialog" id="icon-choice">
+                <img src="/images/mime/22x22/txt.png">
+            </a>
+            <input type="hidden" name="iconFile" id="button{FILE_ID}" class="chosen-one" value="{FILE_ICON}"/>
+        </div>
+        <div class="column small-6">
             <label>Enabled<span data-tooltip class="hint has-tip tip-bottom" title="Controls if files of this type can be uploaded">?</span></label>
             <span class="switch">
                 <input type="hidden" name="enable" value="false" />
                 <input id="enabled-new" type="checkbox" name="enable" checked="checked" value="true" />
                 <label for="enabled-new"></label>
             </span>
-        </div>
-    </div>
-    <div class="row allowed-files add-new">
-        <div class="column">
-            <label>Icon <span data-tooltip class="hint has-tip tip-bottom" title="The icon used to represent this type of file">?</span></label>
-            <a href="#" class="button no-text open-dialog" id="icon-choice">
-                <img src="/images/mime/22x22/txt.png">
-            </a>
-            <input type="hidden" name="iconFile" id="button{FILE_ID}" class="chosen-one" value="{FILE_ICON}"/>
         </div>
         <div class="column">
             <label>Description <span data-tooltip class="hint has-tip tip-bottom" title="A simple name for the type of file">?</span></label>
