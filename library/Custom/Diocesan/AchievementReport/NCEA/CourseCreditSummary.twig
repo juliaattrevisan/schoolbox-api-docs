@@ -1,7 +1,7 @@
 <table>
     <thead>
         <tr class="generic-heading-highlight">
-            <th colspan="8">Course Credit Summary {{ year }}</th>
+            <th colspan="9">Course Credit Summary {{ year }}</th>
         </tr>
         <tr>
             <th>Course</th>
@@ -11,6 +11,7 @@
             {% endfor %}
             <th class="numeric">Achieved</th>
             <th class="numeric">Attempted</th>
+            <th>Endorsement Status</th>
         </tr>
     </thead>
     <tbody>
@@ -23,6 +24,7 @@
             {% endfor %}
             <td class="numeric">{{ allValues.achieved }}</td>
             <td class="numeric">{{ allValues.attempted }}</td>
+            <td>{{ allValues.endorsementStatus }}</td>
         </tr>
         {% endfor %}
     </tbody>
@@ -35,6 +37,7 @@
             {% endfor %}
             <td class="numeric">{{ courseCreditSummary.data.totals.achieved }}</td>
             <td class="numeric">{{ courseCreditSummary.data.totals.attempted }}</td>
+            <td></td>
         </tr>
     </tfoot>
 </table>
