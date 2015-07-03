@@ -8,216 +8,232 @@
 </div>
 
 <div class="row">
-    <div class="large-12 columns">
-        <h2>Search</h2>
+    <div class="large-12 island">
+        <h2 class="subheader">Search</h2>
 
-        <form action="/adminv2/user/bulk/modify" method="post">
-            <div class="small-12 medium-6 large-3 columns">
-                <label>
-                    Campus
-                    <select name="search_campus">
-                        <option value="-1">Any</option>
-                        <!-- BEGIN search_campus -->
-                        <option value="{SEARCH_CAMPUS_ID}" {SEARCH_CAMPUS_SELECTED}>{SEARCH_CAMPUS_NAME}</option>
-                        <!-- END search_campus -->
-                    </select>
-                </label>
-            </div>
+        <section>
+            <div class="content">
+                <div class="row collapse">
+                    <form action="/adminv2/user/bulk/modify" method="post">
+                        <div class="small-12 medium-6 large-3 columns">
+                            <label>
+                                Campus
+                                <select name="search_campus">
+                                    <option value="-1">Any</option>
+                                    <!-- BEGIN search_campus -->
+                                    <option value="{SEARCH_CAMPUS_ID}" {SEARCH_CAMPUS_SELECTED}>{SEARCH_CAMPUS_NAME}</option>
+                                    <!-- END search_campus -->
+                                </select>
+                            </label>
+                        </div>
 
-            <div class="small-12 medium-6 large-3 columns">
-                <label>
-                    Role
-                    <select name="search_role">
-                        <option value="-1">Any</option>
-                        <!-- BEGIN search_role -->
-                        <option value="{SEARCH_ROLE_ID}" {SEARCH_ROLE_SELECTED}>{SEARCH_ROLE_NAME}</option>
-                        <!-- END search_role -->
-                    </select>
-                </label>
-            </div>
+                        <div class="small-12 medium-6 large-3 columns">
+                            <label>
+                                Role
+                                <select name="search_role">
+                                    <option value="-1">Any</option>
+                                    <!-- BEGIN search_role -->
+                                    <option value="{SEARCH_ROLE_ID}" {SEARCH_ROLE_SELECTED}>{SEARCH_ROLE_NAME}</option>
+                                    <!-- END search_role -->
+                                </select>
+                            </label>
+                        </div>
 
-            <div class="small-12 medium-6 large-2 columns">
-                <label>
-                    ePortfolio
-                    <select name="search_eportfolio">
-                        <option value="-1">Any</option>
-                        <!-- BEGIN search_eportfolio -->
-                        <option value="{SEARCH_EPORTFOLIO_ID}" {SEARCH_EPORTFOLIO_SELECTED}>{SEARCH_EPORTFOLIO_NAME}</option>
-                        <!-- END search_eportfolio -->
-                    </select>
-                </label>
-            </div>
+                        <div class="small-12 medium-6 large-2 columns">
+                            <label>
+                                ePortfolio
+                                <select name="search_eportfolio">
+                                    <option value="-1">Any</option>
+                                    <!-- BEGIN search_eportfolio -->
+                                    <option value="{SEARCH_EPORTFOLIO_ID}" {SEARCH_EPORTFOLIO_SELECTED}>{SEARCH_EPORTFOLIO_NAME}</option>
+                                    <!-- END search_eportfolio -->
+                                </select>
+                            </label>
+                        </div>
 
-            <div class="small-12 medium-6 large-2 columns">
-                <label>
-                    Year
-                    <input name='search_year' type="text" value="{SEARCH_YEAR_SELECTED}" />
-                </label>
-            </div>
+                        <div class="small-12 medium-6 large-2 columns">
+                            <label>
+                                Year
+                                <input name='search_year' type="text" value="{SEARCH_YEAR_SELECTED}" />
+                            </label>
+                        </div>
 
-            <div class="small-6 medium-2 large-2 end columns">
-                <label><br />
-                    <input type="submit" value="Search" />
-                </label>
+                        <div class="small-6 medium-2 large-2 end columns">
+                            <label><br />
+                                <input type="submit" value="Search" />
+                            </label>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </form>
+        </section>
     </div>
 </div>
 
 <!-- BEGIN has_results -->
 <div class="row">
-    <div class="large-12 columns">
-
-    <h1>Search Results</h1>
-    <p>
-        Found: {NUM_FOUND}<br />
-        Selected: <span data-selected="true">0</span>
-    </p>
-
-    <form data-action="userUpdate" id="updateForm" action="/adminv2/user/bulk/modifyForm" method="post">
-        <h2>Users</h2>
-
-        <table data-users="true">
-            <colgroup>
-                <col width="50" />
-                <col />
-                <col />
-            </colgroup>
-            <thead>
-                <tr>
-                    <th>
-                        <input type="checkbox" data-selectall="true" id="selectAll">
-                        <label for="selectAll" class="checkbox-label"></label>
-                    </th>
-                    <th>Firstname</th>
-                    <th>Lastname</th>
-                    <th>External ID</th>
-                    <th>Campuses</th>
-                    <th>Role</th>
-                    <th>Year</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- BEGIN user -->
-                <tr>
-                    <td>
-                        <input data-selectallgroup="users" name='userId[]' type="checkbox" value="{USER_ID}" id="user-{USER_ID}" />
-                        <label for="user-{USER_ID}" class="checkbox-label"></label>
-                    </td>
-                    <td>{USER_FIRSTNAME}</td>
-                    <td>{USER_LASTNAME}</td>
-                    <td>{USER_EXTERNAL_ID}</td>
-                    <td>{USER_CAMPUS}</td>
-                    <td>{USER_GROUP}</td>
-                    <td>{USER_YEAR}</td>
-                </tr>
-                <!-- END user -->
-            </tbody>
-        </table>
-
-        <div class="row">
-            <div class="large-12 columns">
-                <h2>New Values</h2>
+    <div class="small-12 island">
+        <h2 class="subheader">Search Results</h2>
+        <section>
+            <div class="content">
+                <p>
+                    Found: {NUM_FOUND}<br />
+                    Selected: <span data-selected="true">0</span>
+                </p>
             </div>
+        </section>
+    </div>
+</div>
 
-            <div class="small-12 medium-6 columns">
-                <label for="apply_defaultcampus">
-                    Default Campus
-                    <span data-tooltip class="hint has-tip" title="If selected, users will be involved in this campus, regardless of the options chosen under Campus Involvement.">?</span>
-                </label>
-                <select id="apply_defaultcampus" name="apply_defaultcampus">
-                    <option value="-1">Unchanged</option>
-                    <!-- BEGIN apply_defaultcampus -->
-                    <option value="{APPLY_DEFAULTCAMPUS_ID}" />{APPLY_DEFAULTCAMPUS_NAME}</option>
-                    <!-- END apply_defaultcampus -->
-                </select>
-            </div>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Users</h2>
 
-            <div data-applycampus="true" class="small-12 medium-6 columns">
-                <label>
-                    Campus Involvement
-                    <span data-tooltip class="hint has-tip" title="One or more campuses that the users will be involved in.">?</span>
-                </label>
-                <input id="apply_campus-unchanged" name='apply_campus[]' type="checkbox" value="-1" checked="checked" />
-                <label class="checkbox-label" for="apply_campus-unchanged">Unchanged</label>
-                <!-- BEGIN apply_campus -->
-                <input id="apply_campus-{APPLY_CAMPUS_ID}" name='apply_campus[]' type="checkbox" value="{APPLY_CAMPUS_ID}" />
-                <label class="checkbox-label" for="apply_campus-{APPLY_CAMPUS_ID}">{APPLY_CAMPUS_NAME}</label>
-                <!-- END apply_campus -->
-            </div>
+        <section>
+            <form data-action="userUpdate" id="updateForm" action="/adminv2/user/bulk/modifyForm" method="post">
+                <table data-users="true">
+                    <colgroup>
+                        <col width="50" />
+                        <col />
+                        <col />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>
+                                <input type="checkbox" data-selectall="true" id="selectAll">
+                                <label for="selectAll" class="checkbox-label"></label>
+                            </th>
+                            <th>Firstname</th>
+                            <th>Lastname</th>
+                            <th>External ID</th>
+                            <th>Campuses</th>
+                            <th>Role</th>
+                            <th>Year</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- BEGIN user -->
+                        <tr>
+                            <td>
+                                <input data-selectallgroup="users" name='userId[]' type="checkbox" value="{USER_ID}" id="user-{USER_ID}" />
+                                <label for="user-{USER_ID}" class="checkbox-label"></label>
+                            </td>
+                            <td>{USER_FIRSTNAME}</td>
+                            <td>{USER_LASTNAME}</td>
+                            <td>{USER_EXTERNAL_ID}</td>
+                            <td>{USER_CAMPUS}</td>
+                            <td>{USER_GROUP}</td>
+                            <td>{USER_YEAR}</td>
+                        </tr>
+                        <!-- END user -->
+                    </tbody>
+                </table>
 
-            <div class="small-12 medium-6 columns">
-                <label for="apply_role">Role</label>
-                <select id="apply_role" name="apply_role">
-                    <option value="-1">Unchanged</option>
-                    <!-- BEGIN apply_role -->
-                    <option value="{APPLY_ROLE_ID}">{APPLY_ROLE_NAME}</option>
-                    <!-- END apply_role -->
-                </select>
-            </div>
+                <div class="row">
+                    <div class="large-12 columns">
+                        <h3>New Values</h3>
+                    </div>
 
-            <div class="small-12 medium-6 columns">
-                <label for="apply_year">
-                    Year
-                    <span data-tooltip class="hint has-tip" title="Leave blank if you don't want to update their year.">?</span>
-                </label>
-                <input id="apply_year" name="apply_year" type="text" value="">
-            </div>
+                    <div class="small-12 medium-6 columns">
+                        <label for="apply_defaultcampus">
+                            Default Campus
+                            <span data-tooltip class="hint has-tip tip-top" title="If selected, users will be involved in this campus, regardless of the options chosen under Campus Involvement.">?</span>
+                        </label>
+                        <select id="apply_defaultcampus" name="apply_defaultcampus">
+                            <option value="-1">Unchanged</option>
+                            <!-- BEGIN apply_defaultcampus -->
+                            <option value="{APPLY_DEFAULTCAMPUS_ID}" />{APPLY_DEFAULTCAMPUS_NAME}</option>
+                            <!-- END apply_defaultcampus -->
+                        </select>
+                    </div>
 
-            <div class="small-12 medium-6 columns">
-                <label for="apply_eportfolio">ePortfolio</label>
-                <select id="apply_eportfolio" name="apply_eportfolio">
-                    <option value="-1">Unchanged</option>
-                    <!-- BEGIN apply_eportfolio -->
-                    <option value="{APPLY_EPORTFOLIO_ID}">{APPLY_EPORTFOLIO_NAME}</option>
-                    <!-- END apply_eportfolio -->
-                </select>
-            </div>
+                    <div data-applycampus="true" class="small-12 medium-6 columns">
+                        <label>
+                            Campus Involvement
+                            <span data-tooltip class="hint has-tip tip-top" title="One or more campuses that the users will be involved in.">?</span>
+                        </label>
+                        <input id="apply_campus-unchanged" name='apply_campus[]' type="checkbox" value="-1" checked="checked" />
+                        <label class="checkbox-label" for="apply_campus-unchanged">Unchanged</label>
+                        <!-- BEGIN apply_campus -->
+                        <input id="apply_campus-{APPLY_CAMPUS_ID}" name='apply_campus[]' type="checkbox" value="{APPLY_CAMPUS_ID}" />
+                        <label class="checkbox-label" for="apply_campus-{APPLY_CAMPUS_ID}">{APPLY_CAMPUS_NAME}</label>
+                        <!-- END apply_campus -->
+                    </div>
 
-            <div class="small-12 medium-6 columns">
-                <label for="apply_emailfromusername">Email Address From Username</label>
-                <select id="apply_emailfromusername" name="apply_emailfromusername">
-                    <option value="-1">Unchanged</option>
-                    <!-- BEGIN apply_emailfromusername -->
-                    <option value="{APPLY_EMAILFROMUSERNAME_ID}">{APPLY_EMAILFROMUSERNAME_NAME}</option>
-                    <!-- END apply_emailfromusername -->
-                </select>
-            </div>
+                    <div class="small-12 medium-6 columns">
+                        <label for="apply_role">Role</label>
+                        <select id="apply_role" name="apply_role">
+                            <option value="-1">Unchanged</option>
+                            <!-- BEGIN apply_role -->
+                            <option value="{APPLY_ROLE_ID}">{APPLY_ROLE_NAME}</option>
+                            <!-- END apply_role -->
+                        </select>
+                    </div>
 
-            <div class="small-12 medium-6 columns">
-                <label for="apply_externalmailclient">Use External Mail Client</label>
-                <select id="apply_externalmailclient" name="apply_externalmailclient">
-                    <option value="-1">Unchanged</option>
-                    <!-- BEGIN apply_externalmailclient -->
-                    <option value="{APPLY_EXTERNALMAILCLIENT_ID}">{APPLY_EXTERNALMAILCLIENT_NAME}</option>
-                    <!-- END apply_externalmailclient -->
-                </select>
-            </div>
+                    <div class="small-12 medium-6 columns">
+                        <label for="apply_year">
+                            Year
+                            <span data-tooltip class="hint has-tip tip-top" title="Leave blank if you don't want to update their year.">?</span>
+                        </label>
+                        <input id="apply_year" name="apply_year" type="text" value="">
+                    </div>
 
-            <div class="small-12 medium-6 columns">
-                <label for="apply_webmail">Enable Webmail Tab</label>
-                <select id="apply_webmail" name="apply_webmail">
-                    <option value="-1">Unchanged</option>
-                    <!-- BEGIN apply_webmail -->
-                    <option value="{APPLY_WEBMAIL_ID}">{APPLY_WEBMAIL_NAME}</option>
-                    <!-- END apply_webmail -->
-                </select>
-            </div>
+                    <div class="small-12 medium-6 columns">
+                        <label for="apply_eportfolio">ePortfolio</label>
+                        <select id="apply_eportfolio" name="apply_eportfolio">
+                            <option value="-1">Unchanged</option>
+                            <!-- BEGIN apply_eportfolio -->
+                            <option value="{APPLY_EPORTFOLIO_ID}">{APPLY_EPORTFOLIO_NAME}</option>
+                            <!-- END apply_eportfolio -->
+                        </select>
+                    </div>
 
-            <div class="small-12 medium-6 columns end">
-                <label for="apply_accountenabled">Account Enabled</label>
-                <select id="apply_accountenabled" name="apply_accountenabled">
-                    <option value="-1">Unchanged</option>
-                    <!-- BEGIN apply_accountenabled -->
-                    <option value="{APPLY_ACCOUNTENABLED_ID}">{APPLY_ACCOUNTENABLED_NAME}</option>
-                    <!-- END apply_accountenabled -->
-                </select>
-            </div>
-        </div>
+                    <div class="small-12 medium-6 columns">
+                        <label for="apply_emailfromusername">Email Address From Username</label>
+                        <select id="apply_emailfromusername" name="apply_emailfromusername">
+                            <option value="-1">Unchanged</option>
+                            <!-- BEGIN apply_emailfromusername -->
+                            <option value="{APPLY_EMAILFROMUSERNAME_ID}">{APPLY_EMAILFROMUSERNAME_NAME}</option>
+                            <!-- END apply_emailfromusername -->
+                        </select>
+                    </div>
 
-        <input name='updateUsers' type="submit" value="Apply To Selected" />
-        <input data-action="delete" name='deleteUsers' type="submit" value="Delete Selected Users" />
-    </form>
+                    <div class="small-12 medium-6 columns">
+                        <label for="apply_externalmailclient">Use External Mail Client</label>
+                        <select id="apply_externalmailclient" name="apply_externalmailclient">
+                            <option value="-1">Unchanged</option>
+                            <!-- BEGIN apply_externalmailclient -->
+                            <option value="{APPLY_EXTERNALMAILCLIENT_ID}">{APPLY_EXTERNALMAILCLIENT_NAME}</option>
+                            <!-- END apply_externalmailclient -->
+                        </select>
+                    </div>
+
+                    <div class="small-12 medium-6 columns">
+                        <label for="apply_webmail">Enable Webmail Tab</label>
+                        <select id="apply_webmail" name="apply_webmail">
+                            <option value="-1">Unchanged</option>
+                            <!-- BEGIN apply_webmail -->
+                            <option value="{APPLY_WEBMAIL_ID}">{APPLY_WEBMAIL_NAME}</option>
+                            <!-- END apply_webmail -->
+                        </select>
+                    </div>
+
+                    <div class="small-12 medium-6 columns end">
+                        <label for="apply_accountenabled">Account Enabled</label>
+                        <select id="apply_accountenabled" name="apply_accountenabled">
+                            <option value="-1">Unchanged</option>
+                            <!-- BEGIN apply_accountenabled -->
+                            <option value="{APPLY_ACCOUNTENABLED_ID}">{APPLY_ACCOUNTENABLED_NAME}</option>
+                            <!-- END apply_accountenabled -->
+                        </select>
+                    </div>
+                </div>
+
+                <input name='updateUsers' type="submit" value="Apply To Selected" />
+                <input data-action="delete" name='deleteUsers' type="submit" value="Delete Selected Users" />
+            </form>
+        </section>
+    </div>
 </div>
 <!-- END has_results -->
 
