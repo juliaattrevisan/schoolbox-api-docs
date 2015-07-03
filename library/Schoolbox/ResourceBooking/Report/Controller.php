@@ -41,16 +41,14 @@ class Controller extends Base
         $defaultTime = Alaress_Date_Format::now()->startOfDay();
         $start       = $this->getRequest()->query->get('start', $defaultTime->getUnixTimeStamp());
         $end         = $this->getRequest()->query->get('end', $defaultTime->addDays(7)->getUnixTimeStamp());
-
         $this->getResponse()->content->set([
-                'template' => '@resourceBookingReport/index.twig',
-                'data'     => [
-                    'start'       => new Alaress_Date_Format($start, Alaress_Date_Format::TIMESTAMP),
-                    'end'         => new Alaress_Date_Format($end, Alaress_Date_Format::TIMESTAMP),
-                    'bookingList' => $this->getBookingMapper()->findForTimespan($start, $end),
-                ],
-            ]
-        );
+            'template' => '@resourceBookingReport/index.twig',
+            'data'     => [
+                'start'       => new Alaress_Date_Format($start, Alaress_Date_Format::TIMESTAMP),
+                'end'         => new Alaress_Date_Format($end, Alaress_Date_Format::TIMESTAMP),
+                'bookingList' => $this->getBookingMapper()->findForTimespan($start, $end),
+            ],
+        ]);
     }
 
     /**
