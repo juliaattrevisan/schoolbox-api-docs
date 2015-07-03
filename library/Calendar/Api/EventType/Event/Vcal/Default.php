@@ -252,7 +252,13 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 
         // No end timestamp?
         if ($eventEndTimestamp === false) {
-            if ($allDay) {
+            if (isset($currentEvent->DURATION)) {
+                // Use duration if there
+                $eventEndDatetime = new DateTime();
+                $eventEndDatetime->setTimestamp($eventStartTimestamp);
+                $eventEndDatetime->add(\Sabre\VObject\DateTimeParser::parseDuration($currentEvent->DURATION));
+                $eventEndTimestamp = $eventEndDatetime->getTimestamp();
+            } elseif ($allDay) {
                 // All day? end at end of day
                 $eventEndTimestamp = strtotime('+1 day', $eventStartTimestamp);
             } else {
