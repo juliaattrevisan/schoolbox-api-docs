@@ -141,7 +141,7 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 			FROM
 				`{$this->getTable()}` `n`
 				LEFT JOIN {$this->getJoinSql('owner',      'n', 'u')}
-				LEFT JOIN {$this->getJoinSql('category',   'n', 'c')}
+				INNER JOIN {$this->getJoinSql('category',   'n', 'c')}
 				LEFT JOIN {$this->getJoinSql('perms',      'n', 'p')}
 					AND p.gid = :role_id
 					AND p.type > :min_access
@@ -202,7 +202,7 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 				{$this->getJoinColumnString('owner', 'u')}
 			FROM
 				`{$this->getTable()}` `n`
-				LEFT JOIN {$this->getJoinSql('category', 'n', 'c')}
+				INNER JOIN {$this->getJoinSql('category', 'n', 'c')}
 				LEFT JOIN {$this->getJoinSql('owner', 'n', 'u')}
 			WHERE
 				`n`.`deleted` = FALSE

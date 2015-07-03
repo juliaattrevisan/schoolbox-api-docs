@@ -52,6 +52,7 @@ class Result extends Base
                 AND ca.uid = :uid
             WHERE (`c`.`name` LIKE :likeKeyword OR `cc`.`code` LIKE :likeKeyword)
             AND   (:superuser OR cp.cid OR ca.sid)
+            AND   `c`.`deleted_at` IS NULL
 			ORDER BY {$sanitiser->getSortByWithAlias('c')} {$sanitiser->getSortDir()}
 			LIMIT {$sanitiser->getOffset()}, {$sanitiser->getLimit()}
         ";
@@ -122,6 +123,7 @@ class Result extends Base
                 AND ca.uid = :uid
             WHERE (`c`.`name` LIKE :likeKeyword OR `cc`.`code` LIKE :likeKeyword)
             AND   (:superuser OR cp.cid OR ca.sid)
+            AND   `c`.`deleted_at` IS NULL
 		";
 
         $stmt = $mapper->getDatabase()->prepare($query);

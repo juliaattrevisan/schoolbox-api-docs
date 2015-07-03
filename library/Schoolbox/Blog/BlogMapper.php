@@ -187,7 +187,7 @@ class BlogMapper extends Mapper implements Searchable, FeedableMapperInterface
 			FROM
 				`{$this->getTable()}` `b`
 				LEFT JOIN {$this->getJoinSql('user', 'b', 'u')}
-				LEFT JOIN {$this->getJoinSql('category', 'b', 'c')}
+				INNER JOIN {$this->getJoinSql('category', 'b', 'c')}
 				LEFT JOIN {$this->getJoinSql('perms', 'b', 'p')}
 					AND p.gid = :role_id
 					AND p.type > :min_access
@@ -247,7 +247,7 @@ class BlogMapper extends Mapper implements Searchable, FeedableMapperInterface
 				{$this->getJoinColumnString('category', 'c')}
 			FROM `{$this->getTable()}` AS `b`
 				LEFT JOIN {$this->getJoinSql('user', 'b', 'u')}
-				LEFT JOIN {$this->getJoinSql('category', 'b', 'c')}
+				INNER JOIN {$this->getJoinSql('category', 'b', 'c')}
 			WHERE `b`.`deleted` IS NULL
 				AND `b`.`cid` = :cat_id
 				AND `b`.`created` < :time

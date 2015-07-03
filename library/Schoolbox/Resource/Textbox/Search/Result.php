@@ -38,7 +38,7 @@ class Result extends Base
 				MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()}) AS `score`
 			FROM
 				`{$mapper->getTable()}` `t`
-				LEFT JOIN {$mapper->getJoinSql('category', 't', 'c')}
+				INNER JOIN {$mapper->getJoinSql('category', 't', 'c')}
 				LEFT JOIN {$mapper->getJoinSql('perms', 't', 'p')}
 					AND p.gid = :role_id
 					AND p.type >= :min_access
@@ -90,7 +90,7 @@ class Result extends Base
 			    COUNT(*) AS num
 			FROM
 				`{$mapper->getTable()}` `t`
-				LEFT JOIN {$mapper->getJoinSql('category', 't', 'c')}
+				INNER JOIN {$mapper->getJoinSql('category', 't', 'c')}
 				LEFT JOIN {$mapper->getJoinSql('perms', 't', 'p')}
 					AND p.gid = :role_id
 					AND p.type >= :min_access
