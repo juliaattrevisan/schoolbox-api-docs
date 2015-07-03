@@ -167,26 +167,26 @@
         </div>
     </div>
     <div class="row allowed-files add-new">
-        <div class="column small-2">
+        <div class="column">
             <label>Icon <span data-tooltip class="hint has-tip tip-bottom" title="The icon used to represent this type of file">?</span></label>
             <a href="#" class="button no-text open-dialog" id="icon-choice">
                 <img src="/images/mime/22x22/txt.png">
             </a>
             <input type="hidden" name="iconFile" id="button{FILE_ID}" class="chosen-one" value="{FILE_ICON}"/>
         </div>
-        <div class="column large-3">
+        <div class="column">
             <label>Description <span data-tooltip class="hint has-tip tip-bottom" title="A simple name for the type of file">?</span></label>
             <input type="text" class="text-input" name="description">
         </div>
-        <div class="column large-3">
+        <div class="column large-6">
             <label>Mime <span data-tooltip class="hint has-tip tip-bottom" title="The mime type for a file can be found by searching Google">?</span></label>
             <input type="text" class="text-input" name="mime">
         </div>
-        <div class="column large-2">
+        <div class="column large-3">
             <label>Max Size <span data-tooltip class="hint has-tip tip-bottom" title="The maximum file size when uploading a file of this type - defaults to system-wide max file size">?</span></label>
             <input type="text" class="text-input" name="max_file_size" placeholder="{FILE_MAXSIZE_PLACEHOLDER}" value=""/>
         </div>
-        <div class="column large-2">
+        <div class="column large-3">
             <label>Inline <span data-tooltip class="hint has-tip tip-bottom" title="Determines if file will be opened in the browser or by a third party application">?</span></label>
             <select name="inline">
                 <option value="true">Inline</option>
@@ -195,8 +195,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="column small-0 large-2"></div>
-        <div class="column small-12 large-10">
+        <div class="column">
             <label>Extensions<span data-tooltip class="hint has-tip tip-bottom" title="The file extension, everything after the dot. Comma-separate multiple extensions">?</span></label>
             <input type="text" class="text-input" name="extension" value=""/>
         </div>
