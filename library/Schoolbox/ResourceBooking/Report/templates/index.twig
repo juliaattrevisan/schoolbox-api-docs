@@ -1,1 +1,30 @@
-Report
+<table>
+    <thead>
+    <tr>
+        <th>Start</th>
+        <th>End</th>
+        <th>Name Of Organisation</th>
+        <th>Venue</th>
+        <th>Notes</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for booking in bookingList %}
+    <tr>
+        <td>
+            <time datetime="{{ booking.getEvent().getStartDateTime().getDatabase() }}">
+                {{ booking.getEvent().getStartDateTime().getLocal() }}
+            </time>
+        </td>
+        <td>
+            <time datetime="{{ booking.getEvent().getEndDateTime().getDatabase() }}">
+                {{ booking.getEvent().getEndDateTime().getLocal() }}
+            </time>
+        </td>
+        <td>{{ booking.getName() }}</td>
+        <td>{{ booking.getResource().getRoomCode() }}</td>
+        <td>{{ booking.getNotes()|purify }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
