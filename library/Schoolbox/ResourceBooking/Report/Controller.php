@@ -10,15 +10,9 @@
 namespace Schoolbox\ResourceBooking\Report;
 
 use Alaress_Date_Format;
-use Schoolbox\ResourceBooking\Booking;
-
-use Alaress\Paginator\IUrlPaginator;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Collection;
-use Schoolbox\User;
-use Schoolbox\UserMapper;
-use Schoolbox\RoleMapper;
-use Schoolbox\Resource\Storage;
+use Schoolbox\ResourceBooking\Booking;
+use Schoolbox\ResourceBooking\Item;
 
 class Controller extends Base
 {
@@ -27,9 +21,22 @@ class Controller extends Base
      */
     protected $bookingMapper;
 
-    public function __construct(Booking\Mapper $bookingMapper)
+    /**
+     * @var Item\Mapper
+     */
+    protected $itemMapper;
+
+    /**
+     * Constructor
+     *
+     * @param Booking\Mapper $bookingMapper
+     */
+    public function __construct(Booking\Mapper $bookingMapper, Item\Mapper $itemMapper)
     {
-        $this->setBookingMapper($bookingMapper);
+        $this
+            ->setBookingMapper($bookingMapper)
+            ->setItemMapper($itemMapper)
+        ;
     }
 
     /**
@@ -41,12 +48,28 @@ class Controller extends Base
         $defaultTime = Alaress_Date_Format::now()->startOfDay();
         $start       = $this->getRequest()->query->get('start', $defaultTime->getUnixTimeStamp());
         $end         = $this->getRequest()->query->get('end', $defaultTime->addDays(7)->getUnixTimeStamp());
+
+        // Calculate extras
+        $categories = $this->getRequest()->query->get('category', []);
+        $extras     = [];
+        if (!empty($categories)) {
+            $extras['resource_id'] = $this->getItemMapper()->findIdsByColumn(
+                'resource_category_id',
+                $categories
+            );
+        }
+
         $this->getResponse()->content->set([
             'template' => '@resourceBookingReport/index.twig',
             'data'     => [
                 'start'       => new Alaress_Date_Format($start, Alaress_Date_Format::TIMESTAMP),
                 'end'         => new Alaress_Date_Format($end, Alaress_Date_Format::TIMESTAMP),
-                'bookingList' => $this->getBookingMapper()->findForTimespan($start, $end),
+                'bookingList' => $this->getBookingMapper()->findForTimespan(
+                    $start,
+                    $end,
+                    [Booking\Status\Model::STATUS_APPROVED],
+                    $extras
+                ),
             ],
         ]);
     }
@@ -66,6 +89,25 @@ class Controller extends Base
     protected function setBookingMapper($bookingMapper)
     {
         $this->bookingMapper = $bookingMapper;
+        return $this;
+    }
+
+    /**
+     * @return Item\Mapper
+     */
+    protected function getItemMapper()
+    {
+        return $this->itemMapper;
+    }
+
+    /**
+     * @param  Item\Mapper $itemMapper
+     *
+     * @return $this
+     */
+    protected function setItemMapper($itemMapper)
+    {
+        $this->itemMapper = $itemMapper;
         return $this;
     }
 }

@@ -14,13 +14,10 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Alaress\Web\Router\PathMatcher;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
-use Schoolbox\Calendar;
-use Schoolbox\CampusMapper;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
+use Schoolbox\ResourceBooking\Item;
 use Schoolbox\ResourceBooking\Booking;
 
 class Module extends BaseModule
@@ -73,11 +70,8 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->params[Controller::class]['bookingMapper']
-            = $injector->lazyNew(Booking\Mapper::class);
-        $injector->set(
-            'controller:resourceBookingReport',
-            $injector->lazyNew(Controller::class)
-        );
+        $injector->params[Controller::class]['bookingMapper'] = $injector->lazyNew(Booking\Mapper::class);
+        $injector->params[Controller::class]['itemMapper']    = $injector->lazyNew(Item\Mapper::class);
+        $injector->set('controller:resourceBookingReport', $injector->lazyNew(Controller::class));
     }
 }
