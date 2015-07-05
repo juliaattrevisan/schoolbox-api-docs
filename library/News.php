@@ -260,7 +260,10 @@ class News extends DeprecatedModel
             AND news_items.item_datetime_expires $beforeOrAfter NOW()
             $topicFilter $yearFilter $monthFilter
          GROUP BY news_items.item_id
-         ORDER BY newsTopic.sequence ASC, news_items.item_datetime_posted DESC";
+         ORDER BY
+            newsTopic.sequence ASC,
+            news_items.item_datetime_published DESC,
+            news_items.item_datetime_posted DESC";
 
             $shareResults = $this->db->getAll($query);
         }
@@ -307,7 +310,10 @@ class News extends DeprecatedModel
 
         $query .= " AND news_items.item_datetime_expires $beforeOrAfter NOW()
                     $topicFilter $yearFilter $monthFilter
-                    ORDER BY newsTopic.sequence ASC, news_items.item_datetime_posted DESC;";
+                    ORDER BY
+                        newsTopic.sequence ASC,
+                        news_items.item_datetime_published DESC,
+                        news_items.item_datetime_posted DESC;";
 
         $userResults = $this->db->getAll($query);
 
