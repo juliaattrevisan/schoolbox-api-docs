@@ -1,0 +1,1 @@
+ALTER TABLE `tile` ADD COLUMN `link_target` VARCHAR(10) DEFAULT '_self' AFTER `link`;
