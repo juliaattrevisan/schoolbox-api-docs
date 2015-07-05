@@ -81,6 +81,20 @@ class Model implements ISoftDeletable, \JsonSerializable
     const POSITION_BOTTOMRIGHT = 3;
 
     /**
+     * Value of $linkTarget when opening in same tab/window.
+     *
+     * @var string
+     */
+    const TARGET_SELF = '_self';
+
+    /**
+     * Value of $linkTarget when opening in same tab/window.
+     *
+     * @var string
+     */
+    const TARGET_BLANK = '_blank';
+
+    /**
      * The primary key of this tile
      *
      * @var int
@@ -123,6 +137,11 @@ class Model implements ISoftDeletable, \JsonSerializable
      * @var string
      */
     protected $link;
+
+    /**
+     * @var string
+     */
+    protected $linkTarget = self::TARGET_SELF;
 
     /**
      * @var IStorage
@@ -292,6 +311,25 @@ class Model implements ISoftDeletable, \JsonSerializable
     public function getLink()
     {
         return $this->link;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLinkTarget()
+    {
+        return $this->linkTarget;
+    }
+
+    /**
+     * @param  string $linkTarget
+     *
+     * @return $this
+     */
+    public function setLinkTarget($linkTarget)
+    {
+        $this->linkTarget = $linkTarget;
+        return $this;
     }
 
     /**
