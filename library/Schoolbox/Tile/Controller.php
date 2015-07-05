@@ -288,6 +288,7 @@ class Controller extends Base
             ->setTitleBackgroundColor($post['title_background_color'] ?: '00000000')
             ->setTitlePosition($post['title_position'])
             ->setLink($post['link'])
+            ->setLinkTarget($post['link_target'])
             ->setBackgroundColor($post['background_color'] ?: '00000000')
             ->setBackgroundImageContained(!empty($post['background_image_contained']))
             ->setBackgroundPosition($post['background_position'])
