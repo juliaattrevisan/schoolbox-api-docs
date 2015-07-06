@@ -14,6 +14,13 @@ use Schoolbox\Collection;
 class Component_Homepage_DueWorkListController extends Component_Homepage_ControllerAbstract
 {
     /**
+     * Component name
+     *
+     * @var string
+     */
+    protected $componentName = 'Due Work';
+
+    /**
      * @var Group
      */
     private $groupHandler;
