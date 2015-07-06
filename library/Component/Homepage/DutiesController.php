@@ -19,7 +19,7 @@ class Component_Homepage_DutiesController extends Component_Homepage_ControllerA
     {
 
         // TODO: Implement execute() method.
-
+        $this->setComponentName("DATE", 'Duties for ' . date('l, jS \of F Y'));
     }
 
     /**
@@ -39,7 +39,6 @@ class Component_Homepage_DutiesController extends Component_Homepage_ControllerA
         $dutyHandler = new Duty;
 
         $dutyList = $dutyHandler->getAllInCategory($this->getContext()->getId());
-        $this->setVar("DATE", 'Duties for ' . date('l, jS \of F Y'));
 
         $block = false;
         if (is_array($dutyList)) {
