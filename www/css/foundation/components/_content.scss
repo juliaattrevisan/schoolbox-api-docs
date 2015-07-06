@@ -821,6 +821,9 @@ table{
 	@extend .information-list;
 	.body{
 		margin: rem-calc(($base-font-size - 8)) 0 rem-calc(($base-font-size - 8)) 74px;
+		p{
+			margin: $paragraph-margin-bottom 0;
+		}
 	}
 	.reply{
 		border-top: 1px solid $body-bg;
