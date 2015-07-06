@@ -14,6 +14,13 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
 {
 
     /**
+     * Component name
+     *
+     * @var string
+     */
+    protected $componentName = 'Rubric';
+
+    /**
      * @var Group
      */
     protected $group_handler;
