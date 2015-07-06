@@ -582,11 +582,14 @@ table{
 
 // Hints
 .hint {
+	color: $white !important;
 	top: -3px;
 	margin-left: 4px;
+
 	@include label(
 		$padding: rem-calc(($base-font-size - 12)) rem-calc(($base-font-size - 10)),
-		$bg: $iron
+		$bg: $iron,
+		$radius: 12px
 	);
 
 	&.icon-help:before{
@@ -599,7 +602,6 @@ table{
 }
 
 // The original list
-// This list can use up to 4 columns
 // All other lists include (@extend) these styles
 .information-list{
 	@include responsive-sides(1, padding);
@@ -901,4 +903,22 @@ tr:hover{
 
 .overflow {
     overflow: auto;
+}
+
+// Drag & Drop
+#dashboard-layout{
+	.component{
+		@include single-transition(background-color, 0.15s, linear);
+
+	    margin: 0 8px 8px 8px;
+	    border: 1px solid $monsoon;
+	    background-color: $vapor;
+	    min-height: 30px;
+	    padding: rem-calc(($base-font-size));
+	    position: relative;
+
+	    &:hover{
+			cursor: move;
+	    }
+	}
 }
