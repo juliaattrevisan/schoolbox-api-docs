@@ -15,18 +15,18 @@
 // $header-text-rendering: optimizeLegibility;
 
 // We use these to control header font sizes
-$h1-font-size: rem-calc(($base-font-size + 6));
+$h1-font-size: rem-calc(($base-font-size * 3));
 $h2-font-size: rem-calc(($base-font-size + 4));
 $h3-font-size: rem-calc(($base-font-size + 2));
 $h4-font-size: rem-calc(($base-font-size));
-$h5-font-size: 1rem;
-$h6-font-size: 1rem;
+$h5-font-size: rem-calc(($base-font-size));
+$h6-font-size: rem-calc(($base-font-size - 2));
 
 // We use these to control header size reduction on small screens
-$h1-font-reduction: rem-calc(5) !default;
-$h2-font-reduction: rem-calc(4) !default;
-$h3-font-reduction: rem-calc(3) !default;
-$h4-font-reduction: rem-calc(2) !default;
+// $h1-font-reduction: rem-calc(5) !default;
+// $h2-font-reduction: rem-calc(4) !default;
+// $h3-font-reduction: 0 !default;
+// $h4-font-reduction: 0 !default;
 // $h5-font-reduction: 0 !default;
 // $h6-font-reduction: 0 !default;
 
@@ -124,10 +124,20 @@ $paragraph-aside-font-size: rem-calc(($base-font-size - 4));
 
 @import "../../../javascript/components/foundation/scss/foundation/components/type";
 
+// Heading 1
 h1{
 	font-weight: $font-weight-bold;
 }
 
+@media #{$medium-only} {
+	h1{ font-size: 1.875rem; }
+}
+
+@media #{$small-only} {
+	h1{ font-size: 1.375rem; }
+}
+
+// Heading 2
 h2.subheader{
 	color: $monsoon;
 	font-weight: 100;
