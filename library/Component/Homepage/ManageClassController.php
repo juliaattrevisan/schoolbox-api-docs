@@ -11,6 +11,13 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 {
 
     /**
+     * Component name
+     *
+     * @var string
+     */
+    protected $componentName = 'Manage Class';
+
+    /**
      * @var Group
      */
     private $groupHandler;
