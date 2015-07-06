@@ -45,9 +45,26 @@ class Controller extends Base
     public function index()
     {
         // Default values: start of today + 1 week
-        $defaultTime = Alaress_Date_Format::now()->startOfDay();
-        $start       = $this->getRequest()->query->get('start', $defaultTime->getUnixTimeStamp());
-        $end         = $this->getRequest()->query->get('end', $defaultTime->addDays(7)->getUnixTimeStamp());
+        /** @var Alaress_Date_Format $start */
+        $start = Alaress_Date_Format::now()->startOfDay();
+        if ($formStart = $this->getRequest()->query->get('start')) {
+            try {
+                $start = Alaress_Date_Format::newLocalShort($formStart);
+            } catch (\Exception $e) {
+                // noop - use default
+            }
+        }
+
+        /** @var Alaress_Date_Format $end */
+        $end = clone $start;
+        $end->addDays(7);
+        if ($formEnd = $this->getRequest()->query->get('end')) {
+            try {
+                $end = Alaress_Date_Format::newLocalShort($formEnd);
+            } catch (\Exception $e) {
+                // noop - use default
+            }
+        }
 
         // Calculate extras
         $categories = $this->getRequest()->query->get('category', []);
@@ -62,11 +79,11 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@resourceBookingReport/index.twig',
             'data'     => [
-                'start'       => new Alaress_Date_Format($start, Alaress_Date_Format::TIMESTAMP),
-                'end'         => new Alaress_Date_Format($end-1, Alaress_Date_Format::TIMESTAMP),
+                'start'       => $start,
+                'end'         => $end,
                 'bookingList' => $this->getBookingMapper()->findForTimespan(
-                    $start,
-                    $end,
+                    $start->getUnixTimeStamp(),
+                    $end->getUnixTimeStamp(),
                     [Booking\Status\Model::STATUS_APPROVED],
                     $extras
                 ),
