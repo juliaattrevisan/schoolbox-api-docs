@@ -11,7 +11,12 @@ use Schoolbox\Collection;
 class Component_Homepage_DropBoxController extends Component_Homepage_ControllerAbstract
 {
 
-
+    /**
+     * Component name
+     *
+     * @var string
+     */
+    protected $componentName = 'Drop Box';
 
     /**
      * Prepares data for the render function. Business logic.
