@@ -11,6 +11,13 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
 {
 
     /**
+     * Component name
+     *
+     * @var string
+     */
+    protected $componentName = 'Random Image';
+
+    /**
      * @var DeprecatedDatabase
      */
     private $db;
@@ -39,7 +46,6 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
 
         //outputs an custom image and link to the homepage
         $this->setBlock($templateHandle, "previewimage", "preview_block");
-        $this->setVar('IMAGE_TITLE', 'Random Image');
 
         // get image id
         $fileList = Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
