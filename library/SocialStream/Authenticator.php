@@ -66,14 +66,18 @@ class Authenticator {
 	 * @return bool|int
 	 */
 	private function determinePermission() {
+        $userId = $this->getCurrentUser()->getId();
 		if ($this->getCurrentUser()->isSuperuser()) {
 			$permission = FULL_ACCESS;
-		}
-		else {
+		} elseif (!$userId) {
+            // Don't fall back to getPermission() call with session user,
+            // instead deny access if there's no actual user
+            $permission = DENY_ACCESS;
+        } else {
 			$groupHandler = new \Group();
             //If we are dealing with a post, check its permission, else check permission of component for rendering purposes
             $homepageID = $this->getNewPost()->getHomepageId() ? $this->getNewPost()->getHomepageId() : $this->getInstance()->getIdentifier();
-			$permission = $groupHandler->getPermission($homepageID, $this->getCurrentUser()->getId());
+			$permission = $groupHandler->getPermission($homepageID, $userId);
 		}
 
 		return $permission;
