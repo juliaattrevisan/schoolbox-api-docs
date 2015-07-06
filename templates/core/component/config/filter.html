@@ -1,11 +1,7 @@
-<span class="config-filters">
 <!-- BEGIN filters -->
-  <span>
-    <input type="hidden" name="filter[{COMPONENT_CONFIG_FILTER_VALUE}]" value="0" />
-    <label for="{COMPONENT_INSTANCE_ID}_{COMPONENT_CONFIG_FILTER_VALUE}">
-        <input id="{COMPONENT_INSTANCE_ID}_{COMPONENT_CONFIG_FILTER_VALUE}" type="checkbox" name="filter[{COMPONENT_CONFIG_FILTER_VALUE}]" value="1" {COMPONENT_CONFIG_FILTER_SELECTED} />
-        {COMPONENT_CONFIG_FILTER_NAME}
-    </label>
-  </span>
+<input type="hidden" name="filter[{COMPONENT_CONFIG_FILTER_VALUE}]" value="0" />
+<input id="component{COMPONENT_INSTANCE_ID}-filter-{COMPONENT_CONFIG_FILTER_VALUE}" type="checkbox" name="filter[{COMPONENT_CONFIG_FILTER_VALUE}]" value="1" {COMPONENT_CONFIG_FILTER_SELECTED} />
+<label for="component{COMPONENT_INSTANCE_ID}-filter-{COMPONENT_CONFIG_FILTER_VALUE}">
+    {COMPONENT_CONFIG_FILTER_NAME}
+</label>
 <!-- END filters -->
-</span>
