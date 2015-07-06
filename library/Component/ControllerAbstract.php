@@ -77,6 +77,13 @@ abstract class Component_ControllerAbstract
     protected $filterFields = null;
 
     /**
+     * Name of the component
+     *
+     * @var string
+     */
+    protected $componentName = '';
+
+    /**
     * Constructor
     *
     * @param Component_Instance $instance
@@ -371,6 +378,10 @@ abstract class Component_ControllerAbstract
             /* Collapsable control button
              */
             'settings_collapse_block' => '',
+
+            /* Component Name
+             */
+            'COMPONENT_NAME' => $this->getComponentName()
         ));
     }
 
@@ -663,5 +674,24 @@ abstract class Component_ControllerAbstract
     public function hasFullAccess()
     {
         return $this->permission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL;
+    }
+
+    /**
+     * Assign component name default
+     *
+     * @return string
+     */
+    protected function setComponentName($componentName)
+    {
+        $this->componentName = $componentName;
+    }
+    /**
+     * Get component name default
+     *
+     * @return string
+     */
+    protected function getComponentName()
+    {
+        return $this->componentName;
     }
 }

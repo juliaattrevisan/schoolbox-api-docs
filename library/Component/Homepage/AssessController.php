@@ -9,6 +9,12 @@
  */
 class Component_Homepage_AssessController extends Component_Homepage_ControllerAbstract
 {
+    /**
+     * Component name
+     *
+     * @var string
+     */
+    protected $componentName = 'Quizzes';
 
     /**
      * Prepares data for the render function. Business logic.
