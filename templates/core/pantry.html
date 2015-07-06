@@ -105,6 +105,184 @@
             </section>
         </div>
     </div>
+
+    <div class="row">
+        <div class="small-12 columns">
+            <h1>Social Stream - action-list</h1>
+            <nav class="top-bar" data-topbar>
+                <ul class="title-area">
+                    <!-- Title Area -->
+                    <li class="name">
+                        <h1><a href="#">Social Stream</a></h1>
+                    </li>
+                </ul>
+                <section class="top-bar-section">
+                    <!-- Right Nav Section -->
+                    <ul class="right">
+                        <li class="divider"></li>
+                        <li><a href="#" class="component-control-button settings edit button icon-settings" title="SS Settings">Settings</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#" class="button no-text icon-close" data-target="delete-it" title="Close"></a></li>
+                    </ul>
+                </section>
+            </nav>
+            <div class="delete-it">
+                <p>Are you sure you want to remove this component? <a href="#" class="success button">Yes</a> <a href="#" class="button">No</a></p>
+            </div>
+        </div> 
+    </div>
+    <div class="row">
+        <div class="small-12 island">
+            <section>
+                <div class="component-form editPanel">
+                    <p>This is the settings area for components. Use the existing .editPanel class.</p>
+                    <!-- BEGIN socialstream_has_newpost -->
+                    <form action='/socialstream/modifyForm.php' method='post' id='socialstream-form-default-{COMPONENT_INSTANCE_ID}' class='addPostForm {FORM_CLASS}' enctype='multipart/form-data'>
+                        <input type='hidden' name='type' value='string' />
+                        <input type='hidden' name='instanceId' value='{COMPONENT_INSTANCE_ID}' />
+                        <input type='hidden' name='homepageId' value='{HOMEPAGE_ID}'/>
+                        <input type='hidden' name='parentId' value='0' />
+                        <input type='hidden' name='rootId' value='0' />
+
+                        <textarea rows="3" cols="50" name="body" placeholder="Share something"></textarea>
+
+                        <div class="dz-wrap">
+                            <div class="row post-attachment attach">
+                                <div class="small-12 medium-9 columns">
+                                    <div class="dropzone" id="socialZone" action="/cms/myFileForm.php?ajax=1"></div>
+                                </div>
+                                <p class="small-12 medium-1 columns"><strong>or</strong></p>
+                                <p class="small-12 medium-2 columns">
+                                    <a class='button icon-link stream-attachment' data-value='url'>Link</a>
+                                </p>
+                            </div>
+                        </div>
+                        <input class='submit-btn-plain' type='submit' value='Post' />
+                    </form>
+                    <!-- END socialstream_has_newpost -->
+                </div>
+                <ul class="action-list social-stream">
+                    <li class="row" data-equalizer="no">
+                        <div class="ten-column" data-equalizer-watch="no">
+                            <div class="avatar-card">
+                                <a href="#" title="View Profile">
+                                    <img src="https://placekitten.com/g/64/64" alt="Moggy" class="hide-for-small-only">
+                                    <p>Karl Pilkington</p>
+                                    <p class="meta">Posted 39 minutes ago</p>
+                                </a>
+                                <div class="body">
+                                    <p>no no ono onon no no no n on on o no
+                                    no no ono onon no no no n on on o no
+                                    no no ono onon no no no n on on o no</p>
+                                    <p>no no ono onon no no no n on on o no
+                                    no no ono onon no no no n on on o no
+                                    no no ono onon no no no n on on o no</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="actions two" data-equalizer-watch="no">
+                            <a href="#" class="no-text icon-comment" title="Comment" data-equalizer-watch></a>
+                            <a href="#" class="no-text icon-delete" title="Delete" data-equalizer-watch></a>
+                        </div>
+                    </li>
+                    <li class="row" data-equalizer="one">
+                        <div class="ten-column" data-equalizer-watch="one">
+                            <div class="avatar-card">
+                                <a href="#" title="View Profile">
+                                    <img src="https://placekitten.com/g/64/64" alt="Moggy" class="hide-for-small-only">
+                                    <p>Karl Pilkington</p>
+                                    <p class="meta">Posted 39 minutes ago</p>
+                                </a>
+                            </div>
+                            <div class="body">
+                                <img src="https://placeimg.com/300/200/people" alt="Moggy">    
+                            </div>
+                        </div>
+                        <div class="actions two" data-equalizer-watch="one">
+                            <a href="#" class="no-text icon-comment" title="Comment" data-equalizer-watch></a>
+                            <a href="#" class="no-text icon-delete" title="Delete" data-equalizer-watch></a>
+                        </div>
+                        <ul class="action-list reply">
+                            <li class="row" data-equalizer="two">
+                                <div class="ten-column" data-equalizer-watch="two">
+                                    <div class="avatar-card">
+                                        <a href="#" title="View Profile">
+                                            <img src="https://placekitten.com/g/64/64" alt="Moggy" class="hide-for-small-only">
+                                            <p>Karl Pilkington</p>
+                                            <p class="meta">Posted 39 minutes ago</p>
+                                        </a>
+                                    </div>
+                                    <div class="body">
+                                        <p>no no ono onon no no no n on on o no</p>
+                                    </div>
+                                </div>
+                                <div class="actions two" data-equalizer-watch="two">
+                                    <a href="#" class="no-text icon-comment" title="Comment" data-equalizer-watch></a>
+                                    <a href="#" class="no-text icon-delete" title="Delete" data-equalizer-watch></a>
+                                </div>
+                                <ul class="action-list reply">
+                                    <li class="row" data-equalizer="three">
+                                        <div class="ten-column" data-equalizer-watch="three">
+                                            <div class="avatar-card">
+                                                <a href="#" title="View Profile">
+                                                    <img src="https://placekitten.com/g/64/64" alt="Moggy" class="hide-for-small-only">
+                                                    <p>Karl Pilkington</p>
+                                                    <p class="meta">Posted 39 minutes ago</p>
+                                                </a>
+                                            </div>
+                                            <div class="body">
+                                                <img src="https://placeimg.com/400/200/people" alt="Moggy">
+                                            </div>
+                                        </div>
+                                        <div class="actions two" data-equalizer-watch="three">
+                                            <a href="#" class="no-text icon-comment" title="Comment" data-equalizer-watch></a>
+                                            <a href="#" class="no-text icon-delete" title="Delete" data-equalizer-watch></a>
+                                        </div>
+                                        <div class="component-form editPanel">
+                                            <!-- BEGIN socialstream_has_newpost -->
+                                            <form action='/socialstream/modifyForm.php' method='post' id='socialstream-form-default-{COMPONENT_INSTANCE_ID}' class='addPostForm {FORM_CLASS}' enctype='multipart/form-data'>
+                                                <input type='hidden' name='type' value='string' />
+                                                <input type='hidden' name='instanceId' value='{COMPONENT_INSTANCE_ID}' />
+                                                <input type='hidden' name='homepageId' value='{HOMEPAGE_ID}'/>
+                                                <input type='hidden' name='parentId' value='0' />
+                                                <input type='hidden' name='rootId' value='0' />
+
+                                                <textarea rows="3" cols="50" name="body" placeholder="This is the reply form"></textarea>
+
+                                                <div class="dz-wrap">
+                                                    <div class="row post-attachment attach">
+                                                        <div class="small-12s medium-9 columns">
+                                                            <div class="dropzone" id="socialZone2" action="/cms/myFileForm.php?ajax=1"></div>
+                                                        </div>
+                                                        <p class="small-12 medium-1 columns"><strong>or</strong></p>
+                                                        <p class="small-12 medium-2 columns">
+                                                            <a class='button icon-link stream-attachment' data-value='url'>Link</a>
+                                                        </p>
+                                                    </div>
+
+                                                    <div class="post-attachment url" style="display:none;">
+                                                        <label>
+                                                            <input type='text' class='url' name='url' maxlength='1024' placeholder="http://" />
+                                                        </label>
+                                                        <p class="alt-src">
+                                                            or <a class='button icon-image stream-attachment' data-value='attach'>Attach</a>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <input class='submit-btn-plain' type='submit' value='Post' />
+                                            </form>
+                                            <!-- END socialstream_has_newpost -->
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <hr>
     
     <div class="row">
         <div class="small-12 columns">
@@ -200,7 +378,7 @@
                                 <h3>9AH French FREA1</h3>
                             </a>
                             <a href="#" title="View Subject" class="text-center one-column" data-equalizer-watch>
-                                <i class="icon-next"></i>
+                                <i class="icon-next no-text"></i>
                             </a>
                         </div>
                         <ul>
@@ -213,7 +391,7 @@
                                     <p class="meta">Teacher</p>
                                 </a>
                                 <a href="#" class="one-column text-center"title="Email Teacher" data-equalizer-watch>
-                                    <i class="icon-email"></i>
+                                    <i class="icon-email no-text"></i>
                                 </a>
                             </li>
                             <li class="row" data-equalizer>
@@ -225,7 +403,7 @@
                                     <p class="meta">Teacher</p>
                                 </a>
                                 <a href="#" class="one-column text-center"title="Email Teacher" data-equalizer-watch>
-                                    <i class="icon-email"></i>
+                                    <i class="icon-email no-text"></i>
                                 </a>
                             </li>
                         </ul>
@@ -314,7 +492,7 @@
     <hr>
 
     <div class="row">
-        <div class="small-12 island">
+        <div class="small-12 columns">
             <h1>Actions List - action-list</h1>
             <nav class="top-bar" data-topbar>
                 <ul class="title-area">
@@ -327,28 +505,82 @@
                     <!-- Right Nav Section -->
                     <ul class="right">
                         <li class="divider"></li>
-                        <li><a href="#" data-reveal-id="courseModal" class="button icon-settings" title="File Settings">Settings</a></li>
+                        <li><a href="#" class="component-control-button settings edit button icon-settings" title="File Settings">Settings</a></li>
                         <li class="divider"></li>
-                        <li><a href="#" class="button no-text icon-close" data-target="delete-it" title="Close"></a></li>
+                        <li><a href="#" class="component-control-button button no-text icon-close delete close-delete" data-target="delete-it" title="Close"></a></li>
                         <!-- Settings Modal -->
                     </ul>
-                    <div id="courseModal" class="reveal-modal" data-reveal>
-                        <h2>Course Outline Settings</h2>
-                        <form action="/homepage/configForm.php" method="GET">
-                            <label>
-                                Heading
-                                <input id="componentname" type="text" name="componentname" value="Files">
-                            </label>
-                            
-                            <label for="submit">
-                                <input id="submit" type="submit" value="Update" class="button success">
-                            </label>
-                            
-                        </form>
-                        <a class="close-reveal-modal">&#215;</a>
-                    </div>
                 </section>
             </nav>
+            <div class="editPanel settings hide">
+                <p>This is the settings area for components. Use the existing .editPanel class.</p>
+                <form>
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <label>Heading
+                                <input id="componentname" type="text" name="componentname" />
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <label>Filter</label>
+                            <input id="doucment" type="checkbox"><label for="doucment" class="checkbox-label">Doucment</label>
+                            <input id="audio" type="checkbox"><label for="audio" class="checkbox-label">Audio</label>
+                            <input id="video" type="checkbox"><label for="video" class="checkbox-label">Video</label>
+                            <input id="image" type="checkbox"><label for="image" class="checkbox-label">Image</label>
+                            <input id="other" type="checkbox"><label for="other" class="checkbox-label">Other</label>
+                        </div>
+                    </div> 
+                    <div class="row">
+                        <div class="small-6 columns">
+                            <label for="size">
+                                Limit
+                                <select id="size" name="size">
+                                    <option value="0">All</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="small-6 columns">
+                            <label for="sort-by">
+                                Sort by
+                                <select id="sort-by" name="sort-by">
+                                    <option value="0">Date</option>
+                                    <option value="1">Name</option>
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <label for="direction">
+                                Direction
+                                <select id="direction" name="direction">
+                                    <option value="0">Descending</option>
+                                    <option value="1">Ascending</option>
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <label>Source
+                                <a href="#" class="button icon-folder" title="Select Source">Select Source</a>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <label>
+                                <input type="submit" value="Update" />
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
     <div class="row">
@@ -417,26 +649,9 @@
                     <!-- Right Nav Section -->
                     <ul class="right">
                         <li class="divider"></li>
-                        <li><a href="#" data-reveal-id="courseModal" class="button icon-settings" title="File Settings">Settings</a></li>
-                        <li class="divider"></li>
                         <li><a href="#" class="button no-text icon-close" data-target="delete-it" title="Close"></a></li>
                         <!-- Settings Modal -->
                     </ul>
-                    <div id="courseModal" class="reveal-modal" data-reveal>
-                        <h2>Course Outline Settings</h2>
-                        <form action="/homepage/configForm.php" method="GET">
-                            <label>
-                                Heading
-                                <input id="componentname" type="text" name="componentname" value="Files">
-                            </label>
-                            
-                            <label for="submit">
-                                <input id="submit" type="submit" value="Update" class="button success">
-                            </label>
-                            
-                        </form>
-                        <a class="close-reveal-modal">&#215;</a>
-                    </div>
                 </section>
             </nav>
         </div>
@@ -532,7 +747,7 @@
 
     <div class="row">
         <div class="small-12 island">
-            <h1>Members Component - Grid Layout (DO NOT USE - NEEDS TO BE FIXED)</h1>
+            <h1>Members Component - Block Grid Layout</h1>
             <nav class="top-bar" data-topbar>
                 <ul class="title-area">
                     <!-- Title Area -->
@@ -544,33 +759,8 @@
                     <!-- Right Nav Section -->
                     <ul class="right">
                         <li class="divider"></li>
-                        <li><a href="#" data-reveal-id="memberModal" class="button icon-settings" title="File Settings">Settings</a></li>
-                        <li class="divider"></li>
                         <li><a href="#" class="button no-text icon-close" data-target="delete-it" title="Close"></a></li>
-                        <!-- Settings Modal -->
                     </ul>
-                    <div id="memberModal" class="reveal-modal" data-reveal>
-                        <h2>Members Settings</h2>
-                        <form action="/homepage/configForm.php" method="GET">
-                            <label>
-                                Heading
-                                <input id="componentname" type="text" name="componentname" value="Members">
-                            </label>
-                            
-                            <label for="size">
-                                Limit
-                                <select id="size" name="size">
-                                    <option value="list">List</option>
-                                    <option value="grid">Grid</option>
-                                </select>
-                            </label>
-
-                            <label for="submit">
-                                <input id="submit" type="submit" value="Update" class="button success">
-                            </label>
-                        </form>
-                        <a class="close-reveal-modal">&#215;</a>
-                    </div>
                 </section>
             </nav>
         </div>
@@ -579,52 +769,50 @@
         <div class="small-12 island">
             <section>
                 <ul class="grid medium-block-grid-2 large-block-grid-4">
-                    <li class="row">
-                        <div class="one-column">
-                            <a href="#">
+                    <li>
+                        <div class="avatar-card">
+                            <a href="#" title="View Profile">
                                 <img src="https://placekitten.com/g/64/64" alt="Moggy">
+                                <p>Karl Pilkington</p>
                             </a>
-                        </div>
-                        <div class="eleven-column">
-                            <a href="#">Steve "Mort" Chan</a>
-                            <p class="meta">Teachers</p>
+                            <p class="meta">Friday April 12th 2015 11:11am</p>
+                            <p class="meta">Edited five days ago</p>
                         </div>
                     </li>
-                    <li class="row">
-                        <div class="one-column">
-                            <a href="#">
+                    <li>
+                        <div class="avatar-card">
+                            <a href="#" title="View Profile">
                                 <img src="https://placekitten.com/g/64/64" alt="Moggy">
+                                <p>Karl Pilkington</p>
                             </a>
-                        </div>
-                        <div class="eleven-column">
-                            <a href="#">Steve "Mort" Chan</a>
-                            <p class="meta">Teachers</p>
+                            <p class="meta">Friday April 12th 2015 11:11am</p>
+                            <p class="meta">Edited five days ago</p>
                         </div>
                     </li>
-                    <li class="row">
-                        <div class="one-column">
-                            <a href="#">
+                    <li>
+                        <div class="avatar-card">
+                            <a href="#" title="View Profile">
                                 <img src="https://placekitten.com/g/64/64" alt="Moggy">
+                                <p>Karl Pilkington</p>
                             </a>
-                        </div>
-                        <div class="eleven-column">
-                            <a href="#">Steve "Mort" Chan</a>
-                            <p class="meta">Teachers</p>
+                            <p class="meta">Friday April 12th 2015 11:11am</p>
+                            <p class="meta">Edited five days ago</p>
                         </div>
                     </li>
-                    <li class="row">
-                        <div class="one-column">
-                            <a href="#">
+                    <li>
+                        <div class="avatar-card">
+                            <a href="#" title="View Profile">
                                 <img src="https://placekitten.com/g/64/64" alt="Moggy">
+                                <p>Karl Pilkington</p>
                             </a>
-                        </div>
-                        <div class="eleven-column">
-                            <a href="#">Steve "Mort" Chan</a>
-                            <p class="meta">Teachers</p>
+                            <p class="meta">Friday April 12th 2015 11:11am</p>
+                            <p class="meta">Edited five days ago</p>
                         </div>
                     </li>
                 </ul>
-                <a href="#" class="button icon-email">Email all</a>
+                <div class="content">
+                    <a href="#" class="button icon-email">Email all</a>
+                </div>
             </section>
         </div>
     </div>
@@ -828,9 +1016,9 @@
     <!--</ul>-->
     <ul class="breadcrumb">
         <li><a href="#">Home</a></li>
-        <li><a href="#">Features</a></li>
+        <li class="active"><a href="#">Features</a></li>
         <li class="unavailable"><a href="#">Gene Splicing</a></li>
-        <li class="current"><a href="#">Cloning</a></li>
+        <li><a href="#">Cloning</a></li>
     </ul>
 
     <hr>
@@ -872,7 +1060,7 @@
     <h1 id="pagination">Pagination</h1>
     <ul class="pagination">
         <li class="arrow unavailable"><a href="">&lsaquo;</a></li>
-        <li class="current"><a href="">1</a></li>
+        <li class="active"><a href="">1</a></li>
         <li><a href="">2</a></li>
         <li><a href="">3</a></li>
         <li><a href="">4</a></li>
@@ -974,7 +1162,7 @@
         <div class="row">
             <fieldset>
                 <legend>Legend</legend>
-                <div class="row collapse">
+                <div class="row">
                     <label>Input Label</label>
                     <div class="small-9 columns">
                         <input type="text" placeholder="small-9.columns" />
@@ -1360,7 +1548,6 @@
 
     <h1 id="sub-nav">Sub Nav</h1>
     <dl class="sub-nav">
-        <dt>Filter:</dt>
         <dd><a href="#">All</a></dd>
         <dd class="active"><a href="#">Active</a></dd>
         <dd><a href="#">Pending</a></dd>
@@ -1517,14 +1704,14 @@
     <h1>h1. This is a very large header.</h1>
     <h2>h2. This is a large header.</h2>
     <h3>h3. This is a medium header.</h3>
-    <h1>h1. This is a moderate header.</h1>
+    <h4>h1. This is a moderate header.</h4>
     <h5>h5. This is a small header.</h5>
     <h6>h6. This is a tiny header.</h6>
 
     <h1 class="subheader">h1.subheader</h1>
     <h2 class="subheader">h2.subheader</h2>
     <h3 class="subheader">h3.subheader</h3>
-    <h1 class="subheader">h1.subheader</h1>
+    <h4 class="subheader">h1.subheader</h4>
     <h5 class="subheader">h5.subheader</h5>
     <h6 class="subheader">h6.subheader</h6>
 
@@ -1631,12 +1818,27 @@
             $("#datepicker").datepicker();
         });
 
+        Dropzone.options.socialZone = {
+            addRemoveLinks: true,
+        };
+
+        Dropzone.options.socialZone2 = {
+            addRemoveLinks: true,
+        };
+
         Dropzone.options.myAwesomeDropzone = {
             addRemoveLinks: true,
         };
 
         $('[data-target="delete-it"]').on('click', function(){
-            $('.delete-it').addClass('show');
+            $('.delete-it').toggleClass('show');
+            event.preventDefault();
+        });
+
+        $('.settings').on('click', function(){
+            $('.editPanel').toggleClass('hide');
+            $(this).closest();
+            event.preventDefault();
         });
 
         $('a[data-interaction="toggle-expanded"]').on('click', function(){

@@ -333,11 +333,6 @@ input[type="submit"]{
 	}
 }
 
-// Tabs
-.tabs .current a{
-	background-color: $tabs-navigation-active-bg-color;
-}
-
 // Header Actions - for when you need buttons inline with the heading
 .header-actions {
   	float: right;
@@ -409,15 +404,29 @@ input[type="submit"]{
 				border-left-color: tint($tertiary, 87%) !important;
 			}
 		}
+		&.active a,
+		&.active a:after{
+			background-color: $white;
+			border-left: 0px solid $white;
+		}
+		&.active a:before{
+			margin-left: 0px;
+		}
 	}
 	li:first-child a{
 		padding-left: rem-calc(($base-font-size));
 	}
 }
 
+// Pagination
 ul.pagination li a,
 ul.pagination li button{
 	background-color: tint($tertiary, 74%);
 	border-radius: 0px;
 	font-weight: $font-weight-bold;
+}
+
+ul.pagination .active a{
+	background-color: $pagination-link-current-background;
+	color: $pagination-link-current-font-color;
 }

@@ -459,6 +459,25 @@ $tooltip-font-color: $white;
 // CUSTOM OVERRIDES
 //
 
+// Deleting Components
+.delete-it{
+	background-color: tint($warning-color, 74%);
+	padding: 0;
+	max-height: 0;
+	overflow: hidden;
+	@include single-transition(max-height, 0.3s, ease-out);
+	&.show{
+		max-height: 700px;
+		padding: rem-calc(($base-font-size - 2));
+		@include single-transition(max-height, 0.3s, ease-in);
+	}
+}
+
+// Hide/Show things
+.show{
+	display: block;
+}
+
 // Disabled elements
 :disabled{
 	opacity: 0.5;
@@ -497,13 +516,7 @@ table{
 .island {
   	@include grid-column();
 
-	@media #{$small-up} {
-		padding: 0 rem-calc(($base-font-size - 4));
-	}
-	@media #{$large-up} {
-		padding: 0 rem-calc(($base-font-size));
-	}
-	
+	@include responsive-sides(1, padding);
 	// Only sections inside islands have these styles
   	section{
 		background-color: $white;
@@ -581,20 +594,6 @@ table{
 	}
 }
 
-// Deleting Components
-.delete-it{
-	background-color: tint($warning-color, 74%);
-	padding: 0;
-	max-height: 0;
-	overflow: hidden;
-	@include single-transition(max-height, 0.3s, ease-out);
-	&.show{
-		max-height: 700px;
-		padding: rem-calc(($base-font-size - 2));
-		@include single-transition(max-height, 0.3s, ease-in);
-	}
-}
-
 .accordion a{
 	@include single-transition(all, 0.15s, linear);
 }
@@ -603,7 +602,7 @@ table{
 // This list can use up to 4 columns
 // All other lists include (@extend) these styles
 .information-list{
-    @include responsive-sides(1, padding);
+	@include responsive-sides(1, padding);
 	list-style: none;
 	margin: 0;
 	padding: 0;
@@ -645,6 +644,9 @@ table{
 		.eleven-column{
 			@media #{$small-up} { @include grid-column(11); }	
 		}
+		.twelve-column{
+			@media #{$small-up} { @include grid-column(12); }	
+		}
 		// Column with thumbnail - No Padding
 		.one-column.thumbnail{
 			padding: 0;
@@ -656,8 +658,12 @@ table{
 		.three-column,
 		.nine-column,
 		.ten-column,
-		.eleven-column{
+		.eleven-column,
+		.twelve-column{
 			@media #{$small-up} {
+				padding: rem-calc(($base-font-size - 8));
+			}
+			@media #{$medium-up} {
 				padding: rem-calc(($base-font-size - 4));
 			}
 			@media #{$large-up} {
@@ -792,6 +798,9 @@ table{
 	&.two a,
 	&.three a{
 		@media #{$small-up} {
+			padding: rem-calc(($base-font-size - 8));
+		}
+		@media #{$medium-up} {
 			padding: rem-calc(($base-font-size - 4));
 		}
 		@media #{$large-up} {
@@ -804,10 +813,39 @@ table{
 .avatar-card{
 	img{
 	  	float: left;
-  		margin: 0 rem-calc(($base-font-size - 8)) rem-calc(($base-font-size - 8)) 0;
+  		margin: 0 rem-calc(($base-font-size )) rem-calc(($base-font-size)) 0;
 	}
 	p{
 		margin: 0;
+	}
+}
+
+// Social Stream
+.social-stream{
+	@extend .information-list;
+	.body{
+		margin: rem-calc(($base-font-size - 8)) 0 rem-calc(($base-font-size - 8)) 74px;
+		p{
+			margin: $paragraph-margin-bottom 0;
+		}
+	}
+	.reply{
+		border-top: 1px solid $body-bg;
+		clear: both;
+		margin-left: 4.3rem;
+		li,
+		.component-form{
+			clear: both;
+		}
+	}
+
+	@media #{$small-only} {
+		.body{
+			margin: rem-calc(($base-font-size - 8)) 0;
+		}
+		.reply{
+			margin-left: 1rem;
+		}
 	}
 }
 

@@ -159,6 +159,21 @@ label.radio-label			{ background-position: 0 -48px; }
 input[type=checkbox]:checked +
 label.checkbox-label		{ background-position: 0 -120px; }
 
+// Component Forms
+.editPanel{
+	background-color: $gainsboro;
+	display: block;
+	padding: rem-calc(($base-font-size));
+
+	input[type=radio] +
+	label.radio-label,
+	input[type=checkbox] +
+	label.checkbox-label{
+		display: inline-block;
+	}
+}
+
+
 //  Show/Hide Advanced form fields
 .form-advanced{
 	display: none;
@@ -604,13 +619,14 @@ ul.az-error-list {
 .dropzone{
 	background-color: rgba($success-color, 0.3);
 	border: 2px dashed $success-color;
-	padding: rem-calc(($base-font-size - 2));
+	padding: rem-calc(($base-font-size - 6));
 	position: relative;
-	min-height: 84px;
+	min-height: 72px;
+	margin-bottom: rem-calc(($base-font-size - 2));
 
 	&.dz-drag-hover {
-		border-color: rgba($black, 0.15);
-		background: rgba($black, 0.4);
+		border-color: $success-color;
+		background: $ocean-sunset;
 	}
 
 	.dz-default.dz-message {
@@ -622,6 +638,7 @@ ul.az-error-list {
 		-ms-filter: none;
 		filter: none;
 	  	height: 48px;
+	  	position: absolute;
 	}
 
 	.dz-preview,
@@ -796,7 +813,8 @@ ul.az-error-list {
 	color: $success-color;
 	font-weight: 700;
 	margin-left: 170px;
-	line-height: rem-calc(($base-font-size * 4))
+	position: relative;
+  	top: 35%;
 }
 .dropzone.dz-square .dz-default.dz-message {
 	background-position: 0 -123px;
