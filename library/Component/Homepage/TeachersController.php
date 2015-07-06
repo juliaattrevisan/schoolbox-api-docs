@@ -10,6 +10,13 @@
 class Component_Homepage_TeachersController extends Component_Homepage_ControllerAbstract
 {
     /**
+     * Component name
+     *
+     * @var string
+     */
+    protected $componentName = 'Teachers';
+
+    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
