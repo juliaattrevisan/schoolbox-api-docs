@@ -73,7 +73,7 @@ $sub-nav-font-color-hover: $sub-nav-font-color;
 
 // We use these to control the active item styles
 $sub-nav-active-font-weight: $font-weight-normal;
-$sub-nav-active-bg: tint($tertiary, 87%);
+$sub-nav-active-bg: $white;
 $sub-nav-active-bg-hover: tint($tertiary, 87%);
 $sub-nav-active-color: $sub-nav-font-color;
 $sub-nav-active-padding: $sub-nav-padding;
@@ -83,7 +83,7 @@ $sub-nav-active-cursor: default;
 // $sub-nav-item-divider-margin: rem-calc(12);
 
 $sub-nav-bg-color: $secondary-color;
-$sub-nav-bg-active-color: tint($tertiary, 74%);
+$sub-nav-bg-active-color: $white;
 
 //
 // TOP BAR
@@ -244,7 +244,6 @@ $menu-slide: "transform 500ms ease";
 // CUSTOM OVERRIDES
 //
 
-
 // Side Navigation
 .side-nav{
 	margin: 0 0 rem-calc(($base-font-size)) 0;
@@ -276,7 +275,6 @@ $menu-slide: "transform 500ms ease";
 		}
 	}
 }
-
 
 // Top bar
 .top-bar-section{
