@@ -97,8 +97,15 @@ abstract class Component_ControllerAbstract
         $this->sitepage = $sitepage;
         $this->config   = $instance->getConfigArray();
         $this->context  = new \Schoolbox\Resource\Category();
+
+        $this->hook();
     }
 
+    /**
+     * Constructor hook method, for dynamic manipulation on a per-component basis
+     */
+    protected function hook() {
+    }
 
     /**
      * Method to provide global config details to the component
