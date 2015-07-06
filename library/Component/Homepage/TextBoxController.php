@@ -10,6 +10,13 @@
 class Component_Homepage_TextBoxController extends Component_Homepage_ControllerAbstract
 {
 
+    /**
+     * Component name
+     *
+     * @var string
+     */
+    protected $componentName = 'Text Box';
+
     /** @var \Schoolbox\Textbox\Model */
     protected $textbox;
 
@@ -52,7 +59,6 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         if (!parent::loadTemplate($templateHandle, 'textBox')) {
             return false;
         }
-        $this->parseConfig();
 
         $this->setBlock($templateHandle, 'text_editable', 'text_editable_block');
         $this->setBlock($templateHandle, 'text_locked', 'text_locked_block');
@@ -74,8 +80,11 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
          * textbox which comes from another homepage, you were able to
          * inadvertently steal ownership of it
          */
+        $heading = Scrub::text($this->getTextbox()->getHeading());
+        $this->setComponentName($heading);
+
         $output = array(
-            'TEXTBOX_HEADING'     => Scrub::text($this->getTextbox()->getHeading()),
+            'TEXTBOX_HEADING'     => $heading,
             'TEXTBOX_BODY'        => Scrub::html($this->getTextbox()->getBody()),
             'TEXTBOX_ID'          => $this->getTextbox()->getId(),
             'TEXTBOX_CATEGORY_ID' => $this->getTextbox()->getCategory()->getId(),
@@ -121,6 +130,10 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             // formatted text
             $this->parse('text_locked_block', 'text_locked');
         }
+
+        /* Need title injected here
+         */
+        $this->parseConfig();
 
         return true; // everything went according to plan
     }
