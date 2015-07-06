@@ -12,6 +12,13 @@ class Component_Homepage_PinterestController extends Component_Homepage_Controll
 {
 
     /**
+     * Component name
+     * 
+     * @var string
+     */
+    protected $componentName = 'Pinterest';
+
+    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
