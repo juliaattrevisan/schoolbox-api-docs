@@ -1,6 +1,34 @@
 <h1>Bookings: {{ start.getLongDateOnly() }} – {{ end.getLongDateOnly() }}</h1>
 
 <div class="directory">
+
+    <form method='get' action='?'>
+    <h2>Search Filter Options</h2>
+    <table class="table">
+        <colgroup>
+            <col width="250"/>
+        </colgroup>
+        <tr>
+            <td>Date</td>
+            <td>
+                from <input data-datepicker name="start" value="{{ start.getLocalShort() }}" />
+                to <input data-datepicker name="end" value="{{ end.getLocalShort() }}" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <h4>Categories</h4>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><input class='submit-btn-plain' type='submit' value='Search' /></td>
+        </tr>
+    </table>
+    </form>
+
     <table class="fullwidth table" data-sortable>
         <thead>
         <tr>
@@ -52,16 +80,19 @@
         },
         type: 'text'
     });
-    $('[data-sortable]').tablesorter({
-        headers:{
-            0:{sorter:'datetime'},
-            1:{sorter:'datetime'},
-            4:{sorter:false}
-        },
-        widgets:['zebra'],
-        widgetZebra:{
-            css:["", "dark"]
-        },
-        cssHeader:"directory-sorter"
+    $(function() {
+        $('[data-sortable]').tablesorter({
+            headers:{
+                0:{sorter:'datetime'},
+                1:{sorter:'datetime'},
+                4:{sorter:false}
+            },
+            widgets:['zebra'],
+            widgetZebra:{
+                css:["", "dark"]
+            },
+            cssHeader:"directory-sorter"
+        });
+        $('[data-datepicker]').datepicker();
     });
 </script>
