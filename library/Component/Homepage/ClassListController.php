@@ -9,6 +9,14 @@
  */
 class Component_Homepage_ClassListController extends Component_Homepage_ControllerAbstract
 {
+
+    /**
+     * Component name
+     *
+     * @var string
+     */
+    protected $componentName = 'Class List';
+
     /**
      * @var Group
      */
