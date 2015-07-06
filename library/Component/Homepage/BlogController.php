@@ -12,7 +12,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
 
     /**
      * Component name
-     * 
+     *
      * @var string
      */
     protected $componentName = 'Blog';
