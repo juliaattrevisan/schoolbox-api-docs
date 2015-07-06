@@ -35,7 +35,7 @@ class Authenticator {
 	/**
 	 * A user instance
 	 *
-	 * @var null
+	 * @var \Schoolbox\User
 	 */
 	private $currentUser = null;
 
@@ -66,14 +66,14 @@ class Authenticator {
 	 * @return bool|int
 	 */
 	private function determinePermission() {
-		if ($_SESSION['su']) {
+		if ($this->getCurrentUser()->isSuperuser()) {
 			$permission = FULL_ACCESS;
 		}
 		else {
 			$groupHandler = new \Group();
             //If we are dealing with a post, check its permission, else check permission of component for rendering purposes
             $homepageID = $this->getNewPost()->getHomepageId() ? $this->getNewPost()->getHomepageId() : $this->getInstance()->getIdentifier();
-			$permission = $groupHandler->getPermission($homepageID);
+			$permission = $groupHandler->getPermission($homepageID, $this->getCurrentUser()->getId());
 		}
 
 		return $permission;
@@ -187,7 +187,7 @@ class Authenticator {
 	/**
 	 * Set current user
 	 *
-	 * @param $currentUser
+	 * @param \Schoolbox\User $currentUser
 	 */
 	private function setCurrentUser($currentUser) {
 		$this->currentUser = $currentUser;
@@ -196,7 +196,7 @@ class Authenticator {
 	/**
 	 * Get current user
 	 *
-	 * @return null
+	 * @return \Schoolbox\User
 	 */
 	private function getCurrentUser() {
 		return $this->currentUser;
