@@ -63,7 +63,7 @@ class Controller extends Base
             'template' => '@resourceBookingReport/index.twig',
             'data'     => [
                 'start'       => new Alaress_Date_Format($start, Alaress_Date_Format::TIMESTAMP),
-                'end'         => new Alaress_Date_Format($end, Alaress_Date_Format::TIMESTAMP),
+                'end'         => new Alaress_Date_Format($end-1, Alaress_Date_Format::TIMESTAMP),
                 'bookingList' => $this->getBookingMapper()->findForTimespan(
                     $start,
                     $end,
