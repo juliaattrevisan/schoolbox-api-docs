@@ -1,25 +1,42 @@
-<h1>Bookings: {{ start.getLongDateOnly() }} – {{ end.getLongDateOnly() }}</h1>
+<h1>Bookings: {{ search.start.getLongDateOnly() }} – {{ search.end.getLongDateOnly() }}</h1>
 
 <div class="directory">
 
-    <form method='get' action='?' class="noprint">
+    <form method='get' action='?' class="noprint" data-action="search">
     <h2>Search Filter Options</h2>
-    <table class="table">
+    <table class="standardForm table">
         <colgroup>
             <col width="250"/>
         </colgroup>
         <tr>
-            <td>Date</td>
-            <td>
-                from <input data-datepicker name="start" value="{{ start.getLocalShort() }}" />
-                to <input data-datepicker name="end" value="{{ end.getLocalShort() }}" />
+            <td><h4>From Date</h4></td>
+            <td><input data-datepicker name="start" value="{{ search.start.getLocalShort() }}" /></td>
+        </tr>
+        <tr>
+            <td><h4>To Date</h4></td>
+            <td><input data-datepicker name="end" value="{{ search.end.getLocalShort() }}" />
             </td>
         </tr>
         <tr>
+            <td><h4>Categories</h4></td>
             <td>
-                <h4>Categories</h4>
-            </td>
-            <td>
+                <label>
+                    <input type="checkbox"
+                           data-selectall="category[]"
+                           {% if search.category is empty or search.category|length == categoryList|length %}checked{% endif %}
+                    />
+                    All
+                </label>
+                {% for category in categoryList %}
+                <label>
+                    <input type="checkbox"
+                           name="category[]"
+                           value="{{ category.getId() }}"
+                           {% if search.category is empty or category.getId() in search.category %}checked{% endif %}
+                    />
+                    {{ category.getName() }}
+                </label>
+                {% endfor %}
             </td>
         </tr>
         <tr>
@@ -71,6 +88,7 @@
 
 <script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
 <script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.widgets.js"></script>
+<script type="text/javascript" src="/javascript/jquery.selectAll.js"></script>
 <script type="text/javascript">
     $.tablesorter.addParser({
         id: 'datetime',
@@ -94,5 +112,11 @@
             cssHeader:"directory-sorter"
         });
         $('[data-datepicker]').datepicker();
+
+        var form = $('form[data-action="search"]');
+        form.selectAll({
+            selector: form.find(':checkbox[data-selectall="category[]"]'),
+            checkboxes: form.find(':checkbox[name="category[]"]')
+        });
     });
 </script>
