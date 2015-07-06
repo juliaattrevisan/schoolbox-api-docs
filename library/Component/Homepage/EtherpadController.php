@@ -12,6 +12,13 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 {
 
     /**
+     * Component name
+     *
+     * @var string
+     */
+    protected $componentName = 'CollabDocs';
+
+    /**
      * The sort options made available to the dropdown
      *
      * @var array
