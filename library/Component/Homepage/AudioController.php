@@ -10,6 +10,12 @@ use Schoolbox\Resource\File\Model;
  */
 class Component_Homepage_AudioController extends Component_Homepage_ControllerAbstract
 {
+    /**
+     * Component name
+     *
+     * @var string
+     */
+    protected $componentName = 'Audio';
 
     /**
      * @var AllowedFile
