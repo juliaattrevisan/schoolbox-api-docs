@@ -11,6 +11,13 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
 {
 
     /**
+     * Component name
+     *
+     * @var string
+     */
+    protected $componentName = 'RSS Feed';
+
+    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
@@ -30,7 +37,6 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
         if (!parent::loadTemplate($templateHandle, 'rss')) {
             return false;
         }
-        $this->parseConfig();
 
         $this->setBlock($templateHandle, 'rss_stories', 'rss_block');
         $this->setBlock('rss_stories', 'rss_date', 'rss_date_block');
@@ -41,15 +47,17 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
         $rss->setLimit($this->getConfig('size'));
         $rss->stream();
 
-        // Set up feed info
-        $this->setVar(
-            array(
-                'RSS_NAME' => Scrub::text($rss->getTitle()),
-                'RSS_LINK' => $rss->getLink(),
-            )
-        );
+        $title = Scrub::text($rss->getTitle());
 
-        $this->setVar('rss_block', '');
+        if (strlen($title)) {
+            $this->setComponentName($title);
+        }
+
+        // Set up feed info
+        $this->setVar(array(
+            'RSS_LINK' => $rss->getLink(),
+            'rss_block' => '',
+        ));
 
         // Process each item in feed
         $allRss      = $rss->getOutput();
@@ -87,6 +95,10 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
         } else {
             $this->setVar('rss_block', '');
         }
+
+        /* Need rss name injected here
+         */
+        $this->parseConfig();
 
         return true; // everything went according to plan
     }
