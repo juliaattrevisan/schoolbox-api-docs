@@ -1,40 +1,67 @@
 <h1>Bookings: {{ start.getLongDateOnly() }} – {{ end.getLongDateOnly() }}</h1>
 
-<table class="fullwidth table">
-    <thead>
-    <tr>
-        <th>Start</th>
-        <th>End</th>
-        <th>Name</th>
-        <th>Venue</th>
-        <th>Notes</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for booking in bookingList %}
-    <tr>
-        <td>
-            <time datetime="{{ booking.getEvent().getStartDateTime().getDatabase() }}">
-                {{ booking.getEvent().getStartDateTime().getLocal() }}
-            </time>
-        </td>
-        <td>
-            <time datetime="{{ booking.getEvent().getEndDateTime().getDatabase() }}">
-                {{ booking.getEvent().getEndDateTime().getLocal() }}
-            </time>
-        </td>
-        <td>
-            <a href="{{ routeLookup('resourceBooking.edit', {id: booking.getId()}) }}">
-                {{ booking.getName() }}
-            </a>
-        </td>
-        <td>
-            <a href="{{ routeLookup('resourceItem.read', {id: booking.getResource().getId()}) }}">
-                {% include "@resourceItem/sub/itemName.twig" with {item: booking.getResource()} %}
-            </a>
-        </td>
-        <td>{{ booking.getNotes()|purify }}</td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
+<div class="directory">
+    <table class="fullwidth table" data-sortable>
+        <thead>
+        <tr>
+            <th>Start</th>
+            <th>End</th>
+            <th>Name</th>
+            <th>Venue</th>
+            <th>Notes</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for booking in bookingList %}
+            <tr>
+                <td>
+                    <time datetime="{{ booking.getEvent().getStartDateTime().getDatabase() }}">
+                        {{ booking.getEvent().getStartDateTime().getLocal() }}
+                    </time>
+                </td>
+                <td>
+                    <time datetime="{{ booking.getEvent().getEndDateTime().getDatabase() }}">
+                        {{ booking.getEvent().getEndDateTime().getLocal() }}
+                    </time>
+                </td>
+                <td>
+                    <a href="{{ routeLookup('resourceBooking.edit', {id: booking.getId()}) }}">
+                        {{ booking.getName() }}
+                    </a>
+                </td>
+                <td>
+                    <a href="{{ routeLookup('resourceItem.read', {id: booking.getResource().getId()}) }}">
+                        {% include "@resourceItem/sub/itemName.twig" with {item: booking.getResource()} %}
+                    </a>
+                </td>
+                <td>{{ booking.getNotes()|purify }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.widgets.js"></script>
+<script type="text/javascript">
+    $.tablesorter.addParser({
+        id: 'datetime',
+        is: function() { return false },
+        format: function(value, table, cell) {
+            return $(cell).find('time').attr('datetime')
+        },
+        type: 'text'
+    });
+    $('[data-sortable]').tablesorter({
+        headers:{
+            0:{sorter:'datetime'},
+            1:{sorter:'datetime'},
+            4:{sorter:false}
+        },
+        widgets:['zebra'],
+        widgetZebra:{
+            css:["", "dark"]
+        },
+        cssHeader:"directory-sorter"
+    });
+</script>
