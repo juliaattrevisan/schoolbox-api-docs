@@ -11,13 +11,19 @@
 namespace SocialStream;
 
 use Schoolbox\Resource\Browser\NodeFactory;
+use Schoolbox\User;
 
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 $page = new \SitePage();
 
 /* Current User
  */
-$currentUser = \Schoolbox\UserMapper::getInstance()->findById($_SESSION['id']);
+$currentUser = $_SESSION['user'];
+
+// Assume there actually is a logged-in user!
+if (!($currentUser instanceof User)) {
+    $currentUser = new User();
+}
 
 /* Delete a post
  */
@@ -64,7 +70,7 @@ else {
 	/* Compile some misc data
 	 */
 	$data = array_merge($_POST, array(
-		'ownerId'     => $_SESSION['id'],
+		'ownerId'     => $currentUser->getId(),
 		'requestTime' => \Alaress_Date_Format::now(),
 	));
 
