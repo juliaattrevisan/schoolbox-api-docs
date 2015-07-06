@@ -644,6 +644,9 @@ table{
 		.eleven-column{
 			@media #{$small-up} { @include grid-column(11); }	
 		}
+		.twelve-column{
+			@media #{$small-up} { @include grid-column(12); }	
+		}
 		// Column with thumbnail - No Padding
 		.one-column.thumbnail{
 			padding: 0;
@@ -655,7 +658,8 @@ table{
 		.three-column,
 		.nine-column,
 		.ten-column,
-		.eleven-column{
+		.eleven-column,
+		.twelve-column{
 			@media #{$small-up} {
 				padding: rem-calc(($base-font-size - 8));
 			}
