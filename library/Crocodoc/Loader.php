@@ -90,10 +90,10 @@ class Loader
         $result = json_decode($this->getCurl()->getResult());
 
         if($this->getCurl()->getErrors()) {
-            throw Exception($this->getCurl()->getErrors());
+            throw new \Exception($this->getCurl()->getErrors());
         }
         else if(isset($result->error)) {
-            throw Exception($result->error);
+            throw new \Exception($result->error);
         }
         else {
             return "https://crocodoc.com/view/{$result->session}";
