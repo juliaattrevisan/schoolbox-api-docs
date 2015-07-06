@@ -8,6 +8,14 @@
  */
 class Component_Homepage_FolderListController extends Component_Homepage_ControllerAbstract
 {
+
+    /**
+     * Component name
+     * 
+     * @var string
+     */
+    protected $componentName = 'Folders';
+
     /**
      * @var Group
      */
@@ -112,7 +120,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
 
         $this->setvar(
             array(
-                'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Folders',
+                'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName(),
                 'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
                 'COMPONENT_CONFIG_SRC_NAME' => $this->source->getName(),
                 'COMPONENT_HANDLE'          => strtolower($templateHandle)
